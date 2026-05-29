@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.onboardingbranddesignupdate
+package com.duckduckgo.app.onboarding
 
 import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
 import com.duckduckgo.di.scopes.AppScope
@@ -23,20 +23,13 @@ import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
 
 @ContributesRemoteFeature(
     scope = AppScope::class,
-    featureName = "onboardingBrandDesignUpdate",
+    featureName = "customDuckAiOnboarding",
 )
-interface OnboardingBrandDesignUpdateToggles {
+interface CustomDuckAiOnboardingFeature {
 
-    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun self(): Toggle
 
-    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
-    fun brandDesignUpdate(): Toggle
-
-    /**
-     * Gates the new fire animation work: new Inferno default in Data Clearing
-     * settings + bottom-sheet Lottie swap.
-     */
-    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
-    fun fireAnimationUpdate(): Toggle
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun introAnimation(): Toggle
 }

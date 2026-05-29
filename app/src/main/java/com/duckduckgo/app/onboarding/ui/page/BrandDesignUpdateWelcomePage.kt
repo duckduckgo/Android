@@ -26,8 +26,10 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.ActivityNotFoundException
 import android.content.Intent
+import android.graphics.Typeface
 import android.graphics.drawable.AnimatedVectorDrawable
 import android.os.Bundle
+import android.util.TypedValue
 import android.view.ContextThemeWrapper
 import android.view.LayoutInflater
 import android.view.View
@@ -40,6 +42,8 @@ import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.content.ContextCompat
+import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.ViewGroupCompat
 import androidx.core.view.WindowInsetsCompat
@@ -56,6 +60,9 @@ import androidx.lifecycle.lifecycleScope
 import androidx.transition.ChangeBounds
 import androidx.transition.TransitionListenerAdapter
 import androidx.transition.TransitionManager
+import com.airbnb.lottie.FontAssetDelegate
+import com.airbnb.lottie.LottieProperty
+import com.airbnb.lottie.model.KeyPath
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ContentOnboardingWelcomePageUpdateBinding
@@ -82,6 +89,7 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.common.ui.view.TypeAnimationTextView
 import com.duckduckgo.common.ui.view.addBottomShadow
+import com.duckduckgo.common.ui.view.appendIconToText
 import com.duckduckgo.common.ui.view.text.DaxTextView
 import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.ui.viewbinding.viewBinding
@@ -93,6 +101,8 @@ import com.duckduckgo.common.utils.extensions.preventWidows
 import com.duckduckgo.common.utils.extensions.showKeyboard
 import com.duckduckgo.di.scopes.FragmentScope
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
@@ -101,6 +111,7 @@ import logcat.LogPriority.WARN
 import logcat.asLog
 import logcat.logcat
 import javax.inject.Inject
+import com.duckduckgo.fonts.R as FontsR
 import com.duckduckgo.mobile.android.R as CommonR
 
 @InjectWith(FragmentScope::class)
@@ -126,6 +137,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
         ViewModelProvider(this, viewModelFactory)[BrandDesignUpdatePageViewModel::class.java]
     }
 
+    private val introInProgress = MutableStateFlow(false)
     private var introAnimatorSet: AnimatorSet? = null
     private var outroAnimatorSet: AnimatorSet? = null
     private var backgroundIntroAnimatorSet: AnimatorSet? = null
@@ -274,8 +286,17 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
             interpolator = fadeEasing
         }
 
+        val animators = mutableListOf<android.animation.Animator>(logoFade, textFade)
+        if (viewModel.viewState.value.isDuckAiIntroAnimationEnabled) {
+            val duckAiIntroFade = ObjectAnimator.ofFloat(binding.duckAiIntroAnimation, View.ALPHA, 1f, 0f).apply {
+                duration = OUTRO_FADE_DURATION
+                interpolator = fadeEasing
+            }
+            animators += duckAiIntroFade
+        }
+
         return AnimatorSet().apply {
-            playTogether(logoFade, textFade)
+            playTogether(animators)
         }
     }
 
@@ -307,7 +328,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
         }
     }
 
-    private fun playIntroAnimation() {
+    private fun playIntroAnimation(isDuckAiIntroAnimationEnabled: Boolean) {
         binding.backgroundPrimary.setMinFrame(BACKGROUND_MIN_FRAME)
 
         backgroundIntroAnimatorSet = buildBackgroundIntroAnimatorSet()
@@ -324,13 +345,72 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
             }
             addAnimatorListener(object : AnimatorListenerAdapter() {
                 override fun onAnimationEnd(animation: android.animation.Animator) {
-                    viewModel.onIntroAnimationFinished()
+                    if (!isDuckAiIntroAnimationEnabled) {
+                        introInProgress.value = false
+                        viewModel.onIntroAnimationFinished()
+                    }
                 }
             })
             playAnimation()
         }
         introAnimatorSet = buildIntroAnimatorSet().apply {
+            addListener(object : AnimatorListenerAdapter() {
+                private var cancelled = false
+
+                override fun onAnimationCancel(animation: Animator) {
+                    cancelled = true
+                }
+
+                override fun onAnimationEnd(animation: Animator) {
+                    if (cancelled || !isDuckAiIntroAnimationEnabled) return
+                    prepareDuckAiIntroAnimation()
+                    binding.duckAiIntroAnimation.isVisible = true
+                    binding.duckAiIntroAnimation.addAnimatorListener(object : AnimatorListenerAdapter() {
+                        override fun onAnimationEnd(animation: Animator) {
+                            introInProgress.value = false
+                            viewModel.onIntroAnimationFinished()
+                        }
+                    })
+                    binding.duckAiIntroAnimation.playAnimation()
+                }
+            })
             start()
+        }
+    }
+
+    private fun prepareDuckAiIntroAnimation() {
+        binding.duckAiIntroAnimation.apply {
+            // compute the view height so that it scales correctly with font size
+            val targetTextPx = TypedValue.applyDimension(
+                TypedValue.COMPLEX_UNIT_SP,
+                DUCK_AI_INTRO_TEXT_SP,
+                resources.displayMetrics,
+            )
+            val viewHeightPx = (targetTextPx * DUCK_AI_INTRO_CANVAS_H / DUCK_AI_INTRO_TEXT_CANVAS_UNITS).toInt()
+            updateLayoutParams {
+                height = viewHeightPx
+            }
+
+            setFontAssetDelegate(object : FontAssetDelegate() {
+                override fun fetchFont(fontFamily: String): Typeface {
+                    return ResourcesCompat.getFont(context, FontsR.font.ducksansdisplay_regular)
+                        ?: Typeface.DEFAULT
+                }
+            })
+
+            val textColor = resolveOnboardingTextPrimary(context)
+            addValueCallback(KeyPath("**", "Duck.ai"), LottieProperty.COLOR) { textColor }
+            addValueCallback(KeyPath("**", "+"), LottieProperty.COLOR) { textColor }
+        }
+    }
+
+    private fun resolveOnboardingTextPrimary(context: android.content.Context): Int {
+        val typedValue = TypedValue()
+        context.theme.resolveAttribute(CommonR.attr.onboardingTextPrimary, typedValue, true)
+        return if (typedValue.resourceId != 0) {
+            ContextCompat.getColor(context, typedValue.resourceId)
+        } else {
+            typedValue.data
         }
     }
 
@@ -360,6 +440,13 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
             scaleY = 1f
             setMinFrame(BACKGROUND_MIN_FRAME)
             progress = 1f
+        }
+        if (viewModel.viewState.value.isDuckAiIntroAnimationEnabled) {
+            prepareDuckAiIntroAnimation()
+            with(binding.duckAiIntroAnimation) {
+                isVisible = true
+                progress = 1f
+            }
         }
     }
 
@@ -424,12 +511,20 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
         binding.daxDialogCta.cardContainer.setOnClickListener { viewModel.onDialogTapped() }
         binding.root.setOnClickListener { viewModel.onBackgroundTapped() }
 
-        viewModel.viewState
+        combine(viewModel.viewState, introInProgress) { state, inProgress -> state to inProgress }
             .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
-            .onEach { state ->
+            .onEach { (state, inProgress) ->
                 when {
-                    !state.hasPlayedIntroAnimation -> binding.root.doOnLayout { playIntroAnimation() }
-                    state.hasPlayedIntroAnimation && state.currentDialog == null -> snapToIntroEndState()
+                    inProgress -> {
+                        // Suppress snap while the intro animator is mid-flight in this view;
+                        // the animator end listener will flip the flag and re-emit through combine.
+                    }
+                    state.hasPlayedIntroAnimation && state.currentDialog == null -> {
+                        snapToIntroEndState()
+                        // Idempotent in the VM; also covers rotation-mid-intro where the
+                        // animator end listener never fires.
+                        viewModel.onIntroAnimationFinished()
+                    }
                     isAnimating -> { /* animation in progress — ignore re-emissions from onDialogAnimationStarted() */ }
                     state.hasAnimatedCurrentDialog -> {
                         val dialog = state.currentDialog ?: return@onEach
@@ -441,6 +536,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                                 inputScreenSelected = state.inputScreenSelected,
                                 maxPageCount = state.maxPageCount,
                                 comparisonChartConfig = state.currentComparisonChartConfig(),
+                                isCustomAiCopy = state.isCustomAiOnboardingCopyEnabled,
                             )
                         }
                     }
@@ -453,6 +549,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                             inputScreenSelected = state.inputScreenSelected,
                             maxPageCount = state.maxPageCount,
                             comparisonChartConfig = state.currentComparisonChartConfig(),
+                            isCustomAiCopy = state.isCustomAiOnboardingCopyEnabled,
                         )
                     }
                 }
@@ -505,6 +602,13 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                             addWidgetItem.setCheckedSilently(command.widgetChecked)
                         }
                     }
+                    is BrandDesignUpdatePageViewModel.Command.PlayIntroAnimation -> {
+                        introInProgress.value = true
+                        viewModel.onIntroAnimationStarted()
+                        binding.root.doOnLayout {
+                            playIntroAnimation(isDuckAiIntroAnimationEnabled = command.withDuckAi)
+                        }
+                    }
                 }
             }
             .launchIn(viewLifecycleOwner.lifecycleScope)
@@ -514,6 +618,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
         super.onDestroyView()
 
         introAnimatorSet?.cancel()
+        introInProgress.value = false
         outroAnimatorSet?.cancel()
         backgroundIntroAnimatorSet?.cancel()
         walkingDaxAnimatorSet?.cancel()
@@ -584,6 +689,10 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
         binding.welcomeScreenWalkingDax.cancelAnimation()
         binding.bottomWingAnimation.cancelAnimation()
         binding.leftWingAnimation.cancelAnimation()
+        binding.duckAiIntroAnimation.apply {
+            removeAllAnimatorListeners()
+            cancelAnimation()
+        }
     }
 
     override fun onResume() {
@@ -633,6 +742,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
         inputScreenSelected: Boolean,
         maxPageCount: Int,
         comparisonChartConfig: ComparisonChartConfig,
+        isCustomAiCopy: Boolean,
     ) {
         context?.let {
             isAnimating = true
@@ -663,15 +773,18 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                             getString(R.string.syncRestoreDialogBrandDesignBody1).preventWidows().html(requireContext())
                         binding.daxDialogCta.primaryCta.text = getString(R.string.syncRestoreDialogPrimaryCta)
                         binding.daxDialogCta.secondaryCta.text = getString(R.string.syncRestoreDialogSecondaryCta)
+                    } else if (isCustomAiCopy) {
+                        binding.daxDialogCta.welcomeContent.bodyText1.text =
+                            getString(R.string.preOnboardingWelcomeDialogBodyCustomAi).preventWidows().html(requireContext())
                     } else {
                         binding.daxDialogCta.welcomeContent.bodyText1.text =
                             getString(R.string.preOnboardingWelcomeDialogBody1).preventWidows()
                         binding.daxDialogCta.welcomeContent.bodyText2.text =
                             getString(R.string.preOnboardingWelcomeDialogBody2).preventWidows()
                     }
-                    // SYNC_RESTORE shows no second body line; INITIAL/INITIAL_REINSTALL_USER do.
+                    // SYNC_RESTORE shows no second body line; custom-AI copy is a single sentence and also hides it; INITIAL/INITIAL_REINSTALL_USER otherwise show both.
                     // Set isVisible explicitly so a prior dialog that hid bodyText2 doesn't leak into this one.
-                    binding.daxDialogCta.welcomeContent.bodyText2.isVisible = !isSyncRestore
+                    binding.daxDialogCta.welcomeContent.bodyText2.isVisible = !isSyncRestore && !isCustomAiCopy
 
                     val showWalkingDax = applyWalkingDaxLayout()
                     binding.daxDialogCta.cardView.setArrowDepthFraction(if (showWalkingDax) 1f else 0f)
@@ -692,7 +805,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                                         ObjectAnimator.ofFloat(binding.daxDialogCta.primaryCta, View.ALPHA, 1f)
                                             .setDuration(DIALOG_CONTENT_FADE_IN_DURATION),
                                     )
-                                    if (!isSyncRestore) {
+                                    if (!isSyncRestore && !isCustomAiCopy) {
                                         animators += ObjectAnimator.ofFloat(binding.daxDialogCta.welcomeContent.bodyText2, View.ALPHA, 1f)
                                             .setDuration(DIALOG_CONTENT_FADE_IN_DURATION)
                                     }
@@ -939,14 +1052,23 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                                 binding.daxDialogCta.welcomeContent.hiddenTitleText.text =
                                     getString(R.string.preOnboardingDaxDialog3Title)
                                 binding.daxDialogCta.welcomeContent.bodyText1.text =
-                                    getString(R.string.preOnboardingDaxDialog3Text).preventWidows().html(requireContext())
+                                    if (isCustomAiCopy) {
+                                        requireContext().appendIconToText(
+                                            getString(R.string.preOnboardingDaxDialog3TextCustomAi).preventWidows(),
+                                            CommonR.drawable.ic_ai_chat_16,
+                                        )
+                                    } else {
+                                        getString(R.string.preOnboardingDaxDialog3Text).preventWidows().html(requireContext())
+                                    }
                                 binding.daxDialogCta.welcomeContent.bodyText2.isGone = true
 
                                 binding.daxDialogCta.welcomeContent.titleText.cancelAnimation()
                                 binding.daxDialogCta.welcomeContent.titleText.text = ""
                                 binding.daxDialogCta.welcomeContent.titleText.alpha = 1f
 
-                                binding.daxDialogCta.primaryCta.text = getString(R.string.preOnboardingDaxDialog3Button)
+                                binding.daxDialogCta.primaryCta.text = getString(
+                                    if (isCustomAiCopy) R.string.preOnboardingDaxDialog3ButtonCustomAi else R.string.preOnboardingDaxDialog3Button,
+                                )
                                 binding.daxDialogCta.secondaryCta.text = getString(R.string.preOnboardingDaxDialog3SecondaryButton)
 
                                 binding.daxDialogCta.welcomeContent.titleText.startOnboardingTypingAnimation(
@@ -1283,6 +1405,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
         inputScreenSelected: Boolean,
         maxPageCount: Int,
         comparisonChartConfig: ComparisonChartConfig,
+        isCustomAiCopy: Boolean,
     ) {
         snapToIntroEndState()
 
@@ -1293,6 +1416,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
 
                 binding.logoAnimation.alpha = 0f
                 binding.welcomeTitle.alpha = 0f
+                binding.duckAiIntroAnimation.alpha = 0f
 
                 backgroundAnimator?.snapTo(OnboardingBackgroundStep.Welcome)
 
@@ -1325,15 +1449,18 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                         getString(R.string.syncRestoreDialogBrandDesignBody1).preventWidows().html(requireContext())
                     binding.daxDialogCta.primaryCta.text = getString(R.string.syncRestoreDialogPrimaryCta)
                     binding.daxDialogCta.secondaryCta.text = getString(R.string.syncRestoreDialogSecondaryCta)
+                } else if (isCustomAiCopy) {
+                    binding.daxDialogCta.welcomeContent.bodyText1.text =
+                        getString(R.string.preOnboardingWelcomeDialogBodyCustomAi).preventWidows().html(requireContext())
                 } else {
                     binding.daxDialogCta.welcomeContent.bodyText1.text =
                         getString(R.string.preOnboardingWelcomeDialogBody1).preventWidows()
                     binding.daxDialogCta.welcomeContent.bodyText2.text =
                         getString(R.string.preOnboardingWelcomeDialogBody2).preventWidows()
                 }
-                // SYNC_RESTORE shows no second body line; INITIAL/INITIAL_REINSTALL_USER do.
+                // SYNC_RESTORE shows no second body line; custom-AI copy is a single sentence and also hides it; INITIAL/INITIAL_REINSTALL_USER otherwise show both.
                 // Set isVisible explicitly so a prior dialog that hid bodyText2 doesn't leak into this one.
-                binding.daxDialogCta.welcomeContent.bodyText2.isVisible = !isSyncRestore
+                binding.daxDialogCta.welcomeContent.bodyText2.isVisible = !isSyncRestore && !isCustomAiCopy
                 binding.daxDialogCta.welcomeContent.bodyText1.alpha = 1f
                 binding.daxDialogCta.welcomeContent.bodyText2.alpha = 1f
                 binding.daxDialogCta.primaryCta.alpha = 1f
@@ -1349,6 +1476,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                 populateComparisonChart(comparisonChartConfig)
                 binding.logoAnimation.alpha = 0f
                 binding.welcomeTitle.alpha = 0f
+                binding.duckAiIntroAnimation.alpha = 0f
 
                 backgroundAnimator?.snapTo(OnboardingBackgroundStep.ComparisonChart)
 
@@ -1410,15 +1538,25 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
             SKIP_ONBOARDING_OPTION -> {
                 binding.logoAnimation.alpha = 0f
                 binding.welcomeTitle.alpha = 0f
+                binding.duckAiIntroAnimation.alpha = 0f
                 backgroundAnimator?.snapTo(OnboardingBackgroundStep.Welcome)
 
                 binding.daxDialogCta.comparisonChartContent.root.isVisible = false
                 binding.daxDialogCta.welcomeContent.root.isVisible = true
                 binding.daxDialogCta.welcomeContent.hiddenTitleText.text = getString(R.string.preOnboardingDaxDialog3Title)
                 binding.daxDialogCta.welcomeContent.bodyText1.text =
-                    getString(R.string.preOnboardingDaxDialog3Text).preventWidows().html(requireContext())
+                    if (isCustomAiCopy) {
+                        requireContext().appendIconToText(
+                            getString(R.string.preOnboardingDaxDialog3TextCustomAi).preventWidows(),
+                            CommonR.drawable.ic_ai_chat_16,
+                        )
+                    } else {
+                        getString(R.string.preOnboardingDaxDialog3Text).preventWidows().html(requireContext())
+                    }
                 binding.daxDialogCta.welcomeContent.bodyText2.isGone = true
-                binding.daxDialogCta.primaryCta.text = getString(R.string.preOnboardingDaxDialog3Button)
+                binding.daxDialogCta.primaryCta.text = getString(
+                    if (isCustomAiCopy) R.string.preOnboardingDaxDialog3ButtonCustomAi else R.string.preOnboardingDaxDialog3Button,
+                )
                 binding.daxDialogCta.secondaryCta.text = getString(R.string.preOnboardingDaxDialog3SecondaryButton)
                 binding.daxDialogCta.secondaryCta.visibility = View.INVISIBLE
 
@@ -1452,6 +1590,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
             ADDRESS_BAR_POSITION -> {
                 binding.logoAnimation.alpha = 0f
                 binding.welcomeTitle.alpha = 0f
+                binding.duckAiIntroAnimation.alpha = 0f
 
                 // Address bar already visible — just update the selected option without re-running full dialog setup.
                 if (binding.daxDialogCta.addressBarContent.root.isVisible) {
@@ -1567,6 +1706,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
 
                 binding.logoAnimation.alpha = 0f
                 binding.welcomeTitle.alpha = 0f
+                binding.duckAiIntroAnimation.alpha = 0f
 
                 backgroundAnimator?.snapTo(OnboardingBackgroundStep.InputType)
 
@@ -1615,6 +1755,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
             QUICK_SETUP -> {
                 binding.logoAnimation.alpha = 0f
                 binding.welcomeTitle.alpha = 0f
+                binding.duckAiIntroAnimation.alpha = 0f
 
                 // Quick setup already visible — observeQuickSetupSelection keeps the row state in sync, nothing else needs re-running.
                 if (binding.daxDialogCta.reinstallerQuickSetupContent.root.isVisible) {
@@ -1682,6 +1823,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
 
                 binding.logoAnimation.alpha = 0f
                 binding.welcomeTitle.alpha = 0f
+                binding.duckAiIntroAnimation.alpha = 0f
 
                 binding.leftWingAnimation.isVisible = false
                 binding.bottomWingAnimation.isVisible = false
@@ -1929,14 +2071,20 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
     }
 
     private fun playWalkingDaxAnimation() {
-        walkingDaxDelayedRunnable = binding.welcomeScreenWalkingDax.postDelayed(WALKING_DAX_DELAY) {
+        val daxView = binding.welcomeScreenWalkingDax
+        walkingDaxDelayedRunnable = daxView.postDelayed(WALKING_DAX_DELAY) {
+            // Defensive: the View's postDelayed message can outlive the fragment view
+            // if onDestroyView's removeCallbacks didn't catch it. Avoid re-resolving
+            // `binding` here (it would throw if the view is already detached) and
+            // skip the work entirely once we're detached.
+            if (view == null) return@postDelayed
             walkingDaxAnimatorSet = AnimatorSet().apply {
                 interpolator = WELCOME_DAX_INTERPOLATOR
                 playTogether(
-                    ObjectAnimator.ofFloat(binding.welcomeScreenWalkingDax, View.ALPHA, 0f, 1f)
+                    ObjectAnimator.ofFloat(daxView, View.ALPHA, 0f, 1f)
                         .setDuration(WALKING_DAX_FADE_DURATION),
                     ObjectAnimator.ofFloat(
-                        binding.welcomeScreenWalkingDax,
+                        daxView,
                         View.TRANSLATION_X,
                         -WALKING_DAX_START_X_DP.toPx().toFloat(),
                         -WALKING_DAX_FINAL_X_DP.toPx().toFloat(),
@@ -1944,7 +2092,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                 )
                 start()
             }
-            binding.welcomeScreenWalkingDax.playAnimation()
+            daxView.playAnimation()
         }
     }
 
@@ -2297,7 +2445,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
 
     private fun BrandDesignUpdatePageViewModel.ViewState.currentComparisonChartConfig(): ComparisonChartConfig = when (this.currentDialog) {
         AI_COMPARISON_CHART -> ComparisonChartConfig.Ai
-        else -> ComparisonChartConfig.Default
+        else -> ComparisonChartConfig.Browser(isCustomAiCopy = this.isCustomAiOnboardingCopyEnabled)
     }
 
     private fun populateComparisonChart(config: ComparisonChartConfig) {
@@ -2344,6 +2492,12 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
     companion object {
         private const val GUIDELINE_START_PERCENT = 0.5f
         private const val GUIDELINE_END_PERCENT = 0.39125f
+
+        // Sizes the Duck.ai intro Lottie so its baked-in text renders at DUCK_AI_INTRO_TEXT_SP.
+        // Derived from the JSON's font-size scale chain: 24 * 3.4 * 0.78 * 1.085 ≈ 69 canvas units at end state.
+        private const val DUCK_AI_INTRO_TEXT_SP = 24f
+        private const val DUCK_AI_INTRO_CANVAS_H = 260f
+        private const val DUCK_AI_INTRO_TEXT_CANVAS_UNITS = 69f
 
         private const val TEXT_INTRO_DELAY = 400L
         private const val TEXT_INTRO_OPACITY_DURATION = 400L
