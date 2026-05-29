@@ -1130,33 +1130,36 @@ class BrowserTabFragment :
             }
         }
 
-        webView?.let { webView ->
-            if (webView.isShown) {
-                webView.onResume()
-            } else if (swipingTabsFeature.isEnabled) {
-                // Sometimes a tab is brought back from the background but the WebView is not shown yet due to
-                // ViewPager page change delay; this makes sure the WebView is resumed when it is shown.
-                webView.post {
-                    if (webView.isShown) {
-                        webView.ensureVisible()
-                        webView.onResume()
-                    }
+        webView?.resumeWhenVisible()
+    }
+
+    /**
+     * Resumes the WebView once it is shown. After tab switcher or fragment hide/show the view can be
+     * not laid out yet; posting handles that race. A follow-up scroll nudge works around WebView
+     * compositor bugs that leave loaded content blank until the user scrolls.
+     */
+    private fun DuckDuckGoWebView.resumeWhenVisible() {
+        if (isShown) {
+            onResume()
+            scheduleContentRepaint()
+        } else {
+            post {
+                if (isShown) {
+                    onResume()
+                    scheduleContentRepaint()
                 }
-            } else {
-                logcat { "WebView is not shown, not resuming" }
             }
         }
     }
 
-    // This is a hack to make sure the WebView content is always rendered when the fragment is resumed
-    private fun DuckDuckGoWebView.ensureVisible() =
+    private fun DuckDuckGoWebView.scheduleContentRepaint() =
         postDelayed(100) {
-            if (swipingTabsFeature.isEnabled) {
+            if (isShown) {
                 wiggle()
             }
         }
 
-    // This is a hack to make sure the WebView content is always rendered when the fragment is resumed
+    // Nudge the compositor to repaint after pause/resume (e.g. tab switch, TabSwitcher return).
     private fun DuckDuckGoWebView.wiggle() {
         scrollBy(0, 1)
         scrollBy(0, -1)
@@ -2217,7 +2220,7 @@ class BrowserTabFragment :
         binding.browserLayout.show()
         webViewContainer.show()
         webView?.show()
-        webView?.onResume()
+        webView?.resumeWhenVisible()
         errorView.errorLayout.gone()
         sslErrorView.gone()
         maliciousWarningView.gone()
@@ -4889,7 +4892,7 @@ class BrowserTabFragment :
 
     private fun onTabVisible() {
         if (!isAdded) return
-        webView?.onResume()
+        webView?.resumeWhenVisible()
         launchDownloadMessagesJob()
         viewModel.onViewVisible()
     }
