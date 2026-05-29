@@ -311,10 +311,10 @@ class NativeInputModeWidget @JvmOverloads constructor(
                         is NativeInputModeWidgetViewModel.Command.UpdatePluginVisibility -> {
                             for (containerId in command.containerIds) {
                                 if (containerId == R.id.startChatContainer) continue
-                                findViewById<FrameLayout?>(containerId)?.isVisible = command.visible
+                                findViewById<FrameLayout?>(containerId)?.isVisible = command.visible && !isStreaming
                             }
                             findViewById<FrameLayout?>(R.id.attachmentsContainer)?.isVisible =
-                                command.visible && hasAttachments
+                                command.visible && hasAttachments && !isStreaming
                         }
                     }
                 }
@@ -460,6 +460,16 @@ class NativeInputModeWidget @JvmOverloads constructor(
             (inputField.hasFocus() || previewEnterFocus || isStreaming) &&
             !suppress
         bottomRow.visibility = if (visible) VISIBLE else GONE
+    }
+
+    private fun updateControlsVisibility() {
+        val show = shouldShowInputControls(isChatTabSelected(), isStreaming)
+        findViewById<View?>(R.id.modelPickerContainer)?.isVisible = show
+        findViewById<View?>(R.id.reasoningModePickerContainer)?.isVisible = show
+        findViewById<View?>(R.id.optionsButtonContainer)?.isVisible = show
+        findViewById<View?>(R.id.attachmentsContainer)?.isVisible = show && hasAttachments
+        // attach button keeps its own supportsUpload gate; setImageButtonVisible folds in !isStreaming
+        setImageButtonVisible(isChatTabSelected() && supportsUpload)
     }
 
     private fun updateToggleVisibilityForState() {
@@ -1115,6 +1125,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
             floatingSubmitContainer?.visibility = if (attachmentLimitExceeded) GONE else VISIBLE
         }
         updateBottomRowVisibility()
+        updateControlsVisibility()
         updateSendButtonVisibility()
         updateVoiceButtonVisibility()
         updateNewLineButtonVisibility()
@@ -1135,7 +1146,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
     }
 
     override fun setImageButtonVisible(visible: Boolean) {
-        findViewById<FrameLayout?>(R.id.attachButtonContainer)?.isVisible = visible
+        findViewById<FrameLayout?>(R.id.attachButtonContainer)?.isVisible = visible && !isStreaming
     }
 
     override fun setFloatingSubmitContainer(container: ViewGroup) {
