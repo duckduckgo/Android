@@ -231,7 +231,7 @@ class RealNativeInputOmnibarController(
             cardElevation = if (isTop) 6f.toPx() else 3f.toPx()
         }
         omnibarView.findViewById<MaterialCardView?>(R.id.omniBarContainer)
-            ?.setCardBackgroundColor(ctx.getColorFromAttr(com.duckduckgo.mobile.android.R.attr.daxColorWindow))
+            ?.setCardBackgroundColor(ctx.getColorFromAttr(com.duckduckgo.mobile.android.R.attr.daxColorOmnibarCard))
     }
 
     private fun restoreBottomOmnibarPosition() {
