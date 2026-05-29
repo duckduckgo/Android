@@ -598,7 +598,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
 
     private fun applyTrailingButtonMargin() {
         findViewById<View?>(R.id.inputModeWidgetLayout)?.updateLayoutParams<MarginLayoutParams> {
-            marginEnd = resources.getDimensionPixelSize(R.dimen.inputScreenOmnibarCardMarginHorizontal)
+            marginEnd = resources.getDimensionPixelSize(R.dimen.nativeInputModeWidgetMarginHorizontal)
         }
     }
 
