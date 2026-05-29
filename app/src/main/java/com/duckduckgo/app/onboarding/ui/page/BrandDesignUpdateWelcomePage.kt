@@ -392,7 +392,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
 
             setFontAssetDelegate(object : FontAssetDelegate() {
                 override fun fetchFont(fontFamily: String): Typeface {
-                    return ResourcesCompat.getFont(requireContext(), FontsR.font.ducksansdisplay_regular)
+                    return ResourcesCompat.getFont(context, FontsR.font.ducksansdisplay_regular)
                         ?: Typeface.DEFAULT
                 }
             })
