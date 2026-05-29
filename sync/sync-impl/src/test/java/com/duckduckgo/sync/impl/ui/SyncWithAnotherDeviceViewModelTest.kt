@@ -37,7 +37,6 @@ import com.duckduckgo.sync.TestSyncFixtures.validLoginKeys
 import com.duckduckgo.sync.impl.AccountErrorCodes.ALREADY_SIGNED_IN
 import com.duckduckgo.sync.impl.AccountErrorCodes.LOGIN_FAILED
 import com.duckduckgo.sync.impl.Clipboard
-import com.duckduckgo.sync.impl.DispatchOutcome
 import com.duckduckgo.sync.impl.ExchangeResult.AccountSwitchingRequired
 import com.duckduckgo.sync.impl.ExchangeResult.LoggedIn
 import com.duckduckgo.sync.impl.InvitationCode
@@ -58,7 +57,6 @@ import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Runner
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2State
 import com.duckduckgo.sync.impl.exchange.v2.LocalTrigger
 import com.duckduckgo.sync.impl.exchange.v2.PairingRole
-import kotlinx.coroutines.flow.filter
 import com.duckduckgo.sync.impl.pixels.SyncPixels
 import com.duckduckgo.sync.impl.pixels.SyncPixels.ScreenType.SYNC_EXCHANGE
 import com.duckduckgo.sync.impl.ui.SyncWithAnotherActivityViewModel.Command
@@ -67,6 +65,7 @@ import com.duckduckgo.sync.impl.ui.SyncWithAnotherActivityViewModel.Command.AskT
 import com.duckduckgo.sync.impl.ui.SyncWithAnotherActivityViewModel.Command.LoginSuccess
 import com.duckduckgo.sync.impl.ui.SyncWithAnotherActivityViewModel.Command.ShowError
 import com.duckduckgo.sync.impl.ui.SyncWithAnotherActivityViewModel.Command.SwitchAccountSuccess
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert
 import org.junit.Assert.assertTrue

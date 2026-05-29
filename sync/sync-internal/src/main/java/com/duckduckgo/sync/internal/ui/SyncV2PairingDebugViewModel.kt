@@ -221,6 +221,12 @@ class SyncV2PairingDebugViewModel @Inject constructor(
                 // intermediate emission here avoids double-prompting.
                 appendDevToolLog("v2 dispatch → ${outcome::class.simpleName} (handled by dev tool's direct observation)")
             }
+            is DispatchOutcome.LinkingCodeReady -> {
+                // No-op: the dev tool drives Presenter sessions directly via runner.startPresent()
+                // (onRunPresentClicked), not through dispatcher.presentV2(). This branch only exists
+                // to keep the when block exhaustive.
+                appendDevToolLog("v2 dispatch → LinkingCodeReady (handled by dev tool's direct observation)")
+            }
         }
     }
 

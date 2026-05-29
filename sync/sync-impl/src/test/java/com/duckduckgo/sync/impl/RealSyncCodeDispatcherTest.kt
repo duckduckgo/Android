@@ -570,7 +570,10 @@ class RealSyncCodeDispatcherTest {
 
     @Test fun `presentV2 defensively maps Joiner_Done to LoggedIn`() = runTest {
         val outcome = withTimeoutOrNull(1000) {
-            val job = async(start = kotlinx.coroutines.CoroutineStart.UNDISPATCHED) { dispatcher.presentV2().first { it !is DispatchOutcome.LinkingCodeReady } }
+            val job =
+                async(
+                    start = kotlinx.coroutines.CoroutineStart.UNDISPATCHED,
+                ) { dispatcher.presentV2().first { it !is DispatchOutcome.LinkingCodeReady } }
             runnerEventsFlow.emit(transition(from = ExchangeV2State.Joiner.Waiting, to = ExchangeV2State.Joiner.Done))
             job.await()
         }
