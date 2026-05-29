@@ -89,6 +89,7 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.common.ui.view.TypeAnimationTextView
 import com.duckduckgo.common.ui.view.addBottomShadow
+import com.duckduckgo.common.ui.view.appendIconToText
 import com.duckduckgo.common.ui.view.text.DaxTextView
 import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.ui.viewbinding.viewBinding
@@ -535,6 +536,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                                 inputScreenSelected = state.inputScreenSelected,
                                 maxPageCount = state.maxPageCount,
                                 comparisonChartConfig = state.currentComparisonChartConfig(),
+                                isCustomAiCopy = state.isCustomAiOnboardingCopyEnabled,
                             )
                         }
                     }
@@ -547,6 +549,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                             inputScreenSelected = state.inputScreenSelected,
                             maxPageCount = state.maxPageCount,
                             comparisonChartConfig = state.currentComparisonChartConfig(),
+                            isCustomAiCopy = state.isCustomAiOnboardingCopyEnabled,
                         )
                     }
                 }
@@ -739,6 +742,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
         inputScreenSelected: Boolean,
         maxPageCount: Int,
         comparisonChartConfig: ComparisonChartConfig,
+        isCustomAiCopy: Boolean,
     ) {
         context?.let {
             isAnimating = true
@@ -769,10 +773,13 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                             getString(R.string.syncRestoreDialogBrandDesignBody1).preventWidows().html(requireContext())
                         binding.daxDialogCta.primaryCta.text = getString(R.string.syncRestoreDialogPrimaryCta)
                         binding.daxDialogCta.secondaryCta.text = getString(R.string.syncRestoreDialogSecondaryCta)
+                    } else if (isCustomAiCopy) {
+                        binding.daxDialogCta.welcomeContent.bodyText1.text =
+                            getString(R.string.preOnboardingWelcomeDialogBodyCustomAi).preventWidows().html(requireContext())
                     }
-                    // SYNC_RESTORE shows no second body line; INITIAL/INITIAL_REINSTALL_USER do.
+                    // SYNC_RESTORE shows no second body line; custom-AI copy is a single sentence and also hides it; INITIAL/INITIAL_REINSTALL_USER otherwise show both.
                     // Set isVisible explicitly so a prior dialog that hid bodyText2 doesn't leak into this one.
-                    binding.daxDialogCta.welcomeContent.bodyText2.isVisible = !isSyncRestore
+                    binding.daxDialogCta.welcomeContent.bodyText2.isVisible = !isSyncRestore && !isCustomAiCopy
 
                     val showWalkingDax = applyWalkingDaxLayout()
                     binding.daxDialogCta.cardView.setArrowDepthFraction(if (showWalkingDax) 1f else 0f)
@@ -793,7 +800,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                                         ObjectAnimator.ofFloat(binding.daxDialogCta.primaryCta, View.ALPHA, 1f)
                                             .setDuration(DIALOG_CONTENT_FADE_IN_DURATION),
                                     )
-                                    if (!isSyncRestore) {
+                                    if (!isSyncRestore && !isCustomAiCopy) {
                                         animators += ObjectAnimator.ofFloat(binding.daxDialogCta.welcomeContent.bodyText2, View.ALPHA, 1f)
                                             .setDuration(DIALOG_CONTENT_FADE_IN_DURATION)
                                     }
@@ -1040,14 +1047,23 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                                 binding.daxDialogCta.welcomeContent.hiddenTitleText.text =
                                     getString(R.string.preOnboardingDaxDialog3Title)
                                 binding.daxDialogCta.welcomeContent.bodyText1.text =
-                                    getString(R.string.preOnboardingDaxDialog3Text).preventWidows().html(requireContext())
+                                    if (isCustomAiCopy) {
+                                        requireContext().appendIconToText(
+                                            getString(R.string.preOnboardingDaxDialog3TextCustomAi).preventWidows(),
+                                            CommonR.drawable.ic_ai_chat_16,
+                                        )
+                                    } else {
+                                        getString(R.string.preOnboardingDaxDialog3Text).preventWidows().html(requireContext())
+                                    }
                                 binding.daxDialogCta.welcomeContent.bodyText2.isGone = true
 
                                 binding.daxDialogCta.welcomeContent.titleText.cancelAnimation()
                                 binding.daxDialogCta.welcomeContent.titleText.text = ""
                                 binding.daxDialogCta.welcomeContent.titleText.alpha = 1f
 
-                                binding.daxDialogCta.primaryCta.text = getString(R.string.preOnboardingDaxDialog3Button)
+                                binding.daxDialogCta.primaryCta.text = getString(
+                                    if (isCustomAiCopy) R.string.preOnboardingDaxDialog3ButtonCustomAi else R.string.preOnboardingDaxDialog3Button,
+                                )
                                 binding.daxDialogCta.secondaryCta.text = getString(R.string.preOnboardingDaxDialog3SecondaryButton)
 
                                 binding.daxDialogCta.welcomeContent.titleText.startOnboardingTypingAnimation(
@@ -1384,6 +1400,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
         inputScreenSelected: Boolean,
         maxPageCount: Int,
         comparisonChartConfig: ComparisonChartConfig,
+        isCustomAiCopy: Boolean,
     ) {
         snapToIntroEndState()
 
@@ -1427,10 +1444,13 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                         getString(R.string.syncRestoreDialogBrandDesignBody1).preventWidows().html(requireContext())
                     binding.daxDialogCta.primaryCta.text = getString(R.string.syncRestoreDialogPrimaryCta)
                     binding.daxDialogCta.secondaryCta.text = getString(R.string.syncRestoreDialogSecondaryCta)
+                } else if (isCustomAiCopy) {
+                    binding.daxDialogCta.welcomeContent.bodyText1.text =
+                        getString(R.string.preOnboardingWelcomeDialogBodyCustomAi).preventWidows().html(requireContext())
                 }
-                // SYNC_RESTORE shows no second body line; INITIAL/INITIAL_REINSTALL_USER do.
+                // SYNC_RESTORE shows no second body line; custom-AI copy is a single sentence and also hides it; INITIAL/INITIAL_REINSTALL_USER otherwise show both.
                 // Set isVisible explicitly so a prior dialog that hid bodyText2 doesn't leak into this one.
-                binding.daxDialogCta.welcomeContent.bodyText2.isVisible = !isSyncRestore
+                binding.daxDialogCta.welcomeContent.bodyText2.isVisible = !isSyncRestore && !isCustomAiCopy
                 binding.daxDialogCta.welcomeContent.bodyText1.alpha = 1f
                 binding.daxDialogCta.welcomeContent.bodyText2.alpha = 1f
                 binding.daxDialogCta.primaryCta.alpha = 1f
@@ -1515,9 +1535,18 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                 binding.daxDialogCta.welcomeContent.root.isVisible = true
                 binding.daxDialogCta.welcomeContent.hiddenTitleText.text = getString(R.string.preOnboardingDaxDialog3Title)
                 binding.daxDialogCta.welcomeContent.bodyText1.text =
-                    getString(R.string.preOnboardingDaxDialog3Text).preventWidows().html(requireContext())
+                    if (isCustomAiCopy) {
+                        requireContext().appendIconToText(
+                            getString(R.string.preOnboardingDaxDialog3TextCustomAi).preventWidows(),
+                            CommonR.drawable.ic_ai_chat_16,
+                        )
+                    } else {
+                        getString(R.string.preOnboardingDaxDialog3Text).preventWidows().html(requireContext())
+                    }
                 binding.daxDialogCta.welcomeContent.bodyText2.isGone = true
-                binding.daxDialogCta.primaryCta.text = getString(R.string.preOnboardingDaxDialog3Button)
+                binding.daxDialogCta.primaryCta.text = getString(
+                    if (isCustomAiCopy) R.string.preOnboardingDaxDialog3ButtonCustomAi else R.string.preOnboardingDaxDialog3Button,
+                )
                 binding.daxDialogCta.secondaryCta.text = getString(R.string.preOnboardingDaxDialog3SecondaryButton)
                 binding.daxDialogCta.secondaryCta.visibility = View.INVISIBLE
 
@@ -2406,7 +2435,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
 
     private fun BrandDesignUpdatePageViewModel.ViewState.currentComparisonChartConfig(): ComparisonChartConfig = when (this.currentDialog) {
         AI_COMPARISON_CHART -> ComparisonChartConfig.Ai
-        else -> ComparisonChartConfig.Default
+        else -> ComparisonChartConfig.Browser(isCustomAiCopy = this.isCustomAiOnboardingCopyEnabled)
     }
 
     private fun populateComparisonChart(config: ComparisonChartConfig) {
