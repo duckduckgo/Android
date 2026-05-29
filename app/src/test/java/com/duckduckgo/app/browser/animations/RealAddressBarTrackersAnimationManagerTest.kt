@@ -17,6 +17,7 @@
 package com.duckduckgo.app.browser.animations
 
 import android.annotation.SuppressLint
+import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.FakeToggleStore
 import com.duckduckgo.feature.toggles.api.FeatureToggles
@@ -104,6 +105,40 @@ class RealAddressBarTrackersAnimationManagerTest {
         val result = testee.isFeatureEnabled()
 
         assertFalse(result)
+    }
+
+    @Test
+    fun whenSoftwareRenderingModeEnabledThenFlowEmitsTrue() = runTest {
+        fakeFeatureToggle.softwareRenderingMode().setRawStoredState(State(enable = true))
+
+        testee.softwareRenderingModeEnabled.test {
+            assertTrue(awaitItem())
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenSoftwareRenderingModeDisabledThenFlowEmitsFalse() = runTest {
+        fakeFeatureToggle.softwareRenderingMode().setRawStoredState(State(enable = false))
+
+        testee.softwareRenderingModeEnabled.test {
+            assertFalse(awaitItem())
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenSoftwareRenderingModeChangesThenFlowEmitsNewValue() = runTest {
+        fakeFeatureToggle.softwareRenderingMode().setRawStoredState(State(enable = true))
+
+        testee.softwareRenderingModeEnabled.test {
+            assertTrue(awaitItem())
+
+            fakeFeatureToggle.softwareRenderingMode().setRawStoredState(State(enable = false))
+            assertFalse(awaitItem())
+
+            cancelAndIgnoreRemainingEvents()
+        }
     }
 
     @Test

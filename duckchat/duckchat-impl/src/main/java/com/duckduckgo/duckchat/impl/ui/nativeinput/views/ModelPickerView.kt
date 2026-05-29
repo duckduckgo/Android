@@ -40,9 +40,16 @@ import com.duckduckgo.common.ui.view.divider.HorizontalDivider
 import com.duckduckgo.common.ui.view.text.DaxTextView
 import com.duckduckgo.common.utils.ViewViewModelFactory
 import com.duckduckgo.di.scopes.ViewScope
+import com.duckduckgo.duckchat.api.nativeinput.NativeInputState.InputContext
+import com.duckduckgo.duckchat.api.nativeinput.NativeInputStateProvider
+import com.duckduckgo.duckchat.impl.DuckChatConstants.DUCK_AI_FEATURE_PAGE
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.models.AIChatModel
 import com.duckduckgo.duckchat.impl.models.ModelState
+import com.duckduckgo.duckchat.impl.nativeinput.NativeInputHost
+import com.duckduckgo.navigation.api.GlobalActivityStarter
+import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionPurchase
+import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionUpgrade
 import com.google.android.material.chip.Chip
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.coroutines.Job
@@ -51,8 +58,14 @@ import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
 
 interface ModelPicker {
+    var onMenuShown: (() -> Unit)?
+    var onMenuDismissed: (() -> Unit)?
+    var onModelSelected: (() -> Unit)?
     fun getSelectedModelId(): String?
+    fun isImageGenerationSupported(): Boolean
+    fun isWebSearchSupported(): Boolean
     fun setPickerEnabled(enabled: Boolean)
+    fun setHost(host: NativeInputHost)
 }
 
 @InjectWith(ViewScope::class)
@@ -64,12 +77,27 @@ class ModelPickerView @JvmOverloads constructor(
 
     @Inject lateinit var viewModelFactory: ViewViewModelFactory
 
+    @Inject lateinit var globalActivityStarter: GlobalActivityStarter
+
+    @Inject lateinit var nativeInputStateProvider: NativeInputStateProvider
+
     private val viewModel by lazy {
         ViewModelProvider(findViewTreeViewModelStoreOwner()!!, viewModelFactory)[ModelPickerViewModel::class.java]
     }
     private val chip: Chip by lazy { findViewById(R.id.modelPickerChip) }
     private var stateJob: Job? = null
+    private var inputContextJob: Job? = null
+    private var commandJob: Job? = null
     private var popupWindow: PopupWindow? = null
+    private var lastObservedModelId: String? = null
+
+    // Mirrors the input context from the per-tab native input state so currentSurface() can be
+    // read synchronously from popup callbacks. Updated by observeInputContext().
+    private var lastInputContext: InputContext = InputContext.BROWSER
+    private lateinit var host: NativeInputHost
+    override var onMenuShown: (() -> Unit)? = null
+    override var onMenuDismissed: (() -> Unit)? = null
+    override var onModelSelected: (() -> Unit)? = null
 
     init {
         inflate(context, R.layout.view_model_picker, this)
@@ -77,11 +105,25 @@ class ModelPickerView @JvmOverloads constructor(
 
     override fun getSelectedModelId(): String? = viewModel.getSelectedModelId()
 
+    override fun isImageGenerationSupported(): Boolean {
+        if (!isAttachedToWindow) return true
+        return viewModel.isImageGenerationSupported()
+    }
+
+    override fun isWebSearchSupported(): Boolean {
+        if (!isAttachedToWindow) return true
+        return viewModel.isWebSearchSupported()
+    }
+
     private var pickerEnabled = false
 
     override fun setPickerEnabled(enabled: Boolean) {
         this.pickerEnabled = enabled
         if (isAttachedToWindow) updateVisibility()
+    }
+
+    override fun setHost(host: NativeInputHost) {
+        this.host = host
     }
 
     private fun updateVisibility() {
@@ -97,24 +139,60 @@ class ModelPickerView @JvmOverloads constructor(
 
         viewModel.fetchModels()
         observeState()
+        observeInputContext()
+    }
+
+    private fun observeInputContext() {
+        val scope = findViewTreeLifecycleOwner()?.lifecycleScope ?: return
+        inputContextJob?.cancel()
+        inputContextJob = nativeInputStateProvider.state
+            .onEach { lastInputContext = it.inputContext }
+            .launchIn(scope)
     }
 
     private fun observeState() {
         val scope = findViewTreeLifecycleOwner()?.lifecycleScope ?: return
         stateJob?.cancel()
+        lastObservedModelId = viewModel.state.value.selectedModelId
         stateJob = viewModel.state
             .onEach { state ->
                 state.selectedModelShortName?.let { chip.text = it }
                 updateVisibility()
+                val newId = state.selectedModelId
+                if (newId != null && newId != lastObservedModelId) {
+                    lastObservedModelId = newId
+                    onModelSelected?.invoke()
+                }
             }
             .launchIn(scope)
+
+        commandJob?.cancel()
+        commandJob = viewModel.commands
+            .onEach { processCommand(it) }
+            .launchIn(scope)
     }
+
+    private fun processCommand(command: UpsellCommand) {
+        when (command) {
+            is UpsellCommand.LaunchPurchase ->
+                globalActivityStarter.start(context, SubscriptionPurchase(origin = command.origin, featurePage = DUCK_AI_FEATURE_PAGE))
+            is UpsellCommand.LaunchUpgrade ->
+                globalActivityStarter.start(context, SubscriptionUpgrade(origin = command.origin))
+        }
+    }
+
+    private fun currentSurface(): PickerSurface =
+        when (lastInputContext) {
+            InputContext.DUCK_AI, InputContext.DUCK_AI_CONTEXTUAL -> PickerSurface.MODEL_PICKER_DUCK_AI_TAB
+            InputContext.BROWSER -> PickerSurface.MODEL_PICKER_ADDRESS_BAR
+        }
 
     private fun showMenu() {
         val state = viewModel.state.value
         if (state.models.isEmpty()) return
 
         viewModel.menuShowing = true
+        onMenuShown?.invoke()
         showPopupWindow(state)
     }
 
@@ -162,12 +240,17 @@ class ModelPickerView @JvmOverloads constructor(
     private fun onPopupDismissed() {
         viewModel.menuShowing = false
         popupWindow = null
+        onMenuDismissed?.invoke()
     }
 
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
         stateJob?.cancel()
         stateJob = null
+        inputContextJob?.cancel()
+        inputContextJob = null
+        commandJob?.cancel()
+        commandJob = null
         dismissPopup()
     }
 
@@ -196,13 +279,9 @@ class ModelPickerView @JvmOverloads constructor(
             setLeadingIcon(viewModel.getIconResForModel(model))
             if (selected) setTrailingIconResource(com.duckduckgo.mobile.android.R.drawable.ic_check_24)
             configureTrailingIcon()
-            if (model.isAccessible) {
-                setOnClickListener {
-                    viewModel.selectModel(model)
-                    popup.dismiss()
-                }
-            } else {
-                setDisabled()
+            setOnClickListener {
+                viewModel.onModelTapped(model, currentSurface())
+                popup.dismiss()
             }
             layoutParams = LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
         }

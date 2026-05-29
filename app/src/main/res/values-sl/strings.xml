@@ -597,6 +597,7 @@
     <!-- Fire Animation settings -->
     <string name="settingsFireAnimation">Animacija za gumb ogenj</string>
     <string name="settingsHeroFireAnimation">Pekel</string>
+    <string name="settingsHeroFireAnimationClassic">Klasični inferno</string>
     <string name="settingsHeroWaterAnimation">Vodni mehurčki</string>
     <string name="settingsHeroAbstractAnimation">Zračni tok</string>
     <string name="settingsNoneAnimation">Brez</string>
@@ -880,6 +881,9 @@
     <string name="preOnboardingDaxDialog3Button">Začni brskanje</string>
     <string name="preOnboardingAddressBarTitle">Kam naj postavim vašo naslovno vrstico?</string>
     <string name="preOnboardingAddressBarOkButton">Naslednji</string>
+    <string name="preOnboardingAddressBarPositionTop">Vrh</string>
+    <string name="preOnboardingAddressBarPositionBottom">Spodaj</string>
+    <string name="preOnboardingAddressBarPositionSplit">Razdeli</string>
     <string name="highlightsPreOnboardingAddressBarOption1Title">Zgoraj (privzeto)</string>
     <string name="highlightsPreOnboardingAddressBarOption1Description">Preprosto vidno</string>
     <string name="highlightsPreOnboardingAddressBarOption2Title">Spodaj</string>
@@ -902,6 +906,8 @@
     <string name="onboardingSitesDaxDialogOption3">ebay.com</string>
     <string name="onboardingSitesDaxDialogOption4">Preseneti me!</string>
     <string name="onboardingSerpDaxDialogDescription"><![CDATA[To je iskanje <b>DuckDuckGo Search</b>! Zasebno. Hitro. Z manj oglasi.]]></string>
+    <string name="onboardingSerpDaxDialogBrandDesignTitle">To je DuckDuckGo Search!</string>
+    <string name="onboardingSerpDaxDialogBrandDesignDescription">Zasebno. Hitro. Z manj oglasi.</string>
     <string name="onboardingSerpDaxDialogButton">Razumem!</string>
     <string name="onboardingSitesSuggestionsDaxDialogTitle">Nato obiščite spletno mesto!</string>
     <plurals name="onboardingTrackersBlockedDialogDescription">
@@ -1024,6 +1030,10 @@
     <string name="syncRestoreDialogPrimaryCta">Obnovi moje stvari</string>
     <string name="syncRestoreDialogSecondaryCta">Preskoči</string>
 
+    <!-- Sync Restore (brand-design onboarding) -->
+    <string name="syncRestoreDialogBrandDesignTitle">Nadaljujte tam, kjer ste končali na DuckDuckGo.</string>
+    <string name="syncRestoreDialogBrandDesignBody1">Shranjeni zaznamki, gesla in drugo so pripravljeni.</string>
+
     <!-- PDF download tooltip -->
     <string name="pdfDownloadTooltipText">Prenesi PDF</string>
 
@@ -1031,4 +1041,11 @@
     <string name="copyLinkText">Kopiraj besedilo povezave</string>
     <string name="linkTextCopied">Besedilo povezave je bilo kopirano</string>
     <string name="linkTextCopyFailed">Besedila povezave ni bilo mogoče kopirati</string>
+
+    <string name="preOnboardingWelcomeDialogTitle">Pozdravljeni.</string>
+    <string name="preOnboardingWelcomeDialogBody1">Ste pripravljeni na hitrejši brskalnik,\nki daje nadzor vam?</string>
+    <string name="preOnboardingWelcomeDialogBody2">Umetna inteligenca je vedno neobvezna,\nzaščita zasebnosti pa je vedno vklopljena.</string>
+    <string name="onboardingStepIndicatorText" instruction="a counter above our instructions in onboarding that tells a user what step they are on">%1$d od %2$d</string>
+    <string name="onboardingSearchDaxDialogOption1Quoted" instruction="translate &apos;duck&apos; too.">Kako reči »raca« v angleščini</string>
+    <string name="onboardingSearchDaxDialogOption1EnglishQuoted" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">Kako reči »raca« v španščini</string>
 </resources>

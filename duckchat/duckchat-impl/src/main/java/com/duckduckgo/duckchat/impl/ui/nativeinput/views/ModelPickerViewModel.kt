@@ -27,9 +27,15 @@ import com.duckduckgo.duckchat.impl.models.AIChatModel
 import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
 import com.duckduckgo.duckchat.impl.models.ModelProvider
 import com.duckduckgo.duckchat.impl.models.ModelState
+import com.duckduckgo.duckchat.impl.models.Tool
 import com.duckduckgo.duckchat.impl.models.UserTier
+import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
+import logcat.logcat
 import javax.inject.Inject
 
 data class ModelSection(@StringRes val headerRes: Int?, val models: List<AIChatModel>)
@@ -45,41 +51,44 @@ class ModelPickerViewModel @Inject constructor(
 
     fun getSelectedModelId(): String? = modelManager.getSelectedModelId()
 
+    fun getSelectedModel(): AIChatModel? = state.value.run { models.find { it.id == selectedModelId } }
+
+    fun isImageGenerationSupported(): Boolean = getSelectedModel()?.supportsTool(Tool.IMAGE_GENERATION) ?: true
+
+    fun isWebSearchSupported(): Boolean = getSelectedModel()?.supportsTool(Tool.WEB_SEARCH) ?: true
+
     fun fetchModels() {
         viewModelScope.launch {
             modelManager.fetchModels()
         }
     }
 
-    fun selectModel(model: AIChatModel) {
-        viewModelScope.launch {
-            modelManager.selectModel(model)
+    private val command = Channel<UpsellCommand>(capacity = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
+    val commands: Flow<UpsellCommand> = command.receiveAsFlow()
+
+    fun onModelTapped(model: AIChatModel, surface: PickerSurface) {
+        if (model.isAccessible) {
+            viewModelScope.launch { modelManager.selectModel(model) }
+            return
         }
+        val userTier = modelManager.modelState.value.userTier
+        val requiredTier = model.requiredTier ?: run {
+            logcat { "Duck.ai picker: tapped model has no public required tier (id=${model.id}, accessTier=${model.accessTier}), ignoring." }
+            return
+        }
+        routeUpsell(userTier, requiredTier, surface.origin)?.let { command.trySend(it) }
     }
 
-    fun buildSections(state: ModelState): List<ModelSection> =
-        if (state.userTier != UserTier.FREE) getSubscriberModels(state.models) else getFreeModels(state.models)
-
-    private fun getSubscriberModels(models: List<AIChatModel>): List<ModelSection> {
-        val advanced = models.filter { !it.accessTier.contains(FREE_TIER) }
-        val basic = models.filter { it.accessTier.contains(FREE_TIER) }
+    fun buildSections(state: ModelState): List<ModelSection> {
+        val byTier = state.models.groupBy { it.requiredTier }
+        // Models with a null requiredTier (non-public access tiers only, e.g. "internal") have no
+        // section to land in and are intentionally hidden from the picker.
         return listOfNotNull(
-            advanced.toSectionOrNull(R.string.duckAiModelPickerAdvancedModels),
-            basic.toSectionOrNull(R.string.duckAiModelPickerBasicModels),
+            byTier[UserTier.FREE].orEmpty().toSectionOrNull(headerRes = null),
+            byTier[UserTier.PLUS].orEmpty().toSectionOrNull(R.string.duckAiModelPickerPlusModels),
+            byTier[UserTier.PRO].orEmpty().toSectionOrNull(R.string.duckAiModelPickerProModels),
         )
     }
-
-    private fun getFreeModels(models: List<AIChatModel>): List<ModelSection> {
-        val accessible = models.filter { it.isAccessible }
-        val premium = models.filter { !it.isAccessible }
-        return listOfNotNull(
-            accessible.toSectionOrNull(headerRes = null),
-            premium.toSectionOrNull(headerRes = null),
-        )
-    }
-
-    private fun List<AIChatModel>.toSectionOrNull(@StringRes headerRes: Int?): ModelSection? =
-        takeIf { it.isNotEmpty() }?.let { ModelSection(headerRes, it) }
 
     @DrawableRes
     fun getIconResForModel(model: AIChatModel): Int? = when (model.provider) {
@@ -91,7 +100,6 @@ class ModelPickerViewModel @Inject constructor(
         ModelProvider.UNKNOWN -> null
     }
 
-    companion object {
-        private const val FREE_TIER = "free"
-    }
+    private fun List<AIChatModel>.toSectionOrNull(@StringRes headerRes: Int?): ModelSection? =
+        takeIf { it.isNotEmpty() }?.let { ModelSection(headerRes, it) }
 }

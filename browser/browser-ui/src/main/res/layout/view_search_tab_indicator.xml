@@ -30,7 +30,7 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        tools:src="@drawable/ic_search_tab_selector"/>
+        android:src="@drawable/ic_search_tab_selector"/>
 
     <com.duckduckgo.common.ui.view.text.DaxTextView
         android:id="@+id/tab_title"

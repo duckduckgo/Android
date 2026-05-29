@@ -596,6 +596,32 @@ class RealPirRunStateHandlerTest {
         }
 
     @Test
+    fun whenHandleBrokerRecordEmailConfirmationNeededAndExtractedProfileEmailEmptyThenUsesGeneratedEmail() =
+        runTest {
+            val state =
+                BrokerRecordEmailConfirmationNeeded(
+                    broker = testBroker,
+                    extractedProfile = testExtractedProfile.copy(email = ""),
+                    attemptId = "c9982ded-021a-4251-9e03-2c58b130410f",
+                    lastActionId = "hello82ded-021a-4251-9e03-2c58b130410f",
+                    durationMs = testTotalTimeMillis,
+                    currentActionAttemptCount = 1,
+                    generatedEmail = "generated@duck.com",
+                )
+            whenever(mockRepository.getBrokerForName(testBrokerName)).thenReturn(testBroker)
+
+            testee.handleState(state)
+
+            verify(mockJobRecordUpdater).markOptOutAsWaitingForEmailConfirmation(
+                profileQueryId = testProfileQueryId,
+                extractedProfileId = testExtractedProfileId,
+                brokerName = testBrokerName,
+                email = "generated@duck.com",
+                attemptId = "c9982ded-021a-4251-9e03-2c58b130410f",
+            )
+        }
+
+    @Test
     fun whenHandleBrokerRecordEmailConfirmationStartedThenUpdateEmailJobRecordAndEmitPixel() =
         runTest {
             val state =

@@ -587,6 +587,7 @@
     <!-- Fire Animation settings -->
     <string name="settingsFireAnimation">Animasjon for brannknappen</string>
     <string name="settingsHeroFireAnimation">Inferno</string>
+    <string name="settingsHeroFireAnimationClassic">Inferno Classic</string>
     <string name="settingsHeroWaterAnimation">Malstrøm</string>
     <string name="settingsHeroAbstractAnimation">Luftstrøm</string>
     <string name="settingsNoneAnimation">Ingen</string>
@@ -844,6 +845,9 @@
     <string name="preOnboardingDaxDialog3Button">Begynn å surfe</string>
     <string name="preOnboardingAddressBarTitle">Hvor skal jeg plassere adressefeltet?</string>
     <string name="preOnboardingAddressBarOkButton">Neste</string>
+    <string name="preOnboardingAddressBarPositionTop">Topp</string>
+    <string name="preOnboardingAddressBarPositionBottom">Nederst</string>
+    <string name="preOnboardingAddressBarPositionSplit">Del</string>
     <string name="highlightsPreOnboardingAddressBarOption1Title">Topp (standard)</string>
     <string name="highlightsPreOnboardingAddressBarOption1Description">Lett å se</string>
     <string name="highlightsPreOnboardingAddressBarOption2Title">Nederst</string>
@@ -866,6 +870,8 @@
     <string name="onboardingSitesDaxDialogOption3">ebay.com</string>
     <string name="onboardingSitesDaxDialogOption4">Overrask meg!</string>
     <string name="onboardingSerpDaxDialogDescription"><![CDATA[Det er <b>DuckDuckGo Search</b>! Privat. Raskt. Færre annonser.]]></string>
+    <string name="onboardingSerpDaxDialogBrandDesignTitle">Det er DuckDuckGo Search!</string>
+    <string name="onboardingSerpDaxDialogBrandDesignDescription">Privat. Raskt. Færre annonser.</string>
     <string name="onboardingSerpDaxDialogButton">Skjønner!</string>
     <string name="onboardingSitesSuggestionsDaxDialogTitle">Nå kan du prøve å besøke et nettsted!</string>
     <plurals name="onboardingTrackersBlockedDialogDescription">
@@ -984,6 +990,10 @@
     <string name="syncRestoreDialogPrimaryCta">Gjenopprett innholdet mitt</string>
     <string name="syncRestoreDialogSecondaryCta">Hopp over</string>
 
+    <!-- Sync Restore (brand-design onboarding) -->
+    <string name="syncRestoreDialogBrandDesignTitle">La oss fortsette der du slapp på DuckDuckGo.</string>
+    <string name="syncRestoreDialogBrandDesignBody1">Dine lagrede bokmerker, passord osv. er klare.</string>
+
     <!-- PDF download tooltip -->
     <string name="pdfDownloadTooltipText">Last ned PDF</string>
 
@@ -991,4 +1001,11 @@
     <string name="copyLinkText">Kopier lenketekst</string>
     <string name="linkTextCopied">Lenketeksten er kopiert</string>
     <string name="linkTextCopyFailed">Kunne ikke kopiere lenketeksten</string>
+
+    <string name="preOnboardingWelcomeDialogTitle">Heisann.</string>
+    <string name="preOnboardingWelcomeDialogBody1">Klar for en raskere nettleser som du har kontroll over?</string>
+    <string name="preOnboardingWelcomeDialogBody2">AI er alltid valgfritt, og personvern er alltid på.</string>
+    <string name="onboardingStepIndicatorText" instruction="a counter above our instructions in onboarding that tells a user what step they are on">%1$d av %2$d</string>
+    <string name="onboardingSearchDaxDialogOption1Quoted" instruction="translate &apos;duck&apos; too.">hvordan si «and» på engelsk</string>
+    <string name="onboardingSearchDaxDialogOption1EnglishQuoted" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">hvordan si «and» på spansk</string>
 </resources>

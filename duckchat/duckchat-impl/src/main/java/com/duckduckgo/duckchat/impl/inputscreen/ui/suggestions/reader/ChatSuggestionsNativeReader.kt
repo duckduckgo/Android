@@ -17,10 +17,13 @@
 package com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.reader
 
 import com.duckduckgo.duckchat.impl.feature.DuckAiChatHistoryFeature
+import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
+import com.duckduckgo.duckchat.impl.feature.maxHistoryCount
 import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.ChatSuggestion
+import com.duckduckgo.duckchat.impl.models.ChatType
+import com.duckduckgo.duckchat.impl.models.toChatType
 import com.duckduckgo.duckchat.store.impl.DuckAiChat
 import com.duckduckgo.duckchat.store.impl.DuckAiChatStore
-import org.json.JSONObject
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
@@ -30,11 +33,13 @@ import javax.inject.Inject
 class ChatSuggestionsNativeReader @Inject constructor(
     private val store: DuckAiChatStore,
     private val feature: DuckAiChatHistoryFeature,
+    private val duckChatFeature: DuckChatFeature,
 ) : ChatSuggestionsReader {
 
     override suspend fun fetchSuggestions(query: String): List<ChatSuggestion> {
-        val maxSuggestions = getMaxHistoryCount()
+        val maxSuggestions = feature.maxHistoryCount()
         val recentCutoff = LocalDateTime.now().minusDays(RECENT_DAYS_CUTOFF).toLocalDate().atStartOfDay()
+        val typeIconEnabled = duckChatFeature.chatSuggestionTypeIcon().isEnabled()
 
         return store.getChats()
             .filter { chat ->
@@ -52,15 +57,12 @@ class ChatSuggestionsNativeReader @Inject constructor(
                     title = chat.title,
                     lastEdit = parseLastEdit(chat.lastEdit),
                     pinned = chat.pinned,
+                    type = if (typeIconEnabled) chat.toChatType() else ChatType.Discussion,
                 )
             }
     }
 
     override fun tearDown() = Unit // no WebView to clean up
-
-    private fun getMaxHistoryCount(): Int = runCatching {
-        feature.self().getSettings()?.let { JSONObject(it).optInt("maxHistoryCount", DEFAULT_MAX_SUGGESTIONS) }
-    }.getOrNull() ?: DEFAULT_MAX_SUGGESTIONS
 
     private fun parseLastEdit(lastEditStr: String): LocalDateTime {
         if (lastEditStr.isEmpty()) return LocalDateTime.MIN
@@ -72,7 +74,6 @@ class ChatSuggestionsNativeReader @Inject constructor(
     }
 
     companion object {
-        private const val DEFAULT_MAX_SUGGESTIONS = 10
         private const val RECENT_DAYS_CUTOFF = 7L
     }
 }

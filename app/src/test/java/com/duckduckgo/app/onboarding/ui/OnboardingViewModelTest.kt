@@ -19,18 +19,29 @@ package com.duckduckgo.app.onboarding.ui
 import android.annotation.SuppressLint
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.duckduckgo.app.browser.newaddressbaroption.RealNewAddressBarOptionManager
+import com.duckduckgo.app.cta.db.DismissedCtaDao
+import com.duckduckgo.app.cta.model.CtaId
+import com.duckduckgo.app.cta.model.DismissedCta
 import com.duckduckgo.app.onboarding.store.AppStage
+import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.onboarding.ui.FullOnboardingSkipper.ViewState
+import com.duckduckgo.app.onboarding.ui.OnboardingViewModel.ExtendedOnboardingFlow.DEFAULT_WITHOUT_INTRO_CTA
+import com.duckduckgo.app.onboarding.ui.OnboardingViewModel.ExtendedOnboardingFlow.DUCK_AI_FOCUSED
+import com.duckduckgo.app.onboardingbranddesignupdate.OnboardingBrandDesignUpdateToggles
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.feature.toggles.api.Toggle
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.test.runTest
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
+import org.mockito.kotlin.verifyNoMoreInteractions
 import org.mockito.kotlin.whenever
 
 @SuppressLint("DenyListedApi")
@@ -54,6 +65,14 @@ class OnboardingViewModelTest {
 
     private val newAddressBarOptionManager: RealNewAddressBarOptionManager = mock()
 
+    private val dismissedCtaDao: DismissedCtaDao = mock()
+
+    private val onboardingStore: OnboardingStore = mock()
+
+    private val onboardingBrandDesignUpdateToggles: OnboardingBrandDesignUpdateToggles = mock()
+    private val enabledToggle: Toggle = mock { on { it.isEnabled() } doReturn true }
+    private val disabledToggle: Toggle = mock { on { it.isEnabled() } doReturn false }
+
     private val testee: OnboardingViewModel by lazy {
         OnboardingViewModel(
             userStageStore = userStageStore,
@@ -62,6 +81,9 @@ class OnboardingViewModelTest {
             onboardingSkipper = onboardingSkipper,
             appBuildConfig = appBuildConfig,
             newAddressBarOptionManager = newAddressBarOptionManager,
+            dismissedCtaDao = dismissedCtaDao,
+            onboardingStore = onboardingStore,
+            onboardingBrandDesignUpdateToggles = onboardingBrandDesignUpdateToggles,
         )
     }
 
@@ -69,6 +91,41 @@ class OnboardingViewModelTest {
     fun whenOnboardingDoneThenCompleteStage() = runTest {
         testee.onOnboardingDone()
         verify(userStageStore).stageCompleted(AppStage.NEW)
+    }
+
+    @Test
+    fun whenOnboardingDoneWithDefaultFlowThenNoCtasDismissedAndDuckAiOnboardingFlowNotSet() = runTest {
+        testee.onOnboardingDone()
+
+        verifyNoInteractions(dismissedCtaDao)
+        verify(onboardingStore, never()).setDuckAiOnboardingFlow()
+    }
+
+    @Test
+    fun whenOnboardingDoneWithDuckAiFocusedFlowThenDuckAiOnboardingFlowIsSet() = runTest {
+        testee.onOnboardingDone(extendedOnboardingFlow = DUCK_AI_FOCUSED)
+
+        verify(onboardingStore).setDuckAiOnboardingFlow()
+    }
+
+    @Test
+    fun whenOnboardingDoneWithDuckAiFocusedFlowThenStandardDaxCtasAreDismissed() = runTest {
+        testee.onOnboardingDone(extendedOnboardingFlow = DUCK_AI_FOCUSED)
+
+        verify(dismissedCtaDao).insert(DismissedCta(CtaId.DAX_INTRO))
+        verify(dismissedCtaDao).insert(DismissedCta(CtaId.DAX_DIALOG_SERP))
+        verify(dismissedCtaDao).insert(DismissedCta(CtaId.DAX_DIALOG_TRACKERS_FOUND))
+        verify(dismissedCtaDao).insert(DismissedCta(CtaId.DAX_FIRE_BUTTON))
+        verify(dismissedCtaDao).insert(DismissedCta(CtaId.DAX_END))
+    }
+
+    @Test
+    fun whenOnboardingDoneWithDefaultWithoutIntroCtaFlowThenOnlyIntroCtaIsDismissed() = runTest {
+        testee.onOnboardingDone(extendedOnboardingFlow = DEFAULT_WITHOUT_INTRO_CTA)
+
+        verify(dismissedCtaDao).insert(DismissedCta(CtaId.DAX_INTRO))
+        verifyNoMoreInteractions(dismissedCtaDao)
+        verify(onboardingStore, never()).setDuckAiOnboardingFlow()
     }
 
     @Test
@@ -101,9 +158,21 @@ class OnboardingViewModelTest {
     }
 
     @Test
-    fun whenInitializePagesCalledThenBuildPageBlueprints() {
+    fun whenInitializePagesCalledAndBrandDesignUpdateDisabledThenBuildPageBlueprints() = runTest {
+        whenever(onboardingBrandDesignUpdateToggles.brandDesignUpdate()).thenReturn(disabledToggle)
+
         testee.initializePages()
+
         verify(pageLayout).buildPageBlueprints()
+    }
+
+    @Test
+    fun whenInitializePagesCalledAndBrandDesignUpdateEnabledThenBuildBrandDesignUpdatePageBlueprints() = runTest {
+        whenever(onboardingBrandDesignUpdateToggles.brandDesignUpdate()).thenReturn(enabledToggle)
+
+        testee.initializePages()
+
+        verify(pageLayout).buildBrandDesignUpdatePageBlueprints()
     }
 
     private fun configureSkipperFlow() = runTest {

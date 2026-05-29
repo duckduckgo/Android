@@ -587,6 +587,7 @@
     <!-- Fire Animation settings -->
     <string name="settingsFireAnimation">Yangın Düğmesi Animasyonu</string>
     <string name="settingsHeroFireAnimation">Ateş</string>
+    <string name="settingsHeroFireAnimationClassic">Inferno Klasik</string>
     <string name="settingsHeroWaterAnimation">Girdap</string>
     <string name="settingsHeroAbstractAnimation">Hava</string>
     <string name="settingsNoneAnimation">Yok</string>
@@ -844,6 +845,9 @@
     <string name="preOnboardingDaxDialog3Button">Gezinmeye Başla</string>
     <string name="preOnboardingAddressBarTitle">Adres çubuğu nereye yerleştirilsin?</string>
     <string name="preOnboardingAddressBarOkButton">Sonraki</string>
+    <string name="preOnboardingAddressBarPositionTop">Başa dön</string>
+    <string name="preOnboardingAddressBarPositionBottom">Alt</string>
+    <string name="preOnboardingAddressBarPositionSplit">Böl</string>
     <string name="highlightsPreOnboardingAddressBarOption1Title">Üst (Varsayılan)</string>
     <string name="highlightsPreOnboardingAddressBarOption1Description">Görmesi kolay</string>
     <string name="highlightsPreOnboardingAddressBarOption2Title">Alt</string>
@@ -866,6 +870,8 @@
     <string name="onboardingSitesDaxDialogOption3">ebay.com</string>
     <string name="onboardingSitesDaxDialogOption4">Şaşırt beni!</string>
     <string name="onboardingSerpDaxDialogDescription"><![CDATA[<b>DuckDuckGo Search</b> işte bu! Özel. Hızlı. Daha az reklam.]]></string>
+    <string name="onboardingSerpDaxDialogBrandDesignTitle">İşte DuckDuckGo Search!</string>
+    <string name="onboardingSerpDaxDialogBrandDesignDescription">Gizli. Hızlı. Daha az reklam.</string>
     <string name="onboardingSerpDaxDialogButton">Anladım!</string>
     <string name="onboardingSitesSuggestionsDaxDialogTitle">Sonra, bir siteyi ziyaret etmeyi deneyin!</string>
     <plurals name="onboardingTrackersBlockedDialogDescription">
@@ -984,6 +990,10 @@
     <string name="syncRestoreDialogPrimaryCta">Geri Yükle</string>
     <string name="syncRestoreDialogSecondaryCta">Atla</string>
 
+    <!-- Sync Restore (brand-design onboarding) -->
+    <string name="syncRestoreDialogBrandDesignTitle">DuckDuckGo\'da kaldığınız yerden devam edelim.</string>
+    <string name="syncRestoreDialogBrandDesignBody1">Kaydedilmiş yer işaretleriniz, şifreleriniz ve daha fazlası hazır.</string>
+
     <!-- PDF download tooltip -->
     <string name="pdfDownloadTooltipText">PDF indir</string>
 
@@ -991,4 +1001,11 @@
     <string name="copyLinkText">Bağlantı Metnini Kopyala</string>
     <string name="linkTextCopied">Bağlantı metni kopyalandı</string>
     <string name="linkTextCopyFailed">Bağlantı metni kopyalanamadı</string>
+
+    <string name="preOnboardingWelcomeDialogTitle">Merhaba.</string>
+    <string name="preOnboardingWelcomeDialogBody1">Kontrolü size verecek daha hızlı bir tarayıcıya hazır mısınız?</string>
+    <string name="preOnboardingWelcomeDialogBody2">Yapay zeka her zaman isteğe bağlıdır ve gizlilik koruması her zaman etkindir.</string>
+    <string name="onboardingStepIndicatorText" instruction="a counter above our instructions in onboarding that tells a user what step they are on">%1$d / %2$d</string>
+    <string name="onboardingSearchDaxDialogOption1Quoted" instruction="translate &apos;duck&apos; too.">ingilizcede \"ördek\" nasıl denir?</string>
+    <string name="onboardingSearchDaxDialogOption1EnglishQuoted" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">ispanyolcada \"ördek\" nasıl denir?</string>
 </resources>

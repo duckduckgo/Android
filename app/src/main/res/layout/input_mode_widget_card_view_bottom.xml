@@ -19,6 +19,7 @@
     android:id="@+id/inputModeBottomRoot"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:background="?daxColorSurface"
     android:layout_gravity="bottom">
 
     <!-- Negative bottom margin pulls the card down to account for the shadow -->
@@ -26,14 +27,21 @@
         android:id="@+id/inputModeWidgetCard"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="-4dp"
-        app:cardBackgroundColor="?attr/daxColorSurface"
+        android:layout_marginStart="@dimen/keyline_2"
+        android:layout_marginEnd="@dimen/keyline_2"
+        android:layout_marginBottom="@dimen/keyline_2"
+        android:layout_marginTop="@dimen/keyline_2"
+        app:cardBackgroundColor="?attr/daxColorWindow"
+        app:cardCornerRadius="26dp"
         app:cardElevation="3dp"
         app:cardUseCompatPadding="false">
 
         <com.duckduckgo.duckchat.impl.ui.nativeinput.views.NativeInputModeWidget
             android:id="@+id/inputModeWidget"
-            android:paddingHorizontal="8dp"
+            android:paddingStart="@dimen/keyline_1"
+            android:paddingTop="@dimen/keyline_2"
+            android:paddingEnd="@dimen/keyline_1"
+            android:paddingBottom="@dimen/keyline_2"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
     </com.google.android.material.card.MaterialCardView>

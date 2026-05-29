@@ -374,6 +374,45 @@
             }
         ]
     },
+    "m_dbp_scan_stage_email-get-data": {
+        "description": "Fired at the email-data polling stage of a scan, when the runner is waiting for data (e.g. a verification code) extracted from a received email.",
+        "owners": ["karlenDimla", "landomen"],
+        "triggers": ["other"],
+        "suffixes": ["daily_count_short", "form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "data_broker",
+                "description": "The URL of the broker the stage was for",
+                "type": "string"
+            },
+            {
+                "key": "parent",
+                "description": "The parent data broker of the scan",
+                "type": "string"
+            },
+            {
+                "key": "broker_version",
+                "description": "The version of the broker JSON file",
+                "type": "string"
+            },
+            {
+                "key": "duration",
+                "description": "Stage duration in milliseconds",
+                "type": "string"
+            },
+            {
+                "key": "tries",
+                "description": "The number of tries it took to complete the stage",
+                "type": "string"
+            },
+            {
+                "key": "action_id",
+                "description": "Predefined identifier of the broker action executed in this stage",
+                "type": "string"
+            }
+        ]
+    },
     "m_dbp_search_stage_main_status_success": {
         "description": "Pixel emitted when the scan is completed with results.",
         "owners": ["karlenDimla", "landomen"],
@@ -603,6 +642,45 @@
     },
     "m_dbp_optout_stage_email-generate": {
         "description": "Fired at the email generation stage of an opt-out attempt.",
+        "owners": ["karlenDimla", "landomen"],
+        "triggers": ["other"],
+        "suffixes": ["daily_count_short", "form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "data_broker",
+                "description": "The URL of the data broker that this opt-out attempt targets",
+                "type": "string"
+            },
+            {
+                "key": "parent",
+                "description": "The parent data broker of the one this opt-out attempt targets",
+                "type": "string"
+            },
+            {
+                "key": "broker_version",
+                "description": "The version of the broker JSON file",
+                "type": "string"
+            },
+            {
+                "key": "duration",
+                "description": "Stage duration in milliseconds",
+                "type": "string"
+            },
+            {
+                "key": "tries",
+                "description": "The number of tries it took to complete the stage",
+                "type": "string"
+            },
+            {
+                "key": "action_id",
+                "description": "Predefined identifier of the broker action executed in this stage",
+                "type": "string"
+            }
+        ]
+    },
+    "m_dbp_optout_stage_email-get-data": {
+        "description": "Fired at the email-data polling stage of an opt-out attempt, when the runner is waiting for data (e.g. a verification code) extracted from a received email.",
         "owners": ["karlenDimla", "landomen"],
         "triggers": ["other"],
         "suffixes": ["daily_count_short", "form_factor"],
@@ -1950,7 +2028,7 @@
             {
                 "key": "scanFrequencyWithinThreshold",
                 "description": "A background scan has run within 48 hours since the last one",
-                "enum": ["false", "true"]
+                "type": "boolean"
             }
         ]
     },
@@ -1998,5 +2076,650 @@
         "triggers": ["other"],
         "suffixes": ["daily_count_short", "form_factor"],
         "parameters": ["appVersion"]
+    },
+    "wide_pir-initial-scan": {
+        "description": "Wide event tracking the lifecycle of a manually-triggered PIR run (initial scan or post-profile-edit), covering scan progress in 10% increments, scan completion, and the follow-on opt-out scheduling phase. Used to measure end-to-end success rate, drop-off, and per-phase latency.",
+        "owners": ["karlenDimla", "landomen"],
+        "triggers": ["other"],
+        "suffixes": ["daily_count_short", "form_factor"],
+        "parameters": [
+            "widePixelPlatform",
+            "widePixelType",
+            "widePixelSampleRate",
+            "widePixelFeatureStatus",
+            "widePixelAppVersion",
+            "widePixelAppName",
+            "widePixelFormFactor",
+            "widePixelDevMode",
+            {
+                "key": "feature.name",
+                "description": "Feature identifier for this wide event",
+                "enum": ["pir-initial-scan"]
+            },
+            {
+                "key": "context.name",
+                "description": "Entry point that triggered the manual PIR run",
+                "enum": ["funnel_pir_initial_android", "funnel_pir_edit_profile_android"]
+            },
+            {
+                "key": "feature.data.ext.execution_type",
+                "description": "Distinguishes between the user's first manual scan after onboarding and a re-scan triggered by editing a saved profile",
+                "enum": ["manual_initial", "manual_edit_profile"]
+            },
+            {
+                "key": "feature.data.ext.profile_queries_count",
+                "description": "Number of user profile queries used in the run",
+                "type": "integer"
+            },
+            {
+                "key": "feature.data.ext.broker_count",
+                "description": "Number of active brokers at the start of the run",
+                "type": "integer"
+            },
+            {
+                "key": "feature.data.ext.total_scan_jobs",
+                "description": "Total number of (broker x profile) scan jobs eligible for execution at the start of the run",
+                "type": "integer"
+            },
+            {
+                "key": "feature.data.ext.web_view_count",
+                "description": "Number of parallel WebView runners used during the scan portion. Equals min(total_scan_jobs, MAX_DETACHED_WEBVIEW_COUNT=20). 0 when there are no eligible scan jobs.",
+                "type": "integer"
+            },
+            {
+                "key": "feature.data.ext.total_opt_out_jobs",
+                "description": "Total number of opt-out jobs executed during the run. 0 when opt-out was skipped (no eligible form-opt-out brokers). Only populated on terminal events.",
+                "type": "integer"
+            },
+            {
+                "key": "manufacturer",
+                "description": "Manufacturer of the device. Injected by PirPixelInterceptor.",
+                "type": "string",
+                "enum": [
+                    "samsung",
+                    "google",
+                    "xiaomi",
+                    "huawei",
+                    "honor",
+                    "oneplus",
+                    "oppo",
+                    "vivo",
+                    "motorola",
+                    "realme",
+                    "sony",
+                    "lg",
+                    "nokia",
+                    "lenovo",
+                    "asus",
+                    "other"
+                ]
+            },
+            {
+                "key": "feature.data.ext.power_saving",
+                "description": "Whether the device was in power saving mode at the start of the run",
+                "enum": ["true", "false"]
+            },
+            {
+                "key": "feature.data.ext.battery_optimizations",
+                "description": "Whether battery optimizations were enabled for the app at the start of the run",
+                "enum": ["true", "false"]
+            },
+            {
+                "key": "feature.data.ext.vpn_connection_state",
+                "description": "Reported VPN connection state at the start of the run",
+                "enum": ["connected", "disconnected"]
+            },
+            {
+                "key": "feature.data.ext.notifications_permission_granted",
+                "description": "Whether the user had granted the POST_NOTIFICATIONS runtime permission at the start of the run",
+                "enum": ["true", "false"]
+            },
+            {
+                "key": "feature.data.ext.tracker_blocking_state",
+                "description": "Whether tracker blocking was enabled or disabled during the run",
+                "enum": ["enabled", "disabled"]
+            },
+            {
+                "key": "feature.data.ext.last_step",
+                "description": "The last recorded step name when the flow terminated. Useful for understanding where flows drop off when status is FAILURE, CANCELLED, or UNKNOWN.",
+                "enum": [
+                    "started",
+                    "progress_10",
+                    "progress_20",
+                    "progress_30",
+                    "progress_40",
+                    "progress_50",
+                    "progress_60",
+                    "progress_70",
+                    "progress_80",
+                    "progress_90",
+                    "scan_completed",
+                    "opt_out_started",
+                    "opt_out_completed",
+                    "opt_out_skipped"
+                ]
+            },
+            {
+                "key": "feature.data.ext.failure_reason",
+                "description": "Reason a run failed. Only present on FAILURE events. Specific exception types are mapped to bounded values; anything not in the known set falls back to unknown_error. The phase the run was in when it failed is recoverable from last_step.",
+                "enum": [
+                    "no_active_brokers",
+                    "illegal_state_exception",
+                    "illegal_argument_exception",
+                    "null_pointer_exception",
+                    "io_exception",
+                    "sqlite_exception",
+                    "timeout_cancellation_exception",
+                    "unknown_error"
+                ]
+            },
+            {
+                "key": "feature.data.ext.step.started",
+                "description": "Parameter present when the run body actually begins (after the no-profiles early return)",
+                "type": "boolean"
+            },
+            {
+                "key": "feature.data.ext.step.progress_10",
+                "description": "Parameter present when the rolling completed-scan-jobs count first crosses 10%",
+                "type": "boolean"
+            },
+            {
+                "key": "feature.data.ext.step.progress_20",
+                "description": "Parameter present when the rolling completed-scan-jobs count first crosses 20%",
+                "type": "boolean"
+            },
+            {
+                "key": "feature.data.ext.step.progress_30",
+                "description": "Parameter present when the rolling completed-scan-jobs count first crosses 30%",
+                "type": "boolean"
+            },
+            {
+                "key": "feature.data.ext.step.progress_40",
+                "description": "Parameter present when the rolling completed-scan-jobs count first crosses 40%",
+                "type": "boolean"
+            },
+            {
+                "key": "feature.data.ext.step.progress_50",
+                "description": "Parameter present when the rolling completed-scan-jobs count first crosses 50%",
+                "type": "boolean"
+            },
+            {
+                "key": "feature.data.ext.step.progress_60",
+                "description": "Parameter present when the rolling completed-scan-jobs count first crosses 60%",
+                "type": "boolean"
+            },
+            {
+                "key": "feature.data.ext.step.progress_70",
+                "description": "Parameter present when the rolling completed-scan-jobs count first crosses 70%",
+                "type": "boolean"
+            },
+            {
+                "key": "feature.data.ext.step.progress_80",
+                "description": "Parameter present when the rolling completed-scan-jobs count first crosses 80%",
+                "type": "boolean"
+            },
+            {
+                "key": "feature.data.ext.step.progress_90",
+                "description": "Parameter present when the rolling completed-scan-jobs count first crosses 90%",
+                "type": "boolean"
+            },
+            {
+                "key": "feature.data.ext.step.scan_completed",
+                "description": "Parameter present when all scan jobs finish (signals the end of the scan portion; replaces a hypothetical progress_100)",
+                "type": "boolean"
+            },
+            {
+                "key": "feature.data.ext.step.opt_out_started",
+                "description": "Parameter present when the opt-out scheduling phase begins (only when there is at least one eligible form-opt-out broker)",
+                "type": "boolean"
+            },
+            {
+                "key": "feature.data.ext.step.opt_out_completed",
+                "description": "Parameter present when the opt-out scheduling phase finishes successfully",
+                "type": "boolean"
+            },
+            {
+                "key": "feature.data.ext.step.opt_out_skipped",
+                "description": "Parameter present when the opt-out scheduling phase is skipped because there are no eligible form-opt-out brokers",
+                "type": "boolean"
+            },
+            {
+                "key": "feature.data.ext.decile_0_10_duration_ms_bucketed",
+                "description": "Time from run start to crossing 10% of scan jobs, bucketed using the lower bucket boundary",
+                "enum": ["0", "1000", "5000", "10000", "30000", "60000", "300000", "600000"]
+            },
+            {
+                "key": "feature.data.ext.decile_10_20_duration_ms_bucketed",
+                "description": "Time from crossing 10% to crossing 20% of scan jobs, bucketed using the lower bucket boundary",
+                "enum": ["0", "1000", "5000", "10000", "30000", "60000", "300000", "600000"]
+            },
+            {
+                "key": "feature.data.ext.decile_20_30_duration_ms_bucketed",
+                "description": "Time from crossing 20% to crossing 30% of scan jobs, bucketed using the lower bucket boundary",
+                "enum": ["0", "1000", "5000", "10000", "30000", "60000", "300000", "600000"]
+            },
+            {
+                "key": "feature.data.ext.decile_30_40_duration_ms_bucketed",
+                "description": "Time from crossing 30% to crossing 40% of scan jobs, bucketed using the lower bucket boundary",
+                "enum": ["0", "1000", "5000", "10000", "30000", "60000", "300000", "600000"]
+            },
+            {
+                "key": "feature.data.ext.decile_40_50_duration_ms_bucketed",
+                "description": "Time from crossing 40% to crossing 50% of scan jobs, bucketed using the lower bucket boundary",
+                "enum": ["0", "1000", "5000", "10000", "30000", "60000", "300000", "600000"]
+            },
+            {
+                "key": "feature.data.ext.decile_50_60_duration_ms_bucketed",
+                "description": "Time from crossing 50% to crossing 60% of scan jobs, bucketed using the lower bucket boundary",
+                "enum": ["0", "1000", "5000", "10000", "30000", "60000", "300000", "600000"]
+            },
+            {
+                "key": "feature.data.ext.decile_60_70_duration_ms_bucketed",
+                "description": "Time from crossing 60% to crossing 70% of scan jobs, bucketed using the lower bucket boundary",
+                "enum": ["0", "1000", "5000", "10000", "30000", "60000", "300000", "600000"]
+            },
+            {
+                "key": "feature.data.ext.decile_70_80_duration_ms_bucketed",
+                "description": "Time from crossing 70% to crossing 80% of scan jobs, bucketed using the lower bucket boundary",
+                "enum": ["0", "1000", "5000", "10000", "30000", "60000", "300000", "600000"]
+            },
+            {
+                "key": "feature.data.ext.decile_80_90_duration_ms_bucketed",
+                "description": "Time from crossing 80% to crossing 90% of scan jobs, bucketed using the lower bucket boundary",
+                "enum": ["0", "1000", "5000", "10000", "30000", "60000", "300000", "600000"]
+            },
+            {
+                "key": "feature.data.ext.opt_out_duration_ms_bucketed",
+                "description": "Time spent in the opt-out scheduling phase from opt_out_started to opt_out_completed, bucketed using the lower bucket boundary",
+                "enum": ["0", "1000", "5000", "10000", "30000", "60000", "300000", "600000"]
+            }
+        ]
+    },
+    "wide_pir-scheduled-scan": {
+        "description": "Wide event tracking the lifecycle of a scheduled (background, WorkManager-triggered) PIR run, covering scan progress in 10% increments, scan completion, and the follow-on opt-out scheduling phase. Sampled client-side at 20% (hardcoded in PirScanWideEventImpl.SCHEDULED_SCAN_SAMPLE_RATE) to keep pixel volume manageable.",
+        "owners": ["karlenDimla", "landomen"],
+        "triggers": ["other"],
+        "suffixes": ["daily_count_short", "form_factor"],
+        "parameters": [
+            "widePixelPlatform",
+            "widePixelType",
+            "widePixelSampleRate",
+            "widePixelFeatureStatus",
+            "widePixelAppVersion",
+            "widePixelAppName",
+            "widePixelFormFactor",
+            "widePixelDevMode",
+            {
+                "key": "feature.name",
+                "description": "Feature identifier for this wide event",
+                "enum": ["pir-scheduled-scan"]
+            },
+            {
+                "key": "context.name",
+                "description": "Entry point that triggered the scheduled PIR run",
+                "enum": ["funnel_pir_scheduled_android"]
+            },
+            {
+                "key": "feature.data.ext.execution_type",
+                "description": "Always 'scheduled' for this event; included for parity with the manual wide event so dashboards can union the two streams.",
+                "enum": ["scheduled"]
+            },
+            {
+                "key": "feature.data.ext.profile_queries_count",
+                "description": "Number of user profile queries used in the run",
+                "type": "integer"
+            },
+            {
+                "key": "feature.data.ext.broker_count",
+                "description": "Number of active brokers at the start of the run",
+                "type": "integer"
+            },
+            {
+                "key": "feature.data.ext.total_scan_jobs",
+                "description": "Total number of (broker x profile) scan jobs eligible for execution at the start of the run",
+                "type": "integer"
+            },
+            {
+                "key": "feature.data.ext.web_view_count",
+                "description": "Number of parallel WebView runners used during the scan portion. Equals min(total_scan_jobs, MAX_DETACHED_WEBVIEW_COUNT=20). 0 when there are no eligible scan jobs.",
+                "type": "integer"
+            },
+            {
+                "key": "feature.data.ext.total_opt_out_jobs",
+                "description": "Total number of opt-out jobs executed during the run. 0 when opt-out was skipped (no eligible form-opt-out brokers). Only populated on terminal events.",
+                "type": "integer"
+            },
+            {
+                "key": "manufacturer",
+                "description": "Manufacturer of the device. Injected by PirPixelInterceptor.",
+                "type": "string",
+                "enum": [
+                    "samsung",
+                    "google",
+                    "xiaomi",
+                    "huawei",
+                    "honor",
+                    "oneplus",
+                    "oppo",
+                    "vivo",
+                    "motorola",
+                    "realme",
+                    "sony",
+                    "lg",
+                    "nokia",
+                    "lenovo",
+                    "asus",
+                    "other"
+                ]
+            },
+            {
+                "key": "feature.data.ext.power_saving",
+                "description": "Whether the device was in power saving mode at the start of the run",
+                "enum": ["true", "false"]
+            },
+            {
+                "key": "feature.data.ext.battery_optimizations",
+                "description": "Whether battery optimizations were enabled for the app at the start of the run",
+                "enum": ["true", "false"]
+            },
+            {
+                "key": "feature.data.ext.vpn_connection_state",
+                "description": "Reported VPN connection state at the start of the run",
+                "enum": ["connected", "disconnected"]
+            },
+            {
+                "key": "feature.data.ext.notifications_permission_granted",
+                "description": "Whether the user had granted the POST_NOTIFICATIONS runtime permission at the start of the run",
+                "enum": ["true", "false"]
+            },
+            {
+                "key": "feature.data.ext.tracker_blocking_state",
+                "description": "Whether tracker blocking was enabled or disabled during the run",
+                "enum": ["enabled", "disabled"]
+            },
+            {
+                "key": "feature.data.ext.last_step",
+                "description": "The last recorded step name when the flow terminated. Useful for understanding where flows drop off when status is FAILURE, CANCELLED, or UNKNOWN.",
+                "enum": [
+                    "started",
+                    "progress_10",
+                    "progress_20",
+                    "progress_30",
+                    "progress_40",
+                    "progress_50",
+                    "progress_60",
+                    "progress_70",
+                    "progress_80",
+                    "progress_90",
+                    "scan_completed",
+                    "opt_out_started",
+                    "opt_out_completed",
+                    "opt_out_skipped"
+                ]
+            },
+            {
+                "key": "feature.data.ext.failure_reason",
+                "description": "Reason a run failed. Only present on FAILURE events. Specific exception types are mapped to bounded values; anything not in the known set falls back to unknown_error. The phase the run was in when it failed is recoverable from last_step.",
+                "enum": [
+                    "no_active_brokers",
+                    "illegal_state_exception",
+                    "illegal_argument_exception",
+                    "null_pointer_exception",
+                    "io_exception",
+                    "sqlite_exception",
+                    "timeout_cancellation_exception",
+                    "unknown_error"
+                ]
+            },
+            {
+                "key": "feature.data.ext.step.started",
+                "description": "Parameter present when the run body actually begins (after the no-profiles early return)",
+                "type": "boolean"
+            },
+            {
+                "key": "feature.data.ext.step.progress_10",
+                "description": "Parameter present when the rolling completed-scan-jobs count first crosses 10%",
+                "type": "boolean"
+            },
+            {
+                "key": "feature.data.ext.step.progress_20",
+                "description": "Parameter present when the rolling completed-scan-jobs count first crosses 20%",
+                "type": "boolean"
+            },
+            {
+                "key": "feature.data.ext.step.progress_30",
+                "description": "Parameter present when the rolling completed-scan-jobs count first crosses 30%",
+                "type": "boolean"
+            },
+            {
+                "key": "feature.data.ext.step.progress_40",
+                "description": "Parameter present when the rolling completed-scan-jobs count first crosses 40%",
+                "type": "boolean"
+            },
+            {
+                "key": "feature.data.ext.step.progress_50",
+                "description": "Parameter present when the rolling completed-scan-jobs count first crosses 50%",
+                "type": "boolean"
+            },
+            {
+                "key": "feature.data.ext.step.progress_60",
+                "description": "Parameter present when the rolling completed-scan-jobs count first crosses 60%",
+                "type": "boolean"
+            },
+            {
+                "key": "feature.data.ext.step.progress_70",
+                "description": "Parameter present when the rolling completed-scan-jobs count first crosses 70%",
+                "type": "boolean"
+            },
+            {
+                "key": "feature.data.ext.step.progress_80",
+                "description": "Parameter present when the rolling completed-scan-jobs count first crosses 80%",
+                "type": "boolean"
+            },
+            {
+                "key": "feature.data.ext.step.progress_90",
+                "description": "Parameter present when the rolling completed-scan-jobs count first crosses 90%",
+                "type": "boolean"
+            },
+            {
+                "key": "feature.data.ext.step.scan_completed",
+                "description": "Parameter present when all scan jobs finish (signals the end of the scan portion; replaces a hypothetical progress_100)",
+                "type": "boolean"
+            },
+            {
+                "key": "feature.data.ext.step.opt_out_started",
+                "description": "Parameter present when the opt-out scheduling phase begins (only when there is at least one eligible form-opt-out broker)",
+                "type": "boolean"
+            },
+            {
+                "key": "feature.data.ext.step.opt_out_completed",
+                "description": "Parameter present when the opt-out scheduling phase finishes successfully",
+                "type": "boolean"
+            },
+            {
+                "key": "feature.data.ext.step.opt_out_skipped",
+                "description": "Parameter present when the opt-out scheduling phase is skipped because there are no eligible form-opt-out brokers",
+                "type": "boolean"
+            },
+            {
+                "key": "feature.data.ext.decile_0_10_duration_ms_bucketed",
+                "description": "Time from run start to crossing 10% of scan jobs, bucketed using the lower bucket boundary",
+                "enum": ["0", "1000", "5000", "10000", "30000", "60000", "300000", "600000"]
+            },
+            {
+                "key": "feature.data.ext.decile_10_20_duration_ms_bucketed",
+                "description": "Time from crossing 10% to crossing 20% of scan jobs, bucketed using the lower bucket boundary",
+                "enum": ["0", "1000", "5000", "10000", "30000", "60000", "300000", "600000"]
+            },
+            {
+                "key": "feature.data.ext.decile_20_30_duration_ms_bucketed",
+                "description": "Time from crossing 20% to crossing 30% of scan jobs, bucketed using the lower bucket boundary",
+                "enum": ["0", "1000", "5000", "10000", "30000", "60000", "300000", "600000"]
+            },
+            {
+                "key": "feature.data.ext.decile_30_40_duration_ms_bucketed",
+                "description": "Time from crossing 30% to crossing 40% of scan jobs, bucketed using the lower bucket boundary",
+                "enum": ["0", "1000", "5000", "10000", "30000", "60000", "300000", "600000"]
+            },
+            {
+                "key": "feature.data.ext.decile_40_50_duration_ms_bucketed",
+                "description": "Time from crossing 40% to crossing 50% of scan jobs, bucketed using the lower bucket boundary",
+                "enum": ["0", "1000", "5000", "10000", "30000", "60000", "300000", "600000"]
+            },
+            {
+                "key": "feature.data.ext.decile_50_60_duration_ms_bucketed",
+                "description": "Time from crossing 50% to crossing 60% of scan jobs, bucketed using the lower bucket boundary",
+                "enum": ["0", "1000", "5000", "10000", "30000", "60000", "300000", "600000"]
+            },
+            {
+                "key": "feature.data.ext.decile_60_70_duration_ms_bucketed",
+                "description": "Time from crossing 60% to crossing 70% of scan jobs, bucketed using the lower bucket boundary",
+                "enum": ["0", "1000", "5000", "10000", "30000", "60000", "300000", "600000"]
+            },
+            {
+                "key": "feature.data.ext.decile_70_80_duration_ms_bucketed",
+                "description": "Time from crossing 70% to crossing 80% of scan jobs, bucketed using the lower bucket boundary",
+                "enum": ["0", "1000", "5000", "10000", "30000", "60000", "300000", "600000"]
+            },
+            {
+                "key": "feature.data.ext.decile_80_90_duration_ms_bucketed",
+                "description": "Time from crossing 80% to crossing 90% of scan jobs, bucketed using the lower bucket boundary",
+                "enum": ["0", "1000", "5000", "10000", "30000", "60000", "300000", "600000"]
+            },
+            {
+                "key": "feature.data.ext.opt_out_duration_ms_bucketed",
+                "description": "Time spent in the opt-out scheduling phase from opt_out_started to opt_out_completed, bucketed using the lower bucket boundary",
+                "enum": ["0", "1000", "5000", "10000", "30000", "60000", "300000", "600000"]
+            }
+        ]
+    },
+    "wide_pir-time-to-first-scan-complete": {
+        "description": "Long-lived wide event measuring the wall-clock duration from the first time the user starts the initial PIR scan (MANUAL_INITIAL) to the moment every broker has at least one completed scan job (the dashboard's 'all done' state). Spans multiple foreground service runs and scheduled worker runs since the foreground service is frequently killed and the worker resumes the work later. One-shot per install (cleared only via PIR data reset). 30-day cleanup timeout records abandoned journeys as Unknown.",
+        "owners": ["karlenDimla", "landomen"],
+        "triggers": ["other"],
+        "suffixes": ["daily_count_short", "form_factor"],
+        "parameters": [
+            "widePixelPlatform",
+            "widePixelType",
+            "widePixelSampleRate",
+            "widePixelFeatureStatus",
+            "widePixelAppVersion",
+            "widePixelAppName",
+            "widePixelFormFactor",
+            "widePixelDevMode",
+            {
+                "key": "feature.name",
+                "description": "Feature identifier for this wide event",
+                "enum": ["pir-time-to-first-scan-complete"]
+            },
+            {
+                "key": "context.name",
+                "description": "Entry point that triggered the time-to-first-scan-complete flow",
+                "enum": ["funnel_pir_time_to_first_scan_complete_android"]
+            },
+            {
+                "key": "feature.data.ext.profile_queries_count",
+                "description": "Number of user profile queries at the moment the flow started (first MANUAL_INITIAL run)",
+                "type": "integer"
+            },
+            {
+                "key": "feature.data.ext.broker_count",
+                "description": "Number of active brokers at the moment the flow started",
+                "type": "integer"
+            },
+            {
+                "key": "feature.data.ext.total_scan_jobs",
+                "description": "Total number of (broker x profile) scan jobs eligible for execution at the moment the flow started",
+                "type": "integer"
+            },
+            {
+                "key": "feature.data.ext.web_view_count",
+                "description": "Number of parallel WebView runners used at the start of the flow. Equals min(total_scan_jobs, MAX_DETACHED_WEBVIEW_COUNT=20). 0 when there are no eligible scan jobs.",
+                "type": "integer"
+            },
+            {
+                "key": "manufacturer",
+                "description": "Manufacturer of the device. Injected by PirPixelInterceptor.",
+                "type": "string",
+                "enum": [
+                    "samsung",
+                    "google",
+                    "xiaomi",
+                    "huawei",
+                    "honor",
+                    "oneplus",
+                    "oppo",
+                    "vivo",
+                    "motorola",
+                    "realme",
+                    "sony",
+                    "lg",
+                    "nokia",
+                    "lenovo",
+                    "asus",
+                    "other"
+                ]
+            },
+            {
+                "key": "feature.data.ext.power_saving",
+                "description": "Whether the device was in power saving mode at the moment the flow started",
+                "enum": ["true", "false"]
+            },
+            {
+                "key": "feature.data.ext.battery_optimizations",
+                "description": "Whether battery optimizations were enabled for the app at the moment the flow started",
+                "enum": ["true", "false"]
+            },
+            {
+                "key": "feature.data.ext.vpn_connection_state",
+                "description": "Reported VPN connection state at the moment the flow started",
+                "enum": ["connected", "disconnected"]
+            },
+            {
+                "key": "feature.data.ext.notifications_permission_granted",
+                "description": "Whether the user had granted the POST_NOTIFICATIONS runtime permission at the moment the flow started",
+                "enum": ["true", "false"]
+            },
+            {
+                "key": "feature.data.ext.tracker_blocking_state",
+                "description": "Whether tracker blocking was enabled or disabled at the moment the flow started",
+                "enum": ["enabled", "disabled"]
+            },
+            {
+                "key": "feature.data.ext.total_scan_jobs_at_finish",
+                "description": "Total number of valid scan jobs at the moment the flow completed. Can differ from total_scan_jobs because the user may edit their profile or brokers may be added/removed during the multi-day journey. Only present on Success events.",
+                "type": "integer"
+            },
+            {
+                "key": "feature.data.ext.foreground_run_count",
+                "description": "Number of foreground service runs (MANUAL_INITIAL or MANUAL_EDIT_PROFILE) that contributed to the journey. Higher counts indicate the user re-opened the app multiple times to make progress. Only present on Success events.",
+                "type": "integer"
+            },
+            {
+                "key": "feature.data.ext.scheduled_run_count",
+                "description": "Number of scheduled WorkManager runs that contributed to the journey. Higher counts indicate the foreground service was killed by the system and the work was picked up by background workers. Only present on Success events.",
+                "type": "integer"
+            },
+            {
+                "key": "feature.data.ext.total_duration_ms_bucketed",
+                "description": "Total wall-clock duration from the first MANUAL_INITIAL run starting to the moment every broker had a completed scan job. Bucketed using the lower bucket boundary. Only present on Success events.",
+                "enum": [
+                    "0",
+                    "60000",
+                    "300000",
+                    "600000",
+                    "1800000",
+                    "3600000",
+                    "10800000",
+                    "21600000",
+                    "43200000",
+                    "86400000",
+                    "259200000",
+                    "604800000",
+                    "1209600000",
+                    "2592000000"
+                ]
+            }
+        ]
     }
 }

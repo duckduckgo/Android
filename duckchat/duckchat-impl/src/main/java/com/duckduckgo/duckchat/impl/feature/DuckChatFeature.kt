@@ -131,9 +131,9 @@ interface DuckChatFeature {
     fun showHideAiGeneratedImages(): Toggle
 
     /**
-     * @return `true` when the "Native Input Field" option should be visible in AI Features Settings.
+     * @return `true` when the Native Input Field should be used instead of the web-based input.
      */
-    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun nativeInputField(): Toggle
 
     /**
@@ -218,6 +218,36 @@ interface DuckChatFeature {
      */
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun useNativeStorageChatData(): Toggle
+
+    /**
+     * @return `true` when the native chat history screen can be launched.
+     * If the remote feature is not present defaults to `internal`.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun historyScreen(): Toggle
+
+    /**
+     * @return `true` when the per-row Fire-icon delete affordance on Duck.ai chat-history
+     * suggestions in the omnibar autocomplete is visible.
+     * If the remote feature is not present defaults to `internal`.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun deleteFromAutocomplete(): Toggle
+
+    /**
+     * @return `true` when chat-suggestion rows in the omnibar autocomplete render a per-type leading icon
+     * (Discussion / ImageGeneration / Voice) instead of the default Discussion icon.
+     * If the remote feature is not present defaults to `true`.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    fun chatSuggestionTypeIcon(): Toggle
+
+    /**
+     * @return `true` when the per-row Rename affordance on the Duck.ai chat history screen is visible.
+     * If the remote feature is not present defaults to `false`.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun renameChat(): Toggle
 
     /**
      * Kill switch for opening Duck.ai voice chat when the digital assistant intent is received.

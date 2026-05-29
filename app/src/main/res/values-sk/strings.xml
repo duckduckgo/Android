@@ -597,6 +597,7 @@
     <!-- Fire Animation settings -->
     <string name="settingsFireAnimation">Animácia tlačidla ohňa</string>
     <string name="settingsHeroFireAnimation">Peklo</string>
+    <string name="settingsHeroFireAnimationClassic">Klasické inferno</string>
     <string name="settingsHeroWaterAnimation">Vodný vír</string>
     <string name="settingsHeroAbstractAnimation">Prúd vzduchu</string>
     <string name="settingsNoneAnimation">Žiadne</string>
@@ -880,6 +881,9 @@
     <string name="preOnboardingDaxDialog3Button">Začnite prehliadať</string>
     <string name="preOnboardingAddressBarTitle">Kam mám umiestniť váš riadok s adresou?</string>
     <string name="preOnboardingAddressBarOkButton">Ďalšie</string>
+    <string name="preOnboardingAddressBarPositionTop">Hore</string>
+    <string name="preOnboardingAddressBarPositionBottom">Spodná časť</string>
+    <string name="preOnboardingAddressBarPositionSplit">Rozdelenie</string>
     <string name="highlightsPreOnboardingAddressBarOption1Title">Hore (predvolené)</string>
     <string name="highlightsPreOnboardingAddressBarOption1Description">Ľahko viditeľné</string>
     <string name="highlightsPreOnboardingAddressBarOption2Title">Spodná časť</string>
@@ -902,6 +906,8 @@
     <string name="onboardingSitesDaxDialogOption3">ebay.com</string>
     <string name="onboardingSitesDaxDialogOption4">Prekvapte ma!</string>
     <string name="onboardingSerpDaxDialogDescription"><![CDATA[To je <b>DuckDuckGo vyhľadávanie</b>! Súkromne. Rýchlo. Menej reklám.]]></string>
+    <string name="onboardingSerpDaxDialogBrandDesignTitle">To je DuckDuckGo Search!</string>
+    <string name="onboardingSerpDaxDialogBrandDesignDescription">Súkromne. Rýchlo. Menej reklám.</string>
     <string name="onboardingSerpDaxDialogButton">Rozumiem!</string>
     <string name="onboardingSitesSuggestionsDaxDialogTitle">Nabudúce skúste navštíviť webovú stránku!</string>
     <plurals name="onboardingTrackersBlockedDialogDescription">
@@ -1024,6 +1030,10 @@
     <string name="syncRestoreDialogPrimaryCta">Obnoviť moje veci</string>
     <string name="syncRestoreDialogSecondaryCta">Preskočiť</string>
 
+    <!-- Sync Restore (brand-design onboarding) -->
+    <string name="syncRestoreDialogBrandDesignTitle">Poďme pokračovať tam, kde si na DuckDuckGo skončil.</string>
+    <string name="syncRestoreDialogBrandDesignBody1">Tvoje uložené záložky, heslá a ďalšie údaje sú pripravené.</string>
+
     <!-- PDF download tooltip -->
     <string name="pdfDownloadTooltipText">Stiahnuť PDF</string>
 
@@ -1031,4 +1041,11 @@
     <string name="copyLinkText">Kopírovať text odkazu</string>
     <string name="linkTextCopied">Skopírovaný text prepojenia</string>
     <string name="linkTextCopyFailed">Nepodarilo sa skopírovať text odkazu</string>
+
+    <string name="preOnboardingWelcomeDialogTitle">Dobrý deň.</string>
+    <string name="preOnboardingWelcomeDialogBody1">Si pripravený/-á na rýchlejší prehliadač,\nktorý ti dáva kontrolu?</string>
+    <string name="preOnboardingWelcomeDialogBody2">Umelá inteligencia je vždy voliteľná\na ochrana súkromia je vždy zapnutá.</string>
+    <string name="onboardingStepIndicatorText" instruction="a counter above our instructions in onboarding that tells a user what step they are on">%1$d z %2$d</string>
+    <string name="onboardingSearchDaxDialogOption1Quoted" instruction="translate &apos;duck&apos; too.">Ako povedať „kačica“ v angličtine</string>
+    <string name="onboardingSearchDaxDialogOption1EnglishQuoted" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">Ako povedať „kačica“ po španielsky</string>
 </resources>

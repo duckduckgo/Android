@@ -43,7 +43,19 @@ interface ExtendedOnboardingFeatureToggles {
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun subscriptionPromoModalCta(): Toggle
 
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun subscriptionPromoModalCtaExistingUsers(): Toggle
+
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     @Experiment
     fun freeTrialCopy(): Toggle
+
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun onboardingDuckAiExperimentMay26(): Toggle
+
+    enum class DuckAiOnboardingExperimentCohort(override val cohortName: String) : Toggle.State.CohortName {
+        CONTROL("control"),
+        TREATMENT_WITH_DUCK_AI_DEFAULT("treatmentWithDuckAiDefault"),
+        TREATMENT_WITH_SEARCH_DEFAULT("treatmentWithSearchDefault"),
+    }
 }

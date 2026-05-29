@@ -242,10 +242,6 @@ sealed class Command {
         val url: String,
     ) : Command()
 
-    class SubmitChat(
-        val query: String,
-    ) : Command()
-
     class LaunchPlayStore(
         val appPackage: String,
     ) : Command()
@@ -418,6 +414,8 @@ sealed class Command {
 
     data class UiLockChanged(val locked: Boolean) : Command()
 
+    data class SetContentAllowsSwipeToRefresh(val allowed: Boolean) : Command()
+
     data object ShowFaviconsPrompt : Command()
 
     data class ShowSSLError(
@@ -470,6 +468,8 @@ sealed class Command {
         @ColorRes val colorRes: Int,
     ) : Command()
 
+    data object ReinflateBrandDesignContextualDialog : Command()
+
     data class LaunchFireDialogFromOnboardingDialog(
         val onboardingCta: OnboardingDaxDialogCta,
     ) : Command()
@@ -490,7 +490,9 @@ sealed class Command {
 
     data object RefreshOmnibar : Command()
 
-    data object LaunchInputScreen : Command()
+    data class LaunchInputScreen(val showDuckAiEndCta: Boolean = false) : Command()
+
+    data object LaunchDuckChatHistory : Command()
 
     data class ExtractSerpLogo(
         val currentUrl: String,

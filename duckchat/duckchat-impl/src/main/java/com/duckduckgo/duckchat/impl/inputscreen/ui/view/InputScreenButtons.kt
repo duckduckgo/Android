@@ -19,15 +19,15 @@ package com.duckduckgo.duckchat.impl.inputscreen.ui.view
 import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
+import android.widget.ImageView
 import android.widget.LinearLayout
+import androidx.annotation.LayoutRes
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
-import androidx.core.view.setPadding
 import androidx.core.view.updateLayoutParams
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.duckchat.impl.R
-import com.duckduckgo.duckchat.impl.databinding.ViewInputScreenButtonsBinding
 import kotlin.math.roundToInt
 import com.duckduckgo.mobile.android.R as CommonR
 
@@ -36,13 +36,18 @@ class InputScreenButtons @JvmOverloads constructor(
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0,
     useTopBar: Boolean = true,
+    @LayoutRes layoutResId: Int = R.layout.view_input_screen_buttons,
 ) : LinearLayout(context, attrs, defStyleAttr) {
-    private val binding = ViewInputScreenButtonsBinding.inflate(LayoutInflater.from(context), this, true)
+
+    private val actionSend: ImageView by lazy { findViewById(R.id.actionSend) }
+    private val actionNewLine: ImageView by lazy { findViewById(R.id.actionNewLine) }
+    private val actionVoiceSearch: ImageView? by lazy { findViewById(R.id.actionVoiceSearch) }
+    private val actionVoiceChat: ImageView? by lazy { findViewById(R.id.actionVoiceChat) }
 
     var onSendClick: (() -> Unit)? = null
         set(value) {
             field = value
-            binding.actionSend.setOnClickListener { sendIfEnabled() }
+            actionSend.setOnClickListener { sendIfEnabled() }
         }
 
     var onStopClick: (() -> Unit)? = null
@@ -50,52 +55,53 @@ class InputScreenButtons @JvmOverloads constructor(
     var onNewLineClick: (() -> Unit)? = null
         set(value) {
             field = value
-            binding.actionNewLine.setOnClickListener { value?.invoke() }
+            actionNewLine.setOnClickListener { value?.invoke() }
         }
 
     var onVoiceSearchClick: (() -> Unit)? = null
         set(value) {
             field = value
-            binding.actionVoiceSearch.setOnClickListener { value?.invoke() }
+            actionVoiceSearch?.setOnClickListener { value?.invoke() }
         }
 
     var onVoiceChatClick: (() -> Unit)? = null
         set(value) {
             field = value
-            binding.actionVoiceChat.setOnClickListener { value?.invoke() }
+            actionVoiceChat?.setOnClickListener { value?.invoke() }
         }
 
     init {
+        LayoutInflater.from(context).inflate(layoutResId, this, true)
         if (useTopBar) {
             // when used in top bar we want to transform the buttons to floating
             transformButtonsToFloating()
         } else {
             // when in bottom bar mode, the voice search icon is shown in the input field
-            binding.actionVoiceSearch.gone()
+            actionVoiceSearch?.gone()
         }
     }
 
     fun setSendButtonIcon(iconResId: Int) {
-        binding.actionSend.setImageResource(iconResId)
+        actionSend.setImageResource(iconResId)
     }
 
     fun showStopButton() {
-        binding.actionSend.isEnabled = true
-        binding.actionSend.setImageResource(R.drawable.ic_stop_16)
-        binding.actionSend.backgroundTintList = resolveThemeColorStateList(CommonR.attr.daxColorButtonDestructiveContainer)
-        binding.actionSend.setOnClickListener { onStopClick?.invoke() }
+        actionSend.isEnabled = true
+        actionSend.setImageResource(R.drawable.ic_stop_16)
+        actionSend.backgroundTintList = resolveThemeColorStateList(CommonR.attr.daxColorButtonDestructiveContainer)
+        actionSend.setOnClickListener { onStopClick?.invoke() }
     }
 
     fun showSendButton() {
-        binding.actionSend.setImageResource(R.drawable.ic_arrow_up_24)
-        binding.actionSend.backgroundTintList = resolveThemeColorStateList(
-            if (binding.actionSend.isEnabled) CommonR.attr.daxColorButtonPrimaryContainer else CommonR.attr.daxColorContainerDisabled,
+        actionSend.setImageResource(R.drawable.ic_arrow_right_24_inverted)
+        actionSend.backgroundTintList = resolveThemeColorStateList(
+            if (actionSend.isEnabled) CommonR.attr.daxColorButtonPrimaryContainer else CommonR.attr.daxColorContainerDisabled,
         )
-        binding.actionSend.setOnClickListener { sendIfEnabled() }
+        actionSend.setOnClickListener { sendIfEnabled() }
     }
 
     private fun sendIfEnabled() {
-        if (binding.actionSend.isEnabled) onSendClick?.invoke()
+        if (actionSend.isEnabled) onSendClick?.invoke()
     }
 
     private fun resolveThemeColorStateList(attr: Int): android.content.res.ColorStateList? {
@@ -106,65 +112,63 @@ class InputScreenButtons @JvmOverloads constructor(
     }
 
     fun setSendButtonEnabled(enabled: Boolean) {
-        binding.actionSend.isEnabled = enabled
-        binding.actionSend.backgroundTintList = resolveThemeColorStateList(
+        actionSend.isEnabled = enabled
+        actionSend.backgroundTintList = resolveThemeColorStateList(
             if (enabled) CommonR.attr.daxColorButtonPrimaryContainer else CommonR.attr.daxColorContainerDisabled,
         )
     }
 
     fun setSendButtonVisible(visible: Boolean) {
-        binding.actionSend.isVisible = visible
+        actionSend.isVisible = visible
     }
 
     fun setNewLineButtonVisible(visible: Boolean) {
-        binding.actionNewLine.isVisible = visible
+        actionNewLine.isVisible = visible
     }
 
     fun setVoiceSearchVisible(visible: Boolean) {
-        binding.actionVoiceSearch.isVisible = visible
+        actionVoiceSearch?.isVisible = visible
     }
 
     fun setVoiceChatVisible(visible: Boolean) {
-        binding.actionVoiceChat.isVisible = visible
+        actionVoiceChat?.isVisible = visible
     }
 
     private fun transformButtonsToFloating() {
         // enlarge buttons if they are floating
         val buttonSizePx = 40f.toPx(context).roundToInt()
-        binding.actionSend.updateLayoutParams {
+        actionSend.updateLayoutParams {
             width = buttonSizePx
             height = buttonSizePx
         }
-        binding.actionNewLine.updateLayoutParams {
+        actionNewLine.updateLayoutParams {
             width = buttonSizePx
             height = buttonSizePx
         }
-        binding.actionVoiceSearch.updateLayoutParams {
+        actionVoiceSearch?.updateLayoutParams {
             width = buttonSizePx
             height = buttonSizePx
         }
-        binding.actionVoiceChat.updateLayoutParams {
+        actionVoiceChat?.updateLayoutParams {
             width = buttonSizePx
             height = buttonSizePx
         }
 
-        // add shadows via elevation and add padding to the container to avoid clipping
-        val elevation = 6f.toPx(context)
-        binding.actionNewLine.elevation = elevation
-        binding.actionVoiceSearch.elevation = elevation
-        binding.actionVoiceChat.elevation = elevation
-        binding.actionSend.elevation = elevation
-        val padding = elevation.times(2).roundToInt()
-        binding.root.setPadding(padding)
+        // breathing room for the floating row inside its container
+        val verticalPad = 16f.toPx(context).roundToInt()
+        val horizontalPad = 10f.toPx(context).roundToInt()
+        setPadding(horizontalPad, verticalPad, horizontalPad, verticalPad)
 
-        // add circular background and click ripple to all remaining buttons
+        // actionSend always carries its own circular background + ripple (set in XML)
+        // because it needs the styling in both top-bar and bottom modes. The other
+        // three buttons only need it when floating, so we apply it here.
         val backgroundRes = R.drawable.background_input_screen_button
-        binding.actionNewLine.setBackgroundResource(backgroundRes)
-        binding.actionVoiceChat.setBackgroundResource(backgroundRes)
-        binding.actionVoiceSearch.setBackgroundResource(backgroundRes)
+        actionNewLine.setBackgroundResource(backgroundRes)
+        actionVoiceChat?.setBackgroundResource(backgroundRes)
+        actionVoiceSearch?.setBackgroundResource(backgroundRes)
         val circularRippleDrawable = ContextCompat.getDrawable(context, CommonR.drawable.selectable_circular_ripple)
-        binding.actionNewLine.foreground = circularRippleDrawable
-        binding.actionVoiceSearch.foreground = circularRippleDrawable
-        binding.actionVoiceChat.foreground = circularRippleDrawable
+        actionNewLine.foreground = circularRippleDrawable
+        actionVoiceSearch?.foreground = circularRippleDrawable
+        actionVoiceChat?.foreground = circularRippleDrawable
     }
 }

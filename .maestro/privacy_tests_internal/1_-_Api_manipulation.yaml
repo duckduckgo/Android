@@ -8,8 +8,7 @@ tags:
       - launchApp:
           clearState: true
       - runFlow: ../shared/skip_all_onboarding.yaml
-      - tapOn:
-          id: "com.duckduckgo.mobile.android:id/browserMenu"
+      - runFlow: ../shared/browser_screen/click_on_menu_button.yaml
       - tapOn:
           id: "com.duckduckgo.mobile.android:id/settingsMenuItem"
       - scrollUntilVisible:
@@ -43,8 +42,10 @@ tags:
       - pressKey: Back
       - pressKey: Back
       - pressKey: Back
+      # With native input enabled, the NTP widget auto-opens with its inputField
+      # focused — type into that directly instead of the (now hidden) omnibar.
       - assertVisible:
-          id: "com.duckduckgo.mobile.android:id/omnibarTextInput"
+          id: "com.duckduckgo.mobile.android:id/inputField"
       - inputText: "https://privacy-test-pages.site/content-scope-scripts/infra/pages/conditional-matching-experiments.html?automation=1"
       - pressKey: Enter
       - tapOn:

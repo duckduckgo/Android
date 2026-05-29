@@ -67,12 +67,23 @@ class CoordinatorLayoutHelper {
         val childBounds = IntArray(2)
         coordinatorChildView!!.getLocationOnScreen(childBounds)
         if (childBounds[1] != lastYPosition) {
-            val childBottom = childBounds[1] + coordinatorChildView!!.height
+            val childHeight = coordinatorChildView!!.height
+            val parentHeight = coordinatorParentView!!.height
+
+            // When the IME inset shrinks the parent mid-layout, the child can still report its
+            // pre-resize height. Computing a diff here would bake the keyboard height into
+            // bottomMargin permanently. Skip without recording lastYPosition so a future call
+            // can run once layout has settled.
+            if (childHeight > parentHeight) {
+                return
+            }
+
+            val childBottom = childBounds[1] + childHeight
             lastYPosition = childBounds[1]
 
             val parentBounds = IntArray(2)
             coordinatorParentView!!.getLocationOnScreen(parentBounds)
-            val parentBottom = parentBounds[1] + coordinatorParentView!!.height
+            val parentBottom = parentBounds[1] + parentHeight
 
             val diff = childBottom - parentBottom
             if (diff != 0) {

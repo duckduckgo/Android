@@ -24,7 +24,10 @@ import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.customtabs.CustomTabActivity
+import com.duckduckgo.app.browser.mode.ExternalUrl
+import com.duckduckgo.app.browser.mode.InAppNavigation
 import com.duckduckgo.app.dispatchers.IntentDispatcherViewModel.ViewState
+import com.duckduckgo.app.global.sanitize
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
@@ -42,6 +45,9 @@ class IntentDispatcherActivity : DuckDuckGoActivity() {
     lateinit var globalActivityStarter: GlobalActivityStarter
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        // Sanitize before super.onCreate so lifecycle callbacks dispatched from there don't trip over
+        // Parcelable extras whose classes are absent from our classpath.
+        intent?.sanitize()
         super.onCreate(savedInstanceState)
 
         logcat { "onCreate called with intent $intent" }
@@ -70,7 +76,7 @@ class IntentDispatcherActivity : DuckDuckGoActivity() {
         startActivity(
             CustomTabActivity.intent(
                 context = this,
-                flags = Intent.FLAG_ACTIVITY_NEW_TASK and Intent.FLAG_ACTIVITY_CLEAR_TASK and Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS,
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS,
                 text = intentText,
                 toolbarColor = toolbarColor,
                 isExternal = isExternal,
@@ -84,6 +90,7 @@ class IntentDispatcherActivity : DuckDuckGoActivity() {
         startActivity(
             BrowserActivity.intent(
                 context = this,
+                launchSource = if (isExternal) ExternalUrl else InAppNavigation,
                 queryExtra = intentText,
                 isExternal = isExternal,
             ),

@@ -121,7 +121,25 @@ interface DuckChat {
     fun openVoiceDuckChat()
 
     /**
-     * Returns `true` if a voice session is currently active.
+     * Returns `true` if a voice session is currently active on the tab with the given [tabId].
      */
-    fun isVoiceSessionActive(): Boolean
+    fun isVoiceChatSessionActive(tabId: String): Boolean
+
+    /**
+     * Emits the set of tab IDs that currently have an active voice session.
+     */
+    val activeVoiceChatSessions: Flow<Set<String>>
+
+    /**
+     * Emits the tab id whenever an end-voice-session action is requested (e.g. from the
+     * foreground service notification). Tabs should collect this flow and dispatch the
+     * end-voice-session JS event when their id is emitted.
+     */
+    fun observeTriggerVoiceChatSessionEnd(): Flow<String>
+
+    /**
+     * Returns `true` when the native Duck.ai chat history surface is enabled by all gating feature flags.
+     * Suspending because the underlying feature-flag reads must not block the main thread.
+     */
+    suspend fun isChatHistoryAvailable(): Boolean
 }

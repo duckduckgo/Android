@@ -597,6 +597,7 @@
     <!-- Fire Animation settings -->
     <string name="settingsFireAnimation">Mygtuko „Fire“ animacija</string>
     <string name="settingsHeroFireAnimation">„Inferno“</string>
+    <string name="settingsHeroFireAnimationClassic">Klasikinė pragariška ugnis</string>
     <string name="settingsHeroWaterAnimation">„Whirlpool“</string>
     <string name="settingsHeroAbstractAnimation">„Airstream“</string>
     <string name="settingsNoneAnimation">Jokie</string>
@@ -880,6 +881,9 @@
     <string name="preOnboardingDaxDialog3Button">Pradėti naršyti</string>
     <string name="preOnboardingAddressBarTitle">Kur turėčiau nustatyti jūsų adreso juostą?</string>
     <string name="preOnboardingAddressBarOkButton">Kitas</string>
+    <string name="preOnboardingAddressBarPositionTop">Viršus</string>
+    <string name="preOnboardingAddressBarPositionBottom">Apačia</string>
+    <string name="preOnboardingAddressBarPositionSplit">Padalintas</string>
     <string name="highlightsPreOnboardingAddressBarOption1Title">Viršuje (numatytasis nustatymas)</string>
     <string name="highlightsPreOnboardingAddressBarOption1Description">Lengva pamatyti</string>
     <string name="highlightsPreOnboardingAddressBarOption2Title">Apačia</string>
@@ -902,6 +906,8 @@
     <string name="onboardingSitesDaxDialogOption3">ebay.com</string>
     <string name="onboardingSitesDaxDialogOption4">Nustebink mane!</string>
     <string name="onboardingSerpDaxDialogDescription"><![CDATA[Tai „<b>DuckDuckGo Search</b>“! Privati. Sparti. Mažiau reklamų.]]></string>
+    <string name="onboardingSerpDaxDialogBrandDesignTitle">Čia – paieška „DuckDuckGo Search“!</string>
+    <string name="onboardingSerpDaxDialogBrandDesignDescription">Privati. Sparti. Mažiau reklamų.</string>
     <string name="onboardingSerpDaxDialogButton">Supratau!</string>
     <string name="onboardingSitesSuggestionsDaxDialogTitle">Pabandyk apsilankyti svetainėje!</string>
     <plurals name="onboardingTrackersBlockedDialogDescription">
@@ -1024,6 +1030,10 @@
     <string name="syncRestoreDialogPrimaryCta">Atkurti mano duomenis</string>
     <string name="syncRestoreDialogSecondaryCta">Praleisti</string>
 
+    <!-- Sync Restore (brand-design onboarding) -->
+    <string name="syncRestoreDialogBrandDesignTitle">Pratęskime nuo ten, kur baigėte naudotis „DuckDuckGo“.</string>
+    <string name="syncRestoreDialogBrandDesignBody1">Jau paruoštos jūsų išsaugotos žymės, slaptažodžiai ir kita.</string>
+
     <!-- PDF download tooltip -->
     <string name="pdfDownloadTooltipText">Atsisiųsti PDF</string>
 
@@ -1031,4 +1041,11 @@
     <string name="copyLinkText">Kopijuoti nuorodos tekstą</string>
     <string name="linkTextCopied">Nuorodos tekstas nukopijuotas</string>
     <string name="linkTextCopyFailed">Nepavyko nukopijuoti nuorodos teksto</string>
+
+    <string name="preOnboardingWelcomeDialogTitle">Sveiki!</string>
+    <string name="preOnboardingWelcomeDialogBody1">Ar norite spartesnės naršyklės,\nkurią patys valdote?</string>
+    <string name="preOnboardingWelcomeDialogBody2">DI neprivalomas, o privatumo apsauga\n veikia visada.</string>
+    <string name="onboardingStepIndicatorText" instruction="a counter above our instructions in onboarding that tells a user what step they are on">%1$d iš %2$d</string>
+    <string name="onboardingSearchDaxDialogOption1Quoted" instruction="translate &apos;duck&apos; too.">kaip angliškai pasakyti „antis“</string>
+    <string name="onboardingSearchDaxDialogOption1EnglishQuoted" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">kaip ispaniškai pasakyti „antis“</string>
 </resources>

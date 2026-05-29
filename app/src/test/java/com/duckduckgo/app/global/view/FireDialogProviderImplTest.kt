@@ -16,9 +16,9 @@
 
 package com.duckduckgo.app.global.view
 
-import com.duckduckgo.app.global.view.FireDialogProvider.FireDialogOrigin
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.dataclearing.api.fire.FireDialogProvider.FireDialogOrigin
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import kotlinx.coroutines.test.runTest
@@ -49,7 +49,7 @@ class FireDialogProviderImplTest {
         fakeAndroidBrowserConfigFeature.singleTabFireDialog().setRawStoredState(State(true))
         fakeAndroidBrowserConfigFeature.granularFireDialog().setRawStoredState(State(false))
 
-        val dialog = testee.createFireDialog(FireDialogOrigin.BROWSER)
+        val dialog = testee.createFireDialog(FireDialogOrigin.Browser)
 
         assertTrue(dialog is SingleTabFireDialog)
     }
@@ -59,7 +59,7 @@ class FireDialogProviderImplTest {
         fakeAndroidBrowserConfigFeature.singleTabFireDialog().setRawStoredState(State(true))
         fakeAndroidBrowserConfigFeature.granularFireDialog().setRawStoredState(State(true))
 
-        val dialog = testee.createFireDialog(FireDialogOrigin.BROWSER)
+        val dialog = testee.createFireDialog(FireDialogOrigin.Browser)
 
         assertTrue(dialog is SingleTabFireDialog)
     }
@@ -69,7 +69,7 @@ class FireDialogProviderImplTest {
         fakeAndroidBrowserConfigFeature.singleTabFireDialog().setRawStoredState(State(false))
         fakeAndroidBrowserConfigFeature.granularFireDialog().setRawStoredState(State(true))
 
-        val dialog = testee.createFireDialog(FireDialogOrigin.BROWSER)
+        val dialog = testee.createFireDialog(FireDialogOrigin.Browser)
 
         assertTrue(dialog is GranularFireDialog)
     }
@@ -79,7 +79,7 @@ class FireDialogProviderImplTest {
         fakeAndroidBrowserConfigFeature.singleTabFireDialog().setRawStoredState(State(false))
         fakeAndroidBrowserConfigFeature.granularFireDialog().setRawStoredState(State(false))
 
-        val dialog = testee.createFireDialog(FireDialogOrigin.BROWSER)
+        val dialog = testee.createFireDialog(FireDialogOrigin.Browser)
 
         assertTrue(dialog is NonGranularFireDialog)
     }

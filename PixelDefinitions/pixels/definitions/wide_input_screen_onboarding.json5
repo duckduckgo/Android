@@ -28,12 +28,12 @@
             {
                 "key": "feature.data.ext.reinstallUser",
                 "description": "true if the user tapped 'I've been here before', false otherwise",
-                "enum": ["true", "false"]
+                "type": "boolean"
             },
             {
                 "key": "feature.data.ext.enabled",
                 "description": "true if the Input Screen is enabled, false otherwise. Only present on CANCELLED events.",
-                "enum": ["true", "false"]
+                "type": "boolean"
             }
         ]
     }

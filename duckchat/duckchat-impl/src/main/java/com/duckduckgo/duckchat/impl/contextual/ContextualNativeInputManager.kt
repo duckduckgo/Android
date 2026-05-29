@@ -16,68 +16,111 @@
 
 package com.duckduckgo.duckchat.impl.contextual
 
+import android.net.Uri
+import android.webkit.ValueCallback
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
+import com.duckduckgo.duckchat.api.nativeinput.NativeInputStatePublisher
 import com.duckduckgo.duckchat.impl.helper.RealDuckChatJSHelper
 import com.duckduckgo.duckchat.impl.ui.nativeinput.views.NativeInputModeWidget
 import com.duckduckgo.js.messaging.api.JsMessaging
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import com.google.android.material.card.MaterialCardView
 import com.squareup.anvil.annotations.ContributesBinding
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import org.json.JSONArray
 import org.json.JSONObject
 import javax.inject.Inject
 
 interface ContextualNativeInputManager {
     fun init(
+        tabId: String,
         card: MaterialCardView,
         widget: NativeInputModeWidget,
         jsMessaging: JsMessaging,
         lifecycleOwner: LifecycleOwner,
+        chatIdFlow: Flow<String?>,
         onSearchSubmitted: (String) -> Unit,
-        onImageButtonPressed: () -> Unit = {},
+        onCameraCaptureRequested: (ValueCallback<Array<Uri>>) -> Unit = {},
+        onFilePickerRequested: (ValueCallback<Array<Uri>>, List<String>) -> Unit = { _, _ -> },
     )
 
     fun onWebViewMode()
     fun onInputMode()
+
+    /**
+     * Called when the contextual sheet is closed (e.g. STATE_HIDDEN). Reverts the per-tab
+     * [NativeInputState] back to a browser-context default so other observers (like StartChatView
+     * in the main widget) don't keep reading the DUCK_AI_CONTEXTUAL/DUCK_AI values the contextual
+     * widget wrote during its lifetime.
+     */
+    fun onContextualClosed(tabId: String)
 }
 
 @ContributesBinding(FragmentScope::class)
 class RealContextualNativeInputManager @Inject constructor(
     private val duckChat: DuckChat,
+    private val nativeInputStatePublisher: NativeInputStatePublisher,
 ) : ContextualNativeInputManager {
 
     private var isNativeInputEnabled = false
     private var card: MaterialCardView? = null
     private var jsMessaging: JsMessaging? = null
+    private var widget: NativeInputModeWidget? = null
 
     override fun init(
+        tabId: String,
         card: MaterialCardView,
         widget: NativeInputModeWidget,
         jsMessaging: JsMessaging,
         lifecycleOwner: LifecycleOwner,
+        chatIdFlow: Flow<String?>,
         onSearchSubmitted: (String) -> Unit,
-        onImageButtonPressed: () -> Unit,
+        onCameraCaptureRequested: (ValueCallback<Array<Uri>>) -> Unit,
+        onFilePickerRequested: (ValueCallback<Array<Uri>>, List<String>) -> Unit,
     ) {
         this.card = card
         this.jsMessaging = jsMessaging
+        this.widget = widget
 
         applyCardShape(card)
-        setupWidget(widget, onSearchSubmitted, onImageButtonPressed)
+        setupWidget(tabId, widget, chatIdFlow, onSearchSubmitted, onCameraCaptureRequested, onFilePickerRequested)
         observeNativeInputSetting(lifecycleOwner)
     }
 
+    override fun onContextualClosed(tabId: String) {
+        if (tabId.isBlank()) return
+        val browser = NativeInputState.InputContext.BROWSER
+        nativeInputStatePublisher.update(tabId) {
+            it.copy(
+                inputContext = browser,
+                toggleSelection = NativeInputState.defaultToggleFor(browser),
+            )
+        }
+    }
+
     override fun onWebViewMode() {
-        if (isNativeInputEnabled) card?.show() else card?.gone()
+        if (isNativeInputEnabled) {
+            card?.show()
+            // WEBVIEW mode means a chat is in progress.
+            // Hide the picker so the user can't change models mid-chat.
+            widget?.setModelPickerEnabled(false)
+        } else {
+            card?.gone()
+        }
     }
 
     override fun onInputMode() {
         card?.gone()
+        // INPUT mode is a new chat: restore the picker
+        if (isNativeInputEnabled) widget?.setModelPickerEnabled(true)
     }
 
     private fun applyCardShape(card: MaterialCardView) {
@@ -92,11 +135,22 @@ class RealContextualNativeInputManager @Inject constructor(
             .build()
     }
 
-    private fun setupWidget(widget: NativeInputModeWidget, onSearchSubmitted: (String) -> Unit, onImageButtonPressed: () -> Unit) {
-        widget.configureContextual()
+    private fun setupWidget(
+        tabId: String,
+        widget: NativeInputModeWidget,
+        chatIdFlow: Flow<String?>,
+        onSearchSubmitted: (String) -> Unit,
+        onCameraCaptureRequested: (ValueCallback<Array<Uri>>) -> Unit,
+        onFilePickerRequested: (ValueCallback<Array<Uri>>, List<String>) -> Unit,
+    ) {
+        widget.configureContextual(tabId)
+        widget.bindChatIdSource(chatIdFlow)
         widget.hideMainButtons()
         widget.onStopTapped = ::sendStopEvent
-        widget.onImageClick = onImageButtonPressed
+        widget.bindAttachmentCallbacks(
+            onCameraCaptureRequested = onCameraCaptureRequested,
+            onFilePickerRequested = onFilePickerRequested,
+        )
         widget.bindInputEvents(
             onSearchTextChanged = { },
             onSearchSubmitted = { query ->
@@ -104,7 +158,11 @@ class RealContextualNativeInputManager @Inject constructor(
                 onSearchSubmitted(query)
             },
             onChatSubmitted = { prompt ->
-                sendPrompt(prompt, widget.getSelectedModelId())
+                val imagesJson = widget.getImageAttachmentsJson()
+                val filesJson = widget.getFileAttachmentsJson()
+                widget.clearAttachments()
+                sendPrompt(prompt, widget.getSelectedModelId(), widget.getResolvedReasoningEffort(), widget.getSelectedTool(), imagesJson, filesJson)
+                widget.clearSelectedTool()
                 widget.text = ""
             },
         )
@@ -116,7 +174,14 @@ class RealContextualNativeInputManager @Inject constructor(
             .launchIn(lifecycleOwner.lifecycleScope)
     }
 
-    private fun sendPrompt(prompt: String, modelId: String? = null) {
+    private fun sendPrompt(
+        prompt: String,
+        modelId: String? = null,
+        reasoningEffort: String? = null,
+        selectedTool: String? = null,
+        imagesJson: JSONArray? = null,
+        filesJson: JSONArray? = null,
+    ) {
         val params = JSONObject().apply {
             put("platform", "android")
             put("tool", "query")
@@ -127,6 +192,18 @@ class RealContextualNativeInputManager @Inject constructor(
                     put("autoSubmit", true)
                     if (modelId != null) {
                         put("modelId", modelId)
+                    }
+                    if (reasoningEffort != null) {
+                        put("reasoningEffort", reasoningEffort)
+                    }
+                    if (selectedTool != null) {
+                        put("toolChoice", JSONArray().apply { put(selectedTool) })
+                    }
+                    if (imagesJson != null) {
+                        put("images", imagesJson)
+                    }
+                    if (filesJson != null) {
+                        put("files", filesJson)
                     }
                 },
             )

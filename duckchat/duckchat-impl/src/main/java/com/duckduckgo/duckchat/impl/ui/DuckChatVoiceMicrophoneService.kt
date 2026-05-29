@@ -29,6 +29,7 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.ServiceCompat
 import androidx.core.content.ContextCompat
 import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.ServiceScope
 import com.duckduckgo.duckchat.impl.R
@@ -45,6 +46,9 @@ class DuckChatVoiceMicrophoneService : Service() {
     @Inject
     lateinit var appBuildConfig: AppBuildConfig
 
+    @Inject
+    lateinit var browserNav: BrowserNav
+
     override fun onBind(intent: Intent?): IBinder? = null
 
     override fun onCreate() {
@@ -58,10 +62,11 @@ class DuckChatVoiceMicrophoneService : Service() {
         flags: Int,
         startId: Int,
     ): Int {
+        val tabId = intent?.getStringExtra(EXTRA_TAB_ID)?.takeIf { it.isNotBlank() }
         ServiceCompat.startForeground(
             this,
             NOTIFICATION_ID,
-            buildNotification(),
+            buildNotification(tabId),
             if (appBuildConfig.sdkInt >= 30) {
                 FOREGROUND_SERVICE_TYPE_MICROPHONE
             } else {
@@ -71,21 +76,54 @@ class DuckChatVoiceMicrophoneService : Service() {
         return START_NOT_STICKY
     }
 
-    private fun buildNotification(): Notification {
-        val launchIntent = packageManager.getLaunchIntentForPackage(packageName)?.apply {
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP
-        }
-        val pendingIntent = launchIntent?.let {
-            PendingIntent.getActivity(this, 0, it, PendingIntent.FLAG_IMMUTABLE)
-        }
-        return NotificationCompat.Builder(this, CHANNEL_ID)
+    private fun buildNotification(tabId: String?): Notification {
+        val builder = NotificationCompat.Builder(this, CHANNEL_ID)
             .setContentTitle(getString(R.string.duckAiVoiceNotificationTitle))
             .setContentText(getString(R.string.duckAiVoiceNotificationMessage))
             .setSmallIcon(com.duckduckgo.mobile.android.R.drawable.notification_logo)
             .setOngoing(true)
             .setPriority(NotificationCompat.PRIORITY_LOW)
-            .setContentIntent(pendingIntent)
-            .build()
+
+        if (tabId != null) {
+            val openChatPendingIntent = openChatPendingIntent(tabId)
+            val endSessionPendingIntent = endSessionPendingIntent(tabId)
+            builder
+                .setContentIntent(openChatPendingIntent)
+                .addAction(0, getString(R.string.duckAiVoiceNotificationActionOpenChat), openChatPendingIntent)
+                .addAction(0, getString(R.string.duckAiVoiceNotificationActionEndSession), endSessionPendingIntent)
+        } else {
+            builder.setContentIntent(fallbackLaunchPendingIntent())
+        }
+        return builder.build()
+    }
+
+    private fun openChatPendingIntent(tabId: String): PendingIntent {
+        val intent = browserNav.openExistingTab(this, tabId).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP
+        }
+        return PendingIntent.getActivity(
+            this,
+            REQUEST_CODE_OPEN_CHAT,
+            intent,
+            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
+        )
+    }
+
+    private fun endSessionPendingIntent(tabId: String): PendingIntent {
+        val intent = DuckChatVoiceNotificationActionReceiver.endSessionIntent(this, tabId)
+        return PendingIntent.getBroadcast(
+            this,
+            REQUEST_CODE_END_SESSION,
+            intent,
+            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
+        )
+    }
+
+    private fun fallbackLaunchPendingIntent(): PendingIntent? {
+        val launchIntent = packageManager.getLaunchIntentForPackage(packageName)?.apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP
+        } ?: return null
+        return PendingIntent.getActivity(this, REQUEST_CODE_FALLBACK, launchIntent, PendingIntent.FLAG_IMMUTABLE)
     }
 
     private fun createNotificationChannel() {
@@ -100,9 +138,16 @@ class DuckChatVoiceMicrophoneService : Service() {
     companion object {
         private const val NOTIFICATION_ID = 9100
         private const val CHANNEL_ID = "duck_ai_voice_microphone"
+        private const val REQUEST_CODE_OPEN_CHAT = 1
+        private const val REQUEST_CODE_END_SESSION = 2
+        private const val REQUEST_CODE_FALLBACK = 3
+        private const val EXTRA_TAB_ID = "EXTRA_TAB_ID"
 
-        fun start(context: Context) {
-            ContextCompat.startForegroundService(context, Intent(context, DuckChatVoiceMicrophoneService::class.java))
+        fun start(context: Context, tabId: String) {
+            val intent = Intent(context, DuckChatVoiceMicrophoneService::class.java).apply {
+                putExtra(EXTRA_TAB_ID, tabId)
+            }
+            ContextCompat.startForegroundService(context, intent)
         }
 
         fun stop(context: Context) {

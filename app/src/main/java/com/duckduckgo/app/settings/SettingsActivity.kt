@@ -36,6 +36,7 @@ import com.duckduckgo.app.appearance.AppearanceScreen
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ActivitySettingsNewBinding
+import com.duckduckgo.app.browser.mode.InAppNavigation
 import com.duckduckgo.app.desktopbrowser.GetDesktopBrowserActivityParams
 import com.duckduckgo.app.email.ui.EmailProtectionUnsupportedScreenNoParams
 import com.duckduckgo.app.firebutton.DataClearingSettingsScreenNoParams
@@ -506,7 +507,9 @@ class SettingsActivity : DuckDuckGoActivity() {
             is LaunchAccessibilitySettings -> launchScreen(AccessibilityScreens.Default)
             is LaunchAppTPTrackersScreen -> launchScreen(AppTrackerActivityWithEmptyParams)
             is LaunchAppTPOnboarding -> launchScreen(AppTrackerOnboardingActivityWithEmptyParamsParams)
-            is LaunchEmailProtection -> launchActivityAndFinish(BrowserActivity.intent(this, it.url, interstitialScreen = true))
+            is LaunchEmailProtection -> launchActivityAndFinish(
+                BrowserActivity.intent(this, launchSource = InAppNavigation, queryExtra = it.url, interstitialScreen = true),
+            )
             is LaunchEmailProtectionNotSupported -> launchScreen(EmailProtectionUnsupportedScreenNoParams)
             is LaunchAddHomeScreenWidget -> launchAddHomeScreenWidget()
             is LaunchSyncSettings -> launchScreen(SyncActivityWithEmptyParams)
@@ -522,7 +525,9 @@ class SettingsActivity : DuckDuckGoActivity() {
             is LaunchGeneralSettingsScreen -> launchScreen(GeneralSettingsScreenNoParams)
             is LaunchFeedback -> launchFeedback()
             is LaunchSubscriptionUnifiedFeedback -> launchScreen(GeneralSubscriptionFeedbackScreenNoParams)
-            is LaunchOtherPlatforms -> launchActivityAndFinish(BrowserActivity.intent(context = this, queryExtra = OTHER_PLATFORMS_URL))
+            is LaunchOtherPlatforms -> launchActivityAndFinish(
+                BrowserActivity.intent(context = this, launchSource = InAppNavigation, queryExtra = OTHER_PLATFORMS_URL),
+            )
             is Command.LaunchGetDesktopBrowser -> launchScreen(GetDesktopBrowserActivityParams(source = GetDesktopBrowserActivityParams.Source.OTHER))
             is Command.LaunchWhatsNew -> launchScreen(ModalSurfaceActivityFromMessageId(it.messageId, it.messageType))
         }

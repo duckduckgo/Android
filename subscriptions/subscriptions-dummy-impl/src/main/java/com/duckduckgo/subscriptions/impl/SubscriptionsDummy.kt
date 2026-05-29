@@ -23,6 +23,7 @@ import com.duckduckgo.subscriptions.api.Product
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.UNKNOWN
 import com.duckduckgo.subscriptions.api.Subscriptions
+import com.duckduckgo.subscriptions.api.model.Entitlement
 import com.squareup.anvil.annotations.ContributesBinding
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
@@ -56,4 +57,6 @@ class SubscriptionsDummy @Inject constructor() : Subscriptions {
     override fun isSubscriptionUrl(uri: Uri): Boolean = false
 
     override suspend fun isFreeTrialEligible(): Boolean = false
+
+    override fun getEntitlements(): Flow<Set<Entitlement>> = flowOf(emptySet())
 }

@@ -46,7 +46,7 @@
                 "type": "boolean"
             },
             {
-                "key": "feature.data.ext.tracker_optimization_enabled_v2",
+                "key": "feature.data.ext.tracker_optimization_enabled_v3",
                 "description": "Whether tracker evaluation optimization is enabled",
                 "type": "boolean"
             },
@@ -76,8 +76,8 @@
                 "type": "boolean"
             },
             {
-                "key": "feature.data.ext.step.page_visible.progress",
-                "description": "True if page became visible at or after fixed progress threshold (50%), false if before",
+                "key": "feature.data.ext.progress",
+                "description": "True if page became visible at or after fixed progress threshold (50%), false if before. Recorded during the page_visible step.",
                 "type": "boolean"
             },
             {
@@ -91,13 +91,18 @@
                 "type": "boolean"
             },
             {
-                "key": "feature.data.ext.step.page_finish.outcome",
-                "description": "Final outcome of the page load",
+                "key": "feature.data.ext.outcome",
+                "description": "Final outcome of the page load. Recorded during the page_finish step.",
                 "enum": ["success", "error"]
             },
             {
-                "key": "feature.data.ext.step.page_finish.error_code",
+                "key": "feature.data.ext.error_code",
                 "description": "WebViewClient error constant name (e.g., ERROR_HOST_LOOKUP, ERROR_CONNECT). Only present on error outcomes.",
+                "type": "string"
+            },
+            {
+                "key": "feature.data.ext.failure_reason",
+                "description": "Failure reason auto-attached by the wide event client when the flow finishes with FlowStatus.Failure. Mirrors error_code for page-load failures.",
                 "type": "string"
             }
         ]

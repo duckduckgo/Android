@@ -592,6 +592,7 @@
     <!-- Fire Animation settings -->
     <string name="settingsFireAnimation">Animație buton Foc</string>
     <string name="settingsHeroFireAnimation">Infern</string>
+    <string name="settingsHeroFireAnimationClassic">Flăcări clasice</string>
     <string name="settingsHeroWaterAnimation">Vârtej de apă</string>
     <string name="settingsHeroAbstractAnimation">Curent de aer</string>
     <string name="settingsNoneAnimation">Niciuna</string>
@@ -862,6 +863,9 @@
     <string name="preOnboardingDaxDialog3Button">Începe navigarea</string>
     <string name="preOnboardingAddressBarTitle">Unde ar trebui să îți pun bara de adrese?</string>
     <string name="preOnboardingAddressBarOkButton">Următorul</string>
+    <string name="preOnboardingAddressBarPositionTop">Sus</string>
+    <string name="preOnboardingAddressBarPositionBottom">Partea de jos</string>
+    <string name="preOnboardingAddressBarPositionSplit">Împarte</string>
     <string name="highlightsPreOnboardingAddressBarOption1Title">Sus (implicit)</string>
     <string name="highlightsPreOnboardingAddressBarOption1Description">Ușor de văzut</string>
     <string name="highlightsPreOnboardingAddressBarOption2Title">Partea de jos</string>
@@ -884,6 +888,8 @@
     <string name="onboardingSitesDaxDialogOption3">ebay.com</string>
     <string name="onboardingSitesDaxDialogOption4">Surprinde-mă!</string>
     <string name="onboardingSerpDaxDialogDescription"><![CDATA[Acesta este <b>DuckDuckGo Search</b>! Privat. Rapid. Mai puține reclame.]]></string>
+    <string name="onboardingSerpDaxDialogBrandDesignTitle">Așa arată DuckDuckGo Search!</string>
+    <string name="onboardingSerpDaxDialogBrandDesignDescription">Privat. Rapid. Cu mai puține reclame.</string>
     <string name="onboardingSerpDaxDialogButton">Am înțeles!</string>
     <string name="onboardingSitesSuggestionsDaxDialogTitle">Apoi, încearcă să vizitezi un site!</string>
     <plurals name="onboardingTrackersBlockedDialogDescription">
@@ -1004,6 +1010,10 @@
     <string name="syncRestoreDialogPrimaryCta">Restaurează lucrurile mele</string>
     <string name="syncRestoreDialogSecondaryCta">Ignorare</string>
 
+    <!-- Sync Restore (brand-design onboarding) -->
+    <string name="syncRestoreDialogBrandDesignTitle">Hai să reluăm de unde ai rămas cu DuckDuckGo.</string>
+    <string name="syncRestoreDialogBrandDesignBody1">Marcajele salvate, parolele și multe altele sunt gata.</string>
+
     <!-- PDF download tooltip -->
     <string name="pdfDownloadTooltipText">Descarcă PDF</string>
 
@@ -1011,4 +1021,11 @@
     <string name="copyLinkText">Copiază textul linkului</string>
     <string name="linkTextCopied">Textul linkului a fost copiat</string>
     <string name="linkTextCopyFailed">Nu s-a putut copia textul linkului</string>
+
+    <string name="preOnboardingWelcomeDialogTitle">Salut!</string>
+    <string name="preOnboardingWelcomeDialogBody1">Ești gata pentru un browser mai rapid, care îți oferă control deplin?</string>
+    <string name="preOnboardingWelcomeDialogBody2">Inteligența artificială este întotdeauna opțională, iar protecția confidențialității este întotdeauna activată.</string>
+    <string name="onboardingStepIndicatorText" instruction="a counter above our instructions in onboarding that tells a user what step they are on">%1$d din %2$d</string>
+    <string name="onboardingSearchDaxDialogOption1Quoted" instruction="translate &apos;duck&apos; too.">cum se spune „rață” în engleză</string>
+    <string name="onboardingSearchDaxDialogOption1EnglishQuoted" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">cum se spune „rață” în spaniolă</string>
 </resources>

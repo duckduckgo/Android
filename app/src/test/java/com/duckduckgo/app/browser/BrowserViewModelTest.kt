@@ -22,7 +22,6 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.MutableLiveData
 import app.cash.turbine.test
 import com.duckduckgo.app.browser.BrowserViewModel.Command
-import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserChangedSurveyManager
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.AdditionalDefaultBrowserPrompts
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.AdditionalDefaultBrowserPrompts.SetAsDefaultActionTrigger
@@ -39,6 +38,9 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
+import com.duckduckgo.browsermode.api.BrowserMode
+import com.duckduckgo.browsermode.api.BrowserModeStateHolder
+import com.duckduckgo.browsermode.api.FireModeAvailability
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.ui.tabs.SwipingTabsFeature
 import com.duckduckgo.common.ui.tabs.SwipingTabsFeatureProvider
@@ -67,7 +69,9 @@ import org.mockito.kotlin.clearInvocations
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
+import org.mockito.kotlin.stub
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 
 @SuppressLint("DenyListedApi")
@@ -97,12 +101,16 @@ class BrowserViewModelTest {
 
     @Mock private lateinit var mockAdditionalDefaultBrowserPrompts: AdditionalDefaultBrowserPrompts
 
-    @Mock private lateinit var mockDefaultBrowserChangedSurveyManager: DefaultBrowserChangedSurveyManager
-
     @Mock private lateinit var mockDuckAIFeatureState: DuckAiFeatureState
     private val mockDuckAiFullScreenMode = MutableStateFlow(false)
 
     private val mockNtpAfterIdleManager: NtpAfterIdleManager = mock()
+
+    private val browserModeFlow = MutableStateFlow(BrowserMode.REGULAR)
+    private val mockBrowserModeStateHolder: BrowserModeStateHolder = mock {
+        on { currentMode } doReturn browserModeFlow
+    }
+    private val mockFireModeAvailability: FireModeAvailability = mock()
 
     private val selectedTabFlow = MutableSharedFlow<TabEntity?>(replay = 1)
 
@@ -688,6 +696,45 @@ class BrowserViewModelTest {
         }
     }
 
+    // --- Fire mode: switchToMode ---
+
+    @Test
+    fun whenSwitchToRegularThenHolderUpdatedAndReturnsTrue() = runTest {
+        val result = testee.switchToMode(BrowserMode.REGULAR)
+
+        assertTrue(result)
+        verify(mockBrowserModeStateHolder).switchTo(BrowserMode.REGULAR)
+    }
+
+    @Test
+    fun whenSwitchToRegularThenAvailabilityNotConsulted() = runTest {
+        clearInvocations(mockFireModeAvailability)
+
+        testee.switchToMode(BrowserMode.REGULAR)
+
+        verifyNoInteractions(mockFireModeAvailability)
+    }
+
+    @Test
+    fun whenSwitchToFireAndAvailableThenHolderUpdatedAndReturnsTrue() = runTest {
+        mockFireModeAvailability.stub { onBlocking { isAvailable() }.thenReturn(true) }
+
+        val result = testee.switchToMode(BrowserMode.FIRE)
+
+        assertTrue(result)
+        verify(mockBrowserModeStateHolder).switchTo(BrowserMode.FIRE)
+    }
+
+    @Test
+    fun whenSwitchToFireAndUnavailableThenHolderNotUpdatedAndReturnsFalse() = runTest {
+        mockFireModeAvailability.stub { onBlocking { isAvailable() }.thenReturn(false) }
+
+        val result = testee.switchToMode(BrowserMode.FIRE)
+
+        assertFalse(result)
+        verify(mockBrowserModeStateHolder, never()).switchTo(any())
+    }
+
     private fun initTestee() {
         testee = BrowserViewModel(
             tabRepository = mockTabRepository,
@@ -700,11 +747,12 @@ class BrowserViewModelTest {
             pixel = mockPixel,
             skipUrlConversionOnNewTabFeature = skipUrlConversionOnNewTabFeature,
             additionalDefaultBrowserPrompts = mockAdditionalDefaultBrowserPrompts,
-            defaultBrowserChangedSurveyManager = mockDefaultBrowserChangedSurveyManager,
             swipingTabsFeature = swipingTabsFeatureProvider,
             duckAiFeatureState = mockDuckAIFeatureState,
             ntpAfterIdleManager = mockNtpAfterIdleManager,
             androidBrowserConfigFeature = fakeAndroidBrowserConfigFeature,
+            browserModeStateHolder = mockBrowserModeStateHolder,
+            fireModeAvailability = mockFireModeAvailability,
         )
     }
 
@@ -724,11 +772,12 @@ class BrowserViewModelTest {
             pixel = mockPixel,
             skipUrlConversionOnNewTabFeature = skipUrlConversionOnNewTabFeature,
             additionalDefaultBrowserPrompts = mockAdditionalDefaultBrowserPrompts,
-            defaultBrowserChangedSurveyManager = mockDefaultBrowserChangedSurveyManager,
             swipingTabsFeature = swipingTabsFeatureProvider,
             duckAiFeatureState = mockDuckAIFeatureState,
             ntpAfterIdleManager = mockNtpAfterIdleManager,
             androidBrowserConfigFeature = fakeAndroidBrowserConfigFeature,
+            browserModeStateHolder = mockBrowserModeStateHolder,
+            fireModeAvailability = mockFireModeAvailability,
         )
     }
 

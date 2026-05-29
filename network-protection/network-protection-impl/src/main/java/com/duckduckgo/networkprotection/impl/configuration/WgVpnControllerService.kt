@@ -40,10 +40,10 @@ object WgVpnControllerServiceModule {
 
     @Retention(AnnotationRetention.BINARY)
     @Qualifier
-    private annotation class InternalApi
+    private annotation class WgInternalApi
 
     @Provides
-    @InternalApi
+    @WgInternalApi
     @SingleInstanceIn(VpnScope::class)
     fun provideInternalCustomHttpClient(
         @Named("api") okHttpClient: OkHttpClient,
@@ -59,7 +59,7 @@ object WgVpnControllerServiceModule {
     @SuppressLint("NoRetrofitCreateMethodCallDetector")
     fun providesWgVpnControllerService(
         @Named(value = "api") retrofit: Retrofit,
-        @InternalApi customClient: Lazy<OkHttpClient>,
+        @WgInternalApi customClient: Lazy<OkHttpClient>,
     ): WgVpnControllerService {
         return retrofit.newBuilder()
             .callFactory { customClient.get().newCall(it) }

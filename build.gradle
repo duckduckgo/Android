@@ -20,6 +20,7 @@ buildscript {
         google()
         mavenCentral()
         maven { url "https://plugins.gradle.org/m2/" }
+        maven { url "https://central.sonatype.com/repository/maven-snapshots/" }
     }
     dependencies {
         classpath(Android.tools.build.gradlePlugin)
@@ -28,7 +29,7 @@ buildscript {
         // in the individual module build.gradle files
 
         // Metro DI plugin (requires JVM 21+ to load)
-        classpath "dev.zacsweers.metro:gradle-plugin:1.0.0"
+        classpath "dev.zacsweers.metro:gradle-plugin:_"
     }
 }
 
@@ -63,6 +64,7 @@ allprojects {
         google()
         mavenCentral()
         maven { url 'https://jitpack.io' }
+        maven { url 'https://central.sonatype.com/repository/maven-snapshots/' }
         if (rootProject.ext.proprietaryFontAvailable) {
             maven {
                 url = uri("https://maven.pkg.github.com/duckduckgo/native-apps-ducksans")
@@ -175,6 +177,7 @@ subprojects {
                                 && dependencyPath != ":navigation-api"
                                 && dependencyPath != ":js-messaging-api"
                                 && dependencyPath != ":browser-api"
+                                && dependencyPath != ":browser-mode-api"
                         ) {
                             if (projectPath.endsWith(":feature-toggles-api") &&
                                     (dependencyPath == ":experiments-api"
@@ -229,6 +232,9 @@ subprojects {
     }
 
     plugins.withId('com.google.devtools.ksp') {
+        ksp {
+            arg("ddg.di", findProperty('ddg.di') ?: 'AnvilDagger')
+        }
         afterEvaluate {
             configurations.configureEach { config ->
                 if (config.name == 'ksp') {
@@ -254,8 +260,13 @@ if (diFramework == 'Metro') {
         // Nest callbacks: first wait for Kotlin, then check for Anvil.
         def applyMetro = {
             pluginManager.withPlugin('com.squareup.anvil') {
+                // Disable Anvil's component merging — Metro handles it
+                anvil {
+                    disableComponentMerging.set(true)
+                }
                 apply plugin: 'dev.zacsweers.metro'
                 metro {
+                    enableKClassToClassMapKeyInterop.set(true)
                     interop {
                         includeDaggerAnnotations.set(true)
                         includeJavaxAnnotations.set(true)
@@ -264,12 +275,23 @@ if (diFramework == 'Metro') {
                         enableDaggerAnvilInterop.set(true)
                     }
                 }
-                // Override Anvil's languageVersion=1.9 AFTER evaluation (Anvil sets it during apply)
+                // Disable Anvil's Kotlin compiler plugin entirely — it forces languageVersion=1.9
+                // which is incompatible with Metro. Metro replaces all Anvil functionality.
                 afterEvaluate {
                     tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
                         compilerOptions {
                             languageVersion.set(org.jetbrains.kotlin.gradle.dsl.KotlinVersion.KOTLIN_2_2)
+                            apiVersion.set(org.jetbrains.kotlin.gradle.dsl.KotlinVersion.KOTLIN_2_2)
                         }
+                        // Remove Anvil from the compiler plugin classpath so it can't
+                        // override language version or run its K1 compiler plugin
+                        pluginClasspath.setFrom(pluginClasspath.filter {
+                            !it.name.contains("anvil")
+                        })
+                    }
+                    // Disable KAPT tasks — Metro replaces Dagger
+                    tasks.matching { it.name.contains("kapt") || it.name.contains("Kapt") }.configureEach {
+                        enabled = false
                     }
                 }
             }
@@ -288,6 +310,9 @@ def isCI = System.getenv('CI') != null
 subprojects {
     tasks.withType(Test).configureEach {
         useJUnitPlatform()
+        // Expose the active DI framework to tests so Anvil/Dagger-specific
+        // assertions can be skipped under Metro
+        systemProperty 'ddg.di', findProperty('ddg.di') ?: 'AnvilDagger'
         develocity.testRetry {
             maxRetries = isCI ? 1 : 0
             maxFailures = 5

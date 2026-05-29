@@ -58,8 +58,7 @@
             {
                 "key": "is_repeated",
                 "description": "Indicates whether this is a repeated crash after a recovery attempt. 'false' for first crash, 'true' for repeated crash.",
-                "type": "string",
-                "enum": ["true", "false"]
+                "type": "boolean"
             }
         ]
     },
@@ -118,7 +117,7 @@
         "owners": ["nalcalag"],
         "triggers": ["other"],
         "suffixes": ["daily_count_short", "form_factor"],
-        "parameters": ["atb", "appVersion", "freeTrial"]
+        "parameters": ["appVersion", "freeTrial", "osVersion"]
     },
     "m_subscribe": {
         "description": "Fired when a subscription purchase completes, capturing purchase origin and locale.",
@@ -145,14 +144,6 @@
         "owners": ["lmac012"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
-        "parameters": [
-            "appVersion",
-            "petal",
-            {
-                "key": "os_version",
-                "description": "OS version of the device",
-                "type": "integer"
-            }
-        ]
+        "parameters": ["appVersion", "petal", "osVersion"]
     }
 }

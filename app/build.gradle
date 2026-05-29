@@ -49,6 +49,8 @@ android {
             }
         }
 
+        buildConfigField "String", "DI_FRAMEWORK", "\"${findProperty('ddg.di') ?: 'AnvilDagger'}\""
+
         if (project.hasProperty('perf-test')) {
             buildConfigField "boolean", "IS_PERFORMANCE_TEST", "true"
         } else {
@@ -290,6 +292,8 @@ dependencies {
 	implementation project(":duckchat-api")
 	implementation project(":duckchat-impl")
 	implementation project(":duckchat-store")
+	implementation project(":test-seeder-api")
+	internalImplementation project(":test-seeder-internal")
 	implementation project(":data-clearing-api")
 	implementation project(":data-clearing-impl")
 	internalImplementation project(":duckchat-internal")
@@ -303,6 +307,8 @@ dependencies {
 	implementation project(":history-api")
 	implementation project(":data-store-impl")
 	implementation project(":data-store-api")
+
+    implementation project (":ad-blocking-impl")
 
 	implementation project(":new-tab-page-impl")
 	implementation project(":new-tab-page-api")
@@ -418,7 +424,8 @@ dependencies {
     implementation project(':fingerprint-protection-impl')
     implementation project(':fingerprint-protection-store')
 
-    implementation project(':fire-mode-impl')
+    implementation project(':browser-mode-api')
+    implementation project(':browser-mode-impl')
 
     implementation project(':element-hiding-impl')
     implementation project(':element-hiding-store')

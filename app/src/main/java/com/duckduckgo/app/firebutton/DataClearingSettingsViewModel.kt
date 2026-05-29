@@ -23,6 +23,7 @@ import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.fire.FireAnimationLoader
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
 import com.duckduckgo.app.fire.store.FireDataStore
+import com.duckduckgo.app.onboardingbranddesignupdate.OnboardingBrandDesignUpdateToggles
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.settings.clear.FireAnimation
 import com.duckduckgo.app.settings.clear.FireClearOption.DUCKAI_CHATS
@@ -42,6 +43,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import logcat.LogPriority.VERBOSE
 import logcat.logcat
 import javax.inject.Inject
@@ -56,10 +58,12 @@ class DataClearingSettingsViewModel @Inject constructor(
     private val fireDataStore: FireDataStore,
     private val dispatcherProvider: DispatcherProvider,
     fireproofWebsiteRepository: FireproofWebsiteRepository,
+    private val brandDesignUpdateToggles: OnboardingBrandDesignUpdateToggles,
 ) : ViewModel() {
 
     data class ViewState(
         val selectedFireAnimation: FireAnimation = FireAnimation.HeroFire,
+        val isFireAnimationUpdateEnabled: Boolean = false,
         val clearDuckAiData: Boolean = false,
         val showClearDuckAiDataSetting: Boolean = false,
         val fireproofWebsitesCount: Int = 0,
@@ -68,7 +72,10 @@ class DataClearingSettingsViewModel @Inject constructor(
 
     sealed class Command {
         data object LaunchFireproofWebsites : Command()
-        data class LaunchFireAnimationSettings(val animation: FireAnimation) : Command()
+        data class LaunchFireAnimationSettings(
+            val animation: FireAnimation,
+            val isFireAnimationUpdateEnabled: Boolean,
+        ) : Command()
         data object LaunchFireDialog : Command()
         data object LaunchAutomaticDataClearingSettings : Command()
     }
@@ -95,11 +102,24 @@ class DataClearingSettingsViewModel @Inject constructor(
 
     private fun loadInitialState() {
         viewModelScope.launch {
+            val isFireAnimationUpdateEnabled = withContext(dispatcherProvider.io()) {
+                brandDesignUpdateToggles.fireAnimationUpdate().isEnabled()
+            }
+            val initialFireAnimation = withContext(dispatcherProvider.io()) {
+                settingsDataStore.selectedFireAnimation
+            }
+            val initialClearDuckAi = withContext(dispatcherProvider.io()) {
+                fireDataStore.isManualClearOptionSelected(DUCKAI_CHATS)
+            }
+            val initialShowClearDuckAi = withContext(dispatcherProvider.io()) {
+                duckChat.wasOpenedBefore() && duckAiFeatureState.showClearDuckAIChatHistory.value
+            }
             _viewState.update {
                 it.copy(
-                    selectedFireAnimation = settingsDataStore.selectedFireAnimation,
-                    clearDuckAiData = fireDataStore.isManualClearOptionSelected(DUCKAI_CHATS),
-                    showClearDuckAiDataSetting = duckChat.wasOpenedBefore() && duckAiFeatureState.showClearDuckAIChatHistory.value,
+                    selectedFireAnimation = initialFireAnimation,
+                    isFireAnimationUpdateEnabled = isFireAnimationUpdateEnabled,
+                    clearDuckAiData = initialClearDuckAi,
+                    showClearDuckAiDataSetting = initialShowClearDuckAi,
                 )
             }
         }
@@ -115,7 +135,15 @@ class DataClearingSettingsViewModel @Inject constructor(
     }
 
     fun userRequestedToChangeFireAnimation() {
-        viewModelScope.launch { _commands.send(Command.LaunchFireAnimationSettings(_viewState.value.selectedFireAnimation)) }
+        viewModelScope.launch {
+            val state = _viewState.value
+            _commands.send(
+                Command.LaunchFireAnimationSettings(
+                    animation = state.selectedFireAnimation,
+                    isFireAnimationUpdateEnabled = state.isFireAnimationUpdateEnabled,
+                ),
+            )
+        }
         pixel.fire(AppPixelName.FIRE_ANIMATION_SETTINGS_OPENED)
     }
 

@@ -33,9 +33,11 @@ import com.duckduckgo.duckchat.impl.helper.RealDuckChatJSHelper.Companion.DUCK_C
 import com.duckduckgo.duckchat.impl.helper.RealDuckChatJSHelper.Companion.METHOD_GET_PAGE_CONTEXT
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.store.DuckChatDataStore
+import com.duckduckgo.duckchat.impl.ui.nativeinput.attachment.LimitsHandler
 import com.duckduckgo.duckchat.impl.voice.VoiceSessionStateManager
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.advanceUntilIdle
@@ -74,6 +76,7 @@ class RealDuckChatJSHelperTest {
     private val mockDuckChatFeature: DuckChatFeature =
         FakeFeatureToggleFactory.create(DuckChatFeature::class.java)
     private val mockVoiceSessionStateManager: VoiceSessionStateManager = mock()
+    private val mockLimitsHandler: LimitsHandler = mock()
     private val testee = RealDuckChatJSHelper(
         duckChat = mockDuckChat,
         duckChatPixels = mockDuckChatPixels,
@@ -85,6 +88,7 @@ class RealDuckChatJSHelperTest {
         faviconManager = mockFaviconManager,
         duckChatFeature = mockDuckChatFeature,
         voiceSessionStateManager = mockVoiceSessionStateManager,
+        limitsHandler = mockLimitsHandler,
     )
     private val viewModel =
         object {
@@ -254,7 +258,6 @@ class RealDuckChatJSHelperTest {
 
         whenever(mockDuckChat.isDuckChatFeatureEnabled()).thenReturn(true)
         whenever(mockDuckChat.isDuckChatFullScreenModeEnabled()).thenReturn(false)
-        whenever(mockDataStore.isNativeInputFieldUserSettingEnabled()).thenReturn(false)
 
         val result = testee.processJsCallbackMessage(
             featureName,
@@ -310,7 +313,7 @@ class RealDuckChatJSHelperTest {
     }
 
     @Test
-    fun whenGetPageContextInitAndAutomaticDisabledThenReturnsNull() = runTest {
+    fun whenGetPageContextInitAndAutomaticDisabledThenReturnsEmptyPageContext() = runTest {
         whenever(mockDuckChat.isAutomaticContextAttachmentEnabled()).thenReturn(false)
 
         val result =
@@ -323,7 +326,9 @@ class RealDuckChatJSHelperTest {
                 pageContext = viewModel.updatedPageContext,
             )
 
-        assertNull(result)
+        assertNotNull(result)
+        assertTrue(result!!.params.has("pageContext"))
+        assertTrue(result.params.isNull("pageContext"))
     }
 
     @Test
@@ -351,7 +356,7 @@ class RealDuckChatJSHelperTest {
     }
 
     @Test
-    fun whenGetPageContextWithoutDataThenReturnsNull() = runTest {
+    fun whenGetPageContextWithoutDataThenReturnsEmptyPageContext() = runTest {
         whenever(mockDuckChat.isAutomaticContextAttachmentEnabled()).thenReturn(true)
 
         val result =
@@ -364,7 +369,9 @@ class RealDuckChatJSHelperTest {
                 pageContext = "",
             )
 
-        assertNull(result)
+        assertNotNull(result)
+        assertTrue(result!!.params.has("pageContext"))
+        assertTrue(result.params.isNull("pageContext"))
     }
 
     @Test
@@ -425,7 +432,7 @@ class RealDuckChatJSHelperTest {
     }
 
     @Test
-    fun whenGetPageContextWithUnknownReasonThenReturnsNull() = runTest {
+    fun whenGetPageContextWithUnknownReasonThenReturnsEmptyPageContext() = runTest {
         whenever(mockDuckChat.isAutomaticContextAttachmentEnabled()).thenReturn(true)
 
         val result =
@@ -438,7 +445,9 @@ class RealDuckChatJSHelperTest {
                 pageContext = viewModel.updatedPageContext,
             )
 
-        assertNull(result)
+        assertNotNull(result)
+        assertTrue(result!!.params.has("pageContext"))
+        assertTrue(result.params.isNull("pageContext"))
     }
 
     @Test
@@ -508,7 +517,6 @@ class RealDuckChatJSHelperTest {
 
         whenever(mockDuckChat.isDuckChatFeatureEnabled()).thenReturn(false)
         whenever(mockDuckChat.isDuckChatFullScreenModeEnabled()).thenReturn(false)
-        whenever(mockDataStore.isNativeInputFieldUserSettingEnabled()).thenReturn(false)
 
         val result = testee.processJsCallbackMessage(
             featureName,
@@ -552,7 +560,6 @@ class RealDuckChatJSHelperTest {
 
         whenever(mockDuckChat.isDuckChatFeatureEnabled()).thenReturn(true)
         whenever(mockDuckChat.isDuckChatFullScreenModeEnabled()).thenReturn(true)
-        whenever(mockDataStore.isNativeInputFieldUserSettingEnabled()).thenReturn(false)
 
         val result = testee.processJsCallbackMessage(
             featureName,
@@ -612,7 +619,7 @@ class RealDuckChatJSHelperTest {
     }
 
     @Test
-    fun `when get AI chat page context for init without automatic attachment then return null`() = runTest {
+    fun `when get AI chat page context for init without automatic attachment then return empty page context`() = runTest {
         val featureName = "aiChat"
         val method = "getAIChatPageContext"
         val id = "123"
@@ -627,7 +634,9 @@ class RealDuckChatJSHelperTest {
             pageContext = viewModel.updatedPageContext,
         )
 
-        assertNull(result)
+        assertNotNull(result)
+        assertTrue(result!!.params.has("pageContext"))
+        assertTrue(result.params.isNull("pageContext"))
     }
 
     @Test
@@ -677,7 +686,7 @@ class RealDuckChatJSHelperTest {
     }
 
     @Test
-    fun `when get AI chat page context without context then return null`() = runTest {
+    fun `when get AI chat page context without context then return empty page context`() = runTest {
         val featureName = "aiChat"
         val method = "getAIChatPageContext"
         val id = "123"
@@ -693,7 +702,9 @@ class RealDuckChatJSHelperTest {
             pageContext = "",
         )
 
-        assertNull(result)
+        assertNotNull(result)
+        assertTrue(result!!.params.has("pageContext"))
+        assertTrue(result.params.isNull("pageContext"))
     }
 
     @Test
@@ -704,7 +715,6 @@ class RealDuckChatJSHelperTest {
 
         whenever(mockDuckChat.isDuckChatFeatureEnabled()).thenReturn(true)
         whenever(mockDuckChat.isDuckChatContextualModeEnabled()).thenReturn(true)
-        whenever(mockDataStore.isNativeInputFieldUserSettingEnabled()).thenReturn(false)
 
         val result = testee.processJsCallbackMessage(
             featureName,
@@ -750,7 +760,6 @@ class RealDuckChatJSHelperTest {
         whenever(mockDuckChat.isDuckChatFeatureEnabled()).thenReturn(true)
         whenever(mockDuckChat.isDuckChatContextualModeEnabled()).thenReturn(true)
         whenever(mockDuckChat.areMultipleContentAttachmentsEnabled()).thenReturn(true)
-        whenever(mockDataStore.isNativeInputFieldUserSettingEnabled()).thenReturn(false)
 
         val result = testee.processJsCallbackMessage(
             featureName,
@@ -794,7 +803,6 @@ class RealDuckChatJSHelperTest {
         val id = "123"
 
         whenever(mockDuckChat.isStandaloneMigrationEnabled()).thenReturn(true)
-        whenever(mockDataStore.isNativeInputFieldUserSettingEnabled()).thenReturn(false)
 
         val result = testee.processJsCallbackMessage(
             featureName,
@@ -837,7 +845,6 @@ class RealDuckChatJSHelperTest {
         val id = "123"
 
         whenever(mockDuckChat.isNativeStorageEnabled()).thenReturn(true)
-        whenever(mockDataStore.isNativeInputFieldUserSettingEnabled()).thenReturn(false)
 
         val result = testee.processJsCallbackMessage(
             featureName,
@@ -1102,7 +1109,6 @@ class RealDuckChatJSHelperTest {
         whenever(mockDuckChat.isDuckChatFeatureEnabled()).thenReturn(true)
         whenever(mockDuckChat.isImageUploadEnabled()).thenReturn(true)
         whenever(mockDuckChat.isDuckChatFullScreenModeEnabled()).thenReturn(false)
-        whenever(mockDataStore.isNativeInputFieldUserSettingEnabled()).thenReturn(false)
 
         val result = testee.processJsCallbackMessage(
             featureName,
@@ -1141,7 +1147,7 @@ class RealDuckChatJSHelperTest {
 
         whenever(mockDuckChat.isDuckChatFeatureEnabled()).thenReturn(true)
         whenever(mockDuckChat.isDuckChatFullScreenModeEnabled()).thenReturn(false)
-        whenever(mockDataStore.isNativeInputFieldUserSettingEnabled()).thenReturn(true)
+        mockDuckChatFeature.nativeInputField().setRawStoredState(State(enable = true))
 
         val result = testee.processJsCallbackMessage(
             featureName,
@@ -1181,7 +1187,6 @@ class RealDuckChatJSHelperTest {
         whenever(mockDuckChat.isDuckChatFeatureEnabled()).thenReturn(true)
         whenever(mockDuckChat.isDuckChatFullScreenModeEnabled()).thenReturn(false)
         whenever(mockDuckChat.isChatSyncFeatureEnabled()).thenReturn(true)
-        whenever(mockDataStore.isNativeInputFieldUserSettingEnabled()).thenReturn(false)
 
         val result = testee.processJsCallbackMessage(
             featureName,
@@ -1400,6 +1405,14 @@ class RealDuckChatJSHelperTest {
     }
 
     @Test
+    fun whenNativeActionEndVoiceSessionRequestedThenSubscriptionDataSent() = runTest {
+        val result = testee.onNativeAction(NativeAction.END_VOICE_SESSION)
+
+        assertEquals("endVoiceSession", result.subscriptionName)
+        assertEquals(DUCK_CHAT_FEATURE_NAME, result.featureName)
+    }
+
+    @Test
     fun whenGetAIChatNativeHandoffDataThenReportOpenIsCalled() = runTest {
         val featureName = "aiChat"
         val method = "getAIChatNativeHandoffData"
@@ -1592,7 +1605,7 @@ class RealDuckChatJSHelperTest {
 
     @Test
     fun whenGetAIChatNativePromptWithPendingPromptThenReturnsPromptData() = runTest {
-        val pending = PendingNativePrompt("test prompt", "model")
+        val pending = PendingNativePrompt("test prompt", "model", null)
         whenever(mockPendingNativePromptStore.consume()).thenReturn(pending)
 
         val result = testee.processJsCallbackMessage(
@@ -1610,11 +1623,12 @@ class RealDuckChatJSHelperTest {
         assertEquals("test prompt", query.getString("prompt"))
         assertTrue(query.getBoolean("autoSubmit"))
         assertEquals("model", query.getString("modelId"))
+        assertFalse(query.has("reasoningEffort"))
     }
 
     @Test
     fun whenGetAIChatNativePromptWithPendingPromptButNoModelIdThenModelIdOmitted() = runTest {
-        val pending = PendingNativePrompt("test prompt", null)
+        val pending = PendingNativePrompt("test prompt", null, null)
         whenever(mockPendingNativePromptStore.consume()).thenReturn(pending)
 
         val result = testee.processJsCallbackMessage(
@@ -1629,6 +1643,40 @@ class RealDuckChatJSHelperTest {
         val query = result!!.params.getJSONObject("query")
         assertEquals("test prompt", query.getString("prompt"))
         assertFalse(query.has("modelId"))
+    }
+
+    @Test
+    fun whenGetAIChatNativePromptWithReasoningEffortThenPayloadIncludesIt() = runTest {
+        val pending = PendingNativePrompt("test prompt", "model", "medium")
+        whenever(mockPendingNativePromptStore.consume()).thenReturn(pending)
+
+        val result = testee.processJsCallbackMessage(
+            "aiChat",
+            "getAIChatNativePrompt",
+            "123",
+            null,
+            pageContext = viewModel.updatedPageContext,
+        )
+
+        val query = result!!.params.getJSONObject("query")
+        assertEquals("medium", query.getString("reasoningEffort"))
+    }
+
+    @Test
+    fun whenGetAIChatNativePromptWithoutReasoningEffortThenPayloadOmitsField() = runTest {
+        val pending = PendingNativePrompt("test prompt", "model", null)
+        whenever(mockPendingNativePromptStore.consume()).thenReturn(pending)
+
+        val result = testee.processJsCallbackMessage(
+            "aiChat",
+            "getAIChatNativePrompt",
+            "123",
+            null,
+            pageContext = viewModel.updatedPageContext,
+        )
+
+        val query = result!!.params.getJSONObject("query")
+        assertFalse(query.has("reasoningEffort"))
     }
 
     @Test
@@ -1680,16 +1728,197 @@ class RealDuckChatJSHelperTest {
 
     @Test
     fun whenVoiceSessionEndedThenNoPixelFiredAndStateUpdated() = runTest {
+        val tabId = "test-tab-id"
         val result = testee.processJsCallbackMessage(
             "aiChat",
             "voiceSessionEnded",
             null,
             null,
             pageContext = viewModel.updatedPageContext,
+            tabId = tabId,
         )
 
         assertNull(result)
-        verify(mockVoiceSessionStateManager).onVoiceSessionEnded()
+        verify(mockVoiceSessionStateManager).onVoiceSessionEnded(tabId)
         verifyNoInteractions(mockDuckChatPixels)
+    }
+
+    @Test
+    fun whenResponseStateWithAttachmentsThenConversationImagesUsedUpdated() = runTest {
+        val data = JSONObject().apply {
+            put("status", "streaming")
+            put(
+                "attachments",
+                JSONObject().apply {
+                    put("imagesUsed", 2)
+                    put("filesUsed", 0)
+                    put("fileSizeBytesUsed", 0)
+                },
+            )
+        }
+
+        testee.processJsCallbackMessage(
+            featureName = "aiChat",
+            method = "responseState",
+            id = "123",
+            data = data,
+            pageContext = viewModel.updatedPageContext,
+        )
+
+        verify(mockLimitsHandler).setConversationImagesUsed(2)
+    }
+
+    @Test
+    fun whenResponseStateWithoutAttachmentsThenConversationImagesUsedNotUpdated() = runTest {
+        val data = JSONObject(mapOf("status" to "streaming"))
+
+        testee.processJsCallbackMessage(
+            featureName = "aiChat",
+            method = "responseState",
+            id = "123",
+            data = data,
+            pageContext = viewModel.updatedPageContext,
+        )
+
+        verify(mockLimitsHandler, never()).setConversationImagesUsed(any())
+    }
+
+    @Test
+    fun whenGetAIChatNativePromptWithImagesThenImagesIncludedInResponse() = runTest {
+        val images = listOf(
+            PendingNativeImage(base64Data = "base64data1", format = "jpeg"),
+            PendingNativeImage(base64Data = "base64data2", format = "png"),
+        )
+        val pending = PendingNativePrompt(
+            prompt = "test prompt",
+            modelId = "model-id",
+            reasoningEffort = null,
+            images = images,
+        )
+        whenever(mockPendingNativePromptStore.consume()).thenReturn(pending)
+
+        val result = testee.processJsCallbackMessage(
+            "aiChat",
+            "getAIChatNativePrompt",
+            "123",
+            null,
+            pageContext = viewModel.updatedPageContext,
+        )
+
+        assertNotNull(result)
+        val query = result!!.params.getJSONObject("query")
+        assertTrue(query.has("images"))
+        val imagesArray = query.getJSONArray("images")
+        assertEquals(2, imagesArray.length())
+        assertEquals("base64data1", imagesArray.getJSONObject(0).getString("data"))
+        assertEquals("jpeg", imagesArray.getJSONObject(0).getString("format"))
+        assertEquals("base64data2", imagesArray.getJSONObject(1).getString("data"))
+        assertEquals("png", imagesArray.getJSONObject(1).getString("format"))
+    }
+
+    @Test
+    fun whenGetAIChatNativePromptWithSelectedToolThenToolChoiceIncluded() = runTest {
+        val pending = PendingNativePrompt(
+            prompt = "test prompt",
+            modelId = "model-id",
+            reasoningEffort = null,
+            selectedTool = "WebSearch",
+        )
+        whenever(mockPendingNativePromptStore.consume()).thenReturn(pending)
+
+        val result = testee.processJsCallbackMessage(
+            "aiChat",
+            "getAIChatNativePrompt",
+            "123",
+            null,
+            pageContext = viewModel.updatedPageContext,
+        )
+
+        assertNotNull(result)
+        val query = result!!.params.getJSONObject("query")
+        assertTrue(query.has("toolChoice"))
+        val toolChoice = query.getJSONArray("toolChoice")
+        assertEquals(1, toolChoice.length())
+        assertEquals("WebSearch", toolChoice.getString(0))
+    }
+
+    @Test
+    fun whenGetAIChatNativePromptWithNoSelectedToolThenToolChoiceAbsent() = runTest {
+        val pending = PendingNativePrompt(
+            prompt = "test prompt",
+            modelId = "model-id",
+            reasoningEffort = null,
+            selectedTool = null,
+        )
+        whenever(mockPendingNativePromptStore.consume()).thenReturn(pending)
+
+        val result = testee.processJsCallbackMessage(
+            "aiChat",
+            "getAIChatNativePrompt",
+            "123",
+            null,
+            pageContext = viewModel.updatedPageContext,
+        )
+
+        assertNotNull(result)
+        val query = result!!.params.getJSONObject("query")
+        assertFalse(query.has("toolChoice"))
+    }
+
+    @Test
+    fun whenGetAIChatNativePromptWithNoImagesThenImagesKeyAbsent() = runTest {
+        val pending = PendingNativePrompt(
+            prompt = "test prompt",
+            modelId = "model-id",
+            reasoningEffort = null,
+            images = emptyList(),
+        )
+        whenever(mockPendingNativePromptStore.consume()).thenReturn(pending)
+
+        val result = testee.processJsCallbackMessage(
+            "aiChat",
+            "getAIChatNativePrompt",
+            "123",
+            null,
+            pageContext = viewModel.updatedPageContext,
+        )
+
+        assertNotNull(result)
+        val query = result!!.params.getJSONObject("query")
+        assertFalse(query.has("images"))
+    }
+
+    @Test
+    fun whenGetAIChatNativeHandoffDataAndVoiceSessionActiveThenForceEndNativeVoiceSession() = runTest {
+        val tabId = "test-tab-id"
+        whenever(mockVoiceSessionStateManager.isVoiceSessionActive(tabId)).thenReturn(true)
+
+        testee.processJsCallbackMessage(
+            "aiChat",
+            "getAIChatNativeHandoffData",
+            "123",
+            null,
+            pageContext = viewModel.updatedPageContext,
+            tabId = tabId,
+        )
+
+        verify(mockVoiceSessionStateManager).onVoiceSessionEnded(tabId)
+    }
+
+    @Test
+    fun whenGetAIChatNativeHandoffDataAndVoiceSessionNotActiveThenDoNotEndNativeVoiceSession() = runTest {
+        val tabId = "test-tab-id"
+        whenever(mockVoiceSessionStateManager.isVoiceSessionActive(tabId)).thenReturn(false)
+
+        testee.processJsCallbackMessage(
+            "aiChat",
+            "getAIChatNativeHandoffData",
+            "123",
+            null,
+            pageContext = viewModel.updatedPageContext,
+            tabId = tabId,
+        )
+
+        verify(mockVoiceSessionStateManager, never()).onVoiceSessionEnded(any())
     }
 }

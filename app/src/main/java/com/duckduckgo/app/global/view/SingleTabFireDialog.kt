@@ -34,6 +34,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat.Type
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.core.view.updatePadding
+import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -50,6 +51,9 @@ import com.duckduckgo.common.ui.view.setAndPropagateUpFitsSystemWindows
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.utils.FragmentViewModelFactory
+import com.duckduckgo.common.utils.extensions.preventWidows
+import com.duckduckgo.dataclearing.api.fire.FireDialog
+import com.duckduckgo.dataclearing.api.fire.FireDialogProvider
 import com.duckduckgo.di.scopes.FragmentScope
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
@@ -66,7 +70,16 @@ import com.google.android.material.R as MaterialR
 private const val ANIMATION_MAX_SPEED = 1.4f
 private const val ANIMATION_SPEED_INCREMENT = 0.15f
 private const val BOTTOM_SHEET_MAX_WIDTH_DP = 640
+private const val NO_MAX_WIDTH = -1
 private const val ARG_ORIGIN = "origin"
+private const val ARG_TAB_ID = "tabId"
+private const val ARG_SELECTED_CHAT_URLS = "selectedChatUrls"
+internal const val ORIGIN_BROWSER = "Browser"
+internal const val ORIGIN_SETTINGS = "Settings"
+internal const val ORIGIN_TAB_SWITCHER = "TabSwitcher"
+internal const val ORIGIN_DUCK_AI_CONTEXTUAL_CHAT = "DuckAiContextualChat"
+internal const val ORIGIN_HATCH = "Hatch"
+internal const val ORIGIN_CHAT_HISTORY = "ChatHistory"
 
 @InjectWith(FragmentScope::class)
 class SingleTabFireDialog : BottomSheetDialogFragment(), FireDialog {
@@ -99,6 +112,14 @@ class SingleTabFireDialog : BottomSheetDialogFragment(), FireDialog {
     private var animationEnabled = false
     private var canFinish = false
     private var pendingFragmentResultEvent: String? = null
+    private var isFireAnimationUpdateEnabled = false
+
+    override fun show(fragmentManager: FragmentManager, tag: String?) {
+        // FragmentManager.commit() inside DialogFragment.show() throws after onSaveInstanceState.
+        // Callers may invoke show() across a coroutine suspension; skip silently if state is saved.
+        if (fragmentManager.isStateSaved) return
+        super.show(fragmentManager, tag)
+    }
 
     override fun onAttach(context: Context) {
         AndroidSupportInjection.inject(this)
@@ -121,8 +142,7 @@ class SingleTabFireDialog : BottomSheetDialogFragment(), FireDialog {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val originName = arguments?.getString(ARG_ORIGIN, "BROWSER") ?: "BROWSER"
-        viewModel.setOrigin(FireDialogProvider.FireDialogOrigin.valueOf(originName))
+        viewModel.setOrigin(readOriginFromArguments())
 
         setupLayout()
         configureBottomSheet()
@@ -157,15 +177,23 @@ class SingleTabFireDialog : BottomSheetDialogFragment(), FireDialog {
     private fun setupLayout() {
         binding.deleteAllPrimaryButton.setOnClickListener {
             hideDialog()
-            viewModel.onDeleteAllClicked()
+            dispatchDeleteAll()
         }
         binding.deleteAllSecondaryButton.setOnClickListener {
             hideDialog()
-            viewModel.onDeleteAllClicked()
+            dispatchDeleteAll()
         }
         binding.deleteThisTabButton.setOnClickListener {
             hideDialog()
             viewModel.onDeleteThisTabClicked()
+        }
+    }
+
+    private fun dispatchDeleteAll() {
+        if (arguments?.getString(ARG_ORIGIN) == ORIGIN_CHAT_HISTORY) {
+            viewModel.onDeleteSelectedChatsClicked()
+        } else {
+            viewModel.onDeleteAllClicked()
         }
     }
 
@@ -240,18 +268,25 @@ class SingleTabFireDialog : BottomSheetDialogFragment(), FireDialog {
     }
 
     private fun render(state: SingleTabFireDialogViewModel.ViewState.Loaded) {
-        if (!state.stateData.isFirePictogramVisible) {
+        isFireAnimationUpdateEnabled = state.stateData.isFireAnimationUpdateEnabled
+
+        if (state.stateData.isFirePictogramVisible) {
+            val animationRes = if (isFireAnimationUpdateEnabled) {
+                R.raw.fire_dialog_animation_brand_design
+            } else {
+                R.raw.fire_dialog_animation
+            }
+            binding.fireIcon.setAnimation(animationRes)
+            binding.fireIcon.playAnimation()
+        } else {
             binding.fireIcon.gone()
         }
 
-        val titleRes = if (state.stateData.isDuckAiTab && state.isDeleteThisTabButtonVisible) {
-            R.string.singleTabFireDialogTitleDuckAi
-        } else if (state.stateData.isDuckAiChatsSelected) {
-            R.string.singleTabFireDialogTitleWithChats
-        } else {
-            R.string.singleTabFireDialogTitle
+        binding.dialogTitle.text = when (val source = state.stateData.titleSource) {
+            is SingleTabFireDialogViewModel.TitleSource.Static -> requireContext().getString(source.resId)
+            is SingleTabFireDialogViewModel.TitleSource.Plural ->
+                resources.getQuantityString(source.pluralsId, source.count, source.count)
         }
-        binding.dialogTitle.text = requireContext().getString(titleRes)
 
         if (state.isDeleteThisTabButtonVisible) {
             binding.deleteThisTabButton.show()
@@ -277,10 +312,10 @@ class SingleTabFireDialog : BottomSheetDialogFragment(), FireDialog {
 
         val subtitleParts = buildList {
             if (state.isSiteDataSubtitleVisible) {
-                add(getString(R.string.singleTabFireDialogSubtitleSiteData))
+                add(getString(R.string.singleTabFireDialogSubtitleSiteData).preventWidows())
             }
             if (state.isDownloadsSubtitleVisible) {
-                add(getString(R.string.singleTabFireDialogSubtitleDownloads))
+                add(getString(R.string.singleTabFireDialogSubtitleDownloads).preventWidows())
             }
         }
         if (subtitleParts.isNotEmpty()) {
@@ -327,6 +362,8 @@ class SingleTabFireDialog : BottomSheetDialogFragment(), FireDialog {
 
     private fun hideDialog() {
         binding.fireDialogRootView.gone()
+        // lift the 640dp cap so the burn animation fills the screen on tablets
+        (dialog as? BottomSheetDialog)?.behavior?.maxWidth = NO_MAX_WIDTH
     }
 
     private fun playAnimation() {
@@ -396,11 +433,47 @@ class SingleTabFireDialog : BottomSheetDialogFragment(), FireDialog {
         data object ClearingFinished : ClearAllEvent()
     }
 
+    private fun readOriginFromArguments(): FireDialogProvider.FireDialogOrigin {
+        val tag = arguments?.getString(ARG_ORIGIN) ?: ORIGIN_BROWSER
+        return when (tag) {
+            ORIGIN_SETTINGS -> FireDialogProvider.FireDialogOrigin.Settings
+            ORIGIN_TAB_SWITCHER -> FireDialogProvider.FireDialogOrigin.TabSwitcher
+            ORIGIN_DUCK_AI_CONTEXTUAL_CHAT -> FireDialogProvider.FireDialogOrigin.DuckAiContextualChat
+            ORIGIN_HATCH -> {
+                val tabId = arguments?.getString(ARG_TAB_ID)
+                if (tabId != null) {
+                    FireDialogProvider.FireDialogOrigin.Hatch(tabId)
+                } else {
+                    FireDialogProvider.FireDialogOrigin.Browser
+                }
+            }
+            ORIGIN_CHAT_HISTORY -> {
+                val urls = arguments?.getStringArrayList(ARG_SELECTED_CHAT_URLS)?.toSet().orEmpty()
+                FireDialogProvider.FireDialogOrigin.ChatHistory(selectedChatUrls = urls)
+            }
+            else -> FireDialogProvider.FireDialogOrigin.Browser
+        }
+    }
+
     companion object {
         fun newInstance(origin: FireDialogProvider.FireDialogOrigin): SingleTabFireDialog {
             return SingleTabFireDialog().apply {
-                arguments = bundleOf(ARG_ORIGIN to origin.name)
+                arguments = bundleOf(
+                    ARG_ORIGIN to origin.tag(),
+                    ARG_TAB_ID to (origin as? FireDialogProvider.FireDialogOrigin.Hatch)?.tabId,
+                    ARG_SELECTED_CHAT_URLS to (origin as? FireDialogProvider.FireDialogOrigin.ChatHistory)
+                        ?.selectedChatUrls?.let { ArrayList(it) },
+                )
             }
+        }
+
+        private fun FireDialogProvider.FireDialogOrigin.tag(): String = when (this) {
+            FireDialogProvider.FireDialogOrigin.Browser -> ORIGIN_BROWSER
+            FireDialogProvider.FireDialogOrigin.Settings -> ORIGIN_SETTINGS
+            FireDialogProvider.FireDialogOrigin.TabSwitcher -> ORIGIN_TAB_SWITCHER
+            FireDialogProvider.FireDialogOrigin.DuckAiContextualChat -> ORIGIN_DUCK_AI_CONTEXTUAL_CHAT
+            is FireDialogProvider.FireDialogOrigin.Hatch -> ORIGIN_HATCH
+            is FireDialogProvider.FireDialogOrigin.ChatHistory -> ORIGIN_CHAT_HISTORY
         }
     }
 }

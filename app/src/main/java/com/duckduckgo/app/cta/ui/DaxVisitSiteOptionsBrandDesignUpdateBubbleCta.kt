@@ -18,14 +18,17 @@ package com.duckduckgo.app.cta.ui
 
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.cta.model.CtaId
+import com.duckduckgo.app.cta.ui.DaxBubbleCta.WavingDaxSpec
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.common.utils.device.DeviceInfo
 
 data class DaxVisitSiteOptionsBrandDesignUpdateBubbleCta(
     override val onboardingStore: OnboardingStore,
     override val appInstallStore: AppInstallStore,
     override val isLightTheme: Boolean,
+    override val deviceInfo: DeviceInfo,
 ) : OptionsBubbleCta(
     ctaId = CtaId.DAX_INTRO_VISIT_SITE,
     title = R.string.onboardingSitesDaxDialogTitle,
@@ -36,4 +39,16 @@ data class DaxVisitSiteOptionsBrandDesignUpdateBubbleCta(
     onboardingStore = onboardingStore,
     appInstallStore = appInstallStore,
     isLightTheme = isLightTheme,
-)
+    deviceInfo = deviceInfo,
+    showArrow = true,
+),
+    DaxBubbleCta.ShowsWavingDax {
+
+    override val wavingDaxSpec = WavingDaxSpec(
+        rotationDegrees = 0f,
+        translationXDp = -54f,
+        translationYDp = -110f,
+        heightDp = 178f,
+        anchorToCardOnTablet = true,
+    )
+}

@@ -587,6 +587,7 @@
     <!-- Fire Animation settings -->
     <string name="settingsFireAnimation">Tulenupu animatsioon</string>
     <string name="settingsHeroFireAnimation">Inferno</string>
+    <string name="settingsHeroFireAnimationClassic">Inferno Classic</string>
     <string name="settingsHeroWaterAnimation">Whirlpool</string>
     <string name="settingsHeroAbstractAnimation">Airstream</string>
     <string name="settingsNoneAnimation">Puudub</string>
@@ -844,6 +845,9 @@
     <string name="preOnboardingDaxDialog3Button">Alusta sirvimist</string>
     <string name="preOnboardingAddressBarTitle">Kuhu soovid oma aadressiriba paigutada?</string>
     <string name="preOnboardingAddressBarOkButton">Järgmine</string>
+    <string name="preOnboardingAddressBarPositionTop">Tipp</string>
+    <string name="preOnboardingAddressBarPositionBottom">All</string>
+    <string name="preOnboardingAddressBarPositionSplit">Jagatud</string>
     <string name="highlightsPreOnboardingAddressBarOption1Title">Üles (vaikimisi)</string>
     <string name="highlightsPreOnboardingAddressBarOption1Description">Kergesti märgatav</string>
     <string name="highlightsPreOnboardingAddressBarOption2Title">All</string>
@@ -866,6 +870,8 @@
     <string name="onboardingSitesDaxDialogOption3">ebay.com</string>
     <string name="onboardingSitesDaxDialogOption4">Üllata mind!</string>
     <string name="onboardingSerpDaxDialogDescription"><![CDATA[See on <b>DuckDuckGo Search</b>! Privaatne. Kiire. Vähem reklaame.]]></string>
+    <string name="onboardingSerpDaxDialogBrandDesignTitle">See on DuckDuckGo Search!</string>
+    <string name="onboardingSerpDaxDialogBrandDesignDescription">Privaatne. Kiire. Vähem reklaame.</string>
     <string name="onboardingSerpDaxDialogButton">Sain aru!</string>
     <string name="onboardingSitesSuggestionsDaxDialogTitle">Järgmisena proovi mõnda saiti külastada!</string>
     <plurals name="onboardingTrackersBlockedDialogDescription">
@@ -984,6 +990,10 @@
     <string name="syncRestoreDialogPrimaryCta">Taasta minu andmed</string>
     <string name="syncRestoreDialogSecondaryCta">Jäta vahele</string>
 
+    <!-- Sync Restore (brand-design onboarding) -->
+    <string name="syncRestoreDialogBrandDesignTitle">Jätkame DuckDuckGo-ga sealt, kus pooleli jäid.</string>
+    <string name="syncRestoreDialogBrandDesignBody1">Sinu salvestatud järjehoidjad, paroolid ja muu on valmis.</string>
+
     <!-- PDF download tooltip -->
     <string name="pdfDownloadTooltipText">Laadi alla PDF</string>
 
@@ -991,4 +1001,11 @@
     <string name="copyLinkText">Kopeeri lingi tekst</string>
     <string name="linkTextCopied">Lingi tekst on kopeeritud</string>
     <string name="linkTextCopyFailed">Lingi teksti ei saanud kopeerida</string>
+
+    <string name="preOnboardingWelcomeDialogTitle">Tere!</string>
+    <string name="preOnboardingWelcomeDialogBody1">Kas oled valmis kasutama kiiremat brauserit,\nmis annab sulle kontrolli?</string>
+    <string name="preOnboardingWelcomeDialogBody2">Tehisintellekt on alati valikuline ja\nprivaatsuskaitse on alati sisse lülitatud.</string>
+    <string name="onboardingStepIndicatorText" instruction="a counter above our instructions in onboarding that tells a user what step they are on">%1$d/%2$d</string>
+    <string name="onboardingSearchDaxDialogOption1Quoted" instruction="translate &apos;duck&apos; too.">Kuidas öelda „part“ inglise keeles</string>
+    <string name="onboardingSearchDaxDialogOption1EnglishQuoted" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">Kuidas öelda „part“ hispaania keeles</string>
 </resources>

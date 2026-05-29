@@ -29,7 +29,7 @@
         android:layout_marginBottom="@dimen/keyline_2"
         android:orientation="horizontal">
 
-        <ImageView
+        <com.google.android.material.imageview.ShapeableImageView
             android:id="@+id/returnHatchFavicon"
             android:layout_width="24dp"
             android:layout_height="24dp"
@@ -39,7 +39,19 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            tools:ignore="ContentDescription" />
+            tools:ignore="ContentDescription"
+            app:shapeAppearanceOverlay="@style/ShapeAppearance.DuckDuckGo.VerySmallComponent" />
+
+        <ImageView
+            android:id="@+id/returnHatchReturnIcon"
+            android:layout_width="12dp"
+            android:layout_height="12dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:importantForAccessibility="no"
+            app:layout_constraintStart_toStartOf="@+id/returnHatchFavicon"
+            app:layout_constraintTop_toTopOf="@+id/returnHatchFavicon"
+            app:srcCompat="@drawable/ic_go_back_circle_recolorable_16" />
 
         <LinearLayout
             android:layout_width="0dp"
@@ -47,7 +59,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toEndOf="@id/returnHatchFavicon"
-            app:layout_constraintEnd_toStartOf="@id/returnHatchCTA"
+            app:layout_constraintEnd_toStartOf="@id/returnHatchOptions"
             android:layout_marginStart="@dimen/keyline_2"
             android:orientation="vertical">
 
@@ -68,28 +80,30 @@
                 app:typography="h3"
                 tools:text="Site Title" />
 
-            <com.duckduckgo.common.ui.view.text.DaxTextView
-                android:id="@+id/returnHatchSiteURL"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:textType="secondary"
-                app:typography="h4"
-                tools:text="www.url.com" />
-
         </LinearLayout>
 
         <ImageView
-            android:id="@+id/returnHatchCTA"
+            android:id="@+id/returnHatchOptions"
             android:layout_marginStart="@dimen/keyline_2"
             android:layout_width="48dp"
             android:layout_height="48dp"
-            android:layout_marginEnd="@dimen/keyline_2"
             android:scaleType="centerInside"
-            android:src="@drawable/ic_return_16"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/returnHatchTabsMenu"
+            app:layout_goneMarginEnd="@dimen/keyline_2"
+            android:src="@drawable/ic_menu_vertical_24"
+
+            tools:ignore="ContentDescription" />
+
+        <com.duckduckgo.browser.ui.tabs.NewTabSwitcherButton
+            android:id="@+id/returnHatchTabsMenu"
+            android:layout_marginEnd="@dimen/keyline_2"
+            android:layout_width="@dimen/toolbarIcon"
+            android:layout_height="@dimen/toolbarIcon"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:ignore="ContentDescription" />
+            app:layout_constraintTop_toTopOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

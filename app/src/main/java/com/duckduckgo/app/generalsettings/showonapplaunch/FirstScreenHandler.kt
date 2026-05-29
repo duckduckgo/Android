@@ -16,7 +16,6 @@
 
 package com.duckduckgo.app.generalsettings.showonapplaunch
 
-import androidx.core.net.toUri
 import com.duckduckgo.app.browser.autofill.SystemAutofillEngagement
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption.NewTabPage
@@ -26,6 +25,8 @@ import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.browser.api.BrowserLifecycleObserver
+import com.duckduckgo.browsermode.api.BrowserModeDataProvider
+import com.duckduckgo.browsermode.api.BrowserModeStateHolder
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.customtabs.api.CustomTabDetector
 import com.duckduckgo.di.scopes.AppScope
@@ -54,20 +55,30 @@ class FirstScreenHandlerImpl @Inject constructor(
     private val appBuildConfig: AppBuildConfig,
     private val dispatcherProvider: DispatcherProvider,
     private val duckChat: DuckChat,
-    private val tabRepository: TabRepository,
+    private val tabRepositoryProvider: BrowserModeDataProvider<TabRepository>,
     private val ntpAfterIdleManager: NtpAfterIdleManager,
     private val systemAutofillEngagement: SystemAutofillEngagement,
     private val customTabDetector: CustomTabDetector,
+    private val browserModeStateHolder: BrowserModeStateHolder,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : BrowserLifecycleObserver {
 
+    private val tabRepository: TabRepository
+        get() = tabRepositoryProvider.forMode(browserModeStateHolder.currentMode.value)
+
     override fun onOpen(isFreshLaunch: Boolean) {
-        // Notify the NtpAfterIdleManager synchronously when the currently selected tab is already
-        // an NTP: BrowserViewModel's flowSelectedTab subscription can fire onNtpShown immediately
-        // on activity recreation, and the async handler path below doesn't run in time to classify
-        // it. Gated on "already on NTP" so LastOpenedTab/SpecificPage users on a URL tab don't
-        // leave a stale pendingAfterIdle flag behind for a later user-initiated NTP.
-        if (androidBrowserConfigFeature.showNTPAfterIdleReturn().isEnabled() &&
+        // Notify the NtpAfterIdleManager synchronously on a fresh launch when the currently
+        // selected tab is already an NTP: BrowserViewModel's flowSelectedTab subscription will
+        // fire onNtpShown immediately on activity recreation, and the async handler path below
+        // doesn't run in time to classify it.
+        //
+        // Restricted to isFreshLaunch=true: on plain background+resume, NtpAfterIdleManager
+        // preserves the prior session's classification, so the existing _isAfterIdleReturn value
+        // is correct without a fresh trigger. Setting pendingAfterIdle here would leak — no
+        // onNtpShown fires (same NTP tab), and the next user action that DOES show an NTP
+        // (e.g. opening a new tab manually) would incorrectly consume the stale pending flag.
+        if (isFreshLaunch &&
+            androidBrowserConfigFeature.showNTPAfterIdleReturn().isEnabled() &&
             computeWasIdle() &&
             isCurrentSelectedTabNtp()
         ) {
@@ -120,10 +131,9 @@ class FirstScreenHandlerImpl @Inject constructor(
     }
 
     private suspend fun isVoiceSessionActiveOnCurrentTab(): Boolean = withContext(dispatcherProvider.io()) {
-        if (!duckChat.isVoiceSessionActive()) return@withContext false
         val selectedTab = tabRepository.getSelectedTab()
-        return@withContext selectedTab?.url?.toUri()?.let {
-            duckChat.isDuckChatUrl(it)
+        return@withContext selectedTab?.tabId?.let {
+            duckChat.isVoiceChatSessionActive(it)
         } == true
     }
 

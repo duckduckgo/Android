@@ -33,6 +33,10 @@ import android.webkit.WebViewClient.ERROR_HOST_LOOKUP
 import android.webkit.WebViewClient.ERROR_UNKNOWN
 import android.webkit.WebViewClient.ERROR_UNSUPPORTED_SCHEME
 import androidx.core.net.toUri
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.LifecycleRegistry
+import androidx.lifecycle.setViewTreeLifecycleOwner
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.anrs.api.CrashLogger
@@ -180,6 +184,7 @@ class BrowserWebViewClientTest {
     fun setup() =
         runTest {
             webView = TestWebView(context)
+            webView.setViewTreeLifecycleOwner(startedLifecycleOwner())
             whenever(mockDuckPlayer.observeShouldOpenInNewTab()).thenReturn(openInNewTabFlow)
             whenever(mockContentScopeExperiments.getActiveExperiments()).thenReturn(listOf(mockToggle))
             val enabledToggle: Toggle = mock()
@@ -359,10 +364,19 @@ class BrowserWebViewClientTest {
     }
 
     @Test
-    fun whenShouldInterceptRequestThenEventSentToLoginDetector() {
+    fun whenShouldInterceptRequestForPostThenEventSentToLoginDetector() {
         val webResourceRequest = mock<WebResourceRequest>()
+        whenever(webResourceRequest.method).thenReturn("POST")
         testee.shouldInterceptRequest(webView, webResourceRequest)
         verify(loginDetector).onEvent(WebNavigationEvent.ShouldInterceptRequest(webView, webResourceRequest))
+    }
+
+    @Test
+    fun whenShouldInterceptRequestForNonPostThenEventNotSentToLoginDetector() {
+        val webResourceRequest = mock<WebResourceRequest>()
+        whenever(webResourceRequest.method).thenReturn("GET")
+        testee.shouldInterceptRequest(webView, webResourceRequest)
+        verify(loginDetector, never()).onEvent(any())
     }
 
     @Test
@@ -1710,6 +1724,12 @@ class BrowserWebViewClientTest {
         override fun getOriginalUrl(): String = EXAMPLE_URL
 
         override fun getProgress(): Int = 100
+    }
+
+    private fun startedLifecycleOwner(): LifecycleOwner = object : LifecycleOwner {
+        override val lifecycle: Lifecycle = LifecycleRegistry(this).apply {
+            currentState = Lifecycle.State.STARTED
+        }
     }
 
     private class FakePluginPoint : PluginPoint<JsInjectorPlugin> {

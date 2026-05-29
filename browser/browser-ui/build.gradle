@@ -51,8 +51,10 @@ dependencies {
     implementation project(path: ':app-build-config-api')
     implementation project(':internal-features-api')
     implementation project(':browser-api')
+    implementation project(':navigation-api')
     implementation project(':duckchat-api')
     implementation project(':new-tab-page-api')
+    implementation project(':statistics-api')
     implementation project(':design-system')
     implementation "androidx.datastore:datastore-preferences:_"
 

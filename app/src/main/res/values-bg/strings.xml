@@ -587,6 +587,7 @@
     <!-- Fire Animation settings -->
     <string name="settingsFireAnimation">Анимация на огнения бутон</string>
     <string name="settingsHeroFireAnimation">Адски огън</string>
+    <string name="settingsHeroFireAnimationClassic">Стандартен огън</string>
     <string name="settingsHeroWaterAnimation">Водовъртеж</string>
     <string name="settingsHeroAbstractAnimation">Въздушна струя</string>
     <string name="settingsNoneAnimation">Няма</string>
@@ -844,6 +845,9 @@
     <string name="preOnboardingDaxDialog3Button">Стартиране на сърфирането</string>
     <string name="preOnboardingAddressBarTitle">Къде да сложа адресната лента?</string>
     <string name="preOnboardingAddressBarOkButton">Следващ</string>
+    <string name="preOnboardingAddressBarPositionTop">Най-горе</string>
+    <string name="preOnboardingAddressBarPositionBottom">Отдолу</string>
+    <string name="preOnboardingAddressBarPositionSplit">Раздели</string>
     <string name="highlightsPreOnboardingAddressBarOption1Title">Горе (по подразбиране)</string>
     <string name="highlightsPreOnboardingAddressBarOption1Description">По-добре се вижда</string>
     <string name="highlightsPreOnboardingAddressBarOption2Title">Отдолу</string>
@@ -866,6 +870,8 @@
     <string name="onboardingSitesDaxDialogOption3">ebay.com</string>
     <string name="onboardingSitesDaxDialogOption4">Изненадайте ме!</string>
     <string name="onboardingSerpDaxDialogDescription"><![CDATA[Това е <b>DuckDuckGo Search</b>! Поверителен. Бърз. По-малко реклами.]]></string>
+    <string name="onboardingSerpDaxDialogBrandDesignTitle">Това е DuckDuckGo Search!</string>
+    <string name="onboardingSerpDaxDialogBrandDesignDescription">Поверителен. Бърз. По-малко реклами.</string>
     <string name="onboardingSerpDaxDialogButton">Разбрах!</string>
     <string name="onboardingSitesSuggestionsDaxDialogTitle">Сега опитайте да посетите някой сайт!</string>
     <plurals name="onboardingTrackersBlockedDialogDescription">
@@ -984,6 +990,10 @@
     <string name="syncRestoreDialogPrimaryCta">Възстановяване на моите неща</string>
     <string name="syncRestoreDialogSecondaryCta">Пропускане</string>
 
+    <!-- Sync Restore (brand-design onboarding) -->
+    <string name="syncRestoreDialogBrandDesignTitle">Нека продължим оттам, откъдето спряхте в DuckDuckGo.</string>
+    <string name="syncRestoreDialogBrandDesignBody1">Запазените отметки, пароли и други са готови.</string>
+
     <!-- PDF download tooltip -->
     <string name="pdfDownloadTooltipText">Изтегляне на PDF</string>
 
@@ -991,4 +1001,11 @@
     <string name="copyLinkText">Копиране на текста на връзката</string>
     <string name="linkTextCopied">Копиран текст на връзката</string>
     <string name="linkTextCopyFailed">Неуспешно копиране на текста на връзката</string>
+
+    <string name="preOnboardingWelcomeDialogTitle">Здравейте.</string>
+    <string name="preOnboardingWelcomeDialogBody1">Готови ли сте за по-бърз браузър,\nкойто осигурява контрол?</string>
+    <string name="preOnboardingWelcomeDialogBody2">Изкуственият интелект винаги е по избор, а защитата на поверителността винаги е включена.</string>
+    <string name="onboardingStepIndicatorText" instruction="a counter above our instructions in onboarding that tells a user what step they are on">%1$d от %2$d</string>
+    <string name="onboardingSearchDaxDialogOption1Quoted" instruction="translate &apos;duck&apos; too.">как се казва „патица“ на английски</string>
+    <string name="onboardingSearchDaxDialogOption1EnglishQuoted" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">как се казва \"патица\" на испански</string>
 </resources>

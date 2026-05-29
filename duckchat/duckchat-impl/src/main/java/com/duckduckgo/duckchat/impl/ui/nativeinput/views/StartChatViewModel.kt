@@ -20,8 +20,9 @@ import androidx.lifecycle.ViewModel
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
-import com.duckduckgo.duckchat.api.DuckChatInputModeState
-import com.duckduckgo.duckchat.api.InputMode
+import com.duckduckgo.duckchat.api.nativeinput.NativeInputState.InputMode
+import com.duckduckgo.duckchat.api.nativeinput.NativeInputState.ToggleSelection
+import com.duckduckgo.duckchat.api.nativeinput.NativeInputStateProvider
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
@@ -30,27 +31,24 @@ import javax.inject.Inject
 @ContributesViewModel(ViewScope::class)
 class StartChatViewModel @Inject constructor(
     duckAiFeatureState: DuckAiFeatureState,
-    private val duckChatInternal: DuckChatInternal,
-    private val duckChatInputModeState: DuckChatInputModeState,
+    duckChatInternal: DuckChatInternal,
+    nativeInputStateProvider: NativeInputStateProvider,
 ) : ViewModel() {
 
     /**
      * Show the start-chat icon only when Duck.ai is available (feature enabled +
      * user setting on) but the input-screen toggle is off — i.e. the user has Duck.ai
-     * but is in `SEARCH_ONLY` mode. Mapping `inputMode == SEARCH_ONLY` directly would
-     * also match the case where Duck.ai is entirely disabled, which would let the icon
-     * navigate to a Duck.ai URL the user has opted out of.
+     * but is in `SEARCH_ONLY` mode. The feature + user-setting gate is needed because
+     * `inputMode == SEARCH_ONLY` also covers the case where Duck.ai is entirely
+     * disabled, which would let the icon navigate to a Duck.ai URL the user has opted out of.
      */
     val isVisible: Flow<Boolean> = combine(
         duckAiFeatureState.showSettings,
         duckChatInternal.observeEnableDuckChatUserSetting(),
-        duckChatInternal.observeInputScreenUserSettingEnabled(),
-        duckChatInputModeState.displayedMode,
-    ) { isFeatureEnabled, isUserEnabled, isInputScreenUserSettingEnabled, displayedMode ->
-        isFeatureEnabled && isUserEnabled && !isInputScreenUserSettingEnabled && displayedMode == InputMode.SEARCH
-    }
-
-    fun openNewChat() {
-        duckChatInternal.openNewDuckChatSession()
+        nativeInputStateProvider.state,
+    ) { isFeatureEnabled, isUserEnabled, state ->
+        isFeatureEnabled && isUserEnabled &&
+            state.inputMode == InputMode.SEARCH_ONLY &&
+            state.toggleSelection == ToggleSelection.SEARCH
     }
 }

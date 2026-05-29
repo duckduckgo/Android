@@ -88,8 +88,7 @@ tags:
                 text: ".*Ad Company"
             - assertVisible:
                 text: "convert.ad-company.site"
-            - action: back
-            - action: back
+            - pressKey: "home"
             - killApp
             - launchApp:
                 clearState: false

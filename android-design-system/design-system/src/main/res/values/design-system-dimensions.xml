@@ -60,6 +60,8 @@
     <dimen name="omnibarCardMarginBottom">12dp</dimen>
     <dimen name="omnibarOutlineWidth">0dp</dimen>
     <dimen name="omnibarOutlineFocusedWidth">2dp</dimen>
+    <!-- 1dp above the legacy AppBarLayout's lifted elevation (4dp) so floated overlays clear it. -->
+    <dimen name="omnibarFloatElevation">5dp</dimen>
     <dimen name="cookiesAnimationHeight">34dp</dimen>
     <dimen name="cookiesAnimationRadius">14dp</dimen>
 
@@ -144,6 +146,11 @@
 
     <!-- Dax Switch -->
     <dimen name="daxSwitchThumbSize">32dp</dimen>
+
+    <!-- Dax Remote Message -->
+    <dimen name="remoteMessageCardImageSize">48dp</dimen>
+    <dimen name="promoMessageCardIllustrationMaxWidth">256dp</dimen>
+    <dimen name="promoMessageCardIllustrationMaxHeight">144dp</dimen>
 
     <!-- Slider -->
     <dimen name="sliderTrackHeight">6dp</dimen>

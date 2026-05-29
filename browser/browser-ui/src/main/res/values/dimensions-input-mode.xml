@@ -16,8 +16,8 @@
 
 <resources>
     <!-- Input Mode Tab Layout -->
-    <dimen name="inputModeSwitchHeight">38dp</dimen>
-    <dimen name="inputModeTabIndicatorHeight">34dp</dimen>
+    <dimen name="inputModeSwitchHeight">36dp</dimen>
+    <dimen name="inputModeTabIndicatorHeight">32dp</dimen>
     <dimen name="inputModeTabIndicatorHorizontalInset">2dp</dimen>
     <dimen name="inputModeTabIndicatorElevation">5dp</dimen>
 </resources>

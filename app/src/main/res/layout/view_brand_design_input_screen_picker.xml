@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (c) 2026 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:parentTag="android.widget.LinearLayout">
+
+    <LinearLayout
+        android:id="@+id/inputScreenSearchOnlyContainer"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:gravity="center_horizontal"
+        android:orientation="vertical">
+
+        <FrameLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:foreground="@drawable/selectable_large_rounded_ripple">
+
+            <ImageView
+                android:id="@+id/inputScreenSearchOnlyImageBack"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:adjustViewBounds="true"
+                android:importantForAccessibility="no"
+                android:scaleType="fitXY" />
+
+            <ImageView
+                android:id="@+id/inputScreenSearchOnlyImageFront"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:adjustViewBounds="true"
+                android:importantForAccessibility="no"
+                android:scaleType="fitXY"
+                tools:src="@drawable/searchbox_withoutai_inactive_brand_design_update" />
+
+        </FrameLayout>
+
+        <com.duckduckgo.common.ui.view.text.DaxTextView
+            android:id="@+id/inputScreenSearchOnlyCaption"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:layout_marginTop="6dp"
+            android:layout_weight="1"
+            android:gravity="center_horizontal"
+            android:text="@string/input_screen_user_pref_without_ai_updated"
+            android:textAppearance="@style/Typography.DuckDuckGo.Onboarding.Label"
+            tools:ignore="NestedWeights" />
+
+        <com.duckduckgo.common.ui.view.button.RadioButton
+            android:id="@+id/inputScreenSearchOnlyCheck"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:background="@null"
+            android:checked="false"
+            android:clickable="false"
+            android:focusable="false"
+            android:importantForAccessibility="no"
+            android:minWidth="0dp"
+            android:minHeight="0dp"
+            android:padding="0dp"
+            app:buttonTint="@color/onboarding_radio_button_tint"
+            tools:ignore="DeprecatedWidgetInXml,InvalidColorAttribute" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/inputScreenWithAiContainer"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_marginStart="8dp"
+        android:layout_weight="1"
+        android:gravity="center_horizontal"
+        android:orientation="vertical">
+
+        <FrameLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:foreground="@drawable/selectable_large_rounded_ripple">
+
+            <com.airbnb.lottie.LottieAnimationView
+                android:id="@+id/inputScreenWithAiAnimationBack"
+                android:layout_width="128dp"
+                android:layout_height="80dp"
+                android:importantForAccessibility="no"
+                android:scaleType="fitXY"
+                app:lottie_loop="false"
+                tools:lottie_progress="0.5"
+                tools:lottie_rawRes="@raw/searchbox_withoutai_inactive_brand_design_update"
+                tools:visibility="gone" />
+
+            <com.airbnb.lottie.LottieAnimationView
+                android:id="@+id/inputScreenWithAiAnimationFront"
+                android:layout_width="128dp"
+                android:layout_height="80dp"
+                android:importantForAccessibility="no"
+                android:scaleType="fitXY"
+                app:lottie_loop="false"
+                tools:lottie_progress="0.5"
+                tools:lottie_rawRes="@raw/searchbox_withoutai_active_brand_design_update"
+                tools:visibility="visible" />
+
+        </FrameLayout>
+
+        <com.duckduckgo.common.ui.view.text.DaxTextView
+            android:id="@+id/inputScreenWithAiCaption"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:layout_marginTop="6dp"
+            android:layout_weight="1"
+            android:gravity="center_horizontal"
+            android:text="@string/input_screen_user_pref_with_ai_updated"
+            android:textAppearance="@style/Typography.DuckDuckGo.Onboarding.Label"
+            tools:ignore="NestedWeights" />
+
+        <com.duckduckgo.common.ui.view.button.RadioButton
+            android:id="@+id/inputScreenWithAiCheck"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:background="@null"
+            android:checked="false"
+            android:clickable="false"
+            android:focusable="false"
+            android:importantForAccessibility="no"
+            android:minWidth="0dp"
+            android:minHeight="0dp"
+            android:padding="0dp"
+            app:buttonTint="@color/onboarding_radio_button_tint"
+            tools:ignore="DeprecatedWidgetInXml,InvalidColorAttribute" />
+
+    </LinearLayout>
+
+</merge>

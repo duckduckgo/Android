@@ -587,6 +587,7 @@
     <!-- Fire Animation settings -->
     <string name="settingsFireAnimation">Animação do Botão de Fogo</string>
     <string name="settingsHeroFireAnimation">Inferno</string>
+    <string name="settingsHeroFireAnimationClassic">Inferno clássico</string>
     <string name="settingsHeroWaterAnimation">Remoinho</string>
     <string name="settingsHeroAbstractAnimation">Corrente de ar</string>
     <string name="settingsNoneAnimation">Nenhum</string>
@@ -844,6 +845,9 @@
     <string name="preOnboardingDaxDialog3Button">Iniciar a navegação</string>
     <string name="preOnboardingAddressBarTitle">Onde devo posicionar a barra de endereços?</string>
     <string name="preOnboardingAddressBarOkButton">Seguinte</string>
+    <string name="preOnboardingAddressBarPositionTop">Topo</string>
+    <string name="preOnboardingAddressBarPositionBottom">Parte inferior</string>
+    <string name="preOnboardingAddressBarPositionSplit">Dividir</string>
     <string name="highlightsPreOnboardingAddressBarOption1Title">Topo (predefinição)</string>
     <string name="highlightsPreOnboardingAddressBarOption1Description">Fácil de ver</string>
     <string name="highlightsPreOnboardingAddressBarOption2Title">Parte inferior</string>
@@ -866,6 +870,8 @@
     <string name="onboardingSitesDaxDialogOption3">ebay.com</string>
     <string name="onboardingSitesDaxDialogOption4">Surpreende-me!</string>
     <string name="onboardingSerpDaxDialogDescription"><![CDATA[É o <b>DuckDuckGo Search</b>! Privado. Rápido. Menos anúncios.]]></string>
+    <string name="onboardingSerpDaxDialogBrandDesignTitle">É o DuckDuckGo Search!</string>
+    <string name="onboardingSerpDaxDialogBrandDesignDescription">Privado. Rápido. Menos anúncios.</string>
     <string name="onboardingSerpDaxDialogButton">Entendi!</string>
     <string name="onboardingSitesSuggestionsDaxDialogTitle">Em seguida, experimenta visitar um site!</string>
     <plurals name="onboardingTrackersBlockedDialogDescription">
@@ -984,6 +990,10 @@
     <string name="syncRestoreDialogPrimaryCta">Restaurar as minhas coisas</string>
     <string name="syncRestoreDialogSecondaryCta">Ignorar</string>
 
+    <!-- Sync Restore (brand-design onboarding) -->
+    <string name="syncRestoreDialogBrandDesignTitle">Vamos continuar onde paraste no DuckDuckGo.</string>
+    <string name="syncRestoreDialogBrandDesignBody1">Os teus marcadores, palavras-passe e mais estão prontos.</string>
+
     <!-- PDF download tooltip -->
     <string name="pdfDownloadTooltipText">Descarregar PDF</string>
 
@@ -991,4 +1001,11 @@
     <string name="copyLinkText">Copiar texto do link</string>
     <string name="linkTextCopied">Texto do link copiado</string>
     <string name="linkTextCopyFailed">Não consegui copiar o texto do link</string>
+
+    <string name="preOnboardingWelcomeDialogTitle">Olá.</string>
+    <string name="preOnboardingWelcomeDialogBody1">Pronto para um navegador mais rápido que te coloca no controlo?</string>
+    <string name="preOnboardingWelcomeDialogBody2">A IA é sempre opcional, e a\nproteção de privacidade está sempre ativa.</string>
+    <string name="onboardingStepIndicatorText" instruction="a counter above our instructions in onboarding that tells a user what step they are on">%1$d de %2$d</string>
+    <string name="onboardingSearchDaxDialogOption1Quoted" instruction="translate &apos;duck&apos; too.">como dizer \"pato\" em inglês</string>
+    <string name="onboardingSearchDaxDialogOption1EnglishQuoted" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">como dizer \"pato\" em espanhol</string>
 </resources>

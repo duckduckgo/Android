@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+@file:SuppressLint("NoImplImportsInAppModule")
+
 package com.duckduckgo.app.browser
 
 import android.annotation.SuppressLint
@@ -38,7 +40,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.activity.viewModels
 import androidx.annotation.VisibleForTesting
-import androidx.core.os.postDelayed
+import androidx.core.os.BundleCompat
 import androidx.core.view.isVisible
 import androidx.core.view.postDelayed
 import androidx.lifecycle.Lifecycle
@@ -63,7 +65,7 @@ import com.duckduckgo.app.browser.databinding.IncludeOmnibarToolbarMockupBinding
 import com.duckduckgo.app.browser.databinding.IncludeOmnibarToolbarMockupBottomBinding
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.ui.DefaultBrowserBottomSheetDialog
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.ui.DefaultBrowserBottomSheetDialog.EventListener
-import com.duckduckgo.app.browser.menu.BrowserMenuDisplayRepository
+import com.duckduckgo.app.browser.mode.BrowserLaunchSource
 import com.duckduckgo.app.browser.newaddressbaroption.NewAddressBarOptionManager
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.browser.omnibar.OmnibarType
@@ -73,7 +75,6 @@ import com.duckduckgo.app.browser.tabs.TabManager.TabModel
 import com.duckduckgo.app.browser.tabs.adapter.TabPagerAdapter
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.dispatchers.ExternalIntentProcessingState
-import com.duckduckgo.app.downloads.DownloadsScreens.DownloadsScreenNoParams
 import com.duckduckgo.app.feedback.ui.common.FeedbackActivity
 import com.duckduckgo.app.fire.DataClearer
 import com.duckduckgo.app.fire.DataClearerForegroundAppRestartPixel
@@ -85,10 +86,7 @@ import com.duckduckgo.app.global.intentText
 import com.duckduckgo.app.global.rating.PromptCount
 import com.duckduckgo.app.global.sanitize
 import com.duckduckgo.app.global.view.ClearDataAction
-import com.duckduckgo.app.global.view.FireDialog
-import com.duckduckgo.app.global.view.FireDialogProvider
-import com.duckduckgo.app.global.view.FireDialogProvider.FireDialogOrigin.BROWSER
-import com.duckduckgo.app.global.view.FireDialogProvider.FireDialogOrigin.DUCK_AI_CONTEXTUAL_CHAT
+import com.duckduckgo.app.global.view.ORIGIN_DUCK_AI_CONTEXTUAL_CHAT
 import com.duckduckgo.app.global.view.renderIfChanged
 import com.duckduckgo.app.onboarding.ui.page.DefaultBrowserPage
 import com.duckduckgo.app.pixels.AppPixelName
@@ -99,14 +97,13 @@ import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
-import com.duckduckgo.app.survey.ui.SurveyActivity
-import com.duckduckgo.app.survey.ui.SurveyActivity.Companion.SurveySource
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.ui.DefaultSnackbar
 import com.duckduckgo.app.tabs.ui.TabSwitcherActivity
 import com.duckduckgo.autofill.api.emailprotection.EmailProtectionLinkVerifier
 import com.duckduckgo.browser.api.ui.BrowserScreens.BookmarksScreenNoParams
 import com.duckduckgo.browser.api.ui.BrowserScreens.SettingsScreenNoParams
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.tabs.SwipingTabsFeatureProvider
 import com.duckduckgo.common.ui.view.addBottomShadow
@@ -119,7 +116,12 @@ import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.extensions.hideKeyboard
 import com.duckduckgo.common.utils.playstore.PlayStoreUtils
+import com.duckduckgo.dataclearing.api.fire.FireDialog
+import com.duckduckgo.dataclearing.api.fire.FireDialogProvider
+import com.duckduckgo.dataclearing.api.fire.FireDialogProvider.FireDialogOrigin.Browser
+import com.duckduckgo.dataclearing.api.fire.FireDialogProvider.FireDialogOrigin.DuckAiContextualChat
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.downloads.api.DownloadsScreens.DownloadsScreenNoParams
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.api.viewmodel.DuckChatSharedViewModel
@@ -131,10 +133,12 @@ import com.duckduckgo.savedsites.impl.bookmarks.BookmarksActivity.Companion.SAVE
 import com.duckduckgo.site.permissions.impl.ui.SitePermissionScreenNoParams
 import com.duckduckgo.sync.api.SyncActivityFromSetupUrl
 import com.duckduckgo.sync.api.setup.SyncUrlIdentifier
+import dev.zacsweers.metro.HasMemberInjections
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -148,13 +152,11 @@ import logcat.logcat
 import javax.inject.Inject
 
 // open class so that we can test BrowserApplicationStateInfo
+@HasMemberInjections
 @InjectWith(ActivityScope::class)
 open class BrowserActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var settingsDataStore: SettingsDataStore
-
-    @Inject
-    lateinit var browserMenuDisplayRepository: BrowserMenuDisplayRepository
 
     @Inject
     lateinit var clearDataAction: ClearDataAction
@@ -225,6 +227,9 @@ open class BrowserActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var fireDialogProvider: FireDialogProvider
 
+    @Inject
+    lateinit var currentBrowserMode: BrowserMode
+
     private val lastActiveTabs = TabList()
 
     private var duckAiFragment: DuckChatWebViewFragment? = null
@@ -262,7 +267,18 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
     private var instanceStateBundles: CombinedInstanceState? = null
 
+    /**
+     * Holds an [Intent] that arrived in [onNewIntent] while [dataClearer] was still clearing,
+     * deferred until it finishes. Read once by [BrowserStateRenderer.showWebContent] and cleared.
+     */
     private var lastIntent: Intent? = null
+
+    /**
+     * Holds an [Intent] that arrived while in [BrowserMode.FIRE] and must be processed in
+     * [BrowserMode.REGULAR]. Read once by [BrowserStateRenderer.showWebContent] and cleared;
+     * takes precedence over [lastIntent].
+     */
+    private var pendingFireToRegularIntent: Intent? = null
 
     // we don't store isExternal in the tab model, as it's only meant for the first time the tab is loaded.
     private val externalLaunchTabIds = mutableSetOf<String>()
@@ -351,14 +367,30 @@ open class BrowserActivity : DuckDuckGoActivity() {
     @SuppressLint("MissingSuperCall")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.daggerInject()
+
+        val savedMode = savedInstanceState?.getString(KEY_SAVED_BROWSER_MODE)
+        val modeChangedSinceSave = savedMode != null && savedMode != currentBrowserMode.name
+        if (modeChangedSinceSave) {
+            savedInstanceState?.remove(KEY_TAB_PAGER_STATE)
+        }
+
         intent?.sanitize()
         logcat(INFO) { "onCreate called. freshAppLaunch: ${dataClearer.isFreshAppLaunch}, savedInstanceState: $savedInstanceState" }
         dataClearerForegroundAppRestartPixel.registerIntent(intent)
         renderer = BrowserStateRenderer()
         val newInstanceState = if (dataClearer.isFreshAppLaunch) null else savedInstanceState
         instanceStateBundles = CombinedInstanceState(originalInstanceState = savedInstanceState, newInstanceState = newInstanceState)
+        pendingFireToRegularIntent = newInstanceState?.let {
+            BundleCompat.getParcelable(it, KEY_PENDING_FIRE_TO_REGULAR_INTENT, Intent::class.java)
+        }
 
         super.onCreate(savedInstanceState = newInstanceState, daggerInject = false)
+
+        if (modeChangedSinceSave) {
+            // remove restored VM and fragments
+            viewModelStore.clear()
+            removeStaleTabFragments()
+        }
 
         bindMockupToolbars()
 
@@ -374,6 +406,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
             .launchIn(lifecycleScope)
 
         observeDuckChatSharedCommands()
+        observeBrowserModeChanges()
 
         viewModel.awaitClearDataFinishedNotification()
         initializeServiceWorker()
@@ -401,9 +434,11 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
+        outState.putString(KEY_SAVED_BROWSER_MODE, currentBrowserMode.name)
         if (swipingTabsFeature.isEnabled) {
             outState.putParcelable(KEY_TAB_PAGER_STATE, tabPagerAdapter.saveState())
         }
+        pendingFireToRegularIntent?.let { outState.putParcelable(KEY_PENDING_FIRE_TO_REGULAR_INTENT, it) }
     }
 
     private suspend fun configureFlowCollectors() {
@@ -435,6 +470,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
                     currentTab?.onFireDialogVisibilityChanged(isVisible = true)
                 }
                 FireDialog.EVENT_ON_CANCEL -> {
+                    pendingDuckAiOnboardingFire = false
                     pixel.fire(FIRE_DIALOG_CANCEL)
                     currentTab?.onFireDialogVisibilityChanged(isVisible = false)
                     externalIntentProcessingState.onPendingSnackbarDisplayed()
@@ -444,11 +480,15 @@ open class BrowserActivity : DuckDuckGoActivity() {
                     removeObservers()
                 }
                 FireDialog.EVENT_CLEAR_WITHOUT_RESTART_STARTED -> {
-                    externalIntentProcessingState.onIntentRequestToShowSnackbar()
                     currentTab?.onFireDialogVisibilityChanged(isVisible = false)
+                    if (pendingDuckAiOnboardingFire) {
+                        currentTab?.dismissDuckAiFireOnboardingCta()
+                    } else {
+                        externalIntentProcessingState.onIntentRequestToShowSnackbar()
+                    }
                 }
                 FireDialog.EVENT_ON_SINGLE_TAB_CLEAR_COMPLETE -> {
-                    val isDuckAiContextual = bundle.getString(FireDialog.RESULT_KEY_ORIGIN) == DUCK_AI_CONTEXTUAL_CHAT.name
+                    val isDuckAiContextual = bundle.getString(FireDialog.RESULT_KEY_ORIGIN) == ORIGIN_DUCK_AI_CONTEXTUAL_CHAT
                     val message = if (isDuckAiContextual) {
                         getString(R.string.duckAiChatDeletedSnackbar)
                     } else {
@@ -456,12 +496,24 @@ open class BrowserActivity : DuckDuckGoActivity() {
                     }
                     showSnackbar(message)
                     if (isDuckAiContextual) currentTab?.onContextualSheetFireComplete()
+                    if (pendingDuckAiOnboardingFire) {
+                        pendingDuckAiOnboardingFire = false
+                        closeDuckChatFullScreen()
+                    }
                 }
                 FireDialog.EVENT_ON_SINGLE_TAB_CLEAR_FEATURE_NOT_SUPPORTED -> {
                     showSnackbar(R.string.singleTabFireDialogClearNotSupportedSnackbar)
+                    if (pendingDuckAiOnboardingFire) {
+                        pendingDuckAiOnboardingFire = false
+                        closeDuckChatFullScreen()
+                    }
                 }
                 FireDialog.EVENT_ON_SINGLE_TAB_CLEAR_ERROR -> {
                     showSnackbar(R.string.singleTabFireDialogClearErrorSnackbar)
+                    if (pendingDuckAiOnboardingFire) {
+                        pendingDuckAiOnboardingFire = false
+                        closeDuckChatFullScreen()
+                    }
                 }
             }
         }
@@ -501,11 +553,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
                 delay(DUCK_AI_ANIM_READY_DELAY_MS)
                 duckAiShouldAnimate = true
             }
-    }
-
-    override fun onResume() {
-        super.onResume()
-        viewModel.checkForDefaultBrowserChangedSurvey()
     }
 
     override fun onStop() {
@@ -647,6 +694,22 @@ open class BrowserActivity : DuckDuckGoActivity() {
             return
         }
 
+        // Intents stamped with LAUNCH_REQUIRES_REGULAR_MODE must reach BrowserActivity in REGULAR
+        // mode. Stash the intent and carry it to the recreated REGULAR-bound instance.
+        val requiresRegularBrowserMode = intent.getBooleanExtra(LAUNCH_REQUIRES_REGULAR_MODE, false)
+        if (requiresRegularBrowserMode && currentBrowserMode != BrowserMode.REGULAR) {
+            logcat(INFO) { "Intent requires REGULAR mode while in a non-regular mode — switching before processing" }
+            pendingFireToRegularIntent = intent
+            lifecycleScope.launch {
+                viewModel.switchToMode(BrowserMode.REGULAR)
+            }
+            return
+        }
+
+        processIntent(intent)
+    }
+
+    private fun processIntent(intent: Intent) {
         if (intent.getBooleanExtra(LAUNCH_FROM_DEFAULT_BROWSER_DIALOG, false)) {
             logcat(INFO) { "launch from default browser" }
             setResult(DefaultBrowserPage.DEFAULT_BROWSER_RESULT_CODE_DIALOG_INTERNAL)
@@ -903,11 +966,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
             )
 
             Command.LaunchTabSwitcher -> currentTab?.launchTabSwitcherAfterTabsUndeleted()
-            is Command.LaunchSurvey -> {
-                Handler(Looper.getMainLooper()).postDelayed(200L) {
-                    startActivity(SurveyActivity.intent(this, command.survey, SurveySource.IN_APP))
-                }
-            }
         }
     }
 
@@ -945,13 +1003,16 @@ open class BrowserActivity : DuckDuckGoActivity() {
         recreate()
     }
 
-    fun launchFire(launchedFromFocusedNtp: Boolean = false) {
+    private var pendingDuckAiOnboardingFire = false
+
+    fun launchFire(launchedFromFocusedNtp: Boolean = false, isDuckAiOnboarding: Boolean = false) {
+        pendingDuckAiOnboardingFire = isDuckAiOnboarding
         val params = mapOf(PixelParameter.FROM_FOCUSED_NTP to launchedFromFocusedNtp.toString())
         pixel.fire(AppPixelName.FORGET_ALL_PRESSED_BROWSING, params)
         pixel.fire(AppPixelName.FORGET_ALL_PRESSED_BROWSING_DAILY, params, type = Daily())
 
         lifecycleScope.launch {
-            val dialog = fireDialogProvider.createFireDialog(BROWSER)
+            val dialog = fireDialogProvider.createFireDialog(Browser)
             dialog.show(supportFragmentManager)
         }
     }
@@ -1022,13 +1083,11 @@ open class BrowserActivity : DuckDuckGoActivity() {
         val wasFragmentVisible = duckAiFragment?.isVisible ?: false
         val fragment =
             DuckChatWebViewFragment().apply {
-                duckChatUrl?.let {
-                    arguments =
-                        Bundle().apply {
-                            putString(KEY_DUCK_AI_URL, duckChatUrl)
-                            putInt(KEY_DUCK_AI_TABS, tabs)
-                        }
-                }
+                arguments =
+                    Bundle().apply {
+                        duckChatUrl?.let { putString(KEY_DUCK_AI_URL, it) }
+                        putInt(KEY_DUCK_AI_TABS, tabs)
+                    }
             }
 
         duckAiFragment = fragment
@@ -1149,7 +1208,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
                         DuckChatSharedViewModel.Command.LaunchFire -> launchFire()
                         DuckChatSharedViewModel.Command.LaunchContextualChatFire -> {
                             lifecycleScope.launch {
-                                val dialog = fireDialogProvider.createFireDialog(DUCK_AI_CONTEXTUAL_CHAT)
+                                val dialog = fireDialogProvider.createFireDialog(DuckAiContextualChat)
                                 dialog.show(supportFragmentManager)
                             }
                         }
@@ -1170,6 +1229,29 @@ open class BrowserActivity : DuckDuckGoActivity() {
                 }
             }
         }
+    }
+
+    /**
+     * Recreates the activity whenever the user switches browser mode. The activity is built for
+     * one mode at a time. The previous mode's tab state is stripped from the saved bundle, and any
+     * stale tab fragments are removed after restoration.
+     */
+    private fun observeBrowserModeChanges() {
+        lifecycleScope.launch {
+            viewModel.currentMode.drop(1).collect {
+                recreate()
+            }
+        }
+    }
+
+    private fun removeStaleTabFragments() {
+        val staleFragments = supportFragmentManager.fragments.filterIsInstance<BrowserTabFragment>()
+        if (staleFragments.isEmpty()) return
+        val transaction = supportFragmentManager.beginTransaction()
+        staleFragments.forEach { transaction.remove(it) }
+        // The activity is still in pre-onResume territory here; commitNowAllowingStateLoss is
+        // the right tool — synchronous and tolerant of an in-progress save/restore.
+        transaction.commitNowAllowingStateLoss()
     }
 
     override fun onAttachFragment(fragment: androidx.fragment.app.Fragment) {
@@ -1211,6 +1293,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
     companion object {
         fun intent(
             context: Context,
+            launchSource: BrowserLaunchSource,
             queryExtra: String? = null,
             newSearch: Boolean = false,
             notifyDataCleared: Boolean = false,
@@ -1243,6 +1326,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
             intent.putExtra(DUCK_CHAT_SESSION_ACTIVE, duckChatSessionActive)
             intent.putExtra(LAUNCH_FROM_BOOKMARKS_APP_SHORTCUT_EXTRA, isLaunchFromBookmarksAppShortcut)
             intent.putExtra(DELETED_TAB_COUNT_EXTRA, deletedTabCount)
+            intent.putExtra(LAUNCH_REQUIRES_REGULAR_MODE, launchSource.requiresRegularMode)
             return intent
         }
 
@@ -1259,6 +1343,12 @@ open class BrowserActivity : DuckDuckGoActivity() {
         const val OPEN_EXISTING_TAB_ID_EXTRA = "OPEN_EXISTING_TAB_ID_EXTRA"
 
         const val LAUNCH_FROM_EXTERNAL_EXTRA = "LAUNCH_FROM_EXTERNAL_EXTRA"
+
+        /**
+         * Stamped by entry points that must reach BrowserActivity in [BrowserMode.REGULAR].
+         */
+        const val LAUNCH_REQUIRES_REGULAR_MODE = "LAUNCH_REQUIRES_REGULAR_MODE"
+
         private const val LAUNCH_FROM_CLEAR_DATA_ACTION = "LAUNCH_FROM_CLEAR_DATA_ACTION"
         private const val OPEN_DUCK_CHAT = "OPEN_DUCK_CHAT_EXTRA"
         private const val CLOSE_DUCK_CHAT = "CLOSE_DUCK_CHAT_EXTRA"
@@ -1267,6 +1357,8 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
         private const val MAX_ACTIVE_TABS = 40
         private const val KEY_TAB_PAGER_STATE = "tabPagerState"
+        private const val KEY_PENDING_FIRE_TO_REGULAR_INTENT = "pendingFireToRegularIntent"
+        private const val KEY_SAVED_BROWSER_MODE = "savedBrowserMode"
 
         private const val DISABLE_SWIPING_DELAY = 1000L
 
@@ -1306,6 +1398,14 @@ open class BrowserActivity : DuckDuckGoActivity() {
             logcat { "BrowserActivity can now start displaying web content. instance state is $instanceStateBundles" }
             configureObservers()
             binding.clearingInProgressView.gone()
+
+            pendingFireToRegularIntent?.let { pending ->
+                logcat(INFO) { "Intent deferred across FIRE→REGULAR recreate; handling now" }
+                pendingFireToRegularIntent = null
+                processedOriginalIntent = true
+                launchNewSearchOrQuery(pending)
+                return
+            }
 
             if (lastIntent != null) {
                 logcat(INFO) { "There was a deferred intent to process; handling now" }
@@ -1651,11 +1751,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
     }
 
     private fun bindMockupToolbars() {
-        val mockupBrowserMenuIcon = if (browserMenuDisplayRepository.isBottomSheetMenuEnabled()) {
-            com.duckduckgo.mobile.android.R.drawable.ic_menu_hamburger_24
-        } else {
-            com.duckduckgo.mobile.android.R.drawable.ic_menu_vertical_24
-        }
+        val mockupBrowserMenuIcon = com.duckduckgo.mobile.android.R.drawable.ic_menu_hamburger_24
         binding.topMockupToolbar.browserMenuImageView.setImageResource(mockupBrowserMenuIcon)
         binding.bottomMockupToolbar.browserMenuImageView.setImageResource(mockupBrowserMenuIcon)
         binding.navigationBarMockup.browserMenuImageView.setImageResource(mockupBrowserMenuIcon)

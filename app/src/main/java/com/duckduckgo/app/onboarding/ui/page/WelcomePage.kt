@@ -31,8 +31,10 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.view.ViewCompat
 import androidx.core.view.ViewPropertyAnimatorCompat
 import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
+import androidx.core.view.updatePadding
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.flowWithLifecycle
@@ -44,16 +46,21 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ContentOnboardingWelcomePageBinding
 import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.cta.ui.DaxBubbleCta.DaxDialogIntroOption
+import com.duckduckgo.app.onboarding.ui.OnboardingActivity
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.ADDRESS_BAR_POSITION
+import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.AI_COMPARISON_CHART
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.COMPARISON_CHART
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.INITIAL
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.INITIAL_REINSTALL_USER
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.INPUT_SCREEN
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.INPUT_SCREEN_PREVIEW
+import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.QUICK_SETUP
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.SKIP_ONBOARDING_OPTION
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.SYNC_RESTORE
 import com.duckduckgo.app.onboarding.ui.page.WelcomePage.InputMode.*
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.Finish
+import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.FinishAndSubmitChatPrompt
+import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.FinishAndSubmitSearchQuery
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.OnboardingSkipped
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.SetAddressBarPositionOptions
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowAddressBarPositionDialog
@@ -104,6 +111,7 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
     private var welcomeAnimation: ViewPropertyAnimatorCompat? = null
     private var typingAnimation: ViewPropertyAnimatorCompat? = null
     private var welcomeAnimationFinished = false
+    private var currentInputMode: InputMode = SEARCH
 
     private val requestPermission = registerForActivityResult(ActivityResultContracts.RequestPermission()) { permissionGranted ->
         if (permissionGranted) {
@@ -133,6 +141,12 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
                     defaultInputMode = if (it.duckAiDefault) CHAT else SEARCH,
                 )
                 is Finish -> onContinuePressed()
+                is FinishAndSubmitSearchQuery -> {
+                    (activity as? OnboardingActivity)?.finishAndSubmitSearchQuery(it.query)
+                }
+                is FinishAndSubmitChatPrompt -> {
+                    (activity as? OnboardingActivity)?.finishAndSubmitChatPrompt(it.prompt)
+                }
                 is OnboardingSkipped -> onSkipPressed()
                 is SetAddressBarPositionOptions -> setAddressBarPositionOptions(it.selectedOption)
             }
@@ -177,9 +191,9 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
 
         setBackgroundRes(
             if (appTheme.isLightModeEnabled()) {
-                R.drawable.onboarding_background_bitmap_light
+                CommonR.drawable.onboarding_background_bitmap_light
             } else {
-                R.drawable.onboarding_background_bitmap_dark
+                CommonR.drawable.onboarding_background_bitmap_dark
             },
         )
 
@@ -342,6 +356,10 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
                     scheduleTypingAnimation(ctaText) { afterAnimation() }
                 }
 
+                AI_COMPARISON_CHART -> {
+                    // no-op, only used in BrandDesignUpdate path
+                }
+
                 SKIP_ONBOARDING_OPTION -> {
                     binding.daxDialogCta.descriptionCta.show()
                     binding.daxDialogCta.descriptionCta.alpha = MIN_ALPHA
@@ -486,6 +504,7 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
                 }
 
                 INPUT_SCREEN_PREVIEW -> return@let // handled by configureInputScreenPreviewDialog()
+                QUICK_SETUP -> return@let
             }
             binding.sceneBg.setOnClickListener { afterAnimation() }
             binding.daxDialogCta.cardContainer.setOnClickListener { afterAnimation() }
@@ -516,6 +535,26 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
 
         binding.daxDialogCta.cardView.updateLayoutParams<ViewGroup.MarginLayoutParams> { topMargin = 0 }
         binding.daxDialogCta.root.updateLayoutParams<ViewGroup.MarginLayoutParams> { topMargin = 20.toPx() }
+
+        // Activity-level decorFitsSystemWindows is false (applyFullScreenFlags), so the dialog
+        // is measured against the full screen and doesn't shrink when the keyboard appears.
+        // The dialog is centered (bias=0.5) and 85% tall, so its bottom edge sits ~7.5% of the
+        // screen below the keyboard top. Apply just enough bottom padding to cap the inner
+        // content area at the keyboard top, so the inner ScrollView can scroll without
+        // changing the bubble's top margin.
+        ViewCompat.setOnApplyWindowInsetsListener(binding.daxDialogCta.daxCtaContainer) { v, insets ->
+            val ime = insets.getInsets(WindowInsetsCompat.Type.ime())
+            val parent = v.parent as? View
+            val paddingNeeded = if (parent != null && ime.bottom > 0) {
+                val keyboardTopY = parent.height - ime.bottom
+                (v.bottom - keyboardTopY).coerceAtLeast(0)
+            } else {
+                0
+            }
+            v.updatePadding(bottom = paddingNeeded)
+            insets
+        }
+        ViewCompat.requestApplyInsets(binding.daxDialogCta.daxCtaContainer)
 
         val ctaText = ctx.getString(R.string.preOnboardingInputModeDemoTitle)
         binding.daxDialogCta.hiddenTextCta.text = ctaText.html(ctx)
@@ -613,21 +652,36 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
         inputMode: InputMode,
         suggestions: List<DaxDialogIntroOption>,
     ) {
+        currentInputMode = inputMode
         val inputScreenPreviewBinding = binding.daxDialogCta.inputScreenPreview
 
-        listOf(inputScreenPreviewBinding.suggestion1, inputScreenPreviewBinding.suggestion2, inputScreenPreviewBinding.suggestion3)
-            .forEachIndexed { index, button -> suggestions[index].setOptionView(button) }
+        val buttons = listOf(inputScreenPreviewBinding.suggestion1, inputScreenPreviewBinding.suggestion2, inputScreenPreviewBinding.suggestion3)
+        buttons.forEachIndexed { index, button ->
+            suggestions[index].setOptionView(button)
+            button.setOnClickListener {
+                viewModel.onInputModeDemoQuerySubmitted(suggestions[index].link, isChat = inputMode == CHAT, optionIndex = index + 1)
+            }
+        }
 
+        inputScreenPreviewBinding.inputModeDemoActionIcon.setOnClickListener {
+            val query = inputScreenPreviewBinding.inputText.text?.toString().orEmpty().trim()
+            if (query.isNotEmpty()) {
+                viewModel.onInputModeDemoQuerySubmitted(query, isChat = currentInputMode == CHAT, optionIndex = null)
+            }
+        }
+
+        // Let the EditText grow vertically with content so the outer ScrollView can handle
+        // scrolling instead of the EditText's internal scroll (which the outer ScrollView
+        // intercepts). minLines still differs by mode to keep the initial visual cue.
+        inputScreenPreviewBinding.inputText.maxLines = Int.MAX_VALUE
         when (inputMode) {
             SEARCH -> {
                 inputScreenPreviewBinding.inputText.minLines = 1
-                inputScreenPreviewBinding.inputText.maxLines = 1
                 inputScreenPreviewBinding.inputText.setHint(R.string.preOnboardingInputModeDemoSearchHint)
                 inputScreenPreviewBinding.inputModeDemoActionIcon.setImageResource(CommonR.drawable.ic_find_search_24)
             }
             CHAT -> {
                 inputScreenPreviewBinding.inputText.minLines = 3
-                inputScreenPreviewBinding.inputText.maxLines = 3
                 inputScreenPreviewBinding.inputText.setHint(R.string.preOnboardingInputModeDemoChatHint)
                 inputScreenPreviewBinding.inputModeDemoActionIcon.setImageResource(CommonR.drawable.ic_arrow_right_24)
             }

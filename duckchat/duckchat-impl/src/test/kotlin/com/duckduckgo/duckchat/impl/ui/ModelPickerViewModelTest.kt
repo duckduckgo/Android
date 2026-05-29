@@ -16,15 +16,21 @@
 
 package com.duckduckgo.duckchat.impl.ui
 
+import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.models.AIChatModel
 import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
 import com.duckduckgo.duckchat.impl.models.ModelProvider
 import com.duckduckgo.duckchat.impl.models.ModelState
+import com.duckduckgo.duckchat.impl.models.Tool
 import com.duckduckgo.duckchat.impl.models.UserTier
 import com.duckduckgo.duckchat.impl.ui.nativeinput.views.ModelPickerViewModel
+import com.duckduckgo.duckchat.impl.ui.nativeinput.views.PickerSurface
+import com.duckduckgo.duckchat.impl.ui.nativeinput.views.UpsellCommand
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -37,6 +43,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class ModelPickerViewModelTest {
 
     @get:Rule
@@ -76,52 +83,108 @@ class ModelPickerViewModelTest {
     }
 
     @Test
-    fun whenSelectModelThenDelegatesToModelManager() = runTest {
-        val model = freeModel("id", "model")
-
-        testee.selectModel(model)
-
-        verify(modelManager).selectModel(model)
-    }
-
-    @Test
     fun whenMenuShowingDefaultThenFalse() {
         assertFalse(testee.menuShowing)
     }
 
     @Test
-    fun whenFreeUserThenFreeSectionHasNoHeader() {
+    fun whenFreeUserThenSectionsAreFreePlusPro() = runTest {
         val state = ModelState(
-            models = listOf(freeModel("id1", "model1"), premiumModel("id2", "model2")),
+            models = listOf(freeModel("f"), plusModel("p"), proModel("pr")),
             userTier = UserTier.FREE,
         )
 
         val sections = testee.buildSections(state)
 
+        assertEquals(3, sections.size)
         assertNull(sections[0].headerRes)
-        assertEquals(listOf("id1"), sections[0].models.map { it.id })
+        assertEquals(R.string.duckAiModelPickerPlusModels, sections[1].headerRes)
+        assertEquals(R.string.duckAiModelPickerProModels, sections[2].headerRes)
     }
 
     @Test
-    fun whenFreeUserThenPremiumSectionHasHeader() {
+    fun whenPlusUserThenSectionsAreFreePlusPro() = runTest {
         val state = ModelState(
-            models = listOf(freeModel("id1", "model1"), premiumModel("id2", "model2")),
+            models = listOf(freeModel("f"), plusModel("p", accessible = true), proModel("pr")),
+            userTier = UserTier.PLUS,
+        )
+
+        val sections = testee.buildSections(state)
+
+        assertEquals(3, sections.size)
+        assertNull(sections[0].headerRes)
+        assertEquals(R.string.duckAiModelPickerPlusModels, sections[1].headerRes)
+        assertEquals(R.string.duckAiModelPickerProModels, sections[2].headerRes)
+    }
+
+    @Test
+    fun whenProUserThenSectionsAreFreePlusPro() = runTest {
+        val state = ModelState(
+            models = listOf(freeModel("f"), plusModel("p", accessible = true), proModel("pr", accessible = true)),
+            userTier = UserTier.PRO,
+        )
+
+        val sections = testee.buildSections(state)
+
+        assertEquals(3, sections.size)
+        assertNull(sections[0].headerRes)
+        assertEquals(R.string.duckAiModelPickerPlusModels, sections[1].headerRes)
+        assertEquals(R.string.duckAiModelPickerProModels, sections[2].headerRes)
+    }
+
+    @Test
+    fun whenModelIsFreeTierThenPlacedInFreeSection() = runTest {
+        val state = ModelState(
+            models = listOf(freeModel("f1"), freeModel("f2")),
             userTier = UserTier.FREE,
         )
 
         val sections = testee.buildSections(state)
 
-        assertEquals(2, sections.size)
-        assertNull(sections[1].headerRes)
-        assertEquals(listOf("id2"), sections[1].models.map { it.id })
+        assertEquals(1, sections.size)
+        assertNull(sections[0].headerRes)
+        assertEquals(listOf("f1", "f2"), sections[0].models.map { it.id })
     }
 
     @Test
-    fun whenFreeUserWithOnlyFreeModelsThenOnlyFreeSectionWithNoHeader() {
+    fun whenModelAccessTierContainsBothPlusAndProThenPlacedInPlusSection() = runTest {
         val state = ModelState(
-            models = listOf(freeModel("id1", "model1"), freeModel("id2", "model2")),
+            models = listOf(plusModel("p1")),
             userTier = UserTier.FREE,
         )
+
+        val sections = testee.buildSections(state)
+
+        assertEquals(1, sections.size)
+        assertEquals(R.string.duckAiModelPickerPlusModels, sections[0].headerRes)
+        assertEquals(listOf("p1"), sections[0].models.map { it.id })
+    }
+
+    @Test
+    fun whenModelAccessTierIsProOnlyThenPlacedInProSection() = runTest {
+        val state = ModelState(
+            models = listOf(proModel("pr1")),
+            userTier = UserTier.FREE,
+        )
+
+        val sections = testee.buildSections(state)
+
+        assertEquals(1, sections.size)
+        assertEquals(R.string.duckAiModelPickerProModels, sections[0].headerRes)
+        assertEquals(listOf("pr1"), sections[0].models.map { it.id })
+    }
+
+    @Test
+    fun whenModelAccessTierIsEmptyAndAccessibleThenPlacedInFreeSection() = runTest {
+        val ubiquitous = AIChatModel(
+            id = "u",
+            name = "u",
+            displayName = "u",
+            shortName = "u",
+            accessTier = emptyList(),
+            isAccessible = true,
+        )
+        val state = ModelState(models = listOf(ubiquitous), userTier = UserTier.FREE)
 
         val sections = testee.buildSections(state)
 
@@ -130,20 +193,7 @@ class ModelPickerViewModelTest {
     }
 
     @Test
-    fun whenFreeUserWithOnlyPremiumModelsThenOnlyPremiumSectionWithHeader() {
-        val state = ModelState(
-            models = listOf(premiumModel("id1", "model1")),
-            userTier = UserTier.FREE,
-        )
-
-        val sections = testee.buildSections(state)
-
-        assertEquals(1, sections.size)
-        assertNull(sections[0].headerRes)
-    }
-
-    @Test
-    fun whenFreeUserWithNoModelsThenNoSections() {
+    fun whenNoModelsThenNoSections() = runTest {
         val state = ModelState(models = emptyList(), userTier = UserTier.FREE)
 
         val sections = testee.buildSections(state)
@@ -152,65 +202,162 @@ class ModelPickerViewModelTest {
     }
 
     @Test
-    fun whenSubscriberThenAdvancedSectionFirst() {
-        val state = ModelState(
-            models = listOf(advancedModel("id1", "model1"), basicModel("id2", "model2")),
-            userTier = UserTier.PLUS,
-        )
+    fun whenAccessibleModelTappedThenSelectModelInvokedAndNoCommandEmitted() = runTest {
+        val model = freeModel("f")
 
-        val sections = testee.buildSections(state)
+        testee.commands.test {
+            testee.onModelTapped(model, PickerSurface.MODEL_PICKER_ADDRESS_BAR)
+            runCurrent()
 
-        assertEquals(2, sections.size)
-        assertEquals(R.string.duckAiModelPickerAdvancedModels, sections[0].headerRes)
-        assertEquals(listOf("id1"), sections[0].models.map { it.id })
+            verify(modelManager).selectModel(model)
+            expectNoEvents()
+            cancelAndConsumeRemainingEvents()
+        }
     }
 
     @Test
-    fun whenSubscriberThenBasicSectionSecond() {
-        val state = ModelState(
-            models = listOf(advancedModel("id1", "model1"), basicModel("id2", "model2")),
-            userTier = UserTier.PLUS,
-        )
+    fun whenFreeUserTapsPlusModelFromAddressBarThenLaunchPurchaseCommandEmittedWithAddressBarOrigin() = runTest {
+        stateFlow.value = ModelState(userTier = UserTier.FREE)
+        val model = plusModel("p")
 
-        val sections = testee.buildSections(state)
+        testee.commands.test {
+            testee.onModelTapped(model, PickerSurface.MODEL_PICKER_ADDRESS_BAR)
 
-        assertEquals(R.string.duckAiModelPickerBasicModels, sections[1].headerRes)
-        assertEquals(listOf("id2"), sections[1].models.map { it.id })
+            assertEquals(
+                UpsellCommand.LaunchPurchase(PickerSurface.MODEL_PICKER_ADDRESS_BAR.origin),
+                awaitItem(),
+            )
+            cancelAndConsumeRemainingEvents()
+        }
     }
 
     @Test
-    fun whenSubscriberWithOnlyAdvancedModelsThenOnlyAdvancedSection() {
+    fun whenFreeUserTapsProModelFromDuckAiTabThenLaunchPurchaseCommandEmittedWithDuckAiOrigin() = runTest {
+        stateFlow.value = ModelState(userTier = UserTier.FREE)
+        val model = proModel("pr")
+
+        testee.commands.test {
+            testee.onModelTapped(model, PickerSurface.MODEL_PICKER_DUCK_AI_TAB)
+
+            assertEquals(
+                UpsellCommand.LaunchPurchase(PickerSurface.MODEL_PICKER_DUCK_AI_TAB.origin),
+                awaitItem(),
+            )
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenPlusUserTapsProModelFromAddressBarThenLaunchUpgradeCommandEmittedWithAddressBarOrigin() = runTest {
+        stateFlow.value = ModelState(userTier = UserTier.PLUS)
+        val model = proModel("pr")
+
+        testee.commands.test {
+            testee.onModelTapped(model, PickerSurface.MODEL_PICKER_ADDRESS_BAR)
+
+            assertEquals(
+                UpsellCommand.LaunchUpgrade(PickerSurface.MODEL_PICKER_ADDRESS_BAR.origin),
+                awaitItem(),
+            )
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenPlusUserTapsProModelFromDuckAiTabThenLaunchUpgradeCommandEmittedWithDuckAiOrigin() = runTest {
+        stateFlow.value = ModelState(userTier = UserTier.PLUS)
+        val model = proModel("pr")
+
+        testee.commands.test {
+            testee.onModelTapped(model, PickerSurface.MODEL_PICKER_DUCK_AI_TAB)
+
+            assertEquals(
+                UpsellCommand.LaunchUpgrade(PickerSurface.MODEL_PICKER_DUCK_AI_TAB.origin),
+                awaitItem(),
+            )
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenInaccessibleModelHasNoPublicTierThenNoCommandEmitted() = runTest {
+        stateFlow.value = ModelState(userTier = UserTier.FREE)
+        val ghost = AIChatModel(
+            id = "ghost",
+            name = "ghost",
+            displayName = "ghost",
+            shortName = "ghost",
+            accessTier = emptyList(),
+            isAccessible = false,
+        )
+
+        testee.commands.test {
+            testee.onModelTapped(ghost, PickerSurface.MODEL_PICKER_ADDRESS_BAR)
+
+            expectNoEvents()
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenFreeUserTapsModelWithNonPublicAccessTierThenNoCommandEmitted() = runTest {
+        stateFlow.value = ModelState(userTier = UserTier.FREE)
+        val internalModel = AIChatModel(
+            id = "internal-1",
+            name = "internal-1",
+            displayName = "internal-1",
+            shortName = "internal-1",
+            accessTier = listOf("internal"),
+            isAccessible = false,
+        )
+
+        testee.commands.test {
+            testee.onModelTapped(internalModel, PickerSurface.MODEL_PICKER_ADDRESS_BAR)
+
+            expectNoEvents()
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenPlusUserTapsModelWithNonPublicAccessTierThenNoCommandEmitted() = runTest {
+        stateFlow.value = ModelState(userTier = UserTier.PLUS)
+        val internalModel = AIChatModel(
+            id = "internal-1",
+            name = "internal-1",
+            displayName = "internal-1",
+            shortName = "internal-1",
+            accessTier = listOf("internal"),
+            isAccessible = false,
+        )
+
+        testee.commands.test {
+            testee.onModelTapped(internalModel, PickerSurface.MODEL_PICKER_DUCK_AI_TAB)
+
+            expectNoEvents()
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenModelAccessTierIsNonPublicOnlyThenNotPlacedInAnySection() = runTest {
+        val internalModel = AIChatModel(
+            id = "internal-1",
+            name = "internal-1",
+            displayName = "internal-1",
+            shortName = "internal-1",
+            accessTier = listOf("internal"),
+            isAccessible = false,
+        )
         val state = ModelState(
-            models = listOf(advancedModel("id1", "model1")),
-            userTier = UserTier.PLUS,
+            models = listOf(freeModel("f1"), internalModel),
+            userTier = UserTier.FREE,
         )
 
         val sections = testee.buildSections(state)
 
         assertEquals(1, sections.size)
-        assertEquals(R.string.duckAiModelPickerAdvancedModels, sections[0].headerRes)
-    }
-
-    @Test
-    fun whenSubscriberWithOnlyBasicModelsThenOnlyBasicSection() {
-        val state = ModelState(
-            models = listOf(basicModel("id1", "model1")),
-            userTier = UserTier.PLUS,
-        )
-
-        val sections = testee.buildSections(state)
-
-        assertEquals(1, sections.size)
-        assertEquals(R.string.duckAiModelPickerBasicModels, sections[0].headerRes)
-    }
-
-    @Test
-    fun whenSubscriberWithNoModelsThenNoSections() {
-        val state = ModelState(models = emptyList(), userTier = UserTier.PLUS)
-
-        val sections = testee.buildSections(state)
-
-        assertTrue(sections.isEmpty())
+        assertEquals(listOf("f1"), sections[0].models.map { it.id })
     }
 
     @Test
@@ -255,7 +402,81 @@ class ModelPickerViewModelTest {
         assertNull(testee.getIconResForModel(model))
     }
 
-    private fun freeModel(id: String, shortName: String, provider: ModelProvider = ModelProvider.UNKNOWN) = AIChatModel(
+    @Test
+    fun whenNoModelSelectedThenGetSelectedModelReturnsNull() {
+        stateFlow.value = ModelState(models = listOf(freeModel("id1", "model1")), selectedModelId = null)
+
+        assertNull(testee.getSelectedModel())
+    }
+
+    @Test
+    fun whenModelSelectedThenGetSelectedModelReturnsIt() {
+        val model = freeModel("id1", "model1")
+        stateFlow.value = ModelState(models = listOf(model), selectedModelId = "id1")
+
+        assertEquals(model, testee.getSelectedModel())
+    }
+
+    @Test
+    fun whenSelectedModelSupportsImageGenerationThenIsImageGenerationSupportedIsTrue() {
+        stateFlow.value = ModelState(
+            models = listOf(freeModel("id1", "model1", supportedTools = listOf(Tool.IMAGE_GENERATION))),
+            selectedModelId = "id1",
+        )
+
+        assertTrue(testee.isImageGenerationSupported())
+    }
+
+    @Test
+    fun whenSelectedModelDoesNotSupportImageGenerationThenIsImageGenerationSupportedIsFalse() {
+        stateFlow.value = ModelState(
+            models = listOf(freeModel("id1", "model1", supportedTools = emptyList())),
+            selectedModelId = "id1",
+        )
+
+        assertFalse(testee.isImageGenerationSupported())
+    }
+
+    @Test
+    fun whenNoModelSelectedThenIsImageGenerationSupportedDefaultsToTrue() {
+        stateFlow.value = ModelState(models = emptyList(), selectedModelId = null)
+
+        assertTrue(testee.isImageGenerationSupported())
+    }
+
+    @Test
+    fun whenSelectedModelSupportsWebSearchThenIsWebSearchSupportedIsTrue() {
+        stateFlow.value = ModelState(
+            models = listOf(freeModel("id1", "model1", supportedTools = listOf(Tool.WEB_SEARCH))),
+            selectedModelId = "id1",
+        )
+
+        assertTrue(testee.isWebSearchSupported())
+    }
+
+    @Test
+    fun whenSelectedModelDoesNotSupportWebSearchThenIsWebSearchSupportedIsFalse() {
+        stateFlow.value = ModelState(
+            models = listOf(freeModel("id1", "model1", supportedTools = emptyList())),
+            selectedModelId = "id1",
+        )
+
+        assertFalse(testee.isWebSearchSupported())
+    }
+
+    @Test
+    fun whenNoModelSelectedThenIsWebSearchSupportedDefaultsToTrue() {
+        stateFlow.value = ModelState(models = emptyList(), selectedModelId = null)
+
+        assertTrue(testee.isWebSearchSupported())
+    }
+
+    private fun freeModel(
+        id: String,
+        shortName: String = id,
+        provider: ModelProvider = ModelProvider.UNKNOWN,
+        supportedTools: List<Tool> = emptyList(),
+    ) = AIChatModel(
         id = id,
         name = id,
         displayName = id,
@@ -263,32 +484,24 @@ class ModelPickerViewModelTest {
         accessTier = listOf("free"),
         isAccessible = true,
         provider = provider,
+        supportedTools = supportedTools,
     )
 
-    private fun premiumModel(id: String, shortName: String) = AIChatModel(
+    private fun plusModel(id: String, shortName: String = id, accessible: Boolean = false) = AIChatModel(
         id = id,
         name = id,
         displayName = id,
         shortName = shortName,
-        accessTier = listOf("plus"),
-        isAccessible = false,
+        accessTier = listOf("plus", "pro"),
+        isAccessible = accessible,
     )
 
-    private fun advancedModel(id: String, shortName: String) = AIChatModel(
+    private fun proModel(id: String, shortName: String = id, accessible: Boolean = false) = AIChatModel(
         id = id,
         name = id,
         displayName = id,
         shortName = shortName,
-        accessTier = listOf("plus"),
-        isAccessible = true,
-    )
-
-    private fun basicModel(id: String, shortName: String) = AIChatModel(
-        id = id,
-        name = id,
-        displayName = id,
-        shortName = shortName,
-        accessTier = listOf("free"),
-        isAccessible = true,
+        accessTier = listOf("pro"),
+        isAccessible = accessible,
     )
 }

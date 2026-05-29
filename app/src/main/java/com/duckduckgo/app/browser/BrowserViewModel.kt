@@ -28,7 +28,6 @@ import com.duckduckgo.app.browser.BrowserViewModel.Command.DoNotAskAgainSetAsDef
 import com.duckduckgo.app.browser.BrowserViewModel.Command.LaunchTabSwitcher
 import com.duckduckgo.app.browser.BrowserViewModel.Command.OpenDuckChat
 import com.duckduckgo.app.browser.BrowserViewModel.Command.ShowUndoDeleteTabsMessage
-import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserChangedSurveyManager
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.AdditionalDefaultBrowserPrompts
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.AdditionalDefaultBrowserPrompts.Command.OpenMessageDialog
@@ -60,9 +59,11 @@ import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
-import com.duckduckgo.app.survey.model.Survey
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
+import com.duckduckgo.browsermode.api.BrowserMode
+import com.duckduckgo.browsermode.api.BrowserModeStateHolder
+import com.duckduckgo.browsermode.api.FireModeAvailability
 import com.duckduckgo.common.ui.tabs.SwipingTabsFeatureProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
@@ -78,6 +79,7 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -109,12 +111,21 @@ class BrowserViewModel @Inject constructor(
     private val pixel: Pixel,
     private val skipUrlConversionOnNewTabFeature: SkipUrlConversionOnNewTabFeature,
     private val additionalDefaultBrowserPrompts: AdditionalDefaultBrowserPrompts,
-    private val defaultBrowserChangedSurveyManager: DefaultBrowserChangedSurveyManager,
     private val swipingTabsFeature: SwipingTabsFeatureProvider,
     private val duckAiFeatureState: DuckAiFeatureState,
     private val ntpAfterIdleManager: NtpAfterIdleManager,
     private val androidBrowserConfigFeature: AndroidBrowserConfigFeature,
+    private val browserModeStateHolder: BrowserModeStateHolder,
+    private val fireModeAvailability: FireModeAvailability,
 ) : ViewModel(), CoroutineScope {
+
+    val currentMode: StateFlow<BrowserMode> = browserModeStateHolder.currentMode
+
+    fun switchToMode(mode: BrowserMode): Boolean {
+        if (mode != BrowserMode.REGULAR && !fireModeAvailability.isAvailable()) return false
+        browserModeStateHolder.switchTo(mode)
+        return true
+    }
 
     init {
         if (androidBrowserConfigFeature.showNTPAfterIdleReturn().isEnabled()) {
@@ -144,7 +155,6 @@ class BrowserViewModel @Inject constructor(
         data object LaunchPlayStore : Command()
         data object LaunchFeedbackView : Command()
         data object LaunchTabSwitcher : Command()
-        data class LaunchSurvey(val survey: Survey) : Command()
         data class ShowAppEnjoymentPrompt(val promptCount: PromptCount) : Command()
         data class ShowAppRatingPrompt(val promptCount: PromptCount) : Command()
         data class ShowAppFeedbackPrompt(val promptCount: PromptCount) : Command()
@@ -519,21 +529,6 @@ class BrowserViewModel @Inject constructor(
         logcat(INFO) { "Duck.ai openDuckChat duckChatSessionActive $duckChatSessionActive" }
         val tabsCount = tabs.value?.size ?: 0
         sendCommand(OpenDuckChat(duckChatUrl, duckChatSessionActive, withTransition, tabsCount))
-    }
-
-    fun checkForDefaultBrowserChangedSurvey() {
-        viewModelScope.launch(dispatchers.io()) {
-            if (defaultBrowserChangedSurveyManager.shouldTriggerSurvey()) {
-                defaultBrowserChangedSurveyManager.markSurveyShown()
-                val survey = Survey(
-                    surveyId = DefaultBrowserChangedSurveyManager.SURVEY_ID_IN_APP,
-                    url = defaultBrowserChangedSurveyManager.buildSurveyUrl("in-app"),
-                    daysInstalled = null,
-                    status = Survey.Status.SCHEDULED,
-                )
-                sendCommand(Command.LaunchSurvey(survey))
-            }
-        }
     }
 
     fun sendPixelEventForLandscapeOrientation() {

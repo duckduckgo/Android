@@ -23,6 +23,7 @@ import com.duckduckgo.subscriptions.api.SubscriptionStatus.INACTIVE
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.NOT_AUTO_RENEWABLE
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.UNKNOWN
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.WAITING
+import com.duckduckgo.subscriptions.api.model.Entitlement
 import com.duckduckgo.subscriptions.impl.RealSubscriptionsManager.RecoverSubscriptionResult
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.ADVANCED_SUBSCRIPTION
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_PLAN_ROW
@@ -46,7 +47,6 @@ import com.duckduckgo.subscriptions.impl.billing.PurchaseState.Canceled
 import com.duckduckgo.subscriptions.impl.billing.PurchaseState.Failure
 import com.duckduckgo.subscriptions.impl.billing.PurchaseState.Purchased
 import com.duckduckgo.subscriptions.impl.billing.SubscriptionReplacementMode
-import com.duckduckgo.subscriptions.impl.model.Entitlement
 import com.duckduckgo.subscriptions.impl.notification.VpnReminderNotificationScheduler
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.repository.Account
@@ -1669,6 +1669,61 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
         subscriptionsManager.entitlements.test {
             val entitlements = expectMostRecentItem()
             assertTrue(entitlements.isEmpty())
+        }
+    }
+
+    @Test
+    fun whenSubscriptionIsActiveThenEntitlementSetEmitsRawEntitlements() = runTest {
+        givenSubscriptionExists()
+
+        subscriptionsManager.entitlementSet.test {
+            assertEquals(
+                setOf(Entitlement(name = "subscriber", product = NetP.value)),
+                expectMostRecentItem(),
+            )
+        }
+    }
+
+    @Test
+    fun whenSubscriptionIsInactiveThenEntitlementSetEmitsEmpty() = runTest {
+        givenSubscriptionExists(status = INACTIVE)
+
+        subscriptionsManager.entitlementSet.test {
+            assertTrue(expectMostRecentItem().isEmpty())
+        }
+    }
+
+    @Test
+    fun whenSignOutThenEntitlementSetReEmitsEmpty() = runTest {
+        givenSubscriptionExists()
+        givenUserIsSignedIn()
+
+        subscriptionsManager.entitlementSet.test {
+            assertFalse(expectMostRecentItem().isEmpty())
+            subscriptionsManager.signOut()
+            assertTrue(expectMostRecentItem().isEmpty())
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenMultipleEntitlementsExistThenAllAreEmittedInSet() = runTest {
+        givenSubscriptionExists()
+        authRepository.setEntitlements(
+            listOf(
+                Entitlement(name = "plus", product = NetP.value),
+                Entitlement(name = "pro", product = "Duck.ai"),
+            ),
+        )
+
+        subscriptionsManager.entitlementSet.test {
+            assertEquals(
+                setOf(
+                    Entitlement(name = "plus", product = NetP.value),
+                    Entitlement(name = "pro", product = "Duck.ai"),
+                ),
+                expectMostRecentItem(),
+            )
         }
     }
 

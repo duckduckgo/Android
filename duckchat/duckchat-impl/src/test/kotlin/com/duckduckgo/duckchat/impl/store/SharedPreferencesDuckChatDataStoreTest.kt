@@ -129,11 +129,6 @@ class SharedPreferencesDuckChatDataStoreTest {
     }
 
     @Test
-    fun `when isNativeInputFieldUserSettingEnabled then return default value`() = runTest {
-        assertFalse(testee.isNativeInputFieldUserSettingEnabled())
-    }
-
-    @Test
     fun `when isInputScreenUserSettingEnabled then return default value`() = runTest {
         assertFalse(testee.isInputScreenUserSettingEnabled())
     }
@@ -189,12 +184,6 @@ class SharedPreferencesDuckChatDataStoreTest {
     fun `when setCosmeticInputScreenUserSetting then cosmetic value is stored`() = runTest {
         testee.setCosmeticInputScreenUserSetting(true)
         assertTrue(testee.isCosmeticInputScreenUserSettingEnabled())
-    }
-
-    @Test
-    fun `when setNativeInputFieldUserSetting then return value`() = runTest {
-        testee.setNativeInputFieldUserSetting(true)
-        assertTrue(testee.isNativeInputFieldUserSettingEnabled())
     }
 
     @Test
@@ -357,21 +346,6 @@ class SharedPreferencesDuckChatDataStoreTest {
     }
 
     @Test
-    fun `when observeNativeInputFieldUserSettingEnabled then receive updates`() = runTest {
-        val results = mutableListOf<Boolean>()
-        val job = launch {
-            testee.observeNativeInputFieldUserSettingEnabled()
-                .take(2)
-                .toList(results)
-        }
-
-        testee.setNativeInputFieldUserSetting(true)
-        job.join()
-
-        assertEquals(listOf(false, true), results)
-    }
-
-    @Test
     fun whenRegisterOpenedThenWasOpenedBeforeThenReturnTrue() = runTest {
         assertFalse(testee.wasOpenedBefore())
         testee.registerOpened()
@@ -528,5 +502,23 @@ class SharedPreferencesDuckChatDataStoreTest {
     fun `isInputScreenEverEnabled returns false when user setting key is absent (user never touched the setting)`() = runTest {
         // No writes at all — DUCK_AI_INPUT_SCREEN_USER_SETTING key is absent
         assertFalse(testee.isInputScreenEverEnabled())
+    }
+
+    @Test
+    fun whenSelectedReasoningModeNotSetThenReturnNull() = runTest {
+        assertNull(testee.getSelectedReasoningMode())
+    }
+
+    @Test
+    fun whenSetSelectedReasoningModeThenStoredValueReturned() = runTest {
+        testee.setSelectedReasoningMode("reasoning")
+        assertEquals("reasoning", testee.getSelectedReasoningMode())
+    }
+
+    @Test
+    fun whenSetSelectedReasoningModeNullThenStoredValueCleared() = runTest {
+        testee.setSelectedReasoningMode("fast")
+        testee.setSelectedReasoningMode(null)
+        assertNull(testee.getSelectedReasoningMode())
     }
 }

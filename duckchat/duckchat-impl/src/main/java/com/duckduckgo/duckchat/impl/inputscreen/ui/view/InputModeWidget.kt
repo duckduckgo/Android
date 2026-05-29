@@ -40,6 +40,7 @@ import android.widget.EditText
 import android.widget.FrameLayout
 import android.widget.ImageView
 import androidx.annotation.DrawableRes
+import androidx.annotation.LayoutRes
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.ColorUtils
@@ -65,14 +66,17 @@ import com.duckduckgo.duckchat.impl.pixel.inputScreenPixelsModeParam
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.tabs.TabLayout
 import dagger.android.support.AndroidSupportInjection
+import dev.zacsweers.metro.HasMemberInjections
 import javax.inject.Inject
 import kotlin.math.roundToInt
 
+@HasMemberInjections
 @InjectWith(ViewScope::class)
 open class InputModeWidget @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyle: Int = 0,
+    @LayoutRes layoutResId: Int = R.layout.view_input_mode_switch_widget,
 ) : ConstraintLayout(context, attrs, defStyle) {
     @Inject
     lateinit var pixel: Pixel
@@ -174,7 +178,7 @@ open class InputModeWidget @JvmOverloads constructor(
         }
 
     init {
-        LayoutInflater.from(context).inflate(R.layout.view_input_mode_switch_widget, this, true)
+        LayoutInflater.from(context).inflate(layoutResId, this, true)
 
         inputField = findViewById(R.id.inputField)
         inputFieldClearText = findViewById(R.id.inputFieldClearText)
@@ -308,7 +312,7 @@ open class InputModeWidget @JvmOverloads constructor(
                     (keyEvent?.keyCode == KeyEvent.KEYCODE_ENTER || keyEvent?.keyCode == KeyEvent.KEYCODE_NUMPAD_ENTER) &&
                         keyEvent.action == KeyEvent.ACTION_DOWN
 
-                if (actionId == EditorInfo.IME_ACTION_GO || isHardwareEnter) {
+                if (actionId == EditorInfo.IME_ACTION_GO || (isHardwareEnter && shouldSubmitOnHardwareEnter())) {
                     submitMessage()
 
                     val params = inputScreenPixelsModeParam(isSearchMode = inputModeSwitch.selectedTabPosition == 0)
@@ -422,6 +426,8 @@ open class InputModeWidget @JvmOverloads constructor(
         (context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager).restartInput(inputField)
     }
 
+    protected open fun shouldSubmitOnHardwareEnter(): Boolean = true
+
     protected open fun EditText.applyChatInputType() {
         imeOptions = EditorInfo.IME_FLAG_NO_EXTRACT_UI or EditorInfo.IME_FLAG_NO_PERSONALIZED_LEARNING or EditorInfo.IME_ACTION_GO
         setRawInputType(
@@ -455,7 +461,7 @@ open class InputModeWidget @JvmOverloads constructor(
         }
     }
 
-    fun submitMessage(message: String? = null) {
+    open fun submitMessage(message: String? = null) {
         val text = message?.also { text = it } ?: inputField.text
         val textToSubmit = text.getTextToSubmit()?.toString()
         if (textToSubmit != null) {

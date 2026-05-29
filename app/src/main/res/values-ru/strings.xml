@@ -597,6 +597,7 @@
     <!-- Fire Animation settings -->
     <string name="settingsFireAnimation">Aнимация кнопки «Огонь»</string>
     <string name="settingsHeroFireAnimation">Инферно</string>
+    <string name="settingsHeroFireAnimationClassic">Классика с пламенем</string>
     <string name="settingsHeroWaterAnimation">Водоворот</string>
     <string name="settingsHeroAbstractAnimation">Воздушный поток</string>
     <string name="settingsNoneAnimation">Ничего</string>
@@ -880,6 +881,9 @@
     <string name="preOnboardingDaxDialog3Button">Начать просмотр</string>
     <string name="preOnboardingAddressBarTitle">Где следует разместить адресную строку?</string>
     <string name="preOnboardingAddressBarOkButton">Далее</string>
+    <string name="preOnboardingAddressBarPositionTop">Вверху</string>
+    <string name="preOnboardingAddressBarPositionBottom">Внизу</string>
+    <string name="preOnboardingAddressBarPositionSplit">Разделить</string>
     <string name="highlightsPreOnboardingAddressBarOption1Title">Вверху (по умолчанию)</string>
     <string name="highlightsPreOnboardingAddressBarOption1Description">Легко заметить</string>
     <string name="highlightsPreOnboardingAddressBarOption2Title">Внизу</string>
@@ -902,6 +906,8 @@
     <string name="onboardingSitesDaxDialogOption3">ebay.com</string>
     <string name="onboardingSitesDaxDialogOption4">Удиви меня!</string>
     <string name="onboardingSerpDaxDialogDescription"><![CDATA[Это — <b>DuckDuckGo Search</b>! Надежно. Быстро. Меньше рекламы.]]></string>
+    <string name="onboardingSerpDaxDialogBrandDesignTitle">Это — DuckDuckGo Search!</string>
+    <string name="onboardingSerpDaxDialogBrandDesignDescription">Надежно. Быстро. Меньше рекламы.</string>
     <string name="onboardingSerpDaxDialogButton">Понятно</string>
     <string name="onboardingSitesSuggestionsDaxDialogTitle">А теперь попробуйте посетить сайт!</string>
     <plurals name="onboardingTrackersBlockedDialogDescription">
@@ -1024,6 +1030,10 @@
     <string name="syncRestoreDialogPrimaryCta">Восстановить мои данные</string>
     <string name="syncRestoreDialogSecondaryCta">Пропустить</string>
 
+    <!-- Sync Restore (brand-design onboarding) -->
+    <string name="syncRestoreDialogBrandDesignTitle">Давайте продолжим с того места, где вы остановились в DuckDuckGo.</string>
+    <string name="syncRestoreDialogBrandDesignBody1">Ваши сохраненные закладки, пароли и т. д. готовы.</string>
+
     <!-- PDF download tooltip -->
     <string name="pdfDownloadTooltipText">Скачать PDF</string>
 
@@ -1031,4 +1041,11 @@
     <string name="copyLinkText">Скопировать текст ссылки</string>
     <string name="linkTextCopied">Текст ссылки скопирован</string>
     <string name="linkTextCopyFailed">Не удалось скопировать текст ссылки</string>
+
+    <string name="preOnboardingWelcomeDialogTitle">Привет!</string>
+    <string name="preOnboardingWelcomeDialogBody1">Нужен быстрый браузер,\nгде все контролируете вы?</string>
+    <string name="preOnboardingWelcomeDialogBody2">Здесь ИИ — всегда лишь дополнительная опция, а защита конфиденциальности всегда включена.</string>
+    <string name="onboardingStepIndicatorText" instruction="a counter above our instructions in onboarding that tells a user what step they are on">%1$d из %2$d</string>
+    <string name="onboardingSearchDaxDialogOption1Quoted" instruction="translate &apos;duck&apos; too.">как сказать «утка» по-английски</string>
+    <string name="onboardingSearchDaxDialogOption1EnglishQuoted" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">как сказать «утка» по-испански</string>
 </resources>

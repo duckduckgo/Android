@@ -43,6 +43,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.Dp
@@ -200,6 +201,7 @@ private fun DaxButtonText(
         text = text,
         style = DuckDuckGoTheme.typography.button,
         color = color,
+        textAlign = TextAlign.Center,
         modifier = modifier,
     )
 }

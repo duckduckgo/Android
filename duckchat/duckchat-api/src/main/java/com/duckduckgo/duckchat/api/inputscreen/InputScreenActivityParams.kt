@@ -38,9 +38,9 @@ data class InputScreenActivityParams(
     val showInstalledApps: Boolean = false,
     val launchWithVoice: Boolean = false,
     val launchOnChat: Boolean = false,
-    val useBottomSheetMenu: Boolean = false,
     val showReturnHatch: Boolean = false,
     val isNewTab: Boolean = false,
+    val showDuckAiOnboardingEndCta: Boolean = false,
 ) : GlobalActivityStarter.ActivityParams
 
 /**
@@ -61,6 +61,9 @@ data object InputScreenActivityResultCodes {
 
     /** User requested to launch the Browser Menu */
     const val MENU_REQUESTED = 5
+
+    /** User requested to open After Inactivity Settings screen */
+    const val AFTER_INACTIVITY_REQUESTED = 6
 }
 
 /**
@@ -75,6 +78,9 @@ data object InputScreenActivityResultParams {
 
     /** Key for any canceled draft content when result is [Activity.RESULT_CANCELED] */
     const val CANCELED_DRAFT_PARAM = "draft"
+
+    /** Key for duck.ai end CTA interaction result (Boolean: true = OK clicked, false = dismissed) */
+    const val DUCK_AI_ONBOARDING_END_CTA_OK_CLICKED = "duck_ai_end_cta_ok"
 }
 
 /**

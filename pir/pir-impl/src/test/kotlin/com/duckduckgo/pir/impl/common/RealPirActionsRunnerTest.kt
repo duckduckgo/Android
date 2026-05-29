@@ -63,6 +63,7 @@ class RealPirActionsRunnerTest {
     private val mockPirDetachedWebViewProvider: PirDetachedWebViewProvider = mock()
     private val mockBrokerActionProcessor: BrokerActionProcessor = mock()
     private val mockNativeBrokerActionHandler: NativeBrokerActionHandler = mock()
+    private val mockEmailDataResolver: EmailDataResolver = mock()
     private val mockEngineFactory: PirActionsRunnerStateEngineFactory = mock()
     private val mockEngine: PirActionsRunnerStateEngine = mock()
     private val mockWebView: WebView = mock()
@@ -123,6 +124,7 @@ class RealPirActionsRunnerTest {
             pirDetachedWebViewProvider = mockPirDetachedWebViewProvider,
             brokerActionProcessor = mockBrokerActionProcessor,
             nativeBrokerActionHandler = mockNativeBrokerActionHandler,
+            emailDataResolver = mockEmailDataResolver,
             engineFactory = mockEngineFactory,
             coroutineScope = coroutineRule.testScope,
             runType = testRunType,
