@@ -21,6 +21,7 @@ import androidx.annotation.VisibleForTesting
 import androidx.core.net.toUri
 import com.duckduckgo.app.autocomplete.AutocompleteTabsFeature
 import com.duckduckgo.app.autocomplete.impl.AutoCompletePixelNames
+import com.duckduckgo.app.browser.DuckDuckGoSerpHostProvider
 import com.duckduckgo.app.browser.UriString
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -46,7 +47,6 @@ import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.browsermode.api.BrowserModeDataProvider
 import com.duckduckgo.browsermode.api.BrowserModeStateHolder
 import com.duckduckgo.common.utils.AppUrl
-import com.duckduckgo.common.utils.AppUrl.Url
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.UrlScheme
 import com.duckduckgo.common.utils.baseHost
@@ -106,6 +106,7 @@ class AutoCompleteApi constructor(
     private val pixel: Pixel,
     private val deviceAppLookup: DeviceAppLookup,
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
+    private val serpHostProvider: DuckDuckGoSerpHostProvider,
     private val config: AutoComplete.Config,
 ) : AutoComplete {
 
@@ -484,7 +485,7 @@ class AutoCompleteApi constructor(
                         Uri.Builder()
                             .scheme(UrlScheme.https)
                             .appendQueryParameter(AppUrl.ParamKey.QUERY, query)
-                            .authority(Url.HOST)
+                            .authority(serpHostProvider.searchHost())
                             .build()
 
                     suggestions.firstOrNull()?.let { suggestion ->

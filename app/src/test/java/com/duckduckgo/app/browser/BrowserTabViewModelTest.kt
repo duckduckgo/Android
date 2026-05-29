@@ -737,6 +737,7 @@ class BrowserTabViewModelTest {
                     mockPixel,
                     mockDeviceAppLookup,
                     coroutineRule.testScope,
+                    mock<DuckDuckGoSerpHostProvider> { on { searchHost() } doReturn "duckduckgo.com" },
                     AutoComplete.Config(),
                 )
             val fireproofWebsiteRepositoryImpl =
