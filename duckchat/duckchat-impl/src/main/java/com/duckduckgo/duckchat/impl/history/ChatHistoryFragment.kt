@@ -236,7 +236,7 @@ class ChatHistoryFragment : DuckDuckGoFragment(R.layout.fragment_chat_history) {
                 adapter.submitList(buildEntries(state, selectMode))
                 if (selectMode != null) {
                     applySelectModeToolbar(selectMode.selectedChatIds.size)
-                    setFireActionVisible(selectMode.selectedChatIds.isNotEmpty())
+                    setFireActionVisible(true)
                 } else {
                     applyDefaultToolbar()
                     // Fire-all wipes every chat including Pinned — show whenever any chat is present.
