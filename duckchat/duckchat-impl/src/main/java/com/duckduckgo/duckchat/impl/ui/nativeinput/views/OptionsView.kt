@@ -53,6 +53,9 @@ class OptionsView(context: Context, private val host: NativeInputHost) : LinearL
         ViewModelProvider(findViewTreeViewModelStoreOwner()!!, viewModelFactory)[OptionsViewModel::class.java]
     }
 
+    /** Whether the model / reasoning pickers are allowed for the current tool selection. */
+    val pickersEnabled: Boolean get() = viewModel.shouldShowPickers
+
     private data class MenuItem(
         val iconRes: Int,
         val titleRes: Int,

@@ -464,8 +464,12 @@ class NativeInputModeWidget @JvmOverloads constructor(
 
     private fun updateControlsVisibility() {
         val show = shouldShowInputControls(isChatTabSelected(), isStreaming)
-        findViewById<View?>(R.id.modelPickerContainer)?.isVisible = show
-        findViewById<View?>(R.id.reasoningModePickerContainer)?.isVisible = show
+        // The model/reasoning pickers are additionally owned by OptionsView, which hides them for
+        // tools that don't use them (e.g. image generation). Respect that so restoring controls
+        // after streaming doesn't re-show pickers that should stay hidden.
+        val showPickers = show && (optionsView?.pickersEnabled ?: true)
+        findViewById<View?>(R.id.modelPickerContainer)?.isVisible = showPickers
+        findViewById<View?>(R.id.reasoningModePickerContainer)?.isVisible = showPickers
         findViewById<View?>(R.id.optionsButtonContainer)?.isVisible = show
         findViewById<View?>(R.id.attachmentsContainer)?.isVisible = show && hasAttachments
         // attach button keeps its own supportsUpload gate; setImageButtonVisible folds in !isStreaming
