@@ -28,6 +28,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.LinkAnnotation
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextLinkStyles
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.style.TextDecoration
 import com.duckduckgo.common.ui.compose.text.DaxText
 import com.duckduckgo.common.ui.compose.theme.DuckDuckGoTheme
 import com.duckduckgo.mobile.android.R
@@ -73,10 +78,49 @@ internal fun DaxPanel(
             contentDescription = null,
         )
         DaxText(
-            text = body,
+            text = body.withDaxPanelLinkStyle(),
             modifier = Modifier
                 .padding(start = dimensionResource(R.dimen.keyline_4)),
             style = DuckDuckGoTheme.typography.body2,
         )
+    }
+}
+
+/**
+ * Re-styles every link in this [AnnotatedString] with the design-system link style (primary text
+ * colour, underlined), discarding any [TextLinkStyles] the caller set so links render consistently
+ * across all panels. The text and any non-link spans are preserved, and the original link
+ * destination/click behaviour is kept. Strings with no links are returned unchanged.
+ */
+@Composable
+private fun AnnotatedString.withDaxPanelLinkStyle(): AnnotatedString {
+    val source = this
+    val links = source.getLinkAnnotations(0, source.length)
+    if (links.isEmpty()) return source
+
+    val linkStyles = TextLinkStyles(
+        style = SpanStyle(
+            color = DuckDuckGoTheme.textColors.primary,
+            textDecoration = TextDecoration.Underline,
+        ),
+    )
+    return buildAnnotatedString {
+        append(source.text)
+        source.spanStyles.forEach { addStyle(it.item, it.start, it.end) }
+        source.paragraphStyles.forEach { addStyle(it.item, it.start, it.end) }
+        links.forEach { range ->
+            when (val link = range.item) {
+                is LinkAnnotation.Url -> addLink(
+                    LinkAnnotation.Url(link.url, linkStyles, link.linkInteractionListener),
+                    range.start,
+                    range.end,
+                )
+                is LinkAnnotation.Clickable -> addLink(
+                    LinkAnnotation.Clickable(link.tag, linkStyles, link.linkInteractionListener),
+                    range.start,
+                    range.end,
+                )
+            }
+        }
     }
 }

@@ -20,6 +20,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.LinkAnnotation
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.withLink
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import com.duckduckgo.common.ui.compose.theme.DuckDuckGoTheme
 import com.duckduckgo.common.ui.compose.tools.PreviewBox
@@ -78,6 +81,22 @@ private fun DaxInfoPanelPreview() {
     PreviewBox {
         DaxAlertPanel(
             body = "This is an info panel. It can be used to show important information to the user.",
+        )
+    }
+}
+
+@PreviewLightDark
+@Composable
+private fun DaxInfoPanelWithLinkPreview() {
+    PreviewBox {
+        DaxInfoPanel(
+            body = buildAnnotatedString {
+                append("This info panel has a link. Visit ")
+                withLink(LinkAnnotation.Url("https://duckduckgo.com")) {
+                    append("duckduckgo.com")
+                }
+                append(" to learn more.")
+            },
         )
     }
 }
