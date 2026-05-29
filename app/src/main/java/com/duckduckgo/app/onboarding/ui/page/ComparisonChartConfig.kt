@@ -34,7 +34,7 @@ sealed class ComparisonChartConfig(
         @StringRes val textRes: Int,
     )
 
-    class Browser(isCustomAiCopy: Boolean) : ComparisonChartConfig(
+    data class Browser(private val isCustomAiCopy: Boolean) : ComparisonChartConfig(
         titleRes = if (isCustomAiCopy) {
             R.string.preOnboardingDaxDialog2TitleCustomAi
         } else {
