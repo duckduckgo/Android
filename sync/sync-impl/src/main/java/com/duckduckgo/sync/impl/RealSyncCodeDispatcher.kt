@@ -105,10 +105,15 @@ class RealSyncCodeDispatcher @Inject constructor(
      * Translate one runner event into a [DispatchOutcome] for the v2 Presenter flow,
      * or null for intermediate events the caller should ignore.
      *
-     * The Joiner.* branches are defensive — unreachable today because this surface is only
-     * reachable when the device is signed in to a ddg sync account, so the runner's role
-     * election always elects this device as Host. Asana subtask `1215168582640073` relaxes
-     * the precondition and will make these branches first-class.
+     * The Joiner.* branches were defensive stubs in M1 (the signed-in surface always elects
+     * Host via role-election rule 1: account-beats-no-account). M1.5 wires `SyncConnectViewModel`
+     * (signed-out surface) to `presentV2`, so a signed-out Presenter facing a signed-in peer
+     * is now elected Joiner — these branches are first-class. Mirrors mapV2LinkingEventToOutcome
+     * behaviour (login on Joiner.Done; preserve abort reason).
+     *
+     * See Asana subtask `1215246284113165` for the M1.5 wire-up and `1215168582640073` for the
+     * runner-side account-provisioning at Host.Sending (used by signed-out Presenter ↔ signed-out
+     * peer scenarios where this device wins Presenter-beats-Scanner).
      */
     private fun mapV2PresentEventToOutcome(event: ExchangeV2Event): DispatchOutcome? = when (event) {
         is ExchangeV2Event.SessionStarted -> event.linkingCode?.let { DispatchOutcome.LinkingCodeReady(it) }
@@ -122,10 +127,19 @@ class RealSyncCodeDispatcher @Inject constructor(
                 else -> DispatchOutcome.Failed("host_aborted")
             }
             ExchangeV2State.SameAccountAbort -> DispatchOutcome.AlreadyConnected
-            // Defensive — see KDoc above.
-            ExchangeV2State.Joiner.Done -> DispatchOutcome.LoggedIn
-            ExchangeV2State.Joiner.AbortedLocal -> DispatchOutcome.Failed("joiner_aborted_local")
-            ExchangeV2State.Joiner.AbortedByHost -> DispatchOutcome.Failed("joiner_aborted_by_host")
+            ExchangeV2State.Joiner.Done -> {
+                val received = (event.trigger as? ExchangeV2Message.RecoveryCodeResponse)?.recoveryCode
+                if (received.isNullOrBlank()) {
+                    DispatchOutcome.Failed("Pairing completed without a recovery code")
+                } else {
+                    loginWithV2RecoveryCode(received)
+                }
+            }
+            ExchangeV2State.Joiner.AbortedByHost -> {
+                val msgType = event.trigger?.messageType ?: "abort"
+                DispatchOutcome.Failed("Pairing aborted by peer ($msgType)")
+            }
+            ExchangeV2State.Joiner.AbortedLocal -> DispatchOutcome.Failed("Pairing cancelled on this device")
             else -> null
         }
         is ExchangeV2Event.SessionError -> DispatchOutcome.Failed(event.message)

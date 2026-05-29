@@ -568,16 +568,103 @@ class RealSyncCodeDispatcherTest {
         assertEquals(DispatchOutcome.Failed("channel 5xx"), outcome)
     }
 
-    @Test fun `presentV2 defensively maps Joiner_Done to LoggedIn`() = runTest {
+    @Test fun `presentV2 emits Failed when Joiner_Done arrives without a recovery code`() = runTest {
         val outcome = withTimeoutOrNull(1000) {
-            val job =
-                async(
-                    start = kotlinx.coroutines.CoroutineStart.UNDISPATCHED,
-                ) { dispatcher.presentV2().first { it !is DispatchOutcome.LinkingCodeReady } }
+            val job = async(start = kotlinx.coroutines.CoroutineStart.UNDISPATCHED) {
+                dispatcher.presentV2().first { it !is DispatchOutcome.LinkingCodeReady }
+            }
             runnerEventsFlow.emit(transition(from = ExchangeV2State.Joiner.Waiting, to = ExchangeV2State.Joiner.Done))
             job.await()
         }
+        assertEquals(DispatchOutcome.Failed("Pairing completed without a recovery code"), outcome)
+    }
+
+    @Test fun `presentV2 emits LoggedIn when Joiner_Done carries a cid=ddg recovery code`() = runTest {
+        setV2(true)
+        // Build a v2 recovery code payload with cid=ddg.
+        val recoveryJson = JSONObject().apply {
+            put(
+                "recovery",
+                JSONObject().apply {
+                    put("user_id", "u-1")
+                    put("secret", "s-1")
+                    put("cid", "ddg")
+                    put("v", "2.0")
+                },
+            )
+        }.toString()
+        val b64 = android.util.Base64.encodeToString(
+            recoveryJson.toByteArray(Charsets.UTF_8),
+            android.util.Base64.URL_SAFE or android.util.Base64.NO_PADDING or android.util.Base64.NO_WRAP,
+        )
+        val responseMessage = com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Message.RecoveryCodeResponse(
+            rawJson = "{}",
+            recoveryCode = b64,
+        )
+        whenever(syncAccountRepository.processCode(any(), anyOrNull())).thenReturn(Result.Success(true))
+
+        val outcome = withTimeoutOrNull(1000) {
+            val job = async(start = kotlinx.coroutines.CoroutineStart.UNDISPATCHED) {
+                dispatcher.presentV2().first { it !is DispatchOutcome.LinkingCodeReady }
+            }
+            runnerEventsFlow.emit(
+                ExchangeV2Event.Transition(
+                    timestampMs = System.currentTimeMillis(),
+                    from = ExchangeV2State.Joiner.Waiting,
+                    to = ExchangeV2State.Joiner.Done,
+                    trigger = responseMessage,
+                    localTrigger = null,
+                ),
+            )
+            job.await()
+        }
         assertEquals(DispatchOutcome.LoggedIn, outcome)
+        // Confirm the v1 Recovery shape was constructed and the login was attempted.
+        verify(syncAccountRepository).processCode(any(), anyOrNull())
+        verify(syncAccountRepository, never()).joinAccountFromThirdPartyRecoveryCode(any())
+    }
+
+    @Test fun `presentV2 emits LoggedIn via 3party upgrade when Joiner_Done carries a cid=3party recovery code`() = runTest {
+        setV2(true)
+        val recoveryJson = JSONObject().apply {
+            put(
+                "recovery",
+                JSONObject().apply {
+                    put("user_id", "u-3p")
+                    put("secret", "s-3p")
+                    put("cid", "3party")
+                    put("v", "2.0")
+                },
+            )
+        }.toString()
+        val b64 = android.util.Base64.encodeToString(
+            recoveryJson.toByteArray(Charsets.UTF_8),
+            android.util.Base64.URL_SAFE or android.util.Base64.NO_PADDING or android.util.Base64.NO_WRAP,
+        )
+        val responseMessage = com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Message.RecoveryCodeResponse(
+            rawJson = "{}",
+            recoveryCode = b64,
+        )
+        whenever(syncAccountRepository.joinAccountFromThirdPartyRecoveryCode(any())).thenReturn(Result.Success(true))
+
+        val outcome = withTimeoutOrNull(1000) {
+            val job = async(start = kotlinx.coroutines.CoroutineStart.UNDISPATCHED) {
+                dispatcher.presentV2().first { it !is DispatchOutcome.LinkingCodeReady }
+            }
+            runnerEventsFlow.emit(
+                ExchangeV2Event.Transition(
+                    timestampMs = System.currentTimeMillis(),
+                    from = ExchangeV2State.Joiner.Waiting,
+                    to = ExchangeV2State.Joiner.Done,
+                    trigger = responseMessage,
+                    localTrigger = null,
+                ),
+            )
+            job.await()
+        }
+        assertEquals(DispatchOutcome.LoggedIn, outcome)
+        verify(syncAccountRepository).joinAccountFromThirdPartyRecoveryCode(any())
+        verify(syncAccountRepository, never()).processCode(any(), anyOrNull())
     }
 
     @Test fun `presentV2 defensively maps Joiner_AbortedLocal to Failed`() = runTest {

@@ -80,12 +80,11 @@ interface SyncCodeDispatcher {
      * Cancelling the collecting coroutine cancels the underlying runner session
      * (best-effort channel DELETE).
      *
-     * Today's callers are assumed to be on a UI surface reachable only when the device is
-     * signed in to a ddg sync account. Under that precondition the runner's role election
-     * always elects this device as Host, so the [Joiner.*] terminal states surfaced via
-     * [Failed]/[LoggedIn] are defensive and unreachable in practice. When Asana subtask
-     * `1215168582640073` ("Host pairs from no-account — create account inline") lands, the
-     * precondition relaxes and the Joiner branches become first-class.
+     * As of M1.5 (subtask `1215246284113165`), this method is called from both the signed-in
+     * `SyncWithAnotherActivityViewModel` and the signed-out `SyncConnectViewModel`. Role election
+     * runs in the runner — the Presenter can end up as Host (signed-in surface, or signed-out
+     * surface with a signed-out peer) or as Joiner (signed-out surface with a signed-in peer,
+     * or with a 3party peer). All terminal mappings are first-class; none are defensive.
      */
     fun presentV2(): Flow<DispatchOutcome>
 }
