@@ -27,6 +27,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.text.AnnotatedString
 import com.duckduckgo.common.ui.compose.text.DaxText
 import com.duckduckgo.common.ui.compose.theme.DuckDuckGoTheme
 import com.duckduckgo.mobile.android.R
@@ -39,14 +40,17 @@ import com.duckduckgo.mobile.android.R
  * [DaxAlertPanel]. Prefer one of those variants over calling this directly, as they provide the
  * correct icon and background colour for each use case.
  *
- * @param body The text to display in the panel.
+ * The body is an [AnnotatedString] so panels can carry inline styling and clickable links. Plain
+ * text is supported by wrapping it, e.g. `AnnotatedString("...")`.
+ *
+ * @param body The text to display in the panel, as an [AnnotatedString].
  * @param color The background colour of the panel.
  * @param icon The leading [Painter] icon displayed at the start of the panel.
  * @param modifier The [Modifier] to be applied to this panel.
  */
 @Composable
 internal fun DaxPanel(
-    body: String,
+    body: AnnotatedString,
     color: Color,
     icon: Painter,
     modifier: Modifier = Modifier,

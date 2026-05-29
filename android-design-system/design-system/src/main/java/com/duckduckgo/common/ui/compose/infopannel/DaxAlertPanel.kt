@@ -19,6 +19,7 @@ package com.duckduckgo.common.ui.compose.infopannel
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import com.duckduckgo.common.ui.compose.theme.DuckDuckGoTheme
 import com.duckduckgo.common.ui.compose.tools.PreviewBox
@@ -32,10 +33,35 @@ import com.duckduckgo.mobile.android.R
  *
  * @param body The warning text to display in the panel.
  * @param modifier The [Modifier] to be applied to this panel.
+ *
+ * Asana Task: https://app.asana.com/1/137249556945/project/1202857801505092/task/1215232366680610?focus=true
+ * Figma reference: https://www.figma.com/design/BOHDESHODUXK7wSRNBOHdu/%F0%9F%A4%96-Android-Components?node-id=25970-57507&m=dev
  */
 @Composable
 fun DaxAlertPanel(
     body: String,
+    modifier: Modifier = Modifier,
+) {
+    DaxAlertPanel(
+        body = AnnotatedString(body),
+        modifier = modifier,
+    )
+}
+
+/**
+ * [AnnotatedString] variant of [DaxAlertPanel]. Use this when the body needs inline styling or a
+ * clickable link. Build the [AnnotatedString] with `buildAnnotatedString`, adding links via
+ * `LinkAnnotation`.
+ *
+ * @param body The warning text to display in the panel, as an [AnnotatedString].
+ * @param modifier The [Modifier] to be applied to this panel.
+ *
+ * Asana Task: https://app.asana.com/1/137249556945/project/1202857801505092/task/1215232366680610?focus=true
+ * Figma reference: https://www.figma.com/design/BOHDESHODUXK7wSRNBOHdu/%F0%9F%A4%96-Android-Components?node-id=25970-57507&m=dev
+ */
+@Composable
+fun DaxAlertPanel(
+    body: AnnotatedString,
     modifier: Modifier = Modifier,
 ) {
     DaxPanel(
