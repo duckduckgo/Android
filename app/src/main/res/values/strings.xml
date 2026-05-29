@@ -264,6 +264,7 @@
     <string name="singleTabFireDialogDeleteAll">Delete All</string>
     <string name="singleTabFireDialogDeleteThisTab">Delete This Tab</string>
     <string name="singleTabFireDialogDeleteChat">Delete Chat</string>
+    <string name="singleTabFireDialogDeleteChats">Delete Chats</string>
     <string name="singleTabFireDialogTitleDuckAi">Delete this chat?</string>
     <string name="singleTabFireDialogSubtitleSiteData">Deleting site data can sign you out of accounts.</string>
     <string name="singleTabFireDialogSubtitleDownloads">This will cancel downloads in progress.</string>
