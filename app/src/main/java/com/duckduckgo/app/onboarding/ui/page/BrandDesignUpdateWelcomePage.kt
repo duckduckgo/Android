@@ -1394,6 +1394,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
 
                 binding.logoAnimation.alpha = 0f
                 binding.welcomeTitle.alpha = 0f
+                binding.duckAiIntroAnimation.alpha = 0f
 
                 backgroundAnimator?.snapTo(OnboardingBackgroundStep.Welcome)
 
@@ -1445,6 +1446,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                 populateComparisonChart(comparisonChartConfig)
                 binding.logoAnimation.alpha = 0f
                 binding.welcomeTitle.alpha = 0f
+                binding.duckAiIntroAnimation.alpha = 0f
 
                 backgroundAnimator?.snapTo(OnboardingBackgroundStep.ComparisonChart)
 
@@ -1506,6 +1508,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
             SKIP_ONBOARDING_OPTION -> {
                 binding.logoAnimation.alpha = 0f
                 binding.welcomeTitle.alpha = 0f
+                binding.duckAiIntroAnimation.alpha = 0f
                 backgroundAnimator?.snapTo(OnboardingBackgroundStep.Welcome)
 
                 binding.daxDialogCta.comparisonChartContent.root.isVisible = false
@@ -1548,6 +1551,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
             ADDRESS_BAR_POSITION -> {
                 binding.logoAnimation.alpha = 0f
                 binding.welcomeTitle.alpha = 0f
+                binding.duckAiIntroAnimation.alpha = 0f
 
                 // Address bar already visible — just update the selected option without re-running full dialog setup.
                 if (binding.daxDialogCta.addressBarContent.root.isVisible) {
@@ -1663,6 +1667,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
 
                 binding.logoAnimation.alpha = 0f
                 binding.welcomeTitle.alpha = 0f
+                binding.duckAiIntroAnimation.alpha = 0f
 
                 backgroundAnimator?.snapTo(OnboardingBackgroundStep.InputType)
 
@@ -1711,6 +1716,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
             QUICK_SETUP -> {
                 binding.logoAnimation.alpha = 0f
                 binding.welcomeTitle.alpha = 0f
+                binding.duckAiIntroAnimation.alpha = 0f
 
                 // Quick setup already visible — observeQuickSetupSelection keeps the row state in sync, nothing else needs re-running.
                 if (binding.daxDialogCta.reinstallerQuickSetupContent.root.isVisible) {
@@ -1778,6 +1784,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
 
                 binding.logoAnimation.alpha = 0f
                 binding.welcomeTitle.alpha = 0f
+                binding.duckAiIntroAnimation.alpha = 0f
 
                 binding.leftWingAnimation.isVisible = false
                 binding.bottomWingAnimation.isVisible = false
