@@ -12,3 +12,16 @@ appId: com.duckduckgo.mobile.android
 - tapOn:
     text: ".*Agree and Continue.*"
     optional: true
+
+# Dismiss the "Your recent chats live here!" tooltip if it appears. This is a
+# one-time onboarding popover anchored to the chat history menu, with a
+# "Got It!" CTA. The flow is unblocked even if it never appears.
+- extendedWaitUntil:
+    visible:
+      text: ".*Got It!.*"
+    timeout: 5000
+    optional: true
+
+- tapOn:
+    text: ".*Got It!.*"
+    optional: true

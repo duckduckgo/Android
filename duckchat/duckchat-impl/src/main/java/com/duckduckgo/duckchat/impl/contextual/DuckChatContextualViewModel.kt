@@ -24,7 +24,7 @@ import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.duckchat.api.DuckChat
-import com.duckduckgo.duckchat.impl.DuckChatConstants.CHAT_ID_PARAM
+import com.duckduckgo.duckchat.api.toChatIdOrNull
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.helper.DuckChatJSHelper
@@ -63,6 +63,7 @@ class DuckChatContextualViewModel @Inject constructor(
     private val duckChatFeature: DuckChatFeature,
     private val featureTogglesInventory: FeatureTogglesInventory,
     private val modelManager: DuckAiModelManager,
+    private val contextualNativeInputManager: ContextualNativeInputManager,
 ) : ViewModel() {
 
     private val commandChannel = Channel<Command>(capacity = 1, onBufferOverflow = DROP_OLDEST)
@@ -412,6 +413,7 @@ class DuckChatContextualViewModel @Inject constructor(
         isPageContextRequested = false
         persistTabClosed()
         duckChatPixels.reportContextualSheetDismissed()
+        contextualNativeInputManager.onContextualClosed(sheetTabId)
     }
 
     private fun persistTabClosed() {
@@ -666,8 +668,10 @@ class DuckChatContextualViewModel @Inject constructor(
 
     private fun hasChatId(url: String?): Boolean = !extractChatId(url).isNullOrBlank()
 
-    private fun extractChatId(url: String?): String? =
-        url?.toUri()?.getQueryParameter(CHAT_ID_PARAM)?.takeIf { it.isNotBlank() }
+    private fun extractChatId(url: String?): String? {
+        val uri = url?.toUri() ?: return null
+        return uri.toChatIdOrNull(duckChat)
+    }
 
     // Owns the coupled (fullModeUrl, _chatId) invariant: _chatId is always extractChatId(fullModeUrl).
     private fun setSheetUrl(url: String) {

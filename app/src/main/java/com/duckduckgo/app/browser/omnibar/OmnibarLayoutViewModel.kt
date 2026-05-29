@@ -255,7 +255,6 @@ class OmnibarLayoutViewModel @Inject constructor(
         val showFindInPage: Boolean = false,
         val showDuckAIHeader: Boolean = false,
         val showDuckAISidebar: Boolean = false,
-        val isDuckAiBackAvailable: Boolean = false,
         val isNativeInputEnabled: Boolean = false,
         val isAddressBarTrackersAnimationEnabled: Boolean = false,
         val useSoftwareRenderingMode: Boolean = false,
@@ -314,12 +313,10 @@ class OmnibarLayoutViewModel @Inject constructor(
         combine(
             duckAiFeatureState.showInputScreen,
             duckChat.observeNativeInputFieldUserSettingEnabled(),
-            duckChat.observeInputScreenUserSettingEnabled(),
-        ) { inputScreenEnabled, nativeInputEnabled, aiToggleEnabled ->
+        ) { inputScreenEnabled, nativeInputEnabled ->
             _viewState.update {
                 it.copy(
                     showTextInputClickCatcher = inputScreenEnabled || nativeInputEnabled,
-                    isDuckAiBackAvailable = nativeInputEnabled && !aiToggleEnabled,
                     isNativeInputEnabled = nativeInputEnabled,
                 )
             }
@@ -857,7 +854,9 @@ class OmnibarLayoutViewModel @Inject constructor(
         forceRender: Boolean,
     ) {
         logcat { "Omnibar: onExternalOmnibarStateChanged $omnibarViewState forceRender $forceRender" }
-        val state = if (shouldUpdateOmnibarTextInput(omnibarViewState, _viewState.value.omnibarText) || forceRender) {
+        val shouldUpdateText =
+            shouldUpdateOmnibarTextInput(omnibarViewState, _viewState.value.omnibarText, _viewState.value.hasFocus) || forceRender
+        val state = if (shouldUpdateText) {
             if (forceRender &&
                 !duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(omnibarViewState.queryOrFullUrl) &&
                 omnibarViewState.omnibarText != ABOUT_BLANK
@@ -898,7 +897,7 @@ class OmnibarLayoutViewModel @Inject constructor(
                 state.copy(
                     expanded = omnibarViewState.forceExpand,
                     expandedAnimated = omnibarViewState.forceExpand,
-                    updateOmnibarText = true,
+                    updateOmnibarText = shouldUpdateText,
                     showVoiceSearch = shouldShowVoiceSearch(
                         viewMode = _viewState.value.viewMode,
                         hasFocus = omnibarViewState.isEditing,
@@ -1075,7 +1074,8 @@ class OmnibarLayoutViewModel @Inject constructor(
     private fun shouldUpdateOmnibarTextInput(
         viewState: OmnibarViewState,
         currentText: String,
-    ) = (!viewState.isEditing || viewState.omnibarText.isEmpty()) && currentText != viewState.omnibarText
+        hasFocus: Boolean,
+    ) = (!hasFocus || viewState.omnibarText.isEmpty()) && currentText != viewState.omnibarText
 
     private fun firePixelBasedOnCurrentUrl(
         emptyUrlPixel: AppPixelName,

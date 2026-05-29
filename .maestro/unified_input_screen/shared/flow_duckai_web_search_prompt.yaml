@@ -6,11 +6,9 @@ appId: com.duckduckgo.mobile.android
       id: "inputModeWidget"
     timeout: 15000
 
-# switch to Duck.ai mode
-- tapOn:
-    text: "Duck.ai"
-    childOf:
-      id: "inputModeWidget"
+# switch to Duck.ai mode — "Duck.ai" only shows as the tab title here, so
+# a text tap is unambiguous
+- tapOn: "Duck.ai"
 - extendedWaitUntil:
     visible:
       id: "optionsButtonContainer"
@@ -36,16 +34,21 @@ appId: com.duckduckgo.mobile.android
 # handle the duck.ai T&C if it appears (first run only)
 - runFlow: ../../shared/accept_duckai_agreement.yaml
 
-# wait for the response to load — the chat puts the user's prompt at the top
-# of the conversation and the unified input slides back in at the bottom
+# duck.ai's web view sometimes fails to load — tap "Reload Duck.ai" if shown
+- runFlow: reload_duckai_if_needed.yaml
+
+# wait for the unified input to slide back in at the bottom — this happens as
+# soon as the chat container loads, independent of whether the duck.ai web view
+# itself finishes rendering (CI has hit the "Oops! Something went wrong"
+# loading-error screen for Duck.ai; we should still verify the pill state
+# rather than depend on the response content)
 - extendedWaitUntil:
     visible:
-      text: "Weather in Lisbon"
+      id: "inputField"
     timeout: 30000
-- extendedWaitUntil:
-    visible:
-      id: "optionsButtonContainer"
-    timeout: 15000
+
+- tapOn:
+    id: "inputField"
 
 # Web Search should NOT be auto-selected for the follow-up prompt — selecting it
 # is a per-prompt choice, not a sticky preference

@@ -161,6 +161,7 @@ interface NativeInputWidget {
         onChatSuggestionSelected: (String) -> Unit,
         onChatUrlSuggestionClicked: (AutoCompleteSuggestion) -> Unit,
         onSearchForQuerySubmitted: (String) -> Unit,
+        onChatHistoryShortcutClicked: () -> Unit,
         onShowSuggestions: (RecyclerView.Adapter<*>) -> Unit,
         onClearSuggestions: (Boolean) -> Unit,
     )
@@ -454,7 +455,10 @@ class NativeInputModeWidget @JvmOverloads constructor(
 
     private fun updateBottomRowVisibility() {
         val bottomRow = findViewById<View?>(R.id.inputModeWidgetBottomRow) ?: return
-        val visible = isChatTabSelected() && (inputField.hasFocus() || previewEnterFocus || isStreaming)
+        val suppress = nativeInputState?.shouldSuppressBottomRow() == true
+        val visible = isChatTabSelected() &&
+            (inputField.hasFocus() || previewEnterFocus || isStreaming) &&
+            !suppress
         bottomRow.visibility = if (visible) VISIBLE else GONE
     }
 
@@ -523,11 +527,17 @@ class NativeInputModeWidget @JvmOverloads constructor(
         val isBrowserContext = nativeInputState?.inputContext == NativeInputState.InputContext.BROWSER
         val hasText = inputField.text.isNotBlank()
         val visible = isBrowserContext && isChatTabSelected() && hasText && !isStreaming
+        // Only the top-bar floating row hosts the new-line button. Bottom-bar mode has no
+        // on-screen new-line; carriage return there is the IME enter key while on a Duck.ai
+        // page (see `applyChatInputType`: IME_ACTION_NONE + TYPE_TEXT_FLAG_MULTI_LINE).
         floatingButtons?.setNewLineButtonVisible(visible)
     }
 
     private fun applyState(state: NativeInputState) {
-        val contextChanged = nativeInputState?.inputContext != state.inputContext
+        val previousState = nativeInputState
+        val firstStateEmission = previousState == null
+        val contextChanged = previousState?.inputContext != state.inputContext
+        val positionChanged = previousState?.isBottom != state.isBottom
         nativeInputState = state
         findViewById<TabLayout?>(R.id.inputModeSwitch)?.let { toggle ->
             setToggleMatchParent()
@@ -538,7 +548,10 @@ class NativeInputModeWidget @JvmOverloads constructor(
         applyVerticalPaddingForFocus()
         updateNewLineButtonVisibility()
         applyOmnibarShape()
-        if (contextChanged && isChatTabSelected()) {
+        // Re-apply chat input type whenever the inputs to `applyChatInputType` (context, position)
+        // change, or on the first emission. This corrects stale IME setup from a tab listener
+        // that fired before the state-flow caught up.
+        if ((firstStateEmission || contextChanged || positionChanged) && isChatTabSelected()) {
             inputField.applyChatInputType()
             (context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager).restartInput(inputField)
         }
@@ -624,15 +637,26 @@ class NativeInputModeWidget @JvmOverloads constructor(
                     applyTabUi()
                     pushToggleSelectionIfUserDriven()
                     viewModel.updatePluginContainerVisibility(isChatTabSelected())
+                    refreshTabDependentButtons()
                 }
                 override fun onTabUnselected(tab: TabLayout.Tab) {}
                 override fun onTabReselected(tab: TabLayout.Tab) {
                     applyTabUi()
                     pushToggleSelectionIfUserDriven()
                     viewModel.updatePluginContainerVisibility(isChatTabSelected())
+                    refreshTabDependentButtons()
                 }
             },
         )
+    }
+
+    // send and new-line both gate on `isChatTabSelected()`. Voice buttons re-evaluate on tab
+    // change via NativeInputManager's `onSearchSelected`/`onChatSelected` hooks (which call
+    // `setVoice*Available`), but send and new-line have no such external trigger, so without
+    // this their visibility stays stale across tab switches.
+    private fun refreshTabDependentButtons() {
+        updateSendButtonVisibility()
+        updateNewLineButtonVisibility()
     }
 
     // Only propagate the TabLayout selection into NativeInputState when the toggle row is actually
@@ -652,19 +676,25 @@ class NativeInputModeWidget @JvmOverloads constructor(
 
     override fun EditText.applyChatInputType() {
         hint = context.getString(R.string.native_input_chat_hint)
-        val isDuckAiChat = isDuckAiPageContext()
-        val actionFlag = if (isDuckAiChat) EditorInfo.IME_ACTION_NONE else EditorInfo.IME_ACTION_GO
+        // Enter inserts a newline when we're on a Duck.ai chat page (existing behavior) or when
+        // the widget sits in bottom-bar position with the Duck.ai toggle selected. Bottom-bar
+        // mode has no on-screen new-line button, so the IME enter key is the only carriage-
+        // return affordance there. We read position from `isWidgetBottom()` (state-driven), and
+        // `applyState` re-fires this on the first state emission / position change so a stale
+        // value at tab-selection time gets corrected via `restartInput`.
+        val newLineOnEnter = isDuckAiPageContext() || isWidgetBottom()
+        val actionFlag = if (newLineOnEnter) EditorInfo.IME_ACTION_NONE else EditorInfo.IME_ACTION_GO
         imeOptions = EditorInfo.IME_FLAG_NO_EXTRACT_UI or EditorInfo.IME_FLAG_NO_PERSONALIZED_LEARNING or actionFlag
         val baseInputType = InputType.TYPE_CLASS_TEXT or
             InputType.TYPE_TEXT_FLAG_AUTO_CORRECT or InputType.TYPE_TEXT_FLAG_CAP_SENTENCES
         setRawInputType(
-            if (isDuckAiChat) baseInputType or InputType.TYPE_TEXT_FLAG_MULTI_LINE else baseInputType,
+            if (newLineOnEnter) baseInputType or InputType.TYPE_TEXT_FLAG_MULTI_LINE else baseInputType,
         )
         setHorizontallyScrolling(false)
     }
 
     override fun shouldSubmitOnHardwareEnter(): Boolean =
-        !(isDuckAiPageContext() && isChatTabSelected())
+        !(isChatTabSelected() && (isDuckAiPageContext() || isWidgetBottom()))
 
     override fun submitMessage(message: String?) {
         if (message == null && isChatTabSelected() && attachmentLimitExceeded) {
@@ -903,7 +933,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
         // fall through and reset card.radius to largeShapeCornerRadius on all four corners.
         if (isContextualWidget) return
         val state = nativeInputState ?: return
-        if (state.inputContext == NativeInputState.InputContext.DUCK_AI_CONTEXTUAL) return
+        if (state.inputContext != NativeInputState.InputContext.BROWSER) return
         if (state.isBottom) return
         if (state.toggleVisible) return
         val card = parent as? MaterialCardView ?: return
@@ -952,6 +982,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
         onChatSuggestionSelected: (String) -> Unit,
         onChatUrlSuggestionClicked: (AutoCompleteSuggestion) -> Unit,
         onSearchForQuerySubmitted: (String) -> Unit,
+        onChatHistoryShortcutClicked: () -> Unit,
         onShowSuggestions: (RecyclerView.Adapter<*>) -> Unit,
         onClearSuggestions: (Boolean) -> Unit,
     ) {
@@ -971,6 +1002,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
                     onChatUrlSuggestionClicked(suggestion)
                 },
                 onSearchForQuerySubmitted = onSearchForQuerySubmitted,
+                onChatHistoryShortcutClicked = onChatHistoryShortcutClicked,
             ).also { chatSuggestionsBinding = it }
         }
 
@@ -987,6 +1019,11 @@ class NativeInputModeWidget @JvmOverloads constructor(
         val previousOnChatSelected = this.onChatSelected
         this.onChatSelected = { animate ->
             previousOnChatSelected?.invoke(animate)
+            // Show the chat list adapter synchronously so async chat-history fetch doesn't leave a
+            // gap. On NTP the focusedView never covers the page (browserShowing=false), so the gap
+            // exposes the NTP logo. The list's match_parent overlay background covers it even with
+            // zero items; real chat history populates when the WebView-backed fetch returns.
+            onShowSuggestions(ensureBinding().adapter)
             showSuggestions(text)
         }
 
@@ -1045,13 +1082,18 @@ class NativeInputModeWidget @JvmOverloads constructor(
             val result = viewModel.fetchChatTabSuggestions(query, chatSuggestionsUserEnabled)
             // Defer the adapter swap until the chat history arrives, so the RecyclerView
             // lays out from position 0 with chat history on top and avoids repositioning.
-            binding.submit(result, query) { hasContent ->
-                if (hasContent) {
-                    onShowSuggestions?.invoke(binding.adapter)
-                } else {
-                    onClearSuggestions?.invoke(true)
-                }
-            }
+            binding.submit(
+                suggestions = result,
+                query = query,
+                isHistoryAvailable = viewModel.isHistoryAvailable.value,
+                onCommit = { hasContent ->
+                    if (hasContent) {
+                        onShowSuggestions?.invoke(binding.adapter)
+                    } else {
+                        onClearSuggestions?.invoke(true)
+                    }
+                },
+            )
         }
     }
 
@@ -1149,6 +1191,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
             ).apply {
                 onSendClick = { submitMessage() }
                 onStopClick = { this@NativeInputModeWidget.onStopTapped?.invoke() }
+                onVoiceChatClick = this@NativeInputModeWidget.onVoiceChatClick
                 setSendButtonVisible(false)
                 setNewLineButtonVisible(false)
             }
@@ -1161,11 +1204,9 @@ class NativeInputModeWidget @JvmOverloads constructor(
             val buttons = InputScreenButtons(
                 context = context,
                 useTopBar = true,
-                layoutResId = R.layout.view_native_input_screen_buttons,
+                layoutResId = R.layout.view_native_input_screen_floating_buttons,
             ).apply {
                 onNewLineClick = { printNewLine() }
-                onVoiceSearchClick = this@NativeInputModeWidget.onVoiceSearchClick
-                onVoiceChatClick = this@NativeInputModeWidget.onVoiceChatClick
                 setSendButtonVisible(false)
                 setNewLineButtonVisible(false)
             }
@@ -1175,7 +1216,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
         updateVoiceButtonVisibility()
     }
 
-    private fun voiceHostButtons(): InputScreenButtons? = floatingButtons ?: submitButtons
+    private fun voiceHostButtons(): InputScreenButtons? = submitButtons
 
     companion object {
         private const val MAX_LINES = 5
@@ -1188,3 +1229,12 @@ internal fun NativeInputState.shouldShowToggleRowBack(): Boolean =
 
 internal fun NativeInputState.shouldShowCardRowBack(): Boolean =
     !toggleVisible && inputContext == NativeInputState.InputContext.BROWSER
+
+/**
+ * The bottom row hosts chat-mode tools (attachments, options, reasoning, model picker).
+ * In search-only mode opened from the browser address bar, those tools should never appear —
+ * even if a stale `toggleSelection=DUCK_AI` from a prior interaction makes `isChatTabSelected()` true.
+ */
+internal fun NativeInputState.shouldSuppressBottomRow(): Boolean =
+    inputMode == NativeInputState.InputMode.SEARCH_ONLY &&
+        inputContext == NativeInputState.InputContext.BROWSER

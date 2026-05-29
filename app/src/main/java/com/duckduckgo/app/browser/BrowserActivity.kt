@@ -75,7 +75,6 @@ import com.duckduckgo.app.browser.tabs.TabManager.TabModel
 import com.duckduckgo.app.browser.tabs.adapter.TabPagerAdapter
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.dispatchers.ExternalIntentProcessingState
-import com.duckduckgo.app.downloads.DownloadsScreens.DownloadsScreenNoParams
 import com.duckduckgo.app.feedback.ui.common.FeedbackActivity
 import com.duckduckgo.app.fire.DataClearer
 import com.duckduckgo.app.fire.DataClearerForegroundAppRestartPixel
@@ -122,11 +121,11 @@ import com.duckduckgo.dataclearing.api.fire.FireDialogProvider
 import com.duckduckgo.dataclearing.api.fire.FireDialogProvider.FireDialogOrigin.Browser
 import com.duckduckgo.dataclearing.api.fire.FireDialogProvider.FireDialogOrigin.DuckAiContextualChat
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.downloads.api.DownloadsScreens.DownloadsScreenNoParams
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.api.viewmodel.DuckChatSharedViewModel
 import com.duckduckgo.duckchat.impl.ui.DuckChatWebViewFragment
-import com.duckduckgo.duckchat.impl.ui.DuckChatWebViewFragment.Companion.KEY_DUCK_AI_BROWSER_MODE
 import com.duckduckgo.duckchat.impl.ui.DuckChatWebViewFragment.Companion.KEY_DUCK_AI_TABS
 import com.duckduckgo.duckchat.impl.ui.DuckChatWebViewFragment.Companion.KEY_DUCK_AI_URL
 import com.duckduckgo.navigation.api.GlobalActivityStarter
@@ -228,6 +227,9 @@ open class BrowserActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var fireDialogProvider: FireDialogProvider
 
+    @Inject
+    lateinit var currentBrowserMode: BrowserMode
+
     private val lastActiveTabs = TabList()
 
     private var duckAiFragment: DuckChatWebViewFragment? = null
@@ -290,7 +292,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
     }
 
     private val tabPagerAdapter by lazy {
-        TabPagerAdapter(this, viewModel.currentMode.value)
+        TabPagerAdapter(this)
     }
 
     private lateinit var omnibarToolbarMockupBinding: IncludeOmnibarToolbarMockupBinding
@@ -365,6 +367,13 @@ open class BrowserActivity : DuckDuckGoActivity() {
     @SuppressLint("MissingSuperCall")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.daggerInject()
+
+        val savedMode = savedInstanceState?.getString(KEY_SAVED_BROWSER_MODE)
+        val modeChangedSinceSave = savedMode != null && savedMode != currentBrowserMode.name
+        if (modeChangedSinceSave) {
+            savedInstanceState?.remove(KEY_TAB_PAGER_STATE)
+        }
+
         intent?.sanitize()
         logcat(INFO) { "onCreate called. freshAppLaunch: ${dataClearer.isFreshAppLaunch}, savedInstanceState: $savedInstanceState" }
         dataClearerForegroundAppRestartPixel.registerIntent(intent)
@@ -376,6 +385,12 @@ open class BrowserActivity : DuckDuckGoActivity() {
         }
 
         super.onCreate(savedInstanceState = newInstanceState, daggerInject = false)
+
+        if (modeChangedSinceSave) {
+            // remove restored VM and fragments
+            viewModelStore.clear()
+            removeStaleTabFragments()
+        }
 
         bindMockupToolbars()
 
@@ -419,6 +434,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
+        outState.putString(KEY_SAVED_BROWSER_MODE, currentBrowserMode.name)
         if (swipingTabsFeature.isEnabled) {
             outState.putParcelable(KEY_TAB_PAGER_STATE, tabPagerAdapter.saveState())
         }
@@ -598,8 +614,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
         isExternal: Boolean,
     ): BrowserTabFragment {
         logcat(INFO) { "Opening new tab, url: $url, tabId: $tabId" }
-        val mode = if (isExternal) BrowserMode.REGULAR else viewModel.currentMode.value
-        val fragment = BrowserTabFragment.newInstance(tabId, url, skipHome, isExternal, mode)
+        val fragment = BrowserTabFragment.newInstance(tabId, url, skipHome, isExternal)
         addOrReplaceNewTab(fragment, tabId)
         currentTab = fragment
         return fragment
@@ -682,7 +697,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
         // Intents stamped with LAUNCH_REQUIRES_REGULAR_MODE must reach BrowserActivity in REGULAR
         // mode. Stash the intent and carry it to the recreated REGULAR-bound instance.
         val requiresRegularBrowserMode = intent.getBooleanExtra(LAUNCH_REQUIRES_REGULAR_MODE, false)
-        if (requiresRegularBrowserMode && viewModel.currentMode.value != BrowserMode.REGULAR) {
+        if (requiresRegularBrowserMode && currentBrowserMode != BrowserMode.REGULAR) {
             logcat(INFO) { "Intent requires REGULAR mode while in a non-regular mode — switching before processing" }
             pendingFireToRegularIntent = intent
             lifecycleScope.launch {
@@ -1066,14 +1081,12 @@ open class BrowserActivity : DuckDuckGoActivity() {
         tabs: Int,
     ) {
         val wasFragmentVisible = duckAiFragment?.isVisible ?: false
-        val mode = viewModel.currentMode.value
         val fragment =
             DuckChatWebViewFragment().apply {
                 arguments =
                     Bundle().apply {
                         duckChatUrl?.let { putString(KEY_DUCK_AI_URL, it) }
                         putInt(KEY_DUCK_AI_TABS, tabs)
-                        putString(KEY_DUCK_AI_BROWSER_MODE, mode.name)
                     }
             }
 
@@ -1220,7 +1233,8 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
     /**
      * Recreates the activity whenever the user switches browser mode. The activity is built for
-     * one mode at a time (single adapter, single currentTab, single lastActiveTabs).
+     * one mode at a time. The previous mode's tab state is stripped from the saved bundle, and any
+     * stale tab fragments are removed after restoration.
      */
     private fun observeBrowserModeChanges() {
         lifecycleScope.launch {
@@ -1228,6 +1242,16 @@ open class BrowserActivity : DuckDuckGoActivity() {
                 recreate()
             }
         }
+    }
+
+    private fun removeStaleTabFragments() {
+        val staleFragments = supportFragmentManager.fragments.filterIsInstance<BrowserTabFragment>()
+        if (staleFragments.isEmpty()) return
+        val transaction = supportFragmentManager.beginTransaction()
+        staleFragments.forEach { transaction.remove(it) }
+        // The activity is still in pre-onResume territory here; commitNowAllowingStateLoss is
+        // the right tool — synchronous and tolerant of an in-progress save/restore.
+        transaction.commitNowAllowingStateLoss()
     }
 
     override fun onAttachFragment(fragment: androidx.fragment.app.Fragment) {
@@ -1334,6 +1358,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
         private const val MAX_ACTIVE_TABS = 40
         private const val KEY_TAB_PAGER_STATE = "tabPagerState"
         private const val KEY_PENDING_FIRE_TO_REGULAR_INTENT = "pendingFireToRegularIntent"
+        private const val KEY_SAVED_BROWSER_MODE = "savedBrowserMode"
 
         private const val DISABLE_SWIPING_DELAY = 1000L
 

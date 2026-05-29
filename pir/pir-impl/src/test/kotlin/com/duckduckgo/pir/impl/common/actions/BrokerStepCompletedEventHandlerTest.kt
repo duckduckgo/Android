@@ -204,6 +204,45 @@ class BrokerStepCompletedEventHandlerTest {
         assertEquals("action-3", capturedState.firstValue.lastActionId)
         assertEquals(testCurrentTimeInMillis - testStageStartMs, capturedState.firstValue.durationMs)
         assertEquals(2, capturedState.firstValue.currentActionAttemptCount)
+        assertNull(capturedState.firstValue.generatedEmail)
+    }
+
+    @Test
+    fun whenNeedsEmailConfirmationTrueAndGeneratedEmailDataPresentThenForwardsGeneratedEmail() = runTest {
+        val optOutStep = OptOutStep(
+            broker = testBroker,
+            step = OptOutStepActions(
+                stepType = "optout",
+                actions = listOf(testAction1, testAction2, testAction3),
+                optOutType = "form",
+            ),
+            profileToOptOut = testExtractedProfile,
+        )
+        val state = State(
+            runType = RunType.OPTOUT,
+            brokerStepsToExecute = listOf(optOutStep),
+            profileQuery = testProfileQuery,
+            currentBrokerStepIndex = 0,
+            currentActionIndex = 2,
+            actionRetryCount = 1,
+            attemptId = "attempt-123",
+            brokerStepStartTime = testBrokerStartTime,
+            generatedEmailData = testGeneratedEmailData,
+            stageStatus = PirStageStatus(
+                currentStage = PirStage.FILL_FORM,
+                stageStartMs = testStageStartMs,
+            ),
+        )
+        val event = BrokerStepCompleted(
+            needsEmailConfirmation = true,
+            stepStatus = StepStatus.Success,
+        )
+
+        testee.invoke(state, event)
+
+        val capturedState = argumentCaptor<BrokerRecordEmailConfirmationNeeded>()
+        verify(mockPirRunStateHandler).handleState(capturedState.capture())
+        assertEquals("generated@example.com", capturedState.firstValue.generatedEmail)
     }
 
     @Test

@@ -16,30 +16,43 @@
 
 package com.duckduckgo.browsermode.impl
 
-import com.duckduckgo.app.browser.api.WebViewCapabilityChecker
-import com.duckduckgo.app.browser.api.WebViewCapabilityChecker.WebViewCapability.MultiProfile
+import androidx.lifecycle.LifecycleOwner
+import androidx.webkit.WebViewFeature
+import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.browsermode.api.FireModeAvailability
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
+import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @SingleInstanceIn(AppScope::class)
-@ContributesBinding(AppScope::class)
+@ContributesBinding(AppScope::class, boundType = FireModeAvailability::class)
+@ContributesMultibinding(AppScope::class, boundType = MainProcessLifecycleObserver::class)
 class RealFireModeAvailability @Inject constructor(
     private val fireModeFeature: FireModeFeature,
-    private val webViewCapabilityChecker: WebViewCapabilityChecker,
     private val dispatchers: DispatcherProvider,
-) : FireModeAvailability {
-    @Volatile
-    private var multiProfileSupported: Boolean? = null
+    @param:AppCoroutineScope private val appScope: CoroutineScope,
+) : FireModeAvailability, MainProcessLifecycleObserver {
 
-    override suspend fun isAvailable(): Boolean = withContext(dispatchers.io()) {
-        if (!fireModeFeature.fireTabs().isEnabled()) return@withContext false
-        multiProfileSupported ?: webViewCapabilityChecker.isSupported(MultiProfile).also {
-            multiProfileSupported = it
-        }
+    @Volatile
+    private var cachedAvailability: Boolean? = null
+
+    override fun onCreate(owner: LifecycleOwner) {
+        appScope.launch(dispatchers.io()) { computeAndCache() }
+    }
+
+    override fun isAvailable(): Boolean = cachedAvailability ?: computeAndCache()
+
+    private fun computeAndCache(): Boolean {
+        cachedAvailability?.let { return it }
+        val value = WebViewFeature.isFeatureSupported(WebViewFeature.MULTI_PROFILE) &&
+            fireModeFeature.fireTabs().isEnabled()
+        cachedAvailability = value
+        return value
     }
 }

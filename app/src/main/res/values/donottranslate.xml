@@ -99,7 +99,7 @@
     <!--Onboarding Reinstall Quick Setup-->
     <string name="preOnboardingReinstallQuickSetupTitle">Welcome back!&lt;br/&gt;Want to customize anything?</string>
     <string name="preOnboardingReinstallSetDefaultLabel">Set DuckDuckGo as default</string>
-    <string name="preOnboardingReinstallAddHomeScreenWidgetLabel">Add home screen widget</string>
+    <string name="preOnboardingReinstallAddHomeScreenWidgetLabel">Add Home screen widget</string>
     <string name="preOnboardingReinstallAddressBarLabel">Address bar position</string>
     <string name="preOnboardingReinstallAddressBarSearchOptionsLabel">Address bar search options</string>
     <string name="preOnboardingReinstallEditAction">Edit</string>
@@ -112,10 +112,32 @@
     <string name="quickSetupBottomSheetDone">Done</string>
     <string name="quickSetupInputScreenSearchOnly">Search Only</string>
     <string name="quickSetupInputScreenSearchAndDuckAi">Search &amp; Duck.ai</string>
+    <string name="quickSetupRemoveHomeScreenWidgetTitle">How to remove the Home screen widget</string>
+    <string name="quickSetupRemoveHomeScreenWidgetStep1">Go to your Home screen</string>
+    <string name="quickSetupRemoveHomeScreenWidgetStep2">Touch and hold the widget</string>
+    <string name="quickSetupRemoveHomeScreenWidgetStep3">Tap or drag to remove it</string>
+
+    <string name="quickSetupRemoveHomeScreenWidgetStep1Number" translatable="false">1</string>
+    <string name="quickSetupRemoveHomeScreenWidgetStep2Number" translatable="false">2</string>
+    <string name="quickSetupRemoveHomeScreenWidgetStep3Number" translatable="false">3</string>
 
     <!-- Fire animation rollout: relabel HeroFire to "Inferno Classic" when fireAnimationUpdate is on — pending translation -->
     <plurals name="fireDialogDeleteCountTitle">
         <item quantity="one" instruction="%1$d is the number of chats the user is about to delete.">Delete %1$d chat?</item>
         <item quantity="other" instruction="%1$d is the number of chats the user is about to delete.">Delete %1$d chats?</item>
     </plurals>
+
+    <!-- Fire mode -->
+    <string name="browserModeToggleFireDescription">Switch to Fire mode tabs</string>
+    <string name="browserModeToggleRegularDescription">Switch to regular tabs</string>
+    <string name="browserModeToggleTabCountInfinite">∞</string>
+
+    <!-- Pre-onboarding: AI comparison chart screen. Move to strings.xml when localized. -->
+    <string name="preOnboardingDaxDialogAiTitle">AI protections activated!</string>
+    <string name="preOnboardingAiComparisonChartPopularAis">Popular AIs</string>
+    <string name="preOnboardingAiComparisonChartItem1">All chats are anonymized</string>
+    <string name="preOnboardingAiComparisonChartItem2">No account needed to access all AI features</string>
+    <string name="preOnboardingAiComparisonChartItem3">Never uses your chats to train AI</string>
+    <string name="preOnboardingAiComparisonChartItem4">Access ChatGPT, Claude, and more, all in one place.</string>
+    <string name="preOnboardingAiComparisonChartButton">Give Duck.ai a try!</string>
 </resources>

@@ -24,6 +24,8 @@ import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
+import com.duckduckgo.duckchat.api.nativeinput.NativeInputStatePublisher
 import com.duckduckgo.duckchat.impl.helper.RealDuckChatJSHelper
 import com.duckduckgo.duckchat.impl.ui.nativeinput.views.NativeInputModeWidget
 import com.duckduckgo.js.messaging.api.JsMessaging
@@ -52,11 +54,20 @@ interface ContextualNativeInputManager {
 
     fun onWebViewMode()
     fun onInputMode()
+
+    /**
+     * Called when the contextual sheet is closed (e.g. STATE_HIDDEN). Reverts the per-tab
+     * [NativeInputState] back to a browser-context default so other observers (like StartChatView
+     * in the main widget) don't keep reading the DUCK_AI_CONTEXTUAL/DUCK_AI values the contextual
+     * widget wrote during its lifetime.
+     */
+    fun onContextualClosed(tabId: String)
 }
 
 @ContributesBinding(FragmentScope::class)
 class RealContextualNativeInputManager @Inject constructor(
     private val duckChat: DuckChat,
+    private val nativeInputStatePublisher: NativeInputStatePublisher,
 ) : ContextualNativeInputManager {
 
     private var isNativeInputEnabled = false
@@ -82,6 +93,17 @@ class RealContextualNativeInputManager @Inject constructor(
         applyCardShape(card)
         setupWidget(tabId, widget, chatIdFlow, onSearchSubmitted, onCameraCaptureRequested, onFilePickerRequested)
         observeNativeInputSetting(lifecycleOwner)
+    }
+
+    override fun onContextualClosed(tabId: String) {
+        if (tabId.isBlank()) return
+        val browser = NativeInputState.InputContext.BROWSER
+        nativeInputStatePublisher.update(tabId) {
+            it.copy(
+                inputContext = browser,
+                toggleSelection = NativeInputState.defaultToggleFor(browser),
+            )
+        }
     }
 
     override fun onWebViewMode() {

@@ -19,6 +19,7 @@ package com.duckduckgo.app.browser.defaultbrowsing
 import android.content.Context
 import android.content.Intent
 import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.onboarding.OnboardingFlowChecker
 import com.duckduckgo.app.survey.model.Survey
 import com.duckduckgo.app.survey.ui.SurveyActivity
 import com.duckduckgo.app.survey.ui.SurveyActivity.Companion.SurveySource
@@ -52,6 +53,7 @@ class DefaultBrowserChangedSurveyEvaluatorImpl @Inject constructor(
     private val surveyManager: DefaultBrowserChangedSurveyManager,
     private val surveySampler: DefaultBrowserChangedSurveySampler,
     private val dispatchers: DispatcherProvider,
+    private val onboardingFlowChecker: OnboardingFlowChecker,
 ) : ModalEvaluator, DefaultBrowserChangedSurveyEvaluator {
 
     override val priority: Int = 1
@@ -59,6 +61,11 @@ class DefaultBrowserChangedSurveyEvaluatorImpl @Inject constructor(
     override val evaluatorId: String = EVALUATOR_ID
 
     override suspend fun evaluate(): ModalEvaluator.EvaluationResult = withContext(dispatchers.io()) {
+        if (!onboardingFlowChecker.isOnboardingComplete()) {
+            logcat { "Default-browser-changed survey skipped: onboarding not complete" }
+            return@withContext ModalEvaluator.EvaluationResult.Skipped
+        }
+
         if (!surveyManager.shouldTriggerSurvey()) {
             logcat { "Should not trigger survey from default browser changed evaluator" }
             return@withContext ModalEvaluator.EvaluationResult.Skipped

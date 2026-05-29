@@ -20,6 +20,7 @@ import android.app.Application
 import android.content.Intent
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.duckduckgo.app.onboarding.OnboardingFlowChecker
 import com.duckduckgo.app.survey.ui.SurveyActivity
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.modalcoordinator.api.ModalEvaluator
@@ -47,6 +48,7 @@ class DefaultBrowserChangedSurveyEvaluatorImplTest {
     private val applicationContext: Application = ApplicationProvider.getApplicationContext()
     private val surveyManager: DefaultBrowserChangedSurveyManager = mock()
     private val sampler: DefaultBrowserChangedSurveySampler = mock()
+    private val onboardingFlowChecker: OnboardingFlowChecker = mock()
 
     private val testee = DefaultBrowserChangedSurveyEvaluatorImpl(
         appCoroutineScope = coroutinesTestRule.testScope,
@@ -54,11 +56,29 @@ class DefaultBrowserChangedSurveyEvaluatorImplTest {
         surveyManager = surveyManager,
         surveySampler = sampler,
         dispatchers = coroutinesTestRule.testDispatcherProvider,
+        onboardingFlowChecker = onboardingFlowChecker,
     )
 
     @Before
     fun setUp() {
         shadowOf(applicationContext).clearNextStartedActivities()
+        runTest {
+            whenever(onboardingFlowChecker.isOnboardingComplete()).thenReturn(true)
+        }
+    }
+
+    @Test
+    fun whenOnboardingNotCompleteThenEvaluationIsSkipped() = runTest {
+        whenever(onboardingFlowChecker.isOnboardingComplete()).thenReturn(false)
+
+        val result = testee.evaluate()
+
+        assertEquals(ModalEvaluator.EvaluationResult.Skipped, result)
+        verify(surveyManager, never()).shouldTriggerSurvey()
+        verify(sampler, never()).isInSample()
+        verify(surveyManager, never()).markSurveyShown()
+        coroutinesTestRule.testScope.testScheduler.advanceUntilIdle()
+        assertNull(shadowOf(applicationContext).nextStartedActivity)
     }
 
     @Test

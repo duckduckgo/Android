@@ -1131,6 +1131,29 @@ class OmnibarLayoutViewModelTest {
     }
 
     @Test
+    fun whenOmnibarFocusedAndExternalOmnibarStateChangedThenUserTextAndCursorPreserved() = runTest {
+        testee.onExternalStateChange(
+            StateChange.OmnibarStateChange(
+                OmnibarViewState(omnibarText = "ducks", queryOrFullUrl = "ducks", forceExpand = false),
+            ),
+        )
+        testee.onOmnibarFocusChanged(hasFocus = true, inputFieldText = "ducks")
+        testee.onInputStateChanged(query = "newquery", hasFocus = true, clearQuery = false, deleteLastCharacter = false)
+
+        testee.onExternalStateChange(
+            StateChange.OmnibarStateChange(
+                OmnibarViewState(omnibarText = "ducks", queryOrFullUrl = "ducks", forceExpand = false),
+            ),
+        )
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertEquals("newquery", viewState.omnibarText)
+            assertFalse(viewState.updateOmnibarText)
+        }
+    }
+
+    @Test
     fun whenOmnibarFocusedAndLoadingStateChangesThenViewStateCorrect() = runTest {
         val omnibarState = OmnibarViewState(
             navigationChange = false,
@@ -1572,69 +1595,6 @@ class OmnibarLayoutViewModelTest {
         testee.viewState.test {
             val viewState = expectMostRecentItem()
             assertTrue(viewState.showTextInputClickCatcher)
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenNativeInputEnabledAndAiToggleDisabledThenIsDuckAiBackAvailableTrue() = runTest {
-        nativeInputFieldSettingFlow.value = true
-        inputScreenUserSettingFlow.value = false
-
-        testee.viewState.test {
-            val viewState = expectMostRecentItem()
-            assertTrue(viewState.isDuckAiBackAvailable)
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenNativeInputEnabledAndAiToggleEnabledThenIsDuckAiBackAvailableFalse() = runTest {
-        nativeInputFieldSettingFlow.value = true
-        inputScreenUserSettingFlow.value = true
-
-        testee.viewState.test {
-            val viewState = expectMostRecentItem()
-            assertFalse(viewState.isDuckAiBackAvailable)
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenNativeInputDisabledAndAiToggleDisabledThenIsDuckAiBackAvailableFalse() = runTest {
-        nativeInputFieldSettingFlow.value = false
-        inputScreenUserSettingFlow.value = false
-
-        testee.viewState.test {
-            val viewState = expectMostRecentItem()
-            assertFalse(viewState.isDuckAiBackAvailable)
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenNativeInputDisabledAndAiToggleEnabledThenIsDuckAiBackAvailableFalse() = runTest {
-        nativeInputFieldSettingFlow.value = false
-        inputScreenUserSettingFlow.value = true
-
-        testee.viewState.test {
-            val viewState = expectMostRecentItem()
-            assertFalse(viewState.isDuckAiBackAvailable)
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenAiToggleFlipsOffWhileNativeInputEnabledThenIsDuckAiBackAvailableBecomesTrue() = runTest {
-        nativeInputFieldSettingFlow.value = true
-        inputScreenUserSettingFlow.value = true
-
-        testee.viewState.test {
-            assertFalse(expectMostRecentItem().isDuckAiBackAvailable)
-
-            inputScreenUserSettingFlow.value = false
-
-            assertTrue(expectMostRecentItem().isDuckAiBackAvailable)
             cancelAndIgnoreRemainingEvents()
         }
     }

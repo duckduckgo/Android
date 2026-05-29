@@ -45,7 +45,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:paddingHorizontal="@dimen/keyline_6">
+            android:paddingHorizontal="@dimen/quickSetupBottomSheetHorizontalPadding">
 
             <com.duckduckgo.common.ui.view.text.DaxTextView
                 android:id="@+id/quickSetupAddressBarPositionTitle"
@@ -63,7 +63,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/keyline_4"
-                android:layout_marginBottom="@dimen/keyline_2"
                 app:itemSpacingMaxWidth="32dp" />
 
             <com.duckduckgo.common.ui.view.text.DaxTextView

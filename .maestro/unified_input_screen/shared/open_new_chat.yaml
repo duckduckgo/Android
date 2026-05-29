@@ -1,8 +1,9 @@
 appId: com.duckduckgo.mobile.android
 ---
-# move to Duck chat mode
+# move to Duck chat mode — "Duck.ai" only appears as the tab title, so a
+# text tap is unambiguous here
 - tapOn: "Duck.ai"
-- assertVisible: "Ask anything privately\u2026"
+- assertVisible: "Ask anything privately…"
 
 # verify that Duck.ai web view is opened when submitting a query in chat mode
 - tapOn:
@@ -11,20 +12,38 @@ appId: com.duckduckgo.mobile.android
 - tapOn:
     id: "actionSend"
 
-# accept T&C if visible
-- assertVisible:
-    optional: true
-    text: 'Agree and Continue'
-- tapOn: 
-    optional: true
-    text: "Agree and Continue"
+# accept the duck.ai T&C if it appears AND dismiss the chat-history
+# "Got It!" tooltip if it appears (first-run states; both optional)
+- runFlow: ../../shared/accept_duckai_agreement.yaml
 
-# move to search mode
-- tapOn: "Ask anything privately\u2026"
-- tapOn: "Search"
+# duck.ai's web view sometimes fails to load — tap "Reload Duck.ai" if shown
+- runFlow: reload_duckai_if_needed.yaml
+
+# move to search mode — `tapOn: "Search"` alone matches the keyboard's
+# magnifying-glass action key. The TabItem id (tabSearch) isn't exposed in
+# the rendered view tree, so we match on the tab_title TextView with the
+# "Search" text combined: this is the actual tab label inside the switcher
+- tapOn: "Ask anything privately…"
+- assertVisible:
+    id: "tab_title"
+    text: "Search"
+- tapOn:
+    id: "tab_title"
+    text: "Search"
 - inputText: "back to search"
 - tapOn: "back to search"
 - pressKey: enter
+
+# wait for the SERP to load — daxIcon and the browser container appear together
+# once rendering finishes; CI is slower than a local device so give it room
+- extendedWaitUntil:
+    visible:
+      id: "browserLayout"
+    timeout: 20000
+- extendedWaitUntil:
+    visible:
+      id: "daxIcon"
+    timeout: 10000
 - assertVisible:
     id: "daxIcon"
 - assertVisible:

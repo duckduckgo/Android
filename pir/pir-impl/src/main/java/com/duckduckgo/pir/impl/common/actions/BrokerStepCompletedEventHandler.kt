@@ -73,6 +73,7 @@ class BrokerStepCompletedEventHandler @Inject constructor(
                     lastActionId = currentBrokerStep.step.actions[state.currentActionIndex].id,
                     durationMs = currentTimeProvider.currentTimeMillis() - state.stageStatus.stageStartMs,
                     currentActionAttemptCount = state.actionRetryCount + 1,
+                    generatedEmail = state.generatedEmailData?.emailAddress,
                 ),
             )
         } else {

@@ -23,6 +23,8 @@ import com.duckduckgo.app.systemsearch.DeviceAppLookup
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.browser.api.autocomplete.AutoComplete
 import com.duckduckgo.browser.api.autocomplete.AutoCompleteFactory
+import com.duckduckgo.browsermode.api.BrowserModeDataProvider
+import com.duckduckgo.browsermode.api.BrowserModeStateHolder
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckChat
@@ -38,7 +40,8 @@ class AutoCompleteFactoryImpl @Inject constructor(
     private val savedSitesRepository: SavedSitesRepository,
     private val navigationHistory: NavigationHistory,
     private val autoCompleteScorer: AutoCompleteScorer,
-    private val tabRepository: TabRepository,
+    private val tabRepositoryProvider: BrowserModeDataProvider<TabRepository>,
+    private val browserModeStateHolder: BrowserModeStateHolder,
     private val autocompleteTabsFeature: AutocompleteTabsFeature,
     private val duckChat: DuckChat,
     private val history: NavigationHistory,
@@ -54,7 +57,8 @@ class AutoCompleteFactoryImpl @Inject constructor(
             savedSitesRepository = savedSitesRepository,
             navigationHistory = navigationHistory,
             autoCompleteScorer = autoCompleteScorer,
-            tabRepository = tabRepository,
+            tabRepositoryProvider = tabRepositoryProvider,
+            browserModeStateHolder = browserModeStateHolder,
             autocompleteTabsFeature = autocompleteTabsFeature,
             duckChat = duckChat,
             history = history,

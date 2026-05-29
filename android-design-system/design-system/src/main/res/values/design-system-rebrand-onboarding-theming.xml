@@ -40,6 +40,9 @@
     <attr name="onboardingShadowBlue" format="color" />
     <color name="onboardingBubbleShadowColor">#08000000</color>
 
+    <!-- Quick setup -->
+    <attr name="quickSetupStepNumberText" format="color" />
+
     <attr name="selectionButtonStyle" format="reference"/>
 
     <style name="Theme.DuckDuckGo.Light.Onboarding" parent="Theme.DuckDuckGo.Light">
@@ -64,6 +67,9 @@
         <item name="onboardingControlFillTertiary">@color/black12</item>
         <item name="onboardingShadowPurple">#0F3E228C</item> <!--6% Alpha-->
         <item name="onboardingShadowBlue">#171E42A4</item> <!--9% Alpha-->
+
+        <!--Quick setup-->
+        <item name="quickSetupStepNumberText">@color/pondwater70</item>
 
         <!--Icons-->
         <item name="onboardingIconsPrimary">#D6242323</item> <!--84% Alpha-->
@@ -130,6 +136,9 @@
         <item name="onboardingControlFillTertiary">@color/white24</item>
         <item name="onboardingShadowPurple">#0F070019</item> <!--6% Alpha-->
         <item name="onboardingShadowBlue">#17051133</item> <!--9% Alpha-->
+
+        <!--Quick setup-->
+        <item name="quickSetupStepNumberText">@color/pondwater0</item>
 
         <!--Icons-->
         <item name="onboardingIconsPrimary">#D6FBFAF9</item> <!--84% Alpha-->

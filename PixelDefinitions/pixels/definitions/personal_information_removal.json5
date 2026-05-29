@@ -374,6 +374,45 @@
             }
         ]
     },
+    "m_dbp_scan_stage_email-get-data": {
+        "description": "Fired at the email-data polling stage of a scan, when the runner is waiting for data (e.g. a verification code) extracted from a received email.",
+        "owners": ["karlenDimla", "landomen"],
+        "triggers": ["other"],
+        "suffixes": ["daily_count_short", "form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "data_broker",
+                "description": "The URL of the broker the stage was for",
+                "type": "string"
+            },
+            {
+                "key": "parent",
+                "description": "The parent data broker of the scan",
+                "type": "string"
+            },
+            {
+                "key": "broker_version",
+                "description": "The version of the broker JSON file",
+                "type": "string"
+            },
+            {
+                "key": "duration",
+                "description": "Stage duration in milliseconds",
+                "type": "string"
+            },
+            {
+                "key": "tries",
+                "description": "The number of tries it took to complete the stage",
+                "type": "string"
+            },
+            {
+                "key": "action_id",
+                "description": "Predefined identifier of the broker action executed in this stage",
+                "type": "string"
+            }
+        ]
+    },
     "m_dbp_search_stage_main_status_success": {
         "description": "Pixel emitted when the scan is completed with results.",
         "owners": ["karlenDimla", "landomen"],
@@ -603,6 +642,45 @@
     },
     "m_dbp_optout_stage_email-generate": {
         "description": "Fired at the email generation stage of an opt-out attempt.",
+        "owners": ["karlenDimla", "landomen"],
+        "triggers": ["other"],
+        "suffixes": ["daily_count_short", "form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "data_broker",
+                "description": "The URL of the data broker that this opt-out attempt targets",
+                "type": "string"
+            },
+            {
+                "key": "parent",
+                "description": "The parent data broker of the one this opt-out attempt targets",
+                "type": "string"
+            },
+            {
+                "key": "broker_version",
+                "description": "The version of the broker JSON file",
+                "type": "string"
+            },
+            {
+                "key": "duration",
+                "description": "Stage duration in milliseconds",
+                "type": "string"
+            },
+            {
+                "key": "tries",
+                "description": "The number of tries it took to complete the stage",
+                "type": "string"
+            },
+            {
+                "key": "action_id",
+                "description": "Predefined identifier of the broker action executed in this stage",
+                "type": "string"
+            }
+        ]
+    },
+    "m_dbp_optout_stage_email-get-data": {
+        "description": "Fired at the email-data polling stage of an opt-out attempt, when the runner is waiting for data (e.g. a verification code) extracted from a received email.",
         "owners": ["karlenDimla", "landomen"],
         "triggers": ["other"],
         "suffixes": ["daily_count_short", "form_factor"],

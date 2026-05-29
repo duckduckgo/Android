@@ -71,6 +71,7 @@ class DuckChatContextualViewModelTest {
     private val contextualFireButtonToggle: Toggle = mock()
     private val featureTogglesInventory: FeatureTogglesInventory = mock()
     private val modelManager: com.duckduckgo.duckchat.impl.models.DuckAiModelManager = mock()
+    private val contextualNativeInputManager: ContextualNativeInputManager = mock()
     private val singleTabFireDialogToggle: Toggle = mock()
     private val singleTabFireDialogFeatureName: Toggle.FeatureName = Toggle.FeatureName(
         parentName = "androidBrowserConfig",
@@ -107,6 +108,7 @@ class DuckChatContextualViewModelTest {
             duckChatFeature = duckChatFeature,
             featureTogglesInventory = featureTogglesInventory,
             modelManager = modelManager,
+            contextualNativeInputManager = contextualNativeInputManager,
         )
     }
 
@@ -388,6 +390,7 @@ class DuckChatContextualViewModelTest {
                     duckChatFeature = duckChatFeature,
                     featureTogglesInventory = featureTogglesInventory,
                     modelManager = modelManager,
+                    contextualNativeInputManager = contextualNativeInputManager,
                 )
 
             val tabId = "tab-1"
@@ -796,6 +799,7 @@ class DuckChatContextualViewModelTest {
                     duckChatFeature = duckChatFeature,
                     featureTogglesInventory = featureTogglesInventory,
                     modelManager = modelManager,
+                    contextualNativeInputManager = contextualNativeInputManager,
                 )
 
             val serializedPageData =
@@ -833,6 +837,7 @@ class DuckChatContextualViewModelTest {
                     duckChatFeature = duckChatFeature,
                     featureTogglesInventory = featureTogglesInventory,
                     modelManager = modelManager,
+                    contextualNativeInputManager = contextualNativeInputManager,
                 )
 
             val serializedPageData =
@@ -1305,6 +1310,16 @@ class DuckChatContextualViewModelTest {
     }
 
     @Test
+    fun `when sheet closed then contextual native input manager is notified with active tabId`() = runTest {
+        val tabId = "tab-1"
+        testee.onSheetOpened(tabId)
+
+        testee.onSheetClosed()
+
+        verify(contextualNativeInputManager).onContextualClosed(tabId)
+    }
+
+    @Test
     fun `reopenSheet in webview mode starts new chat when session expired`() = runTest {
         val tabId = "tab-1"
         val storedUrl = "https://duck.ai/chat?chatID=123"
@@ -1560,6 +1575,7 @@ class DuckChatContextualViewModelTest {
         duckChatFeature = duckChatFeature,
         featureTogglesInventory = featureTogglesInventory,
         modelManager = modelManager,
+        contextualNativeInputManager = contextualNativeInputManager,
     )
 
     private class FakeDuckChat : com.duckduckgo.duckchat.api.DuckChat {
@@ -1577,7 +1593,8 @@ class DuckChatContextualViewModelTest {
             sidebar: Boolean,
         ): String = nextUrl
 
-        override fun isDuckChatUrl(uri: android.net.Uri): Boolean = false
+        override fun isDuckChatUrl(uri: android.net.Uri): Boolean =
+            uri.host == "duck.ai" || uri.host == "duckduckgo.com"
         override suspend fun wasOpenedBefore(): Boolean = false
         override fun showNewAddressBarOptionChoiceScreen(
             context: android.content.Context,

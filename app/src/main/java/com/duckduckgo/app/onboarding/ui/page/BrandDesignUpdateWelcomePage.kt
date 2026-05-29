@@ -24,6 +24,7 @@ import android.animation.ObjectAnimator
 import android.animation.ValueAnimator
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.graphics.Typeface
 import android.graphics.drawable.AnimatedVectorDrawable
@@ -35,6 +36,9 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.animation.OvershootInterpolator
 import android.view.animation.PathInterpolator
+import android.widget.ImageView
+import android.widget.LinearLayout
+import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -43,6 +47,7 @@ import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.ViewGroupCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.children
 import androidx.core.view.doOnLayout
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
@@ -61,10 +66,12 @@ import com.airbnb.lottie.model.KeyPath
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ContentOnboardingWelcomePageUpdateBinding
+import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserSystemSettings
 import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.cta.ui.DaxBubbleCta.DaxDialogIntroOption
 import com.duckduckgo.app.onboarding.ui.OnboardingActivity
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.ADDRESS_BAR_POSITION
+import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.AI_COMPARISON_CHART
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.COMPARISON_CHART
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.INITIAL
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.INITIAL_REINSTALL_USER
@@ -76,10 +83,13 @@ import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.SYNC_RESTOR
 import com.duckduckgo.app.onboardingquicksetup.ui.BrandDesignInputScreenPicker
 import com.duckduckgo.app.onboardingquicksetup.ui.QuickSetupAddressBarPositionBottomSheet
 import com.duckduckgo.app.onboardingquicksetup.ui.QuickSetupSearchOptionsBottomSheet
+import com.duckduckgo.app.onboardingquicksetup.ui.RemoveWidgetInstructionsBottomSheet
+import com.duckduckgo.app.widget.AddWidgetLauncher
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.common.ui.view.TypeAnimationTextView
 import com.duckduckgo.common.ui.view.addBottomShadow
+import com.duckduckgo.common.ui.view.text.DaxTextView
 import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.FragmentViewModelFactory
@@ -96,6 +106,9 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
+import logcat.LogPriority.WARN
+import logcat.asLog
+import logcat.logcat
 import javax.inject.Inject
 import com.duckduckgo.fonts.R as FontsR
 import com.duckduckgo.mobile.android.R as CommonR
@@ -114,6 +127,9 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
 
     @Inject
     lateinit var appTheme: AppTheme
+
+    @Inject
+    lateinit var addWidgetLauncher: AddWidgetLauncher
 
     private val binding: ContentOnboardingWelcomePageUpdateBinding by viewBinding()
     private val viewModel by lazy {
@@ -460,14 +476,6 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
     ) {
         super.onViewCreated(view, savedInstanceState)
 
-        with(binding.daxDialogCta.comparisonChartContent) {
-            comparisonChartItem1.text = getString(R.string.preOnboardingComparisonChartItem1).preventWidows()
-            comparisonChartDuckAi.text = getString(R.string.preOnboardingComparisonChartDuckAi).preventWidows()
-            comparisonChartItem2.text = getString(R.string.preOnboardingComparisonChartItem2).preventWidows()
-            comparisonChartItem3.text = getString(R.string.preOnboardingComparisonChartItem3).preventWidows()
-            comparisonChartItem4.text = getString(R.string.preOnboardingComparisonChartItem4).preventWidows()
-        }
-
         ViewGroupCompat.installCompatInsetsDispatch(binding.root)
         if (deviceInfo.isTablet()) {
             ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, windowInsets ->
@@ -526,6 +534,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                                 showSplitOption = state.showSplitOption,
                                 inputScreenSelected = state.inputScreenSelected,
                                 maxPageCount = state.maxPageCount,
+                                comparisonChartConfig = state.currentComparisonChartConfig(),
                             )
                         }
                     }
@@ -537,6 +546,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                             showSplitOption = state.showSplitOption,
                             inputScreenSelected = state.inputScreenSelected,
                             maxPageCount = state.maxPageCount,
+                            comparisonChartConfig = state.currentComparisonChartConfig(),
                         )
                     }
                 }
@@ -566,6 +576,28 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                     }
                     is BrandDesignUpdatePageViewModel.Command.ShowQuickSetupSearchOptionsBottomSheet -> {
                         showQuickSetupSearchOptionsBottomSheet(initialWithAi = command.initialWithAi)
+                    }
+                    is BrandDesignUpdatePageViewModel.Command.ShowQuickSetupDefaultBrowserDialog -> {
+                        showQuickSetupDefaultBrowserDialog(command.intent)
+                    }
+                    BrandDesignUpdatePageViewModel.Command.OpenDefaultBrowserSystemSettings -> {
+                        openDefaultBrowserSystemSettings()
+                    }
+                    BrandDesignUpdatePageViewModel.Command.LaunchAddWidgetPrompt -> {
+                        addWidgetLauncher.launchAddWidget(activity)
+                    }
+                    BrandDesignUpdatePageViewModel.Command.ShowRemoveWidgetBottomSheet -> {
+                        showRemoveWidgetInstructionsBottomSheet()
+                    }
+                    is BrandDesignUpdatePageViewModel.Command.SyncAddWidgetSwitch -> {
+                        binding.daxDialogCta.reinstallerQuickSetupContent.addWidgetItem
+                            .setCheckedSilently(command.isChecked)
+                    }
+                    is BrandDesignUpdatePageViewModel.Command.SyncQuickSetupSwitches -> {
+                        with(binding.daxDialogCta.reinstallerQuickSetupContent) {
+                            setDefaultBrowserItem.setCheckedSilently(command.defaultBrowserChecked)
+                            addWidgetItem.setCheckedSilently(command.widgetChecked)
+                        }
                     }
                     is BrandDesignUpdatePageViewModel.Command.PlayIntroAnimation -> {
                         introInProgress.value = true
@@ -660,19 +692,33 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        viewModel.checkQuickSetupSwitchesState()
+    }
+
     override fun onActivityResult(
         requestCode: Int,
         resultCode: Int,
         data: Intent?,
     ) {
-        if (requestCode == DEFAULT_BROWSER_ROLE_MANAGER_DIALOG) {
-            if (resultCode == Activity.RESULT_OK) {
-                viewModel.onDefaultBrowserSet()
-            } else {
-                viewModel.onDefaultBrowserNotSet()
+        when (requestCode) {
+            DEFAULT_BROWSER_ROLE_MANAGER_DIALOG -> {
+                if (resultCode == Activity.RESULT_OK) {
+                    viewModel.onDefaultBrowserSet()
+                } else {
+                    viewModel.onDefaultBrowserNotSet()
+                }
             }
-        } else {
-            super.onActivityResult(requestCode, resultCode, data)
+            QUICK_SETUP_DEFAULT_BROWSER_ROLE_MANAGER_DIALOG -> {
+                if (resultCode == Activity.RESULT_OK) {
+                    viewModel.onQuickSetupDefaultBrowserSet()
+                } else {
+                    viewModel.onQuickSetupDefaultBrowserNotSet()
+                    binding.daxDialogCta.reinstallerQuickSetupContent.setDefaultBrowserItem.setCheckedSilently(false)
+                }
+            }
+            else -> super.onActivityResult(requestCode, resultCode, data)
         }
     }
 
@@ -692,13 +738,15 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
         showSplitOption: Boolean,
         inputScreenSelected: Boolean,
         maxPageCount: Int,
+        comparisonChartConfig: ComparisonChartConfig,
     ) {
         context?.let {
             isAnimating = true
             viewModel.onDialogAnimationStarted()
             when (onboardingDialogType) {
-                INITIAL, INITIAL_REINSTALL_USER -> {
-                    val showSecondaryCta = onboardingDialogType == INITIAL_REINSTALL_USER
+                INITIAL, INITIAL_REINSTALL_USER, SYNC_RESTORE -> {
+                    val isSyncRestore = onboardingDialogType == SYNC_RESTORE
+                    val showSecondaryCta = onboardingDialogType == INITIAL_REINSTALL_USER || isSyncRestore
                     if (showSecondaryCta) {
                         // Pin the title at its current position before the secondaryCta
                         // visibility change. The CL is wrap_content in landscape, so
@@ -713,6 +761,19 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                     }
                     binding.daxDialogCta.secondaryCta.visibility = if (showSecondaryCta) View.INVISIBLE else View.GONE
 
+                    val titleRes = if (isSyncRestore) R.string.syncRestoreDialogBrandDesignTitle else R.string.preOnboardingWelcomeDialogTitle
+                    if (isSyncRestore) {
+                        // SYNC_RESTORE reuses welcomeContent with its own copy and the sync-restore CTAs.
+                        binding.daxDialogCta.welcomeContent.hiddenTitleText.text = getString(titleRes)
+                        binding.daxDialogCta.welcomeContent.bodyText1.text =
+                            getString(R.string.syncRestoreDialogBrandDesignBody1).preventWidows().html(requireContext())
+                        binding.daxDialogCta.primaryCta.text = getString(R.string.syncRestoreDialogPrimaryCta)
+                        binding.daxDialogCta.secondaryCta.text = getString(R.string.syncRestoreDialogSecondaryCta)
+                    }
+                    // SYNC_RESTORE shows no second body line; INITIAL/INITIAL_REINSTALL_USER do.
+                    // Set isVisible explicitly so a prior dialog that hid bodyText2 doesn't leak into this one.
+                    binding.daxDialogCta.welcomeContent.bodyText2.isVisible = !isSyncRestore
+
                     val showWalkingDax = applyWalkingDaxLayout()
                     binding.daxDialogCta.cardView.setArrowDepthFraction(if (showWalkingDax) 1f else 0f)
 
@@ -724,16 +785,18 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                         onAnimationEnd = {
                             fadeInDialog {
                                 binding.daxDialogCta.welcomeContent.titleText.startOnboardingTypingAnimation(
-                                    getString(R.string.preOnboardingWelcomeDialogTitle),
+                                    getString(titleRes),
                                 ) {
                                     val animators = mutableListOf<Animator>(
                                         ObjectAnimator.ofFloat(binding.daxDialogCta.welcomeContent.bodyText1, View.ALPHA, 1f)
                                             .setDuration(DIALOG_CONTENT_FADE_IN_DURATION),
-                                        ObjectAnimator.ofFloat(binding.daxDialogCta.welcomeContent.bodyText2, View.ALPHA, 1f)
-                                            .setDuration(DIALOG_CONTENT_FADE_IN_DURATION),
                                         ObjectAnimator.ofFloat(binding.daxDialogCta.primaryCta, View.ALPHA, 1f)
                                             .setDuration(DIALOG_CONTENT_FADE_IN_DURATION),
                                     )
+                                    if (!isSyncRestore) {
+                                        animators += ObjectAnimator.ofFloat(binding.daxDialogCta.welcomeContent.bodyText2, View.ALPHA, 1f)
+                                            .setDuration(DIALOG_CONTENT_FADE_IN_DURATION)
+                                    }
                                     if (showSecondaryCta) {
                                         binding.daxDialogCta.secondaryCta.isVisible = true
                                         animators += ObjectAnimator.ofFloat(binding.daxDialogCta.secondaryCta, View.ALPHA, 1f)
@@ -770,6 +833,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                     binding.daxDialogCta.secondaryCta.isVisible = false
 
                     binding.daxDialogCta.reinstallerQuickSetupContent.root.isVisible = true
+                    updateQuickSetupRowsVisibility()
                     binding.daxDialogCta.reinstallerQuickSetupContent.quickSetupTitleHidden.text =
                         getString(R.string.preOnboardingReinstallQuickSetupTitle).html(requireContext())
 
@@ -857,11 +921,8 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                     binding.daxDialogCta.primaryCta.alpha = 0f
                 }
 
-                SYNC_RESTORE -> {
-                    // TODO - SyncRestore: add dialog UI
-                }
-
-                COMPARISON_CHART -> {
+                COMPARISON_CHART, AI_COMPARISON_CHART -> {
+                    populateComparisonChart(comparisonChartConfig)
                     backgroundAnimator?.transitionTo(
                         step = OnboardingBackgroundStep.ComparisonChart,
                     )
@@ -897,7 +958,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                             // not a synchronous stop.
                             if (view == null) return
                             binding.daxDialogCta.comparisonChartContent.comparisonChartTitle.startOnboardingTypingAnimation(
-                                getString(R.string.preOnboardingDaxDialog2Title).preventWidows(),
+                                getString(comparisonChartConfig.titleRes).preventWidows(),
                             ) {
                                 comparisonChartFadeInAnimatorSet = AnimatorSet().apply {
                                     playTogether(
@@ -954,7 +1015,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                         }
                     }
 
-                    binding.daxDialogCta.primaryCta.text = getString(R.string.preOnboardingDaxDialog2Button)
+                    binding.daxDialogCta.primaryCta.text = getString(comparisonChartConfig.primaryCtaTextRes)
                     binding.daxDialogCta.primaryCta.alpha = 0f
                 }
 
@@ -1322,18 +1383,21 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
         showSplitOption: Boolean,
         inputScreenSelected: Boolean,
         maxPageCount: Int,
+        comparisonChartConfig: ComparisonChartConfig,
     ) {
         snapToIntroEndState()
 
         when (onboardingDialogType) {
-            INITIAL, INITIAL_REINSTALL_USER -> {
+            INITIAL, INITIAL_REINSTALL_USER, SYNC_RESTORE -> {
+                val isSyncRestore = onboardingDialogType == SYNC_RESTORE
+                val showSecondaryCta = onboardingDialogType == INITIAL_REINSTALL_USER || isSyncRestore
+
                 binding.logoAnimation.alpha = 0f
                 binding.welcomeTitle.alpha = 0f
 
                 backgroundAnimator?.snapTo(OnboardingBackgroundStep.Welcome)
 
-                binding.daxDialogCta.secondaryCta.visibility =
-                    if (onboardingDialogType == INITIAL_REINSTALL_USER) View.INVISIBLE else View.GONE
+                binding.daxDialogCta.secondaryCta.visibility = if (showSecondaryCta) View.INVISIBLE else View.GONE
 
                 val showWalkingDax = applyWalkingDaxLayout()
                 if (showWalkingDax) {
@@ -1350,23 +1414,35 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                 binding.daxDialogCta.daxCtaContainer.alpha = 1f
                 binding.daxDialogCta.welcomeContent.root.alpha = 1f
                 binding.daxDialogCta.welcomeContent.titleText.cancelAnimation()
-                binding.daxDialogCta.welcomeContent.titleText.text = getString(R.string.preOnboardingWelcomeDialogTitle)
+                val titleString = if (isSyncRestore) {
+                    getString(R.string.syncRestoreDialogBrandDesignTitle)
+                } else {
+                    getString(R.string.preOnboardingWelcomeDialogTitle)
+                }
+                binding.daxDialogCta.welcomeContent.titleText.text = titleString
+                if (isSyncRestore) {
+                    binding.daxDialogCta.welcomeContent.hiddenTitleText.text = titleString
+                    binding.daxDialogCta.welcomeContent.bodyText1.text =
+                        getString(R.string.syncRestoreDialogBrandDesignBody1).preventWidows().html(requireContext())
+                    binding.daxDialogCta.primaryCta.text = getString(R.string.syncRestoreDialogPrimaryCta)
+                    binding.daxDialogCta.secondaryCta.text = getString(R.string.syncRestoreDialogSecondaryCta)
+                }
+                // SYNC_RESTORE shows no second body line; INITIAL/INITIAL_REINSTALL_USER do.
+                // Set isVisible explicitly so a prior dialog that hid bodyText2 doesn't leak into this one.
+                binding.daxDialogCta.welcomeContent.bodyText2.isVisible = !isSyncRestore
                 binding.daxDialogCta.welcomeContent.bodyText1.alpha = 1f
                 binding.daxDialogCta.welcomeContent.bodyText2.alpha = 1f
                 binding.daxDialogCta.primaryCta.alpha = 1f
                 binding.daxDialogCta.primaryCta.setOnClickListener { viewModel.onPrimaryCtaClicked() }
-                if (onboardingDialogType == INITIAL_REINSTALL_USER) {
+                if (showSecondaryCta) {
                     binding.daxDialogCta.secondaryCta.isVisible = true
                     binding.daxDialogCta.secondaryCta.alpha = 1f
                     binding.daxDialogCta.secondaryCta.setOnClickListener { viewModel.onSecondaryCtaClicked() }
                 }
             }
 
-            SYNC_RESTORE -> {
-                // TODO - SyncRestore: add dialog UI
-            }
-
-            COMPARISON_CHART -> {
+            COMPARISON_CHART, AI_COMPARISON_CHART -> {
+                populateComparisonChart(comparisonChartConfig)
                 binding.logoAnimation.alpha = 0f
                 binding.welcomeTitle.alpha = 0f
 
@@ -1407,15 +1483,9 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                 binding.daxDialogCta.cardView.setArrowDepthFraction(if (showWing) 1f else 0f)
                 binding.daxDialogCta.comparisonChartContent.comparisonChartTitle.cancelAnimation()
                 binding.daxDialogCta.comparisonChartContent.comparisonChartTitle.text =
-                    getString(R.string.preOnboardingDaxDialog2Title).preventWidows()
+                    getString(comparisonChartConfig.titleRes).preventWidows()
                 binding.daxDialogCta.comparisonChartContent.comparisonTable.alpha = 1f
-                listOf(
-                    binding.daxDialogCta.comparisonChartContent.check1,
-                    binding.daxDialogCta.comparisonChartContent.check2,
-                    binding.daxDialogCta.comparisonChartContent.check3,
-                    binding.daxDialogCta.comparisonChartContent.check4,
-                    binding.daxDialogCta.comparisonChartContent.check5,
-                ).forEach { checkView ->
+                comparisonCheckViews().forEach { checkView ->
                     checkView.alpha = 1f
                     checkView.scaleX = 1f
                     checkView.scaleY = 1f
@@ -1426,7 +1496,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                 binding.daxDialogCta.stepIndicator.alpha = 1f
                 binding.daxDialogCta.stepIndicator.setSteps(totalSteps = maxPageCount, currentStep = 1)
                 binding.daxDialogCta.primaryCta.alpha = 1f
-                binding.daxDialogCta.primaryCta.text = getString(R.string.preOnboardingDaxDialog2Button)
+                binding.daxDialogCta.primaryCta.text = getString(comparisonChartConfig.primaryCtaTextRes)
                 binding.daxDialogCta.primaryCta.setOnClickListener { viewModel.onPrimaryCtaClicked() }
 
                 binding.daxDialogCta.root.isVisible = true
@@ -1657,6 +1727,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
 
                 binding.daxDialogCta.reinstallerQuickSetupContent.root.alpha = 1f
                 binding.daxDialogCta.reinstallerQuickSetupContent.root.isVisible = true
+                updateQuickSetupRowsVisibility()
                 binding.daxDialogCta.reinstallerQuickSetupContent.quickSetupOptionsContainer.alpha = 1f
                 binding.daxDialogCta.reinstallerQuickSetupContent.quickSetupTitleHidden.text =
                     getString(R.string.preOnboardingReinstallQuickSetupTitle).html(requireContext())
@@ -1803,11 +1874,31 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
         }
     }
 
+    private fun updateQuickSetupRowsVisibility() {
+        val state = viewModel.viewState.value
+        with(binding.daxDialogCta.reinstallerQuickSetupContent) {
+            setDefaultBrowserItem.isVisible = !state.hideSetDefaultBrowserRow
+            setDefaultBrowserDivider.isVisible = !state.hideSetDefaultBrowserRow
+            addWidgetItem.isVisible = !state.hideAddWidgetRow
+            addWidgetDivider.isVisible = !state.hideAddWidgetRow
+        }
+    }
+
     private fun setQuickSetupListeners() {
         with(binding.daxDialogCta.reinstallerQuickSetupContent) {
             setDefaultBrowserItem.setOnCheckedChangeListener { checked ->
+                if (checked) {
+                    viewModel.onQuickSetupSetAsDefaultClicked()
+                } else {
+                    viewModel.onQuickSetupSetAsDefaultUnchecked()
+                }
             }
             addWidgetItem.setOnCheckedChangeListener { checked ->
+                if (checked) {
+                    viewModel.onQuickSetupAddHomescreenWidgetClicked()
+                } else {
+                    viewModel.onQuickSetupRemoveHomescreenWidgetClicked()
+                }
             }
             addressBarPositionItem.setOnEditClickListener {
                 viewModel.onQuickSetupAddressBarPositionEditClicked()
@@ -1872,6 +1963,11 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
             .show(childFragmentManager, QuickSetupAddressBarPositionBottomSheet.TAG)
     }
 
+    private fun showRemoveWidgetInstructionsBottomSheet() {
+        RemoveWidgetInstructionsBottomSheet()
+            .show(childFragmentManager, RemoveWidgetInstructionsBottomSheet.TAG)
+    }
+
     private fun showQuickSetupSearchOptionsBottomSheet(initialWithAi: Boolean) {
         QuickSetupSearchOptionsBottomSheet
             .newInstance(initialWithAi = initialWithAi)
@@ -1894,6 +1990,12 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
         ) { _, bundle ->
             val withAi = bundle.getBoolean(QuickSetupSearchOptionsBottomSheet.RESULT_KEY_WITH_AI)
             viewModel.onInputScreenOptionSelected(withAi = withAi)
+        }
+        childFragmentManager.setFragmentResultListener(
+            RemoveWidgetInstructionsBottomSheet.REQUEST_KEY,
+            viewLifecycleOwner,
+        ) { _, _ ->
+            viewModel.checkWidgetAddedState()
         }
     }
 
@@ -2067,32 +2169,23 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
         // Only do this on the comparison chart: those runnables are only ever scheduled by playCheckIconAnimation(),
         // and snapping outside that screen leaves the check views at alpha=1/scale=1 with a static drawable, which
         // makes them appear pre-rendered when the comparison chart later fades in.
-        if (viewModel.viewState.value.currentDialog == COMPARISON_CHART) {
+        if (viewModel.viewState.value.currentDialog in setOf(COMPARISON_CHART, AI_COMPARISON_CHART)) {
             snapCheckIconsToFinalState()
         }
     }
 
     private fun snapCheckIconsToFinalState() {
-        with(binding.daxDialogCta.comparisonChartContent) {
-            listOf(check1, check2, check3, check4, check5).forEach { checkView ->
-                checkView.alpha = 1f
-                checkView.scaleX = 1f
-                checkView.scaleY = 1f
-                checkView.setImageResource(CommonR.drawable.ic_check_green_24)
-            }
+        comparisonCheckViews().forEach { checkView ->
+            checkView.alpha = 1f
+            checkView.scaleX = 1f
+            checkView.scaleY = 1f
+            checkView.setImageResource(CommonR.drawable.ic_check_green_24)
         }
     }
 
     private fun playCheckIconAnimation() {
         val overshoot = OvershootInterpolator(CHECK_ICON_OVERSHOOT_TENSION)
-        val comparisonTable = binding.daxDialogCta.comparisonChartContent.comparisonTable
-        val checkViews = listOf(
-            binding.daxDialogCta.comparisonChartContent.check1,
-            binding.daxDialogCta.comparisonChartContent.check2,
-            binding.daxDialogCta.comparisonChartContent.check3,
-            binding.daxDialogCta.comparisonChartContent.check4,
-            binding.daxDialogCta.comparisonChartContent.check5,
-        ).sortedBy { comparisonTable.indexOfChild(it.parent as View) }
+        val checkViews = comparisonCheckViews()
 
         // Reset trimPathEnd up-front: the alpha fade-in completes ~50ms before the postDelayed AVD start,
         // so any stale trimPathEnd=1 from a previous run would render the tick fully drawn during the gap.
@@ -2275,6 +2368,21 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
         startActivityForResult(intent, DEFAULT_BROWSER_ROLE_MANAGER_DIALOG)
     }
 
+    private fun showQuickSetupDefaultBrowserDialog(intent: Intent) {
+        startActivityForResult(intent, QUICK_SETUP_DEFAULT_BROWSER_ROLE_MANAGER_DIALOG)
+    }
+
+    private fun openDefaultBrowserSystemSettings() {
+        try {
+            startActivity(DefaultBrowserSystemSettings.intent())
+        } catch (e: ActivityNotFoundException) {
+            val errorMessage = getString(R.string.cannotLaunchDefaultAppSettings)
+            logcat(WARN) { "$errorMessage: ${e.asLog()}" }
+            Toast.makeText(requireContext(), errorMessage, Toast.LENGTH_SHORT).show()
+            viewModel.checkQuickSetupSwitchesState()
+        }
+    }
+
     private enum class InputMode { SEARCH, CHAT }
 
     private fun updateAiChatToggleState(
@@ -2288,6 +2396,52 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
             setOnSelectionChangedListener { viewModel.onInputScreenOptionSelected(withAi = it) }
         }
     }
+
+    private fun BrandDesignUpdatePageViewModel.ViewState.currentComparisonChartConfig(): ComparisonChartConfig = when (this.currentDialog) {
+        AI_COMPARISON_CHART -> ComparisonChartConfig.Ai
+        else -> ComparisonChartConfig.Default
+    }
+
+    private fun populateComparisonChart(config: ComparisonChartConfig) {
+        with(binding.daxDialogCta.comparisonChartContent) {
+            comparisonChartHeaderLeftIcon.setImageResource(config.headerLeftIconRes)
+            comparisonChartHeaderLeftIcon.updateLayoutParams {
+                width = config.headerLeftIconSizeDp.toPx(comparisonTable.context).toInt()
+                height = config.headerLeftIconSizeDp.toPx(comparisonTable.context).toInt()
+            }
+            if (android.os.Build.VERSION.SDK_INT >= 28) {
+                comparisonChartHeaderLeftIconCard.addBottomShadow()
+                comparisonChartHeaderRightIconCard.addBottomShadow()
+            }
+            comparisonChartTitleHidden.text = getString(config.titleRes).preventWidows()
+            if (config.headerLeftLabelRes != null) {
+                comparisonChartHeaderLabel.text = getString(config.headerLeftLabelRes).preventWidows()
+                comparisonChartHeaderLabel.isVisible = true
+            } else {
+                comparisonChartHeaderLabel.isVisible = false
+            }
+            comparisonRows.removeAllViews()
+            val inflater = LayoutInflater.from(comparisonRows.context)
+            config.rows.forEachIndexed { index, row ->
+                val rowView = inflater.inflate(
+                    R.layout.include_brand_design_comparison_chart_row,
+                    comparisonRows,
+                    false,
+                ) as LinearLayout
+                rowView.findViewById<ImageView>(R.id.rowIcon).setImageResource(row.iconRes)
+                rowView.findViewById<DaxTextView>(R.id.rowText).text = getString(row.textRes).preventWidows()
+                if (index % 2 == 0) {
+                    rowView.setBackgroundResource(R.drawable.background_comparison_chart_row_highlighted)
+                }
+                comparisonRows.addView(rowView)
+            }
+        }
+    }
+
+    private fun comparisonCheckViews(): List<ImageView> =
+        binding.daxDialogCta.comparisonChartContent.comparisonRows.children
+            .map { it.findViewById<ImageView>(R.id.rowCheck) }
+            .toList()
 
     companion object {
         private const val GUIDELINE_START_PERCENT = 0.5f
@@ -2345,6 +2499,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
         private const val WALKING_DAX_MIN_HEIGHT_DP = 174
 
         private const val DEFAULT_BROWSER_ROLE_MANAGER_DIALOG = 101
+        private const val QUICK_SETUP_DEFAULT_BROWSER_ROLE_MANAGER_DIALOG = 102
 
         private val WELCOME_DAX_INTERPOLATOR = PathInterpolator(0.33f, 0f, 0.67f, 1f)
     }

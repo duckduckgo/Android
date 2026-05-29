@@ -118,7 +118,6 @@ class RealDuckChatTest {
         whenever(mockDuckChatFeatureRepository.shouldShowInVoiceChat()).thenReturn(true)
         whenever(mockDuckChatFeatureRepository.isDuckChatUserEnabled()).thenReturn(true)
         whenever(mockDuckChatFeatureRepository.isInputScreenUserSettingEnabled()).thenReturn(true)
-        whenever(mockDuckChatFeatureRepository.isNativeInputFieldUserSettingEnabled()).thenReturn(false)
         whenever(mockDuckChatFeatureRepository.isFullScreenModeUserSettingEnabled()).thenReturn(true)
         whenever(mockDuckChatFeatureRepository.sessionDeltaInMinutes()).thenReturn(10L)
         whenever(mockDuckChatFeatureRepository.lastSessionTimestamp()).thenReturn(0L)
@@ -268,13 +267,18 @@ class RealDuckChatTest {
     }
 
     @Test
-    fun whenObserveNativeInputFieldUserSettingEnabledThenEmitCorrectValues() = runTest {
-        whenever(mockDuckChatFeatureRepository.observeNativeInputFieldUserSettingEnabled()).thenReturn(flowOf(true, false))
+    fun whenObserveNativeInputFieldEnabledThenEmitFeatureFlagValue() = runTest {
+        duckChatFeature.nativeInputField().setRawStoredState(State(enable = true))
+        testee.onPrivacyConfigDownloaded()
+        advanceUntilIdle()
 
-        val results = testee.observeNativeInputFieldUserSettingEnabled().take(2).toList()
+        assertTrue(testee.observeNativeInputFieldUserSettingEnabled().first())
 
-        assertTrue(results[0])
-        assertFalse(results[1])
+        duckChatFeature.nativeInputField().setRawStoredState(State(enable = false))
+        testee.onPrivacyConfigDownloaded()
+        advanceUntilIdle()
+
+        assertFalse(testee.observeNativeInputFieldUserSettingEnabled().first())
     }
 
     @Test
@@ -650,7 +654,7 @@ class RealDuckChatTest {
 
     @Test
     fun whenNativeInputEnabledAndOpenDuckChatThenUrlContainsNativeInputParam() = runTest {
-        whenever(mockDuckChatFeatureRepository.isNativeInputFieldUserSettingEnabled()).thenReturn(true)
+        duckChatFeature.nativeInputField().setRawStoredState(State(enable = true))
         testee.onPrivacyConfigDownloaded()
         coroutineRule.testScope.advanceUntilIdle()
 
@@ -665,7 +669,7 @@ class RealDuckChatTest {
 
     @Test
     fun whenNativeInputEnabledAndOpenDuckChatWithQueryThenUrlContainsNativeInputParam() = runTest {
-        whenever(mockDuckChatFeatureRepository.isNativeInputFieldUserSettingEnabled()).thenReturn(true)
+        duckChatFeature.nativeInputField().setRawStoredState(State(enable = true))
         testee.onPrivacyConfigDownloaded()
         coroutineRule.testScope.advanceUntilIdle()
 
@@ -680,7 +684,7 @@ class RealDuckChatTest {
 
     @Test
     fun whenNativeInputEnabledAndOpenVoiceDuckChatThenUrlContainsNativeInputParam() = runTest {
-        whenever(mockDuckChatFeatureRepository.isNativeInputFieldUserSettingEnabled()).thenReturn(true)
+        duckChatFeature.nativeInputField().setRawStoredState(State(enable = true))
         testee.onPrivacyConfigDownloaded()
         coroutineRule.testScope.advanceUntilIdle()
 
@@ -999,13 +1003,6 @@ class RealDuckChatTest {
     }
 
     @Test
-    fun `when set native input field user setting then repository updated`() = runTest {
-        testee.setNativeInputFieldUserSetting(true)
-
-        verify(mockDuckChatFeatureRepository).setNativeInputFieldUserSetting(true)
-    }
-
-    @Test
     fun `when observe input screen user setting then emit correct values`() = runTest {
         whenever(mockDuckChatFeatureRepository.observeInputScreenUserSettingEnabled()).thenReturn(flowOf(true, false))
 
@@ -1045,7 +1042,7 @@ class RealDuckChatTest {
 
     @Test
     fun `input screen feature - when native input enabled then emit disabled`() = runTest {
-        whenever(mockDuckChatFeatureRepository.isNativeInputFieldUserSettingEnabled()).thenReturn(true)
+        duckChatFeature.nativeInputField().setRawStoredState(State(enable = true))
 
         testee.onPrivacyConfigDownloaded()
 
@@ -1434,7 +1431,7 @@ class RealDuckChatTest {
 
     @Test
     fun `when native input enabled and get duck chat url with query then url contains native input param`() = runTest {
-        whenever(mockDuckChatFeatureRepository.isNativeInputFieldUserSettingEnabled()).thenReturn(true)
+        duckChatFeature.nativeInputField().setRawStoredState(State(enable = true))
         testee.onPrivacyConfigDownloaded()
         coroutineRule.testScope.advanceUntilIdle()
 
@@ -1445,7 +1442,7 @@ class RealDuckChatTest {
 
     @Test
     fun `when native input enabled and get duck chat url with autoprompt then url contains native input param`() = runTest {
-        whenever(mockDuckChatFeatureRepository.isNativeInputFieldUserSettingEnabled()).thenReturn(true)
+        duckChatFeature.nativeInputField().setRawStoredState(State(enable = true))
         testee.onPrivacyConfigDownloaded()
         coroutineRule.testScope.advanceUntilIdle()
 
@@ -1456,13 +1453,35 @@ class RealDuckChatTest {
 
     @Test
     fun `when native input enabled and get duck chat url with empty query then url contains native input param`() = runTest {
-        whenever(mockDuckChatFeatureRepository.isNativeInputFieldUserSettingEnabled()).thenReturn(true)
+        duckChatFeature.nativeInputField().setRawStoredState(State(enable = true))
         testee.onPrivacyConfigDownloaded()
         coroutineRule.testScope.advanceUntilIdle()
 
         val url = testee.getDuckChatUrl(query = "", autoPrompt = false, sidebar = false)
 
         assertTrue(url == "https://duck.ai/chat?native-input=true&duckai=5")
+    }
+
+    @Test
+    fun `when native input disabled and build chat url then url contains chatID without native input param`() = runTest {
+        duckChatFeature.nativeInputField().setRawStoredState(State(enable = false))
+        testee.onPrivacyConfigDownloaded()
+        coroutineRule.testScope.advanceUntilIdle()
+
+        val url = testee.buildChatUrl(chatId = "abc-123")
+
+        assertTrue(url == "https://duck.ai/chat?chatID=abc-123&duckai=5")
+    }
+
+    @Test
+    fun `when native input enabled and build chat url then url contains both chatID and native input param`() = runTest {
+        duckChatFeature.nativeInputField().setRawStoredState(State(enable = true))
+        testee.onPrivacyConfigDownloaded()
+        coroutineRule.testScope.advanceUntilIdle()
+
+        val url = testee.buildChatUrl(chatId = "abc-123")
+
+        assertTrue(url == "https://duck.ai/chat?chatID=abc-123&native-input=true&duckai=5")
     }
 
     @Test

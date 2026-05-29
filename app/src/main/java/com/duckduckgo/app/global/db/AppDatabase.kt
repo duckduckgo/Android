@@ -73,6 +73,14 @@ import com.duckduckgo.savedsites.store.Relation
 import com.duckduckgo.savedsites.store.SavedSitesEntitiesDao
 import com.duckduckgo.savedsites.store.SavedSitesRelationsDao
 
+/**
+ * Main application database.
+ *
+ * [TabEntity] and [TabSelectionEntity] are also used by
+ * [com.duckduckgo.app.fire.db.FireModeDatabase]. Any schema change to these entities must be
+ * accompanied by a migration in BOTH databases — forgetting one will result in a runtime crash
+ * for the affected users.
+ */
 @Database(
     exportSchema = true,
     version = 61,
