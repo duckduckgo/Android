@@ -40,7 +40,11 @@ data class DaxSubscriptionBrandDesignUpdateBubbleCta(
 ) : DaxBubbleCta.BrandDesignUpdateBubbleCta(
     ctaId = CtaId.DAX_INTRO_PRIVACY_PRO,
     title = R.string.onboardingPrivacyProDaxDialogTitle,
-    description = R.string.onboardingPrivacyProDaxDialogDescription,
+    description = if (onboardingStore.isCustomAiOnboardingFlow()) {
+        R.string.onboardingPrivacyProCustomAiFlowDaxDialogDescription
+    } else {
+        R.string.onboardingPrivacyProDaxDialogDescription
+    },
     backgroundRes = R.drawable.bg_onboarding_subscription,
     shownPixel = AppPixelName.ONBOARDING_DAX_CTA_SHOWN,
     okPixel = AppPixelName.ONBOARDING_DAX_CTA_OK_BUTTON,
