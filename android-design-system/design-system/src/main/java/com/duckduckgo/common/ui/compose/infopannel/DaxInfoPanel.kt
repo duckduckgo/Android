@@ -79,7 +79,7 @@ fun DaxInfoPanel(
 @Composable
 private fun DaxInfoPanelPreview() {
     PreviewBox {
-        DaxAlertPanel(
+        DaxInfoPanel(
             body = "This is an info panel. It can be used to show important information to the user.",
         )
     }

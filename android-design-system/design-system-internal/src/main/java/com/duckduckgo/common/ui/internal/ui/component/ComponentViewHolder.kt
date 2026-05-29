@@ -40,6 +40,9 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.LinkAnnotation
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.withLink
 import androidx.compose.ui.unit.dp
 import androidx.recyclerview.widget.RecyclerView
 import coil3.compose.rememberAsyncImagePainter
@@ -228,6 +231,18 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
             view.setupThemedComposeView(R.id.info_panel_alert_compose, isDarkTheme = isDarkTheme) {
                 DaxAlertPanel(
                     body = "This is an Alert Compose Info Panel, warning information can be shown here",
+                )
+            }
+
+            view.setupThemedComposeView(R.id.info_panel_link_compose, isDarkTheme = isDarkTheme) {
+                DaxInfoPanel(
+                    body = buildAnnotatedString {
+                        append("This info panel has a link. Visit ")
+                        withLink(LinkAnnotation.Url("https://duckduckgo.com")) {
+                            append("duckduckgo.com")
+                        }
+                        append(" to learn more.")
+                    },
                 )
             }
         }

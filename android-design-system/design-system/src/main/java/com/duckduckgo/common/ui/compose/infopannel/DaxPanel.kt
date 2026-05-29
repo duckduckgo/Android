@@ -18,6 +18,7 @@ package com.duckduckgo.common.ui.compose.infopannel
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -60,29 +61,30 @@ internal fun DaxPanel(
     icon: Painter,
     modifier: Modifier = Modifier,
 ) {
-    Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .background(
-                color = color,
-                shape = DuckDuckGoTheme.shapes.small,
-            )
-            .padding(dimensionResource(R.dimen.keyline_4)),
-
-    ) {
-        Image(
-            painter = icon,
-            modifier = modifier
-                .padding(top = dimensionResource(R.dimen.keyline_1))
-                .size(dimensionResource(R.dimen.infoPanelIconSize)),
-            contentDescription = null,
-        )
-        DaxText(
-            text = body.withDaxPanelLinkStyle(),
+    Box(modifier = modifier) {
+        Row(
             modifier = Modifier
-                .padding(start = dimensionResource(R.dimen.keyline_4)),
-            style = DuckDuckGoTheme.typography.body2,
-        )
+                .fillMaxWidth()
+                .background(
+                    color = color,
+                    shape = DuckDuckGoTheme.shapes.small,
+                )
+                .padding(dimensionResource(R.dimen.keyline_4)),
+        ) {
+            Image(
+                painter = icon,
+                modifier = Modifier
+                    .padding(top = dimensionResource(R.dimen.keyline_1))
+                    .size(dimensionResource(R.dimen.infoPanelIconSize)),
+                contentDescription = null,
+            )
+            DaxText(
+                text = body.withDaxPanelLinkStyle(),
+                modifier = Modifier
+                    .padding(start = dimensionResource(R.dimen.keyline_4)),
+                style = DuckDuckGoTheme.typography.body2,
+            )
+        }
     }
 }
 
