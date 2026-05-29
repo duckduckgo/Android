@@ -66,6 +66,7 @@ import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.YEARLY_PRO_PLAN_
 import com.duckduckgo.subscriptions.impl.SubscriptionsFeature
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
 import com.duckduckgo.subscriptions.impl.billing.SubscriptionReplacementMode
+import com.duckduckgo.subscriptions.impl.notification.SubscriptionExpirationReminderScheduler
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionFailureErrorType
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.repository.isActive
@@ -102,6 +103,7 @@ class SubscriptionWebViewViewModel @Inject constructor(
     private val pixelSender: SubscriptionPixelSender,
     private val subscriptionsFeature: SubscriptionsFeature,
     private val pirFeature: PirFeature,
+    private val subscriptionExpirationReminderScheduler: SubscriptionExpirationReminderScheduler,
 ) : ViewModel() {
 
     private val moshi = Moshi.Builder().add(JSONObjectAdapter()).build()
@@ -137,6 +139,10 @@ class SubscriptionWebViewViewModel @Inject constructor(
                 }
                 is CurrentPurchase.Success -> {
                     subscriptionsChecker.runChecker()
+                    pendingScheduleNotificationDaysBeforeCancel?.let { days ->
+                        subscriptionExpirationReminderScheduler.scheduleReminderNotification(days)
+                        pendingScheduleNotificationDaysBeforeCancel = null
+                    }
                     Success(
                         SubscriptionEventData(
                             PURCHASE_COMPLETED_FEATURE_NAME,

@@ -35,6 +35,7 @@ import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.YEARLY_PRO_PLAN_
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.YEARLY_PRO_PLAN_US
 import com.duckduckgo.subscriptions.impl.SubscriptionsFeature
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
+import com.duckduckgo.subscriptions.impl.notification.SubscriptionExpirationReminderScheduler
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.repository.Subscription
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command
@@ -81,6 +82,7 @@ class SubscriptionWebViewViewModelTest {
     private val pixelSender: SubscriptionPixelSender = mock()
     private val subscriptionsFeature = FakeFeatureToggleFactory.create(SubscriptionsFeature::class.java, FakeToggleStore())
     private val pirFeature: PirFeature = mock()
+    private val subscriptionExpirationReminderScheduler: SubscriptionExpirationReminderScheduler = mock()
 
     private lateinit var viewModel: SubscriptionWebViewViewModel
 
@@ -96,6 +98,7 @@ class SubscriptionWebViewViewModelTest {
             pixelSender,
             subscriptionsFeature,
             pirFeature,
+            subscriptionExpirationReminderScheduler,
         )
         givenSubscriptionStatus(UNKNOWN)
     }
