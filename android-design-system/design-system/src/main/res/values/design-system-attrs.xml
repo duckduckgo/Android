@@ -30,11 +30,7 @@
     <attr name="cookiesAnimationHeight" format="dimension"/>
 
     <attr name="daxIconTabSwitcher" format="reference"/>
-
     <attr name="daxDrawableTabPlaceholderPreview" format="reference"/>
-
-    <!-- Theme overlay applied to the omnibar card subtree. In Fire mode it renders the omnibar with the
-         dark palette + mandarin accent; a no-op in every other theme. -->
     <attr name="daxOmnibarThemeOverlay" format="reference"/>
 
 </resources>
