@@ -532,7 +532,7 @@
     </style>
 
     <style name="Widget.DuckDuckGo.OmnibarCardView" parent="Widget.MaterialComponents.CardView">
-        <item name="cardBackgroundColor">?attr/daxColorOmnibarCard</item>
+        <item name="cardBackgroundColor">?attr/daxColorWindow</item>
         <item name="cardCornerRadius">@dimen/largeShapeCornerRadius</item>
     </style>
 

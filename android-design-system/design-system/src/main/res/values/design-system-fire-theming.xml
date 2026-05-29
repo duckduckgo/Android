@@ -19,10 +19,9 @@
     <style name="Theme.DuckDuckGo.Light.Fire" parent="Theme.DuckDuckGo.Light">
         <item name="daxColorTabHighlight">@color/mandarin50</item>
 
-        <item name="daxColorOmnibarCard">@color/omnibar_card_fire_light</item>
-        <item name="daxColorOmnibarText">@color/white</item>
-        <item name="daxColorOmnibarTextHint">@color/white60</item>
-        <item name="daxColorOmnibarIcon">@color/white</item>
+        <item name="daxOmnibarThemeOverlay">@style/ThemeOverlay.DuckDuckGo.Omnibar.FireLight</item>
+
+        <!-- Cross-cutting fire accent: omnibar cursor, page progress bar, tab-switcher icons. -->
         <item name="daxColorOmnibarAccent">@color/mandarin50</item>
         <item name="daxOmnibarTextColorHighlight">@color/mandarin50_translucent</item>
 
@@ -42,10 +41,8 @@
     <style name="Theme.DuckDuckGo.Dark.Fire" parent="Theme.DuckDuckGo.Dark">
         <item name="daxColorTabHighlight">@color/mandarin40</item>
 
-        <item name="daxColorOmnibarCard">@color/omnibar_card_fire_dark</item>
-        <item name="daxColorOmnibarText">@color/white</item>
-        <item name="daxColorOmnibarTextHint">@color/white60</item>
-        <item name="daxColorOmnibarIcon">@color/white</item>
+        <item name="daxOmnibarThemeOverlay">@style/ThemeOverlay.DuckDuckGo.Omnibar.FireDark</item>
+
         <item name="daxColorOmnibarAccent">@color/mandarin40</item>
         <item name="daxOmnibarTextColorHighlight">@color/mandarin40_translucent</item>
 
@@ -59,6 +56,22 @@
 
         <item name="daxIconTabSwitcher">@drawable/ic_tab_fire_mode_24</item>
         <item name="daxDrawableTabPlaceholderPreview">@drawable/ic_fire_tab_placeholder_96</item>
+    </style>
+
+    <style name="ThemeOverlay.DuckDuckGo.Omnibar.None" parent="" />
+
+    <style name="ThemeOverlay.DuckDuckGo.Omnibar.FireLight" parent="Theme.DuckDuckGo.Dark">
+        <item name="daxColorWindow">@color/omnibar_card_fire_light</item>
+        <item name="daxColorOmnibarAccent">@color/mandarin50</item>
+        <item name="daxOmnibarTextColorHighlight">@color/mandarin50_translucent</item>
+        <item name="colorControlActivated">@color/mandarin50</item>
+    </style>
+
+    <style name="ThemeOverlay.DuckDuckGo.Omnibar.FireDark" parent="Theme.DuckDuckGo.Dark">
+        <item name="daxColorWindow">@color/omnibar_card_fire_dark</item>
+        <item name="daxColorOmnibarAccent">@color/mandarin40</item>
+        <item name="daxOmnibarTextColorHighlight">@color/mandarin40_translucent</item>
+        <item name="colorControlActivated">@color/mandarin40</item>
     </style>
 
     <color name="omnibar_card_fire_light">#3D3D3D</color>
