@@ -2,16 +2,21 @@ appId: com.duckduckgo.mobile.android
 ---
 - runScript: onboarding_scripts/setup.js
 
+# Tap the Skip Onboarding debug button by id — the text-based selector is
+# unreliable on the new onboarding because the status bar can clip the button.
 - extendedWaitUntil:
-    visible: "Skip Onboarding"
+    visible:
+      id: "skipOnboardingButton"
     timeout: 10000
     optional: true
 
 - runFlow:
     when:
-      visible: "Skip Onboarding"
+      visible:
+        id: "skipOnboardingButton"
     commands:
-      - tapOn: "Skip Onboarding"
+      - tapOn:
+          id: "skipOnboardingButton"
       - runScript: onboarding_scripts/skipped_onboarding.js
 
 - runFlow:

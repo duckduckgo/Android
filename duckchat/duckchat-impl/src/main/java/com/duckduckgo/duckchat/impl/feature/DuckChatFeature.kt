@@ -131,7 +131,7 @@ interface DuckChatFeature {
     fun showHideAiGeneratedImages(): Toggle
 
     /**
-     * @return `true` when the "Native Input Field" option should be visible in AI Features Settings.
+     * @return `true` when the Native Input Field should be used instead of the web-based input.
      */
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun nativeInputField(): Toggle
