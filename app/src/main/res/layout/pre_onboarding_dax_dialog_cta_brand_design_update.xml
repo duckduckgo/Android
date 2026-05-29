@@ -22,7 +22,7 @@
     android:alpha="0"
     android:clipChildren="false"
     android:clipToPadding="false"
-    android:paddingTop="24dp"
+    android:paddingTop="@dimen/preOnboardingDaxCtaPaddingTop"
     android:visibility="invisible"
     tools:alpha="1"
     tools:visibility="visible">
@@ -111,6 +111,7 @@
                     android:layout_marginTop="20dp"
                     android:layout_marginEnd="20dp"
                     android:alpha="0"
+                    android:includeFontPadding="false"
                     android:paddingHorizontal="24dp"
                     android:text="@string/preOnboardingDaxDialog1Button"
                     android:textAppearance="@style/Typography.DuckDuckGo.Onboarding.Button"

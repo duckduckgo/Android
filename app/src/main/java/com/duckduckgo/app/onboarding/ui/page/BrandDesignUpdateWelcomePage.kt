@@ -776,6 +776,11 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                     } else if (isCustomAiCopy) {
                         binding.daxDialogCta.welcomeContent.bodyText1.text =
                             getString(R.string.preOnboardingWelcomeDialogBodyCustomAi).preventWidows().html(requireContext())
+                    } else {
+                        binding.daxDialogCta.welcomeContent.bodyText1.text =
+                            getString(R.string.preOnboardingWelcomeDialogBody1).preventWidows()
+                        binding.daxDialogCta.welcomeContent.bodyText2.text =
+                            getString(R.string.preOnboardingWelcomeDialogBody2).preventWidows()
                     }
                     // SYNC_RESTORE shows no second body line; custom-AI copy is a single sentence and also hides it; INITIAL/INITIAL_REINSTALL_USER otherwise show both.
                     // Set isVisible explicitly so a prior dialog that hid bodyText2 doesn't leak into this one.
@@ -1447,6 +1452,11 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                 } else if (isCustomAiCopy) {
                     binding.daxDialogCta.welcomeContent.bodyText1.text =
                         getString(R.string.preOnboardingWelcomeDialogBodyCustomAi).preventWidows().html(requireContext())
+                } else {
+                    binding.daxDialogCta.welcomeContent.bodyText1.text =
+                        getString(R.string.preOnboardingWelcomeDialogBody1).preventWidows()
+                    binding.daxDialogCta.welcomeContent.bodyText2.text =
+                        getString(R.string.preOnboardingWelcomeDialogBody2).preventWidows()
                 }
                 // SYNC_RESTORE shows no second body line; custom-AI copy is a single sentence and also hides it; INITIAL/INITIAL_REINSTALL_USER otherwise show both.
                 // Set isVisible explicitly so a prior dialog that hid bodyText2 doesn't leak into this one.
@@ -1936,10 +1946,10 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                     viewModel.onQuickSetupRemoveHomescreenWidgetClicked()
                 }
             }
-            addressBarPositionItem.setOnEditClickListener {
+            addressBarPositionItem.setOnClickListener {
                 viewModel.onQuickSetupAddressBarPositionEditClicked()
             }
-            addressBarSearchOptionsItem.setOnEditClickListener {
+            addressBarSearchOptionsItem.setOnClickListener {
                 viewModel.onQuickSetupSearchOptionsEditClicked()
             }
         }

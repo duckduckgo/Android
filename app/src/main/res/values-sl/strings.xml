@@ -1043,8 +1043,8 @@
     <string name="linkTextCopyFailed">Besedila povezave ni bilo mogoče kopirati</string>
 
     <string name="preOnboardingWelcomeDialogTitle">Pozdravljeni.</string>
-    <string name="preOnboardingWelcomeDialogBody1">Ste pripravljeni na hitrejši brskalnik,\nki daje nadzor vam?</string>
-    <string name="preOnboardingWelcomeDialogBody2">Umetna inteligenca je vedno neobvezna,\nzaščita zasebnosti pa je vedno vklopljena.</string>
+    <string name="preOnboardingWelcomeDialogBody1">Ste pripravljeni na hitrejši brskalnik, ki daje nadzor vam?</string>
+    <string name="preOnboardingWelcomeDialogBody2">Umetna inteligenca je vedno neobvezna, zaščita zasebnosti pa je vedno vklopljena.</string>
     <string name="onboardingStepIndicatorText" instruction="a counter above our instructions in onboarding that tells a user what step they are on">%1$d od %2$d</string>
     <string name="onboardingSearchDaxDialogOption1Quoted" instruction="translate &apos;duck&apos; too.">Kako reči »raca« v angleščini</string>
     <string name="onboardingSearchDaxDialogOption1EnglishQuoted" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">Kako reči »raca« v španščini</string>
