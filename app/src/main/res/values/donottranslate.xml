@@ -132,7 +132,8 @@
     <string name="browserModeToggleRegularDescription">Switch to regular tabs</string>
     <string name="browserModeToggleTabCountInfinite">∞</string>
 
-    <!-- Pre-onboarding: AI comparison chart screen. Move to strings.xml when localized. -->
+    <!-- Custom AI onboarding flow -->
+    <!-- Pre-onboarding: AI comparison chart screen. -->
     <string name="preOnboardingDaxDialogAiTitle">AI protections activated!</string>
     <string name="preOnboardingAiComparisonChartPopularAis">Popular AIs</string>
     <string name="preOnboardingAiComparisonChartItem1">All chats are anonymized</string>
@@ -140,4 +141,12 @@
     <string name="preOnboardingAiComparisonChartItem3">Never uses your chats to train AI</string>
     <string name="preOnboardingAiComparisonChartItem4">Access ChatGPT, Claude, and more, all in one place.</string>
     <string name="preOnboardingAiComparisonChartButton">Give Duck.ai a try!</string>
+    <!-- In-context onboarding. -->
+    <string name="onboardingEndCustomAiFlowDaxDialogDescription"><![CDATA[Start a private AI chat with Duck.ai or toggle to Search for protected browsing.<br/><br/>You can use Duck.ai from anywhere you see the chat icon]]></string>
+    <string name="onboardingPrivacyProCustomAiFlowDaxDialogDescription">We also offer a paid subscription featuring advanced AI models with higher chat limits from GPT, Claude, and Llama, a secure VPN, and more.</string>
+    <!-- Pre-onboarding: initial screens -->
+    <string name="preOnboardingWelcomeDialogBodyCustomAi">Ready to chat privately with ChatGPT, Claude, and other AIs for free, in a browser that actively protects you?</string>
+    <string name="preOnboardingDaxDialog2TitleCustomAi">Want to make DuckDuckGo your default browser?</string>
+    <string name="preOnboardingDaxDialog3TextCustomAi">Remember: you can use Duck.ai from anywhere you see the chat icon</string>
+    <string name="preOnboardingDaxDialog3ButtonCustomAi">Start AI Chat</string>
 </resources>

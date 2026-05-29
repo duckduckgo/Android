@@ -14,7 +14,7 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.duckduckgo.duckchat.impl.ui.nativeinput.views.NonCollapsingFrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/inputModeBottomRoot"
     android:layout_width="match_parent"
@@ -45,4 +45,4 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
     </com.google.android.material.card.MaterialCardView>
-</FrameLayout>
+</com.duckduckgo.duckchat.impl.ui.nativeinput.views.NonCollapsingFrameLayout>

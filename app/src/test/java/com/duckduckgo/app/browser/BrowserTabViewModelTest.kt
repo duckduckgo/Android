@@ -994,6 +994,7 @@ class BrowserTabViewModelTest {
                 downloadMenuStateProvider = mockDownloadMenuStateProvider,
                 downloadsRepository = mockDownloadsRepository,
                 onboardingBrandDesignUpdateToggles = mockOnboardingBrandDesignUpdateToggles,
+                onboardingStore = mockOnboardingStore,
             )
 
         testee.loadData("abc", null, false, false)
@@ -3534,6 +3535,23 @@ class BrowserTabViewModelTest {
         testee.onUserClickCtaOkButton(cta)
         assertCommandIssued<LaunchSubscription> {
             assertEquals("funnel_onboarding_android", uri.getQueryParameter("origin"))
+            assertNull(uri.getQueryParameter("featurePage"))
+        }
+    }
+
+    @Test
+    fun whenUserClickedDaxSubscriptionCtaInCustomAiOnboardingFlowThenLaunchSubscriptionWithFeaturePageDuckAi() {
+        whenever(mockOnboardingStore.isCustomAiOnboardingFlow()).thenReturn(true)
+        val cta = DaxBubbleCta.DaxSubscriptionCta(
+            mockOnboardingStore,
+            mockAppInstallStore,
+            isFreeTrialCopy = false,
+        )
+        setCta(cta)
+        testee.onUserClickCtaOkButton(cta)
+        assertCommandIssued<LaunchSubscription> {
+            assertEquals("funnel_onboarding_android", uri.getQueryParameter("origin"))
+            assertEquals("duckai", uri.getQueryParameter("featurePage"))
         }
     }
 
@@ -7571,20 +7589,123 @@ class BrowserTabViewModelTest {
         }
 
     @Test
-    fun whenUserSelectedAutocompleteDuckAiPromptThenCommandSent() =
+    fun whenUserSelectedAutocompleteDuckAiPromptInFullScreenModeOnBrowserTabThenOpensInNewTab() =
         runTest {
+            mockDuckAiFeatureStateFullScreenModeFlow.emit(true)
+            setBrowserShowing(true)
             whenever(mockDuckChat.wasOpenedBefore()).thenReturn(true)
             whenever(mockSavedSitesRepository.hasBookmarks()).thenReturn(false)
             whenever(mockSavedSitesRepository.hasFavorites()).thenReturn(false)
             whenever(mockNavigationHistory.hasHistory()).thenReturn(false)
 
             val duckPrompt = AutoComplete.AutoCompleteSuggestion.AutoCompleteDuckAIPrompt("title")
-
             testee.userSelectedAutocomplete(duckPrompt)
-            assertCommandIssued<Command.SubmitChat> {
-                assertEquals(query, "title")
+
+            assertCommandIssued<Command.OpenInNewTab> {
+                assertEquals(duckChatURL, query)
             }
+            verify(mockDuckChat, never()).openDuckChatWithAutoPrompt(any())
         }
+
+    @Test
+    fun whenUserSelectedAutocompleteDuckAiPromptInLegacyModeThenOpensViaDuckChat() =
+        runTest {
+            mockDuckAiFeatureStateFullScreenModeFlow.emit(false)
+            whenever(mockDuckChat.wasOpenedBefore()).thenReturn(true)
+            whenever(mockSavedSitesRepository.hasBookmarks()).thenReturn(false)
+            whenever(mockSavedSitesRepository.hasFavorites()).thenReturn(false)
+            whenever(mockNavigationHistory.hasHistory()).thenReturn(false)
+
+            val duckPrompt = AutoComplete.AutoCompleteSuggestion.AutoCompleteDuckAIPrompt("title")
+            testee.userSelectedAutocomplete(duckPrompt)
+
+            verify(mockDuckChat).openDuckChatWithAutoPrompt("title")
+            assertCommandNotIssued<Command.OpenInNewTab>()
+        }
+
+    @Test
+    fun whenOpenDuckAiQueryInFullScreenModeOnBrowserTabThenOpensInNewTab() = runTest {
+        mockDuckAiFeatureStateFullScreenModeFlow.emit(true)
+        setBrowserShowing(true)
+
+        testee.openDuckAiQuery(query = "hello", autoPrompt = true)
+
+        assertCommandIssued<Command.OpenInNewTab> {
+            assertEquals(duckChatURL, query)
+        }
+        verify(mockDuckChat).getDuckChatUrl(eq("hello"), eq(true), any())
+        verify(mockDuckChat, never()).openDuckChatWithAutoPrompt(any())
+    }
+
+    @Test
+    fun whenOpenDuckAiQueryInFullScreenModeOnNtpThenStaysInTab() = runTest {
+        mockDuckAiFeatureStateFullScreenModeFlow.emit(true)
+        setBrowserShowing(false)
+        whenever(mockOmnibarConverter.convertQueryToUrl(duckChatURL, null)).thenReturn(duckChatURL)
+
+        testee.openDuckAiQuery(query = "hello", autoPrompt = true)
+
+        assertCommandNotIssued<Command.OpenInNewTab>()
+        verify(mockDuckChat).getDuckChatUrl(eq("hello"), eq(true), any())
+    }
+
+    @Test
+    fun whenOpenDuckAiQueryInLegacyModeWithAutoPromptThenCallsOpenDuckChatWithAutoPrompt() = runTest {
+        mockDuckAiFeatureStateFullScreenModeFlow.emit(false)
+
+        testee.openDuckAiQuery(query = "hello", autoPrompt = true)
+
+        verify(mockDuckChat).openDuckChatWithAutoPrompt("hello")
+        verify(mockDuckChat, never()).openDuckChatWithPrefill(any())
+        assertCommandNotIssued<Command.OpenInNewTab>()
+    }
+
+    @Test
+    fun whenOpenDuckAiQueryInLegacyModeWithoutAutoPromptThenCallsOpenDuckChatWithPrefill() = runTest {
+        mockDuckAiFeatureStateFullScreenModeFlow.emit(false)
+
+        testee.openDuckAiQuery(query = "hello", autoPrompt = false)
+
+        verify(mockDuckChat).openDuckChatWithPrefill("hello")
+        verify(mockDuckChat, never()).openDuckChatWithAutoPrompt(any())
+        assertCommandNotIssued<Command.OpenInNewTab>()
+    }
+
+    @Test
+    fun whenOpenDuckAiChatByIdInFullScreenModeOnBrowserTabThenOpensInNewTab() = runTest {
+        mockDuckAiFeatureStateFullScreenModeFlow.emit(true)
+        setBrowserShowing(true)
+        val chatUrl = "https://duck.ai/chat?chatId=abc"
+
+        testee.openDuckAiChatById(chatUrl)
+
+        assertCommandIssued<Command.OpenInNewTab> {
+            assertEquals(chatUrl, query)
+        }
+    }
+
+    @Test
+    fun whenOpenDuckAiChatByIdInFullScreenModeOnNtpThenStaysInTab() = runTest {
+        mockDuckAiFeatureStateFullScreenModeFlow.emit(true)
+        setBrowserShowing(false)
+        val chatUrl = "https://duck.ai/chat?chatId=abc"
+        whenever(mockOmnibarConverter.convertQueryToUrl(chatUrl, null)).thenReturn(chatUrl)
+
+        testee.openDuckAiChatById(chatUrl)
+
+        assertCommandNotIssued<Command.OpenInNewTab>()
+    }
+
+    @Test
+    fun whenOpenDuckAiChatByIdInLegacyModeThenFallsThroughToOnUserSubmittedQuery() = runTest {
+        mockDuckAiFeatureStateFullScreenModeFlow.emit(false)
+        val chatUrl = "https://duck.ai/chat?chatId=abc"
+        whenever(mockOmnibarConverter.convertQueryToUrl(chatUrl, null)).thenReturn(chatUrl)
+
+        testee.openDuckAiChatById(chatUrl)
+
+        assertCommandNotIssued<Command.OpenInNewTab>()
+    }
 
     @Test
     fun whenNavigationStateChangedCalledThenHandleResolvedUrlIsChecked() =

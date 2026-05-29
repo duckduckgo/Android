@@ -35,7 +35,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/inputModeUnifiedBack"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_goneMarginStart="@dimen/inputScreenOmnibarCardMarginHorizontal">
+        app:layout_goneMarginStart="@dimen/nativeInputModeWidgetMarginHorizontal">
 
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/inputModeWidgetCard"

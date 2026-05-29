@@ -275,6 +275,7 @@ import com.duckduckgo.app.global.model.domain
 import com.duckduckgo.app.global.model.domainMatchesUrl
 import com.duckduckgo.app.global.model.orderedTrackerBlockedEntities
 import com.duckduckgo.app.location.data.LocationPermissionType
+import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboardingbranddesignupdate.OnboardingBrandDesignUpdateToggles
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_RESULT_DELETED
@@ -557,6 +558,7 @@ class BrowserTabViewModel @Inject constructor(
     private val downloadMenuStateProvider: DownloadMenuStateProvider,
     private val downloadsRepository: DownloadsRepository,
     private val onboardingBrandDesignUpdateToggles: OnboardingBrandDesignUpdateToggles,
+    private val onboardingStore: OnboardingStore,
 ) : ViewModel(),
     WebViewClientListener,
     EditSavedSiteListener,
@@ -5071,8 +5073,15 @@ class BrowserTabViewModel @Inject constructor(
             is DaxSubscriptionBrandDesignUpdateBubbleCta,
             -> {
                 viewModelScope.launch {
-                    val origin = "funnel_onboarding_android"
-                    command.value = LaunchSubscription("https://duckduckgo.com/pro?origin=$origin".toUri())
+                    val uri = "https://duckduckgo.com/pro".toUri().buildUpon()
+                        .appendQueryParameter("origin", "funnel_onboarding_android")
+                        .apply {
+                            if (onboardingStore.isCustomAiOnboardingFlow()) {
+                                appendQueryParameter("featurePage", "duckai")
+                            }
+                        }
+                        .build()
+                    command.value = LaunchSubscription(uri)
                 }
             }
             is DaxBubbleCta.DaxEndCta,
@@ -5257,11 +5266,53 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     private fun onUserTappedDuckAiPromptAutocomplete(prompt: String) {
-        command.value = Command.SubmitChat(prompt)
+        openDuckAiQuery(prompt, autoPrompt = true)
 
         viewModelScope.launch {
             val params = duckChat.createWasUsedBeforePixelParams()
             pixel.fire(DuckChatPixelName.DUCK_CHAT_OPEN_AUTOCOMPLETE_LEGACY, parameters = params)
+        }
+    }
+
+    /**
+     * Entry point for "open Duck.ai with a query" from the unified input — the Search/Duck.ai
+     * toggle when Duck.ai is selected, and the "Ask Duck.ai" autocomplete row when Search is
+     * selected. Under fullscreen mode the query opens in a new tab so the current tab is
+     * preserved; on the NTP we reuse the empty tab instead of spawning another. Outside
+     * fullscreen mode we fall back to the legacy Intent-based path.
+     */
+    fun openDuckAiQuery(query: String, autoPrompt: Boolean) {
+        if (!duckAiFeatureState.showFullScreenMode.value) {
+            if (autoPrompt) {
+                duckChat.openDuckChatWithAutoPrompt(query)
+            } else {
+                duckChat.openDuckChatWithPrefill(query)
+            }
+            return
+        }
+        navigateToDuckAi(duckChat.getDuckChatUrl(query, autoPrompt))
+    }
+
+    /**
+     * Entry point for "open an existing Duck.ai chat" from the unified input — taps on a
+     * chat-history suggestion which already carries a Duck.ai URL with the chatId. Same
+     * new-tab-or-stay-on-NTP rule as [openDuckAiQuery]; outside fullscreen mode the URL is
+     * routed through the normal submit path which lands in the legacy Intent flow.
+     */
+    fun openDuckAiChatById(chatUrl: String) {
+        if (!duckAiFeatureState.showFullScreenMode.value) {
+            onUserSubmittedQuery(chatUrl)
+            return
+        }
+        navigateToDuckAi(chatUrl)
+    }
+
+    private fun navigateToDuckAi(url: String) {
+        if (!currentBrowserViewState().browserShowing) {
+            // On NTP: reuse this tab — don't spawn another empty one.
+            onUserSubmittedQuery(url)
+        } else {
+            command.value = OpenInNewTab(query = url, sourceTabId = tabId)
         }
     }
 

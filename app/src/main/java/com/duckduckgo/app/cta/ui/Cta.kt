@@ -1620,6 +1620,8 @@ sealed class DaxBubbleCta(
 
         abstract fun configureContentViews(view: View)
 
+        protected open fun decorateDescription(context: Context, text: CharSequence): CharSequence = text
+
         private var cardContainer: TouchInterceptingLinearLayout? = null
 
         private var isAnimating: Boolean = false
@@ -1701,6 +1703,7 @@ sealed class DaxBubbleCta(
 
             val daxTitle = container.context.getString(title)
             val daxDescription = container.context.getString(description).preventWidows()
+            val descriptionText = decorateDescription(container.context, daxDescription.html(container.context))
 
             val titleView = container.findViewById<DaxTypeAnimationTextView>(R.id.brandDesignTitle)
             val hiddenTitle = container.findViewById<DaxTextView>(R.id.brandDesignHiddenTitle)
@@ -1732,7 +1735,7 @@ sealed class DaxBubbleCta(
             // Helper: type title then fade in content
             val typeAndFadeIn = {
                 hiddenTitle.text = daxTitle.html(container.context)
-                descriptionView.text = daxDescription.html(container.context)
+                descriptionView.text = descriptionText
 
                 val startTyping = {
                     titleView.alpha = 1f
@@ -1793,7 +1796,7 @@ sealed class DaxBubbleCta(
 
             val applySettledState = {
                 hiddenTitle.text = daxTitle.html(container.context)
-                descriptionView.text = daxDescription.html(container.context)
+                descriptionView.text = descriptionText
                 if (!titleView.hasAnimationStarted()) {
                     titleView.text = daxTitle.html(container.context)
                 }
@@ -1856,7 +1859,7 @@ sealed class DaxBubbleCta(
                 clearDialog()
                 resetAllIncludesExcept(container, activeInclude)
                 hiddenTitle.text = daxTitle.html(container.context)
-                descriptionView.text = daxDescription.html(container.context)
+                descriptionView.text = descriptionText
                 resetHeaderState()
                 resetTextAlignment()
                 configureContentViews(container)
