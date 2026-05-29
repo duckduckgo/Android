@@ -30,7 +30,6 @@ import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emitAll
-import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.transformWhile
@@ -67,9 +66,61 @@ class RealSyncCodeDispatcher @Inject constructor(
         runner.localTrigger(LocalTrigger.UserDeniedHost)
     }
 
-    override fun presentV2(): Flow<DispatchOutcome> {
-        // Stub — implemented in Task 2.
-        return emptyFlow()
+    /**
+     * Drive a v2 Presenter session. Mirrors [driveV2Linking] but for the Presenter side:
+     * starts the runner via [ExchangeV2Runner.startPresent], scopes to events emitted after
+     * session start (defensive against the runner's SharedFlow replay cache), and maps each
+     * event to a [DispatchOutcome] via [mapV2PresentEventToOutcome].
+     *
+     * Today's callers are assumed signed in (see [SyncCodeDispatcher.presentV2] KDoc), so the
+     * runner's role election always elects this device as Host. The Joiner.* mappings below
+     * are defensive — they fire only in the role-election edge case unblocked by Asana
+     * subtask `1215168582640073` ("Host pairs from no-account — create account inline").
+     */
+    override fun presentV2(): Flow<DispatchOutcome> = flow {
+        val sessionStartMs = System.currentTimeMillis()
+        logcat { "$TAG: V2 Presenter starting runner.startPresent (scoped to events since $sessionStartMs)" }
+        runner.startPresent()
+        emitAll(
+            runner.eventsSince(sessionStartMs)
+                .mapNotNull { mapV2PresentEventToOutcome(it) }
+                .transformWhile { outcome ->
+                    emit(outcome)
+                    !outcome.isTerminal()
+                },
+        )
+        logcat { "$TAG: V2 Presenter flow completed" }
+    }
+
+    /**
+     * Translate one runner event into a [DispatchOutcome] for the v2 Presenter flow,
+     * or null for intermediate events the caller should ignore.
+     *
+     * The Joiner.* branches are defensive — unreachable today because this surface is only
+     * reachable when the device is signed in to a ddg sync account, so the runner's role
+     * election always elects this device as Host. Asana subtask `1215168582640073` relaxes
+     * the precondition and will make these branches first-class.
+     */
+    private fun mapV2PresentEventToOutcome(event: ExchangeV2Event): DispatchOutcome? = when (event) {
+        is ExchangeV2Event.SessionStarted -> event.linkingCode?.let { DispatchOutcome.LinkingCodeReady(it) }
+        is ExchangeV2Event.Transition -> when (event.to) {
+            ExchangeV2State.Host.Confirming ->
+                DispatchOutcome.HostConfirmationRequested(peerName = runner.peerName)
+            ExchangeV2State.Host.Done -> DispatchOutcome.LoggedIn
+            ExchangeV2State.Host.Aborted -> when (event.localTrigger) {
+                LocalTrigger.UserDeniedHost -> DispatchOutcome.Failed("user_denied")
+                LocalTrigger.HostUnavailable -> DispatchOutcome.Failed("host_unavailable")
+                else -> DispatchOutcome.Failed("host_aborted")
+            }
+            ExchangeV2State.SameAccountAbort -> DispatchOutcome.AlreadyConnected
+            // Defensive — see KDoc above.
+            ExchangeV2State.Joiner.Done -> DispatchOutcome.LoggedIn
+            ExchangeV2State.Joiner.AbortedLocal -> DispatchOutcome.Failed("joiner_aborted_local")
+            ExchangeV2State.Joiner.AbortedByHost -> DispatchOutcome.Failed("joiner_aborted_by_host")
+            else -> null
+        }
+        is ExchangeV2Event.SessionError -> DispatchOutcome.Failed(event.message)
+        else -> null
     }
 
     override fun route(pastedCode: String): RouteDecision {

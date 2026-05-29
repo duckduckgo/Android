@@ -19,13 +19,21 @@ package com.duckduckgo.sync.impl
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2CodeParseResult
+import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Event
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2QrCode
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Runner
+import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2State
+import com.duckduckgo.sync.impl.exchange.v2.LocalTrigger
+import com.duckduckgo.sync.impl.exchange.v2.PairingRole
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.withTimeoutOrNull
 import org.json.JSONObject
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertSame
@@ -433,5 +441,186 @@ class RealSyncCodeDispatcherTest {
         // an empty SharedFlow in this test). We just verify startScan was hit on first collection.
         kotlinx.coroutines.withTimeoutOrNull(50) { decision.outcomes.first() }
         verify(runner).startScan(eq("v2-url"))
+    }
+
+    // ---- presentV2() — Presenter-side mapping ----
+
+    private fun transition(
+        from: ExchangeV2State,
+        to: ExchangeV2State,
+        localTrigger: LocalTrigger? = null,
+        timestampMs: Long = System.currentTimeMillis(),
+    ): ExchangeV2Event.Transition = ExchangeV2Event.Transition(
+        timestampMs = timestampMs,
+        from = from,
+        to = to,
+        trigger = null,
+        localTrigger = localTrigger,
+    )
+
+    private fun sessionStarted(linkingCode: String?, timestampMs: Long = System.currentTimeMillis()) =
+        ExchangeV2Event.SessionStarted(
+            timestampMs = timestampMs,
+            pairingRole = PairingRole.Presenter,
+            ownChannelId = "own-channel",
+            linkingCode = linkingCode,
+        )
+
+    @Test fun `presentV2 emits LinkingCodeReady when runner emits SessionStarted with a linkingCode`() = runTest {
+        val flow = dispatcher.presentV2()
+        // Start collection in the background; emit the session event after a tiny delay.
+        val outcomes = mutableListOf<DispatchOutcome>()
+        val job = launch(start = kotlinx.coroutines.CoroutineStart.UNDISPATCHED) {
+            flow.take(1).collect { outcomes += it }
+        }
+        runnerEventsFlow.emit(sessionStarted(linkingCode = "https://duckduckgo.com/sync/pairing?code2=abc"))
+        job.join()
+
+        assertEquals(1, outcomes.size)
+        assertEquals(
+            DispatchOutcome.LinkingCodeReady("https://duckduckgo.com/sync/pairing?code2=abc"),
+            outcomes.single(),
+        )
+    }
+
+    @Test fun `presentV2 ignores SessionStarted with null linkingCode (Scanner side leakage protection)`() = runTest {
+        // Defensive — startPresent() should always produce a non-null linkingCode, but if the
+        // runner ever emits SessionStarted with null we don't want to emit a malformed outcome.
+        val outcomes = mutableListOf<DispatchOutcome>()
+        val job = launch(start = kotlinx.coroutines.CoroutineStart.UNDISPATCHED) { dispatcher.presentV2().take(1).collect { outcomes += it } }
+        runnerEventsFlow.emit(sessionStarted(linkingCode = null))
+        // Send a follow-up terminal so collection completes.
+        runnerEventsFlow.emit(transition(from = ExchangeV2State.Negotiating, to = ExchangeV2State.Host.Done))
+        job.join()
+
+        // First outcome should be LoggedIn (from Host.Done), not a malformed LinkingCodeReady(null/empty).
+        assertEquals(DispatchOutcome.LoggedIn, outcomes.single())
+    }
+
+    @Test fun `presentV2 emits HostConfirmationRequested with peerName when runner reaches Host_Confirming`() = runTest {
+        whenever(runner.peerName).thenReturn("Peer Phone")
+        val outcomes = mutableListOf<DispatchOutcome>()
+        val job = launch(start = kotlinx.coroutines.CoroutineStart.UNDISPATCHED) { dispatcher.presentV2().take(1).collect { outcomes += it } }
+        runnerEventsFlow.emit(transition(from = ExchangeV2State.Negotiating, to = ExchangeV2State.Host.Confirming))
+        job.join()
+
+        assertEquals(DispatchOutcome.HostConfirmationRequested(peerName = "Peer Phone"), outcomes.single())
+    }
+
+    @Test fun `presentV2 emits LoggedIn when runner reaches Host_Done`() = runTest {
+        val outcome = withTimeoutOrNull(1000) {
+            val job = async(start = kotlinx.coroutines.CoroutineStart.UNDISPATCHED) {
+                dispatcher.presentV2().first { it is DispatchOutcome.LoggedIn || it is DispatchOutcome.Failed }
+            }
+            runnerEventsFlow.emit(transition(from = ExchangeV2State.Host.Sending, to = ExchangeV2State.Host.Done))
+            job.await()
+        }
+        assertEquals(DispatchOutcome.LoggedIn, outcome)
+    }
+
+    @Test fun `presentV2 emits Failed user_denied when Host_Aborted carries UserDeniedHost trigger`() = runTest {
+        val outcome = withTimeoutOrNull(1000) {
+            val job = async(start = kotlinx.coroutines.CoroutineStart.UNDISPATCHED) { dispatcher.presentV2().first() }
+            runnerEventsFlow.emit(
+                transition(
+                    from = ExchangeV2State.Host.Confirming,
+                    to = ExchangeV2State.Host.Aborted,
+                    localTrigger = LocalTrigger.UserDeniedHost,
+                ),
+            )
+            job.await()
+        }
+        assertEquals(DispatchOutcome.Failed("user_denied"), outcome)
+    }
+
+    @Test fun `presentV2 emits Failed host_unavailable when Host_Aborted carries HostUnavailable trigger`() = runTest {
+        val outcome = withTimeoutOrNull(1000) {
+            val job = async(start = kotlinx.coroutines.CoroutineStart.UNDISPATCHED) { dispatcher.presentV2().first() }
+            runnerEventsFlow.emit(
+                transition(
+                    from = ExchangeV2State.Host.Sending,
+                    to = ExchangeV2State.Host.Aborted,
+                    localTrigger = LocalTrigger.HostUnavailable,
+                ),
+            )
+            job.await()
+        }
+        assertEquals(DispatchOutcome.Failed("host_unavailable"), outcome)
+    }
+
+    @Test fun `presentV2 emits AlreadyConnected when runner reaches SameAccountAbort`() = runTest {
+        val outcome = withTimeoutOrNull(1000) {
+            val job = async(start = kotlinx.coroutines.CoroutineStart.UNDISPATCHED) { dispatcher.presentV2().first() }
+            runnerEventsFlow.emit(transition(from = ExchangeV2State.Negotiating, to = ExchangeV2State.SameAccountAbort))
+            job.await()
+        }
+        assertEquals(DispatchOutcome.AlreadyConnected, outcome)
+    }
+
+    @Test fun `presentV2 emits Failed when runner emits SessionError`() = runTest {
+        val outcome = withTimeoutOrNull(1000) {
+            val job = async(start = kotlinx.coroutines.CoroutineStart.UNDISPATCHED) { dispatcher.presentV2().first() }
+            runnerEventsFlow.emit(
+                ExchangeV2Event.SessionError(timestampMs = System.currentTimeMillis(), message = "channel 5xx"),
+            )
+            job.await()
+        }
+        assertEquals(DispatchOutcome.Failed("channel 5xx"), outcome)
+    }
+
+    @Test fun `presentV2 defensively maps Joiner_Done to LoggedIn`() = runTest {
+        val outcome = withTimeoutOrNull(1000) {
+            val job = async(start = kotlinx.coroutines.CoroutineStart.UNDISPATCHED) { dispatcher.presentV2().first { it !is DispatchOutcome.LinkingCodeReady } }
+            runnerEventsFlow.emit(transition(from = ExchangeV2State.Joiner.Waiting, to = ExchangeV2State.Joiner.Done))
+            job.await()
+        }
+        assertEquals(DispatchOutcome.LoggedIn, outcome)
+    }
+
+    @Test fun `presentV2 defensively maps Joiner_AbortedLocal to Failed`() = runTest {
+        val outcome = withTimeoutOrNull(1000) {
+            val job = async(start = kotlinx.coroutines.CoroutineStart.UNDISPATCHED) { dispatcher.presentV2().first() }
+            runnerEventsFlow.emit(
+                transition(
+                    from = ExchangeV2State.Joiner.Confirming,
+                    to = ExchangeV2State.Joiner.AbortedLocal,
+                    localTrigger = LocalTrigger.UserDeniedJoiner,
+                ),
+            )
+            job.await()
+        }
+        assertTrue("expected Failed, got $outcome", outcome is DispatchOutcome.Failed)
+    }
+
+    @Test fun `presentV2 calls runner_startPresent when Flow is collected`() = runTest {
+        val flow = dispatcher.presentV2()
+        verify(runner, never()).startPresent()
+
+        // Collect briefly (no events emitted → first() never resolves; rely on timeout).
+        withTimeoutOrNull(50) { flow.first() }
+        verify(runner).startPresent()
+    }
+
+    @Test fun `presentV2 filters out events from before session start`() = runTest {
+        // Seed a stale Host_Done from a prior session with timestamp=1L (well before now).
+        val staleFlow = MutableSharedFlow<ExchangeV2Event>(replay = 10)
+        staleFlow.tryEmit(
+            ExchangeV2Event.Transition(
+                timestampMs = 1L,
+                from = ExchangeV2State.Host.Sending,
+                to = ExchangeV2State.Host.Done,
+                trigger = null,
+                localTrigger = null,
+            ),
+        )
+        whenever(runner.events).thenReturn(staleFlow)
+        whenever(runner.eventsSince(any())).thenAnswer { inv ->
+            val since = inv.getArgument<Long>(0)
+            staleFlow.filter { it.timestampMs >= since }
+        }
+
+        // No fresh event emitted; outcome should never arrive within timeout.
+        val outcome = withTimeoutOrNull(100) { dispatcher.presentV2().first() }
+        assertEquals(null, outcome)
     }
 }
