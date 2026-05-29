@@ -102,6 +102,10 @@ class SyncWithAnotherActivityViewModel @Inject constructor(
 
     private fun startExchangeProcess() {
         viewModelScope.launch(dispatchers.io()) {
+            if (shouldUseV2()) {
+                startV2Present()
+                return@launch
+            }
             showQRCode()
             var polling = syncFeature.exchangeKeysToSyncWithAnotherDevice().isEnabled()
             val startTime = System.currentTimeMillis()
@@ -132,6 +136,36 @@ class SyncWithAnotherActivityViewModel @Inject constructor(
                     }
             }
         }
+    }
+
+    private fun shouldUseV2(): Boolean =
+        syncFeature.canUseV2ConnectFlow().isEnabled() &&
+            syncFeature.canShowV2ConnectCode().isEnabled()
+
+    /**
+     * Drive a v2 Presenter session through the dispatcher. Today this method is reachable only
+     * when the device is signed in to a ddg sync account (the activity precondition), so the
+     * runner's role election always elects this device as Host. When subtask `1215168582640073`
+     * ("Host pairs from no-account — create account inline") lands, this precondition relaxes
+     * and the Joiner.* branches mapped defensively in [SyncCodeDispatcher.presentV2] become
+     * reachable.
+     */
+    private suspend fun startV2Present() {
+        val previousPrimaryKey = syncAccountRepository.getAccountInfo().primaryKey
+        codeDispatcher.presentV2().collect { outcome ->
+            when (outcome) {
+                is DispatchOutcome.LinkingCodeReady -> renderV2QrCode(outcome.linkingCode)
+                else -> handleV2Outcome(outcome, previousPrimaryKey, qrCode = "")
+            }
+        }
+    }
+
+    private suspend fun renderV2QrCode(linkingCode: String) {
+        barcodeContents = AuthCode(qrCode = linkingCode, rawCode = linkingCode)
+        val bitmap = withContext(dispatchers.io()) {
+            qrEncoder.encodeAsBitmap(linkingCode, dimen.qrSizeSmall, dimen.qrSizeSmall)
+        }
+        viewState.emit(viewState.value.copy(qrCodeBitmap = bitmap))
     }
 
     private suspend fun showQRCode() {
