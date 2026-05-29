@@ -143,12 +143,14 @@ class SyncWithAnotherActivityViewModel @Inject constructor(
             syncFeature.canShowV2ConnectCode().isEnabled()
 
     /**
-     * Drive a v2 Presenter session through the dispatcher. Today this method is reachable only
-     * when the device is signed in to a ddg sync account (the activity precondition), so the
-     * runner's role election always elects this device as Host. When subtask `1215168582640073`
-     * ("Host pairs from no-account — create account inline") lands, this precondition relaxes
-     * and the Joiner.* branches mapped defensively in [SyncCodeDispatcher.presentV2] become
-     * reachable.
+     * Drive a v2 Presenter session through the dispatcher. As of M1.5 (Asana subtask
+     * `1215246284113165`), `presentV2()` is also called from the signed-out `SyncConnectViewModel`,
+     * so the Joiner.* branches mapped in [SyncCodeDispatcher.presentV2] are first-class and not
+     * defensive. On THIS signed-in surface, the device always has a ddg account (activity
+     * precondition), so role election still elects this device as Host. The signed-out variant
+     * is what exercises the Joiner.* branches in practice — see subtask `1215168582640073` for
+     * the runner-side account-provisioning at Host.Sending used by signed-out Presenter ↔
+     * signed-out peer pairings.
      */
     private suspend fun startV2Present() {
         val previousPrimaryKey = syncAccountRepository.getAccountInfo().primaryKey
