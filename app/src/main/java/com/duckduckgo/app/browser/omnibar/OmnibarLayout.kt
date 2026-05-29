@@ -570,7 +570,7 @@ class OmnibarLayout @JvmOverloads constructor(
             omnibarItemPressedListener?.onFireButtonPressed()
         }
         plusIconMenu.setOnClickListener {
-            omnibarItemPressedListener?.onPlusButtonPressed()
+            omnibarItemPressedListener?.onPlusButtonPressed(it)
         }
         browserMenu.setOnClickListener {
             omnibarItemPressedListener?.onBrowserMenuPressed()

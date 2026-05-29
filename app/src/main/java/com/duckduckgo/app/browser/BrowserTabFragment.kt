@@ -276,6 +276,7 @@ import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.browsermode.api.WebViewModeInitializer
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.DuckDuckGoFragment
+import com.duckduckgo.common.ui.menu.PopupMenu
 import com.duckduckgo.common.ui.store.BrowserAppTheme
 import com.duckduckgo.common.ui.tabs.SwipingTabsFeatureProvider
 import com.duckduckgo.common.ui.view.DaxDialog
@@ -788,6 +789,24 @@ class BrowserTabFragment :
 
     private val browserActivity
         get() = activity as? BrowserActivity
+
+    // Duck.ai "+" popup menu, anchored to the omnibar + button (see popup_chat_menu.xml).
+    private val chatMenuPopup by lazy {
+        PopupMenu(layoutInflater, com.duckduckgo.duckchat.impl.R.layout.popup_chat_menu).apply {
+            onMenuItemClicked(contentView.findViewById(com.duckduckgo.duckchat.impl.R.id.chatMenuPopupNewChat)) {
+                viewModel.openNewDuckChat(omnibar.viewMode)
+            }
+            onMenuItemClicked(contentView.findViewById(com.duckduckgo.duckchat.impl.R.id.chatMenuPopupNewVoiceChat)) {
+                duckChat.openVoiceDuckChat()
+            }
+            onMenuItemClicked(contentView.findViewById(com.duckduckgo.duckchat.impl.R.id.chatMenuPopupNewTab)) {
+                browserActivity?.launchNewTab()
+            }
+            onMenuItemClicked(contentView.findViewById(com.duckduckgo.duckchat.impl.R.id.chatMenuPopupNewFireTab)) {
+                browserActivity?.launchNewTab()
+            }
+        }
+    }
 
     private var webView: DuckDuckGoWebView? = null
     private var isWebViewGestureInProgress = false
@@ -3769,8 +3788,9 @@ class BrowserTabFragment :
                     this@BrowserTabFragment.onFireButtonPressed()
                 }
 
-                override fun onPlusButtonPressed() {
-                    // Placeholder: the + popup menu will be wired in a follow-up PR.
+                override fun onPlusButtonPressed(anchor: View) {
+                    val activity = activity ?: return
+                    chatMenuPopup.showAnchoredView(activity, binding.rootView, anchor)
                 }
 
                 override fun onBrowserMenuPressed() {

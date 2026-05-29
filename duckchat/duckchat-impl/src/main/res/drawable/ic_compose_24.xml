@@ -1,0 +1,25 @@
+<!--
+  ~ Copyright (c) 2026 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+  <path
+      android:pathData="M12.091,3.031C12.505,3.031 12.841,3.367 12.841,3.781C12.841,4.195 12.505,4.531 12.091,4.531H6.99C5.057,4.531 3.49,6.098 3.49,8.031V15.969C3.49,17.902 5.057,19.469 6.99,19.469H16.962C18.884,19.469 20.446,17.919 20.462,15.997L20.494,11.994C20.497,11.58 20.836,11.247 21.25,11.25C21.664,11.253 21.997,11.592 21.994,12.006L21.962,16.009C21.94,18.755 19.707,20.969 16.962,20.969H6.99C4.229,20.969 1.99,18.73 1.99,15.969V8.031C1.99,5.27 4.229,3.031 6.99,3.031H12.091ZM17.227,2.905C18.313,1.819 20.073,1.819 21.158,2.905C22.244,3.991 22.244,5.751 21.158,6.836L12.969,15.025C12.658,15.336 12.286,15.581 11.877,15.743L9.222,16.799C7.989,17.288 6.76,16.087 7.22,14.843L8.113,12.436C8.275,11.999 8.529,11.602 8.859,11.273L17.227,2.905ZM20.098,3.966C19.598,3.466 18.787,3.466 18.288,3.966L9.919,12.334C9.743,12.51 9.606,12.723 9.52,12.957L8.627,15.365C8.623,15.374 8.623,15.378 8.623,15.379C8.623,15.38 8.623,15.381 8.623,15.381C8.624,15.383 8.626,15.39 8.634,15.398C8.642,15.406 8.649,15.408 8.651,15.409C8.652,15.409 8.652,15.409 8.653,15.409C8.654,15.409 8.659,15.408 8.668,15.405L11.323,14.35C11.542,14.262 11.742,14.131 11.909,13.964L20.098,5.775C20.597,5.276 20.597,4.465 20.098,3.966Z"
+      android:fillColor="?daxColorPrimaryIcon"
+      android:fillAlpha="0.84"/>
+</vector>
