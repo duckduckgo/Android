@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.global
 
+import android.os.Build
 import android.os.StrictMode
 import android.os.StrictMode.ThreadPolicy
 import androidx.lifecycle.ProcessLifecycleOwner
@@ -176,6 +177,15 @@ open class DuckDuckGoApplication : HasDaggerInjector, MultiProcessApplication() 
                     .penaltyDropBox()
                     .build(),
             )
+            if (Build.VERSION.SDK_INT >= 31) {
+                StrictMode.setVmPolicy(
+                    StrictMode.VmPolicy.Builder()
+                        .detectUnsafeIntentLaunch()
+                        .penaltyLog()
+                        .penaltyDeath()
+                        .build(),
+                )
+            }
         }
     }
 
