@@ -24,6 +24,15 @@ import com.duckduckgo.common.ui.compose.theme.DuckDuckGoTheme
 import com.duckduckgo.common.ui.compose.tools.PreviewBox
 import com.duckduckgo.mobile.android.R
 
+/**
+ * An informational panel used to surface important, non-critical information to the user.
+ *
+ * Displays the given text alongside an info icon on a blue background. For warnings or alerts,
+ * use [DaxAlertPanel] instead.
+ *
+ * @param body The informational text to display in the panel.
+ * @param modifier The [Modifier] to be applied to this panel.
+ */
 @Composable
 fun DaxInfoPanel(
     body: String,

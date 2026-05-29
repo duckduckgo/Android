@@ -50,6 +50,7 @@ import com.airbnb.lottie.compose.rememberLottieComposition
 import com.duckduckgo.common.ui.compose.cards.DaxCard
 import com.duckduckgo.common.ui.compose.cards.DaxSurface
 import com.duckduckgo.common.ui.compose.checkbox.DaxCheckbox
+import com.duckduckgo.common.ui.compose.infopannel.DaxAlertPanel
 import com.duckduckgo.common.ui.compose.infopannel.DaxInfoPanel
 import com.duckduckgo.common.ui.compose.message.DaxAction
 import com.duckduckgo.common.ui.compose.message.remote.DaxBigSingleActionMessage
@@ -225,7 +226,7 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
             }
 
             view.setupThemedComposeView(R.id.info_panel_alert_compose, isDarkTheme = isDarkTheme) {
-                DaxInfoPanel(
+                DaxAlertPanel(
                     body = "This is an Alert Compose Info Panel, warning information can be shown here",
                 )
             }

@@ -31,6 +31,19 @@ import com.duckduckgo.common.ui.compose.text.DaxText
 import com.duckduckgo.common.ui.compose.theme.DuckDuckGoTheme
 import com.duckduckgo.mobile.android.R
 
+/**
+ * Base composable for the Dax info panel family. Renders a rounded, full-width panel with a
+ * leading icon and a body of text.
+ *
+ * This is the shared implementation backing the public variants such as [DaxInfoPanel] and
+ * [DaxAlertPanel]. Prefer one of those variants over calling this directly, as they provide the
+ * correct icon and background colour for each use case.
+ *
+ * @param body The text to display in the panel.
+ * @param color The background colour of the panel.
+ * @param icon The leading [Painter] icon displayed at the start of the panel.
+ * @param modifier The [Modifier] to be applied to this panel.
+ */
 @Composable
 internal fun DaxPanel(
     body: String,

@@ -24,6 +24,15 @@ import com.duckduckgo.common.ui.compose.theme.DuckDuckGoTheme
 import com.duckduckgo.common.ui.compose.tools.PreviewBox
 import com.duckduckgo.mobile.android.R
 
+/**
+ * An alert panel used to surface warnings or information that needs the user's attention.
+ *
+ * Displays the given text alongside a warning icon on a yellow background. For neutral,
+ * informational messages, use [DaxInfoPanel] instead.
+ *
+ * @param body The warning text to display in the panel.
+ * @param modifier The [Modifier] to be applied to this panel.
+ */
 @Composable
 fun DaxAlertPanel(
     body: String,
