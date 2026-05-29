@@ -27,7 +27,6 @@ import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.cta.ui.DaxBubbleCta.DaxDialogIntroOption
 import com.duckduckgo.app.global.DefaultRoleBrowserDialog
 import com.duckduckgo.app.global.install.AppInstallStore
-import com.duckduckgo.app.global.install.daysInstalled
 import com.duckduckgo.app.onboarding.DuckAiOnboardingExperimentManager
 import com.duckduckgo.app.onboarding.DuckAiOnboardingExperimentManager.DuckAiOnboardingExperimentVariant.CONTROL
 import com.duckduckgo.app.onboarding.DuckAiOnboardingExperimentManager.DuckAiOnboardingExperimentVariant.TREATMENT_WITH_DUCK_AI_DEFAULT
@@ -46,7 +45,6 @@ import com.duckduckgo.app.onboardingquicksetup.OnboardingQuickSetupExperimentMan
 import com.duckduckgo.app.onboardingquicksetup.OnboardingQuickSetupExperimentManager.QuickSetupExperimentVariant
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.NOTIFICATION_RUNTIME_PERMISSION_SHOWN
-import com.duckduckgo.app.pixels.AppPixelName.ONBOARDING_QUICK_SETUP
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_ADDRESS_BAR_POSITION_SHOWN_UNIQUE
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_AICHAT_SELECTED
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_BOTTOM_ADDRESS_BAR_SELECTED_UNIQUE
@@ -72,7 +70,6 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.utils.DispatcherProvider
-import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.inputscreen.wideevents.InputScreenOnboardingWideEvent
@@ -115,7 +112,7 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
     private val defaultBrowserDetector: DefaultBrowserDetector,
     private val widgetCapabilities: WidgetCapabilities,
     private val syncAutoRestore: SyncAutoRestore,
-    private val deviceInfo: DeviceInfo,
+    private val quickSetupPixelSender: QuickSetupPixelSender,
 ) : ViewModel() {
 
     private val canRestoreDeferred: Deferred<Boolean> = viewModelScope.async(dispatchers.io()) {
@@ -226,7 +223,7 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
             }
 
             QUICK_SETUP -> {
-                fireQuickSetupShownPixel()
+                quickSetupPixelSender.fireShown(isReinstallUser = _viewState.value.isReinstallUser)
             }
         }
     }
@@ -354,7 +351,12 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
                 viewModelScope.launch {
                     applyAddressBarPositionSelection(fireTelemetry = false)
                     applyInputScreenSelection(fireTelemetry = false)
-                    fireQuickSetupClickedPixel()
+                    val state = _viewState.value
+                    quickSetupPixelSender.fireClicked(
+                        isReinstallUser = state.isReinstallUser,
+                        addressBarPosition = state.selectedAddressBarPosition,
+                        inputScreenSelected = state.inputScreenSelected,
+                    )
                     _commands.send(Command.OnboardingSkipped)
                 }
             }
@@ -606,93 +608,7 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
         }
     }
 
-    private fun fireQuickSetupShownPixel() {
-        viewModelScope.launch {
-            val params = buildQuickSetupStandardParams() + (PIXEL_PARAM_EVENT to PIXEL_EVENT_SHOWN)
-            pixel.fire(
-                pixel = ONBOARDING_QUICK_SETUP,
-                parameters = params,
-                type = Unique(tag = "${ONBOARDING_QUICK_SETUP.pixelName}_$PIXEL_EVENT_SHOWN"),
-            )
-        }
-    }
-
-    private suspend fun fireQuickSetupClickedPixel() {
-        val state = _viewState.value
-        val (isDefault, hasWidget) = withContext(dispatchers.io()) {
-            defaultBrowserDetector.isDefaultBrowser() to widgetCapabilities.hasInstalledWidgets
-        }
-        val addressBar = when (state.selectedAddressBarPosition) {
-            OmnibarType.SINGLE_TOP -> ADDRESS_BAR_TOP
-            OmnibarType.SINGLE_BOTTOM -> ADDRESS_BAR_BOTTOM
-            OmnibarType.SPLIT -> ADDRESS_BAR_SPLIT
-        }
-        val inputType = if (state.inputScreenSelected) {
-            INPUT_TYPE_SEARCH_AND_DUCKAI
-        } else {
-            INPUT_TYPE_SEARCH
-        }
-        val value = "$PIXEL_SET_AS_DEFAULT_VALUE_PARAM:${onOff(isDefault)}," +
-            "$PIXEL_WIDGET_VALUE_PARAM:${onOff(hasWidget)}," +
-            "$PIXEL_ADDRESS_BAR_VALUE_PARAM:$addressBar," +
-            "$PIXEL_INPUT_TYPE_VALUE_PARAM:$inputType"
-        val params = buildQuickSetupStandardParams() + mapOf(
-            PIXEL_PARAM_EVENT to PIXEL_EVENT_CLICKED,
-            PIXEL_PARAM_VALUE to value,
-        )
-        pixel.fire(
-            pixel = ONBOARDING_QUICK_SETUP,
-            parameters = params,
-            type = Unique(tag = "${ONBOARDING_QUICK_SETUP.pixelName}_$PIXEL_EVENT_CLICKED"),
-        )
-    }
-
-    private suspend fun buildQuickSetupStandardParams(): Map<String, String> {
-        val days = withContext(dispatchers.io()) { appInstallStore.daysInstalled() }
-        val params = mutableMapOf(
-            PIXEL_PARAM_INSTALL_TYPE to if (_viewState.value.isReinstallUser) INSTALL_TYPE_REINSTALL else INSTALL_TYPE_NEW,
-            PIXEL_PARAM_SOURCE to ONBOARDING_DEFAULT,
-            PIXEL_PARAM_FLOW to ONBOARDING_DEFAULT,
-            PIXEL_PARAM_PIXEL_SOURCE to deviceInfo.formFactor().description,
-        )
-        if (days in 0..MAX_DAYS_SINCE_INSTALL_REPORTED) {
-            params[PIXEL_PARAM_DAYS_SINCE_INSTALL] = days.toString()
-        }
-        return params
-    }
-
-    private fun onOff(value: Boolean): String = if (value) "on" else "off"
-
     private companion object {
-        private const val PIXEL_PARAM_EVENT = "e"
-        private const val PIXEL_PARAM_VALUE = "value"
-        private const val PIXEL_SET_AS_DEFAULT_VALUE_PARAM = "set_as_default"
-        private const val PIXEL_WIDGET_VALUE_PARAM = "widget"
-        private const val PIXEL_ADDRESS_BAR_VALUE_PARAM = "address_bar"
-        private const val PIXEL_INPUT_TYPE_VALUE_PARAM = "input_type"
-        private const val PIXEL_PARAM_INSTALL_TYPE = "it"
-        private const val PIXEL_PARAM_DAYS_SINCE_INSTALL = "d"
-        private const val PIXEL_PARAM_SOURCE = "source"
-        private const val PIXEL_PARAM_FLOW = "flow"
-        private const val PIXEL_PARAM_PIXEL_SOURCE = "pixelSource"
-
-        private const val PIXEL_EVENT_SHOWN = "shown"
-        private const val PIXEL_EVENT_CLICKED = "clicked"
-
-        private const val INSTALL_TYPE_NEW = "new"
-        private const val INSTALL_TYPE_REINSTALL = "reinstall"
-
-        private const val ONBOARDING_DEFAULT = "default"
-
-        private const val ADDRESS_BAR_TOP = "top"
-        private const val ADDRESS_BAR_BOTTOM = "bottom"
-        private const val ADDRESS_BAR_SPLIT = "split"
-
-        private const val INPUT_TYPE_SEARCH = "search"
-        private const val INPUT_TYPE_SEARCH_AND_DUCKAI = "search_and_duckai"
-
-        private const val MAX_DAYS_SINCE_INSTALL_REPORTED = 28L
-
         private const val BLOCK_STORE_TIMEOUT_MS = 3_000L
     }
 }

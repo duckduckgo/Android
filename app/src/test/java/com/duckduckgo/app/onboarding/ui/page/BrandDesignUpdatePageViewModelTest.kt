@@ -33,7 +33,6 @@ import com.duckduckgo.app.onboardingquicksetup.OnboardingQuickSetupExperimentMan
 import com.duckduckgo.app.onboardingquicksetup.OnboardingQuickSetupExperimentManager.QuickSetupExperimentVariant
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.NOTIFICATION_RUNTIME_PERMISSION_SHOWN
-import com.duckduckgo.app.pixels.AppPixelName.ONBOARDING_QUICK_SETUP
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_ADDRESS_BAR_POSITION_SHOWN_UNIQUE
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_AICHAT_SELECTED
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_BOTTOM_ADDRESS_BAR_SELECTED_UNIQUE
@@ -59,7 +58,6 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.test.CoroutineTestRule
-import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.inputscreen.wideevents.InputScreenOnboardingWideEvent
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
@@ -73,13 +71,11 @@ import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
-import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
-import java.util.concurrent.TimeUnit
 
 @SuppressLint("DenyListedApi")
 class BrandDesignUpdatePageViewModelTest {
@@ -104,9 +100,7 @@ class BrandDesignUpdatePageViewModelTest {
     private val mockDefaultBrowserDetector: DefaultBrowserDetector = mock()
     private val mockWidgetCapabilities: WidgetCapabilities = mock()
     private val mockSyncAutoRestore: SyncAutoRestore = mock()
-    private val mockDeviceInfo: DeviceInfo = mock {
-        on { formFactor() } doReturn DeviceInfo.FormFactor.PHONE
-    }
+    private val mockQuickSetupPixelSender: QuickSetupPixelSender = mock()
 
     private fun createViewModel(): BrandDesignUpdatePageViewModel {
         return BrandDesignUpdatePageViewModel(
@@ -126,7 +120,7 @@ class BrandDesignUpdatePageViewModelTest {
             mockDefaultBrowserDetector,
             mockWidgetCapabilities,
             mockSyncAutoRestore,
-            mockDeviceInfo,
+            mockQuickSetupPixelSender,
         )
     }
 
@@ -1070,90 +1064,22 @@ class BrandDesignUpdatePageViewModelTest {
     // region Quick setup pixels
 
     @Test
-    fun whenQuickSetupShownThenFireShownPixelWithStandardParams() = runTest {
+    fun whenQuickSetupShownThenSenderFiresShownWithReinstallState() = runTest {
         whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(true)
         whenever(mockOnboardingQuickSetupExperimentManager.enroll()).thenReturn(QuickSetupExperimentVariant.TREATMENT)
-        whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(3))
 
         val testee = createViewModel()
         testee.loadDaxDialog()
         testee.onSecondaryCtaClicked() // INITIAL_REINSTALL_USER -> QUICK_SETUP
         advanceUntilIdle()
 
-        verify(mockPixel).fire(
-            ONBOARDING_QUICK_SETUP,
-            mapOf(
-                "it" to "reinstall",
-                "source" to "default",
-                "flow" to "default",
-                "pixelSource" to "phone",
-                "d" to "3",
-                "e" to "shown",
-            ),
-            type = Unique(tag = "onboarding_quick-setup_shown"),
-        )
+        verify(mockQuickSetupPixelSender).fireShown(isReinstallUser = true)
     }
 
     @Test
-    fun whenQuickSetupShownAndInstalledMoreThan28DaysAgoThenOmitDaysParam() = runTest {
+    fun whenQuickSetupClickedThenSenderFiresClickedWithCurrentSelections() = runTest {
         whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(true)
         whenever(mockOnboardingQuickSetupExperimentManager.enroll()).thenReturn(QuickSetupExperimentVariant.TREATMENT)
-        whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(40))
-
-        val testee = createViewModel()
-        testee.loadDaxDialog()
-        testee.onSecondaryCtaClicked()
-        advanceUntilIdle()
-
-        verify(mockPixel).fire(
-            ONBOARDING_QUICK_SETUP,
-            mapOf(
-                "it" to "reinstall",
-                "source" to "default",
-                "flow" to "default",
-                "pixelSource" to "phone",
-                "e" to "shown",
-            ),
-            type = Unique(tag = "onboarding_quick-setup_shown"),
-        )
-    }
-
-    @Test
-    fun whenQuickSetupClickedWithNoConfigurationThenFireClickedPixelWithCompositeValueAndStandardParams() = runTest {
-        whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(true)
-        whenever(mockOnboardingQuickSetupExperimentManager.enroll()).thenReturn(QuickSetupExperimentVariant.TREATMENT)
-        whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(0))
-        whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(false)
-        whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(false)
-
-        val testee = createViewModel()
-        testee.loadDaxDialog()
-        testee.onSecondaryCtaClicked() // -> QUICK_SETUP
-        testee.onPrimaryCtaClicked()
-        advanceUntilIdle()
-
-        verify(mockPixel).fire(
-            ONBOARDING_QUICK_SETUP,
-            mapOf(
-                "it" to "reinstall",
-                "source" to "default",
-                "flow" to "default",
-                "pixelSource" to "phone",
-                "d" to "0",
-                "e" to "clicked",
-                "value" to "set_as_default:off,widget:off,address_bar:top,input_type:search_and_duckai",
-            ),
-            type = Unique(tag = "onboarding_quick-setup_clicked"),
-        )
-    }
-
-    @Test
-    fun whenQuickSetupClickedWithDefaultBrowserSetThenFireClickedPixelWithCompositeValueAndStandardParams() = runTest {
-        whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(true)
-        whenever(mockOnboardingQuickSetupExperimentManager.enroll()).thenReturn(QuickSetupExperimentVariant.TREATMENT)
-        whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(0))
-        whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(true)
-        whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(false)
 
         val testee = createViewModel()
         testee.loadDaxDialog()
@@ -1163,77 +1089,10 @@ class BrandDesignUpdatePageViewModelTest {
         testee.onPrimaryCtaClicked()
         advanceUntilIdle()
 
-        verify(mockPixel).fire(
-            ONBOARDING_QUICK_SETUP,
-            mapOf(
-                "it" to "reinstall",
-                "source" to "default",
-                "flow" to "default",
-                "pixelSource" to "phone",
-                "d" to "0",
-                "e" to "clicked",
-                "value" to "set_as_default:on,widget:off,address_bar:bottom,input_type:search",
-            ),
-            type = Unique(tag = "onboarding_quick-setup_clicked"),
-        )
-    }
-
-    @Test
-    fun whenQuickSetupClickedWithSplitTopAndDuckAiThenValueReflectsSelections() = runTest {
-        whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(true)
-        whenever(mockOnboardingQuickSetupExperimentManager.enroll()).thenReturn(QuickSetupExperimentVariant.TREATMENT)
-        whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis())
-        whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(false)
-        whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(true)
-        mockAndroidBrowserConfigFeature.splitOmnibar().setRawStoredState(Toggle.State(enable = true))
-        mockAndroidBrowserConfigFeature.splitOmnibarWelcomePage().setRawStoredState(Toggle.State(enable = true))
-
-        val testee = createViewModel()
-        testee.loadDaxDialog()
-        testee.onSecondaryCtaClicked()
-        testee.onAddressBarPositionOptionSelected(OmnibarType.SPLIT)
-        testee.onInputScreenOptionSelected(withAi = true)
-        testee.onPrimaryCtaClicked()
-        advanceUntilIdle()
-
-        verify(mockPixel).fire(
-            ONBOARDING_QUICK_SETUP,
-            mapOf(
-                "it" to "reinstall",
-                "source" to "default",
-                "flow" to "default",
-                "pixelSource" to "phone",
-                "d" to "0",
-                "e" to "clicked",
-                "value" to "set_as_default:off,widget:on,address_bar:split,input_type:search_and_duckai",
-            ),
-            type = Unique(tag = "onboarding_quick-setup_clicked"),
-        )
-    }
-
-    @Test
-    fun whenQuickSetupShownOnTabletThenPixelSourceIsTablet() = runTest {
-        whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(true)
-        whenever(mockOnboardingQuickSetupExperimentManager.enroll()).thenReturn(QuickSetupExperimentVariant.TREATMENT)
-        whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis())
-        whenever(mockDeviceInfo.formFactor()).thenReturn(DeviceInfo.FormFactor.TABLET)
-
-        val testee = createViewModel()
-        testee.loadDaxDialog()
-        testee.onSecondaryCtaClicked()
-        advanceUntilIdle()
-
-        verify(mockPixel).fire(
-            ONBOARDING_QUICK_SETUP,
-            mapOf(
-                "it" to "reinstall",
-                "source" to "default",
-                "flow" to "default",
-                "pixelSource" to "tablet",
-                "d" to "0",
-                "e" to "shown",
-            ),
-            type = Unique(tag = "onboarding_quick-setup_shown"),
+        verify(mockQuickSetupPixelSender).fireClicked(
+            isReinstallUser = true,
+            addressBarPosition = OmnibarType.SINGLE_BOTTOM,
+            inputScreenSelected = false,
         )
     }
 
