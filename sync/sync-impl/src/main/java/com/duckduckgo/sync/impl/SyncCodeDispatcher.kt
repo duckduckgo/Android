@@ -116,8 +116,9 @@ sealed interface RouteDecision {
  * then zero or one [HostConfirmationRequested] (caller surfaces a dialog and resumes
  * via [confirmHost] / [denyHost]), then exactly one terminal ([LoggedIn] for Host.Done,
  * [AlreadyConnected] for SameAccountAbort, [Failed] otherwise). [JoinerConfirmationRequested]
- * is never emitted on the Presenter side under current callers (signed-in precondition);
- * see [SyncCodeDispatcher.presentV2] KDoc.
+ * is also possible on the Presenter side as of M1.5 (subtask
+ * `1215246284113165`) when a signed-out Presenter is elected Joiner via role-election rule 1
+ * (account beats no-account) against a signed-in peer.
  *
  * For v2 RecoveryCode flows (cid=ddg, cid=3party) there's no confirmation phase — only
  * a single terminal outcome.

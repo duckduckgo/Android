@@ -667,7 +667,7 @@ class RealSyncCodeDispatcherTest {
         verify(syncAccountRepository, never()).processCode(any(), anyOrNull())
     }
 
-    @Test fun `presentV2 defensively maps Joiner_AbortedLocal to Failed`() = runTest {
+    @Test fun `presentV2 emits Failed with cancelled-on-this-device reason when Joiner reaches AbortedLocal`() = runTest {
         val outcome = withTimeoutOrNull(1000) {
             val job = async(start = kotlinx.coroutines.CoroutineStart.UNDISPATCHED) { dispatcher.presentV2().first() }
             runnerEventsFlow.emit(
@@ -679,7 +679,7 @@ class RealSyncCodeDispatcherTest {
             )
             job.await()
         }
-        assertTrue("expected Failed, got $outcome", outcome is DispatchOutcome.Failed)
+        assertEquals(DispatchOutcome.Failed("Pairing cancelled on this device"), outcome)
     }
 
     @Test fun `presentV2 calls runner_startPresent when Flow is collected`() = runTest {

@@ -73,10 +73,12 @@ class RealSyncCodeDispatcher @Inject constructor(
      * session start (defensive against the runner's SharedFlow replay cache), and maps each
      * event to a [DispatchOutcome] via [mapV2PresentEventToOutcome].
      *
-     * Today's callers are assumed signed in (see [SyncCodeDispatcher.presentV2] KDoc), so the
-     * runner's role election always elects this device as Host. The Joiner.* mappings below
-     * are defensive — they fire only in the role-election edge case unblocked by Asana
-     * subtask `1215168582640073` ("Host pairs from no-account — create account inline").
+     * Today's callers include both the signed-in `SyncWithAnotherActivityViewModel` and the
+     * signed-out `SyncConnectViewModel` (per M1.5, Asana subtask `1215246284113165`). Role
+     * election in the runner can elect this device as Host (signed-in surface, or signed-out
+     * against a signed-out peer with account-creation-on-demand at Host.Sending — see
+     * `1215168582640073`) or as Joiner (signed-out surface against a signed-in or 3party peer).
+     * All terminal mappings are first-class; see `mapV2PresentEventToOutcome` for the table.
      */
     override fun presentV2(): Flow<DispatchOutcome> = flow {
         val sessionStartMs = System.currentTimeMillis()
