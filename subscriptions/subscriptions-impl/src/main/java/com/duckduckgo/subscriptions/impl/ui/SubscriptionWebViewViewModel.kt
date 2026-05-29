@@ -118,6 +118,8 @@ class SubscriptionWebViewViewModel @Inject constructor(
 
     private lateinit var subscriptionStatus: SubscriptionStatus
 
+    private var pendingScheduleNotificationDaysBeforeCancel: Int? = null
+
     fun start() {
         subscriptionsManager.currentPurchaseState.onEach {
             val state = when (it) {
@@ -172,9 +174,60 @@ class SubscriptionWebViewViewModel @Inject constructor(
             "featureSelected" -> data?.let { featureSelected(data) }
             "subscriptionsWelcomeFaqClicked" -> subscriptionsWelcomeFaqClicked()
             "subscriptionsWelcomeAddEmailClicked" -> subscriptionsWelcomeAddEmailClicked()
+            "getUserSettings" -> id?.let { getUserSettings(it) }
+            "requestNotificationsPermission" -> id?.let { requestNotificationsPermission(it) }
             else -> {
                 // NOOP
             }
+        }
+    }
+
+    private fun getUserSettings(id: String) {
+        viewModelScope.launch {
+            command.send(ComputeUserSettings(id))
+        }
+    }
+
+    fun onUserSettingsComputed(
+        id: String,
+        notificationsEnabled: Boolean,
+        sdkAtLeastTiramisu: Boolean,
+        runtimePermissionGranted: Boolean,
+        shouldShowRationale: Boolean,
+    ) {
+        val status = when {
+            notificationsEnabled -> NOTIFICATIONS_PERMISSION_GRANTED
+            !sdkAtLeastTiramisu -> NOTIFICATIONS_PERMISSION_DENIED
+            runtimePermissionGranted -> NOTIFICATIONS_PERMISSION_DENIED
+            shouldShowRationale -> NOTIFICATIONS_PERMISSION_NOT_DETERMINED
+            else -> NOTIFICATIONS_PERMISSION_DENIED
+        }
+        viewModelScope.launch {
+            val response = JsCallbackData(
+                featureName = "useSubscription",
+                method = "getUserSettings",
+                id = id,
+                params = JSONObject().apply { put("notificationsPermission", status) },
+            )
+            command.send(SendResponseToJs(response))
+        }
+    }
+
+    private fun requestNotificationsPermission(id: String) {
+        viewModelScope.launch {
+            command.send(RequestNotificationsPermission(id))
+        }
+    }
+
+    fun onNotificationsPermissionResult(id: String, granted: Boolean) {
+        viewModelScope.launch {
+            val response = JsCallbackData(
+                featureName = "useSubscription",
+                method = "requestNotificationsPermission",
+                id = id,
+                params = JSONObject().apply { put("granted", granted) },
+            )
+            command.send(SendResponseToJs(response))
         }
     }
 
@@ -258,6 +311,9 @@ class SubscriptionWebViewViewModel @Inject constructor(
             val offerId = runCatching { data?.getString("offerId") }.getOrNull()
             val experimentName = runCatching { data?.getJSONObject("experiment")?.getString("name") }.getOrNull()
             val experimentCohort = runCatching { data?.getJSONObject("experiment")?.getString("cohort") }.getOrNull()
+            pendingScheduleNotificationDaysBeforeCancel = runCatching {
+                data?.getJSONObject("scheduleNotification")?.getInt("daysBeforeCancel")
+            }.getOrNull()?.takeIf { it in 1..3 }
             if (id.isNullOrBlank()) {
                 pixelSender.reportPurchaseFailureOther(SubscriptionFailureErrorType.INVALID_PRODUCT_ID.name)
                 _currentPurchaseViewState.emit(currentPurchaseViewState.value.copy(purchaseState = Failure))
@@ -730,6 +786,8 @@ class SubscriptionWebViewViewModel @Inject constructor(
             val replacementMode: SubscriptionReplacementMode,
         ) : Command()
         data object RestoreSubscription : Command()
+        data class ComputeUserSettings(val id: String) : Command()
+        data class RequestNotificationsPermission(val id: String) : Command()
         data object GoToITR : Command()
         data object GoToPIR : Command()
         data object GoToPIRDashboard : Command()
@@ -743,5 +801,8 @@ class SubscriptionWebViewViewModel @Inject constructor(
         const val PURCHASE_COMPLETED_SUBSCRIPTION_NAME = "onPurchaseUpdate"
         const val PURCHASE_COMPLETED_JSON = """{ type: "completed" }"""
         const val PURCHASE_CANCELED_JSON = """{ type: "canceled" }"""
+        private const val NOTIFICATIONS_PERMISSION_GRANTED = "granted"
+        private const val NOTIFICATIONS_PERMISSION_DENIED = "denied"
+        private const val NOTIFICATIONS_PERMISSION_NOT_DETERMINED = "notDetermined"
     }
 }

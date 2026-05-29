@@ -20,6 +20,7 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.content.pm.PackageManager.PERMISSION_GRANTED
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
@@ -30,9 +31,12 @@ import android.webkit.WebChromeClient
 import android.webkit.WebSettings
 import android.webkit.WebView
 import androidx.activity.result.ActivityResult
+import androidx.activity.result.contract.ActivityResultContracts.RequestPermission
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.annotation.AnyThread
 import androidx.appcompat.widget.Toolbar
+import androidx.core.app.ActivityCompat
+import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import androidx.fragment.app.DialogFragment
@@ -85,12 +89,14 @@ import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.BackToSettings
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.BackToSettingsActivateSuccess
+import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.ComputeUserSettings
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.GoToDuckAI
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.GoToITR
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.GoToNetP
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.GoToPIR
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.GoToPIRDashboard
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.Reload
+import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.RequestNotificationsPermission
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.RestoreSubscription
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.SendJsEvent
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.SendResponseToJs
@@ -197,7 +203,15 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
 
     // Used to represent a file to download, but may first require permission
     private var pendingFileDownload: PendingFileDownload? = null
+    private var pendingNotificationsPermissionRequestId: String? = null
     private val downloadMessagesJob = ConflatedJob()
+
+    private val notificationsPermissionLauncher = registerForActivityResult(RequestPermission()) { granted ->
+        pendingNotificationsPermissionRequestId?.let { id ->
+            viewModel.onNotificationsPermissionResult(id, granted)
+        }
+        pendingNotificationsPermissionRequestId = null
+    }
     private val toolbar
         get() = binding.includeToolbar.toolbar
 
@@ -511,6 +525,8 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
             is GoToPIRDashboard -> goToPIRDashboard()
             is GoToNetP -> goToNetP(command.activityParams)
             is GoToDuckAI -> goToDuckAI()
+            is ComputeUserSettings -> computeUserSettings(command.id)
+            is RequestNotificationsPermission -> launchNotificationsPermission(command.id)
             Reload -> binding.webview.reload()
         }
     }
@@ -542,6 +558,30 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
 
     private fun goToDuckAI() {
         duckChat.openDuckChat()
+    }
+
+    private fun computeUserSettings(id: String) {
+        val sdkAtLeastTiramisu = Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
+        viewModel.onUserSettingsComputed(
+            id = id,
+            notificationsEnabled = NotificationManagerCompat.from(this).areNotificationsEnabled(),
+            sdkAtLeastTiramisu = sdkAtLeastTiramisu,
+            runtimePermissionGranted = sdkAtLeastTiramisu &&
+                ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) == PERMISSION_GRANTED,
+            shouldShowRationale = sdkAtLeastTiramisu &&
+                ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.POST_NOTIFICATIONS),
+        )
+    }
+
+    private fun launchNotificationsPermission(id: String) {
+        pendingNotificationsPermissionRequestId = id
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            notificationsPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+        } else {
+            val granted = NotificationManagerCompat.from(this).areNotificationsEnabled()
+            viewModel.onNotificationsPermissionResult(id, granted)
+            pendingNotificationsPermissionRequestId = null
+        }
     }
 
     private fun renderPurchaseState(purchaseState: PurchaseStateView) {
