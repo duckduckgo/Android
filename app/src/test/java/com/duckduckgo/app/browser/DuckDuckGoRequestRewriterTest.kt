@@ -60,6 +60,7 @@ class DuckDuckGoRequestRewriterTest {
         whenever(duckChat.isEnabled()).thenReturn(true)
 
         androidBrowserConfigFeature.hideDuckAiInSerpKillSwitch().setRawStoredState(State(true))
+        androidBrowserConfigFeature.noAiSerpHost().setRawStoredState(State(false))
 
         testee = DuckDuckGoRequestRewriter(
             DuckDuckGoUrlDetectorImpl(),
@@ -69,6 +70,7 @@ class DuckDuckGoRequestRewriterTest {
             duckChat,
             androidBrowserConfigFeature,
             serpSettingsFeature,
+            RealDuckDuckGoSerpHostProvider(duckChat, androidBrowserConfigFeature),
         )
         builder = Uri.Builder()
     }
@@ -194,5 +196,17 @@ class DuckDuckGoRequestRewriterTest {
     fun whenShouldRewriteRequestAndUrlIsDuckDuckGoEmailThenReturnFalse() {
         val uri = "http://duckduckgo.com/email".toUri()
         assertFalse(testee.shouldRewriteRequest(uri))
+    }
+
+    @Test
+    fun whenNoAiHostActiveThenHideDuckAiParamNotAdded() {
+        whenever(duckChat.isEnabled()).thenReturn(false)
+        androidBrowserConfigFeature.hideDuckAiInSerpKillSwitch().setRawStoredState(State(true))
+        androidBrowserConfigFeature.noAiSerpHost().setRawStoredState(State(true))
+
+        testee.addCustomQueryParams(builder)
+
+        val uri = builder.build()
+        assertFalse(uri.queryParameterNames.contains(ParamKey.HIDE_DUCK_AI))
     }
 }

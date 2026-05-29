@@ -70,6 +70,7 @@ class QueryUrlConverterTest {
             duckChat,
             androidBrowserConfigFeature,
             serpSettingsFeature,
+            RealDuckDuckGoSerpHostProvider(duckChat, androidBrowserConfigFeature),
         )
     private val testee: QueryUrlConverter = createTestee(useUrlPredictorEnabled = false)
 
@@ -79,6 +80,7 @@ class QueryUrlConverterTest {
         whenever(duckChat.isEnabled()).thenReturn(true)
         whenever(queryUrlPredictor.isReady()).thenReturn(true)
         androidBrowserConfigFeature.hideDuckAiInSerpKillSwitch().setRawStoredState(State(true))
+        androidBrowserConfigFeature.noAiSerpHost().setRawStoredState(State(false))
     }
 
     @Test
