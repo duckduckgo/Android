@@ -27,7 +27,7 @@ import com.duckduckgo.mobile.android.R
 @Composable
 fun DaxInfoPanel(
     body: String,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     DaxPanel(
         body = body,
@@ -46,4 +46,3 @@ private fun DaxInfoPanelPreview() {
         )
     }
 }
-

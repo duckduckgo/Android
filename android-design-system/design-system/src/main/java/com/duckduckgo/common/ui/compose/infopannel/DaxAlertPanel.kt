@@ -27,7 +27,7 @@ import com.duckduckgo.mobile.android.R
 @Composable
 fun DaxAlertPanel(
     body: String,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     DaxPanel(
         body = body,
