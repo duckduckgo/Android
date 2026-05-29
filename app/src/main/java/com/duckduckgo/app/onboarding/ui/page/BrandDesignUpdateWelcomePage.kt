@@ -390,11 +390,6 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
     ) {
         super.onViewCreated(view, savedInstanceState)
 
-        with(binding.daxDialogCta.welcomeContent) {
-            bodyText1.text = getString(R.string.preOnboardingWelcomeDialogBody1).preventWidows()
-            bodyText2.text = getString(R.string.preOnboardingWelcomeDialogBody2).preventWidows()
-        }
-
         ViewGroupCompat.installCompatInsetsDispatch(binding.root)
         if (deviceInfo.isTablet()) {
             ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, windowInsets ->
@@ -668,6 +663,11 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                             getString(R.string.syncRestoreDialogBrandDesignBody1).preventWidows().html(requireContext())
                         binding.daxDialogCta.primaryCta.text = getString(R.string.syncRestoreDialogPrimaryCta)
                         binding.daxDialogCta.secondaryCta.text = getString(R.string.syncRestoreDialogSecondaryCta)
+                    } else {
+                        binding.daxDialogCta.welcomeContent.bodyText1.text =
+                            getString(R.string.preOnboardingWelcomeDialogBody1).preventWidows()
+                        binding.daxDialogCta.welcomeContent.bodyText2.text =
+                            getString(R.string.preOnboardingWelcomeDialogBody2).preventWidows()
                     }
                     // SYNC_RESTORE shows no second body line; INITIAL/INITIAL_REINSTALL_USER do.
                     // Set isVisible explicitly so a prior dialog that hid bodyText2 doesn't leak into this one.
@@ -1325,6 +1325,11 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                         getString(R.string.syncRestoreDialogBrandDesignBody1).preventWidows().html(requireContext())
                     binding.daxDialogCta.primaryCta.text = getString(R.string.syncRestoreDialogPrimaryCta)
                     binding.daxDialogCta.secondaryCta.text = getString(R.string.syncRestoreDialogSecondaryCta)
+                } else {
+                    binding.daxDialogCta.welcomeContent.bodyText1.text =
+                        getString(R.string.preOnboardingWelcomeDialogBody1).preventWidows()
+                    binding.daxDialogCta.welcomeContent.bodyText2.text =
+                        getString(R.string.preOnboardingWelcomeDialogBody2).preventWidows()
                 }
                 // SYNC_RESTORE shows no second body line; INITIAL/INITIAL_REINSTALL_USER do.
                 // Set isVisible explicitly so a prior dialog that hid bodyText2 doesn't leak into this one.
