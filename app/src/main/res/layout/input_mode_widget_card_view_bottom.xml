@@ -33,12 +33,9 @@
             android:id="@+id/inputFieldFireIconMenu"
             android:layout_width="@dimen/toolbarIcon"
             android:layout_height="@dimen/toolbarIcon"
-            android:background="@drawable/selectable_item_rounded_corner_background"
-            android:visibility="gone"
             android:layout_marginEnd="@dimen/keyline_2"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+            android:background="@drawable/selectable_item_rounded_corner_background"
+            android:visibility="gone">
 
             <ImageView
                 android:id="@+id/inputFieldFireIconImageview"
@@ -50,32 +47,28 @@
                 android:src="@drawable/ic_fire_24" />
         </FrameLayout>
 
-
-    <!-- Negative bottom margin pulls the card down to account for the shadow -->
-    <com.google.android.material.card.MaterialCardView
-        android:id="@+id/inputModeWidgetCard"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/keyline_2"
-        android:layout_marginTop="@dimen/keyline_2"
-        android:layout_marginEnd="@dimen/keyline_2"
-        android:layout_marginBottom="@dimen/keyline_2"
-        app:cardBackgroundColor="?attr/daxColorWindow"
-        app:cardCornerRadius="26dp"
-        app:cardElevation="3dp"
-        app:cardUseCompatPadding="false">
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/inputModeWidgetCard"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_2"
+            android:layout_marginBottom="@dimen/keyline_2"
+            android:layout_weight="1"
+            app:cardBackgroundColor="?attr/daxColorWindow"
+            app:cardCornerRadius="26dp"
+            app:cardElevation="3dp"
+            app:cardUseCompatPadding="false">
 
             <com.duckduckgo.duckchat.impl.ui.nativeinput.views.NativeInputModeWidget
                 android:id="@+id/inputModeWidget"
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
                 android:paddingStart="@dimen/keyline_1"
                 android:paddingTop="@dimen/keyline_2"
                 android:paddingEnd="@dimen/keyline_1"
                 android:paddingBottom="@dimen/keyline_2" />
 
-    </com.google.android.material.card.MaterialCardView>
+        </com.google.android.material.card.MaterialCardView>
 
     </LinearLayout>
 </com.duckduckgo.duckchat.impl.ui.nativeinput.views.NonCollapsingFrameLayout>
