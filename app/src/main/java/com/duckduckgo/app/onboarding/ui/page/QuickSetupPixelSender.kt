@@ -35,10 +35,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
-/**
- * Dispatches the onboarding quick-setup telemetry, keeping the composite pixel construction
- * out of [BrandDesignUpdatePageViewModel].
- */
 interface QuickSetupPixelSender {
     fun fireShown(isReinstallUser: Boolean)
     fun fireClicked(
