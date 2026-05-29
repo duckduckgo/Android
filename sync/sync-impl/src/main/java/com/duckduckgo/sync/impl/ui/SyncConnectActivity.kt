@@ -39,6 +39,8 @@ import com.duckduckgo.sync.impl.databinding.ActivityConnectSyncBinding
 import com.duckduckgo.sync.impl.databinding.ActivityConnectSyncNewBinding
 import com.duckduckgo.sync.impl.ui.EnterCodeActivity.Companion.Code.CONNECT_CODE
 import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command
+import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command.AskHostConfirmation
+import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command.AskJoinerConfirmation
 import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command.FinishWithError
 import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command.LoginSuccess
 import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command.ReadTextCode
@@ -165,13 +167,8 @@ class SyncConnectActivity : DuckDuckGoActivity() {
 
             is ShowMessage -> Snackbar.make(binding.root, it.messageId, Snackbar.LENGTH_SHORT).show()
             is ShowError -> showError(it)
-            // M1.5: v2 confirmation prompts. Dialog rendering arrives in Task 3 (subtask
-            // `1215246284113165`). Until then, log and ignore so the surface still compiles.
-            is Command.AskJoinerConfirmation,
-            is Command.AskHostConfirmation,
-            -> {
-                // Will be replaced by dialog rendering in Task 3.
-            }
+            is AskJoinerConfirmation -> askJoinerConfirmation(it.peerName)
+            is AskHostConfirmation -> askHostConfirmation(it.peerName)
         }
     }
 
@@ -194,6 +191,44 @@ class SyncConnectActivity : DuckDuckGoActivity() {
                     override fun onPositiveButtonClicked() {
                         viewModel.onErrorDialogDismissed()
                     }
+                },
+            ).show()
+    }
+
+    private fun askJoinerConfirmation(peerName: String?) {
+        val message = if (peerName.isNullOrBlank()) {
+            getString(R.string.sync_v2_joiner_confirmation_message_unknown_peer)
+        } else {
+            getString(R.string.sync_v2_joiner_confirmation_message, peerName)
+        }
+        TextAlertDialogBuilder(this)
+            .setTitle(R.string.sync_v2_joiner_confirmation_title)
+            .setMessage(message)
+            .setPositiveButton(R.string.sync_v2_joiner_confirmation_positive)
+            .setNegativeButton(R.string.sync_v2_joiner_confirmation_negative)
+            .addEventListener(
+                object : TextAlertDialogBuilder.EventListener() {
+                    override fun onPositiveButtonClicked() { viewModel.onJoinerConfirmed() }
+                    override fun onNegativeButtonClicked() { viewModel.onJoinerDenied() }
+                },
+            ).show()
+    }
+
+    private fun askHostConfirmation(peerName: String?) {
+        val message = if (peerName.isNullOrBlank()) {
+            getString(R.string.sync_v2_host_confirmation_message_unknown_peer)
+        } else {
+            getString(R.string.sync_v2_host_confirmation_message, peerName)
+        }
+        TextAlertDialogBuilder(this)
+            .setTitle(R.string.sync_v2_host_confirmation_title)
+            .setMessage(message)
+            .setPositiveButton(R.string.sync_v2_host_confirmation_positive)
+            .setNegativeButton(R.string.sync_v2_host_confirmation_negative)
+            .addEventListener(
+                object : TextAlertDialogBuilder.EventListener() {
+                    override fun onPositiveButtonClicked() { viewModel.onHostConfirmed() }
+                    override fun onNegativeButtonClicked() { viewModel.onHostDenied() }
                 },
             ).show()
     }
