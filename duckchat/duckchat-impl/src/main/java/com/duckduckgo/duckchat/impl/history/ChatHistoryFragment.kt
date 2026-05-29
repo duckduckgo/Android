@@ -163,6 +163,7 @@ class ChatHistoryFragment : DuckDuckGoFragment(R.layout.fragment_chat_history) {
         when (event) {
             is ChatHistoryViewModel.NavigationEvent.OpenRename -> openRenameScreen(event.chatId, event.currentTitle)
             is ChatHistoryViewModel.NavigationEvent.ShowDownloadComplete -> showDownloadCompleteSnackbar(event.fileName)
+            is ChatHistoryViewModel.NavigationEvent.ShowBulkDownloadComplete -> showBulkDownloadCompleteSnackbar(event.count)
             ChatHistoryViewModel.NavigationEvent.ShowExportError ->
                 Snackbar.make(binding.root, R.string.duck_ai_chat_history_download_error, Snackbar.LENGTH_SHORT).show()
         }
@@ -183,6 +184,15 @@ class ChatHistoryFragment : DuckDuckGoFragment(R.layout.fragment_chat_history) {
 
     private fun showDownloadCompleteSnackbar(fileName: String) {
         val message = getString(R.string.duck_ai_chat_history_download_complete, fileName)
+        Snackbar.make(binding.root, message, Snackbar.LENGTH_LONG)
+            .setAction(R.string.duck_ai_chat_history_download_view) {
+                globalActivityStarter.start(requireContext(), DownloadsScreens.DownloadsScreenNoParams)
+            }
+            .show()
+    }
+
+    private fun showBulkDownloadCompleteSnackbar(count: Int) {
+        val message = resources.getQuantityString(R.plurals.duck_ai_chat_history_bulk_download_complete, count, count)
         Snackbar.make(binding.root, message, Snackbar.LENGTH_LONG)
             .setAction(R.string.duck_ai_chat_history_download_view) {
                 globalActivityStarter.start(requireContext(), DownloadsScreens.DownloadsScreenNoParams)
@@ -253,6 +263,7 @@ class ChatHistoryFragment : DuckDuckGoFragment(R.layout.fragment_chat_history) {
         binding.toolbar.setTitle(R.string.duck_ai_chat_history_title)
         binding.toolbar.menu.findItem(R.id.chat_history_action_new)?.isVisible = true
         binding.toolbar.menu.findItem(R.id.chat_history_action_search)?.isVisible = true
+        binding.toolbar.menu.findItem(R.id.chat_history_action_download_selected)?.isVisible = false
     }
 
     private fun applySelectModeToolbar(count: Int) {
@@ -263,6 +274,7 @@ class ChatHistoryFragment : DuckDuckGoFragment(R.layout.fragment_chat_history) {
         binding.toolbar.title = count.toString()
         binding.toolbar.menu.findItem(R.id.chat_history_action_new)?.isVisible = false
         binding.toolbar.menu.findItem(R.id.chat_history_action_search)?.isVisible = false
+        binding.toolbar.menu.findItem(R.id.chat_history_action_download_selected)?.isVisible = true
     }
 
     private fun buildEntries(
@@ -319,6 +331,10 @@ class ChatHistoryFragment : DuckDuckGoFragment(R.layout.fragment_chat_history) {
         }
         R.id.chat_history_action_fire -> {
             viewModel.onFireIconClicked()
+            true
+        }
+        R.id.chat_history_action_download_selected -> {
+            viewModel.onDownloadSelectedRequested()
             true
         }
         else -> false

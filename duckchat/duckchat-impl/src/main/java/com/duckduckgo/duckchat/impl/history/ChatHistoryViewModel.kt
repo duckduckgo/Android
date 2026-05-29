@@ -176,6 +176,26 @@ class ChatHistoryViewModel @Inject constructor(
         }
     }
 
+    fun onDownloadSelectedRequested() {
+        val selected = (controls.value.mode as? Mode.Selecting)?.selectedChatIds.orEmpty()
+        if (selected.isEmpty()) return
+        viewModelScope.launch {
+            val results = selected.map { chatId ->
+                val modelId = latestItems.firstOrNull { it.chatId == chatId }?.model
+                val modelDisplay = modelId
+                    ?.let { id -> duckAiModelManager.modelState.value.models.firstOrNull { it.id == id } }
+                    ?.toModelDisplay()
+                runCatching { chatHistoryRepository.exportChat(chatId, modelDisplay) }
+            }
+            if (results.any { it.isFailure }) {
+                navigationChannel.trySend(NavigationEvent.ShowExportError)
+            } else {
+                navigationChannel.trySend(NavigationEvent.ShowBulkDownloadComplete(count = results.size))
+            }
+            controls.update { it.copy(mode = Mode.Default) }
+        }
+    }
+
     private fun dispatchSelectedClear(chatIds: Set<String>) {
         if (chatIds.isEmpty()) return
         if (!duckAiFeatureState.showClearDuckAIChatHistory.value) return
@@ -303,6 +323,7 @@ class ChatHistoryViewModel @Inject constructor(
     sealed interface NavigationEvent {
         data class OpenRename(val chatId: String, val currentTitle: String) : NavigationEvent
         data class ShowDownloadComplete(val fileName: String) : NavigationEvent
+        data class ShowBulkDownloadComplete(val count: Int) : NavigationEvent
         data object ShowExportError : NavigationEvent
     }
 
