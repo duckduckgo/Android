@@ -120,6 +120,8 @@ class RealSyncCodeDispatcher @Inject constructor(
     private fun mapV2PresentEventToOutcome(event: ExchangeV2Event): DispatchOutcome? = when (event) {
         is ExchangeV2Event.SessionStarted -> event.linkingCode?.let { DispatchOutcome.LinkingCodeReady(it) }
         is ExchangeV2Event.Transition -> when (event.to) {
+            ExchangeV2State.Joiner.Confirming ->
+                DispatchOutcome.JoinerConfirmationRequested(peerName = runner.peerName)
             ExchangeV2State.Host.Confirming ->
                 DispatchOutcome.HostConfirmationRequested(peerName = runner.peerName)
             ExchangeV2State.Host.Done -> DispatchOutcome.LoggedIn

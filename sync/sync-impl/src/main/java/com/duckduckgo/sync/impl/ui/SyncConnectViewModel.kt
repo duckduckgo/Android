@@ -29,6 +29,7 @@ import com.duckduckgo.sync.impl.AccountErrorCodes.CREATE_ACCOUNT_FAILED
 import com.duckduckgo.sync.impl.AccountErrorCodes.INVALID_CODE
 import com.duckduckgo.sync.impl.AccountErrorCodes.LOGIN_FAILED
 import com.duckduckgo.sync.impl.Clipboard
+import com.duckduckgo.sync.impl.DispatchOutcome
 import com.duckduckgo.sync.impl.ExchangeResult.AccountSwitchingRequired
 import com.duckduckgo.sync.impl.ExchangeResult.LoggedIn
 import com.duckduckgo.sync.impl.ExchangeResult.Pending
@@ -41,6 +42,8 @@ import com.duckduckgo.sync.impl.SyncAccountRepository
 import com.duckduckgo.sync.impl.SyncAuthCode
 import com.duckduckgo.sync.impl.SyncAuthCode.Exchange
 import com.duckduckgo.sync.impl.SyncAuthCode.Unknown
+import com.duckduckgo.sync.impl.SyncCodeDispatcher
+import com.duckduckgo.sync.impl.SyncFeature
 import com.duckduckgo.sync.impl.getOrNull
 import com.duckduckgo.sync.impl.onFailure
 import com.duckduckgo.sync.impl.onSuccess
@@ -70,9 +73,15 @@ class SyncConnectViewModel @Inject constructor(
     private val clipboard: Clipboard,
     private val syncPixels: SyncPixels,
     private val dispatchers: DispatcherProvider,
+    private val syncFeature: SyncFeature,
+    private val codeDispatcher: SyncCodeDispatcher,
 ) : ViewModel() {
     private val command = Channel<Command>(1, DROP_OLDEST)
     fun commands(): Flow<Command> = command.receiveAsFlow()
+
+    // M1.5: cached v2 linking code so onCopyCodeClicked can return it for the v2 path.
+    // Null when the v1 path is active.
+    private var v2LinkingCode: String? = null
 
     private val viewState = MutableStateFlow(ViewState())
     fun viewState(source: String?): Flow<ViewState> = viewState.onStart {
@@ -81,6 +90,10 @@ class SyncConnectViewModel @Inject constructor(
 
     private fun pollConnectionKeys(source: String?) {
         viewModelScope.launch(dispatchers.io()) {
+            if (shouldUseV2()) {
+                startV2Present()
+                return@launch
+            }
             showQRCode()
             var polling = true
             while (polling) {
@@ -102,6 +115,44 @@ class SyncConnectViewModel @Inject constructor(
                     }
             }
         }
+    }
+
+    private fun shouldUseV2(): Boolean =
+        syncFeature.canUseV2ConnectFlow().isEnabled() &&
+            syncFeature.canShowV2ConnectCode().isEnabled()
+
+    /**
+     * Drive a v2 Presenter session through the dispatcher. M1.5 (subtask `1215246284113165`)
+     * extends M1's signed-in pattern to this signed-out surface. Role election may make this
+     * device Joiner (peer has account: Scenario A — Native; Scenario C — 3party) or Host
+     * (both signed-out: Scenario B, with account-creation-on-demand at Host.Sending via
+     * `RecoveryCodeProvider.createDdgAccountIfNeeded()` per subtask `1215168582640073`).
+     */
+    private suspend fun startV2Present() {
+        codeDispatcher.presentV2().collect { outcome ->
+            when (outcome) {
+                is DispatchOutcome.LinkingCodeReady -> renderV2QrCode(outcome.linkingCode)
+                is DispatchOutcome.HostConfirmationRequested -> command.send(Command.AskHostConfirmation(outcome.peerName))
+                is DispatchOutcome.JoinerConfirmationRequested -> command.send(Command.AskJoinerConfirmation(outcome.peerName))
+                is DispatchOutcome.LoggedIn,
+                is DispatchOutcome.AlreadyConnected,
+                -> {
+                    fireLoginPixels()
+                    command.send(LoginSuccess)
+                }
+                is DispatchOutcome.UpgradeRequired,
+                is DispatchOutcome.Failed,
+                -> command.send(ShowError(R.string.sync_connect_login_error))
+            }
+        }
+    }
+
+    private suspend fun renderV2QrCode(linkingCode: String) {
+        v2LinkingCode = linkingCode
+        val bitmap = withContext(dispatchers.io()) {
+            qrEncoder.encodeAsBitmap(linkingCode, dimen.qrSizeSmall, dimen.qrSizeSmall)
+        }
+        viewState.emit(viewState.value.copy(qrCodeBitmap = bitmap))
     }
 
     private suspend fun pollForRecoveryKey() {
@@ -149,6 +200,13 @@ class SyncConnectViewModel @Inject constructor(
 
     fun onCopyCodeClicked() {
         viewModelScope.launch(dispatchers.io()) {
+            val v2Code = v2LinkingCode
+            if (v2Code != null) {
+                clipboard.copyToClipboard(v2Code)
+                command.send(ShowMessage(R.string.sync_code_copied_message))
+                syncPixels.fireSyncSetupCodeCopiedToClipboard(SYNC_CONNECT)
+                return@launch
+            }
             syncAccountRepository.getConnectQR().getOrNull()?.let { code ->
                 logcat { "Sync: code available for sharing manually: $code" }
                 clipboard.copyToClipboard(code.rawCode)
@@ -168,6 +226,12 @@ class SyncConnectViewModel @Inject constructor(
         data class ShowMessage(val messageId: Int) : Command()
         data object FinishWithError : Command()
         data class ShowError(@StringRes val message: Int, val reason: String = "") : Command()
+
+        /** v2 §"Exchange Confirmations": prompt user "Sync your data with [peerName]?". */
+        data class AskJoinerConfirmation(val peerName: String?) : Command()
+
+        /** v2 §"Exchange Confirmations": prompt user "Allow [peerName] to join your sync?". */
+        data class AskHostConfirmation(val peerName: String?) : Command()
     }
 
     fun onReadTextCodeClicked() {
@@ -223,6 +287,11 @@ class SyncConnectViewModel @Inject constructor(
             command.send(LoginSuccess)
         }
     }
+
+    fun onJoinerConfirmed() { codeDispatcher.confirmJoiner() }
+    fun onJoinerDenied() { codeDispatcher.denyJoiner() }
+    fun onHostConfirmed() { codeDispatcher.confirmHost() }
+    fun onHostDenied() { codeDispatcher.denyHost() }
 
     private fun fireLoginPixels() {
         syncPixels.fireLoginPixel()

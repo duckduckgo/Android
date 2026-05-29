@@ -165,6 +165,13 @@ class SyncConnectActivity : DuckDuckGoActivity() {
 
             is ShowMessage -> Snackbar.make(binding.root, it.messageId, Snackbar.LENGTH_SHORT).show()
             is ShowError -> showError(it)
+            // M1.5: v2 confirmation prompts. Dialog rendering arrives in Task 3 (subtask
+            // `1215246284113165`). Until then, log and ignore so the surface still compiles.
+            is Command.AskJoinerConfirmation,
+            is Command.AskHostConfirmation,
+            -> {
+                // Will be replaced by dialog rendering in Task 3.
+            }
         }
     }
 
