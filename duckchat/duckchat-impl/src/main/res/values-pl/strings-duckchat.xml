@@ -115,4 +115,41 @@
 
     <!-- Duck AI Voice Chat Shortcut Setting -->
     <string name="duckAiVoiceChatVisibilitySetting" instruction="Voice Chat is a feature that lets users talk to Duck.ai using their voice instead of typing.">Czat głosowy</string>
+
+    <!-- Native Duck.ai chat history -->
+    <string name="duck_ai_chat_history_title">Czaty</string>
+    <string name="duck_ai_chat_history_section_pinned">Przypięte</string>
+    <string name="duck_ai_chat_history_section_recent">Ostatnie</string>
+    <string name="duck_ai_chat_history_untitled">Czat bez tytułu</string>
+    <string name="duck_ai_chat_history_empty_title">Nie ma jeszcze czatów</string>
+    <string name="duck_ai_chat_history_empty_cta_open">Otwórz Duck.ai</string>
+    <string name="duck_ai_chat_history_more_options">Więcej opcji</string>
+    <string name="duck_ai_chat_history_action_select">Wybierz</string>
+    <string name="duck_ai_chat_history_action_pin">Przypnij</string>
+    <string name="duck_ai_chat_history_action_unpin">Odepnij</string>
+    <string name="duck_ai_chat_history_action_rename">Zmień nazwę</string>
+    <string name="duck_ai_chat_history_action_download">Pobierz</string>
+    <string name="duck_ai_chat_history_action_delete">Usuń</string>
+    <string name="duck_ai_chat_history_search_hint">Wyszukaj czaty</string>
+    <string name="duck_ai_chat_history_action_search_content_description">Wyszukaj czaty</string>
+    <string name="duck_ai_chat_history_search_close_content_description">Zamknij wyszukiwanie</string>
+    <string name="duck_ai_chat_history_search_clear_content_description">Wyczyść wyszukiwanie</string>
+    <string name="duck_ai_chat_history_action_fire_content_description">Usuń czaty</string>
+    <string name="duck_ai_chat_history_action_overflow_content_description">Otwórz menu przepełnienia</string>
+    <string name="duck_ai_chat_history_select_all">Wybierz wszystko</string>
+    <string name="duck_ai_chat_history_unselect_all">Anuluj wybór wszystkiego</string>
+    <string name="duck_ai_chat_history_row_selected_content_description">Wybrano</string>
+    <string name="duck_ai_chat_history_row_unselected_content_description">Nie wybrano</string>
+    <string name="duck_ai_chat_history_exit_select_mode_content_description">Wyjdź z trybu wyboru</string>
+    <string name="duck_ai_chat_history_rename_title">Zmień nazwę czatu</string>
+    <string name="duck_ai_chat_history_rename_chat_title_hint">Tytuł czatu</string>
+    <string name="duck_ai_chat_history_rename_confirm_title">Zapisz</string>
+    <string name="duck_ai_chat_history_rename_confirm_content_description">Zapisz tytuł czatu</string>
+    <string name="duck_ai_chat_history_rename_error">Nie udało się zmienić nazwy czatu</string>
+    <string name="duck_ai_chat_history_pin_snackbar">Czat przypięty</string>
+    <string name="duck_ai_chat_history_unpin_snackbar">Czat odpięty</string>
+    <string name="duck_ai_chat_history_undo">Cofnij</string>
+    <string name="duck_ai_chat_history_download_complete" instruction="%1$s is the saved chat filename (e.g. \&apos;My Chat.txt\&apos;).">Zakończono pobieranie pliku %1$s</string>
+    <string name="duck_ai_chat_history_download_view">Pokaż</string>
+    <string name="duck_ai_chat_history_download_error">Nie udało się wyeksportować czatu</string>
 </resources>
