@@ -20,7 +20,8 @@
     android:layout_height="wrap_content"
     android:layout_gravity="bottom"
     android:clipChildren="false"
-    android:clipToPadding="false">
+    android:clipToPadding="false"
+    android:theme="?attr/daxInputModeCardThemeOverlay">
 
     <LinearLayout
         android:layout_width="match_parent"

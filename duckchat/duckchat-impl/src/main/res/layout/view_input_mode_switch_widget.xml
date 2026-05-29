@@ -96,6 +96,7 @@
             android:layout_height="wrap_content"
             android:clipChildren="false"
             android:clipToPadding="false"
+            android:theme="?attr/daxInputModeCardThemeOverlay"
             app:cardElevation="0dp"
             app:strokeColor="?attr/daxColorAccentBlue"
             app:strokeWidth="@dimen/omnibarOutlineWidth"

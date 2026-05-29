@@ -19,6 +19,7 @@
     android:id="@+id/inputModeTopRoot"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:theme="?attr/daxInputModeCardThemeOverlay"
     android:layout_gravity="top">
 
     <!-- Negative top margin pulls the card up to account for the shadow -->
