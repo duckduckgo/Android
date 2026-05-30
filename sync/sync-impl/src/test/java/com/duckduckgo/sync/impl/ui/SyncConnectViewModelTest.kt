@@ -29,6 +29,7 @@ import com.duckduckgo.sync.TestSyncFixtures.primaryKey
 import com.duckduckgo.sync.impl.AccountErrorCodes.ALREADY_SIGNED_IN
 import com.duckduckgo.sync.impl.AccountErrorCodes.CONNECT_FAILED
 import com.duckduckgo.sync.impl.AccountErrorCodes.LOGIN_FAILED
+import com.duckduckgo.sync.impl.AccountInfo
 import com.duckduckgo.sync.impl.Clipboard
 import com.duckduckgo.sync.impl.ConnectCode
 import com.duckduckgo.sync.impl.QREncoder
@@ -55,6 +56,7 @@ import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert
 import org.junit.Assert.assertTrue
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -106,6 +108,14 @@ class SyncConnectViewModelTest {
         syncFeature,
         codeDispatcher,
     )
+
+    @Before
+    fun setup() {
+        // SyncConnect VM short-circuits pollConnectionKeys() if the user is already signed in
+        // (returning from a successful EnterCode pair). Default to "no account" so existing
+        // tests that exercise the QR/v2-present flow still run their setup path.
+        whenever(syncRepository.getAccountInfo()).thenReturn(AccountInfo())
+    }
 
     @Test
     fun whenScreenStartedThenShowQRCode() = runTest {

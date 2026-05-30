@@ -90,6 +90,13 @@ class SyncConnectViewModel @Inject constructor(
 
     private fun pollConnectionKeys(source: String?) {
         viewModelScope.launch(dispatchers.io()) {
+            if (syncAccountRepository.getAccountInfo().primaryKey.isNotEmpty()) {
+                // Already signed in. Likely returning from a successful EnterCode pair; the
+                // launcher callback's onLoginSuccess() will finish the activity. Skip starting
+                // a new session to avoid wasting a channel allocation.
+                logcat { "Sync-CodeDispatch: SyncConnect signed in already; skipping new session" }
+                return@launch
+            }
             if (shouldUseV2()) {
                 startV2Present()
                 return@launch

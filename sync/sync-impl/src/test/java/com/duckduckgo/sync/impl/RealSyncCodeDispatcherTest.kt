@@ -725,6 +725,69 @@ class RealSyncCodeDispatcherTest {
         verify(runner).cancel()
     }
 
+    @Test fun `presentV2 terminates silently when another SessionStarted with different channel arrives`() = runTest {
+        val outcomes = mutableListOf<DispatchOutcome>()
+        val job = launch(start = kotlinx.coroutines.CoroutineStart.UNDISPATCHED) {
+            dispatcher.presentV2().toList(outcomes)
+        }
+        // First SessionStarted establishes the Flow's own channel.
+        runnerEventsFlow.emit(sessionStarted(linkingCode = "code-for-own-channel"))
+        // Second SessionStarted with a different channel — simulates preemption by another caller.
+        runnerEventsFlow.emit(
+            ExchangeV2Event.SessionStarted(
+                timestampMs = System.currentTimeMillis(),
+                pairingRole = PairingRole.Scanner,
+                ownChannelId = "other-channel",
+                linkingCode = null,
+            ),
+        )
+        job.join()
+
+        // The Flow should have completed silently after emitting just the first LinkingCodeReady.
+        assertEquals(1, outcomes.size)
+        assertEquals(DispatchOutcome.LinkingCodeReady("code-for-own-channel"), outcomes.single())
+    }
+
+    @Test fun `driveV2Linking terminates silently when another SessionStarted with different channel arrives`() = runTest {
+        setV2(true)
+        whenever(qrCode.parse(any())).thenReturn(
+            com.duckduckgo.sync.impl.exchange.v2.ExchangeV2CodeParseResult.LinkingV2(
+                channelId = "peer-channel",
+                publicKey = "k",
+                version = "2",
+            ),
+        )
+        val decision = dispatcher.route("v2-url") as RouteDecision.V2InProgress
+
+        val outcomes = mutableListOf<DispatchOutcome>()
+        val job = launch(start = kotlinx.coroutines.CoroutineStart.UNDISPATCHED) {
+            decision.outcomes.toList(outcomes)
+        }
+        // First SessionStarted establishes the Scanner's own channel.
+        runnerEventsFlow.emit(
+            ExchangeV2Event.SessionStarted(
+                timestampMs = System.currentTimeMillis(),
+                pairingRole = PairingRole.Scanner,
+                ownChannelId = "scanner-own-channel",
+                linkingCode = null,
+            ),
+        )
+        // Second SessionStarted with a different channel — simulates preemption.
+        runnerEventsFlow.emit(
+            ExchangeV2Event.SessionStarted(
+                timestampMs = System.currentTimeMillis(),
+                pairingRole = PairingRole.Presenter,
+                ownChannelId = "different-channel",
+                linkingCode = "code",
+            ),
+        )
+        job.join()
+
+        // The Flow should have completed silently — no outcomes emitted (Scanner side never
+        // emits anything for the initial SessionStarted because linkingCode=null on its side).
+        assertTrue("expected no outcomes, got $outcomes", outcomes.isEmpty())
+    }
+
     @Test fun `presentV2 filters out events from before session start`() = runTest {
         // Seed a stale Host_Done from a prior session with timestamp=1L (well before now).
         val staleFlow = MutableSharedFlow<ExchangeV2Event>(replay = 10)

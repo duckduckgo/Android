@@ -114,7 +114,7 @@ class SyncWithAnotherDeviceActivity : DuckDuckGoActivity() {
     private fun observeUiEvents() {
         viewModel
             .viewState(isDeepLink = isDeepLinkSetup())
-            .flowWithLifecycle(lifecycle, Lifecycle.State.CREATED)
+            .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
             .onEach { render(it) }
             .launchIn(lifecycleScope)
         viewModel

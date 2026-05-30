@@ -31,7 +31,6 @@ import dagger.SingleInstanceIn
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.transformWhile
 import logcat.logcat
@@ -84,10 +83,26 @@ class RealSyncCodeDispatcher @Inject constructor(
         val sessionStartMs = System.currentTimeMillis()
         logcat { "$TAG: V2 Presenter starting runner.startPresent (scoped to events since $sessionStartMs)" }
         runner.startPresent()
+        var ownChannelId: String? = null
         emitAll(
             runner.eventsSince(sessionStartMs)
-                .mapNotNull { mapV2PresentEventToOutcome(it) }
-                .transformWhile { outcome ->
+                .transformWhile { event ->
+                    // Latch our session's channelId on the first SessionStarted. If a later
+                    // SessionStarted arrives with a different channelId, the shared runner has
+                    // been preempted by another caller (route()/startScan from EnterCode, for
+                    // example). Terminate silently without emitting any DispatchOutcome — the
+                    // new caller's Flow now owns the runner. Defence-in-depth against the
+                    // duplicate-login race; the activity-side lifecycle scope normally prevents
+                    // this from happening at all, but this catches the transition window.
+                    if (event is ExchangeV2Event.SessionStarted) {
+                        if (ownChannelId == null) {
+                            ownChannelId = event.ownChannelId
+                        } else if (event.ownChannelId != ownChannelId) {
+                            logcat { "$TAG: V2 Presenter flow preempted (own=$ownChannelId, new=${event.ownChannelId}); terminating silently" }
+                            return@transformWhile false
+                        }
+                    }
+                    val outcome = mapV2PresentEventToOutcome(event) ?: return@transformWhile true
                     emit(outcome)
                     !outcome.isTerminal()
                 },
@@ -246,10 +261,21 @@ class RealSyncCodeDispatcher @Inject constructor(
         val sessionStartMs = System.currentTimeMillis()
         logcat { "$TAG: V2 LinkingV2 starting runner.startScan (scoped to events since $sessionStartMs)" }
         runner.startScan(pastedCode)
+        var ownChannelId: String? = null
         emitAll(
             runner.eventsSince(sessionStartMs)
-                .mapNotNull { mapV2LinkingEventToOutcome(it) }
-                .transformWhile { outcome ->
+                .transformWhile { event ->
+                    // Same preemption guard as presentV2(). Defence-in-depth against another
+                    // caller invoking startScan or startPresent on the shared runner mid-flow.
+                    if (event is ExchangeV2Event.SessionStarted) {
+                        if (ownChannelId == null) {
+                            ownChannelId = event.ownChannelId
+                        } else if (event.ownChannelId != ownChannelId) {
+                            logcat { "$TAG: V2 LinkingV2 flow preempted (own=$ownChannelId, new=${event.ownChannelId}); terminating silently" }
+                            return@transformWhile false
+                        }
+                    }
+                    val outcome = mapV2LinkingEventToOutcome(event) ?: return@transformWhile true
                     emit(outcome)
                     !outcome.isTerminal()
                 },
