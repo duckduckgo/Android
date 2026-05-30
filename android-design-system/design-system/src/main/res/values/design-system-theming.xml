@@ -141,6 +141,7 @@
         <item name="daxColorToolbar">?attr/daxColorSurface</item>
         <item name="daxColorBrowserOverlay">?attr/daxColorSurface</item>
         <item name="daxColorOmnibarAccent">?attr/daxColorAccentBlue</item>
+        <item name="daxColorOmnibarAccentContent">@color/white</item>
         <item name="daxColorSnackbarAction">?attr/daxColorAccentBlue</item>
         <item name="daxIconTabSwitcher">@drawable/ic_tab_24</item>
         <item name="daxDrawableTabPlaceholderPreview">@drawable/ic_dax_icon_72</item>

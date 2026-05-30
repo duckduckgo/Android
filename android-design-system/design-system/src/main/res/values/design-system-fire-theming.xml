@@ -19,7 +19,6 @@
     <style name="Theme.DuckDuckGo.Light.Fire" parent="Theme.DuckDuckGo.Light">
         <item name="daxColorTabHighlight">@color/mandarin50</item>
 
-        <!-- Cross-cutting fire accent: omnibar cursor, page progress bar, tab-switcher icons. -->
         <item name="daxColorOmnibarAccent">@color/mandarin50</item>
         <item name="daxOmnibarTextColorHighlight">@color/mandarin50_translucent</item>
         <item name="daxColorAccentAltPrimary">?attr/daxColorOmnibarAccent</item>
@@ -28,7 +27,7 @@
         <item name="colorControlActivated">@color/mandarin50</item>
         <item name="daxColorSnackbarAction">@color/mandarin50</item>
 
-        <item name="daxColorInputModeIndicatorShadow">@color/black</item>
+        <item name="daxColorInputModeIndicatorShadow">?attr/daxColorBlack</item>
 
         <item name="daxIconTabSwitcher">@drawable/ic_tab_fire_mode_24</item>
         <item name="daxDrawableTabPlaceholderPreview">@drawable/ic_fire_tab_placeholder_96</item>
@@ -43,7 +42,9 @@
         <item name="daxColorOmnibarAccent">@color/mandarin40</item>
         <item name="daxOmnibarTextColorHighlight">@color/mandarin40_translucent</item>
         <item name="daxColorAccentAltPrimary">?attr/daxColorOmnibarAccent</item>
-        <item name="daxColorAccentAltContentPrimary">?attr/daxColorWhite</item>
+
+        <item name="daxColorAccentAltContentPrimary">?attr/daxColorBlack</item>
+        <item name="daxColorOmnibarAccentContent">?attr/daxColorBlack</item>
 
         <item name="colorControlActivated">@color/mandarin40</item>
         <item name="daxColorSnackbarAction">@color/mandarin40</item>
@@ -76,19 +77,17 @@
     <style name="ThemeOverlay.DuckDuckGo.InputModeCard.None" parent="" />
 
     <style name="ThemeOverlay.DuckDuckGo.InputModeCard.DarkFire" parent="Theme.DuckDuckGo.Dark.Fire">
-        <!-- The card uses the dark Fire palette, but on a light screen the accent stays the darker,
-             more saturated Light-Fire mandarin50 (cursor, selection highlight, submit button). -->
         <item name="daxColorOmnibarAccent">@color/mandarin50</item>
         <item name="daxOmnibarTextColorHighlight">@color/mandarin50_translucent</item>
         <item name="daxColorAccentAltPrimary">?attr/daxColorOmnibarAccent</item>
         <item name="daxColorAccentAltContentPrimary">?attr/daxColorWhite</item>
+        <item name="daxColorOmnibarAccentContent">?attr/daxColorWhite</item>
         <item name="colorControlActivated">@color/mandarin50</item>
     </style>
 
     <color name="omnibar_card_fire_light">#3D3D3D</color>
     <color name="omnibar_card_fire_dark">#1C1C1C</color>
 
-    <!-- ~20% alpha — matches the Figma "Mandarin 40, 20%" swatch for selection highlights -->
     <color name="mandarin50_translucent">#33F05F2B</color>
     <color name="mandarin40_translucent">#33FF8D5C</color>
 

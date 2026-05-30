@@ -338,7 +338,7 @@
                         android:importantForAccessibility="no"
                         android:scaleType="centerInside"
                         android:src="@drawable/ic_arrow_up_24"
-                        app:tint="?attr/daxColorWhite" />
+                        app:tint="?attr/daxColorOmnibarAccentContent" />
 
 
                 </androidx.constraintlayout.widget.ConstraintLayout>

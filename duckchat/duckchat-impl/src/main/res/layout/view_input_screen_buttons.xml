@@ -77,6 +77,6 @@
         android:scaleType="centerInside"
         android:src="@drawable/ic_find_search_24"
         android:visibility="gone"
-        app:tint="?attr/daxColorWhite" />
+        app:tint="?attr/daxColorOmnibarAccentContent" />
 
 </LinearLayout>
