@@ -22,6 +22,8 @@
         <!-- Cross-cutting fire accent: omnibar cursor, page progress bar, tab-switcher icons. -->
         <item name="daxColorOmnibarAccent">@color/mandarin50</item>
         <item name="daxOmnibarTextColorHighlight">@color/mandarin50_translucent</item>
+        <item name="daxColorAccentAltPrimary">?attr/daxColorOmnibarAccent</item>
+        <item name="daxColorAccentAltContentPrimary">?attr/daxColorWhite</item>
 
         <item name="colorControlActivated">@color/mandarin50</item>
         <item name="daxColorSnackbarAction">@color/mandarin50</item>
@@ -40,6 +42,8 @@
 
         <item name="daxColorOmnibarAccent">@color/mandarin40</item>
         <item name="daxOmnibarTextColorHighlight">@color/mandarin40_translucent</item>
+        <item name="daxColorAccentAltPrimary">?attr/daxColorOmnibarAccent</item>
+        <item name="daxColorAccentAltContentPrimary">?attr/daxColorWhite</item>
 
         <item name="colorControlActivated">@color/mandarin40</item>
         <item name="daxColorSnackbarAction">@color/mandarin40</item>
@@ -76,6 +80,8 @@
              more saturated Light-Fire mandarin50 (cursor, selection highlight, submit button). -->
         <item name="daxColorOmnibarAccent">@color/mandarin50</item>
         <item name="daxOmnibarTextColorHighlight">@color/mandarin50_translucent</item>
+        <item name="daxColorAccentAltPrimary">?attr/daxColorOmnibarAccent</item>
+        <item name="daxColorAccentAltContentPrimary">?attr/daxColorWhite</item>
         <item name="colorControlActivated">@color/mandarin50</item>
     </style>
 

@@ -153,6 +153,7 @@
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/inputModeWidgetCard"
             style="@style/Widget.DuckDuckGo.OmnibarCardView"
+            android:theme="?attr/daxInputModeCardThemeOverlay"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="@dimen/keyline_4"
@@ -332,7 +333,7 @@
                         app:layout_constraintTop_toTopOf="parent"
                         app:layout_constraintBottom_toBottomOf="parent"
                         android:background="@drawable/background_input_screen_button"
-                        android:backgroundTint="?attr/daxColorButtonPrimaryContainer"
+                        android:backgroundTint="?attr/daxColorOmnibarAccent"
                         android:foreground="@drawable/selectable_circular_ripple"
                         android:importantForAccessibility="no"
                         android:scaleType="centerInside"
@@ -361,6 +362,7 @@
 
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/contextualNativeInputCard"
+            android:theme="?attr/daxInputModeCardThemeOverlay"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"

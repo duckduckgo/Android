@@ -71,7 +71,7 @@
         android:layout_height="36dp"
         android:layout_marginStart="8dp"
         android:background="@drawable/background_input_screen_button"
-        android:backgroundTint="?attr/daxColorButtonPrimaryContainer"
+        android:backgroundTint="?attr/daxColorOmnibarAccent"
         android:foreground="@drawable/selectable_circular_ripple"
         android:importantForAccessibility="no"
         android:scaleType="centerInside"

@@ -17,7 +17,7 @@
         android:id="@+id/inputModeUnifiedBack"
         android:layout_width="36dp"
         android:layout_height="36dp"
-        android:background="@drawable/selectable_circular_container_ripple"
+        android:background="@drawable/selectable_item_rounded_corner_background"
         android:importantForAccessibility="no"
         android:scaleType="centerInside"
         android:visibility="gone"
