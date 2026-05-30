@@ -90,11 +90,15 @@ class SyncConnectViewModel @Inject constructor(
 
     private fun pollConnectionKeys(source: String?) {
         viewModelScope.launch(dispatchers.io()) {
-            if (syncAccountRepository.getAccountInfo().primaryKey.isNotEmpty()) {
-                // Already signed in. Likely returning from a successful EnterCode pair; the
-                // launcher callback's onLoginSuccess() will finish the activity. Skip starting
-                // a new session to avoid wasting a channel allocation.
-                logcat { "Sync-CodeDispatch: SyncConnect signed in already; skipping new session" }
+            // SyncConnect is the signed-out entry point. The user can pair via EnterCode (a
+            // child activity) which signs the device in; the launcher callback then finishes
+            // this activity via onLoginSuccess(). In the brief window between EnterCode-success
+            // and this activity finishing, viewState re-enters STARTED and onStart re-fires —
+            // we don't want to spin up a fresh v2 session for a user who's already signed in.
+            // The signed-in M1 sibling (SyncWithAnotherActivityViewModel) has no analogous guard
+            // because that surface is signed-in-only by design.
+            if (syncAccountRepository.getAccountInfo().isSignedIn) {
+                logcat { "Sync: SyncConnect already signed in; skipping new session" }
                 return@launch
             }
             if (shouldUseV2()) {

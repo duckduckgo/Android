@@ -114,6 +114,9 @@ class SyncWithAnotherDeviceActivity : DuckDuckGoActivity() {
     private fun observeUiEvents() {
         viewModel
             .viewState(isDeepLink = isDeepLinkSetup())
+            // viewState at STARTED (not CREATED): parity with SyncConnectActivity. The v2
+            // Presenter session tears down on navigation-away and a fresh session starts
+            // on return. Commands stay at CREATED so terminal commands aren't dropped.
             .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
             .onEach { render(it) }
             .launchIn(lifecycleScope)

@@ -131,6 +131,12 @@ class SyncConnectActivity : DuckDuckGoActivity() {
     private fun observeUiEvents() {
         viewModel
             .viewState(extractSource())
+            // viewState at STARTED (not CREATED): when the user navigates away (e.g. to
+            // EnterCodeActivity), we want the v2 Presenter session to tear down cleanly so
+            // it doesn't observe the new EnterCodeViewModel's runner events. Coming back
+            // re-fires viewState.onStart and starts a fresh session. Commands stay at
+            // CREATED below so terminal commands (LoginSuccess, ShowError) aren't dropped
+            // during transitions.
             .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
             .onEach { render(it) }
             .launchIn(lifecycleScope)
