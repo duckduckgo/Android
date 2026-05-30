@@ -17,15 +17,15 @@
 <resources>
 
     <style name="Theme.DuckDuckGo.Light.Fire" parent="Theme.DuckDuckGo.Light">
-        <item name="daxColorTabHighlight">@color/mandarin50</item>
+        <item name="daxColorTabHighlight">?attr/daxColorFireModeAccentLight</item>
 
-        <item name="daxColorOmnibarAccent">@color/mandarin50</item>
-        <item name="daxOmnibarTextColorHighlight">@color/mandarin50_translucent</item>
+        <item name="daxColorOmnibarAccent">?attr/daxColorFireModeAccentLight</item>
+        <item name="daxOmnibarTextColorHighlight">?attr/daxColorFireModeAccentLightTranslucent</item>
         <item name="daxColorAccentAltPrimary">?attr/daxColorOmnibarAccent</item>
         <item name="daxColorAccentAltContentPrimary">?attr/daxColorWhite</item>
 
-        <item name="colorControlActivated">@color/mandarin50</item>
-        <item name="daxColorSnackbarAction">@color/mandarin50</item>
+        <item name="colorControlActivated">?attr/daxColorFireModeAccentLight</item>
+        <item name="daxColorSnackbarAction">?attr/daxColorFireModeAccentLight</item>
 
         <item name="daxColorInputModeIndicatorShadow">?attr/daxColorBlack</item>
 
@@ -37,17 +37,17 @@
     </style>
 
     <style name="Theme.DuckDuckGo.Dark.Fire" parent="Theme.DuckDuckGo.Dark">
-        <item name="daxColorTabHighlight">@color/mandarin40</item>
+        <item name="daxColorTabHighlight">?attr/daxColorFireModeAccentDark</item>
 
-        <item name="daxColorOmnibarAccent">@color/mandarin40</item>
-        <item name="daxOmnibarTextColorHighlight">@color/mandarin40_translucent</item>
+        <item name="daxColorOmnibarAccent">?attr/daxColorFireModeAccentDark</item>
+        <item name="daxOmnibarTextColorHighlight">?attr/daxColorFireModeAccentDarkTranslucent</item>
         <item name="daxColorAccentAltPrimary">?attr/daxColorOmnibarAccent</item>
 
         <item name="daxColorAccentAltContentPrimary">?attr/daxColorBlack</item>
         <item name="daxColorOmnibarAccentContent">?attr/daxColorBlack</item>
 
-        <item name="colorControlActivated">@color/mandarin40</item>
-        <item name="daxColorSnackbarAction">@color/mandarin40</item>
+        <item name="colorControlActivated">?attr/daxColorFireModeAccentDark</item>
+        <item name="daxColorSnackbarAction">?attr/daxColorFireModeAccentDark</item>
 
         <item name="daxIconTabSwitcher">@drawable/ic_tab_fire_mode_24</item>
         <item name="daxDrawableTabPlaceholderPreview">@drawable/ic_fire_tab_placeholder_96</item>
@@ -59,16 +59,16 @@
 
     <style name="ThemeOverlay.DuckDuckGo.Omnibar.FireLight" parent="Theme.DuckDuckGo.Dark">
         <item name="daxColorWindow">@color/omnibar_card_fire_light</item>
-        <item name="daxColorOmnibarAccent">@color/mandarin50</item>
-        <item name="daxOmnibarTextColorHighlight">@color/mandarin50_translucent</item>
-        <item name="colorControlActivated">@color/mandarin50</item>
+        <item name="daxColorOmnibarAccent">?attr/daxColorFireModeAccentLight</item>
+        <item name="daxOmnibarTextColorHighlight">?attr/daxColorFireModeAccentLightTranslucent</item>
+        <item name="colorControlActivated">?attr/daxColorFireModeAccentLight</item>
     </style>
 
     <style name="ThemeOverlay.DuckDuckGo.Omnibar.FireDark" parent="Theme.DuckDuckGo.Dark">
         <item name="daxColorWindow">@color/omnibar_card_fire_dark</item>
-        <item name="daxColorOmnibarAccent">@color/mandarin40</item>
-        <item name="daxOmnibarTextColorHighlight">@color/mandarin40_translucent</item>
-        <item name="colorControlActivated">@color/mandarin40</item>
+        <item name="daxColorOmnibarAccent">?attr/daxColorFireModeAccentDark</item>
+        <item name="daxOmnibarTextColorHighlight">?attr/daxColorFireModeAccentDarkTranslucent</item>
+        <item name="colorControlActivated">?attr/daxColorFireModeAccentDark</item>
     </style>
 
     <!-- Applied to the input mode widget card via android:theme. The DarkFire variant re-applies the
@@ -77,18 +77,15 @@
     <style name="ThemeOverlay.DuckDuckGo.InputModeCard.None" parent="" />
 
     <style name="ThemeOverlay.DuckDuckGo.InputModeCard.DarkFire" parent="Theme.DuckDuckGo.Dark.Fire">
-        <item name="daxColorOmnibarAccent">@color/mandarin50</item>
-        <item name="daxOmnibarTextColorHighlight">@color/mandarin50_translucent</item>
+        <item name="daxColorOmnibarAccent">?attr/daxColorFireModeAccentLight</item>
+        <item name="daxOmnibarTextColorHighlight">?attr/daxColorFireModeAccentLightTranslucent</item>
         <item name="daxColorAccentAltPrimary">?attr/daxColorOmnibarAccent</item>
         <item name="daxColorAccentAltContentPrimary">?attr/daxColorWhite</item>
         <item name="daxColorOmnibarAccentContent">?attr/daxColorWhite</item>
-        <item name="colorControlActivated">@color/mandarin50</item>
+        <item name="colorControlActivated">?attr/daxColorFireModeAccentLight</item>
     </style>
 
     <color name="omnibar_card_fire_light">#3D3D3D</color>
     <color name="omnibar_card_fire_dark">#1C1C1C</color>
-
-    <color name="mandarin50_translucent">#33F05F2B</color>
-    <color name="mandarin40_translucent">#33FF8D5C</color>
 
 </resources>

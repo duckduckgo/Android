@@ -349,6 +349,12 @@
     <attr name="daxColorFireButtonTwo" format="color"/>
     <attr name="daxColorFireButtonThree" format="color"/>
 
+    <!-- Fire Mode Accent -->
+    <attr name="daxColorFireModeAccentLight" format="color"/>
+    <attr name="daxColorFireModeAccentDark" format="color"/>
+    <attr name="daxColorFireModeAccentLightTranslucent" format="color"/>
+    <attr name="daxColorFireModeAccentDarkTranslucent" format="color"/>
+
     <!-- Shadows -->
     <color name="background_omnibar_shadow">#FF000000</color>
 

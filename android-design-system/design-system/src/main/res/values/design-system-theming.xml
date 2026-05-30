@@ -136,6 +136,10 @@
         <item name="daxColorDim">@color/black60</item>
         <item name="daxColorWhite">@color/white</item>
         <item name="daxColorBlack">@color/black84</item>
+        <item name="daxColorFireModeAccentLight">@color/mandarin50</item>
+        <item name="daxColorFireModeAccentDark">@color/mandarin40</item>
+        <item name="daxColorFireModeAccentLightTranslucent">@color/mandarin50_translucent</item>
+        <item name="daxColorFireModeAccentDarkTranslucent">@color/mandarin40_translucent</item>
         <item name="preferredStatusBarColor">?attr/daxColorSurface</item>
         <item name="preferredNavigationBarColor">?attr/daxColorSurface</item>
         <item name="daxColorToolbar">?attr/daxColorSurface</item>
