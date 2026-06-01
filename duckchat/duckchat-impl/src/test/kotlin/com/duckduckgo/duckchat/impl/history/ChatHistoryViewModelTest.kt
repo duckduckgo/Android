@@ -18,6 +18,8 @@ package com.duckduckgo.duckchat.impl.history
 
 import app.cash.turbine.TurbineTestContext
 import app.cash.turbine.test
+import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.common.test.CoroutineTestRule
@@ -33,6 +35,7 @@ import com.duckduckgo.duckchat.impl.models.ModelDisplay
 import com.duckduckgo.duckchat.impl.models.ModelProvider
 import com.duckduckgo.duckchat.impl.models.ModelState
 import com.duckduckgo.duckchat.impl.models.ReasoningMode
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
@@ -41,6 +44,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 
@@ -59,6 +63,7 @@ class ChatHistoryViewModelTest {
     }
     private val duckAiModelManager = FakeDuckAiModelManager()
     private val tabRepository: TabRepository = mock()
+    private val pixel: Pixel = mock()
     private val viewModel = ChatHistoryViewModel(
         repository,
         coroutineRule.testScope,
@@ -67,6 +72,7 @@ class ChatHistoryViewModelTest {
         duckAiFeatureState,
         duckAiModelManager,
         tabRepository,
+        pixel,
     )
 
     @Test
@@ -1097,6 +1103,219 @@ class ChatHistoryViewModelTest {
             assertEquals(ChatHistoryUiState.Mode.Default, final.mode)
         }
         assertEquals(setOf("a", "b"), repository.exportedChats.toSet())
+    }
+
+    // --- Pixels ---
+
+    @Test
+    fun `onChatRowClicked in default mode fires chat opened`() = runTest {
+        source.value = listOf(item("a"))
+        viewModel.uiState.test {
+            awaitInitialLoaded() // populates latestItems
+            viewModel.onChatRowClicked("a")
+            cancelAndIgnoreRemainingEvents()
+        }
+        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_HISTORY_CHAT_OPENED_COUNT)
+        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_HISTORY_CHAT_OPENED_DAILY, type = Daily())
+    }
+
+    @Test
+    fun `onOpenDuckAiClicked fires empty cta tapped`() = runTest {
+        viewModel.onOpenDuckAiClicked()
+        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_HISTORY_EMPTY_CTA_TAPPED_COUNT)
+        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_HISTORY_EMPTY_CTA_TAPPED_DAILY, type = Daily())
+    }
+
+    @Test
+    fun `onSearchActivated fires search activated`() = runTest {
+        viewModel.onSearchActivated()
+        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_HISTORY_SEARCH_ACTIVATED_COUNT)
+        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_HISTORY_SEARCH_ACTIVATED_DAILY, type = Daily())
+    }
+
+    @Test
+    fun `onFireIconClicked in default mode fires fire-all tapped`() = runTest {
+        source.value = listOf(item("a"))
+        viewModel.uiState.test {
+            awaitInitialLoaded()
+            viewModel.onFireIconClicked()
+            cancelAndIgnoreRemainingEvents()
+        }
+        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_HISTORY_FIRE_ALL_TAPPED_COUNT)
+        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_HISTORY_FIRE_ALL_TAPPED_DAILY, type = Daily())
+    }
+
+    @Test
+    fun `onFireIconClicked in select mode fires fire-selected tapped`() = runTest {
+        source.value = listOf(item("a"))
+        viewModel.uiState.test {
+            awaitInitialLoaded()
+            viewModel.onEnterSelectMode()
+            awaitItem()
+            viewModel.onFireIconClicked()
+            cancelAndIgnoreRemainingEvents()
+        }
+        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_HISTORY_FIRE_SELECTED_TAPPED_COUNT)
+        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_HISTORY_FIRE_SELECTED_TAPPED_DAILY, type = Daily())
+    }
+
+    @Test
+    fun `onFireAllConfirmed fires fire-all confirmed`() = runTest {
+        source.value = listOf(item("a"), item("b", pinned = true), item("c"))
+        viewModel.uiState.test {
+            awaitInitialLoaded()
+            viewModel.onFireAllRequested()
+            awaitItem()
+            viewModel.onFireAllConfirmed()
+            cancelAndIgnoreRemainingEvents()
+        }
+        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_HISTORY_FIRE_ALL_CONFIRMED_COUNT)
+        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_HISTORY_FIRE_ALL_CONFIRMED_DAILY, type = Daily())
+    }
+
+    @Test
+    fun `onDeleteSelectedRequested with one selection fires fire-selected confirmed`() = runTest {
+        source.value = listOf(item("a"), item("b"))
+        viewModel.uiState.test {
+            awaitInitialLoaded()
+            viewModel.onEnterSelectMode()
+            awaitItem()
+            viewModel.onSelectionToggled("a")
+            awaitItem()
+            viewModel.onDeleteSelectedRequested()
+            cancelAndIgnoreRemainingEvents()
+        }
+        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_HISTORY_FIRE_SELECTED_CONFIRMED_COUNT)
+        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_HISTORY_FIRE_SELECTED_CONFIRMED_DAILY, type = Daily())
+    }
+
+    @Test
+    fun `onDeleteSelectedConfirmed fires fire-selected confirmed`() = runTest {
+        source.value = listOf(item("a"), item("b"), item("c"))
+        viewModel.uiState.test {
+            awaitInitialLoaded()
+            viewModel.onEnterSelectMode()
+            awaitItem()
+            viewModel.onSelectionToggled("a")
+            awaitItem()
+            viewModel.onSelectionToggled("b")
+            awaitItem()
+            viewModel.onDeleteSelectedRequested()
+            awaitItem()
+            viewModel.onDeleteSelectedConfirmed()
+            cancelAndIgnoreRemainingEvents()
+        }
+        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_HISTORY_FIRE_SELECTED_CONFIRMED_COUNT)
+        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_HISTORY_FIRE_SELECTED_CONFIRMED_DAILY, type = Daily())
+    }
+
+    @Test
+    fun `onTogglePin fires pin added when row was unpinned`() = runTest {
+        source.value = listOf(item("a", pinned = false))
+        viewModel.uiState.test {
+            awaitInitialLoaded()
+            viewModel.onTogglePin("a")
+            cancelAndIgnoreRemainingEvents()
+        }
+        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_HISTORY_PIN_ADDED_COUNT)
+        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_HISTORY_PIN_ADDED_DAILY, type = Daily())
+    }
+
+    @Test
+    fun `onTogglePin fires pin removed when row was pinned`() = runTest {
+        source.value = listOf(item("a", pinned = true))
+        viewModel.uiState.test {
+            awaitInitialLoaded()
+            viewModel.onTogglePin("a")
+            cancelAndIgnoreRemainingEvents()
+        }
+        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_HISTORY_PIN_REMOVED_COUNT)
+        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_HISTORY_PIN_REMOVED_DAILY, type = Daily())
+    }
+
+    @Test
+    fun `onRenameRequested fires rename opened`() = runTest {
+        viewModel.onRenameRequested("a", "Title")
+        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_HISTORY_RENAME_OPENED_COUNT)
+        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_HISTORY_RENAME_OPENED_DAILY, type = Daily())
+    }
+
+    @Test
+    fun `onDownloadRequested fires download started`() = runTest {
+        source.value = listOf(item("a"))
+        viewModel.uiState.test {
+            awaitInitialLoaded()
+            viewModel.onDownloadRequested("a")
+            cancelAndIgnoreRemainingEvents()
+        }
+        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_HISTORY_DOWNLOAD_STARTED_COUNT)
+        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_HISTORY_DOWNLOAD_STARTED_DAILY, type = Daily())
+    }
+
+    @Test
+    fun `onEnterSelectMode fires select mode entered`() = runTest {
+        viewModel.onEnterSelectMode()
+        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_HISTORY_SELECT_MODE_ENTERED_COUNT)
+        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_HISTORY_SELECT_MODE_ENTERED_DAILY, type = Daily())
+    }
+
+    @Test
+    fun `onChatRowLongClicked entering from default mode fires select mode entered`() = runTest {
+        source.value = listOf(item("a"))
+        viewModel.uiState.test {
+            awaitInitialLoaded()
+            viewModel.onChatRowLongClicked("a")
+            cancelAndIgnoreRemainingEvents()
+        }
+        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_HISTORY_SELECT_MODE_ENTERED_COUNT)
+        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_HISTORY_SELECT_MODE_ENTERED_DAILY, type = Daily())
+    }
+
+    @Test
+    fun `onSelectAllToggled fires select all toggled`() = runTest {
+        source.value = listOf(item("a"), item("b"))
+        viewModel.uiState.test {
+            awaitInitialLoaded()
+            viewModel.onEnterSelectMode()
+            awaitItem()
+            viewModel.onSelectAllToggled()
+            cancelAndIgnoreRemainingEvents()
+        }
+        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_HISTORY_SELECT_ALL_TOGGLED_COUNT)
+        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_HISTORY_SELECT_ALL_TOGGLED_DAILY, type = Daily())
+    }
+
+    @Test
+    fun `onDeleteSingleChat fires no pixel`() = runTest {
+        source.value = listOf(item("a"))
+        viewModel.uiState.test {
+            awaitInitialLoaded()
+            viewModel.onDeleteSingleChat("a")
+            cancelAndIgnoreRemainingEvents()
+        }
+        verifyNoInteractions(pixel)
+    }
+
+    @Test
+    fun `onNewChatRequested fires new chat tapped`() = runTest {
+        viewModel.onNewChatRequested()
+        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_HISTORY_NEW_CHAT_TAPPED_COUNT)
+        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_HISTORY_NEW_CHAT_TAPPED_DAILY, type = Daily())
+    }
+
+    @Test
+    fun `onDownloadSelectedRequested with a selection fires download selected`() = runTest {
+        source.value = listOf(item("a"), item("b"))
+        viewModel.uiState.test {
+            awaitInitialLoaded()
+            viewModel.onEnterSelectMode()
+            awaitItem()
+            viewModel.onSelectionToggled("a")
+            cancelAndIgnoreRemainingEvents()
+        }
+        viewModel.onDownloadSelectedRequested()
+        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_HISTORY_DOWNLOAD_SELECTED_COUNT)
+        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_HISTORY_DOWNLOAD_SELECTED_DAILY, type = Daily())
     }
 
     /**

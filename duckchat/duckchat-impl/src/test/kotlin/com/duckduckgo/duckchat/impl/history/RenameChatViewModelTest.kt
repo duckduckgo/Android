@@ -17,14 +17,20 @@
 package com.duckduckgo.duckchat.impl.history
 
 import app.cash.turbine.test
+import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.impl.models.ModelDisplay
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 
 class RenameChatViewModelTest {
 
@@ -32,7 +38,8 @@ class RenameChatViewModelTest {
     val coroutineRule = CoroutineTestRule()
 
     private val repository = RecordingRenameRepository()
-    private val viewModel = RenameChatViewModel(repository, coroutineRule.testScope)
+    private val pixel: Pixel = mock()
+    private val viewModel = RenameChatViewModel(repository, coroutineRule.testScope, pixel)
 
     @Test
     fun `onSaveClicked forwards trimmed title and emits Success`() = coroutineRule.testScope.runTest {
@@ -42,6 +49,8 @@ class RenameChatViewModelTest {
             assertEquals(RenameChatViewModel.RenameResult.Success, awaitItem())
             assertEquals(listOf("chat-1" to "New Title"), repository.renames)
         }
+        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_HISTORY_RENAME_SAVED_COUNT)
+        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_HISTORY_RENAME_SAVED_DAILY, type = Daily())
     }
 
     @Test
@@ -53,6 +62,7 @@ class RenameChatViewModelTest {
 
             assertEquals(RenameChatViewModel.RenameResult.Error, awaitItem())
         }
+        verifyNoInteractions(pixel)
     }
 
     @Test
@@ -64,6 +74,7 @@ class RenameChatViewModelTest {
 
             assertEquals(RenameChatViewModel.RenameResult.Error, awaitItem())
         }
+        verifyNoInteractions(pixel)
     }
 }
 
