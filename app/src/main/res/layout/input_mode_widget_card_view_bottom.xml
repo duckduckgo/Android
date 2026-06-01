@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Copyright (c) 2026 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,30 +18,57 @@
     android:id="@+id/inputModeBottomRoot"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="?daxColorSurface"
-    android:layout_gravity="bottom">
+    android:layout_gravity="bottom"
+    android:background="?daxColorSurface">
 
-    <!-- Negative bottom margin pulls the card down to account for the shadow -->
-    <com.google.android.material.card.MaterialCardView
-        android:id="@+id/inputModeWidgetCard"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/keyline_2"
-        android:layout_marginEnd="@dimen/keyline_2"
-        android:layout_marginBottom="@dimen/keyline_2"
-        android:layout_marginTop="@dimen/keyline_2"
-        app:cardBackgroundColor="?attr/daxColorWindow"
-        app:cardCornerRadius="26dp"
-        app:cardElevation="3dp"
-        app:cardUseCompatPadding="false">
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingStart="@dimen/keyline_2"
+        android:paddingEnd="@dimen/keyline_2">
 
-        <com.duckduckgo.duckchat.impl.ui.nativeinput.views.NativeInputModeWidget
-            android:id="@+id/inputModeWidget"
-            android:paddingStart="@dimen/keyline_1"
-            android:paddingTop="@dimen/keyline_2"
-            android:paddingEnd="@dimen/keyline_1"
-            android:paddingBottom="@dimen/keyline_2"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-    </com.google.android.material.card.MaterialCardView>
+        <FrameLayout
+            android:id="@+id/inputFieldFireIconMenu"
+            android:layout_width="@dimen/toolbarIcon"
+            android:layout_height="@dimen/toolbarIcon"
+            android:layout_marginEnd="@dimen/keyline_2"
+            android:background="@drawable/selectable_item_rounded_corner_background"
+            android:visibility="gone">
+
+            <ImageView
+                android:id="@+id/inputFieldFireIconImageview"
+                android:layout_width="@dimen/bottomNavIcon"
+                android:layout_height="@dimen/bottomNavIcon"
+                android:layout_gravity="center"
+                android:contentDescription="@string/fireMenu"
+                android:scaleType="center"
+                android:src="@drawable/ic_fire_24" />
+        </FrameLayout>
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/inputModeWidgetCard"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_2"
+            android:layout_marginBottom="@dimen/keyline_2"
+            android:layout_weight="1"
+            app:cardBackgroundColor="?attr/daxColorWindow"
+            app:cardCornerRadius="26dp"
+            app:cardElevation="3dp"
+            app:cardUseCompatPadding="false">
+
+            <com.duckduckgo.duckchat.impl.ui.nativeinput.views.NativeInputModeWidget
+                android:id="@+id/inputModeWidget"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingStart="@dimen/keyline_1"
+                android:paddingTop="@dimen/keyline_2"
+                android:paddingEnd="@dimen/keyline_1"
+                android:paddingBottom="@dimen/keyline_2" />
+
+        </com.google.android.material.card.MaterialCardView>
+
+    </LinearLayout>
 </com.duckduckgo.duckchat.impl.ui.nativeinput.views.NonCollapsingFrameLayout>

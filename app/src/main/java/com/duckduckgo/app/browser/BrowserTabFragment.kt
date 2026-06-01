@@ -273,9 +273,11 @@ import com.duckduckgo.browser.ui.browsermenu.BrowserMenuBottomSheet
 import com.duckduckgo.browser.ui.browsermenu.VpnMenuState
 import com.duckduckgo.browser.ui.newtab.hatch.NewTabReturnHatchView
 import com.duckduckgo.browsermode.api.BrowserMode
+import com.duckduckgo.browsermode.api.FireModeAvailability
 import com.duckduckgo.browsermode.api.WebViewModeInitializer
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.DuckDuckGoFragment
+import com.duckduckgo.common.ui.menu.PopupMenu
 import com.duckduckgo.common.ui.store.BrowserAppTheme
 import com.duckduckgo.common.ui.tabs.SwipingTabsFeatureProvider
 import com.duckduckgo.common.ui.view.DaxDialog
@@ -635,6 +637,9 @@ class BrowserTabFragment :
     lateinit var duckChat: DuckChat
 
     @Inject
+    lateinit var fireModeAvailability: FireModeAvailability
+
+    @Inject
     lateinit var duckAiFeatureState: DuckAiFeatureState
 
     @Inject
@@ -788,6 +793,24 @@ class BrowserTabFragment :
 
     private val browserActivity
         get() = activity as? BrowserActivity
+
+    // Duck.ai "+" popup menu, anchored to the omnibar + button (see popup_chat_menu.xml).
+    private val chatMenuPopup by lazy {
+        PopupMenu(layoutInflater, com.duckduckgo.duckchat.impl.R.layout.popup_chat_menu).apply {
+            onMenuItemClicked(contentView.findViewById(com.duckduckgo.duckchat.impl.R.id.chatMenuPopupNewChat)) {
+                viewModel.openNewDuckChat(omnibar.viewMode)
+            }
+            onMenuItemClicked(contentView.findViewById(com.duckduckgo.duckchat.impl.R.id.chatMenuPopupNewVoiceChat)) {
+                duckChat.openVoiceDuckChat()
+            }
+            onMenuItemClicked(contentView.findViewById(com.duckduckgo.duckchat.impl.R.id.chatMenuPopupNewTab)) {
+                browserActivity?.launchNewTab()
+            }
+            onMenuItemClicked(contentView.findViewById(com.duckduckgo.duckchat.impl.R.id.chatMenuPopupNewFireTab)) {
+                browserActivity?.launchNewTab()
+            }
+        }
+    }
 
     private var webView: DuckDuckGoWebView? = null
     private var isWebViewGestureInProgress = false
@@ -1423,6 +1446,7 @@ class BrowserTabFragment :
                         ),
                     )
                 },
+                onFireButtonPressed = { onFireButtonPressed() },
                 onVoiceSearchPressed = { isChatTab ->
                     val mode = if (isChatTab) VoiceSearchMode.DUCK_AI else VoiceSearchMode.SEARCH
                     webView?.onPause()
@@ -3766,6 +3790,17 @@ class BrowserTabFragment :
 
                 override fun onFireButtonPressed() {
                     this@BrowserTabFragment.onFireButtonPressed()
+                }
+
+                override fun onPlusButtonPressed(anchor: View) {
+                    val activity = activity ?: return
+                    // Only offer "New Fire Tab" to users whose feature flag + WebView profile
+                    // support actually allow Fire Mode. Re-checked on each open so a WebView/flag
+                    // change is reflected without rebuilding the menu.
+                    chatMenuPopup.contentView
+                        .findViewById<View>(com.duckduckgo.duckchat.impl.R.id.chatMenuPopupNewFireTab)
+                        .isVisible = fireModeAvailability.isAvailable()
+                    chatMenuPopup.showAnchoredView(activity, binding.rootView, anchor)
                 }
 
                 override fun onBrowserMenuPressed() {
