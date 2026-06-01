@@ -84,7 +84,6 @@ interface NativeInputWidget {
     var onSearchSelected: ((animate: Boolean) -> Unit)?
     var onChatSelected: ((animate: Boolean) -> Unit)?
     var onClearTextTapped: (() -> Unit)?
-    var onFireButtonTapped: (() -> Unit)?
     var onStopTapped: (() -> Unit)?
     var onVoiceSearchClick: (() -> Unit)?
     var onVoiceChatClick: (() -> Unit)?
@@ -275,32 +274,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
         observeChatState()
         observeChatSuggestionsEnabled()
         observeNativeInputState()
-        bindLeadingFireButtonClick()
         if (onPaidTierChanged != null) observeTier()
-    }
-
-    /**
-     * The leading fire menu in the bottom-bar layout lives as a sibling of this widget
-     * (see input_mode_widget_card_view_bottom.xml). Wire its click here so it shares the
-     * same [onFireButtonTapped] callback as the trailing fire that lives inside the widget.
-     */
-    private fun bindLeadingFireButtonClick() {
-        leadingFireButtonView()?.setOnClickListener { onFireButtonTapped?.invoke() }
-    }
-
-    /**
-     * Walk up the view hierarchy looking for the leading fire menu. The button is a
-     * sibling-of-an-ancestor rather than a direct sibling of this widget — in the bottom-bar
-     * layout it lives outside the MaterialCardView that wraps this widget — so a single
-     * `parent.findViewById` isn't enough.
-     */
-    private fun leadingFireButtonView(): View? {
-        var current: android.view.ViewParent? = parent
-        while (current is ViewGroup) {
-            current.findViewById<View?>(R.id.inputFieldFireIconMenu)?.let { return it }
-            current = current.parent
-        }
-        return null
     }
 
     private fun setupPlugins() {
@@ -465,7 +439,6 @@ class NativeInputModeWidget @JvmOverloads constructor(
             if (hasFocus) beginFocusTransition()
             updateBottomRowVisibility()
             applyVerticalPaddingForFocus()
-            nativeInputState?.let { updateFireButtonVisibility(it) }
             if (!hasFocus && isDuckAiPageContext()) {
                 hideKeyboard()
             }
@@ -571,7 +544,6 @@ class NativeInputModeWidget @JvmOverloads constructor(
             updateToggleVisibility(toggle, state)
         }
         updateBackButtons(state)
-        updateFireButtonVisibility(state)
         updateBottomRowVisibility()
         applyVerticalPaddingForFocus()
         updateNewLineButtonVisibility()
@@ -610,22 +582,6 @@ class NativeInputModeWidget @JvmOverloads constructor(
         findViewById<View?>(R.id.inputModeWidgetBack)?.setBackgroundResource(
             com.duckduckgo.mobile.android.R.drawable.selectable_circular_container_ripple,
         )
-    }
-
-    /**
-     * In a fullscreen Duck.ai chat the fire button moves into the bottom-bar layout
-     * (sibling to this widget, see input_mode_widget_card_view_bottom.xml). The trailing
-     * fire that lives inside the widget hides in DUCK_AI so the user only ever sees one
-     * fire affordance; other contexts keep today's trailing placement.
-     *
-     * The leading fire is additionally hidden while the input field has focus — the user is
-     * typing and the chrome around the input should yield space to the keyboard / input area.
-     */
-    private fun updateFireButtonVisibility(state: NativeInputState) {
-        val showLeading = state.shouldShowLeadingFireButton() && !inputField.hasFocus()
-        leadingFireButtonView()?.visibility = if (showLeading) VISIBLE else GONE
-        findViewById<View?>(R.id.inputFieldFireButton)?.visibility =
-            if (state.shouldShowTrailingFireButton()) VISIBLE else GONE
     }
 
     private fun removeMargins() {
@@ -1273,14 +1229,6 @@ internal fun NativeInputState.shouldShowToggleRowBack(): Boolean =
 
 internal fun NativeInputState.shouldShowCardRowBack(): Boolean =
     !toggleVisible && inputContext == NativeInputState.InputContext.BROWSER
-
-/** Fire button placed inside the input field card at the leading edge — only in a fullscreen Duck.ai chat. */
-internal fun NativeInputState.shouldShowLeadingFireButton(): Boolean =
-    inputContext == NativeInputState.InputContext.DUCK_AI
-
-/** Trailing fire button (in the buttons row next to tabs/menu) — hidden in fullscreen Duck.ai chat, otherwise shown. */
-internal fun NativeInputState.shouldShowTrailingFireButton(): Boolean =
-    inputContext != NativeInputState.InputContext.DUCK_AI
 
 /**
  * The bottom row hosts chat-mode tools (attachments, options, reasoning, model picker).
