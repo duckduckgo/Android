@@ -116,6 +116,9 @@
     <!-- Duck AI Voice Chat Shortcut Setting -->
     <string name="duckAiVoiceChatVisibilitySetting" instruction="Voice Chat is a feature that lets users talk to Duck.ai using their voice instead of typing.">Гласов чат</string>
 
+    <!-- Duck AI Chat Suggestions -->
+    <string name="duckAiChatHistoryViewAllChats">Преглед на всички чатове</string>
+
     <!-- Native Duck.ai chat history -->
     <string name="duck_ai_chat_history_title">Чатове</string>
     <string name="duck_ai_chat_history_section_pinned">Закачени</string>
@@ -146,8 +149,8 @@
     <string name="duck_ai_chat_history_rename_confirm_title">Запазване</string>
     <string name="duck_ai_chat_history_rename_confirm_content_description">Запазване на заглавието на чата</string>
     <string name="duck_ai_chat_history_rename_error">Неуспешно преименуване на чата</string>
-    <string name="duck_ai_chat_history_pin_snackbar">Закачен чат</string>
-    <string name="duck_ai_chat_history_unpin_snackbar">Незакачен чат</string>
+    <string name="duck_ai_chat_history_pin_snackbar">Чат с отметка</string>
+    <string name="duck_ai_chat_history_unpin_snackbar">Чат без отметка</string>
     <string name="duck_ai_chat_history_undo">Отмяна</string>
     <string name="duck_ai_chat_history_download_complete" instruction="%1$s is the saved chat filename (e.g. \&apos;My Chat.txt\&apos;).">Завършено изтегляне на %1$s</string>
     <string name="duck_ai_chat_history_download_view">Показване</string>
