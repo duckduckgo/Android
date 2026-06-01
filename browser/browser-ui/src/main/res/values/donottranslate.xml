@@ -30,9 +30,4 @@
     <string name="newTabReturnHatchTabClosed">Tab closed</string>
     <string name="newTabReturnHatchUndo">Undo</string>
     <string name="browserMenuChats">Chats</string>
-
-    <string name="chatMenuPopupNewChat">New Chat</string>
-    <string name="chatMenuPopupNewVoiceChat">New Voice Chat</string>
-    <string name="chatMenuPopupNewTab">New Tab</string>
-    <string name="chatMenuPopupNewFireTab">New Fire Tab</string>
 </resources>
