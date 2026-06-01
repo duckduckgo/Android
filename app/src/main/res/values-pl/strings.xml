@@ -273,6 +273,7 @@
     <string name="singleTabFireDialogDeleteAll">Usuń wszystko</string>
     <string name="singleTabFireDialogDeleteThisTab">Usuń tę kartę</string>
     <string name="singleTabFireDialogDeleteChat">Usuń czat</string>
+    <string name="singleTabFireDialogDeleteChats">Usuń czaty</string>
     <string name="singleTabFireDialogTitleDuckAi">Usunąć ten czat?</string>
     <string name="singleTabFireDialogSubtitleSiteData">Usunięcie danych witryny może spowodować wylogowanie z kont.</string>
     <string name="singleTabFireDialogSubtitleDownloads">Spowoduje to anulowanie trwającego pobierania.</string>
