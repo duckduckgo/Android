@@ -568,6 +568,52 @@ class SyncConnectViewModelTest {
     }
 
     @Test
+    fun whenV2LinkingCodeScannedThenRoutedThroughDispatcherAndLoginSuccess() = runTest {
+        // Regression: signed-out Connect camera scan must route v2 codes through the dispatcher
+        // (BUG-A / SURF-3). Previously onQRCodeScanned parsed v1-only and rejected v2 as invalid.
+        enableV2(displayOn = true)
+        val scannedUrl = "https://duckduckgo.com/sync/pairing/#&code2=scan-me"
+        whenever(qrCode.parse(scannedUrl)).thenReturn(
+            com.duckduckgo.sync.impl.exchange.v2.ExchangeV2CodeParseResult.LinkingV2(
+                channelId = "chan",
+                publicKey = "pk",
+                version = "2",
+            ),
+        )
+        val recoveryJson = org.json.JSONObject().apply {
+            put(
+                "recovery",
+                org.json.JSONObject().apply {
+                    put("user_id", "u-1")
+                    put("secret", "s-1")
+                    put("cid", "ddg")
+                    put("v", "2.0")
+                },
+            )
+        }.toString()
+        val recoveryB64 = android.util.Base64.encodeToString(
+            recoveryJson.toByteArray(Charsets.UTF_8),
+            android.util.Base64.URL_SAFE or android.util.Base64.NO_PADDING or android.util.Base64.NO_WRAP,
+        )
+        whenever(syncRepository.processCode(any(), anyOrNull())).thenReturn(Result.Success(true))
+
+        testee.commands().test {
+            testee.onQRCodeScanned(scannedUrl)
+            runnerEventsFlow.emit(
+                transition(
+                    from = ExchangeV2State.Joiner.Waiting,
+                    to = ExchangeV2State.Joiner.Done,
+                    trigger = ExchangeV2Message.RecoveryCodeResponse(rawJson = "{}", recoveryCode = recoveryB64),
+                ),
+            )
+            val command = awaitItem()
+            assertTrue("expected LoginSuccess, got $command", command is LoginSuccess)
+            cancelAndIgnoreRemainingEvents()
+        }
+        verify(runner).startScan(scannedUrl)
+    }
+
+    @Test
     fun whenHostDoneDuringV2PresentThenLoginSuccess() = runTest {
         enableV2(displayOn = true)
         whenever(qrEncoder.encodeAsBitmap(any(), any(), any())).thenReturn(TestSyncFixtures.qrBitmap())

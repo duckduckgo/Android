@@ -38,6 +38,7 @@ import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.R.dimen
 import com.duckduckgo.sync.impl.Result.Error
 import com.duckduckgo.sync.impl.Result.Success
+import com.duckduckgo.sync.impl.RouteDecision
 import com.duckduckgo.sync.impl.SyncAccountRepository
 import com.duckduckgo.sync.impl.SyncAuthCode
 import com.duckduckgo.sync.impl.SyncAuthCode.Exchange
@@ -140,21 +141,28 @@ class SyncConnectViewModel @Inject constructor(
      * `RecoveryCodeProvider.createDdgAccountIfNeeded()` per subtask `1215168582640073`).
      */
     private suspend fun startV2Present() {
-        codeDispatcher.presentV2().collect { outcome ->
-            when (outcome) {
-                is DispatchOutcome.LinkingCodeReady -> renderV2QrCode(outcome.linkingCode)
-                is DispatchOutcome.HostConfirmationRequested -> command.send(Command.AskHostConfirmation(outcome.peerName))
-                is DispatchOutcome.JoinerConfirmationRequested -> command.send(Command.AskJoinerConfirmation(outcome.peerName))
-                is DispatchOutcome.LoggedIn,
-                is DispatchOutcome.AlreadyConnected,
-                -> {
-                    fireLoginPixels()
-                    command.send(LoginSuccess)
-                }
-                is DispatchOutcome.UpgradeRequired,
-                is DispatchOutcome.Failed,
-                -> command.send(ShowError(R.string.sync_connect_login_error))
+        codeDispatcher.presentV2().collect { handleV2Outcome(it) }
+    }
+
+    /**
+     * Map one v2 [DispatchOutcome] onto this VM's command pipeline. Shared by the Presenter
+     * (QR-display) path [startV2Present] and the Scanner path [onQRCodeScanned] — both observe
+     * the same dispatcher outcome stream.
+     */
+    private suspend fun handleV2Outcome(outcome: DispatchOutcome) {
+        when (outcome) {
+            is DispatchOutcome.LinkingCodeReady -> renderV2QrCode(outcome.linkingCode)
+            is DispatchOutcome.HostConfirmationRequested -> command.send(Command.AskHostConfirmation(outcome.peerName))
+            is DispatchOutcome.JoinerConfirmationRequested -> command.send(Command.AskJoinerConfirmation(outcome.peerName))
+            is DispatchOutcome.LoggedIn,
+            is DispatchOutcome.AlreadyConnected,
+            -> {
+                fireLoginPixels()
+                command.send(LoginSuccess)
             }
+            is DispatchOutcome.UpgradeRequired,
+            is DispatchOutcome.Failed,
+            -> command.send(ShowError(R.string.sync_connect_login_error))
         }
     }
 
@@ -253,19 +261,31 @@ class SyncConnectViewModel @Inject constructor(
 
     fun onQRCodeScanned(qrCode: String) {
         viewModelScope.launch(dispatchers.io()) {
-            val codeType = syncAccountRepository.parseSyncAuthCode(qrCode).also { it.onCodeScanned() }
-            when (val result = syncAccountRepository.processCode(codeType)) {
-                is Error -> {
-                    processError(result)
-                }
+            // Route via SyncCodeDispatcher. FF off → Legacy(parseSyncAuthCode(...)) so the body
+            // below runs byte-identical to pre-dispatcher production. FF on → v2-shaped codes are
+            // taken into ownership and surfaced through DispatchOutcome. Before this, the signed-out
+            // Connect camera scan parsed v1-only and rejected v2 codes as "invalid" (BUG-A / SURF-3).
+            when (val decision = codeDispatcher.route(qrCode)) {
+                is RouteDecision.Legacy -> {
+                    val codeType = decision.authCode.also { it.onCodeScanned() }
+                    when (val result = syncAccountRepository.processCode(codeType)) {
+                        is Error -> {
+                            processError(result)
+                        }
 
-                is Success -> {
-                    if (codeType is Exchange) {
-                        pollForRecoveryKey()
-                    } else {
-                        fireLoginPixels()
-                        command.send(LoginSuccess)
+                        is Success -> {
+                            if (codeType is Exchange) {
+                                pollForRecoveryKey()
+                            } else {
+                                fireLoginPixels()
+                                command.send(LoginSuccess)
+                            }
+                        }
                     }
+                }
+                is RouteDecision.V2InProgress -> {
+                    logcat { "Sync-CodeDispatch: SyncConnectViewModel observing V2InProgress" }
+                    decision.outcomes.collect { handleV2Outcome(it) }
                 }
             }
         }
