@@ -27,6 +27,7 @@ import com.duckduckgo.sync.impl.AccountErrorCodes.CONNECT_FAILED
 import com.duckduckgo.sync.impl.AccountErrorCodes.CREATE_ACCOUNT_FAILED
 import com.duckduckgo.sync.impl.AccountErrorCodes.INVALID_CODE
 import com.duckduckgo.sync.impl.AccountErrorCodes.LOGIN_FAILED
+import com.duckduckgo.sync.impl.AccountErrorCodes.THIRD_PARTY_ALREADY_UPGRADED
 import com.duckduckgo.sync.impl.Clipboard
 import com.duckduckgo.sync.impl.DispatchOutcome
 import com.duckduckgo.sync.impl.ExchangeResult.AccountSwitchingRequired
@@ -160,7 +161,7 @@ class EnterCodeViewModel @Inject constructor(
                 Error(reason = "Code requires protocol v${outcome.codeMajor}"),
                 pastedCode,
             )
-            is DispatchOutcome.Failed -> processError(Error(reason = outcome.reason), pastedCode)
+            is DispatchOutcome.Failed -> processError(Error(code = outcome.code, reason = outcome.reason), pastedCode)
             is DispatchOutcome.JoinerConfirmationRequested ->
                 command.send(Command.AskJoinerConfirmation(outcome.peerName))
             is DispatchOutcome.HostConfirmationRequested ->
@@ -234,6 +235,9 @@ class EnterCodeViewModel @Inject constructor(
                 CONNECT_FAILED.code -> R.string.sync_connect_generic_error
                 CREATE_ACCOUNT_FAILED.code -> R.string.sync_create_account_generic_error
                 INVALID_CODE.code -> R.string.sync_invalid_code_error
+                // 3party→ddg upgrade on an already-upgraded account (REC-4). Generic error for now;
+                // spec-specific copy ("use an already-connected Native app") tracked in 1215295182909247.
+                THIRD_PARTY_ALREADY_UPGRADED.code -> R.string.sync_connect_generic_error
                 else -> null
             }?.let { message ->
                 viewState.value = viewState.value.copy(authState = AuthState.Idle)

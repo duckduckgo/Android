@@ -424,11 +424,11 @@ class RealSyncCodeDispatcher @Inject constructor(
                     }
                     is Result.Error -> {
                         logcat { "$TAG: $label → logout+rejoin failed: ${switched.reason} (code=${switched.code})" }
-                        DispatchOutcome.Failed(switched.reason)
+                        DispatchOutcome.Failed(switched.reason, switched.code)
                     }
                 }
             } else {
-                DispatchOutcome.Failed(reason)
+                DispatchOutcome.Failed(reason, code)
             }
         }
     }

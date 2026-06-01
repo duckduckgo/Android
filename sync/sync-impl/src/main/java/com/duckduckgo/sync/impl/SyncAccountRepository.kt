@@ -809,6 +809,7 @@ class AppSyncAccountRepository @Inject constructor(
         if (accountAlreadyHasDdg) {
             logcat(WARN) { "Sync-ScopedToken: account already has a ddg credential — cannot re-upgrade from 3party" }
             return Error(
+                code = AccountErrorCodes.THIRD_PARTY_ALREADY_UPGRADED.code,
                 reason = "JoinFrom3party: account already upgraded. " +
                     "Please use one of the already connected Native DDG Applications to add another one.",
             )
@@ -841,7 +842,7 @@ class AppSyncAccountRepository @Inject constructor(
                 // successfully after 5 minutes, per the spec author's accepted UX trade-off.
                 logcat(WARN) { "Sync-ScopedToken: 409 — account already has a ddg credential" }
                 return Error(
-                    code = postResult.code,
+                    code = AccountErrorCodes.THIRD_PARTY_ALREADY_UPGRADED.code,
                     reason = "JoinFrom3party: account already has a ddg credential. " +
                         "Please use one of the already connected Native DDG Applications to add another one.",
                 )
@@ -1504,6 +1505,11 @@ enum class AccountErrorCodes(val code: Int) {
     CREATE_ACCOUNT_FAILED(53),
     CONNECT_FAILED(54),
     INVALID_CODE(55),
+
+    // 3party→ddg upgrade attempted on an account that already has a ddg credential (REC-4). Distinct
+    // type so the UI can surface it (today a generic error; spec-specific copy tracked in 1215295182909247)
+    // instead of the silent GENERIC_ERROR no-op.
+    THIRD_PARTY_ALREADY_UPGRADED(56),
     EXCHANGE_FAILED(56),
 }
 

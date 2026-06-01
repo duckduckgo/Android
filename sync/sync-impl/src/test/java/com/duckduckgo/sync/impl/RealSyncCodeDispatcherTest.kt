@@ -283,7 +283,10 @@ class RealSyncCodeDispatcherTest {
 
         val outcome = (dispatcher.route("any") as RouteDecision.V2InProgress).outcomes.first()
 
-        assertEquals(DispatchOutcome.Failed("Login failed"), outcome)
+        assertEquals(
+            DispatchOutcome.Failed("Login failed", com.duckduckgo.sync.impl.AccountErrorCodes.LOGIN_FAILED.code),
+            outcome,
+        )
     }
 
     @Test fun `FF on, v2 RecoveryCode cid=3party - ALREADY_SIGNED_IN does NOT trigger transparent switch (fails as Failed)`() = runTest {
@@ -306,7 +309,10 @@ class RealSyncCodeDispatcherTest {
 
         val outcome = (dispatcher.route("any") as RouteDecision.V2InProgress).outcomes.first()
 
-        assertEquals(DispatchOutcome.Failed("Already signed in"), outcome)
+        assertEquals(
+            DispatchOutcome.Failed("Already signed in", com.duckduckgo.sync.impl.AccountErrorCodes.ALREADY_SIGNED_IN.code),
+            outcome,
+        )
         verify(syncAccountRepository, never()).logoutAndJoinNewAccount(any())
     }
 

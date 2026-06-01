@@ -35,6 +35,7 @@ import com.duckduckgo.sync.impl.AccountErrorCodes.CREATE_ACCOUNT_FAILED
 import com.duckduckgo.sync.impl.AccountErrorCodes.GENERIC_ERROR
 import com.duckduckgo.sync.impl.AccountErrorCodes.INVALID_CODE
 import com.duckduckgo.sync.impl.AccountErrorCodes.LOGIN_FAILED
+import com.duckduckgo.sync.impl.AccountErrorCodes.THIRD_PARTY_ALREADY_UPGRADED
 import com.duckduckgo.sync.impl.Clipboard
 import com.duckduckgo.sync.impl.RealSyncCodeDispatcher
 import com.duckduckgo.sync.impl.RecoveryCode
@@ -44,6 +45,7 @@ import com.duckduckgo.sync.impl.SyncAccountRepository
 import com.duckduckgo.sync.impl.SyncAuthCode.Recovery
 import com.duckduckgo.sync.impl.SyncAuthCode.Unknown
 import com.duckduckgo.sync.impl.SyncFeature
+import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2CodeParseResult
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2QrCode
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Runner
 import com.duckduckgo.sync.impl.pixels.SyncPixels
@@ -119,6 +121,35 @@ internal class EnterCodeViewModelTest {
         testee.onPasteCodeClicked()
 
         verify(clipboard).pasteFromClipboard()
+    }
+
+    @Test
+    fun whenV2ThirdPartyRecoveryAlreadyUpgradedThenShowError() = runTest {
+        // REC-4: pasting a 3party recovery code for an account that already has a ddg credential must
+        // surface an error dialog, not fail silently (the upgrade can only run once). The distinct
+        // THIRD_PARTY_ALREADY_UPGRADED type is mapped to a (generic, for now) ShowError.
+        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
+        whenever(syncAccountRepository.getAccountInfo()).thenReturn(noAccount)
+        val pastedCode = "https://duckduckgo.com/sync/pairing/#&code2=3party-recovery"
+        whenever(clipboard.pasteFromClipboard()).thenReturn(pastedCode)
+        val recoveryJson = org.json.JSONObject().apply {
+            put("cid", "3party")
+            put("user_id", "u-1")
+            put("secret", "s-1")
+            put("v", "2.0")
+        }
+        whenever(qrCode.parse(pastedCode)).thenReturn(ExchangeV2CodeParseResult.RecoveryCode(rawJson = recoveryJson))
+        whenever(syncAccountRepository.joinAccountFromThirdPartyRecoveryCode(any())).thenReturn(
+            Error(code = THIRD_PARTY_ALREADY_UPGRADED.code, reason = "account already upgraded"),
+        )
+
+        testee.onPasteCodeClicked()
+
+        testee.commands().test {
+            val command = awaitItem()
+            assertTrue("expected ShowError, got $command", command is ShowError)
+            cancelAndIgnoreRemainingEvents()
+        }
     }
 
     @Test

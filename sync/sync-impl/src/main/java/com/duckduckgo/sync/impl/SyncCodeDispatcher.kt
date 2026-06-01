@@ -162,6 +162,13 @@ sealed interface DispatchOutcome {
     /** Terminal — the pasted code requires a protocol major version higher than this app supports. */
     data class UpgradeRequired(val codeMajor: Int) : DispatchOutcome
 
-    /** Terminal — transport error, missing credentials on this device, BE rejection, denial, etc. */
-    data class Failed(val reason: String) : DispatchOutcome
+    /**
+     * Terminal — transport error, missing credentials on this device, BE rejection, denial, etc.
+     * [code] carries the originating [AccountErrorCodes] code (defaults to GENERIC_ERROR) so callers
+     * can map specific failures (e.g. THIRD_PARTY_ALREADY_UPGRADED) to user-facing copy.
+     */
+    data class Failed(
+        val reason: String,
+        val code: Int = AccountErrorCodes.GENERIC_ERROR.code,
+    ) : DispatchOutcome
 }
