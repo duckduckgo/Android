@@ -67,7 +67,7 @@ import logcat.logcat
     scope = AppScope::class,
     boundType = MainProcessLifecycleObserver::class,
 )
-@PriorityKey(PRIORITY)
+@PriorityKey(0) // must run before the unkeyed MigrationLifecycleObserver (see KDoc above)
 @SingleInstanceIn(AppScope::class)
 class LocationPermissionsDbCopyObserver @Inject constructor(
     private val context: Context,
@@ -131,8 +131,6 @@ class LocationPermissionsDbCopyObserver @Inject constructor(
     }
 
     companion object {
-        // Must be < the (unkeyed) MigrationLifecycleObserver so the copy runs first.
-        const val PRIORITY = 0
         const val FILENAME = "com.duckduckgo.app.location.migration.dbcopy"
         const val KEY_COPIED = "KEY_LOCATION_PERMISSIONS_COPIED_TO_OWN_DB"
     }
