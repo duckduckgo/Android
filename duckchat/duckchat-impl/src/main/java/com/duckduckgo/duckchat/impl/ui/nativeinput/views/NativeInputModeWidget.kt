@@ -334,7 +334,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
             attachmentView = pluginView
             pluginView.onCameraCaptureRequested = pendingCameraCaptureCallback
             pluginView.onFilePickerRequested = pendingFilePickerCallback
-            pluginView.bind(scope, viewModelFactory)
+            pluginView.bind(scope, viewModelFactory, nativeInputStateProvider)
         }
         (pluginView as? ModelPicker)?.let { picker ->
             picker.onMenuShown = { isModelMenuVisible = true }
