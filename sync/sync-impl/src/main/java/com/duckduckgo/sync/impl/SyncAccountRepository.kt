@@ -642,7 +642,11 @@ class AppSyncAccountRepository @Inject constructor(
 
     override fun refreshThirdPartyCredential(): Result<Boolean> = thirdPartyCredentialManager.refresh()
 
-    override fun createProtectedKey(purpose: String): Result<Boolean> = protectedKeyManager.create(purpose)
+    override fun createProtectedKey(purpose: String): Result<Boolean> =
+        when (val r = protectedKeyManager.create(purpose)) {
+            is Result.Success -> Result.Success(true)
+            is Result.Error -> r
+        }
 
     /**
      * Bundle produced by [buildThirdPartyUpgradePackage] and consumed by the upgrade POST +

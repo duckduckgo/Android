@@ -45,9 +45,13 @@ interface ProtectedKeyManager {
      * Generates an RSA keypair for [purpose] (e.g. "ai_chats"), libsodium-encrypts the private key
      * with the account secret key, and POSTs the entry via /sync/keys/.../set-if-absent.
      *
-     * No-op success if the server already has a key for [purpose] (set-if-absent semantics).
+     * Returns the created [ProtectedKeyEntry] (the locally-generated, ddg-wrapped key) on success so
+     * callers can use it without a read-after-write GET /keys round-trip (which can lag right after
+     * the write). No-op success semantics for set-if-absent: in the newly-created case (the only case
+     * the 3party-extend caller hits, since it generates only when no keys exist) the returned entry is
+     * authoritative.
      */
-    fun create(purpose: String): Result<Boolean>
+    fun create(purpose: String): Result<ProtectedKeyEntry>
 }
 
 @ContributesBinding(AppScope::class)
@@ -61,7 +65,7 @@ class RealProtectedKeyManager @Inject constructor(
     private val syncFeature: SyncFeature,
 ) : ProtectedKeyManager {
 
-    override fun create(purpose: String): Result<Boolean> {
+    override fun create(purpose: String): Result<ProtectedKeyEntry> {
         if (!syncFeature.canUseV2ConnectFlow().isEnabled()) {
             return Error(reason = "Scoped access credentials feature is disabled")
         }
@@ -107,7 +111,7 @@ class RealProtectedKeyManager @Inject constructor(
                 // server after every mutation. Append the new entry so callers don't have to
                 // re-hit /sync/keys to find it.
                 cacheLocalProtectedKey(key)
-                Success(true)
+                Success(key)
             }
             is Error -> {
                 logcat(ERROR) { "Sync-ScopedToken: failed to create protected key: ${result.reason}" }

@@ -17,6 +17,7 @@
 package com.duckduckgo.sync.impl
 
 import android.util.Base64
+import androidx.annotation.VisibleForTesting
 import androidx.annotation.WorkerThread
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.crypto.SyncLib
@@ -71,7 +72,12 @@ class RealThirdPartyCredentialManager @Inject constructor(
     private val syncJweCrypto: SyncJweCrypto,
     private val nativeLib: SyncLib,
     private val syncFeature: SyncFeature,
+    private val protectedKeyManager: ProtectedKeyManager,
 ) : ThirdPartyCredentialManager {
+
+    /** Base linear-backoff between rate-limit retries. Overridable in tests to keep them fast. */
+    @VisibleForTesting
+    internal var rateLimitRetryDelayMillis: Long = DEFAULT_RATE_LIMIT_RETRY_DELAY_MILLIS
 
     override fun create(): Result<Boolean> {
         val inputs = when (val r = validateCreatePreconditions()) {
@@ -218,12 +224,35 @@ class RealThirdPartyCredentialManager @Inject constructor(
         val accountSecretKey = syncStore.secretKey
             ?: return Error(reason = "CreateThirdPartyCredential: no account secret key for ddg-side decrypt")
 
-        val ddgKeys = when (val r = syncApi.getProtectedKeys(token)) {
+        var ddgKeys = when (val r = retryingOnRateLimit { syncApi.getProtectedKeys(token) }) {
             is Success -> r.data.filter { it.encryptedWith == CREDENTIAL_ID_DDG }
             is Error -> {
                 // Fail rather than create a credential without its protected keys.
-                logcat(ERROR) { "Sync-ScopedToken: getKeys failed, aborting 3party credential creation: ${r.reason}" }
-                return Error(reason = "CreateThirdPartyCredential: getKeys failed: ${r.reason}")
+                // Log the HTTP code: getProtectedKeys' reason is blank on HTTP/2 non-2xx
+                // (empty reason-phrase + no error body), so the code is the only signal of
+                // whether this is a post-signup not-ready race (404/425), auth (401/403) or 5xx.
+                logcat(ERROR) { "Sync-ScopedToken: getKeys failed (code=${r.code}), aborting 3party credential creation: ${r.reason}" }
+                return Error(code = r.code, reason = "CreateThirdPartyCredential: getKeys failed (code=${r.code}): ${r.reason}")
+            }
+        }
+
+        // Spec: Unified Algorithm §"Native only - Obtaining 3party secret" — "Fetch keys GET /keys
+        // to get any encrypted with 'ddg'. If there are no Protected Keys, generate new ones for
+        // 'ai_chat' purpose." A freshly-created ddg account (no-account Host) has zero protected
+        // keys; without this step the 3party credential is posted with no keys and a real FE
+        // browser's login returns no ai_chat key, breaking chat sync (Asana 1215297327538410).
+        if (ddgKeys.isEmpty()) {
+            logcat { "Sync-ScopedToken: no ddg protected keys; generating $SYNC_SCOPE_AI_CHATS key before 3party extend" }
+            // Use the freshly-generated entry directly rather than re-fetching it via GET /keys:
+            // the server can lag right after the set-if-absent write (observed on staging), and a
+            // re-fetch would intermittently come back empty. create() returns the authoritative
+            // locally-generated ddg-wrapped key, which we then re-encrypt for 3party below.
+            ddgKeys = when (val gen = protectedKeyManager.create(SYNC_SCOPE_AI_CHATS)) {
+                is Success -> listOf(gen.data)
+                is Error -> {
+                    logcat(ERROR) { "Sync-ScopedToken: failed to generate $SYNC_SCOPE_AI_CHATS protected key: ${gen.reason}" }
+                    return Error(code = gen.code, reason = "CreateThirdPartyCredential: generate $SYNC_SCOPE_AI_CHATS key failed: ${gen.reason}")
+                }
             }
         }
         logcat { "Sync-ScopedToken: ${ddgKeys.size} ddg key(s) to re-encrypt for 3party" }
@@ -373,5 +402,33 @@ class RealThirdPartyCredentialManager @Inject constructor(
 
     private val recoveryCodeAdapter by lazy {
         Moshi.Builder().build().adapter(ThirdPartyRecoveryCodeWrapper::class.java)
+    }
+
+    /**
+     * Retry an idempotent scoped-credential call on rate-limit (HTTP 418 TOO_MANY_REQUESTS_2 /
+     * 429 TOO_MANY_REQUESTS_1). The no-account Host provisioning path fires a burst of
+     * authenticated calls (signup → access-credentials → keys → create) within ~2s; the backend
+     * throttles GET /keys with 418, which previously aborted the whole pairing (BUG-B / N3-1).
+     * A bounded linear backoff recovers since the limit is per-window and the call is idempotent.
+     */
+    private fun <T> retryingOnRateLimit(block: () -> Result<T>): Result<T> {
+        var attempt = 0
+        while (true) {
+            val result = block()
+            val code = (result as? Error)?.code
+            val rateLimited = code == API_CODE.TOO_MANY_REQUESTS_1.code || code == API_CODE.TOO_MANY_REQUESTS_2.code
+            if (rateLimited && attempt < MAX_RATE_LIMIT_RETRIES) {
+                attempt++
+                logcat { "Sync-ScopedToken: rate-limited (code=$code); retry $attempt/$MAX_RATE_LIMIT_RETRIES" }
+                runCatching { Thread.sleep(rateLimitRetryDelayMillis * attempt) }
+                continue
+            }
+            return result
+        }
+    }
+
+    companion object {
+        const val MAX_RATE_LIMIT_RETRIES = 3
+        private const val DEFAULT_RATE_LIMIT_RETRY_DELAY_MILLIS = 1_000L
     }
 }

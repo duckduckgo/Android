@@ -1170,7 +1170,14 @@ class AppSyncAccountRepositoryTest {
 
     @Test
     fun whenCreateProtectedKeyThenDelegatesToManager() {
-        whenever(protectedKeyManager.create("ai_chats")).thenReturn(Success(true))
+        val createdKey = ProtectedKeyEntry(
+            kid = "k1",
+            purpose = "ai_chats",
+            encryptedWith = "ddg",
+            encryptedPrivateKey = "enc",
+            publicKey = RsaJwk(n = "mod", e = "AQAB"),
+        )
+        whenever(protectedKeyManager.create("ai_chats")).thenReturn(Success(createdKey))
 
         val result = syncRepo.createProtectedKey("ai_chats")
 
