@@ -40,8 +40,6 @@ import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.global.events.db.UserEventEntity
 import com.duckduckgo.app.global.events.db.UserEventTypeConverter
 import com.duckduckgo.app.global.events.db.UserEventsDao
-import com.duckduckgo.app.location.data.LocationPermissionEntity
-import com.duckduckgo.app.location.data.LocationPermissionsDao
 import com.duckduckgo.app.notification.db.NotificationDao
 import com.duckduckgo.app.notification.model.Notification
 import com.duckduckgo.app.onboarding.store.*
@@ -67,6 +65,9 @@ import com.duckduckgo.app.usage.app.AppDaysUsedDao
 import com.duckduckgo.app.usage.app.AppDaysUsedEntity
 import com.duckduckgo.app.usage.search.SearchCountDao
 import com.duckduckgo.app.usage.search.SearchCountEntity
+import com.duckduckgo.location.permissions.api.LocationPermissionEntity
+import com.duckduckgo.location.permissions.impl.LocationPermissionTypeConverter
+import com.duckduckgo.location.permissions.impl.LocationPermissionsDao
 import com.duckduckgo.savedsites.store.Entity
 import com.duckduckgo.savedsites.store.EntityTypeConverter
 import com.duckduckgo.savedsites.store.Relation

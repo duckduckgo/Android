@@ -17,13 +17,13 @@
 package com.duckduckgo.app.global.migrations
 
 import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.app.location.data.LocationPermissionType.ALLOW_ALWAYS
-import com.duckduckgo.app.location.data.LocationPermissionType.DENY_ALWAYS
-import com.duckduckgo.app.location.data.LocationPermissionsRepository
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.plugins.migrations.MigrationPlugin
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.location.permissions.api.LocationPermissionType.ALLOW_ALWAYS
+import com.duckduckgo.location.permissions.api.LocationPermissionType.DENY_ALWAYS
+import com.duckduckgo.location.permissions.api.LocationPermissionsRepository
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.LocationPermissionRequest
 import com.duckduckgo.site.permissions.impl.SitePermissionsRepository
 import com.duckduckgo.site.permissions.store.sitepermissions.SitePermissionAskSettingType

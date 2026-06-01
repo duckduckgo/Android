@@ -20,7 +20,6 @@ import android.content.Context
 import com.duckduckgo.app.browser.WebDataManager
 import com.duckduckgo.app.browser.api.WebViewCapabilityChecker
 import com.duckduckgo.app.browser.cookies.ThirdPartyCookieManager
-import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.fire.AndroidAppCacheClearer
 import com.duckduckgo.app.fire.AppCacheClearer
 import com.duckduckgo.app.fire.BackgroundTimeKeeper
@@ -36,9 +35,6 @@ import com.duckduckgo.app.global.file.FileDeleter
 import com.duckduckgo.app.global.view.ClearDataAction
 import com.duckduckgo.app.global.view.ClearPersonalDataAction
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
-import com.duckduckgo.app.location.data.LocationPermissionsDao
-import com.duckduckgo.app.location.data.LocationPermissionsRepository
-import com.duckduckgo.app.location.data.LocationPermissionsRepositoryImpl
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.trackerdetection.api.WebTrackersBlockedRepository
@@ -53,7 +49,6 @@ import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.site.permissions.api.SitePermissionsManager
 import com.duckduckgo.sync.api.DeviceSyncState
 import com.squareup.anvil.annotations.ContributesTo
-import dagger.Lazy
 import dagger.Module
 import dagger.Provides
 import dagger.SingleInstanceIn
@@ -131,14 +126,5 @@ object PrivacyModule {
         dataClearingWideEvent: DataClearingWideEvent,
     ): AppCacheClearer {
         return AndroidAppCacheClearer(context, fileDeleter, exclusionPlugins, dataClearingWideEvent)
-    }
-
-    @Provides
-    fun providesLocationPermissionsRepository(
-        locationPermissionsDao: LocationPermissionsDao,
-        faviconManager: Lazy<FaviconManager>,
-        dispatchers: DispatcherProvider,
-    ): LocationPermissionsRepository {
-        return LocationPermissionsRepositoryImpl(locationPermissionsDao, faviconManager, dispatchers)
     }
 }

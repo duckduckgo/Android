@@ -25,7 +25,6 @@ import com.duckduckgo.app.fire.db.FireModeDatabase
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteDao
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.global.events.db.UserEventsDao
-import com.duckduckgo.app.location.data.LocationPermissionsDao
 import com.duckduckgo.app.notification.db.NotificationDao
 import com.duckduckgo.app.onboarding.store.UserStageDao
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
@@ -45,6 +44,7 @@ import com.duckduckgo.app.usage.search.SearchCountDao
 import com.duckduckgo.browsermode.api.FireMode
 import com.duckduckgo.browsermode.api.RegularMode
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.location.permissions.impl.LocationPermissionsDao
 import com.duckduckgo.savedsites.store.SavedSitesEntitiesDao
 import com.duckduckgo.savedsites.store.SavedSitesRelationsDao
 import com.squareup.anvil.annotations.ContributesTo

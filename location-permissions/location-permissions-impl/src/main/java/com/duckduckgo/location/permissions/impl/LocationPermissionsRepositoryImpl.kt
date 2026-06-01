@@ -14,27 +14,22 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.location.data
+package com.duckduckgo.location.permissions.impl
 
 import androidx.lifecycle.LiveData
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.location.permissions.api.LocationPermissionEntity
+import com.duckduckgo.location.permissions.api.LocationPermissionType
+import com.duckduckgo.location.permissions.api.LocationPermissionsRepository
+import com.squareup.anvil.annotations.ContributesBinding
 import dagger.Lazy
+import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
-import javax.inject.Inject
 
-interface LocationPermissionsRepository {
-    fun getLocationPermissionsSync(): List<LocationPermissionEntity>
-    fun getLocationPermissionsAsync(): LiveData<List<LocationPermissionEntity>>
-    fun getLocationPermissionsFlow(): Flow<List<LocationPermissionEntity>>
-    suspend fun savePermission(domain: String, permission: LocationPermissionType): LocationPermissionEntity?
-    suspend fun getDomainPermission(domain: String): LocationPermissionEntity?
-    suspend fun deletePermission(domain: String)
-    suspend fun permissionEntitiesCountByDomain(domain: String): Int
-    fun savePermissionEntity(entity: LocationPermissionEntity)
-}
-
+@ContributesBinding(AppScope::class)
 class LocationPermissionsRepositoryImpl @Inject constructor(
     private val locationPermissionsDao: LocationPermissionsDao,
     private val faviconManager: Lazy<FaviconManager>,
