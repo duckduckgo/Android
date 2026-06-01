@@ -1095,7 +1095,6 @@ class NativeInputModeWidget @JvmOverloads constructor(
         val streamingContainer = findViewById<FrameLayout?>(R.id.streamingButtonsContainer)
         if (streaming) {
             streamingContainer?.visibility = VISIBLE
-            streamingButtons?.showStopButton()
             streamingButtons?.setSendButtonVisible(true)
         } else {
             streamingContainer?.visibility = GONE
@@ -1190,6 +1189,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
                     layoutResId = R.layout.view_native_input_screen_buttons,
                 ).apply {
                     onStopClick = { this@NativeInputModeWidget.onStopTapped?.invoke() }
+                    showStopButton()
                     setSendButtonVisible(false)
                     setNewLineButtonVisible(false)
                 }
