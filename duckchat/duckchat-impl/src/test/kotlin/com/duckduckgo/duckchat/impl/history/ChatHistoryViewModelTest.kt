@@ -472,6 +472,13 @@ class ChatHistoryViewModelTest {
     }
 
     @Test
+    fun `onNewChatRequested delegates to DuckChat`() = runTest {
+        viewModel.onNewChatRequested()
+
+        assertEquals(1, duckChat.openDuckChatCalls)
+    }
+
+    @Test
     fun `onFireIconClicked in default mode triggers Fire-all`() = runTest {
         source.value = listOf(item("r1"), item("r2"))
         viewModel.uiState.test {

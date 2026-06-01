@@ -310,7 +310,7 @@ class ChatHistoryFragment : DuckDuckGoFragment(R.layout.fragment_chat_history) {
 
     private fun onMenuItemClicked(item: MenuItem): Boolean = when (item.itemId) {
         R.id.chat_history_action_new -> {
-            viewModel.onOpenDuckAiClicked()
+            viewModel.onNewChatRequested()
             true
         }
         R.id.chat_history_action_search -> {
