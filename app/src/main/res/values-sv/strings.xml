@@ -917,7 +917,7 @@
     <string name="quickSetupSearchOptionsTitle">Vill du ha sökning och AI-chatt i adressfältet?</string>
     <string name="quickSetupBottomSheetDone">Klart</string>
     <string name="quickSetupInputScreenSearchOnly">Sök endast</string>
-    <string name="quickSetupInputScreenSearchAndDuckAi">Sök &amp; Duck.ai</string>
+    <string name="quickSetupInputScreenSearchAndDuckAi">Sök och Duck.ai</string>
     <string name="quickSetupRemoveHomeScreenWidgetTitle">Så här tar du bort widgeten för startskärmen</string>
     <string name="quickSetupRemoveHomeScreenWidgetStep1">Gå till din startskärm</string>
     <string name="quickSetupRemoveHomeScreenWidgetStep2">Tryck och håll kvar på widgeten</string>

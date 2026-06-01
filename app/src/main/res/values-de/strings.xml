@@ -917,7 +917,7 @@
     <string name="quickSetupSearchOptionsTitle">Möchtest du Such- und KI-Chatfunktionen in der Adressleiste?</string>
     <string name="quickSetupBottomSheetDone">Fertig</string>
     <string name="quickSetupInputScreenSearchOnly">Nur Suchen</string>
-    <string name="quickSetupInputScreenSearchAndDuckAi">Suche &amp; Duck.ai</string>
+    <string name="quickSetupInputScreenSearchAndDuckAi">Suche und Duck.ai</string>
     <string name="quickSetupRemoveHomeScreenWidgetTitle">So entfernst du das Startbildschirm-Widget</string>
     <string name="quickSetupRemoveHomeScreenWidgetStep1">Gehe zu deinem Startbildschirm</string>
     <string name="quickSetupRemoveHomeScreenWidgetStep2">Halte das Widget gedrückt</string>

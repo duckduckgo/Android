@@ -916,7 +916,7 @@
     <string name="quickSetupSearchOptionsTitle">Want Search &amp; AI chat in the address bar?</string>
     <string name="quickSetupBottomSheetDone">Done</string>
     <string name="quickSetupInputScreenSearchOnly">Search Only</string>
-    <string name="quickSetupInputScreenSearchAndDuckAi">Search &amp; Duck.ai</string>
+    <string name="quickSetupInputScreenSearchAndDuckAi">Search and Duck.ai</string>
     <string name="quickSetupRemoveHomeScreenWidgetTitle">How to remove the Home screen widget</string>
     <string name="quickSetupRemoveHomeScreenWidgetStep1">Go to your Home screen</string>
     <string name="quickSetupRemoveHomeScreenWidgetStep2">Touch and hold the widget</string>
