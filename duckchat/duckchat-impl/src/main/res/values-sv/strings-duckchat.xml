@@ -116,6 +116,9 @@
     <!-- Duck AI Voice Chat Shortcut Setting -->
     <string name="duckAiVoiceChatVisibilitySetting" instruction="Voice Chat is a feature that lets users talk to Duck.ai using their voice instead of typing.">Röstchatt</string>
 
+    <!-- Duck AI Chat Suggestions -->
+    <string name="duckAiChatHistoryViewAllChats">Visa alla chattar</string>
+
     <!-- Native Duck.ai chat history -->
     <string name="duck_ai_chat_history_title">Chattar</string>
     <string name="duck_ai_chat_history_section_pinned">Fäst</string>
@@ -147,7 +150,7 @@
     <string name="duck_ai_chat_history_rename_confirm_content_description">Spara chattitel</string>
     <string name="duck_ai_chat_history_rename_error">Kunde inte byta namn på chatten</string>
     <string name="duck_ai_chat_history_pin_snackbar">Chatt fäst</string>
-    <string name="duck_ai_chat_history_unpin_snackbar">Chat lossad</string>
+    <string name="duck_ai_chat_history_unpin_snackbar">Chatt lossad</string>
     <string name="duck_ai_chat_history_undo">Ångra</string>
     <string name="duck_ai_chat_history_download_complete" instruction="%1$s is the saved chat filename (e.g. \&apos;My Chat.txt\&apos;).">Nerladdning klar för %1$s</string>
     <string name="duck_ai_chat_history_download_view">Visa</string>
