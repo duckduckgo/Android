@@ -1048,4 +1048,7 @@
     <string name="onboardingStepIndicatorText" instruction="a counter above our instructions in onboarding that tells a user what step they are on">%1$d od %2$d</string>
     <string name="onboardingSearchDaxDialogOption1Quoted" instruction="translate &apos;duck&apos; too.">Kako reči »raca« v angleščini</string>
     <string name="onboardingSearchDaxDialogOption1EnglishQuoted" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">Kako reči »raca« v španščini</string>
+
+    <string name="input_screen_user_pref_without_ai_updated">Samo iskanje</string>
+    <string name="input_screen_user_pref_with_ai_updated">Preklopite med\niskanjem in Duck.ai</string>
 </resources>
