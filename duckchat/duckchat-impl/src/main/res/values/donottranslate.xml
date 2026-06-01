@@ -94,6 +94,11 @@
     <string name="duck_ai_chat_history_search_clear_content_description">Clear search</string>
     <string name="duck_ai_chat_history_action_fire_content_description">Delete chats</string>
     <string name="duck_ai_chat_history_action_new">New</string>
+    <string name="duck_ai_chat_history_action_download_selected_content_description">Download chats</string>
+    <plurals name="duck_ai_chat_history_bulk_download_complete">
+        <item quantity="one" instruction="%1$d is the number of chats downloaded">Download complete for %1$d chat</item>
+        <item quantity="other" instruction="%1$d is the number of chats downloaded">Download complete for %1$d chats</item>
+    </plurals>
     <string name="duck_ai_chat_history_select_all">Select all</string>
     <string name="duck_ai_chat_history_unselect_all">Unselect all</string>
     <string name="duck_ai_chat_history_row_selected_content_description">Selected</string>
@@ -110,6 +115,7 @@
     <string name="duck_ai_chat_history_download_complete" instruction="%1$s is the saved chat filename (e.g. \'My Chat.txt\').">Download complete for %1$s</string>
     <string name="duck_ai_chat_history_download_view">Show</string>
     <string name="duck_ai_chat_history_download_error">Couldn\'t export chat</string>
+    <string name="duck_ai_chat_history_bulk_download_error">Couldn\'t export chats</string>
 
     <!-- Duck.ai header -->
     <string name="duckChatPlusButtonContentDescription">Open Duck.ai menu</string>

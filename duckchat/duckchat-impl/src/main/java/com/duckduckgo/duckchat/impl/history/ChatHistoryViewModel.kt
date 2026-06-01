@@ -103,13 +103,16 @@ class ChatHistoryViewModel @Inject constructor(
     fun onChatRowLongClicked(chatId: String): Boolean {
         controls.update { c ->
             val nextMode = when (val mode = c.mode) {
-                is Mode.Selecting -> Mode.Selecting(toggle(mode.selectedChatIds, chatId))
+                is Mode.Selecting -> collapseEmpty(toggle(mode.selectedChatIds, chatId))
                 Mode.Default -> Mode.Selecting(setOf(chatId))
             }
             c.copy(mode = nextMode)
         }
         return true
     }
+
+    private fun collapseEmpty(ids: Set<String>): Mode =
+        if (ids.isEmpty()) Mode.Default else Mode.Selecting(ids)
 
     fun onOpenDuckAiClicked() {
         duckChat.openDuckChat()
@@ -183,6 +186,25 @@ class ChatHistoryViewModel @Inject constructor(
         }
     }
 
+    fun onDownloadSelectedRequested() {
+        val selected = (controls.value.mode as? Mode.Selecting)?.selectedChatIds.orEmpty()
+        if (selected.isEmpty()) return
+        viewModelScope.launch {
+            val requests = selected.map { chatId ->
+                val modelId = latestItems.firstOrNull { it.chatId == chatId }?.model
+                val modelDisplay = modelId
+                    ?.let { id -> duckAiModelManager.modelState.value.models.firstOrNull { it.id == id } }
+                    ?.toModelDisplay()
+                ChatExportRequest(chatId, modelDisplay)
+            }
+            // Atomic: any failure writes no files, so we report a single bulk error rather than a misleading success.
+            runCatching { chatHistoryRepository.exportChats(requests) }
+                .onSuccess { files -> navigationChannel.trySend(NavigationEvent.ShowBulkDownloadComplete(count = files.size)) }
+                .onFailure { navigationChannel.trySend(NavigationEvent.ShowBulkDownloadError) }
+            controls.update { it.copy(mode = Mode.Default) }
+        }
+    }
+
     private fun dispatchSelectedClear(chatIds: Set<String>) {
         if (chatIds.isEmpty()) return
         if (!duckAiFeatureState.showClearDuckAIChatHistory.value) return
@@ -208,7 +230,7 @@ class ChatHistoryViewModel @Inject constructor(
     fun onSelectionToggled(chatId: String) {
         controls.update { c ->
             val mode = c.mode as? Mode.Selecting ?: return@update c
-            c.copy(mode = Mode.Selecting(toggle(mode.selectedChatIds, chatId)))
+            c.copy(mode = collapseEmpty(toggle(mode.selectedChatIds, chatId)))
         }
     }
 
@@ -219,7 +241,7 @@ class ChatHistoryViewModel @Inject constructor(
             // Filter to live ids — selection can lag deletes and skew the comparison.
             val effectiveSelected = mode.selectedChatIds intersect latestItems.mapTo(mutableSetOf()) { it.chatId }
             val next = if (effectiveSelected == visibleIds) emptySet() else visibleIds
-            c.copy(mode = Mode.Selecting(next))
+            c.copy(mode = collapseEmpty(next))
         }
     }
 
@@ -270,6 +292,7 @@ class ChatHistoryViewModel @Inject constructor(
         if (items.isEmpty()) return ChatHistoryUiState.Empty
         val (pinned, recent) = items.partition { it.pinned }
         val effectiveMode = when (val mode = controls.mode) {
+            // Keep Selecting even when empty — collapsing here would make onEnterSelectMode emit no state change.
             is Mode.Selecting -> Mode.Selecting(mode.selectedChatIds intersect items.mapTo(mutableSetOf()) { it.chatId })
             Mode.Default -> Mode.Default
         }
@@ -311,7 +334,9 @@ class ChatHistoryViewModel @Inject constructor(
         data class OpenChat(val url: String, val sourceTabId: String?) : NavigationEvent
         data class OpenRename(val chatId: String, val currentTitle: String) : NavigationEvent
         data class ShowDownloadComplete(val fileName: String) : NavigationEvent
+        data class ShowBulkDownloadComplete(val count: Int) : NavigationEvent
         data object ShowExportError : NavigationEvent
+        data object ShowBulkDownloadError : NavigationEvent
     }
 
     sealed interface MessageEvent {
