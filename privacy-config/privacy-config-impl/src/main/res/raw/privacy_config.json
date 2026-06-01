@@ -951,7 +951,7 @@
         "onboardingQuickSetup": {
             "state": "enabled",
             "features": {
-                "onboardingQuickSetupExperimentMay26": {
+                "onboardingQuickSetupExperimentJun3": {
                     "state": "enabled",
                     "cohorts": [
                         {

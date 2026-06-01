@@ -104,7 +104,7 @@ class OnboardingQuickSetupSearchMetricsAtbLifecyclePluginTest {
 
         plugin.onSearchRetentionAtbRefreshed("", "")
 
-        val expectedName = toggles.onboardingQuickSetupExperimentMay26().featureName().name
+        val expectedName = toggles.onboardingQuickSetupExperimentJun3().featureName().name
         assertTrue(fakeMetricsPixelExtension.sentMetrics.all { it.toggle.featureName().name == expectedName })
     }
 
@@ -138,7 +138,7 @@ class OnboardingQuickSetupSearchMetricsAtbLifecyclePluginTest {
     private fun enableAndEnroll() {
         val today = ZonedDateTime.now(ZoneId.of("America/New_York")).toString()
         val cohort = State.Cohort(name = "treatment", weight = 1, enrollmentDateET = today)
-        toggles.onboardingQuickSetupExperimentMay26().setRawStoredState(
+        toggles.onboardingQuickSetupExperimentJun3().setRawStoredState(
             State(
                 remoteEnableState = true,
                 enable = true,
@@ -151,7 +151,7 @@ class OnboardingQuickSetupSearchMetricsAtbLifecyclePluginTest {
     private fun disabledButEnrolled() {
         val today = ZonedDateTime.now(ZoneId.of("America/New_York")).toString()
         val cohort = State.Cohort(name = "treatment", weight = 1, enrollmentDateET = today)
-        toggles.onboardingQuickSetupExperimentMay26().setRawStoredState(
+        toggles.onboardingQuickSetupExperimentJun3().setRawStoredState(
             State(
                 remoteEnableState = false,
                 enable = false,
@@ -164,7 +164,7 @@ class OnboardingQuickSetupSearchMetricsAtbLifecyclePluginTest {
     private fun enabledButNotEnrolled() {
         val today = ZonedDateTime.now(ZoneId.of("America/New_York")).toString()
         val cohort = State.Cohort(name = "treatment", weight = 1, enrollmentDateET = today)
-        toggles.onboardingQuickSetupExperimentMay26().setRawStoredState(
+        toggles.onboardingQuickSetupExperimentJun3().setRawStoredState(
             State(
                 remoteEnableState = true,
                 enable = true,
