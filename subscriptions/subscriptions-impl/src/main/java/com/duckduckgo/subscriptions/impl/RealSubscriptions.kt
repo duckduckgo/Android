@@ -284,6 +284,13 @@ interface SubscriptionsFeature {
     @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.FALSE)
     fun vpnReminderNotification(): Toggle
 
+    /**
+     * When enabled, a local reminder notification can be scheduled by the subscription page
+     * to fire ahead of the subscription's expiry/renewal date.
+     */
+    @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.TRUE)
+    fun subscriptionExpirationReminderNotification(): Toggle
+
     @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.TRUE)
     fun handleExpiredStateWhenSubscriptionChangeSelected(): Toggle
 

@@ -140,7 +140,9 @@ class SubscriptionWebViewViewModel @Inject constructor(
                 is CurrentPurchase.Success -> {
                     subscriptionsChecker.runChecker()
                     pendingScheduleNotificationDaysBeforeCancel?.let { days ->
-                        subscriptionExpirationReminderScheduler.scheduleReminderNotification(days)
+                        if (subscriptionsFeature.subscriptionExpirationReminderNotification().isEnabled()) {
+                            subscriptionExpirationReminderScheduler.scheduleReminderNotification(days)
+                        }
                         pendingScheduleNotificationDaysBeforeCancel = null
                     }
                     Success(
