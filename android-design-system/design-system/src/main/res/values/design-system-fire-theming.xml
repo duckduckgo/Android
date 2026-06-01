@@ -85,7 +85,4 @@
         <item name="colorControlActivated">?attr/daxColorFireModeAccentLight</item>
     </style>
 
-    <color name="omnibar_card_fire_light">#3D3D3D</color>
-    <color name="omnibar_card_fire_dark">#1C1C1C</color>
-
 </resources>

@@ -358,6 +358,9 @@
     <!-- Shadows -->
     <color name="background_omnibar_shadow">#FF000000</color>
 
+    <color name="omnibar_card_fire_light">#3D3D3D</color>
+    <color name="omnibar_card_fire_dark">#1C1C1C</color>
+
 </resources>
 
     <!-- Opacity Prefixes
