@@ -116,12 +116,15 @@
     <!-- Duck AI Voice Chat Shortcut Setting -->
     <string name="duckAiVoiceChatVisibilitySetting" instruction="Voice Chat is a feature that lets users talk to Duck.ai using their voice instead of typing.">Chat de voz</string>
 
+    <!-- Duck AI Chat Suggestions -->
+    <string name="duckAiChatHistoryViewAllChats">Ver todos os chats</string>
+
     <!-- Native Duck.ai chat history -->
     <string name="duck_ai_chat_history_title">Chats</string>
     <string name="duck_ai_chat_history_section_pinned">Afixado</string>
     <string name="duck_ai_chat_history_section_recent">Recente</string>
     <string name="duck_ai_chat_history_untitled">Chat sem título</string>
-    <string name="duck_ai_chat_history_empty_title">Ainda não há conversas</string>
+    <string name="duck_ai_chat_history_empty_title">Ainda não há chats</string>
     <string name="duck_ai_chat_history_empty_cta_open">Abrir Duck.ai</string>
     <string name="duck_ai_chat_history_more_options">Mais opções</string>
     <string name="duck_ai_chat_history_action_select">Selecionar</string>
