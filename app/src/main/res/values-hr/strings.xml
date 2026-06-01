@@ -1063,7 +1063,7 @@
     <string name="linkTextCopyFailed">Nije moguće kopirati tekst poveznice</string>
 
     <string name="preOnboardingWelcomeDialogTitle">Pozdrav!</string>
-    <string name="preOnboardingWelcomeDialogBody1">Jesi li spreman za brži preglednik koji ti daje kontrolu?</string>
+    <string name="preOnboardingWelcomeDialogBody1">Jesi li spreman za brži preglednik koji te stavlja za upravljač?</string>
     <string name="preOnboardingWelcomeDialogBody2">Umjetna inteligencija uvijek je neobavezna, a zaštita privatnosti uvijek aktivna.</string>
     <string name="onboardingStepIndicatorText" instruction="a counter above our instructions in onboarding that tells a user what step they are on">%1$d od %2$d</string>
     <string name="onboardingSearchDaxDialogOption1Quoted" instruction="translate &apos;duck&apos; too.">kako se kaže \"patka\" na engleskom</string>
