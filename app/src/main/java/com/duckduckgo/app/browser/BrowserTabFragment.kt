@@ -1372,6 +1372,7 @@ class BrowserTabFragment :
             if (!nativeInputManager.isNativeInputEnabled()) {
                 launchInputScreen(query)
             } else {
+                removeDuckChatContextualSheet()
                 showNativeInput(query)
             }
         }
