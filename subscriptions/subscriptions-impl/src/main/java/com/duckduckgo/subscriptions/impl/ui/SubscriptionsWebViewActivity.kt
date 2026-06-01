@@ -561,7 +561,7 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
     }
 
     private fun computeUserSettings(id: String) {
-        val sdkAtLeastTiramisu = Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
+        val sdkAtLeastTiramisu = Build.VERSION.SDK_INT >= 33
         viewModel.onUserSettingsComputed(
             id = id,
             notificationsEnabled = NotificationManagerCompat.from(this).areNotificationsEnabled(),
@@ -575,7 +575,7 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
 
     private fun launchNotificationsPermission(id: String) {
         pendingNotificationsPermissionRequestId = id
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        if (Build.VERSION.SDK_INT >= 33) {
             notificationsPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
         } else {
             val granted = NotificationManagerCompat.from(this).areNotificationsEnabled()
