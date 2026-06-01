@@ -69,6 +69,8 @@ class Omnibar(
 
         fun onFireButtonPressed()
 
+        fun onPlusButtonPressed(anchor: View)
+
         fun onBrowserMenuPressed()
 
         fun onPrivacyShieldPressed()
