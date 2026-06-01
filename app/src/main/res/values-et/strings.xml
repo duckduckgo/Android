@@ -1028,4 +1028,7 @@
     <string name="onboardingStepIndicatorText" instruction="a counter above our instructions in onboarding that tells a user what step they are on">%1$d/%2$d</string>
     <string name="onboardingSearchDaxDialogOption1Quoted" instruction="translate &apos;duck&apos; too.">Kuidas öelda „part“ inglise keeles</string>
     <string name="onboardingSearchDaxDialogOption1EnglishQuoted" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">Kuidas öelda „part“ hispaania keeles</string>
+
+    <string name="input_screen_user_pref_without_ai_updated">Ainult otsi</string>
+    <string name="input_screen_user_pref_with_ai_updated">Lülita\nOtsingu ja Duck.ai vahel</string>
 </resources>
