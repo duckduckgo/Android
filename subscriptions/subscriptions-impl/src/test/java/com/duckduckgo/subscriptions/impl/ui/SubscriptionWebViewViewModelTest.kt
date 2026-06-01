@@ -60,7 +60,9 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
@@ -205,6 +207,55 @@ class SubscriptionWebViewViewModelTest {
             assertTrue(result is Command.SubscriptionSelected)
             assertEquals("myId", (result as Command.SubscriptionSelected).id)
         }
+    }
+
+    @Test
+    fun whenPurchaseSucceedsWithScheduleNotificationAndFlagEnabledThenSchedulerCalled() = runTest {
+        subscriptionsFeature.subscriptionExpirationReminderNotification().setRawStoredState(Toggle.State(enable = true))
+        val flowTest: MutableSharedFlow<CurrentPurchase> = MutableSharedFlow()
+        whenever(subscriptionsManager.currentPurchaseState).thenReturn(flowTest)
+        viewModel.start()
+        viewModel.processJsCallbackMessage(
+            "test",
+            "subscriptionSelected",
+            "id",
+            JSONObject("""{"id":"myId","scheduleNotification":{"daysBeforeCancel":7}}"""),
+        )
+
+        flowTest.emit(CurrentPurchase.Success(isFreeTrial = false))
+
+        verify(subscriptionExpirationReminderScheduler).scheduleReminderNotification(7)
+    }
+
+    @Test
+    fun whenPurchaseSucceedsWithScheduleNotificationAndFlagDisabledThenSchedulerNotCalled() = runTest {
+        subscriptionsFeature.subscriptionExpirationReminderNotification().setRawStoredState(Toggle.State(enable = false))
+        val flowTest: MutableSharedFlow<CurrentPurchase> = MutableSharedFlow()
+        whenever(subscriptionsManager.currentPurchaseState).thenReturn(flowTest)
+        viewModel.start()
+        viewModel.processJsCallbackMessage(
+            "test",
+            "subscriptionSelected",
+            "id",
+            JSONObject("""{"id":"myId","scheduleNotification":{"daysBeforeCancel":7}}"""),
+        )
+
+        flowTest.emit(CurrentPurchase.Success(isFreeTrial = false))
+
+        verify(subscriptionExpirationReminderScheduler, never()).scheduleReminderNotification(any())
+    }
+
+    @Test
+    fun whenPurchaseSucceedsWithoutScheduleNotificationThenSchedulerNotCalled() = runTest {
+        subscriptionsFeature.subscriptionExpirationReminderNotification().setRawStoredState(Toggle.State(enable = true))
+        val flowTest: MutableSharedFlow<CurrentPurchase> = MutableSharedFlow()
+        whenever(subscriptionsManager.currentPurchaseState).thenReturn(flowTest)
+        viewModel.start()
+        viewModel.processJsCallbackMessage("test", "subscriptionSelected", "id", JSONObject("""{"id":"myId"}"""))
+
+        flowTest.emit(CurrentPurchase.Success(isFreeTrial = false))
+
+        verify(subscriptionExpirationReminderScheduler, never()).scheduleReminderNotification(any())
     }
 
     @Test
