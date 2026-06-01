@@ -166,6 +166,7 @@ class OmnibarLayout @JvmOverloads constructor(
         val showSpacer: Boolean,
         val showDuckSidebar: Boolean,
         val showDuckBack: Boolean,
+        val isDuckAiMode: Boolean,
     )
 
     @Inject
@@ -283,6 +284,7 @@ class OmnibarLayout @JvmOverloads constructor(
     override val omnibarTextInput: KeyboardAwareEditText by lazy { findViewById(R.id.omnibarTextInput) }
     internal val tabsMenu: TabSwitcherButton by lazy { findViewById(R.id.tabsMenu) }
     internal val fireIconMenu: FrameLayout by lazy { findViewById(R.id.fireIconMenu) }
+    internal val plusIconMenu: FrameLayout by lazy { findViewById(R.id.plusIconMenu) }
     internal val aiChatMenu: View? by lazy { findViewById(R.id.aiChatIconMenu) }
     private val aiChatDivider: View by lazy { findViewById(R.id.verticalDivider) }
     internal val browserMenu: FrameLayout by lazy { findViewById(R.id.browserMenu) }
@@ -334,6 +336,7 @@ class OmnibarLayout @JvmOverloads constructor(
                     addTarget(clearTextButton)
                     addTarget(voiceSearchButton)
                     addTarget(fireIconMenu)
+                    addTarget(plusIconMenu)
                     addTarget(tabsMenu)
                     addTarget(aiChatMenu)
                     addTarget(browserMenu)
@@ -565,6 +568,9 @@ class OmnibarLayout @JvmOverloads constructor(
                 viewModel.onFireIconPressed(isPulseAnimationPlaying())
             }
             omnibarItemPressedListener?.onFireButtonPressed()
+        }
+        plusIconMenu.setOnClickListener {
+            omnibarItemPressedListener?.onPlusButtonPressed(it)
         }
         browserMenu.setOnClickListener {
             omnibarItemPressedListener?.onBrowserMenuPressed()
@@ -843,11 +849,13 @@ class OmnibarLayout @JvmOverloads constructor(
                 showSpacer = viewState.showClearButton || viewState.showVoiceSearch,
                 showDuckSidebar = viewState.showDuckAISidebar,
                 showDuckBack = viewState.showDuckAISidebar,
+                isDuckAiMode = viewState.viewMode is ViewMode.DuckAI,
             )
 
         if (omnibarAnimationManager.isFeatureEnabled() && previousTransitionState != null &&
             (
                 newTransitionState.showFireIcon != previousTransitionState?.showFireIcon ||
+                    newTransitionState.isDuckAiMode != previousTransitionState?.isDuckAiMode ||
                     newTransitionState.showTabsMenu != previousTransitionState?.showTabsMenu ||
                     newTransitionState.showBrowserMenu != previousTransitionState?.showBrowserMenu ||
                     newTransitionState.showDuckSidebar != previousTransitionState?.showDuckSidebar
@@ -859,7 +867,11 @@ class OmnibarLayout @JvmOverloads constructor(
         clearTextButton.isVisible = viewState.showClearButton
         voiceSearchButton.isVisible = viewState.showVoiceSearch
         tabsMenu.isVisible = newTransitionState.showTabsMenu
-        fireIconMenu.isVisible = newTransitionState.showFireIcon
+        // The fire/+ slot is shared: when the user is in a Duck.ai chat the + icon takes
+        // over from fire as the leading action. Driven by viewMode rather than a separate
+        // state flag so it can't drift out of sync with other state-update paths.
+        fireIconMenu.isVisible = newTransitionState.showFireIcon && !newTransitionState.isDuckAiMode
+        plusIconMenu.isVisible = newTransitionState.showFireIcon && newTransitionState.isDuckAiMode
         browserMenu.isVisible = newTransitionState.showBrowserMenu
         browserMenuHighlight.isVisible = newTransitionState.showBrowserMenuHighlight
         aiChatMenu?.isVisible = newTransitionState.showChatMenu
