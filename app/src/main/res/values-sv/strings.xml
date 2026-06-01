@@ -903,6 +903,26 @@
     <string name="preOnboardingInputScreenButton">Nästa</string>
     <string name="preOnboardingInputScreenDescription"><![CDATA[AI-funktioner är privata och valfria. Du kan göra ändringar i <b>Inställningar > AI-funktioner</b>.]]></string>
 
+    <!--Onboarding Reinstall Quick Setup-->
+    <string name="preOnboardingReinstallQuickSetupTitle">Välkommen tillbaka!&lt;br/&gt;Vill du anpassa något?</string>
+    <string name="preOnboardingReinstallSetDefaultLabel">Ställ in DuckDuckGo som standard</string>
+    <string name="preOnboardingReinstallAddHomeScreenWidgetLabel">Lägg till widget på startskärmen</string>
+    <string name="preOnboardingReinstallAddressBarLabel">Adressfältsläge</string>
+    <string name="preOnboardingReinstallAddressBarSearchOptionsLabel">Sökalternativ för adressfält</string>
+    <string name="preOnboardingReinstallStartBrowsing">Börja surfa</string>
+
+    <!-- Quick setup bottom sheets -->
+    <string name="quickSetupAddressBarPositionTitle">Var vill du ha adressfältet?</string>
+    <string name="quickSetupAddressBarPositionCaption"><![CDATA[Du kan göra ändringar i <b>Inställningar > Utseende</b>.]]></string>
+    <string name="quickSetupSearchOptionsTitle">Vill du ha sökning och AI-chatt i adressfältet?</string>
+    <string name="quickSetupBottomSheetDone">Klart</string>
+    <string name="quickSetupInputScreenSearchOnly">Sök endast</string>
+    <string name="quickSetupInputScreenSearchAndDuckAi">Sök och Duck.ai</string>
+    <string name="quickSetupRemoveHomeScreenWidgetTitle">Så här tar du bort widgeten för startskärmen</string>
+    <string name="quickSetupRemoveHomeScreenWidgetStep1">Gå till din startskärm</string>
+    <string name="quickSetupRemoveHomeScreenWidgetStep2">Tryck och håll kvar på widgeten</string>
+    <string name="quickSetupRemoveHomeScreenWidgetStep3">Tryck eller dra för att ta bort den</string>
+
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Adressfält</string>
     <string name="settingsAddressBarPositionHeaderTitle">Adressfältsläge</string>

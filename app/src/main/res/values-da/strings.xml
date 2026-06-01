@@ -903,6 +903,26 @@
     <string name="preOnboardingInputScreenButton">Næste</string>
     <string name="preOnboardingInputScreenDescription"><![CDATA[AI-funktioner er private og valgfrie. Du kan foretage ændringer i <b>Indstillinger > AI-funktioner</b>.]]></string>
 
+    <!--Onboarding Reinstall Quick Setup-->
+    <string name="preOnboardingReinstallQuickSetupTitle">Velkommen tilbage!&lt;br/&gt;Vil du tilpasse noget?</string>
+    <string name="preOnboardingReinstallSetDefaultLabel">Indstil DuckDuckGo som standard</string>
+    <string name="preOnboardingReinstallAddHomeScreenWidgetLabel">Tilføj widget til startskærmen</string>
+    <string name="preOnboardingReinstallAddressBarLabel">Placering af adresselinje</string>
+    <string name="preOnboardingReinstallAddressBarSearchOptionsLabel">Søgemuligheder i adresselinjen</string>
+    <string name="preOnboardingReinstallStartBrowsing">Start søgning</string>
+
+    <!-- Quick setup bottom sheets -->
+    <string name="quickSetupAddressBarPositionTitle">Hvor vil du have din adresselinje?</string>
+    <string name="quickSetupAddressBarPositionCaption"><![CDATA[Du kan foretage ændringer i <b>Indstillinger > Udseende</b>.]]></string>
+    <string name="quickSetupSearchOptionsTitle">Vil du have søgning og AI-chat i adresselinjen?</string>
+    <string name="quickSetupBottomSheetDone">Færdig</string>
+    <string name="quickSetupInputScreenSearchOnly">Kun søgning</string>
+    <string name="quickSetupInputScreenSearchAndDuckAi">Søgning og Duck.ai</string>
+    <string name="quickSetupRemoveHomeScreenWidgetTitle">Sådan fjerner du widgeten på startskærmen</string>
+    <string name="quickSetupRemoveHomeScreenWidgetStep1">Gå til startskærmen</string>
+    <string name="quickSetupRemoveHomeScreenWidgetStep2">Tryk og hold widgetten nede</string>
+    <string name="quickSetupRemoveHomeScreenWidgetStep3">Tryk eller træk for at fjerne den</string>
+
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Adresselinje</string>
     <string name="settingsAddressBarPositionHeaderTitle">Placering af adresselinje</string>

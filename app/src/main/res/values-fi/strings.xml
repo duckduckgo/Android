@@ -903,6 +903,26 @@
     <string name="preOnboardingInputScreenButton">Seuraava</string>
     <string name="preOnboardingInputScreenDescription"><![CDATA[Tekoälyominaisuudet ovat yksityisiä ja valinnaisia. Voit tehdä muutoksia kohdassa <b>Asetukset > Tekoälyominaisuudet</b>.]]></string>
 
+    <!--Onboarding Reinstall Quick Setup-->
+    <string name="preOnboardingReinstallQuickSetupTitle">Tervetuloa takaisin!&lt;br/&gt;Haluatko muokata jotain?</string>
+    <string name="preOnboardingReinstallSetDefaultLabel">Aseta DuckDuckGo oletukseksi</string>
+    <string name="preOnboardingReinstallAddHomeScreenWidgetLabel">Lisää kotinäytön widget</string>
+    <string name="preOnboardingReinstallAddressBarLabel">Osoitepalkin sijainti</string>
+    <string name="preOnboardingReinstallAddressBarSearchOptionsLabel">Osoitepalkin hakuvaihtoehdot</string>
+    <string name="preOnboardingReinstallStartBrowsing">Aloita selailu</string>
+
+    <!-- Quick setup bottom sheets -->
+    <string name="quickSetupAddressBarPositionTitle">Mihin haluat osoitepalkin?</string>
+    <string name="quickSetupAddressBarPositionCaption"><![CDATA[Voit tehdä muutoksia kohdassa <b>Asetukset > Ulkoasu</b>.]]></string>
+    <string name="quickSetupSearchOptionsTitle">Haluatko haun ja tekoälychatin osoiteriville?</string>
+    <string name="quickSetupBottomSheetDone">Valmis</string>
+    <string name="quickSetupInputScreenSearchOnly">Vain haku</string>
+    <string name="quickSetupInputScreenSearchAndDuckAi">Haku ja Duck.ai</string>
+    <string name="quickSetupRemoveHomeScreenWidgetTitle">Aloitusnäytön widgetin poistaminen</string>
+    <string name="quickSetupRemoveHomeScreenWidgetStep1">Siirry aloitusnäyttöön</string>
+    <string name="quickSetupRemoveHomeScreenWidgetStep2">Kosketa ja pidä widget painettuna</string>
+    <string name="quickSetupRemoveHomeScreenWidgetStep3">Poista se napauttamalla tai vetämällä</string>
+
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Osoitekenttä</string>
     <string name="settingsAddressBarPositionHeaderTitle">Osoitepalkin sijainti</string>
