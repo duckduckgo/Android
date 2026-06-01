@@ -39,6 +39,10 @@ dependencies {
     implementation AndroidX.core.ktx
     implementation Google.dagger
 
+    // Used directly by the repository (LiveData/Flow return types + coroutines).
+    implementation AndroidX.lifecycle.liveDataKtx
+    implementation KotlinX.coroutines.core
+
     testImplementation project(path: ':common-test')
     testImplementation CashApp.turbine
     testImplementation Testing.junit4
