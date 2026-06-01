@@ -943,6 +943,26 @@
     <string name="preOnboardingInputScreenButton">Naslednji</string>
     <string name="preOnboardingInputScreenDescription"><![CDATA[Funkcije umetne inteligence so zasebne in izbirne. Spremembe lahko opravite v meniju <b>Nastavitve > Funkcije UI</b>.]]></string>
 
+    <!--Onboarding Reinstall Quick Setup-->
+    <string name="preOnboardingReinstallQuickSetupTitle">Dobrodošli nazaj!&lt;br/&gt;Želite kaj prilagoditi?</string>
+    <string name="preOnboardingReinstallSetDefaultLabel">Nastavi DuckDuckGo kot privzeto</string>
+    <string name="preOnboardingReinstallAddHomeScreenWidgetLabel">Dodaj pripomoček za začetni zaslon</string>
+    <string name="preOnboardingReinstallAddressBarLabel">Položaj naslovne vrstice</string>
+    <string name="preOnboardingReinstallAddressBarSearchOptionsLabel">Možnosti iskanja v naslovni vrstici</string>
+    <string name="preOnboardingReinstallStartBrowsing">Začni brskanje</string>
+
+    <!-- Quick setup bottom sheets -->
+    <string name="quickSetupAddressBarPositionTitle">Kje želite imeti naslovno vrstico?</string>
+    <string name="quickSetupAddressBarPositionCaption"><![CDATA[Spremembe lahko opravite v <b>Nastavitve > Videz</b>.]]></string>
+    <string name="quickSetupSearchOptionsTitle">Želite iskanje in klepet z umetno inteligenco v naslovni vrstici?</string>
+    <string name="quickSetupBottomSheetDone">Končano</string>
+    <string name="quickSetupInputScreenSearchOnly">Samo iskanje</string>
+    <string name="quickSetupInputScreenSearchAndDuckAi">Iskanje in Duck.ai</string>
+    <string name="quickSetupRemoveHomeScreenWidgetTitle">Kako odstraniti pripomoček z začetnega zaslona</string>
+    <string name="quickSetupRemoveHomeScreenWidgetStep1">Pojdite na svoj začetni zaslon</string>
+    <string name="quickSetupRemoveHomeScreenWidgetStep2">Pripomočka se dotaknite in ga pridržite</string>
+    <string name="quickSetupRemoveHomeScreenWidgetStep3">Tapnite ali povlecite, da ga odstranite</string>
+
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Naslovna vrstica</string>
     <string name="settingsAddressBarPositionHeaderTitle">Položaj naslovne vrstice</string>

@@ -923,6 +923,26 @@
     <string name="preOnboardingInputScreenButton">Nākamais</string>
     <string name="preOnboardingInputScreenDescription"><![CDATA[MI funkcijas ir privātas un nav obligātas. Tu vari veikt izmaiņas sadaļā <b>Iestatījumi > MI funkcijas</b>.]]></string>
 
+    <!--Onboarding Reinstall Quick Setup-->
+    <string name="preOnboardingReinstallQuickSetupTitle">Laipni lūdzam atpakaļ!&lt;br/&gt;Vai gribi kaut ko pielāgot?</string>
+    <string name="preOnboardingReinstallSetDefaultLabel">Iestatī DuckDuckGo kā noklusējumu</string>
+    <string name="preOnboardingReinstallAddHomeScreenWidgetLabel">Pievienot sākuma ekrāna logrīku</string>
+    <string name="preOnboardingReinstallAddressBarLabel">Adreses joslas pozīcija</string>
+    <string name="preOnboardingReinstallAddressBarSearchOptionsLabel">Adreses joslas meklēšanas opcijas</string>
+    <string name="preOnboardingReinstallStartBrowsing">Sākt pārlūkošanu</string>
+
+    <!-- Quick setup bottom sheets -->
+    <string name="quickSetupAddressBarPositionTitle">Kur attēlot adreses joslu?</string>
+    <string name="quickSetupAddressBarPositionCaption"><![CDATA[Tu vari veikt izmaiņas sadaļā <b>Iestatījumi > Izskats</b>.]]></string>
+    <string name="quickSetupSearchOptionsTitle">Vēlies meklēšanu un MI tērzēšanu adreses joslā?</string>
+    <string name="quickSetupBottomSheetDone">Gatavs</string>
+    <string name="quickSetupInputScreenSearchOnly">Tikai meklēšana</string>
+    <string name="quickSetupInputScreenSearchAndDuckAi">Meklēšana un Duck.ai</string>
+    <string name="quickSetupRemoveHomeScreenWidgetTitle">Kā noņemt sākuma ekrāna logrīku</string>
+    <string name="quickSetupRemoveHomeScreenWidgetStep1">Dodies uz sākuma ekrānu</string>
+    <string name="quickSetupRemoveHomeScreenWidgetStep2">Pieskarieties logrīkam un turi to</string>
+    <string name="quickSetupRemoveHomeScreenWidgetStep3">Pieskaries vai velc, lai to noņemtu</string>
+
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Adreses josla</string>
     <string name="settingsAddressBarPositionHeaderTitle">Adreses joslas pozīcija</string>

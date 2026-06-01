@@ -923,6 +923,26 @@
     <string name="preOnboardingInputScreenButton">Următorul</string>
     <string name="preOnboardingInputScreenDescription"><![CDATA[Funcțiile IA sunt private și opționale. Poți face modificări în <b>Setări > Funcții IA</b>.]]></string>
 
+    <!--Onboarding Reinstall Quick Setup-->
+    <string name="preOnboardingReinstallQuickSetupTitle">Bine ai revenit!&lt;br/&gt;Dorești să personalizezi ceva?</string>
+    <string name="preOnboardingReinstallSetDefaultLabel">Setează DuckDuckGo ca implicit</string>
+    <string name="preOnboardingReinstallAddHomeScreenWidgetLabel">Adaugă widgetul pentru ecranul de întâmpinare</string>
+    <string name="preOnboardingReinstallAddressBarLabel">Poziția barei de adrese</string>
+    <string name="preOnboardingReinstallAddressBarSearchOptionsLabel">Opțiuni de căutare în bara de adrese</string>
+    <string name="preOnboardingReinstallStartBrowsing">Începe navigarea</string>
+
+    <!-- Quick setup bottom sheets -->
+    <string name="quickSetupAddressBarPositionTitle">Unde vrei să se afle bara de adrese?</string>
+    <string name="quickSetupAddressBarPositionCaption"><![CDATA[Poți face modificări în <b>Setări > Aspect</b>.]]></string>
+    <string name="quickSetupSearchOptionsTitle">Dorești căutare și chat cu IA în bara de adrese?</string>
+    <string name="quickSetupBottomSheetDone">Terminat</string>
+    <string name="quickSetupInputScreenSearchOnly">Doar căutare</string>
+    <string name="quickSetupInputScreenSearchAndDuckAi">Caută și folosește Duck.ai</string>
+    <string name="quickSetupRemoveHomeScreenWidgetTitle">Cum se elimină widgetul de pe ecranul de întâmpinare</string>
+    <string name="quickSetupRemoveHomeScreenWidgetStep1">Mergi la ecranul de întâmpinare</string>
+    <string name="quickSetupRemoveHomeScreenWidgetStep2">Atinge și menține apăsat widgetul</string>
+    <string name="quickSetupRemoveHomeScreenWidgetStep3">Atinge sau trage pentru a-l elimina</string>
+
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Bara de adrese</string>
     <string name="settingsAddressBarPositionHeaderTitle">Poziția barei de adrese</string>

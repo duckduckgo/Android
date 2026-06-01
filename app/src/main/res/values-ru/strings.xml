@@ -943,6 +943,26 @@
     <string name="preOnboardingInputScreenButton">Далее</string>
     <string name="preOnboardingInputScreenDescription"><![CDATA[Функции на базе ИИ работают конфиденциально и предлагаются дополнительно. Их можно изменить в разделе <b>Настройки > Функции ИИ</b>.]]></string>
 
+    <!--Onboarding Reinstall Quick Setup-->
+    <string name="preOnboardingReinstallQuickSetupTitle">С возвращением!&lt;br/&gt;Хочешь что-нибудь настроить?</string>
+    <string name="preOnboardingReinstallSetDefaultLabel">Сделать DuckDuckGo браузером по умолчанию</string>
+    <string name="preOnboardingReinstallAddHomeScreenWidgetLabel">Добавить виджет на главный экран</string>
+    <string name="preOnboardingReinstallAddressBarLabel">Положение адресной строки</string>
+    <string name="preOnboardingReinstallAddressBarSearchOptionsLabel">Параметры поиска в адресной строке</string>
+    <string name="preOnboardingReinstallStartBrowsing">Начать работу</string>
+
+    <!-- Quick setup bottom sheets -->
+    <string name="quickSetupAddressBarPositionTitle">Где вы хотите разместить адресную строку?</string>
+    <string name="quickSetupAddressBarPositionCaption"><![CDATA[Изменения можно внести в разделе <b>«Настройки» > «Внешний вид»</b>.]]></string>
+    <string name="quickSetupSearchOptionsTitle">Нужен доступ к поиску и чатам с ИИ прямо из адресной строки?</string>
+    <string name="quickSetupBottomSheetDone">Готово</string>
+    <string name="quickSetupInputScreenSearchOnly">Только поиск</string>
+    <string name="quickSetupInputScreenSearchAndDuckAi">Поиск и Duck.ai</string>
+    <string name="quickSetupRemoveHomeScreenWidgetTitle">Как удалить виджет с главного экрана</string>
+    <string name="quickSetupRemoveHomeScreenWidgetStep1">Перейти на главный экран</string>
+    <string name="quickSetupRemoveHomeScreenWidgetStep2">Нажмите и удерживайте виджет</string>
+    <string name="quickSetupRemoveHomeScreenWidgetStep3">Нажми или перетащи, чтобы удалить его</string>
+
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Адресная строка</string>
     <string name="settingsAddressBarPositionHeaderTitle">Положение адресной строки</string>

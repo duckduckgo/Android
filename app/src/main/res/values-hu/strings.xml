@@ -903,6 +903,26 @@
     <string name="preOnboardingInputScreenButton">Következő</string>
     <string name="preOnboardingInputScreenDescription"><![CDATA[Az AI-funkciók privátak és opcionálisak. Módosításokat a <b>Beállítások > AI-funkciók</b> menüpontban végezhetsz.]]></string>
 
+    <!--Onboarding Reinstall Quick Setup-->
+    <string name="preOnboardingReinstallQuickSetupTitle">Üdv újra!&lt;br/&gt;Testre szeretnél szabni valamit?</string>
+    <string name="preOnboardingReinstallSetDefaultLabel">DuckDuckGo beállítása alapértelmezettként</string>
+    <string name="preOnboardingReinstallAddHomeScreenWidgetLabel">Kezdőképernyő minialkalmazás hozzáadása</string>
+    <string name="preOnboardingReinstallAddressBarLabel">Címsor elhelyezkedése</string>
+    <string name="preOnboardingReinstallAddressBarSearchOptionsLabel">Címsor keresési lehetőségei</string>
+    <string name="preOnboardingReinstallStartBrowsing">Böngészés indítása</string>
+
+    <!-- Quick setup bottom sheets -->
+    <string name="quickSetupAddressBarPositionTitle">Hová szeretnéd tenni a címsort?</string>
+    <string name="quickSetupAddressBarPositionCaption"><![CDATA[Módosításokat a <b>Beállítások > Megjelenés</b> menüpontban végezhetsz.]]></string>
+    <string name="quickSetupSearchOptionsTitle">Szeretnéd, ha lenne keresés és AI csevegés a címsorban?</string>
+    <string name="quickSetupBottomSheetDone">Kész</string>
+    <string name="quickSetupInputScreenSearchOnly">Csak keresés</string>
+    <string name="quickSetupInputScreenSearchAndDuckAi">Keresés és Duck.ai</string>
+    <string name="quickSetupRemoveHomeScreenWidgetTitle">Hogyan távolíthatom el a Kezdőképernyő minialkalmazást?</string>
+    <string name="quickSetupRemoveHomeScreenWidgetStep1">Lépj a kezdőképernyőre</string>
+    <string name="quickSetupRemoveHomeScreenWidgetStep2">Érintsd meg és tartsd megérintve a minialkalmazást</string>
+    <string name="quickSetupRemoveHomeScreenWidgetStep3">Koppints rá vagy húzd el az eltávolításhoz</string>
+
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Címsor</string>
     <string name="settingsAddressBarPositionHeaderTitle">Címsor elhelyezkedése</string>

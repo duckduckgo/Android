@@ -903,6 +903,26 @@
     <string name="preOnboardingInputScreenButton">Следващ</string>
     <string name="preOnboardingInputScreenDescription"><![CDATA[Функциите на изкуствения интелект са поверителни и незадължителни. Можеш да направиш промени в <b>Настройки > ИИ функции</b>.]]></string>
 
+    <!--Onboarding Reinstall Quick Setup-->
+    <string name="preOnboardingReinstallQuickSetupTitle">Добре дошли отново!&lt;br/&gt;Искате ли да персонализирате нещо?</string>
+    <string name="preOnboardingReinstallSetDefaultLabel">Задайте DuckDuckGo по подразбиране</string>
+    <string name="preOnboardingReinstallAddHomeScreenWidgetLabel">Добавяне на приспособление на началния екран</string>
+    <string name="preOnboardingReinstallAddressBarLabel">Позиция на адресната лента</string>
+    <string name="preOnboardingReinstallAddressBarSearchOptionsLabel">Опции за търсене в адресната лента</string>
+    <string name="preOnboardingReinstallStartBrowsing">Стартиране на сърфирането</string>
+
+    <!-- Quick setup bottom sheets -->
+    <string name="quickSetupAddressBarPositionTitle">Къде искате да бъде адресната лента?</string>
+    <string name="quickSetupAddressBarPositionCaption"><![CDATA[Можете да направите промени в <b>Настройки > Оформление</b>.]]></string>
+    <string name="quickSetupSearchOptionsTitle">Искате в адресната лента да има търсене и чат с AI?</string>
+    <string name="quickSetupBottomSheetDone">Готово</string>
+    <string name="quickSetupInputScreenSearchOnly">Само търсене</string>
+    <string name="quickSetupInputScreenSearchAndDuckAi">Търсене и Duck.ai</string>
+    <string name="quickSetupRemoveHomeScreenWidgetTitle">Как да премахнете приспособлението от началния екран</string>
+    <string name="quickSetupRemoveHomeScreenWidgetStep1">Отидете на началния екран</string>
+    <string name="quickSetupRemoveHomeScreenWidgetStep2">Докоснете и задръжте приспособлението</string>
+    <string name="quickSetupRemoveHomeScreenWidgetStep3">Докоснете или плъзнете, за да го премахнете</string>
+
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Адресна лента</string>
     <string name="settingsAddressBarPositionHeaderTitle">Позиция на адресната лента</string>

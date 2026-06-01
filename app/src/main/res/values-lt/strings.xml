@@ -943,6 +943,26 @@
     <string name="preOnboardingInputScreenButton">Kitas</string>
     <string name="preOnboardingInputScreenDescription"><![CDATA[DI funkcijos yra privačios ir neprivalomos. Galite atlikti pakeitimus <b>Nustatymai > DI funkcijos</b>.]]></string>
 
+    <!--Onboarding Reinstall Quick Setup-->
+    <string name="preOnboardingReinstallQuickSetupTitle">Smagu, kad grįžai!&lt;br/&gt;Nori ką nors tinkinti?</string>
+    <string name="preOnboardingReinstallSetDefaultLabel">Nustatyti „DuckDuckGo“ kaip numatytąją</string>
+    <string name="preOnboardingReinstallAddHomeScreenWidgetLabel">Pridėti pradžios ekrano valdiklį</string>
+    <string name="preOnboardingReinstallAddressBarLabel">Adreso juostos vieta</string>
+    <string name="preOnboardingReinstallAddressBarSearchOptionsLabel">Adreso juostos paieškos parinktys</string>
+    <string name="preOnboardingReinstallStartBrowsing">Pradėti naršyti</string>
+
+    <!-- Quick setup bottom sheets -->
+    <string name="quickSetupAddressBarPositionTitle">Kur nori matyti adreso juostą?</string>
+    <string name="quickSetupAddressBarPositionCaption"><![CDATA[Jei nori tai pakeisti, pasirink <b>Nuostatos > Išvaizda</b>.]]></string>
+    <string name="quickSetupSearchOptionsTitle">Nori adreso juostoje matyti paiešką ir DI pokalbius?</string>
+    <string name="quickSetupBottomSheetDone">Atlikta</string>
+    <string name="quickSetupInputScreenSearchOnly">Tik paieška</string>
+    <string name="quickSetupInputScreenSearchAndDuckAi">Paieška ir „Duck.ai“</string>
+    <string name="quickSetupRemoveHomeScreenWidgetTitle">Kaip pašalinti pradžios ekrano valdiklį</string>
+    <string name="quickSetupRemoveHomeScreenWidgetStep1">Eik į pradžios ekraną</string>
+    <string name="quickSetupRemoveHomeScreenWidgetStep2">Paliesk ir palaikyk valdiklį</string>
+    <string name="quickSetupRemoveHomeScreenWidgetStep3">Paliesk arba nuvilk, kad pašalintum</string>
+
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Adreso juosta</string>
     <string name="settingsAddressBarPositionHeaderTitle">Adreso juostos padėtis</string>

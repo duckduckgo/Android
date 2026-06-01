@@ -903,6 +903,26 @@
     <string name="preOnboardingInputScreenButton">Weiter</string>
     <string name="preOnboardingInputScreenDescription"><![CDATA[Die KI-Funktionen sind privat und optional. Unter <b>Einstellungen > KI-Funktionen</b> kannst du Änderungen vornehmen.]]></string>
 
+    <!--Onboarding Reinstall Quick Setup-->
+    <string name="preOnboardingReinstallQuickSetupTitle">Willkommen zurück!&lt;br/&gt;Möchtest du etwas individuell anpassen?</string>
+    <string name="preOnboardingReinstallSetDefaultLabel">DuckDuckGo als Standard festlegen</string>
+    <string name="preOnboardingReinstallAddHomeScreenWidgetLabel">Startbildschirm-Widget hinzufügen</string>
+    <string name="preOnboardingReinstallAddressBarLabel">Position der Adressleiste</string>
+    <string name="preOnboardingReinstallAddressBarSearchOptionsLabel">Suchoptionen für die Adressleiste</string>
+    <string name="preOnboardingReinstallStartBrowsing">Mit dem Browsen beginnen</string>
+
+    <!-- Quick setup bottom sheets -->
+    <string name="quickSetupAddressBarPositionTitle">Wo möchtest du deine Adressleiste haben?</string>
+    <string name="quickSetupAddressBarPositionCaption"><![CDATA[Du kannst Änderungen unter <b>Einstellungen > Erscheinungsbild</b> vornehmen.]]></string>
+    <string name="quickSetupSearchOptionsTitle">Möchtest du Such- und KI-Chatfunktionen in der Adressleiste?</string>
+    <string name="quickSetupBottomSheetDone">Fertig</string>
+    <string name="quickSetupInputScreenSearchOnly">Nur Suchen</string>
+    <string name="quickSetupInputScreenSearchAndDuckAi">Suche &amp; Duck.ai</string>
+    <string name="quickSetupRemoveHomeScreenWidgetTitle">So entfernst du das Startbildschirm-Widget</string>
+    <string name="quickSetupRemoveHomeScreenWidgetStep1">Gehe zu deinem Startbildschirm</string>
+    <string name="quickSetupRemoveHomeScreenWidgetStep2">Halte das Widget gedrückt</string>
+    <string name="quickSetupRemoveHomeScreenWidgetStep3">Zum Entfernen antippen oder ziehen</string>
+
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Adresszeile</string>
     <string name="settingsAddressBarPositionHeaderTitle">Position der Adressleiste</string>
