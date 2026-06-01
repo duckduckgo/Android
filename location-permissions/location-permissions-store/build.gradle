@@ -51,6 +51,10 @@ dependencies {
     ksp AndroidX.room.compiler
     implementation Google.dagger
 
+    // DAO query return types (LiveData + Flow) — Room KSP needs these to resolve the DAO.
+    implementation AndroidX.lifecycle.liveDataKtx
+    implementation KotlinX.coroutines.core
+
     testImplementation project(path: ':common-test')
     testImplementation Testing.junit4
 
