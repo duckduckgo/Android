@@ -943,6 +943,26 @@
     <string name="preOnboardingInputScreenButton">Dalje</string>
     <string name="preOnboardingInputScreenDescription"><![CDATA[Značajke umjetne inteligencije privatne su i neobavezne. Izmjene možeš napraviti u izborniku <b>Postavke > AI značajke</b>.]]></string>
 
+    <!--Onboarding Reinstall Quick Setup-->
+    <string name="preOnboardingReinstallQuickSetupTitle">Dobrodošao natrag!&lt;br/&gt;Želiš li nešto prilagoditi?</string>
+    <string name="preOnboardingReinstallSetDefaultLabel">Postavi DuckDuckGo kao zadanu tražilicu</string>
+    <string name="preOnboardingReinstallAddHomeScreenWidgetLabel">Dodaj widget na početni zaslon</string>
+    <string name="preOnboardingReinstallAddressBarLabel">Položaj adresne trake</string>
+    <string name="preOnboardingReinstallAddressBarSearchOptionsLabel">Opcije pretraživanja adresne trake</string>
+    <string name="preOnboardingReinstallStartBrowsing">Započni pretraživanje</string>
+
+    <!-- Quick setup bottom sheets -->
+    <string name="quickSetupAddressBarPositionTitle">Gdje želiš svoju adresnu traku?</string>
+    <string name="quickSetupAddressBarPositionCaption"><![CDATA[Promjene možeš napraviti u <b>Postavke > Izgled</b>.]]></string>
+    <string name="quickSetupSearchOptionsTitle">Želiš pretraživanje i AI čavrljanje u adresnoj traci?</string>
+    <string name="quickSetupBottomSheetDone">Gotovo</string>
+    <string name="quickSetupInputScreenSearchOnly">Samo pretraživanje</string>
+    <string name="quickSetupInputScreenSearchAndDuckAi">Pretraživanje i Duck.ai</string>
+    <string name="quickSetupRemoveHomeScreenWidgetTitle">Kako ukloniti widget s početnog zaslona</string>
+    <string name="quickSetupRemoveHomeScreenWidgetStep1">Idi na početni zaslon</string>
+    <string name="quickSetupRemoveHomeScreenWidgetStep2">Dodirni i drži widget</string>
+    <string name="quickSetupRemoveHomeScreenWidgetStep3">Dodirni ili povuci da ga ukloniš</string>
+
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Adresna traka</string>
     <string name="settingsAddressBarPositionHeaderTitle">Položaj adresne trake</string>

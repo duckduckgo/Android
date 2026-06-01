@@ -903,6 +903,26 @@
     <string name="preOnboardingInputScreenButton">Järgmine</string>
     <string name="preOnboardingInputScreenDescription"><![CDATA[Tehisintellekti funktsioonid on privaatsed ja valikulised. Saate muudatusi teha suvandis <b>Seaded > Tehisintellekti funktsioonid</b>.]]></string>
 
+    <!--Onboarding Reinstall Quick Setup-->
+    <string name="preOnboardingReinstallQuickSetupTitle">Tere tulemast tagasi!&lt;br/&gt;Kas soovid midagi kohandada?</string>
+    <string name="preOnboardingReinstallSetDefaultLabel">Määra DuckDuckGo vaikeotsinguks</string>
+    <string name="preOnboardingReinstallAddHomeScreenWidgetLabel">Lisa avalehe vidin</string>
+    <string name="preOnboardingReinstallAddressBarLabel">Aadressiriba asukoht</string>
+    <string name="preOnboardingReinstallAddressBarSearchOptionsLabel">Aadressiriba otsinguvõimalused</string>
+    <string name="preOnboardingReinstallStartBrowsing">Alusta sirvimist</string>
+
+    <!-- Quick setup bottom sheets -->
+    <string name="quickSetupAddressBarPositionTitle">Kuhu sa oma aadressiriba paigutada soovid?</string>
+    <string name="quickSetupAddressBarPositionCaption"><![CDATA[Muudatusi saad teha <b>menüüs Seaded > Välimus</b>.]]></string>
+    <string name="quickSetupSearchOptionsTitle">Kas soovid otsingut ja tehisintellektiga vestlust aadressiribale?</string>
+    <string name="quickSetupBottomSheetDone">Valmis</string>
+    <string name="quickSetupInputScreenSearchOnly">Ainult otsing</string>
+    <string name="quickSetupInputScreenSearchAndDuckAi">Otsing ja Duck.ai</string>
+    <string name="quickSetupRemoveHomeScreenWidgetTitle">Kuidas avalehe vidinat eemaldada</string>
+    <string name="quickSetupRemoveHomeScreenWidgetStep1">Mine oma avalehele</string>
+    <string name="quickSetupRemoveHomeScreenWidgetStep2">Puuduta ja hoia vidinat</string>
+    <string name="quickSetupRemoveHomeScreenWidgetStep3">Eemalda see puudutades või lohistades</string>
+
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Aadressiriba</string>
     <string name="settingsAddressBarPositionHeaderTitle">Aadressiriba asukoht</string>

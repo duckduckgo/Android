@@ -943,6 +943,26 @@
     <string name="preOnboardingInputScreenButton">Dalej</string>
     <string name="preOnboardingInputScreenDescription"><![CDATA[Funkcje sztucznej inteligencji są prywatne i opcjonalne. Możesz dokonać zmian w obszarze <b>Ustawienia > Funkcje AI</b>.]]></string>
 
+    <!--Onboarding Reinstall Quick Setup-->
+    <string name="preOnboardingReinstallQuickSetupTitle">Witamy z powrotem!&lt;br/&gt;Chcesz coś spersonalizować?</string>
+    <string name="preOnboardingReinstallSetDefaultLabel">Ustaw DuckDuckGo jako domyślną przeglądarkę</string>
+    <string name="preOnboardingReinstallAddHomeScreenWidgetLabel">Dodaj widżet do ekranu głównego</string>
+    <string name="preOnboardingReinstallAddressBarLabel">Pozycja paska adresu</string>
+    <string name="preOnboardingReinstallAddressBarSearchOptionsLabel">Opcje wyszukiwania na pasku adresowym</string>
+    <string name="preOnboardingReinstallStartBrowsing">Rozpocznij przeglądanie</string>
+
+    <!-- Quick setup bottom sheets -->
+    <string name="quickSetupAddressBarPositionTitle">Gdzie chcesz mieć pasek adresu?</string>
+    <string name="quickSetupAddressBarPositionCaption"><![CDATA[Możesz dokonać zmian w obszarze <b>Ustawienia > Wygląd</b>.]]></string>
+    <string name="quickSetupSearchOptionsTitle">Chcesz mieć dostęp do wyszukiwania i czatu AI na pasku adresu?</string>
+    <string name="quickSetupBottomSheetDone">Gotowe</string>
+    <string name="quickSetupInputScreenSearchOnly">Tylko wyszukiwanie</string>
+    <string name="quickSetupInputScreenSearchAndDuckAi">Wyszukiwanie i Duck.ai</string>
+    <string name="quickSetupRemoveHomeScreenWidgetTitle">Jak usunąć widżet na ekranie głównym</string>
+    <string name="quickSetupRemoveHomeScreenWidgetStep1">Przejdź do ekranu głównego</string>
+    <string name="quickSetupRemoveHomeScreenWidgetStep2">Dotknij i przytrzymaj widget</string>
+    <string name="quickSetupRemoveHomeScreenWidgetStep3">Stuknij lub przeciągnij, aby go usunąć</string>
+
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Pasek adresu</string>
     <string name="settingsAddressBarPositionHeaderTitle">Pozycja paska adresu</string>

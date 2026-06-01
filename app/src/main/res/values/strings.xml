@@ -902,6 +902,26 @@
     <string name="preOnboardingInputScreenButton">Next</string>
     <string name="preOnboardingInputScreenDescription"><![CDATA[AI features are private and optional. You can make changes in <b>Settings > AI Features</b>.]]></string>
 
+    <!--Onboarding Reinstall Quick Setup-->
+    <string name="preOnboardingReinstallQuickSetupTitle">Welcome back!&lt;br/&gt;Want to customize anything?</string>
+    <string name="preOnboardingReinstallSetDefaultLabel">Set DuckDuckGo as default</string>
+    <string name="preOnboardingReinstallAddHomeScreenWidgetLabel">Add Home screen widget</string>
+    <string name="preOnboardingReinstallAddressBarLabel">Address bar position</string>
+    <string name="preOnboardingReinstallAddressBarSearchOptionsLabel">Address bar search options</string>
+    <string name="preOnboardingReinstallStartBrowsing">Start Browsing</string>
+
+    <!-- Quick setup bottom sheets -->
+    <string name="quickSetupAddressBarPositionTitle">Where do you want your address bar?</string>
+    <string name="quickSetupAddressBarPositionCaption"><![CDATA[You can make changes in <b>Settings > Appearance</b>.]]></string>
+    <string name="quickSetupSearchOptionsTitle">Want Search &amp; AI chat in the address bar?</string>
+    <string name="quickSetupBottomSheetDone">Done</string>
+    <string name="quickSetupInputScreenSearchOnly">Search Only</string>
+    <string name="quickSetupInputScreenSearchAndDuckAi">Search and Duck.ai</string>
+    <string name="quickSetupRemoveHomeScreenWidgetTitle">How to remove the Home screen widget</string>
+    <string name="quickSetupRemoveHomeScreenWidgetStep1">Go to your Home screen</string>
+    <string name="quickSetupRemoveHomeScreenWidgetStep2">Touch and hold the widget</string>
+    <string name="quickSetupRemoveHomeScreenWidgetStep3">Tap or drag to remove it</string>
+
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Address Bar</string>
     <string name="settingsAddressBarPositionHeaderTitle">Address Bar Position</string>

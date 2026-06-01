@@ -903,6 +903,26 @@
     <string name="preOnboardingInputScreenButton">Siguiente</string>
     <string name="preOnboardingInputScreenDescription"><![CDATA[Las funciones de IA son privadas y opcionales. Puedes realizar cambios en <b>Ajustes > Funciones de</b> IA.]]></string>
 
+    <!--Onboarding Reinstall Quick Setup-->
+    <string name="preOnboardingReinstallQuickSetupTitle">¡Te damos de nuevo la bienvenida!&lt;br/&gt;¿Quieres personalizar algo?</string>
+    <string name="preOnboardingReinstallSetDefaultLabel">Establecer DuckDuckGo como predeterminado</string>
+    <string name="preOnboardingReinstallAddHomeScreenWidgetLabel">Añadir widget a la pantalla de inicio</string>
+    <string name="preOnboardingReinstallAddressBarLabel">Posición de la barra de direcciones</string>
+    <string name="preOnboardingReinstallAddressBarSearchOptionsLabel">Opciones de búsqueda en la barra de direcciones</string>
+    <string name="preOnboardingReinstallStartBrowsing">Empezar a navegar</string>
+
+    <!-- Quick setup bottom sheets -->
+    <string name="quickSetupAddressBarPositionTitle">¿Dónde quieres tu barra de direcciones?</string>
+    <string name="quickSetupAddressBarPositionCaption"><![CDATA[Puedes realizar cambios en <b>Ajustes > Apariencia</b>.]]></string>
+    <string name="quickSetupSearchOptionsTitle">¿Quieres la búsqueda y chat de IA en la barra de direcciones? </string>
+    <string name="quickSetupBottomSheetDone">Hecho</string>
+    <string name="quickSetupInputScreenSearchOnly">Solo buscar</string>
+    <string name="quickSetupInputScreenSearchAndDuckAi">Búsqueda y Duck.ai</string>
+    <string name="quickSetupRemoveHomeScreenWidgetTitle">Cómo eliminar el widget de la pantalla de inicio</string>
+    <string name="quickSetupRemoveHomeScreenWidgetStep1">Ve a tu pantalla de inicio</string>
+    <string name="quickSetupRemoveHomeScreenWidgetStep2">Toca y mantén pulsado el widget</string>
+    <string name="quickSetupRemoveHomeScreenWidgetStep3">Toca o arrastra para eliminarlo</string>
+
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Barra de direcciones</string>
     <string name="settingsAddressBarPositionHeaderTitle">Posición de la barra de direcciones</string>
