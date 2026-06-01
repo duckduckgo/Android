@@ -36,10 +36,6 @@ dependencies {
     implementation "com.squareup.logcat:logcat:_"
     implementation Google.dagger
 
-    // Room (for the @Dao and @TypeConverter codegen)
-    implementation AndroidX.room.runtime
-    ksp AndroidX.room.compiler
-
     testImplementation project(path: ':common-test')
     testImplementation Testing.junit4
     testImplementation AndroidX.test.ext.junit

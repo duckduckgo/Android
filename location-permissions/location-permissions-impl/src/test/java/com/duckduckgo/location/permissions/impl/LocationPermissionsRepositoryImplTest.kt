@@ -21,6 +21,7 @@ import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.location.permissions.api.LocationPermissionEntity
 import com.duckduckgo.location.permissions.api.LocationPermissionType
+import com.duckduckgo.location.permissions.api.LocationPermissionsDao
 import dagger.Lazy
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals

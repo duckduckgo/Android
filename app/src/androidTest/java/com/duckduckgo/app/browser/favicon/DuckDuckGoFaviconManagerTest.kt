@@ -31,7 +31,7 @@ import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepositoryI
 import com.duckduckgo.autofill.api.store.AutofillStore
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.faviconLocation
-import com.duckduckgo.location.permissions.impl.LocationPermissionsDao
+import com.duckduckgo.location.permissions.api.LocationPermissionsDao
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.store.SavedSitesEntitiesDao
 import com.duckduckgo.sync.api.favicons.FaviconsFetchingStore

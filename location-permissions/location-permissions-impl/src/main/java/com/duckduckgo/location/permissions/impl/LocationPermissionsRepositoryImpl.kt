@@ -22,6 +22,7 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.location.permissions.api.LocationPermissionEntity
 import com.duckduckgo.location.permissions.api.LocationPermissionType
+import com.duckduckgo.location.permissions.api.LocationPermissionsDao
 import com.duckduckgo.location.permissions.api.LocationPermissionsRepository
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.Lazy

@@ -66,8 +66,8 @@ import com.duckduckgo.app.usage.app.AppDaysUsedEntity
 import com.duckduckgo.app.usage.search.SearchCountDao
 import com.duckduckgo.app.usage.search.SearchCountEntity
 import com.duckduckgo.location.permissions.api.LocationPermissionEntity
-import com.duckduckgo.location.permissions.impl.LocationPermissionTypeConverter
-import com.duckduckgo.location.permissions.impl.LocationPermissionsDao
+import com.duckduckgo.location.permissions.api.LocationPermissionTypeConverter
+import com.duckduckgo.location.permissions.api.LocationPermissionsDao
 import com.duckduckgo.savedsites.store.Entity
 import com.duckduckgo.savedsites.store.EntityTypeConverter
 import com.duckduckgo.savedsites.store.Relation

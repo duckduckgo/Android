@@ -14,10 +14,9 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.location.permissions.impl
+package com.duckduckgo.location.permissions.api
 
 import androidx.room.TypeConverter
-import com.duckduckgo.location.permissions.api.LocationPermissionType
 
 class LocationPermissionTypeConverter {
 

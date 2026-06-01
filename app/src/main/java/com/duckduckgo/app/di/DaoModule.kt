@@ -44,7 +44,7 @@ import com.duckduckgo.app.usage.search.SearchCountDao
 import com.duckduckgo.browsermode.api.FireMode
 import com.duckduckgo.browsermode.api.RegularMode
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.location.permissions.impl.LocationPermissionsDao
+import com.duckduckgo.location.permissions.api.LocationPermissionsDao
 import com.duckduckgo.savedsites.store.SavedSitesEntitiesDao
 import com.duckduckgo.savedsites.store.SavedSitesRelationsDao
 import com.squareup.anvil.annotations.ContributesTo
