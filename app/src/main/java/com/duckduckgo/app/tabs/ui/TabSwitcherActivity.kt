@@ -28,6 +28,7 @@ import android.view.View
 import android.widget.FrameLayout
 import android.widget.ImageView
 import androidx.activity.OnBackPressedCallback
+import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatDelegate.FEATURE_SUPPORT_ACTION_BAR
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.children
@@ -93,6 +94,9 @@ import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.dataclearing.api.fire.FireDialogProvider
 import com.duckduckgo.dataclearing.api.fire.FireDialogProvider.FireDialogOrigin.TabSwitcher
 import com.duckduckgo.di.scopes.ActivityScope
@@ -149,6 +153,12 @@ class TabSwitcherActivity :
 
     @Inject
     lateinit var omnibarRepository: OmnibarRepository
+
+    @Inject
+    lateinit var edgeToEdgeProvider: EdgeToEdgeProvider
+
+    @Inject
+    lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
 
     private val viewModel: TabSwitcherViewModel by bindViewModel()
 
@@ -236,6 +246,12 @@ class TabSwitcherActivity :
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        val edgeToEdgeEnabled = edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.BROWSER)
+        if (edgeToEdgeEnabled) {
+            enableEdgeToEdge()
+        }
+
         setContentView(binding.root)
 
         tabsAdapter.setAnimationTileCloseClickListener {
@@ -248,10 +264,24 @@ class TabSwitcherActivity :
         configureRecycler()
         configureNavigationBar()
 
+        if (edgeToEdgeEnabled) {
+            configureEdgeToEdgeInsets()
+        }
+
         configureObservers()
         configureOnBackPressedListener()
 
         initMenuClickListeners()
+    }
+
+    private fun configureEdgeToEdgeInsets() {
+        edgeToEdgeHandler.applyNavigationBarInsets(binding.root)
+        when (settingsDataStore.omnibarType) {
+            OmnibarType.SINGLE_TOP, OmnibarType.SPLIT ->
+                edgeToEdgeHandler.applyStatusBarInsets(binding.tabSwitcherToolbarTop.root)
+            OmnibarType.SINGLE_BOTTOM ->
+                edgeToEdgeHandler.applyStatusBarInsets(tabsContainer)
+        }
     }
 
     private fun configureNavigationBar() {
