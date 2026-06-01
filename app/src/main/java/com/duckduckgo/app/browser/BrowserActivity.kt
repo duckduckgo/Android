@@ -40,7 +40,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.activity.viewModels
 import androidx.annotation.VisibleForTesting
-import androidx.core.os.BundleCompat
 import androidx.core.view.isVisible
 import androidx.core.view.postDelayed
 import androidx.lifecycle.Lifecycle
@@ -278,11 +277,12 @@ open class BrowserActivity : DuckDuckGoActivity() {
     private var lastIntent: Intent? = null
 
     /**
-     * Holds an [Intent] that arrived while in [BrowserMode.FIRE] and must be processed in
-     * [BrowserMode.REGULAR]. Read once by [BrowserStateRenderer.showWebContent] and cleared;
-     * takes precedence over [lastIntent].
+     * Holds an action deferred across a browser-mode switch. Switching mode recreates the activity
+     * (see [observeBrowserModeChanges]), which cancels [lifecycleScope], so the action is stashed
+     * here, carried across the recreate via [onSaveInstanceState], and replayed on the recreated,
+     * target-mode instance by [BrowserStateRenderer.showWebContent]. See [switchModeThen].
      */
-    private var pendingFireToRegularIntent: Intent? = null
+    private var pendingModeSwitch: PendingModeSwitch? = null
 
     // we don't store isExternal in the tab model, as it's only meant for the first time the tab is loaded.
     private val externalLaunchTabIds = mutableSetOf<String>()
@@ -384,9 +384,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
         renderer = BrowserStateRenderer()
         val newInstanceState = if (dataClearer.isFreshAppLaunch) null else savedInstanceState
         instanceStateBundles = CombinedInstanceState(originalInstanceState = savedInstanceState, newInstanceState = newInstanceState)
-        pendingFireToRegularIntent = newInstanceState?.let {
-            BundleCompat.getParcelable(it, KEY_PENDING_FIRE_TO_REGULAR_INTENT, Intent::class.java)
-        }
+        pendingModeSwitch = newInstanceState?.getBundle(KEY_PENDING_MODE_SWITCH)?.toPendingModeSwitch()
 
         super.onCreate(savedInstanceState = newInstanceState, daggerInject = false)
 
@@ -442,7 +440,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
         if (swipingTabsFeature.isEnabled) {
             outState.putParcelable(KEY_TAB_PAGER_STATE, tabPagerAdapter.saveState())
         }
-        pendingFireToRegularIntent?.let { outState.putParcelable(KEY_PENDING_FIRE_TO_REGULAR_INTENT, it) }
+        pendingModeSwitch?.let { outState.putBundle(KEY_PENDING_MODE_SWITCH, it.toBundle()) }
     }
 
     private suspend fun configureFlowCollectors() {
@@ -742,14 +740,11 @@ open class BrowserActivity : DuckDuckGoActivity() {
         }
 
         // Intents stamped with LAUNCH_REQUIRES_REGULAR_MODE must reach BrowserActivity in REGULAR
-        // mode. Stash the intent and carry it to the recreated REGULAR-bound instance.
+        // mode. Switch first (recreating the activity) and process the intent on the REGULAR instance.
         val requiresRegularBrowserMode = intent.getBooleanExtra(LAUNCH_REQUIRES_REGULAR_MODE, false)
         if (requiresRegularBrowserMode && currentBrowserMode != BrowserMode.REGULAR) {
             logcat(INFO) { "Intent requires REGULAR mode while in a non-regular mode — switching before processing" }
-            pendingFireToRegularIntent = intent
-            lifecycleScope.launch {
-                viewModel.switchToMode(BrowserMode.REGULAR)
-            }
+            switchModeThen(BrowserMode.REGULAR, PendingAction.ProcessIntent(intent))
             return
         }
 
@@ -1415,8 +1410,9 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
         private const val MAX_ACTIVE_TABS = 40
         private const val KEY_TAB_PAGER_STATE = "tabPagerState"
-        private const val KEY_PENDING_FIRE_TO_REGULAR_INTENT = "pendingFireToRegularIntent"
         private const val KEY_SAVED_BROWSER_MODE = "savedBrowserMode"
+
+        private const val KEY_PENDING_MODE_SWITCH = "pendingModeSwitch"
 
         private const val DISABLE_SWIPING_DELAY = 1000L
 
@@ -1457,11 +1453,11 @@ open class BrowserActivity : DuckDuckGoActivity() {
             configureObservers()
             binding.clearingInProgressView.gone()
 
-            pendingFireToRegularIntent?.let { pending ->
-                logcat(INFO) { "Intent deferred across FIRE→REGULAR recreate; handling now" }
-                pendingFireToRegularIntent = null
+            pendingModeSwitch?.let { pending ->
+                logcat(INFO) { "Action deferred across mode-switch recreate; handling now" }
+                pendingModeSwitch = null
                 processedOriginalIntent = true
-                launchNewSearchOrQuery(pending)
+                switchModeThen(pending.targetMode, pending.action)
                 return
             }
 
@@ -1702,6 +1698,57 @@ open class BrowserActivity : DuckDuckGoActivity() {
         sourceTabId: String? = null,
         skipHome: Boolean = false,
         isExternal: Boolean = false,
+        browserMode: BrowserMode = currentBrowserMode,
+    ) {
+        switchModeThen(browserMode, PendingAction.OpenNewTab(query, sourceTabId, skipHome, isExternal))
+    }
+
+    /**
+     * Switches to [targetMode] (in either direction) and then runs [action]. If [targetMode] is
+     * already current, the action runs immediately. Otherwise switchToMode — a synchronous mutation
+     * of the app-scoped mode holder — recreates the activity in the target mode (see
+     * [observeBrowserModeChanges]), cancelling [lifecycleScope], so the action is stashed in
+     * [pendingModeSwitch], carried across the recreate via [onSaveInstanceState], and replayed by
+     * [BrowserStateRenderer.showWebContent].
+     *
+     * The replay calls this same method, so it is self-correcting: on the recreated instance the
+     * mode matches and the action runs; were it ever to run before the recreate, it simply re-stashes.
+     */
+    private fun switchModeThen(targetMode: BrowserMode, action: PendingAction) {
+        if (targetMode == currentBrowserMode) {
+            runAction(action)
+            return
+        }
+        if (viewModel.switchToMode(targetMode)) {
+            pendingModeSwitch = PendingModeSwitch(targetMode, action)
+        } else {
+            // Switch rejected (e.g. Fire mode unavailable); run the action in the current mode.
+            runAction(action)
+        }
+    }
+
+    private fun runAction(action: PendingAction) {
+        when (action) {
+            // Security invariant: a carried Intent is only ever *consumed* here (its extras read by
+            // processIntent), never re-launched via startActivity/startService. Launching an Intent
+            // sourced from our (externally reachable) launch Intent would be an intent-redirection
+            // sink — see https://developer.android.com/privacy-and-security/risks/intent-redirection.
+            // Any future PendingAction that needs to launch a target must allowlist it first.
+            is PendingAction.ProcessIntent -> processIntent(action.intent)
+            is PendingAction.OpenNewTab -> openNewTabInCurrentMode(
+                action.query,
+                action.sourceTabId,
+                action.skipHome,
+                action.isExternal,
+            )
+        }
+    }
+
+    private fun openNewTabInCurrentMode(
+        query: String?,
+        sourceTabId: String?,
+        skipHome: Boolean,
+        isExternal: Boolean,
     ) {
         lifecycleScope.launch {
             if (swipingTabsFeature.isEnabled) {

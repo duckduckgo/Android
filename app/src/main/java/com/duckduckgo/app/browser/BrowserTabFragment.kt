@@ -805,10 +805,10 @@ class BrowserTabFragment :
                 duckChat.openVoiceDuckChat()
             }
             onMenuItemClicked(contentView.findViewById(com.duckduckgo.duckchat.impl.R.id.chatMenuPopupNewTab)) {
-                browserActivity?.launchNewTab()
+                browserActivity?.launchNewTab(browserMode = BrowserMode.REGULAR)
             }
             onMenuItemClicked(contentView.findViewById(com.duckduckgo.duckchat.impl.R.id.chatMenuPopupNewFireTab)) {
-                browserActivity?.launchNewTab()
+                browserActivity?.launchNewTab(browserMode = BrowserMode.FIRE)
             }
         }
     }
