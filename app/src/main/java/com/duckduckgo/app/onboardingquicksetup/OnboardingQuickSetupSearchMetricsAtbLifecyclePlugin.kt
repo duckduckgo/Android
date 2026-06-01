@@ -41,7 +41,7 @@ class OnboardingQuickSetupSearchMetricsAtbLifecyclePlugin @Inject constructor(
     }
 
     private suspend fun buildMetrics(): List<MetricsPixel> {
-        val toggle = toggles.onboardingQuickSetupExperimentMay26()
+        val toggle = toggles.onboardingQuickSetupExperimentJun3()
         if (!toggle.isEnabled() || !toggle.isEnrolled()) {
             return emptyList()
         }
