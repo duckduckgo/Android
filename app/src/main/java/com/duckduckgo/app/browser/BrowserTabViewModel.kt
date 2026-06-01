@@ -246,6 +246,7 @@ import com.duckduckgo.app.cta.ui.BrokenSitePromptDialogCta
 import com.duckduckgo.app.cta.ui.Cta
 import com.duckduckgo.app.cta.ui.CtaViewModel
 import com.duckduckgo.app.cta.ui.DaxBubbleCta
+import com.duckduckgo.app.cta.ui.DaxDuckAiFireButtonBrandDesignUpdateContextualCta
 import com.duckduckgo.app.cta.ui.DaxEndBrandDesignUpdateBubbleCta
 import com.duckduckgo.app.cta.ui.DaxFireButtonBrandDesignUpdateContextualCta
 import com.duckduckgo.app.cta.ui.DaxMainNetworkBrandDesignUpdateContextualCta
@@ -704,7 +705,9 @@ class BrowserTabViewModel @Inject constructor(
     @FlowPreview
     private val showPulseAnimation: LiveData<Boolean> =
         combine(
-            ctaViewState.asFlow().map { it.cta is OnboardingDaxDialogCta.DaxDuckAiFireButtonCta }.distinctUntilChanged(),
+            ctaViewState.asFlow().map {
+                it.cta is OnboardingDaxDialogCta.DaxDuckAiFireButtonCta || it.cta is DaxDuckAiFireButtonBrandDesignUpdateContextualCta
+            }.distinctUntilChanged(),
             ctaViewModel.showFireButtonPulseAnimation,
         ) { isShowingDuckAiFireButtonCta, showPulseAnimation -> isShowingDuckAiFireButtonCta || showPulseAnimation }
             .asLiveData(context = viewModelScope.coroutineContext)
@@ -5173,7 +5176,7 @@ class BrowserTabViewModel @Inject constructor(
         val cta = currentCtaViewState().cta
 
         // Defer cleanup (CTA dismiss, highlight removal) until the fire action actually completes.
-        if (cta is OnboardingDaxDialogCta.DaxDuckAiFireButtonCta) {
+        if (cta is OnboardingDaxDialogCta.DaxDuckAiFireButtonCta || cta is DaxDuckAiFireButtonBrandDesignUpdateContextualCta) {
             viewModelScope.launch {
                 ctaViewModel.onDuckAiFireButtonCtaPressed()
             }
@@ -5592,11 +5595,10 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun dismissDuckAiFireOnboardingCta() {
-        ctaViewState.value?.cta
-            ?.let { it as? OnboardingDaxDialogCta.DaxDuckAiFireButtonCta }
-            ?.let { duckAiFireCta ->
-                viewModelScope.launch { ctaViewModel.onUserDismissedCta(cta = duckAiFireCta) }
-            }
+        val cta = ctaViewState.value?.cta ?: return
+        if (cta is OnboardingDaxDialogCta.DaxDuckAiFireButtonCta || cta is DaxDuckAiFireButtonBrandDesignUpdateContextualCta) {
+            viewModelScope.launch { ctaViewModel.onUserDismissedCta(cta = cta) }
+        }
     }
 
     private fun trackersCount(): String =
