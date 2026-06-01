@@ -273,6 +273,7 @@
     <string name="singleTabFireDialogDeleteAll">Smazat vše</string>
     <string name="singleTabFireDialogDeleteThisTab">Vymazat tuto kartu</string>
     <string name="singleTabFireDialogDeleteChat">Smazat chat</string>
+    <string name="singleTabFireDialogDeleteChats">Smazat chaty</string>
     <string name="singleTabFireDialogTitleDuckAi">Smazat tento chat?</string>
     <string name="singleTabFireDialogSubtitleSiteData">Když vymažeš data stránek, může dojít ke tvému odhlášení z účtů.</string>
     <string name="singleTabFireDialogSubtitleDownloads">Tím se zruší probíhající stahování.</string>
