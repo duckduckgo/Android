@@ -1525,10 +1525,18 @@ class BrowserTabViewModel @Inject constructor(
 
         globalLayoutState.value = Browser(isNewTabState = false)
         findInPageViewState.value = FindInPageViewState(visible = false)
+        // A submitted Duck.ai URL opens in full-screen Duck.ai mode (empty address bar), so never
+        // paint its URL into the omnibar — otherwise it flashes for the brief window between submit
+        // and full-screen mode engaging, and lingers if the user navigates back during that window.
+        val isDuckChatUrl = duckChat.isDuckChatUrl(trimmedInput.toUri())
         omnibarViewState.value =
             currentOmnibarViewState().copy(
-                omnibarText = if (isFullUrlEnabled.value) trimmedInput else addressDisplayFormatter.getShortUrl(trimmedInput),
-                queryOrFullUrl = trimmedInput,
+                omnibarText = when {
+                    isDuckChatUrl -> ""
+                    isFullUrlEnabled.value -> trimmedInput
+                    else -> addressDisplayFormatter.getShortUrl(trimmedInput)
+                },
+                queryOrFullUrl = if (isDuckChatUrl) "" else trimmedInput,
                 forceExpand = true,
             )
         browserViewState.value =
@@ -2292,6 +2300,7 @@ class BrowserTabViewModel @Inject constructor(
         showFullUrl: Boolean,
     ): String {
         if (url == null) return ""
+        if (duckChat.isDuckChatUrl(url.toUri())) return ""
 
         return if (duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url)) {
             duckDuckGoUrlDetector.extractQuery(url) ?: url

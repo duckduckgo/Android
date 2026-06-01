@@ -1258,6 +1258,18 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenDuckChatUrlSubmittedThenOmnibarTextAndQueryRemainBlank() {
+        val duckChatUrl = "https://duck.ai/chat?q=test&prompt=1&duckai=5"
+        whenever(mockDuckChat.isDuckChatUrl(duckChatUrl.toUri())).thenReturn(true)
+        whenever(mockOmnibarConverter.convertQueryToUrl(duckChatUrl, null)).thenReturn(duckChatUrl)
+
+        testee.onUserSubmittedQuery(duckChatUrl)
+
+        assertEquals("", omnibarViewState().omnibarText)
+        assertEquals("", omnibarViewState().queryOrFullUrl)
+    }
+
+    @Test
     fun whenQuerySubmittedWhileOnNtpAndFeatureEnabledThenNtpSearchSubmittedNotified() {
         fakeAndroidConfigBrowserFeature.showNTPAfterIdleReturn().setRawStoredState(State(enable = true))
         whenever(mockOmnibarConverter.convertQueryToUrl("cats", null)).thenReturn("https://duckduckgo.com/?q=cats")
@@ -1680,6 +1692,15 @@ class BrowserTabViewModelTest {
     fun whenNotBrowsingAndUrlLoadedWithQueryUrlThenOmnibarTextextRemainsBlank() {
         loadUrl("http://duckduckgo.com?q=test", isBrowserShowing = false)
         assertEquals("", omnibarViewState().omnibarText)
+    }
+
+    @Test
+    fun whenBrowsingAndDuckChatUrlLoadedThenOmnibarTextRemainsBlank() {
+        val duckChatUrl = "https://duck.ai/chat?q=DuckDuckGo+AI+Chat&duckai=5"
+        whenever(mockDuckChat.isDuckChatUrl(duckChatUrl.toUri())).thenReturn(true)
+        loadUrl(duckChatUrl, isBrowserShowing = true)
+        assertEquals("", omnibarViewState().omnibarText)
+        assertEquals("", omnibarViewState().queryOrFullUrl)
     }
 
     @Test
