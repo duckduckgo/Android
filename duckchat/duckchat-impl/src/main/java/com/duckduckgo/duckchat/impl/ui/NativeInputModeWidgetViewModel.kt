@@ -60,8 +60,6 @@ import com.duckduckgo.subscriptions.api.Subscriptions
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
-import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
-import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -73,7 +71,6 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -114,10 +111,6 @@ class NativeInputModeWidgetViewModel @Inject constructor(
     @Volatile
     private var lastChatUrlSuggestions: List<AutoCompleteSuggestion> = emptyList()
 
-    sealed class Command {
-        data class UpdatePluginVisibility(val containerIds: List<Int>, val visible: Boolean) : Command()
-    }
-
     private val _plugins = MutableStateFlow<List<NativeInputPlugin>>(emptyList())
     val plugins: StateFlow<List<NativeInputPlugin>> = _plugins.asStateFlow()
 
@@ -135,22 +128,12 @@ class NativeInputModeWidgetViewModel @Inject constructor(
     private var pendingChatId: String? = null
     private var hasPendingChatId = false
 
-    private val commandChannel = Channel<Command>(capacity = 1, onBufferOverflow = DROP_OLDEST)
-    val commands = commandChannel.receiveAsFlow()
-
     init {
         viewModelScope.launch {
             _plugins.value = nativeInputPlugins.getPlugins().toList()
         }
         viewModelScope.launch {
             _isHistoryAvailable.value = duckChatInternal.isChatHistoryAvailable()
-        }
-    }
-
-    fun updatePluginContainerVisibility(isChatTab: Boolean) {
-        val containerIds = _plugins.value.map { it.containerId }
-        if (containerIds.isNotEmpty()) {
-            commandChannel.trySend(Command.UpdatePluginVisibility(containerIds, isChatTab))
         }
     }
 

@@ -219,7 +219,6 @@ class NativeInputModeWidget @JvmOverloads constructor(
     private var isStreaming: Boolean = false
     private var attachmentLimitExceeded: Boolean = false
     private var hasAttachments: Boolean = false
-    private var supportsUpload: Boolean = true
     private var nativeInputState: NativeInputState? = null
     private var chatSuggestionsBinding: NativeInputChatSuggestionsBinder.Binding? = null
     private var onShowSuggestions: ((RecyclerView.Adapter<*>) -> Unit)? = null
@@ -304,20 +303,6 @@ class NativeInputModeWidget @JvmOverloads constructor(
                         wirePluginView(pluginView, scope)
                     }
                     optionsView?.updateCapabilitiesFrom(modelPickerView)
-                }
-            }
-            launch {
-                viewModel.commands.collect { command ->
-                    when (command) {
-                        is NativeInputModeWidgetViewModel.Command.UpdatePluginVisibility -> {
-                            for (containerId in command.containerIds) {
-                                if (containerId == R.id.startChatContainer) continue
-                                findViewById<FrameLayout?>(containerId)?.isVisible = command.visible && !isStreaming
-                            }
-                            findViewById<FrameLayout?>(R.id.attachmentsContainer)?.isVisible =
-                                command.visible && hasAttachments && !isStreaming
-                        }
-                    }
                 }
             }
             launch {
@@ -653,14 +638,12 @@ class NativeInputModeWidget @JvmOverloads constructor(
                 override fun onTabSelected(tab: TabLayout.Tab) {
                     applyTabUi()
                     pushToggleSelectionIfUserDriven()
-                    viewModel.updatePluginContainerVisibility(isChatTabSelected())
                     refreshTabDependentButtons()
                 }
                 override fun onTabUnselected(tab: TabLayout.Tab) {}
                 override fun onTabReselected(tab: TabLayout.Tab) {
                     applyTabUi()
                     pushToggleSelectionIfUserDriven()
-                    viewModel.updatePluginContainerVisibility(isChatTabSelected())
                     refreshTabDependentButtons()
                 }
             },
@@ -1145,7 +1128,6 @@ class NativeInputModeWidget @JvmOverloads constructor(
     private fun applyTabUi() {
         val toggle = findViewById<TabLayout?>(R.id.inputModeSwitch) ?: return
         val isChatTab = toggle.selectedTabPosition == 1
-        setImageButtonVisible(isChatTab && supportsUpload)
         submitButtons?.setSendButtonIcon(R.drawable.ic_arrow_right_24_inverted)
         if (isChatTab) {
             inputField.minLines = 1
@@ -1157,7 +1139,9 @@ class NativeInputModeWidget @JvmOverloads constructor(
     }
 
     override fun setImageButtonVisible(visible: Boolean) {
-        findViewById<FrameLayout?>(R.id.attachButtonContainer)?.isVisible = visible && !isStreaming
+        // Attach button visibility is self-managed by AttachmentView via NativeInputState.
+        // This method is retained for interface compatibility only.
+        findViewById<FrameLayout?>(R.id.attachButtonContainer)?.isVisible = visible
     }
 
     override fun setFloatingSubmitContainer(container: ViewGroup) {
@@ -1182,8 +1166,6 @@ class NativeInputModeWidget @JvmOverloads constructor(
         val hadLimitError = attachmentLimitExceeded
         attachmentLimitExceeded = limitExceeded
         this.hasAttachments = hasAttachments
-        this.supportsUpload = supportsUpload
-        setImageButtonVisible(isChatTabSelected() && supportsUpload)
         if (hadLimitError != attachmentLimitExceeded && !isStreaming) {
             floatingSubmitContainer?.visibility = if (attachmentLimitExceeded) GONE else VISIBLE
         }

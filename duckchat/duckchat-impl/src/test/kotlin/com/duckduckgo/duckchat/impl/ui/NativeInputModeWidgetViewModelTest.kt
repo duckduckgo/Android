@@ -918,20 +918,6 @@ class NativeInputModeWidgetViewModelTest {
         verify(pendingNativePromptStore).store("hello", "model-1", null, "GenerateImage", emptyList(), emptyList())
     }
 
-    @Test
-    fun whenUpdatePluginContainerVisibilityThenSendsCommand() = runTest {
-        val plugin = fakePlugin(containerId = 99)
-        val viewModel = createViewModel(plugins = listOf(plugin))
-
-        viewModel.updatePluginContainerVisibility(isChatTab = true)
-
-        val command = viewModel.commands.firstOrNull()
-        assertTrue(command is NativeInputModeWidgetViewModel.Command.UpdatePluginVisibility)
-        val update = command as NativeInputModeWidgetViewModel.Command.UpdatePluginVisibility
-        assertEquals(listOf(99), update.containerIds)
-        assertTrue(update.visible)
-    }
-
     private fun fakePlugin(containerId: Int): NativeInputPlugin {
         return object : NativeInputPlugin {
             override val containerId: Int = containerId
