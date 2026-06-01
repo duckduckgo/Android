@@ -132,7 +132,9 @@ class OptionsView(context: Context, private val host: NativeInputHost) : LinearL
     }
 
     private fun updateContainerVisibility() {
-        (parent as? View)?.isVisible = lastNativeInputState?.shouldShowPluginControls() == true
+        val show = lastNativeInputState?.shouldShowPluginControls() == true
+        isVisible = show
+        (parent as? View)?.isVisible = show
     }
 
     private fun renderSelection(tool: Tool?) {

@@ -111,7 +111,6 @@ interface NativeInputWidget {
     fun setVoiceChatAvailable(available: Boolean)
     fun submitMessage(message: String?)
     fun submitAsChat(): Boolean
-    fun setImageButtonVisible(visible: Boolean)
     fun setToggleVisible(visible: Boolean)
     fun setFloatingSubmitContainer(container: ViewGroup)
     fun getSelectedModelId(): String?
@@ -448,20 +447,6 @@ class NativeInputModeWidget @JvmOverloads constructor(
             !isStreaming &&
             !suppress
         bottomRow.visibility = if (visible) VISIBLE else GONE
-    }
-
-    private fun updateControlsVisibility() {
-        val show = shouldShowInputControls(isChatTabSelected(), isStreaming)
-        // The model/reasoning pickers are additionally owned by OptionsView, which hides them for
-        // tools that don't use them (e.g. image generation). Respect that so restoring controls
-        // after streaming doesn't re-show pickers that should stay hidden.
-        val showPickers = show && (optionsView?.pickersEnabled ?: true)
-        findViewById<View?>(R.id.modelPickerContainer)?.isVisible = showPickers
-        findViewById<View?>(R.id.reasoningModePickerContainer)?.isVisible = showPickers
-        findViewById<View?>(R.id.optionsButtonContainer)?.isVisible = show
-        findViewById<View?>(R.id.attachmentsContainer)?.isVisible = show && hasAttachments
-        // attach button keeps its own supportsUpload gate; setImageButtonVisible folds in !isStreaming
-        setImageButtonVisible(isChatTabSelected() && supportsUpload)
     }
 
     private fun updateToggleVisibilityForState() {
@@ -1119,7 +1104,6 @@ class NativeInputModeWidget @JvmOverloads constructor(
             floatingSubmitContainer?.visibility = if (attachmentLimitExceeded) GONE else VISIBLE
         }
         updateBottomRowVisibility()
-        updateControlsVisibility()
         updateSendButtonVisibility()
         updateVoiceButtonVisibility()
         updateNewLineButtonVisibility()
@@ -1136,12 +1120,6 @@ class NativeInputModeWidget @JvmOverloads constructor(
         updateSendButtonVisibility()
         updateNewLineButtonVisibility()
         updateBottomRowVisibility()
-    }
-
-    override fun setImageButtonVisible(visible: Boolean) {
-        // Attach button visibility is self-managed by AttachmentView via NativeInputState.
-        // This method is retained for interface compatibility only.
-        findViewById<FrameLayout?>(R.id.attachButtonContainer)?.isVisible = visible
     }
 
     override fun setFloatingSubmitContainer(container: ViewGroup) {
