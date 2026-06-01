@@ -28,7 +28,6 @@ import com.duckduckgo.app.browser.favicon.FileBasedFaviconPersister.Companion.FA
 import com.duckduckgo.app.browser.favicon.FileBasedFaviconPersister.Companion.NO_SUBFOLDER
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteDao
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepositoryImpl
-import com.duckduckgo.app.location.data.LocationPermissionsDao
 import com.duckduckgo.autofill.api.store.AutofillStore
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.faviconLocation
@@ -59,7 +58,6 @@ class DuckDuckGoFaviconManagerTest {
     private val mockSavedSitesDao: SavedSitesEntitiesDao = mock()
     private val mockSavedSitesRepository: SavedSitesRepository = mock()
     private val mockFireproofWebsiteDao: FireproofWebsiteDao = mock()
-    private val mockLocationPermissionsDao: LocationPermissionsDao = mock()
     private val mockFaviconDownloader: FaviconDownloader = mock()
     private val mockAutofillStore: AutofillStore = mock()
     private val mockFaviconFetchingStore: FaviconsFetchingStore = mock()

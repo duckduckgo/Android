@@ -25,7 +25,6 @@ import com.duckduckgo.app.fire.db.FireModeDatabase
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteDao
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.global.events.db.UserEventsDao
-import com.duckduckgo.app.location.data.LocationPermissionsDao
 import com.duckduckgo.app.notification.db.NotificationDao
 import com.duckduckgo.app.onboarding.store.UserStageDao
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
@@ -122,9 +121,6 @@ object DaoModule {
 
     @Provides
     fun userEventsDao(database: AppDatabase): UserEventsDao = database.userEventsDao()
-
-    @Provides
-    fun locationPermissionsDao(database: AppDatabase): LocationPermissionsDao = database.locationPermissionsDao()
 
     @Provides
     fun webTrackersBlockedDao(database: AppDatabase): WebTrackersBlockedDao = database.webTrackersBlockedDao()

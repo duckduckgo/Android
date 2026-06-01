@@ -274,7 +274,6 @@ import com.duckduckgo.app.global.model.SiteFactory
 import com.duckduckgo.app.global.model.domain
 import com.duckduckgo.app.global.model.domainMatchesUrl
 import com.duckduckgo.app.global.model.orderedTrackerBlockedEntities
-import com.duckduckgo.app.location.data.LocationPermissionType
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboardingbranddesignupdate.OnboardingBrandDesignUpdateToggles
 import com.duckduckgo.app.pixels.AppPixelName
@@ -367,6 +366,7 @@ import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.history.api.NavigationHistory
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
+import com.duckduckgo.location.permissions.api.LocationPermissionType
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed.MALWARE
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed.PHISHING

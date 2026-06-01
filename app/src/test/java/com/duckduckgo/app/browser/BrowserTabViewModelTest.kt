@@ -186,7 +186,6 @@ import com.duckduckgo.app.global.model.PrivacyShield.PROTECTED
 import com.duckduckgo.app.global.model.PrivacyShield.UNPROTECTED
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.SiteFactoryImpl
-import com.duckduckgo.app.location.data.LocationPermissionsDao
 import com.duckduckgo.app.onboarding.DuckAiOnboardingExperimentMetrics
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.AppStage.ESTABLISHED
@@ -543,8 +542,6 @@ class BrowserTabViewModelTest {
 
     private lateinit var fireproofWebsiteDao: FireproofWebsiteDao
 
-    private lateinit var locationPermissionsDao: LocationPermissionsDao
-
     private lateinit var accessibilitySettingsDataStore: AccessibilitySettingsDataStore
 
     private val context: Context = RuntimeEnvironment.getApplication()
@@ -714,7 +711,6 @@ class BrowserTabViewModelTest {
                     .allowMainThreadQueries()
                     .build()
             fireproofWebsiteDao = db.fireproofWebsiteDao()
-            locationPermissionsDao = db.locationPermissionsDao()
 
             val tabRepositoryProvider: BrowserModeDataProvider<TabRepository> = mock()
             whenever(tabRepositoryProvider.forMode(BrowserMode.REGULAR)).thenReturn(mockTabRepository)

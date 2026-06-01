@@ -40,8 +40,6 @@ import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.global.events.db.UserEventEntity
 import com.duckduckgo.app.global.events.db.UserEventTypeConverter
 import com.duckduckgo.app.global.events.db.UserEventsDao
-import com.duckduckgo.app.location.data.LocationPermissionEntity
-import com.duckduckgo.app.location.data.LocationPermissionsDao
 import com.duckduckgo.app.notification.db.NotificationDao
 import com.duckduckgo.app.notification.model.Notification
 import com.duckduckgo.app.onboarding.store.*
@@ -83,7 +81,7 @@ import com.duckduckgo.savedsites.store.SavedSitesRelationsDao
  */
 @Database(
     exportSchema = true,
-    version = 61,
+    version = 62,
     entities = [
         TdsTracker::class,
         TdsEntity::class,
@@ -109,7 +107,6 @@ import com.duckduckgo.savedsites.store.SavedSitesRelationsDao
         UserStage::class,
         FireproofWebsiteEntity::class,
         UserEventEntity::class,
-        LocationPermissionEntity::class,
         PixelEntity::class,
         PageLoadedPixelEntity::class,
         PagePaintedPixelEntity::class,
@@ -130,7 +127,6 @@ import com.duckduckgo.savedsites.store.SavedSitesRelationsDao
     CategoriesTypeConverter::class,
     StageTypeConverter::class,
     UserEventTypeConverter::class,
-    LocationPermissionTypeConverter::class,
     QueryParamsTypeConverter::class,
     EntityTypeConverter::class,
     LocalDateTimeTypeConverter::class,
@@ -158,7 +154,6 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun tdsDao(): TdsMetadataDao
     abstract fun userStageDao(): UserStageDao
     abstract fun fireproofWebsiteDao(): FireproofWebsiteDao
-    abstract fun locationPermissionsDao(): LocationPermissionsDao
     abstract fun userEventsDao(): UserEventsDao
     abstract fun pixelDao(): PendingPixelDao
 
@@ -736,6 +731,25 @@ class MigrationsProvider(val context: Context, val settingsDataStore: SettingsDa
     }
 
     /**
+     * The `locationPermissions` table moved out of this database into the standalone
+     * [com.duckduckgo.location.permissions.store.LocationPermissionsDatabase] (own-DB design).
+     *
+     * This migration intentionally DOES NOT drop the legacy `locationPermissions` table. Room no
+     * longer declares it as an entity, but the physical table must survive this release so that
+     * `LocationPermissionsDbCopyObserver` can read the existing rows once on first launch and copy
+     * them into the new database. Dropping it here would race the copy and lose data for users who
+     * have not yet run the location->site-permissions migration.
+     *
+     * TODO (follow-up release, once the copy is guaranteed to have run for the active user base):
+     *   add a later migration that does `DROP TABLE IF EXISTS locationPermissions`.
+     */
+    private val MIGRATION_61_TO_62: Migration = object : Migration(61, 62) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            // no-op: legacy `locationPermissions` table is deliberately retained for the one-time copy.
+        }
+    }
+
+    /**
      * WARNING ⚠️
      * This needs to happen because Room doesn't support UNIQUE (...) ON CONFLICT REPLACE when creating the bookmarks table.
      * When updating the bookmarks table, you will need to update this creation script in order to properly maintain the above
@@ -821,6 +835,7 @@ class MigrationsProvider(val context: Context, val settingsDataStore: SettingsDa
             MIGRATION_58_TO_59,
             MIGRATION_59_TO_60,
             MIGRATION_60_TO_61,
+            MIGRATION_61_TO_62,
         )
 
     @Deprecated(

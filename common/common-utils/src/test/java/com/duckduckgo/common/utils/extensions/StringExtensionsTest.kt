@@ -59,4 +59,9 @@ class StringExtensionsTest {
         assertNull("126.0.6478a.40".compareSemanticVersion("126.0.6478.40"))
         assertNull("126.0.6478.40a".compareSemanticVersion("126.0.6478.40"))
     }
+
+    @Test
+    fun whenDomainIsReturnedAsPermissionOriginThenDomainMatches() {
+        assertEquals("https://www.example.com/", "www.example.com".asLocationPermissionOrigin())
+    }
 }

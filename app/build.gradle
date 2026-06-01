@@ -400,6 +400,10 @@ dependencies {
     implementation project(':site-permissions-api')
     implementation project(':site-permissions-impl')
 
+    implementation project(':location-permissions-api')
+    implementation project(':location-permissions-impl')
+    implementation project(':location-permissions-store')
+
     implementation project(':ad-click-api')
     implementation project(':ad-click-impl')
 
