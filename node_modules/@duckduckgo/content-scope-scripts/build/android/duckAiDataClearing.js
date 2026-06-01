@@ -50,7 +50,6 @@
   var Uint16Array = globalThis.Uint16Array;
   var Uint32Array = globalThis.Uint32Array;
   var JSONparse = JSON.parse;
-  var Arrayfrom = Array.from;
   var ReflectDeleteProperty = Reflect2.deleteProperty.bind(Reflect2);
   var ReflectApply = Reflect2.apply.bind(Reflect2);
   var getRandomValues = globalThis.crypto?.getRandomValues?.bind(globalThis.crypto);
@@ -1230,21 +1229,27 @@
      * @param {import('../index.js').MessagingContext} messagingContext
      */
     constructor(config, messagingContext) {
-      /** @type {Record<string, any>} */
-      __publicField(this, "capturedWebkitHandlers", {});
       /**
-       * @type {{name: string, length: number}}
-       * @internal
+       * Null-prototype cache so a hostile page that pollutes `Object.prototype`
+       * cannot supply a callable from there if `capture` ever misses a handler.
+       *
+       * Uses the `{ __proto__: null }` literal rather than `Object.create(null)`
+       * because the latter is a method dispatch through `globalThis.Object`, which
+       * page JS could replace before this class field runs if transport
+       * construction is deferred (`Messaging` is lazy on `ContentFeature.messaging`).
+       * The `__proto__: null` literal is a syntactic construct, not method
+       * dispatch, so it always yields a true null-prototype object.
+       * @type {Record<string, { handler: any, postMessage: Function }>}
        */
-      __publicField(this, "algoObj", {
-        name: "AES-GCM",
-        length: 256
-      });
+      __publicField(
+        this,
+        "capturedWebkitHandlers",
+        /** @type {any} */
+        { __proto__: null }
+      );
       this.messagingContext = messagingContext;
       this.config = config;
-      if (!this.config.hasModernWebkitAPI) {
-        this.captureWebkitHandlers(this.config.webkitMessageHandlerNames);
-      }
+      this.captureWebkitHandlers(this.config.webkitMessageHandlerNames);
     }
     /**
      * Sends message to the webkit layer (fire and forget)
@@ -1255,24 +1260,11 @@
      * @internal
      */
     wkSend(handler, data = {}) {
-      if (!(handler in window.webkit.messageHandlers)) {
+      const captured = this.capturedWebkitHandlers[handler];
+      if (!captured || typeof captured.postMessage !== "function") {
         throw new MissingHandler(`Missing webkit handler: '${handler}'`, handler);
       }
-      if (!this.config.hasModernWebkitAPI) {
-        const outgoing = {
-          ...data,
-          messageHandling: {
-            ...data.messageHandling,
-            secret: this.config.secret
-          }
-        };
-        if (!(handler in this.capturedWebkitHandlers)) {
-          throw new MissingHandler(`cannot continue, method ${handler} not captured on macos < 11`, handler);
-        } else {
-          return this.capturedWebkitHandlers[handler](outgoing);
-        }
-      }
-      return window.webkit.messageHandlers[handler].postMessage?.(data);
+      return ReflectApply(captured.postMessage, captured.handler, [data]);
     }
     /**
      * Sends message to the webkit layer and waits for the specified response
@@ -1282,44 +1274,8 @@
      * @internal
      */
     async wkSendAndWait(handler, data) {
-      if (this.config.hasModernWebkitAPI) {
-        const response = await this.wkSend(handler, data);
-        return JSONparse(response || "{}");
-      }
-      try {
-        const randMethodName = this.createRandMethodName();
-        const key = await this.createRandKey();
-        const iv = this.createRandIv();
-        const { ciphertext, tag } = await new Promise2((resolve) => {
-          this.generateRandomMethod(randMethodName, resolve);
-          data.messageHandling = new SecureMessagingParams({
-            methodName: randMethodName,
-            secret: this.config.secret,
-            key: Arrayfrom(key),
-            iv: Arrayfrom(iv)
-          });
-          this.wkSend(handler, data);
-        });
-        const cipher = new Uint8Array2([...ciphertext, ...tag]);
-        const decrypted = await this.decryptResponse(
-          /** @type {BufferSource} */
-          /** @type {unknown} */
-          cipher,
-          /** @type {BufferSource} */
-          /** @type {unknown} */
-          key,
-          iv
-        );
-        return JSONparse(decrypted || "{}");
-      } catch (e) {
-        if (e instanceof MissingHandler) {
-          throw e;
-        } else {
-          console.error("decryption failed", e);
-          console.error(e);
-          return { error: e };
-        }
-      }
+      const response = await this.wkSend(handler, data);
+      return JSONparse(response || "{}");
     }
     /**
      * @param {import('../index.js').NotificationMessage} msg
@@ -1344,77 +1300,19 @@
       throw new Error2("an unknown error occurred");
     }
     /**
-     * Generate a random method name and adds it to navigator.duckduckgo.messageHandlers
-     * The native layer will use this method to send the response
-     * @param {string | number} randomMethodName
-     * @param {Function} callback
-     * @internal
-     */
-    generateRandomMethod(randomMethodName, callback) {
-      const target = ensureNavigatorDuckDuckGo().messageHandlers;
-      objectDefineProperty(target, randomMethodName, {
-        enumerable: false,
-        configurable: true,
-        writable: false,
-        /**
-         * @param {any[]} args
-         */
-        value: (...args) => {
-          callback(...args);
-          ReflectDeleteProperty(target, randomMethodName);
-        }
-      });
-    }
-    /**
-     * @internal
-     * @return {string}
-     */
-    randomString() {
-      return "" + getRandomValues(new Uint32Array(1))[0];
-    }
-    /**
-     * @internal
-     * @return {string}
-     */
-    createRandMethodName() {
-      return "_" + this.randomString();
-    }
-    /**
-     * @returns {Promise<Uint8Array>}
-     * @internal
-     */
-    async createRandKey() {
-      const key = await generateKey(this.algoObj, true, ["encrypt", "decrypt"]);
-      const exportedKey = await exportKey("raw", key);
-      return new Uint8Array2(exportedKey);
-    }
-    /**
-     * @returns {Uint8Array}
-     * @internal
-     */
-    createRandIv() {
-      return getRandomValues(new Uint8Array2(12));
-    }
-    /**
-     * @param {BufferSource} ciphertext
-     * @param {BufferSource} key
-     * @param {Uint8Array} iv
-     * @returns {Promise<string>}
-     * @internal
-     */
-    async decryptResponse(ciphertext, key, iv) {
-      const cryptoKey = await importKey("raw", key, "AES-GCM", false, ["decrypt"]);
-      const algo = {
-        name: "AES-GCM",
-        iv
-      };
-      const decrypted = await decrypt(algo, cryptoKey, ciphertext);
-      const dec = new TextDecoder();
-      return dec.decode(decrypted);
-    }
-    /**
-     * When required (such as on macos 10.x), capture the `postMessage` method on
-     * each webkit messageHandler
+     * Capture the `postMessage` method on each webkit messageHandler so the
+     * transport can call them later without re-reading `window.webkit.messageHandlers`.
+     * Makes the transport resilient to later removal or replacement of
+     * `window.webkit.messageHandlers` (e.g. by privacy hardening that nullifies
+     * the namespace for site JS to reduce fingerprinting surface).
+     *
+     * Stores the handler object and its `postMessage` function as a pair so
+     * `wkSend` can dispatch via the captured `ReflectApply` rather than calling
+     * `.bind()` here. `.bind` is a method on the page-mutable
+     * `Function.prototype` — if transport construction is deferred (`Messaging`
+     * is lazy on `ContentFeature.messaging`) page JS could replace
+     * `Function.prototype.bind` first and have the cache store an attacker-
+     * controlled function. Storing the unbound pair sidesteps that.
      *
      * @param {string[]} handlerNames
      */
@@ -1422,11 +1320,12 @@
       const handlers = window.webkit.messageHandlers;
       if (!handlers) throw new MissingHandler("window.webkit.messageHandlers was absent", "all");
       for (const webkitMessageHandlerName of handlerNames) {
-        if (typeof handlers[webkitMessageHandlerName]?.postMessage === "function") {
-          const original = handlers[webkitMessageHandlerName];
-          const bound = handlers[webkitMessageHandlerName].postMessage?.bind(original);
-          this.capturedWebkitHandlers[webkitMessageHandlerName] = bound;
-          delete handlers[webkitMessageHandlerName].postMessage;
+        const handler = handlers[webkitMessageHandlerName];
+        if (typeof handler?.postMessage === "function") {
+          this.capturedWebkitHandlers[webkitMessageHandlerName] = {
+            handler,
+            postMessage: handler.postMessage
+          };
         }
       }
     }
@@ -1459,30 +1358,11 @@
   var WebkitMessagingConfig = class {
     /**
      * @param {object} params
-     * @param {boolean} params.hasModernWebkitAPI
      * @param {string[]} params.webkitMessageHandlerNames
-     * @param {string} params.secret
      * @internal
      */
     constructor(params) {
-      this.hasModernWebkitAPI = params.hasModernWebkitAPI;
       this.webkitMessageHandlerNames = params.webkitMessageHandlerNames;
-      this.secret = params.secret;
-    }
-  };
-  var SecureMessagingParams = class {
-    /**
-     * @param {object} params
-     * @param {string} params.methodName
-     * @param {string} params.secret
-     * @param {number[]} params.key
-     * @param {number[]} params.iv
-     */
-    constructor(params) {
-      this.methodName = params.methodName;
-      this.secret = params.secret;
-      this.key = params.key;
-      this.iv = params.iv;
     }
   };
 
