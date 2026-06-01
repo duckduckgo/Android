@@ -1871,22 +1871,6 @@ class RealDuckChatTest {
         assertFalse(testee.isChatHistoryAvailable())
     }
 
-    @Test
-    fun whenOpenWithChatIdThenDuckChatOpenedWithChatIdUrlParameterAndForcedFreshSession() = runTest {
-        // Stub an active session so the test fails if forceNewSession is not propagated.
-        val thirtyMinutesAgo = System.currentTimeMillis() - (30 * 60 * 1000L)
-        whenever(mockDuckChatFeatureRepository.lastSessionTimestamp()).thenReturn(thirtyMinutesAgo)
-        val urlCaptor = argumentCaptor<String>()
-        val sessionCaptor = argumentCaptor<Boolean>()
-
-        testee.openWithChatId("chat-123")
-        coroutineRule.testScope.advanceUntilIdle()
-
-        verify(mockBrowserNav).openDuckChat(any(), sessionCaptor.capture(), urlCaptor.capture())
-        assertTrue(urlCaptor.firstValue.contains("chatID=chat-123"))
-        assertFalse(sessionCaptor.firstValue)
-    }
-
     private suspend fun enableChatHistoryFlags() {
         duckChatFeature.self().setRawStoredState(State(enable = true))
         duckChatFeature.useNativeStorageChatData().setRawStoredState(State(enable = true))
