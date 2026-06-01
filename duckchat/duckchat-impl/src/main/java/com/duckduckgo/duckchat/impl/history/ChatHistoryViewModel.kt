@@ -20,6 +20,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.tabs.model.TabRepository
+import com.duckduckgo.browsermode.api.RegularMode
 import com.duckduckgo.dataclearing.api.plugin.ClearableData
 import com.duckduckgo.dataclearing.api.plugin.DataClearingTrigger
 import com.duckduckgo.di.scopes.FragmentScope
@@ -53,6 +55,7 @@ class ChatHistoryViewModel @Inject constructor(
     private val dataClearingTrigger: DataClearingTrigger,
     private val duckAiFeatureState: DuckAiFeatureState,
     private val duckAiModelManager: DuckAiModelManager,
+    @RegularMode private val tabRepository: TabRepository,
 ) : ViewModel() {
 
     private val controls = MutableStateFlow(UiControls())
@@ -88,7 +91,11 @@ class ChatHistoryViewModel @Inject constructor(
         if (controls.value.mode is Mode.Selecting) {
             onSelectionToggled(chatId)
         } else {
-            duckChat.openWithChatId(chatId)
+            // Open the chat as a new tab anchored to the tab the user was on, so closing it returns there.
+            viewModelScope.launch {
+                val sourceTabId = tabRepository.getSelectedTab()?.tabId
+                navigationChannel.trySend(NavigationEvent.OpenChat(url = duckChat.buildChatUrl(chatId), sourceTabId = sourceTabId))
+            }
         }
     }
 
@@ -301,6 +308,7 @@ class ChatHistoryViewModel @Inject constructor(
     )
 
     sealed interface NavigationEvent {
+        data class OpenChat(val url: String, val sourceTabId: String?) : NavigationEvent
         data class OpenRename(val chatId: String, val currentTitle: String) : NavigationEvent
         data class ShowDownloadComplete(val fileName: String) : NavigationEvent
         data object ShowExportError : NavigationEvent

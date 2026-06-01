@@ -18,6 +18,8 @@ package com.duckduckgo.duckchat.impl.history
 
 import app.cash.turbine.TurbineTestContext
 import app.cash.turbine.test
+import com.duckduckgo.app.tabs.model.TabEntity
+import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.dataclearing.api.plugin.ClearableData
 import com.duckduckgo.dataclearing.api.plugin.DataClearingTrigger
@@ -39,6 +41,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 
 class ChatHistoryViewModelTest {
@@ -55,6 +58,7 @@ class ChatHistoryViewModelTest {
         whenever(it.showClearDuckAIChatHistory).thenReturn(showClearDuckAIChatHistoryFlow)
     }
     private val duckAiModelManager = FakeDuckAiModelManager()
+    private val tabRepository: TabRepository = mock()
     private val viewModel = ChatHistoryViewModel(
         repository,
         coroutineRule.testScope,
@@ -62,6 +66,7 @@ class ChatHistoryViewModelTest {
         dataClearingTrigger,
         duckAiFeatureState,
         duckAiModelManager,
+        tabRepository,
     )
 
     @Test
@@ -406,11 +411,19 @@ class ChatHistoryViewModelTest {
     // --- Chat resume / Duck.ai open ---
 
     @Test
-    fun `onChatRowClicked in default mode resumes the chat in DuckAi`() = runTest {
-        viewModel.onChatRowClicked("abc")
+    fun `onChatRowClicked in default mode opens the chat in a new tab anchored to the current tab`() =
+        coroutineRule.testScope.runTest {
+            whenever(tabRepository.getSelectedTab()).thenReturn(TabEntity(tabId = "current-tab"))
 
-        assertEquals(listOf("abc"), duckChat.openWithChatIdCalls)
-    }
+            viewModel.navigationEvents.test {
+                viewModel.onChatRowClicked("abc")
+
+                val event = awaitItem() as ChatHistoryViewModel.NavigationEvent.OpenChat
+                assertEquals("https://duck.ai?chatID=abc", event.url)
+                assertEquals("current-tab", event.sourceTabId)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
 
     @Test
     fun `onChatRowLongClicked in default mode enters select mode with the row pre-selected`() = runTest {
@@ -425,7 +438,7 @@ class ChatHistoryViewModelTest {
             val loaded = awaitItem() as Loaded
             val mode = loaded.mode as ChatHistoryUiState.Mode.Selecting
             assertEquals(setOf("a"), mode.selectedChatIds)
-            assertTrue(duckChat.openWithChatIdCalls.isEmpty())
+            verifyNoInteractions(tabRepository)
         }
     }
 
@@ -460,7 +473,7 @@ class ChatHistoryViewModelTest {
             val loaded = awaitItem() as Loaded
             val mode = loaded.mode as ChatHistoryUiState.Mode.Selecting
             assertEquals(setOf("a"), mode.selectedChatIds)
-            assertTrue(duckChat.openWithChatIdCalls.isEmpty())
+            verifyNoInteractions(tabRepository)
         }
     }
 
