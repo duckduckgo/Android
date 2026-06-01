@@ -1287,3 +1287,11 @@ internal fun shouldShowInputControls(
     onChatTab: Boolean,
     isStreaming: Boolean,
 ): Boolean = onChatTab && !isStreaming
+
+/**
+ * Plugin controls (model picker, reasoning picker, options, attach button) are shown only on
+ * the Duck.ai chat tab and only when no chat is streaming. Derived purely from [NativeInputState]
+ * so it is unit-testable without Robolectric.
+ */
+internal fun NativeInputState.shouldShowPluginControls(): Boolean =
+    toggleSelection == NativeInputState.ToggleSelection.DUCK_AI && !isChatStreaming
