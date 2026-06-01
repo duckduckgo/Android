@@ -33,9 +33,13 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import java.io.File
 
 class ChatHistoryRepositoryTest {
 
@@ -225,6 +229,34 @@ class ChatHistoryRepositoryTest {
         verify(syncEngine).triggerSync(SyncEngine.SyncTrigger.DATA_CHANGE)
     }
 
+    @Test
+    fun `exportChats writes a file per chat and returns them`() = runTest {
+        whenever(chatStore.getChatById("a")).thenReturn(chat(chatId = "a"))
+        whenever(chatStore.getChatById("b")).thenReturn(chat(chatId = "b"))
+        whenever(chatStore.getChatContent("a")).thenReturn(EMPTY_CHAT_JSON)
+        whenever(chatStore.getChatContent("b")).thenReturn(EMPTY_CHAT_JSON)
+        whenever(chatExportWriter.write(any())).thenReturn(File("/tmp/export.txt"))
+
+        val files = repository.exportChats(listOf(ChatExportRequest("a", null), ChatExportRequest("b", null)))
+
+        assertEquals(2, files.size)
+        verify(chatExportWriter, times(2)).write(any())
+    }
+
+    @Test
+    fun `exportChats writes no files when any chat cannot be built`() = runTest {
+        whenever(chatStore.getChatById("a")).thenReturn(chat(chatId = "a"))
+        whenever(chatStore.getChatContent("a")).thenReturn(EMPTY_CHAT_JSON)
+        whenever(chatStore.getChatById("missing")).thenReturn(null)
+
+        val result = runCatching {
+            repository.exportChats(listOf(ChatExportRequest("a", null), ChatExportRequest("missing", null)))
+        }
+
+        assertTrue(result.isFailure)
+        verify(chatExportWriter, never()).write(any())
+    }
+
     private fun chat(
         chatId: String,
         title: String = "Title",
@@ -247,5 +279,6 @@ class ChatHistoryRepositoryTest {
 
     private companion object {
         const val FALLBACK = "Untitled chat"
+        const val EMPTY_CHAT_JSON = """{"model":"gpt-5-mini","messages":[]}"""
     }
 }

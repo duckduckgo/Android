@@ -77,6 +77,7 @@ private class RecordingRenameRepository : ChatHistoryRepository {
     override suspend fun deleteChat(chatId: String) = Unit
     override suspend fun deleteAllChats() = Unit
     override suspend fun exportChat(chatId: String, modelDisplay: ModelDisplay?): java.io.File = java.io.File("/tmp/noop.txt")
+    override suspend fun exportChats(requests: List<ChatExportRequest>): List<java.io.File> = requests.map { java.io.File("/tmp/noop.txt") }
 
     override suspend fun renameChat(chatId: String, newTitle: String): Boolean {
         errorToThrow?.let { throw it }

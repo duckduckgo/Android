@@ -183,18 +183,17 @@ class ChatHistoryViewModel @Inject constructor(
         val selected = (controls.value.mode as? Mode.Selecting)?.selectedChatIds.orEmpty()
         if (selected.isEmpty()) return
         viewModelScope.launch {
-            val results = selected.map { chatId ->
+            val requests = selected.map { chatId ->
                 val modelId = latestItems.firstOrNull { it.chatId == chatId }?.model
                 val modelDisplay = modelId
                     ?.let { id -> duckAiModelManager.modelState.value.models.firstOrNull { it.id == id } }
                     ?.toModelDisplay()
-                runCatching { chatHistoryRepository.exportChat(chatId, modelDisplay) }
+                ChatExportRequest(chatId, modelDisplay)
             }
-            if (results.any { it.isFailure }) {
-                navigationChannel.trySend(NavigationEvent.ShowExportError)
-            } else {
-                navigationChannel.trySend(NavigationEvent.ShowBulkDownloadComplete(count = results.size))
-            }
+            // Atomic: any failure writes no files, so we report a single bulk error rather than a misleading success.
+            runCatching { chatHistoryRepository.exportChats(requests) }
+                .onSuccess { files -> navigationChannel.trySend(NavigationEvent.ShowBulkDownloadComplete(count = files.size)) }
+                .onFailure { navigationChannel.trySend(NavigationEvent.ShowBulkDownloadError) }
             controls.update { it.copy(mode = Mode.Default) }
         }
     }
@@ -328,6 +327,7 @@ class ChatHistoryViewModel @Inject constructor(
         data class ShowDownloadComplete(val fileName: String) : NavigationEvent
         data class ShowBulkDownloadComplete(val count: Int) : NavigationEvent
         data object ShowExportError : NavigationEvent
+        data object ShowBulkDownloadError : NavigationEvent
     }
 
     sealed interface MessageEvent {

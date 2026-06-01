@@ -1017,6 +1017,78 @@ class ChatHistoryViewModelTest {
         assertEquals(listOf("a" to false, "a" to true), repository.pinnedChats)
     }
 
+    @Test
+    fun `onChatRowLongClicked in select mode toggling off the only selected row exits to Default`() = runTest {
+        source.value = listOf(item("a"), item("b"))
+
+        viewModel.uiState.test {
+            awaitInitialLoaded()
+            viewModel.onChatRowLongClicked("a")
+            val entered = awaitItem() as Loaded
+            assertEquals(setOf("a"), (entered.mode as ChatHistoryUiState.Mode.Selecting).selectedChatIds)
+
+            viewModel.onChatRowLongClicked("a")
+
+            val exited = awaitItem() as Loaded
+            assertEquals(ChatHistoryUiState.Mode.Default, exited.mode)
+        }
+    }
+
+    @Test
+    fun `onDownloadSelectedRequested with no selection is a no-op`() = coroutineRule.testScope.runTest {
+        viewModel.navigationEvents.test {
+            viewModel.onDownloadSelectedRequested()
+            expectNoEvents()
+        }
+        assertTrue(repository.exportedChats.isEmpty())
+    }
+
+    @Test
+    fun `onDownloadSelectedRequested emits ShowBulkDownloadError, saves no files, and exits select mode when any export fails`() = runTest {
+        source.value = listOf(item("a"), item("b"))
+        repository.exportError = IllegalStateException("boom")
+
+        viewModel.uiState.test {
+            awaitInitialLoaded()
+            viewModel.onChatRowLongClicked("a")
+            awaitItem()
+            viewModel.onSelectionToggled("b")
+            awaitItem()
+
+            viewModel.navigationEvents.test {
+                viewModel.onDownloadSelectedRequested()
+                assertEquals(ChatHistoryViewModel.NavigationEvent.ShowBulkDownloadError, awaitItem())
+            }
+
+            val final = awaitItem() as Loaded
+            assertEquals(ChatHistoryUiState.Mode.Default, final.mode)
+        }
+        // Atomic export: a single failure leaves nothing on disk.
+        assertTrue(repository.exportedChats.isEmpty())
+    }
+
+    @Test
+    fun `onDownloadSelectedRequested exports every selection, emits ShowBulkDownloadComplete with the count, and exits select mode`() = runTest {
+        source.value = listOf(item("a"), item("b"))
+
+        viewModel.uiState.test {
+            awaitInitialLoaded()
+            viewModel.onChatRowLongClicked("a")
+            awaitItem()
+            viewModel.onSelectionToggled("b")
+            awaitItem()
+
+            viewModel.navigationEvents.test {
+                viewModel.onDownloadSelectedRequested()
+                assertEquals(ChatHistoryViewModel.NavigationEvent.ShowBulkDownloadComplete(count = 2), awaitItem())
+            }
+
+            val final = awaitItem() as Loaded
+            assertEquals(ChatHistoryUiState.Mode.Default, final.mode)
+        }
+        assertEquals(setOf("a", "b"), repository.exportedChats.toSet())
+    }
+
     /**
      * `stateIn(WhileSubscribed)` does not guarantee subscribers observe the `Loading` initial
      * value — the upstream may emit before the StateFlow can replay it. Tolerate both orderings.
@@ -1103,6 +1175,14 @@ private class FakeChatHistoryRepository(
         lastExportModelDisplay = modelDisplay
         exportError?.let { throw it }
         return exportResult
+    }
+
+    override suspend fun exportChats(requests: List<ChatExportRequest>): List<java.io.File> {
+        // Atomic: a failure writes nothing, so nothing is recorded either.
+        exportError?.let { throw it }
+        requests.forEach { exportedChats += it.chatId }
+        lastExportModelDisplay = requests.lastOrNull()?.modelDisplay
+        return requests.map { exportResult }
     }
 }
 

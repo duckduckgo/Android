@@ -166,6 +166,8 @@ class ChatHistoryFragment : DuckDuckGoFragment(R.layout.fragment_chat_history) {
             is ChatHistoryViewModel.NavigationEvent.ShowBulkDownloadComplete -> showBulkDownloadCompleteSnackbar(event.count)
             ChatHistoryViewModel.NavigationEvent.ShowExportError ->
                 Snackbar.make(binding.root, R.string.duck_ai_chat_history_download_error, Snackbar.LENGTH_SHORT).show()
+            ChatHistoryViewModel.NavigationEvent.ShowBulkDownloadError ->
+                Snackbar.make(binding.root, R.string.duck_ai_chat_history_bulk_download_error, Snackbar.LENGTH_SHORT).show()
         }
     }
 
