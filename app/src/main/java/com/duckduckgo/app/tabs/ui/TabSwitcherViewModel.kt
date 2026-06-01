@@ -160,6 +160,7 @@ class TabSwitcherViewModel @Inject constructor(
         ViewState(
             isSplitOmnibarEnabled = omnibarRepository.omnibarType == OmnibarType.SPLIT,
             isBrowserModeToggleVisible = fireModeAvailable,
+            browserMode = currentMode.value,
         ),
     )
     val viewState = combine(
