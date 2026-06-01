@@ -444,6 +444,30 @@ class NativeInputModeWidgetViewModelTest {
     }
 
     @Test
+    fun `state isChatStreaming is true when chatState is STREAMING`() = runTest {
+        chatStateFlow.value = ChatState.STREAMING
+        assertTrue(testee.state.firstOrNull()!!.isChatStreaming)
+    }
+
+    @Test
+    fun `state isChatStreaming is true when chatState is LOADING`() = runTest {
+        chatStateFlow.value = ChatState.LOADING
+        assertTrue(testee.state.firstOrNull()!!.isChatStreaming)
+    }
+
+    @Test
+    fun `state isChatStreaming is false when chatState is READY`() = runTest {
+        chatStateFlow.value = ChatState.READY
+        assertFalse(testee.state.firstOrNull()!!.isChatStreaming)
+    }
+
+    @Test
+    fun `state isChatStreaming is false when chatState is HIDE`() = runTest {
+        chatStateFlow.value = ChatState.HIDE
+        assertFalse(testee.state.firstOrNull()!!.isChatStreaming)
+    }
+
+    @Test
     fun whenChatStateFlowEmitsThenViewModelChatStateMirrorsIt() = runTest {
         chatStateFlow.value = ChatState.STREAMING
 

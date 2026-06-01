@@ -203,7 +203,7 @@ class NativeInputModeWidgetViewModel @Inject constructor(
 
     private val activeTabId = MutableStateFlow<String?>(null)
 
-    val state: SharedFlow<NativeInputState> = combine(
+    private val baseState: Flow<NativeInputState> = combine(
         duckAiFeatureState.showSettings,
         duckChatInternal.observeEnableDuckChatUserSetting(),
         duckChatInternal.observeInputScreenUserSettingEnabled(),
@@ -216,6 +216,13 @@ class NativeInputModeWidgetViewModel @Inject constructor(
             inputPosition = config.inputPosition,
             toggleSelection = config.toggleSelection ?: NativeInputState.defaultToggleFor(config.inputContext),
         )
+    }
+
+    val state: SharedFlow<NativeInputState> = combine(
+        baseState,
+        duckChatInternal.chatState,
+    ) { state, chatState ->
+        state.copy(isChatStreaming = chatState == ChatState.STREAMING || chatState == ChatState.LOADING)
     }.shareIn(
         scope = viewModelScope,
         started = SharingStarted.Eagerly,
@@ -240,12 +247,14 @@ class NativeInputModeWidgetViewModel @Inject constructor(
                             inputContext = snapshot.inputContext,
                             inputPosition = snapshot.inputPosition,
                             toggleSelection = snapshot.toggleSelection,
+                            isChatStreaming = snapshot.isChatStreaming,
                         )
                     }
                 }
         }
     }
 
+    // Kept for the widget's observeChatState() which handles HIDE/SHOW/READY root-visibility transitions.
     val chatState: Flow<ChatState> = duckChatInternal.chatState
 
     val isPaidTier: Flow<Boolean> = subscriptions.getEntitlementStatus()
