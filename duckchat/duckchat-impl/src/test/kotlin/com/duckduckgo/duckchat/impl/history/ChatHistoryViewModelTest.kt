@@ -529,7 +529,7 @@ class ChatHistoryViewModelTest {
     }
 
     @Test
-    fun `onSelectionToggled adds and removes ids and empty selection stays in select mode`() = runTest {
+    fun `onSelectionToggled deselecting the last selected row exits to Default`() = runTest {
         source.value = listOf(item("a"), item("b"))
 
         viewModel.uiState.test {
@@ -543,8 +543,7 @@ class ChatHistoryViewModelTest {
 
             viewModel.onSelectionToggled("a")
             val afterRemove = awaitItem() as Loaded
-            val mode = afterRemove.mode as ChatHistoryUiState.Mode.Selecting
-            assertEquals(emptySet<String>(), mode.selectedChatIds)
+            assertEquals(ChatHistoryUiState.Mode.Default, afterRemove.mode)
         }
     }
 
@@ -566,7 +565,7 @@ class ChatHistoryViewModelTest {
     }
 
     @Test
-    fun `onSelectAllToggled with everything selected clears the selection but stays in select mode`() = runTest {
+    fun `onSelectAllToggled with everything selected exits to Default`() = runTest {
         source.value = listOf(item("a"), item("b"))
 
         viewModel.uiState.test {
@@ -579,8 +578,7 @@ class ChatHistoryViewModelTest {
             viewModel.onSelectAllToggled()
 
             val cleared = awaitItem() as Loaded
-            val mode = cleared.mode as ChatHistoryUiState.Mode.Selecting
-            assertEquals(emptySet<String>(), mode.selectedChatIds)
+            assertEquals(ChatHistoryUiState.Mode.Default, cleared.mode)
         }
     }
 
@@ -606,7 +604,7 @@ class ChatHistoryViewModelTest {
     }
 
     @Test
-    fun `onSelectAllToggled with a stale selection equal to visible still toggles off`() = runTest {
+    fun `onSelectAllToggled with a stale selection equal to visible toggles off and exits to Default`() = runTest {
         source.value = listOf(item("a"), item("b"), item("c"))
 
         viewModel.uiState.test {
@@ -622,8 +620,7 @@ class ChatHistoryViewModelTest {
             viewModel.onSelectAllToggled()
 
             val cleared = awaitItem() as Loaded
-            val mode = cleared.mode as ChatHistoryUiState.Mode.Selecting
-            assertEquals(emptySet<String>(), mode.selectedChatIds)
+            assertEquals(ChatHistoryUiState.Mode.Default, cleared.mode)
         }
     }
 

@@ -285,7 +285,8 @@ class ChatHistoryViewModel @Inject constructor(
         if (items.isEmpty()) return ChatHistoryUiState.Empty
         val (pinned, recent) = items.partition { it.pinned }
         val effectiveMode = when (val mode = controls.mode) {
-            is Mode.Selecting -> collapseEmpty(mode.selectedChatIds intersect items.mapTo(mutableSetOf()) { it.chatId })
+            // Keep Selecting even when empty — collapsing here would make onEnterSelectMode emit no state change.
+            is Mode.Selecting -> Mode.Selecting(mode.selectedChatIds intersect items.mapTo(mutableSetOf()) { it.chatId })
             Mode.Default -> Mode.Default
         }
         return Loaded(
