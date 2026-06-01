@@ -18,9 +18,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
-        android:id="@+id/chat_history_action_fire"
-        android:icon="@drawable/ic_fire_24"
-        android:title="@string/duck_ai_chat_history_action_fire_content_description"
+        android:id="@+id/chat_history_action_new"
+        android:icon="@drawable/ic_compose_24"
+        android:title="@string/duck_ai_chat_history_action_new"
         app:showAsAction="always" />
 
     <item
@@ -30,9 +30,9 @@
         app:showAsAction="always" />
 
     <item
-        android:id="@+id/chat_history_action_overflow"
-        android:icon="@drawable/ic_menu_vertical_24"
-        android:title="@string/duck_ai_chat_history_coming_soon"
+        android:id="@+id/chat_history_action_fire"
+        android:icon="@drawable/ic_fire_24"
+        android:title="@string/duck_ai_chat_history_action_fire_content_description"
         app:showAsAction="always" />
 
 </menu>

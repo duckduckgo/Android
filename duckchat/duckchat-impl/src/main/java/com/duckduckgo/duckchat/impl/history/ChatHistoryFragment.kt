@@ -251,8 +251,8 @@ class ChatHistoryFragment : DuckDuckGoFragment(R.layout.fragment_chat_history) {
         binding.toolbar.navigationContentDescription = null
         binding.toolbar.setNavigationOnClickListener { requireActivity().onBackPressedDispatcher.onBackPressed() }
         binding.toolbar.setTitle(R.string.duck_ai_chat_history_title)
+        binding.toolbar.menu.findItem(R.id.chat_history_action_new)?.isVisible = true
         binding.toolbar.menu.findItem(R.id.chat_history_action_search)?.isVisible = true
-        binding.toolbar.menu.findItem(R.id.chat_history_action_overflow)?.isVisible = true
     }
 
     private fun applySelectModeToolbar(count: Int) {
@@ -261,8 +261,8 @@ class ChatHistoryFragment : DuckDuckGoFragment(R.layout.fragment_chat_history) {
             getString(R.string.duck_ai_chat_history_exit_select_mode_content_description)
         binding.toolbar.setNavigationOnClickListener { viewModel.onSelectModeCancelled() }
         binding.toolbar.title = count.toString()
+        binding.toolbar.menu.findItem(R.id.chat_history_action_new)?.isVisible = false
         binding.toolbar.menu.findItem(R.id.chat_history_action_search)?.isVisible = false
-        binding.toolbar.menu.findItem(R.id.chat_history_action_overflow)?.isVisible = false
     }
 
     private fun buildEntries(
@@ -309,8 +309,8 @@ class ChatHistoryFragment : DuckDuckGoFragment(R.layout.fragment_chat_history) {
     }
 
     private fun onMenuItemClicked(item: MenuItem): Boolean = when (item.itemId) {
-        R.id.chat_history_action_overflow -> {
-            showToolbarOverflowPopup()
+        R.id.chat_history_action_new -> {
+            viewModel.onNewChatRequested()
             true
         }
         R.id.chat_history_action_search -> {
@@ -337,14 +337,6 @@ class ChatHistoryFragment : DuckDuckGoFragment(R.layout.fragment_chat_history) {
         binding.toolbar.show()
         viewModel.onSearchClosed()
         // onBackPressedCallback.isEnabled is reset by render() — select mode may still be active.
-    }
-
-    private fun showToolbarOverflowPopup() {
-        val anchor = binding.toolbar.findViewById<View>(R.id.chat_history_action_overflow) ?: return
-        val popup = PopupMenu(layoutInflater, R.layout.popup_chat_history_overflow)
-        val view = popup.contentView
-        popup.onMenuItemClicked(view.findViewById(R.id.select)) { viewModel.onEnterSelectMode() }
-        popup.show(binding.root, anchor)
     }
 
     private fun showRowPopup(item: ChatHistoryItem, anchor: View) {

@@ -108,6 +108,11 @@ class ChatHistoryViewModel @Inject constructor(
         duckChat.openDuckChat()
     }
 
+    /** Toolbar "New chat" action. Kept separate from [onOpenDuckAiClicked] so the two surfaces stay independently instrumentable. */
+    fun onNewChatRequested() {
+        duckChat.openDuckChat()
+    }
+
     fun onFireIconClicked() {
         if (controls.value.mode is Mode.Selecting) {
             onDeleteSelectedRequested()
