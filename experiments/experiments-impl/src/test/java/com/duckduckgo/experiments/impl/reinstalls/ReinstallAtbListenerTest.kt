@@ -38,7 +38,8 @@ class ReinstallAtbListenerTest {
     private val mockStatisticsDataStore: StatisticsDataStore = mock()
     private val mockAppBuildConfig: AppBuildConfig = mock()
     private val mockReinstallerVariantProtectionFeature: ReinstallerVariantProtectionFeature = mock()
-    private val mockProtectionToggle: Toggle = mock()
+    private val mockSelfToggle: Toggle = mock()
+    private val mockProtectVariantsToggle: Toggle = mock()
     private val moshi: Moshi = Moshi.Builder().build()
 
     @get:Rule
@@ -46,8 +47,10 @@ class ReinstallAtbListenerTest {
 
     @Before
     fun before() {
-        whenever(mockReinstallerVariantProtectionFeature.self()).thenReturn(mockProtectionToggle)
-        whenever(mockProtectionToggle.isEnabled()).thenReturn(false)
+        whenever(mockReinstallerVariantProtectionFeature.self()).thenReturn(mockSelfToggle)
+        whenever(mockReinstallerVariantProtectionFeature.protectVariants()).thenReturn(mockProtectVariantsToggle)
+        whenever(mockSelfToggle.isEnabled()).thenReturn(false)
+        whenever(mockProtectVariantsToggle.isEnabled()).thenReturn(false)
 
         testee = ReinstallAtbListener(
             mockBackupDataStore,
@@ -90,8 +93,22 @@ class ReinstallAtbListenerTest {
     fun whenIsAppReinstallAndProtectionFeatureDisabledThenUpdateVariantEvenIfMatchingExistingValue() = runTest {
         whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(true)
         whenever(mockStatisticsDataStore.variant).thenReturn("de")
-        whenever(mockProtectionToggle.isEnabled()).thenReturn(false)
-        whenever(mockProtectionToggle.getSettings()).thenReturn("""{"variants":["de","df"]}""")
+        whenever(mockSelfToggle.isEnabled()).thenReturn(false)
+        whenever(mockProtectVariantsToggle.isEnabled()).thenReturn(true)
+        whenever(mockProtectVariantsToggle.getSettings()).thenReturn("""{"variants":["de","df"]}""")
+
+        testee.beforeAtbInit()
+
+        verify(mockStatisticsDataStore).variant = REINSTALL_VARIANT
+    }
+
+    @Test
+    fun whenIsAppReinstallAndProtectVariantsDisabledThenUpdateVariantEvenIfMatchingExistingValue() = runTest {
+        whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(true)
+        whenever(mockStatisticsDataStore.variant).thenReturn("de")
+        whenever(mockSelfToggle.isEnabled()).thenReturn(true)
+        whenever(mockProtectVariantsToggle.isEnabled()).thenReturn(false)
+        whenever(mockProtectVariantsToggle.getSettings()).thenReturn("""{"variants":["de","df"]}""")
 
         testee.beforeAtbInit()
 
@@ -102,8 +119,9 @@ class ReinstallAtbListenerTest {
     fun whenIsAppReinstallAndProtectionEnabledAndCurrentVariantIsProtectedThenDoNotOverwrite() = runTest {
         whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(true)
         whenever(mockStatisticsDataStore.variant).thenReturn("de")
-        whenever(mockProtectionToggle.isEnabled()).thenReturn(true)
-        whenever(mockProtectionToggle.getSettings()).thenReturn("""{"variants":["de","df"]}""")
+        whenever(mockSelfToggle.isEnabled()).thenReturn(true)
+        whenever(mockProtectVariantsToggle.isEnabled()).thenReturn(true)
+        whenever(mockProtectVariantsToggle.getSettings()).thenReturn("""{"variants":["de","df"]}""")
 
         testee.beforeAtbInit()
 
@@ -114,8 +132,9 @@ class ReinstallAtbListenerTest {
     fun whenIsAppReinstallAndProtectionEnabledAndCurrentVariantIsNotProtectedThenOverwrite() = runTest {
         whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(true)
         whenever(mockStatisticsDataStore.variant).thenReturn("mq")
-        whenever(mockProtectionToggle.isEnabled()).thenReturn(true)
-        whenever(mockProtectionToggle.getSettings()).thenReturn("""{"variants":["de","df"]}""")
+        whenever(mockSelfToggle.isEnabled()).thenReturn(true)
+        whenever(mockProtectVariantsToggle.isEnabled()).thenReturn(true)
+        whenever(mockProtectVariantsToggle.getSettings()).thenReturn("""{"variants":["de","df"]}""")
 
         testee.beforeAtbInit()
 
@@ -126,8 +145,9 @@ class ReinstallAtbListenerTest {
     fun whenIsAppReinstallAndProtectionEnabledAndCurrentVariantIsNullThenOverwrite() = runTest {
         whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(true)
         whenever(mockStatisticsDataStore.variant).thenReturn(null)
-        whenever(mockProtectionToggle.isEnabled()).thenReturn(true)
-        whenever(mockProtectionToggle.getSettings()).thenReturn("""{"variants":["de","df"]}""")
+        whenever(mockSelfToggle.isEnabled()).thenReturn(true)
+        whenever(mockProtectVariantsToggle.isEnabled()).thenReturn(true)
+        whenever(mockProtectVariantsToggle.getSettings()).thenReturn("""{"variants":["de","df"]}""")
 
         testee.beforeAtbInit()
 
@@ -138,8 +158,9 @@ class ReinstallAtbListenerTest {
     fun whenIsAppReinstallAndProtectionEnabledButSettingsAreNullThenOverwrite() = runTest {
         whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(true)
         whenever(mockStatisticsDataStore.variant).thenReturn("de")
-        whenever(mockProtectionToggle.isEnabled()).thenReturn(true)
-        whenever(mockProtectionToggle.getSettings()).thenReturn(null)
+        whenever(mockSelfToggle.isEnabled()).thenReturn(true)
+        whenever(mockProtectVariantsToggle.isEnabled()).thenReturn(true)
+        whenever(mockProtectVariantsToggle.getSettings()).thenReturn(null)
 
         testee.beforeAtbInit()
 
@@ -150,8 +171,9 @@ class ReinstallAtbListenerTest {
     fun whenIsAppReinstallAndProtectionEnabledButProtectedListIsEmptyThenOverwrite() = runTest {
         whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(true)
         whenever(mockStatisticsDataStore.variant).thenReturn("de")
-        whenever(mockProtectionToggle.isEnabled()).thenReturn(true)
-        whenever(mockProtectionToggle.getSettings()).thenReturn("""{"variants":[]}""")
+        whenever(mockSelfToggle.isEnabled()).thenReturn(true)
+        whenever(mockProtectVariantsToggle.isEnabled()).thenReturn(true)
+        whenever(mockProtectVariantsToggle.getSettings()).thenReturn("""{"variants":[]}""")
 
         testee.beforeAtbInit()
 

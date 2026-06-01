@@ -28,6 +28,9 @@ import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
 interface ReinstallerVariantProtectionFeature {
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun self(): Toggle
+
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun protectVariants(): Toggle
 }
 
 data class ReinstallerVariantProtectionSettings(

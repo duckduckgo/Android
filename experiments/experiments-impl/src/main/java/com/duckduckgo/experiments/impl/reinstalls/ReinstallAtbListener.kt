@@ -58,11 +58,13 @@ class ReinstallAtbListener @Inject constructor(
         }
     }
 
-    private fun getProtectedVariants(): List<String> {
-        if (!reinstallerVariantProtectionFeature.self().isEnabled()) return emptyList()
-        val json = reinstallerVariantProtectionFeature.self().getSettings() ?: return emptyList()
-        return runCatching { settingsAdapter.fromJson(json)?.variants }.getOrNull().orEmpty()
-    }
+    private fun getProtectedVariants(): List<String> =
+        if (reinstallerVariantProtectionFeature.self().isEnabled() && reinstallerVariantProtectionFeature.protectVariants().isEnabled()) {
+            val json = reinstallerVariantProtectionFeature.protectVariants().getSettings()
+            runCatching { json?.let { settingsAdapter.fromJson(it)?.variants } }.getOrNull().orEmpty()
+        } else {
+            emptyList()
+        }
 
     override fun beforeAtbInitTimeoutMillis(): Long = MAX_REINSTALL_WAIT_TIME_MS
 
