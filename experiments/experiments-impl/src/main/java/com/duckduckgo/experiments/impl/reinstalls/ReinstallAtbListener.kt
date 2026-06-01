@@ -24,6 +24,7 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.Moshi
+import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.withContext
 import logcat.LogPriority.INFO
@@ -42,7 +43,10 @@ class ReinstallAtbListener @Inject constructor(
     moshi: Moshi,
 ) : AtbInitializerListener {
 
-    private val settingsAdapter by lazy { moshi.adapter(ReinstallerVariantProtectionSettings::class.java) }
+    private val settingsAdapter by lazy {
+        moshi.newBuilder().add(KotlinJsonAdapterFactory()).build()
+            .adapter(ReinstallerVariantProtectionSettings::class.java)
+    }
 
     override suspend fun beforeAtbInit() = withContext(dispatcherProvider.io()) {
         backupDataStore.clearBackupPreferences()
