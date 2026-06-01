@@ -50,6 +50,7 @@ import javax.inject.Inject
 class OptionsView(context: Context, private val host: NativeInputHost) : LinearLayout(context) {
 
     @Inject lateinit var viewModelFactory: ViewViewModelFactory
+
     @Inject lateinit var nativeInputStateProvider: NativeInputStateProvider
 
     private val viewModel by lazy {
