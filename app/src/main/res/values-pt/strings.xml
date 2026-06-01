@@ -1030,5 +1030,5 @@
     <string name="onboardingSearchDaxDialogOption1EnglishQuoted" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">como dizer \"pato\" em espanhol</string>
 
     <string name="input_screen_user_pref_without_ai_updated">Pesquisar apenas</string>
-    <string name="input_screen_user_pref_with_ai_updated">Alternar entre\npesquisa e Duck.ai</string>
+    <string name="input_screen_user_pref_with_ai_updated">Alternar entre\nPesquisa e Duck.ai</string>
 </resources>
