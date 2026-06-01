@@ -265,6 +265,7 @@
     <string name="singleTabFireDialogDeleteAll">Alles verwijderen</string>
     <string name="singleTabFireDialogDeleteThisTab">Dit tabblad verwijderen</string>
     <string name="singleTabFireDialogDeleteChat">Chat verwijderen</string>
+    <string name="singleTabFireDialogDeleteChats">Chats verwijderen</string>
     <string name="singleTabFireDialogTitleDuckAi">Deze chat verwijderen?</string>
     <string name="singleTabFireDialogSubtitleSiteData">Als je sitegegevens verwijdert, kun je uitloggen bij je accounts.</string>
     <string name="singleTabFireDialogSubtitleDownloads">Hiermee worden lopende downloads geannuleerd.</string>
