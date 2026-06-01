@@ -733,10 +733,6 @@ class BrowserTabViewModel @Inject constructor(
     private var alreadyShownKeyboard: Boolean = false
     private var pendingDuckChatAuthUpdate: Boolean = false
 
-    @Volatile
-    var isSerpLogoInMenuEnabled: Boolean = true
-        private set
-
     private val pdfDownloadCommandFlow = MutableSharedFlow<DownloadCommand>(extraBufferCapacity = 1)
 
     private val isFullUrlEnabled = urlDisplayRepository.isFullUrlEnabled
@@ -827,10 +823,6 @@ class BrowserTabViewModel @Inject constructor(
 
         viewModelScope.launch {
             addressBarTrackersAnimationManager.fetchFeatureState()
-        }
-
-        viewModelScope.launch(dispatchers.io()) {
-            isSerpLogoInMenuEnabled = androidBrowserConfig.serpLogoInMenu().isEnabled()
         }
 
         observeSyncStatusChangesForDuckChat()
