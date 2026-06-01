@@ -957,7 +957,7 @@
     <string name="quickSetupSearchOptionsTitle">Chceš mať vyhľadávanie a AI chat v adresnom riadku?</string>
     <string name="quickSetupBottomSheetDone">Hotovo</string>
     <string name="quickSetupInputScreenSearchOnly">Len vyhľadávanie</string>
-    <string name="quickSetupInputScreenSearchAndDuckAi">Vyhľadávanie a Duck.ai</string>
+    <string name="quickSetupInputScreenSearchAndDuckAi">Vyhľadať a Duck.ai</string>
     <string name="quickSetupRemoveHomeScreenWidgetTitle">Ako odstrániť miniaplikáciu z úvodnej obrazovky</string>
     <string name="quickSetupRemoveHomeScreenWidgetStep1">Prejdi na úvodnú obrazovku</string>
     <string name="quickSetupRemoveHomeScreenWidgetStep2">Dotkni sa a podrž miniaplikáciu</string>
@@ -1063,9 +1063,9 @@
     <string name="linkTextCopyFailed">Nepodarilo sa skopírovať text odkazu</string>
 
     <string name="preOnboardingWelcomeDialogTitle">Dobrý deň.</string>
-    <string name="preOnboardingWelcomeDialogBody1">Si pripravený/-á na rýchlejší prehliadač, ktorý ti dáva kontrolu?</string>
+    <string name="preOnboardingWelcomeDialogBody1">Si pripravený/-á na rýchlejší prehliadač,\nktorý ti dáva kontrolu?</string>
     <string name="preOnboardingWelcomeDialogBody2">Umelá inteligencia je vždy voliteľná a ochrana súkromia je vždy zapnutá.</string>
-    <string name="onboardingStepIndicatorText" instruction="a counter above our instructions in onboarding that tells a user what step they are on">%1$d z %2$d</string>
+    <string name="onboardingStepIndicatorText" instruction="a counter above our instructions in onboarding that tells a user what step they are on">%1$d %2$d</string>
     <string name="onboardingSearchDaxDialogOption1Quoted" instruction="translate &apos;duck&apos; too.">Ako povedať „kačica“ v angličtine</string>
     <string name="onboardingSearchDaxDialogOption1EnglishQuoted" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">Ako povedať „kačica“ po španielsky</string>
 
