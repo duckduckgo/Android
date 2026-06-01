@@ -962,6 +962,11 @@
                             "name": "treatment",
                             "weight": 1
                         }
+                    ],
+                    "targets": [
+                      {
+                        "isReturningUser": true
+                      }
                     ]
                 }
             }
