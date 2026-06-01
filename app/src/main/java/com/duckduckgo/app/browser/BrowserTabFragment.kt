@@ -1693,11 +1693,7 @@ class BrowserTabFragment :
     ) {
         val currentSite = viewModel.siteLiveData.value
         val omnibarState = viewModel.omnibarViewState.value
-        val serpLogoUrl = if (viewModel.isSerpLogoInMenuEnabled) {
-            (omnibarState?.serpLogo as? SerpLogo.EasterEgg)?.logoUrl
-        } else {
-            null
-        }
+        val serpLogoUrl = (omnibarState?.serpLogo as? SerpLogo.EasterEgg)?.logoUrl
         val browseMenuState = browserMenuViewStateFactory.create(
             omnibarViewMode = omnibarViewMode,
             viewState = viewState,
