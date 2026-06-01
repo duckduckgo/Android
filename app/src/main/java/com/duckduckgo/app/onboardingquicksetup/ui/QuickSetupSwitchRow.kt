@@ -19,12 +19,14 @@ package com.duckduckgo.app.onboardingquicksetup.ui
 import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
+import android.widget.CompoundButton
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.res.use
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ViewQuickSetupSwitchRowBinding
+import com.duckduckgo.common.ui.view.quietlySetIsChecked
 
 class QuickSetupSwitchRow @JvmOverloads constructor(
     context: Context,
@@ -36,7 +38,6 @@ class QuickSetupSwitchRow @JvmOverloads constructor(
         ViewQuickSetupSwitchRowBinding.inflate(LayoutInflater.from(context), this)
 
     init {
-        minHeight = resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.twoLineItemHeight)
         context.theme.obtainStyledAttributes(attrs, R.styleable.QuickSetupSwitchRow, 0, 0).use { attrs ->
             attrs.getResourceId(R.styleable.QuickSetupSwitchRow_quickSetupRowIcon, 0)
                 .takeIf { it != 0 }
@@ -45,6 +46,8 @@ class QuickSetupSwitchRow @JvmOverloads constructor(
                 ?.let { binding.quickSetupSwitchRowPrimaryText.text = it }
         }
     }
+
+    private var checkedChangeListener: CompoundButton.OnCheckedChangeListener? = null
 
     var isChecked: Boolean
         get() = binding.quickSetupSwitchRowSwitch.isChecked
@@ -61,6 +64,12 @@ class QuickSetupSwitchRow @JvmOverloads constructor(
     }
 
     fun setOnCheckedChangeListener(listener: (Boolean) -> Unit) {
-        binding.quickSetupSwitchRowSwitch.setOnCheckedChangeListener { _, isChecked -> listener(isChecked) }
+        val wrapped = CompoundButton.OnCheckedChangeListener { _, isChecked -> listener(isChecked) }
+        checkedChangeListener = wrapped
+        binding.quickSetupSwitchRowSwitch.setOnCheckedChangeListener(wrapped)
+    }
+
+    fun setCheckedSilently(checked: Boolean) {
+        binding.quickSetupSwitchRowSwitch.quietlySetIsChecked(checked, checkedChangeListener)
     }
 }

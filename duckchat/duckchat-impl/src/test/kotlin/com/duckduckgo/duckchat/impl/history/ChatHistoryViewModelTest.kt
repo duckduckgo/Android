@@ -24,7 +24,13 @@ import com.duckduckgo.dataclearing.api.plugin.DataClearingTrigger
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.impl.history.ChatHistoryUiState.Loaded
 import com.duckduckgo.duckchat.impl.messaging.fakes.FakeDuckChatInternal
+import com.duckduckgo.duckchat.impl.models.AIChatModel
 import com.duckduckgo.duckchat.impl.models.ChatType
+import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
+import com.duckduckgo.duckchat.impl.models.ModelDisplay
+import com.duckduckgo.duckchat.impl.models.ModelProvider
+import com.duckduckgo.duckchat.impl.models.ModelState
+import com.duckduckgo.duckchat.impl.models.ReasoningMode
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
@@ -48,11 +54,29 @@ class ChatHistoryViewModelTest {
     private val duckAiFeatureState: DuckAiFeatureState = mock {
         whenever(it.showClearDuckAIChatHistory).thenReturn(showClearDuckAIChatHistoryFlow)
     }
-    private val viewModel = ChatHistoryViewModel(repository, coroutineRule.testScope, duckChat, dataClearingTrigger, duckAiFeatureState)
+    private val duckAiModelManager = FakeDuckAiModelManager()
+    private val viewModel = ChatHistoryViewModel(
+        repository,
+        coroutineRule.testScope,
+        duckChat,
+        dataClearingTrigger,
+        duckAiFeatureState,
+        duckAiModelManager,
+    )
 
     @Test
     fun `initial state is Loading`() = coroutineRule.testScope.runTest {
         assertEquals(ChatHistoryUiState.Loading, viewModel.uiState.value)
+    }
+
+    @Test
+    fun `init warms the model manager cache by calling fetchModels`() = coroutineRule.testScope.runTest {
+        // Subscribing to uiState advances the test scheduler so the init-block launch runs.
+        viewModel.uiState.test {
+            awaitInitialNonLoading()
+            assertEquals(1, duckAiModelManager.fetchModelsCount)
+            cancelAndIgnoreRemainingEvents()
+        }
     }
 
     @Test
@@ -807,6 +831,73 @@ class ChatHistoryViewModelTest {
     }
 
     @Test
+    fun `onDownloadRequested emits ShowDownloadComplete with the saved file name`() =
+        coroutineRule.testScope.runTest {
+            repository.exportResult = java.io.File("/tmp/duck.ai_2026-05-21_10-00-00.txt")
+
+            viewModel.navigationEvents.test {
+                viewModel.onDownloadRequested("chat-7")
+
+                val event = awaitItem()
+                assertTrue(event is ChatHistoryViewModel.NavigationEvent.ShowDownloadComplete)
+                event as ChatHistoryViewModel.NavigationEvent.ShowDownloadComplete
+                assertEquals("duck.ai_2026-05-21_10-00-00.txt", event.fileName)
+            }
+            assertEquals(listOf("chat-7"), repository.exportedChats)
+        }
+
+    @Test
+    fun `onDownloadRequested resolves the model display from the model manager cache`() =
+        coroutineRule.testScope.runTest {
+            source.value = listOf(item(chatId = "chat-7", model = "gpt-5-mini"))
+            duckAiModelManager.setModels(listOf(fakeApiModel(id = "gpt-5-mini", name = "GPT-5 mini", provider = ModelProvider.OPENAI)))
+
+            viewModel.uiState.test {
+                awaitInitialLoaded() // populates latestItems
+                viewModel.navigationEvents.test {
+                    viewModel.onDownloadRequested("chat-7")
+                    awaitItem() // ShowDownloadComplete
+
+                    val display = repository.lastExportModelDisplay
+                    assertEquals("GPT-5 mini", display?.fullName)
+                    assertEquals("GPT-5 mini", display?.shortName)
+                    assertEquals("OpenAI's", display?.providerPossessive)
+                }
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `onDownloadRequested falls back to null modelDisplay when manager cache misses the model id`() =
+        coroutineRule.testScope.runTest {
+            source.value = listOf(item(chatId = "chat-7", model = "gpt-5.2"))
+            duckAiModelManager.setModels(emptyList())
+
+            viewModel.uiState.test {
+                awaitInitialLoaded()
+                viewModel.navigationEvents.test {
+                    viewModel.onDownloadRequested("chat-7")
+                    awaitItem() // ShowDownloadComplete
+
+                    assertEquals(null, repository.lastExportModelDisplay)
+                }
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `onDownloadRequested emits ShowExportError when repository throws`() =
+        coroutineRule.testScope.runTest {
+            repository.exportError = IllegalStateException("boom")
+
+            viewModel.navigationEvents.test {
+                viewModel.onDownloadRequested("chat-7")
+
+                assertEquals(ChatHistoryViewModel.NavigationEvent.ShowExportError, awaitItem())
+            }
+        }
+
+    @Test
     fun `onRenameRequested emits OpenRename navigation event with chatId and currentTitle`() = coroutineRule.testScope.runTest {
         viewModel.navigationEvents.test {
             viewModel.onRenameRequested("chat-42", "My favourite chat")
@@ -938,12 +1029,29 @@ class ChatHistoryViewModelTest {
         pinned: Boolean = false,
         lastEdit: Long = 0L,
         title: String = chatId,
+        model: String = "gpt-5-mini",
     ): ChatHistoryItem = ChatHistoryItem(
         chatId = chatId,
         displayTitle = title,
         type = ChatType.Discussion,
+        model = model,
         pinned = pinned,
         lastEditMillis = lastEdit,
+    )
+
+    private fun fakeApiModel(
+        id: String,
+        name: String,
+        provider: ModelProvider = ModelProvider.UNKNOWN,
+        shortName: String = name,
+    ): AIChatModel = AIChatModel(
+        id = id,
+        name = name,
+        displayName = name,
+        shortName = shortName,
+        accessTier = emptyList(),
+        isAccessible = true,
+        provider = provider,
     )
 }
 
@@ -953,6 +1061,11 @@ private class FakeChatHistoryRepository(
     val deletedChatIds: MutableList<String> = mutableListOf()
     val renamedChats: MutableList<Pair<String, String>> = mutableListOf()
     val pinnedChats: MutableList<Pair<String, Boolean>> = mutableListOf()
+    val exportedChats: MutableList<String> = mutableListOf()
+    var lastExportModelDisplay: ModelDisplay? = null
+        private set
+    var exportResult: java.io.File = java.io.File("/tmp/chat-export.txt")
+    var exportError: Throwable? = null
     var deleteAllChatsCalled: Boolean = false
         private set
 
@@ -977,6 +1090,13 @@ private class FakeChatHistoryRepository(
         pinnedChats += chatId to pinned
         source.value = source.value.map { if (it.chatId == chatId) it.copy(pinned = pinned) else it }
     }
+
+    override suspend fun exportChat(chatId: String, modelDisplay: ModelDisplay?): java.io.File {
+        exportedChats += chatId
+        lastExportModelDisplay = modelDisplay
+        exportError?.let { throw it }
+        return exportResult
+    }
 }
 
 private class RecordingDataClearingTrigger : DataClearingTrigger {
@@ -985,4 +1105,26 @@ private class RecordingDataClearingTrigger : DataClearingTrigger {
     override suspend fun clearData(types: Set<ClearableData>) {
         calls += types
     }
+}
+
+private class FakeDuckAiModelManager : DuckAiModelManager {
+    private val _modelState = MutableStateFlow(ModelState())
+    override val modelState: kotlinx.coroutines.flow.StateFlow<ModelState> = _modelState
+
+    var fetchModelsCount: Int = 0
+        private set
+
+    fun setModels(models: List<AIChatModel>) {
+        _modelState.value = ModelState(models = models)
+    }
+
+    override suspend fun fetchModels() {
+        fetchModelsCount++
+    }
+
+    override suspend fun selectModel(model: AIChatModel) = Unit
+    override suspend fun selectReasoningMode(mode: ReasoningMode) = Unit
+    override suspend fun setChatScopedReasoningMode(mode: ReasoningMode?) = Unit
+    override fun getSelectedModelId(): String? = null
+    override fun getResolvedReasoningEffort(): String? = null
 }

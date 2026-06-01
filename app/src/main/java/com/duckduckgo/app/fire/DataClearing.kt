@@ -32,6 +32,7 @@ import com.duckduckgo.app.settings.clear.FireClearOption
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.tabs.model.TabAtomicOperations
 import com.duckduckgo.app.tabs.model.TabRepository
+import com.duckduckgo.browsermode.api.RegularMode
 import com.duckduckgo.dataclearing.api.plugin.ClearableData
 import com.duckduckgo.dataclearing.api.plugin.DataClearingTrigger
 import com.duckduckgo.di.scopes.AppScope
@@ -69,7 +70,7 @@ class DataClearing @Inject constructor(
     private val tabVisitedSitesRepository: TabVisitedSitesRepository,
     private val navigationHistory: NavigationHistory,
     private val tabOperations: TabAtomicOperations,
-    private val tabRepository: TabRepository,
+    @RegularMode private val tabRepository: TabRepository,
     private val duckChat: DuckChat,
     private val contextualDataStore: DuckChatContextualDataStore,
     private val showOnAppLaunchOptionDataStore: ShowOnAppLaunchOptionDataStore,

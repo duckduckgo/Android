@@ -943,6 +943,26 @@
     <string name="preOnboardingInputScreenButton">Další</string>
     <string name="preOnboardingInputScreenDescription"><![CDATA[Funkce AI jsou soukromé a volitelné. Změny můžeš provádět v <b>Nastavení > Funkce AI</b>.]]></string>
 
+    <!--Onboarding Reinstall Quick Setup-->
+    <string name="preOnboardingReinstallQuickSetupTitle">Vítej zpět!&lt;br/&gt;Chcete si něco přizpůsobit?</string>
+    <string name="preOnboardingReinstallSetDefaultLabel">Nastavit DuckDuckGo jako výchozí</string>
+    <string name="preOnboardingReinstallAddHomeScreenWidgetLabel">Přidat widget na domovskou obrazovku</string>
+    <string name="preOnboardingReinstallAddressBarLabel">Pozice adresního řádku</string>
+    <string name="preOnboardingReinstallAddressBarSearchOptionsLabel">Možnosti vyhledávání v adresním řádku</string>
+    <string name="preOnboardingReinstallStartBrowsing">Spustit procházení</string>
+
+    <!-- Quick setup bottom sheets -->
+    <string name="quickSetupAddressBarPositionTitle">Kde chceš mít adresní řádek?</string>
+    <string name="quickSetupAddressBarPositionCaption"><![CDATA[Změny můžeš provést v <b>Nastavení > Vzhled</b>.]]></string>
+    <string name="quickSetupSearchOptionsTitle">Chceš Vyhledávání a chat s AI v adresním řádku?</string>
+    <string name="quickSetupBottomSheetDone">Hotovo</string>
+    <string name="quickSetupInputScreenSearchOnly">Jen vyhledávání</string>
+    <string name="quickSetupInputScreenSearchAndDuckAi">Vyhledávání a Duck.ai</string>
+    <string name="quickSetupRemoveHomeScreenWidgetTitle">Jak odstranit widget z domovské obrazovky</string>
+    <string name="quickSetupRemoveHomeScreenWidgetStep1">Přejdi na domovskou obrazovku</string>
+    <string name="quickSetupRemoveHomeScreenWidgetStep2">Dotkni se widgetu a podrž ho</string>
+    <string name="quickSetupRemoveHomeScreenWidgetStep3">Odstraníš ho klepnutím nebo přetažením</string>
+
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Adresní řádek</string>
     <string name="settingsAddressBarPositionHeaderTitle">Pozice adresního řádku</string>
@@ -1030,6 +1050,10 @@
     <string name="syncRestoreDialogPrimaryCta">Obnovit moje věci</string>
     <string name="syncRestoreDialogSecondaryCta">Přeskočit</string>
 
+    <!-- Sync Restore (brand-design onboarding) -->
+    <string name="syncRestoreDialogBrandDesignTitle">Pojďme navázat tam, kde jsi na DuckDuckGo skončil.</string>
+    <string name="syncRestoreDialogBrandDesignBody1">Tvé uložené záložky, hesla a další položky jsou připraveny.</string>
+
     <!-- PDF download tooltip -->
     <string name="pdfDownloadTooltipText">Stáhnout PDF</string>
 
@@ -1044,4 +1068,7 @@
     <string name="onboardingStepIndicatorText" instruction="a counter above our instructions in onboarding that tells a user what step they are on">%1$d z %2$d</string>
     <string name="onboardingSearchDaxDialogOption1Quoted" instruction="translate &apos;duck&apos; too.">jak se anglicky řekne „kachna“</string>
     <string name="onboardingSearchDaxDialogOption1EnglishQuoted" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">jak se španělsky řekne „kachna“</string>
+
+    <string name="input_screen_user_pref_without_ai_updated">Jen vyhledávání</string>
+    <string name="input_screen_user_pref_with_ai_updated">Přepínej mezi\nHledáním a Duck.ai</string>
 </resources>

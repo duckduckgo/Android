@@ -41,8 +41,8 @@ class InputScreenButtons @JvmOverloads constructor(
 
     private val actionSend: ImageView by lazy { findViewById(R.id.actionSend) }
     private val actionNewLine: ImageView by lazy { findViewById(R.id.actionNewLine) }
-    private val actionVoiceSearch: ImageView by lazy { findViewById(R.id.actionVoiceSearch) }
-    private val actionVoiceChat: ImageView by lazy { findViewById(R.id.actionVoiceChat) }
+    private val actionVoiceSearch: ImageView? by lazy { findViewById(R.id.actionVoiceSearch) }
+    private val actionVoiceChat: ImageView? by lazy { findViewById(R.id.actionVoiceChat) }
 
     var onSendClick: (() -> Unit)? = null
         set(value) {
@@ -61,13 +61,13 @@ class InputScreenButtons @JvmOverloads constructor(
     var onVoiceSearchClick: (() -> Unit)? = null
         set(value) {
             field = value
-            actionVoiceSearch.setOnClickListener { value?.invoke() }
+            actionVoiceSearch?.setOnClickListener { value?.invoke() }
         }
 
     var onVoiceChatClick: (() -> Unit)? = null
         set(value) {
             field = value
-            actionVoiceChat.setOnClickListener { value?.invoke() }
+            actionVoiceChat?.setOnClickListener { value?.invoke() }
         }
 
     init {
@@ -77,7 +77,7 @@ class InputScreenButtons @JvmOverloads constructor(
             transformButtonsToFloating()
         } else {
             // when in bottom bar mode, the voice search icon is shown in the input field
-            actionVoiceSearch.gone()
+            actionVoiceSearch?.gone()
         }
     }
 
@@ -127,11 +127,11 @@ class InputScreenButtons @JvmOverloads constructor(
     }
 
     fun setVoiceSearchVisible(visible: Boolean) {
-        actionVoiceSearch.isVisible = visible
+        actionVoiceSearch?.isVisible = visible
     }
 
     fun setVoiceChatVisible(visible: Boolean) {
-        actionVoiceChat.isVisible = visible
+        actionVoiceChat?.isVisible = visible
     }
 
     private fun transformButtonsToFloating() {
@@ -145,11 +145,11 @@ class InputScreenButtons @JvmOverloads constructor(
             width = buttonSizePx
             height = buttonSizePx
         }
-        actionVoiceSearch.updateLayoutParams {
+        actionVoiceSearch?.updateLayoutParams {
             width = buttonSizePx
             height = buttonSizePx
         }
-        actionVoiceChat.updateLayoutParams {
+        actionVoiceChat?.updateLayoutParams {
             width = buttonSizePx
             height = buttonSizePx
         }
@@ -164,11 +164,11 @@ class InputScreenButtons @JvmOverloads constructor(
         // three buttons only need it when floating, so we apply it here.
         val backgroundRes = R.drawable.background_input_screen_button
         actionNewLine.setBackgroundResource(backgroundRes)
-        actionVoiceChat.setBackgroundResource(backgroundRes)
-        actionVoiceSearch.setBackgroundResource(backgroundRes)
+        actionVoiceChat?.setBackgroundResource(backgroundRes)
+        actionVoiceSearch?.setBackgroundResource(backgroundRes)
         val circularRippleDrawable = ContextCompat.getDrawable(context, CommonR.drawable.selectable_circular_ripple)
         actionNewLine.foreground = circularRippleDrawable
-        actionVoiceSearch.foreground = circularRippleDrawable
-        actionVoiceChat.foreground = circularRippleDrawable
+        actionVoiceSearch?.foreground = circularRippleDrawable
+        actionVoiceChat?.foreground = circularRippleDrawable
     }
 }

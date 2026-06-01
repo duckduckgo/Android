@@ -903,6 +903,26 @@
     <string name="preOnboardingInputScreenButton">Nästa</string>
     <string name="preOnboardingInputScreenDescription"><![CDATA[AI-funktioner är privata och valfria. Du kan göra ändringar i <b>Inställningar > AI-funktioner</b>.]]></string>
 
+    <!--Onboarding Reinstall Quick Setup-->
+    <string name="preOnboardingReinstallQuickSetupTitle">Välkommen tillbaka!&lt;br/&gt;Vill du anpassa något?</string>
+    <string name="preOnboardingReinstallSetDefaultLabel">Ställ in DuckDuckGo som standard</string>
+    <string name="preOnboardingReinstallAddHomeScreenWidgetLabel">Lägg till widget på startskärmen</string>
+    <string name="preOnboardingReinstallAddressBarLabel">Adressfältsläge</string>
+    <string name="preOnboardingReinstallAddressBarSearchOptionsLabel">Sökalternativ för adressfält</string>
+    <string name="preOnboardingReinstallStartBrowsing">Börja surfa</string>
+
+    <!-- Quick setup bottom sheets -->
+    <string name="quickSetupAddressBarPositionTitle">Var vill du ha adressfältet?</string>
+    <string name="quickSetupAddressBarPositionCaption"><![CDATA[Du kan göra ändringar i <b>Inställningar > Utseende</b>.]]></string>
+    <string name="quickSetupSearchOptionsTitle">Vill du ha sökning och AI-chatt i adressfältet?</string>
+    <string name="quickSetupBottomSheetDone">Klart</string>
+    <string name="quickSetupInputScreenSearchOnly">Sök endast</string>
+    <string name="quickSetupInputScreenSearchAndDuckAi">Sök och Duck.ai</string>
+    <string name="quickSetupRemoveHomeScreenWidgetTitle">Så här tar du bort widgeten för startskärmen</string>
+    <string name="quickSetupRemoveHomeScreenWidgetStep1">Gå till din startskärm</string>
+    <string name="quickSetupRemoveHomeScreenWidgetStep2">Tryck och håll kvar på widgeten</string>
+    <string name="quickSetupRemoveHomeScreenWidgetStep3">Tryck eller dra för att ta bort den</string>
+
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Adressfält</string>
     <string name="settingsAddressBarPositionHeaderTitle">Adressfältsläge</string>
@@ -990,6 +1010,10 @@
     <string name="syncRestoreDialogPrimaryCta">Återställ mitt innehåll</string>
     <string name="syncRestoreDialogSecondaryCta">Hoppa över</string>
 
+    <!-- Sync Restore (brand-design onboarding) -->
+    <string name="syncRestoreDialogBrandDesignTitle">Nu fortsätter vi där du slutade på DuckDuckGo.</string>
+    <string name="syncRestoreDialogBrandDesignBody1">Dina sparade bokmärken, lösenord och mer är redo.</string>
+
     <!-- PDF download tooltip -->
     <string name="pdfDownloadTooltipText">Ladda ner PDF</string>
 
@@ -999,9 +1023,12 @@
     <string name="linkTextCopyFailed">Kunde inte kopiera länktext</string>
 
     <string name="preOnboardingWelcomeDialogTitle">Hej!</string>
-    <string name="preOnboardingWelcomeDialogBody1">Är du redo för en snabbare webbläsare\nsom ger dig kontroll?</string>
-    <string name="preOnboardingWelcomeDialogBody2">AI är alltid valfritt och\nintegritetsskydd är alltid på.</string>
+    <string name="preOnboardingWelcomeDialogBody1">Är du redo för en snabbare webbläsare som ger dig kontroll?</string>
+    <string name="preOnboardingWelcomeDialogBody2">AI är alltid valfritt och integritetsskydd är alltid på.</string>
     <string name="onboardingStepIndicatorText" instruction="a counter above our instructions in onboarding that tells a user what step they are on">%1$d av %2$d</string>
     <string name="onboardingSearchDaxDialogOption1Quoted" instruction="translate &apos;duck&apos; too.">vad heter ”anka” på engelska</string>
     <string name="onboardingSearchDaxDialogOption1EnglishQuoted" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">vad heter ”anka” på spanska</string>
+
+    <string name="input_screen_user_pref_without_ai_updated">Endast sökning</string>
+    <string name="input_screen_user_pref_with_ai_updated">Växla mellan\nsökning och Duck.ai</string>
 </resources>

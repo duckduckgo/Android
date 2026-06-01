@@ -943,6 +943,26 @@
     <string name="preOnboardingInputScreenButton">Kitas</string>
     <string name="preOnboardingInputScreenDescription"><![CDATA[DI funkcijos yra privačios ir neprivalomos. Galite atlikti pakeitimus <b>Nustatymai > DI funkcijos</b>.]]></string>
 
+    <!--Onboarding Reinstall Quick Setup-->
+    <string name="preOnboardingReinstallQuickSetupTitle">Smagu, kad grįžai!&lt;br/&gt;Nori ką nors tinkinti?</string>
+    <string name="preOnboardingReinstallSetDefaultLabel">Nustatyti „DuckDuckGo“ kaip numatytąją</string>
+    <string name="preOnboardingReinstallAddHomeScreenWidgetLabel">Pridėti pradžios ekrano valdiklį</string>
+    <string name="preOnboardingReinstallAddressBarLabel">Adreso juostos vieta</string>
+    <string name="preOnboardingReinstallAddressBarSearchOptionsLabel">Adreso juostos paieškos parinktys</string>
+    <string name="preOnboardingReinstallStartBrowsing">Pradėti naršyti</string>
+
+    <!-- Quick setup bottom sheets -->
+    <string name="quickSetupAddressBarPositionTitle">Kur nori matyti adreso juostą?</string>
+    <string name="quickSetupAddressBarPositionCaption"><![CDATA[Jei nori tai pakeisti, pasirink <b>Nuostatos > Išvaizda</b>.]]></string>
+    <string name="quickSetupSearchOptionsTitle">Nori adreso juostoje matyti paiešką ir DI pokalbius?</string>
+    <string name="quickSetupBottomSheetDone">Atlikta</string>
+    <string name="quickSetupInputScreenSearchOnly">Tik paieška</string>
+    <string name="quickSetupInputScreenSearchAndDuckAi">Paieška ir „Duck.ai“</string>
+    <string name="quickSetupRemoveHomeScreenWidgetTitle">Kaip pašalinti pradžios ekrano valdiklį</string>
+    <string name="quickSetupRemoveHomeScreenWidgetStep1">Eik į pradžios ekraną</string>
+    <string name="quickSetupRemoveHomeScreenWidgetStep2">Paliesk ir palaikyk valdiklį</string>
+    <string name="quickSetupRemoveHomeScreenWidgetStep3">Paliesk arba nuvilk, kad pašalintum</string>
+
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Adreso juosta</string>
     <string name="settingsAddressBarPositionHeaderTitle">Adreso juostos padėtis</string>
@@ -1030,6 +1050,10 @@
     <string name="syncRestoreDialogPrimaryCta">Atkurti mano duomenis</string>
     <string name="syncRestoreDialogSecondaryCta">Praleisti</string>
 
+    <!-- Sync Restore (brand-design onboarding) -->
+    <string name="syncRestoreDialogBrandDesignTitle">Pratęskime nuo ten, kur baigėte naudotis „DuckDuckGo“.</string>
+    <string name="syncRestoreDialogBrandDesignBody1">Jau paruoštos jūsų išsaugotos žymės, slaptažodžiai ir kita.</string>
+
     <!-- PDF download tooltip -->
     <string name="pdfDownloadTooltipText">Atsisiųsti PDF</string>
 
@@ -1039,9 +1063,12 @@
     <string name="linkTextCopyFailed">Nepavyko nukopijuoti nuorodos teksto</string>
 
     <string name="preOnboardingWelcomeDialogTitle">Sveiki!</string>
-    <string name="preOnboardingWelcomeDialogBody1">Ar norite spartesnės naršyklės,\nkurią patys valdote?</string>
-    <string name="preOnboardingWelcomeDialogBody2">DI neprivalomas, o privatumo apsauga\n veikia visada.</string>
+    <string name="preOnboardingWelcomeDialogBody1">Ar norite spartesnės naršyklės, kurią patys valdote?</string>
+    <string name="preOnboardingWelcomeDialogBody2">DI neprivalomas, o privatumo apsauga veikia visada.</string>
     <string name="onboardingStepIndicatorText" instruction="a counter above our instructions in onboarding that tells a user what step they are on">%1$d iš %2$d</string>
     <string name="onboardingSearchDaxDialogOption1Quoted" instruction="translate &apos;duck&apos; too.">kaip angliškai pasakyti „antis“</string>
     <string name="onboardingSearchDaxDialogOption1EnglishQuoted" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">kaip ispaniškai pasakyti „antis“</string>
+
+    <string name="input_screen_user_pref_without_ai_updated">Tik paieška</string>
+    <string name="input_screen_user_pref_with_ai_updated">Perjungti tarpusavyje\npaiešką ir Duck.ai</string>
 </resources>

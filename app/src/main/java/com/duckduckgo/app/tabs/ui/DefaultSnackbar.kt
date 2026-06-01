@@ -74,4 +74,8 @@ class DefaultSnackbar(
     fun show() {
         snackbar.show()
     }
+
+    fun dismiss() {
+        snackbar.dismiss()
+    }
 }

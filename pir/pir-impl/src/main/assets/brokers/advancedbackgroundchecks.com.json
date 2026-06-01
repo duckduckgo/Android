@@ -1,7 +1,7 @@
 {
   "name": "AdvancedBackgroundChecks",
   "url": "advancedbackgroundchecks.com",
-  "version": "0.8.0",
+  "version": "0.9.0",
   "parent": "peoplefinders.com",
   "addedDatetime": 1678060800000,
   "optOutUrl": "https://www.advancedbackgroundchecks.com/removal",
@@ -13,7 +13,7 @@
         {
           "actionType": "navigate",
           "id": "070b6417-8ccd-4111-b5ae-7ae470b0399a",
-          "url": "https://www.advancedbackgroundchecks.com/names/${firstName|hyphenated}-${lastName|hyphenated}_${city|hyphenated}-${state|hyphenated}"
+          "url": "https://www.advancedbackgroundchecks.com/find/name/${firstName|hyphenated|downcase}-${lastName|hyphenated|downcase}/in/${state|upcase}/${city|hyphenated|downcase}"
         },
         {
           "actionType": "expectation",
@@ -31,46 +31,56 @@
           "expectations": [
             {
               "type": "element",
-              "selector": ".logo-advanced"
+              "selector": "//main//h1[contains(., ' in ')]"
             }
           ],
           "id": "95594c0e-e6a3-4b60-8596-489e58cead2c"
         },
         {
+          "actionType": "click",
+          "elements": [
+            {
+              "type": "button",
+              "selector": "//main//div[contains(., 'Also known as:')]//button[contains(translate(normalize-space(string(.)), 'MORE', 'more'), 'more')]",
+              "multiple": true,
+              "failSilently": true
+            }
+          ],
+          "id": "d3a5e0f1-55f1-4be6-b2c5-d3f92035d7d8"
+        },
+        {
           "actionType": "extract",
           "id": "d760163d-4a1f-476a-bc3e-4f3ccedc29f1",
-          "selector": ".card-block",
-          "noResultsSelector": "//div[@id='site-content']//p[contains(text(), 'We could not find any results')]",
+          "selector": "(//main//div[contains(@class, 'space-y-3')])[1]/div[contains(@class, 'bg-white') and .//a[contains(@href, '/find/person/')]]",
+          "noResultsSelector": "//main//p[contains(., \"didn't find any matching records\")]",
           "profile": {
             "name": {
-              "selector": ".card-title",
+              "selector": ".//h2",
               "beforeText": "Age"
             },
             "alternativeNamesList": {
-              "selector": ".//p[contains(@class, 'card-text') and strong[contains(text(), 'AKA')]]",
-              "afterText": "AKA:",
-              "separator": ","
+              "selector": ".//div[contains(., 'Also known as:')]//a[contains(@href, '/find/name/')]",
+              "findElements": true
             },
             "age": {
-              "selector": ".card-title",
+              "selector": ".//h2",
               "afterText": "Age"
             },
             "addressCityStateList": {
-              "selector": ".//p[@class='card-text address-link-list']//a",
+              "selector": ".//div[span[contains(., 'Used to live:')]]//a[contains(@href, '/people/')]",
               "findElements": true
             },
             "addressCityState": {
-              "selector": "(.//p[@class='card-text'])[1]"
+              "selector": ".//p[contains(@class, 'text-sm')][1]//a[contains(@href, '/people/')][1]"
             },
             "relativesList": {
-              "selector": ".//p[contains(@class, 'card-text') and strong[contains(text(), 'Related to')]]",
-              "afterText": "Related to:",
-              "separator": ","
+              "selector": ".//div[contains(@class, 'text-xs') and contains(., 'Relatives:')][1]//a[contains(@href, '/find/person/') and not(starts-with(normalize-space(string(.)), '+')) and not(contains(translate(normalize-space(string(.)), 'MORE', 'more'), 'more'))]",
+              "findElements": true
             },
             "profileUrl": {
-              "selector": ".link-to-details",
+              "selector": ".//a[contains(@href, '/find/person/')][1]",
               "identifierType": "path",
-              "identifier": "https://www.advancedbackgroundchecks.com/${id}"
+              "identifier": "https://www.advancedbackgroundchecks.com/find/person/${id}"
             }
           }
         }

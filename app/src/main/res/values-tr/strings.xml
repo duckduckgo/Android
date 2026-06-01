@@ -903,6 +903,26 @@
     <string name="preOnboardingInputScreenButton">Sonraki</string>
     <string name="preOnboardingInputScreenDescription"><![CDATA[AI özellikleri gizli ve isteğe bağlıdır. Değişiklikleri <b>Ayarlar > AI Özellikleri</b> bölümünden yapabilirsiniz.]]></string>
 
+    <!--Onboarding Reinstall Quick Setup-->
+    <string name="preOnboardingReinstallQuickSetupTitle">Tekrar hoşgeldiniz!&lt;br/&gt;Özelleştirmek istediğiniz bir var mı?</string>
+    <string name="preOnboardingReinstallSetDefaultLabel">DuckDuckGo\'yu varsayılan olarak ayarla</string>
+    <string name="preOnboardingReinstallAddHomeScreenWidgetLabel">Ana ekran widget\'ını ekle</string>
+    <string name="preOnboardingReinstallAddressBarLabel">Adres çubuğu konumu</string>
+    <string name="preOnboardingReinstallAddressBarSearchOptionsLabel">Adres çubuğu arama seçenekleri</string>
+    <string name="preOnboardingReinstallStartBrowsing">Gezinmeye Başla</string>
+
+    <!-- Quick setup bottom sheets -->
+    <string name="quickSetupAddressBarPositionTitle">Adres çubuğu nerede olsun?</string>
+    <string name="quickSetupAddressBarPositionCaption"><![CDATA[Değişiklikleri <b>Ayarlar > Görünüm</b> bölümünden yapabilirsiniz.]]></string>
+    <string name="quickSetupSearchOptionsTitle">Adres çubuğunda Arama ve Yapay Zeka sohbeti olsun mu?</string>
+    <string name="quickSetupBottomSheetDone">Bitti</string>
+    <string name="quickSetupInputScreenSearchOnly">Yalnızca Arama</string>
+    <string name="quickSetupInputScreenSearchAndDuckAi">Arama ve Duck.ai</string>
+    <string name="quickSetupRemoveHomeScreenWidgetTitle">Ana ekran widget\'ı nasıl kaldırılır?</string>
+    <string name="quickSetupRemoveHomeScreenWidgetStep1">Ana ekranınıza gidin</string>
+    <string name="quickSetupRemoveHomeScreenWidgetStep2">Widget\'a dokunun ve basılı tutun</string>
+    <string name="quickSetupRemoveHomeScreenWidgetStep3">Kaldırmak için dokunun veya sürükleyin</string>
+
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Adres Çubuğu</string>
     <string name="settingsAddressBarPositionHeaderTitle">Adres Çubuğu Konumu</string>
@@ -990,6 +1010,10 @@
     <string name="syncRestoreDialogPrimaryCta">Geri Yükle</string>
     <string name="syncRestoreDialogSecondaryCta">Atla</string>
 
+    <!-- Sync Restore (brand-design onboarding) -->
+    <string name="syncRestoreDialogBrandDesignTitle">DuckDuckGo\'da kaldığınız yerden devam edelim.</string>
+    <string name="syncRestoreDialogBrandDesignBody1">Kaydedilmiş yer işaretleriniz, şifreleriniz ve daha fazlası hazır.</string>
+
     <!-- PDF download tooltip -->
     <string name="pdfDownloadTooltipText">PDF indir</string>
 
@@ -1004,4 +1028,7 @@
     <string name="onboardingStepIndicatorText" instruction="a counter above our instructions in onboarding that tells a user what step they are on">%1$d / %2$d</string>
     <string name="onboardingSearchDaxDialogOption1Quoted" instruction="translate &apos;duck&apos; too.">ingilizcede \"ördek\" nasıl denir?</string>
     <string name="onboardingSearchDaxDialogOption1EnglishQuoted" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">ispanyolcada \"ördek\" nasıl denir?</string>
+
+    <string name="input_screen_user_pref_without_ai_updated">Yalnızca Arama</string>
+    <string name="input_screen_user_pref_with_ai_updated">Arama ile\nDuck.ai arasında geçiş yapın</string>
 </resources>

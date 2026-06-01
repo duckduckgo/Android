@@ -273,6 +273,7 @@ import com.duckduckgo.browser.ui.browsermenu.BrowserMenuBottomSheet
 import com.duckduckgo.browser.ui.browsermenu.VpnMenuState
 import com.duckduckgo.browser.ui.newtab.hatch.NewTabReturnHatchView
 import com.duckduckgo.browsermode.api.BrowserMode
+import com.duckduckgo.browsermode.api.WebViewModeInitializer
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.DuckDuckGoFragment
 import com.duckduckgo.common.ui.store.BrowserAppTheme
@@ -442,6 +443,9 @@ class BrowserTabFragment :
     lateinit var webChromeClient: BrowserChromeClient
 
     @Inject
+    lateinit var webViewModeInitializer: WebViewModeInitializer
+
+    @Inject
     lateinit var viewModelFactory: FragmentViewModelFactory
 
     @Inject
@@ -498,8 +502,8 @@ class BrowserTabFragment :
 
     private val isLaunchedFromExternalApp get() = requireArguments().getBoolean(LAUNCH_FROM_EXTERNAL_EXTRA)
 
-    val browserMode: BrowserMode get() = requireArguments().getString(BROWSER_MODE_ARG)
-        ?.let(BrowserMode::valueOf) ?: BrowserMode.REGULAR
+    @Inject
+    lateinit var browserMode: BrowserMode
 
     @Inject
     lateinit var userAgentProvider: UserAgentProvider
@@ -1403,8 +1407,13 @@ class BrowserTabFragment :
                         ),
                     )
                 },
-                onChatSuggestionSelected = { query -> userEnteredQuery(query) },
+                onChatSuggestionSelected = { chatUrl -> viewModel.openDuckAiChatById(chatUrl) },
+                onDuckAiQuerySubmitted = { query -> viewModel.openDuckAiQuery(query, autoPrompt = true) },
                 onChatUrlSuggestionClicked = { suggestion -> viewModel.userSelectedAutocomplete(suggestion, firePixel = false) },
+                onChatHistoryShortcutClicked = {
+                    pixel.fire(DuckChatPixelName.DUCK_CHAT_SETTINGS_SIDEBAR_TAPPED)
+                    viewModel.openDuckChatHistory()
+                },
                 onStopTapped = {
                     contentScopeScripts.sendSubscriptionEvent(
                         SubscriptionEventData(
@@ -1425,6 +1434,10 @@ class BrowserTabFragment :
                 },
                 onFilePickerRequested = { callback, mimeTypes ->
                     launchFilePicker(callback, mimeTypes)
+                },
+                restoreOmnibarAutocomplete = { forQuery -> restoreOmnibarAutocomplete(forQuery) },
+                onContextualSheetRequested = {
+                    viewModel.openDuckAIContextualMode()
                 },
             ),
         )
@@ -1530,6 +1543,12 @@ class BrowserTabFragment :
         hasFocus: Boolean = true,
     ) {
         viewModel.triggerAutocomplete(text, hasFocus, true)
+    }
+
+    private fun restoreOmnibarAutocomplete(forQuery: String): Boolean {
+        val cached = viewModel.restoreOmnibarAutocomplete(forQuery) ?: return false
+        autoCompleteSuggestionsAdapter.updateData(cached.query, cached.suggestions)
+        return true
     }
 
     private fun onOmnibarCustomTabClosed() {
@@ -1937,7 +1956,7 @@ class BrowserTabFragment :
 
     private fun launchTabSwitcher() {
         val activity = activity ?: return
-        val intent = TabSwitcherActivity.intent(activity, tabId)
+        val intent = TabSwitcherActivity.intent(activity)
         tabSwitcherActivityResult.launch(intent)
     }
 
@@ -2044,7 +2063,10 @@ class BrowserTabFragment :
         viewModel.omnibarViewState.observe(
             viewLifecycleOwner,
             Observer {
-                it?.let { renderer.renderOmnibar(it) }
+                it?.let {
+                    renderer.renderOmnibar(it)
+                    viewModel.onOmnibarTextRendered(it.omnibarText)
+                }
             },
         )
 
@@ -2548,6 +2570,16 @@ class BrowserTabFragment :
         when (it) {
             is NavigationCommand.Refresh -> refresh()
             is Command.OpenInNewTab -> {
+                // The new tab opens within the same activity, so the unified-input overlay
+                // and autocomplete list (which live on this fragment) would otherwise stay
+                // visible on top of it. Mirror Command.SwitchToTab and dismiss them first.
+                binding.focusedView.gone()
+                if (binding.autoCompleteSuggestionsList.isVisible) {
+                    viewModel.autoCompleteSuggestionsGone()
+                }
+                binding.autoCompleteSuggestionsList.gone()
+                nativeInputManager.hideNativeInput(animate = false, isNavigation = true)
+
                 if (swipingTabsFeature.isEnabled) {
                     browserActivity?.launchNewTab(it.query, it.sourceTabId)
                 } else {
@@ -2936,7 +2968,6 @@ class BrowserTabFragment :
                 // NO OP
             }
 
-            is Command.SubmitChat -> duckChat.openDuckChatWithAutoPrompt(it.query)
             is Command.EnqueueCookiesAnimation -> enqueueCookiesAnimation(it.isCosmetic)
             is Command.PageStarted -> onPageStarted()
             is Command.EnableDuckAIFullScreen -> showDuckAI(it.browserViewState)
@@ -3978,6 +4009,19 @@ class BrowserTabFragment :
                 ).findViewById<DuckDuckGoWebView>(R.id.browserWebView)
 
         webView?.let {
+            val bindResult = webViewModeInitializer.bind(it, browserMode)
+            if (bindResult.isFailure) {
+                if (browserMode != BrowserMode.REGULAR) {
+                    bindResult.exceptionOrNull()?.message?.let {
+                            message ->
+                        logcat(ERROR) { message }
+                    }
+                    this.closeCurrentTab()
+                    destroyWebView()
+                    return
+                }
+            }
+
             it.webViewClient = webViewClient
             it.webChromeClient = webChromeClient
             it.clearSslPreferences()
@@ -4175,6 +4219,10 @@ class BrowserTabFragment :
         daxDialogIntroBubble.root.gone()
         daxDialogIntroBubbleBrandDesign.root.gone()
         brandDesignDialogScrollView.gone()
+    }
+
+    private fun hideIfDaxBubble(cta: Cta?) {
+        if (cta is DaxBubbleCta) hideDaxBubbleCta(cta)
     }
 
     @SuppressLint("AddDocumentStartJavaScriptUsage")
@@ -5198,7 +5246,6 @@ class BrowserTabFragment :
         private const val URL_EXTRA_ARG = "URL_EXTRA_ARG"
         private const val SKIP_HOME_ARG = "SKIP_HOME_ARG"
         private const val LAUNCH_FROM_EXTERNAL_EXTRA = "LAUNCH_FROM_EXTERNAL_EXTRA"
-        private const val BROWSER_MODE_ARG = "BROWSER_MODE_ARG"
 
         const val ADD_SAVED_SITE_FRAGMENT_TAG = "ADD_SAVED_SITE"
         private const val PDF_VIEWER_FRAGMENT_TAG = "PDF_VIEWER"
@@ -5591,14 +5638,12 @@ class BrowserTabFragment :
             query: String? = null,
             skipHome: Boolean,
             isExternal: Boolean,
-            browserMode: BrowserMode = BrowserMode.REGULAR,
         ): BrowserTabFragment {
             val fragment = BrowserTabFragment()
             val args = Bundle()
             args.putString(TAB_ID_ARG, tabId)
             args.putBoolean(SKIP_HOME_ARG, skipHome)
             args.putBoolean(LAUNCH_FROM_EXTERNAL_EXTRA, isExternal)
-            args.putString(BROWSER_MODE_ARG, browserMode.name)
             query.let {
                 args.putString(URL_EXTRA_ARG, query)
             }
@@ -5620,7 +5665,6 @@ class BrowserTabFragment :
             args.putInt(CUSTOM_TAB_TOOLBAR_COLOR_ARG, toolbarColor)
             args.putBoolean(TAB_DISPLAYED_IN_CUSTOM_TAB_SCREEN_ARG, true)
             args.putBoolean(LAUNCH_FROM_EXTERNAL_EXTRA, isExternal)
-            args.putString(BROWSER_MODE_ARG, BrowserMode.REGULAR.name)
             query.let {
                 args.putString(URL_EXTRA_ARG, query)
             }
@@ -5905,15 +5949,24 @@ class BrowserTabFragment :
                 when {
                     viewState.cta != null -> {
                         hideNewTab()
-                        showCta(viewState.cta)
+                        // Bubble lives inside newTabLayout, which is shown outside this renderer.
+                        // Hiding the parent doesn't reset the bubble's visibility, so we clear it here.
+                        hideIfDaxBubble(previousCta)
+
+                        // Non-bubble CTAs paint outside newTabLayout, so they're never at risk of leaking.
+                        // If we're on the NTP, the bubbles paint normally.
+                        if (viewState.cta !is DaxBubbleCta || !viewState.isBrowserShowing) {
+                            showCta(viewState.cta)
+                        }
                     }
 
                     viewState.isBrowserShowing -> {
+                        hideIfDaxBubble(previousCta)
                         hideNewTab()
                     }
 
                     viewState.isOnboardingCompleteInNewTabPage && !viewState.isErrorShowing -> {
-                        hideDaxBubbleCta(previousCta as? DaxBubbleCta)
+                        hideIfDaxBubble(previousCta)
                         showNewTab()
                     }
                 }
@@ -5973,7 +6026,7 @@ class BrowserTabFragment :
                         onboardingExperimentEnabled = false,
                         configuration = configuration,
                     ) { option, index ->
-                        userEnteredQuery(option.link)
+                        submitQuery(option.link)
                         viewModel.onUserSelectedOnboardingDialogOption(configuration, index)
                     }
                 }
@@ -6054,7 +6107,7 @@ class BrowserTabFragment :
                 }
             val onSuggestedOptionsSelected: ((DaxDialogIntroOption) -> Unit)? =
                 if (configuration is OnboardingDaxDialogCta.DaxSiteSuggestionsCta) {
-                    { option: DaxDialogIntroOption -> userEnteredQuery(option.link) }
+                    { option: DaxDialogIntroOption -> submitQuery(option.link) }
                 } else {
                     null
                 }
@@ -6092,7 +6145,7 @@ class BrowserTabFragment :
                 // CTA-type-specific notifications (e.g. DaxTrackersBlocked) live on the
                 // subclass override, not on the fragment.
                 onTypingAnimationFinished = { viewModel.onOnboardingDaxTypingAnimationFinished() },
-                onSuggestedOptionClicked = { option: DaxDialogIntroOption -> userEnteredQuery(option.link) },
+                onSuggestedOptionClicked = { option: DaxDialogIntroOption -> submitQuery(option.link) },
                 onDismissCtaClicked = { viewModel.onUserClickCtaDismissButton(configuration) },
                 instantShow = instantShow,
             )
@@ -6314,7 +6367,10 @@ class BrowserTabFragment :
         permissionsToRequest: SitePermissions,
         request: PermissionRequest,
     ) {
-        if (!isActiveCustomTab() && !isActiveTab) {
+        // Use liveSelectedTab.value, not isActiveTab — the latter lags the observer dispatch
+        // and the permission command can land before it updates, opening on the wrong tab.
+        val activeTabId = viewModel.liveSelectedTab.value?.tabId
+        if (!isActiveCustomTab() && tabId != activeTabId) {
             logcat(INFO) { "Will not launch a dialog for an inactive tab" }
             return
         }

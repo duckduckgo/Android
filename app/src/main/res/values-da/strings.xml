@@ -903,6 +903,26 @@
     <string name="preOnboardingInputScreenButton">Næste</string>
     <string name="preOnboardingInputScreenDescription"><![CDATA[AI-funktioner er private og valgfrie. Du kan foretage ændringer i <b>Indstillinger > AI-funktioner</b>.]]></string>
 
+    <!--Onboarding Reinstall Quick Setup-->
+    <string name="preOnboardingReinstallQuickSetupTitle">Velkommen tilbage!&lt;br/&gt;Vil du tilpasse noget?</string>
+    <string name="preOnboardingReinstallSetDefaultLabel">Indstil DuckDuckGo som standard</string>
+    <string name="preOnboardingReinstallAddHomeScreenWidgetLabel">Tilføj widget til startskærmen</string>
+    <string name="preOnboardingReinstallAddressBarLabel">Placering af adresselinje</string>
+    <string name="preOnboardingReinstallAddressBarSearchOptionsLabel">Søgemuligheder i adresselinjen</string>
+    <string name="preOnboardingReinstallStartBrowsing">Start søgning</string>
+
+    <!-- Quick setup bottom sheets -->
+    <string name="quickSetupAddressBarPositionTitle">Hvor vil du have din adresselinje?</string>
+    <string name="quickSetupAddressBarPositionCaption"><![CDATA[Du kan foretage ændringer i <b>Indstillinger > Udseende</b>.]]></string>
+    <string name="quickSetupSearchOptionsTitle">Vil du have søgning og AI-chat i adresselinjen?</string>
+    <string name="quickSetupBottomSheetDone">Færdig</string>
+    <string name="quickSetupInputScreenSearchOnly">Kun søgning</string>
+    <string name="quickSetupInputScreenSearchAndDuckAi">Søgning og Duck.ai</string>
+    <string name="quickSetupRemoveHomeScreenWidgetTitle">Sådan fjerner du widgeten på startskærmen</string>
+    <string name="quickSetupRemoveHomeScreenWidgetStep1">Gå til startskærmen</string>
+    <string name="quickSetupRemoveHomeScreenWidgetStep2">Tryk og hold widgetten nede</string>
+    <string name="quickSetupRemoveHomeScreenWidgetStep3">Tryk eller træk for at fjerne den</string>
+
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Adresselinje</string>
     <string name="settingsAddressBarPositionHeaderTitle">Placering af adresselinje</string>
@@ -990,6 +1010,10 @@
     <string name="syncRestoreDialogPrimaryCta">Gendan mine data</string>
     <string name="syncRestoreDialogSecondaryCta">Spring over</string>
 
+    <!-- Sync Restore (brand-design onboarding) -->
+    <string name="syncRestoreDialogBrandDesignTitle">Lad os fortsætte, hvor du slap på DuckDuckGo.</string>
+    <string name="syncRestoreDialogBrandDesignBody1">Dine gemte bogmærker, adgangskoder og mere er klar.</string>
+
     <!-- PDF download tooltip -->
     <string name="pdfDownloadTooltipText">Download PDF-fil</string>
 
@@ -1004,4 +1028,7 @@
     <string name="onboardingStepIndicatorText" instruction="a counter above our instructions in onboarding that tells a user what step they are on">%1$d af %2$d</string>
     <string name="onboardingSearchDaxDialogOption1Quoted" instruction="translate &apos;duck&apos; too.">sådan siger man \"and\" på engelsk</string>
     <string name="onboardingSearchDaxDialogOption1EnglishQuoted" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">sådan siger man \"and\" på spansk</string>
+
+    <string name="input_screen_user_pref_without_ai_updated">Kun søgning</string>
+    <string name="input_screen_user_pref_with_ai_updated">Skift mellem\nSøg og Duck.ai</string>
 </resources>

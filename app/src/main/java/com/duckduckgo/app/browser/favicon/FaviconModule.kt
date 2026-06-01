@@ -66,7 +66,8 @@ class FaviconModule {
         context: Context,
         dispatcherProvider: DispatcherProvider,
         androidBrowserConfigFeature: AndroidBrowserConfigFeature,
+        downsamplingStrategyFixFeature: FaviconDownloaderGlideDownsamplingStrategyFixFeature,
     ): FaviconDownloader {
-        return GlideFaviconDownloader(context, dispatcherProvider, androidBrowserConfigFeature)
+        return GlideFaviconDownloader(context, dispatcherProvider, androidBrowserConfigFeature, downsamplingStrategyFixFeature)
     }
 }

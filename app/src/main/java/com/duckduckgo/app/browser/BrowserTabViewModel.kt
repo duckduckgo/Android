@@ -275,6 +275,7 @@ import com.duckduckgo.app.global.model.domain
 import com.duckduckgo.app.global.model.domainMatchesUrl
 import com.duckduckgo.app.global.model.orderedTrackerBlockedEntities
 import com.duckduckgo.app.location.data.LocationPermissionType
+import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboardingbranddesignupdate.OnboardingBrandDesignUpdateToggles
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_RESULT_DELETED
@@ -414,6 +415,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
@@ -425,6 +427,7 @@ import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
@@ -555,6 +558,7 @@ class BrowserTabViewModel @Inject constructor(
     private val downloadMenuStateProvider: DownloadMenuStateProvider,
     private val downloadsRepository: DownloadsRepository,
     private val onboardingBrandDesignUpdateToggles: OnboardingBrandDesignUpdateToggles,
+    private val onboardingStore: OnboardingStore,
 ) : ViewModel(),
     WebViewClientListener,
     EditSavedSiteListener,
@@ -634,6 +638,56 @@ class BrowserTabViewModel @Inject constructor(
 
     @VisibleForTesting
     internal val autoCompleteStateFlow = MutableStateFlow("")
+
+    /**
+     * Always-on autocomplete pipeline tied to the omnibar's text. Kept in sync with the
+     * omnibar via [onOmnibarTextRendered] so the native-input widget can restore the
+     * omnibar's autocomplete results when it closes — even if in-widget typing temporarily
+     * overwrote [autoCompleteStateFlow]. Gated on the native-input user setting so that
+     * users without the widget don't pay for a duplicate pipeline.
+     */
+    private val omnibarTextStateFlow = MutableStateFlow("")
+
+    @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
+    internal val omnibarAutocompleteCache: StateFlow<AutoCompleteResult> =
+        duckChat.observeNativeInputFieldUserSettingEnabled()
+            .catch { t ->
+                logcat(WARN) { "Native input setting flow failed: ${t.asLog()}" }
+                emit(false)
+            }
+            .flatMapLatest { isNativeInputEnabled ->
+                if (!isNativeInputEnabled) {
+                    flowOf(AutoCompleteResult("", emptyList()))
+                } else {
+                    omnibarTextStateFlow
+                        .debounce(300)
+                        .distinctUntilChanged()
+                        .flatMapLatest { query ->
+                            // Skip page URLs — omnibarViewState emits on every navigation, and
+                            // running the fetch against full URLs would be both wasteful and
+                            // wrong (the autocomplete API expects user-typed queries).
+                            val isQueryLike = query.isNotBlank() &&
+                                !UriString.isWebUrl(query) &&
+                                !duckPlayer.isDuckPlayerUri(query)
+                            if (!isQueryLike || !autoCompleteSettings.autoCompleteSuggestionsEnabled) {
+                                flowOf(AutoCompleteResult(query, emptyList()))
+                            } else {
+                                // Catch inside flatMapLatest so a failed fetch only drops this query's
+                                // result — without it, .catch + stateIn(Eagerly) would terminate the
+                                // pipeline for the ViewModel's lifetime (no equivalent of the existing
+                                // pipeline's ConflatedJob restart).
+                                autoComplete.autoComplete(query)
+                                    .catch { t ->
+                                        logcat(WARN) { "Failed to get omnibar autocomplete: ${t.asLog()}" }
+                                        emit(AutoCompleteResult(query, emptyList()))
+                                    }
+                            }
+                        }
+                }
+            }
+            .flowOn(dispatchers.io())
+            .stateIn(viewModelScope, SharingStarted.Eagerly, AutoCompleteResult("", emptyList()))
+
     private val fireproofWebsiteState: LiveData<List<FireproofWebsiteEntity>> = fireproofWebsiteRepository.getFireproofWebsites()
 
     @ExperimentalCoroutinesApi
@@ -2783,6 +2837,39 @@ class BrowserTabViewModel @Inject constructor(
         if (hasFocus && autoCompleteSuggestionsEnabled) {
             autoCompleteStateFlow.value = query.trim()
         }
+    }
+
+    /**
+     * Notify the viewmodel that the omnibar finished rendering [text]. Feeds the
+     * [omnibarAutocompleteCache] so the native-input widget can restore the omnibar's
+     * autocomplete state on close. Distinct from [Omnibar.OmnibarTextListener.onOmnibarTextChanged],
+     * which is the user-typing callback.
+     */
+    fun onOmnibarTextRendered(text: String) {
+        omnibarTextStateFlow.value = text
+    }
+
+    /**
+     * Restore the autocomplete view state from [omnibarAutocompleteCache] for [forQuery].
+     * Returns the cached result when it matched and was applied (null otherwise); callers
+     * should also refresh any adapter holding the suggestions since the renderer's
+     * `renderIfChanged` may skip a re-render for an equal view state.
+     *
+     * `showSuggestions` and `showFocusedView` are forced to false — the caller decides
+     * whether to surface the list.
+     */
+    fun restoreOmnibarAutocomplete(forQuery: String): AutoCompleteResult? {
+        val cached = omnibarAutocompleteCache.value
+        if (cached.query != forQuery || cached.suggestions.isEmpty()) return null
+        val current = autoCompleteViewState.value ?: return null
+        val restored = current.copy(
+            searchResults = cached,
+            showSuggestions = false,
+            showFocusedView = false,
+        )
+        autoCompleteViewState.value = restored
+        lastAutoCompleteState = restored
+        return cached
     }
 
     fun onBookmarkMenuClicked() {
@@ -4986,8 +5073,15 @@ class BrowserTabViewModel @Inject constructor(
             is DaxSubscriptionBrandDesignUpdateBubbleCta,
             -> {
                 viewModelScope.launch {
-                    val origin = "funnel_onboarding_android"
-                    command.value = LaunchSubscription("https://duckduckgo.com/pro?origin=$origin".toUri())
+                    val uri = "https://duckduckgo.com/pro".toUri().buildUpon()
+                        .appendQueryParameter("origin", "funnel_onboarding_android")
+                        .apply {
+                            if (onboardingStore.isCustomAiOnboardingFlow()) {
+                                appendQueryParameter("featurePage", "duckai")
+                            }
+                        }
+                        .build()
+                    command.value = LaunchSubscription(uri)
                 }
             }
             is DaxBubbleCta.DaxEndCta,
@@ -5172,11 +5266,53 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     private fun onUserTappedDuckAiPromptAutocomplete(prompt: String) {
-        command.value = Command.SubmitChat(prompt)
+        openDuckAiQuery(prompt, autoPrompt = true)
 
         viewModelScope.launch {
             val params = duckChat.createWasUsedBeforePixelParams()
             pixel.fire(DuckChatPixelName.DUCK_CHAT_OPEN_AUTOCOMPLETE_LEGACY, parameters = params)
+        }
+    }
+
+    /**
+     * Entry point for "open Duck.ai with a query" from the unified input — the Search/Duck.ai
+     * toggle when Duck.ai is selected, and the "Ask Duck.ai" autocomplete row when Search is
+     * selected. Under fullscreen mode the query opens in a new tab so the current tab is
+     * preserved; on the NTP we reuse the empty tab instead of spawning another. Outside
+     * fullscreen mode we fall back to the legacy Intent-based path.
+     */
+    fun openDuckAiQuery(query: String, autoPrompt: Boolean) {
+        if (!duckAiFeatureState.showFullScreenMode.value) {
+            if (autoPrompt) {
+                duckChat.openDuckChatWithAutoPrompt(query)
+            } else {
+                duckChat.openDuckChatWithPrefill(query)
+            }
+            return
+        }
+        navigateToDuckAi(duckChat.getDuckChatUrl(query, autoPrompt))
+    }
+
+    /**
+     * Entry point for "open an existing Duck.ai chat" from the unified input — taps on a
+     * chat-history suggestion which already carries a Duck.ai URL with the chatId. Same
+     * new-tab-or-stay-on-NTP rule as [openDuckAiQuery]; outside fullscreen mode the URL is
+     * routed through the normal submit path which lands in the legacy Intent flow.
+     */
+    fun openDuckAiChatById(chatUrl: String) {
+        if (!duckAiFeatureState.showFullScreenMode.value) {
+            onUserSubmittedQuery(chatUrl)
+            return
+        }
+        navigateToDuckAi(chatUrl)
+    }
+
+    private fun navigateToDuckAi(url: String) {
+        if (!currentBrowserViewState().browserShowing) {
+            // On NTP: reuse this tab — don't spawn another empty one.
+            onUserSubmittedQuery(url)
+        } else {
+            command.value = OpenInNewTab(query = url, sourceTabId = tabId)
         }
     }
 
@@ -5243,6 +5379,10 @@ class BrowserTabViewModel @Inject constructor(
             val subscriptionEvent = pageContextJSHelper.collectPageContext()
             _subscriptionEventDataChannel.send(subscriptionEvent)
         }
+    }
+
+    fun openDuckAIContextualMode() {
+        command.value = Command.ShowDuckAIContextualMode(tabId)
     }
 
     fun onDuckChatOmnibarButtonClicked(

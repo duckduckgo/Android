@@ -14,33 +14,22 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.adblocking.impl
+package com.duckduckgo.app.onboarding
 
 import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
-import com.duckduckgo.app.browser.Domain
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
 
 @ContributesRemoteFeature(
     scope = AppScope::class,
-    featureName = "adBlockingExtension",
+    featureName = "customDuckAiOnboarding",
 )
-interface AdBlockingExtensionFeature {
+interface CustomDuckAiOnboardingFeature {
+
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun self(): Toggle
 
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
-    fun enabledByDefault(): Toggle
+    fun introAnimation(): Toggle
 }
-
-data class AdBlockingExtensionSettings(
-    val version: String? = null,
-    val scriptlets: Map<String, ScriptletEntry>? = null,
-    val domains: List<Domain>? = null,
-)
-
-data class ScriptletEntry(
-    val url: String,
-    val signature: String,
-)

@@ -20,11 +20,10 @@ import android.view.Gravity
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.isVisible
-import com.airbnb.lottie.LottieAnimationView
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.cta.model.CtaId
+import com.duckduckgo.app.cta.ui.DaxBubbleCta.WavingDaxSpec
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.pixels.AppPixelName
@@ -41,7 +40,11 @@ data class DaxSubscriptionBrandDesignUpdateBubbleCta(
 ) : DaxBubbleCta.BrandDesignUpdateBubbleCta(
     ctaId = CtaId.DAX_INTRO_PRIVACY_PRO,
     title = R.string.onboardingPrivacyProDaxDialogTitle,
-    description = R.string.onboardingPrivacyProDaxDialogDescription,
+    description = if (onboardingStore.isCustomAiOnboardingFlow()) {
+        R.string.onboardingPrivacyProCustomAiFlowDaxDialogDescription
+    } else {
+        R.string.onboardingPrivacyProDaxDialogDescription
+    },
     backgroundRes = R.drawable.bg_onboarding_subscription,
     shownPixel = AppPixelName.ONBOARDING_DAX_CTA_SHOWN,
     okPixel = AppPixelName.ONBOARDING_DAX_CTA_OK_BUTTON,
@@ -55,6 +58,14 @@ data class DaxSubscriptionBrandDesignUpdateBubbleCta(
     override val activeIncludeId: Int = R.id.primaryCta
     override val showArrow: Boolean = true
     override val restartWavingDax: Boolean = true
+
+    override val wavingDaxSpec = WavingDaxSpec(
+        rotationDegrees = 22.62f,
+        translationXDp = -114f,
+        translationYDp = -288f,
+        heightDp = 267f,
+        anchorToCardOnTablet = false,
+    )
 
     override fun configureContentViews(view: View) {
         view.findViewById<ImageView>(R.id.brandDesignHeaderImage)?.isVisible = true
@@ -71,22 +82,5 @@ data class DaxSubscriptionBrandDesignUpdateBubbleCta(
         view.findViewById<TextView>(R.id.brandDesignDescription)?.gravity = Gravity.CENTER
 
         view.findViewById<MaterialButton>(R.id.primaryCta)?.setText(buttonTextRes)
-    }
-
-    override fun configureWavingDax(dax: LottieAnimationView, deviceInfo: DeviceInfo) {
-        val density = dax.resources.displayMetrics.density
-        dax.rotation = SUBSCRIPTION_DAX_ROTATION_DEGREES
-        dax.translationX = SUBSCRIPTION_DAX_TRANSLATION_X_DP * density
-        dax.translationY = SUBSCRIPTION_DAX_TRANSLATION_Y_DP * density
-        (dax.layoutParams as? ConstraintLayout.LayoutParams)?.let { lp ->
-            lp.startToStart = ConstraintLayout.LayoutParams.PARENT_ID
-            dax.layoutParams = lp
-        }
-    }
-
-    private companion object {
-        private const val SUBSCRIPTION_DAX_ROTATION_DEGREES = 22.62f
-        private const val SUBSCRIPTION_DAX_TRANSLATION_X_DP = -76f
-        private const val SUBSCRIPTION_DAX_TRANSLATION_Y_DP = -192f
     }
 }

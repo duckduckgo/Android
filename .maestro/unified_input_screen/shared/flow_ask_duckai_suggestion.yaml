@@ -31,6 +31,9 @@ appId: com.duckduckgo.mobile.android
 # accept the duck.ai T&C if it appears (first run only)
 - runFlow: ../../shared/accept_duckai_agreement.yaml
 
+# duck.ai's web view sometimes fails to load — tap "Reload Duck.ai" if shown
+- runFlow: reload_duckai_if_needed.yaml
+
 # verify Duck.ai opened with the query submitted — the Duck.ai header replaces the
 # omnibar and the bottom input shows the chat placeholder
 - extendedWaitUntil:

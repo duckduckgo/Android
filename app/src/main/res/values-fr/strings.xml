@@ -903,6 +903,26 @@
     <string name="preOnboardingInputScreenButton">Suivant</string>
     <string name="preOnboardingInputScreenDescription"><![CDATA[Les fonctionnalités d\'IA sont privées et facultatives. Vous pouvez apporter des modifications dans <b>Paramètres > Fonctionnalités d\'IA</b>.]]></string>
 
+    <!--Onboarding Reinstall Quick Setup-->
+    <string name="preOnboardingReinstallQuickSetupTitle">Bon retour parmi nous !&lt;br/&gt;Vous voulez personnaliser quelque chose ?</string>
+    <string name="preOnboardingReinstallSetDefaultLabel">Définir DuckDuckGo par défaut</string>
+    <string name="preOnboardingReinstallAddHomeScreenWidgetLabel">Ajouter un widget à l\'écran d\'accueil</string>
+    <string name="preOnboardingReinstallAddressBarLabel">Position de la barre d\'adresse</string>
+    <string name="preOnboardingReinstallAddressBarSearchOptionsLabel">Options de recherche dans la barre d’adresses</string>
+    <string name="preOnboardingReinstallStartBrowsing">Commencer la navigation</string>
+
+    <!-- Quick setup bottom sheets -->
+    <string name="quickSetupAddressBarPositionTitle">Où voulez-vous placer votre barre d\'adresse ?</string>
+    <string name="quickSetupAddressBarPositionCaption"><![CDATA[Vous pouvez apporter des modifications dans <b>Paramètres > Apparence</b>.]]></string>
+    <string name="quickSetupSearchOptionsTitle">Vous souhaiter avoir la recherche et le chat IA dans la barre d\'adresse ?</string>
+    <string name="quickSetupBottomSheetDone">Terminé</string>
+    <string name="quickSetupInputScreenSearchOnly">Recherche uniquement</string>
+    <string name="quickSetupInputScreenSearchAndDuckAi">Recherche et Duck.ai</string>
+    <string name="quickSetupRemoveHomeScreenWidgetTitle">Comment supprimer le widget de l\'écran d\'accueil</string>
+    <string name="quickSetupRemoveHomeScreenWidgetStep1">Allez à votre écran d\'accueil</string>
+    <string name="quickSetupRemoveHomeScreenWidgetStep2">Touchez longuement le widget</string>
+    <string name="quickSetupRemoveHomeScreenWidgetStep3">Appuyez ou faites glisser pour le supprimer</string>
+
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Barre d\'adresse</string>
     <string name="settingsAddressBarPositionHeaderTitle">Position de la barre d\'adresse</string>
@@ -990,6 +1010,10 @@
     <string name="syncRestoreDialogPrimaryCta">Rétablir mes données</string>
     <string name="syncRestoreDialogSecondaryCta">Ignorer</string>
 
+    <!-- Sync Restore (brand-design onboarding) -->
+    <string name="syncRestoreDialogBrandDesignTitle">Reprenons là où vous en étiez sur DuckDuckGo.</string>
+    <string name="syncRestoreDialogBrandDesignBody1">Vos favoris, mots de passe et autres informations enregistrées sont prêts.</string>
+
     <!-- PDF download tooltip -->
     <string name="pdfDownloadTooltipText">Télécharger le PDF</string>
 
@@ -1004,4 +1028,7 @@
     <string name="onboardingStepIndicatorText" instruction="a counter above our instructions in onboarding that tells a user what step they are on">%1$d sur %2$d</string>
     <string name="onboardingSearchDaxDialogOption1Quoted" instruction="translate &apos;duck&apos; too.">comment dire « canard » en anglais</string>
     <string name="onboardingSearchDaxDialogOption1EnglishQuoted" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">comment dire « canard » en espagnol</string>
+
+    <string name="input_screen_user_pref_without_ai_updated">Recherche uniquement</string>
+    <string name="input_screen_user_pref_with_ai_updated">Basculer entre\nla recherche et Duck.ai</string>
 </resources>

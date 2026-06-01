@@ -903,6 +903,26 @@
     <string name="preOnboardingInputScreenButton">Επόμενο</string>
     <string name="preOnboardingInputScreenDescription"><![CDATA[Οι λειτουργίες τεχνητής νοημοσύνης είναι ιδιωτικές και προαιρετικές. Μπορείτε να κάνετε αλλαγές στις <b>Ρυθμίσεις > Λειτουργίες τεχνητής νοημοσύνης</b>.]]></string>
 
+    <!--Onboarding Reinstall Quick Setup-->
+    <string name="preOnboardingReinstallQuickSetupTitle">Καλώς ήρθες ξανά!&lt;br/&gt;Θέλεις να προσαρμόσεις κάτι;</string>
+    <string name="preOnboardingReinstallSetDefaultLabel">Ορισμός DuckDuckGo ως προεπιλογή</string>
+    <string name="preOnboardingReinstallAddHomeScreenWidgetLabel">Προσθήκη μικροεφαρμογής Αρχικής οθόνης</string>
+    <string name="preOnboardingReinstallAddressBarLabel">Θέση γραμμής διευθύνσεων</string>
+    <string name="preOnboardingReinstallAddressBarSearchOptionsLabel">Επιλογές αναζήτησης στη γραμμή διευθύνσεων</string>
+    <string name="preOnboardingReinstallStartBrowsing">Έναρξη περιήγησης</string>
+
+    <!-- Quick setup bottom sheets -->
+    <string name="quickSetupAddressBarPositionTitle">Πού θέλεις να τοποθετήσεις τη γραμμή διευθύνσεων;</string>
+    <string name="quickSetupAddressBarPositionCaption"><![CDATA[Μπορείς να κάνεις αλλαγές στις <b>Ρυθμίσεις > Εμφάνιση</b>.]]></string>
+    <string name="quickSetupSearchOptionsTitle">Θέλεις αναζήτηση και συνομιλία με τεχνητή νοημοσύνη στη γραμμή διευθύνσεων;</string>
+    <string name="quickSetupBottomSheetDone">Ολοκληρώθηκε</string>
+    <string name="quickSetupInputScreenSearchOnly">Αναζήτηση μόνο</string>
+    <string name="quickSetupInputScreenSearchAndDuckAi">Αναζήτηση και Duck.ai</string>
+    <string name="quickSetupRemoveHomeScreenWidgetTitle">Οδηγίες για να καταργήσεις τη μικροεφαρμογή Αρχικής Οθόνης</string>
+    <string name="quickSetupRemoveHomeScreenWidgetStep1">Πήγαινε στην Αρχική Οθόνη σου</string>
+    <string name="quickSetupRemoveHomeScreenWidgetStep2">Πάτα και κράτα πατημένη τη μικροεφαρμογή</string>
+    <string name="quickSetupRemoveHomeScreenWidgetStep3">Πάτα ή σύρε για να την αφαιρέσεις</string>
+
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Γραμμή διευθύνσεων</string>
     <string name="settingsAddressBarPositionHeaderTitle">Θέση γραμμής διευθύνσεων</string>
@@ -990,6 +1010,10 @@
     <string name="syncRestoreDialogPrimaryCta">Επαναφορά των στοιχείων μου</string>
     <string name="syncRestoreDialogSecondaryCta">Παράλειψη</string>
 
+    <!-- Sync Restore (brand-design onboarding) -->
+    <string name="syncRestoreDialogBrandDesignTitle">Ας συνεχίσουμε από εκεί που μείνατε στο DuckDuckGo.</string>
+    <string name="syncRestoreDialogBrandDesignBody1">Οι αποθηκευμένοι σελιδοδείκτες, οι κωδικοί πρόσβασης και πολλά άλλα είναι έτοιμα.</string>
+
     <!-- PDF download tooltip -->
     <string name="pdfDownloadTooltipText">Λήψη PDF</string>
 
@@ -999,9 +1023,12 @@
     <string name="linkTextCopyFailed">Δεν ήταν δυνατή η αντιγραφή του κειμένου του συνδέσμου</string>
 
     <string name="preOnboardingWelcomeDialogTitle">Γεια σας.</string>
-    <string name="preOnboardingWelcomeDialogBody1">Είστε έτοιμοι για ένα ταχύτερο πρόγραμμα περιήγησης\nπου σας δίνει τον έλεγχο;</string>
+    <string name="preOnboardingWelcomeDialogBody1">Είστε έτοιμοι για ένα ταχύτερο πρόγραμμα περιήγησης που σας δίνει τον έλεγχο;</string>
     <string name="preOnboardingWelcomeDialogBody2">Η τεχνητή νοημοσύνη είναι πάντα προαιρετική και η προστασία προσωπικών δεδομένων είναι πάντα ενεργοποιημένη.</string>
     <string name="onboardingStepIndicatorText" instruction="a counter above our instructions in onboarding that tells a user what step they are on">%1$d από %2$d</string>
     <string name="onboardingSearchDaxDialogOption1Quoted" instruction="translate &apos;duck&apos; too.">πώς να πείτε «πάπια» στα αγγλικά</string>
     <string name="onboardingSearchDaxDialogOption1EnglishQuoted" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">πώς να πείτε «πάπια» στα ισπανικά</string>
+
+    <string name="input_screen_user_pref_without_ai_updated">Αναζήτηση μόνο</string>
+    <string name="input_screen_user_pref_with_ai_updated">Εναλλαγή μεταξύ\nΑναζήτησης και Duck.ai</string>
 </resources>

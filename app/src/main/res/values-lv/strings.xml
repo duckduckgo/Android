@@ -923,6 +923,26 @@
     <string name="preOnboardingInputScreenButton">Nākamais</string>
     <string name="preOnboardingInputScreenDescription"><![CDATA[MI funkcijas ir privātas un nav obligātas. Tu vari veikt izmaiņas sadaļā <b>Iestatījumi > MI funkcijas</b>.]]></string>
 
+    <!--Onboarding Reinstall Quick Setup-->
+    <string name="preOnboardingReinstallQuickSetupTitle">Laipni lūdzam atpakaļ!&lt;br/&gt;Vai gribi kaut ko pielāgot?</string>
+    <string name="preOnboardingReinstallSetDefaultLabel">Iestatī DuckDuckGo kā noklusējumu</string>
+    <string name="preOnboardingReinstallAddHomeScreenWidgetLabel">Pievienot sākuma ekrāna logrīku</string>
+    <string name="preOnboardingReinstallAddressBarLabel">Adreses joslas pozīcija</string>
+    <string name="preOnboardingReinstallAddressBarSearchOptionsLabel">Adreses joslas meklēšanas opcijas</string>
+    <string name="preOnboardingReinstallStartBrowsing">Sākt pārlūkošanu</string>
+
+    <!-- Quick setup bottom sheets -->
+    <string name="quickSetupAddressBarPositionTitle">Kur attēlot adreses joslu?</string>
+    <string name="quickSetupAddressBarPositionCaption"><![CDATA[Tu vari veikt izmaiņas sadaļā <b>Iestatījumi > Izskats</b>.]]></string>
+    <string name="quickSetupSearchOptionsTitle">Vēlies meklēšanu un MI tērzēšanu adreses joslā?</string>
+    <string name="quickSetupBottomSheetDone">Gatavs</string>
+    <string name="quickSetupInputScreenSearchOnly">Tikai meklēšana</string>
+    <string name="quickSetupInputScreenSearchAndDuckAi">Meklēšana un Duck.ai</string>
+    <string name="quickSetupRemoveHomeScreenWidgetTitle">Kā noņemt sākuma ekrāna logrīku</string>
+    <string name="quickSetupRemoveHomeScreenWidgetStep1">Dodies uz sākuma ekrānu</string>
+    <string name="quickSetupRemoveHomeScreenWidgetStep2">Pieskarieties logrīkam un turi to</string>
+    <string name="quickSetupRemoveHomeScreenWidgetStep3">Pieskaries vai velc, lai to noņemtu</string>
+
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Adreses josla</string>
     <string name="settingsAddressBarPositionHeaderTitle">Adreses joslas pozīcija</string>
@@ -1010,6 +1030,10 @@
     <string name="syncRestoreDialogPrimaryCta">Manas lietas atjaunošana</string>
     <string name="syncRestoreDialogSecondaryCta">Izlaist</string>
 
+    <!-- Sync Restore (brand-design onboarding) -->
+    <string name="syncRestoreDialogBrandDesignTitle">Turpināsim darbu ar DuckDuckGo no vietas, kur beidzāt.</string>
+    <string name="syncRestoreDialogBrandDesignBody1">Tavas saglabātās grāmatzīmes, paroles un citi dati ir gatavi.</string>
+
     <!-- PDF download tooltip -->
     <string name="pdfDownloadTooltipText">Lejupielādēt PDF</string>
 
@@ -1024,4 +1048,7 @@
     <string name="onboardingStepIndicatorText" instruction="a counter above our instructions in onboarding that tells a user what step they are on">%1$d no %2$d</string>
     <string name="onboardingSearchDaxDialogOption1Quoted" instruction="translate &apos;duck&apos; too.">kā angliski pateikt “pīle”</string>
     <string name="onboardingSearchDaxDialogOption1EnglishQuoted" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">kā spāniski pateikt “pīle”</string>
+
+    <string name="input_screen_user_pref_without_ai_updated">Meklēt tikai</string>
+    <string name="input_screen_user_pref_with_ai_updated">Pārslēdzies starp\nmeklēšanu un Duck.ai</string>
 </resources>

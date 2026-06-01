@@ -903,6 +903,26 @@
     <string name="preOnboardingInputScreenButton">Weiter</string>
     <string name="preOnboardingInputScreenDescription"><![CDATA[Die KI-Funktionen sind privat und optional. Unter <b>Einstellungen > KI-Funktionen</b> kannst du Änderungen vornehmen.]]></string>
 
+    <!--Onboarding Reinstall Quick Setup-->
+    <string name="preOnboardingReinstallQuickSetupTitle">Willkommen zurück!&lt;br/&gt;Möchtest du etwas individuell anpassen?</string>
+    <string name="preOnboardingReinstallSetDefaultLabel">DuckDuckGo als Standard festlegen</string>
+    <string name="preOnboardingReinstallAddHomeScreenWidgetLabel">Startbildschirm-Widget hinzufügen</string>
+    <string name="preOnboardingReinstallAddressBarLabel">Position der Adressleiste</string>
+    <string name="preOnboardingReinstallAddressBarSearchOptionsLabel">Suchoptionen für die Adressleiste</string>
+    <string name="preOnboardingReinstallStartBrowsing">Mit dem Browsen beginnen</string>
+
+    <!-- Quick setup bottom sheets -->
+    <string name="quickSetupAddressBarPositionTitle">Wo möchtest du deine Adressleiste haben?</string>
+    <string name="quickSetupAddressBarPositionCaption"><![CDATA[Du kannst Änderungen unter <b>Einstellungen > Erscheinungsbild</b> vornehmen.]]></string>
+    <string name="quickSetupSearchOptionsTitle">Möchtest du Such- und KI-Chatfunktionen in der Adressleiste?</string>
+    <string name="quickSetupBottomSheetDone">Fertig</string>
+    <string name="quickSetupInputScreenSearchOnly">Nur Suchen</string>
+    <string name="quickSetupInputScreenSearchAndDuckAi">Suche und Duck.ai</string>
+    <string name="quickSetupRemoveHomeScreenWidgetTitle">So entfernst du das Startbildschirm-Widget</string>
+    <string name="quickSetupRemoveHomeScreenWidgetStep1">Gehe zu deinem Startbildschirm</string>
+    <string name="quickSetupRemoveHomeScreenWidgetStep2">Halte das Widget gedrückt</string>
+    <string name="quickSetupRemoveHomeScreenWidgetStep3">Zum Entfernen antippen oder ziehen</string>
+
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Adresszeile</string>
     <string name="settingsAddressBarPositionHeaderTitle">Position der Adressleiste</string>
@@ -990,6 +1010,10 @@
     <string name="syncRestoreDialogPrimaryCta">Meine Sachen wiederherstellen</string>
     <string name="syncRestoreDialogSecondaryCta">Überspringen</string>
 
+    <!-- Sync Restore (brand-design onboarding) -->
+    <string name="syncRestoreDialogBrandDesignTitle">Lass uns dort weitermachen, wo du bei DuckDuckGo aufgehört hast.</string>
+    <string name="syncRestoreDialogBrandDesignBody1">Deine gespeicherten Lesezeichen, Passwörter und mehr sind bereit.</string>
+
     <!-- PDF download tooltip -->
     <string name="pdfDownloadTooltipText">PDF herunterladen</string>
 
@@ -999,9 +1023,12 @@
     <string name="linkTextCopyFailed">Linktext konnte nicht kopiert werden</string>
 
     <string name="preOnboardingWelcomeDialogTitle">Hallo.</string>
-    <string name="preOnboardingWelcomeDialogBody1">Bereit für einen schnelleren Browser, \nder dir die Kontrolle gibt?</string>
-    <string name="preOnboardingWelcomeDialogBody2">KI ist immer optional, und \nder Datenschutz ist immer aktiviert.</string>
+    <string name="preOnboardingWelcomeDialogBody1">Bereit für einen schnelleren Browser, der dir die Kontrolle gibt?</string>
+    <string name="preOnboardingWelcomeDialogBody2">KI ist immer optional, und der Datenschutz ist immer aktiviert.</string>
     <string name="onboardingStepIndicatorText" instruction="a counter above our instructions in onboarding that tells a user what step they are on">%1$d von %2$d</string>
     <string name="onboardingSearchDaxDialogOption1Quoted" instruction="translate &apos;duck&apos; too.">Wie sagt man „Ente“ auf Englisch?</string>
     <string name="onboardingSearchDaxDialogOption1EnglishQuoted" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">Wie sagt man „Ente“ auf Spanisch?</string>
+
+    <string name="input_screen_user_pref_without_ai_updated">Nur Suchen</string>
+    <string name="input_screen_user_pref_with_ai_updated">Wechseln zwischen\nSuche und Duck.ai</string>
 </resources>

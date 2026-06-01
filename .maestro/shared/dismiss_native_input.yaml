@@ -1,0 +1,12 @@
+appId: com.duckduckgo.mobile.android
+---
+# With the native input field enabled, the NTP shows the native input widget
+# over the omnibar. Tap its back arrow when visible so the regular omnibar
+# (and its menu / text input / icons) is reachable by subsequent steps.
+- runFlow:
+    when:
+        visible:
+            id: 'com.duckduckgo.mobile.android:id/inputModeUnifiedBack'
+    commands:
+        - tapOn:
+            id: 'com.duckduckgo.mobile.android:id/inputModeUnifiedBack'

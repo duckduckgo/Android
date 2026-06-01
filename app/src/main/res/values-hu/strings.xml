@@ -903,6 +903,26 @@
     <string name="preOnboardingInputScreenButton">Következő</string>
     <string name="preOnboardingInputScreenDescription"><![CDATA[Az AI-funkciók privátak és opcionálisak. Módosításokat a <b>Beállítások > AI-funkciók</b> menüpontban végezhetsz.]]></string>
 
+    <!--Onboarding Reinstall Quick Setup-->
+    <string name="preOnboardingReinstallQuickSetupTitle">Üdv újra!&lt;br/&gt;Testre szeretnél szabni valamit?</string>
+    <string name="preOnboardingReinstallSetDefaultLabel">DuckDuckGo beállítása alapértelmezettként</string>
+    <string name="preOnboardingReinstallAddHomeScreenWidgetLabel">Kezdőképernyő minialkalmazás hozzáadása</string>
+    <string name="preOnboardingReinstallAddressBarLabel">Címsor elhelyezkedése</string>
+    <string name="preOnboardingReinstallAddressBarSearchOptionsLabel">Címsor keresési lehetőségei</string>
+    <string name="preOnboardingReinstallStartBrowsing">Böngészés indítása</string>
+
+    <!-- Quick setup bottom sheets -->
+    <string name="quickSetupAddressBarPositionTitle">Hová szeretnéd tenni a címsort?</string>
+    <string name="quickSetupAddressBarPositionCaption"><![CDATA[Módosításokat a <b>Beállítások > Megjelenés</b> menüpontban végezhetsz.]]></string>
+    <string name="quickSetupSearchOptionsTitle">Szeretnéd, ha lenne keresés és AI csevegés a címsorban?</string>
+    <string name="quickSetupBottomSheetDone">Kész</string>
+    <string name="quickSetupInputScreenSearchOnly">Csak keresés</string>
+    <string name="quickSetupInputScreenSearchAndDuckAi">Keresés és Duck.ai</string>
+    <string name="quickSetupRemoveHomeScreenWidgetTitle">Hogyan távolíthatom el a Kezdőképernyő minialkalmazást?</string>
+    <string name="quickSetupRemoveHomeScreenWidgetStep1">Lépj a kezdőképernyőre</string>
+    <string name="quickSetupRemoveHomeScreenWidgetStep2">Érintsd meg és tartsd megérintve a minialkalmazást</string>
+    <string name="quickSetupRemoveHomeScreenWidgetStep3">Koppints rá vagy húzd el az eltávolításhoz</string>
+
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Címsor</string>
     <string name="settingsAddressBarPositionHeaderTitle">Címsor elhelyezkedése</string>
@@ -990,6 +1010,10 @@
     <string name="syncRestoreDialogPrimaryCta">Saját adataim visszaállítása</string>
     <string name="syncRestoreDialogSecondaryCta">Kihagyás</string>
 
+    <!-- Sync Restore (brand-design onboarding) -->
+    <string name="syncRestoreDialogBrandDesignTitle">Folytassuk ott, ahol abbahagytad a DuckDuckGo használatát.</string>
+    <string name="syncRestoreDialogBrandDesignBody1">Mentett könyvjelzőid, jelszavaid és a további elemek készen állnak.</string>
+
     <!-- PDF download tooltip -->
     <string name="pdfDownloadTooltipText">PDF letöltése</string>
 
@@ -999,9 +1023,12 @@
     <string name="linkTextCopyFailed">Nem sikerült másolni a link szövegét</string>
 
     <string name="preOnboardingWelcomeDialogTitle">Szia!</string>
-    <string name="preOnboardingWelcomeDialogBody1">Felkészültél egy gyorsabb böngészőre, amely\nsaját kezedbe adja az irányítást?</string>
-    <string name="preOnboardingWelcomeDialogBody2">Az AI mindig opcionális, az adatvédelem\npedig állandóan be van kapcsolva.</string>
+    <string name="preOnboardingWelcomeDialogBody1">Felkészültél egy gyorsabb böngészőre, amely saját kezedbe adja az irányítást?</string>
+    <string name="preOnboardingWelcomeDialogBody2">Az AI mindig opcionális, az adatvédelem pedig állandóan be van kapcsolva.</string>
     <string name="onboardingStepIndicatorText" instruction="a counter above our instructions in onboarding that tells a user what step they are on">%1$d/%2$d</string>
     <string name="onboardingSearchDaxDialogOption1Quoted" instruction="translate &apos;duck&apos; too.">hogyan mondják angolul, hogy „kacsa”</string>
     <string name="onboardingSearchDaxDialogOption1EnglishQuoted" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">hogyan mondják spanyolul, hogy „kacsa”</string>
+
+    <string name="input_screen_user_pref_without_ai_updated">Csak keresés</string>
+    <string name="input_screen_user_pref_with_ai_updated">Váltás a keresés\nés a Duck.ai között</string>
 </resources>

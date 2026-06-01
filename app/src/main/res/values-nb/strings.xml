@@ -903,6 +903,26 @@
     <string name="preOnboardingInputScreenButton">Neste</string>
     <string name="preOnboardingInputScreenDescription"><![CDATA[AI-funksjoner er private og valgfrie. Du kan gjøre endringer i <b>Innstillinger > AI-funksjoner</b>.]]></string>
 
+    <!--Onboarding Reinstall Quick Setup-->
+    <string name="preOnboardingReinstallQuickSetupTitle">Velkommen tilbake!&lt;br/&gt;Vil du tilpasse noe?</string>
+    <string name="preOnboardingReinstallSetDefaultLabel">Angi DuckDuckGo som standard</string>
+    <string name="preOnboardingReinstallAddHomeScreenWidgetLabel">Legg til en widget på startskjermen</string>
+    <string name="preOnboardingReinstallAddressBarLabel">Plassering av adressefelt</string>
+    <string name="preOnboardingReinstallAddressBarSearchOptionsLabel">Søkealternativer i adressefeltet</string>
+    <string name="preOnboardingReinstallStartBrowsing">Begynn å surfe</string>
+
+    <!-- Quick setup bottom sheets -->
+    <string name="quickSetupAddressBarPositionTitle">Hvor vil du ha adressefeltet?</string>
+    <string name="quickSetupAddressBarPositionCaption"><![CDATA[Du kan gjøre endringer i <b>Innstillinger > Utseende</b>.]]></string>
+    <string name="quickSetupSearchOptionsTitle">Vil du ha søk og AI-chat i adressefeltet?</string>
+    <string name="quickSetupBottomSheetDone">Ferdig</string>
+    <string name="quickSetupInputScreenSearchOnly">Bare søk</string>
+    <string name="quickSetupInputScreenSearchAndDuckAi">Søk og Duck.ai</string>
+    <string name="quickSetupRemoveHomeScreenWidgetTitle">Slik fjerner du startskjerm-widgeten</string>
+    <string name="quickSetupRemoveHomeScreenWidgetStep1">Gå til startskjermen</string>
+    <string name="quickSetupRemoveHomeScreenWidgetStep2">Trykk og hold på widgeten</string>
+    <string name="quickSetupRemoveHomeScreenWidgetStep3">Trykk eller dra for å fjerne den</string>
+
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Adressefelt</string>
     <string name="settingsAddressBarPositionHeaderTitle">Plassering av adressefelt</string>
@@ -990,6 +1010,10 @@
     <string name="syncRestoreDialogPrimaryCta">Gjenopprett innholdet mitt</string>
     <string name="syncRestoreDialogSecondaryCta">Hopp over</string>
 
+    <!-- Sync Restore (brand-design onboarding) -->
+    <string name="syncRestoreDialogBrandDesignTitle">La oss fortsette der du slapp på DuckDuckGo.</string>
+    <string name="syncRestoreDialogBrandDesignBody1">Dine lagrede bokmerker, passord osv. er klare.</string>
+
     <!-- PDF download tooltip -->
     <string name="pdfDownloadTooltipText">Last ned PDF</string>
 
@@ -1004,4 +1028,7 @@
     <string name="onboardingStepIndicatorText" instruction="a counter above our instructions in onboarding that tells a user what step they are on">%1$d av %2$d</string>
     <string name="onboardingSearchDaxDialogOption1Quoted" instruction="translate &apos;duck&apos; too.">hvordan si «and» på engelsk</string>
     <string name="onboardingSearchDaxDialogOption1EnglishQuoted" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">hvordan si «and» på spansk</string>
+
+    <string name="input_screen_user_pref_without_ai_updated">Bare søk</string>
+    <string name="input_screen_user_pref_with_ai_updated">Bytt mellom\nSøk og Duck.ai</string>
 </resources>

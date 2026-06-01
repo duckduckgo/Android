@@ -46,7 +46,8 @@ data class DaxFireButtonBrandDesignUpdateContextualCta(
     isLightTheme = isLightTheme,
     deviceInfo = deviceInfo,
     backgroundRes = R.drawable.bg_onboarding_fire_button,
-) {
+),
+    OnboardingDaxDialogCta.ShowsWingBottom {
     override val activeIncludeId: Int = R.id.contextualBrandDesignPrimaryCtaContent
 
     override val showArrow: Boolean = true

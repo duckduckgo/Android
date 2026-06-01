@@ -18,8 +18,8 @@ package com.duckduckgo.app.onboardingquicksetup.ui
 
 import android.content.Context
 import android.util.AttributeSet
+import android.util.TypedValue
 import android.view.LayoutInflater
-import android.view.View
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -37,6 +37,11 @@ class QuickSetupEditRow @JvmOverloads constructor(
         ViewQuickSetupEditRowBinding.inflate(LayoutInflater.from(context), this)
 
     init {
+        isClickable = true
+        val selectableBackground = TypedValue().also {
+            context.theme.resolveAttribute(android.R.attr.selectableItemBackground, it, true)
+        }
+        setBackgroundResource(selectableBackground.resourceId)
         val verticalPadding = resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.keyline_2)
         setPadding(paddingLeft, verticalPadding, paddingRight, verticalPadding)
         context.theme.obtainStyledAttributes(attrs, R.styleable.QuickSetupEditRow, 0, 0).use { attrs ->
@@ -60,9 +65,5 @@ class QuickSetupEditRow @JvmOverloads constructor(
 
     fun setSecondaryText(@StringRes res: Int) {
         binding.quickSetupEditRowSecondaryText.setText(res)
-    }
-
-    fun setOnEditClickListener(listener: View.OnClickListener) {
-        binding.quickSetupEditRowEditButton.setOnClickListener(listener)
     }
 }

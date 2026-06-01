@@ -46,6 +46,7 @@ class ChatHistoryRepositoryTest {
     private val context: Context = mock()
     private val duckChatSyncRepository: DuckChatSyncRepository = mock()
     private val syncEngine: SyncEngine = mock()
+    private val chatExportWriter: ChatExportWriter = mock()
     private val source = MutableStateFlow<List<DuckAiChat>>(emptyList())
     private lateinit var repository: RealChatHistoryRepository
 
@@ -59,6 +60,7 @@ class ChatHistoryRepositoryTest {
             context = context,
             duckChatSyncRepository = duckChatSyncRepository,
             syncEngine = syncEngine,
+            chatExportWriter = chatExportWriter,
         )
     }
 

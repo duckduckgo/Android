@@ -48,6 +48,7 @@ import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.cta.ui.DaxBubbleCta.DaxDialogIntroOption
 import com.duckduckgo.app.onboarding.ui.OnboardingActivity
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.ADDRESS_BAR_POSITION
+import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.AI_COMPARISON_CHART
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.COMPARISON_CHART
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.INITIAL
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.INITIAL_REINSTALL_USER
@@ -355,6 +356,10 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
                     scheduleTypingAnimation(ctaText) { afterAnimation() }
                 }
 
+                AI_COMPARISON_CHART -> {
+                    // no-op, only used in BrandDesignUpdate path
+                }
+
                 SKIP_ONBOARDING_OPTION -> {
                     binding.daxDialogCta.descriptionCta.show()
                     binding.daxDialogCta.descriptionCta.alpha = MIN_ALPHA
@@ -451,7 +456,7 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
 
                     binding.daxDialogCta.duckAiInputScreenToggleWithoutAiCaption.setText(
                         if (showDuckAiCopy) {
-                            DuckChatR.string.input_screen_user_pref_without_ai_updated
+                            R.string.input_screen_user_pref_without_ai_updated
                         } else {
                             DuckChatR.string.input_screen_user_pref_without_ai
                         },
@@ -459,7 +464,7 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
 
                     binding.daxDialogCta.duckAiInputScreenToggleWithAiCaption.setText(
                         if (showDuckAiCopy) {
-                            DuckChatR.string.input_screen_user_pref_with_ai_updated
+                            R.string.input_screen_user_pref_with_ai_updated
                         } else {
                             DuckChatR.string.input_screen_user_pref_with_ai
                         },

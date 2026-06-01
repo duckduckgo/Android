@@ -40,7 +40,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.CTA_SHOWN
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Count
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelValues.DAX_ONBOARDING_END_CTA
-import com.duckduckgo.app.tabs.model.TabRepository
+import com.duckduckgo.app.tabs.model.AggregateTabProvider
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import com.duckduckgo.brokensite.api.BrokenSitePrompt
 import com.duckduckgo.brokensite.api.RefreshPattern
@@ -97,7 +97,7 @@ class DaxEndBrandDesignUpdateContextualCtaTest {
     private val mockOnboardingStore: OnboardingStore = mock()
     private val mockUserAllowListRepository: UserAllowListRepository = mock()
     private val mockUserStageStore: UserStageStore = mock()
-    private val mockTabRepository: TabRepository = mock()
+    private val mockAggregateTabProvider: AggregateTabProvider = mock()
     private val mockExtendedOnboardingFeatureToggles: ExtendedOnboardingFeatureToggles = mock()
     private val mockDuckPlayer: DuckPlayer = mock()
     private val mockSubscriptions: Subscriptions = mock()
@@ -150,7 +150,7 @@ class DaxEndBrandDesignUpdateContextualCtaTest {
             settingsDataStore = mockSettingsDataStore,
             onboardingStore = mockOnboardingStore,
             userStageStore = mockUserStageStore,
-            tabRepository = mockTabRepository,
+            aggregateTabProvider = mockAggregateTabProvider,
             dispatchers = coroutineRule.testDispatcherProvider,
             duckChat = mockDuckChat,
             duckDuckGoUrlDetector = DuckDuckGoUrlDetectorImpl(),

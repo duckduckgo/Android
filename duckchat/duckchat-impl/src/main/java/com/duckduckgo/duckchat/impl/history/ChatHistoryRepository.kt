@@ -20,6 +20,7 @@ import android.content.Context
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.impl.R
+import com.duckduckgo.duckchat.impl.models.ModelDisplay
 import com.duckduckgo.duckchat.impl.models.toChatType
 import com.duckduckgo.duckchat.impl.sync.DuckChatSyncRepository
 import com.duckduckgo.duckchat.store.impl.DuckAiChat
@@ -30,6 +31,7 @@ import dagger.SingleInstanceIn
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
+import java.io.File
 import java.time.Instant
 import javax.inject.Inject
 
@@ -40,6 +42,7 @@ interface ChatHistoryRepository {
     suspend fun deleteAllChats()
     suspend fun renameChat(chatId: String, newTitle: String): Boolean
     suspend fun setPinned(chatId: String, pinned: Boolean)
+    suspend fun exportChat(chatId: String, modelDisplay: ModelDisplay?): File
 }
 
 @ContributesBinding(AppScope::class)
@@ -50,7 +53,10 @@ class RealChatHistoryRepository @Inject constructor(
     private val context: Context,
     private val duckChatSyncRepository: DuckChatSyncRepository,
     private val syncEngine: SyncEngine,
+    private val chatExportWriter: ChatExportWriter,
 ) : ChatHistoryRepository {
+
+    private val chatExporter = ChatExporter()
 
     private val fallbackTitle: String by lazy { context.getString(R.string.duck_ai_chat_history_untitled) }
 
@@ -79,10 +85,32 @@ class RealChatHistoryRepository @Inject constructor(
         }
     }
 
+    override suspend fun exportChat(chatId: String, modelDisplay: ModelDisplay?): File =
+        withContext(dispatchers.io()) {
+            val chat = chatStore.getChatById(chatId)
+                ?: throw IllegalStateException("Chat $chatId not found")
+            val rawJson = chatStore.getChatContent(chatId)
+                ?: throw IllegalStateException("Chat $chatId content not found")
+            val result = chatExporter.export(rawJson, chat.toChatType(), chat.fileRefs, modelDisplay)
+            val payload = when (result) {
+                is ExportResult.Text -> ExportPayload.Text(result.content)
+                is ExportResult.Zip -> ExportPayload.Zip(
+                    content = result.content,
+                    images = result.imageFileRefs.mapIndexed { index, uuid ->
+                        val fileRef = chatStore.readFileRef(uuid)
+                            ?: throw IllegalStateException("File $uuid missing for chat $chatId")
+                        ExportPayload.Zip.Image(name = "image-${index + 1}.jpeg", bytes = fileRef.bytes)
+                    },
+                )
+            }
+            chatExportWriter.write(payload)
+        }
+
     private fun toChatHistoryItem(chat: DuckAiChat): ChatHistoryItem = ChatHistoryItem(
         chatId = chat.chatId,
         displayTitle = chat.title.takeIf { it.isNotBlank() && it != UPSTREAM_UNTITLED } ?: fallbackTitle,
         type = chat.toChatType(),
+        model = chat.model,
         pinned = chat.pinned,
         lastEditMillis = chat.lastEdit.parseIsoMillis(),
     )

@@ -18,7 +18,6 @@ package com.duckduckgo.pir.impl.common.actions
 
 import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStep
 import com.duckduckgo.pir.impl.common.PirJob.RunType
-import com.duckduckgo.pir.impl.models.ExtractedProfile
 import com.duckduckgo.pir.impl.models.ProfileQuery
 import com.duckduckgo.pir.impl.pixels.PirStage
 import com.duckduckgo.pir.impl.scripts.models.BrokerAction
@@ -56,6 +55,7 @@ interface PirActionsRunnerStateEngine {
         val preseeding: Boolean = false,
         val actionRetryCount: Int = 0,
         val generatedEmailData: GeneratedEmailData? = null,
+        val emailExtractedData: Map<String, String> = emptyMap(),
         val attemptId: String = "",
         val stageStatus: PirStageStatus,
     )
@@ -137,6 +137,21 @@ interface PirActionsRunnerStateEngine {
         data class ConditionExpectationSucceeded(
             val conditionActions: List<BrokerAction>,
         ) : Event()
+
+        data class EmailDataReceived(
+            val emailExtractedData: Map<String, String>,
+        ) : Event()
+
+        data class RetryAwaitEmailData(
+            val actionId: String,
+            val brokerName: String,
+            val emailAddress: String,
+            val attemptId: String,
+            val extractFields: List<String>,
+            val pollingIntervalSeconds: Int,
+            val maxTimeoutSeconds: Int,
+            val attempt: Int,
+        ) : Event()
     }
 
     /**
@@ -159,8 +174,6 @@ interface PirActionsRunnerStateEngine {
         data class GetEmailForProfile(
             override val actionId: String,
             val brokerName: String,
-            val extractedProfile: ExtractedProfile,
-            val profileQuery: ProfileQuery?,
         ) : SideEffect(),
             BrokerActionSideEffect
 
@@ -177,6 +190,18 @@ interface PirActionsRunnerStateEngine {
             val transactionID: String,
             val pollingIntervalSeconds: Int = 5,
             val retries: Int = 50,
+            val attempt: Int = 0,
+        ) : SideEffect(),
+            BrokerActionSideEffect
+
+        data class AwaitEmailData(
+            override val actionId: String,
+            val brokerName: String,
+            val emailAddress: String,
+            val attemptId: String,
+            val extractFields: List<String>,
+            val pollingIntervalSeconds: Int,
+            val maxTimeoutSeconds: Int = 60,
             val attempt: Int = 0,
         ) : SideEffect(),
             BrokerActionSideEffect
