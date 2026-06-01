@@ -36,6 +36,11 @@ dependencies {
     implementation "com.squareup.logcat:logcat:_"
     implementation Google.dagger
 
+    // Used directly by the repository (LiveData/Flow return types + coroutines);
+    // previously available transitively via room-runtime.
+    implementation AndroidX.lifecycle.liveDataKtx
+    implementation KotlinX.coroutines.core
+
     testImplementation project(path: ':common-test')
     testImplementation Testing.junit4
     testImplementation AndroidX.test.ext.junit
