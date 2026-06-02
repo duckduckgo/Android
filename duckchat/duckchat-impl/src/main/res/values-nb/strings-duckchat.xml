@@ -138,6 +138,12 @@
     <string name="duck_ai_chat_history_search_close_content_description">Lukk søket</string>
     <string name="duck_ai_chat_history_search_clear_content_description">Fjern søket</string>
     <string name="duck_ai_chat_history_action_fire_content_description">Slett chatter</string>
+    <string name="duck_ai_chat_history_action_new">Ny</string>
+    <string name="duck_ai_chat_history_action_download_selected_content_description">Last ned chatter</string>
+    <plurals name="duck_ai_chat_history_bulk_download_complete">
+        <item quantity="one">Nedlasting er fullført for %1$d chat</item>
+        <item quantity="other">Nedlasting er fullført for %1$d chatter</item>
+    </plurals>
     <string name="duck_ai_chat_history_action_overflow_content_description">Åpne overløpsmenyen</string>
     <string name="duck_ai_chat_history_select_all">Velg alle</string>
     <string name="duck_ai_chat_history_unselect_all">Fjern alle valg</string>
@@ -155,4 +161,5 @@
     <string name="duck_ai_chat_history_download_complete" instruction="%1$s is the saved chat filename (e.g. \&apos;My Chat.txt\&apos;).">Nedlastingen av %1$s er fullført</string>
     <string name="duck_ai_chat_history_download_view">Vis</string>
     <string name="duck_ai_chat_history_download_error">Kunne ikke eksportere chatten</string>
+    <string name="duck_ai_chat_history_bulk_download_error">Kunne ikke eksportere chattene</string>
 </resources>
