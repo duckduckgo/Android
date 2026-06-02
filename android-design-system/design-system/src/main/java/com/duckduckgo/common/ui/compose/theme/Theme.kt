@@ -75,11 +75,19 @@ fun ProvideDuckDuckGoTheme(
 @Composable
 fun DuckDuckGoTheme(
     isDarkTheme: Boolean = isSystemInDarkTheme(),
+    variant: DuckDuckGoThemeVariant = DuckDuckGoThemeVariant.Default,
     content: @Composable () -> Unit,
 ) {
-    val colors = if (isDarkTheme) defaultDarkColors() else defaultLightColors()
+    val colors = when (variant) {
+        DuckDuckGoThemeVariant.Default -> if (isDarkTheme) defaultDarkColors() else defaultLightColors()
+        DuckDuckGoThemeVariant.Onboarding -> if (isDarkTheme) onboardingDarkColors() else onboardingLightColors()
+    }
+    val typography = when (variant) {
+        DuckDuckGoThemeVariant.Default -> Typography
+        DuckDuckGoThemeVariant.Onboarding -> OnboardingTypography
+    }
 
-    ProvideDuckDuckGoTheme(colors = colors) {
+    ProvideDuckDuckGoTheme(colors = colors, typography = typography) {
         MaterialTheme(
             colorScheme = debugColors(),
             typography = debugTypography(),
@@ -248,6 +256,67 @@ internal fun defaultDarkColors(): DuckDuckGoColors = DuckDuckGoColors(
     ),
     isDark = true,
 )
+
+@Composable
+internal fun onboardingLightColors(): DuckDuckGoColors {
+    val base = defaultLightColors()
+    val onboardingTextPrimary = Color(0xF5242323)
+    return base.copy(
+        backgrounds = base.backgrounds.copy(
+            background = White,
+            container = Color(0x17242323),
+        ),
+        text = base.text.copy(
+            primary = onboardingTextPrimary,
+            secondary = Black60,
+        ),
+        brand = base.brand.copy(
+            accentBlue = colorResource(R.color.pondwater50),
+        ),
+        icons = base.icons.copy(
+            primary = Color(0xD6242323),
+            secondary = Color(0x99383838),
+        ),
+        button = base.button.copy(
+            primaryContainer = colorResource(R.color.mandarin50),
+            primaryContainerPressed = colorResource(R.color.mandarin60),
+            primaryText = White,
+            secondaryContainerPressed = Black12,
+            secondaryText = onboardingTextPrimary,
+            secondaryTextPressed = onboardingTextPrimary,
+        ),
+    )
+}
+
+@Composable
+internal fun onboardingDarkColors(): DuckDuckGoColors {
+    val base = defaultDarkColors()
+    return base.copy(
+        backgrounds = base.backgrounds.copy(
+            background = Color(0xFF133E7C),
+            container = White6,
+        ),
+        text = base.text.copy(
+            primary = White,
+            secondary = White60,
+        ),
+        brand = base.brand.copy(
+            accentBlue = colorResource(R.color.pondwater40),
+        ),
+        icons = base.icons.copy(
+            primary = Color(0xD6FBFAF9),
+            secondary = Color(0x7AFBFAF9),
+        ),
+        button = base.button.copy(
+            primaryContainer = colorResource(R.color.pollen30),
+            primaryContainerPressed = colorResource(R.color.pollen40),
+            primaryText = colorResource(R.color.pollen100),
+            secondaryContainerPressed = White24,
+            secondaryText = White,
+            secondaryTextPressed = White,
+        ),
+    )
+}
 
 /**
  * A Material3 [ColorScheme] implementation which sets all colors to [debugColor] to discourage usage of
