@@ -29,13 +29,7 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewParameter
-import com.duckduckgo.common.ui.compose.theme.Black6
-import com.duckduckgo.common.ui.compose.theme.Black84
-import com.duckduckgo.common.ui.compose.theme.Blue50
-import com.duckduckgo.common.ui.compose.theme.Blue70
 import com.duckduckgo.common.ui.compose.theme.DuckDuckGoTheme
-import com.duckduckgo.common.ui.compose.theme.White
-import com.duckduckgo.common.ui.compose.theme.White6
 import com.duckduckgo.common.ui.compose.tools.PreviewBox
 import com.duckduckgo.mobile.android.R
 
@@ -79,28 +73,16 @@ fun DaxPrimaryButton(
 private object DaxPrimaryButtonDefaults {
 
     val adsColorButtonPrimaryContainer: Color
-        @Composable @ReadOnlyComposable get() = DuckDuckGoTheme.colors.brand.accentBlue
+        @Composable @ReadOnlyComposable get() = DuckDuckGoTheme.colors.button.primaryContainer
 
     val adsColorButtonPrimaryContainerPressed: Color
-        @Composable @ReadOnlyComposable get() = if (DuckDuckGoTheme.colors.isDark) {
-            Blue50
-        } else {
-            Blue70
-        }
+        @Composable @ReadOnlyComposable get() = DuckDuckGoTheme.colors.button.primaryContainerPressed
 
     val adsColorButtonPrimaryText: Color
-        @Composable @ReadOnlyComposable get() = if (DuckDuckGoTheme.colors.isDark) {
-            Black84
-        } else {
-            White
-        }
+        @Composable @ReadOnlyComposable get() = DuckDuckGoTheme.colors.button.primaryText
 
     val adsColorButtonPrimaryContainerDisabled: Color
-        @Composable @ReadOnlyComposable get() = if (DuckDuckGoTheme.colors.isDark) {
-            White6
-        } else {
-            Black6
-        }
+        @Composable @ReadOnlyComposable get() = DuckDuckGoTheme.colors.button.primaryContainerDisabled
 
     val adsColorButtonPrimaryTextDisabled: Color
         @Composable @ReadOnlyComposable get() = DuckDuckGoTheme.textColors.disabled
