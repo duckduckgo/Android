@@ -29,11 +29,7 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewParameter
-import com.duckduckgo.common.ui.compose.theme.Black6
-import com.duckduckgo.common.ui.compose.theme.Black60
 import com.duckduckgo.common.ui.compose.theme.DuckDuckGoTheme
-import com.duckduckgo.common.ui.compose.theme.White12
-import com.duckduckgo.common.ui.compose.theme.White84
 import com.duckduckgo.common.ui.compose.tools.PreviewBox
 import com.duckduckgo.mobile.android.R
 
@@ -80,25 +76,13 @@ private object DaxDestructiveGhostAltButtonDefaults {
         @Composable @ReadOnlyComposable get() = Color.Transparent
 
     val adsColorButtonGhostAltContainerPressed: Color
-        @Composable @ReadOnlyComposable get() = if (DuckDuckGoTheme.colors.isDark) {
-            White12
-        } else {
-            Black6
-        }
+        @Composable @ReadOnlyComposable get() = DuckDuckGoTheme.colors.button.ghostAltContainerPressed
 
     val adsColorButtonGhostAltText: Color
-        @Composable @ReadOnlyComposable get() = if (DuckDuckGoTheme.colors.isDark) {
-            White84
-        } else {
-            Black60
-        }
+        @Composable @ReadOnlyComposable get() = DuckDuckGoTheme.colors.button.ghostAltText
 
     val adsColorButtonGhostAltTextPressed: Color
-        @Composable @ReadOnlyComposable get() = if (DuckDuckGoTheme.colors.isDark) {
-            White84
-        } else {
-            Black60
-        }
+        @Composable @ReadOnlyComposable get() = DuckDuckGoTheme.colors.button.ghostAltText
 
     val adsColorButtonGhostAltDisabled: Color
         @Composable @ReadOnlyComposable get() = DuckDuckGoTheme.textColors.disabled
