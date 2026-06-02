@@ -31,15 +31,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
-import com.duckduckgo.common.ui.compose.theme.Black12
-import com.duckduckgo.common.ui.compose.theme.Blue20
-import com.duckduckgo.common.ui.compose.theme.Blue30
-import com.duckduckgo.common.ui.compose.theme.Blue30_20
-import com.duckduckgo.common.ui.compose.theme.Blue50
-import com.duckduckgo.common.ui.compose.theme.Blue50_12
-import com.duckduckgo.common.ui.compose.theme.Blue70
 import com.duckduckgo.common.ui.compose.theme.DuckDuckGoTheme
-import com.duckduckgo.common.ui.compose.theme.White24
 import com.duckduckgo.common.ui.compose.tools.PreviewBox
 import com.duckduckgo.mobile.android.R
 
@@ -87,25 +79,13 @@ private object DaxSecondaryButtonDefaults {
         @Composable @ReadOnlyComposable get() = Color.Transparent
 
     val adsColorButtonSecondaryContainerPressed: Color
-        @Composable @ReadOnlyComposable get() = if (DuckDuckGoTheme.colors.isDark) {
-            Blue30_20
-        } else {
-            Blue50_12
-        }
+        @Composable @ReadOnlyComposable get() = DuckDuckGoTheme.colors.button.secondaryContainerPressed
 
     val adsColorButtonSecondaryText: Color
-        @Composable @ReadOnlyComposable get() = if (DuckDuckGoTheme.colors.isDark) {
-            Blue30
-        } else {
-            Blue50
-        }
+        @Composable @ReadOnlyComposable get() = DuckDuckGoTheme.colors.button.secondaryText
 
     val adsColorButtonSecondaryTextPressed: Color
-        @Composable @ReadOnlyComposable get() = if (DuckDuckGoTheme.colors.isDark) {
-            Blue20
-        } else {
-            Blue70
-        }
+        @Composable @ReadOnlyComposable get() = DuckDuckGoTheme.colors.button.secondaryTextPressed
 
     val adsColorButtonSecondaryContainerBorder: Color
         @Composable @ReadOnlyComposable get() = DuckDuckGoTheme.colors.brand.accentBlue
@@ -114,11 +94,7 @@ private object DaxSecondaryButtonDefaults {
         @Composable @ReadOnlyComposable get() = DuckDuckGoTheme.textColors.disabled
 
     val adsColorButtonSecondaryContainerBorderDisabled: Color
-        @Composable @ReadOnlyComposable get() = if (DuckDuckGoTheme.colors.isDark) {
-            White24
-        } else {
-            Black12
-        }
+        @Composable @ReadOnlyComposable get() = DuckDuckGoTheme.colors.button.secondaryBorderDisabled
 
     @Composable @ReadOnlyComposable
     fun colors(): DaxButtonColors = DaxButtonColors(
