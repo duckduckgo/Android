@@ -50,6 +50,7 @@ import com.duckduckgo.subscriptions.impl.auth2.BackgroundTokenRefresh
 import com.duckduckgo.subscriptions.impl.auth2.PkceGenerator
 import com.duckduckgo.subscriptions.impl.auth2.RefreshTokenClaims
 import com.duckduckgo.subscriptions.impl.auth2.TokenPair
+import com.duckduckgo.subscriptions.impl.billing.LatestPurchaseResult
 import com.duckduckgo.subscriptions.impl.billing.PlayBillingManager
 import com.duckduckgo.subscriptions.impl.billing.PurchaseState
 import com.duckduckgo.subscriptions.impl.billing.RetryPolicy
@@ -934,14 +935,23 @@ class RealSubscriptionsManager @Inject constructor(
 
     private suspend fun storeLogin(accountExternalId: String? = null): StoreLoginResult {
         return try {
-            val purchase = playBillingManager.purchaseHistory.lastOrNull()
-                ?: return StoreLoginResult.Failure.PurchaseHistoryNotAvailable
+            val signedPurchase = if (subscriptionsFeature.get().useQueryPurchases().isEnabled()) {
+                when (val result = playBillingManager.getLatestPurchase()) {
+                    is LatestPurchaseResult.Present -> SignedPurchase(result.purchase.signature, result.purchase.originalJson)
+                    LatestPurchaseResult.Absent -> return StoreLoginResult.Failure.PurchaseHistoryNotAvailable
+                    LatestPurchaseResult.Unknown -> return StoreLoginResult.Failure.UnknownError
+                }
+            } else {
+                playBillingManager.purchaseHistory.lastOrNull()
+                    ?.let { SignedPurchase(it.signature, it.originalJson) }
+                    ?: return StoreLoginResult.Failure.PurchaseHistoryNotAvailable
+            }
 
             val codeVerifier = pkceGenerator.generateCodeVerifier()
             val codeChallenge = pkceGenerator.generateCodeChallenge(codeVerifier)
             val jwks = authClient.getJwks()
             val sessionId = authClient.authorize(codeChallenge)
-            val authorizationCode = authClient.storeLogin(sessionId, purchase.signature, purchase.originalJson)
+            val authorizationCode = authClient.storeLogin(sessionId, signedPurchase.signature, signedPurchase.originalJson)
             val tokens = authClient.getTokens(sessionId, authorizationCode, codeVerifier)
             val validatedTokens = try {
                 validateTokens(tokens, jwks)
@@ -1365,6 +1375,8 @@ class RealSubscriptionsManager @Inject constructor(
             null
         }
     }
+
+    private data class SignedPurchase(val signature: String, val originalJson: String)
 
     private sealed class StoreLoginResult {
         data class Success(val tokens: ValidatedTokenPair) : StoreLoginResult()

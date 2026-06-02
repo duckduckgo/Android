@@ -105,6 +105,12 @@ interface PlayBillingManager {
      * This is the preferred method over purchase history for getting current tokens
      */
     fun getLatestPurchaseToken(): String?
+
+    /**
+     * Returns the latest active (PURCHASED) subscription purchase.
+     * See [LatestPurchaseResult] for the meaning of each outcome.
+     */
+    fun getLatestPurchase(): LatestPurchaseResult
 }
 
 @SingleInstanceIn(AppScope::class)
@@ -147,6 +153,8 @@ class RealPlayBillingManager @Inject constructor(
 
     // Active Purchases
     override var purchases = emptyList<Purchase>()
+
+    private var latestQueryPurchasesSucceeded = false
 
     override fun onCreate(owner: LifecycleOwner) {
         connectAsyncWithRetry()
@@ -402,9 +410,11 @@ class RealPlayBillingManager @Inject constructor(
         when (val result = billingClient.queryPurchases()) {
             is QueryPurchasesResult.Success -> {
                 purchases = result.purchases
+                latestQueryPurchasesSucceeded = true
                 logcat { "Billing: Loaded ${result.purchases.size} active purchases" }
             }
             is QueryPurchasesResult.Failure -> {
+                latestQueryPurchasesSucceeded = false
                 logcat { "Billing: Failed to load purchases: ${result.billingError} - ${result.debugMessage}" }
             }
         }
@@ -427,6 +437,31 @@ class RealPlayBillingManager @Inject constructor(
             null
         }
     }
+
+    override fun getLatestPurchase(): LatestPurchaseResult {
+        if (!latestQueryPurchasesSucceeded) return LatestPurchaseResult.Unknown
+        val latest = purchases
+            .filter { purchase ->
+                (purchase.products.contains(BASIC_SUBSCRIPTION) || purchase.products.contains(ADVANCED_SUBSCRIPTION)) &&
+                    purchase.purchaseState == Purchase.PurchaseState.PURCHASED
+            }
+            .maxByOrNull { it.purchaseTime }
+        return if (latest != null) LatestPurchaseResult.Present(latest) else LatestPurchaseResult.Absent
+    }
+}
+
+sealed class LatestPurchaseResult {
+    /** An active purchase exists. */
+    data class Present(val purchase: Purchase) : LatestPurchaseResult()
+
+    /** Play Billing has been successfully queried and confirmed no active purchase exists. */
+    data object Absent : LatestPurchaseResult()
+
+    /**
+     * No confirmed answer yet — either we have not queried Play Billing yet,
+     * or the last query failed (connection error, service unavailable, etc.).
+     */
+    data object Unknown : LatestPurchaseResult()
 }
 
 sealed class PurchaseState {
