@@ -29,10 +29,6 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewParameter
-import com.duckduckgo.common.ui.compose.theme.Blue20
-import com.duckduckgo.common.ui.compose.theme.Blue30_20
-import com.duckduckgo.common.ui.compose.theme.Blue50_12
-import com.duckduckgo.common.ui.compose.theme.Blue70
 import com.duckduckgo.common.ui.compose.theme.DuckDuckGoTheme
 import com.duckduckgo.common.ui.compose.tools.PreviewBox
 import com.duckduckgo.mobile.android.R
@@ -80,21 +76,13 @@ private object DaxGhostButtonDefaults {
         @Composable @ReadOnlyComposable get() = Color.Transparent
 
     val adsColorButtonGhostContainerPressed: Color
-        @Composable @ReadOnlyComposable get() = if (DuckDuckGoTheme.colors.isDark) {
-            Blue30_20
-        } else {
-            Blue50_12
-        }
+        @Composable @ReadOnlyComposable get() = DuckDuckGoTheme.colors.button.secondaryContainerPressed
 
     val adsColorButtonGhostText: Color
         @Composable @ReadOnlyComposable get() = DuckDuckGoTheme.colors.brand.accentBlue
 
     val adsColorButtonGhostTextPressed: Color
-        @Composable @ReadOnlyComposable get() = if (DuckDuckGoTheme.colors.isDark) {
-            Blue20
-        } else {
-            Blue70
-        }
+        @Composable @ReadOnlyComposable get() = DuckDuckGoTheme.colors.button.secondaryTextPressed
 
     val adsColorButtonGhostDisabled: Color
         @Composable @ReadOnlyComposable get() = DuckDuckGoTheme.textColors.disabled
