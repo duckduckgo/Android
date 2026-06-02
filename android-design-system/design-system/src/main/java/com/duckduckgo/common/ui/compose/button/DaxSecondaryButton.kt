@@ -32,6 +32,7 @@ import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import com.duckduckgo.common.ui.compose.theme.DuckDuckGoTheme
+import com.duckduckgo.common.ui.compose.theme.DuckDuckGoThemeVariant
 import com.duckduckgo.common.ui.compose.tools.PreviewBox
 import com.duckduckgo.mobile.android.R
 
@@ -178,6 +179,17 @@ private fun DaxSecondaryButtonWithIconLargePreview(
             onClick = { },
             enabled = enabled,
             leadingIconPainter = painterResource(R.drawable.ic_add_24_solid_color),
+        )
+    }
+}
+
+@PreviewLightDark
+@Composable
+private fun DaxSecondaryButtonOnboardingPreview() {
+    PreviewBox(variant = DuckDuckGoThemeVariant.Onboarding) {
+        DaxSecondaryButton(
+            text = "Onboarding Secondary",
+            onClick = { },
         )
     }
 }

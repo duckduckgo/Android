@@ -25,14 +25,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.duckduckgo.common.ui.compose.theme.DuckDuckGoTheme
+import com.duckduckgo.common.ui.compose.theme.DuckDuckGoThemeVariant
 
 @Composable
 fun PreviewBoxInverted(
     modifier: Modifier = Modifier,
+    variant: DuckDuckGoThemeVariant = DuckDuckGoThemeVariant.Default,
     color: @Composable () -> Color = { DuckDuckGoTheme.colors.backgrounds.backgroundInverted },
     content: @Composable BoxScope.() -> Unit,
 ) = PreviewBox(
     modifier = modifier,
+    variant = variant,
     color = color,
     content = content,
 )
@@ -40,10 +43,11 @@ fun PreviewBoxInverted(
 @Composable
 fun PreviewBox(
     modifier: Modifier = Modifier,
+    variant: DuckDuckGoThemeVariant = DuckDuckGoThemeVariant.Default,
     color: @Composable () -> Color = { DuckDuckGoTheme.colors.backgrounds.background },
     content: @Composable BoxScope.() -> Unit,
 ) {
-    DuckDuckGoTheme {
+    DuckDuckGoTheme(variant = variant) {
         Box(
             modifier = modifier
                 .background(color())
