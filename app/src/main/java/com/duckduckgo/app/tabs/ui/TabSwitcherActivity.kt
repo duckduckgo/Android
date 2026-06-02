@@ -298,7 +298,7 @@ class TabSwitcherActivity :
 
     private fun disableNavigationBarContrast() {
         // isNavigationBarContrastEnforced was added in API 29
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+        if (Build.VERSION.SDK_INT >= 29) {
             window.isNavigationBarContrastEnforced = false
         }
     }
