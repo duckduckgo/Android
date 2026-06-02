@@ -29,7 +29,7 @@ import com.duckduckgo.common.ui.compose.theme.DuckDuckGoThemeVariant
 fun View.setupThemedComposeView(
     id: Int,
     isDarkTheme: Boolean,
-    variant: DuckDuckGoThemeVariant = DuckDuckGoThemeVariant.Default,
+    variant: DuckDuckGoThemeVariant,
     content: @Composable () -> Unit,
 ) {
     findViewById<ComposeView>(id)?.setupThemedComposeView(isDarkTheme, variant, content)
@@ -40,7 +40,7 @@ fun View.setupThemedComposeView(
  */
 fun ComposeView.setupThemedComposeView(
     isDarkTheme: Boolean,
-    variant: DuckDuckGoThemeVariant = DuckDuckGoThemeVariant.Default,
+    variant: DuckDuckGoThemeVariant,
     content: @Composable () -> Unit,
 ) {
     setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)

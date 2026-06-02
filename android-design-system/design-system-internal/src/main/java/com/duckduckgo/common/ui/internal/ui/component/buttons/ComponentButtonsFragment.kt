@@ -36,6 +36,7 @@ import com.duckduckgo.common.ui.compose.button.DaxGhostButton
 import com.duckduckgo.common.ui.compose.button.DaxIconButton
 import com.duckduckgo.common.ui.compose.button.DaxPrimaryButton
 import com.duckduckgo.common.ui.compose.button.DaxSecondaryButton
+import com.duckduckgo.common.ui.compose.theme.DuckDuckGoThemeVariant
 import com.duckduckgo.common.ui.internal.databinding.ComponentButtonsBinding
 import com.duckduckgo.common.ui.internal.ui.appComponentsViewModel
 import com.duckduckgo.common.ui.internal.ui.setupThemedComposeView
@@ -65,18 +66,21 @@ class ComponentButtonsFragment : Fragment() {
     ) {
         super.onViewCreated(view, savedInstanceState)
         val isDarkTheme = runBlocking { appComponentsViewModel.themeFlow.first() } == AppTheme.DARK
-        setupComposeViews(view, isDarkTheme)
+        val variant = runBlocking { appComponentsViewModel.variantFlow.first() }
+        setupComposeViews(view, isDarkTheme, variant)
     }
 
     @Suppress("LongMethod")
     private fun setupComposeViews(
         view: View,
         isDarkTheme: Boolean,
+        variant: DuckDuckGoThemeVariant,
     ) {
         // Primary
         view.setupThemedComposeView(
             id = com.duckduckgo.common.ui.internal.R.id.compose_button_primary,
             isDarkTheme = isDarkTheme,
+            variant = variant,
         ) {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -107,6 +111,7 @@ class ComponentButtonsFragment : Fragment() {
         view.setupThemedComposeView(
             id = com.duckduckgo.common.ui.internal.R.id.compose_button_secondary,
             isDarkTheme = isDarkTheme,
+            variant = variant,
         ) {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -137,6 +142,7 @@ class ComponentButtonsFragment : Fragment() {
         view.setupThemedComposeView(
             id = com.duckduckgo.common.ui.internal.R.id.compose_button_destructive_primary,
             isDarkTheme = isDarkTheme,
+            variant = variant,
         ) {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -167,6 +173,7 @@ class ComponentButtonsFragment : Fragment() {
         view.setupThemedComposeView(
             id = com.duckduckgo.common.ui.internal.R.id.compose_button_ghost,
             isDarkTheme = isDarkTheme,
+            variant = variant,
         ) {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -197,6 +204,7 @@ class ComponentButtonsFragment : Fragment() {
         view.setupThemedComposeView(
             id = com.duckduckgo.common.ui.internal.R.id.compose_button_destructive_ghost_secondary,
             isDarkTheme = isDarkTheme,
+            variant = variant,
         ) {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -227,6 +235,7 @@ class ComponentButtonsFragment : Fragment() {
         view.setupThemedComposeView(
             id = com.duckduckgo.common.ui.internal.R.id.compose_button_destructive_ghost,
             isDarkTheme = isDarkTheme,
+            variant = variant,
         ) {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -257,6 +266,7 @@ class ComponentButtonsFragment : Fragment() {
         view.setupThemedComposeView(
             id = com.duckduckgo.common.ui.internal.R.id.compose_button_ghost_alt,
             isDarkTheme = isDarkTheme,
+            variant = variant,
         ) {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -287,6 +297,7 @@ class ComponentButtonsFragment : Fragment() {
         view.setupThemedComposeView(
             id = com.duckduckgo.common.ui.internal.R.id.compose_icon_button,
             isDarkTheme = isDarkTheme,
+            variant = variant,
         ) {
             DaxIconButton(
                 onClick = {},
