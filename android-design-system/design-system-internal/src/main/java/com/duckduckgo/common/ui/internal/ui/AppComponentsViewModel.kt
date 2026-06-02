@@ -18,6 +18,7 @@ package com.duckduckgo.common.ui.internal.ui
 
 import androidx.lifecycle.ViewModel
 import com.duckduckgo.common.ui.DuckDuckGoTheme
+import com.duckduckgo.common.ui.compose.theme.DuckDuckGoThemeVariant
 import com.duckduckgo.common.ui.internal.ui.store.AppComponentsPrefsDataStore
 import kotlinx.coroutines.flow.Flow
 
@@ -29,5 +30,11 @@ class AppComponentsViewModel(
 
     suspend fun setTheme(theme: DuckDuckGoTheme) {
         appComponentsPrefsDataStore.setTheme(theme)
+    }
+
+    val variantFlow: Flow<DuckDuckGoThemeVariant> = appComponentsPrefsDataStore.variantFlow
+
+    suspend fun setVariant(variant: DuckDuckGoThemeVariant) {
+        appComponentsPrefsDataStore.setVariant(variant)
     }
 }
