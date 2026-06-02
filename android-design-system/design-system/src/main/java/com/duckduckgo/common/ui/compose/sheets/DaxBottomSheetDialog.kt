@@ -27,7 +27,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.dp
-import com.duckduckgo.common.ui.compose.theme.Black
 import com.duckduckgo.common.ui.compose.theme.DuckDuckGoTheme
 
 /**
@@ -85,7 +84,7 @@ object DaxBottomSheetDefaults {
         get() = DuckDuckGoTheme.colors.text.primary
 
     val scrimColor: Color
-        @Composable get() = Black.copy(alpha = .6f)
+        @Composable get() = DuckDuckGoTheme.colors.system.scrim
 
     val shape = RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp)
 }

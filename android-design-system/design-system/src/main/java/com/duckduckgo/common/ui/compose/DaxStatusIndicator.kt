@@ -35,10 +35,8 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import com.duckduckgo.common.ui.compose.text.DaxText
-import com.duckduckgo.common.ui.compose.theme.AlertGreen
 import com.duckduckgo.common.ui.compose.theme.DuckDuckGoTextStyle
 import com.duckduckgo.common.ui.compose.theme.DuckDuckGoTheme
-import com.duckduckgo.common.ui.compose.theme.Gray50
 import com.duckduckgo.common.ui.compose.tools.PreviewBox
 import com.duckduckgo.mobile.android.R
 
@@ -114,12 +112,12 @@ internal object StatusIndicatorDefaults {
     internal val disabledDotColor: Color
         @Composable
         @ReadOnlyComposable
-        get() = Gray50
+        get() = DuckDuckGoTheme.colors.status.indicatorInactive
 
     internal val activeDotColor: Color
         @Composable
         @ReadOnlyComposable
-        get() = AlertGreen
+        get() = DuckDuckGoTheme.colors.status.indicatorActive
 
     internal val contentColor: Color
         @Composable
