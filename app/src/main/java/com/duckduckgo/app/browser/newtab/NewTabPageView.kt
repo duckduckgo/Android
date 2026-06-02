@@ -262,6 +262,17 @@ class NewTabPageView @JvmOverloads constructor(
 
         onHasContent?.invoke(viewState.hasContent)
 
+        if (viewState.showFireTabEmptyState) {
+            binding.fireTabEmptyState.root.show()
+            binding.indonesiaNewTabSectionView.gone()
+            binding.appTrackingProtectionStateView.gone()
+            binding.ddgLogo.gone()
+            binding.messageCta.gone()
+            binding.focusedFavourites.gone()
+            return
+        }
+        binding.fireTabEmptyState.root.gone()
+
         if (viewState.shouldShowLogo) {
             homeBackgroundLogo.showLogo()
         } else {

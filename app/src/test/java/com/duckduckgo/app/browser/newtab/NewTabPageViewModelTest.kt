@@ -27,6 +27,7 @@ import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.ExtendedOnboardi
 import com.duckduckgo.app.onboardingbranddesignupdate.OnboardingBrandDesignUpdateToggles
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.ui.view.MessageCta
 import com.duckduckgo.common.utils.playstore.PlayStoreUtils
@@ -93,7 +94,10 @@ class NewTabPageViewModelTest {
         testee = createTestee()
     }
 
-    private fun createTestee(showLogo: Boolean = true): NewTabPageViewModel {
+    private fun createTestee(
+        showLogo: Boolean = true,
+        browserMode: BrowserMode = BrowserMode.REGULAR,
+    ): NewTabPageViewModel {
         return NewTabPageViewModel(
             showDaxLogo = showLogo,
             dispatchers = coroutinesTestRule.testDispatcherProvider,
@@ -110,7 +114,33 @@ class NewTabPageViewModelTest {
             pixel = pixel,
             onboardingBrandDesignUpdateToggles = mockOnboardingBrandDesignUpdateToggles,
             ctaViewModel = mockCtaViewModel,
+            browserMode = browserMode,
         )
+    }
+
+    @Test
+    fun whenFireModeThenShowFireTabEmptyStateAndLogoHidden() = runTest {
+        testee = createTestee(browserMode = BrowserMode.FIRE)
+        testee.onStart(mockLifecycleOwner)
+
+        testee.viewState.test {
+            expectMostRecentItem().also {
+                assertTrue(it.showFireTabEmptyState)
+                assertFalse(it.shouldShowLogo)
+            }
+        }
+    }
+
+    @Test
+    fun whenRegularModeThenDoesNotShowFireTabEmptyState() = runTest {
+        testee = createTestee(browserMode = BrowserMode.REGULAR)
+        testee.onStart(mockLifecycleOwner)
+
+        testee.viewState.test {
+            expectMostRecentItem().also {
+                assertFalse(it.showFireTabEmptyState)
+            }
+        }
     }
 
     @Test
