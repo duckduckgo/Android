@@ -6,9 +6,12 @@ import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.browser.tabs.TabManager.TabModel
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
+import com.duckduckgo.browsermode.api.BrowserMode
+import com.duckduckgo.browsermode.api.BrowserModeStateHolder
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Before
@@ -29,22 +32,28 @@ class DefaultTabManagerTest {
     private val tabRepository: TabRepository = mock()
     private val omnibarEntryConverter: OmnibarEntryConverter = mock()
     private val skipUrlConversionOnNewTabFeature = FakeFeatureToggleFactory.create(SkipUrlConversionOnNewTabFeature::class.java)
+    private val currentModeFlow = MutableStateFlow(BrowserMode.REGULAR)
+    private val browserModeStateHolder: BrowserModeStateHolder = mock()
 
     private lateinit var testee: DefaultTabManager
 
     @Before
     fun setup() {
         skipUrlConversionOnNewTabFeature.self().setRawStoredState(State(enable = false))
+        whenever(browserModeStateHolder.currentMode).thenReturn(currentModeFlow)
 
-        testee = DefaultTabManager(
-            tabRepository = tabRepository,
-            dispatchers = coroutineTestRule.testDispatcherProvider,
-            queryUrlConverter = omnibarEntryConverter,
-            skipUrlConversionOnNewTabFeature = skipUrlConversionOnNewTabFeature,
-        )
-
+        testee = createTabManager(BrowserMode.REGULAR)
         testee.registerCallbacks({})
     }
+
+    private fun createTabManager(browserMode: BrowserMode) = DefaultTabManager(
+        tabRepository = tabRepository,
+        dispatchers = coroutineTestRule.testDispatcherProvider,
+        queryUrlConverter = omnibarEntryConverter,
+        skipUrlConversionOnNewTabFeature = skipUrlConversionOnNewTabFeature,
+        browserMode = browserMode,
+        browserModeStateHolder = browserModeStateHolder,
+    )
 
     @Test
     fun whenOnSelectedTabChangedThenSelectedTabIdIsUpdated() = runTest {
@@ -71,6 +80,26 @@ class DefaultTabManagerTest {
     @Test
     fun whenOnTabsChangedAndNoTabsThenAddDefaultTabCalled() = runTest {
         testee.onTabsChanged(emptyList())
+
+        verify(tabRepository).addDefaultTab()
+    }
+
+    @Test
+    fun whenOnTabsChangedAndNoTabsInFireModeButGlobalModeRegularThenDefaultTabNotAdded() = runTest {
+        currentModeFlow.value = BrowserMode.REGULAR
+        val fireManager = createTabManager(BrowserMode.FIRE).also { it.registerCallbacks({}) }
+
+        fireManager.onTabsChanged(emptyList())
+
+        verify(tabRepository, never()).addDefaultTab()
+    }
+
+    @Test
+    fun whenOnTabsChangedAndNoTabsInFireModeAndGlobalModeFireThenAddDefaultTabCalled() = runTest {
+        currentModeFlow.value = BrowserMode.FIRE
+        val fireManager = createTabManager(BrowserMode.FIRE).also { it.registerCallbacks({}) }
+
+        fireManager.onTabsChanged(emptyList())
 
         verify(tabRepository).addDefaultTab()
     }

@@ -44,6 +44,7 @@ import com.duckduckgo.app.tabs.ui.TabSwitcherItem.Tab.DuckAiTab
 import com.duckduckgo.app.tabs.ui.TabSwitcherItem.Tab.NormalTab
 import com.duckduckgo.app.tabs.ui.TabSwitcherItem.Tab.SelectableTab
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command
+import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.TabItems
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.ViewState
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.ViewState.BackButtonType
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.ViewState.DynamicInterface
@@ -794,7 +795,7 @@ class TabSwitcherViewModelTest {
 
     @Test
     fun whenNormalModeAndNoTabsThenVerifyDynamicInterface() {
-        val viewState = ViewState(tabSwitcherItems = emptyList(), mode = Normal, layoutType = null, isDuckAIButtonVisible = true)
+        val viewState = ViewState(tabItems = TabItems.Loaded(emptyList()), mode = Normal, layoutType = null, isDuckAIButtonVisible = true)
         val expected = DynamicInterface(
             isFireButtonVisible = true,
             isNewTabButtonVisible = true,
@@ -1156,7 +1157,7 @@ class TabSwitcherViewModelTest {
     @Test
     fun whenNormalModeAndNoTabsAndNewToolbarEnabledThenVerifyDynamicInterface() {
         val viewState = ViewState(
-            tabSwitcherItems = emptyList(),
+            tabItems = TabItems.Loaded(emptyList()),
             mode = Normal,
             layoutType = null,
             isDuckAIButtonVisible = true,
@@ -1927,6 +1928,75 @@ class TabSwitcherViewModelTest {
 
         assertTrue(items.any { it is NormalTab && it.tabEntity.tabId == "fire-1" })
         verify(mockTabRepositoryProvider, atLeastOnce()).forMode(BrowserMode.FIRE)
+    }
+
+    @Test
+    fun `when fire mode and no fire tabs then showFireTabsEmptyState is true`() = runTest {
+        whenever(mockTabRepositoryProvider.forMode(BrowserMode.FIRE)).thenReturn(mockFireTabRepository)
+        whenever(mockFireTabRepository.flowTabs).thenReturn(flowOf(emptyList()))
+        whenever(mockFireTabRepository.flowSelectedTab).thenReturn(flowOf<TabEntity?>(null))
+        whenever(mockFireTabRepository.flowDeletableTabs).thenReturn(flowOf(emptyList()))
+        whenever(mockFireTabRepository.tabSwitcherData).thenReturn(flowOf(tabSwitcherData))
+
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+            testee.viewState.collect()
+        }
+        currentModeFlow.value = BrowserMode.FIRE
+        advanceUntilIdle()
+
+        assertTrue(testee.viewState.value.showFireTabsEmptyState)
+    }
+
+    @Test
+    fun `when fire mode and fire tabs present then showFireTabsEmptyState is false`() = runTest {
+        val fireTabList = listOf(TabEntity("fire-1", url = "https://fire.example", position = 1))
+        whenever(mockTabRepositoryProvider.forMode(BrowserMode.FIRE)).thenReturn(mockFireTabRepository)
+        whenever(mockFireTabRepository.flowTabs).thenReturn(flowOf(fireTabList))
+        whenever(mockFireTabRepository.flowSelectedTab).thenReturn(flowOf(fireTabList.first()))
+        whenever(mockFireTabRepository.flowDeletableTabs).thenReturn(flowOf(emptyList()))
+        whenever(mockFireTabRepository.tabSwitcherData).thenReturn(flowOf(tabSwitcherData))
+
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+            testee.viewState.collect()
+        }
+        currentModeFlow.value = BrowserMode.FIRE
+        advanceUntilIdle()
+
+        assertFalse(testee.viewState.value.showFireTabsEmptyState)
+    }
+
+    @Test
+    fun `when regular mode then showFireTabsEmptyState is false`() = runTest {
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+            testee.viewState.collect()
+        }
+        advanceUntilIdle()
+
+        assertFalse(testee.viewState.value.showFireTabsEmptyState)
+    }
+
+    @Test
+    fun `when closing the last fire tab then switches to regular mode`() = runTest {
+        val fireTab = TabEntity("fire-1", url = "https://fire.example", position = 1)
+        whenever(mockTabRepositoryProvider.forMode(BrowserMode.FIRE)).thenReturn(mockFireTabRepository)
+        whenever(mockFireTabRepository.flowTabs).thenReturn(flowOf(listOf(fireTab)))
+        whenever(mockFireTabRepository.flowSelectedTab).thenReturn(flowOf(fireTab))
+        whenever(mockFireTabRepository.flowDeletableTabs).thenReturn(flowOf(emptyList()))
+        whenever(mockFireTabRepository.tabSwitcherData).thenReturn(flowOf(tabSwitcherData))
+
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+            testee.viewState.collect()
+        }
+        currentModeFlow.value = BrowserMode.FIRE
+        advanceUntilIdle()
+
+        val tab = testee.tabs.first { it.id == "fire-1" }
+        testee.onTabCloseInNormalModeRequested(tab)
+        advanceUntilIdle()
+
+        verify(mockFireTabRepository).markDeletable(fireTab)
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        assertEquals(Command.SwitchToRegularMode, commandCaptor.lastValue)
     }
 
     @Test

@@ -73,11 +73,11 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
@@ -114,8 +114,6 @@ class TabSwitcherViewModel @Inject constructor(
 
     private val fireModeAvailable = fireModeAvailability.isAvailable()
 
-    // When fire mode is unavailable the toggle is never shown, so the view model ignores the
-    // shared browser-mode state and always operates on the regular profile.
     private val currentMode: StateFlow<BrowserMode> =
         if (fireModeAvailable) {
             browserModeStateHolder.currentMode
@@ -136,24 +134,21 @@ class TabSwitcherViewModel @Inject constructor(
 
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
 
-    private val tabSwitcherItemsFlow = tabRepositoryFlow.flatMapLatest { repo ->
-        repo.flowTabs
-            .debounce(100.milliseconds)
-            .conflate()
-            .flatMapLatest { tabEntities ->
-                combine(
-                    repo.flowSelectedTab,
-                    _viewState,
-                    tabSwitcherDataStore.isTrackersAnimationInfoTileHidden(),
-                    currentMode,
-                ) { activeTab, viewState, isAnimationTileDismissed, browserMode ->
-                    getTabItems(tabEntities, activeTab, isAnimationTileDismissed, viewState.mode, browserMode)
-                }
-            }
-            .onStart { emit(emptyList()) }
+    private val tabSwitcherItemsFlow: Flow<TabItems> = tabRepositoryFlow.flatMapLatest { repo ->
+        combine(
+            repo.flowTabs.debounce(100.milliseconds),
+            repo.flowSelectedTab,
+            _viewState,
+            tabSwitcherDataStore.isTrackersAnimationInfoTileHidden(),
+            currentMode,
+        ) { tabEntities, activeTab, viewState, isAnimationTileDismissed, browserMode ->
+            getTabItems(tabEntities, activeTab, isAnimationTileDismissed, viewState.mode, browserMode)
+        }
+            .map<List<TabSwitcherItem>, TabItems> { TabItems.Loaded(it) }
+            .onStart { emit(TabItems.NotInitialized) }
     }
 
-    val tabSwitcherItemsLiveData: LiveData<List<TabSwitcherItem>> = tabSwitcherItemsFlow.asLiveData()
+    val tabSwitcherItemsLiveData: LiveData<List<TabSwitcherItem>> = tabSwitcherItemsFlow.map { it.itemsOrEmpty }.asLiveData()
 
     private val _viewState = MutableStateFlow(
         ViewState(
@@ -169,9 +164,9 @@ class TabSwitcherViewModel @Inject constructor(
         duckAiFeatureState.showOmnibarShortcutOnNtpAndOnFocus,
         currentMode,
         tabRepositoryProvider.forMode(BrowserMode.REGULAR).flowTabs.map { it.size },
-    ) { viewState, tabSwitcherItems, tabSwitcherData, showDuckAiButton, browserMode, regularTabCount ->
+    ) { viewState, tabItems, tabSwitcherData, showDuckAiButton, browserMode, regularTabCount ->
         viewState.copy(
-            tabSwitcherItems = tabSwitcherItems,
+            tabItems = tabItems,
             layoutType = tabSwitcherData.layoutType,
             isDuckAIButtonVisible = showDuckAiButton,
             browserMode = browserMode,
@@ -219,6 +214,7 @@ class TabSwitcherViewModel @Inject constructor(
         data class ShowUndoDeleteTabsMessage(val tabIds: List<String>) : Command()
         data object ShowFireBottomSheet : Command()
         data object DismissSnackbar : Command()
+        data object SwitchToRegularMode : Command()
     }
 
     fun onNewTabRequested(fromOverflowMenu: Boolean = false) = viewModelScope.launch {
@@ -449,7 +445,11 @@ class TabSwitcherViewModel @Inject constructor(
         swipeGestureUsed: Boolean = false,
     ) {
         viewModelScope.launch {
-            if (tabs.size == 1) {
+            val isLastTab = tabs.size == 1
+            if (isLastTab && fireModeAvailable && currentMode.value == BrowserMode.FIRE) {
+                markTabAsDeletable(tab, swipeGestureUsed)
+                command.value = Command.SwitchToRegularMode
+            } else if (isLastTab) {
                 // mark the tab as deletable, the undo snackbar will be shown after tab switcher is closed
                 markTabAsDeletable(tab, swipeGestureUsed)
                 command.value = Command.CloseAndShowUndoMessage(listOf(tab.id))
@@ -677,8 +677,16 @@ class TabSwitcherViewModel @Inject constructor(
         }
     }
 
+    sealed class TabItems {
+        data object NotInitialized : TabItems()
+        data class Loaded(val items: List<TabSwitcherItem>) : TabItems()
+
+        val itemsOrEmpty: List<TabSwitcherItem>
+            get() = (this as? Loaded)?.items.orEmpty()
+    }
+
     data class ViewState(
-        val tabSwitcherItems: List<TabSwitcherItem> = emptyList(),
+        val tabItems: TabItems = TabItems.NotInitialized,
         val mode: Mode = Normal,
         val layoutType: LayoutType? = null,
         val isDuckAIButtonVisible: Boolean = false,
@@ -687,8 +695,11 @@ class TabSwitcherViewModel @Inject constructor(
         val regularTabCount: Int? = null,
         val isBrowserModeToggleVisible: Boolean = false,
     ) {
+        val tabSwitcherItems: List<TabSwitcherItem> = tabItems.itemsOrEmpty
         val tabs: List<Tab> = tabSwitcherItems.filterIsInstance<Tab>()
         val numSelectedTabs: Int = (mode as? Selection)?.selectedTabs?.size ?: 0
+
+        val showFireTabsEmptyState: Boolean = browserMode == BrowserMode.FIRE && tabItems is TabItems.Loaded && tabs.isEmpty()
 
         val dynamicInterface = when (mode) {
             is Normal -> {
