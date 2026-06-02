@@ -22,6 +22,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Count
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.eventhub.impl.EventHubFeature
+import com.duckduckgo.feature.toggles.api.FeatureTogglesInventory
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -36,11 +37,13 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.argumentCaptor
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.stub
 import org.mockito.kotlin.whenever
 import java.util.concurrent.TimeUnit
 
@@ -54,6 +57,9 @@ class RealEventHubPixelManagerTest {
     private val pixel: Pixel = mock()
     private val timeProvider = FakeCurrentTimeProvider()
     private val eventHubFeature: EventHubFeature = FakeFeatureToggleFactory.create(EventHubFeature::class.java)
+    private val featureTogglesInventory: FeatureTogglesInventory = mock {
+        onBlocking { getAllActiveExperimentToggles() } doReturn emptyList()
+    }
 
     private fun webEventData(type: String) = JSONObject().put("type", type)
 
@@ -71,6 +77,7 @@ class RealEventHubPixelManagerTest {
         manager = RealEventHubPixelManager(
             repository, pixel, timeProvider, coroutineTestRule.testScope,
             UnconfinedTestDispatcher(coroutineTestRule.testScope.testScheduler), eventHubFeature,
+            featureTogglesInventory,
         )
         manager.onAppForegrounded()
         eventHubFeature.self().setRawStoredState(savedState ?: Toggle.State(enable = false))
@@ -2510,6 +2517,157 @@ class RealEventHubPixelManagerTest {
     }
 
     // --- helpers ---
+
+    // --- experiments parameter ---
+
+    private val experimentsConfig = """
+        {
+            "telemetry": {
+                "webTelemetry_exp": {
+                    "state": "enabled",
+                    "trigger": { "period": { "days": 1 } },
+                    "parameters": {
+                        "count": {
+                            "template": "counter",
+                            "source": "test",
+                            "buckets": { "0": {"gte": 0, "lt": 1}, "1+": {"gte": 1} }
+                        },
+                        "experiments": {
+                            "template": "experiments",
+                            "matchExperiments": "^(tdsNextExperiment|contentScopeExperiment)"
+                        }
+                    }
+                }
+            }
+        }
+    """.trimIndent()
+
+    private fun experimentToggle(name: String, cohort: String): Toggle = mock {
+        on { featureName() } doReturn Toggle.FeatureName(parentName = null, name = name)
+        onBlocking { getCohort() } doReturn Toggle.State.Cohort(name = cohort, weight = 1)
+    }
+
+    private fun stubActiveExperiments(vararg toggles: Toggle) {
+        featureTogglesInventory.stub { onBlocking { getAllActiveExperimentToggles() } doReturn toggles.toList() }
+    }
+
+    private fun fireExperimentsPixelAndCaptureParams(snapshot: Map<String, String>): Map<String, String> {
+        configureFeature(settings = experimentsConfig)
+        createManager()
+
+        val config = EventHubConfigParser.parseTelemetry(experimentsConfig).first { it.name == "webTelemetry_exp" }
+        val periodStart = 1000L
+        val periodEnd = periodStart + 86_400_000L
+        timeProvider.time = periodEnd + 1
+
+        val state = PixelState(
+            pixelName = "webTelemetry_exp",
+            periodStartMillis = periodStart,
+            periodEndMillis = periodEnd,
+            config = config,
+            params = mapOf(
+                "count" to ParamState(value = 2),
+                "experiments" to ParamState(experiments = snapshot),
+            ),
+        )
+        stubPixelStates(state)
+
+        manager.onAppForegrounded()
+
+        val captor = argumentCaptor<Map<String, String>>()
+        verify(pixel).enqueueFire(
+            pixelName = eq("webTelemetry_exp"),
+            parameters = captor.capture(),
+            encodedParameters = eq(emptyMap()),
+            type = eq(Count),
+        )
+        return captor.firstValue
+    }
+
+    @Test
+    fun `experiments param carries current cohort without changedInPeriod when stable`() {
+        stubActiveExperiments(experimentToggle("tdsNextExperiment008", "treatment"))
+
+        val params = fireExperimentsPixelAndCaptureParams(snapshot = mapOf("tdsNextExperiment008" to "treatment"))
+
+        val experiments = JSONObject(params["experiments"]!!)
+        assertTrue(experiments.has("tdsNextExperiment008"))
+        val entry = experiments.getJSONObject("tdsNextExperiment008")
+        assertEquals("treatment", entry.getString("cohort"))
+        assertFalse(entry.has("changedInPeriod"))
+    }
+
+    @Test
+    fun `experiments param flags changedInPeriod when user joined during period`() {
+        stubActiveExperiments(experimentToggle("tdsNextExperiment008", "treatment"))
+
+        val params = fireExperimentsPixelAndCaptureParams(snapshot = emptyMap())
+
+        val entry = JSONObject(params["experiments"]!!).getJSONObject("tdsNextExperiment008")
+        assertEquals("treatment", entry.getString("cohort"))
+        assertTrue(entry.getBoolean("changedInPeriod"))
+    }
+
+    @Test
+    fun `experiments param flags changedInPeriod with last known cohort when user left during period`() {
+        stubActiveExperiments()
+
+        val params = fireExperimentsPixelAndCaptureParams(snapshot = mapOf("tdsNextExperiment008" to "control"))
+
+        val entry = JSONObject(params["experiments"]!!).getJSONObject("tdsNextExperiment008")
+        assertEquals("control", entry.getString("cohort"))
+        assertTrue(entry.getBoolean("changedInPeriod"))
+    }
+
+    @Test
+    fun `experiments param flags changedInPeriod when cohort switched during period`() {
+        stubActiveExperiments(experimentToggle("tdsNextExperiment008", "treatment"))
+
+        val params = fireExperimentsPixelAndCaptureParams(snapshot = mapOf("tdsNextExperiment008" to "control"))
+
+        val entry = JSONObject(params["experiments"]!!).getJSONObject("tdsNextExperiment008")
+        assertEquals("treatment", entry.getString("cohort"))
+        assertTrue(entry.getBoolean("changedInPeriod"))
+    }
+
+    @Test
+    fun `experiments param is empty object when no experiments are active`() {
+        stubActiveExperiments()
+
+        val params = fireExperimentsPixelAndCaptureParams(snapshot = emptyMap())
+
+        assertEquals("{}", params["experiments"])
+    }
+
+    @Test
+    fun `experiments param conveys multiple simultaneous experiments`() {
+        stubActiveExperiments(
+            experimentToggle("tdsNextExperiment008", "treatment"),
+            experimentToggle("contentScopeExperiment4", "control"),
+        )
+
+        val params = fireExperimentsPixelAndCaptureParams(
+            snapshot = mapOf("tdsNextExperiment008" to "treatment", "contentScopeExperiment4" to "control"),
+        )
+
+        val experiments = JSONObject(params["experiments"]!!)
+        assertEquals("treatment", experiments.getJSONObject("tdsNextExperiment008").getString("cohort"))
+        assertEquals("control", experiments.getJSONObject("contentScopeExperiment4").getString("cohort"))
+    }
+
+    @Test
+    fun `experiments param excludes experiments not matching matchExperiments`() {
+        stubActiveExperiments(
+            experimentToggle("tdsNextExperiment008", "treatment"),
+            experimentToggle("someOtherExperiment", "control"),
+        )
+
+        val params = fireExperimentsPixelAndCaptureParams(snapshot = emptyMap())
+
+        val experiments = JSONObject(params["experiments"]!!)
+        assertTrue(experiments.has("tdsNextExperiment008"))
+        assertFalse(experiments.has("someOtherExperiment"))
+    }
 
     private fun pixelState(
         name: String,

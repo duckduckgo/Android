@@ -204,6 +204,21 @@ class RealEventHubRepositoryTest {
     }
 
     @Test
+    fun `params serialization round-trips experiments snapshot`() {
+        val original = mapOf(
+            "experiments" to ParamState(
+                experiments = mapOf("tdsNextExperiment008" to "treatment", "contentScopeExperiment4" to "control"),
+            ),
+        )
+
+        val json = RealEventHubRepository.serializeParams(original)
+        val parsed = RealEventHubRepository.parseParamsJson(json)
+
+        assertEquals("treatment", parsed["experiments"]?.experiments?.get("tdsNextExperiment008"))
+        assertEquals("control", parsed["experiments"]?.experiments?.get("contentScopeExperiment4"))
+    }
+
+    @Test
     fun `savePixelState stores configJson from serializePixelConfig`() {
         val state = PixelState(
             pixelName = "testPixel",

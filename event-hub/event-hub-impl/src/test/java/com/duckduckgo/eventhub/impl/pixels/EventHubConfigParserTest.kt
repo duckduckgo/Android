@@ -82,6 +82,76 @@ class EventHubConfigParserTest {
     }
 
     @Test
+    fun `experiments parameter parsed correctly`() {
+        val json = """
+            {
+                "telemetry": {
+                    "exp": {
+                        "state": "enabled",
+                        "trigger": { "period": { "days": 1 } },
+                        "parameters": {
+                            "experiments": {
+                                "template": "experiments",
+                                "matchExperiments": "^tdsNextExperiment"
+                            }
+                        }
+                    }
+                }
+            }
+        """.trimIndent()
+
+        val param = EventHubConfigParser.parseTelemetry(json).first().parameters["experiments"]!!
+
+        assertTrue(param.isExperiments)
+        assertEquals("^tdsNextExperiment", param.matchExperiments)
+    }
+
+    @Test
+    fun `experiments parameter without matchExperiments parsed correctly`() {
+        val json = """
+            {
+                "telemetry": {
+                    "exp": {
+                        "state": "enabled",
+                        "trigger": { "period": { "days": 1 } },
+                        "parameters": {
+                            "experiments": { "template": "experiments" }
+                        }
+                    }
+                }
+            }
+        """.trimIndent()
+
+        val param = EventHubConfigParser.parseTelemetry(json).first().parameters["experiments"]!!
+
+        assertTrue(param.isExperiments)
+        assertNull(param.matchExperiments)
+    }
+
+    @Test
+    fun `experiments parameter round-trips through serialization`() {
+        val config = TelemetryPixelConfig(
+            name = "exp",
+            state = "enabled",
+            trigger = TelemetryTriggerConfig(period = TelemetryPeriodConfig(days = 1)),
+            parameters = mapOf(
+                "experiments" to TelemetryParameterConfig(
+                    template = "experiments",
+                    matchExperiments = "^contentScopeExperiment",
+                ),
+            ),
+        )
+
+        val json = EventHubConfigParser.serializePixelConfig(config)
+        assertNotNull(json)
+
+        val restored = EventHubConfigParser.parseSinglePixelConfig(config.name, json!!)!!
+        val restoredParam = restored.parameters["experiments"]!!
+        assertTrue(restoredParam.isExperiments)
+        assertEquals("^contentScopeExperiment", restoredParam.matchExperiments)
+    }
+
+    @Test
     fun `seconds period parses correctly`() {
         val json = """
             {

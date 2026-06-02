@@ -46,6 +46,7 @@ private data class TelemetryParameterJson(
     val template: String,
     val source: String? = null,
     val buckets: Map<String, BucketJson>? = null,
+    val matchExperiments: String? = null,
 )
 
 private data class BucketJson(
@@ -93,13 +94,20 @@ object EventHubConfigParser {
                 ),
             ),
             parameters = config.parameters.mapValues { (_, paramConfig) ->
-                TelemetryParameterJson(
-                    template = paramConfig.template,
-                    source = paramConfig.source,
-                    buckets = paramConfig.buckets.mapValues { (_, bucket) ->
-                        BucketJson(gte = bucket.gte, lt = bucket.lt)
-                    },
-                )
+                if (paramConfig.isExperiments) {
+                    TelemetryParameterJson(
+                        template = paramConfig.template,
+                        matchExperiments = paramConfig.matchExperiments,
+                    )
+                } else {
+                    TelemetryParameterJson(
+                        template = paramConfig.template,
+                        source = paramConfig.source,
+                        buckets = paramConfig.buckets.mapValues { (_, bucket) ->
+                            BucketJson(gte = bucket.gte, lt = bucket.lt)
+                        },
+                    )
+                }
             },
         )
         return runCatching { pixelAdapter.toJson(pixelJson) }
@@ -134,7 +142,14 @@ object EventHubConfigParser {
     }
 
     private fun toParameterConfig(json: TelemetryParameterJson): TelemetryParameterConfig? {
-        if (json.template != "counter") return null
+        return when (json.template) {
+            "counter" -> toCounterParameterConfig(json)
+            "experiments" -> TelemetryParameterConfig(template = json.template, matchExperiments = json.matchExperiments)
+            else -> null
+        }
+    }
+
+    private fun toCounterParameterConfig(json: TelemetryParameterJson): TelemetryParameterConfig? {
         val source = json.source ?: return null
         val bucketsJson = json.buckets ?: return null
 

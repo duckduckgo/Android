@@ -41,10 +41,17 @@ data class TelemetryPeriodConfig(
 
 data class TelemetryParameterConfig(
     val template: String,
-    val source: String,
-    val buckets: Map<String, BucketConfig>,
+    val source: String = "",
+    val buckets: Map<String, BucketConfig> = emptyMap(),
+    /**
+     * Only set for the "experiments" template. When non-null, it is a regular expression matched
+     * against experiment names; only experiments whose name matches are included. When null, all
+     * known supported experiments are included.
+     */
+    val matchExperiments: String? = null,
 ) {
     val isCounter: Boolean get() = template == "counter"
+    val isExperiments: Boolean get() = template == "experiments"
 }
 
 data class BucketConfig(
@@ -52,7 +59,17 @@ data class BucketConfig(
     val lt: Int?,
 )
 
-data class ParamState(val value: Int, val stopCounting: Boolean = false)
+/**
+ * Per-parameter runtime state.
+ * [value] / [stopCounting] are used by the "counter" template.
+ * [experiments] is the period-start snapshot (experiment name -> cohort) used by the "experiments"
+ *   template to detect cohort changes within the period ([changedInPeriod]).
+ */
+data class ParamState(
+    val value: Int = 0,
+    val stopCounting: Boolean = false,
+    val experiments: Map<String, String>? = null,
+)
 
 data class PixelState(
     val pixelName: String,

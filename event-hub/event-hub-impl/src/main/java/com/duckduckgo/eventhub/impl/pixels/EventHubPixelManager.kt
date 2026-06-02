@@ -23,6 +23,7 @@ import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.eventhub.impl.EventHubFeature
 import com.duckduckgo.eventhub.impl.di.EventHubDispatcher
+import com.duckduckgo.feature.toggles.api.FeatureTogglesInventory
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.CoroutineDispatcher
@@ -71,6 +72,7 @@ class RealEventHubPixelManager @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     @EventHubDispatcher private val pixelDispatcher: CoroutineDispatcher,
     private val eventHubFeature: EventHubFeature,
+    private val featureTogglesInventory: FeatureTogglesInventory,
 ) : EventHubPixelManager {
 
     private var cachedTelemetryConfigs: List<TelemetryPixelConfig>? = null
@@ -171,7 +173,7 @@ class RealEventHubPixelManager @Inject constructor(
         return false
     }
 
-    private fun processPixelStates(): Long {
+    private suspend fun processPixelStates(): Long {
         val nowMillis = timeProvider.currentTimeMillis()
         var nextDeadline = Long.MAX_VALUE
 
@@ -189,7 +191,7 @@ class RealEventHubPixelManager @Inject constructor(
         return nextDeadline
     }
 
-    private fun initMissingPixels(): Long {
+    private suspend fun initMissingPixels(): Long {
         var nextDeadline = Long.MAX_VALUE
         for (pixelConfig in getTelemetryConfigs()) {
             if (repository.getPixelState(pixelConfig.name) == null) {
@@ -253,7 +255,7 @@ class RealEventHubPixelManager @Inject constructor(
         }
     }
 
-    private fun fireTelemetry(pixelState: PixelState): Long? {
+    private suspend fun fireTelemetry(pixelState: PixelState): Long? {
         val pixelData = buildPixel(pixelState)
 
         if (pixelData.isNotEmpty()) {
@@ -279,7 +281,7 @@ class RealEventHubPixelManager @Inject constructor(
         return if (latestPixelConfig != null) startNewPeriod(latestPixelConfig) else null
     }
 
-    private fun startNewPeriod(pixelConfig: TelemetryPixelConfig): Long? {
+    private suspend fun startNewPeriod(pixelConfig: TelemetryPixelConfig): Long? {
         if (!isInForeground || !isEnabled() || !pixelConfig.isEnabled) {
             logcat(VERBOSE) { "EventHub: skipping startNewPeriod for ${pixelConfig.name}" }
             return null
@@ -289,33 +291,83 @@ class RealEventHubPixelManager @Inject constructor(
         val periodEndMillis = nowMillis + periodMillis
 
         logcat(VERBOSE) { "EventHub: startNewPeriod ${pixelConfig.name} start=$nowMillis end=$periodEndMillis" }
+        val hasExperimentsParam = pixelConfig.parameters.values.any { it.isExperiments }
+        val experimentsSnapshot = if (hasExperimentsParam) resolveActiveExperimentCohorts() else emptyMap()
+        val params = pixelConfig.parameters.mapValues { (_, paramConfig) ->
+            if (paramConfig.isExperiments) ParamState(experiments = experimentsSnapshot) else ParamState(0)
+        }
         repository.savePixelState(
             PixelState(
                 pixelName = pixelConfig.name,
                 periodStartMillis = nowMillis,
                 periodEndMillis = periodEndMillis,
                 config = pixelConfig,
-                params = pixelConfig.parameters.keys.associateWith { ParamState(0) },
+                params = params,
             ),
         )
 
         return periodEndMillis
     }
 
-    private fun buildPixel(pixelState: PixelState): Map<String, String> {
+    private suspend fun buildPixel(pixelState: PixelState): Map<String, String> {
         val pixelData = mutableMapOf<String, String>()
 
         for ((paramName, paramConfig) in pixelState.config.parameters) {
-            if (paramConfig.isCounter) {
-                val value = (pixelState.params[paramName] ?: ParamState(0)).value
-                val bucketName = BucketCounter.bucketCount(value, paramConfig.buckets)
-                if (bucketName != null) {
-                    pixelData[paramName] = bucketName
+            when {
+                paramConfig.isCounter -> {
+                    val value = (pixelState.params[paramName] ?: ParamState(0)).value
+                    val bucketName = BucketCounter.bucketCount(value, paramConfig.buckets)
+                    if (bucketName != null) {
+                        pixelData[paramName] = bucketName
+                    }
+                }
+                paramConfig.isExperiments -> {
+                    val snapshot = pixelState.params[paramName]?.experiments ?: emptyMap()
+                    pixelData[paramName] = buildExperimentsParam(paramConfig.matchExperiments, snapshot)
                 }
             }
         }
 
         return pixelData
+    }
+
+    /**
+     * Build the value for an "experiments" parameter: a JSON object keyed by experiment name with
+     * `{ "cohort": <cohort>, "changedInPeriod": true? }` values. The value is returned as a plain
+     * JSON string; the pixel sender percent-encodes it over the wire.
+     *
+     * [matchExperiments] optionally filters experiments by a regex on the experiment name.
+     * [snapshot] is the set of experiment cohorts assigned at the start of the period; comparing it
+     * with the current set lets us flag experiments the user joined, left, or switched cohort within
+     * the period via `changedInPeriod`.
+     */
+    private suspend fun buildExperimentsParam(matchExperiments: String?, snapshot: Map<String, String>): String {
+        val regex = matchExperiments?.let { runCatching { Regex(it) }.getOrNull() }
+        fun matches(name: String): Boolean = regex?.containsMatchIn(name) ?: true
+
+        val current = resolveActiveExperimentCohorts().filterKeys { matches(it) }
+        val start = snapshot.filterKeys { matches(it) }
+
+        val result = JSONObject()
+        for (name in (current.keys + start.keys)) {
+            val currentCohort = current[name]
+            val startCohort = start[name]
+            val cohort = currentCohort ?: startCohort ?: continue
+            val experiment = JSONObject().put("cohort", cohort)
+            if (currentCohort != startCohort) {
+                experiment.put("changedInPeriod", true)
+            }
+            result.put(name, experiment)
+        }
+        return result.toString()
+    }
+
+    /** Returns the currently enrolled experiment cohorts as a map of experiment name -> cohort name. */
+    private suspend fun resolveActiveExperimentCohorts(): Map<String, String> {
+        return featureTogglesInventory.getAllActiveExperimentToggles().mapNotNull { toggle ->
+            val cohort = toggle.getCohort()?.name ?: return@mapNotNull null
+            toggle.featureName().name to cohort
+        }.toMap()
     }
 
     companion object {
