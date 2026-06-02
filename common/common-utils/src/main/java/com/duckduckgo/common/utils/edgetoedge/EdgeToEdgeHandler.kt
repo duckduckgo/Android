@@ -46,22 +46,38 @@ class EdgeToEdgeHandler @Inject constructor() {
         }
     }
 
+    /**
+     * Bottom inset: navigation bar + display cutout, bottom edge only
+     */
     fun applyNavigationBarInsets(view: View) {
-        val initialLeft = view.paddingLeft
-        val initialRight = view.paddingRight
         val initialBottom = view.paddingBottom
         ViewCompat.setOnApplyWindowInsetsListener(view) { v, insets ->
-            // The nav bar sits at the bottom in portrait but moves to a side edge in landscape
-            // (where bottom is then 0); the display cutout (camera notch) likewise moves to a side
-            // edge in landscape. Union both so content clears the nav bar AND the cutout on whichever
-            // side/bottom edge they land. The top edge is handled by applyStatusBarInsets.
+            val bottom = insets.getInsets(
+                WindowInsetsCompat.Type.navigationBars() or WindowInsetsCompat.Type.displayCutout(),
+            ).bottom
+
+            v.updatePadding(bottom = initialBottom + bottom)
+            insets
+        }
+    }
+
+    /**
+     * Horizontal inset: navigation bar + display cutout on the left and right edges. In landscape the
+     * 3-button nav bar and the camera cutout move to a side edge and run the full height, so applying
+     * this to a screen's root insets the whole column (toolbar, content, bottom bar) at once. No-op in
+     * portrait. The listener is non-consuming, so child views still receive insets for their own
+     * top/bottom handling.
+     */
+    fun applyHorizontalSystemBarInsets(view: View) {
+        val initialLeft = view.paddingLeft
+        val initialRight = view.paddingRight
+        ViewCompat.setOnApplyWindowInsetsListener(view) { v, insets ->
             val barsAndCutout = insets.getInsets(
                 WindowInsetsCompat.Type.navigationBars() or WindowInsetsCompat.Type.displayCutout(),
             )
             v.updatePadding(
                 left = initialLeft + barsAndCutout.left,
                 right = initialRight + barsAndCutout.right,
-                bottom = initialBottom + barsAndCutout.bottom,
             )
             insets
         }

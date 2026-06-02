@@ -275,12 +275,23 @@ class TabSwitcherActivity :
     }
 
     private fun configureEdgeToEdgeInsets() {
-        edgeToEdgeHandler.applyNavigationBarInsets(binding.root)
+        edgeToEdgeHandler.applyHorizontalSystemBarInsets(binding.root)
+
         when (settingsDataStore.omnibarType) {
-            OmnibarType.SINGLE_TOP, OmnibarType.SPLIT ->
+            OmnibarType.SINGLE_TOP -> {
                 edgeToEdgeHandler.applyStatusBarInsets(binding.tabSwitcherToolbarTop.root)
-            OmnibarType.SINGLE_BOTTOM ->
+                edgeToEdgeHandler.applyNavigationBarInsets(tabsRecycler)
+            }
+            OmnibarType.SINGLE_BOTTOM -> {
                 edgeToEdgeHandler.applyStatusBarInsets(tabsContainer)
+                edgeToEdgeHandler.applyNavigationBarInsets(binding.tabSwitcherToolbarBottom.root)
+                window.isNavigationBarContrastEnforced = false
+            }
+            OmnibarType.SPLIT -> {
+                edgeToEdgeHandler.applyStatusBarInsets(binding.tabSwitcherToolbarTop.root)
+                edgeToEdgeHandler.applyNavigationBarInsets(binding.navigationBar)
+                window.isNavigationBarContrastEnforced = false
+            }
         }
     }
 
