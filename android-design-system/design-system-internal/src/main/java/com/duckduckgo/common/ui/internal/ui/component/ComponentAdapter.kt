@@ -19,9 +19,11 @@ package com.duckduckgo.common.ui.internal.ui.component
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
+import com.duckduckgo.common.ui.compose.theme.DuckDuckGoThemeVariant
 
 class ComponentAdapter(
     private val isDarkTheme: Boolean,
+    private val variant: DuckDuckGoThemeVariant,
 ) : ListAdapter<Component, ComponentViewHolder>(DIFF_CALLBACK) {
 
     override fun getItemViewType(position: Int): Int = getItem(position).ordinal
@@ -30,7 +32,7 @@ class ComponentAdapter(
         parent: ViewGroup,
         viewType: Int,
     ): ComponentViewHolder {
-        return ComponentViewHolder.create(parent, viewType, isDarkTheme)
+        return ComponentViewHolder.create(parent, viewType, isDarkTheme, variant)
     }
 
     override fun onBindViewHolder(

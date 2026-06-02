@@ -59,6 +59,7 @@ import com.duckduckgo.common.ui.compose.message.remote.DaxSmallMessage
 import com.duckduckgo.common.ui.compose.radiobutton.DaxRadioButton
 import com.duckduckgo.common.ui.compose.switch.DaxSwitch
 import com.duckduckgo.common.ui.compose.text.DaxText
+import com.duckduckgo.common.ui.compose.theme.DuckDuckGoThemeVariant
 import com.duckduckgo.common.ui.internal.R
 import com.duckduckgo.common.ui.internal.ui.setupThemedComposeView
 import com.duckduckgo.common.ui.view.MessageCta
@@ -91,9 +92,10 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
     class SwitchComponentViewHolder(
         parent: ViewGroup,
         private val isDarkTheme: Boolean,
+        private val variant: DuckDuckGoThemeVariant,
     ) : ComponentViewHolder(inflate(parent, R.layout.component_switch)) {
         override fun bind(component: Component) {
-            view.setupThemedComposeView(id = R.id.compose_dax_switch_one, isDarkTheme = isDarkTheme) {
+            view.setupThemedComposeView(id = R.id.compose_dax_switch_one, isDarkTheme = isDarkTheme, variant = variant) {
                 var isChecked by remember { mutableStateOf(false) }
 
                 DaxSwitch(
@@ -103,7 +105,7 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
                     },
                 )
             }
-            view.setupThemedComposeView(id = R.id.compose_dax_switch_two, isDarkTheme = isDarkTheme) {
+            view.setupThemedComposeView(id = R.id.compose_dax_switch_two, isDarkTheme = isDarkTheme, variant = variant) {
                 var isChecked by remember { mutableStateOf(true) }
 
                 DaxSwitch(
@@ -113,10 +115,10 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
                     },
                 )
             }
-            view.setupThemedComposeView(id = R.id.compose_dax_switch_three, isDarkTheme = isDarkTheme) {
+            view.setupThemedComposeView(id = R.id.compose_dax_switch_three, isDarkTheme = isDarkTheme, variant = variant) {
                 DaxSwitch(checked = false, onCheckedChange = {}, enabled = false)
             }
-            view.setupThemedComposeView(id = R.id.compose_dax_switch_four, isDarkTheme = isDarkTheme) {
+            view.setupThemedComposeView(id = R.id.compose_dax_switch_four, isDarkTheme = isDarkTheme, variant = variant) {
                 DaxSwitch(checked = true, onCheckedChange = {}, enabled = false)
             }
         }
@@ -125,9 +127,10 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
     class RadioButtonComponentViewHolder(
         parent: ViewGroup,
         private val isDarkTheme: Boolean,
+        private val variant: DuckDuckGoThemeVariant,
     ) : ComponentViewHolder(inflate(parent, R.layout.component_radio_button)) {
         override fun bind(component: Component) {
-            view.setupThemedComposeView(id = R.id.compose_dax_radio_button, isDarkTheme = isDarkTheme) {
+            view.setupThemedComposeView(id = R.id.compose_dax_radio_button, isDarkTheme = isDarkTheme, variant = variant) {
                 var indexSelected by remember { mutableIntStateOf(0) }
 
                 Row(
@@ -156,9 +159,10 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
     class CheckboxComponentViewHolder(
         parent: ViewGroup,
         private val isDarkTheme: Boolean,
+        private val variant: DuckDuckGoThemeVariant,
     ) : ComponentViewHolder(inflate(parent, R.layout.component_checkbox)) {
         override fun bind(component: Component) {
-            view.setupThemedComposeView(id = R.id.compose_dax_checkbox_one, isDarkTheme = isDarkTheme) {
+            view.setupThemedComposeView(id = R.id.compose_dax_checkbox_one, isDarkTheme = isDarkTheme, variant = variant) {
                 var isChecked by remember { mutableStateOf(false) }
 
                 DaxCheckbox(
@@ -168,7 +172,7 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
                     },
                 )
             }
-            view.setupThemedComposeView(id = R.id.compose_dax_checkbox_two, isDarkTheme = isDarkTheme) {
+            view.setupThemedComposeView(id = R.id.compose_dax_checkbox_two, isDarkTheme = isDarkTheme, variant = variant) {
                 var isChecked by remember { mutableStateOf(true) }
 
                 DaxCheckbox(
@@ -178,21 +182,21 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
                     },
                 )
             }
-            view.setupThemedComposeView(id = R.id.compose_dax_checkbox_three, isDarkTheme = isDarkTheme) {
+            view.setupThemedComposeView(id = R.id.compose_dax_checkbox_three, isDarkTheme = isDarkTheme, variant = variant) {
                 DaxCheckbox(
                     checked = false,
                     enabled = false,
                     onCheckedChange = {},
                 )
             }
-            view.setupThemedComposeView(id = R.id.compose_dax_checkbox_four, isDarkTheme = isDarkTheme) {
+            view.setupThemedComposeView(id = R.id.compose_dax_checkbox_four, isDarkTheme = isDarkTheme, variant = variant) {
                 DaxCheckbox(
                     checked = true,
                     enabled = false,
                     onCheckedChange = {},
                 )
             }
-            view.setupThemedComposeView(id = R.id.compose_dax_checkbox_five, isDarkTheme = isDarkTheme) {
+            view.setupThemedComposeView(id = R.id.compose_dax_checkbox_five, isDarkTheme = isDarkTheme, variant = variant) {
                 var isChecked by remember { mutableStateOf(false) }
 
                 Row(verticalAlignment = Alignment.CenterVertically) {
@@ -218,6 +222,7 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
     class RemoteMessageComponentViewHolder(
         parent: ViewGroup,
         private val isDarkTheme: Boolean,
+        private val variant: DuckDuckGoThemeVariant,
     ) : ComponentViewHolder(inflate(parent, R.layout.component_remote_message)) {
         override fun bind(component: Component) {
             val smallMessage = Message(title = "Small Message", subtitle = "Body text goes here. This component doesn't have buttons")
@@ -281,7 +286,7 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
                 setMessage(promoSingleMessage)
             }
 
-            view.setupThemedComposeView(R.id.promo_single_remote_message_compose, isDarkTheme = isDarkTheme) {
+            view.setupThemedComposeView(R.id.promo_single_remote_message_compose, isDarkTheme = isDarkTheme, variant = variant) {
                 DaxPromoSingleActionMessage(
                     title = "Promo Single Action Message",
                     body = "Body text goes here. This component has one promo button and supports <b>bold</b> text",
@@ -299,7 +304,7 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
                 )
             }
 
-            view.setupThemedComposeView(R.id.small_remote_message_compose, isDarkTheme = isDarkTheme) {
+            view.setupThemedComposeView(R.id.small_remote_message_compose, isDarkTheme = isDarkTheme, variant = variant) {
                 DaxSmallMessage(
                     title = "Compose Small Message",
                     body = "Body text goes here. This component doesn't have buttons",
@@ -310,7 +315,7 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
                 )
             }
 
-            view.setupThemedComposeView(R.id.medium_remote_message_compose, isDarkTheme = isDarkTheme) {
+            view.setupThemedComposeView(R.id.medium_remote_message_compose, isDarkTheme = isDarkTheme, variant = variant) {
                 DaxMediumMessage(
                     title = "Compose Medium Message",
                     body = "Body text goes here. This component doesn't have buttons",
@@ -322,7 +327,7 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
                 )
             }
 
-            view.setupThemedComposeView(R.id.big_single_remote_message_compose, isDarkTheme = isDarkTheme) {
+            view.setupThemedComposeView(R.id.big_single_remote_message_compose, isDarkTheme = isDarkTheme, variant = variant) {
                 DaxBigSingleActionMessage(
                     topIllustration = painterResource(CommonR.drawable.ic_announce),
                     title = "Compose Big Single Message",
@@ -335,7 +340,7 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
                 )
             }
 
-            view.setupThemedComposeView(R.id.big_single_lottie_remote_message_compose, isDarkTheme = isDarkTheme) {
+            view.setupThemedComposeView(R.id.big_single_lottie_remote_message_compose, isDarkTheme = isDarkTheme, variant = variant) {
                 DaxBigSingleActionMessage(
                     topIllustration = {
                         val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.anim_password_keys))
@@ -360,7 +365,7 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
                 )
             }
 
-            view.setupThemedComposeView(R.id.big_two_actions_remote_message_compose, isDarkTheme = isDarkTheme) {
+            view.setupThemedComposeView(R.id.big_two_actions_remote_message_compose, isDarkTheme = isDarkTheme, variant = variant) {
                 DaxBigTwoActionsMessage(
                     topIllustration = painterResource(CommonR.drawable.ic_ddg_announce),
                     title = "Compose Big Two Actions",
@@ -374,7 +379,7 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
                 )
             }
 
-            view.setupThemedComposeView(R.id.big_two_actions_update_remote_message_compose, isDarkTheme = isDarkTheme) {
+            view.setupThemedComposeView(R.id.big_two_actions_update_remote_message_compose, isDarkTheme = isDarkTheme, variant = variant) {
                 DaxBigTwoActionsMessage(
                     topIllustration = painterResource(CommonR.drawable.ic_app_update),
                     title = "Compose Big Two Actions",
@@ -388,7 +393,7 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
                 )
             }
 
-            view.setupThemedComposeView(R.id.big_two_actions_server_image_remote_message_compose, isDarkTheme = isDarkTheme) {
+            view.setupThemedComposeView(R.id.big_two_actions_server_image_remote_message_compose, isDarkTheme = isDarkTheme, variant = variant) {
                 DaxBigTwoActionsMessage(
                     topIllustration = rememberAsyncImagePainter(
                         model = "https://staticcdn.duckduckgo.com/remotemessaging/illustrations/image2.png",
@@ -610,6 +615,7 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
     class CardComponentViewHolder(
         parent: ViewGroup,
         private val isDarkTheme: Boolean,
+        private val variant: DuckDuckGoThemeVariant,
     ) : ComponentViewHolder(inflate(parent, R.layout.component_card)) {
         override fun bind(component: Component) {
             view.findViewById<MaterialCardView>(R.id.ticketViewCard).apply {
@@ -625,7 +631,7 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
                 setOnClickListener { Snackbar.make(this, component.name, Snackbar.LENGTH_SHORT).show() }
             }
 
-            view.setupThemedComposeView(R.id.composeCards, isDarkTheme) {
+            view.setupThemedComposeView(R.id.composeCards, isDarkTheme, variant) {
                 Column(
                     verticalArrangement = Arrangement.spacedBy(16.dp),
                     modifier = Modifier.padding(horizontal = 16.dp),
@@ -675,17 +681,18 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
             parent: ViewGroup,
             viewType: Int,
             isDarkTheme: Boolean,
+            variant: DuckDuckGoThemeVariant,
         ): ComponentViewHolder {
             return when (Component.values()[viewType]) {
                 Component.BUTTON -> ButtonComponentViewHolder(parent)
                 Component.TOP_APP_BAR -> TopAppBarComponentViewHolder(parent)
-                Component.SWITCH -> SwitchComponentViewHolder(parent, isDarkTheme)
-                Component.RADIO_BUTTON -> RadioButtonComponentViewHolder(parent, isDarkTheme)
-                Component.CHECKBOX -> CheckboxComponentViewHolder(parent, isDarkTheme)
+                Component.SWITCH -> SwitchComponentViewHolder(parent, isDarkTheme, variant)
+                Component.RADIO_BUTTON -> RadioButtonComponentViewHolder(parent, isDarkTheme, variant)
+                Component.CHECKBOX -> CheckboxComponentViewHolder(parent, isDarkTheme, variant)
                 Component.SLIDER -> SliderComponentViewHolder(parent)
                 Component.SNACKBAR -> SnackbarComponentViewHolder(parent)
                 Component.INFO_PANEL -> InfoPanelComponentViewHolder(parent)
-                Component.REMOTE_MESSAGE -> RemoteMessageComponentViewHolder(parent, isDarkTheme)
+                Component.REMOTE_MESSAGE -> RemoteMessageComponentViewHolder(parent, isDarkTheme, variant)
                 Component.SEARCH_BAR -> SearchBarComponentViewHolder(parent)
                 Component.MENU_ITEM -> MenuItemComponentViewHolder(parent)
                 Component.POPUP_MENU_ITEM -> PopupMenuItemComponentViewHolder(parent)
@@ -693,7 +700,7 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
                 Component.SINGLE_LINE_LIST_ITEM -> OneLineListItemComponentViewHolder(parent)
                 Component.TWO_LINE_LIST_ITEM -> TwoLineItemComponentViewHolder(parent)
                 Component.SECTION_DIVIDER -> DividerComponentViewHolder(parent)
-                Component.CARD -> CardComponentViewHolder(parent, isDarkTheme)
+                Component.CARD -> CardComponentViewHolder(parent, isDarkTheme, variant)
                 Component.SETTINGS_LIST_ITEM -> SettingsListItemComponentViewHolder(parent)
                 else -> {
                     TODO()

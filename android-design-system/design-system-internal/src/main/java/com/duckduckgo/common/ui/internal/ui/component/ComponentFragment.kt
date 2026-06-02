@@ -52,8 +52,9 @@ abstract class ComponentFragment : Fragment() {
         super.onViewCreated(view, savedInstanceBundle)
 
         val isDarkTheme = runBlocking { appComponentsViewModel.themeFlow.first() } == AppTheme.DARK
+        val variant = runBlocking { appComponentsViewModel.variantFlow.first() }
         val recyclerView: RecyclerView = view.findViewById(R.id.recycler_view)
-        val adapter = ComponentAdapter(isDarkTheme = isDarkTheme)
+        val adapter = ComponentAdapter(isDarkTheme = isDarkTheme, variant = variant)
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
         recyclerView.adapter = adapter
         adapter.submitList(getComponents())
