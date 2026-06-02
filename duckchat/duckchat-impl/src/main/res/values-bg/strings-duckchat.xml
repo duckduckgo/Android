@@ -138,6 +138,12 @@
     <string name="duck_ai_chat_history_search_close_content_description">Затваряне на търсенето</string>
     <string name="duck_ai_chat_history_search_clear_content_description">Изчистване на търсенето</string>
     <string name="duck_ai_chat_history_action_fire_content_description">Изтриване на чатовете</string>
+    <string name="duck_ai_chat_history_action_new">Нов</string>
+    <string name="duck_ai_chat_history_action_download_selected_content_description">Изтегляне на чатове</string>
+    <plurals name="duck_ai_chat_history_bulk_download_complete">
+        <item quantity="one">Завършено изтегляне на %1$d чат</item>
+        <item quantity="other">Завършено изтегляне на %1$d чата</item>
+    </plurals>
     <string name="duck_ai_chat_history_action_overflow_content_description">Отваряне на менюто с допълнителни опции</string>
     <string name="duck_ai_chat_history_select_all">Избиране на всички</string>
     <string name="duck_ai_chat_history_unselect_all">Отказ от избора на всички</string>
@@ -155,4 +161,5 @@
     <string name="duck_ai_chat_history_download_complete" instruction="%1$s is the saved chat filename (e.g. \&apos;My Chat.txt\&apos;).">Завършено изтегляне на %1$s</string>
     <string name="duck_ai_chat_history_download_view">Показване</string>
     <string name="duck_ai_chat_history_download_error">Неуспешно експортиране на чата</string>
+    <string name="duck_ai_chat_history_bulk_download_error">Неуспешно експортиране на чатове</string>
 </resources>
