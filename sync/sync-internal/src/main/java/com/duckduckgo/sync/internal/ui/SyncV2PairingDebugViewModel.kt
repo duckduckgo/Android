@@ -494,6 +494,12 @@ class SyncV2PairingDebugViewModel @Inject constructor(
             message = "Peer reported the same user_id — devices are already paired. No action taken.",
             isSuccess = false,
         )
+        ExchangeV2State.Aborted -> TerminalReached(
+            state = event.to,
+            title = "✗ Negotiation aborted",
+            message = "Received an unexpected hello during negotiation (duplicate or double-scan). Channel closed.",
+            isSuccess = false,
+        )
         else -> null
     }
 
@@ -592,6 +598,7 @@ class SyncV2PairingDebugViewModel @Inject constructor(
         ExchangeV2State.Bootstrapped -> "Bootstrapped"
         ExchangeV2State.Negotiating -> "Negotiating"
         ExchangeV2State.SameAccountAbort -> "SameAccountAbort"
+        ExchangeV2State.Aborted -> "Aborted"
         ExchangeV2State.Host.Confirming -> "Host.Confirming"
         ExchangeV2State.Host.Sending -> "Host.Sending"
         ExchangeV2State.Host.Aborted -> "Host.Aborted"
