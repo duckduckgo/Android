@@ -258,6 +258,7 @@ internal fun defaultDarkColors(): DuckDuckGoColors = DuckDuckGoColors(
 )
 
 @Composable
+@ReadOnlyComposable
 internal fun onboardingLightColors(): DuckDuckGoColors {
     val base = defaultLightColors()
     val onboardingTextPrimary = Color(0xF5242323)
@@ -289,6 +290,7 @@ internal fun onboardingLightColors(): DuckDuckGoColors {
 }
 
 @Composable
+@ReadOnlyComposable
 internal fun onboardingDarkColors(): DuckDuckGoColors {
     val base = defaultDarkColors()
     return base.copy(
