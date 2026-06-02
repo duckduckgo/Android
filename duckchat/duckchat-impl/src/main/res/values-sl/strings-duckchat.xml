@@ -138,6 +138,14 @@
     <string name="duck_ai_chat_history_search_close_content_description">Zapri iskanje</string>
     <string name="duck_ai_chat_history_search_clear_content_description">Počisti iskanje</string>
     <string name="duck_ai_chat_history_action_fire_content_description">Izbriši klepete</string>
+    <string name="duck_ai_chat_history_action_new">Novo</string>
+    <string name="duck_ai_chat_history_action_download_selected_content_description">Prenesi klepete</string>
+    <plurals name="duck_ai_chat_history_bulk_download_complete">
+        <item quantity="one">Prenos je končan za %1$d klepet</item>
+        <item quantity="two">Prenos je končan za %1$d klepeta</item>
+        <item quantity="few">Prenos je končan za %1$d klepete</item>
+        <item quantity="other">Prenos je končan za %1$d klepetov</item>
+    </plurals>
     <string name="duck_ai_chat_history_action_overflow_content_description">Odpri dodatni meni</string>
     <string name="duck_ai_chat_history_select_all">Izberi vse</string>
     <string name="duck_ai_chat_history_unselect_all">Odstrani vse izbire</string>
@@ -155,4 +163,5 @@
     <string name="duck_ai_chat_history_download_complete" instruction="%1$s is the saved chat filename (e.g. \&apos;My Chat.txt\&apos;).">Prenos za %1$s je končan</string>
     <string name="duck_ai_chat_history_download_view">Prikaži</string>
     <string name="duck_ai_chat_history_download_error">Klepeta ni bilo mogoče izvoziti</string>
+    <string name="duck_ai_chat_history_bulk_download_error">Klepetov ni bilo mogoče izvoziti</string>
 </resources>
