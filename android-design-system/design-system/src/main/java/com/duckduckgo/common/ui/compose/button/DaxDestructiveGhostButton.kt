@@ -29,10 +29,6 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewParameter
-import com.duckduckgo.common.ui.compose.theme.AlertRedOnDarkDefault18
-import com.duckduckgo.common.ui.compose.theme.AlertRedOnDarkTextPressed
-import com.duckduckgo.common.ui.compose.theme.AlertRedOnLightDefault18
-import com.duckduckgo.common.ui.compose.theme.AlertRedOnLightTextPressed
 import com.duckduckgo.common.ui.compose.theme.DuckDuckGoTheme
 import com.duckduckgo.common.ui.compose.tools.PreviewBox
 import com.duckduckgo.mobile.android.R
@@ -80,21 +76,13 @@ private object DaxDestructiveGhostButtonDefaults {
         @Composable @ReadOnlyComposable get() = Color.Transparent
 
     val adsColorButtonGhostContainerPressed: Color
-        @Composable @ReadOnlyComposable get() = if (DuckDuckGoTheme.colors.isDark) {
-            AlertRedOnDarkDefault18
-        } else {
-            AlertRedOnLightDefault18
-        }
+        @Composable @ReadOnlyComposable get() = DuckDuckGoTheme.colors.button.destructiveGhostContainerPressed
 
     val adsColorButtonGhostText: Color
         @Composable @ReadOnlyComposable get() = DuckDuckGoTheme.colors.status.criticalPrimary
 
     val adsColorButtonGhostTextPressed: Color
-        @Composable @ReadOnlyComposable get() = if (DuckDuckGoTheme.colors.isDark) {
-            AlertRedOnDarkTextPressed
-        } else {
-            AlertRedOnLightTextPressed
-        }
+        @Composable @ReadOnlyComposable get() = DuckDuckGoTheme.colors.button.destructiveGhostTextPressed
 
     val adsColorButtonGhostDisabled: Color
         @Composable @ReadOnlyComposable get() = DuckDuckGoTheme.textColors.disabled
