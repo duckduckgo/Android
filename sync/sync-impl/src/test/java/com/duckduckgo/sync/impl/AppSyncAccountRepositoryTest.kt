@@ -150,6 +150,7 @@ class AppSyncAccountRepositoryTest {
             thirdPartyCredentialManager = thirdPartyCredentialManager,
             protectedKeyManager = protectedKeyManager,
         )
+        (syncRepo as AppSyncAccountRepository).upgradeRetryDelayMillis = 0L // keep retry-path tests instant
 
         // passthrough by default (no modifications)
         whenever(syncCodeUrlWrapper.wrapCodeInUrl(any())).thenAnswer { it.arguments[0] as String }
@@ -1254,8 +1255,11 @@ class AppSyncAccountRepositoryTest {
         val result = syncRepo.joinAccountFromThirdPartyRecoveryCode(pastedCode)
 
         assertTrue(result is Error)
-        // Any non-401 error on Step 7a also blocks the atomic commit. The user is left without
-        // a stored ddg token — safer than persisting a half-valid state.
+        // Persistent non-401: retried MAX_UPGRADE_RETRIES times (4 total attempts) then aborted.
+        verify(
+            syncApi,
+            times(AppSyncAccountRepository.MAX_UPGRADE_RETRIES + 1),
+        ).login(eq(userId), any(), eq(deviceId), any(), any(), eq<String?>(null))
         verify(syncStore, times(0)).storeCredentials(any(), any(), any(), any(), any(), any())
     }
 
@@ -1275,8 +1279,100 @@ class AppSyncAccountRepositoryTest {
         verify(syncStore, times(0)).storeCredentials(any(), any(), any(), any(), any(), any())
     }
 
+    @Test
+    fun whenStep7PostRateLimitedThenRetriesAndSucceeds() {
+        val pastedCode = prepareForJoinAccountFromThirdPartyRecoveryCode()
+        whenever(syncApi.createAccessCredential(anyString(), eq("ddg"), any()))
+            .thenReturn(Error(code = API_CODE.TOO_MANY_REQUESTS_2.code, reason = "rate limited"), Success(true))
+
+        val result = syncRepo.joinAccountFromThirdPartyRecoveryCode(pastedCode)
+
+        assertEquals(Success(true), result)
+        verify(syncApi, times(2)).createAccessCredential(anyString(), eq("ddg"), any())
+    }
+
+    @Test
+    fun whenStep7aLoginServerErrorThenRetriesAndSucceeds() {
+        val pastedCode = prepareForJoinAccountFromThirdPartyRecoveryCode()
+        whenever(syncApi.login(eq(userId), any(), eq(deviceId), any(), any(), eq<String?>(null)))
+            .thenReturn(step7aLoginServerError, step7aLoginSuccess)
+
+        val result = syncRepo.joinAccountFromThirdPartyRecoveryCode(pastedCode)
+
+        assertEquals(Success(true), result)
+        verify(syncApi, times(2)).login(eq(userId), any(), eq(deviceId), any(), any(), eq<String?>(null))
+        verify(syncStore).storeCredentials(
+            userId = userId,
+            deviceId = deviceId,
+            deviceName = deviceName,
+            primaryKey = primaryKey,
+            secretKey = secretKey,
+            token = "ddg_token_step7a",
+        )
+    }
+
+    @Test
+    fun whenStep7aLoginTransportErrorThenRetriesAndSucceeds() {
+        val pastedCode = prepareForJoinAccountFromThirdPartyRecoveryCode()
+        whenever(syncApi.login(eq(userId), any(), eq(deviceId), any(), any(), eq<String?>(null)))
+            .thenReturn(step7aLoginTransportError, step7aLoginSuccess)
+
+        val result = syncRepo.joinAccountFromThirdPartyRecoveryCode(pastedCode)
+
+        assertEquals(Success(true), result)
+        verify(syncApi, times(2)).login(eq(userId), any(), eq(deviceId), any(), any(), eq<String?>(null))
+    }
+
+    @Test
+    fun whenStep7aLogin401ThenAbortsWithoutRetry() {
+        val pastedCode = prepareForJoinAccountFromThirdPartyRecoveryCode(step7aResult = step7aLoginUnauthorized)
+
+        val result = syncRepo.joinAccountFromThirdPartyRecoveryCode(pastedCode)
+
+        assertTrue(result is Error)
+        verify(syncApi, times(1)).login(eq(userId), any(), eq(deviceId), any(), any(), eq<String?>(null))
+        verify(syncStore, times(0)).storeCredentials(any(), any(), any(), any(), any(), any())
+    }
+
+    @Test
+    fun whenStep7Post409AlreadyExistsThenAbortsWithoutRetry() {
+        val pastedCode = prepareForJoinAccountFromThirdPartyRecoveryCode()
+        whenever(syncApi.createAccessCredential(anyString(), eq("ddg"), any()))
+            .thenReturn(Error(code = API_CODE.COUNT_LIMIT.code, reason = "already exists"))
+
+        val result = syncRepo.joinAccountFromThirdPartyRecoveryCode(pastedCode)
+
+        assertTrue(result is Error)
+        assertEquals(AccountErrorCodes.THIRD_PARTY_ALREADY_UPGRADED.code, (result as Error).code)
+        verify(syncApi, times(1)).createAccessCredential(anyString(), eq("ddg"), any())
+    }
+
+    @Test
+    fun whenStep7PostRateLimitedBeyondRetryLimitThenAbortsWithoutStore() {
+        val pastedCode = prepareForJoinAccountFromThirdPartyRecoveryCode()
+        whenever(syncApi.createAccessCredential(anyString(), eq("ddg"), any()))
+            .thenReturn(Error(code = API_CODE.TOO_MANY_REQUESTS_1.code, reason = "rate limited"))
+
+        val result = syncRepo.joinAccountFromThirdPartyRecoveryCode(pastedCode)
+
+        assertTrue(result is Error)
+        verify(syncApi, times(AppSyncAccountRepository.MAX_UPGRADE_RETRIES + 1))
+            .createAccessCredential(anyString(), eq("ddg"), any())
+        verify(syncStore, times(0)).storeCredentials(any(), any(), any(), any(), any(), any())
+    }
+
     private val step7aLoginUnauthorized = Error(code = API_CODE.INVALID_LOGIN_CREDENTIALS.code, reason = "invalid credentials")
     private val step7aLoginServerError = Error(code = 500, reason = "server error")
+    private val step7aLoginTransportError = Error(code = AccountErrorCodes.GENERIC_ERROR.code, reason = "timeout")
+    private val step7aLoginSuccess = Success(
+        LoginResponse(
+            token = "ddg_token_step7a",
+            protected_encryption_key = null,
+            devices = emptyList(),
+            accessCredentials = null,
+            keys = null,
+        ),
+    )
 
     private fun prepareForJoinAccountFromThirdPartyRecoveryCode(
         accountAlreadyHasDdg: Boolean = false,

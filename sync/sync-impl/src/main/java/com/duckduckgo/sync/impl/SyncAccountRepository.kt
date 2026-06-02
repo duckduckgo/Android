@@ -180,6 +180,9 @@ class AppSyncAccountRepository @Inject constructor(
     private val protectedKeyManager: ProtectedKeyManager,
 ) : SyncAccountRepository {
 
+    // Bounded backoff for the 3party→ddg upgrade network calls. `internal` so tests set it to 0.
+    internal var upgradeRetryDelayMillis: Long = DEFAULT_UPGRADE_RETRY_DELAY_MILLIS
+
     /**
      * If there is a key-exchange flow in progress, we need to keep a reference to them
      * There are separate device details for the inviter and the receiver
@@ -831,7 +834,9 @@ class AppSyncAccountRepository @Inject constructor(
         // Step 6 — POST /access-credentials/ddg. If interrupted mid-flight, the BE's 5-minute TTL
         // on newly-minted credentials cleans up the orphan automatically (Unified Algorithm,
         // Backend-supported Alternative). No client-side reconcile needed.
-        val postResult = syncApi.createAccessCredential(loginResponse.token, CREDENTIAL_ID_DDG, upgradePackage.request)
+        val postResult = retryingOnTransientError {
+            syncApi.createAccessCredential(loginResponse.token, CREDENTIAL_ID_DDG, upgradePackage.request)
+        }
         if (postResult is Error) {
             if (postResult.code == API_CODE.COUNT_LIMIT.code) {
                 // 409 credential_already_exists: either another device beat us to creating a ddg
@@ -1232,14 +1237,16 @@ class AppSyncAccountRepository @Inject constructor(
             }.encryptedData
         }.getOrElse { return it.asErrorResult() }
 
-        return syncApi.login(
-            userID = userId,
-            hashedPassword = hashedPassword,
-            deviceId = deviceId,
-            deviceName = encryptedDeviceName,
-            deviceType = encryptedDeviceType,
-            scope = null,
-        )
+        return retryingOnTransientError {
+            syncApi.login(
+                userID = userId,
+                hashedPassword = hashedPassword,
+                deviceId = deviceId,
+                deviceName = encryptedDeviceName,
+                deviceType = encryptedDeviceType,
+                scope = null,
+            )
+        }
     }
 
     private fun performLogin(
@@ -1383,6 +1390,41 @@ class AppSyncAccountRepository @Inject constructor(
     private fun Error.alsoFireAlreadySignedInErrorPixel(): Error {
         syncPixels.fireSyncAccountErrorPixel(this, SyncAccountOperation.USER_SIGNED_IN)
         return this
+    }
+
+    /**
+     * Retry an idempotent upgrade network call on transient failure. Per Unified Algorithm
+     * 1214739740392701 §"Native only - Upgrading 3party account" steps 7-8 (conservative reading):
+     * retry rate-limit (418/429), 5xx, and transport/IO failures (Result.Error.code == -1, the
+     * code-less transport catch in SyncServiceRemote). Terminal — returned unchanged — are 401
+     * (INVALID_LOGIN_CREDENTIALS), 409 (COUNT_LIMIT / already upgraded) and other 4xx. We retry the
+     * call itself rather than re-running the subroutine "from step 2": the 409 detection plus the
+     * BE's 5-minute credential TTL make the two equivalent for the duplicate/partial-success case.
+     */
+    private fun <T> retryingOnTransientError(block: () -> Result<T>): Result<T> {
+        var attempt = 0
+        while (true) {
+            val result = block()
+            val code = (result as? Error)?.code
+            if (code != null && isRetryableTransient(code) && attempt < MAX_UPGRADE_RETRIES) {
+                attempt++
+                logcat { "Sync-ScopedToken: upgrade call transient error (code=$code); retry $attempt/$MAX_UPGRADE_RETRIES" }
+                runCatching { Thread.sleep(upgradeRetryDelayMillis * attempt) }
+                continue
+            }
+            return result
+        }
+    }
+
+    private fun isRetryableTransient(code: Int): Boolean =
+        code == API_CODE.TOO_MANY_REQUESTS_1.code || // 429
+            code == API_CODE.TOO_MANY_REQUESTS_2.code || // 418
+            code in 500..599 || // server errors
+            code == AccountErrorCodes.GENERIC_ERROR.code // -1 == transport/IO exception in this context
+
+    companion object {
+        const val MAX_UPGRADE_RETRIES = 3
+        private const val DEFAULT_UPGRADE_RETRY_DELAY_MILLIS = 1_000L
     }
 
     private class Adapters {
