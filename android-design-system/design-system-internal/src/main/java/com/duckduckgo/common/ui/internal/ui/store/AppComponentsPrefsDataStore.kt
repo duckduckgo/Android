@@ -23,6 +23,7 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import com.duckduckgo.common.ui.DuckDuckGoTheme
+import com.duckduckgo.common.ui.compose.theme.DuckDuckGoThemeVariant
 import com.duckduckgo.common.ui.isInNightMode
 import com.duckduckgo.common.ui.store.ThemingSharedPreferences
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -63,7 +64,22 @@ class AppComponentsPrefsDataStore(
         }
     }
 
+    val variantFlow: Flow<DuckDuckGoThemeVariant> = store.data.map { preferences ->
+        val savedValue = preferences[stringPreferencesKey(KEY_SELECTED_VARIANT)]
+        runCatching { DuckDuckGoThemeVariant.valueOf(savedValue ?: "") }
+            .getOrDefault(DuckDuckGoThemeVariant.Default)
+    }.flowOn(dispatcherProvider.io())
+
+    suspend fun setVariant(variant: DuckDuckGoThemeVariant) {
+        withContext(dispatcherProvider.io()) {
+            store.edit { preferences ->
+                preferences[stringPreferencesKey(KEY_SELECTED_VARIANT)] = variant.name
+            }
+        }
+    }
+
     companion object {
         const val KEY_SELECTED_THEME = "KEY_SELECTED_THEME"
+        const val KEY_SELECTED_VARIANT = "KEY_SELECTED_VARIANT"
     }
 }
