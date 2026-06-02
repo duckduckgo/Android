@@ -173,11 +173,6 @@ interface DuckChatInternal : DuckChat {
      */
     fun openNewDuckChatSession()
 
-    /**
-     * Opens Duck.ai with [chatId] pre-loaded.
-     */
-    fun openWithChatId(chatId: String)
-
     /** Single source of truth for the Duck.ai chat URL shape. */
     fun buildChatUrl(chatId: String): String
 
@@ -814,10 +809,6 @@ class RealDuckChat @Inject constructor(
         isEnabled() &&
             duckChatFeature.useNativeStorageChatData().isEnabled() &&
             duckChatFeature.historyScreen().isEnabled()
-    }
-
-    override fun openWithChatId(chatId: String) {
-        openDuckChat(parameters = mapOf(CHAT_ID_QUERY_NAME to chatId), forceNewSession = true)
     }
 
     override fun buildChatUrl(chatId: String): String {
