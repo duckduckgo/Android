@@ -18,6 +18,7 @@ package com.duckduckgo.browser.ui.browsermenu
 
 import android.app.Application
 import android.view.View
+import android.view.ViewGroup
 import android.widget.TextView
 import androidx.core.view.isVisible
 import androidx.test.core.app.ApplicationProvider
@@ -274,7 +275,144 @@ class BrowserMenuBottomSheetTest {
         assertEquals(expectedHeight, dialog.computePeekHeight())
     }
 
+    @Test
+    fun whenRenderBrowserMenuWithDuckAiSectionEnabledThenSectionAndItemsAreVisible() {
+        dialog.placeDuckAiSection(atTop = false)
+
+        dialog.render(
+            BrowserMenuViewState.Browser(
+                showDuckAiSection = true,
+                showDuckChatVoiceOption = true,
+                showDuckChatHistoryOption = true,
+            ),
+        )
+
+        assertTrue(duckAiSection.isVisible)
+        assertTrue(dialog.duckAiNewChatMenuItem.isVisible)
+        assertTrue(dialog.duckAiNewVoiceChatMenuItem.isVisible)
+        assertTrue(dialog.duckChatHistoryMenuItem.isVisible)
+    }
+
+    @Test
+    fun whenRenderBrowserMenuWithDuckAiSectionDisabledThenSectionIsHidden() {
+        dialog.placeDuckAiSection(atTop = false)
+
+        dialog.render(BrowserMenuViewState.Browser(showDuckAiSection = false))
+
+        assertFalse(duckAiSection.isVisible)
+    }
+
+    @Test
+    fun whenRenderBrowserMenuWithVoiceChatDisabledThenOnlyVoiceChatItemIsHidden() {
+        dialog.placeDuckAiSection(atTop = false)
+
+        dialog.render(
+            BrowserMenuViewState.Browser(
+                showDuckAiSection = true,
+                showDuckChatVoiceOption = false,
+                showDuckChatHistoryOption = true,
+            ),
+        )
+
+        assertTrue(dialog.duckAiNewChatMenuItem.isVisible)
+        assertFalse(dialog.duckAiNewVoiceChatMenuItem.isVisible)
+        assertTrue(dialog.duckChatHistoryMenuItem.isVisible)
+    }
+
+    @Test
+    fun whenRenderBrowserMenuWithChatHistoryUnavailableThenOnlyChatsItemIsHidden() {
+        dialog.placeDuckAiSection(atTop = false)
+
+        dialog.render(
+            BrowserMenuViewState.Browser(
+                showDuckAiSection = true,
+                showDuckChatVoiceOption = true,
+                showDuckChatHistoryOption = false,
+            ),
+        )
+
+        assertTrue(dialog.duckAiNewChatMenuItem.isVisible)
+        assertTrue(dialog.duckAiNewVoiceChatMenuItem.isVisible)
+        assertFalse(dialog.duckChatHistoryMenuItem.isVisible)
+    }
+
+    @Test
+    fun whenRenderNewTabPageMenuWithDuckAiSectionEnabledThenSectionAndItemsAreVisible() {
+        dialog.placeDuckAiSection(atTop = false)
+
+        dialog.render(
+            BrowserMenuViewState.NewTabPage(
+                showDuckAiSection = true,
+                showDuckChatVoiceOption = true,
+                showDuckChatHistoryOption = true,
+            ),
+        )
+
+        assertTrue(duckAiSection.isVisible)
+        assertTrue(dialog.duckAiNewChatMenuItem.isVisible)
+        assertTrue(dialog.duckAiNewVoiceChatMenuItem.isVisible)
+        assertTrue(dialog.duckChatHistoryMenuItem.isVisible)
+    }
+
+    @Test
+    fun whenRenderDuckAiMenuWithDuckAiSectionEnabledThenSectionAndItemsAreVisible() {
+        dialog.placeDuckAiSection(atTop = true)
+
+        dialog.render(
+            BrowserMenuViewState.DuckAi(
+                showDuckAiSection = true,
+                showDuckChatVoiceOption = true,
+                showDuckChatHistoryOption = true,
+                pageContextHeader = PageContextHeaderState.DuckAi(title = null, tabId = "tab1"),
+            ),
+        )
+
+        assertTrue(duckAiSection.isVisible)
+        assertTrue(dialog.duckAiNewChatMenuItem.isVisible)
+        assertTrue(dialog.duckAiNewVoiceChatMenuItem.isVisible)
+        assertTrue(dialog.duckChatHistoryMenuItem.isVisible)
+    }
+
+    @Test
+    fun whenRenderCustomTabsMenuThenDuckAiSectionIsHiddenEvenIfPlaced() {
+        dialog.placeDuckAiSection(atTop = false)
+
+        dialog.render(BrowserMenuViewState.CustomTabs())
+
+        assertFalse(duckAiSection.isVisible)
+    }
+
+    @Test
+    fun whenPlaceDuckAiSectionAtTopThenInsertedBelowActionRowAndAboveUrlPageActionsDivider() {
+        dialog.placeDuckAiSection(atTop = true)
+
+        val sectionIndex = menuItemsContainer.indexOfChild(menuItemsContainer.findViewById(R.id.duckAiMenuSection))
+        val actionRowIndex = menuItemsContainer.indexOfChild(menuItemsContainer.findViewById(R.id.menuActionItemsContainer))
+        val urlActionsDividerIndex = menuItemsContainer.indexOfChild(menuItemsContainer.findViewById(R.id.urlPageActionsSectionDivider))
+
+        assertTrue(sectionIndex > actionRowIndex)
+        assertTrue(sectionIndex < urlActionsDividerIndex)
+    }
+
+    @Test
+    fun whenPlaceDuckAiSectionBelowLibraryThenInsertedBetweenLibraryAndPrivacyDividers() {
+        dialog.placeDuckAiSection(atTop = false)
+
+        val sectionIndex = menuItemsContainer.indexOfChild(menuItemsContainer.findViewById(R.id.duckAiMenuSection))
+        val libraryDividerIndex = menuItemsContainer.indexOfChild(menuItemsContainer.findViewById(R.id.librarySectionDivider))
+        val privacyDividerIndex = menuItemsContainer.indexOfChild(menuItemsContainer.findViewById(R.id.privacyToolsSectionDivider))
+
+        assertTrue(sectionIndex > libraryDividerIndex)
+        assertTrue(sectionIndex < privacyDividerIndex)
+    }
+
     // region Helpers
+
+    private val duckAiSection: View
+        get() = dialog.window!!.decorView.findViewById(R.id.duckAiMenuSection)
+
+    private val menuItemsContainer: ViewGroup
+        get() = dialog.window!!.decorView.findViewById(R.id.menuItemsContainer)
 
     private val menuHeader: View
         get() = dialog.window!!.decorView.findViewById(R.id.menuHeader)

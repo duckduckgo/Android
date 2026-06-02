@@ -28,6 +28,7 @@ import com.bumptech.glide.Glide
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.browser.ui.R
 import com.duckduckgo.browser.ui.databinding.BottomSheetBrowserMenuBinding
+import com.duckduckgo.browser.ui.databinding.ViewBrowserMenuDuckaiSectionBinding
 import com.duckduckgo.common.ui.setRoundCorners
 import com.duckduckgo.common.ui.view.MenuActionButtonView
 import com.duckduckgo.common.ui.view.MenuItemView
@@ -47,6 +48,11 @@ class BrowserMenuBottomSheet(
     private val onMenuItemClickListener: () -> Unit,
 ) : BottomSheetDialog(context) {
     private val binding = BottomSheetBrowserMenuBinding.inflate(LayoutInflater.from(context))
+
+    // Duck.ai menu section, inflated once and inserted at the position decided on open (see placeDuckAiSection).
+    private val duckAiSectionBinding by lazy {
+        ViewBrowserMenuDuckaiSectionBinding.inflate(LayoutInflater.from(context), binding.menuItemsContainer, false)
+    }
 
     init {
         setContentView(binding.root)
@@ -132,8 +138,14 @@ class BrowserMenuBottomSheet(
     val downloadsMenuItem: MenuItemView
         get() = binding.downloadsMenuItem
 
+    val duckAiNewChatMenuItem: MenuItemView
+        get() = duckAiSectionBinding.duckAiNewChatMenuItem
+
+    val duckAiNewVoiceChatMenuItem: MenuItemView
+        get() = duckAiSectionBinding.duckAiNewVoiceChatMenuItem
+
     val duckChatHistoryMenuItem: MenuItemView
-        get() = binding.duckChatHistoryMenuItem
+        get() = duckAiSectionBinding.duckAiChatsMenuItem
 
     val duckChatSettingsMenuItem: MenuItemView
         get() = binding.chatSettings
@@ -177,6 +189,17 @@ class BrowserMenuBottomSheet(
             is BrowserMenuViewState.CustomTabs -> renderCustomTabsMenu(viewState)
             is BrowserMenuViewState.DuckAi -> renderDuckAiMenu(viewState)
         }
+    }
+
+    /**
+     * Inserts the Duck.ai section once, at the position decided when the menu is opened: at the top
+     * (above the other sections) when [atTop] is true, otherwise below the library section. Visibility
+     * of the section and its items is still controlled per-render via [renderDuckAiSection].
+     */
+    fun placeDuckAiSection(atTop: Boolean) {
+        if (duckAiSectionBinding.root.parent != null) return
+        val anchor = if (atTop) binding.urlPageActionsSectionDivider else binding.privacyToolsSectionDivider
+        menuItemsContainer.addView(duckAiSectionBinding.root, menuItemsContainer.indexOfChild(anchor))
     }
 
     fun onMenuItemClicked(view: View, onClick: () -> Unit) {
@@ -245,7 +268,11 @@ class BrowserMenuBottomSheet(
         )
         fireproofWebsiteMenuItem.label(fireproofLabel)
         fireproofWebsiteMenuItem.setIcon(if (viewState.isFireproofWebsite) drawable.ic_fireproof_solid_24 else drawable.ic_fireproof_24)
-        duckChatHistoryMenuItem.isVisible = viewState.showDuckChatHistoryOption
+        renderDuckAiSection(
+            showSection = viewState.showDuckAiSection,
+            showVoiceChat = viewState.showDuckChatVoiceOption,
+            showChatHistory = viewState.showDuckChatHistoryOption,
+        )
 
         createAliasMenuItem.isVisible = viewState.isEmailSignedIn
 
@@ -310,7 +337,11 @@ class BrowserMenuBottomSheet(
         autofillMenuItem.isVisible = viewState.showAutofill
         downloadsMenuItem.isVisible = true
         downloadsMenuItem.showDotIndicator = viewState.showDownloadDot
-        duckChatHistoryMenuItem.isVisible = viewState.showDuckChatHistoryOption
+        renderDuckAiSection(
+            showSection = viewState.showDuckAiSection,
+            showVoiceChat = viewState.showDuckChatVoiceOption,
+            showChatHistory = viewState.showDuckChatHistoryOption,
+        )
         renderVpnMenu(viewState.vpnMenuState)
         createAliasMenuItem.isVisible = viewState.isEmailSignedIn
 
@@ -389,7 +420,11 @@ class BrowserMenuBottomSheet(
         downloadsMenuItem.showDotIndicator = viewState.showDownloadDot
         renderPageContextHeader(viewState.pageContextHeader)
 
-        duckChatHistoryMenuItem.isVisible = true
+        renderDuckAiSection(
+            showSection = viewState.showDuckAiSection,
+            showVoiceChat = viewState.showDuckChatVoiceOption,
+            showChatHistory = viewState.showDuckChatHistoryOption,
+        )
         duckChatSettingsMenuItem.isVisible = true
 
         binding.urlPageActionsSectionDivider.isVisible = true
@@ -397,6 +432,17 @@ class BrowserMenuBottomSheet(
         binding.privacyToolsSectionDivider.isVisible = false
         binding.utilitiesSectionDivider.isVisible = true
         binding.customTabsMenuDivider.isVisible = false
+    }
+
+    private fun renderDuckAiSection(
+        showSection: Boolean,
+        showVoiceChat: Boolean,
+        showChatHistory: Boolean,
+    ) {
+        duckAiSectionBinding.root.isVisible = showSection
+        duckAiNewChatMenuItem.isVisible = true
+        duckAiNewVoiceChatMenuItem.isVisible = showVoiceChat
+        duckChatHistoryMenuItem.isVisible = showChatHistory
     }
 
     private fun renderPageContextHeader(pageContextHeaderState: PageContextHeaderState) {
