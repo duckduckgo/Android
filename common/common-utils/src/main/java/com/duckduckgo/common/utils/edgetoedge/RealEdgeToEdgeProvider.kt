@@ -16,16 +16,39 @@
 
 package com.duckduckgo.common.utils.edgetoedge
 
+import androidx.lifecycle.LifecycleOwner
+import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
+import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @SingleInstanceIn(AppScope::class)
-@ContributesBinding(AppScope::class)
+@ContributesBinding(AppScope::class, boundType = EdgeToEdgeProvider::class)
+@ContributesMultibinding(AppScope::class, boundType = MainProcessLifecycleObserver::class)
 class RealEdgeToEdgeProvider @Inject constructor(
     private val edgeToEdgeFeature: EdgeToEdgeFeature,
-) : EdgeToEdgeProvider {
+    private val dispatchers: DispatcherProvider,
+    @param:AppCoroutineScope private val appScope: CoroutineScope,
+) : EdgeToEdgeProvider, MainProcessLifecycleObserver {
+
+    override fun onCreate(owner: LifecycleOwner) {
+        super.onCreate(owner)
+
+        appScope.launch {
+            withContext(dispatchers.io()) {
+                edgeToEdgeFeature.self().isEnabled()
+                edgeToEdgeFeature.browser().isEnabled()
+                edgeToEdgeFeature.settings().isEnabled()
+            }
+        }
+    }
 
     override fun isEnabled(bucket: EdgeToEdgeBucket): Boolean = if (edgeToEdgeFeature.self().isEnabled()) {
         val bucketToggle = when (bucket) {
