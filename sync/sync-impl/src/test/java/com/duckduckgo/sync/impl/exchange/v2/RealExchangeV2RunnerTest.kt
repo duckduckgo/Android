@@ -189,7 +189,6 @@ class RealExchangeV2RunnerTest {
         whenever(syncStore.userId).thenReturn(null)
         val runner = newRunner()
         runner.startScan("")
-        runner.deliverIncomingMessage(Hello("{}"))
         runner.deliverIncomingMessage(ExchangeV2Message.RecoveryCodeAvailable(rawJson = "{}", userId = "other", name = "Peer", kind = "3party"))
         runner.localTrigger(LocalTrigger.RoleElected(Role.Joiner))
         runner.localTrigger(LocalTrigger.UserConfirmedJoiner)
@@ -260,7 +259,6 @@ class RealExchangeV2RunnerTest {
         whenever(syncStore.userId).thenReturn(null)
         val runner = newRunner()
         runner.startScan("")
-        runner.deliverIncomingMessage(Hello("{}"))
 
         runner.deliverIncomingMessage(
             ExchangeV2Message.RecoveryCodeAvailable(rawJson = "{}", userId = "host-user", name = "Host", kind = "ddg"),
@@ -349,7 +347,6 @@ class RealExchangeV2RunnerTest {
         whenever(syncStore.userId).thenReturn("my-user")
         val runner = newRunner()
         runner.startScan("")
-        runner.deliverIncomingMessage(Hello("{}"))
 
         runner.deliverIncomingMessage(
             ExchangeV2Message.RecoveryCodeAvailable(rawJson = "{}", userId = "peer-user", name = "Peer", kind = "3party"),
@@ -357,6 +354,20 @@ class RealExchangeV2RunnerTest {
 
         // ddg-vs-3party rule wins over Presenter/Scanner — even though we scanned, ddg becomes Host.
         assertSame(ExchangeV2State.Host.Confirming, runner.currentState)
+    }
+
+    @Test fun `Scanner hello during negotiating aborts and tears down the session`() = runTest {
+        whenever(syncStore.userId).thenReturn("my-user")
+        val runner = newRunner()
+        runner.startScan("")
+
+        runner.events.filterIsInstance<ExchangeV2Event.Transition>().test {
+            runner.deliverIncomingMessage(Hello("{}"))
+            val event = awaitItem()
+            assertSame(ExchangeV2State.Aborted, event.to)
+        }
+        // Aborted is terminal → runner clears the session (best-effort channel DELETE).
+        assertNull(runner.currentState)
     }
 
     @Test fun `same-account abort skips auto-election`() = runTest {
@@ -393,7 +404,6 @@ class RealExchangeV2RunnerTest {
         whenever(syncStore.userId).thenReturn("my-user")
         val runner = newRunner()
         runner.startScan("")
-        runner.deliverIncomingMessage(Hello("{}"))
 
         runner.deliverIncomingMessage(
             ExchangeV2Message.RecoveryCodeAvailable(rawJson = "{}", userId = "peer-user", name = "Peer", kind = "ddg"),
