@@ -807,6 +807,7 @@ class RealSubscriptionsManager @Inject constructor(
 
                         StoreLoginResult.Failure.AccountExternalIdMismatch,
                         StoreLoginResult.Failure.PurchaseHistoryNotAvailable,
+                        StoreLoginResult.Failure.NoActivePurchase,
                         StoreLoginResult.Failure.AuthenticationError,
                         -> {
                             tokenRefreshWideEvent.onPlayLoginFailure(
@@ -820,6 +821,7 @@ class RealSubscriptionsManager @Inject constructor(
                         }
 
                         StoreLoginResult.Failure.TokenValidationFailed,
+                        StoreLoginResult.Failure.PurchaseInfoNotAvailable,
                         StoreLoginResult.Failure.UnknownError,
                         -> {
                             tokenRefreshWideEvent.onPlayLoginFailure(
@@ -938,8 +940,8 @@ class RealSubscriptionsManager @Inject constructor(
             val signedPurchase = if (subscriptionsFeature.get().useQueryPurchases().isEnabled()) {
                 when (val result = playBillingManager.getLatestPurchase()) {
                     is LatestPurchaseResult.Present -> SignedPurchase(result.purchase.signature, result.purchase.originalJson)
-                    LatestPurchaseResult.Absent -> return StoreLoginResult.Failure.PurchaseHistoryNotAvailable
-                    LatestPurchaseResult.Unknown -> return StoreLoginResult.Failure.UnknownError
+                    LatestPurchaseResult.Absent -> return StoreLoginResult.Failure.NoActivePurchase
+                    LatestPurchaseResult.Unknown -> return StoreLoginResult.Failure.PurchaseInfoNotAvailable
                 }
             } else {
                 playBillingManager.purchaseHistory.lastOrNull()
@@ -989,8 +991,9 @@ class RealSubscriptionsManager @Inject constructor(
                         }
                     }
 
-                    is StoreLoginResult.Failure -> {
-                        RecoverSubscriptionResult.Failure(message = "Store login error: ${storeLoginResult.javaClass.simpleName}")
+                    is StoreLoginResult.Failure -> when (storeLoginResult) {
+                        StoreLoginResult.Failure.NoActivePurchase -> RecoverSubscriptionResult.Failure(SUBSCRIPTION_NOT_FOUND_ERROR)
+                        else -> RecoverSubscriptionResult.Failure(message = "Store login error: ${storeLoginResult.javaClass.simpleName}")
                     }
                 }
             } else {
@@ -1382,6 +1385,8 @@ class RealSubscriptionsManager @Inject constructor(
         data class Success(val tokens: ValidatedTokenPair) : StoreLoginResult()
         sealed class Failure : StoreLoginResult() {
             data object PurchaseHistoryNotAvailable : Failure()
+            data object NoActivePurchase : Failure()
+            data object PurchaseInfoNotAvailable : Failure()
             data object AccountExternalIdMismatch : Failure()
             data object AuthenticationError : Failure()
             data object TokenValidationFailed : Failure()
