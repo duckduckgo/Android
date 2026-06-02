@@ -33,6 +33,9 @@
     <dimen name="modelPickerChipTextSize">13sp</dimen>
     <dimen name="modelPickerMenuElevation">6dp</dimen>
 
+    <!-- Shared width for the native input widget popup menus (options, model picker, attachment) -->
+    <dimen name="nativeInputMenuWidth">260dp</dimen>
+
     <!-- Reasoning Mode Picker -->
     <dimen name="reasoningModePickerMenuWidth">220dp</dimen>
 

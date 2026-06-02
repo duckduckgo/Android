@@ -168,7 +168,7 @@ class OptionsView(context: Context, private val host: NativeInputHost) : LinearL
                 addView(container)
                 isVerticalScrollBarEnabled = false
             },
-            resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.popupMenuWidth),
+            resources.getDimensionPixelSize(R.dimen.nativeInputMenuWidth),
             LayoutParams.WRAP_CONTENT,
             false,
         ).apply {
