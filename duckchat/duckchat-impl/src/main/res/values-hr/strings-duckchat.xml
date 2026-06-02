@@ -138,6 +138,14 @@
     <string name="duck_ai_chat_history_search_close_content_description">Zatvori pretragu</string>
     <string name="duck_ai_chat_history_search_clear_content_description">Izbriši pretragu</string>
     <string name="duck_ai_chat_history_action_fire_content_description">Izbriši čavrljanja</string>
+    <string name="duck_ai_chat_history_action_new">Novo</string>
+    <string name="duck_ai_chat_history_action_download_selected_content_description">Preuzmi čavrljanja</string>
+    <plurals name="duck_ai_chat_history_bulk_download_complete">
+        <item quantity="one">Preuzimanje je dovršeno za %1$d čavrljanje</item>
+        <item quantity="few">Preuzimanje je dovršeno za %1$d čavrljanja</item>
+        <item quantity="many">Preuzimanje je dovršeno za %1$d čavrljanja</item>
+        <item quantity="other">Preuzimanje je dovršeno za %1$d čavrljanja</item>
+    </plurals>
     <string name="duck_ai_chat_history_action_overflow_content_description">Otvori izbornik prelijevanja</string>
     <string name="duck_ai_chat_history_select_all">Odaberi sve</string>
     <string name="duck_ai_chat_history_unselect_all">Odznači sve</string>
@@ -155,4 +163,5 @@
     <string name="duck_ai_chat_history_download_complete" instruction="%1$s is the saved chat filename (e.g. \&apos;My Chat.txt\&apos;).">Završeno je preuzimanje datoteke %1$s</string>
     <string name="duck_ai_chat_history_download_view">Prikaži</string>
     <string name="duck_ai_chat_history_download_error">Izvoz čavrljanja nije moguć</string>
+    <string name="duck_ai_chat_history_bulk_download_error">Izvoz čavrljanja nije uspio</string>
 </resources>
