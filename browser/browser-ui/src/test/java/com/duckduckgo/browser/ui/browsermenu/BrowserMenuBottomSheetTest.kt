@@ -228,7 +228,7 @@ class BrowserMenuBottomSheetTest {
         assertTrue(dialog.backMenuItem.isVisible)
         assertTrue(dialog.forwardMenuItem.isVisible)
         assertTrue(dialog.newTabMenuItem.isVisible)
-        assertTrue(dialog.newDuckChatTabMenuItem.isVisible)
+        assertFalse(dialog.newDuckChatTabMenuItem.isVisible)
         assertTrue(dialog.settingsMenuItem.isVisible)
         assertTrue(dialog.refreshMenuItem.isVisible)
         assertFalse(dialog.refreshActionMenuItem.isVisible)

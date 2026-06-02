@@ -406,8 +406,7 @@ class BrowserMenuBottomSheet(
     private fun renderDuckAiMenu(viewState: BrowserMenuViewState.DuckAi) {
         forwardMenuItem.isEnabled = false
         newTabMenuItem.isEnabled = true
-        newDuckChatTabMenuItem.isEnabled = true
-        newDuckChatTabMenuItem.isVisible = true
+        newDuckChatTabMenuItem.isVisible = false
         newDuckChatMenuItem.isEnabled = false
         newDuckChatMenuItem.isVisible = false
         settingsMenuItem.isEnabled = true

@@ -93,8 +93,8 @@
                     android:layout_marginStart="@dimen/keyline_1"
                     android:layout_marginEnd="@dimen/keyline_1"
                     android:visibility="gone"
-                    app:menuActionLabel="@string/browserMenuNewChat"
-                    app:menuActionSrc="@drawable/ic_ai_chat_add_24" />
+                    app:menuActionLabel="@string/browserMenuDuckChat"
+                    app:menuActionSrc="@drawable/ic_duck_ai_menu_log_24" />
 
                 <com.duckduckgo.common.ui.view.MenuActionButtonView
                     android:id="@+id/newDuckChatMenuItem"
@@ -104,7 +104,7 @@
                     android:layout_marginStart="@dimen/keyline_1"
                     android:layout_marginEnd="@dimen/keyline_1"
                     app:menuActionLabel="@string/browserMenuDuckChat"
-                    app:menuActionSrc="@drawable/ic_ai_chat_add_24" />
+                    app:menuActionSrc="@drawable/ic_duck_ai_menu_log_24" />
 
                 <com.duckduckgo.common.ui.view.MenuActionButtonView
                     android:id="@+id/settingsMenuItem"

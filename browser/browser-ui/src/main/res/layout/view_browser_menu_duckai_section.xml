@@ -40,7 +40,7 @@
         android:id="@+id/duckAiNewVoiceChatMenuItem"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:iconDrawable="@drawable/ic_ai_chat_voice_24"
+        app:iconDrawable="@drawable/ic_ai_chat_voice_menu_24"
         app:menuSize="medium"
         app:primaryText="@string/chatMenuPopupNewVoiceChat" />
 
