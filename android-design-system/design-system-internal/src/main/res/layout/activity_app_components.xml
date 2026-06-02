@@ -64,6 +64,33 @@
                     app:primaryText="Enable Dark Theme"
                     app:showSwitch="true"/>
 
+                <com.duckduckgo.common.ui.view.text.DaxTextView
+                    app:typography="h5"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/keyline_4"
+                    android:text="Theme family" />
+
+                <RadioGroup
+                    android:id="@+id/theme_variant_group"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <RadioButton
+                        android:id="@+id/radio_theme_default"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Default" />
+
+                    <RadioButton
+                        android:id="@+id/radio_theme_onboarding"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Onboarding" />
+
+                </RadioGroup>
+
             </LinearLayout>
 
         </com.google.android.material.appbar.CollapsingToolbarLayout>
