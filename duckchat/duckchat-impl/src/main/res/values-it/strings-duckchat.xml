@@ -138,6 +138,12 @@
     <string name="duck_ai_chat_history_search_close_content_description">Chiudi ricerca</string>
     <string name="duck_ai_chat_history_search_clear_content_description">Cancella ricerca</string>
     <string name="duck_ai_chat_history_action_fire_content_description">Elimina chat</string>
+    <string name="duck_ai_chat_history_action_new">Nuova</string>
+    <string name="duck_ai_chat_history_action_download_selected_content_description">Scarica le chat</string>
+    <plurals name="duck_ai_chat_history_bulk_download_complete">
+        <item quantity="one">Download completato per %1$d chat</item>
+        <item quantity="other">Download completato per %1$d chat</item>
+    </plurals>
     <string name="duck_ai_chat_history_action_overflow_content_description">Apri il menu di overflow</string>
     <string name="duck_ai_chat_history_select_all">Seleziona tutto</string>
     <string name="duck_ai_chat_history_unselect_all">Deseleziona tutti</string>
@@ -155,4 +161,5 @@
     <string name="duck_ai_chat_history_download_complete" instruction="%1$s is the saved chat filename (e.g. \&apos;My Chat.txt\&apos;).">Download di %1$s completato</string>
     <string name="duck_ai_chat_history_download_view">Mostra</string>
     <string name="duck_ai_chat_history_download_error">Non è possibile esportare la chat</string>
+    <string name="duck_ai_chat_history_bulk_download_error">Non è stato possibile esportare le chat</string>
 </resources>
