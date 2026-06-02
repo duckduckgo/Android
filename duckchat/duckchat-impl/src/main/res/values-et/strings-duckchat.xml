@@ -138,6 +138,12 @@
     <string name="duck_ai_chat_history_search_close_content_description">Sulge otsing</string>
     <string name="duck_ai_chat_history_search_clear_content_description">Tühjenda otsing</string>
     <string name="duck_ai_chat_history_action_fire_content_description">Kustuta vestlused</string>
+    <string name="duck_ai_chat_history_action_new">Uus</string>
+    <string name="duck_ai_chat_history_action_download_selected_content_description">Laadi alla vestlused</string>
+    <plurals name="duck_ai_chat_history_bulk_download_complete">
+        <item quantity="one">Allalaadimine lõpetatud %1$d vestluse jaoks</item>
+        <item quantity="other">Allalaadimine lõpetatud %1$d vestluse jaoks</item>
+    </plurals>
     <string name="duck_ai_chat_history_action_overflow_content_description">Ava ülevoolu menüü</string>
     <string name="duck_ai_chat_history_select_all">Vali kõik</string>
     <string name="duck_ai_chat_history_unselect_all">Tühjenda kõik valikud</string>
@@ -155,4 +161,5 @@
     <string name="duck_ai_chat_history_download_complete" instruction="%1$s is the saved chat filename (e.g. \&apos;My Chat.txt\&apos;).">Faili %1$s allalaadimine jõudis lõpule</string>
     <string name="duck_ai_chat_history_download_view">Kuva</string>
     <string name="duck_ai_chat_history_download_error">Vestlust ei õnnestunud eksportida</string>
+    <string name="duck_ai_chat_history_bulk_download_error">Vestlusi ei õnnestunud eksportida</string>
 </resources>
