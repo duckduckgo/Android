@@ -29,11 +29,7 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewParameter
-import com.duckduckgo.common.ui.compose.theme.AlertRedOnDarkPressed
-import com.duckduckgo.common.ui.compose.theme.AlertRedOnLightPressed
-import com.duckduckgo.common.ui.compose.theme.Black84
 import com.duckduckgo.common.ui.compose.theme.DuckDuckGoTheme
-import com.duckduckgo.common.ui.compose.theme.White
 import com.duckduckgo.common.ui.compose.tools.PreviewBox
 import com.duckduckgo.mobile.android.R
 
@@ -80,18 +76,10 @@ private object DaxDestructivePrimaryButtonDefaults {
         @Composable @ReadOnlyComposable get() = DuckDuckGoTheme.colors.status.criticalPrimary
 
     val adsColorButtonDestructivePrimaryContainerPressed: Color
-        @Composable @ReadOnlyComposable get() = if (DuckDuckGoTheme.colors.isDark) {
-            AlertRedOnDarkPressed
-        } else {
-            AlertRedOnLightPressed
-        }
+        @Composable @ReadOnlyComposable get() = DuckDuckGoTheme.colors.button.destructiveContainerPressed
 
     val adsColorButtonDestructivePrimaryText: Color
-        @Composable @ReadOnlyComposable get() = if (DuckDuckGoTheme.colors.isDark) {
-            Black84
-        } else {
-            White
-        }
+        @Composable @ReadOnlyComposable get() = DuckDuckGoTheme.colors.button.primaryText
 
     val adsColorButtonDestructivePrimaryContainerDisabled: Color
         @Composable @ReadOnlyComposable get() = DuckDuckGoTheme.colors.backgrounds.containerDisabled
