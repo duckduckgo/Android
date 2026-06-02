@@ -20,6 +20,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.browsermode.api.RegularMode
 import com.duckduckgo.dataclearing.api.plugin.ClearableData
@@ -32,6 +33,8 @@ import com.duckduckgo.duckchat.impl.history.ChatHistoryUiState.Mode
 import com.duckduckgo.duckchat.impl.history.ChatHistoryUiState.PendingConfirmation
 import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
 import com.duckduckgo.duckchat.impl.models.toModelDisplay
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
+import com.duckduckgo.duckchat.impl.pixel.fireCountAndDaily
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
@@ -56,6 +59,7 @@ class ChatHistoryViewModel @Inject constructor(
     private val duckAiFeatureState: DuckAiFeatureState,
     private val duckAiModelManager: DuckAiModelManager,
     @RegularMode private val tabRepository: TabRepository,
+    private val pixel: Pixel,
 ) : ViewModel() {
 
     private val controls = MutableStateFlow(UiControls())
@@ -91,6 +95,7 @@ class ChatHistoryViewModel @Inject constructor(
         if (controls.value.mode is Mode.Selecting) {
             onSelectionToggled(chatId)
         } else {
+            pixel.fireCountAndDaily(DuckChatPixelName.DUCK_CHAT_HISTORY_CHAT_OPENED_COUNT, DuckChatPixelName.DUCK_CHAT_HISTORY_CHAT_OPENED_DAILY)
             // Open the chat as a new tab anchored to the tab the user was on, so closing it returns there.
             viewModelScope.launch {
                 val sourceTabId = tabRepository.getSelectedTab()?.tabId
@@ -101,12 +106,19 @@ class ChatHistoryViewModel @Inject constructor(
 
     /** Long-press enters select mode with the row pre-selected; returns true to consume the event. */
     fun onChatRowLongClicked(chatId: String): Boolean {
+        val wasDefault = controls.value.mode is Mode.Default
         controls.update { c ->
             val nextMode = when (val mode = c.mode) {
                 is Mode.Selecting -> collapseEmpty(toggle(mode.selectedChatIds, chatId))
                 Mode.Default -> Mode.Selecting(setOf(chatId))
             }
             c.copy(mode = nextMode)
+        }
+        if (wasDefault) {
+            pixel.fireCountAndDaily(
+                DuckChatPixelName.DUCK_CHAT_HISTORY_SELECT_MODE_ENTERED_COUNT,
+                DuckChatPixelName.DUCK_CHAT_HISTORY_SELECT_MODE_ENTERED_DAILY,
+            )
         }
         return true
     }
@@ -115,23 +127,40 @@ class ChatHistoryViewModel @Inject constructor(
         if (ids.isEmpty()) Mode.Default else Mode.Selecting(ids)
 
     fun onOpenDuckAiClicked() {
+        pixel.fireCountAndDaily(
+            DuckChatPixelName.DUCK_CHAT_HISTORY_EMPTY_CTA_TAPPED_COUNT,
+            DuckChatPixelName.DUCK_CHAT_HISTORY_EMPTY_CTA_TAPPED_DAILY,
+        )
         duckChat.openDuckChat()
     }
 
     /** Toolbar "New chat" action. Kept separate from [onOpenDuckAiClicked] so the two surfaces stay independently instrumentable. */
     fun onNewChatRequested() {
+        pixel.fireCountAndDaily(DuckChatPixelName.DUCK_CHAT_HISTORY_NEW_CHAT_TAPPED_COUNT, DuckChatPixelName.DUCK_CHAT_HISTORY_NEW_CHAT_TAPPED_DAILY)
         duckChat.openDuckChat()
     }
 
     fun onFireIconClicked() {
         if (controls.value.mode is Mode.Selecting) {
+            pixel.fireCountAndDaily(
+                DuckChatPixelName.DUCK_CHAT_HISTORY_FIRE_SELECTED_TAPPED_COUNT,
+                DuckChatPixelName.DUCK_CHAT_HISTORY_FIRE_SELECTED_TAPPED_DAILY,
+            )
             onDeleteSelectedRequested()
         } else {
+            pixel.fireCountAndDaily(
+                DuckChatPixelName.DUCK_CHAT_HISTORY_FIRE_ALL_TAPPED_COUNT,
+                DuckChatPixelName.DUCK_CHAT_HISTORY_FIRE_ALL_TAPPED_DAILY,
+            )
             onFireAllRequested()
         }
     }
 
     fun onSearchActivated() {
+        pixel.fireCountAndDaily(
+            DuckChatPixelName.DUCK_CHAT_HISTORY_SEARCH_ACTIVATED_COUNT,
+            DuckChatPixelName.DUCK_CHAT_HISTORY_SEARCH_ACTIVATED_DAILY,
+        )
         controls.update { it.copy(search = it.search.copy(active = true)) }
     }
 
@@ -158,12 +187,18 @@ class ChatHistoryViewModel @Inject constructor(
     }
 
     fun onRenameRequested(chatId: String, currentTitle: String) {
+        pixel.fireCountAndDaily(DuckChatPixelName.DUCK_CHAT_HISTORY_RENAME_OPENED_COUNT, DuckChatPixelName.DUCK_CHAT_HISTORY_RENAME_OPENED_DAILY)
         navigationChannel.trySend(NavigationEvent.OpenRename(chatId = chatId, currentTitle = currentTitle))
     }
 
     fun onTogglePin(chatId: String) {
         val current = latestItems.firstOrNull { it.chatId == chatId } ?: return
         val wasPinned = current.pinned
+        if (wasPinned) {
+            pixel.fireCountAndDaily(DuckChatPixelName.DUCK_CHAT_HISTORY_PIN_REMOVED_COUNT, DuckChatPixelName.DUCK_CHAT_HISTORY_PIN_REMOVED_DAILY)
+        } else {
+            pixel.fireCountAndDaily(DuckChatPixelName.DUCK_CHAT_HISTORY_PIN_ADDED_COUNT, DuckChatPixelName.DUCK_CHAT_HISTORY_PIN_ADDED_DAILY)
+        }
         appScope.launch { chatHistoryRepository.setPinned(chatId, !wasPinned) }
         messageChannel.trySend(MessageEvent.PinToggled(chatId = chatId, wasPinned = wasPinned))
     }
@@ -173,10 +208,16 @@ class ChatHistoryViewModel @Inject constructor(
     }
 
     fun onDownloadRequested(chatId: String) {
+        val item = latestItems.firstOrNull { it.chatId == chatId }
+        if (item != null) {
+            pixel.fireCountAndDaily(
+                DuckChatPixelName.DUCK_CHAT_HISTORY_DOWNLOAD_STARTED_COUNT,
+                DuckChatPixelName.DUCK_CHAT_HISTORY_DOWNLOAD_STARTED_DAILY,
+            )
+        }
         // Snapshot-read the models cache; null when the model isn't cached and the exporter
         // falls back to the raw model id.
-        val modelId = latestItems.firstOrNull { it.chatId == chatId }?.model
-        val modelDisplay = modelId
+        val modelDisplay = item?.model
             ?.let { id -> duckAiModelManager.modelState.value.models.firstOrNull { it.id == id } }
             ?.toModelDisplay()
         viewModelScope.launch {
@@ -189,6 +230,10 @@ class ChatHistoryViewModel @Inject constructor(
     fun onDownloadSelectedRequested() {
         val selected = (controls.value.mode as? Mode.Selecting)?.selectedChatIds.orEmpty()
         if (selected.isEmpty()) return
+        pixel.fireCountAndDaily(
+            DuckChatPixelName.DUCK_CHAT_HISTORY_DOWNLOAD_SELECTED_COUNT,
+            DuckChatPixelName.DUCK_CHAT_HISTORY_DOWNLOAD_SELECTED_DAILY,
+        )
         viewModelScope.launch {
             val requests = selected.map { chatId ->
                 val modelId = latestItems.firstOrNull { it.chatId == chatId }?.model
@@ -216,6 +261,13 @@ class ChatHistoryViewModel @Inject constructor(
 
     /** The dialog drives the actual deletion via the URL set surfaced by [chatUrlsForDialog]. */
     fun onFireAllConfirmed() {
+        val count = controls.value.confirmation?.chatIds?.size ?: 0
+        if (count > 0) {
+            pixel.fireCountAndDaily(
+                DuckChatPixelName.DUCK_CHAT_HISTORY_FIRE_ALL_CONFIRMED_COUNT,
+                DuckChatPixelName.DUCK_CHAT_HISTORY_FIRE_ALL_CONFIRMED_DAILY,
+            )
+        }
         controls.update { it.copy(confirmation = null) }
     }
 
@@ -224,6 +276,10 @@ class ChatHistoryViewModel @Inject constructor(
     }
 
     fun onEnterSelectMode() {
+        pixel.fireCountAndDaily(
+            DuckChatPixelName.DUCK_CHAT_HISTORY_SELECT_MODE_ENTERED_COUNT,
+            DuckChatPixelName.DUCK_CHAT_HISTORY_SELECT_MODE_ENTERED_DAILY,
+        )
         controls.update { it.copy(mode = Mode.Selecting(emptySet())) }
     }
 
@@ -235,6 +291,11 @@ class ChatHistoryViewModel @Inject constructor(
     }
 
     fun onSelectAllToggled() {
+        if (controls.value.mode !is Mode.Selecting) return
+        pixel.fireCountAndDaily(
+            DuckChatPixelName.DUCK_CHAT_HISTORY_SELECT_ALL_TOGGLED_COUNT,
+            DuckChatPixelName.DUCK_CHAT_HISTORY_SELECT_ALL_TOGGLED_DAILY,
+        )
         controls.update { c ->
             val mode = c.mode as? Mode.Selecting ?: return@update c
             val visibleIds = visibleChatIds(c.search)
@@ -255,6 +316,10 @@ class ChatHistoryViewModel @Inject constructor(
         when {
             ids.isEmpty() -> Unit
             ids.size == 1 -> {
+                pixel.fireCountAndDaily(
+                    DuckChatPixelName.DUCK_CHAT_HISTORY_FIRE_SELECTED_CONFIRMED_COUNT,
+                    DuckChatPixelName.DUCK_CHAT_HISTORY_FIRE_SELECTED_CONFIRMED_DAILY,
+                )
                 controls.update { it.copy(mode = Mode.Default) }
                 dispatchSelectedClear(ids)
             }
@@ -269,6 +334,13 @@ class ChatHistoryViewModel @Inject constructor(
      * Both fields update atomically (one frame, not two) — keeps the test contract simple.
      */
     fun onDeleteSelectedConfirmed() {
+        val count = controls.value.confirmation?.chatIds?.size ?: 0
+        if (count > 0) {
+            pixel.fireCountAndDaily(
+                DuckChatPixelName.DUCK_CHAT_HISTORY_FIRE_SELECTED_CONFIRMED_COUNT,
+                DuckChatPixelName.DUCK_CHAT_HISTORY_FIRE_SELECTED_CONFIRMED_DAILY,
+            )
+        }
         controls.update { it.copy(confirmation = null, mode = Mode.Default) }
     }
 

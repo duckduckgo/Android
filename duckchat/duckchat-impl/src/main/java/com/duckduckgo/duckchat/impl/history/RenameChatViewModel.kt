@@ -19,7 +19,10 @@ package com.duckduckgo.duckchat.impl.history
 import androidx.lifecycle.ViewModel
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.FragmentScope
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
+import com.duckduckgo.duckchat.impl.pixel.fireCountAndDaily
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.BufferOverflow
@@ -33,6 +36,7 @@ import javax.inject.Inject
 class RenameChatViewModel @Inject constructor(
     private val chatHistoryRepository: ChatHistoryRepository,
     @AppCoroutineScope private val appScope: CoroutineScope,
+    private val pixel: Pixel,
 ) : ViewModel() {
 
     private val resultChannel = Channel<RenameResult>(capacity = Channel.BUFFERED, onBufferOverflow = BufferOverflow.DROP_OLDEST)
@@ -41,7 +45,15 @@ class RenameChatViewModel @Inject constructor(
     fun onSaveClicked(chatId: String, newTitle: String) {
         appScope.launch {
             val outcome = try {
-                if (chatHistoryRepository.renameChat(chatId, newTitle.trim())) RenameResult.Success else RenameResult.Error
+                if (chatHistoryRepository.renameChat(chatId, newTitle.trim())) {
+                    pixel.fireCountAndDaily(
+                        DuckChatPixelName.DUCK_CHAT_HISTORY_RENAME_SAVED_COUNT,
+                        DuckChatPixelName.DUCK_CHAT_HISTORY_RENAME_SAVED_DAILY,
+                    )
+                    RenameResult.Success
+                } else {
+                    RenameResult.Error
+                }
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
