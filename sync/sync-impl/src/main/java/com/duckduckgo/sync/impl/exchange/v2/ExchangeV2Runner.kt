@@ -764,6 +764,7 @@ class RealExchangeV2Runner @Inject constructor(
 
     private fun ExchangeV2State.isTerminal(): Boolean = when (this) {
         SameAccountAbort,
+        ExchangeV2State.Aborted,
         Host.Aborted,
         Host.Done,
         Joiner.AbortedLocal,

@@ -159,6 +159,7 @@ class RealSyncCodeDispatcher @Inject constructor(
                 DispatchOutcome.Failed("Pairing aborted by peer ($msgType)")
             }
             ExchangeV2State.Joiner.AbortedLocal -> DispatchOutcome.Failed("Pairing cancelled on this device")
+            ExchangeV2State.Aborted -> DispatchOutcome.Failed("negotiation_aborted")
             else -> null
         }
         is ExchangeV2Event.SessionError -> DispatchOutcome.Failed(event.message)
@@ -333,6 +334,7 @@ class RealSyncCodeDispatcher @Inject constructor(
             // Scanner-side Host.Done means we were elected Host and have shared a recovery
             // code with the peer — successful pairing from this device's perspective.
             ExchangeV2State.Host.Done -> DispatchOutcome.LoggedIn
+            ExchangeV2State.Aborted -> DispatchOutcome.Failed("negotiation_aborted")
             else -> null
         }
         is ExchangeV2Event.SessionError -> {

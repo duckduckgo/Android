@@ -794,6 +794,33 @@ class RealSyncCodeDispatcherTest {
         assertTrue("expected no outcomes, got $outcomes", outcomes.isEmpty())
     }
 
+    @Test fun `presentV2 emits Failed when runner reaches Aborted (hello during negotiating)`() = runTest {
+        val outcomes = mutableListOf<DispatchOutcome>()
+        val job = launch(start = kotlinx.coroutines.CoroutineStart.UNDISPATCHED) {
+            dispatcher.presentV2().take(1).collect { outcomes += it }
+        }
+        runnerEventsFlow.emit(transition(from = ExchangeV2State.Negotiating, to = ExchangeV2State.Aborted))
+        job.join()
+
+        assertTrue("expected Failed, got ${outcomes.single()}", outcomes.single() is DispatchOutcome.Failed)
+    }
+
+    @Test fun `linking flow emits Failed when runner reaches Aborted (hello during negotiating)`() = runTest {
+        setV2(true)
+        whenever(qrCode.parse(any())).thenReturn(
+            ExchangeV2CodeParseResult.LinkingV2(channelId = "c", publicKey = "k", version = "2"),
+        )
+        val decision = dispatcher.route("v2-url") as RouteDecision.V2InProgress
+        val outcome = withTimeoutOrNull(1000) {
+            val job = async(start = kotlinx.coroutines.CoroutineStart.UNDISPATCHED) {
+                decision.outcomes.first { it is DispatchOutcome.Failed }
+            }
+            runnerEventsFlow.emit(transition(from = ExchangeV2State.Negotiating, to = ExchangeV2State.Aborted))
+            job.await()
+        }
+        assertTrue("expected Failed, got $outcome", outcome is DispatchOutcome.Failed)
+    }
+
     @Test fun `presentV2 filters out events from before session start`() = runTest {
         // Seed a stale Host_Done from a prior session with timestamp=1L (well before now).
         val staleFlow = MutableSharedFlow<ExchangeV2Event>(replay = 10)
