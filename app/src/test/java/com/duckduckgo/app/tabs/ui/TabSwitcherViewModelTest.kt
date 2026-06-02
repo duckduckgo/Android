@@ -822,7 +822,7 @@ class TabSwitcherViewModelTest {
     @Test
     fun whenNormalModeAndOneNewTabPageThenVerifyDynamicInterface() {
         val tabItems = listOf(NormalTab(TabEntity("1"), true))
-        val viewState = ViewState(tabSwitcherItems = tabItems, mode = Normal, layoutType = null, isDuckAIButtonVisible = true)
+        val viewState = ViewState(tabItems = TabItems.Loaded(tabItems), mode = Normal, layoutType = null, isDuckAIButtonVisible = true)
         val expected = DynamicInterface(
             isFireButtonVisible = true,
             isNewTabButtonVisible = true,
@@ -850,7 +850,7 @@ class TabSwitcherViewModelTest {
     fun whenNormalModeAndMultipleTabsThenVerifyDynamicInterface() {
         val tabItems = listOf(NormalTab(TabEntity("1"), true), NormalTab(TabEntity("2"), false))
         val viewState = ViewState(
-            tabSwitcherItems = tabItems,
+            tabItems = TabItems.Loaded(tabItems),
             mode = Normal,
             layoutType = null,
             isDuckAIButtonVisible = true,
@@ -882,7 +882,7 @@ class TabSwitcherViewModelTest {
     fun whenNormalModeAndNewVisualDesignEnabledAndDuckChatDisabledThenVerifyDynamicInterface() {
         val tabItems = listOf(NormalTab(TabEntity("1"), true), NormalTab(TabEntity("2"), false))
         val viewState = ViewState(
-            tabSwitcherItems = tabItems,
+            tabItems = TabItems.Loaded(tabItems),
             mode = Normal,
             layoutType = null,
             isDuckAIButtonVisible = false,
@@ -914,7 +914,7 @@ class TabSwitcherViewModelTest {
     fun whenNormalModeAndNewVisualDesignDisabledAndDuckChatDisabledThenVerifyDynamicInterface() {
         val tabItems = listOf(NormalTab(TabEntity("1"), true), NormalTab(TabEntity("2"), false))
         val viewState = ViewState(
-            tabSwitcherItems = tabItems,
+            tabItems = TabItems.Loaded(tabItems),
             mode = Normal,
             layoutType = null,
             isDuckAIButtonVisible = false,
@@ -945,7 +945,7 @@ class TabSwitcherViewModelTest {
     @Test
     fun whenNormalModeAndMultipleTabsAndLayoutIsGridThenVerifyDynamicInterface() {
         val tabItems = listOf(NormalTab(TabEntity("1"), true), NormalTab(TabEntity("2"), false))
-        val viewState = ViewState(tabSwitcherItems = tabItems, mode = Normal, layoutType = GRID, isDuckAIButtonVisible = true)
+        val viewState = ViewState(tabItems = TabItems.Loaded(tabItems), mode = Normal, layoutType = GRID, isDuckAIButtonVisible = true)
         val expected = DynamicInterface(
             isFireButtonVisible = true,
             isNewTabButtonVisible = true,
@@ -973,7 +973,7 @@ class TabSwitcherViewModelTest {
     fun whenNormalModeAndMultipleTabsAndLayoutIsListThenVerifyDynamicInterface() {
         val tabItems = listOf(NormalTab(TabEntity("1", "http://cnn.com"), true), NormalTab(TabEntity("2"), false))
         val viewState = ViewState(
-            tabSwitcherItems = tabItems,
+            tabItems = TabItems.Loaded(tabItems),
             mode = Normal,
             layoutType = LIST,
             isDuckAIButtonVisible = true,
@@ -1007,7 +1007,7 @@ class TabSwitcherViewModelTest {
             SelectableTab(TabEntity("1", "http://cnn.com"), false),
             SelectableTab(TabEntity("2"), false),
         )
-        val viewState = ViewState(tabSwitcherItems = tabItems, mode = Selection(emptyList()), layoutType = null)
+        val viewState = ViewState(tabItems = TabItems.Loaded(tabItems), mode = Selection(emptyList()), layoutType = null)
         val expected = DynamicInterface(
             isFireButtonVisible = false,
             isNewTabButtonVisible = false,
@@ -1037,7 +1037,7 @@ class TabSwitcherViewModelTest {
             SelectableTab(TabEntity("1", "http://cnn.com"), true),
             SelectableTab(TabEntity("2"), false),
         )
-        val viewState = ViewState(tabSwitcherItems = tabItems, mode = Selection(listOf("1")), layoutType = null)
+        val viewState = ViewState(tabItems = TabItems.Loaded(tabItems), mode = Selection(listOf("1")), layoutType = null)
         val expected = DynamicInterface(
             isFireButtonVisible = false,
             isNewTabButtonVisible = false,
@@ -1067,7 +1067,7 @@ class TabSwitcherViewModelTest {
             SelectableTab(TabEntity("1"), true),
             SelectableTab(TabEntity("2", url = "cnn.com"), false),
         )
-        val viewState = ViewState(tabSwitcherItems = tabItems, mode = Selection(listOf("1")), layoutType = null)
+        val viewState = ViewState(tabItems = TabItems.Loaded(tabItems), mode = Selection(listOf("1")), layoutType = null)
         val expected = DynamicInterface(
             isFireButtonVisible = false,
             isNewTabButtonVisible = false,
@@ -1098,7 +1098,7 @@ class TabSwitcherViewModelTest {
             SelectableTab(TabEntity("2", "http://cnn.com"), true),
             SelectableTab(TabEntity("3"), false),
         )
-        val viewState = ViewState(tabSwitcherItems = tabItems, mode = Selection(listOf("1", "2")), layoutType = null)
+        val viewState = ViewState(tabItems = TabItems.Loaded(tabItems), mode = Selection(listOf("1", "2")), layoutType = null)
         val expected = DynamicInterface(
             isFireButtonVisible = false,
             isNewTabButtonVisible = false,
@@ -1128,7 +1128,7 @@ class TabSwitcherViewModelTest {
             SelectableTab(TabEntity("1", "http://cnn.com"), true),
             SelectableTab(TabEntity("2"), true),
         )
-        val viewState = ViewState(tabSwitcherItems = tabItems, mode = Selection(listOf("1", "2")), layoutType = null)
+        val viewState = ViewState(tabItems = TabItems.Loaded(tabItems), mode = Selection(listOf("1", "2")), layoutType = null)
         val expected = DynamicInterface(
             isFireButtonVisible = false,
             isNewTabButtonVisible = false,
@@ -1189,7 +1189,7 @@ class TabSwitcherViewModelTest {
     fun whenNormalModeAndOneNewTabPageAndNewToolbarEnabledThenVerifyDynamicInterface() {
         val tabItems = listOf(NormalTab(TabEntity("1"), true))
         val viewState = ViewState(
-            tabSwitcherItems = tabItems,
+            tabItems = TabItems.Loaded(tabItems),
             mode = Normal,
             layoutType = null,
             isDuckAIButtonVisible = true,
@@ -1221,7 +1221,7 @@ class TabSwitcherViewModelTest {
     fun whenNormalModeAndMultipleTabsAndNewToolbarEnabledThenVerifyDynamicInterface() {
         val tabItems = listOf(NormalTab(TabEntity("1"), true), NormalTab(TabEntity("2"), false))
         val viewState = ViewState(
-            tabSwitcherItems = tabItems,
+            tabItems = TabItems.Loaded(tabItems),
             mode = Normal,
             layoutType = null,
             isDuckAIButtonVisible = true,
@@ -1253,7 +1253,7 @@ class TabSwitcherViewModelTest {
     fun whenNormalModeAndNewVisualDesignEnabledAndDuckChatDisabledAndNewToolbarEnabledThenVerifyDynamicInterface() {
         val tabItems = listOf(NormalTab(TabEntity("1"), true), NormalTab(TabEntity("2"), false))
         val viewState = ViewState(
-            tabSwitcherItems = tabItems,
+            tabItems = TabItems.Loaded(tabItems),
             mode = Normal,
             layoutType = null,
             isDuckAIButtonVisible = false,
@@ -1285,7 +1285,7 @@ class TabSwitcherViewModelTest {
     fun whenNormalModeAndNewVisualDesignDisabledAndDuckChatDisabledAndNewToolbarEnabledThenVerifyDynamicInterface() {
         val tabItems = listOf(NormalTab(TabEntity("1"), true), NormalTab(TabEntity("2"), false))
         val viewState = ViewState(
-            tabSwitcherItems = tabItems,
+            tabItems = TabItems.Loaded(tabItems),
             mode = Normal,
             layoutType = null,
             isDuckAIButtonVisible = false,
@@ -1317,7 +1317,7 @@ class TabSwitcherViewModelTest {
     fun whenNormalModeAndMultipleTabsAndLayoutIsGridAndNewToolbarEnabledThenVerifyDynamicInterface() {
         val tabItems = listOf(NormalTab(TabEntity("1"), true), NormalTab(TabEntity("2"), false))
         val viewState = ViewState(
-            tabSwitcherItems = tabItems,
+            tabItems = TabItems.Loaded(tabItems),
             mode = Normal,
             layoutType = GRID,
             isDuckAIButtonVisible = true,
@@ -1349,7 +1349,7 @@ class TabSwitcherViewModelTest {
     fun whenNormalModeAndMultipleTabsAndLayoutIsListAndNewToolbarEnabledThenVerifyDynamicInterface() {
         val tabItems = listOf(NormalTab(TabEntity("1", "http://cnn.com"), true), NormalTab(TabEntity("2"), false))
         val viewState = ViewState(
-            tabSwitcherItems = tabItems,
+            tabItems = TabItems.Loaded(tabItems),
             mode = Normal,
             layoutType = LIST,
             isDuckAIButtonVisible = true,
@@ -1384,7 +1384,7 @@ class TabSwitcherViewModelTest {
             SelectableTab(TabEntity("2"), false),
         )
         val viewState = ViewState(
-            tabSwitcherItems = tabItems,
+            tabItems = TabItems.Loaded(tabItems),
             mode = Selection(emptyList()),
             layoutType = null,
         )
@@ -1418,7 +1418,7 @@ class TabSwitcherViewModelTest {
             SelectableTab(TabEntity("2"), false),
         )
         val viewState = ViewState(
-            tabSwitcherItems = tabItems,
+            tabItems = TabItems.Loaded(tabItems),
             mode = Selection(listOf("1")),
             layoutType = null,
         )
@@ -1452,7 +1452,7 @@ class TabSwitcherViewModelTest {
             SelectableTab(TabEntity("2", url = "cnn.com"), false),
         )
         val viewState = ViewState(
-            tabSwitcherItems = tabItems,
+            tabItems = TabItems.Loaded(tabItems),
             mode = Selection(listOf("1")),
             layoutType = null,
         )
@@ -1486,7 +1486,7 @@ class TabSwitcherViewModelTest {
             SelectableTab(TabEntity("2"), true),
         )
         val viewState = ViewState(
-            tabSwitcherItems = tabItems,
+            tabItems = TabItems.Loaded(tabItems),
             mode = Selection(listOf("1", "2")),
             layoutType = null,
         )
@@ -1520,7 +1520,7 @@ class TabSwitcherViewModelTest {
             SelectableTab(TabEntity("2"), true),
         )
         val viewState = ViewState(
-            tabSwitcherItems = tabItems,
+            tabItems = TabItems.Loaded(tabItems),
             mode = Selection(listOf("1", "2")),
             layoutType = null,
         )
@@ -1657,7 +1657,7 @@ class TabSwitcherViewModelTest {
     fun whenNormalModeAndSplitOmnibarEnabledThenMenuButtonHiddenAndBottomBarVisible() {
         val tabItems = listOf(NormalTab(TabEntity("1"), true), NormalTab(TabEntity("2"), false))
         val viewState = ViewState(
-            tabSwitcherItems = tabItems,
+            tabItems = TabItems.Loaded(tabItems),
             mode = Normal,
             layoutType = null,
             isDuckAIButtonVisible = true,
@@ -1690,7 +1690,7 @@ class TabSwitcherViewModelTest {
     fun whenNormalModeAndSplitOmnibarEnabledAndDuckAIDisabledThenMenuButtonHiddenAndBottomBarVisible() {
         val tabItems = listOf(NormalTab(TabEntity("1"), true), NormalTab(TabEntity("2"), false))
         val viewState = ViewState(
-            tabSwitcherItems = tabItems,
+            tabItems = TabItems.Loaded(tabItems),
             mode = Normal,
             layoutType = null,
             isDuckAIButtonVisible = false,
@@ -1726,7 +1726,7 @@ class TabSwitcherViewModelTest {
             SelectableTab(TabEntity("2"), false),
         )
         val viewState = ViewState(
-            tabSwitcherItems = tabItems,
+            tabItems = TabItems.Loaded(tabItems),
             mode = Selection(listOf("1")),
             layoutType = null,
             isDuckAIButtonVisible = false,
@@ -1762,7 +1762,7 @@ class TabSwitcherViewModelTest {
             SelectableTab(TabEntity("2"), false),
         )
         val viewState = ViewState(
-            tabSwitcherItems = tabItems,
+            tabItems = TabItems.Loaded(tabItems),
             mode = Selection(emptyList()),
             layoutType = null,
             isDuckAIButtonVisible = false,
@@ -1798,7 +1798,7 @@ class TabSwitcherViewModelTest {
             SelectableTab(TabEntity("2"), true),
         )
         val viewState = ViewState(
-            tabSwitcherItems = tabItems,
+            tabItems = TabItems.Loaded(tabItems),
             mode = Selection(listOf("1", "2")),
             layoutType = null,
             isDuckAIButtonVisible = false,
