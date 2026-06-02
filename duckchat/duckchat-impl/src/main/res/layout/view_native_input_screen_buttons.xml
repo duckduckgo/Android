@@ -62,13 +62,10 @@
         android:layout_width="36dp"
         android:layout_height="36dp"
         android:layout_marginStart="8dp"
-        android:background="@drawable/background_input_screen_button"
-        android:backgroundTint="?attr/daxColorButtonPrimaryContainer"
-        android:foreground="@drawable/selectable_circular_ripple"
+        android:background="@drawable/selectable_circular_container_ripple"
         android:importantForAccessibility="no"
         android:scaleType="centerInside"
-        android:src="@drawable/ic_arrow_right_24_inverted"
-        android:visibility="gone"
-        app:tint="?attr/daxColorWhite" />
+        android:src="@drawable/ic_arrow_right_24"
+        android:visibility="gone" />
 
 </LinearLayout>

@@ -1168,7 +1168,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
         val toggle = findViewById<TabLayout?>(R.id.inputModeSwitch) ?: return
         val isChatTab = toggle.selectedTabPosition == 1
         setImageButtonVisible(isChatTab && supportsUpload)
-        submitButtons?.setSendButtonIcon(R.drawable.ic_arrow_right_24_inverted)
+        submitButtons?.setSendButtonIcon(com.duckduckgo.mobile.android.R.drawable.ic_arrow_right_24)
         if (isChatTab) {
             inputField.minLines = 1
             inputField.maxLines = MAX_LINES
