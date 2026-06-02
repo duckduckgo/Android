@@ -138,6 +138,12 @@
     <string name="duck_ai_chat_history_search_close_content_description">Keresés bezárása</string>
     <string name="duck_ai_chat_history_search_clear_content_description">Keresés törlése</string>
     <string name="duck_ai_chat_history_action_fire_content_description">Csevegések törlése</string>
+    <string name="duck_ai_chat_history_action_new">Új</string>
+    <string name="duck_ai_chat_history_action_download_selected_content_description">Csevegések letöltése</string>
+    <plurals name="duck_ai_chat_history_bulk_download_complete">
+        <item quantity="one">%1$d csevegés letöltése befejeződött</item>
+        <item quantity="other">%1$d csevegés letöltése befejeződött</item>
+    </plurals>
     <string name="duck_ai_chat_history_action_overflow_content_description">Túlfolyó menü megnyitása</string>
     <string name="duck_ai_chat_history_select_all">Összes kijelölése</string>
     <string name="duck_ai_chat_history_unselect_all">Minden kijelölés megszüntetése</string>
@@ -155,4 +161,5 @@
     <string name="duck_ai_chat_history_download_complete" instruction="%1$s is the saved chat filename (e.g. \&apos;My Chat.txt\&apos;).">%1$s letöltése befejeződött</string>
     <string name="duck_ai_chat_history_download_view">Megjelenítés</string>
     <string name="duck_ai_chat_history_download_error">Nem sikerült exportálni a csevegést</string>
+    <string name="duck_ai_chat_history_bulk_download_error">Nem sikerült exportálni a csevegéseket</string>
 </resources>
