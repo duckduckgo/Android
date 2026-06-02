@@ -138,6 +138,14 @@
     <string name="duck_ai_chat_history_search_close_content_description">Zatvoriť vyhľadávanie</string>
     <string name="duck_ai_chat_history_search_clear_content_description">Vymazať vyhľadávanie</string>
     <string name="duck_ai_chat_history_action_fire_content_description">Odstrániť chaty</string>
+    <string name="duck_ai_chat_history_action_new">Nové</string>
+    <string name="duck_ai_chat_history_action_download_selected_content_description">Stiahnutie četov</string>
+    <plurals name="duck_ai_chat_history_bulk_download_complete">
+        <item quantity="one">Sťahovanie %1$d četu je dokončené</item>
+        <item quantity="few">Sťahovanie pre %1$d čety je dokončené</item>
+        <item quantity="many">Sťahovanie pre %1$d četov je dokončené</item>
+        <item quantity="other">Sťahovanie pre %1$d chatov je dokončené</item>
+    </plurals>
     <string name="duck_ai_chat_history_action_overflow_content_description">Otvoriť rozšírenú ponuku</string>
     <string name="duck_ai_chat_history_select_all">Vybrať všetko</string>
     <string name="duck_ai_chat_history_unselect_all">Zrušiť výber všetkých</string>
@@ -155,4 +163,5 @@
     <string name="duck_ai_chat_history_download_complete" instruction="%1$s is the saved chat filename (e.g. \&apos;My Chat.txt\&apos;).">Sťahovanie %1$s bolo dokončené</string>
     <string name="duck_ai_chat_history_download_view">Zobraziť</string>
     <string name="duck_ai_chat_history_download_error">Nepodarilo sa exportovať chat</string>
+    <string name="duck_ai_chat_history_bulk_download_error">Nepodarilo sa exportovať čety</string>
 </resources>
