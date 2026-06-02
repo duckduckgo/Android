@@ -167,6 +167,7 @@ class OmnibarLayout @JvmOverloads constructor(
         val showDuckSidebar: Boolean,
         val showDuckBack: Boolean,
         val isDuckAiMode: Boolean,
+        val isNativeInputEnabled: Boolean,
     )
 
     @Inject
@@ -850,12 +851,14 @@ class OmnibarLayout @JvmOverloads constructor(
                 showDuckSidebar = viewState.showDuckAISidebar,
                 showDuckBack = viewState.showDuckAISidebar,
                 isDuckAiMode = viewState.viewMode is ViewMode.DuckAI,
+                isNativeInputEnabled = viewState.isNativeInputEnabled,
             )
 
         if (omnibarAnimationManager.isFeatureEnabled() && previousTransitionState != null &&
             (
                 newTransitionState.showFireIcon != previousTransitionState?.showFireIcon ||
                     newTransitionState.isDuckAiMode != previousTransitionState?.isDuckAiMode ||
+                    newTransitionState.isNativeInputEnabled != previousTransitionState?.isNativeInputEnabled ||
                     newTransitionState.showTabsMenu != previousTransitionState?.showTabsMenu ||
                     newTransitionState.showBrowserMenu != previousTransitionState?.showBrowserMenu ||
                     newTransitionState.showDuckSidebar != previousTransitionState?.showDuckSidebar
@@ -867,11 +870,21 @@ class OmnibarLayout @JvmOverloads constructor(
         clearTextButton.isVisible = viewState.showClearButton
         voiceSearchButton.isVisible = viewState.showVoiceSearch
         tabsMenu.isVisible = newTransitionState.showTabsMenu
-        // The fire/+ slot is shared: when the user is in a Duck.ai chat the + icon takes
-        // over from fire as the leading action. Driven by viewMode rather than a separate
-        // state flag so it can't drift out of sync with other state-update paths.
-        fireIconMenu.isVisible = newTransitionState.showFireIcon && !newTransitionState.isDuckAiMode
-        plusIconMenu.isVisible = newTransitionState.showFireIcon && newTransitionState.isDuckAiMode
+        // The fire/+ slot is shared: in a Duck.ai chat the + icon takes over from fire as the
+        // leading action, but only when the native input field is enabled. Users with the
+        // nativeInputField flag off keep the fire button even in a Duck.ai view. Driven by
+        // viewMode (plus the flag) rather than a separate state flag so it can't drift out of
+        // sync with other state-update paths.
+        fireIconMenu.isVisible = shouldShowFireIcon(
+            showFireIcon = newTransitionState.showFireIcon,
+            isDuckAiMode = newTransitionState.isDuckAiMode,
+            isNativeInputEnabled = newTransitionState.isNativeInputEnabled,
+        )
+        plusIconMenu.isVisible = shouldShowPlusIcon(
+            showFireIcon = newTransitionState.showFireIcon,
+            isDuckAiMode = newTransitionState.isDuckAiMode,
+            isNativeInputEnabled = newTransitionState.isNativeInputEnabled,
+        )
         browserMenu.isVisible = newTransitionState.showBrowserMenu
         browserMenuHighlight.isVisible = newTransitionState.showBrowserMenuHighlight
         aiChatMenu?.isVisible = newTransitionState.showChatMenu
@@ -1647,3 +1660,26 @@ class OmnibarLayout @JvmOverloads constructor(
         private const val LOCKED_INPUT_ALPHA = 0.4f
     }
 }
+
+/**
+ * Whether the fire icon should occupy the shared fire/+ leading slot in the omnibar.
+ *
+ * Fire is the default leading action. The + icon only replaces it inside a Duck.ai view when the
+ * native input field is enabled; with the nativeInputField flag off the user keeps the fire button
+ * even in a Duck.ai view.
+ */
+internal fun shouldShowFireIcon(
+    showFireIcon: Boolean,
+    isDuckAiMode: Boolean,
+    isNativeInputEnabled: Boolean,
+): Boolean = showFireIcon && !(isDuckAiMode && isNativeInputEnabled)
+
+/**
+ * Whether the + icon should occupy the shared fire/+ leading slot in the omnibar. Only shown inside
+ * a Duck.ai view when the native input field is enabled.
+ */
+internal fun shouldShowPlusIcon(
+    showFireIcon: Boolean,
+    isDuckAiMode: Boolean,
+    isNativeInputEnabled: Boolean,
+): Boolean = showFireIcon && isDuckAiMode && isNativeInputEnabled
