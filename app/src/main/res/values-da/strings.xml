@@ -1030,5 +1030,5 @@
     <string name="onboardingSearchDaxDialogOption1EnglishQuoted" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">sådan siger man \"and\" på spansk</string>
 
     <string name="input_screen_user_pref_without_ai_updated">Kun søgning</string>
-    <string name="input_screen_user_pref_with_ai_updated">Skift mellem\nSøg og Duck.ai</string>
+    <string name="input_screen_user_pref_with_ai_updated">Skift mellem\nSøgning og Duck.ai</string>
 </resources>
