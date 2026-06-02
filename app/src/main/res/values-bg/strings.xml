@@ -265,6 +265,7 @@
     <string name="singleTabFireDialogDeleteAll">Изтриване на всички</string>
     <string name="singleTabFireDialogDeleteThisTab">Изтриване на този раздел</string>
     <string name="singleTabFireDialogDeleteChat">Изтриване на чата</string>
+    <string name="singleTabFireDialogDeleteChats">Изтриване на чатовете</string>
     <string name="singleTabFireDialogTitleDuckAi">Да бъде ли изтрит този чат?</string>
     <string name="singleTabFireDialogSubtitleSiteData">Изтриването на данни от сайта може да те отпише от акаунтите.</string>
     <string name="singleTabFireDialogSubtitleDownloads">Това ще отмени текущите изтегляния.</string>
