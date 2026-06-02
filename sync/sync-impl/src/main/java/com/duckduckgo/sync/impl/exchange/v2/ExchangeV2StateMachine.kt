@@ -74,8 +74,6 @@ internal class RealExchangeV2StateMachine(
     override var currentState: ExchangeV2State = initialState
         private set
 
-    private var helloAbsorbedInNegotiating: Boolean = false
-
     override fun receive(msg: ExchangeV2Message): TransitionResult {
         if (msg is Unknown) return drop(msg)
         return when (val state = currentState) {
@@ -104,14 +102,11 @@ internal class RealExchangeV2StateMachine(
 
     private fun receiveInNegotiating(state: ExchangeV2State, msg: ExchangeV2Message): TransitionResult {
         return when (msg) {
-            is Hello -> {
-                if (helloAbsorbedInNegotiating) {
-                    abort(state, msg, RejectReason.ImplicitAbort)
-                } else {
-                    helloAbsorbedInNegotiating = true
-                    accept(state, ExchangeV2State.Negotiating, msg)
-                }
-            }
+            // By the time we are in Negotiating the peer hello is already established
+            // (Scanner: by scanning the QR; Presenter: consumed in receiveInBootstrapped).
+            // Any further hello is a duplicate or the double-scan race → abort and close the
+            // channel. Spec: Unified Algorithm 1214739740392701 §Handshake Note (scope-cut path).
+            is Hello -> abort(state, msg, RejectReason.ImplicitAbort, newState = ExchangeV2State.Aborted)
             is RecoveryCodeAvailable -> {
                 if (localUserId != null && msg.userId == localUserId) {
                     abort(state, msg, RejectReason.SameAccount, newState = ExchangeV2State.SameAccountAbort)

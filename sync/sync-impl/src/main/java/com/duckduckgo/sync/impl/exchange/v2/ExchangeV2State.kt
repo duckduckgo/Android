@@ -35,6 +35,13 @@ sealed interface ExchangeV2State {
      */
     data object SameAccountAbort : ExchangeV2State
 
+    /**
+     * Negotiation aborted before role election — e.g. an unexpected or duplicate `hello`
+     * received while in [Negotiating] (a second hello, or the double-scan race). Terminal.
+     * Per Unified Algorithm 1214739740392701 §Handshake Note: "abort and close the channel".
+     */
+    data object Aborted : ExchangeV2State
+
     sealed interface Host : ExchangeV2State {
         data object Confirming : Host
         data object Sending : Host

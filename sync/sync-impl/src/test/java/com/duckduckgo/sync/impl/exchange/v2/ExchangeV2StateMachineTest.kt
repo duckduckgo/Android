@@ -37,6 +37,9 @@ class ExchangeV2StateMachineTest {
     private fun sm(localUserId: String? = "local-user"): ExchangeV2StateMachine =
         RealExchangeV2StateMachine(localUserId = localUserId, clock = clock)
 
+    private fun scannerSm(localUserId: String? = "local-user"): ExchangeV2StateMachine =
+        RealExchangeV2StateMachine(localUserId = localUserId, clock = clock, initialState = ExchangeV2State.Negotiating)
+
     private fun availableFromPeer(userId: String = "other", name: String = "Peer", kind: String = "3party") =
         RecoveryCodeAvailable(rawJson = "{}", userId = userId, name = name, kind = kind)
 
@@ -94,16 +97,42 @@ class ExchangeV2StateMachineTest {
 
     // ---------- Negotiating ----------
 
-    @Test fun `negotiating absorbs one hello and aborts on a second`() {
-        val machine = sm()
-        machine.receive(Hello("{}"))
-        val first = machine.receive(Hello("{}"))
-        assertSame(TransitionOutcome.Accepted, first.outcome)
-        assertSame(ExchangeV2State.Negotiating, machine.currentState)
+    @Test fun `negotiating - presenter second hello aborts to terminal Aborted`() {
+        val machine = sm() // starts Bootstrapped
+        assertSame(ExchangeV2State.Negotiating, machine.receive(Hello("{}")).newState) // legit first hello
 
-        val second = machine.receive(Hello("{}"))
-        assertTrue(second.outcome is TransitionOutcome.Aborted)
-        assertEquals(RejectReason.ImplicitAbort, (second.outcome as TransitionOutcome.Aborted).reason)
+        val result = machine.receive(Hello("{}")) // duplicate/second hello while negotiating
+
+        assertSame(ExchangeV2State.Aborted, machine.currentState)
+        assertTrue(result.outcome is TransitionOutcome.Aborted)
+        assertEquals(RejectReason.ImplicitAbort, (result.outcome as TransitionOutcome.Aborted).reason)
+        val transition = result.event as ExchangeV2Event.Transition
+        assertSame(ExchangeV2State.Negotiating, transition.from)
+        assertSame(ExchangeV2State.Aborted, transition.to)
+    }
+
+    @Test fun `negotiating - scanner hello aborts to terminal Aborted (double-scan race)`() {
+        val machine = scannerSm() // Scanner starts directly in Negotiating
+
+        val result = machine.receive(Hello("{}"))
+
+        assertSame(ExchangeV2State.Aborted, machine.currentState)
+        assertTrue(result.outcome is TransitionOutcome.Aborted)
+        assertEquals(RejectReason.ImplicitAbort, (result.outcome as TransitionOutcome.Aborted).reason)
+        val transition = result.event as ExchangeV2Event.Transition
+        assertSame(ExchangeV2State.Negotiating, transition.from)
+        assertSame(ExchangeV2State.Aborted, transition.to)
+    }
+
+    @Test fun `aborted is terminal - further messages keep state and abort`() {
+        val machine = scannerSm()
+        machine.receive(Hello("{}"))
+        assertSame(ExchangeV2State.Aborted, machine.currentState)
+
+        val result = machine.receive(availableFromPeer())
+
+        assertSame(ExchangeV2State.Aborted, machine.currentState)
+        assertTrue(result.outcome is TransitionOutcome.Aborted)
     }
 
     @Test fun `negotiating recv recovery_code_available with matching user_id transitions to SameAccountAbort`() {
