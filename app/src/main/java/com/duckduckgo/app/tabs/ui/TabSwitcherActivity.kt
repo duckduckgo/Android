@@ -19,6 +19,7 @@ package com.duckduckgo.app.tabs.ui
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.view.Gravity
 import android.view.Menu
@@ -285,13 +286,20 @@ class TabSwitcherActivity :
             OmnibarType.SINGLE_BOTTOM -> {
                 edgeToEdgeHandler.applyStatusBarInsets(tabsContainer)
                 edgeToEdgeHandler.applyNavigationBarInsets(binding.tabSwitcherToolbarBottom.root)
-                window.isNavigationBarContrastEnforced = false
+                disableNavigationBarContrast()
             }
             OmnibarType.SPLIT -> {
                 edgeToEdgeHandler.applyStatusBarInsets(binding.tabSwitcherToolbarTop.root)
                 edgeToEdgeHandler.applyNavigationBarInsets(binding.navigationBar)
-                window.isNavigationBarContrastEnforced = false
+                disableNavigationBarContrast()
             }
+        }
+    }
+
+    private fun disableNavigationBarContrast() {
+        // isNavigationBarContrastEnforced was added in API 29
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            window.isNavigationBarContrastEnforced = false
         }
     }
 
