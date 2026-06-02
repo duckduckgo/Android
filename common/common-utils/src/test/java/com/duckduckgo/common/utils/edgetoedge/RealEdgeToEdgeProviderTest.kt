@@ -16,16 +16,25 @@
 
 package com.duckduckgo.common.utils.edgetoedge
 
+import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
+import org.junit.Rule
 import org.junit.Test
 
 class RealEdgeToEdgeProviderTest {
 
+    @get:Rule
+    val coroutineRule = CoroutineTestRule()
+
     private val feature = FakeFeatureToggleFactory.create(EdgeToEdgeFeature::class.java)
-    private val testee = RealEdgeToEdgeProvider(feature)
+    private val testee = RealEdgeToEdgeProvider(
+        edgeToEdgeFeature = feature,
+        dispatchers = coroutineRule.testDispatcherProvider,
+        appScope = coroutineRule.testScope,
+    )
 
     @Test
     fun whenMasterDisabledThenBucketDisabledEvenIfBucketToggleEnabled() {
