@@ -5,12 +5,12 @@ appId: com.duckduckgo.mobile.android
 #
 - extendedWaitUntil:
     visible:
-      text: ".*Agree and Continue.*"
+      text: ".*Agree.*"
     timeout: 10000
     optional: true
 
 - tapOn:
-    text: ".*Agree and Continue.*"
+    text: ".*Agree.*"
     optional: true
 
 # Dismiss the "Your recent chats live here!" tooltip if it appears. This is a
