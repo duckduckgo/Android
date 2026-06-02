@@ -21,6 +21,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import com.duckduckgo.common.ui.compose.theme.DuckDuckGoTheme
+import com.duckduckgo.common.ui.compose.theme.DuckDuckGoThemeVariant
 
 /**
  * Helper to setup a ComposeView in an XML based layout and properly handle its lifecycle.
@@ -28,9 +29,10 @@ import com.duckduckgo.common.ui.compose.theme.DuckDuckGoTheme
 fun View.setupThemedComposeView(
     id: Int,
     isDarkTheme: Boolean,
+    variant: DuckDuckGoThemeVariant = DuckDuckGoThemeVariant.Default,
     content: @Composable () -> Unit,
 ) {
-    findViewById<ComposeView>(id)?.setupThemedComposeView(isDarkTheme, content)
+    findViewById<ComposeView>(id)?.setupThemedComposeView(isDarkTheme, variant, content)
 }
 
 /**
@@ -38,11 +40,12 @@ fun View.setupThemedComposeView(
  */
 fun ComposeView.setupThemedComposeView(
     isDarkTheme: Boolean,
+    variant: DuckDuckGoThemeVariant = DuckDuckGoThemeVariant.Default,
     content: @Composable () -> Unit,
 ) {
     setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
     setContent {
-        DuckDuckGoTheme(isDarkTheme) {
+        DuckDuckGoTheme(isDarkTheme = isDarkTheme, variant = variant) {
             content()
         }
     }
