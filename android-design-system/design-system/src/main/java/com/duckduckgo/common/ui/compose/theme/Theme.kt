@@ -77,127 +77,7 @@ fun DuckDuckGoTheme(
     isDarkTheme: Boolean = isSystemInDarkTheme(),
     content: @Composable () -> Unit,
 ) {
-    val lightColorPalette = DuckDuckGoColors(
-        backgrounds = DuckDuckGoBackgroundColors(
-            background = colorResource(R.color.background_background_light),
-            backgroundInverted = colorResource(R.color.gray100),
-            surface = colorResource(R.color.background_surface_light),
-            surfaceTransparent = White30,
-            window = colorResource(R.color.background_window_light),
-            container = Black6,
-            containerDisabled = colorResource(R.color.black6),
-        ),
-        text = DuckDuckGoTextColors(
-            primary = colorResource(R.color.text_primary_light),
-            primaryInverted = White84,
-            secondary = colorResource(R.color.text_secondary_light),
-            secondaryInverted = White60,
-            tertiary = Black36,
-            destructive = AlertRedOnLightDefault,
-            disabled = Black40,
-            logoTitle = Gray85,
-            omnibarHighlight = colorResource(R.color.blue50_20),
-        ),
-        textField = DuckDuckGoTextFieldColors(
-            borders = colorResource(R.color.black30),
-        ),
-        brand = DuckDuckGoBrandColors(
-            accentBlue = Blue50,
-            accentYellow = Yellow50,
-            accentBrand50 = Blue50.copy(alpha = .5f),
-            accentBrand20 = Blue50_20,
-        ),
-        icons = DuckDuckGoIconsColors(
-            primary = colorResource(R.color.icon_primary_light),
-            secondary = colorResource(R.color.icon_secondary_light),
-            white = White,
-            destructive = AlertRedOnLightDefault,
-            text = White,
-            disabled = colorResource(R.color.icon_tertiary_light),
-        ),
-        system = DuckDuckGoSystemColors(
-            lines = colorResource(R.color.lines_light),
-            switchTrackOn = Blue50,
-            switchTrackOff = Gray60_50,
-            switchThumb = White,
-            checkboxOn = Blue50,
-            checkboxOff = Blue50,
-            checkboxMark = White,
-            sliderTrackInactive = Gray60_50,
-            textInputEnabledOutline = Black30,
-            touchFeedback = colorResource(R.color.controls_fill_primary_light),
-        ),
-        infoPanel = DuckDuckGoInfoPanelColors(
-            backgroundBlue = Blue0_50,
-            backgroundYellow = Yellow10,
-        ),
-        status = DuckDuckGoStatusColors(
-            criticalPrimary = colorResource(R.color.alertRedOnLightDefault),
-        ),
-        isDark = false,
-    )
-
-    val darkColorPalette = DuckDuckGoColors(
-        backgrounds = DuckDuckGoBackgroundColors(
-            background = colorResource(R.color.background_background_dark),
-            backgroundInverted = colorResource(R.color.gray0),
-            surface = colorResource(R.color.background_surface_dark),
-            surfaceTransparent = Gray90.copy(alpha = .3f),
-            window = colorResource(R.color.background_window_dark),
-            container = White12,
-            containerDisabled = colorResource(R.color.white18),
-        ),
-        text = DuckDuckGoTextColors(
-            primary = colorResource(R.color.text_primary_dark),
-            primaryInverted = colorResource(R.color.black84),
-            secondary = colorResource(R.color.text_secondary_dark),
-            secondaryInverted = colorResource(R.color.black60),
-            tertiary = White36,
-            destructive = AlertRedOnDarkDefault,
-            disabled = White40,
-            logoTitle = White,
-            omnibarHighlight = colorResource(R.color.blue30_20),
-        ),
-        textField = DuckDuckGoTextFieldColors(
-            borders = colorResource(R.color.white30),
-        ),
-        brand = DuckDuckGoBrandColors(
-            accentBlue = Blue30,
-            accentYellow = Yellow50,
-            accentBrand50 = Blue30.copy(alpha = .5f),
-            accentBrand20 = Blue30_20,
-        ),
-        icons = DuckDuckGoIconsColors(
-            primary = colorResource(R.color.icon_primary_dark),
-            secondary = colorResource(R.color.icon_secondary_dark),
-            white = White,
-            destructive = AlertRedOnDarkDefault,
-            text = Black,
-            disabled = colorResource(R.color.icon_tertiary_dark),
-        ),
-        system = DuckDuckGoSystemColors(
-            lines = colorResource(R.color.lines_dark),
-            switchTrackOff = Gray40_50,
-            switchTrackOn = Blue30,
-            switchThumb = White,
-            checkboxOn = Blue30,
-            checkboxOff = Blue30,
-            checkboxMark = colorResource(R.color.background_background_dark),
-            sliderTrackInactive = Gray40_50,
-            textInputEnabledOutline = White30,
-            touchFeedback = colorResource(R.color.controls_fill_primary_dark),
-        ),
-        infoPanel = DuckDuckGoInfoPanelColors(
-            backgroundBlue = Blue50_12,
-            backgroundYellow = Yellow50_14,
-        ),
-        status = DuckDuckGoStatusColors(
-            criticalPrimary = colorResource(R.color.alertRedOnDarkDefault),
-        ),
-        isDark = true,
-    )
-
-    val colors = if (isDarkTheme) darkColorPalette else lightColorPalette
+    val colors = if (isDarkTheme) defaultDarkColors() else defaultLightColors()
 
     ProvideDuckDuckGoTheme(colors = colors) {
         MaterialTheme(
@@ -208,6 +88,166 @@ fun DuckDuckGoTheme(
         )
     }
 }
+
+@Composable
+@ReadOnlyComposable
+internal fun defaultLightColors(): DuckDuckGoColors = DuckDuckGoColors(
+    backgrounds = DuckDuckGoBackgroundColors(
+        background = colorResource(R.color.background_background_light),
+        backgroundInverted = colorResource(R.color.gray100),
+        surface = colorResource(R.color.background_surface_light),
+        surfaceTransparent = White30,
+        window = colorResource(R.color.background_window_light),
+        container = Black6,
+        containerDisabled = colorResource(R.color.black6),
+    ),
+    text = DuckDuckGoTextColors(
+        primary = colorResource(R.color.text_primary_light),
+        primaryInverted = White84,
+        secondary = colorResource(R.color.text_secondary_light),
+        secondaryInverted = White60,
+        tertiary = Black36,
+        destructive = AlertRedOnLightDefault,
+        disabled = Black40,
+        logoTitle = Gray85,
+        omnibarHighlight = colorResource(R.color.blue50_20),
+    ),
+    brand = DuckDuckGoBrandColors(
+        accentBlue = Blue50,
+        accentYellow = Yellow50,
+        accentBrand50 = Blue50.copy(alpha = .5f),
+        accentBrand20 = Blue50_20,
+    ),
+    icons = DuckDuckGoIconsColors(
+        primary = colorResource(R.color.icon_primary_light),
+        secondary = colorResource(R.color.icon_secondary_light),
+        white = White,
+        destructive = AlertRedOnLightDefault,
+        text = White,
+        disabled = colorResource(R.color.icon_tertiary_light),
+    ),
+    infoPanel = DuckDuckGoInfoPanelColors(
+        backgroundBlue = Blue0_50,
+        backgroundYellow = Yellow10,
+    ),
+    textField = DuckDuckGoTextFieldColors(
+        borders = colorResource(R.color.black30),
+    ),
+    status = DuckDuckGoStatusColors(
+        criticalPrimary = colorResource(R.color.alertRedOnLightDefault),
+        indicatorActive = AlertGreen,
+        indicatorInactive = Gray50,
+    ),
+    system = DuckDuckGoSystemColors(
+        lines = colorResource(R.color.lines_light),
+        switchTrackOn = Blue50,
+        switchTrackOff = Gray60_50,
+        switchThumb = White,
+        checkboxOn = Blue50,
+        checkboxOff = Blue50,
+        checkboxMark = White,
+        sliderTrackInactive = Gray60_50,
+        textInputEnabledOutline = Black30,
+        touchFeedback = colorResource(R.color.controls_fill_primary_light),
+        scrim = Scrim,
+    ),
+    button = DuckDuckGoButtonColors(
+        primaryContainer = Blue50,
+        primaryContainerPressed = Blue70,
+        primaryText = White,
+        primaryContainerDisabled = Black6,
+        secondaryContainerPressed = Blue50_12,
+        secondaryText = Blue50,
+        secondaryTextPressed = Blue70,
+        secondaryBorderDisabled = Black12,
+        ghostAltContainerPressed = Black6,
+        ghostAltText = Black60,
+        destructiveContainerPressed = AlertRedOnLightPressed,
+        destructiveGhostContainerPressed = AlertRedOnLightDefault18,
+        destructiveGhostTextPressed = AlertRedOnLightTextPressed,
+    ),
+    isDark = false,
+)
+
+@Composable
+@ReadOnlyComposable
+internal fun defaultDarkColors(): DuckDuckGoColors = DuckDuckGoColors(
+    backgrounds = DuckDuckGoBackgroundColors(
+        background = colorResource(R.color.background_background_dark),
+        backgroundInverted = colorResource(R.color.gray0),
+        surface = colorResource(R.color.background_surface_dark),
+        surfaceTransparent = Gray90.copy(alpha = .3f),
+        window = colorResource(R.color.background_window_dark),
+        container = White12,
+        containerDisabled = colorResource(R.color.white18),
+    ),
+    text = DuckDuckGoTextColors(
+        primary = colorResource(R.color.text_primary_dark),
+        primaryInverted = colorResource(R.color.black84),
+        secondary = colorResource(R.color.text_secondary_dark),
+        secondaryInverted = colorResource(R.color.black60),
+        tertiary = White36,
+        destructive = AlertRedOnDarkDefault,
+        disabled = White40,
+        logoTitle = White,
+        omnibarHighlight = colorResource(R.color.blue30_20),
+    ),
+    brand = DuckDuckGoBrandColors(
+        accentBlue = Blue30,
+        accentYellow = Yellow50,
+        accentBrand50 = Blue30.copy(alpha = .5f),
+        accentBrand20 = Blue30_20,
+    ),
+    icons = DuckDuckGoIconsColors(
+        primary = colorResource(R.color.icon_primary_dark),
+        secondary = colorResource(R.color.icon_secondary_dark),
+        white = White,
+        destructive = AlertRedOnDarkDefault,
+        text = Black,
+        disabled = colorResource(R.color.icon_tertiary_dark),
+    ),
+    infoPanel = DuckDuckGoInfoPanelColors(
+        backgroundBlue = Blue50_12,
+        backgroundYellow = Yellow50_14,
+    ),
+    textField = DuckDuckGoTextFieldColors(
+        borders = colorResource(R.color.white30),
+    ),
+    status = DuckDuckGoStatusColors(
+        criticalPrimary = colorResource(R.color.alertRedOnDarkDefault),
+        indicatorActive = AlertGreen,
+        indicatorInactive = Gray50,
+    ),
+    system = DuckDuckGoSystemColors(
+        lines = colorResource(R.color.lines_dark),
+        switchTrackOff = Gray40_50,
+        switchTrackOn = Blue30,
+        switchThumb = White,
+        checkboxOn = Blue30,
+        checkboxOff = Blue30,
+        checkboxMark = colorResource(R.color.background_background_dark),
+        sliderTrackInactive = Gray40_50,
+        textInputEnabledOutline = White30,
+        touchFeedback = colorResource(R.color.controls_fill_primary_dark),
+        scrim = Scrim,
+    ),
+    button = DuckDuckGoButtonColors(
+        primaryContainer = Blue30,
+        primaryContainerPressed = Blue50,
+        primaryText = Black84,
+        primaryContainerDisabled = White6,
+        secondaryContainerPressed = Blue30_20,
+        secondaryText = Blue30,
+        secondaryTextPressed = Blue20,
+        secondaryBorderDisabled = White24,
+        ghostAltContainerPressed = White12,
+        ghostAltText = White84,
+        destructiveContainerPressed = AlertRedOnDarkPressed,
+        destructiveGhostContainerPressed = AlertRedOnDarkDefault18,
+        destructiveGhostTextPressed = AlertRedOnDarkTextPressed,
+    ),
+    isDark = true,
+)
 
 /**
  * A Material3 [ColorScheme] implementation which sets all colors to [debugColor] to discourage usage of
