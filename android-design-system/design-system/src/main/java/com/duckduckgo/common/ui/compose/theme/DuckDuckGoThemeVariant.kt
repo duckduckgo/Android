@@ -16,10 +16,6 @@
 
 package com.duckduckgo.common.ui.compose.theme
 
-/**
- * Selects which set of colors and typography [DuckDuckGoTheme] provides. The semantic layer
- * ([DuckDuckGoColors], [DuckDuckGoTypography]) is identical across variants — only the instances differ.
- */
 enum class DuckDuckGoThemeVariant {
     Default,
     Onboarding,

@@ -72,6 +72,15 @@ fun ProvideDuckDuckGoTheme(
     )
 }
 
+/**
+ * The main entry point for applying the DuckDuckGo theme to an app. This should typically be called from the top level of an app's composable hierarchy.
+ *
+ * @param isDarkTheme Whether to use the dark theme variant. By default, this uses the system setting.
+ * @param variant The theme variant to use, which selects the specific semantic classes instances to provide. By default, this is [DuckDuckGoThemeVariant.Default].
+ * @param content The composable content to which the theme should be applied.
+ *
+ * Asana task: https://app.asana.com/1/137249556945/project/1202857801505092/task/1215345890679455
+ */
 @Composable
 fun DuckDuckGoTheme(
     isDarkTheme: Boolean = isSystemInDarkTheme(),
