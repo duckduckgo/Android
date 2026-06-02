@@ -19,6 +19,7 @@ package com.duckduckgo.common.ui.internal.ui
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.widget.RadioGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -26,6 +27,8 @@ import androidx.lifecycle.lifecycleScope
 import androidx.viewpager.widget.ViewPager
 import com.duckduckgo.common.ui.DuckDuckGoTheme
 import com.duckduckgo.common.ui.applyTheme
+import com.duckduckgo.common.ui.compose.theme.DuckDuckGoThemeVariant
+import com.duckduckgo.common.ui.getThemeId
 import com.duckduckgo.common.ui.internal.R
 import com.duckduckgo.common.ui.internal.ui.store.AppComponentsPrefsDataStore
 import com.duckduckgo.common.ui.internal.ui.store.appComponentsDataStore
@@ -62,13 +65,19 @@ class AppComponentsActivity : AppCompatActivity() {
     private lateinit var viewPager: ViewPager
     private lateinit var tabLayout: TabLayout
     private lateinit var darkThemeSwitch: OneLineListItem
+    private lateinit var themeVariantGroup: RadioGroup
 
     @Suppress("DenyListedApi")
     override fun onCreate(savedInstanceState: Bundle?) {
-        val selectedTheme = runBlocking {
+        val (selectedTheme, selectedVariant) = runBlocking {
             val selectedTheme = appComponentsViewModel.themeFlow.first()
-            applyTheme(selectedTheme)
-            selectedTheme
+            val selectedVariant = appComponentsViewModel.variantFlow.first()
+            if (selectedVariant == DuckDuckGoThemeVariant.Onboarding) {
+                setTheme(onboardingThemeId(selectedTheme))
+            } else {
+                applyTheme(selectedTheme)
+            }
+            selectedTheme to selectedVariant
         }
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_app_components)
@@ -92,6 +101,36 @@ class AppComponentsActivity : AppCompatActivity() {
                 startActivity(intent(this@AppComponentsActivity))
                 finish()
             }
+        }
+
+        themeVariantGroup = findViewById(R.id.theme_variant_group)
+        themeVariantGroup.check(
+            if (selectedVariant == DuckDuckGoThemeVariant.Onboarding) {
+                R.id.radio_theme_onboarding
+            } else {
+                R.id.radio_theme_default
+            },
+        )
+        themeVariantGroup.setOnCheckedChangeListener { _, checkedId ->
+            val newVariant = if (checkedId == R.id.radio_theme_onboarding) {
+                DuckDuckGoThemeVariant.Onboarding
+            } else {
+                DuckDuckGoThemeVariant.Default
+            }
+            lifecycleScope.launch {
+                appComponentsViewModel.setVariant(newVariant)
+                startActivity(intent(this@AppComponentsActivity))
+                finish()
+            }
+        }
+    }
+
+    private fun onboardingThemeId(theme: DuckDuckGoTheme): Int {
+        val dark = getThemeId(theme) == com.duckduckgo.mobile.android.R.style.Theme_DuckDuckGo_Dark
+        return if (dark) {
+            com.duckduckgo.mobile.android.R.style.Theme_DuckDuckGo_Dark_Onboarding
+        } else {
+            com.duckduckgo.mobile.android.R.style.Theme_DuckDuckGo_Light_Onboarding
         }
     }
 
