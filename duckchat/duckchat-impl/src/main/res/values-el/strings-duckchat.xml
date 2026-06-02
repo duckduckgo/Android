@@ -116,6 +116,9 @@
     <!-- Duck AI Voice Chat Shortcut Setting -->
     <string name="duckAiVoiceChatVisibilitySetting" instruction="Voice Chat is a feature that lets users talk to Duck.ai using their voice instead of typing.">Φωνητική συνομιλία</string>
 
+    <!-- Duck AI Chat Suggestions -->
+    <string name="duckAiChatHistoryViewAllChats">Προβολή όλων των συνομιλιών</string>
+
     <!-- Native Duck.ai chat history -->
     <string name="duck_ai_chat_history_title">Συνομιλίες</string>
     <string name="duck_ai_chat_history_section_pinned">Καρφιτσωμένες</string>
@@ -135,6 +138,12 @@
     <string name="duck_ai_chat_history_search_close_content_description">Κλείσιμο αναζήτησης</string>
     <string name="duck_ai_chat_history_search_clear_content_description">Εκκαθάριση αναζήτησης</string>
     <string name="duck_ai_chat_history_action_fire_content_description">Διαγραφή συνομιλιών</string>
+    <string name="duck_ai_chat_history_action_new">Νέο</string>
+    <string name="duck_ai_chat_history_action_download_selected_content_description">Λήψη συνομιλιών</string>
+    <plurals name="duck_ai_chat_history_bulk_download_complete">
+        <item quantity="one">Ολοκληρώθηκε η λήψη για %1$d συνομιλία</item>
+        <item quantity="other">Ολοκληρώθηκε η λήψη για %1$d συνομιλίες</item>
+    </plurals>
     <string name="duck_ai_chat_history_action_overflow_content_description">Άνοιγμα μενού υπερχείλισης</string>
     <string name="duck_ai_chat_history_select_all">Επιλογή όλων</string>
     <string name="duck_ai_chat_history_unselect_all">Αποεπιλογή όλων</string>
@@ -152,4 +161,5 @@
     <string name="duck_ai_chat_history_download_complete" instruction="%1$s is the saved chat filename (e.g. \&apos;My Chat.txt\&apos;).">Ολοκληρώθηκε η λήψη για το αρχείο %1$s</string>
     <string name="duck_ai_chat_history_download_view">Εμφάνιση</string>
     <string name="duck_ai_chat_history_download_error">Δεν ήταν δυνατή η εξαγωγή της συνομιλίας</string>
+    <string name="duck_ai_chat_history_bulk_download_error">Δεν ήταν δυνατή η εξαγωγή των συνομιλιών</string>
 </resources>
