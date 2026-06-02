@@ -44,6 +44,7 @@ class EdgeToEdgeHandler @Inject constructor() {
             v.updatePadding(top = initialTop + top)
             insets
         }
+        ViewCompat.requestApplyInsets(view)
     }
 
     /**
@@ -59,6 +60,7 @@ class EdgeToEdgeHandler @Inject constructor() {
             v.updatePadding(bottom = initialBottom + bottom)
             insets
         }
+        ViewCompat.requestApplyInsets(view)
     }
 
     /**
@@ -81,5 +83,6 @@ class EdgeToEdgeHandler @Inject constructor() {
             )
             insets
         }
+        ViewCompat.requestApplyInsets(view)
     }
 }
