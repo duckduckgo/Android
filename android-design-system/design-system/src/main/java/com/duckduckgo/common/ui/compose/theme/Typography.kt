@@ -179,6 +179,48 @@ data class DuckDuckGoTypography(
 
 val Typography = DuckDuckGoTypography()
 
+val OnboardingTypography = DuckDuckGoTypography(
+    title = DuckDuckGoTextStyle(
+        TextStyle(fontSize = 32.sp, lineHeight = 36.sp, fontWeight = FontWeight.Bold, fontFamily = DuckSansDisplay),
+    ),
+    h1 = DuckDuckGoTextStyle(
+        TextStyle(fontSize = 24.sp, lineHeight = 30.sp, fontWeight = FontWeight.Bold, fontFamily = DuckSansDisplay),
+    ),
+    h2 = DuckDuckGoTextStyle(
+        TextStyle(fontSize = 24.sp, lineHeight = 28.sp, fontWeight = FontWeight.Bold, fontFamily = DuckSansDisplay),
+    ),
+    h3 = DuckDuckGoTextStyle(
+        TextStyle(fontSize = 16.sp, lineHeight = 21.sp, fontWeight = FontWeight.Medium, fontFamily = DuckSansDisplay),
+    ),
+    h4 = DuckDuckGoTextStyle(
+        TextStyle(fontSize = 14.sp, lineHeight = 20.sp, letterSpacing = 0.3.sp, fontWeight = FontWeight.Medium, fontFamily = DuckSansDisplay),
+    ),
+    h5 = DuckDuckGoTextStyle(
+        TextStyle(fontSize = 13.sp, lineHeight = 16.sp, fontWeight = FontWeight.Medium, fontFamily = DuckSansDisplay),
+    ),
+    body1 = DuckDuckGoTextStyle(
+        TextStyle(fontSize = 18.sp, lineHeight = 22.sp, fontFamily = DuckSansProduct),
+    ),
+    body1Bold = DuckDuckGoTextStyle(
+        TextStyle(fontSize = 18.sp, lineHeight = 22.sp, fontWeight = FontWeight.Bold, fontFamily = DuckSansProduct),
+    ),
+    body1Mono = DuckDuckGoTextStyle(
+        TextStyle(fontSize = 16.sp, lineHeight = 20.sp, fontFamily = RobotoMono),
+    ),
+    body2 = DuckDuckGoTextStyle(
+        TextStyle(fontSize = 14.sp, lineHeight = 18.sp, letterSpacing = 0.2.sp, fontFamily = DuckSansProduct),
+    ),
+    body2Bold = DuckDuckGoTextStyle(
+        TextStyle(fontSize = 14.sp, lineHeight = 18.sp, letterSpacing = 0.3.sp, fontWeight = FontWeight.Bold, fontFamily = DuckSansProduct),
+    ),
+    button = DuckDuckGoTextStyle(
+        TextStyle(fontSize = 18.sp, lineHeight = 20.sp, fontWeight = FontWeight.Normal, fontFamily = DuckSansProduct),
+    ),
+    caption = DuckDuckGoTextStyle(
+        TextStyle(fontSize = 12.sp, lineHeight = 16.sp, letterSpacing = 0.2.sp, fontFamily = DuckSansProduct),
+    ),
+)
+
 @SuppressLint("ComposeCompositionLocalUsage")
 val LocalDuckDuckGoTypography = staticCompositionLocalOf<DuckDuckGoTypography> {
     error("No DuckDuckGoTypography provided")
