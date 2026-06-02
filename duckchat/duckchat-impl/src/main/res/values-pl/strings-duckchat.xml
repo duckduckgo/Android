@@ -138,6 +138,14 @@
     <string name="duck_ai_chat_history_search_close_content_description">Zamknij wyszukiwanie</string>
     <string name="duck_ai_chat_history_search_clear_content_description">Wyczyść wyszukiwanie</string>
     <string name="duck_ai_chat_history_action_fire_content_description">Usuń czaty</string>
+    <string name="duck_ai_chat_history_action_new">Nowe</string>
+    <string name="duck_ai_chat_history_action_download_selected_content_description">Pobierz czaty</string>
+    <plurals name="duck_ai_chat_history_bulk_download_complete">
+        <item quantity="one">Pobieranie zakończone dla %1$d czatu</item>
+        <item quantity="few">Pobieranie zakończone dla %1$d czatów</item>
+        <item quantity="many">Pobieranie zakończone dla %1$d czatów</item>
+        <item quantity="other">Pobieranie zakończone dla %1$d czatów</item>
+    </plurals>
     <string name="duck_ai_chat_history_action_overflow_content_description">Otwórz menu przepełnienia</string>
     <string name="duck_ai_chat_history_select_all">Wybierz wszystko</string>
     <string name="duck_ai_chat_history_unselect_all">Anuluj wybór wszystkiego</string>
@@ -155,4 +163,5 @@
     <string name="duck_ai_chat_history_download_complete" instruction="%1$s is the saved chat filename (e.g. \&apos;My Chat.txt\&apos;).">Zakończono pobieranie pliku %1$s</string>
     <string name="duck_ai_chat_history_download_view">Pokaż</string>
     <string name="duck_ai_chat_history_download_error">Nie udało się wyeksportować czatu</string>
+    <string name="duck_ai_chat_history_bulk_download_error">Nie udało się wyeksportować czatów</string>
 </resources>
