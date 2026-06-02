@@ -49,6 +49,7 @@ import com.duckduckgo.common.ui.compose.textfield.DaxTextFieldDefaults
 import com.duckduckgo.common.ui.compose.textfield.DaxTextFieldInputMode
 import com.duckduckgo.common.ui.compose.textfield.DaxTextFieldLineLimits
 import com.duckduckgo.common.ui.compose.textfield.DaxTextFieldTrailingIconScope
+import com.duckduckgo.common.ui.compose.theme.DuckDuckGoThemeVariant
 import com.duckduckgo.common.ui.internal.databinding.ComponentTextInputViewBinding
 import com.duckduckgo.common.ui.internal.ui.appComponentsViewModel
 import com.duckduckgo.common.ui.internal.ui.setupThemedComposeView
@@ -117,7 +118,8 @@ class ComponentTextInputFragment : Fragment() {
         }
 
         val isDarkTheme = runBlocking { appComponentsViewModel.themeFlow.first() } == AppTheme.DARK
-        setupComposeViews(view, isDarkTheme)
+        val variant = runBlocking { appComponentsViewModel.variantFlow.first() }
+        setupComposeViews(view, isDarkTheme, variant)
     }
 
     override fun onDestroyView() {
@@ -138,9 +140,10 @@ class ComponentTextInputFragment : Fragment() {
     private fun setupComposeViews(
         view: View,
         isDarkTheme: Boolean,
+        variant: DuckDuckGoThemeVariant,
     ) {
         // Hint text
-        view.setupThemedComposeView(id = com.duckduckgo.common.ui.internal.R.id.compose_text_input_1, isDarkTheme = isDarkTheme) {
+        view.setupThemedComposeView(id = com.duckduckgo.common.ui.internal.R.id.compose_text_input_1, isDarkTheme = isDarkTheme, variant = variant) {
             val state = rememberTextFieldState()
             DaxTextField(
                 state = state,
@@ -149,7 +152,7 @@ class ComponentTextInputFragment : Fragment() {
         }
 
         // Single line editable text
-        view.setupThemedComposeView(id = com.duckduckgo.common.ui.internal.R.id.compose_text_input_3, isDarkTheme = isDarkTheme) {
+        view.setupThemedComposeView(id = com.duckduckgo.common.ui.internal.R.id.compose_text_input_3, isDarkTheme = isDarkTheme, variant = variant) {
             val state =
                 rememberTextFieldState(
                     "This is an editable text! It has a very long text to show how it behaves when " +
@@ -163,7 +166,7 @@ class ComponentTextInputFragment : Fragment() {
         }
 
         // Multi line editable text
-        view.setupThemedComposeView(id = com.duckduckgo.common.ui.internal.R.id.compose_text_input_2, isDarkTheme = isDarkTheme) {
+        view.setupThemedComposeView(id = com.duckduckgo.common.ui.internal.R.id.compose_text_input_2, isDarkTheme = isDarkTheme, variant = variant) {
             val state =
                 rememberTextFieldState(
                     "This is an editable text! It has a very long text to show how it behaves when " +
@@ -177,7 +180,7 @@ class ComponentTextInputFragment : Fragment() {
         }
 
         // Form mode editable text
-        view.setupThemedComposeView(id = com.duckduckgo.common.ui.internal.R.id.compose_text_input_40, isDarkTheme = isDarkTheme) {
+        view.setupThemedComposeView(id = com.duckduckgo.common.ui.internal.R.id.compose_text_input_40, isDarkTheme = isDarkTheme, variant = variant) {
             val state =
                 rememberTextFieldState(
                     "This is an editable text! It has a very long text to show how it behaves when " +
@@ -191,7 +194,7 @@ class ComponentTextInputFragment : Fragment() {
         }
 
         // Non-editable text full click listener with end icon
-        view.setupThemedComposeView(id = com.duckduckgo.common.ui.internal.R.id.compose_text_input_30, isDarkTheme = isDarkTheme) {
+        view.setupThemedComposeView(id = com.duckduckgo.common.ui.internal.R.id.compose_text_input_30, isDarkTheme = isDarkTheme, variant = variant) {
             val state = rememberTextFieldState("Non-editable text full click listener with end icon.")
 
             val interactionSource = remember { MutableInteractionSource() }
@@ -222,7 +225,7 @@ class ComponentTextInputFragment : Fragment() {
         }
 
         // Non-editable text full click listener
-        view.setupThemedComposeView(id = com.duckduckgo.common.ui.internal.R.id.compose_text_input_31, isDarkTheme = isDarkTheme) {
+        view.setupThemedComposeView(id = com.duckduckgo.common.ui.internal.R.id.compose_text_input_31, isDarkTheme = isDarkTheme, variant = variant) {
             val state = rememberTextFieldState("Non-editable text full click listener.")
 
             val interactionSource = remember { MutableInteractionSource() }
@@ -244,7 +247,7 @@ class ComponentTextInputFragment : Fragment() {
         }
 
         // Non-editable text with line truncation and end icon
-        view.setupThemedComposeView(id = com.duckduckgo.common.ui.internal.R.id.compose_text_input_32, isDarkTheme = isDarkTheme) {
+        view.setupThemedComposeView(id = com.duckduckgo.common.ui.internal.R.id.compose_text_input_32, isDarkTheme = isDarkTheme, variant = variant) {
             val state =
                 rememberTextFieldState(
                     "Non-editable text with line truncation and end icon. It has a very long text to " +
@@ -268,7 +271,7 @@ class ComponentTextInputFragment : Fragment() {
         }
 
         // Non-editable text with line truncation
-        view.setupThemedComposeView(id = com.duckduckgo.common.ui.internal.R.id.compose_text_input_33, isDarkTheme = isDarkTheme) {
+        view.setupThemedComposeView(id = com.duckduckgo.common.ui.internal.R.id.compose_text_input_33, isDarkTheme = isDarkTheme, variant = variant) {
             val state =
                 rememberTextFieldState(
                     "Non-editable text with line truncation. It has a very long text to show how it " +
@@ -284,7 +287,7 @@ class ComponentTextInputFragment : Fragment() {
         }
 
         // Non-editable text with end icon
-        view.setupThemedComposeView(id = com.duckduckgo.common.ui.internal.R.id.compose_text_input_4, isDarkTheme = isDarkTheme) {
+        view.setupThemedComposeView(id = com.duckduckgo.common.ui.internal.R.id.compose_text_input_4, isDarkTheme = isDarkTheme, variant = variant) {
             val state = rememberTextFieldState("This is not editable.")
             DaxTextField(
                 state = state,
@@ -304,7 +307,7 @@ class ComponentTextInputFragment : Fragment() {
         }
 
         // Non-editable text without end icon
-        view.setupThemedComposeView(id = com.duckduckgo.common.ui.internal.R.id.compose_text_input_5, isDarkTheme = isDarkTheme) {
+        view.setupThemedComposeView(id = com.duckduckgo.common.ui.internal.R.id.compose_text_input_5, isDarkTheme = isDarkTheme, variant = variant) {
             val state =
                 rememberTextFieldState(
                     "This is not editable and has no icon. Lorem ipsum dolor sit amet, consectetur " +
@@ -318,7 +321,7 @@ class ComponentTextInputFragment : Fragment() {
         }
 
         // Editable password that fits in one line
-        view.setupThemedComposeView(id = com.duckduckgo.common.ui.internal.R.id.compose_text_input_6, isDarkTheme = isDarkTheme) {
+        view.setupThemedComposeView(id = com.duckduckgo.common.ui.internal.R.id.compose_text_input_6, isDarkTheme = isDarkTheme, variant = variant) {
             val state = rememberTextFieldState("Loremipsumolor")
 
             DaxSecureTextField(
@@ -328,7 +331,7 @@ class ComponentTextInputFragment : Fragment() {
         }
 
         // Editable password that doesn't fit in one line
-        view.setupThemedComposeView(id = com.duckduckgo.common.ui.internal.R.id.compose_text_input_9, isDarkTheme = isDarkTheme) {
+        view.setupThemedComposeView(id = com.duckduckgo.common.ui.internal.R.id.compose_text_input_9, isDarkTheme = isDarkTheme, variant = variant) {
             val state = rememberTextFieldState(
                 "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do " +
                     "eiusmod tempor incididunt ut labore.",
@@ -341,7 +344,7 @@ class ComponentTextInputFragment : Fragment() {
         }
 
         // Non-editable password
-        view.setupThemedComposeView(id = com.duckduckgo.common.ui.internal.R.id.compose_text_input_8, isDarkTheme = isDarkTheme) {
+        view.setupThemedComposeView(id = com.duckduckgo.common.ui.internal.R.id.compose_text_input_8, isDarkTheme = isDarkTheme, variant = variant) {
             val state = rememberTextFieldState(
                 "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do " +
                     "eiusmod tempor incididunt ut labore.",
@@ -355,7 +358,7 @@ class ComponentTextInputFragment : Fragment() {
         }
 
         // Non-editable password with icon
-        view.setupThemedComposeView(id = com.duckduckgo.common.ui.internal.R.id.compose_text_input_20, isDarkTheme = isDarkTheme) {
+        view.setupThemedComposeView(id = com.duckduckgo.common.ui.internal.R.id.compose_text_input_20, isDarkTheme = isDarkTheme, variant = variant) {
             val state = rememberTextFieldState(
                 "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do " +
                     "eiusmod tempor incididunt ut labore.",
@@ -378,7 +381,7 @@ class ComponentTextInputFragment : Fragment() {
         }
 
         // Error
-        view.setupThemedComposeView(id = com.duckduckgo.common.ui.internal.R.id.compose_text_input_21, isDarkTheme = isDarkTheme) {
+        view.setupThemedComposeView(id = com.duckduckgo.common.ui.internal.R.id.compose_text_input_21, isDarkTheme = isDarkTheme, variant = variant) {
             val state = rememberTextFieldState("This is an error")
             DaxTextField(
                 state = state,
@@ -389,7 +392,7 @@ class ComponentTextInputFragment : Fragment() {
         }
 
         // Non-editable text with end icon in error state
-        view.setupThemedComposeView(id = com.duckduckgo.common.ui.internal.R.id.compose_text_input_41, isDarkTheme = isDarkTheme) {
+        view.setupThemedComposeView(id = com.duckduckgo.common.ui.internal.R.id.compose_text_input_41, isDarkTheme = isDarkTheme, variant = variant) {
             val state = rememberTextFieldState("Non-editable text with end icon in error state")
 
             DaxTextField(
@@ -411,7 +414,7 @@ class ComponentTextInputFragment : Fragment() {
         }
 
         // Disabled text input
-        view.setupThemedComposeView(id = com.duckduckgo.common.ui.internal.R.id.compose_text_input_22, isDarkTheme = isDarkTheme) {
+        view.setupThemedComposeView(id = com.duckduckgo.common.ui.internal.R.id.compose_text_input_22, isDarkTheme = isDarkTheme, variant = variant) {
             val state = rememberTextFieldState("This input is disabled")
             DaxTextField(
                 state = state,
@@ -422,7 +425,7 @@ class ComponentTextInputFragment : Fragment() {
         }
 
         // Disabled multi line input
-        view.setupThemedComposeView(id = com.duckduckgo.common.ui.internal.R.id.compose_text_input_23, isDarkTheme = isDarkTheme) {
+        view.setupThemedComposeView(id = com.duckduckgo.common.ui.internal.R.id.compose_text_input_23, isDarkTheme = isDarkTheme, variant = variant) {
             val state = rememberTextFieldState("This input is disabled")
             DaxTextField(
                 state = state,
@@ -433,7 +436,7 @@ class ComponentTextInputFragment : Fragment() {
         }
 
         // Disabled password
-        view.setupThemedComposeView(id = com.duckduckgo.common.ui.internal.R.id.compose_text_input_24, isDarkTheme = isDarkTheme) {
+        view.setupThemedComposeView(id = com.duckduckgo.common.ui.internal.R.id.compose_text_input_24, isDarkTheme = isDarkTheme, variant = variant) {
             val state = rememberTextFieldState("This password input is disabled")
 
             DaxSecureTextField(
@@ -444,7 +447,7 @@ class ComponentTextInputFragment : Fragment() {
         }
 
         // IP Address
-        view.setupThemedComposeView(id = com.duckduckgo.common.ui.internal.R.id.compose_text_input_25, isDarkTheme = isDarkTheme) {
+        view.setupThemedComposeView(id = com.duckduckgo.common.ui.internal.R.id.compose_text_input_25, isDarkTheme = isDarkTheme, variant = variant) {
             val state = rememberTextFieldState("192.168.1.1")
             DaxTextField(
                 state = state,
@@ -456,7 +459,7 @@ class ComponentTextInputFragment : Fragment() {
         }
 
         // URL
-        view.setupThemedComposeView(id = com.duckduckgo.common.ui.internal.R.id.compose_text_input_26, isDarkTheme = isDarkTheme) {
+        view.setupThemedComposeView(id = com.duckduckgo.common.ui.internal.R.id.compose_text_input_26, isDarkTheme = isDarkTheme, variant = variant) {
             val state = rememberTextFieldState("https://www.duckduckgo.com")
             DaxTextField(
                 state = state,
@@ -467,7 +470,11 @@ class ComponentTextInputFragment : Fragment() {
         }
 
         // Observable text - option 1
-        view.setupThemedComposeView(id = com.duckduckgo.common.ui.internal.R.id.compose_text_input_27a, isDarkTheme = isDarkTheme) {
+        view.setupThemedComposeView(
+            id = com.duckduckgo.common.ui.internal.R.id.compose_text_input_27a,
+            isDarkTheme = isDarkTheme,
+            variant = variant,
+        ) {
             val state = rememberTextFieldState("")
 
             DaxTextField(
@@ -483,7 +490,11 @@ class ComponentTextInputFragment : Fragment() {
         }
 
         // Observable text - option 2
-        view.setupThemedComposeView(id = com.duckduckgo.common.ui.internal.R.id.compose_text_input_27b, isDarkTheme = isDarkTheme) {
+        view.setupThemedComposeView(
+            id = com.duckduckgo.common.ui.internal.R.id.compose_text_input_27b,
+            isDarkTheme = isDarkTheme,
+            variant = variant,
+        ) {
             val state = rememberTextFieldState("")
             var error by remember { mutableStateOf<String?>(null) }
 
@@ -510,7 +521,7 @@ class ComponentTextInputFragment : Fragment() {
         }
 
         // Autoselect text on focus
-        view.setupThemedComposeView(id = com.duckduckgo.common.ui.internal.R.id.compose_text_input_28, isDarkTheme = isDarkTheme) {
+        view.setupThemedComposeView(id = com.duckduckgo.common.ui.internal.R.id.compose_text_input_28, isDarkTheme = isDarkTheme, variant = variant) {
             val state = rememberTextFieldState("Tap to focus and select all text")
 
             val interactionSource = remember { MutableInteractionSource() }
@@ -532,7 +543,7 @@ class ComponentTextInputFragment : Fragment() {
         }
 
         // Focus programmatically
-        view.setupThemedComposeView(id = com.duckduckgo.common.ui.internal.R.id.compose_text_input_29, isDarkTheme = isDarkTheme) {
+        view.setupThemedComposeView(id = com.duckduckgo.common.ui.internal.R.id.compose_text_input_29, isDarkTheme = isDarkTheme, variant = variant) {
             val focusRequester = remember { FocusRequester() }
             val state = rememberTextFieldState("")
 

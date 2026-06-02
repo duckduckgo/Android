@@ -40,8 +40,9 @@ class TemplatesFragment : Fragment() {
         savedInstanceState: Bundle?,
     ): View {
         val isDarkTheme = runBlocking { appComponentsViewModel.themeFlow.first() } == DuckDuckGoTheme.DARK
+        val variant = runBlocking { appComponentsViewModel.variantFlow.first() }
         return ComposeView(requireContext()).apply {
-            setupThemedComposeView(isDarkTheme) {
+            setupThemedComposeView(isDarkTheme, variant) {
                 TemplatesPane()
             }
         }

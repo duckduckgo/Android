@@ -23,6 +23,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.duckduckgo.common.ui.compose.theme.DuckDuckGoTheme
+import com.duckduckgo.common.ui.compose.theme.DuckDuckGoThemeVariant
 import com.duckduckgo.common.ui.internal.R
 import com.duckduckgo.common.ui.internal.ui.appComponentsViewModel
 import com.duckduckgo.common.ui.internal.ui.setupThemedComposeView
@@ -52,15 +53,17 @@ class ColorPaletteFragment : Fragment() {
         savedInstanceBundle: Bundle?,
     ) {
         val isDarkTheme = runBlocking { appComponentsViewModel.themeFlow.first() } == AppTheme.DARK
+        val variant = runBlocking { appComponentsViewModel.variantFlow.first() }
 
-        setupComposeViews(view, isDarkTheme)
+        setupComposeViews(view, isDarkTheme, variant)
     }
 
     private fun setupComposeViews(
         view: View,
         isDarkTheme: Boolean,
+        variant: DuckDuckGoThemeVariant,
     ) {
-        view.setupThemedComposeView(id = R.id.compose_background, isDarkTheme = isDarkTheme) {
+        view.setupThemedComposeView(id = R.id.compose_background, isDarkTheme = isDarkTheme, variant = variant) {
             DaxColorAttributeListItem(
                 text = "Background",
                 dotColors = DaxColorDotColors(
@@ -70,7 +73,7 @@ class ColorPaletteFragment : Fragment() {
             )
         }
 
-        view.setupThemedComposeView(id = R.id.compose_surface, isDarkTheme = isDarkTheme) {
+        view.setupThemedComposeView(id = R.id.compose_surface, isDarkTheme = isDarkTheme, variant = variant) {
             DaxColorAttributeListItem(
                 text = "Surface",
                 dotColors = DaxColorDotColors(
@@ -81,7 +84,7 @@ class ColorPaletteFragment : Fragment() {
         }
 
         // Container
-        view.setupThemedComposeView(id = R.id.compose_container, isDarkTheme = isDarkTheme) {
+        view.setupThemedComposeView(id = R.id.compose_container, isDarkTheme = isDarkTheme, variant = variant) {
             DaxColorAttributeListItem(
                 text = "Container",
                 dotColors = DaxColorDotColors(
@@ -92,7 +95,7 @@ class ColorPaletteFragment : Fragment() {
         }
 
         // Destructive
-        view.setupThemedComposeView(id = R.id.compose_destructive, isDarkTheme = isDarkTheme) {
+        view.setupThemedComposeView(id = R.id.compose_destructive, isDarkTheme = isDarkTheme, variant = variant) {
             DaxColorAttributeListItem(
                 text = "Destructive",
                 dotColors = DaxColorDotColors(
@@ -103,7 +106,7 @@ class ColorPaletteFragment : Fragment() {
         }
 
         // Container Disabled
-        view.setupThemedComposeView(id = R.id.compose_container_disabled, isDarkTheme = isDarkTheme) {
+        view.setupThemedComposeView(id = R.id.compose_container_disabled, isDarkTheme = isDarkTheme, variant = variant) {
             DaxColorAttributeListItem(
                 text = "Container Disabled",
                 dotColors = DaxColorDotColors(
@@ -114,7 +117,7 @@ class ColorPaletteFragment : Fragment() {
         }
 
         // Lines
-        view.setupThemedComposeView(id = R.id.compose_lines, isDarkTheme = isDarkTheme) {
+        view.setupThemedComposeView(id = R.id.compose_lines, isDarkTheme = isDarkTheme, variant = variant) {
             DaxColorAttributeListItem(
                 text = "Lines",
                 dotColors = DaxColorDotColors(
@@ -125,7 +128,7 @@ class ColorPaletteFragment : Fragment() {
         }
 
         // Accent Blue
-        view.setupThemedComposeView(id = R.id.compose_accent_blue, isDarkTheme = isDarkTheme) {
+        view.setupThemedComposeView(id = R.id.compose_accent_blue, isDarkTheme = isDarkTheme, variant = variant) {
             DaxColorAttributeListItem(
                 text = "Accent Blue",
                 dotColors = DaxColorDotColors(
@@ -136,7 +139,7 @@ class ColorPaletteFragment : Fragment() {
         }
 
         // Accent Yellow
-        view.setupThemedComposeView(id = R.id.compose_accent_yellow, isDarkTheme = isDarkTheme) {
+        view.setupThemedComposeView(id = R.id.compose_accent_yellow, isDarkTheme = isDarkTheme, variant = variant) {
             DaxColorAttributeListItem(
                 text = "Accent Yellow",
                 dotColors = DaxColorDotColors(
@@ -147,7 +150,7 @@ class ColorPaletteFragment : Fragment() {
         }
 
         // Primary Text
-        view.setupThemedComposeView(id = R.id.compose_primary_text, isDarkTheme = isDarkTheme) {
+        view.setupThemedComposeView(id = R.id.compose_primary_text, isDarkTheme = isDarkTheme, variant = variant) {
             DaxColorAttributeListItem(
                 text = "Primary Text",
                 dotColors = DaxColorDotColors(
@@ -158,7 +161,7 @@ class ColorPaletteFragment : Fragment() {
         }
 
         // Secondary Text
-        view.setupThemedComposeView(id = R.id.compose_secondary_text, isDarkTheme = isDarkTheme) {
+        view.setupThemedComposeView(id = R.id.compose_secondary_text, isDarkTheme = isDarkTheme, variant = variant) {
             DaxColorAttributeListItem(
                 text = "Secondary Text",
                 dotColors = DaxColorDotColors(
@@ -169,7 +172,7 @@ class ColorPaletteFragment : Fragment() {
         }
 
         // Text Disabled
-        view.setupThemedComposeView(id = R.id.compose_text_disabled, isDarkTheme = isDarkTheme) {
+        view.setupThemedComposeView(id = R.id.compose_text_disabled, isDarkTheme = isDarkTheme, variant = variant) {
             DaxColorAttributeListItem(
                 text = "Text Disabled",
                 dotColors = DaxColorDotColors(
@@ -180,7 +183,7 @@ class ColorPaletteFragment : Fragment() {
         }
 
         // Primary Icon - Note: There's no direct primaryIcon in DuckDuckGoColors, using text.primary as fallback
-        view.setupThemedComposeView(id = R.id.compose_primary_icon, isDarkTheme = isDarkTheme) {
+        view.setupThemedComposeView(id = R.id.compose_primary_icon, isDarkTheme = isDarkTheme, variant = variant) {
             DaxColorAttributeListItem(
                 text = "Primary Icon",
                 dotColors = DaxColorDotColors(

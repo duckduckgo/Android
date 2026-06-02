@@ -55,6 +55,7 @@ import com.duckduckgo.common.ui.compose.listitem.DaxOneLineListItem
 import com.duckduckgo.common.ui.compose.sheets.DaxActionBottomSheetDialog
 import com.duckduckgo.common.ui.compose.sheets.DaxPromoBottomSheetDialog
 import com.duckduckgo.common.ui.compose.text.DaxText
+import com.duckduckgo.common.ui.compose.theme.DuckDuckGoThemeVariant
 import com.duckduckgo.common.ui.internal.R
 import com.duckduckgo.common.ui.internal.ui.appComponentsViewModel
 import com.duckduckgo.common.ui.internal.ui.setupThemedComposeView
@@ -97,6 +98,7 @@ class DialogsFragment : Fragment() {
     ) {
         super.onViewCreated(view, savedInstanceState)
         val isDarkTheme = runBlocking { appComponentsViewModel.themeFlow.first() } == AppTheme.DARK
+        val variant = runBlocking { appComponentsViewModel.variantFlow.first() }
 
         // Common string resources used across dialog demos
         val dialogTitle = getString(CommonR.string.text_dialog_title)
@@ -129,7 +131,12 @@ class DialogsFragment : Fragment() {
             }
         }
 
-        view.setupComposeDialogShowcase(R.id.composeTextAlertDialogWithImageButton, isDarkTheme, "Text Alert Dialog With Image") { onDismiss ->
+        view.setupComposeDialogShowcase(
+            R.id.composeTextAlertDialogWithImageButton,
+            isDarkTheme,
+            variant,
+            "Text Alert Dialog With Image",
+        ) { onDismiss ->
             DaxTextAlertDialog(
                 onDismissRequest = onDismiss,
                 title = dialogTitle,
@@ -167,7 +174,7 @@ class DialogsFragment : Fragment() {
             }
         }
 
-        view.setupComposeDialogShowcase(R.id.composeRadioButtonAlertDialog, isDarkTheme, "Single Choice Alert Dialog") { onDismiss ->
+        view.setupComposeDialogShowcase(R.id.composeRadioButtonAlertDialog, isDarkTheme, variant, "Single Choice Alert Dialog") { onDismiss ->
             var selectedIndex by rememberSaveable { mutableIntStateOf(-1) }
             val options = List(3) { index ->
                 DaxRadioOption(text = optionText, onSelected = { selectedIndex = index })
@@ -218,6 +225,7 @@ class DialogsFragment : Fragment() {
         view.setupComposeDialogShowcase(
             R.id.composeRadioButtonDestructiveAlertDialog,
             isDarkTheme,
+            variant,
             "Single Choice Destructive Alert Dialog",
         ) { onDismiss ->
             var selectedIndex by rememberSaveable { mutableIntStateOf(-1) }
@@ -270,7 +278,7 @@ class DialogsFragment : Fragment() {
             }
         }
 
-        view.setupComposeDialogShowcase(R.id.composeTextAlertDialogButton, isDarkTheme, "Text Alert Dialog") { onDismiss ->
+        view.setupComposeDialogShowcase(R.id.composeTextAlertDialogButton, isDarkTheme, variant, "Text Alert Dialog") { onDismiss ->
             DaxTextAlertDialog(
                 onDismissRequest = onDismiss,
                 title = dialogTitle,
@@ -304,7 +312,12 @@ class DialogsFragment : Fragment() {
             }
         }
 
-        view.setupComposeDialogShowcase(R.id.composeTextAlertDestructiveDialogButton, isDarkTheme, "Text Alert Destructive Dialog") { onDismiss ->
+        view.setupComposeDialogShowcase(
+            R.id.composeTextAlertDestructiveDialogButton,
+            isDarkTheme,
+            variant,
+            "Text Alert Destructive Dialog",
+        ) { onDismiss ->
             DaxAlertDialog(
                 onDismissRequest = onDismiss,
                 title = dialogTitle,
@@ -349,7 +362,12 @@ class DialogsFragment : Fragment() {
             }
         }
 
-        view.setupComposeDialogShowcase(R.id.composeTextAlertSingleDialogButton, isDarkTheme, "Text Alert Single Button Dialog") { onDismiss ->
+        view.setupComposeDialogShowcase(
+            R.id.composeTextAlertSingleDialogButton,
+            isDarkTheme,
+            variant,
+            "Text Alert Single Button Dialog",
+        ) { onDismiss ->
             DaxAlertDialog(
                 onDismissRequest = onDismiss,
                 title = dialogTitle,
@@ -393,7 +411,7 @@ class DialogsFragment : Fragment() {
             }
         }
 
-        view.setupComposeDialogShowcase(R.id.composeTextAlertDialogCancellable, isDarkTheme, "Text Alert Dialog Cancellable") { onDismiss ->
+        view.setupComposeDialogShowcase(R.id.composeTextAlertDialogCancellable, isDarkTheme, variant, "Text Alert Dialog Cancellable") { onDismiss ->
             DaxTextAlertDialog(
                 onDismissRequest = onDismiss,
                 title = dialogTitle,
@@ -424,7 +442,12 @@ class DialogsFragment : Fragment() {
             }
         }
 
-        view.setupComposeDialogShowcase(R.id.composeTextAlertDialogOneButton, isDarkTheme, "Text Alert Dialog With One Button") { onDismiss ->
+        view.setupComposeDialogShowcase(
+            R.id.composeTextAlertDialogOneButton,
+            isDarkTheme,
+            variant,
+            "Text Alert Dialog With One Button",
+        ) { onDismiss ->
             DaxTextAlertDialog(
                 onDismissRequest = onDismiss,
                 title = dialogTitle,
@@ -463,7 +486,7 @@ class DialogsFragment : Fragment() {
             }
         }
 
-        view.setupThemedComposeView(R.id.composeTextAlertDialogCheckbox, isDarkTheme) {
+        view.setupThemedComposeView(R.id.composeTextAlertDialogCheckbox, isDarkTheme, variant) {
             var showDialog by remember { mutableStateOf(false) }
             var checkboxChecked by remember { mutableStateOf(false) }
             DaxSecondaryButton(
@@ -517,6 +540,7 @@ class DialogsFragment : Fragment() {
         view.setupComposeDialogShowcase(
             R.id.composeStackedAlertDialogWithImageButton,
             isDarkTheme,
+            variant,
             "Stacked Text Alert Dialog With Image and 3 buttons",
         ) { onDismiss ->
             DaxAlertDialog(
@@ -567,6 +591,7 @@ class DialogsFragment : Fragment() {
         view.setupComposeDialogShowcase(
             R.id.composeStackedAlertDialogWithButtons,
             isDarkTheme,
+            variant,
             "Stacked Text Alert Dialog With 4 buttons",
         ) { onDismiss ->
             DaxAlertDialog(
@@ -617,6 +642,7 @@ class DialogsFragment : Fragment() {
         view.setupComposeDialogShowcase(
             R.id.composeStackedAlertDestructiveDialogWithButtons,
             isDarkTheme,
+            variant,
             "Stacked Text Alert Destructive Dialog With 4 buttons",
         ) { onDismiss ->
             DaxAlertDialog(
@@ -659,7 +685,7 @@ class DialogsFragment : Fragment() {
             }
         }
 
-        view.setupThemedComposeView(R.id.composeActionBottomSheetButton, isDarkTheme) {
+        view.setupThemedComposeView(R.id.composeActionBottomSheetButton, isDarkTheme, variant) {
             val sheetState = rememberModalBottomSheetState()
             val scope = rememberCoroutineScope()
             var showBottomSheet by remember { mutableStateOf(false) }
@@ -713,7 +739,7 @@ class DialogsFragment : Fragment() {
             }
         }
 
-        view.setupThemedComposeView(R.id.composeActionBottomSheetButtonWithTitle, isDarkTheme) {
+        view.setupThemedComposeView(R.id.composeActionBottomSheetButtonWithTitle, isDarkTheme, variant) {
             val sheetState = rememberModalBottomSheetState()
             val scope = rememberCoroutineScope()
             var showBottomSheet by remember { mutableStateOf(false) }
@@ -787,7 +813,7 @@ class DialogsFragment : Fragment() {
             }
         }
 
-        view.setupThemedComposeView(R.id.composePromoBottomSheetButton, isDarkTheme) {
+        view.setupThemedComposeView(R.id.composePromoBottomSheetButton, isDarkTheme, variant) {
             val sheetState = rememberModalBottomSheetState()
             val scope = rememberCoroutineScope()
             var showBottomSheet by remember { mutableStateOf(false) }
@@ -844,7 +870,7 @@ class DialogsFragment : Fragment() {
             }
         }
 
-        view.setupThemedComposeView(R.id.composePromoBottomSheetButtonWithTitle, isDarkTheme) {
+        view.setupThemedComposeView(R.id.composePromoBottomSheetButtonWithTitle, isDarkTheme, variant) {
             val sheetState = rememberModalBottomSheetState()
             val scope = rememberCoroutineScope()
             var showBottomSheet by remember { mutableStateOf(false) }
@@ -902,7 +928,7 @@ class DialogsFragment : Fragment() {
             }
         }
 
-        view.setupThemedComposeView(R.id.composePromoBottomSheetButtonWithImage, isDarkTheme) {
+        view.setupThemedComposeView(R.id.composePromoBottomSheetButtonWithImage, isDarkTheme, variant) {
             val sheetState = rememberModalBottomSheetState()
             val scope = rememberCoroutineScope()
             var showBottomSheet by remember { mutableStateOf(false) }
@@ -1032,10 +1058,11 @@ class DialogsFragment : Fragment() {
     private fun View.setupComposeDialogShowcase(
         viewId: Int,
         isDarkTheme: Boolean,
+        variant: DuckDuckGoThemeVariant,
         buttonText: String,
         dialogContent: @Composable (onDismiss: () -> Unit) -> Unit,
     ) {
-        setupThemedComposeView(viewId, isDarkTheme) {
+        setupThemedComposeView(viewId, isDarkTheme, variant) {
             var showDialog by remember { mutableStateOf(false) }
             DaxSecondaryButton(
                 text = buttonText,

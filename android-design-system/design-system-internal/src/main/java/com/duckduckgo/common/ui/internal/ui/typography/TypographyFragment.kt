@@ -24,6 +24,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.duckduckgo.common.ui.compose.text.DaxText
 import com.duckduckgo.common.ui.compose.theme.DuckDuckGoTheme
+import com.duckduckgo.common.ui.compose.theme.DuckDuckGoThemeVariant
 import com.duckduckgo.common.ui.internal.R
 import com.duckduckgo.common.ui.internal.ui.appComponentsViewModel
 import com.duckduckgo.common.ui.internal.ui.setupThemedComposeView
@@ -60,24 +61,25 @@ class TypographyFragment : Fragment() {
         daxTextView.setTypography(Typography.Body1)
 
         val isDarkTheme = runBlocking { appComponentsViewModel.themeFlow.first() } == AppTheme.DARK
+        val variant = runBlocking { appComponentsViewModel.variantFlow.first() }
 
-        setupComposeViews(view, isDarkTheme)
+        setupComposeViews(view, isDarkTheme, variant)
     }
 
-    private fun setupComposeViews(view: View, isDarkTheme: Boolean) {
+    private fun setupComposeViews(view: View, isDarkTheme: Boolean, variant: DuckDuckGoThemeVariant) {
         // Title
-        view.setupThemedComposeView(id = R.id.compose_title_label, isDarkTheme = isDarkTheme) {
+        view.setupThemedComposeView(id = R.id.compose_title_label, isDarkTheme = isDarkTheme, variant = variant) {
             DaxText(text = "Text Appearance Title", style = DuckDuckGoTheme.typography.title)
         }
-        view.setupThemedComposeView(id = R.id.compose_title_lorem, isDarkTheme = isDarkTheme) {
+        view.setupThemedComposeView(id = R.id.compose_title_lorem, isDarkTheme = isDarkTheme, variant = variant) {
             DaxText(text = loremIpsumShort, style = DuckDuckGoTheme.typography.title)
         }
 
         // H1
-        view.setupThemedComposeView(id = R.id.compose_h1_label, isDarkTheme = isDarkTheme) {
+        view.setupThemedComposeView(id = R.id.compose_h1_label, isDarkTheme = isDarkTheme, variant = variant) {
             DaxText(text = "Text Appearance H1", style = DuckDuckGoTheme.typography.h1)
         }
-        view.setupThemedComposeView(id = R.id.compose_h1_lorem, isDarkTheme = isDarkTheme) {
+        view.setupThemedComposeView(id = R.id.compose_h1_lorem, isDarkTheme = isDarkTheme, variant = variant) {
             DaxText(
                 text = loremIpsumLong,
                 style = DuckDuckGoTheme.typography.h1,
@@ -85,10 +87,10 @@ class TypographyFragment : Fragment() {
         }
 
         // H2
-        view.setupThemedComposeView(id = R.id.compose_h2_label, isDarkTheme = isDarkTheme) {
+        view.setupThemedComposeView(id = R.id.compose_h2_label, isDarkTheme = isDarkTheme, variant = variant) {
             DaxText(text = "Text Appearance H2", style = DuckDuckGoTheme.typography.h2)
         }
-        view.setupThemedComposeView(id = R.id.compose_h2_lorem, isDarkTheme = isDarkTheme) {
+        view.setupThemedComposeView(id = R.id.compose_h2_lorem, isDarkTheme = isDarkTheme, variant = variant) {
             DaxText(
                 text = loremIpsumLong,
                 style = DuckDuckGoTheme.typography.h2,
@@ -96,10 +98,10 @@ class TypographyFragment : Fragment() {
         }
 
         // H3
-        view.setupThemedComposeView(id = R.id.compose_h3_label, isDarkTheme = isDarkTheme) {
+        view.setupThemedComposeView(id = R.id.compose_h3_label, isDarkTheme = isDarkTheme, variant = variant) {
             DaxText(text = "Text Appearance H3", style = DuckDuckGoTheme.typography.h3)
         }
-        view.setupThemedComposeView(id = R.id.compose_h3_lorem, isDarkTheme = isDarkTheme) {
+        view.setupThemedComposeView(id = R.id.compose_h3_lorem, isDarkTheme = isDarkTheme, variant = variant) {
             DaxText(
                 text = loremIpsumLong,
                 style = DuckDuckGoTheme.typography.h3,
@@ -107,10 +109,10 @@ class TypographyFragment : Fragment() {
         }
 
         // H4
-        view.setupThemedComposeView(id = R.id.compose_h4_label, isDarkTheme = isDarkTheme) {
+        view.setupThemedComposeView(id = R.id.compose_h4_label, isDarkTheme = isDarkTheme, variant = variant) {
             DaxText(text = "Text Appearance H4", style = DuckDuckGoTheme.typography.h4)
         }
-        view.setupThemedComposeView(id = R.id.compose_h4_lorem, isDarkTheme = isDarkTheme) {
+        view.setupThemedComposeView(id = R.id.compose_h4_lorem, isDarkTheme = isDarkTheme, variant = variant) {
             DaxText(
                 text = loremIpsumLong,
                 style = DuckDuckGoTheme.typography.h4,
@@ -118,10 +120,10 @@ class TypographyFragment : Fragment() {
         }
 
         // H5
-        view.setupThemedComposeView(id = R.id.compose_h5_label, isDarkTheme = isDarkTheme) {
+        view.setupThemedComposeView(id = R.id.compose_h5_label, isDarkTheme = isDarkTheme, variant = variant) {
             DaxText(text = "Text Appearance H5", style = DuckDuckGoTheme.typography.h5)
         }
-        view.setupThemedComposeView(id = R.id.compose_h5_lorem, isDarkTheme = isDarkTheme) {
+        view.setupThemedComposeView(id = R.id.compose_h5_lorem, isDarkTheme = isDarkTheme, variant = variant) {
             DaxText(
                 text = loremIpsumLong,
                 style = DuckDuckGoTheme.typography.h5,
@@ -129,30 +131,30 @@ class TypographyFragment : Fragment() {
         }
 
         // Body1
-        view.setupThemedComposeView(id = R.id.compose_body1_label, isDarkTheme = isDarkTheme) {
+        view.setupThemedComposeView(id = R.id.compose_body1_label, isDarkTheme = isDarkTheme, variant = variant) {
             DaxText(text = "Text Appearance Body1", style = DuckDuckGoTheme.typography.body1)
         }
-        view.setupThemedComposeView(id = R.id.compose_body1_lorem, isDarkTheme = isDarkTheme) {
+        view.setupThemedComposeView(id = R.id.compose_body1_lorem, isDarkTheme = isDarkTheme, variant = variant) {
             DaxText(
                 text = loremIpsumLong,
                 style = DuckDuckGoTheme.typography.body1,
             )
         }
 
-        view.setupThemedComposeView(id = R.id.compose_body1_bold_label, isDarkTheme = isDarkTheme) {
+        view.setupThemedComposeView(id = R.id.compose_body1_bold_label, isDarkTheme = isDarkTheme, variant = variant) {
             DaxText(text = "Text Appearance Body1 Bold", style = DuckDuckGoTheme.typography.body1Bold)
         }
-        view.setupThemedComposeView(id = R.id.compose_body1_bold_lorem, isDarkTheme = isDarkTheme) {
+        view.setupThemedComposeView(id = R.id.compose_body1_bold_lorem, isDarkTheme = isDarkTheme, variant = variant) {
             DaxText(
                 text = loremIpsumLong,
                 style = DuckDuckGoTheme.typography.body1Bold,
             )
         }
 
-        view.setupThemedComposeView(id = R.id.compose_body1_mono_label, isDarkTheme = isDarkTheme) {
+        view.setupThemedComposeView(id = R.id.compose_body1_mono_label, isDarkTheme = isDarkTheme, variant = variant) {
             DaxText(text = "Text Appearance Body1 Mono", style = DuckDuckGoTheme.typography.body1Mono)
         }
-        view.setupThemedComposeView(id = R.id.compose_body1_mono_lorem, isDarkTheme = isDarkTheme) {
+        view.setupThemedComposeView(id = R.id.compose_body1_mono_lorem, isDarkTheme = isDarkTheme, variant = variant) {
             DaxText(
                 text = loremIpsumLong,
                 style = DuckDuckGoTheme.typography.body1Mono,
@@ -160,20 +162,20 @@ class TypographyFragment : Fragment() {
         }
 
         // Body2
-        view.setupThemedComposeView(id = R.id.compose_body2_label, isDarkTheme = isDarkTheme) {
+        view.setupThemedComposeView(id = R.id.compose_body2_label, isDarkTheme = isDarkTheme, variant = variant) {
             DaxText(text = "Text Appearance Body2", style = DuckDuckGoTheme.typography.body2)
         }
-        view.setupThemedComposeView(id = R.id.compose_body2_lorem, isDarkTheme = isDarkTheme) {
+        view.setupThemedComposeView(id = R.id.compose_body2_lorem, isDarkTheme = isDarkTheme, variant = variant) {
             DaxText(
                 text = loremIpsumLong,
                 style = DuckDuckGoTheme.typography.body2,
             )
         }
 
-        view.setupThemedComposeView(id = R.id.compose_body2_bold_label, isDarkTheme = isDarkTheme) {
+        view.setupThemedComposeView(id = R.id.compose_body2_bold_label, isDarkTheme = isDarkTheme, variant = variant) {
             DaxText(text = "Text Appearance Body2 Bold", style = DuckDuckGoTheme.typography.body2Bold)
         }
-        view.setupThemedComposeView(id = R.id.compose_body2_bold_lorem, isDarkTheme = isDarkTheme) {
+        view.setupThemedComposeView(id = R.id.compose_body2_bold_lorem, isDarkTheme = isDarkTheme, variant = variant) {
             DaxText(
                 text = loremIpsumLong,
                 style = DuckDuckGoTheme.typography.body2Bold,
@@ -181,10 +183,10 @@ class TypographyFragment : Fragment() {
         }
 
         // Button
-        view.setupThemedComposeView(id = R.id.compose_button_label, isDarkTheme = isDarkTheme) {
+        view.setupThemedComposeView(id = R.id.compose_button_label, isDarkTheme = isDarkTheme, variant = variant) {
             DaxText(text = "Text Appearance Button", style = DuckDuckGoTheme.typography.button)
         }
-        view.setupThemedComposeView(id = R.id.compose_button_lorem, isDarkTheme = isDarkTheme) {
+        view.setupThemedComposeView(id = R.id.compose_button_lorem, isDarkTheme = isDarkTheme, variant = variant) {
             DaxText(
                 text = loremIpsumLong,
                 style = DuckDuckGoTheme.typography.button,
@@ -192,27 +194,27 @@ class TypographyFragment : Fragment() {
         }
 
         // Caption
-        view.setupThemedComposeView(id = R.id.compose_caption_label, isDarkTheme = isDarkTheme) {
+        view.setupThemedComposeView(id = R.id.compose_caption_label, isDarkTheme = isDarkTheme, variant = variant) {
             DaxText(text = "Text Appearance Caption", style = DuckDuckGoTheme.typography.caption)
         }
-        view.setupThemedComposeView(id = R.id.compose_caption_lorem, isDarkTheme = isDarkTheme) {
+        view.setupThemedComposeView(id = R.id.compose_caption_lorem, isDarkTheme = isDarkTheme, variant = variant) {
             DaxText(
                 text = loremIpsumLong,
                 style = DuckDuckGoTheme.typography.caption,
             )
         }
 
-        view.setupThemedComposeView(id = R.id.compose_caption_allcaps_label, isDarkTheme = isDarkTheme) {
+        view.setupThemedComposeView(id = R.id.compose_caption_allcaps_label, isDarkTheme = isDarkTheme, variant = variant) {
             DaxText(text = "Text Appearance Caption All Caps".uppercase(), style = DuckDuckGoTheme.typography.caption)
         }
-        view.setupThemedComposeView(id = R.id.compose_caption_allcaps_lorem, isDarkTheme = isDarkTheme) {
+        view.setupThemedComposeView(id = R.id.compose_caption_allcaps_lorem, isDarkTheme = isDarkTheme, variant = variant) {
             DaxText(
                 text = loremIpsumLong.uppercase(),
                 style = DuckDuckGoTheme.typography.caption,
             )
         }
 
-        view.setupThemedComposeView(id = R.id.compose_manual_typography, isDarkTheme = isDarkTheme) {
+        view.setupThemedComposeView(id = R.id.compose_manual_typography, isDarkTheme = isDarkTheme, variant = variant) {
             DaxText(
                 text = "Text Appearance Body 1 set manually",
                 style = DuckDuckGoTheme.typography.body1,
@@ -221,12 +223,12 @@ class TypographyFragment : Fragment() {
         }
 
         // Onboarding Title
-        view.setupThemedComposeView(id = R.id.compose_onboarding_title, isDarkTheme = isDarkTheme) {
+        view.setupThemedComposeView(id = R.id.compose_onboarding_title, isDarkTheme = isDarkTheme, variant = variant) {
             DaxText(text = "Onboarding Title", style = DuckDuckGoTheme.typography.onboardingTitle)
         }
 
         // Onboarding Body
-        view.setupThemedComposeView(id = R.id.compose_onboarding_body, isDarkTheme = isDarkTheme) {
+        view.setupThemedComposeView(id = R.id.compose_onboarding_body, isDarkTheme = isDarkTheme, variant = variant) {
             DaxText(text = "Onboarding Body", style = DuckDuckGoTheme.typography.onboardingBody)
         }
     }
