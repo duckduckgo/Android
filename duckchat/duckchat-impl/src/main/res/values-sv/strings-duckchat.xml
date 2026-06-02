@@ -138,6 +138,12 @@
     <string name="duck_ai_chat_history_search_close_content_description">Stäng sökning</string>
     <string name="duck_ai_chat_history_search_clear_content_description">Rensa sökning</string>
     <string name="duck_ai_chat_history_action_fire_content_description">Raderade chattar</string>
+    <string name="duck_ai_chat_history_action_new">Ny</string>
+    <string name="duck_ai_chat_history_action_download_selected_content_description">Ladda ner chattar</string>
+    <plurals name="duck_ai_chat_history_bulk_download_complete">
+        <item quantity="one">Nedladdning klar för %1$d chatt</item>
+        <item quantity="other">Nedladdning klar för %1$d chattar</item>
+    </plurals>
     <string name="duck_ai_chat_history_action_overflow_content_description">Öppna överflödesmeny</string>
     <string name="duck_ai_chat_history_select_all">Välj alla</string>
     <string name="duck_ai_chat_history_unselect_all">Avmarkera alla</string>
@@ -155,4 +161,5 @@
     <string name="duck_ai_chat_history_download_complete" instruction="%1$s is the saved chat filename (e.g. \&apos;My Chat.txt\&apos;).">Nerladdning klar för %1$s</string>
     <string name="duck_ai_chat_history_download_view">Visa</string>
     <string name="duck_ai_chat_history_download_error">Kunde inte exportera chatt</string>
+    <string name="duck_ai_chat_history_bulk_download_error">Kunde inte exportera chattar</string>
 </resources>
