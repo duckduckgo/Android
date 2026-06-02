@@ -197,14 +197,9 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
 
         subscriptionsManager.recoverSubscriptionFromStore() as RecoverSubscriptionResult.Success
 
-        if (authApiV2Enabled) {
-            verify(authClient).storeLogin(any(), any(), any())
-            assertEquals(FAKE_ACCESS_TOKEN_V2, authDataStore.accessTokenV2)
-            assertEquals(FAKE_REFRESH_TOKEN_V2, authDataStore.refreshTokenV2)
-        } else {
-            verify(authService).storeLogin(any())
-            assertEquals("authToken", authDataStore.authToken)
-        }
+        verify(authClient).storeLogin(any(), any(), any())
+        assertEquals(FAKE_ACCESS_TOKEN_V2, authDataStore.accessTokenV2)
+        assertEquals(FAKE_REFRESH_TOKEN_V2, authDataStore.refreshTokenV2)
         assertTrue(authRepository.getEntitlements().firstOrNull { it.product == NetP.value } != null)
     }
 
@@ -277,12 +272,8 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
         subscriptionsManager.recoverSubscriptionFromStore()
         subscriptionsManager.isSignedIn.test {
             assertTrue(awaitItem())
-            if (authApiV2Enabled) {
-                assertEquals(FAKE_ACCESS_TOKEN_V2, authDataStore.accessTokenV2)
-                assertEquals(FAKE_REFRESH_TOKEN_V2, authDataStore.refreshTokenV2)
-            } else {
-                assertEquals("accessToken", authDataStore.accessToken)
-            }
+            assertEquals(FAKE_ACCESS_TOKEN_V2, authDataStore.accessTokenV2)
+            assertEquals(FAKE_REFRESH_TOKEN_V2, authDataStore.refreshTokenV2)
             cancelAndConsumeRemainingEvents()
         }
     }
@@ -546,17 +537,10 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
 
         subscriptionsManager.isSignedIn.test {
             assertTrue(awaitItem())
-            if (authApiV2Enabled) {
-                assertEquals(FAKE_ACCESS_TOKEN_V2, authDataStore.accessTokenV2)
-                assertEquals(FAKE_REFRESH_TOKEN_V2, authDataStore.refreshTokenV2)
-                assertNull(authDataStore.accessToken)
-                assertNull(authDataStore.authToken)
-            } else {
-                assertNull(authDataStore.accessTokenV2)
-                assertNull(authDataStore.refreshTokenV2)
-                assertEquals("accessToken", authDataStore.accessToken)
-                assertEquals("authToken", authDataStore.authToken)
-            }
+            assertEquals(FAKE_ACCESS_TOKEN_V2, authDataStore.accessTokenV2)
+            assertEquals(FAKE_REFRESH_TOKEN_V2, authDataStore.refreshTokenV2)
+            assertNull(authDataStore.accessToken)
+            assertNull(authDataStore.authToken)
             cancelAndConsumeRemainingEvents()
         }
     }
@@ -1047,6 +1031,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
 
     @Test
     fun whenGetAuthTokenIfUserSignedInAndValidTokenThenReturnSuccess() = runTest {
+        assumeTrue(authApiV2Enabled) // getAuthToken() now only returns a token for auth v2 signed-in users
         givenUserIsSignedIn()
         givenValidateTokenSucceedsWithEntitlements()
 
@@ -1055,8 +1040,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
         assertTrue(result is AuthTokenResult.Success)
 
         val actualAuthToken = (result as AuthTokenResult.Success).authToken
-        val expectedAuthToken = if (authApiV2Enabled) FAKE_ACCESS_TOKEN_V2 else "authToken"
-        assertEquals(expectedAuthToken, actualAuthToken)
+        assertEquals(FAKE_ACCESS_TOKEN_V2, actualAuthToken)
     }
 
     @Test
@@ -1066,92 +1050,6 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
         val result = subscriptionsManager.getAuthToken()
 
         assertTrue(result is AuthTokenResult.Failure)
-    }
-
-    @Test
-    fun whenGetAuthTokenIfUserSignedInWithSubscriptionAndTokenExpiredAndEntitlementsExistsThenReturnSuccess() = runTest {
-        assumeFalse(authApiV2Enabled) // getAuthToken() is deprecated and with auth v2 enabled will just delegate to getAccessToken()
-
-        authDataStore.externalId = "1234"
-        givenUserIsSignedIn()
-        givenSubscriptionSucceedsWithEntitlements()
-        givenValidateTokenFailsAndThenSucceeds("""{ "error": "expired_token" }""")
-        givenPurchaseStored()
-        givenStoreLoginSucceeds()
-        givenAccessTokenSucceeds()
-
-        val result = subscriptionsManager.getAuthToken()
-
-        verify(authService).storeLogin(any())
-        assertTrue(result is AuthTokenResult.Success)
-        assertEquals("authToken", (result as AuthTokenResult.Success).authToken)
-    }
-
-    @Test
-    fun whenGetAuthTokenIfUserSignedInWithSubscriptionAndTokenExpiredAndEntitlementsExistsAndExternalIdDifferentThenReturnFailure() = runTest {
-        assumeFalse(authApiV2Enabled) // getAuthToken() is deprecated and with auth v2 enabled will just delegate to getAccessToken()
-
-        givenUserIsSignedIn()
-        authDataStore.externalId = "test"
-        givenSubscriptionSucceedsWithEntitlements()
-        givenValidateTokenFailsAndThenSucceeds("""{ "error": "expired_token" }""")
-        givenPurchaseStored()
-        givenStoreLoginSucceeds()
-        givenAccessTokenSucceeds()
-
-        val result = subscriptionsManager.getAuthToken()
-
-        verify(authService).storeLogin(any())
-        assertTrue(result is AuthTokenResult.Failure.TokenExpired)
-        assertEquals("authToken", (result as AuthTokenResult.Failure.TokenExpired).authToken)
-    }
-
-    @Test
-    fun whenGetAuthTokenIfUserSignedInWithSubscriptionAndTokenExpiredAndEntitlementsDoNotExistThenReturnFailure() = runTest {
-        assumeFalse(authApiV2Enabled) // getAuthToken() is deprecated and with auth v2 enabled will just delegate to getAccessToken()
-
-        givenUserIsSignedIn()
-        givenValidateTokenSucceedsNoEntitlements()
-        givenValidateTokenFailsAndThenSucceedsWithNoEntitlements("""{ "error": "expired_token" }""")
-        givenPurchaseStored()
-        givenStoreLoginSucceeds()
-        givenAccessTokenSucceeds()
-
-        val result = subscriptionsManager.getAuthToken()
-
-        verify(authService).storeLogin(any())
-        assertTrue(result is AuthTokenResult.Failure.TokenExpired)
-        assertEquals("authToken", (result as AuthTokenResult.Failure.TokenExpired).authToken)
-    }
-
-    @Test
-    fun whenGetAuthTokenIfUserSignedInAndTokenExpiredAndNoPurchaseInTheStoreThenReturnFailure() = runTest {
-        assumeFalse(authApiV2Enabled) // getAuthToken() is deprecated and with auth v2 enabled will just delegate to getAccessToken()
-
-        givenUserIsSignedIn()
-        givenValidateTokenFailsAndThenSucceeds("""{ "error": "expired_token" }""")
-
-        val result = subscriptionsManager.getAuthToken()
-
-        verify(authService, never()).storeLogin(any())
-        assertTrue(result is AuthTokenResult.Failure.TokenExpired)
-        assertEquals("authToken", (result as AuthTokenResult.Failure.TokenExpired).authToken)
-    }
-
-    @Test
-    fun whenGetAuthTokenIfUserSignedInAndTokenExpiredAndPurchaseNotValidThenReturnFailure() = runTest {
-        assumeFalse(authApiV2Enabled) // getAuthToken() is deprecated and with auth v2 enabled will just delegate to getAccessToken()
-
-        givenUserIsSignedIn()
-        givenValidateTokenFailsAndThenSucceeds("""{ "error": "expired_token" }""")
-        givenStoreLoginFails()
-        givenPurchaseStored()
-
-        val result = subscriptionsManager.getAuthToken()
-
-        verify(authService).storeLogin(any())
-        assertTrue(result is AuthTokenResult.Failure.TokenExpired)
-        assertEquals("authToken", (result as AuthTokenResult.Failure.TokenExpired).authToken)
     }
 
     @Test

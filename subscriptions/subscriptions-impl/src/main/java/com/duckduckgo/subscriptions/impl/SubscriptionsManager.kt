@@ -72,7 +72,6 @@ import com.duckduckgo.subscriptions.impl.repository.toProductList
 import com.duckduckgo.subscriptions.impl.services.AuthService
 import com.duckduckgo.subscriptions.impl.services.ConfirmationBody
 import com.duckduckgo.subscriptions.impl.services.ResponseError
-import com.duckduckgo.subscriptions.impl.services.StoreLoginBody
 import com.duckduckgo.subscriptions.impl.services.SubscriptionsService
 import com.duckduckgo.subscriptions.impl.services.ValidateTokenResponse
 import com.duckduckgo.subscriptions.impl.services.toEntitlements
@@ -976,50 +975,23 @@ class RealSubscriptionsManager @Inject constructor(
     }
 
     override suspend fun recoverSubscriptionFromStore(externalId: String?): RecoverSubscriptionResult {
+        require(externalId == null) { "Use storeLogin() directly to re-authenticate using existing externalId" }
         return try {
-            if (shouldUseAuthV2()) {
-                require(externalId == null) { "Use storeLogin() directly to re-authenticate using existing externalId" }
-                when (val storeLoginResult = storeLogin()) {
-                    is StoreLoginResult.Success -> {
-                        saveTokens(storeLoginResult.tokens)
-                        refreshSubscriptionData()
-                        val subscription = getSubscription()
-                        if (subscription?.isActive() == true) {
-                            RecoverSubscriptionResult.Success(subscription)
-                        } else {
-                            RecoverSubscriptionResult.Failure(SUBSCRIPTION_NOT_FOUND_ERROR)
-                        }
-                    }
-
-                    is StoreLoginResult.Failure -> when (storeLoginResult) {
-                        StoreLoginResult.Failure.NoActivePurchase -> RecoverSubscriptionResult.Failure(SUBSCRIPTION_NOT_FOUND_ERROR)
-                        else -> RecoverSubscriptionResult.Failure(message = "Store login error: ${storeLoginResult.javaClass.simpleName}")
+            when (val storeLoginResult = storeLogin()) {
+                is StoreLoginResult.Success -> {
+                    saveTokens(storeLoginResult.tokens)
+                    refreshSubscriptionData()
+                    val subscription = getSubscription()
+                    if (subscription?.isActive() == true) {
+                        RecoverSubscriptionResult.Success(subscription)
+                    } else {
+                        RecoverSubscriptionResult.Failure(SUBSCRIPTION_NOT_FOUND_ERROR)
                     }
                 }
-            } else {
-                val purchase = playBillingManager.purchaseHistory.lastOrNull()
-                if (purchase != null) {
-                    val signature = purchase.signature
-                    val body = purchase.originalJson
-                    val storeLoginBody = StoreLoginBody(signature = signature, signedData = body, packageName = context.packageName)
-                    val response = authService.storeLogin(storeLoginBody)
-                    if (externalId != null && externalId != response.externalId) return RecoverSubscriptionResult.Failure("")
-                    authRepository.setAccount(Account(externalId = response.externalId, email = null))
-                    authRepository.setAuthToken(response.authToken)
-                    exchangeAuthToken(response.authToken)
-                    if (fetchAndStoreAllData()) {
-                        logcat { "Subs: store login succeeded" }
-                        val subscription = authRepository.getSubscription()
-                        if (subscription?.isActive() == true) {
-                            RecoverSubscriptionResult.Success(subscription)
-                        } else {
-                            RecoverSubscriptionResult.Failure(SUBSCRIPTION_NOT_FOUND_ERROR)
-                        }
-                    } else {
-                        RecoverSubscriptionResult.Failure("")
-                    }
-                } else {
-                    RecoverSubscriptionResult.Failure(SUBSCRIPTION_NOT_FOUND_ERROR)
+
+                is StoreLoginResult.Failure -> when (storeLoginResult) {
+                    StoreLoginResult.Failure.NoActivePurchase -> RecoverSubscriptionResult.Failure(SUBSCRIPTION_NOT_FOUND_ERROR)
+                    else -> RecoverSubscriptionResult.Failure(message = "Store login error: ${storeLoginResult.javaClass.simpleName}")
                 }
             }
         } catch (e: Exception) {
@@ -1232,31 +1204,7 @@ class RealSubscriptionsManager @Inject constructor(
                 is AccessTokenResult.Success -> AuthTokenResult.Success(accessToken.accessToken)
             }
         }
-
-        try {
-            return if (isSignedInV1()) {
-                logcat { "Subs auth token is ${authRepository.getAuthToken()}" }
-                validateToken(authRepository.getAuthToken()!!)
-                AuthTokenResult.Success(authRepository.getAuthToken()!!)
-            } else {
-                AuthTokenResult.Failure.UnknownError
-            }
-        } catch (e: Exception) {
-            return when (extractError(e)) {
-                "expired_token" -> {
-                    logcat { "Subs: auth token expired" }
-                    val result = recoverSubscriptionFromStore(authRepository.getAccount()?.externalId)
-                    if (result is RecoverSubscriptionResult.Success) {
-                        AuthTokenResult.Success(authRepository.getAuthToken()!!)
-                    } else {
-                        AuthTokenResult.Failure.TokenExpired(authRepository.getAuthToken()!!)
-                    }
-                }
-                else -> {
-                    AuthTokenResult.Failure.UnknownError
-                }
-            }
-        }
+        return AuthTokenResult.Failure.UnknownError
     }
 
     override suspend fun getAccessToken(): AccessTokenResult {
