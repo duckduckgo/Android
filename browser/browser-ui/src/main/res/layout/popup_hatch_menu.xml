@@ -48,20 +48,6 @@
         android:layout_height="match_parent"/>
 
     <com.duckduckgo.common.ui.view.PopupMenuItemView
-        android:id="@+id/hatchMenuBurnTab"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:primaryText="@string/hatchMenuBurnTab"
-        app:leadingIcon="@drawable/ic_fire_24"
-        app:leadingIconTint="?daxColorDestructive"
-        app:primaryTextType="destructive" />
-
-    <com.duckduckgo.common.ui.view.divider.HorizontalDivider
-        app:defaultPadding="false"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
-
-    <com.duckduckgo.common.ui.view.PopupMenuItemView
         android:id="@+id/hatchMenuAfterInactivity"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

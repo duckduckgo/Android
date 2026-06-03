@@ -59,7 +59,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toEndOf="@id/returnHatchFavicon"
-            app:layout_constraintEnd_toStartOf="@id/returnHatchOptions"
+            app:layout_constraintEnd_toStartOf="@id/returnHatchFireButton"
             android:layout_marginStart="@dimen/keyline_2"
             android:orientation="vertical">
 
@@ -81,6 +81,17 @@
                 tools:text="Site Title" />
 
         </LinearLayout>
+
+        <ImageView
+            android:id="@+id/returnHatchFireButton"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:scaleType="centerInside"
+            android:contentDescription="@string/hatchMenuBurnTab"
+            android:src="@drawable/ic_fire_tabs_24"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/returnHatchOptions" />
 
         <ImageView
             android:id="@+id/returnHatchOptions"
