@@ -55,6 +55,7 @@ class NewAddressBarOptionDataStoreTest {
     companion object {
         val WAS_SHOWN_KEY = booleanPreferencesKey("NEW_ADDRESS_BAR_OPTION_WAS_SHOWN")
         val WAS_VALIDATED_KEY = booleanPreferencesKey("NEW_ADDRESS_BAR_OPTION_WAS_VALIDATED")
+        val WAS_SHOWN_V2_KEY = booleanPreferencesKey("NEW_ADDRESS_BAR_OPTION_V2_WAS_SHOWN")
     }
 
     @Test
@@ -79,5 +80,29 @@ class NewAddressBarOptionDataStoreTest {
         testee.setAsValidated()
         assertTrue(testee.wasValidated())
         assertTrue(testDataStore.data.firstOrNull()?.get(WAS_VALIDATED_KEY) == true)
+    }
+
+    @Test
+    fun `when wasShownV2 called initially then returns false`() = runTest {
+        assertFalse(testee.wasShownV2())
+    }
+
+    @Test
+    fun `when setAsShownV2 called then wasShownV2 returns true`() = runTest {
+        testee.setAsShownV2()
+        assertTrue(testee.wasShownV2())
+        assertTrue(testDataStore.data.firstOrNull()?.get(WAS_SHOWN_V2_KEY) == true)
+    }
+
+    @Test
+    fun `when setAsShownV2 called then V1 wasShown stays false`() = runTest {
+        testee.setAsShownV2()
+        assertFalse(testee.wasShown())
+    }
+
+    @Test
+    fun `when V1 setAsShown called then wasShownV2 stays false`() = runTest {
+        testee.setAsShown()
+        assertFalse(testee.wasShownV2())
     }
 }

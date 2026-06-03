@@ -130,4 +130,8 @@
     <string name="preOnboardingDaxDialog2TitleCustomAi">Want to make DuckDuckGo your default browser?</string>
     <string name="preOnboardingDaxDialog3TextCustomAi">Remember: you can use Duck.ai from anywhere you see the chat icon</string>
     <string name="preOnboardingDaxDialog3ButtonCustomAi">Start AI Chat</string>
+
+    <!-- V2 New Address Bar Picker (post-onboarding Duck.ai toggle promotion) -->
+    <string name="newAddressBarOptionV2Eyebrow">Address Bar Option</string>
+    <string name="newAddressBarOptionV2Confirm">Confirm</string>
 </resources>
