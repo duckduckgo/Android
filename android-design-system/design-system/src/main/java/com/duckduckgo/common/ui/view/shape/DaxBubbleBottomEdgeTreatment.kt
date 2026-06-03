@@ -41,7 +41,7 @@ open class DaxBubbleBottomEdgeTreatment(
         shapePath: ShapePath,
     ) {
         val scaleFactor = (heightPx.toFloat() / ORIGINAL_BOTTOM_ARROW_HEIGHT_DP) * depthFraction
-        val arrowWidth = 47.14058f * scaleFactor
+        val arrowWidth = ORIGINAL_BOTTOM_ARROW_WIDTH_DP * scaleFactor
         val arrowStart = center - (arrowWidth / 2)
 
         shapePath.lineTo(arrowStart, 0f)
@@ -132,5 +132,6 @@ open class DaxBubbleBottomEdgeTreatment(
 
     companion object {
         const val ORIGINAL_BOTTOM_ARROW_HEIGHT_DP = 30
+        const val ORIGINAL_BOTTOM_ARROW_WIDTH_DP = 47.14058f
     }
 }

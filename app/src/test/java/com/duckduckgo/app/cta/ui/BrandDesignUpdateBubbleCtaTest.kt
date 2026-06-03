@@ -85,6 +85,36 @@ class BrandDesignUpdateBubbleCtaTest {
         verify(dax).isVisible = false
     }
 
+    @Test
+    fun daxFits_false_whenHeadIntrudesIntoCardBody() {
+        val cta = TestableBubbleCta()
+        assertEquals(false, cta.daxFits(daxTop = 90, daxLeft = 0, daxRight = 40, cardBodyBottom = 100, finBottom = 130, finLeft = 50, finRight = 100))
+    }
+
+    @Test
+    fun daxFits_false_whenInFinBandAndOverlapsFinHorizontally() {
+        val cta = TestableBubbleCta()
+        assertEquals(
+            false,
+            cta.daxFits(daxTop = 110, daxLeft = 60, daxRight = 90, cardBodyBottom = 100, finBottom = 130, finLeft = 50, finRight = 100),
+        )
+    }
+
+    @Test
+    fun daxFits_true_whenInFinBandButHorizontallyClearOfFin() {
+        val cta = TestableBubbleCta()
+        assertEquals(true, cta.daxFits(daxTop = 110, daxLeft = 0, daxRight = 40, cardBodyBottom = 100, finBottom = 130, finLeft = 50, finRight = 100))
+    }
+
+    @Test
+    fun daxFits_true_whenEntirelyBelowFinTip() {
+        val cta = TestableBubbleCta()
+        assertEquals(
+            true,
+            cta.daxFits(daxTop = 140, daxLeft = 60, daxRight = 90, cardBodyBottom = 100, finBottom = 130, finLeft = 50, finRight = 100),
+        )
+    }
+
     private fun configureContainer(orientation: Int, formFactor: FormFactor) {
         val configuration = Configuration().apply { this.orientation = orientation }
         val resources: Resources = mock()

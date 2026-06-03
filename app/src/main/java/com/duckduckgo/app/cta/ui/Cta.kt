@@ -1678,6 +1678,26 @@ sealed class DaxBubbleCta(
             }
         }
 
+        /**
+         * Pure fit test. The Dax fits unless its head intrudes into the card body (above the
+         * top-of-fin line) or its rect overlaps the fin's own region. The Dax may sit in the
+         * fin's vertical band as long as it is horizontally clear of the fin.
+         */
+        internal fun daxFits(
+            daxTop: Int,
+            daxLeft: Int,
+            daxRight: Int,
+            cardBodyBottom: Int,
+            finBottom: Int,
+            finLeft: Int,
+            finRight: Int,
+        ): Boolean {
+            if (daxTop < cardBodyBottom) return false
+            val overlapsFinHorizontally = daxRight > finLeft && daxLeft < finRight
+            if (daxTop < finBottom && overlapsFinHorizontally) return false
+            return true
+        }
+
         private fun resetAllIncludesExcept(view: View, active: View) {
             getAllContentIncludes(view).forEach { include ->
                 if (include == active) {
