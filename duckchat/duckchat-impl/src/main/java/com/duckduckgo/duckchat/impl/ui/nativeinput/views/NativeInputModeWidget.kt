@@ -730,7 +730,9 @@ class NativeInputModeWidget @JvmOverloads constructor(
     }
 
     override fun EditText.applyChatInputType() {
-        hint = context.getString(R.string.native_input_chat_hint)
+        hint = context.getString(
+            if (isDuckAiPageContext()) R.string.native_input_chat_duck_mode_hint else R.string.native_input_chat_hint,
+        )
         // Enter inserts a newline when we're on a Duck.ai chat page (existing behavior) or when
         // the widget sits in bottom-bar position with the Duck.ai toggle selected. Bottom-bar
         // mode has no on-screen new-line button, so the IME enter key is the only carriage-

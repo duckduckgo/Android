@@ -18,6 +18,7 @@
     <string name="duckAiChatSearchDuckDuckGo">Search DuckDuckGo</string>
     <string name="duckAiChatHistoryViewAllChats">View all Chats</string>
     <string name="native_input_chat_hint">Ask anything privately…</string>
+    <string name="native_input_chat_duck_mode_hint">Reply…</string>
 
     <!-- Model Picker -->
     <string name="duckAiModelPickerPlusModels" translatable="false">Plus</string>
@@ -56,8 +57,8 @@
 
     <!-- File/image attachment menu options -->
     <string name="attachmentTakePhoto">Take Photo</string>
-    <string name="attachmentAttachPhoto">Attach Photo</string>
-    <string name="attachmentAttachFile">Attach File</string>
+    <string name="attachmentAttachPhoto">Add Image</string>
+    <string name="attachmentAttachFile">Add File</string>
 
     <!-- File attachment -->
     <string name="duckChatFileAttachmentRemoveContentDescription">Remove file</string>
