@@ -93,9 +93,6 @@ class BrowserMenuBottomSheet(
     val newTabMenuItem: MenuActionButtonView
         get() = binding.newTabMenuItem
 
-    val newDuckChatTabMenuItem: MenuActionButtonView
-        get() = binding.newDuckChatTabMenuItem
-
     val newDuckChatMenuItem: MenuActionButtonView
         get() = binding.newDuckChatMenuItem
 
@@ -237,8 +234,6 @@ class BrowserMenuBottomSheet(
     private fun renderBrowserMenu(viewState: BrowserMenuViewState.Browser) {
         backMenuItem.isEnabled = viewState.canGoBack
         forwardMenuItem.isEnabled = viewState.canGoForward
-        newDuckChatTabMenuItem.isEnabled = viewState.showNewDuckChatTabOption
-        newDuckChatTabMenuItem.isVisible = viewState.showNewDuckChatTabOption
         newDuckChatMenuItem.isEnabled = viewState.showDuckChatOption
         newDuckChatMenuItem.isVisible = viewState.showDuckChatOption
         newTabMenuItem.isEnabled = true
@@ -327,8 +322,6 @@ class BrowserMenuBottomSheet(
         backMenuItem.isEnabled = false
         forwardMenuItem.isEnabled = viewState.canGoForward
         newTabMenuItem.isEnabled = true
-        newDuckChatTabMenuItem.isEnabled = false
-        newDuckChatTabMenuItem.isVisible = false
         newDuckChatMenuItem.isEnabled = viewState.showDuckChatOption
         newDuckChatMenuItem.isVisible = viewState.showDuckChatOption
         settingsMenuItem.isEnabled = true
@@ -356,7 +349,6 @@ class BrowserMenuBottomSheet(
         backMenuItem.isEnabled = viewState.canGoBack
         forwardMenuItem.isEnabled = viewState.canGoForward
         newTabMenuItem.isVisible = false
-        newDuckChatTabMenuItem.isVisible = false
         newDuckChatMenuItem.isVisible = false
         settingsMenuItem.isVisible = false
         refreshActionMenuItem.isVisible = true
@@ -406,7 +398,6 @@ class BrowserMenuBottomSheet(
     private fun renderDuckAiMenu(viewState: BrowserMenuViewState.DuckAi) {
         forwardMenuItem.isEnabled = false
         newTabMenuItem.isEnabled = true
-        newDuckChatTabMenuItem.isVisible = false
         newDuckChatMenuItem.isEnabled = false
         newDuckChatMenuItem.isVisible = false
         settingsMenuItem.isEnabled = true

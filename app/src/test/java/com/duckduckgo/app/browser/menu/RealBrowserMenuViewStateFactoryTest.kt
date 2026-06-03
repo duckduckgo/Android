@@ -271,7 +271,6 @@ class RealBrowserMenuViewStateFactoryTest {
         assertTrue(viewState.canGoBack)
         assertTrue(viewState.canGoForward)
         assertTrue(viewState.showDuckChatOption)
-        assertFalse(viewState.showNewDuckChatTabOption)
         assertTrue(viewState.canSharePage)
         assertFalse(viewState.showSelectDefaultBrowserMenuItem)
         assertTrue(viewState.canSaveSite)
@@ -337,8 +336,7 @@ class RealBrowserMenuViewStateFactoryTest {
 
         assertTrue(viewState.canGoBack)
         assertTrue(viewState.canGoForward)
-        assertFalse(viewState.showDuckChatOption)
-        assertTrue(viewState.showNewDuckChatTabOption)
+        assertTrue(viewState.showDuckChatOption)
         assertTrue(viewState.canSharePage)
         assertFalse(viewState.showSelectDefaultBrowserMenuItem)
         assertTrue(viewState.canSaveSite)

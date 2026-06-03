@@ -23,7 +23,6 @@ sealed class BrowserMenuViewState {
         val canGoForward: Boolean = false,
         val showDuckChatOption: Boolean = false,
         val showDuckChatHistoryOption: Boolean = false,
-        val showNewDuckChatTabOption: Boolean = false,
         val showDuckAiSection: Boolean = false,
         val showDuckChatVoiceOption: Boolean = false,
         val canSharePage: Boolean = false,

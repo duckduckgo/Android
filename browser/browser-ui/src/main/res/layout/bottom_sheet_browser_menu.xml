@@ -86,17 +86,6 @@
                     app:menuActionSrc="@drawable/ic_add_24" />
 
                 <com.duckduckgo.common.ui.view.MenuActionButtonView
-                    android:id="@+id/newDuckChatTabMenuItem"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:layout_marginStart="@dimen/keyline_1"
-                    android:layout_marginEnd="@dimen/keyline_1"
-                    android:visibility="gone"
-                    app:menuActionLabel="@string/browserMenuDuckChat"
-                    app:menuActionSrc="@drawable/ic_duck_ai_menu_log_24" />
-
-                <com.duckduckgo.common.ui.view.MenuActionButtonView
                     android:id="@+id/newDuckChatMenuItem"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
@@ -104,7 +93,7 @@
                     android:layout_marginStart="@dimen/keyline_1"
                     android:layout_marginEnd="@dimen/keyline_1"
                     app:menuActionLabel="@string/browserMenuDuckChat"
-                    app:menuActionSrc="@drawable/ic_duck_ai_menu_log_24" />
+                    app:menuActionSrc="@drawable/ic_duck_ai_menu_logo_24" />
 
                 <com.duckduckgo.common.ui.view.MenuActionButtonView
                     android:id="@+id/settingsMenuItem"

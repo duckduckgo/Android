@@ -138,13 +138,11 @@ class RealBrowserMenuViewStateFactory @Inject constructor(
         serpLogoUrl: String? = null,
         siteUrl: String? = null,
     ): BrowserMenuViewState.Browser {
-        val isDuckAIFullscreenModeEnabled = duckAiFeatureState.showFullScreenMode.value
         return BrowserMenuViewState.Browser(
             canGoBack = browserViewState.canGoBack,
             canGoForward = browserViewState.canGoForward,
-            showDuckChatOption = browserViewState.showDuckChatOption && !isDuckAIFullscreenModeEnabled,
+            showDuckChatOption = browserViewState.showDuckChatOption,
             showDuckChatHistoryOption = browserViewState.showDuckChatHistoryOption,
-            showNewDuckChatTabOption = isDuckAIFullscreenModeEnabled,
             showDuckAiSection = duckAiFeatureState.showPopupMenuShortcut.value,
             showDuckChatVoiceOption = duckAiFeatureState.showVoiceChatEntry.value,
             canSharePage = browserViewState.canSharePage,
