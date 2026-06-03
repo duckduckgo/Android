@@ -4889,7 +4889,7 @@ class BrowserTabViewModelTest {
         loadUrl("foo.com")
         testee.onPrintSelected()
         val command = captureCommands().lastValue as Command.PrintLink
-        assertEquals("foo.com", command.url)
+        assertEquals("foo.com", command.documentName)
         assertEquals(PrintAttributes.MediaSize.NA_LETTER, command.mediaSize)
     }
 
@@ -4899,7 +4899,7 @@ class BrowserTabViewModelTest {
         loadUrl("foo.com")
         testee.onPrintSelected()
         val command = captureCommands().lastValue as Command.PrintLink
-        assertEquals("foo.com", command.url)
+        assertEquals("foo.com", command.documentName)
         assertEquals(PrintAttributes.MediaSize.ISO_A4, command.mediaSize)
     }
 
@@ -4909,7 +4909,7 @@ class BrowserTabViewModelTest {
         loadUrl("foo.com")
         testee.onPrintSelected()
         val command = captureCommands().lastValue as Command.PrintLink
-        assertEquals("foo.com", command.url)
+        assertEquals("foo.com", command.documentName)
         assertEquals(PrintAttributes.MediaSize.ISO_A4, command.mediaSize)
     }
 
@@ -4918,6 +4918,38 @@ class BrowserTabViewModelTest {
         whenever(mockDeviceInfo.country).thenReturn("US")
         loadUrl("foo.com")
         testee.onPrintSelected()
+        verify(mockPixel).fire(AppPixelName.MENU_ACTION_PRINT_PRESSED)
+    }
+
+    @Test
+    fun whenUserSelectsToPrintPageAndUrlIsBlankAndNoPdfShownThenNoPrintLinkCommandOrPixelSent() {
+        whenever(mockDeviceInfo.country).thenReturn("US")
+        loadUrl("")
+        testee.onPrintSelected()
+        assertCommandNotIssued<Command.PrintLink>()
+        verify(mockPixel, never()).fire(AppPixelName.MENU_ACTION_PRINT_PRESSED)
+    }
+
+    @Test
+    fun whenUserSelectsToPrintPageAndUrlIsNullAndNoPdfShownThenNoPrintLinkCommandOrPixelSent() {
+        whenever(mockDeviceInfo.country).thenReturn("US")
+        loadUrl(null)
+        testee.onPrintSelected()
+        assertCommandNotIssued<Command.PrintLink>()
+        verify(mockPixel, never()).fire(AppPixelName.MENU_ACTION_PRINT_PRESSED)
+    }
+
+    @Test
+    fun whenUserSelectsToPrintPageAndUrlIsBlankButPdfShownThenPrintLinkCommandSentWithPdfNameAsJobName() {
+        whenever(mockDeviceInfo.country).thenReturn("US")
+        loadUrl("")
+        testee.browserViewState.value = browserViewState().copy(
+            currentPdfCachedUri = Uri.parse("file:///cache/doc.pdf"),
+            currentPdfFileName = "doc.pdf",
+        )
+        testee.onPrintSelected()
+        val command = captureCommands().lastValue as Command.PrintLink
+        assertEquals("doc.pdf", command.documentName)
         verify(mockPixel).fire(AppPixelName.MENU_ACTION_PRINT_PRESSED)
     }
 

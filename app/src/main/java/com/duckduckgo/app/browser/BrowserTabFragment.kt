@@ -2871,7 +2871,7 @@ class BrowserTabFragment :
                 notifyEmailSignEvent()
             }
 
-            is Command.PrintLink -> launchPrint(it.url, it.mediaSize)
+            is Command.PrintLink -> launchPrint(it.documentName, it.mediaSize)
             is Command.ShowSitePermissionsDialog -> showSitePermissionsDialog(it.permissionsToRequest, it.request)
             is Command.ShowUserCredentialSavedOrUpdatedConfirmation ->
                 showAuthenticationSavedOrUpdatedSnackbar(
@@ -6363,20 +6363,20 @@ class BrowserTabFragment :
     }
 
     private fun launchPrint(
-        url: String,
+        documentName: String,
         defaultMediaSize: PrintAttributes.MediaSize,
     ) {
         if (viewModel.isPrinting()) return
 
         val printManager = activity?.getSystemService(Context.PRINT_SERVICE) as? PrintManager ?: return
-        val sourceAdapter = pdfPrintDocumentAdapterOrNull() ?: webView?.createSafePrintDocumentAdapter(url) ?: return
+        val sourceAdapter = pdfPrintDocumentAdapterOrNull() ?: webView?.createSafePrintDocumentAdapter(documentName) ?: return
         val printAdapter = PrintDocumentAdapterFactory.createPrintDocumentAdapter(
             sourceAdapter,
             onStartCallback = { viewModel.onStartPrint() },
             onFinishCallback = { viewModel.onFinishPrint() },
         )
         printManager.print(
-            url,
+            documentName,
             printAdapter,
             PrintAttributes.Builder().setMediaSize(defaultMediaSize).build(),
         )

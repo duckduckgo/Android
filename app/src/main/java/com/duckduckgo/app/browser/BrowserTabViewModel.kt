@@ -3713,10 +3713,11 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun onPrintSelected() {
-        url?.let {
-            pixel.fire(AppPixelName.MENU_ACTION_PRINT_PRESSED)
-            command.value = PrintLink(removeAtbAndSourceParamsFromSearch(it), defaultMediaSize())
-        }
+        val documentName = url?.let { removeAtbAndSourceParamsFromSearch(it) }?.takeIf { it.isNotBlank() }
+            ?: currentBrowserViewState().currentPdfFileName?.takeIf { it.isNotBlank() }
+            ?: return
+        pixel.fire(AppPixelName.MENU_ACTION_PRINT_PRESSED)
+        command.value = PrintLink(documentName, defaultMediaSize())
     }
 
     fun printFromWebView() {
