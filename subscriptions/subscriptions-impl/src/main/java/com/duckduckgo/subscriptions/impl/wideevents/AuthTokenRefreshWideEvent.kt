@@ -74,6 +74,7 @@ class AuthTokenRefreshWideEventImpl @Inject constructor(
                     KEY_NETP_IS_ENABLED to runCatching { networkProtectionState.get().isEnabled().toString() }.getOrDefault(""),
                     KEY_NETP_IS_RUNNING to runCatching { networkProtectionState.get().isRunning().toString() }.getOrDefault(""),
                     KEY_PROCESS_NAME to processName,
+                    KEY_USE_QUERY_PURCHASES to subscriptionsFeature.get().useQueryPurchases().isEnabled().toString(),
                 ),
             )
             .getOrNull()
@@ -198,6 +199,7 @@ class AuthTokenRefreshWideEventImpl @Inject constructor(
         const val KEY_NETP_IS_ENABLED = "netp_is_enabled"
         const val KEY_NETP_IS_RUNNING = "netp_is_running"
         const val KEY_PROCESS_NAME = "process_name"
+        const val KEY_USE_QUERY_PURCHASES = "use_query_purchases"
     }
 }
 

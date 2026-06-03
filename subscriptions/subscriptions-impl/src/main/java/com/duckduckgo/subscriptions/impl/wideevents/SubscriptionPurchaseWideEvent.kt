@@ -127,6 +127,7 @@ class SubscriptionPurchaseWideEventImpl @Inject constructor(
                 metadata = mapOf(
                     KEY_SUBSCRIPTION_IDENTIFIER to subscriptionIdentifier,
                     KEY_FREE_TRIAL_ELIGIBLE to freeTrialEligible.toString(),
+                    KEY_USE_QUERY_PURCHASES to subscriptionsFeature.get().useQueryPurchases().isEnabled().toString(),
                 ),
                 cleanupPolicy = OnProcessStart(ignoreIfIntervalTimeoutPresent = true),
             )
@@ -381,6 +382,7 @@ class SubscriptionPurchaseWideEventImpl @Inject constructor(
         const val KEY_ACTIVATION_LATENCY_MS_BUCKETED = "activation_latency_ms_bucketed"
         const val KEY_FREE_TRIAL_ELIGIBLE = "free_trial_eligible"
         const val KEY_SUBSCRIPTION_IDENTIFIER = "subscription_identifier"
+        const val KEY_USE_QUERY_PURCHASES = "use_query_purchases"
 
         const val STEP_REFRESH_SUBSCRIPTION = "refresh_subscription"
         const val STEP_CREATE_ACCOUNT = "create_account"

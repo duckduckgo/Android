@@ -62,6 +62,27 @@ class SubscriptionRestoreWideEventTest {
     }
 
     @Test
+    @SuppressLint("DenyListedApi")
+    fun `onGooglePlayRestoreFlowStarted includes use_query_purchases true when feature flag enabled`() = runTest {
+        subscriptionsFeature.useQueryPurchases().setRawStoredState(Toggle.State(true))
+        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any()))
+            .thenReturn(Result.success(321L))
+
+        subscriptionRestoreWideEvent.onGooglePlayRestoreFlowStarted(isOriginWeb = false)
+
+        verify(wideEventClient).flowStart(
+            name = "subscription-restore",
+            flowEntryPoint = "funnel_appsettings_android",
+            cleanupPolicy = CleanupPolicy.OnProcessStart(ignoreIfIntervalTimeoutPresent = true),
+            metadata = mapOf(
+                "restore_platform" to "google_play",
+                "is_purchase_attempt" to "false",
+                "use_query_purchases" to "true",
+            ),
+        )
+    }
+
+    @Test
     fun `onEmailRestoreFlowStarted starts a new flow with email platform`() = runTest {
         whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any()))
             .thenReturn(Result.success(123L))
@@ -75,6 +96,7 @@ class SubscriptionRestoreWideEventTest {
             metadata = mapOf(
                 "restore_platform" to "email_address",
                 "is_purchase_attempt" to "false",
+                "use_query_purchases" to "false",
             ),
         )
         verify(wideEventClient).intervalStart(wideEventId = 123L, key = "restore_latency_ms_bucketed")
@@ -94,6 +116,7 @@ class SubscriptionRestoreWideEventTest {
             metadata = mapOf(
                 "restore_platform" to "google_play",
                 "is_purchase_attempt" to "false",
+                "use_query_purchases" to "false",
             ),
         )
         verify(wideEventClient).intervalStart(wideEventId = 456L, key = "restore_latency_ms_bucketed")
@@ -112,6 +135,7 @@ class SubscriptionRestoreWideEventTest {
             metadata = mapOf(
                 "restore_platform" to "google_play",
                 "is_purchase_attempt" to "true",
+                "use_query_purchases" to "false",
             ),
         )
         verify(wideEventClient).intervalStart(wideEventId = 789L, key = "restore_latency_ms_bucketed")

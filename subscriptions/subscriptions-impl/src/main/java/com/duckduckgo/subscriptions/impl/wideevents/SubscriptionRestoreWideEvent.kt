@@ -131,6 +131,7 @@ class SubscriptionRestoreWideEventImpl @Inject constructor(
                 metadata = mapOf(
                     KEY_RESTORE_PLATFORM to restorePlatform,
                     KEY_IS_PURCHASE_ATTEMPT to purchaseAttempt.toString(),
+                    KEY_USE_QUERY_PURCHASES to subscriptionsFeature.get().useQueryPurchases().isEnabled().toString(),
                 ),
             )
             .getOrNull() ?: return
@@ -160,6 +161,7 @@ class SubscriptionRestoreWideEventImpl @Inject constructor(
         const val INTERVAL_RESTORE_LATENCY = "restore_latency_ms_bucketed"
         const val KEY_RESTORE_PLATFORM = "restore_platform"
         const val KEY_IS_PURCHASE_ATTEMPT = "is_purchase_attempt"
+        const val KEY_USE_QUERY_PURCHASES = "use_query_purchases"
         const val RESTORE_PLATFORM_GOOGLE_PLAY = "google_play"
         const val RESTORE_PLATFORM_EMAIL_ADDRESS = "email_address"
         const val FLOW_ENTRY_POINT_APP_SETTINGS = "funnel_appsettings_android"
