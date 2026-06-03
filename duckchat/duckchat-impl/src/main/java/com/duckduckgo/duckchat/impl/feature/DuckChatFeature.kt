@@ -92,6 +92,14 @@ interface DuckChatFeature {
     fun showAIChatAddressBarChoiceScreen(): Toggle
 
     /**
+     * @return `true` when the V2 (refreshed) new address bar option choice screen should be shown.
+     * If the remote feature is not present defaults to `internal`.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    @InternalAlwaysEnabled
+    fun showAIChatAddressBarChoiceScreenV2(): Toggle
+
+    /**
      * @return `true` when the Setting for allowing Duck.ai chats to be deleted with the Fire Button is enabled
      */
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
