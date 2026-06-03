@@ -18,27 +18,19 @@ package com.duckduckgo.app.browser.newaddressbaroption
 
 import android.app.Activity
 import com.duckduckgo.app.browser.omnibar.OmnibarType
-import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.store.UserStageStore
-import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.settings.db.SettingsDataStore
-import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.ui.DuckDuckGoActivity
-import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.common.utils.DefaultDispatcherProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
-import com.duckduckgo.duckchat.impl.inputscreen.newaddressbaroption.NewAddressBarSelection
-import com.duckduckgo.duckchat.impl.inputscreen.newaddressbaroption.NewAddressBarSelection.SEARCH_AND_AI
 import com.duckduckgo.remote.messaging.api.RemoteMessageModel
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
@@ -65,10 +57,6 @@ class RealNewAddressBarOptionManager @Inject constructor(
     private val newAddressBarOptionDataStore: NewAddressBarOptionDataStore,
     private val settingsDataStore: SettingsDataStore,
     private val onboardingStore: OnboardingStore,
-    private val newAddressBarOptionV2BottomSheetDialogFactory: NewAddressBarOptionV2BottomSheetDialogFactory,
-    private val pixel: Pixel,
-    private val appTheme: AppTheme,
-    @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val dispatchers: DispatcherProvider = DefaultDispatcherProvider(),
 ) : NewAddressBarOptionManager {
     private val showChoiceScreenMutex = Mutex()
@@ -80,16 +68,9 @@ class RealNewAddressBarOptionManager @Inject constructor(
         showChoiceScreenMutex.withLock {
             if (validate(activity, isLaunchedFromExternal)) {
                 logcat(DEBUG) { "NewAddressBarOptionManager: All conditions met, showing choice screen" }
-                if (isNewAddressBarOptionChoiceScreenV2Enabled()) {
-                    newAddressBarOptionDataStore.setAsShownV2()
-                    withContext(dispatchers.main()) {
-                        showV2ChoiceScreen(activity)
-                    }
-                } else {
-                    newAddressBarOptionDataStore.setAsShown()
-                    withContext(dispatchers.main()) {
-                        duckChat.showNewAddressBarOptionChoiceScreen(activity, activity.isDarkThemeEnabled())
-                    }
+                newAddressBarOptionDataStore.setAsShown()
+                withContext(dispatchers.main()) {
+                    duckChat.showNewAddressBarOptionChoiceScreen(activity, activity.isDarkThemeEnabled())
                 }
             }
         }
@@ -108,16 +89,6 @@ class RealNewAddressBarOptionManager @Inject constructor(
                 "NewAddressBarOptionManager: Starting validation..." +
                 "\n--------------------------"
         }
-        val v2Enabled = isNewAddressBarOptionChoiceScreenV2Enabled()
-        if (v2Enabled) {
-            return isDuckAiEnabled() &&
-                isInputScreenNeverEnabled() &&
-                hasNotShownV2Announcement() &&
-                hasNotInteractedWithSearchAndDuckAiRMF() &&
-                isSubsequentLaunch() &&
-                isActivityValid(activity)
-        }
-
         return isActivityValid(activity) &&
             isOnboardingCompleted() &&
             hasNotShownNewAddressBarOptionAnnouncement() &&
@@ -162,12 +133,6 @@ class RealNewAddressBarOptionManager @Inject constructor(
             logcat(DEBUG) { "NewAddressBarOptionManager: $it isInputScreenDisabled" }
         }
 
-    // "Ever enabled" is sticky and counts the onboarding choice — the TOGGLE_NEVER_ENABLED DAU cohort.
-    private suspend fun isInputScreenNeverEnabled(): Boolean =
-        (!duckChat.isInputScreenEverEnabled()).also {
-            logcat(DEBUG) { "NewAddressBarOptionManager: $it isInputScreenNeverEnabled" }
-        }
-
     private fun hasNoInputScreenSelection(): Boolean =
         (onboardingStore.getInputScreenSelection() == null).also {
             logcat(DEBUG) { "NewAddressBarOptionManager: $it hasNoInputScreenSelection" }
@@ -202,43 +167,4 @@ class RealNewAddressBarOptionManager @Inject constructor(
         }.also {
             logcat(DEBUG) { "NewAddressBarOptionManager: $it isSubsequentLaunch" }
         }
-
-    private fun isNewAddressBarOptionChoiceScreenV2Enabled(): Boolean =
-        duckAiFeatureState.showNewAddressBarOptionChoiceScreenV2.value.also {
-            logcat(DEBUG) { "NewAddressBarOptionManager: $it isNewAddressBarOptionChoiceScreenV2Enabled" }
-        }
-
-    private suspend fun hasNotShownV2Announcement(): Boolean =
-        (!newAddressBarOptionDataStore.wasShownV2()).also {
-            logcat(DEBUG) { "NewAddressBarOptionManager: $it hasNotShownV2Announcement" }
-        }
-
-    private fun showV2ChoiceScreen(activity: DuckDuckGoActivity) {
-        newAddressBarOptionV2BottomSheetDialogFactory.create(
-            context = activity,
-            isLightMode = appTheme.isLightModeEnabled(),
-            callback =
-            object : NewAddressBarV2Callback {
-                override fun onDisplayed() {
-                    pixel.fire(AppPixelName.NEW_ADDRESS_BAR_PICKER_V2_DISPLAYED)
-                }
-
-                override fun onConfirmed(selection: NewAddressBarSelection) {
-                    if (selection == SEARCH_AND_AI) {
-                        appCoroutineScope.launch {
-                            duckChat.setInputScreenUserSetting(true)
-                        }
-                    }
-                    pixel.fire(
-                        AppPixelName.NEW_ADDRESS_BAR_PICKER_V2_CONFIRMED,
-                        parameters = mapOf(SELECTION_PARAM to selection.value),
-                    )
-                }
-            },
-        ).show()
-    }
-
-    private companion object {
-        private const val SELECTION_PARAM = "selection"
-    }
 }

@@ -380,7 +380,6 @@ class RealDuckChat @Inject constructor(
     private val _showOmnibarShortcutOnNtpAndOnFocus = MutableStateFlow(false)
     private val _showOmnibarShortcutInAllStates = MutableStateFlow(false)
     private val _showNewAddressBarOptionChoiceScreen = MutableStateFlow(false)
-    private val _showNewAddressBarOptionChoiceScreenV2 = MutableStateFlow(false)
     private val _showClearDuckAIChatHistory = MutableStateFlow(true)
     private val _showMainButtonsInInputScreen = MutableStateFlow(false)
 
@@ -405,7 +404,6 @@ class RealDuckChat @Inject constructor(
     private var duckAiInputScreen = false
     private var duckAiInputScreenBottomBarEnabled = false
     private var showAIChatAddressBarChoiceScreen = false
-    private var showAIChatAddressBarChoiceScreenV2 = false
     private var isDuckChatUserEnabled = false
     private var isChatSyncFeatureEnabled = false
     private var duckChatLink = DUCK_CHAT_WEB_LINK
@@ -445,8 +443,6 @@ class RealDuckChat @Inject constructor(
         duckChatFeatureRepository.setInputScreenUserSetting(enabled)
         cacheUserSettings()
     }
-
-    override suspend fun isInputScreenEverEnabled(): Boolean = duckChatFeatureRepository.isInputScreenEverEnabled()
 
     override suspend fun setCosmeticInputScreenUserSetting(enabled: Boolean) {
         duckChatFeatureRepository.setCosmeticInputScreenUserSetting(enabled)
@@ -578,8 +574,6 @@ class RealDuckChat @Inject constructor(
     override val showOmnibarShortcutInAllStates: StateFlow<Boolean> = _showOmnibarShortcutInAllStates.asStateFlow()
 
     override val showNewAddressBarOptionChoiceScreen: StateFlow<Boolean> = _showNewAddressBarOptionChoiceScreen.asStateFlow()
-
-    override val showNewAddressBarOptionChoiceScreenV2: StateFlow<Boolean> = _showNewAddressBarOptionChoiceScreenV2.asStateFlow()
 
     override val showMainButtonsInInputScreen: StateFlow<Boolean> = _showMainButtonsInInputScreen.asStateFlow()
 
@@ -871,7 +865,6 @@ class RealDuckChat @Inject constructor(
             duckAiInputScreenBottomBarEnabled = duckChatFeature.inputScreenBottomBarSupport().isEnabled()
             clearChatHistory = duckChatFeature.clearHistory().isEnabled()
             showAIChatAddressBarChoiceScreen = duckChatFeature.showAIChatAddressBarChoiceScreen().isEnabled()
-            showAIChatAddressBarChoiceScreenV2 = duckChatFeature.showAIChatAddressBarChoiceScreenV2().isEnabled()
             showInputScreenOnSystemSearchLaunchEnabled = duckChatFeature.showInputScreenOnSystemSearchLaunch().isEnabled()
             inputScreenMainButtonsEnabled = duckChatFeature.showMainButtonsInInputScreen().isEnabled()
             isChatSyncFeatureEnabled = deviceSyncState.isDuckChatSyncFeatureEnabled()
@@ -939,7 +932,6 @@ class RealDuckChat @Inject constructor(
             _showOmnibarShortcutInAllStates.emit(showOmnibarShortcutInAllStates)
 
             _showNewAddressBarOptionChoiceScreen.emit(showAIChatAddressBarChoiceScreen)
-            _showNewAddressBarOptionChoiceScreenV2.emit(showAIChatAddressBarChoiceScreenV2)
 
             val showClearChatHistory = clearChatHistory
             _showClearDuckAIChatHistory.emit(showClearChatHistory)

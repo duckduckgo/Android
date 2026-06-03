@@ -66,6 +66,8 @@ import com.duckduckgo.app.browser.defaultbrowsing.prompts.ui.DefaultBrowserBotto
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.ui.DefaultBrowserBottomSheetDialog.EventListener
 import com.duckduckgo.app.browser.mode.BrowserLaunchSource
 import com.duckduckgo.app.browser.newaddressbaroption.NewAddressBarOptionManager
+import com.duckduckgo.app.browser.newaddressbaroption.NewAddressBarOptionV2BottomSheetDialogFactory
+import com.duckduckgo.app.browser.newaddressbaroption.NewAddressBarV2Callback
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.browser.shortcut.ShortcutBuilder
@@ -105,6 +107,7 @@ import com.duckduckgo.browser.api.ui.BrowserScreens.BookmarksScreenNoParams
 import com.duckduckgo.browser.api.ui.BrowserScreens.SettingsScreenNoParams
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.ui.DuckDuckGoActivity
+import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.common.ui.tabs.SwipingTabsFeatureProvider
 import com.duckduckgo.common.ui.view.addBottomShadow
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
@@ -125,6 +128,7 @@ import com.duckduckgo.downloads.api.DownloadsScreens.DownloadsScreenNoParams
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.api.viewmodel.DuckChatSharedViewModel
+import com.duckduckgo.duckchat.impl.inputscreen.newaddressbaroption.NewAddressBarSelection
 import com.duckduckgo.duckchat.impl.ui.DuckChatWebViewFragment
 import com.duckduckgo.duckchat.impl.ui.DuckChatWebViewFragment.Companion.KEY_DUCK_AI_TABS
 import com.duckduckgo.duckchat.impl.ui.DuckChatWebViewFragment.Companion.KEY_DUCK_AI_URL
@@ -223,6 +227,12 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var newAddressBarOptionManager: NewAddressBarOptionManager
+
+    @Inject
+    lateinit var newAddressBarOptionV2BottomSheetDialogFactory: NewAddressBarOptionV2BottomSheetDialogFactory
+
+    @Inject
+    lateinit var appTheme: AppTheme
 
     @Inject
     lateinit var fireDialogProvider: FireDialogProvider
@@ -999,6 +1009,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
             is Command.OpenInNewTab -> launchNewTab(command.url)
             is Command.OpenSavedSite -> currentTab?.openSavedSite(command.url)
             is Command.ShowSetAsDefaultBrowserDialog -> showSetAsDefaultBrowserDialog()
+            is Command.ShowNewAddressBarOptionV2Picker -> showNewAddressBarOptionV2Picker()
             is Command.DismissSetAsDefaultBrowserDialog -> dismissSetAsDefaultBrowserDialog()
             is Command.DoNotAskAgainSetAsDefaultBrowserDialog -> dismissSetAsDefaultBrowserDialog()
             is Command.ShowSystemDefaultAppsActivity -> showSystemDefaultAppsActivity(command.intent)
@@ -1013,6 +1024,27 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
             Command.LaunchTabSwitcher -> currentTab?.launchTabSwitcherAfterTabsUndeleted()
         }
+    }
+
+    private fun showNewAddressBarOptionV2Picker() {
+        newAddressBarOptionV2BottomSheetDialogFactory.create(
+            context = this,
+            isLightMode = appTheme.isLightModeEnabled(),
+            callback =
+            object : NewAddressBarV2Callback {
+                override fun onDisplayed() {
+                    pixel.fire(AppPixelName.NEW_ADDRESS_BAR_PICKER_V2_DISPLAYED)
+                }
+
+                override fun onConfirmed(selection: NewAddressBarSelection) {
+                    pixel.fire(
+                        AppPixelName.NEW_ADDRESS_BAR_PICKER_V2_CONFIRMED,
+                        parameters = mapOf("selection" to selection.value),
+                    )
+                    viewModel.onNewAddressBarOptionV2Confirmed(selection == NewAddressBarSelection.SEARCH_AND_AI)
+                }
+            },
+        ).show()
     }
 
     private fun showTabsDeletedSnackbar(tabIds: List<String>) {

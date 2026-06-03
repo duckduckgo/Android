@@ -107,6 +107,10 @@ interface DuckChatDataStore {
 
     suspend fun isInputScreenEverEnabled(): Boolean
 
+    suspend fun setNewAddressBarOptionV2Shown()
+
+    suspend fun wasNewAddressBarOptionV2Shown(): Boolean
+
     suspend fun isFullScreenUserSettingEnabled(): Boolean
 
     suspend fun getShowInBrowserMenu(): Boolean
@@ -182,6 +186,7 @@ class SharedPreferencesDuckChatDataStore @Inject constructor(
         val DUCK_AI_INPUT_SCREEN_USER_SETTING = booleanPreferencesKey(name = "DUCK_AI_INPUT_SCREEN_USER_SETTING")
         val DUCK_AI_INPUT_SCREEN_COSMETIC_SETTING = booleanPreferencesKey(name = "DUCK_AI_INPUT_SCREEN_COSMETIC_SETTING")
         val DUCK_AI_INPUT_SCREEN_EVER_ENABLED = booleanPreferencesKey(name = "DUCK_AI_INPUT_SCREEN_EVER_ENABLED")
+        val DUCK_AI_NEW_ADDRESS_BAR_OPTION_V2_SHOWN = booleanPreferencesKey(name = "DUCK_AI_NEW_ADDRESS_BAR_OPTION_V2_SHOWN")
         val DUCK_CHAT_SHOW_IN_MENU = booleanPreferencesKey(name = "DUCK_CHAT_SHOW_IN_MENU")
         val DUCK_CHAT_SHOW_IN_ADDRESS_BAR = booleanPreferencesKey(name = "DUCK_CHAT_SHOW_IN_ADDRESS_BAR")
         val DUCK_CHAT_SHOW_IN_VOICE_SEARCH = booleanPreferencesKey(name = "DUCK_CHAT_SHOW_IN_VOICE_SEARCH")
@@ -368,6 +373,14 @@ class SharedPreferencesDuckChatDataStore @Inject constructor(
         }
         return everInteracted
     }
+
+    override suspend fun setNewAddressBarOptionV2Shown() {
+        store.edit { it[Keys.DUCK_AI_NEW_ADDRESS_BAR_OPTION_V2_SHOWN] = true }
+    }
+
+    override suspend fun wasNewAddressBarOptionV2Shown(): Boolean = store.data.firstOrNull()?.let {
+        it[Keys.DUCK_AI_NEW_ADDRESS_BAR_OPTION_V2_SHOWN]
+    } ?: false
 
     override suspend fun isFullScreenUserSettingEnabled(): Boolean = store.data.firstOrNull()?.let {
         it[DUCK_CHAT_FULLSCREEN_MODE_SETTING]

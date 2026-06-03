@@ -84,13 +84,6 @@ interface DuckChat {
     suspend fun setInputScreenUserSetting(enabled: Boolean)
 
     /**
-     * Returns `true` if the user has ever interacted with the Duck.ai input screen toggle — whether by
-     * enabling it explicitly or having a value written implicitly (e.g. the onboarding selection). Sticky
-     * once set: turning the toggle back off does not reset it.
-     */
-    suspend fun isInputScreenEverEnabled(): Boolean
-
-    /**
      * Cosmetically sets the input screen user setting.
      */
     suspend fun setCosmeticInputScreenUserSetting(enabled: Boolean)

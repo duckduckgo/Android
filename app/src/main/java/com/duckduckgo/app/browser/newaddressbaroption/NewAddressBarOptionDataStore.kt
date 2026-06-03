@@ -35,9 +35,6 @@ interface NewAddressBarOptionDataStore {
 
     suspend fun setAsValidated()
     suspend fun wasValidated(): Boolean
-
-    suspend fun setAsShownV2()
-    suspend fun wasShownV2(): Boolean
 }
 
 @SingleInstanceIn(AppScope::class)
@@ -50,7 +47,6 @@ class SharedPreferencesNewAddressBarOptionDataStore @Inject constructor(
     private object Keys {
         val WAS_SHOWN_KEY = booleanPreferencesKey(name = "NEW_ADDRESS_BAR_OPTION_WAS_SHOWN")
         val WAS_VALIDATED_KEY = booleanPreferencesKey(name = "NEW_ADDRESS_BAR_OPTION_WAS_VALIDATED")
-        val WAS_SHOWN_V2_KEY = booleanPreferencesKey(name = "NEW_ADDRESS_BAR_OPTION_V2_WAS_SHOWN")
     }
 
     override suspend fun setAsShown() {
@@ -75,17 +71,5 @@ class SharedPreferencesNewAddressBarOptionDataStore @Inject constructor(
 
     override suspend fun wasValidated(): Boolean = withContext(dispatchers.io()) {
         dataStore.data.firstOrNull()?.let { it[Keys.WAS_VALIDATED_KEY] } ?: false
-    }
-
-    override suspend fun setAsShownV2() {
-        withContext(dispatchers.io()) {
-            dataStore.edit { prefs ->
-                prefs[Keys.WAS_SHOWN_V2_KEY] = true
-            }
-        }
-    }
-
-    override suspend fun wasShownV2(): Boolean = withContext(dispatchers.io()) {
-        dataStore.data.firstOrNull()?.let { it[Keys.WAS_SHOWN_V2_KEY] } ?: false
     }
 }

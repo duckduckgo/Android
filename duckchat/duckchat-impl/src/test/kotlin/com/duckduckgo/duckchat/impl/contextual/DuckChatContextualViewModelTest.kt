@@ -1922,7 +1922,6 @@ class DuckChatContextualViewModelTest {
         ) = Unit
 
         override suspend fun setInputScreenUserSetting(enabled: Boolean) = Unit
-        override suspend fun isInputScreenEverEnabled(): Boolean = false
         override suspend fun setCosmeticInputScreenUserSetting(enabled: Boolean) = Unit
         override fun observeInputScreenUserSettingEnabled(): Flow<Boolean> = kotlinx.coroutines.flow.emptyFlow()
         override fun observeCosmeticInputScreenUserSettingEnabled(): Flow<Boolean?> = kotlinx.coroutines.flow.emptyFlow()
