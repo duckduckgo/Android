@@ -691,6 +691,7 @@ tasks.register('android_checks') {
 
 tasks.register('jvm_checks') {
     dependsOn 'spotlessCheck', 'lint', 'testPlayDebugUnitTest'
+    dependsOn rootProject.tasks.named('aiConfigCheck')
 }
 
 tasks.register('lint_check') {

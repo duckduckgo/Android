@@ -12,6 +12,19 @@ The following rule files contain detailed guidance for specific topics. Read the
 | `.cursor/rules/wide-events.mdc` | Wide event API, FlowStatus, CleanupPolicy, implementation patterns |
 | `.cursor/rules/dependency-updates.mdc` | How to safely update Android library dependencies |
 | `.cursor/rules/contributions.mdc` | Branch naming, commit messages, PR creation workflow |
+| `.cursor/rules/pixels.mdc` | What pixels are, when to use them, privacy requirements, telemetry best practices |
+| `.cursor/rules/pixel-definitions.mdc` | Creating and maintaining pixel definition JSON files for pixels and wide events |
+
+## Skills
+
+Claude Code skills (model-invoked capabilities, one directory each under `.claude/skills/` with a `SKILL.md`). These are Claude-Code-only; Cursor has no equivalent.
+
+| Skill | Purpose |
+|---|---|
+| `.claude/skills/check-translations-pr/` | Verify a translations PR provides full language coverage |
+| `.claude/skills/review-public-api/` | Review a DuckDuckGo Android public API proposal |
+| `.claude/skills/run-maintenance-task/` | Execute a task from the Android Agentic Maintenance Backlog |
+| `.claude/skills/scope-maintenance-task/` | Scope a maintenance idea into a backlog task |
 
 ---
 
@@ -20,8 +33,8 @@ The following rule files contain detailed guidance for specific topics. Read the
 DuckDuckGo Android is a privacy-focused browser with 100+ Gradle modules. The app provides built-in search, tracker blocking, HTTPS enforcement, and other privacy features.
 
 **SDK targets:** minSdk 26, targetSdk 35, compileSdk 35
-**Language:** Kotlin (1.9.24), Java 17 (JVM toolchain)
-**Build:** Gradle 7.6, AGP via refreshVersions, Anvil (Dagger2)
+**Language:** Kotlin (2.2.21), Java 17 (JVM toolchain)
+**Build:** Gradle 8.14.4, AGP via refreshVersions, Anvil (Dagger2)
 
 ---
 

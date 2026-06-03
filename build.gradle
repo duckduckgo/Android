@@ -362,4 +362,19 @@ afterEvaluate {
     }
 }
 
+tasks.register('aiConfigCheck') {
+    group = 'verification'
+    description = 'Validates AI config (.cursor/rules, .claude/skills) against AGENTS.md and checks for dangling references.'
+    def repoRoot = layout.projectDirectory.asFile
+    doLast {
+        def checker = new com.duckduckgo.gradle.AiConfigChecker(repoRoot)
+        def violations = checker.check()
+        if (!violations.isEmpty()) {
+            violations.each { v -> logger.error("AI config: " + v.format()) }
+            throw new GradleException("AI config check failed with ${violations.size()} violation(s). See messages above.")
+        }
+        logger.lifecycle("AI config check passed: ${violations.size()} violations.")
+    }
+}
+
 apply plugin: 'android-reporting'
