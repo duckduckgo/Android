@@ -119,6 +119,10 @@ class CtaViewModel @Inject constructor(
         onboardingBrandDesignUpdateToggles.brandDesignUpdate().isEnabled()
     }
 
+    private suspend fun isOnboardingImprovementsEnabled(): Boolean = withContext(dispatchers.io()) {
+        onboardingBrandDesignUpdateToggles.onboardingImprovements().isEnabled()
+    }
+
     // Exposed for onboarding dev settings and tests. Used internally for completion checks
     @VisibleForTesting
     suspend fun requiredDaxOnboardingCtas(): List<CtaId> {
@@ -365,7 +369,13 @@ class CtaViewModel @Inject constructor(
             // Site suggestions
             canShowDaxIntroVisitSiteCta() && !extendedOnboardingFeatureToggles.noBrowserCtas().isEnabled() -> {
                 if (isBrandDesignUpdateEnabled()) {
-                    DaxVisitSiteOptionsBrandDesignUpdateBubbleCta(onboardingStore, appInstallStore, appTheme.isLightModeEnabled(), deviceInfo)
+                    DaxVisitSiteOptionsBrandDesignUpdateBubbleCta(
+                        onboardingStore,
+                        appInstallStore,
+                        appTheme.isLightModeEnabled(),
+                        deviceInfo,
+                        onboardingImprovementsEnabled = isOnboardingImprovementsEnabled(),
+                    )
                 } else {
                     DaxBubbleCta.DaxIntroVisitSiteOptionsCta(onboardingStore, appInstallStore)
                 }
@@ -374,7 +384,13 @@ class CtaViewModel @Inject constructor(
             // End
             canShowDaxCtaEndOfJourney() && !extendedOnboardingFeatureToggles.noBrowserCtas().isEnabled() -> {
                 if (isBrandDesignUpdateEnabled()) {
-                    DaxEndBrandDesignUpdateBubbleCta(onboardingStore, appInstallStore, appTheme.isLightModeEnabled(), deviceInfo)
+                    DaxEndBrandDesignUpdateBubbleCta(
+                        onboardingStore,
+                        appInstallStore,
+                        appTheme.isLightModeEnabled(),
+                        deviceInfo,
+                        onboardingImprovementsEnabled = isOnboardingImprovementsEnabled(),
+                    )
                 } else {
                     DaxBubbleCta.DaxEndCta(onboardingStore, appInstallStore)
                 }
@@ -389,6 +405,7 @@ class CtaViewModel @Inject constructor(
                         appTheme.isLightModeEnabled(),
                         deviceInfo,
                         isFreeTrialCopy = freeTrialCopyAvailable(),
+                        onboardingImprovementsEnabled = isOnboardingImprovementsEnabled(),
                     )
                 } else {
                     DaxBubbleCta.DaxSubscriptionCta(

@@ -21,6 +21,7 @@ import android.content.res.Configuration
 import android.content.res.Resources
 import android.view.View
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import com.airbnb.lottie.LottieAnimationView
 import com.duckduckgo.app.browser.R
@@ -64,16 +65,15 @@ class BrandDesignUpdateBubbleCtaTest {
     }
 
     @Test
-    fun applyWavingDaxState_notPhoneLandscape_showsAndConfiguresDax_whenCtaOptsIn() {
+    fun applyWavingDaxState_notPhoneLandscape_configuresDaxAndStartsInvisible_whenCtaOptsIn() {
         configureContainerForPhonePortrait()
-        whenever(dax.alpha).thenReturn(0f)
         val cta = TestableBubbleCta()
         val showsWavingDax: DaxBubbleCta.ShowsWavingDax = mock()
 
         cta.applyWavingDaxState(container, showsWavingDax)
 
         verify(showsWavingDax).configureWavingDax(dax, mockDeviceInfo)
-        verify(dax).isVisible = true
+        verify(dax).isInvisible = true
     }
 
     @Test

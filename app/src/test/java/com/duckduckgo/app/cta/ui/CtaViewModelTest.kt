@@ -182,6 +182,7 @@ class CtaViewModelTest {
         whenever(mockBrokenSitePrompt.getUserRefreshPatterns()).thenReturn(emptySet())
         whenever(mockSubscriptions.isEligible()).thenReturn(false)
         whenever(mockOnboardingBrandDesignUpdateToggles.brandDesignUpdate()).thenReturn(mockDisabledToggle)
+        whenever(mockOnboardingBrandDesignUpdateToggles.onboardingImprovements()).thenReturn(mockEnabledToggle)
 
         testee = CtaViewModel(
             appInstallStore = mockAppInstallStore,
@@ -1129,6 +1130,30 @@ class CtaViewModelTest {
 
         val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false, detectedRefreshPatterns = detectedRefreshPatterns)
         assertTrue(value is DaxVisitSiteOptionsBrandDesignUpdateBubbleCta)
+    }
+
+    @Test
+    fun whenOnboardingImprovementsDisabledThenVisitSiteBrandCtaHasFlagFalse() = runTest {
+        givenDaxOnboardingActive()
+        whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO)).thenReturn(true)
+        whenever(mockOnboardingBrandDesignUpdateToggles.brandDesignUpdate()).thenReturn(mockEnabledToggle)
+        whenever(mockOnboardingBrandDesignUpdateToggles.onboardingImprovements()).thenReturn(mockDisabledToggle)
+
+        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false, detectedRefreshPatterns = detectedRefreshPatterns)
+        assertTrue(value is DaxVisitSiteOptionsBrandDesignUpdateBubbleCta)
+        assertFalse((value as DaxVisitSiteOptionsBrandDesignUpdateBubbleCta).onboardingImprovementsEnabled)
+    }
+
+    @Test
+    fun whenOnboardingImprovementsEnabledThenVisitSiteBrandCtaHasFlagTrue() = runTest {
+        givenDaxOnboardingActive()
+        whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO)).thenReturn(true)
+        whenever(mockOnboardingBrandDesignUpdateToggles.brandDesignUpdate()).thenReturn(mockEnabledToggle)
+        whenever(mockOnboardingBrandDesignUpdateToggles.onboardingImprovements()).thenReturn(mockEnabledToggle)
+
+        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false, detectedRefreshPatterns = detectedRefreshPatterns)
+        assertTrue(value is DaxVisitSiteOptionsBrandDesignUpdateBubbleCta)
+        assertTrue((value as DaxVisitSiteOptionsBrandDesignUpdateBubbleCta).onboardingImprovementsEnabled)
     }
 
     @Test

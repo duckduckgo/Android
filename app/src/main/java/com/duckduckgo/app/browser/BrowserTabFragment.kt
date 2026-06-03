@@ -49,6 +49,7 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewGroup.LayoutParams
+import android.view.ViewTreeObserver
 import android.webkit.PermissionRequest
 import android.webkit.SslErrorHandler
 import android.webkit.ValueCallback
@@ -1208,6 +1209,7 @@ class BrowserTabFragment :
         configureNavigationBar()
         configureOmnibar()
         configureBrowserTabKeyboardListener()
+        renderer.configureBrandDesignFitListener()
 
         disableViewStateSaving()
 
@@ -2037,6 +2039,7 @@ class BrowserTabFragment :
         }
         contextualSheetBottomSheetCallback = null
         browserNavigationBarIntegration.onDestroyView()
+        renderer.removeBrandDesignFitListener()
         super.onDestroyView()
     }
 
@@ -5714,6 +5717,7 @@ class BrowserTabFragment :
         private var lastSeenAutoCompleteViewState: AutoCompleteViewState? = null
         private var lastSeenCtaViewState: CtaViewState? = null
         private var lastSeenPrivacyShieldViewState: PrivacyShieldViewState? = null
+        private var brandDesignFitLayoutListener: ViewTreeObserver.OnGlobalLayoutListener? = null
 
         fun renderPrivacyShield(viewState: PrivacyShieldViewState) {
             renderIfChanged(viewState, lastSeenPrivacyShieldViewState) {
@@ -6078,10 +6082,26 @@ class BrowserTabFragment :
             if (configuration is DaxBubbleCta.BrandDesignUpdateBubbleCta) {
                 setBrowserBackgroundRes(configuration.backgroundRes, useRebrandBackground = true)
                 setNewTabBackgroundColor(com.duckduckgo.mobile.android.R.attr.onboardingSurfaceBackdrop)
+                brandDesignDialogScrollView.post { configuration.applyFit() }
             } else {
                 viewModel.setBrowserBackground(appTheme.isLightModeEnabled())
             }
             viewModel.onCtaShown()
+        }
+
+        fun configureBrandDesignFitListener() {
+            val listener = ViewTreeObserver.OnGlobalLayoutListener {
+                (lastSeenCtaViewState?.cta as? DaxBubbleCta.BrandDesignUpdateBubbleCta)?.applyFit()
+            }
+            brandDesignFitLayoutListener = listener
+            brandDesignDialogScrollView.viewTreeObserver.addOnGlobalLayoutListener(listener)
+        }
+
+        fun removeBrandDesignFitListener() {
+            brandDesignFitLayoutListener?.let {
+                brandDesignDialogScrollView.viewTreeObserver.removeOnGlobalLayoutListener(it)
+            }
+            brandDesignFitLayoutListener = null
         }
 
         private fun showPrivacyProSkippedOnboardingBottomSheet(configuration: SubscriptionPromoModalCta) {

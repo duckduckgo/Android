@@ -34,6 +34,7 @@ data class DaxEndBrandDesignUpdateBubbleCta(
     override val appInstallStore: AppInstallStore,
     override val isLightTheme: Boolean,
     override val deviceInfo: DeviceInfo,
+    override val onboardingImprovementsEnabled: Boolean = true,
 ) : DaxBubbleCta.BrandDesignUpdateBubbleCta(
     ctaId = CtaId.DAX_END,
     title = R.string.onboardingEndDaxDialogTitle,
@@ -50,6 +51,7 @@ data class DaxEndBrandDesignUpdateBubbleCta(
     appInstallStore = appInstallStore,
     isLightTheme = isLightTheme,
     deviceInfo = deviceInfo,
+    onboardingImprovementsEnabled = onboardingImprovementsEnabled,
 ),
     DaxBubbleCta.ShowsWavingDax {
     override val activeIncludeId: Int = R.id.primaryCta
