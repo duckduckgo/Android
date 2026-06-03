@@ -199,7 +199,6 @@ class NativeInputModeWidget @JvmOverloads constructor(
     private var tabCountLiveData: LiveData<Int>? = null
     private var tabCountObserver: Observer<Int>? = null
     private var submitButtons: InputScreenButtons? = null
-    private var streamingButtons: InputScreenButtons? = null
     private var floatingButtons: InputScreenButtons? = null
     private var floatingSubmitContainer: ViewGroup? = null
     private var chatStateJob: Job? = null
@@ -357,7 +356,6 @@ class NativeInputModeWidget @JvmOverloads constructor(
         chatIdJob = null
         modelPickerView = null
         optionsView = null
-        streamingButtons = null
         widgetRoot = null
         tearDownChatSuggestions()
     }
@@ -1092,12 +1090,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
     private fun setChatStreaming(streaming: Boolean) {
         isStreaming = streaming
         configureSubmitButtons()
-        val streamingContainer = findViewById<FrameLayout?>(R.id.streamingButtonsContainer)
-        if (streaming) {
-            streamingContainer?.visibility = VISIBLE
-            streamingButtons?.setSendButtonVisible(true)
-        } else {
-            streamingContainer?.visibility = GONE
+        if (!streaming) {
             submitButtons?.showSendButton()
             applyTabUi()
             floatingSubmitContainer?.visibility = if (attachmentLimitExceeded) GONE else VISIBLE
@@ -1129,6 +1122,10 @@ class NativeInputModeWidget @JvmOverloads constructor(
         // in Duck.ai mode we treat this as submitting prompts.
         // In non-Duck.ai mode we treat this as starting a chat with or without a prompt.
         if (!submitAsChat()) viewModel.openNewChat()
+    }
+
+    override fun stop() {
+        onStopTapped?.invoke()
     }
 
     override fun showAttachmentChooser(showing: Boolean) {
@@ -1178,24 +1175,6 @@ class NativeInputModeWidget @JvmOverloads constructor(
             }
             bottomContainer.addView(buttons)
             submitButtons = buttons
-        }
-
-        if (streamingButtons == null) {
-            val streamingContainer = findViewById<FrameLayout?>(R.id.streamingButtonsContainer)
-            if (streamingContainer != null) {
-                val buttons = InputScreenButtons(
-                    context = context,
-                    useTopBar = false,
-                    layoutResId = R.layout.view_native_input_screen_buttons,
-                ).apply {
-                    onStopClick = { this@NativeInputModeWidget.onStopTapped?.invoke() }
-                    showStopButton()
-                    setSendButtonVisible(false)
-                    setNewLineButtonVisible(false)
-                }
-                streamingContainer.addView(buttons)
-                streamingButtons = buttons
-            }
         }
 
         val floating = floatingSubmitContainer
