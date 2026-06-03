@@ -162,7 +162,7 @@ sealed class Command {
     ) : Command()
 
     class PrintLink(
-        val url: String,
+        val documentName: String,
         val mediaSize: MediaSize,
     ) : Command()
 
