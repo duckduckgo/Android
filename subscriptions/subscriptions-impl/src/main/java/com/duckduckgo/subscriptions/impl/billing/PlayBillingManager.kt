@@ -107,10 +107,11 @@ interface PlayBillingManager {
     fun getLatestPurchaseToken(): String?
 
     /**
-     * Returns the latest active (PURCHASED) subscription purchase.
+     * Returns the latest active (PURCHASED) subscription purchase. Queries Play Billing
+     * directly on every call so the result reflects current state (no cache staleness).
      * See [LatestPurchaseResult] for the meaning of each outcome.
      */
-    fun getLatestPurchase(): LatestPurchaseResult
+    suspend fun getLatestPurchase(): LatestPurchaseResult
 }
 
 @SingleInstanceIn(AppScope::class)
@@ -153,8 +154,6 @@ class RealPlayBillingManager @Inject constructor(
 
     // Active Purchases
     override var purchases = emptyList<Purchase>()
-
-    private var latestQueryPurchasesSucceeded = false
 
     override fun onCreate(owner: LifecycleOwner) {
         connectAsyncWithRetry()
@@ -410,11 +409,9 @@ class RealPlayBillingManager @Inject constructor(
         when (val result = billingClient.queryPurchases()) {
             is QueryPurchasesResult.Success -> {
                 purchases = result.purchases
-                latestQueryPurchasesSucceeded = true
                 logcat { "Billing: Loaded ${result.purchases.size} active purchases" }
             }
             is QueryPurchasesResult.Failure -> {
-                latestQueryPurchasesSucceeded = false
                 logcat { "Billing: Failed to load purchases: ${result.billingError} - ${result.debugMessage}" }
             }
         }
@@ -438,15 +435,24 @@ class RealPlayBillingManager @Inject constructor(
         }
     }
 
-    override fun getLatestPurchase(): LatestPurchaseResult {
-        if (!latestQueryPurchasesSucceeded) return LatestPurchaseResult.Unknown
-        val latest = purchases
-            .filter { purchase ->
-                (purchase.products.contains(BASIC_SUBSCRIPTION) || purchase.products.contains(ADVANCED_SUBSCRIPTION)) &&
-                    purchase.purchaseState == Purchase.PurchaseState.PURCHASED
+    override suspend fun getLatestPurchase(): LatestPurchaseResult = withContext(dispatcherProvider.io()) {
+        if (!billingClient.ready) return@withContext LatestPurchaseResult.Unknown
+
+        when (val result = billingClient.queryPurchases()) {
+            is QueryPurchasesResult.Success -> {
+                val latest = result.purchases
+                    .filter { purchase ->
+                        (purchase.products.contains(BASIC_SUBSCRIPTION) || purchase.products.contains(ADVANCED_SUBSCRIPTION)) &&
+                            purchase.purchaseState == Purchase.PurchaseState.PURCHASED
+                    }
+                    .maxByOrNull { it.purchaseTime }
+                if (latest != null) LatestPurchaseResult.Present(latest) else LatestPurchaseResult.Absent
             }
-            .maxByOrNull { it.purchaseTime }
-        return if (latest != null) LatestPurchaseResult.Present(latest) else LatestPurchaseResult.Absent
+            is QueryPurchasesResult.Failure -> {
+                logcat { "Billing: getLatestPurchase query failed: ${result.billingError} - ${result.debugMessage}" }
+                LatestPurchaseResult.Unknown
+            }
+        }
     }
 }
 
