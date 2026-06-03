@@ -138,6 +138,12 @@
     <string name="duck_ai_chat_history_search_close_content_description">Zoeken sluiten</string>
     <string name="duck_ai_chat_history_search_clear_content_description">Zoeken wissen</string>
     <string name="duck_ai_chat_history_action_fire_content_description">Chats verwijderen</string>
+    <string name="duck_ai_chat_history_action_new">Nieuw</string>
+    <string name="duck_ai_chat_history_action_download_selected_content_description">Chats downloaden</string>
+    <plurals name="duck_ai_chat_history_bulk_download_complete">
+        <item quantity="one">Download voltooid voor %1$d chat</item>
+        <item quantity="other">Download voltooid voor %1$d chats</item>
+    </plurals>
     <string name="duck_ai_chat_history_action_overflow_content_description">Overloopmenu openen</string>
     <string name="duck_ai_chat_history_select_all">Alles selecteren</string>
     <string name="duck_ai_chat_history_unselect_all">Alles deselecteren</string>
@@ -155,4 +161,5 @@
     <string name="duck_ai_chat_history_download_complete" instruction="%1$s is the saved chat filename (e.g. \&apos;My Chat.txt\&apos;).">Downloaden voltooid voor %1$s</string>
     <string name="duck_ai_chat_history_download_view">Tonen</string>
     <string name="duck_ai_chat_history_download_error">Kan chat niet exporteren</string>
+    <string name="duck_ai_chat_history_bulk_download_error">Kan chats niet exporteren</string>
 </resources>
