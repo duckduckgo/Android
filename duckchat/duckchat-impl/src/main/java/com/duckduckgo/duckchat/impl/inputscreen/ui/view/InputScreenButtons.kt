@@ -100,13 +100,6 @@ class InputScreenButtons @JvmOverloads constructor(
         if (actionSend.isEnabled) onSendClick?.invoke()
     }
 
-    private fun resolveThemeColorStateList(attr: Int): android.content.res.ColorStateList? {
-        val attributes = context.obtainStyledAttributes(intArrayOf(attr))
-        val colorStateList = attributes.getColorStateList(0)
-        attributes.recycle()
-        return colorStateList
-    }
-
     fun setSendButtonEnabled(enabled: Boolean) {
         actionSend.isEnabled = enabled
     }
