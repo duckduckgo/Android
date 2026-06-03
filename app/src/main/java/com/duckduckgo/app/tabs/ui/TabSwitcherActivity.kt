@@ -292,7 +292,7 @@ class TabSwitcherActivity :
         when (settingsDataStore.omnibarType) {
             OmnibarType.SINGLE_TOP -> {
                 edgeToEdgeHandler.applyStatusBarInsets(binding.tabSwitcherToolbarTop.root)
-                edgeToEdgeHandler.applyNavigationBarInsets(tabsRecycler)
+                edgeToEdgeHandler.applyNavigationBarInsets(tabsContainer)
             }
             OmnibarType.SINGLE_BOTTOM -> {
                 edgeToEdgeHandler.applyStatusBarInsets(tabsContainer)
