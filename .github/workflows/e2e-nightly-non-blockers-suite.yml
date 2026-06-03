@@ -31,7 +31,7 @@ jobs:
           gradle_encryption_key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
           # Disable the 50/50 onboardingQuickSetupExperimentJun3 A/B experiment so the
           # preonboarding tests don't randomly fail when enrolled in the TREATMENT cohort
-          gradle_flags: '-Pconfig_patches=.maestro/preonboarding/remote_config_patches/disable_onboarding_quick_setup_experiment.json'
+          gradle_flags: '-Pconfig_patches=.maestro/onboarding/remote_config_patches/disable_onboarding_quick_setup_experiment.json'
           develocity_access_key: ${{ secrets.DEVELOCITY_ACCESS_KEY }}
           ducksans_package_auth_user: ${{ secrets.DAXMOBILE_GITHUB_PACKAGES_AUTOMATION_USER }}
           ducksans_package_auth_token: ${{ secrets.DAXMOBILE_GITHUB_PACKAGES_AUTOMATION }}
