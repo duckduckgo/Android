@@ -86,17 +86,6 @@
                     app:menuActionSrc="@drawable/ic_add_24" />
 
                 <com.duckduckgo.common.ui.view.MenuActionButtonView
-                    android:id="@+id/newDuckChatTabMenuItem"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:layout_marginStart="@dimen/keyline_1"
-                    android:layout_marginEnd="@dimen/keyline_1"
-                    android:visibility="gone"
-                    app:menuActionLabel="@string/browserMenuNewChat"
-                    app:menuActionSrc="@drawable/ic_ai_chat_add_24" />
-
-                <com.duckduckgo.common.ui.view.MenuActionButtonView
                     android:id="@+id/newDuckChatMenuItem"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
@@ -104,7 +93,7 @@
                     android:layout_marginStart="@dimen/keyline_1"
                     android:layout_marginEnd="@dimen/keyline_1"
                     app:menuActionLabel="@string/browserMenuDuckChat"
-                    app:menuActionSrc="@drawable/ic_ai_chat_add_24" />
+                    app:menuActionSrc="@drawable/ic_duck_ai_menu_logo_24" />
 
                 <com.duckduckgo.common.ui.view.MenuActionButtonView
                     android:id="@+id/settingsMenuItem"
@@ -223,14 +212,6 @@
                 app:fullWidth="false" />
 
             <com.duckduckgo.common.ui.view.MenuItemView
-                android:id="@+id/duckChatHistoryMenuItem"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:iconDrawable="@drawable/ic_chats_24"
-                app:menuSize="medium"
-                app:primaryText="@string/browserMenuChats" />
-
-            <com.duckduckgo.common.ui.view.MenuItemView
                 android:id="@+id/bookmarksMenuItem"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -322,16 +303,6 @@
                 app:iconDrawable="@drawable/ic_print_24"
                 app:menuSize="medium"
                 app:primaryText="@string/browserMenuPrintSite" />
-
-            <com.duckduckgo.common.ui.view.MenuItemView
-                android:id="@+id/chatSettings"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:visibility="gone"
-                app:iconDrawable="@drawable/ic_settings_ai_24"
-                app:primaryText="@string/browserMenuChatSettings"
-                app:menuSize="medium"
-                tools:visibility="visible" />
 
             <com.duckduckgo.common.ui.view.divider.HorizontalDivider
                 android:id="@+id/customTabsMenuDivider"

@@ -1830,10 +1830,6 @@ class BrowserTabFragment :
                 pixel.fire(AppPixelName.SHEET_MENU_VPN)
                 viewModel.onVpnMenuClicked()
             }
-            onMenuItemClicked(newDuckChatTabMenuItem) {
-                pixel.fire(AppPixelName.SHEET_MENU_AICHAT)
-                viewModel.openNewDuckChat(omnibar.viewMode)
-            }
             onMenuItemClicked(newDuckChatMenuItem) {
                 pixel.fire(AppPixelName.SHEET_MENU_AICHAT)
                 activity?.currentFocus?.let {
@@ -1846,6 +1842,15 @@ class BrowserTabFragment :
                     viewModel.onDuckChatMenuClicked()
                 }
             }
+            onMenuItemClicked(duckAiNewChatMenuItem) {
+                pixel.fire(AppPixelName.SHEET_MENU_AICHAT)
+                viewModel.openNewDuckChat(omnibar.viewMode)
+            }
+            onMenuItemClicked(duckAiNewVoiceChatMenuItem) {
+                pixel.fire(DuckChatPixelName.DUCK_CHAT_VOICE_ENTRY_TAPPED_COUNT)
+                pixel.fire(DuckChatPixelName.DUCK_CHAT_VOICE_ENTRY_TAPPED_DAILY, type = Daily())
+                duckChat.openVoiceDuckChat()
+            }
             onMenuItemClicked(duckChatHistoryMenuItem) {
                 pixel.fire(DuckChatPixelName.DUCK_CHAT_SETTINGS_SIDEBAR_TAPPED)
                 viewModel.openDuckChatHistory()
@@ -1856,6 +1861,9 @@ class BrowserTabFragment :
             onMenuItemClicked(fireMenuItem) {
                 onFireButtonPressed()
             }
+        }
+        if (!tabDisplayedInCustomTabScreen) {
+            bottomSheetMenu?.placeDuckAiSection(atTop = omnibar.viewMode == DuckAI)
         }
     }
 

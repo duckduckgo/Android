@@ -49,6 +49,8 @@ class RealBrowserMenuViewStateFactoryTest {
     @Mock
     private var duckAiFeatureStateMock: DuckAiFeatureState = mock()
     private val fullscreenModeFlow = MutableStateFlow(false)
+    private val popupMenuShortcutFlow = MutableStateFlow(false)
+    private val voiceChatEntryFlow = MutableStateFlow(false)
     private val downloadMenuStateProvider: DownloadMenuStateProvider = mock()
     private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector = mock()
 
@@ -57,6 +59,8 @@ class RealBrowserMenuViewStateFactoryTest {
     @Before
     fun setup() {
         whenever(duckAiFeatureStateMock.showFullScreenMode).thenReturn(fullscreenModeFlow)
+        whenever(duckAiFeatureStateMock.showPopupMenuShortcut).thenReturn(popupMenuShortcutFlow)
+        whenever(duckAiFeatureStateMock.showVoiceChatEntry).thenReturn(voiceChatEntryFlow)
         testee = RealBrowserMenuViewStateFactory(duckAiFeatureStateMock, downloadMenuStateProvider, duckDuckGoUrlDetector)
     }
 
@@ -267,7 +271,6 @@ class RealBrowserMenuViewStateFactoryTest {
         assertTrue(viewState.canGoBack)
         assertTrue(viewState.canGoForward)
         assertTrue(viewState.showDuckChatOption)
-        assertFalse(viewState.showNewDuckChatTabOption)
         assertTrue(viewState.canSharePage)
         assertFalse(viewState.showSelectDefaultBrowserMenuItem)
         assertTrue(viewState.canSaveSite)
@@ -333,8 +336,7 @@ class RealBrowserMenuViewStateFactoryTest {
 
         assertTrue(viewState.canGoBack)
         assertTrue(viewState.canGoForward)
-        assertFalse(viewState.showDuckChatOption)
-        assertTrue(viewState.showNewDuckChatTabOption)
+        assertTrue(viewState.showDuckChatOption)
         assertTrue(viewState.canSharePage)
         assertFalse(viewState.showSelectDefaultBrowserMenuItem)
         assertTrue(viewState.canSaveSite)
@@ -353,6 +355,58 @@ class RealBrowserMenuViewStateFactoryTest {
         assertTrue(viewState.showAutofill)
         assertFalse(viewState.isSSLError)
         assertTrue(viewState.canPrintPage)
+    }
+
+    @Test
+    fun `when popup menu shortcut is enabled then Duck ai section is shown across browser, new tab and duck ai modes`() = runTest {
+        popupMenuShortcutFlow.emit(true)
+        val browserViewState = BrowserViewState()
+
+        val browser = testee.create(ViewMode.Browser("https://example.com"), browserViewState, false, "", null, null, null)
+        val newTab = testee.create(ViewMode.NewTab, browserViewState, false, "", null, null, null)
+        val duckAi = testee.create(ViewMode.DuckAI, browserViewState, false, "", null, null, null)
+
+        assertTrue((browser as BrowserMenuViewState.Browser).showDuckAiSection)
+        assertTrue((newTab as BrowserMenuViewState.NewTabPage).showDuckAiSection)
+        assertTrue((duckAi as BrowserMenuViewState.DuckAi).showDuckAiSection)
+    }
+
+    @Test
+    fun `when popup menu shortcut is disabled then Duck ai section is hidden`() = runTest {
+        popupMenuShortcutFlow.emit(false)
+
+        val result = testee.create(ViewMode.Browser("https://example.com"), BrowserViewState(), false, "", null, null, null)
+
+        assertFalse((result as BrowserMenuViewState.Browser).showDuckAiSection)
+    }
+
+    @Test
+    fun `when voice chat entry is enabled then voice chat option is shown across browser, new tab and duck ai modes`() = runTest {
+        voiceChatEntryFlow.emit(true)
+        val browserViewState = BrowserViewState()
+
+        val browser = testee.create(ViewMode.Browser("https://example.com"), browserViewState, false, "", null, null, null)
+        val newTab = testee.create(ViewMode.NewTab, browserViewState, false, "", null, null, null)
+        val duckAi = testee.create(ViewMode.DuckAI, browserViewState, false, "", null, null, null)
+
+        assertTrue((browser as BrowserMenuViewState.Browser).showDuckChatVoiceOption)
+        assertTrue((newTab as BrowserMenuViewState.NewTabPage).showDuckChatVoiceOption)
+        assertTrue((duckAi as BrowserMenuViewState.DuckAi).showDuckChatVoiceOption)
+    }
+
+    @Test
+    fun `when chat history available then duck ai mode propagates showDuckChatHistoryOption`() = runTest {
+        val result = testee.create(
+            omnibarViewMode = ViewMode.DuckAI,
+            viewState = BrowserViewState(showDuckChatHistoryOption = true),
+            customTabsMode = false,
+            tabId = "",
+            title = null,
+            shortUrl = null,
+            omnibarText = null,
+        )
+
+        assertTrue((result as BrowserMenuViewState.DuckAi).showDuckChatHistoryOption)
     }
 
     @Test
