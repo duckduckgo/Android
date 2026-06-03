@@ -19,6 +19,7 @@ package com.duckduckgo.app.tabs.ui
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
 import android.view.Gravity
 import android.view.Menu
@@ -28,6 +29,8 @@ import android.view.View
 import android.widget.FrameLayout
 import android.widget.ImageView
 import androidx.activity.OnBackPressedCallback
+import androidx.activity.SystemBarStyle
+import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatDelegate.FEATURE_SUPPORT_ACTION_BAR
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.children
@@ -87,12 +90,16 @@ import com.duckduckgo.common.ui.view.button.ButtonType.GHOST
 import com.duckduckgo.common.ui.view.button.ButtonType.GHOST_ALT
 import com.duckduckgo.common.ui.view.dialog.DaxAlertDialog
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
+import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.hide
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.dataclearing.api.fire.FireDialogProvider
 import com.duckduckgo.dataclearing.api.fire.FireDialogProvider.FireDialogOrigin.TabSwitcher
 import com.duckduckgo.di.scopes.ActivityScope
@@ -149,6 +156,12 @@ class TabSwitcherActivity :
 
     @Inject
     lateinit var omnibarRepository: OmnibarRepository
+
+    @Inject
+    lateinit var edgeToEdgeProvider: EdgeToEdgeProvider
+
+    @Inject
+    lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
 
     private val viewModel: TabSwitcherViewModel by bindViewModel()
 
@@ -236,6 +249,17 @@ class TabSwitcherActivity :
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        val edgeToEdgeEnabled = edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.BROWSER)
+        if (edgeToEdgeEnabled) {
+            val barStyle = if (isDarkThemeEnabled()) {
+                SystemBarStyle.dark(Color.TRANSPARENT)
+            } else {
+                SystemBarStyle.light(Color.TRANSPARENT, Color.TRANSPARENT)
+            }
+            enableEdgeToEdge(statusBarStyle = barStyle, navigationBarStyle = barStyle)
+        }
+
         setContentView(binding.root)
 
         tabsAdapter.setAnimationTileCloseClickListener {
@@ -248,10 +272,36 @@ class TabSwitcherActivity :
         configureRecycler()
         configureNavigationBar()
 
+        if (edgeToEdgeEnabled) {
+            configureEdgeToEdgeInsets()
+        }
+
         configureObservers()
         configureOnBackPressedListener()
 
         initMenuClickListeners()
+    }
+
+    private fun configureEdgeToEdgeInsets() {
+        edgeToEdgeHandler.applyHorizontalSystemBarInsets(binding.root)
+
+        when (settingsDataStore.omnibarType) {
+            OmnibarType.SINGLE_TOP -> {
+                edgeToEdgeHandler.applyStatusBarInsets(binding.tabSwitcherToolbarTop.root)
+                edgeToEdgeHandler.applyNavigationBarInsets(tabsContainer)
+            }
+            OmnibarType.SINGLE_BOTTOM -> {
+                edgeToEdgeHandler.applyStatusBarInsets(tabsContainer)
+                edgeToEdgeHandler.applyNavigationBarInsets(binding.tabSwitcherToolbarBottom.appBarLayout)
+                binding.tabSwitcherToolbarBottom.appBarLayout.setBackgroundColor(
+                    getColorFromAttr(com.duckduckgo.mobile.android.R.attr.daxColorToolbar),
+                )
+            }
+            OmnibarType.SPLIT -> {
+                edgeToEdgeHandler.applyStatusBarInsets(binding.tabSwitcherToolbarTop.root)
+                edgeToEdgeHandler.applyNavigationBarInsets(binding.navigationBar)
+            }
+        }
     }
 
     private fun configureNavigationBar() {
