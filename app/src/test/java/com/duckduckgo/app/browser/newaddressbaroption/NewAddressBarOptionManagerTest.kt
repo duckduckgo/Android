@@ -387,12 +387,23 @@ class NewAddressBarOptionManagerTest {
         }
 
     @Test
-    fun `when v2 enabled and search-only picked during onboarding then shows v2 dialog`() =
+    fun `when v2 enabled and input screen was ever enabled then does not show dialog`() =
         runTest {
-            // rule 4 dropped for V2 (2026-06-02): onboarding search-only no longer excludes
             setupAllConditionsMet()
             showNewAddressBarOptionChoiceScreenV2Flow.value = true
-            whenever(onboardingStoreMock.getInputScreenSelection()).thenReturn(false)
+            whenever(duckChatMock.isInputScreenEverEnabled()).thenReturn(true)
+
+            testee.showChoiceScreen(mock(), isLaunchedFromExternal = false)
+
+            verify(v2DialogFactoryMock, never()).create(any(), any(), any())
+        }
+
+    @Test
+    fun `when v2 enabled and bottom address bar selected then still shows v2 dialog`() =
+        runTest {
+            setupAllConditionsMet()
+            showNewAddressBarOptionChoiceScreenV2Flow.value = true
+            whenever(settingsDataStoreMock.omnibarType).thenReturn(OmnibarType.SINGLE_BOTTOM)
 
             testee.showChoiceScreen(mock(), isLaunchedFromExternal = false)
 
@@ -400,13 +411,36 @@ class NewAddressBarOptionManagerTest {
         }
 
     @Test
-    fun `when v2 enabled and ai selected during onboarding then shows v2 dialog`() =
+    fun `when v2 enabled and omnibar shortcut disabled then still shows v2 dialog`() =
         runTest {
             setupAllConditionsMet()
             showNewAddressBarOptionChoiceScreenV2Flow.value = true
-            whenever(onboardingStoreMock.getInputScreenSelection()).thenReturn(true)
+            showOmnibarShortcutInAllStatesFlow.value = false
 
             testee.showChoiceScreen(mock(), isLaunchedFromExternal = false)
+
+            verify(v2DialogFactoryMock).create(any(), any(), any())
+        }
+
+    @Test
+    fun `when v2 enabled and onboarding not completed then still shows v2 dialog`() =
+        runTest {
+            setupAllConditionsMet()
+            showNewAddressBarOptionChoiceScreenV2Flow.value = true
+            whenever(userStageStoreMock.getUserAppStage()).thenReturn(AppStage.DAX_ONBOARDING)
+
+            testee.showChoiceScreen(mock(), isLaunchedFromExternal = false)
+
+            verify(v2DialogFactoryMock).create(any(), any(), any())
+        }
+
+    @Test
+    fun `when v2 enabled and launched from external then still shows v2 dialog`() =
+        runTest {
+            setupAllConditionsMet()
+            showNewAddressBarOptionChoiceScreenV2Flow.value = true
+
+            testee.showChoiceScreen(mock(), isLaunchedFromExternal = true)
 
             verify(v2DialogFactoryMock).create(any(), any(), any())
         }
@@ -491,6 +525,7 @@ class NewAddressBarOptionManagerTest {
         showInputScreenFlow.value = false
         whenever(newAddressBarOptionDataStoreMock.wasShown()).thenReturn(false)
         whenever(newAddressBarOptionDataStoreMock.wasShownV2()).thenReturn(false)
+        whenever(duckChatMock.isInputScreenEverEnabled()).thenReturn(false)
         whenever(remoteMessageModelMock.isMessageDismissed("search_duck_ai_announcement")).thenReturn(false)
         whenever(settingsDataStoreMock.omnibarType).thenReturn(OmnibarType.SINGLE_TOP)
         whenever(newAddressBarOptionDataStoreMock.wasValidated()).thenReturn(true)

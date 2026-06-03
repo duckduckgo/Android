@@ -446,6 +446,8 @@ class RealDuckChat @Inject constructor(
         cacheUserSettings()
     }
 
+    override suspend fun isInputScreenEverEnabled(): Boolean = duckChatFeatureRepository.isInputScreenEverEnabled()
+
     override suspend fun setCosmeticInputScreenUserSetting(enabled: Boolean) {
         duckChatFeatureRepository.setCosmeticInputScreenUserSetting(enabled)
     }

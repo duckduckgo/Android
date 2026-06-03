@@ -111,13 +111,9 @@ class RealNewAddressBarOptionManager @Inject constructor(
         val v2Enabled = isNewAddressBarOptionChoiceScreenV2Enabled()
         if (v2Enabled) {
             return isDuckAiEnabled() &&
-                isOnboardingCompleted() &&
-                isInputScreenDisabled() &&
+                isInputScreenNeverEnabled() &&
                 hasNotShownV2Announcement() &&
-                isDuckAiOmnibarShortcutEnabled() &&
-                isBottomAddressBarDisabled() &&
                 hasNotInteractedWithSearchAndDuckAiRMF() &&
-                isNotLaunchedFromExternal(isLaunchedFromExternal) &&
                 isSubsequentLaunch() &&
                 isActivityValid(activity)
         }
@@ -164,6 +160,12 @@ class RealNewAddressBarOptionManager @Inject constructor(
     private fun isInputScreenDisabled(): Boolean =
         (!duckAiFeatureState.showInputScreen.value).also {
             logcat(DEBUG) { "NewAddressBarOptionManager: $it isInputScreenDisabled" }
+        }
+
+    // "Ever enabled" is sticky and counts the onboarding choice — the TOGGLE_NEVER_ENABLED DAU cohort.
+    private suspend fun isInputScreenNeverEnabled(): Boolean =
+        (!duckChat.isInputScreenEverEnabled()).also {
+            logcat(DEBUG) { "NewAddressBarOptionManager: $it isInputScreenNeverEnabled" }
         }
 
     private fun hasNoInputScreenSelection(): Boolean =

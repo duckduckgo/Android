@@ -71,7 +71,7 @@ class NewAddressBarOptionV2BottomSheetDialog(
         // BottomSheetDialog content view has none by default, so borrow the host Activity's.
         (context as? LifecycleOwner)?.let { binding.root.setViewTreeLifecycleOwner(it) }
 
-        with(binding.v2InputScreen) {
+        with(binding.inputScreen) {
             inputScreenTitle.text = context.getString(R.string.preOnboardingInputScreenTitleUpdated)
             inputScreenDescription.text = context.getString(R.string.preOnboardingInputScreenDescription).html(context)
             with(inputScreenPicker) {
@@ -92,7 +92,7 @@ class NewAddressBarOptionV2BottomSheetDialog(
             revealContent()
         }
 
-        binding.v2ConfirmButton.setOnClickListener {
+        binding.confirmButton.setOnClickListener {
             val selection = if (searchAndDuckAiSelected) SEARCH_AND_AI else SEARCH_ONLY
             callback?.onConfirmed(selection)
             restoreOrientation()
@@ -114,29 +114,29 @@ class NewAddressBarOptionV2BottomSheetDialog(
     // description and Confirm together, then start the picker Lottie once they are visible — so the
     // animations are staggered rather than competing at open.
     private fun revealContent() {
-        binding.v2InputScreen.root.isVisible = true
-        binding.v2InputScreen.inputScreenTitle.startOnboardingTypingAnimation(
+        binding.inputScreen.root.isVisible = true
+        binding.inputScreen.inputScreenTitle.startOnboardingTypingAnimation(
             getString(context, R.string.preOnboardingInputScreenTitleUpdated),
         ) {
             contentFadeInAnimatorSet = AnimatorSet().apply {
                 playTogether(
                     ObjectAnimator.ofFloat(
-                        binding.v2InputScreen.inputScreenPicker,
+                        binding.inputScreen.inputScreenPicker,
                         View.ALPHA,
                         1f,
                     ).setDuration(CONTENT_FADE_IN_DURATION),
                     ObjectAnimator.ofFloat(
-                        binding.v2InputScreen.inputScreenDescription,
+                        binding.inputScreen.inputScreenDescription,
                         View.ALPHA,
                         1f,
                     ).setDuration(CONTENT_FADE_IN_DURATION),
-                    ObjectAnimator.ofFloat(binding.v2ConfirmButton, View.ALPHA, 1f)
+                    ObjectAnimator.ofFloat(binding.confirmButton, View.ALPHA, 1f)
                         .setDuration(CONTENT_FADE_IN_DURATION),
                 )
                 addListener(
                     object : AnimatorListenerAdapter() {
                         override fun onAnimationEnd(animation: Animator) {
-                            binding.v2InputScreen.inputScreenPicker.startWithAiAnimation(delayedStart = true)
+                            binding.inputScreen.inputScreenPicker.startWithAiAnimation(delayedStart = true)
                         }
                     },
                 )
@@ -146,7 +146,7 @@ class NewAddressBarOptionV2BottomSheetDialog(
     }
 
     private fun playLeftWingAnimation() {
-        binding.v2LeftWing.apply {
+        binding.leftWing.apply {
             alpha = 0f
             setMaxProgress(WING_STOP_PROGRESS)
             leftWingRunnable = postDelayed(WING_START_DELAY) {
@@ -173,9 +173,9 @@ class NewAddressBarOptionV2BottomSheetDialog(
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
         contentFadeInAnimatorSet?.cancel()
-        leftWingRunnable?.let { binding.v2LeftWing.removeCallbacks(it) }
-        binding.v2LeftWing.cancelAnimation()
-        binding.v2InputScreen.inputScreenPicker.cancelLottieAnimations()
+        leftWingRunnable?.let { binding.leftWing.removeCallbacks(it) }
+        binding.leftWing.cancelAnimation()
+        binding.inputScreen.inputScreenPicker.cancelLottieAnimations()
         restoreOrientation()
     }
 

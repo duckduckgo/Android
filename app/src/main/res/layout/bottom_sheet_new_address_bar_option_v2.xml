@@ -73,7 +73,7 @@
                 tools:visibility="visible" />
 
             <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
-                android:id="@+id/v2ConfirmButton"
+                android:id="@+id/confirmButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/keyline_5"
