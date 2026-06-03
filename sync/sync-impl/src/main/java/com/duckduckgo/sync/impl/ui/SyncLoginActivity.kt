@@ -95,7 +95,47 @@ class SyncLoginActivity : DuckDuckGoActivity() {
             }
 
             is ShowError -> showError(it)
+            is Command.AskJoinerConfirmation -> askJoinerConfirmation(it.peerName)
+            is Command.AskHostConfirmation -> askHostConfirmation(it.peerName)
         }
+    }
+
+    private fun askJoinerConfirmation(peerName: String?) {
+        val message = if (peerName.isNullOrBlank()) {
+            getString(R.string.sync_v2_joiner_confirmation_message_unknown_peer)
+        } else {
+            getString(R.string.sync_v2_joiner_confirmation_message, peerName)
+        }
+        TextAlertDialogBuilder(this)
+            .setTitle(R.string.sync_v2_joiner_confirmation_title)
+            .setMessage(message)
+            .setPositiveButton(R.string.sync_v2_joiner_confirmation_positive)
+            .setNegativeButton(R.string.sync_v2_joiner_confirmation_negative)
+            .addEventListener(
+                object : TextAlertDialogBuilder.EventListener() {
+                    override fun onPositiveButtonClicked() { viewModel.onJoinerConfirmed() }
+                    override fun onNegativeButtonClicked() { viewModel.onJoinerDenied() }
+                },
+            ).show()
+    }
+
+    private fun askHostConfirmation(peerName: String?) {
+        val message = if (peerName.isNullOrBlank()) {
+            getString(R.string.sync_v2_host_confirmation_message_unknown_peer)
+        } else {
+            getString(R.string.sync_v2_host_confirmation_message, peerName)
+        }
+        TextAlertDialogBuilder(this)
+            .setTitle(R.string.sync_v2_host_confirmation_title)
+            .setMessage(message)
+            .setPositiveButton(R.string.sync_v2_host_confirmation_positive)
+            .setNegativeButton(R.string.sync_v2_host_confirmation_negative)
+            .addEventListener(
+                object : TextAlertDialogBuilder.EventListener() {
+                    override fun onPositiveButtonClicked() { viewModel.onHostConfirmed() }
+                    override fun onNegativeButtonClicked() { viewModel.onHostDenied() }
+                },
+            ).show()
     }
 
     private fun configureListeners() {

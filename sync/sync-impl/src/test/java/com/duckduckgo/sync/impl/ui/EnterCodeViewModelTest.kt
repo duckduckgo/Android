@@ -35,7 +35,9 @@ import com.duckduckgo.sync.impl.AccountErrorCodes.CREATE_ACCOUNT_FAILED
 import com.duckduckgo.sync.impl.AccountErrorCodes.GENERIC_ERROR
 import com.duckduckgo.sync.impl.AccountErrorCodes.INVALID_CODE
 import com.duckduckgo.sync.impl.AccountErrorCodes.LOGIN_FAILED
+import com.duckduckgo.sync.impl.AccountErrorCodes.THIRD_PARTY_ALREADY_UPGRADED
 import com.duckduckgo.sync.impl.Clipboard
+import com.duckduckgo.sync.impl.RealSyncCodeDispatcher
 import com.duckduckgo.sync.impl.RecoveryCode
 import com.duckduckgo.sync.impl.Result.Error
 import com.duckduckgo.sync.impl.Result.Success
@@ -43,6 +45,9 @@ import com.duckduckgo.sync.impl.SyncAccountRepository
 import com.duckduckgo.sync.impl.SyncAuthCode.Recovery
 import com.duckduckgo.sync.impl.SyncAuthCode.Unknown
 import com.duckduckgo.sync.impl.SyncFeature
+import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2CodeParseResult
+import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2QrCode
+import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Runner
 import com.duckduckgo.sync.impl.pixels.SyncPixels
 import com.duckduckgo.sync.impl.ui.EnterCodeViewModel.AuthState
 import com.duckduckgo.sync.impl.ui.EnterCodeViewModel.AuthState.Idle
@@ -71,8 +76,19 @@ internal class EnterCodeViewModelTest {
     private val clipboard: Clipboard = mock()
     private val syncFeature = FakeFeatureToggleFactory.create(SyncFeature::class.java).apply {
         this.seamlessAccountSwitching().setRawStoredState(State(true))
+        // canUseV2ConnectFlow stays FALSE by default → dispatcher's Legacy path returns the
+        // SyncAuthCode straight from parseSyncAuthCode, byte-identical to pre-dispatcher production.
     }
     private val syncPixels: SyncPixels = mock()
+    private val qrCode: ExchangeV2QrCode = mock()
+    private val runner: ExchangeV2Runner = mock()
+
+    private val codeDispatcher = RealSyncCodeDispatcher(
+        syncFeature = syncFeature,
+        syncAccountRepository = syncAccountRepository,
+        qrCode = qrCode,
+        runner = runner,
+    )
 
     private val testee = EnterCodeViewModel(
         syncAccountRepository,
@@ -80,6 +96,7 @@ internal class EnterCodeViewModelTest {
         coroutineTestRule.testDispatcherProvider,
         syncFeature = syncFeature,
         syncPixels = syncPixels,
+        codeDispatcher = codeDispatcher,
     )
 
     @Test
@@ -104,6 +121,35 @@ internal class EnterCodeViewModelTest {
         testee.onPasteCodeClicked()
 
         verify(clipboard).pasteFromClipboard()
+    }
+
+    @Test
+    fun whenV2ThirdPartyRecoveryAlreadyUpgradedThenShowError() = runTest {
+        // REC-4: pasting a 3party recovery code for an account that already has a ddg credential must
+        // surface an error dialog, not fail silently (the upgrade can only run once). The distinct
+        // THIRD_PARTY_ALREADY_UPGRADED type is mapped to a (generic, for now) ShowError.
+        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
+        whenever(syncAccountRepository.getAccountInfo()).thenReturn(noAccount)
+        val pastedCode = "https://duckduckgo.com/sync/pairing/#&code2=3party-recovery"
+        whenever(clipboard.pasteFromClipboard()).thenReturn(pastedCode)
+        val recoveryJson = org.json.JSONObject().apply {
+            put("cid", "3party")
+            put("user_id", "u-1")
+            put("secret", "s-1")
+            put("v", "2.0")
+        }
+        whenever(qrCode.parse(pastedCode)).thenReturn(ExchangeV2CodeParseResult.RecoveryCode(rawJson = recoveryJson))
+        whenever(syncAccountRepository.joinAccountFromThirdPartyRecoveryCode(any())).thenReturn(
+            Error(code = THIRD_PARTY_ALREADY_UPGRADED.code, reason = "account already upgraded"),
+        )
+
+        testee.onPasteCodeClicked()
+
+        testee.commands().test {
+            val command = awaitItem()
+            assertTrue("expected ShowError, got $command", command is ShowError)
+            cancelAndIgnoreRemainingEvents()
+        }
     }
 
     @Test

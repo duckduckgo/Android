@@ -39,6 +39,8 @@ import com.duckduckgo.sync.impl.databinding.ActivityConnectSyncBinding
 import com.duckduckgo.sync.impl.databinding.ActivityConnectSyncNewBinding
 import com.duckduckgo.sync.impl.ui.EnterCodeActivity.Companion.Code.CONNECT_CODE
 import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command
+import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command.AskHostConfirmation
+import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command.AskJoinerConfirmation
 import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command.FinishWithError
 import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command.LoginSuccess
 import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command.ReadTextCode
@@ -129,6 +131,12 @@ class SyncConnectActivity : DuckDuckGoActivity() {
     private fun observeUiEvents() {
         viewModel
             .viewState(extractSource())
+            // viewState at CREATED (production behaviour). The session is started exactly once by
+            // the ViewModel's sessionStarted guard, so we must NOT use STARTED here: STARTED cancels
+            // + re-subscribes on every background→foreground, which re-fired viewState.onStart and
+            // regenerated the pairing code, orphaning a code the user had already shared. Commands
+            // stay at CREATED too so terminal commands (LoginSuccess, ShowError) aren't dropped
+            // during transitions.
             .flowWithLifecycle(lifecycle, Lifecycle.State.CREATED)
             .onEach { render(it) }
             .launchIn(lifecycleScope)
@@ -165,6 +173,8 @@ class SyncConnectActivity : DuckDuckGoActivity() {
 
             is ShowMessage -> Snackbar.make(binding.root, it.messageId, Snackbar.LENGTH_SHORT).show()
             is ShowError -> showError(it)
+            is AskJoinerConfirmation -> askJoinerConfirmation(it.peerName)
+            is AskHostConfirmation -> askHostConfirmation(it.peerName)
         }
     }
 
@@ -187,6 +197,44 @@ class SyncConnectActivity : DuckDuckGoActivity() {
                     override fun onPositiveButtonClicked() {
                         viewModel.onErrorDialogDismissed()
                     }
+                },
+            ).show()
+    }
+
+    private fun askJoinerConfirmation(peerName: String?) {
+        val message = if (peerName.isNullOrBlank()) {
+            getString(R.string.sync_v2_joiner_confirmation_message_unknown_peer)
+        } else {
+            getString(R.string.sync_v2_joiner_confirmation_message, peerName)
+        }
+        TextAlertDialogBuilder(this)
+            .setTitle(R.string.sync_v2_joiner_confirmation_title)
+            .setMessage(message)
+            .setPositiveButton(R.string.sync_v2_joiner_confirmation_positive)
+            .setNegativeButton(R.string.sync_v2_joiner_confirmation_negative)
+            .addEventListener(
+                object : TextAlertDialogBuilder.EventListener() {
+                    override fun onPositiveButtonClicked() { viewModel.onJoinerConfirmed() }
+                    override fun onNegativeButtonClicked() { viewModel.onJoinerDenied() }
+                },
+            ).show()
+    }
+
+    private fun askHostConfirmation(peerName: String?) {
+        val message = if (peerName.isNullOrBlank()) {
+            getString(R.string.sync_v2_host_confirmation_message_unknown_peer)
+        } else {
+            getString(R.string.sync_v2_host_confirmation_message, peerName)
+        }
+        TextAlertDialogBuilder(this)
+            .setTitle(R.string.sync_v2_host_confirmation_title)
+            .setMessage(message)
+            .setPositiveButton(R.string.sync_v2_host_confirmation_positive)
+            .setNegativeButton(R.string.sync_v2_host_confirmation_negative)
+            .addEventListener(
+                object : TextAlertDialogBuilder.EventListener() {
+                    override fun onPositiveButtonClicked() { viewModel.onHostConfirmed() }
+                    override fun onNegativeButtonClicked() { viewModel.onHostDenied() }
                 },
             ).show()
     }

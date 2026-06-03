@@ -19,13 +19,18 @@ package com.duckduckgo.sync.impl.ui
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.sync.TestSyncFixtures.jsonRecoveryKey
 import com.duckduckgo.sync.TestSyncFixtures.jsonRecoveryKeyEncoded
 import com.duckduckgo.sync.TestSyncFixtures.primaryKey
+import com.duckduckgo.sync.impl.RealSyncCodeDispatcher
 import com.duckduckgo.sync.impl.RecoveryCode
 import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.impl.SyncAccountRepository
 import com.duckduckgo.sync.impl.SyncAuthCode.Recovery
+import com.duckduckgo.sync.impl.SyncFeature
+import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2QrCode
+import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Runner
 import com.duckduckgo.sync.impl.pixels.SyncPixels
 import com.duckduckgo.sync.impl.ui.SyncLoginViewModel.Command
 import kotlinx.coroutines.test.runTest
@@ -47,11 +52,24 @@ class SyncLoginViewModelTest {
 
     private val syncRepostitory: SyncAccountRepository = mock()
     private val syncPixels: SyncPixels = mock()
+    private val syncFeature = FakeFeatureToggleFactory.create(SyncFeature::class.java)
+
+    // canUseV2ConnectFlow stays FALSE → dispatcher's Legacy path returns parseSyncAuthCode
+    // unchanged, so the existing test setup mirrors pre-dispatcher production.
+    private val qrCode: ExchangeV2QrCode = mock()
+    private val runner: ExchangeV2Runner = mock()
+    private val codeDispatcher = RealSyncCodeDispatcher(
+        syncFeature = syncFeature,
+        syncAccountRepository = syncRepostitory,
+        qrCode = qrCode,
+        runner = runner,
+    )
 
     private val testee = SyncLoginViewModel(
         syncRepostitory,
         syncPixels,
         coroutineTestRule.testDispatcherProvider,
+        codeDispatcher = codeDispatcher,
     )
 
     @Test
