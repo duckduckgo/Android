@@ -19,7 +19,7 @@ package com.duckduckgo.app.tabs.ui
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
-import android.os.Build
+import android.graphics.Color
 import android.os.Bundle
 import android.view.Gravity
 import android.view.Menu
@@ -29,6 +29,7 @@ import android.view.View
 import android.widget.FrameLayout
 import android.widget.ImageView
 import androidx.activity.OnBackPressedCallback
+import androidx.activity.SystemBarStyle
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatDelegate.FEATURE_SUPPORT_ACTION_BAR
 import androidx.appcompat.widget.Toolbar
@@ -83,12 +84,14 @@ import com.duckduckgo.browser.api.ui.BrowserScreens.TabSwitcherScreenNoParams
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.menu.PopupMenu
+import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.common.ui.view.button.ButtonType
 import com.duckduckgo.common.ui.view.button.ButtonType.DESTRUCTIVE
 import com.duckduckgo.common.ui.view.button.ButtonType.GHOST
 import com.duckduckgo.common.ui.view.button.ButtonType.GHOST_ALT
 import com.duckduckgo.common.ui.view.dialog.DaxAlertDialog
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
+import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.hide
 import com.duckduckgo.common.ui.view.show
@@ -160,6 +163,9 @@ class TabSwitcherActivity :
 
     @Inject
     lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
+
+    @Inject
+    lateinit var appTheme: AppTheme
 
     private val viewModel: TabSwitcherViewModel by bindViewModel()
 
@@ -250,7 +256,12 @@ class TabSwitcherActivity :
 
         val edgeToEdgeEnabled = edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.BROWSER)
         if (edgeToEdgeEnabled) {
-            enableEdgeToEdge()
+            val barStyle = if (appTheme.isLightModeEnabled()) {
+                SystemBarStyle.light(Color.TRANSPARENT, Color.TRANSPARENT)
+            } else {
+                SystemBarStyle.dark(Color.TRANSPARENT)
+            }
+            enableEdgeToEdge(statusBarStyle = barStyle, navigationBarStyle = barStyle)
         }
 
         setContentView(binding.root)
@@ -285,21 +296,15 @@ class TabSwitcherActivity :
             }
             OmnibarType.SINGLE_BOTTOM -> {
                 edgeToEdgeHandler.applyStatusBarInsets(tabsContainer)
-                edgeToEdgeHandler.applyNavigationBarInsets(binding.tabSwitcherToolbarBottom.root)
-                disableNavigationBarContrast()
+                edgeToEdgeHandler.applyNavigationBarInsets(binding.tabSwitcherToolbarBottom.appBarLayout)
+                binding.tabSwitcherToolbarBottom.appBarLayout.setBackgroundColor(
+                    getColorFromAttr(com.duckduckgo.mobile.android.R.attr.daxColorToolbar),
+                )
             }
             OmnibarType.SPLIT -> {
                 edgeToEdgeHandler.applyStatusBarInsets(binding.tabSwitcherToolbarTop.root)
                 edgeToEdgeHandler.applyNavigationBarInsets(binding.navigationBar)
-                disableNavigationBarContrast()
             }
-        }
-    }
-
-    private fun disableNavigationBarContrast() {
-        // isNavigationBarContrastEnforced was added in API 29
-        if (Build.VERSION.SDK_INT >= 29) {
-            window.isNavigationBarContrastEnforced = false
         }
     }
 
