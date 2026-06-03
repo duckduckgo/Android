@@ -84,12 +84,18 @@ class SyncConnectViewModel @Inject constructor(
     // Null when the v1 path is active.
     private var v2LinkingCode: String? = null
 
+    // Start the session exactly once per ViewModel instance — see SyncWithAnotherActivityViewModel.
+    // The existing signed-in guard below stays as belt-and-suspenders.
+    private var sessionStarted = false
+
     private val viewState = MutableStateFlow(ViewState())
     fun viewState(source: String?): Flow<ViewState> = viewState.onStart {
         pollConnectionKeys(source)
     }
 
     private fun pollConnectionKeys(source: String?) {
+        if (sessionStarted) return
+        sessionStarted = true
         viewModelScope.launch(dispatchers.io()) {
             // SyncConnect is the signed-out entry point. The user can pair via EnterCode (a
             // child activity) which signs the device in; the launcher callback then finishes

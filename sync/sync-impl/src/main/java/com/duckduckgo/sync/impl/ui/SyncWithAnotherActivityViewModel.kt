@@ -93,6 +93,11 @@ class SyncWithAnotherActivityViewModel @Inject constructor(
     private var canTimeout = false
     private var isDeepLink = false
 
+    // Start the session exactly once per ViewModel instance. viewState.onStart re-fires on every
+    // re-collection (background→foreground, config-change, navigate-return); without this guard each
+    // re-fire regenerates the invitation/channel and orphans the code the user already shared.
+    private var sessionStarted = false
+
     private val viewState = MutableStateFlow(ViewState())
     fun viewState(isDeepLink: Boolean = false): Flow<ViewState> = viewState.onStart {
         this@SyncWithAnotherActivityViewModel.canTimeout = isDeepLink
@@ -101,6 +106,8 @@ class SyncWithAnotherActivityViewModel @Inject constructor(
     }
 
     private fun startExchangeProcess() {
+        if (sessionStarted) return
+        sessionStarted = true
         viewModelScope.launch(dispatchers.io()) {
             if (shouldUseV2()) {
                 startV2Present()
