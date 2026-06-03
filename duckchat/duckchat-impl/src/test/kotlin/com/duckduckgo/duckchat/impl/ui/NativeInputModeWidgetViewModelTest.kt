@@ -255,6 +255,52 @@ class NativeInputModeWidgetViewModelTest {
     }
 
     @Test
+    fun whenEmptyQueryFetchReturnsChatsThenHadRecentChatsTrue() = runTest {
+        whenever(chatSuggestionsReader.fetchSuggestions("")).thenReturn(
+            listOf(ChatSuggestion(chatId = "id", title = "t", lastEdit = LocalDateTime.now(), pinned = false)),
+        )
+
+        testee.fetchChatTabSuggestions(query = "", chatSuggestionsEnabled = true)
+
+        assertTrue(testee.hadRecentChats())
+    }
+
+    @Test
+    fun whenEmptyQueryFetchReturnsNoChatsThenHadRecentChatsFalse() = runTest {
+        whenever(chatSuggestionsReader.fetchSuggestions("")).thenReturn(emptyList())
+
+        testee.fetchChatTabSuggestions(query = "", chatSuggestionsEnabled = true)
+
+        assertFalse(testee.hadRecentChats())
+    }
+
+    @Test
+    fun whenChatSuggestionsDisabledThenEmptyQueryDoesNotReportRecentChats() = runTest {
+        whenever(chatSuggestionsReader.fetchSuggestions("")).thenReturn(
+            listOf(ChatSuggestion(chatId = "id", title = "t", lastEdit = LocalDateTime.now(), pinned = false)),
+        )
+
+        testee.fetchChatTabSuggestions(query = "", chatSuggestionsEnabled = false)
+
+        assertFalse(testee.hadRecentChats())
+    }
+
+    @Test
+    fun whenNonEmptyQueryFetchedThenCachedRecentChatsUnchanged() = runTest {
+        whenever(chatSuggestionsReader.fetchSuggestions("")).thenReturn(
+            listOf(ChatSuggestion(chatId = "id", title = "t", lastEdit = LocalDateTime.now(), pinned = false)),
+        )
+        whenever(chatSuggestionsReader.fetchSuggestions("weather")).thenReturn(emptyList())
+
+        testee.fetchChatTabSuggestions(query = "", chatSuggestionsEnabled = true)
+        assertTrue(testee.hadRecentChats())
+
+        testee.fetchChatTabSuggestions(query = "weather", chatSuggestionsEnabled = true)
+
+        assertTrue(testee.hadRecentChats())
+    }
+
+    @Test
     fun whenSearchAndDuckAiThenToggleVisible() = runTest {
         setIsEnabled(true)
         inputScreenUserSettingFlow.value = true

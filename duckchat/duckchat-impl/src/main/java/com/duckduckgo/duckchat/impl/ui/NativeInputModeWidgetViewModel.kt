@@ -114,6 +114,17 @@ class NativeInputModeWidgetViewModel @Inject constructor(
     @Volatile
     private var lastChatUrlSuggestions: List<AutoCompleteSuggestion> = emptyList()
 
+    // Whether the most recent empty-query chat-history fetch returned any chats. Read synchronously
+    // (via [hadRecentChats]) by the widget to decide whether to show the suggestions cover when the
+    // Duck.ai tab is selected with empty input. Covering only when content will actually appear keeps
+    // the morphing logo from being briefly covered then revealed (a flash) when there are no chats.
+    // Stale until the first empty-query fetch completes, so the first such transition will not cover.
+    @Volatile
+    private var lastEmptyQueryHadChats: Boolean = false
+
+    /** @see lastEmptyQueryHadChats */
+    fun hadRecentChats(): Boolean = lastEmptyQueryHadChats
+
     sealed class Command {
         data class UpdatePluginVisibility(val containerIds: List<Int>, val visible: Boolean) : Command()
     }
@@ -373,8 +384,13 @@ class NativeInputModeWidgetViewModel @Inject constructor(
                 AutoCompleteResult(query, emptyList())
             }
         }
+        val chatHistory = chatHistoryDeferred.await()
+        if (query.isEmpty()) {
+            // Remember whether an empty query yields chats so the cover decision can predict it next time.
+            lastEmptyQueryHadChats = chatHistory.isNotEmpty()
+        }
         val result = ChatTabSuggestions(
-            chatHistory = chatHistoryDeferred.await(),
+            chatHistory = chatHistory,
             urlSuggestions = urlSuggestionsDeferred.await(),
         )
         lastChatUrlSuggestions = result.urlSuggestions.suggestions
