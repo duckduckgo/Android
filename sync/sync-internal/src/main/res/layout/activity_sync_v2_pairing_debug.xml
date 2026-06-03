@@ -1,0 +1,267 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (c) 2026 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <include
+        android:id="@+id/includeToolbar"
+        layout="@layout/include_default_toolbar" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fadeScrollbars="false"
+        android:scrollbarAlwaysDrawVerticalTrack="true"
+        android:scrollbars="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:primaryText="Account status" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+                    android:id="@+id/statusSignedIn"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    app:primaryText="Signed in"
+                    tools:secondaryText="No" />
+
+                <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
+                    android:id="@+id/signInOutButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="@dimen/keyline_4"
+                    android:text="Sign in" />
+            </LinearLayout>
+
+            <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+                android:id="@+id/statusThirdPartyCredential"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:primaryText="3party credential"
+                tools:secondaryText="Not created" />
+
+            <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+                android:id="@+id/statusAiChatsKey"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:primaryText="ai_chats protected key"
+                tools:secondaryText="Not created" />
+
+            <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:primaryText="Settings" />
+
+            <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+                android:id="@+id/autoApproveSetting"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:primaryText="Auto-approve confirmations"
+                app:secondaryText="When on, this device automatically confirms its own Host/Joiner prompt. Turn off to see the real alert dialog."
+                app:showSwitch="true" />
+
+            <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:primaryText="Session" />
+
+            <!-- Presenter side: tap Start, get linking code, share it with the Scanner. -->
+
+            <com.duckduckgo.common.ui.view.text.DaxTextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/keyline_4"
+                android:layout_marginEnd="@dimen/keyline_4"
+                android:text="Presenter mode: tap Start to generate a v2 linking code for a Scanner to paste."
+                app:typography="caption" />
+
+            <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
+                android:id="@+id/runPresentButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/keyline_4"
+                android:layout_margin="10dp"
+                android:text="Start as Presenter" />
+
+            <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
+                android:id="@+id/linkingCodeSectionHeader"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                app:primaryText="Linking code (give this to the Scanner)" />
+
+            <com.duckduckgo.common.ui.view.text.DaxTextView
+                android:id="@+id/linkingCodeTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/keyline_4"
+                android:layout_marginEnd="@dimen/keyline_4"
+                android:layout_marginBottom="@dimen/keyline_4"
+                android:visibility="gone"
+                app:typography="caption" />
+
+            <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
+                android:id="@+id/copyLinkingCodeButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/keyline_4"
+                android:layout_marginBottom="@dimen/keyline_4"
+                android:text="Copy linking code"
+                android:visibility="gone" />
+
+            <ImageView
+                android:id="@+id/linkingCodeQrImage"
+                android:layout_width="280dp"
+                android:layout_height="280dp"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginBottom="@dimen/keyline_4"
+                android:contentDescription="QR for v2 linking code"
+                android:visibility="gone" />
+
+            <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <!-- Scanner side: paste a linking code, tap Start. -->
+
+            <com.duckduckgo.common.ui.view.text.DaxTextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/keyline_4"
+                android:layout_marginEnd="@dimen/keyline_4"
+                android:text="Scanner mode: paste the Presenter's linking code below, then tap Start as Scanner."
+                app:typography="caption" />
+
+            <com.duckduckgo.common.ui.view.text.DaxTextInput
+                android:id="@+id/pastedUrlInput"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/keyline_4"
+                android:layout_marginEnd="@dimen/keyline_4"
+                android:hint="Paste Presenter's https://duckduckgo.com/sync/pairing/#&amp;code2=… URL"
+                app:editable="true"
+                app:type="single_line" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
+                    android:id="@+id/pasteAndGoButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="10dp"
+                    android:text="Paste &amp; Go" />
+
+                <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
+                    android:id="@+id/runScanButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="10dp"
+                    android:text="Start as Scanner" />
+
+                <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
+                    android:id="@+id/clearPastedUrlButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="10dp"
+                    android:text="Clear URL" />
+            </LinearLayout>
+
+            <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
+                    android:id="@+id/cancelButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="10dp"
+                    android:text="Cancel" />
+
+                <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
+                    android:id="@+id/clearLogButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="10dp"
+                    android:text="Clear Log" />
+            </LinearLayout>
+
+            <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:primaryText="State" />
+
+            <com.duckduckgo.common.ui.view.text.DaxTextView
+                android:id="@+id/currentStateTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/keyline_4"
+                android:layout_marginEnd="@dimen/keyline_4"
+                android:layout_marginBottom="@dimen/keyline_4"
+                app:typography="body2" />
+
+            <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:primaryText="Log" />
+
+            <LinearLayout
+                android:id="@+id/logContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/keyline_4"
+                android:orientation="vertical" />
+
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>

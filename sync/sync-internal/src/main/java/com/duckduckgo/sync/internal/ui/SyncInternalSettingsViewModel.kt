@@ -30,11 +30,13 @@ import com.duckduckgo.persistentstorage.api.PersistentStorage
 import com.duckduckgo.persistentstorage.api.PersistentStorageAvailability
 import com.duckduckgo.sync.api.favicons.FaviconsFetchingStore
 import com.duckduckgo.sync.impl.ConnectedDevice
+import com.duckduckgo.sync.impl.ProtectedKeyEntry
 import com.duckduckgo.sync.impl.Result
 import com.duckduckgo.sync.impl.Result.Error
 import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.impl.SyncAccountRepository
 import com.duckduckgo.sync.impl.SyncApi
+import com.duckduckgo.sync.impl.SyncAuthCode
 import com.duckduckgo.sync.impl.SyncFeature
 import com.duckduckgo.sync.impl.autorestore.SyncAutoRestoreManager
 import com.duckduckgo.sync.impl.autorestore.SyncRecoveryPersistentStorageKey
@@ -49,6 +51,9 @@ import com.duckduckgo.sync.internal.ui.SyncInternalSettingsViewModel.Command.Rea
 import com.duckduckgo.sync.internal.ui.SyncInternalSettingsViewModel.Command.ShowMessage
 import com.duckduckgo.sync.internal.ui.SyncInternalSettingsViewModel.Command.ShowQR
 import com.duckduckgo.sync.store.*
+import com.squareup.moshi.JsonAdapter
+import com.squareup.moshi.Moshi
+import com.squareup.moshi.Types
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
@@ -396,7 +401,23 @@ constructor(
 
     fun useRecoveryCode(recoveryCode: String) {
         viewModelScope.launch(dispatchers.io()) {
-            authFlow(recoveryCode)
+            // 3party recovery codes are intentionally rejected by parseSyncAuthCode (production
+            // paste/scan paths must not accept them). For the dev-tool entrypoint we explicitly
+            // try the 3party→ddg upgrade path when the existing parser doesn't recognize the code.
+            val codeType = syncAccountRepository.parseSyncAuthCode(recoveryCode)
+            if (codeType is SyncAuthCode.Unknown) {
+                when (val joinResult = syncAccountRepository.joinAccountFromThirdPartyRecoveryCode(recoveryCode)) {
+                    is Success -> {
+                        command.send(Command.LoginSuccess)
+                        updateViewState()
+                    }
+                    is Error -> {
+                        command.send(Command.ShowMessage("$joinResult"))
+                    }
+                }
+            } else {
+                authFlow(recoveryCode)
+            }
         }
     }
 
@@ -577,6 +598,9 @@ constructor(
                     }
                 }
                 logcat { "Sync-ScopedToken: keys:\n$text" }
+                // Refresh the local cache to match the server — per Access Credentials TD,
+                // the cache is the device's last-known view of /sync/keys.
+                syncStore.protectedKeysJson = protectedKeysAdapter.toJson(result.data)
                 viewState.update { it.copy(keysText = text) }
             }
             is Error -> {
@@ -782,5 +806,12 @@ constructor(
     private fun isDeviceSecureLockEnabled(): Boolean {
         val keyguardManager = context.getSystemService(KeyguardManager::class.java)
         return keyguardManager?.isDeviceSecure == true
+    }
+
+    private companion object {
+        private val protectedKeysAdapter: JsonAdapter<List<ProtectedKeyEntry>> =
+            Moshi.Builder().build().adapter(
+                Types.newParameterizedType(List::class.java, ProtectedKeyEntry::class.java),
+            )
     }
 }
