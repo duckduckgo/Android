@@ -304,16 +304,6 @@
                 app:menuSize="medium"
                 app:primaryText="@string/browserMenuPrintSite" />
 
-            <com.duckduckgo.common.ui.view.MenuItemView
-                android:id="@+id/chatSettings"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:visibility="gone"
-                app:iconDrawable="@drawable/ic_settings_ai_24"
-                app:primaryText="@string/browserMenuChatSettings"
-                app:menuSize="medium"
-                tools:visibility="visible" />
-
             <com.duckduckgo.common.ui.view.divider.HorizontalDivider
                 android:id="@+id/customTabsMenuDivider"
                 style="@style/Widget.DuckDuckGo.PopupMenuHorizontalDivider"

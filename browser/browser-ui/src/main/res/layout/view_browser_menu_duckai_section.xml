@@ -51,4 +51,12 @@
         app:iconDrawable="@drawable/ic_chats_24"
         app:menuSize="medium"
         app:primaryText="@string/browserMenuChats" />
+
+    <com.duckduckgo.common.ui.view.MenuItemView
+        android:id="@+id/duckAiChatSettingsMenuItem"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:iconDrawable="@drawable/ic_settings_ai_24"
+        app:menuSize="medium"
+        app:primaryText="@string/browserMenuChatSettings" />
 </LinearLayout>

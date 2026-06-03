@@ -145,7 +145,7 @@ class BrowserMenuBottomSheet(
         get() = duckAiSectionBinding.duckAiChatsMenuItem
 
     val duckChatSettingsMenuItem: MenuItemView
-        get() = binding.chatSettings
+        get() = duckAiSectionBinding.duckAiChatSettingsMenuItem
 
     val sharePageMenuItem: MenuItemView
         get() = binding.sharePageMenuItem
@@ -264,9 +264,10 @@ class BrowserMenuBottomSheet(
         fireproofWebsiteMenuItem.label(fireproofLabel)
         fireproofWebsiteMenuItem.setIcon(if (viewState.isFireproofWebsite) drawable.ic_fireproof_solid_24 else drawable.ic_fireproof_24)
         renderDuckAiSection(
-            showSection = viewState.showDuckAiSection,
+            showShortcuts = viewState.showDuckAiSection,
             showVoiceChat = viewState.showDuckChatVoiceOption,
             showChatHistory = viewState.showDuckChatHistoryOption,
+            showChatSettings = false,
         )
 
         createAliasMenuItem.isVisible = viewState.isEmailSignedIn
@@ -331,9 +332,10 @@ class BrowserMenuBottomSheet(
         downloadsMenuItem.isVisible = true
         downloadsMenuItem.showDotIndicator = viewState.showDownloadDot
         renderDuckAiSection(
-            showSection = viewState.showDuckAiSection,
+            showShortcuts = viewState.showDuckAiSection,
             showVoiceChat = viewState.showDuckChatVoiceOption,
             showChatHistory = viewState.showDuckChatHistoryOption,
+            showChatSettings = false,
         )
         renderVpnMenu(viewState.vpnMenuState)
         createAliasMenuItem.isVisible = viewState.isEmailSignedIn
@@ -411,11 +413,11 @@ class BrowserMenuBottomSheet(
         renderPageContextHeader(viewState.pageContextHeader)
 
         renderDuckAiSection(
-            showSection = viewState.showDuckAiSection,
+            showShortcuts = viewState.showDuckAiSection,
             showVoiceChat = viewState.showDuckChatVoiceOption,
             showChatHistory = viewState.showDuckChatHistoryOption,
+            showChatSettings = true,
         )
-        duckChatSettingsMenuItem.isVisible = true
 
         binding.urlPageActionsSectionDivider.isVisible = true
         binding.librarySectionDivider.isVisible = true
@@ -425,14 +427,16 @@ class BrowserMenuBottomSheet(
     }
 
     private fun renderDuckAiSection(
-        showSection: Boolean,
+        showShortcuts: Boolean,
         showVoiceChat: Boolean,
         showChatHistory: Boolean,
+        showChatSettings: Boolean,
     ) {
-        duckAiSectionBinding.root.isVisible = showSection
-        duckAiNewChatMenuItem.isVisible = true
-        duckAiNewVoiceChatMenuItem.isVisible = showVoiceChat
-        duckChatHistoryMenuItem.isVisible = showChatHistory
+        duckAiSectionBinding.root.isVisible = showShortcuts || showChatSettings
+        duckAiNewChatMenuItem.isVisible = showShortcuts
+        duckAiNewVoiceChatMenuItem.isVisible = showShortcuts && showVoiceChat
+        duckChatHistoryMenuItem.isVisible = showShortcuts && showChatHistory
+        duckChatSettingsMenuItem.isVisible = showChatSettings
     }
 
     private fun renderPageContextHeader(pageContextHeaderState: PageContextHeaderState) {

@@ -290,6 +290,7 @@ class BrowserMenuBottomSheetTest {
         assertTrue(dialog.duckAiNewChatMenuItem.isVisible)
         assertTrue(dialog.duckAiNewVoiceChatMenuItem.isVisible)
         assertTrue(dialog.duckChatHistoryMenuItem.isVisible)
+        assertFalse(dialog.duckChatSettingsMenuItem.isVisible)
     }
 
     @Test
@@ -370,6 +371,27 @@ class BrowserMenuBottomSheetTest {
         assertTrue(dialog.duckAiNewChatMenuItem.isVisible)
         assertTrue(dialog.duckAiNewVoiceChatMenuItem.isVisible)
         assertTrue(dialog.duckChatHistoryMenuItem.isVisible)
+        assertTrue(dialog.duckChatSettingsMenuItem.isVisible)
+    }
+
+    @Test
+    fun whenRenderDuckAiMenuWithShortcutsDisabledThenOnlyChatSettingsVisibleInSection() {
+        dialog.placeDuckAiSection(atTop = true)
+
+        dialog.render(
+            BrowserMenuViewState.DuckAi(
+                showDuckAiSection = false,
+                showDuckChatVoiceOption = true,
+                showDuckChatHistoryOption = true,
+                pageContextHeader = PageContextHeaderState.DuckAi(title = null, tabId = "tab1"),
+            ),
+        )
+
+        assertTrue(duckAiSection.isVisible)
+        assertFalse(dialog.duckAiNewChatMenuItem.isVisible)
+        assertFalse(dialog.duckAiNewVoiceChatMenuItem.isVisible)
+        assertFalse(dialog.duckChatHistoryMenuItem.isVisible)
+        assertTrue(dialog.duckChatSettingsMenuItem.isVisible)
     }
 
     @Test
