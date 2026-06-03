@@ -138,6 +138,14 @@
     <string name="duck_ai_chat_history_search_close_content_description">Закрыть поиск</string>
     <string name="duck_ai_chat_history_search_clear_content_description">Очистить поиск</string>
     <string name="duck_ai_chat_history_action_fire_content_description">Удалить чаты</string>
+    <string name="duck_ai_chat_history_action_new">Создать</string>
+    <string name="duck_ai_chat_history_action_download_selected_content_description">Скачать чаты</string>
+    <plurals name="duck_ai_chat_history_bulk_download_complete">
+        <item quantity="one">Скачивание %1$d чата завершено</item>
+        <item quantity="few">Скачивание %1$d чатов завершено</item>
+        <item quantity="many">Скачивание %1$d чатов завершено</item>
+        <item quantity="other">Скачивание %1$d чата завершено</item>
+    </plurals>
     <string name="duck_ai_chat_history_action_overflow_content_description">Открыть раскрывающееся меню</string>
     <string name="duck_ai_chat_history_select_all">Выбрать все</string>
     <string name="duck_ai_chat_history_unselect_all">Отменить выбор всех</string>
@@ -155,4 +163,5 @@
     <string name="duck_ai_chat_history_download_complete" instruction="%1$s is the saved chat filename (e.g. \&apos;My Chat.txt\&apos;).">Загрузка файла %1$s завершена</string>
     <string name="duck_ai_chat_history_download_view">Показать</string>
     <string name="duck_ai_chat_history_download_error">Не удалось экспортировать чат</string>
+    <string name="duck_ai_chat_history_bulk_download_error">Не удалось экспортировать чаты</string>
 </resources>
