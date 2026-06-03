@@ -137,7 +137,7 @@ jobs:
           asana_section_id: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
           test_suite_name: Unified Input Field
 
-      - name: Preonboarding flows
+      - name: Internal Onboarding Flows
         id: maestro-preonboarding
         uses: ./.github/actions/maestro-cloud-asana-reporter
         timeout-minutes: 120
