@@ -7,6 +7,7 @@ import com.android.billingclient.api.ProductDetails
 import com.android.billingclient.api.ProductDetails.PricingPhase
 import com.android.billingclient.api.ProductDetails.PricingPhases
 import com.android.billingclient.api.ProductDetails.SubscriptionOfferDetails
+import com.android.billingclient.api.Purchase
 import com.android.billingclient.api.PurchaseHistoryRecord
 import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.common.test.CoroutineTestRule
@@ -41,6 +42,7 @@ import com.duckduckgo.subscriptions.impl.auth2.PkceGenerator
 import com.duckduckgo.subscriptions.impl.auth2.PkceGeneratorImpl
 import com.duckduckgo.subscriptions.impl.auth2.RefreshTokenClaims
 import com.duckduckgo.subscriptions.impl.auth2.TokenPair
+import com.duckduckgo.subscriptions.impl.billing.LatestPurchaseResult
 import com.duckduckgo.subscriptions.impl.billing.PlayBillingManager
 import com.duckduckgo.subscriptions.impl.billing.PurchaseState
 import com.duckduckgo.subscriptions.impl.billing.PurchaseState.Canceled
@@ -276,6 +278,111 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
             assertEquals(FAKE_REFRESH_TOKEN_V2, authDataStore.refreshTokenV2)
             cancelAndConsumeRemainingEvents()
         }
+    }
+
+    @Test
+    fun whenRecoverSubscriptionFromStoreWithUseQueryPurchasesAndActivePurchaseThenSuccess() = runTest {
+        givenUseQueryPurchasesEnabled()
+        givenUserIsNotSignedIn()
+        givenActivePurchase()
+        givenStoreLoginSucceeds()
+        givenSubscriptionSucceedsWithEntitlements()
+        givenAccessTokenSucceeds()
+        givenV2AccessTokenRefreshSucceeds()
+
+        val result = subscriptionsManager.recoverSubscriptionFromStore()
+
+        assertTrue(result is RecoverSubscriptionResult.Success)
+        verify(authClient).storeLogin(any(), any(), any())
+        verify(playBillingManager, never()).purchaseHistory
+    }
+
+    @Test
+    fun whenRecoverSubscriptionFromStoreWithUseQueryPurchasesAndNoActivePurchaseThenSubscriptionNotFoundFailure() = runTest {
+        givenUseQueryPurchasesEnabled()
+        givenUserIsNotSignedIn()
+        givenNoActivePurchase()
+
+        val result = subscriptionsManager.recoverSubscriptionFromStore()
+
+        assertTrue(result is RecoverSubscriptionResult.Failure)
+        assertEquals("SubscriptionNotFound", (result as RecoverSubscriptionResult.Failure).message)
+        verify(authClient, never()).storeLogin(any(), any(), any())
+    }
+
+    @Test
+    fun whenRecoverSubscriptionFromStoreWithUseQueryPurchasesAndPurchaseInfoUnknownThenGenericFailure() = runTest {
+        givenUseQueryPurchasesEnabled()
+        givenUserIsNotSignedIn()
+        givenPurchaseInfoUnknown()
+
+        val result = subscriptionsManager.recoverSubscriptionFromStore()
+
+        assertTrue(result is RecoverSubscriptionResult.Failure)
+        assertEquals(
+            "Store login error: PurchaseInfoNotAvailable",
+            (result as RecoverSubscriptionResult.Failure).message,
+        )
+        verify(authClient, never()).storeLogin(any(), any(), any())
+    }
+
+    @Test
+    fun whenRefreshTokenWithUseQueryPurchasesAndNoActivePurchaseThenSignsOutWithoutInvalidRefreshTokenSignedOutPixel() = runTest {
+        assumeTrue(authApiV2Enabled)
+        givenUseQueryPurchasesEnabled()
+        givenUserIsSignedIn()
+        givenSubscriptionExists()
+        givenAccessTokenIsExpired()
+        givenV2AccessTokenRefreshFails(errorCode = "invalid_token")
+        givenNoActivePurchase()
+
+        val result = subscriptionsManager.getAccessToken()
+
+        assertTrue(result is AccessTokenResult.Failure)
+        assertFalse(subscriptionsManager.isSignedIn())
+        assertNull(authRepository.getAccessTokenV2())
+        assertNull(authRepository.getRefreshTokenV2())
+        verify(pixelSender).reportAuthV2InvalidRefreshTokenDetected()
+        verify(pixelSender, never()).reportAuthV2InvalidRefreshTokenSignedOut()
+        verify(pixelSender, never()).reportAuthV2InvalidRefreshTokenRecovered()
+    }
+
+    @Test
+    fun whenRefreshTokenWithUseQueryPurchasesAndPurchaseInfoUnknownThenDoesNotSignOut() = runTest {
+        assumeTrue(authApiV2Enabled)
+        givenUseQueryPurchasesEnabled()
+        givenUserIsSignedIn()
+        givenSubscriptionExists()
+        givenAccessTokenIsExpired()
+        givenV2AccessTokenRefreshFails(errorCode = "invalid_token")
+        givenPurchaseInfoUnknown()
+
+        val result = subscriptionsManager.getAccessToken()
+
+        assertTrue(result is AccessTokenResult.Failure)
+        assertTrue(subscriptionsManager.isSignedIn())
+        assertEquals(FAKE_REFRESH_TOKEN_V2, authDataStore.refreshTokenV2)
+        verify(pixelSender).reportAuthV2InvalidRefreshTokenDetected()
+        verify(pixelSender, never()).reportAuthV2InvalidRefreshTokenSignedOut()
+        verify(pixelSender, never()).reportAuthV2InvalidRefreshTokenRecovered()
+    }
+
+    @Test
+    fun whenRefreshTokenWithUseQueryPurchasesAndActivePurchaseThenRecoversTokens() = runTest {
+        assumeTrue(authApiV2Enabled)
+        givenUseQueryPurchasesEnabled()
+        givenUserIsSignedIn()
+        givenAccessTokenIsExpired()
+        givenV2AccessTokenRefreshFails(errorCode = "invalid_token")
+        givenActivePurchase()
+        givenStoreLoginSucceeds(newAccessToken = "new access token")
+
+        val result = subscriptionsManager.getAccessToken()
+
+        assertTrue(result is AccessTokenResult.Success)
+        assertEquals("new access token", (result as AccessTokenResult.Success).accessToken)
+        verify(pixelSender).reportAuthV2InvalidRefreshTokenDetected()
+        verify(pixelSender).reportAuthV2InvalidRefreshTokenRecovered()
     }
 
     @Test
@@ -1882,6 +1989,27 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
         )
         whenever(playBillingManager.products).thenReturn(emptyList())
         whenever(playBillingManager.purchaseHistory).thenReturn(listOf(purchaseRecord))
+    }
+
+    @SuppressLint("DenyListedApi")
+    private fun givenUseQueryPurchasesEnabled() {
+        subscriptionsFeature.useQueryPurchases().setRawStoredState(State(true))
+    }
+
+    private suspend fun givenActivePurchase() {
+        val purchase: Purchase = mock {
+            whenever(it.signature).thenReturn("signature")
+            whenever(it.originalJson).thenReturn("originalJson")
+        }
+        whenever(playBillingManager.getLatestPurchase()).thenReturn(LatestPurchaseResult.Present(purchase))
+    }
+
+    private suspend fun givenNoActivePurchase() {
+        whenever(playBillingManager.getLatestPurchase()).thenReturn(LatestPurchaseResult.Absent)
+    }
+
+    private suspend fun givenPurchaseInfoUnknown() {
+        whenever(playBillingManager.getLatestPurchase()).thenReturn(LatestPurchaseResult.Unknown)
     }
 
     private suspend fun givenStoreLoginSucceeds(newAccessToken: String = FAKE_ACCESS_TOKEN_V2) {
