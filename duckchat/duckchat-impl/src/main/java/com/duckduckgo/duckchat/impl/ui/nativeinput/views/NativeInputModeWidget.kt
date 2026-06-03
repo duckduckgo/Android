@@ -551,6 +551,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
     }
 
     private fun updateSendButtonIcon() {
+        if (isStreaming) return
         val iconResId = if (isDuckAiPageContext()) {
             R.drawable.ic_arrow_up_24
         } else {
