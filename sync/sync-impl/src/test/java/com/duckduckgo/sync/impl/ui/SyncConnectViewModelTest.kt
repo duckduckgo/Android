@@ -737,8 +737,14 @@ class SyncConnectViewModelTest {
         whenever(syncRepository.getConnectQR()).thenReturn(Result.Success(authCodeToUse))
         whenever(qrEncoder.encodeAsBitmap(eq(jsonConnectKeyEncoded), any(), any())).thenReturn(TestSyncFixtures.qrBitmap())
         whenever(syncRepository.pollConnectionKeys()).thenReturn(Result.Success(true))
-        testee.viewState(source = null).test { awaitItem(); cancelAndIgnoreRemainingEvents() }
-        testee.viewState(source = null).test { awaitItem(); cancelAndIgnoreRemainingEvents() }
+        testee.viewState(source = null).test {
+            awaitItem()
+            cancelAndIgnoreRemainingEvents()
+        }
+        testee.viewState(source = null).test {
+            awaitItem()
+            cancelAndIgnoreRemainingEvents()
+        }
         verify(syncRepository, times(1)).getConnectQR()
     }
 
@@ -747,8 +753,14 @@ class SyncConnectViewModelTest {
         syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
         syncFeature.canShowV2ConnectCode().setRawStoredState(State(true))
         whenever(qrEncoder.encodeAsBitmap(any(), any(), any())).thenReturn(TestSyncFixtures.qrBitmap())
-        testee.viewState(source = null).test { awaitItem(); cancelAndIgnoreRemainingEvents() }
-        testee.viewState(source = null).test { awaitItem(); cancelAndIgnoreRemainingEvents() }
+        testee.viewState(source = null).test {
+            awaitItem()
+            cancelAndIgnoreRemainingEvents()
+        }
+        testee.viewState(source = null).test {
+            awaitItem()
+            cancelAndIgnoreRemainingEvents()
+        }
         verify(runner, times(1)).startPresent()
     }
 }

@@ -689,8 +689,14 @@ class SyncWithAnotherDeviceViewModelTest {
     fun whenViewStateReCollectedThenExchangeInvitationGeneratedOnce() = runTest {
         configureExchangeKeysSupported() // v1 exchange path: generate→Success, poll→Success(true)
         // Two collections simulate a background→foreground re-subscription.
-        testee.viewState().test { awaitItem(); cancelAndIgnoreRemainingEvents() }
-        testee.viewState().test { awaitItem(); cancelAndIgnoreRemainingEvents() }
+        testee.viewState().test {
+            awaitItem()
+            cancelAndIgnoreRemainingEvents()
+        }
+        testee.viewState().test {
+            awaitItem()
+            cancelAndIgnoreRemainingEvents()
+        }
         verify(syncRepository, times(1)).generateExchangeInvitationCode()
     }
 
@@ -699,8 +705,14 @@ class SyncWithAnotherDeviceViewModelTest {
         enableV2(displayOn = true)
         whenever(syncRepository.getAccountInfo()).thenReturn(accountA)
         whenever(qrEncoder.encodeAsBitmap(any(), any(), any())).thenReturn(TestSyncFixtures.qrBitmap())
-        testee.viewState().test { awaitItem(); cancelAndIgnoreRemainingEvents() }
-        testee.viewState().test { awaitItem(); cancelAndIgnoreRemainingEvents() }
+        testee.viewState().test {
+            awaitItem()
+            cancelAndIgnoreRemainingEvents()
+        }
+        testee.viewState().test {
+            awaitItem()
+            cancelAndIgnoreRemainingEvents()
+        }
         verify(runner, times(1)).startPresent()
     }
 }
