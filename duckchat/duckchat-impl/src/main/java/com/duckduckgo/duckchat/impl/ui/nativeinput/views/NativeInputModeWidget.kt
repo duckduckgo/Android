@@ -550,6 +550,16 @@ class NativeInputModeWidget @JvmOverloads constructor(
         }
     }
 
+    private fun updateSendButtonIcon() {
+        if (isStreaming) return
+        val iconResId = if (isDuckAiPageContext()) {
+            R.drawable.ic_arrow_up_24
+        } else {
+            com.duckduckgo.mobile.android.R.drawable.ic_arrow_right_24
+        }
+        submitButtons?.setSendButtonIcon(iconResId)
+    }
+
     private fun updateNewLineButtonVisibility() {
         val isBrowserContext = nativeInputState?.inputContext == NativeInputState.InputContext.BROWSER
         val hasText = inputField.text.isNotBlank()
@@ -575,6 +585,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
         updateBottomRowVisibility()
         applyVerticalPaddingForFocus()
         updateNewLineButtonVisibility()
+        updateSendButtonIcon()
         applyOmnibarShape()
         // Re-apply chat input type whenever the inputs to `applyChatInputType` (context, position)
         // change, or on the first emission. This corrects stale IME setup from a tab listener
@@ -1168,7 +1179,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
         val toggle = findViewById<TabLayout?>(R.id.inputModeSwitch) ?: return
         val isChatTab = toggle.selectedTabPosition == 1
         setImageButtonVisible(isChatTab && supportsUpload)
-        submitButtons?.setSendButtonIcon(R.drawable.ic_arrow_right_24_inverted)
+        updateSendButtonIcon()
         if (isChatTab) {
             inputField.minLines = 1
             inputField.maxLines = MAX_LINES

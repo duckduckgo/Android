@@ -88,15 +88,11 @@ class InputScreenButtons @JvmOverloads constructor(
     fun showStopButton() {
         actionSend.isEnabled = true
         actionSend.setImageResource(R.drawable.ic_stop_16)
-        actionSend.backgroundTintList = resolveThemeColorStateList(CommonR.attr.daxColorButtonDestructiveContainer)
         actionSend.setOnClickListener { onStopClick?.invoke() }
     }
 
     fun showSendButton() {
-        actionSend.setImageResource(R.drawable.ic_arrow_right_24_inverted)
-        actionSend.backgroundTintList = resolveThemeColorStateList(
-            if (actionSend.isEnabled) CommonR.attr.daxColorButtonPrimaryContainer else CommonR.attr.daxColorContainerDisabled,
-        )
+        actionSend.setImageResource(CommonR.drawable.ic_arrow_right_24)
         actionSend.setOnClickListener { sendIfEnabled() }
     }
 
@@ -104,18 +100,8 @@ class InputScreenButtons @JvmOverloads constructor(
         if (actionSend.isEnabled) onSendClick?.invoke()
     }
 
-    private fun resolveThemeColorStateList(attr: Int): android.content.res.ColorStateList? {
-        val attributes = context.obtainStyledAttributes(intArrayOf(attr))
-        val colorStateList = attributes.getColorStateList(0)
-        attributes.recycle()
-        return colorStateList
-    }
-
     fun setSendButtonEnabled(enabled: Boolean) {
         actionSend.isEnabled = enabled
-        actionSend.backgroundTintList = resolveThemeColorStateList(
-            if (enabled) CommonR.attr.daxColorButtonPrimaryContainer else CommonR.attr.daxColorContainerDisabled,
-        )
     }
 
     fun setSendButtonVisible(visible: Boolean) {
