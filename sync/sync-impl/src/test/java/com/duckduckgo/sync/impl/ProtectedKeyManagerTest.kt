@@ -95,7 +95,10 @@ class ProtectedKeyManagerTest {
 
         val result = manager.create("ai_chats")
 
-        assertEquals(Success(true), result)
+        assertTrue(result is Success)
+        // create() returns the created entry, not a bare boolean.
+        assertEquals("ai_chats", (result as Success).data.purpose)
+        assertEquals("ddg", result.data.encryptedWith)
         verify(syncApi).setProtectedKeyIfAbsent(
             eq(token),
             eq("ai_chats"),

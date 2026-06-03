@@ -153,6 +153,7 @@ class AppSyncAccountRepositoryTest {
             protectedKeyManager = protectedKeyManager,
             thirdPartyDeviceListDecryptor = thirdPartyDeviceListDecryptor,
         )
+        (syncRepo as AppSyncAccountRepository).upgradeRetryDelayMillis = 0L // keep retry-path tests instant
 
         // passthrough by default (no modifications)
         whenever(syncCodeUrlWrapper.wrapCodeInUrl(any())).thenAnswer { it.arguments[0] as String }
@@ -952,7 +953,7 @@ class AppSyncAccountRepositoryTest {
 
         val result = syncRepo.renameDevice(connectedDevice)
 
-        verify(syncApi).login(anyString(), anyString(), eq(connectedDevice.deviceId), anyString(), anyString())
+        verify(syncApi).login(anyString(), anyString(), eq(connectedDevice.deviceId), anyString(), anyString(), anyOrNull())
         assertTrue(result is Success)
     }
 
@@ -1160,7 +1161,7 @@ class AppSyncAccountRepositoryTest {
             accessCredentials = listOf(AccessCredentialEntry(id = "ddg", scope = null)),
             keys = listOf(ProtectedKeyEntry(kid = "k1", purpose = "ai_chats", encryptedWith = "ddg", encryptedPrivateKey = "jwe_data")),
         )
-        whenever(syncApi.login(anyString(), anyString(), anyString(), anyString(), anyString())).thenReturn(Success(loginResponseWithV2))
+        whenever(syncApi.login(anyString(), anyString(), anyString(), anyString(), anyString(), anyOrNull())).thenReturn(Success(loginResponseWithV2))
 
         val result = syncRepo.processCode(SyncAuthCode.Recovery(RecoveryCode(primaryKey = primaryKey, userId = userId)))
 
@@ -1194,7 +1195,7 @@ class AppSyncAccountRepositoryTest {
                 ProtectedKeyEntry(kid = "k1", purpose = "ai_chats", encryptedWith = "3party", encryptedPrivateKey = "jwe_3p"),
             ),
         )
-        whenever(syncApi.login(anyString(), anyString(), anyString(), anyString(), anyString())).thenReturn(Success(loginResponseWithV2))
+        whenever(syncApi.login(anyString(), anyString(), anyString(), anyString(), anyString(), anyOrNull())).thenReturn(Success(loginResponseWithV2))
 
         val result = syncRepo.processCode(SyncAuthCode.Recovery(RecoveryCode(primaryKey = primaryKey, userId = userId)))
 
@@ -1210,7 +1211,7 @@ class AppSyncAccountRepositoryTest {
         prepareToProvideDeviceIds()
         prepareForEncryption()
         whenever(nativeLib.prepareForLogin(primaryKey)).thenReturn(validLoginKeys)
-        whenever(syncApi.login(anyString(), anyString(), anyString(), anyString(), anyString())).thenReturn(loginSuccess)
+        whenever(syncApi.login(anyString(), anyString(), anyString(), anyString(), anyString(), anyOrNull())).thenReturn(loginSuccess)
 
         val result = syncRepo.processCode(SyncAuthCode.Recovery(RecoveryCode(primaryKey = primaryKey, userId = userId)))
 
@@ -1288,11 +1289,289 @@ class AppSyncAccountRepositoryTest {
 
     @Test
     fun whenCreateProtectedKeyThenDelegatesToManager() {
-        whenever(protectedKeyManager.create("ai_chats")).thenReturn(Success(true))
+        val createdKey = ProtectedKeyEntry(
+            kid = "k1",
+            purpose = "ai_chats",
+            encryptedWith = "ddg",
+            encryptedPrivateKey = "enc",
+            publicKey = RsaJwk(n = "mod", e = "AQAB"),
+        )
+        whenever(protectedKeyManager.create("ai_chats")).thenReturn(Success(createdKey))
 
         val result = syncRepo.createProtectedKey("ai_chats")
 
         assertEquals(Success(true), result)
         verify(protectedKeyManager).create("ai_chats")
+    }
+
+    // joinAccountFromThirdPartyRecoveryCode
+
+    @Test
+    fun whenJoinAccountFromThirdPartyAndAllStepsSucceedThenAtomicStoreUsesDdgTokenFromSecondLogin() {
+        val pastedCode = prepareForJoinAccountFromThirdPartyRecoveryCode()
+
+        val result = syncRepo.joinAccountFromThirdPartyRecoveryCode(pastedCode)
+
+        assertEquals(Success(true), result)
+        // Commits the ddg token from Step 7a, not the ai_chats-scoped Step 2 token (else 403).
+        verify(syncStore).storeCredentials(
+            userId = userId,
+            deviceId = deviceId,
+            deviceName = deviceName,
+            primaryKey = primaryKey,
+            secretKey = secretKey,
+            token = "ddg_token_step7a",
+        )
+    }
+
+    @Test
+    fun whenJoinAccountFromThirdPartyThenStep7aPostUpgradeLoginUsesUnrestrictedScope() {
+        val pastedCode = prepareForJoinAccountFromThirdPartyRecoveryCode()
+
+        syncRepo.joinAccountFromThirdPartyRecoveryCode(pastedCode)
+
+        verify(syncApi).login(
+            userID = eq(userId),
+            hashedPassword = anyString(),
+            deviceId = eq(deviceId),
+            deviceName = anyString(),
+            deviceType = anyString(),
+            scope = eq("ai_chats"),
+        )
+        // Step 7a must use scope=null — the unscoped ddg token is needed for device-management endpoints.
+        verify(syncApi).login(
+            userID = eq(userId),
+            hashedPassword = anyString(),
+            deviceId = eq(deviceId),
+            deviceName = anyString(),
+            deviceType = anyString(),
+            scope = eq<String?>(null),
+        )
+    }
+
+    @Test
+    fun whenStep7aPostUpgradeLoginReturns401ThenAbortsWithoutAtomicStore() {
+        val pastedCode = prepareForJoinAccountFromThirdPartyRecoveryCode(step7aResult = step7aLoginUnauthorized)
+
+        val result = syncRepo.joinAccountFromThirdPartyRecoveryCode(pastedCode)
+
+        assertTrue(result is Error)
+        // 401 => BE removed the credential (TTL); must not persist any local state.
+        verify(syncStore, times(0)).storeCredentials(any(), any(), any(), any(), any(), any())
+    }
+
+    @Test
+    fun whenStep7aPostUpgradeLoginFailsWithNon401ThenAbortsWithoutAtomicStore() {
+        val pastedCode = prepareForJoinAccountFromThirdPartyRecoveryCode(step7aResult = step7aLoginServerError)
+
+        val result = syncRepo.joinAccountFromThirdPartyRecoveryCode(pastedCode)
+
+        assertTrue(result is Error)
+        verify(
+            syncApi,
+            times(AppSyncAccountRepository.MAX_UPGRADE_RETRIES + 1),
+        ).login(eq(userId), any(), eq(deviceId), any(), any(), eq<String?>(null))
+        verify(syncStore, times(0)).storeCredentials(any(), any(), any(), any(), any(), any())
+    }
+
+    @Test
+    fun whenJoinAccountFromThirdPartyAndAccountAlreadyHasDdgCredentialThenAbortsBeforePost() {
+        val pastedCode = prepareForJoinAccountFromThirdPartyRecoveryCode(accountAlreadyHasDdg = true)
+
+        val result = syncRepo.joinAccountFromThirdPartyRecoveryCode(pastedCode)
+
+        assertTrue(result is Error)
+        // Aborts before the POST when the login response already shows a ddg credential.
+        verify(syncApi, times(0)).createAccessCredential(anyString(), eq("ddg"), any())
+        verify(syncApi, times(0)).login(any(), any(), any(), any(), any(), eq<String?>(null))
+        verify(syncStore, times(0)).storeCredentials(any(), any(), any(), any(), any(), any())
+    }
+
+    @Test
+    fun whenStep7PostRateLimitedThenRetriesAndSucceeds() {
+        val pastedCode = prepareForJoinAccountFromThirdPartyRecoveryCode()
+        whenever(syncApi.createAccessCredential(anyString(), eq("ddg"), any()))
+            .thenReturn(Error(code = API_CODE.TOO_MANY_REQUESTS_2.code, reason = "rate limited"), Success(true))
+
+        val result = syncRepo.joinAccountFromThirdPartyRecoveryCode(pastedCode)
+
+        assertEquals(Success(true), result)
+        verify(syncApi, times(2)).createAccessCredential(anyString(), eq("ddg"), any())
+    }
+
+    @Test
+    fun whenStep7aLoginServerErrorThenRetriesAndSucceeds() {
+        val pastedCode = prepareForJoinAccountFromThirdPartyRecoveryCode()
+        whenever(syncApi.login(eq(userId), any(), eq(deviceId), any(), any(), eq<String?>(null)))
+            .thenReturn(step7aLoginServerError, step7aLoginSuccess)
+
+        val result = syncRepo.joinAccountFromThirdPartyRecoveryCode(pastedCode)
+
+        assertEquals(Success(true), result)
+        verify(syncApi, times(2)).login(eq(userId), any(), eq(deviceId), any(), any(), eq<String?>(null))
+        verify(syncStore).storeCredentials(
+            userId = userId,
+            deviceId = deviceId,
+            deviceName = deviceName,
+            primaryKey = primaryKey,
+            secretKey = secretKey,
+            token = "ddg_token_step7a",
+        )
+    }
+
+    @Test
+    fun whenStep7aLoginTransportErrorThenRetriesAndSucceeds() {
+        val pastedCode = prepareForJoinAccountFromThirdPartyRecoveryCode()
+        whenever(syncApi.login(eq(userId), any(), eq(deviceId), any(), any(), eq<String?>(null)))
+            .thenReturn(step7aLoginTransportError, step7aLoginSuccess)
+
+        val result = syncRepo.joinAccountFromThirdPartyRecoveryCode(pastedCode)
+
+        assertEquals(Success(true), result)
+        verify(syncApi, times(2)).login(eq(userId), any(), eq(deviceId), any(), any(), eq<String?>(null))
+    }
+
+    @Test
+    fun whenStep7aLogin401ThenAbortsWithoutRetry() {
+        val pastedCode = prepareForJoinAccountFromThirdPartyRecoveryCode(step7aResult = step7aLoginUnauthorized)
+
+        val result = syncRepo.joinAccountFromThirdPartyRecoveryCode(pastedCode)
+
+        assertTrue(result is Error)
+        verify(syncApi, times(1)).login(eq(userId), any(), eq(deviceId), any(), any(), eq<String?>(null))
+        verify(syncStore, times(0)).storeCredentials(any(), any(), any(), any(), any(), any())
+    }
+
+    @Test
+    fun whenStep7Post409AlreadyExistsThenAbortsWithoutRetry() {
+        val pastedCode = prepareForJoinAccountFromThirdPartyRecoveryCode()
+        whenever(syncApi.createAccessCredential(anyString(), eq("ddg"), any()))
+            .thenReturn(Error(code = API_CODE.COUNT_LIMIT.code, reason = "already exists"))
+
+        val result = syncRepo.joinAccountFromThirdPartyRecoveryCode(pastedCode)
+
+        assertTrue(result is Error)
+        assertEquals(AccountErrorCodes.THIRD_PARTY_ALREADY_UPGRADED.code, (result as Error).code)
+        verify(syncApi, times(1)).createAccessCredential(anyString(), eq("ddg"), any())
+    }
+
+    @Test
+    fun whenStep7PostRateLimitedBeyondRetryLimitThenAbortsWithoutStore() {
+        val pastedCode = prepareForJoinAccountFromThirdPartyRecoveryCode()
+        whenever(syncApi.createAccessCredential(anyString(), eq("ddg"), any()))
+            .thenReturn(Error(code = API_CODE.TOO_MANY_REQUESTS_1.code, reason = "rate limited"))
+
+        val result = syncRepo.joinAccountFromThirdPartyRecoveryCode(pastedCode)
+
+        assertTrue(result is Error)
+        verify(syncApi, times(AppSyncAccountRepository.MAX_UPGRADE_RETRIES + 1))
+            .createAccessCredential(anyString(), eq("ddg"), any())
+        verify(syncStore, times(0)).storeCredentials(any(), any(), any(), any(), any(), any())
+    }
+
+    @Test
+    fun whenJoinAccountFromThirdPartyAndCodeIsLaterMinorVersionThenAccepted() {
+        val pastedCode = prepareForJoinAccountFromThirdPartyRecoveryCode(version = "2.5")
+
+        val result = syncRepo.joinAccountFromThirdPartyRecoveryCode(pastedCode)
+
+        assertTrue(result is Success)
+    }
+
+    @Test
+    fun whenJoinAccountFromThirdPartyAndCodeIsMajorVersion3ThenRejectedWithoutNetwork() {
+        val pastedCode = prepareForJoinAccountFromThirdPartyRecoveryCode(version = "3.0")
+
+        val result = syncRepo.joinAccountFromThirdPartyRecoveryCode(pastedCode)
+
+        assertTrue(result is Error)
+        verify(syncApi, times(0)).login(any(), any(), any(), any(), any(), anyOrNull())
+    }
+
+    @Test
+    fun whenJoinAccountFromThirdPartyAndCodeCidIsNotThirdPartyThenRejectedWithoutNetwork() {
+        val pastedCode = prepareForJoinAccountFromThirdPartyRecoveryCode(cid = "ddg")
+
+        val result = syncRepo.joinAccountFromThirdPartyRecoveryCode(pastedCode)
+
+        assertTrue(result is Error)
+        verify(syncApi, times(0)).login(any(), any(), any(), any(), any(), anyOrNull())
+    }
+
+    @Test
+    fun whenV2ThirdPartyCodeParsedAsAuthCodeThenNotTreatedAsRecovery() {
+        val v2ThirdPartyJson =
+            """{"recovery":{"user_id":"$userId","secret":"rUzlGqLLlbonAC_zIeh1nrCmuDsDAn6UooUUDz-6x3o","cid":"3party","v":"2.0"}}"""
+
+        val type = syncRepo.parseSyncAuthCode(v2ThirdPartyJson.encodeB64())
+
+        assertTrue(type is SyncAuthCode.Unknown)
+    }
+
+    private val step7aLoginUnauthorized = Error(code = API_CODE.INVALID_LOGIN_CREDENTIALS.code, reason = "invalid credentials")
+    private val step7aLoginServerError = Error(code = 500, reason = "server error")
+    private val step7aLoginTransportError = Error(code = AccountErrorCodes.GENERIC_ERROR.code, reason = "timeout")
+    private val step7aLoginSuccess = Success(
+        LoginResponse(
+            token = "ddg_token_step7a",
+            protected_encryption_key = null,
+            devices = emptyList(),
+            accessCredentials = null,
+            keys = null,
+        ),
+    )
+
+    private fun prepareForJoinAccountFromThirdPartyRecoveryCode(
+        accountAlreadyHasDdg: Boolean = false,
+        step7aResult: Result<LoginResponse>? = null,
+        version: String = "2.0",
+        cid: String = "3party",
+    ): String {
+        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
+        whenever(syncDeviceIds.deviceId()).thenReturn(deviceId)
+        whenever(syncDeviceIds.deviceName()).thenReturn(deviceName)
+        whenever(syncDeviceIds.deviceType()).thenReturn(deviceType)
+
+        val recoveryJson =
+            """{"recovery":{"user_id":"$userId","secret":"rUzlGqLLlbonAC_zIeh1nrCmuDsDAn6UooUUDz-6x3o","cid":"$cid","v":"$version"}}"""
+        val pastedCode = java.util.Base64.getUrlEncoder().withoutPadding().encodeToString(recoveryJson.toByteArray(Charsets.UTF_8))
+
+        whenever(nativeLib.encryptData(anyString(), anyString())).thenReturn(EncryptResult(0, "encrypted"))
+        whenever(syncJweCrypto.hkdfSha256SingleBlock(any(), any(), any(), any())).thenReturn(ByteArray(32))
+        whenever(syncJweCrypto.jweEncryptSymmetric(any(), any(), any())).thenReturn("encrypted_3party_credential")
+        whenever(nativeLib.generateAccountKeys(userId = eq(userId), password = anyString())).thenReturn(accountKeys)
+
+        // Step 2 response; optionally includes ddg to drive the "already upgraded" path.
+        val accessCredentialsInResponse = buildList {
+            add(AccessCredentialEntry(id = "3party", scope = "ai_chats"))
+            if (accountAlreadyHasDdg) add(AccessCredentialEntry(id = "ddg", scope = null))
+        }
+        val step2LoginResponse = LoginResponse(
+            token = "scoped_token_step2",
+            protected_encryption_key = null,
+            devices = emptyList(),
+            accessCredentials = accessCredentialsInResponse,
+            keys = emptyList(),
+        )
+
+        val step7aResponse = step7aResult ?: Success(
+            LoginResponse(
+                token = "ddg_token_step7a",
+                protected_encryption_key = null,
+                devices = emptyList(),
+                accessCredentials = null,
+                keys = null,
+            ),
+        )
+
+        // Differentiate the two /sync/login calls by scope.
+        whenever(syncApi.login(eq(userId), any(), eq(deviceId), any(), any(), anyOrNull())).doAnswer { invocation ->
+            val scope = invocation.getArgument<String?>(5)
+            if (scope == "ai_chats") Success(step2LoginResponse) else step7aResponse
+        }
+
+        whenever(syncApi.createAccessCredential(anyString(), eq("ddg"), any())).thenReturn(Success(true))
+
+        return pastedCode
     }
 }
