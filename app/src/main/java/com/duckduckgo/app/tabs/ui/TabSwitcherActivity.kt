@@ -84,7 +84,6 @@ import com.duckduckgo.browser.api.ui.BrowserScreens.TabSwitcherScreenNoParams
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.menu.PopupMenu
-import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.common.ui.view.button.ButtonType
 import com.duckduckgo.common.ui.view.button.ButtonType.DESTRUCTIVE
 import com.duckduckgo.common.ui.view.button.ButtonType.GHOST
@@ -163,9 +162,6 @@ class TabSwitcherActivity :
 
     @Inject
     lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
-
-    @Inject
-    lateinit var appTheme: AppTheme
 
     private val viewModel: TabSwitcherViewModel by bindViewModel()
 
@@ -256,10 +252,10 @@ class TabSwitcherActivity :
 
         val edgeToEdgeEnabled = edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.BROWSER)
         if (edgeToEdgeEnabled) {
-            val barStyle = if (appTheme.isLightModeEnabled()) {
-                SystemBarStyle.light(Color.TRANSPARENT, Color.TRANSPARENT)
-            } else {
+            val barStyle = if (isDarkThemeEnabled()) {
                 SystemBarStyle.dark(Color.TRANSPARENT)
+            } else {
+                SystemBarStyle.light(Color.TRANSPARENT, Color.TRANSPARENT)
             }
             enableEdgeToEdge(statusBarStyle = barStyle, navigationBarStyle = barStyle)
         }
