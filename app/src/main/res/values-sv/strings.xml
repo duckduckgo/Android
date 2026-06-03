@@ -265,6 +265,7 @@
     <string name="singleTabFireDialogDeleteAll">Radera allt</string>
     <string name="singleTabFireDialogDeleteThisTab">Ta bort denna flik</string>
     <string name="singleTabFireDialogDeleteChat">Radera chatt</string>
+    <string name="singleTabFireDialogDeleteChats">Radera chattar</string>
     <string name="singleTabFireDialogTitleDuckAi">Radera den här chatten?</string>
     <string name="singleTabFireDialogSubtitleSiteData">Om du tar bort webbplatsdata kan du loggas ut från konton.</string>
     <string name="singleTabFireDialogSubtitleDownloads">Detta kommer att avbryta pågående nerladdningar.</string>
@@ -1023,7 +1024,7 @@
     <string name="linkTextCopyFailed">Kunde inte kopiera länktext</string>
 
     <string name="preOnboardingWelcomeDialogTitle">Hej!</string>
-    <string name="preOnboardingWelcomeDialogBody1">Är du redo för en snabbare webbläsare som ger dig kontroll?</string>
+    <string name="preOnboardingWelcomeDialogBody1">Är du redo för en snabbare webbläsare\nsom ger dig kontroll?</string>
     <string name="preOnboardingWelcomeDialogBody2">AI är alltid valfritt och integritetsskydd är alltid på.</string>
     <string name="onboardingStepIndicatorText" instruction="a counter above our instructions in onboarding that tells a user what step they are on">%1$d av %2$d</string>
     <string name="onboardingSearchDaxDialogOption1Quoted" instruction="translate &apos;duck&apos; too.">vad heter ”anka” på engelska</string>

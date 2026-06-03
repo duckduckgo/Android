@@ -115,4 +115,52 @@
 
     <!-- Duck AI Voice Chat Shortcut Setting -->
     <string name="duckAiVoiceChatVisibilitySetting" instruction="Voice Chat is a feature that lets users talk to Duck.ai using their voice instead of typing.">Balss tērzēšana</string>
+
+    <!-- Duck AI Chat Suggestions -->
+    <string name="duckAiChatHistoryViewAllChats">Skatīt visas tērzēšanas sarunas</string>
+
+    <!-- Native Duck.ai chat history -->
+    <string name="duck_ai_chat_history_title">Tērzēšanas</string>
+    <string name="duck_ai_chat_history_section_pinned">Piesprausts</string>
+    <string name="duck_ai_chat_history_section_recent">Nesen</string>
+    <string name="duck_ai_chat_history_untitled">Tērzēšana bez nosaukuma</string>
+    <string name="duck_ai_chat_history_empty_title">Vēl nav nevienas tērzēšanas</string>
+    <string name="duck_ai_chat_history_empty_cta_open">Atvērt Duck.ai</string>
+    <string name="duck_ai_chat_history_more_options">Citas iespējas</string>
+    <string name="duck_ai_chat_history_action_select">Atlasīt</string>
+    <string name="duck_ai_chat_history_action_pin">Piespraust</string>
+    <string name="duck_ai_chat_history_action_unpin">Noņemt piespraudi</string>
+    <string name="duck_ai_chat_history_action_rename">Pārdēvēt</string>
+    <string name="duck_ai_chat_history_action_download">Lejupielādēt</string>
+    <string name="duck_ai_chat_history_action_delete">Dzēst</string>
+    <string name="duck_ai_chat_history_search_hint">Meklēt tērzēšanas</string>
+    <string name="duck_ai_chat_history_action_search_content_description">Meklēt tērzēšanas</string>
+    <string name="duck_ai_chat_history_search_close_content_description">Aizvērt meklēšanu</string>
+    <string name="duck_ai_chat_history_search_clear_content_description">Notīrīt meklēšanu</string>
+    <string name="duck_ai_chat_history_action_fire_content_description">Dzēst tērzēšanas</string>
+    <string name="duck_ai_chat_history_action_new">Jauns</string>
+    <string name="duck_ai_chat_history_action_download_selected_content_description">Lejupielādēt tērzēšanas</string>
+    <plurals name="duck_ai_chat_history_bulk_download_complete">
+        <item quantity="zero">Pabeigta %1$d tērzēšanu lejupielāde</item>
+        <item quantity="one">Pabeigta %1$d tērzēšanas lejupielāde</item>
+        <item quantity="other">Pabeigta %1$d tērzēšanu lejupielāde</item>
+    </plurals>
+    <string name="duck_ai_chat_history_action_overflow_content_description">Atvērt pārpildes izvēlni</string>
+    <string name="duck_ai_chat_history_select_all">Atlasīt visus</string>
+    <string name="duck_ai_chat_history_unselect_all">Noņemt visu atlasi</string>
+    <string name="duck_ai_chat_history_row_selected_content_description">Atlasīts</string>
+    <string name="duck_ai_chat_history_row_unselected_content_description">Nav atlasīts</string>
+    <string name="duck_ai_chat_history_exit_select_mode_content_description">Iziešana no atlases režīma</string>
+    <string name="duck_ai_chat_history_rename_title">Pārdēvēt tērzēšanu</string>
+    <string name="duck_ai_chat_history_rename_chat_title_hint">Tērzēšanas nosaukums</string>
+    <string name="duck_ai_chat_history_rename_confirm_title">Saglabāt</string>
+    <string name="duck_ai_chat_history_rename_confirm_content_description">Saglabāt tērzēšanas nosaukumu</string>
+    <string name="duck_ai_chat_history_rename_error">Nevarēja pārdēvēt tērzēšanu</string>
+    <string name="duck_ai_chat_history_pin_snackbar">Tērzēšana piesprausta</string>
+    <string name="duck_ai_chat_history_unpin_snackbar">Tērzēšanas piespraude noņemta</string>
+    <string name="duck_ai_chat_history_undo">Atsaukt</string>
+    <string name="duck_ai_chat_history_download_complete" instruction="%1$s is the saved chat filename (e.g. \&apos;My Chat.txt\&apos;).">%1$s lejupielāde pabeigta</string>
+    <string name="duck_ai_chat_history_download_view">Rādīt</string>
+    <string name="duck_ai_chat_history_download_error">Nevarēja eksportēt tērzēšanu</string>
+    <string name="duck_ai_chat_history_bulk_download_error">Neizdevās eksportēt tērzēšanas</string>
 </resources>

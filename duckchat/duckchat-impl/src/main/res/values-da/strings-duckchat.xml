@@ -115,4 +115,51 @@
 
     <!-- Duck AI Voice Chat Shortcut Setting -->
     <string name="duckAiVoiceChatVisibilitySetting" instruction="Voice Chat is a feature that lets users talk to Duck.ai using their voice instead of typing.">Stemmechat</string>
+
+    <!-- Duck AI Chat Suggestions -->
+    <string name="duckAiChatHistoryViewAllChats">Se alle chats</string>
+
+    <!-- Native Duck.ai chat history -->
+    <string name="duck_ai_chat_history_title">Chats</string>
+    <string name="duck_ai_chat_history_section_pinned">Fastgjort</string>
+    <string name="duck_ai_chat_history_section_recent">Seneste</string>
+    <string name="duck_ai_chat_history_untitled">Chat uden titel</string>
+    <string name="duck_ai_chat_history_empty_title">Ingen chats endnu</string>
+    <string name="duck_ai_chat_history_empty_cta_open">Åbn Duck.ai</string>
+    <string name="duck_ai_chat_history_more_options">Flere muligheder</string>
+    <string name="duck_ai_chat_history_action_select">Vælg</string>
+    <string name="duck_ai_chat_history_action_pin">Fastgør</string>
+    <string name="duck_ai_chat_history_action_unpin">Fjern fastgørelse</string>
+    <string name="duck_ai_chat_history_action_rename">Omdøb</string>
+    <string name="duck_ai_chat_history_action_download">Download</string>
+    <string name="duck_ai_chat_history_action_delete">Slet</string>
+    <string name="duck_ai_chat_history_search_hint">Søg i chats</string>
+    <string name="duck_ai_chat_history_action_search_content_description">Søg i chats</string>
+    <string name="duck_ai_chat_history_search_close_content_description">Luk søgning</string>
+    <string name="duck_ai_chat_history_search_clear_content_description">Ryd søgning</string>
+    <string name="duck_ai_chat_history_action_fire_content_description">Slettede chats</string>
+    <string name="duck_ai_chat_history_action_new">Ny</string>
+    <string name="duck_ai_chat_history_action_download_selected_content_description">Download chats</string>
+    <plurals name="duck_ai_chat_history_bulk_download_complete">
+        <item quantity="one">Download fuldført for %1$d chat</item>
+        <item quantity="other">Download fuldført for %1$d chats</item>
+    </plurals>
+    <string name="duck_ai_chat_history_action_overflow_content_description">Åbn overløbsmenuen</string>
+    <string name="duck_ai_chat_history_select_all">Vælg alle</string>
+    <string name="duck_ai_chat_history_unselect_all">Fravælg alle</string>
+    <string name="duck_ai_chat_history_row_selected_content_description">Valgt</string>
+    <string name="duck_ai_chat_history_row_unselected_content_description">Ikke valgt</string>
+    <string name="duck_ai_chat_history_exit_select_mode_content_description">Afslut valgtilstand</string>
+    <string name="duck_ai_chat_history_rename_title">Omdøb chatten</string>
+    <string name="duck_ai_chat_history_rename_chat_title_hint">Chattitel</string>
+    <string name="duck_ai_chat_history_rename_confirm_title">Gem</string>
+    <string name="duck_ai_chat_history_rename_confirm_content_description">Gem chattitel</string>
+    <string name="duck_ai_chat_history_rename_error">Kunne ikke omdøbe chat</string>
+    <string name="duck_ai_chat_history_pin_snackbar">Chat fastgjort</string>
+    <string name="duck_ai_chat_history_unpin_snackbar">Chat ikke fastgjort</string>
+    <string name="duck_ai_chat_history_undo">Fortryd</string>
+    <string name="duck_ai_chat_history_download_complete" instruction="%1$s is the saved chat filename (e.g. \&apos;My Chat.txt\&apos;).">Download fuldført for %1$s</string>
+    <string name="duck_ai_chat_history_download_view">Vis</string>
+    <string name="duck_ai_chat_history_download_error">Kunne ikke eksportere chat</string>
+    <string name="duck_ai_chat_history_bulk_download_error">Kunne ikke eksportere chats</string>
 </resources>
