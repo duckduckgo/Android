@@ -1574,6 +1574,9 @@
   var Uint16Array = globalThis.Uint16Array;
   var Uint32Array = globalThis.Uint32Array;
   var JSONparse = JSON.parse;
+  var atob = globalThis.atob?.bind(globalThis);
+  var DOMException2 = globalThis.DOMException;
+  var charCodeAt = globalThis.String.prototype.charCodeAt;
   var ReflectDeleteProperty = Reflect2.deleteProperty.bind(Reflect2);
   var ReflectApply = Reflect2.apply.bind(Reflect2);
   var getRandomValues = globalThis.crypto?.getRandomValues?.bind(globalThis.crypto);
@@ -2123,7 +2126,8 @@
       "hover",
       "browserUiLock",
       "trackerProtection",
-      "tabSuspension"
+      "tabSuspension",
+      "autofillPasskeys"
     ]
   );
   var platformSupport = {
@@ -2194,7 +2198,8 @@
       "pageContext",
       "duckAiDataClearing",
       "performanceMetrics",
-      "duckAiChatHistory"
+      "duckAiChatHistory",
+      "autofillPasskeys"
     ],
     firefox: ["cookie", ...baseFeatures, "clickToLoad", "webDetection", "webEvents", "webInterferenceDetection", "breakageReporting"],
     chrome: ["cookie", ...baseFeatures, "clickToLoad", "webDetection", "webEvents", "webInterferenceDetection", "breakageReporting"],
