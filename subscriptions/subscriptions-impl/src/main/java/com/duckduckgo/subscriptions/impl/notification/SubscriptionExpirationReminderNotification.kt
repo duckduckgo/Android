@@ -20,7 +20,6 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.core.app.NotificationManagerCompat
-import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.notification.model.Channel
 import com.duckduckgo.app.notification.model.NotificationSpec
 import com.duckduckgo.app.notification.model.SchedulableNotification
@@ -35,8 +34,6 @@ import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.subscriptions.impl.R
 import com.squareup.anvil.annotations.ContributesMultibinding
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -99,8 +96,6 @@ class SubscriptionExpirationReminderNotificationPlugin @Inject constructor(
     private val schedulableNotification: SubscriptionExpirationReminderNotification,
     private val globalActivityStarter: GlobalActivityStarter,
     private val pixel: Pixel,
-    @AppCoroutineScope private val coroutineScope: CoroutineScope,
-    private val dispatcherProvider: DispatcherProvider,
 ) : SchedulableNotificationPlugin {
 
     override fun getSchedulableNotification(): SchedulableNotification = schedulableNotification
@@ -116,10 +111,7 @@ class SubscriptionExpirationReminderNotificationPlugin @Inject constructor(
     private fun pixelName(notificationType: String) = "${notificationType}_${getSpecification().pixelSuffix}"
 
     override fun getSpecification(): NotificationSpec {
-        val deferred = coroutineScope.async(dispatcherProvider.io()) {
-            schedulableNotification.buildSpecification()
-        }
-        return runBlocking { deferred.await() }
+        return runBlocking { schedulableNotification.buildSpecification() }
     }
 
     override suspend fun getLaunchIntent(): Intent? {

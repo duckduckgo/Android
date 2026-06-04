@@ -561,14 +561,14 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
     }
 
     private fun computeUserSettings(id: String) {
-        val sdkAtLeastTiramisu = Build.VERSION.SDK_INT >= 33
+        val isAtLeastApi33 = Build.VERSION.SDK_INT >= 33
         viewModel.onUserSettingsComputed(
             id = id,
             notificationsEnabled = NotificationManagerCompat.from(this).areNotificationsEnabled(),
-            sdkAtLeastTiramisu = sdkAtLeastTiramisu,
-            runtimePermissionGranted = sdkAtLeastTiramisu &&
+            isAtLeastApi33 = isAtLeastApi33,
+            runtimePermissionGranted = isAtLeastApi33 &&
                 ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) == PERMISSION_GRANTED,
-            shouldShowRationale = sdkAtLeastTiramisu &&
+            shouldShowRationale = isAtLeastApi33 &&
                 ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.POST_NOTIFICATIONS),
         )
     }

@@ -199,13 +199,13 @@ class SubscriptionWebViewViewModel @Inject constructor(
     fun onUserSettingsComputed(
         id: String,
         notificationsEnabled: Boolean,
-        sdkAtLeastTiramisu: Boolean,
+        isAtLeastApi33: Boolean,
         runtimePermissionGranted: Boolean,
         shouldShowRationale: Boolean,
     ) {
         val status = when {
             notificationsEnabled -> NOTIFICATIONS_PERMISSION_GRANTED
-            !sdkAtLeastTiramisu -> NOTIFICATIONS_PERMISSION_DENIED
+            !isAtLeastApi33 -> NOTIFICATIONS_PERMISSION_DENIED
             runtimePermissionGranted -> NOTIFICATIONS_PERMISSION_DENIED
             shouldShowRationale -> NOTIFICATIONS_PERMISSION_NOT_DETERMINED
             else -> NOTIFICATIONS_PERMISSION_DENIED

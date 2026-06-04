@@ -210,6 +210,58 @@ class SubscriptionWebViewViewModelTest {
     }
 
     @Test
+    fun whenGetUserSettingsThenComputeUserSettingsCommandSent() = runTest {
+        viewModel.commands().test {
+            viewModel.processJsCallbackMessage("test", "getUserSettings", "msgId", JSONObject("{}"))
+            val result = awaitItem()
+            assertTrue(result is Command.ComputeUserSettings)
+            assertEquals("msgId", (result as Command.ComputeUserSettings).id)
+        }
+    }
+
+    @Test
+    fun whenOnUserSettingsComputedThenSendResponseToJsWithNotificationsPermission() = runTest {
+        viewModel.commands().test {
+            viewModel.onUserSettingsComputed(
+                id = "msgId",
+                notificationsEnabled = true,
+                isAtLeastApi33 = true,
+                runtimePermissionGranted = true,
+                shouldShowRationale = false,
+            )
+            val result = awaitItem()
+            assertTrue(result is Command.SendResponseToJs)
+            val response = (result as Command.SendResponseToJs).data
+            assertEquals("msgId", response.id)
+            assertEquals("getUserSettings", response.method)
+            assertEquals("granted", response.params.getString("notificationsPermission"))
+        }
+    }
+
+    @Test
+    fun whenRequestNotificationsPermissionThenRequestNotificationsPermissionCommandSent() = runTest {
+        viewModel.commands().test {
+            viewModel.processJsCallbackMessage("test", "requestNotificationsPermission", "msgId", JSONObject("{}"))
+            val result = awaitItem()
+            assertTrue(result is Command.RequestNotificationsPermission)
+            assertEquals("msgId", (result as Command.RequestNotificationsPermission).id)
+        }
+    }
+
+    @Test
+    fun whenOnNotificationsPermissionResultThenSendResponseToJsWithGranted() = runTest {
+        viewModel.commands().test {
+            viewModel.onNotificationsPermissionResult(id = "msgId", granted = true)
+            val result = awaitItem()
+            assertTrue(result is Command.SendResponseToJs)
+            val response = (result as Command.SendResponseToJs).data
+            assertEquals("msgId", response.id)
+            assertEquals("requestNotificationsPermission", response.method)
+            assertTrue(response.params.getBoolean("granted"))
+        }
+    }
+
+    @Test
     fun whenPurchaseSucceedsWithScheduleNotificationAndFlagEnabledThenSchedulerCalled() = runTest {
         subscriptionsFeature.subscriptionExpirationReminderNotification().setRawStoredState(Toggle.State(enable = true))
         val flowTest: MutableSharedFlow<CurrentPurchase> = MutableSharedFlow()
