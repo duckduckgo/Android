@@ -796,10 +796,13 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
             if (duckAiFeatureState.showFullScreenMode.value) {
                 val url = intent.getStringExtra(DUCK_CHAT_URL) ?: duckChat.getDuckChatUrl("", false)
+                // The tab to return to when this Duck.ai tab is closed.
+                // Fallback to the current tab if no explicit tab id is passed.
+                val sourceTabId = intent.getStringExtra(SOURCE_TAB_ID_EXTRA) ?: currentTab?.tabId
                 if (swipingTabsFeature.isEnabled) {
-                    launchNewTab(query = url, skipHome = true)
+                    launchNewTab(query = url, skipHome = true, sourceTabId = sourceTabId)
                 } else {
-                    lifecycleScope.launch { viewModel.onOpenInNewTabRequested(query = url, skipHome = true) }
+                    lifecycleScope.launch { viewModel.onOpenInNewTabRequested(query = url, sourceTabId = sourceTabId, skipHome = true) }
                 }
             } else {
                 val duckChatSessionActive = intent.getBooleanExtra(DUCK_CHAT_SESSION_ACTIVE, false)
