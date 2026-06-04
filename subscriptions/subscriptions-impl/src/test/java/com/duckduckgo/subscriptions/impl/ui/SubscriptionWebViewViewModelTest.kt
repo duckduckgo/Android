@@ -211,6 +211,8 @@ class SubscriptionWebViewViewModelTest {
 
     @Test
     fun whenGetUserSettingsThenComputeUserSettingsCommandSent() = runTest {
+        subscriptionsFeature.userSettingsMessaging().setRawStoredState(Toggle.State(enable = true))
+
         viewModel.commands().test {
             viewModel.processJsCallbackMessage("test", "getUserSettings", "msgId", JSONObject("{}"))
             val result = awaitItem()
@@ -240,6 +242,8 @@ class SubscriptionWebViewViewModelTest {
 
     @Test
     fun whenRequestNotificationsPermissionThenRequestNotificationsPermissionCommandSent() = runTest {
+        subscriptionsFeature.notificationsPermissionMessaging().setRawStoredState(Toggle.State(enable = true))
+
         viewModel.commands().test {
             viewModel.processJsCallbackMessage("test", "requestNotificationsPermission", "msgId", JSONObject("{}"))
             val result = awaitItem()
@@ -302,6 +306,7 @@ class SubscriptionWebViewViewModelTest {
 
     @Test
     fun whenPurchaseSucceedsWithScheduleNotificationAndFlagEnabledThenSchedulerCalled() = runTest {
+        subscriptionsFeature.userSettingsMessaging().setRawStoredState(Toggle.State(enable = true))
         subscriptionsFeature.subscriptionExpirationReminderNotification().setRawStoredState(Toggle.State(enable = true))
         val flowTest: MutableSharedFlow<CurrentPurchase> = MutableSharedFlow()
         whenever(subscriptionsManager.currentPurchaseState).thenReturn(flowTest)
@@ -320,6 +325,7 @@ class SubscriptionWebViewViewModelTest {
 
     @Test
     fun whenPurchaseSucceedsWithScheduleNotificationAndFlagDisabledThenSchedulerNotCalled() = runTest {
+        subscriptionsFeature.userSettingsMessaging().setRawStoredState(Toggle.State(enable = true))
         subscriptionsFeature.subscriptionExpirationReminderNotification().setRawStoredState(Toggle.State(enable = false))
         val flowTest: MutableSharedFlow<CurrentPurchase> = MutableSharedFlow()
         whenever(subscriptionsManager.currentPurchaseState).thenReturn(flowTest)
