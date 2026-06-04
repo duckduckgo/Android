@@ -64,16 +64,24 @@ class ChatHistoryViewModelTest {
     private val duckAiModelManager = FakeDuckAiModelManager()
     private val tabRepository: TabRepository = mock()
     private val pixel: Pixel = mock()
-    private val viewModel = ChatHistoryViewModel(
-        repository,
-        coroutineRule.testScope,
-        duckChat,
-        dataClearingTrigger,
-        duckAiFeatureState,
-        duckAiModelManager,
-        tabRepository,
-        pixel,
-    )
+
+    // Build the ViewModel lazily so it's created inside the test, not as a field. The rule that
+    // swaps in the test dispatcher runs after fields are initialized, so an eagerly-built ViewModel
+    // ends up running its coroutines on real background threads. That makes the init block's
+    // fetchModels() call race the test. Lazy construction happens after the rule, keeping everything
+    // on the test thread.
+    private val viewModel by lazy {
+        ChatHistoryViewModel(
+            repository,
+            coroutineRule.testScope,
+            duckChat,
+            dataClearingTrigger,
+            duckAiFeatureState,
+            duckAiModelManager,
+            tabRepository,
+            pixel,
+        )
+    }
 
     @Test
     fun `initial state is Loading`() = coroutineRule.testScope.runTest {
