@@ -291,6 +291,18 @@ interface SubscriptionsFeature {
     @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.TRUE)
     fun subscriptionExpirationReminderNotification(): Toggle
 
+    /**
+     * Kill switch for `getUserSettings` JS message
+     */
+    @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.TRUE)
+    fun userSettingsMessaging(): Toggle
+
+    /**
+     * Kill switch for the `requestNotificationsPermission` JS message
+     */
+    @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.TRUE)
+    fun notificationsPermissionMessaging(): Toggle
+
     @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.TRUE)
     fun handleExpiredStateWhenSubscriptionChangeSelected(): Toggle
 

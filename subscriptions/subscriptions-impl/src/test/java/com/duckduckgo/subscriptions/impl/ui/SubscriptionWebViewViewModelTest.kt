@@ -262,6 +262,45 @@ class SubscriptionWebViewViewModelTest {
     }
 
     @Test
+    fun whenMessagingFlagDisabledAndGetUserSettingsThenNoCommandEmitted() = runTest {
+        subscriptionsFeature.userSettingsMessaging().setRawStoredState(Toggle.State(enable = false))
+
+        viewModel.commands().test {
+            viewModel.processJsCallbackMessage("test", "getUserSettings", "msgId", JSONObject("{}"))
+            expectNoEvents()
+        }
+    }
+
+    @Test
+    fun whenMessagingFlagDisabledAndRequestNotificationsPermissionThenNoCommandEmitted() = runTest {
+        subscriptionsFeature.notificationsPermissionMessaging().setRawStoredState(Toggle.State(enable = false))
+
+        viewModel.commands().test {
+            viewModel.processJsCallbackMessage("test", "requestNotificationsPermission", "msgId", JSONObject("{}"))
+            expectNoEvents()
+        }
+    }
+
+    @Test
+    fun whenMessagingFlagDisabledAndSubscriptionSelectedHasScheduleNotificationThenSchedulerNotCalled() = runTest {
+        subscriptionsFeature.userSettingsMessaging().setRawStoredState(Toggle.State(enable = false))
+        subscriptionsFeature.subscriptionExpirationReminderNotification().setRawStoredState(Toggle.State(enable = true))
+        val flowTest: MutableSharedFlow<CurrentPurchase> = MutableSharedFlow()
+        whenever(subscriptionsManager.currentPurchaseState).thenReturn(flowTest)
+        viewModel.start()
+        viewModel.processJsCallbackMessage(
+            "test",
+            "subscriptionSelected",
+            "id",
+            JSONObject("""{"id":"myId","scheduleNotification":{"daysBeforeCancel":7}}"""),
+        )
+
+        flowTest.emit(CurrentPurchase.Success(isFreeTrial = false))
+
+        verify(subscriptionExpirationReminderScheduler, never()).scheduleReminderNotification(any())
+    }
+
+    @Test
     fun whenPurchaseSucceedsWithScheduleNotificationAndFlagEnabledThenSchedulerCalled() = runTest {
         subscriptionsFeature.subscriptionExpirationReminderNotification().setRawStoredState(Toggle.State(enable = true))
         val flowTest: MutableSharedFlow<CurrentPurchase> = MutableSharedFlow()

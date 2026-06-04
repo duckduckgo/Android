@@ -191,7 +191,8 @@ class SubscriptionWebViewViewModel @Inject constructor(
     }
 
     private fun getUserSettings(id: String) {
-        viewModelScope.launch {
+        viewModelScope.launch(dispatcherProvider.io()) {
+            if (!subscriptionsFeature.userSettingsMessaging().isEnabled()) return@launch
             command.send(ComputeUserSettings(id))
         }
     }
@@ -222,7 +223,8 @@ class SubscriptionWebViewViewModel @Inject constructor(
     }
 
     private fun requestNotificationsPermission(id: String) {
-        viewModelScope.launch {
+        viewModelScope.launch(dispatcherProvider.io()) {
+            if (!subscriptionsFeature.notificationsPermissionMessaging().isEnabled()) return@launch
             command.send(RequestNotificationsPermission(id))
         }
     }
@@ -319,9 +321,13 @@ class SubscriptionWebViewViewModel @Inject constructor(
             val offerId = runCatching { data?.getString("offerId") }.getOrNull()
             val experimentName = runCatching { data?.getJSONObject("experiment")?.getString("name") }.getOrNull()
             val experimentCohort = runCatching { data?.getJSONObject("experiment")?.getString("cohort") }.getOrNull()
-            pendingScheduleNotificationDaysBeforeCancel = runCatching {
-                data?.getJSONObject("scheduleNotification")?.getInt("daysBeforeCancel")
-            }.getOrNull()
+            pendingScheduleNotificationDaysBeforeCancel = if (subscriptionsFeature.userSettingsMessaging().isEnabled()) {
+                runCatching {
+                    data?.getJSONObject("scheduleNotification")?.getInt("daysBeforeCancel")
+                }.getOrNull()
+            } else {
+                null
+            }
             if (id.isNullOrBlank()) {
                 pixelSender.reportPurchaseFailureOther(SubscriptionFailureErrorType.INVALID_PRODUCT_ID.name)
                 _currentPurchaseViewState.emit(currentPurchaseViewState.value.copy(purchaseState = Failure))
