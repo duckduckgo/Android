@@ -1076,11 +1076,16 @@ class NativeInputModeWidget @JvmOverloads constructor(
         val previousOnChatSelected = this.onChatSelected
         this.onChatSelected = { animate ->
             previousOnChatSelected?.invoke(animate)
-            // Show the chat list adapter synchronously so async chat-history fetch doesn't leave a
-            // gap. On NTP the focusedView never covers the page (browserShowing=false), so the gap
+            // Show the chat list adapter synchronously so the async chat-history fetch doesn't leave
+            // a gap. On NTP the focusedView never covers the page (browserShowing=false), so the gap
             // exposes the NTP logo. The list's match_parent overlay background covers it even with
-            // zero items; real chat history populates when the WebView-backed fetch returns.
-            onShowSuggestions(ensureBinding().adapter)
+            // zero items; real chat history populates when the WebView-backed fetch returns. Only
+            // cover when there will be content to show (see [shouldShowChatSuggestionsCoverOnSelect]);
+            // covering an empty result and then clearing it produces a visible flash.
+            val recentChatsExpected = chatSuggestionsUserEnabled && viewModel.hadRecentChats()
+            if (shouldShowChatSuggestionsCoverOnSelect(inputText = text, recentChatsExpected = recentChatsExpected)) {
+                onShowSuggestions(ensureBinding().adapter)
+            }
             showSuggestions(text)
         }
 
@@ -1286,6 +1291,21 @@ internal fun NativeInputState.shouldShowToggleRowBack(): Boolean =
 
 internal fun NativeInputState.shouldShowCardRowBack(): Boolean =
     !toggleVisible && inputContext == NativeInputState.InputContext.BROWSER
+
+/**
+ * Whether to synchronously show the chat-suggestions list (an opaque overlay) when the Duck.ai tab is
+ * selected, to cover the NTP logo while the async chat-history fetch runs.
+ *
+ * Cover only when content will actually appear, otherwise the just-shown overlay is cleared ~200ms
+ * later when the fetch returns nothing — a visible flash of the list and of the NTP logo it briefly
+ * covered. Content appears when there is input text (the "Search for [query]" row at minimum), or
+ * when an empty query is expected to yield recent chats ([recentChatsExpected], cached from the
+ * previous empty-query fetch — see NativeInputModeWidgetViewModel.hadRecentChats).
+ */
+internal fun shouldShowChatSuggestionsCoverOnSelect(
+    inputText: String,
+    recentChatsExpected: Boolean,
+): Boolean = inputText.isNotEmpty() || recentChatsExpected
 
 /** Fire button placed inside the input field card at the leading edge — only in a fullscreen Duck.ai chat. */
 internal fun NativeInputState.shouldShowLeadingFireButton(): Boolean =
