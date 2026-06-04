@@ -69,8 +69,6 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
-import com.duckduckgo.duckchat.api.NewAddressBarOptionV2Prompt
-import com.duckduckgo.duckchat.api.NewAddressBarOptionV2Prompt.Command.ShowPicker
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
 import com.duckduckgo.newtabpage.api.NtpAfterIdleManager
@@ -113,7 +111,6 @@ class BrowserViewModel @Inject constructor(
     private val pixel: Pixel,
     private val skipUrlConversionOnNewTabFeature: SkipUrlConversionOnNewTabFeature,
     private val additionalDefaultBrowserPrompts: AdditionalDefaultBrowserPrompts,
-    private val newAddressBarOptionV2Prompt: NewAddressBarOptionV2Prompt,
     private val swipingTabsFeature: SwipingTabsFeatureProvider,
     private val duckAiFeatureState: DuckAiFeatureState,
     private val ntpAfterIdleManager: NtpAfterIdleManager,
@@ -165,7 +162,6 @@ class BrowserViewModel @Inject constructor(
         data class OpenInNewTab(val url: String) : Command()
         data class OpenSavedSite(val url: String) : Command()
         data object ShowSetAsDefaultBrowserDialog : Command()
-        data object ShowNewAddressBarOptionV2Picker : Command()
         data object DismissSetAsDefaultBrowserDialog : Command()
         data object DoNotAskAgainSetAsDefaultBrowserDialog : Command()
         data class ShowSystemDefaultBrowserDialog(val intent: Intent) : Command()
@@ -270,19 +266,6 @@ class BrowserViewModel @Inject constructor(
                     }
                 }
             }
-        }
-        viewModelScope.launch {
-            newAddressBarOptionV2Prompt.commands.collect {
-                when (it) {
-                    ShowPicker -> sendCommand(Command.ShowNewAddressBarOptionV2Picker)
-                }
-            }
-        }
-    }
-
-    fun onNewAddressBarOptionV2Confirmed(searchAndAiSelected: Boolean) {
-        viewModelScope.launch {
-            newAddressBarOptionV2Prompt.onConfirmed(searchAndAiSelected)
         }
     }
 

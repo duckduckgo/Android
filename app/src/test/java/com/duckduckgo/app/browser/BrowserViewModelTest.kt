@@ -45,7 +45,6 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.ui.tabs.SwipingTabsFeature
 import com.duckduckgo.common.ui.tabs.SwipingTabsFeatureProvider
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
-import com.duckduckgo.duckchat.api.NewAddressBarOptionV2Prompt
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.State
@@ -102,10 +101,6 @@ class BrowserViewModelTest {
 
     @Mock private lateinit var mockAdditionalDefaultBrowserPrompts: AdditionalDefaultBrowserPrompts
 
-    private val newAddressBarOptionV2PromptCommandsFlow = Channel<NewAddressBarOptionV2Prompt.Command>(capacity = Channel.CONFLATED)
-
-    @Mock private lateinit var mockNewAddressBarOptionV2Prompt: NewAddressBarOptionV2Prompt
-
     @Mock private lateinit var mockDuckAIFeatureState: DuckAiFeatureState
     private val mockDuckAiFullScreenMode = MutableStateFlow(false)
 
@@ -142,7 +137,6 @@ class BrowserViewModelTest {
         swipingTabsFeature.enabledForUsers().setRawStoredState(State(enable = true))
 
         whenever(mockAdditionalDefaultBrowserPrompts.commands).thenReturn(additionalDefaultBrowserPromptsCommandsFlow.receiveAsFlow())
-        whenever(mockNewAddressBarOptionV2Prompt.commands).thenReturn(newAddressBarOptionV2PromptCommandsFlow.receiveAsFlow())
 
         initTestee()
 
@@ -753,7 +747,6 @@ class BrowserViewModelTest {
             pixel = mockPixel,
             skipUrlConversionOnNewTabFeature = skipUrlConversionOnNewTabFeature,
             additionalDefaultBrowserPrompts = mockAdditionalDefaultBrowserPrompts,
-            newAddressBarOptionV2Prompt = mockNewAddressBarOptionV2Prompt,
             swipingTabsFeature = swipingTabsFeatureProvider,
             duckAiFeatureState = mockDuckAIFeatureState,
             ntpAfterIdleManager = mockNtpAfterIdleManager,
@@ -779,7 +772,6 @@ class BrowserViewModelTest {
             pixel = mockPixel,
             skipUrlConversionOnNewTabFeature = skipUrlConversionOnNewTabFeature,
             additionalDefaultBrowserPrompts = mockAdditionalDefaultBrowserPrompts,
-            newAddressBarOptionV2Prompt = mockNewAddressBarOptionV2Prompt,
             swipingTabsFeature = swipingTabsFeatureProvider,
             duckAiFeatureState = mockDuckAIFeatureState,
             ntpAfterIdleManager = mockNtpAfterIdleManager,

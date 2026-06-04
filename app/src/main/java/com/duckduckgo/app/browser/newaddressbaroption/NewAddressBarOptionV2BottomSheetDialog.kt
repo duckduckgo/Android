@@ -30,16 +30,12 @@ import android.view.View
 import androidx.core.content.ContextCompat.getString
 import androidx.core.view.isVisible
 import androidx.core.view.postDelayed
-import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.setViewTreeLifecycleOwner
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.BottomSheetNewAddressBarOptionV2Binding
 import com.duckduckgo.app.onboardingquicksetup.ui.BrandDesignInputScreenPicker.Transition
 import com.duckduckgo.common.ui.setRoundCorners
 import com.duckduckgo.common.ui.view.TypeAnimationTextView
 import com.duckduckgo.common.utils.extensions.html
-import com.duckduckgo.duckchat.impl.inputscreen.newaddressbaroption.NewAddressBarSelection.SEARCH_AND_AI
-import com.duckduckgo.duckchat.impl.inputscreen.newaddressbaroption.NewAddressBarSelection.SEARCH_ONLY
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 
@@ -67,12 +63,7 @@ class NewAddressBarOptionV2BottomSheetDialog(
 
         setCancelable(false)
 
-        // The reused picker + wing drive their Lottie on the view-tree lifecycle scope; a
-        // BottomSheetDialog content view has none by default, so borrow the host Activity's.
-        (context as? LifecycleOwner)?.let { binding.root.setViewTreeLifecycleOwner(it) }
-
         with(binding.inputScreen) {
-            inputScreenTitle.text = context.getString(R.string.preOnboardingInputScreenTitleUpdated)
             inputScreenDescription.text = context.getString(R.string.preOnboardingInputScreenDescription).html(context)
             with(inputScreenPicker) {
                 setLightMode(isLightMode)
@@ -93,8 +84,7 @@ class NewAddressBarOptionV2BottomSheetDialog(
         }
 
         binding.confirmButton.setOnClickListener {
-            val selection = if (searchAndDuckAiSelected) SEARCH_AND_AI else SEARCH_ONLY
-            callback?.onConfirmed(selection)
+            callback?.onConfirmed(searchAndDuckAiSelected)
             restoreOrientation()
             dismiss()
         }
@@ -102,17 +92,10 @@ class NewAddressBarOptionV2BottomSheetDialog(
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        // V2 is a content-height sheet (wraps content, scrim above) — not V1's full-height picker. The
-        // content view supplies the rounded onboarding background, so clear the container's opaque
-        // background to let the scrim (not grey surface) show through the rounded corners.
-        findViewById<View>(com.google.android.material.R.id.design_bottom_sheet)?.background = null
         lockOrientationToPortrait()
         this.behavior.state = BottomSheetBehavior.STATE_EXPANDED
     }
 
-    // Orchestrate the reveal like onboarding (BrandDesignUpdateWelcomePage): fade in the picker,
-    // description and Confirm together, then start the picker Lottie once they are visible — so the
-    // animations are staggered rather than competing at open.
     private fun revealContent() {
         binding.inputScreen.root.isVisible = true
         binding.inputScreen.inputScreenTitle.startOnboardingTypingAnimation(
@@ -193,7 +176,6 @@ class NewAddressBarOptionV2BottomSheetDialog(
     } ?: false
 
     private companion object {
-        // The wing Lottie reaches its fully-extended pose at the midpoint; stopping here keeps it visible.
         private const val WING_STOP_PROGRESS = 0.5f
         private const val WING_START_DELAY = 300L
         private const val WING_FADE_IN_DURATION = 150L

@@ -1168,12 +1168,25 @@ class RealDuckChatTest {
     @Test
     fun `when showAIChatAddressBarChoiceScreen enabled then showNewAddressBarOptionChoiceScreen emits true`() = runTest {
         duckChatFeature.showAIChatAddressBarChoiceScreen().setRawStoredState(State(enable = true))
+        duckChatFeature.showAIChatAddressBarChoiceScreenV2().setRawStoredState(State(enable = false))
         whenever(mockDuckChatFeatureRepository.isDuckChatUserEnabled()).thenReturn(true)
         whenever(mockDuckChatFeatureRepository.shouldShowInAddressBar()).thenReturn(true)
 
         testee.onPrivacyConfigDownloaded()
 
         assertTrue(testee.showNewAddressBarOptionChoiceScreen.value)
+    }
+
+    @Test
+    fun `when V2 picker enabled then showNewAddressBarOptionChoiceScreen emits false even if V1 enabled`() = runTest {
+        duckChatFeature.showAIChatAddressBarChoiceScreen().setRawStoredState(State(enable = true))
+        duckChatFeature.showAIChatAddressBarChoiceScreenV2().setRawStoredState(State(enable = true))
+        whenever(mockDuckChatFeatureRepository.isDuckChatUserEnabled()).thenReturn(true)
+        whenever(mockDuckChatFeatureRepository.shouldShowInAddressBar()).thenReturn(true)
+
+        testee.onPrivacyConfigDownloaded()
+
+        assertFalse(testee.showNewAddressBarOptionChoiceScreen.value)
     }
 
     @Test

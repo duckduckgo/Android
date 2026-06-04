@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.onboarding.ui
 
+import com.duckduckgo.app.browser.newaddressbaroption.NewAddressBarOptionV2DataStore
 import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.cta.model.DismissedCta
@@ -51,6 +52,7 @@ class FullOnboardingSkipper @Inject constructor(
     private val settingsDataStore: SettingsDataStore,
     private val dismissedCtaDao: DismissedCtaDao,
     private val userStageStore: UserStageStore,
+    private val newAddressBarOptionV2DataStore: NewAddressBarOptionV2DataStore,
 ) : OnboardingSkipper, PrivacyConfigCallbackPlugin {
 
     private val _privacyConfigDownloaded = MutableStateFlow(ViewState())
@@ -60,6 +62,7 @@ class FullOnboardingSkipper @Inject constructor(
     override suspend fun markOnboardingAsCompleted() {
         withContext(dispatchers.io()) {
             settingsDataStore.hideTips = true
+            newAddressBarOptionV2DataStore.setAsShown()
             dismissedCtaDao.insert(DismissedCta(CtaId.ADD_WIDGET))
             userStageStore.stageCompleted(AppStage.DAX_ONBOARDING)
         }

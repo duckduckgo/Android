@@ -44,7 +44,6 @@ dependencies {
     implementation project(':history-api')
     implementation project(':saved-sites-api')
     implementation project(':remote-messaging-api')
-    implementation project(':modal-coordinator-api')
     implementation project(':attributed-metrics-api')
     implementation project(':navigation-api')
     implementation project(':sync-api')
