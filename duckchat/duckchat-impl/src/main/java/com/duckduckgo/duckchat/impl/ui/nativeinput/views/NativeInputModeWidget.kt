@@ -397,11 +397,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
         chatStateJob = viewModel.chatState
             .drop(1)
             .onEach { state ->
-                // Streaming is driven from applyState (NativeInputState.isChatStreaming), not here:
-                // this flow drops its initial emission, so on a re-attach mid-stream it would never
-                // set isStreaming and the bottom row would desync from the state-driven plugin
-                // controls. observeChatState owns only the HIDE/SHOW/READY root-visibility
-                // transitions, which intentionally skip the replayed value via drop(1).
+                setChatStreaming(state == ChatState.STREAMING || state == ChatState.LOADING)
                 when (state) {
                     ChatState.HIDE -> {
                         isFocussed = hasInputFocus()
@@ -565,13 +561,6 @@ class NativeInputModeWidget @JvmOverloads constructor(
         val contextChanged = previousState?.inputContext != state.inputContext
         val positionChanged = previousState?.isBottom != state.isBottom
         nativeInputState = state
-        // NativeInputState is the single source of truth for streaming. Syncing isStreaming here
-        // (rather than only from observeChatState, which drops its initial emission) keeps the
-        // bottom row consistent with the state-driven plugin controls when the widget re-attaches
-        // while a chat is already streaming.
-        if (isStreaming != state.isChatStreaming) {
-            setChatStreaming(state.isChatStreaming)
-        }
         findViewById<TabLayout?>(R.id.inputModeSwitch)?.let { toggle ->
             setToggleMatchParent()
             updateToggleVisibility(toggle, state)
