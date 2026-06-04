@@ -35,7 +35,7 @@ appId: com.duckduckgo.mobile.android
 - runFlow: reload_duckai_if_needed.yaml
 
 # verify Duck.ai opened with the query submitted — the Duck.ai header replaces the
-# omnibar and the bottom input shows the chat placeholder
+# omnibar and, with a chat now active, the bottom input shows the reply hint
 - extendedWaitUntil:
     visible:
       id: "duckAIHeader"
@@ -43,4 +43,4 @@ appId: com.duckduckgo.mobile.android
 - assertVisible:
     id: "duckAIHeader"
 - assertVisible:
-    text: "Ask anything privately…"
+    text: "Reply…"
