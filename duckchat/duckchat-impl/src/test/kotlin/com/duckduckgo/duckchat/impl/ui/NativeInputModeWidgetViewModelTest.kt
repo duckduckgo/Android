@@ -490,6 +490,30 @@ class NativeInputModeWidgetViewModelTest {
     }
 
     @Test
+    fun `state isChatStreaming is true when chatState is STREAMING`() = runTest {
+        chatStateFlow.value = ChatState.STREAMING
+        assertTrue(testee.state.firstOrNull()!!.isChatStreaming)
+    }
+
+    @Test
+    fun `state isChatStreaming is true when chatState is LOADING`() = runTest {
+        chatStateFlow.value = ChatState.LOADING
+        assertTrue(testee.state.firstOrNull()!!.isChatStreaming)
+    }
+
+    @Test
+    fun `state isChatStreaming is false when chatState is READY`() = runTest {
+        chatStateFlow.value = ChatState.READY
+        assertFalse(testee.state.firstOrNull()!!.isChatStreaming)
+    }
+
+    @Test
+    fun `state isChatStreaming is false when chatState is HIDE`() = runTest {
+        chatStateFlow.value = ChatState.HIDE
+        assertFalse(testee.state.firstOrNull()!!.isChatStreaming)
+    }
+
+    @Test
     fun whenChatStateFlowEmitsThenViewModelChatStateMirrorsIt() = runTest {
         chatStateFlow.value = ChatState.STREAMING
 
@@ -938,20 +962,6 @@ class NativeInputModeWidgetViewModelTest {
         viewModel.storePendingPrompt("hello", "model-1", null, selectedTool = "GenerateImage")
 
         verify(pendingNativePromptStore).store("hello", "model-1", null, "GenerateImage", emptyList(), emptyList())
-    }
-
-    @Test
-    fun whenUpdatePluginContainerVisibilityThenSendsCommand() = runTest {
-        val plugin = fakePlugin(containerId = 99)
-        val viewModel = createViewModel(plugins = listOf(plugin))
-
-        viewModel.updatePluginContainerVisibility(isChatTab = true)
-
-        val command = viewModel.commands.firstOrNull()
-        assertTrue(command is NativeInputModeWidgetViewModel.Command.UpdatePluginVisibility)
-        val update = command as NativeInputModeWidgetViewModel.Command.UpdatePluginVisibility
-        assertEquals(listOf(99), update.containerIds)
-        assertTrue(update.visible)
     }
 
     private fun fakePlugin(containerId: Int): NativeInputPlugin {
