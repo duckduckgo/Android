@@ -33,19 +33,21 @@ It is required by the refreshVersions plugin at build time. If missing, the buil
 
 This is the most important rule when evaluating a library update.
 
-**The project currently uses Kotlin 1.9.24.** Many libraries have silently started publishing
-releases compiled with Kotlin 2.x. These cause a build failure at KSP/kapt time:
+**The project currently uses Kotlin 2.2.21** (`version.kotlin` in `versions.properties`;
+`languageVersion` is pinned to `KOTLIN_2_2` in the root `build.gradle`). Some libraries have
+started publishing releases compiled with a newer Kotlin (2.3.x). These cause a build failure
+at KSP time:
 
 ```
 Module was compiled with an incompatible version of Kotlin.
-The binary version of its metadata is 2.x.x, expected version is 1.9.0.
+The binary version of its metadata is 2.3.0, expected version is 2.2.0.
 ```
 
 ### What to do when a library requires a newer Kotlin version
 
 **Do not auto-revert.** Instead, **ask the engineer**:
 
-> "Library X update from A → B requires Kotlin 2.x (currently on 1.9.24).
+> "Library X update from A → B requires Kotlin 2.3.x (currently on 2.2.21).
 > Do you want to:
 > 1. Skip this update for now
 > 2. Include it as a separate task to upgrade Kotlin first"
@@ -53,16 +55,15 @@ The binary version of its metadata is 2.x.x, expected version is 1.9.0.
 The engineer may decide to batch multiple blocked libraries into a Kotlin upgrade task,
 or simply defer them. Either way, document the decision in the PR and Asana task.
 
-### Known libraries requiring Kotlin 2.x (as of March 2026)
+### Known libraries requiring a newer Kotlin (as of June 2026)
 
-| Library | Last safe version | First breaking version |
-|---|---|---|
-| `logcat` (Square) | 0.1 | 0.4 |
-| `com.frybits.harmony` | 1.2.6 | 1.2.7 |
-| `com.frybits.harmony-crypto` | 1.2.6 | 1.2.7 |
-| `app.cash.turbine` | 1.1.0 | 1.2.1 |
+| Library | Last safe version | First breaking version | Reason |
+|---|---|---|---|
+| `io.coil-kt.coil3` | 3.3.0 | 3.4.0 | requires Kotlin 2.3.x |
 
 These libraries look like safe minor/patch bumps but are not — always check Kotlin metadata.
+When a `versions.properties` entry carries a `# Cannot update … because it requires Kotlin …`
+comment, treat that as the current source of truth for the blocker.
 
 ---
 
@@ -74,10 +75,10 @@ These libraries look like safe minor/patch bumps but are not — always check Ko
 
 ### Needs Kotlin version check
 - Any Kotlin-first library (Square, Cash App, JetBrains, etc.)
-- Check if the JAR contains `.kotlin_module` files compiled with Kotlin 2.x metadata
+- Check if the JAR contains `.kotlin_module` files compiled with a Kotlin newer than 2.2.x (i.e. 2.3.x metadata)
 
 ### Defer — requires dedicated migration
-- Kotlin itself (1.9.x → 2.x)
+- Kotlin itself (2.2.x → 2.3.x)
 - AGP (Android Gradle Plugin)
 - Room
 - Dagger / Anvil
