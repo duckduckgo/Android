@@ -230,6 +230,30 @@ class RealDuckChatTest {
     }
 
     @Test
+    fun whenFeatureEnabledAndUserDisabledThenShowFullScreenModeIsTrue() = runTest {
+        duckChatFeature.self().setRawStoredState(State(true))
+        duckChatFeature.fullscreenMode().setRawStoredState(State(true))
+        whenever(mockDuckChatFeatureRepository.isDuckChatUserEnabled()).thenReturn(false)
+
+        testee.onPrivacyConfigDownloaded()
+        advanceUntilIdle()
+
+        assertTrue(testee.showFullScreenMode.value)
+    }
+
+    @Test
+    fun whenFeatureDisabledThenShowFullScreenModeIsFalse() = runTest {
+        duckChatFeature.self().setRawStoredState(State(false))
+        duckChatFeature.fullscreenMode().setRawStoredState(State(true))
+        whenever(mockDuckChatFeatureRepository.isDuckChatUserEnabled()).thenReturn(true)
+
+        testee.onPrivacyConfigDownloaded()
+        advanceUntilIdle()
+
+        assertFalse(testee.showFullScreenMode.value)
+    }
+
+    @Test
     fun whenObserveShowInBrowserMenuUserSettingThenEmitCorrectValues() = runTest {
         whenever(mockDuckChatFeatureRepository.observeShowInBrowserMenu()).thenReturn(flowOf(true, false))
 
