@@ -85,6 +85,7 @@ interface PirScanWideEvent {
 
     enum class CancellationReason(val value: String) {
         SUPERSEDED_BY_NEW_RUN("superseded_by_new_run"),
+        SUPERSEDED_BY_PROFILE_EDIT("superseded_by_profile_edit"),
         PROFILE_DELETED("profile_deleted"),
         FEATURE_DISABLED("feature_disabled"),
         SUBSCRIPTION_EXPIRED("subscription_expired"),
@@ -304,12 +305,17 @@ class PirScanWideEventImpl @Inject constructor(
                 // before the previous one finished, so it was superseded.
                 cachedFlowId?.let { staleId ->
                     closeOpenIntervalsLocked(staleId)
+                    val supersededReason = if (executionType == PirExecutionType.MANUAL_EDIT_PROFILE) {
+                        PirScanWideEvent.CancellationReason.SUPERSEDED_BY_PROFILE_EDIT
+                    } else {
+                        PirScanWideEvent.CancellationReason.SUPERSEDED_BY_NEW_RUN
+                    }
                     wideEventClient.flowFinish(
                         wideEventId = staleId,
                         status = FlowStatus.Cancelled,
                         metadata = mapOf(
                             KEY_LAST_STEP to lastStep,
-                            KEY_CANCELLATION_REASON to PirScanWideEvent.CancellationReason.SUPERSEDED_BY_NEW_RUN.value,
+                            KEY_CANCELLATION_REASON to supersededReason.value,
                         ),
                     )
                     clearStateLocked()

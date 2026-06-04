@@ -395,6 +395,30 @@ class PirScanWideEventTest {
     }
 
     @Test
+    fun whenManualFlowOpenAndProfileEditRunStartsThenStaleFlowFinishedWithSupersededByProfileEdit() = runTest {
+        // Given an open manual flow (the initial scan)
+        whenever(wideEventClient.flowStart(any(), any(), any(), any()))
+            .thenReturn(Result.success(101L))
+            .thenReturn(Result.success(201L))
+        runStarted(PirExecutionType.MANUAL_INITIAL, 1, 1, 1)
+
+        // When the user edits their profile, triggering a MANUAL_EDIT_PROFILE re-scan that supersedes it
+        runStarted(PirExecutionType.MANUAL_EDIT_PROFILE, 1, 1, 1)
+
+        // Then the stale flow is attributed specifically to the profile edit
+        val order = inOrder(wideEventClient)
+        order.verify(wideEventClient).intervalEnd(wideEventId = 101L, key = "decile_0_10_duration_ms_bucketed")
+        order.verify(wideEventClient).flowFinish(
+            wideEventId = 101L,
+            status = FlowStatus.Cancelled,
+            metadata = mapOf(
+                KEY_LAST_STEP to STEP_STARTED,
+                KEY_CANCELLATION_REASON to "superseded_by_profile_edit",
+            ),
+        )
+    }
+
+    @Test
     fun whenTenJobsCompleteOneAtATimeThenAllNineProgressStepsFire() = runTest {
         // Given
         whenever(wideEventClient.flowStart(any(), any(), any(), any())).thenReturn(Result.success(1L))
