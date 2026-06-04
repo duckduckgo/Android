@@ -30,11 +30,14 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.di.scopes.ServiceScope
 import com.duckduckgo.pir.impl.PirFeatureDataCleaner
 import com.duckduckgo.pir.impl.R
+import com.duckduckgo.pir.impl.checker.PirEligibility
 import com.duckduckgo.pir.impl.checker.PirWorkHandler
 import com.duckduckgo.pir.impl.notifications.PirNotificationManager
 import com.duckduckgo.pir.impl.pixels.PirPixelSender
 import com.duckduckgo.pir.impl.scheduling.PirExecutionType
 import com.duckduckgo.pir.impl.scheduling.PirJobsRunner
+import com.duckduckgo.pir.impl.wideevents.PirScanWideEvent
+import com.duckduckgo.pir.impl.wideevents.PirScanWideEvent.CancellationReason
 import dagger.android.AndroidInjection
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
@@ -62,6 +65,9 @@ class PirForegroundScanService : Service(), CoroutineScope by MainScope() {
     @Inject
     lateinit var pirPixelSender: PirPixelSender
 
+    @Inject
+    lateinit var pirScanWideEvent: PirScanWideEvent
+
     override fun onCreate() {
         super.onCreate()
         AndroidInjection.inject(this)
@@ -77,6 +83,8 @@ class PirForegroundScanService : Service(), CoroutineScope by MainScope() {
         startId: Int,
     ): Int {
         logcat { "PIR-SCAN: PIR service started on ${Process.myPid()} thread: ${Thread.currentThread().name}" }
+        val executionType = intent?.getStringExtra(EXTRA_EXECUTION_TYPE)?.let { PirExecutionType.valueOf(it) }
+            ?: PirExecutionType.MANUAL_INITIAL
         val notification: Notification = pirNotificationManager.createScanStatusNotification(
             title = getString(R.string.pirFeatureName),
             message = getString(R.string.pirNotificationMessageInProgress),
@@ -95,22 +103,26 @@ class PirForegroundScanService : Service(), CoroutineScope by MainScope() {
         } catch (_: Exception) {
             logcat(LogPriority.ERROR) { "PIR-SCAN: Could not start the service as foreground!" }
             pirPixelSender.reportManualScanStartFailed()
+            // Record a one-shot Cancelled wide event for the run that never started (no flow is open yet).
+            launch { pirScanWideEvent.onRunCancelledBeforeStart(executionType, CancellationReason.FOREGROUND_START_FAILED) }
             // If we can't start as a foreground service, there's no point in continuing.
             stopSelf()
             return START_NOT_STICKY
         }
 
         launch {
-            if (pirWorkHandler.canRunPir().firstOrNull() == false) {
+            val eligibility = pirWorkHandler.canRunPir().firstOrNull()
+            if (eligibility is PirEligibility.Disabled) {
                 logcat { "PIR-SCAN: PIR scan not allowed to run!" }
-                pirWorkHandler.cancelWork()
+                val reason = CancellationReason.fromDisabledReason(eligibility.reason)
+                // Record a one-shot Cancelled wide event for the run that never started.
+                pirScanWideEvent.onRunCancelledBeforeStart(executionType, reason)
+                pirWorkHandler.cancelWork(reason)
                 pirFeatureDataCleaner.removeAllData()
                 stopSelf()
                 return@launch
             }
 
-            val executionType = intent?.getStringExtra(EXTRA_EXECUTION_TYPE)?.let { PirExecutionType.valueOf(it) }
-                ?: PirExecutionType.MANUAL_INITIAL
             val result = pirJobsRunner.runEligibleJobs(this@PirForegroundScanService, executionType)
             if (result.isSuccess) {
                 pirNotificationManager.showScanStatusNotification(
