@@ -127,7 +127,7 @@ class SubscriptionPurchaseWideEventImpl @Inject constructor(
                 metadata = mapOf(
                     KEY_SUBSCRIPTION_IDENTIFIER to subscriptionIdentifier,
                     KEY_FREE_TRIAL_ELIGIBLE to freeTrialEligible.toString(),
-                    KEY_USE_QUERY_PURCHASES to subscriptionsFeature.get().useQueryPurchases().isEnabled().toString(),
+                    KEY_USE_QUERY_PURCHASES to subscriptionsFeature.isUseQueryPurchasesEnabled(dispatchers),
                 ),
                 cleanupPolicy = OnProcessStart(ignoreIfIntervalTimeoutPresent = true),
             )

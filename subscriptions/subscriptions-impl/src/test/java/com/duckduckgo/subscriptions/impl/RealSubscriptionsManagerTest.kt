@@ -327,7 +327,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
     }
 
     @Test
-    fun whenRefreshTokenWithUseQueryPurchasesAndNoActivePurchaseThenSignsOutWithoutInvalidRefreshTokenSignedOutPixel() = runTest {
+    fun whenRefreshTokenWithUseQueryPurchasesAndNoActivePurchaseThenSignsOut() = runTest {
         assumeTrue(authApiV2Enabled)
         givenUseQueryPurchasesEnabled()
         givenUserIsSignedIn()
@@ -343,7 +343,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
         assertNull(authRepository.getAccessTokenV2())
         assertNull(authRepository.getRefreshTokenV2())
         verify(pixelSender).reportAuthV2InvalidRefreshTokenDetected()
-        verify(pixelSender, never()).reportAuthV2InvalidRefreshTokenSignedOut()
+        verify(pixelSender).reportAuthV2InvalidRefreshTokenSignedOut()
         verify(pixelSender, never()).reportAuthV2InvalidRefreshTokenRecovered()
     }
 

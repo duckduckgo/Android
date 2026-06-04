@@ -117,7 +117,11 @@ class SubscriptionRestoreWideEventImpl @Inject constructor(
         }
     }
 
-    private suspend fun onRestoreFlowStarted(restorePlatform: String, purchaseAttempt: Boolean, flowEntryPoint: String?) {
+    private suspend fun onRestoreFlowStarted(
+        restorePlatform: String,
+        purchaseAttempt: Boolean,
+        flowEntryPoint: String?,
+    ) {
         getCurrentWideEventId()?.let { wideEventId ->
             wideEventClient.flowFinish(wideEventId = wideEventId, status = FlowStatus.Unknown)
             cachedFlowId = null
@@ -131,7 +135,7 @@ class SubscriptionRestoreWideEventImpl @Inject constructor(
                 metadata = mapOf(
                     KEY_RESTORE_PLATFORM to restorePlatform,
                     KEY_IS_PURCHASE_ATTEMPT to purchaseAttempt.toString(),
-                    KEY_USE_QUERY_PURCHASES to subscriptionsFeature.get().useQueryPurchases().isEnabled().toString(),
+                    KEY_USE_QUERY_PURCHASES to subscriptionsFeature.isUseQueryPurchasesEnabled(dispatchers),
                 ),
             )
             .getOrNull() ?: return

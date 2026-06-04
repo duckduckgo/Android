@@ -807,6 +807,7 @@ class RealSubscriptionsManager @Inject constructor(
                         StoreLoginResult.Failure.AccountExternalIdMismatch,
                         StoreLoginResult.Failure.PurchaseHistoryNotAvailable,
                         StoreLoginResult.Failure.AuthenticationError,
+                        StoreLoginResult.Failure.NoActivePurchase,
                         -> {
                             tokenRefreshWideEvent.onPlayLoginFailure(
                                 signedOut = true,
@@ -814,16 +815,6 @@ class RealSubscriptionsManager @Inject constructor(
                                 loginError = storeLoginResult.javaClass.simpleName,
                             )
                             pixelSender.reportAuthV2InvalidRefreshTokenSignedOut()
-                            signOut()
-                            throw e
-                        }
-
-                        StoreLoginResult.Failure.NoActivePurchase -> {
-                            tokenRefreshWideEvent.onPlayLoginFailure(
-                                signedOut = true,
-                                refreshException = e,
-                                loginError = storeLoginResult.javaClass.simpleName,
-                            )
                             signOut()
                             throw e
                         }
