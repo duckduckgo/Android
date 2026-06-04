@@ -112,7 +112,6 @@ interface NativeInputWidget {
     fun setVoiceChatAvailable(available: Boolean)
     fun submitMessage(message: String?)
     fun submitAsChat(): Boolean
-    fun setImageButtonVisible(visible: Boolean)
     fun setToggleVisible(visible: Boolean)
     fun setFloatingSubmitContainer(container: ViewGroup)
     fun getSelectedModelId(): String?
@@ -201,7 +200,6 @@ class NativeInputModeWidget @JvmOverloads constructor(
     private var tabCountLiveData: LiveData<Int>? = null
     private var tabCountObserver: Observer<Int>? = null
     private var submitButtons: InputScreenButtons? = null
-    private var streamingButtons: InputScreenButtons? = null
     private var floatingButtons: InputScreenButtons? = null
     private var floatingSubmitContainer: ViewGroup? = null
     private var chatStateJob: Job? = null
@@ -220,7 +218,6 @@ class NativeInputModeWidget @JvmOverloads constructor(
     private var isStreaming: Boolean = false
     private var attachmentLimitExceeded: Boolean = false
     private var hasAttachments: Boolean = false
-    private var supportsUpload: Boolean = true
     private var nativeInputState: NativeInputState? = null
     private var chatSuggestionsBinding: NativeInputChatSuggestionsBinder.Binding? = null
     private var onShowSuggestions: ((RecyclerView.Adapter<*>) -> Unit)? = null
@@ -333,20 +330,6 @@ class NativeInputModeWidget @JvmOverloads constructor(
                 }
             }
             launch {
-                viewModel.commands.collect { command ->
-                    when (command) {
-                        is NativeInputModeWidgetViewModel.Command.UpdatePluginVisibility -> {
-                            for (containerId in command.containerIds) {
-                                if (containerId == R.id.startChatContainer) continue
-                                findViewById<FrameLayout?>(containerId)?.isVisible = command.visible && !isStreaming
-                            }
-                            findViewById<FrameLayout?>(R.id.attachmentsContainer)?.isVisible =
-                                command.visible && hasAttachments && !isStreaming
-                        }
-                    }
-                }
-            }
-            launch {
                 viewModel.modelPickerEnabled.collect { enabled ->
                     modelPickerView?.setPickerEnabled(enabled)
                 }
@@ -360,7 +343,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
             attachmentView = pluginView
             pluginView.onCameraCaptureRequested = pendingCameraCaptureCallback
             pluginView.onFilePickerRequested = pendingFilePickerCallback
-            pluginView.bind(scope, viewModelFactory)
+            pluginView.bind(scope, viewModelFactory, nativeInputStateProvider)
         }
         (pluginView as? ModelPicker)?.let { picker ->
             picker.onMenuShown = { isModelMenuVisible = true }
@@ -399,7 +382,6 @@ class NativeInputModeWidget @JvmOverloads constructor(
         chatIdJob = null
         modelPickerView = null
         optionsView = null
-        streamingButtons = null
         widgetRoot = null
         tearDownChatSuggestions()
     }
@@ -490,20 +472,6 @@ class NativeInputModeWidget @JvmOverloads constructor(
             !isStreaming &&
             !suppress
         bottomRow.visibility = if (visible) VISIBLE else GONE
-    }
-
-    private fun updateControlsVisibility() {
-        val show = shouldShowInputControls(isChatTabSelected(), isStreaming)
-        // The model/reasoning pickers are additionally owned by OptionsView, which hides them for
-        // tools that don't use them (e.g. image generation). Respect that so restoring controls
-        // after streaming doesn't re-show pickers that should stay hidden.
-        val showPickers = show && (optionsView?.pickersEnabled ?: true)
-        findViewById<View?>(R.id.modelPickerContainer)?.isVisible = showPickers
-        findViewById<View?>(R.id.reasoningModePickerContainer)?.isVisible = showPickers
-        findViewById<View?>(R.id.optionsButtonContainer)?.isVisible = show
-        findViewById<View?>(R.id.attachmentsContainer)?.isVisible = show && hasAttachments
-        // attach button keeps its own supportsUpload gate; setImageButtonVisible folds in !isStreaming
-        setImageButtonVisible(isChatTabSelected() && supportsUpload)
     }
 
     private fun updateToggleVisibilityForState() {
@@ -708,14 +676,12 @@ class NativeInputModeWidget @JvmOverloads constructor(
                 override fun onTabSelected(tab: TabLayout.Tab) {
                     applyTabUi()
                     pushToggleSelectionIfUserDriven()
-                    viewModel.updatePluginContainerVisibility(isChatTabSelected())
                     refreshTabDependentButtons()
                 }
                 override fun onTabUnselected(tab: TabLayout.Tab) {}
                 override fun onTabReselected(tab: TabLayout.Tab) {
                     applyTabUi()
                     pushToggleSelectionIfUserDriven()
-                    viewModel.updatePluginContainerVisibility(isChatTabSelected())
                     refreshTabDependentButtons()
                 }
             },
@@ -1186,19 +1152,12 @@ class NativeInputModeWidget @JvmOverloads constructor(
     private fun setChatStreaming(streaming: Boolean) {
         isStreaming = streaming
         configureSubmitButtons()
-        val streamingContainer = findViewById<FrameLayout?>(R.id.streamingButtonsContainer)
-        if (streaming) {
-            streamingContainer?.visibility = VISIBLE
-            streamingButtons?.showStopButton()
-            streamingButtons?.setSendButtonVisible(true)
-        } else {
-            streamingContainer?.visibility = GONE
+        if (!streaming) {
             submitButtons?.showSendButton()
             applyTabUi()
             floatingSubmitContainer?.visibility = if (attachmentLimitExceeded) GONE else VISIBLE
         }
         updateBottomRowVisibility()
-        updateControlsVisibility()
         updateSendButtonVisibility()
         updateVoiceButtonVisibility()
         updateNewLineButtonVisibility()
@@ -1207,7 +1166,6 @@ class NativeInputModeWidget @JvmOverloads constructor(
     private fun applyTabUi() {
         val toggle = findViewById<TabLayout?>(R.id.inputModeSwitch) ?: return
         val isChatTab = toggle.selectedTabPosition == 1
-        setImageButtonVisible(isChatTab && supportsUpload)
         updateSendButtonIcon()
         if (isChatTab) {
             inputField.minLines = 1
@@ -1218,10 +1176,6 @@ class NativeInputModeWidget @JvmOverloads constructor(
         updateBottomRowVisibility()
     }
 
-    override fun setImageButtonVisible(visible: Boolean) {
-        findViewById<FrameLayout?>(R.id.attachButtonContainer)?.isVisible = visible && !isStreaming
-    }
-
     override fun setFloatingSubmitContainer(container: ViewGroup) {
         floatingSubmitContainer = container
     }
@@ -1230,6 +1184,10 @@ class NativeInputModeWidget @JvmOverloads constructor(
         // in Duck.ai mode we treat this as submitting prompts.
         // In non-Duck.ai mode we treat this as starting a chat with or without a prompt.
         if (!submitAsChat()) viewModel.openNewChat()
+    }
+
+    override fun stop() {
+        onStopTapped?.invoke()
     }
 
     override fun showAttachmentChooser(showing: Boolean) {
@@ -1244,8 +1202,6 @@ class NativeInputModeWidget @JvmOverloads constructor(
         val hadLimitError = attachmentLimitExceeded
         attachmentLimitExceeded = limitExceeded
         this.hasAttachments = hasAttachments
-        this.supportsUpload = supportsUpload
-        setImageButtonVisible(isChatTabSelected() && supportsUpload)
         if (hadLimitError != attachmentLimitExceeded && !isStreaming) {
             floatingSubmitContainer?.visibility = if (attachmentLimitExceeded) GONE else VISIBLE
         }
@@ -1281,23 +1237,6 @@ class NativeInputModeWidget @JvmOverloads constructor(
             }
             bottomContainer.addView(buttons)
             submitButtons = buttons
-        }
-
-        if (streamingButtons == null) {
-            val streamingContainer = findViewById<FrameLayout?>(R.id.streamingButtonsContainer)
-            if (streamingContainer != null) {
-                val buttons = InputScreenButtons(
-                    context = context,
-                    useTopBar = false,
-                    layoutResId = R.layout.view_native_input_screen_buttons,
-                ).apply {
-                    onStopClick = { this@NativeInputModeWidget.onStopTapped?.invoke() }
-                    setSendButtonVisible(false)
-                    setNewLineButtonVisible(false)
-                }
-                streamingContainer.addView(buttons)
-                streamingButtons = buttons
-            }
         }
 
         val floating = floatingSubmitContainer
@@ -1372,3 +1311,11 @@ internal fun shouldShowInputControls(
     onChatTab: Boolean,
     isStreaming: Boolean,
 ): Boolean = onChatTab && !isStreaming
+
+/**
+ * Plugin controls (model picker, reasoning picker, options, attach button) are shown only on
+ * the Duck.ai chat tab and only when no chat is streaming. Derived purely from [NativeInputState]
+ * so it is unit-testable without Robolectric.
+ */
+internal fun NativeInputState.shouldShowPluginControls(): Boolean =
+    toggleSelection == NativeInputState.ToggleSelection.DUCK_AI && !isChatStreaming

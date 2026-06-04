@@ -31,6 +31,9 @@ interface NativeInputHost {
     /** Submit the current input as a chat message; opens a new chat session if the input is empty. */
     fun submit()
 
+    /** Stop the active chat stream. Delegates to the host's [NativeInputWidget.onStopTapped] callback. */
+    fun stop()
+
     fun showAttachmentChooser(showing: Boolean)
     fun showModelPicker(showing: Boolean)
     fun showReasoningPicker(showing: Boolean)

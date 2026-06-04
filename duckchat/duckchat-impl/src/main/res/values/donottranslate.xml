@@ -41,6 +41,7 @@
 
     <!-- Start chat icon content description -->
     <string name="duckChatStartChatContentDescription">Start chat</string>
+    <string name="duckChatStopStreamingContentDescription">Stop generating</string>
 
     <!-- Image attachment -->
     <string name="duckChatImageAttachmentRemoveContentDescription">Remove image</string>
