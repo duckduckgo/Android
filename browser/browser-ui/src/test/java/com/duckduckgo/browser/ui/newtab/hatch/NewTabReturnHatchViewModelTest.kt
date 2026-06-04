@@ -540,4 +540,12 @@ class NewTabReturnHatchViewModelTest {
         verify(mockPixel).fire(NewTabReturnHatchPixelName.OPTION_SELECTED_AFTER_INACTIVITY, type = Count)
         verify(mockPixel).fire(NewTabReturnHatchPixelName.OPTION_SELECTED_AFTER_INACTIVITY_DAILY, type = Daily())
     }
+
+    @Test
+    fun whenOnTabManagerPressedThenFiresTabSwitcherCountAndDailyPixels() = runTest {
+        testee.onTabManagerPressed()
+
+        verify(mockPixel).fire(NewTabReturnHatchPixelName.OPTION_SELECTED_TAB_SWITCHER, type = Count)
+        verify(mockPixel).fire(NewTabReturnHatchPixelName.OPTION_SELECTED_TAB_SWITCHER_DAILY, type = Daily())
+    }
 }

@@ -88,7 +88,7 @@
             android:layout_height="48dp"
             android:scaleType="centerInside"
             android:contentDescription="@string/hatchMenuBurnTab"
-            android:src="@drawable/ic_fire_tabs_24"
+            android:src="@drawable/ic_fire_outline_24"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintEnd_toStartOf="@id/returnHatchOptions" />
