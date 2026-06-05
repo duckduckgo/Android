@@ -28,6 +28,7 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.common.ui.view.shape.DaxOnboardingBubbleBrandDesignUpdateCardView
 import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.common.utils.device.isTablet
+import kotlin.math.abs
 
 /**
  * Keeps the waving Dax below a new-tab bubble in sync with the space available: decides whether the
@@ -91,6 +92,15 @@ internal class WavingDaxController(
         return true
     }
 
+    /**
+     * Half the gap between a rotated view's axis-aligned bounding box and its true content size on one
+     * axis. A rotated Dax's bounding box gains empty triangular corners; subtracting this inset from each
+     * edge recovers the content box so [daxFits] tests the artwork rather than a corner that merely grazes
+     * the card (which otherwise hid the rotated subscription Dax in landscape). Zero for a non-rotated Dax.
+     */
+    internal fun rotationInset(boundingBoxExtent: Float, contentExtent: Float): Float =
+        ((boundingBoxExtent - contentExtent) / 2f).coerceAtLeast(0f)
+
     private fun decideFit(container: View) {
         if (computeDaxFits(container) == true) applyFitResult(container, true)
     }
@@ -105,13 +115,16 @@ internal class WavingDaxController(
         val daxRect = RectF()
         viewBoundsOnScreen(dax, daxRect)
 
+        val insetX = rotationInset(daxRect.width(), dax.width * abs(dax.scaleX))
+        val insetY = rotationInset(daxRect.height(), dax.height * abs(dax.scaleY))
+
         val cardLoc = IntArray(2)
         cardView.getLocationOnScreen(cardLoc)
 
         return daxFits(
-            daxTop = daxRect.top.toInt(),
-            daxLeft = daxRect.left.toInt(),
-            daxRight = daxRect.right.toInt(),
+            daxTop = (daxRect.top + insetY).toInt(),
+            daxLeft = (daxRect.left + insetX).toInt(),
+            daxRight = (daxRect.right - insetX).toInt(),
             cardBodyBottom = cardLoc[1] + finBounds.top.toInt(),
             finBottom = cardLoc[1] + finBounds.bottom.toInt(),
             finLeft = cardLoc[0] + finBounds.left.toInt(),
