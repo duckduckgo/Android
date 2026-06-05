@@ -126,16 +126,22 @@ class RealContentScopeScripts @Inject constructor(
         var preferences = ""
         val plugins = pluginPoint.getPlugins()
         plugins.forEach { plugin ->
-            if (config.isNotEmpty()) {
-                config += ","
+            plugin.config().let { pluginConfig ->
+                if (pluginConfig.isNotEmpty()) {
+                    if (config.isNotEmpty()) {
+                        config += ","
+                    }
+                    config += pluginConfig
+                }
             }
-            config += plugin.config()
 
             plugin.preferences()?.let { pluginPreferences ->
-                if (preferences.isNotEmpty()) {
-                    preferences += ","
+                if (pluginPreferences.isNotEmpty()) {
+                    if (preferences.isNotEmpty()) {
+                        preferences += ","
+                    }
+                    preferences += pluginPreferences
                 }
-                preferences += pluginPreferences
             }
         }
         return PluginParameters(config, preferences)
