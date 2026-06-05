@@ -16,43 +16,37 @@
 
 package com.duckduckgo.duckchat.store.impl.handler
 
+import com.duckduckgo.browsermode.api.BrowserMode
+import com.duckduckgo.browsermode.api.BrowserModeDataProvider
 import com.duckduckgo.contentscopescripts.api.ContentScopeJsMessageHandlersPlugin
-import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.api.DuckAiHostProvider
-import com.duckduckgo.duckchat.store.impl.DuckAiBridgeFilesDir
+import com.duckduckgo.duckchat.store.impl.DuckAiBridgeStorage
 import com.duckduckgo.duckchat.store.impl.DuckAiMigrationPrefs
 import com.duckduckgo.duckchat.store.impl.DuckAiNativeStoragePixels
 import com.duckduckgo.duckchat.store.impl.store.DuckAiBridgeChatEntity
-import com.duckduckgo.duckchat.store.impl.store.DuckAiBridgeChatsDao
-import com.duckduckgo.duckchat.store.impl.store.DuckAiBridgeFileMetaDao
 import com.duckduckgo.duckchat.store.impl.store.DuckAiBridgeFileMetaEntity
 import com.duckduckgo.duckchat.store.impl.store.DuckAiBridgeSettingEntity
-import com.duckduckgo.duckchat.store.impl.store.DuckAiBridgeSettingsDao
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.js.messaging.api.JsMessage
 import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessageHandler
 import com.duckduckgo.js.messaging.api.JsMessaging
 import com.squareup.anvil.annotations.ContributesMultibinding
-import dagger.Lazy
 import logcat.logcat
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.File
 import javax.inject.Inject
 
-@ContributesMultibinding(AppScope::class)
+@ContributesMultibinding(ActivityScope::class)
 class DuckAiNativeStorageJsMessageHandler @Inject constructor(
-    private val settingsDao: DuckAiBridgeSettingsDao,
-    private val chatsDao: DuckAiBridgeChatsDao,
-    private val fileMetaDao: DuckAiBridgeFileMetaDao,
-    @DuckAiBridgeFilesDir private val filesDirLazy: Lazy<File>,
+    private val storageProvider: BrowserModeDataProvider<DuckAiBridgeStorage>,
     private val duckAiHostProvider: DuckAiHostProvider,
     private val migrationPrefs: DuckAiMigrationPrefs,
     private val pixels: DuckAiNativeStoragePixels,
+    private val browserMode: BrowserMode,
 ) : ContentScopeJsMessageHandlersPlugin {
-
-    private val filesDir: File get() = filesDirLazy.get()
 
     override fun getJsMessageHandler(): JsMessageHandler =
         object : JsMessageHandler {
@@ -71,6 +65,14 @@ class DuckAiNativeStorageJsMessageHandler @Inject constructor(
 
             // Runs on the JavaBridge thread — DAO/file I/O are safe here.
             override fun process(jsMessage: JsMessage, jsMessaging: JsMessaging, jsMessageCallback: JsMessageCallback?) {
+                // The activity's browsing mode (injected, frozen for the activity's lifetime) selects which per-mode
+                // storage backend this message reads from / writes to.
+                val mode = browserMode
+                val storage = storageProvider.forMode(mode)
+                val settingsDao = storage.settings
+                val chatsDao = storage.chats
+                val fileMetaDao = storage.fileMeta
+                val filesDir = storage.filesDir
                 when (jsMessage.method) {
                     // --- Entries ---
                     "getEntry" -> {
@@ -326,17 +328,24 @@ class DuckAiNativeStorageJsMessageHandler @Inject constructor(
                     }
                     "markMigrationDone" -> {
                         val key = jsMessage.params.optString("key")
-                        if (key.isNotBlank()) {
-                            logcat { "DuckAiNativeStorage: markMigrationDone key=$key" }
-                            try {
-                                migrationPrefs.markMigrationDone(key)
-                                pixels.reportMigrationDone(key)
-                                pixels.reportMigrationStarted()
-                            } catch (e: Exception) {
-                                pixels.reportMigrationError()
+                        when {
+                            // Migration is a one-time, app-level event keyed off the shared migration flag. A Fire
+                            // session runs in a fresh, empty WebView profile, so letting it mark migration "done"
+                            // would flip the shared flag and strand un-migrated Regular chats. Suppress the write in
+                            // Fire mode — Regular still migrates on its first Regular session. isMigrationDone is left
+                            // un-guarded so a Fire FE still reads the real (shared) state.
+                            mode == BrowserMode.FIRE -> logcat { "DuckAiNativeStorage: markMigrationDone ignored in Fire mode" }
+                            key.isNotBlank() -> {
+                                logcat { "DuckAiNativeStorage: markMigrationDone key=$key" }
+                                try {
+                                    migrationPrefs.markMigrationDone(key)
+                                    pixels.reportMigrationDone(key)
+                                    pixels.reportMigrationStarted()
+                                } catch (e: Exception) {
+                                    pixels.reportMigrationError()
+                                }
                             }
-                        } else {
-                            pixels.reportMigrationDoneBlankKey()
+                            else -> pixels.reportMigrationDoneBlankKey()
                         }
                     }
 
@@ -345,7 +354,7 @@ class DuckAiNativeStorageJsMessageHandler @Inject constructor(
                         val uuid = jsMessage.params.optString("uuid")
                         logcat { "DuckAiNativeStorage: getFile $uuid" }
                         try {
-                            val json = if (isValidUuid(uuid)) {
+                            val json = if (isValidUuid(filesDir, uuid)) {
                                 val file = File(filesDir, uuid)
                                 if (file.exists()) file.readText() else null
                             } else {
@@ -379,7 +388,7 @@ class DuckAiNativeStorageJsMessageHandler @Inject constructor(
                     }
                     "putFile" -> {
                         val uuid = jsMessage.params.optString("uuid")
-                        if (isValidUuid(uuid)) {
+                        if (isValidUuid(filesDir, uuid)) {
                             val sizeBytes = jsMessage.params.toString().length
                             logcat { "DuckAiNativeStorage: putFile uuid=$uuid size=${sizeBytes}B" }
                             try {
@@ -401,7 +410,7 @@ class DuckAiNativeStorageJsMessageHandler @Inject constructor(
                     "deleteFile" -> {
                         val uuid = jsMessage.params.optString("uuid")
                         logcat { "DuckAiNativeStorage: deleteFile $uuid" }
-                        if (isValidUuid(uuid)) {
+                        if (isValidUuid(filesDir, uuid)) {
                             logcat { "DuckAiNativeStorage: deleteFile uuid=$uuid" }
                             try {
                                 File(filesDir, uuid).delete()
@@ -418,7 +427,7 @@ class DuckAiNativeStorageJsMessageHandler @Inject constructor(
                             logcat { "DuckAiNativeStorage: deleteFiles chatId=$chatId" }
                             try {
                                 fileMetaDao.getByChatId(chatId).forEach { meta ->
-                                    if (isValidUuid(meta.uuid)) File(filesDir, meta.uuid).delete()
+                                    if (isValidUuid(filesDir, meta.uuid)) File(filesDir, meta.uuid).delete()
                                 }
                                 fileMetaDao.deleteByChatId(chatId)
                             } catch (e: Exception) {
@@ -429,7 +438,7 @@ class DuckAiNativeStorageJsMessageHandler @Inject constructor(
                     "deleteAllFiles" -> {
                         logcat { "DuckAiNativeStorage: deleteAllFiles" }
                         try {
-                            filesDir.listFiles()?.filter { isValidUuid(it.name) }?.forEach { it.delete() }
+                            filesDir.listFiles()?.filter { isValidUuid(filesDir, it.name) }?.forEach { it.delete() }
                             fileMetaDao.deleteAll()
                         } catch (e: Exception) {
                             pixels.reportFileDeleteError()
@@ -477,7 +486,7 @@ class DuckAiNativeStorageJsMessageHandler @Inject constructor(
             }
         }
 
-    private fun isValidUuid(uuid: String): Boolean {
+    private fun isValidUuid(filesDir: File, uuid: String): Boolean {
         if (uuid.contains('/') || uuid.contains('\\') || uuid.contains("..")) return false
         val candidate = File(filesDir, uuid).canonicalFile
         return candidate.parentFile?.canonicalFile == filesDir.canonicalFile
