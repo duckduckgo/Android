@@ -202,6 +202,8 @@ class RealNativeInputOmnibarController(
         restoreBottomOmnibarPosition()
         if (omnibar.omnibarType == OmnibarType.SPLIT) {
             rootView.findViewById<View?>(R.id.navigationBar)?.show()
+        } else {
+            rootView.findViewById<View?>(R.id.bottomBrowserOutlineStroke)?.show()
         }
         omnibar.isScrollingEnabled = true
     }
