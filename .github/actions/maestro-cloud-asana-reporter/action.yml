@@ -20,7 +20,7 @@ inputs:
   maestro_api_level:
     description: 'Android API level'
     required: false
-    default: '34'
+    default: '36'
   maestro_include_tags:
     description: 'Maestro tags to include'
     required: true

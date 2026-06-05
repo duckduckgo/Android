@@ -84,7 +84,7 @@ jobs:
           maestro_test_name: binary_internal_upload${{ env.DI_UNDERSCORE_SUFFIX }}_${{ github.sha }}
           maestro_timeout: ${{ vars.ROBIN_TIMEOUT_MINUTES }}
           maestro_app_file: ${{ steps.assemble.outputs.internal_apk_path }}
-          maestro_api_level: 30
+          maestro_api_level: 36
           maestro_include_tags: binaryUpload
           asana_pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
           asana_project_id: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
@@ -102,7 +102,7 @@ jobs:
           maestro_test_name: binary_release_upload${{ env.DI_UNDERSCORE_SUFFIX }}_${{ github.sha }}
           maestro_timeout: ${{ vars.ROBIN_TIMEOUT_MINUTES }}
           maestro_app_file: ${{ steps.assemble.outputs.play_apk_path }}
-          maestro_api_level: 30
+          maestro_api_level: 36
           maestro_include_tags: binaryUpload
           asana_pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
           asana_project_id: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
@@ -120,7 +120,7 @@ jobs:
           maestro_test_name: customTabs${{ env.DI_UNDERSCORE_SUFFIX }}_${{ github.sha }}
           maestro_timeout: ${{ vars.ROBIN_TIMEOUT_MINUTES }}
           maestro_app_binary_id: ${{ steps.maestro-upload-internal-binary.outputs.maestro_app_binary_id }}
-          maestro_api_level: 30
+          maestro_api_level: 36
           maestro_include_tags: customTabsTest
           asana_pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
           asana_project_id: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
@@ -142,7 +142,7 @@ jobs:
           maestro_test_name: internalPrivacyTest${{ env.DI_UNDERSCORE_SUFFIX }}_${{ github.sha }}
           maestro_timeout: ${{ vars.ROBIN_TIMEOUT_MINUTES }}
           maestro_app_binary_id: ${{ steps.maestro-upload-internal-binary.outputs.maestro_app_binary_id }}
-          maestro_api_level: 34
+          maestro_api_level: 36
           maestro_include_tags: privacyTestInternal
           asana_pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
           asana_project_id: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
@@ -164,7 +164,7 @@ jobs:
           maestro_test_name: onboardingTest${{ env.DI_UNDERSCORE_SUFFIX }}_${{ github.sha }}
           maestro_timeout: ${{ vars.ROBIN_TIMEOUT_MINUTES }}
           maestro_app_binary_id: ${{ steps.maestro-upload-release-binary.outputs.maestro_app_binary_id }}
-          maestro_api_level: 30
+          maestro_api_level: 36
           maestro_include_tags: onboardingTest
           asana_pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
           asana_project_id: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
@@ -186,7 +186,7 @@ jobs:
           maestro_test_name: navigationTest${{ env.DI_UNDERSCORE_SUFFIX }}_${{ github.sha }}
           maestro_timeout: ${{ vars.ROBIN_TIMEOUT_MINUTES }}
           maestro_app_binary_id: ${{ steps.maestro-upload-release-binary.outputs.maestro_app_binary_id }}
-          maestro_api_level: 30
+          maestro_api_level: 36
           maestro_include_tags: navigationTest
           asana_pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
           asana_project_id: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
@@ -208,7 +208,7 @@ jobs:
           maestro_test_name: adClickTest${{ env.DI_UNDERSCORE_SUFFIX }}_${{ github.sha }}
           maestro_timeout: ${{ vars.ROBIN_TIMEOUT_MINUTES }}
           maestro_app_binary_id: ${{ steps.maestro-upload-release-binary.outputs.maestro_app_binary_id }}
-          maestro_api_level: 30
+          maestro_api_level: 36
           maestro_include_tags: adClickTest
           asana_pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
           asana_project_id: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
@@ -230,7 +230,7 @@ jobs:
           maestro_test_name: privacyTest${{ env.DI_UNDERSCORE_SUFFIX }}_${{ github.sha }}
           maestro_timeout: ${{ vars.ROBIN_TIMEOUT_MINUTES }}
           maestro_app_binary_id: ${{ steps.maestro-upload-release-binary.outputs.maestro_app_binary_id }}
-          maestro_api_level: 30
+          maestro_api_level: 36
           maestro_include_tags: privacyTest
           asana_pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
           asana_project_id: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
@@ -252,7 +252,7 @@ jobs:
           maestro_test_name: securityTest${{ env.DI_UNDERSCORE_SUFFIX }}_${{ github.sha }}
           maestro_timeout: ${{ vars.ROBIN_TIMEOUT_MINUTES }}
           maestro_app_binary_id: ${{ steps.maestro-upload-release-binary.outputs.maestro_app_binary_id }}
-          maestro_api_level: 30
+          maestro_api_level: 36
           maestro_include_tags: securityTest
           asana_pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
           asana_project_id: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
@@ -274,7 +274,7 @@ jobs:
           maestro_test_name: releaseTest${{ env.DI_UNDERSCORE_SUFFIX }}_${{ github.sha }}
           maestro_timeout: ${{ vars.ROBIN_TIMEOUT_MINUTES }}
           maestro_app_binary_id: ${{ steps.maestro-upload-release-binary.outputs.maestro_app_binary_id }}
-          maestro_api_level: 30
+          maestro_api_level: 36
           maestro_include_tags: releaseTest
           asana_pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
           asana_project_id: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
@@ -296,7 +296,7 @@ jobs:
           maestro_test_name: notificationPermissionTest${{ env.DI_UNDERSCORE_SUFFIX }}_${{ github.sha }}
           maestro_timeout: ${{ vars.ROBIN_TIMEOUT_MINUTES }}
           maestro_app_binary_id: ${{ steps.maestro-upload-release-binary.outputs.maestro_app_binary_id }}
-          maestro_api_level: 33
+          maestro_api_level: 36
           maestro_include_tags: permissionsTest
           asana_pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
           asana_project_id: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
