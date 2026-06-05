@@ -34,7 +34,7 @@ data class DaxEndBrandDesignUpdateBubbleCta(
     override val appInstallStore: AppInstallStore,
     override val isLightTheme: Boolean,
     override val deviceInfo: DeviceInfo,
-    override val onboardingImprovementsEnabled: Boolean = true,
+    override val onboardingImprovementsEnabled: Boolean,
 ) : DaxBubbleCta.BrandDesignUpdateBubbleCta(
     ctaId = CtaId.DAX_END,
     title = R.string.onboardingEndDaxDialogTitle,

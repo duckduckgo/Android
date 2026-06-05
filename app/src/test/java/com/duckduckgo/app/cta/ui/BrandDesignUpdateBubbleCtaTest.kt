@@ -77,6 +77,20 @@ class BrandDesignUpdateBubbleCtaTest {
     }
 
     @Test
+    fun applyWavingDaxState_notPhoneLandscape_playsDaxImmediately_whenImprovementsDisabled() {
+        configureContainerForPhonePortrait()
+        val cta = TestableBubbleCta(onboardingImprovementsEnabled = false)
+        val showsWavingDax: DaxBubbleCta.ShowsWavingDax = mock()
+
+        cta.applyWavingDaxState(container, showsWavingDax)
+
+        verify(showsWavingDax).configureWavingDax(dax, mockDeviceInfo)
+        verify(dax).progress = 0f
+        verify(dax).alpha = 1f
+        verify(dax).isVisible = true
+    }
+
+    @Test
     fun applyWavingDaxState_nullCtaOptIn_hidesDax_noOrientationLookup() {
         val cta = TestableBubbleCta()
 
@@ -171,6 +185,7 @@ class BrandDesignUpdateBubbleCtaTest {
             isLightTheme = true,
             deviceInfo = mockDeviceInfo,
             isFreeTrialCopy = false,
+            onboardingImprovementsEnabled = true,
         )
 
         cta.configureWavingDax(dax, mockDeviceInfo)
@@ -190,6 +205,7 @@ class BrandDesignUpdateBubbleCtaTest {
             appInstallStore = appInstallStore,
             isLightTheme = true,
             deviceInfo = mockDeviceInfo,
+            onboardingImprovementsEnabled = true,
         )
 
         cta.configureWavingDax(dax, mockDeviceInfo)
@@ -208,6 +224,7 @@ class BrandDesignUpdateBubbleCtaTest {
             isLightTheme = true,
             deviceInfo = mockDeviceInfo,
             isFreeTrialCopy = false,
+            onboardingImprovementsEnabled = true,
         )
 
         cta.configureWavingDax(dax, mockDeviceInfo)
@@ -231,7 +248,9 @@ class BrandDesignUpdateBubbleCtaTest {
         return lp
     }
 
-    private inner class TestableBubbleCta : DaxBubbleCta.BrandDesignUpdateBubbleCta(
+    private inner class TestableBubbleCta(
+        onboardingImprovementsEnabled: Boolean = true,
+    ) : DaxBubbleCta.BrandDesignUpdateBubbleCta(
         ctaId = CtaId.DAX_END,
         title = R.string.onboardingEndDaxDialogTitle,
         description = R.string.onboardingEndDaxDialogDescription,
@@ -242,6 +261,7 @@ class BrandDesignUpdateBubbleCtaTest {
         appInstallStore = this@BrandDesignUpdateBubbleCtaTest.appInstallStore,
         isLightTheme = true,
         deviceInfo = this@BrandDesignUpdateBubbleCtaTest.mockDeviceInfo,
+        onboardingImprovementsEnabled = onboardingImprovementsEnabled,
     ) {
         override val activeIncludeId: Int = R.id.primaryCta
         override val showArrow: Boolean = false

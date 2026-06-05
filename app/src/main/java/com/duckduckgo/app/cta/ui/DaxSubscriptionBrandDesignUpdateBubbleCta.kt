@@ -37,7 +37,7 @@ data class DaxSubscriptionBrandDesignUpdateBubbleCta(
     override val isLightTheme: Boolean,
     override val deviceInfo: DeviceInfo,
     val isFreeTrialCopy: Boolean,
-    override val onboardingImprovementsEnabled: Boolean = true,
+    override val onboardingImprovementsEnabled: Boolean,
 ) : DaxBubbleCta.BrandDesignUpdateBubbleCta(
     ctaId = CtaId.DAX_INTRO_PRIVACY_PRO,
     title = R.string.onboardingPrivacyProDaxDialogTitle,
