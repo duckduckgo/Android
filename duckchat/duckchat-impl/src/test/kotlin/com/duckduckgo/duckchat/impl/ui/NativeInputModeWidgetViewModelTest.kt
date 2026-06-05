@@ -1228,6 +1228,34 @@ class NativeInputModeWidgetViewModelTest {
         assertEquals("chat-123", nativeInputStateProvider.stateForTab("tab-A").value.chatId)
     }
 
+    @Test
+    fun whenSetActiveChatIdThenStateExposesChatId() = runTest {
+        val tabId = "tab-A"
+        testee.configure(tabId = tabId, isDuckAiMode = true, isBottom = false)
+        advanceUntilIdle()
+
+        assertNull(testee.state.first().chatId)
+
+        testee.setActiveChatId("chat-123")
+        advanceUntilIdle()
+
+        assertEquals("chat-123", testee.state.first { it.chatId != null }.chatId)
+    }
+
+    @Test
+    fun whenSetActiveChatIdWithNullThenStateClearsChatId() = runTest {
+        val tabId = "tab-A"
+        testee.configure(tabId = tabId, isDuckAiMode = true, isBottom = false)
+        testee.setActiveChatId("chat-123")
+        advanceUntilIdle()
+        assertEquals("chat-123", testee.state.first { it.chatId != null }.chatId)
+
+        testee.setActiveChatId(null)
+        advanceUntilIdle()
+
+        assertNull(testee.state.first().chatId)
+    }
+
     // endregion
 
     // region fireChatHistorySelectedPixel
