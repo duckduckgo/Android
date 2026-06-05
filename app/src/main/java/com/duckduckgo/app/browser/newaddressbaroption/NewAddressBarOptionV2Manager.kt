@@ -116,7 +116,8 @@ class RealNewAddressBarOptionV2Manager @Inject constructor(
             callback =
             object : NewAddressBarV2Callback {
                 override fun onDisplayed() {
-                    pixel.fire(AppPixelName.NEW_ADDRESS_BAR_PICKER_V2_DISPLAYED)
+                    pixel.fire(AppPixelName.NEW_ADDRESS_BAR_PICKER_V2_DISPLAYED_COUNT)
+                    pixel.fire(AppPixelName.NEW_ADDRESS_BAR_PICKER_V2_DISPLAYED_DAILY, type = Pixel.PixelType.Daily())
                 }
 
                 override fun onConfirmed(searchAndAiSelected: Boolean) {
@@ -125,11 +126,9 @@ class RealNewAddressBarOptionV2Manager @Inject constructor(
                             duckChat.setInputScreenUserSetting(true)
                         }
                     }
-                    val selectionParam = if (searchAndAiSelected) SELECTION_SEARCH_AND_AI else SELECTION_SEARCH_ONLY
-                    pixel.fire(
-                        AppPixelName.NEW_ADDRESS_BAR_PICKER_V2_CONFIRMED,
-                        parameters = mapOf(SELECTION_PARAM to selectionParam),
-                    )
+                    val params = mapOf(SELECTION_PARAM to if (searchAndAiSelected) SELECTION_SEARCH_AND_AI else SELECTION_SEARCH_ONLY)
+                    pixel.fire(AppPixelName.NEW_ADDRESS_BAR_PICKER_V2_CONFIRMED_COUNT, parameters = params)
+                    pixel.fire(AppPixelName.NEW_ADDRESS_BAR_PICKER_V2_CONFIRMED_DAILY, parameters = params, type = Pixel.PixelType.Daily())
                 }
             },
         ).show()

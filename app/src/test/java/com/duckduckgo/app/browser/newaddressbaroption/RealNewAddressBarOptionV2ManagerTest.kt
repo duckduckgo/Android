@@ -184,7 +184,8 @@ class RealNewAddressBarOptionV2ManagerTest {
 
             assertNotNull(capturedCallback)
             capturedCallback!!.onDisplayed()
-            verify(pixelMock).fire(AppPixelName.NEW_ADDRESS_BAR_PICKER_V2_DISPLAYED)
+            verify(pixelMock).fire(AppPixelName.NEW_ADDRESS_BAR_PICKER_V2_DISPLAYED_COUNT)
+            verify(pixelMock).fire(AppPixelName.NEW_ADDRESS_BAR_PICKER_V2_DISPLAYED_DAILY, type = Pixel.PixelType.Daily())
         }
 
     @Test
@@ -204,7 +205,12 @@ class RealNewAddressBarOptionV2ManagerTest {
             coroutineTestRule.testScope.advanceUntilIdle()
 
             verify(duckChatMock).setInputScreenUserSetting(true)
-            verify(pixelMock).fire(AppPixelName.NEW_ADDRESS_BAR_PICKER_V2_CONFIRMED, mapOf("selection" to "search_and_ai"))
+            verify(pixelMock).fire(AppPixelName.NEW_ADDRESS_BAR_PICKER_V2_CONFIRMED_COUNT, mapOf("selection" to "search_and_ai"))
+            verify(pixelMock).fire(
+                AppPixelName.NEW_ADDRESS_BAR_PICKER_V2_CONFIRMED_DAILY,
+                mapOf("selection" to "search_and_ai"),
+                type = Pixel.PixelType.Daily(),
+            )
         }
 
     @Test
@@ -224,7 +230,12 @@ class RealNewAddressBarOptionV2ManagerTest {
             coroutineTestRule.testScope.advanceUntilIdle()
 
             verify(duckChatMock, never()).setInputScreenUserSetting(any())
-            verify(pixelMock).fire(AppPixelName.NEW_ADDRESS_BAR_PICKER_V2_CONFIRMED, mapOf("selection" to "search_only"))
+            verify(pixelMock).fire(AppPixelName.NEW_ADDRESS_BAR_PICKER_V2_CONFIRMED_COUNT, mapOf("selection" to "search_only"))
+            verify(pixelMock).fire(
+                AppPixelName.NEW_ADDRESS_BAR_PICKER_V2_CONFIRMED_DAILY,
+                mapOf("selection" to "search_only"),
+                type = Pixel.PixelType.Daily(),
+            )
         }
 
     private suspend fun setupAllConditionsMet() {
