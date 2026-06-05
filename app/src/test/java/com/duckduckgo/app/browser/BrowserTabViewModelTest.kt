@@ -2462,6 +2462,26 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenBackToHomeWithActiveVoiceSessionThenEndsVoiceChatSession() {
+        setupNavigation(isBrowsing = true, canGoBack = false)
+        whenever(mockDuckChat.isVoiceChatSessionActive(any())).thenReturn(true)
+
+        testee.onUserPressedBack()
+
+        verify(mockDuckChat).endVoiceChatSession(any())
+    }
+
+    @Test
+    fun whenBackToHomeWithNoActiveVoiceSessionThenDoesNotEndVoiceChatSession() {
+        setupNavigation(isBrowsing = true, canGoBack = false)
+        whenever(mockDuckChat.isVoiceChatSessionActive(any())).thenReturn(false)
+
+        testee.onUserPressedBack()
+
+        verify(mockDuckChat, never()).endVoiceChatSession(any())
+    }
+
+    @Test
     fun whenHomeShowingByPressingBackOnInvalidatedBrowserThenForwardButtonInactive() {
         setupNavigation(isBrowsing = true)
         givenInvalidatedGlobalLayout()

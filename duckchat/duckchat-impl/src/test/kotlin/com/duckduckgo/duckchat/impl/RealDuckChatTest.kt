@@ -798,6 +798,13 @@ class RealDuckChatTest {
     }
 
     @Test
+    fun whenEndVoiceChatSessionThenTriggersVoiceSessionEndForTab() = runTest {
+        testee.endVoiceChatSession("tab-123")
+
+        verify(mockVoiceSessionStateManager).triggerVoiceSessionEnd("tab-123")
+    }
+
+    @Test
     fun whenSetEnableDuckChatUserSettingTrueThenRepositoryUpdated() = runTest {
         whenever(mockDuckChatFeatureRepository.isDuckChatUserEnabled()).thenReturn(true)
 
