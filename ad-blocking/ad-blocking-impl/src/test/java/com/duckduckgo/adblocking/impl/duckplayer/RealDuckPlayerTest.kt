@@ -140,6 +140,41 @@ class RealDuckPlayerTest {
 
     // endregion
 
+    // region observeDuckPlayerState
+
+    @Test
+    fun observeDuckPlayerState_emitsEnabledWhenFeatureEnabled() = runTest {
+        setFeatureToggle(true)
+
+        assertEquals(ENABLED, testee.observeDuckPlayerState().first())
+    }
+
+    @Test
+    fun observeDuckPlayerState_emitsDisabledWhenFeatureDisabled() = runTest {
+        setFeatureToggle(false)
+
+        assertEquals(DISABLED, testee.observeDuckPlayerState().first())
+    }
+
+    @Test
+    fun observeDuckPlayerState_emitsDisabledWithHelpLinkWhenDisabledAndHelpLinkPresent() = runTest {
+        whenever(mockDuckPlayerFeatureRepository.getDuckPlayerDisabledHelpPageLink()).thenReturn("help_link")
+        setFeatureToggle(false)
+
+        assertEquals(DISABLED_WIH_HELP_LINK, testee.observeDuckPlayerState().first())
+    }
+
+    @Test
+    fun observeDuckPlayerState_reflectsToggleChanges() = runTest {
+        setFeatureToggle(false)
+        assertEquals(DISABLED, testee.observeDuckPlayerState().first())
+
+        setFeatureToggle(true)
+        assertEquals(ENABLED, testee.observeDuckPlayerState().first())
+    }
+
+    // endregion
+
     // region setUserPreferences
     @Test
     fun whenOverlayInteracted_setUserPreferencesUpdatesOverlayInteracted() = runTest {

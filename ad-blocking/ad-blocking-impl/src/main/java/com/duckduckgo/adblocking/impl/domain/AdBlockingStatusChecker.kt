@@ -35,6 +35,12 @@ interface AdBlockingStatusChecker {
     fun canInject(): Boolean
     fun isShownInSettings(): Boolean
 
+    /**
+     * Emits whether the feature is shown in settings and re-emits when it changes
+     * (e.g. after a remote privacy config download).
+     */
+    fun isShownInSettingsFlow(): Flow<Boolean>
+
     fun isUserEnabledFlow(): Flow<Boolean>
 }
 
@@ -67,6 +73,8 @@ class RealAdBlockingStatusChecker @Inject constructor(
     }
 
     override fun isShownInSettings(): Boolean = feature.self().isEnabled()
+
+    override fun isShownInSettingsFlow(): Flow<Boolean> = feature.self().enabled()
 
     override fun isUserEnabledFlow(): Flow<Boolean> = userEnabled
 }

@@ -68,6 +68,7 @@ import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -84,6 +85,14 @@ private const val REFERER_HEADER = "referer"
 private const val EMBED_REFERER_VALUE = "http://android.mobile.duckduckgo.com"
 
 interface DuckPlayerInternal : DuckPlayer {
+    /**
+     * Emits the current [DuckPlayer.DuckPlayerState] and re-emits whenever it changes
+     * (e.g. after a remote privacy config download).
+     *
+     * @return a [Flow] of [DuckPlayer.DuckPlayerState].
+     */
+    fun observeDuckPlayerState(): Flow<DuckPlayerState>
+
     /**
      * Retrieves the YouTube embed URL.
      *
@@ -139,6 +148,20 @@ class RealDuckPlayer @Inject constructor(
             }
         }
     }
+
+    override fun observeDuckPlayerState(): Flow<DuckPlayerState> =
+        combine(
+            duckPlayerFeature.self().enabled(),
+            duckPlayerFeature.enableDuckPlayer().enabled(),
+        ) { selfEnabled, duckPlayerEnabled ->
+            if (selfEnabled && duckPlayerEnabled) {
+                ENABLED
+            } else if (duckPlayerFeatureRepository.getDuckPlayerDisabledHelpPageLink()?.isNotBlank() == true) {
+                DISABLED_WIH_HELP_LINK
+            } else {
+                DISABLED
+            }
+        }
 
     override suspend fun setUserPreferences(
         overlayInteracted: Boolean,

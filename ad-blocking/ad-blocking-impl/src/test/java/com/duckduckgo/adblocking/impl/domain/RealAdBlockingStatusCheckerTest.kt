@@ -42,8 +42,11 @@ class RealAdBlockingStatusCheckerTest {
     private var contingencyModeEnabled = false
     private var enabledByDefault = false
 
+    private val killSwitchEnabledFlow = MutableStateFlow(true)
+
     private val selfToggle: Toggle = mock {
         on { isEnabled() } doAnswer { killSwitchEnabled }
+        on { enabled() } doReturn killSwitchEnabledFlow
     }
     private val contingencyModeToggle: Toggle = mock {
         on { isEnabled() } doAnswer { contingencyModeEnabled }
@@ -150,5 +153,28 @@ class RealAdBlockingStatusCheckerTest {
         killSwitchEnabled = false
 
         assertFalse(checker.isShownInSettings())
+    }
+
+    @Test
+    fun whenKillSwitchEnabledThenIsShownInSettingsFlowEmitsTrue() = runTest {
+        killSwitchEnabledFlow.value = true
+
+        assertTrue(checker.isShownInSettingsFlow().first())
+    }
+
+    @Test
+    fun whenKillSwitchDisabledThenIsShownInSettingsFlowEmitsFalse() = runTest {
+        killSwitchEnabledFlow.value = false
+
+        assertFalse(checker.isShownInSettingsFlow().first())
+    }
+
+    @Test
+    fun whenKillSwitchFlowChangesThenIsShownInSettingsFlowReflectsIt() = runTest {
+        killSwitchEnabledFlow.value = true
+        assertTrue(checker.isShownInSettingsFlow().first())
+
+        killSwitchEnabledFlow.value = false
+        assertFalse(checker.isShownInSettingsFlow().first())
     }
 }
