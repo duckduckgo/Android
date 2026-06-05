@@ -267,7 +267,7 @@ class RealPirJobsRunner @Inject constructor(
             pirScanWideEvent.onRunFailed(executionType = executionType, reason = FailureReason.TIMEOUT_CANCELLATION_EXCEPTION)
             throw e
         } catch (e: CancellationException) {
-            pirScanWideEvent.onRunCancelled(executionType)
+            pirScanWideEvent.onRunCancelled(executionType, PirScanWideEvent.CancellationReason.WORK_STOPPED)
             throw e
         } catch (e: Exception) {
             pirScanWideEvent.onRunFailed(executionType = executionType, reason = FailureReason.fromException(e))

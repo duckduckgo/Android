@@ -26,6 +26,8 @@ import com.duckduckgo.pir.impl.optout.PirForegroundOptOutService
 import com.duckduckgo.pir.impl.scan.PirForegroundScanService
 import com.duckduckgo.pir.impl.scan.PirScanScheduler
 import com.duckduckgo.pir.impl.store.PirRepository
+import com.duckduckgo.pir.impl.wideevents.PirScanWideEvent
+import com.duckduckgo.pir.impl.wideevents.PirScanWideEvent.CancellationReason
 import com.duckduckgo.subscriptions.api.Product.PIR
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.api.Subscriptions
@@ -44,16 +46,21 @@ import javax.inject.Inject
  */
 interface PirWorkHandler {
     /**
-     * Checks if PIR can run based on remote features and subscription status.
+     * Checks if PIR can run based on remote features, subscription status, entitlement and
+     * repository availability.
      *
-     * @return Flow that emits true if PIR can run, false otherwise.
+     * @return Flow that emits [PirEligibility.Enabled] when PIR can run, or
+     * [PirEligibility.Disabled] (carrying the failing [DisabledReason]) otherwise.
      */
-    suspend fun canRunPir(): Flow<Boolean>
+    suspend fun canRunPir(): Flow<PirEligibility>
 
     /**
      * Cancels any ongoing PIR work, including foreground services and scheduled scans.
+     *
+     * @param reason why the work is being cancelled, used to attribute any in-flight scan run in
+     * the wide event.
      */
-    suspend fun cancelWork()
+    suspend fun cancelWork(reason: CancellationReason)
 }
 
 @SingleInstanceIn(AppScope::class)
@@ -69,9 +76,10 @@ class RealPirWorkHandler @Inject constructor(
     private val pirScanScheduler: PirScanScheduler,
     private val pirRepository: PirRepository,
     private val pirNotificationManager: PirNotificationManager,
+    private val pirScanWideEvent: PirScanWideEvent,
 ) : PirWorkHandler {
 
-    override suspend fun canRunPir(): Flow<Boolean> {
+    override suspend fun canRunPir(): Flow<PirEligibility> {
         return withContext(dispatcherProvider.io()) {
             if (pirRemoteFeatures.pirBeta().isEnabled()) {
                 // User could have a valid subscription but is not entitled to PIR,
@@ -85,15 +93,17 @@ class RealPirWorkHandler @Inject constructor(
                         }
                         .distinctUntilChanged(),
                 ) { subscriptionStatus, hasValidEntitlement ->
-                    isPirEnabled(hasValidEntitlement, subscriptionStatus) && pirRepository.isRepositoryAvailable()
+                    resolveEligibility(subscriptionStatus, hasValidEntitlement)
                 }
             } else {
-                flowOf(false)
+                flowOf(PirEligibility.Disabled(DisabledReason.FEATURE_DISABLED))
             }
         }
     }
 
-    override suspend fun cancelWork() {
+    override suspend fun cancelWork(reason: CancellationReason) {
+        // Finalize any in-flight wide-event run as Cancelled
+        pirScanWideEvent.onWorkCancelled(reason)
         // Stop any running foreground services
         context.stopService(Intent(context, PirForegroundScanService::class.java))
         context.stopService(Intent(context, PirForegroundOptOutService::class.java))
@@ -102,25 +112,28 @@ class RealPirWorkHandler @Inject constructor(
         pirNotificationManager.cancelNotifications()
     }
 
-    private fun isPirEnabled(
-        hasValidEntitlement: Boolean,
+    private suspend fun resolveEligibility(
         subscriptionStatus: SubscriptionStatus,
-    ): Boolean {
-        return when (subscriptionStatus) {
+        hasValidEntitlement: Boolean,
+    ): PirEligibility {
+        val subscriptionActive = when (subscriptionStatus) {
             SubscriptionStatus.UNKNOWN,
             SubscriptionStatus.INACTIVE,
             SubscriptionStatus.EXPIRED,
             SubscriptionStatus.WAITING,
-            -> {
-                false
-            }
+            -> false
 
             SubscriptionStatus.AUTO_RENEWABLE,
             SubscriptionStatus.NOT_AUTO_RENEWABLE,
             SubscriptionStatus.GRACE_PERIOD,
-            -> {
-                hasValidEntitlement
-            }
+            -> true
+        }
+
+        return when {
+            !subscriptionActive -> PirEligibility.Disabled(DisabledReason.SUBSCRIPTION_EXPIRED)
+            !hasValidEntitlement -> PirEligibility.Disabled(DisabledReason.ENTITLEMENT_LOST)
+            !pirRepository.isRepositoryAvailable() -> PirEligibility.Disabled(DisabledReason.REPOSITORY_UNAVAILABLE)
+            else -> PirEligibility.Enabled
         }
     }
 }
