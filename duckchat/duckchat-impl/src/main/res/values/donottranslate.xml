@@ -32,13 +32,6 @@
     <string name="duckChatReasoningModeExtendedTitle" translatable="false">Extended Reasoning</string>
     <string name="duckChatReasoningModeExtendedSubtitle" translatable="false">For analytical tasks</string>
 
-    <!-- Duck.ai voice microphone foreground service notification -->
-    <string name="duckAiVoiceNotificationTitle">Duck.ai Voice Chat Active</string>
-    <string name="duckAiVoiceNotificationMessage">Microphone is in use by Duck.ai</string>
-    <string name="duckAiVoiceNotificationChannelName">Duck.ai Voice Chat</string>
-    <string name="duckAiVoiceNotificationActionOpenChat">Open chat</string>
-    <string name="duckAiVoiceNotificationActionEndSession">End chat</string>
-
     <!-- Start chat icon content description -->
     <string name="duckChatStartChatContentDescription">Start chat</string>
     <string name="duckChatStopStreamingContentDescription">Stop generating</string>
