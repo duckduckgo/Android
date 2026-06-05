@@ -232,6 +232,10 @@ class PirScanWideEventImpl @Inject constructor(
     ) {
         if (!isFeatureEnabled()) return
 
+        // If a flow for this run is already open, finalize that one
+        if (stateFor(executionType).onRunCancelled(reason)) return
+
+        // No open flow: synthesize a one-shot Cancelled flow to record the never-started run.
         val flowId = wideEventClient.flowStart(
             name = wideEventNameFor(executionType),
             flowEntryPoint = entryPointFor(executionType),
@@ -480,7 +484,12 @@ class PirScanWideEventImpl @Inject constructor(
             }
         }
 
-        suspend fun onRunCancelled(reason: PirScanWideEvent.CancellationReason) {
+        /**
+         * Finishes the open flow (if any) as Cancelled with [reason]. Returns true if a flow was
+         * finalized, false if there was nothing open — letting callers avoid synthesizing a
+         * duplicate flow.
+         */
+        suspend fun onRunCancelled(reason: PirScanWideEvent.CancellationReason): Boolean =
             mutex.withLock {
                 // The flow may have been started in a different process (the :pir scan service) than
                 // the one handling the cancellation (the main process, for profile deletion or
@@ -489,7 +498,7 @@ class PirScanWideEventImpl @Inject constructor(
                 val ownFlowId = cachedFlowId
                 val flowId = ownFlowId
                     ?: wideEventClient.getFlowIds(wideEventName).getOrNull()?.lastOrNull()
-                    ?: return@withLock
+                    ?: return@withLock false
                 closeOpenIntervalsLocked(flowId)
                 wideEventClient.flowFinish(
                     wideEventId = flowId,
@@ -501,8 +510,8 @@ class PirScanWideEventImpl @Inject constructor(
                     },
                 )
                 clearStateLocked()
+                true
             }
-        }
 
         suspend fun onUserReset() {
             mutex.withLock {

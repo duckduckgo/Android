@@ -65,6 +65,7 @@ import org.mockito.kotlin.eq
 import org.mockito.kotlin.inOrder
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
@@ -784,6 +785,35 @@ class PirScanWideEventTest {
             metadata = mapOf(
                 KEY_LAST_STEP to STEP_STARTED,
                 KEY_CANCELLATION_REASON to "foreground_start_failed",
+            ),
+        )
+    }
+
+    @Test
+    fun whenRunCancelledBeforeStartAndManualFlowAlreadyOpenThenReusesItWithoutDoubleEmitting() = runTest {
+        // Reproduces the cause-4 sequence in PirForegroundScanService: a manual flow is still open
+        // when the service is blocked at start. onRunCancelledBeforeStart is followed by cancelWork
+        // (-> onWorkCancelled). The before-start hook must reuse the already-open flow instead of
+        // synthesizing a second one, otherwise the follow-on onWorkCancelled produces a duplicate
+        // cancelled wide event for a single user action.
+        whenever(wideEventClient.flowStart(any(), any(), any(), any()))
+            .thenReturn(Result.success(300L)) // onRunStarted
+            .thenReturn(Result.success(301L)) // any (unwanted) synthetic one-shot would get this id
+        runStarted(PirExecutionType.MANUAL_INITIAL, 1, 1, 0) // opens manual flow 300L
+
+        testee.onRunCancelledBeforeStart(PirExecutionType.MANUAL_INITIAL, CancellationReason.SUBSCRIPTION_EXPIRED)
+        testee.onWorkCancelled(CancellationReason.SUBSCRIPTION_EXPIRED)
+
+        // No synthetic one-shot was started (only the original onRunStarted flowStart)...
+        verify(wideEventClient, times(1)).flowStart(any(), any(), any(), any())
+        // ...and the run is finished as Cancelled exactly once, reusing the open flow.
+        verify(wideEventClient, times(1)).flowFinish(any(), eq(FlowStatus.Cancelled), any())
+        verify(wideEventClient).flowFinish(
+            wideEventId = 300L,
+            status = FlowStatus.Cancelled,
+            metadata = mapOf(
+                KEY_LAST_STEP to STEP_STARTED,
+                KEY_CANCELLATION_REASON to "subscription_expired",
             ),
         )
     }
