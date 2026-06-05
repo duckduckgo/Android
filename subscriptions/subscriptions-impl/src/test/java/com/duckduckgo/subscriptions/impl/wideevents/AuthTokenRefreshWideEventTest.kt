@@ -62,6 +62,29 @@ class AuthTokenRefreshWideEventTest {
         )
     }
 
+    @SuppressLint("DenyListedApi")
+    @Test
+    fun `onStart includes use_query_purchases true when feature flag enabled`() = runTest {
+        subscriptionsFeature.useQueryPurchases().setRawStoredState(Toggle.State(true))
+        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any()))
+            .thenReturn(Result.success(123L))
+
+        authWideEvent.onStart(SubscriptionStatus.UNKNOWN)
+
+        verify(wideEventClient).flowStart(
+            name = "auth-token-refresh",
+            flowEntryPoint = null,
+            metadata = mapOf(
+                "subscription_status" to SubscriptionStatus.UNKNOWN.statusName,
+                "netp_is_enabled" to "false",
+                "netp_is_running" to "false",
+                "process_name" to "main",
+                "use_query_purchases" to "true",
+            ),
+            cleanupPolicy = CleanupPolicy.OnProcessStart(ignoreIfIntervalTimeoutPresent = false),
+        )
+    }
+
     @Test
     fun `onStart starts a new flow and total interval`() = runTest {
         whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any()))
@@ -77,6 +100,7 @@ class AuthTokenRefreshWideEventTest {
                 "netp_is_enabled" to "false",
                 "netp_is_running" to "false",
                 "process_name" to "main",
+                "use_query_purchases" to "false",
             ),
             cleanupPolicy = CleanupPolicy.OnProcessStart(ignoreIfIntervalTimeoutPresent = false),
         )

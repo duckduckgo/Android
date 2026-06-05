@@ -451,6 +451,89 @@ class RealPlayBillingManagerTest {
             assertEquals(PurchaseState.Failure("BILLING_UNAVAILABLE"), awaitItem())
         }
     }
+
+    @Test
+    fun `getLatestPurchase returns Present when active subscription purchase exists`() = runTest {
+        val activePurchase = mock<Purchase> {
+            whenever(it.products).thenReturn(listOf(BASIC_SUBSCRIPTION))
+            whenever(it.purchaseState).thenReturn(Purchase.PurchaseState.PURCHASED)
+            whenever(it.purchaseTime).thenReturn(1000L)
+        }
+        billingClientAdapter.activePurchases = listOf(activePurchase)
+        processLifecycleOwner.currentState = RESUMED
+
+        val result = subject.getLatestPurchase()
+
+        assertEquals(LatestPurchaseResult.Present(activePurchase), result)
+    }
+
+    @Test
+    fun `getLatestPurchase returns the most recent active purchase when multiple exist`() = runTest {
+        val older = mock<Purchase> {
+            whenever(it.products).thenReturn(listOf(BASIC_SUBSCRIPTION))
+            whenever(it.purchaseState).thenReturn(Purchase.PurchaseState.PURCHASED)
+            whenever(it.purchaseTime).thenReturn(1000L)
+        }
+        val newer = mock<Purchase> {
+            whenever(it.products).thenReturn(listOf(BASIC_SUBSCRIPTION))
+            whenever(it.purchaseState).thenReturn(Purchase.PurchaseState.PURCHASED)
+            whenever(it.purchaseTime).thenReturn(2000L)
+        }
+        billingClientAdapter.activePurchases = listOf(older, newer)
+        processLifecycleOwner.currentState = RESUMED
+
+        val result = subject.getLatestPurchase()
+
+        assertEquals(LatestPurchaseResult.Present(newer), result)
+    }
+
+    @Test
+    fun `getLatestPurchase ignores purchases that are not in PURCHASED state`() = runTest {
+        val pendingPurchase = mock<Purchase> {
+            whenever(it.products).thenReturn(listOf(BASIC_SUBSCRIPTION))
+            whenever(it.purchaseState).thenReturn(Purchase.PurchaseState.PENDING)
+            whenever(it.purchaseTime).thenReturn(1000L)
+        }
+        billingClientAdapter.activePurchases = listOf(pendingPurchase)
+        processLifecycleOwner.currentState = RESUMED
+
+        val result = subject.getLatestPurchase()
+
+        assertEquals(LatestPurchaseResult.Absent, result)
+    }
+
+    @Test
+    fun `getLatestPurchase ignores purchases for unrelated products`() = runTest {
+        val otherProductPurchase = mock<Purchase> {
+            whenever(it.products).thenReturn(listOf("some.other.product"))
+            whenever(it.purchaseState).thenReturn(Purchase.PurchaseState.PURCHASED)
+            whenever(it.purchaseTime).thenReturn(1000L)
+        }
+        billingClientAdapter.activePurchases = listOf(otherProductPurchase)
+        processLifecycleOwner.currentState = RESUMED
+
+        val result = subject.getLatestPurchase()
+
+        assertEquals(LatestPurchaseResult.Absent, result)
+    }
+
+    @Test
+    fun `getLatestPurchase returns Absent when billing client confirms no active purchases`() = runTest {
+        billingClientAdapter.activePurchases = emptyList()
+        processLifecycleOwner.currentState = RESUMED
+
+        val result = subject.getLatestPurchase()
+
+        assertEquals(LatestPurchaseResult.Absent, result)
+    }
+
+    @Test
+    fun `getLatestPurchase returns Unknown when billing client is not ready`() = runTest {
+        // do not connect the billing client (no lifecycle transition to CREATED/RESUMED)
+        val result = subject.getLatestPurchase()
+
+        assertEquals(LatestPurchaseResult.Unknown, result)
+    }
 }
 
 class FakeBillingClientAdapter : BillingClientAdapter {

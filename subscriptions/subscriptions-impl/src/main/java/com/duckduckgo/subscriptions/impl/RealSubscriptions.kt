@@ -311,6 +311,9 @@ interface SubscriptionsFeature {
 
     @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.TRUE)
     fun schedulePaywallNotSeenPixels(): Toggle
+
+    @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.FALSE)
+    fun useQueryPurchases(): Toggle
 }
 
 @ContributesBinding(AppScope::class)
