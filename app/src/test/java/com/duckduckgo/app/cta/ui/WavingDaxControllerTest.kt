@@ -57,4 +57,17 @@ class WavingDaxControllerTest {
             controller.daxFits(daxTop = 140, daxLeft = 60, daxRight = 90, cardBodyBottom = 100, finBottom = 130, finLeft = 50, finRight = 100),
         )
     }
+
+    @Test
+    fun rotationInset_recoversContentEdges_forRotatedDax() {
+        // Subscription Dax repro: 360x400 content rotated 22.62° -> 486x507 bounding box. The vertical inset
+        // (53) lifts the tested top from the empty box corner (630) to the content (683), clearing the card.
+        assertEquals(53, controller.rotationInset(boundingBoxExtent = 507f, contentExtent = 400f).toInt())
+        assertEquals(63, controller.rotationInset(boundingBoxExtent = 486f, contentExtent = 360f).toInt())
+    }
+
+    @Test
+    fun rotationInset_isZero_whenNotRotated() {
+        assertEquals(0, controller.rotationInset(boundingBoxExtent = 400f, contentExtent = 400f).toInt())
+    }
 }
