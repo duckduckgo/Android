@@ -18,7 +18,7 @@ package com.duckduckgo.adblocking.impl.duckplayer
 
 import android.content.Context
 import android.util.AttributeSet
-import android.widget.FrameLayout
+import android.widget.LinearLayout
 import androidx.core.view.isGone
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.findViewTreeLifecycleOwner
@@ -45,7 +45,11 @@ class DuckPlayerSettingsEntryView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyle: Int = 0,
-) : FrameLayout(context, attrs, defStyle) {
+) : LinearLayout(context, attrs, defStyle) {
+
+    init {
+        orientation = VERTICAL
+    }
 
     @Inject
     lateinit var viewModelFactory: ViewViewModelFactory
