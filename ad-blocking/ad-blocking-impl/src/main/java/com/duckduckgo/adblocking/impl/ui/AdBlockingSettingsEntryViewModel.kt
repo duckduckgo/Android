@@ -24,6 +24,7 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.adblocking.impl.domain.AdBlockingStatusChecker
 import com.duckduckgo.adblocking.impl.ui.AdBlockingSettingsEntryViewModel.Command.OpenSettings
 import com.duckduckgo.anvil.annotations.ContributesViewModel
+import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ViewScope
 import kotlinx.coroutines.channels.BufferOverflow
@@ -58,13 +59,20 @@ class AdBlockingSettingsEntryViewModel @Inject constructor(
     private val _viewState = MutableStateFlow(ViewState())
     val viewState = _viewState.asStateFlow()
 
+    private val viewStateJob = ConflatedJob()
+
     override fun onStart(owner: LifecycleOwner) {
         super.onStart(owner)
 
-        statusChecker.isShownInSettingsFlow()
+        viewStateJob += statusChecker.isShownInSettingsFlow()
             .onEach { isShownInSettings -> _viewState.update { it.copy(isVisible = isShownInSettings) } }
             .flowOn(dispatcherProvider.io())
             .launchIn(viewModelScope)
+    }
+
+    override fun onStop(owner: LifecycleOwner) {
+        super.onStop(owner)
+        viewStateJob.cancel()
     }
 
     fun onSettingClicked() {

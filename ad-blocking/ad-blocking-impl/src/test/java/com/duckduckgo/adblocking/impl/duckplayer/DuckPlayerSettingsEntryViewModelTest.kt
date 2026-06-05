@@ -27,6 +27,7 @@ import com.duckduckgo.adblocking.impl.duckplayer.DuckPlayerSettingsEntryViewMode
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Count
 import com.duckduckgo.common.test.CoroutineTestRule
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertFalse
@@ -104,6 +105,23 @@ class DuckPlayerSettingsEntryViewModelTest {
         viewModel.viewState.test {
             assertFalse(awaitItem().isVisible)
         }
+    }
+
+    @Test
+    fun whenStoppedThenStopsObservingVisibilityChanges() = runTest {
+        val shownInSettings = MutableStateFlow(false)
+        whenever(duckPlayer.observeDuckPlayerState()).thenReturn(flowOf(ENABLED))
+        whenever(statusChecker.isShownInSettingsFlow()).thenReturn(shownInSettings)
+        val viewModel = createViewModel()
+
+        viewModel.onStart(lifecycleOwner)
+        assertTrue(viewModel.viewState.value.isVisible)
+
+        viewModel.onStop(lifecycleOwner)
+        shownInSettings.value = true
+
+        // collection was cancelled on stop, so the change is not observed
+        assertTrue(viewModel.viewState.value.isVisible)
     }
 
     @Test

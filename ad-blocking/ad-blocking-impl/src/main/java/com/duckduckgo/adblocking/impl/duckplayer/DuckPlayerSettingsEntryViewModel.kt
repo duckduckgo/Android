@@ -28,6 +28,7 @@ import com.duckduckgo.adblocking.impl.duckplayer.DuckPlayerPixelName.DUCK_PLAYER
 import com.duckduckgo.adblocking.impl.duckplayer.DuckPlayerSettingsEntryViewModel.Command.OpenSettings
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.extensions.toBinaryString
 import com.duckduckgo.di.scopes.ViewScope
@@ -65,10 +66,12 @@ class DuckPlayerSettingsEntryViewModel @Inject constructor(
     private val _viewState = MutableStateFlow(ViewState())
     val viewState = _viewState.asStateFlow()
 
+    private val viewStateJob = ConflatedJob()
+
     override fun onStart(owner: LifecycleOwner) {
         super.onStart(owner)
 
-        combine(
+        viewStateJob += combine(
             duckPlayer.observeDuckPlayerState(),
             statusChecker.isShownInSettingsFlow(),
         ) { duckPlayerState, adBlockingShownInSettings ->
@@ -78,6 +81,11 @@ class DuckPlayerSettingsEntryViewModel @Inject constructor(
         }
             .flowOn(dispatcherProvider.io())
             .launchIn(viewModelScope)
+    }
+
+    override fun onStop(owner: LifecycleOwner) {
+        super.onStop(owner)
+        viewStateJob.cancel()
     }
 
     fun onSettingClicked() {

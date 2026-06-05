@@ -21,6 +21,7 @@ import app.cash.turbine.test
 import com.duckduckgo.adblocking.impl.domain.AdBlockingStatusChecker
 import com.duckduckgo.adblocking.impl.ui.AdBlockingSettingsEntryViewModel.Command.OpenSettings
 import com.duckduckgo.common.test.CoroutineTestRule
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertFalse
@@ -65,6 +66,22 @@ class AdBlockingSettingsEntryViewModelTest {
         viewModel.viewState.test {
             assertFalse(awaitItem().isVisible)
         }
+    }
+
+    @Test
+    fun whenStoppedThenStopsObservingVisibilityChanges() = runTest {
+        val shownInSettings = MutableStateFlow(true)
+        whenever(statusChecker.isShownInSettingsFlow()).thenReturn(shownInSettings)
+        val viewModel = createViewModel()
+
+        viewModel.onStart(lifecycleOwner)
+        assertTrue(viewModel.viewState.value.isVisible)
+
+        viewModel.onStop(lifecycleOwner)
+        shownInSettings.value = false
+
+        // collection was cancelled on stop, so the change is not observed
+        assertTrue(viewModel.viewState.value.isVisible)
     }
 
     @Test
