@@ -17,6 +17,7 @@
 package com.duckduckgo.adblocking.impl.duckplayer
 
 import com.duckduckgo.adblocking.api.duckplayer.DuckPlayer.UserPreferences
+import com.duckduckgo.adblocking.api.duckplayer.PrivatePlayerMode
 import com.duckduckgo.adblocking.api.duckplayer.PrivatePlayerMode.AlwaysAsk
 import com.duckduckgo.adblocking.api.duckplayer.PrivatePlayerMode.Disabled
 import com.duckduckgo.adblocking.api.duckplayer.PrivatePlayerMode.Enabled
@@ -45,9 +46,9 @@ interface DuckPlayerFeatureRepository {
 
     fun setDuckPlayerRemoteConfigJson(jsonString: String)
 
-    fun getUserPreferences(): UserPreferences
+    fun getUserPreferences(defaultPlayerMode: PrivatePlayerMode): UserPreferences
 
-    fun observeUserPreferences(): Flow<UserPreferences>
+    fun observeUserPreferences(defaultPlayerMode: PrivatePlayerMode): Flow<UserPreferences>
 
     suspend fun setUserPreferences(userPreferences: UserPreferences)
 
@@ -116,7 +117,7 @@ class RealDuckPlayerFeatureRepository @Inject constructor(
         }
     }
 
-    override fun observeUserPreferences(): Flow<UserPreferences> {
+    override fun observeUserPreferences(defaultPlayerMode: PrivatePlayerMode): Flow<UserPreferences> {
         return duckPlayerDataStore.observePrivatePlayerMode()
             .combine(duckPlayerDataStore.observeOverlayInteracted()) { privatePlayerMode, overlayInteracted ->
                 UserPreferences(
@@ -124,19 +125,21 @@ class RealDuckPlayerFeatureRepository @Inject constructor(
                     privatePlayerMode = when (privatePlayerMode) {
                         Enabled.value -> Enabled
                         Disabled.value -> Disabled
-                        else -> AlwaysAsk
+                        AlwaysAsk.value -> AlwaysAsk
+                        else -> defaultPlayerMode
                     },
                 )
             }
     }
 
-    override fun getUserPreferences(): UserPreferences {
+    override fun getUserPreferences(defaultPlayerMode: PrivatePlayerMode): UserPreferences {
         return UserPreferences(
             overlayInteracted = duckPlayerDataStore.getOverlayInteracted(),
             privatePlayerMode = when (duckPlayerDataStore.getPrivatePlayerMode()) {
                 Enabled.value -> Enabled
                 Disabled.value -> Disabled
-                else -> AlwaysAsk
+                AlwaysAsk.value -> AlwaysAsk
+                else -> defaultPlayerMode
             },
         )
     }

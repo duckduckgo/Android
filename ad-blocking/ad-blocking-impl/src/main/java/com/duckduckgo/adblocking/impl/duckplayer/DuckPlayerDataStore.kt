@@ -56,9 +56,9 @@ interface DuckPlayerDataStore {
 
     suspend fun setOverlayInteracted(value: Boolean)
 
-    fun getPrivatePlayerMode(): String
+    fun getPrivatePlayerMode(): String?
 
-    fun observePrivatePlayerMode(): Flow<String>
+    fun observePrivatePlayerMode(): Flow<String?>
 
     suspend fun setPrivatePlayerMode(value: String)
 
@@ -142,9 +142,9 @@ class SharedPreferencesDuckPlayerDataStore @Inject constructor(
         .distinctUntilChanged()
         .stateIn(appCoroutineScope, SharingStarted.Eagerly, "{}")
 
-    private val privatePlayerMode: StateFlow<String> = store.data
+    private val privatePlayerMode: StateFlow<String?> = store.data
         .map { prefs ->
-            prefs[PRIVATE_PLAYER_MODE] ?: "ALWAYS_ASK"
+            prefs[PRIVATE_PLAYER_MODE]
         }
         .distinctUntilChanged()
         .stateIn(appCoroutineScope, SharingStarted.Eagerly, "ALWAYS_ASK")
@@ -232,11 +232,11 @@ class SharedPreferencesDuckPlayerDataStore @Inject constructor(
         store.edit { prefs -> prefs[OVERLAY_INTERACTED] = value }
     }
 
-    override fun getPrivatePlayerMode(): String {
+    override fun getPrivatePlayerMode(): String? {
         return privatePlayerMode.value
     }
 
-    override fun observePrivatePlayerMode(): Flow<String> {
+    override fun observePrivatePlayerMode(): Flow<String?> {
         return privatePlayerMode
     }
 

@@ -42,6 +42,7 @@ import com.duckduckgo.adblocking.api.duckplayer.PrivatePlayerMode.Disabled
 import com.duckduckgo.adblocking.api.duckplayer.PrivatePlayerMode.Enabled
 import com.duckduckgo.adblocking.api.duckplayer.YOUTUBE_HOST
 import com.duckduckgo.adblocking.api.duckplayer.YOUTUBE_MOBILE_HOST
+import com.duckduckgo.adblocking.impl.domain.AdBlockingStatusChecker
 import com.duckduckgo.adblocking.impl.duckplayer.DuckPlayerPixelName.DUCK_PLAYER_DAILY_UNIQUE_VIEW
 import com.duckduckgo.adblocking.impl.duckplayer.DuckPlayerPixelName.DUCK_PLAYER_NEWTAB_SETTING_OFF
 import com.duckduckgo.adblocking.impl.duckplayer.DuckPlayerPixelName.DUCK_PLAYER_NEWTAB_SETTING_ON
@@ -67,8 +68,10 @@ import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -117,6 +120,7 @@ class RealDuckPlayer @Inject constructor(
     private val duckPlayerLocalFilesPath: DuckPlayerLocalFilesPath,
     private val mimeTypeMap: MimeTypeMap,
     private val dispatchers: DispatcherProvider,
+    private val adBlockingStatusChecker: AdBlockingStatusChecker,
     @IsMainProcess private val isMainProcess: Boolean,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : DuckPlayerInternal, PrivacyConfigCallbackPlugin {
@@ -176,7 +180,7 @@ class RealDuckPlayer @Inject constructor(
     }
 
     override fun getUserPreferences(): UserPreferences {
-        return duckPlayerFeatureRepository.getUserPreferences()
+        return duckPlayerFeatureRepository.getUserPreferences(if (adBlockingStatusChecker.isShownInSettings()) Disabled else AlwaysAsk)
     }
 
     override fun shouldHideDuckPlayerOverlay(): Boolean {
@@ -197,10 +201,13 @@ class RealDuckPlayer @Inject constructor(
         shouldForceYTNavigation = false
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     override fun observeUserPreferences(): Flow<UserPreferences> {
-        return duckPlayerFeatureRepository.observeUserPreferences().map {
-            UserPreferences(it.overlayInteracted, it.privatePlayerMode)
-        }
+        return adBlockingStatusChecker.isShownInSettingsFlow()
+            .flatMapLatest { isShownInSettings ->
+                duckPlayerFeatureRepository.observeUserPreferences(if (isShownInSettings) Disabled else AlwaysAsk)
+            }
+            .map { UserPreferences(it.overlayInteracted, it.privatePlayerMode) }
     }
 
     override suspend fun sendDuckPlayerPixel(
