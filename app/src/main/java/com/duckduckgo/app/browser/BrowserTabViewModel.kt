@@ -5289,6 +5289,7 @@ class BrowserTabViewModel @Inject constructor(
      * fullscreen mode we fall back to the legacy Intent-based path.
      */
     fun openDuckAiQuery(query: String, autoPrompt: Boolean) {
+        browserInteractionsPlugins.getPlugins().forEach { it.onInputSubmitted() }
         if (!duckAiFeatureState.showFullScreenMode.value) {
             if (autoPrompt) {
                 duckChat.openDuckChatWithAutoPrompt(query)
@@ -5307,6 +5308,7 @@ class BrowserTabViewModel @Inject constructor(
      * routed through the normal submit path which lands in the legacy Intent flow.
      */
     fun openDuckAiChatById(chatUrl: String) {
+        browserInteractionsPlugins.getPlugins().forEach { it.onChatSelected() }
         if (!duckAiFeatureState.showFullScreenMode.value) {
             onUserSubmittedQuery(chatUrl)
             return

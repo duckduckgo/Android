@@ -254,6 +254,30 @@ class RealPostIdleSessionWideEventTest {
     }
 
     @Test
+    fun `when onChatSelected terminates session then flowFinish is Success with chat_selected reason`() = runTest {
+        testee.onHatchShownAfterIdle()
+        coroutineRule.testScope.testScheduler.advanceUntilIdle()
+
+        testee.onChatSelected()
+        coroutineRule.testScope.testScheduler.advanceUntilIdle()
+
+        verify(wideEventClient).intervalEnd(123L, "session_duration_ms_bucketed")
+        verify(wideEventClient).flowFinish(
+            wideEventId = eq(123L),
+            status = eq<FlowStatus>(FlowStatus.Success),
+            metadata = eq(
+                mapOf(
+                    "surface" to "ntp",
+                    "status_reason" to "chat_selected",
+                    "page_engaged" to "false",
+                    "toggle_used" to "false",
+                    "back_pressed" to "false",
+                ),
+            ),
+        )
+    }
+
+    @Test
     fun `when onReturnToPageTapped terminates session then flowFinish reason is return_to_page_tapped`() = runTest {
         testee.onHatchShownAfterIdle()
         coroutineRule.testScope.testScheduler.advanceUntilIdle()

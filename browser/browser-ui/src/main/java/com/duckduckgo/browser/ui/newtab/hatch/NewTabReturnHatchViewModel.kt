@@ -166,6 +166,7 @@ class NewTabReturnHatchViewModel @Inject constructor(
     fun onTabManagerPressed() {
         pixel.fire(NewTabReturnHatchPixelName.OPTION_SELECTED_TAB_SWITCHER, type = Count)
         pixel.fire(NewTabReturnHatchPixelName.OPTION_SELECTED_TAB_SWITCHER_DAILY, type = Daily())
+        ntpAfterIdleManager.onTabSwitcherSelected()
         commandChannel.trySend(Command.LaunchTabSwitcher)
     }
 
