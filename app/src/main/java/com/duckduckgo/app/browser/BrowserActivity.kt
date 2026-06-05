@@ -797,12 +797,13 @@ open class BrowserActivity : DuckDuckGoActivity() {
             if (duckAiFeatureState.showFullScreenMode.value) {
                 val url = intent.getStringExtra(DUCK_CHAT_URL) ?: duckChat.getDuckChatUrl("", false)
                 // The tab to return to when this Duck.ai tab is closed.
-                // Fallback to the current tab if no explicit tab id is passed.
+                // Use to the current tab if no explicit tab id is passed.
+                // Falls back to NTP otherwise.
                 val sourceTabId = intent.getStringExtra(SOURCE_TAB_ID_EXTRA) ?: currentTab?.tabId
                 if (swipingTabsFeature.isEnabled) {
-                    launchNewTab(query = url, skipHome = true, sourceTabId = sourceTabId)
+                    launchNewTab(query = url, skipHome = false, sourceTabId = sourceTabId)
                 } else {
-                    lifecycleScope.launch { viewModel.onOpenInNewTabRequested(query = url, sourceTabId = sourceTabId, skipHome = true) }
+                    lifecycleScope.launch { viewModel.onOpenInNewTabRequested(query = url, sourceTabId = sourceTabId, skipHome = false) }
                 }
             } else {
                 val duckChatSessionActive = intent.getBooleanExtra(DUCK_CHAT_SESSION_ACTIVE, false)
@@ -863,7 +864,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
                 }
                 val selectedText = intent.getBooleanExtra(SELECTED_TEXT_EXTRA, false)
                 val sourceTabId = intent.getStringExtra(SOURCE_TAB_ID_EXTRA) ?: if (selectedText) currentTab?.tabId else null
-                val skipHome = !selectedText
+                val skipHome = !selectedText && sourceTabId == null
                 if (swipingTabsFeature.isEnabled) {
                     val query =
                         if (isExternal) {

@@ -1848,6 +1848,11 @@ class BrowserTabViewModel @Inject constructor(
         isLinkOpenedInNewTab && hasSourceTab && !isCustomTab && site?.url.isNullOrEmpty()
 
     private fun navigateHome() {
+        // Going home reuses this tab, so an active Duck.ai voice session would keep
+        // running with the mic open. End it here so the frontend cleans it up.
+        if (duckChat.isVoiceChatSessionActive(tabId)) {
+            duckChat.endVoiceChatSession(tabId)
+        }
         pdfDownloadJob.cancel()
         site = null
         onSiteChanged()
