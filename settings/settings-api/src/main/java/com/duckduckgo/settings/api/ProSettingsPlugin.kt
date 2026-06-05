@@ -45,11 +45,8 @@ interface DuckPlayerSettingsPlugin : SettingsPlugin
 interface ThreatProtectionSettingsPlugin : SettingsPlugin
 
 /**
- * This is the plugin for YouTube Ad Blocking settings
+ * This is the plugin for YouTube Ad Blocking settings.
+ *
+ * The returned view is responsible for managing its own visibility reactively.
  */
-interface AdBlockingSettingsPlugin : SettingsPlugin {
-    /**
-     * Whether the settings section should be shown
-     */
-    fun isShownInSettings(): Boolean
-}
+interface AdBlockingSettingsPlugin : SettingsPlugin

@@ -20,12 +20,15 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.adblocking.impl.AdBlockingSettingsRepository
 import com.duckduckgo.adblocking.impl.domain.AdBlockingStatusChecker
+import com.duckduckgo.adblocking.impl.ui.AdBlockingSettingsViewModel.Command.OpenDuckPlayerSettings
+import com.duckduckgo.adblocking.impl.ui.AdBlockingSettingsViewModel.Command.OpenLearnMore
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.di.scopes.ActivityScope
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.SharingStarted.Companion.WhileSubscribed
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.receiveAsFlow
@@ -35,7 +38,7 @@ import javax.inject.Inject
 
 @ContributesViewModel(ActivityScope::class)
 class AdBlockingSettingsViewModel @Inject constructor(
-    private val statusChecker: AdBlockingStatusChecker,
+    statusChecker: AdBlockingStatusChecker,
     private val repository: AdBlockingSettingsRepository,
 ) : ViewModel() {
 
@@ -50,7 +53,7 @@ class AdBlockingSettingsViewModel @Inject constructor(
         .map { ViewState(isEnabled = it) }
         .stateIn(
             viewModelScope,
-            started = SharingStarted.Companion.WhileSubscribed(),
+            started = WhileSubscribed(),
             initialValue = ViewState(),
         )
 
@@ -66,13 +69,13 @@ class AdBlockingSettingsViewModel @Inject constructor(
 
     fun onLearnMoreClicked() {
         viewModelScope.launch {
-            commandChannel.send(Command.OpenLearnMore(LEARN_MORE_URL))
+            commandChannel.send(OpenLearnMore(LEARN_MORE_URL))
         }
     }
 
     fun onDuckPlayerClicked() {
         viewModelScope.launch {
-            commandChannel.send(Command.OpenDuckPlayerSettings)
+            commandChannel.send(OpenDuckPlayerSettings)
         }
     }
 
