@@ -345,7 +345,6 @@ class SettingsActivity : DuckDuckGoActivity() {
                     updateSyncSetting(visible = it.showSyncSetting)
                     updateAutoconsent(it.isAutoconsentEnabled)
                     updateSubscription(it.isSubscriptionEnabled)
-                    updateDuckPlayer(it.isDuckPlayerEnabled)
                     updateAdBlocking(it.isAdBlockingEnabled)
                     updateThreatProtection(it.isNewThreatProtectionSettingsEnabled)
                     updateDuckChat(it.isDuckChatEnabled)
@@ -370,14 +369,6 @@ class SettingsActivity : DuckDuckGoActivity() {
             viewsPro.show()
         } else {
             viewsPro.gone()
-        }
-    }
-
-    private fun updateDuckPlayer(isDuckPlayerEnabled: Boolean) {
-        if (isDuckPlayerEnabled) {
-            viewsMain.settingsSectionDuckPlayer.show()
-        } else {
-            viewsMain.settingsSectionDuckPlayer.gone()
         }
     }
 

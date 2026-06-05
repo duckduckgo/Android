@@ -50,7 +50,6 @@ import com.duckduckgo.mobile.android.app.tracking.AppTrackingProtection
 import com.duckduckgo.remote.messaging.api.Content.MessageType
 import com.duckduckgo.remote.messaging.impl.store.ModalSurfaceStore
 import com.duckduckgo.settings.api.AdBlockingSettingsPlugin
-import com.duckduckgo.settings.api.DuckPlayerSettingsPlugin
 import com.duckduckgo.settings.api.SettingsPageFeature
 import com.duckduckgo.subscriptions.api.SubscriptionUnifiedFeedback
 import com.duckduckgo.subscriptions.api.Subscriptions
@@ -125,7 +124,6 @@ class SettingsViewModelTest {
     private val mockAppInstallStore: AppInstallStore = mock()
 
     private val mockAdBlockingSettingsPlugins: PluginPoint<AdBlockingSettingsPlugin> = mock()
-    private val mockDuckPlayerSettingsPlugins: PluginPoint<DuckPlayerSettingsPlugin> = mock()
 
     @Before
     fun before() = runTest {
@@ -160,7 +158,6 @@ class SettingsViewModelTest {
             settingsDataStore = fakeSettingsDataStore,
             appInstallStore = mockAppInstallStore,
             adBlockingSettingsPlugins = mockAdBlockingSettingsPlugins,
-            duckPlayerSettingsPlugins = mockDuckPlayerSettingsPlugins,
         )
     }
 

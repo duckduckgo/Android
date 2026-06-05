@@ -18,53 +18,15 @@ package com.duckduckgo.adblocking.impl.duckplayer
 
 import android.content.Context
 import android.view.View
-import com.duckduckgo.adblocking.api.duckplayer.DuckPlayer
-import com.duckduckgo.adblocking.api.duckplayer.DuckPlayer.DuckPlayerState.DISABLED_WIH_HELP_LINK
-import com.duckduckgo.adblocking.api.duckplayer.DuckPlayer.DuckPlayerState.ENABLED
-import com.duckduckgo.adblocking.api.duckplayer.DuckPlayerSettingsNoParams
-import com.duckduckgo.adblocking.impl.R
-import com.duckduckgo.adblocking.impl.domain.AdBlockingStatusChecker
-import com.duckduckgo.adblocking.impl.duckplayer.DuckPlayerPixelName.DUCK_PLAYER_SETTINGS_PRESSED
 import com.duckduckgo.anvil.annotations.PriorityKey
-import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.common.ui.view.listitem.OneLineListItem
-import com.duckduckgo.common.utils.extensions.toBinaryString
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.settings.api.DuckPlayerSettingsPlugin
 import com.squareup.anvil.annotations.ContributesMultibinding
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
 import javax.inject.Inject
-import com.duckduckgo.mobile.android.R as CommonR
 
 @ContributesMultibinding(ActivityScope::class)
 @PriorityKey(100)
-class DuckPlayerSettingsEntry @Inject constructor(
-    private val globalActivityStarter: GlobalActivityStarter,
-    private val duckPlayer: DuckPlayer,
-    private val pixel: Pixel,
-    private val statusChecker: AdBlockingStatusChecker,
-    @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
-) : DuckPlayerSettingsPlugin {
+class DuckPlayerSettingsEntry @Inject constructor() : DuckPlayerSettingsPlugin {
 
-    override fun getView(context: Context): View {
-        return OneLineListItem(context).apply {
-            setLeadingIconResource(CommonR.drawable.ic_video_player_color_24)
-
-            setPrimaryText(context.getString(R.string.ad_blocking_settings_duck_player_header))
-            setOnClickListener {
-                globalActivityStarter.start(this.context, DuckPlayerSettingsNoParams, null)
-                appCoroutineScope.launch {
-                    val wasUsedBefore = duckPlayer.wasUsedBefore()
-                    pixel.fire(DUCK_PLAYER_SETTINGS_PRESSED, parameters = mapOf("was_used_before" to wasUsedBefore.toBinaryString()))
-                }
-            }
-        }
-    }
-
-    override fun isShownInSettings(): Boolean {
-        return !statusChecker.isShownInSettings() && duckPlayer.getDuckPlayerState().let { it == ENABLED || it == DISABLED_WIH_HELP_LINK }
-    }
+    override fun getView(context: Context): View = DuckPlayerSettingsEntryView(context)
 }

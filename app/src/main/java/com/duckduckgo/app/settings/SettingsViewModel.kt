@@ -88,7 +88,6 @@ import com.duckduckgo.mobile.android.app.tracking.AppTrackingProtection
 import com.duckduckgo.remote.messaging.api.Content
 import com.duckduckgo.remote.messaging.impl.store.ModalSurfaceStore
 import com.duckduckgo.settings.api.AdBlockingSettingsPlugin
-import com.duckduckgo.settings.api.DuckPlayerSettingsPlugin
 import com.duckduckgo.settings.api.SettingsPageFeature
 import com.duckduckgo.subscriptions.api.SubscriptionUnifiedFeedback
 import com.duckduckgo.subscriptions.api.SubscriptionUnifiedFeedback.SubscriptionFeedbackSource.DDG_SETTINGS
@@ -136,7 +135,6 @@ class SettingsViewModel @Inject constructor(
     private val settingsDataStore: SettingsDataStore,
     private val appInstallStore: AppInstallStore,
     private val adBlockingSettingsPlugins: PluginPoint<AdBlockingSettingsPlugin>,
-    private val duckPlayerSettingsPlugins: PluginPoint<DuckPlayerSettingsPlugin>,
 ) : ViewModel(), DefaultLifecycleObserver {
 
     data class ViewState(
@@ -148,7 +146,6 @@ class SettingsViewModel @Inject constructor(
         val showSyncSetting: Boolean = false,
         val isAutoconsentEnabled: Boolean = false,
         val isSubscriptionEnabled: Boolean = false,
-        val isDuckPlayerEnabled: Boolean = false,
         val isAdBlockingEnabled: Boolean = false,
         val isNewThreatProtectionSettingsEnabled: Boolean = false,
         val isDuckChatEnabled: Boolean = false,
@@ -240,7 +237,6 @@ class SettingsViewModel @Inject constructor(
                     showSyncSetting = deviceSyncState.isFeatureEnabled(),
                     isAutoconsentEnabled = autoconsent.isSettingEnabled(),
                     isSubscriptionEnabled = subscriptions.isEligible(),
-                    isDuckPlayerEnabled = duckPlayerSettingsPlugins.getPlugins().any { it.isShownInSettings() },
                     isAdBlockingEnabled = adBlockingSettingsPlugins.getPlugins().any { it.isShownInSettings() },
                     isNewThreatProtectionSettingsEnabled = androidBrowserConfigFeature.newThreatProtectionSettings().isEnabled(),
                     isVoiceSearchVisible = voiceSearchAvailability.isVoiceSearchSupported,

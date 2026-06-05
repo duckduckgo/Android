@@ -36,14 +36,11 @@ interface SettingsPlugin {
 interface ProSettingsPlugin : SettingsPlugin
 
 /**
- * This is the plugin for Duck Player settings
+ * This is the plugin for Duck Player settings.
+ *
+ * The returned view is responsible for managing its own visibility reactively.
  */
-interface DuckPlayerSettingsPlugin : SettingsPlugin {
-    /**
-     * Whether the settings section should be shown
-     */
-    fun isShownInSettings(): Boolean
-}
+interface DuckPlayerSettingsPlugin : SettingsPlugin
 
 interface ThreatProtectionSettingsPlugin : SettingsPlugin
 
