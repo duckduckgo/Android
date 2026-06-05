@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 DuckDuckGo
+ * Copyright (c) 2026 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,10 +18,10 @@ package com.duckduckgo.settings.impl
 
 import com.duckduckgo.anvil.annotations.ContributesPluginPoint
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.settings.api.DuckPlayerSettingsPlugin
+import com.duckduckgo.settings.api.OtherSettingsPlugin
 
 @ContributesPluginPoint(
     scope = ActivityScope::class,
-    boundType = DuckPlayerSettingsPlugin::class,
+    boundType = OtherSettingsPlugin::class,
 )
-private interface DuckPlayerSettingsPluginTrigger
+private interface OtherSettingsPluginTrigger

@@ -98,9 +98,8 @@ import com.duckduckgo.mobile.android.app.tracking.ui.AppTrackingProtectionScreen
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
 import com.duckduckgo.remote.messaging.impl.modal.ModalSurfaceActivityFromMessageId
-import com.duckduckgo.settings.api.AdBlockingSettingsPlugin
 import com.duckduckgo.settings.api.CompleteSetupSettingsPlugin
-import com.duckduckgo.settings.api.DuckPlayerSettingsPlugin
+import com.duckduckgo.settings.api.OtherSettingsPlugin
 import com.duckduckgo.settings.api.ProSettingsPlugin
 import com.duckduckgo.settings.api.ThreatProtectionSettingsPlugin
 import com.duckduckgo.subscriptions.api.SubscriptionFeedbackScreens.GeneralSubscriptionFeedbackScreenNoParams
@@ -144,15 +143,9 @@ class SettingsActivity : DuckDuckGoActivity() {
     }
 
     @Inject
-    lateinit var _duckPlayerSettingsPlugin: PluginPoint<DuckPlayerSettingsPlugin>
-    private val duckPlayerSettingsPlugin by lazy {
-        _duckPlayerSettingsPlugin.getPlugins()
-    }
-
-    @Inject
-    lateinit var _adBlockingSettingsPlugin: PluginPoint<AdBlockingSettingsPlugin>
-    private val adBlockingSettingsPlugin by lazy {
-        _adBlockingSettingsPlugin.getPlugins()
+    lateinit var _otherSettingsPlugin: PluginPoint<OtherSettingsPlugin>
+    private val otherSettingsPlugin by lazy {
+        _otherSettingsPlugin.getPlugins()
     }
 
     @Inject
@@ -292,20 +285,8 @@ class SettingsActivity : DuckDuckGoActivity() {
             }
         }
 
-        if (duckPlayerSettingsPlugin.isEmpty()) {
-            viewsMain.settingsSectionDuckPlayer.gone()
-        } else {
-            duckPlayerSettingsPlugin.forEach { plugin ->
-                viewsMain.settingsSectionDuckPlayer.addView(plugin.getView(this))
-            }
-        }
-
-        if (adBlockingSettingsPlugin.isEmpty()) {
-            viewsMain.settingsSectionAdBlocking.gone()
-        } else {
-            adBlockingSettingsPlugin.forEach { plugin ->
-                viewsMain.settingsSectionAdBlocking.addView(plugin.getView(this))
-            }
+        otherSettingsPlugin.forEach { plugin ->
+            viewsMain.root.addView(plugin.getView(this))
         }
 
         if (threatProtectionSettingsPlugin.isEmpty()) {

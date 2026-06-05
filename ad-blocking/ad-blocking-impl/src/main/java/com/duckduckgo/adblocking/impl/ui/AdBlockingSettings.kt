@@ -20,13 +20,13 @@ import android.content.Context
 import android.view.View
 import com.duckduckgo.anvil.annotations.PriorityKey
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.settings.api.AdBlockingSettingsPlugin
+import com.duckduckgo.settings.api.OtherSettingsPlugin
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 
 @ContributesMultibinding(ActivityScope::class)
 @PriorityKey(100)
-class AdBlockingSettingsEntry @Inject constructor() : AdBlockingSettingsPlugin {
+class AdBlockingSettingsEntry @Inject constructor() : OtherSettingsPlugin {
 
     override fun getView(context: Context): View = AdBlockingSettingsEntryView(context)
 }
