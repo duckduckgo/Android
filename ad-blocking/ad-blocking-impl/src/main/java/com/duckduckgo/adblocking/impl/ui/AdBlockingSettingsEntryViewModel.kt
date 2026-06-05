@@ -20,11 +20,12 @@ import android.annotation.SuppressLint
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.adblocking.impl.domain.AdBlockingStatusChecker
 import com.duckduckgo.adblocking.impl.ui.AdBlockingSettingsEntryViewModel.Command.OpenSettings
+import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.di.scopes.ViewScope
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -39,7 +40,8 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @SuppressLint("NoLifecycleObserver") // we don't observe app lifecycle
-class AdBlockingSettingsEntryViewModel(
+@ContributesViewModel(ViewScope::class)
+class AdBlockingSettingsEntryViewModel @Inject constructor(
     private val statusChecker: AdBlockingStatusChecker,
     private val dispatcherProvider: DispatcherProvider,
 ) : ViewModel(), DefaultLifecycleObserver {
@@ -68,25 +70,6 @@ class AdBlockingSettingsEntryViewModel(
     fun onSettingClicked() {
         viewModelScope.launch {
             command.send(OpenSettings)
-        }
-    }
-
-    @Suppress("UNCHECKED_CAST")
-    class Factory @Inject constructor(
-        private val statusChecker: AdBlockingStatusChecker,
-        private val dispatcherProvider: DispatcherProvider,
-    ) : ViewModelProvider.NewInstanceFactory() {
-        override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            return with(modelClass) {
-                when {
-                    isAssignableFrom(AdBlockingSettingsEntryViewModel::class.java) -> AdBlockingSettingsEntryViewModel(
-                        statusChecker,
-                        dispatcherProvider,
-                    )
-
-                    else -> throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
-                }
-            } as T
         }
     }
 }

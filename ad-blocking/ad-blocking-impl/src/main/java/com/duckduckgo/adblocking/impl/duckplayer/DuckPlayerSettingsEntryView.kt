@@ -31,6 +31,7 @@ import com.duckduckgo.adblocking.impl.duckplayer.DuckPlayerSettingsEntryViewMode
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.view.listitem.OneLineListItem
 import com.duckduckgo.common.utils.ConflatedJob
+import com.duckduckgo.common.utils.ViewViewModelFactory
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import dagger.android.support.AndroidSupportInjection
@@ -47,7 +48,7 @@ class DuckPlayerSettingsEntryView @JvmOverloads constructor(
 ) : FrameLayout(context, attrs, defStyle) {
 
     @Inject
-    lateinit var viewModelFactory: DuckPlayerSettingsEntryViewModel.Factory
+    lateinit var viewModelFactory: ViewViewModelFactory
 
     @Inject
     lateinit var globalActivityStarter: GlobalActivityStarter

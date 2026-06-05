@@ -30,6 +30,7 @@ import com.duckduckgo.adblocking.impl.ui.AdBlockingSettingsEntryViewModel.Comman
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.view.listitem.OneLineListItem
 import com.duckduckgo.common.utils.ConflatedJob
+import com.duckduckgo.common.utils.ViewViewModelFactory
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import dagger.android.support.AndroidSupportInjection
@@ -46,7 +47,7 @@ class AdBlockingSettingsEntryView @JvmOverloads constructor(
 ) : FrameLayout(context, attrs, defStyle) {
 
     @Inject
-    lateinit var viewModelFactory: AdBlockingSettingsEntryViewModel.Factory
+    lateinit var viewModelFactory: ViewViewModelFactory
 
     @Inject
     lateinit var globalActivityStarter: GlobalActivityStarter

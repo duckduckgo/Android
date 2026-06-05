@@ -20,16 +20,17 @@ import android.annotation.SuppressLint
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.adblocking.api.duckplayer.DuckPlayer.DuckPlayerState.DISABLED_WIH_HELP_LINK
 import com.duckduckgo.adblocking.api.duckplayer.DuckPlayer.DuckPlayerState.ENABLED
 import com.duckduckgo.adblocking.impl.domain.AdBlockingStatusChecker
 import com.duckduckgo.adblocking.impl.duckplayer.DuckPlayerPixelName.DUCK_PLAYER_SETTINGS_PRESSED
 import com.duckduckgo.adblocking.impl.duckplayer.DuckPlayerSettingsEntryViewModel.Command.OpenSettings
+import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.extensions.toBinaryString
+import com.duckduckgo.di.scopes.ViewScope
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -44,7 +45,8 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @SuppressLint("NoLifecycleObserver") // we don't observe app lifecycle
-class DuckPlayerSettingsEntryViewModel(
+@ContributesViewModel(ViewScope::class)
+class DuckPlayerSettingsEntryViewModel @Inject constructor(
     private val duckPlayer: DuckPlayerInternal,
     private val statusChecker: AdBlockingStatusChecker,
     private val pixel: Pixel,
@@ -83,29 +85,6 @@ class DuckPlayerSettingsEntryViewModel(
             command.send(OpenSettings)
             val wasUsedBefore = duckPlayer.wasUsedBefore()
             pixel.fire(DUCK_PLAYER_SETTINGS_PRESSED, parameters = mapOf("was_used_before" to wasUsedBefore.toBinaryString()))
-        }
-    }
-
-    @Suppress("UNCHECKED_CAST")
-    class Factory @Inject constructor(
-        private val duckPlayer: DuckPlayerInternal,
-        private val statusChecker: AdBlockingStatusChecker,
-        private val pixel: Pixel,
-        private val dispatcherProvider: DispatcherProvider,
-    ) : ViewModelProvider.NewInstanceFactory() {
-        override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            return with(modelClass) {
-                when {
-                    isAssignableFrom(DuckPlayerSettingsEntryViewModel::class.java) -> DuckPlayerSettingsEntryViewModel(
-                        duckPlayer,
-                        statusChecker,
-                        pixel,
-                        dispatcherProvider,
-                    )
-
-                    else -> throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
-                }
-            } as T
         }
     }
 }
