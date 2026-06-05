@@ -23,62 +23,21 @@ import androidx.core.widget.NestedScrollView
 
 object BrandDesignUpdateOnboardingLayoutHelper {
 
-    /**
-     * Returns whether there is enough vertical space within [rootView] to display both
-     * the [dialogView] and the [decorationView] without overlap.
-     *
-     * With edge-to-edge enabled, the root view spans the full screen including system
-     * bar areas. Both the dialog margins (from parent top) and the decoration margins
-     * (from parent bottom) are defined relative to the parent edges, so the check
-     * compares against [rootView.height] directly — no inset subtraction is needed.
-     *
-     * @param rootView the root view used to determine available height
-     * @param dialogView the dialog whose measured height is checked
-     * @param decorationView the optional decoration (e.g. walking Dax animation)
-     */
-    fun hasSpaceForAnimation(
+    fun computeDecorationHeight(
+        availableContentHeight: Int,
+        dialogSpace: Int,
+        decorationBottomMargin: Int,
+        maxHeightPx: Int,
+        minHeightPx: Int,
+    ): Int? {
+        val available = availableContentHeight - dialogSpace - decorationBottomMargin
+        return if (available < minHeightPx) null else available.coerceAtMost(maxHeightPx)
+    }
+
+    fun calculateDecorationHeight(
         rootView: View,
         dialogView: View,
         decorationView: View,
-    ): Boolean {
-        if (rootView.height == 0) return false
-        if (isInScrollableContainer(dialogView, rootView)) return true
-
-        // Measure at the dialog's actual width when available; AT_MOST can let inner
-        // ConstraintLayouts collapse and reflow text tall, inflating measuredHeight.
-        val dialogWidthSpec = if (dialogView.width > 0) {
-            View.MeasureSpec.makeMeasureSpec(dialogView.width, View.MeasureSpec.EXACTLY)
-        } else {
-            View.MeasureSpec.makeMeasureSpec(rootView.width, View.MeasureSpec.AT_MOST)
-        }
-        val dialogHeightSpec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
-        dialogView.measure(dialogWidthSpec, dialogHeightSpec)
-
-        val dialogParams = dialogView.layoutParams as ViewGroup.MarginLayoutParams
-        val dialogSpace = dialogView.measuredHeight + dialogParams.topMargin + dialogParams.bottomMargin
-
-        val decorationParams = decorationView.layoutParams as ViewGroup.MarginLayoutParams
-        val decorationSpace = decorationView.layoutParams.height + decorationParams.bottomMargin
-
-        return rootView.height >= dialogSpace + decorationSpace
-    }
-
-    /**
-     * Calculates the height to use for the walking Dax animation based on available space.
-     *
-     * Returns the height in pixels to apply (clamped between [minHeightPx] and [maxHeightPx]),
-     * or null if Dax should be hidden because there is not enough room even at the minimum height.
-     *
-     * @param rootView the root view used to determine available height
-     * @param dialogView the dialog whose measured height is checked
-     * @param daxView the walking Dax animation view
-     * @param maxHeightPx the maximum allowed height for Dax in pixels
-     * @param minHeightPx the minimum required height for Dax in pixels; below this Dax is hidden
-     */
-    fun calculateWalkingDaxHeight(
-        rootView: View,
-        dialogView: View,
-        daxView: View,
         maxHeightPx: Int,
         minHeightPx: Int,
     ): Int? {
@@ -96,13 +55,16 @@ object BrandDesignUpdateOnboardingLayoutHelper {
         val dialogParams = dialogView.layoutParams as ViewGroup.MarginLayoutParams
         val dialogSpace = dialogView.measuredHeight + dialogParams.topMargin + dialogParams.bottomMargin
 
-        val daxParams = daxView.layoutParams as ViewGroup.MarginLayoutParams
-        val availableForDax = rootView.height - dialogSpace - daxParams.bottomMargin
+        val decorationParams = decorationView.layoutParams as ViewGroup.MarginLayoutParams
+        val availableContentHeight = rootView.height - rootView.paddingTop - rootView.paddingBottom
 
-        return when {
-            availableForDax < minHeightPx -> null
-            else -> availableForDax.coerceAtMost(maxHeightPx)
-        }
+        return computeDecorationHeight(
+            availableContentHeight = availableContentHeight,
+            dialogSpace = dialogSpace,
+            decorationBottomMargin = decorationParams.bottomMargin,
+            maxHeightPx = maxHeightPx,
+            minHeightPx = minHeightPx,
+        )
     }
 
     private fun isInScrollableContainer(view: View, stopAt: View): Boolean {
