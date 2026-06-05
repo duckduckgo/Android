@@ -67,8 +67,25 @@ class RealDuckChatSyncRepository @Inject constructor(
     private val browserModeStateHolder: BrowserModeStateHolder,
 ) : DuckChatSyncRepository {
 
+    /**
+     * Fire-mode chat activity must never enter the sync pipeline (Fire chats stay on-device). This is the single
+     * choke point guarding every queue/timestamp writer. Exhaustive `when` so a new [BrowserMode] is a compile
+     * error here rather than silently defaulting to syncable.
+     *
+     * Complements the `@RegularMode` store injected into `DuckChatSyncDataManager`: this guard keeps Fire chatIds
+     * out of the pending queues (write side), while that ensures patch content is read from the Regular store even
+     * if sync runs while the user is in Fire mode (read side). Both are needed — don't drop one as "redundant".
+     */
+    private fun isSyncableMode(): Boolean = when (browserModeStateHolder.currentMode.value) {
+        BrowserMode.REGULAR -> true
+        BrowserMode.FIRE -> false
+    }
+
     override suspend fun recordDuckAiChatsDeleted(timestampMillis: Long) {
-        if (isFireMode()) return
+        if (!isSyncableMode()) {
+            logcat { "DuckChat-Sync: skipping deletion timestamp in non-syncable mode" }
+            return
+        }
         withContext(dispatchers.io()) {
             val isoTimestamp = DatabaseDateFormatter.parseMillisIso8601(timestampMillis)
             duckChatSyncMetadataStore.deletionTimestamp = isoTimestamp
@@ -94,7 +111,10 @@ class RealDuckChatSyncRepository @Inject constructor(
     }
 
     override suspend fun recordSingleChatDeletion(chatId: String) {
-        if (isFireMode()) return
+        if (!isSyncableMode()) {
+            logcat { "DuckChat-Sync: skipping pending chat deletion for $chatId in non-syncable mode" }
+            return
+        }
         withContext(dispatchers.io()) {
             val current = duckChatSyncMetadataStore.pendingChatDeletions
             duckChatSyncMetadataStore.pendingChatDeletions = current + chatId
@@ -124,7 +144,10 @@ class RealDuckChatSyncRepository @Inject constructor(
     }
 
     override suspend fun recordSingleChatUpdate(chatId: String) {
-        if (isFireMode()) return
+        if (!isSyncableMode()) {
+            logcat { "DuckChat-Sync: skipping pending chat update for $chatId in non-syncable mode" }
+            return
+        }
         withContext(dispatchers.io()) {
             val current = duckChatSyncMetadataStore.pendingChatUpdates
             duckChatSyncMetadataStore.pendingChatUpdates = current + chatId
@@ -152,6 +175,4 @@ class RealDuckChatSyncRepository @Inject constructor(
             logcat { "DuckChat-Sync: cleared all pending chat updates" }
         }
     }
-
-    private fun isFireMode(): Boolean = browserModeStateHolder.currentMode.value == BrowserMode.FIRE
 }

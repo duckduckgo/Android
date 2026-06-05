@@ -49,6 +49,16 @@ class GetSyncStatusHandler @Inject constructor(
 
                 logcat { "DuckChat-Sync: ${jsMessage.method} called" }
 
+                // In Fire mode report sync as unavailable so the FE never attempts to sync the ephemeral chats.
+                if (jsMessaging.isFireMode()) {
+                    val firePayload = JSONObject().apply {
+                        put("ok", true)
+                        put("payload", syncStatusHelper.unavailablePayload())
+                    }
+                    jsMessaging.onResponse(JsCallbackData(firePayload, featureName, jsMessage.method, jsMessage.id!!))
+                    return
+                }
+
                 // Handler is already called on worker thread, use runBlocking for suspend call
                 val jsonPayload = runCatching {
                     val payload = runBlocking { syncStatusHelper.buildSyncStatusPayload() }

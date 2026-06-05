@@ -17,6 +17,7 @@
 package com.duckduckgo.duckchat.impl.messaging.sync
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import com.duckduckgo.js.messaging.api.JsCallbackData
@@ -146,6 +147,20 @@ class GetSyncStatusHandlerTest {
         val responseJson = response.params
         assertFalse(responseJson.getBoolean("ok"))
         assertEquals("internal error", responseJson.getString("reason"))
+    }
+
+    @Test
+    fun `when in Fire mode then sync is reported unavailable without consulting account state`() {
+        val unavailable = JSONObject().apply { put("syncAvailable", false) }
+        whenever(mockSyncStatusHelper.unavailablePayload()).thenReturn(unavailable)
+        whenever(mockJsMessaging.browserMode).thenReturn(BrowserMode.FIRE)
+
+        handler.getJsMessageHandler().process(createJsMessage("test-id"), mockJsMessaging, null)
+
+        verify(mockJsMessaging).onResponse(callbackDataCaptor.capture())
+        val responseJson = callbackDataCaptor.firstValue.params
+        assertTrue(responseJson.getBoolean("ok"))
+        assertFalse(responseJson.getJSONObject("payload").getBoolean("syncAvailable"))
     }
 
     private fun createJsMessage(id: String?): JsMessage {

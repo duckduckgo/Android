@@ -18,6 +18,7 @@ package com.duckduckgo.duckchat.impl.messaging.sync
 
 import android.util.Base64
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.js.messaging.api.JsCallbackData
@@ -194,6 +195,20 @@ class EncryptWithSyncMasterKeyHandlerTest {
         assertEquals(FEATURE_NAME, response.featureName)
         assertEquals(METHOD_NAME, response.method)
         verifySuccessResponse(response.params)
+    }
+
+    @Test
+    fun `when in Fire mode then encryption is refused even if signed in`() {
+        configureSyncEnabled()
+        configureSignedIn()
+        whenever(mockJsMessaging.browserMode).thenReturn(BrowserMode.FIRE)
+        val jsMessage = createJsMessage(TEST_MESSAGE_ID, JSONObject().apply { put("data", BASE64_URL_DATA) })
+
+        handler.getJsMessageHandler().process(jsMessage, mockJsMessaging, null)
+
+        verify(mockJsMessaging).onResponse(callbackDataCaptor.capture())
+        verifyErrorResponse(callbackDataCaptor.firstValue.params, "sync unavailable")
+        verifyNoInteractions(mockCrypto)
     }
 
     @Test

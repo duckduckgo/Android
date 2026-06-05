@@ -58,6 +58,15 @@ class SyncStatusHelper @Inject constructor(
         }
     }
 
+    /** Payload signalling sync is unavailable (Fire mode): syncAvailable=false with all account fields null. */
+    fun unavailablePayload(): JSONObject = JSONObject().apply {
+        put(KEY_SYNC_AVAILABLE, false)
+        put(KEY_USER_ID, JSONObject.NULL)
+        put(KEY_DEVICE_ID, JSONObject.NULL)
+        put(KEY_DEVICE_NAME, JSONObject.NULL)
+        put(KEY_DEVICE_TYPE, JSONObject.NULL)
+    }
+
     private fun DeviceSyncState.Type.toApiString(): String = when (this) {
         DeviceSyncState.Type.MOBILE -> "mobile"
         DeviceSyncState.Type.DESKTOP -> "desktop"

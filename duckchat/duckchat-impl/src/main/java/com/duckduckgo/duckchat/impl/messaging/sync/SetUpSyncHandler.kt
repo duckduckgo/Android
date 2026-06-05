@@ -55,6 +55,12 @@ class SetUpSyncHandler @Inject constructor(
 
                 val responder = SyncJsResponder(jsMessaging, jsMessage, featureName)
 
+                // A Fire session must not be able to set up or open sync.
+                if (jsMessaging.isFireMode()) {
+                    responder.sendError(ERROR_SETUP_UNAVAILABLE)
+                    return
+                }
+
                 val setupError = validateSetupState(jsMessage.method)
                 if (setupError != null) {
                     responder.sendError(setupError)
