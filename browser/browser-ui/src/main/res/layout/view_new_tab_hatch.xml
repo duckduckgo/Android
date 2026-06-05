@@ -87,6 +87,7 @@
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:scaleType="centerInside"
+            android:background="@drawable/selectable_item_rounded_corner_background"
             android:contentDescription="@string/hatchMenuBurnTab"
             android:src="@drawable/ic_fire_outline_24"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -95,10 +96,10 @@
 
         <ImageView
             android:id="@+id/returnHatchOptions"
-            android:layout_marginStart="@dimen/keyline_2"
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:scaleType="centerInside"
+            android:background="@drawable/selectable_item_rounded_corner_background"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintEnd_toStartOf="@id/returnHatchTabsMenu"
