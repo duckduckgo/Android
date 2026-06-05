@@ -31,6 +31,7 @@ import android.view.inputmethod.InputMethodManager
 import android.webkit.ValueCallback
 import android.widget.EditText
 import android.widget.FrameLayout
+import androidx.annotation.StringRes
 import androidx.core.view.doOnAttach
 import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
@@ -560,6 +561,9 @@ class NativeInputModeWidget @JvmOverloads constructor(
         val firstStateEmission = previousState == null
         val contextChanged = previousState?.inputContext != state.inputContext
         val positionChanged = previousState?.isBottom != state.isBottom
+        // chatId flips from null to non-null when a chat is created; the hint depends on it
+        // (see `applyChatInputType`), so re-apply the input type to swap the placeholder.
+        val chatIdChanged = previousState?.chatId != state.chatId
         nativeInputState = state
         findViewById<TabLayout?>(R.id.inputModeSwitch)?.let { toggle ->
             setToggleMatchParent()
@@ -572,10 +576,10 @@ class NativeInputModeWidget @JvmOverloads constructor(
         updateNewLineButtonVisibility()
         updateSendButtonIcon()
         applyOmnibarShape()
-        // Re-apply chat input type whenever the inputs to `applyChatInputType` (context, position)
-        // change, or on the first emission. This corrects stale IME setup from a tab listener
+        // Re-apply chat input type whenever the inputs to `applyChatInputType` (context, position,
+        // chatId) change, or on the first emission. This corrects stale IME setup from a tab listener
         // that fired before the state-flow caught up.
-        if ((firstStateEmission || contextChanged || positionChanged) && isChatTabSelected()) {
+        if ((firstStateEmission || contextChanged || positionChanged || chatIdChanged) && isChatTabSelected()) {
             inputField.applyChatInputType()
             (context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager).restartInput(inputField)
         }
@@ -713,9 +717,10 @@ class NativeInputModeWidget @JvmOverloads constructor(
     }
 
     override fun EditText.applyChatInputType() {
-        hint = context.getString(
-            if (isDuckAiPageContext()) R.string.native_input_chat_duck_mode_hint else R.string.native_input_chat_hint,
-        )
+        // Placeholder depends on whether a chat already exists (see `NativeInputState.chatHintRes`):
+        // a fresh Duck.ai page starts a new chat and gets "Ask anything privately…" until a chat is
+        // created and `chatId` is populated, at which point it becomes "Reply…".
+        hint = context.getString((nativeInputState ?: NativeInputState.zero()).chatHintRes())
         // Enter inserts a newline when we're on a Duck.ai chat page (existing behavior) or when
         // the widget sits in bottom-bar position with the Duck.ai toggle selected. Bottom-bar
         // mode has no on-screen new-line button, so the IME enter key is the only carriage-
@@ -1263,6 +1268,15 @@ class NativeInputModeWidget @JvmOverloads constructor(
         private const val FOCUS_TRANSITION_DURATION_MS = 100L
     }
 }
+
+/**
+ * Chat input placeholder. A chat only exists once it has been created, which [NativeInputState.chatId]
+ * tells us, so "Reply…" is shown only then. Being on a Duck.ai page is not sufficient — a fresh Duck.ai
+ * page starts a new chat, which gets the "Ask anything privately…" prompt until the first message.
+ */
+@StringRes
+internal fun NativeInputState.chatHintRes(): Int =
+    if (chatId != null) R.string.native_input_chat_duck_mode_hint else R.string.native_input_chat_hint
 
 internal fun NativeInputState.shouldShowToggleRowBack(): Boolean =
     toggleVisible && inputContext == NativeInputState.InputContext.BROWSER

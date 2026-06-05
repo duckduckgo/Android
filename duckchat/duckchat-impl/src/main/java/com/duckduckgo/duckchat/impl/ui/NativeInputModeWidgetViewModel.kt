@@ -58,6 +58,7 @@ import com.duckduckgo.duckchat.store.impl.DuckAiChatStore
 import com.duckduckgo.subscriptions.api.Product
 import com.duckduckgo.subscriptions.api.Subscriptions
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
@@ -68,8 +69,10 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.update
@@ -212,11 +215,24 @@ class NativeInputModeWidgetViewModel @Inject constructor(
         )
     }
 
+    // chatId lives in the per-tab provider state (written by applyChatId), not in baseState. Fold it
+    // back in here so widget UI that depends on it (e.g. the chat input hint) sees the real value
+    // rather than the baseState default of null. flatMapLatest re-targets on tab switch.
+    @OptIn(ExperimentalCoroutinesApi::class)
+    private val activeChatId: Flow<String?> = activeTabId.filterNotNull()
+        .flatMapLatest { tabId -> nativeInputStateProvider.stateForTab(tabId) }
+        .map { it.chatId }
+        .distinctUntilChanged()
+
     val state: SharedFlow<NativeInputState> = combine(
         baseState,
         duckChatInternal.chatState,
-    ) { state, chatState ->
-        state.copy(isChatStreaming = chatState == ChatState.STREAMING || chatState == ChatState.LOADING)
+        activeChatId,
+    ) { state, chatState, chatId ->
+        state.copy(
+            isChatStreaming = chatState == ChatState.STREAMING || chatState == ChatState.LOADING,
+            chatId = chatId,
+        )
     }.shareIn(
         scope = viewModelScope,
         started = SharingStarted.Eagerly,
