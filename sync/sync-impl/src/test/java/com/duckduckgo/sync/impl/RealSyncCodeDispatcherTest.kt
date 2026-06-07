@@ -36,6 +36,7 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.withTimeoutOrNull
 import org.json.JSONObject
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertSame
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -227,6 +228,35 @@ class RealSyncCodeDispatcherTest {
         verify(syncAccountRepository, never()).processCode(any(), anyOrNull())
     }
 
+    @Test fun `FF on, v2 RecoveryCode cid=3party - re-encoded code is canonical JSON without escaped slashes`() = runTest {
+        // Real 3party secrets are base64url (slash-free), but the re-wrapped code handed to
+        // joinAccountFromThirdPartyRecoveryCode must never carry AOSP org.json '\/' escaping should
+        // any field contain '/'. Defence-in-depth, consistent with the other v2 wire-JSON producers.
+        setV2(true)
+        val secretWithSlashes = "apZ+7PAe89rDhuG4DRyi/M3zU2/D5DZNdRsR3RM6Ujw="
+        val rawJson = JSONObject().apply {
+            put("user_id", "u-3p")
+            put("secret", secretWithSlashes)
+            put("cid", "3party")
+            put("v", "2.0")
+        }
+        whenever(qrCode.parse(any())).thenReturn(ExchangeV2CodeParseResult.RecoveryCode(rawJson))
+        whenever(syncAccountRepository.joinAccountFromThirdPartyRecoveryCode(any())).thenReturn(Result.Success(true))
+
+        (dispatcher.route("any") as RouteDecision.V2InProgress).outcomes.toList()
+
+        val captor = org.mockito.kotlin.argumentCaptor<String>()
+        verify(syncAccountRepository).joinAccountFromThirdPartyRecoveryCode(captor.capture())
+        val decodedJson = String(java.util.Base64.getUrlDecoder().decode(captor.firstValue), Charsets.UTF_8)
+        assertFalse("re-wrapped 3party JSON must not contain escaped slashes (\\/): $decodedJson", decodedJson.contains("\\/"))
+        // …and the wrapped recovery must round-trip back to the original fields.
+        val recovery = JSONObject(decodedJson).getJSONObject("recovery")
+        assertEquals(secretWithSlashes, recovery.getString("secret"))
+        assertEquals("u-3p", recovery.getString("user_id"))
+        assertEquals("3party", recovery.getString("cid"))
+        assertEquals("2.0", recovery.getString("v"))
+    }
+
     @Test fun `FF on, v2 RecoveryCode cid=ddg - ALREADY_SIGNED_IN triggers logoutAndJoinNewAccount and emits LoggedIn`() = runTest {
         // Per spec, the v2 path does NOT surface a v1-style AskToSwitchAccount prompt - the
         // Confirmations phase (or the act of pasting a recovery code) is already the consent
@@ -260,6 +290,38 @@ class RealSyncCodeDispatcherTest {
         val decoded = java.util.Base64.getUrlDecoder().decode(captor.firstValue)
         val recovery = JSONObject(String(decoded)).getJSONObject("recovery")
         assertEquals("s-other", recovery.getString("primary_key"))
+        assertEquals("u-other", recovery.getString("user_id"))
+    }
+
+    @Test fun `FF on, v2 RecoveryCode cid=ddg - account-switch code is canonical v1 JSON without escaped slashes`() = runTest {
+        // The ddg secret is standard base64 and routinely contains '/'. The re-encoded v1 code fed
+        // to logoutAndJoinNewAccount must be canonical (Moshi, no AOSP org.json '\/' escaping) so it
+        // is byte-identical to genuine v1 codes and never depends on a lenient consumer to unescape.
+        setV2(true)
+        val secretWithSlashes = "apZ+7PAe89rDhuG4DRyi/M3zU2/D5DZNdRsR3RM6Ujw="
+        val rawJson = JSONObject().apply {
+            put("user_id", "u-other")
+            put("secret", secretWithSlashes)
+            put("cid", "ddg")
+        }
+        whenever(qrCode.parse(any())).thenReturn(ExchangeV2CodeParseResult.RecoveryCode(rawJson))
+        whenever(syncAccountRepository.processCode(any(), anyOrNull())).thenReturn(
+            Result.Error(
+                code = com.duckduckgo.sync.impl.AccountErrorCodes.ALREADY_SIGNED_IN.code,
+                reason = "Already signed in",
+            ),
+        )
+        whenever(syncAccountRepository.logoutAndJoinNewAccount(any())).thenReturn(Result.Success(true))
+
+        (dispatcher.route("any") as RouteDecision.V2InProgress).outcomes.first()
+
+        val captor = org.mockito.kotlin.argumentCaptor<String>()
+        verify(syncAccountRepository).logoutAndJoinNewAccount(captor.capture())
+        val decodedJson = String(java.util.Base64.getUrlDecoder().decode(captor.firstValue), Charsets.UTF_8)
+        assertFalse("v1 account-switch JSON must not contain escaped slashes (\\/): $decodedJson", decodedJson.contains("\\/"))
+        // …and it must still round-trip back to the exact secret.
+        val recovery = JSONObject(decodedJson).getJSONObject("recovery")
+        assertEquals(secretWithSlashes, recovery.getString("primary_key"))
         assertEquals("u-other", recovery.getString("user_id"))
     }
 

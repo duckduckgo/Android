@@ -27,6 +27,7 @@ import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Runner
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2State
 import com.duckduckgo.sync.impl.exchange.v2.LocalTrigger
 import com.squareup.anvil.annotations.ContributesBinding
+import com.squareup.moshi.Moshi
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emitAll
@@ -228,8 +229,20 @@ class RealSyncCodeDispatcher @Inject constructor(
             }
             CID_3PARTY -> {
                 // joinAccountFromThirdPartyRecoveryCode takes the bare b64 code; re-encode the
-                // inner recovery JSON so we don't need to crack the original URL fragment.
-                val rewrapped = JSONObject().put("recovery", parsed.rawJson).toString()
+                // inner recovery JSON so we don't need to crack the original URL fragment. Mint via
+                // Moshi (NOT org.json) so we never emit AOSP JSONObject.toString()'s '/' -> '\/'
+                // escaping; the consumer (parseThirdPartyRecoveryCode) is Moshi too. Real 3party
+                // secrets are base64url (slash-free) but this keeps every v2 producer consistent.
+                val rewrapped = thirdPartyRecoveryCodeAdapter.toJson(
+                    ThirdPartyRecoveryCodeWrapper(
+                        recovery = ThirdPartyRecoveryCode(
+                            userId = parsed.rawJson.optString("user_id"),
+                            secret = parsed.rawJson.optString("secret"),
+                            cid = parsed.rawJson.optString("cid", CID_3PARTY),
+                            v = parsed.rawJson.optString("v", RECOVERY_CODE_V2),
+                        ),
+                    ),
+                )
                 val b64 = Base64.encodeToString(
                     rewrapped.toByteArray(Charsets.UTF_8),
                     Base64.URL_SAFE or Base64.NO_PADDING or Base64.NO_WRAP,
@@ -442,19 +455,24 @@ class RealSyncCodeDispatcher @Inject constructor(
      * user accepts the account-switch prompt.
      */
     private fun encodeV1RecoveryCodeAsB64(userId: String, secret: String): String {
-        val v1Json = JSONObject().apply {
-            put(
-                "recovery",
-                JSONObject().apply {
-                    put("primary_key", secret)
-                    put("user_id", userId)
-                },
-            )
-        }.toString()
+        // Mint via Moshi (NOT org.json): the ddg secret is standard base64 and routinely contains
+        // '/', and AOSP's JSONObject.toString() escapes it to '\/'. Reusing the same LinkCode shape
+        // the v1 stack uses to MINT recovery codes keeps this byte-identical to a genuine v1 code,
+        // so the local logoutAndJoinNewAccount → parseSyncAuthCode round-trip stays robust without
+        // depending on the consumer to tolerate non-canonical escaping.
+        val v1Json = v1RecoveryCodeAdapter.toJson(LinkCode(recovery = RecoveryCode(primaryKey = secret, userId = userId)))
         return Base64.encodeToString(
             v1Json.toByteArray(Charsets.UTF_8),
             Base64.URL_SAFE or Base64.NO_PADDING or Base64.NO_WRAP,
         )
+    }
+
+    private val v1RecoveryCodeAdapter by lazy {
+        Moshi.Builder().build().adapter(LinkCode::class.java)
+    }
+
+    private val thirdPartyRecoveryCodeAdapter by lazy {
+        Moshi.Builder().build().adapter(ThirdPartyRecoveryCodeWrapper::class.java)
     }
 
     companion object {
