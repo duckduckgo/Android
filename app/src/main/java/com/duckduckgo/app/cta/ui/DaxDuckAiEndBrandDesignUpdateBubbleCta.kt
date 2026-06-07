@@ -16,50 +16,52 @@
 
 package com.duckduckgo.app.cta.ui
 
+import android.content.Context
 import android.view.View
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.onboarding.store.OnboardingStore
-import com.duckduckgo.app.onboarding.ui.view.DaxTypeAnimationTextView
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.common.ui.view.text.DaxTextView
+import com.duckduckgo.common.ui.view.appendIconToText
 import com.duckduckgo.common.utils.device.DeviceInfo
-import com.duckduckgo.common.utils.extensions.html
+import com.google.android.material.button.MaterialButton
+import com.duckduckgo.mobile.android.R as CommonR
 
-data class DaxDuckAiFireButtonBrandDesignUpdateContextualCta(
+data class DaxDuckAiEndBrandDesignUpdateBubbleCta(
     override val onboardingStore: OnboardingStore,
     override val appInstallStore: AppInstallStore,
     override val isLightTheme: Boolean,
     override val deviceInfo: DeviceInfo,
-) : OnboardingDaxDialogCta.BrandDesignContextualDaxDialogCta(
-    ctaId = CtaId.DAX_DUCK_AI_FIRE_BUTTON,
-    description = R.string.onboardingDuckAiFireButtonDaxDialogDescription,
-    buttonText = null,
+) : DaxBubbleCta.BrandDesignUpdateBubbleCta(
+    ctaId = CtaId.DAX_DUCK_AI_END,
+    title = R.string.onboardingDuckAiEndCtaTitle,
+    description = R.string.onboardingDuckAiEndCtaDescription,
+    backgroundRes = CommonR.drawable.bg_onboarding_end,
     shownPixel = AppPixelName.ONBOARDING_DAX_CTA_SHOWN,
     okPixel = AppPixelName.ONBOARDING_DAX_CTA_OK_BUTTON,
-    cancelPixel = null,
-    closePixel = AppPixelName.ONBOARDING_DAX_CTA_DISMISS_BUTTON,
-    ctaPixelParam = Pixel.PixelValues.DUCK_AI_FIRE_BUTTON_CTA,
+    ctaPixelParam = Pixel.PixelValues.DUCK_AI_END_CTA,
     onboardingStore = onboardingStore,
     appInstallStore = appInstallStore,
     isLightTheme = isLightTheme,
     deviceInfo = deviceInfo,
-    backgroundRes = R.drawable.bg_onboarding_fire_button,
 ),
-    OnboardingDaxDialogCta.ShowsWingBottom {
-    override val activeIncludeId: Int = R.id.contextualBrandDesignNoCtaContent
-
+    DaxBubbleCta.ShowsWavingDax {
+    override val activeIncludeId: Int = R.id.primaryCta
     override val showArrow: Boolean = true
-
-    override val showDismiss: Boolean = false
+    override val wavingDaxSpec = WavingDaxSpec(
+        rotationDegrees = 0f,
+        translationXDp = -40f,
+        translationYDp = -150f,
+        heightDp = 178f,
+        anchorToCardOnTablet = true,
+    )
 
     override fun configureContentViews(view: View) {
-        val context = view.context
-        view.findViewById<DaxTypeAnimationTextView>(R.id.contextualBrandDesignTitle)
-            ?.setText(R.string.onboardingDuckAiFireButtonDaxDialogTitle)
-        view.findViewById<DaxTextView>(R.id.contextualBrandDesignDescription)?.text =
-            context.getString(R.string.onboardingDuckAiFireButtonDaxDialogDescription).html(context)
+        view.findViewById<MaterialButton>(R.id.primaryCta)?.setText(R.string.onboardingDuckAiEndCtaButton)
     }
+
+    override fun decorateDescription(context: Context, text: CharSequence): CharSequence =
+        context.appendIconToText(text, CommonR.drawable.ic_ai_chat_16)
 }

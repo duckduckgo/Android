@@ -151,6 +151,7 @@ import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.model.LongPressTarget
 import com.duckduckgo.app.browser.nativeinput.NativeInputCallbacks
 import com.duckduckgo.app.browser.nativeinput.NativeInputManager
+import com.duckduckgo.app.browser.nativeinput.NativeInputManager.EnabledState
 import com.duckduckgo.app.browser.navigation.bar.BrowserNavigationBarViewIntegration
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarObserver
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarView
@@ -5036,6 +5037,9 @@ class BrowserTabFragment :
 
     fun onBackPressed(isCustomTab: Boolean = false): Boolean {
         if (!isAdded) return false
+        // During the locked Duck.ai onboarding demo, don't navigate within the app — returning false
+        // lets BrowserActivity exit (close the app). The user progresses by tapping the fire button.
+        if (viewModel.isOmnibarLockedForOnboarding()) return false
         if (nativeInputManager.hideNativeInput()) return true
         if (isPdfVisible()) {
             hidePdf()
@@ -5996,6 +6000,13 @@ class BrowserTabFragment :
 
                 browserNavigationBarIntegration.configureFireButtonHighlight(highlighted = viewState.fireButton.isHighlighted())
                 browserNavigationBarIntegration.configureLockForOnboarding(locked = viewState.isOmnibarLockedForOnboarding)
+                nativeInputManager.setEnabledState(
+                    when {
+                        !viewState.isOmnibarLockedForOnboarding -> EnabledState.ENABLED
+                        viewState.fireButton.isHighlighted() -> EnabledState.FIRE_BUTTON_SPOTLIGHT
+                        else -> EnabledState.DISABLED
+                    },
+                )
 
                 renderBrowserMenu(viewState)
 

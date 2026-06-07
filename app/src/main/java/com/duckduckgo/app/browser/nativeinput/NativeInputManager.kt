@@ -28,12 +28,17 @@ import android.view.ViewOutlineProvider
 import android.webkit.ValueCallback
 import android.widget.FrameLayout
 import androidx.core.net.toUri
+import androidx.core.view.doOnNextLayout
+import androidx.core.view.isVisible
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.map
 import androidx.recyclerview.widget.RecyclerView
+import com.duckduckgo.app.browser.PulseAnimation
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.browser.nativeinput.NativeInputManager.EnabledState
 import com.duckduckgo.app.browser.omnibar.Omnibar
 import com.duckduckgo.app.browser.omnibar.QueryUrlPredictor
 import com.duckduckgo.app.pixels.AppPixelName
@@ -123,6 +128,16 @@ interface NativeInputManager {
     fun onKeyboardVisibilityChanged(isVisible: Boolean)
     fun setPickingImage(picking: Boolean)
     fun setText(text: String)
+
+    /** Apply an [EnabledState] to the widget. No-op outside Duck.ai mode. */
+    fun setEnabledState(state: EnabledState)
+
+    /**
+     * Which of the widget's controls are interactive: [EnabledState.ENABLED] all,
+     * [EnabledState.DISABLED] none, [EnabledState.FIRE_BUTTON_SPOTLIGHT] only the fire button
+     * (highlighted with a pulse).
+     */
+    enum class EnabledState { ENABLED, DISABLED, FIRE_BUTTON_SPOTLIGHT }
 }
 
 @ContributesBinding(FragmentScope::class)
@@ -145,6 +160,9 @@ class RealNativeInputManager @Inject constructor(
     private var floatingSubmitContainer: View? = null
     private var widgetRoot: View? = null
     private var lastCallbacks: NativeInputCallbacks? = null
+
+    private var pulseAnimation: PulseAnimation? = null
+    private var enabledState: EnabledState = EnabledState.ENABLED
 
     private fun widgetFrom(widgetView: View): NativeInputWidget? {
         return widgetView.findViewById<View?>(R.id.inputModeWidget) as? NativeInputWidget
@@ -519,6 +537,7 @@ class RealNativeInputManager @Inject constructor(
 
     private fun removeWidget(): Boolean {
         var removed = false
+        pulseAnimation?.stop()
         rootView.findViewById<View?>(R.id.inputModeTopRoot)?.let {
             rootView.removeView(it)
             removed = true
@@ -681,11 +700,45 @@ class RealNativeInputManager @Inject constructor(
         }
 
         applyWindowChrome(widgetView, isBottom)
+        applyEnabledState(widgetView)
 
         if (!startEnterAnimation(widgetView, isBottom)) {
             animator.applyLayoutTransitions(widgetView, isBottom)
             onEnterComplete(widgetView)
         }
+    }
+
+    override fun setEnabledState(state: EnabledState) {
+        if (enabledState == state) return
+        enabledState = state
+        applyEnabledState()
+    }
+
+    // Mirrors the omnibar's applyEnabledState: the card lock dims and blocks the widget's controls; the
+    // leading fire button is a sibling the card lock can't reach, so it's dimmed/disabled here unless
+    // it's the spotlight target, when it stays bright and pulses. Only the spotlit fire button needs
+    // deferring (first layout after attach or focus clear) — the lock keeps things stable after that.
+    private fun applyEnabledState(widgetView: View? = widgetRoot) {
+        val state = if (omnibarController.isDuckAiMode()) enabledState else EnabledState.ENABLED
+        widgetView?.let { widgetFrom(it) }?.setInteractionLocked(state != EnabledState.ENABLED)
+
+        val fireMenu = widgetView?.findViewById<View?>(R.id.inputFieldFireIconMenu)
+        val fireIcon = widgetView?.findViewById<View?>(R.id.inputFieldFireIconImageview)
+        val fireEnabled = state != EnabledState.DISABLED
+        fireMenu?.let {
+            it.isEnabled = fireEnabled
+            it.alpha = if (fireEnabled) 1f else LOCKED_FIRE_ALPHA
+        }
+        when {
+            state != EnabledState.FIRE_BUTTON_SPOTLIGHT || fireMenu?.isVisible != true || fireIcon == null -> pulseAnimation?.stop()
+            fireIcon.height > 0 -> ensurePulseAnimation(fireIcon)?.playOn(fireIcon)
+            else -> fireIcon.doOnNextLayout { applyEnabledState() }
+        }
+    }
+
+    private fun ensurePulseAnimation(view: View): PulseAnimation? {
+        if (pulseAnimation == null) pulseAnimation = view.findViewTreeLifecycleOwner()?.let { PulseAnimation(it) }
+        return pulseAnimation
     }
 
     private fun suppressShadow(view: View) {
@@ -880,6 +933,7 @@ class RealNativeInputManager @Inject constructor(
         private const val WIDGET_ELEVATION_DP = 8f
         private const val FADE_OUT_DURATION_MS = 150L
         private const val DUCK_AI_FEATURE_PAGE = "duckai"
+        private const val LOCKED_FIRE_ALPHA = 0.4f
     }
 }
 
