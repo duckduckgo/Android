@@ -838,6 +838,7 @@ class BrowserTabViewModelTest {
                     linearOnboardingOrchestrator = mock<LinearOnboardingOrchestrator> {
                         on { state } doReturn MutableStateFlow(LinearOnboardingState.NotStarted)
                     },
+                    duckAiFeatureState = mockDuckAiFeatureState,
                 )
 
             accessibilitySettingsDataStore = AccessibilitySettingsSharedPreferences(context)

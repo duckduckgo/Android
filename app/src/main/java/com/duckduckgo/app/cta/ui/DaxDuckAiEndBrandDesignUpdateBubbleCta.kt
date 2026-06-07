@@ -1,0 +1,66 @@
+/*
+ * Copyright (c) 2026 DuckDuckGo
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.duckduckgo.app.cta.ui
+
+import android.content.Context
+import android.view.View
+import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.cta.model.CtaId
+import com.duckduckgo.app.global.install.AppInstallStore
+import com.duckduckgo.app.onboarding.store.OnboardingStore
+import com.duckduckgo.app.pixels.AppPixelName
+import com.duckduckgo.common.ui.view.appendIconToText
+import com.duckduckgo.common.utils.device.DeviceInfo
+import com.google.android.material.button.MaterialButton
+import com.duckduckgo.mobile.android.R as CommonR
+
+data class DaxDuckAiEndBrandDesignUpdateBubbleCta(
+    override val onboardingStore: OnboardingStore,
+    override val appInstallStore: AppInstallStore,
+    override val isLightTheme: Boolean,
+    override val deviceInfo: DeviceInfo,
+) : DaxBubbleCta.BrandDesignUpdateBubbleCta(
+    ctaId = CtaId.DAX_DUCK_AI_END,
+    title = R.string.onboardingDuckAiEndCtaTitle,
+    description = R.string.onboardingDuckAiEndCtaDescription,
+    backgroundRes = CommonR.drawable.bg_onboarding_end,
+    shownPixel = AppPixelName.ONBOARDING_DAX_CTA_SHOWN,
+    okPixel = AppPixelName.ONBOARDING_DAX_CTA_OK_BUTTON,
+    ctaPixelParam = "duck_ai_end_cta",
+    onboardingStore = onboardingStore,
+    appInstallStore = appInstallStore,
+    isLightTheme = isLightTheme,
+    deviceInfo = deviceInfo,
+),
+    DaxBubbleCta.ShowsWavingDax {
+    override val activeIncludeId: Int = R.id.primaryCta
+    override val showArrow: Boolean = true
+    override val wavingDaxSpec = WavingDaxSpec(
+        rotationDegrees = 0f,
+        translationXDp = -40f,
+        translationYDp = -150f,
+        heightDp = 178f,
+        anchorToCardOnTablet = true,
+    )
+
+    override fun configureContentViews(view: View) {
+        view.findViewById<MaterialButton>(R.id.primaryCta)?.setText(R.string.onboardingDuckAiEndCtaButton)
+    }
+
+    override fun decorateDescription(context: Context, text: CharSequence): CharSequence =
+        context.appendIconToText(text, CommonR.drawable.ic_ai_chat_16)
+}
