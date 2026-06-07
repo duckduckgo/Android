@@ -831,6 +831,7 @@ class BrowserTabViewModelTest {
                     appTheme = mockAppTheme,
                     duckAiOnboardingExperimentMetrics = mockDuckAiOnboardingExperimentMetrics,
                     deviceInfo = mockDeviceInfo,
+                    duckAiFeatureState = mockDuckAiFeatureState,
                 )
 
             accessibilitySettingsDataStore = AccessibilitySettingsSharedPreferences(context)

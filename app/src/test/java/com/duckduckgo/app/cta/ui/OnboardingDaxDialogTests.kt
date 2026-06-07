@@ -45,11 +45,13 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.common.utils.plugins.PluginPoint
+import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.subscriptions.api.SubscriptionPromoCtaShownPlugin
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.api.Subscriptions
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
@@ -129,6 +131,7 @@ class OnboardingDaxDialogTests {
             mockAppTheme,
             mock(DuckAiOnboardingExperimentMetrics::class.java),
             mockDeviceInfo,
+            mock(DuckAiFeatureState::class.java).also { whenever(it.showInputScreen).thenReturn(MutableStateFlow(true)) },
         )
     }
 
