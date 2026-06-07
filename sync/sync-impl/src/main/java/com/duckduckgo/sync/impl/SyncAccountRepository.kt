@@ -1522,8 +1522,10 @@ data class ThirdPartyRecoveryCodeWrapper(
 )
 
 /**
- * 3party recovery code v2 payload per Asana 1214804486778180. Outer JSON is base64url-encoded
- * for transport; `secret` is base64url of the 32 raw SP bytes.
+ * v2 recovery code payload per Asana 1214804486778180, used for both `cid` values. Outer JSON is
+ * base64url-encoded for transport. The `secret` encoding depends on the credential: 3party uses
+ * base64url of the 32 raw SP bytes; ddg carries the v1 primary_key verbatim (standard base64).
+ * Serialized with Moshi (never org.json) so forward slashes in the secret are not escaped to `\/`.
  */
 data class ThirdPartyRecoveryCode(
     @field:Json(name = "user_id") val userId: String,
