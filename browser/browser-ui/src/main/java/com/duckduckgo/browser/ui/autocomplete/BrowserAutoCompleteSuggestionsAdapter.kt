@@ -19,6 +19,7 @@ package com.duckduckgo.browser.ui.autocomplete
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.UiThread
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion
@@ -50,6 +51,7 @@ class BrowserAutoCompleteSuggestionsAdapter(
     omnibarType: OmnibarType,
     private val hideEditQueryArrow: Boolean = false,
     private val hideSectionDividers: Boolean = false,
+    private val isDeleteButtonVisible: Boolean = true,
 ) : RecyclerView.Adapter<AutoCompleteViewHolder>() {
     private val viewHolderFactoryMap: Map<Int, SuggestionViewHolderFactory> =
         mapOf(
@@ -117,6 +119,7 @@ class BrowserAutoCompleteSuggestionsAdapter(
                 if (hideEditQueryArrow) {
                     holder.itemView.findViewById<View>(R.id.editQueryImage)?.visibility = View.GONE
                 }
+                holder.itemView.findViewById<View>(R.id.deleteSuggestionButton)?.isVisible = isDeleteButtonVisible
             }
         }
     }
