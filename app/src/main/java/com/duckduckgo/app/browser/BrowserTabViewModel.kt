@@ -5384,11 +5384,15 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
-    fun openDuckChatSettings() {
-        viewModelScope.launch {
-            pixel.fire(DuckChatPixelName.DUCK_CHAT_DUCK_AI_SETTINGS_TAPPED)
-            val subscriptionEvent = duckChatJSHelper.onNativeAction(NativeAction.DUCK_AI_SETTINGS)
-            _subscriptionEventDataChannel.send(subscriptionEvent)
+    fun openDuckChatSettings(viewMode: ViewMode) {
+        pixel.fire(DuckChatPixelName.DUCK_CHAT_DUCK_AI_SETTINGS_TAPPED)
+        if (viewMode == ViewMode.DuckAI) {
+            viewModelScope.launch {
+                val subscriptionEvent = duckChatJSHelper.onNativeAction(NativeAction.DUCK_AI_SETTINGS)
+                _subscriptionEventDataChannel.send(subscriptionEvent)
+            }
+        } else {
+            command.value = OpenInNewTab(duckChat.getDuckChatSettingsUrl(), tabId)
         }
     }
 
