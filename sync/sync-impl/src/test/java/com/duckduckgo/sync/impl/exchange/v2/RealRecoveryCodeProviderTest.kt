@@ -16,19 +16,23 @@
 
 package com.duckduckgo.sync.impl.exchange.v2
 
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.sync.impl.Result
 import com.duckduckgo.sync.impl.SyncAccountRepository
 import com.duckduckgo.sync.store.ScopedPassword
 import com.duckduckgo.sync.store.SyncStore
 import org.json.JSONObject
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import java.util.Base64
 
+@RunWith(AndroidJUnit4::class)
 class RealRecoveryCodeProviderTest {
 
     private val syncAccountRepository: SyncAccountRepository = mock()
@@ -52,6 +56,26 @@ class RealRecoveryCodeProviderTest {
         assertEquals("pk-abc", v2.getString("secret"))
         assertEquals("ddg", v2.getString("cid"))
         assertEquals("2.0", v2.getString("v"))
+    }
+
+    @Test fun `getDdgRecoveryCode does not escape forward slashes in standard-base64 secret`() {
+        // Regression (Android↔Windows interop): the ddg secret is the v1 primary_key in STANDARD
+        // base64, which routinely contains '/'. AOSP's org.json.JSONObject.toString() escapes '/'
+        // to '\/', producing a recovery code Windows native cannot decode. Spec 1214804486778180
+        // constrains only the OUTER encoding to base64url; the inner secret must travel verbatim.
+        val secretWithSlashes = "apZ+7PAe89rDhuG4DRyi/M3zU2/D5DZNdRsR3RM6Ujw="
+        val v1Json = """{"recovery":{"primary_key":"$secretWithSlashes","user_id":"user-123"}}"""
+        val v1B64 = Base64.getUrlEncoder().withoutPadding().encodeToString(v1Json.toByteArray())
+        whenever(syncAccountRepository.getRecoveryCode()).thenReturn(
+            Result.Success(SyncAccountRepository.AuthCode(qrCode = v1B64, rawCode = v1B64)),
+        )
+
+        val result = provider.getDdgRecoveryCode()
+
+        assertTrue(result is Result.Success)
+        val rawJson = String(Base64.getUrlDecoder().decode((result as Result.Success).data), Charsets.UTF_8)
+        assertFalse("recovery JSON must not contain escaped slashes (\\/): $rawJson", rawJson.contains("\\/"))
+        assertTrue("secret must appear verbatim with raw '/': $rawJson", rawJson.contains(secretWithSlashes))
     }
 
     @Test fun `getDdgRecoveryCode bubbles up repository errors`() {

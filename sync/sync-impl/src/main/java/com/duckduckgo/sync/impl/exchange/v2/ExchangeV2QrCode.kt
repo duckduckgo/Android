@@ -19,6 +19,8 @@ package com.duckduckgo.sync.impl.exchange.v2
 import android.util.Base64
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
+import com.squareup.moshi.Json
+import com.squareup.moshi.Moshi
 import org.json.JSONObject
 import javax.inject.Inject
 
@@ -61,18 +63,22 @@ sealed interface ExchangeV2CodeParseResult {
 class RealExchangeV2QrCode @Inject constructor() : ExchangeV2QrCode {
 
     override fun buildLinkingCode(channelId: String, publicKeyBase64Url: String, version: String): String {
-        // Compact JSON, no whitespace — cross-platform clients hash/compare the encoded payload
-        // byte-for-byte, so JSON serialisation must be deterministic and minimal.
-        val payload = JSONObject().apply {
-            put("version", version)
-            put("channel_id", channelId)
-            put("public_key", publicKeyBase64Url)
-        }.toString()
+        // Compact JSON, no whitespace. Serialized with Moshi (not org.json) because AOSP's
+        // JSONObject.toString() escapes '/' to '\/', which non-strict cross-platform decoders
+        // reject. Consumers only ever PARSE this code and read the field values — nothing
+        // hashes or byte-compares the encoded payload — so field order is not contractual.
+        val payload = linkingCodeAdapter.toJson(
+            V2LinkingCodePayload(version = version, channelId = channelId, publicKey = publicKeyBase64Url),
+        )
         val encoded = Base64.encodeToString(
             payload.toByteArray(Charsets.UTF_8),
             Base64.URL_SAFE or Base64.NO_PADDING or Base64.NO_WRAP,
         )
         return "$URL_PREFIX#&$PARAM_V2=$encoded"
+    }
+
+    private val linkingCodeAdapter by lazy {
+        Moshi.Builder().build().adapter(V2LinkingCodePayload::class.java)
     }
 
     override fun parse(text: String): ExchangeV2CodeParseResult {
@@ -146,3 +152,14 @@ class RealExchangeV2QrCode @Inject constructor() : ExchangeV2QrCode {
         private val BASE64_URL_ALPHABET = (('A'..'Z') + ('a'..'z') + ('0'..'9') + listOf('-', '_', '=')).toSet()
     }
 }
+
+/**
+ * v2 linking-code payload. Serialized with plain (reflective) Moshi, which reads `@field:Json`
+ * and emits fields alphabetically — order is fine because the code is parse-only on every
+ * platform (nothing byte-compares it). See [RealExchangeV2QrCode.buildLinkingCode].
+ */
+internal data class V2LinkingCodePayload(
+    val version: String,
+    @field:Json(name = "channel_id") val channelId: String,
+    @field:Json(name = "public_key") val publicKey: String,
+)

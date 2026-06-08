@@ -19,6 +19,7 @@ package com.duckduckgo.sync.impl.exchange.v2
 import android.util.Base64
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -141,6 +142,27 @@ class RealExchangeV2QrCodeTest {
     @Test fun `buildLinkingCode produces the documented URL shape`() {
         val built = qrCode.buildLinkingCode(channelId = "c", publicKeyBase64Url = "k")
         assertTrue("expected URL prefix, got: $built", built.startsWith("https://duckduckgo.com/sync/pairing/#&code2="))
+    }
+
+    @Test fun `buildLinkingCode emits the expected compact JSON shape`() {
+        // Documents the exact wire shape and catches accidental serializer drift. Field ORDER is
+        // not contractual (the code is parse-only on every platform; nothing byte-compares it) —
+        // this just pins what plain Moshi currently emits (snake_case names, alphabetical order).
+        val built = qrCode.buildLinkingCode(channelId = "c", publicKeyBase64Url = "k", version = "2")
+        val fragment = built.substringAfter("code2=")
+        val decoded = String(Base64.decode(fragment, Base64.URL_SAFE or Base64.NO_PADDING or Base64.NO_WRAP))
+        assertEquals("""{"channel_id":"c","public_key":"k","version":"2"}""", decoded)
+    }
+
+    @Test fun `buildLinkingCode does not escape forward slashes (defense-in-depth)`() {
+        // Production keys are base64url (slash-free), but the JSON is byte-compared cross-platform —
+        // it must never carry Android-only '\/' escaping should any field ever contain '/'.
+        val built = qrCode.buildLinkingCode(channelId = "chan/123", publicKeyBase64Url = "pub/key+raw")
+        val fragment = built.substringAfter("code2=")
+        val decoded = String(Base64.decode(fragment, Base64.URL_SAFE or Base64.NO_PADDING or Base64.NO_WRAP))
+        assertFalse("linking JSON must not contain escaped slashes (\\/): $decoded", decoded.contains("\\/"))
+        assertTrue(decoded.contains("chan/123"))
+        assertTrue(decoded.contains("pub/key+raw"))
     }
 
     @Test fun `buildLinkingCode honours custom version`() {

@@ -17,9 +17,13 @@
 package com.duckduckgo.sync.impl.exchange.v2
 
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.sync.impl.RECOVERY_CODE_V2
 import com.duckduckgo.sync.impl.Result
 import com.duckduckgo.sync.impl.SyncAccountRepository
+import com.duckduckgo.sync.impl.ThirdPartyRecoveryCode
+import com.duckduckgo.sync.impl.ThirdPartyRecoveryCodeWrapper
 import com.squareup.anvil.annotations.ContributesBinding
+import com.squareup.moshi.Moshi
 import org.json.JSONObject
 import java.util.Base64
 import javax.inject.Inject
@@ -113,18 +117,20 @@ class RealRecoveryCodeProvider @Inject constructor(
         val v1 = JSONObject(String(decoded, Charsets.UTF_8)).getJSONObject("recovery")
         val userId = v1.getString("user_id")
         val secret = v1.getString("primary_key")
-        val v2Json = JSONObject().apply {
-            put(
-                "recovery",
-                JSONObject().apply {
-                    put("user_id", userId)
-                    put("secret", secret)
-                    put("cid", cid)
-                    put("v", "2.0")
-                },
-            )
-        }.toString()
+        // Serialize with Moshi, NOT org.json: AOSP's JSONObject.toString() escapes '/' to '\/',
+        // which non-strict cross-platform decoders (e.g. Windows native) reject. The ddg secret is
+        // the v1 primary_key in standard base64 and routinely contains '/'. Spec 1214804486778180
+        // constrains only the outer base64url encoding; the secret must travel verbatim.
+        val v2Json = recoveryCodeAdapter.toJson(
+            ThirdPartyRecoveryCodeWrapper(
+                recovery = ThirdPartyRecoveryCode(userId = userId, secret = secret, cid = cid, v = RECOVERY_CODE_V2),
+            ),
+        )
         return Base64.getUrlEncoder().withoutPadding().encodeToString(v2Json.toByteArray(Charsets.UTF_8))
+    }
+
+    private val recoveryCodeAdapter by lazy {
+        Moshi.Builder().build().adapter(ThirdPartyRecoveryCodeWrapper::class.java)
     }
 
     /** Accept either standard or URL-safe base64 (with or without padding). */
