@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.autocomplete.impl
 
+import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin
 import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin.PixelParameter
@@ -45,6 +46,8 @@ class AutocompleteParamRemovalPlugin @Inject constructor() : PixelParamRemovalPl
     override fun names(): List<Pair<String, Set<PixelParameter>>> {
         return listOf(
             AutoCompletePixelNames.AUTOCOMPLETE_INSTALLED_APP_SELECTION.pixelName to PixelParameter.removeAtb(),
+            AppPixelName.AUTOCOMPLETE_RESULT_DELETE_BUTTON_CLICKED.pixelName to PixelParameter.removeAtb(),
+            AppPixelName.AUTOCOMPLETE_RESULT_DELETE_BUTTON_CLICKED_DAILY.pixelName to PixelParameter.removeAtb(),
         )
     }
 }

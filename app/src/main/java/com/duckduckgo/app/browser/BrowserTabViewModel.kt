@@ -280,6 +280,8 @@ import com.duckduckgo.app.onboardingbranddesignupdate.OnboardingBrandDesignUpdat
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_RESULT_DELETED
 import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_RESULT_DELETED_DAILY
+import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_RESULT_DELETE_BUTTON_CLICKED
+import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_RESULT_DELETE_BUTTON_CLICKED_DAILY
 import com.duckduckgo.app.pixels.AppPixelName.ONBOARDING_SEARCH_CUSTOM
 import com.duckduckgo.app.pixels.AppPixelName.ONBOARDING_VISIT_SITE_CUSTOM
 import com.duckduckgo.app.pixels.AppPixelName.TAB_MANAGER_CLICKED_DAILY
@@ -1327,9 +1329,13 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
-    fun userLongPressedAutocomplete(suggestion: AutoCompleteSuggestion) {
+    fun onUserRequestedToDeleteAutocompleteItem(suggestion: AutoCompleteSuggestion) {
         when (suggestion) {
-            is AutoCompleteHistorySuggestion, is AutoCompleteHistorySearchSuggestion -> showRemoveSearchSuggestionDialog(suggestion)
+            is AutoCompleteHistorySuggestion, is AutoCompleteHistorySearchSuggestion -> {
+                pixel.fire(AUTOCOMPLETE_RESULT_DELETE_BUTTON_CLICKED)
+                pixel.fire(AUTOCOMPLETE_RESULT_DELETE_BUTTON_CLICKED_DAILY, type = Daily())
+                showRemoveSearchSuggestionDialog(suggestion)
+            }
             else -> return
         }
     }

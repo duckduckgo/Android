@@ -46,7 +46,7 @@ private val AutoCompleteSuggestion.isSearchItem: Boolean
 class BrowserAutoCompleteSuggestionsAdapter(
     private val immediateSearchClickListener: (AutoCompleteSuggestion) -> Unit,
     private val editableSearchClickListener: (AutoCompleteSuggestion) -> Unit,
-    private val autoCompleteLongPressClickListener: (AutoCompleteSuggestion) -> Unit,
+    private val autoCompleteDeleteClickListener: (AutoCompleteSuggestion) -> Unit,
     omnibarType: OmnibarType,
     private val hideEditQueryArrow: Boolean = false,
     private val hideSectionDividers: Boolean = false,
@@ -112,7 +112,7 @@ class BrowserAutoCompleteSuggestionsAdapter(
                         phrase,
                         immediateSearchClickListener,
                         editableSearchClickListener,
-                        autoCompleteLongPressClickListener,
+                        autoCompleteDeleteClickListener,
                     )
                 if (hideEditQueryArrow) {
                     holder.itemView.findViewById<View>(R.id.editQueryImage)?.visibility = View.GONE

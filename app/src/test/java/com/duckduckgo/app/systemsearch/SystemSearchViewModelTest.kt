@@ -554,34 +554,40 @@ class SystemSearchViewModelTest {
     }
 
     @Test
-    fun whenUserLongPressedOnHistorySuggestionThenShowRemoveSearchSuggestionDialogCommandIssued() {
+    fun whenUserClickedDeleteOnHistorySuggestionThenPixelFiredAndShowRemoveSearchSuggestionDialogCommandIssued() {
         val suggestion = AutoCompleteHistorySuggestion(phrase = "phrase", title = "title", url = "url", isAllowedInTopHits = false)
 
-        testee.userLongPressedAutocomplete(suggestion)
+        testee.onUserRequestedToDeleteAutocompleteItem(suggestion)
 
+        verify(mockPixel).fire(AUTOCOMPLETE_RESULT_DELETE_BUTTON_CLICKED)
+        verify(mockPixel).fire(AUTOCOMPLETE_RESULT_DELETE_BUTTON_CLICKED_DAILY, type = Daily())
         verify(commandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         val issuedCommand = commandCaptor.allValues.find { it is ShowRemoveSearchSuggestionDialog }
         assertEquals(suggestion, (issuedCommand as ShowRemoveSearchSuggestionDialog).suggestion)
     }
 
     @Test
-    fun whenUserLongPressedOnHistorySearchSuggestionThenShowRemoveSearchSuggestionDialogCommandIssued() {
+    fun whenUserClickedDeleteOnHistorySearchSuggestionThenPixelFiredAndShowRemoveSearchSuggestionDialogCommandIssued() {
         val suggestion = AutoCompleteHistorySearchSuggestion(phrase = "phrase", isAllowedInTopHits = false)
 
-        testee.userLongPressedAutocomplete(suggestion)
+        testee.onUserRequestedToDeleteAutocompleteItem(suggestion)
 
+        verify(mockPixel).fire(AUTOCOMPLETE_RESULT_DELETE_BUTTON_CLICKED)
+        verify(mockPixel).fire(AUTOCOMPLETE_RESULT_DELETE_BUTTON_CLICKED_DAILY, type = Daily())
         verify(commandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         val issuedCommand = commandCaptor.allValues.find { it is ShowRemoveSearchSuggestionDialog }
         assertEquals(suggestion, (issuedCommand as ShowRemoveSearchSuggestionDialog).suggestion)
     }
 
     @Test
-    fun whenUserLongPressedOnOtherSuggestionThenDoNothing() {
+    fun whenUserClickedDeleteOnOtherSuggestionThenDoNothing() {
         val suggestion = AutoCompleteDefaultSuggestion(phrase = "phrase")
 
-        testee.userLongPressedAutocomplete(suggestion)
+        testee.onUserRequestedToDeleteAutocompleteItem(suggestion)
 
         assertCommandNotIssued<ShowRemoveSearchSuggestionDialog>()
+        verify(mockPixel, never()).fire(AUTOCOMPLETE_RESULT_DELETE_BUTTON_CLICKED)
+        verify(mockPixel, never()).fire(AUTOCOMPLETE_RESULT_DELETE_BUTTON_CLICKED_DAILY, type = Daily())
     }
 
     @Test

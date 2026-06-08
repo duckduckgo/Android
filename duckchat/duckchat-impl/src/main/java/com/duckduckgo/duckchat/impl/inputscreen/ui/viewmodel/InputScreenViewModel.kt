@@ -491,7 +491,7 @@ class InputScreenViewModel @AssistedInject constructor(
         }
     }
 
-    fun userLongPressedAutocomplete(suggestion: AutoCompleteSuggestion) {
+    fun onUserRequestedToDeleteAutocompleteItem(suggestion: AutoCompleteSuggestion) {
         when (suggestion) {
             is AutoCompleteHistorySuggestion, is AutoCompleteHistorySearchSuggestion -> showRemoveSearchSuggestionDialog(suggestion)
             else -> return

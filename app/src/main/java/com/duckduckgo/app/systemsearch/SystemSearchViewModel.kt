@@ -383,9 +383,13 @@ class SystemSearchViewModel @Inject constructor(
         }
     }
 
-    fun userLongPressedAutocomplete(suggestion: AutoCompleteSuggestion) {
+    fun onUserRequestedToDeleteAutocompleteItem(suggestion: AutoCompleteSuggestion) {
         when (suggestion) {
-            is AutoCompleteHistorySuggestion, is AutoCompleteHistorySearchSuggestion -> showRemoveSearchSuggestionDialog(suggestion)
+            is AutoCompleteHistorySuggestion, is AutoCompleteHistorySearchSuggestion -> {
+                pixel.fire(AUTOCOMPLETE_RESULT_DELETE_BUTTON_CLICKED)
+                pixel.fire(AUTOCOMPLETE_RESULT_DELETE_BUTTON_CLICKED_DAILY, type = Daily())
+                showRemoveSearchSuggestionDialog(suggestion)
+            }
             else -> return
         }
     }

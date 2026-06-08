@@ -3699,8 +3699,8 @@ class BrowserTabFragment :
                 editableSearchClickListener = {
                     viewModel.onUserSelectedToEditQuery(it.phrase)
                 },
-                autoCompleteLongPressClickListener = {
-                    viewModel.userLongPressedAutocomplete(it)
+                autoCompleteDeleteClickListener = {
+                    viewModel.onUserRequestedToDeleteAutocompleteItem(it)
                 },
                 omnibarType = settingsDataStore.omnibarType,
             )

@@ -260,6 +260,8 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
 
     AUTOCOMPLETE_RESULT_DELETED("m_autocomplete_result_deleted"),
     AUTOCOMPLETE_RESULT_DELETED_DAILY("m_autocomplete_result_deleted_daily"),
+    AUTOCOMPLETE_RESULT_DELETE_BUTTON_CLICKED("autocomplete_result_delete_button_clicked"),
+    AUTOCOMPLETE_RESULT_DELETE_BUTTON_CLICKED_DAILY("autocomplete_result_delete_button_clicked_daily"),
 
     CHAT_SUGGESTIONS_GENERAL_SETTINGS_TOGGLED_ON_COUNT("m_aichat_settings_chat_suggestions_turned_on_count"),
     CHAT_SUGGESTIONS_GENERAL_SETTINGS_TOGGLED_ON_DAILY("m_aichat_settings_chat_suggestions_turned_on_daily"),

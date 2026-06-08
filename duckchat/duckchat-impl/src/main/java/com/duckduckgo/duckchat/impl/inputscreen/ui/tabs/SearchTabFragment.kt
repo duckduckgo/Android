@@ -181,8 +181,8 @@ class SearchTabFragment : DuckDuckGoFragment(R.layout.fragment_search_tab) {
                 editableSearchClickListener = {
                     viewModel.onUserSelectedToEditQuery(it.phrase)
                 },
-                autoCompleteLongPressClickListener = {
-                    viewModel.userLongPressedAutocomplete(it)
+                autoCompleteDeleteClickListener = {
+                    viewModel.onUserRequestedToDeleteAutocompleteItem(it)
                 },
                 omnibarType =
                 if (inputScreenConfigResolver.useTopBar()) {

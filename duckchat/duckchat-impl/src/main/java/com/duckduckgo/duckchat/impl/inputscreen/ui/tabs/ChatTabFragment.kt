@@ -187,7 +187,7 @@ class ChatTabFragment : DuckDuckGoFragment(R.layout.fragment_chat_tab) {
         chatUrlSuggestionsAdapter = BrowserAutoCompleteSuggestionsAdapter(
             immediateSearchClickListener = { viewModel.userSelectedAutocomplete(it, fromChatUrlSuggestions = true) },
             editableSearchClickListener = { },
-            autoCompleteLongPressClickListener = { },
+            autoCompleteDeleteClickListener = { },
             omnibarType = if (inputScreenConfigResolver.useTopBar()) OmnibarType.SINGLE_TOP else OmnibarType.SINGLE_BOTTOM,
             hideEditQueryArrow = true,
             hideSectionDividers = true,
