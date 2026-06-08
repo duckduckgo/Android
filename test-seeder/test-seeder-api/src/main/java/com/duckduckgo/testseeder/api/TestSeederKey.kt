@@ -36,4 +36,9 @@ enum class TestSeederKey(val key: String, val description: String) {
         "Semicolon-separated list of URLs to seed as bookmarks. " +
             "URLs without a scheme are normalised to https://. Example: \"reddit.com;eff.org;cnn.com\"",
     ),
+    WEB_CONTENT_DEBUGGING(
+        "webContentDebugging",
+        "Enables WebView remote debugging so Maestro's androidWebViewHierarchy: devtools mode can read " +
+            "WebView DOM content. Set at launch, before any WebView is created. Values: true | false",
+    ),
 }
