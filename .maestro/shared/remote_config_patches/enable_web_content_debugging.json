@@ -1,3 +1,0 @@
-[
-  { "op": "add", "path": "/features/InternalWebContentDebuggingFlag", "value": { "state": "enabled", "features": { "webContentDebugging": { "state": "enabled" } } } }
-]

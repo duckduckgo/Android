@@ -8,6 +8,9 @@ tags:
     commands:
       - launchApp:
           clearState: true
+          arguments:
+            isMaestro: "true"
+            webContentDebugging: "true"
       - runFlow: ../shared/skip_all_onboarding.yaml
       - runFlow: ../shared/browser_screen/click_on_menu_button.yaml
       - tapOn:

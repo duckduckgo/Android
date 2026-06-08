@@ -8,6 +8,9 @@ name: "Custom Tabs navigation"
       - launchApp:
           clearState: true
           stopApp: true
+          arguments:
+            isMaestro: "true"
+            webContentDebugging: "true"
 
       - runFlow:
           file: ../shared/pre_onboarding.yaml
