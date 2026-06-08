@@ -68,6 +68,7 @@ class SyncV2PairingDebugViewModelTest {
         syncAccountRepository = syncAccountRepository,
         dispatcher = dispatcher,
         dispatchers = coroutineTestRule.testDispatcherProvider,
+        appScope = coroutineTestRule.testScope,
     )
 
     // ---- Event log ----
@@ -155,7 +156,7 @@ class SyncV2PairingDebugViewModelTest {
 
     // ---- Lifecycle / control ----
 
-    @Test fun `onCancelClicked delegates to runner cancel`() {
+    @Test fun `onCancelClicked delegates to runner cancel`() = runTest {
         val viewModel = newViewModel()
         viewModel.onCancelClicked()
         verify(runner).cancel()

@@ -19,6 +19,7 @@ package com.duckduckgo.sync.internal.ui
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
+import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.sync.impl.DispatchOutcome
@@ -39,6 +40,7 @@ import com.duckduckgo.sync.impl.exchange.v2.RejectReason
 import com.duckduckgo.sync.impl.exchange.v2.Role
 import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Companion.POLLING_INTERVAL_EXCHANGE_FLOW
 import com.duckduckgo.sync.store.SyncStore
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
@@ -58,6 +60,7 @@ class SyncV2PairingDebugViewModel @Inject constructor(
     private val syncAccountRepository: SyncAccountRepository,
     private val dispatcher: SyncCodeDispatcher,
     private val dispatchers: DispatcherProvider,
+    @AppCoroutineScope private val appScope: CoroutineScope,
 ) : ViewModel() {
 
     data class LogRow(
@@ -117,7 +120,9 @@ class SyncV2PairingDebugViewModel @Inject constructor(
      */
     override fun onCleared() {
         super.onCleared()
-        runner.cancel()
+        // cancel() suspends until teardown completes; onCleared can't await and viewModelScope is
+        // already cancelling, so fire-and-forget the teardown on the app scope (it outlives the VM).
+        appScope.launch { runner.cancel() }
     }
 
     private val confirmationRequests = Channel<ConfirmationRequest>(Channel.BUFFERED)
