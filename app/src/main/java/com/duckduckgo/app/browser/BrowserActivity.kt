@@ -87,6 +87,7 @@ import com.duckduckgo.app.global.rating.PromptCount
 import com.duckduckgo.app.global.sanitize
 import com.duckduckgo.app.global.view.ClearDataAction
 import com.duckduckgo.app.global.view.ORIGIN_DUCK_AI_CONTEXTUAL_CHAT
+import com.duckduckgo.app.global.view.ORIGIN_HATCH
 import com.duckduckgo.app.global.view.renderIfChanged
 import com.duckduckgo.app.onboarding.ui.page.DefaultBrowserPage
 import com.duckduckgo.app.pixels.AppPixelName
@@ -488,7 +489,8 @@ open class BrowserActivity : DuckDuckGoActivity() {
                     }
                 }
                 FireDialog.EVENT_ON_SINGLE_TAB_CLEAR_COMPLETE -> {
-                    val isDuckAiContextual = bundle.getString(FireDialog.RESULT_KEY_ORIGIN) == ORIGIN_DUCK_AI_CONTEXTUAL_CHAT
+                    val origin = bundle.getString(FireDialog.RESULT_KEY_ORIGIN)
+                    val isDuckAiContextual = origin == ORIGIN_DUCK_AI_CONTEXTUAL_CHAT
                     val message = if (isDuckAiContextual) {
                         getString(R.string.duckAiChatDeletedSnackbar)
                     } else {
@@ -496,6 +498,12 @@ open class BrowserActivity : DuckDuckGoActivity() {
                     }
                     showSnackbar(message)
                     if (isDuckAiContextual) currentTab?.onContextualSheetFireComplete()
+                    // Burning a tab from the return hatch closes the tab the user is on and opens a
+                    // fresh new tab, so they land on a clean tab rather than back on the burned one.
+                    if (origin == ORIGIN_HATCH) {
+                        currentTab?.closeCurrentTab()
+                        launchNewTab()
+                    }
                     if (pendingDuckAiOnboardingFire) {
                         pendingDuckAiOnboardingFire = false
                         closeDuckChatFullScreen()
