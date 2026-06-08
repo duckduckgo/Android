@@ -36,6 +36,7 @@ tags:
       - tapOn:
           text: "add your url here"
       - inputText: "https://www.search-company.site"
+      - hideKeyboard
       - tapOn:
           text: "load custom tab"
       - tapOn:
@@ -45,24 +46,36 @@ tags:
       - action: back
       - tapOn:
           text: "[Ad 2] Shopping Tab Ad (heuristic)"
-      - assertVisible:
-          text: "Publisher site"
+      - extendedWaitUntil:
+          visible:
+            text: "Publisher site"
+          timeout: 5000
       - action: back
       - tapOn:
           text: "[Ad 2] Shopping Tab Ad (heuristic)"
+      - extendedWaitUntil:
+          visible:
+            text: "Red shoes"
+          timeout: 5000
       - tapOn:
           text: "Red shoes"
-      - assertVisible:
-          text: "Checkout"
+      - extendedWaitUntil:
+          visible:
+            text: "Checkout"
+          timeout: 5000
       - tapOn:
           id: "com.duckduckgo.mobile.android:id/browserMenuImageView"
       - tapOn:
           id: "com.duckduckgo.mobile.android:id/backMenuItem"
-      - assertVisible:
-          text: "Red shoes"
+      - extendedWaitUntil:
+          visible:
+            text: "Red shoes"
+          timeout: 5000
       - tapOn:
           id: "com.duckduckgo.mobile.android:id/browserMenuImageView"
       - tapOn:
           id: "com.duckduckgo.mobile.android:id/forwardMenuItem"
-      - assertVisible:
-          text: "Checkout"
+      - extendedWaitUntil:
+          visible:
+            text: "Checkout"
+          timeout: 5000
