@@ -30,7 +30,7 @@ develocity {
         }
         // Tag scans with the active DI framework so cache hits are queryable per-variant
         // and Anvil/Metro builds remain visibly distinct on Develocity.
-        def diFrameworkTag = settings.startParameter.projectProperties.get('ddg.di') ?: 'AnvilDagger'
+        def diFrameworkTag = providers.gradleProperty('ddg.di').getOrElse('AnvilDagger')
         tag(diFrameworkTag)
         value('ddg.di', diFrameworkTag)
     }
