@@ -640,15 +640,19 @@ class RealExchangeV2Runner @Inject constructor(
             sendOnWireAndRecord(json, peer, peerKey, ExchangeV2Message.RecoveryCodeRequest(json, DEVICE_NAME, OWN_DEVICE_KIND))
         }
         sentOwnAvailability = true
-        // Roll the maybe-auto-elect check forward in case we already received peer availability
-        // before we knew our own context.
+        // Roll the auto-elect check forward in case the peer's availability arrived before we
+        // sent ours. Delegate to [autoElectRoleLocked] (the single election path) so the
+        // RoleElected side effects actually run — notably SendAwaitingConfirmation on the Host
+        // branch. An earlier inline copy here emitted the transition but dropped the side effects.
+        //
+        // REVIEW (spec reachability): with the current eager-send ordering this looks unreachable
+        // — entering Negotiating and sending our own availability happen in the same locked pass,
+        // so we never arrive here in Negotiating with peerKind already set. Confirm against the
+        // cross-platform ordering spec (Unified Algorithm 1214739740392701) whether any client
+        // ordering can make it live; if not, this branch is dead code and can be removed.
         val sm = session ?: return
         if (sm.currentState == ExchangeV2State.Negotiating && peerKind != null) {
-            val elected = electRole()
-            if (elected != null) {
-                val r = sm.localTrigger(LocalTrigger.RoleElected(elected))
-                emit(r.event)
-            }
+            autoElectRoleLocked(sm)
         }
     }
 
