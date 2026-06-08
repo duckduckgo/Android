@@ -93,7 +93,7 @@ class RealExchangeV2RunnerTest {
         assertSame(ExchangeV2State.Negotiating, runner.currentState)
     }
 
-    @Test fun `cancel abandons the session`() {
+    @Test fun `cancel abandons the session`() = runTest {
         val runner = newRunner()
         runner.startScan("")
         runner.cancel()
@@ -251,7 +251,7 @@ class RealExchangeV2RunnerTest {
         assertTrue(newRunner().canStartAsPresenter)
     }
 
-    @Test fun `cancel clears pairingRole`() {
+    @Test fun `cancel clears pairingRole`() = runTest {
         val runner = newRunner()
         runner.startScan("")
         runner.cancel()

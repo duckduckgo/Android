@@ -95,7 +95,14 @@ interface ExchangeV2Runner {
 
     fun startPresent()
 
-    fun cancel()
+    /**
+     * Tear down the active session (stop polling, discard ephemeral keys, best-effort DELETE the
+     * channel, clear state). Suspends until teardown completes so callers that must sequence work
+     * after it (e.g. signing out, which invalidates the recovery code) can await it. Lifecycle /
+     * abandon callers that can't await — e.g. `ViewModel.onCleared` — should launch this on a
+     * longer-lived scope themselves.
+     */
+    suspend fun cancel()
 
     fun deliverIncomingMessage(message: ExchangeV2Message)
 
@@ -271,19 +278,11 @@ class RealExchangeV2Runner @Inject constructor(
         return null
     }
 
-    override fun cancel() {
-        // Public, fire-and-forget: external callers (dispatcher/UI) abandon the session. Internal
-        // sites call [teardownSession]/[failSession] directly so they can await teardown. All
-        // teardown runs under [mutex] so it can't race the locked message/trigger handlers.
-        appScope.launch(dispatchers.io()) { teardownSession() }
-    }
-
-    /**
-     * Tear down off the lock. [NonCancellable] so a caller cancelling its own job mid-teardown
-     * (the poll loop or the session timer both call this from inside the job [cancelLocked]
-     * cancels) can't abort the teardown half-way.
-     */
-    private suspend fun teardownSession() {
+    override suspend fun cancel() {
+        // Runs teardown under [mutex] so it can't race the locked message/trigger handlers.
+        // [NonCancellable] so a caller cancelling its own job mid-teardown can't abort it
+        // half-way (matches [failSession], which the poll loop / timer call from inside the very
+        // job [cancelLocked] cancels).
         withContext(NonCancellable) { mutex.withLock { cancelLocked() } }
     }
 
