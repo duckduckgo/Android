@@ -20,6 +20,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.impl.DuckChatInternal
+import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.helper.DuckChatJSHelper
 import com.duckduckgo.duckchat.impl.helper.NativeAction
@@ -69,6 +70,7 @@ class DuckChatContextualViewModelTest {
     private val duckChatPixels: DuckChatPixels = mock()
     private val duckChatFeature: DuckChatFeature = mock()
     private val contextualFireButtonToggle: Toggle = mock()
+    private val contextualSheetImprovementsToggle: Toggle = mock()
     private val featureTogglesInventory: FeatureTogglesInventory = mock()
     private val modelManager: com.duckduckgo.duckchat.impl.models.DuckAiModelManager = mock()
     private val contextualNativeInputManager: ContextualNativeInputManager = mock()
@@ -82,6 +84,8 @@ class DuckChatContextualViewModelTest {
     fun setup() {
         whenever(duckChatFeature.contextualFireButton()).thenReturn(contextualFireButtonToggle)
         whenever(contextualFireButtonToggle.isEnabled()).thenReturn(false)
+        whenever(duckChatFeature.contextualSheetImprovements()).thenReturn(contextualSheetImprovementsToggle)
+        whenever(contextualSheetImprovementsToggle.isEnabled()).thenReturn(false)
         whenever(singleTabFireDialogToggle.featureName()).thenReturn(singleTabFireDialogFeatureName)
         whenever(singleTabFireDialogToggle.isEnabled()).thenReturn(false)
         runBlocking { whenever(featureTogglesInventory.getAllTogglesForParent("androidBrowserConfig")) }.thenReturn(listOf(singleTabFireDialogToggle))
@@ -1530,6 +1534,22 @@ class DuckChatContextualViewModelTest {
         val testee = buildViewModel()
 
         assertFalse(testee.viewState.value.isFireButtonEnabled)
+    }
+
+    @Test
+    fun `when aiChatContextualSheetImprovements disabled then quickActionPromptResId is summarize`() = runTest {
+        whenever(contextualSheetImprovementsToggle.isEnabled()).thenReturn(false)
+        val testee = buildViewModel()
+
+        assertEquals(R.string.duckAIContextualPromptSummarize, testee.viewState.value.quickActionPromptResId)
+    }
+
+    @Test
+    fun `when aiChatContextualSheetImprovements enabled then quickActionPromptResId is ask about page`() = runTest {
+        whenever(contextualSheetImprovementsToggle.isEnabled()).thenReturn(true)
+        val testee = buildViewModel()
+
+        assertEquals(R.string.duckAIContextualPromptAskAboutPage, testee.viewState.value.quickActionPromptResId)
     }
 
     @Test

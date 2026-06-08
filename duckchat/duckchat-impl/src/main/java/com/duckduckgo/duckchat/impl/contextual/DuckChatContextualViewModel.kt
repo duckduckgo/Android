@@ -16,6 +16,7 @@
 
 package com.duckduckgo.duckchat.impl.contextual
 
+import androidx.annotation.StringRes
 import androidx.annotation.VisibleForTesting
 import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
@@ -26,6 +27,7 @@ import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.api.toChatIdOrNull
 import com.duckduckgo.duckchat.impl.DuckChatInternal
+import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.helper.DuckChatJSHelper
 import com.duckduckgo.duckchat.impl.helper.NativeAction
@@ -111,6 +113,7 @@ class DuckChatContextualViewModel @Inject constructor(
                 tabId = "",
                 prompt = "",
                 isFireButtonEnabled = false,
+                quickActionPromptResId = R.string.duckAIContextualPromptSummarize,
             ),
         )
     val viewState: StateFlow<ViewState> = _viewState.asStateFlow()
@@ -121,8 +124,16 @@ class DuckChatContextualViewModel @Inject constructor(
                 .getAllTogglesForParent("androidBrowserConfig")
                 .find { it.featureName().name == "singleTabFireDialog" }
                 ?.isEnabled() == true
+            val quickActionPromptResId = if (duckChatFeature.contextualSheetImprovements().isEnabled()) {
+                R.string.duckAIContextualPromptAskAboutPage
+            } else {
+                R.string.duckAIContextualPromptSummarize
+            }
             _viewState.update {
-                it.copy(isFireButtonEnabled = duckChatFeature.contextualFireButton().isEnabled() && isSingleTabFireEnabled)
+                it.copy(
+                    isFireButtonEnabled = duckChatFeature.contextualFireButton().isEnabled() && isSingleTabFireEnabled,
+                    quickActionPromptResId = quickActionPromptResId,
+                )
             }
         }
     }
@@ -138,6 +149,7 @@ class DuckChatContextualViewModel @Inject constructor(
         val tabId: String = "",
         val prompt: String = "",
         val isFireButtonEnabled: Boolean = false,
+        @StringRes val quickActionPromptResId: Int = R.string.duckAIContextualPromptSummarize,
     )
 
     fun onSheetReopened() {

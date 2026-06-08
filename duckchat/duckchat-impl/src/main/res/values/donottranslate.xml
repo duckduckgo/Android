@@ -71,4 +71,7 @@
 
     <!-- Duck.ai header -->
     <string name="duckChatPlusButtonContentDescription">Open Duck.ai menu</string>
+
+    <!-- Contextual sheet quick action -->
+    <string name="duckAIContextualPromptAskAboutPage">Ask about page</string>
 </resources>

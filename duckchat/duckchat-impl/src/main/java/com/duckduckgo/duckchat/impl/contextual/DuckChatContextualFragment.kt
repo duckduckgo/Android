@@ -556,8 +556,8 @@ class DuckChatContextualFragment :
         binding.duckAiAttachContextLayout.setOnClickListener {
             viewModel.addPageContext()
         }
-        binding.contextualPromptSummarize.setOnClickListener {
-            val prompt = getString(R.string.duckAIContextualPromptSummarize)
+        binding.contextualPromptQuickAction.setOnClickListener {
+            val prompt = getString(viewModel.viewState.value.quickActionPromptResId)
             viewModel.replacePrompt(binding.inputField.text.toString(), prompt)
         }
     }
@@ -661,6 +661,8 @@ class DuckChatContextualFragment :
         } else {
             binding.contextualFullScreen.gone()
         }
+
+        binding.contextualPromptQuickAction.setText(viewState.quickActionPromptResId)
 
         when (viewState.sheetMode) {
             DuckChatContextualViewModel.SheetMode.INPUT -> {
