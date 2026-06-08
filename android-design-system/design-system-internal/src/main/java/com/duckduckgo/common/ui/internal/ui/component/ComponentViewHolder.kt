@@ -47,9 +47,12 @@ import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
+import com.duckduckgo.common.ui.compose.button.DaxIconButton
 import com.duckduckgo.common.ui.compose.cards.DaxCard
 import com.duckduckgo.common.ui.compose.cards.DaxSurface
 import com.duckduckgo.common.ui.compose.checkbox.DaxCheckbox
+import com.duckduckgo.common.ui.compose.divider.DaxHorizontalDivider
+import com.duckduckgo.common.ui.compose.divider.DaxVerticalDivider
 import com.duckduckgo.common.ui.compose.message.DaxAction
 import com.duckduckgo.common.ui.compose.message.remote.DaxBigSingleActionMessage
 import com.duckduckgo.common.ui.compose.message.remote.DaxBigTwoActionsMessage
@@ -605,7 +608,63 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
         }
     }
 
-    class DividerComponentViewHolder(parent: ViewGroup) : ComponentViewHolder(inflate(parent, R.layout.component_section_divider))
+    class DividerComponentViewHolder(
+        parent: ViewGroup,
+        private val isDarkTheme: Boolean,
+    ) : ComponentViewHolder(inflate(parent, R.layout.component_section_divider)) {
+        override fun bind(component: Component) {
+            view.setupThemedComposeView(
+                id = R.id.compose_dax_horizontal_divider_full_width,
+                isDarkTheme = isDarkTheme,
+            ) {
+                DaxHorizontalDivider(
+                    modifier = Modifier.padding(vertical = 8.dp),
+                )
+            }
+            view.setupThemedComposeView(
+                id = R.id.compose_dax_horizontal_divider_inset,
+                isDarkTheme = isDarkTheme,
+            ) {
+                DaxHorizontalDivider(
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                )
+            }
+            view.setupThemedComposeView(
+                id = R.id.compose_dax_horizontal_divider_custom_margin,
+                isDarkTheme = isDarkTheme,
+            ) {
+                DaxHorizontalDivider(
+                    modifier = Modifier.padding(56.dp),
+                )
+            }
+            view.setupThemedComposeView(
+                id = R.id.compose_dax_vertical_divider,
+                isDarkTheme = isDarkTheme,
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(100.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center,
+                ) {
+                    DaxIconButton(
+                        onClick = {},
+                        iconPainter = painterResource(CommonR.drawable.ic_union),
+                        contentDescription = "Menu",
+                    )
+
+                    DaxVerticalDivider()
+
+                    DaxIconButton(
+                        onClick = {},
+                        iconPainter = painterResource(CommonR.drawable.ic_union),
+                        contentDescription = "Menu",
+                    )
+                }
+            }
+        }
+    }
 
     class CardComponentViewHolder(
         parent: ViewGroup,
@@ -692,7 +751,7 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
                 Component.SECTION_HEADER_LIST_ITEM -> HeaderSectionComponentViewHolder(parent)
                 Component.SINGLE_LINE_LIST_ITEM -> OneLineListItemComponentViewHolder(parent)
                 Component.TWO_LINE_LIST_ITEM -> TwoLineItemComponentViewHolder(parent)
-                Component.SECTION_DIVIDER -> DividerComponentViewHolder(parent)
+                Component.SECTION_DIVIDER -> DividerComponentViewHolder(parent, isDarkTheme)
                 Component.CARD -> CardComponentViewHolder(parent, isDarkTheme)
                 Component.SETTINGS_LIST_ITEM -> SettingsListItemComponentViewHolder(parent)
                 else -> {
