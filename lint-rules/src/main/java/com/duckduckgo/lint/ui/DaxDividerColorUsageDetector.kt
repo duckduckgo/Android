@@ -27,13 +27,15 @@ import com.android.tools.lint.detector.api.Severity
 import com.android.tools.lint.detector.api.SourceCodeScanner
 import com.android.tools.lint.detector.api.TextFormat
 import com.intellij.psi.PsiElement
-import com.intellij.psi.PsiField
-import com.intellij.psi.PsiMethod
+import org.jetbrains.uast.UBlockExpression
 import org.jetbrains.uast.UCallExpression
 import org.jetbrains.uast.UExpression
-import org.jetbrains.uast.UQualifiedReferenceExpression
+import org.jetbrains.uast.UMethod
 import org.jetbrains.uast.UReferenceExpression
+import org.jetbrains.uast.UReturnExpression
+import org.jetbrains.uast.UVariable
 import org.jetbrains.uast.getParameterForArgument
+import org.jetbrains.uast.toUElement
 import java.util.EnumSet
 
 @Suppress("UnstableApiUsage")
@@ -44,66 +46,33 @@ class DaxDividerColorUsageDetector : Detector(), SourceCodeScanner {
     override fun createUastHandler(context: JavaContext): UElementHandler = DaxDividerColorCallHandler(context)
 
     internal class DaxDividerColorCallHandler(private val context: JavaContext) : UElementHandler() {
+
         override fun visitCallExpression(node: UCallExpression) {
             val methodName = node.methodName
-            if (methodName == "DaxHorizontalDivider" || methodName == "DaxVerticalDivider") {
-                checkColorParameter(node)
-            }
+            if (methodName != "DaxHorizontalDivider" && methodName != "DaxVerticalDivider") return
+
+            val resolvedMethod = node.resolve() ?: return
+            val pkg = context.evaluator.getPackage(resolvedMethod)?.qualifiedName
+            if (pkg != DAX_DIVIDER_PACKAGE) return
+
+            checkColorParameter(node)
         }
 
         private fun checkColorParameter(node: UCallExpression) {
             val colorArgument = node.valueArguments.find { arg ->
-                val parameterName = node.getParameterForArgument(arg)?.name
-                parameterName == "color"
+                node.getParameterForArgument(arg)?.name == "color"
             } ?: return
 
-            if (!isFromValidDuckDuckGoColorSource(colorArgument)) {
-                reportInvalidColorUsage(colorArgument)
+            if (!resolvesIntoThemePackage(colorArgument, depth = 0, visited = mutableSetOf())) {
+                context.report(
+                    issue = INVALID_DAX_DIVIDER_COLOR_USAGE,
+                    location = context.getLocation(colorArgument),
+                    message = INVALID_DAX_DIVIDER_COLOR_USAGE.getExplanation(TextFormat.RAW),
+                )
             }
         }
 
-        private fun isFromValidDuckDuckGoColorSource(argument: UExpression): Boolean {
-            val source = argument.sourcePsi?.text.orEmpty()
-
-            if (containsSemanticThemeColorPath(source)) return true
-
-            if (resolvesToThemePackageElement(argument)) return true
-
-            return resolvesToValidatedColorDeclaration(
-                expression = argument,
-                depth = 0,
-                visited = mutableSetOf(),
-            )
-        }
-
-        private fun containsSemanticThemeColorPath(source: String): Boolean {
-            return SEMANTIC_THEME_COLOR_PATH_REGEX.containsMatchIn(source)
-        }
-
-        private fun resolvesToThemePackageElement(expression: UExpression): Boolean {
-            val resolved = resolveExpression(expression) ?: return false
-            return isThemePackageElement(resolved)
-        }
-
-        private fun resolveExpression(expression: UExpression): PsiElement? {
-            return when (expression) {
-                is UQualifiedReferenceExpression -> expression.resolve()
-                is UReferenceExpression -> expression.resolve()
-                else -> null
-            }
-        }
-
-        private fun isThemePackageElement(element: PsiElement): Boolean {
-            val qualifiedName = when (element) {
-                is PsiMethod -> element.containingClass?.qualifiedName
-                is PsiField -> element.containingClass?.qualifiedName
-                else -> null
-            } ?: return false
-
-            return qualifiedName.startsWith(COLOR_THEME_PACKAGE)
-        }
-
-        private fun resolvesToValidatedColorDeclaration(
+        private fun resolvesIntoThemePackage(
             expression: UExpression,
             depth: Int,
             visited: MutableSet<PsiElement>,
@@ -115,72 +84,48 @@ class DaxDividerColorUsageDetector : Detector(), SourceCodeScanner {
 
             if (isThemePackageElement(resolved)) return true
 
-            val declaration = resolved.navigationElement ?: resolved
-            val declarationText = declaration.text.orEmpty()
-            if (declarationText.isBlank()) return false
-
-            if (containsSemanticThemeColorPath(declarationText)) return true
-            if (declarationText.contains(COLOR_THEME_PACKAGE)) return true
-            if (containsArbitraryComposeColorLiteral(declarationText)) return false
-
-            val referencedIdentifier = extractSimpleReturnedIdentifier(declarationText) ?: return false
-            return isImportedFromThemePackage(
-                fileText = declaration.containingFile?.text.orEmpty(),
-                identifier = referencedIdentifier,
-            )
+            val body = bodyExpressionOf(resolved) ?: return false
+            return resolvesIntoThemePackage(body, depth + 1, visited)
         }
 
-        private fun containsArbitraryComposeColorLiteral(declarationText: String): Boolean {
-            return declarationText.contains(ARBITRARY_COLOR_ACCESS_REGEX) ||
-                declarationText.contains(ARBITRARY_COLOR_CONSTRUCTOR_REGEX)
+        private fun resolveExpression(expression: UExpression): PsiElement? {
+            return when (expression) {
+                is UReferenceExpression -> expression.resolve()
+                is UCallExpression -> expression.resolve()
+                else -> null
+            }
         }
 
-        private fun extractSimpleReturnedIdentifier(declarationText: String): String? {
-            val getterMatch = GETTER_IDENTIFIER_REGEX.find(declarationText)
-            if (getterMatch != null) return getterMatch.groupValues[1]
-
-            val initializerMatch = INITIALIZER_IDENTIFIER_REGEX.find(declarationText)
-            if (initializerMatch != null) return initializerMatch.groupValues[1]
-
-            val returnMatch = RETURN_IDENTIFIER_REGEX.find(declarationText)
-            if (returnMatch != null) return returnMatch.groupValues[1]
-
-            return null
+        private fun isThemePackageElement(element: PsiElement): Boolean {
+            val packageName = context.evaluator.getPackage(element)?.qualifiedName ?: return false
+            return packageName == THEME_PACKAGE || packageName.startsWith("$THEME_PACKAGE.")
         }
 
-        private fun isImportedFromThemePackage(
-            fileText: String,
-            identifier: String,
-        ): Boolean {
-            if (fileText.isBlank()) return false
-            val escapedThemePackage = Regex.escape(COLOR_THEME_PACKAGE)
-            val escapedIdentifier = Regex.escape(identifier)
-            val importRegex = Regex("""import\s+$escapedThemePackage\.$escapedIdentifier(\s+as\s+\w+)?""")
-            return importRegex.containsMatchIn(fileText)
+        private fun bodyExpressionOf(element: PsiElement): UExpression? {
+            return when (val u = element.toUElement()) {
+                is UVariable -> u.uastInitializer
+                is UMethod -> singleExpressionBody(u.uastBody)
+                else -> null
+            }
         }
 
-        private fun reportInvalidColorUsage(colorArgument: UExpression) {
-            context.report(
-                issue = INVALID_DAX_DIVIDER_COLOR_USAGE,
-                location = context.getLocation(colorArgument),
-                message = INVALID_DAX_DIVIDER_COLOR_USAGE.getExplanation(TextFormat.RAW),
-            )
+        private fun singleExpressionBody(body: UExpression?): UExpression? {
+            return when (body) {
+                null -> null
+                is UReturnExpression -> body.returnExpression
+                is UBlockExpression -> {
+                    val single = body.expressions.singleOrNull() ?: return null
+                    if (single is UReturnExpression) single.returnExpression else single
+                }
+                else -> body
+            }
         }
     }
 
     companion object {
-        private const val COLOR_THEME_PACKAGE = "com.duckduckgo.common.ui.compose.theme"
+        private const val THEME_PACKAGE = "com.duckduckgo.common.ui.compose.theme"
+        private const val DAX_DIVIDER_PACKAGE = "com.duckduckgo.common.ui.compose.divider"
         private const val MAX_VALIDATION_DEPTH = 4
-
-        private val SEMANTIC_THEME_COLOR_PATH_REGEX =
-            Regex("""\.colors\.(backgrounds|text|brand|icons|infoPanel|textField|status|system)\.""")
-
-        private val ARBITRARY_COLOR_ACCESS_REGEX = Regex("""\bColor\.[A-Za-z_][A-Za-z0-9_]*""")
-        private val ARBITRARY_COLOR_CONSTRUCTOR_REGEX = Regex("""\bColor\s*\(""")
-
-        private val GETTER_IDENTIFIER_REGEX = Regex("""get\s*\(\s*\)\s*=\s*([A-Za-z_][A-Za-z0-9_]*)""")
-        private val INITIALIZER_IDENTIFIER_REGEX = Regex("""=\s*([A-Za-z_][A-Za-z0-9_]*)\s*${'$'}""")
-        private val RETURN_IDENTIFIER_REGEX = Regex("""return\s+([A-Za-z_][A-Za-z0-9_]*)""")
 
         val INVALID_DAX_DIVIDER_COLOR_USAGE = Issue
             .create(

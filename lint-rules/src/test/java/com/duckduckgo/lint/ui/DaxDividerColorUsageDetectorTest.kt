@@ -306,7 +306,7 @@ class DaxDividerColorUsageDetectorTest {
             )
             .allowCompilationErrors()
             .issues(INVALID_DAX_DIVIDER_COLOR_USAGE)
-            .skipTestModes(TestMode.WHITESPACE, TestMode.IMPORT_ALIAS)
+            .skipTestModes(TestMode.WHITESPACE)
             .run()
             .expectClean()
     }
@@ -450,6 +450,144 @@ class DaxDividerColorUsageDetectorTest {
             .run()
             .expectContains("InvalidDaxDividerColorUsage")
             .expectContains("color = SomeOtherPalette.colors.danger")
+            .expectContains("0 errors, 1 warnings")
+    }
+
+    @Test
+    fun whenSameNamedFunctionInDifferentPackageThenNoWarning() {
+        // The rule only applies to the actual DDG composable.
+        // A user-defined function with the same name in another package must not trip it.
+        lint()
+            .files(
+                TestFiles.kt(
+                    """
+                    package com.example.othermodule
+
+                    import androidx.compose.runtime.Composable
+                    import androidx.compose.ui.graphics.Color
+
+                    @Composable
+                    fun DaxHorizontalDivider(color: Color = Color(0xFF111111)) {
+                        // Not the DDG composable
+                    }
+                    """.trimIndent(),
+                ).indented(),
+                TestFiles.kt(
+                    """
+                    package com.example.test
+
+                    import androidx.compose.runtime.Composable
+                    import androidx.compose.ui.graphics.Color
+                    import com.example.othermodule.DaxHorizontalDivider
+
+                    @Composable
+                    fun TestScreen() {
+                        DaxHorizontalDivider(color = Color.Red)
+                    }
+                    """.trimIndent(),
+                ).indented(),
+                composeStubs,
+                themeStubs,
+            )
+            .allowCompilationErrors()
+            .issues(INVALID_DAX_DIVIDER_COLOR_USAGE)
+            .run()
+            .expectClean()
+    }
+
+    @Test
+    fun whenDefaultsBodyResolvesToFakeSemanticPathThenWarning() {
+        // Defaults class whose getter body uses a non-DDG receiver shaped like
+        // a DDG semantic color path. The PSI walk must follow the getter body
+        // and reject because the resolved property is not in the theme package.
+        lint()
+            .files(
+                TestFiles.kt(
+                    """
+                    package com.example.test
+
+                    import androidx.compose.runtime.Composable
+                    import androidx.compose.ui.graphics.Color
+                    import com.duckduckgo.common.ui.compose.divider.DaxHorizontalDivider
+
+                    data class FakeSystemColors(val lines: Color)
+                    data class FakeColors(val system: FakeSystemColors)
+
+                    object SomeOtherPalette {
+                        val colors: FakeColors = FakeColors(
+                            system = FakeSystemColors(lines = Color.Red),
+                        )
+                    }
+
+                    object FakeDefaults {
+                        val lineColor: Color
+                            @Composable
+                            get() = SomeOtherPalette.colors.system.lines
+                    }
+
+                    @Composable
+                    fun TestScreen() {
+                        DaxHorizontalDivider(
+                            color = FakeDefaults.lineColor,
+                        )
+                    }
+                    """.trimIndent(),
+                ).indented(),
+                composeStubs,
+                themeStubs,
+                daxDividerStubs,
+            )
+            .allowCompilationErrors()
+            .issues(INVALID_DAX_DIVIDER_COLOR_USAGE)
+            .skipTestModes(TestMode.WHITESPACE)
+            .run()
+            .expectContains("InvalidDaxDividerColorUsage")
+            .expectContains("color = FakeDefaults.lineColor")
+            .expectContains("0 errors, 1 warnings")
+    }
+
+    @Test
+    fun whenFakeSemanticPathFromNonDuckDuckGoColorsThenWarning() {
+        // Uses the exact DDG semantic path shape (.colors.system.lines) but with
+        // a non-theme receiver. A naive text-only check would accept this; the
+        // detector must require PSI resolution into the theme package.
+        lint()
+            .files(
+                TestFiles.kt(
+                    """
+                    package com.example.test
+
+                    import androidx.compose.runtime.Composable
+                    import androidx.compose.ui.graphics.Color
+                    import com.duckduckgo.common.ui.compose.divider.DaxHorizontalDivider
+
+                    data class FakeSystemColors(val lines: Color)
+                    data class FakeColors(val system: FakeSystemColors)
+
+                    object SomeOtherPalette {
+                        val colors: FakeColors = FakeColors(
+                            system = FakeSystemColors(lines = Color.Red),
+                        )
+                    }
+
+                    @Composable
+                    fun TestScreen() {
+                        DaxHorizontalDivider(
+                            color = SomeOtherPalette.colors.system.lines,
+                        )
+                    }
+                    """.trimIndent(),
+                ).indented(),
+                composeStubs,
+                themeStubs,
+                daxDividerStubs,
+            )
+            .allowCompilationErrors()
+            .issues(INVALID_DAX_DIVIDER_COLOR_USAGE)
+            .skipTestModes(TestMode.WHITESPACE)
+            .run()
+            .expectContains("InvalidDaxDividerColorUsage")
+            .expectContains("color = SomeOtherPalette.colors.system.lines")
             .expectContains("0 errors, 1 warnings")
     }
 
