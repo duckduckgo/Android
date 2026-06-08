@@ -1209,7 +1209,6 @@ class BrowserTabFragment :
         configureNavigationBar()
         configureOmnibar()
         configureBrowserTabKeyboardListener()
-        renderer.configureBrandDesignFitListener()
 
         disableViewStateSaving()
 
@@ -4242,6 +4241,7 @@ class BrowserTabFragment :
 
     private fun hideDaxBubbleCta(cta: DaxBubbleCta?) {
         (cta as? DaxBubbleCta.BrandDesignUpdateBubbleCta)?.cancelRunningAnimations()
+        renderer.removeBrandDesignFitListener()
         newBrowserTab.browserBackground.setImageResource(0)
         val wasBrandDesign = newBrowserTab.rebrandBrowserBackground.isVisible
         newBrowserTab.rebrandBrowserBackground.apply {
@@ -6082,14 +6082,17 @@ class BrowserTabFragment :
             if (configuration is DaxBubbleCta.BrandDesignUpdateBubbleCta) {
                 setBrowserBackgroundRes(configuration.backgroundRes, useRebrandBackground = true)
                 setNewTabBackgroundColor(com.duckduckgo.mobile.android.R.attr.onboardingSurfaceBackdrop)
+                configureBrandDesignFitListener()
                 brandDesignDialogScrollView.post { configuration.applyFit() }
             } else {
+                removeBrandDesignFitListener()
                 viewModel.setBrowserBackground(appTheme.isLightModeEnabled())
             }
             viewModel.onCtaShown()
         }
 
         fun configureBrandDesignFitListener() {
+            removeBrandDesignFitListener()
             val listener = ViewTreeObserver.OnGlobalLayoutListener {
                 (lastSeenCtaViewState?.cta as? DaxBubbleCta.BrandDesignUpdateBubbleCta)?.applyFit()
             }
