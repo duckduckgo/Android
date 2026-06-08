@@ -1,0 +1,18 @@
+{
+  "agents_md": "AGENTS.md",
+  "volatile_fact_guard": {
+    "description": "AGENTS.md must not restate tool version numbers — they drift and are inferable from the build files. Flag a known tool name immediately followed by a semver-like version (x.y or x.y.z). Single integers (e.g. 'JDK 21', 'JVM target 17') are intentionally allowed.",
+    "pattern": "(?i)\\b(kotlin|gradle|ktlint|google java format|agp)\\b\\s*\\(?\\s*v?\\d+\\.\\d+(?:\\.\\d+)?\\)?",
+    "allow": []
+  },
+  "claims": [
+    {
+      "id": "di-framework",
+      "type": "source_signal",
+      "extract": "grep -q 'dev.zacsweers.metro' build.gradle && echo present || echo absent",
+      "expected": "present",
+      "doc_note": "AGENTS.md states DI is Anvil/Dagger2 today with a Metro migration in flight (the 'dev.zacsweers.metro' plugin in build.gradle).",
+      "on_mismatch": "build.gradle no longer shows the 'dev.zacsweers.metro' plugin; the Metro migration may be complete or reverted. Review the DI wording in AGENTS.md (Project Overview > Build) and update the claim accordingly."
+    }
+  ]
+}
