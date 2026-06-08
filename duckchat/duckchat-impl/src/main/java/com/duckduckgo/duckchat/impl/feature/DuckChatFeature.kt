@@ -272,4 +272,11 @@ interface DuckChatFeature {
      */
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun duckAiVoiceChatService(): Toggle
+
+    /**
+     * @return `true` when the contextual Duck.ai sheet improvements are enabled.
+     * If the remote feature is not present defaults to `internal`
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun contextualSheetImprovements(): Toggle
 }
