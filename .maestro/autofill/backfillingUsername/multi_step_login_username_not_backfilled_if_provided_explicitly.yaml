@@ -1,4 +1,5 @@
 appId: com.duckduckgo.mobile.android
+androidWebViewHierarchy: devtools
 name: "Autofill: Will not backfill username if the form submission provides a username already"
 tags:
     - autofillBackfillingUsername
