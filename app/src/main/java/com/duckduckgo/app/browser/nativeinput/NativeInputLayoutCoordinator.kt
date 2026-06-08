@@ -20,6 +20,7 @@ import android.animation.LayoutTransition
 import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewTreeObserver
 import android.widget.FrameLayout
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.view.updateLayoutParams
@@ -273,6 +274,19 @@ class NativeInputLayoutCoordinator(
             }
         widgetView.addOnLayoutChangeListener(layoutListener)
         rootView.addOnLayoutChangeListener(layoutListener)
+
+        // NTP content can change visibility/size asynchronously without moving rootView/widgetView
+        // — e.g. the return hatch re-appearing on undo. Those passes never re-fire the layout
+        // listeners above, leaving a stale offset that overlaps the floating input. Observe the NTP
+        // subtree and re-apply the offset on its layout passes. Guarded by isWidgetAnimating like
+        // layoutListener, and idempotent via applyPadding's no-op-when-unchanged check.
+        val ntpContentView = newTabContent?.takeIf { !isBottom }
+        val globalLayoutListener =
+            ViewTreeObserver.OnGlobalLayoutListener {
+                if (isWidgetAnimating) return@OnGlobalLayoutListener
+                applyOffset()
+            }
+        ntpContentView?.viewTreeObserver?.addOnGlobalLayoutListener(globalLayoutListener)
         widgetView.addOnAttachStateChangeListener(
             object : View.OnAttachStateChangeListener {
                 override fun onViewAttachedToWindow(v: View) = Unit
@@ -287,6 +301,7 @@ class NativeInputLayoutCoordinator(
                     }
                     v.removeOnLayoutChangeListener(layoutListener)
                     rootView.removeOnLayoutChangeListener(layoutListener)
+                    ntpContentView?.viewTreeObserver?.takeIf { it.isAlive }?.removeOnGlobalLayoutListener(globalLayoutListener)
                     v.removeOnAttachStateChangeListener(this)
                 }
             },
