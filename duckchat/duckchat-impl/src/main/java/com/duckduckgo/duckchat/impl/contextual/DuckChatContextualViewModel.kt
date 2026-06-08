@@ -16,6 +16,7 @@
 
 package com.duckduckgo.duckchat.impl.contextual
 
+import android.content.Context
 import androidx.annotation.StringRes
 import androidx.annotation.VisibleForTesting
 import androidx.core.net.toUri
@@ -66,6 +67,7 @@ class DuckChatContextualViewModel @Inject constructor(
     private val featureTogglesInventory: FeatureTogglesInventory,
     private val modelManager: DuckAiModelManager,
     private val contextualNativeInputManager: ContextualNativeInputManager,
+    private val context: Context,
 ) : ViewModel() {
 
     private val commandChannel = Channel<Command>(capacity = 1, onBufferOverflow = DROP_OLDEST)
@@ -77,6 +79,12 @@ class DuckChatContextualViewModel @Inject constructor(
     enum class SheetMode {
         INPUT,
         WEBVIEW,
+    }
+
+    enum class QuickActionState(@StringRes val labelResId: Int) {
+        LEGACY_SUMMARIZE(R.string.duckAIContextualPromptSummarize),
+        ASK_ABOUT_PAGE(R.string.duckAIContextualPromptAskAboutPage),
+        SUBMIT_SUMMARIZE(R.string.duckAIContextualPromptSummarize),
     }
 
     private var fullModeUrl: String = ""
@@ -113,10 +121,12 @@ class DuckChatContextualViewModel @Inject constructor(
                 tabId = "",
                 prompt = "",
                 isFireButtonEnabled = false,
-                quickActionPromptResId = R.string.duckAIContextualPromptSummarize,
+                quickActionState = QuickActionState.LEGACY_SUMMARIZE,
             ),
         )
     val viewState: StateFlow<ViewState> = _viewState.asStateFlow()
+
+    private var isContextualSheetImprovementsEnabled: Boolean = false
 
     init {
         viewModelScope.launch(dispatchers.io()) {
@@ -124,15 +134,16 @@ class DuckChatContextualViewModel @Inject constructor(
                 .getAllTogglesForParent("androidBrowserConfig")
                 .find { it.featureName().name == "singleTabFireDialog" }
                 ?.isEnabled() == true
-            val quickActionPromptResId = if (duckChatFeature.contextualSheetImprovements().isEnabled()) {
-                R.string.duckAIContextualPromptAskAboutPage
+            isContextualSheetImprovementsEnabled = duckChatFeature.contextualSheetImprovements().isEnabled()
+            val initialQuickActionState = if (isContextualSheetImprovementsEnabled) {
+                QuickActionState.ASK_ABOUT_PAGE
             } else {
-                R.string.duckAIContextualPromptSummarize
+                QuickActionState.LEGACY_SUMMARIZE
             }
             _viewState.update {
                 it.copy(
                     isFireButtonEnabled = duckChatFeature.contextualFireButton().isEnabled() && isSingleTabFireEnabled,
-                    quickActionPromptResId = quickActionPromptResId,
+                    quickActionState = initialQuickActionState,
                 )
             }
         }
@@ -149,7 +160,7 @@ class DuckChatContextualViewModel @Inject constructor(
         val tabId: String = "",
         val prompt: String = "",
         val isFireButtonEnabled: Boolean = false,
-        @StringRes val quickActionPromptResId: Int = R.string.duckAIContextualPromptSummarize,
+        val quickActionState: QuickActionState = QuickActionState.LEGACY_SUMMARIZE,
     )
 
     fun onSheetReopened() {
@@ -518,6 +529,24 @@ class DuckChatContextualViewModel @Inject constructor(
         }
     }
 
+    fun onQuickActionClicked(currentInput: String) {
+        when (_viewState.value.quickActionState) {
+            QuickActionState.LEGACY_SUMMARIZE -> {
+                replacePrompt(currentInput, context.getString(R.string.duckAIContextualPromptSummarize))
+            }
+            QuickActionState.ASK_ABOUT_PAGE -> {
+                addPageContext()
+                viewModelScope.launch {
+                    _viewState.update { it.copy(quickActionState = QuickActionState.SUBMIT_SUMMARIZE) }
+                }
+            }
+            QuickActionState.SUBMIT_SUMMARIZE -> {
+                addPageContext()
+                onPromptSent(context.getString(R.string.duckAIContextualPromptSummarize))
+            }
+        }
+    }
+
     fun onPromptCleared() {
         logcat { "Duck.ai Contextual: onPromptCleared" }
         viewModelScope.launch {
@@ -659,11 +688,17 @@ class DuckChatContextualViewModel @Inject constructor(
 
                 withContext(dispatchers.main()) {
                     clearSheetUrl()
+                    val resetQuickActionState = if (isContextualSheetImprovementsEnabled) {
+                        QuickActionState.ASK_ABOUT_PAGE
+                    } else {
+                        QuickActionState.LEGACY_SUMMARIZE
+                    }
                     _viewState.update {
                         it.copy(
                             sheetMode = SheetMode.INPUT,
                             showFullscreen = true,
                             prompt = "",
+                            quickActionState = resetQuickActionState,
                         )
                     }
                     commandChannel.trySend(Command.ChangeSheetState(sheetState))
