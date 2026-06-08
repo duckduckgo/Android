@@ -13,6 +13,23 @@
                 "type": "string"
             },
             {
+                "key": "blockListExperiment",
+                "description": "Block list experiment cohort identifier.",
+                "type": "string",
+                "pattern": "^tdsNextExperiment.*_(control|treatment)$",
+                "examples": [
+                    "tdsNextExperiment003_control",
+                    "tdsNextExperiment003_treatment",
+                    "tdsNextExperimentBaseline_control",
+                    "tdsNextExperiment002_control"
+                ]
+            },
+            {
+                "key": "breakageData",
+                "description": "Specific website breakage types (e.g., adwalls or captchas) detected by C-S-S.",
+                "type": "string"
+            },
+            {
                 "key": "category",
                 "description": "User chosen breakage category",
                 "enum": ["", "comments", "blocked", "dislike", "empty-spaces", "layout", "login", "other", "paywall", "shopping", "videos"]
@@ -43,14 +60,34 @@
                 "enum": ["0", "1"]
             },
             {
+                "key": "contentScopeExperiments",
+                "description": "Experiments enabled that impact the page content",
+                "type": "string"
+            },
+            {
+                "key": "debugFlags",
+                "description": "Enabled debug flags, comma-separated (may be URL-encoded).",
+                "type": "string"
+            },
+            {
                 "key": "description",
                 "description": "User-provided description of the breakage.",
                 "type": "string"
             },
             {
+                "key": "drmEnabled",
+                "description": "Whether DRM is effectively enabled for the reported site load.",
+                "type": "boolean"
+            },
+            {
                 "key": "errorDescriptions",
                 "description": "List of main frame status error on page. URL encoded JSON array.",
                 "type": "string"
+            },
+            {
+                "key": "gpc",
+                "description": "Global Privacy Control value reported.",
+                "type": "boolean"
             },
             {
                 "key": "httpErrorCodes",
@@ -82,14 +119,10 @@
                 "pattern": "[a-z][a-z](-[A-Z][A-Z])?"
             },
             {
-                "key": "openerContext",
-                "description": "Reported page's opener context",
-                "enum": ["external", "navigation", "serp", ""]
-            },
-            {
-                "key": "os",
-                "description": "User's operating system version",
-                "type": "string"
+                "key": "loginSite",
+                "description": "Login site/domain if supplied.",
+                "type": "string",
+                "enum": [""]
             },
             {
                 "key": "manufacturer",
@@ -102,15 +135,19 @@
                 "type": "string"
             },
             {
-                "key": "siteType",
-                "description": "Type of site version loaded.",
-                "enum": ["desktop", "mobile"]
+                "key": "openerContext",
+                "description": "Reported page's opener context",
+                "enum": ["external", "navigation", "serp", ""]
             },
             {
-                "key": "loginSite",
-                "description": "Login site/domain if supplied.",
-                "type": "string",
-                "enum": [""]
+                "key": "os",
+                "description": "User's operating system version",
+                "type": "string"
+            },
+            {
+                "key": "protectionsState",
+                "description": "If the protections toggle is on or not for the site.",
+                "type": "boolean"
             },
             {
                 "key": "remoteConfigVersion",
@@ -128,6 +165,11 @@
                     "reload-three-times-within-20-seconds",
                     "prompt"
                 ]
+            },
+            {
+                "key": "siteType",
+                "description": "Type of site version loaded.",
+                "enum": ["desktop", "mobile"]
             },
             {
                 "key": "siteUrl",
@@ -150,19 +192,14 @@
                 "type": "boolean"
             },
             {
+                "key": "urlParametersRemoved",
+                "description": "Whether URL parameters were removed.",
+                "enum": ["0", "1"]
+            }
+            {
                 "key": "userRefreshCount",
                 "description": "Number of times the user refreshed this page.",
                 "type": "number"
-            },
-            {
-                "key": "wvVersion",
-                "description": "User's runtime WebView version",
-                "type": "string"
-            },
-            {
-                "key": "protectionsState",
-                "description": "If the protections toggle is on or not for the site.",
-                "type": "boolean"
             },
             {
                 "key": "vpnOn",
@@ -170,41 +207,9 @@
                 "type": "boolean"
             },
             {
-                "key": "blockListExperiment",
-                "description": "Block list experiment cohort identifier.",
-                "type": "string",
-                "pattern": "^tdsNextExperiment.*_(control|treatment)$",
-                "examples": [
-                    "tdsNextExperiment003_control",
-                    "tdsNextExperiment003_treatment",
-                    "tdsNextExperimentBaseline_control",
-                    "tdsNextExperiment002_control"
-                ]
-            },
-            {
-                "key": "contentScopeExperiments",
-                "description": "Experiments enabled that impact the page content",
+                "key": "wvVersion",
+                "description": "User's runtime WebView version",
                 "type": "string"
-            },
-            {
-                "key": "debugFlags",
-                "description": "Enabled debug flags, comma-separated (may be URL-encoded).",
-                "type": "string"
-            },
-            {
-                "key": "gpc",
-                "description": "Global Privacy Control value reported.",
-                "type": "boolean"
-            },
-            {
-                "key": "drmEnabled",
-                "description": "Whether DRM is effectively enabled for the reported site load.",
-                "type": "boolean"
-            },
-            {
-                "key": "urlParametersRemoved",
-                "description": "Whether URL parameters were removed.",
-                "enum": ["0", "1"]
             }
         ]
     },
@@ -219,6 +224,23 @@
             {
                 "key": "blockedTrackers",
                 "description": "Tracker domains blocked on the page. Comma separated list.",
+                "type": "string"
+            },
+            {
+                "key": "blockListExperiment",
+                "description": "Block list experiment cohort identifier.",
+                "type": "string",
+                "pattern": "^tdsNextExperiment.*_(control|treatment)$",
+                "examples": [
+                    "tdsNextExperiment003_control",
+                    "tdsNextExperiment003_treatment",
+                    "tdsNextExperimentBaseline_control",
+                    "tdsNextExperiment002_control"
+                ]
+            },
+            {
+                "key": "breakageData",
+                "description": "Specific website breakage types (e.g., adwalls or captchas) detected by C-S-S.",
                 "type": "string"
             },
             {
@@ -247,9 +269,29 @@
                 "enum": ["0", "1"]
             },
             {
+                "key": "contentScopeExperiments",
+                "description": "Experiments enabled that impact the page content",
+                "type": "string"
+            },
+            {
+                "key": "debugFlags",
+                "description": "Enabled debug flags, comma-separated (may be URL-encoded).",
+                "type": "string"
+            },
+            {
+                "key": "drmEnabled",
+                "description": "Whether DRM is effectively enabled for the reported site load.",
+                "type": "boolean"
+            },
+            {
                 "key": "errorDescriptions",
                 "description": "List of main frame status error on page. URL encoded JSON array.",
                 "type": "string"
+            },
+            {
+                "key": "gpc",
+                "description": "Global Privacy Control value reported.",
+                "type": "boolean"
             },
             {
                 "key": "httpErrorCodes",
@@ -281,6 +323,22 @@
                 "pattern": "[a-z][a-z](-[A-Z][A-Z])?"
             },
             {
+                "key": "loginSite",
+                "description": "Login site/domain if supplied.",
+                "type": "string",
+                "enum": [""]
+            },
+            {
+                "key": "manufacturer",
+                "description": "Device manufacturer.",
+                "type": "string"
+            },
+            {
+                "key": "model",
+                "description": "Device model.",
+                "type": "string"
+            },
+            {
                 "key": "openerContext",
                 "description": "Reported page's opener context",
                 "enum": ["external", "navigation", "serp", ""]
@@ -291,11 +349,6 @@
                 "type": "string"
             },
             {
-                "key": "referrerHeaderTrimmed",
-                "description": "True if the 'Referer' request header was trimmed for this page.",
-                "type": "boolean"
-            },
-            {
                 "key": "remoteConfigVersion",
                 "description": "",
                 "type": "number"
@@ -303,7 +356,19 @@
             {
                 "key": "reportFlow",
                 "description": "The UI flow that the user used to trigger this breakage report.",
-                "enum": ["on_protections_off_menu", "on_protections_off_dashboard_main"]
+                "enum": [
+                    "dashboard",
+                    "menu",
+                    "on_protections_off_dashboard_main",
+                    "on_protections_off_menu",
+                    "reload-three-times-within-20-seconds",
+                    "prompt"
+                ]
+            },
+            {
+                "key": "siteType",
+                "description": "Type of site version loaded.",
+                "enum": ["desktop", "mobile"]
             },
             {
                 "key": "siteUrl",
@@ -326,18 +391,18 @@
                 "type": "boolean"
             },
             {
+                "key": "urlParametersRemoved",
+                "description": "Whether URL parameters were removed.",
+                "enum": ["0", "1"]
+            }
+            {
                 "key": "userRefreshCount",
-                "type": "number",
-                "description": "Number of times the user refreshed this page."
+                "description": "Number of times the user refreshed this page.",
+                "type": "number"
             },
             {
                 "key": "vpnOn",
                 "description": "True if the user has the DuckDuckGo VPN enabled.",
-                "type": "boolean"
-            },
-            {
-                "key": "drmEnabled",
-                "description": "Whether DRM is effectively enabled for the reported site load.",
                 "type": "boolean"
             },
             {
