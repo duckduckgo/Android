@@ -612,6 +612,10 @@ class DuckChatContextualFragment :
                     is DuckChatContextualViewModel.Command.ShowFireConfirmation -> {
                         showFireConfirmationDialog()
                     }
+
+                    is DuckChatContextualViewModel.Command.PrefillContextualNativeInput -> {
+                        binding.contextualNativeInputWidget.text = command.text
+                    }
                 }
             }.launchIn(lifecycleScope)
 

@@ -106,6 +106,7 @@ class DuckChatContextualViewModel @Inject constructor(
         data class ChangeSheetState(val newState: Int) : Command()
         data object RequestPageContext : Command()
         data object ShowFireConfirmation : Command()
+        data class PrefillContextualNativeInput(val text: String) : Command()
     }
 
     private val _viewState: MutableStateFlow<ViewState> =
@@ -297,9 +298,13 @@ class DuckChatContextualViewModel @Inject constructor(
         duckChatPixels.reportContextualSheetOpened()
     }
 
-    fun onPromptSent(prompt: String) {
+    fun onPromptSent(
+        prompt: String,
+        followUpPrefill: String? = null,
+    ) {
         viewModelScope.launch(dispatchers.io()) {
             val contextPrompt = generateContextPrompt(prompt)
+            val prefillEvent = followUpPrefill?.takeIf { it.isNotEmpty() }?.let { generatePrefillEvent(it) }
             withContext(dispatchers.main()) {
                 _viewState.value =
                     _viewState.value.copy(
@@ -307,9 +312,29 @@ class DuckChatContextualViewModel @Inject constructor(
                         prompt = "",
                     )
                 _subscriptionEventDataChannel.trySend(contextPrompt)
+                prefillEvent?.let { _subscriptionEventDataChannel.trySend(it) }
                 commandChannel.trySend(Command.ChangeSheetState(BottomSheetBehavior.STATE_EXPANDED))
             }
         }
+    }
+
+    private fun generatePrefillEvent(text: String): SubscriptionEventData {
+        val params = JSONObject().apply {
+            put("platform", "android")
+            put("tool", "query")
+            put(
+                "query",
+                JSONObject().apply {
+                    put("prompt", text)
+                    put("autoSubmit", false)
+                },
+            )
+        }
+        return SubscriptionEventData(
+            featureName = RealDuckChatJSHelper.DUCK_CHAT_FEATURE_NAME,
+            subscriptionName = "submitAIChatNativePrompt",
+            params = params,
+        )
     }
 
     fun onChatPageLoaded(url: String?) {
@@ -542,15 +567,21 @@ class DuckChatContextualViewModel @Inject constructor(
             QuickActionState.LEGACY_SUMMARIZE -> {
                 replacePrompt(currentInput, context.getString(R.string.duckAIContextualPromptSummarize))
             }
+
             QuickActionState.ASK_ABOUT_PAGE -> {
                 addPageContext()
                 viewModelScope.launch {
                     _viewState.update { it.copy(quickActionState = QuickActionState.SUBMIT_SUMMARIZE) }
                 }
             }
+
             QuickActionState.SUBMIT_SUMMARIZE -> {
                 addPageContext()
-                onPromptSent(context.getString(R.string.duckAIContextualPromptSummarize))
+                onPromptSent(
+                    prompt = context.getString(R.string.duckAIContextualPromptSummarize),
+                    followUpPrefill = currentInput.takeIf { it.isNotEmpty() },
+                )
+                commandChannel.trySend(Command.PrefillContextualNativeInput(currentInput))
             }
         }
     }

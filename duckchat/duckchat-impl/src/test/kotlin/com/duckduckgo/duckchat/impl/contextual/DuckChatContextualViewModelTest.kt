@@ -1640,6 +1640,58 @@ class DuckChatContextualViewModelTest {
     }
 
     @Test
+    fun `when SUBMIT_SUMMARIZE clicked with typed input then web prefill event emitted after auto-submit`() = runTest {
+        whenever(contextualSheetImprovementsToggle.isEnabled()).thenReturn(true)
+        val testee = buildViewModel()
+        testee.onSheetOpened("tab-1")
+        testee.onQuickActionClicked("") // ASK_ABOUT_PAGE -> SUBMIT_SUMMARIZE
+
+        testee.subscriptionEventDataFlow.test {
+            testee.onQuickActionClicked("my draft")
+
+            // First event: auto-submit of the summarize prompt.
+            val submitEvent = awaitItem()
+            assertEquals("submitAIChatNativePrompt", submitEvent.subscriptionName)
+            assertEquals(
+                context.getString(R.string.duckAIContextualPromptSummarize),
+                submitEvent.params.getJSONObject("query").getString("prompt"),
+            )
+            assertTrue(submitEvent.params.getJSONObject("query").getBoolean("autoSubmit"))
+
+            // Second event: prefill of the typed draft (no autoSubmit).
+            val prefillEvent = awaitItem()
+            assertEquals("submitAIChatNativePrompt", prefillEvent.subscriptionName)
+            assertEquals("my draft", prefillEvent.params.getJSONObject("query").getString("prompt"))
+            assertFalse(prefillEvent.params.getJSONObject("query").getBoolean("autoSubmit"))
+
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `when SUBMIT_SUMMARIZE clicked with typed input then PrefillContextualNativeInput command emitted`() = runTest {
+        whenever(contextualSheetImprovementsToggle.isEnabled()).thenReturn(true)
+        val testee = buildViewModel()
+        testee.onSheetOpened("tab-1")
+        testee.onQuickActionClicked("") // ASK_ABOUT_PAGE -> SUBMIT_SUMMARIZE
+
+        testee.commands.test {
+            testee.onQuickActionClicked("my draft")
+
+            // Drain commands until we see the prefill (other commands like ChangeSheetState may be ahead).
+            var prefill: DuckChatContextualViewModel.Command.PrefillContextualNativeInput? = null
+            while (prefill == null) {
+                val item = awaitItem()
+                if (item is DuckChatContextualViewModel.Command.PrefillContextualNativeInput) {
+                    prefill = item
+                }
+            }
+            assertEquals("my draft", prefill.text)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
     fun `when fire button clicked then tapped pixel is fired`() = runTest {
         testee.onFireButtonClicked()
         verify(duckChatPixels).reportContextualFireButtonTapped()
