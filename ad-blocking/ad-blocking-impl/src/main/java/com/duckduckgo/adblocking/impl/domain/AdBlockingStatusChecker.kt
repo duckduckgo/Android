@@ -26,7 +26,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import logcat.logcat
 import javax.inject.Inject
@@ -52,9 +52,12 @@ class RealAdBlockingStatusChecker @Inject constructor(
     @AppCoroutineScope appScope: CoroutineScope,
 ) : AdBlockingStatusChecker {
 
-    private val userEnabled: StateFlow<Boolean> = settingsRepository.isEnabledFlow()
-        .map { it ?: feature.enabledByDefault().isEnabled() }
-        .stateIn(appScope, SharingStarted.Eagerly, initialValue = false)
+    private val userEnabled: StateFlow<Boolean> = combine(
+        settingsRepository.isEnabledFlow(),
+        feature.enabledByDefault().enabled(),
+    ) { stored, enabledByDefault ->
+        stored ?: enabledByDefault
+    }.stateIn(appScope, SharingStarted.Eagerly, initialValue = false)
 
     override fun canInject(): Boolean {
         if (!feature.self().isEnabled()) {

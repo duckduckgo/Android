@@ -40,9 +40,9 @@ class RealAdBlockingStatusCheckerTest {
 
     private var killSwitchEnabled = true
     private var contingencyModeEnabled = false
-    private var enabledByDefault = false
 
     private val killSwitchEnabledFlow = MutableStateFlow(true)
+    private val enabledByDefaultFlow = MutableStateFlow(false)
 
     private val selfToggle: Toggle = mock {
         on { isEnabled() } doAnswer { killSwitchEnabled }
@@ -52,7 +52,8 @@ class RealAdBlockingStatusCheckerTest {
         on { isEnabled() } doAnswer { contingencyModeEnabled }
     }
     private val enabledByDefaultToggle: Toggle = mock {
-        on { isEnabled() } doAnswer { enabledByDefault }
+        on { isEnabled() } doAnswer { enabledByDefaultFlow.value }
+        on { enabled() } doReturn enabledByDefaultFlow
     }
     private val feature: AdBlockingExtensionFeature = mock {
         on { self() } doReturn selfToggle
@@ -107,7 +108,7 @@ class RealAdBlockingStatusCheckerTest {
     @Test
     fun whenUserHasNoPreferenceAndEnabledByDefaultIsTrueThenCanInject() {
         userEnabledFlow.value = null
-        enabledByDefault = true
+        enabledByDefaultFlow.value = true
 
         assertTrue(checker.canInject())
     }
@@ -115,7 +116,7 @@ class RealAdBlockingStatusCheckerTest {
     @Test
     fun whenUserHasNoPreferenceAndEnabledByDefaultIsFalseThenCannotInject() {
         userEnabledFlow.value = null
-        enabledByDefault = false
+        enabledByDefaultFlow.value = false
 
         assertFalse(checker.canInject())
     }
@@ -130,7 +131,7 @@ class RealAdBlockingStatusCheckerTest {
     @Test
     fun whenUserHasSetFalseThenIsUserEnabledFlowEmitsFalseEvenIfDefaultIsTrue() = runTest {
         userEnabledFlow.value = false
-        enabledByDefault = true
+        enabledByDefaultFlow.value = true
 
         assertFalse(checker.isUserEnabledFlow().first())
     }
@@ -138,8 +139,18 @@ class RealAdBlockingStatusCheckerTest {
     @Test
     fun whenUserHasNoPreferenceThenIsUserEnabledFlowEmitsDefault() = runTest {
         userEnabledFlow.value = null
-        enabledByDefault = true
+        enabledByDefaultFlow.value = true
 
+        assertTrue(checker.isUserEnabledFlow().first())
+    }
+
+    @Test
+    fun whenUserHasNoPreferenceAndDefaultFlowChangesThenIsUserEnabledFlowReflectsIt() = runTest {
+        userEnabledFlow.value = null
+        enabledByDefaultFlow.value = false
+        assertFalse(checker.isUserEnabledFlow().first())
+
+        enabledByDefaultFlow.value = true
         assertTrue(checker.isUserEnabledFlow().first())
     }
 
