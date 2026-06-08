@@ -1,12 +1,14 @@
 #!/usr/bin/env python3
-"""Deterministic drift checker for AGENTS.md.
+"""Deterministic drift checker for AI-docs files.
 
-Reads `.github/drift-audit/registry.json` and verifies two things:
+Reads `scripts/drift-audit/registry.json` and, for each registered doc
+(`AGENTS.md` and selected `.cursor/rules/*.mdc`), verifies:
 
-  1. AGENTS.md has not re-introduced volatile version numbers (the inverse
-     guard — see the spec). A trimmed AGENTS.md points to the build files for
+  1. The doc has not re-introduced volatile version numbers (the inverse
+     guard — see the spec). Trimmed docs point to the build files for
      versions; if a tool name reappears followed by a semver, that's drift.
-  2. Each registered claim still agrees with the codebase.
+  2. Each registered claim still agrees with the codebase (source signals,
+     value equality, referenced file paths).
 
 Prints a JSON report to stdout. Exit code 0 = clean, 1 = findings found.
 
@@ -28,15 +30,13 @@ def load_registry(path):
         return json.load(fh)
 
 
-def run_guard(agents_text, guard):
+def run_guard(text, pattern, allow):
     """Flag a known tool name immediately followed by a semver-like version."""
     findings = []
-    if not guard:
-        return findings
-    pattern = re.compile(guard["pattern"])
-    allow = set(guard.get("allow", []))
-    for line_no, line in enumerate(agents_text.splitlines(), start=1):
-        for match in pattern.finditer(line):
+    compiled = re.compile(pattern)
+    allow = set(allow or [])
+    for line_no, line in enumerate(text.splitlines(), start=1):
+        for match in compiled.finditer(line):
             snippet = match.group(0)
             if snippet in allow:
                 continue
@@ -45,7 +45,7 @@ def run_guard(agents_text, guard):
                 "status": "drift",
                 "line": line_no,
                 "match": snippet,
-                "message": "AGENTS.md restates a tool version number; remove it and point to the source of truth.",
+                "message": "Restates a tool version number; remove it and point to the source of truth.",
             })
     return findings
 
@@ -56,7 +56,7 @@ def _shell(cmd, root):
     ).stdout.strip()
 
 
-def run_claim(claim, agents_text, root):
+def run_claim(claim, doc_text, root):
     ctype = claim.get("type")
     if ctype == "source_signal":
         actual = _shell(claim["extract"], root)
@@ -71,7 +71,7 @@ def run_claim(claim, agents_text, root):
         return None
     if ctype == "equals":
         actual = _shell(claim["extract"], root)
-        match = re.search(claim["doc_pattern"], agents_text)
+        match = re.search(claim["doc_pattern"], doc_text)
         doc_value = match.group(1) if match else None
         if doc_value != actual:
             return {
@@ -79,7 +79,17 @@ def run_claim(claim, agents_text, root):
                 "status": "drift",
                 "doc_value": doc_value,
                 "actual": actual,
-                "message": claim.get("on_mismatch", "AGENTS.md value disagrees with the codebase."),
+                "message": claim.get("on_mismatch", "Doc value disagrees with the codebase."),
+            }
+        return None
+    if ctype == "path-exists":
+        target = os.path.join(root, claim["target"])
+        if not os.path.exists(target):
+            return {
+                "id": claim["id"],
+                "status": "drift",
+                "target": claim["target"],
+                "message": claim.get("on_missing", "Referenced file no longer exists."),
             }
         return None
     return {
@@ -89,20 +99,35 @@ def run_claim(claim, agents_text, root):
     }
 
 
-def audit(registry, root):
-    agents_path = os.path.join(root, registry["agents_md"])
-    with open(agents_path) as fh:
-        agents_text = fh.read()
-    findings = list(run_guard(agents_text, registry.get("volatile_fact_guard")))
-    for claim in registry.get("claims", []):
-        finding = run_claim(claim, agents_text, root)
+def audit_doc(doc, registry, root):
+    """Run the guard and claims for a single registered doc. Returns findings,
+    each tagged with the doc's path."""
+    findings = []
+    doc_path = doc["path"]
+    with open(os.path.join(root, doc_path)) as fh:
+        text = fh.read()
+
+    if doc.get("guard"):
+        findings += run_guard(text, registry["guard_pattern"], doc.get("guard_allow", []))
+    for claim in doc.get("claims", []):
+        finding = run_claim(claim, text, root)
         if finding:
             findings.append(finding)
+
+    for finding in findings:
+        finding["file"] = doc_path
+    return findings
+
+
+def audit(registry, root):
+    findings = []
+    for doc in registry.get("docs", []):
+        findings += audit_doc(doc, registry, root)
     return findings
 
 
 def main(argv=None):
-    parser = argparse.ArgumentParser(description="AGENTS.md drift checker")
+    parser = argparse.ArgumentParser(description="AI-docs drift checker")
     parser.add_argument(
         "--registry",
         default=os.path.join(os.path.dirname(__file__), "registry.json"),

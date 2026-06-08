@@ -1,18 +1,46 @@
 {
-  "agents_md": "AGENTS.md",
-  "volatile_fact_guard": {
-    "description": "AGENTS.md must not restate tool version numbers — they drift and are inferable from the build files. Flag a known tool name immediately followed by a semver-like version (x.y or x.y.z). Single integers (e.g. 'JDK 21', 'JVM target 17') are intentionally allowed.",
-    "pattern": "(?i)\\b(kotlin|gradle|ktlint|google java format|agp)\\b\\s*\\(?\\s*v?\\d+\\.\\d+(?:\\.\\d+)?\\)?",
-    "allow": []
-  },
-  "claims": [
+  "guard_description": "Guarded docs must not restate tool version numbers — they drift and are inferable from the build files. The guard flags a known tool name immediately followed by a semver-like version (x.y or x.y.z). Single integers (e.g. 'JDK 21', 'JVM target 17') are intentionally allowed. Use a doc's guard_allow to whitelist intentional example snippets.",
+  "guard_pattern": "(?i)\\b(kotlin|gradle|ktlint|google java format|agp)\\b\\s*\\(?\\s*v?\\d+\\.\\d+(?:\\.\\d+)?\\)?",
+  "docs": [
     {
-      "id": "di-framework",
-      "type": "source_signal",
-      "extract": "grep -q 'dev.zacsweers.metro' build.gradle && echo present || echo absent",
-      "expected": "present",
-      "doc_note": "AGENTS.md states DI is Anvil/Dagger2 today with a Metro migration in flight (the 'dev.zacsweers.metro' plugin in build.gradle).",
-      "on_mismatch": "build.gradle no longer shows the 'dev.zacsweers.metro' plugin; the Metro migration may be complete or reverted. Review the DI wording in AGENTS.md (Project Overview > Build) and update the claim accordingly."
+      "path": "AGENTS.md",
+      "guard": true,
+      "guard_allow": [],
+      "claims": [
+        {
+          "id": "di-framework",
+          "type": "source_signal",
+          "extract": "grep -q 'dev.zacsweers.metro' build.gradle && echo present || echo absent",
+          "expected": "present",
+          "doc_note": "AGENTS.md states DI is Anvil/Dagger2 today with a Metro migration in flight (the 'dev.zacsweers.metro' plugin in build.gradle).",
+          "on_mismatch": "build.gradle no longer shows the 'dev.zacsweers.metro' plugin; the Metro migration may be complete or reverted. Review the DI wording in AGENTS.md (Project Overview > Build) and update the claim accordingly."
+        }
+      ]
+    },
+    {
+      "path": ".cursor/rules/dependency-updates.mdc",
+      "guard": true,
+      "guard_allow": [],
+      "claims": []
+    },
+    {
+      "path": ".cursor/rules/wide-events.mdc",
+      "guard": false,
+      "guard_allow": [],
+      "claims": [
+        {
+          "id": "wide-events-pageload-ref",
+          "type": "path-exists",
+          "target": "app/src/main/java/com/duckduckgo/app/browser/pageload/PageLoadWideEvent.kt",
+          "on_missing": "wide-events.mdc cites this reference implementation; the file was moved or renamed. Update the path in the 'Reference implementations' list."
+        },
+        {
+          "id": "wide-events-subscription-ref",
+          "type": "path-exists",
+          "target": "subscriptions/subscriptions-impl/src/main/java/com/duckduckgo/subscriptions/impl/wideevents/SubscriptionPurchaseWideEvent.kt",
+          "on_missing": "wide-events.mdc cites this reference implementation (abbreviated as '.../SubscriptionPurchaseWideEvent.kt'); the file was moved or renamed. Update the reference."
+        }
+      ]
     }
   ]
 }
