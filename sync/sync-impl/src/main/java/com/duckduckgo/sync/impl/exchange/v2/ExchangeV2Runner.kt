@@ -653,8 +653,8 @@ class RealExchangeV2Runner @Inject constructor(
                     put("type", "recovery_code_response")
                     put("recovery_code", recoveryCode)
                 }.toString()
+                // Propagate the send result
                 sendOnWireAndRecord(json, peer, peerKey, ExchangeV2Message.RecoveryCodeResponse(json, recoveryCode))
-                true
             }
             is Result.Error -> {
                 logcat(ERROR) { "Sync-ExchangeV2: recovery code unavailable for peerKind=$peerKind: ${codeResult.reason}" }

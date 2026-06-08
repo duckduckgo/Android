@@ -343,6 +343,27 @@ class RealExchangeV2RunnerTest {
         )
     }
 
+    @Test fun `Host aborts (not Done) when the recovery_code_response send fails`() = runTest {
+        whenever(syncStore.userId).thenReturn("my-user")
+        whenever(recoveryCodeProvider.createDdgAccountIfNeeded()).thenReturn(Result.Success(Unit))
+        whenever(recoveryCodeProvider.getDdgRecoveryCode()).thenReturn(Result.Success("the-code"))
+        // The recovery_code_response POST fails on the relay (e.g. peer channel already TTL'd);
+        // the earlier awaiting_confirmation / confirmed sends use the default Success stub.
+        whenever(
+            channel.sendMessage(argThat { contains("recovery_code_response") }, any(), any(), any()),
+        ).thenReturn(Result.Error(reason = "relay unreachable"))
+
+        val runner = newRunner()
+        runner.startPresent()
+        runner.deliverIncomingMessage(Hello("{}"))
+        runner.deliverIncomingMessage(RecoveryCodeRequest(rawJson = "{}", name = "Joiner", kind = "ddg")) // → Host.Confirming
+        runner.localTrigger(LocalTrigger.UserConfirmedHost) // → Host.Sending; response send then fails
+
+        // A failed response delivery must abort, not complete: the host never delivered the code.
+        val lastTransition = runner.events.replayCache.filterIsInstance<ExchangeV2Event.Transition>().last()
+        assertSame(ExchangeV2State.Host.Aborted, lastTransition.to)
+    }
+
     @Test fun `Scanner ddg auto-elects Host when peer is 3party (both have accounts)`() = runTest {
         whenever(syncStore.userId).thenReturn("my-user")
         val runner = newRunner()
