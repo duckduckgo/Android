@@ -1,4 +1,5 @@
 appId: com.duckduckgo.mobile.android
+androidWebViewHierarchy: devtools
 name: "Onboarding: Ensuring we can navigate through pre-onboarding flow and dismissing all dialogs"
 tags:
   - onboardingTest
