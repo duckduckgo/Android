@@ -4953,6 +4953,9 @@ class BrowserTabFragment :
         renderer.renderHomeCta()
         recreateBrowserMenu()
         viewModel.onConfigurationChanged(orientationChanged)
+        if (orientationChanged) {
+            renderer.reapplyBubbleForOrientation()
+        }
     }
 
     fun onBackPressed(isCustomTab: Boolean = false): Boolean {
@@ -6105,6 +6108,10 @@ class BrowserTabFragment :
                 brandDesignDialogScrollView.viewTreeObserver.removeOnGlobalLayoutListener(it)
             }
             brandDesignFitLayoutListener = null
+        }
+
+        fun reapplyBubbleForOrientation() {
+            (lastSeenCtaViewState?.cta as? DaxBubbleCta.BrandDesignUpdateBubbleCta)?.onOrientationChanged()
         }
 
         private fun showPrivacyProSkippedOnboardingBottomSheet(configuration: SubscriptionPromoModalCta) {

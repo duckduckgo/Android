@@ -1708,6 +1708,17 @@ sealed class DaxBubbleCta(
             wavingDaxController?.applyFit(container)
         }
 
+        fun onOrientationChanged() {
+            if (!onboardingImprovementsEnabled) return
+            val container = ctaView ?: return
+            val cardView = container.findViewById<DaxOnboardingBubbleBrandDesignUpdateCardView>(R.id.brandDesignCardView) ?: return
+
+            applyWavingDaxState(container, this as? ShowsWavingDax)
+            cardView.setArrowDepthFraction(showCtaFinTarget(container) ?: 0f)
+            wavingDaxController?.reset()
+            container.post { applyFit() }
+        }
+
         private fun resetAllIncludesExcept(view: View, active: View) {
             getAllContentIncludes(view).forEach { include ->
                 if (include == active) {
