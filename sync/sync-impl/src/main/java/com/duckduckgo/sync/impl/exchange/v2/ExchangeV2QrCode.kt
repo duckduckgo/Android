@@ -106,12 +106,14 @@ class RealExchangeV2QrCode @Inject constructor() : ExchangeV2QrCode {
             }
         }
 
-        // v2 linking code
-        if (json.optString("version") == "2" && json.has("channel_id") && json.has("public_key")) {
+        // v2 linking code — accept any same-major (2.x) version per Transport TD 1214486492252757
+        // §Versioning ("same major version — proceed"). The raw version string is preserved.
+        val version = json.optString("version")
+        if (majorVersion(version) == 2 && json.has("channel_id") && json.has("public_key")) {
             return ExchangeV2CodeParseResult.LinkingV2(
                 channelId = json.optString("channel_id"),
                 publicKey = json.optString("public_key"),
-                version = json.optString("version"),
+                version = version,
             )
         }
 
@@ -141,6 +143,9 @@ class RealExchangeV2QrCode @Inject constructor() : ExchangeV2QrCode {
         }
         return null
     }
+
+    /** Major component of a "major.minor" version string (e.g. "2.1" → 2), or null if unparseable. */
+    private fun majorVersion(version: String): Int? = version.substringBefore(".").toIntOrNull()
 
     private fun looksLikeBase64Url(s: String): Boolean =
         s.length >= 8 && s.all { it in BASE64_URL_ALPHABET }

@@ -128,6 +128,20 @@ class RealExchangeV2QrCodeTest {
         assertEquals(ExchangeV2CodeParseResult.Unknown, qrCode.parse(bareB64))
     }
 
+    @Test fun `parse accepts a 2_x minor version as LinkingV2`() {
+        // Transport TD 1214486492252757 §Versioning: a same-major (2) code proceeds; minor bumps
+        // (2.0, 2.1, …) are tolerated. The raw version string is preserved for downstream.
+        val bareB64 = encodeUrl("""{"version":"2.1","channel_id":"chan","public_key":"pub"}""")
+
+        val parsed = qrCode.parse(bareB64)
+
+        assertTrue("expected LinkingV2 for a 2.x code, got $parsed", parsed is ExchangeV2CodeParseResult.LinkingV2)
+        parsed as ExchangeV2CodeParseResult.LinkingV2
+        assertEquals("chan", parsed.channelId)
+        assertEquals("pub", parsed.publicKey)
+        assertEquals("2.1", parsed.version)
+    }
+
     // ---- buildLinkingCode round-trip ----
 
     @Test fun `buildLinkingCode emits a URL parse can decode back to its inputs`() {
@@ -167,7 +181,7 @@ class RealExchangeV2QrCodeTest {
 
     @Test fun `buildLinkingCode honours custom version`() {
         val built = qrCode.buildLinkingCode("c", "k", version = "2.1")
-        // 2.1 isn't decoded by us (parse looks for exact "2"), but the wire shape carries it through.
+        // Pins that the wire shape carries the custom version through (parse now accepts 2.x).
         val fragment = built.substringAfter("code2=")
         val decoded = Base64.decode(fragment, Base64.URL_SAFE or Base64.NO_PADDING or Base64.NO_WRAP)
         assertTrue(String(decoded).contains("\"version\":\"2.1\""))
