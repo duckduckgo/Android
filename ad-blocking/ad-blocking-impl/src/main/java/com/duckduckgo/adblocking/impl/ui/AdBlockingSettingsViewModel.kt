@@ -19,6 +19,7 @@ package com.duckduckgo.adblocking.impl.ui
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.adblocking.impl.AdBlockingSettingsRepository
+import com.duckduckgo.adblocking.impl.domain.AdBlockingState
 import com.duckduckgo.adblocking.impl.domain.AdBlockingStatusChecker
 import com.duckduckgo.adblocking.impl.ui.AdBlockingSettingsViewModel.Command.OpenDuckPlayerSettings
 import com.duckduckgo.adblocking.impl.ui.AdBlockingSettingsViewModel.Command.OpenLearnMore
@@ -41,15 +42,23 @@ class AdBlockingSettingsViewModel @Inject constructor(
     private val repository: AdBlockingSettingsRepository,
 ) : ViewModel() {
 
-    data class ViewState(val isEnabled: Boolean = false)
+    data class ViewState(
+        val isEnabled: Boolean = false,
+        val showConsentDescription: Boolean? = null,
+    )
 
     sealed class Command {
         data class OpenLearnMore(val url: String) : Command()
         data object OpenDuckPlayerSettings : Command()
     }
 
-    val viewState: StateFlow<ViewState> = statusChecker.isUserEnabledFlow()
-        .map { ViewState(isEnabled = it) }
+    val viewState: StateFlow<ViewState> = statusChecker.observeState()
+        .map { state ->
+            ViewState(
+                isEnabled = state is AdBlockingState.Enabled,
+                showConsentDescription = state !is AdBlockingState.Enabled.Default,
+            )
+        }
         .stateIn(
             viewModelScope,
             started = WhileSubscribed(),

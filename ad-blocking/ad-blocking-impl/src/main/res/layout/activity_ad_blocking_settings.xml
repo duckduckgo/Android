@@ -74,7 +74,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="@dimen/keyline_4"
                 android:layout_marginTop="@dimen/keyline_2"
-                android:text="@string/ad_blocking_settings_description"
+                android:visibility="gone"
                 app:textType="secondary"
                 app:typography="body2" />
 

@@ -41,9 +41,22 @@ interface AdBlockingStatusChecker {
      */
     fun isShownInSettingsFlow(): Flow<Boolean>
 
-    fun isUserEnabledFlow(): Flow<Boolean>
+    /**
+     * Emits the current [AdBlockingState], distinguishing whether ad blocking is enabled because
+     * the user turned it on ([AdBlockingState.Enabled.UserEnabled]) or because of the remote
+     * default ([AdBlockingState.Enabled.Default]).
+     */
+    fun observeState(): Flow<AdBlockingState>
 
-    fun isUserEnabled(): Boolean
+    fun currentState(): AdBlockingState
+}
+
+sealed interface AdBlockingState {
+    data object Disabled : AdBlockingState
+    sealed interface Enabled : AdBlockingState {
+        data object UserEnabled : Enabled
+        data object Default : Enabled
+    }
 }
 
 @SingleInstanceIn(AppScope::class)
@@ -81,10 +94,23 @@ class RealAdBlockingStatusChecker @Inject constructor(
 
     override fun isShownInSettingsFlow(): Flow<Boolean> = feature.self().enabled()
 
-    private val isUserEnabled: StateFlow<Boolean> = isUserEnabledFlow()
-        .stateIn(appScope, SharingStarted.Eagerly, false)
+    override fun observeState(): Flow<AdBlockingState> =
+        combine(
+            settingsRepository.isEnabledFlow(),
+            feature.enabledByDefault().enabled(),
+        ) { userSetting, enabledByDefault ->
+            when (userSetting) {
+                true -> AdBlockingState.Enabled.UserEnabled
+                false -> AdBlockingState.Disabled
+                null -> if (enabledByDefault) {
+                    AdBlockingState.Enabled.Default
+                } else {
+                    AdBlockingState.Disabled
+                }
+            }
+        }
+    private val isUserEnabled: StateFlow<AdBlockingState> = observeState()
+        .stateIn(appScope, SharingStarted.Eagerly, AdBlockingState.Disabled)
 
-    override fun isUserEnabledFlow(): Flow<Boolean> = userEnabled
-
-    override fun isUserEnabled(): Boolean = isUserEnabled.value
+    override fun currentState(): AdBlockingState = isUserEnabled.value
 }

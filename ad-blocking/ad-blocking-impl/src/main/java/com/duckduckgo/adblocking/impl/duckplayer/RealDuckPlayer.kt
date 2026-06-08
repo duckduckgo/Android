@@ -42,6 +42,7 @@ import com.duckduckgo.adblocking.api.duckplayer.PrivatePlayerMode.Disabled
 import com.duckduckgo.adblocking.api.duckplayer.PrivatePlayerMode.Enabled
 import com.duckduckgo.adblocking.api.duckplayer.YOUTUBE_HOST
 import com.duckduckgo.adblocking.api.duckplayer.YOUTUBE_MOBILE_HOST
+import com.duckduckgo.adblocking.impl.domain.AdBlockingState
 import com.duckduckgo.adblocking.impl.domain.AdBlockingStatusChecker
 import com.duckduckgo.adblocking.impl.duckplayer.DuckPlayerPixelName.DUCK_PLAYER_DAILY_UNIQUE_VIEW
 import com.duckduckgo.adblocking.impl.duckplayer.DuckPlayerPixelName.DUCK_PLAYER_NEWTAB_SETTING_OFF
@@ -180,7 +181,7 @@ class RealDuckPlayer @Inject constructor(
     }
 
     override fun getUserPreferences(): UserPreferences {
-        val defaultPlayerMode = if (adBlockingStatusChecker.isShownInSettings() && adBlockingStatusChecker.isUserEnabled()) {
+        val defaultPlayerMode = if (adBlockingStatusChecker.isShownInSettings() && adBlockingStatusChecker.currentState() is AdBlockingState.Enabled) {
             Disabled
         } else {
             AlwaysAsk
@@ -214,9 +215,9 @@ class RealDuckPlayer @Inject constructor(
     override fun observeUserPreferences(): Flow<UserPreferences> {
         return combine(
             adBlockingStatusChecker.isShownInSettingsFlow(),
-            adBlockingStatusChecker.isUserEnabledFlow(),
-        ) { isShownInSettings, isUserEnabled ->
-            isShownInSettings && isUserEnabled
+            adBlockingStatusChecker.observeState(),
+        ) { isShownInSettings, currentState ->
+            isShownInSettings && currentState is AdBlockingState.Enabled
         }
             .flatMapLatest { consentGated ->
                 val defaultPlayerMode = if (consentGated) Disabled else AlwaysAsk
