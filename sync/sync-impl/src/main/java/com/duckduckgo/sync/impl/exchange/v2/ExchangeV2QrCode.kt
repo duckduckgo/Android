@@ -109,10 +109,12 @@ class RealExchangeV2QrCode @Inject constructor() : ExchangeV2QrCode {
         // v2 linking code — accept any same-major (2.x) version per Transport TD 1214486492252757
         // §Versioning ("same major version — proceed"). The raw version string is preserved.
         val version = json.optString("version")
-        if (majorVersion(version) == 2 && json.has("channel_id") && json.has("public_key")) {
+        val channelId = json.optString("channel_id")
+        val publicKey = json.optString("public_key")
+        if (majorVersion(version) == 2 && channelId.isNotEmpty() && publicKey.isNotEmpty()) {
             return ExchangeV2CodeParseResult.LinkingV2(
-                channelId = json.optString("channel_id"),
-                publicKey = json.optString("public_key"),
+                channelId = channelId,
+                publicKey = publicKey,
                 version = version,
             )
         }

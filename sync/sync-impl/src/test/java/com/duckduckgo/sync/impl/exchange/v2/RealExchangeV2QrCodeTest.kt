@@ -142,6 +142,18 @@ class RealExchangeV2QrCodeTest {
         assertEquals("2.1", parsed.version)
     }
 
+    @Test fun `parse rejects a v2 code with an empty public_key`() {
+        // channel_id and public_key are required + non-empty (Transport TD §QR Code); an empty one
+        // must reject at parse, not be accepted and fail later at decodePublicKey.
+        val bareB64 = encodeUrl("""{"version":"2","channel_id":"chan","public_key":""}""")
+        assertEquals(ExchangeV2CodeParseResult.Unknown, qrCode.parse(bareB64))
+    }
+
+    @Test fun `parse rejects a v2 code with an empty channel_id`() {
+        val bareB64 = encodeUrl("""{"version":"2","channel_id":"","public_key":"pub"}""")
+        assertEquals(ExchangeV2CodeParseResult.Unknown, qrCode.parse(bareB64))
+    }
+
     // ---- buildLinkingCode round-trip ----
 
     @Test fun `buildLinkingCode emits a URL parse can decode back to its inputs`() {
