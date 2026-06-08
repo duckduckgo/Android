@@ -1022,7 +1022,7 @@
     <string name="linkTextCopied">Link text copied</string>
     <string name="linkTextCopyFailed">Couldn\'t copy link text</string>
 
-    <string name="preOnboardingWelcomeDialogTitle">Hi there.</string>
+    <string name="preOnboardingWelcomeDialogTitle">Hi CursorDuck.</string>
     <string name="preOnboardingWelcomeDialogBody1">Ready for a faster browser that puts you in control?</string>
     <string name="preOnboardingWelcomeDialogBody2">AI is always optional, and privacy protection is always on.</string>
     <string name="onboardingStepIndicatorText" instruction="a counter above our instructions in onboarding that tells a user what step they are on">%1$d of %2$d</string>
