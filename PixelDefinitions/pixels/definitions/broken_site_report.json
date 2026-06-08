@@ -195,7 +195,7 @@
                 "key": "urlParametersRemoved",
                 "description": "Whether URL parameters were removed.",
                 "enum": ["0", "1"]
-            }
+            },
             {
                 "key": "userRefreshCount",
                 "description": "Number of times the user refreshed this page.",
@@ -394,7 +394,7 @@
                 "key": "urlParametersRemoved",
                 "description": "Whether URL parameters were removed.",
                 "enum": ["0", "1"]
-            }
+            },
             {
                 "key": "userRefreshCount",
                 "description": "Number of times the user refreshed this page.",
