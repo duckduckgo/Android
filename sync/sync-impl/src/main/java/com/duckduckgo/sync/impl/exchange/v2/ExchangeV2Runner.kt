@@ -28,6 +28,7 @@ import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2State.SameAccountAbort
 import com.duckduckgo.sync.store.SyncStore
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -314,8 +315,14 @@ class RealExchangeV2Runner @Inject constructor(
                         "${decryptFailure.cause?.message}. The keys probably don't match — try restarting pairing.",
                 )
                 cancel()
+            } catch (cancellation: CancellationException) {
+                throw cancellation // normal teardown (cancel() / scope cancellation) — let it propagate
             } catch (t: Throwable) {
-                logcat(ERROR) { "Sync-ExchangeV2: poll loop exited: ${t.message}" }
+                // Unexpected failure: fail fast — surface an error and tear down rather than
+                // dying silently and leaving the session to linger until the 5-min timeout.
+                logcat(ERROR) { "Sync-ExchangeV2: poll loop failed: ${t.message}" }
+                emitSessionError("Pairing failed: ${t.message}")
+                cancel()
             }
         }
     }

@@ -25,8 +25,10 @@ import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Message.Hello
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Message.RecoveryCodeRequest
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Message.RecoveryCodeResponse
 import com.duckduckgo.sync.store.SyncStore
+import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.filterIsInstance
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertFalse
@@ -470,5 +472,34 @@ class RealExchangeV2RunnerTest {
             .filterIsInstance<ExchangeV2Event.SessionError>()
             .any { it.message.contains("timed out", ignoreCase = true) }
         assertFalse("a completed session must not later emit a timeout", timedOut)
+    }
+
+    // ---- Poll-loop error handling (Transport TD 1214486492252757 §Session Lifecycle) ----
+
+    @Test fun `an unexpected poll error tears down the session with a SessionError`() = runTest {
+        whenever(syncStore.userId).thenReturn("my-user")
+        whenever(channel.poll(any(), any())).thenReturn(flow<ExchangeV2Message> { throw RuntimeException("boom") })
+        val runner = newRunner()
+        runner.startPresent()
+
+        val errored = runner.events.replayCache
+            .filterIsInstance<ExchangeV2Event.SessionError>()
+            .any { it.message.contains("boom") }
+        assertTrue("expected a SessionError from the failed poll loop", errored)
+        assertNull(runner.currentState) // session torn down, not left hanging
+    }
+
+    @Test fun `cancel during an open poll does not surface a spurious error`() = runTest {
+        whenever(syncStore.userId).thenReturn("my-user")
+        whenever(channel.poll(any(), any())).thenReturn(flow<ExchangeV2Message> { awaitCancellation() })
+        val runner = newRunner()
+        runner.startPresent()
+
+        runner.cancel() // cancels the open poll → CancellationException must propagate, not become an error
+
+        val spurious = runner.events.replayCache
+            .filterIsInstance<ExchangeV2Event.SessionError>()
+            .any { it.message.contains("Pairing failed") }
+        assertFalse("cancellation must not surface as a 'Pairing failed' error", spurious)
     }
 }
