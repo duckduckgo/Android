@@ -1,26 +1,28 @@
-name: Test - Workflow for Testing
+name: Test workflow
 
 on:
   workflow_dispatch:
 
-    inputs:
-      ref:
-        description: 'This is an example of an input'
-        required: true
-
-env:
-  ASANA_PAT: ${{ secrets.ASANA_ACCESS_TOKEN }}
-  GH_TOKEN: ${{ secrets.GT_DAXMOBILE }}
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
-  test-workflow:
-    runs-on: ubuntu-latest
-    name: Add here whatever steps you want to test
-
+  resolve-commit:
+    name: Resolve commit SHA
+    runs-on: android-large-runner
+    outputs:
+      commit_sha: ${{ steps.resolve.outputs.commit_sha }}
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          submodules: recursive
-          token: ${{ secrets.GT_DAXMOBILE }}
-          ref: ${{ github.event.inputs.ref }}
+      - name: Resolve commit SHA
+        id: resolve
+        run: |
+          echo "Using commit: ${{ github.sha }}"
+          echo "commit_sha=${{ github.sha }}" >> $GITHUB_OUTPUT
+
+  call-end-to-end:
+    needs: [resolve-commit]
+    uses: ./.github/workflows/e2e-nightly-full-suite.yml
+    with:
+      commit: ${{ needs.resolve-commit.outputs.commit_sha }}
+    secrets: inherit
