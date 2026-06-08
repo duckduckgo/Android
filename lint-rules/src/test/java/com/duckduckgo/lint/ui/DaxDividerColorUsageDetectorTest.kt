@@ -415,6 +415,45 @@ class DaxDividerColorUsageDetectorTest {
     }
 
     @Test
+    fun whenNonDuckDuckGoColorsPathThenWarning() {
+        lint()
+            .files(
+                TestFiles.kt(
+                    """
+                    package com.example.test
+
+                    import androidx.compose.runtime.Composable
+                    import androidx.compose.ui.graphics.Color
+                    import com.duckduckgo.common.ui.compose.divider.DaxHorizontalDivider
+
+                    data class OtherColors(val danger: Color)
+
+                    object SomeOtherPalette {
+                        val colors: OtherColors = OtherColors(danger = Color.Red)
+                    }
+
+                    @Composable
+                    fun TestScreen() {
+                        DaxHorizontalDivider(
+                            color = SomeOtherPalette.colors.danger,
+                        )
+                    }
+                    """.trimIndent(),
+                ).indented(),
+                composeStubs,
+                themeStubs,
+                daxDividerStubs,
+            )
+            .allowCompilationErrors()
+            .issues(INVALID_DAX_DIVIDER_COLOR_USAGE)
+            .skipTestModes(TestMode.WHITESPACE)
+            .run()
+            .expectContains("InvalidDaxDividerColorUsage")
+            .expectContains("color = SomeOtherPalette.colors.danger")
+            .expectContains("0 errors, 1 warnings")
+    }
+
+    @Test
     fun whenMixedValidAndInvalidCallsThenWarningsForInvalidOnly() {
         lint()
             .files(

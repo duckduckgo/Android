@@ -77,7 +77,7 @@ class DaxDividerColorUsageDetector : Detector(), SourceCodeScanner {
         }
 
         private fun containsSemanticThemeColorPath(source: String): Boolean {
-            return source.contains("DuckDuckGoTheme.colors.") || source.contains(".colors.")
+            return SEMANTIC_THEME_COLOR_PATH_REGEX.containsMatchIn(source)
         }
 
         private fun resolvesToThemePackageElement(expression: UExpression): Boolean {
@@ -171,6 +171,9 @@ class DaxDividerColorUsageDetector : Detector(), SourceCodeScanner {
     companion object {
         private const val COLOR_THEME_PACKAGE = "com.duckduckgo.common.ui.compose.theme"
         private const val MAX_VALIDATION_DEPTH = 4
+
+        private val SEMANTIC_THEME_COLOR_PATH_REGEX =
+            Regex("""\.colors\.(backgrounds|text|brand|icons|infoPanel|textField|status|system)\.""")
 
         private val ARBITRARY_COLOR_ACCESS_REGEX = Regex("""\bColor\.[A-Za-z_][A-Za-z0-9_]*""")
         private val ARBITRARY_COLOR_CONSTRUCTOR_REGEX = Regex("""\bColor\s*\(""")
