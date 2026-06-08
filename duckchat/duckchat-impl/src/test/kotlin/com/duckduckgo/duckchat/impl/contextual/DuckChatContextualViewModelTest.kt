@@ -1546,6 +1546,22 @@ class DuckChatContextualViewModelTest {
     }
 
     @Test
+    fun `when contextualSheetImprovements disabled then chatHintResId is legacy hint`() = runTest {
+        whenever(contextualSheetImprovementsToggle.isEnabled()).thenReturn(false)
+        val testee = buildViewModel()
+
+        assertEquals(R.string.input_screen_chat_hint, testee.viewState.value.chatHintResId)
+    }
+
+    @Test
+    fun `when contextualSheetImprovements enabled then chatHintResId is improved hint`() = runTest {
+        whenever(contextualSheetImprovementsToggle.isEnabled()).thenReturn(true)
+        val testee = buildViewModel()
+
+        assertEquals(R.string.contextualSheetImprovedHint, testee.viewState.value.chatHintResId)
+    }
+
+    @Test
     fun `when quick action clicked in LEGACY_SUMMARIZE then prompt is inserted into viewState`() = runTest {
         whenever(contextualSheetImprovementsToggle.isEnabled()).thenReturn(false)
         val testee = buildViewModel()

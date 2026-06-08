@@ -122,6 +122,7 @@ class DuckChatContextualViewModel @Inject constructor(
                 prompt = "",
                 isFireButtonEnabled = false,
                 quickActionState = QuickActionState.LEGACY_SUMMARIZE,
+                chatHintResId = R.string.input_screen_chat_hint,
             ),
         )
     val viewState: StateFlow<ViewState> = _viewState.asStateFlow()
@@ -140,10 +141,16 @@ class DuckChatContextualViewModel @Inject constructor(
             } else {
                 QuickActionState.LEGACY_SUMMARIZE
             }
+            val chatHintResId = if (isContextualSheetImprovementsEnabled) {
+                R.string.contextualSheetImprovedHint
+            } else {
+                R.string.input_screen_chat_hint
+            }
             _viewState.update {
                 it.copy(
                     isFireButtonEnabled = duckChatFeature.contextualFireButton().isEnabled() && isSingleTabFireEnabled,
                     quickActionState = initialQuickActionState,
+                    chatHintResId = chatHintResId,
                 )
             }
         }
@@ -161,6 +168,7 @@ class DuckChatContextualViewModel @Inject constructor(
         val prompt: String = "",
         val isFireButtonEnabled: Boolean = false,
         val quickActionState: QuickActionState = QuickActionState.LEGACY_SUMMARIZE,
+        @StringRes val chatHintResId: Int = R.string.input_screen_chat_hint,
     )
 
     fun onSheetReopened() {

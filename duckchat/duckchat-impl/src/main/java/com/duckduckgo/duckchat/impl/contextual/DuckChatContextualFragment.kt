@@ -662,6 +662,7 @@ class DuckChatContextualFragment :
         }
 
         binding.contextualPromptQuickAction.setText(viewState.quickActionState.labelResId)
+        binding.inputField.setHint(viewState.chatHintResId)
 
         when (viewState.sheetMode) {
             DuckChatContextualViewModel.SheetMode.INPUT -> {
