@@ -27,7 +27,9 @@ import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Message.RecoveryCodeRespon
 import com.duckduckgo.sync.store.SyncStore
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.filterIsInstance
+import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertSame
 import org.junit.Assert.assertTrue
@@ -431,5 +433,42 @@ class RealExchangeV2RunnerTest {
         )
 
         assertSame(ExchangeV2State.Joiner.Confirming, runner.currentState)
+    }
+
+    // ---- Session timeout (Transport TD 1214486492252757 §Session Lifecycle: 5-min deadline) ----
+
+    @Test fun `session times out and tears down after the deadline`() = coroutineTestRule.testScope.runTest {
+        whenever(syncStore.userId).thenReturn("my-user")
+        val runner = newRunner()
+        runner.startPresent()
+        assertSame(ExchangeV2State.Bootstrapped, runner.currentState) // session active, awaiting a peer
+
+        advanceTimeBy(6 * 60 * 1000L) // past the 5-min session deadline (virtual time, instant)
+
+        val timedOut = runner.events.replayCache
+            .filterIsInstance<ExchangeV2Event.SessionError>()
+            .any { it.message.contains("timed out", ignoreCase = true) }
+        assertTrue("expected a 'timed out' SessionError", timedOut)
+        assertNull(runner.currentState) // session torn down
+    }
+
+    @Test fun `no timeout fires after the session already reached a terminal state`() = coroutineTestRule.testScope.runTest {
+        whenever(syncStore.userId).thenReturn(null)
+        val runner = newRunner()
+        runner.startScan("")
+        // Drive to a terminal (Joiner.Done) well before the deadline; this must cancel the timer.
+        runner.deliverIncomingMessage(
+            ExchangeV2Message.RecoveryCodeAvailable(rawJson = "{}", userId = "other", name = "Peer", kind = "3party"),
+        ) // auto-elects Joiner → Joiner.Confirming
+        runner.localTrigger(LocalTrigger.UserConfirmedJoiner) // → Joiner.Waiting
+        runner.deliverIncomingMessage(RecoveryCodeResponse("{}")) // → Joiner.Done (terminal)
+        assertNull(runner.currentState)
+
+        advanceTimeBy(6 * 60 * 1000L) // past the deadline
+
+        val timedOut = runner.events.replayCache
+            .filterIsInstance<ExchangeV2Event.SessionError>()
+            .any { it.message.contains("timed out", ignoreCase = true) }
+        assertFalse("a completed session must not later emit a timeout", timedOut)
     }
 }

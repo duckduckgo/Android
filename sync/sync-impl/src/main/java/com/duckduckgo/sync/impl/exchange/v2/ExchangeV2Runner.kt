@@ -30,6 +30,7 @@ import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -145,6 +146,8 @@ class RealExchangeV2Runner @Inject constructor(
 
     @Volatile private var pollJob: Job? = null
 
+    @Volatile private var timeoutJob: Job? = null
+
     @Volatile private var sentOwnAvailability: Boolean = false
 
     /**
@@ -200,6 +203,7 @@ class RealExchangeV2Runner @Inject constructor(
             }
             sendOwnAvailability()
             startPolling()
+            startSessionTimer()
         }
     }
 
@@ -225,6 +229,7 @@ class RealExchangeV2Runner @Inject constructor(
             }
             emitSessionStarted()
             startPolling()
+            startSessionTimer()
         }
     }
 
@@ -264,6 +269,8 @@ class RealExchangeV2Runner @Inject constructor(
         }
         pollJob?.cancel()
         pollJob = null
+        timeoutJob?.cancel()
+        timeoutJob = null
         val toDelete = ownChannelId
         if (toDelete != null) {
             // Best-effort DELETE per Tomek's 2026-05-26 ruling.
@@ -310,6 +317,23 @@ class RealExchangeV2Runner @Inject constructor(
             } catch (t: Throwable) {
                 logcat(ERROR) { "Sync-ExchangeV2: poll loop exited: ${t.message}" }
             }
+        }
+    }
+
+    /**
+     * Client-side session deadline. Per Transport TD 1214486492252757 §Session Lifecycle, abort the
+     * session 5 minutes after the QR code is generated (a single fixed deadline, NOT reset by
+     * activity). Cancelled when the session ends (terminal state or [cancel]) — which subsumes the
+     * spec's per-event cancel conditions, since those all drive the SM to a terminal state.
+     */
+    private fun startSessionTimer() {
+        timeoutJob = appScope.launch(dispatchers.io()) {
+            delay(SESSION_TIMEOUT_MS)
+            if (session == null) return@launch // session already ended; nothing to time out
+            logcat { "Sync-ExchangeV2: session timed out after ${SESSION_TIMEOUT_MS}ms; aborting" }
+            emitSessionError("Session timed out")
+            timeoutJob = null // null before cancel() so it doesn't cancel this now-completing coroutine
+            cancel()
         }
     }
 
@@ -776,6 +800,9 @@ class RealExchangeV2Runner @Inject constructor(
 
     companion object {
         private const val REPLAY = 100
+
+        // Transport TD 1214486492252757 §Session Lifecycle: 5-minute client session deadline.
+        private const val SESSION_TIMEOUT_MS = 5 * 60 * 1000L
 
         // Android is always a ddg-kind device.
         private const val OWN_DEVICE_KIND = "ddg"
