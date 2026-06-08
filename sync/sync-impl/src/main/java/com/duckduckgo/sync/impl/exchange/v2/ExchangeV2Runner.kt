@@ -183,7 +183,7 @@ class RealExchangeV2Runner @Inject constructor(
                 _pairingRole = PairingRole.Scanner
                 peerChannelId = parsed.channelId
                 peerPublicKey = parsed.publicKey
-                bootstrapLocked(PairingRole.Scanner) ?: return@withLock // bootstrap reports its own error
+                bootstrapLocked(PairingRole.Scanner) ?: return@launch // bootstrap reports its own error; abort the whole flow
                 // Scanner already knows the peer; SM starts directly in Negotiating.
                 session = smFactory.create(
                     localUserId = syncStore.userId,
@@ -217,7 +217,7 @@ class RealExchangeV2Runner @Inject constructor(
             cancel()
             mutex.withLock {
                 _pairingRole = PairingRole.Presenter
-                val keyPair = bootstrapLocked(PairingRole.Presenter) ?: return@withLock
+                val keyPair = bootstrapLocked(PairingRole.Presenter) ?: return@launch
                 _linkingCode = qrCode.buildLinkingCode(
                     channelId = ownChannelId!!,
                     publicKeyBase64Url = keyPair.publicKeyBase64,

@@ -502,4 +502,16 @@ class RealExchangeV2RunnerTest {
             .any { it.message.contains("Pairing failed") }
         assertFalse("cancellation must not surface as a 'Pairing failed' error", spurious)
     }
+
+    @Test fun `startScan with a failed channel bootstrap aborts cleanly without the misleading reach-Presenter error`() = runTest {
+        whenever(channel.createChannel(any())).thenReturn(Result.Error(reason = "relay 500"))
+        val runner = newRunner()
+        runner.startScan("")
+
+        val errors = runner.events.replayCache.filterIsInstance<ExchangeV2Event.SessionError>().map { it.message }
+        assertTrue("expected the bootstrap error", errors.any { it.contains("Failed to create channel") })
+        // The bootstrap failure must end the launch immediately — not fall through to sendHello and
+        // emit a second, misleading "couldn't reach the Presenter" error.
+        assertFalse("must not emit the misleading reach-Presenter error on a bootstrap failure", errors.any { it.contains("reach the Presenter") })
+    }
 }
