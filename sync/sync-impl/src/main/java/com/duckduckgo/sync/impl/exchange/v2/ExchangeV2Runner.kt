@@ -568,6 +568,8 @@ class RealExchangeV2Runner @Inject constructor(
         logcat { "Sync-ExchangeV2: session reached terminal state $terminal, clearing" }
         session = null
         _linkingCode = null
+        timeoutJob?.cancel() // session is over — stop the 5-min timer so it doesn't linger
+        timeoutJob = null
         val ch = ownChannelId
         if (ch != null) {
             appScope.launch(dispatchers.io()) { runCatching { channel.deleteChannel(ch) } }
