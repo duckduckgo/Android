@@ -55,7 +55,8 @@ interface ExchangeV2Channel {
      * Long-running poll loop on [ownChannelId]. Emits decrypted + parsed messages as they
      * arrive. The flow:
      *  - Polls every 1s using cursor-as-ack semantics.
-     *  - Completes (returns) on 404 (peer/server closed the channel) or [PollOutcome.Closed].
+     *  - Completes (returns) on a non-recoverable HTTP status (e.g. 404 channel gone, 401/403);
+     *    transient statuses (5xx / 429 / 418 / timeouts) keep polling.
      *  - Throws [EnvelopeVersionTooNew] if an envelope arrives with a higher major version.
      *  - Drops envelopes that fail to decrypt or that have unknown types (forward-compat).
      */
@@ -105,12 +106,16 @@ class RealExchangeV2Channel @Inject constructor(
                     }
                 }
                 is Result.Error -> {
-                    if (outcome.code == HTTP_NOT_FOUND) {
-                        logcat { "Sync-ExchangeV2: channel $ownChannelId gone (404), ending poll" }
+                    if (outcome.code in NON_RECOVERABLE_HTTP_CODES) {
+                        // Channel is gone (404/410) or permanently erroring — re-polling can't
+                        // recover, so stop rather than spin until the session deadline. The
+                        // session ends via the runner's timeout; poll() only decides whether to
+                        // keep polling.
+                        logcat { "Sync-ExchangeV2: ending poll on $ownChannelId — non-recoverable status ${outcome.code} (${outcome.reason})" }
                         return@flow
                     }
-                    logcat(ERROR) { "Sync-ExchangeV2: poll error ${outcome.code}: ${outcome.reason}" }
-                    // Transient error — back off but stay in the loop.
+                    // Transient (5xx / 429 / 418 / timeout / IO) — stay in the loop and retry next tick.
+                    logcat(ERROR) { "Sync-ExchangeV2: transient poll error ${outcome.code}: ${outcome.reason}, retrying" }
                 }
             }
             delay(POLL_INTERVAL_MS)
@@ -137,6 +142,16 @@ class RealExchangeV2Channel @Inject constructor(
 
     companion object {
         private const val POLL_INTERVAL_MS: Long = 1_000L
-        private const val HTTP_NOT_FOUND = 404
+
+        // HTTP statuses that won't recover by re-polling the same channel: stop the loop instead
+        // of retrying until the 5-min session deadline. Transient statuses (5xx / 429 / 418 /
+        // timeouts / IO) are deliberately absent here so they keep polling.
+        private val NON_RECOVERABLE_HTTP_CODES = setOf(
+            400, // Bad Request — malformed poll
+            401, // Unauthorized
+            403, // Forbidden
+            404, // Not Found — channel gone (the normal end when the peer/server closed it)
+            410, // Gone — channel permanently removed
+        )
     }
 }
