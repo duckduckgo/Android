@@ -514,4 +514,15 @@ class RealExchangeV2RunnerTest {
         // emit a second, misleading "couldn't reach the Presenter" error.
         assertFalse("must not emit the misleading reach-Presenter error on a bootstrap failure", errors.any { it.contains("reach the Presenter") })
     }
+
+    @Test fun `a failed bootstrap clears the pairing role so no half-started session lingers`() = runTest {
+        whenever(channel.createChannel(any())).thenReturn(Result.Error(reason = "relay 500"))
+        val runner = newRunner()
+
+        runner.startScan("")
+
+        // _pairingRole is set before bootstrapLocked runs; a bootstrap failure must tear that
+        // (and the ephemeral keys) back down rather than leave it dangling until the next attempt.
+        assertNull("pairingRole must be cleared after a failed bootstrap", runner.pairingRole)
+    }
 }

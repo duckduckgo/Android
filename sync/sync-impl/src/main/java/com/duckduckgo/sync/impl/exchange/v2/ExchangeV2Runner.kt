@@ -31,6 +31,7 @@ import dagger.SingleInstanceIn
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -40,6 +41,7 @@ import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withContext
 import logcat.LogPriority.ERROR
 import logcat.logcat
 import org.json.JSONObject
@@ -178,12 +180,15 @@ class RealExchangeV2Runner @Inject constructor(
                 emitSessionError("Pasted code is not a v2 linking code: $parsed")
                 return@launch
             }
-            cancel()
             mutex.withLock {
+                cancelLocked() // abandon any prior session before starting a new one
                 _pairingRole = PairingRole.Scanner
                 peerChannelId = parsed.channelId
                 peerPublicKey = parsed.publicKey
-                bootstrapLocked(PairingRole.Scanner) ?: return@launch // bootstrap reports its own error; abort the whole flow
+                bootstrapLocked(PairingRole.Scanner) ?: run {
+                    cancelLocked() // bootstrap reported its own error; discard the half-set state
+                    return@launch
+                }
                 // Scanner already knows the peer; SM starts directly in Negotiating.
                 session = smFactory.create(
                     localUserId = syncStore.userId,
@@ -195,11 +200,10 @@ class RealExchangeV2Runner @Inject constructor(
                 // Couldn't deliver hello — most likely the Presenter's channel has TTL'd out
                 // (5 min) or never existed (stale/typo'd code). No point sending availability
                 // or polling our own channel; tear down and let the user know.
-                emitSessionError(
+                failSession(
                     "Pairing aborted — couldn't reach the Presenter. Their session may have expired (5-min TTL). " +
                         "Ask them to Start as Presenter again.",
                 )
-                cancel()
                 return@launch
             }
             sendOwnAvailability()
@@ -214,10 +218,13 @@ class RealExchangeV2Runner @Inject constructor(
             // No pre-flight account check: per spec §"Exchange Share Recovery Code", a Host
             // without an account creates one during the pairing flow. [sendRecoveryCodeResponse]
             // calls createDdgAccountIfNeeded at Host.Sending time for ddg peers.
-            cancel()
             mutex.withLock {
+                cancelLocked() // abandon any prior session before starting a new one
                 _pairingRole = PairingRole.Presenter
-                val keyPair = bootstrapLocked(PairingRole.Presenter) ?: return@launch
+                val keyPair = bootstrapLocked(PairingRole.Presenter) ?: run {
+                    cancelLocked() // bootstrap reported its own error; discard the half-set state
+                    return@launch
+                }
                 _linkingCode = qrCode.buildLinkingCode(
                     channelId = ownChannelId!!,
                     publicKeyBase64Url = keyPair.publicKeyBase64,
@@ -265,8 +272,44 @@ class RealExchangeV2Runner @Inject constructor(
     }
 
     override fun cancel() {
+        // Public, fire-and-forget: external callers (dispatcher/UI) abandon the session. Internal
+        // sites call [teardownSession]/[failSession] directly so they can await teardown. All
+        // teardown runs under [mutex] so it can't race the locked message/trigger handlers.
+        appScope.launch(dispatchers.io()) { teardownSession() }
+    }
+
+    /**
+     * Tear down off the lock. [NonCancellable] so a caller cancelling its own job mid-teardown
+     * (the poll loop or the session timer both call this from inside the job [cancelLocked]
+     * cancels) can't abort the teardown half-way.
+     */
+    private suspend fun teardownSession() {
+        withContext(NonCancellable) { mutex.withLock { cancelLocked() } }
+    }
+
+    /**
+     * Emit one session error and tear down, atomically under the lock. No-ops if the session
+     * already ended, so a late timeout or poll error can't surface a spurious error over a
+     * session that already completed.
+     */
+    private suspend fun failSession(reason: String) {
+        withContext(NonCancellable) {
+            mutex.withLock {
+                if (session == null) return@withLock
+                emitSessionError(reason)
+                cancelLocked()
+            }
+        }
+    }
+
+    /**
+     * Caller MUST hold [mutex]. Stops the jobs, best-effort DELETEs our channel, discards the
+     * ephemeral key material, and clears all per-session state. Single teardown path so the
+     * field resets can't drift between call sites.
+     */
+    private fun cancelLocked() {
         if (session != null || pollJob != null) {
-            logcat { "Sync-ExchangeV2: cancel (was in state ${session?.currentState})" }
+            logcat { "Sync-ExchangeV2: teardown (was in state ${session?.currentState})" }
         }
         pollJob?.cancel()
         pollJob = null
@@ -306,23 +349,20 @@ class RealExchangeV2Runner @Inject constructor(
                     deliverIncomingMessage(incoming)
                 }
             } catch (versionTooNew: EnvelopeVersionTooNew) {
-                emitSessionError("Peer requires protocol v${versionTooNew.version}; please update this app")
-                cancel()
+                failSession("Peer requires protocol v${versionTooNew.version}; please update this app")
             } catch (decryptFailure: EnvelopeDecryptFailure) {
                 // Permanent — the cursor would just re-pull the same broken bytes forever.
-                emitSessionError(
+                failSession(
                     "Couldn't decrypt a message from the peer (seq=${decryptFailure.seq}): " +
                         "${decryptFailure.cause?.message}. The keys probably don't match — try restarting pairing.",
                 )
-                cancel()
             } catch (cancellation: CancellationException) {
                 throw cancellation // normal teardown (cancel() / scope cancellation) — let it propagate
             } catch (t: Throwable) {
                 // Unexpected failure: fail fast — surface an error and tear down rather than
                 // dying silently and leaving the session to linger until the 5-min timeout.
                 logcat(ERROR) { "Sync-ExchangeV2: poll loop failed: ${t.message}" }
-                emitSessionError("Pairing failed: ${t.message}")
-                cancel()
+                failSession("Pairing failed: ${t.message}")
             }
         }
     }
@@ -336,11 +376,9 @@ class RealExchangeV2Runner @Inject constructor(
     private fun startSessionTimer() {
         timeoutJob = appScope.launch(dispatchers.io()) {
             delay(SESSION_TIMEOUT_MS)
-            if (session == null) return@launch // session already ended; nothing to time out
-            logcat { "Sync-ExchangeV2: session timed out after ${SESSION_TIMEOUT_MS}ms; aborting" }
-            emitSessionError("Session timed out")
-            timeoutJob = null // null before cancel() so it doesn't cancel this now-completing coroutine
-            cancel()
+            logcat { "Sync-ExchangeV2: session deadline (${SESSION_TIMEOUT_MS}ms) reached" }
+            // failSession no-ops if the session already ended, and tears down under the lock.
+            failSession("Session timed out")
         }
     }
 
@@ -565,15 +603,10 @@ class RealExchangeV2Runner @Inject constructor(
      * fires a best-effort DELETE of our own channel (Tomek 2026-05-26).
      */
     private fun onTerminalReachedLocked(terminal: ExchangeV2State) {
-        logcat { "Sync-ExchangeV2: session reached terminal state $terminal, clearing" }
-        session = null
-        _linkingCode = null
-        timeoutJob?.cancel() // session is over — stop the 5-min timer so it doesn't linger
-        timeoutJob = null
-        val ch = ownChannelId
-        if (ch != null) {
-            appScope.launch(dispatchers.io()) { runCatching { channel.deleteChannel(ch) } }
-        }
+        logcat { "Sync-ExchangeV2: session reached terminal state $terminal, tearing down" }
+        // Full teardown via the single path: stops the poll loop, cancels the timer, discards
+        // ephemeral keys, DELETEs the channel, and clears state. Caller holds the lock.
+        cancelLocked()
     }
 
     /**
