@@ -66,7 +66,7 @@ internal fun PendingModeSwitch.toBundle(): Bundle {
 }
 
 internal fun Bundle.toPendingModeSwitch(): PendingModeSwitch? {
-    val targetMode = getString(KEY_TARGET_MODE)?.let { BrowserMode.valueOf(it) } ?: return null
+    val targetMode = getString(KEY_TARGET_MODE)?.let { runCatching { BrowserMode.valueOf(it) }.getOrNull() } ?: return null
     val action = when (getString(KEY_ACTION)) {
         ACTION_PROCESS_INTENT -> {
             val intent = BundleCompat.getParcelable(this, KEY_INTENT, Intent::class.java) ?: return null
