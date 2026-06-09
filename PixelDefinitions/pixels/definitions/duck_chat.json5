@@ -972,10 +972,7 @@
         "owners": ["malmstein"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
-        "parameters": [
-            "appVersion",
-            { "key": "model_id", "type": "string", "description": "Identifier of the selected model" }
-        ]
+        "parameters": ["appVersion", { "key": "model_id", "type": "string", "description": "Identifier of the selected model" }]
     },
     "m_aichat_unified_input_reasoning_effort_selected": {
         "description": "User selected a reasoning effort level in the Unified Input",
@@ -1006,8 +1003,18 @@
                 "enum": ["model_picker", "reasoning_picker"]
             },
             { "key": "current_tier", "type": "string", "description": "The user's current subscription tier", "enum": ["free", "plus"] },
-            { "key": "required_tier", "type": "string", "description": "The subscription tier required to access the feature", "enum": ["plus", "pro"] },
-            { "key": "flow_type", "type": "string", "description": "The type of subscription flow offered", "enum": ["purchase", "upgrade"] }
+            {
+                "key": "required_tier",
+                "type": "string",
+                "description": "The subscription tier required to access the feature",
+                "enum": ["plus", "pro"]
+            },
+            {
+                "key": "flow_type",
+                "type": "string",
+                "description": "The type of subscription flow offered",
+                "enum": ["purchase", "upgrade"]
+            }
         ]
     }
 }
