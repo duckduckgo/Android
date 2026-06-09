@@ -163,6 +163,9 @@ interface DuckChatPixels {
         hasFileAttachment: Boolean,
         hasText: Boolean,
     )
+    fun fireModelSelected(modelId: String)
+    fun fireReasoningEffortSelected(effortLevel: String)
+    fun fireSubscriptionUpsellTriggered(source: String, currentTier: String, requiredTier: String, flowType: String)
 }
 
 @ContributesBinding(AppScope::class)
@@ -492,6 +495,35 @@ class RealDuckChatPixels @Inject constructor(
             params,
         )
     }
+
+    override fun fireModelSelected(modelId: String) {
+        appCoroutineScope.launch(dispatcherProvider.io()) {
+            pixel.fire(DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_MODEL_SELECTED, parameters = mapOf(DuckChatPixelParameters.MODEL_ID to modelId))
+        }
+    }
+
+    override fun fireReasoningEffortSelected(effortLevel: String) {
+        appCoroutineScope.launch(dispatcherProvider.io()) {
+            pixel.fire(
+                DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_REASONING_EFFORT_SELECTED,
+                parameters = mapOf(DuckChatPixelParameters.EFFORT_LEVEL to effortLevel),
+            )
+        }
+    }
+
+    override fun fireSubscriptionUpsellTriggered(source: String, currentTier: String, requiredTier: String, flowType: String) {
+        appCoroutineScope.launch(dispatcherProvider.io()) {
+            pixel.fire(
+                DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_SUBSCRIPTION_UPSELL_TRIGGERED,
+                parameters = mapOf(
+                    DuckChatPixelParameters.UPSELL_SOURCE to source,
+                    DuckChatPixelParameters.UPSELL_CURRENT_TIER to currentTier,
+                    DuckChatPixelParameters.UPSELL_REQUIRED_TIER to requiredTier,
+                    DuckChatPixelParameters.UPSELL_FLOW_TYPE to flowType,
+                ),
+            )
+        }
+    }
 }
 
 enum class DuckChatPixelName(override val pixelName: String) : Pixel.PixelName {
@@ -692,6 +724,9 @@ enum class DuckChatPixelName(override val pixelName: String) : Pixel.PixelName {
     DUCK_CHAT_UNIFIED_INPUT_WEB_SEARCH_SUBMITTED_DAILY("m_aichat_unified_input_web_search_submitted_daily"),
     DUCK_CHAT_UNIFIED_INPUT_PROMPT_SUBMITTED_COUNT("m_aichat_unified_input_prompt_submitted_count"),
     DUCK_CHAT_UNIFIED_INPUT_PROMPT_SUBMITTED_DAILY("m_aichat_unified_input_prompt_submitted_daily"),
+    DUCK_CHAT_UNIFIED_INPUT_MODEL_SELECTED("m_aichat_unified_input_model_selected"),
+    DUCK_CHAT_UNIFIED_INPUT_REASONING_EFFORT_SELECTED("m_aichat_unified_input_reasoning_effort_selected"),
+    DUCK_CHAT_UNIFIED_INPUT_SUBSCRIPTION_UPSELL_TRIGGERED("m_aichat_unified_input_subscription_upsell_triggered"),
 }
 
 object DuckChatPixelParameters {
