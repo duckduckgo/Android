@@ -505,6 +505,15 @@ class TabSwitcherActivity :
         if (fadingOutForRecreate) return
         fadingOutForRecreate = true
 
+        // In the Fire tabs empty state the recycler is hidden and empty, so there is nothing to
+        // fade out. Animate nothing and just switch mode and recreate immediately; the recreated
+        // activity still fades the new mode's tabs in via the saved fadingInAfterRecreate flag.
+        if (tabsRecycler.visibility != View.VISIBLE) {
+            viewModel.onBrowserModeToggled(newMode)
+            recreate()
+            return
+        }
+
         tabsRecycler.animate()
             .alpha(0f)
             .setDuration(MODE_SWITCH_FADE_OUT_MS)
