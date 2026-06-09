@@ -28,6 +28,7 @@ import com.duckduckgo.duckchat.impl.models.ReasoningEffort
 import com.duckduckgo.duckchat.impl.models.ReasoningEffortAccess
 import com.duckduckgo.duckchat.impl.models.ReasoningMode
 import com.duckduckgo.duckchat.impl.models.UserTier
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.ui.nativeinput.views.PickerSurface
 import com.duckduckgo.duckchat.impl.ui.nativeinput.views.ReasoningModePickerViewModel
 import com.duckduckgo.duckchat.impl.ui.nativeinput.views.UpsellCommand
@@ -69,6 +70,7 @@ class ReasoningModePickerViewModelTest {
         whenever(it.state).thenReturn(nativeInputState)
     }
     private val duckAiChatStore: DuckAiChatStore = mock()
+    private val duckChatPixels: DuckChatPixels = mock()
 
     private lateinit var testee: ReasoningModePickerViewModel
 
@@ -78,6 +80,7 @@ class ReasoningModePickerViewModelTest {
             modelManager = modelManager,
             nativeInputStateProvider = nativeInputStateProvider,
             duckAiChatStore = duckAiChatStore,
+            duckChatPixels = duckChatPixels,
         )
     }
 
@@ -168,6 +171,45 @@ class ReasoningModePickerViewModelTest {
             expectNoEvents()
             cancelAndConsumeRemainingEvents()
         }
+    }
+
+    @Test
+    fun whenAccessibleModeTappedThenReasoningEffortSelectedPixelFired() = runTest {
+        modelState.value = ModelState(
+            availableReasoningModes = listOf(
+                AvailableReasoningMode(ReasoningMode.FAST, ReasoningEffort.NONE),
+                AvailableReasoningMode(ReasoningMode.REASONING, ReasoningEffort.LOW),
+            ),
+        )
+        runCurrent()
+
+        testee.onModeTapped(ReasoningMode.REASONING, PickerSurface.REASONING_PICKER_ADDRESS_BAR)
+        runCurrent()
+
+        verify(duckChatPixels).fireReasoningEffortSelected("reasoning")
+    }
+
+    @Test
+    fun whenPlusUserTapsGatedModeRequiringProThenUpsellPixelFiredAndNoEffortPixel() = runTest {
+        modelState.value = ModelState(
+            userTier = UserTier.PLUS,
+            availableReasoningModes = listOf(
+                AvailableReasoningMode(ReasoningMode.FAST, ReasoningEffort.NONE),
+                gatedExtended(requires = listOf("pro")),
+            ),
+        )
+        runCurrent()
+
+        testee.onModeTapped(ReasoningMode.EXTENDED_REASONING, PickerSurface.REASONING_PICKER_ADDRESS_BAR)
+        runCurrent()
+
+        verify(duckChatPixels).fireSubscriptionUpsellTriggered(
+            source = "reasoning_picker",
+            currentTier = "plus",
+            requiredTier = "pro",
+            flowType = "upgrade",
+        )
+        verify(duckChatPixels, never()).fireReasoningEffortSelected(any())
     }
 
     @Test

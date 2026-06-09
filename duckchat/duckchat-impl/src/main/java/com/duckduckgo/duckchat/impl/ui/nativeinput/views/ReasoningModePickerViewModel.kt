@@ -30,6 +30,7 @@ import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
 import com.duckduckgo.duckchat.impl.models.ModelState
 import com.duckduckgo.duckchat.impl.models.ReasoningMode
 import com.duckduckgo.duckchat.impl.models.ReasoningResolver
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.store.impl.DuckAiChat
 import com.duckduckgo.duckchat.store.impl.DuckAiChatStore
 import kotlinx.coroutines.channels.BufferOverflow
@@ -68,6 +69,7 @@ class ReasoningModePickerViewModel @Inject constructor(
     private val modelManager: DuckAiModelManager,
     private val nativeInputStateProvider: NativeInputStateProvider,
     private val duckAiChatStore: DuckAiChatStore,
+    private val duckChatPixels: DuckChatPixels,
 ) : ViewModel() {
 
     private val currentChat = MutableStateFlow<DuckAiChat?>(null)
@@ -132,6 +134,7 @@ class ReasoningModePickerViewModel @Inject constructor(
             return
         }
         if (match.isAccessible) {
+            duckChatPixels.fireReasoningEffortSelected(mode.toEffortParam())
             if (chatResolution != null) {
                 viewModelScope.launch { modelManager.setChatScopedReasoningMode(mode) }
             } else {
@@ -144,7 +147,21 @@ class ReasoningModePickerViewModel @Inject constructor(
             logcat { "Duck.ai reasoning picker: gated mode $mode has no public required tier, ignoring." }
             return
         }
-        routeUpsell(userTier, requiredTier, surface.origin)?.let { command.trySend(it) }
+        routeUpsell(userTier, requiredTier, surface.origin)?.let { upsell ->
+            duckChatPixels.fireSubscriptionUpsellTriggered(
+                source = "reasoning_picker",
+                currentTier = userTier.toParam(),
+                requiredTier = requiredTier.toParam(),
+                flowType = upsell.toFlowTypeParam(),
+            )
+            command.trySend(upsell)
+        }
+    }
+
+    private fun ReasoningMode.toEffortParam(): String = when (this) {
+        ReasoningMode.FAST -> "fast"
+        ReasoningMode.REASONING -> "reasoning"
+        ReasoningMode.EXTENDED_REASONING -> "extended_reasoning"
     }
 
     @DrawableRes
