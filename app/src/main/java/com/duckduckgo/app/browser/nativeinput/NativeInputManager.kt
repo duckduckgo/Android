@@ -18,11 +18,13 @@ package com.duckduckgo.app.browser.nativeinput
 
 import android.app.Activity
 import android.content.res.Configuration
+import android.graphics.Outline
 import android.net.Uri
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewOutlineProvider
 import android.webkit.ValueCallback
 import android.widget.FrameLayout
 import androidx.core.net.toUri
@@ -36,6 +38,7 @@ import com.duckduckgo.app.browser.omnibar.Omnibar
 import com.duckduckgo.app.browser.omnibar.QueryUrlPredictor
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion
+import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.toPx
@@ -73,6 +76,7 @@ class NativeInputCallbacks(
     val onChatHistoryShortcutClicked: () -> Unit = {},
     val onClearAutocomplete: () -> Unit,
     val onStopTapped: () -> Unit,
+    val onFireButtonPressed: () -> Unit = {},
     val onVoiceSearchPressed: (isChatTab: Boolean) -> Unit = {},
     val onCameraCaptureRequested: (ValueCallback<Array<Uri>>) -> Unit = {},
     val onFilePickerRequested: (ValueCallback<Array<Uri>>, List<String>) -> Unit = { _, _ -> },
@@ -541,6 +545,7 @@ class RealNativeInputManager @Inject constructor(
     ) {
         widgetFrom(widgetView)?.apply {
             onStopTapped = callbacks.onStopTapped
+            onFireButtonTapped = callbacks.onFireButtonPressed
             bindTabCount(lifecycleOwner, tabs.map { it.size })
             hideMainButtons()
             onAttachmentChooserStateChanged = { showing -> isPickingImage = showing }
@@ -663,10 +668,32 @@ class RealNativeInputManager @Inject constructor(
         }
     }
 
+    private fun suppressShadow(view: View) {
+        view.outlineProvider = object : ViewOutlineProvider() {
+            override fun getOutline(v: View, outline: Outline) {
+                outline.setRect(0, 0, v.width, v.height)
+                outline.alpha = 0f
+            }
+        }
+    }
+
     private fun applyWindowChrome(widgetView: View, isBottom: Boolean) {
         widgetView.translationZ = WIDGET_ELEVATION_DP.toPx()
         if (isBottom) {
             rootView.findViewById<View?>(R.id.navigationBar)?.gone()
+            rootView.findViewById<View?>(R.id.bottomBrowserOutlineStroke)?.gone()
+            if (omnibarController.isBrowserMode()) {
+                widgetView.setBackgroundColor(
+                    widgetView.context.getColorFromAttr(com.duckduckgo.mobile.android.R.attr.daxColorBackground),
+                )
+            } else if (omnibarController.isDuckAiMode()) {
+                widgetView.setBackgroundColor(
+                    widgetView.context.getColorFromAttr(
+                        com.duckduckgo.mobile.android.R.attr.daxColorDuckAiBackground,
+                    ),
+                )
+                suppressShadow(widgetView)
+            }
             rootView.findViewById<View?>(R.id.browserLayout)?.let {
                 it.setPadding(it.paddingLeft, it.paddingTop, it.paddingRight, 0)
             }

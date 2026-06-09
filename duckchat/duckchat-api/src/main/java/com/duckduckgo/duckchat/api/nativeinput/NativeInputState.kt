@@ -24,6 +24,8 @@ data class NativeInputState(
     val selectedTool: String? = null,
     /** Set when the active tab is a Duck.ai page already attached to an existing chat. */
     val chatId: String? = null,
+    /** True while the active chat is streaming a response (ChatState.STREAMING or LOADING). */
+    val isChatStreaming: Boolean = false,
 ) {
     enum class InputMode {
         SEARCH_AND_DUCK_AI,

@@ -25,7 +25,9 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.pir.impl.PirRemoteFeatures
+import com.duckduckgo.pir.impl.checker.DisabledReason
 import com.duckduckgo.pir.impl.scheduling.PirExecutionType
+import com.duckduckgo.pir.impl.wideevents.PirScanWideEvent.CancellationReason
 import com.duckduckgo.pir.impl.wideevents.PirScanWideEvent.FailureReason
 import com.duckduckgo.pir.impl.wideevents.PirScanWideEventImpl.Companion.ENTRY_POINT_MANUAL_EDIT_PROFILE
 import com.duckduckgo.pir.impl.wideevents.PirScanWideEventImpl.Companion.ENTRY_POINT_MANUAL_INITIAL
@@ -36,6 +38,7 @@ import com.duckduckgo.pir.impl.wideevents.PirScanWideEventImpl.Companion.EXECUTI
 import com.duckduckgo.pir.impl.wideevents.PirScanWideEventImpl.Companion.INTERVAL_OPT_OUT_DURATION
 import com.duckduckgo.pir.impl.wideevents.PirScanWideEventImpl.Companion.KEY_BATTERY_OPTIMIZATIONS
 import com.duckduckgo.pir.impl.wideevents.PirScanWideEventImpl.Companion.KEY_BROKER_COUNT
+import com.duckduckgo.pir.impl.wideevents.PirScanWideEventImpl.Companion.KEY_CANCELLATION_REASON
 import com.duckduckgo.pir.impl.wideevents.PirScanWideEventImpl.Companion.KEY_EXECUTION_TYPE
 import com.duckduckgo.pir.impl.wideevents.PirScanWideEventImpl.Companion.KEY_LAST_STEP
 import com.duckduckgo.pir.impl.wideevents.PirScanWideEventImpl.Companion.KEY_NOTIFICATIONS_PERMISSION_GRANTED
@@ -62,6 +65,7 @@ import org.mockito.kotlin.eq
 import org.mockito.kotlin.inOrder
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
@@ -83,7 +87,9 @@ class PirScanWideEventTest {
     private lateinit var testee: PirScanWideEventImpl
 
     @Before
-    fun setUp() {
+    fun setUp() = runTest {
+        // Default: no open flow in the shared wide-events DB. Cross-process tests override this.
+        whenever(wideEventClient.getFlowIds(any())).thenReturn(Result.success(emptyList()))
         testee = PirScanWideEventImpl(
             wideEventClient = wideEventClient,
             pirRemoteFeatures = pirRemoteFeatures,
@@ -382,7 +388,34 @@ class PirScanWideEventTest {
         order.verify(wideEventClient).flowFinish(
             wideEventId = 100L,
             status = FlowStatus.Cancelled,
-            metadata = mapOf(KEY_LAST_STEP to STEP_STARTED),
+            metadata = mapOf(
+                KEY_LAST_STEP to STEP_STARTED,
+                KEY_CANCELLATION_REASON to "superseded_by_new_run",
+            ),
+        )
+    }
+
+    @Test
+    fun whenManualFlowOpenAndProfileEditRunStartsThenStaleFlowFinishedWithSupersededByProfileEdit() = runTest {
+        // Given an open manual flow (the initial scan)
+        whenever(wideEventClient.flowStart(any(), any(), any(), any()))
+            .thenReturn(Result.success(101L))
+            .thenReturn(Result.success(201L))
+        runStarted(PirExecutionType.MANUAL_INITIAL, 1, 1, 1)
+
+        // When the user edits their profile, triggering a MANUAL_EDIT_PROFILE re-scan that supersedes it
+        runStarted(PirExecutionType.MANUAL_EDIT_PROFILE, 1, 1, 1)
+
+        // Then the stale flow is attributed specifically to the profile edit
+        val order = inOrder(wideEventClient)
+        order.verify(wideEventClient).intervalEnd(wideEventId = 101L, key = "decile_0_10_duration_ms_bucketed")
+        order.verify(wideEventClient).flowFinish(
+            wideEventId = 101L,
+            status = FlowStatus.Cancelled,
+            metadata = mapOf(
+                KEY_LAST_STEP to STEP_STARTED,
+                KEY_CANCELLATION_REASON to "superseded_by_profile_edit",
+            ),
         )
     }
 
@@ -581,13 +614,16 @@ class PirScanWideEventTest {
         testee.onScanJobCompleted(PirExecutionType.MANUAL_INITIAL) // emits progress_90 -> last_step = progress_90
 
         // When
-        testee.onRunCancelled(PirExecutionType.MANUAL_INITIAL)
+        testee.onRunCancelled(PirExecutionType.MANUAL_INITIAL, CancellationReason.WORK_STOPPED)
 
         // Then
         verify(wideEventClient).flowFinish(
             wideEventId = 8L,
             status = FlowStatus.Cancelled,
-            metadata = mapOf(KEY_LAST_STEP to "progress_90"),
+            metadata = mapOf(
+                KEY_LAST_STEP to "progress_90",
+                KEY_CANCELLATION_REASON to "work_stopped",
+            ),
         )
     }
 
@@ -639,7 +675,7 @@ class PirScanWideEventTest {
         runStarted(PirExecutionType.MANUAL_INITIAL, 1, 1, 10)
 
         // When
-        testee.onRunCancelled(PirExecutionType.MANUAL_INITIAL)
+        testee.onRunCancelled(PirExecutionType.MANUAL_INITIAL, CancellationReason.WORK_STOPPED)
 
         // Then
         val order = inOrder(wideEventClient)
@@ -647,7 +683,10 @@ class PirScanWideEventTest {
         order.verify(wideEventClient).flowFinish(
             wideEventId = 62L,
             status = FlowStatus.Cancelled,
-            metadata = mapOf(KEY_LAST_STEP to STEP_STARTED),
+            metadata = mapOf(
+                KEY_LAST_STEP to STEP_STARTED,
+                KEY_CANCELLATION_REASON to "work_stopped",
+            ),
         )
     }
 
@@ -660,7 +699,7 @@ class PirScanWideEventTest {
         testee.onOptOutStarted(PirExecutionType.MANUAL_INITIAL)
 
         // When
-        testee.onRunCancelled(PirExecutionType.MANUAL_INITIAL)
+        testee.onRunCancelled(PirExecutionType.MANUAL_INITIAL, CancellationReason.WORK_STOPPED)
 
         // Then
         val order = inOrder(wideEventClient)
@@ -668,7 +707,114 @@ class PirScanWideEventTest {
         order.verify(wideEventClient).flowFinish(
             wideEventId = 63L,
             status = FlowStatus.Cancelled,
-            metadata = mapOf(KEY_LAST_STEP to STEP_OPT_OUT_STARTED),
+            metadata = mapOf(
+                KEY_LAST_STEP to STEP_OPT_OUT_STARTED,
+                KEY_CANCELLATION_REASON to "work_stopped",
+            ),
+        )
+    }
+
+    @Test
+    fun whenOnWorkCancelledThenOpenFlowFinishedWithCancelledAndReason() = runTest {
+        // Given an open manual flow with no scan jobs (so no decile interval is opened)
+        whenever(wideEventClient.flowStart(any(), any(), any(), any())).thenReturn(Result.success(80L))
+        runStarted(PirExecutionType.MANUAL_INITIAL, 1, 1, 0)
+
+        // When work is cancelled externally (e.g. via PirWorkHandler.cancelWork)
+        testee.onWorkCancelled(CancellationReason.PROFILE_DELETED)
+
+        // Then
+        verify(wideEventClient).flowFinish(
+            wideEventId = 80L,
+            status = FlowStatus.Cancelled,
+            metadata = mapOf(
+                KEY_LAST_STEP to STEP_STARTED,
+                KEY_CANCELLATION_REASON to "profile_deleted",
+            ),
+        )
+    }
+
+    @Test
+    fun whenOnWorkCancelledAndNoOpenFlowThenNothingIsFinished() = runTest {
+        // No flow open in this process or the shared DB (getFlowIds stubbed empty in setUp).
+        testee.onWorkCancelled(CancellationReason.PROFILE_DELETED)
+
+        verify(wideEventClient, never()).flowFinish(any(), any(), any())
+    }
+
+    @Test
+    fun whenOnWorkCancelledAndFlowStartedInAnotherProcessThenResolvesFromDbAndFinishesCancelled() = runTest {
+        // Reproduces the cross-process bug: the scan ran in the :pir process (so cachedFlowId is null
+        // in this process), but the shared wide-events DB has the open manual flow. cancelWork runs in
+        // the main process (profile delete / eligibility loss), so we must resolve the flow from the DB.
+        whenever(wideEventClient.getFlowIds(WIDE_EVENT_NAME_MANUAL)).thenReturn(Result.success(listOf(555L)))
+
+        testee.onWorkCancelled(CancellationReason.PROFILE_DELETED)
+
+        // last_step is omitted: it is per-process in-memory state we don't own here.
+        verify(wideEventClient).flowFinish(
+            wideEventId = 555L,
+            status = FlowStatus.Cancelled,
+            metadata = mapOf(KEY_CANCELLATION_REASON to "profile_deleted"),
+        )
+    }
+
+    @Test
+    fun whenRunCancelledBeforeStartThenOneShotFlowEmittedWithZeroedCountsAndReason() = runTest {
+        whenever(wideEventClient.flowStart(any(), any(), any(), any())).thenReturn(Result.success(90L))
+
+        testee.onRunCancelledBeforeStart(PirExecutionType.MANUAL_INITIAL, CancellationReason.FOREGROUND_START_FAILED)
+
+        val order = inOrder(wideEventClient)
+        order.verify(wideEventClient).flowStart(
+            name = WIDE_EVENT_NAME_MANUAL,
+            flowEntryPoint = ENTRY_POINT_MANUAL_INITIAL,
+            metadata = mapOf(
+                KEY_EXECUTION_TYPE to EXECUTION_TYPE_MANUAL_INITIAL,
+                KEY_PROFILE_QUERIES_COUNT to "0",
+                KEY_BROKER_COUNT to "0",
+                KEY_TOTAL_SCAN_JOBS to "0",
+                KEY_WEB_VIEW_COUNT to "0",
+            ),
+            cleanupPolicy = CleanupPolicy.OnTimeout(duration = 8.hours, flowStatus = FlowStatus.Unknown),
+        )
+        order.verify(wideEventClient).flowStep(wideEventId = 90L, stepName = STEP_STARTED, success = true)
+        order.verify(wideEventClient).flowFinish(
+            wideEventId = 90L,
+            status = FlowStatus.Cancelled,
+            metadata = mapOf(
+                KEY_LAST_STEP to STEP_STARTED,
+                KEY_CANCELLATION_REASON to "foreground_start_failed",
+            ),
+        )
+    }
+
+    @Test
+    fun whenRunCancelledBeforeStartAndManualFlowAlreadyOpenThenReusesItWithoutDoubleEmitting() = runTest {
+        // Reproduces the cause-4 sequence in PirForegroundScanService: a manual flow is still open
+        // when the service is blocked at start. onRunCancelledBeforeStart is followed by cancelWork
+        // (-> onWorkCancelled). The before-start hook must reuse the already-open flow instead of
+        // synthesizing a second one, otherwise the follow-on onWorkCancelled produces a duplicate
+        // cancelled wide event for a single user action.
+        whenever(wideEventClient.flowStart(any(), any(), any(), any()))
+            .thenReturn(Result.success(300L)) // onRunStarted
+            .thenReturn(Result.success(301L)) // any (unwanted) synthetic one-shot would get this id
+        runStarted(PirExecutionType.MANUAL_INITIAL, 1, 1, 0) // opens manual flow 300L
+
+        testee.onRunCancelledBeforeStart(PirExecutionType.MANUAL_INITIAL, CancellationReason.SUBSCRIPTION_EXPIRED)
+        testee.onWorkCancelled(CancellationReason.SUBSCRIPTION_EXPIRED)
+
+        // No synthetic one-shot was started (only the original onRunStarted flowStart)...
+        verify(wideEventClient, times(1)).flowStart(any(), any(), any(), any())
+        // ...and the run is finished as Cancelled exactly once, reusing the open flow.
+        verify(wideEventClient, times(1)).flowFinish(any(), eq(FlowStatus.Cancelled), any())
+        verify(wideEventClient).flowFinish(
+            wideEventId = 300L,
+            status = FlowStatus.Cancelled,
+            metadata = mapOf(
+                KEY_LAST_STEP to STEP_STARTED,
+                KEY_CANCELLATION_REASON to "subscription_expired",
+            ),
         )
     }
 
@@ -702,6 +848,26 @@ class PirScanWideEventTest {
         org.junit.Assert.assertEquals(
             FailureReason.UNKNOWN_ERROR,
             FailureReason.fromException(RuntimeException("boom")),
+        )
+    }
+
+    @Test
+    fun fromDisabledReasonMapsEachEligibilityReasonToBoundedCancellationReason() {
+        org.junit.Assert.assertEquals(
+            CancellationReason.FEATURE_DISABLED,
+            CancellationReason.fromDisabledReason(DisabledReason.FEATURE_DISABLED),
+        )
+        org.junit.Assert.assertEquals(
+            CancellationReason.SUBSCRIPTION_EXPIRED,
+            CancellationReason.fromDisabledReason(DisabledReason.SUBSCRIPTION_EXPIRED),
+        )
+        org.junit.Assert.assertEquals(
+            CancellationReason.ENTITLEMENT_LOST,
+            CancellationReason.fromDisabledReason(DisabledReason.ENTITLEMENT_LOST),
+        )
+        org.junit.Assert.assertEquals(
+            CancellationReason.REPOSITORY_UNAVAILABLE,
+            CancellationReason.fromDisabledReason(DisabledReason.REPOSITORY_UNAVAILABLE),
         )
     }
 

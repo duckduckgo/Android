@@ -1,4 +1,5 @@
 appId: com.duckduckgo.mobile.android
+androidWebViewHierarchy: devtools
 name: "ReleaseTest: Multiple tabs can be opened"
 tags:
     - releaseTest

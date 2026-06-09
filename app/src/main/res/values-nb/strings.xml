@@ -265,6 +265,7 @@
     <string name="singleTabFireDialogDeleteAll">Slett alt</string>
     <string name="singleTabFireDialogDeleteThisTab">Slett denne fanen</string>
     <string name="singleTabFireDialogDeleteChat">Slett chat</string>
+    <string name="singleTabFireDialogDeleteChats">Slett chatter</string>
     <string name="singleTabFireDialogTitleDuckAi">Vil du slette denne chatten?</string>
     <string name="singleTabFireDialogSubtitleSiteData">Hvis du sletter nettstedsdata, kan du bli logget ut av kontoer.</string>
     <string name="singleTabFireDialogSubtitleDownloads">Dette avbryter pågående nedlastinger.</string>
@@ -1023,12 +1024,12 @@
     <string name="linkTextCopyFailed">Kunne ikke kopiere lenketeksten</string>
 
     <string name="preOnboardingWelcomeDialogTitle">Heisann.</string>
-    <string name="preOnboardingWelcomeDialogBody1">Klar for en raskere nettleser som du har kontroll over?</string>
+    <string name="preOnboardingWelcomeDialogBody1">Er du klar for en raskere nettleser som du har kontroll over?</string>
     <string name="preOnboardingWelcomeDialogBody2">AI er alltid valgfritt, og personvern er alltid på.</string>
     <string name="onboardingStepIndicatorText" instruction="a counter above our instructions in onboarding that tells a user what step they are on">%1$d av %2$d</string>
-    <string name="onboardingSearchDaxDialogOption1Quoted" instruction="translate &apos;duck&apos; too.">hvordan si «and» på engelsk</string>
-    <string name="onboardingSearchDaxDialogOption1EnglishQuoted" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">hvordan si «and» på spansk</string>
+    <string name="onboardingSearchDaxDialogOption1Quoted" instruction="translate &apos;duck&apos; too.">hvordan si «duck» på engelsk</string>
+    <string name="onboardingSearchDaxDialogOption1EnglishQuoted" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">hvordan si duck» på spansk</string>
 
     <string name="input_screen_user_pref_without_ai_updated">Bare søk</string>
-    <string name="input_screen_user_pref_with_ai_updated">Bytt mellom\nSøk og Duck.ai</string>
+    <string name="input_screen_user_pref_with_ai_updated">Bytt mellom\nsøk og Duck.ai</string>
 </resources>

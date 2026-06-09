@@ -496,8 +496,16 @@
                     android:layout_height="@dimen/toolbarIcon"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toStartOf="@id/browserMenu"
-                    app:layout_constraintStart_toEndOf="@id/fireIconMenu"
+                    app:layout_constraintStart_toEndOf="@id/leadingIconBarrier"
                     app:layout_constraintTop_toTopOf="parent" />
+
+                <androidx.constraintlayout.widget.Barrier
+                    android:id="@+id/leadingIconBarrier"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:barrierAllowsGoneWidgets="false"
+                    app:barrierDirection="end"
+                    app:constraint_referenced_ids="fireIconMenu,plusIconMenu" />
 
                 <FrameLayout
                     android:id="@+id/browserMenu"
@@ -535,7 +543,6 @@
                     android:layout_height="@dimen/toolbarIcon"
                     android:background="@drawable/selectable_item_rounded_corner_background"
                     app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toStartOf="@id/tabsMenu"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent">
 
@@ -547,6 +554,26 @@
                         android:contentDescription="@string/fireMenu"
                         android:scaleType="center"
                         android:src="@drawable/ic_fire_24" />
+                </FrameLayout>
+
+                <FrameLayout
+                    android:id="@+id/plusIconMenu"
+                    android:layout_width="@dimen/toolbarIcon"
+                    android:layout_height="@dimen/toolbarIcon"
+                    android:background="@drawable/selectable_item_rounded_corner_background"
+                    android:visibility="gone"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                    <ImageView
+                        android:id="@+id/plusIconImageView"
+                        android:layout_width="@dimen/bottomNavIcon"
+                        android:layout_height="@dimen/bottomNavIcon"
+                        android:layout_gravity="center"
+                        android:contentDescription="@string/duckChatPlusButtonContentDescription"
+                        android:scaleType="center"
+                        android:src="@drawable/ic_add_24" />
                 </FrameLayout>
 
                 <Space

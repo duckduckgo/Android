@@ -1,4 +1,5 @@
 appId: com.duckduckgo.mobile.android
+androidWebViewHierarchy: devtools
 name: "ReleaseTest: Deleting a favorite does not delete bookmark"
 tags:
   - releaseTest

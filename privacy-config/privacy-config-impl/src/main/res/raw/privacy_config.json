@@ -947,6 +947,24 @@
                     "reason": "Site breakage"
                 }
             ]
+        },
+        "onboardingQuickSetup": {
+            "state": "enabled",
+            "features": {
+                "onboardingQuickSetupExperimentJun3": {
+                    "state": "enabled",
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatment",
+                            "weight": 1
+                        }
+                    ]
+                }
+            }
         }
     },
     "unprotectedTemporary": []

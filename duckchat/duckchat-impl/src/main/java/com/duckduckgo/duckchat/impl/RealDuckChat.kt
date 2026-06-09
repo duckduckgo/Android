@@ -173,11 +173,6 @@ interface DuckChatInternal : DuckChat {
      */
     fun openNewDuckChatSession()
 
-    /**
-     * Opens Duck.ai with [chatId] pre-loaded.
-     */
-    fun openWithChatId(chatId: String)
-
     /** Single source of truth for the Duck.ai chat URL shape. */
     fun buildChatUrl(chatId: String): String
 
@@ -810,14 +805,12 @@ class RealDuckChat @Inject constructor(
 
     override fun observeTriggerVoiceChatSessionEnd(): Flow<String> = voiceSessionStateManager.observeTriggerVoiceSessionEnd()
 
+    override fun endVoiceChatSession(tabId: String) = voiceSessionStateManager.triggerVoiceSessionEnd(tabId)
+
     override suspend fun isChatHistoryAvailable(): Boolean = withContext(dispatchers.io()) {
         isEnabled() &&
             duckChatFeature.useNativeStorageChatData().isEnabled() &&
             duckChatFeature.historyScreen().isEnabled()
-    }
-
-    override fun openWithChatId(chatId: String) {
-        openDuckChat(parameters = mapOf(CHAT_ID_QUERY_NAME to chatId), forceNewSession = true)
     }
 
     override fun buildChatUrl(chatId: String): String {
@@ -949,7 +942,10 @@ class RealDuckChat @Inject constructor(
                     isDuckChatFeatureEnabled && isDuckChatUserEnabled && isVoiceChatEntryPointEnabled
             _showVoiceChatEntry.emit(showVoiceChatEntry)
 
-            val showFullScreenMode = isDuckChatFeatureEnabled && isDuckChatUserEnabled &&
+            // Full screen mode (new Duck.ai header, unified input, hamburger menu) is intentionally NOT gated on
+            // isDuckChatUserEnabled: users who disabled Duck.ai still get the new UX when navigating directly to a
+            // duck.ai tab. It remains gated on the feature rollout flag/setting only.
+            val showFullScreenMode = isDuckChatFeatureEnabled &&
                 (duckChatFeature.fullscreenMode().isEnabled() || duckChatFeatureRepository.isFullScreenModeUserSettingEnabled())
             isFullscreenModeEnabled = showFullScreenMode
             _showFullScreenMode.emit(showFullScreenMode)

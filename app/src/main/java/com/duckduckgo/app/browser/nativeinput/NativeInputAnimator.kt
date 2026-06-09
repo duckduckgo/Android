@@ -25,6 +25,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.ViewTreeObserver
 import android.widget.FrameLayout
+import android.widget.LinearLayout
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.di.scopes.FragmentScope
@@ -74,6 +75,11 @@ class RealNativeInputAnimator @Inject constructor() : NativeInputAnimator {
     private var widgetCompatPaddingHeight = 0
     private var isBottomCard = false
 
+    // In bottom mode the card is a weighted LinearLayout child (width=0dp), which ignores an
+    // explicit width. We zero the weight for the duration of the morph so the width lerps take
+    // effect, saving the original here to restore the resting layout afterwards.
+    private var savedCardWeight = 0f
+
     override fun init(
         widgetCard: View,
         omnibarCard: View,
@@ -82,13 +88,14 @@ class RealNativeInputAnimator @Inject constructor() : NativeInputAnimator {
         isBottom: Boolean,
     ): Margins? {
         if (omnibarWidth <= 0 || omnibarHeight <= 0) return null
-        val params = widgetCard.layoutParams as? FrameLayout.LayoutParams ?: return null
+        val params = widgetCard.layoutParams as? ViewGroup.MarginLayoutParams ?: return null
 
         captureCardProperties(widgetCard, omnibarCard)
         isBottomCard = isBottom
 
         val margins = Margins(params.topMargin, params.bottomMargin)
 
+        detachWeightForMorph(params)
         shrinkCardToMatchOmnibar(params, omnibarWidth, omnibarHeight, isBottom)
 
         animateCornerRadius(widgetCard, omnibarCornerRadius)
@@ -108,8 +115,8 @@ class RealNativeInputAnimator @Inject constructor() : NativeInputAnimator {
     ) {
         cancelAnimation()
 
-        val startWidth = (widgetCard.layoutParams as FrameLayout.LayoutParams).width
-        val startHeight = (widgetCard.layoutParams as FrameLayout.LayoutParams).height
+        val startWidth = (widgetCard.layoutParams as ViewGroup.MarginLayoutParams).width
+        val startHeight = (widgetCard.layoutParams as ViewGroup.MarginLayoutParams).height
         animationCleanup = { omnibarCard.alpha = 1f }
 
         waitForLayout(widgetCard) {
@@ -155,7 +162,7 @@ class RealNativeInputAnimator @Inject constructor() : NativeInputAnimator {
         val omnibarPosition = visibleSurfacePosition(omnibarCard)
         val visibleBounds = stripCompatPadding(widgetCard, isBottom)
 
-        val params = widgetCard.layoutParams as FrameLayout.LayoutParams
+        val params = widgetCard.layoutParams as ViewGroup.MarginLayoutParams
 
         return ExitSnapshot(
             preSurface = preSurface,
@@ -259,7 +266,7 @@ class RealNativeInputAnimator @Inject constructor() : NativeInputAnimator {
     }
 
     private fun shrinkCardToMatchOmnibar(
-        params: FrameLayout.LayoutParams,
+        params: ViewGroup.MarginLayoutParams,
         omnibarWidth: Int,
         omnibarHeight: Int,
         isBottom: Boolean,
@@ -268,7 +275,11 @@ class RealNativeInputAnimator @Inject constructor() : NativeInputAnimator {
         params.height = omnibarHeight + widgetCompatPaddingHeight
         params.topMargin = 0
         params.bottomMargin = 0
-        params.gravity = Gravity.CENTER_HORIZONTAL or if (isBottom) Gravity.BOTTOM else Gravity.TOP
+        // Gravity only applies to FrameLayout children. For the LinearLayout (bottom) case the card's
+        // horizontal placement is driven by translationX toward the omnibar, so no gravity is needed.
+        if (params is FrameLayout.LayoutParams) {
+            params.gravity = Gravity.CENTER_HORIZONTAL or if (isBottom) Gravity.BOTTOM else Gravity.TOP
+        }
     }
 
     private fun waitForLayout(card: View, block: () -> Unit) {
@@ -300,8 +311,12 @@ class RealNativeInputAnimator @Inject constructor() : NativeInputAnimator {
         val widgetContent = card.findViewById<View?>(R.id.inputModeWidget)
         widgetContent?.alpha = 0f
 
-        val params = card.layoutParams as FrameLayout.LayoutParams
-        val fullWidth = (card.parent as View).width - params.leftMargin - params.rightMargin
+        val params = card.layoutParams as ViewGroup.MarginLayoutParams
+        // Subtract the parent's horizontal padding as well as the card's margins: in bottom mode
+        // #8730 moved the keyline_2 inset from the card's margins onto the LinearLayout's padding,
+        // so omitting it would land the card 2×keyline_2 too wide. Top-mode parent has no padding.
+        val parent = card.parent as View
+        val fullWidth = parent.width - parent.paddingLeft - parent.paddingRight - params.leftMargin - params.rightMargin
         // MaterialCardView compat padding scales with corner radius, but setRadius doesn't
         // trigger updatePadding — only setMaxCardElevation does. Measure with the final radius
         // (re-set maxCardElevation to force the padding update); otherwise fullHeight is short
@@ -367,7 +382,8 @@ class RealNativeInputAnimator @Inject constructor() : NativeInputAnimator {
         materialCard?.useCompatPadding = false
         materialCard?.cardElevation = widgetCardElevation
 
-        val params = card.layoutParams as FrameLayout.LayoutParams
+        val params = card.layoutParams as ViewGroup.MarginLayoutParams
+        detachWeightForMorph(params)
         params.width = visibleWidth
         params.height = visibleHeight
         params.topMargin = 0
@@ -391,15 +407,35 @@ class RealNativeInputAnimator @Inject constructor() : NativeInputAnimator {
         materialCard.radius = topRadius
     }
 
-    private fun restoreLayout(card: View, params: FrameLayout.LayoutParams, margins: Margins) {
-        params.width = ViewGroup.LayoutParams.MATCH_PARENT
+    private fun restoreLayout(card: View, params: ViewGroup.MarginLayoutParams, margins: Margins) {
         params.height = ViewGroup.LayoutParams.WRAP_CONTENT
         params.topMargin = margins.top
         params.bottomMargin = margins.bottom
-        params.gravity = FrameLayout.LayoutParams.UNSPECIFIED_GRAVITY
+        when (params) {
+            // Bottom mode: restore the card's XML resting state (width=0dp + weight) and hand width
+            // distribution back to the LinearLayout, undoing detachWeightForMorph.
+            is LinearLayout.LayoutParams -> {
+                params.width = 0
+                params.weight = savedCardWeight
+            }
+            is FrameLayout.LayoutParams -> {
+                params.width = ViewGroup.LayoutParams.MATCH_PARENT
+                params.gravity = FrameLayout.LayoutParams.UNSPECIFIED_GRAVITY
+            }
+            else -> params.width = ViewGroup.LayoutParams.MATCH_PARENT
+        }
         card.layoutParams = params
         card.translationX = 0f
         card.translationY = 0f
+    }
+
+    // Bottom mode: a weighted (width=0dp) child ignores explicit widths, so zero the weight for the
+    // morph and remember it. restoreLayout puts it back (enter); exit ends in widget removal.
+    private fun detachWeightForMorph(params: ViewGroup.MarginLayoutParams) {
+        if (params is LinearLayout.LayoutParams) {
+            savedCardWeight = params.weight
+            params.weight = 0f
+        }
     }
 
     override fun clearLayoutTransitions(widgetView: View) {
@@ -470,7 +506,7 @@ class RealNativeInputAnimator @Inject constructor() : NativeInputAnimator {
         val visibleBounds: Bounds,
         val targetWidth: Int,
         val targetHeight: Int,
-        val params: FrameLayout.LayoutParams,
+        val params: ViewGroup.MarginLayoutParams,
     )
 
     companion object {

@@ -255,6 +255,52 @@ class NativeInputModeWidgetViewModelTest {
     }
 
     @Test
+    fun whenEmptyQueryFetchReturnsChatsThenHadRecentChatsTrue() = runTest {
+        whenever(chatSuggestionsReader.fetchSuggestions("")).thenReturn(
+            listOf(ChatSuggestion(chatId = "id", title = "t", lastEdit = LocalDateTime.now(), pinned = false)),
+        )
+
+        testee.fetchChatTabSuggestions(query = "", chatSuggestionsEnabled = true)
+
+        assertTrue(testee.hadRecentChats())
+    }
+
+    @Test
+    fun whenEmptyQueryFetchReturnsNoChatsThenHadRecentChatsFalse() = runTest {
+        whenever(chatSuggestionsReader.fetchSuggestions("")).thenReturn(emptyList())
+
+        testee.fetchChatTabSuggestions(query = "", chatSuggestionsEnabled = true)
+
+        assertFalse(testee.hadRecentChats())
+    }
+
+    @Test
+    fun whenChatSuggestionsDisabledThenEmptyQueryDoesNotReportRecentChats() = runTest {
+        whenever(chatSuggestionsReader.fetchSuggestions("")).thenReturn(
+            listOf(ChatSuggestion(chatId = "id", title = "t", lastEdit = LocalDateTime.now(), pinned = false)),
+        )
+
+        testee.fetchChatTabSuggestions(query = "", chatSuggestionsEnabled = false)
+
+        assertFalse(testee.hadRecentChats())
+    }
+
+    @Test
+    fun whenNonEmptyQueryFetchedThenCachedRecentChatsUnchanged() = runTest {
+        whenever(chatSuggestionsReader.fetchSuggestions("")).thenReturn(
+            listOf(ChatSuggestion(chatId = "id", title = "t", lastEdit = LocalDateTime.now(), pinned = false)),
+        )
+        whenever(chatSuggestionsReader.fetchSuggestions("weather")).thenReturn(emptyList())
+
+        testee.fetchChatTabSuggestions(query = "", chatSuggestionsEnabled = true)
+        assertTrue(testee.hadRecentChats())
+
+        testee.fetchChatTabSuggestions(query = "weather", chatSuggestionsEnabled = true)
+
+        assertTrue(testee.hadRecentChats())
+    }
+
+    @Test
     fun whenSearchAndDuckAiThenToggleVisible() = runTest {
         setIsEnabled(true)
         inputScreenUserSettingFlow.value = true
@@ -441,6 +487,30 @@ class NativeInputModeWidgetViewModelTest {
         val url = testee.buildChatSuggestionUrl(suggestion)
 
         assertTrue(url.contains("chatID=abc-123"))
+    }
+
+    @Test
+    fun `state isChatStreaming is true when chatState is STREAMING`() = runTest {
+        chatStateFlow.value = ChatState.STREAMING
+        assertTrue(testee.state.firstOrNull()!!.isChatStreaming)
+    }
+
+    @Test
+    fun `state isChatStreaming is true when chatState is LOADING`() = runTest {
+        chatStateFlow.value = ChatState.LOADING
+        assertTrue(testee.state.firstOrNull()!!.isChatStreaming)
+    }
+
+    @Test
+    fun `state isChatStreaming is false when chatState is READY`() = runTest {
+        chatStateFlow.value = ChatState.READY
+        assertFalse(testee.state.firstOrNull()!!.isChatStreaming)
+    }
+
+    @Test
+    fun `state isChatStreaming is false when chatState is HIDE`() = runTest {
+        chatStateFlow.value = ChatState.HIDE
+        assertFalse(testee.state.firstOrNull()!!.isChatStreaming)
     }
 
     @Test
@@ -894,20 +964,6 @@ class NativeInputModeWidgetViewModelTest {
         verify(pendingNativePromptStore).store("hello", "model-1", null, "GenerateImage", emptyList(), emptyList())
     }
 
-    @Test
-    fun whenUpdatePluginContainerVisibilityThenSendsCommand() = runTest {
-        val plugin = fakePlugin(containerId = 99)
-        val viewModel = createViewModel(plugins = listOf(plugin))
-
-        viewModel.updatePluginContainerVisibility(isChatTab = true)
-
-        val command = viewModel.commands.firstOrNull()
-        assertTrue(command is NativeInputModeWidgetViewModel.Command.UpdatePluginVisibility)
-        val update = command as NativeInputModeWidgetViewModel.Command.UpdatePluginVisibility
-        assertEquals(listOf(99), update.containerIds)
-        assertTrue(update.visible)
-    }
-
     private fun fakePlugin(containerId: Int): NativeInputPlugin {
         return object : NativeInputPlugin {
             override val containerId: Int = containerId
@@ -1170,6 +1226,34 @@ class NativeInputModeWidgetViewModelTest {
         advanceUntilIdle()
 
         assertEquals("chat-123", nativeInputStateProvider.stateForTab("tab-A").value.chatId)
+    }
+
+    @Test
+    fun whenSetActiveChatIdThenStateExposesChatId() = runTest {
+        val tabId = "tab-A"
+        testee.configure(tabId = tabId, isDuckAiMode = true, isBottom = false)
+        advanceUntilIdle()
+
+        assertNull(testee.state.first().chatId)
+
+        testee.setActiveChatId("chat-123")
+        advanceUntilIdle()
+
+        assertEquals("chat-123", testee.state.first { it.chatId != null }.chatId)
+    }
+
+    @Test
+    fun whenSetActiveChatIdWithNullThenStateClearsChatId() = runTest {
+        val tabId = "tab-A"
+        testee.configure(tabId = tabId, isDuckAiMode = true, isBottom = false)
+        testee.setActiveChatId("chat-123")
+        advanceUntilIdle()
+        assertEquals("chat-123", testee.state.first { it.chatId != null }.chatId)
+
+        testee.setActiveChatId(null)
+        advanceUntilIdle()
+
+        assertNull(testee.state.first().chatId)
     }
 
     // endregion

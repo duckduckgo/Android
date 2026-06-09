@@ -342,6 +342,9 @@ class SingleTabFireDialogViewModel @Inject constructor(
             val isDuckAiTabInBrowser: Boolean
                 get() = (stateData.isDuckAiTab && (origin == Browser || origin is Hatch)) || origin == DuckAiContextualChat
 
+            val isInChatSelectionMode: Boolean
+                get() = origin is FireDialogOrigin.ChatHistory
+
             val isDeleteThisTabButtonVisible: Boolean
                 get() = (stateData.isSingleTabEnabled && origin == Browser) ||
                     origin == DuckAiContextualChat ||

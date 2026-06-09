@@ -20,6 +20,7 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import androidx.annotation.VisibleForTesting
 import androidx.appcompat.app.AppCompatActivity
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.BrowserActivity
@@ -42,15 +43,18 @@ class FireActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val intent = intent.getParcelableExtra<Intent>(KEY_RESTART_INTENTS)
-        startActivity(intent, fadeTransitionConfig())
+        // Reconstruct the restart Intent in this process from the primitive extras passed by triggerRestart.
+        val notifyDataCleared = intent.getBooleanExtra(KEY_NOTIFY_DATA_CLEARED, false)
+        val deletedTabCount = intent.getIntExtra(KEY_DELETED_TAB_COUNT, 0)
+        startActivity(getRestartIntent(this, notifyDataCleared, deletedTabCount), fadeTransitionConfig())
         overridePendingTransition(0, 0)
         finish()
         killProcess()
     }
 
     companion object {
-        private const val KEY_RESTART_INTENTS = "KEY_RESTART_INTENTS"
+        private const val KEY_NOTIFY_DATA_CLEARED = "KEY_NOTIFY_DATA_CLEARED"
+        private const val KEY_DELETED_TAB_COUNT = "KEY_DELETED_TAB_COUNT"
 
         fun triggerRestart(
             context: Context,
@@ -58,11 +62,7 @@ class FireActivity : AppCompatActivity() {
             enableTransitionAnimation: Boolean = true,
             deletedTabCount: Int = 0,
         ) {
-            val intent = Intent(context, FireActivity::class.java)
-            val nextIntent = getRestartIntent(context, notifyDataCleared, deletedTabCount)
-
-            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-            intent.putExtra(KEY_RESTART_INTENTS, nextIntent)
+            val intent = fireActivityIntent(context, notifyDataCleared, deletedTabCount)
 
             val transitionAnimationConfig = if (enableTransitionAnimation) {
                 context.fadeTransitionConfig()
@@ -76,6 +76,25 @@ class FireActivity : AppCompatActivity() {
                 context.finish()
             }
             killProcess()
+        }
+
+        /**
+         * Builds the Intent that launches [FireActivity], carrying only primitive extras and never a
+         * nested Intent. [FireActivity] reconstructs the restart Intent itself, because forwarding a
+         * nested Intent unparceled from another Intent's extras trips Android 16's intent-redirection
+         * hardening (UnsafeIntentLaunchViolation).
+         */
+        @VisibleForTesting
+        internal fun fireActivityIntent(
+            context: Context,
+            notifyDataCleared: Boolean,
+            deletedTabCount: Int,
+        ): Intent {
+            return Intent(context, FireActivity::class.java).apply {
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                putExtra(KEY_NOTIFY_DATA_CLEARED, notifyDataCleared)
+                putExtra(KEY_DELETED_TAB_COUNT, deletedTabCount)
+            }
         }
 
         private fun getRestartIntent(

@@ -112,6 +112,7 @@ class FakeDuckChat(
     override fun isVoiceChatSessionActive(tabId: String): Boolean = false
     override val activeVoiceChatSessions: Flow<Set<String>> = MutableStateFlow(emptySet())
     override fun observeTriggerVoiceChatSessionEnd(): Flow<String> = kotlinx.coroutines.flow.emptyFlow()
+    override fun endVoiceChatSession(tabId: String) { }
 
     override suspend fun isChatHistoryAvailable(): Boolean = false
 

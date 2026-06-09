@@ -733,10 +733,6 @@ class BrowserTabViewModel @Inject constructor(
     private var alreadyShownKeyboard: Boolean = false
     private var pendingDuckChatAuthUpdate: Boolean = false
 
-    @Volatile
-    var isSerpLogoInMenuEnabled: Boolean = true
-        private set
-
     private val pdfDownloadCommandFlow = MutableSharedFlow<DownloadCommand>(extraBufferCapacity = 1)
 
     private val isFullUrlEnabled = urlDisplayRepository.isFullUrlEnabled
@@ -827,10 +823,6 @@ class BrowserTabViewModel @Inject constructor(
 
         viewModelScope.launch {
             addressBarTrackersAnimationManager.fetchFeatureState()
-        }
-
-        viewModelScope.launch(dispatchers.io()) {
-            isSerpLogoInMenuEnabled = androidBrowserConfig.serpLogoInMenu().isEnabled()
         }
 
         observeSyncStatusChangesForDuckChat()
@@ -1525,10 +1517,18 @@ class BrowserTabViewModel @Inject constructor(
 
         globalLayoutState.value = Browser(isNewTabState = false)
         findInPageViewState.value = FindInPageViewState(visible = false)
+        // A submitted Duck.ai URL opens in full-screen Duck.ai mode (empty address bar), so never
+        // paint its URL into the omnibar — otherwise it flashes for the brief window between submit
+        // and full-screen mode engaging, and lingers if the user navigates back during that window.
+        val isDuckChatUrl = duckChat.isDuckChatUrl(trimmedInput.toUri())
         omnibarViewState.value =
             currentOmnibarViewState().copy(
-                omnibarText = if (isFullUrlEnabled.value) trimmedInput else addressDisplayFormatter.getShortUrl(trimmedInput),
-                queryOrFullUrl = trimmedInput,
+                omnibarText = when {
+                    isDuckChatUrl -> ""
+                    isFullUrlEnabled.value -> trimmedInput
+                    else -> addressDisplayFormatter.getShortUrl(trimmedInput)
+                },
+                queryOrFullUrl = if (isDuckChatUrl) "" else trimmedInput,
                 forceExpand = true,
             )
         browserViewState.value =
@@ -1848,6 +1848,11 @@ class BrowserTabViewModel @Inject constructor(
         isLinkOpenedInNewTab && hasSourceTab && !isCustomTab && site?.url.isNullOrEmpty()
 
     private fun navigateHome() {
+        // Going home reuses this tab, so an active Duck.ai voice session would keep
+        // running with the mic open. End it here so the frontend cleans it up.
+        if (duckChat.isVoiceChatSessionActive(tabId)) {
+            duckChat.endVoiceChatSession(tabId)
+        }
         pdfDownloadJob.cancel()
         site = null
         onSiteChanged()
@@ -2292,6 +2297,7 @@ class BrowserTabViewModel @Inject constructor(
         showFullUrl: Boolean,
     ): String {
         if (url == null) return ""
+        if (duckChat.isDuckChatUrl(url.toUri())) return ""
 
         return if (duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url)) {
             duckDuckGoUrlDetector.extractQuery(url) ?: url
@@ -3712,10 +3718,11 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun onPrintSelected() {
-        url?.let {
-            pixel.fire(AppPixelName.MENU_ACTION_PRINT_PRESSED)
-            command.value = PrintLink(removeAtbAndSourceParamsFromSearch(it), defaultMediaSize())
-        }
+        val documentName = url?.let { removeAtbAndSourceParamsFromSearch(it) }?.takeIf { it.isNotBlank() }
+            ?: currentBrowserViewState().currentPdfFileName?.takeIf { it.isNotBlank() }
+            ?: return
+        pixel.fire(AppPixelName.MENU_ACTION_PRINT_PRESSED)
+        command.value = PrintLink(documentName, defaultMediaSize())
     }
 
     fun printFromWebView() {

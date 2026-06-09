@@ -265,6 +265,7 @@
     <string name="singleTabFireDialogDeleteAll">Poista kaikki</string>
     <string name="singleTabFireDialogDeleteThisTab">Poista tämä välilehti</string>
     <string name="singleTabFireDialogDeleteChat">Poista keskustelu</string>
+    <string name="singleTabFireDialogDeleteChats">Poista keskustelut</string>
     <string name="singleTabFireDialogTitleDuckAi">Poistetaanko tämä keskustelu?</string>
     <string name="singleTabFireDialogSubtitleSiteData">Sivustotietojen poistaminen voi kirjata sinut ulos tileiltä.</string>
     <string name="singleTabFireDialogSubtitleDownloads">Tämä peruuttaa käynnissä olevat lataukset.</string>

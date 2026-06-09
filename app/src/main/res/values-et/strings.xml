@@ -265,6 +265,7 @@
     <string name="singleTabFireDialogDeleteAll">Kustuta kõik</string>
     <string name="singleTabFireDialogDeleteThisTab">Kustuta see vahekaart</string>
     <string name="singleTabFireDialogDeleteChat">Kustuta vestlus</string>
+    <string name="singleTabFireDialogDeleteChats">Kustuta vestlused</string>
     <string name="singleTabFireDialogTitleDuckAi">Kustutada see vestlus?</string>
     <string name="singleTabFireDialogSubtitleSiteData">Saidi andmete kustutamine võib sind kontodelt välja logida.</string>
     <string name="singleTabFireDialogSubtitleDownloads">See tühistab pooleliolevad allalaadimised.</string>
@@ -1030,5 +1031,5 @@
     <string name="onboardingSearchDaxDialogOption1EnglishQuoted" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">Kuidas öelda „part“ hispaania keeles</string>
 
     <string name="input_screen_user_pref_without_ai_updated">Ainult otsi</string>
-    <string name="input_screen_user_pref_with_ai_updated">Lülita\nOtsingu ja Duck.ai vahel</string>
+    <string name="input_screen_user_pref_with_ai_updated">Lülita \n otsingu ja Duck.ai vahel</string>
 </resources>

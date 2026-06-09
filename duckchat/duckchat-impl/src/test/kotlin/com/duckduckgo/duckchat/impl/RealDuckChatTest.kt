@@ -230,6 +230,30 @@ class RealDuckChatTest {
     }
 
     @Test
+    fun whenFeatureEnabledAndUserDisabledThenShowFullScreenModeIsTrue() = runTest {
+        duckChatFeature.self().setRawStoredState(State(true))
+        duckChatFeature.fullscreenMode().setRawStoredState(State(true))
+        whenever(mockDuckChatFeatureRepository.isDuckChatUserEnabled()).thenReturn(false)
+
+        testee.onPrivacyConfigDownloaded()
+        advanceUntilIdle()
+
+        assertTrue(testee.showFullScreenMode.value)
+    }
+
+    @Test
+    fun whenFeatureDisabledThenShowFullScreenModeIsFalse() = runTest {
+        duckChatFeature.self().setRawStoredState(State(false))
+        duckChatFeature.fullscreenMode().setRawStoredState(State(true))
+        whenever(mockDuckChatFeatureRepository.isDuckChatUserEnabled()).thenReturn(true)
+
+        testee.onPrivacyConfigDownloaded()
+        advanceUntilIdle()
+
+        assertFalse(testee.showFullScreenMode.value)
+    }
+
+    @Test
     fun whenObserveShowInBrowserMenuUserSettingThenEmitCorrectValues() = runTest {
         whenever(mockDuckChatFeatureRepository.observeShowInBrowserMenu()).thenReturn(flowOf(true, false))
 
@@ -771,6 +795,13 @@ class RealDuckChatTest {
 
         verify(mockBrowserNav).closeDuckChat(mockContext)
         verify(mockContext).startActivity(mockIntent)
+    }
+
+    @Test
+    fun whenEndVoiceChatSessionThenTriggersVoiceSessionEndForTab() = runTest {
+        testee.endVoiceChatSession("tab-123")
+
+        verify(mockVoiceSessionStateManager).triggerVoiceSessionEnd("tab-123")
     }
 
     @Test
@@ -1869,22 +1900,6 @@ class RealDuckChatTest {
         coroutineRule.testScope.advanceUntilIdle()
 
         assertFalse(testee.isChatHistoryAvailable())
-    }
-
-    @Test
-    fun whenOpenWithChatIdThenDuckChatOpenedWithChatIdUrlParameterAndForcedFreshSession() = runTest {
-        // Stub an active session so the test fails if forceNewSession is not propagated.
-        val thirtyMinutesAgo = System.currentTimeMillis() - (30 * 60 * 1000L)
-        whenever(mockDuckChatFeatureRepository.lastSessionTimestamp()).thenReturn(thirtyMinutesAgo)
-        val urlCaptor = argumentCaptor<String>()
-        val sessionCaptor = argumentCaptor<Boolean>()
-
-        testee.openWithChatId("chat-123")
-        coroutineRule.testScope.advanceUntilIdle()
-
-        verify(mockBrowserNav).openDuckChat(any(), sessionCaptor.capture(), urlCaptor.capture())
-        assertTrue(urlCaptor.firstValue.contains("chatID=chat-123"))
-        assertFalse(sessionCaptor.firstValue)
     }
 
     private suspend fun enableChatHistoryFlags() {

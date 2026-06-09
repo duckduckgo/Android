@@ -273,9 +273,11 @@ import com.duckduckgo.browser.ui.browsermenu.BrowserMenuBottomSheet
 import com.duckduckgo.browser.ui.browsermenu.VpnMenuState
 import com.duckduckgo.browser.ui.newtab.hatch.NewTabReturnHatchView
 import com.duckduckgo.browsermode.api.BrowserMode
+import com.duckduckgo.browsermode.api.FireModeAvailability
 import com.duckduckgo.browsermode.api.WebViewModeInitializer
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.DuckDuckGoFragment
+import com.duckduckgo.common.ui.menu.PopupMenu
 import com.duckduckgo.common.ui.store.BrowserAppTheme
 import com.duckduckgo.common.ui.tabs.SwipingTabsFeatureProvider
 import com.duckduckgo.common.ui.view.DaxDialog
@@ -635,6 +637,9 @@ class BrowserTabFragment :
     lateinit var duckChat: DuckChat
 
     @Inject
+    lateinit var fireModeAvailability: FireModeAvailability
+
+    @Inject
     lateinit var duckAiFeatureState: DuckAiFeatureState
 
     @Inject
@@ -788,6 +793,24 @@ class BrowserTabFragment :
 
     private val browserActivity
         get() = activity as? BrowserActivity
+
+    // Duck.ai "+" popup menu, anchored to the omnibar + button (see popup_chat_menu.xml).
+    private val chatMenuPopup by lazy {
+        PopupMenu(layoutInflater, com.duckduckgo.duckchat.impl.R.layout.popup_chat_menu).apply {
+            onMenuItemClicked(contentView.findViewById(com.duckduckgo.duckchat.impl.R.id.chatMenuPopupNewChat)) {
+                viewModel.openNewDuckChat(omnibar.viewMode)
+            }
+            onMenuItemClicked(contentView.findViewById(com.duckduckgo.duckchat.impl.R.id.chatMenuPopupNewVoiceChat)) {
+                duckChat.openVoiceDuckChat()
+            }
+            onMenuItemClicked(contentView.findViewById(com.duckduckgo.duckchat.impl.R.id.chatMenuPopupNewTab)) {
+                browserActivity?.launchNewTab()
+            }
+            onMenuItemClicked(contentView.findViewById(com.duckduckgo.duckchat.impl.R.id.chatMenuPopupNewFireTab)) {
+                browserActivity?.launchNewTab()
+            }
+        }
+    }
 
     private var webView: DuckDuckGoWebView? = null
     private var isWebViewGestureInProgress = false
@@ -1349,6 +1372,7 @@ class BrowserTabFragment :
             if (!nativeInputManager.isNativeInputEnabled()) {
                 launchInputScreen(query)
             } else {
+                removeDuckChatContextualSheet()
                 showNativeInput(query)
             }
         }
@@ -1423,6 +1447,7 @@ class BrowserTabFragment :
                         ),
                     )
                 },
+                onFireButtonPressed = { onFireButtonPressed() },
                 onVoiceSearchPressed = { isChatTab ->
                     val mode = if (isChatTab) VoiceSearchMode.DUCK_AI else VoiceSearchMode.SEARCH
                     webView?.onPause()
@@ -1668,11 +1693,7 @@ class BrowserTabFragment :
     ) {
         val currentSite = viewModel.siteLiveData.value
         val omnibarState = viewModel.omnibarViewState.value
-        val serpLogoUrl = if (viewModel.isSerpLogoInMenuEnabled) {
-            (omnibarState?.serpLogo as? SerpLogo.EasterEgg)?.logoUrl
-        } else {
-            null
-        }
+        val serpLogoUrl = (omnibarState?.serpLogo as? SerpLogo.EasterEgg)?.logoUrl
         val browseMenuState = browserMenuViewStateFactory.create(
             omnibarViewMode = omnibarViewMode,
             viewState = viewState,
@@ -1809,10 +1830,6 @@ class BrowserTabFragment :
                 pixel.fire(AppPixelName.SHEET_MENU_VPN)
                 viewModel.onVpnMenuClicked()
             }
-            onMenuItemClicked(newDuckChatTabMenuItem) {
-                pixel.fire(AppPixelName.SHEET_MENU_AICHAT)
-                viewModel.openNewDuckChat(omnibar.viewMode)
-            }
             onMenuItemClicked(newDuckChatMenuItem) {
                 pixel.fire(AppPixelName.SHEET_MENU_AICHAT)
                 activity?.currentFocus?.let {
@@ -1825,6 +1842,15 @@ class BrowserTabFragment :
                     viewModel.onDuckChatMenuClicked()
                 }
             }
+            onMenuItemClicked(duckAiNewChatMenuItem) {
+                pixel.fire(AppPixelName.SHEET_MENU_AICHAT)
+                viewModel.openNewDuckChat(omnibar.viewMode)
+            }
+            onMenuItemClicked(duckAiNewVoiceChatMenuItem) {
+                pixel.fire(DuckChatPixelName.DUCK_CHAT_VOICE_ENTRY_TAPPED_COUNT)
+                pixel.fire(DuckChatPixelName.DUCK_CHAT_VOICE_ENTRY_TAPPED_DAILY, type = Daily())
+                duckChat.openVoiceDuckChat()
+            }
             onMenuItemClicked(duckChatHistoryMenuItem) {
                 pixel.fire(DuckChatPixelName.DUCK_CHAT_SETTINGS_SIDEBAR_TAPPED)
                 viewModel.openDuckChatHistory()
@@ -1835,6 +1861,9 @@ class BrowserTabFragment :
             onMenuItemClicked(fireMenuItem) {
                 onFireButtonPressed()
             }
+        }
+        if (!tabDisplayedInCustomTabScreen) {
+            bottomSheetMenu?.placeDuckAiSection(atTop = omnibar.viewMode == DuckAI)
         }
     }
 
@@ -2850,7 +2879,7 @@ class BrowserTabFragment :
                 notifyEmailSignEvent()
             }
 
-            is Command.PrintLink -> launchPrint(it.url, it.mediaSize)
+            is Command.PrintLink -> launchPrint(it.documentName, it.mediaSize)
             is Command.ShowSitePermissionsDialog -> showSitePermissionsDialog(it.permissionsToRequest, it.request)
             is Command.ShowUserCredentialSavedOrUpdatedConfirmation ->
                 showAuthenticationSavedOrUpdatedSnackbar(
@@ -3700,6 +3729,7 @@ class BrowserTabFragment :
         newTabReturnHatchView.setHatchListener(
             object : NewTabReturnHatchView.HatchListener {
                 override fun onHatchPressed() {
+                    hideKeyboard()
                     ntpAfterIdleManager.onReturnToPageTapped()
                     browserActivity?.openExistingTab(newTabReturnHatchView.tabId)
                 }
@@ -3766,6 +3796,17 @@ class BrowserTabFragment :
 
                 override fun onFireButtonPressed() {
                     this@BrowserTabFragment.onFireButtonPressed()
+                }
+
+                override fun onPlusButtonPressed(anchor: View) {
+                    val activity = activity ?: return
+                    // Only offer "New Fire Tab" to users whose feature flag + WebView profile
+                    // support actually allow Fire Mode. Re-checked on each open so a WebView/flag
+                    // change is reflected without rebuilding the menu.
+                    chatMenuPopup.contentView
+                        .findViewById<View>(com.duckduckgo.duckchat.impl.R.id.chatMenuPopupNewFireTab)
+                        .isVisible = fireModeAvailability.isAvailable()
+                    chatMenuPopup.showAnchoredView(activity, binding.rootView, anchor)
                 }
 
                 override fun onBrowserMenuPressed() {
@@ -6331,20 +6372,20 @@ class BrowserTabFragment :
     }
 
     private fun launchPrint(
-        url: String,
+        documentName: String,
         defaultMediaSize: PrintAttributes.MediaSize,
     ) {
         if (viewModel.isPrinting()) return
 
         val printManager = activity?.getSystemService(Context.PRINT_SERVICE) as? PrintManager ?: return
-        val sourceAdapter = pdfPrintDocumentAdapterOrNull() ?: webView?.createSafePrintDocumentAdapter(url) ?: return
+        val sourceAdapter = pdfPrintDocumentAdapterOrNull() ?: webView?.createSafePrintDocumentAdapter(documentName) ?: return
         val printAdapter = PrintDocumentAdapterFactory.createPrintDocumentAdapter(
             sourceAdapter,
             onStartCallback = { viewModel.onStartPrint() },
             onFinishCallback = { viewModel.onFinishPrint() },
         )
         printManager.print(
-            url,
+            documentName,
             printAdapter,
             PrintAttributes.Builder().setMediaSize(defaultMediaSize).build(),
         )

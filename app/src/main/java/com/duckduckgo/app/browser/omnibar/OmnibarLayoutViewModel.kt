@@ -261,6 +261,16 @@ class OmnibarLayoutViewModel @Inject constructor(
         val isProgressBarUpgradeEnabled: Boolean = false,
         val enabledState: EnabledState = EnabledState.ALL,
     ) {
+        /**
+         * The Duck.ai entry icon shows the chevron-down (contextual sheet) variant when the native
+         * input field setting is enabled and we're not on the new-tab page — tapping it then opens
+         * the contextual sheet. In every other case it falls back to the standard chat icon, whose
+         * tap opens Duck.ai in full screen. Derived from the flag + viewMode rather than a stored
+         * flag so it can't drift out of sync with other state-update paths.
+         */
+        val showContextualSheetIcon: Boolean
+            get() = isNativeInputEnabled && viewMode !is NewTab
+
         fun shouldUpdateOmnibarText(
             isFullUrlEnabled: Boolean,
         ): Boolean {

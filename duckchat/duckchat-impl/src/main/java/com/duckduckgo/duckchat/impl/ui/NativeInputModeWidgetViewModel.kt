@@ -58,10 +58,9 @@ import com.duckduckgo.duckchat.store.impl.DuckAiChatStore
 import com.duckduckgo.subscriptions.api.Product
 import com.duckduckgo.subscriptions.api.Subscriptions
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
-import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
-import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -70,10 +69,11 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -114,9 +114,16 @@ class NativeInputModeWidgetViewModel @Inject constructor(
     @Volatile
     private var lastChatUrlSuggestions: List<AutoCompleteSuggestion> = emptyList()
 
-    sealed class Command {
-        data class UpdatePluginVisibility(val containerIds: List<Int>, val visible: Boolean) : Command()
-    }
+    // Whether the most recent empty-query chat-history fetch returned any chats. Read synchronously
+    // (via [hadRecentChats]) by the widget to decide whether to show the suggestions cover when the
+    // Duck.ai tab is selected with empty input. Covering only when content will actually appear keeps
+    // the morphing logo from being briefly covered then revealed (a flash) when there are no chats.
+    // Stale until the first empty-query fetch completes, so the first such transition will not cover.
+    @Volatile
+    private var lastEmptyQueryHadChats: Boolean = false
+
+    /** @see lastEmptyQueryHadChats */
+    fun hadRecentChats(): Boolean = lastEmptyQueryHadChats
 
     private val _plugins = MutableStateFlow<List<NativeInputPlugin>>(emptyList())
     val plugins: StateFlow<List<NativeInputPlugin>> = _plugins.asStateFlow()
@@ -135,22 +142,12 @@ class NativeInputModeWidgetViewModel @Inject constructor(
     private var pendingChatId: String? = null
     private var hasPendingChatId = false
 
-    private val commandChannel = Channel<Command>(capacity = 1, onBufferOverflow = DROP_OLDEST)
-    val commands = commandChannel.receiveAsFlow()
-
     init {
         viewModelScope.launch {
             _plugins.value = nativeInputPlugins.getPlugins().toList()
         }
         viewModelScope.launch {
             _isHistoryAvailable.value = duckChatInternal.isChatHistoryAvailable()
-        }
-    }
-
-    fun updatePluginContainerVisibility(isChatTab: Boolean) {
-        val containerIds = _plugins.value.map { it.containerId }
-        if (containerIds.isNotEmpty()) {
-            commandChannel.trySend(Command.UpdatePluginVisibility(containerIds, isChatTab))
         }
     }
 
@@ -203,7 +200,7 @@ class NativeInputModeWidgetViewModel @Inject constructor(
 
     private val activeTabId = MutableStateFlow<String?>(null)
 
-    val state: SharedFlow<NativeInputState> = combine(
+    private val baseState: Flow<NativeInputState> = combine(
         duckAiFeatureState.showSettings,
         duckChatInternal.observeEnableDuckChatUserSetting(),
         duckChatInternal.observeInputScreenUserSettingEnabled(),
@@ -215,6 +212,26 @@ class NativeInputModeWidgetViewModel @Inject constructor(
             inputContext = config.inputContext,
             inputPosition = config.inputPosition,
             toggleSelection = config.toggleSelection ?: NativeInputState.defaultToggleFor(config.inputContext),
+        )
+    }
+
+    // chatId lives in the per-tab provider state (written by applyChatId), not in baseState. Fold it
+    // back in here so widget UI that depends on it (e.g. the chat input hint) sees the real value
+    // rather than the baseState default of null. flatMapLatest re-targets on tab switch.
+    @OptIn(ExperimentalCoroutinesApi::class)
+    private val activeChatId: Flow<String?> = activeTabId.filterNotNull()
+        .flatMapLatest { tabId -> nativeInputStateProvider.stateForTab(tabId) }
+        .map { it.chatId }
+        .distinctUntilChanged()
+
+    val state: SharedFlow<NativeInputState> = combine(
+        baseState,
+        duckChatInternal.chatState,
+        activeChatId,
+    ) { state, chatState, chatId ->
+        state.copy(
+            isChatStreaming = chatState == ChatState.STREAMING || chatState == ChatState.LOADING,
+            chatId = chatId,
         )
     }.shareIn(
         scope = viewModelScope,
@@ -240,12 +257,14 @@ class NativeInputModeWidgetViewModel @Inject constructor(
                             inputContext = snapshot.inputContext,
                             inputPosition = snapshot.inputPosition,
                             toggleSelection = snapshot.toggleSelection,
+                            isChatStreaming = snapshot.isChatStreaming,
                         )
                     }
                 }
         }
     }
 
+    // Kept for the widget's observeChatState() which handles HIDE/SHOW/READY root-visibility transitions.
     val chatState: Flow<ChatState> = duckChatInternal.chatState
 
     val isPaidTier: Flow<Boolean> = subscriptions.getEntitlementStatus()
@@ -373,8 +392,13 @@ class NativeInputModeWidgetViewModel @Inject constructor(
                 AutoCompleteResult(query, emptyList())
             }
         }
+        val chatHistory = chatHistoryDeferred.await()
+        if (query.isEmpty()) {
+            // Remember whether an empty query yields chats so the cover decision can predict it next time.
+            lastEmptyQueryHadChats = chatHistory.isNotEmpty()
+        }
         val result = ChatTabSuggestions(
-            chatHistory = chatHistoryDeferred.await(),
+            chatHistory = chatHistory,
             urlSuggestions = urlSuggestionsDeferred.await(),
         )
         lastChatUrlSuggestions = result.urlSuggestions.suggestions

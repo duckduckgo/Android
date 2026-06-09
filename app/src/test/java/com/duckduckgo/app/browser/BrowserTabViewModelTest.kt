@@ -1258,6 +1258,18 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenDuckChatUrlSubmittedThenOmnibarTextAndQueryRemainBlank() {
+        val duckChatUrl = "https://duck.ai/chat?q=test&prompt=1&duckai=5"
+        whenever(mockDuckChat.isDuckChatUrl(duckChatUrl.toUri())).thenReturn(true)
+        whenever(mockOmnibarConverter.convertQueryToUrl(duckChatUrl, null)).thenReturn(duckChatUrl)
+
+        testee.onUserSubmittedQuery(duckChatUrl)
+
+        assertEquals("", omnibarViewState().omnibarText)
+        assertEquals("", omnibarViewState().queryOrFullUrl)
+    }
+
+    @Test
     fun whenQuerySubmittedWhileOnNtpAndFeatureEnabledThenNtpSearchSubmittedNotified() {
         fakeAndroidConfigBrowserFeature.showNTPAfterIdleReturn().setRawStoredState(State(enable = true))
         whenever(mockOmnibarConverter.convertQueryToUrl("cats", null)).thenReturn("https://duckduckgo.com/?q=cats")
@@ -1680,6 +1692,15 @@ class BrowserTabViewModelTest {
     fun whenNotBrowsingAndUrlLoadedWithQueryUrlThenOmnibarTextextRemainsBlank() {
         loadUrl("http://duckduckgo.com?q=test", isBrowserShowing = false)
         assertEquals("", omnibarViewState().omnibarText)
+    }
+
+    @Test
+    fun whenBrowsingAndDuckChatUrlLoadedThenOmnibarTextRemainsBlank() {
+        val duckChatUrl = "https://duck.ai/chat?q=DuckDuckGo+AI+Chat&duckai=5"
+        whenever(mockDuckChat.isDuckChatUrl(duckChatUrl.toUri())).thenReturn(true)
+        loadUrl(duckChatUrl, isBrowserShowing = true)
+        assertEquals("", omnibarViewState().omnibarText)
+        assertEquals("", omnibarViewState().queryOrFullUrl)
     }
 
     @Test
@@ -2438,6 +2459,26 @@ class BrowserTabViewModelTest {
 
         val backCommand = captureCommands().lastValue as NavigationCommand.NavigateBack
         assertNotNull(backCommand)
+    }
+
+    @Test
+    fun whenBackToHomeWithActiveVoiceSessionThenEndsVoiceChatSession() {
+        setupNavigation(isBrowsing = true, canGoBack = false)
+        whenever(mockDuckChat.isVoiceChatSessionActive(any())).thenReturn(true)
+
+        testee.onUserPressedBack()
+
+        verify(mockDuckChat).endVoiceChatSession(any())
+    }
+
+    @Test
+    fun whenBackToHomeWithNoActiveVoiceSessionThenDoesNotEndVoiceChatSession() {
+        setupNavigation(isBrowsing = true, canGoBack = false)
+        whenever(mockDuckChat.isVoiceChatSessionActive(any())).thenReturn(false)
+
+        testee.onUserPressedBack()
+
+        verify(mockDuckChat, never()).endVoiceChatSession(any())
     }
 
     @Test
@@ -4868,7 +4909,7 @@ class BrowserTabViewModelTest {
         loadUrl("foo.com")
         testee.onPrintSelected()
         val command = captureCommands().lastValue as Command.PrintLink
-        assertEquals("foo.com", command.url)
+        assertEquals("foo.com", command.documentName)
         assertEquals(PrintAttributes.MediaSize.NA_LETTER, command.mediaSize)
     }
 
@@ -4878,7 +4919,7 @@ class BrowserTabViewModelTest {
         loadUrl("foo.com")
         testee.onPrintSelected()
         val command = captureCommands().lastValue as Command.PrintLink
-        assertEquals("foo.com", command.url)
+        assertEquals("foo.com", command.documentName)
         assertEquals(PrintAttributes.MediaSize.ISO_A4, command.mediaSize)
     }
 
@@ -4888,7 +4929,7 @@ class BrowserTabViewModelTest {
         loadUrl("foo.com")
         testee.onPrintSelected()
         val command = captureCommands().lastValue as Command.PrintLink
-        assertEquals("foo.com", command.url)
+        assertEquals("foo.com", command.documentName)
         assertEquals(PrintAttributes.MediaSize.ISO_A4, command.mediaSize)
     }
 
@@ -4897,6 +4938,38 @@ class BrowserTabViewModelTest {
         whenever(mockDeviceInfo.country).thenReturn("US")
         loadUrl("foo.com")
         testee.onPrintSelected()
+        verify(mockPixel).fire(AppPixelName.MENU_ACTION_PRINT_PRESSED)
+    }
+
+    @Test
+    fun whenUserSelectsToPrintPageAndUrlIsBlankAndNoPdfShownThenNoPrintLinkCommandOrPixelSent() {
+        whenever(mockDeviceInfo.country).thenReturn("US")
+        loadUrl("")
+        testee.onPrintSelected()
+        assertCommandNotIssued<Command.PrintLink>()
+        verify(mockPixel, never()).fire(AppPixelName.MENU_ACTION_PRINT_PRESSED)
+    }
+
+    @Test
+    fun whenUserSelectsToPrintPageAndUrlIsNullAndNoPdfShownThenNoPrintLinkCommandOrPixelSent() {
+        whenever(mockDeviceInfo.country).thenReturn("US")
+        loadUrl(null)
+        testee.onPrintSelected()
+        assertCommandNotIssued<Command.PrintLink>()
+        verify(mockPixel, never()).fire(AppPixelName.MENU_ACTION_PRINT_PRESSED)
+    }
+
+    @Test
+    fun whenUserSelectsToPrintPageAndUrlIsBlankButPdfShownThenPrintLinkCommandSentWithPdfNameAsJobName() {
+        whenever(mockDeviceInfo.country).thenReturn("US")
+        loadUrl("")
+        testee.browserViewState.value = browserViewState().copy(
+            currentPdfCachedUri = Uri.parse("file:///cache/doc.pdf"),
+            currentPdfFileName = "doc.pdf",
+        )
+        testee.onPrintSelected()
+        val command = captureCommands().lastValue as Command.PrintLink
+        assertEquals("doc.pdf", command.documentName)
         verify(mockPixel).fire(AppPixelName.MENU_ACTION_PRINT_PRESSED)
     }
 

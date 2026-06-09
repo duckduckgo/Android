@@ -210,8 +210,8 @@ class NativeInputLayoutCoordinator(
         fun isLogoOnlyContent(view: View): Boolean {
             if (view != newTabContent) return false
             val logoVisible = rootView.findViewById<View?>(R.id.ddgLogo)?.visibility == View.VISIBLE
-            val hatchVisible = rootView.findViewById<View?>(R.id.newTabReturnHatchView)?.visibility == View.VISIBLE
-            return logoVisible && !hatchVisible
+            val hatchHeightPx = rootView.findViewById<View?>(R.id.newTabReturnHatchView)?.height ?: 0
+            return isLogoOnly(logoVisible, hatchHeightPx)
         }
 
         fun computeDeltaTop(view: View, anchorBottomInWindow: Int): Int {
@@ -337,3 +337,17 @@ class NativeInputLayoutCoordinator(
         )
     }
 }
+
+/**
+ * Whether the new-tab page's only content is the dax logo. When true the content is NOT offset below
+ * the input widget (it stays centered), so the logo keeps a fixed vertical position regardless of the
+ * widget's height — otherwise it would sit lower on the Duck.ai tab (whose widget is taller than
+ * Search's) and appear to shift when switching tabs.
+ *
+ * A real return-hatch is detected via [hatchHeightPx] rather than visibility: the NewTabReturnHatchView
+ * container is always VISIBLE and merely collapses to zero height when no hatch is shown (its inner
+ * content is what's toggled), so a visibility check would always report "hatch present" and defeat
+ * this guard.
+ */
+internal fun isLogoOnly(logoVisible: Boolean, hatchHeightPx: Int): Boolean =
+    logoVisible && hatchHeightPx <= 0

@@ -31,6 +31,7 @@ import android.view.inputmethod.InputMethodManager
 import android.webkit.ValueCallback
 import android.widget.EditText
 import android.widget.FrameLayout
+import androidx.annotation.StringRes
 import androidx.core.view.doOnAttach
 import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
@@ -84,6 +85,7 @@ interface NativeInputWidget {
     var onSearchSelected: ((animate: Boolean) -> Unit)?
     var onChatSelected: ((animate: Boolean) -> Unit)?
     var onClearTextTapped: (() -> Unit)?
+    var onFireButtonTapped: (() -> Unit)?
     var onStopTapped: (() -> Unit)?
     var onVoiceSearchClick: (() -> Unit)?
     var onVoiceChatClick: (() -> Unit)?
@@ -111,7 +113,6 @@ interface NativeInputWidget {
     fun setVoiceChatAvailable(available: Boolean)
     fun submitMessage(message: String?)
     fun submitAsChat(): Boolean
-    fun setImageButtonVisible(visible: Boolean)
     fun setToggleVisible(visible: Boolean)
     fun setFloatingSubmitContainer(container: ViewGroup)
     fun getSelectedModelId(): String?
@@ -218,7 +219,6 @@ class NativeInputModeWidget @JvmOverloads constructor(
     private var isStreaming: Boolean = false
     private var attachmentLimitExceeded: Boolean = false
     private var hasAttachments: Boolean = false
-    private var supportsUpload: Boolean = true
     private var nativeInputState: NativeInputState? = null
     private var chatSuggestionsBinding: NativeInputChatSuggestionsBinder.Binding? = null
     private var onShowSuggestions: ((RecyclerView.Adapter<*>) -> Unit)? = null
@@ -274,7 +274,32 @@ class NativeInputModeWidget @JvmOverloads constructor(
         observeChatState()
         observeChatSuggestionsEnabled()
         observeNativeInputState()
+        bindLeadingFireButtonClick()
         if (onPaidTierChanged != null) observeTier()
+    }
+
+    /**
+     * The leading fire menu in the bottom-bar layout lives as a sibling of this widget
+     * (see input_mode_widget_card_view_bottom.xml). Wire its click here so it shares the
+     * same [onFireButtonTapped] callback as the trailing fire that lives inside the widget.
+     */
+    private fun bindLeadingFireButtonClick() {
+        leadingFireButtonView()?.setOnClickListener { onFireButtonTapped?.invoke() }
+    }
+
+    /**
+     * Walk up the view hierarchy looking for the leading fire menu. The button is a
+     * sibling-of-an-ancestor rather than a direct sibling of this widget — in the bottom-bar
+     * layout it lives outside the MaterialCardView that wraps this widget — so a single
+     * `parent.findViewById` isn't enough.
+     */
+    private fun leadingFireButtonView(): View? {
+        var current: android.view.ViewParent? = parent
+        while (current is ViewGroup) {
+            current.findViewById<View?>(R.id.inputFieldFireIconMenu)?.let { return it }
+            current = current.parent
+        }
+        return null
     }
 
     private fun setupPlugins() {
@@ -306,20 +331,6 @@ class NativeInputModeWidget @JvmOverloads constructor(
                 }
             }
             launch {
-                viewModel.commands.collect { command ->
-                    when (command) {
-                        is NativeInputModeWidgetViewModel.Command.UpdatePluginVisibility -> {
-                            for (containerId in command.containerIds) {
-                                if (containerId == R.id.startChatContainer) continue
-                                findViewById<FrameLayout?>(containerId)?.isVisible = command.visible
-                            }
-                            findViewById<FrameLayout?>(R.id.attachmentsContainer)?.isVisible =
-                                command.visible && hasAttachments
-                        }
-                    }
-                }
-            }
-            launch {
                 viewModel.modelPickerEnabled.collect { enabled ->
                     modelPickerView?.setPickerEnabled(enabled)
                 }
@@ -333,7 +344,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
             attachmentView = pluginView
             pluginView.onCameraCaptureRequested = pendingCameraCaptureCallback
             pluginView.onFilePickerRequested = pendingFilePickerCallback
-            pluginView.bind(scope, viewModelFactory)
+            pluginView.bind(scope, viewModelFactory, nativeInputStateProvider)
         }
         (pluginView as? ModelPicker)?.let { picker ->
             picker.onMenuShown = { isModelMenuVisible = true }
@@ -439,6 +450,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
             if (hasFocus) beginFocusTransition()
             updateBottomRowVisibility()
             applyVerticalPaddingForFocus()
+            nativeInputState?.let { updateFireButtonVisibility(it) }
             if (!hasFocus && isDuckAiPageContext()) {
                 hideKeyboard()
             }
@@ -457,7 +469,8 @@ class NativeInputModeWidget @JvmOverloads constructor(
         val bottomRow = findViewById<View?>(R.id.inputModeWidgetBottomRow) ?: return
         val suppress = nativeInputState?.shouldSuppressBottomRow() == true
         val visible = isChatTabSelected() &&
-            (inputField.hasFocus() || previewEnterFocus || isStreaming) &&
+            (inputField.hasFocus() || previewEnterFocus) &&
+            !isStreaming &&
             !suppress
         bottomRow.visibility = if (visible) VISIBLE else GONE
     }
@@ -523,6 +536,16 @@ class NativeInputModeWidget @JvmOverloads constructor(
         }
     }
 
+    private fun updateSendButtonIcon() {
+        if (isStreaming) return
+        val iconResId = if (isDuckAiPageContext()) {
+            R.drawable.ic_arrow_up_24
+        } else {
+            com.duckduckgo.mobile.android.R.drawable.ic_arrow_right_24
+        }
+        submitButtons?.setSendButtonIcon(iconResId)
+    }
+
     private fun updateNewLineButtonVisibility() {
         val isBrowserContext = nativeInputState?.inputContext == NativeInputState.InputContext.BROWSER
         val hasText = inputField.text.isNotBlank()
@@ -538,20 +561,25 @@ class NativeInputModeWidget @JvmOverloads constructor(
         val firstStateEmission = previousState == null
         val contextChanged = previousState?.inputContext != state.inputContext
         val positionChanged = previousState?.isBottom != state.isBottom
+        // chatId flips from null to non-null when a chat is created; the hint depends on it
+        // (see `applyChatInputType`), so re-apply the input type to swap the placeholder.
+        val chatIdChanged = previousState?.chatId != state.chatId
         nativeInputState = state
         findViewById<TabLayout?>(R.id.inputModeSwitch)?.let { toggle ->
             setToggleMatchParent()
             updateToggleVisibility(toggle, state)
         }
         updateBackButtons(state)
+        updateFireButtonVisibility(state)
         updateBottomRowVisibility()
         applyVerticalPaddingForFocus()
         updateNewLineButtonVisibility()
+        updateSendButtonIcon()
         applyOmnibarShape()
-        // Re-apply chat input type whenever the inputs to `applyChatInputType` (context, position)
-        // change, or on the first emission. This corrects stale IME setup from a tab listener
+        // Re-apply chat input type whenever the inputs to `applyChatInputType` (context, position,
+        // chatId) change, or on the first emission. This corrects stale IME setup from a tab listener
         // that fired before the state-flow caught up.
-        if ((firstStateEmission || contextChanged || positionChanged) && isChatTabSelected()) {
+        if ((firstStateEmission || contextChanged || positionChanged || chatIdChanged) && isChatTabSelected()) {
             inputField.applyChatInputType()
             (context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager).restartInput(inputField)
         }
@@ -582,6 +610,22 @@ class NativeInputModeWidget @JvmOverloads constructor(
         findViewById<View?>(R.id.inputModeWidgetBack)?.setBackgroundResource(
             com.duckduckgo.mobile.android.R.drawable.selectable_circular_container_ripple,
         )
+    }
+
+    /**
+     * In a fullscreen Duck.ai chat the fire button moves into the bottom-bar layout
+     * (sibling to this widget, see input_mode_widget_card_view_bottom.xml). The trailing
+     * fire that lives inside the widget hides in DUCK_AI so the user only ever sees one
+     * fire affordance; other contexts keep today's trailing placement.
+     *
+     * The leading fire is additionally hidden while the input field has focus — the user is
+     * typing and the chrome around the input should yield space to the keyboard / input area.
+     */
+    private fun updateFireButtonVisibility(state: NativeInputState) {
+        val showLeading = state.shouldShowLeadingFireButton() && !inputField.hasFocus()
+        leadingFireButtonView()?.visibility = if (showLeading) VISIBLE else GONE
+        findViewById<View?>(R.id.inputFieldFireButton)?.visibility =
+            if (state.shouldShowTrailingFireButton()) VISIBLE else GONE
     }
 
     private fun removeMargins() {
@@ -636,14 +680,12 @@ class NativeInputModeWidget @JvmOverloads constructor(
                 override fun onTabSelected(tab: TabLayout.Tab) {
                     applyTabUi()
                     pushToggleSelectionIfUserDriven()
-                    viewModel.updatePluginContainerVisibility(isChatTabSelected())
                     refreshTabDependentButtons()
                 }
                 override fun onTabUnselected(tab: TabLayout.Tab) {}
                 override fun onTabReselected(tab: TabLayout.Tab) {
                     applyTabUi()
                     pushToggleSelectionIfUserDriven()
-                    viewModel.updatePluginContainerVisibility(isChatTabSelected())
                     refreshTabDependentButtons()
                 }
             },
@@ -675,7 +717,10 @@ class NativeInputModeWidget @JvmOverloads constructor(
     }
 
     override fun EditText.applyChatInputType() {
-        hint = context.getString(R.string.native_input_chat_hint)
+        // Placeholder depends on whether a chat already exists (see `NativeInputState.chatHintRes`):
+        // a fresh Duck.ai page starts a new chat and gets "Ask anything privately…" until a chat is
+        // created and `chatId` is populated, at which point it becomes "Reply…".
+        hint = context.getString((nativeInputState ?: NativeInputState.zero()).chatHintRes())
         // Enter inserts a newline when we're on a Duck.ai chat page (existing behavior) or when
         // the widget sits in bottom-bar position with the Duck.ai toggle selected. Bottom-bar
         // mode has no on-screen new-line button, so the IME enter key is the only carriage-
@@ -1019,11 +1064,16 @@ class NativeInputModeWidget @JvmOverloads constructor(
         val previousOnChatSelected = this.onChatSelected
         this.onChatSelected = { animate ->
             previousOnChatSelected?.invoke(animate)
-            // Show the chat list adapter synchronously so async chat-history fetch doesn't leave a
-            // gap. On NTP the focusedView never covers the page (browserShowing=false), so the gap
+            // Show the chat list adapter synchronously so the async chat-history fetch doesn't leave
+            // a gap. On NTP the focusedView never covers the page (browserShowing=false), so the gap
             // exposes the NTP logo. The list's match_parent overlay background covers it even with
-            // zero items; real chat history populates when the WebView-backed fetch returns.
-            onShowSuggestions(ensureBinding().adapter)
+            // zero items; real chat history populates when the WebView-backed fetch returns. Only
+            // cover when there will be content to show (see [shouldShowChatSuggestionsCoverOnSelect]);
+            // covering an empty result and then clearing it produces a visible flash.
+            val recentChatsExpected = chatSuggestionsUserEnabled && viewModel.hadRecentChats()
+            if (shouldShowChatSuggestionsCoverOnSelect(inputText = text, recentChatsExpected = recentChatsExpected)) {
+                onShowSuggestions(ensureBinding().adapter)
+            }
             showSuggestions(text)
         }
 
@@ -1107,9 +1157,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
     private fun setChatStreaming(streaming: Boolean) {
         isStreaming = streaming
         configureSubmitButtons()
-        if (streaming) {
-            submitButtons?.showStopButton()
-        } else {
+        if (!streaming) {
             submitButtons?.showSendButton()
             applyTabUi()
             floatingSubmitContainer?.visibility = if (attachmentLimitExceeded) GONE else VISIBLE
@@ -1123,8 +1171,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
     private fun applyTabUi() {
         val toggle = findViewById<TabLayout?>(R.id.inputModeSwitch) ?: return
         val isChatTab = toggle.selectedTabPosition == 1
-        setImageButtonVisible(isChatTab && supportsUpload)
-        submitButtons?.setSendButtonIcon(R.drawable.ic_arrow_right_24_inverted)
+        updateSendButtonIcon()
         if (isChatTab) {
             inputField.minLines = 1
             inputField.maxLines = MAX_LINES
@@ -1132,10 +1179,6 @@ class NativeInputModeWidget @JvmOverloads constructor(
         updateSendButtonVisibility()
         updateNewLineButtonVisibility()
         updateBottomRowVisibility()
-    }
-
-    override fun setImageButtonVisible(visible: Boolean) {
-        findViewById<FrameLayout?>(R.id.attachButtonContainer)?.isVisible = visible
     }
 
     override fun setFloatingSubmitContainer(container: ViewGroup) {
@@ -1146,6 +1189,10 @@ class NativeInputModeWidget @JvmOverloads constructor(
         // in Duck.ai mode we treat this as submitting prompts.
         // In non-Duck.ai mode we treat this as starting a chat with or without a prompt.
         if (!submitAsChat()) viewModel.openNewChat()
+    }
+
+    override fun stop() {
+        onStopTapped?.invoke()
     }
 
     override fun showAttachmentChooser(showing: Boolean) {
@@ -1160,8 +1207,6 @@ class NativeInputModeWidget @JvmOverloads constructor(
         val hadLimitError = attachmentLimitExceeded
         attachmentLimitExceeded = limitExceeded
         this.hasAttachments = hasAttachments
-        this.supportsUpload = supportsUpload
-        setImageButtonVisible(isChatTabSelected() && supportsUpload)
         if (hadLimitError != attachmentLimitExceeded && !isStreaming) {
             floatingSubmitContainer?.visibility = if (attachmentLimitExceeded) GONE else VISIBLE
         }
@@ -1224,11 +1269,43 @@ class NativeInputModeWidget @JvmOverloads constructor(
     }
 }
 
+/**
+ * Chat input placeholder. A chat only exists once it has been created, which [NativeInputState.chatId]
+ * tells us, so "Reply…" is shown only then. Being on a Duck.ai page is not sufficient — a fresh Duck.ai
+ * page starts a new chat, which gets the "Ask anything privately…" prompt until the first message.
+ */
+@StringRes
+internal fun NativeInputState.chatHintRes(): Int =
+    if (chatId != null) R.string.native_input_chat_duck_mode_hint else R.string.native_input_chat_hint
+
 internal fun NativeInputState.shouldShowToggleRowBack(): Boolean =
     toggleVisible && inputContext == NativeInputState.InputContext.BROWSER
 
 internal fun NativeInputState.shouldShowCardRowBack(): Boolean =
     !toggleVisible && inputContext == NativeInputState.InputContext.BROWSER
+
+/**
+ * Whether to synchronously show the chat-suggestions list (an opaque overlay) when the Duck.ai tab is
+ * selected, to cover the NTP logo while the async chat-history fetch runs.
+ *
+ * Cover only when content will actually appear, otherwise the just-shown overlay is cleared ~200ms
+ * later when the fetch returns nothing — a visible flash of the list and of the NTP logo it briefly
+ * covered. Content appears when there is input text (the "Search for [query]" row at minimum), or
+ * when an empty query is expected to yield recent chats ([recentChatsExpected], cached from the
+ * previous empty-query fetch — see NativeInputModeWidgetViewModel.hadRecentChats).
+ */
+internal fun shouldShowChatSuggestionsCoverOnSelect(
+    inputText: String,
+    recentChatsExpected: Boolean,
+): Boolean = inputText.isNotEmpty() || recentChatsExpected
+
+/** Fire button placed inside the input field card at the leading edge — only in a fullscreen Duck.ai chat. */
+internal fun NativeInputState.shouldShowLeadingFireButton(): Boolean =
+    inputContext == NativeInputState.InputContext.DUCK_AI
+
+/** Trailing fire button (in the buttons row next to tabs/menu) — hidden in fullscreen Duck.ai chat, otherwise shown. */
+internal fun NativeInputState.shouldShowTrailingFireButton(): Boolean =
+    inputContext != NativeInputState.InputContext.DUCK_AI
 
 /**
  * The bottom row hosts chat-mode tools (attachments, options, reasoning, model picker).
@@ -1238,3 +1315,21 @@ internal fun NativeInputState.shouldShowCardRowBack(): Boolean =
 internal fun NativeInputState.shouldSuppressBottomRow(): Boolean =
     inputMode == NativeInputState.InputMode.SEARCH_ONLY &&
         inputContext == NativeInputState.InputContext.BROWSER
+
+/**
+ * Bottom-row controls (model / reasoning / options / attachment) are shown only on the Duck.ai
+ * chat tab and only when no chat is streaming. While streaming, the bottom row stays visible for
+ * the stop button but these controls are hidden.
+ */
+internal fun shouldShowInputControls(
+    onChatTab: Boolean,
+    isStreaming: Boolean,
+): Boolean = onChatTab && !isStreaming
+
+/**
+ * Plugin controls (model picker, reasoning picker, options, attach button) are shown only on
+ * the Duck.ai chat tab and only when no chat is streaming. Derived purely from [NativeInputState]
+ * so it is unit-testable without Robolectric.
+ */
+internal fun NativeInputState.shouldShowPluginControls(): Boolean =
+    toggleSelection == NativeInputState.ToggleSelection.DUCK_AI && !isChatStreaming
