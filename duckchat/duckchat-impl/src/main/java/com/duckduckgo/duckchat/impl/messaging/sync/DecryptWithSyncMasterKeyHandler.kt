@@ -60,10 +60,10 @@ class DecryptWithSyncMasterKeyHandler @Inject constructor(
 
                 val responder = SyncJsResponder(jsMessaging, jsMessage, featureName)
 
-                // Fire-mode chats must never sync — refuse the master key so Regular synced chats can't be read into Fire.
-                if (!browserMode.isSyncAvailable()) {
+                // Non-syncable modes must never sync — refuse the master key so synced chats can't be decrypted into a non-syncable mode.
+                if (!browserMode.isSyncable) {
                     responder.sendError(ERROR_SYNC_DISABLED).also {
-                        logcat(LogPriority.WARN) { "DuckChat-Sync: decryptWithSyncMasterKey blocked in Fire mode" }
+                        logcat(LogPriority.WARN) { "DuckChat-Sync: decryptWithSyncMasterKey blocked in non-syncable mode" }
                     }
                     return
                 }

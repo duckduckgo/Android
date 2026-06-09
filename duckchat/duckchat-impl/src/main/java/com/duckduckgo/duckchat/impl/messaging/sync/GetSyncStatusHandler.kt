@@ -51,13 +51,13 @@ class GetSyncStatusHandler @Inject constructor(
 
                 logcat { "DuckChat-Sync: ${jsMessage.method} called" }
 
-                // In Fire mode report sync as unavailable so the FE never attempts to sync the ephemeral chats.
-                if (!browserMode.isSyncAvailable()) {
-                    val firePayload = JSONObject().apply {
+                // In a non-syncable mode report sync as unavailable so the FE never attempts to sync the ephemeral chats.
+                if (!browserMode.isSyncable) {
+                    val unavailableResponse = JSONObject().apply {
                         put("ok", true)
                         put("payload", syncStatusHelper.unavailablePayload())
                     }
-                    jsMessaging.onResponse(JsCallbackData(firePayload, featureName, jsMessage.method, jsMessage.id!!))
+                    jsMessaging.onResponse(JsCallbackData(unavailableResponse, featureName, jsMessage.method, jsMessage.id!!))
                     return
                 }
 

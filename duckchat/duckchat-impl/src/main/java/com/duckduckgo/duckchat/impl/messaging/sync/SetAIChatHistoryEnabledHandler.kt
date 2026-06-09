@@ -51,9 +51,9 @@ class SetAIChatHistoryEnabledHandler @Inject constructor(
                 jsMessaging: JsMessaging,
                 jsMessageCallback: JsMessageCallback?,
             ) {
-                // A Fire session must not mutate the account-level chat-history setting.
-                if (!browserMode.isSyncAvailable()) {
-                    logcat { "DuckChat-Sync: setAIChatHistoryEnabled ignored in Fire mode" }
+                // A non-syncable mode must not mutate the account-level chat-history setting.
+                if (!browserMode.isSyncable) {
+                    logcat { "DuckChat-Sync: setAIChatHistoryEnabled ignored in non-syncable mode" }
                     return
                 }
 

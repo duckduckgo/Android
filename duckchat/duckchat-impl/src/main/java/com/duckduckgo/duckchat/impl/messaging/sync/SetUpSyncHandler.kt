@@ -57,8 +57,8 @@ class SetUpSyncHandler @Inject constructor(
 
                 val responder = SyncJsResponder(jsMessaging, jsMessage, featureName)
 
-                // A Fire session must not be able to set up or open sync.
-                if (!browserMode.isSyncAvailable()) {
+                // A non-syncable mode must not be able to set up or open sync.
+                if (!browserMode.isSyncable) {
                     responder.sendError(ERROR_SETUP_UNAVAILABLE)
                     return
                 }

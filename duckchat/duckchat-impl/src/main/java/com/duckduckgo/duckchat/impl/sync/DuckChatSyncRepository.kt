@@ -16,11 +16,11 @@
 
 package com.duckduckgo.duckchat.impl.sync
 
-import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.browsermode.api.BrowserModeStateHolder
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.duckchat.impl.messaging.sync.isSyncable
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.withContext
@@ -67,22 +67,18 @@ class RealDuckChatSyncRepository @Inject constructor(
     private val browserModeStateHolder: BrowserModeStateHolder,
 ) : DuckChatSyncRepository {
 
-    /**
-     * Fire-mode chat activity must never enter the sync pipeline (Fire chats stay on-device). This is the single
-     * choke point guarding every queue/timestamp writer. Exhaustive `when` so a new [BrowserMode] is a compile
-     * error here rather than silently defaulting to syncable.
+    /*
+     * Chat activity in a non-syncable mode must never enter the sync pipeline (those chats stay on-device). Every
+     * queue/timestamp writer below guards on [BrowserMode.isSyncable] over the current mode — the single write-side
+     * choke point.
      *
-     * Complements the `@RegularMode` store injected into `DuckChatSyncDataManager`: this guard keeps Fire chatIds
-     * out of the pending queues (write side), while that ensures patch content is read from the Regular store even
-     * if sync runs while the user is in Fire mode (read side). Both are needed — don't drop one as "redundant".
+     * Complements the `@RegularMode` store injected into `DuckChatSyncDataManager`: this guard keeps non-syncable
+     * chatIds out of the pending queues (write side), while that ensures patch content is read from the Regular store
+     * even if sync runs while the user is in a non-syncable mode (read side). Both are needed — don't drop one as
+     * "redundant".
      */
-    private fun isSyncableMode(): Boolean = when (browserModeStateHolder.currentMode.value) {
-        BrowserMode.REGULAR -> true
-        BrowserMode.FIRE -> false
-    }
-
     override suspend fun recordDuckAiChatsDeleted(timestampMillis: Long) {
-        if (!isSyncableMode()) {
+        if (!browserModeStateHolder.currentMode.value.isSyncable) {
             logcat { "DuckChat-Sync: skipping deletion timestamp in non-syncable mode" }
             return
         }
@@ -111,7 +107,7 @@ class RealDuckChatSyncRepository @Inject constructor(
     }
 
     override suspend fun recordSingleChatDeletion(chatId: String) {
-        if (!isSyncableMode()) {
+        if (!browserModeStateHolder.currentMode.value.isSyncable) {
             logcat { "DuckChat-Sync: skipping pending chat deletion for $chatId in non-syncable mode" }
             return
         }
@@ -144,7 +140,7 @@ class RealDuckChatSyncRepository @Inject constructor(
     }
 
     override suspend fun recordSingleChatUpdate(chatId: String) {
-        if (!isSyncableMode()) {
+        if (!browserModeStateHolder.currentMode.value.isSyncable) {
             logcat { "DuckChat-Sync: skipping pending chat update for $chatId in non-syncable mode" }
             return
         }

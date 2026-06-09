@@ -58,7 +58,7 @@ class SyncStatusHelper @Inject constructor(
         }
     }
 
-    /** Payload signalling sync is unavailable (Fire mode): syncAvailable=false with all account fields null. */
+    /** Payload signalling sync is unavailable (non-syncable mode): syncAvailable=false with all account fields null. */
     fun unavailablePayload(): JSONObject = JSONObject().apply {
         put(KEY_SYNC_AVAILABLE, false)
         put(KEY_USER_ID, JSONObject.NULL)
