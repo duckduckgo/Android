@@ -221,6 +221,10 @@ class NativeInputModeWidgetViewModel @Inject constructor(
         }
     }
 
+    fun fireVoiceTapped() = duckChatPixels.fireVoiceTapped()
+
+    fun fireStopGenerationTapped() = duckChatPixels.fireStopGenerationTapped()
+
     private data class WidgetConfig(
         val inputContext: NativeInputState.InputContext = NativeInputState.InputContext.BROWSER,
         val inputPosition: NativeInputState.InputPosition = NativeInputState.InputPosition.TOP,

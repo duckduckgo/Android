@@ -237,8 +237,16 @@ class NativeInputModeWidget @JvmOverloads constructor(
     override var onVoiceChatClick: (() -> Unit)? = null
         set(value) {
             field = value
-            voiceHostButtons()?.onVoiceChatClick = value
+            voiceHostButtons()?.onVoiceChatClick = voiceChatClickWithPixel
         }
+
+    // Wrapper installed on the host buttons so the unified-input voice pixel fires exactly once per
+    // tap, before delegating to whatever external [onVoiceChatClick] is currently set. Reads the
+    // field at invocation time so re-assigning the external callback keeps working.
+    private val voiceChatClickWithPixel: () -> Unit = {
+        viewModel.fireVoiceTapped()
+        onVoiceChatClick?.invoke()
+    }
     override var onPaidTierChanged: ((Boolean) -> Unit)? = null
         set(value) {
             field = value
@@ -1260,8 +1268,11 @@ class NativeInputModeWidget @JvmOverloads constructor(
                 layoutResId = R.layout.view_native_input_screen_buttons,
             ).apply {
                 onSendClick = { submitMessage() }
-                onStopClick = { this@NativeInputModeWidget.onStopTapped?.invoke() }
-                onVoiceChatClick = this@NativeInputModeWidget.onVoiceChatClick
+                onStopClick = {
+                    viewModel.fireStopGenerationTapped()
+                    this@NativeInputModeWidget.onStopTapped?.invoke()
+                }
+                onVoiceChatClick = voiceChatClickWithPixel
                 setSendButtonVisible(false)
                 setNewLineButtonVisible(false)
             }

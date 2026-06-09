@@ -1384,4 +1384,20 @@ class NativeInputModeWidgetViewModelTest {
     }
 
     // endregion
+
+    // region voice / stop pixels
+
+    @Test
+    fun whenVoiceTappedThenVoicePixel() {
+        testee.fireVoiceTapped()
+        verify(duckChatPixels).fireVoiceTapped()
+    }
+
+    @Test
+    fun whenStopGenerationTappedThenStopPixel() {
+        testee.fireStopGenerationTapped()
+        verify(duckChatPixels).fireStopGenerationTapped()
+    }
+
+    // endregion
 }
