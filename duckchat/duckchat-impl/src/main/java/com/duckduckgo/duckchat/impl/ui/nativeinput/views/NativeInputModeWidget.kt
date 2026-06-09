@@ -1073,7 +1073,10 @@ class NativeInputModeWidget @JvmOverloads constructor(
                     viewModel.fireChatUrlSuggestionPixel(suggestion)
                     onChatUrlSuggestionClicked(suggestion)
                 },
-                onSearchForQuerySubmitted = onSearchForQuerySubmitted,
+                onSearchForQuerySubmitted = { query ->
+                    viewModel.fireDuckAiSearchForQuerySubmittedPixel()
+                    onSearchForQuerySubmitted(query)
+                },
                 onChatHistoryShortcutClicked = onChatHistoryShortcutClicked,
             ).also { chatSuggestionsBinding = it }
         }

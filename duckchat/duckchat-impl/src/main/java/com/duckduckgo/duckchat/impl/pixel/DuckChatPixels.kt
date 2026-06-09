@@ -173,6 +173,8 @@ interface DuckChatPixels {
     fun fireFileValidationFailed(reason: String)
     fun fireVoiceTapped()
     fun fireStopGenerationTapped()
+    fun fireDuckAiChatHistorySuggestionClicked()
+    fun fireDuckAiSearchDuckDuckGoSuggestionClicked()
 }
 
 @ContributesBinding(AppScope::class)
@@ -569,6 +571,18 @@ class RealDuckChatPixels @Inject constructor(
             pixel.fire(DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_STOP_GENERATION_TAPPED)
         }
     }
+
+    override fun fireDuckAiChatHistorySuggestionClicked() {
+        appCoroutineScope.launch(dispatcherProvider.io()) {
+            pixel.fire(DuckChatPixelName.AUTOCOMPLETE_DUCKAI_CLICK_CHAT_HISTORY)
+        }
+    }
+
+    override fun fireDuckAiSearchDuckDuckGoSuggestionClicked() {
+        appCoroutineScope.launch(dispatcherProvider.io()) {
+            pixel.fire(DuckChatPixelName.AUTOCOMPLETE_DUCKAI_CLICK_SEARCH_DUCKDUCKGO)
+        }
+    }
 }
 
 enum class DuckChatPixelName(override val pixelName: String) : Pixel.PixelName {
@@ -697,6 +711,8 @@ enum class DuckChatPixelName(override val pixelName: String) : Pixel.PixelName {
     DUCK_CHAT_RECENT_CHAT_SELECTED_DAILY("m_aichat_recent_chat_selected_daily"),
     DUCK_CHAT_RECENT_CHAT_SELECTED_PINNED_COUNT("m_aichat_recent_chat_selected_pinned_count"),
     DUCK_CHAT_RECENT_CHAT_SELECTED_PINNED_DAILY("m_aichat_recent_chat_selected_pinned_daily"),
+    AUTOCOMPLETE_DUCKAI_CLICK_CHAT_HISTORY("m_autocomplete_duckai_click_chat_history"),
+    AUTOCOMPLETE_DUCKAI_CLICK_SEARCH_DUCKDUCKGO("m_autocomplete_duckai_click_search_duckduckgo"),
     DUCK_CHAT_VOICE_ENTRY_TAPPED_COUNT("m_aichat_voice_entry_tapped_count"),
     DUCK_CHAT_VOICE_ENTRY_TAPPED_DAILY("m_aichat_voice_entry_tapped_daily"),
     DUCK_CHAT_VOICE_SESSION_STARTED("m_aichat_voice_session_started"),

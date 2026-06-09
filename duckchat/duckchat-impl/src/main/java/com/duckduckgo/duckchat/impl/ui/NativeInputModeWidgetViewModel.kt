@@ -447,7 +447,7 @@ class NativeInputModeWidgetViewModel @Inject constructor(
         val suggestionsShown = lastChatUrlSuggestions
         // Use appCoroutineScope so the pixel fire survives the widget detach
         appCoroutineScope.launch(dispatchers.io()) {
-            autoComplete.fireAutocompletePixel(suggestionsShown, suggestion, experimentalInputScreen = true)
+            autoComplete.fireAutocompletePixel(suggestionsShown, suggestion, experimentalInputScreen = true, duckAiSurface = true)
         }
     }
 
@@ -459,6 +459,13 @@ class NativeInputModeWidgetViewModel @Inject constructor(
             pixel.fire(DuckChatPixelName.DUCK_CHAT_RECENT_CHAT_SELECTED_COUNT)
             pixel.fire(DuckChatPixelName.DUCK_CHAT_RECENT_CHAT_SELECTED_DAILY, type = Daily())
         }
+        // The autocomplete-family pixel sits alongside the RECENT_CHAT_SELECTED metrics above: those
+        // measure recent-chat re-entry, this one credits the Duck.ai-tab autocomplete surface.
+        duckChatPixels.fireDuckAiChatHistorySuggestionClicked()
+    }
+
+    fun fireDuckAiSearchForQuerySubmittedPixel() {
+        duckChatPixels.fireDuckAiSearchDuckDuckGoSuggestionClicked()
     }
 
     fun buildChatSuggestionUrl(suggestion: ChatSuggestion): String =

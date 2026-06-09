@@ -172,4 +172,18 @@ class RealDuckChatPixelsToolsTest {
             type = Pixel.PixelType.Daily(),
         )
     }
+
+    @Test
+    fun whenDuckAiChatHistorySuggestionClickedThenFiresSingleCountPixel() = runTest {
+        testee.fireDuckAiChatHistorySuggestionClicked()
+
+        verify(pixel).fire(DuckChatPixelName.AUTOCOMPLETE_DUCKAI_CLICK_CHAT_HISTORY)
+    }
+
+    @Test
+    fun whenDuckAiSearchDuckDuckGoSuggestionClickedThenFiresSingleCountPixel() = runTest {
+        testee.fireDuckAiSearchDuckDuckGoSuggestionClicked()
+
+        verify(pixel).fire(DuckChatPixelName.AUTOCOMPLETE_DUCKAI_CLICK_SEARCH_DUCKDUCKGO)
+    }
 }

@@ -1106,7 +1106,7 @@ class NativeInputModeWidgetViewModelTest {
 
         testee.fireChatUrlSuggestionPixel(url)
 
-        verify(autoComplete).fireAutocompletePixel(eq(listOf(url)), eq(url), eq(true))
+        verify(autoComplete).fireAutocompletePixel(eq(listOf(url)), eq(url), experimentalInputScreen = eq(true), duckAiSurface = eq(true))
     }
 
     @Test
@@ -1115,7 +1115,7 @@ class NativeInputModeWidgetViewModelTest {
 
         testee.fireChatUrlSuggestionPixel(url)
 
-        verify(autoComplete).fireAutocompletePixel(eq(emptyList()), eq(url), eq(true))
+        verify(autoComplete).fireAutocompletePixel(eq(emptyList()), eq(url), experimentalInputScreen = eq(true), duckAiSurface = eq(true))
     }
 
     @Test
@@ -1129,7 +1129,7 @@ class NativeInputModeWidgetViewModelTest {
         testee.cancelChatSuggestions()
         testee.fireChatUrlSuggestionPixel(url)
 
-        verify(autoComplete).fireAutocompletePixel(eq(emptyList()), eq(url), eq(true))
+        verify(autoComplete).fireAutocompletePixel(eq(emptyList()), eq(url), experimentalInputScreen = eq(true), duckAiSurface = eq(true))
     }
 
     // endregion
@@ -1282,6 +1282,18 @@ class NativeInputModeWidgetViewModelTest {
         verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_RECENT_CHAT_SELECTED_DAILY, type = Daily())
         verify(pixel, never()).fire(DuckChatPixelName.DUCK_CHAT_RECENT_CHAT_SELECTED_PINNED_COUNT)
         verify(pixel, never()).fire(DuckChatPixelName.DUCK_CHAT_RECENT_CHAT_SELECTED_PINNED_DAILY, type = Daily())
+        verify(duckChatPixels).fireDuckAiChatHistorySuggestionClicked()
+    }
+
+    // endregion
+
+    // region duckai autocomplete-family pixels
+
+    @Test
+    fun whenFireDuckAiSearchForQuerySubmittedPixelThenFiresSearchDuckDuckGoPixel() {
+        testee.fireDuckAiSearchForQuerySubmittedPixel()
+
+        verify(duckChatPixels).fireDuckAiSearchDuckDuckGoSuggestionClicked()
     }
 
     // endregion
