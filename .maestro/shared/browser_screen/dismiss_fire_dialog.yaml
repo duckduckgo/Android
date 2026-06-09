@@ -1,0 +1,14 @@
+appId: com.duckduckgo.mobile.android
+---
+# Dismisses the fire dialog without clearing data.
+# Handles both the legacy dialog (Cancel button) and the single-tab dialog (no Cancel button).
+- runFlow:
+    when:
+      notVisible: "Cancel"
+    commands:
+      - pressKey: back
+- runFlow:
+    when:
+        visible: "Cancel"
+    commands:
+        - tapOn: "Cancel"

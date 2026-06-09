@@ -21,7 +21,7 @@ import android.content.Intent
 import com.duckduckgo.anvil.annotations.PriorityKey
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.internal.features.api.InternalFeaturePlugin
-import com.duckduckgo.sync.impl.ui.SyncInternalSettingsActivity
+import com.duckduckgo.sync.internal.ui.SyncInternalSettingsActivity
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 

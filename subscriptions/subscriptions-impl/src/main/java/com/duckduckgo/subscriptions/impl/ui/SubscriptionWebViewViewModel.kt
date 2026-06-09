@@ -31,7 +31,6 @@ import com.duckduckgo.pir.api.dashboard.PirFeatureState.ENABLED
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.impl.CurrentPurchase
 import com.duckduckgo.subscriptions.impl.JSONObjectAdapter
-import com.duckduckgo.subscriptions.impl.PrivacyProFeature
 import com.duckduckgo.subscriptions.impl.SubscriptionOffer
 import com.duckduckgo.subscriptions.impl.SubscriptionTier
 import com.duckduckgo.subscriptions.impl.SubscriptionTier.PLUS
@@ -64,8 +63,10 @@ import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.YEARLY_PRO_FREE_
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.YEARLY_PRO_FREE_TRIAL_OFFER_US
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.YEARLY_PRO_PLAN_ROW
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.YEARLY_PRO_PLAN_US
+import com.duckduckgo.subscriptions.impl.SubscriptionsFeature
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
 import com.duckduckgo.subscriptions.impl.billing.SubscriptionReplacementMode
+import com.duckduckgo.subscriptions.impl.notification.SubscriptionExpirationReminderScheduler
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionFailureErrorType
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.repository.isActive
@@ -100,8 +101,9 @@ class SubscriptionWebViewViewModel @Inject constructor(
     private val subscriptionsChecker: SubscriptionsChecker,
     private val networkProtectionAccessState: NetworkProtectionAccessState,
     private val pixelSender: SubscriptionPixelSender,
-    private val privacyProFeature: PrivacyProFeature,
+    private val subscriptionsFeature: SubscriptionsFeature,
     private val pirFeature: PirFeature,
+    private val subscriptionExpirationReminderScheduler: SubscriptionExpirationReminderScheduler,
 ) : ViewModel() {
 
     private val moshi = Moshi.Builder().add(JSONObjectAdapter()).build()
@@ -117,6 +119,8 @@ class SubscriptionWebViewViewModel @Inject constructor(
     val currentPurchaseViewState = _currentPurchaseViewState.asStateFlow()
 
     private lateinit var subscriptionStatus: SubscriptionStatus
+
+    private var pendingScheduleNotificationDaysBeforeCancel: Int? = null
 
     fun start() {
         subscriptionsManager.currentPurchaseState.onEach {
@@ -135,12 +139,19 @@ class SubscriptionWebViewViewModel @Inject constructor(
                 }
                 is CurrentPurchase.Success -> {
                     subscriptionsChecker.runChecker()
+                    pendingScheduleNotificationDaysBeforeCancel?.let { days ->
+                        if (subscriptionsFeature.subscriptionExpirationReminderNotification().isEnabled()) {
+                            subscriptionExpirationReminderScheduler.scheduleReminderNotification(days)
+                        }
+                        pendingScheduleNotificationDaysBeforeCancel = null
+                    }
                     Success(
                         SubscriptionEventData(
                             PURCHASE_COMPLETED_FEATURE_NAME,
                             PURCHASE_COMPLETED_SUBSCRIPTION_NAME,
                             JSONObject(PURCHASE_COMPLETED_JSON),
                         ),
+                        isFreeTrial = it.isFreeTrial,
                     )
                 }
                 is CurrentPurchase.InProgress, CurrentPurchase.PreFlowInProgress -> InProgress
@@ -171,9 +182,62 @@ class SubscriptionWebViewViewModel @Inject constructor(
             "featureSelected" -> data?.let { featureSelected(data) }
             "subscriptionsWelcomeFaqClicked" -> subscriptionsWelcomeFaqClicked()
             "subscriptionsWelcomeAddEmailClicked" -> subscriptionsWelcomeAddEmailClicked()
+            "getUserSettings" -> id?.let { getUserSettings(it) }
+            "requestNotificationsPermission" -> id?.let { requestNotificationsPermission(it) }
             else -> {
                 // NOOP
             }
+        }
+    }
+
+    private fun getUserSettings(id: String) {
+        viewModelScope.launch(dispatcherProvider.io()) {
+            if (!subscriptionsFeature.userSettingsMessaging().isEnabled()) return@launch
+            command.send(ComputeUserSettings(id))
+        }
+    }
+
+    fun onUserSettingsComputed(
+        id: String,
+        notificationsEnabled: Boolean,
+        isAtLeastApi33: Boolean,
+        runtimePermissionGranted: Boolean,
+        shouldShowRationale: Boolean,
+    ) {
+        val status = when {
+            notificationsEnabled -> NOTIFICATIONS_PERMISSION_GRANTED
+            !isAtLeastApi33 -> NOTIFICATIONS_PERMISSION_DENIED
+            runtimePermissionGranted -> NOTIFICATIONS_PERMISSION_DENIED
+            shouldShowRationale -> NOTIFICATIONS_PERMISSION_NOT_DETERMINED
+            else -> NOTIFICATIONS_PERMISSION_DENIED
+        }
+        viewModelScope.launch {
+            val response = JsCallbackData(
+                featureName = "useSubscription",
+                method = "getUserSettings",
+                id = id,
+                params = JSONObject().apply { put("notificationsPermission", status) },
+            )
+            command.send(SendResponseToJs(response))
+        }
+    }
+
+    private fun requestNotificationsPermission(id: String) {
+        viewModelScope.launch(dispatcherProvider.io()) {
+            if (!subscriptionsFeature.notificationsPermissionMessaging().isEnabled()) return@launch
+            command.send(RequestNotificationsPermission(id))
+        }
+    }
+
+    fun onNotificationsPermissionResult(id: String, granted: Boolean) {
+        viewModelScope.launch {
+            val response = JsCallbackData(
+                featureName = "useSubscription",
+                method = "requestNotificationsPermission",
+                id = id,
+                params = JSONObject().apply { put("granted", granted) },
+            )
+            command.send(SendResponseToJs(response))
         }
     }
 
@@ -257,6 +321,13 @@ class SubscriptionWebViewViewModel @Inject constructor(
             val offerId = runCatching { data?.getString("offerId") }.getOrNull()
             val experimentName = runCatching { data?.getJSONObject("experiment")?.getString("name") }.getOrNull()
             val experimentCohort = runCatching { data?.getJSONObject("experiment")?.getString("cohort") }.getOrNull()
+            pendingScheduleNotificationDaysBeforeCancel = if (subscriptionsFeature.userSettingsMessaging().isEnabled()) {
+                runCatching {
+                    data?.getJSONObject("scheduleNotification")?.getInt("daysBeforeCancel")
+                }.getOrNull()
+            } else {
+                null
+            }
             if (id.isNullOrBlank()) {
                 pixelSender.reportPurchaseFailureOther(SubscriptionFailureErrorType.INVALID_PRODUCT_ID.name)
                 _currentPurchaseViewState.emit(currentPurchaseViewState.value.copy(purchaseState = Failure))
@@ -296,7 +367,7 @@ class SubscriptionWebViewViewModel @Inject constructor(
             val subscription = subscriptionResult.getOrNull()
 
             // Expired/inactive subscriptions can't be switched — route to a new purchase instead
-            val canHandleExpiredState = privacyProFeature.handleExpiredStateWhenSubscriptionChangeSelected().isEnabled()
+            val canHandleExpiredState = subscriptionsFeature.handleExpiredStateWhenSubscriptionChangeSelected().isEnabled()
             if (canHandleExpiredState && (subscription == null || subscription.status.isExpired())) {
                 val offerId = runCatching { data?.getString("offerId") }.getOrNull()
                 val experimentName = runCatching { data?.getJSONObject("experiment")?.getString("name") }.getOrNull()
@@ -402,7 +473,7 @@ class SubscriptionWebViewViewModel @Inject constructor(
                 features = emptyList(),
             )
 
-            val subscriptionOptions = if (privacyProFeature.allowPurchase().isEnabled()) {
+            val subscriptionOptions = if (subscriptionsFeature.allowPurchase().isEnabled()) {
                 val subscriptionOffers = subscriptionsManager.getSubscriptionOffer().associateBy { it.offerId ?: it.planId }
                 when {
                     subscriptionOffers.keys.containsAll(listOf(MONTHLY_FREE_TRIAL_OFFER_US, YEARLY_FREE_TRIAL_OFFER_US)) &&
@@ -468,7 +539,7 @@ class SubscriptionWebViewViewModel @Inject constructor(
                 products = emptyList(),
             )
 
-            val subscriptionTierOptions = if (privacyProFeature.allowPurchase().isEnabled()) {
+            val subscriptionTierOptions = if (subscriptionsFeature.allowPurchase().isEnabled()) {
                 val subscriptionOffers = subscriptionsManager.getSubscriptionOffer().associateBy { it.offerId ?: it.planId }
                 val isFreeTrialEligible = subscriptionsManager.isFreeTrialEligible()
 
@@ -518,7 +589,7 @@ class SubscriptionWebViewViewModel @Inject constructor(
                 plusProduct?.let { products.add(it) }
 
                 // Check for Pro tier products (gated by feature flag - acts as kill switch)
-                val proProduct = if (privacyProFeature.allowProTierPurchase().isEnabled()) {
+                val proProduct = if (subscriptionsFeature.allowProTierPurchase().isEnabled()) {
                     when {
                         // Pro Free Trial US
                         subscriptionOffers.keys.containsAll(listOf(MONTHLY_PRO_FREE_TRIAL_OFFER_US, YEARLY_PRO_FREE_TRIAL_OFFER_US)) &&
@@ -705,7 +776,7 @@ class SubscriptionWebViewViewModel @Inject constructor(
     sealed class PurchaseStateView {
         data object Inactive : PurchaseStateView()
         data object InProgress : PurchaseStateView()
-        data class Success(val subscriptionEventData: SubscriptionEventData) : PurchaseStateView()
+        data class Success(val subscriptionEventData: SubscriptionEventData, val isFreeTrial: Boolean) : PurchaseStateView()
         data object Waiting : PurchaseStateView()
         data object Recovered : PurchaseStateView()
         data object Failure : PurchaseStateView()
@@ -729,6 +800,8 @@ class SubscriptionWebViewViewModel @Inject constructor(
             val replacementMode: SubscriptionReplacementMode,
         ) : Command()
         data object RestoreSubscription : Command()
+        data class ComputeUserSettings(val id: String) : Command()
+        data class RequestNotificationsPermission(val id: String) : Command()
         data object GoToITR : Command()
         data object GoToPIR : Command()
         data object GoToPIRDashboard : Command()
@@ -742,5 +815,8 @@ class SubscriptionWebViewViewModel @Inject constructor(
         const val PURCHASE_COMPLETED_SUBSCRIPTION_NAME = "onPurchaseUpdate"
         const val PURCHASE_COMPLETED_JSON = """{ type: "completed" }"""
         const val PURCHASE_CANCELED_JSON = """{ type: "canceled" }"""
+        private const val NOTIFICATIONS_PERMISSION_GRANTED = "granted"
+        private const val NOTIFICATIONS_PERMISSION_DENIED = "denied"
+        private const val NOTIFICATIONS_PERMISSION_NOT_DETERMINED = "notDetermined"
     }
 }

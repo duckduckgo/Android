@@ -40,4 +40,9 @@
 
     <!-- Page Header -->
     <string name="pageHeaderLearnMore">Sužinoti daugiau</string>
+
+    <!-- Content Descriptions -->
+    <string name="closeButtonContentDescription">Uždaryti</string>
+    <string name="bookmarkFavoriteContentDescription">Mėgstamas</string>
+
 </resources>

@@ -36,6 +36,7 @@
     <string name="browserMenuPrintSite">Imprimir</string>
     <string name="browserMenuOpenAppLink">Abrir en la aplicación</string>
     <string name="browserMenuAddToHome">Añadir a la Pantalla de Inicio</string>
+    <string name="browserMenuDownloadPdf">Descargar PDF</string>
     <string name="browserMenuReportBrokenSite">Informar de sitio web dañado</string>
     <string name="browserMenuAutofill">Contraseñas</string>
     <string name="browserMenuDownloads">Descargas</string>
@@ -56,5 +57,5 @@
     <string name="browserMenuBack">Volver</string>
     <string name="browserMenuForward">Avanzar</string>
     <string name="browserMenuRefresh">Actualizar</string>
-    <string name="browserMenuFire">Borrar datos y pestañas</string>
+    <string name="browserMenuFireTabsData">Eliminar pestañas y datos</string>
 </resources>

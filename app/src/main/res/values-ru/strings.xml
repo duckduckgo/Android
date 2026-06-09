@@ -27,6 +27,9 @@
     <string name="cancel">Отменить</string>
     <string name="search">Поиск</string>
 
+    <!--Duck.ai contextual fire-->
+    <string name="duckAiChatDeletedSnackbar">Чат удален</string>
+
     <!-- Onboarding Activity -->
     <string name="onboardingDefaultBrowserDescription">Чтобы сделать DuckDuckGo браузером по умолчанию, перейдите в «Настройки».</string>
     <string name="onboardingDefaultBrowserTitle">Сделайте DuckDuckGo браузером по умолчанию</string>
@@ -139,6 +142,7 @@
     <string name="leaveFeedbackNew">Отправить отзыв</string>
     <string name="settingsEmailProtectionTitle">Защита электронной почты</string>
     <string name="settingsHeadingNextSteps">Дальнейшие шаги</string>
+    <string name="settingsNextStepsHideItem">Скрыть</string>
     <string name="settingsLightTheme">Светлая</string>
     <string name="settingsTheme">Тема</string>
     <string name="settingsDarkTheme">Тёмная</string>
@@ -176,9 +180,6 @@
     <string name="privateSearchAutocompleteHint">Показывать поисковые рекомендации (включая закладки) по мере ввода текста. Все поисковые запросы конфиденциальны.</string>
     <string name="privateSearchAutocompleteRecentlyVisitedSitesToggle">Недавно посещенные сайты</string>
     <string name="privateSearchAutocompleteRecentlyVisitedSitesHint">Показывать в рекомендациях поиска недавно посещенные сайты. Их список хранится только на вашем устройстве, и его можно удалить с помощью кнопки Fire Button.</string>
-    <string name="improvedAutoCompleteIAMContent">Теперь рекомендации по автозаполнению включают недавно посещенные вами сайты. Их можно отключить в настройках или очистить с помощью кнопки Fire Button 🔥.</string>
-    <string name="improvedAutoCompleteIAMTitle">Та же конфиденциальность.\nЛучшие поисковые рекомендации!</string>
-    <string name="openAutoCompleteSettings">Открыть Настройки</string>
     <string name="privateSearchChatSuggestionsToggle">Рекомендации в чате</string>
     <string name="privateSearchAutocompleteHintWithChatSuggestions">При вводе запроса в адресную строку показывать рекомендации из поисковой истории, закладок и (по желанию) журнала чатов Duck.ai. Все поисковые запросы конфиденциальны.</string>
 
@@ -273,6 +274,7 @@
     <string name="singleTabFireDialogDeleteAll">Удалить все</string>
     <string name="singleTabFireDialogDeleteThisTab">Удалить эту вкладку</string>
     <string name="singleTabFireDialogDeleteChat">Удалить чат</string>
+    <string name="singleTabFireDialogDeleteChats">Удалить чаты</string>
     <string name="singleTabFireDialogTitleDuckAi">Удалить этот чат?</string>
     <string name="singleTabFireDialogSubtitleSiteData">Удаление данных сайтов может сопровождаться выходом из учетных записей.</string>
     <string name="singleTabFireDialogSubtitleDownloads">Текущие загрузки будут отменены.</string>
@@ -597,6 +599,7 @@
     <!-- Fire Animation settings -->
     <string name="settingsFireAnimation">Aнимация кнопки «Огонь»</string>
     <string name="settingsHeroFireAnimation">Инферно</string>
+    <string name="settingsHeroFireAnimationClassic">Классика с пламенем</string>
     <string name="settingsHeroWaterAnimation">Водоворот</string>
     <string name="settingsHeroAbstractAnimation">Воздушный поток</string>
     <string name="settingsNoneAnimation">Ничего</string>
@@ -880,6 +883,9 @@
     <string name="preOnboardingDaxDialog3Button">Начать просмотр</string>
     <string name="preOnboardingAddressBarTitle">Где следует разместить адресную строку?</string>
     <string name="preOnboardingAddressBarOkButton">Далее</string>
+    <string name="preOnboardingAddressBarPositionTop">Вверху</string>
+    <string name="preOnboardingAddressBarPositionBottom">Внизу</string>
+    <string name="preOnboardingAddressBarPositionSplit">Разделить</string>
     <string name="highlightsPreOnboardingAddressBarOption1Title">Вверху (по умолчанию)</string>
     <string name="highlightsPreOnboardingAddressBarOption1Description">Легко заметить</string>
     <string name="highlightsPreOnboardingAddressBarOption2Title">Внизу</string>
@@ -902,6 +908,8 @@
     <string name="onboardingSitesDaxDialogOption3">ebay.com</string>
     <string name="onboardingSitesDaxDialogOption4">Удиви меня!</string>
     <string name="onboardingSerpDaxDialogDescription"><![CDATA[Это — <b>DuckDuckGo Search</b>! Надежно. Быстро. Меньше рекламы.]]></string>
+    <string name="onboardingSerpDaxDialogBrandDesignTitle">Это — DuckDuckGo Search!</string>
+    <string name="onboardingSerpDaxDialogBrandDesignDescription">Надежно. Быстро. Меньше рекламы.</string>
     <string name="onboardingSerpDaxDialogButton">Понятно</string>
     <string name="onboardingSitesSuggestionsDaxDialogTitle">А теперь попробуйте посетить сайт!</string>
     <plurals name="onboardingTrackersBlockedDialogDescription">
@@ -936,6 +944,26 @@
     <string name="preOnboardingInputScreenTitleUpdated" translatable="false">Want easy access to private AI chat in the address bar?</string>
     <string name="preOnboardingInputScreenButton">Далее</string>
     <string name="preOnboardingInputScreenDescription"><![CDATA[Функции на базе ИИ работают конфиденциально и предлагаются дополнительно. Их можно изменить в разделе <b>Настройки > Функции ИИ</b>.]]></string>
+
+    <!--Onboarding Reinstall Quick Setup-->
+    <string name="preOnboardingReinstallQuickSetupTitle">С возвращением!&lt;br/&gt;Хочешь что-нибудь настроить?</string>
+    <string name="preOnboardingReinstallSetDefaultLabel">Сделать DuckDuckGo браузером по умолчанию</string>
+    <string name="preOnboardingReinstallAddHomeScreenWidgetLabel">Добавить виджет на главный экран</string>
+    <string name="preOnboardingReinstallAddressBarLabel">Положение адресной строки</string>
+    <string name="preOnboardingReinstallAddressBarSearchOptionsLabel">Параметры поиска в адресной строке</string>
+    <string name="preOnboardingReinstallStartBrowsing">Начать работу</string>
+
+    <!-- Quick setup bottom sheets -->
+    <string name="quickSetupAddressBarPositionTitle">Где вы хотите разместить адресную строку?</string>
+    <string name="quickSetupAddressBarPositionCaption"><![CDATA[Изменения можно внести в разделе <b>«Настройки» > «Внешний вид»</b>.]]></string>
+    <string name="quickSetupSearchOptionsTitle">Нужен доступ к поиску и чатам с ИИ прямо из адресной строки?</string>
+    <string name="quickSetupBottomSheetDone">Готово</string>
+    <string name="quickSetupInputScreenSearchOnly">Только поиск</string>
+    <string name="quickSetupInputScreenSearchAndDuckAi">Поиск и Duck.ai</string>
+    <string name="quickSetupRemoveHomeScreenWidgetTitle">Как удалить виджет с главного экрана</string>
+    <string name="quickSetupRemoveHomeScreenWidgetStep1">Перейти на главный экран</string>
+    <string name="quickSetupRemoveHomeScreenWidgetStep2">Нажмите и удерживайте виджет</string>
+    <string name="quickSetupRemoveHomeScreenWidgetStep3">Нажми или перетащи, чтобы удалить его</string>
 
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Адресная строка</string>
@@ -1017,4 +1045,32 @@
     <string name="searchWidgetDescription" instruction="Description for the search widget, which may include Duck.ai and voice search">Конфиденциальный поиск с DuckDuckGo или вопросы для Duck.ai. Голосовой поиск и Duck.ai можно включить по желанию.</string>
     <string name="searchAndFavoritesWidgetDescription" instruction="Description for the search and favorites widget">Поиск или посещение любимых сайтов в приватном режиме одним касанием. По желанию можно включить голосовой поиск и Duck.ai.</string>
     <string name="duckAiOnlyPinShortcutLabel" instruction="Label for the Duck.ai pinned shortcut. Should be Duck.ai in all languages">Duck.ai</string>
+
+    <!-- Sync Restore (onboarding) -->
+    <string name="syncRestoreDialogTitle">Давайте продолжим с того места, где вы остановились</string>
+    <string name="syncRestoreDialogDescription">Восстановить закладки, пароли и другие данные из предыдущей синхронизации DuckDuckGo?</string>
+    <string name="syncRestoreDialogPrimaryCta">Восстановить мои данные</string>
+    <string name="syncRestoreDialogSecondaryCta">Пропустить</string>
+
+    <!-- Sync Restore (brand-design onboarding) -->
+    <string name="syncRestoreDialogBrandDesignTitle">Давайте продолжим с того места, где вы остановились в DuckDuckGo.</string>
+    <string name="syncRestoreDialogBrandDesignBody1">Ваши сохраненные закладки, пароли и т. д. готовы.</string>
+
+    <!-- PDF download tooltip -->
+    <string name="pdfDownloadTooltipText">Скачать PDF</string>
+
+    <!-- Sharing options -->
+    <string name="copyLinkText">Скопировать текст ссылки</string>
+    <string name="linkTextCopied">Текст ссылки скопирован</string>
+    <string name="linkTextCopyFailed">Не удалось скопировать текст ссылки</string>
+
+    <string name="preOnboardingWelcomeDialogTitle">Привет!</string>
+    <string name="preOnboardingWelcomeDialogBody1">Готовы перейти на быстрый браузер, где все под вашим контролем?</string>
+    <string name="preOnboardingWelcomeDialogBody2">Здесь ИИ — всегда лишь дополнительная опция, а защита конфиденциальности всегда включена.</string>
+    <string name="onboardingStepIndicatorText" instruction="a counter above our instructions in onboarding that tells a user what step they are on">%1$d из %2$d</string>
+    <string name="onboardingSearchDaxDialogOption1Quoted" instruction="translate &apos;duck&apos; too.">как сказать «утка» по-английски</string>
+    <string name="onboardingSearchDaxDialogOption1EnglishQuoted" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">как сказать «утка» по-испански</string>
+
+    <string name="input_screen_user_pref_without_ai_updated">Только поиск</string>
+    <string name="input_screen_user_pref_with_ai_updated">Переключайтесь между\nПоиском и Duck.ai</string>
 </resources>

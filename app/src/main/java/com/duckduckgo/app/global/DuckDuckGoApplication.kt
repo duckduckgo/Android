@@ -16,22 +16,24 @@
 
 package com.duckduckgo.app.global
 
+import android.os.Build
 import android.os.StrictMode
 import android.os.StrictMode.ThreadPolicy
 import androidx.lifecycle.ProcessLifecycleOwner
 import com.duckduckgo.app.browser.BuildConfig
 import com.duckduckgo.app.di.AppComponent
+import com.duckduckgo.app.di.AppComponentFactory
 import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.app.di.DaggerAppComponent
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.app.lifecycle.PirProcessLifecycleObserver
 import com.duckduckgo.app.lifecycle.VpnProcessLifecycleObserver
 import com.duckduckgo.app.referral.AppInstallationReferrerStateListener
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.plugins.PluginPoint
-import com.duckduckgo.di.DaggerMap
 import dagger.android.AndroidInjector
 import dagger.android.HasDaggerInjector
+import dagger.android.getFactory
+import dev.zacsweers.metro.HasMemberInjections
 import io.reactivex.exceptions.UndeliverableException
 import io.reactivex.plugins.RxJavaPlugins
 import kotlinx.coroutines.*
@@ -46,6 +48,7 @@ import javax.inject.Inject
 private const val VPN_PROCESS_NAME = "vpn"
 private const val PIR_PROCESS_NAME = "pir"
 
+@HasMemberInjections
 open class DuckDuckGoApplication : HasDaggerInjector, MultiProcessApplication() {
 
     @Inject
@@ -71,7 +74,7 @@ open class DuckDuckGoApplication : HasDaggerInjector, MultiProcessApplication() 
     lateinit var appCoroutineScope: CoroutineScope
 
     @Inject
-    lateinit var injectorFactoryMap: DaggerMap<Class<*>, AndroidInjector.Factory<*, *>>
+    lateinit var injectorFactoryMap: dagger.android.InjectorFactoryMap
 
     @Inject
     lateinit var dispatchers: DispatcherProvider
@@ -159,10 +162,7 @@ open class DuckDuckGoApplication : HasDaggerInjector, MultiProcessApplication() 
     }
 
     private fun configureDependencyInjection() {
-        daggerAppComponent = DaggerAppComponent.builder()
-            .application(this)
-            .applicationCoroutineScope(applicationCoroutineScope)
-            .build()
+        daggerAppComponent = AppComponentFactory.create(this, applicationCoroutineScope)
         daggerAppComponent.inject(this)
     }
 
@@ -177,6 +177,15 @@ open class DuckDuckGoApplication : HasDaggerInjector, MultiProcessApplication() 
                     .penaltyDropBox()
                     .build(),
             )
+            if (Build.VERSION.SDK_INT >= 31) {
+                StrictMode.setVmPolicy(
+                    StrictMode.VmPolicy.Builder()
+                        .detectUnsafeIntentLaunch()
+                        .penaltyLog()
+                        .penaltyDeath()
+                        .build(),
+                )
+            }
         }
     }
 
@@ -239,7 +248,7 @@ open class DuckDuckGoApplication : HasDaggerInjector, MultiProcessApplication() 
      * This method will return the [AndroidInjector.Factory] for the given key passed in as parameter.
      */
     override fun daggerFactoryFor(key: Class<*>): AndroidInjector.Factory<*, *> {
-        return injectorFactoryMap[key]
+        return injectorFactoryMap.getFactory(key)
             ?: throw RuntimeException(
                 """
                 Could not find the dagger component for ${key.simpleName}.

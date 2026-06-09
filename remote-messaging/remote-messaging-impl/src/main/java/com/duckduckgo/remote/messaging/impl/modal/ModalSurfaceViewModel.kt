@@ -32,6 +32,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @ContributesViewModel(ActivityScope::class)
@@ -78,7 +79,9 @@ class ModalSurfaceViewModel @Inject constructor(
                 PARAM_NAME_DISMISS_TYPE to PARAM_VALUE_BACK_BUTTON_OR_GESTURE,
             )
             lastRemoteMessageIdSeen?.let {
-                cardsListPixelHelper.dismissCardsListMessage(it, customParams)
+                withContext(dispatchers.io()) {
+                    cardsListPixelHelper.dismissCardsListMessage(it, customParams)
+                }
             }
             _command.send(Command.DismissMessage)
         }

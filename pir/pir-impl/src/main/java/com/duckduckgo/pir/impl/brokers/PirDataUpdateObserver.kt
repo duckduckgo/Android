@@ -23,9 +23,11 @@ import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.pir.impl.PirFeatureDataCleaner
+import com.duckduckgo.pir.impl.checker.PirEligibility
 import com.duckduckgo.pir.impl.checker.PirWorkHandler
 import com.duckduckgo.pir.impl.pixels.PirPixelSender
 import com.duckduckgo.pir.impl.store.PirRepository
+import com.duckduckgo.pir.impl.wideevents.PirScanWideEvent.CancellationReason
 import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.collectLatest
@@ -52,30 +54,34 @@ class PirDataUpdateObserver @Inject constructor(
             // Observe when PIR becomes available so we can fetch the broker data or cancel all related work
             pirWorkHandler
                 .canRunPir()
-                .collectLatest { enabled ->
+                .collectLatest { eligibility ->
                     val featureReceiveMs = pirRepository.getFeatureReceivedMs()
-                    if (enabled) {
-                        pirPixelSender.reportCanRunPir()
-                        // We only set the value if it was not set previously
-                        if (featureReceiveMs == 0L) {
-                            pirRepository.setFeatureReceivedMs(currentTimeProvider.currentTimeMillis())
+                    when (eligibility) {
+                        is PirEligibility.Enabled -> {
+                            pirPixelSender.reportCanRunPir()
+                            // We only set the value if it was not set previously
+                            if (featureReceiveMs == 0L) {
+                                pirRepository.setFeatureReceivedMs(currentTimeProvider.currentTimeMillis())
+                            }
+
+                            logcat { "PIR-update: Attempting to update all broker data" }
+                            if (brokerJsonUpdater.update()) {
+                                logcat { "PIR-update: Update successfully completed." }
+                            } else {
+                                logcat { "PIR-update: Failed to complete." }
+                            }
                         }
 
-                        logcat { "PIR-update: Attempting to update all broker data" }
-                        if (brokerJsonUpdater.update()) {
-                            logcat { "PIR-update: Update successfully completed." }
-                        } else {
-                            logcat { "PIR-update: Failed to complete." }
-                        }
-                    } else {
-                        logcat { "PIR-update: PIR not enabled" }
-                        // We also check the etag to handle scenarios where featureReceiveMs was not yet available
-                        if (featureReceiveMs != 0L || pirRepository.getCurrentMainEtag() != null) {
-                            logcat { "PIR-update: resetting feature" }
-                            // This will also cancel any ongoing work that is currently running if PIR is not enabled
-                            // This will also clear the featureReceivedMs
-                            pirWorkHandler.cancelWork()
-                            pirFeatureDataCleaner.removeAllData()
+                        is PirEligibility.Disabled -> {
+                            logcat { "PIR-update: PIR not enabled" }
+                            // We also check the etag to handle scenarios where featureReceiveMs was not yet available
+                            if (featureReceiveMs != 0L || pirRepository.getCurrentMainEtag() != null) {
+                                logcat { "PIR-update: resetting feature" }
+                                // This will also cancel any ongoing work that is currently running if PIR is not enabled
+                                // This will also clear the featureReceivedMs
+                                pirWorkHandler.cancelWork(CancellationReason.fromDisabledReason(eligibility.reason))
+                                pirFeatureDataCleaner.removeAllData()
+                            }
                         }
                     }
                 }

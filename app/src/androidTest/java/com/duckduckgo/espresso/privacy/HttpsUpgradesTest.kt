@@ -31,6 +31,7 @@ import androidx.test.ext.junit.rules.activityScenarioRule
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.browser.mode.InAppNavigation
 import com.duckduckgo.common.utils.isHttps
 import com.duckduckgo.espresso.PrivacyTest
 import com.duckduckgo.espresso.WebViewIdlingResource
@@ -48,6 +49,7 @@ class HttpsUpgradesTest {
     var activityScenarioRule = activityScenarioRule<BrowserActivity>(
         BrowserActivity.intent(
             InstrumentationRegistry.getInstrumentation().targetContext,
+            launchSource = InAppNavigation,
             queryExtra = "http://privacy-test-pages.site/privacy-protections/https-upgrades/",
         ),
     )

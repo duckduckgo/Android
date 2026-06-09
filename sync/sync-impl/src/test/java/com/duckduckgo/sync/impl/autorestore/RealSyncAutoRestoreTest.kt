@@ -23,6 +23,7 @@ import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.sync.impl.SyncAccountRepository
 import com.duckduckgo.sync.impl.SyncAuthCode
 import com.duckduckgo.sync.impl.SyncFeature
+import com.duckduckgo.sync.impl.pixels.SyncPixels
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -47,6 +48,7 @@ class RealSyncAutoRestoreTest {
     private val syncFeature = FakeFeatureToggleFactory.create(SyncFeature::class.java)
     private val manager: SyncAutoRestoreManager = mock()
     private val syncAccountRepository: SyncAccountRepository = mock()
+    private val syncPixels: SyncPixels = mock()
 
     private lateinit var testee: RealSyncAutoRestore
 
@@ -57,6 +59,7 @@ class RealSyncAutoRestoreTest {
             manager = manager,
             syncFeature = syncFeature,
             syncAccountRepository = syncAccountRepository,
+            syncPixels = syncPixels,
             appScope = coroutineTestRule.testScope,
             dispatcherProvider = coroutineTestRule.testDispatcherProvider,
         )
@@ -115,6 +118,29 @@ class RealSyncAutoRestoreTest {
 
         verify(syncAccountRepository).parseSyncAuthCode(recoveryCodeString)
         verify(syncAccountRepository).processCode(any(), eq(deviceId))
+    }
+
+    @Test
+    fun whenRestoreSucceedsThenSavesAutoRestoreDataToReaffirmPreferenceAndPayload() = runTest {
+        val recoveryCodeString = "eyJyZWNvdmVyeSI6eyJwcmltYXJ5X2tleSI6ImFiYzEyMyIsInVzZXJfaWQiOiJ1c2VyMTIzIn19"
+        val deviceId = "device-abc-123"
+        configureRetrieveSuccess(payload = RestorePayload(recoveryCode = recoveryCodeString, deviceId = deviceId))
+        configureProcessCodeResult(SyncResult.Success(true))
+
+        testee.restoreSyncAccount()
+
+        verify(manager).saveAutoRestoreData(recoveryCodeString, deviceId)
+    }
+
+    @Test
+    fun whenRestoreFailsThenDoesNotSaveAutoRestoreData() = runTest {
+        val recoveryCodeString = "eyJyZWNvdmVyeSI6eyJwcmltYXJ5X2tleSI6ImFiYzEyMyIsInVzZXJfaWQiOiJ1c2VyMTIzIn19"
+        configureRetrieveSuccess(payload = RestorePayload(recoveryCode = recoveryCodeString, deviceId = "device-123"))
+        configureProcessCodeResult(SyncResult.Error(code = 52, reason = "Login failed"))
+
+        testee.restoreSyncAccount()
+
+        verify(manager, never()).saveAutoRestoreData(any(), anyOrNull())
     }
 
     @Test

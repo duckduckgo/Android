@@ -56,4 +56,9 @@ sealed class BrowserScreens {
      * Use this model to launch the PrivateSearch screen
      */
     data object PrivateSearchScreenNoParams : GlobalActivityStarter.ActivityParams
+
+    /**
+     * Use this model to launch the Tab Switcher screen
+     */
+    data object TabSwitcherScreenNoParams : GlobalActivityStarter.ActivityParams
 }

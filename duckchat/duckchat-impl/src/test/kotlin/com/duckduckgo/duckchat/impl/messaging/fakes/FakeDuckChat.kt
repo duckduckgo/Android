@@ -66,8 +66,6 @@ class FakeDuckChat(
         return uri.toString().contains("duckchat")
     }
 
-    override suspend fun deleteChat(url: String): Boolean = false
-
     override suspend fun wasOpenedBefore(): Boolean {
         return wasOpenedBeforeValue
     }
@@ -108,11 +106,15 @@ class FakeDuckChat(
         chatSuggestionsUserSettingEnabled.value = enabled
     }
 
-    override fun isChatSuggestionsFeatureAvailable(): Boolean = true
-
     override fun observeChatSuggestionsUserSettingEnabled(): Flow<Boolean> = chatSuggestionsUserSettingEnabled
 
     override fun openVoiceDuckChat() { }
+    override fun isVoiceChatSessionActive(tabId: String): Boolean = false
+    override val activeVoiceChatSessions: Flow<Set<String>> = MutableStateFlow(emptySet())
+    override fun observeTriggerVoiceChatSessionEnd(): Flow<String> = kotlinx.coroutines.flow.emptyFlow()
+    override fun endVoiceChatSession(tabId: String) { }
+
+    override suspend fun isChatHistoryAvailable(): Boolean = false
 
     fun setEnabled(enabled: Boolean) {
         this.enabled = enabled

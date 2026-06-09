@@ -56,6 +56,8 @@ import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.browsermode.api.BrowserMode
+import com.duckduckgo.browsermode.api.WebViewModeInitializer
 import com.duckduckgo.common.ui.DuckDuckGoFragment
 import com.duckduckgo.common.ui.view.dialog.ActionBottomSheetDialog
 import com.duckduckgo.common.ui.view.gone
@@ -74,6 +76,7 @@ import com.duckduckgo.downloads.api.DownloadConfirmationDialogListener
 import com.duckduckgo.downloads.api.DownloadStateListener
 import com.duckduckgo.downloads.api.DownloadsFileActions
 import com.duckduckgo.downloads.api.FileDownloader
+import com.duckduckgo.duckchat.api.viewmodel.DuckChatSharedViewModel
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.databinding.FragmentContextualDuckAiBinding
@@ -82,7 +85,6 @@ import com.duckduckgo.duckchat.impl.helper.DuckChatJSHelper
 import com.duckduckgo.duckchat.impl.helper.Mode
 import com.duckduckgo.duckchat.impl.helper.RealDuckChatJSHelper
 import com.duckduckgo.duckchat.impl.ui.DuckChatWebViewClient
-import com.duckduckgo.duckchat.impl.ui.SubscriptionsHandler
 import com.duckduckgo.duckchat.impl.ui.filechooser.FileChooserIntentBuilder
 import com.duckduckgo.duckchat.impl.ui.filechooser.capture.camera.CameraHardwareChecker
 import com.duckduckgo.duckchat.impl.ui.filechooser.capture.launcher.UploadFromExternalMediaAppLauncher
@@ -91,6 +93,7 @@ import com.duckduckgo.js.messaging.api.JsMessaging
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.subscriptions.api.SUBSCRIPTIONS_FEATURE_NAME
+import com.duckduckgo.subscriptions.api.SubscriptionsJSHelper
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
@@ -120,6 +123,10 @@ class DuckChatContextualFragment :
 
     private val sharedContextualViewModel: DuckChatContextualSharedViewModel by viewModels({ requireParentFragment() })
 
+    private val duckChatSharedViewModel: DuckChatSharedViewModel by lazy {
+        ViewModelProvider(requireActivity())[DuckChatSharedViewModel::class.java]
+    }
+
     @Inject
     lateinit var webViewClient: DuckChatWebViewClient
 
@@ -131,7 +138,7 @@ class DuckChatContextualFragment :
     lateinit var duckChatJSHelper: DuckChatJSHelper
 
     @Inject
-    lateinit var subscriptionsHandler: SubscriptionsHandler
+    lateinit var subscriptionsJSHelper: SubscriptionsJSHelper
 
     @Inject
     @AppCoroutineScope
@@ -178,6 +185,12 @@ class DuckChatContextualFragment :
 
     @Inject
     lateinit var contextualNativeInputManager: ContextualNativeInputManager
+
+    @Inject
+    lateinit var webViewModeInitializer: WebViewModeInitializer
+
+    @Inject
+    lateinit var browserMode: BrowserMode
 
     private val cookieManager: CookieManager by lazy { CookieManager.getInstance() }
 
@@ -247,6 +260,8 @@ class DuckChatContextualFragment :
         cookieManager.setAcceptThirdPartyCookies(simpleWebview, true)
 
         simpleWebview.let {
+            webViewModeInitializer.bind(it, browserMode)
+
             it.webViewClient = webViewClient
             webViewClient
                 .onPageFinishedListener = { url ->
@@ -372,15 +387,20 @@ class DuckChatContextualFragment :
                             }
 
                             SUBSCRIPTIONS_FEATURE_NAME -> {
-                                subscriptionsHandler.handleSubscriptionsFeature(
-                                    featureName,
-                                    method,
-                                    id,
-                                    data,
-                                    requireActivity(),
-                                    appCoroutineScope,
-                                    contentScopeScripts,
-                                )
+                                val activity = requireActivity()
+                                appCoroutineScope.launch(dispatcherProvider.io()) {
+                                    subscriptionsJSHelper.processJsCallbackMessage(
+                                        featureName,
+                                        method,
+                                        id,
+                                        data,
+                                        activity,
+                                    )?.let { response ->
+                                        withContext(dispatcherProvider.main()) {
+                                            contentScopeScripts.onResponse(response)
+                                        }
+                                    }
+                                }
                             }
 
                             else -> {}
@@ -414,22 +434,31 @@ class DuckChatContextualFragment :
 
         configureBottomSheet(view)
         setupBackPressHandling()
+        val tabId = requireNotNull(requireArguments().getString(KEY_DUCK_AI_CONTEXTUAL_TAB_ID)) {
+            "DuckChatContextualFragment requires $KEY_DUCK_AI_CONTEXTUAL_TAB_ID argument"
+        }
         contextualNativeInputManager.init(
+            tabId = tabId,
             card = binding.contextualNativeInputCard,
             widget = binding.contextualNativeInputWidget,
             jsMessaging = contentScopeScripts,
             lifecycleOwner = viewLifecycleOwner,
+            chatIdFlow = viewModel.chatId,
             onSearchSubmitted = { query ->
                 viewModel.onContextualClose()
                 startActivity(browserNav.openInNewTab(requireContext(), query))
             },
+            onCameraCaptureRequested = { callback ->
+                launchCameraCapture(callback)
+            },
+            onFilePickerRequested = { callback, mimeTypes ->
+                launchNativeFilePicker(callback, mimeTypes)
+            },
         )
         observeViewModel()
 
-        requireArguments().getString(KEY_DUCK_AI_CONTEXTUAL_TAB_ID)?.let { tabId ->
-            viewModel.onSheetOpened(tabId)
-            setupKeyboardVisibilityListener()
-        }
+        viewModel.onSheetOpened(tabId)
+        setupKeyboardVisibilityListener()
     }
 
     private fun configureBottomSheet(view: View) {
@@ -469,6 +498,9 @@ class DuckChatContextualFragment :
         binding.contextualNewChat.setOnClickListener {
             hideKeyboard(binding.inputField)
             viewModel.onNewChatRequested()
+        }
+        binding.contextualFire.setOnClickListener {
+            viewModel.onFireButtonClicked()
         }
         binding.contextualModeButtons.setOnClickListener { }
         binding.contextualModeRoot.setOnClickListener { }
@@ -577,6 +609,10 @@ class DuckChatContextualFragment :
                     is DuckChatContextualViewModel.Command.RequestPageContext -> {
                         sharedContextualViewModel.requestPageContext()
                     }
+
+                    is DuckChatContextualViewModel.Command.ShowFireConfirmation -> {
+                        showFireConfirmationDialog()
+                    }
                 }
             }.launchIn(lifecycleScope)
 
@@ -595,6 +631,10 @@ class DuckChatContextualFragment :
                         logcat { "Duck.ai Contextual: OpenSheet" }
                         setupKeyboardVisibilityListener()
                         viewModel.onSheetReopened()
+                    }
+
+                    is DuckChatContextualSharedViewModel.Command.OnContextualFireConfirmed -> {
+                        viewModel.onContextualFireConfirmed()
                     }
 
                     else -> {}
@@ -629,6 +669,7 @@ class DuckChatContextualFragment :
                 contextualNativeInputManager.onInputMode()
 
                 binding.contextualNewChat.gone()
+                binding.contextualFire.gone()
 
                 renderPageContext(viewState.contextTitle, viewState.contextUrl, viewState.tabId)
 
@@ -651,9 +692,14 @@ class DuckChatContextualFragment :
                 binding.contextualModeNativeContent.gone()
                 binding.contextualWebviewContainer.show()
                 binding.contextualNewChat.show()
+                if (viewState.isFireButtonEnabled) binding.contextualFire.show() else binding.contextualFire.gone()
                 contextualNativeInputManager.onWebViewMode()
             }
         }
+    }
+
+    private fun showFireConfirmationDialog() {
+        duckChatSharedViewModel.onContextualFireButtonClicked()
     }
 
     private fun observeSubscriptionEventDataChannel() {
@@ -671,6 +717,22 @@ class DuckChatContextualFragment :
         viewModel.viewModelScope.launch {
             faviconManager.loadToViewFromLocalWithPlaceholder(tabId, pageUrl, binding.duckAiContextualFavicon)
         }
+    }
+
+    private fun launchCameraCapture(callback: ValueCallback<Array<Uri>>) {
+        val fileChooserParams = FileChooserRequestedParams(
+            filePickingMode = WebChromeClient.FileChooserParams.MODE_OPEN_MULTIPLE,
+            acceptMimeTypes = listOf("image/*"),
+        )
+        launchCameraCapture(callback, fileChooserParams, MediaStore.ACTION_IMAGE_CAPTURE)
+    }
+
+    private fun launchNativeFilePicker(callback: ValueCallback<Array<Uri>>, mimeTypes: List<String>) {
+        val fileChooserParams = FileChooserRequestedParams(
+            filePickingMode = WebChromeClient.FileChooserParams.MODE_OPEN_MULTIPLE,
+            acceptMimeTypes = mimeTypes.ifEmpty { listOf("*/*") },
+        )
+        launchFilePicker(callback, fileChooserParams)
     }
 
     data class FileChooserRequestedParams(

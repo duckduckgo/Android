@@ -48,6 +48,12 @@
     <string name="duck_ai_shortcut_settings_title">Bližnjice do Duck.ai</string>
     <string name="duck_ai_shortcut_settings_description">Izberite, katere bližnjice do Duck.ai naj bodo prikazane</string>
 
+    <!-- Default Toggle Position -->
+    <string name="duckAiDefaultTogglePositionTitle" instruction="&apos;Toggle&apos; refers to the UI tab switcher component (Search/Duck.ai), not the verb &apos;to toggle&apos;.">Preklop položaja za nov zavihek</string>
+    <string name="duckAiDefaultTogglePositionSearch">Iskanje</string>
+    <string name="duckAiDefaultTogglePositionDuckAi">Duck.ai</string>
+    <string name="duckAiDefaultTogglePositionLastUsed">Nazadnje uporabljeno</string>
+
     <!-- Duck AI Voice Search Shortcut Setting -->
     <string name="duckAiVoiceSearchVisibilitySetting">Glasovno iskanje</string>
 
@@ -55,9 +61,7 @@
     <string name="input_screen_search_hint">Poišči ali vnesi naslov</string>
     <string name="input_screen_chat_hint">Vprašaj zasebno</string>
     <string name="input_screen_user_pref_without_ai">Samo iskanje</string>
-    <string name="input_screen_user_pref_without_ai_updated" translatable="false">Search only</string>
     <string name="input_screen_user_pref_with_ai">Iskanje in Duck.ai</string>
-    <string name="input_screen_user_pref_with_ai_updated" translatable="false">Toggle between\nSearch and Duck.ai</string>
     <string name="input_screen_user_pref_description">Preizkusite novo možnost, da vprašate Duck.ai neposredno iz naslovne vrstice. <annotation type="share_feedback">Podajte povratne informacije</annotation></string>
 
     <!-- Duck.ai Pro settings -->
@@ -101,4 +105,70 @@
     <string name="duckAIContextualAutomaticContextTitle">Samodejno pošiljanje vsebine strani</string>
     <string name="duckAIContextualAutomaticContextMessage">Vsebino strani samodejno pošljite Duck.ai</string>
     <string name="duckAIContextualAttachPageContent">Priloži vsebino strani</string>
+
+    <!-- duck.ai contextual fire button -->
+    <string name="duckAIContextualFireButtonContentDescription">Počisti klepet</string>
+
+    <!-- Content Descriptions -->
+    <string name="duckChatFireButtonContentDescription">Počisti podatke</string>
+    <string name="duckChatBrowserMenuContentDescription">Več možnosti</string>
+
+    <!-- Duck AI Voice Chat Shortcut Setting -->
+    <string name="duckAiVoiceChatVisibilitySetting" instruction="Voice Chat is a feature that lets users talk to Duck.ai using their voice instead of typing.">Glasovni klepet</string>
+
+    <!-- Duck.ai voice microphone foreground service notification -->
+    <string name="duckAiVoiceNotificationTitle" instruction="Title shown in the notification when Duck.ai Voice Chat is active and using the microphone.">Aktiven glasovni klepet Duck.ai</string>
+    <string name="duckAiVoiceNotificationMessage" instruction="Message shown in the notification explaining that the microphone is being used by Duck.ai.">Mikrofon uporablja Duck.ai</string>
+    <string name="duckAiVoiceNotificationChannelName" instruction="Name of the Android notification channel for the Duck.ai Voice Chat foreground service.">Glasovni klepet Duck.ai</string>
+    <string name="duckAiVoiceNotificationActionOpenChat" instruction="Notification action button that opens the active Duck.ai chat.">Odpri klepet</string>
+    <string name="duckAiVoiceNotificationActionEndSession" instruction="Notification action button that ends the active Duck.ai voice chat session.">Končaj klepet</string>
+
+    <!-- Duck AI Chat Suggestions -->
+    <string name="duckAiChatHistoryViewAllChats">Oglejte si vse klepete</string>
+
+    <!-- Native Duck.ai chat history -->
+    <string name="duck_ai_chat_history_title">Klepeti</string>
+    <string name="duck_ai_chat_history_section_pinned">Pripeto</string>
+    <string name="duck_ai_chat_history_section_recent">Nedavno</string>
+    <string name="duck_ai_chat_history_untitled">Nepoimenovan klepet</string>
+    <string name="duck_ai_chat_history_empty_title">Še ni pogovorov</string>
+    <string name="duck_ai_chat_history_empty_cta_open">Odprite Duck.ai</string>
+    <string name="duck_ai_chat_history_more_options">Več možnosti</string>
+    <string name="duck_ai_chat_history_action_select">Izberi</string>
+    <string name="duck_ai_chat_history_action_pin">Pripni</string>
+    <string name="duck_ai_chat_history_action_unpin">Odpni</string>
+    <string name="duck_ai_chat_history_action_rename">Preimenuj</string>
+    <string name="duck_ai_chat_history_action_download">Prenesi</string>
+    <string name="duck_ai_chat_history_action_delete">Izbriši</string>
+    <string name="duck_ai_chat_history_search_hint">Iskanje klepetov</string>
+    <string name="duck_ai_chat_history_action_search_content_description">Iskanje klepetov</string>
+    <string name="duck_ai_chat_history_search_close_content_description">Zapri iskanje</string>
+    <string name="duck_ai_chat_history_search_clear_content_description">Počisti iskanje</string>
+    <string name="duck_ai_chat_history_action_fire_content_description">Izbriši klepete</string>
+    <string name="duck_ai_chat_history_action_new">Novo</string>
+    <string name="duck_ai_chat_history_action_download_selected_content_description">Prenesi klepete</string>
+    <plurals name="duck_ai_chat_history_bulk_download_complete">
+        <item quantity="one">Prenos je končan za %1$d klepet</item>
+        <item quantity="two">Prenos je končan za %1$d klepeta</item>
+        <item quantity="few">Prenos je končan za %1$d klepete</item>
+        <item quantity="other">Prenos je končan za %1$d klepetov</item>
+    </plurals>
+    <string name="duck_ai_chat_history_action_overflow_content_description">Odpri dodatni meni</string>
+    <string name="duck_ai_chat_history_select_all">Izberi vse</string>
+    <string name="duck_ai_chat_history_unselect_all">Odstrani vse izbire</string>
+    <string name="duck_ai_chat_history_row_selected_content_description">Izbrano</string>
+    <string name="duck_ai_chat_history_row_unselected_content_description">Ni izbrano</string>
+    <string name="duck_ai_chat_history_exit_select_mode_content_description">Izhod iz načina izbire</string>
+    <string name="duck_ai_chat_history_rename_title">Preimenuj klepet</string>
+    <string name="duck_ai_chat_history_rename_chat_title_hint">Naslov klepeta</string>
+    <string name="duck_ai_chat_history_rename_confirm_title">Shrani</string>
+    <string name="duck_ai_chat_history_rename_confirm_content_description">Shrani naslov klepeta</string>
+    <string name="duck_ai_chat_history_rename_error">Klepeta ni bilo mogoče preimenovati</string>
+    <string name="duck_ai_chat_history_pin_snackbar">Klepet je pripet</string>
+    <string name="duck_ai_chat_history_unpin_snackbar">Klepet je odpet</string>
+    <string name="duck_ai_chat_history_undo">Razveljavi</string>
+    <string name="duck_ai_chat_history_download_complete" instruction="%1$s is the saved chat filename (e.g. \&apos;My Chat.txt\&apos;).">Prenos za %1$s je končan</string>
+    <string name="duck_ai_chat_history_download_view">Prikaži</string>
+    <string name="duck_ai_chat_history_download_error">Klepeta ni bilo mogoče izvoziti</string>
+    <string name="duck_ai_chat_history_bulk_download_error">Klepetov ni bilo mogoče izvoziti</string>
 </resources>

@@ -92,6 +92,14 @@ interface DuckChatFeature {
     fun showAIChatAddressBarChoiceScreen(): Toggle
 
     /**
+     * @return `true` when the V2 (refreshed) new address bar option choice screen should be shown.
+     * If the remote feature is not present defaults to `internal`.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    @InternalAlwaysEnabled
+    fun showAIChatAddressBarChoiceScreenV2(): Toggle
+
+    /**
      * @return `true` when the Setting for allowing Duck.ai chats to be deleted with the Fire Button is enabled
      */
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
@@ -131,9 +139,9 @@ interface DuckChatFeature {
     fun showHideAiGeneratedImages(): Toggle
 
     /**
-     * @return `true` when the "Native Input Field" option should be visible in AI Features Settings.
+     * @return `true` when the Native Input Field should be used instead of the web-based input.
      */
-    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun nativeInputField(): Toggle
 
     /**
@@ -170,27 +178,11 @@ interface DuckChatFeature {
     fun supportsMultipleContexts(): Toggle
 
     /**
-     * @return `true` when the Duck.ai Paid Settings status indicator and navigation features are enabled.
-     * This controls syncing the status indicator with DuckChat enabled state and showing the
-     * "Enable/Manage in AI Features Settings" item.
-     * If the remote feature is not present defaults to `true`
-     */
-    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
-    fun duckAiPaidSettingsStatus(): Toggle
-
-    /**
      * @return `true` when we can sync the deletion of duck chats to sync backend
      * If the remote feature is not present defaults to `true`
      */
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun supportsSyncChatsDeletion(): Toggle
-
-    /**
-     * @return `true` when the AI chat suggestions (pinned and recent chats) are enabled
-     * If the remote feature is not present defaults to `internal`
-     */
-    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
-    fun aiChatSuggestions(): Toggle
 
     /**
      * @return `true` when the tab attachment feature (@-mention tabs in chat) is enabled
@@ -212,4 +204,72 @@ interface DuckChatFeature {
      */
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun rememberTogglePosition(): Toggle
+
+    /**
+     * @return `true` when the fire button is shown in the contextual Duck.ai sheet,
+     * allowing the user to clear their current chat.
+     * If the remote feature is not present defaults to `internal`
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun contextualFireButton(): Toggle
+
+    /**
+     * @return `true` when the native storage for duck.ai data is ready to be used
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun duckAiNativeStorage(): Toggle
+
+    /**
+     * @return `true` when the native storage should be used for chat history
+     * (deletion and suggestions), provided migration is complete.
+     * If the remote feature is not present defaults to `internal`
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun useNativeStorageChatData(): Toggle
+
+    /**
+     * @return `true` when the native chat history screen can be launched.
+     * If the remote feature is not present defaults to `internal`.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun historyScreen(): Toggle
+
+    /**
+     * @return `true` when the per-row Fire-icon delete affordance on Duck.ai chat-history
+     * suggestions in the omnibar autocomplete is visible.
+     * If the remote feature is not present defaults to `internal`.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun deleteFromAutocomplete(): Toggle
+
+    /**
+     * @return `true` when chat-suggestion rows in the omnibar autocomplete render a per-type leading icon
+     * (Discussion / ImageGeneration / Voice) instead of the default Discussion icon.
+     * If the remote feature is not present defaults to `true`.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    fun chatSuggestionTypeIcon(): Toggle
+
+    /**
+     * @return `true` when the per-row Rename affordance on the Duck.ai chat history screen is visible.
+     * If the remote feature is not present defaults to `false`.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun renameChat(): Toggle
+
+    /**
+     * Kill switch for opening Duck.ai voice chat when the digital assistant intent is received.
+     * @return `true` when the remote config has the "digitalAssistantDuckAi"
+     * sub-feature flag enabled
+     * If the remote feature is not present defaults to `internal`
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun digitalAssistantDuckAi(): Toggle
+
+    /**
+     * @return `true` when the Duck.ai voice chat foreground service (microphone) should be started
+     * and stopped during a voice session.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun duckAiVoiceChatService(): Toggle
 }

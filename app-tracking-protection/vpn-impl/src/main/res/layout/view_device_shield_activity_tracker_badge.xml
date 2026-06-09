@@ -26,6 +26,7 @@
         android:id="@+id/tracker_company_badge_icon"
         android:layout_width="@dimen/keyline_5"
         android:layout_height="@dimen/keyline_5"
+        android:importantForAccessibility="no"
         android:visibility="gone" />
 
     <com.duckduckgo.common.ui.view.text.DaxTextView

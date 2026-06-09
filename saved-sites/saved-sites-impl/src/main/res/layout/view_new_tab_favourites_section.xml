@@ -69,6 +69,7 @@
         android:layout_height="wrap_content"
         android:visibility="gone"
         tools:visibility="visible"
+        android:contentDescription="@string/newTabFavoritesToggleContentDescription"
         android:layout_marginTop="@dimen/keyline_2"
         android:paddingHorizontal="@dimen/keyline_5">
 
@@ -84,6 +85,7 @@
             android:layout_gravity="center"
             android:background="@drawable/selectable_circular_32dp_shape_container_ripple"
             android:layout_centerHorizontal="true"
+            android:importantForAccessibility="no"
             android:padding="@dimen/keyline_1"
             app:srcCompat="@drawable/ic_chevron_small_down_16"/>
 

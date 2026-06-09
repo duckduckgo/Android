@@ -30,6 +30,12 @@
         <item quantity="many">Jūsų %1$s ir %2$d kitų svetainės žymės negali būti sinchronizuojamos, nes tekstas kai kuriuose laukuose viršija simbolių limitą.</item>
         <item quantity="other">Jūsų %1$s ir %2$d kitų svetainių žymės negali būti sinchronizuojamos, nes tekstas kai kuriuose laukuose viršija simbolių limitą.</item>
     </plurals>
+
+    <!-- Content Descriptions -->
+    <string name="bookmarksSearchMenuContentDescription">Ieškoti žymių</string>
+    <string name="bookmarksAddFolderMenuContentDescription">Pridėti aplanką</string>
+    <string name="bookmarksMenuContentDescription">Daugiau parinkčių</string>
+    <string name="newTabFavoritesToggleContentDescription">Perjungti mėgstamų matomumą</string>
     <string name="saved_site_invalid_items_warning_link"><annotation type="manage_bookmarks">Tvarkyti žymes</annotation></string>
 
     <!-- Bookmarks Activity -->
@@ -124,4 +130,5 @@
     <string name="importBookmarksFromGooglePreImportDialogImportButton">Importuok iš „Google“</string>
     <string name="importBookmarksFromGooglePreImportDialogSelectFileButton">Pasirinkite žymių failą…</string>
     <string name="bookmarksImportDialogClose">Uždaryti</string>
+
 </resources>

@@ -28,6 +28,7 @@ import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import logcat.logcat
 import javax.inject.Inject
 
 interface PageLoadedHandler {
@@ -62,6 +63,7 @@ class RealPageLoadedHandler @Inject constructor(
         activeRequestsOnLoadStart: Int,
         concurrentRequestsOnFinish: Int,
     ) {
+        logcat { "onPageLoaded URL: $url, duration: ${end - start}ms" }
         appCoroutineScope.launch(dispatcherProvider.io()) {
             if (sites.any { UriString.sameOrSubdomain(url, it) }) {
                 pageLoadedPixelDao.add(

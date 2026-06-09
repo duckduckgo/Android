@@ -36,6 +36,7 @@
     <string name="browserMenuPrintSite">Spausdinti</string>
     <string name="browserMenuOpenAppLink">Atidaryti programėlėje</string>
     <string name="browserMenuAddToHome">Pridėti prie pagrindinio ekrano</string>
+    <string name="browserMenuDownloadPdf">Atsisiųsti PDF</string>
     <string name="browserMenuReportBrokenSite">Pranešti apie sugadintą svetainę</string>
     <string name="browserMenuAutofill">Slaptažodžiai</string>
     <string name="browserMenuDownloads">Atsisiuntimai</string>
@@ -56,5 +57,5 @@
     <string name="browserMenuBack">Atgal</string>
     <string name="browserMenuForward">Pirmyn</string>
     <string name="browserMenuRefresh">Atnaujinti</string>
-    <string name="browserMenuFire">Valyti skirtukus ir duomenis</string>
+    <string name="browserMenuFireTabsData">Ištrinti korteles ir duomenis</string>
 </resources>

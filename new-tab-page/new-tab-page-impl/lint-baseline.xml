@@ -74,7 +74,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/com/duckduckgo/newtabpage/impl/shortcuts/NewTabShortcuts.kt"
-            line="61"
+            line="63"
             column="13"/>
     </issue>
 
@@ -85,7 +85,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/com/duckduckgo/newtabpage/impl/shortcuts/NewTabShortcuts.kt"
-            line="63"
+            line="65"
             column="13"/>
     </issue>
 
@@ -105,39 +105,6 @@
         message="Missing density variation folders in `src/main/res`: drawable-mdpi, drawable-xhdpi, drawable-xxhdpi">
         <location
             file="src/main/res"/>
-    </issue>
-
-    <issue
-        id="ContentDescription"
-        message="Missing `contentDescription` attribute on image"
-        errorLine1="            &lt;ImageButton"
-        errorLine2="             ~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/view_configurable_new_tab_page.xml"
-            line="131"
-            column="14"/>
-    </issue>
-
-    <issue
-        id="ContentDescription"
-        message="Missing `contentDescription` attribute on image"
-        errorLine1="    &lt;ImageButton"
-        errorLine2="     ~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/view_configurable_new_tab_page.xml"
-            line="146"
-            column="6"/>
-    </issue>
-
-    <issue
-        id="ContentDescription"
-        message="Missing `contentDescription` attribute on image"
-        errorLine1="    &lt;ImageView"
-        errorLine2="     ~~~~~~~~~">
-        <location
-            file="src/main/res/layout/view_new_tab_setting_manage_shortcut_item.xml"
-            line="32"
-            column="6"/>
     </issue>
 
 </issues>

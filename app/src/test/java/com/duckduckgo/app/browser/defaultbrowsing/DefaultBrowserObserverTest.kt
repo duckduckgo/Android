@@ -45,7 +45,11 @@ class DefaultBrowserObserverTest {
     @Before
     fun setup() {
         MockitoAnnotations.openMocks(this)
-        testee = DefaultBrowserObserver(mockDefaultBrowserDetector, mockAppInstallStore, mockPixel)
+        testee = DefaultBrowserObserver(
+            defaultBrowserDetector = mockDefaultBrowserDetector,
+            appInstallStore = mockAppInstallStore,
+            pixel = mockPixel,
+        )
     }
 
     @Test

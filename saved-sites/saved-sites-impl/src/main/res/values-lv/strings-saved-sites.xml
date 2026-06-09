@@ -29,6 +29,12 @@
         <item quantity="one">Tavu grāmatzīmi vietnei %1$s nevar sinhronizēt, jo kāds no tās laukiem pārsniedz rakstzīmju ierobežojumu.</item>
         <item quantity="other">Tavas grāmatzīmes vietnei %1$s un vēl %2$d vietnēm nevar sinhronizēt, jo daži to lauki pārsniedz rakstzīmju ierobežojumu.</item>
     </plurals>
+
+    <!-- Content Descriptions -->
+    <string name="bookmarksSearchMenuContentDescription">Meklēt grāmatzīmes</string>
+    <string name="bookmarksAddFolderMenuContentDescription">Pievienot mapi</string>
+    <string name="bookmarksMenuContentDescription">Citas iespējas</string>
+    <string name="newTabFavoritesToggleContentDescription">Pārslēgt izlases redzamību</string>
     <string name="saved_site_invalid_items_warning_link"><annotation type="manage_bookmarks">Pārvaldīt grāmatzīmes</annotation></string>
 
     <!-- Bookmarks Activity -->
@@ -120,4 +126,5 @@
     <string name="importBookmarksFromGooglePreImportDialogImportButton">Importēt no Google</string>
     <string name="importBookmarksFromGooglePreImportDialogSelectFileButton">Izvēlies grāmatzīmju failu…</string>
     <string name="bookmarksImportDialogClose">Aizvērt</string>
+
 </resources>

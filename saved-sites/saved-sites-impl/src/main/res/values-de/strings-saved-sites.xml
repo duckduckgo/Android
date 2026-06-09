@@ -28,6 +28,12 @@
         <item quantity="one">Dein Lesezeichen für %1$s kann nicht synchronisiert werden, weil eines seiner Felder das Zeichenlimit überschreitet.</item>
         <item quantity="other">Deine Lesezeichen für %1$s und %2$d andere Websites können nicht synchronisiert werden, weil einige ihrer Felder das Zeichenlimit überschreiten.</item>
     </plurals>
+
+    <!-- Content Descriptions -->
+    <string name="bookmarksSearchMenuContentDescription">Lesezeichen durchsuchen</string>
+    <string name="bookmarksAddFolderMenuContentDescription">Ordner hinzufügen</string>
+    <string name="bookmarksMenuContentDescription">Weitere Optionen</string>
+    <string name="newTabFavoritesToggleContentDescription">Favoriten-Sichtbarkeit umschalten</string>
     <string name="saved_site_invalid_items_warning_link"><annotation type="manage_bookmarks">Lesezeichen verwalten</annotation></string>
 
     <!-- Bookmarks Activity -->
@@ -116,4 +122,5 @@
     <string name="importBookmarksFromGooglePreImportDialogImportButton">Von Google importieren</string>
     <string name="importBookmarksFromGooglePreImportDialogSelectFileButton">Lesezeichendatei auswählen …</string>
     <string name="bookmarksImportDialogClose">Schließen</string>
+
 </resources>

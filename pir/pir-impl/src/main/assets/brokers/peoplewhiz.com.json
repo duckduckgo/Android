@@ -1,7 +1,7 @@
 {
   "name": "PeopleWhiz.com",
   "url": "peoplewhiz.com",
-  "version": "0.8.0",
+  "version": "0.9.0",
   "addedDatetime": 1676160000000,
   "optOutUrl": "https://www.peoplewhiz.com/remove-my-info",
   "steps": [
@@ -99,6 +99,16 @@
           "id": "d04e9122-30e1-49fa-b684-2398b4f96213"
         },
         {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//div[contains(concat(' ', normalize-space(@class), ' '), ' altcha ')]//span[@role='status' and normalize-space(.)='Verified']"
+            }
+          ],
+          "id": "538eadc4-5fdb-44e2-8cf4-d7a65bdea0d7"
+        },
+        {
           "actionType": "click",
           "id": "0d61b830-c740-4d55-a32e-dcc370ff0cdc",
           "elements": [
@@ -144,5 +154,5 @@
     "maintenanceScan": 120,
     "maxAttempts": -1
   },
-  "removedAt": 1763741688379
+  "removedAt": null
 }

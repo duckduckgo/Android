@@ -23,7 +23,7 @@ import com.duckduckgo.app.statistics.wideevents.FlowStatus
 import com.duckduckgo.app.statistics.wideevents.WideEventClient
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.subscriptions.impl.PrivacyProFeature
+import com.duckduckgo.subscriptions.impl.SubscriptionsFeature
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.Lazy
 import dagger.SingleInstanceIn
@@ -47,7 +47,7 @@ interface SubscriptionRestoreWideEvent {
 @ContributesBinding(AppScope::class)
 class SubscriptionRestoreWideEventImpl @Inject constructor(
     private val wideEventClient: WideEventClient,
-    private val privacyProFeature: Lazy<PrivacyProFeature>,
+    private val subscriptionsFeature: Lazy<SubscriptionsFeature>,
     private val dispatchers: DispatcherProvider,
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
 ) : SubscriptionRestoreWideEvent {
@@ -117,7 +117,11 @@ class SubscriptionRestoreWideEventImpl @Inject constructor(
         }
     }
 
-    private suspend fun onRestoreFlowStarted(restorePlatform: String, purchaseAttempt: Boolean, flowEntryPoint: String?) {
+    private suspend fun onRestoreFlowStarted(
+        restorePlatform: String,
+        purchaseAttempt: Boolean,
+        flowEntryPoint: String?,
+    ) {
         getCurrentWideEventId()?.let { wideEventId ->
             wideEventClient.flowFinish(wideEventId = wideEventId, status = FlowStatus.Unknown)
             cachedFlowId = null
@@ -131,6 +135,7 @@ class SubscriptionRestoreWideEventImpl @Inject constructor(
                 metadata = mapOf(
                     KEY_RESTORE_PLATFORM to restorePlatform,
                     KEY_IS_PURCHASE_ATTEMPT to purchaseAttempt.toString(),
+                    KEY_USE_QUERY_PURCHASES to subscriptionsFeature.isUseQueryPurchasesEnabled(dispatchers),
                 ),
             )
             .getOrNull() ?: return
@@ -141,7 +146,7 @@ class SubscriptionRestoreWideEventImpl @Inject constructor(
     }
 
     private suspend fun isFeatureEnabled(): Boolean = withContext(dispatchers.io()) {
-        privacyProFeature.get().sendSubscriptionRestoreWideEvent().isEnabled()
+        subscriptionsFeature.get().sendSubscriptionRestoreWideEvent().isEnabled()
     }
 
     private suspend fun getCurrentWideEventId(): Long? {
@@ -160,6 +165,7 @@ class SubscriptionRestoreWideEventImpl @Inject constructor(
         const val INTERVAL_RESTORE_LATENCY = "restore_latency_ms_bucketed"
         const val KEY_RESTORE_PLATFORM = "restore_platform"
         const val KEY_IS_PURCHASE_ATTEMPT = "is_purchase_attempt"
+        const val KEY_USE_QUERY_PURCHASES = "use_query_purchases"
         const val RESTORE_PLATFORM_GOOGLE_PLAY = "google_play"
         const val RESTORE_PLATFORM_EMAIL_ADDRESS = "email_address"
         const val FLOW_ENTRY_POINT_APP_SETTINGS = "funnel_appsettings_android"

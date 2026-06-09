@@ -258,4 +258,8 @@
     <string name="netpExclusionListLabelAutoExclude">Ei yhteensopiva VPN-verkkojen kanssa</string>
     <string name="netpExclusionListAutoExcludeDescription">Jotkin sovellukset, kuten pankki- tai suoratoistosovellukset, eivät toimi hyvin VPN-verkkojen kanssa. Kun tämä asetus on käytössä, suljemme kyseiset sovellukset automaattisesti pois.</string>
 
+    <!-- Content Descriptions -->
+    <string name="netpCloseButtonContentDescription">Sulje</string>
+    <string name="netpVpnIndicatorContentDescription">VPN-tila-indikaattori</string>
+
 </resources>

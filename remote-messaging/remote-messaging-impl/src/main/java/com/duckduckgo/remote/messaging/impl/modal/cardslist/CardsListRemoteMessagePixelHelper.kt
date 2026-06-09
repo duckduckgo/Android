@@ -20,7 +20,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.remote.messaging.api.CardItem
 import com.duckduckgo.remote.messaging.api.RemoteMessage
-import com.duckduckgo.remote.messaging.api.RemoteMessagingRepository
+import com.duckduckgo.remote.messaging.impl.RemoteMessagingRepository
 import com.duckduckgo.remote.messaging.impl.pixels.RemoteMessagingPixelName
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
@@ -103,7 +103,7 @@ class RealCardsListRemoteMessagePixelHelper @Inject constructor(
 
     companion object {
         private const val PARAM_NAME_MESSAGE_ID = "message"
-        private const val PARAM_NAME_CARD_ID = "card"
+        internal const val PARAM_NAME_CARD_ID = "card"
         internal const val PARAM_NAME_DISMISS_TYPE = "dismissType"
         internal const val PARAM_VALUE_CLOSE_BUTTON = "close_button"
         internal const val PARAM_VALUE_BACK_BUTTON_OR_GESTURE = "back_button_or_gesture"

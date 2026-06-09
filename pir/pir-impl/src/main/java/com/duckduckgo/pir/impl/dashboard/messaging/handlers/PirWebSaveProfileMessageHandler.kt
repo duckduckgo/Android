@@ -17,7 +17,6 @@
 package com.duckduckgo.pir.impl.dashboard.messaging.handlers
 
 import android.content.Context
-import android.content.Intent
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -32,6 +31,7 @@ import com.duckduckgo.pir.impl.models.ProfileQuery
 import com.duckduckgo.pir.impl.scan.PirForegroundScanService
 import com.duckduckgo.pir.impl.scan.PirScanScheduler
 import com.duckduckgo.pir.impl.scheduling.JobRecordUpdater
+import com.duckduckgo.pir.impl.scheduling.PirExecutionType
 import com.duckduckgo.pir.impl.store.PirRepository
 import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.CoroutineScope
@@ -77,6 +77,9 @@ class PirWebSaveProfileMessageHandler @Inject constructor(
         }
 
         appCoroutineScope.launch(dispatcherProvider.io()) {
+            // capture before update so we can tell onboarding (no prior profiles) vs profile edit
+            val hadExistingProfiles = repository.getAllUserProfileQueries().isNotEmpty()
+
             val isProfileUpdateSuccess = handleProfileQueryUpdates()
 
             if (!isProfileUpdateSuccess) {
@@ -93,8 +96,14 @@ class PirWebSaveProfileMessageHandler @Inject constructor(
                 response = PirWebMessageResponse.DefaultResponse.SUCCESS,
             )
 
+            val executionType = if (hadExistingProfiles) {
+                PirExecutionType.MANUAL_EDIT_PROFILE
+            } else {
+                PirExecutionType.MANUAL_INITIAL
+            }
+
             // start the initial scan at this point as startScanAndOptOut message is not reliable
-            startAndScheduleInitialScan()
+            startAndScheduleInitialScan(executionType)
 
             pirWebProfileStateHolder.clear()
         }
@@ -171,8 +180,8 @@ class PirWebSaveProfileMessageHandler @Inject constructor(
         }
     }
 
-    private fun startAndScheduleInitialScan() {
-        context.startForegroundService(Intent(context, PirForegroundScanService::class.java))
+    private fun startAndScheduleInitialScan(executionType: PirExecutionType) {
+        context.startForegroundService(PirForegroundScanService.intentFor(context, executionType))
         scanScheduler.scheduleScans()
     }
 }

@@ -100,6 +100,20 @@ class RealMetricsPixelSenderTest {
     }
 
     @Test
+    fun `NORMAL - pixel not fired when toggle disabled`() = runTest {
+        val enrollmentDate = ZonedDateTime.now(ZoneId.of("America/New_York")).toString()
+        testFeature.experimentFooFeature().setRawStoredState(
+            State(
+                remoteEnableState = false,
+                enable = false,
+                assignedCohort = State.Cohort(name = "control", weight = 1, enrollmentDateET = enrollmentDate),
+            ),
+        )
+        sender.send(metricsPixel(type = MetricType.NORMAL, lowerWindow = 0, upperWindow = 1))
+        assertTrue(fakePixel.firedPixels.isEmpty())
+    }
+
+    @Test
     fun `NORMAL - pixel not fired on second send`() = runTest {
         val pixel = metricsPixel(type = MetricType.NORMAL, lowerWindow = 0, upperWindow = 1)
         sender.send(pixel)
@@ -193,6 +207,23 @@ class RealMetricsPixelSenderTest {
         assertTrue(fakePixel.firedPixels.isEmpty())
     }
 
+    @Test
+    fun `COUNT_WHEN_IN_WINDOW - pixel not fired and count not incremented when toggle disabled`() = runTest {
+        val enrollmentDate = ZonedDateTime.now(ZoneId.of("America/New_York")).toString()
+        testFeature.experimentFooFeature().setRawStoredState(
+            State(
+                remoteEnableState = false,
+                enable = false,
+                assignedCohort = State.Cohort(name = "control", weight = 1, enrollmentDateET = enrollmentDate),
+            ),
+        )
+        val pixel = metricsPixel(type = MetricType.COUNT_WHEN_IN_WINDOW, value = "1", lowerWindow = 0, upperWindow = 1)
+        repeat(3) { sender.send(pixel) }
+        assertTrue(fakePixel.firedPixels.isEmpty())
+        val definition = pixel.getPixelDefinitions().first()
+        assertEquals(0, store.getMetricForPixelDefinition(definition))
+    }
+
     // COUNT_ALWAYS type tests
 
     @Test
@@ -239,6 +270,23 @@ class RealMetricsPixelSenderTest {
         )
         sender.send(metricsPixel(type = MetricType.COUNT_ALWAYS, value = "1", lowerWindow = 0, upperWindow = 1))
         assertTrue(fakePixel.firedPixels.isEmpty())
+    }
+
+    @Test
+    fun `COUNT_ALWAYS - pixel not fired and count not incremented when toggle disabled`() = runTest {
+        val enrollmentDate = ZonedDateTime.now(ZoneId.of("America/New_York")).toString()
+        testFeature.experimentFooFeature().setRawStoredState(
+            State(
+                remoteEnableState = false,
+                enable = false,
+                assignedCohort = State.Cohort(name = "control", weight = 1, enrollmentDateET = enrollmentDate),
+            ),
+        )
+        val pixel = metricsPixel(type = MetricType.COUNT_ALWAYS, value = "1", lowerWindow = 0, upperWindow = 1)
+        repeat(3) { sender.send(pixel) }
+        assertTrue(fakePixel.firedPixels.isEmpty())
+        val definition = pixel.getPixelDefinitions().first()
+        assertEquals(0, store.getMetricForPixelDefinition(definition))
     }
 
     private fun metricsPixel(

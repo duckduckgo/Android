@@ -16,15 +16,27 @@
 
 package com.duckduckgo.app.generalsettings.showonapplaunch
 
+import com.duckduckgo.app.browser.autofill.SystemAutofillEngagement
 import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption.NewTabPage
+import com.duckduckgo.app.generalsettings.showonapplaunch.store.ShowOnAppLaunchOptionDataStore
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.settings.db.SettingsDataStore
+import com.duckduckgo.app.tabs.model.TabRepository
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.browser.api.BrowserLifecycleObserver
+import com.duckduckgo.browsermode.api.BrowserModeDataProvider
+import com.duckduckgo.browsermode.api.BrowserModeStateHolder
+import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.customtabs.api.CustomTabDetector
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.newtabpage.api.NtpAfterIdleManager
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import logcat.logcat
 import org.json.JSONObject
 import javax.inject.Inject
@@ -39,47 +51,123 @@ class FirstScreenHandlerImpl @Inject constructor(
     private val showOnAppLaunchFeature: ShowOnAppLaunchFeature,
     private val settingsDataStore: SettingsDataStore,
     private val showOnAppLaunchOptionHandler: ShowOnAppLaunchOptionHandler,
+    private val showOnAppLaunchOptionDataStore: ShowOnAppLaunchOptionDataStore,
+    private val appBuildConfig: AppBuildConfig,
+    private val dispatcherProvider: DispatcherProvider,
+    private val duckChat: DuckChat,
+    private val tabRepositoryProvider: BrowserModeDataProvider<TabRepository>,
+    private val ntpAfterIdleManager: NtpAfterIdleManager,
+    private val systemAutofillEngagement: SystemAutofillEngagement,
+    private val customTabDetector: CustomTabDetector,
+    private val browserModeStateHolder: BrowserModeStateHolder,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : BrowserLifecycleObserver {
 
+    private val tabRepository: TabRepository
+        get() = tabRepositoryProvider.forMode(browserModeStateHolder.currentMode.value)
+
     override fun onOpen(isFreshLaunch: Boolean) {
+        // Notify the NtpAfterIdleManager synchronously on a fresh launch when the currently
+        // selected tab is already an NTP: BrowserViewModel's flowSelectedTab subscription will
+        // fire onNtpShown immediately on activity recreation, and the async handler path below
+        // doesn't run in time to classify it.
+        //
+        // Restricted to isFreshLaunch=true: on plain background+resume, NtpAfterIdleManager
+        // preserves the prior session's classification, so the existing _isAfterIdleReturn value
+        // is correct without a fresh trigger. Setting pendingAfterIdle here would leak — no
+        // onNtpShown fires (same NTP tab), and the next user action that DOES show an NTP
+        // (e.g. opening a new tab manually) would incorrectly consume the stale pending flag.
+        if (isFreshLaunch &&
+            androidBrowserConfigFeature.showNTPAfterIdleReturn().isEnabled() &&
+            computeWasIdle() &&
+            isCurrentSelectedTabNtp()
+        ) {
+            ntpAfterIdleManager.onIdleReturnTriggered()
+        }
         appCoroutineScope.launch {
+            logcat { "FirstScreen: onOpen isFreshLaunch $isFreshLaunch" }
+            // Persist the new-user default eagerly so screens that read optionFlow
+            // (e.g. GeneralSettings) don't fall back to LastOpenedTab before the
+            // after-inactivity flow has had a chance to run.
+            ensureNewUserDefault()
             handleFirstScreen(isFreshLaunch)
         }
     }
 
+    private suspend fun ensureNewUserDefault() {
+        val ntpAfterIdleEnabled = androidBrowserConfigFeature.showNTPAfterIdleReturn().isEnabled()
+        if (ntpAfterIdleEnabled && appBuildConfig.isNewInstall() && !showOnAppLaunchOptionDataStore.hasOptionSelected()) {
+            logcat { "FirstScreen: setting New Tab for new users" }
+            showOnAppLaunchOptionDataStore.setShowOnAppLaunchOption(NewTabPage)
+        }
+    }
+
+    private fun isCurrentSelectedTabNtp(): Boolean {
+        return tabRepository.liveSelectedTab.value?.url.isNullOrBlank()
+    }
+
+    private fun computeWasIdle(): Boolean {
+        val timeoutMs = getTimeoutSeconds() * 1000
+        val lastBackgrounded = settingsDataStore.lastSessionBackgroundTimestamp
+        val elapsed = System.currentTimeMillis() - lastBackgrounded
+        return lastBackgrounded != 0L && elapsed >= timeoutMs
+    }
+
     private suspend fun handleFirstScreen(isFreshLaunch: Boolean) {
         if (androidBrowserConfigFeature.showNTPAfterIdleReturn().isEnabled()) {
-            val timeoutMs = getTimeoutMs()
             val lastBackgrounded = settingsDataStore.lastSessionBackgroundTimestamp
-            logcat { "FirstScreen: timeout is $timeoutMs and lastBackgrounded is $lastBackgrounded" }
-            val elapsed = System.currentTimeMillis() - lastBackgrounded
-            logcat { "FirstScreen: time elapsed $elapsed" }
-            if (lastBackgrounded == 0L || elapsed >= timeoutMs) {
-                logcat { "FirstScreen: handleAppLaunchOption" }
+            val wasIdle = computeWasIdle()
+            if (lastBackgrounded == 0L || wasIdle) {
+                if (!isVoiceSessionActiveOnCurrentTab() && !isActiveTabCustomTab()) {
+                    showOnAppLaunchOptionHandler.handleAfterInactivityOption(wasIdle = wasIdle)
+                }
+                return
+            }
+        } else if (isFreshLaunch && showOnAppLaunchFeature.self().isEnabled()) {
+            if (!isVoiceSessionActiveOnCurrentTab()) {
                 showOnAppLaunchOptionHandler.handleAppLaunchOption()
             }
-            return
         }
+    }
 
-        if (isFreshLaunch && showOnAppLaunchFeature.self().isEnabled()) {
-            showOnAppLaunchOptionHandler.handleAppLaunchOption()
-        }
+    private suspend fun isVoiceSessionActiveOnCurrentTab(): Boolean = withContext(dispatcherProvider.io()) {
+        val selectedTab = tabRepository.getSelectedTab()
+        return@withContext selectedTab?.tabId?.let {
+            duckChat.isVoiceChatSessionActive(it)
+        } == true
+    }
+
+    private suspend fun isActiveTabCustomTab(): Boolean = withContext(dispatcherProvider.io()) {
+        return@withContext customTabDetector.isCustomTab()
     }
 
     override fun onClose() {
-        settingsDataStore.lastSessionBackgroundTimestamp = System.currentTimeMillis()
+        systemAutofillEngagement.clearIdleReturnTriggered()
+        appCoroutineScope.launch(dispatcherProvider.io()) {
+            settingsDataStore.lastSessionBackgroundTimestamp = System.currentTimeMillis()
+        }
     }
 
-    private fun getTimeoutMs(): Long {
-        val settings = androidBrowserConfigFeature.showNTPAfterIdleReturn().getSettings()
-            ?: return DEFAULT_TIMEOUT_MS
-        return runCatching {
-            JSONObject(settings).getLong("defaultIdleThresholdSeconds") * 1000
-        }.getOrDefault(DEFAULT_TIMEOUT_MS)
+    private fun getTimeoutSeconds(): Long {
+        val userPref = settingsDataStore.userSelectedIdleThresholdSeconds
+        if (userPref != null) return userPref
+
+        return parseDefaultIdleThresholdSeconds(androidBrowserConfigFeature.showNTPAfterIdleReturn().getSettings())
+            ?: DEFAULT_IDLE_THRESHOLD_SECONDS
     }
 
     companion object {
-        private const val DEFAULT_TIMEOUT_MS = 5 * 60 * 1000L // 5 minutes
+        const val DEFAULT_IDLE_THRESHOLD_SECONDS = 300L
+        val DEFAULT_IDLE_THRESHOLD_OPTIONS = listOf(0L, 60L, 300L, 600L, 1800L, 3600L, 43200L, 86400L)
+
+        fun parseDefaultIdleThresholdSeconds(settingsJson: String?): Long? {
+            if (settingsJson == null) return null
+            return try {
+                val json = JSONObject(settingsJson)
+                if (json.has("defaultIdleThresholdSeconds")) json.getLong("defaultIdleThresholdSeconds") else null
+            } catch (e: Exception) {
+                null
+            }
+        }
     }
 }

@@ -1,7 +1,7 @@
 {
   "name": "Centeda",
   "url": "centeda.com",
-  "version": "0.90.0",
+  "version": "0.91.0",
   "addedDatetime": 1677736800000,
   "optOutUrl": "https://centeda.com/ng/control/privacy",
   "steps": [
@@ -22,6 +22,17 @@
             "71-80",
             "81+"
           ]
+        },
+        {
+          "actionType": "expectation",
+          "_comment": "wait for cloudflare check to pass - we are using a negative xpath selector to ensure the challenge is not being displayed",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//body[not(.//script[contains(@src, '/cdn-cgi/challenge-platform/')]) and not(.//script[contains(., '_cf_chl_opt')])]"
+            }
+          ],
+          "id": "cfc-cb72ba41-7692-44ca-a7f7-646c3f295852"
         },
         {
           "actionType": "expectation",
@@ -80,11 +91,11 @@
           "expectations": [
             {
               "type": "element",
-              "selector": ".page-title",
-              "parent": ".search-page"
+              "selector": ".logo",
+              "parent": "header"
             }
           ],
-          "id": "eeeef2aa-1360-4e5e-912b-28b3e067c941"
+          "id": "b8a4d47e-cbe0-43c3-ba3e-86191946f1e9"
         },
         {
           "actionType": "click",

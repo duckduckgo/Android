@@ -5,112 +5,112 @@
         "owners": ["muodov"],
         "triggers": ["page_load"],
         "suffixes": ["form_factor"],
-        "parameters": ["appVersion", "atb"]
+        "parameters": ["appVersion"]
     },
     "m_autoconsent_disabled-for-site_daily": {
         "description": "Fires when autoconsent is not run because the feature is disabled for the site via config.",
         "owners": ["muodov"],
         "triggers": ["page_load"],
         "suffixes": ["form_factor"],
-        "parameters": ["appVersion", "atb"]
+        "parameters": ["appVersion"]
     },
     "m_autoconsent_popup-found_daily": {
         "description": "Fires when autoconsent found an open popup on a page.",
         "owners": ["muodov"],
         "triggers": ["page_load"],
         "suffixes": ["form_factor"],
-        "parameters": ["appVersion", "atb"]
+        "parameters": ["appVersion"]
     },
     "m_autoconsent_error_optout_daily": {
         "description": "Fires when the rule opt-out steps hit an error.",
         "owners": ["muodov"],
         "triggers": ["page_load"],
         "suffixes": ["form_factor"],
-        "parameters": ["appVersion", "atb"]
+        "parameters": ["appVersion"]
     },
     "m_autoconsent_done_daily": {
         "description": "Fires when autoconsent successfully opts out of a popup.",
         "owners": ["muodov"],
         "triggers": ["page_load"],
         "suffixes": ["form_factor"],
-        "parameters": ["appVersion", "atb"]
+        "parameters": ["appVersion"]
     },
     "m_autoconsent_done_cosmetic_daily": {
         "description": "Fires when autoconsent successfully dismisses a cosmetic popup.",
         "owners": ["muodov"],
         "triggers": ["page_load"],
         "suffixes": ["form_factor"],
-        "parameters": ["appVersion", "atb"]
+        "parameters": ["appVersion"]
     },
     "m_autoconsent_done_heuristic_daily": {
         "description": "Fires when autoconsent on-device heuristic successfully dismisses a popup.",
         "owners": ["muodov"],
         "triggers": ["page_load"],
         "suffixes": ["form_factor"],
-        "parameters": ["appVersion", "atb"]
+        "parameters": ["appVersion"]
     },
     "m_autoconsent_animation-shown_daily": {
         "description": "Fires when the autoconsent URLbar animation is shown after a non-cosmetic opt-out.",
         "owners": ["muodov"],
         "triggers": ["page_load"],
         "suffixes": ["form_factor"],
-        "parameters": ["appVersion", "atb"]
+        "parameters": ["appVersion"]
     },
     "m_autoconsent_animation-shown_cosmetic_daily": {
         "description": "Fires when the autoconsent URLbar animation is shown after a cosmetic popup dismissal.",
         "owners": ["muodov"],
         "triggers": ["page_load"],
         "suffixes": ["form_factor"],
-        "parameters": ["appVersion", "atb"]
+        "parameters": ["appVersion"]
     },
     "m_autoconsent_self-test-ok_daily": {
         "description": "Fires when the autoconsent self-test passes.",
         "owners": ["muodov"],
         "triggers": ["page_load"],
         "suffixes": ["form_factor"],
-        "parameters": ["appVersion", "atb"]
+        "parameters": ["appVersion"]
     },
     "m_autoconsent_self-test-fail_daily": {
         "description": "Fires when the autoconsent self-test fails.",
         "owners": ["muodov"],
         "triggers": ["page_load"],
         "suffixes": ["form_factor"],
-        "parameters": ["appVersion", "atb"]
+        "parameters": ["appVersion"]
     },
     "m_autoconsent_error_multiple-popups_daily": {
         "description": "Autoconsent error state when multiple valid rules were matched on a page.",
         "owners": ["muodov"],
         "triggers": ["page_load"],
         "suffixes": ["form_factor"],
-        "parameters": ["appVersion", "atb"]
+        "parameters": ["appVersion"]
     },
     "m_autoconsent_detected-by-patterns_daily": {
         "description": "Fires when heuristic patterns match on a page.",
         "owners": ["muodov"],
         "triggers": ["page_load"],
         "suffixes": ["form_factor"],
-        "parameters": ["appVersion", "atb"]
+        "parameters": ["appVersion"]
     },
     "m_autoconsent_detected-by-both_daily": {
         "description": "Fires when both heuristic patterns and a popup is found on a page.",
         "owners": ["muodov"],
         "triggers": ["page_load"],
         "suffixes": ["form_factor"],
-        "parameters": ["appVersion", "atb"]
+        "parameters": ["appVersion"]
     },
     "m_autoconsent_detected-only-rules_daily": {
         "description": "Fires when a popup is found but no heuristic patterns match on a page.",
         "owners": ["muodov"],
         "triggers": ["page_load"],
         "suffixes": ["form_factor"],
-        "parameters": ["appVersion", "atb"]
+        "parameters": ["appVersion"]
     },
     "m_autoconsent_error_reload-loop_daily": {
         "description": "Fires when the autoconsent reload loop is detected.",
         "owners": ["muodov"],
         "triggers": ["page_load"],
         "suffixes": ["form_factor"],
-        "parameters": ["appVersion", "atb"]
+        "parameters": ["appVersion"]
     },
     "m_autoconsent_summary": {
         "description": "Fires periodically with counts of autoconsent metrics accumulated over 2 minutes.",
@@ -119,7 +119,6 @@
         "suffixes": ["form_factor"],
         "parameters": [
             "appVersion",
-            "atb",
             {
                 "key": "init",
                 "description": "Number of autoconsent init events.",

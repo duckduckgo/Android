@@ -1,7 +1,7 @@
 {
   "name": "USPhoneBook",
   "url": "usphonebook.com",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "parent": "peoplefinders.com",
   "addedDatetime": 1678082400000,
   "optOutUrl": "https://www.usphonebook.com/opt-out",
@@ -13,7 +13,7 @@
         {
           "actionType": "navigate",
           "id": "98a804b2-115c-4c2c-8e97-3f3679cd3fbb",
-          "url": "https://www.usphonebook.com/${firstName}-${lastName}/${state|stateFull}/${city}"
+          "url": "https://www.usphonebook.com/${firstName|hyphenated}-${lastName|hyphenated}/${state|upcase}/${city|hyphenated}"
         },
         {
           "actionType": "extract",

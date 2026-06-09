@@ -28,6 +28,7 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import com.duckduckgo.duckchat.impl.feature.DuckAiChatHistoryFeature
+import com.duckduckgo.duckchat.impl.feature.maxHistoryCount
 import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.ChatSuggestion
 import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
@@ -73,7 +74,7 @@ class RealChatSuggestionsReader @Inject constructor(
     @SuppressLint("SetJavaScriptEnabled")
     override suspend fun fetchSuggestions(query: String): List<ChatSuggestion> {
         return withContext(dispatchers.main()) {
-            val maxSuggestions = getMaxHistoryCount()
+            val maxSuggestions = duckAiChatHistoryFeature.maxHistoryCount()
             val script = getScript()
             val wv = getOrCreateWebView(script)
 
@@ -133,15 +134,6 @@ class RealChatSuggestionsReader @Inject constructor(
             }
         }
         return """{"features":{"duckAiChatHistory":{"state":"$state","exceptions":$exceptions,"settings":$settings}},"unprotectedTemporary":[]}"""
-    }
-
-    @VisibleForTesting
-    internal fun getMaxHistoryCount(): Int {
-        return runCatching {
-            duckAiChatHistoryFeature.self().getSettings()?.let {
-                JSONObject(it).optInt(MAX_HISTORY_COUNT_KEY, DEFAULT_MAX_SUGGESTIONS)
-            }
-        }.getOrNull() ?: DEFAULT_MAX_SUGGESTIONS
     }
 
     private fun getUserPreferencesJson(): String {
@@ -315,7 +307,6 @@ class RealChatSuggestionsReader @Inject constructor(
         private const val FEATURE_NAME = "duckAiChatHistory"
         private const val SUBSCRIPTION_GET_CHATS = "getDuckAiChats"
         private const val METHOD_CHATS_RESULT = "duckAiChatsResult"
-        private const val MAX_HISTORY_COUNT_KEY = "maxHistoryCount"
         private const val DEFAULT_MAX_SUGGESTIONS = 10
         private const val FETCH_TIMEOUT_MS = 3000L
         private const val SEVEN_DAYS_MS = 7L * 24 * 60 * 60 * 1000

@@ -28,6 +28,7 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.BrowserWebViewClient
 import com.duckduckgo.app.browser.databinding.ActivityWebviewBinding
+import com.duckduckgo.app.browser.mode.InAppNavigation
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.browser.api.ui.BrowserScreens.WebViewActivityWithParams
 import com.duckduckgo.common.ui.DuckDuckGoActivity
@@ -81,7 +82,7 @@ class WebViewActivity : DuckDuckGoActivity() {
                         view?.requestFocusNodeHref(resultMsg)
                         val newWindowUrl = resultMsg?.data?.getString("url")
                         if (newWindowUrl != null) {
-                            startActivity(BrowserActivity.intent(this@WebViewActivity, newWindowUrl))
+                            startActivity(BrowserActivity.intent(this@WebViewActivity, launchSource = InAppNavigation, queryExtra = newWindowUrl))
                             return true
                         }
                         return false

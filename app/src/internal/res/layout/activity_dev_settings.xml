@@ -109,19 +109,6 @@
                 app:secondaryText="@string/devSettingsScreenPrivacyRemoteConfigUrlOverrideSubtitle"
                 />
 
-            <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
-                android:id="@+id/duckAiTitle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:primaryText="@string/devSettingsDuckAiSection" />
-
-            <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
-                android:id="@+id/overrideDuckAiUrl"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:primaryText="@string/devSettingsDuckAiUrlOverrideTitle"
-                app:secondaryText="@string/devSettingsDuckAiUrlOverrideSubtitle" />
-
             <com.duckduckgo.common.ui.view.divider.HorizontalDivider
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

@@ -70,7 +70,6 @@ class AppRemoteMessagingRepositoryTest {
     private val testee = AppRemoteMessagingRepository(
         remoteMessagingConfigRepository,
         dao,
-        coroutineRule.testDispatcherProvider,
         getMessageMapper(),
         remoteMessageImageStore,
     )
@@ -451,6 +450,25 @@ class AppRemoteMessagingRepositoryTest {
         testee.clearMessageImage(Surface.MODAL)
 
         verify(remoteMessageImageStore).clearStoredImageFile(Surface.MODAL)
+    }
+
+    @Test
+    fun whenGetCardItemImageFilePathThenReturnImagePathFromImageStore() = runTest {
+        whenever(remoteMessageImageStore.getCardItemImageFilePath("item1")).thenReturn("/path/to/item1.png")
+
+        val result = testee.getCardItemImageFilePath("item1")
+
+        assertEquals("/path/to/item1.png", result)
+        verify(remoteMessageImageStore).getCardItemImageFilePath("item1")
+    }
+
+    @Test
+    fun whenGetCardItemImageFilePathReturnNullWhenStoreReturnsNull() = runTest {
+        whenever(remoteMessageImageStore.getCardItemImageFilePath("item1")).thenReturn(null)
+
+        val result = testee.getCardItemImageFilePath("item1")
+
+        assertNull(result)
     }
 
     companion object {

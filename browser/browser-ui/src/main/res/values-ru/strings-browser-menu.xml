@@ -36,6 +36,7 @@
     <string name="browserMenuPrintSite">Распечатать</string>
     <string name="browserMenuOpenAppLink">Открыть в приложении</string>
     <string name="browserMenuAddToHome">Добавить на домашнюю страницу</string>
+    <string name="browserMenuDownloadPdf">Скачать PDF</string>
     <string name="browserMenuReportBrokenSite">Сообщить о неработающем сайте</string>
     <string name="browserMenuAutofill">Пароли</string>
     <string name="browserMenuDownloads">Загрузки</string>
@@ -56,5 +57,5 @@
     <string name="browserMenuBack">Назад</string>
     <string name="browserMenuForward">Вперёд</string>
     <string name="browserMenuRefresh">Обновить</string>
-    <string name="browserMenuFire">Сбросить вкладки и данные</string>
+    <string name="browserMenuFireTabsData">Удалить вкладки и данные</string>
 </resources>

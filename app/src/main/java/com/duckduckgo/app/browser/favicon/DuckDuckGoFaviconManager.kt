@@ -167,12 +167,20 @@ class DuckDuckGoFaviconManager constructor(
         view: ImageView,
         placeholder: String?,
     ) {
-        val bitmap = loadFromDisk(tabId = null, url = url)
-        if (bitmap == null && faviconsFetchingStore.isFaviconsFetchingEnabled) {
+        val domain = url.extractDomain() ?: return
+        var faviconFile = withContext(dispatcherProvider.io()) {
+            faviconPersister.faviconFile(FAVICON_PERSISTED_DIR, NO_SUBFOLDER, domain)
+        }
+        if (faviconFile == null && faviconsFetchingStore.isFaviconsFetchingEnabled) {
             tryFetchFaviconForUrl(url)
-            view.loadFavicon(loadFromDisk(tabId = null, url = url), url, placeholder)
+            faviconFile = withContext(dispatcherProvider.io()) {
+                faviconPersister.faviconFile(FAVICON_PERSISTED_DIR, NO_SUBFOLDER, domain)
+            }
+        }
+        if (faviconFile != null) {
+            view.loadFavicon(faviconFile, url, placeholder)
         } else {
-            view.loadFavicon(bitmap, url, placeholder)
+            view.loadFavicon(null as Bitmap?, url, placeholder)
         }
     }
 
@@ -189,6 +197,21 @@ class DuckDuckGoFaviconManager constructor(
                     if (bitmap != null) {
                         view.loadFavicon(bitmap, url, placeholder)
                     }
+                }
+            }
+        }
+    }
+
+    override suspend fun loadToViewFromLocalWithRetry(tabId: String?, url: String, view: ImageView, placeholder: String?) {
+        var bitmap = loadFromDisk(tabId, url)
+        view.loadFavicon(bitmap, url, placeholder)
+
+        repeat(FAVICON_LOAD_RETRIES) {
+            if (bitmap == null) {
+                delay(FAVICON_LOAD_RETRY_DELAY)
+                bitmap = loadFromDisk(tabId, url)
+                if (bitmap != null) {
+                    view.loadFavicon(bitmap, url, placeholder)
                 }
             }
         }

@@ -36,6 +36,7 @@
     <string name="browserMenuPrintSite">Prindi</string>
     <string name="browserMenuOpenAppLink">Ava rakenduses</string>
     <string name="browserMenuAddToHome">Lisa kodukuvale</string>
+    <string name="browserMenuDownloadPdf">Laadi alla PDF</string>
     <string name="browserMenuReportBrokenSite">Teata mittetoimivast saidist</string>
     <string name="browserMenuAutofill">Paroolid</string>
     <string name="browserMenuDownloads">Allalaadimised</string>
@@ -56,5 +57,5 @@
     <string name="browserMenuBack">Tagasi</string>
     <string name="browserMenuForward">Edasi</string>
     <string name="browserMenuRefresh">Värskenda</string>
-    <string name="browserMenuFire">Kustuta vahekaardid ja andmed</string>
+    <string name="browserMenuFireTabsData">Kustuta vahekaardid ja andmed</string>
 </resources>

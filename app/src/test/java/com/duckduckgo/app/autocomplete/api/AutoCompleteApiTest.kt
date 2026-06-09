@@ -22,10 +22,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.autocomplete.AutocompleteTabsFeature
 import com.duckduckgo.app.autocomplete.impl.AutoCompletePixelNames
-import com.duckduckgo.app.autocomplete.impl.AutoCompleteRepository
-import com.duckduckgo.app.onboarding.store.AppStage
-import com.duckduckgo.app.onboarding.store.AppStage.NEW
-import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
 import com.duckduckgo.app.systemsearch.DeviceApp
@@ -38,10 +34,12 @@ import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggesti
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteDeviceAppSuggestion
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteHistorySearchSuggestion
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteHistorySuggestion
-import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteInAppMessageSuggestion
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteSearchSuggestion
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteUrlSuggestion.AutoCompleteBookmarkSuggestion
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteUrlSuggestion.AutoCompleteSwitchToTabSuggestion
+import com.duckduckgo.browsermode.api.BrowserMode
+import com.duckduckgo.browsermode.api.BrowserModeDataProvider
+import com.duckduckgo.browsermode.api.BrowserModeStateHolder
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.DefaultDispatcherProvider
 import com.duckduckgo.common.utils.formatters.time.DatabaseDateFormatter
@@ -54,10 +52,13 @@ import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
 import com.duckduckgo.savedsites.api.models.SavedSitesNames
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -87,13 +88,18 @@ class AutoCompleteApiTest {
     private lateinit var mockNavigationHistory: NavigationHistory
 
     @Mock
-    private lateinit var mockAutoCompleteRepository: AutoCompleteRepository
-
-    @Mock
     private lateinit var mockTabRepository: TabRepository
 
     @Mock
-    private lateinit var mockUserStageStore: UserStageStore
+    private lateinit var mockFireTabRepository: TabRepository
+
+    @Mock
+    private lateinit var mockTabRepositoryProvider: BrowserModeDataProvider<TabRepository>
+
+    @Mock
+    private lateinit var mockBrowserModeStateHolder: BrowserModeStateHolder
+
+    private val currentModeFlow = MutableStateFlow(BrowserMode.REGULAR)
 
     @Mock
     private lateinit var mockAutocompleteTabsFeature: AutocompleteTabsFeature
@@ -127,8 +133,10 @@ class AutoCompleteApiTest {
         whenever(mockTabRepository.flowTabs).thenReturn(flowOf(listOf(TabEntity("1", position = 1))))
         whenever(mockNavigationHistory.getHistory()).thenReturn(flowOf(emptyList()))
         whenever(mockTabRepository.liveTabs).thenReturn(tabsLiveData)
+        whenever(mockBrowserModeStateHolder.currentMode).thenReturn(currentModeFlow)
+        whenever(mockTabRepositoryProvider.forMode(BrowserMode.REGULAR)).thenReturn(mockTabRepository)
+        whenever(mockTabRepositoryProvider.forMode(BrowserMode.FIRE)).thenReturn(mockFireTabRepository)
         runTest {
-            whenever(mockUserStageStore.getUserAppStage()).thenReturn(NEW)
             whenever(mockDeviceAppLookup.query(any())).thenReturn(emptyList())
         }
         whenever(mockAutocompleteTabsFeature.self()).thenReturn(mockToggle)
@@ -1215,170 +1223,6 @@ class AutoCompleteApiTest {
     }
 
     @Test
-    fun testWhenAutoCompleteAndHistoryResultsAvailableAndSeenCountLessThan3AndIAMNotDismissedAndExistingUserThenInAppMessageIsPrepended() {
-        runTest {
-            whenever(mockAutoCompleteRepository.countHistoryInAutoCompleteIAMShown()).thenReturn(0)
-            whenever(mockAutoCompleteRepository.wasHistoryInAutoCompleteIAMDismissed()).thenReturn(false)
-            whenever(mockAutoCompleteService.autoComplete("title")).thenReturn(emptyList())
-            whenever(mockNavigationHistory.getHistory()).thenReturn(
-                flowOf(
-                    listOf(
-                        VisitedPage(
-                            title = "title",
-                            url = "https://bar.com".toUri(),
-                            visits = listOf(LocalDateTime.now(), LocalDateTime.now()),
-                        ),
-                        VisitedPage(
-                            title = "title",
-                            url = "https://foo.com".toUri(),
-                            visits = listOf(LocalDateTime.now(), LocalDateTime.now()),
-                        ),
-                    ),
-                ),
-            )
-            whenever(mockSavedSitesRepository.getFavorites()).thenReturn(flowOf(emptyList()))
-            whenever(mockSavedSitesRepository.getBookmarks()).thenReturn(flowOf(emptyList()))
-            whenever(mockUserStageStore.getUserAppStage()).thenReturn(AppStage.ESTABLISHED)
-
-            val result = testee.autoComplete("title")
-            val value = result.first()
-
-            assertEquals(
-                listOf(
-                    AutoCompleteInAppMessageSuggestion,
-                    AutoCompleteHistorySuggestion(phrase = "bar.com", "title", "https://bar.com", isAllowedInTopHits = true),
-                    AutoCompleteHistorySuggestion(phrase = "foo.com", "title", "https://foo.com", isAllowedInTopHits = true),
-                ),
-                value.suggestions,
-            )
-        }
-    }
-
-    @Test
-    fun testWhenAutoCompleteAndHistoryResultsAvailableAndSeenCountLessThan3AndIAMNotDismissedAndExistingUserThenInAppMessageIsNotPrepended() {
-        runTest {
-            whenever(mockAutoCompleteRepository.countHistoryInAutoCompleteIAMShown()).thenReturn(0)
-            whenever(mockAutoCompleteRepository.wasHistoryInAutoCompleteIAMDismissed()).thenReturn(false)
-            whenever(mockAutoCompleteService.autoComplete("title")).thenReturn(emptyList())
-            whenever(mockNavigationHistory.getHistory()).thenReturn(
-                flowOf(
-                    listOf(
-                        VisitedPage(
-                            title = "title",
-                            url = "https://bar.com".toUri(),
-                            visits = listOf(LocalDateTime.now(), LocalDateTime.now()),
-                        ),
-                        VisitedPage(
-                            title = "title",
-                            url = "https://foo.com".toUri(),
-                            visits = listOf(LocalDateTime.now(), LocalDateTime.now()),
-                        ),
-                    ),
-                ),
-            )
-            whenever(mockSavedSitesRepository.getFavorites()).thenReturn(flowOf(emptyList()))
-            whenever(mockSavedSitesRepository.getBookmarks()).thenReturn(flowOf(emptyList()))
-            whenever(mockUserStageStore.getUserAppStage()).thenReturn(AppStage.DAX_ONBOARDING)
-
-            val result = testee.autoComplete("title")
-            val value = result.first()
-
-            assertEquals(
-                listOf(
-                    AutoCompleteHistorySuggestion(phrase = "bar.com", "title", "https://bar.com", isAllowedInTopHits = true),
-                    AutoCompleteHistorySuggestion(phrase = "foo.com", "title", "https://foo.com", isAllowedInTopHits = true),
-                ),
-                value.suggestions,
-            )
-        }
-    }
-
-    @Test
-    fun testWhenAutoCompleteAndHistoryResultsAvailableAndSeenCount3AndIAMNotDismissedThenInAppMessageIsNotPrepended() {
-        runTest {
-            whenever(mockAutoCompleteRepository.countHistoryInAutoCompleteIAMShown()).thenReturn(3)
-            whenever(mockAutoCompleteRepository.wasHistoryInAutoCompleteIAMDismissed()).thenReturn(false)
-            whenever(mockAutoCompleteService.autoComplete("title")).thenReturn(emptyList())
-            whenever(mockNavigationHistory.getHistory()).thenReturn(
-                flowOf(
-                    listOf(
-                        VisitedPage(
-                            title = "title",
-                            url = "https://bar.com".toUri(),
-                            visits = listOf(LocalDateTime.now(), LocalDateTime.now()),
-                        ),
-                        VisitedPage(
-                            title = "title",
-                            url = "https://foo.com".toUri(),
-                            visits = listOf(LocalDateTime.now(), LocalDateTime.now()),
-                        ),
-                    ),
-                ),
-            )
-            whenever(mockSavedSitesRepository.getFavorites()).thenReturn(flowOf(emptyList()))
-            whenever(mockSavedSitesRepository.getBookmarks()).thenReturn(flowOf(emptyList()))
-
-            val result = testee.autoComplete("title")
-            val value = result.first()
-
-            assertEquals(
-                listOf(
-                    AutoCompleteHistorySuggestion(phrase = "bar.com", "title", "https://bar.com", isAllowedInTopHits = true),
-                    AutoCompleteHistorySuggestion(phrase = "foo.com", "title", "https://foo.com", isAllowedInTopHits = true),
-                ),
-                value.suggestions,
-            )
-        }
-    }
-
-    @Test
-    fun testWhenAutoCompleteAndHistoryResultsAvailableAndSeenCountLessThan3AndIAMDismissedThenInAppMessageIsNotPrepended() {
-        runTest {
-            whenever(mockAutoCompleteRepository.countHistoryInAutoCompleteIAMShown()).thenReturn(0)
-            whenever(mockAutoCompleteRepository.wasHistoryInAutoCompleteIAMDismissed()).thenReturn(true)
-            whenever(mockAutoCompleteService.autoComplete("title")).thenReturn(emptyList())
-            whenever(mockNavigationHistory.getHistory()).thenReturn(
-                flowOf(
-                    listOf(
-                        VisitedPage(
-                            title = "title",
-                            url = "https://bar.com".toUri(),
-                            visits = listOf(LocalDateTime.now(), LocalDateTime.now()),
-                        ),
-                        VisitedPage(
-                            title = "title",
-                            url = "https://foo.com".toUri(),
-                            visits = listOf(LocalDateTime.now(), LocalDateTime.now()),
-                        ),
-                    ),
-                ),
-            )
-            whenever(mockSavedSitesRepository.getFavorites()).thenReturn(flowOf(emptyList()))
-            whenever(mockSavedSitesRepository.getBookmarks()).thenReturn(flowOf(emptyList()))
-
-            val result = testee.autoComplete("title")
-            val value = result.first()
-
-            assertEquals(
-                listOf(
-                    AutoCompleteHistorySuggestion(phrase = "bar.com", "title", "https://bar.com", isAllowedInTopHits = true),
-                    AutoCompleteHistorySuggestion(phrase = "foo.com", "title", "https://foo.com", isAllowedInTopHits = true),
-                ),
-                value.suggestions,
-            )
-        }
-    }
-
-    @Test
-    fun testUserSeenHistoryThenCallRepositoryUserSeenHistory() {
-        runTest {
-            testee.submitUserSeenHistoryIAM()
-
-            verify(mockAutoCompleteRepository).submitUserSeenHistoryIAM()
-        }
-    }
-
-    @Test
     fun whenOtherExceptionThenReturnDefaultSuggestion() = runTest {
         val query = "example title foo"
         whenever(mockAutoCompleteService.autoComplete(query)).thenThrow(RuntimeException())
@@ -2237,9 +2081,8 @@ class AutoCompleteApiTest {
             mockSavedSitesRepository,
             mockNavigationHistory,
             RealAutoCompleteScorer(),
-            mockAutoCompleteRepository,
-            mockTabRepository,
-            mockUserStageStore,
+            mockTabRepositoryProvider,
+            mockBrowserModeStateHolder,
             mockAutocompleteTabsFeature,
             mockDuckChat,
             mockHistory,

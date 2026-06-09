@@ -1,0 +1,14 @@
+appId: com.duckduckgo.mobile.android
+---
+# Confirms clearing all data in the fire dialog.
+# Handles both the legacy dialog (Delete Tabs and Data) and the single-tab dialog (Delete All).
+- runFlow:
+    when:
+        visible: "Delete Tabs and Data"
+    commands:
+        - tapOn: "Delete Tabs and Data"
+- runFlow:
+    when:
+        visible: "Delete All"
+    commands:
+        - tapOn: "Delete All"

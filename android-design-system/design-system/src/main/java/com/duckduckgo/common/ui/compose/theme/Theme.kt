@@ -113,11 +113,16 @@ fun DuckDuckGoTheme(
             white = White,
             destructive = AlertRedOnLightDefault,
             text = White,
+            disabled = colorResource(R.color.icon_tertiary_light),
         ),
         system = DuckDuckGoSystemColors(
             lines = colorResource(R.color.lines_light),
+            switchTrackOn = Blue50,
             switchTrackOff = Gray60_50,
             switchThumb = White,
+            checkboxOn = Blue50,
+            checkboxOff = Blue50,
+            checkboxMark = White,
             sliderTrackInactive = Gray60_50,
             textInputEnabledOutline = Black30,
             touchFeedback = colorResource(R.color.controls_fill_primary_light),
@@ -125,6 +130,9 @@ fun DuckDuckGoTheme(
         infoPanel = DuckDuckGoInfoPanelColors(
             backgroundBlue = Blue0_50,
             backgroundYellow = Yellow10,
+        ),
+        status = DuckDuckGoStatusColors(
+            criticalPrimary = colorResource(R.color.alertRedOnLightDefault),
         ),
         isDark = false,
     )
@@ -165,11 +173,16 @@ fun DuckDuckGoTheme(
             white = White,
             destructive = AlertRedOnDarkDefault,
             text = Black,
+            disabled = colorResource(R.color.icon_tertiary_dark),
         ),
         system = DuckDuckGoSystemColors(
             lines = colorResource(R.color.lines_dark),
             switchTrackOff = Gray40_50,
+            switchTrackOn = Blue30,
             switchThumb = White,
+            checkboxOn = Blue30,
+            checkboxOff = Blue30,
+            checkboxMark = colorResource(R.color.background_background_dark),
             sliderTrackInactive = Gray40_50,
             textInputEnabledOutline = White30,
             touchFeedback = colorResource(R.color.controls_fill_primary_dark),
@@ -177,6 +190,9 @@ fun DuckDuckGoTheme(
         infoPanel = DuckDuckGoInfoPanelColors(
             backgroundBlue = Blue50_12,
             backgroundYellow = Yellow50_14,
+        ),
+        status = DuckDuckGoStatusColors(
+            criticalPrimary = colorResource(R.color.alertRedOnDarkDefault),
         ),
         isDark = true,
     )

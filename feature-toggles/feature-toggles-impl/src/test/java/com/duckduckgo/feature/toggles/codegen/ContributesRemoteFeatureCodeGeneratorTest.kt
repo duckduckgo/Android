@@ -50,6 +50,7 @@ import org.junit.Assert.assertNotEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
+import org.junit.Assume.assumeFalse
 import org.junit.Before
 import org.junit.Ignore
 import org.junit.Test
@@ -117,6 +118,8 @@ class ContributesRemoteFeatureCodeGeneratorTest {
 
     @Test
     fun `the class factory is generated`() = runTest {
+        // Metro replaces Dagger/Anvil codegen and does not emit standalone `_Factory` classes.
+        assumeFalse("Dagger `_Factory` codegen does not apply under Metro", System.getProperty("ddg.di") == "Metro")
         val generatedClass = Class
             .forName("com.duckduckgo.feature.toggles.codegen.TestTriggerFeature_RemoteFeature_Factory")
         assertNotNull(generatedClass)

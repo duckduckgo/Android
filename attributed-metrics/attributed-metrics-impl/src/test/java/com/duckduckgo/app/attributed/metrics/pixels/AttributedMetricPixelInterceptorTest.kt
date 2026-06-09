@@ -17,6 +17,8 @@
 package com.duckduckgo.app.attributed.metrics.pixels
 
 import com.duckduckgo.common.test.api.FakeChain
+import com.duckduckgo.common.utils.featureflags.OkHttpInterceptorRefactorFeature
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
@@ -27,7 +29,9 @@ class AttributedMetricPixelInterceptorTest {
 
     @Before
     fun setup() {
-        interceptor = AttributedMetricPixelInterceptor()
+        interceptor = AttributedMetricPixelInterceptor(
+            FakeFeatureToggleFactory.create(OkHttpInterceptorRefactorFeature::class.java),
+        )
     }
 
     @Test

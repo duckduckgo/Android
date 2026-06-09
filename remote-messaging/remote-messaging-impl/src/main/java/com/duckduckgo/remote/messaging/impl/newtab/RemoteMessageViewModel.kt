@@ -103,7 +103,7 @@ class RemoteMessageViewModel @Inject constructor(
         super.onStart(owner)
 
         viewModelScope.launch(dispatchers.io()) {
-            remoteMessagingModel.getActiveMessages()
+            remoteMessagingModel.observeActiveMessages()
                 .map { message ->
                     if (message?.surfaces?.contains(Surface.NEW_TAB_PAGE) == true) {
                         val imageFile = remoteMessagingModel.getRemoteMessageImageFile(Surface.NEW_TAB_PAGE)

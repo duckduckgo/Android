@@ -22,14 +22,36 @@ import com.duckduckgo.app.statistics.wideevents.WideEventClient
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
-import com.duckduckgo.subscriptions.impl.PrivacyProFeature
+import com.duckduckgo.subscriptions.impl.SubscriptionsFeature
 import com.duckduckgo.subscriptions.impl.repository.isActive
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.Lazy
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.withContext
-import java.time.Duration
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.hours
+
+data class BillingFlowInitFailureContext(
+    val reason: Reason,
+    val requestedProductId: String,
+    val requestedPlanId: String,
+    val requestedOfferId: String?,
+    val loadedProductIds: List<String>,
+    val billingClientReady: Boolean,
+    val lastLoadProductsOutcome: LastLoadProductsOutcome,
+) {
+    enum class Reason {
+        NO_PRODUCTS_LOADED,
+        PRODUCT_ID_NOT_FOUND,
+        OFFER_NOT_FOUND,
+    }
+}
+
+sealed class LastLoadProductsOutcome {
+    data object NeverAttempted : LastLoadProductsOutcome()
+    data class Success(val productsCount: Int) : LastLoadProductsOutcome()
+    data class Failure(val billingError: String) : LastLoadProductsOutcome()
+}
 
 interface SubscriptionPurchaseWideEvent {
     suspend fun onPurchaseFlowStarted(
@@ -52,7 +74,10 @@ interface SubscriptionPurchaseWideEvent {
 
     suspend fun onBillingFlowInitSuccess()
 
-    suspend fun onBillingFlowInitFailure(error: String)
+    suspend fun onBillingFlowInitFailure(
+        error: String,
+        failureContext: BillingFlowInitFailureContext? = null,
+    )
 
     suspend fun onBillingFlowPurchaseSuccess()
 
@@ -74,7 +99,7 @@ interface SubscriptionPurchaseWideEvent {
 @ContributesBinding(AppScope::class)
 class SubscriptionPurchaseWideEventImpl @Inject constructor(
     private val wideEventClient: WideEventClient,
-    private val privacyProFeature: Lazy<PrivacyProFeature>,
+    private val subscriptionsFeature: Lazy<SubscriptionsFeature>,
     private val dispatchers: DispatcherProvider,
 ) : SubscriptionPurchaseWideEvent {
 
@@ -102,6 +127,7 @@ class SubscriptionPurchaseWideEventImpl @Inject constructor(
                 metadata = mapOf(
                     KEY_SUBSCRIPTION_IDENTIFIER to subscriptionIdentifier,
                     KEY_FREE_TRIAL_ELIGIBLE to freeTrialEligible.toString(),
+                    KEY_USE_QUERY_PURCHASES to subscriptionsFeature.isUseQueryPurchasesEnabled(dispatchers),
                 ),
                 cleanupPolicy = OnProcessStart(ignoreIfIntervalTimeoutPresent = true),
             )
@@ -189,14 +215,42 @@ class SubscriptionPurchaseWideEventImpl @Inject constructor(
         )
     }
 
-    override suspend fun onBillingFlowInitFailure(error: String) {
+    override suspend fun onBillingFlowInitFailure(
+        error: String,
+        failureContext: BillingFlowInitFailureContext?,
+    ) {
         if (!isFeatureEnabled()) return
         val wideEventId = getCurrentWideEventId() ?: return
+
+        val metadata = if (failureContext != null) {
+            val reason = when (failureContext.reason) {
+                BillingFlowInitFailureContext.Reason.NO_PRODUCTS_LOADED -> "no_products_loaded"
+                BillingFlowInitFailureContext.Reason.PRODUCT_ID_NOT_FOUND -> "product_id_not_found"
+                BillingFlowInitFailureContext.Reason.OFFER_NOT_FOUND -> "offer_not_found"
+            }
+            val outcome = when (val o = failureContext.lastLoadProductsOutcome) {
+                LastLoadProductsOutcome.NeverAttempted -> "never_attempted"
+                is LastLoadProductsOutcome.Success -> "success_n=${o.productsCount}"
+                is LastLoadProductsOutcome.Failure -> "failure_${o.billingError}"
+            }
+            mapOf(
+                KEY_MISSING_PRODUCT_FAILURE_REASON to reason,
+                KEY_REQUESTED_PRODUCT_ID to failureContext.requestedProductId,
+                KEY_REQUESTED_PLAN_ID to failureContext.requestedPlanId,
+                KEY_REQUESTED_OFFER_ID to (failureContext.requestedOfferId ?: "none"),
+                KEY_LOADED_PRODUCTS_COUNT to failureContext.loadedProductIds.size.toString(),
+                KEY_BILLING_CLIENT_READY to failureContext.billingClientReady.toString(),
+                KEY_LAST_LOAD_PRODUCTS_OUTCOME to outcome,
+            )
+        } else {
+            emptyMap()
+        }
 
         wideEventClient.flowStep(
             wideEventId = wideEventId,
             stepName = STEP_BILLING_FLOW_INIT,
             success = false,
+            metadata = metadata,
         )
 
         wideEventClient.flowFinish(
@@ -213,7 +267,7 @@ class SubscriptionPurchaseWideEventImpl @Inject constructor(
         wideEventClient.intervalStart(
             wideEventId = wideEventId,
             key = KEY_ACTIVATION_LATENCY_MS_BUCKETED,
-            timeout = Duration.ofHours(4),
+            timeout = 4.hours,
         )
 
         wideEventClient.flowStep(
@@ -306,7 +360,7 @@ class SubscriptionPurchaseWideEventImpl @Inject constructor(
     }
 
     private suspend fun isFeatureEnabled(): Boolean = withContext(dispatchers.io()) {
-        privacyProFeature.get().sendSubscriptionPurchaseWideEvent().isEnabled()
+        subscriptionsFeature.get().sendSubscriptionPurchaseWideEvent().isEnabled()
     }
 
     private suspend fun getCurrentWideEventId(): Long? {
@@ -328,12 +382,22 @@ class SubscriptionPurchaseWideEventImpl @Inject constructor(
         const val KEY_ACTIVATION_LATENCY_MS_BUCKETED = "activation_latency_ms_bucketed"
         const val KEY_FREE_TRIAL_ELIGIBLE = "free_trial_eligible"
         const val KEY_SUBSCRIPTION_IDENTIFIER = "subscription_identifier"
+        const val KEY_USE_QUERY_PURCHASES = "use_query_purchases"
 
         const val STEP_REFRESH_SUBSCRIPTION = "refresh_subscription"
         const val STEP_CREATE_ACCOUNT = "create_account"
         const val STEP_BILLING_FLOW_INIT = "billing_flow_init"
         const val STEP_BILLING_FLOW_PURCHASE = "billing_flow_purchase"
         const val STEP_CONFIRM_PURCHASE = "confirm_purchase"
+
+        // metadata keys for missing-product-details failure
+        const val KEY_MISSING_PRODUCT_FAILURE_REASON = "missing_product_failure_reason"
+        const val KEY_REQUESTED_PRODUCT_ID = "requested_product_id"
+        const val KEY_REQUESTED_PLAN_ID = "requested_plan_id"
+        const val KEY_REQUESTED_OFFER_ID = "requested_offer_id"
+        const val KEY_LOADED_PRODUCTS_COUNT = "loaded_products_count"
+        const val KEY_BILLING_CLIENT_READY = "billing_client_ready"
+        const val KEY_LAST_LOAD_PRODUCTS_OUTCOME = "last_load_products_outcome"
     }
 }
 

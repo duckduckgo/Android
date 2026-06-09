@@ -36,6 +36,8 @@ import androidx.annotation.StringRes
 import androidx.annotation.UiThread
 import androidx.annotation.WorkerThread
 import androidx.core.net.toUri
+import androidx.lifecycle.findViewTreeLifecycleOwner
+import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.anrs.api.CrashLogger
 import com.duckduckgo.app.browser.SSLErrorType.EXPIRED
@@ -233,8 +235,8 @@ class BrowserWebViewClient @Inject constructor(
             }
 
             return when (val urlType = specialUrlDetector.determineType(initiatingUrl = webView.originalUrl, uri = url)) {
-                is SpecialUrlDetector.UrlType.ShouldLaunchPrivacyProLink -> {
-                    subscriptions.launchPrivacyPro(webView.context, url)
+                is SpecialUrlDetector.UrlType.ShouldLaunchSubscriptionLink -> {
+                    subscriptions.launchSubscription(webView.context, url)
                     true
                 }
 
@@ -537,6 +539,20 @@ class BrowserWebViewClient @Inject constructor(
         loginDetector.onEvent(WebNavigationEvent.OnPageStarted(webView))
     }
 
+    override fun doUpdateVisitedHistory(
+        view: WebView?,
+        url: String?,
+        isReload: Boolean,
+    ) {
+        super.doUpdateVisitedHistory(view, url, isReload)
+        url?.let {
+            if (duckChat.isDuckChatUrl(it.toUri())) {
+                logcat { "doUpdateVisitedHistory url=$it" }
+                if (it != view?.originalUrl) webViewClientListener?.onHistoryUrlChanged(it)
+            }
+        }
+    }
+
     /**
      * Intercepts app-scheme URLs (e.g., intent://, tel://, mailto://) that bypass shouldOverrideUrlLoading().
      * This can happen when window.open() is used with special URLs, as the WebViewTransport mechanism
@@ -603,7 +619,7 @@ class BrowserWebViewClient @Inject constructor(
             webViewClientListener?.run {
                 pageFinished(webView, WebViewNavigationState(navigationList), url)
             }
-            flushCookies()
+            flushCookies(webView)
             printInjector.injectPrint(webView)
 
             if (url != null && url != ABOUT_BLANK) {
@@ -646,8 +662,15 @@ class BrowserWebViewClient @Inject constructor(
         }
     }
 
-    private fun flushCookies() {
-        appCoroutineScope.launch(dispatcherProvider.io()) {
+    /**
+     * Flush cookies on the WebView's view-tree lifecycleScope (the fragment's
+     * viewLifecycleOwner) instead of appCoroutineScope. When the fragment's view is
+     * destroyed, the scope auto-cancels — preventing a post-destroy flush from SEGV'ing
+     * on the freed native cookie store of this WebView's profile.
+     */
+    private fun flushCookies(webView: WebView) {
+        val scope = webView.findViewTreeLifecycleOwner()?.lifecycleScope ?: return
+        scope.launch(dispatcherProvider.io()) {
             cookieManagerProvider.get()?.flush()
         }
     }
@@ -658,9 +681,11 @@ class BrowserWebViewClient @Inject constructor(
         request: WebResourceRequest,
     ): WebResourceResponse? =
         runBlocking {
-            val documentUrl = withContext(dispatcherProvider.main()) { webView.url }
-            withContext(dispatcherProvider.main()) {
-                loginDetector.onEvent(WebNavigationEvent.ShouldInterceptRequest(webView, request))
+            val documentUrl = withContext(dispatcherProvider.main()) {
+                if (request.method == "POST") {
+                    loginDetector.onEvent(WebNavigationEvent.ShouldInterceptRequest(webView, request))
+                }
+                webView.url
             }
             logcat(VERBOSE) { "Intercepting resource ${request.url} type:${request.method} on page $documentUrl" }
             requestInterceptor.shouldIntercept(
@@ -832,8 +857,8 @@ class BrowserWebViewClient @Inject constructor(
                         }
                         this.start = null
                     }
-                    webViewClientListener?.onReceivedError(parsedError, request.url.toString())
                 }
+                webViewClientListener?.onReceivedError(parsedError, request.url.toString(), webResourceError.errorCode.asStringErrorCode())
                 logcat { "recordErrorCode for ${request.url}" }
                 webViewClientListener?.recordErrorCode(
                     "${webResourceError.errorCode.asStringErrorCode()} - ${webResourceError.description}",

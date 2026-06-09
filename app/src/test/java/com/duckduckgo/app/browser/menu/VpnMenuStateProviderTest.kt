@@ -71,6 +71,7 @@ class VpnMenuStateProviderTest {
         whenever(vpnMenuItemInternationalToggle.isEnabled()).thenReturn(true)
         whenever(vpnMenuStore.canShowVpnMenuForNotSubscribed()).thenReturn(true)
         whenever(subscriptions.isFreeTrialEligible()).thenReturn(true)
+        whenever(subscriptions.isEligible()).thenReturn(true)
         testee = VpnMenuStateProviderImpl(
             subscriptions,
             networkProtectionState,
@@ -350,6 +351,38 @@ class VpnMenuStateProviderTest {
             testee.getVpnMenuState().test {
                 val state = awaitItem()
                 assertEquals(VpnMenuState.NotSubscribedNoPill, state)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `when subscriptions are not eligible then return Hidden regardless of subscription status`() =
+        runTest {
+            whenever(subscriptions.isEligible()).thenReturn(false)
+            whenever(subscriptions.getSubscriptionStatusFlow()).thenReturn(flowOf(SubscriptionStatus.AUTO_RENEWABLE))
+            whenever(subscriptions.getEntitlementStatus()).thenReturn(flowOf(listOf(NetP)))
+            whenever(connectionState.isConnected()).thenReturn(true)
+            whenever(networkProtectionState.getConnectionStateFlow()).thenReturn(flowOf(connectionState))
+
+            testee.getVpnMenuState().test {
+                val state = awaitItem()
+                assertEquals(VpnMenuState.Hidden, state)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `when subscriptions are not eligible and user has no subscription then return Hidden`() =
+        runTest {
+            whenever(subscriptions.isEligible()).thenReturn(false)
+            whenever(subscriptions.getSubscriptionStatusFlow()).thenReturn(flowOf(SubscriptionStatus.UNKNOWN))
+            whenever(subscriptions.getEntitlementStatus()).thenReturn(flowOf(emptyList()))
+            whenever(connectionState.isConnected()).thenReturn(false)
+            whenever(networkProtectionState.getConnectionStateFlow()).thenReturn(flowOf(connectionState))
+
+            testee.getVpnMenuState().test {
+                val state = awaitItem()
+                assertEquals(VpnMenuState.Hidden, state)
                 cancelAndIgnoreRemainingEvents()
             }
         }

@@ -26,6 +26,7 @@ import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.inputscreen.ui.metrics.discovery.InputScreenDiscoveryFunnel
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelParameters
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.store.DefaultTogglePosition
 import com.duckduckgo.duckchat.impl.ui.settings.DuckChatSettingsViewModel.Command.LaunchFeedback
@@ -73,7 +74,6 @@ class DuckChatSettingsViewModelTest {
             whenever(duckChat.observeCosmeticInputScreenUserSettingEnabled()).thenReturn(flowOf(null))
             whenever(duckChat.observeInputScreenUserSettingEnabled()).thenReturn(flowOf(false))
             whenever(duckChat.observeAutomaticContextAttachmentUserSettingEnabled()).thenReturn(flowOf(false))
-            whenever(duckChat.observeNativeInputFieldUserSettingEnabled()).thenReturn(flowOf(false))
             whenever(duckChat.observeDefaultTogglePosition()).thenReturn(flowOf(DefaultTogglePosition.SEARCH))
             testee = DuckChatSettingsViewModel(
                 duckChatActivityParams = DuckChatSettingsNoParams,
@@ -610,13 +610,6 @@ class DuckChatSettingsViewModelTest {
     }
 
     @Test
-    fun whenNativeInputFieldToggledThenSetUserSetting() =
-        runTest {
-            testee.onNativeInputFieldToggled(true)
-            verify(duckChat).setNativeInputFieldUserSetting(true)
-        }
-
-    @Test
     fun `view state - automatic context enabled then set correct state`() =
         runTest {
             whenever(duckChat.observeAutomaticContextAttachmentUserSettingEnabled()).thenReturn(flowOf(true))
@@ -634,27 +627,6 @@ class DuckChatSettingsViewModelTest {
 
             testee.viewState.test {
                 assertTrue(awaitItem().isAutomaticContextEnabled)
-            }
-        }
-
-    @Test
-    fun `view state - native input field enabled then set correct state`() =
-        runTest {
-            whenever(duckChat.observeNativeInputFieldUserSettingEnabled()).thenReturn(flowOf(true))
-
-            testee = DuckChatSettingsViewModel(
-                duckChatActivityParams = DuckChatNativeSettingsNoParams,
-                duckChat = duckChat,
-                pixel = mockPixel,
-                inputScreenDiscoveryFunnel = mockInputScreenDiscoveryFunnel,
-                settingsPageFeature = settingsPageFeature,
-                duckChatPixels = mockDuckChatPixels,
-                dispatcherProvider = coroutineRule.testDispatcherProvider,
-                duckChatFeature = duckChatFeature,
-            )
-
-            testee.viewState.test {
-                assertTrue(awaitItem().isNativeInputFieldEnabled)
             }
         }
 
@@ -743,95 +715,6 @@ class DuckChatSettingsViewModelTest {
 
             testee.viewState.test {
                 assertFalse(awaitItem().isAutomaticContextVisible)
-            }
-        }
-
-    @Test
-    fun `view state - native input field visible when flag enabled and duck chat enabled`() =
-        runTest {
-            whenever(duckChat.observeEnableDuckChatUserSetting()).thenReturn(flowOf(true))
-            whenever(duckChat.observeNativeInputFieldUserSettingEnabled()).thenReturn(flowOf(false))
-            @Suppress("DenyListedApi")
-            duckChatFeature.nativeInputField().setRawStoredState(State(enable = true))
-            testee = DuckChatSettingsViewModel(
-                duckChatActivityParams = DuckChatNativeSettingsNoParams,
-                duckChat = duckChat,
-                pixel = mockPixel,
-                inputScreenDiscoveryFunnel = mockInputScreenDiscoveryFunnel,
-                settingsPageFeature = settingsPageFeature,
-                duckChatPixels = mockDuckChatPixels,
-                dispatcherProvider = coroutineRule.testDispatcherProvider,
-                duckChatFeature = duckChatFeature,
-            )
-
-            testee.viewState.test {
-                assertTrue(awaitItem().isNativeInputFieldVisible)
-            }
-        }
-
-    @Test
-    fun `view state - native input field hidden when flag enabled and duck chat disabled`() =
-        runTest {
-            whenever(duckChat.observeEnableDuckChatUserSetting()).thenReturn(flowOf(false))
-            whenever(duckChat.observeNativeInputFieldUserSettingEnabled()).thenReturn(flowOf(false))
-            @Suppress("DenyListedApi")
-            duckChatFeature.nativeInputField().setRawStoredState(State(enable = true))
-            testee = DuckChatSettingsViewModel(
-                duckChatActivityParams = DuckChatNativeSettingsNoParams,
-                duckChat = duckChat,
-                pixel = mockPixel,
-                inputScreenDiscoveryFunnel = mockInputScreenDiscoveryFunnel,
-                settingsPageFeature = settingsPageFeature,
-                duckChatPixels = mockDuckChatPixels,
-                dispatcherProvider = coroutineRule.testDispatcherProvider,
-                duckChatFeature = duckChatFeature,
-            )
-
-            testee.viewState.test {
-                assertFalse(awaitItem().isNativeInputFieldVisible)
-            }
-        }
-
-    @Test
-    fun `view state - native input field hidden when flag disabled`() =
-        runTest {
-            whenever(duckChat.observeEnableDuckChatUserSetting()).thenReturn(flowOf(true))
-            whenever(duckChat.observeNativeInputFieldUserSettingEnabled()).thenReturn(flowOf(false))
-            @Suppress("DenyListedApi")
-            duckChatFeature.nativeInputField().setRawStoredState(State(enable = false))
-            testee = DuckChatSettingsViewModel(
-                duckChatActivityParams = DuckChatNativeSettingsNoParams,
-                duckChat = duckChat,
-                pixel = mockPixel,
-                inputScreenDiscoveryFunnel = mockInputScreenDiscoveryFunnel,
-                settingsPageFeature = settingsPageFeature,
-                duckChatPixels = mockDuckChatPixels,
-                dispatcherProvider = coroutineRule.testDispatcherProvider,
-                duckChatFeature = duckChatFeature,
-            )
-
-            testee.viewState.test {
-                assertFalse(awaitItem().isNativeInputFieldVisible)
-            }
-        }
-
-    @Test
-    fun `view state - native input field disabled then set correct state`() =
-        runTest {
-            whenever(duckChat.observeNativeInputFieldUserSettingEnabled()).thenReturn(flowOf(false))
-            testee = DuckChatSettingsViewModel(
-                duckChatActivityParams = DuckChatNativeSettingsNoParams,
-                duckChat = duckChat,
-                pixel = mockPixel,
-                inputScreenDiscoveryFunnel = mockInputScreenDiscoveryFunnel,
-                settingsPageFeature = settingsPageFeature,
-                duckChatPixels = mockDuckChatPixels,
-                dispatcherProvider = coroutineRule.testDispatcherProvider,
-                duckChatFeature = duckChatFeature,
-            )
-
-            testee.viewState.test {
-                assertFalse(awaitItem().isNativeInputFieldEnabled)
             }
         }
 
@@ -988,5 +871,21 @@ class DuckChatSettingsViewModelTest {
         runTest {
             testee.onDefaultTogglePositionSelected(DefaultTogglePosition.LAST_USED)
             verify(duckChat).setDefaultTogglePosition(DefaultTogglePosition.LAST_USED)
+        }
+
+    @Test
+    fun `when default toggle position selected then count and daily pixels fired with correct value`() =
+        runTest {
+            testee.onDefaultTogglePositionSelected(DefaultTogglePosition.DUCK_AI)
+
+            verify(mockPixel).fire(
+                pixel = DuckChatPixelName.DUCK_CHAT_SETTINGS_DEFAULT_TOGGLE_POSITION_CHANGED_COUNT,
+                parameters = mapOf(DuckChatPixelParameters.DEFAULT_TOGGLE_POSITION_VALUE to "duckAI"),
+            )
+            verify(mockPixel).fire(
+                pixel = DuckChatPixelName.DUCK_CHAT_SETTINGS_DEFAULT_TOGGLE_POSITION_CHANGED_DAILY,
+                parameters = mapOf(DuckChatPixelParameters.DEFAULT_TOGGLE_POSITION_VALUE to "duckAI"),
+                type = Pixel.PixelType.Daily(),
+            )
         }
 }

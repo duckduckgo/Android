@@ -11,7 +11,7 @@ Pixel definitions are JSON (or JSON5) files that document every pixel and wide e
 - **Pixels:** `PixelDefinitions/pixels/definitions/`
 - **Wide events:** Wide events may be defined as pixel definitions (using `widePixel*` parameters from the params dictionary) or in a dedicated wide events directory, depending on the product.
 
-Each product has a `params_dictionary` and `suffixes_dictionary` for reusable definitions.
+Each product has a `params_dictionary` and `suffixes_dictionary` for reusable pixel property definitions and may have a `props_dictionary` for reusable wide event property definitions.  Properties used across many events -- especially across many event files -- should to be defined in those to adhere to Don't Repeat Yourself.
 
 **Note:** The definitions directory contains a `TEMPLATE.json5` file. This is a scaffold for creating new definition files — it is not a real pixel definition. Ignore it when reviewing or auditing existing definitions.
 
@@ -221,6 +221,22 @@ Some products use a separate `wide_events/definitions/` directory with a hierarc
     }
 }
 ```
+
+#### Wire Format vs Schema Type (do NOT flag)
+
+The pixel/wide-event transport stringifies every value when serializing to URL parameters. Tests therefore assert string values for parameters of every type. This is purely a transport detail — it has nothing to do with the declared schema type, and the ingest pipeline coerces values back to their declared types.
+
+Do NOT flag a `"type"` declaration as wrong on the basis that:
+- A test asserts the wire value as a string (e.g. asserting `params["...free_trial_eligible"] == "true"` or `params["...latency_ms_bucketed"] == "5000"`).
+- The value appears as a string in a URL parameter, log, or pixel request.
+- The same conceptual field is defined with a different type in a different schema file (e.g. a legacy `pixels/definitions/*.json5` params definition uses `"type": "string"` with `enum: ["true", "false"]` while the corresponding `wide_events/definitions/*.json5` uses `"type": "boolean"`). The two schemas describe different layers and are allowed to diverge.
+
+The following non-string types are valid in both pixel parameter definitions and wide-event definitions even though the wire format stringifies them:
+- `"type": "boolean"` — values `true` / `false` (sent as `"true"` / `"false"`).
+- `"type": "integer"` — values like `5000` (sent as `"5000"`).
+- `"type": "number"` — values like `1.5` (sent as `"1.5"`).
+
+If you are tempted to flag a `boolean`/`integer`/`number` type because the value "is actually a string on the wire", do not flag it. Apply the same logic uniformly: if `account_creation_latency_ms_bucketed` is allowed to be `"type": "integer"` despite the test asserting `"5000"`, then `free_trial_eligible` is allowed to be `"type": "boolean"` despite the test asserting `"true"`.
 
 ### Wide Event Definition Checklist
 

@@ -23,6 +23,7 @@ import com.duckduckgo.app.trackerdetection.api.TDS_BASE_URL
 import com.duckduckgo.app.trackerdetection.api.TdsRequired
 import com.duckduckgo.app.trackerdetection.blocklist.BlockList.Cohorts.CONTROL
 import com.duckduckgo.app.trackerdetection.blocklist.BlockList.Cohorts.TREATMENT
+import com.duckduckgo.common.utils.featureflags.OkHttpInterceptorRefactorFeature
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.FeatureTogglesInventory
 import com.squareup.anvil.annotations.ContributesMultibinding
@@ -44,12 +45,54 @@ class BlockListInterceptorApiPlugin @Inject constructor(
     private val inventory: FeatureTogglesInventory,
     private val moshi: Moshi,
     private val pixel: Pixel,
+    private val okHttpInterceptorRefactorFeature: OkHttpInterceptorRefactorFeature,
 ) : Interceptor, ApiInterceptorPlugin {
 
     private val jsonAdapter: JsonAdapter<Map<String, String>> by lazy {
         moshi.adapter(Types.newParameterizedType(Map::class.java, String::class.java, String::class.java))
     }
     override fun intercept(chain: Chain): Response {
+        if (!okHttpInterceptorRefactorFeature.self().isEnabled()) {
+            return interceptLegacy(chain)
+        }
+        val originalRequest = chain.request()
+
+        val tdsRequired = originalRequest.tag(Invocation::class.java)
+            ?.method()
+            ?.isAnnotationPresent(TdsRequired::class.java) == true
+
+        if (!tdsRequired) {
+            return chain.proceed(originalRequest)
+        }
+
+        val activeExperiment = runBlocking {
+            inventory.activeTdsFlag().also { it?.enroll() }
+        }
+
+        if (activeExperiment == null) {
+            return chain.proceed(originalRequest)
+        }
+
+        val config = activeExperiment.getSettings()?.let {
+            runCatching {
+                jsonAdapter.fromJson(it)
+            }.getOrDefault(emptyMap())
+        } ?: emptyMap()
+
+        val path = when {
+            runBlocking { activeExperiment.isEnrolledAndEnabled(TREATMENT) } -> config["treatmentUrl"]
+            runBlocking { activeExperiment.isEnrolledAndEnabled(CONTROL) } -> config["controlUrl"]
+            else -> config["nextUrl"]
+        } ?: return chain.proceed(originalRequest)
+
+        return chain.proceed(originalRequest.newBuilder().url("$TDS_BASE_URL$path").build()).also { response ->
+            if (!response.isSuccessful) {
+                pixel.fire(BLOCKLIST_TDS_FAILURE, mapOf("code" to response.code.toString()))
+            }
+        }
+    }
+
+    private fun interceptLegacy(chain: Chain): Response {
         val request = chain.request().newBuilder()
 
         val tdsRequired = chain.request().tag(Invocation::class.java)

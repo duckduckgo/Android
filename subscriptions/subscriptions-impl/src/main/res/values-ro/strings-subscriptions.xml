@@ -84,10 +84,6 @@
     <string name="subscriptionSettingSectionHelpAndSupport">Ajutor și suport</string>
     <string name="subscriptionSettingSendFeedback">Trimite feedback</string>
     <string name="subscriptionSettingActivating">Se activează</string>
-    <string name="subscriptionSettingSwitchUpgradeDynamic" instruction="%1$s is the savings percentage when switching from monthly to yearly (e.g. 16)">Economisește %1$s%% cu un plan anual</string>
-    <!-- smartling.character_limit = 10 -->
-    <string name="subscriptionSettingSwitchUpgradePill">Cea mai bună ofertă</string>
-    <string name="subscriptionSettingSwitchDowngrade">Schimbă planul</string>
     <string name="subscriptionSettingManagePlan">Gestionează plata</string>
 
     <!--Purchase Subscriptions-->
@@ -184,16 +180,6 @@
 
     <string name="feedbackGeneralSubscription">Abonament</string>
 
-    <!-- Switch plan-->
-    <string name="switchBottomSheetDynamicTitleUpgrade" instruction="%1$s is the savings percentage when switching from monthly to yearly (e.g. 16)">Economisește %1$s%% \ncu un plan anual!</string>
-    <string name="switchBottomSheetDescriptionUpgrade" instruction="%1$s is the yearly plan monthly equivalent price (e.g. $8.33), %2$s is the current monthly plan price (e.g. $9.99)">Un plan anual costă doar %1$s/lună, comparativ cu planul tău lunar actual de %2$s.</string>
-    <string name="switchBottomSheetPrimaryButtonUpgrade" instruction="%1$s is the yearly plan price (e.g. $99.99)">Treci la planul anual (%1$s/an)</string>
-    <string name="switchBottomSheetSecondaryButtonUpgrade">Păstrează planul lunar</string>
-    <string name="switchBottomSheetDynamicTitleDowngrade" instruction="%1$s is the savings percentage when using a yearly plan instead of monthly (e.g. 16)">Economisești %1$s%% cu un plan anual!</string>
-    <string name="switchBottomSheetDescriptionDowngrade" instruction="%1$s is the yearly plan monthly equivalent price (e.g. $8.33), %2$s is the monthly plan price (e.g. $9.99)">Trecerea va crește prețul lunar de la %1$s/lună la %2$s/lună.</string>
-    <string name="switchBottomSheetPrimaryButtonDowngrade">Păstrează planul anual</string>
-    <string name="switchBottomSheetSecondaryButtonDowngrade" instruction="%1$s is the monthly plan price (e.g. $9.99)">Treci la planul lunar (%1$s/lună)</string>
-
     <!-- Pro tier changes -->
     <string name="feedbackSubCategorySubsUnableToAccessProFeatures">Nu poți accesa funcțiile de nivel Plus sau Pro</string>
     <string name="subscriptionsProUpgradeTitle">Fă upgrade la Pro</string>
@@ -203,6 +189,7 @@
     <string name="subscriptionSettingManagePaymentOrCancel">Gestionează plata sau anulează</string>
 
     <!-- Pending plan changes -->
+    <string name="subscriptionPendingPlanChangeDowngradePanel" instruction="First placeholder is the Tier name (e.g. Plus, Pro), second is date in short format (month day)">Planul tău va fi retrogradat la %1$s la data de %2$s.</string>
     <string name="subscriptionPendingPlanChangeUpgrade" instruction="First placeholder is the plan name (e.g. Plus Yearly), third is a date">Planul tău va fi actualizat la %1$s la data de %2$s.</string>
     <string name="subscriptionPendingPlanChangeDowngrade" instruction="First placeholder is the plan name (e.g. Plus Yearly), third is a date">Planul tău va fi retrogradat la %1$s la data de %2$s.</string>
     <string name="planNamePlusMonthly">Plus lunar</string>
@@ -211,5 +198,9 @@
     <string name="planNameProYearly">Pro anual</string>
     <string name="tierPlusName" translatable="false">PLUS</string>
     <string name="tierProName" translatable="false">PRO</string>
+
+    <!-- Content Descriptions -->
+    <string name="subscriptionExpiredStatusIconContentDescription">Abonament expirat</string>
+    <string name="subscriptionActiveStatusIconContentDescription">Abonament activ</string>
 
 </resources>

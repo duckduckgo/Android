@@ -165,7 +165,7 @@ class AutofillSettingsActivityScreenViewModelTest {
 
         runTest {
             whenever(mockStore.getAllCredentials()).thenReturn(emptyFlow())
-            whenever(mockStore.getCredentialCount()).thenReturn(flowOf(0))
+            whenever(mockStore.getCredentialCount()).thenReturn(flowOf(Result.success(0)))
             whenever(neverSavedSiteRepository.neverSaveListCount()).thenReturn(emptyFlow())
             whenever(deviceAuthenticator.isAuthenticationRequiredForAutofill()).thenReturn(true)
             whenever(importGooglePasswordsCapabilityChecker.webViewCapableOfImporting()).thenReturn(true)
@@ -817,7 +817,7 @@ class AutofillSettingsActivityScreenViewModelTest {
 
     @Test
     fun `when screen launched from settings activity and one credential saved then correct launch pixels sent`() = runTest {
-        whenever(mockStore.getCredentialCount()).thenReturn(flowOf(1))
+        whenever(mockStore.getCredentialCount()).thenReturn(flowOf(Result.success(1)))
 
         testee.sendLaunchPixel(SettingsActivity)
         val expectedParams = mapOf("source" to "settings", "has_credentials_saved" to "1")
@@ -828,7 +828,7 @@ class AutofillSettingsActivityScreenViewModelTest {
 
     @Test
     fun `when screen launched from browser menu and multiple credentials saved then correct launch pixels sent`() = runTest {
-        whenever(mockStore.getCredentialCount()).thenReturn(flowOf(7))
+        whenever(mockStore.getCredentialCount()).thenReturn(flowOf(Result.success(7)))
 
         testee.sendLaunchPixel(BrowserOverflow)
         val expectedParams = mapOf("source" to "overflow_menu", "has_credentials_saved" to "1")
@@ -1116,7 +1116,7 @@ class AutofillSettingsActivityScreenViewModelTest {
     }
 
     private suspend fun configureStoreToHaveThisManyCredentialsStored(value: Int) {
-        whenever(mockStore.getCredentialCount()).thenReturn(flowOf(value))
+        whenever(mockStore.getCredentialCount()).thenReturn(flowOf(Result.success(value)))
 
         val credentialList = mutableListOf<LoginCredentials>()
         repeat(value) { credentialList.add(someCredentials()) }

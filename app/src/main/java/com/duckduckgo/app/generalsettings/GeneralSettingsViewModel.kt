@@ -123,8 +123,7 @@ class GeneralSettingsViewModel @Inject constructor(
                     maliciousSiteProtection.isFeatureEnabled() &&
                     !androidBrowserConfigFeature.newThreatProtectionSettings().isEnabled(),
                 showChatSuggestionsToggle = duckChat.isEnabled() &&
-                    duckChat.observeInputScreenUserSettingEnabled().firstOrNull() == true &&
-                    duckChat.isChatSuggestionsFeatureAvailable(),
+                    duckChat.observeInputScreenUserSettingEnabled().firstOrNull() == true,
                 chatSuggestionsEnabled = duckChat.observeChatSuggestionsUserSettingEnabled().firstOrNull() ?: true,
                 showNTPAfterIdleReturn = androidBrowserConfigFeature.showNTPAfterIdleReturn().isEnabled(),
             )

@@ -86,17 +86,6 @@
                     app:menuActionSrc="@drawable/ic_add_24" />
 
                 <com.duckduckgo.common.ui.view.MenuActionButtonView
-                    android:id="@+id/newDuckChatTabMenuItem"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:layout_marginStart="@dimen/keyline_1"
-                    android:layout_marginEnd="@dimen/keyline_1"
-                    android:visibility="gone"
-                    app:menuActionLabel="@string/browserMenuNewChat"
-                    app:menuActionSrc="@drawable/ic_ai_chat_add_24" />
-
-                <com.duckduckgo.common.ui.view.MenuActionButtonView
                     android:id="@+id/newDuckChatMenuItem"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
@@ -104,7 +93,7 @@
                     android:layout_marginStart="@dimen/keyline_1"
                     android:layout_marginEnd="@dimen/keyline_1"
                     app:menuActionLabel="@string/browserMenuDuckChat"
-                    app:menuActionSrc="@drawable/ic_ai_chat_24" />
+                    app:menuActionSrc="@drawable/ic_duck_ai_menu_logo_24" />
 
                 <com.duckduckgo.common.ui.view.MenuActionButtonView
                     android:id="@+id/settingsMenuItem"
@@ -138,6 +127,22 @@
             <include
                 android:id="@+id/includeDefaultBrowserMenuItem"
                 layout="@layout/view_menu_item_default_browser_medium" />
+
+            <com.duckduckgo.common.ui.view.MenuItemView
+                android:id="@+id/downloadPdfMenuItem"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:iconDrawable="@drawable/ic_document_download_24"
+                app:menuSize="medium"
+                app:primaryText="@string/browserMenuDownloadPdf" />
+
+            <com.duckduckgo.common.ui.view.MenuItemView
+                android:id="@+id/refreshMenuItem"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:iconDrawable="@drawable/ic_reload_24"
+                app:menuSize="medium"
+                app:primaryText="@string/browserMenuRefresh" />
 
             <com.duckduckgo.common.ui.view.MenuItemView
                 android:id="@+id/addBookmarksMenuItem"
@@ -178,14 +183,6 @@
                 app:iconDrawable="@drawable/ic_device_desktop_24"
                 app:menuSize="medium"
                 app:primaryText="@string/browserMenuDesktopSite" />
-
-            <com.duckduckgo.common.ui.view.MenuItemView
-                android:id="@+id/refreshMenuItem"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:iconDrawable="@drawable/ic_reload_24"
-                app:menuSize="medium"
-                app:primaryText="@string/browserMenuRefresh" />
 
             <com.duckduckgo.common.ui.view.MenuItemView
                 android:id="@+id/openInAppMenuItem"
@@ -239,14 +236,6 @@
                 app:menuSize="medium"
                 app:primaryText="@string/browserMenuDownloads" />
 
-            <com.duckduckgo.common.ui.view.MenuItemView
-                android:id="@+id/duckChatHistoryMenuItem"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:iconDrawable="@drawable/ic_dot_list_24"
-                app:menuSize="medium"
-                app:primaryText="@string/browserMenuDuckChatHistory" />
-
             <com.duckduckgo.common.ui.view.divider.HorizontalDivider
                 android:id="@+id/privacyToolsSectionDivider"
                 android:layout_width="match_parent"
@@ -282,7 +271,7 @@
                 android:layout_height="wrap_content"
                 app:iconDrawable="@drawable/ic_fire_24"
                 app:menuSize="medium"
-                app:primaryText="@string/browserMenuFire" />
+                app:primaryText="@string/browserMenuFireTabsData" />
 
             <com.duckduckgo.common.ui.view.divider.HorizontalDivider
                 android:id="@+id/utilitiesSectionDivider"
@@ -314,16 +303,6 @@
                 app:iconDrawable="@drawable/ic_print_24"
                 app:menuSize="medium"
                 app:primaryText="@string/browserMenuPrintSite" />
-
-            <com.duckduckgo.common.ui.view.MenuItemView
-                android:id="@+id/chatSettings"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:visibility="gone"
-                app:iconDrawable="@drawable/ic_settings_ai_24"
-                app:primaryText="@string/browserMenuChatSettings"
-                app:menuSize="medium"
-                tools:visibility="visible" />
 
             <com.duckduckgo.common.ui.view.divider.HorizontalDivider
                 android:id="@+id/customTabsMenuDivider"

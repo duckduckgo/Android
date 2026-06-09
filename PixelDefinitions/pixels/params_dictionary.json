@@ -9,6 +9,11 @@
         "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+(\\.[0-9]+)?$",
         "examples": ["0.89.3"]
     },
+    "osVersion": {
+        "key": "os_version",
+        "type": "integer",
+        "description": "OS version of the device"
+    },
     "atb": {
         "key": "atb",
         "type": "string",
@@ -80,26 +85,64 @@
     },
     "tabs": {
         "key": "tabs",
-        "type": "string",
-        "description": "Indicates whether the tabs clearing option is enabled or disabled",
-        "enum": ["true", "false"]
+        "type": "boolean",
+        "description": "Indicates whether the tabs clearing option is enabled or disabled"
     },
     "data": {
         "key": "data",
-        "type": "string",
-        "description": "Indicates whether the browsing data clearing option is enabled or disabled",
-        "enum": ["true", "false"]
+        "type": "boolean",
+        "description": "Indicates whether the browsing data clearing option is enabled or disabled"
     },
     "chats": {
         "key": "chats",
-        "type": "string",
-        "description": "Indicates whether the Duck.ai chats clearing option is enabled or disabled",
-        "enum": ["true", "false"]
+        "type": "boolean",
+        "description": "Indicates whether the Duck.ai chats clearing option is enabled or disabled"
     },
     "vpnMenuItemStatus": {
         "key": "status",
         "type": "string",
         "description": "VPN menu item state when the menu was opened or when the VPN item was tapped",
         "enum": ["pill", "no_pill", "subscribed", "hidden"]
+    },
+    "returningUser": {
+        "key": "returning_user",
+        "type": "boolean",
+        "description": "Whether the app is a reinstall or a fresh install"
+    },
+    "privacyDashboardOpened": {
+        "key": "privacy_dashboard_opened",
+        "type": "boolean",
+        "description": "Whether the user has ever opened the Privacy Dashboard"
+    },
+    "subscriptionPromoShown": {
+        "key": "subscription_promo_shown",
+        "type": "boolean",
+        "description": "Whether the subscription promo CTA has been shown to the user"
+    },
+    "error": {
+        "key": "error",
+        "type": "string",
+        "description": "The stacktrace for the error thrown, sanitized to remove potentially sensitive data"
+    },
+    "freeTrial": {
+        "key": "free_trial",
+        "type": "boolean",
+        "description": "Whether the subscription purchase is a free trial"
+    },
+    "pirCancellationReason": {
+        "key": "feature.data.ext.cancellation_reason",
+        "type": "string",
+        "description": "Reason a PIR run was cancelled. Only present on CANCELLED events. superseded_by_profile_edit (a profile-edit re-scan replaced this run), superseded_by_new_run (any other newer run replaced it), profile_deleted/foreground_start_failed and the eligibility reasons (feature_disabled, subscription_expired, entitlement_lost, repository_unavailable) are client-attributed; work_stopped is a generic coroutine/WorkManager cancellation. The phase the run was in when it was cancelled is recoverable from last_step.",
+        "enum": [
+            "superseded_by_new_run",
+            "superseded_by_profile_edit",
+            "profile_deleted",
+            "feature_disabled",
+            "subscription_expired",
+            "entitlement_lost",
+            "repository_unavailable",
+            "foreground_start_failed",
+            "work_stopped"
+        ]
     }
 }

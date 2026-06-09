@@ -115,6 +115,9 @@ class FavouritesNewTabSectionView @JvmOverloads constructor(
     @Inject
     lateinit var favoritesSwipeHandling: FavoritesSwipeHandling
 
+    @Inject
+    lateinit var feature: FavouritesNewTabSectionFixFeature
+
     private var isExpandable = true
     private var showPlaceholders = false
     private var placement: FavoritesPlacement = FavoritesPlacement.NEW_TAB_PAGE
@@ -173,7 +176,9 @@ class FavouritesNewTabSectionView @JvmOverloads constructor(
         AndroidSupportInjection.inject(this)
         super.onAttachedToWindow()
 
-        findViewTreeLifecycleOwner()?.lifecycle?.addObserver(viewModel)
+        if (!feature.self().isEnabled()) {
+            findViewTreeLifecycleOwner()?.lifecycle?.addObserver(viewModel)
+        }
 
         val coroutineScope = findViewTreeLifecycleOwner()?.lifecycleScope
 

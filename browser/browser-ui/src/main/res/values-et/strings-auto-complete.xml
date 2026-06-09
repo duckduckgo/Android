@@ -22,7 +22,4 @@
     <string name="autocompleteRemoveItemCancel">Loobu</string>
     <string name="autocompleteRemoveItemRemove">Eemaldage</string>
     <string name="autocompleteSwitchToTab" instruction="Placeholder is a website">Vaheta vahekaardile · %1$s</string>
-    <string name="improvedAutoCompleteIAMContent">Automaatse täitmise soovitused hõlmavad nüüd sinu hiljuti külastatud saite. Saad selle välja lülitada seadetes või tühjendada igal ajal nupu 🔥 Fire Button abil.</string>
-    <string name="improvedAutoCompleteIAMTitle">Sama privaatsus.\nParemad otsingusoovitused!</string>
-    <string name="openAutoCompleteSettings">Ava sätted</string>
 </resources>

@@ -25,7 +25,7 @@ import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
-import com.duckduckgo.subscriptions.impl.PrivacyProFeature
+import com.duckduckgo.subscriptions.impl.SubscriptionsFeature
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
@@ -41,9 +41,9 @@ class AuthTokenRefreshWideEventTest {
     private val networkProtectionState: NetworkProtectionState = mock()
 
     @SuppressLint("DenyListedApi")
-    private val privacyProFeature: PrivacyProFeature =
+    private val subscriptionsFeature: SubscriptionsFeature =
         FakeFeatureToggleFactory
-            .create(PrivacyProFeature::class.java)
+            .create(SubscriptionsFeature::class.java)
             .apply { sendAuthTokenRefreshWideEvent().setRawStoredState(Toggle.State(true)) }
 
     private lateinit var authWideEvent: AuthTokenRefreshWideEventImpl
@@ -55,10 +55,33 @@ class AuthTokenRefreshWideEventTest {
 
         authWideEvent = AuthTokenRefreshWideEventImpl(
             wideEventClient = wideEventClient,
-            privacyProFeature = { privacyProFeature },
+            subscriptionsFeature = { subscriptionsFeature },
             dispatchers = coroutineRule.testDispatcherProvider,
             networkProtectionState = { networkProtectionState },
             processName = "main",
+        )
+    }
+
+    @SuppressLint("DenyListedApi")
+    @Test
+    fun `onStart includes use_query_purchases true when feature flag enabled`() = runTest {
+        subscriptionsFeature.useQueryPurchases().setRawStoredState(Toggle.State(true))
+        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any()))
+            .thenReturn(Result.success(123L))
+
+        authWideEvent.onStart(SubscriptionStatus.UNKNOWN)
+
+        verify(wideEventClient).flowStart(
+            name = "auth-token-refresh",
+            flowEntryPoint = null,
+            metadata = mapOf(
+                "subscription_status" to SubscriptionStatus.UNKNOWN.statusName,
+                "netp_is_enabled" to "false",
+                "netp_is_running" to "false",
+                "process_name" to "main",
+                "use_query_purchases" to "true",
+            ),
+            cleanupPolicy = CleanupPolicy.OnProcessStart(ignoreIfIntervalTimeoutPresent = false),
         )
     }
 
@@ -77,6 +100,7 @@ class AuthTokenRefreshWideEventTest {
                 "netp_is_enabled" to "false",
                 "netp_is_running" to "false",
                 "process_name" to "main",
+                "use_query_purchases" to "false",
             ),
             cleanupPolicy = CleanupPolicy.OnProcessStart(ignoreIfIntervalTimeoutPresent = false),
         )
@@ -247,7 +271,7 @@ class AuthTokenRefreshWideEventTest {
     @SuppressLint("DenyListedApi")
     @Test
     fun `feature disabled results in no interactions`() = runTest {
-        privacyProFeature.sendAuthTokenRefreshWideEvent().setRawStoredState(Toggle.State(false))
+        subscriptionsFeature.sendAuthTokenRefreshWideEvent().setRawStoredState(Toggle.State(false))
 
         authWideEvent.onStart(SubscriptionStatus.UNKNOWN)
         authWideEvent.onTokensFetched()

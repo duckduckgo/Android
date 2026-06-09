@@ -17,6 +17,7 @@
 package com.duckduckgo.mobile.android.vpn.blocklist
 
 import com.duckduckgo.app.global.api.ApiInterceptorPlugin
+import com.duckduckgo.common.utils.featureflags.OkHttpInterceptorRefactorFeature
 import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin
 import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin.PixelParameter
 import com.duckduckgo.di.scopes.AppScope
@@ -48,12 +49,70 @@ class AppTPBlockListInterceptorApiPlugin @Inject constructor(
     private val moshi: Moshi,
     private val pixel: DeviceShieldPixels,
     private val appTrackingProtection: AppTrackingProtection,
+    private val okHttpInterceptorRefactorFeature: OkHttpInterceptorRefactorFeature,
 ) : Interceptor, ApiInterceptorPlugin {
 
     private val jsonAdapter: JsonAdapter<Map<String, String>> by lazy {
         moshi.adapter(Types.newParameterizedType(Map::class.java, String::class.java, String::class.java))
     }
     override fun intercept(chain: Chain): Response {
+        if (!okHttpInterceptorRefactorFeature.self().isEnabled()) {
+            return interceptLegacy(chain)
+        }
+        val originalRequest = chain.request()
+
+        val tdsRequired = originalRequest.tag(Invocation::class.java)
+            ?.method()
+            ?.isAnnotationPresent(AppTPTdsRequired::class.java) == true
+
+        val shouldInterceptRequest = tdsRequired && runBlocking {
+            appTrackingProtection.isEnabled()
+        }
+
+        if (!shouldInterceptRequest) {
+            return chain.proceed(originalRequest)
+        }
+
+        logcat { "[AppTP]: Intercepted AppTP TDS Request: $originalRequest" }
+        val activeExperiment = runBlocking {
+            inventory.activeAppTpTdsFlag()?.also {
+                it.enroll()
+            }
+        }
+        logcat { "[AppTP]: Active experiment: ${activeExperiment?.featureName()}" }
+        logcat { "[AppTP]: Cohort: ${runBlocking { activeExperiment?.getCohort() }}" }
+
+        if (activeExperiment == null) {
+            return chain.proceed(originalRequest)
+        }
+
+        val config = activeExperiment.getSettings()?.let {
+            runCatching {
+                jsonAdapter.fromJson(it)
+            }.getOrDefault(emptyMap())
+        } ?: emptyMap()
+
+        val path = when {
+            runBlocking { activeExperiment.isEnrolledAndEnabled(TREATMENT) } -> config["treatmentUrl"]
+            runBlocking { activeExperiment.isEnrolledAndEnabled(CONTROL) } -> config["controlUrl"]
+            else -> config["nextUrl"]
+        } ?: return chain.proceed(originalRequest)
+
+        val newURL = "$APPTP_TDS_BASE_URL$path"
+        logcat { "[AppTP]: Rewrote TDS request URL to $newURL" }
+
+        return chain.proceed(originalRequest.newBuilder().url(newURL).build()).also { response ->
+            if (!response.isSuccessful) {
+                pixel.appTPBlocklistExperimentDownloadFailure(
+                    response.code,
+                    activeExperiment.featureName().name,
+                    runBlocking { activeExperiment.getCohort() }?.name.toString(),
+                )
+            }
+        }
+    }
+
+    private fun interceptLegacy(chain: Chain): Response {
         val request = chain.request().newBuilder()
 
         val tdsRequired = chain.request().tag(Invocation::class.java)

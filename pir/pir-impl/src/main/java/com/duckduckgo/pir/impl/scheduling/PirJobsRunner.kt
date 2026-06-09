@@ -18,25 +18,31 @@ package com.duckduckgo.pir.impl.scheduling
 
 import android.content.Context
 import android.os.PowerManager
+import androidx.core.app.NotificationManagerCompat
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.extensions.isIgnoringBatteryOptimizations
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.pir.impl.PirRemoteFeatures
 import com.duckduckgo.pir.impl.brokers.BrokerJsonUpdater
 import com.duckduckgo.pir.impl.common.PirJob.RunType
+import com.duckduckgo.pir.impl.common.PirJobConstants.MAX_DETACHED_WEBVIEW_COUNT
 import com.duckduckgo.pir.impl.models.ProfileQuery
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord.OptOutJobRecord
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord.ScanJobRecord
 import com.duckduckgo.pir.impl.optout.PirOptOut
 import com.duckduckgo.pir.impl.pixels.PirPixelSender
 import com.duckduckgo.pir.impl.scan.PirScan
-import com.duckduckgo.pir.impl.scheduling.PirExecutionType.MANUAL
 import com.duckduckgo.pir.impl.store.PirRepository
 import com.duckduckgo.pir.impl.store.PirSchedulingRepository
+import com.duckduckgo.pir.impl.wideevents.PirInitialScanCompletionWideEvent
+import com.duckduckgo.pir.impl.wideevents.PirScanWideEvent
+import com.duckduckgo.pir.impl.wideevents.PirScanWideEvent.FailureReason
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.withContext
 import logcat.logcat
 import javax.inject.Inject
@@ -73,6 +79,9 @@ class RealPirJobsRunner @Inject constructor(
     private val pixelSender: PirPixelSender,
     private val brokerJsonUpdater: BrokerJsonUpdater,
     private val pirRemoteFeatures: PirRemoteFeatures,
+    private val pirScanWideEvent: PirScanWideEvent,
+    private val pirInitialScanCompletionWideEvent: PirInitialScanCompletionWideEvent,
+    private val networkProtectionState: NetworkProtectionState,
 ) : PirJobsRunner {
     override suspend fun runEligibleJobs(
         context: Context,
@@ -98,7 +107,15 @@ class RealPirJobsRunner @Inject constructor(
         if (profileQueries.isEmpty()) {
             emitStartPixel(context, executionType, 0, activeBrokers.size)
             logcat { "PIR-JOB-RUNNER: No profile queries available. Completing run." }
-            emitCompletedPixel(context, executionType, startTimeInMillis, totalScanJobs = 0, totalOptOutJobs = 0)
+            emitCompletedPixel(
+                context = context,
+                executionType = executionType,
+                startTimeInMillis = startTimeInMillis,
+                totalScanJobs = 0,
+                totalOptOutJobs = 0,
+                profileQueryCount = 0,
+                brokerCount = activeBrokers.size,
+            )
             return@withContext Result.success(Unit)
         }
 
@@ -119,39 +136,143 @@ class RealPirJobsRunner @Inject constructor(
 
         emitStartPixel(context, executionType, profileQueries.size, activeBrokers.size)
 
+        // Pre-create scan jobs and resolve eligible jobs up front so the wide event has the accurate
+        // total_scan_jobs count at flowStart.
+        val eligibleJobs = if (activeBrokers.isNotEmpty()) {
+            attemptCreateScanJobs(activeBrokers, profileQueries)
+            eligibleScanJobProvider.getAllEligibleScanJobs(currentTimeProvider.currentTimeMillis())
+                .filter { it.brokerName in activeBrokers }
+        } else {
+            emptyList()
+        }
+
+        val isPowerSavingEnabled = context.isPowerSavingModeEnabled()
+        val isVpnConnected = networkProtectionState.safeIsVpnRunning()
+        val batteryOptimizationsEnabled = !context.isIgnoringBatteryOptimizations()
+        val notificationsPermissionGranted = context.areNotificationsPermissionGranted()
+        val isTrackerBlockingEnabled = pirRemoteFeatures.trackerBlocking().isEnabled()
+        val webViewCount = minOf(eligibleJobs.size, MAX_DETACHED_WEBVIEW_COUNT)
+
+        pirScanWideEvent.onRunStarted(
+            executionType = executionType,
+            profileQueriesCount = profileQueries.size,
+            brokerCount = activeBrokers.size,
+            totalScanJobs = eligibleJobs.size,
+            webViewCount = webViewCount,
+            isPowerSavingEnabled = isPowerSavingEnabled,
+            isVpnConnected = isVpnConnected,
+            batteryOptimizationsEnabled = batteryOptimizationsEnabled,
+            notificationsPermissionGranted = notificationsPermissionGranted,
+            isTrackerBlockingEnabled = isTrackerBlockingEnabled,
+        )
+
+        pirInitialScanCompletionWideEvent.onRunStarted(
+            executionType = executionType,
+            profileQueriesCount = profileQueries.size,
+            brokerCount = activeBrokers.size,
+            totalScanJobs = eligibleJobs.size,
+            webViewCount = webViewCount,
+            isPowerSavingEnabled = isPowerSavingEnabled,
+            isVpnConnected = isVpnConnected,
+            batteryOptimizationsEnabled = batteryOptimizationsEnabled,
+            notificationsPermissionGranted = notificationsPermissionGranted,
+            isTrackerBlockingEnabled = isTrackerBlockingEnabled,
+        )
+
         if (activeBrokers.isEmpty()) {
             logcat { "PIR-JOB-RUNNER: No active brokers available. Completing run." }
-            emitCompletedPixel(context, executionType, startTimeInMillis, totalScanJobs = 0, totalOptOutJobs = 0)
-            return@withContext Result.success(Unit)
-        }
-
-        storeScanStats(startTimeInMillis, executionType)
-        attemptCreateScanJobs(activeBrokers, profileQueries)
-        val totalScanJobs = executeScanJobs(context, executionType, activeBrokers)
-
-        // We emit a pixel after the scans are completed from the foreground scan
-        if (executionType == MANUAL) {
-            pixelSender.reportInitialScanDuration(
-                durationMs = currentTimeProvider.currentTimeMillis() - startTimeInMillis,
+            pirScanWideEvent.onRunFailed(executionType = executionType, reason = FailureReason.NO_ACTIVE_BROKERS)
+            emitCompletedPixel(
+                context = context,
+                executionType = executionType,
+                startTimeInMillis = startTimeInMillis,
+                totalScanJobs = 0,
+                totalOptOutJobs = 0,
                 profileQueryCount = profileQueries.size,
+                brokerCount = 0,
             )
-        }
-
-        val formOptOutBrokers = pirRepository.getBrokersForOptOut(true).toSet()
-        val activeFormOptOutBrokers = formOptOutBrokers.intersect(activeBrokers)
-
-        if (activeFormOptOutBrokers.isEmpty()) {
-            logcat { "PIR-JOB-RUNNER: No active parent brokers available for optout. Completing run." }
-            emitCompletedPixel(context, executionType, startTimeInMillis, totalScanJobs, totalOptOutJobs = 0)
             return@withContext Result.success(Unit)
         }
 
-        attemptCreateOptOutJobs(activeFormOptOutBrokers)
-        val totalOptOutJobs = executeOptOutJobs(context, activeFormOptOutBrokers)
+        try {
+            storeScanStats(startTimeInMillis, executionType)
 
-        logcat { "PIR-JOB-RUNNER: Completed." }
-        emitCompletedPixel(context, executionType, startTimeInMillis, totalScanJobs, totalOptOutJobs)
-        return@withContext Result.success(Unit)
+            val onJobCompletedCallback: suspend () -> Unit = {
+                pirScanWideEvent.onScanJobCompleted(executionType)
+            }
+            val onScanJobsResolvedCallback: suspend (Int) -> Unit = { actual ->
+                pirScanWideEvent.onScanJobsResolved(executionType, actual)
+            }
+            val totalScanJobs = executeScanJobs(
+                context = context,
+                executionType = executionType,
+                eligibleJobs = eligibleJobs,
+                onJobCompleted = onJobCompletedCallback,
+                onScanJobsResolved = onScanJobsResolvedCallback,
+            )
+
+            pirScanWideEvent.onScanCompleted(executionType)
+            pirInitialScanCompletionWideEvent.onScanCompleted()
+
+            if (executionType.isManual) {
+                val batteryOptimizationsEnabled = !context.isIgnoringBatteryOptimizations()
+                pixelSender.reportInitialScanDuration(
+                    durationMs = currentTimeProvider.currentTimeMillis() - startTimeInMillis,
+                    profileQueryCount = profileQueries.size,
+                    isPowerSavingEnabled = context.isPowerSavingModeEnabled(),
+                    batteryOptimizationsEnabled = batteryOptimizationsEnabled,
+                    brokerCount = activeBrokers.size,
+                    executionType = executionType,
+                    notificationsPermissionGranted = context.areNotificationsPermissionGranted(),
+                )
+            }
+
+            val formOptOutBrokers = pirRepository.getBrokersForOptOut(true).toSet()
+            val activeFormOptOutBrokers = formOptOutBrokers.intersect(activeBrokers)
+
+            if (activeFormOptOutBrokers.isEmpty()) {
+                logcat { "PIR-JOB-RUNNER: No active parent brokers available for optout. Completing run." }
+                pirScanWideEvent.onOptOutSkipped(executionType)
+                emitCompletedPixel(
+                    context = context,
+                    executionType = executionType,
+                    startTimeInMillis = startTimeInMillis,
+                    totalScanJobs = totalScanJobs,
+                    totalOptOutJobs = 0,
+                    profileQueryCount = profileQueries.size,
+                    brokerCount = activeBrokers.size,
+                )
+                return@withContext Result.success(Unit)
+            }
+
+            pirScanWideEvent.onOptOutStarted(executionType)
+
+            attemptCreateOptOutJobs(activeFormOptOutBrokers)
+            val totalOptOutJobs = executeOptOutJobs(context, activeFormOptOutBrokers)
+
+            pirScanWideEvent.onOptOutCompleted(executionType = executionType, totalOptOutJobs = totalOptOutJobs)
+
+            logcat { "PIR-JOB-RUNNER: Completed." }
+            emitCompletedPixel(
+                context = context,
+                executionType = executionType,
+                startTimeInMillis = startTimeInMillis,
+                totalScanJobs = totalScanJobs,
+                totalOptOutJobs = totalOptOutJobs,
+                profileQueryCount = profileQueries.size,
+                brokerCount = activeBrokers.size,
+            )
+            return@withContext Result.success(Unit)
+        } catch (e: TimeoutCancellationException) {
+            pirScanWideEvent.onRunFailed(executionType = executionType, reason = FailureReason.TIMEOUT_CANCELLATION_EXCEPTION)
+            throw e
+        } catch (e: CancellationException) {
+            pirScanWideEvent.onRunCancelled(executionType, PirScanWideEvent.CancellationReason.WORK_STOPPED)
+            throw e
+        } catch (e: Exception) {
+            pirScanWideEvent.onRunFailed(executionType = executionType, reason = FailureReason.fromException(e))
+            throw e
+        }
     }
 
     private suspend fun storeScanStats(
@@ -171,35 +292,57 @@ class RealPirJobsRunner @Inject constructor(
         }
     }
 
-    private fun emitStartPixel(
+    private suspend fun emitStartPixel(
         context: Context,
         executionType: PirExecutionType,
         profileQueryCount: Int,
         brokerCount: Int,
     ) {
-        if (executionType == MANUAL) {
-            val isPowerSavingEnabled = runCatching {
-                (context.getSystemService(Context.POWER_SERVICE) as PowerManager).isPowerSaveMode
-            }.getOrDefault(false)
-            pixelSender.reportManualScanStarted(isPowerSavingEnabled, profileQueryCount, brokerCount)
+        if (executionType.isManual) {
+            val isPowerSavingEnabled = context.isPowerSavingModeEnabled()
+            pixelSender.reportManualScanStarted(
+                isPowerSavingEnabled = isPowerSavingEnabled,
+                profileQueryCount = profileQueryCount,
+                brokerCount = brokerCount,
+                executionType = executionType,
+                notificationsPermissionGranted = context.areNotificationsPermissionGranted(),
+            )
         } else {
-            pixelSender.reportScheduledScanStarted()
+            pixelSender.reportScheduledScanStarted(profileQueryCount, brokerCount)
         }
     }
 
-    private fun emitCompletedPixel(
+    private suspend fun emitCompletedPixel(
         context: Context,
         executionType: PirExecutionType,
         startTimeInMillis: Long,
         totalScanJobs: Int,
         totalOptOutJobs: Int,
+        profileQueryCount: Int,
+        brokerCount: Int,
     ) {
         val totalTimeMillis = currentTimeProvider.currentTimeMillis() - startTimeInMillis
-        if (executionType == MANUAL) {
+        if (executionType.isManual) {
             val batteryOptimizationsEnabled = !context.isIgnoringBatteryOptimizations()
-            pixelSender.reportManualScanCompleted(totalTimeMillis, batteryOptimizationsEnabled, totalScanJobs, totalOptOutJobs)
+            pixelSender.reportManualScanCompleted(
+                totalTimeInMillis = totalTimeMillis,
+                batteryOptimizationsEnabled = batteryOptimizationsEnabled,
+                totalScanJobs = totalScanJobs,
+                totalOptOutJobs = totalOptOutJobs,
+                profileQueryCount = profileQueryCount,
+                brokerCount = brokerCount,
+                isPowerSavingEnabled = context.isPowerSavingModeEnabled(),
+                executionType = executionType,
+                notificationsPermissionGranted = context.areNotificationsPermissionGranted(),
+            )
         } else {
-            pixelSender.reportScheduledScanCompleted(totalTimeMillis)
+            pixelSender.reportScheduledScanCompleted(
+                totalTimeInMillis = totalTimeMillis,
+                totalScanJobs = totalScanJobs,
+                totalOptOutJobs = totalOptOutJobs,
+                profileQueryCount = profileQueryCount,
+                brokerCount = brokerCount,
+            )
         }
     }
 
@@ -242,20 +385,21 @@ class RealPirJobsRunner @Inject constructor(
     private suspend fun executeScanJobs(
         context: Context,
         executionType: PirExecutionType,
-        activeBrokers: Set<String>,
+        eligibleJobs: List<ScanJobRecord>,
+        onJobCompleted: (suspend () -> Unit)? = null,
+        onScanJobsResolved: (suspend (Int) -> Unit)? = null,
     ): Int {
-        val eligibleJobs = eligibleScanJobProvider.getAllEligibleScanJobs(currentTimeProvider.currentTimeMillis())
-            .filter { it.brokerName in activeBrokers }
-        val runType = if (executionType == MANUAL) {
+        val runType = if (executionType.isManual) {
             RunType.MANUAL
         } else {
             RunType.SCHEDULED
         }
         if (eligibleJobs.isNotEmpty()) {
             logcat { "PIR-JOB-RUNNER: Executing scan for ${eligibleJobs.size} eligible scan jobs." }
-            pirScan.executeScanForJobs(eligibleJobs, context, runType)
+            pirScan.executeScanForJobs(eligibleJobs, context, runType, onJobCompleted, onScanJobsResolved)
         } else {
             logcat { "PIR-JOB-RUNNER: No eligible scan jobs to execute." }
+            onScanJobsResolved?.invoke(0)
         }
         return eligibleJobs.size
     }
@@ -305,5 +449,21 @@ class RealPirJobsRunner @Inject constructor(
     override fun stop() {
         pirScan.stop()
         pirOptOut.stop()
+    }
+
+    private fun Context.isPowerSavingModeEnabled(): Boolean {
+        return runCatching {
+            (getSystemService(Context.POWER_SERVICE) as PowerManager).isPowerSaveMode
+        }.getOrDefault(false)
+    }
+
+    private fun Context.areNotificationsPermissionGranted(): Boolean {
+        return runCatching {
+            NotificationManagerCompat.from(this).areNotificationsEnabled()
+        }.getOrDefault(false)
+    }
+
+    private suspend fun NetworkProtectionState.safeIsVpnRunning(): Boolean {
+        return runCatching { isRunning() }.getOrDefault(false)
     }
 }

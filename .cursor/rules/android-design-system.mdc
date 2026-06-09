@@ -61,7 +61,7 @@ One component for all text. Never use `TextView` or set `android:textAppearance`
 ```
 
 **`app:typography` values:**
-`title` · `h1` · `h2` · `h3` · `h4` · `h5` · `body1` (default) · `body1_bold` · `body1_mono` · `body2` · `body2_bold` · `button` · `caption` · `caption_allCaps`
+`title` · `h1` · `h2` · `h3` · `h4` · `h5` · `body1` (default) · `body1_bold` · `body1_mono` · `body2` · `body2_bold` · `button` · `caption` · `caption_allCaps` · `onboarding_title` · `onboarding_body`
 
 **`app:textType` values:** `primary` (default) · `secondary`
 
@@ -83,6 +83,8 @@ body2_bold    14sp bold,   18sp line height
 button        15sp bold,   20sp line height
 caption       12sp regular, 16sp line height
 caption_allCaps  12sp regular, uppercase
+onboarding_title 24sp bold,   28sp line height, DuckSans Display
+onboarding_body  18sp regular, 22sp line height, DuckSans Product
 ```
 
 ---

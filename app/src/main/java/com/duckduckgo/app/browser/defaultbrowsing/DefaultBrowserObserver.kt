@@ -40,7 +40,9 @@ class DefaultBrowserObserver(
                     )
                     pixel.fire(AppPixelName.DEFAULT_BROWSER_SET, params)
                 }
-                else -> pixel.fire(AppPixelName.DEFAULT_BROWSER_UNSET)
+                else -> {
+                    pixel.fire(AppPixelName.DEFAULT_BROWSER_UNSET)
+                }
             }
         }
     }

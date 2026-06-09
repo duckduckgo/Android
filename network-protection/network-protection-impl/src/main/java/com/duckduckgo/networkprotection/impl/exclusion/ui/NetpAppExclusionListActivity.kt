@@ -46,9 +46,9 @@ import com.duckduckgo.networkprotection.impl.autoexclude.VpnAutoExcludePromptFra
 import com.duckduckgo.networkprotection.impl.databinding.ActivityNetpAppExclusionBinding
 import com.duckduckgo.networkprotection.impl.exclusion.ui.AppExclusionListAdapter.ExclusionListListener
 import com.duckduckgo.networkprotection.store.db.VpnIncompatibleApp
-import com.duckduckgo.subscriptions.api.PrivacyProFeedbackScreens.PrivacyProAppFeedbackScreenWithParams
-import com.duckduckgo.subscriptions.api.PrivacyProFeedbackScreens.PrivacyProFeedbackScreenWithParams
-import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback.PrivacyProFeedbackSource.VPN_EXCLUDED_APPS
+import com.duckduckgo.subscriptions.api.SubscriptionFeedbackScreens.SubscriptionAppFeedbackScreenWithParams
+import com.duckduckgo.subscriptions.api.SubscriptionFeedbackScreens.SubscriptionFeedbackScreenWithParams
+import com.duckduckgo.subscriptions.api.SubscriptionUnifiedFeedback.SubscriptionFeedbackSource.VPN_EXCLUDED_APPS
 import com.facebook.shimmer.ShimmerFrameLayout
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.launchIn
@@ -227,7 +227,7 @@ class NetpAppExclusionListActivity :
             is Command.ShowIssueReportingPage -> globalActivityStarter.start(this, command.params)
             is Command.ShowUnifiedPproAppFeedback -> globalActivityStarter.start(
                 this,
-                PrivacyProAppFeedbackScreenWithParams(
+                SubscriptionAppFeedbackScreenWithParams(
                     appName = command.appName,
                     appPackageName = command.appPackageName,
                 ),
@@ -235,7 +235,7 @@ class NetpAppExclusionListActivity :
 
             is Command.ShowUnifiedPproFeedback -> globalActivityStarter.start(
                 this,
-                PrivacyProFeedbackScreenWithParams(feedbackSource = VPN_EXCLUDED_APPS),
+                SubscriptionFeedbackScreenWithParams(feedbackSource = VPN_EXCLUDED_APPS),
             )
 
             is Command.ShowSystemAppsExclusionWarning -> showSystemAppsWarning(command.category)

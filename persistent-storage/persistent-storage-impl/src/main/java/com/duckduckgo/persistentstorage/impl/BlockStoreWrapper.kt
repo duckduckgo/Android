@@ -65,7 +65,7 @@ class RealBlockStoreWrapper @Inject constructor(
         val storeBytesData = StoreBytesData.Builder()
             .setKey(key)
             .setBytes(bytes)
-            .setShouldBackupToCloud(shouldBackupToCloud)
+            .setShouldBackupToCloud(false) // Cloud backup not yet supported
             .build()
         client.storeBytes(storeBytesData).await()
     }

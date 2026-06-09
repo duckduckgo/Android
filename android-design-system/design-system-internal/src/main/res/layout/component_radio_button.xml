@@ -55,4 +55,26 @@
 
     </RadioGroup>
 
+    <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
+        android:id="@+id/compose_label"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/keyline_4"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/radio_group"
+        app:primaryText="Compose Radio Button" />
+
+    <androidx.compose.ui.platform.ComposeView
+        android:id="@+id/compose_dax_radio_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/keyline_2"
+        android:layout_marginTop="@dimen/keyline_4"
+        android:paddingStart="@dimen/keyline_4"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/compose_label" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

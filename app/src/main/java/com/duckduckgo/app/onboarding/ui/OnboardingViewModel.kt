@@ -20,15 +20,23 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.browser.newaddressbaroption.RealNewAddressBarOptionManager
+import com.duckduckgo.app.cta.db.DismissedCtaDao
+import com.duckduckgo.app.cta.model.CtaId
+import com.duckduckgo.app.cta.model.DismissedCta
 import com.duckduckgo.app.onboarding.store.AppStage
+import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.store.UserStageStore
+import com.duckduckgo.app.onboarding.ui.OnboardingViewModel.ExtendedOnboardingFlow.*
+import com.duckduckgo.app.onboarding.ui.OnboardingViewModel.ExtendedOnboardingFlow.DEFAULT
 import com.duckduckgo.app.onboarding.ui.page.OnboardingPageFragment
+import com.duckduckgo.app.onboardingbranddesignupdate.OnboardingBrandDesignUpdateToggles
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @ContributesViewModel(ActivityScope::class)
@@ -39,13 +47,23 @@ class OnboardingViewModel @Inject constructor(
     private val onboardingSkipper: OnboardingSkipper,
     private val appBuildConfig: AppBuildConfig,
     private val newAddressBarOptionManager: RealNewAddressBarOptionManager,
+    private val dismissedCtaDao: DismissedCtaDao,
+    private val onboardingStore: OnboardingStore,
+    private val onboardingBrandDesignUpdateToggles: OnboardingBrandDesignUpdateToggles,
 ) : ViewModel() {
 
     private val _viewState = MutableStateFlow(ViewState())
     val viewState = _viewState.asStateFlow()
 
-    fun initializePages() {
-        pageLayoutManager.buildPageBlueprints()
+    suspend fun initializePages() {
+        val isBrandDesignUpdateEnabled = withContext(dispatchers.io()) {
+            onboardingBrandDesignUpdateToggles.brandDesignUpdate().isEnabled()
+        }
+        if (isBrandDesignUpdateEnabled) {
+            pageLayoutManager.buildBrandDesignUpdatePageBlueprints()
+        } else {
+            pageLayoutManager.buildPageBlueprints()
+        }
     }
 
     fun pageCount(): Int {
@@ -56,10 +74,33 @@ class OnboardingViewModel @Inject constructor(
         return pageLayoutManager.buildPage(position)
     }
 
-    fun onOnboardingDone() {
-        // Executing this on IO to avoid any delay changing threads between Main-IO.
-        viewModelScope.launch(dispatchers.io()) {
+    suspend fun onOnboardingDone(extendedOnboardingFlow: ExtendedOnboardingFlow = DEFAULT) {
+        withContext(dispatchers.io()) {
             userStageStore.stageCompleted(AppStage.NEW)
+
+            when (extendedOnboardingFlow) {
+                DEFAULT -> {
+                    // no-op
+                }
+
+                DUCK_AI_FOCUSED -> {
+                    // Mark this as a duck.ai onboarding path so CtaViewModel shows duck.ai-specific CTAs
+                    onboardingStore.setDuckAiOnboardingFlow()
+
+                    // Silence all standard DAX CTAs so they don't appear in the browser
+                    listOf(
+                        CtaId.DAX_INTRO,
+                        CtaId.DAX_DIALOG_SERP,
+                        CtaId.DAX_DIALOG_TRACKERS_FOUND,
+                        CtaId.DAX_FIRE_BUTTON,
+                        CtaId.DAX_END,
+                    ).forEach { dismissedCtaDao.insert(DismissedCta(it)) }
+                }
+
+                DEFAULT_WITHOUT_INTRO_CTA -> {
+                    dismissedCtaDao.insert(DismissedCta(CtaId.DAX_INTRO))
+                }
+            }
         }
     }
 
@@ -87,5 +128,11 @@ class OnboardingViewModel @Inject constructor(
 
     companion object {
         data class ViewState(val canShowSkipOnboardingButton: Boolean = false)
+    }
+
+    enum class ExtendedOnboardingFlow {
+        DEFAULT,
+        DUCK_AI_FOCUSED,
+        DEFAULT_WITHOUT_INTRO_CTA,
     }
 }

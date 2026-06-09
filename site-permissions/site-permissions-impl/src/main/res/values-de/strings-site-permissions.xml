@@ -18,8 +18,8 @@
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
     <!-- DRM Permission -->
-    <string name="drmSiteDialogTitle" instruction="Placeholder is the name of a website">„%1$s“ möchte deine DRM-Software öffnen</string>
-    <string name="drmSiteDialogSubtitle">Zum Abspielen geschützter Medieninhalte ist eine Digital Rights Management-Software erforderlich, die aber auch Zugriff auf Gerätekennungen ermöglicht. Erlaube nur Websites, denen du vertraust, den Zugriff auf diese Daten. Du kannst die Berechtigungen jederzeit in den Einstellungen verwalten. <annotation type="drm_learn_more_link">Mehr erfahren</annotation></string>
+    <string name="drmSitePermissionDialogTitle" instruction="Placeholder is the name of a website">„%1$s“ möchte deine DRM-Software (Digital Rights Management) öffnen</string>
+    <string name="drmSitePermissionDialogSubtitle" instruction="Placeholder is the name of a website">Wenn du „Ablehnen“ wählst, können Videos auf der Website möglicherweise nicht mehr abgespielt werden, aber %1$s hat dann keinen Zugriff auf die von der DRM-Software bereitgestellten Gerätekennungen. Du kannst die Berechtigungen jederzeit in den Einstellungen verwalten. <annotation type="drm_learn_more_link">Mehr erfahren</annotation></string>
     <string name="drmSiteDialogAllowAlways">Immer</string>
     <string name="drmSiteDialogAllowOnce">Nur für diese Sitzung</string>
     <string name="drmSiteDialogDenyAlways">Immer ablehnen</string>

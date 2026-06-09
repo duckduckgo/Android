@@ -48,6 +48,12 @@
     <string name="duck_ai_shortcut_settings_title">Duck.ai-genveje</string>
     <string name="duck_ai_shortcut_settings_description">Vælg hvilke Duck.ai-genveje der skal vises</string>
 
+    <!-- Default Toggle Position -->
+    <string name="duckAiDefaultTogglePositionTitle" instruction="&apos;Toggle&apos; refers to the UI tab switcher component (Search/Duck.ai), not the verb &apos;to toggle&apos;.">Ny position for faneskift</string>
+    <string name="duckAiDefaultTogglePositionSearch">Søg</string>
+    <string name="duckAiDefaultTogglePositionDuckAi">Duck.ai</string>
+    <string name="duckAiDefaultTogglePositionLastUsed">Sidst brugt</string>
+
     <!-- Duck AI Voice Search Shortcut Setting -->
     <string name="duckAiVoiceSearchVisibilitySetting">Stemmesøgning</string>
 
@@ -55,9 +61,7 @@
     <string name="input_screen_search_hint">Søg eller indtast adresse</string>
     <string name="input_screen_chat_hint">Spørg privat</string>
     <string name="input_screen_user_pref_without_ai">Kun søgning</string>
-    <string name="input_screen_user_pref_without_ai_updated" translatable="false">Search only</string>
     <string name="input_screen_user_pref_with_ai">Søg &amp; Duck.ai</string>
-    <string name="input_screen_user_pref_with_ai_updated" translatable="false">Toggle between\nSearch and Duck.ai</string>
     <string name="input_screen_user_pref_description">Prøv den nye mulighed for at spørge Duck.ai direkte fra adresselinjen. <annotation type="share_feedback">Del feedback</annotation></string>
 
     <!-- Duck.ai Pro settings -->
@@ -101,4 +105,68 @@
     <string name="duckAIContextualAutomaticContextTitle">Send automatisk sideindhold</string>
     <string name="duckAIContextualAutomaticContextMessage">Send automatisk sideindhold til Duck.ai</string>
     <string name="duckAIContextualAttachPageContent">Vedhæft sideindhold</string>
+
+    <!-- duck.ai contextual fire button -->
+    <string name="duckAIContextualFireButtonContentDescription">Ryd chat</string>
+
+    <!-- Content Descriptions -->
+    <string name="duckChatFireButtonContentDescription">Ryd data</string>
+    <string name="duckChatBrowserMenuContentDescription">Flere muligheder</string>
+
+    <!-- Duck AI Voice Chat Shortcut Setting -->
+    <string name="duckAiVoiceChatVisibilitySetting" instruction="Voice Chat is a feature that lets users talk to Duck.ai using their voice instead of typing.">Stemmechat</string>
+
+    <!-- Duck.ai voice microphone foreground service notification -->
+    <string name="duckAiVoiceNotificationTitle" instruction="Title shown in the notification when Duck.ai Voice Chat is active and using the microphone.">Duck.ai-stemmechat er aktiv</string>
+    <string name="duckAiVoiceNotificationMessage" instruction="Message shown in the notification explaining that the microphone is being used by Duck.ai.">Mikrofonen bruges af Duck.ai</string>
+    <string name="duckAiVoiceNotificationChannelName" instruction="Name of the Android notification channel for the Duck.ai Voice Chat foreground service.">Duck.ai-stemmechat</string>
+    <string name="duckAiVoiceNotificationActionOpenChat" instruction="Notification action button that opens the active Duck.ai chat.">Åbn chat</string>
+    <string name="duckAiVoiceNotificationActionEndSession" instruction="Notification action button that ends the active Duck.ai voice chat session.">Afslut chat</string>
+
+    <!-- Duck AI Chat Suggestions -->
+    <string name="duckAiChatHistoryViewAllChats">Se alle chats</string>
+
+    <!-- Native Duck.ai chat history -->
+    <string name="duck_ai_chat_history_title">Chats</string>
+    <string name="duck_ai_chat_history_section_pinned">Fastgjort</string>
+    <string name="duck_ai_chat_history_section_recent">Seneste</string>
+    <string name="duck_ai_chat_history_untitled">Chat uden titel</string>
+    <string name="duck_ai_chat_history_empty_title">Ingen chats endnu</string>
+    <string name="duck_ai_chat_history_empty_cta_open">Åbn Duck.ai</string>
+    <string name="duck_ai_chat_history_more_options">Flere muligheder</string>
+    <string name="duck_ai_chat_history_action_select">Vælg</string>
+    <string name="duck_ai_chat_history_action_pin">Fastgør</string>
+    <string name="duck_ai_chat_history_action_unpin">Fjern fastgørelse</string>
+    <string name="duck_ai_chat_history_action_rename">Omdøb</string>
+    <string name="duck_ai_chat_history_action_download">Download</string>
+    <string name="duck_ai_chat_history_action_delete">Slet</string>
+    <string name="duck_ai_chat_history_search_hint">Søg i chats</string>
+    <string name="duck_ai_chat_history_action_search_content_description">Søg i chats</string>
+    <string name="duck_ai_chat_history_search_close_content_description">Luk søgning</string>
+    <string name="duck_ai_chat_history_search_clear_content_description">Ryd søgning</string>
+    <string name="duck_ai_chat_history_action_fire_content_description">Slettede chats</string>
+    <string name="duck_ai_chat_history_action_new">Ny</string>
+    <string name="duck_ai_chat_history_action_download_selected_content_description">Download chats</string>
+    <plurals name="duck_ai_chat_history_bulk_download_complete">
+        <item quantity="one">Download fuldført for %1$d chat</item>
+        <item quantity="other">Download fuldført for %1$d chats</item>
+    </plurals>
+    <string name="duck_ai_chat_history_action_overflow_content_description">Åbn overløbsmenuen</string>
+    <string name="duck_ai_chat_history_select_all">Vælg alle</string>
+    <string name="duck_ai_chat_history_unselect_all">Fravælg alle</string>
+    <string name="duck_ai_chat_history_row_selected_content_description">Valgt</string>
+    <string name="duck_ai_chat_history_row_unselected_content_description">Ikke valgt</string>
+    <string name="duck_ai_chat_history_exit_select_mode_content_description">Afslut valgtilstand</string>
+    <string name="duck_ai_chat_history_rename_title">Omdøb chatten</string>
+    <string name="duck_ai_chat_history_rename_chat_title_hint">Chattitel</string>
+    <string name="duck_ai_chat_history_rename_confirm_title">Gem</string>
+    <string name="duck_ai_chat_history_rename_confirm_content_description">Gem chattitel</string>
+    <string name="duck_ai_chat_history_rename_error">Kunne ikke omdøbe chat</string>
+    <string name="duck_ai_chat_history_pin_snackbar">Chat fastgjort</string>
+    <string name="duck_ai_chat_history_unpin_snackbar">Chat ikke fastgjort</string>
+    <string name="duck_ai_chat_history_undo">Fortryd</string>
+    <string name="duck_ai_chat_history_download_complete" instruction="%1$s is the saved chat filename (e.g. \&apos;My Chat.txt\&apos;).">Download fuldført for %1$s</string>
+    <string name="duck_ai_chat_history_download_view">Vis</string>
+    <string name="duck_ai_chat_history_download_error">Kunne ikke eksportere chat</string>
+    <string name="duck_ai_chat_history_bulk_download_error">Kunne ikke eksportere chats</string>
 </resources>

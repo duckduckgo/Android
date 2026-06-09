@@ -22,7 +22,4 @@
     <string name="autocompleteRemoveItemCancel">Annuler</string>
     <string name="autocompleteRemoveItemRemove">Supprimer</string>
     <string name="autocompleteSwitchToTab" instruction="Placeholder is a website">Passer à l\'onglet · %1$s</string>
-    <string name="improvedAutoCompleteIAMContent">Les suggestions de saisie semi-automatique incluent désormais les sites que vous avez récemment visités. Désactivez cette option dans Paramètres ou effacez à tout moment grâce au Fire Button 🔥.</string>
-    <string name="improvedAutoCompleteIAMTitle">La confidentialité reste la même.\nLes suggestions de recherche s\'améliorent !</string>
-    <string name="openAutoCompleteSettings">Ouvrir les paramètres</string>
 </resources>

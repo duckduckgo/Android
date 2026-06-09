@@ -14,7 +14,7 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.duckduckgo.duckchat.impl.ui.nativeinput.views.NonCollapsingFrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/inputModeTopRoot"
     android:layout_width="match_parent"
@@ -32,10 +32,11 @@
         app:cardElevation="6dp"
         app:cardUseCompatPadding="true">
 
-        <com.duckduckgo.duckchat.impl.ui.NativeInputModeWidget
+        <com.duckduckgo.duckchat.impl.ui.nativeinput.views.NativeInputModeWidget
             android:id="@+id/inputModeWidget"
             android:paddingHorizontal="8dp"
+            android:paddingVertical="4dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
     </com.google.android.material.card.MaterialCardView>
-</FrameLayout>
+</com.duckduckgo.duckchat.impl.ui.nativeinput.views.NonCollapsingFrameLayout>

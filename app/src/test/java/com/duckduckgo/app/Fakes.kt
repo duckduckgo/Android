@@ -138,6 +138,16 @@ class FakeSettingsDataStore :
             store["lastSessionBackgroundTimestamp"] = value
         }
 
+    override var userSelectedIdleThresholdSeconds: Long?
+        get() = store["userSelectedIdleThresholdSeconds"] as Long?
+        set(value) {
+            if (value == null) {
+                store.remove("userSelectedIdleThresholdSeconds")
+            } else {
+                store["userSelectedIdleThresholdSeconds"] = value
+            }
+        }
+
     override var appNotificationsEnabled: Boolean
         get() = store["appNotificationsEnabled"] as Boolean? ?: true
         set(value) {
@@ -220,12 +230,6 @@ class FakeSettingsDataStore :
             store["clearDuckAiData"] = value
         }
 
-    override var useBottomSheetMenu: Boolean
-        get() = store["useBottomSheetMenu"] as Boolean? ?: false
-        set(value) {
-            store["useBottomSheetMenu"] = value
-        }
-
     override var showTrackersCountInAddressBar: Boolean
         get() = store["showTrackersCountInAddressBar"] as Boolean? ?: true
         set(value) {
@@ -248,6 +252,24 @@ class FakeSettingsDataStore :
         get() = store["getDesktopBrowserSettingDismissed"] as Boolean? ?: false
         set(value) {
             store["getDesktopBrowserSettingDismissed"] = value
+        }
+
+    override var nextStepsAddressBarDismissed: Boolean
+        get() = store["nextStepsAddressBarDismissed"] as Boolean? ?: false
+        set(value) {
+            store["nextStepsAddressBarDismissed"] = value
+        }
+
+    override var nextStepsVoiceSearchDismissed: Boolean
+        get() = store["nextStepsVoiceSearchDismissed"] as Boolean? ?: false
+        set(value) {
+            store["nextStepsVoiceSearchDismissed"] = value
+        }
+
+    override var nextStepsSectionHidden: Boolean
+        get() = store["nextStepsSectionHidden"] as Boolean? ?: false
+        set(value) {
+            store["nextStepsSectionHidden"] = value
         }
 
     override fun isCurrentlySelected(clearWhatOption: ClearWhatOption): Boolean {

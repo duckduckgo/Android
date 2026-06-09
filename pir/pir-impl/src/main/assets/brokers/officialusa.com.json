@@ -1,7 +1,7 @@
 {
   "name": "OfficialUSA",
   "url": "officialusa.com",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "parent": "neighbor.report",
   "addedDatetime": 1692594000000,
   "optOutUrl": "https://www.officialusa.com/opt-out/",
@@ -46,7 +46,9 @@
               "selector": ".//span[@itemprop='telephone']"
             },
             "relativesList": null,
-            "profileUrl": null
+            "profileUrl": {
+              "identifierType": "hash"
+            }
           }
         }
       ]

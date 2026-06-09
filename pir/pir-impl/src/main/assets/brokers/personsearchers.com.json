@@ -1,7 +1,7 @@
 {
   "name": "PersonSearchers",
   "url": "personsearchers.com",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "parent": "privatereports.com",
   "optOutUrl": "https://www.personsearchers.com/optOut/name/landing",
   "steps": [
@@ -61,6 +61,17 @@
             }
           ],
           "id": "91f495d7-2037-42b7-904b-76ae2c2798e0"
+        },
+        {
+          "_comment": "Turnstile auto-completes. This one should disappear after clicking, so we'll use a negative selector to ensure it's not present.",
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//body[not(.//input[@name='cf-turnstile-response'])]"
+            }
+          ],
+          "id": "cft-fde7d76b-54c9-48d4-95bd-ef9a58b95992"
         },
         {
           "actionType": "expectation",

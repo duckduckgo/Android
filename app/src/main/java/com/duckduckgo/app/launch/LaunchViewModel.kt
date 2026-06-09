@@ -16,9 +16,11 @@
 
 package com.duckduckgo.app.launch
 
+import android.content.Intent
+import android.os.Bundle
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
-import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.onboarding.store.isNewUser
 import com.duckduckgo.app.pixels.AppPixelName
@@ -26,11 +28,11 @@ import com.duckduckgo.app.referral.AppInstallationReferrerStateListener
 import com.duckduckgo.app.referral.AppInstallationReferrerStateListener.Companion.MAX_REFERRER_WAIT_TIME_MS
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.utils.SingleLiveEvent
-import com.duckduckgo.daxprompts.api.DaxPrompts
-import com.duckduckgo.daxprompts.api.DaxPrompts.ActionType.NONE
-import com.duckduckgo.daxprompts.api.DaxPrompts.ActionType.SHOW_BROWSER_COMPARISON_PROMPT
-import com.duckduckgo.daxprompts.api.DaxPrompts.ActionType.TOO_SOON_TO_SHOW_OTHER_PROMPTS
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.testseeder.api.TestScenarioSeeder
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeoutOrNull
 import logcat.LogPriority
 import logcat.logcat
@@ -40,9 +42,8 @@ import javax.inject.Inject
 class LaunchViewModel @Inject constructor(
     private val userStageStore: UserStageStore,
     private val appReferrerStateListener: AppInstallationReferrerStateListener,
-    private val daxPrompts: DaxPrompts,
-    private val appInstallStore: AppInstallStore,
     private val pixel: Pixel,
+    private val testScenarioSeeder: TestScenarioSeeder,
 ) : ViewModel() {
 
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
@@ -50,24 +51,28 @@ class LaunchViewModel @Inject constructor(
     sealed class Command {
         data object Onboarding : Command()
         data class Home(val replaceExistingSearch: Boolean = false) : Command()
-        data object DaxPromptBrowserComparison : Command()
-        data object CloseDaxPrompt : Command()
     }
 
-    suspend fun determineViewToShow() {
-        waitForReferrerData()
-
-        when (daxPrompts.evaluate()) {
-            NONE, TOO_SOON_TO_SHOW_OTHER_PROMPTS -> {
-                logcat { "daxPrompts evaluate: None action" }
-                showOnboardingOrHome()
-            }
-
-            SHOW_BROWSER_COMPARISON_PROMPT -> {
-                logcat { "daxPrompts evaluate: Browser Comparison Prompt action" }
-                command.value = Command.DaxPromptBrowserComparison
-            }
+    fun start(intent: Intent) {
+        viewModelScope.launch {
+            seedTestScenario(intent)
+            waitForReferrerData()
+            showOnboardingOrHome()
         }
+    }
+
+    private suspend fun seedTestScenario(intent: Intent) {
+        runCatching {
+            testScenarioSeeder.seedIfNeeded(intent.extras.toStringMap())
+        }
+        // runCatching swallows CancellationException; re-check so a cancelled viewModelScope
+        // (activity finished mid-launch) stops the rest of start() instead of routing into a dead UI.
+        currentCoroutineContext().ensureActive()
+    }
+
+    private fun Bundle?.toStringMap(): Map<String, String> {
+        if (this == null) return emptyMap()
+        return keySet().mapNotNull { key -> getString(key)?.let { key to it } }.toMap()
     }
 
     suspend fun showOnboardingOrHome() {
@@ -76,13 +81,6 @@ class LaunchViewModel @Inject constructor(
         } else {
             command.value = Command.Home()
         }
-    }
-
-    fun onDaxPromptBrowserComparisonActivityResult(showComparisonChart: Boolean? = false) {
-        if (showComparisonChart != null) {
-            appInstallStore.defaultBrowser = showComparisonChart
-        }
-        command.value = Command.CloseDaxPrompt
     }
 
     private suspend fun waitForReferrerData() {

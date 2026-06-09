@@ -22,10 +22,8 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
-import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.duckchat.impl.DuckChatInternal
-import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.subscription.DuckAiPlusSettingsViewModel.ViewState.SettingState
 import com.duckduckgo.duckchat.impl.subscription.DuckAiPlusSettingsViewModel.ViewState.SettingState.Disabled
 import com.duckduckgo.duckchat.impl.subscription.DuckAiPlusSettingsViewModel.ViewState.SettingState.Hidden
@@ -40,7 +38,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -50,9 +47,7 @@ import javax.inject.Inject
 @ContributesViewModel(ViewScope::class)
 class DuckAiPlusSettingsViewModel @Inject constructor(
     private val subscriptions: Subscriptions,
-    private val dispatcherProvider: DispatcherProvider,
     private val duckChat: DuckChatInternal,
-    private val duckChatFeature: DuckChatFeature,
 ) : ViewModel(), DefaultLifecycleObserver {
 
     sealed class Command {
@@ -64,7 +59,6 @@ class DuckAiPlusSettingsViewModel @Inject constructor(
     data class ViewState(
         val settingState: SettingState = Hidden,
         val isDuckAiEnabled: Boolean = true,
-        val isDuckAiPaidSettingsFeatureEnabled: Boolean = false,
     ) {
 
         sealed class SettingState {
@@ -85,40 +79,23 @@ class DuckAiPlusSettingsViewModel @Inject constructor(
     override fun onCreate(owner: LifecycleOwner) {
         super.onCreate(owner)
 
-        viewModelScope.launch(dispatcherProvider.io()) {
-            val isFeatureEnabled = duckChatFeature.duckAiPaidSettingsStatus().isEnabled()
-
-            if (isFeatureEnabled) {
-                combine(
-                    subscriptions.getEntitlementStatus().map { entitlements ->
-                        entitlements.any { product ->
-                            product == DuckAiPlus
-                        }
-                    },
-                    duckChat.observeEnableDuckChatUserSetting(),
-                ) { hasValidEntitlement, isDuckAiEnabled ->
-                    val subscriptionStatus = subscriptions.getSubscriptionStatus()
-                    val state = getDuckAiProState(hasValidEntitlement, subscriptionStatus)
-                    _viewState.update {
-                        it.copy(
-                            settingState = state,
-                            isDuckAiEnabled = isDuckAiEnabled,
-                            isDuckAiPaidSettingsFeatureEnabled = true,
-                        )
-                    }
-                }.launchIn(viewModelScope)
-            } else {
-                subscriptions.getEntitlementStatus().map { entitlements ->
-                    entitlements.any { product ->
-                        product == DuckAiPlus
-                    }
-                }.onEach { hasValidEntitlement ->
-                    val subscriptionStatus = subscriptions.getSubscriptionStatus()
-                    val state = getDuckAiProState(hasValidEntitlement, subscriptionStatus)
-                    _viewState.update { it.copy(settingState = state) }
-                }.launchIn(viewModelScope)
+        combine(
+            subscriptions.getEntitlementStatus().map { entitlements ->
+                entitlements.any { product ->
+                    product == DuckAiPlus
+                }
+            },
+            duckChat.observeEnableDuckChatUserSetting(),
+        ) { hasValidEntitlement, isDuckAiEnabled ->
+            val subscriptionStatus = subscriptions.getSubscriptionStatus()
+            val state = getDuckAiProState(hasValidEntitlement, subscriptionStatus)
+            _viewState.update {
+                it.copy(
+                    settingState = state,
+                    isDuckAiEnabled = isDuckAiEnabled,
+                )
             }
-        }
+        }.launchIn(viewModelScope)
     }
 
     private suspend fun getDuckAiProState(

@@ -1,7 +1,7 @@
 {
   "name": "SealedRecords",
   "url": "sealedrecords.net",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "parent": "privatereports.com",
   "optOutUrl": "https://www.sealedrecords.net/optOut/name/landing",
   "steps": [
@@ -57,6 +57,17 @@
             }
           ],
           "id": "5f797133-1947-4b9b-9687-a9780e58f480"
+        },
+        {
+          "_comment": "Turnstile auto-completes. This one should disappear after clicking, so we'll use a negative selector to ensure it's not present.",
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//body[not(.//input[@name='cf-turnstile-response'])]"
+            }
+          ],
+          "id": "cft-c6a106d9-ee53-48fb-a6b7-21afedf1bbf3"
         },
         {
           "actionType": "expectation",

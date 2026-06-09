@@ -36,8 +36,8 @@ import com.duckduckgo.common.ui.view.text.DaxTextView
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
-import com.duckduckgo.subscriptions.impl.PrivacyProFeature
 import com.duckduckgo.subscriptions.impl.R
+import com.duckduckgo.subscriptions.impl.SubscriptionsFeature
 import com.duckduckgo.subscriptions.impl.databinding.ContentFeedbackSubmitBinding
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackReportType.GENERAL_FEEDBACK
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackReportType.REPORT_PROBLEM
@@ -51,7 +51,7 @@ class SubscriptionFeedbackSubmitFragment : SubscriptionFeedbackFragment(R.layout
     lateinit var globalActivityStarter: GlobalActivityStarter
 
     @Inject
-    lateinit var privacyProFeature: PrivacyProFeature
+    lateinit var subscriptionsFeature: SubscriptionsFeature
 
     private val submitTextWatcher: TextWatcher = object : TextWatcher {
         override fun beforeTextChanged(

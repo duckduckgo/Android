@@ -69,6 +69,8 @@ class Omnibar(
 
         fun onFireButtonPressed()
 
+        fun onPlusButtonPressed(anchor: View)
+
         fun onBrowserMenuPressed()
 
         fun onPrivacyShieldPressed()
@@ -84,6 +86,8 @@ class Omnibar(
         fun onBackButtonPressed()
 
         fun onDuckAISidebarButtonPressed()
+
+        fun onDuckAIBackButtonPressed()
     }
 
     interface FindInPageListener {
@@ -107,7 +111,7 @@ class Omnibar(
             query: String,
         )
 
-        fun onBackKeyPressed()
+        fun onBackKeyPressed(): Boolean
 
         fun onEnterPressed()
 
@@ -153,6 +157,8 @@ class Omnibar(
         ) : ViewMode()
 
         data object DuckAI : ViewMode()
+
+        data class Pdf(val url: String?) : ViewMode()
     }
 
     val omnibarView: OmnibarView by lazy {
@@ -391,6 +397,7 @@ class Omnibar(
                 privacyShield = viewState.showPrivacyShield.isHighlighted(),
             ),
         )
+        omnibarView.decorate(Decoration.LockForOnboarding(viewState.isOmnibarLockedForOnboarding))
     }
 
     fun createCookiesAnimation(isCosmetic: Boolean) {

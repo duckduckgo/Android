@@ -205,7 +205,7 @@ class WebViewDataManagerTest {
 
             verify(mockFileDeleter).deleteContents(
                 File(context.applicationInfo.dataDir, "app_webview"),
-                listOf("Default", "Cookies"),
+                listOf("Default", "Cookies", "pir"),
             )
         }
     }
@@ -470,7 +470,7 @@ class WebViewDataManagerTest {
 
             verify(mockFileDeleter).deleteContents(
                 File(context.applicationInfo.dataDir, "app_webview"),
-                listOf("Default", "Cookies"),
+                listOf("Default", "Cookies", "pir"),
             )
             verify(mockFileDeleter).deleteContents(
                 File(context.applicationInfo.dataDir, "app_webview/Default"),

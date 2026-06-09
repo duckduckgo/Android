@@ -19,19 +19,17 @@ package com.duckduckgo.subscriptions.impl
 import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
-import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.subscriptions.api.model.Entitlement
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.ADVANCED_SUBSCRIPTION
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.BASIC_SUBSCRIPTION
 import com.duckduckgo.subscriptions.impl.billing.PlayBillingManager
-import com.duckduckgo.subscriptions.impl.model.Entitlement
 import com.duckduckgo.subscriptions.impl.repository.AuthRepository
 import com.duckduckgo.subscriptions.impl.services.SubscriptionsCachedService
 import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import logcat.logcat
 import javax.inject.Inject
 
@@ -44,32 +42,25 @@ class SubscriptionFeaturesFetcher @Inject constructor(
     private val playBillingManager: PlayBillingManager,
     private val subscriptionsCachedService: SubscriptionsCachedService,
     private val authRepository: AuthRepository,
-    private val privacyProFeature: PrivacyProFeature,
-    private val dispatcherProvider: DispatcherProvider,
+    private val subscriptionsFeature: SubscriptionsFeature,
 ) : MainProcessLifecycleObserver {
 
     override fun onCreate(owner: LifecycleOwner) {
         super.onCreate(owner)
         appCoroutineScope.launch {
             try {
-                if (isFeaturesApiEnabled()) {
-                    fetchSubscriptionFeatures()
-                }
+                fetchSubscriptionFeatures()
             } catch (e: Exception) {
                 logcat { "Failed to fetch subscription features" }
             }
         }
     }
 
-    private suspend fun isFeaturesApiEnabled(): Boolean = withContext(dispatcherProvider.io()) {
-        privacyProFeature.featuresApi().isEnabled()
-    }
-
     private suspend fun fetchSubscriptionFeatures() {
         playBillingManager.productsFlow
             .firstOrNull() { it.isNotEmpty() }
             ?.filter {
-                if (privacyProFeature.fetchProTierEntitlements().isEnabled()) {
+                if (subscriptionsFeature.fetchProTierEntitlements().isEnabled()) {
                     it.productId == BASIC_SUBSCRIPTION || it.productId == ADVANCED_SUBSCRIPTION
                 } else {
                     it.productId == BASIC_SUBSCRIPTION
@@ -78,21 +69,9 @@ class SubscriptionFeaturesFetcher @Inject constructor(
             ?.flatMap { it.subscriptionOfferDetails ?: emptyList() }
             ?.map { it.basePlanId }
             ?.distinct()
-            ?.let { basePlanIds ->
-                logcat {
-                    "fetchSubscriptionFeatures: found base plan ids: $basePlanIds"
-                }
-                if (privacyProFeature.refreshSubscriptionPlanFeatures().isEnabled()) {
-                    basePlanIds
-                } else {
-                    basePlanIds.filter {
-                        authRepository.getFeatures(it).isEmpty()
-                    }
-                }
-            }
             ?.forEach { basePlanId ->
                 runCatching {
-                    if (privacyProFeature.tierMessagingEnabled().isEnabled()) {
+                    if (subscriptionsFeature.tierMessagingEnabled().isEnabled()) {
                         val features = subscriptionsCachedService.featuresV2(basePlanId).features[basePlanId] ?: emptyList()
                         logcat { "fetchSubscriptionFeatures: Subscription features for base plan $basePlanId fetched: $features" }
                         if (features.isNotEmpty()) {

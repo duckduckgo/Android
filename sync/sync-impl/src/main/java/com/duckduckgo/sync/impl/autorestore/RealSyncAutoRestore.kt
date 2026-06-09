@@ -23,6 +23,8 @@ import com.duckduckgo.sync.api.SyncAutoRestore
 import com.duckduckgo.sync.impl.Result
 import com.duckduckgo.sync.impl.SyncAccountRepository
 import com.duckduckgo.sync.impl.SyncFeature
+import com.duckduckgo.sync.impl.pixels.SyncPixelParameters
+import com.duckduckgo.sync.impl.pixels.SyncPixels
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.CoroutineScope
@@ -34,14 +36,18 @@ import logcat.logcat
 import javax.inject.Inject
 
 @SingleInstanceIn(AppScope::class)
-@ContributesBinding(AppScope::class)
+@ContributesBinding(AppScope::class, boundType = SyncAutoRestore::class)
+@ContributesBinding(AppScope::class, boundType = SyncOnboardingRestoreState::class)
 class RealSyncAutoRestore @Inject constructor(
     private val manager: SyncAutoRestoreManager,
     private val syncFeature: SyncFeature,
     private val syncAccountRepository: SyncAccountRepository,
+    private val syncPixels: SyncPixels,
     @AppCoroutineScope private val appScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
-) : SyncAutoRestore {
+) : SyncAutoRestore, SyncOnboardingRestoreState {
+
+    @Volatile private var restoreTimestamp: Long? = null
 
     override suspend fun canRestore(): Boolean {
         return withContext(dispatcherProvider.io()) {
@@ -69,8 +75,20 @@ class RealSyncAutoRestore @Inject constructor(
 
                 val parsedCode = syncAccountRepository.parseSyncAuthCode(payload.recoveryCode)
                 when (val result = syncAccountRepository.processCode(parsedCode, existingDeviceId = payload.deviceId)) {
-                    is Result.Success -> logcat(LogPriority.INFO) { "Sync-Recovery: account restored successfully" }
-                    is Result.Error -> logcat(LogPriority.WARN) { "Sync-Recovery: restore failed - code=${result.code}, reason=${result.reason}" }
+                    is Result.Success -> {
+                        logcat(LogPriority.INFO) { "Sync-Recovery: account restored successfully" }
+                        restoreTimestamp = System.currentTimeMillis()
+                        syncPixels.fireAutoRestoreSuccess(SyncPixelParameters.AUTO_RESTORE_SOURCE_ONBOARDING)
+                        manager.saveAutoRestoreData(payload.recoveryCode, payload.deviceId)
+                    }
+                    is Result.Error -> {
+                        logcat(LogPriority.WARN) { "Sync-Recovery: restore failed - code=${result.code}, reason=${result.reason}" }
+                        syncPixels.fireAutoRestoreFailure(
+                            source = SyncPixelParameters.AUTO_RESTORE_SOURCE_ONBOARDING,
+                            errorCode = result.code.toString(),
+                            errorMessage = result.reason,
+                        )
+                    }
                 }
             } catch (t: Throwable) {
                 coroutineContext.ensureActive()
@@ -78,4 +96,6 @@ class RealSyncAutoRestore @Inject constructor(
             }
         }
     }
+
+    override fun autoRestoredTimestamp(): Long? = restoreTimestamp
 }

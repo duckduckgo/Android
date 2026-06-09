@@ -36,6 +36,7 @@
     <string name="browserMenuPrintSite">Yazdır</string>
     <string name="browserMenuOpenAppLink">Uygulamada Aç</string>
     <string name="browserMenuAddToHome">Ana ekrana ekle</string>
+    <string name="browserMenuDownloadPdf">PDF indir</string>
     <string name="browserMenuReportBrokenSite">Hatalı Siteyi Bildirin</string>
     <string name="browserMenuAutofill">Şifreler</string>
     <string name="browserMenuDownloads">İndirilenler</string>
@@ -56,5 +57,5 @@
     <string name="browserMenuBack">Geri</string>
     <string name="browserMenuForward">İleri</string>
     <string name="browserMenuRefresh">Yenile</string>
-    <string name="browserMenuFire">Sekmeleri ve Verileri Temizle</string>
+    <string name="browserMenuFireTabsData">Sekmeleri ve Verileri Sil</string>
 </resources>

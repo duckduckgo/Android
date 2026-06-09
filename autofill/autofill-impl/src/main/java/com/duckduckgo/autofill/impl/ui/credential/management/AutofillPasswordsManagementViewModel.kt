@@ -324,7 +324,7 @@ class AutofillPasswordsManagementViewModel @Inject constructor(
             return
         }
 
-        val credentialCount = autofillStore.getCredentialCount().firstOrNull()
+        val credentialCount = autofillStore.getCredentialCount().firstOrNull()?.getOrThrow()
         val shouldAskAuth = credentialCount == null || credentialCount == 0
         if (shouldAskAuth) {
             logcat(VERBOSE) { "No credentials; can skip showing device auth" }
@@ -681,7 +681,7 @@ class AutofillPasswordsManagementViewModel @Inject constructor(
             logcat(VERBOSE) { "Opened autofill management screen from from $launchSource" }
 
             val source = launchSource.asString()
-            val hasCredentialsSaved = (autofillStore.getCredentialCount().firstOrNull() ?: 0) > 0
+            val hasCredentialsSaved = (autofillStore.getCredentialCount().firstOrNull()?.getOrThrow() ?: 0) > 0
             pixel.fire(AUTOFILL_MANAGEMENT_SCREEN_OPENED, mapOf("source" to source, "has_credentials_saved" to hasCredentialsSaved.toBinaryString()))
             pixel.fire(AutofillPixelNames.PRODUCT_TELEMETRY_SURFACE_PASSWORDS_OPENED)
             pixel.fire(AutofillPixelNames.PRODUCT_TELEMETRY_SURFACE_PASSWORDS_OPENED_DAILY, type = Pixel.PixelType.Daily())

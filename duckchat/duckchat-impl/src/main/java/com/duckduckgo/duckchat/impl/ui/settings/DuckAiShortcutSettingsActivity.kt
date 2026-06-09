@@ -52,6 +52,11 @@ class DuckAiShortcutSettingsActivity : DuckDuckGoActivity() {
             viewModel.onShowDuckChatInVoiceSearchToggled(isChecked)
         }
 
+    private val voiceChatToggleListener =
+        CompoundButton.OnCheckedChangeListener { _, isChecked ->
+            viewModel.onShowDuckChatInVoiceChatToggled(isChecked)
+        }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -80,6 +85,10 @@ class DuckAiShortcutSettingsActivity : DuckDuckGoActivity() {
         binding.showDuckAiInVoiceSearchToggle.apply {
             isVisible = viewState.shouldShowVoiceSearchToggle
             quietlySetIsChecked(viewState.showInVoiceSearch, voiceSearchToggleListener)
+        }
+        binding.showDuckAiInVoiceChatToggle.apply {
+            isVisible = viewState.shouldShowVoiceChatToggle
+            quietlySetIsChecked(viewState.showInVoiceChat, voiceChatToggleListener)
         }
     }
 }

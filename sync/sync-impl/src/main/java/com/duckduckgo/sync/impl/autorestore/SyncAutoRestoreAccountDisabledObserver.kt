@@ -56,8 +56,8 @@ class SyncAutoRestoreAccountDisabledObserver @Inject constructor(
             .filter { isSignedIn -> !isSignedIn }
             .filter { syncFeature.syncAutoRestore().isEnabled() }
             .onEach {
-                logcat { "Sync-Recovery: sync disabled, clearing recovery code from Block Store" }
-                syncAutoRestoreManager.clearRecoveryCode()
+                logcat { "Sync-Recovery: sync disabled, clearing auto-restore data" }
+                syncAutoRestoreManager.clearAutoRestoreData()
             }
             .flowOn(dispatcherProvider.io())
             .launchIn(appCoroutineScope)

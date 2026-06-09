@@ -1,0 +1,131 @@
+{
+  "name": "PropertyRec",
+  "url": "propertyrec.com",
+  "version": "0.3.0",
+  "parent": "propertyrecord.com",
+  "addedDatetime": 1775829600000,
+  "optOutUrl": "https://dashboard.propertyrec.com/opt-out",
+  "steps": [
+    {
+      "stepType": "scan",
+      "scanType": "templatedUrl",
+      "actions": [
+        {
+          "actionType": "navigate",
+          "_comment": "All other child sites go to the homepage first and click the opt-out link, but this one pops the page up in a new window, so we'll go to the opt-out page directly instead",
+          "id": "3591978e-66c7-4bc8-864c-4a0c4741d182",
+          "url": "https://dashboard.propertyrec.com/opt-out/"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//h1[contains(text(), 'Remove My Information')]"
+            }
+          ],
+          "id": "3e44df56-fc5d-49d3-a408-0bc059c5d2c8"
+        },
+        {
+          "actionType": "fillForm",
+          "selector": "form#backgroundCheckForm",
+          "dataSource": "userProfile",
+          "elements": [
+            {
+              "type": "fullName",
+              "selector": ".//input[@name='name']"
+            },
+            {
+              "type": "cityState",
+              "selector": ".//input[@name='cityState']"
+            }
+          ],
+          "id": "790f6a0e-2236-4502-8627-726c214094bd"
+        },
+        {
+          "actionType": "click",
+          "elements": [
+            {
+              "type": "button",
+              "selector": "button[type='submit']"
+            }
+          ],
+          "id": "5d160b1d-d825-4b7a-aaa2-d43972edb7ca"
+        },
+        {
+          "actionType": "condition",
+          "_comment": "Occasionally the site pops ups a spelling correction, and we need to press the 'Use Original' button",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "#spellcheck-original"
+            }
+          ],
+          "actions": [
+            {
+              "actionType": "click",
+              "elements": [
+                {
+                  "type": "button",
+                  "selector": "#spellcheck-original"
+                }
+              ],
+              "id": "074b7f8d-0438-44cf-b3d6-3d03b2cb4f71"
+            }
+          ],
+          "id": "0ffcb4fa-c9c7-418d-822d-8c70d6f811f7"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//div[contains(text(), 'Search Results')]"
+            }
+          ],
+          "id": "56ac8192-ec96-4129-8f69-0ed50475d771"
+        },
+        {
+          "actionType": "extract",
+          "id": "7cdeb58f-7b1c-494e-b367-4eb17d45aa76",
+          "selector": "//ul[@id='people-search-results']/li",
+          "noResultsSelector": "//h3[contains(text(), 'No results found')]",
+          "profile": {
+            "name": {
+              "selector": ".//div[contains(@class,'grid')]/div[contains(@class,'flex-col')][1]/div[contains(@class,'!text-[#222]')]"
+            },
+            "addressCityState": {
+              "selector": ".//div[contains(@class,'grid')]/div[contains(@class,'flex-col')][1]/div[contains(@class,'!leading-tight')]"
+            },
+            "age": {
+              "selector": ".//div[contains(@class,'grid')]/div[contains(@class,'flex-col')][1]/div[contains(.,'Years Old') or contains(.,'Deceased')]"
+            },
+            "addressCityStateList": {
+              "selector": ".//div[contains(@class,'text-xs') and normalize-space(.)='Locations Include']/following-sibling::div",
+              "findElements": true
+            },
+            "relativesList": {
+              "selector": ".//div[contains(@class,'text-xs') and normalize-space(.)='Possible Relatives']/following-sibling::div",
+              "findElements": true
+            },
+            "profileUrl": {
+              "identifierType": "hash"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "stepType": "optOut",
+      "optOutType": "parentSiteOptOut",
+      "actions": []
+    }
+  ],
+  "schedulingConfig": {
+    "retryError": 48,
+    "confirmOptOutScan": 72,
+    "maintenanceScan": 120,
+    "maxAttempts": -1
+  },
+  "removedAt": null
+}

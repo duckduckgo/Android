@@ -18,6 +18,7 @@ package com.duckduckgo.pir.impl.integration.fakes
 
 import android.content.Context
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.pir.impl.common.EmailDataResolver
 import com.duckduckgo.pir.impl.common.PirJob.RunType
 import com.duckduckgo.pir.impl.common.RealPirActionsRunner
 import com.duckduckgo.pir.impl.common.actions.RealPirActionsRunnerStateEngineFactory
@@ -32,6 +33,7 @@ class TestPirActionsRunnerFactory(
     private val pirDetachedWebViewProvider: FakePirDetachedWebViewProvider,
     private val brokerActionProcessor: RealBrokerActionProcessor,
     private val nativeBrokerActionHandler: FakeNativeBrokerActionHandler,
+    private val emailDataResolver: EmailDataResolver,
     private val engineFactory: RealPirActionsRunnerStateEngineFactory,
     private val coroutineScope: CoroutineScope,
 ) : RealPirActionsRunner.Factory {
@@ -45,6 +47,7 @@ class TestPirActionsRunnerFactory(
             pirDetachedWebViewProvider = pirDetachedWebViewProvider,
             brokerActionProcessor = brokerActionProcessor,
             nativeBrokerActionHandler = nativeBrokerActionHandler,
+            emailDataResolver = emailDataResolver,
             engineFactory = engineFactory,
             coroutineScope = coroutineScope,
             runType = runType,

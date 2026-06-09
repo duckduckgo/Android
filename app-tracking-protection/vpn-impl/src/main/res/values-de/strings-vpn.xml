@@ -432,4 +432,8 @@
     <string name="apptp_PproUpsellBannerMessage_freeTrial">Abonniere DuckDuckGo und erhalte das einzige VPN, das mit App Tracking Protection kompatibel ist.</string>
     <string name="apptp_PproUpsellBannerAction_freeTrial">Kostenlos testen!</string>
 
+    <!-- Content Descriptions -->
+    <string name="atp_onboarding_close_button_content_description">Schließen</string>
+    <string name="atp_close_button_content_description">Schließen</string>
+
 </resources>

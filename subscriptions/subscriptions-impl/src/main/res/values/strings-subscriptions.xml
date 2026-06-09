@@ -83,10 +83,6 @@
     <string name="subscriptionSettingSectionHelpAndSupport">Help and Support</string>
     <string name="subscriptionSettingSendFeedback">Send Feedback</string>
     <string name="subscriptionSettingActivating">Activating</string>
-    <string name="subscriptionSettingSwitchUpgradeDynamic" instruction="%1$s is the savings percentage when switching from monthly to yearly (e.g. 16)">Save %1$s%% With a Yearly Plan</string>
-    <!-- smartling.character_limit = 10 -->
-    <string name="subscriptionSettingSwitchUpgradePill">Best offer</string>
-    <string name="subscriptionSettingSwitchDowngrade">Switch Plan</string>
     <string name="subscriptionSettingManagePlan">Manage Payment</string>
 
     <!--Purchase Subscriptions-->
@@ -183,16 +179,6 @@
 
     <string name="feedbackGeneralSubscription">Subscription</string>
 
-    <!-- Switch plan-->
-    <string name="switchBottomSheetDynamicTitleUpgrade" instruction="%1$s is the savings percentage when switching from monthly to yearly (e.g. 16)">Save %1$s%% with\na yearly plan!</string>
-    <string name="switchBottomSheetDescriptionUpgrade" instruction="%1$s is the yearly plan monthly equivalent price (e.g. $8.33), %2$s is the current monthly plan price (e.g. $9.99)">A yearly plan is just %1$s/mo, compared to your current %2$s monthly plan.</string>
-    <string name="switchBottomSheetPrimaryButtonUpgrade" instruction="%1$s is the yearly plan price (e.g. $99.99)">Switch to Yearly (%1$s/year)</string>
-    <string name="switchBottomSheetSecondaryButtonUpgrade">Keep Monthly Plan</string>
-    <string name="switchBottomSheetDynamicTitleDowngrade" instruction="%1$s is the savings percentage when using a yearly plan instead of monthly (e.g. 16)">You\'re saving %1$s%% with\na yearly plan!</string>
-    <string name="switchBottomSheetDescriptionDowngrade" instruction="%1$s is the yearly plan monthly equivalent price (e.g. $8.33), %2$s is the monthly plan price (e.g. $9.99)">Switching will increase your monthly price from %1$s/mo to %2$s/mo.</string>
-    <string name="switchBottomSheetPrimaryButtonDowngrade">Keep Yearly Plan</string>
-    <string name="switchBottomSheetSecondaryButtonDowngrade" instruction="%1$s is the monthly plan price (e.g. $9.99)">Switch to Monthly (%1$s/month)</string>
-
     <!-- Pro tier changes -->
     <string name="feedbackSubCategorySubsUnableToAccessProFeatures">Unable to access Plus or Pro tier features</string>
     <string name="subscriptionsProUpgradeTitle">Upgrade to Pro</string>
@@ -202,6 +188,7 @@
     <string name="subscriptionSettingManagePaymentOrCancel">Manage Payment or Cancel</string>
 
     <!-- Pending plan changes -->
+    <string name="subscriptionPendingPlanChangeDowngradePanel" instruction="First placeholder is the Tier name (e.g. Plus, Pro), second is date in short format (month day)">Your plan will downgrade to %1$s on %2$s.</string>
     <string name="subscriptionPendingPlanChangeUpgrade" instruction="First placeholder is the plan name (e.g. Plus Yearly), third is a date">Your plan will upgrade to %1$s on %2$s.</string>
     <string name="subscriptionPendingPlanChangeDowngrade" instruction="First placeholder is the plan name (e.g. Plus Yearly), third is a date">Your plan will downgrade to %1$s on %2$s.</string>
     <string name="planNamePlusMonthly">Plus Monthly</string>
@@ -210,5 +197,9 @@
     <string name="planNameProYearly">Pro Yearly</string>
     <string name="tierPlusName" translatable="false">PLUS</string>
     <string name="tierProName" translatable="false">PRO</string>
+
+    <!-- Content Descriptions -->
+    <string name="subscriptionExpiredStatusIconContentDescription">Subscription expired</string>
+    <string name="subscriptionActiveStatusIconContentDescription">Subscription active</string>
 
 </resources>

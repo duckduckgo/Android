@@ -153,7 +153,7 @@
                 android:layout_height="7dp"
                 android:layout_gravity="end"
                 android:layout_margin="@dimen/keyline_2"
-                android:background="@drawable/ic_circle_7_accent_blue"
+                android:background="@drawable/ic_dot_indicator_7"
                 android:visibility="gone" />
 
         </FrameLayout>

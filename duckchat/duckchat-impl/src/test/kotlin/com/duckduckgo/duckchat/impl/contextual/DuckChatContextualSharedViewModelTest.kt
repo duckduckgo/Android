@@ -96,6 +96,17 @@ class DuckChatContextualSharedViewModelTest {
     }
 
     @Test
+    fun whenContextualFireConfirmedThenOnContextualFireConfirmedCommandEmitted() = runTest {
+        testee.commands.test {
+            testee.onContextualFireConfirmed()
+
+            val command = awaitItem()
+            assertEquals(DuckChatContextualSharedViewModel.Command.OnContextualFireConfirmed, command)
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
     fun whenRequestPageContextThenCollectPageContextCommandEmitted() = runTest {
         testee.commands.test {
             testee.requestPageContext()

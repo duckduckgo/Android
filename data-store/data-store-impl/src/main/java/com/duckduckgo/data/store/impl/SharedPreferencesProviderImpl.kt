@@ -254,9 +254,7 @@ class SharedPreferencesProviderImpl @Inject constructor(
                 return@withContext null
             }
 
-            runCatching {
-                migrateContentsToHarmony(origin, destination, name)
-            }.getOrElse {
+            migrateContentsToHarmony(origin, destination, name).getOrElse {
                 ensureActive()
                 return@withContext null
             }
@@ -278,9 +276,7 @@ class SharedPreferencesProviderImpl @Inject constructor(
                 return@withContext null
             }
 
-            runCatching {
-                migrateContentsToHarmony(origin, destination, name)
-            }.getOrElse {
+            migrateContentsToHarmony(origin, destination, name).getOrElse {
                 ensureActive()
                 return@withContext null
             }
@@ -326,13 +322,13 @@ class SharedPreferencesProviderImpl @Inject constructor(
 
     /**
      * Migrates contents from origin to destination SharedPreferences.
-     * Throws on error after firing the appropriate pixel.
+     * Returns Result.failure after firing the appropriate pixel on error.
      */
     private fun migrateContentsToHarmony(
         origin: SharedPreferences,
         destination: SharedPreferences,
         name: String,
-    ) {
+    ): Result<Unit> {
         logcat { "Performing encrypted migration to Harmony" }
 
         val contents: Map<String?, Any?>? = runCatching {
@@ -343,38 +339,55 @@ class SharedPreferencesProviderImpl @Inject constructor(
                 mapOf("error" to it.error(), "name" to name),
                 type = Pixel.PixelType.Daily(),
             )
-            throw it
+            return Result.failure(it)
         }
 
         logcat(TAG) { "Migrating keys to harmony: ${contents?.keys}" }
 
-        runCatching {
-            contents?.keys?.forEach { key ->
-                when (val originalValue = contents[key]) {
-                    is Boolean -> destination.edit { putBoolean(key, originalValue) }
-                    is Long -> destination.edit { putLong(key, originalValue) }
-                    is Int -> destination.edit { putInt(key, originalValue) }
-                    is Float -> destination.edit { putFloat(key, originalValue) }
-                    is String -> destination.edit { putString(key, originalValue) }
+        try {
+            val editor = destination.edit()
+
+            for (key in contents?.keys.orEmpty()) {
+                when (val value = contents?.get(key)) {
+                    is Boolean -> editor.putBoolean(key, value)
+                    is Long -> editor.putLong(key, value)
+                    is Int -> editor.putInt(key, value)
+                    is Float -> editor.putFloat(key, value)
+                    is String -> editor.putString(key, value)
                     is Set<*> -> {
-                        if (originalValue.all { it is String }) {
-                            destination.edit { putStringSet(key, originalValue.filterIsInstance<String>().toSet()) }
+                        if (value.all { it is String }) {
+                            editor.putStringSet(key, value.filterIsInstance<String>().toSet())
                         } else {
-                            logcat(WARN) { "Could not migrate $key from $name preferences" }
+                            return onMigrationFailure(Exception("Could not migrate $key from $name preferences"), name)
                         }
                     }
-                    else -> logcat(WARN) { "Could not migrate $key from $name preferences" }
+                    else -> {
+                        return onMigrationFailure(Exception("Could not migrate $key from $name preferences"), name)
+                    }
                 }
             }
-            destination.edit(commit = true) { putBoolean(MIGRATED_TO_HARMONY, true) }
-        }.getOrElse {
-            pixel.fire(
-                DATA_STORE_MIGRATE_ENCRYPTED_UPDATE_PREFERENCES_DESTINATION_FAILED,
-                mapOf("error" to it.error(), "name" to name),
-                type = Pixel.PixelType.Daily(),
-            )
-            throw it
+
+            editor.putBoolean(MIGRATED_TO_HARMONY, true)
+            if (!editor.commit()) {
+                return onMigrationFailure(Exception("Migrating keys to harmony failed"), name)
+            }
+
+            return Result.success(Unit)
+        } catch (e: Exception) {
+            return onMigrationFailure(e, name)
         }
+    }
+
+    private fun onMigrationFailure(throwable: Throwable, name: String): Result<Unit> {
+        pixel.fire(
+            DATA_STORE_MIGRATE_ENCRYPTED_UPDATE_PREFERENCES_DESTINATION_FAILED,
+            mapOf("error" to throwable.error(), "name" to name),
+            type = Pixel.PixelType.Daily(),
+        )
+        throwable.message?.let {
+            logcat(WARN) { it }
+        }
+        return Result.failure(throwable)
     }
 
     private fun Throwable.error(): String {

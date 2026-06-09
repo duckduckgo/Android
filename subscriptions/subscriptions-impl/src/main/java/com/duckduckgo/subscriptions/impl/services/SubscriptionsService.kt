@@ -18,8 +18,8 @@ package com.duckduckgo.subscriptions.impl.services
 
 import com.duckduckgo.anvil.annotations.ContributesNonCachingServiceApi
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.subscriptions.api.model.Entitlement
 import com.duckduckgo.subscriptions.impl.auth.AuthRequired
-import com.duckduckgo.subscriptions.impl.model.Entitlement
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
@@ -34,10 +34,6 @@ interface SubscriptionsService {
     @AuthRequired
     @GET("https://subscriptions.duckduckgo.com/api/checkout/portal")
     suspend fun portal(): PortalResponse
-
-    @AuthRequired
-    @GET("https://subscriptions.duckduckgo.com/api/v1/offer-status")
-    suspend fun offerStatus(): OfferStatusResponse
 
     @AuthRequired
     @POST("https://subscriptions.duckduckgo.com/api/purchase/confirm/google")
@@ -98,8 +94,4 @@ fun List<ConfirmationEntitlement>.toEntitlements(): List<Entitlement> {
 
 data class FeaturesResponse(
     val features: List<String>,
-)
-
-data class OfferStatusResponse(
-    val hadTrial: Boolean,
 )

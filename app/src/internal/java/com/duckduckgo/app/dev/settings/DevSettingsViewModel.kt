@@ -55,7 +55,6 @@ class DevSettingsViewModel @Inject constructor(
         data object SendTdsIntent : Command()
         data object OpenUASelector : Command()
         data object ChangePrivacyConfigUrl : Command()
-        data object ChangeDuckAiUrl : Command()
         data object CustomTabs : Command()
         data object Notifications : Command()
         data object Tabs : Command()
@@ -118,10 +117,6 @@ class DevSettingsViewModel @Inject constructor(
 
     fun onRemotePrivacyUrlClicked() {
         viewModelScope.launch { command.send(Command.ChangePrivacyConfigUrl) }
-    }
-
-    fun onDuckAiUrlClicked() {
-        viewModelScope.launch { command.send(Command.ChangeDuckAiUrl) }
     }
 
     fun customTabsClicked() {

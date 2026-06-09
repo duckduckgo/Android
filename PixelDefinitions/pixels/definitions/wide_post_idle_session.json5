@@ -1,0 +1,82 @@
+// Wide event pixel for the post-idle session journey (NTP and LUT after idle return)
+// Tracks the full session from "surface shown" to terminal outcome to measure whether the
+// NTP-after-idle hatch reduces friction for new searches vs Last Used Tab.
+{
+    "wide_post_idle_session": {
+        "description": "Captures a post-idle session — NTP (with hatch) or LUT shown after an idle return — from surface shown to terminal user action or app background.",
+        "owners": ["GerardPaligot"],
+        "triggers": ["other"],
+        "suffixes": ["daily_count_short", "form_factor"],
+        "parameters": [
+            "widePixelPlatform",
+            "widePixelType",
+            "widePixelSampleRate",
+            "widePixelFeatureStatus",
+            "widePixelAppVersion",
+            "widePixelAppName",
+            "widePixelFormFactor",
+            "widePixelDevMode",
+            {
+                "key": "meta.type",
+                "type": "string",
+                "description": "Wide event type identifier (platform-prefixed)",
+                "enum": ["android-post-idle-session"]
+            },
+            {
+                "key": "meta.version",
+                "type": "string",
+                "description": "Composed semver: <base_major>.<event_minor>.<event_patch>"
+            },
+            {
+                "key": "global.is_first_daily_occurrence",
+                "type": "boolean",
+                "description": "Whether this is the first occurrence of the event for the user today"
+            },
+            {
+                "key": "feature.name",
+                "type": "string",
+                "description": "Feature identifier for this wide event",
+                "enum": ["post_idle_session"]
+            },
+            {
+                "key": "feature.data.ext.surface",
+                "type": "string",
+                "description": "Which post-idle surface was shown",
+                "enum": ["ntp", "lut"]
+            },
+            {
+                "key": "feature.data.ext.status_reason",
+                "type": "string",
+                "description": "Reason the session ended",
+                "enum": ["bar_used", "return_to_page_tapped", "tab_switcher_selected", "app_backgrounded", "favorite_selected"]
+            },
+            {
+                "key": "feature.data.ext.session_duration_ms_bucketed",
+                "type": "string",
+                "description": "Duration from surface shown to session end, bucketed (lower end of bucket, in ms)",
+                "enum": ["0", "1000", "5000", "10000", "30000", "60000", "300000", "600000"]
+            },
+            {
+                "key": "feature.data.ext.time_to_first_interaction_ms_bucketed",
+                "type": "string",
+                "description": "Duration from surface shown to the first non-terminal interaction (page_engaged, toggle_used, or back_pressed), bucketed (lower end of bucket, in ms)",
+                "enum": ["0", "1000", "5000", "10000", "30000", "60000", "300000", "600000"]
+            },
+            {
+                "key": "feature.data.ext.page_engaged",
+                "type": "boolean",
+                "description": "Whether the user touched the page content during the session (NTP body or WebView)"
+            },
+            {
+                "key": "feature.data.ext.toggle_used",
+                "type": "boolean",
+                "description": "Whether the user switched between search and Duck.ai modes during the session"
+            },
+            {
+                "key": "feature.data.ext.back_pressed",
+                "type": "boolean",
+                "description": "Whether the user pressed back at least once during the session"
+            }
+        ]
+    }
+}

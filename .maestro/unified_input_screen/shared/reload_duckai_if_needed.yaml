@@ -1,0 +1,15 @@
+appId: com.duckduckgo.mobile.android
+---
+# Duck.ai's web view occasionally fails to load and shows an
+# "Oops! Something went wrong" screen with a "Reload Duck.ai" button.
+# Tap it optionally so the test can proceed instead of failing on
+# assertions that depend on chat content. If the load succeeded, this
+# is a no-op — the optional wait + optional tap both fall through.
+- extendedWaitUntil:
+    visible:
+      text: ".*Reload Duck.ai.*"
+    timeout: 5000
+    optional: true
+- tapOn:
+    text: ".*Reload Duck.ai.*"
+    optional: true

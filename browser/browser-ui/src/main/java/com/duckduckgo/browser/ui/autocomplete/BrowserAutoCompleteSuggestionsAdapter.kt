@@ -16,22 +16,20 @@
 
 package com.duckduckgo.browser.ui.autocomplete
 
+import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.UiThread
-import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.DiffUtil.Callback
-import androidx.recyclerview.widget.DiffUtil.DiffResult
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteDefaultSuggestion
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteHistorySearchSuggestion
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteHistorySuggestion
-import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteInAppMessageSuggestion
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteSearchSuggestion
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteUrlSuggestion
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteUrlSuggestion.AutoCompleteBookmarkSuggestion
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteUrlSuggestion.AutoCompleteSwitchToTabSuggestion
+import com.duckduckgo.browser.ui.R
 import com.duckduckgo.browser.ui.autocomplete.AutoCompleteViewHolder.EmptySuggestionViewHolder
 
 private sealed interface AutoCompleteItem {
@@ -48,48 +46,11 @@ private val AutoCompleteSuggestion.isSearchItem: Boolean
 class BrowserAutoCompleteSuggestionsAdapter(
     private val immediateSearchClickListener: (AutoCompleteSuggestion) -> Unit,
     private val editableSearchClickListener: (AutoCompleteSuggestion) -> Unit,
-    private val autoCompleteInAppMessageDismissedListener: () -> Unit,
-    private val autoCompleteOpenSettingsClickListener: () -> Unit,
     private val autoCompleteLongPressClickListener: (AutoCompleteSuggestion) -> Unit,
     omnibarType: OmnibarType,
+    private val hideEditQueryArrow: Boolean = false,
+    private val hideSectionDividers: Boolean = false,
 ) : RecyclerView.Adapter<AutoCompleteViewHolder>() {
-    private val deleteClickListener: (AutoCompleteSuggestion) -> Unit = {
-        val suggestions = getSuggestions().filter { suggestion -> suggestion != it }
-        val newItems = createItemsWithDividers(suggestions)
-        val diffResult = calculateDiff(newItems)
-        items = newItems
-        // Animate the change
-        diffResult.dispatchUpdatesTo(this)
-        autoCompleteInAppMessageDismissedListener()
-    }
-
-    private fun calculateDiff(newItems: List<AutoCompleteItem>): DiffResult =
-        DiffUtil.calculateDiff(
-            object : Callback() {
-                override fun getOldListSize() = items.size
-
-                override fun getNewListSize() = newItems.size
-
-                override fun areItemsTheSame(
-                    oldItemPosition: Int,
-                    newItemPosition: Int,
-                ): Boolean =
-                    when {
-                        items[oldItemPosition] is AutoCompleteItem.Divider && newItems[newItemPosition] is AutoCompleteItem.Divider -> true
-                        items[oldItemPosition] is AutoCompleteItem.Suggestion && newItems[newItemPosition] is AutoCompleteItem.Suggestion ->
-                            (items[oldItemPosition] as AutoCompleteItem.Suggestion).value ==
-                                (newItems[newItemPosition] as AutoCompleteItem.Suggestion).value
-
-                        else -> false
-                    }
-
-                override fun areContentsTheSame(
-                    oldItemPosition: Int,
-                    newItemPosition: Int,
-                ) = true
-            },
-        )
-
     private val viewHolderFactoryMap: Map<Int, SuggestionViewHolderFactory> =
         mapOf(
             Type.EMPTY_TYPE to EmptySuggestionViewHolderFactory(),
@@ -97,7 +58,6 @@ class BrowserAutoCompleteSuggestionsAdapter(
             Type.BOOKMARK_TYPE to BookmarkSuggestionViewHolderFactory(),
             Type.HISTORY_TYPE to HistorySuggestionViewHolderFactory(),
             Type.HISTORY_SEARCH_TYPE to HistorySearchSuggestionViewHolderFactory(),
-            Type.IN_APP_MESSAGE_TYPE to InAppMessageViewHolderFactory(),
             Type.DEFAULT_TYPE to DefaultSuggestionViewHolderFactory(omnibarType),
             Type.SWITCH_TO_TAB_TYPE to SwitchToTabSuggestionViewHolderFactory(),
             Type.DIVIDER_TYPE to DividerViewHolderFactory(),
@@ -125,7 +85,6 @@ class BrowserAutoCompleteSuggestionsAdapter(
                     is AutoCompleteBookmarkSuggestion -> Type.BOOKMARK_TYPE
                     is AutoCompleteHistorySuggestion -> Type.HISTORY_TYPE
                     is AutoCompleteHistorySearchSuggestion -> Type.HISTORY_SEARCH_TYPE
-                    is AutoCompleteInAppMessageSuggestion -> Type.IN_APP_MESSAGE_TYPE
                     is AutoCompleteDefaultSuggestion -> Type.DEFAULT_TYPE
                     is AutoCompleteSwitchToTabSuggestion -> Type.SWITCH_TO_TAB_TYPE
                     is AutoCompleteUrlSuggestion -> Type.SWITCH_TO_TAB_TYPE
@@ -150,12 +109,14 @@ class BrowserAutoCompleteSuggestionsAdapter(
                     .onBindViewHolder(
                         holder,
                         item.value,
+                        phrase,
                         immediateSearchClickListener,
                         editableSearchClickListener,
-                        deleteClickListener,
-                        autoCompleteOpenSettingsClickListener,
                         autoCompleteLongPressClickListener,
                     )
+                if (hideEditQueryArrow) {
+                    holder.itemView.findViewById<View>(R.id.editQueryImage)?.visibility = View.GONE
+                }
             }
         }
     }
@@ -195,8 +156,10 @@ class BrowserAutoCompleteSuggestionsAdapter(
     private fun needsDivider(
         current: AutoCompleteSuggestion,
         next: AutoCompleteSuggestion,
-    ): Boolean = (current.isSearchItem != next.isSearchItem) ||
-        (current is AutoCompleteSuggestion.AutoCompleteDeviceAppSuggestion) != (next is AutoCompleteSuggestion.AutoCompleteDeviceAppSuggestion)
+    ): Boolean = !hideSectionDividers && (
+        (current.isSearchItem != next.isSearchItem) ||
+            (current is AutoCompleteSuggestion.AutoCompleteDeviceAppSuggestion) != (next is AutoCompleteSuggestion.AutoCompleteDeviceAppSuggestion)
+        )
 
     object Type {
         const val EMPTY_TYPE = 1
@@ -204,7 +167,6 @@ class BrowserAutoCompleteSuggestionsAdapter(
         const val BOOKMARK_TYPE = 3
         const val HISTORY_TYPE = 4
         const val HISTORY_SEARCH_TYPE = 5
-        const val IN_APP_MESSAGE_TYPE = 6
         const val DEFAULT_TYPE = 7
         const val SWITCH_TO_TAB_TYPE = 8
         const val DIVIDER_TYPE = 9

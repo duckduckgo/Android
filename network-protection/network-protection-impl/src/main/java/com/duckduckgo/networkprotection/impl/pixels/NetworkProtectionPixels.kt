@@ -266,8 +266,10 @@ interface NetworkProtectionPixels {
     fun reportFailureRecoveryCompletedWithDifferentTunnelAddress()
 
     fun reportAccessRevokedDialogShown()
-    fun reportPrivacyProPromotionDialogShown()
-    fun reportVpnBetaStoppedWhenPrivacyProUpdatedAndEnabled()
+    fun reportAccessRevokedDialogSubscribeClicked()
+    fun reportAccessRevokedDialogDismissClicked()
+    fun reportSubscriptionPromotionDialogShown()
+    fun reportVpnBetaStoppedWhenSubscriptionUpdatedAndEnabled()
 
     fun reportVpnEnabledFromQuickSettingsTile()
     fun reportVpnDisabledFromQuickSettingsTile()
@@ -546,14 +548,24 @@ class RealNetworkProtectionPixel @Inject constructor(
         tryToFireDailyPixel(NETP_ACCESS_REVOKED_DIALOG_SHOWN_DAILY)
     }
 
-    override fun reportPrivacyProPromotionDialogShown() {
-        firePixel(NETP_PRIVACY_PRO_PROMOTION_DIALOG_SHOWN)
-        tryToFireDailyPixel(NETP_PRIVACY_PRO_PROMOTION_DIALOG_SHOWN_DAILY)
+    override fun reportAccessRevokedDialogSubscribeClicked() {
+        firePixel(NETP_ACCESS_REVOKED_DIALOG_SUBSCRIBE_CLICKED)
+        tryToFireDailyPixel(NETP_ACCESS_REVOKED_DIALOG_SUBSCRIBE_CLICKED_DAILY)
     }
 
-    override fun reportVpnBetaStoppedWhenPrivacyProUpdatedAndEnabled() {
-        firePixel(NETP_BETA_STOPPED_WHEN_PRIVACY_PRO_UPDATED_AND_ENABLED)
-        tryToFireDailyPixel(NETP_BETA_STOPPED_WHEN_PRIVACY_PRO_UPDATED_AND_ENABLED_DAILY)
+    override fun reportAccessRevokedDialogDismissClicked() {
+        firePixel(NETP_ACCESS_REVOKED_DIALOG_DISMISS_CLICKED)
+        tryToFireDailyPixel(NETP_ACCESS_REVOKED_DIALOG_DISMISS_CLICKED_DAILY)
+    }
+
+    override fun reportSubscriptionPromotionDialogShown() {
+        firePixel(NETP_SUBSCRIPTION_PROMOTION_DIALOG_SHOWN)
+        tryToFireDailyPixel(NETP_SUBSCRIPTION_PROMOTION_DIALOG_SHOWN_DAILY)
+    }
+
+    override fun reportVpnBetaStoppedWhenSubscriptionUpdatedAndEnabled() {
+        firePixel(NETP_BETA_STOPPED_WHEN_SUBSCRIPTION_UPDATED_AND_ENABLED)
+        tryToFireDailyPixel(NETP_BETA_STOPPED_WHEN_SUBSCRIPTION_UPDATED_AND_ENABLED_DAILY)
     }
 
     override fun reportVpnEnabledFromQuickSettingsTile() {

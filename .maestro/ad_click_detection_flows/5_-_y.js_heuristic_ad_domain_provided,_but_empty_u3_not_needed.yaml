@@ -1,4 +1,5 @@
 appId: com.duckduckgo.mobile.android
+androidWebViewHierarchy: devtools
 tags:
   - adClickTest
 ---
@@ -14,8 +15,7 @@ tags:
       - pressKey: Enter
 
       - runFlow: ../shared/browser_screen/click_on_fire_button.yaml
-      - tapOn:
-          text: "Cancel"
+      - runFlow: ../shared/browser_screen/dismiss_fire_dialog.yaml
       - assertVisible:
           id: "ad-id-5"
       - tapOn:

@@ -86,6 +86,7 @@ class RecoverDataViewModel @Inject constructor(
                     showRestoreOnReinstall = showRestore,
                 ),
             )
+            if (showRestore) syncPixels.fireAutoRestoreSetupToggleShown()
         } ?: run {
             syncSetupWideEvent.onRecoveryCodeGenerationFailed()
             command.send(Command.FinishWithError)
@@ -123,26 +124,24 @@ class RecoverDataViewModel @Inject constructor(
         }
     }
 
-    private suspend fun persistTogglePreference() {
-        syncAutoRestoreManager.setRestoreOnReinstallEnabled(viewState.value.restoreOnReinstallEnabled)
-    }
-
     private suspend fun persistRecoveryPayload() {
         if (viewState.value.restoreOnReinstallEnabled) {
             val recoveryCode = syncAccountRepository.getRecoveryCode().getOrNull()?.rawCode
             val deviceId = syncAccountRepository.getAccountInfo().deviceId
             if (recoveryCode != null) {
-                syncAutoRestoreManager.saveRecoveryPayload(recoveryCode, deviceId)
+                syncAutoRestoreManager.saveAutoRestoreData(recoveryCode, deviceId)
             }
         } else {
-            syncAutoRestoreManager.clearRecoveryCode()
+            syncAutoRestoreManager.clearAutoRestoreData()
         }
     }
 
     fun onNextClicked() {
         viewModelScope.launch(dispatchers.io()) {
             if (viewState.value.showRestoreOnReinstall) {
-                persistTogglePreference()
+                if (!viewState.value.restoreOnReinstallEnabled) {
+                    syncPixels.fireAutoRestoreSetupToggleOptedOut()
+                }
                 persistRecoveryPayload()
             }
             command.send(Next)
@@ -152,7 +151,6 @@ class RecoverDataViewModel @Inject constructor(
     fun onBackPressed() {
         viewModelScope.launch(dispatchers.io()) {
             if (viewState.value.showRestoreOnReinstall) {
-                persistTogglePreference()
                 persistRecoveryPayload()
             }
             command.send(Close)

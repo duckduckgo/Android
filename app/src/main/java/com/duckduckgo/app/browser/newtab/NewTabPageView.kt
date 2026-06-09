@@ -16,14 +16,15 @@
 
 package com.duckduckgo.app.browser.newtab
 
+import android.animation.ValueAnimator
 import android.annotation.SuppressLint
-import android.app.PendingIntent
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.provider.Settings
 import android.util.AttributeSet
+import android.view.MotionEvent
 import android.view.View
 import android.widget.LinearLayout
 import androidx.core.view.isGone
@@ -48,7 +49,6 @@ import com.duckduckgo.app.browser.newtab.NewTabPageViewModel.Command.SubmitUrl
 import com.duckduckgo.app.browser.newtab.NewTabPageViewModel.NewTabPageViewModelFactory
 import com.duckduckgo.app.browser.newtab.NewTabPageViewModel.NewTabPageViewModelProviderFactory
 import com.duckduckgo.app.browser.newtab.NewTabPageViewModel.ViewState
-import com.duckduckgo.app.browser.remotemessage.SharePromoLinkRMFBroadCastReceiver
 import com.duckduckgo.app.browser.remotemessage.asMessage
 import com.duckduckgo.app.global.view.launchDefaultAppActivity
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
@@ -62,12 +62,17 @@ import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.duckchat.api.DuckChatInputModeState
+import com.duckduckgo.duckchat.api.InputMode
 import com.duckduckgo.mobile.android.app.tracking.ui.AppTrackingProtectionScreens.AppTrackerOnboardingActivityWithEmptyParamsParams
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.GlobalActivityStarter.DeeplinkActivityParams
+import com.duckduckgo.newtabpage.api.interactions.HatchInteractionsPlugin
 import com.duckduckgo.remote.messaging.api.RemoteMessage
+import com.duckduckgo.remote.messaging.api.SharePromoLinkIntentFactory
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -114,6 +119,15 @@ class NewTabPageView @JvmOverloads constructor(
     @Inject
     lateinit var duckChat: DuckChat
 
+    @Inject
+    lateinit var inputModeState: DuckChatInputModeState
+
+    @Inject
+    lateinit var sharePromoLinkIntentFactory: SharePromoLinkIntentFactory
+
+    @Inject
+    lateinit var hatchInteractionsPlugins: PluginPoint<HatchInteractionsPlugin>
+
     private val binding: ViewNewTabBinding by viewBinding()
 
     private val homeBackgroundLogo by lazy { HomeBackgroundLogo(binding.ddgLogo) }
@@ -129,12 +143,28 @@ class NewTabPageView @JvmOverloads constructor(
     private val conflatedStateJob = ConflatedJob()
     private val conflatedCommandJob = ConflatedJob()
     private val conflatedNativeInputJob = ConflatedJob()
+    private val conflatedChatModeJob = ConflatedJob()
+
+    private var lastSelectedMode: InputMode? = null
+    private var logoAnimator: ValueAnimator? = null
+
+    private var pageEngagedFiredForCurrentAttachment = false
+
+    override fun dispatchTouchEvent(ev: MotionEvent): Boolean {
+        if (ev.actionMasked == MotionEvent.ACTION_DOWN && !pageEngagedFiredForCurrentAttachment) {
+            pageEngagedFiredForCurrentAttachment = true
+            hatchInteractionsPlugins.getPlugins().forEach { it.onNtpEngaged() }
+        }
+        return super.dispatchTouchEvent(ev)
+    }
 
     override fun onAttachedToWindow() {
         AndroidSupportInjection.inject(this)
         super.onAttachedToWindow()
 
         findViewTreeLifecycleOwner()?.lifecycle?.addObserver(viewModel)
+
+        configureLogoAnimation()
 
         conflatedStateJob += viewModel.viewState
             .onEach { render(it) }
@@ -148,6 +178,12 @@ class NewTabPageView @JvmOverloads constructor(
             .onEach { enabled -> updateLogoMargin(enabled) }
             .launchIn(findViewTreeLifecycleOwner()?.lifecycleScope!!)
 
+        conflatedChatModeJob += inputModeState.displayedMode
+            .onEach { mode -> updateLogoForMode(mode) }
+            .launchIn(findViewTreeLifecycleOwner()?.lifecycleScope!!)
+
+        pageEngagedFiredForCurrentAttachment = false
+
         disableViewStateSaving()
     }
 
@@ -158,6 +194,47 @@ class NewTabPageView @JvmOverloads constructor(
         conflatedStateJob.cancel()
         conflatedCommandJob.cancel()
         conflatedNativeInputJob.cancel()
+        conflatedChatModeJob.cancel()
+        logoAnimator?.cancel()
+        logoAnimator = null
+        lastSelectedMode = null
+    }
+
+    private fun configureLogoAnimation() {
+        with(binding.ddgLogo) {
+            setMinAndMaxFrame(0, LOGO_MAX_FRAME)
+            setAnimation(
+                if (appTheme.isLightModeEnabled()) {
+                    com.duckduckgo.duckchat.impl.R.raw.duckduckgo_ai_transition_light
+                } else {
+                    com.duckduckgo.duckchat.impl.R.raw.duckduckgo_ai_transition_dark
+                },
+            )
+        }
+    }
+
+    private fun updateLogoForMode(mode: InputMode) {
+        val previous = lastSelectedMode
+        if (previous == mode) return
+
+        val targetProgress = if (mode == InputMode.DUCK_AI) 1f else 0f
+
+        if (previous == null) {
+            binding.ddgLogo.progress = targetProgress
+        } else {
+            logoAnimator?.cancel()
+            logoAnimator = ValueAnimator.ofFloat(binding.ddgLogo.progress, targetProgress).apply {
+                duration = LOGO_ANIMATION_DURATION_MS
+                addUpdateListener { binding.ddgLogo.progress = it.animatedValue as Float }
+                start()
+            }
+        }
+        lastSelectedMode = mode
+    }
+
+    private companion object {
+        private const val LOGO_ANIMATION_DURATION_MS = 350L
+        private const val LOGO_MAX_FRAME = 15
     }
 
     private fun disableViewStateSaving() {
@@ -255,12 +332,7 @@ class NewTabPageView @JvmOverloads constructor(
             type = "text/plain"
         }
 
-        val pi = PendingIntent.getBroadcast(
-            context,
-            0,
-            Intent(context, SharePromoLinkRMFBroadCastReceiver::class.java),
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
-        )
+        val pi = sharePromoLinkIntentFactory.pendingIntent(context)
         try {
             context.startActivity(Intent.createChooser(share, null, pi.intentSender))
         } catch (e: ActivityNotFoundException) {

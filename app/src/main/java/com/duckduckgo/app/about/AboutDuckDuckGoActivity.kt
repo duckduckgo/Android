@@ -35,14 +35,15 @@ import com.duckduckgo.app.about.AboutDuckDuckGoViewModel.Command
 import com.duckduckgo.app.about.AboutDuckDuckGoViewModel.Command.LaunchBrowserWithLearnMoreUrl
 import com.duckduckgo.app.about.AboutDuckDuckGoViewModel.Command.LaunchBrowserWithPrivacyProtectionsUrl
 import com.duckduckgo.app.about.AboutDuckDuckGoViewModel.Command.LaunchFeedback
-import com.duckduckgo.app.about.AboutDuckDuckGoViewModel.Command.LaunchPproUnifiedFeedback
+import com.duckduckgo.app.about.AboutDuckDuckGoViewModel.Command.LaunchSubscriptionUnifiedFeedback
 import com.duckduckgo.app.about.AboutDuckDuckGoViewModel.Command.LaunchWebViewWithComparisonChartUrl
-import com.duckduckgo.app.about.AboutDuckDuckGoViewModel.Command.LaunchWebViewWithPPROUrl
 import com.duckduckgo.app.about.AboutDuckDuckGoViewModel.Command.LaunchWebViewWithPrivacyPolicyUrl
+import com.duckduckgo.app.about.AboutDuckDuckGoViewModel.Command.LaunchWebViewWithSubscriptionUrl
 import com.duckduckgo.app.about.AboutDuckDuckGoViewModel.Command.LaunchWebViewWithVPNUrl
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ActivityAboutDuckDuckGoBinding
+import com.duckduckgo.app.browser.mode.InAppNavigation
 import com.duckduckgo.browser.api.ui.BrowserScreens.WebViewActivityWithParams
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.getColorFromAttr
@@ -51,7 +52,7 @@ import com.duckduckgo.common.utils.AppUrl.Url
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.R.attr
 import com.duckduckgo.navigation.api.GlobalActivityStarter
-import com.duckduckgo.subscriptions.api.PrivacyProFeedbackScreens.GeneralPrivacyProFeedbackScreenNoParams
+import com.duckduckgo.subscriptions.api.SubscriptionFeedbackScreens.GeneralSubscriptionFeedbackScreenNoParams
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -112,9 +113,9 @@ class AboutDuckDuckGoActivity : DuckDuckGoActivity() {
             }
         }
 
-        annotations?.find { it.value == PPRO_ANNOTATION }?.let {
+        annotations?.find { it.value == SUBSCRIPTION_ANNOTATION }?.let {
             addSpannable(spannableString, fullText, it) {
-                viewModel.onPProHelpPageLinkClicked()
+                viewModel.onSubscriptionHelpPageLinkClicked()
             }
         }
 
@@ -204,15 +205,15 @@ class AboutDuckDuckGoActivity : DuckDuckGoActivity() {
             LaunchWebViewWithPrivacyPolicyUrl -> launchWebViewScreen(PRIVACY_POLICY_WEB_LINK, getString(R.string.settingsPrivacyPolicyDuckduckgo))
             LaunchBrowserWithPrivacyProtectionsUrl -> launchPrivacyProtectionsScreen()
             LaunchFeedback -> launchFeedback()
-            LaunchPproUnifiedFeedback -> launchPproUnifiedFeedback()
+            LaunchSubscriptionUnifiedFeedback -> launchSubscriptionUnifiedFeedback()
             LaunchWebViewWithComparisonChartUrl -> launchWebViewScreen(COMPARISON_CHART_URL, getString(R.string.settingsAboutDuckduckgo))
-            LaunchWebViewWithPPROUrl -> launchWebViewScreen(PPRO_URL, getString(R.string.settingsAboutDuckduckgo))
+            LaunchWebViewWithSubscriptionUrl -> launchWebViewScreen(PPRO_URL, getString(R.string.settingsAboutDuckduckgo))
             LaunchWebViewWithVPNUrl -> launchWebViewScreen(VPN_URL, getString(R.string.settingsAboutDuckduckgo))
         }
     }
 
     private fun launchBrowserScreen() {
-        startActivity(BrowserActivity.intent(this, Url.ABOUT, interstitialScreen = true))
+        startActivity(BrowserActivity.intent(this, launchSource = InAppNavigation, queryExtra = Url.ABOUT, interstitialScreen = true))
         finish()
     }
 
@@ -240,10 +241,10 @@ class AboutDuckDuckGoActivity : DuckDuckGoActivity() {
         feedbackFlow.launch(null)
     }
 
-    private fun launchPproUnifiedFeedback() {
+    private fun launchSubscriptionUnifiedFeedback() {
         globalActivityStarter.start(
             this,
-            GeneralPrivacyProFeedbackScreenNoParams,
+            GeneralSubscriptionFeedbackScreenNoParams,
         )
     }
 
@@ -254,7 +255,7 @@ class AboutDuckDuckGoActivity : DuckDuckGoActivity() {
         private const val PRIVACY_PROTECTIONS_WEB_LINK = "https://duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/"
         private const val COMPARISON_CHART_ANNOTATION = "chart_comparison"
         private const val COMPARISON_CHART_URL = "https://duckduckgo.com/compare-privacy"
-        private const val PPRO_ANNOTATION = "ppro_help_page"
+        private const val SUBSCRIPTION_ANNOTATION = "ppro_help_page"
         private const val PPRO_URL = "https://duckduckgo.com/duckduckgo-help-pages/privacy-pro/"
         private const val VPN_ANNOTATION = "vpn_help_page"
         private const val VPN_URL = "https://duckduckgo.com/duckduckgo-help-pages/privacy-pro/vpn/"

@@ -1,0 +1,112 @@
+name: Nightly (Metro)
+
+# Runs the full nightly suite under the Metro DI framework. Scheduled at 04:30 UTC,
+# 2h30m after nightly-orchestrator.yml (02:00 UTC) — that orchestrator typically
+# completes in ~2h, so the gap absorbs cron-drift and avoids contention for runners
+# and Maestro/Robin quota without blocking the Anvil release flow. Metro is still
+# the non-default DI path, so this nightly is intentionally informational and does
+# not gate LGC tagging.
+
+on:
+  schedule:
+    - cron: '30 4 * * *'
+  workflow_call:
+    inputs:
+      commit:
+        description: 'Specific commit SHA to checkout'
+        required: true
+        type: string
+  workflow_dispatch:
+    inputs:
+      commit:
+        description: 'Specific commit SHA to checkout (optional, defaults to latest)'
+        required: false
+        type: string
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  call-nightly:
+    uses: ./.github/workflows/nightly.yml
+    with:
+      commit: ${{ inputs.commit || github.sha }}
+      ddg_di: Metro
+    secrets: inherit
+
+  call-end-to-end:
+    needs: [call-nightly]
+    uses: ./.github/workflows/e2e-nightly-full-suite.yml
+    with:
+      commit: ${{ inputs.commit || github.sha }}
+      ddg_di: Metro
+    secrets: inherit
+
+  call-privacy:
+    needs: [call-end-to-end]
+    uses: ./.github/workflows/privacy.yml
+    with:
+      commit: ${{ inputs.commit || github.sha }}
+      ddg_di: Metro
+    secrets: inherit
+
+  build_variants:
+    name: Assemble ${{ matrix.variant }} (Metro)
+    runs-on: android-large-runner
+    strategy:
+      fail-fast: false
+      matrix:
+        variant: [internalRelease, playRelease, fdroidRelease]
+    env:
+      DEVELOCITY_ACCESS_KEY: ${{ secrets.DEVELOCITY_ACCESS_KEY }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.commit || github.sha }}
+          submodules: recursive
+
+      - name: Decode release properties
+        uses: davidSchuppa/base64Secret-toFile-action@v2
+        with:
+          secret: ${{ secrets.FAKE_RELEASE_PROPERTIES }}
+          fileName: ddg_android_build.properties
+          destination-path: $HOME/jenkins_static/com.duckduckgo.mobile.android/
+
+      - name: Decode release key
+        uses: davidSchuppa/base64Secret-toFile-action@v2
+        with:
+          secret: ${{ secrets.FAKE_RELEASE_KEY }}
+          fileName: android
+          destination-path: $HOME/jenkins_static/com.duckduckgo.mobile.android/
+
+      - name: Set up JDK version
+        uses: actions/setup-java@v4
+        with:
+          java-version-file: .github/.java-version
+          distribution: 'adopt'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v5
+        with:
+          cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
+
+      - name: Assemble ${{ matrix.variant }}
+        env:
+          MALICIOUS_SITE_PROTECTION_AUTH_TOKEN: ${{ secrets.MALICIOUS_SITE_PROTECTION_AUTH_TOKEN }}
+          DUCKSANS_PACKAGE_AUTH_USER: ${{ secrets.DAXMOBILE_GITHUB_PACKAGES_AUTOMATION_USER }}
+          DUCKSANS_PACKAGE_AUTH_TOKEN: ${{ secrets.DAXMOBILE_GITHUB_PACKAGES_AUTOMATION }}
+        run: ./gradlew assemble${{ matrix.variant }} -Pforce-default-variant -Pskip-onboarding -Pddg.di=Metro -x lint
+
+      - name: Create Asana task on failure
+        if: ${{ failure() }}
+        uses: duckduckgo/native-github-asana-sync@v2.0
+        with:
+          asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
+          asana-project: ${{ secrets.GH_ASANA_AOR_PROJECT_ID }}
+          asana-section: ${{ secrets.GH_ASANA_INCOMING_ID }}
+          asana-task-name: GH Workflow Failure - Assemble ${{ matrix.variant }} (Metro)
+          asana-task-description: The Metro assemble ${{ matrix.variant }} build has failed. See https://github.com/duckduckgo/Android/actions/runs/${{ github.run_id }}
+          action: 'create-asana-task'

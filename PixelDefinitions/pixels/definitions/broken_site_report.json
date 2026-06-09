@@ -5,7 +5,6 @@
         "triggers": ["user_submitted"],
         "suffixes": ["form_factor"],
         "parameters": [
-            "atb",
             "appVersion",
             "remoteConfigEtag",
             {
@@ -148,7 +147,7 @@
             {
                 "key": "upgradedHttps",
                 "description": "",
-                "enum": ["false", "true"]
+                "type": "boolean"
             },
             {
                 "key": "userRefreshCount",
@@ -163,12 +162,12 @@
             {
                 "key": "protectionsState",
                 "description": "If the protections toggle is on or not for the site.",
-                "enum": ["false", "true"]
+                "type": "boolean"
             },
             {
                 "key": "vpnOn",
                 "description": "True if the user has the DuckDuckGo VPN enabled.",
-                "enum": ["false", "true"]
+                "type": "boolean"
             },
             {
                 "key": "blockListExperiment",
@@ -195,7 +194,12 @@
             {
                 "key": "gpc",
                 "description": "Global Privacy Control value reported.",
-                "enum": ["false", "true"]
+                "type": "boolean"
+            },
+            {
+                "key": "drmEnabled",
+                "description": "Whether DRM is effectively enabled for the reported site load.",
+                "type": "boolean"
             },
             {
                 "key": "urlParametersRemoved",
@@ -210,7 +214,6 @@
         "triggers": ["user_submitted"],
         "suffixes": ["form_factor"],
         "parameters": [
-            "atb",
             "appVersion",
             "remoteConfigEtag",
             {
@@ -290,7 +293,7 @@
             {
                 "key": "referrerHeaderTrimmed",
                 "description": "True if the 'Referer' request header was trimmed for this page.",
-                "enum": ["true", "false"]
+                "type": "boolean"
             },
             {
                 "key": "remoteConfigVersion",
@@ -320,7 +323,7 @@
             {
                 "key": "upgradedHttps",
                 "description": "",
-                "enum": ["false", "true"]
+                "type": "boolean"
             },
             {
                 "key": "userRefreshCount",
@@ -330,7 +333,12 @@
             {
                 "key": "vpnOn",
                 "description": "True if the user has the DuckDuckGo VPN enabled.",
-                "enum": ["false", "true"]
+                "type": "boolean"
+            },
+            {
+                "key": "drmEnabled",
+                "description": "Whether DRM is effectively enabled for the reported site load.",
+                "type": "boolean"
             },
             {
                 "key": "wvVersion",
@@ -346,7 +354,6 @@
         "suffixes": ["form_factor"],
         "parameters": [
             "appVersion",
-            "atb",
             {
                 "key": "opener",
                 "description": "Where the report UI was opened from.",
@@ -361,7 +368,6 @@
         "suffixes": ["form_factor"],
         "parameters": [
             "appVersion",
-            "atb",
             {
                 "key": "opener",
                 "description": "Where the report UI was opened from.",
@@ -374,20 +380,20 @@
         "owners": ["laghee"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
-        "parameters": ["appVersion", "atb"]
+        "parameters": ["appVersion"]
     },
     "m_site-not-working_shown": {
         "description": "User was shown the prompt to send a broken site report after reloading a website three times in 20 seconds.",
         "owners": ["laghee"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
-        "parameters": ["appVersion", "atb"]
+        "parameters": ["appVersion"]
     },
     "m_site-not-working_website-is-broken": {
         "description": "User agreed to send a broken site report when prompted, after they reloaded a website three times in 20 seconds.",
         "owners": ["laghee"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
-        "parameters": ["appVersion", "atb"]
+        "parameters": ["appVersion"]
     }
 }

@@ -22,7 +22,4 @@
     <string name="autocompleteRemoveItemCancel">Ακύρωση</string>
     <string name="autocompleteRemoveItemRemove">Αφαίρεση</string>
     <string name="autocompleteSwitchToTab" instruction="Placeholder is a website">Αλλαγή στην Καρτέλα · %1$s</string>
-    <string name="improvedAutoCompleteIAMContent">Οι προτάσεις αυτόματης συμπλήρωσης περιλαμβάνουν πλέον τους ιστότοπους που επισκεφθήκατε πρόσφατα. Απενεργοποιήστε τη λειτουργία από τις Ρυθμίσεις ή καταργήστε την οποιαδήποτε στιγμή με το κουμπί 🔥 Fire Button.</string>
-    <string name="improvedAutoCompleteIAMTitle">Ίδιο απόρρητο.\nΚαλύτερες προτάσεις αναζήτησης!</string>
-    <string name="openAutoCompleteSettings">Άνοιγμα ρυθμίσεων</string>
 </resources>

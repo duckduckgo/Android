@@ -27,11 +27,13 @@ import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.utils.AppUrl.Url
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.featureflags.OkHttpInterceptorRefactorFeature
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.common.utils.plugins.pixel.PixelInterceptorPlugin
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.experiments.api.VariantManager
 import com.duckduckgo.user.agent.api.UserAgentProvider
+import com.squareup.anvil.annotations.ContributesTo
 import com.squareup.moshi.Moshi
 import dagger.Lazy
 import dagger.Module
@@ -56,6 +58,7 @@ import java.net.URI
 import javax.inject.Named
 
 @Module
+@ContributesTo(AppScope::class)
 class NetworkModule {
 
     @Provides
@@ -158,8 +161,10 @@ class NetworkModule {
     }
 
     @Provides
-    fun pixelReQueryInterceptor(): PixelReQueryInterceptor {
-        return PixelReQueryInterceptor()
+    fun pixelReQueryInterceptor(
+        okHttpInterceptorRefactorFeature: OkHttpInterceptorRefactorFeature,
+    ): PixelReQueryInterceptor {
+        return PixelReQueryInterceptor(okHttpInterceptorRefactorFeature)
     }
 
     @Provides

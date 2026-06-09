@@ -17,6 +17,8 @@
 package com.duckduckgo.networkprotection.impl.cohort
 
 import com.duckduckgo.common.test.api.FakeChain
+import com.duckduckgo.common.utils.featureflags.OkHttpInterceptorRefactorFeature
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotEquals
 import org.junit.Before
@@ -35,7 +37,10 @@ class NetpCohortPixelInterceptorTest {
     @Before
     fun setUp() {
         MockitoAnnotations.openMocks(this)
-        testee = NetpCohortPixelInterceptor(netpCohortStore)
+        testee = NetpCohortPixelInterceptor(
+            netpCohortStore,
+            FakeFeatureToggleFactory.create(OkHttpInterceptorRefactorFeature::class.java),
+        )
     }
 
     @Test

@@ -18,8 +18,8 @@
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
     <!-- DRM Permission -->
-    <string name="drmSiteDialogTitle" instruction="Placeholder is the name of a website">A(z) „%1$s” meg akarja nyitni a DRM-szoftveredet</string>
-    <string name="drmSiteDialogSubtitle">A digitális jogosultságokat kezelő szoftver a védett médiatartalmak lejátszásához szükséges, de az eszközazonosítókhoz is hozzáférést biztosít. Csak olyan webhelyeknek adj engedélyt ezekhez az adatokhoz, amelyekben megbízol. Az engedélyek bármikor kezelhetők a Beállításokban. <annotation type="drm_learn_more_link">További tudnivalók</annotation></string>
+    <string name="drmSitePermissionDialogTitle" instruction="Placeholder is the name of a website">A(z) „%1$s” meg szeretné nyitni a digitális jogkezelő (DRM-) szoftveredet</string>
+    <string name="drmSitePermissionDialogSubtitle" instruction="Placeholder is the name of a website">Ha az „Elutasítás” lehetőséget választod, előfordulhat, hogy a webhelyen lévő videók nem lesznek lejátszhatók, de a(z) %1$s nem fog hozzáférni a DRM-szoftver által biztosított eszközazonosítókhoz. Az engedélyeket bármikor kezelheted a Beállításokban. <annotation type="drm_learn_more_link">További információk</annotation></string>
     <string name="drmSiteDialogAllowAlways">Mindig</string>
     <string name="drmSiteDialogAllowOnce">Csak erre a munkamenetre</string>
     <string name="drmSiteDialogDenyAlways">Mindig megtagad</string>

@@ -28,6 +28,12 @@
         <item quantity="one">%1$s için yer işaretiniz, alanlarından biri karakter sınırını aştığı için senkronize edilemiyor.</item>
         <item quantity="other">%1$s ve %2$d diğer site için yer işaretleriniz, bazı alanları karakter sınırını aştığı için senkronize edilemiyor.</item>
     </plurals>
+
+    <!-- Content Descriptions -->
+    <string name="bookmarksSearchMenuContentDescription">Yer İmlerini Ara</string>
+    <string name="bookmarksAddFolderMenuContentDescription">Klasör Ekle</string>
+    <string name="bookmarksMenuContentDescription">Diğer seçenekler</string>
+    <string name="newTabFavoritesToggleContentDescription">Favorilerin görünürlüğünü aç/kapat</string>
     <string name="saved_site_invalid_items_warning_link"><annotation type="manage_bookmarks">Yer İşaretlerini Yönet</annotation></string>
 
     <!-- Bookmarks Activity -->
@@ -116,4 +122,5 @@
     <string name="importBookmarksFromGooglePreImportDialogImportButton">Google\'dan İçe Aktar</string>
     <string name="importBookmarksFromGooglePreImportDialogSelectFileButton">Yer İşaretleri Dosyasını Seç…</string>
     <string name="bookmarksImportDialogClose">Kapat</string>
+
 </resources>

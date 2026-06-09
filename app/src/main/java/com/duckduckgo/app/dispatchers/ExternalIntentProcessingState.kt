@@ -18,11 +18,15 @@ package com.duckduckgo.app.dispatchers
 
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.tabs.model.TabRepository
+import com.duckduckgo.browsermode.api.BrowserModeDataProvider
+import com.duckduckgo.browsermode.api.BrowserModeStateHolder
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
@@ -38,12 +42,15 @@ interface ExternalIntentProcessingState {
     fun onDuckAiClosed()
 }
 
+@OptIn(ExperimentalCoroutinesApi::class)
 @ContributesBinding(AppScope::class)
 @SingleInstanceIn(AppScope::class)
 class ExternalIntentProcessingStateImpl @Inject constructor(
     @AppCoroutineScope coroutineScope: CoroutineScope,
-    tabRepository: TabRepository,
+    tabRepositoryProvider: BrowserModeDataProvider<TabRepository>,
+    browserModeStateHolder: BrowserModeStateHolder,
 ) : ExternalIntentProcessingState {
+
     @Volatile
     override var hasPendingTabLaunch: Boolean = false
         private set
@@ -57,12 +64,15 @@ class ExternalIntentProcessingStateImpl @Inject constructor(
         private set
 
     init {
-        tabRepository.flowSelectedTab.filterNotNull().onEach { tab ->
-            // if we are switching to a tab that already has a URL, consider tab launch processing complete
-            if (!tab.url.isNullOrBlank()) {
-                hasPendingTabLaunch = false
-            }
-        }.launchIn(coroutineScope)
+        browserModeStateHolder.currentMode
+            .flatMapLatest { mode -> tabRepositoryProvider.forMode(mode).flowSelectedTab }
+            .filterNotNull()
+            .onEach { tab ->
+                // if we are switching to a tab that already has a URL, consider tab launch processing complete
+                if (!tab.url.isNullOrBlank()) {
+                    hasPendingTabLaunch = false
+                }
+            }.launchIn(coroutineScope)
     }
 
     override fun onIntentRequestToChangeTab() {

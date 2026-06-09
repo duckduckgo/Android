@@ -10,8 +10,8 @@ import com.duckduckgo.js.messaging.api.JsRequestResponse
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.AUTO_RENEWABLE
 import com.duckduckgo.subscriptions.impl.AccessTokenResult
 import com.duckduckgo.subscriptions.impl.AuthTokenResult
-import com.duckduckgo.subscriptions.impl.PrivacyProFeature
 import com.duckduckgo.subscriptions.impl.SubscriptionsChecker
+import com.duckduckgo.subscriptions.impl.SubscriptionsFeature
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.repository.Subscription
@@ -42,7 +42,7 @@ class SubscriptionMessagingInterfaceTest {
     private val subscriptionsManager: SubscriptionsManager = mock()
     private val pixelSender: SubscriptionPixelSender = mock()
     private val subscriptionsChecker: SubscriptionsChecker = mock()
-    private val privacyProFeature: PrivacyProFeature = mock()
+    private val subscriptionsFeature: SubscriptionsFeature = mock()
     private val mockDuckAiHostProvider: DuckAiHostProvider = mock()
     private val messagingInterface = SubscriptionMessagingInterface(
         subscriptionsManager,
@@ -52,7 +52,7 @@ class SubscriptionMessagingInterfaceTest {
         pixelSender,
         subscriptionsChecker,
         mockDuckAiHostProvider,
-        privacyProFeature,
+        subscriptionsFeature,
     )
 
     private val callback = object : JsMessageCallback() {
@@ -862,7 +862,6 @@ class SubscriptionMessagingInterfaceTest {
     @Test
     fun `when process and get feature config and messaging enabled then return response with feature flags`() = runTest {
         givenInterfaceIsRegistered()
-        givenSubscriptionMessaging(enabled = true)
         givenAuthV2(enabled = true)
         givenDuckAiPlus(enabled = true)
         givenStripeSupported(enabled = true)
@@ -895,7 +894,6 @@ class SubscriptionMessagingInterfaceTest {
     @Test
     fun `when process and get feature config and messaging enabled but auth v2 disabled then return response with auth v2 false`() = runTest {
         givenInterfaceIsRegistered()
-        givenSubscriptionMessaging(enabled = true)
         givenAuthV2(enabled = false)
         givenDuckAiPlus(enabled = true)
         givenStripeSupported(enabled = true)
@@ -930,7 +928,6 @@ class SubscriptionMessagingInterfaceTest {
     @Test
     fun `when process and get feature config and messaging enabled but duck ai plus disabled then return response with duck ai false`() = runTest {
         givenInterfaceIsRegistered()
-        givenSubscriptionMessaging(enabled = true)
         givenAuthV2(enabled = true)
         givenDuckAiPlus(enabled = false)
         givenStripeSupported(enabled = true)
@@ -965,7 +962,6 @@ class SubscriptionMessagingInterfaceTest {
     @Test
     fun `when process and get feature config and tier options enabled then return response with tier options true`() = runTest {
         givenInterfaceIsRegistered()
-        givenSubscriptionMessaging(enabled = true)
         givenAuthV2(enabled = true)
         givenDuckAiPlus(enabled = true)
         givenStripeSupported(enabled = true)
@@ -998,23 +994,8 @@ class SubscriptionMessagingInterfaceTest {
     }
 
     @Test
-    fun `when process and get feature config and messaging disabled then do nothing`() = runTest {
-        givenInterfaceIsRegistered()
-        givenSubscriptionMessaging(enabled = false)
-
-        val message = """
-            {"context":"subscriptionPages","featureName":"useSubscription","method":"getFeatureConfig","id":"myId","params":{}}
-        """.trimIndent()
-
-        messagingInterface.process(message, "duckduckgo-android-messaging-secret")
-
-        verifyNoInteractions(jsMessageHelper)
-    }
-
-    @Test
     fun `when process and get feature config if no id do nothing`() = runTest {
         givenInterfaceIsRegistered()
-        givenSubscriptionMessaging(enabled = true)
 
         val message = """
             {"context":"subscriptionPages","featureName":"useSubscription","method":"getFeatureConfig","params":{}}
@@ -1064,34 +1045,28 @@ class SubscriptionMessagingInterfaceTest {
         whenever(subscriptionsManager.getAccessToken()).thenReturn(AccessTokenResult.Failure(message = "something happened"))
     }
 
-    private fun givenSubscriptionMessaging(enabled: Boolean) {
-        val subscriptionMessagingToggle = mock<com.duckduckgo.feature.toggles.api.Toggle>()
-        whenever(subscriptionMessagingToggle.isEnabled()).thenReturn(enabled)
-        whenever(privacyProFeature.enableNewSubscriptionMessages()).thenReturn(subscriptionMessagingToggle)
-    }
-
     private fun givenAuthV2(enabled: Boolean) {
         val v2SubscriptionFlow = mock<com.duckduckgo.feature.toggles.api.Toggle>()
         whenever(v2SubscriptionFlow.isEnabled()).thenReturn(enabled)
-        whenever(privacyProFeature.enableSubscriptionFlowsV2()).thenReturn(v2SubscriptionFlow)
+        whenever(subscriptionsFeature.enableSubscriptionFlowsV2()).thenReturn(v2SubscriptionFlow)
     }
 
     private fun givenDuckAiPlus(enabled: Boolean) {
         val duckAiPlusToggle = mock<com.duckduckgo.feature.toggles.api.Toggle>()
         whenever(duckAiPlusToggle.isEnabled()).thenReturn(enabled)
-        whenever(privacyProFeature.duckAiPlus()).thenReturn(duckAiPlusToggle)
+        whenever(subscriptionsFeature.duckAiPlus()).thenReturn(duckAiPlusToggle)
     }
 
     private fun givenStripeSupported(enabled: Boolean) {
         val stripeSupportedToggle = mock<com.duckduckgo.feature.toggles.api.Toggle>()
         whenever(stripeSupportedToggle.isEnabled()).thenReturn(enabled)
-        whenever(privacyProFeature.supportsAlternateStripePaymentFlow()).thenReturn(stripeSupportedToggle)
+        whenever(subscriptionsFeature.supportsAlternateStripePaymentFlow()).thenReturn(stripeSupportedToggle)
     }
 
     private fun givenUseGetSubscriptionTierOptions(enabled: Boolean) {
         val toggle = mock<com.duckduckgo.feature.toggles.api.Toggle>()
         whenever(toggle.isEnabled()).thenReturn(enabled)
-        whenever(privacyProFeature.tierMessagingEnabled()).thenReturn(toggle)
+        whenever(subscriptionsFeature.tierMessagingEnabled()).thenReturn(toggle)
     }
 
     private fun checkEquals(expected: JsRequestResponse, actual: JsRequestResponse) {

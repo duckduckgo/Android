@@ -31,4 +31,7 @@ interface ReactivateUsersToggles {
 
     @Toggle.DefaultValue(Toggle.DefaultFeatureValue.FALSE)
     fun browserComparisonPrompt(): Toggle
+
+    @Toggle.DefaultValue(Toggle.DefaultFeatureValue.FALSE)
+    fun defaultBrowserWinBackPrompt(): Toggle
 }

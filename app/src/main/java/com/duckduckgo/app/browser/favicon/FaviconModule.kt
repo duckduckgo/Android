@@ -25,11 +25,13 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.store.SavedSitesEntitiesDao
 import com.duckduckgo.sync.api.favicons.FaviconsFetchingStore
+import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
 import dagger.SingleInstanceIn
 
 @Module
+@ContributesTo(AppScope::class)
 class FaviconModule {
 
     @Provides
@@ -64,7 +66,8 @@ class FaviconModule {
         context: Context,
         dispatcherProvider: DispatcherProvider,
         androidBrowserConfigFeature: AndroidBrowserConfigFeature,
+        downsamplingStrategyFixFeature: FaviconDownloaderGlideDownsamplingStrategyFixFeature,
     ): FaviconDownloader {
-        return GlideFaviconDownloader(context, dispatcherProvider, androidBrowserConfigFeature)
+        return GlideFaviconDownloader(context, dispatcherProvider, androidBrowserConfigFeature, downsamplingStrategyFixFeature)
     }
 }

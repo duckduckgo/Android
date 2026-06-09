@@ -28,7 +28,7 @@ on:
         description: 'Android API level to run tests on (e.g. 30, 33, 34)'
         required: false
         type: string
-        default: '30'
+        default: '35'
   workflow_dispatch:
     inputs:
       tags:
@@ -48,7 +48,7 @@ on:
         description: 'Android API level to run tests on (e.g. 30, 33, 34)'
         required: false
         type: string
-        default: '30'
+        default: '35'
 
 concurrency:
   group: ${{ github.workflow_ref }}-${{ github.ref }}
@@ -74,6 +74,8 @@ jobs:
           release_key: ${{ secrets.FAKE_RELEASE_KEY }}
           gradle_encryption_key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
           develocity_access_key: ${{ secrets.DEVELOCITY_ACCESS_KEY }}
+          ducksans_package_auth_user: ${{ secrets.DAXMOBILE_GITHUB_PACKAGES_AUTOMATION_USER }}
+          ducksans_package_auth_token: ${{ secrets.DAXMOBILE_GITHUB_PACKAGES_AUTOMATION }}
 
       - name: Run Maestro Tests
         id: maestro-run

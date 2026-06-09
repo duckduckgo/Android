@@ -64,6 +64,10 @@ class DuckChatContentScopeJsMessageHandler @Inject constructor(
                     "togglePageContextTelemetry",
                     "submitAIChatPageContext",
                     "userDidAcceptTermsAndConditions",
+                    "getAIChatNativePrompt",
+                    "voiceSessionStarted",
+                    "voiceSessionEnded",
+                    "responseReceived",
                 )
         }
 }

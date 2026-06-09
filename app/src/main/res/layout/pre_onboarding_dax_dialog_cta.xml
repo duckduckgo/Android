@@ -86,12 +86,13 @@
                 android:id="@+id/cardContainer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="@dimen/keyline_5">
+                android:orientation="vertical">
 
                 <FrameLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="@dimen/keyline_5"
+                    android:layout_marginTop="@dimen/keyline_5">
 
                     <com.duckduckgo.common.ui.view.text.DaxTextView
                         android:id="@+id/hiddenTextCta"
@@ -116,6 +117,7 @@
                     android:id="@+id/descriptionCta"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="@dimen/keyline_5"
                     android:layout_marginTop="@dimen/keyline_4"
                     android:visibility="invisible"
                     app:typography="body1"
@@ -127,6 +129,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
+                    android:layout_marginHorizontal="@dimen/keyline_5"
                     android:layout_marginTop="@dimen/keyline_4"
                     android:adjustViewBounds="true"
                     android:visibility="gone" />
@@ -134,16 +137,29 @@
                 <include
                     android:id="@+id/comparison_chart"
                     layout="@layout/pre_onboarding_comparison_chart"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="@dimen/keyline_5"
+                    android:layout_marginTop="@dimen/keyline_4"
                     android:visibility="gone" />
 
                 <include
                     android:id="@+id/comparison_chart_with_duck_ai"
                     layout="@layout/pre_onboarding_comparison_chart_with_duck_ai"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="@dimen/keyline_5"
+                    android:layout_marginTop="@dimen/keyline_4"
                     android:visibility="gone" />
 
                 <include
                     android:id="@+id/address_bar_position"
                     layout="@layout/pre_onboarding_address_bar_position_horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="@dimen/keyline_5"
+                    android:layout_marginTop="@dimen/keyline_4"
+                    android:layout_marginBottom="@dimen/keyline_2"
                     android:visibility="gone" />
 
                 <LinearLayout
@@ -151,7 +167,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/keyline_4"
-                    android:layout_marginHorizontal="@dimen/keyline_4"
+                    android:layout_marginHorizontal="40dp"
                     android:gravity="center"
                     android:orientation="horizontal"
                     android:visibility="gone">
@@ -240,17 +256,29 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/keyline_6"
-                    android:layout_marginHorizontal="@dimen/keyline_4"
+                    android:layout_marginHorizontal="40dp"
                     android:gravity="start"
                     android:visibility="gone"
                     app:textType="secondary"
                     app:typography="caption" />
 
+                <include
+                    android:id="@+id/input_screen_preview"
+                    layout="@layout/pre_onboarding_input_mode_demo"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="@dimen/keyline_4"
+                    android:layout_marginTop="@dimen/keyline_5"
+                    android:layout_marginBottom="@dimen/keyline_4"
+                    android:visibility="gone" />
+
                 <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
                     android:id="@+id/primaryCta"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="@dimen/keyline_5"
                     android:layout_marginTop="@dimen/keyline_5"
+                    android:layout_marginBottom="@dimen/keyline_5"
                     android:alpha="0"
                     android:text="@string/onboardingLetsDoItButton"
                     app:daxButtonSize="large"
@@ -260,7 +288,9 @@
                     android:id="@+id/secondaryCta"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/keyline_0"
+                    android:layout_marginHorizontal="@dimen/keyline_5"
+                    android:layout_marginTop="-22dp"
+                    android:layout_marginBottom="@dimen/keyline_5"
                     android:alpha="0"
                     android:text="@string/preOnboardingDaxDialog1SecondaryButton"
                     app:daxButtonSize="large"

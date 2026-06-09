@@ -33,6 +33,7 @@ sealed class ModalListItem {
     data class CardListItem(
         override val id: String,
         val cardItem: CardItem,
+        val imageFilePath: String? = null,
     ) : ModalListItem()
 }
 

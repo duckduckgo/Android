@@ -27,6 +27,8 @@ import androidx.test.ext.junit.rules.activityScenarioRule
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.browser.clickMenuItem
+import com.duckduckgo.app.browser.mode.InAppNavigation
 import com.duckduckgo.espresso.*
 import com.duckduckgo.privacy.config.impl.network.JSONObjectAdapter
 import com.squareup.moshi.JsonAdapter
@@ -44,6 +46,7 @@ class SurrogatesTest {
     var activityScenarioRule = activityScenarioRule<BrowserActivity>(
         BrowserActivity.intent(
             InstrumentationRegistry.getInstrumentation().targetContext,
+            launchSource = InAppNavigation,
             queryExtra = "https://privacy-test-pages.site/privacy-protections/surrogates/",
         ),
     )
@@ -93,8 +96,7 @@ class SurrogatesTest {
         IdlingRegistry.getInstance().register(idlingResourceForDisableProtections)
 
         onView(allOf(withId(R.id.browserMenu), isClickable())).perform(ViewActions.click())
-        onView(isRoot()).perform(waitForView(withText("Disable Privacy Protection")))
-        onView(withText("Disable Privacy Protection")).perform(ViewActions.click())
+        clickMenuItem(withText("Disable Privacy Protection"))
 
         // handle the privacy protection toggle check screen showing
         onView(isRoot()).perform(ViewActions.pressBack())

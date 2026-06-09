@@ -33,6 +33,10 @@ import android.webkit.WebViewClient.ERROR_HOST_LOOKUP
 import android.webkit.WebViewClient.ERROR_UNKNOWN
 import android.webkit.WebViewClient.ERROR_UNSUPPORTED_SCHEME
 import androidx.core.net.toUri
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.LifecycleRegistry
+import androidx.lifecycle.setViewTreeLifecycleOwner
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.anrs.api.CrashLogger
@@ -40,6 +44,7 @@ import com.duckduckgo.anrs.api.CrashLogger.Crash
 import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType.Web
 import com.duckduckgo.app.browser.WebViewErrorResponse.BAD_URL
 import com.duckduckgo.app.browser.WebViewErrorResponse.CONNECTION
+import com.duckduckgo.app.browser.WebViewErrorResponse.OMITTED
 import com.duckduckgo.app.browser.WebViewErrorResponse.SSL_PROTOCOL_ERROR
 import com.duckduckgo.app.browser.applinks.AppSchemeInterceptionFeature
 import com.duckduckgo.app.browser.certificates.rootstore.TrustedCertificateStore
@@ -179,6 +184,7 @@ class BrowserWebViewClientTest {
     fun setup() =
         runTest {
             webView = TestWebView(context)
+            webView.setViewTreeLifecycleOwner(startedLifecycleOwner())
             whenever(mockDuckPlayer.observeShouldOpenInNewTab()).thenReturn(openInNewTabFlow)
             whenever(mockContentScopeExperiments.getActiveExperiments()).thenReturn(listOf(mockToggle))
             val enabledToggle: Toggle = mock()
@@ -358,10 +364,19 @@ class BrowserWebViewClientTest {
     }
 
     @Test
-    fun whenShouldInterceptRequestThenEventSentToLoginDetector() {
+    fun whenShouldInterceptRequestForPostThenEventSentToLoginDetector() {
         val webResourceRequest = mock<WebResourceRequest>()
+        whenever(webResourceRequest.method).thenReturn("POST")
         testee.shouldInterceptRequest(webView, webResourceRequest)
         verify(loginDetector).onEvent(WebNavigationEvent.ShouldInterceptRequest(webView, webResourceRequest))
+    }
+
+    @Test
+    fun whenShouldInterceptRequestForNonPostThenEventNotSentToLoginDetector() {
+        val webResourceRequest = mock<WebResourceRequest>()
+        whenever(webResourceRequest.method).thenReturn("GET")
+        testee.shouldInterceptRequest(webView, webResourceRequest)
+        verify(loginDetector, never()).onEvent(any())
     }
 
     @Test
@@ -513,11 +528,11 @@ class BrowserWebViewClientTest {
     }
 
     @Test
-    fun whenPrivacyProLinkDetectedThenLaunchPrivacyProAndReturnTrue() {
-        val urlType = SpecialUrlDetector.UrlType.ShouldLaunchPrivacyProLink
+    fun whenSubscriptionLinkDetectedThenLaunchSubscriptionAndReturnTrue() {
+        val urlType = SpecialUrlDetector.UrlType.ShouldLaunchSubscriptionLink
         whenever(specialUrlDetector.determineType(initiatingUrl = any(), uri = any())).thenReturn(urlType)
         assertTrue(testee.shouldOverrideUrlLoading(webView, webResourceRequest))
-        verify(subscriptions).launchPrivacyPro(any(), any())
+        verify(subscriptions).launchSubscription(any(), any())
     }
 
     @Test
@@ -969,7 +984,7 @@ class BrowserWebViewClientTest {
 
         testee.onReceivedError(mockWebView, webResourceRequest, webResourceError)
 
-        verify(testee.webViewClientListener)!!.onReceivedError(BAD_URL, "")
+        verify(testee.webViewClientListener)!!.onReceivedError(eq(BAD_URL), eq(""), anyString())
     }
 
     @Test
@@ -981,7 +996,7 @@ class BrowserWebViewClientTest {
 
         testee.onReceivedError(mockWebView, webResourceRequest, webResourceError)
 
-        verify(testee.webViewClientListener)!!.onReceivedError(CONNECTION, "")
+        verify(testee.webViewClientListener)!!.onReceivedError(eq(CONNECTION), eq(""), anyString())
     }
 
     @Test
@@ -993,7 +1008,7 @@ class BrowserWebViewClientTest {
 
         testee.onReceivedError(mockWebView, webResourceRequest, webResourceError)
 
-        verify(testee.webViewClientListener, times(0))!!.onReceivedError(any(), anyString())
+        verify(testee.webViewClientListener, times(1))!!.onReceivedError(eq(OMITTED), anyString(), anyString())
     }
 
     @Test
@@ -1005,7 +1020,7 @@ class BrowserWebViewClientTest {
 
         testee.onReceivedError(mockWebView, webResourceRequest, webResourceError)
 
-        verify(testee.webViewClientListener, times(0))!!.onReceivedError(any(), anyString())
+        verify(testee.webViewClientListener, times(1))!!.onReceivedError(eq(OMITTED), anyString(), anyString())
     }
 
     @Test
@@ -1017,7 +1032,7 @@ class BrowserWebViewClientTest {
 
         testee.onReceivedError(mockWebView, webResourceRequest, webResourceError)
 
-        verify(testee.webViewClientListener, times(0))!!.onReceivedError(any(), anyString())
+        verify(testee.webViewClientListener, times(0))!!.onReceivedError(any(), anyString(), anyString())
     }
 
     @Test
@@ -1031,7 +1046,7 @@ class BrowserWebViewClientTest {
 
         testee.onReceivedError(mockWebView, webResourceRequest, webResourceError)
 
-        verify(testee.webViewClientListener)!!.onReceivedError(SSL_PROTOCOL_ERROR, requestUrl)
+        verify(testee.webViewClientListener)!!.onReceivedError(eq(SSL_PROTOCOL_ERROR), eq(requestUrl), anyString())
     }
 
     @Test
@@ -1711,6 +1726,12 @@ class BrowserWebViewClientTest {
         override fun getProgress(): Int = 100
     }
 
+    private fun startedLifecycleOwner(): LifecycleOwner = object : LifecycleOwner {
+        override val lifecycle: Lifecycle = LifecycleRegistry(this).apply {
+            currentState = Lifecycle.State.STARTED
+        }
+    }
+
     private class FakePluginPoint : PluginPoint<JsInjectorPlugin> {
         val plugin = FakeJsInjectorPlugin()
 
@@ -1759,6 +1780,41 @@ class BrowserWebViewClientTest {
         return mock<SslCertificate>().apply {
             whenever(x509Certificate).thenReturn(certificate)
         }
+    }
+
+    @Test
+    fun whenDoUpdateVisitedHistoryOnDuckChatUrlAndUrlDiffersFromOriginalUrlThenNotifyListener() {
+        val mockWebView = mock<WebView>()
+        val duckChatUrl = "https://duck.ai/chat-1"
+        whenever(mockWebView.originalUrl).thenReturn("https://duck.ai")
+        whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(true)
+
+        testee.doUpdateVisitedHistory(mockWebView, duckChatUrl, false)
+
+        verify(listener).onHistoryUrlChanged(duckChatUrl)
+    }
+
+    @Test
+    fun whenDoUpdateVisitedHistoryOnDuckChatUrlAndUrlMatchesOriginalUrlThenDoNotNotifyListener() {
+        val mockWebView = mock<WebView>()
+        val duckChatUrl = "https://duck.ai"
+        whenever(mockWebView.originalUrl).thenReturn(duckChatUrl)
+        whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(true)
+
+        testee.doUpdateVisitedHistory(mockWebView, duckChatUrl, false)
+
+        verify(listener, never()).onHistoryUrlChanged(any())
+    }
+
+    @Test
+    fun whenDoUpdateVisitedHistoryOnNonDuckChatUrlThenDoNotNotifyListener() {
+        val mockWebView = mock<WebView>()
+        whenever(mockWebView.originalUrl).thenReturn(EXAMPLE_URL)
+        whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(false)
+
+        testee.doUpdateVisitedHistory(mockWebView, EXAMPLE_URL, false)
+
+        verify(listener, never()).onHistoryUrlChanged(any())
     }
 
     companion object {

@@ -20,6 +20,7 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.content.pm.PackageManager.PERMISSION_GRANTED
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
@@ -30,9 +31,12 @@ import android.webkit.WebChromeClient
 import android.webkit.WebSettings
 import android.webkit.WebView
 import androidx.activity.result.ActivityResult
+import androidx.activity.result.contract.ActivityResultContracts.RequestPermission
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.annotation.AnyThread
 import androidx.appcompat.widget.Toolbar
+import androidx.core.app.ActivityCompat
+import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import androidx.fragment.app.DialogFragment
@@ -74,10 +78,10 @@ import com.duckduckgo.subscriptions.api.SubscriptionScreens.RestoreSubscriptionS
 import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionPurchase
 import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionUpgrade
 import com.duckduckgo.subscriptions.api.Subscriptions
-import com.duckduckgo.subscriptions.impl.PrivacyProFeature
 import com.duckduckgo.subscriptions.impl.R.string
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.FEATURE_PAGE_QUERY_PARAM_KEY
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.ITR_URL
+import com.duckduckgo.subscriptions.impl.SubscriptionsFeature
 import com.duckduckgo.subscriptions.impl.databinding.ActivitySubscriptionsWebviewBinding
 import com.duckduckgo.subscriptions.impl.internal.SubscriptionsUrlProvider
 import com.duckduckgo.subscriptions.impl.pir.PirActivity.Companion.PirScreenWithEmptyParams
@@ -85,12 +89,14 @@ import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.BackToSettings
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.BackToSettingsActivateSuccess
+import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.ComputeUserSettings
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.GoToDuckAI
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.GoToITR
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.GoToNetP
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.GoToPIR
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.GoToPIRDashboard
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.Reload
+import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.RequestNotificationsPermission
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.RestoreSubscription
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.SendJsEvent
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.SendResponseToJs
@@ -99,7 +105,7 @@ import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.PurchaseStateView
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionsWebViewActivityWithParams.ToolbarConfig
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionsWebViewActivityWithParams.ToolbarConfig.CustomTitle
-import com.duckduckgo.subscriptions.impl.ui.SubscriptionsWebViewActivityWithParams.ToolbarConfig.DaxPrivacyPro
+import com.duckduckgo.subscriptions.impl.ui.SubscriptionsWebViewActivityWithParams.ToolbarConfig.DaxSubscription
 import com.duckduckgo.subscriptions.impl.wideevents.SubscriptionRestoreWideEvent
 import com.duckduckgo.user.agent.api.UserAgentProvider
 import com.google.android.material.snackbar.Snackbar
@@ -117,13 +123,13 @@ import javax.inject.Named
 
 data class SubscriptionsWebViewActivityWithParams(
     val url: String,
-    val toolbarConfig: ToolbarConfig = DaxPrivacyPro,
+    val toolbarConfig: ToolbarConfig = DaxSubscription,
     val origin: String? = null,
 ) : ActivityParams {
 
     sealed class ToolbarConfig : Serializable {
-        data object DaxPrivacyPro : ToolbarConfig() {
-            private fun readResolve(): Any = DaxPrivacyPro
+        data object DaxSubscription : ToolbarConfig() {
+            private fun readResolve(): Any = DaxSubscription
         }
 
         data class CustomTitle(val title: String) : ToolbarConfig()
@@ -184,7 +190,7 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
     lateinit var subscriptionsUrlProvider: SubscriptionsUrlProvider
 
     @Inject
-    lateinit var privacyProFeature: PrivacyProFeature
+    lateinit var subscriptionsFeature: SubscriptionsFeature
 
     @Inject
     lateinit var subscriptionRestoreWideEvent: SubscriptionRestoreWideEvent
@@ -197,7 +203,15 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
 
     // Used to represent a file to download, but may first require permission
     private var pendingFileDownload: PendingFileDownload? = null
+    private var pendingNotificationsPermissionRequestId: String? = null
     private val downloadMessagesJob = ConflatedJob()
+
+    private val notificationsPermissionLauncher = registerForActivityResult(RequestPermission()) { granted ->
+        pendingNotificationsPermissionRequestId?.let { id ->
+            viewModel.onNotificationsPermissionResult(id, granted)
+        }
+        pendingNotificationsPermissionRequestId = null
+    }
     private val toolbar
         get() = binding.includeToolbar.toolbar
 
@@ -294,16 +308,16 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
             renderPurchaseState(it.purchaseState)
         }.launchIn(lifecycleScope)
 
-        val isPrivacyProUrl by lazy {
-            runCatching { subscriptions.isPrivacyProUrl(params.url.toUri()) }.getOrDefault(false)
+        val isSubscriptionUrl by lazy {
+            runCatching { subscriptions.isSubscriptionUrl(params.url.toUri()) }.getOrDefault(false)
         }
-        if (savedInstanceState == null && isPrivacyProUrl) {
+        if (savedInstanceState == null && isSubscriptionUrl) {
             viewModel.paywallShown()
         }
     }
 
     private fun recoverFromRenderProcessCrash(): Boolean {
-        if (!privacyProFeature.handleSubscriptionsWebViewRenderProcessCrash().isEnabled()) return false
+        if (!subscriptionsFeature.handleSubscriptionsWebViewRenderProcessCrash().isEnabled()) return false
 
         val isRepeatedCrash = intent.getBooleanExtra(ACTIVITY_LAUNCHED_AFTER_WEBVIEW_RENDER_PROCESS_CRASH, false)
         pixelSender.reportSubscriptionsWebViewRenderProcessCrash(isRepeatedCrash)
@@ -472,7 +486,7 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
         toolbar.setNavigationIcon(
             when (params.toolbarConfig) {
                 is CustomTitle -> R.drawable.ic_arrow_left_24
-                DaxPrivacyPro -> R.drawable.ic_close_24
+                DaxSubscription -> R.drawable.ic_close_24
             },
         )
 
@@ -487,7 +501,7 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
                 binding.includeToolbar.titleToolbar.hide()
                 title = config.title
             }
-            DaxPrivacyPro -> {
+            DaxSubscription -> {
                 supportActionBar?.setDisplayShowTitleEnabled(false)
                 binding.includeToolbar.logoToolbar.show()
                 binding.includeToolbar.titleToolbar.show()
@@ -511,6 +525,8 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
             is GoToPIRDashboard -> goToPIRDashboard()
             is GoToNetP -> goToNetP(command.activityParams)
             is GoToDuckAI -> goToDuckAI()
+            is ComputeUserSettings -> computeUserSettings(command.id)
+            is RequestNotificationsPermission -> launchNotificationsPermission(command.id)
             Reload -> binding.webview.reload()
         }
     }
@@ -544,6 +560,30 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
         duckChat.openDuckChat()
     }
 
+    private fun computeUserSettings(id: String) {
+        val isAtLeastApi33 = Build.VERSION.SDK_INT >= 33
+        viewModel.onUserSettingsComputed(
+            id = id,
+            notificationsEnabled = NotificationManagerCompat.from(this).areNotificationsEnabled(),
+            isAtLeastApi33 = isAtLeastApi33,
+            runtimePermissionGranted = isAtLeastApi33 &&
+                ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) == PERMISSION_GRANTED,
+            shouldShowRationale = isAtLeastApi33 &&
+                ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.POST_NOTIFICATIONS),
+        )
+    }
+
+    private fun launchNotificationsPermission(id: String) {
+        pendingNotificationsPermissionRequestId = id
+        if (Build.VERSION.SDK_INT >= 33) {
+            notificationsPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+        } else {
+            val granted = NotificationManagerCompat.from(this).areNotificationsEnabled()
+            viewModel.onNotificationsPermissionResult(id, granted)
+            pendingNotificationsPermissionRequestId = null
+        }
+    }
+
     private fun renderPurchaseState(purchaseState: PurchaseStateView) {
         when (purchaseState) {
             is PurchaseStateView.InProgress, PurchaseStateView.Inactive -> {
@@ -553,7 +593,7 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
                 onPurchaseSuccess(null)
             }
             is PurchaseStateView.Success -> {
-                pixelSender.reportPurchaseSuccessOrigin(params.origin)
+                pixelSender.reportPurchaseSuccessOrigin(params.origin, purchaseState.isFreeTrial)
                 onPurchaseSuccess(purchaseState.subscriptionEventData)
             }
             is PurchaseStateView.Recovered -> {

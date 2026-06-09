@@ -1,0 +1,184 @@
+{
+    "sync-auto-restore_toggle_shown": {
+        "description": "Save Recovery Key screen shown during sync setup with the auto-restore toggle visible",
+        "owners": ["CDRussell"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "sync-auto-restore_toggle_opted_out": {
+        "description": "User taps Next on the Save Recovery Key screen with the auto-restore toggle OFF",
+        "owners": ["CDRussell"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "sync-auto-restore_settings_ready_shown": {
+        "description": "Previous Session Ready screen shown in Settings when auto-restore data is available",
+        "owners": ["CDRussell"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "source",
+                "type": "string",
+                "description": "Which sync setup flow the user chose before seeing the restore prompt",
+                "enum": ["sync_pairing", "sync_backup", "sync_recover"]
+            }
+        ]
+    },
+    "sync-auto-restore_settings_restore_tapped": {
+        "description": "User taps Restore My Data on the Previous Session Ready screen",
+        "owners": ["CDRussell"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "source",
+                "type": "string",
+                "description": "Which sync setup flow the user chose before seeing the restore prompt",
+                "enum": ["sync_pairing", "sync_backup", "sync_recover"]
+            }
+        ]
+    },
+    "sync-auto-restore_settings_skip_restore_tapped": {
+        "description": "User taps secondary action to skip restore and continue with fresh setup",
+        "owners": ["CDRussell"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "source",
+                "type": "string",
+                "description": "Which sync setup flow the user chose before seeing the restore prompt",
+                "enum": ["sync_pairing", "sync_backup", "sync_recover"]
+            }
+        ]
+    },
+    "sync-auto-restore_settings_cancelled": {
+        "description": "User dismisses the Previous Session Ready screen via back press or swipe",
+        "owners": ["CDRussell"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "source",
+                "type": "string",
+                "description": "Which sync setup flow the user chose before seeing the restore prompt",
+                "enum": ["sync_pairing", "sync_backup", "sync_recover"]
+            }
+        ]
+    },
+    "sync-auto-restore_settings_manual_recovery_shown": {
+        "description": "Recover Synced Data screen shown when auto-restore is OFF (manual recovery fallback path)",
+        "owners": ["CDRussell"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "sync-auto-restore_settings_page_shown": {
+        "description": "Sync settings page opened with the auto-restore toggle visible",
+        "owners": ["CDRussell"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "sync-auto-restore_settings_page_toggle_enabled": {
+        "description": "User turns the auto-restore toggle ON in Sync settings",
+        "owners": ["CDRussell"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "sync-auto-restore_settings_page_toggle_disabled": {
+        "description": "User turns the auto-restore toggle OFF in Sync settings",
+        "owners": ["CDRussell"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "sync-auto-restore_success": {
+        "description": "Auto-restore completed successfully",
+        "owners": ["CDRussell"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "source",
+                "type": "string",
+                "description": "Whether the restore was triggered from onboarding or settings",
+                "enum": ["onboarding", "settings"]
+            }
+        ]
+    },
+    "sync-auto-restore_failure": {
+        "description": "Auto-restore failed",
+        "owners": ["CDRussell"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "source",
+                "type": "string",
+                "description": "Whether the restore was triggered from onboarding or settings",
+                "enum": ["onboarding", "settings"]
+            },
+            {
+                "key": "errorCode",
+                "type": "string",
+                "description": "Error code from the sync account repository"
+            },
+            {
+                "key": "errorMessage",
+                "type": "string",
+                "description": "Error message describing the failure"
+            }
+        ]
+    },
+    "sync-auto-restore_preserved_account_cleared": {
+        "description": "Preserved sync account successfully removed before starting fresh sync setup",
+        "owners": ["CDRussell"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "source",
+                "type": "string",
+                "description": "Which sync setup flow the user chose after skipping restore",
+                "enum": ["sync_pairing", "sync_backup", "sync_recover"]
+            }
+        ]
+    },
+    "sync-auto-restore_preserved_account_clear_failed": {
+        "description": "Preserved sync account removal failed; fresh setup aborted",
+        "owners": ["CDRussell"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "source",
+                "type": "string",
+                "description": "Which sync setup flow the user chose after skipping restore",
+                "enum": ["sync_pairing", "sync_backup", "sync_recover"]
+            },
+            {
+                "key": "errorCode",
+                "type": "string",
+                "description": "Error code from the Block Store clear operation"
+            },
+            {
+                "key": "errorMessage",
+                "type": "string",
+                "description": "Error message describing the failure"
+            }
+        ]
+    }
+}

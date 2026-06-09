@@ -300,7 +300,13 @@
         "owners": ["malmstein"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
-        "parameters": ["appVersion"]
+        "parameters": [
+            "appVersion",
+            {
+                "key": "is_enabled",
+                "description": "whether automatic page context collection is enabled or not"
+            }
+        ]
     },
     "m_aichat_settings_chat_suggestions_turned_on_count": {
         "description": "User enabled the Chat Suggestions toggle in General Settings",
@@ -359,14 +365,288 @@
         "parameters": ["appVersion"]
     },
     "m_aichat_voice_entry_tapped_count": {
-        "description": "User tapped the voice entry point button on the duck.ai tab in the input screen",
-        "owners": ["aitorvs"],
+        "description": "User tapped the voice entry point button to open Duck.ai voice mode",
+        "owners": ["aitorvs", "karlenDimla"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
         "parameters": ["appVersion"]
     },
     "m_aichat_voice_entry_tapped_daily": {
-        "description": "(Daily Pixel) User tapped the voice entry point button on the duck.ai tab in the input screen",
+        "description": "(Daily Pixel) User tapped the voice entry point button to open Duck.ai voice mode",
+        "owners": ["aitorvs", "karlenDimla"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_voice_session_started": {
+        "description": "Fires when the native layer receives a voiceSessionStarted bridge message from the Duck.ai frontend, indicating a voice session has actually begun",
+        "owners": ["karlenDimla"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_voice_session_digital-assistant_started": {
+        "description": "Fires when Duck.ai voice chat is launched as the digital assistant (e.g. via Google Assistant ACTION_ASSIST intent)",
+        "owners": ["karlenDimla"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_settings_default_toggle_position_changed": {
+        "description": "User changed the default toggle position setting in AI Features settings",
+        "owners": ["YoussefKeyrouz"],
+        "triggers": ["other"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": [
+            "appVersion",
+            { "key": "value", "type": "string", "description": "The selected toggle position", "enum": ["search", "duckAI", "lastUsed"] }
+        ]
+    },
+    "m_aichat_new_address_bar_picker_v2_displayed_count": {
+        "description": "Fires every time the V2 New Address Bar Picker bottom sheet is displayed to an existing Duck.ai-enabled user who has not yet enabled the AI Chat Toggle.",
+        "owners": ["GerardPaligot"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_new_address_bar_picker_v2_displayed_daily": {
+        "description": "Fires once per day when the V2 New Address Bar Picker bottom sheet is displayed to an existing Duck.ai-enabled user who has not yet enabled the AI Chat Toggle.",
+        "owners": ["GerardPaligot"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_new_address_bar_picker_v2_confirmed_count": {
+        "description": "Fires every time the user taps Confirm on the V2 New Address Bar Picker.",
+        "owners": ["GerardPaligot"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "selection",
+                "type": "string",
+                "description": "Which option the user picked on the V2 picker before tapping Confirm.",
+                "enum": ["search_only", "search_and_ai"]
+            }
+        ]
+    },
+    "m_aichat_new_address_bar_picker_v2_confirmed_daily": {
+        "description": "Fires once per day when the user taps Confirm on the V2 New Address Bar Picker.",
+        "owners": ["GerardPaligot"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "selection",
+                "type": "string",
+                "description": "Which option the user picked on the V2 picker before tapping Confirm.",
+                "enum": ["search_only", "search_and_ai"]
+            }
+        ]
+    },
+    "m_aichat_experimental_omnibar_mode_switched": {
+        "description": "User switched between Search and Duck.ai toggle in the input screen",
+        "owners": ["YoussefKeyrouz"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            { "key": "direction", "type": "string", "description": "Direction of the toggle switch", "enum": ["to_search", "to_duckai"] },
+            { "key": "had_text", "type": "boolean", "description": "Whether the input field had text" },
+            {
+                "key": "default_position",
+                "type": "string",
+                "description": "The user's default toggle position setting",
+                "enum": ["search", "duckAI", "lastUsed"]
+            }
+        ]
+    },
+    "m_aichat_duckai_dau_toggle_never_enabled": {
+        "description": "Fired once per Duck.ai DAU day for users who have never enabled the Duck.ai input screen toggle. Used to identify heavy Duck.ai users who haven't discovered the feature.",
+        "owners": ["aitorvs"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_contextual_fire_button_tapped": {
+        "description": "User tapped the fire button in the contextual Duck.ai sheet",
+        "owners": ["aitorvs"],
+        "triggers": ["other"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_contextual_fire_button_confirmed": {
+        "description": "User confirmed chat deletion via the fire button in the contextual Duck.ai sheet",
+        "owners": ["aitorvs"],
+        "triggers": ["other"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_duck-ai_native-storage_reader_native_daily": {
+        "description": "Duck.ai chat suggestions were loaded from the native store (daily)",
+        "owners": ["aitorvs"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_duck-ai_native-storage_reader_webview_daily": {
+        "description": "Duck.ai chat suggestions were loaded from the WebView store (daily)",
+        "owners": ["aitorvs"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_duck-ai_native-storage_deletion_native_count": {
+        "description": "A Duck.ai chat was deleted via the native store path",
+        "owners": ["aitorvs"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_duck-ai_native-storage_deletion_webview_count": {
+        "description": "A Duck.ai chat was deleted via the WebView store path",
+        "owners": ["aitorvs"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_duck-ai_native-storage_migration_done_chats_unique": {
+        "description": "Duck.ai chat history migration to native storage completed for the chats key (unique per install)",
+        "owners": ["aitorvs"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_duck-ai_native-storage_migration_done_chats_count": {
+        "description": "Duck.ai chat history migration to native storage completed for the chats key (count; should match unique)",
+        "owners": ["aitorvs"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_duck-ai_native-storage_migration_done_entries_unique": {
+        "description": "Duck.ai chat history migration to native storage completed for the entries key (unique per install)",
+        "owners": ["aitorvs"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_duck-ai_native-storage_migration_done_entries_count": {
+        "description": "Duck.ai chat history migration to native storage completed for the entries key (count; should match unique)",
+        "owners": ["aitorvs"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_duck-ai_native-storage_migration_done_files_unique": {
+        "description": "Duck.ai chat history migration to native storage completed for the files key (unique per install)",
+        "owners": ["aitorvs"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_duck-ai_native-storage_migration_done_files_count": {
+        "description": "Duck.ai chat history migration to native storage completed for the files key (count; should match unique)",
+        "owners": ["aitorvs"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_duck-ai_native-storage_migration_done_blank_count": {
+        "description": "Duck.ai markMigrationDone was called with a blank key — indicates a JS-side bug",
+        "owners": ["aitorvs"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_duck-ai_native-storage_migration_started": {
+        "description": "Duck.ai native storage: markMigrationDone was called (migration was attempted by the web layer)",
+        "owners": ["aitorvs"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_duck-ai_native-storage_migration_already-done": {
+        "description": "Duck.ai native storage: isMigrationDone returned true (page load found migration already complete)",
+        "owners": ["aitorvs"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_duck-ai_native-storage_migration_error": {
+        "description": "Duck.ai native storage: isMigrationDone or markMigrationDone threw an exception",
+        "owners": ["aitorvs"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_duck-ai_native-storage_settings-put_error": {
+        "description": "Duck.ai native storage: putEntry or replaceAllEntries failed with an exception",
+        "owners": ["aitorvs"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_duck-ai_native-storage_settings-get_error": {
+        "description": "Duck.ai native storage: getEntry or getAllEntries failed with an exception",
+        "owners": ["aitorvs"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_duck-ai_native-storage_settings-delete_error": {
+        "description": "Duck.ai native storage: deleteEntry, deleteAllEntries, or replaceAllEntries failed with an exception",
+        "owners": ["aitorvs"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_duck-ai_native-storage_chat-put_error": {
+        "description": "Duck.ai native storage: putChat, putChats, or migrateChats failed with an exception",
+        "owners": ["aitorvs"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_duck-ai_native-storage_chat-get_error": {
+        "description": "Duck.ai native storage: getChat or getAllChats failed with an exception",
+        "owners": ["aitorvs"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_duck-ai_native-storage_chat-delete_error": {
+        "description": "Duck.ai native storage: deleteChat or deleteAllChats failed with an exception",
+        "owners": ["aitorvs"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_duck-ai_native-storage_file-put_error": {
+        "description": "Duck.ai native storage: putFile failed with an exception",
+        "owners": ["aitorvs"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_duck-ai_native-storage_file-get_error": {
+        "description": "Duck.ai native storage: getFile failed with an exception",
+        "owners": ["aitorvs"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_duck-ai_native-storage_file-list_error": {
+        "description": "Duck.ai native storage: listFiles failed with an exception",
+        "owners": ["aitorvs"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_duck-ai_native-storage_file-delete_error": {
+        "description": "Duck.ai native storage: deleteFile, deleteFiles, or deleteAllFiles failed with an exception",
         "owners": ["aitorvs"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],

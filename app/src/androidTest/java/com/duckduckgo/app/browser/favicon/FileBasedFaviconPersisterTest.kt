@@ -32,6 +32,7 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
@@ -104,6 +105,20 @@ class FileBasedFaviconPersisterTest {
     }
 
     @Test
+    fun whenCopyToDirectoryAndAtomicWritesEnabledThenFileCopiedAndNoTmpFileLeft() = runTest {
+        fakeBrowserConfigFeature.atomicFaviconWrites().setRawStoredState(Toggle.State(true))
+        val filename = "newFileName"
+        createNewFile()
+
+        testee.copyToDirectory(getTestFile(), secondaryTestDirectory, subFolder, filename)
+
+        val newFile = testee.faviconFile(secondaryTestDirectory, subFolder, filename)
+        assertNotNull(newFile)
+        verifyDirectoryUse(newFile!!.absolutePath, secondaryTestDirectory)
+        assertFalse(File(newFile.parent, "${newFile.name}.tmp").exists())
+    }
+
+    @Test
     fun whenStoreBitmapCorrectlyThenReturnFile() = runTest {
         val bitmap: Bitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.RGB_565)
 
@@ -146,6 +161,18 @@ class FileBasedFaviconPersisterTest {
         val file = testee.store(testDirectory, subFolder, newBitmap, "filename")
 
         assertNotNull(file)
+    }
+
+    @Test
+    fun whenStoreFaviconSuspendDisabledAndAtomicWritesEnabledThenFileWrittenAndNoTmpFileLeft() = runTest {
+        fakeBrowserConfigFeature.storeFaviconSuspend().setRawStoredState(Toggle.State(false))
+        fakeBrowserConfigFeature.atomicFaviconWrites().setRawStoredState(Toggle.State(true))
+        val bitmap: Bitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.RGB_565)
+
+        val file = testee.store(testDirectory, subFolder, bitmap, "filename")
+
+        assertTrue(file!!.exists())
+        assertFalse(File(file.parent, "${file.name}.tmp").exists())
     }
 
     @Test

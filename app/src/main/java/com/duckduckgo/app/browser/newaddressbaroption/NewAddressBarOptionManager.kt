@@ -28,7 +28,7 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
-import com.duckduckgo.remote.messaging.api.RemoteMessagingRepository
+import com.duckduckgo.remote.messaging.api.RemoteMessageModel
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.sync.Mutex
@@ -53,7 +53,7 @@ class RealNewAddressBarOptionManager @Inject constructor(
     private val duckAiFeatureState: DuckAiFeatureState,
     private val userStageStore: UserStageStore,
     private val duckChat: DuckChat,
-    private val remoteMessagingRepository: RemoteMessagingRepository,
+    private val remoteMessageModel: RemoteMessageModel,
     private val newAddressBarOptionDataStore: NewAddressBarOptionDataStore,
     private val settingsDataStore: SettingsDataStore,
     private val onboardingStore: OnboardingStore,
@@ -143,11 +143,9 @@ class RealNewAddressBarOptionManager @Inject constructor(
             logcat(DEBUG) { "NewAddressBarOptionManager: $it isBottomAddressBarDisabled" }
         }
 
-    private fun hasNotInteractedWithSearchAndDuckAiRMF(): Boolean =
-        remoteMessagingRepository.dismissedMessages().let { dismissedMessages ->
-            (!dismissedMessages.contains("search_duck_ai_announcement")).also {
-                logcat(DEBUG) { "NewAddressBarOptionManager: $it hasNotInteractedWithSearchAndDuckAiRMF" }
-            }
+    private suspend fun hasNotInteractedWithSearchAndDuckAiRMF(): Boolean =
+        (!remoteMessageModel.isMessageDismissed("search_duck_ai_announcement")).also {
+            logcat(DEBUG) { "NewAddressBarOptionManager: $it hasNotInteractedWithSearchAndDuckAiRMF" }
         }
 
     private fun isNewAddressBarOptionChoiceScreenEnabled(): Boolean =

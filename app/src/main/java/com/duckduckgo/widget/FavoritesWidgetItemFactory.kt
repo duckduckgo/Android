@@ -26,17 +26,13 @@ import android.view.View
 import android.widget.RemoteViews
 import android.widget.RemoteViewsService
 import androidx.core.content.FileProvider
-import androidx.core.graphics.drawable.toBitmap
 import androidx.core.net.toUri
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.browser.favicon.FaviconPersister
-import com.duckduckgo.app.browser.favicon.FileBasedFaviconPersister.Companion.FAVICON_PERSISTED_DIR
-import com.duckduckgo.app.browser.favicon.FileBasedFaviconPersister.Companion.NO_SUBFOLDER
+import com.duckduckgo.app.browser.mode.FavoritesWidget
 import com.duckduckgo.app.global.DuckDuckGoApplication
-import com.duckduckgo.app.global.view.generateDefaultDrawable
 import com.duckduckgo.common.utils.DispatcherProvider
-import com.duckduckgo.common.utils.domain
+import com.duckduckgo.common.utils.baseHost
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.api.models.SavedSite
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -61,7 +57,7 @@ class FavoritesWidgetItemFactory(
     lateinit var widgetPrefs: WidgetPreferences
 
     @Inject
-    lateinit var faviconPersister: FaviconPersister
+    lateinit var widgetFaviconProvider: WidgetFaviconProvider
 
     @Inject
     lateinit var dispatchers: DispatcherProvider
@@ -118,45 +114,16 @@ class FavoritesWidgetItemFactory(
         }
     }
 
-    /**
-     * Converts a SavedSite.Favorite to a WidgetFavorite by ensuring we have a bitmap URI for the favicon.
-     */
     private suspend fun SavedSite.Favorite.toWidgetFavorite(): WidgetFavorite {
         val domain = url.extractDomain().orEmpty()
-
-        // step 1: check if any file (real favicon or placeholder) already exists on disk to avoid fetching/generating it again
-        val existingFile = faviconPersister.faviconFile(
-            directory = FAVICON_PERSISTED_DIR,
-            subFolder = NO_SUBFOLDER,
-            domain = domain,
-        )
-        var uri: Uri? = null
-
-        if (existingFile != null) {
-            // found existing file on disk (favicon or placeholder) - use it without network call
-            uri = existingFile.getContentUri()
-        }
-        if (uri != null) {
-            return WidgetFavorite(
-                title = title,
-                url = url,
-                bitmapUri = uri,
-            )
-        }
-
-        // step 2: generate and save placeholder
-        val placeholderBitmap = generateDefaultDrawable(
-            context = context,
-            domain = domain,
-            cornerRadius = faviconItemCornerRadius,
-        ).toBitmap(faviconItemSize, faviconItemSize)
-        uri = faviconPersister.store(FAVICON_PERSISTED_DIR, NO_SUBFOLDER, placeholderBitmap, domain)?.getContentUri()
-
-        return WidgetFavorite(
-            title = title,
-            url = url,
-            bitmapUri = uri,
-        )
+        val bitmapUri = runCatching {
+            widgetFaviconProvider.getOrGenerateWidgetFavicon(
+                domain = domain,
+                placeholderSizePx = faviconItemSize,
+                placeholderCornerRadius = faviconItemCornerRadius,
+            )?.getContentUri()
+        }.getOrNull()
+        return WidgetFavorite(title = title, url = url, bitmapUri = bitmapUri)
     }
 
     override fun onDestroy() {
@@ -169,7 +136,7 @@ class FavoritesWidgetItemFactory(
 
     private fun String.extractDomain(): String? {
         return if (this.startsWith("http")) {
-            this.toUri().domain()
+            this.toUri().baseHost
         } else {
             "https://$this".extractDomain()
         }
@@ -225,6 +192,10 @@ class FavoritesWidgetItemFactory(
         bundle.putBoolean(BrowserActivity.NEW_SEARCH_EXTRA, false)
         bundle.putBoolean(BrowserActivity.LAUNCH_FROM_FAVORITES_WIDGET, true)
         bundle.putBoolean(BrowserActivity.NOTIFY_DATA_CLEARED_EXTRA, false)
+        bundle.putBoolean(
+            BrowserActivity.LAUNCH_REQUIRES_REGULAR_MODE,
+            FavoritesWidget.requiresRegularMode,
+        )
         val intent = Intent()
         intent.putExtras(bundle)
         remoteViews.setOnClickFillInIntent(R.id.quickAccessFaviconContainer, intent)

@@ -18,4 +18,15 @@
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
     <string name="showExperimentalBrowserMenu">Experimental Browser Menu</string>
+
+    <!-- Inactivity timeout -->
+    <string name="afterInactivityOptionTitle">After Inactivity</string>
+    <string name="afterInactivityTimeoutRowTitle">Choose an inactivity timer</string>
+    <string name="afterInactivityScreenSectionHeader">Choose what you see when you return after inactivity</string>
+    <string name="afterInactivityOptionMessage" instruction="'%1$s' is a placeholder and will be replaced with the number of minutes, e.g. 'after 5 minutes of inactivity'">Choose what you see when you return after %1$s minutes of inactivity.</string>
+    <string name="afterInactivityTimeoutAlways">Always</string>
+    <string name="afterInactivityTimeout1Minute">1 minute</string>
+    <string name="afterInactivityTimeoutXMinutes" instruction="'%1$d' is a placeholder and will be replaced with the number of minutes, e.g. '5 minutes'">%1$d minutes</string>
+    <string name="afterInactivityTimeout1Hour">1 hour</string>
+    <string name="afterInactivityTimeoutXHours" instruction="'%1$d' is a placeholder and will be replaced with the number of hours, e.g. '2 hours'">%1$d hours</string>
 </resources>

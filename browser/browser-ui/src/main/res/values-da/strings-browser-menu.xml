@@ -36,6 +36,7 @@
     <string name="browserMenuPrintSite">Print</string>
     <string name="browserMenuOpenAppLink">Åbn i app</string>
     <string name="browserMenuAddToHome">Tilføj til startskærm</string>
+    <string name="browserMenuDownloadPdf">Download PDF-fil</string>
     <string name="browserMenuReportBrokenSite">Rapporter ødelagt websted</string>
     <string name="browserMenuAutofill">Adgangskoder</string>
     <string name="browserMenuDownloads">Downloads</string>
@@ -56,5 +57,5 @@
     <string name="browserMenuBack">Tilbage</string>
     <string name="browserMenuForward">Frem</string>
     <string name="browserMenuRefresh">Opdater</string>
-    <string name="browserMenuFire">Ryd faner og data</string>
+    <string name="browserMenuFireTabsData">Slet faner og data</string>
 </resources>

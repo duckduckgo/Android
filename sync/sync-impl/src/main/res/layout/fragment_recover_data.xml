@@ -63,6 +63,7 @@
             android:paddingStart="@dimen/keyline_5"
             android:paddingEnd="@dimen/keyline_5"
             android:paddingTop="20dp"
+            android:paddingBottom="@dimen/keyline_5"
             android:clipToPadding="false">
 
             <ImageView
@@ -123,78 +124,14 @@
                 android:paddingBottom="@dimen/keyline_4"
                 android:visibility="visible">
 
-                <!-- Recovery code list item row -->
-                <androidx.constraintlayout.widget.ConstraintLayout
+                <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+                    android:id="@+id/recoveryCodeItem"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:minHeight="64dp"
-                    android:paddingStart="@dimen/keyline_4"
-                    android:paddingEnd="@dimen/keyline_4"
-                    android:paddingTop="@dimen/keyline_3"
-                    android:paddingBottom="@dimen/keyline_3">
-
-                    <!-- QR icon with container background -->
-                    <FrameLayout
-                        android:id="@+id/recoveryCodeIcon"
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
-                        android:background="@drawable/list_item_image_round_background"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintBottom_toBottomOf="parent">
-
-                        <ImageView
-                            android:layout_width="24dp"
-                            android:layout_height="24dp"
-                            android:layout_gravity="center"
-                            android:src="@drawable/ic_qr_24"
-                            tools:ignore="ContentDescription" />
-
-                    </FrameLayout>
-
-                    <!-- Recovery code label + text -->
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="@dimen/keyline_4"
-                        android:layout_marginEnd="@dimen/keyline_4"
-                        android:orientation="vertical"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toStartOf="@id/copyCodeButton"
-                        app:layout_constraintStart_toEndOf="@id/recoveryCodeIcon"
-                        app:layout_constraintTop_toTopOf="parent">
-
-                        <com.duckduckgo.common.ui.view.text.DaxTextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/sync_recover_data_recovery_code_label"
-                            app:textType="secondary"
-                            app:typography="body1" />
-
-                        <com.duckduckgo.common.ui.view.text.DaxTextView
-                            android:id="@+id/recoveryCodeText"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="2dp"
-                            android:ellipsize="end"
-                            android:maxLines="2"
-                            app:textType="secondary"
-                            app:typography="body1_mono" />
-
-                    </LinearLayout>
-
-                    <!-- Copy button -->
-                    <com.duckduckgo.common.ui.view.button.IconButton
-                        android:id="@+id/copyCodeButton"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:background="?selectableItemBackgroundBorderless"
-                        app:srcCompat="@drawable/ic_copy_24"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintBottom_toBottomOf="parent" />
-
-                </androidx.constraintlayout.widget.ConstraintLayout>
+                    app:primaryText="@string/sync_recover_data_recovery_code_label"
+                    app:leadingIcon="@drawable/ic_qr_24"
+                    app:leadingIconBackground="circular"
+                    app:trailingIcon="@drawable/ic_copy_24" />
 
                 <!-- Download as PDF button -->
                 <com.duckduckgo.common.ui.view.button.DaxButtonSecondary

@@ -25,8 +25,10 @@ import com.duckduckgo.sync.impl.SyncFeature
 import com.duckduckgo.sync.impl.promotion.SyncGetOnOtherPlatformsLaunchSource
 import com.duckduckgo.sync.impl.promotion.SyncGetOnOtherPlatformsLaunchSource.SOURCE_ACTIVATING
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen
+import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.PREVIOUS_SESSION_READY
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.RECOVERY_CODE
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.RECOVERY_INTRO
+import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.RESTORE_IN_PROGRESS
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.SETUP_COMPLETE
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.SYNC_INTRO
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.SYNC_SETUP
@@ -38,6 +40,8 @@ import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.ViewMode.AskSaveR
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.ViewMode.CreateAccount
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.ViewMode.IntroCreateAccount
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.ViewMode.IntroRecoveryCode
+import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.ViewMode.PreviousSessionReady
+import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.ViewMode.RestoreInProgress
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.ViewMode.SyncSetupCompleted
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
@@ -68,6 +72,8 @@ class SetupAccountViewModel @Inject constructor(
                     RECOVERY_CODE -> AskSaveRecoveryCode(useNewScreen = syncFeature.recoverDataEasilySetupScreen().isEnabled())
                     SYNC_INTRO -> IntroCreateAccount
                     RECOVERY_INTRO -> IntroRecoveryCode
+                    PREVIOUS_SESSION_READY -> PreviousSessionReady
+                    RESTORE_IN_PROGRESS -> RestoreInProgress
                 }
             }
             viewState.emit(ViewState(viewMode))
@@ -88,6 +94,8 @@ class SetupAccountViewModel @Inject constructor(
 
         data object IntroCreateAccount : ViewMode()
         data object IntroRecoveryCode : ViewMode()
+        data object PreviousSessionReady : ViewMode()
+        data object RestoreInProgress : ViewMode()
     }
 
     sealed class Command {
@@ -124,6 +132,12 @@ class SetupAccountViewModel @Inject constructor(
     fun onSetupFinished() {
         viewModelScope.launch {
             command.send(Finish)
+        }
+    }
+
+    fun onRestoreInProgress() {
+        viewModelScope.launch {
+            viewState.emit(ViewState(viewMode = RestoreInProgress))
         }
     }
 

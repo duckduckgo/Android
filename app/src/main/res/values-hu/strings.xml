@@ -27,6 +27,9 @@
     <string name="cancel">Mégsem</string>
     <string name="search">Keresés</string>
 
+    <!--Duck.ai contextual fire-->
+    <string name="duckAiChatDeletedSnackbar">Csevegés törölve</string>
+
     <!-- Onboarding Activity -->
     <string name="onboardingDefaultBrowserDescription">A Beállítások oldalon bármikor kereshetsz és böngészhetsz a DuckDuckGo segítségével.</string>
     <string name="onboardingDefaultBrowserTitle">Tedd a DuckDuckGót az alapértelmezett keresőoldaladdá</string>
@@ -137,6 +140,7 @@
     <string name="leaveFeedbackNew">Visszajelzés küldése</string>
     <string name="settingsEmailProtectionTitle">E-mail védelem</string>
     <string name="settingsHeadingNextSteps">Következő lépések</string>
+    <string name="settingsNextStepsHideItem">Elrejtés</string>
     <string name="settingsLightTheme">Világos</string>
     <string name="settingsTheme">Kinézet</string>
     <string name="settingsDarkTheme">Sötét</string>
@@ -174,9 +178,6 @@
     <string name="privateSearchAutocompleteHint">Keresési javaslatok megjelenítése gépelés közben, beleértve a könyvjelzőket is. Minden keresés privát.</string>
     <string name="privateSearchAutocompleteRecentlyVisitedSitesToggle">Legutóbb meglátogatott webhelyek</string>
     <string name="privateSearchAutocompleteRecentlyVisitedSitesHint">A legutóbb meglátogatott webhelyek megjelenítése a keresési javaslatokban. A legutóbb meglátogatott webhelyek privátak, csak az eszközödön tárolódnak, és a Tűz gombbal törölheted őket.</string>
-    <string name="improvedAutoCompleteIAMContent">Az automatikus kiegészítési javaslatok között már a legutóbb meglátogatott webhelyek is szerepelnek. A Beállítások alatt kikapcsolhatod, vagy bármikor törölheted a 🔥 Tűz gombbal.</string>
-    <string name="improvedAutoCompleteIAMTitle">Ugyanolyan adatvédelem.\nJobb keresési javaslatok!</string>
-    <string name="openAutoCompleteSettings">Beállítások megnyitása</string>
     <string name="privateSearchChatSuggestionsToggle">Csevegési javaslatok</string>
     <string name="privateSearchAutocompleteHintWithChatSuggestions">Az előzményekből, a könyvjelzőkből és (opcionálisan) a Duck.ai csevegési előzményekből származó javaslatok megjelenítése a keresősávba való gépeléskor. Minden keresés privát.</string>
 
@@ -265,6 +266,7 @@
     <string name="singleTabFireDialogDeleteAll">Összes törlése</string>
     <string name="singleTabFireDialogDeleteThisTab">Lap törlése</string>
     <string name="singleTabFireDialogDeleteChat">Csevegés törlése</string>
+    <string name="singleTabFireDialogDeleteChats">Csevegések törlése</string>
     <string name="singleTabFireDialogTitleDuckAi">Csevegés törlése?</string>
     <string name="singleTabFireDialogSubtitleSiteData">A webhelyadatok törlése kijelentkeztethet a fiókjaidból.</string>
     <string name="singleTabFireDialogSubtitleDownloads">Ez megszakítja a folyamatban lévő letöltéseket.</string>
@@ -587,6 +589,7 @@
     <!-- Fire Animation settings -->
     <string name="settingsFireAnimation">Tűz gomb animáció</string>
     <string name="settingsHeroFireAnimation">Lángnyelvek</string>
+    <string name="settingsHeroFireAnimationClassic">Klasszikus lángnyelvek</string>
     <string name="settingsHeroWaterAnimation">Örvény</string>
     <string name="settingsHeroAbstractAnimation">Levegő</string>
     <string name="settingsNoneAnimation">Nincs</string>
@@ -844,6 +847,9 @@
     <string name="preOnboardingDaxDialog3Button">Böngészés indítása</string>
     <string name="preOnboardingAddressBarTitle">Hol helyezzem el a címsort?</string>
     <string name="preOnboardingAddressBarOkButton">Következő</string>
+    <string name="preOnboardingAddressBarPositionTop">Fent</string>
+    <string name="preOnboardingAddressBarPositionBottom">Lent</string>
+    <string name="preOnboardingAddressBarPositionSplit">Felosztás</string>
     <string name="highlightsPreOnboardingAddressBarOption1Title">Felül (alapértelmezett)</string>
     <string name="highlightsPreOnboardingAddressBarOption1Description">Könnyen látható</string>
     <string name="highlightsPreOnboardingAddressBarOption2Title">Alul</string>
@@ -866,6 +872,8 @@
     <string name="onboardingSitesDaxDialogOption3">ebay.com</string>
     <string name="onboardingSitesDaxDialogOption4">Lepj meg!</string>
     <string name="onboardingSerpDaxDialogDescription"><![CDATA[Ez a <b>DuckDuckGo Search</b>! Privát. Gyors. Kevesebb hirdetés.]]></string>
+    <string name="onboardingSerpDaxDialogBrandDesignTitle">Ez a DuckDuckGo Search!</string>
+    <string name="onboardingSerpDaxDialogBrandDesignDescription">Privát. Gyors. Kevesebb hirdetés.</string>
     <string name="onboardingSerpDaxDialogButton">Megvan!</string>
     <string name="onboardingSitesSuggestionsDaxDialogTitle">A következő lépésben próbálj meg ellátogatni egy webhelyre!</string>
     <plurals name="onboardingTrackersBlockedDialogDescription">
@@ -896,6 +904,26 @@
     <string name="preOnboardingInputScreenTitleUpdated" translatable="false">Want easy access to private AI chat in the address bar?</string>
     <string name="preOnboardingInputScreenButton">Következő</string>
     <string name="preOnboardingInputScreenDescription"><![CDATA[Az AI-funkciók privátak és opcionálisak. Módosításokat a <b>Beállítások > AI-funkciók</b> menüpontban végezhetsz.]]></string>
+
+    <!--Onboarding Reinstall Quick Setup-->
+    <string name="preOnboardingReinstallQuickSetupTitle">Üdv újra!&lt;br/&gt;Testre szeretnél szabni valamit?</string>
+    <string name="preOnboardingReinstallSetDefaultLabel">DuckDuckGo beállítása alapértelmezettként</string>
+    <string name="preOnboardingReinstallAddHomeScreenWidgetLabel">Kezdőképernyő minialkalmazás hozzáadása</string>
+    <string name="preOnboardingReinstallAddressBarLabel">Címsor elhelyezkedése</string>
+    <string name="preOnboardingReinstallAddressBarSearchOptionsLabel">Címsor keresési lehetőségei</string>
+    <string name="preOnboardingReinstallStartBrowsing">Böngészés indítása</string>
+
+    <!-- Quick setup bottom sheets -->
+    <string name="quickSetupAddressBarPositionTitle">Hová szeretnéd tenni a címsort?</string>
+    <string name="quickSetupAddressBarPositionCaption"><![CDATA[Módosításokat a <b>Beállítások > Megjelenés</b> menüpontban végezhetsz.]]></string>
+    <string name="quickSetupSearchOptionsTitle">Szeretnéd, ha lenne keresés és AI csevegés a címsorban?</string>
+    <string name="quickSetupBottomSheetDone">Kész</string>
+    <string name="quickSetupInputScreenSearchOnly">Csak keresés</string>
+    <string name="quickSetupInputScreenSearchAndDuckAi">Keresés és Duck.ai</string>
+    <string name="quickSetupRemoveHomeScreenWidgetTitle">Hogyan távolíthatom el a Kezdőképernyő minialkalmazást?</string>
+    <string name="quickSetupRemoveHomeScreenWidgetStep1">Lépj a kezdőképernyőre</string>
+    <string name="quickSetupRemoveHomeScreenWidgetStep2">Érintsd meg és tartsd megérintve a minialkalmazást</string>
+    <string name="quickSetupRemoveHomeScreenWidgetStep3">Koppints rá vagy húzd el az eltávolításhoz</string>
 
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Címsor</string>
@@ -977,4 +1005,32 @@
     <string name="searchWidgetDescription" instruction="Description for the search widget, which may include Duck.ai and voice search">Keress privát módon a DuckDuckGóval, vagy tegyél fel kérdést a Duck.ai számára. A hangalapú keresés és a Duck.ai akkor érhető el, ha engedélyezve van.</string>
     <string name="searchAndFavoritesWidgetDescription" instruction="Description for the search and favorites widget">Látogasd meg a kedvenc weboldalaidat és keress rajtuk privát módon egyetlen koppintással. A hangalapú keresés és a Duck.ai akkor érhető el, ha engedélyezve van.</string>
     <string name="duckAiOnlyPinShortcutLabel" instruction="Label for the Duck.ai pinned shortcut. Should be Duck.ai in all languages">Duck.ai</string>
+
+    <!-- Sync Restore (onboarding) -->
+    <string name="syncRestoreDialogTitle">Folytassuk ott, ahol abbahagytad</string>
+    <string name="syncRestoreDialogDescription">Szeretnéd visszaállítani a könyvjelzőidet, a jelszavaidat és az egyéb dolgokat az előző DuckDuckGo-szinkronizálásból?</string>
+    <string name="syncRestoreDialogPrimaryCta">Saját adataim visszaállítása</string>
+    <string name="syncRestoreDialogSecondaryCta">Kihagyás</string>
+
+    <!-- Sync Restore (brand-design onboarding) -->
+    <string name="syncRestoreDialogBrandDesignTitle">Folytassuk ott, ahol abbahagytad a DuckDuckGo használatát.</string>
+    <string name="syncRestoreDialogBrandDesignBody1">Mentett könyvjelzőid, jelszavaid és a további elemek készen állnak.</string>
+
+    <!-- PDF download tooltip -->
+    <string name="pdfDownloadTooltipText">PDF letöltése</string>
+
+    <!-- Sharing options -->
+    <string name="copyLinkText">Link szövegének másolása</string>
+    <string name="linkTextCopied">Link szövege másolva</string>
+    <string name="linkTextCopyFailed">Nem sikerült másolni a link szövegét</string>
+
+    <string name="preOnboardingWelcomeDialogTitle">Szia!</string>
+    <string name="preOnboardingWelcomeDialogBody1">Felkészültél egy gyorsabb böngészőre, amely a te kezedbe adja az irányítást?</string>
+    <string name="preOnboardingWelcomeDialogBody2">Az MI mindig opcionális, az adatvédelem pedig állandóan be van kapcsolva.</string>
+    <string name="onboardingStepIndicatorText" instruction="a counter above our instructions in onboarding that tells a user what step they are on">%1$d/%2$d</string>
+    <string name="onboardingSearchDaxDialogOption1Quoted" instruction="translate &apos;duck&apos; too.">hogyan mondják angolul, hogy „kacsa”</string>
+    <string name="onboardingSearchDaxDialogOption1EnglishQuoted" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">hogyan mondják spanyolul, hogy „kacsa”</string>
+
+    <string name="input_screen_user_pref_without_ai_updated">Csak keresés</string>
+    <string name="input_screen_user_pref_with_ai_updated">Váltás a keresés\nés a Duck.ai között</string>
 </resources>

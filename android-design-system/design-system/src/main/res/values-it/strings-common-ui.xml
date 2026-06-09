@@ -40,4 +40,9 @@
 
     <!-- Page Header -->
     <string name="pageHeaderLearnMore">Ulteriori informazioni</string>
+
+    <!-- Content Descriptions -->
+    <string name="closeButtonContentDescription">Chiudi</string>
+    <string name="bookmarkFavoriteContentDescription">Preferito</string>
+
 </resources>

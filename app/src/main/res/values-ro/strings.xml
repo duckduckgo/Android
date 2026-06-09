@@ -27,6 +27,9 @@
     <string name="cancel">Anulează</string>
     <string name="search">Căutare</string>
 
+    <!--Duck.ai contextual fire-->
+    <string name="duckAiChatDeletedSnackbar">Chat șters</string>
+
     <!-- Onboarding Activity -->
     <string name="onboardingDefaultBrowserDescription">Accesează „Setări” pentru a căuta și naviga cu DuckDuckGo de fiecare dată.</string>
     <string name="onboardingDefaultBrowserTitle">Fă DuckDuckGo aplicația ta implicită</string>
@@ -138,6 +141,7 @@
     <string name="leaveFeedbackNew">Trimite feedback</string>
     <string name="settingsEmailProtectionTitle">Protecția comunicațiilor prin e-mail</string>
     <string name="settingsHeadingNextSteps">Pașii următori</string>
+    <string name="settingsNextStepsHideItem">Ascunde</string>
     <string name="settingsLightTheme">Luminoasă</string>
     <string name="settingsTheme">Temă</string>
     <string name="settingsDarkTheme">Intunecată</string>
@@ -175,9 +179,6 @@
     <string name="privateSearchAutocompleteHint">Afișează sugestii de căutare, inclusiv marcajele tale, pe măsură ce tastezi. Toate căutările sunt private.</string>
     <string name="privateSearchAutocompleteRecentlyVisitedSitesToggle">Site-uri vizitate recent</string>
     <string name="privateSearchAutocompleteRecentlyVisitedSitesHint">Afișează site-urile accesate recent în sugestiile de căutare. Site-urile accesate recent sunt private, stocate doar pe dispozitiv și pot fi șterse cu Fire Button.</string>
-    <string name="improvedAutoCompleteIAMContent">Sugestiile de completare automată includ acum site-urile accesate recent. Dezactivează-le din Setări sau șterge-le în orice moment cu ajutorul Fire Button 🔥.</string>
-    <string name="improvedAutoCompleteIAMTitle">Aceeași confidențialitate.\nSugestii de căutare mai bune!</string>
-    <string name="openAutoCompleteSettings">Deschide Setări</string>
     <string name="privateSearchChatSuggestionsToggle">Sugestii de chat</string>
     <string name="privateSearchAutocompleteHintWithChatSuggestions">Afișează sugestii din istoricul tău, marcaje și (opțional) istoricul chaturilor Duck.ai pe măsură ce tastezi în bara de căutare. Toate căutările sunt private.</string>
 
@@ -269,6 +270,7 @@
     <string name="singleTabFireDialogDeleteAll">Șterge toate</string>
     <string name="singleTabFireDialogDeleteThisTab">Șterge această filă</string>
     <string name="singleTabFireDialogDeleteChat">Șterge chatul</string>
+    <string name="singleTabFireDialogDeleteChats">Șterge chaturile</string>
     <string name="singleTabFireDialogTitleDuckAi">Ștergi acest chat?</string>
     <string name="singleTabFireDialogSubtitleSiteData">Ștergerea datelor de pe site te poate deconecta de la conturi.</string>
     <string name="singleTabFireDialogSubtitleDownloads">Aceasta va anula descărcările în desfășurare.</string>
@@ -592,6 +594,7 @@
     <!-- Fire Animation settings -->
     <string name="settingsFireAnimation">Animație buton Foc</string>
     <string name="settingsHeroFireAnimation">Infern</string>
+    <string name="settingsHeroFireAnimationClassic">Flăcări clasice</string>
     <string name="settingsHeroWaterAnimation">Vârtej de apă</string>
     <string name="settingsHeroAbstractAnimation">Curent de aer</string>
     <string name="settingsNoneAnimation">Niciuna</string>
@@ -862,6 +865,9 @@
     <string name="preOnboardingDaxDialog3Button">Începe navigarea</string>
     <string name="preOnboardingAddressBarTitle">Unde ar trebui să îți pun bara de adrese?</string>
     <string name="preOnboardingAddressBarOkButton">Următorul</string>
+    <string name="preOnboardingAddressBarPositionTop">Sus</string>
+    <string name="preOnboardingAddressBarPositionBottom">Partea de jos</string>
+    <string name="preOnboardingAddressBarPositionSplit">Împarte</string>
     <string name="highlightsPreOnboardingAddressBarOption1Title">Sus (implicit)</string>
     <string name="highlightsPreOnboardingAddressBarOption1Description">Ușor de văzut</string>
     <string name="highlightsPreOnboardingAddressBarOption2Title">Partea de jos</string>
@@ -884,6 +890,8 @@
     <string name="onboardingSitesDaxDialogOption3">ebay.com</string>
     <string name="onboardingSitesDaxDialogOption4">Surprinde-mă!</string>
     <string name="onboardingSerpDaxDialogDescription"><![CDATA[Acesta este <b>DuckDuckGo Search</b>! Privat. Rapid. Mai puține reclame.]]></string>
+    <string name="onboardingSerpDaxDialogBrandDesignTitle">Așa arată DuckDuckGo Search!</string>
+    <string name="onboardingSerpDaxDialogBrandDesignDescription">Privat. Rapid. Cu mai puține reclame.</string>
     <string name="onboardingSerpDaxDialogButton">Am înțeles!</string>
     <string name="onboardingSitesSuggestionsDaxDialogTitle">Apoi, încearcă să vizitezi un site!</string>
     <plurals name="onboardingTrackersBlockedDialogDescription">
@@ -916,6 +924,26 @@
     <string name="preOnboardingInputScreenTitleUpdated" translatable="false">Want easy access to private AI chat in the address bar?</string>
     <string name="preOnboardingInputScreenButton">Următorul</string>
     <string name="preOnboardingInputScreenDescription"><![CDATA[Funcțiile IA sunt private și opționale. Poți face modificări în <b>Setări > Funcții IA</b>.]]></string>
+
+    <!--Onboarding Reinstall Quick Setup-->
+    <string name="preOnboardingReinstallQuickSetupTitle">Bine ai revenit!&lt;br/&gt;Dorești să personalizezi ceva?</string>
+    <string name="preOnboardingReinstallSetDefaultLabel">Setează DuckDuckGo ca implicit</string>
+    <string name="preOnboardingReinstallAddHomeScreenWidgetLabel">Adaugă widgetul pentru ecranul de întâmpinare</string>
+    <string name="preOnboardingReinstallAddressBarLabel">Poziția barei de adrese</string>
+    <string name="preOnboardingReinstallAddressBarSearchOptionsLabel">Opțiuni de căutare în bara de adrese</string>
+    <string name="preOnboardingReinstallStartBrowsing">Începe navigarea</string>
+
+    <!-- Quick setup bottom sheets -->
+    <string name="quickSetupAddressBarPositionTitle">Unde vrei să se afle bara de adrese?</string>
+    <string name="quickSetupAddressBarPositionCaption"><![CDATA[Poți face modificări în <b>Setări > Aspect</b>.]]></string>
+    <string name="quickSetupSearchOptionsTitle">Dorești căutare și chat cu IA în bara de adrese?</string>
+    <string name="quickSetupBottomSheetDone">Terminat</string>
+    <string name="quickSetupInputScreenSearchOnly">Doar căutare</string>
+    <string name="quickSetupInputScreenSearchAndDuckAi">Caută și Duck.ai</string>
+    <string name="quickSetupRemoveHomeScreenWidgetTitle">Cum se elimină widgetul de pe ecranul de întâmpinare</string>
+    <string name="quickSetupRemoveHomeScreenWidgetStep1">Mergi la ecranul de întâmpinare</string>
+    <string name="quickSetupRemoveHomeScreenWidgetStep2">Atinge și menține apăsat widgetul</string>
+    <string name="quickSetupRemoveHomeScreenWidgetStep3">Atinge sau trage pentru a-l elimina</string>
 
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Bara de adrese</string>
@@ -997,4 +1025,32 @@
     <string name="searchWidgetDescription" instruction="Description for the search widget, which may include Duck.ai and voice search">Caută în mod privat cu DuckDuckGo sau întreabă Duck.ai. Căutarea vocală și Duck.ai sunt disponibile dacă sunt activate.</string>
     <string name="searchAndFavoritesWidgetDescription" instruction="Description for the search and favorites widget">Caută sau vizitează site-urile preferate în mod privat, cu o singură atingere. Căutarea vocală și Duck.ai sunt disponibile dacă sunt activate.</string>
     <string name="duckAiOnlyPinShortcutLabel" instruction="Label for the Duck.ai pinned shortcut. Should be Duck.ai in all languages">Duck.ai</string>
+
+    <!-- Sync Restore (onboarding) -->
+    <string name="syncRestoreDialogTitle">Să continuăm de unde ai rămas</string>
+    <string name="syncRestoreDialogDescription">Vrei să restaurezi marcajele, parolele și alte elemente din sincronizarea anterioară DuckDuckGo?</string>
+    <string name="syncRestoreDialogPrimaryCta">Restaurează lucrurile mele</string>
+    <string name="syncRestoreDialogSecondaryCta">Ignorare</string>
+
+    <!-- Sync Restore (brand-design onboarding) -->
+    <string name="syncRestoreDialogBrandDesignTitle">Hai să reluăm de unde ai rămas cu DuckDuckGo.</string>
+    <string name="syncRestoreDialogBrandDesignBody1">Marcajele salvate, parolele și multe altele sunt gata.</string>
+
+    <!-- PDF download tooltip -->
+    <string name="pdfDownloadTooltipText">Descarcă PDF</string>
+
+    <!-- Sharing options -->
+    <string name="copyLinkText">Copiază textul linkului</string>
+    <string name="linkTextCopied">Textul linkului a fost copiat</string>
+    <string name="linkTextCopyFailed">Nu s-a putut copia textul linkului</string>
+
+    <string name="preOnboardingWelcomeDialogTitle">Salut!</string>
+    <string name="preOnboardingWelcomeDialogBody1">Ești gata pentru un browser mai rapid, care îți oferă control deplin?</string>
+    <string name="preOnboardingWelcomeDialogBody2">IA este întotdeauna opțională, iar protecția confidențialității este întotdeauna activată.</string>
+    <string name="onboardingStepIndicatorText" instruction="a counter above our instructions in onboarding that tells a user what step they are on">%1$d din %2$d</string>
+    <string name="onboardingSearchDaxDialogOption1Quoted" instruction="translate &apos;duck&apos; too.">cum se spune „rață” în engleză</string>
+    <string name="onboardingSearchDaxDialogOption1EnglishQuoted" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">cum se spune „rață” în spaniolă</string>
+
+    <string name="input_screen_user_pref_without_ai_updated">Doar căutare</string>
+    <string name="input_screen_user_pref_with_ai_updated">Comută între Căutare și Duck.ai</string>
 </resources>

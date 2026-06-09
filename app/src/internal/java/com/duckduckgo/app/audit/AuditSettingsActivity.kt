@@ -38,6 +38,7 @@ import com.duckduckgo.app.audit.AuditSettingsViewModel.Companion.STEP_3
 import com.duckduckgo.app.audit.AuditSettingsViewModel.Companion.SURROGATES
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.databinding.ActivityAuditSettingsBinding
+import com.duckduckgo.app.browser.mode.InAppNavigation
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
@@ -97,7 +98,7 @@ class AuditSettingsActivity : DuckDuckGoActivity() {
     }
 
     private fun goToUrl(url: String) {
-        startActivity(BrowserActivity.intent(this, url))
+        startActivity(BrowserActivity.intent(this, launchSource = InAppNavigation, queryExtra = url))
         finish()
     }
 

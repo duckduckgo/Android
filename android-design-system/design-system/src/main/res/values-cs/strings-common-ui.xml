@@ -40,4 +40,9 @@
 
     <!-- Page Header -->
     <string name="pageHeaderLearnMore">Více informací</string>
+
+    <!-- Content Descriptions -->
+    <string name="closeButtonContentDescription">Zavřít</string>
+    <string name="bookmarkFavoriteContentDescription">Oblíbené</string>
+
 </resources>

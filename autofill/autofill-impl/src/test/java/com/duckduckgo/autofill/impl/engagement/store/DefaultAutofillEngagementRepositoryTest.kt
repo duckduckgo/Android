@@ -59,7 +59,7 @@ class DefaultAutofillEngagementRepositoryTest {
     @Before
     fun setup() {
         coroutineTestRule.testScope.runTest {
-            whenever(autofillStore.getCredentialCount()).thenReturn(flowOf(0))
+            whenever(autofillStore.getCredentialCount()).thenReturn(flowOf(Result.success(0)))
             whenever(secureStorage.canAccessSecureStorage()).thenReturn(true)
             whenever(deviceAuthenticator.hasValidDeviceAuthentication()).thenReturn(true)
         }
@@ -200,7 +200,7 @@ class DefaultAutofillEngagementRepositoryTest {
     }
 
     private suspend fun givenUserHasPasswords(storePasswords: Int) {
-        whenever(autofillStore.getCredentialCount()).thenReturn(flowOf(storePasswords))
+        whenever(autofillStore.getCredentialCount()).thenReturn(flowOf(Result.success(storePasswords)))
     }
 
     private fun AutofillPixelNames.verifySent() {

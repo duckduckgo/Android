@@ -33,7 +33,7 @@ import javax.inject.Inject
 class TdsEntityLookup @Inject constructor(
     private val entityDao: TdsEntityDao,
     private val domainEntityDao: TdsDomainEntityDao,
-) : EntityLookup {
+) : EntityLookupWithRefresh {
 
     var entities: List<TdsEntity> = emptyList()
 
@@ -67,6 +67,11 @@ class TdsEntityLookup @Inject constructor(
     @WorkerThread
     override fun entityForName(name: String): Entity? {
         return entityDao.get(name)
+    }
+
+    override fun refresh() {
+        // No-op. Legacy DB-walking lookup has no in-memory cache to rebuild;
+        // every request hits the DAOs directly.
     }
 
     @WorkerThread

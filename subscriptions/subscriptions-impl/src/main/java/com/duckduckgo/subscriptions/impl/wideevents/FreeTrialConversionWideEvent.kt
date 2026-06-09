@@ -22,7 +22,7 @@ import com.duckduckgo.app.statistics.wideevents.WideEventClient
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.subscriptions.impl.PrivacyProFeature
+import com.duckduckgo.subscriptions.impl.SubscriptionsFeature
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.repository.AuthRepository
 import com.duckduckgo.subscriptions.impl.repository.Subscription
@@ -30,9 +30,9 @@ import com.squareup.anvil.annotations.ContributesBinding
 import dagger.Lazy
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.withContext
-import java.time.Duration
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.days
 
 interface FreeTrialConversionWideEvent {
     suspend fun onFreeTrialStarted(productId: String)
@@ -58,7 +58,7 @@ interface FreeTrialConversionWideEvent {
 @ContributesBinding(AppScope::class)
 class FreeTrialConversionWideEventImpl @Inject constructor(
     private val wideEventClient: WideEventClient,
-    private val privacyProFeature: Lazy<PrivacyProFeature>,
+    private val subscriptionsFeature: Lazy<SubscriptionsFeature>,
     private val authRepository: AuthRepository,
     private val timeProvider: CurrentTimeProvider,
     private val dispatchers: DispatcherProvider,
@@ -89,7 +89,7 @@ class FreeTrialConversionWideEventImpl @Inject constructor(
                     KEY_FREE_TRIAL_PLAN to productId,
                 ),
                 cleanupPolicy = OnTimeout(
-                    duration = Duration.ofDays(FREE_TRIAL_TIMEOUT_DAYS),
+                    duration = FREE_TRIAL_TIMEOUT_DAYS.days,
                     flowStatus = FlowStatus.Failure(FAILURE_REASON_TIMEOUT),
                 ),
             )
@@ -186,7 +186,7 @@ class FreeTrialConversionWideEventImpl @Inject constructor(
     }
 
     private suspend fun isFeatureEnabled(): Boolean = withContext(dispatchers.io()) {
-        privacyProFeature.get().sendFreeTrialConversionWideEvent().isEnabled()
+        subscriptionsFeature.get().sendFreeTrialConversionWideEvent().isEnabled()
     }
 
     private suspend fun getCurrentWideEventId(): Long? {

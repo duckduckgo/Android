@@ -22,7 +22,4 @@
     <string name="autocompleteRemoveItemCancel">Odustani</string>
     <string name="autocompleteRemoveItemRemove">Ukloni</string>
     <string name="autocompleteSwitchToTab" instruction="Placeholder is a website">Prebaci se na karticu · %1$s</string>
-    <string name="improvedAutoCompleteIAMContent">Prijedlozi za automatsko popunjavanje sada uključuju i nedavno posjećena mrežna mjesta. Isključi u Postavkama ili izbriši u bilo kojem trenutku pomoću Fire Buttona 🔥.</string>
-    <string name="improvedAutoCompleteIAMTitle">Ista privatnost.\nBolji prijedlozi za pretraživanje!</string>
-    <string name="openAutoCompleteSettings">Otvori postavke</string>
 </resources>

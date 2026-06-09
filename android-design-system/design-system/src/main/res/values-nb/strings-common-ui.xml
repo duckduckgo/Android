@@ -40,4 +40,9 @@
 
     <!-- Page Header -->
     <string name="pageHeaderLearnMore">Finn ut mer</string>
+
+    <!-- Content Descriptions -->
+    <string name="closeButtonContentDescription">Lukk</string>
+    <string name="bookmarkFavoriteContentDescription">Favoritt</string>
+
 </resources>

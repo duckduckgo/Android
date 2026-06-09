@@ -9,6 +9,7 @@
         android:layout_width="match_parent"
         android:layout_height="@dimen/horizontalDividerHeight"
         android:layout_gravity="center_vertical"
+        android:importantForAccessibility="no"
         android:scaleType="fitXY"
         android:src="@drawable/suggestions_divider" />
 

@@ -28,7 +28,9 @@ import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.inputscreen.ui.metrics.discovery.InputScreenDiscoveryFunnel
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelParameters
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
+import com.duckduckgo.duckchat.impl.pixel.fireCountAndDaily
 import com.duckduckgo.duckchat.impl.store.DefaultTogglePosition
 import com.duckduckgo.duckchat.impl.ui.settings.DuckChatSettingsViewModel.Command.OpenLink
 import com.duckduckgo.duckchat.impl.ui.settings.DuckChatSettingsViewModel.Command.OpenLinkInNewTab
@@ -71,8 +73,6 @@ class DuckChatSettingsViewModel @AssistedInject constructor(
         val isHideGeneratedImagesOptionVisible: Boolean = false,
         val isAutomaticContextVisible: Boolean = false,
         val isAutomaticContextEnabled: Boolean = false,
-        val isNativeInputFieldVisible: Boolean = false,
-        val isNativeInputFieldEnabled: Boolean = false,
         val isDefaultTogglePositionVisible: Boolean = false,
         val defaultTogglePosition: DefaultTogglePosition = DefaultTogglePosition.SEARCH,
     )
@@ -82,12 +82,10 @@ class DuckChatSettingsViewModel @AssistedInject constructor(
         val isCosmeticInputScreenEnabled: Boolean?,
         val isInputScreenEnabled: Boolean,
         val isAutomaticContextEnabled: Boolean,
-        val isNativeInputFieldEnabled: Boolean,
     )
 
     private data class FeatureVisibility(
         val isHideGeneratedImagesOptionVisible: Boolean,
-        val isNativeInputFieldSettingVisible: Boolean,
         val isRememberTogglePositionVisible: Boolean,
     )
 
@@ -97,14 +95,12 @@ class DuckChatSettingsViewModel @AssistedInject constructor(
             duckChat.observeCosmeticInputScreenUserSettingEnabled(),
             duckChat.observeInputScreenUserSettingEnabled(),
             duckChat.observeAutomaticContextAttachmentUserSettingEnabled(),
-            duckChat.observeNativeInputFieldUserSettingEnabled(),
-        ) { isDuckChatUserEnabled, cosmeticInputScreenEnabled, isInputScreenEnabled, isAutomaticPageContextEnabled, isNativeInputFieldEnabled ->
+        ) { isDuckChatUserEnabled, cosmeticInputScreenEnabled, isInputScreenEnabled, isAutomaticPageContextEnabled ->
             FeatureState(
                 isDuckChatUserEnabled = isDuckChatUserEnabled,
                 isCosmeticInputScreenEnabled = cosmeticInputScreenEnabled,
                 isInputScreenEnabled = isInputScreenEnabled,
                 isAutomaticContextEnabled = isAutomaticPageContextEnabled,
-                isNativeInputFieldEnabled = isNativeInputFieldEnabled,
             )
         }
 
@@ -113,7 +109,6 @@ class DuckChatSettingsViewModel @AssistedInject constructor(
             emit(
                 FeatureVisibility(
                     isHideGeneratedImagesOptionVisible = duckChatFeature.showHideAiGeneratedImages().isEnabled(),
-                    isNativeInputFieldSettingVisible = duckChatFeature.nativeInputField().isEnabled(),
                     isRememberTogglePositionVisible = duckChatFeature.rememberTogglePosition().isEnabled(),
                 ),
             )
@@ -136,8 +131,6 @@ class DuckChatSettingsViewModel @AssistedInject constructor(
                 isHideGeneratedImagesOptionVisible = featureVisibility.isHideGeneratedImagesOptionVisible,
                 isAutomaticContextEnabled = featureState.isAutomaticContextEnabled,
                 isAutomaticContextVisible = isDuckChatUserEnabled && duckChatFeature.automaticContextAttachment().isEnabled(),
-                isNativeInputFieldEnabled = featureState.isNativeInputFieldEnabled,
-                isNativeInputFieldVisible = isDuckChatUserEnabled && featureVisibility.isNativeInputFieldSettingVisible,
                 isDefaultTogglePositionVisible = isDuckChatUserEnabled && isInputScreenEnabled &&
                     duckChat.isInputScreenFeatureAvailable() && featureVisibility.isRememberTogglePositionVisible,
                 defaultTogglePosition = defaultTogglePosition,
@@ -179,12 +172,6 @@ class DuckChatSettingsViewModel @AssistedInject constructor(
             duckChat.setAutomaticPageContextUserSetting(checked)
         }
         duckChatPixels.reportContextualSettingAutomaticPageContentToggled(checked)
-    }
-
-    fun onNativeInputFieldToggled(checked: Boolean) {
-        viewModelScope.launch {
-            duckChat.setNativeInputFieldUserSetting(checked)
-        }
     }
 
     fun onShowDuckChatInMenuToggled(checked: Boolean) {
@@ -280,6 +267,11 @@ class DuckChatSettingsViewModel @AssistedInject constructor(
         viewModelScope.launch {
             duckChat.setDefaultTogglePosition(position)
         }
+        pixel.fireCountAndDaily(
+            countPixel = DuckChatPixelName.DUCK_CHAT_SETTINGS_DEFAULT_TOGGLE_POSITION_CHANGED_COUNT,
+            dailyPixel = DuckChatPixelName.DUCK_CHAT_SETTINGS_DEFAULT_TOGGLE_POSITION_CHANGED_DAILY,
+            parameters = mapOf(DuckChatPixelParameters.DEFAULT_TOGGLE_POSITION_VALUE to position.pixelValue),
+        )
     }
 
     fun duckAiInputScreenShareFeedbackClicked() {

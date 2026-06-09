@@ -26,6 +26,7 @@ import com.duckduckgo.app.fire.AppCacheClearer
 import com.duckduckgo.app.fire.BackgroundTimeKeeper
 import com.duckduckgo.app.fire.DataClearerForegroundAppRestartPixel
 import com.duckduckgo.app.fire.DataClearerTimeKeeper
+import com.duckduckgo.app.fire.SiteDataCleaner
 import com.duckduckgo.app.fire.UnsentForgetAllPixelStore
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
 import com.duckduckgo.app.fire.model.AppCacheExclusionPlugin
@@ -40,11 +41,8 @@ import com.duckduckgo.app.location.data.LocationPermissionsRepository
 import com.duckduckgo.app.location.data.LocationPermissionsRepositoryImpl
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.tabs.model.TabRepository
-import com.duckduckgo.app.trackerdetection.EntityLookup
-import com.duckduckgo.app.trackerdetection.TdsEntityLookup
 import com.duckduckgo.app.trackerdetection.api.WebTrackersBlockedRepository
-import com.duckduckgo.app.trackerdetection.db.TdsDomainEntityDao
-import com.duckduckgo.app.trackerdetection.db.TdsEntityDao
+import com.duckduckgo.browsermode.api.RegularMode
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.cookies.api.DuckDuckGoCookieManager
@@ -54,6 +52,7 @@ import com.duckduckgo.history.api.NavigationHistory
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.site.permissions.api.SitePermissionsManager
 import com.duckduckgo.sync.api.DeviceSyncState
+import com.squareup.anvil.annotations.ContributesTo
 import dagger.Lazy
 import dagger.Module
 import dagger.Provides
@@ -61,22 +60,15 @@ import dagger.SingleInstanceIn
 import dagger.multibindings.IntoSet
 
 @Module
+@ContributesTo(AppScope::class)
 object PrivacyModule {
-
-    @Provides
-    @SingleInstanceIn(AppScope::class)
-    fun entityLookup(
-        entityDao: TdsEntityDao,
-        domainEntityDao: TdsDomainEntityDao,
-    ): EntityLookup =
-        TdsEntityLookup(entityDao, domainEntityDao)
 
     @Provides
     fun clearDataAction(
         context: Context,
         dataManager: WebDataManager,
         clearingStore: UnsentForgetAllPixelStore,
-        tabRepository: TabRepository,
+        @RegularMode tabRepository: TabRepository,
         settingsDataStore: SettingsDataStore,
         cookieManager: DuckDuckGoCookieManager,
         appCacheClearer: AppCacheClearer,
@@ -91,7 +83,10 @@ object PrivacyModule {
         tabVisitedSitesRepository: TabVisitedSitesRepository,
         webViewCapabilityChecker: WebViewCapabilityChecker,
         duckAiHostProvider: DuckAiHostProvider,
+        siteDataCleaner: SiteDataCleaner,
     ): ClearDataAction {
+        // TODO: Burns currently only clear @RegularMode tabs. Cross-mode tab clearing will be
+        // handled as part of the data-clearing fire-mode work.
         return ClearPersonalDataAction(
             context,
             dataManager,
@@ -111,6 +106,7 @@ object PrivacyModule {
             tabVisitedSitesRepository,
             webViewCapabilityChecker,
             duckAiHostProvider,
+            siteDataCleaner,
         )
     }
 

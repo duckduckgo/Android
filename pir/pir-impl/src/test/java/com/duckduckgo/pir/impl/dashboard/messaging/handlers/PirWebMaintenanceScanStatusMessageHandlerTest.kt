@@ -209,6 +209,7 @@ class PirWebMaintenanceScanStatusMessageHandlerTest {
             extractedProfile = extractedProfile,
             broker = broker,
             optOutSubmittedDateInMillis = 1640995200000L,
+            optOutFormSubmittedDateInMillis = 1640900000000L,
             estimatedRemovalDateInMillis = 1641081600000L,
             hasMatchingRecordOnParentBroker = true,
         )
@@ -218,6 +219,7 @@ class PirWebMaintenanceScanStatusMessageHandlerTest {
                 extractedProfile = extractedProfile,
                 broker = broker,
                 optOutSubmittedDateInMillis = 1640995200000L,
+                optOutFormSubmittedDateInMillis = 1640900000000L,
                 optOutRemovedDateInMillis = 1643673600000L,
                 estimatedRemovalDateInMillis = 1641081600000L,
                 hasMatchingRecordOnParentBroker = false,
@@ -265,6 +267,7 @@ class PirWebMaintenanceScanStatusMessageHandlerTest {
         assertEquals("MA", inProgressResult.addresses[1].state)
         assertEquals(TimeUnit.MILLISECONDS.toSeconds(1640995200000L), inProgressResult.foundDate)
         assertEquals(TimeUnit.MILLISECONDS.toSeconds(1640995200000L), inProgressResult.optOutSubmittedDate)
+        assertEquals(TimeUnit.MILLISECONDS.toSeconds(1640900000000L), inProgressResult.optOutFormSubmittedDate)
         assertEquals(TimeUnit.MILLISECONDS.toSeconds(1641081600000L), inProgressResult.estimatedRemovalDate)
         assertEquals(null, inProgressResult.removedDate)
         assertEquals(true, inProgressResult.hasMatchingRecordOnParentBroker)
@@ -275,6 +278,7 @@ class PirWebMaintenanceScanStatusMessageHandlerTest {
         assertEquals(1L, completedResult.id)
         assertEquals("John Doe", completedResult.name)
         assertEquals(TimeUnit.MILLISECONDS.toSeconds(1643673600000L), completedResult.removedDate)
+        assertEquals(TimeUnit.MILLISECONDS.toSeconds(1640900000000L), completedResult.optOutFormSubmittedDate)
         assertEquals(5, completedResult.matches)
         assertEquals(false, completedResult.hasMatchingRecordOnParentBroker)
 

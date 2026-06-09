@@ -109,11 +109,11 @@ class SyncSetupIntroFragment : DuckDuckGoFragment(R.layout.fragment_intro_sync) 
             }
 
             is RecoverAccountIntro -> {
-                binding.contentTitle.text = getString(R.string.sync_intro_recover_title)
-                binding.contentBody.text = getString(R.string.sync_intro_recover_content)
+                binding.contentTitle.text = getString(R.string.sync_recover_synced_data_title)
+                binding.contentBody.text = getString(R.string.sync_recover_synced_data_content)
                 binding.contentIllustration.setImageResource(R.drawable.ic_sync_recover_128)
                 binding.syncIntroFooter.hide()
-                binding.syncIntroCta.text = getString(R.string.sync_intro_recover_cta)
+                binding.syncIntroCta.text = getString(R.string.sync_recover_synced_data_cta)
                 binding.syncIntroCta.setOnClickListener {
                     viewModel.onStartRecoverDataClicked()
                 }

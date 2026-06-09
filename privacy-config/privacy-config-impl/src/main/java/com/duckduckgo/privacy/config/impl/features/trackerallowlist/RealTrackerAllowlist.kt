@@ -18,11 +18,13 @@ package com.duckduckgo.privacy.config.impl.features.trackerallowlist
 
 import androidx.core.net.toUri
 import com.duckduckgo.app.browser.UriString
+import com.duckduckgo.common.utils.extensions.toTldPlusOne
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.duckduckgo.privacy.config.api.TrackerAllowlist
 import com.duckduckgo.privacy.config.store.TrackerAllowlistEntity
+import com.duckduckgo.privacy.config.store.features.trackerallowlist.CompiledRule
 import com.duckduckgo.privacy.config.store.features.trackerallowlist.TrackerAllowlistRepository
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
@@ -34,19 +36,53 @@ import javax.inject.Inject
 class RealTrackerAllowlist @Inject constructor(
     private val trackerAllowlistRepository: TrackerAllowlistRepository,
     private val featureToggle: FeatureToggle,
+    private val optimizeTrackerAllowList: OptimizeTrackerAllowListRCWrapper,
 ) : TrackerAllowlist {
 
     override fun isAnException(
         documentURL: String,
         url: String,
     ): Boolean {
-        return if (featureToggle.isFeatureEnabled(PrivacyFeatureName.TrackerAllowlistFeatureName.value, true)) {
+        if (!featureToggle.isFeatureEnabled(PrivacyFeatureName.TrackerAllowlistFeatureName.value, true)) {
+            return false
+        }
+        return if (optimizeTrackerAllowList.enabled) {
+            isAnExceptionOptimized(url, documentURL)
+        } else {
             trackerAllowlistRepository.exceptions
                 .filter { UriString.sameOrSubdomain(url, it.domain) }
                 .map { matches(url, documentURL, it) }
                 .firstOrNull() ?: false
-        } else {
-            false
+        }
+    }
+
+    private fun isAnExceptionOptimized(
+        url: String,
+        documentUrl: String,
+    ): Boolean {
+        val host = UriString.host(url) ?: return false
+        val rules = findRulesForHost(host, trackerAllowlistRepository.rulesByDomain) ?: return false
+        val cleanedUrl = removePortFromUrl(url)
+        return rules.any { compiledRule ->
+            val regex = compiledRule.regex ?: return@any false
+            if (!cleanedUrl.matches(regex)) return@any false
+            val ruleDomains = compiledRule.rule.domains
+            ruleDomains.contains("<all>") || ruleDomains.any { domain -> UriString.sameOrSubdomain(documentUrl, domain) }
+        }
+    }
+
+    private fun findRulesForHost(
+        host: String,
+        rulesByDomain: Map<String, List<CompiledRule>>,
+    ): List<CompiledRule>? {
+        val eTldPlusOne = host.toTldPlusOne() ?: return null
+        var candidate = host
+        while (true) {
+            rulesByDomain[candidate]?.let { return it }
+            if (candidate == eTldPlusOne) return null
+            val dot = candidate.indexOf('.')
+            if (dot < 0) return null
+            candidate = candidate.substring(dot + 1)
         }
     }
 

@@ -26,7 +26,7 @@ import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import java.time.LocalDateTime
-import java.time.ZoneId
+import java.time.ZoneOffset.UTC
 
 class CustomHeaderAllowedCheckerTest {
 
@@ -112,7 +112,7 @@ class CustomHeaderAllowedCheckerTest {
     }
 
     private fun givenBuildDateDaysAgo(days: Long) {
-        val daysAgo = LocalDateTime.now().minusDays(days).atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
+        val daysAgo = LocalDateTime.now(UTC).minusDays(days).atZone(UTC).toInstant().toEpochMilli()
         whenever(appBuildConfig.buildDateTimeMillis).thenReturn(daysAgo)
     }
 }

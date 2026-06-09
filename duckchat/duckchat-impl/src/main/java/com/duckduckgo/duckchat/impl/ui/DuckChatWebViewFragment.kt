@@ -49,6 +49,8 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.browsermode.api.BrowserMode
+import com.duckduckgo.browsermode.api.WebViewModeInitializer
 import com.duckduckgo.common.ui.DuckDuckGoFragment
 import com.duckduckgo.common.ui.view.dialog.ActionBottomSheetDialog
 import com.duckduckgo.common.ui.view.makeSnackbarWithNoBottomInset
@@ -92,8 +94,10 @@ import com.duckduckgo.js.messaging.api.JsMessaging
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.subscriptions.api.SUBSCRIPTIONS_FEATURE_NAME
+import com.duckduckgo.subscriptions.api.SubscriptionsJSHelper
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
+import dev.zacsweers.metro.HasMemberInjections
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.cancellable
 import kotlinx.coroutines.flow.launchIn
@@ -106,6 +110,7 @@ import java.io.File
 import javax.inject.Inject
 import javax.inject.Named
 
+@HasMemberInjections
 @InjectWith(FragmentScope::class)
 open class DuckChatWebViewFragment : DuckDuckGoFragment(R.layout.activity_duck_chat_webview), DownloadConfirmationDialogListener {
 
@@ -129,7 +134,7 @@ open class DuckChatWebViewFragment : DuckDuckGoFragment(R.layout.activity_duck_c
     lateinit var duckChatJSHelper: DuckChatJSHelper
 
     @Inject
-    lateinit var subscriptionsHandler: SubscriptionsHandler
+    lateinit var subscriptionsJSHelper: SubscriptionsJSHelper
 
     @Inject
     @AppCoroutineScope
@@ -174,6 +179,12 @@ open class DuckChatWebViewFragment : DuckDuckGoFragment(R.layout.activity_duck_c
     @Inject
     lateinit var browserAndInputScreenTransitionProvider: BrowserAndInputScreenTransitionProvider
 
+    @Inject
+    lateinit var webViewModeInitializer: WebViewModeInitializer
+
+    @Inject
+    lateinit var browserMode: BrowserMode
+
     private val cookieManager: CookieManager by lazy { CookieManager.getInstance() }
 
     private var pendingFileDownload: PendingFileDownload? = null
@@ -202,6 +213,8 @@ open class DuckChatWebViewFragment : DuckDuckGoFragment(R.layout.activity_duck_c
         cookieManager.setAcceptThirdPartyCookies(simpleWebview, true)
 
         simpleWebview.let {
+            webViewModeInitializer.bind(it, browserMode)
+
             it.webViewClient = webViewClient
             it.webChromeClient = object : WebChromeClient() {
                 override fun onCreateWindow(
@@ -301,15 +314,20 @@ open class DuckChatWebViewFragment : DuckDuckGoFragment(R.layout.activity_duck_c
                             }
 
                             SUBSCRIPTIONS_FEATURE_NAME -> {
-                                subscriptionsHandler.handleSubscriptionsFeature(
-                                    featureName,
-                                    method,
-                                    id,
-                                    data,
-                                    requireActivity(),
-                                    appCoroutineScope,
-                                    contentScopeScripts,
-                                )
+                                val activity = requireActivity()
+                                appCoroutineScope.launch(dispatcherProvider.io()) {
+                                    subscriptionsJSHelper.processJsCallbackMessage(
+                                        featureName,
+                                        method,
+                                        id,
+                                        data,
+                                        activity,
+                                    )?.let { response ->
+                                        withContext(dispatcherProvider.main()) {
+                                            contentScopeScripts.onResponse(response)
+                                        }
+                                    }
+                                }
                             }
 
                             else -> {}

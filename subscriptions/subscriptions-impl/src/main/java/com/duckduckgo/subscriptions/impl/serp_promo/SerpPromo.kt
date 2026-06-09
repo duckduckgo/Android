@@ -24,7 +24,7 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.cookies.api.CookieManagerProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.subscriptions.api.Subscriptions
-import com.duckduckgo.subscriptions.impl.PrivacyProFeature
+import com.duckduckgo.subscriptions.impl.SubscriptionsFeature
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.anvil.annotations.ContributesTo
@@ -55,12 +55,12 @@ private const val SERP_PPRO_PROMO_COOKIE_NAME = "privacy_pro_access_token"
 class RealSerpPromo @Inject constructor(
     @InternalApi private val cookieManager: CookieManagerWrapper,
     private val dispatcherProvider: DispatcherProvider,
-    private val privacyProFeature: Lazy<PrivacyProFeature>,
+    private val subscriptionsFeature: Lazy<SubscriptionsFeature>,
     private val subscriptions: Lazy<Subscriptions>, // break dep cycle
 ) : SerpPromo, MainProcessLifecycleObserver {
 
     override suspend fun injectCookie(cookieValue: String?) = withContext(dispatcherProvider.io()) {
-        if (privacyProFeature.get().serpPromoCookie().isEnabled()) {
+        if (subscriptionsFeature.get().serpPromoCookie().isEnabled()) {
             synchronized(cookieManager) {
                 kotlin.runCatching {
                     val cookieString = "$SERP_PPRO_PROMO_COOKIE_NAME=${cookieValue.orEmpty()};HttpOnly;Path=/;"
@@ -73,7 +73,7 @@ class RealSerpPromo @Inject constructor(
 
     override fun onStart(owner: LifecycleOwner) {
         owner.lifecycleScope.launch(dispatcherProvider.io()) {
-            if (privacyProFeature.get().serpPromoCookie().isEnabled()) {
+            if (subscriptionsFeature.get().serpPromoCookie().isEnabled()) {
                 kotlin.runCatching {
                     val accessToken = subscriptions.get().getAccessToken() ?: ""
                     injectCookie(accessToken)

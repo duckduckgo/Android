@@ -22,7 +22,4 @@
     <string name="autocompleteRemoveItemCancel">Avbryt</string>
     <string name="autocompleteRemoveItemRemove">Ta bort</string>
     <string name="autocompleteSwitchToTab" instruction="Placeholder is a website">Byt till flik · %1$s</string>
-    <string name="improvedAutoCompleteIAMContent">Komplettera automatiskt-förslag inkluderar nu dina nyligen besökta webbplatser. Stäng av funktionen i inställningarna, eller rensa när som helst med 🔥 Fire Button.</string>
-    <string name="improvedAutoCompleteIAMTitle">Samma integritet.\nBättre sökförslag!</string>
-    <string name="openAutoCompleteSettings">Öppna inställningar</string>
 </resources>

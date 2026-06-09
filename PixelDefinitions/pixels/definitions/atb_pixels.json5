@@ -1,0 +1,86 @@
+{
+    "m_anr_exception": {
+        "description": "Fired (deferred) when an Application Not Responding (ANR) was previously recorded for the app. Carries the captured ANR stack trace.",
+        "owners": ["CDRussell"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            "atb",
+            {
+                "key": "stackTrace",
+                "description": "Base64-encoded (URL-safe, no padding) string of the ANR stack trace.",
+                "type": "string"
+            },
+            {
+                "key": "webView",
+                "description": "Full WebView version string in use at the time the ANR was captured.",
+                "type": "string"
+            },
+            {
+                "key": "customTab",
+                "description": "Whether the ANR was captured while a Custom Tab was active.",
+                "type": "boolean"
+            },
+            {
+                "key": "v",
+                "description": "App version recorded at the time of the ANR (may differ from appVersion if the app has been updated since).",
+                "type": "string",
+                "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+(\\.[0-9]+)?$",
+                "examples": ["0.89.3"]
+            }
+        ]
+    },
+    "m_d_ac_g": {
+        "description": "Fired (deferred) when a previously recorded uncaught exception (global application crash) is replayed from local storage. One pixel is sent per stored exception.",
+        "owners": ["CDRussell"],
+        "triggers": ["exception"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            "atb",
+            {
+                "key": "sn",
+                "description": "Short name (class) of the uncaught exception.",
+                "type": "string"
+            },
+            {
+                "key": "m",
+                "description": "Exception message.",
+                "type": "string"
+            },
+            {
+                "key": "pn",
+                "description": "Name of the process in which the crash occurred.",
+                "type": "string"
+            },
+            {
+                "key": "ss",
+                "description": "Base64-encoded (URL-safe, no padding) string of the full crash stack trace.",
+                "type": "string"
+            },
+            {
+                "key": "v",
+                "description": "App version recorded at the time of the crash (may differ from appVersion if the app has been updated since).",
+                "type": "string",
+                "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+(\\.[0-9]+)?$",
+                "examples": ["0.89.3"]
+            },
+            {
+                "key": "t",
+                "description": "Timestamp at which the crash was originally recorded.",
+                "type": "string"
+            },
+            {
+                "key": "webView",
+                "description": "Full WebView version string at the time the pixel is sent.",
+                "type": "string"
+            },
+            {
+                "key": "customTab",
+                "description": "Whether the crash occurred while a Custom Tab was active.",
+                "type": "boolean"
+            }
+        ]
+    }
+}

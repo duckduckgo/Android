@@ -258,4 +258,8 @@
     <string name="netpExclusionListLabelAutoExclude">Inkompatibel med VPN-tjänster</string>
     <string name="netpExclusionListAutoExcludeDescription">Vissa appar, som bank- eller streamingappar, fungerar inte så bra med VPN-tjänster. När den här inställningen är aktiverad kommer vi automatiskt att exkludera sådana appar.</string>
 
+    <!-- Content Descriptions -->
+    <string name="netpCloseButtonContentDescription">Stäng</string>
+    <string name="netpVpnIndicatorContentDescription">VPN-statusindikator</string>
+
 </resources>

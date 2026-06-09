@@ -48,6 +48,12 @@
     <string name="duck_ai_shortcut_settings_title">Comenzi rapide Duck.ai</string>
     <string name="duck_ai_shortcut_settings_description">Alege ce comenzi rapide Duck.ai dorești să afișezi</string>
 
+    <!-- Default Toggle Position -->
+    <string name="duckAiDefaultTogglePositionTitle" instruction="&apos;Toggle&apos; refers to the UI tab switcher component (Search/Duck.ai), not the verb &apos;to toggle&apos;.">Poziția de comutare a filei noi</string>
+    <string name="duckAiDefaultTogglePositionSearch">Căutare</string>
+    <string name="duckAiDefaultTogglePositionDuckAi">Duck.ai</string>
+    <string name="duckAiDefaultTogglePositionLastUsed">Ultima utilizare</string>
+
     <!-- Duck AI Voice Search Shortcut Setting -->
     <string name="duckAiVoiceSearchVisibilitySetting">Căutare vocală</string>
 
@@ -55,9 +61,7 @@
     <string name="input_screen_search_hint">Caută sau introdu adresa</string>
     <string name="input_screen_chat_hint">Întreabă în mod privat</string>
     <string name="input_screen_user_pref_without_ai">Doar căutare</string>
-    <string name="input_screen_user_pref_without_ai_updated" translatable="false">Search only</string>
     <string name="input_screen_user_pref_with_ai">Caută pe Duck.ai</string>
-    <string name="input_screen_user_pref_with_ai_updated" translatable="false">Toggle between\nSearch and Duck.ai</string>
     <string name="input_screen_user_pref_description">Încearcă noua opțiune de a adresa o întrebare către Duck.ai direct din bara de adrese. <annotation type="share_feedback">Trimite feedback</annotation></string>
 
     <!-- Duck.ai Pro settings -->
@@ -101,4 +105,69 @@
     <string name="duckAIContextualAutomaticContextTitle">Trimite automat conținutul paginii</string>
     <string name="duckAIContextualAutomaticContextMessage">Trimite automat conținutul paginii către Duck.ai</string>
     <string name="duckAIContextualAttachPageContent">Atașează conținutul paginii</string>
+
+    <!-- duck.ai contextual fire button -->
+    <string name="duckAIContextualFireButtonContentDescription">Șterge chatul</string>
+
+    <!-- Content Descriptions -->
+    <string name="duckChatFireButtonContentDescription">Ștergere date</string>
+    <string name="duckChatBrowserMenuContentDescription">Mai multe opțiuni</string>
+
+    <!-- Duck AI Voice Chat Shortcut Setting -->
+    <string name="duckAiVoiceChatVisibilitySetting" instruction="Voice Chat is a feature that lets users talk to Duck.ai using their voice instead of typing.">Chat vocal</string>
+
+    <!-- Duck.ai voice microphone foreground service notification -->
+    <string name="duckAiVoiceNotificationTitle" instruction="Title shown in the notification when Duck.ai Voice Chat is active and using the microphone.">Chat vocal Duck.ai activ</string>
+    <string name="duckAiVoiceNotificationMessage" instruction="Message shown in the notification explaining that the microphone is being used by Duck.ai.">Microfonul este folosit de Duck.ai</string>
+    <string name="duckAiVoiceNotificationChannelName" instruction="Name of the Android notification channel for the Duck.ai Voice Chat foreground service.">Chat vocal Duck.ai</string>
+    <string name="duckAiVoiceNotificationActionOpenChat" instruction="Notification action button that opens the active Duck.ai chat.">Deschide chatul</string>
+    <string name="duckAiVoiceNotificationActionEndSession" instruction="Notification action button that ends the active Duck.ai voice chat session.">Încheie chatul</string>
+
+    <!-- Duck AI Chat Suggestions -->
+    <string name="duckAiChatHistoryViewAllChats">Vezi toate chaturile</string>
+
+    <!-- Native Duck.ai chat history -->
+    <string name="duck_ai_chat_history_title">Chaturi</string>
+    <string name="duck_ai_chat_history_section_pinned">Fixat</string>
+    <string name="duck_ai_chat_history_section_recent">Recent</string>
+    <string name="duck_ai_chat_history_untitled">Chat fără titlu</string>
+    <string name="duck_ai_chat_history_empty_title">Nu există încă chaturi</string>
+    <string name="duck_ai_chat_history_empty_cta_open">Deschide Duck.ai</string>
+    <string name="duck_ai_chat_history_more_options">Mai multe opțiuni</string>
+    <string name="duck_ai_chat_history_action_select">Selectează</string>
+    <string name="duck_ai_chat_history_action_pin">Fixează</string>
+    <string name="duck_ai_chat_history_action_unpin">Elimină fixarea</string>
+    <string name="duck_ai_chat_history_action_rename">Redenumește</string>
+    <string name="duck_ai_chat_history_action_download">Descarcă</string>
+    <string name="duck_ai_chat_history_action_delete">Șterge</string>
+    <string name="duck_ai_chat_history_search_hint">Caută în chaturi</string>
+    <string name="duck_ai_chat_history_action_search_content_description">Caută în chaturi</string>
+    <string name="duck_ai_chat_history_search_close_content_description">Închide căutarea</string>
+    <string name="duck_ai_chat_history_search_clear_content_description">Șterge căutarea</string>
+    <string name="duck_ai_chat_history_action_fire_content_description">Șterge chaturile</string>
+    <string name="duck_ai_chat_history_action_new">Nou</string>
+    <string name="duck_ai_chat_history_action_download_selected_content_description">Descarcă chaturile</string>
+    <plurals name="duck_ai_chat_history_bulk_download_complete">
+        <item quantity="one">Descărcare finalizată pentru %1$d chat</item>
+        <item quantity="few">Descărcare completă pentru %1$d chaturi</item>
+        <item quantity="other">Descărcare completă pentru %1$d de chaturi</item>
+    </plurals>
+    <string name="duck_ai_chat_history_action_overflow_content_description">Deschide meniul suplimentar</string>
+    <string name="duck_ai_chat_history_select_all">Selectează toate</string>
+    <string name="duck_ai_chat_history_unselect_all">Deselectează toate</string>
+    <string name="duck_ai_chat_history_row_selected_content_description">Selectat</string>
+    <string name="duck_ai_chat_history_row_unselected_content_description">Nu este selectat</string>
+    <string name="duck_ai_chat_history_exit_select_mode_content_description">Ieși din modul de selectare</string>
+    <string name="duck_ai_chat_history_rename_title">Redenumește chatul</string>
+    <string name="duck_ai_chat_history_rename_chat_title_hint">Titlu chat</string>
+    <string name="duck_ai_chat_history_rename_confirm_title">Salvează</string>
+    <string name="duck_ai_chat_history_rename_confirm_content_description">Salvează titlul chatului</string>
+    <string name="duck_ai_chat_history_rename_error">Nu am putut redenumi chatul</string>
+    <string name="duck_ai_chat_history_pin_snackbar">Chat fixat</string>
+    <string name="duck_ai_chat_history_unpin_snackbar">Chat deblocat</string>
+    <string name="duck_ai_chat_history_undo">Anulează</string>
+    <string name="duck_ai_chat_history_download_complete" instruction="%1$s is the saved chat filename (e.g. \&apos;My Chat.txt\&apos;).">Descărcare finalizată pentru %1$s</string>
+    <string name="duck_ai_chat_history_download_view">Afișează</string>
+    <string name="duck_ai_chat_history_download_error">Nu s-a putut exporta chatul</string>
+    <string name="duck_ai_chat_history_bulk_download_error">Nu s-au putut exporta chaturile</string>
 </resources>

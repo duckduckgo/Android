@@ -17,6 +17,7 @@
 package com.duckduckgo.mobile.android.vpn.cohort
 
 import androidx.annotation.VisibleForTesting
+import com.duckduckgo.common.utils.featureflags.OkHttpInterceptorRefactorFeature
 import com.duckduckgo.common.utils.plugins.pixel.PixelInterceptorPlugin
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixelNames.ATP_REPORT_BLOCKLIST_STATS_DAILY
@@ -36,8 +37,32 @@ import javax.inject.Inject
 class CohortPixelInterceptor @Inject constructor(
     private val cohortCalculator: CohortCalculator,
     private val cohortStore: CohortStore,
+    private val okHttpInterceptorRefactorFeature: OkHttpInterceptorRefactorFeature,
 ) : PixelInterceptorPlugin, Interceptor {
     override fun intercept(chain: Interceptor.Chain): Response {
+        if (!okHttpInterceptorRefactorFeature.self().isEnabled()) {
+            return interceptLegacy(chain)
+        }
+        val originalRequest = chain.request()
+        val pixel = originalRequest.url.pathSegments.last()
+
+        if (!pixel.startsWith(PIXEL_PREFIX) || EXCEPTIONS.any { exception -> pixel.startsWith(exception) }) {
+            return chain.proceed(originalRequest)
+        }
+
+        // IF there is no cohort for ATP we just drop the pixel request
+        val cohortDate = cohortStore.getCohortStoredLocalDate()
+            ?: return dummyResponse(chain)
+
+        // ELSE we add the cohort param
+        val url = originalRequest.url.newBuilder()
+            .addQueryParameter(COHORT_PARAM, cohortCalculator.calculateCohortForDate(cohortDate))
+            .build()
+
+        return chain.proceed(originalRequest.newBuilder().url(url).build())
+    }
+
+    private fun interceptLegacy(chain: Interceptor.Chain): Response {
         val request = chain.request().newBuilder()
         val pixel = chain.request().url.pathSegments.last()
 

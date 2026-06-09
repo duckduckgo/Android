@@ -9,9 +9,8 @@
             "appVersion",
             {
                 "key": "returning_user",
-                "type": "string",
-                "description": "Whether the user was detected as a returning user on first install",
-                "enum": ["true", "false"]
+                "type": "boolean",
+                "description": "Whether the user was detected as a returning user on first install"
             }
         ]
     },
@@ -24,9 +23,8 @@
             "appVersion",
             {
                 "key": "returning_user",
-                "type": "string",
-                "description": "Whether they were originally detected as a returning user on first install",
-                "enum": ["true", "false"]
+                "type": "boolean",
+                "description": "Whether they were originally detected as a returning user on first install"
             }
         ]
     }

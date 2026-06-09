@@ -264,4 +264,8 @@
     <string name="netpExclusionListLabelAutoExclude">Nezdružljivo z VPN-ji</string>
     <string name="netpExclusionListAutoExcludeDescription">Nekatere aplikacije, kot so bančne ali pretočne aplikacije, ne delujejo dobro z VPN-ji. Ko je ta nastavitev omogočena, bomo te aplikacije samodejno izključili.</string>
 
+    <!-- Content Descriptions -->
+    <string name="netpCloseButtonContentDescription">Zapri</string>
+    <string name="netpVpnIndicatorContentDescription">Indikator stanja omrežja VPN</string>
+
 </resources>

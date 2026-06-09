@@ -16,22 +16,25 @@
 
 package com.duckduckgo.duckchat.impl.contextual
 
-import android.content.Context
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.impl.DuckChatInternal
+import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.helper.DuckChatJSHelper
 import com.duckduckgo.duckchat.impl.helper.NativeAction
 import com.duckduckgo.duckchat.impl.helper.RealDuckChatJSHelper
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.store.DuckChatContextualDataStore
+import com.duckduckgo.feature.toggles.api.FeatureTogglesInventory
+import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.json.JSONObject
 import org.junit.Assert.assertEquals
@@ -64,9 +67,24 @@ class DuckChatContextualViewModelTest {
     private val timeProvider = FakeDuckChatContextualTimeProvider()
     private val sessionTimeoutProvider = FakeDuckChatContextualSessionTimeoutProvider()
     private val duckChatPixels: DuckChatPixels = mock()
+    private val duckChatFeature: DuckChatFeature = mock()
+    private val contextualFireButtonToggle: Toggle = mock()
+    private val featureTogglesInventory: FeatureTogglesInventory = mock()
+    private val modelManager: com.duckduckgo.duckchat.impl.models.DuckAiModelManager = mock()
+    private val contextualNativeInputManager: ContextualNativeInputManager = mock()
+    private val singleTabFireDialogToggle: Toggle = mock()
+    private val singleTabFireDialogFeatureName: Toggle.FeatureName = Toggle.FeatureName(
+        parentName = "androidBrowserConfig",
+        name = "singleTabFireDialog",
+    )
 
     @Before
     fun setup() {
+        whenever(duckChatFeature.contextualFireButton()).thenReturn(contextualFireButtonToggle)
+        whenever(contextualFireButtonToggle.isEnabled()).thenReturn(false)
+        whenever(singleTabFireDialogToggle.featureName()).thenReturn(singleTabFireDialogFeatureName)
+        whenever(singleTabFireDialogToggle.isEnabled()).thenReturn(false)
+        runBlocking { whenever(featureTogglesInventory.getAllTogglesForParent("androidBrowserConfig")) }.thenReturn(listOf(singleTabFireDialogToggle))
         whenever(duckChatInternal.isAutomaticContextAttachmentEnabled()).thenReturn(true)
         whenever(
             duckChatJSHelper.onNativeAction(NativeAction.NEW_CHAT),
@@ -87,6 +105,10 @@ class DuckChatContextualViewModelTest {
             sessionTimeoutProvider = sessionTimeoutProvider,
             timeProvider = timeProvider,
             duckChatPixels = duckChatPixels,
+            duckChatFeature = duckChatFeature,
+            featureTogglesInventory = featureTogglesInventory,
+            modelManager = modelManager,
+            contextualNativeInputManager = contextualNativeInputManager,
         )
     }
 
@@ -192,6 +214,57 @@ class DuckChatContextualViewModelTest {
         testee.onPromptSent("Hello Duck.ai")
 
         verify(duckChatPixels).reportContextualPromptSubmittedWithoutContextNative()
+    }
+
+    @Test
+    fun `when prompt sent and model id available then query contains modelId`() = runTest {
+        whenever(modelManager.getSelectedModelId()).thenReturn("gpt-5.2")
+        whenever(modelManager.getResolvedReasoningEffort()).thenReturn(null)
+
+        testee.subscriptionEventDataFlow.test {
+            testee.onPromptSent("hello")
+
+            val event = awaitItem()
+            val query = event.params.getJSONObject("query")
+            assertEquals("gpt-5.2", query.getString("modelId"))
+            assertFalse(query.has("reasoningEffort"))
+
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `when prompt sent and reasoning effort available then query contains reasoningEffort`() = runTest {
+        whenever(modelManager.getSelectedModelId()).thenReturn("gpt-5.2")
+        whenever(modelManager.getResolvedReasoningEffort()).thenReturn("low")
+
+        testee.subscriptionEventDataFlow.test {
+            testee.onPromptSent("hello")
+
+            val event = awaitItem()
+            val query = event.params.getJSONObject("query")
+            assertEquals("gpt-5.2", query.getString("modelId"))
+            assertEquals("low", query.getString("reasoningEffort"))
+
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `when prompt sent and neither model nor reasoning available then query omits both`() = runTest {
+        whenever(modelManager.getSelectedModelId()).thenReturn(null)
+        whenever(modelManager.getResolvedReasoningEffort()).thenReturn(null)
+
+        testee.subscriptionEventDataFlow.test {
+            testee.onPromptSent("hello")
+
+            val event = awaitItem()
+            val query = event.params.getJSONObject("query")
+            assertFalse(query.has("modelId"))
+            assertFalse(query.has("reasoningEffort"))
+
+            cancelAndIgnoreRemainingEvents()
+        }
     }
 
     @Test
@@ -314,6 +387,10 @@ class DuckChatContextualViewModelTest {
                     sessionTimeoutProvider = sessionTimeoutProvider,
                     timeProvider = timeProvider,
                     duckChatPixels = duckChatPixels,
+                    duckChatFeature = duckChatFeature,
+                    featureTogglesInventory = featureTogglesInventory,
+                    modelManager = modelManager,
+                    contextualNativeInputManager = contextualNativeInputManager,
                 )
 
             val tabId = "tab-1"
@@ -507,7 +584,7 @@ class DuckChatContextualViewModelTest {
         }
 
     @Test
-    fun `when page context received without content then state unchanged`() =
+    fun `when page context received without content then state unchanged and invalid no content pixel fired`() =
         runTest {
             val serializedPageData =
                 """
@@ -525,7 +602,47 @@ class DuckChatContextualViewModelTest {
             assertEquals("", state.contextUrl)
             assertEquals("", state.tabId)
             assertEquals("", testee.updatedPageContext)
+            verify(duckChatPixels).reportContextualPageContextInvalidNoContent()
+            verify(duckChatPixels, never()).reportContextualPageContextCollectionEmpty()
+        }
+
+    @Test
+    fun `when page context received without title then invalid no title pixel fired`() =
+        runTest {
+            val serializedPageData =
+                """
+                {
+                    "url": "https://ctx.com",
+                    "content": "some content"
+                }
+                """.trimIndent()
+
+            testee.onPageContextReceived("tab-1", serializedPageData)
+
+            assertEquals("", testee.updatedPageContext)
+            verify(duckChatPixels).reportContextualPageContextInvalidNoTitle()
+            verify(duckChatPixels, never()).reportContextualPageContextCollectionEmpty()
+        }
+
+    @Test
+    fun `when page context received empty then invalid empty pixel fired`() =
+        runTest {
+            testee.onPageContextReceived("tab-1", "")
+
+            assertEquals("", testee.updatedPageContext)
+            verify(duckChatPixels).reportContextualPageContextInvalidEmpty()
+            verify(duckChatPixels, never()).reportContextualPageContextCollectionEmpty()
+        }
+
+    @Test
+    fun `when page context received with malformed json then collection empty pixel fired and no crash`() =
+        runTest {
+            testee.onPageContextReceived("tab-1", "{not valid json")
+
+            assertEquals("", testee.updatedPageContext)
             verify(duckChatPixels).reportContextualPageContextCollectionEmpty()
+            verify(duckChatPixels, never()).reportContextualPageContextInvalidNoTitle()
+            verify(duckChatPixels, never()).reportContextualPageContextInvalidNoContent()
         }
 
     @Test
@@ -679,6 +796,10 @@ class DuckChatContextualViewModelTest {
                     sessionTimeoutProvider = sessionTimeoutProvider,
                     timeProvider = timeProvider,
                     duckChatPixels = duckChatPixels,
+                    duckChatFeature = duckChatFeature,
+                    featureTogglesInventory = featureTogglesInventory,
+                    modelManager = modelManager,
+                    contextualNativeInputManager = contextualNativeInputManager,
                 )
 
             val serializedPageData =
@@ -713,6 +834,10 @@ class DuckChatContextualViewModelTest {
                     sessionTimeoutProvider = sessionTimeoutProvider,
                     timeProvider = timeProvider,
                     duckChatPixels = duckChatPixels,
+                    duckChatFeature = duckChatFeature,
+                    featureTogglesInventory = featureTogglesInventory,
+                    modelManager = modelManager,
+                    contextualNativeInputManager = contextualNativeInputManager,
                 )
 
             val serializedPageData =
@@ -1082,6 +1207,67 @@ class DuckChatContextualViewModelTest {
     }
 
     @Test
+    fun `chatId starts null`() {
+        assertNull(testee.chatId.value)
+    }
+
+    @Test
+    fun `when sheet opened with stored chat url then chatId set before page load`() = runTest {
+        val tabId = "tab-1"
+        val storedUrl = "https://duck.ai/chat?chatID=abc-123"
+        contextualDataStore.persistTabChatUrl(tabId, storedUrl)
+
+        testee.onSheetOpened(tabId)
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+        assertEquals("abc-123", testee.chatId.value)
+    }
+
+    @Test
+    fun `onChatPageLoaded in WEBVIEW mode then chatId set from url`() = runTest {
+        val tabId = "tab-1"
+        val storedUrl = "https://duck.ai/chat?chatID=abc-123"
+        contextualDataStore.persistTabChatUrl(tabId, storedUrl)
+        testee.onSheetOpened(tabId)
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+        val newUrl = "https://duck.ai/chat?chatID=xyz-789"
+        testee.onChatPageLoaded(newUrl)
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+        assertEquals("xyz-789", testee.chatId.value)
+    }
+
+    @Test
+    fun `onChatPageLoaded in INPUT mode then chatId not set`() = runTest {
+        val tabId = "tab-1"
+        testee.onSheetOpened(tabId)
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+        assertNull(testee.chatId.value)
+
+        val staleUrl = "https://duck.ai/chat?chatID=stale-123"
+        testee.onChatPageLoaded(staleUrl)
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+        assertNull(testee.chatId.value)
+    }
+
+    @Test
+    fun `onNewChatRequested clears chatId`() = runTest {
+        val tabId = "tab-1"
+        val storedUrl = "https://duck.ai/chat?chatID=abc-123"
+        contextualDataStore.persistTabChatUrl(tabId, storedUrl)
+        testee.onSheetOpened(tabId)
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+        assertEquals("abc-123", testee.chatId.value)
+
+        testee.onNewChatRequested()
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+        assertNull(testee.chatId.value)
+    }
+
+    @Test
     fun `onNewChatRequested clears stored url for current tab`() = runTest {
         val tabId = "tab-1"
         val url = "https://duck.ai/chat?chatID=123"
@@ -1121,6 +1307,16 @@ class DuckChatContextualViewModelTest {
         coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
 
         assertEquals(now, contextualDataStore.getTabClosedTimestamp(tabId))
+    }
+
+    @Test
+    fun `when sheet closed then contextual native input manager is notified with active tabId`() = runTest {
+        val tabId = "tab-1"
+        testee.onSheetOpened(tabId)
+
+        testee.onSheetClosed()
+
+        verify(contextualNativeInputManager).onContextualClosed(tabId)
     }
 
     @Test
@@ -1300,6 +1496,88 @@ class DuckChatContextualViewModelTest {
         assertFalse(testee.isPageContextRequested)
     }
 
+    @Test
+    fun `when both fire flags enabled then isFireButtonEnabled is true`() = runTest {
+        whenever(contextualFireButtonToggle.isEnabled()).thenReturn(true)
+        whenever(singleTabFireDialogToggle.isEnabled()).thenReturn(true)
+        val testee = buildViewModel()
+
+        assertTrue(testee.viewState.value.isFireButtonEnabled)
+    }
+
+    @Test
+    fun `when contextual fire button flag disabled then isFireButtonEnabled is false`() = runTest {
+        whenever(contextualFireButtonToggle.isEnabled()).thenReturn(false)
+        whenever(singleTabFireDialogToggle.isEnabled()).thenReturn(true)
+        val testee = buildViewModel()
+
+        assertFalse(testee.viewState.value.isFireButtonEnabled)
+    }
+
+    @Test
+    fun `when singleTabFireDialog flag disabled then isFireButtonEnabled is false`() = runTest {
+        whenever(contextualFireButtonToggle.isEnabled()).thenReturn(true)
+        whenever(singleTabFireDialogToggle.isEnabled()).thenReturn(false)
+        val testee = buildViewModel()
+
+        assertFalse(testee.viewState.value.isFireButtonEnabled)
+    }
+
+    @Test
+    fun `when singleTabFireDialog toggle does not exist then isFireButtonEnabled is false`() = runTest {
+        whenever(contextualFireButtonToggle.isEnabled()).thenReturn(true)
+        runBlocking { whenever(featureTogglesInventory.getAllTogglesForParent("androidBrowserConfig")) }.thenReturn(emptyList())
+        val testee = buildViewModel()
+
+        assertFalse(testee.viewState.value.isFireButtonEnabled)
+    }
+
+    @Test
+    fun `when fire button clicked then tapped pixel is fired`() = runTest {
+        testee.onFireButtonClicked()
+        verify(duckChatPixels).reportContextualFireButtonTapped()
+    }
+
+    @Test
+    fun `when fire confirmed then confirmed pixel is fired`() = runTest {
+        testee.onContextualFireConfirmed()
+        verify(duckChatPixels).reportContextualFireButtonConfirmed()
+    }
+
+    @Test
+    fun `when fire confirmed then placeholder shown pixel is not fired`() = runTest {
+        testee.onContextualFireConfirmed()
+        verify(duckChatPixels, never()).reportContextualPlaceholderContextShown()
+    }
+
+    @Test
+    fun `when fire confirmed then sheet is hidden`() = runTest {
+        testee.commands.test {
+            testee.onSheetOpened("tab-1")
+            expectMostRecentItem() // drain onSheetOpened commands
+
+            testee.onContextualFireConfirmed()
+            val command = awaitItem() as DuckChatContextualViewModel.Command.ChangeSheetState
+            assertEquals(BottomSheetBehavior.STATE_HIDDEN, command.newState)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    private fun buildViewModel() = DuckChatContextualViewModel(
+        dispatchers = coroutineRule.testDispatcherProvider,
+        duckChat = duckChat,
+        duckChatInternal = duckChatInternal,
+        duckChatJSHelper = duckChatJSHelper,
+        contextualDataStore = contextualDataStore,
+        sessionTimeoutProvider = sessionTimeoutProvider,
+        timeProvider = timeProvider,
+        duckChatPixels = duckChatPixels,
+        duckChatFeature = duckChatFeature,
+        featureTogglesInventory = featureTogglesInventory,
+        modelManager = modelManager,
+        contextualNativeInputManager = contextualNativeInputManager,
+    )
+
     private class FakeDuckChat : com.duckduckgo.duckchat.api.DuckChat {
         var nextUrl: String = ""
         private val automaticContextAttachment = MutableStateFlow(true)
@@ -1315,8 +1593,8 @@ class DuckChatContextualViewModelTest {
             sidebar: Boolean,
         ): String = nextUrl
 
-        override fun isDuckChatUrl(uri: android.net.Uri): Boolean = false
-        override suspend fun deleteChat(url: String): Boolean = false
+        override fun isDuckChatUrl(uri: android.net.Uri): Boolean =
+            uri.host == "duck.ai" || uri.host == "duckduckgo.com"
         override suspend fun wasOpenedBefore(): Boolean = false
         override fun showNewAddressBarOptionChoiceScreen(
             context: android.content.Context,
@@ -1331,9 +1609,13 @@ class DuckChatContextualViewModelTest {
         override fun observeNativeInputFieldUserSettingEnabled(): Flow<Boolean> = nativeInputFieldSettingEnabled
         override suspend fun isStandaloneMigrationCompleted(): Boolean = true
         override suspend fun setChatSuggestionsUserSetting(enabled: Boolean) = Unit
-        override fun isChatSuggestionsFeatureAvailable(): Boolean = true
         override fun observeChatSuggestionsUserSettingEnabled(): Flow<Boolean> = flowOf(true)
         override fun openVoiceDuckChat() { }
+        override fun isVoiceChatSessionActive(tabId: String): Boolean = false
+        override val activeVoiceChatSessions: Flow<Set<String>> = flowOf(emptySet())
+        override fun observeTriggerVoiceChatSessionEnd(): Flow<String> = kotlinx.coroutines.flow.emptyFlow()
+        override fun endVoiceChatSession(tabId: String) { }
+        override suspend fun isChatHistoryAvailable(): Boolean = false
     }
 
     private class FakeDuckChatContextualDataStore : DuckChatContextualDataStore {

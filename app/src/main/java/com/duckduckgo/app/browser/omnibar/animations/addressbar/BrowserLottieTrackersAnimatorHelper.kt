@@ -143,6 +143,7 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
         shieldViews: List<View>,
         entities: List<Entity>?,
         customBackgroundColor: Int?,
+        useSoftwareRenderingMode: Boolean,
     ) {
         if (isCookiesAnimationRunning || addressBarTrackersAnimator.isAnimationRunning) return
 
@@ -155,6 +156,7 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
             shieldViews = shieldViews,
             entities = entities,
             customBackgroundColor = customBackgroundColor,
+            useSoftwareRenderingMode = useSoftwareRenderingMode,
             onAnimationComplete = {
                 conflatedJob +=
                     coroutineScope.launch {

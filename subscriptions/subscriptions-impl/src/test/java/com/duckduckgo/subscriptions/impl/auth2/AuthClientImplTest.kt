@@ -7,7 +7,7 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
-import com.duckduckgo.subscriptions.impl.PrivacyProFeature
+import com.duckduckgo.subscriptions.impl.SubscriptionsFeature
 import kotlinx.coroutines.test.runTest
 import okhttp3.Headers
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
@@ -41,13 +41,13 @@ class AuthClientImplTest {
         whenever(config.applicationId).thenReturn("com.duckduckgo.android")
     }
     private val timeProvider = FakeTimeProvider()
-    private val privacyProFeature = FakeFeatureToggleFactory.create(PrivacyProFeature::class.java)
+    private val subscriptionsFeature = FakeFeatureToggleFactory.create(SubscriptionsFeature::class.java)
 
     private val authClient = AuthClientImpl(
         authService = authService,
         appBuildConfig = appBuildConfig,
         timeProvider = timeProvider,
-        privacyProFeature = { privacyProFeature },
+        subscriptionsFeature = { subscriptionsFeature },
         dispatchers = coroutinesTestRule.testDispatcherProvider,
     )
 
@@ -348,7 +348,7 @@ class AuthClientImplTest {
     @SuppressLint("DenyListedApi")
     @Test
     fun `when JWKS cache is disabled then always fetches from network`() = runTest {
-        privacyProFeature.authApiV2JwksCache().setRawStoredState(State(false))
+        subscriptionsFeature.authApiV2JwksCache().setRawStoredState(State(false))
 
         val jwks1 = """{"keys": [{"kty": "RSA", "kid": "key1"}]}"""
         val jwks2 = """{"keys": [{"kty": "RSA", "kid": "key2"}]}"""

@@ -27,7 +27,7 @@ apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 dependencies {
 	implementation project(":history-api")
 
-    anvil project(path: ':anvil-compiler')
+    ksp project(':anvil-ksp')
     implementation project(path: ':anvil-annotations')
     implementation project(path: ':di')
     ksp AndroidX.room.compiler
@@ -45,7 +45,6 @@ dependencies {
     implementation "com.squareup.logcat:logcat:_"
     implementation AndroidX.room.runtime
     implementation AndroidX.room.rxJava2
-    implementation AndroidX.room.ktx
 
     implementation Square.moshi
 

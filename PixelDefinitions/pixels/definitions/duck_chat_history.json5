@@ -1,0 +1,228 @@
+// Pixel definitions for the native Duck.ai chat history screen.
+// Sibling of the existing aichat_open_history entry pixel in duck_chat.json5.
+{
+    "m_aichat_history_chat_opened_count": {
+        "description": "User tapped a chat row on the chat history screen to resume that conversation in Duck.ai",
+        "owners": ["GerardPaligot"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_history_chat_opened_daily": {
+        "description": "(Daily Pixel) User tapped a chat row on the chat history screen to resume that conversation in Duck.ai",
+        "owners": ["GerardPaligot"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_history_empty_cta_tapped_count": {
+        "description": "User tapped the empty-state 'Open Duck.ai' CTA on the chat history screen (shown when there is no chat history); opens a new Duck.ai tab",
+        "owners": ["GerardPaligot"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_history_empty_cta_tapped_daily": {
+        "description": "(Daily Pixel) User tapped the empty-state 'Open Duck.ai' CTA on the chat history screen",
+        "owners": ["GerardPaligot"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_history_search_activated_count": {
+        "description": "User opened search from the chat history toolbar",
+        "owners": ["GerardPaligot"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_history_search_activated_daily": {
+        "description": "(Daily Pixel) User opened search from the chat history toolbar",
+        "owners": ["GerardPaligot"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_history_fire_all_tapped_count": {
+        "description": "User tapped the Fire icon in default mode on the chat history screen, initiating a fire of all chats",
+        "owners": ["GerardPaligot"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_history_fire_all_tapped_daily": {
+        "description": "(Daily Pixel) User tapped the Fire icon in default mode on the chat history screen",
+        "owners": ["GerardPaligot"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_history_fire_all_confirmed_count": {
+        "description": "User confirmed the fire-all action on the chat history screen",
+        "owners": ["GerardPaligot"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_history_fire_all_confirmed_daily": {
+        "description": "(Daily Pixel) User confirmed the fire-all action on the chat history screen",
+        "owners": ["GerardPaligot"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_history_fire_selected_tapped_count": {
+        "description": "User tapped the Fire icon in select mode on the chat history screen, initiating a fire of the selected chats",
+        "owners": ["GerardPaligot"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_history_fire_selected_tapped_daily": {
+        "description": "(Daily Pixel) User tapped the Fire icon in select mode on the chat history screen",
+        "owners": ["GerardPaligot"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_history_fire_selected_confirmed_count": {
+        "description": "User confirmed the fire-selected action on the chat history screen",
+        "owners": ["GerardPaligot"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_history_fire_selected_confirmed_daily": {
+        "description": "(Daily Pixel) User confirmed the fire-selected action on the chat history screen",
+        "owners": ["GerardPaligot"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_history_pin_added_count": {
+        "description": "User pinned a chat from a chat row on the chat history screen",
+        "owners": ["GerardPaligot"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_history_pin_added_daily": {
+        "description": "(Daily Pixel) User pinned a chat from a chat row on the chat history screen",
+        "owners": ["GerardPaligot"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_history_pin_removed_count": {
+        "description": "User unpinned a chat from a chat row on the chat history screen",
+        "owners": ["GerardPaligot"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_history_pin_removed_daily": {
+        "description": "(Daily Pixel) User unpinned a chat from a chat row on the chat history screen",
+        "owners": ["GerardPaligot"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_history_rename_opened_count": {
+        "description": "User opened Rename from the per-row overflow on the chat history screen",
+        "owners": ["GerardPaligot"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_history_rename_opened_daily": {
+        "description": "(Daily Pixel) User opened Rename from the per-row overflow on the chat history screen",
+        "owners": ["GerardPaligot"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_history_rename_saved_count": {
+        "description": "User saved a renamed chat title; the chat store accepted the new title",
+        "owners": ["GerardPaligot"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_history_rename_saved_daily": {
+        "description": "(Daily Pixel) User saved a renamed chat title",
+        "owners": ["GerardPaligot"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_history_download_started_count": {
+        "description": "User tapped Download from the per-row overflow on the chat history screen",
+        "owners": ["GerardPaligot"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_history_download_started_daily": {
+        "description": "(Daily Pixel) User tapped Download from the per-row overflow on the chat history screen",
+        "owners": ["GerardPaligot"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_history_select_mode_entered_count": {
+        "description": "User entered select mode on the chat history screen, via the toolbar overflow or a long press",
+        "owners": ["GerardPaligot"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_history_select_mode_entered_daily": {
+        "description": "(Daily Pixel) User entered select mode on the chat history screen",
+        "owners": ["GerardPaligot"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_history_select_all_toggled_count": {
+        "description": "User toggled Select all / Unselect all inside select mode on the chat history screen",
+        "owners": ["GerardPaligot"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_history_select_all_toggled_daily": {
+        "description": "(Daily Pixel) User toggled Select all / Unselect all inside select mode on the chat history screen",
+        "owners": ["GerardPaligot"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_history_new_chat_tapped_count": {
+        "description": "User tapped the New chat action in the toolbar on the chat history screen",
+        "owners": ["GerardPaligot"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_history_new_chat_tapped_daily": {
+        "description": "(Daily Pixel) User tapped the New chat action in the toolbar on the chat history screen",
+        "owners": ["GerardPaligot"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_history_download_selected_count": {
+        "description": "User tapped Download on the selected chats while in select mode on the chat history screen",
+        "owners": ["GerardPaligot"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_history_download_selected_daily": {
+        "description": "(Daily Pixel) User tapped Download on the selected chats while in select mode on the chat history screen",
+        "owners": ["GerardPaligot"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    }
+}

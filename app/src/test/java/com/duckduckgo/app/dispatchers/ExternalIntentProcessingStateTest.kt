@@ -18,6 +18,9 @@ package com.duckduckgo.app.dispatchers
 
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
+import com.duckduckgo.browsermode.api.BrowserMode
+import com.duckduckgo.browsermode.api.BrowserModeDataProvider
+import com.duckduckgo.browsermode.api.BrowserModeStateHolder
 import com.duckduckgo.common.test.CoroutineTestRule
 import junit.framework.TestCase.assertFalse
 import junit.framework.TestCase.assertTrue
@@ -29,6 +32,9 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
+import org.mockito.kotlin.any
+import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
 class ExternalIntentProcessingStateTest {
@@ -40,6 +46,11 @@ class ExternalIntentProcessingStateTest {
     private lateinit var mockTabRepository: TabRepository
 
     private val selectedTabFlow = MutableStateFlow<TabEntity?>(null)
+    private val browserModeFlow = MutableStateFlow(BrowserMode.REGULAR)
+    private val mockBrowserModeStateHolder: BrowserModeStateHolder = mock {
+        on { currentMode } doReturn browserModeFlow
+    }
+    private lateinit var mockTabRepositoryProvider: BrowserModeDataProvider<TabRepository>
     private lateinit var testee: ExternalIntentProcessingState
 
     @Before
@@ -47,9 +58,14 @@ class ExternalIntentProcessingStateTest {
         MockitoAnnotations.openMocks(this)
         whenever(mockTabRepository.flowSelectedTab).thenReturn(selectedTabFlow)
 
+        mockTabRepositoryProvider = mock {
+            on { forMode(any()) } doReturn mockTabRepository
+        }
+
         testee = ExternalIntentProcessingStateImpl(
             coroutineScope = TestScope(coroutineRule.testDispatcher),
-            tabRepository = mockTabRepository,
+            tabRepositoryProvider = mockTabRepositoryProvider,
+            browserModeStateHolder = mockBrowserModeStateHolder,
         )
     }
 

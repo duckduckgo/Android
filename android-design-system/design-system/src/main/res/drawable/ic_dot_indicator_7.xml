@@ -1,0 +1,7 @@
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="oval">
+    <solid android:color="?attr/daxColorAccentBlue" />
+    <size
+        android:width="7dp"
+        android:height="7dp" />
+</shape>

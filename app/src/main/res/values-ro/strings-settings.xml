@@ -18,4 +18,15 @@
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
     <string name="showExperimentalBrowserMenu">Meniu browser experimental</string>
+
+    <!-- Inactivity timeout -->
+    <string name="afterInactivityOptionTitle">După inactivitate</string>
+    <string name="afterInactivityTimeoutRowTitle">Alege un cronometru de inactivitate</string>
+    <string name="afterInactivityScreenSectionHeader">Alege ce vezi când revii după inactivitate</string>
+    <string name="afterInactivityOptionMessage" instruction="&apos;%1$s&apos; is a placeholder and will be replaced with the number of minutes, e.g. &apos;after 5 minutes of inactivity&apos;">Alege ce vezi când te întorci după %1$s minute de inactivitate.</string>
+    <string name="afterInactivityTimeoutAlways">Întotdeauna</string>
+    <string name="afterInactivityTimeout1Minute">1 minut</string>
+    <string name="afterInactivityTimeoutXMinutes" instruction="&apos;%1$d&apos; is a placeholder and will be replaced with the number of minutes, e.g. &apos;5 minutes&apos;">%1$d minute</string>
+    <string name="afterInactivityTimeout1Hour">1 oră</string>
+    <string name="afterInactivityTimeoutXHours" instruction="&apos;%1$d&apos; is a placeholder and will be replaced with the number of hours, e.g. &apos;2 hours&apos;">%1$d ore</string>
 </resources>

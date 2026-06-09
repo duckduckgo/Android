@@ -89,7 +89,8 @@ class IntentDispatcherViewModel @Inject constructor(
 
                 logcat { "Intent $intent received. Has extra session=$hasSession. Intent text=$intentText. Toolbar color=$toolbarColor" }
 
-                customTabDetector.setCustomTab(false)
+                customTabDetector.setCustomTab(customTabRequested)
+
                 _viewState.emit(
                     viewState.value.copy(
                         customTabRequested = customTabRequested,

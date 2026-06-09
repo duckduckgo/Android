@@ -37,6 +37,12 @@ import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.toPx
 import com.google.android.material.card.MaterialCardView
 
+sealed class DuckAiTier {
+    data object Free : DuckAiTier()
+    data object Paid : DuckAiTier()
+    data object Unknown : DuckAiTier()
+}
+
 interface OmnibarState {
     fun isDuckAiMode(): Boolean
     fun isBrowserMode(): Boolean
@@ -49,11 +55,10 @@ interface NativeInputOmnibarController : OmnibarState {
     fun hide()
     fun getText(): String
     fun hideBackground()
-    fun showTransparentOmnibar()
-    fun getButtonsWidth(): Int
     fun getCardView(): View?
     fun restore()
     fun forceToTop()
+    fun updateTierTitle(tier: DuckAiTier, onUpgradeClicked: () -> Unit)
 }
 
 class RealNativeInputOmnibarController(
@@ -85,22 +90,22 @@ class RealNativeInputOmnibarController(
             makeOmnibarTransparent(omnibarView)
             hideOmnibarContent(omnibarView)
             showDuckAiTitle(omnibarView)
+            if (isSplitMode()) {
+                showOmnibarButtons(omnibarView)
+            }
         }
     }
 
-    override fun showTransparentOmnibar() {
-        val omnibarView = omnibar.omnibarView as? View ?: return
-        if (rootView.findViewById<View?>(R.id.inputModeWidget) == null) return
-        omnibar.show()
-        omnibar.isScrollingEnabled = false
-        omnibar.setExpanded(true)
-        applyOnLayout(omnibarView) {
-            makeOmnibarTransparent(omnibarView)
-            hideOmnibarContent(omnibarView)
-            omnibarView.findViewById<View?>(R.id.duckAIHeader)?.gone()
-            omnibarView.findViewById<View?>(R.id.endIconsContainer)?.gone()
-            omnibarView.findViewById<View?>(R.id.duckAiSidebar)?.gone()
-        }
+    private fun showOmnibarButtons(omnibarView: View) {
+        omnibarView.findViewById<View?>(R.id.fireIconMenu)?.show()
+        omnibarView.findViewById<View?>(R.id.tabsMenu)?.show()
+        omnibarView.findViewById<View?>(R.id.browserMenu)?.show()
+    }
+
+    private fun hideOmnibarButtons(omnibarView: View) {
+        omnibarView.findViewById<View?>(R.id.fireIconMenu)?.gone()
+        omnibarView.findViewById<View?>(R.id.tabsMenu)?.gone()
+        omnibarView.findViewById<View?>(R.id.browserMenu)?.gone()
     }
 
     private fun makeOmnibarTransparent(omnibarView: View) {
@@ -127,17 +132,45 @@ class RealNativeInputOmnibarController(
         omnibarView.findViewById<View?>(R.id.shieldIcon)?.gone()
         omnibarView.findViewById<View?>(R.id.omnibarTextInput)?.gone()
         omnibarView.findViewById<View?>(R.id.pageLoadingIndicator)?.gone()
+        omnibarView.findViewById<View?>(R.id.pageLoadProgressBar)?.gone()
     }
+
+    private var currentTier: DuckAiTier = DuckAiTier.Unknown
+    private var currentUpgradeClick: (() -> Unit)? = null
 
     private fun showDuckAiTitle(omnibarView: View) {
         val header = omnibarView.findViewById<android.widget.LinearLayout?>(R.id.duckAIHeader)
-        val aiTitle = omnibarView.findViewById<TextView?>(R.id.aiTitle)
         omnibarView.findViewById<View?>(R.id.aiIcon)?.gone()
         header?.show()
         header?.gravity = Gravity.CENTER_VERTICAL or Gravity.START
         header?.setBackgroundColor(Color.TRANSPARENT)
-        aiTitle?.show()
-        aiTitle?.setTextAppearance(com.google.android.material.R.style.TextAppearance_MaterialComponents_Headline6)
+        applyTierText(omnibarView)
+    }
+
+    override fun updateTierTitle(tier: DuckAiTier, onUpgradeClicked: () -> Unit) {
+        currentTier = tier
+        currentUpgradeClick = onUpgradeClicked
+        val omnibarView = omnibar.omnibarView as? View ?: return
+        applyTierText(omnibarView)
+    }
+
+    private fun applyTierText(omnibarView: View) {
+        val aiTitle = omnibarView.findViewById<TextView?>(R.id.aiTitle)
+        val freePill = omnibarView.findViewById<View?>(R.id.duckAIFreePill)
+        when (currentTier) {
+            is DuckAiTier.Free -> {
+                aiTitle?.gone()
+                freePill?.show()
+                freePill?.setOnClickListener { currentUpgradeClick?.invoke() }
+            }
+            is DuckAiTier.Paid, is DuckAiTier.Unknown -> {
+                freePill?.gone()
+                freePill?.setOnClickListener(null)
+                aiTitle?.show()
+                aiTitle?.text = aiTitle?.context?.getString(R.string.duckAiHeaderPaidTitle)
+                aiTitle?.textSize = 16f
+            }
+        }
     }
 
     private fun applyOnLayout(omnibarView: View, block: () -> Unit) {
@@ -160,20 +193,17 @@ class RealNativeInputOmnibarController(
         return omnibarView.findViewById(R.id.omniBarContainerShadow)
     }
 
-    override fun getButtonsWidth(): Int {
-        val omnibarView = omnibar.omnibarView as? View ?: return 0
-        val tabsMenu = omnibarView.findViewById<View?>(R.id.tabsMenu)
-        val browserMenu = omnibarView.findViewById<View?>(R.id.browserMenu)
-        return (tabsMenu?.width ?: 0) + (browserMenu?.width ?: 0)
-    }
-
     override fun restore() {
+        currentTier = DuckAiTier.Unknown
+        currentUpgradeClick = null
         (omnibar.omnibarView as? View)?.let { removeLayoutListener(it) }
         restoreOmnibarColors()
         restoreOmnibarContent()
         restoreBottomOmnibarPosition()
         if (omnibar.omnibarType == OmnibarType.SPLIT) {
             rootView.findViewById<View?>(R.id.navigationBar)?.show()
+        } else {
+            rootView.findViewById<View?>(R.id.bottomBrowserOutlineStroke)?.show()
         }
         omnibar.isScrollingEnabled = true
     }
@@ -184,6 +214,10 @@ class RealNativeInputOmnibarController(
         omnibarView.findViewById<View?>(R.id.omnibarIconContainer)?.show()
         omnibarView.findViewById<View?>(R.id.omnibarTextInput)?.show()
         omnibarView.findViewById<View?>(R.id.duckAIHeader)?.gone()
+        omnibarView.findViewById<View?>(R.id.duckAIFreePill)?.gone()
+        if (isSplitMode()) {
+            hideOmnibarButtons(omnibarView)
+        }
     }
 
     private fun restoreOmnibarColors() {

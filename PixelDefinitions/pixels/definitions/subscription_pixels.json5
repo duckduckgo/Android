@@ -58,9 +58,85 @@
             {
                 "key": "is_repeated",
                 "description": "Indicates whether this is a repeated crash after a recovery attempt. 'false' for first crash, 'true' for repeated crash.",
-                "type": "string",
-                "enum": ["true", "false"]
+                "type": "boolean"
             }
+        ]
+    },
+    "m_subscription_paywall_impression_u": {
+        "description": "Fired once (unique) the first time a user opens the Privacy Pro paywall. Includes the day-since-install cohort bucket to understand when users first encounter the paywall.",
+        "owners": ["nalcalag"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "days_since_install",
+                "description": "Day-cohort bucket indicating how many days after install the user first saw the paywall",
+                "type": "string",
+                "enum": ["d0", "d1_to_d3", "d4_to_d7", "d8_to_d14", "d15_to_d30", "d30_plus"]
+            }
+        ]
+    },
+    "m_subscription_paywall_not_seen_d0_u": {
+        "description": "Fired once (unique) on day 1 if the user has not yet opened the Privacy Pro paywall since install.",
+        "owners": ["nalcalag"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion", "returningUser", "privacyDashboardOpened", "subscriptionPromoShown"]
+    },
+    "m_subscription_paywall_not_seen_d3_u": {
+        "description": "Fired once (unique) on day 4 if the user has not yet opened the Privacy Pro paywall since install.",
+        "owners": ["nalcalag"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion", "returningUser", "privacyDashboardOpened", "subscriptionPromoShown"]
+    },
+    "m_subscription_paywall_not_seen_d7_u": {
+        "description": "Fired once (unique) on day 8 if the user has not yet opened the Privacy Pro paywall since install.",
+        "owners": ["nalcalag"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion", "returningUser", "privacyDashboardOpened", "subscriptionPromoShown"]
+    },
+    "m_subscription_paywall_not_seen_d14_u": {
+        "description": "Fired once (unique) on day 15 if the user has not yet opened the Privacy Pro paywall since install.",
+        "owners": ["nalcalag"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion", "returningUser", "privacyDashboardOpened", "subscriptionPromoShown"]
+    },
+    "m_subscription_paywall_not_seen_d30_u": {
+        "description": "Fired once (unique) on day 31 if the user has not yet opened the Privacy Pro paywall since install.",
+        "owners": ["nalcalag"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion", "returningUser", "privacyDashboardOpened", "subscriptionPromoShown"]
+    },
+    "m_privacy-pro_app_subscription-purchase_success": {
+        "description": "Fired when a subscription purchase completes successfully.",
+        "owners": ["nalcalag"],
+        "triggers": ["other"],
+        "suffixes": ["daily_count_short", "form_factor"],
+        "parameters": ["appVersion", "freeTrial", "osVersion"]
+    },
+    "m_subscribe": {
+        "description": "Fired when a subscription purchase completes, capturing purchase origin and locale.",
+        "owners": ["nalcalag"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "locale",
+                "description": "The sanitized BCP 47 language tag of the device locale.",
+                "type": "string"
+            },
+            {
+                "key": "origin",
+                "description": "The origin from which the user initiated the purchase, if available.",
+                "type": "string"
+            },
+            "freeTrial"
         ]
     },
     "m_privacy-pro_app_subscription_active_d": {
@@ -68,14 +144,6 @@
         "owners": ["lmac012"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
-        "parameters": [
-            "appVersion",
-            "petal",
-            {
-                "key": "os_version",
-                "description": "OS version of the device",
-                "type": "integer"
-            }
-        ]
+        "parameters": ["appVersion", "petal", "osVersion"]
     }
 }

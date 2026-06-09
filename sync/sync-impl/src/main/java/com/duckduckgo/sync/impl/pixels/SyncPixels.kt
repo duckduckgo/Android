@@ -122,6 +122,21 @@ interface SyncPixels {
 
     fun fireAiChatActive()
     fun fireAiChatsRescopeTokenError(error: Error)
+
+    fun fireAutoRestoreSetupToggleShown()
+    fun fireAutoRestoreSetupToggleOptedOut()
+    fun fireAutoRestoreSettingsReadyShown(source: String)
+    fun fireAutoRestoreSettingsRestoreTapped(source: String)
+    fun fireAutoRestoreSettingsSkipRestoreTapped(source: String)
+    fun fireAutoRestoreSettingsCancelled(source: String)
+    fun fireAutoRestoreSettingsManualRecoveryShown()
+    fun fireAutoRestoreSettingsPageShown()
+    fun fireAutoRestoreSettingsPageToggleEnabled()
+    fun fireAutoRestoreSettingsPageToggleDisabled()
+    fun fireAutoRestoreSuccess(source: String)
+    fun fireAutoRestoreFailure(source: String, errorCode: String, errorMessage: String)
+    fun fireAutoRestorePreservedAccountCleared(source: String)
+    fun fireAutoRestorePreservedAccountClearFailed(source: String, errorCode: String, errorMessage: String)
 }
 
 @ContributesBinding(AppScope::class)
@@ -419,6 +434,76 @@ class RealSyncPixels @Inject constructor(
         fireDailySyncApiErrorPixel(DeletableType.DUCK_AI_CHATS, error)
     }
 
+    override fun fireAutoRestoreSetupToggleShown() {
+        pixel.fire(SyncPixelName.SYNC_AUTO_RESTORE_TOGGLE_SHOWN)
+    }
+
+    override fun fireAutoRestoreSetupToggleOptedOut() {
+        pixel.fire(SyncPixelName.SYNC_AUTO_RESTORE_TOGGLE_OPTED_OUT)
+    }
+
+    override fun fireAutoRestoreSettingsReadyShown(source: String) {
+        pixel.fire(SyncPixelName.SYNC_AUTO_RESTORE_SETTINGS_READY_SHOWN, mapOf(SyncPixelParameters.AUTO_RESTORE_SOURCE to source))
+    }
+
+    override fun fireAutoRestoreSettingsRestoreTapped(source: String) {
+        pixel.fire(SyncPixelName.SYNC_AUTO_RESTORE_SETTINGS_RESTORE_TAPPED, mapOf(SyncPixelParameters.AUTO_RESTORE_SOURCE to source))
+    }
+
+    override fun fireAutoRestoreSettingsSkipRestoreTapped(source: String) {
+        pixel.fire(SyncPixelName.SYNC_AUTO_RESTORE_SETTINGS_SKIP_RESTORE_TAPPED, mapOf(SyncPixelParameters.AUTO_RESTORE_SOURCE to source))
+    }
+
+    override fun fireAutoRestoreSettingsCancelled(source: String) {
+        pixel.fire(SyncPixelName.SYNC_AUTO_RESTORE_SETTINGS_CANCELLED, mapOf(SyncPixelParameters.AUTO_RESTORE_SOURCE to source))
+    }
+
+    override fun fireAutoRestoreSettingsManualRecoveryShown() {
+        pixel.fire(SyncPixelName.SYNC_AUTO_RESTORE_SETTINGS_MANUAL_RECOVERY_SHOWN)
+    }
+
+    override fun fireAutoRestoreSettingsPageShown() {
+        pixel.fire(SyncPixelName.SYNC_AUTO_RESTORE_SETTINGS_PAGE_SHOWN)
+    }
+
+    override fun fireAutoRestoreSettingsPageToggleEnabled() {
+        pixel.fire(SyncPixelName.SYNC_AUTO_RESTORE_SETTINGS_PAGE_TOGGLE_ENABLED)
+    }
+
+    override fun fireAutoRestoreSettingsPageToggleDisabled() {
+        pixel.fire(SyncPixelName.SYNC_AUTO_RESTORE_SETTINGS_PAGE_TOGGLE_DISABLED)
+    }
+
+    override fun fireAutoRestoreSuccess(source: String) {
+        pixel.fire(SyncPixelName.SYNC_AUTO_RESTORE_SUCCESS, mapOf(SyncPixelParameters.AUTO_RESTORE_SOURCE to source))
+    }
+
+    override fun fireAutoRestoreFailure(source: String, errorCode: String, errorMessage: String) {
+        pixel.fire(
+            SyncPixelName.SYNC_AUTO_RESTORE_FAILURE,
+            mapOf(
+                SyncPixelParameters.AUTO_RESTORE_SOURCE to source,
+                SyncPixelParameters.AUTO_RESTORE_ERROR_CODE to errorCode,
+                SyncPixelParameters.AUTO_RESTORE_ERROR_MESSAGE to errorMessage,
+            ),
+        )
+    }
+
+    override fun fireAutoRestorePreservedAccountCleared(source: String) {
+        pixel.fire(SyncPixelName.SYNC_AUTO_RESTORE_PRESERVED_ACCOUNT_CLEARED, mapOf(SyncPixelParameters.AUTO_RESTORE_SOURCE to source))
+    }
+
+    override fun fireAutoRestorePreservedAccountClearFailed(source: String, errorCode: String, errorMessage: String) {
+        pixel.fire(
+            SyncPixelName.SYNC_AUTO_RESTORE_PRESERVED_ACCOUNT_CLEAR_FAILED,
+            mapOf(
+                SyncPixelParameters.AUTO_RESTORE_SOURCE to source,
+                SyncPixelParameters.AUTO_RESTORE_ERROR_CODE to errorCode,
+                SyncPixelParameters.AUTO_RESTORE_ERROR_MESSAGE to errorMessage,
+            ),
+        )
+    }
+
     companion object {
         private const val SYNC_PIXELS_PREF_FILE = "com.duckduckgo.sync.pixels.v1"
     }
@@ -494,6 +579,21 @@ enum class SyncPixelName(override val pixelName: String) : Pixel.PixelName {
     SYNC_SETUP_PROMO_BOOKMARK_ADDED_DIALOG_DISMISSED("sync_setup_promo_bookmark_added_dialog_dismissed"),
     SYNC_SETUP_PROMO_BOOKMARK_ADDED_DIALOG_CONFIRMED("sync_setup_promo_bookmark_added_dialog_confirmed"),
     SYNC_AI_CHAT_ACTIVE("sync_ai_chat_active"),
+
+    SYNC_AUTO_RESTORE_TOGGLE_SHOWN("sync-auto-restore_toggle_shown"),
+    SYNC_AUTO_RESTORE_TOGGLE_OPTED_OUT("sync-auto-restore_toggle_opted_out"),
+    SYNC_AUTO_RESTORE_SETTINGS_READY_SHOWN("sync-auto-restore_settings_ready_shown"),
+    SYNC_AUTO_RESTORE_SETTINGS_RESTORE_TAPPED("sync-auto-restore_settings_restore_tapped"),
+    SYNC_AUTO_RESTORE_SETTINGS_SKIP_RESTORE_TAPPED("sync-auto-restore_settings_skip_restore_tapped"),
+    SYNC_AUTO_RESTORE_SETTINGS_CANCELLED("sync-auto-restore_settings_cancelled"),
+    SYNC_AUTO_RESTORE_SETTINGS_MANUAL_RECOVERY_SHOWN("sync-auto-restore_settings_manual_recovery_shown"),
+    SYNC_AUTO_RESTORE_SETTINGS_PAGE_SHOWN("sync-auto-restore_settings_page_shown"),
+    SYNC_AUTO_RESTORE_SETTINGS_PAGE_TOGGLE_ENABLED("sync-auto-restore_settings_page_toggle_enabled"),
+    SYNC_AUTO_RESTORE_SETTINGS_PAGE_TOGGLE_DISABLED("sync-auto-restore_settings_page_toggle_disabled"),
+    SYNC_AUTO_RESTORE_SUCCESS("sync-auto-restore_success"),
+    SYNC_AUTO_RESTORE_FAILURE("sync-auto-restore_failure"),
+    SYNC_AUTO_RESTORE_PRESERVED_ACCOUNT_CLEARED("sync-auto-restore_preserved_account_cleared"),
+    SYNC_AUTO_RESTORE_PRESERVED_ACCOUNT_CLEAR_FAILED("sync-auto-restore_preserved_account_clear_failed"),
 }
 
 object SyncPixelParameters {
@@ -516,6 +616,15 @@ object SyncPixelParameters {
     const val GET_OTHER_DEVICES_SCREEN_LAUNCH_SOURCE = "source"
     const val SYNC_SETUP_SCREEN_TYPE = "source"
     const val CONNECTED_DEVICES_WHEN_DELETING = "connected_devices"
+
+    const val AUTO_RESTORE_SOURCE = "source"
+    const val AUTO_RESTORE_ERROR_CODE = "errorCode"
+    const val AUTO_RESTORE_ERROR_MESSAGE = "errorMessage"
+    const val AUTO_RESTORE_SOURCE_PAIRING = "sync_pairing"
+    const val AUTO_RESTORE_SOURCE_BACKUP = "sync_backup"
+    const val AUTO_RESTORE_SOURCE_RECOVER = "sync_recover"
+    const val AUTO_RESTORE_SOURCE_ONBOARDING = "onboarding"
+    const val AUTO_RESTORE_SOURCE_SETTINGS = "settings"
 }
 
 @ContributesMultibinding(

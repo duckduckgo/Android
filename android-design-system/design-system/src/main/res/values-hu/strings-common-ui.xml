@@ -40,4 +40,9 @@
 
     <!-- Page Header -->
     <string name="pageHeaderLearnMore">További részletek</string>
+
+    <!-- Content Descriptions -->
+    <string name="closeButtonContentDescription">Bezárás</string>
+    <string name="bookmarkFavoriteContentDescription">Kedvenc</string>
+
 </resources>

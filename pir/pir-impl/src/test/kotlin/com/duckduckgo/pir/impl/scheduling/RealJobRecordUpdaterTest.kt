@@ -303,6 +303,28 @@ class RealJobRecordUpdaterTest {
                 testOptOutJobRecord.copy(
                     status = OptOutJobStatus.REQUESTED,
                     optOutRequestedDateInMillis = TEST_CURRENT_TIME,
+                    optOutFormSubmittedDateInMillis = TEST_CURRENT_TIME,
+                ),
+            )
+        }
+
+    @Test
+    fun whenUpdateOptOutRequestedRetriesThenFormSubmittedDateIsNotOverwritten() =
+        runTest {
+            val originalFormSubmittedDate = 1234L
+            val recordWithFormSubmittedDate = testOptOutJobRecord.copy(
+                optOutFormSubmittedDateInMillis = originalFormSubmittedDate,
+            )
+            whenever(mockSchedulingRepository.getValidOptOutJobRecord(testExtractedProfileId))
+                .thenReturn(recordWithFormSubmittedDate)
+
+            toTest.updateOptOutRequested(testExtractedProfileId)
+
+            verify(mockSchedulingRepository).saveOptOutJobRecord(
+                recordWithFormSubmittedDate.copy(
+                    status = OptOutJobStatus.REQUESTED,
+                    optOutRequestedDateInMillis = TEST_CURRENT_TIME,
+                    optOutFormSubmittedDateInMillis = originalFormSubmittedDate,
                 ),
             )
         }
@@ -511,6 +533,7 @@ class RealJobRecordUpdaterTest {
             verify(mockSchedulingRepository).saveOptOutJobRecord(
                 testOptOutJobRecord.copy(
                     status = OptOutJobStatus.PENDING_EMAIL_CONFIRMATION,
+                    optOutFormSubmittedDateInMillis = TEST_CURRENT_TIME,
                 ),
             )
             verify(mockSchedulingRepository).saveEmailConfirmationJobRecord(
@@ -522,6 +545,32 @@ class RealJobRecordUpdaterTest {
                         email = "test@duck.com",
                         attemptId = "attemptId",
                     ),
+                ),
+            )
+        }
+
+    @Test
+    fun whenMarkOptOutAsWaitingForEmailConfirmationOnRetryThenFormSubmittedDateIsNotOverwritten() =
+        runTest {
+            val originalFormSubmittedDate = 1234L
+            val recordWithFormSubmittedDate = testOptOutJobRecord.copy(
+                optOutFormSubmittedDateInMillis = originalFormSubmittedDate,
+            )
+            whenever(mockSchedulingRepository.getValidOptOutJobRecord(testExtractedProfileId))
+                .thenReturn(recordWithFormSubmittedDate)
+
+            toTest.markOptOutAsWaitingForEmailConfirmation(
+                profileQueryId = testProfileQueryId,
+                extractedProfileId = testExtractedProfileId,
+                brokerName = testBrokerName,
+                email = "test@duck.com",
+                attemptId = "attemptId",
+            )
+
+            verify(mockSchedulingRepository).saveOptOutJobRecord(
+                recordWithFormSubmittedDate.copy(
+                    status = OptOutJobStatus.PENDING_EMAIL_CONFIRMATION,
+                    optOutFormSubmittedDateInMillis = originalFormSubmittedDate,
                 ),
             )
         }
@@ -666,18 +715,26 @@ class RealJobRecordUpdaterTest {
 
     // Email confirmation completion tests
     @Test
-    fun whenRecordEmailConfirmationCompletedThenDeletesEmailJobAndMarksOptOutAsRequested() =
+    fun whenRecordEmailConfirmationCompletedThenDeletesEmailJobAndMarksOptOutAsRequestedAndPreservesFormSubmittedDate() =
         runTest {
+            // Email-confirming brokers stamp optOutFormSubmittedDateInMillis when the form is
+            // submitted (markOptOutAsWaitingForEmailConfirmation), so the email confirmation
+            // moment should NOT overwrite that earlier timestamp.
+            val originalFormSubmittedDate = 1234L
+            val recordWithFormSubmittedDate = testOptOutJobRecord.copy(
+                optOutFormSubmittedDateInMillis = originalFormSubmittedDate,
+            )
             whenever(mockSchedulingRepository.getValidOptOutJobRecord(testExtractedProfileId))
-                .thenReturn(testOptOutJobRecord)
+                .thenReturn(recordWithFormSubmittedDate)
 
             toTest.recordEmailConfirmationCompleted(testExtractedProfileId)
 
             verify(mockSchedulingRepository).deleteEmailConfirmationJobRecord(testExtractedProfileId)
             verify(mockSchedulingRepository).saveOptOutJobRecord(
-                testOptOutJobRecord.copy(
+                recordWithFormSubmittedDate.copy(
                     status = OptOutJobStatus.REQUESTED,
                     optOutRequestedDateInMillis = TEST_CURRENT_TIME,
+                    optOutFormSubmittedDateInMillis = originalFormSubmittedDate,
                 ),
             )
         }

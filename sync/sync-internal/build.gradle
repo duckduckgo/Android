@@ -18,6 +18,7 @@ plugins {
     id 'com.android.library'
     id 'kotlin-android'
     id 'com.squareup.anvil'
+    id 'com.google.devtools.ksp'
 }
 
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
@@ -31,12 +32,31 @@ android {
 
 dependencies {
     implementation project(':sync-impl')
+    implementation project(':sync-api')
+    implementation project(':sync-store')
     implementation project(':di')
     implementation project(':internal-features-api')
+    implementation project(':common-utils')
+    implementation project(':design-system')
+    implementation project(':persistent-storage-api')
+    implementation project(':app-build-config-api')
+
+    ksp project(':anvil-ksp')
     implementation project(':anvil-annotations')
 
     // Dagger
     implementation Google.dagger
+
+    implementation AndroidX.lifecycle.viewModelKtx
+    implementation AndroidX.lifecycle.runtime.ktx
+    implementation AndroidX.appCompat
+    implementation AndroidX.core.ktx
+    implementation Google.android.material
+    implementation AndroidX.constraintLayout
+
+    // Barcode scanning
+    implementation "com.journeyapps:zxing-android-embedded:_"
+    implementation "com.google.zxing:core:_"
 
     implementation "com.squareup.logcat:logcat:_"
 }

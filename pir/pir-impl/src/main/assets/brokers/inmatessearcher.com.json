@@ -1,7 +1,7 @@
 {
   "name": "InmatesSearcher",
   "url": "inmatessearcher.com",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "parent": "privatereports.com",
   "optOutUrl": "https://www.inmatessearcher.com/optOut/name/landing",
   "steps": [
@@ -57,6 +57,17 @@
             }
           ],
           "id": "c19c3169-28a6-4b2d-af77-06eddfbf3c6b"
+        },
+        {
+          "_comment": "Turnstile auto-completes. This one should disappear after clicking, so we'll use a negative selector to ensure it's not present.",
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//body[not(.//input[@name='cf-turnstile-response'])]"
+            }
+          ],
+          "id": "cft-7ac5dc38-8858-4593-bd42-2638b6ed99bc"
         },
         {
           "actionType": "expectation",

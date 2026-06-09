@@ -115,15 +115,44 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
+    <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
+        android:id="@+id/syncSettingsRecoverySectionHeader"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:primaryText="@string/sync_settings_recovery_section_header" />
+
+    <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+        android:id="@+id/restoreOnReinstallItem"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:leadingIcon="@drawable/device_soft_alert_24"
+        app:leadingIconBackground="circular"
+        app:primaryText="@string/sync_restore_on_reinstall_title"
+        app:secondaryText="@string/sync_restore_on_reinstall_description"
+        app:showSwitch="true" />
+
     <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
         android:id="@+id/saveRecoveryCodeItem"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:leadingIcon="@drawable/ic_downloads_24"
         app:leadingIconBackground="circular"
-        app:primaryText="@string/sync_save_recovery_code_item"
+        app:primaryText="@string/sync_settings_download_recovery_code_item"
         app:primaryTextTruncated="true"
-        app:secondaryText="@string/sync_save_recovery_code_item_hint" />
+        app:secondaryText="@string/sync_settings_download_recovery_code_item_hint" />
+
+    <com.duckduckgo.common.ui.view.text.DaxTextView
+        android:id="@+id/dataExpirationText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingStart="@dimen/keyline_4"
+        android:paddingEnd="@dimen/keyline_4"
+        android:layout_marginTop="@dimen/keyline_3"
+        android:paddingBottom="@dimen/keyline_4"
+        android:text="@string/sync_settings_data_expiration"
+        app:textType="secondary"
+        app:typography="caption" />
 
     <com.duckduckgo.common.ui.view.divider.HorizontalDivider
         android:layout_width="match_parent"

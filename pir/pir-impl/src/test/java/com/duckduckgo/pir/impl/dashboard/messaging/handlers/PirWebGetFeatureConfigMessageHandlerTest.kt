@@ -24,8 +24,8 @@ import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessaging
 import com.duckduckgo.pir.impl.dashboard.messaging.PirDashboardWebMessages.GET_FEATURE_CONFIG
 import com.duckduckgo.pir.impl.dashboard.messaging.handlers.PirMessageHandlerUtils.createJsMessage
-import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback
-import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback.PrivacyProFeedbackSource.PIR_DASHBOARD
+import com.duckduckgo.subscriptions.api.SubscriptionUnifiedFeedback
+import com.duckduckgo.subscriptions.api.SubscriptionUnifiedFeedback.SubscriptionFeedbackSource.PIR_DASHBOARD
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -47,7 +47,7 @@ class PirWebGetFeatureConfigMessageHandlerTest {
 
     private lateinit var testee: PirWebGetFeatureConfigMessageHandler
 
-    private val mockPrivacyProUnifiedFeedback: PrivacyProUnifiedFeedback = mock()
+    private val mockSubscriptionUnifiedFeedback: SubscriptionUnifiedFeedback = mock()
     private val mockJsMessaging: JsMessaging = mock()
     private val mockJsMessageCallback: JsMessageCallback = mock()
     private val testScope = TestScope()
@@ -57,7 +57,7 @@ class PirWebGetFeatureConfigMessageHandlerTest {
         testee = PirWebGetFeatureConfigMessageHandler(
             dispatcherProvider = coroutineRule.testDispatcherProvider,
             appCoroutineScope = testScope,
-            privacyProUnifiedFeedback = mockPrivacyProUnifiedFeedback,
+            subscriptionUnifiedFeedback = mockSubscriptionUnifiedFeedback,
         )
     }
 
@@ -70,7 +70,7 @@ class PirWebGetFeatureConfigMessageHandlerTest {
     fun whenProcessWithUnifiedFeedbackEnabledThenSendsCorrectResponse() = runTest {
         // Given
         val jsMessage = createJsMessage("""""", GET_FEATURE_CONFIG)
-        whenever(mockPrivacyProUnifiedFeedback.shouldUseUnifiedFeedback(PIR_DASHBOARD)).thenReturn(
+        whenever(mockSubscriptionUnifiedFeedback.shouldUseUnifiedFeedback(PIR_DASHBOARD)).thenReturn(
             true,
         )
 
@@ -78,7 +78,7 @@ class PirWebGetFeatureConfigMessageHandlerTest {
         testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
 
         // Then
-        verify(mockPrivacyProUnifiedFeedback).shouldUseUnifiedFeedback(PIR_DASHBOARD)
+        verify(mockSubscriptionUnifiedFeedback).shouldUseUnifiedFeedback(PIR_DASHBOARD)
         verifyFeatureConfigResponse(jsMessage, useUnifiedFeedback = true)
     }
 
@@ -86,7 +86,7 @@ class PirWebGetFeatureConfigMessageHandlerTest {
     fun whenProcessWithUnifiedFeedbackDisabledThenSendsCorrectResponse() = runTest {
         // Given
         val jsMessage = createJsMessage("""""", GET_FEATURE_CONFIG)
-        whenever(mockPrivacyProUnifiedFeedback.shouldUseUnifiedFeedback(PIR_DASHBOARD)).thenReturn(
+        whenever(mockSubscriptionUnifiedFeedback.shouldUseUnifiedFeedback(PIR_DASHBOARD)).thenReturn(
             false,
         )
 
@@ -94,7 +94,7 @@ class PirWebGetFeatureConfigMessageHandlerTest {
         testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
 
         // Then
-        verify(mockPrivacyProUnifiedFeedback).shouldUseUnifiedFeedback(PIR_DASHBOARD)
+        verify(mockSubscriptionUnifiedFeedback).shouldUseUnifiedFeedback(PIR_DASHBOARD)
         verifyFeatureConfigResponse(jsMessage, useUnifiedFeedback = false)
     }
 

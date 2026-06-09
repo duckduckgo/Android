@@ -78,10 +78,13 @@ jobs:
         run: ./gradlew spotlessCheck
 
   unit_tests:
-    name: Unit tests
+    name: ${{ matrix.di == 'AnvilDagger' && 'Unit tests' || format('Unit tests ({0})', matrix.di) }}
     needs: [check_changes]
     if: needs.check_changes.outputs.should_run == 'true'
     runs-on: android-large-runner
+    strategy:
+      matrix:
+        di: [AnvilDagger, Metro]
     env:
       DEVELOCITY_ACCESS_KEY: ${{ secrets.DEVELOCITY_ACCESS_KEY }}
 
@@ -103,18 +106,18 @@ jobs:
           cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
 
       - name: JVM tests
-        run: ./gradlew jvm_tests ${{ github.event_name != 'pull_request' && '-Dpts.enabled=false' || '' }}
+        run: ./gradlew jvm_tests -Pddg.di=${{ matrix.di }} ${{ github.event_name != 'pull_request' && '-Dpts.enabled=false' || '' }}
 
       - name: Bundle the JVM checks report
         if: always()
-        run: find . -type d -name 'reports' | zip -@ -r unit-tests-report.zip
+        run: find . -type d -name 'reports' | zip -@ -r unit-tests-report-${{ matrix.di }}.zip
 
       - name: Upload the JVM checks report
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: unit-tests-report
-          path: unit-tests-report.zip
+          name: unit-tests-report-${{ matrix.di }}
+          path: unit-tests-report-${{ matrix.di }}.zip
 
   lint:
     name: Lint

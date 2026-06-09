@@ -1,7 +1,7 @@
 {
   "name": "PeopleSearch123",
   "url": "peoplesearch123.com",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "parent": "privatereports.com",
   "optOutUrl": "https://www.peoplesearch123.com/optOut/name/landing",
   "steps": [
@@ -61,6 +61,17 @@
             }
           ],
           "id": "5334448e-6ca2-48d1-9a69-75d910dabd7b"
+        },
+        {
+          "_comment": "Turnstile auto-completes. This one should disappear after clicking, so we'll use a negative selector to ensure it's not present.",
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//body[not(.//input[@name='cf-turnstile-response'])]"
+            }
+          ],
+          "id": "cft-dddfd8b3-6e36-4cf2-89d4-d43f52985e03"
         },
         {
           "actionType": "expectation",

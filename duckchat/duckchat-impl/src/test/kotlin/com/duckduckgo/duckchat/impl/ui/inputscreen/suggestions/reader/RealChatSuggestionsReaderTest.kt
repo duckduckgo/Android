@@ -512,40 +512,4 @@ class RealChatSuggestionsReaderTest {
     }
 
     // endregion
-
-    // region getMaxHistoryCount
-
-    @Test
-    fun `when settings has maxHistoryCount then returns that value`() {
-        duckAiChatHistoryFeature.self().setRawStoredState(
-            State(enable = true, settings = """{"maxHistoryCount":5}"""),
-        )
-
-        assertEquals(5, reader.getMaxHistoryCount())
-    }
-
-    @Test
-    fun `when settings has no maxHistoryCount then returns default`() {
-        duckAiChatHistoryFeature.self().setRawStoredState(
-            State(enable = true, settings = """{}"""),
-        )
-
-        assertEquals(10, reader.getMaxHistoryCount())
-    }
-
-    @Test
-    fun `when settings is null then returns default`() {
-        assertEquals(10, reader.getMaxHistoryCount())
-    }
-
-    @Test
-    fun `when settings has invalid json then returns default`() {
-        duckAiChatHistoryFeature.self().setRawStoredState(
-            State(enable = true, settings = "invalid"),
-        )
-
-        assertEquals(10, reader.getMaxHistoryCount())
-    }
-
-    // endregion
 }

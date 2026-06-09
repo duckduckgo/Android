@@ -31,10 +31,6 @@
     <string name="devEnableWebContentDebuggingTitle">Web Content Debugging</string>
     <string name="devEnableWebContentDebuggingByline">Enable WebView debugging in Chrome DevTools</string>
 
-    <string name="devSettingsDuckAiSection">Duck.ai</string>
-    <string name="devSettingsDuckAiUrlOverrideTitle">Custom Duck.ai URL</string>
-    <string name="devSettingsDuckAiUrlOverrideSubtitle">Click here to customize the Duck.ai URL</string>
-
     <string name="devSettingsScreenUserAgentSection">User Agent</string>
     <string name="devSettingsScreenUserAgentOverride">Override UserAgent</string>
     <string name="devSettingsScreenPrivacyRemoteConfigUrlOverride">Override Privacy Remote Config URL</string>
@@ -55,6 +51,10 @@
     <string name="devSettingsTabsScreenTabsToAdd">Tabs to add</string>
     <string name="devSettingsTabsScreenAddTabsButtonText">Add Tabs</string>
     <string name="devSettingsTabsScreenClearTabsButtonText">Clear Tabs</string>
+    <string name="devSettingsFireTabsScreenHeader" instruction="Not translated">Current fire tab count: %1$d</string>
+    <string name="devSettingsFireTabsScreenTabsToAdd">Fire tabs to add</string>
+    <string name="devSettingsFireTabsScreenAddTabsButtonText">Add Fire Tabs</string>
+    <string name="devSettingsFireTabsScreenClearTabsButtonText">Clear Fire Tabs</string>
     <string name="devSettingsTabsBookmarksScreenHeader" instruction="Not translated">Current bookmarks count: %1$d</string>
     <string name="devSettingsTabsFavoritesScreenHeader" instruction="Not translated">Current favorites count: %1$d</string>
     <string name="devSettingsTabsScreenBookmarksToAdd">Bookmarks to add</string>

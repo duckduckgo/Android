@@ -41,12 +41,13 @@ import kotlinx.coroutines.withContext
 import logcat.logcat
 import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
+import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
-import kotlin.time.toJavaDuration
+import kotlin.time.Duration.Companion.seconds
 
 /**
  * Tracks page load events as Wide Event flows with multi-phase tracking.
- * Manages flow lifecycle: page_start → page_visible → page_escaped_fixed_progress → page_finish
+ * Manages flow lifecycle: page_start → page_visible → page_escaped_max_progress → page_finish
  */
 interface PageLoadWideEvent {
     /**
@@ -65,7 +66,7 @@ interface PageLoadWideEvent {
     fun onPageVisible(tabId: String, url: String, progress: Int)
 
     /**
-     * Called when page progress changes and escapes the fixed progress state.
+     * Called when page progress changes and escapes the max progress threshold state.
      * @param tabId The unique identifier for the tab
      * @param url The URL of the page being loaded
      */
@@ -129,7 +130,7 @@ class RealPageLoadWideEvent @Inject constructor(
 
                 val result = wideEventClient.flowStart(
                     name = PAGE_LOAD_FEATURE_NAME,
-                    cleanupPolicy = CleanupPolicy.OnTimeout(CLEANUP_TIMEOUT.toJavaDuration()),
+                    cleanupPolicy = CleanupPolicy.OnTimeout(CLEANUP_TIMEOUT),
                 )
 
                 result.onSuccess { flowId ->
@@ -144,16 +145,19 @@ class RealPageLoadWideEvent @Inject constructor(
                     wideEventClient.intervalStart(
                         wideEventId = flowId,
                         key = KEY_ELAPSED_TIME_TO_FINISH,
+                        buckets = PAGE_LOAD_INTERVAL_BUCKETS,
                     )
 
                     wideEventClient.intervalStart(
                         wideEventId = flowId,
                         key = KEY_ELAPSED_TIME_TO_VISIBLE,
+                        buckets = PAGE_LOAD_INTERVAL_BUCKETS,
                     )
 
                     wideEventClient.intervalStart(
                         wideEventId = flowId,
                         key = KEY_ELAPSED_TIME_TO_ESCAPED_FIXED_PROGRESS,
+                        buckets = PAGE_LOAD_INTERVAL_BUCKETS,
                     )
                 }.onFailure { error ->
                     logcat { "Failed to start page load flow for tabId=$tabId: ${error.message}" }
@@ -191,7 +195,7 @@ class RealPageLoadWideEvent @Inject constructor(
                 wideEventId = flowId,
                 stepName = STEP_PAGE_ESCAPED_FIXED_PROGRESS,
             )
-            logcat { "Exited fixed progress: flowId=$flowId" }
+            logcat { "Exited max progress threshold: flowId=$flowId" }
         }
     }
 
@@ -303,6 +307,16 @@ class RealPageLoadWideEvent @Inject constructor(
     private companion object {
         const val ABOUT_BLANK = "about:blank"
         val CLEANUP_TIMEOUT = 5.minutes
+        val PAGE_LOAD_INTERVAL_BUCKETS: Set<Duration> = setOf(
+            1.seconds,
+            2.seconds,
+            3.seconds,
+            4.seconds,
+            5.seconds,
+            10.seconds,
+            30.seconds,
+            1.minutes,
+        )
         const val PAGE_LOAD_FEATURE_NAME = "page-load"
         const val STEP_PAGE_START = "page_start"
         const val STEP_PAGE_VISIBLE = "page_visible"
@@ -316,7 +330,7 @@ class RealPageLoadWideEvent @Inject constructor(
         const val KEY_ERROR_CODE = "error_code"
         const val KEY_WEBVIEW_VERSION = "webview_version"
         const val KEY_CPM_ENABLED = "cpm_enabled"
-        const val KEY_TRACKER_OPTIMIZATION_ENABLED = "tracker_optimization_enabled_v2"
+        const val KEY_TRACKER_OPTIMIZATION_ENABLED = "tracker_optimization_enabled_v3"
         const val KEY_IS_TAB_IN_FOREGROUND_ON_FINISH = "is_tab_in_foreground_on_finish"
         const val KEY_ACTIVE_REQUESTS_ON_LOAD_START = "active_requests_on_load_start"
         const val KEY_CONCURRENT_REQUESTS_ON_FINISH = "concurrent_requests_on_finish"

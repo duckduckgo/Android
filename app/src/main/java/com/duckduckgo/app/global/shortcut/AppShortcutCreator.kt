@@ -28,6 +28,10 @@ import androidx.core.graphics.drawable.IconCompat
 import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.browser.mode.AppShortcutBookmarks
+import com.duckduckgo.app.browser.mode.AppShortcutDuckAi
+import com.duckduckgo.app.browser.mode.AppShortcutNewTab
+import com.duckduckgo.app.browser.mode.FireRestart
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
@@ -125,10 +129,8 @@ class AppShortcutCreator @Inject constructor(
             .setShortLabel(context.getString(R.string.newTabMenuItem))
             .setIcon(IconCompat.createWithResource(context, R.drawable.ic_app_shortcut_new_tab_adaptive))
             .setIntent(
-                Intent(context, BrowserActivity::class.java).also {
-                    it.action = Intent.ACTION_VIEW
-                    it.putExtra(BrowserActivity.NEW_SEARCH_EXTRA, true)
-                },
+                BrowserActivity.intent(context, launchSource = AppShortcutNewTab, newSearch = true)
+                    .also { it.action = Intent.ACTION_VIEW },
             )
             .build().toShortcutInfo()
     }
@@ -138,7 +140,7 @@ class AppShortcutCreator @Inject constructor(
             .setShortLabel(context.getString(R.string.fireMenu))
             .setIcon(IconCompat.createWithResource(context, R.drawable.ic_app_shortcut_fire_adaptive))
             .setIntent(
-                Intent(context, BrowserActivity::class.java).also {
+                BrowserActivity.intent(context, launchSource = FireRestart).also {
                     it.action = Intent.ACTION_VIEW
                     it.putExtra(BrowserActivity.PERFORM_FIRE_ON_ENTRY_EXTRA, true)
                 },
@@ -149,6 +151,7 @@ class AppShortcutCreator @Inject constructor(
     private fun buildBookmarksShortcut(context: Context): ShortcutInfo {
         val browserActivity = BrowserActivity.intent(
             context = context,
+            launchSource = AppShortcutBookmarks,
             isLaunchFromBookmarksAppShortcut = true,
         ).also { it.action = Intent.ACTION_VIEW }
         val bookmarksActivity = BookmarksActivity.intent(context).also { it.action = Intent.ACTION_VIEW }
@@ -165,7 +168,8 @@ class AppShortcutCreator @Inject constructor(
     }
 
     private fun buildDuckChatShortcut(context: Context): ShortcutInfo {
-        val browserActivity = BrowserActivity.intent(context, openDuckChat = true).also { it.action = Intent.ACTION_VIEW }
+        val browserActivity = BrowserActivity.intent(context, launchSource = AppShortcutDuckAi, openDuckChat = true)
+            .also { it.action = Intent.ACTION_VIEW }
         val stackBuilder = TaskStackBuilder.create(context)
             .addNextIntent(browserActivity)
 

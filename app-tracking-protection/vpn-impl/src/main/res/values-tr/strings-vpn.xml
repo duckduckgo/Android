@@ -432,4 +432,8 @@
     <string name="apptp_PproUpsellBannerMessage_freeTrial">DuckDuckGo\'ya abone olun ve App Tracking Protection ile uyumlu tek VPN\'e sahip olun.</string>
     <string name="apptp_PproUpsellBannerAction_freeTrial">Ücretsiz deneyin!</string>
 
+    <!-- Content Descriptions -->
+    <string name="atp_onboarding_close_button_content_description">Kapat</string>
+    <string name="atp_close_button_content_description">Kapat</string>
+
 </resources>

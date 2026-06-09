@@ -10,4 +10,5 @@ jobs:
     uses: ./.github/workflows/e2e-nightly-full-suite.yml
     with:
       commit: ${{ github.event.pull_request.head.sha }}
+      create_asana_tasks: false
     secrets: inherit

@@ -36,6 +36,7 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
+import com.duckduckgo.pir.impl.PirFeatureDataCleaner
 import com.duckduckgo.pir.impl.models.Address
 import com.duckduckgo.pir.impl.models.ExtractedProfile
 import com.duckduckgo.pir.impl.models.ProfileQuery
@@ -43,6 +44,7 @@ import com.duckduckgo.pir.impl.notifications.PirNotificationManager
 import com.duckduckgo.pir.impl.scan.PirForegroundScanService
 import com.duckduckgo.pir.impl.scan.PirRemoteWorkerService
 import com.duckduckgo.pir.impl.scan.PirScanScheduler
+import com.duckduckgo.pir.impl.scheduling.PirExecutionType
 import com.duckduckgo.pir.impl.store.PirEventsRepository
 import com.duckduckgo.pir.impl.store.PirRepository
 import com.duckduckgo.pir.impl.store.PirSchedulingRepository
@@ -66,6 +68,9 @@ class PirDevScanActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var pirSchedulingRepository: PirSchedulingRepository
+
+    @Inject
+    lateinit var pirFeatureDataCleaner: PirFeatureDataCleaner
 
     @Inject
     lateinit var dispatcherProvider: DispatcherProvider
@@ -154,7 +159,7 @@ class PirDevScanActivity : DuckDuckGoActivity() {
                     saveUserInputToDatabase()
                 }
             }
-            startForegroundService(Intent(this, PirForegroundScanService::class.java))
+            startForegroundService(PirForegroundScanService.intentFor(this, PirExecutionType.MANUAL_EDIT_PROFILE))
             globalActivityStarter.start(this, PirResultsScreenParams.PirScanResultsScreen)
         }
 
@@ -199,12 +204,7 @@ class PirDevScanActivity : DuckDuckGoActivity() {
         binding.debugResetAll.setOnClickListener {
             killRunningWork()
             lifecycleScope.launch(dispatcherProvider.io()) {
-                eventsRepository.deleteAllScanResults()
-                repository.deleteAllUserProfilesQueries()
-                eventsRepository.deleteEventLogs()
-                eventsRepository.deleteAllOptOutData()
-                pirSchedulingRepository.clearAllData()
-                eventsRepository.deleteAllEmailConfirmationsLogs()
+                pirFeatureDataCleaner.removeUserData()
             }
         }
 

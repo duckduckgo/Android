@@ -24,7 +24,7 @@ import com.duckduckgo.app.statistics.wideevents.WideEventClient
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
-import com.duckduckgo.subscriptions.impl.PrivacyProFeature
+import com.duckduckgo.subscriptions.impl.SubscriptionsFeature
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
@@ -43,9 +43,9 @@ class SubscriptionRestoreWideEventTest {
     private val wideEventClient: WideEventClient = mock()
 
     @SuppressLint("DenyListedApi")
-    private val privacyProFeature: PrivacyProFeature =
+    private val subscriptionsFeature: SubscriptionsFeature =
         FakeFeatureToggleFactory
-            .create(PrivacyProFeature::class.java)
+            .create(SubscriptionsFeature::class.java)
             .apply { sendSubscriptionRestoreWideEvent().setRawStoredState(Toggle.State(true)) }
 
     private lateinit var subscriptionRestoreWideEvent: SubscriptionRestoreWideEventImpl
@@ -55,10 +55,31 @@ class SubscriptionRestoreWideEventTest {
         subscriptionRestoreWideEvent =
             SubscriptionRestoreWideEventImpl(
                 wideEventClient = wideEventClient,
-                privacyProFeature = { privacyProFeature },
+                subscriptionsFeature = { subscriptionsFeature },
                 dispatchers = coroutineRule.testDispatcherProvider,
                 coroutineScope = coroutineRule.testScope,
             )
+    }
+
+    @Test
+    @SuppressLint("DenyListedApi")
+    fun `onGooglePlayRestoreFlowStarted includes use_query_purchases true when feature flag enabled`() = runTest {
+        subscriptionsFeature.useQueryPurchases().setRawStoredState(Toggle.State(true))
+        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any()))
+            .thenReturn(Result.success(321L))
+
+        subscriptionRestoreWideEvent.onGooglePlayRestoreFlowStarted(isOriginWeb = false)
+
+        verify(wideEventClient).flowStart(
+            name = "subscription-restore",
+            flowEntryPoint = "funnel_appsettings_android",
+            cleanupPolicy = CleanupPolicy.OnProcessStart(ignoreIfIntervalTimeoutPresent = true),
+            metadata = mapOf(
+                "restore_platform" to "google_play",
+                "is_purchase_attempt" to "false",
+                "use_query_purchases" to "true",
+            ),
+        )
     }
 
     @Test
@@ -75,6 +96,7 @@ class SubscriptionRestoreWideEventTest {
             metadata = mapOf(
                 "restore_platform" to "email_address",
                 "is_purchase_attempt" to "false",
+                "use_query_purchases" to "false",
             ),
         )
         verify(wideEventClient).intervalStart(wideEventId = 123L, key = "restore_latency_ms_bucketed")
@@ -94,6 +116,7 @@ class SubscriptionRestoreWideEventTest {
             metadata = mapOf(
                 "restore_platform" to "google_play",
                 "is_purchase_attempt" to "false",
+                "use_query_purchases" to "false",
             ),
         )
         verify(wideEventClient).intervalStart(wideEventId = 456L, key = "restore_latency_ms_bucketed")
@@ -112,6 +135,7 @@ class SubscriptionRestoreWideEventTest {
             metadata = mapOf(
                 "restore_platform" to "google_play",
                 "is_purchase_attempt" to "true",
+                "use_query_purchases" to "false",
             ),
         )
         verify(wideEventClient).intervalStart(wideEventId = 789L, key = "restore_latency_ms_bucketed")
@@ -193,7 +217,7 @@ class SubscriptionRestoreWideEventTest {
     @SuppressLint("DenyListedApi")
     @Test
     fun `feature disabled results in no interactions`() = runTest {
-        privacyProFeature.sendSubscriptionRestoreWideEvent().setRawStoredState(Toggle.State(false))
+        subscriptionsFeature.sendSubscriptionRestoreWideEvent().setRawStoredState(Toggle.State(false))
 
         subscriptionRestoreWideEvent.onEmailRestoreFlowStarted(isOriginWeb = false)
         subscriptionRestoreWideEvent.onGooglePlayRestoreFlowStarted(isOriginWeb = false)
@@ -213,7 +237,7 @@ class SubscriptionRestoreWideEventTest {
         subscriptionRestoreWideEvent.onEmailRestoreFlowStarted(isOriginWeb = false)
 
         verify(wideEventClient).flowStart(any(), anyOrNull(), any(), any())
-        verify(wideEventClient, never()).intervalStart(any(), any(), any())
+        verify(wideEventClient, never()).intervalStart(any(), any(), any(), any())
     }
 
     @Test

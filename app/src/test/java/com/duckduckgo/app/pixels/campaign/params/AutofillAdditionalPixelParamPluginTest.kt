@@ -30,7 +30,7 @@ class AutofillAdditionalPixelParamPluginTest {
     fun whenCredentialsStoredIsMoreThan10ThenPluginShouldReturnParamTrue() = runTest {
         val internalAutofillStore: InternalAutofillStore = mock()
         val plugin = AutofillUserAdditionalPixelParamPlugin(internalAutofillStore)
-        whenever(internalAutofillStore.getCredentialCount()).thenReturn(flowOf(15))
+        whenever(internalAutofillStore.getCredentialCount()).thenReturn(flowOf(Result.success(15)))
 
         assertEquals("autofillUser" to "true", plugin.params())
     }
@@ -39,7 +39,7 @@ class AutofillAdditionalPixelParamPluginTest {
     fun whenCredentialsStoredIs10ThenPluginShouldReturnParamFalse() = runTest {
         val internalAutofillStore: InternalAutofillStore = mock()
         val plugin = AutofillUserAdditionalPixelParamPlugin(internalAutofillStore)
-        whenever(internalAutofillStore.getCredentialCount()).thenReturn(flowOf(10))
+        whenever(internalAutofillStore.getCredentialCount()).thenReturn(flowOf(Result.success(10)))
 
         assertEquals("autofillUser" to "false", plugin.params())
     }
@@ -48,7 +48,7 @@ class AutofillAdditionalPixelParamPluginTest {
     fun whenCredentialsStoredIsLessThan10ThenPluginShouldReturnParamFalse() = runTest {
         val internalAutofillStore: InternalAutofillStore = mock()
         val plugin = AutofillUserAdditionalPixelParamPlugin(internalAutofillStore)
-        whenever(internalAutofillStore.getCredentialCount()).thenReturn(flowOf(3))
+        whenever(internalAutofillStore.getCredentialCount()).thenReturn(flowOf(Result.success(3)))
 
         assertEquals("autofillUser" to "false", plugin.params())
     }

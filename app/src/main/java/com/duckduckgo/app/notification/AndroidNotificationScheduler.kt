@@ -25,6 +25,7 @@ import com.duckduckgo.app.notification.model.ClearDataNotification
 import com.duckduckgo.app.notification.model.PrivacyProtectionNotification
 import com.duckduckgo.app.notification.model.SchedulableNotification
 import com.duckduckgo.di.scopes.AppScope
+import dev.zacsweers.metro.HasMemberInjections
 import logcat.LogPriority.VERBOSE
 import logcat.logcat
 import java.util.concurrent.TimeUnit
@@ -111,6 +112,7 @@ class ShowClearDataNotification(
     override lateinit var notification: ClearDataNotification
 }
 
+@HasMemberInjections
 @ContributesWorker(AppScope::class)
 open class ClearDataNotificationWorker(
     context: Context,

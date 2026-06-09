@@ -46,6 +46,7 @@ interface InternalFeaturePlugin {
         const val AUDIT_SETTINGS_PRIO_KEY = 700
         const val ADS_SETTINGS_PRIO_KEY = 800
         const val CRASH_ANR_SETTINGS_PRIO_KEY = 900
+        const val DUCK_AI_SETTINGS_PRIO_KEY = 950
         const val WEB_VIEW_DEV_SETTINGS_PRIO_KEY = 1_000
         const val SAVED_SITES_SETTINGS_PRIO_KEY = 1_100
         const val ATTRIBUTED_METRICS_SETTINGS_PRIO_KEY = 1_200

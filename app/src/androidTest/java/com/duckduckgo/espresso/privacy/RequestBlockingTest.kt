@@ -17,7 +17,6 @@
 package com.duckduckgo.espresso.privacy
 
 import android.webkit.WebView
-import androidx.test.core.app.*
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.IdlingRegistry
 import androidx.test.espresso.IdlingResource
@@ -30,6 +29,8 @@ import androidx.test.ext.junit.rules.activityScenarioRule
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.browser.clickMenuItem
+import com.duckduckgo.app.browser.mode.InAppNavigation
 import com.duckduckgo.espresso.*
 import com.duckduckgo.privacy.config.impl.network.JSONObjectAdapter
 import com.squareup.moshi.JsonAdapter
@@ -47,6 +48,7 @@ class RequestBlockingTest {
     var activityScenarioRule = activityScenarioRule<BrowserActivity>(
         BrowserActivity.intent(
             InstrumentationRegistry.getInstrumentation().targetContext,
+            launchSource = InAppNavigation,
             queryExtra = "https://privacy-test-pages.site/privacy-protections/request-blocking/?run",
         ),
     )
@@ -87,8 +89,7 @@ class RequestBlockingTest {
         IdlingRegistry.getInstance().register(idlingResourceForDisableProtections)
 
         onView(allOf(withId(R.id.browserMenu), isClickable())).perform(click())
-        onView(isRoot()).perform(waitForView(withText("Disable Privacy Protection")))
-        onView(withText("Disable Privacy Protection")).perform(click())
+        clickMenuItem(withText("Disable Privacy Protection"))
 
         // handle the privacy protection toggle check screen showing
         onView(isRoot()).perform(ViewActions.pressBack())

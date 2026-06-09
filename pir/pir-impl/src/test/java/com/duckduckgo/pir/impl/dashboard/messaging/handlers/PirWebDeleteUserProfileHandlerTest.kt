@@ -27,12 +27,14 @@ import com.duckduckgo.pir.impl.dashboard.messaging.handlers.PirMessageHandlerUti
 import com.duckduckgo.pir.impl.dashboard.messaging.handlers.PirMessageHandlerUtils.verifyResponse
 import com.duckduckgo.pir.impl.dashboard.state.PirWebProfileStateHolder
 import com.duckduckgo.pir.impl.pixels.PirPixelSender
+import com.duckduckgo.pir.impl.wideevents.PirScanWideEvent.CancellationReason
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
@@ -80,7 +82,7 @@ class PirWebDeleteUserProfileHandlerTest {
         // Then
         verify(mockPirPixelSender).reportUserReset()
         verify(mockPirWebProfileStateHolder).clear()
-        verify(mockWorkHandler).cancelWork()
+        verify(mockWorkHandler).cancelWork(CancellationReason.PROFILE_DELETED)
         verify(mockPirFeatureDataCleaner).removeUserData()
         verifyResponse(jsMessage, true, mockJsMessaging)
     }
@@ -89,7 +91,7 @@ class PirWebDeleteUserProfileHandlerTest {
     fun whenCancelWorkThrowsExceptionThenSendsErrorResponse() = runTest {
         // Given
         val jsMessage = createJsMessage("""""", PirDashboardWebMessages.DELETE_USER_PROFILE_DATA)
-        whenever(mockWorkHandler.cancelWork()).thenThrow(RuntimeException("Cancel work failed"))
+        whenever(mockWorkHandler.cancelWork(any())).thenThrow(RuntimeException("Cancel work failed"))
 
         // When
         testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
@@ -122,7 +124,7 @@ class PirWebDeleteUserProfileHandlerTest {
         // Then
         verify(mockPirPixelSender).reportUserReset()
         verify(mockPirWebProfileStateHolder).clear()
-        verify(mockWorkHandler).cancelWork()
+        verify(mockWorkHandler).cancelWork(CancellationReason.PROFILE_DELETED)
         verify(mockPirFeatureDataCleaner).removeUserData()
         verifyResponse(jsMessage, true, mockJsMessaging)
     }

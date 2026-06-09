@@ -53,7 +53,7 @@
             {
                 "key": "feature.data.ext.step.web_storage_clear_success",
                 "description": "true if the step completed successfully, false otherwise. The implementation swallows exceptions so it does not affect the overall outcome of the data clearing operation, represented by feature.status.",
-                "enum": ["true", "false"]
+                "type": "boolean"
             },
             {
                 "key": "feature.data.ext.web_storage_clear_error",
@@ -63,7 +63,7 @@
             {
                 "key": "feature.data.ext.step.webview_app_webview_clear_success",
                 "description": "true if the step completed successfully, false otherwise. The implementation swallows exceptions so it does not affect the overall outcome of the data clearing operation, represented by feature.status.",
-                "enum": ["true", "false"]
+                "type": "boolean"
             },
             {
                 "key": "feature.data.ext.webview_app_webview_clear_error",
@@ -73,7 +73,7 @@
             {
                 "key": "feature.data.ext.step.webview_default_clear_success",
                 "description": "true if the step completed successfully, false otherwise. The implementation swallows exceptions so it does not affect the overall outcome of the data clearing operation, represented by feature.status.",
-                "enum": ["true", "false"]
+                "type": "boolean"
             },
             {
                 "key": "feature.data.ext.webview_default_clear_error",
@@ -83,7 +83,7 @@
             {
                 "key": "feature.data.ext.step.indexeddb_clear_selective_success",
                 "description": "true if the step completed successfully, false otherwise. The implementation swallows exceptions so it does not affect the overall outcome of the data clearing operation, represented by feature.status.",
-                "enum": ["true", "false"]
+                "type": "boolean"
             },
             {
                 "key": "feature.data.ext.indexeddb_clear_selective_error",
@@ -93,7 +93,7 @@
             {
                 "key": "feature.data.ext.step.indexeddb_clear_duckai_only_success",
                 "description": "true if the step completed successfully, false otherwise. The implementation swallows exceptions so it does not affect the overall outcome of the data clearing operation, represented by feature.status.",
-                "enum": ["true", "false"]
+                "type": "boolean"
             },
             {
                 "key": "feature.data.ext.indexeddb_clear_duckai_only_error",
@@ -103,7 +103,7 @@
             {
                 "key": "feature.data.ext.step.app_cache_clear_success",
                 "description": "true if the step completed successfully, false otherwise. The implementation swallows exceptions so it does not affect the overall outcome of the data clearing operation, represented by feature.status.",
-                "enum": ["true", "false"]
+                "type": "boolean"
             },
             {
                 "key": "feature.data.ext.app_cache_clear_error",

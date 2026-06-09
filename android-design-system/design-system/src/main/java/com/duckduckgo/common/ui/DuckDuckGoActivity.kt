@@ -34,8 +34,10 @@ import com.duckduckgo.common.ui.view.isFullScreen
 import com.duckduckgo.mobile.android.R
 import dagger.android.AndroidInjection
 import dagger.android.DaggerActivity
+import dev.zacsweers.metro.HasMemberInjections
 import javax.inject.Inject
 
+@HasMemberInjections
 abstract class DuckDuckGoActivity : DaggerActivity() {
 
     @Inject lateinit var viewModelFactory: ViewModelProvider.NewInstanceFactory

@@ -37,8 +37,8 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.*
 import org.robolectric.annotation.Config
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
-import kotlin.time.toJavaDuration
 
 @RunWith(AndroidJUnit4::class)
 @Config(sdk = [34])
@@ -68,8 +68,8 @@ class PageLoadWideEventTest {
         // Mock all WideEventClient methods to return successful Results
         whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any())).thenReturn(Result.success(123L))
         whenever(wideEventClient.flowStep(any(), any(), any(), any())).thenReturn(Result.success(Unit))
-        whenever(wideEventClient.intervalStart(any(), any(), any())).thenReturn(Result.success(Unit))
-        whenever(wideEventClient.intervalEnd(any(), any())).thenReturn(Result.success(java.time.Duration.ofMillis(100)))
+        whenever(wideEventClient.intervalStart(any(), any(), any(), any())).thenReturn(Result.success(Unit))
+        whenever(wideEventClient.intervalEnd(any(), any())).thenReturn(Result.success(100.milliseconds))
         whenever(wideEventClient.flowFinish(any(), any(), any())).thenReturn(Result.success(Unit))
 
         pageLoadWideEvent = RealPageLoadWideEvent(
@@ -96,7 +96,7 @@ class PageLoadWideEventTest {
             name = "page-load",
             flowEntryPoint = null,
             metadata = emptyMap(),
-            cleanupPolicy = CleanupPolicy.OnTimeout(5.minutes.toJavaDuration()),
+            cleanupPolicy = CleanupPolicy.OnTimeout(5.minutes),
         )
         verify(wideEventClient).flowStep(
             wideEventId = 123L,
@@ -104,9 +104,9 @@ class PageLoadWideEventTest {
             success = true,
             metadata = emptyMap(),
         )
-        verify(wideEventClient).intervalStart(123L, "elapsed_time_to_finish_ms_bucketed", null)
-        verify(wideEventClient).intervalStart(123L, "elapsed_time_to_visible_ms_bucketed", null)
-        verify(wideEventClient).intervalStart(123L, "elapsed_time_to_escaped_fixed_progress_ms_bucketed", null)
+        verify(wideEventClient).intervalStart(eq(123L), eq("elapsed_time_to_finish_ms_bucketed"), eq(null), any())
+        verify(wideEventClient).intervalStart(eq(123L), eq("elapsed_time_to_visible_ms_bucketed"), eq(null), any())
+        verify(wideEventClient).intervalStart(eq(123L), eq("elapsed_time_to_escaped_fixed_progress_ms_bucketed"), eq(null), any())
     }
 
     @Test
@@ -193,7 +193,7 @@ class PageLoadWideEventTest {
             metadata = mapOf(
                 "webview_version" to "120",
                 "cpm_enabled" to "true",
-                "tracker_optimization_enabled_v2" to "true",
+                "tracker_optimization_enabled_v3" to "true",
                 "is_tab_in_foreground_on_finish" to "true",
                 "active_requests_on_load_start" to "5",
                 "concurrent_requests_on_finish" to "2",
@@ -233,7 +233,7 @@ class PageLoadWideEventTest {
             metadata = mapOf(
                 "webview_version" to "120",
                 "cpm_enabled" to "true",
-                "tracker_optimization_enabled_v2" to "true",
+                "tracker_optimization_enabled_v3" to "true",
                 "is_tab_in_foreground_on_finish" to "false",
                 "active_requests_on_load_start" to "3",
                 "concurrent_requests_on_finish" to "0",
@@ -321,7 +321,7 @@ class PageLoadWideEventTest {
 
         // Should not crash and should not call flowStep
         verify(wideEventClient, never()).flowStep(any(), any(), any(), any())
-        verify(wideEventClient, never()).intervalStart(any(), any(), any())
+        verify(wideEventClient, never()).intervalStart(any(), any(), any(), any())
     }
 
     @Test
@@ -364,9 +364,9 @@ class PageLoadWideEventTest {
         )
 
         // Verify all intervals were managed
-        verify(wideEventClient).intervalStart(500L, "elapsed_time_to_finish_ms_bucketed", null)
-        verify(wideEventClient).intervalStart(500L, "elapsed_time_to_visible_ms_bucketed", null)
-        verify(wideEventClient).intervalStart(500L, "elapsed_time_to_escaped_fixed_progress_ms_bucketed", null)
+        verify(wideEventClient).intervalStart(eq(500L), eq("elapsed_time_to_finish_ms_bucketed"), eq(null), any())
+        verify(wideEventClient).intervalStart(eq(500L), eq("elapsed_time_to_visible_ms_bucketed"), eq(null), any())
+        verify(wideEventClient).intervalStart(eq(500L), eq("elapsed_time_to_escaped_fixed_progress_ms_bucketed"), eq(null), any())
         verify(wideEventClient).intervalEnd(500L, "elapsed_time_to_visible_ms_bucketed")
         verify(wideEventClient).intervalEnd(500L, "elapsed_time_to_escaped_fixed_progress_ms_bucketed")
         verify(wideEventClient).intervalEnd(500L, "elapsed_time_to_finish_ms_bucketed")
@@ -445,7 +445,7 @@ class PageLoadWideEventTest {
             name = "page-load",
             flowEntryPoint = null,
             metadata = emptyMap(),
-            cleanupPolicy = CleanupPolicy.OnTimeout(5.minutes.toJavaDuration()),
+            cleanupPolicy = CleanupPolicy.OnTimeout(5.minutes),
         )
     }
 

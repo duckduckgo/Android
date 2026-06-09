@@ -3,7 +3,6 @@ package com.duckduckgo.mobile.android.vpn.ui.tracker_activity.view.message
 import android.content.Context
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnRunningState.DISABLED
@@ -22,7 +21,6 @@ import org.mockito.kotlin.whenever
 @RunWith(AndroidJUnit4::class)
 class PProUpsellBannerPluginTest {
     private val context: Context = InstrumentationRegistry.getInstrumentation().targetContext
-    private val browserNav: BrowserNav = mock()
     private val subscriptions: Subscriptions = mock()
     private val deviceShieldPixels: DeviceShieldPixels = mock()
     private val appTPStateMessageToggle: AppTPStateMessageToggle = mock()
@@ -36,7 +34,7 @@ class PProUpsellBannerPluginTest {
         vpnStore = FakeVPNStore(pproUpsellBannerDismissed = false)
         whenever(subscriptions.isFreeTrialEligible()).thenReturn(false)
         whenever(appTPStateMessageToggle.freeTrialCopy()).thenReturn(mockDisabledToggle)
-        plugin = PProUpsellBannerPlugin(subscriptions, browserNav, vpnStore, deviceShieldPixels, appTPStateMessageToggle)
+        plugin = PProUpsellBannerPlugin(subscriptions, vpnStore, deviceShieldPixels, appTPStateMessageToggle)
     }
 
     @Test
@@ -63,7 +61,7 @@ class PProUpsellBannerPluginTest {
     fun whenBannerDismissedThenGetViewReturnsNull() = runTest {
         whenever(subscriptions.isEligible()).thenReturn(true)
         whenever(subscriptions.isSignedIn()).thenReturn(false)
-        vpnStore.dismissPproUpsellBanner()
+        vpnStore.dismissSubscriptionUpsellBanner()
 
         val result = plugin.getView(context, VpnState(state = ENABLED)) {}
 

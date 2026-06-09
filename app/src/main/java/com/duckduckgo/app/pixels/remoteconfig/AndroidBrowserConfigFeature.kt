@@ -53,12 +53,30 @@ interface AndroidBrowserConfigFeature {
     fun screenLock(): Toggle
 
     /**
-     * @return `true` when the remote config has the global "optimizeTrackerEvaluationV2" androidBrowserConfig
+     * @return `true` when the remote config has the global "optimizeTrackerEvaluationV3" androidBrowserConfig
+     * sub-feature flag enabled. Controls the HashMap label-walk tracker-domain lookup path.
+     * If the remote feature is not present defaults to `false`. Always-on for internal builds.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun optimizeTrackerEvaluationV3(): Toggle
+
+    /**
+     * Pre-compile TDS rule regex patterns once when TdsClient is built rather than recompiling
+     * on every URL match. When disabled, regex compilation happens per-call (legacy behavior).
+     * @return `true` when the remote config has the global "precompileTdsRegex" androidBrowserConfig
      * sub-feature flag enabled
      * If the remote feature is not present defaults to `false`
      */
-    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
-    fun optimizeTrackerEvaluationV2(): Toggle
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun precompileTdsRegex(): Toggle
+
+    /**
+     * Routes entity lookups through the in-memory cached path
+     * (CachedTdsEntityLookup). When disabled, the legacy DB-walking
+     * TdsEntityLookup is used. Default INTERNAL during rollout.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun cachedEntityLookup(): Toggle
 
     /**
      * @return `true` when the remote config has the global "errorPagePixel" androidBrowserConfig
@@ -67,6 +85,14 @@ interface AndroidBrowserConfigFeature {
      */
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun errorPagePixel(): Toggle
+
+    /**
+     * @return `true` when the remote config has the global "errorCodePixel" androidBrowserConfig
+     * sub-feature flag enabled
+     * If the remote feature is not present defaults to `false`
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun errorCodePixel(): Toggle
 
     /**
      * @return `true` when the remote config has the global "featuresRequestHeader" androidBrowserConfig
@@ -137,6 +163,9 @@ interface AndroidBrowserConfigFeature {
 
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun storeFaviconSuspend(): Toggle
+
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    fun atomicFaviconWrites(): Toggle
 
     /**
      * @return `true` when the remote config has the global "checkMaliciousAfterHttpsUpgrade" androidBrowserConfig
@@ -240,14 +269,6 @@ interface AndroidBrowserConfigFeature {
     fun newCustomTab(): Toggle
 
     /**
-     * @return `true` when the remote config has the global "showInputScreenOnboarding" androidBrowserConfig
-     * sub-feature flag enabled
-     * If the remote feature is not present defaults to `internal`
-     */
-    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
-    fun showInputScreenOnboarding(): Toggle
-
-    /**
      * Controls the duck-ai related copy updates related to browser onboarding
      */
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
@@ -261,25 +282,6 @@ interface AndroidBrowserConfigFeature {
      */
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun granularFireDialog(): Toggle
-
-    /**
-     * Controls the experimental browsing menu in appearance settings.
-     * @return `true` when the remote config has the global "experimentalBrowsingMenu" androidBrowserConfig
-     * sub-feature flag enabled
-     * If the remote feature is not present defaults to `false`
-     */
-    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
-    fun experimentalBrowsingMenu(): Toggle
-
-    /**
-     * Controls the rollout of the new browser bottom-sheet menu to 100% of users.
-     * Independent of the Settings visibility toggle ("experimentalBrowsingMenu").
-     * @return `true` when the remote config has the global "rolloutBrowsingMenu" androidBrowserConfig
-     * sub-feature flag enabled
-     * If the remote feature is not present defaults to `false`
-     */
-    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
-    fun rolloutBrowsingMenu(): Toggle
 
     /**
      * Controls whether verified install/update pixels are sent.
@@ -317,6 +319,7 @@ interface AndroidBrowserConfigFeature {
      * sub-feature flag enabled
      * If the remote feature is not present defaults to `false`
      */
+    @Toggle.InternalAlwaysEnabled
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun singleTabFireDialog(): Toggle
 
@@ -337,6 +340,15 @@ interface AndroidBrowserConfigFeature {
     fun sendPageLoadWideEvent(): Toggle
 
     /**
+     * Controls whether post-idle session wide events are sent.
+     * @return `true` when the remote config has the global "sendPostIdleSessionWideEvent" androidBrowserConfig
+     * sub-feature flag enabled
+     * If the remote feature is not present defaults to `internal`
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun sendPostIdleSessionWideEvent(): Toggle
+
+    /**
      * Controls whether page content is cached in Room for each tab.
      * @return `true` when the remote config has the global "storePageContext" androidBrowserConfig
      * sub-feature flag enabled
@@ -344,4 +356,23 @@ interface AndroidBrowserConfigFeature {
      */
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun storePageContext(): Toggle
+
+    /**
+     * Controls whether the tab state restoration fix is enabled for swiping tabs.
+     * When enabled, the adapter populates tabs before restoring state to prevent
+     * garbage collection.
+     * @return `true` when the remote config has the global "tabStateRestorationFix" androidBrowserConfig
+     * sub-feature flag enabled
+     * If the remote feature is not present defaults to `true`
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    fun tabStateRestorationFix(): Toggle
+
+    /**
+     * @return `true` when the remote config has the global "pdfViewer" androidBrowserConfig
+     * sub-feature flag enabled
+     * If the remote feature is not present defaults to `false`
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun pdfViewer(): Toggle
 }

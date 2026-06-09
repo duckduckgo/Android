@@ -17,9 +17,11 @@
 package com.duckduckgo.app.global.api
 
 import com.duckduckgo.common.test.api.FakeChain
+import com.duckduckgo.common.utils.featureflags.OkHttpInterceptorRefactorFeature
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin
 import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin.PixelParameter
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Before
@@ -42,6 +44,7 @@ class PixelParamRemovalInterceptorTest {
                     )
                 }
             },
+            okHttpInterceptorRefactorFeature = FakeFeatureToggleFactory.create(OkHttpInterceptorRefactorFeature::class.java),
         )
     }
 

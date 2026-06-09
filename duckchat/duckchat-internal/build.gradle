@@ -18,6 +18,7 @@ plugins {
     id 'com.android.library'
     id 'kotlin-android'
     id 'com.squareup.anvil'
+    id 'com.google.devtools.ksp'
 }
 
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
@@ -34,10 +35,13 @@ android {
 }
 
 dependencies {
-    anvil project(path: ':anvil-compiler')
+    ksp project(':anvil-ksp')
     implementation project(path: ':anvil-annotations')
+    implementation project(path: ':internal-features-api')
     implementation project(path: ':duckchat-api')
     implementation project(path: ':duckchat-impl')
+    implementation project(path: ':duckchat-store')
+    implementation project(path: ':test-seeder-api')
     implementation project(path: ':content-scope-scripts-api')
     implementation project(path: ':content-scope-scripts-impl')
     implementation project(path: ':di')
@@ -52,6 +56,8 @@ dependencies {
     implementation AndroidX.lifecycle.runtime.ktx
     implementation Google.android.material
     implementation Google.dagger
+    implementation "org.nanohttpd:nanohttpd:2.3.1"
+    implementation "com.squareup.logcat:logcat:_"
 
     testImplementation Testing.junit4
     testImplementation Testing.robolectric

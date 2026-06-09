@@ -47,7 +47,24 @@ interface FaviconManager {
         placeholder: String? = null,
     )
 
+    @Deprecated("Use loadToViewFromLocalWithRetry instead, which supports cancellation of pending retries")
     suspend fun loadToViewFromLocalWithPlaceholder(
+        tabId: String? = null,
+        url: String,
+        view: ImageView,
+        placeholder: String? = null,
+    )
+
+    /**
+     * Loads a favicon from local disk into the given [ImageView], retrying up to 3 times with a delay if the
+     * favicon is not yet cached. Cancelling the coroutine cancels pending retries immediately.
+     *
+     * @param tabId the tab ID to look up the favicon for, or null to skip the temp directory lookup
+     * @param url the URL whose domain is used to locate the cached favicon
+     * @param view the [ImageView] to load the favicon into
+     * @param placeholder optional text used to generate a placeholder drawable if the favicon is not found
+     */
+    suspend fun loadToViewFromLocalWithRetry(
         tabId: String? = null,
         url: String,
         view: ImageView,

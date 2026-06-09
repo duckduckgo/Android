@@ -24,6 +24,7 @@ import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
 import com.duckduckgo.app.fire.store.FireDataStore
 import com.duckduckgo.app.firebutton.DataClearingSettingsViewModel.Command
+import com.duckduckgo.app.onboardingbranddesignupdate.OnboardingBrandDesignUpdateToggles
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.settings.clear.FireAnimation
 import com.duckduckgo.app.settings.clear.FireClearOption
@@ -33,6 +34,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.feature.toggles.api.Toggle
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
@@ -42,6 +44,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
@@ -64,6 +67,9 @@ internal class DataClearingSettingsViewModelTest {
     private val mockDuckAiFeatureState: DuckAiFeatureState = mock()
     private val mockFireproofWebsiteRepository: FireproofWebsiteRepository = mock()
     private val mockFireDataStore: FireDataStore = mock()
+    private val mockBrandDesignUpdateToggles: OnboardingBrandDesignUpdateToggles = mock()
+    private val enabledToggle: Toggle = mock { on { it.isEnabled() } doReturn true }
+    private val disabledToggle: Toggle = mock { on { it.isEnabled() } doReturn false }
 
     private val duckAiShowClearDuckAIChatHistoryFlow = MutableStateFlow(false)
     private val fireproofWebsitesLiveData = MutableLiveData<List<FireproofWebsiteEntity>>(emptyList())
@@ -81,6 +87,8 @@ internal class DataClearingSettingsViewModelTest {
             whenever(mockDuckChat.wasOpenedBefore()).thenReturn(false)
         }
 
+        whenever(mockBrandDesignUpdateToggles.fireAnimationUpdate()).thenReturn(disabledToggle)
+
         testee = DataClearingSettingsViewModel(
             mockSettingsDataStore,
             mockFireAnimationLoader,
@@ -90,6 +98,7 @@ internal class DataClearingSettingsViewModelTest {
             mockFireDataStore,
             coroutineTestRule.testDispatcherProvider,
             mockFireproofWebsiteRepository,
+            mockBrandDesignUpdateToggles,
         )
     }
 
@@ -122,6 +131,7 @@ internal class DataClearingSettingsViewModelTest {
             mockFireDataStore,
             coroutineTestRule.testDispatcherProvider,
             mockFireproofWebsiteRepository,
+            mockBrandDesignUpdateToggles,
         )
 
         testee.viewState.test {
@@ -145,6 +155,7 @@ internal class DataClearingSettingsViewModelTest {
             mockFireDataStore,
             coroutineTestRule.testDispatcherProvider,
             mockFireproofWebsiteRepository,
+            mockBrandDesignUpdateToggles,
         )
 
         testee.viewState.test {
@@ -168,6 +179,7 @@ internal class DataClearingSettingsViewModelTest {
             mockFireDataStore,
             coroutineTestRule.testDispatcherProvider,
             mockFireproofWebsiteRepository,
+            mockBrandDesignUpdateToggles,
         )
 
         testee.viewState.test {
@@ -231,7 +243,44 @@ internal class DataClearingSettingsViewModelTest {
         testee.commands.test {
             testee.userRequestedToChangeFireAnimation()
 
-            assertEquals(Command.LaunchFireAnimationSettings(FireAnimation.HeroFire), awaitItem())
+            assertEquals(
+                Command.LaunchFireAnimationSettings(
+                    animation = FireAnimation.HeroFire,
+                    isFireAnimationUpdateEnabled = false,
+                ),
+                awaitItem(),
+            )
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenUserRequestedToChangeFireAnimationWithFireAnimationUpdateToggleOnThenCommandFlagsItEnabled() = runTest {
+        whenever(mockBrandDesignUpdateToggles.fireAnimationUpdate()).thenReturn(enabledToggle)
+
+        testee = DataClearingSettingsViewModel(
+            mockSettingsDataStore,
+            mockFireAnimationLoader,
+            mockPixel,
+            mockDuckChat,
+            mockDuckAiFeatureState,
+            mockFireDataStore,
+            coroutineTestRule.testDispatcherProvider,
+            mockFireproofWebsiteRepository,
+            mockBrandDesignUpdateToggles,
+        )
+
+        testee.commands.test {
+            testee.userRequestedToChangeFireAnimation()
+
+            assertEquals(
+                Command.LaunchFireAnimationSettings(
+                    animation = FireAnimation.HeroFire,
+                    isFireAnimationUpdateEnabled = true,
+                ),
+                awaitItem(),
+            )
 
             cancelAndConsumeRemainingEvents()
         }
@@ -279,6 +328,16 @@ internal class DataClearingSettingsViewModelTest {
         verify(mockPixel).fire(
             AppPixelName.FIRE_ANIMATION_NEW_SELECTED,
             mapOf(Pixel.PixelParameter.FIRE_ANIMATION to Pixel.PixelValues.FIRE_ANIMATION_WHIRLPOOL),
+        )
+    }
+
+    @Test
+    fun whenInfernoSelectedThenPixelSent() {
+        testee.onFireAnimationSelected(FireAnimation.Inferno)
+
+        verify(mockPixel).fire(
+            AppPixelName.FIRE_ANIMATION_NEW_SELECTED,
+            mapOf(Pixel.PixelParameter.FIRE_ANIMATION to Pixel.PixelValues.FIRE_ANIMATION_INFERNO_NEW),
         )
     }
 
@@ -335,6 +394,7 @@ internal class DataClearingSettingsViewModelTest {
             mockFireDataStore,
             coroutineTestRule.testDispatcherProvider,
             mockFireproofWebsiteRepository,
+            mockBrandDesignUpdateToggles,
         )
 
         testee.viewState.test {
@@ -367,5 +427,37 @@ internal class DataClearingSettingsViewModelTest {
 
         verify(mockPixel).fire(AppPixelName.FORGET_ALL_PRESSED_SETTINGS)
         verify(mockPixel).fire(AppPixelName.FORGET_ALL_PRESSED_SETTINGS_DAILY, type = Daily())
+    }
+
+    @Test
+    fun whenToggleOffThenViewStateMarksFireAnimationUpdateDisabled() = runTest {
+        testee.viewState.test {
+            assertFalse(awaitItem().isFireAnimationUpdateEnabled)
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenToggleOnThenViewStateMarksFireAnimationUpdateEnabled() = runTest {
+        whenever(mockBrandDesignUpdateToggles.fireAnimationUpdate()).thenReturn(enabledToggle)
+
+        testee = DataClearingSettingsViewModel(
+            mockSettingsDataStore,
+            mockFireAnimationLoader,
+            mockPixel,
+            mockDuckChat,
+            mockDuckAiFeatureState,
+            mockFireDataStore,
+            coroutineTestRule.testDispatcherProvider,
+            mockFireproofWebsiteRepository,
+            mockBrandDesignUpdateToggles,
+        )
+
+        testee.viewState.test {
+            assertTrue(awaitItem().isFireAnimationUpdateEnabled)
+
+            cancelAndConsumeRemainingEvents()
+        }
     }
 }

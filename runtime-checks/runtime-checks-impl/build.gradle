@@ -30,7 +30,6 @@ android {
 }
 
 dependencies {
-    anvil project(path: ':anvil-compiler')
     implementation project(path: ':anvil-annotations')
     implementation project(path: ':di')
     implementation project(path: ':common-utils')
@@ -59,7 +58,6 @@ dependencies {
     // Room
     implementation AndroidX.room.runtime
     implementation AndroidX.room.rxJava2
-    implementation AndroidX.room.ktx
     testImplementation AndroidX.room.testing
 
     // Dagger

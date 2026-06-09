@@ -101,7 +101,7 @@ class RecoverDataFragment : DuckDuckGoFragment(R.layout.fragment_recover_data) {
         binding.footerNextButton.setOnClickListener {
             viewModel.onNextClicked()
         }
-        binding.copyCodeButton.setOnClickListener {
+        binding.recoveryCodeItem.setClickListener {
             viewModel.onCopyCodeClicked()
         }
         binding.restoreOnReinstallToggle.setOnCheckedChangeListener { _, isChecked ->
@@ -181,7 +181,13 @@ class RecoverDataFragment : DuckDuckGoFragment(R.layout.fragment_recover_data) {
                 binding.recoveryCodeSkeleton.stopShimmer()
                 binding.recoveryCodeSkeleton.gone()
                 binding.recoverCodeContainer.show()
-                binding.recoveryCodeText.text = viewMode.b64RecoveryCode
+
+                val truncatedCode = if (viewMode.b64RecoveryCode.length > RECOVERY_CODE_MAX_CHAR_BEFORE_TRUNCATION) {
+                    viewMode.b64RecoveryCode.take(RECOVERY_CODE_MAX_CHAR_BEFORE_TRUNCATION) + "…"
+                } else {
+                    viewMode.b64RecoveryCode
+                }
+                binding.recoveryCodeItem.setSecondaryText(truncatedCode)
             }
 
             CreatingAccount -> {
@@ -201,5 +207,6 @@ class RecoverDataFragment : DuckDuckGoFragment(R.layout.fragment_recover_data) {
 
     companion object {
         fun instance() = RecoverDataFragment()
+        private const val RECOVERY_CODE_MAX_CHAR_BEFORE_TRUNCATION = 56
     }
 }

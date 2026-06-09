@@ -40,4 +40,9 @@
 
     <!-- Page Header -->
     <string name="pageHeaderLearnMore">Lue lisää</string>
+
+    <!-- Content Descriptions -->
+    <string name="closeButtonContentDescription">Sulje</string>
+    <string name="bookmarkFavoriteContentDescription">Suosikki</string>
+
 </resources>

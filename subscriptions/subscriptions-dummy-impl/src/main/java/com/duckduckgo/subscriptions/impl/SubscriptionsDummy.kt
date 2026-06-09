@@ -23,6 +23,7 @@ import com.duckduckgo.subscriptions.api.Product
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.UNKNOWN
 import com.duckduckgo.subscriptions.api.Subscriptions
+import com.duckduckgo.subscriptions.api.model.Entitlement
 import com.squareup.anvil.annotations.ContributesBinding
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
@@ -44,16 +45,18 @@ class SubscriptionsDummy @Inject constructor() : Subscriptions {
 
     override suspend fun getAvailableProducts(): Set<Product> = emptySet()
 
-    override fun shouldLaunchPrivacyProForUrl(url: String): Boolean = false
+    override fun shouldLaunchSubscriptionForUrl(url: String): Boolean = false
 
-    override fun launchPrivacyPro(
+    override fun launchSubscription(
         context: Context,
         uri: Uri?,
     ) {
         // no-op
     }
 
-    override fun isPrivacyProUrl(uri: Uri): Boolean = false
+    override fun isSubscriptionUrl(uri: Uri): Boolean = false
 
     override suspend fun isFreeTrialEligible(): Boolean = false
+
+    override fun getEntitlements(): Flow<Set<Entitlement>> = flowOf(emptySet())
 }

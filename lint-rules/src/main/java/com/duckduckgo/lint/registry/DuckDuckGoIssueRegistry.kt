@@ -26,6 +26,9 @@ import com.duckduckgo.lint.NoFragmentDetector.Companion.NO_FRAGMENT_ISSUE
 import com.duckduckgo.lint.NoHardcodedCoroutineDispatcherDetector.Companion.NO_HARCODED_COROUTINE_DISPATCHER
 import com.duckduckgo.lint.NoImplImportsInAppModuleDetector.Companion.NO_IMPL_IMPORTS_IN_APP_MODULE_ISSUE
 import com.duckduckgo.lint.MetricsPixelNumericValueDetector.Companion.NUMERIC_VALUE_REQUIRED
+import com.duckduckgo.lint.MissingContributesToOnModuleDetector.Companion.MISSING_CONTRIBUTES_TO_ON_MODULE
+import com.duckduckgo.lint.MissingExplicitReturnTypeOnProvidesBindsDetector.Companion.MISSING_EXPLICIT_RETURN_TYPE
+import com.duckduckgo.lint.MissingHasMemberInjectionsDetector.Companion.MISSING_HAS_MEMBER_INJECTIONS
 import com.duckduckgo.lint.NoMetricsPixelExtensionUsageDetector.Companion.NO_METRICS_PIXEL_EXTENSION_USAGE
 import com.duckduckgo.lint.NoLifecycleObserverDetector.Companion.NO_LIFECYCLE_OBSERVER_ISSUE
 import com.duckduckgo.lint.NoLifecycleScopeInFragmentDetector.Companion.NO_LIFECYCLE_SCOPE_IN_FRAGMENT
@@ -43,9 +46,18 @@ import com.duckduckgo.lint.strings.MissingSmartlingRequiredDirectivesDetector.Co
 import com.duckduckgo.lint.strings.PlaceholderDetector.Companion.PLACEHOLDER_MISSING_POSITION
 import com.duckduckgo.lint.ui.ColorAttributeInXmlDetector.Companion.INVALID_COLOR_ATTRIBUTE
 import com.duckduckgo.lint.ui.DaxButtonStylingDetector.Companion.INVALID_DAX_BUTTON_PROPERTY
+import com.duckduckgo.lint.ui.DaxDividerColorUsageDetector.Companion.INVALID_DAX_DIVIDER_COLOR_USAGE
 import com.duckduckgo.lint.ui.DaxTextColorUsageDetector.Companion.INVALID_DAX_TEXT_COLOR_USAGE
+import com.duckduckgo.lint.ui.NoRawM3AlertDialogUsageDetector.Companion.NO_RAW_M3_ALERT_DIALOG_USAGE
+import com.duckduckgo.lint.ui.NoRawM3ButtonUsageDetector.Companion.NO_RAW_M3_BUTTON_USAGE
+import com.duckduckgo.lint.ui.NoRawM3SurfaceUsageDetector.Companion.NO_RAW_M3_SURFACE_USAGE
 import com.duckduckgo.lint.ui.DaxTextFieldTrailingIconDetector.Companion.INVALID_DAX_TEXT_FIELD_TRAILING_ICON_USAGE
 import com.duckduckgo.lint.ui.DaxSecureTextFieldTrailingIconDetector.Companion.INVALID_DAX_SECURE_TEXT_FIELD_TRAILING_ICON_USAGE
+import com.duckduckgo.lint.ui.NoMaterial3CheckboxUsageDetector.Companion.NO_MATERIAL3_CHECKBOX_USAGE
+import com.duckduckgo.lint.ui.NoMaterial3DividerUsageDetector.Companion.NO_MATERIAL3_HORIZONTAL_DIVIDER_USAGE
+import com.duckduckgo.lint.ui.NoMaterial3DividerUsageDetector.Companion.NO_MATERIAL3_VERTICAL_DIVIDER_USAGE
+import com.duckduckgo.lint.ui.NoMaterial3RadioButtonUsageDetector.Companion.NO_MATERIAL3_RADIO_BUTTON_USAGE
+import com.duckduckgo.lint.ui.NoMaterial3SwitchUsageDetector.Companion.NO_MATERIAL3_SWITCH_USAGE
 import com.duckduckgo.lint.ui.DaxTextViewStylingDetector.Companion.INVALID_DAX_TEXT_VIEW_PROPERTY
 import com.duckduckgo.lint.ui.DeprecatedAndroidWidgetsUsedInXmlDetector.Companion.DEPRECATED_WIDGET_IN_XML
 import com.duckduckgo.lint.ui.MissingDividerDetector.Companion.MISSING_HORIZONTAL_DIVIDER
@@ -83,6 +95,9 @@ class DuckDuckGoIssueRegistry : IssueRegistry() {
             DenyListedApiDetector.ISSUE,
             NO_LIFECYCLE_SCOPE_IN_FRAGMENT,
             NO_POST_VALUE_ON_SINGLE_LIVE_EVENT,
+            MISSING_CONTRIBUTES_TO_ON_MODULE,
+            MISSING_HAS_MEMBER_INJECTIONS,
+            MISSING_EXPLICIT_RETURN_TYPE,
 
             // Android Design System
             DEPRECATED_WIDGET_IN_XML,
@@ -100,8 +115,17 @@ class DuckDuckGoIssueRegistry : IssueRegistry() {
             NO_COMPOSE_VIEW_USAGE,
             NO_SET_CONTENT_USAGE,
             INVALID_DAX_TEXT_COLOR_USAGE,
+            INVALID_DAX_DIVIDER_COLOR_USAGE,
             INVALID_DAX_TEXT_FIELD_TRAILING_ICON_USAGE,
             INVALID_DAX_SECURE_TEXT_FIELD_TRAILING_ICON_USAGE,
+            NO_MATERIAL3_SWITCH_USAGE,
+            NO_MATERIAL3_RADIO_BUTTON_USAGE,
+            NO_MATERIAL3_CHECKBOX_USAGE,
+            NO_MATERIAL3_HORIZONTAL_DIVIDER_USAGE,
+            NO_MATERIAL3_VERTICAL_DIVIDER_USAGE,
+            NO_RAW_M3_BUTTON_USAGE,
+            NO_RAW_M3_ALERT_DIALOG_USAGE,
+            NO_RAW_M3_SURFACE_USAGE,
 
         ).plus(WebViewCompatApisUsageDetector.issues)
 

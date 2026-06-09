@@ -16,10 +16,10 @@
 
 package com.duckduckgo.duckchat.impl.store
 
-enum class DefaultTogglePosition {
-    SEARCH,
-    DUCK_AI,
-    LAST_USED,
+enum class DefaultTogglePosition(val pixelValue: String) {
+    SEARCH("search"),
+    DUCK_AI("duckAI"),
+    LAST_USED("lastUsed"),
     ;
 
     fun getOptionIndex(): Int {

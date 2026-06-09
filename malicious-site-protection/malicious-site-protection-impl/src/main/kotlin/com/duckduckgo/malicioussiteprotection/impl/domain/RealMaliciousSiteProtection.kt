@@ -19,6 +19,7 @@ package com.duckduckgo.malicioussiteprotection.impl.domain
 import android.R.attr.priority
 import android.net.Uri
 import android.util.LruCache
+import com.duckduckgo.app.browser.Domain
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
@@ -50,7 +51,6 @@ import javax.inject.Inject
 
 class WriteInProgressException : Exception("Write in progress")
 
-@ContributesBinding(AppScope::class, MaliciousSiteProtection::class)
 interface InternalMaliciousSiteProtection : MaliciousSiteProtection {
     suspend fun loadFilters(vararg feeds: Feed): kotlin.Result<Unit>
     suspend fun loadHashPrefixes(vararg feeds: Feed): kotlin.Result<Unit>
@@ -58,6 +58,7 @@ interface InternalMaliciousSiteProtection : MaliciousSiteProtection {
 
 @SingleInstanceIn(AppScope::class)
 @ContributesBinding(AppScope::class, InternalMaliciousSiteProtection::class)
+@ContributesBinding(AppScope::class, MaliciousSiteProtection::class)
 class RealMaliciousSiteProtection @Inject constructor(
     private val dispatchers: DispatcherProvider,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
@@ -99,7 +100,7 @@ class RealMaliciousSiteProtection @Inject constructor(
             }
         }
 
-        if (maliciousSiteProtectionRCRepository.isExempted(hostname)) {
+        if (maliciousSiteProtectionRCRepository.isExempted(Domain(hostname))) {
             logcat { "should not block (exempted) $hostname" }
             cacheResult(canonicalUriString, Safe)
             return ConfirmedResult(Safe)

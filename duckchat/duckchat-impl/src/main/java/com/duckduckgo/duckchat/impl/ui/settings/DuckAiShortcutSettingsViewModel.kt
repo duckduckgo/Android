@@ -20,7 +20,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
@@ -31,29 +30,32 @@ import javax.inject.Inject
 @ContributesViewModel(ActivityScope::class)
 class DuckAiShortcutSettingsViewModel @Inject constructor(
     private val duckChat: DuckChatInternal,
-    duckAiFeatureState: DuckAiFeatureState,
 ) : ViewModel() {
 
     data class ViewState(
         val showInBrowserMenu: Boolean = false,
         val showInAddressBar: Boolean = false,
         val showInVoiceSearch: Boolean = false,
+        val showInVoiceChat: Boolean = false,
         val shouldShowAddressBarToggle: Boolean = false,
         val shouldShowVoiceSearchToggle: Boolean = false,
+        val shouldShowVoiceChatToggle: Boolean = false,
     )
 
     val viewState = combine(
         duckChat.observeShowInBrowserMenuUserSetting(),
         duckChat.observeShowInAddressBarUserSetting(),
         duckChat.observeShowInVoiceSearchUserSetting(),
-        duckAiFeatureState.showVoiceSearchToggle,
-    ) { showInBrowserMenu, showInAddressBar, showInVoiceSearch, showVoiceSearchToggle ->
+        duckChat.observeShowInVoiceChatUserSetting(),
+    ) { showInBrowserMenu, showInAddressBar, showInVoiceSearch, showInVoiceChat ->
         ViewState(
             showInBrowserMenu = showInBrowserMenu,
             showInAddressBar = showInAddressBar,
             showInVoiceSearch = showInVoiceSearch,
+            showInVoiceChat = showInVoiceChat,
             shouldShowAddressBarToggle = duckChat.isAddressBarEntryPointEnabled(),
             shouldShowVoiceSearchToggle = duckChat.isVoiceSearchEntryPointEnabled(),
+            shouldShowVoiceChatToggle = duckChat.isVoiceChatEntryPointEnabled(),
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ViewState())
 
@@ -72,6 +74,12 @@ class DuckAiShortcutSettingsViewModel @Inject constructor(
     fun onShowDuckChatInVoiceSearchToggled(checked: Boolean) {
         viewModelScope.launch {
             duckChat.setShowInVoiceSearchUserSetting(checked)
+        }
+    }
+
+    fun onShowDuckChatInVoiceChatToggled(checked: Boolean) {
+        viewModelScope.launch {
+            duckChat.setShowInVoiceChatUserSetting(checked)
         }
     }
 }
