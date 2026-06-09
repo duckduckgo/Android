@@ -50,8 +50,10 @@ import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.ChatSuggestion
 import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.reader.ChatSuggestionsReader
 import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
 import com.duckduckgo.duckchat.impl.models.ReasoningResolver
+import com.duckduckgo.duckchat.impl.models.Tool
 import com.duckduckgo.duckchat.impl.nativeinput.NativeInputPlugin
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.store.DefaultTogglePosition
 import com.duckduckgo.duckchat.store.impl.DuckAiChat
 import com.duckduckgo.duckchat.store.impl.DuckAiChatStore
@@ -98,6 +100,7 @@ class NativeInputModeWidgetViewModel @Inject constructor(
     private val dispatchers: DispatcherProvider,
     private val inputScreenConfigResolver: InputScreenConfigResolver,
     private val pixel: Pixel,
+    private val duckChatPixels: DuckChatPixels,
     private val nativeInputStatePublisher: NativeInputStatePublisher,
     private val nativeInputStateProvider: NativeInputStateProvider,
     private val modelManager: DuckAiModelManager,
@@ -185,6 +188,37 @@ class NativeInputModeWidgetViewModel @Inject constructor(
     fun getSelectedTool(): String? {
         val tabId = activeTabId.value ?: return null
         return nativeInputStateProvider.stateForTab(tabId).value.selectedTool
+    }
+
+    /**
+     * Fires the unified prompt-submitted pixel plus, when a tool is selected, the matching per-tool
+     * submitted pixel. Called exactly once per Duck.ai (AI-chat) submission by the widget. Attachment
+     * presence is passed in because the attachment lists live in the widget's AttachmentView, not here.
+     */
+    fun fireSubmissionPixels(
+        hasText: Boolean,
+        hasImageAttachment: Boolean,
+        hasFileAttachment: Boolean,
+    ) {
+        val tool = getSelectedTool()?.let { Tool.from(it) }
+        val selectedToolParam = when (tool) {
+            Tool.IMAGE_GENERATION -> "image_generation"
+            Tool.WEB_SEARCH -> "web_search"
+            null -> "none"
+        }
+        duckChatPixels.firePromptSubmitted(
+            selectedTool = selectedToolParam,
+            modelId = getSelectedModelId(),
+            reasoningEffort = getResolvedReasoningEffort(),
+            hasImageAttachment = hasImageAttachment,
+            hasFileAttachment = hasFileAttachment,
+            hasText = hasText,
+        )
+        when (tool) {
+            Tool.IMAGE_GENERATION -> duckChatPixels.fireImageGenerationSubmitted()
+            Tool.WEB_SEARCH -> duckChatPixels.fireWebSearchSubmitted()
+            null -> {}
+        }
     }
 
     private data class WidgetConfig(

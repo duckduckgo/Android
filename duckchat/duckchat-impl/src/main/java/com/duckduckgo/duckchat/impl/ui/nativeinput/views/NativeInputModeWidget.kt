@@ -746,12 +746,31 @@ class NativeInputModeWidget @JvmOverloads constructor(
             logcat { "submitMessage: suppressed - attachment limit exceeded" }
             return
         }
+        // Capture text presence before any clearFocus / submission mutates the field.
+        val hasText = !(message ?: inputField.text?.toString()).isNullOrBlank()
         if (message == null && inputField.text.isNullOrBlank() && hasAttachments && isChatTabSelected()) {
+            fireSubmissionPixels(hasText = hasText)
             onChatSent?.invoke("")
             inputField.clearFocus()
         } else {
+            // super routes to onChatSent (chat tab) or onSearchSent (search tab) only when there is
+            // non-blank text. Fire the chat-submission pixels only for the chat-tab + has-text case so
+            // we never fire for a search submit nor for a no-op blank submit.
+            if (isChatTabSelected() && hasText) {
+                fireSubmissionPixels(hasText = true)
+            }
             super.submitMessage(message)
         }
+    }
+
+    private fun fireSubmissionPixels(hasText: Boolean) {
+        val hasImageAttachment = attachmentView?.getImageAttachments()?.isNotEmpty() == true
+        val hasFileAttachment = attachmentView?.getFileAttachments()?.isNotEmpty() == true
+        viewModel.fireSubmissionPixels(
+            hasText = hasText,
+            hasImageAttachment = hasImageAttachment,
+            hasFileAttachment = hasFileAttachment,
+        )
     }
 
     override fun focusInput(activity: Activity?) {
