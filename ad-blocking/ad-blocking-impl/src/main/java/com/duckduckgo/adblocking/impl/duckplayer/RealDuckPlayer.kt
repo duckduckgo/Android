@@ -181,11 +181,12 @@ class RealDuckPlayer @Inject constructor(
     }
 
     override fun getUserPreferences(): UserPreferences {
-        val defaultPlayerMode = if (adBlockingStatusChecker.isShownInSettings() && adBlockingStatusChecker.currentState() is AdBlockingState.Enabled) {
-            Disabled
-        } else {
-            AlwaysAsk
-        }
+        val defaultPlayerMode =
+            if (adBlockingStatusChecker.isShownInSettings() && adBlockingStatusChecker.currentState() is AdBlockingState.Enabled) {
+                Disabled
+            } else {
+                AlwaysAsk
+            }
         val stored = duckPlayerFeatureRepository.getUserPreferences()
         return UserPreferences(
             overlayInteracted = stored.overlayInteracted,
