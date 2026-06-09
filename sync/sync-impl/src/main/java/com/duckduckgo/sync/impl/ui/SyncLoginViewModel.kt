@@ -142,7 +142,10 @@ class SyncLoginViewModel @Inject constructor(
                 command.send(LoginSucess)
             }
             is DispatchOutcome.UpgradeRequired -> {
-                processError(Error(reason = "Code requires protocol v${outcome.codeMajor}"))
+                // Peer needs a newer protocol major than we support — show a visible "please
+                // update" error rather than the no-op processError gives an uncoded error.
+                // (Richer version-too-new UX tracked in Asana 1215484651575360.)
+                command.send(ShowError(message = R.string.sync_flows_disabled_new_version, reason = "Code requires protocol v${outcome.codeMajor}"))
             }
             is DispatchOutcome.Failed -> {
                 processError(Error(reason = outcome.reason))

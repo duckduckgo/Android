@@ -37,6 +37,7 @@ import com.duckduckgo.sync.impl.AccountErrorCodes.INVALID_CODE
 import com.duckduckgo.sync.impl.AccountErrorCodes.LOGIN_FAILED
 import com.duckduckgo.sync.impl.AccountErrorCodes.THIRD_PARTY_ALREADY_UPGRADED
 import com.duckduckgo.sync.impl.Clipboard
+import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.RealSyncCodeDispatcher
 import com.duckduckgo.sync.impl.RecoveryCode
 import com.duckduckgo.sync.impl.Result.Error
@@ -46,6 +47,7 @@ import com.duckduckgo.sync.impl.SyncAuthCode.Recovery
 import com.duckduckgo.sync.impl.SyncAuthCode.Unknown
 import com.duckduckgo.sync.impl.SyncFeature
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2CodeParseResult
+import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Event
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2QrCode
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Runner
 import com.duckduckgo.sync.impl.pixels.SyncPixels
@@ -55,7 +57,9 @@ import com.duckduckgo.sync.impl.ui.EnterCodeViewModel.Command.AskToSwitchAccount
 import com.duckduckgo.sync.impl.ui.EnterCodeViewModel.Command.LoginSuccess
 import com.duckduckgo.sync.impl.ui.EnterCodeViewModel.Command.ShowError
 import com.duckduckgo.sync.impl.ui.EnterCodeViewModel.Command.SwitchAccountSuccess
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
@@ -148,6 +152,31 @@ internal class EnterCodeViewModelTest {
         testee.commands().test {
             val command = awaitItem()
             assertTrue("expected ShowError, got $command", command is ShowError)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenV2CodeRequiresNewerProtocolThenShowUpdateError() = runTest {
+        // A peer requiring a newer protocol major must surface a visible "please update" error,
+        // not silently do nothing (UpgradeRequired previously fell through to a no-op).
+        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
+        whenever(syncAccountRepository.getAccountInfo()).thenReturn(noAccount)
+        val pastedCode = "https://duckduckgo.com/sync/pairing/#&code2=v2code"
+        whenever(clipboard.pasteFromClipboard()).thenReturn(pastedCode)
+        whenever(qrCode.parse(pastedCode)).thenReturn(
+            ExchangeV2CodeParseResult.LinkingV2(channelId = "c", publicKey = "k", version = "2"),
+        )
+        whenever(runner.eventsSince(any())).thenReturn(
+            flowOf(ExchangeV2Event.SessionError(timestampMs = 0L, message = "Peer requires protocol v3; please update this app")),
+        )
+
+        testee.onPasteCodeClicked()
+
+        testee.commands().test {
+            val command = awaitItem()
+            assertTrue("expected ShowError, got $command", command is ShowError)
+            assertEquals(R.string.sync_flows_disabled_new_version, (command as ShowError).message)
             cancelAndIgnoreRemainingEvents()
         }
     }

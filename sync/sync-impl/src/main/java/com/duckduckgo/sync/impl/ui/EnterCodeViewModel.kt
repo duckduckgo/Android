@@ -157,9 +157,14 @@ class EnterCodeViewModel @Inject constructor(
             is DispatchOutcome.LoggedIn -> onLoginSuccess(previousPrimaryKey)
             // Spec §"Same-account case": friendly finish, no account change. Surface as success.
             is DispatchOutcome.AlreadyConnected -> onLoginSuccess(previousPrimaryKey)
-            is DispatchOutcome.UpgradeRequired -> processError(
-                Error(reason = "Code requires protocol v${outcome.codeMajor}"),
-                pastedCode,
+            // Peer needs a newer protocol major than we support — show a visible "please update"
+            // error rather than the generic-error no-op processError gives an uncoded error.
+            // (Richer version-too-new UX tracked in Asana 1215484651575360.)
+            is DispatchOutcome.UpgradeRequired -> command.send(
+                Command.ShowError(
+                    message = R.string.sync_flows_disabled_new_version,
+                    reason = "Code requires protocol v${outcome.codeMajor}",
+                ),
             )
             is DispatchOutcome.Failed -> processError(Error(code = outcome.code, reason = outcome.reason), pastedCode)
             is DispatchOutcome.JoinerConfirmationRequested ->
