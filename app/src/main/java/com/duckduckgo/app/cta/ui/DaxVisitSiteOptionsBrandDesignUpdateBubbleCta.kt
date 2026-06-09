@@ -50,7 +50,8 @@ data class DaxVisitSiteOptionsBrandDesignUpdateBubbleCta(
         rotationDegrees = 0f,
         translationXDp = -54f,
         translationYDp = -110f,
-        heightDp = 178f,
+        minHeightDp = 178f,
+        maxHeightDp = 178f,
         anchorToCardOnTablet = true,
     )
 }

@@ -57,7 +57,8 @@ data class DaxEndBrandDesignUpdateBubbleCta(
         // so we need to nudge Dax to the right to ensure both his legs are behind the address bar.
         translationXDp = if (isOmnibarBottom) -30f else -40f,
         translationYDp = -150f,
-        heightDp = 178f,
+        minHeightDp = 178f,
+        maxHeightDp = 178f,
         anchorToCardOnTablet = true,
     )
 

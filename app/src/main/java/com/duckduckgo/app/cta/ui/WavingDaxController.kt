@@ -18,17 +18,17 @@ package com.duckduckgo.app.cta.ui
 
 import android.animation.ValueAnimator
 import android.content.res.Configuration
-import android.graphics.RectF
+import android.graphics.Rect
 import android.view.View
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import com.airbnb.lottie.LottieAnimationView
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.onboarding.ui.page.OnboardingDecorationSizing
 import com.duckduckgo.common.ui.view.shape.DaxOnboardingBubbleBrandDesignUpdateCardView
 import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.common.utils.device.isTablet
-import kotlin.math.abs
 
 /**
  * Keeps the waving Dax below a new-tab bubble in sync with the space available: decides whether the
@@ -41,6 +41,7 @@ import kotlin.math.abs
 internal class WavingDaxController(
     private val showArrow: Boolean,
     private val deviceInfo: DeviceInfo,
+    private val wavingDaxSpec: DaxBubbleCta.WavingDaxSpec,
 ) {
 
     private var fitArrowAnimator: ValueAnimator? = null
@@ -51,11 +52,12 @@ internal class WavingDaxController(
     fun applyFit(container: View) {
         this.container = container
         container.removeCallbacks(fitRunnable)
-        val fits = computeDaxFits(container) ?: return
-        if (fits) {
-            container.postDelayed(fitRunnable, FIT_SETTLE_DELAY_MS)
-        } else {
+        val height = computeDaxFitHeight(container)
+        if (height == null) {
             applyFitResult(container, false)
+        } else {
+            applyDaxHeight(container, height)
+            container.postDelayed(fitRunnable, FIT_SETTLE_DELAY_MS)
         }
     }
 
@@ -73,62 +75,71 @@ internal class WavingDaxController(
     }
 
     /**
-     * Pure fit test. The Dax fits unless its head intrudes into the card body (above the
-     * top-of-fin line) or its rect overlaps the fin's own region. The Dax may sit in the
-     * fin's vertical band as long as it is horizontally clear of the fin.
+     * Height for a bottom-anchored waving Dax: the room between the card's bottom and the IME-aware usable
+     * window bottom (less [marginPx]), clamped to [maxHeightPx] and hidden (null) below [minHeightPx]. Pure
+     * so it can be unit-tested without a device.
      */
-    internal fun daxFits(
-        daxTop: Int,
-        daxLeft: Int,
-        daxRight: Int,
-        cardBodyBottom: Int,
-        finBottom: Int,
-        finLeft: Int,
-        finRight: Int,
-    ): Boolean {
-        if (daxTop < cardBodyBottom) return false
-        val overlapsFinHorizontally = daxRight > finLeft && daxLeft < finRight
-        if (daxTop < finBottom && overlapsFinHorizontally) return false
-        return true
+    internal fun daxFitHeight(
+        usableBottom: Int,
+        cardBottom: Int,
+        marginPx: Int,
+        minHeightPx: Int,
+        maxHeightPx: Int,
+    ): Int? = OnboardingDecorationSizing.fitHeight(
+        availablePx = usableBottom - cardBottom - marginPx,
+        minHeightPx = minHeightPx,
+        maxHeightPx = maxHeightPx,
+    )
+
+    private fun decideFit(container: View) {
+        val height = computeDaxFitHeight(container) ?: return
+        applyDaxHeight(container, height)
+        applyFitResult(container, true)
+    }
+
+    private fun applyDaxHeight(container: View, height: Int) {
+        val dax = container.findViewById<LottieAnimationView>(R.id.wavingDax) ?: return
+        val density = dax.resources.displayMetrics.density
+        val maxHeightPx = (wavingDaxSpec.maxHeightDp * density).toInt()
+        val scale = daxHorizontalScale(height, maxHeightPx)
+        dax.translationX = wavingDaxSpec.translationXDp * density * scale
+        if (dax.layoutParams.height != height) {
+            dax.layoutParams = dax.layoutParams.apply { this.height = height }
+        }
     }
 
     /**
-     * Half the gap between a rotated view's axis-aligned bounding box and its true content size on one
-     * axis. A rotated Dax's bounding box gains empty triangular corners; subtracting this inset from each
-     * edge recovers the content box so [daxFits] tests the artwork rather than a corner that merely grazes
-     * the card (which otherwise hid the rotated subscription Dax in landscape). Zero for a non-rotated Dax.
+     * Fraction by which to scale the Dax's horizontal peek so it shrinks in step with its height: the
+     * shrunk [heightPx] over [maxHeightPx]. Falls back to 1 when [maxHeightPx] is non-positive. Pure so
+     * it can be unit-tested without a device.
      */
-    internal fun rotationInset(boundingBoxExtent: Float, contentExtent: Float): Float =
-        ((boundingBoxExtent - contentExtent) / 2f).coerceAtLeast(0f)
+    internal fun daxHorizontalScale(heightPx: Int, maxHeightPx: Int): Float =
+        if (maxHeightPx > 0) heightPx.toFloat() / maxHeightPx else 1f
 
-    private fun decideFit(container: View) {
-        if (computeDaxFits(container) == true) applyFitResult(container, true)
-    }
-
-    private fun computeDaxFits(container: View): Boolean? {
+    private fun computeDaxFitHeight(container: View): Int? {
         if (!container.isShown || container.isPhoneLandscape()) return null
 
-        val dax = container.findViewById<LottieAnimationView>(R.id.wavingDax) ?: return null
         val cardView = container.findViewById<DaxOnboardingBubbleBrandDesignUpdateCardView>(R.id.brandDesignCardView) ?: return null
-        val finBounds = cardView.arrowBounds() ?: return null
 
-        val daxRect = RectF()
-        viewBoundsOnScreen(dax, daxRect)
-
-        val insetX = rotationInset(daxRect.width(), dax.width * abs(dax.scaleX))
-        val insetY = rotationInset(daxRect.height(), dax.height * abs(dax.scaleY))
+        val density = container.resources.displayMetrics.density
+        val marginPx = (DAX_FIT_MARGIN_DP * density).toInt()
+        val minHeightPx = (wavingDaxSpec.minHeightDp * density).toInt()
+        val maxHeightPx = (wavingDaxSpec.maxHeightDp * density).toInt()
 
         val cardLoc = IntArray(2)
         cardView.getLocationOnScreen(cardLoc)
+        val cardBottom = cardLoc[1] + cardView.height
 
-        return daxFits(
-            daxTop = (daxRect.top + insetY).toInt(),
-            daxLeft = (daxRect.left + insetX).toInt(),
-            daxRight = (daxRect.right - insetX).toInt(),
-            cardBodyBottom = cardLoc[1] + finBounds.top.toInt(),
-            finBottom = cardLoc[1] + finBounds.bottom.toInt(),
-            finLeft = cardLoc[0] + finBounds.left.toInt(),
-            finRight = cardLoc[0] + finBounds.right.toInt(),
+        val visibleFrame = Rect()
+        container.getWindowVisibleDisplayFrame(visibleFrame)
+        val usableBottom = visibleFrame.bottom
+
+        return daxFitHeight(
+            usableBottom = usableBottom,
+            cardBottom = cardBottom,
+            marginPx = marginPx,
+            minHeightPx = minHeightPx,
+            maxHeightPx = maxHeightPx,
         )
     }
 
@@ -172,14 +183,6 @@ internal class WavingDaxController(
             addUpdateListener { cardView.setArrowDepthFraction(it.animatedValue as Float) }
         }
 
-    private fun viewBoundsOnScreen(view: View, out: RectF) {
-        out.set(0f, 0f, view.width.toFloat(), view.height.toFloat())
-        view.matrix.mapRect(out)
-        val loc = IntArray(2)
-        (view.parent as? View)?.getLocationOnScreen(loc)
-        out.offset((loc[0] + view.left).toFloat(), (loc[1] + view.top).toFloat())
-    }
-
     private fun View.isPhoneLandscape(): Boolean =
         !deviceInfo.isTablet() &&
             context.resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
@@ -188,5 +191,6 @@ internal class WavingDaxController(
         private const val FIT_SETTLE_DELAY_MS = 100L
         private const val DAX_WAVE_START_FRAME = 17
         private const val ARROW_DEPTH_ANIMATION_DURATION = 200L
+        private const val DAX_FIT_MARGIN_DP = 8
     }
 }
