@@ -42,13 +42,15 @@ interface AdBlockingStatusChecker {
     fun isShownInSettingsFlow(): Flow<Boolean>
 
     fun isUserEnabledFlow(): Flow<Boolean>
+
+    fun isUserEnabled(): Boolean
 }
 
 @SingleInstanceIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class RealAdBlockingStatusChecker @Inject constructor(
     private val feature: AdBlockingExtensionFeature,
-    settingsRepository: AdBlockingSettingsRepository,
+    private val settingsRepository: AdBlockingSettingsRepository,
     @AppCoroutineScope appScope: CoroutineScope,
 ) : AdBlockingStatusChecker {
 
@@ -79,5 +81,10 @@ class RealAdBlockingStatusChecker @Inject constructor(
 
     override fun isShownInSettingsFlow(): Flow<Boolean> = feature.self().enabled()
 
+    private val isUserEnabled: StateFlow<Boolean> = isUserEnabledFlow()
+        .stateIn(appScope, SharingStarted.Eagerly, false)
+
     override fun isUserEnabledFlow(): Flow<Boolean> = userEnabled
+
+    override fun isUserEnabled(): Boolean = isUserEnabled.value
 }

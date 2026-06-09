@@ -180,7 +180,13 @@ class RealDuckPlayer @Inject constructor(
     }
 
     override fun getUserPreferences(): UserPreferences {
-        return duckPlayerFeatureRepository.getUserPreferences(if (adBlockingStatusChecker.isShownInSettings()) Disabled else AlwaysAsk)
+        return duckPlayerFeatureRepository.getUserPreferences(
+            if (adBlockingStatusChecker.isShownInSettings() && adBlockingStatusChecker.isUserEnabled()) {
+                Disabled
+            } else {
+                AlwaysAsk
+            },
+        )
     }
 
     override fun shouldHideDuckPlayerOverlay(): Boolean {
@@ -203,9 +209,14 @@ class RealDuckPlayer @Inject constructor(
 
     @OptIn(ExperimentalCoroutinesApi::class)
     override fun observeUserPreferences(): Flow<UserPreferences> {
-        return adBlockingStatusChecker.isShownInSettingsFlow()
-            .flatMapLatest { isShownInSettings ->
-                duckPlayerFeatureRepository.observeUserPreferences(if (isShownInSettings) Disabled else AlwaysAsk)
+        return combine(
+            adBlockingStatusChecker.isShownInSettingsFlow(),
+            adBlockingStatusChecker.isUserEnabledFlow(),
+        ) { isShownInSettings, isUserEnabled ->
+            isShownInSettings && isUserEnabled
+        }
+            .flatMapLatest { consentGated ->
+                duckPlayerFeatureRepository.observeUserPreferences(if (consentGated) Disabled else AlwaysAsk)
             }
             .map { UserPreferences(it.overlayInteracted, it.privatePlayerMode) }
     }

@@ -155,6 +155,39 @@ class RealAdBlockingStatusCheckerTest {
     }
 
     @Test
+    fun whenUserHasSetTrueThenIsUserEnabledReturnsTrue() {
+        userEnabledFlow.value = true
+
+        assertTrue(checker.isUserEnabled())
+    }
+
+    @Test
+    fun whenUserHasSetFalseThenIsUserEnabledReturnsFalseEvenIfDefaultIsTrue() {
+        userEnabledFlow.value = false
+        enabledByDefaultFlow.value = true
+
+        assertFalse(checker.isUserEnabled())
+    }
+
+    @Test
+    fun whenUserHasNoPreferenceThenIsUserEnabledReturnsDefault() {
+        userEnabledFlow.value = null
+        enabledByDefaultFlow.value = true
+
+        assertTrue(checker.isUserEnabled())
+    }
+
+    @Test
+    fun whenUserHasNoPreferenceAndDefaultChangesThenIsUserEnabledReflectsIt() {
+        userEnabledFlow.value = null
+        enabledByDefaultFlow.value = false
+        assertFalse(checker.isUserEnabled())
+
+        enabledByDefaultFlow.value = true
+        assertTrue(checker.isUserEnabled())
+    }
+
+    @Test
     fun whenKillSwitchIsOnThenIsShownInSettings() {
         assertTrue(checker.isShownInSettings())
     }

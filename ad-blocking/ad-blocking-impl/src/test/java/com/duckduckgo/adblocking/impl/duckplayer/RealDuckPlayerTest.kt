@@ -103,6 +103,8 @@ class RealDuckPlayerTest {
         setFeatureToggle(true)
         whenever(mockAdBlockingStatusChecker.isShownInSettings()).thenReturn(false)
         whenever(mockAdBlockingStatusChecker.isShownInSettingsFlow()).thenReturn(flowOf(false))
+        whenever(mockAdBlockingStatusChecker.isUserEnabled()).thenReturn(false)
+        whenever(mockAdBlockingStatusChecker.isUserEnabledFlow()).thenReturn(flowOf(false))
         whenever(mockDuckPlayerFeatureRepository.getDuckPlayerDisabledHelpPageLink())
             .thenReturn(null)
         whenever(mockDuckPlayerFeatureRepository.getVideoIDQueryParam()).thenReturn("v")
@@ -234,6 +236,39 @@ class RealDuckPlayerTest {
         assertEquals(AlwaysAsk, result.privatePlayerMode)
     }
 
+    @Test
+    fun whenAdBlockingShownInSettingsAndUserEnabled_getUserPreferencesUsesDisabledAsDefault() = runTest {
+        whenever(mockAdBlockingStatusChecker.isShownInSettings()).thenReturn(true)
+        whenever(mockAdBlockingStatusChecker.isUserEnabled()).thenReturn(true)
+        whenever(mockDuckPlayerFeatureRepository.getUserPreferences(any())).thenReturn(UserPreferences(false, Disabled))
+
+        testee.getUserPreferences()
+
+        verify(mockDuckPlayerFeatureRepository).getUserPreferences(Disabled)
+    }
+
+    @Test
+    fun whenAdBlockingShownInSettingsButUserNotEnabled_getUserPreferencesUsesAlwaysAskAsDefault() = runTest {
+        whenever(mockAdBlockingStatusChecker.isShownInSettings()).thenReturn(true)
+        whenever(mockAdBlockingStatusChecker.isUserEnabled()).thenReturn(false)
+        whenever(mockDuckPlayerFeatureRepository.getUserPreferences(any())).thenReturn(UserPreferences(false, AlwaysAsk))
+
+        testee.getUserPreferences()
+
+        verify(mockDuckPlayerFeatureRepository).getUserPreferences(AlwaysAsk)
+    }
+
+    @Test
+    fun whenAdBlockingNotShownInSettings_getUserPreferencesUsesAlwaysAskAsDefault() = runTest {
+        whenever(mockAdBlockingStatusChecker.isShownInSettings()).thenReturn(false)
+        whenever(mockAdBlockingStatusChecker.isUserEnabled()).thenReturn(true)
+        whenever(mockDuckPlayerFeatureRepository.getUserPreferences(any())).thenReturn(UserPreferences(false, AlwaysAsk))
+
+        testee.getUserPreferences()
+
+        verify(mockDuckPlayerFeatureRepository).getUserPreferences(AlwaysAsk)
+    }
+
     // endregion
 
     // region shouldHideDuckPlayerOverlay
@@ -276,8 +311,9 @@ class RealDuckPlayerTest {
     }
 
     @Test
-    fun whenAdBlockingShownInSettings_observeUserPreferencesUsesDisabledAsDefault() = runTest {
+    fun whenAdBlockingShownInSettingsAndUserEnabled_observeUserPreferencesUsesDisabledAsDefault() = runTest {
         whenever(mockAdBlockingStatusChecker.isShownInSettingsFlow()).thenReturn(flowOf(true))
+        whenever(mockAdBlockingStatusChecker.isUserEnabledFlow()).thenReturn(flowOf(true))
         whenever(mockDuckPlayerFeatureRepository.observeUserPreferences(any())).thenReturn(flowOf(UserPreferences(false, Disabled)))
 
         testee.observeUserPreferences().first()
@@ -286,8 +322,31 @@ class RealDuckPlayerTest {
     }
 
     @Test
+    fun whenAdBlockingShownInSettingsButUserNotEnabled_observeUserPreferencesUsesAlwaysAskAsDefault() = runTest {
+        whenever(mockAdBlockingStatusChecker.isShownInSettingsFlow()).thenReturn(flowOf(true))
+        whenever(mockAdBlockingStatusChecker.isUserEnabledFlow()).thenReturn(flowOf(false))
+        whenever(mockDuckPlayerFeatureRepository.observeUserPreferences(any())).thenReturn(flowOf(UserPreferences(false, AlwaysAsk)))
+
+        testee.observeUserPreferences().first()
+
+        verify(mockDuckPlayerFeatureRepository).observeUserPreferences(AlwaysAsk)
+    }
+
+    @Test
+    fun whenAdBlockingNotShownInSettingsButUserEnabled_observeUserPreferencesUsesAlwaysAskAsDefault() = runTest {
+        whenever(mockAdBlockingStatusChecker.isShownInSettingsFlow()).thenReturn(flowOf(false))
+        whenever(mockAdBlockingStatusChecker.isUserEnabledFlow()).thenReturn(flowOf(true))
+        whenever(mockDuckPlayerFeatureRepository.observeUserPreferences(any())).thenReturn(flowOf(UserPreferences(false, AlwaysAsk)))
+
+        testee.observeUserPreferences().first()
+
+        verify(mockDuckPlayerFeatureRepository).observeUserPreferences(AlwaysAsk)
+    }
+
+    @Test
     fun whenAdBlockingNotShownInSettings_observeUserPreferencesUsesAlwaysAskAsDefault() = runTest {
         whenever(mockAdBlockingStatusChecker.isShownInSettingsFlow()).thenReturn(flowOf(false))
+        whenever(mockAdBlockingStatusChecker.isUserEnabledFlow()).thenReturn(flowOf(false))
         whenever(mockDuckPlayerFeatureRepository.observeUserPreferences(any())).thenReturn(flowOf(UserPreferences(false, AlwaysAsk)))
 
         testee.observeUserPreferences().first()
