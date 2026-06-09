@@ -30,6 +30,7 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -125,8 +126,18 @@ class OptionsViewModelTest {
     }
 
     @Test
-    fun whenVisibleToolsClearsSelectionThenNoPixel() {
-        testee.updateVisibleTools(emptySet())
+    fun whenVisibleToolsAutoClearsSelectedToolThenNoPixel() = runTest {
+        val tabId = "tab-E"
+        store.publish(tabId, NativeInputState.zero().copy(selectedTool = Tool.WEB_SEARCH.rawValue))
+        selectedTabFlow.value = tabEntity(tabId)
+        advanceUntilIdle()
+        assertEquals(Tool.WEB_SEARCH, testee.selectedTool.value)
+
+        // A model-capability change that removes the selected tool must auto-clear it
+        // (updateVisibleTools returns true) WITHOUT firing a deselect pixel.
+        val selectionCleared = testee.updateVisibleTools(emptySet())
+
+        assertTrue(selectionCleared)
         verifyNoInteractions(duckChatPixels)
     }
 

@@ -250,7 +250,7 @@ class OptionsView(context: Context, private val host: NativeInputHost) : LinearL
         view.findViewById<ImageView>(R.id.optionsChipIcon).setImageResource(item.iconRes)
         view.contentDescription = context.getString(R.string.duckChatOptionsChipDismissContentDescription, context.getString(item.titleRes))
         view.setOnClickListener {
-            viewModel.selectedTool.value?.let { viewModel.onToolDeselectedByUser(it) }
+            viewModel.onToolDeselectedByUser(item.tool)
             host.toolSelected(null)
         }
         return view
