@@ -36,6 +36,7 @@ import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
 import com.duckduckgo.duckchat.impl.models.ImageLimits
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.ui.nativeinput.attachment.ImageAttachment
 import com.duckduckgo.duckchat.impl.ui.nativeinput.attachment.LimitsHandler
 import com.duckduckgo.duckchat.impl.ui.nativeinput.file.FileAttachment
@@ -61,13 +62,19 @@ import kotlin.math.max
 class AttachmentViewModel @Inject constructor(
     private val duckChatInternal: DuckChatInternal,
     private val dispatchers: DispatcherProvider,
-    modelManager: DuckAiModelManager,
+    private val modelManager: DuckAiModelManager,
     private val limitsHandler: LimitsHandler,
     private val fileAttachmentProcessor: FileAttachmentProcessor,
     private val context: Context,
     private val appBuildConfig: AppBuildConfig,
     nativeInputStateProvider: NativeInputStateProvider,
+    private val duckChatPixels: DuckChatPixels,
 ) : ViewModel() {
+
+    enum class ImageSource(val pixelValue: String) {
+        CAMERA("camera"),
+        PHOTO_LIBRARY("photo_library"),
+    }
 
     data class AttachmentState(
         val images: List<ImageAttachment> = emptyList(),
@@ -130,11 +137,12 @@ class AttachmentViewModel @Inject constructor(
         )
     }.stateIn(scope = viewModelScope, started = SharingStarted.Eagerly, initialValue = AttachmentState())
 
-    fun onImagesPicked(uris: List<Uri>) {
+    fun onImagesPicked(uris: List<Uri>, source: ImageSource) {
         viewModelScope.launch {
             uris.forEach { uri ->
                 val attachment = withContext(dispatchers.io()) { processImage(uri) } ?: return@forEach
                 imageAttachments.update { it + attachment }
+                duckChatPixels.fireImageAttached(source.pixelValue)
             }
         }
     }
@@ -142,8 +150,13 @@ class AttachmentViewModel @Inject constructor(
     fun onFilesPicked(uris: List<Uri>) {
         viewModelScope.launch {
             for (uri in uris) {
-                val attachment = fileAttachmentProcessor.processFile(context, uri) ?: continue
+                val attachment = fileAttachmentProcessor.processFile(context, uri)
+                if (attachment == null) {
+                    duckChatPixels.fireFileValidationFailed(FILE_VALIDATION_OTHER)
+                    continue
+                }
                 _fileAttachments.update { it + attachment }
+                fireFileAcceptedOrRejectedPixel(attachment)
             }
         }
     }
@@ -157,25 +170,70 @@ class AttachmentViewModel @Inject constructor(
             imageUris.forEach { uri ->
                 val attachment = withContext(dispatchers.io()) { processImage(uri) } ?: return@forEach
                 imageAttachments.update { it + attachment }
+                duckChatPixels.fireImageAttached(ImageSource.PHOTO_LIBRARY.pixelValue)
             }
             for (uri in fileUris) {
-                val attachment = fileAttachmentProcessor.processFile(context, uri) ?: continue
+                val attachment = fileAttachmentProcessor.processFile(context, uri)
+                if (attachment == null) {
+                    duckChatPixels.fireFileValidationFailed(FILE_VALIDATION_OTHER)
+                    continue
+                }
                 _fileAttachments.update { it + attachment }
+                fireFileAcceptedOrRejectedPixel(attachment)
             }
+        }
+    }
+
+    /**
+     * Fired once per picked file, after it has been added to the list. Files are always added; limit
+     * violations are reflected as derived error state rather than an explicit rejection, so this is the
+     * single transition point where we can attribute a reason to a freshly-picked file exactly once.
+     */
+    private fun fireFileAcceptedOrRejectedPixel(added: FileAttachment) {
+        val reason = resolveFileValidationReason(added)
+        if (reason != null) {
+            duckChatPixels.fireFileValidationFailed(reason)
+        } else {
+            duckChatPixels.fireFileAttached()
+        }
+    }
+
+    private fun resolveFileValidationReason(added: FileAttachment): String? {
+        val fileLimits = modelManager.modelState.value.attachmentLimits.files
+        val isDuckAiMode = isDuckAiModeFlow.value
+        val files = _fileAttachments.value
+        val conversationFilesUsed = limitsHandler.conversationFilesUsed.value
+        val totalFiles = files.size + if (isDuckAiMode) conversationFilesUsed.count else 0
+        val totalFileSizeBytes = files.sumOf { it.sizeBytes } + if (isDuckAiMode) conversationFilesUsed.sizeBytes else 0L
+        return when {
+            added.sizeBytes > fileLimits.maxFileSizeBytes -> FILE_VALIDATION_SIZE_EXCEEDED
+            totalFileSizeBytes > fileLimits.maxTotalFileSizeBytes -> FILE_VALIDATION_SIZE_EXCEEDED
+            totalFiles > fileLimits.maxPerConversation -> FILE_VALIDATION_COUNT_EXCEEDED
+            (added.pageCount ?: 0) > fileLimits.maxPagesPerFile -> FILE_VALIDATION_OTHER
+            else -> null
         }
     }
 
     fun removeImageAttachment(id: String) {
         var toRecycle: Bitmap? = null
+        var removed = false
         imageAttachments.update { list ->
-            toRecycle = list.find { it.id == id }?.bitmap
+            val match = list.find { it.id == id }
+            toRecycle = match?.bitmap
+            removed = match != null
             list.filter { it.id != id }
         }
+        if (removed) duckChatPixels.fireImageRemoved()
         viewModelScope.launch { toRecycle?.recycle() }
     }
 
     fun removeFileAttachment(id: String) {
-        _fileAttachments.update { list -> list.filter { it.id != id } }
+        var removed = false
+        _fileAttachments.update { list ->
+            removed = list.any { it.id == id }
+            list.filter { it.id != id }
+        }
+        if (removed) duckChatPixels.fireFileRemoved()
     }
 
     fun clearAttachments() {
@@ -315,5 +373,8 @@ class AttachmentViewModel @Inject constructor(
     companion object {
         private const val COMPRESSION_QUALITY = 85
         private const val MAX_DIMENSION_PX = 512
+        private const val FILE_VALIDATION_SIZE_EXCEEDED = "size_exceeded"
+        private const val FILE_VALIDATION_COUNT_EXCEEDED = "count_exceeded"
+        private const val FILE_VALIDATION_OTHER = "other"
     }
 }
