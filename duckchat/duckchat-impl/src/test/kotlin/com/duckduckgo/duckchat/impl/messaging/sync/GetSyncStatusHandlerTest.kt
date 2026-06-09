@@ -58,6 +58,7 @@ class GetSyncStatusHandlerTest {
         handler = GetSyncStatusHandler(
             syncStatusHelper = mockSyncStatusHelper,
             duckAiHostProvider = mockDuckAiHostProvider,
+            browserMode = BrowserMode.REGULAR,
         )
     }
 
@@ -153,7 +154,11 @@ class GetSyncStatusHandlerTest {
     fun `when in Fire mode then sync is reported unavailable without consulting account state`() {
         val unavailable = JSONObject().apply { put("syncAvailable", false) }
         whenever(mockSyncStatusHelper.unavailablePayload()).thenReturn(unavailable)
-        whenever(mockJsMessaging.browserMode).thenReturn(BrowserMode.FIRE)
+        handler = GetSyncStatusHandler(
+            syncStatusHelper = mockSyncStatusHelper,
+            duckAiHostProvider = mockDuckAiHostProvider,
+            browserMode = BrowserMode.FIRE,
+        )
 
         handler.getJsMessageHandler().process(createJsMessage("test-id"), mockJsMessaging, null)
 

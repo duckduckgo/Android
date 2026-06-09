@@ -65,6 +65,7 @@ class SetUpSyncHandlerTest {
             context = mockContext,
             deviceSyncState = mockDeviceSyncState,
             duckAiHostProvider = mockDuckAiHostProvider,
+            browserMode = BrowserMode.REGULAR,
         )
     }
 
@@ -164,7 +165,13 @@ class SetUpSyncHandlerTest {
     fun `when in Fire mode then setup is refused and no activity is started`() {
         configureSyncEnabled()
         configureSignedOut()
-        whenever(mockJsMessaging.browserMode).thenReturn(BrowserMode.FIRE)
+        handler = SetUpSyncHandler(
+            globalActivityStarter = mockGlobalActivityStarter,
+            context = mockContext,
+            deviceSyncState = mockDeviceSyncState,
+            duckAiHostProvider = mockDuckAiHostProvider,
+            browserMode = BrowserMode.FIRE,
+        )
         val jsMessage = createJsMessage("sendToSetupSync", "test-id")
 
         handler.getJsMessageHandler().process(jsMessage, mockJsMessaging, null)

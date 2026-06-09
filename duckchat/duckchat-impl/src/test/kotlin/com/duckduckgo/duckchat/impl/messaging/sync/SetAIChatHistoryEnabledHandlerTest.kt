@@ -24,7 +24,6 @@ import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import com.duckduckgo.duckchat.impl.messaging.fakes.FakeJsMessaging
 import com.duckduckgo.duckchat.impl.repository.DuckChatFeatureRepository
 import com.duckduckgo.js.messaging.api.JsMessage
-import com.duckduckgo.js.messaging.api.JsMessaging
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.test.runTest
 import org.json.JSONObject
@@ -60,6 +59,7 @@ class SetAIChatHistoryEnabledHandlerTest {
             duckAiHostProvider = mockDuckAiHostProvider,
             dispatchers = dispatchers,
             appCoroutineScope = appCoroutineScope,
+            browserMode = BrowserMode.REGULAR,
         )
     }
 
@@ -85,10 +85,16 @@ class SetAIChatHistoryEnabledHandlerTest {
 
     @Test
     fun `when in Fire mode then repository is not called`() = runTest {
-        val fireJsMessaging = mock<JsMessaging>().also { whenever(it.browserMode).thenReturn(BrowserMode.FIRE) }
+        handler = SetAIChatHistoryEnabledHandler(
+            duckChatFeatureRepository = mockDuckChatFeatureRepository,
+            duckAiHostProvider = mockDuckAiHostProvider,
+            dispatchers = dispatchers,
+            appCoroutineScope = appCoroutineScope,
+            browserMode = BrowserMode.FIRE,
+        )
         val jsMessage = createJsMessage(JSONObject().apply { put("enabled", true) })
 
-        handler.getJsMessageHandler().process(jsMessage, fireJsMessaging, null)
+        handler.getJsMessageHandler().process(jsMessage, fakeJsMessaging, null)
 
         verifyNoInteractions(mockDuckChatFeatureRepository)
     }

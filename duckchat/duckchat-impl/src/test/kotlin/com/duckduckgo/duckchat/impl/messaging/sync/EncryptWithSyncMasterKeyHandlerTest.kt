@@ -62,6 +62,7 @@ class EncryptWithSyncMasterKeyHandlerTest {
             deviceSyncState = mockDeviceSyncState,
             duckAiHostProvider = mockDuckAiHostProvider,
             duckChatPixels = mockDuckChatPixels,
+            browserMode = BrowserMode.REGULAR,
         )
     }
 
@@ -201,7 +202,13 @@ class EncryptWithSyncMasterKeyHandlerTest {
     fun `when in Fire mode then encryption is refused even if signed in`() {
         configureSyncEnabled()
         configureSignedIn()
-        whenever(mockJsMessaging.browserMode).thenReturn(BrowserMode.FIRE)
+        handler = EncryptWithSyncMasterKeyHandler(
+            crypto = mockCrypto,
+            deviceSyncState = mockDeviceSyncState,
+            duckAiHostProvider = mockDuckAiHostProvider,
+            duckChatPixels = mockDuckChatPixels,
+            browserMode = BrowserMode.FIRE,
+        )
         val jsMessage = createJsMessage(TEST_MESSAGE_ID, JSONObject().apply { put("data", BASE64_URL_DATA) })
 
         handler.getJsMessageHandler().process(jsMessage, mockJsMessaging, null)
