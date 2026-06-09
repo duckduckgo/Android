@@ -147,7 +147,7 @@ class SharedPreferencesDuckPlayerDataStore @Inject constructor(
             prefs[PRIVATE_PLAYER_MODE]
         }
         .distinctUntilChanged()
-        .stateIn(appCoroutineScope, SharingStarted.Eagerly, "ALWAYS_ASK")
+        .stateIn(appCoroutineScope, SharingStarted.Eagerly, null)
 
     private val duckPlayerDisabledHelpPageLink: StateFlow<String> = store.data
         .map { prefs ->
