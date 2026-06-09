@@ -548,4 +548,11 @@ class NewTabReturnHatchViewModelTest {
         verify(mockPixel).fire(NewTabReturnHatchPixelName.OPTION_SELECTED_TAB_SWITCHER, type = Count)
         verify(mockPixel).fire(NewTabReturnHatchPixelName.OPTION_SELECTED_TAB_SWITCHER_DAILY, type = Daily())
     }
+
+    @Test
+    fun whenOnTabManagerPressedThenNotifiesNtpAfterIdleManager() = runTest {
+        testee.onTabManagerPressed()
+
+        verify(mockNtpAfterIdleManager).onTabSwitcherSelected()
+    }
 }
