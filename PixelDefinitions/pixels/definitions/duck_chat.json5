@@ -880,6 +880,21 @@
             }
         ]
     },
+    "m_aichat_unified_input_chat_header_upgrade_tapped": {
+        "description": "User tapped the Upgrade pill in the Duck.ai omnibar header (shown only while the subscription is inactive)",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "user_tier",
+                "type": "string",
+                "description": "The tapper's current tier",
+                "enum": ["free", "plus"]
+            }
+        ]
+    },
     "m_aichat_unified_input_image_validation_failed_count": {
         "description": "An image the user attempted to attach in the Unified Input failed validation",
         "owners": ["malmstein"],
