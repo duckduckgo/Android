@@ -28,16 +28,16 @@ import javax.inject.Qualifier
 
 @ContributesTo(AppScope::class)
 @Module
-object NewAddressBarOptionV2DataStoreModule {
+object NewAddressBarPickerDataStoreModule {
 
-    private val Context.newAddressBarOptionV2DataStore: DataStore<Preferences> by preferencesDataStore(
-        name = "new_address_bar_option_v2",
+    private val Context.newAddressBarPickerDataStore: DataStore<Preferences> by preferencesDataStore(
+        name = "new_address_bar_picker",
     )
 
     @Provides
-    @NewAddressBarOptionV2
-    fun provideNewAddressBarOptionV2DataStore(context: Context): DataStore<Preferences> = context.newAddressBarOptionV2DataStore
+    @NewAddressBarPicker
+    fun provideNewAddressBarPickerDataStore(context: Context): DataStore<Preferences> = context.newAddressBarPickerDataStore
 }
 
 @Qualifier
-internal annotation class NewAddressBarOptionV2
+internal annotation class NewAddressBarPicker

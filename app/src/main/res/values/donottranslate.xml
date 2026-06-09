@@ -132,6 +132,6 @@
     <string name="preOnboardingDaxDialog3ButtonCustomAi">Start AI Chat</string>
 
     <!-- V2 New Address Bar Picker (post-onboarding Duck.ai toggle promotion) -->
-    <string name="newAddressBarOptionV2Eyebrow">Address Bar Option</string>
-    <string name="newAddressBarOptionV2Confirm">Confirm</string>
+    <string name="newAddressBarPickerEyebrow">Address Bar Option</string>
+    <string name="newAddressBarPickerConfirm">Confirm</string>
 </resources>

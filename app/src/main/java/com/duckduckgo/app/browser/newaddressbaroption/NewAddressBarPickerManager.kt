@@ -40,30 +40,29 @@ import logcat.LogPriority.DEBUG
 import logcat.logcat
 import javax.inject.Inject
 
-interface NewAddressBarOptionV2Manager {
+interface NewAddressBarPickerManager {
     suspend fun showChoiceScreen(activity: DuckDuckGoActivity)
 }
 
 @SingleInstanceIn(AppScope::class)
 @ContributesBinding(AppScope::class)
-class RealNewAddressBarOptionV2Manager @Inject constructor(
+class RealNewAddressBarPickerManager @Inject constructor(
     private val duckAiFeatureState: DuckAiFeatureState,
     private val duckChat: DuckChat,
     private val userStageStore: UserStageStore,
-    private val newAddressBarOptionV2DataStore: NewAddressBarOptionV2DataStore,
-    private val newAddressBarOptionV2BottomSheetDialogFactory: NewAddressBarOptionV2BottomSheetDialogFactory,
+    private val newAddressBarPickerDataStore: NewAddressBarPickerDataStore,
+    private val newAddressBarPickerBottomSheetDialogFactory: NewAddressBarPickerBottomSheetDialogFactory,
     private val pixel: Pixel,
     private val appTheme: AppTheme,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val dispatchers: DispatcherProvider = DefaultDispatcherProvider(),
-) : NewAddressBarOptionV2Manager {
+) : NewAddressBarPickerManager {
     private val showChoiceScreenMutex = Mutex()
 
     override suspend fun showChoiceScreen(activity: DuckDuckGoActivity) {
         showChoiceScreenMutex.withLock {
             if (validate(activity)) {
-                logcat(DEBUG) { "NewAddressBarOptionV2Manager: All conditions met, showing choice screen" }
-                newAddressBarOptionV2DataStore.setAsShown()
+                logcat(DEBUG) { "NewAddressBarPickerManager: All conditions met, showing choice screen" }
                 withContext(dispatchers.main()) {
                     showChoiceScreenDialog(activity)
                 }
@@ -72,57 +71,58 @@ class RealNewAddressBarOptionV2Manager @Inject constructor(
     }
 
     private suspend fun validate(activity: Activity): Boolean =
-        isV2Enabled() &&
+        isPickerEnabled() &&
             isDuckAiEnabled() &&
             isOnboardingCompleted() &&
             isInputScreenNeverEnabled() &&
             hasNotShownBefore() &&
             isActivityValid(activity)
 
-    private fun isV2Enabled(): Boolean =
-        duckAiFeatureState.showAIChatAddressBarOptionChoiceScreenV2.value.also {
-            logcat(DEBUG) { "NewAddressBarOptionV2Manager: $it isV2Enabled" }
+    private fun isPickerEnabled(): Boolean =
+        duckAiFeatureState.showAIChatAddressBarOptionChoiceScreen.value.also {
+            logcat(DEBUG) { "NewAddressBarPickerManager: $it isPickerEnabled" }
         }
 
     private fun isDuckAiEnabled(): Boolean =
         duckChat.isEnabled().also {
-            logcat(DEBUG) { "NewAddressBarOptionV2Manager: $it isDuckAiEnabled" }
+            logcat(DEBUG) { "NewAddressBarPickerManager: $it isDuckAiEnabled" }
         }
 
     private suspend fun isOnboardingCompleted(): Boolean =
         (userStageStore.getUserAppStage() == AppStage.ESTABLISHED).also {
-            logcat(DEBUG) { "NewAddressBarOptionV2Manager: $it isOnboardingCompleted" }
+            logcat(DEBUG) { "NewAddressBarPickerManager: $it isOnboardingCompleted" }
         }
 
     private suspend fun isInputScreenNeverEnabled(): Boolean =
         (!duckChat.isInputScreenEverEnabled()).also {
-            logcat(DEBUG) { "NewAddressBarOptionV2Manager: $it isInputScreenNeverEnabled" }
+            logcat(DEBUG) { "NewAddressBarPickerManager: $it isInputScreenNeverEnabled" }
         }
 
     private suspend fun hasNotShownBefore(): Boolean =
-        (!newAddressBarOptionV2DataStore.wasShown()).also {
-            logcat(DEBUG) { "NewAddressBarOptionV2Manager: $it hasNotShownBefore" }
+        (!newAddressBarPickerDataStore.wasShown()).also {
+            logcat(DEBUG) { "NewAddressBarPickerManager: $it hasNotShownBefore" }
         }
 
     private fun isActivityValid(activity: Activity): Boolean =
         (!activity.isFinishing && !activity.isDestroyed).also {
-            logcat(DEBUG) { "NewAddressBarOptionV2Manager: $it isActivityValid" }
+            logcat(DEBUG) { "NewAddressBarPickerManager: $it isActivityValid" }
         }
 
     private fun showChoiceScreenDialog(activity: DuckDuckGoActivity) {
-        newAddressBarOptionV2BottomSheetDialogFactory.create(
+        newAddressBarPickerBottomSheetDialogFactory.create(
             context = activity,
             isLightMode = appTheme.isLightModeEnabled(),
             callback =
-            object : NewAddressBarV2Callback {
+            object : NewAddressBarCallback {
                 override fun onDisplayed() {
                     pixel.fire(AppPixelName.NEW_ADDRESS_BAR_PICKER_V2_DISPLAYED_COUNT)
                     pixel.fire(AppPixelName.NEW_ADDRESS_BAR_PICKER_V2_DISPLAYED_DAILY, type = Pixel.PixelType.Daily())
                 }
 
                 override fun onConfirmed(searchAndAiSelected: Boolean) {
-                    if (searchAndAiSelected) {
-                        appCoroutineScope.launch {
+                    appCoroutineScope.launch {
+                        newAddressBarPickerDataStore.setAsShown()
+                        if (searchAndAiSelected) {
                             duckChat.setInputScreenUserSetting(true)
                         }
                     }

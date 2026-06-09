@@ -38,7 +38,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/keyline_3"
         android:letterSpacing="0.08"
-        android:text="@string/newAddressBarOptionV2Eyebrow"
+        android:text="@string/newAddressBarPickerEyebrow"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/duckAiLogo"
@@ -78,7 +78,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/keyline_5"
                 android:alpha="0"
-                android:text="@string/newAddressBarOptionV2Confirm" />
+                android:text="@string/newAddressBarPickerConfirm" />
 
         </LinearLayout>
 

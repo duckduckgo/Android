@@ -1,7 +1,7 @@
 package com.duckduckgo.app.onboarding.ui
 
 import app.cash.turbine.test
-import com.duckduckgo.app.browser.newaddressbaroption.NewAddressBarOptionV2DataStore
+import com.duckduckgo.app.browser.newaddressbaroption.NewAddressBarPickerDataStore
 import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.CtaId.ADD_WIDGET
 import com.duckduckgo.app.cta.model.DismissedCta
@@ -28,14 +28,14 @@ class FullOnboardingSkipperTest {
     private val dismissedCtaDao: DismissedCtaDao = mock()
     private val userStageStore: UserStageStore = mock()
     private val settingsDataStore: SettingsDataStore = mock()
-    private val newAddressBarOptionV2DataStore: NewAddressBarOptionV2DataStore = mock()
+    private val newAddressBarPickerDataStore: NewAddressBarPickerDataStore = mock()
 
     private val testee = FullOnboardingSkipper(
         dispatchers = coroutineTestRule.testDispatcherProvider,
         settingsDataStore = settingsDataStore,
         dismissedCtaDao = dismissedCtaDao,
         userStageStore = userStageStore,
-        newAddressBarOptionV2DataStore = newAddressBarOptionV2DataStore,
+        newAddressBarPickerDataStore = newAddressBarPickerDataStore,
     )
 
     @Test
@@ -61,9 +61,9 @@ class FullOnboardingSkipperTest {
     }
 
     @Test
-    fun whenMarkOnboardingAsCompletedThenNewAddressBarOptionV2PickerSuppressed() = runTest {
+    fun whenMarkOnboardingAsCompletedThenNewAddressBarPickerSuppressed() = runTest {
         testee.markOnboardingAsCompleted()
-        verify(newAddressBarOptionV2DataStore).setAsShown()
+        verify(newAddressBarPickerDataStore).setAsShown()
     }
 
     private suspend fun verifyStoreInvocations(expectingToBeCalled: Boolean) {

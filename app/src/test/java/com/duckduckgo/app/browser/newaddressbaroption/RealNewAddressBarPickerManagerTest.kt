@@ -39,32 +39,32 @@ import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
-class RealNewAddressBarOptionV2ManagerTest {
+class RealNewAddressBarPickerManagerTest {
     @get:Rule
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
     private val duckAiFeatureStateMock: DuckAiFeatureState = mock()
     private val duckChatMock: DuckChat = mock()
     private val userStageStoreMock: UserStageStore = mock()
-    private val dataStoreMock: NewAddressBarOptionV2DataStore = mock()
-    private val dialogFactoryMock: NewAddressBarOptionV2BottomSheetDialogFactory = mock()
+    private val dataStoreMock: NewAddressBarPickerDataStore = mock()
+    private val dialogFactoryMock: NewAddressBarPickerBottomSheetDialogFactory = mock()
     private val pixelMock: Pixel = mock()
     private val appThemeMock: AppTheme = mock()
     private val dialogMock: BottomSheetDialog = mock()
 
-    private val showV2Flow = MutableStateFlow(false)
+    private val showPickerFlow = MutableStateFlow(false)
 
-    private lateinit var testee: RealNewAddressBarOptionV2Manager
+    private lateinit var testee: RealNewAddressBarPickerManager
 
     @Before
     fun setUp() =
         runTest {
-            whenever(duckAiFeatureStateMock.showAIChatAddressBarOptionChoiceScreenV2).thenReturn(showV2Flow)
+            whenever(duckAiFeatureStateMock.showAIChatAddressBarOptionChoiceScreen).thenReturn(showPickerFlow)
             whenever(dialogFactoryMock.create(any(), any(), any())).thenReturn(dialogMock)
             whenever(appThemeMock.isLightModeEnabled()).thenReturn(true)
 
             testee =
-                RealNewAddressBarOptionV2Manager(
+                RealNewAddressBarPickerManager(
                     duckAiFeatureStateMock,
                     duckChatMock,
                     userStageStoreMock,
@@ -78,22 +78,21 @@ class RealNewAddressBarOptionV2ManagerTest {
         }
 
     @Test
-    fun `when all conditions met then shows dialog and sets as shown`() =
+    fun `when all conditions met then shows dialog`() =
         runTest {
             setupAllConditionsMet()
 
             testee.showChoiceScreen(mock())
 
-            verify(dataStoreMock).setAsShown()
             verify(dialogFactoryMock).create(any(), any(), any())
             verify(dialogMock).show()
         }
 
     @Test
-    fun `when v2 flag disabled then does not show`() =
+    fun `when picker flag disabled then does not show`() =
         runTest {
             setupAllConditionsMet()
-            showV2Flow.value = false
+            showPickerFlow.value = false
 
             testee.showChoiceScreen(mock())
 
@@ -174,9 +173,9 @@ class RealNewAddressBarOptionV2ManagerTest {
     fun `when dialog displayed then fires displayed pixel`() =
         runTest {
             setupAllConditionsMet()
-            var capturedCallback: NewAddressBarV2Callback? = null
+            var capturedCallback: NewAddressBarCallback? = null
             whenever(dialogFactoryMock.create(any(), any(), any())).thenAnswer {
-                capturedCallback = it.getArgument<NewAddressBarV2Callback?>(2)
+                capturedCallback = it.getArgument<NewAddressBarCallback?>(2)
                 dialogMock
             }
 
@@ -192,9 +191,9 @@ class RealNewAddressBarOptionV2ManagerTest {
     fun `when confirmed with search and ai then enables toggle and fires confirmed pixel`() =
         runTest {
             setupAllConditionsMet()
-            var capturedCallback: NewAddressBarV2Callback? = null
+            var capturedCallback: NewAddressBarCallback? = null
             whenever(dialogFactoryMock.create(any(), any(), any())).thenAnswer {
-                capturedCallback = it.getArgument<NewAddressBarV2Callback?>(2)
+                capturedCallback = it.getArgument<NewAddressBarCallback?>(2)
                 dialogMock
             }
 
@@ -205,6 +204,7 @@ class RealNewAddressBarOptionV2ManagerTest {
             coroutineTestRule.testScope.advanceUntilIdle()
 
             verify(duckChatMock).setInputScreenUserSetting(true)
+            verify(dataStoreMock).setAsShown()
             verify(pixelMock).fire(AppPixelName.NEW_ADDRESS_BAR_PICKER_V2_CONFIRMED_COUNT, mapOf("selection" to "search_and_ai"))
             verify(pixelMock).fire(
                 AppPixelName.NEW_ADDRESS_BAR_PICKER_V2_CONFIRMED_DAILY,
@@ -217,9 +217,9 @@ class RealNewAddressBarOptionV2ManagerTest {
     fun `when confirmed with search only then does not enable toggle and fires confirmed pixel`() =
         runTest {
             setupAllConditionsMet()
-            var capturedCallback: NewAddressBarV2Callback? = null
+            var capturedCallback: NewAddressBarCallback? = null
             whenever(dialogFactoryMock.create(any(), any(), any())).thenAnswer {
-                capturedCallback = it.getArgument<NewAddressBarV2Callback?>(2)
+                capturedCallback = it.getArgument<NewAddressBarCallback?>(2)
                 dialogMock
             }
 
@@ -230,6 +230,7 @@ class RealNewAddressBarOptionV2ManagerTest {
             coroutineTestRule.testScope.advanceUntilIdle()
 
             verify(duckChatMock, never()).setInputScreenUserSetting(any())
+            verify(dataStoreMock).setAsShown()
             verify(pixelMock).fire(AppPixelName.NEW_ADDRESS_BAR_PICKER_V2_CONFIRMED_COUNT, mapOf("selection" to "search_only"))
             verify(pixelMock).fire(
                 AppPixelName.NEW_ADDRESS_BAR_PICKER_V2_CONFIRMED_DAILY,
@@ -239,7 +240,7 @@ class RealNewAddressBarOptionV2ManagerTest {
         }
 
     private suspend fun setupAllConditionsMet() {
-        showV2Flow.value = true
+        showPickerFlow.value = true
         whenever(duckChatMock.isEnabled()).thenReturn(true)
         whenever(userStageStoreMock.getUserAppStage()).thenReturn(AppStage.ESTABLISHED)
         whenever(duckChatMock.isInputScreenEverEnabled()).thenReturn(false)

@@ -20,7 +20,7 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
-import com.duckduckgo.app.di.NewAddressBarOptionV2
+import com.duckduckgo.app.di.NewAddressBarPicker
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
@@ -29,20 +29,20 @@ import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
-interface NewAddressBarOptionV2DataStore {
+interface NewAddressBarPickerDataStore {
     suspend fun setAsShown()
     suspend fun wasShown(): Boolean
 }
 
 @SingleInstanceIn(AppScope::class)
 @ContributesBinding(AppScope::class)
-class SharedPreferencesNewAddressBarOptionV2DataStore @Inject constructor(
-    @NewAddressBarOptionV2 private val dataStore: DataStore<Preferences>,
+class SharedPreferencesNewAddressBarPickerDataStore @Inject constructor(
+    @NewAddressBarPicker private val dataStore: DataStore<Preferences>,
     private val dispatchers: DispatcherProvider,
-) : NewAddressBarOptionV2DataStore {
+) : NewAddressBarPickerDataStore {
 
     private object Keys {
-        val WAS_SHOWN_KEY = booleanPreferencesKey(name = "NEW_ADDRESS_BAR_OPTION_V2_WAS_SHOWN")
+        val WAS_SHOWN_KEY = booleanPreferencesKey(name = "NEW_ADDRESS_BAR_PICKER_WAS_SHOWN")
     }
 
     override suspend fun setAsShown() {

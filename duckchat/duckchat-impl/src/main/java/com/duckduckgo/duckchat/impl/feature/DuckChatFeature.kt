@@ -97,7 +97,7 @@ interface DuckChatFeature {
      */
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     @InternalAlwaysEnabled
-    fun showAIChatAddressBarChoiceScreenV2(): Toggle
+    fun showNewAddressBarPickerScreen(): Toggle
 
     /**
      * @return `true` when the Setting for allowing Duck.ai chats to be deleted with the Fire Button is enabled

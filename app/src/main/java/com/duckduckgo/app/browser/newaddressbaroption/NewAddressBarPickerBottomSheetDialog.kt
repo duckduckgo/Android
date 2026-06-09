@@ -31,7 +31,7 @@ import androidx.core.content.ContextCompat.getString
 import androidx.core.view.isVisible
 import androidx.core.view.postDelayed
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.browser.databinding.BottomSheetNewAddressBarOptionV2Binding
+import com.duckduckgo.app.browser.databinding.BottomSheetNewAddressBarPickerBinding
 import com.duckduckgo.app.onboardingquicksetup.ui.BrandDesignInputScreenPicker.Transition
 import com.duckduckgo.common.ui.setRoundCorners
 import com.duckduckgo.common.ui.view.TypeAnimationTextView
@@ -40,14 +40,14 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 
 @SuppressLint("NoBottomSheetDialog")
-class NewAddressBarOptionV2BottomSheetDialog(
+class NewAddressBarPickerBottomSheetDialog(
     private val context: Context,
     private val isLightMode: Boolean,
-    private val callback: NewAddressBarV2Callback?,
+    private val callback: NewAddressBarCallback?,
 ) : BottomSheetDialog(context) {
 
-    private val binding: BottomSheetNewAddressBarOptionV2Binding =
-        BottomSheetNewAddressBarOptionV2Binding.inflate(LayoutInflater.from(context))
+    private val binding: BottomSheetNewAddressBarPickerBinding =
+        BottomSheetNewAddressBarPickerBinding.inflate(LayoutInflater.from(context))
 
     private var searchAndDuckAiSelected = true
     private var originalOrientation: Int = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED

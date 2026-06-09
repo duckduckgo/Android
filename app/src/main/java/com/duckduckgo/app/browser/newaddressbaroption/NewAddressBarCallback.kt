@@ -16,7 +16,7 @@
 
 package com.duckduckgo.app.browser.newaddressbaroption
 
-interface NewAddressBarV2Callback {
+interface NewAddressBarCallback {
     fun onDisplayed()
     fun onConfirmed(searchAndAiSelected: Boolean)
 }

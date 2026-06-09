@@ -22,22 +22,22 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 
-interface NewAddressBarOptionV2BottomSheetDialogFactory {
+interface NewAddressBarPickerBottomSheetDialogFactory {
     fun create(
         context: Context,
         isLightMode: Boolean,
-        callback: NewAddressBarV2Callback?,
+        callback: NewAddressBarCallback?,
     ): BottomSheetDialog
 }
 
 @ContributesBinding(AppScope::class)
-class RealNewAddressBarOptionV2BottomSheetDialogFactory @Inject constructor() : NewAddressBarOptionV2BottomSheetDialogFactory {
+class RealNewAddressBarPickerBottomSheetDialogFactory @Inject constructor() : NewAddressBarPickerBottomSheetDialogFactory {
     override fun create(
         context: Context,
         isLightMode: Boolean,
-        callback: NewAddressBarV2Callback?,
+        callback: NewAddressBarCallback?,
     ): BottomSheetDialog =
-        NewAddressBarOptionV2BottomSheetDialog(
+        NewAddressBarPickerBottomSheetDialog(
             context = context,
             isLightMode = isLightMode,
             callback = callback,
