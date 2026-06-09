@@ -167,6 +167,7 @@ interface DuckChatPixels {
     fun fireReasoningEffortSelected(effortLevel: String)
     fun fireSubscriptionUpsellTriggered(source: String, currentTier: String, requiredTier: String, flowType: String)
     fun fireImageAttached(source: String)
+    fun fireImageValidationFailed(reason: String)
     fun fireImageRemoved()
     fun fireFileAttached()
     fun fireFileRemoved()
@@ -545,6 +546,12 @@ class RealDuckChatPixels @Inject constructor(
         DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_IMAGE_REMOVED_DAILY,
     )
 
+    override fun fireImageValidationFailed(reason: String) = fireCountAndDaily(
+        DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_IMAGE_VALIDATION_FAILED_COUNT,
+        DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_IMAGE_VALIDATION_FAILED_DAILY,
+        mapOf(DuckChatPixelParameters.FILE_VALIDATION_REASON to reason),
+    )
+
     override fun fireFileAttached() = fireCountAndDaily(
         DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_FILE_ATTACHED_COUNT,
         DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_FILE_ATTACHED_DAILY,
@@ -792,6 +799,8 @@ enum class DuckChatPixelName(override val pixelName: String) : Pixel.PixelName {
     DUCK_CHAT_UNIFIED_INPUT_IMAGE_ATTACHED_DAILY("m_aichat_unified_input_image_attached_daily"),
     DUCK_CHAT_UNIFIED_INPUT_IMAGE_REMOVED_COUNT("m_aichat_unified_input_image_removed_count"),
     DUCK_CHAT_UNIFIED_INPUT_IMAGE_REMOVED_DAILY("m_aichat_unified_input_image_removed_daily"),
+    DUCK_CHAT_UNIFIED_INPUT_IMAGE_VALIDATION_FAILED_COUNT("m_aichat_unified_input_image_validation_failed_count"),
+    DUCK_CHAT_UNIFIED_INPUT_IMAGE_VALIDATION_FAILED_DAILY("m_aichat_unified_input_image_validation_failed_daily"),
     DUCK_CHAT_UNIFIED_INPUT_FILE_ATTACHED_COUNT("m_aichat_unified_input_file_attached_count"),
     DUCK_CHAT_UNIFIED_INPUT_FILE_ATTACHED_DAILY("m_aichat_unified_input_file_attached_daily"),
     DUCK_CHAT_UNIFIED_INPUT_FILE_REMOVED_COUNT("m_aichat_unified_input_file_removed_count"),

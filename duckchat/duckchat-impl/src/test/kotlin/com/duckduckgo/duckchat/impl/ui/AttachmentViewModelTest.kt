@@ -743,6 +743,33 @@ class AttachmentViewModelTest {
     }
 
     @Test
+    fun whenImageExceedsPerTurnLimitThenImageValidationFailedCountExceeded() = runTest {
+        modelStateFlow.value = ModelState(attachmentLimits = AttachmentLimits(images = ImageLimits(maxPerTurn = 1, maxPerConversation = 10)))
+        addImages(1)
+        val uri = givenImageDecodes()
+
+        viewModel.onImagesPicked(listOf(uri), AttachmentViewModel.ImageSource.PHOTO_LIBRARY)
+        advanceUntilIdle()
+
+        verify(duckChatPixels).fireImageValidationFailed("count_exceeded")
+        verify(duckChatPixels, never()).fireImageAttached(any())
+    }
+
+    @Test
+    fun whenImageDecodeFailsThenImageValidationFailedOther() = runTest {
+        val contentResolver: android.content.ContentResolver = mock()
+        whenever(context.contentResolver).thenReturn(contentResolver)
+        whenever(contentResolver.openInputStream(any())).thenReturn(null)
+        val uri: Uri = mock()
+
+        viewModel.onImagesPicked(listOf(uri), AttachmentViewModel.ImageSource.PHOTO_LIBRARY)
+        advanceUntilIdle()
+
+        verify(duckChatPixels).fireImageValidationFailed("other")
+        verify(duckChatPixels, never()).fireImageAttached(any())
+    }
+
+    @Test
     fun whenImageRemovedThenImageRemovedPixelFired() = runTest {
         addImages(1)
         val id = viewModel.attachmentState.value.images[0].id

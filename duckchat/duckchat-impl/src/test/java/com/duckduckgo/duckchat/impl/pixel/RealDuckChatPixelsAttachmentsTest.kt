@@ -77,6 +77,21 @@ class RealDuckChatPixelsAttachmentsTest {
     }
 
     @Test
+    fun whenImageValidationFailedThenReasonParam() = runTest {
+        testee.fireImageValidationFailed(reason = "count_exceeded")
+
+        verify(pixel).fire(
+            DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_IMAGE_VALIDATION_FAILED_COUNT,
+            parameters = mapOf(DuckChatPixelParameters.FILE_VALIDATION_REASON to "count_exceeded"),
+        )
+        verify(pixel).fire(
+            DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_IMAGE_VALIDATION_FAILED_DAILY,
+            parameters = mapOf(DuckChatPixelParameters.FILE_VALIDATION_REASON to "count_exceeded"),
+            type = Pixel.PixelType.Daily(),
+        )
+    }
+
+    @Test
     fun whenFileAttachedThenCountAndDaily() = runTest {
         testee.fireFileAttached()
 

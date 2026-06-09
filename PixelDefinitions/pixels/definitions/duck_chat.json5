@@ -880,6 +880,36 @@
             }
         ]
     },
+    "m_aichat_unified_input_image_validation_failed_count": {
+        "description": "An image the user attempted to attach in the Unified Input failed validation",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "reason",
+                "type": "string",
+                "description": "Why the image validation failed",
+                "enum": ["count_exceeded", "other"]
+            }
+        ]
+    },
+    "m_aichat_unified_input_image_validation_failed_daily": {
+        "description": "(Daily Pixel) An image the user attempted to attach in the Unified Input failed validation",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "reason",
+                "type": "string",
+                "description": "Why the image validation failed",
+                "enum": ["count_exceeded", "other"]
+            }
+        ]
+    },
     "m_aichat_unified_input_file_validation_failed_count": {
         "description": "A file the user attempted to attach in the Unified Input failed validation",
         "owners": ["malmstein"],

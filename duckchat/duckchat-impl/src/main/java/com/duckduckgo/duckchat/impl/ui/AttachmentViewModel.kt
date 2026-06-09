@@ -140,9 +140,13 @@ class AttachmentViewModel @Inject constructor(
     fun onImagesPicked(uris: List<Uri>, source: ImageSource) {
         viewModelScope.launch {
             uris.forEach { uri ->
-                val attachment = withContext(dispatchers.io()) { processImage(uri) } ?: return@forEach
+                val attachment = withContext(dispatchers.io()) { processImage(uri) }
+                if (attachment == null) {
+                    duckChatPixels.fireImageValidationFailed(IMAGE_VALIDATION_OTHER)
+                    return@forEach
+                }
                 imageAttachments.update { it + attachment }
-                duckChatPixels.fireImageAttached(source.pixelValue)
+                fireImageAcceptedOrRejectedPixel(source)
             }
         }
     }
@@ -168,9 +172,13 @@ class AttachmentViewModel @Inject constructor(
             }
             val fileUris = uris - imageUris.toSet()
             imageUris.forEach { uri ->
-                val attachment = withContext(dispatchers.io()) { processImage(uri) } ?: return@forEach
+                val attachment = withContext(dispatchers.io()) { processImage(uri) }
+                if (attachment == null) {
+                    duckChatPixels.fireImageValidationFailed(IMAGE_VALIDATION_OTHER)
+                    return@forEach
+                }
                 imageAttachments.update { it + attachment }
-                duckChatPixels.fireImageAttached(ImageSource.PHOTO_LIBRARY.pixelValue)
+                fireImageAcceptedOrRejectedPixel(ImageSource.PHOTO_LIBRARY)
             }
             for (uri in fileUris) {
                 val attachment = fileAttachmentProcessor.processFile(context, uri)
@@ -195,6 +203,32 @@ class AttachmentViewModel @Inject constructor(
             duckChatPixels.fireFileValidationFailed(reason)
         } else {
             duckChatPixels.fireFileAttached()
+        }
+    }
+
+    /**
+     * Fired once per picked image, after it has been added to the list. Mirrors the file flow: images are
+     * always added and limit violations surface as derived error state, so this is the single transition
+     * point where a freshly-picked image is attributed as attached or as a validation failure exactly once.
+     */
+    private fun fireImageAcceptedOrRejectedPixel(source: ImageSource) {
+        val reason = resolveImageValidationReason()
+        if (reason != null) {
+            duckChatPixels.fireImageValidationFailed(reason)
+        } else {
+            duckChatPixels.fireImageAttached(source.pixelValue)
+        }
+    }
+
+    private fun resolveImageValidationReason(): String? {
+        val imageLimits = modelManager.modelState.value.attachmentLimits.images
+        val isDuckAiMode = isDuckAiModeFlow.value
+        val currentImageCount = imageAttachments.value.size
+        val totalImages = currentImageCount + if (isDuckAiMode) limitsHandler.conversationImagesSent.value else 0
+        return when {
+            currentImageCount > imageLimits.maxPerTurn -> IMAGE_VALIDATION_COUNT_EXCEEDED
+            totalImages > imageLimits.maxPerConversation -> IMAGE_VALIDATION_COUNT_EXCEEDED
+            else -> null
         }
     }
 
@@ -376,5 +410,7 @@ class AttachmentViewModel @Inject constructor(
         private const val FILE_VALIDATION_SIZE_EXCEEDED = "size_exceeded"
         private const val FILE_VALIDATION_COUNT_EXCEEDED = "count_exceeded"
         private const val FILE_VALIDATION_OTHER = "other"
+        private const val IMAGE_VALIDATION_COUNT_EXCEEDED = "count_exceeded"
+        private const val IMAGE_VALIDATION_OTHER = "other"
     }
 }
