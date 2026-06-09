@@ -107,14 +107,11 @@ class RealExchangeV2Channel @Inject constructor(
                 }
                 is Result.Error -> {
                     if (outcome.code in NON_RECOVERABLE_HTTP_CODES) {
-                        // Channel is gone (404/410) or permanently erroring — re-polling can't
-                        // recover, so stop rather than spin until the session deadline. The
-                        // session ends via the runner's timeout; poll() only decides whether to
-                        // keep polling.
+                        // Re-polling won't recover; stop. The session ends via the runner's timeout.
                         logcat { "Sync-ExchangeV2: ending poll on $ownChannelId — non-recoverable status ${outcome.code} (${outcome.reason})" }
                         return@flow
                     }
-                    // Transient (5xx / 429 / 418 / timeout / IO) — stay in the loop and retry next tick.
+                    // Transient — retry on the next tick.
                     logcat(ERROR) { "Sync-ExchangeV2: transient poll error ${outcome.code}: ${outcome.reason}, retrying" }
                 }
             }

@@ -96,11 +96,9 @@ interface ExchangeV2Runner {
     fun startPresent()
 
     /**
-     * Tear down the active session (stop polling, discard ephemeral keys, best-effort DELETE the
-     * channel, clear state). Suspends until teardown completes so callers that must sequence work
-     * after it (e.g. signing out, which invalidates the recovery code) can await it. Lifecycle /
-     * abandon callers that can't await — e.g. `ViewModel.onCleared` — should launch this on a
-     * longer-lived scope themselves.
+     * Tear down the active session. Suspends until done, so callers can sequence work after it
+     * (e.g. sign-out, which invalidates the recovery code). Callers that can't await — e.g.
+     * `ViewModel.onCleared` — launch it on a longer-lived scope.
      */
     suspend fun cancel()
 
@@ -188,12 +186,12 @@ class RealExchangeV2Runner @Inject constructor(
                 return@launch
             }
             mutex.withLock {
-                cancelLocked() // abandon any prior session before starting a new one
+                cancelLocked() // abandon any prior session
                 _pairingRole = PairingRole.Scanner
                 peerChannelId = parsed.channelId
                 peerPublicKey = parsed.publicKey
                 bootstrapLocked(PairingRole.Scanner) ?: run {
-                    cancelLocked() // bootstrap reported its own error; discard the half-set state
+                    cancelLocked() // bootstrap already emitted the error; just clear the half-set state
                     return@launch
                 }
                 // Scanner already knows the peer; SM starts directly in Negotiating.
@@ -204,9 +202,7 @@ class RealExchangeV2Runner @Inject constructor(
             }
             emitSessionStarted()
             if (!sendHello()) {
-                // Couldn't deliver hello — most likely the Presenter's channel has TTL'd out
-                // (5 min) or never existed (stale/typo'd code). No point sending availability
-                // or polling our own channel; tear down and let the user know.
+                // Couldn't reach the Presenter (their channel TTL'd out, or a stale/typo'd code) — abort.
                 failSession(
                     "Pairing aborted — couldn't reach the Presenter. Their session may have expired (5-min TTL). " +
                         "Ask them to Start as Presenter again.",
@@ -222,14 +218,13 @@ class RealExchangeV2Runner @Inject constructor(
     override fun startPresent() {
         appScope.launch(dispatchers.io()) {
             logcat { "Sync-ExchangeV2: startPresent (signedIn=${syncStore.userId != null})" }
-            // No pre-flight account check: per spec §"Exchange Share Recovery Code", a Host
-            // without an account creates one during the pairing flow. [sendRecoveryCodeResponse]
-            // calls createDdgAccountIfNeeded at Host.Sending time for ddg peers.
+            // No pre-flight account check: per spec §"Exchange Share Recovery Code" a Host without
+            // an account creates one mid-flow ([sendRecoveryCodeResponse] at Host.Sending).
             mutex.withLock {
-                cancelLocked() // abandon any prior session before starting a new one
+                cancelLocked() // abandon any prior session
                 _pairingRole = PairingRole.Presenter
                 val keyPair = bootstrapLocked(PairingRole.Presenter) ?: run {
-                    cancelLocked() // bootstrap reported its own error; discard the half-set state
+                    cancelLocked() // bootstrap already emitted the error; just clear the half-set state
                     return@launch
                 }
                 _linkingCode = qrCode.buildLinkingCode(
@@ -279,18 +274,13 @@ class RealExchangeV2Runner @Inject constructor(
     }
 
     override suspend fun cancel() {
-        // Runs teardown under [mutex] so it can't race the locked message/trigger handlers.
-        // [NonCancellable] so a caller cancelling its own job mid-teardown can't abort it
-        // half-way (matches [failSession], which the poll loop / timer call from inside the very
-        // job [cancelLocked] cancels).
+        // NonCancellable: teardown must finish even when the caller's coroutine is itself being
+        // cancelled (e.g. the dispatcher cancels this from a flow's onCompletion).
         withContext(NonCancellable) { mutex.withLock { cancelLocked() } }
     }
 
-    /**
-     * Emit one session error and tear down, atomically under the lock. No-ops if the session
-     * already ended, so a late timeout or poll error can't surface a spurious error over a
-     * session that already completed.
-     */
+    /** Emit one error, then tear down. No-ops if the session already ended, so a late timeout or
+     *  poll error can't surface a spurious error over a completed session. */
     private suspend fun failSession(reason: String) {
         withContext(NonCancellable) {
             mutex.withLock {
@@ -301,11 +291,8 @@ class RealExchangeV2Runner @Inject constructor(
         }
     }
 
-    /**
-     * Caller MUST hold [mutex]. Stops the jobs, best-effort DELETEs our channel, discards the
-     * ephemeral key material, and clears all per-session state. Single teardown path so the
-     * field resets can't drift between call sites.
-     */
+    /** Caller MUST hold [mutex]. The single teardown path, so field resets can't drift between
+     *  call sites: stop the jobs, best-effort DELETE the channel, discard keys, clear all state. */
     private fun cancelLocked() {
         if (session != null || pollJob != null) {
             logcat { "Sync-ExchangeV2: teardown (was in state ${session?.currentState})" }
@@ -358,8 +345,7 @@ class RealExchangeV2Runner @Inject constructor(
             } catch (cancellation: CancellationException) {
                 throw cancellation // normal teardown (cancel() / scope cancellation) — let it propagate
             } catch (t: Throwable) {
-                // Unexpected failure: fail fast — surface an error and tear down rather than
-                // dying silently and leaving the session to linger until the 5-min timeout.
+                // Fail fast rather than dying silently and lingering until the 5-min timeout.
                 logcat(ERROR) { "Sync-ExchangeV2: poll loop failed: ${t.message}" }
                 failSession("Pairing failed: ${t.message}")
             }
@@ -376,7 +362,6 @@ class RealExchangeV2Runner @Inject constructor(
         timeoutJob = appScope.launch(dispatchers.io()) {
             delay(SESSION_TIMEOUT_MS)
             logcat { "Sync-ExchangeV2: session deadline (${SESSION_TIMEOUT_MS}ms) reached" }
-            // failSession no-ops if the session already ended, and tears down under the lock.
             failSession("Session timed out")
         }
     }
@@ -596,15 +581,9 @@ class RealExchangeV2Runner @Inject constructor(
         if (sm.currentState.isTerminal()) onTerminalReachedLocked(sm.currentState)
     }
 
-    /**
-     * Clean up after the SM reaches a terminal state. Clears the live-session-only fields so
-     * stale UI ("linking code still showing") doesn't suggest the session is reusable, and
-     * fires a best-effort DELETE of our own channel (Tomek 2026-05-26).
-     */
+    /** On a terminal SM state, tear down via [cancelLocked]. Caller holds [mutex]. */
     private fun onTerminalReachedLocked(terminal: ExchangeV2State) {
         logcat { "Sync-ExchangeV2: session reached terminal state $terminal, tearing down" }
-        // Full teardown via the single path: stops the poll loop, cancels the timer, discards
-        // ephemeral keys, DELETEs the channel, and clears state. Caller holds the lock.
         cancelLocked()
     }
 
@@ -672,16 +651,11 @@ class RealExchangeV2Runner @Inject constructor(
             sendOnWireAndRecord(json, peer, peerKey, ExchangeV2Message.RecoveryCodeRequest(json, DEVICE_NAME, OWN_DEVICE_KIND))
         }
         sentOwnAvailability = true
-        // Roll the auto-elect check forward in case the peer's availability arrived before we
-        // sent ours. Delegate to [autoElectRoleLocked] (the single election path) so the
-        // RoleElected side effects actually run — notably SendAwaitingConfirmation on the Host
-        // branch. An earlier inline copy here emitted the transition but dropped the side effects.
-        //
-        // REVIEW (spec reachability): with the current eager-send ordering this looks unreachable
-        // — entering Negotiating and sending our own availability happen in the same locked pass,
-        // so we never arrive here in Negotiating with peerKind already set. Confirm against the
-        // cross-platform ordering spec (Unified Algorithm 1214739740392701) whether any client
-        // ordering can make it live; if not, this branch is dead code and can be removed.
+        // Re-elect in case the peer's availability arrived before we sent ours, via the one
+        // election path ([autoElectRoleLocked]) so RoleElected's side effects run.
+        // REVIEW: likely unreachable under the current eager-send ordering (Negotiating entry and
+        // our availability send happen in one locked pass) — confirm against the ordering spec
+        // (Unified Algorithm 1214739740392701) and delete if dead.
         val sm = session ?: return
         if (sm.currentState == ExchangeV2State.Negotiating && peerKind != null) {
             autoElectRoleLocked(sm)

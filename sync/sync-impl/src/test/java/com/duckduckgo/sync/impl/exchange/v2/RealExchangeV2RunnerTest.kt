@@ -521,8 +521,7 @@ class RealExchangeV2RunnerTest {
 
         runner.startScan("")
 
-        // _pairingRole is set before bootstrapLocked runs; a bootstrap failure must tear that
-        // (and the ephemeral keys) back down rather than leave it dangling until the next attempt.
+        // _pairingRole is set before bootstrapLocked runs, so a bootstrap failure must clear it.
         assertNull("pairingRole must be cleared after a failed bootstrap", runner.pairingRole)
     }
 }

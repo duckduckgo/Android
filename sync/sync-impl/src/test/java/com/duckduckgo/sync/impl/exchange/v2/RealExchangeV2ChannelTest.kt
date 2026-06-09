@@ -41,9 +41,7 @@ class RealExchangeV2ChannelTest {
     )
 
     @Test fun `poll stops without retrying when the relay returns a non-recoverable status`() = runTest {
-        // 403 won't recover by re-polling the same channel, so the loop must stop immediately
-        // (like a 404) rather than spinning until the 5-min session deadline. The second stubbed
-        // response would only be consumed if the loop wrongly kept polling.
+        // Second stub is only reached if the loop wrongly keeps polling past the 403.
         whenever(syncApi.pollExchangeMessages(any(), any())).thenReturn(
             Result.Error(code = 403, reason = "Forbidden"),
             Result.Error(code = 404, reason = "should not be reached"),
@@ -56,7 +54,6 @@ class RealExchangeV2ChannelTest {
     }
 
     @Test fun `poll keeps polling after a transient status and ends on 404`() = runTest {
-        // 5xx is transient: the loop should retry on the next tick, then end normally on 404.
         whenever(syncApi.pollExchangeMessages(any(), any())).thenReturn(
             Result.Error(code = 500, reason = "Server error"),
             Result.Error(code = 404, reason = "channel gone"),
