@@ -264,6 +264,7 @@ class AutoCompleteApi constructor(
         suggestions: List<AutoCompleteSuggestion>,
         suggestion: AutoCompleteSuggestion,
         experimentalInputScreen: Boolean,
+        duckAiSurface: Boolean,
     ) {
         val hasBookmarks = withContext(dispatchers.io()) {
             savedSitesRepository.hasBookmarks()
@@ -295,21 +296,45 @@ class AutoCompleteApi constructor(
         val pixelName = when (suggestion) {
             is AutoCompleteBookmarkSuggestion -> {
                 if (suggestion.isFavorite) {
-                    AutoCompletePixelNames.AUTOCOMPLETE_FAVORITE_SELECTION
+                    if (duckAiSurface) {
+                        AutoCompletePixelNames.AUTOCOMPLETE_DUCKAI_FAVORITE_SELECTION
+                    } else {
+                        AutoCompletePixelNames.AUTOCOMPLETE_FAVORITE_SELECTION
+                    }
                 } else {
-                    AutoCompletePixelNames.AUTOCOMPLETE_BOOKMARK_SELECTION
+                    if (duckAiSurface) {
+                        AutoCompletePixelNames.AUTOCOMPLETE_DUCKAI_BOOKMARK_SELECTION
+                    } else {
+                        AutoCompletePixelNames.AUTOCOMPLETE_BOOKMARK_SELECTION
+                    }
                 }
             }
 
             is AutoCompleteSearchSuggestion -> if (suggestion.isUrl) {
-                AutoCompletePixelNames.AUTOCOMPLETE_SEARCH_WEBSITE_SELECTION
+                if (duckAiSurface) {
+                    AutoCompletePixelNames.AUTOCOMPLETE_DUCKAI_WEBSITE_SELECTION
+                } else {
+                    AutoCompletePixelNames.AUTOCOMPLETE_SEARCH_WEBSITE_SELECTION
+                }
             } else {
                 AutoCompletePixelNames.AUTOCOMPLETE_SEARCH_PHRASE_SELECTION
             }
 
-            is AutoCompleteHistorySuggestion -> AutoCompletePixelNames.AUTOCOMPLETE_HISTORY_SITE_SELECTION
-            is AutoCompleteHistorySearchSuggestion -> AutoCompletePixelNames.AUTOCOMPLETE_HISTORY_SEARCH_SELECTION
-            is AutoCompleteSwitchToTabSuggestion -> AutoCompletePixelNames.AUTOCOMPLETE_SWITCH_TO_TAB_SELECTION
+            is AutoCompleteHistorySuggestion -> if (duckAiSurface) {
+                AutoCompletePixelNames.AUTOCOMPLETE_DUCKAI_HISTORY_SITE_SELECTION
+            } else {
+                AutoCompletePixelNames.AUTOCOMPLETE_HISTORY_SITE_SELECTION
+            }
+            is AutoCompleteHistorySearchSuggestion -> if (duckAiSurface) {
+                AutoCompletePixelNames.AUTOCOMPLETE_DUCKAI_HISTORY_SEARCH_SELECTION
+            } else {
+                AutoCompletePixelNames.AUTOCOMPLETE_HISTORY_SEARCH_SELECTION
+            }
+            is AutoCompleteSwitchToTabSuggestion -> if (duckAiSurface) {
+                AutoCompletePixelNames.AUTOCOMPLETE_DUCKAI_SWITCH_TO_TAB_SELECTION
+            } else {
+                AutoCompletePixelNames.AUTOCOMPLETE_SWITCH_TO_TAB_SELECTION
+            }
             is AutoCompleteSuggestion.AutoCompleteDuckAIPrompt -> if (experimentalInputScreen) {
                 AutoCompletePixelNames.AUTOCOMPLETE_DUCKAI_PROMPT_EXPERIMENTAL_SELECTION
             } else {
