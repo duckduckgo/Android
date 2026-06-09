@@ -554,6 +554,38 @@ open class BrowserActivity : DuckDuckGoActivity() {
         }
     }
 
+    // Same parent + omnibar anchor as showSnackbar, but with an undo action. Used by the new-tab-page
+    // return hatch so its "tab closed" snackbar clears the keyboard and the floating native input,
+    // which it can't do when shown from inside the hatch view's own (lower) view subtree.
+    fun showUndoableSnackbar(
+        message: String,
+        actionLabel: String,
+        onAction: () -> Unit,
+        onDismiss: () -> Unit,
+    ) {
+        lifecycleScope.launch {
+            val omnibarType = withContext(dispatcherProvider.io()) {
+                settingsDataStore.omnibarType
+            }
+            val anchorView = when (omnibarType) {
+                OmnibarType.SINGLE_TOP -> null
+                OmnibarType.SINGLE_BOTTOM -> currentTab?.getOmnibar()?.omnibarView?.toolbar
+                    ?: binding.fragmentContainer
+
+                OmnibarType.SPLIT -> currentTab?.navigationBar ?: binding.fragmentContainer
+            }
+            DefaultSnackbar(
+                parentView = binding.fragmentContainer,
+                message = message,
+                anchor = anchorView,
+                action = actionLabel,
+                showAction = true,
+                onAction = onAction,
+                onDismiss = onDismiss,
+            ).show()
+        }
+    }
+
     override fun onStart() {
         super.onStart()
         duckAiAnimDelayJob =

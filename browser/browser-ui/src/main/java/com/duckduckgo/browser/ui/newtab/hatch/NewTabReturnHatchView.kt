@@ -38,7 +38,6 @@ import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.ViewViewModelFactory
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
-import com.google.android.material.snackbar.Snackbar
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -58,6 +57,11 @@ class NewTabReturnHatchView @JvmOverloads constructor(
         fun onHatchRendered(visible: Boolean)
         fun onBurnTabPressed()
         fun onAfterInactivityPressed()
+
+        // The host shows the "tab closed" snackbar so it can parent it to the activity content
+        // (above the floating native input) and anchor it to the omnibar, matching the burn-tab
+        // snackbar. onUndo restores the tab; onCommit commits the deletion.
+        fun onTabClosed(tabId: String, onUndo: () -> Unit, onCommit: () -> Unit)
     }
 
     @Inject
@@ -106,19 +110,12 @@ class NewTabReturnHatchView @JvmOverloads constructor(
             NewTabReturnHatchViewModel.Command.LaunchTabSwitcher ->
                 globalActivityStarter.start(context, TabSwitcherScreenNoParams)
             is NewTabReturnHatchViewModel.Command.ShowTabClosedSnackbar ->
-                showTabClosedSnackbar(command.tabId)
+                hatchHatchListener?.onTabClosed(
+                    command.tabId,
+                    onUndo = { viewModel.onUndoCloseTab(command.tabId) },
+                    onCommit = { viewModel.onTabClosedSnackbarDismissed(command.tabId) },
+                )
         }
-    }
-
-    private fun showTabClosedSnackbar(tabId: String) {
-        Snackbar.make(rootView, R.string.newTabReturnHatchTabClosed, Snackbar.LENGTH_LONG)
-            .setAction(R.string.newTabReturnHatchUndo) { viewModel.onUndoCloseTab(tabId) }
-            .addCallback(object : Snackbar.Callback() {
-                override fun onDismissed(snackbar: Snackbar, event: Int) {
-                    if (event != DISMISS_EVENT_ACTION) viewModel.onTabClosedSnackbarDismissed(tabId)
-                }
-            })
-            .show()
     }
 
     override fun onDetachedFromWindow() {
