@@ -202,11 +202,6 @@ class BrokenSiteSubmitter @Inject constructor(
                     }
                 }
                 .onFailure { logcat(WARN) { "Feedback submission failed: ${it.asLog()}" } }
-
-            pixel.fire(
-                AppPixelName.BROKEN_SITE_REPORTED,
-                mapOf(Pixel.PixelParameter.URL to siteUrl),
-            )
         }
     }
 

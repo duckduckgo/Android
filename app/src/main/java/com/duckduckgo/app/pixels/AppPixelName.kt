@@ -37,7 +37,6 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     FORGET_ALL_AUTO_RESTART("m_f_r"),
     FORGET_ALL_AUTO_RESTART_WITH_INTENT("m_f_ri"),
 
-    BROKEN_SITE_REPORTED("m_bsr"),
     BROKEN_SITE_REPORT("epbf"),
     BROKEN_SITE_ALLOWLIST_ADD("m_broken_site_allowlist_add"),
     BROKEN_SITE_ALLOWLIST_REMOVE("m_broken_site_allowlist_remove"),
