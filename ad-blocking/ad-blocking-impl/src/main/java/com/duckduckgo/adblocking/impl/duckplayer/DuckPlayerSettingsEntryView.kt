@@ -64,6 +64,10 @@ class DuckPlayerSettingsEntryView @JvmOverloads constructor(
         }
     }
 
+    init {
+        addView(listItem)
+    }
+
     private val viewModel: DuckPlayerSettingsEntryViewModel by lazy {
         ViewModelProvider(findViewTreeViewModelStoreOwner()!!, viewModelFactory)[DuckPlayerSettingsEntryViewModel::class.java]
     }
@@ -75,9 +79,6 @@ class DuckPlayerSettingsEntryView @JvmOverloads constructor(
         AndroidSupportInjection.inject(this)
         super.onAttachedToWindow()
 
-        if (childCount == 0) {
-            addView(listItem)
-        }
         listItem.setOnClickListener { viewModel.onSettingClicked() }
 
         findViewTreeLifecycleOwner()?.lifecycle?.addObserver(viewModel)

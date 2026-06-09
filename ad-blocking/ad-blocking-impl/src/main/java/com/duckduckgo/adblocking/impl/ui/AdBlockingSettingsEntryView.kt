@@ -63,6 +63,10 @@ class AdBlockingSettingsEntryView @JvmOverloads constructor(
         }
     }
 
+    init {
+        addView(listItem)
+    }
+
     private val viewModel: AdBlockingSettingsEntryViewModel by lazy {
         ViewModelProvider(findViewTreeViewModelStoreOwner()!!, viewModelFactory)[AdBlockingSettingsEntryViewModel::class.java]
     }
@@ -74,9 +78,6 @@ class AdBlockingSettingsEntryView @JvmOverloads constructor(
         AndroidSupportInjection.inject(this)
         super.onAttachedToWindow()
 
-        if (childCount == 0) {
-            addView(listItem)
-        }
         listItem.setOnClickListener { viewModel.onSettingClicked() }
 
         findViewTreeLifecycleOwner()?.lifecycle?.addObserver(viewModel)
