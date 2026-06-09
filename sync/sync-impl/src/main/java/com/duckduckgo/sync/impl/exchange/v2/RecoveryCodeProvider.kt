@@ -116,11 +116,13 @@ class RealRecoveryCodeProvider @Inject constructor(
         val decoded = decodePermissiveBase64(v1Base64)
         val v1 = JSONObject(String(decoded, Charsets.UTF_8)).getJSONObject("recovery")
         val userId = v1.getString("user_id")
-        val secret = v1.getString("primary_key")
-        // Serialize with Moshi, NOT org.json: AOSP's JSONObject.toString() escapes '/' to '\/',
-        // which non-strict cross-platform decoders (e.g. Windows native) reject. The ddg secret is
-        // the v1 primary_key in standard base64 and routinely contains '/'. Spec 1214804486778180
-        // constrains only the outer base64url encoding; the secret must travel verbatim.
+        // The v2 wire `secret` is base64url-encoded per spec 1214802412121967 (and Gabor's sign-off
+        // on 1214804486778180: "v2 recovery keys will be base64url encoded"). Android holds the
+        // primary_key as STANDARD base64 internally, so re-encode the same key bytes to base64url
+        // here — otherwise conformant peers (macOS/iOS/FE/Windows) can't base64url-decode it, and a
+        // '+'/'/' in standard base64 also forces the org.json '\/'-escaping workaround. Moshi (not
+        // org.json) keeps the outer JSON canonical regardless.
+        val secret = Base64.getUrlEncoder().withoutPadding().encodeToString(decodePermissiveBase64(v1.getString("primary_key")))
         val v2Json = recoveryCodeAdapter.toJson(
             ThirdPartyRecoveryCodeWrapper(
                 recovery = ThirdPartyRecoveryCode(userId = userId, secret = secret, cid = cid, v = RECOVERY_CODE_V2),

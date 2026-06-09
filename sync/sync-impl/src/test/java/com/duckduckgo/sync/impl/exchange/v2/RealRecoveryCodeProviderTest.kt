@@ -22,6 +22,7 @@ import com.duckduckgo.sync.impl.SyncAccountRepository
 import com.duckduckgo.sync.store.ScopedPassword
 import com.duckduckgo.sync.store.SyncStore
 import org.json.JSONObject
+import org.junit.Assert.assertArrayEquals
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -53,18 +54,19 @@ class RealRecoveryCodeProviderTest {
         assertTrue(result is Result.Success)
         val v2 = decodeRecovery((result as Result.Success).data)
         assertEquals("user-123", v2.getString("user_id"))
-        assertEquals("pk-abc", v2.getString("secret"))
+        // secret is re-encoded base64url but must carry the same key bytes (see the base64url test below)
+        assertArrayEquals(Base64.getUrlDecoder().decode("pk-abc"), Base64.getUrlDecoder().decode(v2.getString("secret")))
         assertEquals("ddg", v2.getString("cid"))
         assertEquals("2.0", v2.getString("v"))
     }
 
-    @Test fun `getDdgRecoveryCode does not escape forward slashes in standard-base64 secret`() {
-        // Regression (Android↔Windows interop): the ddg secret is the v1 primary_key in STANDARD
-        // base64, which routinely contains '/'. AOSP's org.json.JSONObject.toString() escapes '/'
-        // to '\/', producing a recovery code Windows native cannot decode. Spec 1214804486778180
-        // constrains only the OUTER encoding to base64url; the inner secret must travel verbatim.
-        val secretWithSlashes = "apZ+7PAe89rDhuG4DRyi/M3zU2/D5DZNdRsR3RM6Ujw="
-        val v1Json = """{"recovery":{"primary_key":"$secretWithSlashes","user_id":"user-123"}}"""
+    @Test fun `getDdgRecoveryCode encodes the secret as base64url per spec, not standard base64`() {
+        // Spec 1214802412121967 (Encryption Algorithms): the v2 account `secret` is base64url
+        // encoded. Android stores the primary_key as STANDARD base64 internally; we must convert
+        // at the v2 wire boundary so spec-conformant peers (macOS/iOS/FE/Windows) can base64url-
+        // decode it. Same key bytes, different alphabet. A standard-base64 emit broke macOS↔Android.
+        val standardPrimaryKey = "apZ+7PAe89rDhuG4DRyi/M3zU2/D5DZNdRsR3RM6Ujw=" // standard base64: has '+' and '/'
+        val v1Json = """{"recovery":{"primary_key":"$standardPrimaryKey","user_id":"user-123"}}"""
         val v1B64 = Base64.getUrlEncoder().withoutPadding().encodeToString(v1Json.toByteArray())
         whenever(syncAccountRepository.getRecoveryCode()).thenReturn(
             Result.Success(SyncAccountRepository.AuthCode(qrCode = v1B64, rawCode = v1B64)),
@@ -73,9 +75,14 @@ class RealRecoveryCodeProviderTest {
         val result = provider.getDdgRecoveryCode()
 
         assertTrue(result is Result.Success)
-        val rawJson = String(Base64.getUrlDecoder().decode((result as Result.Success).data), Charsets.UTF_8)
-        assertFalse("recovery JSON must not contain escaped slashes (\\/): $rawJson", rawJson.contains("\\/"))
-        assertTrue("secret must appear verbatim with raw '/': $rawJson", rawJson.contains(secretWithSlashes))
+        val secret = decodeRecovery((result as Result.Success).data).getString("secret")
+        assertFalse("secret must be base64url (no '+'): $secret", secret.contains('+'))
+        assertFalse("secret must be base64url (no '/'): $secret", secret.contains('/'))
+        // …and it must decode back to the exact same key bytes as the standard-base64 primary_key.
+        assertArrayEquals(
+            Base64.getDecoder().decode(standardPrimaryKey),
+            Base64.getUrlDecoder().decode(secret),
+        )
     }
 
     @Test fun `getDdgRecoveryCode bubbles up repository errors`() {
