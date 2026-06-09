@@ -921,7 +921,7 @@
                 "key": "reason",
                 "type": "string",
                 "description": "Why the file validation failed",
-                "enum": ["size_exceeded", "count_exceeded", "page_count_exceeded", "unsupported_type", "other"]
+                "enum": ["size_exceeded", "count_exceeded", "page_count_exceeded", "other"]
             }
         ]
     },
@@ -936,7 +936,7 @@
                 "key": "reason",
                 "type": "string",
                 "description": "Why the file validation failed",
-                "enum": ["size_exceeded", "count_exceeded", "page_count_exceeded", "unsupported_type", "other"]
+                "enum": ["size_exceeded", "count_exceeded", "page_count_exceeded", "other"]
             }
         ]
     },
