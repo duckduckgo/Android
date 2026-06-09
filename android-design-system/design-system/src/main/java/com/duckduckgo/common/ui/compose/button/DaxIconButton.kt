@@ -17,9 +17,12 @@
 package com.duckduckgo.common.ui.compose.button
 
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Column
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonColors
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.LocalMinimumInteractiveComponentSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -30,6 +33,7 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.Dp
+import com.duckduckgo.common.ui.compose.theme.DuckDuckGoTheme
 import com.duckduckgo.common.ui.compose.tools.PreviewBox
 import com.duckduckgo.mobile.android.R
 
@@ -38,15 +42,19 @@ import com.duckduckgo.mobile.android.R
  *
  * Wraps Material3 [IconButton] for icon-only actions (e.g. close, back, overflow).
  *
- * No tint is applied — the icon renders with its native colors, matching the
- * View-system [IconButton][com.duckduckgo.common.ui.view.button.IconButton] which
- * relies on the drawable's own `?attr/` theme colors (e.g. `?attr/daxColorPrimaryIcon`).
+ * The icon is tinted with [colors]'s content color so it follows the Compose
+ * [DuckDuckGoTheme] (light/dark) rather than the drawable's baked-in colors. Pass
+ * [DaxIconButtonDefaults.filledColors] for a filled container.
  *
  * @param onClick Called when the button is clicked.
  * @param iconPainter The icon to display.
  * @param contentDescription Accessibility description, or null if decorative.
  * @param modifier Modifier for this button.
+ * @param enabled Whether the button is enabled.
+ * @param colors Container and content colors; defaults to [DaxIconButtonDefaults.colors].
  * @param interactionSource The interaction source for this button.
+ *
+ * Asana task: https://app.asana.com/1/137249556945/project/1202857801505092/task/1215540472063931?focus=true
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -55,6 +63,8 @@ fun DaxIconButton(
     iconPainter: Painter,
     contentDescription: String?,
     modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    colors: IconButtonColors = DaxIconButtonDefaults.colors,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
 ) {
     CompositionLocalProvider(
@@ -63,25 +73,59 @@ fun DaxIconButton(
         IconButton(
             onClick = onClick,
             modifier = modifier,
+            colors = colors,
+            enabled = enabled,
             interactionSource = interactionSource,
         ) {
             Icon(
                 painter = iconPainter,
                 contentDescription = contentDescription,
-                tint = Color.Unspecified,
+                tint = if (enabled) {
+                    colors.contentColor
+                } else {
+                    colors.disabledContentColor
+                },
             )
         }
     }
+}
+
+object DaxIconButtonDefaults {
+    val colors: IconButtonColors
+        @Composable
+        get() = IconButtonDefaults.iconButtonColors(
+            containerColor = Color.Transparent,
+            contentColor = DuckDuckGoTheme.colors.icons.primary,
+            disabledContainerColor = Color.Transparent,
+            disabledContentColor = DuckDuckGoTheme.colors.icons.disabled,
+        )
+
+    val filledColors: IconButtonColors
+        @Composable
+        get() = IconButtonDefaults.iconButtonColors(
+            containerColor = DuckDuckGoTheme.colors.backgrounds.container,
+            contentColor = DuckDuckGoTheme.colors.icons.primary,
+            disabledContainerColor = DuckDuckGoTheme.colors.backgrounds.container,
+            disabledContentColor = DuckDuckGoTheme.colors.icons.disabled,
+        )
 }
 
 @PreviewLightDark
 @Composable
 private fun DaxIconButtonPreview() {
     PreviewBox {
-        DaxIconButton(
-            onClick = {},
-            iconPainter = painterResource(R.drawable.ic_settings_24),
-            contentDescription = "Settings",
-        )
+        Column {
+            DaxIconButton(
+                onClick = {},
+                iconPainter = painterResource(R.drawable.ic_settings_24),
+                contentDescription = "Settings",
+            )
+            DaxIconButton(
+                onClick = {},
+                iconPainter = painterResource(R.drawable.ic_settings_24),
+                contentDescription = "Settings",
+                colors = DaxIconButtonDefaults.filledColors,
+            )
+        }
     }
 }
