@@ -1207,7 +1207,13 @@ class NativeInputModeWidget @JvmOverloads constructor(
     override fun submit() {
         // in Duck.ai mode we treat this as submitting prompts.
         // In non-Duck.ai mode we treat this as starting a chat with or without a prompt.
-        if (!submitAsChat()) viewModel.openNewChat()
+        // submitAsChat() returns true only when there is text to submit (a real prompt
+        // submission), so an empty start-new-chat does not fire the submission pixels.
+        if (submitAsChat()) {
+            fireSubmissionPixels(hasText = true)
+        } else {
+            viewModel.openNewChat()
+        }
     }
 
     override fun stop() {
