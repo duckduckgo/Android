@@ -35,6 +35,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.withTimeoutOrNull
 import org.json.JSONObject
+import org.junit.Assert.assertArrayEquals
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertSame
@@ -195,6 +196,33 @@ class RealSyncCodeDispatcherTest {
         assertEquals(DispatchOutcome.LoggedIn, outcomes.single())
     }
 
+    @Test fun `FF on, v2 RecoveryCode cid=ddg - base64url secret is normalised to standard base64 for v1 login`() = runTest {
+        // Spec 1214802412121967: the v2 wire `secret` is base64url. Android's native v1 login
+        // (SyncNativeLib.decodeKey) decodes the primary_key as STANDARD base64, so the dispatcher
+        // must convert at the v2->v1 boundary. A base64url secret from a conformant peer (macOS/
+        // iOS/FE) fed verbatim to prepareForLogin throws "bad base-64" (LOGIN_FAILED). Same key
+        // bytes, different alphabet.
+        setV2(true)
+        val base64urlSecret = "rUzlGqLLlbonAC_zIeh1nrCmuDsDAn6UooUUDz-6x3o" // spec example: base64url, has '_' and '-'
+        val expectedBytes = java.util.Base64.getUrlDecoder().decode(base64urlSecret)
+        val rawJson = JSONObject().apply {
+            put("user_id", "u-1")
+            put("secret", base64urlSecret)
+            put("cid", "ddg")
+        }
+        whenever(qrCode.parse(any())).thenReturn(ExchangeV2CodeParseResult.RecoveryCode(rawJson))
+        whenever(syncAccountRepository.processCode(any(), anyOrNull())).thenReturn(Result.Success(true))
+
+        (dispatcher.route("any") as RouteDecision.V2InProgress).outcomes.toList()
+
+        val captor = org.mockito.kotlin.argumentCaptor<SyncAuthCode>()
+        verify(syncAccountRepository).processCode(captor.capture(), anyOrNull())
+        val primaryKey = (captor.firstValue as SyncAuthCode.Recovery).b64Code.primaryKey
+        assertFalse("primaryKey must be standard base64 (no '-'): $primaryKey", primaryKey.contains('-'))
+        assertFalse("primaryKey must be standard base64 (no '_'): $primaryKey", primaryKey.contains('_'))
+        assertArrayEquals(expectedBytes, java.util.Base64.getDecoder().decode(primaryKey))
+    }
+
     @Test fun `FF on, v2 RecoveryCode cid=ddg with missing user_id - emits Failed without calling processCode`() = runTest {
         setV2(true)
         val rawJson = JSONObject().apply {
@@ -264,9 +292,10 @@ class RealSyncCodeDispatcherTest {
         // calls logoutAndJoinNewAccount with a re-encoded v1-shape recovery code and emits
         // LoggedIn (success) without bubbling AccountSwitchingRequired up to the VM.
         setV2(true)
+        val base64urlSecret = "rUzlGqLLlbonAC_zIeh1nrCmuDsDAn6UooUUDz-6x3o" // spec base64url secret
         val rawJson = JSONObject().apply {
             put("user_id", "u-other")
-            put("secret", "s-other")
+            put("secret", base64urlSecret)
             put("cid", "ddg")
         }
         whenever(qrCode.parse(any())).thenReturn(ExchangeV2CodeParseResult.RecoveryCode(rawJson))
@@ -284,12 +313,15 @@ class RealSyncCodeDispatcherTest {
 
         // Verify the v1-shape recovery code passed to logoutAndJoinNewAccount: base64url-encoded
         // JSON with primary_key+user_id (so the v1-only parseSyncAuthCode inside the repo can
-        // re-parse it).
+        // re-parse it). The primary_key is the secret normalised to STANDARD base64 (v1 form).
         val captor = org.mockito.kotlin.argumentCaptor<String>()
         verify(syncAccountRepository).logoutAndJoinNewAccount(captor.capture())
         val decoded = java.util.Base64.getUrlDecoder().decode(captor.firstValue)
         val recovery = JSONObject(String(decoded)).getJSONObject("recovery")
-        assertEquals("s-other", recovery.getString("primary_key"))
+        assertArrayEquals(
+            java.util.Base64.getUrlDecoder().decode(base64urlSecret),
+            java.util.Base64.getDecoder().decode(recovery.getString("primary_key")),
+        )
         assertEquals("u-other", recovery.getString("user_id"))
     }
 
@@ -382,7 +414,7 @@ class RealSyncCodeDispatcherTest {
         setV2(true)
         val rawJson = JSONObject().apply {
             put("user_id", "u")
-            put("secret", "s")
+            put("secret", "AQID") // valid base64 so we reach processCode (the error path under test)
             put("cid", "ddg")
         }
         whenever(qrCode.parse(any())).thenReturn(ExchangeV2CodeParseResult.RecoveryCode(rawJson))
@@ -509,6 +541,57 @@ class RealSyncCodeDispatcherTest {
         // an empty SharedFlow in this test). We just verify startScan was hit on first collection.
         kotlinx.coroutines.withTimeoutOrNull(50) { decision.outcomes.first() }
         verify(runner).startScan(eq("v2-url"))
+    }
+
+    @Test fun `FF on, LinkingV2 exchange - base64url recovery secret is normalised to standard base64 for v1 login`() = runTest {
+        // The actual macOS↔Android failure: Joiner reaches Done with a RecoveryCodeResponse whose
+        // payload carries a base64url secret (spec 1214802412121967). loginWithV2RecoveryCode must
+        // normalise it to standard base64 before the native v1 login, or prepareForLogin throws
+        // "bad base-64" (LOGIN_FAILED). Same key bytes, different alphabet.
+        setV2(true)
+        whenever(qrCode.parse(any())).thenReturn(
+            ExchangeV2CodeParseResult.LinkingV2(channelId = "c", publicKey = "k", version = "2"),
+        )
+        whenever(syncAccountRepository.processCode(any(), anyOrNull())).thenReturn(Result.Success(true))
+        val base64urlSecret = "rUzlGqLLlbonAC_zIeh1nrCmuDsDAn6UooUUDz-6x3o" // spec example: base64url, has '_' and '-'
+        val payloadJson = JSONObject().apply {
+            put(
+                "recovery",
+                JSONObject().apply {
+                    put("user_id", "u-1")
+                    put("secret", base64urlSecret)
+                    put("cid", "ddg")
+                    put("v", "2.0")
+                },
+            )
+        }.toString()
+        val recoveryCodeB64 = java.util.Base64.getUrlEncoder().withoutPadding().encodeToString(payloadJson.toByteArray())
+
+        val flow = (dispatcher.route("v2-url") as RouteDecision.V2InProgress).outcomes
+        val job = launch(start = kotlinx.coroutines.CoroutineStart.UNDISPATCHED) { flow.take(1).toList() }
+        runnerEventsFlow.emit(
+            ExchangeV2Event.Transition(
+                timestampMs = System.currentTimeMillis(),
+                from = ExchangeV2State.Joiner.Waiting,
+                to = ExchangeV2State.Joiner.Done,
+                trigger = com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Message.RecoveryCodeResponse(
+                    rawJson = payloadJson,
+                    recoveryCode = recoveryCodeB64,
+                ),
+                localTrigger = null,
+            ),
+        )
+        job.join()
+
+        val captor = org.mockito.kotlin.argumentCaptor<SyncAuthCode>()
+        verify(syncAccountRepository).processCode(captor.capture(), anyOrNull())
+        val primaryKey = (captor.firstValue as SyncAuthCode.Recovery).b64Code.primaryKey
+        assertFalse("primaryKey must be standard base64 (no '-'): $primaryKey", primaryKey.contains('-'))
+        assertFalse("primaryKey must be standard base64 (no '_'): $primaryKey", primaryKey.contains('_'))
+        assertArrayEquals(
+            java.util.Base64.getUrlDecoder().decode(base64urlSecret),
+            java.util.Base64.getDecoder().decode(primaryKey),
+        )
     }
 
     // ---- presentV2() — Presenter-side mapping ----

@@ -218,12 +218,18 @@ class RealSyncCodeDispatcher @Inject constructor(
                     emit(DispatchOutcome.Failed("v2 recovery code missing required fields"))
                     return@flow
                 }
-                val authCode = SyncAuthCode.Recovery(RecoveryCode(primaryKey = secret, userId = userId))
+                val primaryKey = v2SecretToV1PrimaryKey(secret)
+                if (primaryKey == null) {
+                    logcat { "$TAG: v2 recovery (ddg) secret is not valid base64" }
+                    emit(DispatchOutcome.Failed("v2 recovery code has a malformed secret"))
+                    return@flow
+                }
+                val authCode = SyncAuthCode.Recovery(RecoveryCode(primaryKey = primaryKey, userId = userId))
                 logcat { "$TAG: v2 recovery (ddg) → processCode(Recovery)" }
                 emit(
                     syncAccountRepository.processCode(authCode, existingDeviceId = null).toOutcome(
                         label = "v2 recovery (ddg)",
-                        codeForAccountSwitch = encodeV1RecoveryCodeAsB64(userId = userId, secret = secret),
+                        codeForAccountSwitch = encodeV1RecoveryCodeAsB64(userId = userId, secret = primaryKey),
                     ),
                 )
             }
@@ -375,11 +381,13 @@ class RealSyncCodeDispatcher @Inject constructor(
         val parsed = decodeV2Recovery(b64) ?: return DispatchOutcome.Failed("Couldn't parse received recovery code as v2.0")
         return when (parsed.cid) {
             CID_DDG -> {
-                val recovery = SyncAuthCode.Recovery(RecoveryCode(primaryKey = parsed.secret, userId = parsed.userId))
+                val primaryKey = v2SecretToV1PrimaryKey(parsed.secret)
+                    ?: return DispatchOutcome.Failed("Received recovery code has a malformed secret")
+                val recovery = SyncAuthCode.Recovery(RecoveryCode(primaryKey = primaryKey, userId = parsed.userId))
                 syncAccountRepository.processCode(recovery, existingDeviceId = null)
                     .toOutcome(
                         label = "v2 LinkingV2 login (ddg)",
-                        codeForAccountSwitch = encodeV1RecoveryCodeAsB64(userId = parsed.userId, secret = parsed.secret),
+                        codeForAccountSwitch = encodeV1RecoveryCodeAsB64(userId = parsed.userId, secret = primaryKey),
                     )
             }
             CID_3PARTY -> {
@@ -405,6 +413,19 @@ class RealSyncCodeDispatcher @Inject constructor(
             cid = rec.optString("cid", CID_DDG),
             v = rec.optString("v", "2.0"),
         )
+    }.getOrNull()
+
+    /**
+     * The v2 wire `secret` is base64url-encoded per spec 1214802412121967; Android's native v1
+     * login (SyncNativeLib.decodeKey → android.util.Base64 standard) decodes the primary_key as
+     * STANDARD base64. Re-encode the same key bytes to canonical standard base64 at the v2->v1
+     * boundary, otherwise a conformant peer's base64url secret (macOS/iOS/FE) throws "bad base-64"
+     * (LOGIN_FAILED). Normalising the alphabet first also tolerates an already-standard secret from
+     * a non-conformant/older Android peer. Returns null if the secret isn't valid base64 at all.
+     */
+    private fun v2SecretToV1PrimaryKey(secret: String): String? = runCatching {
+        val bytes = Base64.decode(secret.replace('-', '+').replace('_', '/'), Base64.NO_WRAP)
+        Base64.encodeToString(bytes, Base64.NO_WRAP)
     }.getOrNull()
 
     /**
