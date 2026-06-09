@@ -832,13 +832,13 @@ class AttachmentViewModelTest {
     }
 
     @Test
-    fun whenFileExceedsPageCountThenValidationFailedPixelFiredWithOther() = runTest {
+    fun whenFileExceedsPageCountThenValidationFailedPixelFiredWithPageCountExceeded() = runTest {
         val limits = FileLimits(maxPagesPerFile = 10)
         modelStateFlow.value = ModelState(attachmentLimits = AttachmentLimits(files = limits))
         addFiles(aFileAttachment(pageCount = 11))
         advanceUntilIdle()
 
-        verify(duckChatPixels).fireFileValidationFailed("other")
+        verify(duckChatPixels).fireFileValidationFailed("page_count_exceeded")
         verify(duckChatPixels, never()).fireFileAttached()
     }
 

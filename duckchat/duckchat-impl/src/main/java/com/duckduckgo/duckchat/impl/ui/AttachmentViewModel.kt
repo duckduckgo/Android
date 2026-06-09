@@ -243,7 +243,7 @@ class AttachmentViewModel @Inject constructor(
             added.sizeBytes > fileLimits.maxFileSizeBytes -> FILE_VALIDATION_SIZE_EXCEEDED
             totalFileSizeBytes > fileLimits.maxTotalFileSizeBytes -> FILE_VALIDATION_SIZE_EXCEEDED
             totalFiles > fileLimits.maxPerConversation -> FILE_VALIDATION_COUNT_EXCEEDED
-            (added.pageCount ?: 0) > fileLimits.maxPagesPerFile -> FILE_VALIDATION_OTHER
+            (added.pageCount ?: 0) > fileLimits.maxPagesPerFile -> FILE_VALIDATION_PAGE_COUNT_EXCEEDED
             else -> null
         }
     }
@@ -409,6 +409,7 @@ class AttachmentViewModel @Inject constructor(
         private const val MAX_DIMENSION_PX = 512
         private const val FILE_VALIDATION_SIZE_EXCEEDED = "size_exceeded"
         private const val FILE_VALIDATION_COUNT_EXCEEDED = "count_exceeded"
+        private const val FILE_VALIDATION_PAGE_COUNT_EXCEEDED = "page_count_exceeded"
         private const val FILE_VALIDATION_OTHER = "other"
         private const val IMAGE_VALIDATION_COUNT_EXCEEDED = "count_exceeded"
         private const val IMAGE_VALIDATION_OTHER = "other"
