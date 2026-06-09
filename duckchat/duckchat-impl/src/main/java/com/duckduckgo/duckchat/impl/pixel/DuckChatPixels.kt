@@ -616,6 +616,21 @@ object DuckChatPixelParameters {
     const val NEW_ADDRESS_BAR_SELECTION = "selection"
     const val DEFAULT_TOGGLE_POSITION = "default_position"
     const val DEFAULT_TOGGLE_POSITION_VALUE = "value"
+
+    // Unified Input pixels
+    const val SELECTED_TOOL = "selected_tool"
+    const val MODEL_ID = "model_id"
+    const val REASONING_EFFORT = "reasoning_effort"
+    const val EFFORT_LEVEL = "effort_level"
+    const val HAS_IMAGE_ATTACHMENT = "has_image_attachment"
+    const val HAS_FILE_ATTACHMENT = "has_file_attachment"
+    const val HAS_TEXT = "has_text"
+    const val ATTACHMENT_SOURCE = "source"
+    const val FILE_VALIDATION_REASON = "reason"
+    const val UPSELL_SOURCE = "source"
+    const val UPSELL_CURRENT_TIER = "current_tier"
+    const val UPSELL_REQUIRED_TIER = "required_tier"
+    const val UPSELL_FLOW_TYPE = "flow_type"
 }
 
 @ContributesMultibinding(AppScope::class)
