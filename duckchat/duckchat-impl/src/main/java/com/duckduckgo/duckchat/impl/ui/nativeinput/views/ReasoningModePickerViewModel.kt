@@ -134,7 +134,11 @@ class ReasoningModePickerViewModel @Inject constructor(
             return
         }
         if (match.isAccessible) {
-            duckChatPixels.fireReasoningEffortSelected(mode.toEffortParam())
+            // Mirror the model picker: only report a selection when it actually changes, not on
+            // re-tapping the already-selected effort. The persisted selection still updates below.
+            if (mode != state.value.displayedMode) {
+                duckChatPixels.fireReasoningEffortSelected(mode.toEffortParam())
+            }
             if (chatResolution != null) {
                 viewModelScope.launch { modelManager.setChatScopedReasoningMode(mode) }
             } else {

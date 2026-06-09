@@ -190,6 +190,24 @@ class ReasoningModePickerViewModelTest {
     }
 
     @Test
+    fun whenAccessibleModeTappedMatchingCurrentThenNoEffortPixel() = runTest {
+        modelState.value = ModelState(
+            selectedReasoningMode = ReasoningMode.FAST,
+            availableReasoningModes = listOf(
+                AvailableReasoningMode(ReasoningMode.FAST, ReasoningEffort.NONE),
+                AvailableReasoningMode(ReasoningMode.REASONING, ReasoningEffort.LOW),
+            ),
+        )
+        runCurrent()
+        assertEquals(ReasoningMode.FAST, testee.state.value.displayedMode)
+
+        testee.onModeTapped(ReasoningMode.FAST, PickerSurface.REASONING_PICKER_ADDRESS_BAR)
+        runCurrent()
+
+        verify(duckChatPixels, never()).fireReasoningEffortSelected(any())
+    }
+
+    @Test
     fun whenPlusUserTapsGatedModeRequiringProThenUpsellPixelFiredAndNoEffortPixel() = runTest {
         modelState.value = ModelState(
             userTier = UserTier.PLUS,
