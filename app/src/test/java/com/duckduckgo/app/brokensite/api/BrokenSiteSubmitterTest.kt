@@ -3,7 +3,6 @@ package com.duckduckgo.app.brokensite.api
 import android.annotation.SuppressLint
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.pixels.AppPixelName.BROKEN_SITE_REPORT
-import com.duckduckgo.app.pixels.AppPixelName.BROKEN_SITE_REPORTED
 import com.duckduckgo.app.pixels.AppPixelName.PROTECTION_TOGGLE_BROKEN_SITE_REPORT
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.statistics.model.Atb
@@ -532,12 +531,6 @@ class BrokenSiteSubmitterTest {
         testee.submitBrokenSiteFeedback(brokenSite, toggle = false)
 
         verify(mockPixel).fire(eq(BROKEN_SITE_REPORT.pixelName), any(), any(), eq(Count))
-
-        val paramsCaptor = argumentCaptor<Map<String, String>>()
-        verify(mockPixel).fire(eq(BROKEN_SITE_REPORTED), parameters = paramsCaptor.capture(), any(), eq(Count))
-        val params = paramsCaptor.firstValue
-        assertEquals(brokenSite.siteUrl, params[Pixel.PixelParameter.URL])
-
         verify(mockPixel, never()).fire(eq(PROTECTION_TOGGLE_BROKEN_SITE_REPORT.pixelName), any(), any(), eq(Count))
     }
 
@@ -551,9 +544,6 @@ class BrokenSiteSubmitterTest {
         val paramsCaptor = argumentCaptor<Map<String, String>>()
         verify(mockPixel).fire(eq(BROKEN_SITE_REPORT.pixelName), parameters = paramsCaptor.capture(), any(), eq(Count))
         assertEquals(brokenSite.siteUrl, paramsCaptor.lastValue["siteUrl"])
-
-        verify(mockPixel).fire(eq(BROKEN_SITE_REPORTED), parameters = paramsCaptor.capture(), any(), eq(Count))
-        assertEquals(brokenSite.siteUrl, paramsCaptor.lastValue[Pixel.PixelParameter.URL])
     }
 
     @Test
@@ -566,9 +556,6 @@ class BrokenSiteSubmitterTest {
         val paramsCaptor = argumentCaptor<Map<String, String>>()
         verify(mockPixel).fire(eq(BROKEN_SITE_REPORT.pixelName), parameters = paramsCaptor.capture(), any(), eq(Count))
         assertEquals(brokenSite.siteUrl, paramsCaptor.lastValue["siteUrl"])
-
-        verify(mockPixel).fire(eq(BROKEN_SITE_REPORTED), parameters = paramsCaptor.capture(), any(), eq(Count))
-        assertEquals(brokenSite.siteUrl, paramsCaptor.lastValue[Pixel.PixelParameter.URL])
     }
 
     @Test
@@ -581,9 +568,6 @@ class BrokenSiteSubmitterTest {
         val paramsCaptor = argumentCaptor<Map<String, String>>()
         verify(mockPixel).fire(eq(BROKEN_SITE_REPORT.pixelName), parameters = paramsCaptor.capture(), any(), eq(Count))
         assertEquals(TRACKING_URL, paramsCaptor.lastValue["siteUrl"])
-
-        verify(mockPixel).fire(eq(BROKEN_SITE_REPORTED), parameters = paramsCaptor.capture(), any(), eq(Count))
-        assertEquals(TRACKING_URL, paramsCaptor.lastValue[Pixel.PixelParameter.URL])
     }
 
     @Test
