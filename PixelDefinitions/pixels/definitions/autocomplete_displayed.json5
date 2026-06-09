@@ -41,5 +41,61 @@
         "triggers": ["other"],
         "suffixes": ["form_factor"],
         "parameters": ["appVersion"]
+    },
+    "m_autocomplete_duckai_click_website": {
+        "description": "User tapped a website autocomplete suggestion in the Duck.ai Unified Input.",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_autocomplete_duckai_click_bookmark": {
+        "description": "User tapped a bookmark autocomplete suggestion in the Duck.ai Unified Input.",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_autocomplete_duckai_click_favorite": {
+        "description": "User tapped a favorite autocomplete suggestion in the Duck.ai Unified Input.",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_autocomplete_duckai_click_history_search": {
+        "description": "User tapped a history search-query autocomplete suggestion in the Duck.ai Unified Input.",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_autocomplete_duckai_click_history_site": {
+        "description": "User tapped a history site autocomplete suggestion in the Duck.ai Unified Input.",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_autocomplete_duckai_click_switch_to_tab": {
+        "description": "User tapped a 'switch to tab' autocomplete suggestion in the Duck.ai Unified Input.",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_autocomplete_duckai_click_chat_history": {
+        "description": "User tapped a chat history autocomplete suggestion in the Duck.ai Unified Input.",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_autocomplete_duckai_click_search_duckduckgo": {
+        "description": "User tapped a 'search DuckDuckGo' autocomplete suggestion in the Duck.ai Unified Input.",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
     }
 }
