@@ -3740,6 +3740,19 @@ class BrowserTabFragment :
                     // no-op
                 }
 
+                override fun onTabClosed(
+                    tabId: String,
+                    onUndo: () -> Unit,
+                    onCommit: () -> Unit,
+                ) {
+                    browserActivity?.showUndoableSnackbar(
+                        message = getString(com.duckduckgo.browser.ui.R.string.newTabReturnHatchTabClosed),
+                        actionLabel = getString(com.duckduckgo.browser.ui.R.string.newTabReturnHatchUndo),
+                        onAction = onUndo,
+                        onDismiss = onCommit,
+                    )
+                }
+
                 override fun onBurnTabPressed() {
                     viewLifecycleOwner.lifecycleScope.launch {
                         val dialog = fireDialogProvider.createFireDialog(FireDialogOrigin.Hatch(newTabReturnHatchView.tabId))

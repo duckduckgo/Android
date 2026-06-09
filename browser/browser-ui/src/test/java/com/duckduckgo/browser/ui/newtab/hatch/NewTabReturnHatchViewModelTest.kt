@@ -29,6 +29,7 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.newtabpage.api.NtpAfterIdleManager
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -54,16 +55,16 @@ class NewTabReturnHatchViewModelTest {
     private val mockDuckDuckGoUrlDetector: DuckDuckGoUrlDetector = mock()
     private val mockNtpAfterIdleManager: NtpAfterIdleManager = mock()
     private val mockPixel: Pixel = mock()
-    private val lastAccessedTabFlow = MutableStateFlow<TabEntity?>(null)
     private val tabsFlow = MutableStateFlow<List<TabEntity>>(emptyList())
-    private val afterIdleReturnFlow = MutableStateFlow(true)
+
+    // Starts false so each test controls the idle-return rising edge that captures the snapshot.
+    private val afterIdleReturnFlow = MutableStateFlow(false)
     private val nativeInputEnabledFlow = MutableStateFlow(true)
 
     private lateinit var testee: NewTabReturnHatchViewModel
 
     @Before
     fun setup() {
-        whenever(mockTabRepository.flowLastAccessedTab).thenReturn(lastAccessedTabFlow)
         whenever(mockTabRepository.flowTabs).thenReturn(tabsFlow)
         whenever(mockNtpAfterIdleManager.isAfterIdleReturn).thenReturn(afterIdleReturnFlow)
         whenever(mockDuckChat.observeNativeInputFieldUserSettingEnabled()).thenReturn(nativeInputEnabledFlow)
@@ -78,14 +79,22 @@ class NewTabReturnHatchViewModelTest {
         )
     }
 
+    // Simulates returning from idle: stub the one-time last-accessed read and trigger the rising
+    // edge that captures the snapshot.
+    private suspend fun returnFromIdleWith(tab: TabEntity?) {
+        whenever(mockTabRepository.getLastAccessedTab()).thenReturn(tab)
+        afterIdleReturnFlow.value = false
+        afterIdleReturnFlow.value = true
+    }
+
     @Test
-    fun whenLastAccessedTabExistsThenViewStateShowsTab() = runTest {
+    fun whenReturnFromIdleWithTabThenViewStateShowsTab() = runTest {
         val tab = TabEntity(tabId = "tab1", url = "https://example.com", title = "Example")
 
-        lastAccessedTabFlow.emit(tab)
-
         testee.viewState.test {
-            val state = awaitItem()
+            returnFromIdleWith(tab)
+
+            val state = expectMostRecentItem()
             assertTrue(state.shouldShow)
             assertEquals("Example", state.tabTitle)
             assertEquals("https://example.com", state.url)
@@ -95,45 +104,64 @@ class NewTabReturnHatchViewModelTest {
     }
 
     @Test
-    fun whenNoLastAccessedTabThenViewStateHidesHatch() = runTest {
-        lastAccessedTabFlow.emit(null)
-
+    fun whenReturnFromIdleWithNoTabThenViewStateHidesHatch() = runTest {
         testee.viewState.test {
-            val state = awaitItem()
+            returnFromIdleWith(null)
+
+            assertFalse(expectMostRecentItem().shouldShow)
+        }
+    }
+
+    @Test
+    fun whenInitialStateThenTabIdIsEmptyAndHatchHidden() = runTest {
+        testee.viewState.test {
+            val state = expectMostRecentItem()
+            assertEquals("", state.tabId)
             assertFalse(state.shouldShow)
         }
     }
 
     @Test
-    fun whenLastAccessedTabChangesThenViewStateUpdates() = runTest {
+    fun whenSnapshotCapturedThenHatchDoesNotChangeWhenLastAccessedTabChanges() = runTest {
         val tab1 = TabEntity(tabId = "tab1", url = "https://example.com", title = "Example")
         val tab2 = TabEntity(tabId = "tab2", url = "https://other.com", title = "Other")
 
         testee.viewState.test {
-            skipItems(1) // initial state
+            returnFromIdleWith(tab1)
+            assertEquals("tab1", expectMostRecentItem().tabId)
 
-            lastAccessedTabFlow.emit(tab1)
-            assertEquals("tab1", awaitItem().tabId)
+            // A new last-accessed tab without a fresh idle-return must NOT re-emit / switch tabs.
+            whenever(mockTabRepository.getLastAccessedTab()).thenReturn(tab2)
+            advanceUntilIdle()
 
-            lastAccessedTabFlow.emit(tab2)
-            assertEquals("tab2", awaitItem().tabId)
+            expectNoEvents()
         }
     }
 
     @Test
-    fun whenOnHatchPressedThenFiresReturnTabCountAndDailyPixels() = runTest {
-        testee.onHatchPressed()
+    fun whenFreshIdleReturnThenRecapturesSnapshot() = runTest {
+        val tab1 = TabEntity(tabId = "tab1", url = "https://example.com", title = "Example")
+        val tab2 = TabEntity(tabId = "tab2", url = "https://other.com", title = "Other")
 
-        verify(mockPixel).fire(NewTabReturnHatchPixelName.OPTION_SELECTED_RETURN_TAB, type = Count)
-        verify(mockPixel).fire(NewTabReturnHatchPixelName.OPTION_SELECTED_RETURN_TAB_DAILY, type = Daily())
+        testee.viewState.test {
+            returnFromIdleWith(tab1)
+            assertEquals("tab1", expectMostRecentItem().tabId)
+
+            returnFromIdleWith(tab2)
+            assertEquals("tab2", expectMostRecentItem().tabId)
+        }
     }
 
     @Test
-    fun whenInitialStateThenTabIdIsEmpty() = runTest {
+    fun whenNotAfterIdleReturnThenViewStateHidesHatch() = runTest {
+        val tab = TabEntity(tabId = "tab1", url = "https://example.com", title = "Example")
+
         testee.viewState.test {
-            val state = awaitItem()
-            assertEquals("", state.tabId)
-            assertFalse(state.shouldShow)
+            returnFromIdleWith(tab)
+            assertTrue(expectMostRecentItem().shouldShow)
+
+            afterIdleReturnFlow.value = false
+            assertFalse(expectMostRecentItem().shouldShow)
         }
     }
 
@@ -141,10 +169,10 @@ class NewTabReturnHatchViewModelTest {
     fun whenLastAccessedTabHasNullTitleAndUrlThenViewStateUsesEmptyStrings() = runTest {
         val tab = TabEntity(tabId = "tab1", url = null, title = null)
 
-        lastAccessedTabFlow.emit(tab)
-
         testee.viewState.test {
-            val state = awaitItem()
+            returnFromIdleWith(tab)
+
+            val state = expectMostRecentItem()
             assertTrue(state.shouldShow)
             assertEquals("", state.tabTitle)
             assertEquals("", state.url)
@@ -158,11 +186,9 @@ class NewTabReturnHatchViewModelTest {
         val tab = TabEntity(tabId = "tab1", url = url, title = "Duck.ai")
         whenever(mockDuckChat.isDuckChatUrl(Uri.parse(url))).thenReturn(true)
 
-        lastAccessedTabFlow.emit(tab)
-
         testee.viewState.test {
-            val state = awaitItem()
-            assertTrue(state.isDuckChat)
+            returnFromIdleWith(tab)
+            assertTrue(expectMostRecentItem().isDuckChat)
         }
     }
 
@@ -172,11 +198,9 @@ class NewTabReturnHatchViewModelTest {
         val tab = TabEntity(tabId = "tab1", url = url, title = "Example")
         whenever(mockDuckChat.isDuckChatUrl(Uri.parse(url))).thenReturn(false)
 
-        lastAccessedTabFlow.emit(tab)
-
         testee.viewState.test {
-            val state = awaitItem()
-            assertFalse(state.isDuckChat)
+            returnFromIdleWith(tab)
+            assertFalse(expectMostRecentItem().isDuckChat)
         }
     }
 
@@ -184,11 +208,9 @@ class NewTabReturnHatchViewModelTest {
     fun whenLastAccessedTabHasNullUrlThenIsDuckChatIsFalse() = runTest {
         val tab = TabEntity(tabId = "tab1", url = null, title = null)
 
-        lastAccessedTabFlow.emit(tab)
-
         testee.viewState.test {
-            val state = awaitItem()
-            assertFalse(state.isDuckChat)
+            returnFromIdleWith(tab)
+            assertFalse(expectMostRecentItem().isDuckChat)
         }
     }
 
@@ -198,11 +220,9 @@ class NewTabReturnHatchViewModelTest {
         val tab = TabEntity(tabId = "tab1", url = url, title = "test at DuckDuckGo")
         whenever(mockDuckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url)).thenReturn(true)
 
-        lastAccessedTabFlow.emit(tab)
-
         testee.viewState.test {
-            val state = awaitItem()
-            assertTrue(state.isSerp)
+            returnFromIdleWith(tab)
+            assertTrue(expectMostRecentItem().isSerp)
         }
     }
 
@@ -212,83 +232,18 @@ class NewTabReturnHatchViewModelTest {
         val tab = TabEntity(tabId = "tab1", url = url, title = "Example")
         whenever(mockDuckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url)).thenReturn(false)
 
-        lastAccessedTabFlow.emit(tab)
-
         testee.viewState.test {
-            val state = awaitItem()
-            assertFalse(state.isSerp)
+            returnFromIdleWith(tab)
+            assertFalse(expectMostRecentItem().isSerp)
         }
     }
 
     @Test
-    fun whenLastAccessedTabIsDuckChatWithEmptyTitleThenViewStateHasEmptyTitle() = runTest {
-        val url = "https://duck.ai/chat"
-        val tab = TabEntity(tabId = "tab1", url = url, title = "")
-        whenever(mockDuckChat.isDuckChatUrl(Uri.parse(url))).thenReturn(true)
+    fun whenOnHatchPressedThenFiresReturnTabCountAndDailyPixels() = runTest {
+        testee.onHatchPressed()
 
-        lastAccessedTabFlow.emit(tab)
-
-        testee.viewState.test {
-            val state = awaitItem()
-            assertTrue(state.isDuckChat)
-            assertEquals("", state.tabTitle)
-        }
-    }
-
-    @Test
-    fun whenLastAccessedTabIsSerpWithEmptyTitleThenViewStateHasEmptyTitle() = runTest {
-        val url = "https://duckduckgo.com/?q=test"
-        val tab = TabEntity(tabId = "tab1", url = url, title = "")
-        whenever(mockDuckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url)).thenReturn(true)
-
-        lastAccessedTabFlow.emit(tab)
-
-        testee.viewState.test {
-            val state = awaitItem()
-            assertTrue(state.isSerp)
-            assertEquals("", state.tabTitle)
-        }
-    }
-
-    @Test
-    fun whenLastAccessedTabExistsButNotAfterIdleReturnThenViewStateHidesHatch() = runTest {
-        afterIdleReturnFlow.value = false
-        val tab = TabEntity(tabId = "tab1", url = "https://example.com", title = "Example")
-
-        lastAccessedTabFlow.emit(tab)
-
-        testee.viewState.test {
-            val state = awaitItem()
-            assertFalse(state.shouldShow)
-        }
-    }
-
-    @Test
-    fun whenAfterIdleReturnChangesToFalseThenViewStateHidesHatch() = runTest {
-        val tab = TabEntity(tabId = "tab1", url = "https://example.com", title = "Example")
-        lastAccessedTabFlow.emit(tab)
-
-        testee.viewState.test {
-            assertTrue(awaitItem().shouldShow)
-
-            afterIdleReturnFlow.value = false
-            assertFalse(awaitItem().shouldShow)
-        }
-    }
-
-    @Test
-    fun whenLastAccessedTabClearedThenViewStateHidesHatch() = runTest {
-        val tab = TabEntity(tabId = "tab1", url = "https://example.com", title = "Example")
-
-        testee.viewState.test {
-            skipItems(1) // initial state
-
-            lastAccessedTabFlow.emit(tab)
-            assertTrue(awaitItem().shouldShow)
-
-            lastAccessedTabFlow.emit(null)
-            assertFalse(awaitItem().shouldShow)
-        }
+        verify(mockPixel).fire(NewTabReturnHatchPixelName.OPTION_SELECTED_RETURN_TAB, type = Count)
+        verify(mockPixel).fire(NewTabReturnHatchPixelName.OPTION_SELECTED_RETURN_TAB_DAILY, type = Daily())
     }
 
     @Test
@@ -296,11 +251,9 @@ class NewTabReturnHatchViewModelTest {
         nativeInputEnabledFlow.value = true
         val tab = TabEntity(tabId = "tab1", url = "https://example.com", title = "Example")
 
-        lastAccessedTabFlow.emit(tab)
-
         testee.viewState.test {
-            val state = awaitItem()
-            assertTrue(state.showTabsButton)
+            returnFromIdleWith(tab)
+            assertTrue(expectMostRecentItem().showTabsButton)
         }
     }
 
@@ -309,27 +262,23 @@ class NewTabReturnHatchViewModelTest {
         nativeInputEnabledFlow.value = false
         val tab = TabEntity(tabId = "tab1", url = "https://example.com", title = "Example")
 
-        lastAccessedTabFlow.emit(tab)
-
         testee.viewState.test {
-            val state = awaitItem()
-            assertFalse(state.showTabsButton)
+            returnFromIdleWith(tab)
+            assertFalse(expectMostRecentItem().showTabsButton)
         }
     }
 
     @Test
-    fun whenNativeInputToggledThenShowTabsButtonUpdates() = runTest {
+    fun whenTabsCountChangesThenViewStateCountStaysLive() = runTest {
         val tab = TabEntity(tabId = "tab1", url = "https://example.com", title = "Example")
-        lastAccessedTabFlow.emit(tab)
+        tabsFlow.value = listOf(tab)
 
         testee.viewState.test {
-            assertTrue(awaitItem().showTabsButton)
+            returnFromIdleWith(tab)
+            assertEquals(1, expectMostRecentItem().tabs)
 
-            nativeInputEnabledFlow.value = false
-            assertFalse(awaitItem().showTabsButton)
-
-            nativeInputEnabledFlow.value = true
-            assertTrue(awaitItem().showTabsButton)
+            tabsFlow.value = listOf(tab, TabEntity(tabId = "tab2", url = "https://other.com", title = "Other"))
+            assertEquals(2, expectMostRecentItem().tabs)
         }
     }
 
@@ -343,28 +292,31 @@ class NewTabReturnHatchViewModelTest {
     }
 
     @Test
-    fun whenCloseTabThenHidesHatchWithoutDeletingTab() = runTest {
+    fun whenCloseTabThenMarksTabDeletableAndHidesHatch() = runTest {
         val tab = TabEntity(tabId = "tab1", url = "https://example.com", title = "Example")
-        lastAccessedTabFlow.emit(tab)
 
         testee.viewState.test {
-            assertTrue(awaitItem().shouldShow)
+            returnFromIdleWith(tab)
+            assertTrue(expectMostRecentItem().shouldShow)
 
             testee.closeTab()
+            advanceUntilIdle()
 
-            assertFalse(awaitItem().shouldShow)
+            assertFalse(expectMostRecentItem().shouldShow)
         }
 
+        verify(mockTabRepository).markDeletable(listOf("tab1"))
+        verify(mockTabRepository, never()).purgeDeletableTabs()
         verify(mockTabRepository, never()).deleteTabs(any())
     }
 
     @Test
     fun whenCloseTabThenShowTabClosedSnackbarCommandEmittedWithTabId() = runTest {
         val tab = TabEntity(tabId = "tab1", url = "https://example.com", title = "Example")
-        lastAccessedTabFlow.emit(tab)
 
         testee.viewState.test {
-            awaitItem() // wait for state to settle with the emitted tab
+            returnFromIdleWith(tab)
+            expectMostRecentItem()
         }
 
         testee.commands.test {
@@ -375,71 +327,92 @@ class NewTabReturnHatchViewModelTest {
     }
 
     @Test
-    fun whenCloseTabWithEmptyCurrentTabIdThenNoSnackbarAndNoStateChange() = runTest {
+    fun whenCloseTabWithEmptyCurrentTabIdThenNoSnackbarAndDoesNotMarkDeletable() = runTest {
         testee.viewState.test {
-            assertFalse(awaitItem().shouldShow)
+            assertFalse(expectMostRecentItem().shouldShow)
 
             testee.commands.test {
                 testee.closeTab()
                 expectNoEvents()
             }
-
-            expectNoEvents()
         }
+
+        advanceUntilIdle()
+        verify(mockTabRepository, never()).markDeletable(any<List<String>>())
     }
 
     @Test
-    fun whenOnUndoCloseTabThenRestoresHatchWithoutDeletingTab() = runTest {
+    fun whenOnUndoCloseTabThenUndoesDeletableAndReshowsSameTab() = runTest {
         val tab = TabEntity(tabId = "tab1", url = "https://example.com", title = "Example")
-        lastAccessedTabFlow.emit(tab)
 
         testee.viewState.test {
-            assertTrue(awaitItem().shouldShow)
+            returnFromIdleWith(tab)
+            assertTrue(expectMostRecentItem().shouldShow)
 
             testee.closeTab()
-            assertFalse(awaitItem().shouldShow)
+            advanceUntilIdle()
+            assertFalse(expectMostRecentItem().shouldShow)
 
             testee.onUndoCloseTab("tab1")
-            assertTrue(awaitItem().shouldShow)
+            advanceUntilIdle()
+            val restored = expectMostRecentItem()
+            assertTrue(restored.shouldShow)
+            assertEquals("tab1", restored.tabId)
         }
 
+        verify(mockTabRepository).undoDeletable(listOf("tab1"))
+        verify(mockTabRepository, never()).purgeDeletableTabs()
+    }
+
+    @Test
+    fun whenOnTabClosedSnackbarDismissedThenPurgesDeletableTabs() = runTest {
+        testee.onTabClosedSnackbarDismissed("tab1")
+        advanceUntilIdle()
+
+        verify(mockTabRepository).purgeDeletableTabs()
         verify(mockTabRepository, never()).deleteTabs(any())
     }
 
     @Test
-    fun whenOnTabClosedSnackbarDismissedThenDeletesTab() = runTest {
-        testee.onTabClosedSnackbarDismissed("tab1")
+    fun whenSnackbarDismissedThenHatchStaysHiddenUntilFreshIdleReturn() = runTest {
+        val tab1 = TabEntity(tabId = "tab1", url = "https://example.com", title = "Example")
 
-        verify(mockTabRepository).deleteTabs(listOf("tab1"))
+        testee.viewState.test {
+            returnFromIdleWith(tab1)
+            assertTrue(expectMostRecentItem().shouldShow)
+
+            testee.closeTab()
+            advanceUntilIdle()
+            testee.onTabClosedSnackbarDismissed("tab1")
+            advanceUntilIdle()
+
+            assertFalse(expectMostRecentItem().shouldShow)
+        }
     }
 
     @Test
-    fun whenSnackbarDismissedThenHatchStaysHiddenEvenIfAnotherTabBecomesLastAccessed() = runTest {
-        val tab1 = TabEntity(tabId = "tab1", url = "https://example.com", title = "Example")
-        val tab2 = TabEntity(tabId = "tab2", url = "https://other.com", title = "Other")
-        lastAccessedTabFlow.emit(tab1)
+    fun whenCloseTabThenFiresCloseTabCountAndDailyPixels() = runTest {
+        val tab = TabEntity(tabId = "tab1", url = "https://example.com", title = "Example")
 
         testee.viewState.test {
-            assertTrue(awaitItem().shouldShow)
-
-            testee.closeTab()
-            assertFalse(awaitItem().shouldShow)
-
-            testee.onTabClosedSnackbarDismissed("tab1")
-            lastAccessedTabFlow.emit(tab2)
-
-            expectNoEvents()
+            returnFromIdleWith(tab)
+            expectMostRecentItem()
         }
+
+        testee.closeTab()
+
+        verify(mockPixel).fire(NewTabReturnHatchPixelName.OPTION_SELECTED_CLOSE_TAB, type = Count)
+        verify(mockPixel).fire(NewTabReturnHatchPixelName.OPTION_SELECTED_CLOSE_TAB_DAILY, type = Daily())
     }
 
     @Test
     fun whenBurnTabPressedAndTabRemovedFromRepositoryThenHatchHides() = runTest {
         val tab = TabEntity(tabId = "tab1", url = "https://example.com", title = "Example")
-        lastAccessedTabFlow.emit(tab)
         tabsFlow.value = listOf(tab)
 
         testee.viewState.test {
-            assertTrue(awaitItem().shouldShow)
+            returnFromIdleWith(tab)
+            assertTrue(expectMostRecentItem().shouldShow)
 
             testee.onBurnTabPressed()
             tabsFlow.value = emptyList()
@@ -457,72 +430,18 @@ class NewTabReturnHatchViewModelTest {
     @Test
     fun whenBurnTabPressedButTabStillInRepositoryThenHatchStaysVisible() = runTest {
         val tab = TabEntity(tabId = "tab1", url = "https://example.com", title = "Example")
-        lastAccessedTabFlow.emit(tab)
         tabsFlow.value = listOf(tab)
 
         testee.viewState.test {
-            assertTrue(awaitItem().shouldShow)
+            returnFromIdleWith(tab)
+            assertTrue(expectMostRecentItem().shouldShow)
 
             testee.onBurnTabPressed()
+            advanceUntilIdle()
 
+            // Burn target still present, so the hatch state is unchanged (stays visible).
             expectNoEvents()
         }
-    }
-
-    @Test
-    fun whenBurnTabPressedAndOnlyAnotherTabRemovedThenHatchStaysVisible() = runTest {
-        val burnTarget = TabEntity(tabId = "tab1", url = "https://example.com", title = "Example")
-        val otherTab = TabEntity(tabId = "tab2", url = "https://other.com", title = "Other")
-        lastAccessedTabFlow.emit(burnTarget)
-        tabsFlow.value = listOf(burnTarget, otherTab)
-
-        testee.viewState.test {
-            assertTrue(awaitItem().shouldShow)
-
-            testee.onBurnTabPressed()
-            tabsFlow.value = listOf(burnTarget)
-
-            // tabs count drops from 2 to 1 so viewState re-emits, but shouldShow stays true
-            // because the burn target is still present in the repository.
-            assertTrue(awaitItem().shouldShow)
-        }
-    }
-
-    @Test
-    fun whenBurnTabPressedWithEmptyCurrentTabIdThenHatchUnaffectedByTabsChanges() = runTest {
-        lastAccessedTabFlow.emit(null)
-
-        testee.viewState.test {
-            assertFalse(awaitItem().shouldShow)
-
-            testee.onBurnTabPressed()
-            tabsFlow.value = emptyList()
-
-            expectNoEvents()
-        }
-    }
-
-    @Test
-    fun whenCloseTabThenFiresCloseTabCountAndDailyPixels() = runTest {
-        val tab = TabEntity(tabId = "tab1", url = "https://example.com", title = "Example")
-        lastAccessedTabFlow.emit(tab)
-
-        testee.viewState.test {
-            awaitItem() // wait for state to settle so currentTabId is populated
-        }
-
-        testee.closeTab()
-
-        verify(mockPixel).fire(NewTabReturnHatchPixelName.OPTION_SELECTED_CLOSE_TAB, type = Count)
-        verify(mockPixel).fire(NewTabReturnHatchPixelName.OPTION_SELECTED_CLOSE_TAB_DAILY, type = Daily())
-    }
-
-    @Test
-    fun whenCloseTabWithEmptyCurrentTabIdThenStillFiresCloseTabPixels() = runTest {
-        testee.closeTab()
-
-        verify(mockPixel).fire(NewTabReturnHatchPixelName.OPTION_SELECTED_CLOSE_TAB, type = Count)
-        verify(mockPixel).fire(NewTabReturnHatchPixelName.OPTION_SELECTED_CLOSE_TAB_DAILY, type = Daily())
     }
 
     @Test

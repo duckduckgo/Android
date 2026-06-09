@@ -105,6 +105,8 @@ import com.duckduckgo.voice.api.VoiceSearchLauncher.Event.VoiceRecognitionSucces
 import com.duckduckgo.voice.api.VoiceSearchLauncher.Event.VoiceSearchDisabled
 import com.duckduckgo.voice.api.VoiceSearchLauncher.Source.BROWSER
 import com.duckduckgo.voice.api.VoiceSearchLauncher.VoiceSearchMode
+import com.google.android.material.snackbar.BaseTransientBottomBar
+import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
@@ -112,6 +114,7 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import logcat.logcat
 import javax.inject.Inject
+import com.duckduckgo.browser.ui.R as BrowserUiR
 import com.duckduckgo.mobile.android.R as CommonR
 
 @InjectWith(FragmentScope::class)
@@ -616,6 +619,25 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
                             restoreLogoTopMargin(visible)
                         }
                     }
+                }
+
+                override fun onTabClosed(
+                    tabId: String,
+                    onUndo: () -> Unit,
+                    onCommit: () -> Unit,
+                ) {
+                    // Parent to the screen root (resolves to the resizing activity content, so it
+                    // clears the keyboard) and anchor above the input widget when it's at the bottom.
+                    val anchor = if (useTopBar) null else binding.inputModeWidgetContainerBottom
+                    Snackbar.make(binding.root, BrowserUiR.string.newTabReturnHatchTabClosed, Snackbar.LENGTH_LONG)
+                        .apply { anchor?.let { setAnchorView(it) } }
+                        .setAction(BrowserUiR.string.newTabReturnHatchUndo) { onUndo() }
+                        .addCallback(object : Snackbar.Callback() {
+                            override fun onDismissed(snackbar: Snackbar, event: Int) {
+                                if (event != BaseTransientBottomBar.BaseCallback.DISMISS_EVENT_ACTION) onCommit()
+                            }
+                        })
+                        .show()
                 }
 
                 override fun onBurnTabPressed() {

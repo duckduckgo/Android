@@ -20,6 +20,7 @@ import android.animation.LayoutTransition
 import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewTreeObserver
 import android.widget.FrameLayout
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.view.updateLayoutParams
@@ -176,6 +177,13 @@ class NativeInputLayoutCoordinator(
         if (targets.isEmpty()) return
         val anchor = widgetView.findViewById(R.id.inputModeWidgetCard) ?: widgetView
 
+        // Resolved once here instead of per call inside isLogoOnlyContent: that runs from the global
+        // layout listener below on every window layout pass, and findViewById walks the tree each
+        // time. These views inflate alongside newTabContent, so caching the references is safe;
+        // their live visibility/height are still read on each pass.
+        val ddgLogoView = rootView.findViewById<View?>(R.id.ddgLogo)
+        val returnHatchView = rootView.findViewById<View?>(R.id.newTabReturnHatchView)
+
         // Animate child reflows when the widget toggles Search ↔ DuckAI changes our padding.
         // The transition is staged here but only assigned to the parent once the enter animation
         // completes (see enableContentLayoutTransition). Otherwise the per-frame setPadding
@@ -209,8 +217,8 @@ class NativeInputLayoutCoordinator(
 
         fun isLogoOnlyContent(view: View): Boolean {
             if (view != newTabContent) return false
-            val logoVisible = rootView.findViewById<View?>(R.id.ddgLogo)?.visibility == View.VISIBLE
-            val hatchHeightPx = rootView.findViewById<View?>(R.id.newTabReturnHatchView)?.height ?: 0
+            val logoVisible = ddgLogoView?.visibility == View.VISIBLE
+            val hatchHeightPx = returnHatchView?.height ?: 0
             return isLogoOnly(logoVisible, hatchHeightPx)
         }
 
@@ -273,6 +281,23 @@ class NativeInputLayoutCoordinator(
             }
         widgetView.addOnLayoutChangeListener(layoutListener)
         rootView.addOnLayoutChangeListener(layoutListener)
+
+        // Several inputs to the offset change asynchronously without moving rootView/widgetView —
+        // the return hatch showing/hiding (its height feeds isLogoOnlyContent), the logo's
+        // visibility, and NTP content reflow shifting the content's window position. The per-view
+        // OnLayoutChange listeners above don't fire for those, so we need a post-layout signal that
+        // covers the whole NTP. viewTreeObserver is the window-shared one, so this fires on every
+        // global layout pass (keyboard, scroll, etc.); that breadth is deliberate — a listener
+        // scoped to just the hatch misses the logo/content cases and fires mid-layout with stale
+        // sibling positions. Kept cheap: skipped while animating (isWidgetAnimating), a no-op when
+        // padding is unchanged (applyPadding), and the lookups it needs are cached above.
+        val ntpContentView = newTabContent?.takeIf { !isBottom }
+        val globalLayoutListener =
+            ViewTreeObserver.OnGlobalLayoutListener {
+                if (isWidgetAnimating) return@OnGlobalLayoutListener
+                applyOffset()
+            }
+        ntpContentView?.viewTreeObserver?.addOnGlobalLayoutListener(globalLayoutListener)
         widgetView.addOnAttachStateChangeListener(
             object : View.OnAttachStateChangeListener {
                 override fun onViewAttachedToWindow(v: View) = Unit
@@ -287,6 +312,7 @@ class NativeInputLayoutCoordinator(
                     }
                     v.removeOnLayoutChangeListener(layoutListener)
                     rootView.removeOnLayoutChangeListener(layoutListener)
+                    ntpContentView?.viewTreeObserver?.takeIf { it.isAlive }?.removeOnGlobalLayoutListener(globalLayoutListener)
                     v.removeOnAttachStateChangeListener(this)
                 }
             },
