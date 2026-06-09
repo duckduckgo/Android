@@ -252,14 +252,11 @@ class PirScanWideEventImpl @Inject constructor(
             ),
         ).getOrNull() ?: return
 
-        wideEventClient.flowStep(wideEventId = flowId, stepName = STEP_STARTED, success = true)
+        recordStep(flowId, STEP_STARTED)
         wideEventClient.flowFinish(
             wideEventId = flowId,
             status = FlowStatus.Cancelled,
-            metadata = mapOf(
-                KEY_LAST_STEP to STEP_STARTED,
-                KEY_CANCELLATION_REASON to reason.value,
-            ),
+            metadata = mapOf(KEY_CANCELLATION_REASON to reason.value),
         )
     }
 
@@ -278,6 +275,22 @@ class PirScanWideEventImpl @Inject constructor(
     }
 
     /**
+     * Records a flow step and persists [stepName] as `last_step` metadata in the same write. Because
+     * flowStep metadata is merged into the event and persisted immediately, the furthest-reached step
+     * survives an abnormal termination — e.g. the `:pir` process being killed mid-scan and the flow
+     * finalized as [FlowStatus.Unknown] by the cleanup-on-timeout policy, which never calls
+     * flowFinish.
+     */
+    private suspend fun recordStep(flowId: Long, stepName: String) {
+        wideEventClient.flowStep(
+            wideEventId = flowId,
+            stepName = stepName,
+            success = true,
+            metadata = mapOf(KEY_LAST_STEP to stepName),
+        )
+    }
+
+    /**
      * Per-flow state. Two instances live in the singleton (manual and scheduled) so the two flows
      * never alias on `cachedFlowId`, decile counters, or the `getFlowIds(name)` lookup.
      */
@@ -289,7 +302,6 @@ class PirScanWideEventImpl @Inject constructor(
         private var lastReportedDecile: Int = 0
         private var currentDecileIntervalKey: String? = null
         private var optOutIntervalOpen: Boolean = false
-        private var lastStep: String = STEP_STARTED
 
         suspend fun onRunStarted(
             executionType: PirExecutionType,
@@ -317,10 +329,7 @@ class PirScanWideEventImpl @Inject constructor(
                     wideEventClient.flowFinish(
                         wideEventId = staleId,
                         status = FlowStatus.Cancelled,
-                        metadata = mapOf(
-                            KEY_LAST_STEP to lastStep,
-                            KEY_CANCELLATION_REASON to supersededReason.value,
-                        ),
+                        metadata = mapOf(KEY_CANCELLATION_REASON to supersededReason.value),
                     )
                     clearStateLocked()
                 }
@@ -329,7 +338,6 @@ class PirScanWideEventImpl @Inject constructor(
                 this.completedScanJobs = 0
                 this.lastReportedDecile = 0
                 this.currentDecileIntervalKey = null
-                this.lastStep = STEP_STARTED
 
                 val newFlowId = wideEventClient.flowStart(
                     name = wideEventName,
@@ -353,7 +361,7 @@ class PirScanWideEventImpl @Inject constructor(
                 ).getOrNull() ?: return@withLock
 
                 cachedFlowId = newFlowId
-                wideEventClient.flowStep(wideEventId = newFlowId, stepName = STEP_STARTED, success = true)
+                recordStep(newFlowId, STEP_STARTED)
 
                 if (totalScanJobs > 0) {
                     val key = decileIntervalKey(0, 10)
@@ -396,8 +404,7 @@ class PirScanWideEventImpl @Inject constructor(
                     }
 
                     val stepName = "$STEP_PROGRESS_PREFIX${currentDecile * 10}"
-                    wideEventClient.flowStep(wideEventId = flowId, stepName = stepName, success = true)
-                    lastStep = stepName
+                    recordStep(flowId, stepName)
 
                     if (currentDecile < 9) {
                         val nextKey = decileIntervalKey(currentDecile * 10, (currentDecile + 1) * 10)
@@ -421,18 +428,16 @@ class PirScanWideEventImpl @Inject constructor(
                     currentDecileIntervalKey = null
                 }
 
-                wideEventClient.flowStep(wideEventId = flowId, stepName = STEP_SCAN_COMPLETED, success = true)
-                lastStep = STEP_SCAN_COMPLETED
+                recordStep(flowId, STEP_SCAN_COMPLETED)
             }
         }
 
         suspend fun onOptOutStarted() {
             mutex.withLock {
                 val flowId = cachedFlowId ?: return@withLock
-                wideEventClient.flowStep(wideEventId = flowId, stepName = STEP_OPT_OUT_STARTED, success = true)
+                recordStep(flowId, STEP_OPT_OUT_STARTED)
                 wideEventClient.intervalStart(wideEventId = flowId, key = INTERVAL_OPT_OUT_DURATION)
                 optOutIntervalOpen = true
-                lastStep = STEP_OPT_OUT_STARTED
             }
         }
 
@@ -441,14 +446,11 @@ class PirScanWideEventImpl @Inject constructor(
                 val flowId = cachedFlowId ?: return@withLock
                 wideEventClient.intervalEnd(wideEventId = flowId, key = INTERVAL_OPT_OUT_DURATION)
                 optOutIntervalOpen = false
-                wideEventClient.flowStep(wideEventId = flowId, stepName = STEP_OPT_OUT_COMPLETED, success = true)
+                recordStep(flowId, STEP_OPT_OUT_COMPLETED)
                 wideEventClient.flowFinish(
                     wideEventId = flowId,
                     status = FlowStatus.Success,
-                    metadata = mapOf(
-                        KEY_LAST_STEP to STEP_OPT_OUT_COMPLETED,
-                        KEY_TOTAL_OPT_OUT_JOBS to totalOptOutJobs.toString(),
-                    ),
+                    metadata = mapOf(KEY_TOTAL_OPT_OUT_JOBS to totalOptOutJobs.toString()),
                 )
                 clearStateLocked()
             }
@@ -457,14 +459,11 @@ class PirScanWideEventImpl @Inject constructor(
         suspend fun onOptOutSkipped() {
             mutex.withLock {
                 val flowId = cachedFlowId ?: return@withLock
-                wideEventClient.flowStep(wideEventId = flowId, stepName = STEP_OPT_OUT_SKIPPED, success = true)
+                recordStep(flowId, STEP_OPT_OUT_SKIPPED)
                 wideEventClient.flowFinish(
                     wideEventId = flowId,
                     status = FlowStatus.Success,
-                    metadata = mapOf(
-                        KEY_LAST_STEP to STEP_OPT_OUT_SKIPPED,
-                        KEY_TOTAL_OPT_OUT_JOBS to "0",
-                    ),
+                    metadata = mapOf(KEY_TOTAL_OPT_OUT_JOBS to "0"),
                 )
                 clearStateLocked()
             }
@@ -474,11 +473,11 @@ class PirScanWideEventImpl @Inject constructor(
             mutex.withLock {
                 val flowId = cachedFlowId ?: return@withLock
                 closeOpenIntervalsLocked(flowId)
-                val finalStep = lastStep
+                // last_step is already persisted per-step via recordStep, so it stays on the flow
+                // even when this finish is never reached (Unknown timeout cleanup).
                 wideEventClient.flowFinish(
                     wideEventId = flowId,
                     status = FlowStatus.Failure(reason = reason.value),
-                    metadata = mapOf(KEY_LAST_STEP to finalStep),
                 )
                 clearStateLocked()
             }
@@ -495,19 +494,15 @@ class PirScanWideEventImpl @Inject constructor(
                 // the one handling the cancellation (the main process, for profile deletion or
                 // eligibility loss). cachedFlowId is per-process in-memory state, so fall back to the
                 // shared wide-events DB to resolve the still-open flow by name.
-                val ownFlowId = cachedFlowId
-                val flowId = ownFlowId
+                val flowId = cachedFlowId
                     ?: wideEventClient.getFlowIds(wideEventName).getOrNull()?.lastOrNull()
                     ?: return@withLock false
                 closeOpenIntervalsLocked(flowId)
+                // last_step is persisted incrementally via recordStep, so it is already stored
                 wideEventClient.flowFinish(
                     wideEventId = flowId,
                     status = FlowStatus.Cancelled,
-                    metadata = buildMap {
-                        // last_step is in-memory state, authoritative only when this process owns the flow.
-                        ownFlowId?.let { put(KEY_LAST_STEP, lastStep) }
-                        put(KEY_CANCELLATION_REASON, reason.value)
-                    },
+                    metadata = mapOf(KEY_CANCELLATION_REASON to reason.value),
                 )
                 clearStateLocked()
                 true
@@ -544,7 +539,6 @@ class PirScanWideEventImpl @Inject constructor(
             lastReportedDecile = 0
             currentDecileIntervalKey = null
             optOutIntervalOpen = false
-            lastStep = STEP_STARTED
         }
     }
 
