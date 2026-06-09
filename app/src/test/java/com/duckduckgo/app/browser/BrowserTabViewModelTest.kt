@@ -7781,6 +7781,29 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenOpenDuckAiQueryThenFiresOnInputSubmittedOnBrowserInteractionsPlugins() = runTest {
+        val plugin: BrowserInteractionsPlugin = mock()
+        whenever(mockBrowserInteractionsPlugins.getPlugins()).thenReturn(listOf(plugin))
+        mockDuckAiFeatureStateFullScreenModeFlow.emit(false)
+
+        testee.openDuckAiQuery(query = "hello", autoPrompt = true)
+
+        verify(plugin).onInputSubmitted()
+    }
+
+    @Test
+    fun whenOpenDuckAiChatByIdThenFiresOnChatSelectedOnBrowserInteractionsPlugins() = runTest {
+        val plugin: BrowserInteractionsPlugin = mock()
+        whenever(mockBrowserInteractionsPlugins.getPlugins()).thenReturn(listOf(plugin))
+        mockDuckAiFeatureStateFullScreenModeFlow.emit(true)
+        setBrowserShowing(true)
+
+        testee.openDuckAiChatById("https://duck.ai/chat?chatId=abc")
+
+        verify(plugin).onChatSelected()
+    }
+
+    @Test
     fun whenNavigationStateChangedCalledThenHandleResolvedUrlIsChecked() =
         runTest {
             testee.navigationStateChanged(buildWebNavigation("https://example.com"))
