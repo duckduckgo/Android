@@ -29,10 +29,11 @@ object BrandDesignUpdateOnboardingLayoutHelper {
         decorationBottomMargin: Int,
         maxHeightPx: Int,
         minHeightPx: Int,
-    ): Int? {
-        val available = availableContentHeight - dialogSpace - decorationBottomMargin
-        return if (available < minHeightPx) null else available.coerceAtMost(maxHeightPx)
-    }
+    ): Int? = OnboardingDecorationSizing.fitHeight(
+        availablePx = availableContentHeight - dialogSpace - decorationBottomMargin,
+        minHeightPx = minHeightPx,
+        maxHeightPx = maxHeightPx,
+    )
 
     fun calculateDecorationHeight(
         rootView: View,

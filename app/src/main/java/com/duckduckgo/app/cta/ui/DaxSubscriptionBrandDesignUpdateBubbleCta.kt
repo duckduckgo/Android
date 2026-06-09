@@ -66,7 +66,8 @@ data class DaxSubscriptionBrandDesignUpdateBubbleCta(
         rotationDegrees = 22.62f,
         translationXDp = -114f,
         translationYDp = -288f,
-        heightDp = 267f,
+        minHeightDp = 178f,
+        maxHeightDp = 267f,
         anchorToCardOnTablet = false,
     )
 
