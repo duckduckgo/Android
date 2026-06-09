@@ -49,6 +49,7 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewGroup.LayoutParams
+import android.view.ViewTreeObserver
 import android.webkit.PermissionRequest
 import android.webkit.SslErrorHandler
 import android.webkit.ValueCallback
@@ -2045,6 +2046,7 @@ class BrowserTabFragment :
         }
         contextualSheetBottomSheetCallback = null
         browserNavigationBarIntegration.onDestroyView()
+        renderer.removeBrandDesignFitListener()
         super.onDestroyView()
     }
 
@@ -4248,6 +4250,7 @@ class BrowserTabFragment :
 
     private fun hideDaxBubbleCta(cta: DaxBubbleCta?) {
         (cta as? DaxBubbleCta.BrandDesignUpdateBubbleCta)?.cancelRunningAnimations()
+        renderer.removeBrandDesignFitListener()
         newBrowserTab.browserBackground.setImageResource(0)
         val wasBrandDesign = newBrowserTab.rebrandBrowserBackground.isVisible
         newBrowserTab.rebrandBrowserBackground.apply {
@@ -4959,6 +4962,9 @@ class BrowserTabFragment :
         renderer.renderHomeCta()
         recreateBrowserMenu()
         viewModel.onConfigurationChanged(orientationChanged)
+        if (orientationChanged) {
+            renderer.reapplyBubbleForOrientation()
+        }
     }
 
     fun onBackPressed(isCustomTab: Boolean = false): Boolean {
@@ -5723,6 +5729,7 @@ class BrowserTabFragment :
         private var lastSeenAutoCompleteViewState: AutoCompleteViewState? = null
         private var lastSeenCtaViewState: CtaViewState? = null
         private var lastSeenPrivacyShieldViewState: PrivacyShieldViewState? = null
+        private var brandDesignFitLayoutListener: ViewTreeObserver.OnGlobalLayoutListener? = null
 
         fun renderPrivacyShield(viewState: PrivacyShieldViewState) {
             renderIfChanged(viewState, lastSeenPrivacyShieldViewState) {
@@ -6087,10 +6094,33 @@ class BrowserTabFragment :
             if (configuration is DaxBubbleCta.BrandDesignUpdateBubbleCta) {
                 setBrowserBackgroundRes(configuration.backgroundRes, useRebrandBackground = true)
                 setNewTabBackgroundColor(com.duckduckgo.mobile.android.R.attr.onboardingSurfaceBackdrop)
+                configureBrandDesignFitListener()
+                brandDesignDialogScrollView.post { configuration.applyFit() }
             } else {
+                removeBrandDesignFitListener()
                 viewModel.setBrowserBackground(appTheme.isLightModeEnabled())
             }
             viewModel.onCtaShown()
+        }
+
+        fun configureBrandDesignFitListener() {
+            removeBrandDesignFitListener()
+            val listener = ViewTreeObserver.OnGlobalLayoutListener {
+                (lastSeenCtaViewState?.cta as? DaxBubbleCta.BrandDesignUpdateBubbleCta)?.applyFit()
+            }
+            brandDesignFitLayoutListener = listener
+            brandDesignDialogScrollView.viewTreeObserver.addOnGlobalLayoutListener(listener)
+        }
+
+        fun removeBrandDesignFitListener() {
+            brandDesignFitLayoutListener?.let {
+                brandDesignDialogScrollView.viewTreeObserver.removeOnGlobalLayoutListener(it)
+            }
+            brandDesignFitLayoutListener = null
+        }
+
+        fun reapplyBubbleForOrientation() {
+            (lastSeenCtaViewState?.cta as? DaxBubbleCta.BrandDesignUpdateBubbleCta)?.onOrientationChanged()
         }
 
         private fun showPrivacyProSkippedOnboardingBottomSheet(configuration: SubscriptionPromoModalCta) {

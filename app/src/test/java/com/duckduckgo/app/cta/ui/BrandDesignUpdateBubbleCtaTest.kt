@@ -21,6 +21,7 @@ import android.content.res.Configuration
 import android.content.res.Resources
 import android.view.View
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import com.airbnb.lottie.LottieAnimationView
 import com.duckduckgo.app.browser.R
@@ -29,6 +30,7 @@ import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.common.ui.view.shape.DaxOnboardingBubbleBrandDesignUpdateCardView
 import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.common.utils.device.DeviceInfo.FormFactor
 import org.junit.Assert.assertEquals
@@ -36,12 +38,14 @@ import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 
 class BrandDesignUpdateBubbleCtaTest {
 
     private val container: View = mock()
     private val dax: LottieAnimationView = mock()
+    private val cardView: DaxOnboardingBubbleBrandDesignUpdateCardView = mock()
 
     private val onboardingStore: OnboardingStore = mock()
     private val appInstallStore: AppInstallStore = mock()
@@ -64,15 +68,28 @@ class BrandDesignUpdateBubbleCtaTest {
     }
 
     @Test
-    fun applyWavingDaxState_notPhoneLandscape_showsAndConfiguresDax_whenCtaOptsIn() {
+    fun applyWavingDaxState_notPhoneLandscape_configuresDaxAndStartsInvisible_whenCtaOptsIn() {
         configureContainerForPhonePortrait()
-        whenever(dax.alpha).thenReturn(0f)
         val cta = TestableBubbleCta()
         val showsWavingDax: DaxBubbleCta.ShowsWavingDax = mock()
 
         cta.applyWavingDaxState(container, showsWavingDax)
 
         verify(showsWavingDax).configureWavingDax(dax, mockDeviceInfo)
+        verify(dax).isInvisible = true
+    }
+
+    @Test
+    fun applyWavingDaxState_notPhoneLandscape_playsDaxImmediately_whenImprovementsDisabled() {
+        configureContainerForPhonePortrait()
+        val cta = TestableBubbleCta(onboardingImprovementsEnabled = false)
+        val showsWavingDax: DaxBubbleCta.ShowsWavingDax = mock()
+
+        cta.applyWavingDaxState(container, showsWavingDax)
+
+        verify(showsWavingDax).configureWavingDax(dax, mockDeviceInfo)
+        verify(dax).progress = 0f
+        verify(dax).alpha = 1f
         verify(dax).isVisible = true
     }
 
@@ -83,6 +100,40 @@ class BrandDesignUpdateBubbleCtaTest {
         cta.applyWavingDaxState(container, showsWavingDax = null)
 
         verify(dax).isVisible = false
+    }
+
+    @Test
+    fun onOrientationChanged_flagOn_phoneLandscape_hidesWavingDax() {
+        configureContainerForPhoneLandscape()
+        whenever(container.findViewById<DaxOnboardingBubbleBrandDesignUpdateCardView>(R.id.brandDesignCardView)).thenReturn(cardView)
+        val cta = WavingDaxBubbleCta().apply { attachCtaView(container) }
+
+        cta.onOrientationChanged()
+
+        verify(dax).isVisible = false
+    }
+
+    @Test
+    fun onOrientationChanged_flagOn_phoneLandscape_retractsFin() {
+        configureContainerForPhoneLandscape()
+        whenever(container.findViewById<DaxOnboardingBubbleBrandDesignUpdateCardView>(R.id.brandDesignCardView)).thenReturn(cardView)
+        val cta = WavingDaxBubbleCta().apply { attachCtaView(container) }
+
+        cta.onOrientationChanged()
+
+        verify(cardView).setArrowDepthFraction(0f)
+    }
+
+    @Test
+    fun onOrientationChanged_flagOff_isNoOp() {
+        configureContainerForPhoneLandscape()
+        whenever(container.findViewById<DaxOnboardingBubbleBrandDesignUpdateCardView>(R.id.brandDesignCardView)).thenReturn(cardView)
+        val cta = WavingDaxBubbleCta(onboardingImprovementsEnabled = false).apply { attachCtaView(container) }
+
+        cta.onOrientationChanged()
+
+        verifyNoInteractions(dax)
+        verifyNoInteractions(cardView)
     }
 
     private fun configureContainer(orientation: Int, formFactor: FormFactor) {
@@ -141,6 +192,7 @@ class BrandDesignUpdateBubbleCtaTest {
             isLightTheme = true,
             deviceInfo = mockDeviceInfo,
             isFreeTrialCopy = false,
+            onboardingImprovementsEnabled = true,
         )
 
         cta.configureWavingDax(dax, mockDeviceInfo)
@@ -160,6 +212,7 @@ class BrandDesignUpdateBubbleCtaTest {
             appInstallStore = appInstallStore,
             isLightTheme = true,
             deviceInfo = mockDeviceInfo,
+            onboardingImprovementsEnabled = true,
         )
 
         cta.configureWavingDax(dax, mockDeviceInfo)
@@ -178,6 +231,7 @@ class BrandDesignUpdateBubbleCtaTest {
             isLightTheme = true,
             deviceInfo = mockDeviceInfo,
             isFreeTrialCopy = false,
+            onboardingImprovementsEnabled = true,
         )
 
         cta.configureWavingDax(dax, mockDeviceInfo)
@@ -201,7 +255,9 @@ class BrandDesignUpdateBubbleCtaTest {
         return lp
     }
 
-    private inner class TestableBubbleCta : DaxBubbleCta.BrandDesignUpdateBubbleCta(
+    private inner class TestableBubbleCta(
+        onboardingImprovementsEnabled: Boolean = true,
+    ) : DaxBubbleCta.BrandDesignUpdateBubbleCta(
         ctaId = CtaId.DAX_END,
         title = R.string.onboardingEndDaxDialogTitle,
         description = R.string.onboardingEndDaxDialogDescription,
@@ -212,6 +268,7 @@ class BrandDesignUpdateBubbleCtaTest {
         appInstallStore = this@BrandDesignUpdateBubbleCtaTest.appInstallStore,
         isLightTheme = true,
         deviceInfo = this@BrandDesignUpdateBubbleCtaTest.mockDeviceInfo,
+        onboardingImprovementsEnabled = onboardingImprovementsEnabled,
     ) {
         override val activeIncludeId: Int = R.id.primaryCta
         override val showArrow: Boolean = false
@@ -219,19 +276,21 @@ class BrandDesignUpdateBubbleCtaTest {
         override fun configureContentViews(view: View) {}
     }
 
-    private inner class WavingDaxBubbleCta :
-        DaxBubbleCta.BrandDesignUpdateBubbleCta(
-            ctaId = CtaId.DAX_END,
-            title = R.string.onboardingEndDaxDialogTitle,
-            description = R.string.onboardingEndDaxDialogDescription,
-            shownPixel = AppPixelName.ONBOARDING_DAX_CTA_SHOWN,
-            okPixel = AppPixelName.ONBOARDING_DAX_CTA_OK_BUTTON,
-            ctaPixelParam = Pixel.PixelValues.DAX_END_CTA,
-            onboardingStore = this@BrandDesignUpdateBubbleCtaTest.onboardingStore,
-            appInstallStore = this@BrandDesignUpdateBubbleCtaTest.appInstallStore,
-            isLightTheme = true,
-            deviceInfo = this@BrandDesignUpdateBubbleCtaTest.mockDeviceInfo,
-        ),
+    private inner class WavingDaxBubbleCta(
+        onboardingImprovementsEnabled: Boolean = true,
+    ) : DaxBubbleCta.BrandDesignUpdateBubbleCta(
+        ctaId = CtaId.DAX_END,
+        title = R.string.onboardingEndDaxDialogTitle,
+        description = R.string.onboardingEndDaxDialogDescription,
+        shownPixel = AppPixelName.ONBOARDING_DAX_CTA_SHOWN,
+        okPixel = AppPixelName.ONBOARDING_DAX_CTA_OK_BUTTON,
+        ctaPixelParam = Pixel.PixelValues.DAX_END_CTA,
+        onboardingStore = this@BrandDesignUpdateBubbleCtaTest.onboardingStore,
+        appInstallStore = this@BrandDesignUpdateBubbleCtaTest.appInstallStore,
+        isLightTheme = true,
+        deviceInfo = this@BrandDesignUpdateBubbleCtaTest.mockDeviceInfo,
+        onboardingImprovementsEnabled = onboardingImprovementsEnabled,
+    ),
         DaxBubbleCta.ShowsWavingDax {
         override val activeIncludeId: Int = R.id.primaryCta
         override val showArrow: Boolean = false
@@ -244,5 +303,9 @@ class BrandDesignUpdateBubbleCtaTest {
         )
 
         override fun configureContentViews(view: View) {}
+
+        fun attachCtaView(view: View) {
+            ctaView = view
+        }
     }
 }
