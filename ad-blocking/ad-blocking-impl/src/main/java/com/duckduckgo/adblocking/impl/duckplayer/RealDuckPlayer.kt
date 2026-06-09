@@ -180,12 +180,15 @@ class RealDuckPlayer @Inject constructor(
     }
 
     override fun getUserPreferences(): UserPreferences {
-        return duckPlayerFeatureRepository.getUserPreferences(
-            if (adBlockingStatusChecker.isShownInSettings() && adBlockingStatusChecker.isUserEnabled()) {
-                Disabled
-            } else {
-                AlwaysAsk
-            },
+        val defaultPlayerMode = if (adBlockingStatusChecker.isShownInSettings() && adBlockingStatusChecker.isUserEnabled()) {
+            Disabled
+        } else {
+            AlwaysAsk
+        }
+        val stored = duckPlayerFeatureRepository.getUserPreferences()
+        return UserPreferences(
+            overlayInteracted = stored.overlayInteracted,
+            privatePlayerMode = stored.privatePlayerMode ?: defaultPlayerMode,
         )
     }
 
@@ -216,9 +219,10 @@ class RealDuckPlayer @Inject constructor(
             isShownInSettings && isUserEnabled
         }
             .flatMapLatest { consentGated ->
-                duckPlayerFeatureRepository.observeUserPreferences(if (consentGated) Disabled else AlwaysAsk)
+                val defaultPlayerMode = if (consentGated) Disabled else AlwaysAsk
+                duckPlayerFeatureRepository.observeUserPreferences()
+                    .map { UserPreferences(it.overlayInteracted, it.privatePlayerMode ?: defaultPlayerMode) }
             }
-            .map { UserPreferences(it.overlayInteracted, it.privatePlayerMode) }
     }
 
     override suspend fun sendDuckPlayerPixel(
