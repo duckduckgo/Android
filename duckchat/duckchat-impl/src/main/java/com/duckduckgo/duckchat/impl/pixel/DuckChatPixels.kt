@@ -1011,6 +1011,10 @@ class DuckChatParamRemovalPlugin @Inject constructor() : PixelParamRemovalPlugin
             DuckChatPixelName.DUCK_CHAT_HISTORY_DOWNLOAD_SELECTED_COUNT.pixelName to PixelParameter.removeAtb(),
             DuckChatPixelName.DUCK_CHAT_HISTORY_DOWNLOAD_SELECTED_DAILY.pixelName to PixelParameter.removeAtb(),
             "m_duck-ai_native-storage_" to PixelParameter.removeAtb(),
+            // Prefix: covers every m_aichat_unified_input_* pixel (tools, submit, model/reasoning,
+            // upsell, attachments, voice, stop) AND the app-side chat_header_upgrade_tapped, which
+            // shares the prefix — the interceptor matches outgoing pixel names with startsWith.
+            "m_aichat_unified_input_" to PixelParameter.removeAtb(),
         )
     }
 }
