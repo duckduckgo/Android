@@ -425,6 +425,7 @@ class RealDuckChat @Inject constructor(
     private var duckAiNativeStorage: Boolean = false
     private var areMultipleContentAttachmentsEnabled: Boolean = false
     private var isNativeInputFieldEnabled: Boolean = false
+    private var addressBarPickerSelectedAtMillis: Long? = null
 
     init {
         if (isMainProcess) {
@@ -618,6 +619,12 @@ class RealDuckChat @Inject constructor(
         openDuckChat(parameters, forceNewSession = true)
     }
 
+    override suspend fun onAddressBarPickerDuckAiSelected() {
+        val now = System.currentTimeMillis()
+        addressBarPickerSelectedAtMillis = now
+        duckChatFeatureRepository.storeAddressBarPickerSelectedAt(now)
+    }
+
     override fun openDuckChatWithPrefill(query: String) {
         logcat { "Duck.ai: openDuckChatWithPrefill query $query" }
         val parameters = addChatParameters(query, autoPrompt = false, sidebar = false)
@@ -712,8 +719,24 @@ class RealDuckChat @Inject constructor(
     private fun resolveDuckAiUrl(link: String): String =
         link.toUri().buildUpon().authority(duckAiHostProvider.getHost()).build().toString()
 
-    private fun nativeInputParameters(): Map<String, String> =
-        if (isNativeInputFieldEnabled) mapOf(NATIVE_INPUT_QUERY_NAME to NATIVE_INPUT_QUERY_VALUE) else emptyMap()
+    private fun nativeInputParameters(): Map<String, String> {
+        if (!isNativeInputFieldEnabled) return emptyMap()
+        val params = mutableMapOf(NATIVE_INPUT_QUERY_NAME to NATIVE_INPUT_QUERY_VALUE)
+        val selectedAt = addressBarPickerSelectedAtMillis
+        if (selectedAt != null) {
+            addressBarPickerSelectedAtMillis = null // one-shot: consumed on first native-input open
+            appCoroutineScope.launch(dispatchers.io()) { duckChatFeatureRepository.clearAddressBarPickerSelectedAt() }
+            if (isWithinAttributionWindow(selectedAt, System.currentTimeMillis())) {
+                params[ORIGIN_QUERY_NAME] = ORIGIN_VALUE_ADDRESS_BAR_PICKER
+            }
+        }
+        return params
+    }
+
+    private fun isWithinAttributionWindow(
+        selectedAtMillis: Long,
+        nowMillis: Long,
+    ) = (nowMillis - selectedAtMillis) in 0..ADDRESS_BAR_PICKER_ATTRIBUTION_WINDOW_MS
 
     private fun appendParameters(
         parameters: Map<String, String>,
@@ -904,6 +927,7 @@ class RealDuckChat @Inject constructor(
             _nativeInputFieldEnabled.value = duckChatFeature.nativeInputField().isEnabled()
 
             keepSessionAliveInMinutes = settingsJson?.sessionTimeoutMinutes ?: DEFAULT_SESSION_ALIVE
+            addressBarPickerSelectedAtMillis = duckChatFeatureRepository.getAddressBarPickerSelectedAt()
 
             cacheUserSettings()
         }
@@ -1002,5 +1026,8 @@ class RealDuckChat @Inject constructor(
         private const val NATIVE_INPUT_QUERY_VALUE = "true"
         private const val DEFAULT_SESSION_ALIVE = 60
         private const val REVOKE_URL = "https://duckduckgo.com/revoke-duckai-access"
+        private const val ORIGIN_QUERY_NAME = "origin"
+        private const val ORIGIN_VALUE_ADDRESS_BAR_PICKER = "funnel_addressbar_android__aitoggle"
+        private val ADDRESS_BAR_PICKER_ATTRIBUTION_WINDOW_MS = java.util.concurrent.TimeUnit.HOURS.toMillis(24)
     }
 }

@@ -204,6 +204,7 @@ class RealNewAddressBarPickerManagerTest {
             coroutineTestRule.testScope.advanceUntilIdle()
 
             verify(duckChatMock).setInputScreenUserSetting(true)
+            verify(duckChatMock).onAddressBarPickerDuckAiSelected()
             verify(dataStoreMock).setAsShown()
             verify(pixelMock).fire(AppPixelName.NEW_ADDRESS_BAR_PICKER_V2_CONFIRMED_COUNT, mapOf("selection" to "search_and_ai"))
             verify(pixelMock).fire(
@@ -230,6 +231,7 @@ class RealNewAddressBarPickerManagerTest {
             coroutineTestRule.testScope.advanceUntilIdle()
 
             verify(duckChatMock, never()).setInputScreenUserSetting(any())
+            verify(duckChatMock, never()).onAddressBarPickerDuckAiSelected()
             verify(dataStoreMock).setAsShown()
             verify(pixelMock).fire(AppPixelName.NEW_ADDRESS_BAR_PICKER_V2_CONFIRMED_COUNT, mapOf("selection" to "search_only"))
             verify(pixelMock).fire(

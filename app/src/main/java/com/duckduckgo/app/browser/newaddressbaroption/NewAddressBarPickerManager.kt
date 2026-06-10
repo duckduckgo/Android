@@ -124,6 +124,7 @@ class RealNewAddressBarPickerManager @Inject constructor(
                         newAddressBarPickerDataStore.setAsShown()
                         if (searchAndAiSelected) {
                             duckChat.setInputScreenUserSetting(true)
+                            duckChat.onAddressBarPickerDuckAiSelected()
                         }
                     }
                     val params = mapOf(SELECTION_PARAM to if (searchAndAiSelected) SELECTION_SEARCH_AND_AI else SELECTION_SEARCH_ONLY)

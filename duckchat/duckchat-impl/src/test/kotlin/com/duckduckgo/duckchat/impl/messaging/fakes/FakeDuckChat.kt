@@ -120,6 +120,8 @@ class FakeDuckChat(
 
     override suspend fun isChatHistoryAvailable(): Boolean = false
 
+    override suspend fun onAddressBarPickerDuckAiSelected() { }
+
     fun setEnabled(enabled: Boolean) {
         this.enabled = enabled
     }

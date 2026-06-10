@@ -161,4 +161,11 @@ interface DuckChat {
      * Suspending because the underlying feature-flag reads must not block the main thread.
      */
     suspend fun isChatHistoryAvailable(): Boolean
+
+    /**
+     * Records that the user selected the "Search + Duck.ai" option on the new address bar picker, so the
+     * first prompt submitted from the Duck.ai toggle input field within the attribution window can be
+     * attributed back to the picker.
+     */
+    suspend fun onAddressBarPickerDuckAiSelected()
 }

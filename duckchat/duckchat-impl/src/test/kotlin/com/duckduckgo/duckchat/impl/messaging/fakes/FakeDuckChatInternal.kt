@@ -199,6 +199,8 @@ class FakeDuckChatInternal(
 
     override suspend fun isChatHistoryAvailable(): Boolean = false
 
+    override suspend fun onAddressBarPickerDuckAiSelected() { }
+
     override fun buildChatUrl(chatId: String): String = "https://duck.ai?chatID=$chatId"
 
     private val _defaultTogglePosition = MutableStateFlow<String?>(null)

@@ -521,4 +521,25 @@ class SharedPreferencesDuckChatDataStoreTest {
         testee.setSelectedReasoningMode(null)
         assertNull(testee.getSelectedReasoningMode())
     }
+
+    @Test
+    fun `when storeAddressBarPickerSelectedAt then getAddressBarPickerSelectedAt returns stored value`() = runTest {
+        testee.storeAddressBarPickerSelectedAt(12345L)
+
+        assertEquals(12345L, testee.getAddressBarPickerSelectedAt())
+    }
+
+    @Test
+    fun `when nothing stored then getAddressBarPickerSelectedAt returns null`() = runTest {
+        assertNull(testee.getAddressBarPickerSelectedAt())
+    }
+
+    @Test
+    fun `when clearAddressBarPickerSelectedAt then getAddressBarPickerSelectedAt returns null`() = runTest {
+        testee.storeAddressBarPickerSelectedAt(12345L)
+
+        testee.clearAddressBarPickerSelectedAt()
+
+        assertNull(testee.getAddressBarPickerSelectedAt())
+    }
 }

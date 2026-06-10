@@ -162,6 +162,12 @@ interface DuckChatDataStore {
     suspend fun getSelectedReasoningMode(): String?
 
     suspend fun setSelectedReasoningMode(rawValue: String?)
+
+    suspend fun storeAddressBarPickerSelectedAt(timestampMillis: Long)
+
+    suspend fun getAddressBarPickerSelectedAt(): Long?
+
+    suspend fun clearAddressBarPickerSelectedAt()
 }
 
 data class SelectedModel(
@@ -201,6 +207,7 @@ class SharedPreferencesDuckChatDataStore @Inject constructor(
         val DUCK_AI_SELECTED_MODEL_ID = stringPreferencesKey(name = "DUCK_AI_SELECTED_MODEL_ID")
         val DUCK_AI_SELECTED_MODEL_SHORT_NAME = stringPreferencesKey(name = "DUCK_AI_SELECTED_MODEL_SHORT_NAME")
         val DUCK_AI_SELECTED_MODEL_REASONING_MODE = stringPreferencesKey(name = "DUCK_AI_SELECTED_MODEL_REASONING_MODE")
+        val DUCK_AI_ADDRESS_BAR_PICKER_SELECTED_AT = longPreferencesKey(name = "DUCK_AI_ADDRESS_BAR_PICKER_SELECTED_AT")
     }
 
     private fun Preferences.defaultShowInAddressBar(): Boolean =
@@ -493,5 +500,16 @@ class SharedPreferencesDuckChatDataStore @Inject constructor(
                 prefs[Keys.DUCK_AI_SELECTED_MODEL_REASONING_MODE] = rawValue
             }
         }
+    }
+
+    override suspend fun storeAddressBarPickerSelectedAt(timestampMillis: Long) {
+        store.edit { prefs -> prefs[Keys.DUCK_AI_ADDRESS_BAR_PICKER_SELECTED_AT] = timestampMillis }
+    }
+
+    override suspend fun getAddressBarPickerSelectedAt(): Long? =
+        store.data.firstOrNull()?.let { it[Keys.DUCK_AI_ADDRESS_BAR_PICKER_SELECTED_AT] }
+
+    override suspend fun clearAddressBarPickerSelectedAt() {
+        store.edit { prefs -> prefs.remove(Keys.DUCK_AI_ADDRESS_BAR_PICKER_SELECTED_AT) }
     }
 }

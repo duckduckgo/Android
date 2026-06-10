@@ -677,6 +677,43 @@ class RealDuckChatTest {
     }
 
     @Test
+    fun whenOnAddressBarPickerDuckAiSelectedThenTimestampStored() = runTest {
+        testee.onAddressBarPickerDuckAiSelected()
+
+        verify(mockDuckChatFeatureRepository).storeAddressBarPickerSelectedAt(any())
+    }
+
+    @Test
+    fun whenNativeInputEnabledAndPickerSelectedThenFirstUrlContainsOriginButSecondDoesNot() = runTest {
+        duckChatFeature.nativeInputField().setRawStoredState(State(enable = true))
+        testee.onPrivacyConfigDownloaded()
+        coroutineRule.testScope.advanceUntilIdle()
+
+        testee.onAddressBarPickerDuckAiSelected()
+
+        val firstUrl = testee.getDuckChatUrl(query = "query", autoPrompt = true)
+        assertEquals(
+            "https://duck.ai/chat?q=query&prompt=1&native-input=true&origin=funnel_addressbar_android__aitoggle&duckai=5",
+            firstUrl,
+        )
+
+        val secondUrl = testee.getDuckChatUrl(query = "query", autoPrompt = true)
+        assertEquals("https://duck.ai/chat?q=query&prompt=1&native-input=true&duckai=5", secondUrl)
+    }
+
+    @Test
+    fun whenNativeInputDisabledAndPickerSelectedThenUrlHasNoOriginParam() = runTest {
+        duckChatFeature.nativeInputField().setRawStoredState(State(enable = false))
+        testee.onPrivacyConfigDownloaded()
+        coroutineRule.testScope.advanceUntilIdle()
+
+        testee.onAddressBarPickerDuckAiSelected()
+
+        val url = testee.getDuckChatUrl(query = "query", autoPrompt = true)
+        assertEquals("https://duck.ai/chat?q=query&prompt=1&duckai=5", url)
+    }
+
+    @Test
     fun whenNativeInputEnabledAndOpenDuckChatThenUrlContainsNativeInputParam() = runTest {
         duckChatFeature.nativeInputField().setRawStoredState(State(enable = true))
         testee.onPrivacyConfigDownloaded()
