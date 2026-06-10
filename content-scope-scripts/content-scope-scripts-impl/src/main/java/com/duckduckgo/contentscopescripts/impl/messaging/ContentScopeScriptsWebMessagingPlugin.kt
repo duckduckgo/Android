@@ -24,11 +24,13 @@ import androidx.lifecycle.lifecycleScope
 import androidx.webkit.JavaScriptReplyProxy
 import com.duckduckgo.browser.api.webviewcompat.WebViewCompatWrapper
 import com.duckduckgo.common.utils.plugins.PluginPoint
+import com.duckduckgo.contentscopescripts.api.ContentScopeJsMessageHandlersPlugin
 import com.duckduckgo.contentscopescripts.api.WebViewCompatContentScopeJsMessageHandlersPlugin
 import com.duckduckgo.contentscopescripts.impl.WebViewCompatContentScopeScripts
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.js.messaging.api.JsMessage
+import com.duckduckgo.js.messaging.api.JsMessaging
 import com.duckduckgo.js.messaging.api.ProcessResult.SendResponse
 import com.duckduckgo.js.messaging.api.ProcessResult.SendToConsumer
 import com.duckduckgo.js.messaging.api.SubscriptionEvent
@@ -55,6 +57,7 @@ private const val JS_OBJECT_NAME = "contentScopeAdsjs"
 @ContributesMultibinding(scope = FragmentScope::class, ignoreQualifier = true)
 class ContentScopeScriptsWebMessagingPlugin @Inject constructor(
     private val handlers: PluginPoint<WebViewCompatContentScopeJsMessageHandlersPlugin>,
+    private val legacyHandlers: PluginPoint<ContentScopeJsMessageHandlersPlugin>,
     private val globalHandlers: PluginPoint<GlobalContentScopeJsMessageHandlersPlugin>,
     private val webViewCompatContentScopeScripts: WebViewCompatContentScopeScripts,
     private val webViewCompatWrapper: WebViewCompatWrapper,
@@ -79,8 +82,10 @@ class ContentScopeScriptsWebMessagingPlugin @Inject constructor(
 
             jsMessage?.let {
                 if (context == jsMessage.context) {
+                    val enrichedMessage = enrichMessage(webView, jsMessage)
+
                     // Setup reply proxy so we can send subscription events
-                    if (jsMessage.featureName == "messaging" && jsMessage.method == "initialPing") {
+                    if (enrichedMessage.featureName == "messaging" && enrichedMessage.method == "initialPing") {
                         globalReplyProxy = replyProxy
                     }
 
@@ -88,41 +93,45 @@ class ContentScopeScriptsWebMessagingPlugin @Inject constructor(
                     globalHandlers
                         .getPlugins()
                         .map { it.getGlobalJsMessageHandler() }
-                        .filter { it.method == jsMessage.method }
+                        .filter { it.method == enrichedMessage.method }
                         .forEach { handler ->
-                            handler.process(jsMessage)?.let { processResult ->
+                            handler.process(enrichedMessage)?.let { processResult ->
                                 when (processResult) {
                                     is SendToConsumer -> {
-                                        sendToConsumer(webView, jsMessageCallback, jsMessage, replyProxy)
+                                        sendToConsumer(webView, jsMessageCallback, enrichedMessage, replyProxy)
                                     }
                                     is SendResponse -> {
                                         webView.findViewTreeLifecycleOwner()?.lifecycleScope?.launch {
-                                            onResponse(webView, jsMessage, replyProxy)
+                                            onResponse(webView, enrichedMessage, replyProxy)
                                         }
                                     }
                                 }
                             }
                         }
 
-                    // Process with feature handlers
-                    handlers
+                    val webViewCompatHandler = handlers
                         .getPlugins()
                         .map { it.getJsMessageHandler() }
                         .firstOrNull {
-                            it.methods.contains(jsMessage.method) && it.featureName == jsMessage.featureName
-                        }?.process(jsMessage)
-                        ?.let { processResult ->
+                            it.methods.contains(enrichedMessage.method) && it.featureName == enrichedMessage.featureName
+                        }
+
+                    if (webViewCompatHandler != null) {
+                        webViewCompatHandler.process(enrichedMessage)?.let { processResult ->
                             when (processResult) {
                                 is SendToConsumer -> {
-                                    sendToConsumer(webView, jsMessageCallback, jsMessage, replyProxy)
+                                    sendToConsumer(webView, jsMessageCallback, enrichedMessage, replyProxy)
                                 }
                                 is SendResponse -> {
                                     webView.findViewTreeLifecycleOwner()?.lifecycleScope?.launch {
-                                        onResponse(webView, jsMessage, replyProxy)
+                                        onResponse(webView, enrichedMessage, replyProxy)
                                     }
                                 }
                             }
                         }
+                    } else {
+                        processWithLegacyHandler(webView, jsMessageCallback, enrichedMessage, replyProxy)
+                    }
                 }
             }
         } catch (e: Exception) {
@@ -144,6 +153,42 @@ class ContentScopeScriptsWebMessagingPlugin @Inject constructor(
             )
         onResponse(webView, callbackData, replyProxy)
     }
+
+    private fun enrichMessage(
+        webView: WebView,
+        jsMessage: JsMessage,
+    ): JsMessage {
+        if (jsMessage.featureName == "webEvents" && jsMessage.method == "webEvent") {
+            val nativeData = JSONObject()
+            nativeData.put("webViewId", System.identityHashCode(webView).toString())
+            jsMessage.params.put("nativeData", nativeData)
+        }
+        return jsMessage
+    }
+
+    private fun processWithLegacyHandler(
+        webView: WebView,
+        jsMessageCallback: WebViewCompatMessageCallback,
+        jsMessage: JsMessage,
+        replyProxy: JavaScriptReplyProxy,
+    ) {
+        val legacyHandler = legacyHandlers
+            .getPlugins()
+            .map { it.getJsMessageHandler() }
+            .firstOrNull {
+                it.methods.contains(jsMessage.method) && it.featureName == jsMessage.featureName
+            } ?: return
+
+        if (isSelfContainedLegacyHandler(jsMessage)) {
+            legacyHandler.process(jsMessage, NoOpJsMessaging, null)
+            return
+        }
+
+        sendToConsumer(webView, jsMessageCallback, jsMessage, replyProxy)
+    }
+
+    private fun isSelfContainedLegacyHandler(jsMessage: JsMessage): Boolean =
+        jsMessage.featureName == "webEvents" && jsMessage.method == "webEvent"
 
     private fun sendToConsumer(
         webView: WebView,
@@ -247,5 +292,26 @@ class ContentScopeScriptsWebMessagingPlugin @Inject constructor(
 
             webViewCompatWrapper.postMessage(webView, globalReplyProxy, subscriptionEvent)
         }
+    }
+
+    private object NoOpJsMessaging : JsMessaging {
+        override fun onResponse(response: JsCallbackData) = Unit
+
+        override fun register(
+            webView: WebView,
+            jsMessageCallback: com.duckduckgo.js.messaging.api.JsMessageCallback?,
+        ) = Unit
+
+        override fun process(
+            message: String,
+            secret: String,
+        ) = Unit
+
+        override fun sendSubscriptionEvent(subscriptionEventData: SubscriptionEventData) = Unit
+
+        override val context: String = ""
+        override val callbackName: String = ""
+        override val secret: String = ""
+        override val allowedDomains: List<String> = emptyList()
     }
 }

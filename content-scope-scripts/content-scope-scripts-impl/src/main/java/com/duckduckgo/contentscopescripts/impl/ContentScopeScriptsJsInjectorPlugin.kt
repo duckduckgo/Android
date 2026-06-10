@@ -19,14 +19,21 @@ package com.duckduckgo.contentscopescripts.impl
 import android.webkit.WebView
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.browser.api.JsInjectorPlugin
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.js.messaging.api.AddDocumentStartJavaScriptPlugin
+import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.squareup.anvil.annotations.ContributesMultibinding
+import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
 @ContributesMultibinding(AppScope::class)
 class ContentScopeScriptsJsInjectorPlugin @Inject constructor(
     private val coreContentScopeScripts: CoreContentScopeScripts,
+    private val webViewCompatContentScopeScripts: WebViewCompatContentScopeScripts,
+    private val documentStartPlugins: PluginPoint<AddDocumentStartJavaScriptPlugin>,
+    private val dispatcherProvider: DispatcherProvider,
 ) : JsInjectorPlugin {
     override fun onPageStarted(
         webView: WebView,
@@ -34,9 +41,23 @@ class ContentScopeScriptsJsInjectorPlugin @Inject constructor(
         isDesktopMode: Boolean?,
         activeExperiments: List<Toggle>,
     ) {
-        if (coreContentScopeScripts.isEnabled()) {
-            webView.evaluateJavascript("javascript:${coreContentScopeScripts.getScript(isDesktopMode, activeExperiments)}", null)
+        if (!coreContentScopeScripts.isEnabled()) {
+            return
         }
+
+        val useDocumentStartInjection = runBlocking(dispatcherProvider.io()) {
+            webViewCompatContentScopeScripts.isEnabled()
+        }
+        if (useDocumentStartInjection) {
+            runBlocking(dispatcherProvider.main()) {
+                documentStartPlugins.getPlugins().forEach { plugin ->
+                    plugin.addDocumentStartJavaScript(webView)
+                }
+            }
+            return
+        }
+
+        webView.evaluateJavascript("javascript:${coreContentScopeScripts.getScript(isDesktopMode, activeExperiments)}", null)
     }
 
     override fun onPageFinished(

@@ -336,10 +336,12 @@ import com.duckduckgo.duckchat.impl.contextual.DuckChatContextualFragment.Compan
 import com.duckduckgo.duckchat.impl.contextual.DuckChatContextualFragment.Companion.KEY_DUCK_AI_URL
 import com.duckduckgo.duckchat.impl.contextual.DuckChatContextualSharedViewModel
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
+import com.duckduckgo.contentscopescripts.impl.WebViewCompatContentScopeScriptsConfigurator
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessaging
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
+import com.duckduckgo.js.messaging.api.WebViewCompatMessageCallback
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed
 import com.duckduckgo.mobile.android.app.tracking.ui.AppTrackingProtectionScreens.AppTrackerOnboardingActivityWithEmptyParamsParams
 import com.duckduckgo.navigation.api.GlobalActivityStarter
@@ -593,6 +595,9 @@ class BrowserTabFragment :
     @Inject
     @Named("ContentScopeScripts")
     lateinit var contentScopeScripts: JsMessaging
+
+    @Inject
+    lateinit var webViewCompatContentScopeScriptsConfigurator: WebViewCompatContentScopeScriptsConfigurator
 
     @Inject
     @Named("DuckPlayer")
@@ -4176,6 +4181,12 @@ class BrowserTabFragment :
                     }
                 },
             )
+            lifecycleScope.launch {
+                webViewCompatContentScopeScriptsConfigurator.configure(
+                    webView = it,
+                    jsMessageCallback = webViewCompatMessageCallback,
+                )
+            }
             duckPlayerScripts.register(
                 it,
                 object : JsMessageCallback() {
@@ -5027,11 +5038,38 @@ class BrowserTabFragment :
     private fun destroyWebView() {
         if (::webViewContainer.isInitialized) webViewContainer.removeAllViews()
         webView?.let {
+            lifecycleScope.launch {
+                webViewCompatContentScopeScriptsConfigurator.cleanup(it)
+            }
             it.removeSystemAutofillCallback()
             it.destroy()
         }
         webView = null
     }
+
+    private val webViewCompatMessageCallback =
+        object : WebViewCompatMessageCallback {
+            override fun process(
+                context: String,
+                featureName: String,
+                method: String,
+                id: String?,
+                data: JSONObject?,
+                onResponse: suspend (JSONObject) -> Unit,
+            ) {
+                viewModel.webViewCompatProcessJsCallbackMessage(
+                    context = context,
+                    featureName = featureName,
+                    method = method,
+                    id = id,
+                    data = data,
+                    onResponse = onResponse,
+                    isActiveCustomTab = isActiveCustomTab(),
+                    activityContext = requireActivity(),
+                    getWebViewUrl = { webView?.url },
+                )
+            }
+        }
 
     private fun convertBlobToDataUri(blob: Command.ConvertBlobToDataUri) {
         webView?.let {

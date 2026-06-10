@@ -4522,6 +4522,9 @@ class BrowserTabViewModel @Inject constructor(
         id: String?,
         data: JSONObject?,
         onResponse: suspend (JSONObject) -> Unit,
+        isActiveCustomTab: Boolean = false,
+        activityContext: Context? = null,
+        getWebViewUrl: () -> String? = { null },
     ) {
         processGlobalMessages(
             featureName = featureName,
@@ -4539,6 +4542,9 @@ class BrowserTabViewModel @Inject constructor(
                     id = id,
                     data = data,
                     onResponse = onResponse,
+                    isActiveCustomTab = isActiveCustomTab,
+                    activityContext = activityContext,
+                    getWebViewUrl = getWebViewUrl,
                 )
         }
     }
@@ -4594,6 +4600,9 @@ class BrowserTabViewModel @Inject constructor(
         id: String?,
         data: JSONObject?,
         onResponse: suspend (JSONObject) -> Unit,
+        isActiveCustomTab: Boolean = false,
+        activityContext: Context? = null,
+        getWebViewUrl: () -> String? = { null },
     ) {
         when (featureName) {
             "webCompat" -> {
@@ -4629,7 +4638,6 @@ class BrowserTabViewModel @Inject constructor(
             "messaging" ->
                 when (method) {
                     "initialPing" -> {
-                        // TODO: Eventually, we might want plugins here
                         val response =
                             JSONObject(
                                 mapOf(
@@ -4642,6 +4650,99 @@ class BrowserTabViewModel @Inject constructor(
                         }
                     }
                 }
+
+            BROWSER_UI_LOCK_FEATURE_NAME -> {
+                when (method) {
+                    "uiLockChanged" -> {
+                        val locked = data?.optBoolean("locked", false) ?: false
+                        uiLockChanged(locked)
+                    }
+                }
+            }
+
+            DUCK_PLAYER_FEATURE_NAME, DUCK_PLAYER_PAGE_FEATURE_NAME -> {
+                viewModelScope.launch(dispatchers.io()) {
+                    val webViewUrl = getWebViewUrl()
+                    val response = duckPlayerJSHelper.processJsCallbackMessage(
+                        featureName,
+                        method,
+                        id,
+                        data,
+                        webViewUrl,
+                        tabId,
+                        isActiveCustomTab,
+                    )
+                    withContext(dispatchers.main()) {
+                        response?.let { command.value = it }
+                    }
+                }
+            }
+
+            DUCK_CHAT_FEATURE_NAME -> {
+                viewModelScope.launch(dispatchers.io()) {
+                    val response = duckChatJSHelper.processJsCallbackMessage(
+                        featureName,
+                        method,
+                        id,
+                        data,
+                        tabId = tabId,
+                    )
+                    withContext(dispatchers.main()) {
+                        response?.let { callbackData ->
+                            viewModelScope.launch {
+                                onResponse(callbackData.params)
+                            }
+                        }
+                        if (method == "responseReceived") {
+                            unblockDuckAiOnboardingCta()
+                        }
+                    }
+                    duckChatJSHelper.consumeTabContextPromptOnHandoff(method)?.let { event ->
+                        withContext(dispatchers.main()) {
+                            _subscriptionEventDataChannel.send(event)
+                        }
+                    }
+                }
+            }
+
+            SUBSCRIPTIONS_FEATURE_NAME -> {
+                viewModelScope.launch(dispatchers.io()) {
+                    val response = subscriptionsJSHelper.processJsCallbackMessage(featureName, method, id, data, activityContext)
+                    withContext(dispatchers.main()) {
+                        response?.let { callbackData ->
+                            viewModelScope.launch {
+                                onResponse(callbackData.params)
+                            }
+                        }
+                    }
+                }
+            }
+
+            PAGE_CONTEXT_FEATURE_NAME -> {
+                viewModelScope.launch(dispatchers.io()) {
+                    val pageContext = pageContextJSHelper.processPageContext(featureName, method, data, tabId)
+                    if (pageContext != null) {
+                        val enrichedContext = duckChatJSHelper.enrichPageContextIfPossible(tabId, pageContext)
+                        withContext(dispatchers.main()) {
+                            command.value = Command.PageContextReceived(tabId, enrichedContext)
+                        }
+
+                        if (androidBrowserConfig.storePageContext().isEnabled()) {
+                            runCatching {
+                                val pageContextUrl = JSONObject(pageContext).optString("url", "")
+                                tabPageContextRepository.storePageContext(
+                                    tabId = tabId,
+                                    url = pageContextUrl,
+                                    serializedPageContext = pageContext,
+                                )
+                            }.onFailure {
+                                ensureActive()
+                                logcat(WARN) { "Failed to store page context: ${it.asLog()}" }
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 

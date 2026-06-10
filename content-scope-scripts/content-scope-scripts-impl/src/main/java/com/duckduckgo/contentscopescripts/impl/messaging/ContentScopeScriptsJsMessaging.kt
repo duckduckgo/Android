@@ -22,9 +22,13 @@ import androidx.core.net.toUri
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.extensions.toTldPlusOne
 import com.duckduckgo.common.utils.plugins.PluginPoint
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.contentscopescripts.api.ContentScopeJsMessageHandlersPlugin
 import com.duckduckgo.contentscopescripts.impl.CoreContentScopeScripts
+import com.duckduckgo.contentscopescripts.impl.WebViewCompatContentScopeScripts
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.js.messaging.api.PostMessageWrapperPlugin
+import com.duckduckgo.js.messaging.api.WebMessagingPlugin
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.js.messaging.api.JsMessage
 import com.duckduckgo.js.messaging.api.JsMessageCallback
@@ -49,7 +53,10 @@ class ContentScopeScriptsJsMessaging @Inject constructor(
     private val jsMessageHelper: JsMessageHelper,
     private val dispatcherProvider: DispatcherProvider,
     private val coreContentScopeScripts: CoreContentScopeScripts,
+    private val webViewCompatContentScopeScripts: WebViewCompatContentScopeScripts,
     private val handlers: PluginPoint<ContentScopeJsMessageHandlersPlugin>,
+    @Named("contentScopeScripts") private val webMessagingPlugin: WebMessagingPlugin,
+    private val postMessageWrapperPlugins: PluginPoint<PostMessageWrapperPlugin>,
 ) : JsMessaging {
     private val moshi = Moshi.Builder().add(JSONObjectAdapter()).build()
 
@@ -110,10 +117,28 @@ class ContentScopeScriptsJsMessaging @Inject constructor(
         if (jsMessageCallback == null) throw Exception("Callback cannot be null")
         this.webView = webView
         this.jsMessageCallback = jsMessageCallback
+        if (runBlocking(dispatcherProvider.io()) { webViewCompatContentScopeScripts.isWebMessagingEnabled() }) {
+            return
+        }
         this.webView.addJavascriptInterface(this, coreContentScopeScripts.javascriptInterface)
     }
 
     override fun sendSubscriptionEvent(subscriptionEventData: SubscriptionEventData) {
+        if (!::webView.isInitialized) {
+            return
+        }
+
+        if (runBlocking(dispatcherProvider.io()) { webViewCompatContentScopeScripts.isWebMessagingEnabled() }) {
+            runBlocking(dispatcherProvider.main()) {
+                postMessageWrapperPlugins
+                    .getPlugins()
+                    .firstOrNull { it.context == context }
+                    ?.postMessage(subscriptionEventData, webView)
+                    ?: webMessagingPlugin.postMessage(webView, subscriptionEventData)
+            }
+            return
+        }
+
         val subscriptionEvent =
             SubscriptionEvent(
                 context,
@@ -121,9 +146,7 @@ class ContentScopeScriptsJsMessaging @Inject constructor(
                 subscriptionEventData.subscriptionName,
                 subscriptionEventData.params,
             )
-        if (::webView.isInitialized) {
-            jsMessageHelper.sendSubscriptionEvent(subscriptionEvent, callbackName, secret, webView)
-        }
+        jsMessageHelper.sendSubscriptionEvent(subscriptionEvent, callbackName, secret, webView)
     }
 
     override fun onResponse(response: JsCallbackData) {

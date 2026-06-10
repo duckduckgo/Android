@@ -92,6 +92,7 @@ class ContentScopeScriptsWebMessagingPluginTest {
             testee =
                 ContentScopeScriptsWebMessagingPlugin(
                     handlers = handlers,
+                    legacyHandlers = mock(),
                     globalHandlers = globalHandlers,
                     webViewCompatContentScopeScripts = webViewCompatContentScopeScripts,
                     webViewCompatWrapper = mockWebViewCompatWrapper,
