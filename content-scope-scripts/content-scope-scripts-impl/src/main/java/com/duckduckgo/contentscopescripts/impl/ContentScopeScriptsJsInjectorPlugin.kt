@@ -20,10 +20,10 @@ import android.webkit.WebView
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.browser.api.JsInjectorPlugin
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.js.messaging.api.AddDocumentStartJavaScriptPlugin
-import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.runBlocking
 import javax.inject.Inject

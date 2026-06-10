@@ -19,6 +19,7 @@ package com.duckduckgo.contentscopescripts.impl
 import android.webkit.WebView
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.plugins.PluginPoint
+import com.duckduckgo.contentscopescripts.api.contentscopeExperiments.ContentScopeExperiments
 import com.duckduckgo.js.messaging.api.AddDocumentStartJavaScriptPlugin
 import com.duckduckgo.js.messaging.api.WebMessagingPlugin
 import com.duckduckgo.js.messaging.api.WebViewCompatMessageCallback
@@ -42,6 +43,7 @@ class WebViewCompatContentScopeScriptsConfiguratorTest {
     private val webMessagingPlugin: WebMessagingPlugin = mock()
     private val documentStartPlugins: PluginPoint<AddDocumentStartJavaScriptPlugin> = mock()
     private val webMessagingPlugins: PluginPoint<WebMessagingPlugin> = mock()
+    private val contentScopeExperiments: ContentScopeExperiments = mock()
     private val webView: WebView = mock()
     private val callback: WebViewCompatMessageCallback = mock()
 
@@ -56,6 +58,7 @@ class WebViewCompatContentScopeScriptsConfiguratorTest {
                 webViewCompatContentScopeScripts = webViewCompatContentScopeScripts,
                 documentStartPlugins = documentStartPlugins,
                 webMessagingPlugins = webMessagingPlugins,
+                contentScopeExperiments = contentScopeExperiments,
             )
     }
 

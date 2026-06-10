@@ -24,12 +24,12 @@ import com.duckduckgo.contentscopescripts.api.ContentScopeJsMessageHandlersPlugi
 import com.duckduckgo.contentscopescripts.impl.CoreContentScopeScripts
 import com.duckduckgo.contentscopescripts.impl.WebViewCompatContentScopeScripts
 import com.duckduckgo.js.messaging.api.JsMessage
-import com.duckduckgo.js.messaging.api.PostMessageWrapperPlugin
-import com.duckduckgo.js.messaging.api.WebMessagingPlugin
 import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessageHandler
 import com.duckduckgo.js.messaging.api.JsMessageHelper
 import com.duckduckgo.js.messaging.api.JsMessaging
+import com.duckduckgo.js.messaging.api.PostMessageWrapperPlugin
+import com.duckduckgo.js.messaging.api.WebMessagingPlugin
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertFalse
 import kotlinx.coroutines.test.runTest
@@ -79,22 +79,23 @@ class ContentScopeScriptsJsMessagingTest {
     }
 
     @Before
-    fun setUp() {
-        whenever(coreContentScopeScripts.secret).thenReturn("secret")
-        whenever(coreContentScopeScripts.javascriptInterface).thenReturn("javascriptInterface")
-        whenever(coreContentScopeScripts.callbackName).thenReturn("callbackName")
-        whenever(webViewCompatContentScopeScripts.isWebMessagingEnabled()).thenReturn(false)
-        contentScopeScriptsJsMessaging =
-            ContentScopeScriptsJsMessaging(
-                jsMessageHelper,
-                coroutineRule.testDispatcherProvider,
-                coreContentScopeScripts,
-                webViewCompatContentScopeScripts,
-                handlers,
-                webMessagingPlugin,
-                postMessageWrapperPlugins,
-            )
-    }
+    fun setUp() =
+        runTest {
+            whenever(coreContentScopeScripts.secret).thenReturn("secret")
+            whenever(coreContentScopeScripts.javascriptInterface).thenReturn("javascriptInterface")
+            whenever(coreContentScopeScripts.callbackName).thenReturn("callbackName")
+            whenever(webViewCompatContentScopeScripts.isWebMessagingEnabled()).thenReturn(false)
+            contentScopeScriptsJsMessaging =
+                ContentScopeScriptsJsMessaging(
+                    jsMessageHelper,
+                    coroutineRule.testDispatcherProvider,
+                    coreContentScopeScripts,
+                    webViewCompatContentScopeScripts,
+                    handlers,
+                    webMessagingPlugin,
+                    postMessageWrapperPlugins,
+                )
+        }
 
     @Test
     fun `when process and message can be handled then execute callback`() =
@@ -270,12 +271,16 @@ class ContentScopeScriptsJsMessagingTest {
     fun `when processing webEvents webEvent message then nativeData with webViewId is injected`() =
         runTest {
             val webEventsHandlers = WebEventsPluginPoint()
-            val messaging = ContentScopeScriptsJsMessaging(
-                jsMessageHelper,
-                coroutineRule.testDispatcherProvider,
-                coreContentScopeScripts,
-                webEventsHandlers,
-            )
+            val messaging =
+                ContentScopeScriptsJsMessaging(
+                    jsMessageHelper,
+                    coroutineRule.testDispatcherProvider,
+                    coreContentScopeScripts,
+                    webViewCompatContentScopeScripts,
+                    webEventsHandlers,
+                    webMessagingPlugin,
+                    postMessageWrapperPlugins,
+                )
             messaging.register(mockWebView, webEventsCallback)
             whenever(mockWebView.url).thenReturn("https://example.com")
 

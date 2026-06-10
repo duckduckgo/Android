@@ -1,8 +1,7 @@
 package com.duckduckgo.contentscopescripts.impl
 
 import android.webkit.WebView
-import com.duckduckgo.common.test.InstantSchedulersRule
-import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.js.messaging.api.AddDocumentStartJavaScriptPlugin
 import kotlinx.coroutines.test.runTest
@@ -19,41 +18,39 @@ import org.mockito.kotlin.whenever
 
 class ContentScopeScriptsJsInjectorPluginTest {
     @get:Rule
-    val schedulers = InstantSchedulersRule()
+    val coroutineRule = CoroutineTestRule()
 
     private val mockCoreContentScopeScripts: CoreContentScopeScripts = mock()
     private val mockWebViewCompatContentScopeScripts: WebViewCompatContentScopeScripts = mock()
     private val mockDocumentStartPlugin: AddDocumentStartJavaScriptPlugin = mock()
     private val mockDocumentStartPlugins: PluginPoint<AddDocumentStartJavaScriptPlugin> = mock()
-    private val mockDispatcherProvider: DispatcherProvider = mock()
     private val mockWebView: WebView = mock()
 
     private lateinit var contentScopeScriptsJsInjectorPlugin: ContentScopeScriptsJsInjectorPlugin
 
     @Before
     fun setUp() {
-        whenever(mockDispatcherProvider.io()).thenReturn(schedulers.testScheduler)
-        whenever(mockDispatcherProvider.main()).thenReturn(schedulers.testScheduler)
         whenever(mockDocumentStartPlugins.getPlugins()).thenReturn(listOf(mockDocumentStartPlugin))
         contentScopeScriptsJsInjectorPlugin =
             ContentScopeScriptsJsInjectorPlugin(
                 mockCoreContentScopeScripts,
                 mockWebViewCompatContentScopeScripts,
                 mockDocumentStartPlugins,
-                mockDispatcherProvider,
+                coroutineRule.testDispatcherProvider,
             )
     }
 
     @Test
-    fun whenEnabledAndInjectContentScopeScriptsThenPopulateMessagingParameters() {
-        whenever(mockCoreContentScopeScripts.isEnabled()).thenReturn(true)
-        whenever(mockWebViewCompatContentScopeScripts.isEnabled()).thenReturn(false)
-        whenever(mockCoreContentScopeScripts.getScript(null, listOf())).thenReturn("")
-        contentScopeScriptsJsInjectorPlugin.onPageStarted(mockWebView, null, null, listOf())
+    fun whenEnabledAndInjectContentScopeScriptsThenPopulateMessagingParameters() =
+        runTest {
+            whenever(mockCoreContentScopeScripts.isEnabled()).thenReturn(true)
+            whenever(mockWebViewCompatContentScopeScripts.isEnabled()).thenReturn(false)
+            whenever(mockCoreContentScopeScripts.getScript(null, listOf())).thenReturn("")
+            contentScopeScriptsJsInjectorPlugin.onPageStarted(mockWebView, null, null, listOf())
 
-        verify(mockCoreContentScopeScripts).getScript(null, listOf())
-        verify(mockWebView).evaluateJavascript(any(), anyOrNull())
-    }
+            verify(mockCoreContentScopeScripts).getScript(null, listOf())
+            verify(mockWebView).evaluateJavascript(any(), anyOrNull())
+        }
 
     @Test
     fun whenDisabledAndInjectContentScopeScriptsThenDoNothing() {
@@ -64,14 +61,15 @@ class ContentScopeScriptsJsInjectorPluginTest {
     }
 
     @Test
-    fun whenEnabledAndInjectContentScopeScriptsThenUseParams() {
-        whenever(mockCoreContentScopeScripts.isEnabled()).thenReturn(true)
-        whenever(mockWebViewCompatContentScopeScripts.isEnabled()).thenReturn(false)
-        whenever(mockCoreContentScopeScripts.getScript(true, listOf())).thenReturn("")
-        contentScopeScriptsJsInjectorPlugin.onPageStarted(mockWebView, null, true, listOf())
+    fun whenEnabledAndInjectContentScopeScriptsThenUseParams() =
+        runTest {
+            whenever(mockCoreContentScopeScripts.isEnabled()).thenReturn(true)
+            whenever(mockWebViewCompatContentScopeScripts.isEnabled()).thenReturn(false)
+            whenever(mockCoreContentScopeScripts.getScript(true, listOf())).thenReturn("")
+            contentScopeScriptsJsInjectorPlugin.onPageStarted(mockWebView, null, true, listOf())
 
-        verify(mockCoreContentScopeScripts).getScript(true, listOf())
-    }
+            verify(mockCoreContentScopeScripts).getScript(true, listOf())
+        }
 
     @Test
     fun whenDocumentStartEnabledThenRefreshDocumentStartScriptsInsteadOfEvaluateJavascript() =
