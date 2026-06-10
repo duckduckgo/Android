@@ -167,6 +167,20 @@ class SubscriptionWebViewViewModel @Inject constructor(
             .launchIn(viewModelScope)
     }
 
+    fun onPurchaseSuccessAcknowledged(subscriptionEventData: SubscriptionEventData) {
+        viewModelScope.launch(dispatcherProvider.io()) {
+            if (subscriptionsFeature.subscriptionsNativeOnboarding().isEnabled()) {
+                // Still notify the FE of the successful purchase (preserving the FE<->Android
+                // contract), but navigate natively instead of letting the FE show its welcome page.
+                // A single command carries the event because `command` is a capacity-1 DROP_OLDEST
+                // channel and emitting two commands could drop the JS event.
+                command.send(GoToSubscriptionOnboarding(subscriptionEventData))
+            } else {
+                command.send(SendJsEvent(subscriptionEventData))
+            }
+        }
+    }
+
     fun processJsCallbackMessage(featureName: String, method: String, id: String?, data: JSONObject?) {
         logcat {
             "SubscriptionWebViewViewModel: processJsCallbackMessage called with featureName: $featureName, method: $method, id: $id, data: $data"
@@ -786,6 +800,7 @@ class SubscriptionWebViewViewModel @Inject constructor(
         data object BackToSettings : Command()
         data object BackToSettingsActivateSuccess : Command()
         data class SendJsEvent(val event: SubscriptionEventData) : Command()
+        data class GoToSubscriptionOnboarding(val event: SubscriptionEventData) : Command()
         data class SendResponseToJs(val data: JsCallbackData) : Command()
         data class SubscriptionSelected(
             val id: String,

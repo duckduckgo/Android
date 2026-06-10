@@ -57,5 +57,10 @@
             android:parentActivityName=".ui.SubscriptionSettingsActivity"
             android:configChanges="orientation|screenSize"
             android:windowSoftInputMode="adjustResize"/>
+
+        <activity
+                android:name=".ui.onboarding.SubscriptionOnboardingActivity"
+                android:exported="false"
+                android:screenOrientation="portrait" />
     </application>
 </manifest>

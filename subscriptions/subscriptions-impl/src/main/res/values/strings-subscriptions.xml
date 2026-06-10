@@ -202,4 +202,7 @@
     <string name="subscriptionExpiredStatusIconContentDescription">Subscription expired</string>
     <string name="subscriptionActiveStatusIconContentDescription">Subscription active</string>
 
+    <!-- Subscription onboarding -->
+    <string name="subscriptionOnboardingDetailsTitle">Subscription details</string>
+
 </resources>
