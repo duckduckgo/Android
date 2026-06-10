@@ -431,9 +431,8 @@ class RealNativeInputManager @Inject constructor(
             },
             onChatSubmitted = { query ->
                 if (omnibarController.isDuckAiMode()) {
-                    // In Duck.ai context the user is actively chatting — a pasted URL is a chat
-                    // message, never a contextual-sheet trigger or a navigation. Fall through to
-                    // the standard chat-submit path so the message reaches the Duck.ai webview.
+                    // Already in a Duck.ai chat — every submission, URL or not, is a chat prompt
+                    // that reaches the Duck.ai webview.
                     widget.saveLastUsedTogglePosition(isChat = true)
                     val imagesJson = widget.getImageAttachmentsJson()
                     val filesJson = widget.getFileAttachmentsJson()
@@ -450,8 +449,11 @@ class RealNativeInputManager @Inject constructor(
                     )
                     widget.clearSelectedTool()
                 } else if (queryUrlPredictor.isUrl(query)) {
+                    // Not in a Duck.ai chat (e.g. on the NTP with the Duck.ai toggle selected): a
+                    // URL is an address, so navigate to it exactly like Search mode rather than
+                    // opening the Duck.ai contextual sheet.
                     hideNativeInput(isNavigation = true)
-                    callbacks.onContextualSheetRequested()
+                    callbacks.onSearchSubmitted(query)
                 } else {
                     widget.saveLastUsedTogglePosition(isChat = true)
                     widget.storePendingPrompt(query)
