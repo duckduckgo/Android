@@ -760,6 +760,10 @@ class DuckChatParamRemovalPlugin @Inject constructor() : PixelParamRemovalPlugin
             DuckChatPixelName.DUCK_CHAT_HISTORY_DOWNLOAD_SELECTED_COUNT.pixelName to PixelParameter.removeAtb(),
             DuckChatPixelName.DUCK_CHAT_HISTORY_DOWNLOAD_SELECTED_DAILY.pixelName to PixelParameter.removeAtb(),
             "m_duck-ai_native-storage_" to PixelParameter.removeAtb(),
+            // Duck.ai telemetry: strip ATB from the direct-navigation pixels (fired from :app's
+            // BrowserTabViewModel). The interceptor matches outgoing names with startsWith across
+            // all plugins, so this prefix covers both _count and _daily.
+            "m_aichat_duck_ai_direct_navigation_" to PixelParameter.removeAtb(),
         )
     }
 }
