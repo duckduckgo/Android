@@ -66,7 +66,7 @@ class IntentDispatcherActivity : DuckDuckGoActivity() {
 
     private fun dispatch(viewState: ViewState) {
         if (viewState.localPdfError) {
-            Toast.makeText(this, R.string.pdfOpenError, Toast.LENGTH_LONG).show()
+            Toast.makeText(this, R.string.downloadConfirmationUnableToOpenFileText, Toast.LENGTH_LONG).show()
             finish()
         } else if (viewState.openLocalPdf) {
             showLocalPdf(viewState.intentText, viewState.localPdfName)

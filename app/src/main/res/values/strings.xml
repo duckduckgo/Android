@@ -1016,7 +1016,6 @@
 
     <!-- PDF download tooltip -->
     <string name="pdfDownloadTooltipText">Download PDF</string>
-    <string name="pdfOpenError">Couldn\'t open this PDF</string>
 
     <!-- Sharing options -->
     <string name="copyLinkText">Copy Link Text</string>
