@@ -321,6 +321,7 @@ class IntentDispatcherViewModelTest {
             assertTrue(state.openLocalPdf)
             assertEquals(cachedUri.toString(), state.intentText)
             assertFalse(state.localPdfError)
+            assertEquals("doc.pdf", state.localPdfName)
         }
     }
 
@@ -341,6 +342,7 @@ class IntentDispatcherViewModelTest {
             val state = awaitItem()
             assertTrue(state.openLocalPdf)
             assertEquals(cachedUri.toString(), state.intentText)
+            assertEquals("report.pdf", state.localPdfName)
         }
     }
 

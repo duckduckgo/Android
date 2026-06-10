@@ -28,6 +28,7 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.customtabs.CustomTabActivity
 import com.duckduckgo.app.browser.mode.ExternalUrl
 import com.duckduckgo.app.browser.mode.InAppNavigation
+import com.duckduckgo.app.browser.pdf.PdfViewerActivity
 import com.duckduckgo.app.dispatchers.IntentDispatcherViewModel.ViewState
 import com.duckduckgo.app.global.sanitize
 import com.duckduckgo.common.ui.DuckDuckGoActivity
@@ -68,7 +69,7 @@ class IntentDispatcherActivity : DuckDuckGoActivity() {
             Toast.makeText(this, R.string.pdfOpenError, Toast.LENGTH_LONG).show()
             finish()
         } else if (viewState.openLocalPdf) {
-            showLocalPdf(viewState.intentText, viewState.isExternal)
+            showLocalPdf(viewState.intentText, viewState.localPdfName)
         } else if (viewState.activityParams != null) {
             globalActivityStarter.start(this, viewState.activityParams)
         } else if (viewState.customTabRequested) {
@@ -78,17 +79,12 @@ class IntentDispatcherActivity : DuckDuckGoActivity() {
         }
     }
 
-    private fun showLocalPdf(cachedFileUri: String?, isExternal: Boolean) {
-        startActivity(
-            BrowserActivity.intent(
-                context = this,
-                launchSource = if (isExternal) ExternalUrl else InAppNavigation,
-                queryExtra = cachedFileUri,
-                isExternal = isExternal,
-                openLocalPdf = true,
-            ),
-        )
-        overridePendingTransition(0, 0)
+    private fun showLocalPdf(cachedFileUri: String?, fileName: String?) {
+        if (cachedFileUri == null) {
+            finish()
+            return
+        }
+        startActivity(PdfViewerActivity.intent(this, cachedFileUri, fileName.orEmpty()))
         finish()
     }
 

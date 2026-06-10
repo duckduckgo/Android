@@ -66,6 +66,7 @@ class IntentDispatcherViewModel @Inject constructor(
         val isExternal: Boolean = false,
         val openLocalPdf: Boolean = false,
         val localPdfError: Boolean = false,
+        val localPdfName: String? = null,
     )
 
     fun onIntentReceived(intent: Intent?, isExternal: Boolean) {
@@ -81,6 +82,7 @@ class IntentDispatcherViewModel @Inject constructor(
                                     openLocalPdf = true,
                                     localPdfError = false,
                                     isExternal = isExternal,
+                                    localPdfName = result.displayName,
                                 ),
                             )
                         }

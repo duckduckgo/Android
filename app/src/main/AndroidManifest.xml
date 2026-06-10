@@ -526,6 +526,14 @@
             android:label="@string/downloadsActivityTitle"
             android:parentActivityName=".BrowserActivity" />
         <activity
+            android:name="com.duckduckgo.app.browser.pdf.PdfViewerActivity"
+            android:exported="false"
+            android:parentActivityName=".BrowserActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.duckduckgo.app.browser.BrowserActivity" />
+        </activity>
+        <activity
             android:name=".threatprotection.ThreatProtectionSettingsActivity"
             android:exported="false"
             android:label="Threat protection"
