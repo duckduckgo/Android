@@ -52,6 +52,10 @@ class AutocompleteParamRemovalPlugin @Inject constructor() : PixelParamRemovalPl
     override fun names(): List<Pair<String, Set<PixelParameter>>> {
         return listOf(
             AutoCompletePixelNames.AUTOCOMPLETE_INSTALLED_APP_SELECTION.pixelName to PixelParameter.removeAtb(),
+            // Prefix: the Duck.ai-surface autocomplete family is Duck.ai telemetry, so it drops ATB.
+            // Covers the 6 names above and the 2 Duck.ai-unique ones (chat_history, search_duckduckgo)
+            // declared in DuckChatPixelName — the interceptor matches outgoing names with startsWith.
+            "m_autocomplete_duckai_click_" to PixelParameter.removeAtb(),
         )
     }
 }
