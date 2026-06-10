@@ -33,6 +33,7 @@ import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.ServiceScope
 import com.duckduckgo.duckchat.impl.R
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import dagger.android.AndroidInjection
 import javax.inject.Inject
@@ -110,6 +111,8 @@ class DuckChatVoiceMicrophoneService : Service() {
     private fun openChatPendingIntent(tabId: String): PendingIntent {
         val intent = browserNav.openExistingTab(this, tabId).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP
+            // Consumed by BrowserActivity to fire a pixel on cold/warm resume from a notification tap.
+            putExtra(LAUNCH_FROM_NOTIFICATION_PIXEL_NAME_EXTRA, DuckChatPixelName.DUCK_CHAT_VOICE_NOTIFICATION_OPEN_CHAT_TAPPED.pixelName)
         }
         return PendingIntent.getActivity(
             this,
@@ -152,6 +155,9 @@ class DuckChatVoiceMicrophoneService : Service() {
         private const val REQUEST_CODE_END_SESSION = 2
         private const val REQUEST_CODE_FALLBACK = 3
         private const val EXTRA_TAB_ID = "EXTRA_TAB_ID"
+
+        // Must match BrowserActivity.LAUNCH_FROM_NOTIFICATION_PIXEL_NAME — :app reads this extra to fire a pixel on resume.
+        private const val LAUNCH_FROM_NOTIFICATION_PIXEL_NAME_EXTRA = "LAUNCH_FROM_NOTIFICATION_PIXEL_NAME"
 
         fun start(context: Context, tabId: String) {
             val intent = Intent(context, DuckChatVoiceMicrophoneService::class.java).apply {
