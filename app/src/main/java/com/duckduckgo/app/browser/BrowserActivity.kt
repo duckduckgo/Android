@@ -23,6 +23,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.Intent.EXTRA_TEXT
 import android.content.res.Configuration
+import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
@@ -35,6 +36,8 @@ import android.view.View
 import android.view.View.IMPORTANT_FOR_AUTOFILL_YES
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
+import androidx.activity.SystemBarStyle
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
@@ -109,12 +112,16 @@ import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.tabs.SwipingTabsFeatureProvider
 import com.duckduckgo.common.ui.view.addBottomShadow
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
+import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.isFullScreen
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.common.utils.extensions.hideKeyboard
 import com.duckduckgo.common.utils.playstore.PlayStoreUtils
 import com.duckduckgo.dataclearing.api.fire.FireDialog
@@ -230,6 +237,12 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var currentBrowserMode: BrowserMode
+
+    @Inject
+    lateinit var edgeToEdgeProvider: EdgeToEdgeProvider
+
+    @Inject
+    lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
 
     private val lastActiveTabs = TabList()
 
@@ -394,6 +407,23 @@ open class BrowserActivity : DuckDuckGoActivity() {
         }
 
         bindMockupToolbars()
+
+        if (edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.BROWSER)) {
+            val toolbarColor = getColorFromAttr(com.duckduckgo.mobile.android.R.attr.daxColorToolbar)
+            val statusBarStyle = if (isDarkThemeEnabled()) {
+                SystemBarStyle.dark(toolbarColor)
+            } else {
+                SystemBarStyle.light(toolbarColor, toolbarColor)
+            }
+            val navBarColor = Color.TRANSPARENT
+            val navigationBarStyle = if (isDarkThemeEnabled()) {
+                SystemBarStyle.dark(navBarColor)
+            } else {
+                SystemBarStyle.light(navBarColor, navBarColor)
+            }
+            enableEdgeToEdge(statusBarStyle = statusBarStyle, navigationBarStyle = navigationBarStyle)
+            edgeToEdgeHandler.applyInsets(binding.root)
+        }
 
         setContentView(binding.root)
 
