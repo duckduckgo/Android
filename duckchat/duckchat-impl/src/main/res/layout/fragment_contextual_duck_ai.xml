@@ -142,7 +142,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@drawable/duck_ai_prompt_background"
-                android:drawableStart="@drawable/ic_arrow_down_right_16"
+                android:drawableStart="@drawable/ic_context_action_16"
                 android:drawablePadding="@dimen/keyline_2"
                 android:padding="@dimen/keyline_2"
                 tools:text="@string/duckAIContextualPromptSummarize"
