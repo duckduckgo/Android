@@ -905,12 +905,13 @@ open class BrowserActivity : DuckDuckGoActivity() {
                 val selectedText = intent.getBooleanExtra(SELECTED_TEXT_EXTRA, false)
                 val sourceTabId = intent.getStringExtra(SOURCE_TAB_ID_EXTRA) ?: if (selectedText) currentTab?.tabId else null
                 val skipHome = !selectedText && sourceTabId == null
+                val openLocalPdf = intent.getBooleanExtra(OPEN_LOCAL_PDF_EXTRA, false)
                 if (swipingTabsFeature.isEnabled) {
                     val query =
-                        if (isExternal) {
-                            omnibarEntryConverter.convertQueryToUrl(searchQuery = sharedText, extractUrlFromQuery = true)
-                        } else {
-                            sharedText
+                        when {
+                            openLocalPdf -> sharedText
+                            isExternal -> omnibarEntryConverter.convertQueryToUrl(searchQuery = sharedText, extractUrlFromQuery = true)
+                            else -> sharedText
                         }
                     launchNewTab(query = query, sourceTabId = sourceTabId, skipHome = skipHome, isExternal = isExternal)
                 } else {
@@ -1354,6 +1355,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
             duckChatSessionActive: Boolean = false,
             isLaunchFromBookmarksAppShortcut: Boolean = false,
             deletedTabCount: Int = 0,
+            openLocalPdf: Boolean = false,
         ): Intent {
             val intent = Intent(context, BrowserActivity::class.java)
             intent.putExtra(EXTRA_TEXT, queryExtra)
@@ -1373,6 +1375,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
             intent.putExtra(LAUNCH_FROM_BOOKMARKS_APP_SHORTCUT_EXTRA, isLaunchFromBookmarksAppShortcut)
             intent.putExtra(DELETED_TAB_COUNT_EXTRA, deletedTabCount)
             intent.putExtra(LAUNCH_REQUIRES_REGULAR_MODE, launchSource.requiresRegularMode)
+            intent.putExtra(OPEN_LOCAL_PDF_EXTRA, openLocalPdf)
             return intent
         }
 
@@ -1390,6 +1393,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
         const val OPEN_EXISTING_TAB_ID_EXTRA = "OPEN_EXISTING_TAB_ID_EXTRA"
 
         const val LAUNCH_FROM_EXTERNAL_EXTRA = "LAUNCH_FROM_EXTERNAL_EXTRA"
+        const val OPEN_LOCAL_PDF_EXTRA = "OPEN_LOCAL_PDF_EXTRA"
 
         /**
          * Stamped by entry points that must reach BrowserActivity in [BrowserMode.REGULAR].

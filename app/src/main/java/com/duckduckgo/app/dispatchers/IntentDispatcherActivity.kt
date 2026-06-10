@@ -18,11 +18,13 @@ package com.duckduckgo.app.dispatchers
 
 import android.content.Intent
 import android.os.Bundle
+import android.widget.Toast
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.BrowserActivity
+import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.customtabs.CustomTabActivity
 import com.duckduckgo.app.browser.mode.ExternalUrl
 import com.duckduckgo.app.browser.mode.InAppNavigation
@@ -62,13 +64,32 @@ class IntentDispatcherActivity : DuckDuckGoActivity() {
     }
 
     private fun dispatch(viewState: ViewState) {
-        if (viewState.activityParams != null) {
+        if (viewState.localPdfError) {
+            Toast.makeText(this, R.string.pdfOpenError, Toast.LENGTH_LONG).show()
+            finish()
+        } else if (viewState.openLocalPdf) {
+            showLocalPdf(viewState.intentText, viewState.isExternal)
+        } else if (viewState.activityParams != null) {
             globalActivityStarter.start(this, viewState.activityParams)
         } else if (viewState.customTabRequested) {
             showCustomTab(viewState.intentText, viewState.toolbarColor, viewState.isExternal)
         } else {
             showBrowserActivity(viewState.intentText, viewState.isExternal)
         }
+    }
+
+    private fun showLocalPdf(cachedFileUri: String?, isExternal: Boolean) {
+        startActivity(
+            BrowserActivity.intent(
+                context = this,
+                launchSource = if (isExternal) ExternalUrl else InAppNavigation,
+                queryExtra = cachedFileUri,
+                isExternal = isExternal,
+                openLocalPdf = true,
+            ),
+        )
+        overridePendingTransition(0, 0)
+        finish()
     }
 
     private fun showCustomTab(intentText: String?, toolbarColor: Int?, isExternal: Boolean) {
