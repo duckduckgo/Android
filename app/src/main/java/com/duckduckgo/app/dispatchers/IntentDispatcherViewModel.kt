@@ -17,13 +17,17 @@
 package com.duckduckgo.app.dispatchers
 
 import android.content.Intent
+import android.net.Uri
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.adblocking.api.duckplayer.DuckPlayerSettingsNoParams
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
+import com.duckduckgo.app.browser.pdf.InlinePdfHandler
+import com.duckduckgo.app.browser.pdf.LocalPdfResult
 import com.duckduckgo.app.global.intentText
+import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.appbuildconfig.api.isInternalBuild
 import com.duckduckgo.autofill.api.emailprotection.EmailProtectionLinkVerifier
@@ -47,6 +51,8 @@ class IntentDispatcherViewModel @Inject constructor(
     private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
     private val syncUrlIdentifier: SyncUrlIdentifier,
     private val appBuildConfig: AppBuildConfig,
+    private val inlinePdfHandler: InlinePdfHandler,
+    private val androidBrowserConfigFeature: AndroidBrowserConfigFeature,
 ) : ViewModel() {
 
     private val _viewState = MutableStateFlow(ViewState())
@@ -58,11 +64,33 @@ class IntentDispatcherViewModel @Inject constructor(
         val activityParams: ActivityParams? = null,
         val toolbarColor: Int? = null,
         val isExternal: Boolean = false,
+        val openLocalPdf: Boolean = false,
+        val localPdfError: Boolean = false,
     )
 
     fun onIntentReceived(intent: Intent?, isExternal: Boolean) {
         viewModelScope.launch(dispatcherProvider.io()) {
             runCatching {
+                val localPdfUri = localPdfUriOrNull(intent)
+                if (localPdfUri != null) {
+                    when (val result = inlinePdfHandler.cacheLocalPdf(localPdfUri)) {
+                        is LocalPdfResult.Success -> {
+                            _viewState.emit(
+                                viewState.value.copy(
+                                    intentText = result.uri.toString(),
+                                    openLocalPdf = true,
+                                    localPdfError = false,
+                                    isExternal = isExternal,
+                                ),
+                            )
+                        }
+                        is LocalPdfResult.Failure -> {
+                            _viewState.emit(viewState.value.copy(localPdfError = true, isExternal = isExternal))
+                        }
+                    }
+                    return@launch
+                }
+
                 val hasSession = intent?.hasExtra(CustomTabsIntent.EXTRA_SESSION) == true
                 val intentText = intent?.intentText
                 val activityParams = if (appBuildConfig.isInternalBuild()) {
@@ -104,6 +132,17 @@ class IntentDispatcherViewModel @Inject constructor(
                 logcat(WARN) { "Error handling custom tab intent: ${it.message}" }
             }
         }
+    }
+
+    private fun localPdfUriOrNull(intent: Intent?): Uri? {
+        if (intent?.action != Intent.ACTION_VIEW) return null
+        if (!androidBrowserConfigFeature.pdfViewer().isEnabled()) return null
+        val data = intent.data ?: return null
+        val scheme = data.scheme?.lowercase()
+        if (scheme != "content" && scheme != "file") return null
+        val isPdf = intent.type?.lowercase() == "application/pdf" ||
+            data.lastPathSegment?.endsWith(".pdf", ignoreCase = true) == true
+        return if (isPdf) data else null
     }
 
     private fun String.sanitize(): String {
