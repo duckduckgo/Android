@@ -16,6 +16,8 @@
 
 package com.duckduckgo.app.browser.pdf
 
+import android.content.ContentResolver
+import android.net.Uri
 import android.webkit.CookieManager
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
@@ -43,6 +45,8 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import org.robolectric.annotation.Config
@@ -637,4 +641,127 @@ class InlinePdfHandlerTest {
         assertTrue(second is PdfDownloadResult.Success)
         assertNull((second as PdfDownloadResult.Success).certificate)
     }
+
+    // region cacheLocalPdf / isCachedLocalPdf tests
+
+    @Test
+    fun whenCacheLocalPdfWithValidPdfThenReturnsSuccessWithFileUri() = runTest {
+        val pdfBytes = "%PDF-1.7\nsome content".toByteArray()
+        val source = Uri.parse("content://downloads/123")
+        val realContext = InstrumentationRegistry.getInstrumentation().targetContext
+        val mockContext: android.content.Context = mock()
+        val resolver: ContentResolver = mock()
+        whenever(mockContext.contentResolver).thenReturn(resolver)
+        whenever(mockContext.cacheDir).thenReturn(realContext.cacheDir)
+        whenever(resolver.openInputStream(source)).thenReturn(pdfBytes.inputStream())
+        whenever(resolver.query(eq(source), any(), anyOrNull(), anyOrNull(), anyOrNull())).thenReturn(null)
+        val handler = RealInlinePdfHandler(
+            context = mockContext,
+            okHttpClient = OkHttpClient(),
+            cookieManagerProvider = cookieManagerProvider,
+            dispatcherProvider = coroutineTestRule.testDispatcherProvider,
+            androidBrowserConfigFeature = androidBrowserConfigFeature,
+        )
+
+        val result = handler.cacheLocalPdf(source)
+
+        assertTrue(result is LocalPdfResult.Success)
+        val success = result as LocalPdfResult.Success
+        assertEquals("file", success.uri.scheme)
+        assertTrue(File(success.uri.path!!).exists())
+    }
+
+    @Test
+    fun whenCacheLocalPdfWithNonPdfContentThenReturnsFailureUnknownAndLeavesNoFile() = runTest {
+        val nonPdfBytes = "<html><body>Not a PDF</body></html>".toByteArray()
+        val source = Uri.parse("content://downloads/456")
+        val realContext = InstrumentationRegistry.getInstrumentation().targetContext
+        val mockContext: android.content.Context = mock()
+        val resolver: ContentResolver = mock()
+        whenever(mockContext.contentResolver).thenReturn(resolver)
+        whenever(mockContext.cacheDir).thenReturn(realContext.cacheDir)
+        whenever(resolver.openInputStream(source)).thenReturn(nonPdfBytes.inputStream())
+        whenever(resolver.query(eq(source), any(), anyOrNull(), anyOrNull(), anyOrNull())).thenReturn(null)
+        val handler = RealInlinePdfHandler(
+            context = mockContext,
+            okHttpClient = OkHttpClient(),
+            cookieManagerProvider = cookieManagerProvider,
+            dispatcherProvider = coroutineTestRule.testDispatcherProvider,
+            androidBrowserConfigFeature = androidBrowserConfigFeature,
+        )
+
+        val result = handler.cacheLocalPdf(source)
+
+        assertEquals(LocalPdfResult.Failure(PdfErrorType.UNKNOWN), result)
+        val cacheDir = File(realContext.cacheDir, "pdf_cache")
+        val leftoverFiles = cacheDir.listFiles()?.filter { it.isFile } ?: emptyList()
+        assertTrue("No files should remain in cache after magic-bytes failure", leftoverFiles.isEmpty())
+    }
+
+    @Test
+    fun whenCacheLocalPdfResolverThrowsSecurityExceptionThenReturnsFailureSecurityError() = runTest {
+        val source = Uri.parse("content://downloads/789")
+        val realContext = InstrumentationRegistry.getInstrumentation().targetContext
+        val mockContext: android.content.Context = mock()
+        val resolver: ContentResolver = mock()
+        whenever(mockContext.contentResolver).thenReturn(resolver)
+        whenever(mockContext.cacheDir).thenReturn(realContext.cacheDir)
+        whenever(resolver.openInputStream(source)).thenThrow(SecurityException("permission denied"))
+        val handler = RealInlinePdfHandler(
+            context = mockContext,
+            okHttpClient = OkHttpClient(),
+            cookieManagerProvider = cookieManagerProvider,
+            dispatcherProvider = coroutineTestRule.testDispatcherProvider,
+            androidBrowserConfigFeature = androidBrowserConfigFeature,
+        )
+
+        val result = handler.cacheLocalPdf(source)
+
+        assertEquals(LocalPdfResult.Failure(PdfErrorType.SECURITY_ERROR), result)
+    }
+
+    @Test
+    fun whenIsCachedLocalPdfForFilePdfInsideCacheDirThenReturnsTrue() = runTest {
+        val pdfBytes = "%PDF-1.7\nsome content".toByteArray()
+        val source = Uri.parse("content://downloads/111")
+        val realContext = InstrumentationRegistry.getInstrumentation().targetContext
+        val mockContext: android.content.Context = mock()
+        val resolver: ContentResolver = mock()
+        whenever(mockContext.contentResolver).thenReturn(resolver)
+        whenever(mockContext.cacheDir).thenReturn(realContext.cacheDir)
+        whenever(resolver.openInputStream(source)).thenReturn(pdfBytes.inputStream())
+        whenever(resolver.query(eq(source), any(), anyOrNull(), anyOrNull(), anyOrNull())).thenReturn(null)
+        val handler = RealInlinePdfHandler(
+            context = mockContext,
+            okHttpClient = OkHttpClient(),
+            cookieManagerProvider = cookieManagerProvider,
+            dispatcherProvider = coroutineTestRule.testDispatcherProvider,
+            androidBrowserConfigFeature = androidBrowserConfigFeature,
+        )
+        val cacheResult = handler.cacheLocalPdf(source)
+        assertTrue(cacheResult is LocalPdfResult.Success)
+        val cachedUri = (cacheResult as LocalPdfResult.Success).uri.toString()
+
+        assertTrue(handler.isCachedLocalPdf(cachedUri))
+    }
+
+    @Test
+    fun whenIsCachedLocalPdfForFilePdfOutsideCacheDirThenReturnsFalse() {
+        val pdfBytes = "%PDF-1.7\nsome content".toByteArray()
+        val realContext = InstrumentationRegistry.getInstrumentation().targetContext
+        val externalFile = File(realContext.filesDir, "external.pdf")
+        externalFile.writeBytes(pdfBytes)
+        val externalUri = Uri.fromFile(externalFile).toString()
+
+        assertFalse(inlinePdfHandler.isCachedLocalPdf(externalUri))
+
+        externalFile.delete()
+    }
+
+    @Test
+    fun whenIsCachedLocalPdfForHttpsUrlThenReturnsFalse() {
+        assertFalse(inlinePdfHandler.isCachedLocalPdf("https://example.com/doc.pdf"))
+    }
+
+    // endregion
 }
