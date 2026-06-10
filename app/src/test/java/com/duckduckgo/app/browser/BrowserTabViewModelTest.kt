@@ -285,6 +285,7 @@ import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
 import com.duckduckgo.downloads.api.model.DownloadItem
 import com.duckduckgo.downloads.store.DownloadStatus
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
+import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.contextual.PageContextJSHelper
 import com.duckduckgo.duckchat.impl.contextual.RealPageContextJSHelper.Companion.PAGE_CONTEXT_FEATURE_NAME
@@ -616,6 +617,7 @@ class BrowserTabViewModelTest {
     private val mockDuckChat: DuckChat = mock {
         on { observeTriggerVoiceChatSessionEnd() } doReturn voiceSessionEndTriggerFlow
     }
+    private val mockDuckAiHostProvider: DuckAiHostProvider = mock()
     private val mockSyncStatusChangedObserver: SyncStatusChangedObserver = mock()
     private val syncStatusChangedEventsFlow = MutableSharedFlow<JSONObject>()
     private val subscriptionStatusFlow = MutableSharedFlow<SubscriptionStatus>()
@@ -845,6 +847,7 @@ class BrowserTabViewModelTest {
 
             fakeContentScopeScriptsSubscriptionEventPluginPoint = FakeContentScopeScriptsSubscriptionEventPluginPoint()
 
+            whenever(mockDuckAiHostProvider.getHost()).thenReturn("duck.ai")
             whenever(mockDuckChat.getDuckChatUrl(any(), any(), any())).thenReturn(duckChatURL)
             whenever(mockDuckChat.isChatHistoryAvailable()).thenReturn(false)
             whenever(mockDuckChat.observeNativeInputFieldUserSettingEnabled()).thenReturn(nativeInputUserSettingFlow)
@@ -941,6 +944,7 @@ class BrowserTabViewModelTest {
                 httpErrorPixels = { mockHttpErrorPixels },
                 duckPlayer = mockDuckPlayer,
                 duckChat = mockDuckChat,
+                duckAiHostProvider = mockDuckAiHostProvider,
                 duckAiFeatureState = mockDuckAiFeatureState,
                 duckPlayerJSHelper =
                 DuckPlayerJSHelper(
@@ -7234,6 +7238,62 @@ class BrowserTabViewModelTest {
         testee.onUserSubmittedQuery("foo")
 
         assertEquals(testee.browserViewState.value?.lastQueryOrigin, FromUser)
+    }
+
+    @Test
+    fun whenTypedDuckAiUrlSubmittedFromUserAndDuckAiEnabledThenDirectNavigationPixelsFireWithEnabledTrue() {
+        whenever(mockOmnibarConverter.convertQueryToUrl("duck.ai", null, FromUser)).thenReturn("https://duck.ai/")
+        whenever(mockDuckChat.isEnabled()).thenReturn(true)
+
+        testee.onUserSubmittedQuery("duck.ai", queryOrigin = FromUser)
+
+        verify(mockPixel).fire(
+            AppPixelName.AI_CHAT_DUCK_AI_DIRECT_NAVIGATION_COUNT,
+            parameters = mapOf("duck_ai_enabled" to "true"),
+        )
+        verify(mockPixel).fire(
+            AppPixelName.AI_CHAT_DUCK_AI_DIRECT_NAVIGATION_DAILY,
+            parameters = mapOf("duck_ai_enabled" to "true"),
+            type = Daily(),
+        )
+    }
+
+    @Test
+    fun whenTypedDuckAiUrlSubmittedFromUserAndDuckAiDisabledThenDirectNavigationPixelsFireWithEnabledFalse() {
+        whenever(mockOmnibarConverter.convertQueryToUrl("duck.ai", null, FromUser)).thenReturn("https://duck.ai/")
+        whenever(mockDuckChat.isEnabled()).thenReturn(false)
+
+        testee.onUserSubmittedQuery("duck.ai", queryOrigin = FromUser)
+
+        verify(mockPixel).fire(
+            AppPixelName.AI_CHAT_DUCK_AI_DIRECT_NAVIGATION_COUNT,
+            parameters = mapOf("duck_ai_enabled" to "false"),
+        )
+        verify(mockPixel).fire(
+            AppPixelName.AI_CHAT_DUCK_AI_DIRECT_NAVIGATION_DAILY,
+            parameters = mapOf("duck_ai_enabled" to "false"),
+            type = Daily(),
+        )
+    }
+
+    @Test
+    fun whenTypedNonDuckAiUrlSubmittedFromUserThenDirectNavigationPixelsDoNotFire() {
+        whenever(mockOmnibarConverter.convertQueryToUrl("example.com", null, FromUser)).thenReturn("https://example.com/")
+
+        testee.onUserSubmittedQuery("example.com", queryOrigin = FromUser)
+
+        verify(mockPixel, never()).fire(eq(AppPixelName.AI_CHAT_DUCK_AI_DIRECT_NAVIGATION_COUNT), any(), any(), any())
+        verify(mockPixel, never()).fire(eq(AppPixelName.AI_CHAT_DUCK_AI_DIRECT_NAVIGATION_DAILY), any(), any(), any())
+    }
+
+    @Test
+    fun whenDuckAiUrlSubmittedFromBookmarkThenDirectNavigationPixelsDoNotFire() {
+        whenever(mockOmnibarConverter.convertQueryToUrl("duck.ai", null, FromBookmark)).thenReturn("https://duck.ai/")
+
+        testee.onUserSubmittedQuery("duck.ai", queryOrigin = FromBookmark)
+
+        verify(mockPixel, never()).fire(eq(AppPixelName.AI_CHAT_DUCK_AI_DIRECT_NAVIGATION_COUNT), any(), any(), any())
+        verify(mockPixel, never()).fire(eq(AppPixelName.AI_CHAT_DUCK_AI_DIRECT_NAVIGATION_DAILY), any(), any(), any())
     }
 
     @Test

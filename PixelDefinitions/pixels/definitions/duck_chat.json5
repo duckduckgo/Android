@@ -446,6 +446,36 @@
             }
         ]
     },
+    "m_aichat_duck_ai_direct_navigation_count": {
+        "description": "User navigated directly to the Duck.ai URL by typing it in the omnibar",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "duck_ai_enabled",
+                "type": "string",
+                "description": "Whether the Duck.ai global setting is enabled",
+                "enum": ["true", "false"]
+            }
+        ]
+    },
+    "m_aichat_duck_ai_direct_navigation_daily": {
+        "description": "(Daily Pixel) User navigated directly to the Duck.ai URL by typing it in the omnibar",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "duck_ai_enabled",
+                "type": "string",
+                "description": "Whether the Duck.ai global setting is enabled",
+                "enum": ["true", "false"]
+            }
+        ]
+    },
     "m_aichat_experimental_omnibar_mode_switched": {
         "description": "User switched between Search and Duck.ai toggle in the input screen",
         "owners": ["YoussefKeyrouz"],
