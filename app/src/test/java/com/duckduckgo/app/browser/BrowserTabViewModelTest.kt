@@ -11385,9 +11385,14 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenUserSubmittedQueryIsCachedLocalPdfThenFiresExternalOpenedPixels() = runTest {
+        // Simulate production first-open: loadData is called with isExternal=true AND initialUrl=cachedUri
+        // (so site.url == cachedUri), then onViewReady() triggers onUserSubmittedQuery(cachedUri).
+        // The old guard (cachedFileUriString != url) would be FALSE here and pixels would NEVER fire.
+        // The correct guard is isExternalLaunch == true.
         val cachedUri = "file:///data/user/0/com.duckduckgo.mobile.android/cache/pdf_cache/1-doc.pdf"
         whenever(mockInlinePdfHandler.isCachedLocalPdf(cachedUri)).thenReturn(true)
         whenever(mockInlinePdfHandler.extractFileName(cachedUri)).thenReturn("doc.pdf")
+        testee.loadData("TAB_ID", cachedUri, false, isExternal = true)
 
         testee.onUserSubmittedQuery(cachedUri)
         advanceUntilIdle()
@@ -11399,13 +11404,14 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenCachedLocalPdfRestoredThenShowPdfInTabEmittedButPixelsNotFired() = runTest {
-        // Simulate a tab restore: the stored file:// URL is already the current site URL.
-        // onViewReady() calls onUserSubmittedQuery(url) with query == url, so pixels
-        // must not fire (this is a restore, not a fresh external open).
+        // Simulate tab restore: loadData is called with isExternal=false AND initialUrl=cachedUri
+        // (so site.url == cachedUri). onViewReady() triggers onUserSubmittedQuery(cachedUri).
+        // Both first-open and restore paths reach renderCachedLocalPdf with url == cachedUri,
+        // so the only reliable discriminator is isExternalLaunch.
         val cachedUri = "file:///data/user/0/com.duckduckgo.mobile.android/cache/pdf_cache/1-doc.pdf"
-        givenCurrentSite(cachedUri)
         whenever(mockInlinePdfHandler.isCachedLocalPdf(cachedUri)).thenReturn(true)
         whenever(mockInlinePdfHandler.extractFileName(cachedUri)).thenReturn("doc.pdf")
+        testee.loadData("TAB_ID", cachedUri, false, isExternal = false)
 
         testee.onUserSubmittedQuery(cachedUri)
         advanceUntilIdle()
