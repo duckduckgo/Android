@@ -47,6 +47,7 @@ import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.duckchat.api.InputMode
 import com.duckduckgo.duckchat.api.toChatIdOrNull
 import com.duckduckgo.duckchat.impl.ui.nativeinput.views.NativeInputWidget
 import com.duckduckgo.navigation.api.GlobalActivityStarter
@@ -114,7 +115,9 @@ interface NativeInputManager {
         currentTabUrl: Flow<String?>,
         query: String = "",
         callbacks: NativeInputCallbacks,
+        initialInputMode: InputMode? = null,
     )
+
     fun hideNativeInput(animate: Boolean = true, isNavigation: Boolean = false): Boolean
     fun handleDuckAiVoiceResult(query: String)
     fun onKeyboardVisibilityChanged(isVisible: Boolean)
@@ -363,6 +366,7 @@ class RealNativeInputManager @Inject constructor(
         currentTabUrl: Flow<String?>,
         query: String,
         callbacks: NativeInputCallbacks,
+        initialInputMode: InputMode?,
     ) {
         if (!isNativeInputFieldEnabled) return
 
@@ -408,7 +412,7 @@ class RealNativeInputManager @Inject constructor(
         }
         attachWidget(widgetView, isBottom, tabId)
         val isNewTab = query.isEmpty() && omnibarController.getText().isEmpty()
-        applyInitialTabSelection(widgetView, isNewTab)
+        applyInitialTabSelection(widgetView, isNewTab, initialInputMode)
         if (omnibarController.isDuckAiMode()) {
             widgetFrom(widgetView)?.setToggleVisible(false)
         } else {
@@ -640,12 +644,16 @@ class RealNativeInputManager @Inject constructor(
         }
     }
 
-    private fun applyInitialTabSelection(widgetView: View, isNewTab: Boolean) {
+    private fun applyInitialTabSelection(widgetView: View, isNewTab: Boolean, initialInputMode: InputMode?) {
         val widget = widgetFrom(widgetView) ?: return
-        if (omnibarController.isDuckAiMode()) {
-            widget.selectChatTab()
-        } else if (isNewTab) {
-            widget.applyDefaultTogglePosition()
+        when (initialInputMode) {
+            InputMode.DUCK_AI -> widget.selectChatTab()
+            InputMode.SEARCH -> widget.selectSearchTab()
+            null -> if (omnibarController.isDuckAiMode()) {
+                widget.selectChatTab()
+            } else if (isNewTab) {
+                widget.applyDefaultTogglePosition()
+            }
         }
     }
 

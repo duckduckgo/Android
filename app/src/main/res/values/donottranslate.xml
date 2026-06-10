@@ -127,7 +127,7 @@
     <string name="preOnboardingAiComparisonChartItem1">All chats are anonymized</string>
     <string name="preOnboardingAiComparisonChartItem2">No account needed to access all AI features</string>
     <string name="preOnboardingAiComparisonChartItem3">Never uses your chats to train AI</string>
-    <string name="preOnboardingAiComparisonChartItem4">Access ChatGPT, Claude, and more, all in one place.</string>
+    <string name="preOnboardingAiComparisonChartItem4">Access ChatGPT, Claude, and more, all in one place</string>
     <string name="preOnboardingAiComparisonChartButton">Give Duck.ai a try!</string>
     <!-- In-context onboarding. -->
     <string name="onboardingEndCustomAiFlowDaxDialogDescription"><![CDATA[Start a private AI chat with Duck.ai or toggle to Search for protected browsing.<br/><br/>You can use Duck.ai from anywhere you see the chat icon]]></string>
@@ -137,4 +137,6 @@
     <string name="preOnboardingDaxDialog2TitleCustomAi">Want to make DuckDuckGo your default browser?</string>
     <string name="preOnboardingDaxDialog3TextCustomAi">Remember: you can use Duck.ai from anywhere you see the chat icon</string>
     <string name="preOnboardingDaxDialog3ButtonCustomAi">Start AI Chat</string>
+    <!-- Pre-onboarding: input demo screen -->
+    <string name="preOnboardingInputModeDemoTitleCustomAi">Now, try a private AI chat!</string>
 </resources>

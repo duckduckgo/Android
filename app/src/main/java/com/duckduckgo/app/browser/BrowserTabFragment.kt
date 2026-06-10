@@ -219,6 +219,7 @@ import com.duckduckgo.app.global.model.orderedTrackerBlockedEntities
 import com.duckduckgo.app.global.view.NonDismissibleBehavior
 import com.duckduckgo.app.global.view.launchDefaultAppActivity
 import com.duckduckgo.app.global.view.renderIfChanged
+import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.settings.db.SettingsDataStore
@@ -330,6 +331,7 @@ import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.api.DuckChatHistoryNoParams
+import com.duckduckgo.duckchat.api.InputMode
 import com.duckduckgo.duckchat.api.inputscreen.BrowserAndInputScreenTransitionProvider
 import com.duckduckgo.duckchat.api.inputscreen.InputScreenActivityParams
 import com.duckduckgo.duckchat.api.inputscreen.InputScreenActivityResultCodes
@@ -691,6 +693,9 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
+
+    @Inject
+    lateinit var onboardingStore: OnboardingStore
 
     /**
      * We use this to monitor whether the user was seeing the in-context Email Protection signup prompt
@@ -1388,7 +1393,7 @@ class BrowserTabFragment :
     private fun configureInputScreenLauncher() {
         omnibar.configureInputScreenLaunchListener { query ->
             if (!nativeInputManager.isNativeInputEnabled()) {
-                launchInputScreen(query, isNewTab = omnibar.viewMode == NewTab)
+                launchInputScreen(query, isNewTab = omnibar.viewMode == NewTab, launchOnChat = omnibar.viewMode == ViewMode.DuckAI)
             } else {
                 removeDuckChatContextualSheet()
                 showNativeInput(query)
@@ -1404,6 +1409,11 @@ class BrowserTabFragment :
             tabs = viewModel.tabs,
             currentTabUrl = viewModel.siteLiveData.asFlow().map { it?.url },
             query = query,
+            initialInputMode = if (onboardingStore.consumeOpenInputOnDuckAiTab()) {
+                InputMode.DUCK_AI
+            } else {
+                null
+            },
             callbacks = NativeInputCallbacks(
                 onSearchTextChanged = { text -> onUserEnteredText(text) },
                 onClearAutocomplete = {
@@ -1502,6 +1512,7 @@ class BrowserTabFragment :
         query: String,
         isNewTab: Boolean = false,
         showDuckAiEndCta: Boolean = false,
+        launchOnChat: Boolean = false,
     ) {
         logcat { "Duck.ai: launchInputScreen" }
         val isTopOmnibar = omnibar.omnibarType != OmnibarType.SINGLE_BOTTOM
@@ -1512,7 +1523,11 @@ class BrowserTabFragment :
                     query = query,
                     isTopOmnibar = isTopOmnibar,
                     browserButtonsConfig = InputScreenBrowserButtonsConfig.Enabled(tabs = viewModel.tabs.value?.size ?: 0),
-                    launchOnChat = omnibar.viewMode == ViewMode.DuckAI,
+                    initialInputMode = if (launchOnChat) {
+                        InputMode.DUCK_AI
+                    } else {
+                        null
+                    },
                     isNewTab = isNewTab,
                     showReturnHatch = androidBrowserConfigFeature.showNTPAfterIdleReturn().isEnabled(),
                     showDuckAiOnboardingEndCta = showDuckAiEndCta,
@@ -3019,7 +3034,7 @@ class BrowserTabFragment :
             is Command.LaunchInputScreen -> {
                 // if the fire button is used, prevent automatically launching the input screen until the process reloads
                 if ((requireActivity() as? BrowserActivity)?.isDataClearingInProgress == false) {
-                    launchInputScreen(query = "", isNewTab = true, showDuckAiEndCta = it.showDuckAiEndCta)
+                    launchInputScreen(query = "", isNewTab = true, showDuckAiEndCta = it.showDuckAiEndCta, launchOnChat = it.launchOnChat)
                 }
             }
 

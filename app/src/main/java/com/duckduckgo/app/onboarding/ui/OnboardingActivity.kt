@@ -96,6 +96,11 @@ class OnboardingActivity : DuckDuckGoActivity() {
         }
     }
 
+    fun handOffToBrowserActivity() {
+        startActivity(BrowserActivity.intent(this@OnboardingActivity, launchSource = Onboarding))
+        finish()
+    }
+
     fun finishAndSubmitChatPrompt(prompt: String) {
         lifecycleScope.launch {
             viewModel.onOnboardingDone(extendedOnboardingFlow = DUCK_AI_FOCUSED)

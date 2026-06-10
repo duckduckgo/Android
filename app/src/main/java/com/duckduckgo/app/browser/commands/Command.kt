@@ -490,7 +490,7 @@ sealed class Command {
 
     data object RefreshOmnibar : Command()
 
-    data class LaunchInputScreen(val showDuckAiEndCta: Boolean = false) : Command()
+    data class LaunchInputScreen(val showDuckAiEndCta: Boolean = false, val launchOnChat: Boolean = false) : Command()
 
     data object LaunchDuckChatHistory : Command()
 

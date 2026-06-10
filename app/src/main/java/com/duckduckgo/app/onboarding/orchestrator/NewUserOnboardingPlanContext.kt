@@ -40,4 +40,11 @@ class NewUserOnboardingPlanContext {
      */
     @Volatile
     var completionResult: LinearOnboardingResult? = null
+
+    /**
+     * Chat prompt captured by the custom-AI [NewUserOnboardingStepIds.INPUT_SCREEN_PREVIEW] step,
+     * read by the [NewUserOnboardingStepIds.DUCK_AI_DEMO] step.
+     */
+    @Volatile
+    var pendingDuckAiPrompt: String? = null
 }

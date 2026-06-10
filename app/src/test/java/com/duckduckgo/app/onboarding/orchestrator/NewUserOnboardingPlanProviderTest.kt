@@ -18,8 +18,8 @@ package com.duckduckgo.app.onboarding.orchestrator
 
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.browser.omnibar.OmnibarType
+import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.global.DefaultRoleBrowserDialog
-import com.duckduckgo.app.onboarding.CustomDuckAiOnboardingFeature
 import com.duckduckgo.app.onboarding.DuckAiOnboardingExperimentManager
 import com.duckduckgo.app.onboarding.DuckAiOnboardingExperimentManager.DuckAiOnboardingExperimentVariant
 import com.duckduckgo.app.onboarding.store.OnboardingStore
@@ -52,11 +52,13 @@ import com.duckduckgo.sync.api.SyncAutoRestore
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
@@ -72,8 +74,6 @@ class NewUserOnboardingPlanProviderTest {
     private val onboardingStore: OnboardingStore = mock()
     private val duckChat: DuckChat = mock()
     private val androidBrowserConfigFeature: AndroidBrowserConfigFeature = mock()
-    private val customDuckAiOnboardingFeature: CustomDuckAiOnboardingFeature = mock()
-    private val introAnimationToggle: Toggle = mock()
     private val duckAiExperiment: DuckAiOnboardingExperimentManager = mock()
     private val quickSetupExperiment: OnboardingQuickSetupExperimentManager = mock()
     private val quickSetupPixelSender: QuickSetupPixelSender = mock()
@@ -83,6 +83,7 @@ class NewUserOnboardingPlanProviderTest {
     private val pixel: Pixel = mock()
     private val splitOmnibarToggle: Toggle = mock()
     private val splitOmnibarWelcomeToggle: Toggle = mock()
+    private val dismissedCtaDao: DismissedCtaDao = mock()
 
     private lateinit var provider: NewUserOnboardingPlanProvider
     private val orchestrator = LinearOnboardingOrchestratorImpl()
@@ -96,14 +97,13 @@ class NewUserOnboardingPlanProviderTest {
         whenever(defaultRoleBrowserDialog.shouldShowDialog()).thenReturn(true)
         whenever(defaultBrowserDetector.isDefaultBrowser()).thenReturn(false)
         whenever(widgetCapabilities.hasInstalledWidgets).thenReturn(false)
-        whenever(customDuckAiOnboardingFeature.introAnimation()).thenReturn(introAnimationToggle)
-        whenever(introAnimationToggle.isEnabled()).thenReturn(false)
         runBlocking {
             whenever(syncAutoRestore.canRestore()).thenReturn(false)
             whenever(appBuildConfig.isAppReinstall()).thenReturn(false)
             whenever(duckAiExperiment.enroll()).thenReturn(DuckAiOnboardingExperimentVariant.CONTROL)
             whenever(quickSetupExperiment.enroll()).thenReturn(QuickSetupExperimentVariant.CONTROL)
         }
+        whenever(onboardingStore.isCustomAiOnboardingFlow()).thenReturn(false)
         provider = NewUserOnboardingPlanProvider(
             syncAutoRestore = syncAutoRestore,
             appBuildConfig = appBuildConfig,
@@ -112,7 +112,6 @@ class NewUserOnboardingPlanProviderTest {
             onboardingStore = onboardingStore,
             duckChat = duckChat,
             androidBrowserConfigFeature = androidBrowserConfigFeature,
-            customDuckAiOnboardingFeature = customDuckAiOnboardingFeature,
             duckAiOnboardingExperimentManager = duckAiExperiment,
             onboardingQuickSetupExperimentManager = quickSetupExperiment,
             quickSetupPixelSender = quickSetupPixelSender,
@@ -121,6 +120,7 @@ class NewUserOnboardingPlanProviderTest {
             widgetCapabilities = widgetCapabilities,
             pixel = pixel,
             dispatchers = coroutineRule.testDispatcherProvider,
+            dismissedCtaDao = dismissedCtaDao,
         )
     }
 
@@ -132,6 +132,10 @@ class NewUserOnboardingPlanProviderTest {
         val state = orchestrator.state.value
         assertTrue("expected InProgress on '$id' but was $state", state is InProgress)
         assertEquals(id, (state as InProgress).currentStep.id)
+    }
+
+    private fun assertStepProgress(current: Int, total: Int) {
+        assertEquals(StepProgress(current = current, total = total), (orchestrator.state.value as InProgress).stepIndicatorProgress())
     }
 
     @Test
@@ -378,5 +382,118 @@ class NewUserOnboardingPlanProviderTest {
         assertStep(NewUserOnboardingStepIds.SKIP_ONBOARDING_OPTION)
         orchestrator.onEvent(NewUserOnboardingEvent.SkipNewUserOnboardingDevOptionClicked)
         assertEquals(Skipped(rootPlanId = NewUserOnboardingPlanProvider.ROOT_PLAN_ID), orchestrator.state.value)
+    }
+
+    @Test
+    fun `when onboarding path then custom ai plan walks to completed`() = runTest {
+        whenever(onboardingStore.isCustomAiOnboardingFlow()).thenReturn(true)
+        start()
+
+        assertStep(NewUserOnboardingStepIds.INTRO_ANIMATION)
+        orchestrator.onEvent(NewUserOnboardingEvent.IntroAnimationFinished)
+        assertStep(NewUserOnboardingStepIds.NOTIFICATION_PERMISSION)
+        orchestrator.onEvent(NewUserOnboardingEvent.NotificationPermissionFinished)
+        assertStep(NewUserOnboardingStepIds.INITIAL)
+        orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked)
+        assertStep(NewUserOnboardingStepIds.AI_COMPARISON_CHART)
+        assertStepProgress(current = 1, total = 4)
+        orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked)
+        assertStep(NewUserOnboardingStepIds.INPUT_SCREEN_PREVIEW)
+        assertStepProgress(current = 2, total = 4)
+        orchestrator.onEvent(NewUserOnboardingEvent.InputDemoQuerySubmitted(query = "best privacy tips", isChat = true))
+        assertStep(NewUserOnboardingStepIds.DUCK_AI_DEMO)
+
+        val step = (orchestrator.state.value as InProgress).currentStep as NewUserBrowserActivityStep
+        assertEquals(NewUserBrowserActivityAction.RunDuckAiOnboardingDemo("best privacy tips"), step.resolveAction())
+
+        orchestrator.onEvent(NewUserOnboardingEvent.DuckAiFireCompleted)
+        assertStep(NewUserOnboardingStepIds.COMPARISON_CHART)
+        assertStepProgress(current = 3, total = 4)
+        orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked)
+        assertStep(NewUserOnboardingStepIds.DEFAULT_BROWSER_PROMPT)
+        orchestrator.onEvent(NewUserOnboardingEvent.DefaultBrowserPromptFinished(isDefaultBrowser = false))
+        assertStep(NewUserOnboardingStepIds.ADDRESS_BAR_POSITION)
+        assertStepProgress(current = 4, total = 4)
+        orchestrator.onEvent(NewUserOnboardingEvent.AddressBarConfirmed(OmnibarType.SINGLE_TOP))
+        assertEquals(Completed(rootPlanId = NewUserOnboardingPlanProvider.ROOT_PLAN_ID), orchestrator.state.value)
+    }
+
+    @Test
+    fun `when onboarding path and reinstall then reinstall dialog replaces initial`() = runTest {
+        whenever(onboardingStore.isCustomAiOnboardingFlow()).thenReturn(true)
+        whenever(appBuildConfig.isAppReinstall()).thenReturn(true)
+        start()
+
+        orchestrator.onEvent(NewUserOnboardingEvent.IntroAnimationFinished)
+        orchestrator.onEvent(NewUserOnboardingEvent.NotificationPermissionFinished)
+        assertStep(NewUserOnboardingStepIds.INITIAL_REINSTALL_USER)
+        orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked)
+        assertStep(NewUserOnboardingStepIds.AI_COMPARISON_CHART)
+    }
+
+    @Test
+    fun `when onboarding path then input screen preview is chat only`() = runTest {
+        whenever(onboardingStore.isCustomAiOnboardingFlow()).thenReturn(true)
+        start()
+        orchestrator.onEvent(NewUserOnboardingEvent.IntroAnimationFinished)
+        orchestrator.onEvent(NewUserOnboardingEvent.NotificationPermissionFinished)
+        orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked) // initial
+        orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked) // ai_comparison_chart
+        assertStep(NewUserOnboardingStepIds.INPUT_SCREEN_PREVIEW)
+
+        val state = orchestrator.state.value as InProgress
+        val dialog = (state.currentStep as NewUserOnboardingActivityStep).resolveDialog() as NewUserOnboardingActivityDialog.InputScreenPreview
+        // Step number is derived from the step's position in the plan, not carried on the dialog.
+        assertEquals(StepProgress(current = 2, total = 4), state.stepIndicatorProgress())
+        assertFalse(dialog.isSearchDefault)
+    }
+
+    @Test
+    fun `when custom ai onboarding completed then arms open input on duck ai tab`() = runTest {
+        whenever(onboardingStore.isCustomAiOnboardingFlow()).thenReturn(true)
+        start()
+        orchestrator.onEvent(NewUserOnboardingEvent.IntroAnimationFinished)
+        orchestrator.onEvent(NewUserOnboardingEvent.NotificationPermissionFinished)
+        orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked) // initial
+        orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked) // ai_comparison_chart
+        orchestrator.onEvent(NewUserOnboardingEvent.InputDemoQuerySubmitted(query = "best privacy tips", isChat = true))
+        orchestrator.onEvent(NewUserOnboardingEvent.DuckAiFireCompleted)
+        orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked) // comparison_chart
+        orchestrator.onEvent(NewUserOnboardingEvent.DefaultBrowserPromptFinished(isDefaultBrowser = false))
+        orchestrator.onEvent(NewUserOnboardingEvent.AddressBarConfirmed(OmnibarType.SINGLE_TOP))
+
+        assertEquals(Completed(rootPlanId = NewUserOnboardingPlanProvider.ROOT_PLAN_ID), orchestrator.state.value)
+        verify(onboardingStore).setOpenInputOnDuckAiTab()
+    }
+
+    @Test
+    fun `when custom ai onboarding skipped then arms open input on duck ai tab`() = runTest {
+        whenever(onboardingStore.isCustomAiOnboardingFlow()).thenReturn(true)
+        whenever(appBuildConfig.isAppReinstall()).thenReturn(true)
+        start()
+        orchestrator.onEvent(NewUserOnboardingEvent.IntroAnimationFinished)
+        orchestrator.onEvent(NewUserOnboardingEvent.NotificationPermissionFinished)
+        assertStep(NewUserOnboardingStepIds.INITIAL_REINSTALL_USER)
+        orchestrator.onEvent(NewUserOnboardingEvent.SkipRequested)
+        assertStep(NewUserOnboardingStepIds.SKIP_ONBOARDING_OPTION)
+        orchestrator.onEvent(NewUserOnboardingEvent.SkipConfirmed)
+
+        assertEquals(Skipped(rootPlanId = NewUserOnboardingPlanProvider.ROOT_PLAN_ID), orchestrator.state.value)
+        verify(onboardingStore).setOpenInputOnDuckAiTab()
+    }
+
+    @Test
+    fun `when default onboarding completed then does not arm open input on duck ai tab`() = runTest {
+        start()
+        orchestrator.onEvent(NewUserOnboardingEvent.IntroAnimationFinished)
+        orchestrator.onEvent(NewUserOnboardingEvent.NotificationPermissionFinished)
+        orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked) // initial
+        orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked) // comparison_chart
+        orchestrator.onEvent(NewUserOnboardingEvent.DefaultBrowserPromptFinished(isDefaultBrowser = false))
+        orchestrator.onEvent(NewUserOnboardingEvent.AddressBarConfirmed(OmnibarType.SINGLE_TOP))
+        orchestrator.onEvent(NewUserOnboardingEvent.InputModeConfirmed(withAi = false))
+
+        assertEquals(Completed(rootPlanId = NewUserOnboardingPlanProvider.ROOT_PLAN_ID), orchestrator.state.value)
+        verify(onboardingStore, never()).setOpenInputOnDuckAiTab()
     }
 }

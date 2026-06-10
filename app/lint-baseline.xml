@@ -4127,17 +4127,6 @@
     <issue
         id="DenyListedApi"
         message="Use com.duckduckgo.data.store.api.SharedPreferencesProvider instead"
-        errorLine1="    private val preferences: SharedPreferences by lazy { context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE) }"
-        errorLine2="                                                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/com/duckduckgo/app/onboarding/store/OnboardingStoreImpl.kt"
-            line="32"
-            column="58"/>
-    </issue>
-
-    <issue
-        id="DenyListedApi"
-        message="Use com.duckduckgo.data.store.api.SharedPreferencesProvider instead"
         errorLine1="        whenever(mockContext.getSharedPreferences(&quot;com.duckduckgo.app.browser.httperrors&quot;, 0)).thenReturn(prefs)"
         errorLine2="                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location

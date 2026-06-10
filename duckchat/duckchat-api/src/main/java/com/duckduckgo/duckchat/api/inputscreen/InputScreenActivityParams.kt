@@ -18,6 +18,7 @@ package com.duckduckgo.duckchat.api.inputscreen
 
 import android.app.Activity
 import androidx.activity.result.ActivityResult
+import com.duckduckgo.duckchat.api.InputMode
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import java.io.Serializable
 
@@ -30,6 +31,7 @@ import java.io.Serializable
  * @param showInstalledApps whether apps installed on the device should appear in autocomplete results
  * @param launchWithVoice whether to immediately launch voice input on activity start, if supported and enabled
  * @param isNewTab whether the input screen is being launched as part of a new tab creation action
+ * @param initialInputMode if null, falls back to user preference (Search / Chat / Last Used)
  */
 data class InputScreenActivityParams(
     val query: String,
@@ -37,7 +39,7 @@ data class InputScreenActivityParams(
     val browserButtonsConfig: InputScreenBrowserButtonsConfig,
     val showInstalledApps: Boolean = false,
     val launchWithVoice: Boolean = false,
-    val launchOnChat: Boolean = false,
+    val initialInputMode: InputMode? = null,
     val showReturnHatch: Boolean = false,
     val isNewTab: Boolean = false,
     val showDuckAiOnboardingEndCta: Boolean = false,

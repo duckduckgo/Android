@@ -25,7 +25,6 @@ import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.cta.ui.DaxBubbleCta.DaxDialogIntroOption
 import com.duckduckgo.app.global.DefaultRoleBrowserDialog
 import com.duckduckgo.app.global.install.AppInstallStore
-import com.duckduckgo.app.onboarding.CustomDuckAiOnboardingFeature
 import com.duckduckgo.app.onboarding.DuckAiOnboardingExperimentManager
 import com.duckduckgo.app.onboarding.DuckAiOnboardingExperimentManager.DuckAiOnboardingExperimentVariant
 import com.duckduckgo.app.onboarding.store.OnboardingStore
@@ -98,9 +97,6 @@ class BrandDesignUpdatePageViewModelTest {
     private val mockAndroidBrowserConfigFeature: AndroidBrowserConfigFeature = FakeFeatureToggleFactory.create(
         AndroidBrowserConfigFeature::class.java,
     )
-    private val mockCustomDuckAiOnboardingFeature: CustomDuckAiOnboardingFeature = FakeFeatureToggleFactory.create(
-        CustomDuckAiOnboardingFeature::class.java,
-    )
     private val mockDuckChat: DuckChat = mock()
     private val mockInputScreenOnboardingWideEvent: InputScreenOnboardingWideEvent = mock()
     private val mockDuckAiOnboardingExperimentManager: DuckAiOnboardingExperimentManager = mock()
@@ -134,7 +130,6 @@ class BrandDesignUpdatePageViewModelTest {
             mockWidgetCapabilities,
             mockSyncAutoRestore,
             mockQuickSetupPixelSender,
-            mockCustomDuckAiOnboardingFeature,
             mockOrchestrator,
         )
     }
@@ -219,49 +214,7 @@ class BrandDesignUpdatePageViewModelTest {
     }
 
     @Test
-    fun whenIntroAnimationFlagEnabledThenViewStateIsDuckAiIntroAnimationEnabledIsTrue() = runTest {
-        mockCustomDuckAiOnboardingFeature.introAnimation().setRawStoredState(Toggle.State(enable = true))
-
-        val testee = createViewModel()
-
-        testee.viewState.test {
-            val state = awaitItem()
-            assertEquals(true, state.isDuckAiIntroAnimationEnabled)
-            cancelAndConsumeRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenIntroAnimationFlagDisabledThenViewStateIsDuckAiIntroAnimationEnabledIsFalse() = runTest {
-        mockCustomDuckAiOnboardingFeature.introAnimation().setRawStoredState(Toggle.State(enable = false))
-
-        val testee = createViewModel()
-
-        testee.viewState.test {
-            val state = awaitItem()
-            assertEquals(false, state.isDuckAiIntroAnimationEnabled)
-            cancelAndConsumeRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenViewModelCreatedAndFlagEnabledThenPlayIntroAnimationCommandWithDuckAiTrueIsEmitted() = runTest {
-        mockCustomDuckAiOnboardingFeature.introAnimation().setRawStoredState(Toggle.State(enable = true))
-
-        val testee = createViewModel()
-
-        testee.commands.test {
-            val command = awaitItem()
-            assertTrue(command is Command.PlayIntroAnimation)
-            assertEquals(true, (command as Command.PlayIntroAnimation).withDuckAi)
-            cancelAndConsumeRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenViewModelCreatedAndFlagDisabledThenPlayIntroAnimationCommandWithDuckAiFalseIsEmitted() = runTest {
-        mockCustomDuckAiOnboardingFeature.introAnimation().setRawStoredState(Toggle.State(enable = false))
-
+    fun whenViewModelCreatedInLegacyModeThenPlayIntroAnimationCommandWithoutDuckAiIsEmitted() = runTest {
         val testee = createViewModel()
 
         testee.commands.test {

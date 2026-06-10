@@ -36,6 +36,9 @@ sealed interface NewUserOnboardingEvent : LinearOnboardingEvent {
     data class QuickSetupConfirmed(val type: OmnibarType, val withAi: Boolean) : NewUserOnboardingEvent
     data class InputDemoQuerySubmitted(val query: String, val isChat: Boolean) : NewUserOnboardingEvent
 
+    /** The in-browser Duck.ai onboarding demo's fire flow completed; advances the duck_ai_demo step. */
+    data object DuckAiFireCompleted : NewUserOnboardingEvent
+
     /**
      * Internal-only "skip all onboarding" dev shortcut. Not a dialog action: every step's transition
      * is wrapped to treat it as [com.duckduckgo.onboarding.api.LinearOnboardingTransition.AbortPlan],
