@@ -17,8 +17,7 @@
 package com.duckduckgo.contentscopescripts.impl
 
 import android.webkit.WebView
-import com.duckduckgo.app.browser.api.WebViewCapabilityChecker
-import com.duckduckgo.app.browser.api.WebViewCapabilityChecker.WebViewCapability.DocumentStartJavaScript
+import androidx.webkit.WebViewFeature
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.browser.api.JsInjectorPlugin
 import com.duckduckgo.di.scopes.AppScope
@@ -30,7 +29,6 @@ import javax.inject.Inject
 class ContentScopeScriptsJsInjectorPlugin @Inject constructor(
     private val coreContentScopeScripts: CoreContentScopeScripts,
     private val contentScopeScriptsFeature: ContentScopeScriptsFeature,
-    private val webViewCapabilityChecker: WebViewCapabilityChecker,
 ) : JsInjectorPlugin {
     override fun onPageStarted(
         webView: WebView,
@@ -46,7 +44,7 @@ class ContentScopeScriptsJsInjectorPlugin @Inject constructor(
     private fun isDocumentStartContentScopeScriptsEnabled(): Boolean {
         return contentScopeScriptsFeature.useNewWebCompatApis().isEnabled() &&
             contentScopeScriptsFeature.useWebMessageListener().isEnabled() &&
-            webViewCapabilityChecker.isSupported(DocumentStartJavaScript)
+            WebViewFeature.isFeatureSupported(WebViewFeature.DOCUMENT_START_SCRIPT)
     }
 
     override fun onPageFinished(
