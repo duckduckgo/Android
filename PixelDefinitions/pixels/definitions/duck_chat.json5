@@ -681,5 +681,33 @@
         "triggers": ["other"],
         "suffixes": ["form_factor"],
         "parameters": ["appVersion"]
+    },
+    "m_aichat_voice_notification_open_chat_tapped": {
+        "description": "User tapped the Open Chat action on the Duck.ai voice session notification, returning to the chat",
+        "owners": ["karlenDimla"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_voice_notification_end_chat_tapped": {
+        "description": "User tapped the End Chat action on the Duck.ai voice session notification",
+        "owners": ["karlenDimla"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_voice_service_started": {
+        "description": "The Duck.ai voice microphone foreground service was created (voice session resources active)",
+        "owners": ["karlenDimla"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_voice_service_killed": {
+        "description": "The Duck.ai voice microphone foreground service was destroyed (voice session resources released)",
+        "owners": ["karlenDimla"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
     }
 }
