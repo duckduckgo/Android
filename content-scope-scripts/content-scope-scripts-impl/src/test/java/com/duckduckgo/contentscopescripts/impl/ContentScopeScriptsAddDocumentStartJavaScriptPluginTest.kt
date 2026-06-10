@@ -10,6 +10,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
@@ -46,10 +47,11 @@ class ContentScopeScriptsAddDocumentStartJavaScriptPluginTest {
         runTest {
             whenever(mockWebViewCompatContentScopeScripts.isEnabled()).thenReturn(true)
             whenever(mockWebViewCapabilityChecker.isSupported(any())).thenReturn(true)
-            whenever(mockWebViewCompatContentScopeScripts.getScript(any())).thenReturn("script")
+            whenever(mockWebViewCompatContentScopeScripts.getScript(anyOrNull(), any())).thenReturn("script")
 
-            testee.addDocumentStartJavaScript(mockWebView)
+            testee.addDocumentStartJavaScript(mockWebView, true)
 
+            verify(mockWebViewCompatContentScopeScripts).getScript(true, listOf())
             verify(mockWebViewCompatWrapper).addDocumentStartJavaScript(mockWebView, "script", setOf("*"))
         }
 
@@ -58,9 +60,9 @@ class ContentScopeScriptsAddDocumentStartJavaScriptPluginTest {
         runTest {
             whenever(mockWebViewCompatContentScopeScripts.isEnabled()).thenReturn(false)
             whenever(mockWebViewCapabilityChecker.isSupported(any())).thenReturn(true)
-            whenever(mockWebViewCompatContentScopeScripts.getScript(any())).thenReturn("script")
+            whenever(mockWebViewCompatContentScopeScripts.getScript(anyOrNull(), any())).thenReturn("script")
 
-            testee.addDocumentStartJavaScript(mockWebView)
+            testee.addDocumentStartJavaScript(mockWebView, null)
 
             verify(mockWebViewCompatWrapper, never()).addDocumentStartJavaScript(any(), any(), any())
         }
@@ -70,9 +72,9 @@ class ContentScopeScriptsAddDocumentStartJavaScriptPluginTest {
         runTest {
             whenever(mockWebViewCompatContentScopeScripts.isEnabled()).thenReturn(true)
             whenever(mockWebViewCapabilityChecker.isSupported(any())).thenReturn(false)
-            whenever(mockWebViewCompatContentScopeScripts.getScript(any())).thenReturn("script")
+            whenever(mockWebViewCompatContentScopeScripts.getScript(anyOrNull(), any())).thenReturn("script")
 
-            testee.addDocumentStartJavaScript(mockWebView)
+            testee.addDocumentStartJavaScript(mockWebView, null)
 
             verify(mockWebViewCompatWrapper, never()).addDocumentStartJavaScript(any(), any(), any())
         }

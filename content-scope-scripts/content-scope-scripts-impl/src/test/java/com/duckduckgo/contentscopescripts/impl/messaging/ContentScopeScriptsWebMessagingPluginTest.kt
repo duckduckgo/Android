@@ -22,9 +22,13 @@ import androidx.webkit.JavaScriptReplyProxy
 import com.duckduckgo.browser.api.webviewcompat.WebViewCompatWrapper
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.plugins.PluginPoint
+import com.duckduckgo.contentscopescripts.api.ContentScopeJsMessageHandlersPlugin
 import com.duckduckgo.contentscopescripts.api.WebViewCompatContentScopeJsMessageHandlersPlugin
 import com.duckduckgo.contentscopescripts.impl.WebViewCompatContentScopeScripts
 import com.duckduckgo.js.messaging.api.JsMessage
+import com.duckduckgo.js.messaging.api.JsMessageCallback
+import com.duckduckgo.js.messaging.api.JsMessageHandler
+import com.duckduckgo.js.messaging.api.JsMessaging
 import com.duckduckgo.js.messaging.api.ProcessResult
 import com.duckduckgo.js.messaging.api.ProcessResult.SendToConsumer
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
@@ -51,14 +55,41 @@ class ContentScopeScriptsWebMessagingPluginTest {
     val coroutineRule = CoroutineTestRule()
 
     private val webViewCompatContentScopeScripts: WebViewCompatContentScopeScripts = mock()
-    private val handlers: PluginPoint<WebViewCompatContentScopeJsMessageHandlersPlugin> = FakePluginPoint()
+    private val handlers: PluginPoint<ContentScopeJsMessageHandlersPlugin> = FakePluginPoint()
+    private val webViewCompatHandlers: PluginPoint<WebViewCompatContentScopeJsMessageHandlersPlugin> = FakeWebViewCompatPluginPoint()
     private val mockReplyProxy: JavaScriptReplyProxy = mock()
     private val globalHandlers: PluginPoint<GlobalContentScopeJsMessageHandlersPlugin> = FakeGlobalHandlersPluginPoint()
     private val mockWebViewCompatWrapper: WebViewCompatWrapper = mock()
     private val mockWebView: WebView = mock()
     private lateinit var testee: ContentScopeScriptsWebMessagingPlugin
 
-    private class FakePluginPoint : PluginPoint<WebViewCompatContentScopeJsMessageHandlersPlugin> {
+    private class FakePluginPoint : PluginPoint<ContentScopeJsMessageHandlersPlugin> {
+        override fun getPlugins(): Collection<ContentScopeJsMessageHandlersPlugin> = listOf(FakePlugin())
+
+        inner class FakePlugin : ContentScopeJsMessageHandlersPlugin {
+            override fun getJsMessageHandler(): JsMessageHandler =
+                object : JsMessageHandler {
+                    override fun process(
+                        jsMessage: JsMessage,
+                        jsMessaging: JsMessaging,
+                        jsMessageCallback: JsMessageCallback?,
+                    ) {
+                        jsMessageCallback?.process(
+                            featureName = jsMessage.featureName,
+                            method = jsMessage.method,
+                            id = jsMessage.id,
+                            data = jsMessage.params,
+                        )
+                    }
+
+                    override val allowedDomains: List<String> = emptyList()
+                    override val featureName: String = "webCompat"
+                    override val methods: List<String> = listOf("webShare", "permissionsQuery")
+                }
+        }
+    }
+
+    private class FakeWebViewCompatPluginPoint : PluginPoint<WebViewCompatContentScopeJsMessageHandlersPlugin> {
         override fun getPlugins(): Collection<WebViewCompatContentScopeJsMessageHandlersPlugin> = listOf(FakePlugin())
 
         inner class FakePlugin : WebViewCompatContentScopeJsMessageHandlersPlugin {
@@ -66,8 +97,8 @@ class ContentScopeScriptsWebMessagingPluginTest {
                 object : WebViewCompatMessageHandler {
                     override fun process(jsMessage: JsMessage): ProcessResult = SendToConsumer
 
-                    override val featureName: String = "webCompat"
-                    override val methods: List<String> = listOf("webShare", "permissionsQuery")
+                    override val featureName: String = "messaging"
+                    override val methods: List<String> = listOf("initialPing")
                 }
         }
     }
@@ -92,6 +123,7 @@ class ContentScopeScriptsWebMessagingPluginTest {
             testee =
                 ContentScopeScriptsWebMessagingPlugin(
                     handlers = handlers,
+                    webViewCompatHandlers = webViewCompatHandlers,
                     globalHandlers = globalHandlers,
                     webViewCompatContentScopeScripts = webViewCompatContentScopeScripts,
                     webViewCompatWrapper = mockWebViewCompatWrapper,
@@ -255,6 +287,7 @@ class ContentScopeScriptsWebMessagingPluginTest {
             whenever(webViewCompatContentScopeScripts.isWebMessagingEnabled()).thenReturn(true)
             val eventData = SubscriptionEventData("feature", "subscription", JSONObject())
             givenInterfaceIsRegistered()
+            givenInitialPingProcessed()
             val expectedMessage =
                 """
                 {"context":"contentScopeScripts","featureName":"feature","params":{},"subscriptionName":"subscription"}
@@ -285,6 +318,10 @@ class ContentScopeScriptsWebMessagingPluginTest {
     private fun givenInterfaceIsRegistered() =
         runTest {
             testee.register(callback, mockWebView)
+        }
+
+    private fun givenInitialPingProcessed() =
+        runTest {
             val initialPingMessage =
                 """
                 {"context":"contentScopeScripts","featureName":"messaging","id":"debugId","method":"initialPing","params":{}}

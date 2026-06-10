@@ -40,6 +40,7 @@ import javax.inject.Inject
 
 interface WebViewCompatContentScopeScripts {
     suspend fun getScript(
+        isDesktopMode: Boolean?,
         activeExperiments: List<Toggle>,
     ): String
 
@@ -82,6 +83,7 @@ class RealWebViewCompatContentScopeScripts @Inject constructor(
     override val callbackName: String = getSecret()
 
     override suspend fun getScript(
+        isDesktopMode: Boolean?,
         activeExperiments: List<Toggle>,
     ): String {
         return withContext(dispatcherProvider.io()) {
@@ -105,7 +107,7 @@ class RealWebViewCompatContentScopeScripts @Inject constructor(
                 updateJS = true
             }
 
-            val userPreferencesJson = getUserPreferencesJson(pluginParameters.preferences, activeExperiments = activeExperiments)
+            val userPreferencesJson = getUserPreferencesJson(pluginParameters.preferences, isDesktopMode, activeExperiments)
             if (cachedUserPreferencesJson != userPreferencesJson) {
                 cachedUserPreferencesJson = userPreferencesJson
                 updateJS = true

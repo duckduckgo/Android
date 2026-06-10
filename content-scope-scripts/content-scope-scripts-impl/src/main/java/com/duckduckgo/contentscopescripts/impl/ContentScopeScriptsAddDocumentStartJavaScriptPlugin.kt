@@ -42,9 +42,13 @@ class ContentScopeScriptsAddDocumentStartJavaScriptPlugin @Inject constructor(
 ) : AddDocumentStartJavaScriptPlugin {
     private var script: ScriptHandler? = null
     private var currentScriptString: String? = null
+    private var currentWebView: WebView? = null
 
     @SuppressLint("RequiresFeature")
-    override suspend fun addDocumentStartJavaScript(webView: WebView) {
+    override suspend fun addDocumentStartJavaScript(
+        webView: WebView,
+        isDesktopMode: Boolean?,
+    ) {
         if (!webViewCompatContentScopeScripts.isEnabled() ||
             !webViewCapabilityChecker.isSupported(
                 DocumentStartJavaScript,
@@ -54,8 +58,8 @@ class ContentScopeScriptsAddDocumentStartJavaScriptPlugin @Inject constructor(
         }
 
         val activeExperiments = contentScopeExperiments.getActiveExperiments()
-        val scriptString = webViewCompatContentScopeScripts.getScript(activeExperiments)
-        if (scriptString == currentScriptString) {
+        val scriptString = webViewCompatContentScopeScripts.getScript(isDesktopMode, activeExperiments)
+        if (scriptString == currentScriptString && webView == currentWebView && script != null) {
             return
         }
         script?.let {
@@ -73,6 +77,7 @@ class ContentScopeScriptsAddDocumentStartJavaScriptPlugin @Inject constructor(
             )?.let {
                 script = it
                 currentScriptString = scriptString
+                currentWebView = webView
             }
     }
 

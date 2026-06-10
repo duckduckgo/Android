@@ -1,6 +1,7 @@
 package com.duckduckgo.contentscopescripts.impl
 
 import android.webkit.WebView
+import com.duckduckgo.feature.toggles.api.Toggle
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.any
@@ -12,13 +13,17 @@ import org.mockito.kotlin.whenever
 
 class ContentScopeScriptsJsInjectorPluginTest {
     private val mockCoreContentScopeScripts: CoreContentScopeScripts = mock()
+    private val mockContentScopeScriptsFeature: ContentScopeScriptsFeature = mock()
+    private val mockUseNewWebCompatApisToggle: Toggle = mock()
     private val mockWebView: WebView = mock()
 
     private lateinit var contentScopeScriptsJsInjectorPlugin: ContentScopeScriptsJsInjectorPlugin
 
     @Before
     fun setUp() {
-        contentScopeScriptsJsInjectorPlugin = ContentScopeScriptsJsInjectorPlugin(mockCoreContentScopeScripts)
+        whenever(mockContentScopeScriptsFeature.useNewWebCompatApis()).thenReturn(mockUseNewWebCompatApisToggle)
+        whenever(mockUseNewWebCompatApisToggle.isEnabled()).thenReturn(false)
+        contentScopeScriptsJsInjectorPlugin = ContentScopeScriptsJsInjectorPlugin(mockCoreContentScopeScripts, mockContentScopeScriptsFeature)
     }
 
     @Test
@@ -34,6 +39,16 @@ class ContentScopeScriptsJsInjectorPluginTest {
     @Test
     fun whenDisabledAndInjectContentScopeScriptsThenDoNothing() {
         whenever(mockCoreContentScopeScripts.isEnabled()).thenReturn(false)
+        contentScopeScriptsJsInjectorPlugin.onPageStarted(mockWebView, null, null, listOf())
+
+        verifyNoInteractions(mockWebView)
+    }
+
+    @Test
+    fun whenWebViewCompatApisEnabledAndInjectContentScopeScriptsThenDoNothing() {
+        whenever(mockCoreContentScopeScripts.isEnabled()).thenReturn(true)
+        whenever(mockUseNewWebCompatApisToggle.isEnabled()).thenReturn(true)
+
         contentScopeScriptsJsInjectorPlugin.onPageStarted(mockWebView, null, null, listOf())
 
         verifyNoInteractions(mockWebView)

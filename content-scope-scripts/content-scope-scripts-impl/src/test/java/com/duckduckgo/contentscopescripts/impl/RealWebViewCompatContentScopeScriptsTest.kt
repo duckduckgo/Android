@@ -87,10 +87,10 @@ class RealWebViewCompatContentScopeScriptsTest {
 
     @Test
     fun whenGetScriptWhenVariablesAreCachedAndNoChangesThenUseCachedVariables() = runTest {
-        var js = testee.getScript(listOf())
+        var js = testee.getScript(null, listOf())
         verifyJsScript(js)
 
-        js = testee.getScript(listOf())
+        js = testee.getScript(null, listOf())
 
         verifyJsScript(js)
         verify(mockContentScopeJsReader).getContentScopeJS()
@@ -100,7 +100,7 @@ class RealWebViewCompatContentScopeScriptsTest {
 
     @Test
     fun whenGetScriptAndVariablesAreCachedAndAllowListChangedThenUseNewAllowListValue() = runTest {
-        var js = testee.getScript(listOf())
+        var js = testee.getScript(null, listOf())
         verifyJsScript(js)
 
         val newRegEx = Regex(
@@ -118,7 +118,7 @@ class RealWebViewCompatContentScopeScriptsTest {
                 "\"javascriptInterface\":\"([\\da-f]{32})\"\\}\\)$",
         )
         whenever(mockUserAllowListRepository.domainsInUserAllowList()).thenReturn(listOf(exampleUrl2))
-        js = testee.getScript(listOf())
+        js = testee.getScript(null, listOf())
 
         verifyJsScript(js, newRegEx)
         verify(mockUnprotectedTemporary, times(3)).unprotectedTemporaryExceptions
@@ -128,7 +128,7 @@ class RealWebViewCompatContentScopeScriptsTest {
 
     @Test
     fun whenGetScriptAndVariablesAreCachedAndGpcChangedThenUseNewGpcValue() = runTest {
-        var js = testee.getScript(listOf())
+        var js = testee.getScript(null, listOf())
         verifyJsScript(js)
 
         val newRegEx = Regex(
@@ -146,7 +146,7 @@ class RealWebViewCompatContentScopeScriptsTest {
                 "\"javascriptInterface\":\"([\\da-f]{32})\"\\}\\)$",
         )
         whenever(mockPlugin2.preferences()).thenReturn("\"globalPrivacyControlValue\":false")
-        js = testee.getScript(listOf())
+        js = testee.getScript(null, listOf())
 
         verifyJsScript(js, newRegEx)
         verify(mockUnprotectedTemporary, times(3)).unprotectedTemporaryExceptions
@@ -156,7 +156,7 @@ class RealWebViewCompatContentScopeScriptsTest {
 
     @Test
     fun whenGetScriptAndVariablesAreCachedAndConfigChangedThenUseNewConfigValue() = runTest {
-        var js = testee.getScript(listOf())
+        var js = testee.getScript(null, listOf())
         verifyJsScript(js)
 
         val newRegEx = Regex(
@@ -174,7 +174,7 @@ class RealWebViewCompatContentScopeScriptsTest {
         )
         whenever(mockPlugin1.preferences()).thenReturn("\"globalPrivacyControlValue\":true")
         whenever(mockPluginPoint.getPlugins()).thenReturn(listOf(mockPlugin1))
-        js = testee.getScript(listOf())
+        js = testee.getScript(null, listOf())
 
         verifyJsScript(js, newRegEx)
         verify(mockUnprotectedTemporary, times(3)).unprotectedTemporaryExceptions
@@ -184,7 +184,7 @@ class RealWebViewCompatContentScopeScriptsTest {
 
     @Test
     fun whenGetScriptAndVariablesAreCachedAndUnprotectedTemporaryChangedThenUseNewUnprotectedTemporaryValue() = runTest {
-        var js = testee.getScript(listOf())
+        var js = testee.getScript(null, listOf())
         verifyJsScript(js)
 
         val newRegEx = Regex(
@@ -202,7 +202,7 @@ class RealWebViewCompatContentScopeScriptsTest {
                 "\"javascriptInterface\":\"([\\da-f]{32})\"\\}\\)$",
         )
         whenever(mockUnprotectedTemporary.unprotectedTemporaryExceptions).thenReturn(listOf(unprotectedTemporaryException))
-        js = testee.getScript(listOf())
+        js = testee.getScript(null, listOf())
 
         verifyJsScript(js, newRegEx)
         verify(mockUnprotectedTemporary, times(4)).unprotectedTemporaryExceptions
@@ -212,7 +212,7 @@ class RealWebViewCompatContentScopeScriptsTest {
 
     @Test
     fun whenGetScriptAndVariablesAreCachedAndCurrentCohortsChangedThenUseNewCurrentCohortsValue() = runTest {
-        var js = testee.getScript(listOf())
+        var js = testee.getScript(null, listOf())
         verifyJsScript(js)
 
         val newRegEx = Regex(
@@ -236,7 +236,7 @@ class RealWebViewCompatContentScopeScriptsTest {
 
         val activeExperiments = listOf(mockToggle)
 
-        js = testee.getScript(activeExperiments)
+        js = testee.getScript(null, activeExperiments)
 
         verifyJsScript(js, newRegEx)
         verify(mockUnprotectedTemporary, times(3)).unprotectedTemporaryExceptions
@@ -273,7 +273,7 @@ class RealWebViewCompatContentScopeScriptsTest {
 
         val activeExperiments = listOf(mockToggle1, mockToggle2)
 
-        val js = testee.getScript(activeExperiments)
+        val js = testee.getScript(null, activeExperiments)
 
         verifyJsScript(js, newRegEx)
     }
@@ -286,21 +286,21 @@ class RealWebViewCompatContentScopeScriptsTest {
 
         val activeExperiments = listOf(mockToggle)
 
-        val js = testee.getScript(activeExperiments)
+        val js = testee.getScript(null, activeExperiments)
 
         verifyJsScript(js)
     }
 
     @Test
     fun whenGetScriptWithNoActiveExperimentsThenFormatsCorrectly() = runTest {
-        val js = testee.getScript(listOf())
+        val js = testee.getScript(null, listOf())
 
         verifyJsScript(js)
     }
 
     @Test
     fun whenGetScriptWithNullSiteThenFormatsCorrectly() = runTest {
-        val js = testee.getScript(listOf())
+        val js = testee.getScript(null, listOf())
 
         verifyJsScript(js)
     }
@@ -358,7 +358,7 @@ class RealWebViewCompatContentScopeScriptsTest {
 
     @Test
     fun whenGetScriptThenPopulateMessagingParameters() = runTest {
-        val js = testee.getScript(listOf())
+        val js = testee.getScript(null, listOf())
         verifyJsScript(js)
         verify(mockContentScopeJsReader).getContentScopeJS()
     }
@@ -391,7 +391,7 @@ class RealWebViewCompatContentScopeScriptsTest {
 
         val activeExperiments = listOf(validExperiment, nullCohortExperiment)
 
-        val js = testee.getScript(activeExperiments)
+        val js = testee.getScript(null, activeExperiments)
 
         verifyJsScript(js, newRegEx)
     }
@@ -406,7 +406,7 @@ class RealWebViewCompatContentScopeScriptsTest {
 
         val activeExperiments = listOf(mockToggle)
 
-        val js = testee.getScript(activeExperiments)
+        val js = testee.getScript(null, activeExperiments)
 
         verifyJsScript(js, expectedRegEx)
     }

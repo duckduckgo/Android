@@ -336,10 +336,14 @@ import com.duckduckgo.duckchat.impl.contextual.DuckChatContextualFragment.Compan
 import com.duckduckgo.duckchat.impl.contextual.DuckChatContextualFragment.Companion.KEY_DUCK_AI_URL
 import com.duckduckgo.duckchat.impl.contextual.DuckChatContextualSharedViewModel
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
+import com.duckduckgo.js.messaging.api.AddDocumentStartJavaScriptPlugin
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessaging
+import com.duckduckgo.js.messaging.api.PostMessageWrapperPlugin
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
+import com.duckduckgo.js.messaging.api.WebMessagingPlugin
+import com.duckduckgo.js.messaging.api.WebViewCompatMessageCallback
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed
 import com.duckduckgo.mobile.android.app.tracking.ui.AppTrackingProtectionScreens.AppTrackerOnboardingActivityWithEmptyParamsParams
 import com.duckduckgo.navigation.api.GlobalActivityStarter
@@ -593,6 +597,15 @@ class BrowserTabFragment :
     @Inject
     @Named("ContentScopeScripts")
     lateinit var contentScopeScripts: JsMessaging
+
+    @Inject
+    lateinit var addDocumentStartJavaScriptPlugins: PluginPoint<AddDocumentStartJavaScriptPlugin>
+
+    @Inject
+    lateinit var webMessagingPlugins: PluginPoint<WebMessagingPlugin>
+
+    @Inject
+    lateinit var postMessageWrapperPlugins: PluginPoint<PostMessageWrapperPlugin>
 
     @Inject
     @Named("DuckPlayer")
@@ -1015,6 +1028,8 @@ class BrowserTabFragment :
 
     private var currentWebShareReplyCallback: (suspend (JSONObject) -> Unit)? = null
 
+    private val contentScopeWebMessageReplyCallbacks = mutableMapOf<String, suspend (JSONObject) -> Unit>()
+
     private val webViewCompatWebShareLauncher =
         registerForActivityResult(WebViewCompatWebShareChooser()) { result ->
             lifecycleScope.launch {
@@ -1138,8 +1153,27 @@ class BrowserTabFragment :
 
     private fun observeSubscriptionEventDataChannel() {
         viewModel.subscriptionEventDataFlow.onEach { subscriptionEventData ->
-            contentScopeScripts.sendSubscriptionEvent(subscriptionEventData)
+            sendContentScopeSubscriptionEvent(subscriptionEventData)
         }.launchIn(lifecycleScope)
+    }
+
+    private fun sendContentScopeSubscriptionEvent(subscriptionEventData: SubscriptionEventData) {
+        val currentWebView = webView ?: return
+        lifecycleScope.launch {
+            postMessageWrapperPlugins.getPlugins()
+                .firstOrNull { it.context == contentScopeScripts.context }
+                ?.postMessage(subscriptionEventData, currentWebView)
+        }
+    }
+
+    private fun shouldProcessWithWebViewCompatCallback(
+        featureName: String,
+        method: String,
+    ): Boolean {
+        return method == "addDebugFlag" ||
+            featureName == "messaging" ||
+            featureName == "webCompat" ||
+            featureName == "breakageReporting"
     }
 
     private fun resumeWebView() {
@@ -1399,7 +1433,7 @@ class BrowserTabFragment :
                 },
                 onSearchSubmitted = { query -> onUserSubmittedText(query) },
                 onDuckAiChatSubmitted = { query, modelId, reasoningEffort, selectedTool, imagesJson, filesJson ->
-                    contentScopeScripts.sendSubscriptionEvent(
+                    sendContentScopeSubscriptionEvent(
                         SubscriptionEventData(
                             featureName = "aiChat",
                             subscriptionName = "submitAIChatNativePrompt",
@@ -1440,7 +1474,7 @@ class BrowserTabFragment :
                     viewModel.openDuckChatHistory()
                 },
                 onStopTapped = {
-                    contentScopeScripts.sendSubscriptionEvent(
+                    sendContentScopeSubscriptionEvent(
                         SubscriptionEventData(
                             featureName = "aiChat",
                             subscriptionName = "submitPromptInterruption",
@@ -1584,7 +1618,7 @@ class BrowserTabFragment :
     private fun onOmnibarCustomTabPrivacyDashboardPressed() {
         val params = PrivacyDashboardPrimaryScreen(tabId)
         val intent = globalActivityStarter.startIntent(requireContext(), params)
-        contentScopeScripts.sendSubscriptionEvent(createBreakageReportingEventData())
+        sendContentScopeSubscriptionEvent(createBreakageReportingEventData())
         intent?.let { activityResultPrivacyDashboard.launch(intent) }
         pixel.fire(CustomTabPixelNames.CUSTOM_TABS_PRIVACY_DASHBOARD_OPENED)
     }
@@ -1597,7 +1631,7 @@ class BrowserTabFragment :
     }
 
     private fun onBrowserMenuButtonPressed() {
-        contentScopeScripts.sendSubscriptionEvent(createBreakageReportingEventData())
+        sendContentScopeSubscriptionEvent(createBreakageReportingEventData())
         viewModel.onBrowserMenuClicked(isCustomTab = isActiveCustomTab())
 
         lifecycleScope.launch {
@@ -1613,7 +1647,7 @@ class BrowserTabFragment :
     }
 
     private fun onOmnibarPrivacyShieldButtonPressed() {
-        contentScopeScripts.sendSubscriptionEvent(createBreakageReportingEventData())
+        sendContentScopeSubscriptionEvent(createBreakageReportingEventData())
         launchPrivacyDashboard(toggle = false)
     }
 
@@ -2906,7 +2940,7 @@ class BrowserTabFragment :
             is Command.BypassMaliciousSiteWarning -> onBypassMaliciousWarning(it.url, it.feed)
             is OpenBrokenSiteLearnMore -> openBrokenSiteLearnMore(it.url)
             is ReportBrokenSiteError -> openBrokenSiteReportError(it.url)
-            is Command.SendResponseToJs -> contentScopeScripts.onResponse(it.data)
+            is Command.SendResponseToJs -> sendResponseToContentScopeJs(it.data)
             is Command.SendResponseToDuckPlayer -> duckPlayerScripts.onResponse(it.data)
             is Command.WebShareRequest -> webShareRequest.launch(it.data)
             is Command.WebViewCompatWebShareRequest -> {
@@ -2943,7 +2977,7 @@ class BrowserTabFragment :
             }
 
             is Command.SendSubscriptions -> {
-                contentScopeScripts.sendSubscriptionEvent(it.cssData)
+                sendContentScopeSubscriptionEvent(it.cssData)
                 duckPlayerScripts.sendSubscriptionEvent(it.duckPlayerData)
             }
 
@@ -4158,6 +4192,50 @@ class BrowserTabFragment :
                     isBlobDownloadWebViewFeatureEnabled(it),
                 )
             }
+            val browserWebView = it
+            lifecycleScope.launch {
+                webMessagingPlugins.getPlugins().forEach { plugin ->
+                    plugin.register(
+                        object : WebViewCompatMessageCallback {
+                            override fun process(
+                                context: String,
+                                featureName: String,
+                                method: String,
+                                id: String?,
+                                data: JSONObject?,
+                                onResponse: suspend (params: JSONObject) -> Unit,
+                            ) {
+                                if (shouldProcessWithWebViewCompatCallback(featureName, method)) {
+                                    viewModel.webViewCompatProcessJsCallbackMessage(
+                                        context = context,
+                                        featureName = featureName,
+                                        method = method,
+                                        id = id,
+                                        data = data,
+                                        onResponse = onResponse,
+                                    )
+                                } else {
+                                    id?.let { contentScopeWebMessageReplyCallbacks[it] = onResponse }
+                                    viewModel.processJsCallbackMessage(
+                                        featureName,
+                                        method,
+                                        id,
+                                        data,
+                                        isActiveCustomTab(),
+                                        context = requireActivity(),
+                                    ) {
+                                        browserWebView.url
+                                    }
+                                }
+                            }
+                        },
+                        browserWebView,
+                    )
+                }
+                addDocumentStartJavaScriptPlugins.getPlugins().forEach { plugin ->
+                    plugin.addDocumentStartJavaScript(browserWebView, viewModel.getSite()?.isDesktopMode)
+                }
+            }
             configureWebViewForAutofill(it)
             printInjector.addJsInterface(it) { viewModel.printFromWebView() }
             autoconsent.addJsInterface(it, autoconsentCallback)
@@ -4203,6 +4281,17 @@ class BrowserTabFragment :
     private fun screenLock(data: JsCallbackData) {
         val returnData = jsOrientationHandler.updateOrientation(data, this)
         contentScopeScripts.onResponse(returnData)
+    }
+
+    private fun sendResponseToContentScopeJs(data: JsCallbackData) {
+        val replyCallback = contentScopeWebMessageReplyCallbacks.remove(data.id)
+        if (replyCallback != null) {
+            lifecycleScope.launch {
+                replyCallback(data.params)
+            }
+        } else {
+            contentScopeScripts.onResponse(data)
+        }
     }
 
     private fun webViewCompatScreenLock(
@@ -5026,6 +5115,7 @@ class BrowserTabFragment :
 
     private fun destroyWebView() {
         if (::webViewContainer.isInitialized) webViewContainer.removeAllViews()
+        contentScopeWebMessageReplyCallbacks.clear()
         webView?.let {
             it.removeSystemAutofillCallback()
             it.destroy()
