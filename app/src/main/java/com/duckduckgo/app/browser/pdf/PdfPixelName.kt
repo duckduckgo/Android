@@ -25,4 +25,7 @@ enum class PdfPixelName(override val pixelName: String) : Pixel.PixelName {
     PDF_RENDER_FAILURE("m_pdf_render_failure"),
     PDF_DOWNLOAD_MENU_ITEM_PRESSED("m_nav_pdf_download_menu_item_pressed"),
     PDF_FALLBACK("m_pdf_fallback"),
+    PDF_EXTERNAL_OPENED("m_pdf_external_opened"),
+    PDF_EXTERNAL_OPENED_DAILY("m_pdf_external_opened_daily"),
+    PDF_EXTERNAL_OPENED_UNIQUE("m_pdf_external_opened_unique"),
 }
