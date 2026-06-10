@@ -414,76 +414,13 @@
     <string name="systemTextSearchMessage">Sök DuckDuckGo</string>
 
     <!-- App feedback disambiguation -->
-    <string name="feedbackActivityTitle">Berätta vad du tycker</string>
-    <string name="missingBrowserFeaturesTitleLong">Webbläsarfunktionerna saknas eller hindras</string>
-    <string name="missingBrowserFeaturesTitleShort">Problem med webbläsarfunktionen</string>
-    <string name="missingBrowserFeaturesSubtitle">Vilken webbläsarfunktion kan vi lägga till eller förbättra?</string>
-    <string name="missingBrowserFeatureSubReasonNavigation">Navigering framåt och bakåt och/eller uppdatering</string>
-    <string name="missingBrowserFeatureSubReasonTabManagement">Skapa och hantera flikar</string>
-    <string name="missingBrowserFeatureSubReasonAdPopups">Blockering av annonser och poppuppfönster</string>
-    <string name="missingBrowserFeatureSubReasonVideos">Visning av videoklipp</string>
-    <string name="missingBrowserFeatureSubReasonImages">Interaktion med bilder</string>
-    <string name="missingBrowserFeatureSubReasonBookmarks">Skapa och hantera bokmärken</string>
-    <string name="missingBrowserFeatureSubReasonOther">Inget av ovanstående</string>
 
-    <string name="websiteNotLoadingTitleLong">Problem med webbplatser som inte laddas korrekt</string>
-    <string name="websiteNotLoadingTitleShort">Problem med webbplatser som inte laddas korrekt</string>
-    <string name="websiteNotLoadingSubtitle">Vilken webbplats är skadad?</string>
 
-    <string name="searchNotGoodEnoughTitleLong">DuckDuckGo-sökning är inte tillräckligt bra</string>
-    <string name="searchNotGoodEnoughTitleShort">Problem med DuckDuckGo-sökning</string>
-    <string name="searchNotGoodEnoughSubtitle">Vilken sökfunktion kan vi lägga till eller förbättra?</string>
-    <string name="searchNotGoodEnoughSubReasonTechnicalSearches">Programmering/teknisk sökning</string>
-    <string name="searchNotGoodEnoughSubReasonGoogleLayout">Layouten borde vara mer lik Googles</string>
-    <string name="searchNotGoodEnoughSubReasonFasterLoadTimes">Snabbare laddningstid</string>
-    <string name="searchNotGoodEnoughSubReasonSpecificLanguage">Sökning på ett specifikt språk eller i en viss region</string>
-    <string name="searchNotGoodEnoughSubReasonBetterAutocomplete">Förbättring av Komplettera automatiskt</string>
-    <string name="searchNotGoodEnoughSubReasonOther">Inget av ovanstående</string>
 
-    <string name="needMoreCustomizationTitleLong">Det finns inte tillräckligt många sätt att anpassa appen på</string>
-    <string name="needMoreCustomizationTitleShort">Anpassningsproblem</string>
-    <string name="needMoreCustomizationSubtitle">Vilket anpassningsalternativ kan vi lägga till eller förbättra?</string>
-    <string name="needMoreCustomizationSubReasonHomeScreenConfiguration">Startsidans konfiguration</string>
-    <string name="needMoreCustomizationSubReasonTabDisplay">Hur flikar visas</string>
-    <string name="needMoreCustomizationSubReasonAppLooks">Hur appen ser ut</string>
-    <string name="needMoreCustomizationSubReasonWhichDataIsCleared">Vilka data som rensas</string>
-    <string name="needMoreCustomizationSubReasonWhenDataIsCleared">När data rensas</string>
-    <string name="needMoreCustomizationSubReasonBookmarksDisplay">Hur bokmärken visas</string>
-    <string name="needMoreCustomizationSubReasonOther">Inget av ovanstående</string>
 
-    <string name="appIsSlowOrBuggyTitleLong">Appen är långsam, har många buggar eller kraschar</string>
-    <string name="appIsSlowOrBuggyTitleShort">Prestandaproblem</string>
-    <string name="appIsSlowOrBuggySubtitle">Vilket problem upplever du?</string>
-    <string name="appIsSlowOrBuggySubReasonSlowResults">Webbsidor eller sökresultat laddas långsamt</string>
-    <string name="appIsSlowOrBuggySubReasonAppCrashesOrFreezes">Appen kraschar eller låser sig</string>
-    <string name="appIsSlowOrBuggySubReasonMediaPlayback">Video- eller medieuppspelningsfel</string>
-    <string name="appIsSlowOrBuggySubReasonOther">Inget av ovanstående</string>
 
-    <string name="otherMainReasonTitleLong">Inget av ovanstående</string>
-    <string name="otherMainReasonTitleShort">Andra problem</string>
 
-    <string name="openEndedInputHint">Beskriv så noggrant som möjligt</string>
-    <string name="submitFeedback">Skicka</string>
 
-    <string name="tellUsHowToImprove">Berätta vad vi kan förbättra.</string>
-    <string name="thanksForTheFeedback">Tack för din återkoppling!</string>
-    <string name="feedbackNegativeMainReasonPageSubtitle">Vad anser du vara mest frustrerande?</string>
-    <string name="feedbackNegativeMainReasonPageTitle">Det var tråkigt att höra</string>
-    <string name="feedbackShareDetails">Berätta mer om dina upplevelser</string>
-    <string name="sharePositiveFeedbackWithTheTeam">Finns det några detaljer du vill dela med teamet?</string>
-    <string name="whatHaveYouBeenEnjoying">Vad har du uppskattat med appen?</string>
-    <string name="awesomeToHear">Kul att höra!</string>
-    <string name="shareTheLoveWithARating">Dela din uppskattning, betygsätt appen på Play Store.</string>
-    <string name="rateTheApp">Betygsätt appen</string>
-    <string name="declineFurtherFeedback">Nej tack, jag är klar</string>
-    <string name="whichBrokenSites">Var ser du dessa problem?</string>
-    <string name="whichBrokenSitesHint">På vilken webbplats finns problemen?</string>
-    <string name="feedbackSpecificAsPossible">Beskriv så noggrant som möjligt</string>
-    <string name="feedbackInitialDisambiguationTitle">Då sätter vi igång!</string>
-    <string name="feedbackInitialDisambiguationSubtitle">Hur skulle du kategorisera din återkoppling?</string>
-    <string name="feedbackInitialDisambiguationHappyButtonContentDescription">Knappen för positiv återkoppling</string>
-    <string name="feedbackInitialDisambiguationSadButtonContentDescription">Knappen för negativ återkoppling</string>
-    <string name="feedbackIsImportantToUs">Din anonyma återkoppling är viktig för oss.</string>
 
     <!-- Webview Recovery -->
     <string name="crashedWebViewErrorMessage">"Webbsidan kunde inte visas."</string>

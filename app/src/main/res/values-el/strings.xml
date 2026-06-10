@@ -414,76 +414,13 @@
     <string name="systemTextSearchMessage">Αναζήτηση DuckDuckGo</string>
 
     <!-- App feedback disambiguation -->
-    <string name="feedbackActivityTitle">Κοινοποίηση σχολίου</string>
-    <string name="missingBrowserFeaturesTitleLong">Δυνατότητες του προγράμματος περιήγησης που απουσιάζουν ή προκαλούν προβλήματα</string>
-    <string name="missingBrowserFeaturesTitleShort">Προβλήματα με δυνατότητες του προγράμματος περιήγησης</string>
-    <string name="missingBrowserFeaturesSubtitle">Ποιες δυνατότητες περιήγησης μπορούμε να προσθέσουμε ή να βελτιώσουμε;</string>
-    <string name="missingBrowserFeatureSubReasonNavigation">Πλοήγηση προς τα εμπρός, προς τα πίσω, ή/και ανανέωση</string>
-    <string name="missingBrowserFeatureSubReasonTabManagement">Δημιουργία και διαχείριση καρτελών</string>
-    <string name="missingBrowserFeatureSubReasonAdPopups">Αποκλεισμός διαφημίσεων και αναδυόμενων παραθύρων</string>
-    <string name="missingBrowserFeatureSubReasonVideos">Παρακολούθηση βίντεο</string>
-    <string name="missingBrowserFeatureSubReasonImages">Αλληλεπίδραση με εικόνες</string>
-    <string name="missingBrowserFeatureSubReasonBookmarks">Δημιουργία και διαχείριση σελιδοδεικτών</string>
-    <string name="missingBrowserFeatureSubReasonOther">Τίποτα από τα παραπάνω</string>
 
-    <string name="websiteNotLoadingTitleLong">Προβλήματα φόρτωσης ιστότοπων</string>
-    <string name="websiteNotLoadingTitleShort">Προβλήματα φόρτωσης ιστότοπων</string>
-    <string name="websiteNotLoadingSubtitle">Ποιος ιστότοπος είναι κατεστραμμένος;</string>
 
-    <string name="searchNotGoodEnoughTitleLong">Η αναζήτηση DuckDuckGo δεν είναι αρκετά καλή</string>
-    <string name="searchNotGoodEnoughTitleShort">Προβλήματα αναζήτησης DuckDuckGo</string>
-    <string name="searchNotGoodEnoughSubtitle">Ποια δυνατότητα αναζήτησης μπορούμε να προσθέσουμε ή να βελτιώσουμε;</string>
-    <string name="searchNotGoodEnoughSubReasonTechnicalSearches">Προγραμματισμός/τεχνική αναζήτηση</string>
-    <string name="searchNotGoodEnoughSubReasonGoogleLayout">Η διάταξη θα πρέπει να μοιάζει περισσότερο με το Google</string>
-    <string name="searchNotGoodEnoughSubReasonFasterLoadTimes">Ταχύτερος χρόνος φόρτωσης</string>
-    <string name="searchNotGoodEnoughSubReasonSpecificLanguage">Αναζήτηση σε μια συγκεκριμένη γλώσσα ή περιοχή</string>
-    <string name="searchNotGoodEnoughSubReasonBetterAutocomplete">Καλύτερη αυτόματη συμπλήρωση</string>
-    <string name="searchNotGoodEnoughSubReasonOther">Τίποτα από τα παραπάνω</string>
 
-    <string name="needMoreCustomizationTitleLong">Δεν υπάρχουν αρκετοί τρόποι προσαρμογής της εφαρμογής</string>
-    <string name="needMoreCustomizationTitleShort">Προβλήματα προσαρμογής</string>
-    <string name="needMoreCustomizationSubtitle">Ποια επιλογή προσαρμογής μπορούμε να προσθέσουμε ή να βελτιώσουμε;</string>
-    <string name="needMoreCustomizationSubReasonHomeScreenConfiguration">Διαμόρφωση αρχικής οθόνης</string>
-    <string name="needMoreCustomizationSubReasonTabDisplay">Τρόπος εμφάνισης των καρτελών</string>
-    <string name="needMoreCustomizationSubReasonAppLooks">Εμφάνιση της εφαρμογής</string>
-    <string name="needMoreCustomizationSubReasonWhichDataIsCleared">Ποια δεδομένα διαγράφονται</string>
-    <string name="needMoreCustomizationSubReasonWhenDataIsCleared">Πότε διαγράφονται τα δεδομένα</string>
-    <string name="needMoreCustomizationSubReasonBookmarksDisplay">Τρόπος εμφάνισης των σελιδοδεικτών</string>
-    <string name="needMoreCustomizationSubReasonOther">Τίποτα από τα παραπάνω</string>
 
-    <string name="appIsSlowOrBuggyTitleLong">Η εφαρμογή είναι αργή, ελαττωματική ή παρουσιάζει σφάλματα</string>
-    <string name="appIsSlowOrBuggyTitleShort">Προβλήματα επιδόσεων</string>
-    <string name="appIsSlowOrBuggySubtitle">Ποιο πρόβλημα αντιμετωπίζετε;</string>
-    <string name="appIsSlowOrBuggySubReasonSlowResults">Οι ιστοσελίδες ή τα αποτελέσματα αναζήτησης φορτώνουν αργά</string>
-    <string name="appIsSlowOrBuggySubReasonAppCrashesOrFreezes">Η εφαρμογή παρουσιάζει σφάλματα ή παγώνει</string>
-    <string name="appIsSlowOrBuggySubReasonMediaPlayback">Προβλήματα αναπαραγωγής βίντεο ή πολυμέσων</string>
-    <string name="appIsSlowOrBuggySubReasonOther">Τίποτα από τα παραπάνω</string>
 
-    <string name="otherMainReasonTitleLong">Τίποτα από τα παραπάνω</string>
-    <string name="otherMainReasonTitleShort">Άλλα προβλήματα</string>
 
-    <string name="openEndedInputHint">Να είστε όσο το δυνατόν πιο συγκεκριμένοι</string>
-    <string name="submitFeedback">Υποβολή</string>
 
-    <string name="tellUsHowToImprove">Πείτε μας πού μπορούμε να βελτιωθούμε.</string>
-    <string name="thanksForTheFeedback">Ευχαριστούμε για τα σχόλιά σας!</string>
-    <string name="feedbackNegativeMainReasonPageSubtitle">Με τι σχετίζεται περισσότερο το πρόβλημά σας;</string>
-    <string name="feedbackNegativeMainReasonPageTitle">Λυπούμαστε πολύ για αυτό</string>
-    <string name="feedbackShareDetails">Μοιραστείτε τις λεπτομέρειες</string>
-    <string name="sharePositiveFeedbackWithTheTeam">Υπάρχουν λεπτομέρειες που θα θέλατε να μοιραστείτε με την ομάδα;</string>
-    <string name="whatHaveYouBeenEnjoying">Ποια στοιχεία απολαμβάνετε;</string>
-    <string name="awesomeToHear">Αυτό μας κάνει πολύ χαρούμενους!</string>
-    <string name="shareTheLoveWithARating">Δείξτε την αγάπη σας αξιολογώντας μας στο Play Store.</string>
-    <string name="rateTheApp">Αξιολόγηση εφαρμογής</string>
-    <string name="declineFurtherFeedback">Όχι, ευχαριστώ, τελείωσα</string>
-    <string name="whichBrokenSites">Πού βλέπετε τα προβλήματα αυτά;</string>
-    <string name="whichBrokenSitesHint">Ποιος ιστότοπος παρουσιάζει προβλήματα;</string>
-    <string name="feedbackSpecificAsPossible">Να είστε όσο το δυνατόν πιο συγκεκριμένοι</string>
-    <string name="feedbackInitialDisambiguationTitle">Ας ξεκινήσουμε!</string>
-    <string name="feedbackInitialDisambiguationSubtitle">Πώς θα αξιολογούσατε τα σχόλιά σας;</string>
-    <string name="feedbackInitialDisambiguationHappyButtonContentDescription">Κουμπί θετικών σχολίων</string>
-    <string name="feedbackInitialDisambiguationSadButtonContentDescription">Κουμπί αρνητικών σχολίων</string>
-    <string name="feedbackIsImportantToUs">Τα ανώνυμα σχόλιά σας είναι σημαντικά για εμάς.</string>
 
     <!-- Webview Recovery -->
     <string name="crashedWebViewErrorMessage">"Δεν ήταν δυνατή η εμφάνιση της ιστοσελίδας."</string>

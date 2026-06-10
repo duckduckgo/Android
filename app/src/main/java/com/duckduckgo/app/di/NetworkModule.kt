@@ -17,21 +17,13 @@
 package com.duckduckgo.app.di
 
 import android.content.Context
-import com.duckduckgo.app.feedback.api.FeedbackService
-import com.duckduckgo.app.feedback.api.FeedbackSubmitter
-import com.duckduckgo.app.feedback.api.FireAndForgetFeedbackSubmitter
-import com.duckduckgo.app.feedback.api.SubReasonApiMapper
 import com.duckduckgo.app.global.api.*
-import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.utils.AppUrl.Url
-import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.featureflags.OkHttpInterceptorRefactorFeature
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.common.utils.plugins.pixel.PixelInterceptorPlugin
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.experiments.api.VariantManager
 import com.duckduckgo.user.agent.api.UserAgentProvider
 import com.squareup.anvil.annotations.ContributesTo
 import com.squareup.moshi.Moshi
@@ -39,7 +31,6 @@ import dagger.Lazy
 import dagger.Module
 import dagger.Provides
 import dagger.SingleInstanceIn
-import kotlinx.coroutines.CoroutineScope
 import logcat.LogPriority.VERBOSE
 import logcat.logcat
 import okhttp3.Cache
@@ -166,28 +157,6 @@ class NetworkModule {
     ): PixelReQueryInterceptor {
         return PixelReQueryInterceptor(okHttpInterceptorRefactorFeature)
     }
-
-    @Provides
-    fun feedbackSubmitter(
-        feedbackService: FeedbackService,
-        variantManager: VariantManager,
-        apiKeyMapper: SubReasonApiMapper,
-        statisticsStore: StatisticsDataStore,
-        pixel: Pixel,
-        @AppCoroutineScope appCoroutineScope: CoroutineScope,
-        appBuildConfig: AppBuildConfig,
-        dispatcherProvider: DispatcherProvider,
-    ): FeedbackSubmitter =
-        FireAndForgetFeedbackSubmitter(
-            feedbackService,
-            variantManager,
-            apiKeyMapper,
-            statisticsStore,
-            pixel,
-            appCoroutineScope,
-            appBuildConfig,
-            dispatcherProvider,
-        )
 
     companion object {
         private const val CACHE_SIZE: Long = 10 * 1024 * 1024 // 10MB

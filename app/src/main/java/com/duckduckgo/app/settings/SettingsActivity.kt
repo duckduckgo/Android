@@ -30,7 +30,6 @@ import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.about.AboutScreenNoParams
-import com.duckduckgo.app.about.FeedbackContract
 import com.duckduckgo.app.accessibility.AccessibilityScreens
 import com.duckduckgo.app.appearance.AppearanceScreen
 import com.duckduckgo.app.browser.BrowserActivity
@@ -92,6 +91,7 @@ import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.api.DuckChatSettingsNoParams
+import com.duckduckgo.feedback.api.FeedbackScreenNoParams
 import com.duckduckgo.internal.features.api.InternalFeaturePlugin
 import com.duckduckgo.mobile.android.app.tracking.ui.AppTrackingProtectionScreens.AppTrackerActivityWithEmptyParams
 import com.duckduckgo.mobile.android.app.tracking.ui.AppTrackingProtectionScreens.AppTrackerOnboardingActivityWithEmptyParamsParams
@@ -104,7 +104,6 @@ import com.duckduckgo.settings.api.ProSettingsPlugin
 import com.duckduckgo.settings.api.ThreatProtectionSettingsPlugin
 import com.duckduckgo.subscriptions.api.SubscriptionFeedbackScreens.GeneralSubscriptionFeedbackScreenNoParams
 import com.duckduckgo.sync.api.SyncActivityWithEmptyParams
-import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -158,16 +157,6 @@ class SettingsActivity : DuckDuckGoActivity() {
     lateinit var _completeSetupSettingsPlugin: PluginPoint<CompleteSetupSettingsPlugin>
     private val completeSetupSettingsPlugin by lazy {
         _completeSetupSettingsPlugin.getPlugins()
-    }
-
-    private val feedbackFlow = registerForActivityResult(FeedbackContract()) { resultOk ->
-        if (resultOk) {
-            Snackbar.make(
-                binding.root,
-                R.string.thanksForTheFeedback,
-                Snackbar.LENGTH_LONG,
-            ).show()
-        }
     }
 
     private val viewsPrivacy
@@ -558,7 +547,7 @@ class SettingsActivity : DuckDuckGoActivity() {
     }
 
     private fun launchFeedback() {
-        feedbackFlow.launch(null)
+        globalActivityStarter.start(this, FeedbackScreenNoParams)
     }
 
     companion object {

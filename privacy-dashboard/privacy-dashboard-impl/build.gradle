@@ -37,6 +37,7 @@ dependencies {
     implementation project(':common-utils')
     implementation project(':design-system')
     implementation project(':browser-api')
+    implementation project(':feedback-api')
     implementation project(':autoconsent-api')
     implementation project(':app-build-config-api')
     implementation project(':navigation-api')
