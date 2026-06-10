@@ -7,6 +7,7 @@ import app.cash.turbine.test
 import com.duckduckgo.app.browser.AddressDisplayFormatter
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetectorImpl
 import com.duckduckgo.app.browser.animations.AddressBarTrackersAnimationManager
+import com.duckduckgo.app.browser.customtabs.CustomTabPixelNames
 import com.duckduckgo.app.browser.menu.BrowserMenuHighlight
 import com.duckduckgo.app.browser.menu.BrowserViewMode
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode
@@ -2898,6 +2899,15 @@ class OmnibarLayoutViewModelTest {
     }
 
     @Test
+    fun whenCustomTabUrlLongClickedWithValidUrlThenCopyUrlPixelFired() = runTest {
+        givenSiteLoaded(RANDOM_URL)
+
+        testee.onCustomTabUrlLongClicked()
+
+        verify(pixel).fire(CustomTabPixelNames.CUSTOM_TABS_COPY_URL)
+    }
+
+    @Test
     fun whenCustomTabUrlLongClickedWithEmptyUrlThenNoCommandSent() = runTest {
         givenSiteLoaded(EMPTY_URL)
 
@@ -2906,6 +2916,15 @@ class OmnibarLayoutViewModelTest {
         testee.commands().test {
             expectNoEvents()
         }
+    }
+
+    @Test
+    fun whenCustomTabUrlLongClickedWithEmptyUrlThenCopyUrlPixelNotFired() = runTest {
+        givenSiteLoaded(EMPTY_URL)
+
+        testee.onCustomTabUrlLongClicked()
+
+        verify(pixel, never()).fire(CustomTabPixelNames.CUSTOM_TABS_COPY_URL)
     }
 
     @Test

@@ -25,6 +25,7 @@ import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.browser.AddressDisplayFormatter
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.browser.animations.AddressBarTrackersAnimationManager
+import com.duckduckgo.app.browser.customtabs.CustomTabPixelNames
 import com.duckduckgo.app.browser.menu.BrowserMenuHighlight
 import com.duckduckgo.app.browser.menu.BrowserViewMode
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode
@@ -1220,6 +1221,7 @@ class OmnibarLayoutViewModel @Inject constructor(
             val url = _viewState.value.url
             if (url.isNotEmpty()) {
                 command.send(Command.CopyUrlToClipboard(url))
+                pixel.fire(CustomTabPixelNames.CUSTOM_TABS_COPY_URL)
             }
         }
     }
