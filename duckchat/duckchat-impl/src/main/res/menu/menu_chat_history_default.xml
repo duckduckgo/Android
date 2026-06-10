@@ -33,7 +33,7 @@
     <item
         android:id="@+id/chat_history_action_search"
         android:icon="@drawable/ic_find_search_24"
-        android:title="@string/duck_ai_chat_history_coming_soon"
+        android:title="@string/duck_ai_chat_history_action_search_content_description"
         app:showAsAction="always" />
 
     <item

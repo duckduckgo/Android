@@ -269,6 +269,7 @@
     <string name="singleTabFireDialogDeleteAll">Șterge toate</string>
     <string name="singleTabFireDialogDeleteThisTab">Șterge această filă</string>
     <string name="singleTabFireDialogDeleteChat">Șterge chatul</string>
+    <string name="singleTabFireDialogDeleteChats">Șterge chaturile</string>
     <string name="singleTabFireDialogTitleDuckAi">Ștergi acest chat?</string>
     <string name="singleTabFireDialogSubtitleSiteData">Ștergerea datelor de pe site te poate deconecta de la conturi.</string>
     <string name="singleTabFireDialogSubtitleDownloads">Aceasta va anula descărcările în desfășurare.</string>
@@ -937,7 +938,7 @@
     <string name="quickSetupSearchOptionsTitle">Dorești căutare și chat cu IA în bara de adrese?</string>
     <string name="quickSetupBottomSheetDone">Terminat</string>
     <string name="quickSetupInputScreenSearchOnly">Doar căutare</string>
-    <string name="quickSetupInputScreenSearchAndDuckAi">Caută și folosește Duck.ai</string>
+    <string name="quickSetupInputScreenSearchAndDuckAi">Caută și Duck.ai</string>
     <string name="quickSetupRemoveHomeScreenWidgetTitle">Cum se elimină widgetul de pe ecranul de întâmpinare</string>
     <string name="quickSetupRemoveHomeScreenWidgetStep1">Mergi la ecranul de întâmpinare</string>
     <string name="quickSetupRemoveHomeScreenWidgetStep2">Atinge și menține apăsat widgetul</string>
@@ -1044,11 +1045,11 @@
 
     <string name="preOnboardingWelcomeDialogTitle">Salut!</string>
     <string name="preOnboardingWelcomeDialogBody1">Ești gata pentru un browser mai rapid, care îți oferă control deplin?</string>
-    <string name="preOnboardingWelcomeDialogBody2">Inteligența artificială este întotdeauna opțională, iar protecția confidențialității este întotdeauna activată.</string>
+    <string name="preOnboardingWelcomeDialogBody2">IA este întotdeauna opțională, iar protecția confidențialității este întotdeauna activată.</string>
     <string name="onboardingStepIndicatorText" instruction="a counter above our instructions in onboarding that tells a user what step they are on">%1$d din %2$d</string>
     <string name="onboardingSearchDaxDialogOption1Quoted" instruction="translate &apos;duck&apos; too.">cum se spune „rață” în engleză</string>
     <string name="onboardingSearchDaxDialogOption1EnglishQuoted" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">cum se spune „rață” în spaniolă</string>
 
     <string name="input_screen_user_pref_without_ai_updated">Doar căutare</string>
-    <string name="input_screen_user_pref_with_ai_updated">Comută între căutare și Duck.ai</string>
+    <string name="input_screen_user_pref_with_ai_updated">Comută între Căutare și Duck.ai</string>
 </resources>

@@ -138,6 +138,13 @@ interface DuckChat {
     fun observeTriggerVoiceChatSessionEnd(): Flow<String>
 
     /**
+     * Requests that the active voice session on the tab with the given [tabId] end. This drives the web
+     * frontend to tear down the session (stop recording, release the mic) and report it ended, which in
+     * turn releases the native voice resources.
+     */
+    fun endVoiceChatSession(tabId: String)
+
+    /**
      * Returns `true` when the native Duck.ai chat history surface is enabled by all gating feature flags.
      * Suspending because the underlying feature-flag reads must not block the main thread.
      */

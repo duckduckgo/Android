@@ -25,14 +25,15 @@ import com.duckduckgo.pir.impl.PirRemoteFeatures
 import com.duckduckgo.pir.impl.notifications.PirNotificationManager
 import com.duckduckgo.pir.impl.scan.PirScanScheduler
 import com.duckduckgo.pir.impl.store.PirRepository
+import com.duckduckgo.pir.impl.wideevents.PirScanWideEvent
+import com.duckduckgo.pir.impl.wideevents.PirScanWideEvent.CancellationReason
 import com.duckduckgo.subscriptions.api.Product
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.api.Subscriptions
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
-import org.junit.Assert.assertFalse
-import org.junit.Assert.assertTrue
+import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -54,6 +55,7 @@ class RealPirWorkHandlerTest {
     private val pirBetaToggle: Toggle = mock()
     private val pirRepository: PirRepository = mock()
     private val pirNotificationManager: PirNotificationManager = mock()
+    private val pirScanWideEvent: PirScanWideEvent = mock()
 
     private lateinit var pirWorkHandler: RealPirWorkHandler
 
@@ -70,144 +72,145 @@ class RealPirWorkHandlerTest {
             pirScanScheduler = pirScanScheduler,
             pirRepository = pirRepository,
             pirNotificationManager = pirNotificationManager,
+            pirScanWideEvent = pirScanWideEvent,
         )
     }
 
     @Test
-    fun whenPirBetaDisabledThenCanRunPirReturnsFalse() = runTest {
+    fun whenPirBetaDisabledThenCanRunPirDisabledWithFeatureDisabled() = runTest {
         whenever(pirBetaToggle.isEnabled()).thenReturn(false)
 
         pirWorkHandler.canRunPir().test {
-            assertFalse(awaitItem())
+            assertEquals(PirEligibility.Disabled(DisabledReason.FEATURE_DISABLED), awaitItem())
             awaitComplete()
         }
     }
 
     @Test
-    fun whenSubscriptionStatusIsUnknownThenCanRunPirReturnsFalse() = runTest {
+    fun whenSubscriptionStatusIsUnknownThenCanRunPirDisabledWithSubscriptionExpired() = runTest {
         whenever(pirBetaToggle.isEnabled()).thenReturn(true)
         whenever(subscriptions.getSubscriptionStatusFlow()).thenReturn(flowOf(SubscriptionStatus.UNKNOWN))
         whenever(subscriptions.getEntitlementStatus()).thenReturn(flowOf(listOf()))
 
         pirWorkHandler.canRunPir().test {
-            assertFalse(awaitItem())
+            assertEquals(PirEligibility.Disabled(DisabledReason.SUBSCRIPTION_EXPIRED), awaitItem())
             awaitComplete()
         }
     }
 
     @Test
-    fun whenPirBetaEnabledAndPirEntitledAndAutoRenewableThenCanRunPirReturnsTrue() =
+    fun whenPirBetaEnabledAndPirEntitledAndAutoRenewableThenCanRunPirEnabled() =
         runTest {
             whenever(pirBetaToggle.isEnabled()).thenReturn(true)
             whenever(subscriptions.getEntitlementStatus()).thenReturn(flowOf(listOf(Product.PIR)))
             whenever(subscriptions.getSubscriptionStatusFlow()).thenReturn(flowOf(SubscriptionStatus.AUTO_RENEWABLE))
 
             pirWorkHandler.canRunPir().test {
-                assertTrue(awaitItem())
+                assertEquals(PirEligibility.Enabled, awaitItem())
                 cancelAndIgnoreRemainingEvents()
             }
         }
 
     @Test
-    fun whenPirBetaEnabledAndPirEntitledAndNotAutoRenewableThenCanRunPirReturnsTrue() =
+    fun whenPirBetaEnabledAndPirEntitledAndNotAutoRenewableThenCanRunPirEnabled() =
         runTest {
             whenever(pirBetaToggle.isEnabled()).thenReturn(true)
             whenever(subscriptions.getEntitlementStatus()).thenReturn(flowOf(listOf(Product.PIR)))
             whenever(subscriptions.getSubscriptionStatusFlow()).thenReturn(flowOf(SubscriptionStatus.NOT_AUTO_RENEWABLE))
 
             pirWorkHandler.canRunPir().test {
-                assertTrue(awaitItem())
+                assertEquals(PirEligibility.Enabled, awaitItem())
                 cancelAndIgnoreRemainingEvents()
             }
         }
 
     @Test
-    fun whenPirBetaEnabledAndPirEntitledAndGracePeriodThenCanRunPirReturnsTrue() =
+    fun whenPirBetaEnabledAndPirEntitledAndGracePeriodThenCanRunPirEnabled() =
         runTest {
             whenever(pirBetaToggle.isEnabled()).thenReturn(true)
             whenever(subscriptions.getEntitlementStatus()).thenReturn(flowOf(listOf(Product.PIR)))
             whenever(subscriptions.getSubscriptionStatusFlow()).thenReturn(flowOf(SubscriptionStatus.GRACE_PERIOD))
 
             pirWorkHandler.canRunPir().test {
-                assertTrue(awaitItem())
+                assertEquals(PirEligibility.Enabled, awaitItem())
                 cancelAndIgnoreRemainingEvents()
             }
         }
 
     @Test
-    fun whenPirBetaEnabledAndPirEntitledButUnknownStatusThenCanRunPirReturnsFalse() =
+    fun whenPirBetaEnabledAndPirEntitledButUnknownStatusThenCanRunPirDisabledWithSubscriptionExpired() =
         runTest {
             whenever(pirBetaToggle.isEnabled()).thenReturn(true)
             whenever(subscriptions.getEntitlementStatus()).thenReturn(flowOf(listOf(Product.PIR)))
             whenever(subscriptions.getSubscriptionStatusFlow()).thenReturn(flowOf(SubscriptionStatus.UNKNOWN))
 
             pirWorkHandler.canRunPir().test {
-                assertFalse(awaitItem())
+                assertEquals(PirEligibility.Disabled(DisabledReason.SUBSCRIPTION_EXPIRED), awaitItem())
                 cancelAndIgnoreRemainingEvents()
             }
         }
 
     @Test
-    fun whenPirBetaEnabledAndPirEntitledButInactiveStatusThenCanRunPirReturnsFalse() =
+    fun whenPirBetaEnabledAndPirEntitledButInactiveStatusThenCanRunPirDisabledWithSubscriptionExpired() =
         runTest {
             whenever(pirBetaToggle.isEnabled()).thenReturn(true)
             whenever(subscriptions.getEntitlementStatus()).thenReturn(flowOf(listOf(Product.PIR)))
             whenever(subscriptions.getSubscriptionStatusFlow()).thenReturn(flowOf(SubscriptionStatus.INACTIVE))
 
             pirWorkHandler.canRunPir().test {
-                assertFalse(awaitItem())
+                assertEquals(PirEligibility.Disabled(DisabledReason.SUBSCRIPTION_EXPIRED), awaitItem())
                 cancelAndIgnoreRemainingEvents()
             }
         }
 
     @Test
-    fun whenPirBetaEnabledAndPirEntitledButExpiredStatusThenCanRunPirReturnsFalse() =
+    fun whenPirBetaEnabledAndPirEntitledButExpiredStatusThenCanRunPirDisabledWithSubscriptionExpired() =
         runTest {
             whenever(pirBetaToggle.isEnabled()).thenReturn(true)
             whenever(subscriptions.getEntitlementStatus()).thenReturn(flowOf(listOf(Product.PIR)))
             whenever(subscriptions.getSubscriptionStatusFlow()).thenReturn(flowOf(SubscriptionStatus.EXPIRED))
 
             pirWorkHandler.canRunPir().test {
-                assertFalse(awaitItem())
+                assertEquals(PirEligibility.Disabled(DisabledReason.SUBSCRIPTION_EXPIRED), awaitItem())
                 cancelAndIgnoreRemainingEvents()
             }
         }
 
     @Test
-    fun whenPirBetaEnabledAndPirEntitledButWaitingStatusThenCanRunPirReturnsFalse() =
+    fun whenPirBetaEnabledAndPirEntitledButWaitingStatusThenCanRunPirDisabledWithSubscriptionExpired() =
         runTest {
             whenever(pirBetaToggle.isEnabled()).thenReturn(true)
             whenever(subscriptions.getEntitlementStatus()).thenReturn(flowOf(listOf(Product.PIR)))
             whenever(subscriptions.getSubscriptionStatusFlow()).thenReturn(flowOf(SubscriptionStatus.WAITING))
 
             pirWorkHandler.canRunPir().test {
-                assertFalse(awaitItem())
+                assertEquals(PirEligibility.Disabled(DisabledReason.SUBSCRIPTION_EXPIRED), awaitItem())
                 cancelAndIgnoreRemainingEvents()
             }
         }
 
     @Test
-    fun whenPirBetaEnabledAndAutoRenewableButNotPirEntitledThenCanRunPirReturnsFalse() =
+    fun whenPirBetaEnabledAndAutoRenewableButNotPirEntitledThenCanRunPirDisabledWithEntitlementLost() =
         runTest {
             whenever(pirBetaToggle.isEnabled()).thenReturn(true)
             whenever(subscriptions.getEntitlementStatus()).thenReturn(flowOf(listOf(Product.NetP))) // Different product
             whenever(subscriptions.getSubscriptionStatusFlow()).thenReturn(flowOf(SubscriptionStatus.AUTO_RENEWABLE))
 
             pirWorkHandler.canRunPir().test {
-                assertFalse(awaitItem())
+                assertEquals(PirEligibility.Disabled(DisabledReason.ENTITLEMENT_LOST), awaitItem())
                 cancelAndIgnoreRemainingEvents()
             }
         }
 
     @Test
-    fun whenPirBetaEnabledAndAutoRenewableButNoEntitlementsThenCanRunPirReturnsFalse() =
+    fun whenPirBetaEnabledAndAutoRenewableButNoEntitlementsThenCanRunPirDisabledWithEntitlementLost() =
         runTest {
             whenever(pirBetaToggle.isEnabled()).thenReturn(true)
             whenever(subscriptions.getEntitlementStatus()).thenReturn(flowOf(emptyList()))
             whenever(subscriptions.getSubscriptionStatusFlow()).thenReturn(flowOf(SubscriptionStatus.AUTO_RENEWABLE))
 
             pirWorkHandler.canRunPir().test {
-                assertFalse(awaitItem())
+                assertEquals(PirEligibility.Disabled(DisabledReason.ENTITLEMENT_LOST), awaitItem())
                 cancelAndIgnoreRemainingEvents()
             }
         }
@@ -223,15 +226,15 @@ class RealPirWorkHandlerTest {
 
             pirWorkHandler.canRunPir().test {
                 // Initially enabled
-                assertTrue(awaitItem())
+                assertEquals(PirEligibility.Enabled, awaitItem())
 
                 // Remove PIR entitlement
                 entitlementFlow.value = emptyList()
-                assertFalse(awaitItem())
+                assertEquals(PirEligibility.Disabled(DisabledReason.ENTITLEMENT_LOST), awaitItem())
 
                 // Add PIR entitlement back
                 entitlementFlow.value = listOf(Product.PIR)
-                assertTrue(awaitItem())
+                assertEquals(PirEligibility.Enabled, awaitItem())
 
                 cancelAndIgnoreRemainingEvents()
             }
@@ -247,7 +250,7 @@ class RealPirWorkHandlerTest {
 
         pirWorkHandler.canRunPir().test {
             // Initially enabled
-            assertTrue(awaitItem())
+            assertEquals(PirEligibility.Enabled, awaitItem())
 
             // Emit same value multiple times - should only get one emission due to distinctUntilChanged
             entitlementFlow.value = listOf(Product.PIR)
@@ -262,23 +265,25 @@ class RealPirWorkHandlerTest {
     }
 
     @Test
-    fun whenRepositoryNotAvailableThenCanRunPirReturnsFalse() = runTest {
+    fun whenRepositoryNotAvailableThenCanRunPirDisabledWithRepositoryUnavailable() = runTest {
         whenever(pirBetaToggle.isEnabled()).thenReturn(true)
         whenever(subscriptions.getEntitlementStatus()).thenReturn(flowOf(listOf(Product.PIR)))
         whenever(subscriptions.getSubscriptionStatusFlow()).thenReturn(flowOf(SubscriptionStatus.AUTO_RENEWABLE))
         whenever(pirRepository.isRepositoryAvailable()).thenReturn(false)
 
         pirWorkHandler.canRunPir().test {
-            assertFalse(awaitItem())
+            assertEquals(PirEligibility.Disabled(DisabledReason.REPOSITORY_UNAVAILABLE), awaitItem())
             cancelAndIgnoreRemainingEvents()
         }
     }
 
     @Test
-    fun whenCancelWorkThenStopsForegroundServicesAndCancelsWorkManager() = runTest {
-        pirWorkHandler.cancelWork()
+    fun whenCancelWorkThenFinalizesWideEventAndStopsForegroundServicesAndCancelsWorkManager() = runTest {
+        pirWorkHandler.cancelWork(CancellationReason.PROFILE_DELETED)
 
-        // Verify that stopService is called 3 times (for each of the 3 services)
+        // Wide event must be finalized before the services hosting the run are torn down
+        verify(pirScanWideEvent).onWorkCancelled(CancellationReason.PROFILE_DELETED)
+        // Verify that stopService is called for each of the 2 foreground services
         verify(context, times(2)).stopService(any<Intent>())
         verify(pirScanScheduler).cancelScheduledScans(context)
         verify(pirNotificationManager).cancelNotifications()

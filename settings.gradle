@@ -30,49 +30,34 @@ develocity {
         }
         // Tag scans with the active DI framework so cache hits are queryable per-variant
         // and Anvil/Metro builds remain visibly distinct on Develocity.
-        def diFrameworkTag = settings.startParameter.projectProperties.get('ddg.di') ?: 'AnvilDagger'
+        def diFrameworkTag = providers.gradleProperty('ddg.di').getOrElse('AnvilDagger')
         tag(diFrameworkTag)
         value('ddg.di', diFrameworkTag)
     }
 }
 
+// Discover modules by checking for a build file directly rather than listing each directory's full
+// contents. A full listing gets fingerprinted as a configuration-cache input (so any new top-level
+// file in a module dir would invalidate it); statting the specific build file narrows the input to
+// exactly what matters and avoids reading large directories. It also drops the old
+// `name.contains("build.gradle")` match, which would also match stray files like build.gradle.orig.
+def hasBuildFile = { File dir -> new File(dir, "build.gradle").isFile() || new File(dir, "build.gradle.kts").isFile() }
+
 rootDir.eachFile(groovy.io.FileType.DIRECTORIES) { File parent ->
 
-    String[] ignoreFolders = ["buildSrc", "fastlane", "submodules", "node_modules", "gradle", "build", ".maestro"]
+    String[] ignoreFolders = ["buildSrc", "fastlane", "submodules", "node_modules", "gradle", "build", "build-cache", ".maestro"]
     if (!parent.name.startsWith(".") && !ignoreFolders.contains(parent.name)) {
-        Boolean shouldAddProject = false
-        parent.eachFile {
-            if (it.name.contains("build.gradle")) {
-                shouldAddProject = true
-                return
-            }
-        }
-        if (shouldAddProject) {
+        if (hasBuildFile(parent)) {
             include ":${parent.name}"
         } else {
-            parent.eachFile(groovy.io.FileType.DIRECTORIES) { child -> // We only one level deep
-                Boolean shouldAddSubProject = false
-                child.eachFile {
-                    if (it.name.contains("build.gradle")) {
-                        shouldAddSubProject = true
-                        return
-                    }
-                }
-                if (shouldAddSubProject) {
+            parent.eachFile(groovy.io.FileType.DIRECTORIES) { child -> // only one level deep
+                if (hasBuildFile(child)) {
                     include ":${child.name}"; project(":${child.name}").projectDir = new File("${parent.name}/${child.name}")
                 }
             }
         }
     }
 }
-
-rootProject.children.each { subproject ->
-
-    if (subproject.name == "vpn") {
-        subproject.buildFileName = "${subproject.name}-build.gradle"
-    }
-}
-
 
 buildCache {
 
@@ -100,6 +85,8 @@ buildCache {
             enabled = true
         }
         // configure local build cache directory so that it is local to the project dir
+        // (NOTE: 'build-cache' is kept in the module auto-discovery ignore list above so its
+        // ever-changing contents are not fingerprinted as a configuration-cache input).
         directory = new File(rootDir, 'build-cache')
         removeUnusedEntriesAfterDays = 7
     }

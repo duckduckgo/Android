@@ -24,8 +24,11 @@ interface BrowserInteractionsPlugin {
     /** Last used tab (LUT) is shown after an idle return. */
     fun onLutShownAfterIdle() {}
 
-    /** User submitted a search or chat query via the omnibar. */
+    /** User submitted a typed query via the omnibar (search or chat prompt). */
     fun onInputSubmitted() {}
+
+    /** User selected a Duck.ai chat suggestion (without typing a prompt). */
+    fun onChatSelected() {}
 
     /** User opened the tab switcher. */
     fun onTabSwitcherSelected() {}

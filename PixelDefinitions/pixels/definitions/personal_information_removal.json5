@@ -2213,6 +2213,7 @@
                     "unknown_error"
                 ]
             },
+            "pirCancellationReason",
             {
                 "key": "feature.data.ext.step.started",
                 "description": "Parameter present when the run body actually begins (after the no-profiles early return)",
@@ -2471,6 +2472,7 @@
                     "unknown_error"
                 ]
             },
+            "pirCancellationReason",
             {
                 "key": "feature.data.ext.step.started",
                 "description": "Parameter present when the run body actually begins (after the no-profiles early return)",
@@ -2716,8 +2718,7 @@
                     "86400000",
                     "259200000",
                     "604800000",
-                    "1209600000",
-                    "2592000000"
+                    "1209600000"
                 ]
             }
         ]

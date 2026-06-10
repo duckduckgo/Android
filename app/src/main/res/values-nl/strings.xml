@@ -265,6 +265,7 @@
     <string name="singleTabFireDialogDeleteAll">Alles verwijderen</string>
     <string name="singleTabFireDialogDeleteThisTab">Dit tabblad verwijderen</string>
     <string name="singleTabFireDialogDeleteChat">Chat verwijderen</string>
+    <string name="singleTabFireDialogDeleteChats">Chats verwijderen</string>
     <string name="singleTabFireDialogTitleDuckAi">Deze chat verwijderen?</string>
     <string name="singleTabFireDialogSubtitleSiteData">Als je sitegegevens verwijdert, kun je uitloggen bij je accounts.</string>
     <string name="singleTabFireDialogSubtitleDownloads">Hiermee worden lopende downloads geannuleerd.</string>
@@ -1027,7 +1028,7 @@
     <string name="preOnboardingWelcomeDialogBody2">AI is altijd optioneel en privacybescherming staat altijd aan.</string>
     <string name="onboardingStepIndicatorText" instruction="a counter above our instructions in onboarding that tells a user what step they are on">%1$d van %2$d</string>
     <string name="onboardingSearchDaxDialogOption1Quoted" instruction="translate &apos;duck&apos; too.">hoe zeg je \'eend\' in het Engels?</string>
-    <string name="onboardingSearchDaxDialogOption1EnglishQuoted" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">hoe zeg je \'eend\' in het Spaans</string>
+    <string name="onboardingSearchDaxDialogOption1EnglishQuoted" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">hoe zeg je \'eend\' in het Nederlands</string>
 
     <string name="input_screen_user_pref_without_ai_updated">Alleen zoeken</string>
     <string name="input_screen_user_pref_with_ai_updated">Schakelen tussen\nzoeken en Duck.ai</string>

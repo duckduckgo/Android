@@ -24,6 +24,7 @@ import com.duckduckgo.app.statistics.wideevents.WideEventClient
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.pir.impl.PirRemoteFeatures
+import com.duckduckgo.pir.impl.checker.DisabledReason
 import com.duckduckgo.pir.impl.scheduling.PirExecutionType
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
@@ -70,13 +71,39 @@ interface PirScanWideEvent {
 
     suspend fun onRunFailed(executionType: PirExecutionType, reason: FailureReason)
 
-    suspend fun onRunCancelled(executionType: PirExecutionType)
+    suspend fun onRunCancelled(executionType: PirExecutionType, reason: CancellationReason)
+
+    suspend fun onWorkCancelled(reason: CancellationReason)
+
+    suspend fun onRunCancelledBeforeStart(executionType: PirExecutionType, reason: CancellationReason)
 
     /**
      * Aborts any open manual or scheduled flow so they are discarded rather than eventually
      * emitting a stale `FlowStatus.Unknown` record via the cleanup-on-timeout policy.
      */
     suspend fun onUserReset()
+
+    enum class CancellationReason(val value: String) {
+        SUPERSEDED_BY_NEW_RUN("superseded_by_new_run"),
+        SUPERSEDED_BY_PROFILE_EDIT("superseded_by_profile_edit"),
+        PROFILE_DELETED("profile_deleted"),
+        FEATURE_DISABLED("feature_disabled"),
+        SUBSCRIPTION_EXPIRED("subscription_expired"),
+        ENTITLEMENT_LOST("entitlement_lost"),
+        REPOSITORY_UNAVAILABLE("repository_unavailable"),
+        FOREGROUND_START_FAILED("foreground_start_failed"),
+        WORK_STOPPED("work_stopped"),
+        ;
+
+        companion object {
+            fun fromDisabledReason(reason: DisabledReason): CancellationReason = when (reason) {
+                DisabledReason.FEATURE_DISABLED -> FEATURE_DISABLED
+                DisabledReason.SUBSCRIPTION_EXPIRED -> SUBSCRIPTION_EXPIRED
+                DisabledReason.ENTITLEMENT_LOST -> ENTITLEMENT_LOST
+                DisabledReason.REPOSITORY_UNAVAILABLE -> REPOSITORY_UNAVAILABLE
+            }
+        }
+    }
 
     enum class FailureReason(val value: String) {
         NO_ACTIVE_BROKERS("no_active_brokers"),
@@ -189,9 +216,48 @@ class PirScanWideEventImpl @Inject constructor(
         stateFor(executionType).onRunFailed(reason)
     }
 
-    override suspend fun onRunCancelled(executionType: PirExecutionType) {
+    override suspend fun onRunCancelled(executionType: PirExecutionType, reason: PirScanWideEvent.CancellationReason) {
         if (!isFeatureEnabled()) return
-        stateFor(executionType).onRunCancelled()
+        stateFor(executionType).onRunCancelled(reason)
+    }
+
+    override suspend fun onWorkCancelled(reason: PirScanWideEvent.CancellationReason) {
+        manualState.onRunCancelled(reason)
+        scheduledState.onRunCancelled(reason)
+    }
+
+    override suspend fun onRunCancelledBeforeStart(
+        executionType: PirExecutionType,
+        reason: PirScanWideEvent.CancellationReason,
+    ) {
+        if (!isFeatureEnabled()) return
+
+        // If a flow for this run is already open, finalize that one
+        if (stateFor(executionType).onRunCancelled(reason)) return
+
+        // No open flow: synthesize a one-shot Cancelled flow to record the never-started run.
+        val flowId = wideEventClient.flowStart(
+            name = wideEventNameFor(executionType),
+            flowEntryPoint = entryPointFor(executionType),
+            metadata = mapOf(
+                KEY_EXECUTION_TYPE to executionType.metadataValue(),
+                KEY_PROFILE_QUERIES_COUNT to "0",
+                KEY_BROKER_COUNT to "0",
+                KEY_TOTAL_SCAN_JOBS to "0",
+                KEY_WEB_VIEW_COUNT to "0",
+            ),
+            cleanupPolicy = CleanupPolicy.OnTimeout(
+                duration = TIMEOUT_DURATION,
+                flowStatus = FlowStatus.Unknown,
+            ),
+        ).getOrNull() ?: return
+
+        recordStep(flowId, STEP_STARTED)
+        wideEventClient.flowFinish(
+            wideEventId = flowId,
+            status = FlowStatus.Cancelled,
+            metadata = mapOf(KEY_CANCELLATION_REASON to reason.value),
+        )
     }
 
     override suspend fun onUserReset() {
@@ -209,6 +275,22 @@ class PirScanWideEventImpl @Inject constructor(
     }
 
     /**
+     * Records a flow step and persists [stepName] as `last_step` metadata in the same write. Because
+     * flowStep metadata is merged into the event and persisted immediately, the furthest-reached step
+     * survives an abnormal termination — e.g. the `:pir` process being killed mid-scan and the flow
+     * finalized as [FlowStatus.Unknown] by the cleanup-on-timeout policy, which never calls
+     * flowFinish.
+     */
+    private suspend fun recordStep(flowId: Long, stepName: String) {
+        wideEventClient.flowStep(
+            wideEventId = flowId,
+            stepName = stepName,
+            success = true,
+            metadata = mapOf(KEY_LAST_STEP to stepName),
+        )
+    }
+
+    /**
      * Per-flow state. Two instances live in the singleton (manual and scheduled) so the two flows
      * never alias on `cachedFlowId`, decile counters, or the `getFlowIds(name)` lookup.
      */
@@ -220,7 +302,6 @@ class PirScanWideEventImpl @Inject constructor(
         private var lastReportedDecile: Int = 0
         private var currentDecileIntervalKey: String? = null
         private var optOutIntervalOpen: Boolean = false
-        private var lastStep: String = STEP_STARTED
 
         suspend fun onRunStarted(
             executionType: PirExecutionType,
@@ -236,13 +317,19 @@ class PirScanWideEventImpl @Inject constructor(
         ) {
             mutex.withLock {
                 // Finish any stale in-memory flow with Cancelled so we don't leave two open flows of
-                // the same name in the wide-events DB.
+                // the same name in the wide-events DB. A still-open flow here means a new run started
+                // before the previous one finished, so it was superseded.
                 cachedFlowId?.let { staleId ->
                     closeOpenIntervalsLocked(staleId)
+                    val supersededReason = if (executionType == PirExecutionType.MANUAL_EDIT_PROFILE) {
+                        PirScanWideEvent.CancellationReason.SUPERSEDED_BY_PROFILE_EDIT
+                    } else {
+                        PirScanWideEvent.CancellationReason.SUPERSEDED_BY_NEW_RUN
+                    }
                     wideEventClient.flowFinish(
                         wideEventId = staleId,
                         status = FlowStatus.Cancelled,
-                        metadata = mapOf(KEY_LAST_STEP to lastStep),
+                        metadata = mapOf(KEY_CANCELLATION_REASON to supersededReason.value),
                     )
                     clearStateLocked()
                 }
@@ -251,7 +338,6 @@ class PirScanWideEventImpl @Inject constructor(
                 this.completedScanJobs = 0
                 this.lastReportedDecile = 0
                 this.currentDecileIntervalKey = null
-                this.lastStep = STEP_STARTED
 
                 val newFlowId = wideEventClient.flowStart(
                     name = wideEventName,
@@ -269,13 +355,13 @@ class PirScanWideEventImpl @Inject constructor(
                         KEY_TRACKER_BLOCKING_STATE to isTrackerBlockingEnabled.toTrackerBlockingState(),
                     ),
                     cleanupPolicy = CleanupPolicy.OnTimeout(
-                        duration = 8.hours,
+                        duration = TIMEOUT_DURATION,
                         flowStatus = FlowStatus.Unknown,
                     ),
                 ).getOrNull() ?: return@withLock
 
                 cachedFlowId = newFlowId
-                wideEventClient.flowStep(wideEventId = newFlowId, stepName = STEP_STARTED, success = true)
+                recordStep(newFlowId, STEP_STARTED)
 
                 if (totalScanJobs > 0) {
                     val key = decileIntervalKey(0, 10)
@@ -318,8 +404,7 @@ class PirScanWideEventImpl @Inject constructor(
                     }
 
                     val stepName = "$STEP_PROGRESS_PREFIX${currentDecile * 10}"
-                    wideEventClient.flowStep(wideEventId = flowId, stepName = stepName, success = true)
-                    lastStep = stepName
+                    recordStep(flowId, stepName)
 
                     if (currentDecile < 9) {
                         val nextKey = decileIntervalKey(currentDecile * 10, (currentDecile + 1) * 10)
@@ -343,18 +428,16 @@ class PirScanWideEventImpl @Inject constructor(
                     currentDecileIntervalKey = null
                 }
 
-                wideEventClient.flowStep(wideEventId = flowId, stepName = STEP_SCAN_COMPLETED, success = true)
-                lastStep = STEP_SCAN_COMPLETED
+                recordStep(flowId, STEP_SCAN_COMPLETED)
             }
         }
 
         suspend fun onOptOutStarted() {
             mutex.withLock {
                 val flowId = cachedFlowId ?: return@withLock
-                wideEventClient.flowStep(wideEventId = flowId, stepName = STEP_OPT_OUT_STARTED, success = true)
+                recordStep(flowId, STEP_OPT_OUT_STARTED)
                 wideEventClient.intervalStart(wideEventId = flowId, key = INTERVAL_OPT_OUT_DURATION)
                 optOutIntervalOpen = true
-                lastStep = STEP_OPT_OUT_STARTED
             }
         }
 
@@ -363,14 +446,11 @@ class PirScanWideEventImpl @Inject constructor(
                 val flowId = cachedFlowId ?: return@withLock
                 wideEventClient.intervalEnd(wideEventId = flowId, key = INTERVAL_OPT_OUT_DURATION)
                 optOutIntervalOpen = false
-                wideEventClient.flowStep(wideEventId = flowId, stepName = STEP_OPT_OUT_COMPLETED, success = true)
+                recordStep(flowId, STEP_OPT_OUT_COMPLETED)
                 wideEventClient.flowFinish(
                     wideEventId = flowId,
                     status = FlowStatus.Success,
-                    metadata = mapOf(
-                        KEY_LAST_STEP to STEP_OPT_OUT_COMPLETED,
-                        KEY_TOTAL_OPT_OUT_JOBS to totalOptOutJobs.toString(),
-                    ),
+                    metadata = mapOf(KEY_TOTAL_OPT_OUT_JOBS to totalOptOutJobs.toString()),
                 )
                 clearStateLocked()
             }
@@ -379,14 +459,11 @@ class PirScanWideEventImpl @Inject constructor(
         suspend fun onOptOutSkipped() {
             mutex.withLock {
                 val flowId = cachedFlowId ?: return@withLock
-                wideEventClient.flowStep(wideEventId = flowId, stepName = STEP_OPT_OUT_SKIPPED, success = true)
+                recordStep(flowId, STEP_OPT_OUT_SKIPPED)
                 wideEventClient.flowFinish(
                     wideEventId = flowId,
                     status = FlowStatus.Success,
-                    metadata = mapOf(
-                        KEY_LAST_STEP to STEP_OPT_OUT_SKIPPED,
-                        KEY_TOTAL_OPT_OUT_JOBS to "0",
-                    ),
+                    metadata = mapOf(KEY_TOTAL_OPT_OUT_JOBS to "0"),
                 )
                 clearStateLocked()
             }
@@ -396,29 +473,40 @@ class PirScanWideEventImpl @Inject constructor(
             mutex.withLock {
                 val flowId = cachedFlowId ?: return@withLock
                 closeOpenIntervalsLocked(flowId)
-                val finalStep = lastStep
+                // last_step is already persisted per-step via recordStep, so it stays on the flow
+                // even when this finish is never reached (Unknown timeout cleanup).
                 wideEventClient.flowFinish(
                     wideEventId = flowId,
                     status = FlowStatus.Failure(reason = reason.value),
-                    metadata = mapOf(KEY_LAST_STEP to finalStep),
                 )
                 clearStateLocked()
             }
         }
 
-        suspend fun onRunCancelled() {
+        /**
+         * Finishes the open flow (if any) as Cancelled with [reason]. Returns true if a flow was
+         * finalized, false if there was nothing open — letting callers avoid synthesizing a
+         * duplicate flow.
+         */
+        suspend fun onRunCancelled(reason: PirScanWideEvent.CancellationReason): Boolean =
             mutex.withLock {
-                val flowId = cachedFlowId ?: return@withLock
+                // The flow may have been started in a different process (the :pir scan service) than
+                // the one handling the cancellation (the main process, for profile deletion or
+                // eligibility loss). cachedFlowId is per-process in-memory state, so fall back to the
+                // shared wide-events DB to resolve the still-open flow by name.
+                val flowId = cachedFlowId
+                    ?: wideEventClient.getFlowIds(wideEventName).getOrNull()?.lastOrNull()
+                    ?: return@withLock false
                 closeOpenIntervalsLocked(flowId)
-                val finalStep = lastStep
+                // last_step is persisted incrementally via recordStep, so it is already stored
                 wideEventClient.flowFinish(
                     wideEventId = flowId,
                     status = FlowStatus.Cancelled,
-                    metadata = mapOf(KEY_LAST_STEP to finalStep),
+                    metadata = mapOf(KEY_CANCELLATION_REASON to reason.value),
                 )
                 clearStateLocked()
+                true
             }
-        }
 
         suspend fun onUserReset() {
             mutex.withLock {
@@ -451,7 +539,6 @@ class PirScanWideEventImpl @Inject constructor(
             lastReportedDecile = 0
             currentDecileIntervalKey = null
             optOutIntervalOpen = false
-            lastStep = STEP_STARTED
         }
     }
 
@@ -459,6 +546,11 @@ class PirScanWideEventImpl @Inject constructor(
         PirExecutionType.MANUAL_INITIAL -> ENTRY_POINT_MANUAL_INITIAL
         PirExecutionType.MANUAL_EDIT_PROFILE -> ENTRY_POINT_MANUAL_EDIT_PROFILE
         PirExecutionType.SCHEDULED -> ENTRY_POINT_SCHEDULED
+    }
+
+    private fun wideEventNameFor(executionType: PirExecutionType): String = when (executionType) {
+        PirExecutionType.MANUAL_INITIAL, PirExecutionType.MANUAL_EDIT_PROFILE -> WIDE_EVENT_NAME_MANUAL
+        PirExecutionType.SCHEDULED -> WIDE_EVENT_NAME_SCHEDULED
     }
 
     private fun PirExecutionType.metadataValue(): String = when (this) {
@@ -474,6 +566,8 @@ class PirScanWideEventImpl @Inject constructor(
     private fun Boolean.toTrackerBlockingState(): String = if (this) "enabled" else "disabled"
 
     companion object {
+        private val TIMEOUT_DURATION = 8.hours
+
         const val WIDE_EVENT_NAME_MANUAL = "pir-initial-scan"
         const val WIDE_EVENT_NAME_SCHEDULED = "pir-scheduled-scan"
 
@@ -497,6 +591,7 @@ class PirScanWideEventImpl @Inject constructor(
         const val KEY_NOTIFICATIONS_PERMISSION_GRANTED = "notifications_permission_granted"
         const val KEY_TRACKER_BLOCKING_STATE = "tracker_blocking_state"
         const val KEY_LAST_STEP = "last_step"
+        const val KEY_CANCELLATION_REASON = "cancellation_reason"
 
         const val STEP_STARTED = "started"
         const val STEP_PROGRESS_PREFIX = "progress_"

@@ -25,6 +25,7 @@ import android.content.pm.PackageManager
 import android.content.pm.ResolveInfo
 import androidx.core.net.toUri
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.duckduckgo.adblocking.api.duckplayer.DuckPlayer
 import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType.*
 import com.duckduckgo.app.browser.SpecialUrlDetectorImpl.Companion.EMAIL_MAX_LENGTH
 import com.duckduckgo.app.browser.SpecialUrlDetectorImpl.Companion.PHONE_MAX_LENGTH
@@ -35,7 +36,6 @@ import com.duckduckgo.app.browser.duckchat.AIChatQueryDetectionFeature
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
-import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.State

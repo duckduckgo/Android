@@ -18,6 +18,7 @@ package com.duckduckgo.pir.impl
 
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.pir.impl.checker.PirWorkHandler
+import com.duckduckgo.pir.impl.checker.isEnabled
 import com.duckduckgo.pir.impl.store.PirRepository
 import com.squareup.anvil.annotations.ContributesBinding
 import kotlinx.coroutines.flow.firstOrNull
@@ -40,6 +41,6 @@ class RealPirUserUtils @Inject constructor(
      * - Has a userprofile set up for scanning
      */
     override suspend fun isActiveUser(): Boolean {
-        return pirWorkHandler.canRunPir().firstOrNull() == true && pirRepository.getValidUserProfileQueries().isNotEmpty()
+        return pirWorkHandler.canRunPir().firstOrNull()?.isEnabled == true && pirRepository.getValidUserProfileQueries().isNotEmpty()
     }
 }

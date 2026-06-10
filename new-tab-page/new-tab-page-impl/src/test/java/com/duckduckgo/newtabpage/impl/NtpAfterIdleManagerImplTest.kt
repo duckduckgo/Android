@@ -40,6 +40,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
+import org.mockito.kotlin.whenever
 
 class NtpAfterIdleManagerImplTest {
 
@@ -87,6 +88,18 @@ class NtpAfterIdleManagerImplTest {
         verify(pixel).fire(NTP_SHOWN_AFTER_IDLE_DAILY, type = Daily())
         verify(pixel).fire(NTP_SHOWN_USER_INITIATED, type = Count)
         verify(pixel).fire(NTP_SHOWN_USER_INITIATED_DAILY, type = Daily())
+    }
+
+    // --- onTabSwitcherSelected forwarding ---
+
+    @Test
+    fun whenOnTabSwitcherSelectedThenForwardsToHatchPlugins() {
+        val plugin: HatchInteractionsPlugin = mock()
+        whenever(hatchInteractionsPlugins.getPlugins()).thenReturn(listOf(plugin))
+
+        testee.onTabSwitcherSelected()
+
+        verify(plugin).onTabSwitcherSelected()
     }
 
     // --- onReturnToPageTapped classification ---

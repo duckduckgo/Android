@@ -21,6 +21,7 @@ import android.webkit.URLUtil
 import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.duckduckgo.adblocking.api.duckplayer.DuckPlayer.DuckPlayerState.ENABLED
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.browser.AddressDisplayFormatter
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
@@ -67,7 +68,6 @@ import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
-import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState.ENABLED
 import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardPixels
 import com.duckduckgo.serp.logos.api.SerpEasterEggLogosToggles
 import com.duckduckgo.serp.logos.api.SerpLogo
@@ -102,7 +102,7 @@ class OmnibarLayoutViewModel @Inject constructor(
     private val voiceSearchAvailability: VoiceSearchAvailability,
     private val voiceSearchPixelLogger: VoiceSearchAvailabilityPixelLogger,
     private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
-    private val duckPlayer: com.duckduckgo.duckplayer.api.DuckPlayer,
+    private val duckPlayer: com.duckduckgo.adblocking.api.duckplayer.DuckPlayer,
     private val pixel: Pixel,
     private val userBrowserProperties: UserBrowserProperties,
     private val dispatcherProvider: DispatcherProvider,
@@ -261,6 +261,16 @@ class OmnibarLayoutViewModel @Inject constructor(
         val isProgressBarUpgradeEnabled: Boolean = false,
         val enabledState: EnabledState = EnabledState.ALL,
     ) {
+        /**
+         * The Duck.ai entry icon shows the chevron-down (contextual sheet) variant when the native
+         * input field setting is enabled and we're not on the new-tab page — tapping it then opens
+         * the contextual sheet. In every other case it falls back to the standard chat icon, whose
+         * tap opens Duck.ai in full screen. Derived from the flag + viewMode rather than a stored
+         * flag so it can't drift out of sync with other state-update paths.
+         */
+        val showContextualSheetIcon: Boolean
+            get() = isNativeInputEnabled && viewMode !is NewTab
+
         fun shouldUpdateOmnibarText(
             isFullUrlEnabled: Boolean,
         ): Boolean {

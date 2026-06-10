@@ -273,6 +273,7 @@
     <string name="singleTabFireDialogDeleteAll">Izbriši vse</string>
     <string name="singleTabFireDialogDeleteThisTab">Izbriši ta zavihek</string>
     <string name="singleTabFireDialogDeleteChat">Izbriši klepet</string>
+    <string name="singleTabFireDialogDeleteChats">Izbriši klepete</string>
     <string name="singleTabFireDialogTitleDuckAi">Želite izbrisati ta klepet?</string>
     <string name="singleTabFireDialogSubtitleSiteData">Brisanje podatkov o spletnem mestu vas lahko odjavi iz računov.</string>
     <string name="singleTabFireDialogSubtitleDownloads">S tem boste preklicali prenose v teku.</string>

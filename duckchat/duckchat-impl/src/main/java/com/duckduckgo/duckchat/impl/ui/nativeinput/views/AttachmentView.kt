@@ -22,6 +22,7 @@ import android.graphics.Typeface
 import android.net.Uri
 import android.view.Gravity
 import android.view.LayoutInflater
+import android.view.View
 import android.webkit.ValueCallback
 import android.widget.FrameLayout
 import android.widget.HorizontalScrollView
@@ -36,6 +37,8 @@ import androidx.lifecycle.findViewTreeViewModelStoreOwner
 import com.duckduckgo.common.ui.view.text.DaxTextView
 import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.utils.ViewViewModelFactory
+import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
+import com.duckduckgo.duckchat.api.nativeinput.NativeInputStateProvider
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.nativeinput.NativeInputHost
 import com.duckduckgo.duckchat.impl.ui.AttachmentViewModel
@@ -43,6 +46,9 @@ import com.duckduckgo.duckchat.impl.ui.nativeinput.attachment.ImageAttachment
 import com.duckduckgo.duckchat.impl.ui.nativeinput.file.FileAttachment
 import com.duckduckgo.duckchat.impl.ui.nativeinput.file.FileAttachmentsContainerView
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import org.json.JSONArray
 
@@ -56,6 +62,9 @@ class AttachmentView(
     var onFilePickerRequested: ((ValueCallback<Array<Uri>>, List<String>) -> Unit)? = null
 
     private var viewModel: AttachmentViewModel? = null
+    private var supportsUpload: Boolean = false
+    private var nativeInputStateJob: Job? = null
+    private var lastNativeInputState: NativeInputState? = null
     private var popupWindow: PopupWindow? = null
     private var thumbnailsLayout: LinearLayout? = null
     private var imageAttachmentsContainer: ImageAttachmentsContainerView? = null
@@ -67,7 +76,7 @@ class AttachmentView(
         setOnClickListener { showPopupMenu() }
     }
 
-    fun bind(scope: CoroutineScope, factory: ViewViewModelFactory) {
+    fun bind(scope: CoroutineScope, factory: ViewViewModelFactory, nativeInputStateProvider: NativeInputStateProvider) {
         val owner = findViewTreeViewModelStoreOwner() ?: return
         val vm = ViewModelProvider(owner, factory)[AttachmentViewModel::class.java]
         viewModel = vm
@@ -76,6 +85,18 @@ class AttachmentView(
         scope.launch {
             vm.attachmentState.collect { state -> applyState(state, container) }
         }
+        nativeInputStateJob = nativeInputStateProvider.state
+            .onEach { state ->
+                lastNativeInputState = state
+                updateButtonVisibility()
+            }
+            .launchIn(scope)
+    }
+
+    private fun updateButtonVisibility() {
+        val show = supportsUpload && lastNativeInputState?.shouldShowPluginControls() == true
+        isVisible = show
+        (parent as? View)?.isVisible = show
     }
 
     fun getImageAttachments(): List<ImageAttachment> = viewModel?.getImageAttachments() ?: emptyList()
@@ -170,7 +191,8 @@ class AttachmentView(
                 ?: state.fileSizeError
                 ?: state.filePageCountError
                 ?: state.fileTotalSizeError
-        container.isVisible = state.hasAttachments || errorMessage != null
+        val notStreaming = lastNativeInputState?.isChatStreaming != true
+        container.isVisible = (state.hasAttachments || errorMessage != null) && notStreaming
         updateLimitError(errorMessage)
         notifyStateChanged(state)
     }
@@ -202,6 +224,8 @@ class AttachmentView(
     }
 
     private fun notifyStateChanged(state: AttachmentViewModel.AttachmentState) {
+        supportsUpload = state.supportsUpload
+        updateButtonVisibility()
         host?.attachmentChanged(
             hasAttachments = state.hasAttachments,
             limitExceeded = (
@@ -217,6 +241,9 @@ class AttachmentView(
 
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
+        nativeInputStateJob?.cancel()
+        nativeInputStateJob = null
+        lastNativeInputState = null
         dismissPopup()
     }
 

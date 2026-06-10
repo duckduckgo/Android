@@ -43,6 +43,18 @@ import androidx.room.Room
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.webkit.JavaScriptReplyProxy
 import app.cash.turbine.test
+import com.duckduckgo.adblocking.api.duckplayer.DuckPlayer
+import com.duckduckgo.adblocking.api.duckplayer.DuckPlayer.DuckPlayerOrigin.AUTO
+import com.duckduckgo.adblocking.api.duckplayer.DuckPlayer.DuckPlayerOrigin.OVERLAY
+import com.duckduckgo.adblocking.api.duckplayer.DuckPlayer.DuckPlayerState.ENABLED
+import com.duckduckgo.adblocking.api.duckplayer.DuckPlayer.OpenDuckPlayerInNewTab.Off
+import com.duckduckgo.adblocking.api.duckplayer.DuckPlayer.OpenDuckPlayerInNewTab.On
+import com.duckduckgo.adblocking.api.duckplayer.DuckPlayer.OpenDuckPlayerInNewTab.Unavailable
+import com.duckduckgo.adblocking.api.duckplayer.DuckPlayer.UserPreferences
+import com.duckduckgo.adblocking.api.duckplayer.DuckPlayerPageSettingsPlugin
+import com.duckduckgo.adblocking.api.duckplayer.PrivatePlayerMode.AlwaysAsk
+import com.duckduckgo.adblocking.api.duckplayer.PrivatePlayerMode.Disabled
+import com.duckduckgo.adblocking.api.duckplayer.PrivatePlayerMode.Enabled
 import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.app.ValueCaptorObserver
 import com.duckduckgo.app.accessibility.data.AccessibilitySettingsDataStore
@@ -273,6 +285,7 @@ import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
 import com.duckduckgo.downloads.api.model.DownloadItem
 import com.duckduckgo.downloads.store.DownloadStatus
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
+import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.contextual.PageContextJSHelper
 import com.duckduckgo.duckchat.impl.contextual.RealPageContextJSHelper.Companion.PAGE_CONTEXT_FEATURE_NAME
@@ -281,18 +294,6 @@ import com.duckduckgo.duckchat.impl.helper.NativeAction
 import com.duckduckgo.duckchat.impl.helper.RealDuckChatJSHelper.Companion.DUCK_CHAT_FEATURE_NAME
 import com.duckduckgo.duckchat.impl.messaging.sync.SyncStatusChangedObserver
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
-import com.duckduckgo.duckplayer.api.DuckPlayer
-import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerOrigin.AUTO
-import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerOrigin.OVERLAY
-import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState.ENABLED
-import com.duckduckgo.duckplayer.api.DuckPlayer.OpenDuckPlayerInNewTab.Off
-import com.duckduckgo.duckplayer.api.DuckPlayer.OpenDuckPlayerInNewTab.On
-import com.duckduckgo.duckplayer.api.DuckPlayer.OpenDuckPlayerInNewTab.Unavailable
-import com.duckduckgo.duckplayer.api.DuckPlayer.UserPreferences
-import com.duckduckgo.duckplayer.api.DuckPlayerPageSettingsPlugin
-import com.duckduckgo.duckplayer.api.PrivatePlayerMode.AlwaysAsk
-import com.duckduckgo.duckplayer.api.PrivatePlayerMode.Disabled
-import com.duckduckgo.duckplayer.api.PrivatePlayerMode.Enabled
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.State
@@ -616,6 +617,7 @@ class BrowserTabViewModelTest {
     private val mockDuckChat: DuckChat = mock {
         on { observeTriggerVoiceChatSessionEnd() } doReturn voiceSessionEndTriggerFlow
     }
+    private val mockDuckAiHostProvider: DuckAiHostProvider = mock()
     private val mockSyncStatusChangedObserver: SyncStatusChangedObserver = mock()
     private val syncStatusChangedEventsFlow = MutableSharedFlow<JSONObject>()
     private val subscriptionStatusFlow = MutableSharedFlow<SubscriptionStatus>()
@@ -845,6 +847,7 @@ class BrowserTabViewModelTest {
 
             fakeContentScopeScriptsSubscriptionEventPluginPoint = FakeContentScopeScriptsSubscriptionEventPluginPoint()
 
+            whenever(mockDuckAiHostProvider.getHost()).thenReturn("duck.ai")
             whenever(mockDuckChat.getDuckChatUrl(any(), any(), any())).thenReturn(duckChatURL)
             whenever(mockDuckChat.isChatHistoryAvailable()).thenReturn(false)
             whenever(mockDuckChat.observeNativeInputFieldUserSettingEnabled()).thenReturn(nativeInputUserSettingFlow)
@@ -941,6 +944,7 @@ class BrowserTabViewModelTest {
                 httpErrorPixels = { mockHttpErrorPixels },
                 duckPlayer = mockDuckPlayer,
                 duckChat = mockDuckChat,
+                duckAiHostProvider = mockDuckAiHostProvider,
                 duckAiFeatureState = mockDuckAiFeatureState,
                 duckPlayerJSHelper =
                 DuckPlayerJSHelper(
@@ -2459,6 +2463,26 @@ class BrowserTabViewModelTest {
 
         val backCommand = captureCommands().lastValue as NavigationCommand.NavigateBack
         assertNotNull(backCommand)
+    }
+
+    @Test
+    fun whenBackToHomeWithActiveVoiceSessionThenEndsVoiceChatSession() {
+        setupNavigation(isBrowsing = true, canGoBack = false)
+        whenever(mockDuckChat.isVoiceChatSessionActive(any())).thenReturn(true)
+
+        testee.onUserPressedBack()
+
+        verify(mockDuckChat).endVoiceChatSession(any())
+    }
+
+    @Test
+    fun whenBackToHomeWithNoActiveVoiceSessionThenDoesNotEndVoiceChatSession() {
+        setupNavigation(isBrowsing = true, canGoBack = false)
+        whenever(mockDuckChat.isVoiceChatSessionActive(any())).thenReturn(false)
+
+        testee.onUserPressedBack()
+
+        verify(mockDuckChat, never()).endVoiceChatSession(any())
     }
 
     @Test
@@ -4889,7 +4913,7 @@ class BrowserTabViewModelTest {
         loadUrl("foo.com")
         testee.onPrintSelected()
         val command = captureCommands().lastValue as Command.PrintLink
-        assertEquals("foo.com", command.url)
+        assertEquals("foo.com", command.documentName)
         assertEquals(PrintAttributes.MediaSize.NA_LETTER, command.mediaSize)
     }
 
@@ -4899,7 +4923,7 @@ class BrowserTabViewModelTest {
         loadUrl("foo.com")
         testee.onPrintSelected()
         val command = captureCommands().lastValue as Command.PrintLink
-        assertEquals("foo.com", command.url)
+        assertEquals("foo.com", command.documentName)
         assertEquals(PrintAttributes.MediaSize.ISO_A4, command.mediaSize)
     }
 
@@ -4909,7 +4933,7 @@ class BrowserTabViewModelTest {
         loadUrl("foo.com")
         testee.onPrintSelected()
         val command = captureCommands().lastValue as Command.PrintLink
-        assertEquals("foo.com", command.url)
+        assertEquals("foo.com", command.documentName)
         assertEquals(PrintAttributes.MediaSize.ISO_A4, command.mediaSize)
     }
 
@@ -4918,6 +4942,38 @@ class BrowserTabViewModelTest {
         whenever(mockDeviceInfo.country).thenReturn("US")
         loadUrl("foo.com")
         testee.onPrintSelected()
+        verify(mockPixel).fire(AppPixelName.MENU_ACTION_PRINT_PRESSED)
+    }
+
+    @Test
+    fun whenUserSelectsToPrintPageAndUrlIsBlankAndNoPdfShownThenNoPrintLinkCommandOrPixelSent() {
+        whenever(mockDeviceInfo.country).thenReturn("US")
+        loadUrl("")
+        testee.onPrintSelected()
+        assertCommandNotIssued<Command.PrintLink>()
+        verify(mockPixel, never()).fire(AppPixelName.MENU_ACTION_PRINT_PRESSED)
+    }
+
+    @Test
+    fun whenUserSelectsToPrintPageAndUrlIsNullAndNoPdfShownThenNoPrintLinkCommandOrPixelSent() {
+        whenever(mockDeviceInfo.country).thenReturn("US")
+        loadUrl(null)
+        testee.onPrintSelected()
+        assertCommandNotIssued<Command.PrintLink>()
+        verify(mockPixel, never()).fire(AppPixelName.MENU_ACTION_PRINT_PRESSED)
+    }
+
+    @Test
+    fun whenUserSelectsToPrintPageAndUrlIsBlankButPdfShownThenPrintLinkCommandSentWithPdfNameAsJobName() {
+        whenever(mockDeviceInfo.country).thenReturn("US")
+        loadUrl("")
+        testee.browserViewState.value = browserViewState().copy(
+            currentPdfCachedUri = Uri.parse("file:///cache/doc.pdf"),
+            currentPdfFileName = "doc.pdf",
+        )
+        testee.onPrintSelected()
+        val command = captureCommands().lastValue as Command.PrintLink
+        assertEquals("doc.pdf", command.documentName)
         verify(mockPixel).fire(AppPixelName.MENU_ACTION_PRINT_PRESSED)
     }
 
@@ -7185,6 +7241,62 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenTypedDuckAiUrlSubmittedFromUserAndDuckAiEnabledThenDirectNavigationPixelsFireWithEnabledTrue() {
+        whenever(mockOmnibarConverter.convertQueryToUrl("duck.ai", null, FromUser)).thenReturn("https://duck.ai/")
+        whenever(mockDuckChat.isEnabled()).thenReturn(true)
+
+        testee.onUserSubmittedQuery("duck.ai", queryOrigin = FromUser)
+
+        verify(mockPixel).fire(
+            AppPixelName.AI_CHAT_DUCK_AI_DIRECT_NAVIGATION_COUNT,
+            parameters = mapOf("duck_ai_enabled" to "true"),
+        )
+        verify(mockPixel).fire(
+            AppPixelName.AI_CHAT_DUCK_AI_DIRECT_NAVIGATION_DAILY,
+            parameters = mapOf("duck_ai_enabled" to "true"),
+            type = Daily(),
+        )
+    }
+
+    @Test
+    fun whenTypedDuckAiUrlSubmittedFromUserAndDuckAiDisabledThenDirectNavigationPixelsFireWithEnabledFalse() {
+        whenever(mockOmnibarConverter.convertQueryToUrl("duck.ai", null, FromUser)).thenReturn("https://duck.ai/")
+        whenever(mockDuckChat.isEnabled()).thenReturn(false)
+
+        testee.onUserSubmittedQuery("duck.ai", queryOrigin = FromUser)
+
+        verify(mockPixel).fire(
+            AppPixelName.AI_CHAT_DUCK_AI_DIRECT_NAVIGATION_COUNT,
+            parameters = mapOf("duck_ai_enabled" to "false"),
+        )
+        verify(mockPixel).fire(
+            AppPixelName.AI_CHAT_DUCK_AI_DIRECT_NAVIGATION_DAILY,
+            parameters = mapOf("duck_ai_enabled" to "false"),
+            type = Daily(),
+        )
+    }
+
+    @Test
+    fun whenTypedNonDuckAiUrlSubmittedFromUserThenDirectNavigationPixelsDoNotFire() {
+        whenever(mockOmnibarConverter.convertQueryToUrl("example.com", null, FromUser)).thenReturn("https://example.com/")
+
+        testee.onUserSubmittedQuery("example.com", queryOrigin = FromUser)
+
+        verify(mockPixel, never()).fire(eq(AppPixelName.AI_CHAT_DUCK_AI_DIRECT_NAVIGATION_COUNT), any(), any(), any())
+        verify(mockPixel, never()).fire(eq(AppPixelName.AI_CHAT_DUCK_AI_DIRECT_NAVIGATION_DAILY), any(), any(), any())
+    }
+
+    @Test
+    fun whenDuckAiUrlSubmittedFromBookmarkThenDirectNavigationPixelsDoNotFire() {
+        whenever(mockOmnibarConverter.convertQueryToUrl("duck.ai", null, FromBookmark)).thenReturn("https://duck.ai/")
+
+        testee.onUserSubmittedQuery("duck.ai", queryOrigin = FromBookmark)
+
+        verify(mockPixel, never()).fire(eq(AppPixelName.AI_CHAT_DUCK_AI_DIRECT_NAVIGATION_COUNT), any(), any(), any())
+        verify(mockPixel, never()).fire(eq(AppPixelName.AI_CHAT_DUCK_AI_DIRECT_NAVIGATION_DAILY), any(), any(), any())
+    }
+
+    @Test
     fun givenSuggestedSearchesDialogShownWhenUserSubmittedQueryThenCustomSearchPixelIsSent() {
         whenever(mockOmnibarConverter.convertQueryToUrl("foo", null)).thenReturn("foo.com")
         val cta = DaxBubbleCta.DaxIntroSearchOptionsCta(mockOnboardingStore, mockAppInstallStore)
@@ -7726,6 +7838,29 @@ class BrowserTabViewModelTest {
         testee.openDuckAiChatById(chatUrl)
 
         assertCommandNotIssued<Command.OpenInNewTab>()
+    }
+
+    @Test
+    fun whenOpenDuckAiQueryThenFiresOnInputSubmittedOnBrowserInteractionsPlugins() = runTest {
+        val plugin: BrowserInteractionsPlugin = mock()
+        whenever(mockBrowserInteractionsPlugins.getPlugins()).thenReturn(listOf(plugin))
+        mockDuckAiFeatureStateFullScreenModeFlow.emit(false)
+
+        testee.openDuckAiQuery(query = "hello", autoPrompt = true)
+
+        verify(plugin).onInputSubmitted()
+    }
+
+    @Test
+    fun whenOpenDuckAiChatByIdThenFiresOnChatSelectedOnBrowserInteractionsPlugins() = runTest {
+        val plugin: BrowserInteractionsPlugin = mock()
+        whenever(mockBrowserInteractionsPlugins.getPlugins()).thenReturn(listOf(plugin))
+        mockDuckAiFeatureStateFullScreenModeFlow.emit(true)
+        setBrowserShowing(true)
+
+        testee.openDuckAiChatById("https://duck.ai/chat?chatId=abc")
+
+        verify(plugin).onChatSelected()
     }
 
     @Test

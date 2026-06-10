@@ -38,6 +38,12 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LifecycleRegistry
 import androidx.lifecycle.setViewTreeLifecycleOwner
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.duckduckgo.adblocking.api.duckplayer.DuckPlayer
+import com.duckduckgo.adblocking.api.duckplayer.DuckPlayer.DuckPlayerOrigin.SERP_AUTO
+import com.duckduckgo.adblocking.api.duckplayer.DuckPlayer.OpenDuckPlayerInNewTab
+import com.duckduckgo.adblocking.api.duckplayer.DuckPlayer.OpenDuckPlayerInNewTab.Off
+import com.duckduckgo.adblocking.api.duckplayer.DuckPlayer.OpenDuckPlayerInNewTab.On
+import com.duckduckgo.adblocking.api.duckplayer.DuckPlayer.OpenDuckPlayerInNewTab.Unavailable
 import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.anrs.api.CrashLogger
 import com.duckduckgo.anrs.api.CrashLogger.Crash
@@ -78,12 +84,6 @@ import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.contentscopescripts.api.contentscopeExperiments.ContentScopeExperiments
 import com.duckduckgo.cookies.api.CookieManagerProvider
 import com.duckduckgo.duckchat.api.DuckChat
-import com.duckduckgo.duckplayer.api.DuckPlayer
-import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerOrigin.SERP_AUTO
-import com.duckduckgo.duckplayer.api.DuckPlayer.OpenDuckPlayerInNewTab
-import com.duckduckgo.duckplayer.api.DuckPlayer.OpenDuckPlayerInNewTab.Off
-import com.duckduckgo.duckplayer.api.DuckPlayer.OpenDuckPlayerInNewTab.On
-import com.duckduckgo.duckplayer.api.DuckPlayer.OpenDuckPlayerInNewTab.Unavailable
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.privacy.config.api.AmpLinks
 import com.duckduckgo.subscriptions.api.Subscriptions

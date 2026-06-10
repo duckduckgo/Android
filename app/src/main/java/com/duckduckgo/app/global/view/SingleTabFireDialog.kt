@@ -305,6 +305,10 @@ class SingleTabFireDialog : BottomSheetDialogFragment(), FireDialog {
                 binding.deleteAllPrimaryButton.show()
                 binding.deleteAllSecondaryButton.gone()
             }
+            if (state.isInChatSelectionMode) {
+                binding.deleteAllPrimaryButton.text =
+                    requireContext().getString(R.string.singleTabFireDialogDeleteChats)
+            }
         } else {
             binding.deleteAllPrimaryButton.gone()
             binding.deleteAllSecondaryButton.gone()
