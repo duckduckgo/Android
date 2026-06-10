@@ -35,7 +35,6 @@ import com.duckduckgo.js.messaging.api.JsRequestResponse
 import com.duckduckgo.js.messaging.api.PostMessageWrapperPlugin
 import com.duckduckgo.js.messaging.api.SubscriptionEvent
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
-import com.duckduckgo.js.messaging.api.WebMessagingPlugin
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.Moshi
 import kotlinx.coroutines.runBlocking
@@ -54,7 +53,6 @@ class ContentScopeScriptsJsMessaging @Inject constructor(
     private val coreContentScopeScripts: CoreContentScopeScripts,
     private val webViewCompatContentScopeScripts: WebViewCompatContentScopeScripts,
     private val handlers: PluginPoint<ContentScopeJsMessageHandlersPlugin>,
-    @Named("contentScopeScripts") private val webMessagingPlugin: WebMessagingPlugin,
     private val postMessageWrapperPlugins: PluginPoint<PostMessageWrapperPlugin>,
 ) : JsMessaging {
     private val moshi = Moshi.Builder().add(JSONObjectAdapter()).build()
@@ -133,7 +131,6 @@ class ContentScopeScriptsJsMessaging @Inject constructor(
                     .getPlugins()
                     .firstOrNull { it.context == context }
                     ?.postMessage(subscriptionEventData, webView)
-                    ?: webMessagingPlugin.postMessage(webView, subscriptionEventData)
             }
             return
         }

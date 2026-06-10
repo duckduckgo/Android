@@ -29,7 +29,6 @@ import com.duckduckgo.js.messaging.api.JsMessageHandler
 import com.duckduckgo.js.messaging.api.JsMessageHelper
 import com.duckduckgo.js.messaging.api.JsMessaging
 import com.duckduckgo.js.messaging.api.PostMessageWrapperPlugin
-import com.duckduckgo.js.messaging.api.WebMessagingPlugin
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertFalse
 import kotlinx.coroutines.test.runTest
@@ -52,7 +51,6 @@ class ContentScopeScriptsJsMessagingTest {
     private val jsMessageHelper: JsMessageHelper = mock()
     private val coreContentScopeScripts: CoreContentScopeScripts = mock()
     private val webViewCompatContentScopeScripts: WebViewCompatContentScopeScripts = mock()
-    private val webMessagingPlugin: WebMessagingPlugin = mock()
     private val postMessageWrapperPlugins: PluginPoint<PostMessageWrapperPlugin> = mock()
     private val handlers: PluginPoint<ContentScopeJsMessageHandlersPlugin> = FakePluginPoint()
     private lateinit var contentScopeScriptsJsMessaging: ContentScopeScriptsJsMessaging
@@ -92,7 +90,6 @@ class ContentScopeScriptsJsMessagingTest {
                     coreContentScopeScripts,
                     webViewCompatContentScopeScripts,
                     handlers,
-                    webMessagingPlugin,
                     postMessageWrapperPlugins,
                 )
         }
@@ -278,7 +275,6 @@ class ContentScopeScriptsJsMessagingTest {
                     coreContentScopeScripts,
                     webViewCompatContentScopeScripts,
                     webEventsHandlers,
-                    webMessagingPlugin,
                     postMessageWrapperPlugins,
                 )
             messaging.register(mockWebView, webEventsCallback)
