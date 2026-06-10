@@ -905,19 +905,17 @@ open class BrowserActivity : DuckDuckGoActivity() {
                 val selectedText = intent.getBooleanExtra(SELECTED_TEXT_EXTRA, false)
                 val sourceTabId = intent.getStringExtra(SOURCE_TAB_ID_EXTRA) ?: if (selectedText) currentTab?.tabId else null
                 val skipHome = !selectedText && sourceTabId == null
-                val query = if (isExternal) {
-                    omnibarEntryConverter.convertQueryToUrl(
-                        searchQuery = sharedText,
-                        extractUrlFromQuery = true,
-                    )
-                } else {
-                    sharedText
-                }
                 if (swipingTabsFeature.isEnabled) {
+                    val query =
+                        if (isExternal) {
+                            omnibarEntryConverter.convertQueryToUrl(searchQuery = sharedText, extractUrlFromQuery = true)
+                        } else {
+                            sharedText
+                        }
                     launchNewTab(query = query, sourceTabId = sourceTabId, skipHome = skipHome, isExternal = isExternal)
                 } else {
                     lifecycleScope.launch {
-                        val tabId = viewModel.onOpenInNewTabRequested(sourceTabId = sourceTabId, query = query, skipHome = skipHome)
+                        val tabId = viewModel.onOpenInNewTabRequested(sourceTabId = sourceTabId, query = sharedText, skipHome = skipHome)
                         if (isExternal) {
                             externalLaunchTabIds.add(tabId)
                         }
