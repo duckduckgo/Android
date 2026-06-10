@@ -642,7 +642,7 @@ class InlinePdfHandlerTest {
         assertNull((second as PdfDownloadResult.Success).certificate)
     }
 
-    // region cacheLocalPdf / isCachedLocalPdf tests
+    // region cacheLocalPdf tests
 
     @Test
     fun whenCacheLocalPdfWithValidPdfThenReturnsSuccessWithFileUri() = runTest {
@@ -718,49 +718,6 @@ class InlinePdfHandlerTest {
         val result = handler.cacheLocalPdf(source)
 
         assertEquals(LocalPdfResult.Failure(PdfErrorType.SECURITY_ERROR), result)
-    }
-
-    @Test
-    fun whenIsCachedLocalPdfForFilePdfInsideCacheDirThenReturnsTrue() = runTest {
-        val pdfBytes = "%PDF-1.7\nsome content".toByteArray()
-        val source = Uri.parse("content://downloads/111")
-        val realContext = InstrumentationRegistry.getInstrumentation().targetContext
-        val mockContext: android.content.Context = mock()
-        val resolver: ContentResolver = mock()
-        whenever(mockContext.contentResolver).thenReturn(resolver)
-        whenever(mockContext.cacheDir).thenReturn(realContext.cacheDir)
-        whenever(resolver.openInputStream(source)).thenReturn(pdfBytes.inputStream())
-        whenever(resolver.query(eq(source), any(), anyOrNull(), anyOrNull(), anyOrNull())).thenReturn(null)
-        val handler = RealInlinePdfHandler(
-            context = mockContext,
-            okHttpClient = OkHttpClient(),
-            cookieManagerProvider = cookieManagerProvider,
-            dispatcherProvider = coroutineTestRule.testDispatcherProvider,
-            androidBrowserConfigFeature = androidBrowserConfigFeature,
-        )
-        val cacheResult = handler.cacheLocalPdf(source)
-        assertTrue(cacheResult is LocalPdfResult.Success)
-        val cachedUri = (cacheResult as LocalPdfResult.Success).uri.toString()
-
-        assertTrue(handler.isCachedLocalPdf(cachedUri))
-    }
-
-    @Test
-    fun whenIsCachedLocalPdfForFilePdfOutsideCacheDirThenReturnsFalse() {
-        val pdfBytes = "%PDF-1.7\nsome content".toByteArray()
-        val realContext = InstrumentationRegistry.getInstrumentation().targetContext
-        val externalFile = File(realContext.filesDir, "external.pdf")
-        externalFile.writeBytes(pdfBytes)
-        val externalUri = Uri.fromFile(externalFile).toString()
-
-        assertFalse(inlinePdfHandler.isCachedLocalPdf(externalUri))
-
-        externalFile.delete()
-    }
-
-    @Test
-    fun whenIsCachedLocalPdfForHttpsUrlThenReturnsFalse() {
-        assertFalse(inlinePdfHandler.isCachedLocalPdf("https://example.com/doc.pdf"))
     }
 
     @Test

@@ -41,7 +41,7 @@ interface TabManager {
 
     suspend fun onTabsChanged(updatedTabIds: List<TabModel>)
     suspend fun switchToTab(tabId: String)
-    suspend fun openNewTab(query: String? = null, sourceTabId: String? = null, skipHome: Boolean = false, skipUrlConversion: Boolean = false): String
+    suspend fun openNewTab(query: String? = null, sourceTabId: String? = null, skipHome: Boolean = false): String
     suspend fun getTabById(tabId: String): TabEntity?
 
     data class TabModel(
@@ -97,10 +97,9 @@ class DefaultTabManager @Inject constructor(
         query: String?,
         sourceTabId: String?,
         skipHome: Boolean,
-        skipUrlConversion: Boolean,
     ): String = withContext(dispatchers.io()) {
         val url = query?.let {
-            if (skipUrlConversion || skipUrlConversionOnNewTabFeature.self().isEnabled()) {
+            if (skipUrlConversionOnNewTabFeature.self().isEnabled()) {
                 query
             } else {
                 queryUrlConverter.convertQueryToUrl(query)

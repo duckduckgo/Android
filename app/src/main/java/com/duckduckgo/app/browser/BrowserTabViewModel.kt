@@ -599,7 +599,6 @@ class BrowserTabViewModel @Inject constructor(
     // if navigating from home, want to know if a site was loaded previously to decide whether to reset WebView
     private var returnedHomeAfterSiteLoaded = false
     var skipHome = false
-    internal var isExternalLaunch = false
     var hasCtaBeenShownForCurrentPage: AtomicBoolean = AtomicBoolean(false)
 
     @VisibleForTesting
@@ -952,7 +951,6 @@ class BrowserTabViewModel @Inject constructor(
     ) {
         this.tabId = tabId
         this.skipHome = skipHome
-        this.isExternalLaunch = isExternal
         siteLiveData = tabRepository.retrieveSiteData(tabId)
         site = siteLiveData.value
 
@@ -1394,11 +1392,6 @@ class BrowserTabViewModel @Inject constructor(
         navigationAwareLoginDetector.onEvent(NavigationEvent.UserAction.NewQuerySubmitted)
 
         if (query.isBlank()) {
-            return
-        }
-
-        if (inlinePdfHandler.isCachedLocalPdf(query)) {
-            renderCachedLocalPdf(query)
             return
         }
 
@@ -3972,27 +3965,6 @@ class BrowserTabViewModel @Inject constructor(
                 }
             }
         }
-    }
-
-    private fun renderCachedLocalPdf(cachedFileUriString: String) {
-        val cachedUri = cachedFileUriString.toUri()
-        val fileName = inlinePdfHandler.extractFileName(cachedFileUriString)
-        // Fire open pixels only on a genuine first/external open. isExternalLaunch is set to
-        // true in loadData() only when the fragment was created with LAUNCH_FROM_EXTERNAL_EXTRA=true
-        // (i.e. the tab was opened by an external app this session). On tab restore the flag is
-        // false, so pixels are correctly suppressed even though url == cachedFileUriString in
-        // both cases. The render (browserViewState + ShowPdfInTab) always runs so the PDF is
-        // re-displayed after process death or tab switch.
-        if (isExternalLaunch) {
-            pixel.fire(PdfPixelName.PDF_EXTERNAL_OPENED)
-            pixel.fire(PdfPixelName.PDF_EXTERNAL_OPENED_DAILY, type = Daily())
-            pixel.fire(PdfPixelName.PDF_EXTERNAL_OPENED_UNIQUE, type = Unique())
-        }
-        browserViewState.value = currentBrowserViewState().copy(
-            currentPdfCachedUri = cachedUri,
-            currentPdfFileName = fileName,
-        )
-        command.value = ShowPdfInTab(fileName, cachedUri)
     }
 
     fun pdfDownloadCommands(): Flow<DownloadCommand> = pdfDownloadCommandFlow.asSharedFlow()

@@ -401,16 +401,6 @@ class BrowserViewModelTest {
     }
 
     @Test
-    fun whenOpenInNewTabWithSkipUrlConversionParamTrueAndFeatureDisabledThenQueryNotConverted() = runTest {
-        val pdfQuery = "file:///x/pdf_cache/1-a.pdf"
-        configureSkipUrlConversionInNewTabState(enabled = false)
-        whenever(mockTabRepository.add(url = pdfQuery, skipHome = true)).thenReturn(TAB_ID)
-        testee.onOpenInNewTabRequested(query = pdfQuery, sourceTabId = null, skipHome = true, skipUrlConversion = true)
-        verify(mockOmnibarEntryConverter, never()).convertQueryToUrl(pdfQuery)
-        verify(mockTabRepository).add(url = pdfQuery, skipHome = true)
-    }
-
-    @Test
     fun whenOnTabSelectedCalledWithTabIdThenSelectTabWithTheSameId() = runTest {
         val tabId = "tabId"
 

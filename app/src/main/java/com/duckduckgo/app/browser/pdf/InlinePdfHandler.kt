@@ -104,21 +104,6 @@ interface InlinePdfHandler {
      * [downloadToCache]. No network, cookies, or SSL certificate handling.
      */
     suspend fun cacheLocalPdf(uri: Uri): LocalPdfResult
-
-    /**
-     * True when [query] is a file:// URI whose path lives inside our internal pdf_cache
-     * directory (i.e. produced by [cacheLocalPdf] or [downloadToCache]).
-     *
-     * This is a **pure path check — no I/O performed**. It does not verify that the file
-     * exists on disk or re-read its magic bytes. That is safe because:
-     * - Only our own code writes to pdf_cache, and both write paths validate %PDF- magic
-     *   bytes at write time before returning a success URI.
-     * - WebView file access is disabled, so web content cannot set a tab's initial URL to
-     *   a file:// path — only URLs our own flow produced can match.
-     * - If the file is missing or corrupt, the PDF viewer fragment surfaces the failure via
-     *   [onPdfRenderFailure], which is already wired to the render-failure pixel.
-     */
-    fun isCachedLocalPdf(query: String): Boolean
 }
 
 sealed class PdfRenderDecision {
@@ -172,11 +157,6 @@ class RealInlinePdfHandler @Inject constructor(
 
     private val cacheDir: File
         get() = File(context.cacheDir, PDF_CACHE_DIR).also { it.mkdirs() }
-
-    // Raw path without the mkdirs() side effect — used by read-only checks that must not
-    // create the directory.
-    private val cacheDirPath: File
-        get() = File(context.cacheDir, PDF_CACHE_DIR)
 
     override suspend fun downloadToCache(url: String, forceRefresh: Boolean): PdfDownloadResult = withContext(dispatcherProvider.io()) {
         val fileName = extractFileName(url)
@@ -404,15 +384,6 @@ class RealInlinePdfHandler @Inject constructor(
             targetFile.delete()
             LocalPdfResult.Failure(PdfErrorType.SECURITY_ERROR)
         }
-    }
-
-    override fun isCachedLocalPdf(query: String): Boolean {
-        val uri = query.toUri()
-        if (uri.scheme?.lowercase() != "file") return false
-        val path = uri.path ?: return false
-        val file = File(path)
-        // Pure path check — no I/O. See interface KDoc for the validity guarantee.
-        return file.parentFile?.absolutePath == cacheDirPath.absolutePath
     }
 
     private fun resolveDisplayName(uri: Uri): String {
