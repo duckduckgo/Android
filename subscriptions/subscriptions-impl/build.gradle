@@ -44,6 +44,7 @@ dependencies {
     implementation project(path: ':app-build-config-api')
     implementation project(path: ':navigation-api')
     implementation project(path: ':browser-api')
+    implementation project(path: ':feedback-api')
     implementation project(path: ':js-messaging-api')
     implementation project(path: ':user-agent-api')
     implementation project(path: ':subscriptions-api')

@@ -31,10 +31,10 @@ import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.autoconsent.api.AutoconsentNav
 import com.duckduckgo.brokensite.api.ReportFlow
-import com.duckduckgo.browser.api.ui.BrowserScreens.FeedbackActivityWithEmptyParams
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.feedback.api.FeedbackScreenNoParams
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.getActivityParams
 import com.duckduckgo.privacy.dashboard.api.ui.DashboardOpener
@@ -190,7 +190,7 @@ class PrivacyDashboardHybridActivity : DuckDuckGoActivity() {
     private fun processCommands(it: Command) {
         when (it) {
             is LaunchAppFeedback -> {
-                globalActivityStarter.startIntent(this, FeedbackActivityWithEmptyParams)?.let { startActivity(it) }
+                globalActivityStarter.startIntent(this, FeedbackScreenNoParams)?.let { startActivity(it) }
             }
             is FetchToggleData -> fetchToggleData(it.toggleData)
             is LaunchToggleReport -> {
