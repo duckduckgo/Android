@@ -24,6 +24,7 @@ import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.common.utils.extensions.registerNotExportedReceiver
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.voice.VoiceSessionStateManager
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
@@ -37,6 +38,7 @@ import javax.inject.Inject
 class DuckChatVoiceNotificationActionReceiver @Inject constructor(
     private val context: Context,
     private val voiceSessionStateManager: VoiceSessionStateManager,
+    private val duckChatPixels: DuckChatPixels,
 ) : BroadcastReceiver(), MainProcessLifecycleObserver {
 
     override fun onCreate(owner: LifecycleOwner) {
@@ -56,6 +58,7 @@ class DuckChatVoiceNotificationActionReceiver @Inject constructor(
         if (intent.action != INTENT_VOICE_NOTIFICATION_ACTION) return
         val tabId = intent.getStringExtra(EXTRA_TAB_ID)?.takeIf { it.isNotBlank() } ?: return
 
+        duckChatPixels.reportVoiceNotificationEndSessionTapped()
         voiceSessionStateManager.triggerVoiceSessionEnd(tabId)
     }
 

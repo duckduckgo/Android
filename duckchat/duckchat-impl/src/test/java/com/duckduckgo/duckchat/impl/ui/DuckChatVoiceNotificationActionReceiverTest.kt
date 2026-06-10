@@ -20,12 +20,14 @@ import android.content.Context
 import android.content.Intent
 import androidx.lifecycle.LifecycleOwner
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.ui.DuckChatVoiceNotificationActionReceiver.Companion.endSessionIntent
 import com.duckduckgo.duckchat.impl.voice.VoiceSessionStateManager
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
@@ -36,21 +38,23 @@ class DuckChatVoiceNotificationActionReceiverTest {
 
     private val context: Context = mock()
     private val voiceSessionStateManager: VoiceSessionStateManager = mock()
+    private val duckChatPixels: DuckChatPixels = mock()
     private val lifecycleOwner: LifecycleOwner = mock()
 
     private lateinit var receiver: DuckChatVoiceNotificationActionReceiver
 
     @Before
     fun setUp() {
-        receiver = DuckChatVoiceNotificationActionReceiver(context, voiceSessionStateManager)
+        receiver = DuckChatVoiceNotificationActionReceiver(context, voiceSessionStateManager, duckChatPixels)
     }
 
     @Test
-    fun whenOnReceiveWithValidIntentThenTriggersVoiceSessionEnd() {
+    fun whenOnReceiveWithEndSessionIntentThenFiresPixelAndTriggersVoiceSessionEnd() {
         val intent = endSessionIntent(context, TAB_ID)
 
         receiver.onReceive(context, intent)
 
+        verify(duckChatPixels).reportVoiceNotificationEndSessionTapped()
         verify(voiceSessionStateManager).triggerVoiceSessionEnd(TAB_ID)
     }
 
@@ -63,6 +67,7 @@ class DuckChatVoiceNotificationActionReceiverTest {
         receiver.onReceive(context, intent)
 
         verifyNoInteractions(voiceSessionStateManager)
+        verifyNoInteractions(duckChatPixels)
     }
 
     @Test
@@ -72,7 +77,8 @@ class DuckChatVoiceNotificationActionReceiverTest {
 
         receiver.onReceive(context, intent)
 
-        verify(voiceSessionStateManager, never()).triggerVoiceSessionEnd(org.mockito.kotlin.any())
+        verify(voiceSessionStateManager, never()).triggerVoiceSessionEnd(any())
+        verifyNoInteractions(duckChatPixels)
     }
 
     @Test
@@ -81,7 +87,8 @@ class DuckChatVoiceNotificationActionReceiverTest {
 
         receiver.onReceive(context, intent)
 
-        verify(voiceSessionStateManager, never()).triggerVoiceSessionEnd(org.mockito.kotlin.any())
+        verify(voiceSessionStateManager, never()).triggerVoiceSessionEnd(any())
+        verifyNoInteractions(duckChatPixels)
     }
 
     @Test
@@ -90,7 +97,8 @@ class DuckChatVoiceNotificationActionReceiverTest {
 
         receiver.onReceive(context, intent)
 
-        verify(voiceSessionStateManager, never()).triggerVoiceSessionEnd(org.mockito.kotlin.any())
+        verify(voiceSessionStateManager, never()).triggerVoiceSessionEnd(any())
+        verifyNoInteractions(duckChatPixels)
     }
 
     @Test

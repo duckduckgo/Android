@@ -33,6 +33,7 @@ import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.ServiceScope
 import com.duckduckgo.duckchat.impl.R
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import dagger.android.AndroidInjection
 import javax.inject.Inject
 
@@ -49,12 +50,21 @@ class DuckChatVoiceMicrophoneService : Service() {
     @Inject
     lateinit var browserNav: BrowserNav
 
+    @Inject
+    lateinit var duckChatPixels: DuckChatPixels
+
     override fun onBind(intent: Intent?): IBinder? = null
 
     override fun onCreate() {
         super.onCreate()
         AndroidInjection.inject(this)
         createNotificationChannel()
+        duckChatPixels.reportVoiceServiceStarted()
+    }
+
+    override fun onDestroy() {
+        duckChatPixels.reportVoiceServiceKilled()
+        super.onDestroy()
     }
 
     override fun onStartCommand(
