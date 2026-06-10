@@ -82,6 +82,6 @@ class AdBlockingTelemetryPixelInterceptor @Inject constructor(
     override fun getInterceptor(): Interceptor = this
 
     companion object {
-        const val YOUTUBE_TELEMETRY_PIXEL_PREFIX = "webTelemetry_youTube"
+        const val YOUTUBE_TELEMETRY_PIXEL_PREFIX = "webTelemetry_youtube"
     }
 }
