@@ -1228,6 +1228,9 @@ class NativeInputModeWidget @JvmOverloads constructor(
     }
 
     override fun stop() {
+        // Single chokepoint for every stop affordance (the streaming-plugin button routes here via
+        // host.stop(), and the input-screen stop button calls stop() too), so the pixel fires once.
+        viewModel.fireStopGenerationTapped()
         onStopTapped?.invoke()
     }
 
@@ -1271,10 +1274,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
                 layoutResId = R.layout.view_native_input_screen_buttons,
             ).apply {
                 onSendClick = { submitMessage() }
-                onStopClick = {
-                    viewModel.fireStopGenerationTapped()
-                    this@NativeInputModeWidget.onStopTapped?.invoke()
-                }
+                onStopClick = { this@NativeInputModeWidget.stop() }
                 onVoiceChatClick = voiceChatClickWithPixel
                 setSendButtonVisible(false)
                 setNewLineButtonVisible(false)
