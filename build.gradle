@@ -89,7 +89,7 @@ subprojects {
         apply plugin: 'org.jetbrains.dokka'
     }
 
-    String[] allowAndroidTestsIn = ["app", "sync-lib", "httpsupgrade-impl", "pir-impl", "feature-toggles-impl"]
+    String[] allowAndroidTestsIn = ["app", "browser-impl", "sync-lib", "httpsupgrade-impl", "pir-impl", "feature-toggles-impl"]
     if (!allowAndroidTestsIn.contains(project.name)) {
         project.projectDir.eachFile(groovy.io.FileType.DIRECTORIES) { File parent ->
             if (parent.name == "src") {
@@ -102,7 +102,7 @@ subprojects {
         }
     }
 
-    String[] allowStringsIn = ["app"]
+    String[] allowStringsIn = ["app", "browser-impl"]
     if (!allowStringsIn.contains(project.name)) {
         project.projectDir.eachDirRecurse { File parent ->
             if (parent.name == "values") {
@@ -160,6 +160,10 @@ subprojects {
                         }
                         // internal modules can depend on impl
                         if (projectPath.endsWith('internal') && dependencyPath.endsWith('impl')) continue
+                        // :browser-impl is allowed to depend on other -impl modules during the
+                        // :app → :browser-impl migration. Long-term it should only depend on
+                        // -api modules; tracked as a follow-up to the modularization refactor.
+                        if (projectPath == ':browser-impl' && dependencyPath.endsWith('impl')) continue
                         if (!projectPath.endsWith(":app") && dependencyPath.endsWith("impl")) {
                             throw new GradleException("Invalid dependency $projectPath -> $dependencyPath. " +
                                     "Only :app module can depend on 'impl' modules")
@@ -190,6 +194,11 @@ subprojects {
                             }
                         }
                         if (dependencyPath.endsWith(":app")) {
+                            // Hurdle #6 workaround: :browser-impl's androidTests need
+                            // DuckDuckGoApplication (which lives in :app) and the test
+                            // helper getDaggerComponent(). Tracked as a follow-up:
+                            // refactor AtbIntegrationTest to remove this coupling.
+                            if (projectPath == ':browser-impl' && name.toLowerCase().contains("androidtest")) continue
                             throw new GradleException("Invalid dependency $projectPath -> $dependencyPath. " +
                                     "No other module can depend on ':app'")
                         }

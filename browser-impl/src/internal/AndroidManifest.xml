@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <application>
+        <activity
+            android:name="com.duckduckgo.app.browser.webview.WebViewDevSettingsActivity"
+            android:exported="true"
+            android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity"
+            android:label="@string/webview_dev_settings_label"
+            />
+        <activity
+            android:name="com.duckduckgo.app.dev.settings.DevSettingsActivity"
+            android:label="@string/devSettingsTitle"
+            android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity" />
+        <activity
+            android:name="com.duckduckgo.app.dev.settings.notifications.NotificationsActivity"
+            android:label="@string/devSettingsScreenNotificationsTitle"
+            android:parentActivityName="com.duckduckgo.app.dev.settings.DevSettingsActivity" />
+        <activity
+            android:name="com.duckduckgo.app.audit.AuditSettingsActivity"
+            android:label="@string/auditSettingsTitle"
+            android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity" />
+        <activity
+            android:name="com.duckduckgo.app.dev.settings.customtabs.CustomTabsInternalSettingsActivity"
+            android:label="@string/customTabsTitle"
+            android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity" />
+        <activity
+            android:name="com.duckduckgo.app.dev.settings.tabs.DevTabsActivity"
+            android:label="@string/devSettingsScreenTabs"
+            android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity" />
+        <activity
+            android:name="com.duckduckgo.app.dev.settings.onboarding.OnboardingDevSettingsActivity"
+            android:label="@string/onboardingDevSettingsTitle"
+            android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity" />
+    </application>
+
+</manifest>

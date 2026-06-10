@@ -24,6 +24,7 @@ import com.duckduckgo.widget.FavoritesWidgetItemFactory
 import com.duckduckgo.widget.SearchAndFavoritesWidget
 import com.duckduckgo.widget.SearchOnlyWidget
 import com.duckduckgo.widget.SearchWidget
+import com.duckduckgo.widget.WidgetInjector
 import dev.zacsweers.metro.DependencyGraph
 import dev.zacsweers.metro.Provides
 import dev.zacsweers.metro.SingleIn
@@ -33,7 +34,7 @@ import javax.inject.Named
 
 @SingleIn(AppScope::class)
 @DependencyGraph(scope = AppScope::class)
-interface AppComponent {
+interface AppComponent : WidgetInjector {
 
     fun inject(instance: DuckDuckGoApplication)
 
@@ -45,15 +46,15 @@ interface AppComponent {
         ): AppComponent
     }
 
-    fun inject(searchWidget: SearchWidget)
+    override fun inject(searchWidget: SearchWidget)
 
-    fun inject(searchOnlyWidget: SearchOnlyWidget)
+    override fun inject(searchOnlyWidget: SearchOnlyWidget)
 
-    fun inject(searchAndFavoritesWidget: SearchAndFavoritesWidget)
+    override fun inject(searchAndFavoritesWidget: SearchAndFavoritesWidget)
 
-    fun inject(favoritesWidgetItemFactory: FavoritesWidgetItemFactory)
+    override fun inject(favoritesWidgetItemFactory: FavoritesWidgetItemFactory)
 
-    fun inject(emptyFavoritesWidgetItemFactory: EmptyFavoritesWidgetItemFactory)
+    override fun inject(emptyFavoritesWidgetItemFactory: EmptyFavoritesWidgetItemFactory)
 
     // accessor to Retrofit instance for test only
     @Named("api")

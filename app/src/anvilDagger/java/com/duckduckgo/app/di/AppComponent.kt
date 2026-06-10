@@ -32,6 +32,7 @@ import com.duckduckgo.widget.FavoritesWidgetItemFactory
 import com.duckduckgo.widget.SearchAndFavoritesWidget
 import com.duckduckgo.widget.SearchOnlyWidget
 import com.duckduckgo.widget.SearchWidget
+import com.duckduckgo.widget.WidgetInjector
 import com.squareup.anvil.annotations.MergeComponent
 import dagger.BindsInstance
 import dagger.Component
@@ -70,7 +71,7 @@ import javax.inject.Named
         EmailModule::class,
     ],
 )
-interface AppComponent : AndroidInjector<DuckDuckGoApplication> {
+interface AppComponent : AndroidInjector<DuckDuckGoApplication>, WidgetInjector {
 
     @Component.Factory
     interface Factory {
@@ -80,15 +81,15 @@ interface AppComponent : AndroidInjector<DuckDuckGoApplication> {
         ): AppComponent
     }
 
-    fun inject(searchWidget: SearchWidget)
+    override fun inject(searchWidget: SearchWidget)
 
-    fun inject(searchOnlyWidget: SearchOnlyWidget)
+    override fun inject(searchOnlyWidget: SearchOnlyWidget)
 
-    fun inject(searchAndFavoritesWidget: SearchAndFavoritesWidget)
+    override fun inject(searchAndFavoritesWidget: SearchAndFavoritesWidget)
 
-    fun inject(favoritesWidgetItemFactory: FavoritesWidgetItemFactory)
+    override fun inject(favoritesWidgetItemFactory: FavoritesWidgetItemFactory)
 
-    fun inject(emptyFavoritesWidgetItemFactory: EmptyFavoritesWidgetItemFactory)
+    override fun inject(emptyFavoritesWidgetItemFactory: EmptyFavoritesWidgetItemFactory)
 
     // accessor to Retrofit instance for test only only for test
     @Named("api")

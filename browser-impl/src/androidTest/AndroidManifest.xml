@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <!--
+        Hurdle #6 workaround: instrumentation tests in :browser-impl expect the
+        real DuckDuckGoApplication (which now lives in :app) at runtime so they
+        can reach the merged Dagger graph via getDaggerComponent(). Without this
+        override the test APK would otherwise default to android.app.Application.
+        Paired with `androidTestImplementation project(':app')` in build.gradle.
+    -->
+    <application
+        android:name="com.duckduckgo.app.global.DuckDuckGoApplication"
+        tools:replace="android:name" />
+
+</manifest>

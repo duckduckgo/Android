@@ -10,8 +10,6 @@ plugins {
     id 'kotlin-kapt'
     id 'com.google.devtools.ksp'
     id 'com.squareup.anvil'
-    id 'androidx.room'
-    id 'org.jetbrains.kotlin.plugin.compose'
 }
 apply from: '../versioning.gradle'
 apply from: "$rootDir/code-formatting.gradle"
@@ -33,21 +31,8 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         archivesBaseName = "duckduckgo-$versionName"
         vectorDrawables.useSupportLibrary = true
-        sourceSets {
-            androidTest.assets.srcDirs += files("$projectDir/schemas")
-            main {
-                java {
-                    resources {
-                        srcDirs += files("$projectDir/../node_modules/@duckduckgo/autofill/dist/".toString())
-                        srcDirs += files("$projectDir/../submodules/".toString())
-                    }
-                }
-                assets {
-                    srcDirs += files("$projectDir/../node_modules/@duckduckgo/privacy-dashboard/build/app".toString())
-                    srcDirs += files("$projectDir/../node_modules/@duckduckgo/content-scope-scripts/build/android/pages".toString())
-                }
-            }
-        }
+        // sourceSets for autofill/privacy-dashboard/content-scope-scripts/submodules/schemas
+        // are owned by :browser-impl now (that module hosts the consuming code).
 
         buildConfigField "String", "DI_FRAMEWORK", "\"${findProperty('ddg.di') ?: 'AnvilDagger'}\""
 
@@ -75,7 +60,6 @@ android {
         namespace 'com.duckduckgo.app.browser'
     }
     buildFeatures {
-        viewBinding = true
         buildConfig = true
     }
     compileOptions {
@@ -200,13 +184,8 @@ android {
         }
     }
 
-    buildFeatures {
-        compose true
-    }
-
-    room {
-        schemaDirectory("$projectDir/schemas")
-    }
+    // Room schemas and the androidx.room plugin live in :browser-impl (that module owns
+    // @Database). :app's DatabaseModule only uses the room-runtime API.
 
     // Conditional source set: swap DI graph creation based on ddg.di property
     def diFramework = findProperty('ddg.di') ?: 'AnvilDagger'
@@ -289,6 +268,12 @@ fladle {
 
 dependencies {
     ksp project(':anvil-ksp')
+
+    // The new :app is intentionally thin (Application class + DI graph wiring only).
+    // Everything else lives in :browser-impl. All other -impl modules below remain
+    // listed here so they enter the merged Dagger graph during Anvil/Dagger codegen.
+    implementation project(':browser-impl')
+
 	implementation project(":duckchat-api")
 	implementation project(":duckchat-impl")
 	implementation project(":duckchat-store")
@@ -326,7 +311,6 @@ dependencies {
     implementation project(':autofill-api')
     implementation project(':autofill-impl')
     internalImplementation project(':autofill-internal')
-    testImplementation project(':autofill-test')
 
     implementation project(':anvil-annotations')
 
@@ -350,7 +334,6 @@ dependencies {
 
     implementation project(':feature-toggles-api')
     implementation project(':feature-toggles-internal-api')
-    testImplementation project(':feature-toggles-test')
     implementation project(':feature-toggles-impl')
     internalImplementation project(":feature-toggles-internal")
     implementation project(':privacy-config-api')
@@ -514,149 +497,67 @@ dependencies {
     implementation project(':serp-logos-api')
     implementation project(':serp-logos-impl')
 
-    // Widgets
-    implementation "androidx.core:core-remoteviews:1.1.0"
-
-    // Deprecated. TODO: Stop using this artifact.
-    implementation "androidx.legacy:legacy-support-v4:_"
+    // :app keeps only what Application, AppComponent and the kept DI modules need at
+    // compile time. UI / feature / test libraries live in :browser-impl now.
     debugImplementation Square.leakCanary.android
-
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
     implementation KotlinX.coroutines.core
     implementation KotlinX.coroutines.android
-    androidTestImplementation(KotlinX.coroutines.test) {
-        // https://github.com/Kotlin/kotlinx.coroutines/issues/2023
-        // conflicts with mockito due to direct inclusion of byte buddy
-        exclude group: "org.jetbrains.kotlinx", module: "kotlinx-coroutines-debug"
-    }
 
     implementation AndroidX.appCompat
-    implementation AndroidX.activity.compose
-    implementation Google.android.material
-    implementation AndroidX.constraintLayout
-    implementation AndroidX.recyclerView
-    implementation AndroidX.swipeRefreshLayout
-    implementation AndroidX.webkit
+    implementation AndroidX.core.ktx
+    implementation AndroidX.lifecycle.runtime.ktx
+    implementation AndroidX.lifecycle.process
+    implementation AndroidX.lifecycle.commonJava8
+
+    // LocalBroadcastManager (used by ApplicationModule). Comes from legacy-support-v4
+    // historically; keep this artifact so the import resolves.
+    implementation "androidx.legacy:legacy-support-v4:_"
+
+    // Network stack used by NetworkModule
     implementation Square.okHttp3.okHttp
     implementation "com.squareup.okhttp3:okhttp-tls:_"
     implementation Square.retrofit2.retrofit
     implementation Square.retrofit2.converter.moshi
-    implementation "com.squareup.moshi:moshi-kotlin:_"
     implementation Square.retrofit2.adapter.rxJava2
     implementation Square.retrofit2.converter.scalars
-    implementation "com.jakewharton.retrofit:retrofit2-kotlin-coroutines-adapter:_"
+    implementation "com.squareup.moshi:moshi-kotlin:_"
     implementation "io.reactivex.rxjava2:rxjava:_"
-    implementation "io.reactivex.rxjava2:rxandroid:_"
     implementation "com.squareup.logcat:logcat:_"
-    implementation 'nl.dionsegijn:konfetti:1.2.5'
-    implementation("io.github.pcmind:leveldb:_") {
-        exclude group: 'com.google.guava', module: 'guava'
-    }
 
-    // Required by LevelDB
-    implementation("org.iq80.snappy:snappy:_")
-    implementation("com.google.guava:guava:_")
-
-    // RxRelay
-    implementation "com.jakewharton.rxrelay2:rxrelay:_"
-
-    implementation "com.duckduckgo.urlpredictor:url-predictor-android:_"
-
-    // Android KTX
-    implementation AndroidX.core.ktx
-    implementation AndroidX.core.splashscreen
-    implementation AndroidX.fragment.ktx
-
-    // ViewModel and LiveData
-    implementation AndroidX.lifecycle.runtime.ktx
-    implementation AndroidX.lifecycle.viewModelKtx
-    implementation AndroidX.lifecycle.liveDataKtx
-    implementation AndroidX.lifecycle.process
-
-    implementation AndroidX.lifecycle.commonJava8
-    testImplementation AndroidX.archCore.testing
-    androidTestImplementation AndroidX.archCore.testing
-
-    // Room
+    // Room runtime (no Room compiler / schemas — those live in :browser-impl)
     implementation AndroidX.room.runtime
-    implementation AndroidX.room.rxJava2
-    ksp AndroidX.room.compiler
-    testImplementation AndroidX.room.testing
-    androidTestImplementation AndroidX.room.testing
 
-    // WorkManager
+    // WorkManager (DaggerWorkerFactory + multi-process workers)
     implementation AndroidX.work.runtimeKtx
     implementation "androidx.work:work-multiprocess:_"
-    androidTestImplementation AndroidX.work.testing
-    testImplementation AndroidX.work.testing
-    implementation AndroidX.work.rxJava2
 
-    // Dagger
+    // Dagger codegen for AppComponent
     kapt Google.dagger.compiler
     implementation Google.dagger
 
-    // Glide
-    implementation "com.github.bumptech.glide:glide:_"
-    implementation "com.github.bumptech.glide:okhttp3-integration:_"
-    ksp "com.github.bumptech.glide:ksp:_"
-
-    // Lottie
-    implementation "com.airbnb.android:lottie:_"
-
-    // Security crypto
+    // Needed on the compile classpath so Dagger codegen in :app can resolve binding types
+    // declared in -impl modules. Those modules use `implementation` for these libs, so they
+    // are not exposed transitively. A cleaner long-term fix is to switch those impl modules
+    // to use `api` for types that appear in their public bindings.
+    implementation AndroidX.webkit
+    implementation Google.android.material
+    implementation AndroidX.constraintLayout
+    implementation AndroidX.recyclerView
+    implementation AndroidX.fragment.ktx
+    implementation AndroidX.lifecycle.viewModelKtx
+    implementation AndroidX.lifecycle.liveDataKtx
     implementation AndroidX.security.crypto
-
-    // Play Store referrer library
-    playImplementation("com.android.installreferrer:installreferrer:_")
-
-    // HTML
-    implementation 'org.jsoup:jsoup:_'
-
-    // Browser
     implementation "androidx.browser:browser:_"
-
-    // PDF Viewer
-    implementation "androidx.pdf:pdf-viewer-fragment:_"
-
-    // Testing dependencies
-    androidTestUtil AndroidX.test.orchestrator
-    androidTestImplementation AndroidX.archCore.testing
-    androidTestImplementation AndroidX.test.runner
-    androidTestImplementation AndroidX.test.rules
-    androidTestImplementation "org.mockito:mockito-android:_"
-    androidTestImplementation "org.mockito.kotlin:mockito-kotlin:_"
-    androidTestImplementation Square.okHttp3.mockWebServer
-    testImplementation Square.okHttp3.mockWebServer
-    androidTestImplementation CashApp.turbine
-    androidTestUtil AndroidX.test.orchestrator
-    androidTestImplementation AndroidX.test.ext.junit
-    androidTestImplementation "androidx.test.ext:junit-ktx:_"
-    androidTestImplementation "androidx.test.espresso:espresso-core:_"
-    androidTestImplementation "androidx.test.espresso:espresso-web:_"
-
-    testImplementation project(':vpn-api-test')
-    testImplementation "org.mockito.kotlin:mockito-kotlin:_"
-    testImplementation 'org.junit.vintage:junit-vintage-engine:_'
-    testImplementation Testing.junit4
-    testImplementation AndroidX.archCore.testing
-    testImplementation AndroidX.core
-    testImplementation AndroidX.test.ext.junit
-    testImplementation Testing.robolectric
-    testImplementation CashApp.turbine
-    testImplementation "androidx.test:runner:_"
-    testImplementation (KotlinX.coroutines.test) {
-        // https://github.com/Kotlin/kotlinx.coroutines/issues/2023
-        // conflicts with mockito due to direct inclusion of byte buddy
-        exclude group: "org.jetbrains.kotlinx", module: "kotlinx-coroutines-debug"
+    implementation "com.github.bumptech.glide:glide:_"
+    implementation("io.github.pcmind:leveldb:_") {
+        exclude group: 'com.google.guava', module: 'guava'
     }
+    implementation("org.iq80.snappy:snappy:_")
+    implementation("com.google.guava:guava:_")
 
-    androidTestImplementation project(':common-test')
-    testImplementation project(':common-test')
-    testImplementation project(':feature-toggles-test')
-    androidTestImplementation project(':feature-toggles-test')
     lintChecks project(":lint-rules")
-
     coreLibraryDesugaring Android.tools.desugarJdkLibs
 }
 

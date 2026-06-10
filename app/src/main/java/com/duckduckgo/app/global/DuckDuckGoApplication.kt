@@ -29,6 +29,12 @@ import com.duckduckgo.app.lifecycle.VpnProcessLifecycleObserver
 import com.duckduckgo.app.referral.AppInstallationReferrerStateListener
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.plugins.PluginPoint
+import com.duckduckgo.widget.EmptyFavoritesWidgetItemFactory
+import com.duckduckgo.widget.FavoritesWidgetItemFactory
+import com.duckduckgo.widget.SearchAndFavoritesWidget
+import com.duckduckgo.widget.SearchOnlyWidget
+import com.duckduckgo.widget.SearchWidget
+import com.duckduckgo.widget.WidgetInjector
 import dagger.android.AndroidInjector
 import dagger.android.HasDaggerInjector
 import dagger.android.getFactory
@@ -48,7 +54,16 @@ private const val VPN_PROCESS_NAME = "vpn"
 private const val PIR_PROCESS_NAME = "pir"
 
 @HasMemberInjections
-open class DuckDuckGoApplication : HasDaggerInjector, MultiProcessApplication() {
+open class DuckDuckGoApplication : HasDaggerInjector, WidgetInjector, MultiProcessApplication() {
+
+    // WidgetInjector implementation: delegate inject calls to the merged Dagger graph.
+    // This lets widget classes in :browser-impl access the app's DI graph without
+    // depending on :app (which would create a cycle).
+    override fun inject(searchWidget: SearchWidget) = daggerAppComponent.inject(searchWidget)
+    override fun inject(searchOnlyWidget: SearchOnlyWidget) = daggerAppComponent.inject(searchOnlyWidget)
+    override fun inject(searchAndFavoritesWidget: SearchAndFavoritesWidget) = daggerAppComponent.inject(searchAndFavoritesWidget)
+    override fun inject(favoritesWidgetItemFactory: FavoritesWidgetItemFactory) = daggerAppComponent.inject(favoritesWidgetItemFactory)
+    override fun inject(emptyFavoritesWidgetItemFactory: EmptyFavoritesWidgetItemFactory) = daggerAppComponent.inject(emptyFavoritesWidgetItemFactory)
 
     @Inject
     lateinit var uncaughtExceptionHandler: Thread.UncaughtExceptionHandler
