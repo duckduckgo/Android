@@ -337,6 +337,26 @@
             android:windowSoftInputMode="adjustResize|stateHidden" />
 
         <activity
+            android:name="com.duckduckgo.app.browser.pdf.PdfViewerActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize|smallestScreenSize|screenLayout|navigation|keyboard"
+            android:exported="true"
+            android:label="@string/appName">
+
+            <!-- Lets the app appear in the system "Open with" picker for local PDF files.
+                 Web (http/https) PDFs are handled by the browser's inline viewer, so they are
+                 intentionally not claimed here. -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data android:scheme="content" android:mimeType="application/pdf" />
+                <data android:scheme="file" android:mimeType="application/pdf" />
+            </intent-filter>
+        </activity>
+
+        <activity
             android:name="com.duckduckgo.app.SelectedTextSearchActivity"
             android:exported="true"
             android:launchMode="singleTask"

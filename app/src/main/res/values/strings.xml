@@ -1017,6 +1017,11 @@
     <!-- PDF download tooltip -->
     <string name="pdfDownloadTooltipText">Download PDF</string>
 
+    <!-- PDF viewer error shown when a PDF opened from another app cannot be displayed -->
+    <string name="pdfViewerExternalLoadError">Couldn\'t open this PDF</string>
+    <!-- PDF viewer error shown when no other app is available to open a PDF -->
+    <string name="pdfViewerExternalNoAppError">No app found to open this PDF</string>
+
     <!-- Sharing options -->
     <string name="copyLinkText">Copy Link Text</string>
     <string name="linkTextCopied">Link text copied</string>
