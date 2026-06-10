@@ -11448,28 +11448,6 @@
 
     <issue
         id="ClickableViewAccessibility"
-        message="Custom view ``DaxTextInput`` has `setOnTouchListener` called on it but does not override `performClick`"
-        errorLine1="                brokenSiteInput.setOnTouchListener(LayoutScrollingTouchListener(rootScrollView, brokenSiteInput.y.toInt()))"
-        errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/com/duckduckgo/app/feedback/ui/negative/brokensite/BrokenSiteNegativeFeedbackFragment.kt"
-            line="63"
-            column="17"/>
-    </issue>
-
-    <issue
-        id="ClickableViewAccessibility"
-        message="Custom view ``DaxTextInput`` has `setOnTouchListener` called on it but does not override `performClick`"
-        errorLine1="                openEndedFeedback.setOnTouchListener(LayoutScrollingTouchListener(rootScrollView, openEndedFeedback.y.toInt()))"
-        errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/com/duckduckgo/app/feedback/ui/negative/brokensite/BrokenSiteNegativeFeedbackFragment.kt"
-            line="64"
-            column="17"/>
-    </issue>
-
-    <issue
-        id="ClickableViewAccessibility"
         message="Custom view ``DuckDuckGoWebView`` has `setOnTouchListener` called on it but does not override `performClick`"
         errorLine1="            it.setOnTouchListener { webView, event ->"
         errorLine2="            ^">
@@ -11488,17 +11466,6 @@
             file="src/main/java/com/duckduckgo/app/browser/BrowserTabFragment.kt"
             line="3813"
             column="35"/>
-    </issue>
-
-    <issue
-        id="ClickableViewAccessibility"
-        message="Custom view ``DaxTextInput`` has `setOnTouchListener` called on it but does not override `performClick`"
-        errorLine1="                binding.openEndedFeedback.setOnTouchListener(LayoutScrollingTouchListener(rootScrollView, openEndedFeedback.y.toInt()))"
-        errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/com/duckduckgo/app/feedback/ui/negative/openended/ShareOpenEndedFeedbackFragment.kt"
-            line="130"
-            column="17"/>
     </issue>
 
     <issue

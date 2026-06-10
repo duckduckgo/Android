@@ -414,76 +414,13 @@
     <string name="systemTextSearchMessage">Keresés a DuckDuckGo alkalmazásban</string>
 
     <!-- App feedback disambiguation -->
-    <string name="feedbackActivityTitle">Visszajelzés megosztása</string>
-    <string name="missingBrowserFeaturesTitleLong">Hiányzó vagy zavaró böngészőfunkciók</string>
-    <string name="missingBrowserFeaturesTitleShort">Böngésző funkció-problémái</string>
-    <string name="missingBrowserFeaturesSubtitle">Melyik böngészési funkciót vezessük be, vagy melyik meglévőt javítsuk?</string>
-    <string name="missingBrowserFeatureSubReasonNavigation">Navigálás előre, hátra, és/vagy frissítés</string>
-    <string name="missingBrowserFeatureSubReasonTabManagement">Lapok létrehozása és kezelése</string>
-    <string name="missingBrowserFeatureSubReasonAdPopups">Hirdetések és felugró ablakok letiltása</string>
-    <string name="missingBrowserFeatureSubReasonVideos">Videók megtekintése</string>
-    <string name="missingBrowserFeatureSubReasonImages">Képek más programokkal történő egyidejű kezelése</string>
-    <string name="missingBrowserFeatureSubReasonBookmarks">Könyvjelzők létrehozása és kezelése</string>
-    <string name="missingBrowserFeatureSubReasonOther">Ezek közül egyik sem</string>
 
-    <string name="websiteNotLoadingTitleLong">Weboldal betöltésével kapcsolatos problémák</string>
-    <string name="websiteNotLoadingTitleShort">Weboldal betöltésével kapcsolatos problémák</string>
-    <string name="websiteNotLoadingSubtitle">Melyik weboldal nem működik?</string>
 
-    <string name="searchNotGoodEnoughTitleLong">A DuckDuckGo keresés nem elég jó</string>
-    <string name="searchNotGoodEnoughTitleShort">DuckDuckGo keresési problémák</string>
-    <string name="searchNotGoodEnoughSubtitle">Melyik keresési funkciót vezessük be vagy javítsuk?</string>
-    <string name="searchNotGoodEnoughSubReasonTechnicalSearches">Programozás/műszaki keresés</string>
-    <string name="searchNotGoodEnoughSubReasonGoogleLayout">Az elrendezés hasonlítson jobban a Google elrendezéséhez</string>
-    <string name="searchNotGoodEnoughSubReasonFasterLoadTimes">Gyorsabb betöltési idő</string>
-    <string name="searchNotGoodEnoughSubReasonSpecificLanguage">Keresés egy adott nyelven vagy régióban</string>
-    <string name="searchNotGoodEnoughSubReasonBetterAutocomplete">Jobb automatikus kiegészítés</string>
-    <string name="searchNotGoodEnoughSubReasonOther">Ezek közül egyik sem</string>
 
-    <string name="needMoreCustomizationTitleLong">Az alkalmazás testreszabására nincs elegendő lehetőség</string>
-    <string name="needMoreCustomizationTitleShort">Testreszabási problémák</string>
-    <string name="needMoreCustomizationSubtitle">Melyik testreszabási lehetőséget vezessük be, vagy a meglévők közül melyiken javítsunk?</string>
-    <string name="needMoreCustomizationSubReasonHomeScreenConfiguration">A kezdőképernyő kialakítása</string>
-    <string name="needMoreCustomizationSubReasonTabDisplay">A lapok elrendezésének módja</string>
-    <string name="needMoreCustomizationSubReasonAppLooks">Az alkalmazás kinézete</string>
-    <string name="needMoreCustomizationSubReasonWhichDataIsCleared">A törlendő adatok kiválasztása</string>
-    <string name="needMoreCustomizationSubReasonWhenDataIsCleared">Az adatok törlésének időzítése</string>
-    <string name="needMoreCustomizationSubReasonBookmarksDisplay">A könyvjelzők elrendezésének módja</string>
-    <string name="needMoreCustomizationSubReasonOther">Ezek közül egyik sem</string>
 
-    <string name="appIsSlowOrBuggyTitleLong">Az alkalmazás lassú, hibás, vagy sokszor összeomlik</string>
-    <string name="appIsSlowOrBuggyTitleShort">Teljesítmény-problémák</string>
-    <string name="appIsSlowOrBuggySubtitle">Melyik problémával találkoztál?</string>
-    <string name="appIsSlowOrBuggySubReasonSlowResults">A weboldalak vagy a keresési eredmények lassan töltődnek be</string>
-    <string name="appIsSlowOrBuggySubReasonAppCrashesOrFreezes">Az alkalmazás összeomlik vagy lefagy</string>
-    <string name="appIsSlowOrBuggySubReasonMediaPlayback">Video- vagy médialejátszási hibák</string>
-    <string name="appIsSlowOrBuggySubReasonOther">Ezek közül egyik sem</string>
 
-    <string name="otherMainReasonTitleLong">Ezek közül egyik sem</string>
-    <string name="otherMainReasonTitleShort">Egyéb problémák</string>
 
-    <string name="openEndedInputHint">Kérjük, a lehető legpontosabban írj meg mindent</string>
-    <string name="submitFeedback">Küldés</string>
 
-    <string name="tellUsHowToImprove">Kérjük, mondd el, min tudunk még javítani.</string>
-    <string name="thanksForTheFeedback">Köszönjük a visszajelzést!</string>
-    <string name="feedbackNegativeMainReasonPageSubtitle">Mi okozta a legtöbb problémát?</string>
-    <string name="feedbackNegativeMainReasonPageTitle">Sajnálattal halljuk</string>
-    <string name="feedbackShareDetails">Részletek megosztása</string>
-    <string name="sharePositiveFeedbackWithTheTeam">Szeretnél valamit megosztani a csapattal?</string>
-    <string name="whatHaveYouBeenEnjoying">Mi tetszett?</string>
-    <string name="awesomeToHear">Örömmel halljuk!</string>
-    <string name="shareTheLoveWithARating">Ha tetszik az alkalmazás, kérjük, oszd meg véleményed a Play Áruházban.</string>
-    <string name="rateTheApp">Alkalmazás értékelése</string>
-    <string name="declineFurtherFeedback">Nem, köszönöm, végeztem</string>
-    <string name="whichBrokenSites">Hol látod ezeket a problémákat?</string>
-    <string name="whichBrokenSitesHint">Melyik weboldalon vannak problémák?</string>
-    <string name="feedbackSpecificAsPossible">Kérjük, a lehető legpontosabban írj meg mindent</string>
-    <string name="feedbackInitialDisambiguationTitle">Kezdjünk hozzá!</string>
-    <string name="feedbackInitialDisambiguationSubtitle">Hogyan jellemeznéd a visszajelzésedet?</string>
-    <string name="feedbackInitialDisambiguationHappyButtonContentDescription">Pozitív visszajelzés gomb</string>
-    <string name="feedbackInitialDisambiguationSadButtonContentDescription">Negatív visszajelzés gomb</string>
-    <string name="feedbackIsImportantToUs">Anonim visszajelzésed fontos számunkra.</string>
 
     <!-- Webview Recovery -->
     <string name="crashedWebViewErrorMessage">"A weblap nem jeleníthető meg."</string>

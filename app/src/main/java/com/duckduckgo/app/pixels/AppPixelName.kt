@@ -237,9 +237,6 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     APP_LINKS_SNACKBAR_SHOWN("m_app_links_snackbar_shown"),
     APP_LINKS_SNACKBAR_OPEN_ACTION_PRESSED("m_app_links_snackbar_open_action_pressed"),
 
-    FEEDBACK_POSITIVE_SUBMISSION("mfbs_%s_submit"),
-    FEEDBACK_NEGATIVE_SUBMISSION("mfbs_%s_%s_%s"),
-
     AUTOCOMPLETE_TOGGLED_OFF("m_autocomplete_recent_sites_toggled_off"),
     AUTOCOMPLETE_TOGGLED_ON("m_autocomplete_recent_sites_toggled_on"),
 

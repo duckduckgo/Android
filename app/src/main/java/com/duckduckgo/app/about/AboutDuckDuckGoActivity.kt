@@ -50,10 +50,10 @@ import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.AppUrl.Url
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.feedback.api.FeedbackScreenNoParams
 import com.duckduckgo.mobile.android.R.attr
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.subscriptions.api.SubscriptionFeedbackScreens.GeneralSubscriptionFeedbackScreenNoParams
-import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
@@ -64,16 +64,6 @@ class AboutDuckDuckGoActivity : DuckDuckGoActivity() {
 
     private val viewModel: AboutDuckDuckGoViewModel by bindViewModel()
     private val binding: ActivityAboutDuckDuckGoBinding by viewBinding()
-
-    private val feedbackFlow = registerForActivityResult(FeedbackContract()) { resultOk ->
-        if (resultOk) {
-            Snackbar.make(
-                binding.root,
-                R.string.thanksForTheFeedback,
-                Snackbar.LENGTH_LONG,
-            ).show()
-        }
-    }
 
     @Inject
     lateinit var globalActivityStarter: GlobalActivityStarter
@@ -238,7 +228,7 @@ class AboutDuckDuckGoActivity : DuckDuckGoActivity() {
     }
 
     private fun launchFeedback() {
-        feedbackFlow.launch(null)
+        globalActivityStarter.start(this, FeedbackScreenNoParams)
     }
 
     private fun launchSubscriptionUnifiedFeedback() {
