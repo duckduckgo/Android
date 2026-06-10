@@ -1,0 +1,136 @@
+// YouTube ad blocking pixels: https://app.asana.com/1/137249556945/project/72649045549333/task/1214489455564221?focus=true.
+{
+    "adBlocking_settings_opened_daily": {
+        "description": "(Daily) User opened the YouTube ad blocking settings screen.",
+        "owners": ["CrisBarreiro"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "adBlocking_settings_opened_count": {
+        "description": "User opened the YouTube ad blocking settings screen.",
+        "owners": ["CrisBarreiro"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "adBlocking_state_daily": {
+        "description": "(Daily) Reports the client-side ad blocking state. Fired once daily on app foreground.",
+        "owners": ["CrisBarreiro"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "is_enabled",
+                "type": "boolean",
+                "description": "Whether ad blocking is currently active (requires the feature enabled in remote config — kill-switch on and not in contingency mode — in addition to the user/default setting being on)"
+            },
+            {
+                "key": "analytics_enabled",
+                "type": "boolean",
+                "description": "Whether the user has explicitly opted in (turned the ad blocking setting on)"
+            }
+        ]
+    },
+    "adBlocking_enabled_daily": {
+        "description": "(Daily) User enabled YouTube ad blocking in settings.",
+        "owners": ["CrisBarreiro"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "adBlocking_enabled_count": {
+        "description": "User enabled YouTube ad blocking in settings.",
+        "owners": ["CrisBarreiro"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "adBlocking_disabled_daily": {
+        "description": "(Daily) User disabled YouTube ad blocking in settings.",
+        "owners": ["CrisBarreiro"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "adBlocking_disabled_count": {
+        "description": "User disabled YouTube ad blocking in settings.",
+        "owners": ["CrisBarreiro"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "adBlocking_scriptlets_fetch_error_daily": {
+        "description": "(Daily) Downloading an ad blocking scriptlet failed; the update will be retried.",
+        "owners": ["CrisBarreiro"],
+        "triggers": ["exception"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "adBlocking_scriptlets_fetch_error_count": {
+        "description": "Downloading an ad blocking scriptlet failed; the update will be retried.",
+        "owners": ["CrisBarreiro"],
+        "triggers": ["exception"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "adBlocking_scriptlets_validation_error_daily": {
+        "description": "(Daily) Signature validation of a downloaded ad blocking scriptlet failed, blocking the update.",
+        "owners": ["CrisBarreiro"],
+        "triggers": ["exception"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "reason",
+                "type": "string",
+                "description": "The validation failure reason",
+                "enum": ["Encoding", "SignatureFormat", "SignatureVerificationFailed", "Unknown"]
+            }
+        ]
+    },
+    "adBlocking_scriptlets_validation_error_count": {
+        "description": "Signature validation of a downloaded ad blocking scriptlet failed, blocking the update.",
+        "owners": ["CrisBarreiro"],
+        "triggers": ["exception"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "reason",
+                "type": "string",
+                "description": "The validation failure reason",
+                "enum": ["Encoding", "SignatureFormat", "SignatureVerificationFailed", "Unknown"]
+            }
+        ]
+    },
+    "adBlocking_scriptlets_installed_daily": {
+        "description": "(Daily) Ad blocking scriptlets were downloaded and stored.",
+        "owners": ["CrisBarreiro"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion", { "key": "version", "type": "string", "description": "The newly stored scriptlets version" }]
+    },
+    "adBlocking_scriptlets_installed_count": {
+        "description": "Ad blocking scriptlets were downloaded and stored.",
+        "owners": ["CrisBarreiro"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion", { "key": "version", "type": "string", "description": "The newly stored scriptlets version" }]
+    },
+    "adBlocking_scriptlets_install_error_daily": {
+        "description": "(Daily) Storing ad blocking scriptlets into the local cache failed; the update will be retried.",
+        "owners": ["CrisBarreiro"],
+        "triggers": ["exception"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "adBlocking_scriptlets_install_error_count": {
+        "description": "Storing ad blocking scriptlets into the local cache failed; the update will be retried.",
+        "owners": ["CrisBarreiro"],
+        "triggers": ["exception"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    }
+}
