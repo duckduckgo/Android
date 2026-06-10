@@ -54,7 +54,7 @@ class DuckChatVoiceNotificationActionReceiverTest {
 
         receiver.onReceive(context, intent)
 
-        verify(duckChatPixels).reportVoiceNotificationEndSessionTapped()
+        verify(duckChatPixels).reportVoiceNotificationEndChatTapped()
         verify(voiceSessionStateManager).triggerVoiceSessionEnd(TAB_ID)
     }
 

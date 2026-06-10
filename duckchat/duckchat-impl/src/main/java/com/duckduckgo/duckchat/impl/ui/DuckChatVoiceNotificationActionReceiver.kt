@@ -58,7 +58,7 @@ class DuckChatVoiceNotificationActionReceiver @Inject constructor(
         if (intent.action != INTENT_VOICE_NOTIFICATION_ACTION) return
         val tabId = intent.getStringExtra(EXTRA_TAB_ID)?.takeIf { it.isNotBlank() } ?: return
 
-        duckChatPixels.reportVoiceNotificationEndSessionTapped()
+        duckChatPixels.reportVoiceNotificationEndChatTapped()
         voiceSessionStateManager.triggerVoiceSessionEnd(tabId)
     }
 
