@@ -29,6 +29,7 @@ import com.duckduckgo.app.fire.SiteDataCleaner
 import com.duckduckgo.app.fire.UnsentForgetAllPixelStore
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
 import com.duckduckgo.app.fire.store.TabVisitedSitesRepository
+import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.trackerdetection.api.WebTrackersBlockedRepository
@@ -143,6 +144,7 @@ class ClearPersonalDataAction(
     private val webViewCapabilityChecker: WebViewCapabilityChecker,
     duckAiHostProvider: DuckAiHostProvider,
     private val siteDataCleaner: SiteDataCleaner,
+    private val androidBrowserConfigFeature: AndroidBrowserConfigFeature,
 ) : ClearDataAction {
 
     override fun killAndRestartProcess(notifyDataCleared: Boolean, enableTransitionAnimation: Boolean, deletedTabCount: Int) {
@@ -254,27 +256,14 @@ class ClearPersonalDataAction(
             val domainsToClear = domains
                 .filter { !duckDuckGoDomains.contains(it) && !fireproofDomains.contains(it) }
 
-            val completedWithinDeadline = withTimeoutOrNull(OVERALL_CLEAR_TIMEOUT_MS.milliseconds) {
-                withContext(dispatchers.main()) {
-                    val webStorage = createWebStorage()
-                    val semaphore = Semaphore(MAX_CONCURRENT_SITE_DELETIONS)
-                    coroutineScope {
-                        domainsToClear.map { domain ->
-                            async {
-                                semaphore.withPermit {
-                                    siteDataCleaner.deleteSiteData(webStorage, domain)
-                                }
-                            }
-                        }.awaitAll()
-                    }
-                }
-                true
-            } ?: false
+            val concurrentClearEnabled = withContext(dispatchers.io()) {
+                androidBrowserConfigFeature.concurrentSingleTabDataClearing().isEnabled()
+            }
 
-            if (completedWithinDeadline) {
-                logcat(INFO) { "Cleared site data for ${domainsToClear.size} domains" }
+            if (concurrentClearEnabled) {
+                clearDomainsConcurrently(domainsToClear)
             } else {
-                logcat(WARN) { "Clearing site data timed out after ${OVERALL_CLEAR_TIMEOUT_MS}ms" }
+                clearDomainsSequentially(domainsToClear)
             }
             ClearDataResult.Success
         } catch (e: CancellationException) {
@@ -282,6 +271,47 @@ class ClearPersonalDataAction(
         } catch (e: Exception) {
             logcat(WARN) { "Failed to clear site data: ${e.message}" }
             ClearDataResult.Error(e)
+        }
+    }
+
+    /**
+     * Each deleteBrowsingDataForSite is async/callback-based. The per-domain timeout skip a stalled
+     * WebView callback; the overall timeout is a backstop so the burn can block the dialog.
+     */
+    private suspend fun clearDomainsConcurrently(domainsToClear: List<String>) {
+        val completedWithinDeadline = withTimeoutOrNull(OVERALL_CLEAR_TIMEOUT_MS.milliseconds) {
+            withContext(dispatchers.main()) {
+                val webStorage = createWebStorage()
+                val semaphore = Semaphore(MAX_CONCURRENT_SITE_DELETIONS)
+                coroutineScope {
+                    domainsToClear.map { domain ->
+                        async {
+                            semaphore.withPermit {
+                                withTimeoutOrNull(SITE_DELETION_TIMEOUT_MS.milliseconds) {
+                                    siteDataCleaner.deleteSiteData(webStorage, domain)
+                                }
+                            }
+                        }
+                    }.awaitAll()
+                }
+            }
+            true
+        } ?: false
+
+        if (completedWithinDeadline) {
+            logcat(INFO) { "Cleared site data for ${domainsToClear.size} domains" }
+        } else {
+            logcat(WARN) { "Clearing site data timed out after ${OVERALL_CLEAR_TIMEOUT_MS}ms" }
+        }
+    }
+
+    private suspend fun clearDomainsSequentially(domainsToClear: List<String>) {
+        withContext(dispatchers.main()) {
+            val webStorage = createWebStorage()
+            domainsToClear.forEach { domain ->
+                siteDataCleaner.deleteSiteData(webStorage, domain)
+            }
+            logcat(INFO) { "Cleared site data for ${domainsToClear.size} domains" }
         }
     }
 
@@ -345,6 +375,9 @@ class ClearPersonalDataAction(
     private companion object {
         // Max number of per-site web-storage deletions in flight at once
         private const val MAX_CONCURRENT_SITE_DELETIONS = 10
+
+        // Per-domain timeout, so a single stalled WebView callback skips that domain instead of hanging the burn
+        private const val SITE_DELETION_TIMEOUT_MS = 5_000L
 
         // Hard ceiling for the whole per-domain clear, so a stalled WebView can never hang the burn
         private const val OVERALL_CLEAR_TIMEOUT_MS = 15_000L

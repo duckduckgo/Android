@@ -29,11 +29,14 @@ import com.duckduckgo.app.fire.UnsentForgetAllPixelStore
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
 import com.duckduckgo.app.fire.store.TabVisitedSitesRepository
+import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.trackerdetection.api.WebTrackersBlockedRepository
 import com.duckduckgo.cookies.api.DuckDuckGoCookieManager
 import com.duckduckgo.duckchat.api.DuckAiHostProvider
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.history.api.NavigationHistory
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.site.permissions.api.SitePermissionsManager
@@ -70,6 +73,7 @@ class ClearPersonalDataActionTest {
     private val mockTabVisitedSitesRepository: TabVisitedSitesRepository = mock()
     private val mockWebViewCapabilityChecker: WebViewCapabilityChecker = mock()
     private val mockDuckAiHostProvider: DuckAiHostProvider = mock()
+    private val fakeAndroidBrowserConfigFeature = FakeFeatureToggleFactory.create(AndroidBrowserConfigFeature::class.java)
 
     private val fireproofWebsites: LiveData<List<FireproofWebsiteEntity>> = MutableLiveData()
 
@@ -78,6 +82,7 @@ class ClearPersonalDataActionTest {
     @Before
     fun setup() {
         whenever(mockDuckAiHostProvider.getHost()).thenReturn("duck.ai")
+        fakeAndroidBrowserConfigFeature.concurrentSingleTabDataClearing().setRawStoredState(State(enable = true))
         testee = createTestee()
         whenever(mockFireproofWebsiteRepository.getFireproofWebsites()).thenReturn(fireproofWebsites)
         whenever(mockDeviceSyncState.isUserSignedInOnDevice()).thenReturn(true)
@@ -104,6 +109,7 @@ class ClearPersonalDataActionTest {
         webViewCapabilityChecker = mockWebViewCapabilityChecker,
         duckAiHostProvider = mockDuckAiHostProvider,
         siteDataCleaner = siteDataCleaner,
+        androidBrowserConfigFeature = fakeAndroidBrowserConfigFeature,
     )
 
     @Test
@@ -452,6 +458,22 @@ class ClearPersonalDataActionTest {
 
         assertTrue(result is ClearDataResult.Success)
         assertEquals(setOf("a.com", "b.com"), clearedDomains.toSet())
+    }
+
+    @Test
+    fun whenClearDataForSpecificDomainsCalledAndConcurrentClearingDisabledThenDomainsAreStillCleared() = runTest {
+        whenever(mockWebViewCapabilityChecker.isSupported(DeleteBrowsingData)).thenReturn(true)
+        whenever(mockFireproofWebsiteRepository.fireproofWebsitesSync()).thenReturn(emptyList())
+        fakeAndroidBrowserConfigFeature.concurrentSingleTabDataClearing().setRawStoredState(State(enable = false))
+        val clearedDomains = java.util.Collections.synchronizedList(mutableListOf<String>())
+        val testeeWithCapture = createTestee(
+            siteDataCleaner = { _, domain -> clearedDomains.add(domain) },
+        )
+
+        val result = testeeWithCapture.clearDataForSpecificDomains(domains = setOf("a.com", "b.com", "c.com"))
+
+        assertTrue(result is ClearDataResult.Success)
+        assertEquals(setOf("a.com", "b.com", "c.com"), clearedDomains.toSet())
     }
 
     @Test
