@@ -11398,6 +11398,25 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenCachedLocalPdfRestoredThenShowPdfInTabEmittedButPixelsNotFired() = runTest {
+        // Simulate a tab restore: the stored file:// URL is already the current site URL.
+        // onViewReady() calls onUserSubmittedQuery(url) with query == url, so pixels
+        // must not fire (this is a restore, not a fresh external open).
+        val cachedUri = "file:///data/user/0/com.duckduckgo.mobile.android/cache/pdf_cache/1-doc.pdf"
+        givenCurrentSite(cachedUri)
+        whenever(mockInlinePdfHandler.isCachedLocalPdf(cachedUri)).thenReturn(true)
+        whenever(mockInlinePdfHandler.extractFileName(cachedUri)).thenReturn("doc.pdf")
+
+        testee.onUserSubmittedQuery(cachedUri)
+        advanceUntilIdle()
+
+        assertCommandIssued<Command.ShowPdfInTab>()
+        verify(mockPixel, never()).fire(PdfPixelName.PDF_EXTERNAL_OPENED)
+        verify(mockPixel, never()).fire(PdfPixelName.PDF_EXTERNAL_OPENED_DAILY, type = Daily())
+        verify(mockPixel, never()).fire(PdfPixelName.PDF_EXTERNAL_OPENED_UNIQUE, type = Unique())
+    }
+
+    @Test
     fun whenUserSubmittedQueryIsCachedLocalPdfThenDoesNotNavigate() = runTest {
         val cachedUri = "file:///data/user/0/com.duckduckgo.mobile.android/cache/pdf_cache/1-doc.pdf"
         whenever(mockInlinePdfHandler.isCachedLocalPdf(cachedUri)).thenReturn(true)

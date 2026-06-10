@@ -106,9 +106,17 @@ interface InlinePdfHandler {
     suspend fun cacheLocalPdf(uri: Uri): LocalPdfResult
 
     /**
-     * True when [query] is a file:// URI pointing at a PDF already stored in our internal
-     * pdf_cache directory (i.e. produced by [cacheLocalPdf]). Used to detect, at tab-load
-     * time, that a tab should render a cached local PDF instead of navigating the WebView.
+     * True when [query] is a file:// URI whose path lives inside our internal pdf_cache
+     * directory (i.e. produced by [cacheLocalPdf] or [downloadToCache]).
+     *
+     * This is a **pure path check — no I/O performed**. It does not verify that the file
+     * exists on disk or re-read its magic bytes. That is safe because:
+     * - Only our own code writes to pdf_cache, and both write paths validate %PDF- magic
+     *   bytes at write time before returning a success URI.
+     * - WebView file access is disabled, so web content cannot set a tab's initial URL to
+     *   a file:// path — only URLs our own flow produced can match.
+     * - If the file is missing or corrupt, the PDF viewer fragment surfaces the failure via
+     *   [onPdfRenderFailure], which is already wired to the render-failure pixel.
      */
     fun isCachedLocalPdf(query: String): Boolean
 }
@@ -403,9 +411,8 @@ class RealInlinePdfHandler @Inject constructor(
         if (uri.scheme?.lowercase() != "file") return false
         val path = uri.path ?: return false
         val file = File(path)
-        return file.parentFile?.absolutePath == cacheDirPath.absolutePath &&
-            file.exists() &&
-            hasPdfMagicBytes(file)
+        // Pure path check — no I/O. See interface KDoc for the validity guarantee.
+        return file.parentFile?.absolutePath == cacheDirPath.absolutePath
     }
 
     private fun resolveDisplayName(uri: Uri): String {

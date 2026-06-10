@@ -3975,9 +3975,16 @@ class BrowserTabViewModel @Inject constructor(
     private fun renderCachedLocalPdf(cachedFileUriString: String) {
         val cachedUri = cachedFileUriString.toUri()
         val fileName = inlinePdfHandler.extractFileName(cachedFileUriString)
-        pixel.fire(PdfPixelName.PDF_EXTERNAL_OPENED)
-        pixel.fire(PdfPixelName.PDF_EXTERNAL_OPENED_DAILY, type = Daily())
-        pixel.fire(PdfPixelName.PDF_EXTERNAL_OPENED_UNIQUE, type = Unique())
+        // Fire open pixels only on a genuine first/external open. Restoration paths
+        // (onViewReady re-submitting the tab's stored file:// URL) reach here with
+        // cachedFileUriString == url, the same guard used elsewhere to skip re-submission
+        // side-effects. The render (browserViewState + ShowPdfInTab) always runs so the
+        // PDF is re-displayed after process death.
+        if (cachedFileUriString != url) {
+            pixel.fire(PdfPixelName.PDF_EXTERNAL_OPENED)
+            pixel.fire(PdfPixelName.PDF_EXTERNAL_OPENED_DAILY, type = Daily())
+            pixel.fire(PdfPixelName.PDF_EXTERNAL_OPENED_UNIQUE, type = Unique())
+        }
         browserViewState.value = currentBrowserViewState().copy(
             currentPdfCachedUri = cachedUri,
             currentPdfFileName = fileName,
