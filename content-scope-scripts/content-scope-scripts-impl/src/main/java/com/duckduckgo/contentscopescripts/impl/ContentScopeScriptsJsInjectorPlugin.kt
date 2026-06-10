@@ -17,6 +17,8 @@
 package com.duckduckgo.contentscopescripts.impl
 
 import android.webkit.WebView
+import com.duckduckgo.app.browser.api.WebViewCapabilityChecker
+import com.duckduckgo.app.browser.api.WebViewCapabilityChecker.WebViewCapability.DocumentStartJavaScript
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.browser.api.JsInjectorPlugin
 import com.duckduckgo.di.scopes.AppScope
@@ -27,6 +29,8 @@ import javax.inject.Inject
 @ContributesMultibinding(AppScope::class)
 class ContentScopeScriptsJsInjectorPlugin @Inject constructor(
     private val coreContentScopeScripts: CoreContentScopeScripts,
+    private val contentScopeScriptsFeature: ContentScopeScriptsFeature,
+    private val webViewCapabilityChecker: WebViewCapabilityChecker,
 ) : JsInjectorPlugin {
     override fun onPageStarted(
         webView: WebView,
@@ -34,9 +38,15 @@ class ContentScopeScriptsJsInjectorPlugin @Inject constructor(
         isDesktopMode: Boolean?,
         activeExperiments: List<Toggle>,
     ) {
-        if (coreContentScopeScripts.isEnabled()) {
+        if (coreContentScopeScripts.isEnabled() && !isDocumentStartContentScopeScriptsEnabled()) {
             webView.evaluateJavascript("javascript:${coreContentScopeScripts.getScript(isDesktopMode, activeExperiments)}", null)
         }
+    }
+
+    private fun isDocumentStartContentScopeScriptsEnabled(): Boolean {
+        return contentScopeScriptsFeature.useNewWebCompatApis().isEnabled() &&
+            contentScopeScriptsFeature.useWebMessageListener().isEnabled() &&
+            webViewCapabilityChecker.isSupported(DocumentStartJavaScript)
     }
 
     override fun onPageFinished(

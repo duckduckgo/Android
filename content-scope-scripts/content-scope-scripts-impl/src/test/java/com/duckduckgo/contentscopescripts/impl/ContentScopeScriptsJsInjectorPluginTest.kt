@@ -1,24 +1,35 @@
 package com.duckduckgo.contentscopescripts.impl
 
 import android.webkit.WebView
+import com.duckduckgo.app.browser.api.WebViewCapabilityChecker
+import com.duckduckgo.app.browser.api.WebViewCapabilityChecker.WebViewCapability.DocumentStartJavaScript
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.feature.toggles.api.Toggle.State
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 
 class ContentScopeScriptsJsInjectorPluginTest {
     private val mockCoreContentScopeScripts: CoreContentScopeScripts = mock()
+    private val contentScopeScriptsFeature = FakeFeatureToggleFactory.create(ContentScopeScriptsFeature::class.java)
+    private val mockWebViewCapabilityChecker: WebViewCapabilityChecker = mock()
     private val mockWebView: WebView = mock()
 
     private lateinit var contentScopeScriptsJsInjectorPlugin: ContentScopeScriptsJsInjectorPlugin
 
     @Before
     fun setUp() {
-        contentScopeScriptsJsInjectorPlugin = ContentScopeScriptsJsInjectorPlugin(mockCoreContentScopeScripts)
+        contentScopeScriptsJsInjectorPlugin = ContentScopeScriptsJsInjectorPlugin(
+            mockCoreContentScopeScripts,
+            contentScopeScriptsFeature,
+            mockWebViewCapabilityChecker,
+        )
     }
 
     @Test
@@ -46,5 +57,18 @@ class ContentScopeScriptsJsInjectorPluginTest {
         contentScopeScriptsJsInjectorPlugin.onPageStarted(mockWebView, null, true, listOf())
 
         verify(mockCoreContentScopeScripts).getScript(true, listOf())
+    }
+
+    @Test
+    fun whenDocumentStartAndWebMessagingEnabledThenDoNotInjectLegacyContentScopeScripts() {
+        whenever(mockCoreContentScopeScripts.isEnabled()).thenReturn(true)
+        whenever(mockWebViewCapabilityChecker.isSupported(DocumentStartJavaScript)).thenReturn(true)
+        contentScopeScriptsFeature.useNewWebCompatApis().setRawStoredState(State(enable = true))
+        contentScopeScriptsFeature.useWebMessageListener().setRawStoredState(State(enable = true))
+
+        contentScopeScriptsJsInjectorPlugin.onPageStarted(mockWebView, null, null, listOf())
+
+        verify(mockCoreContentScopeScripts, never()).getScript(anyOrNull(), any())
+        verify(mockWebView, never()).evaluateJavascript(any(), anyOrNull())
     }
 }

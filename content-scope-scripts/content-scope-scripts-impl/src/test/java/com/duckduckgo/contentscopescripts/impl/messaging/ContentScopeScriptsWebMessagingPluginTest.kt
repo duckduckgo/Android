@@ -22,9 +22,13 @@ import androidx.webkit.JavaScriptReplyProxy
 import com.duckduckgo.browser.api.webviewcompat.WebViewCompatWrapper
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.plugins.PluginPoint
+import com.duckduckgo.contentscopescripts.api.ContentScopeJsMessageHandlersPlugin
 import com.duckduckgo.contentscopescripts.api.WebViewCompatContentScopeJsMessageHandlersPlugin
 import com.duckduckgo.contentscopescripts.impl.WebViewCompatContentScopeScripts
 import com.duckduckgo.js.messaging.api.JsMessage
+import com.duckduckgo.js.messaging.api.JsMessageCallback
+import com.duckduckgo.js.messaging.api.JsMessageHandler
+import com.duckduckgo.js.messaging.api.JsMessaging
 import com.duckduckgo.js.messaging.api.ProcessResult
 import com.duckduckgo.js.messaging.api.ProcessResult.SendToConsumer
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
@@ -52,6 +56,7 @@ class ContentScopeScriptsWebMessagingPluginTest {
 
     private val webViewCompatContentScopeScripts: WebViewCompatContentScopeScripts = mock()
     private val handlers: PluginPoint<WebViewCompatContentScopeJsMessageHandlersPlugin> = FakePluginPoint()
+    private val legacyHandlers: PluginPoint<ContentScopeJsMessageHandlersPlugin> = FakeLegacyPluginPoint()
     private val mockReplyProxy: JavaScriptReplyProxy = mock()
     private val globalHandlers: PluginPoint<GlobalContentScopeJsMessageHandlersPlugin> = FakeGlobalHandlersPluginPoint()
     private val mockWebViewCompatWrapper: WebViewCompatWrapper = mock()
@@ -68,6 +73,45 @@ class ContentScopeScriptsWebMessagingPluginTest {
 
                     override val featureName: String = "webCompat"
                     override val methods: List<String> = listOf("webShare", "permissionsQuery")
+                }
+        }
+    }
+
+    private class FakeLegacyPluginPoint : PluginPoint<ContentScopeJsMessageHandlersPlugin> {
+        override fun getPlugins(): Collection<ContentScopeJsMessageHandlersPlugin> =
+            listOf(FakeDuckPlayerPlugin(), FakeWebEventsPlugin())
+
+        class FakeDuckPlayerPlugin : ContentScopeJsMessageHandlersPlugin {
+            override fun getJsMessageHandler(): JsMessageHandler =
+                object : JsMessageHandler {
+                    override fun process(
+                        jsMessage: JsMessage,
+                        jsMessaging: JsMessaging,
+                        jsMessageCallback: JsMessageCallback?,
+                    ) {
+                        jsMessageCallback?.process(featureName, jsMessage.method, jsMessage.id, jsMessage.params)
+                    }
+
+                    override val allowedDomains: List<String> = listOf("youtube.com")
+                    override val featureName: String = "duckPlayer"
+                    override val methods: List<String> = listOf("initialSetup")
+                }
+        }
+
+        class FakeWebEventsPlugin : ContentScopeJsMessageHandlersPlugin {
+            override fun getJsMessageHandler(): JsMessageHandler =
+                object : JsMessageHandler {
+                    override fun process(
+                        jsMessage: JsMessage,
+                        jsMessaging: JsMessaging,
+                        jsMessageCallback: JsMessageCallback?,
+                    ) {
+                        jsMessageCallback?.process(featureName, jsMessage.method, jsMessage.id, jsMessage.params)
+                    }
+
+                    override val allowedDomains: List<String> = emptyList()
+                    override val featureName: String = "webEvents"
+                    override val methods: List<String> = listOf("webEvent")
                 }
         }
     }
@@ -92,6 +136,7 @@ class ContentScopeScriptsWebMessagingPluginTest {
             testee =
                 ContentScopeScriptsWebMessagingPlugin(
                     handlers = handlers,
+                    legacyHandlers = legacyHandlers,
                     globalHandlers = globalHandlers,
                     webViewCompatContentScopeScripts = webViewCompatContentScopeScripts,
                     webViewCompatWrapper = mockWebViewCompatWrapper,
@@ -111,6 +156,58 @@ class ContentScopeScriptsWebMessagingPluginTest {
             testee.process(mockWebView, message, callback, mockReplyProxy)
 
             assertEquals(1, callback.counter)
+        }
+
+    @Test
+    fun `when legacy handler matches then execute callback through web messaging`() =
+        runTest {
+            givenInterfaceIsRegistered()
+            whenever(mockWebView.url).thenReturn("https://www.youtube.com/watch?v=abc")
+
+            val message =
+                """
+                {"context":"contentScopeScripts","featureName":"duckPlayer","id":"myId","method":"initialSetup","params":{}}
+                """.trimIndent()
+
+            testee.process(mockWebView, message, callback, mockReplyProxy)
+
+            assertEquals(1, callback.counter)
+            assertEquals("duckPlayer", callback.lastFeatureName)
+        }
+
+    @Test
+    fun `when legacy handler domain does not match then do nothing`() =
+        runTest {
+            givenInterfaceIsRegistered()
+            whenever(mockWebView.url).thenReturn("https://example.com")
+
+            val message =
+                """
+                {"context":"contentScopeScripts","featureName":"duckPlayer","id":"myId","method":"initialSetup","params":{}}
+                """.trimIndent()
+
+            testee.process(mockWebView, message, callback, mockReplyProxy)
+
+            assertEquals(0, callback.counter)
+        }
+
+    @Test
+    fun `when webEvents message is processed then add native webView id`() =
+        runTest {
+            givenInterfaceIsRegistered()
+
+            val message =
+                """
+                {"context":"contentScopeScripts","featureName":"webEvents","id":"myId","method":"webEvent","params":{"type":"test"}}
+                """.trimIndent()
+
+            testee.process(mockWebView, message, callback, mockReplyProxy)
+
+            assertEquals(1, callback.counter)
+            assertEquals(
+                System.identityHashCode(mockWebView).toString(),
+                callback.lastData?.getJSONObject("nativeData")?.getString("webViewId"),
+            )
         }
 
     @Test
@@ -269,6 +366,8 @@ class ContentScopeScriptsWebMessagingPluginTest {
     private val callback =
         object : WebViewCompatMessageCallback {
             var counter = 0
+            var lastFeatureName: String? = null
+            var lastData: JSONObject? = null
 
             override fun process(
                 context: String,
@@ -279,6 +378,8 @@ class ContentScopeScriptsWebMessagingPluginTest {
                 onResponse: suspend (params: JSONObject) -> Unit,
             ) {
                 counter++
+                lastFeatureName = featureName
+                lastData = data
             }
         }
 
