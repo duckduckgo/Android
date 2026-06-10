@@ -231,8 +231,8 @@ class NativeInputModeWidget @JvmOverloads constructor(
     override var onVoiceSearchClick: (() -> Unit)? = null
         set(value) {
             field = value
-            voiceHostButtons()?.onVoiceSearchClick = value
-            onVoiceClick = value
+            voiceHostButtons()?.onVoiceSearchClick = voiceSearchClickWithPixel
+            onVoiceClick = voiceSearchClickWithPixel
         }
     override var onVoiceChatClick: (() -> Unit)? = null
         set(value) {
@@ -246,6 +246,17 @@ class NativeInputModeWidget @JvmOverloads constructor(
     private val voiceChatClickWithPixel: () -> Unit = {
         viewModel.fireVoiceTapped()
         onVoiceChatClick?.invoke()
+    }
+
+    // The in-field microphone doubles as the Duck.ai voice entry whenever the Duck.ai tab is selected
+    // — including an active Duck.ai chat page, where configure(isDuckAiMode = true) selects the chat
+    // tab and the bottom-row voice-chat chip is hidden, leaving the mic as the only voice affordance.
+    // Count those as a unified voice tap; a search-tab mic tap is plain voice search, not Duck.ai.
+    private val voiceSearchClickWithPixel: () -> Unit = {
+        if (isChatTabSelected()) {
+            viewModel.fireVoiceTapped()
+        }
+        onVoiceSearchClick?.invoke()
     }
     override var onPaidTierChanged: ((Boolean) -> Unit)? = null
         set(value) {
