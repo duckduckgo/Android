@@ -1551,8 +1551,8 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     private fun isTypedDuckAiUrl(url: String): Boolean {
-        val host = runCatching { url.toUri().host }.getOrNull() ?: return false
-        val duckAiHost = duckAiHostProvider.getHost()
+        val host = runCatching { url.toUri().host }.getOrNull()?.lowercase() ?: return false
+        val duckAiHost = duckAiHostProvider.getHost().lowercase()
         return host == duckAiHost || host == "www.$duckAiHost"
     }
 
