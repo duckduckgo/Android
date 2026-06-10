@@ -1395,6 +1395,11 @@ class BrowserTabViewModel @Inject constructor(
             return
         }
 
+        if (inlinePdfHandler.isCachedLocalPdf(query)) {
+            renderCachedLocalPdf(query)
+            return
+        }
+
         val layoutState = currentGlobalLayoutState()
         if (layoutState is Invalidated) {
             recoverTabWithQuery(query)
@@ -3965,6 +3970,19 @@ class BrowserTabViewModel @Inject constructor(
                 }
             }
         }
+    }
+
+    private fun renderCachedLocalPdf(cachedFileUriString: String) {
+        val cachedUri = cachedFileUriString.toUri()
+        val fileName = inlinePdfHandler.extractFileName(cachedFileUriString)
+        pixel.fire(PdfPixelName.PDF_EXTERNAL_OPENED)
+        pixel.fire(PdfPixelName.PDF_EXTERNAL_OPENED_DAILY, type = Daily())
+        pixel.fire(PdfPixelName.PDF_EXTERNAL_OPENED_UNIQUE, type = Unique())
+        browserViewState.value = currentBrowserViewState().copy(
+            currentPdfCachedUri = cachedUri,
+            currentPdfFileName = fileName,
+        )
+        command.value = ShowPdfInTab(fileName, cachedUri)
     }
 
     fun pdfDownloadCommands(): Flow<DownloadCommand> = pdfDownloadCommandFlow.asSharedFlow()

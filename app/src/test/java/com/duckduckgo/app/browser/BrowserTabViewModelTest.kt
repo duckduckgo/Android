@@ -11366,6 +11366,63 @@ class BrowserTabViewModelTest {
 
     // endregion
 
+    // region cached local PDF tests
+
+    @Test
+    fun whenUserSubmittedQueryIsCachedLocalPdfThenEmitsShowPdfInTab() = runTest {
+        val cachedUri = "file:///data/user/0/com.duckduckgo.mobile.android/cache/pdf_cache/1-doc.pdf"
+        whenever(mockInlinePdfHandler.isCachedLocalPdf(cachedUri)).thenReturn(true)
+        whenever(mockInlinePdfHandler.extractFileName(cachedUri)).thenReturn("doc.pdf")
+
+        testee.onUserSubmittedQuery(cachedUri)
+        advanceUntilIdle()
+
+        assertCommandIssued<Command.ShowPdfInTab> {
+            assertEquals("doc.pdf", this.url)
+            assertEquals(cachedUri.toUri(), this.cachedFileUri)
+        }
+    }
+
+    @Test
+    fun whenUserSubmittedQueryIsCachedLocalPdfThenFiresExternalOpenedPixels() = runTest {
+        val cachedUri = "file:///data/user/0/com.duckduckgo.mobile.android/cache/pdf_cache/1-doc.pdf"
+        whenever(mockInlinePdfHandler.isCachedLocalPdf(cachedUri)).thenReturn(true)
+        whenever(mockInlinePdfHandler.extractFileName(cachedUri)).thenReturn("doc.pdf")
+
+        testee.onUserSubmittedQuery(cachedUri)
+        advanceUntilIdle()
+
+        verify(mockPixel).fire(PdfPixelName.PDF_EXTERNAL_OPENED)
+        verify(mockPixel).fire(PdfPixelName.PDF_EXTERNAL_OPENED_DAILY, type = Daily())
+        verify(mockPixel).fire(PdfPixelName.PDF_EXTERNAL_OPENED_UNIQUE, type = Unique())
+    }
+
+    @Test
+    fun whenUserSubmittedQueryIsCachedLocalPdfThenDoesNotNavigate() = runTest {
+        val cachedUri = "file:///data/user/0/com.duckduckgo.mobile.android/cache/pdf_cache/1-doc.pdf"
+        whenever(mockInlinePdfHandler.isCachedLocalPdf(cachedUri)).thenReturn(true)
+        whenever(mockInlinePdfHandler.extractFileName(cachedUri)).thenReturn("doc.pdf")
+
+        testee.onUserSubmittedQuery(cachedUri)
+        advanceUntilIdle()
+
+        assertCommandNotIssued<Navigate>()
+    }
+
+    @Test
+    fun whenUserSubmittedQueryIsNotCachedLocalPdfThenExtractFileNameIsNotCalled() {
+        val url = "https://example.com"
+        whenever(mockInlinePdfHandler.isCachedLocalPdf(url)).thenReturn(false)
+        whenever(mockSpecialUrlDetector.determineType(anyString())).thenReturn(SpecialUrlDetector.UrlType.ShouldLaunchSubscriptionLink)
+        whenever(mockOmnibarConverter.convertQueryToUrl(url, null)).thenReturn(url)
+
+        testee.onUserSubmittedQuery(url)
+
+        verify(mockInlinePdfHandler, never()).extractFileName(url)
+    }
+
+    // endregion
+
     @Test
     fun whenDaxDuckAiFireButtonCtaShownThenFireButtonHighlighted() = runTest {
         val observer = ValueCaptorObserver<BrowserViewState>(false)
