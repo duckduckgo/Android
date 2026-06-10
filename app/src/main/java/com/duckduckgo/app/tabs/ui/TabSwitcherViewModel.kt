@@ -16,7 +16,6 @@
 
 package com.duckduckgo.app.tabs.ui
 
-import android.net.Uri
 import androidx.core.net.toUri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
@@ -662,7 +661,7 @@ class TabSwitcherViewModel @Inject constructor(
         val tabs = tabEntities.map { entity ->
             val isActive = entity.tabId == activeTab?.tabId
             val title = tabTitleResolver.resolveTitle(entity, browserMode)
-            val uri = entity.url?.let { Uri.parse(it) }
+            val uri = entity.url?.toUri()
             if (uri != null && duckChat.isDuckChatUrl(uri)) {
                 DuckAiTab(entity, isActive, title)
             } else {
