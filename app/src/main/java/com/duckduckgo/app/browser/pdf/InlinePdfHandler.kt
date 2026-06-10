@@ -165,6 +165,11 @@ class RealInlinePdfHandler @Inject constructor(
     private val cacheDir: File
         get() = File(context.cacheDir, PDF_CACHE_DIR).also { it.mkdirs() }
 
+    // Raw path without the mkdirs() side effect — used by read-only checks that must not
+    // create the directory.
+    private val cacheDirPath: File
+        get() = File(context.cacheDir, PDF_CACHE_DIR)
+
     override suspend fun downloadToCache(url: String, forceRefresh: Boolean): PdfDownloadResult = withContext(dispatcherProvider.io()) {
         val fileName = extractFileName(url)
         // Prefix the cache filename with the URL hash so two URLs sharing a last path segment
@@ -370,6 +375,7 @@ class RealInlinePdfHandler @Inject constructor(
                 targetFile.outputStream().use { output -> input.copyTo(output) }
             } ?: run {
                 logcat { "Local PDF copy failed: null input stream" }
+                targetFile.delete()
                 return@withContext LocalPdfResult.Failure(PdfErrorType.IO_ERROR)
             }
 
@@ -397,7 +403,7 @@ class RealInlinePdfHandler @Inject constructor(
         if (uri.scheme?.lowercase() != "file") return false
         val path = uri.path ?: return false
         val file = File(path)
-        return file.parentFile?.absolutePath == cacheDir.absolutePath &&
+        return file.parentFile?.absolutePath == cacheDirPath.absolutePath &&
             file.exists() &&
             hasPdfMagicBytes(file)
     }

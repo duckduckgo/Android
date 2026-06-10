@@ -763,5 +763,62 @@ class InlinePdfHandlerTest {
         assertFalse(inlinePdfHandler.isCachedLocalPdf("https://example.com/doc.pdf"))
     }
 
+    @Test
+    fun whenCacheLocalPdfWithFileUriThenReturnsSuccess() = runTest {
+        val pdfBytes = "%PDF-1.7\nfile source content".toByteArray()
+        val realContext = InstrumentationRegistry.getInstrumentation().targetContext
+        val sourceFile = File(realContext.filesDir, "source.pdf").apply { writeBytes(pdfBytes) }
+        val sourceUri = Uri.fromFile(sourceFile)
+
+        val mockContext: android.content.Context = mock()
+        val resolver: ContentResolver = mock()
+        whenever(mockContext.contentResolver).thenReturn(resolver)
+        whenever(mockContext.cacheDir).thenReturn(realContext.cacheDir)
+        whenever(resolver.openInputStream(sourceUri)).thenReturn(pdfBytes.inputStream())
+        val handler = RealInlinePdfHandler(
+            context = mockContext,
+            okHttpClient = OkHttpClient(),
+            cookieManagerProvider = cookieManagerProvider,
+            dispatcherProvider = coroutineTestRule.testDispatcherProvider,
+            androidBrowserConfigFeature = androidBrowserConfigFeature,
+        )
+
+        val result = handler.cacheLocalPdf(sourceUri)
+
+        assertTrue(result is LocalPdfResult.Success)
+        val success = result as LocalPdfResult.Success
+        assertEquals("file", success.uri.scheme)
+        assertTrue(success.displayName.endsWith(".pdf"))
+        assertTrue(File(success.uri.path!!).exists())
+
+        sourceFile.delete()
+    }
+
+    @Test
+    fun whenCacheLocalPdfOpenInputStreamReturnsNullThenReturnsIoErrorAndLeavesNoFile() = runTest {
+        val source = Uri.parse("content://downloads/null-stream")
+        val realContext = InstrumentationRegistry.getInstrumentation().targetContext
+        val mockContext: android.content.Context = mock()
+        val resolver: ContentResolver = mock()
+        whenever(mockContext.contentResolver).thenReturn(resolver)
+        whenever(mockContext.cacheDir).thenReturn(realContext.cacheDir)
+        whenever(resolver.openInputStream(source)).thenReturn(null)
+        whenever(resolver.query(eq(source), any(), anyOrNull(), anyOrNull(), anyOrNull())).thenReturn(null)
+        val handler = RealInlinePdfHandler(
+            context = mockContext,
+            okHttpClient = OkHttpClient(),
+            cookieManagerProvider = cookieManagerProvider,
+            dispatcherProvider = coroutineTestRule.testDispatcherProvider,
+            androidBrowserConfigFeature = androidBrowserConfigFeature,
+        )
+
+        val result = handler.cacheLocalPdf(source)
+
+        assertEquals(LocalPdfResult.Failure(PdfErrorType.IO_ERROR), result)
+        val cacheDir = File(realContext.cacheDir, "pdf_cache")
+        val leftoverFiles = cacheDir.listFiles()?.filter { it.isFile } ?: emptyList()
+        assertTrue("No files should remain in cache after null-stream failure", leftoverFiles.isEmpty())
+    }
+
     // endregion
 }
