@@ -287,8 +287,9 @@ class BrowserViewModel @Inject constructor(
         query: String,
         sourceTabId: String? = null,
         skipHome: Boolean = false,
+        skipUrlConversion: Boolean = false,
     ): String {
-        val url = if (skipUrlConversionOnNewTabFeature.self().isEnabled()) {
+        val url = if (skipUrlConversion || skipUrlConversionOnNewTabFeature.self().isEnabled()) {
             query
         } else {
             queryUrlConverter.convertQueryToUrl(query)

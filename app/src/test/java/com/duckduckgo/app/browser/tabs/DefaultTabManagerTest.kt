@@ -152,4 +152,16 @@ class DefaultTabManagerTest {
         verify(tabRepository).add(url = query, skipHome = false)
         verify(omnibarEntryConverter, never()).convertQueryToUrl(query)
     }
+
+    @Test
+    fun whenOpenNewTabWithSkipUrlConversionParamTrueAndFeatureDisabledThenQueryNotConverted() = runTest {
+        val pdfQuery = "file:///x/pdf_cache/1-a.pdf"
+        skipUrlConversionOnNewTabFeature.self().setRawStoredState(State(enable = false))
+        whenever(tabRepository.add(url = pdfQuery, skipHome = true)).thenReturn("tabId")
+
+        testee.openNewTab(query = pdfQuery, skipHome = true, skipUrlConversion = true)
+
+        verify(tabRepository).add(url = pdfQuery, skipHome = true)
+        verify(omnibarEntryConverter, never()).convertQueryToUrl(pdfQuery)
+    }
 }

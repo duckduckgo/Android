@@ -913,10 +913,21 @@ open class BrowserActivity : DuckDuckGoActivity() {
                         else -> sharedText
                     }
                 if (swipingTabsFeature.isEnabled) {
-                    launchNewTab(query = query, sourceTabId = sourceTabId, skipHome = skipHome, isExternal = isExternal)
+                    launchNewTab(
+                        query = query,
+                        sourceTabId = sourceTabId,
+                        skipHome = skipHome,
+                        isExternal = isExternal,
+                        skipUrlConversion = openLocalPdf,
+                    )
                 } else {
                     lifecycleScope.launch {
-                        val tabId = viewModel.onOpenInNewTabRequested(sourceTabId = sourceTabId, query = query, skipHome = skipHome)
+                        val tabId = viewModel.onOpenInNewTabRequested(
+                            sourceTabId = sourceTabId,
+                            query = query,
+                            skipHome = skipHome,
+                            skipUrlConversion = openLocalPdf,
+                        )
                         if (isExternal) {
                             externalLaunchTabIds.add(tabId)
                         }
@@ -1695,10 +1706,11 @@ open class BrowserActivity : DuckDuckGoActivity() {
         sourceTabId: String? = null,
         skipHome: Boolean = false,
         isExternal: Boolean = false,
+        skipUrlConversion: Boolean = false,
     ) {
         lifecycleScope.launch {
             if (swipingTabsFeature.isEnabled) {
-                val tabId = tabManager.openNewTab(query, sourceTabId, skipHome)
+                val tabId = tabManager.openNewTab(query, sourceTabId, skipHome, skipUrlConversion)
                 if (isExternal) {
                     externalLaunchTabIds.add(tabId)
                 }
