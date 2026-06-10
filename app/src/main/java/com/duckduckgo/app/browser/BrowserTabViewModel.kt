@@ -355,6 +355,7 @@ import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
 import com.duckduckgo.downloads.api.model.DownloadItem
 import com.duckduckgo.downloads.store.DownloadStatus
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
+import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.contextual.PageContextJSHelper
 import com.duckduckgo.duckchat.impl.contextual.RealPageContextJSHelper.Companion.PAGE_CONTEXT_FEATURE_NAME
@@ -513,6 +514,7 @@ class BrowserTabViewModel @Inject constructor(
     private val httpErrorPixels: Lazy<HttpErrorPixels>,
     private val duckPlayer: DuckPlayer,
     private val duckChat: DuckChat,
+    private val duckAiHostProvider: DuckAiHostProvider,
     private val duckAiFeatureState: DuckAiFeatureState,
     private val duckPlayerJSHelper: DuckPlayerJSHelper,
     private val refreshPixelSender: RefreshPixelSender,
@@ -1457,6 +1459,10 @@ class BrowserTabViewModel @Inject constructor(
         val verticalParameter = extractVerticalParameter(url)
         var urlToNavigate = queryUrlConverter.convertQueryToUrl(trimmedInput, verticalParameter, queryOrigin)
 
+        if (queryOrigin is QueryOrigin.FromUser && isTypedDuckAiUrl(urlToNavigate)) {
+            fireDuckAiDirectNavigationPixel()
+        }
+
         when (val type = specialUrlDetector.determineType(trimmedInput)) {
             is ShouldLaunchDuckChatLink -> {
                 runCatching {
@@ -1542,6 +1548,18 @@ class BrowserTabViewModel @Inject constructor(
             )
         autoCompleteViewState.value =
             currentAutoCompleteViewState().copy(showSuggestions = false, showFocusedView = false, searchResults = AutoCompleteResult("", emptyList()))
+    }
+
+    private fun isTypedDuckAiUrl(url: String): Boolean {
+        val host = runCatching { url.toUri().host }.getOrNull() ?: return false
+        val duckAiHost = duckAiHostProvider.getHost()
+        return host == duckAiHost || host == "www.$duckAiHost"
+    }
+
+    private fun fireDuckAiDirectNavigationPixel() {
+        val params = mapOf("duck_ai_enabled" to duckChat.isEnabled().toString())
+        pixel.fire(AppPixelName.AI_CHAT_DUCK_AI_DIRECT_NAVIGATION_COUNT, parameters = params)
+        pixel.fire(AppPixelName.AI_CHAT_DUCK_AI_DIRECT_NAVIGATION_DAILY, parameters = params, type = Daily())
     }
 
     private fun getUrlHeaders(url: String?): Map<String, String> = url?.let { customHeadersProvider.getCustomHeaders(it) } ?: emptyMap()
