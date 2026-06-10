@@ -1424,6 +1424,53 @@ class SingleTabFireDialogViewModelTest {
         }
     }
 
+    @Test
+    fun `when delete this tab clicked then wide event is started with single tab entry point and finished`() = runTest {
+        whenever(mockTabRepository.getSelectedTab()).thenReturn(
+            TabEntity(tabId = "tab1", url = "https://example.com", title = "Example"),
+        )
+        testee = createViewModel()
+
+        testee.onDeleteThisTabClicked()
+
+        coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
+
+        verify(mockDataClearingWideEvent).start(
+            entryPoint = eq(DataClearingWideEvent.EntryPoint.SINGLE_TAB_FIRE_DIALOG),
+            clearOptions = any(),
+        )
+        verify(mockDataClearingWideEvent).finishSuccess()
+    }
+
+    @Test
+    fun `when delete this tab returns error then wide event finishes with failure`() = runTest {
+        whenever(mockTabRepository.getSelectedTab()).thenReturn(
+            TabEntity(tabId = "tab1", url = "https://example.com", title = "Example"),
+        )
+        val exception = RuntimeException("test")
+        whenever(mockDataClearing.clearSingleTabData(any(), any())).thenReturn(ClearDataResult.Error(exception))
+        testee = createViewModel()
+
+        testee.onDeleteThisTabClicked()
+
+        coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
+
+        verify(mockDataClearingWideEvent).finishFailure(exception)
+        verify(mockDataClearingWideEvent, never()).finishSuccess()
+    }
+
+    @Test
+    fun `when delete this tab clicked without selected tab then wide event is not started`() = runTest {
+        whenever(mockTabRepository.getSelectedTab()).thenReturn(null)
+        testee = createViewModel()
+
+        testee.onDeleteThisTabClicked()
+
+        coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
+
+        verify(mockDataClearingWideEvent, never()).start(any(), any())
+    }
+
     // endregion
 
     // region DUCK_AI_CONTEXTUAL_CHAT origin

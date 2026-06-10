@@ -22,8 +22,10 @@ import androidx.webkit.WebStorageCompat
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.withTimeoutOrNull
 import javax.inject.Inject
 import kotlin.coroutines.resume
+import kotlin.time.Duration.Companion.milliseconds
 
 fun interface SiteDataCleaner {
     suspend fun deleteSiteData(webStorage: WebStorage, domain: String)
@@ -33,10 +35,16 @@ fun interface SiteDataCleaner {
 @SuppressLint("RequiresFeature")
 class RealSiteDataCleaner @Inject constructor() : SiteDataCleaner {
     override suspend fun deleteSiteData(webStorage: WebStorage, domain: String) {
-        suspendCancellableCoroutine { continuation ->
-            WebStorageCompat.deleteBrowsingDataForSite(webStorage, domain) {
-                continuation.resume(Unit)
+        withTimeoutOrNull(SITE_DELETION_TIMEOUT_MS.milliseconds) {
+            suspendCancellableCoroutine { continuation ->
+                WebStorageCompat.deleteBrowsingDataForSite(webStorage, domain) {
+                    continuation.resume(Unit)
+                }
             }
         }
+    }
+
+    private companion object {
+        private const val SITE_DELETION_TIMEOUT_MS = 5_000L
     }
 }

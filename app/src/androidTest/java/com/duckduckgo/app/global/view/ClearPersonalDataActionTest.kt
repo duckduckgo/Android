@@ -38,6 +38,7 @@ import com.duckduckgo.history.api.NavigationHistory
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.site.permissions.api.SitePermissionsManager
 import com.duckduckgo.sync.api.DeviceSyncState
+import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -387,7 +388,7 @@ class ClearPersonalDataActionTest {
         )
         val result = testeeWithCapture.clearDataForSpecificDomains(domains = setOf("fireproof.com", "clearable.com"))
         assertTrue(result is ClearDataResult.Success)
-        assertEquals(listOf("clearable.com"), clearedDomains)
+        assertEquals(setOf("clearable.com"), clearedDomains.toSet())
     }
 
     @Test
@@ -400,7 +401,7 @@ class ClearPersonalDataActionTest {
         )
         val result = testeeWithCapture.clearDataForSpecificDomains(domains = setOf("duckduckgo.com", "duck.ai", "clearable.com"))
         assertTrue(result is ClearDataResult.Success)
-        assertEquals(listOf("clearable.com"), clearedDomains)
+        assertEquals(setOf("clearable.com"), clearedDomains.toSet())
     }
 
     @Test
@@ -412,6 +413,45 @@ class ClearPersonalDataActionTest {
         )
         val result = testeeWithError.clearDataForSpecificDomains(domains = setOf("example.com"))
         assertTrue(result is ClearDataResult.Error)
+    }
+
+    @Test
+    fun whenClearDataForSpecificDomainsCalledWithManyDomainsThenAllNonFilteredDomainsAreCleared() = runTest {
+        whenever(mockWebViewCapabilityChecker.isSupported(DeleteBrowsingData)).thenReturn(true)
+        whenever(mockFireproofWebsiteRepository.fireproofWebsitesSync()).thenReturn(emptyList())
+        val domains = (1..25).map { "site$it.com" }.toSet()
+        // Synchronised because the bounded-concurrency clear may invoke the cleaner from multiple coroutines.
+        val clearedDomains = java.util.Collections.synchronizedList(mutableListOf<String>())
+        val testeeWithCapture = createTestee(
+            siteDataCleaner = { _, domain -> clearedDomains.add(domain) },
+        )
+
+        val result = testeeWithCapture.clearDataForSpecificDomains(domains = domains)
+
+        assertTrue(result is ClearDataResult.Success)
+        assertEquals(domains, clearedDomains.toSet())
+    }
+
+    @Test
+    fun whenClearDataForSpecificDomainsCalledAndOneDomainStallsThenOthersAreClearedAndReturnsSuccess() = runTest {
+        whenever(mockWebViewCapabilityChecker.isSupported(DeleteBrowsingData)).thenReturn(true)
+        whenever(mockFireproofWebsiteRepository.fireproofWebsitesSync()).thenReturn(emptyList())
+        val clearedDomains = java.util.Collections.synchronizedList(mutableListOf<String>())
+        val testeeWithStall = createTestee(
+            siteDataCleaner = { _, domain ->
+                if (domain == "stall.com") {
+                    // Simulate a WebView callback that never fires; the overall timeout must recover.
+                    suspendCancellableCoroutine<Unit> { }
+                } else {
+                    clearedDomains.add(domain)
+                }
+            },
+        )
+
+        val result = testeeWithStall.clearDataForSpecificDomains(domains = setOf("stall.com", "a.com", "b.com"))
+
+        assertTrue(result is ClearDataResult.Success)
+        assertEquals(setOf("a.com", "b.com"), clearedDomains.toSet())
     }
 
     @Test

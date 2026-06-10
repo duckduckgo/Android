@@ -41,12 +41,19 @@ import com.duckduckgo.history.api.NavigationHistory
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.site.permissions.api.SitePermissionsManager
 import com.duckduckgo.sync.api.DeviceSyncState
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.sync.Semaphore
+import kotlinx.coroutines.sync.withPermit
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeoutOrNull
 import logcat.LogPriority.INFO
 import logcat.LogPriority.WARN
 import logcat.logcat
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import kotlin.coroutines.cancellation.CancellationException
+import kotlin.time.Duration.Companion.milliseconds
 
 sealed class ClearDataResult {
     data object Success : ClearDataResult()
@@ -244,14 +251,30 @@ class ClearPersonalDataAction(
                     .toSet()
             }
 
-            withContext(dispatchers.main()) {
-                val webStorage = createWebStorage()
-                domains
-                    .filter { !duckDuckGoDomains.contains(it) && !fireproofDomains.contains(it) }
-                    .forEach { domain ->
-                        siteDataCleaner.deleteSiteData(webStorage, domain)
+            val domainsToClear = domains
+                .filter { !duckDuckGoDomains.contains(it) && !fireproofDomains.contains(it) }
+
+            val completedWithinDeadline = withTimeoutOrNull(OVERALL_CLEAR_TIMEOUT_MS.milliseconds) {
+                withContext(dispatchers.main()) {
+                    val webStorage = createWebStorage()
+                    val semaphore = Semaphore(MAX_CONCURRENT_SITE_DELETIONS)
+                    coroutineScope {
+                        domainsToClear.map { domain ->
+                            async {
+                                semaphore.withPermit {
+                                    siteDataCleaner.deleteSiteData(webStorage, domain)
+                                }
+                            }
+                        }.awaitAll()
                     }
-                logcat(INFO) { "Cleared site data for ${domains.size} domains" }
+                }
+                true
+            } ?: false
+
+            if (completedWithinDeadline) {
+                logcat(INFO) { "Cleared site data for ${domainsToClear.size} domains" }
+            } else {
+                logcat(WARN) { "Clearing site data timed out after ${OVERALL_CLEAR_TIMEOUT_MS}ms" }
             }
             ClearDataResult.Success
         } catch (e: CancellationException) {
@@ -317,5 +340,13 @@ class ClearPersonalDataAction(
         setOf("duckduckgo.com", duckAiHostProvider.getHost())
             .map { host -> "https://$host".toHttpUrlOrNull()?.topPrivateDomain() ?: host }
             .toSet()
+    }
+
+    private companion object {
+        // Max number of per-site web-storage deletions in flight at once
+        private const val MAX_CONCURRENT_SITE_DELETIONS = 10
+
+        // Hard ceiling for the whole per-domain clear, so a stalled WebView can never hang the burn
+        private const val OVERALL_CLEAR_TIMEOUT_MS = 15_000L
     }
 }

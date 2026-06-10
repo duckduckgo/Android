@@ -213,13 +213,28 @@ class SingleTabFireDialogViewModel @Inject constructor(
 
             val result = withContext(dispatcherProvider.io()) {
                 if (originalTabId != null) {
-                    if (origin.value == DuckAiContextualChat) {
-                        dataClearing.clearTabContextualChat(originalTabId)
-                    } else {
-                        dataClearing.clearSingleTabData(
-                            tabId = originalTabId,
-                            replaceCurrentTab = origin.value !is Hatch,
-                        )
+                    val clearOptions = fireDataStore.getManualClearOptions()
+                    dataClearingWideEvent.start(
+                        entryPoint = DataClearingWideEvent.EntryPoint.SINGLE_TAB_FIRE_DIALOG,
+                        clearOptions = clearOptions,
+                    )
+                    try {
+                        val clearResult = if (origin.value == DuckAiContextualChat) {
+                            dataClearing.clearTabContextualChat(originalTabId)
+                        } else {
+                            dataClearing.clearSingleTabData(
+                                tabId = originalTabId,
+                                replaceCurrentTab = origin.value !is Hatch,
+                            )
+                        }
+                        when (clearResult) {
+                            is ClearDataResult.Error -> dataClearingWideEvent.finishFailure(clearResult.exception)
+                            else -> dataClearingWideEvent.finishSuccess()
+                        }
+                        clearResult
+                    } catch (e: Exception) {
+                        dataClearingWideEvent.finishFailure(e)
+                        throw e
                     }
                 } else {
                     null
