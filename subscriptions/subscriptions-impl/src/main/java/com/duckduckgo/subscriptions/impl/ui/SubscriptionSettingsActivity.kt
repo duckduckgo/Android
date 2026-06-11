@@ -64,6 +64,7 @@ import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Subscr
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.SubscriptionDuration.Yearly
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.ViewState
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionsWebViewActivityWithParams.ToolbarConfig.CustomTitle
+import com.duckduckgo.subscriptions.impl.ui.onboarding.SubscriptionOnboardingActivity.Companion.SubscriptionOnboardingScreenWithEmptyParams
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -138,6 +139,10 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
 
         binding.privacyPolicy.setOnClickListener {
             goToPrivacyPolicy()
+        }
+
+        binding.onboardingEntryPoint.setOnClickListener {
+            globalActivityStarter.start(this, SubscriptionOnboardingScreenWithEmptyParams)
         }
 
         if (savedInstanceState == null) {
