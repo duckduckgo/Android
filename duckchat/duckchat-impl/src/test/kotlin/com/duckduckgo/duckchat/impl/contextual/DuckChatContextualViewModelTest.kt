@@ -1598,13 +1598,29 @@ class DuckChatContextualViewModelTest {
     }
 
     @Test
-    fun `when quick action clicked in ASK_ABOUT_PAGE then state transitions to SUBMIT_SUMMARIZE`() = runTest {
+    fun `when quick action clicked in ASK_ABOUT_PAGE with valid context then state transitions to SUBMIT_SUMMARIZE`() = runTest {
         whenever(contextualSheetImprovementsToggle.isEnabled()).thenReturn(true)
         val testee = buildViewModel()
+        testee.onSheetOpened("tab-1")
+        val pageContext = """{"title":"Page","url":"https://example.com","content":"text"}"""
+        testee.onPageContextReceived("tab-1", pageContext)
 
         testee.onQuickActionClicked("")
 
         assertEquals(DuckChatContextualViewModel.QuickActionState.SUBMIT_SUMMARIZE, testee.viewState.value.quickActionState)
+    }
+
+    @Test
+    fun `when quick action clicked in ASK_ABOUT_PAGE with no page context then state stays ASK_ABOUT_PAGE`() = runTest {
+        whenever(contextualSheetImprovementsToggle.isEnabled()).thenReturn(true)
+        val testee = buildViewModel()
+        testee.onSheetOpened("tab-1")
+        // No onPageContextReceived call — updatedPageContext is empty/invalid.
+
+        testee.onQuickActionClicked("")
+
+        assertEquals(DuckChatContextualViewModel.QuickActionState.ASK_ABOUT_PAGE, testee.viewState.value.quickActionState)
+        assertFalse(testee.viewState.value.showContext)
     }
 
     @Test
@@ -1652,6 +1668,8 @@ class DuckChatContextualViewModelTest {
         whenever(contextualSheetImprovementsToggle.isEnabled()).thenReturn(true)
         val testee = buildViewModel()
         testee.onSheetOpened("tab-1")
+        val pageContext = """{"title":"Page","url":"https://example.com","content":"text"}"""
+        testee.onPageContextReceived("tab-1", pageContext)
         testee.onQuickActionClicked("") // transition ASK_ABOUT_PAGE -> SUBMIT_SUMMARIZE
 
         testee.subscriptionEventDataFlow.test {
@@ -1668,10 +1686,33 @@ class DuckChatContextualViewModelTest {
     }
 
     @Test
+    fun `when SUBMIT_SUMMARIZE clicked after user removed context then summarize is NOT submitted`() = runTest {
+        whenever(contextualSheetImprovementsToggle.isEnabled()).thenReturn(true)
+        val testee = buildViewModel()
+        testee.onSheetOpened("tab-1")
+        val pageContext = """{"title":"Page","url":"https://example.com","content":"text"}"""
+        testee.onPageContextReceived("tab-1", pageContext)
+        testee.onQuickActionClicked("") // ASK_ABOUT_PAGE -> SUBMIT_SUMMARIZE
+        testee.removePageContext() // user dismisses the URL chip
+        assertFalse(testee.viewState.value.showContext)
+
+        testee.subscriptionEventDataFlow.test {
+            testee.onQuickActionClicked("")
+
+            expectNoEvents()
+            cancelAndIgnoreRemainingEvents()
+        }
+        // Still in input mode — no auto-submit happened.
+        assertEquals(DuckChatContextualViewModel.SheetMode.INPUT, testee.viewState.value.sheetMode)
+    }
+
+    @Test
     fun `when new chat triggered with contextualSheetImprovements enabled then quickActionState resets to ASK_ABOUT_PAGE`() = runTest {
         whenever(contextualSheetImprovementsToggle.isEnabled()).thenReturn(true)
         val testee = buildViewModel()
         testee.onSheetOpened("tab-1")
+        val pageContext = """{"title":"Page","url":"https://example.com","content":"text"}"""
+        testee.onPageContextReceived("tab-1", pageContext)
         testee.onQuickActionClicked("") // ASK_ABOUT_PAGE -> SUBMIT_SUMMARIZE
 
         testee.onNewChatRequested()
@@ -1695,6 +1736,8 @@ class DuckChatContextualViewModelTest {
         whenever(contextualSheetImprovementsToggle.isEnabled()).thenReturn(true)
         val testee = buildViewModel()
         testee.onSheetOpened("tab-1")
+        val pageContext = """{"title":"Page","url":"https://example.com","content":"text"}"""
+        testee.onPageContextReceived("tab-1", pageContext)
         testee.onQuickActionClicked("") // ASK_ABOUT_PAGE -> SUBMIT_SUMMARIZE
 
         testee.subscriptionEventDataFlow.test {
@@ -1724,6 +1767,8 @@ class DuckChatContextualViewModelTest {
         whenever(contextualSheetImprovementsToggle.isEnabled()).thenReturn(true)
         val testee = buildViewModel()
         testee.onSheetOpened("tab-1")
+        val pageContext = """{"title":"Page","url":"https://example.com","content":"text"}"""
+        testee.onPageContextReceived("tab-1", pageContext)
         testee.onQuickActionClicked("") // ASK_ABOUT_PAGE -> SUBMIT_SUMMARIZE
 
         testee.commands.test {

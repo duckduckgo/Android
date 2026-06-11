@@ -581,6 +581,10 @@ class DuckChatContextualViewModel @Inject constructor(
             }
 
             QuickActionState.ASK_ABOUT_PAGE -> {
+                if (!isContextValid(updatedPageContext)) {
+                    // Page context not ready yet; stay in ASK_ABOUT_PAGE so the user can retry.
+                    return
+                }
                 addPageContext()
                 viewModelScope.launch {
                     _viewState.update { it.copy(quickActionState = QuickActionState.SUBMIT_SUMMARIZE) }
@@ -588,6 +592,10 @@ class DuckChatContextualViewModel @Inject constructor(
             }
 
             QuickActionState.SUBMIT_SUMMARIZE -> {
+                if (!_viewState.value.showContext) {
+                    // Context was removed before submit; refuse to auto-submit without it.
+                    return
+                }
                 addPageContext()
                 onPromptSent(
                     prompt = context.getString(R.string.duckAIContextualPromptSummarize),
