@@ -36,6 +36,9 @@ import com.duckduckgo.sync.TestSyncFixtures.primaryKey
 import com.duckduckgo.sync.TestSyncFixtures.validLoginKeys
 import com.duckduckgo.sync.impl.AccountErrorCodes.ALREADY_SIGNED_IN
 import com.duckduckgo.sync.impl.AccountErrorCodes.LOGIN_FAILED
+import com.duckduckgo.sync.impl.AccountErrorCodes.PAIRING_REJECTED
+import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2CodeParseResult
+import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Message
 import com.duckduckgo.sync.impl.Clipboard
 import com.duckduckgo.sync.impl.ExchangeResult.AccountSwitchingRequired
 import com.duckduckgo.sync.impl.ExchangeResult.LoggedIn
@@ -702,5 +705,36 @@ class SyncWithAnotherDeviceViewModelTest {
             cancelAndIgnoreRemainingEvents()
         }
         verify(runner, times(1)).startPresent()
+    }
+
+    // ---- v2 Joiner: abort-error codes surfaced through onQRCodeScanned ----
+
+    @Test
+    fun whenV2PairingRejectedByPeerThenShowError() = runTest {
+        // Signed-in device elected Joiner against a signed-in peer; peer rejects → Failed(PAIRING_REJECTED).
+        // Must show a visible error. (Previously force-mapped to CONNECT_FAILED, discarding the code;
+        // guards the visible-error contract once the real code is passed through.)
+        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
+        whenever(syncRepository.getAccountInfo()).thenReturn(accountA)
+        val scannedCode = "https://duckduckgo.com/sync/pairing/#&code2=v2code"
+        whenever(qrCode.parse(scannedCode)).thenReturn(
+            ExchangeV2CodeParseResult.LinkingV2(channelId = "c", publicKey = "k", version = "2"),
+        )
+
+        testee.commands().test {
+            testee.onQRCodeScanned(scannedCode)
+            runnerEventsFlow.emit(
+                ExchangeV2Event.Transition(
+                    timestampMs = System.currentTimeMillis(),
+                    from = ExchangeV2State.Joiner.Confirming,
+                    to = ExchangeV2State.Joiner.AbortedByHost,
+                    trigger = ExchangeV2Message.RecoveryCodeDenied(rawJson = "{}"),
+                    localTrigger = null,
+                ),
+            )
+            val command = awaitItem()
+            assertTrue("expected ShowError, got $command", command is ShowError)
+            cancelAndIgnoreRemainingEvents()
+        }
     }
 }
