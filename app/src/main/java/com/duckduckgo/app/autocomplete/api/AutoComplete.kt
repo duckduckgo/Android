@@ -264,6 +264,7 @@ class AutoCompleteApi constructor(
         suggestions: List<AutoCompleteSuggestion>,
         suggestion: AutoCompleteSuggestion,
         experimentalInputScreen: Boolean,
+        duckAiSurface: Boolean,
     ) {
         val hasBookmarks = withContext(dispatchers.io()) {
             savedSitesRepository.hasBookmarks()
@@ -293,12 +294,10 @@ class AutoCompleteApi constructor(
             PixelParameter.SHOWED_SWITCH_TO_TAB to hasSwitchToTabResults.toString(),
         )
         val pixelName = when (suggestion) {
-            is AutoCompleteBookmarkSuggestion -> {
-                if (suggestion.isFavorite) {
-                    AutoCompletePixelNames.AUTOCOMPLETE_FAVORITE_SELECTION
-                } else {
-                    AutoCompletePixelNames.AUTOCOMPLETE_BOOKMARK_SELECTION
-                }
+            is AutoCompleteBookmarkSuggestion -> if (suggestion.isFavorite) {
+                AutoCompletePixelNames.AUTOCOMPLETE_FAVORITE_SELECTION
+            } else {
+                AutoCompletePixelNames.AUTOCOMPLETE_BOOKMARK_SELECTION
             }
 
             is AutoCompleteSearchSuggestion -> if (suggestion.isUrl) {
@@ -323,7 +322,19 @@ class AutoCompleteApi constructor(
             else -> return
         }
 
-        pixel.fire(pixelName, params)
+        // On the Duck.ai tab the same suggestion taps are attributed to a separate
+        // m_autocomplete_duckai_click_* family so they aren't conflated with search-mode taps.
+        pixel.fire(if (duckAiSurface) pixelName.toDuckAiSurface() else pixelName, params)
+    }
+
+    private fun AutoCompletePixelNames.toDuckAiSurface(): AutoCompletePixelNames = when (this) {
+        AutoCompletePixelNames.AUTOCOMPLETE_FAVORITE_SELECTION -> AutoCompletePixelNames.AUTOCOMPLETE_DUCKAI_FAVORITE_SELECTION
+        AutoCompletePixelNames.AUTOCOMPLETE_BOOKMARK_SELECTION -> AutoCompletePixelNames.AUTOCOMPLETE_DUCKAI_BOOKMARK_SELECTION
+        AutoCompletePixelNames.AUTOCOMPLETE_SEARCH_WEBSITE_SELECTION -> AutoCompletePixelNames.AUTOCOMPLETE_DUCKAI_WEBSITE_SELECTION
+        AutoCompletePixelNames.AUTOCOMPLETE_HISTORY_SITE_SELECTION -> AutoCompletePixelNames.AUTOCOMPLETE_DUCKAI_HISTORY_SITE_SELECTION
+        AutoCompletePixelNames.AUTOCOMPLETE_HISTORY_SEARCH_SELECTION -> AutoCompletePixelNames.AUTOCOMPLETE_DUCKAI_HISTORY_SEARCH_SELECTION
+        AutoCompletePixelNames.AUTOCOMPLETE_SWITCH_TO_TAB_SELECTION -> AutoCompletePixelNames.AUTOCOMPLETE_DUCKAI_SWITCH_TO_TAB_SELECTION
+        else -> this
     }
 
     private fun isAllowedInTopHits(entry: HistoryEntry): Boolean {

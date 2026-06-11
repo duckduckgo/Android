@@ -22,6 +22,7 @@ import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputStateProvider
 import com.duckduckgo.duckchat.impl.models.Tool
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -33,6 +34,7 @@ import javax.inject.Inject
 @ContributesViewModel(ViewScope::class)
 class OptionsViewModel @Inject constructor(
     nativeInputStateProvider: NativeInputStateProvider,
+    private val duckChatPixels: DuckChatPixels,
 ) : ViewModel() {
 
     val selectedTool: StateFlow<Tool?> = nativeInputStateProvider.state
@@ -53,5 +55,19 @@ class OptionsViewModel @Inject constructor(
         _visibleTools.value = tools
         val current = selectedTool.value
         return current != null && current !in tools
+    }
+
+    fun onToolSelectedByUser(tool: Tool) {
+        when (tool) {
+            Tool.IMAGE_GENERATION -> duckChatPixels.fireImageGenerationSelected()
+            Tool.WEB_SEARCH -> duckChatPixels.fireWebSearchSelected()
+        }
+    }
+
+    fun onToolDeselectedByUser(tool: Tool) {
+        when (tool) {
+            Tool.IMAGE_GENERATION -> duckChatPixels.fireImageGenerationDeselected()
+            Tool.WEB_SEARCH -> duckChatPixels.fireWebSearchDeselected()
+        }
     }
 }

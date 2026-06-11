@@ -1181,7 +1181,7 @@ class InputScreenViewModelTest {
             assertEquals(SubmitChat(query), viewModel.command.value)
 
             verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_OPEN_AUTOCOMPLETE_EXPERIMENTAL, params)
-            verify(autoComplete).fireAutocompletePixel(any(), any(), any())
+            verify(autoComplete).fireAutocompletePixel(any(), any(), any(), any())
         }
 
     @Test

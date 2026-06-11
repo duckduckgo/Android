@@ -114,11 +114,7 @@ import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 interface DuckChatPixels {
-    fun sendReportMetricPixel(
-        reportMetric: ReportMetric,
-        modelTier: ModelTier? = null,
-    )
-
+    fun sendReportMetricPixel(reportMetric: ReportMetric, modelTier: ModelTier? = null)
     fun reportOpen()
     fun reportContextualSheetOpened()
     fun reportContextualSheetDismissed()
@@ -152,6 +148,34 @@ interface DuckChatPixels {
     fun reportVoiceNotificationEndChatTapped()
     fun reportVoiceServiceStarted()
     fun reportVoiceServiceKilled()
+
+    fun fireImageGenerationSelected()
+    fun fireImageGenerationDeselected()
+    fun fireImageGenerationSubmitted()
+    fun fireWebSearchSelected()
+    fun fireWebSearchDeselected()
+    fun fireWebSearchSubmitted()
+    fun firePromptSubmitted(
+        selectedTool: String,
+        modelId: String?,
+        reasoningEffort: String?,
+        hasImageAttachment: Boolean,
+        hasFileAttachment: Boolean,
+        hasText: Boolean,
+    )
+    fun fireModelSelected(modelId: String)
+    fun fireReasoningEffortSelected(effortLevel: String)
+    fun fireSubscriptionUpsellTriggered(source: String, currentTier: String, requiredTier: String, flowType: String)
+    fun fireImageAttached(source: String)
+    fun fireImageValidationFailed(reason: String)
+    fun fireImageRemoved()
+    fun fireFileAttached()
+    fun fireFileRemoved()
+    fun fireFileValidationFailed(reason: String)
+    fun fireVoiceTapped()
+    fun fireStopGenerationTapped()
+    fun fireDuckAiChatHistorySuggestionClicked()
+    fun fireDuckAiSearchDuckDuckGoSuggestionClicked()
 }
 
 @ContributesBinding(AppScope::class)
@@ -165,10 +189,18 @@ class RealDuckChatPixels @Inject constructor(
     private val termsOfServiceHandler: DuckChatTermsOfServiceHandler,
 ) : DuckChatPixels {
 
-    override fun sendReportMetricPixel(
-        reportMetric: ReportMetric,
-        modelTier: ModelTier?,
+    private fun fireCountAndDaily(
+        count: DuckChatPixelName,
+        daily: DuckChatPixelName,
+        parameters: Map<String, String> = emptyMap(),
     ) {
+        appCoroutineScope.launch(dispatcherProvider.io()) {
+            pixel.fire(count, parameters = parameters)
+            pixel.fire(daily, parameters = parameters, type = Pixel.PixelType.Daily())
+        }
+    }
+
+    override fun sendReportMetricPixel(reportMetric: ReportMetric, modelTier: ModelTier?) {
         appCoroutineScope.launch(dispatcherProvider.io()) {
             var refreshAtb = false
             val sessionParams = mapOf(
@@ -420,6 +452,144 @@ class RealDuckChatPixels @Inject constructor(
     override fun reportVoiceServiceKilled() {
         pixel.fire(DuckChatPixelName.DUCK_CHAT_VOICE_SERVICE_KILLED)
     }
+
+    override fun fireImageGenerationSelected() = fireCountAndDaily(
+        DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_IMAGE_GENERATION_SELECTED_COUNT,
+        DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_IMAGE_GENERATION_SELECTED_DAILY,
+    )
+
+    override fun fireImageGenerationDeselected() = fireCountAndDaily(
+        DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_IMAGE_GENERATION_DESELECTED_COUNT,
+        DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_IMAGE_GENERATION_DESELECTED_DAILY,
+    )
+
+    override fun fireImageGenerationSubmitted() = fireCountAndDaily(
+        DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_IMAGE_GENERATION_SUBMITTED_COUNT,
+        DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_IMAGE_GENERATION_SUBMITTED_DAILY,
+    )
+
+    override fun fireWebSearchSelected() = fireCountAndDaily(
+        DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_WEB_SEARCH_SELECTED_COUNT,
+        DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_WEB_SEARCH_SELECTED_DAILY,
+    )
+
+    override fun fireWebSearchDeselected() = fireCountAndDaily(
+        DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_WEB_SEARCH_DESELECTED_COUNT,
+        DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_WEB_SEARCH_DESELECTED_DAILY,
+    )
+
+    override fun fireWebSearchSubmitted() = fireCountAndDaily(
+        DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_WEB_SEARCH_SUBMITTED_COUNT,
+        DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_WEB_SEARCH_SUBMITTED_DAILY,
+    )
+
+    override fun firePromptSubmitted(
+        selectedTool: String,
+        modelId: String?,
+        reasoningEffort: String?,
+        hasImageAttachment: Boolean,
+        hasFileAttachment: Boolean,
+        hasText: Boolean,
+    ) {
+        val params = buildMap {
+            put(DuckChatPixelParameters.SELECTED_TOOL, selectedTool)
+            modelId?.let { put(DuckChatPixelParameters.MODEL_ID, it) }
+            reasoningEffort?.let { put(DuckChatPixelParameters.REASONING_EFFORT, it) }
+            put(DuckChatPixelParameters.HAS_IMAGE_ATTACHMENT, hasImageAttachment.toString())
+            put(DuckChatPixelParameters.HAS_FILE_ATTACHMENT, hasFileAttachment.toString())
+            put(DuckChatPixelParameters.HAS_TEXT, hasText.toString())
+        }
+        fireCountAndDaily(
+            DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_PROMPT_SUBMITTED_COUNT,
+            DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_PROMPT_SUBMITTED_DAILY,
+            params,
+        )
+    }
+
+    override fun fireModelSelected(modelId: String) {
+        appCoroutineScope.launch(dispatcherProvider.io()) {
+            pixel.fire(DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_MODEL_SELECTED, parameters = mapOf(DuckChatPixelParameters.MODEL_ID to modelId))
+        }
+    }
+
+    override fun fireReasoningEffortSelected(effortLevel: String) {
+        appCoroutineScope.launch(dispatcherProvider.io()) {
+            pixel.fire(
+                DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_REASONING_EFFORT_SELECTED,
+                parameters = mapOf(DuckChatPixelParameters.EFFORT_LEVEL to effortLevel),
+            )
+        }
+    }
+
+    override fun fireSubscriptionUpsellTriggered(source: String, currentTier: String, requiredTier: String, flowType: String) {
+        appCoroutineScope.launch(dispatcherProvider.io()) {
+            pixel.fire(
+                DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_SUBSCRIPTION_UPSELL_TRIGGERED,
+                parameters = mapOf(
+                    DuckChatPixelParameters.UPSELL_SOURCE to source,
+                    DuckChatPixelParameters.UPSELL_CURRENT_TIER to currentTier,
+                    DuckChatPixelParameters.UPSELL_REQUIRED_TIER to requiredTier,
+                    DuckChatPixelParameters.UPSELL_FLOW_TYPE to flowType,
+                ),
+            )
+        }
+    }
+
+    override fun fireImageAttached(source: String) = fireCountAndDaily(
+        DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_IMAGE_ATTACHED_COUNT,
+        DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_IMAGE_ATTACHED_DAILY,
+        mapOf(DuckChatPixelParameters.ATTACHMENT_SOURCE to source),
+    )
+
+    override fun fireImageRemoved() = fireCountAndDaily(
+        DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_IMAGE_REMOVED_COUNT,
+        DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_IMAGE_REMOVED_DAILY,
+    )
+
+    override fun fireImageValidationFailed(reason: String) = fireCountAndDaily(
+        DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_IMAGE_VALIDATION_FAILED_COUNT,
+        DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_IMAGE_VALIDATION_FAILED_DAILY,
+        mapOf(DuckChatPixelParameters.FILE_VALIDATION_REASON to reason),
+    )
+
+    override fun fireFileAttached() = fireCountAndDaily(
+        DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_FILE_ATTACHED_COUNT,
+        DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_FILE_ATTACHED_DAILY,
+    )
+
+    override fun fireFileRemoved() = fireCountAndDaily(
+        DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_FILE_REMOVED_COUNT,
+        DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_FILE_REMOVED_DAILY,
+    )
+
+    override fun fireFileValidationFailed(reason: String) = fireCountAndDaily(
+        DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_FILE_VALIDATION_FAILED_COUNT,
+        DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_FILE_VALIDATION_FAILED_DAILY,
+        mapOf(DuckChatPixelParameters.FILE_VALIDATION_REASON to reason),
+    )
+
+    override fun fireVoiceTapped() = fireCountAndDaily(
+        DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_VOICE_TAPPED_COUNT,
+        DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_VOICE_TAPPED_DAILY,
+    )
+
+    override fun fireStopGenerationTapped() {
+        appCoroutineScope.launch(dispatcherProvider.io()) {
+            pixel.fire(DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_STOP_GENERATION_TAPPED)
+        }
+    }
+
+    override fun fireDuckAiChatHistorySuggestionClicked() {
+        appCoroutineScope.launch(dispatcherProvider.io()) {
+            pixel.fire(DuckChatPixelName.AUTOCOMPLETE_DUCKAI_CLICK_CHAT_HISTORY)
+        }
+    }
+
+    override fun fireDuckAiSearchDuckDuckGoSuggestionClicked() {
+        appCoroutineScope.launch(dispatcherProvider.io()) {
+            pixel.fire(DuckChatPixelName.AUTOCOMPLETE_DUCKAI_CLICK_SEARCH_DUCKDUCKGO)
+        }
+    }
 }
 
 enum class DuckChatPixelName(override val pixelName: String) : Pixel.PixelName {
@@ -548,6 +718,8 @@ enum class DuckChatPixelName(override val pixelName: String) : Pixel.PixelName {
     DUCK_CHAT_RECENT_CHAT_SELECTED_DAILY("m_aichat_recent_chat_selected_daily"),
     DUCK_CHAT_RECENT_CHAT_SELECTED_PINNED_COUNT("m_aichat_recent_chat_selected_pinned_count"),
     DUCK_CHAT_RECENT_CHAT_SELECTED_PINNED_DAILY("m_aichat_recent_chat_selected_pinned_daily"),
+    AUTOCOMPLETE_DUCKAI_CLICK_CHAT_HISTORY("m_autocomplete_duckai_click_chat_history"),
+    AUTOCOMPLETE_DUCKAI_CLICK_SEARCH_DUCKDUCKGO("m_autocomplete_duckai_click_search_duckduckgo"),
     DUCK_CHAT_VOICE_ENTRY_TAPPED_COUNT("m_aichat_voice_entry_tapped_count"),
     DUCK_CHAT_VOICE_ENTRY_TAPPED_DAILY("m_aichat_voice_entry_tapped_daily"),
     DUCK_CHAT_VOICE_SESSION_STARTED("m_aichat_voice_session_started"),
@@ -606,6 +778,38 @@ enum class DuckChatPixelName(override val pixelName: String) : Pixel.PixelName {
     DUCK_CHAT_HISTORY_NEW_CHAT_TAPPED_DAILY("m_aichat_history_new_chat_tapped_daily"),
     DUCK_CHAT_HISTORY_DOWNLOAD_SELECTED_COUNT("m_aichat_history_download_selected_count"),
     DUCK_CHAT_HISTORY_DOWNLOAD_SELECTED_DAILY("m_aichat_history_download_selected_daily"),
+    DUCK_CHAT_UNIFIED_INPUT_IMAGE_GENERATION_SELECTED_COUNT("m_aichat_unified_input_image_generation_selected_count"),
+    DUCK_CHAT_UNIFIED_INPUT_IMAGE_GENERATION_SELECTED_DAILY("m_aichat_unified_input_image_generation_selected_daily"),
+    DUCK_CHAT_UNIFIED_INPUT_IMAGE_GENERATION_DESELECTED_COUNT("m_aichat_unified_input_image_generation_deselected_count"),
+    DUCK_CHAT_UNIFIED_INPUT_IMAGE_GENERATION_DESELECTED_DAILY("m_aichat_unified_input_image_generation_deselected_daily"),
+    DUCK_CHAT_UNIFIED_INPUT_IMAGE_GENERATION_SUBMITTED_COUNT("m_aichat_unified_input_image_generation_submitted_count"),
+    DUCK_CHAT_UNIFIED_INPUT_IMAGE_GENERATION_SUBMITTED_DAILY("m_aichat_unified_input_image_generation_submitted_daily"),
+    DUCK_CHAT_UNIFIED_INPUT_WEB_SEARCH_SELECTED_COUNT("m_aichat_unified_input_web_search_selected_count"),
+    DUCK_CHAT_UNIFIED_INPUT_WEB_SEARCH_SELECTED_DAILY("m_aichat_unified_input_web_search_selected_daily"),
+    DUCK_CHAT_UNIFIED_INPUT_WEB_SEARCH_DESELECTED_COUNT("m_aichat_unified_input_web_search_deselected_count"),
+    DUCK_CHAT_UNIFIED_INPUT_WEB_SEARCH_DESELECTED_DAILY("m_aichat_unified_input_web_search_deselected_daily"),
+    DUCK_CHAT_UNIFIED_INPUT_WEB_SEARCH_SUBMITTED_COUNT("m_aichat_unified_input_web_search_submitted_count"),
+    DUCK_CHAT_UNIFIED_INPUT_WEB_SEARCH_SUBMITTED_DAILY("m_aichat_unified_input_web_search_submitted_daily"),
+    DUCK_CHAT_UNIFIED_INPUT_PROMPT_SUBMITTED_COUNT("m_aichat_unified_input_prompt_submitted_count"),
+    DUCK_CHAT_UNIFIED_INPUT_PROMPT_SUBMITTED_DAILY("m_aichat_unified_input_prompt_submitted_daily"),
+    DUCK_CHAT_UNIFIED_INPUT_MODEL_SELECTED("m_aichat_unified_input_model_selected"),
+    DUCK_CHAT_UNIFIED_INPUT_REASONING_EFFORT_SELECTED("m_aichat_unified_input_reasoning_effort_selected"),
+    DUCK_CHAT_UNIFIED_INPUT_SUBSCRIPTION_UPSELL_TRIGGERED("m_aichat_unified_input_subscription_upsell_triggered"),
+    DUCK_CHAT_UNIFIED_INPUT_IMAGE_ATTACHED_COUNT("m_aichat_unified_input_image_attached_count"),
+    DUCK_CHAT_UNIFIED_INPUT_IMAGE_ATTACHED_DAILY("m_aichat_unified_input_image_attached_daily"),
+    DUCK_CHAT_UNIFIED_INPUT_IMAGE_REMOVED_COUNT("m_aichat_unified_input_image_removed_count"),
+    DUCK_CHAT_UNIFIED_INPUT_IMAGE_REMOVED_DAILY("m_aichat_unified_input_image_removed_daily"),
+    DUCK_CHAT_UNIFIED_INPUT_IMAGE_VALIDATION_FAILED_COUNT("m_aichat_unified_input_image_validation_failed_count"),
+    DUCK_CHAT_UNIFIED_INPUT_IMAGE_VALIDATION_FAILED_DAILY("m_aichat_unified_input_image_validation_failed_daily"),
+    DUCK_CHAT_UNIFIED_INPUT_FILE_ATTACHED_COUNT("m_aichat_unified_input_file_attached_count"),
+    DUCK_CHAT_UNIFIED_INPUT_FILE_ATTACHED_DAILY("m_aichat_unified_input_file_attached_daily"),
+    DUCK_CHAT_UNIFIED_INPUT_FILE_REMOVED_COUNT("m_aichat_unified_input_file_removed_count"),
+    DUCK_CHAT_UNIFIED_INPUT_FILE_REMOVED_DAILY("m_aichat_unified_input_file_removed_daily"),
+    DUCK_CHAT_UNIFIED_INPUT_FILE_VALIDATION_FAILED_COUNT("m_aichat_unified_input_file_validation_failed_count"),
+    DUCK_CHAT_UNIFIED_INPUT_FILE_VALIDATION_FAILED_DAILY("m_aichat_unified_input_file_validation_failed_daily"),
+    DUCK_CHAT_UNIFIED_INPUT_VOICE_TAPPED_COUNT("m_aichat_unified_input_voice_tapped_count"),
+    DUCK_CHAT_UNIFIED_INPUT_VOICE_TAPPED_DAILY("m_aichat_unified_input_voice_tapped_daily"),
+    DUCK_CHAT_UNIFIED_INPUT_STOP_GENERATION_TAPPED("m_aichat_unified_input_stop_generation_tapped"),
 }
 
 object DuckChatPixelParameters {
@@ -616,6 +820,21 @@ object DuckChatPixelParameters {
     const val NEW_ADDRESS_BAR_SELECTION = "selection"
     const val DEFAULT_TOGGLE_POSITION = "default_position"
     const val DEFAULT_TOGGLE_POSITION_VALUE = "value"
+
+    // Unified Input pixels
+    const val SELECTED_TOOL = "selected_tool"
+    const val MODEL_ID = "model_id"
+    const val REASONING_EFFORT = "reasoning_effort"
+    const val EFFORT_LEVEL = "effort_level"
+    const val HAS_IMAGE_ATTACHMENT = "has_image_attachment"
+    const val HAS_FILE_ATTACHMENT = "has_file_attachment"
+    const val HAS_TEXT = "has_text"
+    const val ATTACHMENT_SOURCE = "source"
+    const val FILE_VALIDATION_REASON = "reason"
+    const val UPSELL_SOURCE = "source"
+    const val UPSELL_CURRENT_TIER = "current_tier"
+    const val UPSELL_REQUIRED_TIER = "required_tier"
+    const val UPSELL_FLOW_TYPE = "flow_type"
 }
 
 @ContributesMultibinding(AppScope::class)
@@ -792,6 +1011,10 @@ class DuckChatParamRemovalPlugin @Inject constructor() : PixelParamRemovalPlugin
             DuckChatPixelName.DUCK_CHAT_HISTORY_DOWNLOAD_SELECTED_COUNT.pixelName to PixelParameter.removeAtb(),
             DuckChatPixelName.DUCK_CHAT_HISTORY_DOWNLOAD_SELECTED_DAILY.pixelName to PixelParameter.removeAtb(),
             "m_duck-ai_native-storage_" to PixelParameter.removeAtb(),
+            // Prefix: covers every m_aichat_unified_input_* pixel (tools, submit, model/reasoning,
+            // upsell, attachments, voice, stop) AND the app-side chat_header_upgrade_tapped, which
+            // shares the prefix — the interceptor matches outgoing pixel names with startsWith.
+            "m_aichat_unified_input_" to PixelParameter.removeAtb(),
         )
     }
 }
