@@ -1,4 +1,5 @@
 appId: com.duckduckgo.mobile.android
+androidWebViewHierarchy: devtools
 name: "Autofill: Will backfill username and use that to prompt to update if a matching password already stored"
 tags:
     - autofillBackfillingUsername

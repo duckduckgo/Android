@@ -36,6 +36,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.omnibar.Omnibar
 import com.duckduckgo.app.browser.omnibar.QueryUrlPredictor
+import com.duckduckgo.app.pixels.AppPixelName
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion
 import com.duckduckgo.common.ui.view.getColorFromAttr
@@ -126,6 +128,7 @@ class RealNativeInputManager @Inject constructor(
     private val globalActivityStarter: GlobalActivityStarter,
     private val queryUrlPredictor: QueryUrlPredictor,
     private val duckAiFeatureState: DuckAiFeatureState,
+    private val pixel: Pixel,
 ) : NativeInputManager {
     private lateinit var omnibarController: NativeInputOmnibarController
     private lateinit var rootView: ViewGroup
@@ -431,9 +434,8 @@ class RealNativeInputManager @Inject constructor(
             },
             onChatSubmitted = { query ->
                 if (omnibarController.isDuckAiMode()) {
-                    // In Duck.ai context the user is actively chatting — a pasted URL is a chat
-                    // message, never a contextual-sheet trigger or a navigation. Fall through to
-                    // the standard chat-submit path so the message reaches the Duck.ai webview.
+                    // Already in a Duck.ai chat — every submission, URL or not, is a chat prompt
+                    // that reaches the Duck.ai webview.
                     widget.saveLastUsedTogglePosition(isChat = true)
                     val imagesJson = widget.getImageAttachmentsJson()
                     val filesJson = widget.getFileAttachmentsJson()
@@ -450,8 +452,11 @@ class RealNativeInputManager @Inject constructor(
                     )
                     widget.clearSelectedTool()
                 } else if (queryUrlPredictor.isUrl(query)) {
+                    // Not in a Duck.ai chat (e.g. on the NTP with the Duck.ai toggle selected): a
+                    // URL is an address, so navigate to it exactly like Search mode rather than
+                    // opening the Duck.ai contextual sheet.
                     hideNativeInput(isNavigation = true)
-                    callbacks.onContextualSheetRequested()
+                    callbacks.onSearchSubmitted(query)
                 } else {
                     widget.saveLastUsedTogglePosition(isChat = true)
                     widget.storePendingPrompt(query)
@@ -555,7 +560,10 @@ class RealNativeInputManager @Inject constructor(
             )
             onPaidTierChanged = { isPaid ->
                 val tier = if (isPaid) DuckAiTier.Paid else DuckAiTier.Free
-                omnibarController.updateTierTitle(tier) { launchPurchase() }
+                omnibarController.updateTierTitle(tier) {
+                    fireChatHeaderUpgradeTapped(tier)
+                    launchPurchase()
+                }
             }
             if (!isBottom) {
                 setFloatingSubmitContainer(createFloatingSubmitContainer())
@@ -835,6 +843,15 @@ class RealNativeInputManager @Inject constructor(
 
     private fun launchPurchase() {
         globalActivityStarter.start(rootView.context, SubscriptionPurchase(featurePage = DUCK_AI_FEATURE_PAGE))
+    }
+
+    /**
+     * Fired when the user taps the "Upgrade" pill in the Duck.ai omnibar header. The pill is only shown
+     * for [DuckAiTier.Free] (subscription inactive), so this is the chat-header upgrade entry point.
+     */
+    internal fun fireChatHeaderUpgradeTapped(tier: DuckAiTier) {
+        val userTier = if (tier is DuckAiTier.Paid) "plus" else "free"
+        pixel.fire(AppPixelName.AI_CHAT_UNIFIED_INPUT_CHAT_HEADER_UPGRADE_TAPPED, mapOf("user_tier" to userTier))
     }
 
     /** True if [rawUrl] points at an in-progress Duck.ai chat (Duck.ai URL with a non-blank `chatID`). */

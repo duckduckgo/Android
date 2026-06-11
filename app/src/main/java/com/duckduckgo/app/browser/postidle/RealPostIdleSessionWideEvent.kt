@@ -126,6 +126,10 @@ class RealPostIdleSessionWideEvent @Inject constructor(
         finishSession(statusReason = REASON_BAR_USED, status = FlowStatus.Success)
     }
 
+    override fun onChatSelected() {
+        finishSession(statusReason = REASON_CHAT_SELECTED, status = FlowStatus.Success)
+    }
+
     override fun onReturnToPageTapped() {
         finishSession(statusReason = REASON_RETURN_TO_PAGE_TAPPED, status = FlowStatus.Success)
     }
@@ -220,6 +224,7 @@ class RealPostIdleSessionWideEvent @Inject constructor(
         const val FEATURE_NAME = "post_idle_session"
 
         const val REASON_BAR_USED = "bar_used"
+        const val REASON_CHAT_SELECTED = "chat_selected"
         const val REASON_RETURN_TO_PAGE_TAPPED = "return_to_page_tapped"
         const val REASON_TAB_SWITCHER_SELECTED = "tab_switcher_selected"
         const val REASON_FAVORITE_SELECTED = "favorite_selected"

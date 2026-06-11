@@ -75,6 +75,7 @@
     <string name="options">Opciones</string>
     <string name="shareLink">Compartir enlace</string>
     <string name="copyUrl">Copiar dirección de enlace</string>
+    <string name="urlCopiedToClipboard">URL copiada en el portapapeles</string>
 
     <!-- Find in page -->
     <string name="nextSearchTermDescription">Buscar siguiente</string>

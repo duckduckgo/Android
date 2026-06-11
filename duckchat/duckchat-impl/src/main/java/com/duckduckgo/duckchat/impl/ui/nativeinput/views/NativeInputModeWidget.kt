@@ -231,14 +231,33 @@ class NativeInputModeWidget @JvmOverloads constructor(
     override var onVoiceSearchClick: (() -> Unit)? = null
         set(value) {
             field = value
-            voiceHostButtons()?.onVoiceSearchClick = value
-            onVoiceClick = value
+            voiceHostButtons()?.onVoiceSearchClick = voiceSearchClickWithPixel
+            onVoiceClick = voiceSearchClickWithPixel
         }
     override var onVoiceChatClick: (() -> Unit)? = null
         set(value) {
             field = value
-            voiceHostButtons()?.onVoiceChatClick = value
+            voiceHostButtons()?.onVoiceChatClick = voiceChatClickWithPixel
         }
+
+    // Wrapper installed on the host buttons so the unified-input voice pixel fires exactly once per
+    // tap, before delegating to whatever external [onVoiceChatClick] is currently set. Reads the
+    // field at invocation time so re-assigning the external callback keeps working.
+    private val voiceChatClickWithPixel: () -> Unit = {
+        viewModel.fireVoiceTapped()
+        onVoiceChatClick?.invoke()
+    }
+
+    // The in-field microphone doubles as the Duck.ai voice entry whenever the Duck.ai tab is selected
+    // — including an active Duck.ai chat page, where configure(isDuckAiMode = true) selects the chat
+    // tab and the bottom-row voice-chat chip is hidden, leaving the mic as the only voice affordance.
+    // Count those as a unified voice tap; a search-tab mic tap is plain voice search, not Duck.ai.
+    private val voiceSearchClickWithPixel: () -> Unit = {
+        if (isChatTabSelected()) {
+            viewModel.fireVoiceTapped()
+        }
+        onVoiceSearchClick?.invoke()
+    }
     override var onPaidTierChanged: ((Boolean) -> Unit)? = null
         set(value) {
             field = value
@@ -746,12 +765,31 @@ class NativeInputModeWidget @JvmOverloads constructor(
             logcat { "submitMessage: suppressed - attachment limit exceeded" }
             return
         }
+        // Capture text presence before any clearFocus / submission mutates the field.
+        val hasText = !(message ?: inputField.text?.toString()).isNullOrBlank()
         if (message == null && inputField.text.isNullOrBlank() && hasAttachments && isChatTabSelected()) {
+            fireSubmissionPixels(hasText = hasText)
             onChatSent?.invoke("")
             inputField.clearFocus()
         } else {
+            // super routes to onChatSent (chat tab) or onSearchSent (search tab) only when there is
+            // non-blank text. Fire the chat-submission pixels only for the chat-tab + has-text case so
+            // we never fire for a search submit nor for a no-op blank submit.
+            if (isChatTabSelected() && hasText) {
+                fireSubmissionPixels(hasText = true)
+            }
             super.submitMessage(message)
         }
+    }
+
+    private fun fireSubmissionPixels(hasText: Boolean) {
+        val hasImageAttachment = attachmentView?.getImageAttachments()?.isNotEmpty() == true
+        val hasFileAttachment = attachmentView?.getFileAttachments()?.isNotEmpty() == true
+        viewModel.fireSubmissionPixels(
+            hasText = hasText,
+            hasImageAttachment = hasImageAttachment,
+            hasFileAttachment = hasFileAttachment,
+        )
     }
 
     override fun focusInput(activity: Activity?) {
@@ -1046,7 +1084,10 @@ class NativeInputModeWidget @JvmOverloads constructor(
                     viewModel.fireChatUrlSuggestionPixel(suggestion)
                     onChatUrlSuggestionClicked(suggestion)
                 },
-                onSearchForQuerySubmitted = onSearchForQuerySubmitted,
+                onSearchForQuerySubmitted = { query ->
+                    viewModel.fireDuckAiSearchForQuerySubmittedPixel()
+                    onSearchForQuerySubmitted(query)
+                },
                 onChatHistoryShortcutClicked = onChatHistoryShortcutClicked,
             ).also { chatSuggestionsBinding = it }
         }
@@ -1188,10 +1229,19 @@ class NativeInputModeWidget @JvmOverloads constructor(
     override fun submit() {
         // in Duck.ai mode we treat this as submitting prompts.
         // In non-Duck.ai mode we treat this as starting a chat with or without a prompt.
-        if (!submitAsChat()) viewModel.openNewChat()
+        // submitAsChat() returns true only when there is text to submit (a real prompt
+        // submission), so an empty start-new-chat does not fire the submission pixels.
+        if (submitAsChat()) {
+            fireSubmissionPixels(hasText = true)
+        } else {
+            viewModel.openNewChat()
+        }
     }
 
     override fun stop() {
+        // Single chokepoint for every stop affordance (the streaming-plugin button routes here via
+        // host.stop(), and the input-screen stop button calls stop() too), so the pixel fires once.
+        viewModel.fireStopGenerationTapped()
         onStopTapped?.invoke()
     }
 
@@ -1235,8 +1285,8 @@ class NativeInputModeWidget @JvmOverloads constructor(
                 layoutResId = R.layout.view_native_input_screen_buttons,
             ).apply {
                 onSendClick = { submitMessage() }
-                onStopClick = { this@NativeInputModeWidget.onStopTapped?.invoke() }
-                onVoiceChatClick = this@NativeInputModeWidget.onVoiceChatClick
+                onStopClick = { this@NativeInputModeWidget.stop() }
+                onVoiceChatClick = voiceChatClickWithPixel
                 setSendButtonVisible(false)
                 setNewLineButtonVisible(false)
             }

@@ -1726,6 +1726,104 @@ class AutoCompleteApiTest {
     }
 
     @Test
+    fun whenBookmarkSubmittedFromDuckAiSurfaceThenDuckAiBookmarkPixelSentAndSearchFamilyNotSent() = runTest {
+        whenever(mockSavedSitesRepository.hasBookmarks()).thenReturn(true)
+        whenever(mockSavedSitesRepository.hasFavorites()).thenReturn(false)
+        whenever(mockHistory.hasHistory()).thenReturn(false)
+        tabsLiveData.value = listOf(TabEntity("1", "https://example.com", position = 0), TabEntity("2", "https://example.com", position = 1))
+
+        val suggestion = AutoCompleteBookmarkSuggestion("example", "Example", "https://example.com")
+        testee.fireAutocompletePixel(listOf(suggestion), suggestion, duckAiSurface = true)
+
+        verify(mockPixel).fire(eq(AutoCompletePixelNames.AUTOCOMPLETE_DUCKAI_BOOKMARK_SELECTION), any(), any(), any())
+        verify(mockPixel, never()).fire(eq(AutoCompletePixelNames.AUTOCOMPLETE_BOOKMARK_SELECTION), any(), any(), any())
+    }
+
+    @Test
+    fun whenFavoriteSubmittedFromDuckAiSurfaceThenDuckAiFavoritePixelSentAndSearchFamilyNotSent() = runTest {
+        whenever(mockSavedSitesRepository.hasBookmarks()).thenReturn(true)
+        whenever(mockSavedSitesRepository.hasFavorites()).thenReturn(true)
+        whenever(mockHistory.hasHistory()).thenReturn(false)
+        tabsLiveData.value = listOf(TabEntity("1", "https://example.com", position = 0), TabEntity("2", "https://example.com", position = 1))
+
+        val suggestion = AutoCompleteBookmarkSuggestion("example", "Example", "https://example.com", isFavorite = true)
+        testee.fireAutocompletePixel(listOf(suggestion), suggestion, duckAiSurface = true)
+
+        verify(mockPixel).fire(eq(AutoCompletePixelNames.AUTOCOMPLETE_DUCKAI_FAVORITE_SELECTION), any(), any(), any())
+        verify(mockPixel, never()).fire(eq(AutoCompletePixelNames.AUTOCOMPLETE_FAVORITE_SELECTION), any(), any(), any())
+    }
+
+    @Test
+    fun whenUrlSearchSuggestionSubmittedFromDuckAiSurfaceThenDuckAiWebsitePixelSentAndSearchFamilyNotSent() = runTest {
+        whenever(mockSavedSitesRepository.hasBookmarks()).thenReturn(false)
+        whenever(mockNavigationHistory.hasHistory()).thenReturn(false)
+        whenever(mockHistory.hasHistory()).thenReturn(false)
+        tabsLiveData.value = listOf(TabEntity("1", "https://example.com", position = 0), TabEntity("2", "https://example.com", position = 1))
+
+        val suggestion = AutoCompleteSearchSuggestion("example", isUrl = true, isAllowedInTopHits = true)
+        testee.fireAutocompletePixel(listOf(suggestion), suggestion, duckAiSurface = true)
+
+        verify(mockPixel).fire(eq(AutoCompletePixelNames.AUTOCOMPLETE_DUCKAI_WEBSITE_SELECTION), any(), any(), any())
+        verify(mockPixel, never()).fire(eq(AutoCompletePixelNames.AUTOCOMPLETE_SEARCH_WEBSITE_SELECTION), any(), any(), any())
+    }
+
+    @Test
+    fun whenHistorySiteSubmittedFromDuckAiSurfaceThenDuckAiHistorySitePixelSentAndSearchFamilyNotSent() = runTest {
+        whenever(mockSavedSitesRepository.hasBookmarks()).thenReturn(false)
+        whenever(mockNavigationHistory.hasHistory()).thenReturn(true)
+        whenever(mockHistory.hasHistory()).thenReturn(true)
+        tabsLiveData.value = listOf(TabEntity("1", "https://example.com", position = 0), TabEntity("2", "https://example.com", position = 1))
+
+        val suggestion = AutoCompleteHistorySuggestion("example", "Example", "https://example.com", isAllowedInTopHits = true)
+        testee.fireAutocompletePixel(listOf(suggestion), suggestion, duckAiSurface = true)
+
+        verify(mockPixel).fire(eq(AutoCompletePixelNames.AUTOCOMPLETE_DUCKAI_HISTORY_SITE_SELECTION), any(), any(), any())
+        verify(mockPixel, never()).fire(eq(AutoCompletePixelNames.AUTOCOMPLETE_HISTORY_SITE_SELECTION), any(), any(), any())
+    }
+
+    @Test
+    fun whenHistorySearchSubmittedFromDuckAiSurfaceThenDuckAiHistorySearchPixelSentAndSearchFamilyNotSent() = runTest {
+        whenever(mockSavedSitesRepository.hasBookmarks()).thenReturn(false)
+        whenever(mockNavigationHistory.hasHistory()).thenReturn(true)
+        whenever(mockHistory.hasHistory()).thenReturn(true)
+        tabsLiveData.value = listOf(TabEntity("1", "https://example.com", position = 0), TabEntity("2", "https://example.com", position = 1))
+
+        val suggestion = AutoCompleteHistorySearchSuggestion("example", true)
+        testee.fireAutocompletePixel(listOf(suggestion), suggestion, duckAiSurface = true)
+
+        verify(mockPixel).fire(eq(AutoCompletePixelNames.AUTOCOMPLETE_DUCKAI_HISTORY_SEARCH_SELECTION), any(), any(), any())
+        verify(mockPixel, never()).fire(eq(AutoCompletePixelNames.AUTOCOMPLETE_HISTORY_SEARCH_SELECTION), any(), any(), any())
+    }
+
+    @Test
+    fun whenSwitchToTabSubmittedFromDuckAiSurfaceThenDuckAiSwitchToTabPixelSentAndSearchFamilyNotSent() = runTest {
+        whenever(mockSavedSitesRepository.hasBookmarks()).thenReturn(false)
+        whenever(mockNavigationHistory.hasHistory()).thenReturn(false)
+        whenever(mockHistory.hasHistory()).thenReturn(false)
+        tabsLiveData.value = listOf(TabEntity("1", "https://example.com", position = 0), TabEntity("2", "https://example.com", position = 1))
+
+        val suggestion = AutoCompleteSwitchToTabSuggestion("example", "", "", "")
+        testee.fireAutocompletePixel(listOf(suggestion), suggestion, duckAiSurface = true)
+
+        verify(mockPixel).fire(eq(AutoCompletePixelNames.AUTOCOMPLETE_DUCKAI_SWITCH_TO_TAB_SELECTION), any(), any(), any())
+        verify(mockPixel, never()).fire(eq(AutoCompletePixelNames.AUTOCOMPLETE_SWITCH_TO_TAB_SELECTION), any(), any(), any())
+    }
+
+    @Test
+    fun whenBookmarkSubmittedWithDefaultDuckAiSurfaceThenSearchFamilyBookmarkPixelStillSent() = runTest {
+        whenever(mockSavedSitesRepository.hasBookmarks()).thenReturn(true)
+        whenever(mockSavedSitesRepository.hasFavorites()).thenReturn(false)
+        whenever(mockHistory.hasHistory()).thenReturn(false)
+        tabsLiveData.value = listOf(TabEntity("1", "https://example.com", position = 0), TabEntity("2", "https://example.com", position = 1))
+
+        val suggestion = AutoCompleteBookmarkSuggestion("example", "Example", "https://example.com")
+        testee.fireAutocompletePixel(listOf(suggestion), suggestion)
+
+        verify(mockPixel).fire(eq(AutoCompletePixelNames.AUTOCOMPLETE_BOOKMARK_SELECTION), any(), any(), any())
+        verify(mockPixel, never()).fire(eq(AutoCompletePixelNames.AUTOCOMPLETE_DUCKAI_BOOKMARK_SELECTION), any(), any(), any())
+    }
+
+    @Test
     fun whenShowInstalledAppsDisabledThenNoDeviceAppResultsReturned() = runTest {
         val testee = createTestee(AutoComplete.Config(showInstalledApps = false))
         val mockIntent = Intent()

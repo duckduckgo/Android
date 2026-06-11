@@ -5,6 +5,10 @@ build-warm {
     tasks = ["app:buildInternalDebug"]
     warm-ups = 4
     iterations = 5
+    system-properties {
+        "scan.tag.benchmark" = "true"
+        "scan.value.benchmark.scenario" = "build-warm"
+    }
 }
 
 # Scenario 2: Clean Build
@@ -16,6 +20,10 @@ build-cold {
     cleanup-tasks = ["clean"]
     warm-ups = 2
     iterations = 4
+    system-properties {
+        "scan.tag.benchmark" = "true"
+        "scan.value.benchmark.scenario" = "build-cold"
+    }
 }
 
 # Scenario 3: ABI Change
@@ -30,6 +38,10 @@ build-abi-change-incremental {
 
     warm-ups = 4
     iterations = 5
+    system-properties {
+        "scan.tag.benchmark" = "true"
+        "scan.value.benchmark.scenario" = "build-abi-change-incremental"
+    }
 }
 
 # Scenario 4: Non-ABI Change
@@ -44,4 +56,8 @@ build-non-abi-change-incremental {
 
     warm-ups = 4
     iterations = 5
+    system-properties {
+        "scan.tag.benchmark" = "true"
+        "scan.value.benchmark.scenario" = "build-non-abi-change-incremental"
+    }
 }

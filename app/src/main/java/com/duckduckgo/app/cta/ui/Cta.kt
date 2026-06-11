@@ -39,6 +39,8 @@ import androidx.annotation.VisibleForTesting
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.core.view.doOnPreDraw
+import androidx.core.view.isGone
+import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
 import androidx.core.widget.ImageViewCompat
@@ -1585,6 +1587,7 @@ sealed class DaxBubbleCta(
         appInstallStore: AppInstallStore,
         open val isLightTheme: Boolean,
         open val deviceInfo: DeviceInfo,
+        open val onboardingImprovementsEnabled: Boolean = true,
     ) : DaxBubbleCta(
         ctaId = ctaId,
         title = title,
@@ -1634,6 +1637,14 @@ sealed class DaxBubbleCta(
         private var fadeOutAnimator: AnimatorSet? = null
         private var arrowDepthAnimator: ValueAnimator? = null
 
+        private val wavingDaxController: WavingDaxController? by lazy {
+            if (onboardingImprovementsEnabled && this is ShowsWavingDax) {
+                WavingDaxController(showArrow, deviceInfo)
+            } else {
+                null
+            }
+        }
+
         protected fun resolveOnboardingContext(context: Context): Context {
             val themeRes = if (isLightTheme) {
                 DesignSystemR.style.Theme_DuckDuckGo_Light_Onboarding
@@ -1666,16 +1677,46 @@ sealed class DaxBubbleCta(
             container.findViewById<LottieAnimationView>(R.id.wavingDax)?.let { dax ->
                 if (showsWavingDax != null && !container.isPhoneLandscape()) {
                     showsWavingDax.configureWavingDax(dax, deviceInfo)
-                    if (!dax.isVisible || dax.alpha == 0f) {
-                        dax.progress = 0f
-                        dax.alpha = 1f
-                        dax.isVisible = true
-                        dax.post { dax.playAnimation() }
+                    if (onboardingImprovementsEnabled) {
+                        dax.isInvisible = true
+                    } else {
+                        if (!dax.isVisible || dax.alpha == 0f) {
+                            dax.progress = 0f
+                            dax.alpha = 1f
+                            dax.isVisible = true
+                            dax.post { dax.playAnimation() }
+                        }
                     }
                 } else {
-                    dax.isVisible = false
+                    dax.isGone = true
                 }
             }
+        }
+
+        /**
+         * The fin depth [showCta] should apply, or null when the controller owns the fin (waving-Dax
+         * CTAs in portrait/tablet). The null case mirrors the controller's portrait/tablet ownership
+         * guard, so [showCta] and the controller can never both write the fin.
+         */
+        private fun showCtaFinTarget(container: View): Float? {
+            if (onboardingImprovementsEnabled && this is ShowsWavingDax && !container.isPhoneLandscape()) return null
+            return if (showArrow && !container.isPhoneLandscape()) 1f else 0f
+        }
+
+        fun applyFit() {
+            val container = ctaView ?: return
+            wavingDaxController?.applyFit(container)
+        }
+
+        fun onOrientationChanged() {
+            if (!onboardingImprovementsEnabled) return
+            val container = ctaView ?: return
+            val cardView = container.findViewById<DaxOnboardingBubbleBrandDesignUpdateCardView>(R.id.brandDesignCardView) ?: return
+
+            applyWavingDaxState(container, this as? ShowsWavingDax)
+            cardView.setArrowDepthFraction(showCtaFinTarget(container) ?: 0f)
+            wavingDaxController?.reset()
+            container.post { applyFit() }
         }
 
         private fun resetAllIncludesExcept(view: View, active: View) {
@@ -1696,10 +1737,10 @@ sealed class DaxBubbleCta(
             ctaView = container
 
             cancelRunningAnimations()
+            wavingDaxController?.reset()
             val isContentTransition = container.alpha > 0f && container.isVisible // card already visible from previous CTA
 
             val cardView = container.findViewById<DaxOnboardingBubbleBrandDesignUpdateCardView>(R.id.brandDesignCardView)
-            val targetDepth = if (showArrow && !container.isPhoneLandscape()) 1f else 0f
 
             val daxTitle = container.context.getString(title)
             val daxDescription = container.context.getString(description).preventWidows()
@@ -1754,14 +1795,17 @@ sealed class DaxBubbleCta(
                         )
                         // Read depth live: the first-show arm synchronously sets it before this lambda runs,
                         // so a value captured at function entry would animate from a stale snapshot.
-                        val currentDepth = cardView.arrowDepthFraction
-                        if (targetDepth != currentDepth) {
-                            arrowDepthAnimator = ValueAnimator.ofFloat(currentDepth, targetDepth).apply {
-                                duration = ARROW_DEPTH_ANIMATION_DURATION
-                                interpolator = FastOutSlowInInterpolator()
-                                addUpdateListener { cardView.setArrowDepthFraction(it.animatedValue as Float) }
+                        val targetDepth = showCtaFinTarget(container)
+                        if (targetDepth != null) {
+                            val currentDepth = cardView.arrowDepthFraction
+                            if (targetDepth != currentDepth) {
+                                arrowDepthAnimator = ValueAnimator.ofFloat(currentDepth, targetDepth).apply {
+                                    duration = ARROW_DEPTH_ANIMATION_DURATION
+                                    interpolator = FastOutSlowInInterpolator()
+                                    addUpdateListener { cardView.setArrowDepthFraction(it.animatedValue as Float) }
+                                }
+                                animators.add(arrowDepthAnimator!!)
                             }
-                            animators.add(arrowDepthAnimator!!)
                         }
                         contentFadeInAnimator = AnimatorSet().apply {
                             playTogether(animators.toList())
@@ -1807,7 +1851,7 @@ sealed class DaxBubbleCta(
                 if (headerImage?.isVisible == true) {
                     headerImage.alpha = 1f
                 }
-                cardView.setArrowDepthFraction(targetDepth)
+                showCtaFinTarget(container)?.let { cardView.setArrowDepthFraction(it) }
             }
 
             if (isContentTransition) {
@@ -1864,7 +1908,7 @@ sealed class DaxBubbleCta(
                 resetTextAlignment()
                 configureContentViews(container)
                 applyWavingDaxState(container, wavingDax)
-                cardView.setArrowDepthFraction(targetDepth)
+                cardView.setArrowDepthFraction(showCtaFinTarget(container) ?: 0f)
                 container.show()
                 container.animate().alpha(1f).setDuration(DIALOG_FADE_IN_DURATION).setStartDelay(200L)
                     .withEndAction {
@@ -1890,7 +1934,7 @@ sealed class DaxBubbleCta(
                     applySettledState()
                 }
                 contentFadeInAnimator?.let { if (it.isRunning) it.end() }
-                cardView.setArrowDepthFraction(targetDepth)
+                showCtaFinTarget(container)?.let { cardView.setArrowDepthFraction(it) }
                 if (wasAnimating) {
                     onTypingAnimationFinished()
                 }
@@ -1909,6 +1953,7 @@ sealed class DaxBubbleCta(
             arrowDepthAnimator?.removeAllUpdateListeners()
             arrowDepthAnimator?.cancel()
             arrowDepthAnimator = null
+            ctaView?.let { wavingDaxController?.cancel(it) }
             ctaView?.animate()?.cancel()
         }
 

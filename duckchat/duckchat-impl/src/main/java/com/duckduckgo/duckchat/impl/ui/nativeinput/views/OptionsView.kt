@@ -237,6 +237,7 @@ class OptionsView(context: Context, private val host: NativeInputHost) : LinearL
 
     private fun onOptionTapped(item: MenuItem) {
         val nowSelected = item.tool != viewModel.selectedTool.value
+        if (nowSelected) viewModel.onToolSelectedByUser(item.tool) else viewModel.onToolDeselectedByUser(item.tool)
         host.toolSelected(if (nowSelected) item.tool.rawValue else null)
     }
 
@@ -249,6 +250,7 @@ class OptionsView(context: Context, private val host: NativeInputHost) : LinearL
         view.findViewById<ImageView>(R.id.optionsChipIcon).setImageResource(item.iconRes)
         view.contentDescription = context.getString(R.string.duckChatOptionsChipDismissContentDescription, context.getString(item.titleRes))
         view.setOnClickListener {
+            viewModel.onToolDeselectedByUser(item.tool)
             host.toolSelected(null)
         }
         return view

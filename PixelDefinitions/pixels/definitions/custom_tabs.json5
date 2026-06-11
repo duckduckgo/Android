@@ -1,0 +1,9 @@
+{
+    "custom_tabs_copy_url": {
+        "description": "Fired when a user long-taps on the custom tab toolbar showing the URL.",
+        "owners": ["0nko"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    }
+}

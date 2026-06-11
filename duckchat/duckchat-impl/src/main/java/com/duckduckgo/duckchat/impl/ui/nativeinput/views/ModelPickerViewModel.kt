@@ -29,6 +29,7 @@ import com.duckduckgo.duckchat.impl.models.ModelProvider
 import com.duckduckgo.duckchat.impl.models.ModelState
 import com.duckduckgo.duckchat.impl.models.Tool
 import com.duckduckgo.duckchat.impl.models.UserTier
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -43,6 +44,7 @@ data class ModelSection(@StringRes val headerRes: Int?, val models: List<AIChatM
 @ContributesViewModel(ViewScope::class)
 class ModelPickerViewModel @Inject constructor(
     private val modelManager: DuckAiModelManager,
+    private val duckChatPixels: DuckChatPixels,
 ) : ViewModel() {
 
     val state: StateFlow<ModelState> = modelManager.modelState
@@ -68,6 +70,9 @@ class ModelPickerViewModel @Inject constructor(
 
     fun onModelTapped(model: AIChatModel, surface: PickerSurface) {
         if (model.isAccessible) {
+            if (model.id != modelManager.getSelectedModelId()) {
+                duckChatPixels.fireModelSelected(model.id)
+            }
             viewModelScope.launch { modelManager.selectModel(model) }
             return
         }
@@ -76,7 +81,15 @@ class ModelPickerViewModel @Inject constructor(
             logcat { "Duck.ai picker: tapped model has no public required tier (id=${model.id}, accessTier=${model.accessTier}), ignoring." }
             return
         }
-        routeUpsell(userTier, requiredTier, surface.origin)?.let { command.trySend(it) }
+        routeUpsell(userTier, requiredTier, surface.origin)?.let { upsell ->
+            duckChatPixels.fireSubscriptionUpsellTriggered(
+                source = "model_picker",
+                currentTier = userTier.toParam(),
+                requiredTier = requiredTier.toParam(),
+                flowType = upsell.toFlowTypeParam(),
+            )
+            command.trySend(upsell)
+        }
     }
 
     fun buildSections(state: ModelState): List<ModelSection> {
