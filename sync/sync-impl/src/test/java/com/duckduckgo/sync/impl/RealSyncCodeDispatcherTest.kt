@@ -18,8 +18,15 @@ package com.duckduckgo.sync.impl
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.sync.impl.AccountErrorCodes.NEGOTIATION_ABORTED
+import com.duckduckgo.sync.impl.AccountErrorCodes.NO_RECOVERY_CODE
+import com.duckduckgo.sync.impl.AccountErrorCodes.PAIRING_CANCELLED
+import com.duckduckgo.sync.impl.AccountErrorCodes.PAIRING_FAILED
+import com.duckduckgo.sync.impl.AccountErrorCodes.PAIRING_REJECTED
+import com.duckduckgo.sync.impl.AccountErrorCodes.PAIRING_UNAVAILABLE
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2CodeParseResult
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Event
+import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Message
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2QrCode
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Runner
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2State
@@ -535,13 +542,14 @@ class RealSyncCodeDispatcherTest {
     private fun transition(
         from: ExchangeV2State,
         to: ExchangeV2State,
+        trigger: ExchangeV2Message? = null,
         localTrigger: LocalTrigger? = null,
         timestampMs: Long = System.currentTimeMillis(),
     ): ExchangeV2Event.Transition = ExchangeV2Event.Transition(
         timestampMs = timestampMs,
         from = from,
         to = to,
-        trigger = null,
+        trigger = trigger,
         localTrigger = localTrigger,
     )
 
@@ -612,7 +620,7 @@ class RealSyncCodeDispatcherTest {
             )
             job.await()
         }
-        assertEquals(DispatchOutcome.Failed("user_denied"), outcome)
+        assertEquals(DispatchOutcome.Failed("user_denied", PAIRING_CANCELLED.code), outcome)
     }
 
     @Test fun `presentV2 emits Failed host_unavailable when Host_Aborted carries HostUnavailable trigger`() = runTest {
@@ -627,7 +635,7 @@ class RealSyncCodeDispatcherTest {
             )
             job.await()
         }
-        assertEquals(DispatchOutcome.Failed("host_unavailable"), outcome)
+        assertEquals(DispatchOutcome.Failed("host_unavailable", PAIRING_UNAVAILABLE.code), outcome)
     }
 
     @Test fun `presentV2 emits AlreadyConnected when runner reaches SameAccountAbort`() = runTest {
@@ -647,7 +655,7 @@ class RealSyncCodeDispatcherTest {
             )
             job.await()
         }
-        assertEquals(DispatchOutcome.Failed("channel 5xx"), outcome)
+        assertEquals(DispatchOutcome.Failed("channel 5xx", PAIRING_FAILED.code), outcome)
     }
 
     @Test fun `presentV2 emits Failed when Joiner_Done arrives without a recovery code`() = runTest {
@@ -658,7 +666,7 @@ class RealSyncCodeDispatcherTest {
             runnerEventsFlow.emit(transition(from = ExchangeV2State.Joiner.Waiting, to = ExchangeV2State.Joiner.Done))
             job.await()
         }
-        assertEquals(DispatchOutcome.Failed("Pairing completed without a recovery code"), outcome)
+        assertEquals(DispatchOutcome.Failed("Pairing completed without a recovery code", NO_RECOVERY_CODE.code), outcome)
     }
 
     @Test fun `presentV2 emits LoggedIn when Joiner_Done carries a cid=ddg recovery code`() = runTest {
@@ -759,7 +767,7 @@ class RealSyncCodeDispatcherTest {
             )
             job.await()
         }
-        assertEquals(DispatchOutcome.Failed("Pairing cancelled on this device"), outcome)
+        assertEquals(DispatchOutcome.Failed("Pairing cancelled on this device", PAIRING_CANCELLED.code), outcome)
     }
 
     @Test fun `presentV2 calls runner_startPresent when Flow is collected`() = runTest {
@@ -906,5 +914,115 @@ class RealSyncCodeDispatcherTest {
 
         val outcome = withTimeoutOrNull(100) { dispatcher.presentV2().first() }
         assertEquals(null, outcome)
+    }
+
+    // ---- v2 abort error codes (linking / scanner side) ----
+
+    private fun startLinking(): kotlinx.coroutines.flow.Flow<DispatchOutcome> {
+        setV2(true)
+        whenever(qrCode.parse(any())).thenReturn(
+            ExchangeV2CodeParseResult.LinkingV2(channelId = "c", publicKey = "k", version = "2"),
+        )
+        return (dispatcher.route("v2-url") as RouteDecision.V2InProgress).outcomes
+    }
+
+    @Test fun `linking - AbortedByHost with RecoveryCodeDenied maps to Failed PAIRING_REJECTED`() = runTest {
+        val outcome = withTimeoutOrNull(1000) {
+            val job = async(start = kotlinx.coroutines.CoroutineStart.UNDISPATCHED) { startLinking().first() }
+            runnerEventsFlow.emit(
+                transition(
+                    from = ExchangeV2State.Joiner.Confirming,
+                    to = ExchangeV2State.Joiner.AbortedByHost,
+                    trigger = ExchangeV2Message.RecoveryCodeDenied(rawJson = "{}"),
+                ),
+            )
+            job.await()
+        }
+        assertTrue("expected Failed, got $outcome", outcome is DispatchOutcome.Failed)
+        assertEquals(PAIRING_REJECTED.code, (outcome as DispatchOutcome.Failed).code)
+    }
+
+    @Test fun `linking - AbortedByHost with RecoveryCodeUnavailable maps to Failed PAIRING_UNAVAILABLE`() = runTest {
+        val outcome = withTimeoutOrNull(1000) {
+            val job = async(start = kotlinx.coroutines.CoroutineStart.UNDISPATCHED) { startLinking().first() }
+            runnerEventsFlow.emit(
+                transition(
+                    from = ExchangeV2State.Joiner.Confirming,
+                    to = ExchangeV2State.Joiner.AbortedByHost,
+                    trigger = ExchangeV2Message.RecoveryCodeUnavailable(rawJson = "{}"),
+                ),
+            )
+            job.await()
+        }
+        assertEquals(PAIRING_UNAVAILABLE.code, (outcome as DispatchOutcome.Failed).code)
+    }
+
+    @Test fun `linking - Joiner AbortedLocal maps to Failed PAIRING_CANCELLED`() = runTest {
+        val outcome = withTimeoutOrNull(1000) {
+            val job = async(start = kotlinx.coroutines.CoroutineStart.UNDISPATCHED) { startLinking().first() }
+            runnerEventsFlow.emit(transition(from = ExchangeV2State.Joiner.Confirming, to = ExchangeV2State.Joiner.AbortedLocal))
+            job.await()
+        }
+        assertEquals(PAIRING_CANCELLED.code, (outcome as DispatchOutcome.Failed).code)
+    }
+
+    @Test fun `linking - Aborted maps to Failed NEGOTIATION_ABORTED`() = runTest {
+        val outcome = withTimeoutOrNull(1000) {
+            val job = async(start = kotlinx.coroutines.CoroutineStart.UNDISPATCHED) { startLinking().first() }
+            runnerEventsFlow.emit(transition(from = ExchangeV2State.Negotiating, to = ExchangeV2State.Aborted))
+            job.await()
+        }
+        assertEquals(NEGOTIATION_ABORTED.code, (outcome as DispatchOutcome.Failed).code)
+    }
+
+    @Test fun `linking - Joiner Done without recovery code maps to Failed NO_RECOVERY_CODE`() = runTest {
+        val outcome = withTimeoutOrNull(1000) {
+            val job = async(start = kotlinx.coroutines.CoroutineStart.UNDISPATCHED) { startLinking().first() }
+            runnerEventsFlow.emit(transition(from = ExchangeV2State.Joiner.Waiting, to = ExchangeV2State.Joiner.Done))
+            job.await()
+        }
+        assertEquals(NO_RECOVERY_CODE.code, (outcome as DispatchOutcome.Failed).code)
+    }
+
+    @Test fun `linking - SessionError maps to Failed PAIRING_FAILED`() = runTest {
+        val outcome = withTimeoutOrNull(1000) {
+            val job = async(start = kotlinx.coroutines.CoroutineStart.UNDISPATCHED) { startLinking().first() }
+            runnerEventsFlow.emit(ExchangeV2Event.SessionError(timestampMs = System.currentTimeMillis(), message = "channel 500"))
+            job.await()
+        }
+        assertEquals(PAIRING_FAILED.code, (outcome as DispatchOutcome.Failed).code)
+    }
+
+    @Test fun `linking - Host Aborted maps to Failed NEGOTIATION_ABORTED`() = runTest {
+        val outcome = withTimeoutOrNull(1000) {
+            val job = async(start = kotlinx.coroutines.CoroutineStart.UNDISPATCHED) { startLinking().first() }
+            runnerEventsFlow.emit(transition(from = ExchangeV2State.Host.Confirming, to = ExchangeV2State.Host.Aborted))
+            job.await()
+        }
+        assertEquals(NEGOTIATION_ABORTED.code, (outcome as DispatchOutcome.Failed).code)
+    }
+
+    @Test fun `present - AbortedByHost with RecoveryCodeDenied maps to Failed PAIRING_REJECTED`() = runTest {
+        val outcome = withTimeoutOrNull(1000) {
+            val job = async(start = kotlinx.coroutines.CoroutineStart.UNDISPATCHED) { dispatcher.presentV2().first() }
+            runnerEventsFlow.emit(
+                transition(
+                    from = ExchangeV2State.Joiner.Confirming,
+                    to = ExchangeV2State.Joiner.AbortedByHost,
+                    trigger = ExchangeV2Message.RecoveryCodeDenied(rawJson = "{}"),
+                ),
+            )
+            job.await()
+        }
+        assertEquals(PAIRING_REJECTED.code, (outcome as DispatchOutcome.Failed).code)
+    }
+
+    @Test fun `present - Host Aborted with no localTrigger maps to Failed NEGOTIATION_ABORTED`() = runTest {
+        val outcome = withTimeoutOrNull(1000) {
+            val job = async(start = kotlinx.coroutines.CoroutineStart.UNDISPATCHED) { dispatcher.presentV2().first() }
+            runnerEventsFlow.emit(transition(from = ExchangeV2State.Host.Confirming, to = ExchangeV2State.Host.Aborted))
+            job.await()
+        }
+        assertEquals(NEGOTIATION_ABORTED.code, (outcome as DispatchOutcome.Failed).code)
     }
 }

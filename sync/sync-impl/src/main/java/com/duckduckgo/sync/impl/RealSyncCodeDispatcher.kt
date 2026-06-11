@@ -19,6 +19,12 @@ package com.duckduckgo.sync.impl
 import android.util.Base64
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.impl.AccountErrorCodes.ALREADY_SIGNED_IN
+import com.duckduckgo.sync.impl.AccountErrorCodes.NEGOTIATION_ABORTED
+import com.duckduckgo.sync.impl.AccountErrorCodes.NO_RECOVERY_CODE
+import com.duckduckgo.sync.impl.AccountErrorCodes.PAIRING_CANCELLED
+import com.duckduckgo.sync.impl.AccountErrorCodes.PAIRING_FAILED
+import com.duckduckgo.sync.impl.AccountErrorCodes.PAIRING_REJECTED
+import com.duckduckgo.sync.impl.AccountErrorCodes.PAIRING_UNAVAILABLE
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2CodeParseResult
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Event
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Message
@@ -119,28 +125,32 @@ class RealSyncCodeDispatcher @Inject constructor(
                 DispatchOutcome.HostConfirmationRequested(peerName = runner.peerName)
             ExchangeV2State.Host.Done -> DispatchOutcome.LoggedIn
             ExchangeV2State.Host.Aborted -> when (event.localTrigger) {
-                LocalTrigger.UserDeniedHost -> DispatchOutcome.Failed("user_denied")
-                LocalTrigger.HostUnavailable -> DispatchOutcome.Failed("host_unavailable")
-                else -> DispatchOutcome.Failed("host_aborted")
+                LocalTrigger.UserDeniedHost -> DispatchOutcome.Failed("user_denied", PAIRING_CANCELLED.code)
+                LocalTrigger.HostUnavailable -> DispatchOutcome.Failed("host_unavailable", PAIRING_UNAVAILABLE.code)
+                else -> DispatchOutcome.Failed("host_aborted", NEGOTIATION_ABORTED.code)
             }
             ExchangeV2State.SameAccountAbort -> DispatchOutcome.AlreadyConnected
             ExchangeV2State.Joiner.Done -> {
                 val received = (event.trigger as? ExchangeV2Message.RecoveryCodeResponse)?.recoveryCode
                 if (received.isNullOrBlank()) {
-                    DispatchOutcome.Failed("Pairing completed without a recovery code")
+                    DispatchOutcome.Failed("Pairing completed without a recovery code", NO_RECOVERY_CODE.code)
                 } else {
                     loginWithV2RecoveryCode(received)
                 }
             }
-            ExchangeV2State.Joiner.AbortedByHost -> {
-                val msgType = event.trigger?.messageType ?: "abort"
-                DispatchOutcome.Failed("Pairing aborted by peer ($msgType)")
+            ExchangeV2State.Joiner.AbortedByHost -> when (event.trigger) {
+                is ExchangeV2Message.RecoveryCodeDenied ->
+                    DispatchOutcome.Failed("Pairing declined by peer", PAIRING_REJECTED.code)
+                is ExchangeV2Message.RecoveryCodeUnavailable ->
+                    DispatchOutcome.Failed("Peer has no recovery code", PAIRING_UNAVAILABLE.code)
+                // AbortedByHost is only reachable via those two host messages; default defensively to rejected.
+                else -> DispatchOutcome.Failed("Pairing aborted by peer", PAIRING_REJECTED.code)
             }
-            ExchangeV2State.Joiner.AbortedLocal -> DispatchOutcome.Failed("Pairing cancelled on this device")
-            ExchangeV2State.Aborted -> DispatchOutcome.Failed("negotiation_aborted")
+            ExchangeV2State.Joiner.AbortedLocal -> DispatchOutcome.Failed("Pairing cancelled on this device", PAIRING_CANCELLED.code)
+            ExchangeV2State.Aborted -> DispatchOutcome.Failed("negotiation_aborted", NEGOTIATION_ABORTED.code)
             else -> null
         }
-        is ExchangeV2Event.SessionError -> DispatchOutcome.Failed(event.message)
+        is ExchangeV2Event.SessionError -> DispatchOutcome.Failed(event.message, PAIRING_FAILED.code)
         else -> null
     }
 
@@ -301,22 +311,26 @@ class RealSyncCodeDispatcher @Inject constructor(
             ExchangeV2State.Joiner.Done -> {
                 val received = (event.trigger as? ExchangeV2Message.RecoveryCodeResponse)?.recoveryCode
                 if (received.isNullOrBlank()) {
-                    DispatchOutcome.Failed("Pairing completed without a recovery code")
+                    DispatchOutcome.Failed("Pairing completed without a recovery code", NO_RECOVERY_CODE.code)
                 } else {
                     loginWithV2RecoveryCode(received)
                 }
             }
-            ExchangeV2State.Joiner.AbortedByHost -> {
-                val msgType = event.trigger?.messageType ?: "abort"
-                DispatchOutcome.Failed("Pairing aborted by peer ($msgType)")
+            ExchangeV2State.Joiner.AbortedByHost -> when (event.trigger) {
+                is ExchangeV2Message.RecoveryCodeDenied ->
+                    DispatchOutcome.Failed("Pairing declined by peer", PAIRING_REJECTED.code)
+                is ExchangeV2Message.RecoveryCodeUnavailable ->
+                    DispatchOutcome.Failed("Peer has no recovery code", PAIRING_UNAVAILABLE.code)
+                // AbortedByHost is only reachable via those two host messages; default defensively to rejected.
+                else -> DispatchOutcome.Failed("Pairing aborted by peer", PAIRING_REJECTED.code)
             }
-            ExchangeV2State.Joiner.AbortedLocal -> DispatchOutcome.Failed("Pairing cancelled on this device")
-            ExchangeV2State.Host.Aborted -> DispatchOutcome.Failed("Pairing aborted")
+            ExchangeV2State.Joiner.AbortedLocal -> DispatchOutcome.Failed("Pairing cancelled on this device", PAIRING_CANCELLED.code)
+            ExchangeV2State.Host.Aborted -> DispatchOutcome.Failed("Pairing aborted", NEGOTIATION_ABORTED.code)
             // Per spec §"Same-account case": not an abort; both devices share an account already.
             ExchangeV2State.SameAccountAbort -> DispatchOutcome.AlreadyConnected
             // Elected Host and shared a recovery code — success from this device's perspective.
             ExchangeV2State.Host.Done -> DispatchOutcome.LoggedIn
-            ExchangeV2State.Aborted -> DispatchOutcome.Failed("negotiation_aborted")
+            ExchangeV2State.Aborted -> DispatchOutcome.Failed("negotiation_aborted", NEGOTIATION_ABORTED.code)
             else -> null
         }
         is ExchangeV2Event.SessionError -> {
@@ -324,7 +338,7 @@ class RealSyncCodeDispatcher @Inject constructor(
             if (match != null) {
                 DispatchOutcome.UpgradeRequired(codeMajor = match.groupValues[1].toIntOrNull() ?: -1)
             } else {
-                DispatchOutcome.Failed(event.message)
+                DispatchOutcome.Failed(event.message, PAIRING_FAILED.code)
             }
         }
         else -> null
