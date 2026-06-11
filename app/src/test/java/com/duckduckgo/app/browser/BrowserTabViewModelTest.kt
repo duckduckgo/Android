@@ -5336,6 +5336,28 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenFontSizeActuallyChangesThenRefreshWebView() {
+        accessibilitySettingsDataStore.overrideSystemFontSize = true
+        accessibilitySettingsDataStore.appFontSize = 150f
+
+        assertEquals(accessibilitySettingsDataStore.fontSize, accessibilityViewState().fontSize)
+        assertTrue(accessibilityViewState().refreshWebView)
+    }
+
+    @Test
+    fun whenAccessibilitySettingsFirstObservedWithNonDefaultFontSizeThenDoNotRefreshWebView() {
+        // Simulate a user who already has a non-default text size persisted before the tab observes settings.
+        accessibilitySettingsDataStore.overrideSystemFontSize = true
+        accessibilitySettingsDataStore.appFontSize = 150f
+        testee.onWebViewRefreshed() // clear the pending refresh caused by the change above
+
+        testee.observeAccessibilitySettings() // re-subscribe, as happens on tab init/restore
+
+        assertEquals(accessibilitySettingsDataStore.fontSize, accessibilityViewState().fontSize)
+        assertFalse(accessibilityViewState().refreshWebView)
+    }
+
+    @Test
     fun whenDownloadIsCalledThenDownloadRequestedForUrl() =
         runTest {
             val pendingFileDownload = buildPendingDownload(url = "http://www.example.com/download.pdf", contentDisposition = null, mimeType = null)

@@ -50,6 +50,7 @@ import com.duckduckgo.adblocking.api.duckplayer.DuckPlayer
 import com.duckduckgo.adblocking.api.duckplayer.DuckPlayer.DuckPlayerState.ENABLED
 import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.anvil.annotations.ContributesViewModel
+import com.duckduckgo.app.accessibility.data.AccessibilitySettings
 import com.duckduckgo.app.accessibility.data.AccessibilitySettingsDataStore
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction
 import com.duckduckgo.app.browser.SSLErrorType.EXPIRED
@@ -1056,14 +1057,21 @@ class BrowserTabViewModel @Inject constructor(
 
     fun observeAccessibilitySettings() {
         accessibilityObserver?.cancel()
+        var previousSettings: AccessibilitySettings? = null
         accessibilityObserver =
             accessibilitySettingsDataStore
                 .settingsFlow()
                 .combine(refreshOnViewVisible.asStateFlow(), ::Pair)
                 .onEach { (settings, viewVisible) ->
                     logcat(VERBOSE) { "Accessibility: newSettings $settings, $viewVisible" }
-                    val shouldRefreshWebview =
-                        (currentAccessibilityViewState().forceZoom != settings.forceZoom) || currentAccessibilityViewState().refreshWebView
+
+                    // Reload the WebView when a11y changes, so the page re-runs layout with the new zoom.
+                    // Skip the first emission so that opening a tab with a non-default text size does not trigger an unnecessary reload
+                    val settingsChanged =
+                        previousSettings?.let { it.fontSize != settings.fontSize || it.forceZoom != settings.forceZoom } ?: false
+                    previousSettings = settings
+
+                    val shouldRefreshWebview = settingsChanged || currentAccessibilityViewState().refreshWebView
                     accessibilityViewState.value =
                         currentAccessibilityViewState().copy(
                             fontSize = settings.fontSize,

@@ -5982,7 +5982,7 @@ class BrowserTabFragment :
 
             if (this@BrowserTabFragment.isHidden && viewState.refreshWebView) return
             if (viewState.refreshWebView) {
-                logcat(INFO) { "Accessibility: UpdateAccessibilitySetting forceZoomChanged" }
+                logcat(INFO) { "Accessibility: refreshing WebView to reflow content after a text-size or forced-zoom change" }
                 refresh()
             }
         }
