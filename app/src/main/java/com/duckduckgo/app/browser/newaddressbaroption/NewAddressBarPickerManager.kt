@@ -29,6 +29,7 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.CoroutineScope
@@ -58,13 +59,18 @@ class RealNewAddressBarPickerManager @Inject constructor(
     private val dispatchers: DispatcherProvider = DefaultDispatcherProvider(),
 ) : NewAddressBarPickerManager {
     private val showChoiceScreenMutex = Mutex()
+    private var currentDialog: BottomSheetDialog? = null
 
     override suspend fun showChoiceScreen(activity: DuckDuckGoActivity) {
         showChoiceScreenMutex.withLock {
             if (validate(activity)) {
                 logcat(DEBUG) { "NewAddressBarPickerManager: All conditions met, showing choice screen" }
                 withContext(dispatchers.main()) {
-                    showChoiceScreenDialog(activity)
+                    // The sheet is non-cancelable, so don't present a second one while one is already showing
+                    // (showHome() can re-fire from browser/SSL error state clearing while still on the new tab).
+                    if (currentDialog?.isShowing != true) {
+                        showChoiceScreenDialog(activity)
+                    }
                 }
             }
         }
@@ -109,7 +115,7 @@ class RealNewAddressBarPickerManager @Inject constructor(
         }
 
     private fun showChoiceScreenDialog(activity: DuckDuckGoActivity) {
-        newAddressBarPickerBottomSheetDialogFactory.create(
+        currentDialog = newAddressBarPickerBottomSheetDialogFactory.create(
             context = activity,
             isLightMode = appTheme.isLightModeEnabled(),
             callback =
@@ -138,7 +144,10 @@ class RealNewAddressBarPickerManager @Inject constructor(
                     pixel.fire(AppPixelName.NEW_ADDRESS_BAR_PICKER_V2_CONFIRMED_DAILY, parameters = params, type = Pixel.PixelType.Daily())
                 }
             },
-        ).show()
+        ).apply {
+            setOnDismissListener { currentDialog = null }
+            show()
+        }
     }
 
     private companion object {

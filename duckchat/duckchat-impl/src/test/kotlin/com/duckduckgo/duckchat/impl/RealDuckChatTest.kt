@@ -46,6 +46,7 @@ import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_NEW_ADDRES
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_NEW_ADDRESS_BAR_PICKER_DISPLAYED
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_NEW_ADDRESS_BAR_PICKER_NOT_NOW
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelParameters.NEW_ADDRESS_BAR_SELECTION
+import com.duckduckgo.duckchat.impl.repository.AddressBarPickerAttributionRepository
 import com.duckduckgo.duckchat.impl.repository.DuckChatFeatureRepository
 import com.duckduckgo.duckchat.impl.store.DefaultTogglePosition
 import com.duckduckgo.duckchat.impl.voice.VoiceSessionStateManager
@@ -91,6 +92,7 @@ class RealDuckChatTest {
     var coroutineRule = CoroutineTestRule()
 
     private val mockDuckChatFeatureRepository: DuckChatFeatureRepository = mock()
+    private val mockAddressBarPickerAttributionRepository: AddressBarPickerAttributionRepository = mock()
     private val duckChatFeature = FakeFeatureToggleFactory.create(DuckChatFeature::class.java)
     private val moshi: Moshi = Moshi.Builder().build()
     private val dispatcherProvider = coroutineRule.testDispatcherProvider
@@ -132,6 +134,7 @@ class RealDuckChatTest {
         testee = spy(
             RealDuckChat(
                 mockDuckChatFeatureRepository,
+                mockAddressBarPickerAttributionRepository,
                 duckChatFeature,
                 moshi,
                 dispatcherProvider,
@@ -677,39 +680,47 @@ class RealDuckChatTest {
     }
 
     @Test
-    fun whenOnAddressBarPickerDuckAiSelectedThenTimestampStored() = runTest {
+    fun whenOnAddressBarPickerDuckAiSelectedThenDelegatesToRepository() = runTest {
         testee.onAddressBarPickerDuckAiSelected()
 
-        verify(mockDuckChatFeatureRepository).storeAddressBarPickerSelectedAt(any())
+        verify(mockAddressBarPickerAttributionRepository).onPickerDuckAiSelected()
     }
 
     @Test
-    fun whenNativeInputEnabledAndPickerSelectedThenFirstUrlContainsOriginButSecondDoesNot() = runTest {
+    fun whenNativeInputEnabledAndAttributedToPickerThenUrlContainsOrigin() = runTest {
         duckChatFeature.nativeInputField().setRawStoredState(State(enable = true))
         testee.onPrivacyConfigDownloaded()
         coroutineRule.testScope.advanceUntilIdle()
+        whenever(mockAddressBarPickerAttributionRepository.consumeAttributionToPicker()).thenReturn(true)
 
-        testee.onAddressBarPickerDuckAiSelected()
+        val url = testee.getDuckChatUrl(query = "query", autoPrompt = true)
 
-        val firstUrl = testee.getDuckChatUrl(query = "query", autoPrompt = true)
         assertEquals(
             "https://duck.ai/chat?q=query&prompt=1&native-input=true&origin=funnel_addressbar_android__aitoggle&duckai=5",
-            firstUrl,
+            url,
         )
-
-        val secondUrl = testee.getDuckChatUrl(query = "query", autoPrompt = true)
-        assertEquals("https://duck.ai/chat?q=query&prompt=1&native-input=true&duckai=5", secondUrl)
     }
 
     @Test
-    fun whenNativeInputDisabledAndPickerSelectedThenUrlHasNoOriginParam() = runTest {
+    fun whenNativeInputEnabledAndNotAttributedThenUrlHasNoOrigin() = runTest {
+        duckChatFeature.nativeInputField().setRawStoredState(State(enable = true))
+        testee.onPrivacyConfigDownloaded()
+        coroutineRule.testScope.advanceUntilIdle()
+        whenever(mockAddressBarPickerAttributionRepository.consumeAttributionToPicker()).thenReturn(false)
+
+        val url = testee.getDuckChatUrl(query = "query", autoPrompt = true)
+
+        assertEquals("https://duck.ai/chat?q=query&prompt=1&native-input=true&duckai=5", url)
+    }
+
+    @Test
+    fun whenNativeInputDisabledThenUrlHasNoOriginParam() = runTest {
         duckChatFeature.nativeInputField().setRawStoredState(State(enable = false))
         testee.onPrivacyConfigDownloaded()
         coroutineRule.testScope.advanceUntilIdle()
 
-        testee.onAddressBarPickerDuckAiSelected()
-
         val url = testee.getDuckChatUrl(query = "query", autoPrompt = true)
+
         assertEquals("https://duck.ai/chat?q=query&prompt=1&duckai=5", url)
     }
 

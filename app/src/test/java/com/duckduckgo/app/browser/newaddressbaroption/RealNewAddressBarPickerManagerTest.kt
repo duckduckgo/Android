@@ -282,6 +282,19 @@ class RealNewAddressBarPickerManagerTest {
             verify(dataStoreMock, never()).setAsShown()
         }
 
+    @Test
+    fun `when a sheet is already showing then does not show another`() =
+        runTest {
+            setupAllConditionsMet()
+            whenever(dialogMock.isShowing).thenReturn(true)
+
+            testee.showChoiceScreen(mock())
+            testee.showChoiceScreen(mock())
+
+            verify(dialogFactoryMock).create(any(), any(), any())
+            verify(dialogMock).show()
+        }
+
     private suspend fun setupAllConditionsMet() {
         showPickerFlow.value = true
         whenever(duckChatMock.isEnabled()).thenReturn(true)

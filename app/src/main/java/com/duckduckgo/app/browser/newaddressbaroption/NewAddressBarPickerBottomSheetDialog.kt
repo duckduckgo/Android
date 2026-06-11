@@ -73,7 +73,8 @@ class NewAddressBarPickerBottomSheetDialog(
 
         this.behavior.isDraggable = false
         this.behavior.isHideable = false
-        this.behavior.peekHeight = 0
+        this.behavior.peekHeight = context.resources.displayMetrics.heightPixels
+        this.behavior.isShouldRemoveExpandedCorners = false
 
         setCancelable(false)
 
@@ -87,6 +88,12 @@ class NewAddressBarPickerBottomSheetDialog(
                     setSelection(withAi, transition = Transition.CROSSFADE_ANIMATE)
                 }
             }
+        }
+        val bottomSheet = findViewById<View>(com.google.android.material.R.id.design_bottom_sheet)
+        bottomSheet?.let {
+            val layoutParams = bottomSheet.layoutParams
+            layoutParams.height = context.resources.displayMetrics.heightPixels
+            bottomSheet.layoutParams = layoutParams
         }
 
         setOnShowListener {

@@ -370,26 +370,4 @@ class DuckChatFeatureRepositoryTest {
         assertNull(results[0])
         assertEquals("DUCK_AI", results[1])
     }
-
-    @Test
-    fun `when storeAddressBarPickerSelectedAt then set in data store`() = runTest {
-        testee.storeAddressBarPickerSelectedAt(12345L)
-
-        verify(mockDataStore).storeAddressBarPickerSelectedAt(12345L)
-    }
-
-    @Test
-    fun `when getAddressBarPickerSelectedAt then delegate to data store`() = runTest {
-        whenever(mockDataStore.getAddressBarPickerSelectedAt()).thenReturn(12345L)
-
-        assertEquals(12345L, testee.getAddressBarPickerSelectedAt())
-        verify(mockDataStore).getAddressBarPickerSelectedAt()
-    }
-
-    @Test
-    fun `when clearAddressBarPickerSelectedAt then delegate to data store`() = runTest {
-        testee.clearAddressBarPickerSelectedAt()
-
-        verify(mockDataStore).clearAddressBarPickerSelectedAt()
-    }
 }

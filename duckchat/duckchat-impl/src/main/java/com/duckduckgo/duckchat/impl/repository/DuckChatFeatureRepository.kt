@@ -106,12 +106,6 @@ interface DuckChatFeatureRepository {
     suspend fun setLastUsedTogglePosition(position: String)
 
     fun observeLastUsedTogglePosition(): Flow<String?>
-
-    suspend fun storeAddressBarPickerSelectedAt(timestampMillis: Long)
-
-    suspend fun getAddressBarPickerSelectedAt(): Long?
-
-    suspend fun clearAddressBarPickerSelectedAt()
 }
 
 @SingleInstanceIn(AppScope::class)
@@ -232,16 +226,6 @@ class RealDuckChatFeatureRepository @Inject constructor(
     }
 
     override fun observeLastUsedTogglePosition(): Flow<String?> = duckChatDataStore.observeLastUsedTogglePosition()
-
-    override suspend fun storeAddressBarPickerSelectedAt(timestampMillis: Long) {
-        duckChatDataStore.storeAddressBarPickerSelectedAt(timestampMillis)
-    }
-
-    override suspend fun getAddressBarPickerSelectedAt(): Long? = duckChatDataStore.getAddressBarPickerSelectedAt()
-
-    override suspend fun clearAddressBarPickerSelectedAt() {
-        duckChatDataStore.clearAddressBarPickerSelectedAt()
-    }
 
     private fun updateWidgets() {
         val intent = Intent(AppWidgetManager.ACTION_APPWIDGET_UPDATE)

@@ -17,7 +17,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="match_parent"
     android:clipChildren="false"
     android:theme="@style/ThemeOverlay.DuckDuckGo.Onboarding">
 
@@ -30,15 +30,14 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/ic_duckai" />
+        app:srcCompat="@drawable/ic_duckduckgo_color_24" />
 
     <com.duckduckgo.common.ui.view.text.DaxTextView
         android:id="@+id/eyebrow"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/keyline_3"
-        android:letterSpacing="0.08"
-        android:text="@string/newAddressBarPickerEyebrow"
+        android:text="@string/newAddressBarPickerDuckDuckGo"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/duckAiLogo"
@@ -93,7 +92,6 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/daxBubble"
         app:srcCompat="@drawable/onboarding_input_type_background" />
 
     <com.airbnb.lottie.LottieAnimationView
