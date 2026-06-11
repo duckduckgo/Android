@@ -54,14 +54,14 @@ class AdBlockingTelemetryPixelInterceptor @Inject constructor(
     override fun intercept(chain: Chain): Response {
         val pixelName = chain.request().url.pathSegments.last()
 
-        if (pixelName.startsWith(YOUTUBE_TELEMETRY_PIXEL_PREFIX, ignoreCase = true) &&
-            statusChecker.currentState() !is AdBlockingState.Enabled.UserEnabled
-        ) {
-            logcat(INFO) { "Ad blocking telemetry pixel dropped (no explicit consent): $pixelName" }
-            return dummyResponse(chain)
+        if (pixelName.startsWith(YOUTUBE_TELEMETRY_PIXEL_PREFIX, ignoreCase = true)) {
+            if (statusChecker.currentState() !is AdBlockingState.Enabled.UserEnabled) {
+                logcat(INFO) { "Ad blocking telemetry pixel dropped (no explicit consent): $pixelName" }
+                return dummyResponse(chain)
+            }
+            logcat(INFO) { "Ad blocking telemetry pixel sending: $pixelName" }
         }
 
-        logcat(INFO) { "Pixel proceeding: $pixelName" }
         return chain.proceed(chain.request())
     }
 
