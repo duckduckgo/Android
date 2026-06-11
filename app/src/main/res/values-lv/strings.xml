@@ -76,6 +76,7 @@
     <string name="options">Opcijas</string>
     <string name="shareLink">Kopīgot saiti</string>
     <string name="copyUrl">Kopēt saites adresi</string>
+    <string name="urlCopiedToClipboard">URL ir nokopēts starpliktuvē</string>
 
     <!-- Find in page -->
     <string name="nextSearchTermDescription">Atrast nākamo</string>
@@ -269,6 +270,7 @@
     <string name="singleTabFireDialogDeleteAll">Dzēst visus</string>
     <string name="singleTabFireDialogDeleteThisTab">Dzēst šo cilni</string>
     <string name="singleTabFireDialogDeleteChat">Dzēst tērzēšanas sarunu</string>
+    <string name="singleTabFireDialogDeleteChats">Dzēst tērzēšanas</string>
     <string name="singleTabFireDialogTitleDuckAi">Dzēst šo tērzēšanas sarunu?</string>
     <string name="singleTabFireDialogSubtitleSiteData">Dzēšot vietnes datus, tu vari tikt izrakstīts no kontiem.</string>
     <string name="singleTabFireDialogSubtitleDownloads">Tas atcels notiekošās lejupielādes.</string>
@@ -923,6 +925,26 @@
     <string name="preOnboardingInputScreenButton">Nākamais</string>
     <string name="preOnboardingInputScreenDescription"><![CDATA[MI funkcijas ir privātas un nav obligātas. Tu vari veikt izmaiņas sadaļā <b>Iestatījumi > MI funkcijas</b>.]]></string>
 
+    <!--Onboarding Reinstall Quick Setup-->
+    <string name="preOnboardingReinstallQuickSetupTitle">Laipni lūdzam atpakaļ!&lt;br/&gt;Vai gribi kaut ko pielāgot?</string>
+    <string name="preOnboardingReinstallSetDefaultLabel">Iestatī DuckDuckGo kā noklusējumu</string>
+    <string name="preOnboardingReinstallAddHomeScreenWidgetLabel">Pievienot sākuma ekrāna logrīku</string>
+    <string name="preOnboardingReinstallAddressBarLabel">Adreses joslas pozīcija</string>
+    <string name="preOnboardingReinstallAddressBarSearchOptionsLabel">Adreses joslas meklēšanas opcijas</string>
+    <string name="preOnboardingReinstallStartBrowsing">Sākt pārlūkošanu</string>
+
+    <!-- Quick setup bottom sheets -->
+    <string name="quickSetupAddressBarPositionTitle">Kur attēlot adreses joslu?</string>
+    <string name="quickSetupAddressBarPositionCaption"><![CDATA[Tu vari veikt izmaiņas sadaļā <b>Iestatījumi > Izskats</b>.]]></string>
+    <string name="quickSetupSearchOptionsTitle">Vēlies meklēšanu un MI tērzēšanu adreses joslā?</string>
+    <string name="quickSetupBottomSheetDone">Gatavs</string>
+    <string name="quickSetupInputScreenSearchOnly">Tikai meklēšana</string>
+    <string name="quickSetupInputScreenSearchAndDuckAi">Meklēšana un Duck.ai</string>
+    <string name="quickSetupRemoveHomeScreenWidgetTitle">Kā noņemt sākuma ekrāna logrīku</string>
+    <string name="quickSetupRemoveHomeScreenWidgetStep1">Dodies uz sākuma ekrānu</string>
+    <string name="quickSetupRemoveHomeScreenWidgetStep2">Pieskarieties logrīkam un turi to</string>
+    <string name="quickSetupRemoveHomeScreenWidgetStep3">Pieskaries vai velc, lai to noņemtu</string>
+
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Adreses josla</string>
     <string name="settingsAddressBarPositionHeaderTitle">Adreses joslas pozīcija</string>
@@ -1024,8 +1046,11 @@
 
     <string name="preOnboardingWelcomeDialogTitle">Sveiki!</string>
     <string name="preOnboardingWelcomeDialogBody1">Vai esi gatavs ātrākai pārlūkprogrammai, kas tev sniedz kontroli?</string>
-    <string name="preOnboardingWelcomeDialogBody2">Mākslīgais intelekts vienmēr ir izvēles iespēja, un privātuma aizsardzība vienmēr ir ieslēgta.</string>
+    <string name="preOnboardingWelcomeDialogBody2">Mākslīgais intelekts vienmēr ir izvēles iespēja, un privātuma aizsardzība vienmēr darbojas.</string>
     <string name="onboardingStepIndicatorText" instruction="a counter above our instructions in onboarding that tells a user what step they are on">%1$d no %2$d</string>
-    <string name="onboardingSearchDaxDialogOption1Quoted" instruction="translate &apos;duck&apos; too.">kā angliski pateikt “pīle”</string>
+    <string name="onboardingSearchDaxDialogOption1Quoted" instruction="translate &apos;duck&apos; too.">kā angliski pateikt “duck”</string>
     <string name="onboardingSearchDaxDialogOption1EnglishQuoted" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">kā spāniski pateikt “pīle”</string>
+
+    <string name="input_screen_user_pref_without_ai_updated">Meklēt tikai</string>
+    <string name="input_screen_user_pref_with_ai_updated">Pārslēdzies starp\nmeklēšanu un Duck.ai</string>
 </resources>

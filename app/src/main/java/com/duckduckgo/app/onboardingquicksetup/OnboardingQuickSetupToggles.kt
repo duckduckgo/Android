@@ -43,7 +43,7 @@ interface OnboardingQuickSetupToggles {
      * cohort should be shown the quick-setup screen during onboarding.
      */
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
-    fun onboardingQuickSetupExperimentMay26(): Toggle
+    fun onboardingQuickSetupExperimentJun3(): Toggle
 
     enum class QuickSetupCohorts(override val cohortName: String) : CohortName {
         CONTROL("control"),

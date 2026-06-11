@@ -34,7 +34,7 @@ dependencies {
     implementation project(':browser-api')
     implementation project(':feature-toggles-api')
     implementation project(':js-messaging-api')
-    implementation project(':duckplayer-api')
+    implementation project(':ad-blocking-api')
     implementation project(':data-store-api')
     implementation AndroidX.webkit
 

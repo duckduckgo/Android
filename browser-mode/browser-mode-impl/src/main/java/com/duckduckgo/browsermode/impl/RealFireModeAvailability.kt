@@ -28,6 +28,9 @@ import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import logcat.LogPriority.ERROR
+import logcat.asLog
+import logcat.logcat
 import javax.inject.Inject
 
 @SingleInstanceIn(AppScope::class)
@@ -50,9 +53,16 @@ class RealFireModeAvailability @Inject constructor(
 
     private fun computeAndCache(): Boolean {
         cachedAvailability?.let { return it }
-        val value = WebViewFeature.isFeatureSupported(WebViewFeature.MULTI_PROFILE) &&
-            fireModeFeature.fireTabs().isEnabled()
+        val value = isMultiProfileSupported() && fireModeFeature.fireTabs().isEnabled()
         cachedAvailability = value
         return value
+    }
+
+    private fun isMultiProfileSupported(): Boolean {
+        return runCatching { WebViewFeature.isFeatureSupported(WebViewFeature.MULTI_PROFILE) }
+            .getOrElse { exception ->
+                logcat(ERROR) { "Failed to check MULTI_PROFILE WebView support: ${exception.asLog()}" }
+                false
+            }
     }
 }

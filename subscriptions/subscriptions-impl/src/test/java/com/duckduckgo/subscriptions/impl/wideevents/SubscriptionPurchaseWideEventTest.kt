@@ -57,6 +57,28 @@ class SubscriptionPurchaseWideEventTest {
     }
 
     @Test
+    @SuppressLint("DenyListedApi")
+    fun `onPurchaseFlowStarted includes use_query_purchases true when feature flag enabled`() =
+        runTest {
+            subscriptionsFeature.useQueryPurchases().setRawStoredState(Toggle.State(true))
+            whenever(wideEventClient.flowStart(any(), any(), any(), any()))
+                .thenReturn(Result.success(321L))
+
+            subscriptionPurchaseWideEvent.onPurchaseFlowStarted("sub_id", true, "app_settings")
+
+            verify(wideEventClient).flowStart(
+                name = "subscription-purchase",
+                flowEntryPoint = "app_settings",
+                metadata = mapOf(
+                    "subscription_identifier" to "sub_id",
+                    "free_trial_eligible" to "true",
+                    "use_query_purchases" to "true",
+                ),
+                cleanupPolicy = CleanupPolicy.OnProcessStart(ignoreIfIntervalTimeoutPresent = true),
+            )
+        }
+
+    @Test
     fun `onPurchaseFlowStarted starts a new flow`() =
         runTest {
             whenever(wideEventClient.flowStart(any(), any(), any(), any()))
@@ -70,6 +92,7 @@ class SubscriptionPurchaseWideEventTest {
                 metadata = mapOf(
                     "subscription_identifier" to "sub_id",
                     "free_trial_eligible" to "true",
+                    "use_query_purchases" to "false",
                 ),
                 cleanupPolicy = CleanupPolicy.OnProcessStart(ignoreIfIntervalTimeoutPresent = true),
             )

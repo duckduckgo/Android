@@ -402,6 +402,80 @@
             { "key": "value", "type": "string", "description": "The selected toggle position", "enum": ["search", "duckAI", "lastUsed"] }
         ]
     },
+    "m_aichat_new_address_bar_picker_v2_displayed_count": {
+        "description": "Fires every time the V2 New Address Bar Picker bottom sheet is displayed to an existing Duck.ai-enabled user who has not yet enabled the AI Chat Toggle.",
+        "owners": ["GerardPaligot"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_new_address_bar_picker_v2_displayed_daily": {
+        "description": "Fires once per day when the V2 New Address Bar Picker bottom sheet is displayed to an existing Duck.ai-enabled user who has not yet enabled the AI Chat Toggle.",
+        "owners": ["GerardPaligot"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_new_address_bar_picker_v2_confirmed_count": {
+        "description": "Fires every time the user taps Confirm on the V2 New Address Bar Picker.",
+        "owners": ["GerardPaligot"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "selection",
+                "type": "string",
+                "description": "Which option the user picked on the V2 picker before tapping Confirm.",
+                "enum": ["search_only", "search_and_ai"]
+            }
+        ]
+    },
+    "m_aichat_new_address_bar_picker_v2_confirmed_daily": {
+        "description": "Fires once per day when the user taps Confirm on the V2 New Address Bar Picker.",
+        "owners": ["GerardPaligot"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "selection",
+                "type": "string",
+                "description": "Which option the user picked on the V2 picker before tapping Confirm.",
+                "enum": ["search_only", "search_and_ai"]
+            }
+        ]
+    },
+    "m_aichat_duck_ai_direct_navigation_count": {
+        "description": "User navigated directly to the Duck.ai URL by typing it in the omnibar",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "duck_ai_enabled",
+                "type": "string",
+                "description": "Whether the Duck.ai global setting is enabled",
+                "enum": ["true", "false"]
+            }
+        ]
+    },
+    "m_aichat_duck_ai_direct_navigation_daily": {
+        "description": "(Daily Pixel) User navigated directly to the Duck.ai URL by typing it in the omnibar",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "duck_ai_enabled",
+                "type": "string",
+                "description": "Whether the Duck.ai global setting is enabled",
+                "enum": ["true", "false"]
+            }
+        ]
+    },
     "m_aichat_experimental_omnibar_mode_switched": {
         "description": "User switched between Search and Duck.ai toggle in the input screen",
         "owners": ["YoussefKeyrouz"],
@@ -604,6 +678,34 @@
     "m_duck-ai_native-storage_file-delete_error": {
         "description": "Duck.ai native storage: deleteFile, deleteFiles, or deleteAllFiles failed with an exception",
         "owners": ["aitorvs"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_voice_notification_open_chat_tapped": {
+        "description": "User tapped the Open Chat action on the Duck.ai voice session notification, returning to the chat",
+        "owners": ["karlenDimla"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_voice_notification_end_chat_tapped": {
+        "description": "User tapped the End Chat action on the Duck.ai voice session notification",
+        "owners": ["karlenDimla"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_voice_service_started": {
+        "description": "The Duck.ai voice microphone foreground service was created (voice session resources active)",
+        "owners": ["karlenDimla"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_voice_service_killed": {
+        "description": "The Duck.ai voice microphone foreground service was destroyed (voice session resources released)",
+        "owners": ["karlenDimla"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
         "parameters": ["appVersion"]

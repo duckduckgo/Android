@@ -173,11 +173,6 @@ interface DuckChatInternal : DuckChat {
      */
     fun openNewDuckChatSession()
 
-    /**
-     * Opens Duck.ai with [chatId] pre-loaded.
-     */
-    fun openWithChatId(chatId: String)
-
     /** Single source of truth for the Duck.ai chat URL shape. */
     fun buildChatUrl(chatId: String): String
 
@@ -632,6 +627,8 @@ class RealDuckChat @Inject constructor(
         return appendParameters(parameters, getDuckChatLink())
     }
 
+    override fun getDuckChatSettingsUrl(): String = resolveDuckAiUrl(DUCK_CHAT_SETTINGS_WEB_LINK)
+
     private fun addChatParameters(
         query: String,
         autoPrompt: Boolean,
@@ -703,9 +700,11 @@ class RealDuckChat @Inject constructor(
             }
     }
 
-    private fun getDuckChatLink(): String {
-        return duckChatLink.toUri().buildUpon().authority(duckAiHostProvider.getHost()).build().toString()
-    }
+    private fun getDuckChatLink(): String = resolveDuckAiUrl(duckChatLink)
+
+    /** Resolves [link] against the configured Duck.ai host by swapping its authority (e.g. for internal/staging overrides). */
+    private fun resolveDuckAiUrl(link: String): String =
+        link.toUri().buildUpon().authority(duckAiHostProvider.getHost()).build().toString()
 
     private fun nativeInputParameters(): Map<String, String> =
         if (isNativeInputFieldEnabled) mapOf(NATIVE_INPUT_QUERY_NAME to NATIVE_INPUT_QUERY_VALUE) else emptyMap()
@@ -810,14 +809,12 @@ class RealDuckChat @Inject constructor(
 
     override fun observeTriggerVoiceChatSessionEnd(): Flow<String> = voiceSessionStateManager.observeTriggerVoiceSessionEnd()
 
+    override fun endVoiceChatSession(tabId: String) = voiceSessionStateManager.triggerVoiceSessionEnd(tabId)
+
     override suspend fun isChatHistoryAvailable(): Boolean = withContext(dispatchers.io()) {
         isEnabled() &&
             duckChatFeature.useNativeStorageChatData().isEnabled() &&
             duckChatFeature.historyScreen().isEnabled()
-    }
-
-    override fun openWithChatId(chatId: String) {
-        openDuckChat(parameters = mapOf(CHAT_ID_QUERY_NAME to chatId), forceNewSession = true)
     }
 
     override fun buildChatUrl(chatId: String): String {
@@ -949,7 +946,10 @@ class RealDuckChat @Inject constructor(
                     isDuckChatFeatureEnabled && isDuckChatUserEnabled && isVoiceChatEntryPointEnabled
             _showVoiceChatEntry.emit(showVoiceChatEntry)
 
-            val showFullScreenMode = isDuckChatFeatureEnabled && isDuckChatUserEnabled &&
+            // Full screen mode (new Duck.ai header, unified input, hamburger menu) is intentionally NOT gated on
+            // isDuckChatUserEnabled: users who disabled Duck.ai still get the new UX when navigating directly to a
+            // duck.ai tab. It remains gated on the feature rollout flag/setting only.
+            val showFullScreenMode = isDuckChatFeatureEnabled &&
                 (duckChatFeature.fullscreenMode().isEnabled() || duckChatFeatureRepository.isFullScreenModeUserSettingEnabled())
             isFullscreenModeEnabled = showFullScreenMode
             _showFullScreenMode.emit(showFullScreenMode)
@@ -977,6 +977,7 @@ class RealDuckChat @Inject constructor(
 
     companion object {
         private const val DUCK_CHAT_WEB_LINK = "https://duck.ai/chat?duckai=5"
+        private const val DUCK_CHAT_SETTINGS_WEB_LINK = "https://duck.ai?settings=open"
         private const val DUCKDUCKGO_HOST = "duckduckgo.com"
         private const val CHAT_QUERY_NAME = "ia"
         private const val CHAT_QUERY_VALUE = "chat"

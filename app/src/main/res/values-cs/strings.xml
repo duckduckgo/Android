@@ -77,6 +77,7 @@
     <string name="options">Možnosti</string>
     <string name="shareLink">Sdílet odkaz</string>
     <string name="copyUrl">Kopírovat adresu odkazu</string>
+    <string name="urlCopiedToClipboard">Adresa URL se zkopírovala do schránky</string>
 
     <!-- Find in page -->
     <string name="nextSearchTermDescription">Najít další</string>
@@ -273,6 +274,7 @@
     <string name="singleTabFireDialogDeleteAll">Smazat vše</string>
     <string name="singleTabFireDialogDeleteThisTab">Vymazat tuto kartu</string>
     <string name="singleTabFireDialogDeleteChat">Smazat chat</string>
+    <string name="singleTabFireDialogDeleteChats">Smazat chaty</string>
     <string name="singleTabFireDialogTitleDuckAi">Smazat tento chat?</string>
     <string name="singleTabFireDialogSubtitleSiteData">Když vymažeš data stránek, může dojít ke tvému odhlášení z účtů.</string>
     <string name="singleTabFireDialogSubtitleDownloads">Tím se zruší probíhající stahování.</string>
@@ -943,6 +945,26 @@
     <string name="preOnboardingInputScreenButton">Další</string>
     <string name="preOnboardingInputScreenDescription"><![CDATA[Funkce AI jsou soukromé a volitelné. Změny můžeš provádět v <b>Nastavení > Funkce AI</b>.]]></string>
 
+    <!--Onboarding Reinstall Quick Setup-->
+    <string name="preOnboardingReinstallQuickSetupTitle">Vítej zpět!&lt;br/&gt;Chcete si něco přizpůsobit?</string>
+    <string name="preOnboardingReinstallSetDefaultLabel">Nastavit DuckDuckGo jako výchozí</string>
+    <string name="preOnboardingReinstallAddHomeScreenWidgetLabel">Přidat widget na domovskou obrazovku</string>
+    <string name="preOnboardingReinstallAddressBarLabel">Pozice adresního řádku</string>
+    <string name="preOnboardingReinstallAddressBarSearchOptionsLabel">Možnosti vyhledávání v adresním řádku</string>
+    <string name="preOnboardingReinstallStartBrowsing">Spustit procházení</string>
+
+    <!-- Quick setup bottom sheets -->
+    <string name="quickSetupAddressBarPositionTitle">Kde chceš mít adresní řádek?</string>
+    <string name="quickSetupAddressBarPositionCaption"><![CDATA[Změny můžeš provést v <b>Nastavení > Vzhled</b>.]]></string>
+    <string name="quickSetupSearchOptionsTitle">Chceš Vyhledávání a chat s AI v adresním řádku?</string>
+    <string name="quickSetupBottomSheetDone">Hotovo</string>
+    <string name="quickSetupInputScreenSearchOnly">Jen vyhledávání</string>
+    <string name="quickSetupInputScreenSearchAndDuckAi">Vyhledávání a Duck.ai</string>
+    <string name="quickSetupRemoveHomeScreenWidgetTitle">Jak odstranit widget z domovské obrazovky</string>
+    <string name="quickSetupRemoveHomeScreenWidgetStep1">Přejdi na domovskou obrazovku</string>
+    <string name="quickSetupRemoveHomeScreenWidgetStep2">Dotkni se widgetu a podrž ho</string>
+    <string name="quickSetupRemoveHomeScreenWidgetStep3">Odstraníš ho klepnutím nebo přetažením</string>
+
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Adresní řádek</string>
     <string name="settingsAddressBarPositionHeaderTitle">Pozice adresního řádku</string>
@@ -1045,7 +1067,10 @@
     <string name="preOnboardingWelcomeDialogTitle">Zdravíme tě.</string>
     <string name="preOnboardingWelcomeDialogBody1">Chceš rychlejší prohlížeč, se kterým budeš mít vše pod kontrolou?</string>
     <string name="preOnboardingWelcomeDialogBody2">Umělá inteligence je vždy volitelná a ochrana soukromí je vždy zapnutá.</string>
-    <string name="onboardingStepIndicatorText" instruction="a counter above our instructions in onboarding that tells a user what step they are on">%1$d z %2$d</string>
+    <string name="onboardingStepIndicatorText" instruction="a counter above our instructions in onboarding that tells a user what step they are on">%1$d %2$d</string>
     <string name="onboardingSearchDaxDialogOption1Quoted" instruction="translate &apos;duck&apos; too.">jak se anglicky řekne „kachna“</string>
     <string name="onboardingSearchDaxDialogOption1EnglishQuoted" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">jak se španělsky řekne „kachna“</string>
+
+    <string name="input_screen_user_pref_without_ai_updated">Jen vyhledávání</string>
+    <string name="input_screen_user_pref_with_ai_updated">Přepínej mezi\nHledáním a Duck.ai</string>
 </resources>

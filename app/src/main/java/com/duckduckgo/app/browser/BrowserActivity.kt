@@ -87,6 +87,7 @@ import com.duckduckgo.app.global.rating.PromptCount
 import com.duckduckgo.app.global.sanitize
 import com.duckduckgo.app.global.view.ClearDataAction
 import com.duckduckgo.app.global.view.ORIGIN_DUCK_AI_CONTEXTUAL_CHAT
+import com.duckduckgo.app.global.view.ORIGIN_HATCH
 import com.duckduckgo.app.global.view.renderIfChanged
 import com.duckduckgo.app.onboarding.ui.page.DefaultBrowserPage
 import com.duckduckgo.app.pixels.AppPixelName
@@ -488,7 +489,8 @@ open class BrowserActivity : DuckDuckGoActivity() {
                     }
                 }
                 FireDialog.EVENT_ON_SINGLE_TAB_CLEAR_COMPLETE -> {
-                    val isDuckAiContextual = bundle.getString(FireDialog.RESULT_KEY_ORIGIN) == ORIGIN_DUCK_AI_CONTEXTUAL_CHAT
+                    val origin = bundle.getString(FireDialog.RESULT_KEY_ORIGIN)
+                    val isDuckAiContextual = origin == ORIGIN_DUCK_AI_CONTEXTUAL_CHAT
                     val message = if (isDuckAiContextual) {
                         getString(R.string.duckAiChatDeletedSnackbar)
                     } else {
@@ -496,6 +498,12 @@ open class BrowserActivity : DuckDuckGoActivity() {
                     }
                     showSnackbar(message)
                     if (isDuckAiContextual) currentTab?.onContextualSheetFireComplete()
+                    // Burning a tab from the return hatch closes the tab the user is on and opens a
+                    // fresh new tab, so they land on a clean tab rather than back on the burned one.
+                    if (origin == ORIGIN_HATCH) {
+                        currentTab?.closeCurrentTab()
+                        launchNewTab()
+                    }
                     if (pendingDuckAiOnboardingFire) {
                         pendingDuckAiOnboardingFire = false
                         closeDuckChatFullScreen()
@@ -546,6 +554,38 @@ open class BrowserActivity : DuckDuckGoActivity() {
         }
     }
 
+    // Same parent + omnibar anchor as showSnackbar, but with an undo action. Used by the new-tab-page
+    // return hatch so its "tab closed" snackbar clears the keyboard and the floating native input,
+    // which it can't do when shown from inside the hatch view's own (lower) view subtree.
+    fun showUndoableSnackbar(
+        message: String,
+        actionLabel: String,
+        onAction: () -> Unit,
+        onDismiss: () -> Unit,
+    ) {
+        lifecycleScope.launch {
+            val omnibarType = withContext(dispatcherProvider.io()) {
+                settingsDataStore.omnibarType
+            }
+            val anchorView = when (omnibarType) {
+                OmnibarType.SINGLE_TOP -> null
+                OmnibarType.SINGLE_BOTTOM -> currentTab?.getOmnibar()?.omnibarView?.toolbar
+                    ?: binding.fragmentContainer
+
+                OmnibarType.SPLIT -> currentTab?.navigationBar ?: binding.fragmentContainer
+            }
+            DefaultSnackbar(
+                parentView = binding.fragmentContainer,
+                message = message,
+                anchor = anchorView,
+                action = actionLabel,
+                showAction = true,
+                onAction = onAction,
+                onDismiss = onDismiss,
+            ).show()
+        }
+    }
+
     override fun onStart() {
         super.onStart()
         duckAiAnimDelayJob =
@@ -585,6 +625,10 @@ open class BrowserActivity : DuckDuckGoActivity() {
         logcat(INFO) { "onNewIntent: $intent" }
 
         intent.sanitize()
+
+        intent.getStringExtra(LAUNCH_FROM_NOTIFICATION_PIXEL_NAME)?.let {
+            viewModel.onLaunchedFromNotification(it)
+        }
 
         dataClearerForegroundAppRestartPixel.registerIntent(intent)
 
@@ -796,10 +840,14 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
             if (duckAiFeatureState.showFullScreenMode.value) {
                 val url = intent.getStringExtra(DUCK_CHAT_URL) ?: duckChat.getDuckChatUrl("", false)
+                // The tab to return to when this Duck.ai tab is closed.
+                // Use to the current tab if no explicit tab id is passed.
+                // Falls back to NTP otherwise.
+                val sourceTabId = intent.getStringExtra(SOURCE_TAB_ID_EXTRA) ?: currentTab?.tabId
                 if (swipingTabsFeature.isEnabled) {
-                    launchNewTab(query = url, skipHome = true)
+                    launchNewTab(query = url, skipHome = false, sourceTabId = sourceTabId)
                 } else {
-                    lifecycleScope.launch { viewModel.onOpenInNewTabRequested(query = url, skipHome = true) }
+                    lifecycleScope.launch { viewModel.onOpenInNewTabRequested(query = url, sourceTabId = sourceTabId, skipHome = false) }
                 }
             } else {
                 val duckChatSessionActive = intent.getBooleanExtra(DUCK_CHAT_SESSION_ACTIVE, false)
@@ -859,8 +907,8 @@ open class BrowserActivity : DuckDuckGoActivity() {
                     viewModel.launchFromThirdParty()
                 }
                 val selectedText = intent.getBooleanExtra(SELECTED_TEXT_EXTRA, false)
-                val sourceTabId = if (selectedText) currentTab?.tabId else null
-                val skipHome = !selectedText
+                val sourceTabId = intent.getStringExtra(SOURCE_TAB_ID_EXTRA) ?: if (selectedText) currentTab?.tabId else null
+                val skipHome = !selectedText && sourceTabId == null
                 if (swipingTabsFeature.isEnabled) {
                     val query =
                         if (isExternal) {
@@ -1299,6 +1347,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
             notifyDataCleared: Boolean = false,
             openInCurrentTab: Boolean = false,
             selectedText: Boolean = false,
+            sourceTabId: String? = null,
             isExternal: Boolean = false,
             interstitialScreen: Boolean = false,
             openExistingTabId: String? = null,
@@ -1316,6 +1365,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
             intent.putExtra(NOTIFY_DATA_CLEARED_EXTRA, notifyDataCleared)
             intent.putExtra(OPEN_IN_CURRENT_TAB_EXTRA, openInCurrentTab)
             intent.putExtra(SELECTED_TEXT_EXTRA, selectedText)
+            intent.putExtra(SOURCE_TAB_ID_EXTRA, sourceTabId)
             intent.putExtra(LAUNCH_FROM_EXTERNAL_EXTRA, isExternal)
             intent.putExtra(LAUNCH_FROM_INTERSTITIAL_EXTRA, interstitialScreen)
             intent.putExtra(OPEN_EXISTING_TAB_ID_EXTRA, openExistingTabId)
@@ -1339,6 +1389,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
         const val LAUNCH_FROM_NOTIFICATION_PIXEL_NAME = "LAUNCH_FROM_NOTIFICATION_PIXEL_NAME"
         const val OPEN_IN_CURRENT_TAB_EXTRA = "OPEN_IN_CURRENT_TAB_EXTRA"
         const val SELECTED_TEXT_EXTRA = "SELECTED_TEXT_EXTRA"
+        const val SOURCE_TAB_ID_EXTRA = "SOURCE_TAB_ID_EXTRA"
         private const val LAUNCH_FROM_INTERSTITIAL_EXTRA = "INTERSTITIAL_SCREEN_EXTRA"
         const val OPEN_EXISTING_TAB_ID_EXTRA = "OPEN_EXISTING_TAB_ID_EXTRA"
 

@@ -27,6 +27,7 @@ import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.common.ui.DuckDuckGoFragment
 import com.duckduckgo.common.ui.menu.PopupMenu
 import com.duckduckgo.common.ui.view.PopupMenuItemView
@@ -73,6 +74,9 @@ class ChatHistoryFragment : DuckDuckGoFragment(R.layout.fragment_chat_history) {
 
     @Inject
     lateinit var globalActivityStarter: GlobalActivityStarter
+
+    @Inject
+    lateinit var browserNav: BrowserNav
 
     private val binding: FragmentChatHistoryBinding by viewBinding()
     private val viewModel: ChatHistoryViewModel by lazy {
@@ -161,10 +165,15 @@ class ChatHistoryFragment : DuckDuckGoFragment(R.layout.fragment_chat_history) {
 
     private fun onNavigationEvent(event: ChatHistoryViewModel.NavigationEvent) {
         when (event) {
+            is ChatHistoryViewModel.NavigationEvent.OpenChat ->
+                startActivity(browserNav.openInNewTab(requireContext(), event.url, event.sourceTabId))
             is ChatHistoryViewModel.NavigationEvent.OpenRename -> openRenameScreen(event.chatId, event.currentTitle)
             is ChatHistoryViewModel.NavigationEvent.ShowDownloadComplete -> showDownloadCompleteSnackbar(event.fileName)
+            is ChatHistoryViewModel.NavigationEvent.ShowBulkDownloadComplete -> showBulkDownloadCompleteSnackbar(event.count)
             ChatHistoryViewModel.NavigationEvent.ShowExportError ->
                 Snackbar.make(binding.root, R.string.duck_ai_chat_history_download_error, Snackbar.LENGTH_SHORT).show()
+            ChatHistoryViewModel.NavigationEvent.ShowBulkDownloadError ->
+                Snackbar.make(binding.root, R.string.duck_ai_chat_history_bulk_download_error, Snackbar.LENGTH_SHORT).show()
         }
     }
 
@@ -183,6 +192,15 @@ class ChatHistoryFragment : DuckDuckGoFragment(R.layout.fragment_chat_history) {
 
     private fun showDownloadCompleteSnackbar(fileName: String) {
         val message = getString(R.string.duck_ai_chat_history_download_complete, fileName)
+        Snackbar.make(binding.root, message, Snackbar.LENGTH_LONG)
+            .setAction(R.string.duck_ai_chat_history_download_view) {
+                globalActivityStarter.start(requireContext(), DownloadsScreens.DownloadsScreenNoParams)
+            }
+            .show()
+    }
+
+    private fun showBulkDownloadCompleteSnackbar(count: Int) {
+        val message = resources.getQuantityString(R.plurals.duck_ai_chat_history_bulk_download_complete, count, count)
         Snackbar.make(binding.root, message, Snackbar.LENGTH_LONG)
             .setAction(R.string.duck_ai_chat_history_download_view) {
                 globalActivityStarter.start(requireContext(), DownloadsScreens.DownloadsScreenNoParams)
@@ -226,7 +244,7 @@ class ChatHistoryFragment : DuckDuckGoFragment(R.layout.fragment_chat_history) {
                 adapter.submitList(buildEntries(state, selectMode))
                 if (selectMode != null) {
                     applySelectModeToolbar(selectMode.selectedChatIds.size)
-                    setFireActionVisible(selectMode.selectedChatIds.isNotEmpty())
+                    setFireActionVisible(true)
                 } else {
                     applyDefaultToolbar()
                     // Fire-all wipes every chat including Pinned — show whenever any chat is present.
@@ -251,8 +269,9 @@ class ChatHistoryFragment : DuckDuckGoFragment(R.layout.fragment_chat_history) {
         binding.toolbar.navigationContentDescription = null
         binding.toolbar.setNavigationOnClickListener { requireActivity().onBackPressedDispatcher.onBackPressed() }
         binding.toolbar.setTitle(R.string.duck_ai_chat_history_title)
+        binding.toolbar.menu.findItem(R.id.chat_history_action_new)?.isVisible = true
         binding.toolbar.menu.findItem(R.id.chat_history_action_search)?.isVisible = true
-        binding.toolbar.menu.findItem(R.id.chat_history_action_overflow)?.isVisible = true
+        binding.toolbar.menu.findItem(R.id.chat_history_action_download_selected)?.isVisible = false
     }
 
     private fun applySelectModeToolbar(count: Int) {
@@ -261,8 +280,9 @@ class ChatHistoryFragment : DuckDuckGoFragment(R.layout.fragment_chat_history) {
             getString(R.string.duck_ai_chat_history_exit_select_mode_content_description)
         binding.toolbar.setNavigationOnClickListener { viewModel.onSelectModeCancelled() }
         binding.toolbar.title = count.toString()
+        binding.toolbar.menu.findItem(R.id.chat_history_action_new)?.isVisible = false
         binding.toolbar.menu.findItem(R.id.chat_history_action_search)?.isVisible = false
-        binding.toolbar.menu.findItem(R.id.chat_history_action_overflow)?.isVisible = false
+        binding.toolbar.menu.findItem(R.id.chat_history_action_download_selected)?.isVisible = true
     }
 
     private fun buildEntries(
@@ -309,8 +329,8 @@ class ChatHistoryFragment : DuckDuckGoFragment(R.layout.fragment_chat_history) {
     }
 
     private fun onMenuItemClicked(item: MenuItem): Boolean = when (item.itemId) {
-        R.id.chat_history_action_overflow -> {
-            showToolbarOverflowPopup()
+        R.id.chat_history_action_new -> {
+            viewModel.onNewChatRequested()
             true
         }
         R.id.chat_history_action_search -> {
@@ -319,6 +339,10 @@ class ChatHistoryFragment : DuckDuckGoFragment(R.layout.fragment_chat_history) {
         }
         R.id.chat_history_action_fire -> {
             viewModel.onFireIconClicked()
+            true
+        }
+        R.id.chat_history_action_download_selected -> {
+            viewModel.onDownloadSelectedRequested()
             true
         }
         else -> false
@@ -337,14 +361,6 @@ class ChatHistoryFragment : DuckDuckGoFragment(R.layout.fragment_chat_history) {
         binding.toolbar.show()
         viewModel.onSearchClosed()
         // onBackPressedCallback.isEnabled is reset by render() — select mode may still be active.
-    }
-
-    private fun showToolbarOverflowPopup() {
-        val anchor = binding.toolbar.findViewById<View>(R.id.chat_history_action_overflow) ?: return
-        val popup = PopupMenu(layoutInflater, R.layout.popup_chat_history_overflow)
-        val view = popup.contentView
-        popup.onMenuItemClicked(view.findViewById(R.id.select)) { viewModel.onEnterSelectMode() }
-        popup.show(binding.root, anchor)
     }
 
     private fun showRowPopup(item: ChatHistoryItem, anchor: View) {

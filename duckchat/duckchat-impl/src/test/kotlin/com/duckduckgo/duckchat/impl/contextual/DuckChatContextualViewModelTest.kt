@@ -1593,6 +1593,8 @@ class DuckChatContextualViewModelTest {
             sidebar: Boolean,
         ): String = nextUrl
 
+        override fun getDuckChatSettingsUrl(): String = "https://duck.ai?settings=open"
+
         override fun isDuckChatUrl(uri: android.net.Uri): Boolean =
             uri.host == "duck.ai" || uri.host == "duckduckgo.com"
         override suspend fun wasOpenedBefore(): Boolean = false
@@ -1614,6 +1616,7 @@ class DuckChatContextualViewModelTest {
         override fun isVoiceChatSessionActive(tabId: String): Boolean = false
         override val activeVoiceChatSessions: Flow<Set<String>> = flowOf(emptySet())
         override fun observeTriggerVoiceChatSessionEnd(): Flow<String> = kotlinx.coroutines.flow.emptyFlow()
+        override fun endVoiceChatSession(tabId: String) { }
         override suspend fun isChatHistoryAvailable(): Boolean = false
     }
 

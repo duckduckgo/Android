@@ -23,6 +23,7 @@ import android.net.Uri
 import com.bumptech.glide.Glide
 import com.bumptech.glide.RequestBuilder
 import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.bumptech.glide.load.resource.bitmap.DownsampleStrategy
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
@@ -50,11 +51,28 @@ class GlideFaviconDownloader @Inject constructor(
     private val context: Context,
     private val dispatcherProvider: DispatcherProvider,
     private val androidBrowserConfigFeature: AndroidBrowserConfigFeature,
+    private val downsamplingStrategyFixFeature: FaviconDownloaderGlideDownsamplingStrategyFixFeature,
 ) : FaviconDownloader {
 
     companion object {
         private const val MAX_FAVICON_SIZE_PX = 512
     }
+
+    // Single point of policy for every Glide favicon load. When the kill-switch flag is on
+    // (default), apply DownsampleStrategy.CENTER_INSIDE: Glide's default (CENTER_OUTSIDE)
+    // would upscale a sub-target source (e.g. a 32×32 favicon → 512×512) and that upscaled
+    // bitmap is what we then encode to disk, destroying the size signal FaviconPersister's
+    // "keep higher-res" guard relies on. CENTER_INSIDE keeps the MAX_FAVICON_SIZE_PX ceiling
+    // but never scales up.
+    //
+    // Callers are already inside withContext(dispatcherProvider.io()) via the public overrides,
+    // so the synchronous isEnabled() check below runs on IO without an extra dispatch.
+    private fun faviconRequest(): RequestBuilder<Bitmap> =
+        Glide.with(context)
+            .asBitmap()
+            .let { if (downsamplingStrategyFixFeature.self().isEnabled()) it.downsample(DownsampleStrategy.CENTER_INSIDE) else it }
+            .diskCacheStrategy(DiskCacheStrategy.NONE)
+            .skipMemoryCache(true)
 
     override suspend fun getFaviconFromDisk(file: File): Bitmap? = withContext(dispatcherProvider.io()) {
         if (androidBrowserConfigFeature.glideSuspend().isEnabled()) {
@@ -86,7 +104,7 @@ class GlideFaviconDownloader @Inject constructor(
     }
 
     private suspend fun getFaviconFromDiskAsync(file: File): Bitmap? = runCatching {
-        Glide.with(context).asBitmap().load(file).diskCacheStrategy(DiskCacheStrategy.NONE).skipMemoryCache(true).awaitBitmap(context)
+        faviconRequest().load(file).awaitBitmap(context)
     }.getOrNull()
 
     private suspend fun getFaviconFromDiskAsync(
@@ -94,18 +112,15 @@ class GlideFaviconDownloader @Inject constructor(
         cornerRadius: Int,
         width: Int,
         height: Int,
-    ): Bitmap? = kotlin.runCatching {
-        Glide.with(context)
-            .asBitmap()
+    ): Bitmap? = runCatching {
+        faviconRequest()
             .load(file)
             .transform(RoundedCorners(cornerRadius))
-            .diskCacheStrategy(DiskCacheStrategy.NONE)
-            .skipMemoryCache(true)
             .awaitBitmap(context, width, height)
     }.getOrNull()
 
     private suspend fun getFaviconFromUrlAsync(uri: Uri): Bitmap? = runCatching {
-        Glide.with(context).asBitmap().load(uri).diskCacheStrategy(DiskCacheStrategy.NONE).skipMemoryCache(true).awaitBitmap(context)
+        faviconRequest().load(uri).awaitBitmap(context)
     }.getOrNull()
 
     private suspend fun RequestBuilder<Bitmap>.awaitBitmap(
@@ -113,7 +128,7 @@ class GlideFaviconDownloader @Inject constructor(
         width: Int,
         height: Int,
     ): Bitmap? = suspendCancellableCoroutine { continuation ->
-        kotlin.runCatching {
+        runCatching {
             val target = object : CustomTarget<Bitmap>(width, height) {
                 override fun onResourceReady(
                     resource: Bitmap,
@@ -139,7 +154,7 @@ class GlideFaviconDownloader @Inject constructor(
     }
 
     private suspend fun RequestBuilder<Bitmap>.awaitBitmap(context: Context): Bitmap? = suspendCancellableCoroutine { continuation ->
-        kotlin.runCatching {
+        runCatching {
             val target = object : CustomTarget<Bitmap>(MAX_FAVICON_SIZE_PX, MAX_FAVICON_SIZE_PX) {
                 override fun onResourceReady(
                     resource: Bitmap,
@@ -174,8 +189,7 @@ class GlideFaviconDownloader @Inject constructor(
     }
 
     private fun getFaviconFromDiskSync(file: File): Bitmap? = runCatching {
-        Glide.with(context).asBitmap().load(file).diskCacheStrategy(DiskCacheStrategy.NONE).skipMemoryCache(true)
-            .submit(MAX_FAVICON_SIZE_PX, MAX_FAVICON_SIZE_PX).get()
+        faviconRequest().load(file).submit(MAX_FAVICON_SIZE_PX, MAX_FAVICON_SIZE_PX).get()
     }.getOrNull()
 
     private fun getFaviconFromDiskSync(
@@ -184,18 +198,14 @@ class GlideFaviconDownloader @Inject constructor(
         width: Int,
         height: Int,
     ): Bitmap? = runCatching {
-        Glide.with(context)
-            .asBitmap()
+        faviconRequest()
             .load(file)
             .transform(RoundedCorners(cornerRadius))
-            .diskCacheStrategy(DiskCacheStrategy.NONE)
-            .skipMemoryCache(true)
             .submit(width, height)
             .get()
     }.getOrNull()
 
     private fun getFaviconFromUrlSync(uri: Uri): Bitmap? = runCatching {
-        Glide.with(context).asBitmap().load(uri).diskCacheStrategy(DiskCacheStrategy.NONE).skipMemoryCache(true)
-            .submit(MAX_FAVICON_SIZE_PX, MAX_FAVICON_SIZE_PX).get()
+        faviconRequest().load(uri).submit(MAX_FAVICON_SIZE_PX, MAX_FAVICON_SIZE_PX).get()
     }.getOrNull()
 }

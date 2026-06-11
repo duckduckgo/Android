@@ -21,12 +21,14 @@ import android.widget.ImageView
 import androidx.core.view.updateLayoutParams
 
 /**
- * Sets the Duck.ai entry icon according to whether the native input field setting is enabled.
- * Native enabled → chevron-down variant with a leading inset and 4dp trailing margin; otherwise
- * the standard chat icon with no leading inset and no trailing margin.
+ * Sets the Duck.ai entry icon according to what tapping it will do.
+ *
+ * Contextual sheet variant (chevron-down with a leading inset and 4dp trailing margin) when a tap
+ * opens the contextual sheet; otherwise the standard chat icon with no leading inset and no
+ * trailing margin, where a tap opens Duck.ai in full screen.
  */
-fun ImageView.applyDuckAiIconStyling(isNativeInputEnabled: Boolean) {
-    if (isNativeInputEnabled) {
+fun ImageView.applyDuckAiIconStyling(showContextualSheetIcon: Boolean) {
+    if (showContextualSheetIcon) {
         setImageResource(com.duckduckgo.duckchat.impl.R.drawable.ic_ai_chat_down_24)
         setPaddingRelative(
             resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.keyline_2),

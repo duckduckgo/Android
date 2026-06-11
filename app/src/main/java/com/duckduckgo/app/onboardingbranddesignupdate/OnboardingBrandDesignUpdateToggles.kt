@@ -39,4 +39,11 @@ interface OnboardingBrandDesignUpdateToggles {
      */
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun fireAnimationUpdate(): Toggle
+
+    /**
+     * Gates new-tab onboarding bubble improvements: showing/hiding the waving Dax and shark fin
+     * based on whether they fit below the bubble (keyboard state, orientation, per-bubble sizing).
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    fun onboardingImprovements(): Toggle
 }

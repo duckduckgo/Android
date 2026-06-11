@@ -27,6 +27,9 @@ interface HatchInteractionsPlugin {
     /** User tapped the return-to-page hatch. */
     fun onReturnToPageTapped() {}
 
+    /** User opened the tab switcher from the hatch. */
+    fun onTabSwitcherSelected() {}
+
     /** User tapped a favorite tile on the NTP. */
     fun onFavoriteSelected() {}
 

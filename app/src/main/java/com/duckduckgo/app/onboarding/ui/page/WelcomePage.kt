@@ -456,7 +456,7 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
 
                     binding.daxDialogCta.duckAiInputScreenToggleWithoutAiCaption.setText(
                         if (showDuckAiCopy) {
-                            DuckChatR.string.input_screen_user_pref_without_ai_updated
+                            R.string.input_screen_user_pref_without_ai_updated
                         } else {
                             DuckChatR.string.input_screen_user_pref_without_ai
                         },
@@ -464,7 +464,7 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
 
                     binding.daxDialogCta.duckAiInputScreenToggleWithAiCaption.setText(
                         if (showDuckAiCopy) {
-                            DuckChatR.string.input_screen_user_pref_with_ai_updated
+                            R.string.input_screen_user_pref_with_ai_updated
                         } else {
                             DuckChatR.string.input_screen_user_pref_with_ai
                         },

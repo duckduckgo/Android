@@ -105,6 +105,13 @@ interface PlayBillingManager {
      * This is the preferred method over purchase history for getting current tokens
      */
     fun getLatestPurchaseToken(): String?
+
+    /**
+     * Returns the latest active (PURCHASED) subscription purchase. Queries Play Billing
+     * directly on every call so the result reflects current state (no cache staleness).
+     * See [LatestPurchaseResult] for the meaning of each outcome.
+     */
+    suspend fun getLatestPurchase(): LatestPurchaseResult
 }
 
 @SingleInstanceIn(AppScope::class)
@@ -427,6 +434,40 @@ class RealPlayBillingManager @Inject constructor(
             null
         }
     }
+
+    override suspend fun getLatestPurchase(): LatestPurchaseResult = withContext(dispatcherProvider.io()) {
+        if (!billingClient.ready) return@withContext LatestPurchaseResult.Unknown
+
+        when (val result = billingClient.queryPurchases()) {
+            is QueryPurchasesResult.Success -> {
+                val latest = result.purchases
+                    .filter { purchase ->
+                        (purchase.products.contains(BASIC_SUBSCRIPTION) || purchase.products.contains(ADVANCED_SUBSCRIPTION)) &&
+                            purchase.purchaseState == Purchase.PurchaseState.PURCHASED
+                    }
+                    .maxByOrNull { it.purchaseTime }
+                if (latest != null) LatestPurchaseResult.Present(latest) else LatestPurchaseResult.Absent
+            }
+            is QueryPurchasesResult.Failure -> {
+                logcat { "Billing: getLatestPurchase query failed: ${result.billingError} - ${result.debugMessage}" }
+                LatestPurchaseResult.Unknown
+            }
+        }
+    }
+}
+
+sealed class LatestPurchaseResult {
+    /** An active purchase exists. */
+    data class Present(val purchase: Purchase) : LatestPurchaseResult()
+
+    /** Play Billing has been successfully queried and confirmed no active purchase exists. */
+    data object Absent : LatestPurchaseResult()
+
+    /**
+     * No confirmed answer yet — either we have not queried Play Billing yet,
+     * or the last query failed (connection error, service unavailable, etc.).
+     */
+    data object Unknown : LatestPurchaseResult()
 }
 
 sealed class PurchaseState {

@@ -77,6 +77,7 @@
     <string name="options">Možnosti</string>
     <string name="shareLink">Daj povezavo v skupno rabo</string>
     <string name="copyUrl">Kopiraj naslov povezave</string>
+    <string name="urlCopiedToClipboard">URL je kopiran v odložišče</string>
 
     <!-- Find in page -->
     <string name="nextSearchTermDescription">Najdi naslednje</string>
@@ -273,6 +274,7 @@
     <string name="singleTabFireDialogDeleteAll">Izbriši vse</string>
     <string name="singleTabFireDialogDeleteThisTab">Izbriši ta zavihek</string>
     <string name="singleTabFireDialogDeleteChat">Izbriši klepet</string>
+    <string name="singleTabFireDialogDeleteChats">Izbriši klepete</string>
     <string name="singleTabFireDialogTitleDuckAi">Želite izbrisati ta klepet?</string>
     <string name="singleTabFireDialogSubtitleSiteData">Brisanje podatkov o spletnem mestu vas lahko odjavi iz računov.</string>
     <string name="singleTabFireDialogSubtitleDownloads">S tem boste preklicali prenose v teku.</string>
@@ -943,6 +945,26 @@
     <string name="preOnboardingInputScreenButton">Naslednji</string>
     <string name="preOnboardingInputScreenDescription"><![CDATA[Funkcije umetne inteligence so zasebne in izbirne. Spremembe lahko opravite v meniju <b>Nastavitve > Funkcije UI</b>.]]></string>
 
+    <!--Onboarding Reinstall Quick Setup-->
+    <string name="preOnboardingReinstallQuickSetupTitle">Dobrodošli nazaj!&lt;br/&gt;Želite kaj prilagoditi?</string>
+    <string name="preOnboardingReinstallSetDefaultLabel">Nastavi DuckDuckGo kot privzeto</string>
+    <string name="preOnboardingReinstallAddHomeScreenWidgetLabel">Dodaj pripomoček za začetni zaslon</string>
+    <string name="preOnboardingReinstallAddressBarLabel">Položaj naslovne vrstice</string>
+    <string name="preOnboardingReinstallAddressBarSearchOptionsLabel">Možnosti iskanja v naslovni vrstici</string>
+    <string name="preOnboardingReinstallStartBrowsing">Začni brskanje</string>
+
+    <!-- Quick setup bottom sheets -->
+    <string name="quickSetupAddressBarPositionTitle">Kje želite imeti naslovno vrstico?</string>
+    <string name="quickSetupAddressBarPositionCaption"><![CDATA[Spremembe lahko opravite v <b>Nastavitve > Videz</b>.]]></string>
+    <string name="quickSetupSearchOptionsTitle">Želite iskanje in klepet z umetno inteligenco v naslovni vrstici?</string>
+    <string name="quickSetupBottomSheetDone">Končano</string>
+    <string name="quickSetupInputScreenSearchOnly">Samo iskanje</string>
+    <string name="quickSetupInputScreenSearchAndDuckAi">Iskanje in Duck.ai</string>
+    <string name="quickSetupRemoveHomeScreenWidgetTitle">Kako odstraniti pripomoček z začetnega zaslona</string>
+    <string name="quickSetupRemoveHomeScreenWidgetStep1">Pojdite na svoj začetni zaslon</string>
+    <string name="quickSetupRemoveHomeScreenWidgetStep2">Pripomočka se dotaknite in ga pridržite</string>
+    <string name="quickSetupRemoveHomeScreenWidgetStep3">Tapnite ali povlecite, da ga odstranite</string>
+
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Naslovna vrstica</string>
     <string name="settingsAddressBarPositionHeaderTitle">Položaj naslovne vrstice</string>
@@ -1043,9 +1065,12 @@
     <string name="linkTextCopyFailed">Besedila povezave ni bilo mogoče kopirati</string>
 
     <string name="preOnboardingWelcomeDialogTitle">Pozdravljeni.</string>
-    <string name="preOnboardingWelcomeDialogBody1">Ste pripravljeni na hitrejši brskalnik,\nki daje nadzor vam?</string>
-    <string name="preOnboardingWelcomeDialogBody2">Umetna inteligenca je vedno neobvezna,\nzaščita zasebnosti pa je vedno vklopljena.</string>
+    <string name="preOnboardingWelcomeDialogBody1">Ste pripravljeni na hitrejši brskalnik, ki daje nadzor vam?</string>
+    <string name="preOnboardingWelcomeDialogBody2">Umetna inteligenca je vedno neobvezna, zaščita zasebnosti pa je vedno vklopljena.</string>
     <string name="onboardingStepIndicatorText" instruction="a counter above our instructions in onboarding that tells a user what step they are on">%1$d od %2$d</string>
     <string name="onboardingSearchDaxDialogOption1Quoted" instruction="translate &apos;duck&apos; too.">Kako reči »raca« v angleščini</string>
     <string name="onboardingSearchDaxDialogOption1EnglishQuoted" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">Kako reči »raca« v španščini</string>
+
+    <string name="input_screen_user_pref_without_ai_updated">Samo iskanje</string>
+    <string name="input_screen_user_pref_with_ai_updated">Preklopite med\niskanjem in Duck.ai</string>
 </resources>

@@ -23,6 +23,7 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
 import androidx.work.WorkManager
+import com.duckduckgo.adblocking.api.duckplayer.DuckPlayer
 import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.anvil.annotations.ContributesPluginPoint
 import com.duckduckgo.app.bookmarks.BookmarkAddedDialogPlugin
@@ -93,7 +94,6 @@ import com.duckduckgo.downloads.impl.FileDownloadCallback
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import com.duckduckgo.duckchat.api.DuckChat
-import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.experiments.api.VariantManager
 import com.duckduckgo.httpsupgrade.api.HttpsUpgrader
 import com.duckduckgo.privacy.config.api.AmpLinks

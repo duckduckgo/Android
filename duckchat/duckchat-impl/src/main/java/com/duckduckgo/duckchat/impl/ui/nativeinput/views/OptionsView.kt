@@ -34,6 +34,8 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.view.text.DaxTextView
 import com.duckduckgo.common.utils.ViewViewModelFactory
 import com.duckduckgo.di.scopes.ViewScope
+import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
+import com.duckduckgo.duckchat.api.nativeinput.NativeInputStateProvider
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.models.Tool
 import com.duckduckgo.duckchat.impl.nativeinput.NativeInputHost
@@ -49,9 +51,14 @@ class OptionsView(context: Context, private val host: NativeInputHost) : LinearL
 
     @Inject lateinit var viewModelFactory: ViewViewModelFactory
 
+    @Inject lateinit var nativeInputStateProvider: NativeInputStateProvider
+
     private val viewModel by lazy {
         ViewModelProvider(findViewTreeViewModelStoreOwner()!!, viewModelFactory)[OptionsViewModel::class.java]
     }
+
+    /** Whether the model / reasoning pickers are allowed for the current tool selection. */
+    val pickersEnabled: Boolean get() = viewModel.shouldShowPickers
 
     private data class MenuItem(
         val iconRes: Int,
@@ -78,6 +85,8 @@ class OptionsView(context: Context, private val host: NativeInputHost) : LinearL
     private var popupWindow: PopupWindow? = null
     private var optionsButton: ImageView
     private var selectedToolJob: Job? = null
+    private var nativeInputStateJob: Job? = null
+    private var lastNativeInputState: NativeInputState? = null
 
     init {
         orientation = HORIZONTAL
@@ -90,12 +99,16 @@ class OptionsView(context: Context, private val host: NativeInputHost) : LinearL
         AndroidSupportInjection.inject(this)
         super.onAttachedToWindow()
         observeSelectedTool()
+        observeNativeInputState()
     }
 
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
         selectedToolJob?.cancel()
         selectedToolJob = null
+        nativeInputStateJob?.cancel()
+        nativeInputStateJob = null
+        lastNativeInputState = null
         dismissPopup()
     }
 
@@ -105,6 +118,23 @@ class OptionsView(context: Context, private val host: NativeInputHost) : LinearL
         selectedToolJob = viewModel.selectedTool
             .onEach { tool -> renderSelection(tool) }
             .launchIn(lifecycleOwner.lifecycleScope)
+    }
+
+    private fun observeNativeInputState() {
+        val scope = findViewTreeLifecycleOwner()?.lifecycleScope ?: return
+        nativeInputStateJob?.cancel()
+        nativeInputStateJob = nativeInputStateProvider.state
+            .onEach { state ->
+                lastNativeInputState = state
+                updateContainerVisibility()
+            }
+            .launchIn(scope)
+    }
+
+    private fun updateContainerVisibility() {
+        val show = lastNativeInputState?.shouldShowPluginControls() == true
+        isVisible = show
+        (parent as? View)?.isVisible = show
     }
 
     private fun renderSelection(tool: Tool?) {
@@ -168,7 +198,7 @@ class OptionsView(context: Context, private val host: NativeInputHost) : LinearL
                 addView(container)
                 isVerticalScrollBarEnabled = false
             },
-            resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.popupMenuWidth),
+            resources.getDimensionPixelSize(R.dimen.nativeInputMenuWidth),
             LayoutParams.WRAP_CONTENT,
             false,
         ).apply {

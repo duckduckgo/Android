@@ -17,6 +17,7 @@
 package com.duckduckgo.app.global.model
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.duckduckgo.adblocking.api.duckplayer.DuckPlayer
 import com.duckduckgo.app.browser.certificates.BypassedSSLCertificatesRepository
 import com.duckduckgo.app.browser.omnibar.StandardizedLeadingIconFeatureToggle
 import com.duckduckgo.app.global.model.PrivacyShield.PROTECTED
@@ -32,7 +33,6 @@ import com.duckduckgo.app.trackerdetection.model.TrackerType
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.browser.api.brokensite.BrokenSiteContext
 import com.duckduckgo.common.test.CoroutineTestRule
-import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.privacy.config.api.ContentBlocking
 import org.junit.Assert
 import org.junit.Assert.assertEquals

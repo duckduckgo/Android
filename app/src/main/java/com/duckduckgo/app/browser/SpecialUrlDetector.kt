@@ -26,6 +26,7 @@ import android.content.pm.ResolveInfo
 import android.net.Uri
 import androidx.annotation.VisibleForTesting
 import androidx.core.net.toUri
+import com.duckduckgo.adblocking.api.duckplayer.DuckPlayer
 import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType
 import com.duckduckgo.app.browser.applinks.AppSchemeInterceptionFeature
 import com.duckduckgo.app.browser.applinks.ExternalAppIntentFlagsFeature
@@ -33,7 +34,6 @@ import com.duckduckgo.app.browser.duckchat.AIChatQueryDetectionFeature
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
-import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.privacy.config.api.AmpLinkType
 import com.duckduckgo.privacy.config.api.AmpLinks
 import com.duckduckgo.privacy.config.api.TrackingParameters

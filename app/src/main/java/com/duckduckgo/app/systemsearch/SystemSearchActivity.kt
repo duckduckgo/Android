@@ -49,7 +49,6 @@ import com.duckduckgo.app.browser.R.string
 import com.duckduckgo.app.browser.databinding.ActivitySystemSearchBinding
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.mode.SystemSearchExternal
-import com.duckduckgo.app.browser.nativeinput.applyDuckAiIconStyling
 import com.duckduckgo.app.browser.newtab.FavoritesQuickAccessAdapter
 import com.duckduckgo.app.browser.newtab.FavoritesQuickAccessAdapter.Companion.QUICK_ACCESS_GRID_MAX_COLUMNS
 import com.duckduckgo.app.browser.newtab.FavoritesQuickAccessAdapter.Companion.QUICK_ACCESS_ITEM_MAX_SIZE_DP
@@ -334,11 +333,6 @@ class SystemSearchActivity : DuckDuckGoActivity() {
                 launch {
                     viewModel.favoritesViewState.collectLatest {
                         renderQuickAccessItems(it)
-                    }
-                }
-                launch {
-                    duckChat.observeNativeInputFieldUserSettingEnabled().collect {
-                        duckAi.applyDuckAiIconStyling(it)
                     }
                 }
             }

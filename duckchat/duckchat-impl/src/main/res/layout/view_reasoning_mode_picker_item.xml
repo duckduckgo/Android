@@ -23,9 +23,9 @@
     android:gravity="center_vertical"
     android:orientation="horizontal"
     android:paddingStart="@dimen/keyline_4"
-    android:paddingTop="@dimen/keyline_1"
+    android:paddingTop="@dimen/keyline_2"
     android:paddingEnd="@dimen/keyline_4"
-    android:paddingBottom="@dimen/keyline_1">
+    android:paddingBottom="@dimen/keyline_2">
 
     <ImageView
         android:id="@+id/reasoningModeItemLeadingIcon"

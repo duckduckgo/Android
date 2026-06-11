@@ -1,4 +1,5 @@
 appId: com.duckduckgo.mobile.android
+androidWebViewHierarchy: devtools
 name: "Launch Privacy Pro from special URL is working"
 tags:
   - pproTest

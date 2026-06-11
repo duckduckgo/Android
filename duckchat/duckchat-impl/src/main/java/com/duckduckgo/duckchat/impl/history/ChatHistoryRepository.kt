@@ -35,6 +35,8 @@ import java.io.File
 import java.time.Instant
 import javax.inject.Inject
 
+data class ChatExportRequest(val chatId: String, val modelDisplay: ModelDisplay?)
+
 interface ChatHistoryRepository {
     fun observeChats(): Flow<List<ChatHistoryItem>>
 
@@ -43,6 +45,9 @@ interface ChatHistoryRepository {
     suspend fun renameChat(chatId: String, newTitle: String): Boolean
     suspend fun setPinned(chatId: String, pinned: Boolean)
     suspend fun exportChat(chatId: String, modelDisplay: ModelDisplay?): File
+
+    /** Atomic: builds every payload before writing any, so a failure on any chat leaves no files behind. */
+    suspend fun exportChats(requests: List<ChatExportRequest>): List<File>
 }
 
 @ContributesBinding(AppScope::class)
@@ -87,24 +92,34 @@ class RealChatHistoryRepository @Inject constructor(
 
     override suspend fun exportChat(chatId: String, modelDisplay: ModelDisplay?): File =
         withContext(dispatchers.io()) {
-            val chat = chatStore.getChatById(chatId)
-                ?: throw IllegalStateException("Chat $chatId not found")
-            val rawJson = chatStore.getChatContent(chatId)
-                ?: throw IllegalStateException("Chat $chatId content not found")
-            val result = chatExporter.export(rawJson, chat.toChatType(), chat.fileRefs, modelDisplay)
-            val payload = when (result) {
-                is ExportResult.Text -> ExportPayload.Text(result.content)
-                is ExportResult.Zip -> ExportPayload.Zip(
-                    content = result.content,
-                    images = result.imageFileRefs.mapIndexed { index, uuid ->
-                        val fileRef = chatStore.readFileRef(uuid)
-                            ?: throw IllegalStateException("File $uuid missing for chat $chatId")
-                        ExportPayload.Zip.Image(name = "image-${index + 1}.jpeg", bytes = fileRef.bytes)
-                    },
-                )
-            }
-            chatExportWriter.write(payload)
+            chatExportWriter.write(buildPayload(chatId, modelDisplay))
         }
+
+    override suspend fun exportChats(requests: List<ChatExportRequest>): List<File> =
+        withContext(dispatchers.io()) {
+            // Build every payload up front so a missing chat/content/image aborts before any file is written.
+            val payloads = requests.map { buildPayload(it.chatId, it.modelDisplay) }
+            payloads.map { chatExportWriter.write(it) }
+        }
+
+    private suspend fun buildPayload(chatId: String, modelDisplay: ModelDisplay?): ExportPayload {
+        val chat = chatStore.getChatById(chatId)
+            ?: throw IllegalStateException("Chat $chatId not found")
+        val rawJson = chatStore.getChatContent(chatId)
+            ?: throw IllegalStateException("Chat $chatId content not found")
+        val result = chatExporter.export(rawJson, chat.toChatType(), chat.fileRefs, modelDisplay)
+        return when (result) {
+            is ExportResult.Text -> ExportPayload.Text(result.content)
+            is ExportResult.Zip -> ExportPayload.Zip(
+                content = result.content,
+                images = result.imageFileRefs.mapIndexed { index, uuid ->
+                    val fileRef = chatStore.readFileRef(uuid)
+                        ?: throw IllegalStateException("File $uuid missing for chat $chatId")
+                    ExportPayload.Zip.Image(name = "image-${index + 1}.jpeg", bytes = fileRef.bytes)
+                },
+            )
+        }
+    }
 
     private fun toChatHistoryItem(chat: DuckAiChat): ChatHistoryItem = ChatHistoryItem(
         chatId = chat.chatId,

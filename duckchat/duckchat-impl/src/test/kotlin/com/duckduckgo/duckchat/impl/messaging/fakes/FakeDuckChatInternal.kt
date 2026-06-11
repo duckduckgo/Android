@@ -56,7 +56,6 @@ class FakeDuckChatInternal(
     // DuckChat interface methods
     override fun isEnabled(): Boolean = enabled
 
-    val openWithChatIdCalls: MutableList<String> = mutableListOf()
     var openDuckChatCalls: Int = 0
         private set
 
@@ -71,6 +70,8 @@ class FakeDuckChatInternal(
     override fun getDuckChatUrl(query: String, autoPrompt: Boolean, sidebar: Boolean): String {
         return "https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5"
     }
+
+    override fun getDuckChatSettingsUrl(): String = "https://duck.ai?settings=open"
 
     override fun isDuckChatUrl(uri: Uri): Boolean = false
 
@@ -192,12 +193,9 @@ class FakeDuckChatInternal(
     override fun isVoiceChatSessionActive(tabId: String): Boolean = false
     override val activeVoiceChatSessions: Flow<Set<String>> = MutableStateFlow(emptySet())
     override fun observeTriggerVoiceChatSessionEnd(): Flow<String> = kotlinx.coroutines.flow.emptyFlow()
+    override fun endVoiceChatSession(tabId: String) { }
 
     override suspend fun isChatHistoryAvailable(): Boolean = false
-
-    override fun openWithChatId(chatId: String) {
-        openWithChatIdCalls += chatId
-    }
 
     override fun buildChatUrl(chatId: String): String = "https://duck.ai?chatID=$chatId"
 

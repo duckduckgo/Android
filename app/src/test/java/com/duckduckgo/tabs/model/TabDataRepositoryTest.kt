@@ -21,6 +21,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.room.Room
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
+import com.duckduckgo.adblocking.api.duckplayer.DuckPlayer
 import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.browser.certificates.BypassedSSLCertificatesRepository
@@ -45,7 +46,6 @@ import com.duckduckgo.common.test.blockingObserve
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputStatePublisher
 import com.duckduckgo.duckchat.impl.store.DuckChatContextualDataStore
-import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.privacy.config.api.ContentBlocking

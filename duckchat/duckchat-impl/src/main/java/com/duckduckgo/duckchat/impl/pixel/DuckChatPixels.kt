@@ -114,7 +114,11 @@ import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 interface DuckChatPixels {
-    fun sendReportMetricPixel(reportMetric: ReportMetric, modelTier: ModelTier? = null)
+    fun sendReportMetricPixel(
+        reportMetric: ReportMetric,
+        modelTier: ModelTier? = null,
+    )
+
     fun reportOpen()
     fun reportContextualSheetOpened()
     fun reportContextualSheetDismissed()
@@ -145,6 +149,9 @@ interface DuckChatPixels {
     fun reportNativeStorageReaderUsed(native: Boolean)
     fun reportNativeStorageDeletionUsed(native: Boolean)
     fun reportVoiceSessionStarted()
+    fun reportVoiceNotificationEndChatTapped()
+    fun reportVoiceServiceStarted()
+    fun reportVoiceServiceKilled()
 }
 
 @ContributesBinding(AppScope::class)
@@ -158,7 +165,10 @@ class RealDuckChatPixels @Inject constructor(
     private val termsOfServiceHandler: DuckChatTermsOfServiceHandler,
 ) : DuckChatPixels {
 
-    override fun sendReportMetricPixel(reportMetric: ReportMetric, modelTier: ModelTier?) {
+    override fun sendReportMetricPixel(
+        reportMetric: ReportMetric,
+        modelTier: ModelTier?,
+    ) {
         appCoroutineScope.launch(dispatcherProvider.io()) {
             var refreshAtb = false
             val sessionParams = mapOf(
@@ -169,10 +179,12 @@ class RealDuckChatPixels @Inject constructor(
                     refreshAtb = true
                     DUCK_CHAT_SEND_PROMPT_ONGOING_CHAT to sessionParams
                 }
+
                 USER_DID_SUBMIT_FIRST_PROMPT -> {
                     refreshAtb = true
                     DUCK_CHAT_START_NEW_CONVERSATION to sessionParams
                 }
+
                 USER_DID_OPEN_HISTORY -> DUCK_CHAT_OPEN_HISTORY to sessionParams
                 USER_DID_SELECT_FIRST_HISTORY_ITEM -> DUCK_CHAT_OPEN_MOST_RECENT_HISTORY_CHAT to sessionParams
                 USER_DID_CREATE_NEW_CHAT -> DUCK_CHAT_START_NEW_CONVERSATION_BUTTON_CLICKED to sessionParams
@@ -396,6 +408,18 @@ class RealDuckChatPixels @Inject constructor(
     override fun reportVoiceSessionStarted() {
         pixel.fire(DuckChatPixelName.DUCK_CHAT_VOICE_SESSION_STARTED)
     }
+
+    override fun reportVoiceNotificationEndChatTapped() {
+        pixel.fire(DuckChatPixelName.DUCK_CHAT_VOICE_NOTIFICATION_END_CHAT_TAPPED)
+    }
+
+    override fun reportVoiceServiceStarted() {
+        pixel.fire(DuckChatPixelName.DUCK_CHAT_VOICE_SERVICE_STARTED)
+    }
+
+    override fun reportVoiceServiceKilled() {
+        pixel.fire(DuckChatPixelName.DUCK_CHAT_VOICE_SERVICE_KILLED)
+    }
 }
 
 enum class DuckChatPixelName(override val pixelName: String) : Pixel.PixelName {
@@ -527,6 +551,10 @@ enum class DuckChatPixelName(override val pixelName: String) : Pixel.PixelName {
     DUCK_CHAT_VOICE_ENTRY_TAPPED_COUNT("m_aichat_voice_entry_tapped_count"),
     DUCK_CHAT_VOICE_ENTRY_TAPPED_DAILY("m_aichat_voice_entry_tapped_daily"),
     DUCK_CHAT_VOICE_SESSION_STARTED("m_aichat_voice_session_started"),
+    DUCK_CHAT_VOICE_NOTIFICATION_OPEN_CHAT_TAPPED("m_aichat_voice_notification_open_chat_tapped"),
+    DUCK_CHAT_VOICE_NOTIFICATION_END_CHAT_TAPPED("m_aichat_voice_notification_end_chat_tapped"),
+    DUCK_CHAT_VOICE_SERVICE_STARTED("m_aichat_voice_service_started"),
+    DUCK_CHAT_VOICE_SERVICE_KILLED("m_aichat_voice_service_killed"),
     DUCK_CHAT_CONTEXTUAL_FIRE_BUTTON_TAPPED_FIRST("m_aichat_contextual_fire_button_tapped_first"),
     DUCK_CHAT_CONTEXTUAL_FIRE_BUTTON_TAPPED_DAILY("m_aichat_contextual_fire_button_tapped_daily"),
     DUCK_CHAT_CONTEXTUAL_FIRE_BUTTON_TAPPED_COUNT("m_aichat_contextual_fire_button_tapped_count"),
@@ -545,6 +573,39 @@ enum class DuckChatPixelName(override val pixelName: String) : Pixel.PixelName {
     DUCK_CHAT_NATIVE_STORAGE_READER_WEBVIEW_DAILY("m_duck-ai_native-storage_reader_webview_daily"),
     DUCK_CHAT_NATIVE_STORAGE_DELETION_NATIVE_COUNT("m_duck-ai_native-storage_deletion_native_count"),
     DUCK_CHAT_NATIVE_STORAGE_DELETION_WEBVIEW_COUNT("m_duck-ai_native-storage_deletion_webview_count"),
+
+    DUCK_CHAT_HISTORY_CHAT_OPENED_COUNT("m_aichat_history_chat_opened_count"),
+    DUCK_CHAT_HISTORY_CHAT_OPENED_DAILY("m_aichat_history_chat_opened_daily"),
+    DUCK_CHAT_HISTORY_EMPTY_CTA_TAPPED_COUNT("m_aichat_history_empty_cta_tapped_count"),
+    DUCK_CHAT_HISTORY_EMPTY_CTA_TAPPED_DAILY("m_aichat_history_empty_cta_tapped_daily"),
+    DUCK_CHAT_HISTORY_SEARCH_ACTIVATED_COUNT("m_aichat_history_search_activated_count"),
+    DUCK_CHAT_HISTORY_SEARCH_ACTIVATED_DAILY("m_aichat_history_search_activated_daily"),
+    DUCK_CHAT_HISTORY_FIRE_ALL_TAPPED_COUNT("m_aichat_history_fire_all_tapped_count"),
+    DUCK_CHAT_HISTORY_FIRE_ALL_TAPPED_DAILY("m_aichat_history_fire_all_tapped_daily"),
+    DUCK_CHAT_HISTORY_FIRE_ALL_CONFIRMED_COUNT("m_aichat_history_fire_all_confirmed_count"),
+    DUCK_CHAT_HISTORY_FIRE_ALL_CONFIRMED_DAILY("m_aichat_history_fire_all_confirmed_daily"),
+    DUCK_CHAT_HISTORY_FIRE_SELECTED_TAPPED_COUNT("m_aichat_history_fire_selected_tapped_count"),
+    DUCK_CHAT_HISTORY_FIRE_SELECTED_TAPPED_DAILY("m_aichat_history_fire_selected_tapped_daily"),
+    DUCK_CHAT_HISTORY_FIRE_SELECTED_CONFIRMED_COUNT("m_aichat_history_fire_selected_confirmed_count"),
+    DUCK_CHAT_HISTORY_FIRE_SELECTED_CONFIRMED_DAILY("m_aichat_history_fire_selected_confirmed_daily"),
+    DUCK_CHAT_HISTORY_PIN_ADDED_COUNT("m_aichat_history_pin_added_count"),
+    DUCK_CHAT_HISTORY_PIN_ADDED_DAILY("m_aichat_history_pin_added_daily"),
+    DUCK_CHAT_HISTORY_PIN_REMOVED_COUNT("m_aichat_history_pin_removed_count"),
+    DUCK_CHAT_HISTORY_PIN_REMOVED_DAILY("m_aichat_history_pin_removed_daily"),
+    DUCK_CHAT_HISTORY_RENAME_OPENED_COUNT("m_aichat_history_rename_opened_count"),
+    DUCK_CHAT_HISTORY_RENAME_OPENED_DAILY("m_aichat_history_rename_opened_daily"),
+    DUCK_CHAT_HISTORY_RENAME_SAVED_COUNT("m_aichat_history_rename_saved_count"),
+    DUCK_CHAT_HISTORY_RENAME_SAVED_DAILY("m_aichat_history_rename_saved_daily"),
+    DUCK_CHAT_HISTORY_DOWNLOAD_STARTED_COUNT("m_aichat_history_download_started_count"),
+    DUCK_CHAT_HISTORY_DOWNLOAD_STARTED_DAILY("m_aichat_history_download_started_daily"),
+    DUCK_CHAT_HISTORY_SELECT_MODE_ENTERED_COUNT("m_aichat_history_select_mode_entered_count"),
+    DUCK_CHAT_HISTORY_SELECT_MODE_ENTERED_DAILY("m_aichat_history_select_mode_entered_daily"),
+    DUCK_CHAT_HISTORY_SELECT_ALL_TOGGLED_COUNT("m_aichat_history_select_all_toggled_count"),
+    DUCK_CHAT_HISTORY_SELECT_ALL_TOGGLED_DAILY("m_aichat_history_select_all_toggled_daily"),
+    DUCK_CHAT_HISTORY_NEW_CHAT_TAPPED_COUNT("m_aichat_history_new_chat_tapped_count"),
+    DUCK_CHAT_HISTORY_NEW_CHAT_TAPPED_DAILY("m_aichat_history_new_chat_tapped_daily"),
+    DUCK_CHAT_HISTORY_DOWNLOAD_SELECTED_COUNT("m_aichat_history_download_selected_count"),
+    DUCK_CHAT_HISTORY_DOWNLOAD_SELECTED_DAILY("m_aichat_history_download_selected_daily"),
 }
 
 object DuckChatPixelParameters {
@@ -682,6 +743,10 @@ class DuckChatParamRemovalPlugin @Inject constructor() : PixelParamRemovalPlugin
             DuckChatPixelName.DUCK_CHAT_VOICE_ENTRY_TAPPED_COUNT.pixelName to PixelParameter.removeAtb(),
             DuckChatPixelName.DUCK_CHAT_VOICE_ENTRY_TAPPED_DAILY.pixelName to PixelParameter.removeAtb(),
             DuckChatPixelName.DUCK_CHAT_VOICE_SESSION_STARTED.pixelName to PixelParameter.removeAtb(),
+            DuckChatPixelName.DUCK_CHAT_VOICE_NOTIFICATION_OPEN_CHAT_TAPPED.pixelName to PixelParameter.removeAtb(),
+            DuckChatPixelName.DUCK_CHAT_VOICE_NOTIFICATION_END_CHAT_TAPPED.pixelName to PixelParameter.removeAtb(),
+            DuckChatPixelName.DUCK_CHAT_VOICE_SERVICE_STARTED.pixelName to PixelParameter.removeAtb(),
+            DuckChatPixelName.DUCK_CHAT_VOICE_SERVICE_KILLED.pixelName to PixelParameter.removeAtb(),
             DuckChatPixelName.DUCK_CHAT_SETTINGS_DEFAULT_TOGGLE_POSITION_CHANGED_COUNT.pixelName to PixelParameter.removeAtb(),
             DuckChatPixelName.DUCK_CHAT_SETTINGS_DEFAULT_TOGGLE_POSITION_CHANGED_DAILY.pixelName to PixelParameter.removeAtb(),
             DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_FIRE_BUTTON_TAPPED_FIRST.pixelName to PixelParameter.removeAtb(),
@@ -694,6 +759,38 @@ class DuckChatParamRemovalPlugin @Inject constructor() : PixelParamRemovalPlugin
             DuckChatPixelName.DUCK_CHAT_NATIVE_STORAGE_READER_WEBVIEW_DAILY.pixelName to PixelParameter.removeAtb(),
             DuckChatPixelName.DUCK_CHAT_NATIVE_STORAGE_DELETION_NATIVE_COUNT.pixelName to PixelParameter.removeAtb(),
             DuckChatPixelName.DUCK_CHAT_NATIVE_STORAGE_DELETION_WEBVIEW_COUNT.pixelName to PixelParameter.removeAtb(),
+            DuckChatPixelName.DUCK_CHAT_HISTORY_CHAT_OPENED_COUNT.pixelName to PixelParameter.removeAtb(),
+            DuckChatPixelName.DUCK_CHAT_HISTORY_CHAT_OPENED_DAILY.pixelName to PixelParameter.removeAtb(),
+            DuckChatPixelName.DUCK_CHAT_HISTORY_EMPTY_CTA_TAPPED_COUNT.pixelName to PixelParameter.removeAtb(),
+            DuckChatPixelName.DUCK_CHAT_HISTORY_EMPTY_CTA_TAPPED_DAILY.pixelName to PixelParameter.removeAtb(),
+            DuckChatPixelName.DUCK_CHAT_HISTORY_SEARCH_ACTIVATED_COUNT.pixelName to PixelParameter.removeAtb(),
+            DuckChatPixelName.DUCK_CHAT_HISTORY_SEARCH_ACTIVATED_DAILY.pixelName to PixelParameter.removeAtb(),
+            DuckChatPixelName.DUCK_CHAT_HISTORY_FIRE_ALL_TAPPED_COUNT.pixelName to PixelParameter.removeAtb(),
+            DuckChatPixelName.DUCK_CHAT_HISTORY_FIRE_ALL_TAPPED_DAILY.pixelName to PixelParameter.removeAtb(),
+            DuckChatPixelName.DUCK_CHAT_HISTORY_FIRE_ALL_CONFIRMED_COUNT.pixelName to PixelParameter.removeAtb(),
+            DuckChatPixelName.DUCK_CHAT_HISTORY_FIRE_ALL_CONFIRMED_DAILY.pixelName to PixelParameter.removeAtb(),
+            DuckChatPixelName.DUCK_CHAT_HISTORY_FIRE_SELECTED_TAPPED_COUNT.pixelName to PixelParameter.removeAtb(),
+            DuckChatPixelName.DUCK_CHAT_HISTORY_FIRE_SELECTED_TAPPED_DAILY.pixelName to PixelParameter.removeAtb(),
+            DuckChatPixelName.DUCK_CHAT_HISTORY_FIRE_SELECTED_CONFIRMED_COUNT.pixelName to PixelParameter.removeAtb(),
+            DuckChatPixelName.DUCK_CHAT_HISTORY_FIRE_SELECTED_CONFIRMED_DAILY.pixelName to PixelParameter.removeAtb(),
+            DuckChatPixelName.DUCK_CHAT_HISTORY_PIN_ADDED_COUNT.pixelName to PixelParameter.removeAtb(),
+            DuckChatPixelName.DUCK_CHAT_HISTORY_PIN_ADDED_DAILY.pixelName to PixelParameter.removeAtb(),
+            DuckChatPixelName.DUCK_CHAT_HISTORY_PIN_REMOVED_COUNT.pixelName to PixelParameter.removeAtb(),
+            DuckChatPixelName.DUCK_CHAT_HISTORY_PIN_REMOVED_DAILY.pixelName to PixelParameter.removeAtb(),
+            DuckChatPixelName.DUCK_CHAT_HISTORY_RENAME_OPENED_COUNT.pixelName to PixelParameter.removeAtb(),
+            DuckChatPixelName.DUCK_CHAT_HISTORY_RENAME_OPENED_DAILY.pixelName to PixelParameter.removeAtb(),
+            DuckChatPixelName.DUCK_CHAT_HISTORY_RENAME_SAVED_COUNT.pixelName to PixelParameter.removeAtb(),
+            DuckChatPixelName.DUCK_CHAT_HISTORY_RENAME_SAVED_DAILY.pixelName to PixelParameter.removeAtb(),
+            DuckChatPixelName.DUCK_CHAT_HISTORY_DOWNLOAD_STARTED_COUNT.pixelName to PixelParameter.removeAtb(),
+            DuckChatPixelName.DUCK_CHAT_HISTORY_DOWNLOAD_STARTED_DAILY.pixelName to PixelParameter.removeAtb(),
+            DuckChatPixelName.DUCK_CHAT_HISTORY_SELECT_MODE_ENTERED_COUNT.pixelName to PixelParameter.removeAtb(),
+            DuckChatPixelName.DUCK_CHAT_HISTORY_SELECT_MODE_ENTERED_DAILY.pixelName to PixelParameter.removeAtb(),
+            DuckChatPixelName.DUCK_CHAT_HISTORY_SELECT_ALL_TOGGLED_COUNT.pixelName to PixelParameter.removeAtb(),
+            DuckChatPixelName.DUCK_CHAT_HISTORY_SELECT_ALL_TOGGLED_DAILY.pixelName to PixelParameter.removeAtb(),
+            DuckChatPixelName.DUCK_CHAT_HISTORY_NEW_CHAT_TAPPED_COUNT.pixelName to PixelParameter.removeAtb(),
+            DuckChatPixelName.DUCK_CHAT_HISTORY_NEW_CHAT_TAPPED_DAILY.pixelName to PixelParameter.removeAtb(),
+            DuckChatPixelName.DUCK_CHAT_HISTORY_DOWNLOAD_SELECTED_COUNT.pixelName to PixelParameter.removeAtb(),
+            DuckChatPixelName.DUCK_CHAT_HISTORY_DOWNLOAD_SELECTED_DAILY.pixelName to PixelParameter.removeAtb(),
             "m_duck-ai_native-storage_" to PixelParameter.removeAtb(),
         )
     }

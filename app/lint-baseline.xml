@@ -674,8 +674,8 @@
 
     <issue
         id="NoImplImportsInAppModule"
-        message="Modules should not import from :*-impl modules.&#xA;Consider using the public API instead: com.duckduckgo.duckplayer.impl.DUCK_PLAYER_OPEN_IN_YOUTUBE_PATH&#xA;If the API doesn&apos;t expose what you need, extend the API module first."
-        errorLine1="import com.duckduckgo.duckplayer.impl.DUCK_PLAYER_OPEN_IN_YOUTUBE_PATH"
+        message="Modules should not import from :*-impl modules.&#xA;Consider using the public API instead: com.duckduckgo.adblocking.impl.duckplayer.DUCK_PLAYER_OPEN_IN_YOUTUBE_PATH&#xA;If the API doesn&apos;t expose what you need, extend the API module first."
+        errorLine1="import com.duckduckgo.adblocking.impl.duckplayer.DUCK_PLAYER_OPEN_IN_YOUTUBE_PATH"
         errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/com/duckduckgo/app/browser/BrowserWebViewClient.kt"
@@ -696,8 +696,8 @@
 
     <issue
         id="NoImplImportsInAppModule"
-        message="Modules should not import from :*-impl modules.&#xA;Consider using the public API instead: com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_SETTINGS_ALWAYS_SETTINGS&#xA;If the API doesn&apos;t expose what you need, extend the API module first."
-        errorLine1="import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_SETTINGS_ALWAYS_SETTINGS"
+        message="Modules should not import from :*-impl modules.&#xA;Consider using the public API instead: com.duckduckgo.adblocking.impl.duckplayer.DuckPlayerPixelName.DUCK_PLAYER_SETTINGS_ALWAYS_SETTINGS&#xA;If the API doesn&apos;t expose what you need, extend the API module first."
+        errorLine1="import com.duckduckgo.adblocking.impl.duckplayer.DuckPlayerPixelName.DUCK_PLAYER_SETTINGS_ALWAYS_SETTINGS"
         errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/duckplayer/impl/DuckPlayerSettingsViewModelTest.kt"
@@ -707,8 +707,8 @@
 
     <issue
         id="NoImplImportsInAppModule"
-        message="Modules should not import from :*-impl modules.&#xA;Consider using the public API instead: com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_SETTINGS_BACK_TO_DEFAULT&#xA;If the API doesn&apos;t expose what you need, extend the API module first."
-        errorLine1="import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_SETTINGS_BACK_TO_DEFAULT"
+        message="Modules should not import from :*-impl modules.&#xA;Consider using the public API instead: com.duckduckgo.adblocking.impl.duckplayer.DuckPlayerPixelName.DUCK_PLAYER_SETTINGS_BACK_TO_DEFAULT&#xA;If the API doesn&apos;t expose what you need, extend the API module first."
+        errorLine1="import com.duckduckgo.adblocking.impl.duckplayer.DuckPlayerPixelName.DUCK_PLAYER_SETTINGS_BACK_TO_DEFAULT"
         errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/duckplayer/impl/DuckPlayerSettingsViewModelTest.kt"
@@ -718,8 +718,8 @@
 
     <issue
         id="NoImplImportsInAppModule"
-        message="Modules should not import from :*-impl modules.&#xA;Consider using the public API instead: com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_SETTINGS_NEVER_SETTINGS&#xA;If the API doesn&apos;t expose what you need, extend the API module first."
-        errorLine1="import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_SETTINGS_NEVER_SETTINGS"
+        message="Modules should not import from :*-impl modules.&#xA;Consider using the public API instead: com.duckduckgo.adblocking.impl.duckplayer.DuckPlayerPixelName.DUCK_PLAYER_SETTINGS_NEVER_SETTINGS&#xA;If the API doesn&apos;t expose what you need, extend the API module first."
+        errorLine1="import com.duckduckgo.adblocking.impl.duckplayer.DuckPlayerPixelName.DUCK_PLAYER_SETTINGS_NEVER_SETTINGS"
         errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/duckplayer/impl/DuckPlayerSettingsViewModelTest.kt"
@@ -729,8 +729,8 @@
 
     <issue
         id="NoImplImportsInAppModule"
-        message="Modules should not import from :*-impl modules.&#xA;Consider using the public API instead: com.duckduckgo.duckplayer.impl.DuckPlayerSettingsViewModel.Command.OpenPlayerModeSelector&#xA;If the API doesn&apos;t expose what you need, extend the API module first."
-        errorLine1="import com.duckduckgo.duckplayer.impl.DuckPlayerSettingsViewModel.Command.OpenPlayerModeSelector"
+        message="Modules should not import from :*-impl modules.&#xA;Consider using the public API instead: com.duckduckgo.adblocking.impl.duckplayer.DuckPlayerSettingsViewModel.Command.OpenPlayerModeSelector&#xA;If the API doesn&apos;t expose what you need, extend the API module first."
+        errorLine1="import com.duckduckgo.adblocking.impl.duckplayer.DuckPlayerSettingsViewModel.Command.OpenPlayerModeSelector"
         errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/duckplayer/impl/DuckPlayerSettingsViewModelTest.kt"
