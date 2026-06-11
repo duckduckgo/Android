@@ -281,6 +281,17 @@ class RealDuckPlayerTest {
         assertEquals(AlwaysAsk, result.privatePlayerMode)
     }
 
+    @Test
+    fun whenAdBlockingStateUninitializedAndNoStoredModeThenGetUserPreferencesDefaultsToAlwaysAsk() = runTest {
+        whenever(mockAdBlockingStatusChecker.isShownInSettings()).thenReturn(true)
+        whenever(mockAdBlockingStatusChecker.currentState()).thenReturn(AdBlockingState.Uninitialized)
+        whenever(mockDuckPlayerFeatureRepository.getUserPreferences()).thenReturn(StoredUserPreferences(false, null))
+
+        val result = testee.getUserPreferences()
+
+        assertEquals(AlwaysAsk, result.privatePlayerMode)
+    }
+
     // endregion
 
     // region shouldHideDuckPlayerOverlay

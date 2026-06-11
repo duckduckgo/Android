@@ -24,6 +24,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
@@ -246,5 +247,17 @@ class RealAdBlockingStatusCheckerTest {
 
         enabledByDefaultFlow.value = true
         assertEquals(AdBlockingState.Enabled.Default, checker.observeState().first())
+    }
+
+    @Test
+    fun whenUpstreamHasNotEmittedYetThenCurrentStateIsUninitialized() {
+        val pendingRepository = object : AdBlockingSettingsRepository {
+            override fun isEnabledFlow(): Flow<Boolean?> = emptyFlow()
+            override suspend fun setEnabled(enabled: Boolean) = Unit
+        }
+
+        val checker = RealAdBlockingStatusChecker(feature, pendingRepository, testScope)
+
+        assertEquals(AdBlockingState.Uninitialized, checker.currentState())
     }
 }

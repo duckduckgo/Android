@@ -52,6 +52,7 @@ interface AdBlockingStatusChecker {
 }
 
 sealed interface AdBlockingState {
+    data object Uninitialized : AdBlockingState
     data object Disabled : AdBlockingState
     sealed interface Enabled : AdBlockingState {
         data object UserEnabled : Enabled
@@ -109,8 +110,8 @@ class RealAdBlockingStatusChecker @Inject constructor(
                 }
             }
         }
-    private val isUserEnabled: StateFlow<AdBlockingState> = observeState()
-        .stateIn(appScope, SharingStarted.Eagerly, AdBlockingState.Disabled)
+    private val state: StateFlow<AdBlockingState> = observeState()
+        .stateIn(appScope, SharingStarted.Eagerly, AdBlockingState.Uninitialized)
 
-    override fun currentState(): AdBlockingState = isUserEnabled.value
+    override fun currentState(): AdBlockingState = state.value
 }
