@@ -114,7 +114,11 @@ import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 interface DuckChatPixels {
-    fun sendReportMetricPixel(reportMetric: ReportMetric, modelTier: ModelTier? = null)
+    fun sendReportMetricPixel(
+        reportMetric: ReportMetric,
+        modelTier: ModelTier? = null,
+    )
+
     fun reportOpen()
     fun reportContextualSheetOpened()
     fun reportContextualSheetDismissed()
@@ -145,6 +149,9 @@ interface DuckChatPixels {
     fun reportNativeStorageReaderUsed(native: Boolean)
     fun reportNativeStorageDeletionUsed(native: Boolean)
     fun reportVoiceSessionStarted()
+    fun reportVoiceNotificationEndChatTapped()
+    fun reportVoiceServiceStarted()
+    fun reportVoiceServiceKilled()
 }
 
 @ContributesBinding(AppScope::class)
@@ -158,7 +165,10 @@ class RealDuckChatPixels @Inject constructor(
     private val termsOfServiceHandler: DuckChatTermsOfServiceHandler,
 ) : DuckChatPixels {
 
-    override fun sendReportMetricPixel(reportMetric: ReportMetric, modelTier: ModelTier?) {
+    override fun sendReportMetricPixel(
+        reportMetric: ReportMetric,
+        modelTier: ModelTier?,
+    ) {
         appCoroutineScope.launch(dispatcherProvider.io()) {
             var refreshAtb = false
             val sessionParams = mapOf(
@@ -169,10 +179,12 @@ class RealDuckChatPixels @Inject constructor(
                     refreshAtb = true
                     DUCK_CHAT_SEND_PROMPT_ONGOING_CHAT to sessionParams
                 }
+
                 USER_DID_SUBMIT_FIRST_PROMPT -> {
                     refreshAtb = true
                     DUCK_CHAT_START_NEW_CONVERSATION to sessionParams
                 }
+
                 USER_DID_OPEN_HISTORY -> DUCK_CHAT_OPEN_HISTORY to sessionParams
                 USER_DID_SELECT_FIRST_HISTORY_ITEM -> DUCK_CHAT_OPEN_MOST_RECENT_HISTORY_CHAT to sessionParams
                 USER_DID_CREATE_NEW_CHAT -> DUCK_CHAT_START_NEW_CONVERSATION_BUTTON_CLICKED to sessionParams
@@ -396,6 +408,18 @@ class RealDuckChatPixels @Inject constructor(
     override fun reportVoiceSessionStarted() {
         pixel.fire(DuckChatPixelName.DUCK_CHAT_VOICE_SESSION_STARTED)
     }
+
+    override fun reportVoiceNotificationEndChatTapped() {
+        pixel.fire(DuckChatPixelName.DUCK_CHAT_VOICE_NOTIFICATION_END_CHAT_TAPPED)
+    }
+
+    override fun reportVoiceServiceStarted() {
+        pixel.fire(DuckChatPixelName.DUCK_CHAT_VOICE_SERVICE_STARTED)
+    }
+
+    override fun reportVoiceServiceKilled() {
+        pixel.fire(DuckChatPixelName.DUCK_CHAT_VOICE_SERVICE_KILLED)
+    }
 }
 
 enum class DuckChatPixelName(override val pixelName: String) : Pixel.PixelName {
@@ -527,6 +551,10 @@ enum class DuckChatPixelName(override val pixelName: String) : Pixel.PixelName {
     DUCK_CHAT_VOICE_ENTRY_TAPPED_COUNT("m_aichat_voice_entry_tapped_count"),
     DUCK_CHAT_VOICE_ENTRY_TAPPED_DAILY("m_aichat_voice_entry_tapped_daily"),
     DUCK_CHAT_VOICE_SESSION_STARTED("m_aichat_voice_session_started"),
+    DUCK_CHAT_VOICE_NOTIFICATION_OPEN_CHAT_TAPPED("m_aichat_voice_notification_open_chat_tapped"),
+    DUCK_CHAT_VOICE_NOTIFICATION_END_CHAT_TAPPED("m_aichat_voice_notification_end_chat_tapped"),
+    DUCK_CHAT_VOICE_SERVICE_STARTED("m_aichat_voice_service_started"),
+    DUCK_CHAT_VOICE_SERVICE_KILLED("m_aichat_voice_service_killed"),
     DUCK_CHAT_CONTEXTUAL_FIRE_BUTTON_TAPPED_FIRST("m_aichat_contextual_fire_button_tapped_first"),
     DUCK_CHAT_CONTEXTUAL_FIRE_BUTTON_TAPPED_DAILY("m_aichat_contextual_fire_button_tapped_daily"),
     DUCK_CHAT_CONTEXTUAL_FIRE_BUTTON_TAPPED_COUNT("m_aichat_contextual_fire_button_tapped_count"),
@@ -715,6 +743,10 @@ class DuckChatParamRemovalPlugin @Inject constructor() : PixelParamRemovalPlugin
             DuckChatPixelName.DUCK_CHAT_VOICE_ENTRY_TAPPED_COUNT.pixelName to PixelParameter.removeAtb(),
             DuckChatPixelName.DUCK_CHAT_VOICE_ENTRY_TAPPED_DAILY.pixelName to PixelParameter.removeAtb(),
             DuckChatPixelName.DUCK_CHAT_VOICE_SESSION_STARTED.pixelName to PixelParameter.removeAtb(),
+            DuckChatPixelName.DUCK_CHAT_VOICE_NOTIFICATION_OPEN_CHAT_TAPPED.pixelName to PixelParameter.removeAtb(),
+            DuckChatPixelName.DUCK_CHAT_VOICE_NOTIFICATION_END_CHAT_TAPPED.pixelName to PixelParameter.removeAtb(),
+            DuckChatPixelName.DUCK_CHAT_VOICE_SERVICE_STARTED.pixelName to PixelParameter.removeAtb(),
+            DuckChatPixelName.DUCK_CHAT_VOICE_SERVICE_KILLED.pixelName to PixelParameter.removeAtb(),
             DuckChatPixelName.DUCK_CHAT_SETTINGS_DEFAULT_TOGGLE_POSITION_CHANGED_COUNT.pixelName to PixelParameter.removeAtb(),
             DuckChatPixelName.DUCK_CHAT_SETTINGS_DEFAULT_TOGGLE_POSITION_CHANGED_DAILY.pixelName to PixelParameter.removeAtb(),
             DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_FIRE_BUTTON_TAPPED_FIRST.pixelName to PixelParameter.removeAtb(),
