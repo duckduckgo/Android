@@ -379,6 +379,24 @@ class RealWebViewCompatContentScopeScriptsTest {
     }
 
     @Test
+    fun whenGetScriptWithEmptyPluginConfigThenSkipsEmptyValues() = runTest {
+        val emptyConfigPlugin: ContentScopeConfigPlugin = mock()
+        whenever(mockPluginPoint.getPlugins()).thenReturn(listOf(mockPlugin1, emptyConfigPlugin, mockPlugin2))
+        whenever(mockPlugin1.config()).thenReturn(config1)
+        whenever(mockPlugin2.config()).thenReturn(config2)
+        whenever(emptyConfigPlugin.config()).thenReturn("")
+        whenever(mockPlugin1.preferences()).thenReturn("\"globalPrivacyControlValue\":true")
+        whenever(emptyConfigPlugin.preferences()).thenReturn("")
+        whenever(mockPlugin2.preferences()).thenReturn("\"navigatorGlobalPrivacyControlValue\":true")
+
+        val js = testee.getScript(null, listOf())
+
+        assertTrue(js.contains("\"features\":{\"config1\":{\"state\":\"enabled\"},\"config2\":{\"state\":\"disabled\"}}"))
+        assertTrue(js.contains("\"globalPrivacyControlValue\":true,\"navigatorGlobalPrivacyControlValue\":true"))
+        assertFalse(js.contains(",,"))
+    }
+
+    @Test
     fun whenGetScriptWithMixedValidAndNullCohortExperimentsThenFiltersOutNullCohorts() = runTest {
         val newRegEx = Regex(
             "^processConfig\\(\\{\"features\":\\{" +
