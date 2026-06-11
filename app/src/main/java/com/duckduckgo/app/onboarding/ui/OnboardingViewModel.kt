@@ -19,7 +19,6 @@ package com.duckduckgo.app.onboarding.ui
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
-import com.duckduckgo.app.browser.newaddressbaroption.RealNewAddressBarOptionManager
 import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.cta.model.DismissedCta
@@ -46,7 +45,6 @@ class OnboardingViewModel @Inject constructor(
     private val dispatchers: DispatcherProvider,
     private val onboardingSkipper: OnboardingSkipper,
     private val appBuildConfig: AppBuildConfig,
-    private val newAddressBarOptionManager: RealNewAddressBarOptionManager,
     private val dismissedCtaDao: DismissedCtaDao,
     private val onboardingStore: OnboardingStore,
     private val onboardingBrandDesignUpdateToggles: OnboardingBrandDesignUpdateToggles,
@@ -123,7 +121,6 @@ class OnboardingViewModel @Inject constructor(
 
     suspend fun devOnlyFullyCompleteAllOnboarding() {
         onboardingSkipper.markOnboardingAsCompleted()
-        newAddressBarOptionManager.setAsShown()
     }
 
     companion object {

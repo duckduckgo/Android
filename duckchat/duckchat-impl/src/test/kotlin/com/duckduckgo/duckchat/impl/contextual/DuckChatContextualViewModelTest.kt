@@ -1916,10 +1916,6 @@ class DuckChatContextualViewModelTest {
         override fun isDuckChatUrl(uri: android.net.Uri): Boolean =
             uri.host == "duck.ai" || uri.host == "duckduckgo.com"
         override suspend fun wasOpenedBefore(): Boolean = false
-        override fun showNewAddressBarOptionChoiceScreen(
-            context: android.content.Context,
-            isDarkThemeEnabled: Boolean,
-        ) = Unit
 
         override suspend fun setInputScreenUserSetting(enabled: Boolean) = Unit
         override suspend fun isInputScreenEverEnabled(): Boolean = false

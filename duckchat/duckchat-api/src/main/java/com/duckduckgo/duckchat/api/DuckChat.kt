@@ -16,7 +16,6 @@
 
 package com.duckduckgo.duckchat.api
 
-import android.content.Context
 import android.net.Uri
 import kotlinx.coroutines.flow.Flow
 
@@ -72,11 +71,6 @@ interface DuckChat {
      * Returns `true` if Duck Chat was ever opened before.
      */
     suspend fun wasOpenedBefore(): Boolean
-
-    /**
-     * Displays the new address bar option choice screen.
-     */
-    fun showNewAddressBarOptionChoiceScreen(context: Context, isDarkThemeEnabled: Boolean)
 
     /**
      * Set user setting to determine whether dedicated Duck.ai input screen with a mode switch should be used.

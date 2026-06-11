@@ -68,7 +68,6 @@ import com.duckduckgo.app.browser.databinding.IncludeOmnibarToolbarMockupBottomB
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.ui.DefaultBrowserBottomSheetDialog
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.ui.DefaultBrowserBottomSheetDialog.EventListener
 import com.duckduckgo.app.browser.mode.BrowserLaunchSource
-import com.duckduckgo.app.browser.newaddressbaroption.NewAddressBarOptionManager
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.browser.shortcut.ShortcutBuilder
@@ -227,9 +226,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var omnibarEntryConverter: OmnibarEntryConverter
-
-    @Inject
-    lateinit var newAddressBarOptionManager: NewAddressBarOptionManager
 
     @Inject
     lateinit var fireDialogProvider: FireDialogProvider
@@ -442,7 +438,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
             viewModel.onLaunchedFromNotification(it)
         }
         configureOnBackPressedListener()
-        showNewAddressBarOptionChoiceScreen()
         checkForLanscapeOrientation()
 
         if (savedInstanceState == null) {
@@ -1393,12 +1388,10 @@ open class BrowserActivity : DuckDuckGoActivity() {
             isExternal: Boolean = false,
             interstitialScreen: Boolean = false,
             openExistingTabId: String? = null,
-            isLaunchFromClearDataAction: Boolean = false,
             openDuckChat: Boolean = false,
             closeDuckChat: Boolean = false,
             duckChatUrl: String? = null,
             duckChatSessionActive: Boolean = false,
-            isLaunchFromBookmarksAppShortcut: Boolean = false,
             deletedTabCount: Int = 0,
         ): Intent {
             val intent = Intent(context, BrowserActivity::class.java)
@@ -1411,12 +1404,10 @@ open class BrowserActivity : DuckDuckGoActivity() {
             intent.putExtra(LAUNCH_FROM_EXTERNAL_EXTRA, isExternal)
             intent.putExtra(LAUNCH_FROM_INTERSTITIAL_EXTRA, interstitialScreen)
             intent.putExtra(OPEN_EXISTING_TAB_ID_EXTRA, openExistingTabId)
-            intent.putExtra(LAUNCH_FROM_CLEAR_DATA_ACTION, isLaunchFromClearDataAction)
             intent.putExtra(OPEN_DUCK_CHAT, openDuckChat)
             intent.putExtra(CLOSE_DUCK_CHAT, closeDuckChat)
             intent.putExtra(DUCK_CHAT_URL, duckChatUrl)
             intent.putExtra(DUCK_CHAT_SESSION_ACTIVE, duckChatSessionActive)
-            intent.putExtra(LAUNCH_FROM_BOOKMARKS_APP_SHORTCUT_EXTRA, isLaunchFromBookmarksAppShortcut)
             intent.putExtra(DELETED_TAB_COUNT_EXTRA, deletedTabCount)
             intent.putExtra(LAUNCH_REQUIRES_REGULAR_MODE, launchSource.requiresRegularMode)
             return intent
@@ -1427,7 +1418,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
         const val NOTIFY_DATA_CLEARED_EXTRA = "NOTIFY_DATA_CLEARED_EXTRA"
         const val LAUNCH_FROM_DEFAULT_BROWSER_DIALOG = "LAUNCH_FROM_DEFAULT_BROWSER_DIALOG"
         const val LAUNCH_FROM_FAVORITES_WIDGET = "LAUNCH_FROM_FAVORITES_WIDGET"
-        const val LAUNCH_FROM_BOOKMARKS_APP_SHORTCUT_EXTRA = "LAUNCH_FROM_BOOKMARKS_APP_SHORTCUT_EXTRA"
         const val LAUNCH_FROM_NOTIFICATION_PIXEL_NAME = "LAUNCH_FROM_NOTIFICATION_PIXEL_NAME"
         const val OPEN_IN_CURRENT_TAB_EXTRA = "OPEN_IN_CURRENT_TAB_EXTRA"
         const val SELECTED_TEXT_EXTRA = "SELECTED_TEXT_EXTRA"
@@ -1442,7 +1432,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
          */
         const val LAUNCH_REQUIRES_REGULAR_MODE = "LAUNCH_REQUIRES_REGULAR_MODE"
 
-        private const val LAUNCH_FROM_CLEAR_DATA_ACTION = "LAUNCH_FROM_CLEAR_DATA_ACTION"
         private const val OPEN_DUCK_CHAT = "OPEN_DUCK_CHAT_EXTRA"
         private const val CLOSE_DUCK_CHAT = "CLOSE_DUCK_CHAT_EXTRA"
         private const val DUCK_CHAT_URL = "DUCK_CHAT_URL"
@@ -1513,22 +1502,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
                 launchNewSearchOrQuery(intent)
                 processedOriginalIntent = true
             }
-        }
-    }
-
-    private fun showNewAddressBarOptionChoiceScreen() {
-        lifecycleScope.launch(dispatcherProvider.io()) {
-            newAddressBarOptionManager.showChoiceScreen(
-                activity = this@BrowserActivity,
-                isLaunchedFromExternal = intent.getBooleanExtra(LAUNCH_FROM_EXTERNAL_EXTRA, false) ||
-                    intent.getBooleanExtra(LAUNCH_FROM_CLEAR_DATA_ACTION, false) ||
-                    intent.getBooleanExtra(NOTIFY_DATA_CLEARED_EXTRA, false) ||
-                    intent.getBooleanExtra(LAUNCH_FROM_INTERSTITIAL_EXTRA, false) ||
-                    intent.getBooleanExtra(OPEN_DUCK_CHAT, false) ||
-                    intent.getBooleanExtra(LAUNCH_FROM_FAVORITES_WIDGET, false) ||
-                    intent.getBooleanExtra(LAUNCH_FROM_BOOKMARKS_APP_SHORTCUT_EXTRA, false) ||
-                    intent.getBooleanExtra(NEW_SEARCH_EXTRA, false),
-            )
         }
     }
 

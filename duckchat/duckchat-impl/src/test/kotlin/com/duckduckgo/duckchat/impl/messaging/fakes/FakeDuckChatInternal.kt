@@ -16,7 +16,6 @@
 
 package com.duckduckgo.duckchat.impl.messaging.fakes
 
-import android.content.Context
 import android.net.Uri
 import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.duckchat.api.DuckChatInputModeState
@@ -78,8 +77,6 @@ class FakeDuckChatInternal(
     override fun isDuckChatUrl(uri: Uri): Boolean = false
 
     override suspend fun wasOpenedBefore(): Boolean = false
-
-    override fun showNewAddressBarOptionChoiceScreen(context: Context, isDarkThemeEnabled: Boolean) { }
 
     override suspend fun setInputScreenUserSetting(enabled: Boolean) {
         inputScreenUserSettingEnabled.value = enabled
