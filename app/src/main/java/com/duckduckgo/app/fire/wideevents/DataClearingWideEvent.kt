@@ -58,6 +58,7 @@ interface DataClearingWideEvent {
 
 enum class DataClearingFlowStep(val stepName: String) {
     WEB_STORAGE_CLEAR("web_storage_clear"),
+    WEB_STORAGE_CLEAR_SELECTIVE("web_storage_clear_selective"),
     WEBVIEW_APP_WEBVIEW_CLEAR("webview_app_webview_clear"),
     WEBVIEW_DEFAULT_CLEAR("webview_default_clear"),
     INDEXEDDB_CLEAR_SELECTIVE("indexeddb_clear_selective"),

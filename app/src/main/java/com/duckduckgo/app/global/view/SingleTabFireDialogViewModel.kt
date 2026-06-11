@@ -51,6 +51,7 @@ import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.downloads.api.DownloadsRepository
 import com.duckduckgo.downloads.store.DownloadStatus
 import com.duckduckgo.duckchat.api.DuckChat
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
@@ -227,11 +228,16 @@ class SingleTabFireDialogViewModel @Inject constructor(
                                 replaceCurrentTab = origin.value !is Hatch,
                             )
                         }
+
                         when (clearResult) {
+                            is ClearDataResult.Success -> dataClearingWideEvent.finishSuccess()
                             is ClearDataResult.Error -> dataClearingWideEvent.finishFailure(clearResult.exception)
-                            else -> dataClearingWideEvent.finishSuccess()
+                            is ClearDataResult.FeatureNotSupported ->
+                                dataClearingWideEvent.finishFailure(UnsupportedOperationException("DeleteBrowsingData not supported"))
                         }
                         clearResult
+                    } catch (e: CancellationException) {
+                        throw e
                     } catch (e: Exception) {
                         dataClearingWideEvent.finishFailure(e)
                         throw e

@@ -29,6 +29,8 @@ import com.duckduckgo.app.fire.SiteDataCleaner
 import com.duckduckgo.app.fire.UnsentForgetAllPixelStore
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
 import com.duckduckgo.app.fire.store.TabVisitedSitesRepository
+import com.duckduckgo.app.fire.wideevents.DataClearingFlowStep
+import com.duckduckgo.app.fire.wideevents.DataClearingWideEvent
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.tabs.model.TabRepository
@@ -145,6 +147,7 @@ class ClearPersonalDataAction(
     duckAiHostProvider: DuckAiHostProvider,
     private val siteDataCleaner: SiteDataCleaner,
     private val androidBrowserConfigFeature: AndroidBrowserConfigFeature,
+    private val dataClearingWideEvent: DataClearingWideEvent,
 ) : ClearDataAction {
 
     override fun killAndRestartProcess(notifyDataCleared: Boolean, enableTransitionAnimation: Boolean, deletedTabCount: Int) {
@@ -247,23 +250,32 @@ class ClearPersonalDataAction(
         }
 
         return try {
-            val fireproofDomains = withContext(dispatchers.io()) {
-                fireproofWebsiteRepository.fireproofWebsitesSync()
+            val fireproofDomains: Set<String>
+            val isConcurrentClearEnabled: Boolean
+            withContext(dispatchers.io()) {
+                fireproofDomains = fireproofWebsiteRepository.fireproofWebsitesSync()
                     .mapNotNull { it.domain.toTldPlusOne() }
                     .toSet()
+                isConcurrentClearEnabled = androidBrowserConfigFeature
+                    .concurrentSingleTabDataClearing().isEnabled()
             }
 
             val domainsToClear = domains
                 .filter { !duckDuckGoDomains.contains(it) && !fireproofDomains.contains(it) }
 
-            val concurrentClearEnabled = withContext(dispatchers.io()) {
-                androidBrowserConfigFeature.concurrentSingleTabDataClearing().isEnabled()
-            }
-
-            if (concurrentClearEnabled) {
+            val fullyCleared = if (isConcurrentClearEnabled) {
                 clearDomainsConcurrently(domainsToClear)
             } else {
                 clearDomainsSequentially(domainsToClear)
+                true
+            }
+
+            // Record the selective clear as a wide-event step so a partial clear (a domain — or the whole
+            // batch — hitting its timeout) is observable
+            if (fullyCleared) {
+                dataClearingWideEvent.stepSuccess(DataClearingFlowStep.WEB_STORAGE_CLEAR_SELECTIVE)
+            } else {
+                dataClearingWideEvent.stepFailure(DataClearingFlowStep.WEB_STORAGE_CLEAR_SELECTIVE, SiteDataClearTimeoutException())
             }
             ClearDataResult.Success
         } catch (e: CancellationException) {
@@ -275,11 +287,14 @@ class ClearPersonalDataAction(
     }
 
     /**
-     * Each deleteBrowsingDataForSite is async/callback-based. The per-domain timeout skip a stalled
-     * WebView callback; the overall timeout is a backstop so the burn can block the dialog.
+     * Each deleteBrowsingDataForSite is async-based. The per-domain timeout skips a stalled
+     * WebView callback; the overall timeout is a backstop so the burn can never wedge the dialog
+     * indefinitely.
+     *
+     * @return true if every domain cleared within the deadlines, false if the timeout fired.
      */
-    private suspend fun clearDomainsConcurrently(domainsToClear: List<String>) {
-        val completedWithinDeadline = withTimeoutOrNull(OVERALL_CLEAR_TIMEOUT_MS.milliseconds) {
+    private suspend fun clearDomainsConcurrently(domainsToClear: List<String>): Boolean {
+        val perDomainResults = withTimeoutOrNull(OVERALL_CLEAR_TIMEOUT_MS.milliseconds) {
             withContext(dispatchers.main()) {
                 val webStorage = createWebStorage()
                 val semaphore = Semaphore(MAX_CONCURRENT_SITE_DELETIONS)
@@ -295,13 +310,22 @@ class ClearPersonalDataAction(
                     }.awaitAll()
                 }
             }
-            true
-        } ?: false
+        }
 
-        if (completedWithinDeadline) {
-            logcat(INFO) { "Cleared site data for ${domainsToClear.size} domains" }
-        } else {
-            logcat(WARN) { "Clearing site data timed out after ${OVERALL_CLEAR_TIMEOUT_MS}ms" }
+        return when {
+            perDomainResults == null -> {
+                logcat(WARN) { "Clearing site data timed out after ${OVERALL_CLEAR_TIMEOUT_MS}ms" }
+                false
+            }
+            perDomainResults.any { it == null } -> {
+                val timedOut = perDomainResults.count { it == null }
+                logcat(WARN) { "Cleared site data for ${domainsToClear.size - timedOut} of ${domainsToClear.size} domains ($timedOut timed out)" }
+                false
+            }
+            else -> {
+                logcat(INFO) { "Cleared site data for ${domainsToClear.size} domains" }
+                true
+            }
         }
     }
 
@@ -383,3 +407,5 @@ class ClearPersonalDataAction(
         private const val OVERALL_CLEAR_TIMEOUT_MS = 15_000L
     }
 }
+
+private class SiteDataClearTimeoutException : Exception("Timed out clearing per-site web storage")

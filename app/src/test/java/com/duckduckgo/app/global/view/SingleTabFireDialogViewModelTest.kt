@@ -1460,6 +1460,22 @@ class SingleTabFireDialogViewModelTest {
     }
 
     @Test
+    fun `when delete this tab returns feature not supported then wide event finishes with failure`() = runTest {
+        whenever(mockTabRepository.getSelectedTab()).thenReturn(
+            TabEntity(tabId = "tab1", url = "https://example.com", title = "Example"),
+        )
+        whenever(mockDataClearing.clearSingleTabData(any(), any())).thenReturn(ClearDataResult.FeatureNotSupported)
+        testee = createViewModel()
+
+        testee.onDeleteThisTabClicked()
+
+        coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
+
+        verify(mockDataClearingWideEvent).finishFailure(any())
+        verify(mockDataClearingWideEvent, never()).finishSuccess()
+    }
+
+    @Test
     fun `when delete this tab clicked without selected tab then wide event is not started`() = runTest {
         whenever(mockTabRepository.getSelectedTab()).thenReturn(null)
         testee = createViewModel()

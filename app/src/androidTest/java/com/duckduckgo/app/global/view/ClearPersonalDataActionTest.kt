@@ -29,6 +29,8 @@ import com.duckduckgo.app.fire.UnsentForgetAllPixelStore
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
 import com.duckduckgo.app.fire.store.TabVisitedSitesRepository
+import com.duckduckgo.app.fire.wideevents.DataClearingFlowStep
+import com.duckduckgo.app.fire.wideevents.DataClearingWideEvent
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.tabs.model.TabRepository
@@ -73,6 +75,7 @@ class ClearPersonalDataActionTest {
     private val mockTabVisitedSitesRepository: TabVisitedSitesRepository = mock()
     private val mockWebViewCapabilityChecker: WebViewCapabilityChecker = mock()
     private val mockDuckAiHostProvider: DuckAiHostProvider = mock()
+    private val mockDataClearingWideEvent: DataClearingWideEvent = mock()
     private val fakeAndroidBrowserConfigFeature = FakeFeatureToggleFactory.create(AndroidBrowserConfigFeature::class.java)
 
     private val fireproofWebsites: LiveData<List<FireproofWebsiteEntity>> = MutableLiveData()
@@ -110,6 +113,7 @@ class ClearPersonalDataActionTest {
         duckAiHostProvider = mockDuckAiHostProvider,
         siteDataCleaner = siteDataCleaner,
         androidBrowserConfigFeature = fakeAndroidBrowserConfigFeature,
+        dataClearingWideEvent = mockDataClearingWideEvent,
     )
 
     @Test
@@ -436,6 +440,7 @@ class ClearPersonalDataActionTest {
 
         assertTrue(result is ClearDataResult.Success)
         assertEquals(domains, clearedDomains.toSet())
+        verify(mockDataClearingWideEvent).stepSuccess(DataClearingFlowStep.WEB_STORAGE_CLEAR_SELECTIVE)
     }
 
     @Test
@@ -458,6 +463,7 @@ class ClearPersonalDataActionTest {
 
         assertTrue(result is ClearDataResult.Success)
         assertEquals(setOf("a.com", "b.com"), clearedDomains.toSet())
+        verify(mockDataClearingWideEvent).stepFailure(eq(DataClearingFlowStep.WEB_STORAGE_CLEAR_SELECTIVE), any())
     }
 
     @Test

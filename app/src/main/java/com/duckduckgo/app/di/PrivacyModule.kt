@@ -86,6 +86,7 @@ object PrivacyModule {
         duckAiHostProvider: DuckAiHostProvider,
         siteDataCleaner: SiteDataCleaner,
         androidBrowserConfigFeature: AndroidBrowserConfigFeature,
+        dataClearingWideEvent: DataClearingWideEvent,
     ): ClearDataAction {
         // TODO: Burns currently only clear @RegularMode tabs. Cross-mode tab clearing will be
         // handled as part of the data-clearing fire-mode work.
@@ -110,6 +111,7 @@ object PrivacyModule {
             duckAiHostProvider,
             siteDataCleaner,
             androidBrowserConfigFeature,
+            dataClearingWideEvent,
         )
     }
 
