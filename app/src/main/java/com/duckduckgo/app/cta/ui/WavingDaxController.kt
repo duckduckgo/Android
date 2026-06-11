@@ -92,7 +92,11 @@ internal class WavingDaxController(
     )
 
     private fun decideFit(container: View) {
-        val height = computeDaxFitHeight(container) ?: return
+        val height = computeDaxFitHeight(container)
+        if (height == null) {
+            applyFitResult(container, false)
+            return
+        }
         applyDaxHeight(container, height)
         applyFitResult(container, true)
     }

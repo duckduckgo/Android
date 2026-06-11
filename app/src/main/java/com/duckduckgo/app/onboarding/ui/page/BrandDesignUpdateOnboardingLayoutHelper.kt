@@ -68,7 +68,7 @@ object BrandDesignUpdateOnboardingLayoutHelper {
         )
     }
 
-    private fun isInScrollableContainer(view: View, stopAt: View): Boolean {
+    fun isInScrollableContainer(view: View, stopAt: View): Boolean {
         var parent = view.parent
         while (parent != null && parent != stopAt) {
             if (parent is ScrollView || parent is NestedScrollView) return true
