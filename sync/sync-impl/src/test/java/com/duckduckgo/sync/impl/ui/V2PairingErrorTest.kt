@@ -32,8 +32,12 @@ class V2PairingErrorTest {
     @Test
     fun whenCodeIsAKnownPairingAbortThenReturnsSyncWithAnotherDeviceError() {
         listOf(
-            PAIRING_REJECTED, PAIRING_UNAVAILABLE, PAIRING_CANCELLED,
-            NEGOTIATION_ABORTED, NO_RECOVERY_CODE, PAIRING_FAILED,
+            PAIRING_REJECTED,
+            PAIRING_UNAVAILABLE,
+            PAIRING_CANCELLED,
+            NEGOTIATION_ABORTED,
+            NO_RECOVERY_CODE,
+            PAIRING_FAILED,
         ).forEach { code ->
             assertEquals(
                 "code $code should map to the pairing error string",

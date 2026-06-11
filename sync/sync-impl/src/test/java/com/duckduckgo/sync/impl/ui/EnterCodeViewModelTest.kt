@@ -35,10 +35,7 @@ import com.duckduckgo.sync.impl.AccountErrorCodes.CREATE_ACCOUNT_FAILED
 import com.duckduckgo.sync.impl.AccountErrorCodes.GENERIC_ERROR
 import com.duckduckgo.sync.impl.AccountErrorCodes.INVALID_CODE
 import com.duckduckgo.sync.impl.AccountErrorCodes.LOGIN_FAILED
-import com.duckduckgo.sync.impl.AccountErrorCodes.PAIRING_REJECTED
 import com.duckduckgo.sync.impl.AccountErrorCodes.THIRD_PARTY_ALREADY_UPGRADED
-import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Message
-import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2State
 import com.duckduckgo.sync.impl.Clipboard
 import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.RealSyncCodeDispatcher
@@ -51,8 +48,10 @@ import com.duckduckgo.sync.impl.SyncAuthCode.Unknown
 import com.duckduckgo.sync.impl.SyncFeature
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2CodeParseResult
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Event
+import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Message
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2QrCode
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Runner
+import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2State
 import com.duckduckgo.sync.impl.pixels.SyncPixels
 import com.duckduckgo.sync.impl.ui.EnterCodeViewModel.AuthState
 import com.duckduckgo.sync.impl.ui.EnterCodeViewModel.AuthState.Idle

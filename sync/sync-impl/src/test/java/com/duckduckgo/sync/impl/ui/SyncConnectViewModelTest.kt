@@ -30,7 +30,6 @@ import com.duckduckgo.sync.impl.AccountErrorCodes.ALREADY_SIGNED_IN
 import com.duckduckgo.sync.impl.AccountErrorCodes.CONNECT_FAILED
 import com.duckduckgo.sync.impl.AccountErrorCodes.LOGIN_FAILED
 import com.duckduckgo.sync.impl.AccountInfo
-import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2CodeParseResult
 import com.duckduckgo.sync.impl.Clipboard
 import com.duckduckgo.sync.impl.ConnectCode
 import com.duckduckgo.sync.impl.QREncoder
@@ -42,6 +41,7 @@ import com.duckduckgo.sync.impl.SyncAccountRepository.AuthCode
 import com.duckduckgo.sync.impl.SyncAuthCode.Connect
 import com.duckduckgo.sync.impl.SyncAuthCode.Recovery
 import com.duckduckgo.sync.impl.SyncFeature
+import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2CodeParseResult
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Event
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Message
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2State

@@ -36,9 +36,6 @@ import com.duckduckgo.sync.TestSyncFixtures.primaryKey
 import com.duckduckgo.sync.TestSyncFixtures.validLoginKeys
 import com.duckduckgo.sync.impl.AccountErrorCodes.ALREADY_SIGNED_IN
 import com.duckduckgo.sync.impl.AccountErrorCodes.LOGIN_FAILED
-import com.duckduckgo.sync.impl.AccountErrorCodes.PAIRING_REJECTED
-import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2CodeParseResult
-import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Message
 import com.duckduckgo.sync.impl.Clipboard
 import com.duckduckgo.sync.impl.ExchangeResult.AccountSwitchingRequired
 import com.duckduckgo.sync.impl.ExchangeResult.LoggedIn
@@ -55,7 +52,9 @@ import com.duckduckgo.sync.impl.SyncAuthCode.Exchange
 import com.duckduckgo.sync.impl.SyncAuthCode.Recovery
 import com.duckduckgo.sync.impl.SyncFeature
 import com.duckduckgo.sync.impl.encodeB64
+import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2CodeParseResult
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Event
+import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Message
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2QrCode
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Runner
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2State
