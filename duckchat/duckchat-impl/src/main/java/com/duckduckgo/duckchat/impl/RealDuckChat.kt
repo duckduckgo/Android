@@ -627,6 +627,8 @@ class RealDuckChat @Inject constructor(
         return appendParameters(parameters, getDuckChatLink())
     }
 
+    override fun getDuckChatSettingsUrl(): String = resolveDuckAiUrl(DUCK_CHAT_SETTINGS_WEB_LINK)
+
     private fun addChatParameters(
         query: String,
         autoPrompt: Boolean,
@@ -698,9 +700,11 @@ class RealDuckChat @Inject constructor(
             }
     }
 
-    private fun getDuckChatLink(): String {
-        return duckChatLink.toUri().buildUpon().authority(duckAiHostProvider.getHost()).build().toString()
-    }
+    private fun getDuckChatLink(): String = resolveDuckAiUrl(duckChatLink)
+
+    /** Resolves [link] against the configured Duck.ai host by swapping its authority (e.g. for internal/staging overrides). */
+    private fun resolveDuckAiUrl(link: String): String =
+        link.toUri().buildUpon().authority(duckAiHostProvider.getHost()).build().toString()
 
     private fun nativeInputParameters(): Map<String, String> =
         if (isNativeInputFieldEnabled) mapOf(NATIVE_INPUT_QUERY_NAME to NATIVE_INPUT_QUERY_VALUE) else emptyMap()
@@ -973,6 +977,7 @@ class RealDuckChat @Inject constructor(
 
     companion object {
         private const val DUCK_CHAT_WEB_LINK = "https://duck.ai/chat?duckai=5"
+        private const val DUCK_CHAT_SETTINGS_WEB_LINK = "https://duck.ai?settings=open"
         private const val DUCKDUCKGO_HOST = "duckduckgo.com"
         private const val CHAT_QUERY_NAME = "ia"
         private const val CHAT_QUERY_VALUE = "chat"

@@ -10082,7 +10082,7 @@ class BrowserTabViewModelTest {
         )
         whenever(mockDuckChatJSHelper.onNativeAction(NativeAction.DUCK_AI_SETTINGS)).thenReturn(expectedEvent)
 
-        testee.openDuckChatSettings()
+        testee.openDuckChatSettings(ViewMode.DuckAI)
 
         testee.subscriptionEventDataFlow.test {
             val emittedEvent = awaitItem()
@@ -10092,6 +10092,19 @@ class BrowserTabViewModelTest {
             cancelAndIgnoreRemainingEvents()
         }
 
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_DUCK_AI_SETTINGS_TAPPED)
+    }
+
+    @Test
+    fun whenDuckChatSettingsRequestedOutsideDuckAiThenSettingsUrlOpenedInNewTab() = runTest {
+        val settingsUrl = "https://duck.ai?settings=open"
+        whenever(mockDuckChat.getDuckChatSettingsUrl()).thenReturn(settingsUrl)
+
+        testee.openDuckChatSettings(ViewMode.Browser("https://example.com"))
+
+        assertCommandIssued<Command.OpenInNewTab> {
+            assertEquals(settingsUrl, query)
+        }
         verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_DUCK_AI_SETTINGS_TAPPED)
     }
 
