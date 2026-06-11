@@ -1562,6 +1562,30 @@ class DuckChatContextualViewModelTest {
     }
 
     @Test
+    fun `LEGACY_SUMMARIZE uses the legacy arrow icon`() {
+        assertEquals(
+            com.duckduckgo.mobile.android.R.drawable.ic_arrow_down_right_16,
+            DuckChatContextualViewModel.QuickActionState.LEGACY_SUMMARIZE.iconResId,
+        )
+    }
+
+    @Test
+    fun `ASK_ABOUT_PAGE uses the 16dp page-content-attach icon`() {
+        assertEquals(
+            R.drawable.ic_page_content_attach_16,
+            DuckChatContextualViewModel.QuickActionState.ASK_ABOUT_PAGE.iconResId,
+        )
+    }
+
+    @Test
+    fun `SUBMIT_SUMMARIZE uses the summarize icon`() {
+        assertEquals(
+            R.drawable.ic_summarize_16,
+            DuckChatContextualViewModel.QuickActionState.SUBMIT_SUMMARIZE.iconResId,
+        )
+    }
+
+    @Test
     fun `when quick action clicked in LEGACY_SUMMARIZE then prompt is inserted into viewState`() = runTest {
         whenever(contextualSheetImprovementsToggle.isEnabled()).thenReturn(false)
         val testee = buildViewModel()

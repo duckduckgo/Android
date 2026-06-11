@@ -92,13 +92,11 @@ class DuckChatContextualViewModel @Inject constructor(
         ),
         ASK_ABOUT_PAGE(
             labelResId = R.string.duckAIContextualPromptAskAboutPage,
-            iconResId = R.drawable.ic_context_action_16,
+            iconResId = R.drawable.ic_page_content_attach_16,
         ),
-
-        // TODO: swap to dedicated summarize icon when SVG is available
         SUBMIT_SUMMARIZE(
             labelResId = R.string.duckAIContextualPromptSummarize,
-            iconResId = R.drawable.ic_context_action_16,
+            iconResId = R.drawable.ic_summarize_16,
         ),
     }
 
