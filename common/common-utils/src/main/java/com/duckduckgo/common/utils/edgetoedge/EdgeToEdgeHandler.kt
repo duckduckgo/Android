@@ -37,6 +37,11 @@ import javax.inject.Inject
  */
 class EdgeToEdgeHandler @Inject constructor() {
 
+    /**
+     * Pads [view]'s top (status bar + cutout) and left/right (side system bars + cutout) edges.
+     *
+     * @param view The view to pad, typically the screen's root.
+     */
     fun applyStatusBarAndHorizontalInsets(view: View) {
         val initialLeft = view.paddingLeft
         val initialTop = view.paddingTop
@@ -55,6 +60,11 @@ class EdgeToEdgeHandler @Inject constructor() {
         ViewCompat.requestApplyInsets(view)
     }
 
+    /**
+     * Pads [view]'s top by the status-bar + cutout inset.
+     *
+     * @param view The view to pad at the top edge.
+     */
     fun applyStatusBarInsets(view: View) {
         val initialTop = view.paddingTop
         ViewCompat.setOnApplyWindowInsetsListener(view) { v, insets ->
@@ -68,7 +78,9 @@ class EdgeToEdgeHandler @Inject constructor() {
     }
 
     /**
-     * Bottom inset: navigation bar + display cutout, bottom edge only
+     * Pads [view]'s bottom by the navigation-bar + cutout + IME inset.
+     *
+     * @param view The view to pad at the bottom edge.
      */
     fun applyNavigationBarInsets(view: View) {
         val initialBottom = view.paddingBottom
@@ -83,6 +95,11 @@ class EdgeToEdgeHandler @Inject constructor() {
         ViewCompat.requestApplyInsets(view)
     }
 
+    /**
+     * Adds the navigation-bar + cutout + IME inset as [view]'s bottom margin, so a scrolling bottom bar clips at the nav-bar edge when hidden.
+     *
+     * @param view The view whose bottom margin is updated; must use [ViewGroup.MarginLayoutParams].
+     */
     fun applyNavigationBarInsetsAsMargin(view: View) {
         val initialBottom = (view.layoutParams as? ViewGroup.MarginLayoutParams)?.bottomMargin ?: 0
         view.applyInsets { insets ->
@@ -101,11 +118,9 @@ class EdgeToEdgeHandler @Inject constructor() {
     }
 
     /**
-     * Horizontal inset: navigation bar + display cutout on the left and right edges. In landscape the
-     * 3-button nav bar and the camera cutout move to a side edge and run the full height, so applying
-     * this to a screen's root insets the whole column (toolbar, content, bottom bar) at once. No-op in
-     * portrait. The listener is non-consuming, so child views still receive insets for their own
-     * top/bottom handling.
+     * Pads [view]'s left/right by the side navigation-bar + cutout inset (landscape only; no-op in portrait).
+     *
+     * @param view The view to pad on the left/right edges.
      */
     fun applyHorizontalSystemBarInsets(view: View) {
         val initialLeft = view.paddingLeft
