@@ -250,6 +250,37 @@ class RealAdBlockingStatusCheckerTest {
     }
 
     @Test
+    fun whenUserHasEnabledThenCurrentStateIsUserEnabled() {
+        userEnabledFlow.value = true
+
+        assertEquals(AdBlockingState.Enabled.UserEnabled, checker.currentState())
+    }
+
+    @Test
+    fun whenUserHasDisabledThenCurrentStateIsDisabled() {
+        userEnabledFlow.value = false
+
+        assertEquals(AdBlockingState.Disabled, checker.currentState())
+    }
+
+    @Test
+    fun whenNotSetAndEnabledByDefaultThenCurrentStateIsEnabledDefault() {
+        userEnabledFlow.value = null
+        enabledByDefaultFlow.value = true
+
+        assertEquals(AdBlockingState.Enabled.Default, checker.currentState())
+    }
+
+    @Test
+    fun whenStateChangesThenCurrentStateReflectsItSynchronously() {
+        userEnabledFlow.value = true
+        assertEquals(AdBlockingState.Enabled.UserEnabled, checker.currentState())
+
+        userEnabledFlow.value = false
+        assertEquals(AdBlockingState.Disabled, checker.currentState())
+    }
+
+    @Test
     fun whenUpstreamHasNotEmittedYetThenCurrentStateIsUninitialized() {
         val pendingRepository = object : AdBlockingSettingsRepository {
             override fun isEnabledFlow(): Flow<Boolean?> = emptyFlow()
