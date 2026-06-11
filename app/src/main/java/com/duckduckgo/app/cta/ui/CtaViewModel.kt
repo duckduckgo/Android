@@ -167,7 +167,7 @@ class CtaViewModel @Inject constructor(
                     pixel.fire(it, cta.pixelShownParameters())
                 }
             }
-            if (cta is OnboardingDaxDialogCta.DaxDuckAiFireButtonCta) {
+            if (cta is OnboardingDaxDialogCta.DaxDuckAiFireButtonCta || cta is DaxDuckAiFireButtonBrandDesignUpdateContextualCta) {
                 duckAiOnboardingExperimentMetrics.fireFireDialogImpression()
             }
             if (cta is DaxCta && cta.markAsReadOnShow) {
