@@ -165,7 +165,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/contextualModePrompts"
-            app:strokeColor="?attr/daxColorAccentBlue"
+            app:strokeColor="?attr/daxColorOmnibarAccent"
             app:strokeWidth="@dimen/omnibarOutlineWidth">
 
             <LinearLayout
