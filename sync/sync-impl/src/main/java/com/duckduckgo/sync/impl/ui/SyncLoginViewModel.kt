@@ -140,7 +140,9 @@ class SyncLoginViewModel @Inject constructor(
                 command.send(ShowError(message = R.string.sync_flows_disabled_new_version, reason = "Code requires protocol v${outcome.codeMajor}"))
             }
             is DispatchOutcome.Failed -> {
-                processError(Error(reason = outcome.reason))
+                // v2 failures must always surface — bypass the v1 processError catch-all (else -> null),
+                // which would silently no-op the GENERIC/uncoded reason this used to pass.
+                command.send(ShowError(message = outcome.code.toV2PairingErrorMessage(), reason = outcome.reason))
             }
             is DispatchOutcome.JoinerConfirmationRequested ->
                 command.send(Command.AskJoinerConfirmation(outcome.peerName))
