@@ -1608,6 +1608,33 @@ class DuckChatContextualViewModelTest {
     }
 
     @Test
+    fun `when contextualSheetImprovements enabled and page context arrives then context is NOT auto-attached`() = runTest {
+        whenever(contextualSheetImprovementsToggle.isEnabled()).thenReturn(true)
+        val testee = buildViewModel()
+        testee.onSheetOpened("tab-1")
+        val pageContext = """{"title":"Page","url":"https://example.com","content":"text"}"""
+
+        testee.onPageContextReceived("tab-1", pageContext)
+
+        assertFalse(testee.viewState.value.showContext)
+        verify(duckChatPixels, never()).reportContextualPageContextAutoAttached()
+    }
+
+    @Test
+    fun `when contextualSheetImprovements enabled then context only attaches after ASK_ABOUT_PAGE clicked`() = runTest {
+        whenever(contextualSheetImprovementsToggle.isEnabled()).thenReturn(true)
+        val testee = buildViewModel()
+        testee.onSheetOpened("tab-1")
+        val pageContext = """{"title":"Page","url":"https://example.com","content":"text"}"""
+        testee.onPageContextReceived("tab-1", pageContext)
+        assertFalse(testee.viewState.value.showContext)
+
+        testee.onQuickActionClicked("")
+
+        assertTrue(testee.viewState.value.showContext)
+    }
+
+    @Test
     fun `when quick action clicked in ASK_ABOUT_PAGE with valid page context then context is attached`() = runTest {
         whenever(contextualSheetImprovementsToggle.isEnabled()).thenReturn(true)
         val testee = buildViewModel()

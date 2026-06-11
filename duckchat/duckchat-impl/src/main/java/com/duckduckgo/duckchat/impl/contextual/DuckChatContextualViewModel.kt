@@ -669,7 +669,7 @@ class DuckChatContextualViewModel @Inject constructor(
                         tabId = tabId,
                         allowsAutomaticContextAttachment = allowsAutomaticContextAttachment,
                         showContext =
-                        if (allowsAutomaticContextAttachment) {
+                        if (allowsAutomaticContextAttachment && !isContextualSheetImprovementsEnabled) {
                             !inputMode.userRemovedContext
                         } else {
                             inputMode.showContext
