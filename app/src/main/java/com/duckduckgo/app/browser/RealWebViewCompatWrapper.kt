@@ -28,11 +28,13 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import kotlinx.coroutines.isActive
+import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import logcat.LogPriority.ERROR
 import logcat.asLog
 import logcat.logcat
 import javax.inject.Inject
+import kotlin.coroutines.resume
 
 @SuppressLint(
     "RequiresFeature",
@@ -55,12 +57,9 @@ class RealWebViewCompatWrapper @Inject constructor(
                 return null
             }
 
-            if (!webView.isAttachedToWindow) {
-                logcat(ERROR) { "Error calling addDocumentStartJavaScript on detached WebView" }
-                return null
-            }
-
             return withContext(dispatcherProvider.main()) {
+                if (!isActive) return@withContext null
+                webView.awaitAttachedToWindow()
                 if (!isActive) return@withContext null
 
                 if (webView is DuckDuckGoWebView) {
@@ -108,17 +107,15 @@ class RealWebViewCompatWrapper @Inject constructor(
             return
         }
 
-        if (!webView.isAttachedToWindow) {
-            logcat(ERROR) { "Error calling addWebMessageListener on detached WebView" }
-            return
-        }
-
-        if (webView is DuckDuckGoWebView) {
-            webView.safeAddWebMessageListener(jsObjectName, allowedOriginRules, listener)
-            return
-        }
         return withContext(dispatcherProvider.main()) {
             if (!isActive) return@withContext
+            webView.awaitAttachedToWindow()
+            if (!isActive) return@withContext
+
+            if (webView is DuckDuckGoWebView) {
+                webView.safeAddWebMessageListener(jsObjectName, allowedOriginRules, listener)
+                return@withContext
+            }
             WebViewCompat.addWebMessageListener(webView, jsObjectName, allowedOriginRules, listener)
         }
     }
@@ -143,6 +140,32 @@ class RealWebViewCompatWrapper @Inject constructor(
         withContext(dispatcherProvider.main()) {
             if (!isActive) return@withContext
             replyProxy?.postMessage(subscriptionEvent)
+        }
+    }
+
+    private suspend fun WebView.awaitAttachedToWindow() {
+        if (isAttachedToWindow) return
+
+        suspendCancellableCoroutine { continuation ->
+            val listener = object : android.view.View.OnAttachStateChangeListener {
+                override fun onViewAttachedToWindow(v: android.view.View) {
+                    removeOnAttachStateChangeListener(this)
+                    if (continuation.isActive) {
+                        continuation.resume(Unit)
+                    }
+                }
+
+                override fun onViewDetachedFromWindow(v: android.view.View) = Unit
+            }
+
+            addOnAttachStateChangeListener(listener)
+            if (continuation.isActive && isAttachedToWindow) {
+                removeOnAttachStateChangeListener(listener)
+                continuation.resume(Unit)
+            }
+            continuation.invokeOnCancellation {
+                removeOnAttachStateChangeListener(listener)
+            }
         }
     }
 }

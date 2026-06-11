@@ -6,6 +6,7 @@ import com.duckduckgo.app.browser.api.WebViewCapabilityChecker.WebViewCapability
 import com.duckduckgo.common.test.CoroutineTestRule
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
@@ -47,14 +48,19 @@ class RealWebViewCompatWrapperTest {
         }
 
     @Test
-    fun whenAddDocumentStartJavaScriptWithWebViewDetachedThenDoNotAddScript() =
+    fun whenAddDocumentStartJavaScriptWithWebViewDetachedThenWaitForAttach() =
         runTest {
             whenever(mockWebViewCapabilityChecker.isSupported(DocumentStartJavaScript)).thenReturn(true)
             whenever(mockDuckDuckGoWebView.isAttachedToWindow).thenReturn(false)
 
-            testee.addDocumentStartJavaScript(mockDuckDuckGoWebView, "script", setOf("*"))
+            val job = launch {
+                testee.addDocumentStartJavaScript(mockDuckDuckGoWebView, "script", setOf("*"))
+            }
+            runCurrent()
 
             verify(mockDuckDuckGoWebView, never()).safeAddDocumentStartJavaScript("script", setOf("*"))
+            verify(mockDuckDuckGoWebView).addOnAttachStateChangeListener(any())
+            job.cancel()
         }
 
     @Test
@@ -104,14 +110,19 @@ class RealWebViewCompatWrapperTest {
         }
 
     @Test
-    fun whenAddMessageListenerWithWebViewDettchedThenDoNotAddListener() =
+    fun whenAddMessageListenerWithWebViewDetachedThenWaitForAttach() =
         runTest {
             whenever(mockWebViewCapabilityChecker.isSupported(WebMessageListener)).thenReturn(true)
             whenever(mockDuckDuckGoWebView.isAttachedToWindow).thenReturn(false)
 
-            testee.addWebMessageListener(mockDuckDuckGoWebView, "script", setOf("*")) { _, _, _, _, _ -> }
+            val job = launch {
+                testee.addWebMessageListener(mockDuckDuckGoWebView, "script", setOf("*")) { _, _, _, _, _ -> }
+            }
+            runCurrent()
 
             verify(mockDuckDuckGoWebView, never()).safeAddWebMessageListener(eq("script"), eq(setOf("*")), any())
+            verify(mockDuckDuckGoWebView).addOnAttachStateChangeListener(any())
+            job.cancel()
         }
 
     @Test
