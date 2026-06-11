@@ -78,6 +78,7 @@ import androidx.core.text.HtmlCompat
 import androidx.core.text.HtmlCompat.FROM_HTML_MODE_LEGACY
 import androidx.core.text.toSpannable
 import androidx.core.view.ViewCompat
+import androidx.core.view.doOnAttach
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.core.view.postDelayed
@@ -4194,44 +4195,46 @@ class BrowserTabFragment :
                 )
             }
             val browserWebView = it
-            lifecycleScope.launch {
-                contentScopeWebMessaging.register(
-                    object : WebViewCompatMessageCallback {
-                        override fun process(
-                            context: String,
-                            featureName: String,
-                            method: String,
-                            id: String?,
-                            data: JSONObject?,
-                            onResponse: suspend (params: JSONObject) -> Unit,
-                        ) {
-                            if (shouldProcessWithWebViewCompatCallback(featureName, method)) {
-                                viewModel.webViewCompatProcessJsCallbackMessage(
-                                    context = context,
-                                    featureName = featureName,
-                                    method = method,
-                                    id = id,
-                                    data = data,
-                                    onResponse = onResponse,
-                                )
-                            } else {
-                                id?.let { contentScopeWebMessageReplyCallbacks[it] = onResponse }
-                                viewModel.processJsCallbackMessage(
-                                    featureName,
-                                    method,
-                                    id,
-                                    data,
-                                    isActiveCustomTab(),
-                                    context = requireActivity(),
-                                ) {
-                                    browserWebView.url
+            browserWebView.doOnAttach {
+                lifecycleScope.launch {
+                    contentScopeWebMessaging.register(
+                        object : WebViewCompatMessageCallback {
+                            override fun process(
+                                context: String,
+                                featureName: String,
+                                method: String,
+                                id: String?,
+                                data: JSONObject?,
+                                onResponse: suspend (params: JSONObject) -> Unit,
+                            ) {
+                                if (shouldProcessWithWebViewCompatCallback(featureName, method)) {
+                                    viewModel.webViewCompatProcessJsCallbackMessage(
+                                        context = context,
+                                        featureName = featureName,
+                                        method = method,
+                                        id = id,
+                                        data = data,
+                                        onResponse = onResponse,
+                                    )
+                                } else {
+                                    id?.let { contentScopeWebMessageReplyCallbacks[it] = onResponse }
+                                    viewModel.processJsCallbackMessage(
+                                        featureName,
+                                        method,
+                                        id,
+                                        data,
+                                        isActiveCustomTab(),
+                                        context = requireActivity(),
+                                    ) {
+                                        browserWebView.url
+                                    }
                                 }
                             }
-                        }
-                    },
-                    browserWebView,
-                )
-                contentScopeDocumentStartJavaScript.addDocumentStartJavaScript(browserWebView, viewModel.getSite()?.isDesktopMode)
+                        },
+                        browserWebView,
+                    )
+                    contentScopeDocumentStartJavaScript.addDocumentStartJavaScript(browserWebView, viewModel.getSite()?.isDesktopMode)
+                }
             }
             configureWebViewForAutofill(it)
             printInjector.addJsInterface(it) { viewModel.printFromWebView() }
