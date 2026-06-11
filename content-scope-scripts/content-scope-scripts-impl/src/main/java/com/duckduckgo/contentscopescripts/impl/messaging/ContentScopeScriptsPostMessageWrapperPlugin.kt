@@ -26,10 +26,13 @@ import com.duckduckgo.js.messaging.api.PostMessageWrapperPlugin
 import com.duckduckgo.js.messaging.api.SubscriptionEvent
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import com.duckduckgo.js.messaging.api.WebMessagingPlugin
+import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 import javax.inject.Named
 
+@Named("contentScopeScripts")
+@ContributesBinding(FragmentScope::class)
 @ContributesMultibinding(FragmentScope::class)
 class ContentScopeScriptsPostMessageWrapperPlugin @Inject constructor(
     @Named("contentScopeScripts") private val webMessagingPlugin: WebMessagingPlugin,

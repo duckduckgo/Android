@@ -599,13 +599,16 @@ class BrowserTabFragment :
     lateinit var contentScopeScripts: JsMessaging
 
     @Inject
-    lateinit var addDocumentStartJavaScriptPlugins: PluginPoint<AddDocumentStartJavaScriptPlugin>
+    @Named("contentScopeScripts")
+    lateinit var contentScopeDocumentStartJavaScript: AddDocumentStartJavaScriptPlugin
 
     @Inject
-    lateinit var webMessagingPlugins: PluginPoint<WebMessagingPlugin>
+    @Named("contentScopeScripts")
+    lateinit var contentScopeWebMessaging: WebMessagingPlugin
 
     @Inject
-    lateinit var postMessageWrapperPlugins: PluginPoint<PostMessageWrapperPlugin>
+    @Named("contentScopeScripts")
+    lateinit var contentScopePostMessage: PostMessageWrapperPlugin
 
     @Inject
     @Named("DuckPlayer")
@@ -1160,9 +1163,7 @@ class BrowserTabFragment :
     private fun sendContentScopeSubscriptionEvent(subscriptionEventData: SubscriptionEventData) {
         val currentWebView = webView ?: return
         lifecycleScope.launch {
-            postMessageWrapperPlugins.getPlugins()
-                .firstOrNull { it.context == contentScopeScripts.context }
-                ?.postMessage(subscriptionEventData, currentWebView)
+            contentScopePostMessage.postMessage(subscriptionEventData, currentWebView)
         }
     }
 
@@ -4194,47 +4195,43 @@ class BrowserTabFragment :
             }
             val browserWebView = it
             lifecycleScope.launch {
-                webMessagingPlugins.getPlugins().forEach { plugin ->
-                    plugin.register(
-                        object : WebViewCompatMessageCallback {
-                            override fun process(
-                                context: String,
-                                featureName: String,
-                                method: String,
-                                id: String?,
-                                data: JSONObject?,
-                                onResponse: suspend (params: JSONObject) -> Unit,
-                            ) {
-                                if (shouldProcessWithWebViewCompatCallback(featureName, method)) {
-                                    viewModel.webViewCompatProcessJsCallbackMessage(
-                                        context = context,
-                                        featureName = featureName,
-                                        method = method,
-                                        id = id,
-                                        data = data,
-                                        onResponse = onResponse,
-                                    )
-                                } else {
-                                    id?.let { contentScopeWebMessageReplyCallbacks[it] = onResponse }
-                                    viewModel.processJsCallbackMessage(
-                                        featureName,
-                                        method,
-                                        id,
-                                        data,
-                                        isActiveCustomTab(),
-                                        context = requireActivity(),
-                                    ) {
-                                        browserWebView.url
-                                    }
+                contentScopeWebMessaging.register(
+                    object : WebViewCompatMessageCallback {
+                        override fun process(
+                            context: String,
+                            featureName: String,
+                            method: String,
+                            id: String?,
+                            data: JSONObject?,
+                            onResponse: suspend (params: JSONObject) -> Unit,
+                        ) {
+                            if (shouldProcessWithWebViewCompatCallback(featureName, method)) {
+                                viewModel.webViewCompatProcessJsCallbackMessage(
+                                    context = context,
+                                    featureName = featureName,
+                                    method = method,
+                                    id = id,
+                                    data = data,
+                                    onResponse = onResponse,
+                                )
+                            } else {
+                                id?.let { contentScopeWebMessageReplyCallbacks[it] = onResponse }
+                                viewModel.processJsCallbackMessage(
+                                    featureName,
+                                    method,
+                                    id,
+                                    data,
+                                    isActiveCustomTab(),
+                                    context = requireActivity(),
+                                ) {
+                                    browserWebView.url
                                 }
                             }
-                        },
-                        browserWebView,
-                    )
-                }
-                addDocumentStartJavaScriptPlugins.getPlugins().forEach { plugin ->
-                    plugin.addDocumentStartJavaScript(browserWebView, viewModel.getSite()?.isDesktopMode)
-                }
+                        }
+                    },
+                    browserWebView,
+                )
+                contentScopeDocumentStartJavaScript.addDocumentStartJavaScript(browserWebView, viewModel.getSite()?.isDesktopMode)
             }
             configureWebViewForAutofill(it)
             printInjector.addJsInterface(it) { viewModel.printFromWebView() }

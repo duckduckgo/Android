@@ -26,12 +26,16 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.contentscopescripts.api.contentscopeExperiments.ContentScopeExperiments
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.js.messaging.api.AddDocumentStartJavaScriptPlugin
+import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
+import javax.inject.Named
 
+@Named("contentScopeScripts")
 @SingleInstanceIn(FragmentScope::class)
+@ContributesBinding(FragmentScope::class)
 @ContributesMultibinding(FragmentScope::class)
 class ContentScopeScriptsAddDocumentStartJavaScriptPlugin @Inject constructor(
     private val webViewCompatContentScopeScripts: WebViewCompatContentScopeScripts,
