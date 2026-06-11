@@ -16,7 +16,8 @@
 <resources>
     <string name="ad_blocking_settings_title">YouTube Ad Blocking</string>
     <string name="ad_blocking_settings_toggle_title">Block Ads on YouTube</string>
-    <string name="ad_blocking_settings_description">DuckDuckGo removes video ads on YouTube, so you can watch videos without interruption.\n\nWhen this is on, DuckDuckGo will anonymously detect ad blocking interference or YouTube errors, to improve the experience for everyone. DuckDuckGo never sees which videos you view or any personally identifiable information. <annotation type="learn_more_link">Learn more</annotation></string>
+    <string name="ad_blocking_settings_description_with_consent">DuckDuckGo removes video ads on YouTube, so you can watch videos without interruption.\n\nWhen this is on, DuckDuckGo will anonymously detect ad blocking interference or YouTube errors, to improve the experience for everyone. DuckDuckGo never sees which videos you view or any personally identifiable information. <annotation type="learn_more_link">Learn more</annotation></string>
+    <string name="ad_blocking_settings_description">DuckDuckGo removes video ads on YouTube, so you can watch videos without interruption. <annotation type="learn_more_link">Learn more</annotation></string>
     <string name="ad_blocking_settings_duck_player_header">Duck Player</string>
     <string name="ad_blocking_settings_duck_player_description">Opens videos in a distraction-free theater mode that prevents what you watch from influencing your YouTube feed.</string>
 </resources>

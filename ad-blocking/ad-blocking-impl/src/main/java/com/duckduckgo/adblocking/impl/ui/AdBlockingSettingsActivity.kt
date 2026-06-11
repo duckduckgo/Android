@@ -31,6 +31,8 @@ import com.duckduckgo.browser.api.ui.BrowserScreens
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.spans.DuckDuckGoClickableSpan
 import com.duckduckgo.common.ui.view.addClickableSpan
+import com.duckduckgo.common.ui.view.gone
+import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
@@ -58,17 +60,6 @@ class AdBlockingSettingsActivity : DuckDuckGoActivity() {
         setContentView(binding.root)
         setupToolbar(binding.includeToolbar.toolbar)
 
-        binding.adBlockingDescription.addClickableSpan(
-            textSequence = getText(R.string.ad_blocking_settings_description),
-            spans = listOf(
-                "learn_more_link" to object : DuckDuckGoClickableSpan() {
-                    override fun onClick(widget: View) {
-                        viewModel.onLearnMoreClicked()
-                    }
-                },
-            ),
-        )
-
         binding.blockAdsToggle.setOnCheckedChangeListener(blockAdsToggleListener)
 
         val openDuckPlayerSettings = View.OnClickListener { viewModel.onDuckPlayerClicked() }
@@ -78,10 +69,36 @@ class AdBlockingSettingsActivity : DuckDuckGoActivity() {
         observeViewModel()
     }
 
+    private fun renderDescription(showConsentDescription: Boolean?) {
+        if (showConsentDescription == null) {
+            binding.adBlockingDescription.gone()
+            return
+        }
+        val descriptionRes = if (showConsentDescription) {
+            R.string.ad_blocking_settings_description_with_consent
+        } else {
+            R.string.ad_blocking_settings_description
+        }
+        binding.adBlockingDescription.addClickableSpan(
+            textSequence = getText(descriptionRes),
+            spans = listOf(
+                "learn_more_link" to object : DuckDuckGoClickableSpan() {
+                    override fun onClick(widget: View) {
+                        viewModel.onLearnMoreClicked()
+                    }
+                },
+            ),
+        )
+        binding.adBlockingDescription.show()
+    }
+
     private fun observeViewModel() {
         viewModel.viewState
             .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
-            .onEach { state -> binding.blockAdsToggle.quietlySetIsChecked(state.isEnabled, blockAdsToggleListener) }
+            .onEach { state ->
+                binding.blockAdsToggle.quietlySetIsChecked(state.isEnabled, blockAdsToggleListener)
+                renderDescription(state.showConsentDescription)
+            }
             .launchIn(lifecycleScope)
 
         viewModel.commands

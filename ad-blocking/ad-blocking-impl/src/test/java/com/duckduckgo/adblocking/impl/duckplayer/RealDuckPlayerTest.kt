@@ -33,6 +33,8 @@ import com.duckduckgo.adblocking.api.duckplayer.DuckPlayer.UserPreferences
 import com.duckduckgo.adblocking.api.duckplayer.PrivatePlayerMode.AlwaysAsk
 import com.duckduckgo.adblocking.api.duckplayer.PrivatePlayerMode.Disabled
 import com.duckduckgo.adblocking.api.duckplayer.PrivatePlayerMode.Enabled
+import com.duckduckgo.adblocking.impl.domain.AdBlockingState
+import com.duckduckgo.adblocking.impl.domain.AdBlockingState.Enabled.UserEnabled
 import com.duckduckgo.adblocking.impl.domain.AdBlockingStatusChecker
 import com.duckduckgo.adblocking.impl.duckplayer.DuckPlayerPixelName.DUCK_PLAYER_DAILY_UNIQUE_VIEW
 import com.duckduckgo.adblocking.impl.duckplayer.DuckPlayerPixelName.DUCK_PLAYER_NEWTAB_SETTING_OFF
@@ -103,8 +105,8 @@ class RealDuckPlayerTest {
         setFeatureToggle(true)
         whenever(mockAdBlockingStatusChecker.isShownInSettings()).thenReturn(false)
         whenever(mockAdBlockingStatusChecker.isShownInSettingsFlow()).thenReturn(flowOf(false))
-        whenever(mockAdBlockingStatusChecker.isUserEnabled()).thenReturn(false)
-        whenever(mockAdBlockingStatusChecker.isUserEnabledFlow()).thenReturn(flowOf(false))
+        whenever(mockAdBlockingStatusChecker.currentState()).thenReturn(AdBlockingState.Disabled)
+        whenever(mockAdBlockingStatusChecker.observeState()).thenReturn(flowOf(AdBlockingState.Disabled))
         whenever(mockDuckPlayerFeatureRepository.getDuckPlayerDisabledHelpPageLink())
             .thenReturn(null)
         whenever(mockDuckPlayerFeatureRepository.getVideoIDQueryParam()).thenReturn("v")
@@ -238,7 +240,7 @@ class RealDuckPlayerTest {
     @Test
     fun whenStoredPlayerModeSetThenGetUserPreferencesKeepsItOverDefault() = runTest {
         whenever(mockAdBlockingStatusChecker.isShownInSettings()).thenReturn(true)
-        whenever(mockAdBlockingStatusChecker.isUserEnabled()).thenReturn(true)
+        whenever(mockAdBlockingStatusChecker.currentState()).thenReturn(UserEnabled)
         whenever(mockDuckPlayerFeatureRepository.getUserPreferences()).thenReturn(StoredUserPreferences(false, Enabled))
 
         val result = testee.getUserPreferences()
@@ -249,7 +251,7 @@ class RealDuckPlayerTest {
     @Test
     fun whenAdBlockingShownInSettingsAndUserEnabledAndNoStoredModeThenGetUserPreferencesDefaultsToDisabled() = runTest {
         whenever(mockAdBlockingStatusChecker.isShownInSettings()).thenReturn(true)
-        whenever(mockAdBlockingStatusChecker.isUserEnabled()).thenReturn(true)
+        whenever(mockAdBlockingStatusChecker.currentState()).thenReturn(UserEnabled)
         whenever(mockDuckPlayerFeatureRepository.getUserPreferences()).thenReturn(StoredUserPreferences(false, null))
 
         val result = testee.getUserPreferences()
@@ -260,7 +262,7 @@ class RealDuckPlayerTest {
     @Test
     fun whenAdBlockingShownInSettingsButUserNotEnabledAndNoStoredModeThenGetUserPreferencesDefaultsToAlwaysAsk() = runTest {
         whenever(mockAdBlockingStatusChecker.isShownInSettings()).thenReturn(true)
-        whenever(mockAdBlockingStatusChecker.isUserEnabled()).thenReturn(false)
+        whenever(mockAdBlockingStatusChecker.currentState()).thenReturn(AdBlockingState.Disabled)
         whenever(mockDuckPlayerFeatureRepository.getUserPreferences()).thenReturn(StoredUserPreferences(false, null))
 
         val result = testee.getUserPreferences()
@@ -271,7 +273,18 @@ class RealDuckPlayerTest {
     @Test
     fun whenAdBlockingNotShownInSettingsAndNoStoredModeThenGetUserPreferencesDefaultsToAlwaysAsk() = runTest {
         whenever(mockAdBlockingStatusChecker.isShownInSettings()).thenReturn(false)
-        whenever(mockAdBlockingStatusChecker.isUserEnabled()).thenReturn(true)
+        whenever(mockAdBlockingStatusChecker.currentState()).thenReturn(UserEnabled)
+        whenever(mockDuckPlayerFeatureRepository.getUserPreferences()).thenReturn(StoredUserPreferences(false, null))
+
+        val result = testee.getUserPreferences()
+
+        assertEquals(AlwaysAsk, result.privatePlayerMode)
+    }
+
+    @Test
+    fun whenAdBlockingStateUninitializedAndNoStoredModeThenGetUserPreferencesDefaultsToAlwaysAsk() = runTest {
+        whenever(mockAdBlockingStatusChecker.isShownInSettings()).thenReturn(true)
+        whenever(mockAdBlockingStatusChecker.currentState()).thenReturn(AdBlockingState.Uninitialized)
         whenever(mockDuckPlayerFeatureRepository.getUserPreferences()).thenReturn(StoredUserPreferences(false, null))
 
         val result = testee.getUserPreferences()
@@ -322,7 +335,7 @@ class RealDuckPlayerTest {
     @Test
     fun whenStoredPlayerModeSetThenObserveUserPreferencesKeepsItOverDefault() = runTest {
         whenever(mockAdBlockingStatusChecker.isShownInSettingsFlow()).thenReturn(flowOf(true))
-        whenever(mockAdBlockingStatusChecker.isUserEnabledFlow()).thenReturn(flowOf(true))
+        whenever(mockAdBlockingStatusChecker.observeState()).thenReturn(flowOf(UserEnabled))
         whenever(mockDuckPlayerFeatureRepository.observeUserPreferences()).thenReturn(flowOf(StoredUserPreferences(false, Enabled)))
 
         val result = testee.observeUserPreferences().first()
@@ -333,7 +346,7 @@ class RealDuckPlayerTest {
     @Test
     fun whenAdBlockingShownInSettingsAndUserEnabledAndNoStoredModeThenObserveUserPreferencesDefaultsToDisabled() = runTest {
         whenever(mockAdBlockingStatusChecker.isShownInSettingsFlow()).thenReturn(flowOf(true))
-        whenever(mockAdBlockingStatusChecker.isUserEnabledFlow()).thenReturn(flowOf(true))
+        whenever(mockAdBlockingStatusChecker.observeState()).thenReturn(flowOf(UserEnabled))
         whenever(mockDuckPlayerFeatureRepository.observeUserPreferences()).thenReturn(flowOf(StoredUserPreferences(false, null)))
 
         val result = testee.observeUserPreferences().first()
@@ -344,7 +357,7 @@ class RealDuckPlayerTest {
     @Test
     fun whenAdBlockingShownInSettingsButUserNotEnabledAndNoStoredModeThenObserveUserPreferencesDefaultsToAlwaysAsk() = runTest {
         whenever(mockAdBlockingStatusChecker.isShownInSettingsFlow()).thenReturn(flowOf(true))
-        whenever(mockAdBlockingStatusChecker.isUserEnabledFlow()).thenReturn(flowOf(false))
+        whenever(mockAdBlockingStatusChecker.observeState()).thenReturn(flowOf(AdBlockingState.Disabled))
         whenever(mockDuckPlayerFeatureRepository.observeUserPreferences()).thenReturn(flowOf(StoredUserPreferences(false, null)))
 
         val result = testee.observeUserPreferences().first()
@@ -355,7 +368,7 @@ class RealDuckPlayerTest {
     @Test
     fun whenAdBlockingNotShownInSettingsButUserEnabledAndNoStoredModeThenObserveUserPreferencesDefaultsToAlwaysAsk() = runTest {
         whenever(mockAdBlockingStatusChecker.isShownInSettingsFlow()).thenReturn(flowOf(false))
-        whenever(mockAdBlockingStatusChecker.isUserEnabledFlow()).thenReturn(flowOf(true))
+        whenever(mockAdBlockingStatusChecker.observeState()).thenReturn(flowOf(UserEnabled))
         whenever(mockDuckPlayerFeatureRepository.observeUserPreferences()).thenReturn(flowOf(StoredUserPreferences(false, null)))
 
         val result = testee.observeUserPreferences().first()
@@ -366,7 +379,7 @@ class RealDuckPlayerTest {
     @Test
     fun whenAdBlockingNotShownInSettingsAndNoStoredModeThenObserveUserPreferencesDefaultsToAlwaysAsk() = runTest {
         whenever(mockAdBlockingStatusChecker.isShownInSettingsFlow()).thenReturn(flowOf(false))
-        whenever(mockAdBlockingStatusChecker.isUserEnabledFlow()).thenReturn(flowOf(false))
+        whenever(mockAdBlockingStatusChecker.observeState()).thenReturn(flowOf(AdBlockingState.Disabled))
         whenever(mockDuckPlayerFeatureRepository.observeUserPreferences()).thenReturn(flowOf(StoredUserPreferences(false, null)))
 
         val result = testee.observeUserPreferences().first()
