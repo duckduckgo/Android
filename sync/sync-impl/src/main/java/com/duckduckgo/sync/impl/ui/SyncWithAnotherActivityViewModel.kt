@@ -302,9 +302,7 @@ class SyncWithAnotherActivityViewModel @Inject constructor(
             }
             is DispatchOutcome.Failed -> {
                 cancelTimeout()
-                // Pass the dispatcher's specific code through the shared helper (was force-mapped to
-                // CONNECT_FAILED, discarding it). Always a visible error — bypasses the v1 emitError
-                // catch-all and its AskToSwitchAccount branch.
+                // Always surface v2 failures via the helper; bypass the v1 catch-all (silent no-op) and AskToSwitchAccount.
                 command.send(ShowError(message = outcome.code.toV2PairingErrorMessage(), reason = outcome.reason))
             }
             is DispatchOutcome.JoinerConfirmationRequested ->

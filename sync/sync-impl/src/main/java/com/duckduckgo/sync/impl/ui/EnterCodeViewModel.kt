@@ -158,9 +158,7 @@ class EnterCodeViewModel @Inject constructor(
                 ),
             )
             is DispatchOutcome.Failed -> {
-                // v2 failures must always surface a visible error — never the v1 processError catch-all
-                // (else -> null) which silently no-ops an unrecognised code, and never the v1
-                // AskToSwitchAccount dialog (v2 switches transparently in the dispatcher).
+                // Always surface v2 failures via the helper; bypass the v1 catch-all (silent no-op) and AskToSwitchAccount.
                 viewState.value = viewState.value.copy(authState = AuthState.Idle)
                 command.send(ShowError(message = outcome.code.toV2PairingErrorMessage(), reason = outcome.reason))
             }
