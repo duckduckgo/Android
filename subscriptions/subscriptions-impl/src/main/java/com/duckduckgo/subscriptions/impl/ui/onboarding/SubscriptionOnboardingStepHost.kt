@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 DuckDuckGo
+ * Copyright (c) 2026 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,20 +14,12 @@
  * limitations under the License.
  */
 
-plugins {
-    id 'com.android.library'
-    id 'kotlin-android'
-}
+package com.duckduckgo.subscriptions.impl.ui.onboarding
 
-apply from: "$rootProject.projectDir/gradle/android-library.gradle"
-
-dependencies {
-    implementation project(path: ':navigation-api')
-    implementation project(':js-messaging-api')
-    implementation project(':common-utils')
-    implementation KotlinX.coroutines.core
-}
-
-android {
-    namespace 'com.duckduckgo.subscriptions.api'
+/**
+ * Implemented by the activity hosting the onboarding steps. A step fragment casts its host activity
+ * to this and calls [onStepCompleted] to advance the flow.
+ */
+interface SubscriptionOnboardingStepHost {
+    fun onStepCompleted()
 }

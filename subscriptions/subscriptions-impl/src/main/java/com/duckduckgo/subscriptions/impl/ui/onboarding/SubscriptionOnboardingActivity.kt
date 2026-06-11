@@ -18,6 +18,9 @@ package com.duckduckgo.subscriptions.impl.ui.onboarding
 
 import android.os.Bundle
 import androidx.fragment.app.commit
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.flowWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
@@ -26,12 +29,18 @@ import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.subscriptions.impl.R
 import com.duckduckgo.subscriptions.impl.databinding.ActivitySubscriptionOnboardingBinding
+import com.duckduckgo.subscriptions.impl.ui.onboarding.SubscriptionOnboardingViewModel.Command
+import com.duckduckgo.subscriptions.impl.ui.onboarding.SubscriptionOnboardingViewModel.Command.CloseOnboarding
+import com.duckduckgo.subscriptions.impl.ui.onboarding.SubscriptionOnboardingViewModel.Command.ShowStep
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 
 @InjectWith(ActivityScope::class)
 @ContributeToActivityStarter(SubscriptionOnboardingActivity.Companion.SubscriptionOnboardingScreenWithEmptyParams::class)
-class SubscriptionOnboardingActivity : DuckDuckGoActivity() {
+class SubscriptionOnboardingActivity : DuckDuckGoActivity(), SubscriptionOnboardingStepHost {
 
     private val binding: ActivitySubscriptionOnboardingBinding by viewBinding()
+    private val viewModel: SubscriptionOnboardingViewModel by bindViewModel()
 
     private val toolbar
         get() = binding.includeToolbar.toolbar
@@ -46,10 +55,33 @@ class SubscriptionOnboardingActivity : DuckDuckGoActivity() {
                 replace(R.id.onboardingFragmentContainer, SubscriptionOnboardingDetailsFragment(), DETAILS_FRAGMENT_TAG)
             }
         }
+
+        viewModel.commands()
+            .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
+            .onEach { processCommand(it) }
+            .launchIn(lifecycleScope)
+    }
+
+    override fun onStepCompleted() {
+        viewModel.onStepCompleted()
+    }
+
+    private fun processCommand(command: Command) {
+        when (command) {
+            is ShowStep -> supportFragmentManager.commit {
+                replace(
+                    R.id.onboardingFragmentContainer,
+                    SubscriptionOnboardingStepFragment.instance(command.pluginName),
+                    STEP_FRAGMENT_TAG,
+                )
+            }
+            is CloseOnboarding -> finish()
+        }
     }
 
     companion object {
         private const val DETAILS_FRAGMENT_TAG = "subscriptionOnboardingDetails"
+        private const val STEP_FRAGMENT_TAG = "subscriptionOnboardingStep"
 
         data object SubscriptionOnboardingScreenWithEmptyParams : GlobalActivityStarter.ActivityParams {
             private fun readResolve(): Any = SubscriptionOnboardingScreenWithEmptyParams

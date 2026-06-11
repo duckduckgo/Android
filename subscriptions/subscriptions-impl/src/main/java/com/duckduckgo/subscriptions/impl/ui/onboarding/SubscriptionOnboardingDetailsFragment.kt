@@ -16,10 +16,28 @@
 
 package com.duckduckgo.subscriptions.impl.ui.onboarding
 
+import android.os.Bundle
+import android.view.View
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoFragment
+import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.subscriptions.impl.R
+import com.duckduckgo.subscriptions.impl.databinding.FragmentSubscriptionOnboardingDetailsBinding
 
+/**
+ * The concrete first screen of the onboarding flow (subscription details). Tapping continue starts
+ * the plugin-contributed step sequence via the host.
+ */
 @InjectWith(FragmentScope::class)
-class SubscriptionOnboardingDetailsFragment : DuckDuckGoFragment(R.layout.fragment_subscription_onboarding_details)
+class SubscriptionOnboardingDetailsFragment : DuckDuckGoFragment(R.layout.fragment_subscription_onboarding_details) {
+
+    private val binding: FragmentSubscriptionOnboardingDetailsBinding by viewBinding()
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        binding.continueButton.setOnClickListener {
+            (requireActivity() as SubscriptionOnboardingStepHost).onStepCompleted()
+        }
+    }
+}

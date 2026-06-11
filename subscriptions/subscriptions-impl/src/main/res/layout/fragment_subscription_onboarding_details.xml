@@ -27,4 +27,12 @@
         android:text="@string/subscriptionOnboardingDetailsTitle"
         app:typography="h2" />
 
+    <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
+        android:id="@+id/continueButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:text="@string/subscriptionOnboardingContinueButton"
+        app:daxButtonSize="large" />
+
 </FrameLayout>

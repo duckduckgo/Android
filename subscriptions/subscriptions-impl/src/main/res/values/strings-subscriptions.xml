@@ -204,5 +204,12 @@
 
     <!-- Subscription onboarding -->
     <string name="subscriptionOnboardingDetailsTitle">Subscription details</string>
+    <string name="subscriptionOnboardingContinueButton">Continue</string>
+    <!-- Sample onboarding step (internal only, placeholder) -->
+    <string name="subscriptionOnboardingSampleToolbarTitle">Welcome</string>
+    <string name="subscriptionOnboardingSampleTitle">Sample step</string>
+    <string name="subscriptionOnboardingSampleSubtitle">This is a placeholder onboarding step used to verify the plugin flow.</string>
+    <string name="subscriptionOnboardingSampleLearnMore">Learn More</string>
+    <string name="subscriptionOnboardingSamplePrimaryButton">Next</string>
 
 </resources>
