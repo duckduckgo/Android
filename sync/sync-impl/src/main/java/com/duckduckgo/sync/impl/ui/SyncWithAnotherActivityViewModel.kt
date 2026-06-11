@@ -154,7 +154,7 @@ class SyncWithAnotherActivityViewModel @Inject constructor(
         codeDispatcher.presentV2().collect { outcome ->
             when (outcome) {
                 is DispatchOutcome.LinkingCodeReady -> renderV2QrCode(outcome.linkingCode)
-                else -> handleV2Outcome(outcome, previousPrimaryKey, qrCode = "")
+                else -> handleV2Outcome(outcome, previousPrimaryKey)
             }
         }
     }
@@ -268,17 +268,20 @@ class SyncWithAnotherActivityViewModel @Inject constructor(
                 }
                 is RouteDecision.V2InProgress -> {
                     logcat { "Sync-CodeDispatch: SyncWithAnotherActivityViewModel observing V2InProgress" }
-                    decision.outcomes.collect { handleV2Outcome(it, previousPrimaryKey, qrCode) }
+                    decision.outcomes.collect { handleV2Outcome(it, previousPrimaryKey) }
                 }
             }
         }
     }
 
-    /** Map one v2 [DispatchOutcome] onto this VM's existing command pipeline. */
+    /**
+     * Map one v2 [DispatchOutcome] onto this VM's command pipeline. LoggedIn mirrors v1 Connect
+     * post-success semantics: show recovery to fresh devices (no prior primary key), skip it for
+     * account-switchers.
+     */
     private suspend fun handleV2Outcome(
         outcome: DispatchOutcome,
         previousPrimaryKey: String,
-        qrCode: String,
     ) {
         // Cancel the deep-link timeout only on terminal outcomes; keep it running across confirmation prompts.
         when (outcome) {
@@ -294,7 +297,8 @@ class SyncWithAnotherActivityViewModel @Inject constructor(
             }
             is DispatchOutcome.UpgradeRequired -> {
                 cancelTimeout()
-                emitError(Error(code = CONNECT_FAILED.code, reason = "Code requires protocol v${outcome.codeMajor}"), qrCode)
+                // Peer needs a newer protocol major — show the "please update" string like EnterCode/SyncLogin.
+                command.send(ShowError(R.string.sync_flows_disabled_new_version, "Code requires protocol v${outcome.codeMajor}"))
             }
             is DispatchOutcome.Failed -> {
                 cancelTimeout()

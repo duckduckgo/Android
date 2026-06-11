@@ -149,9 +149,11 @@ class SyncConnectViewModel @Inject constructor(
                 fireLoginPixels()
                 command.send(LoginSuccess)
             }
-            is DispatchOutcome.UpgradeRequired,
-            is DispatchOutcome.Failed,
-            -> command.send(ShowError(R.string.sync_connect_login_error))
+            // Peer needs a newer protocol major — show the "please update" string like EnterCode/SyncLogin.
+            is DispatchOutcome.UpgradeRequired ->
+                command.send(ShowError(R.string.sync_flows_disabled_new_version, "Code requires protocol v${outcome.codeMajor}"))
+            is DispatchOutcome.Failed ->
+                command.send(ShowError(message = outcome.code.toV2PairingErrorMessage(), reason = outcome.reason))
         }
     }
 

@@ -30,9 +30,11 @@ import com.duckduckgo.sync.impl.AccountErrorCodes.ALREADY_SIGNED_IN
 import com.duckduckgo.sync.impl.AccountErrorCodes.CONNECT_FAILED
 import com.duckduckgo.sync.impl.AccountErrorCodes.LOGIN_FAILED
 import com.duckduckgo.sync.impl.AccountInfo
+import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2CodeParseResult
 import com.duckduckgo.sync.impl.Clipboard
 import com.duckduckgo.sync.impl.ConnectCode
 import com.duckduckgo.sync.impl.QREncoder
+import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.RecoveryCode
 import com.duckduckgo.sync.impl.Result
 import com.duckduckgo.sync.impl.SyncAccountRepository
@@ -53,8 +55,10 @@ import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command.AskJoinerConfirm
 import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command.LoginSuccess
 import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command.ShowError
 import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
@@ -753,5 +757,54 @@ class SyncConnectViewModelTest {
             cancelAndIgnoreRemainingEvents()
         }
         verify(runner, times(1)).startPresent()
+    }
+
+    @Test
+    fun whenV2PairingRejectedByPeerThenShowError() = runTest {
+        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
+        whenever(syncRepository.getAccountInfo()).thenReturn(AccountInfo())
+        val scannedCode = "https://duckduckgo.com/sync/pairing/#&code2=v2code"
+        whenever(qrCode.parse(scannedCode)).thenReturn(
+            ExchangeV2CodeParseResult.LinkingV2(channelId = "c", publicKey = "k", version = "2"),
+        )
+        whenever(runner.eventsSince(any())).thenReturn(
+            flowOf(
+                ExchangeV2Event.Transition(
+                    timestampMs = 0L,
+                    from = ExchangeV2State.Joiner.Confirming,
+                    to = ExchangeV2State.Joiner.AbortedByHost,
+                    trigger = ExchangeV2Message.RecoveryCodeDenied(rawJson = "{}"),
+                    localTrigger = null,
+                ),
+            ),
+        )
+
+        testee.commands().test {
+            testee.onQRCodeScanned(scannedCode)
+            val command = awaitItem()
+            assertTrue("expected ShowError, got $command", command is ShowError)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenV2UpgradeRequiredThenShowUpdateError() = runTest {
+        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
+        whenever(syncRepository.getAccountInfo()).thenReturn(AccountInfo())
+        val scannedCode = "https://duckduckgo.com/sync/pairing/#&code2=v2code"
+        whenever(qrCode.parse(scannedCode)).thenReturn(
+            ExchangeV2CodeParseResult.LinkingV2(channelId = "c", publicKey = "k", version = "2"),
+        )
+        whenever(runner.eventsSince(any())).thenReturn(
+            flowOf(ExchangeV2Event.SessionError(timestampMs = 0L, message = "Peer requires protocol v3; please update this app")),
+        )
+
+        testee.commands().test {
+            testee.onQRCodeScanned(scannedCode)
+            val command = awaitItem()
+            assertTrue("expected ShowError, got $command", command is ShowError)
+            assertEquals(R.string.sync_flows_disabled_new_version, (command as ShowError).message)
+            cancelAndIgnoreRemainingEvents()
+        }
     }
 }

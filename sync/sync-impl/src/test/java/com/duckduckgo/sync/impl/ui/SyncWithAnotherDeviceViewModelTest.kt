@@ -44,6 +44,7 @@ import com.duckduckgo.sync.impl.ExchangeResult.AccountSwitchingRequired
 import com.duckduckgo.sync.impl.ExchangeResult.LoggedIn
 import com.duckduckgo.sync.impl.InvitationCode
 import com.duckduckgo.sync.impl.QREncoder
+import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.RealSyncCodeDispatcher
 import com.duckduckgo.sync.impl.RecoveryCode
 import com.duckduckgo.sync.impl.Result
@@ -69,8 +70,10 @@ import com.duckduckgo.sync.impl.ui.SyncWithAnotherActivityViewModel.Command.Logi
 import com.duckduckgo.sync.impl.ui.SyncWithAnotherActivityViewModel.Command.ShowError
 import com.duckduckgo.sync.impl.ui.SyncWithAnotherActivityViewModel.Command.SwitchAccountSuccess
 import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
@@ -734,6 +737,27 @@ class SyncWithAnotherDeviceViewModelTest {
             )
             val command = awaitItem()
             assertTrue("expected ShowError, got $command", command is ShowError)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenV2UpgradeRequiredThenShowUpdateError() = runTest {
+        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
+        whenever(syncRepository.getAccountInfo()).thenReturn(accountA)
+        val scannedCode = "https://duckduckgo.com/sync/pairing/#&code2=v2code"
+        whenever(qrCode.parse(scannedCode)).thenReturn(
+            ExchangeV2CodeParseResult.LinkingV2(channelId = "c", publicKey = "k", version = "2"),
+        )
+        whenever(runner.eventsSince(any())).thenReturn(
+            flowOf(ExchangeV2Event.SessionError(timestampMs = 0L, message = "Peer requires protocol v3; please update this app")),
+        )
+
+        testee.commands().test {
+            testee.onQRCodeScanned(scannedCode)
+            val command = awaitItem()
+            assertTrue("expected ShowError, got $command", command is ShowError)
+            assertEquals(R.string.sync_flows_disabled_new_version, (command as ShowError).message)
             cancelAndIgnoreRemainingEvents()
         }
     }
