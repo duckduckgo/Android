@@ -28,43 +28,27 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:gravity="center"
             android:orientation="vertical"
             android:padding="@dimen/keyline_5">
 
-            <ImageView
-                android:layout_width="108dp"
-                android:layout_height="108dp"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginTop="@dimen/keyline_5"
-                app:srcCompat="@drawable/ic_privacy_pro_color_24"
-                tools:ignore="ContentDescription" />
-
             <com.duckduckgo.common.ui.view.text.DaxTextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/keyline_5"
                 android:gravity="center"
-                android:text="@string/subscriptionOnboardingSampleTitle"
+                android:text="@string/subscriptionOnboardingSummaryTitle"
                 app:typography="h1" />
 
             <com.duckduckgo.common.ui.view.text.DaxTextView
+                android:id="@+id/completionPercent"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/keyline_4"
                 android:gravity="center"
-                android:text="@string/subscriptionOnboardingSampleSubtitle"
                 app:textType="secondary"
-                app:typography="body1" />
-
-            <com.duckduckgo.common.ui.view.text.DaxTextView
-                android:id="@+id/learnMore"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/keyline_4"
-                android:gravity="center"
-                android:text="@string/subscriptionOnboardingSampleLearnMore"
-                android:textColor="?attr/daxColorAccentBlue"
-                app:typography="body1" />
+                app:typography="body1"
+                tools:text="100% complete" />
 
         </LinearLayout>
 
@@ -74,18 +58,8 @@
         android:id="@+id/primaryButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="@dimen/keyline_5"
-        android:layout_marginTop="@dimen/keyline_5"
-        android:text="@string/subscriptionOnboardingSamplePrimaryButton"
-        app:daxButtonSize="large" />
-
-    <com.duckduckgo.common.ui.view.button.DaxButtonGhost
-        android:id="@+id/secondaryButton"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="@dimen/keyline_5"
-        android:layout_marginBottom="@dimen/keyline_4"
-        android:text="@string/subscriptionOnboardingSampleSecondaryButton"
+        android:layout_margin="@dimen/keyline_5"
+        android:text="@string/subscriptionOnboardingSummaryButton"
         app:daxButtonSize="large" />
 
 </merge>

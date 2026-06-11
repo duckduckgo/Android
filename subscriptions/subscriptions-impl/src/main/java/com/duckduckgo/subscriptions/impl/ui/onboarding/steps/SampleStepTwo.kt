@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.subscriptions.impl.ui.onboarding.sample
+package com.duckduckgo.subscriptions.impl.ui.onboarding.steps
 
 import android.content.Context
 import android.view.View
@@ -22,29 +22,32 @@ import com.duckduckgo.anvil.annotations.ContributesActivePlugin
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.subscriptions.api.SubscriptionOnboardingStepNavigator
 import com.duckduckgo.subscriptions.api.SubscriptionOnboardingStepPlugin
+import com.duckduckgo.subscriptions.api.SubscriptionOnboardingStepType
 import com.duckduckgo.subscriptions.impl.R
 import javax.inject.Inject
 
 /**
- * Sample onboarding step used to exercise the flow end-to-end on internal builds. Safe to delete
- * once real feature steps (VPN, Duck.ai, …) are contributed. Add a second sample with a higher
- * `priority` to verify multi-step ordering and the final close.
+ * A second sample STEP (higher priority) so multi-step ordering, completion % and back navigation
+ * can be verified. Reuses [SampleStepView] since it's an identical placeholder. Safe to delete with
+ * the other placeholders.
  */
 @ContributesActivePlugin(
     AppScope::class,
     boundType = SubscriptionOnboardingStepPlugin::class,
-    priority = 10,
-    featureName = "pluginSampleSubscriptionOnboardingStep",
+    priority = 20,
+    featureName = "pluginSampleSubscriptionOnboardingStepTwo",
     parentFeatureName = "pluginPointSubscriptionOnboardingStep",
 )
-class SampleOnboardingStepPlugin @Inject constructor() : SubscriptionOnboardingStepPlugin {
+class SampleStepTwoPlugin @Inject constructor() : SubscriptionOnboardingStepPlugin {
 
-    override val name = "sampleStep"
+    override val name = "sampleStepTwo"
 
-    override val toolbarTitle = R.string.subscriptionOnboardingSampleToolbarTitle
+    override val toolbarTitle = R.string.subscriptionOnboardingSampleTwoToolbarTitle
+
+    override val stepType = SubscriptionOnboardingStepType.STEP
 
     override fun getOnboardingStepView(
         context: Context,
         navigator: SubscriptionOnboardingStepNavigator,
-    ): View = SampleOnboardingStepView(context).apply { this.navigator = navigator }
+    ): View = SampleStepView(context).apply { this.navigator = navigator }
 }

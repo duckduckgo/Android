@@ -107,7 +107,8 @@ import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Purchas
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionsWebViewActivityWithParams.ToolbarConfig
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionsWebViewActivityWithParams.ToolbarConfig.CustomTitle
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionsWebViewActivityWithParams.ToolbarConfig.DaxSubscription
-import com.duckduckgo.subscriptions.impl.ui.onboarding.SubscriptionOnboardingActivity.Companion.SubscriptionOnboardingScreenWithEmptyParams
+import com.duckduckgo.subscriptions.impl.ui.onboarding.SubscriptionOnboardingActivity.Companion.SubscriptionOnboardingScreenWithParams
+import com.duckduckgo.subscriptions.impl.ui.onboarding.SubscriptionOnboardingOrigin
 import com.duckduckgo.subscriptions.impl.wideevents.SubscriptionRestoreWideEvent
 import com.duckduckgo.user.agent.api.UserAgentProvider
 import com.google.android.material.snackbar.Snackbar
@@ -573,7 +574,7 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
         // Only finish the WebView if the onboarding screen actually launched, so a launch failure
         // can't leave the user on a black/closed screen; log the cause if it does fail.
         val launched = runCatching {
-            globalActivityStarter.start(this, SubscriptionOnboardingScreenWithEmptyParams)
+            globalActivityStarter.start(this, SubscriptionOnboardingScreenWithParams(SubscriptionOnboardingOrigin.PURCHASE))
         }.onFailure { logcat(ERROR) { "Subscription onboarding launch failed: ${it.asLog()}" } }.isSuccess
         if (launched) finish()
     }

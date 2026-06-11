@@ -14,28 +14,56 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.subscriptions.impl.ui.onboarding.sample
+package com.duckduckgo.subscriptions.impl.ui.onboarding.steps
 
 import android.content.Context
 import android.util.AttributeSet
+import android.view.View
 import android.widget.LinearLayout
+import com.duckduckgo.anvil.annotations.ContributesActivePlugin
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.viewbinding.viewBinding
+import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.subscriptions.api.SubscriptionOnboardingStepNavigator
+import com.duckduckgo.subscriptions.api.SubscriptionOnboardingStepPlugin
+import com.duckduckgo.subscriptions.api.SubscriptionOnboardingStepType
 import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionsSettingsScreenWithEmptyParams
+import com.duckduckgo.subscriptions.impl.R
 import com.duckduckgo.subscriptions.impl.databinding.ViewSampleOnboardingStepBinding
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
 
 /**
- * Placeholder content view for [SampleOnboardingStepPlugin]. Declares its own header, content and
- * primary button, navigates a "Learn More" link to a native screen, and finishes the step via the
- * injected [navigator].
+ * Sample onboarding STEP used to exercise the flow end-to-end on internal builds. The primary button
+ * completes the step (persisted) and advances; the secondary button skips to the next without
+ * completing; the "Learn More" link navigates to a native screen. Safe to delete once real feature
+ * steps (VPN, Duck.ai, …) are contributed.
  */
+@ContributesActivePlugin(
+    AppScope::class,
+    boundType = SubscriptionOnboardingStepPlugin::class,
+    priority = 10,
+    featureName = "pluginSampleSubscriptionOnboardingStep",
+    parentFeatureName = "pluginPointSubscriptionOnboardingStep",
+)
+class SampleStepPlugin @Inject constructor() : SubscriptionOnboardingStepPlugin {
+
+    override val name = "sampleStep"
+
+    override val toolbarTitle = R.string.subscriptionOnboardingSampleToolbarTitle
+
+    override val stepType = SubscriptionOnboardingStepType.STEP
+
+    override fun getOnboardingStepView(
+        context: Context,
+        navigator: SubscriptionOnboardingStepNavigator,
+    ): View = SampleStepView(context).apply { this.navigator = navigator }
+}
+
 @InjectWith(ViewScope::class)
-class SampleOnboardingStepView @JvmOverloads constructor(
+class SampleStepView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyle: Int = 0,
@@ -59,8 +87,7 @@ class SampleOnboardingStepView @JvmOverloads constructor(
         binding.learnMore.setOnClickListener {
             globalActivityStarter.start(context, SubscriptionsSettingsScreenWithEmptyParams)
         }
-        binding.primaryButton.setOnClickListener {
-            navigator?.onStepComplete()
-        }
+        binding.primaryButton.setOnClickListener { navigator?.onStepCompleted() }
+        binding.secondaryButton.setOnClickListener { navigator?.onNextStep() }
     }
 }

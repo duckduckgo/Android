@@ -17,6 +17,7 @@
 package com.duckduckgo.subscriptions.impl.ui.onboarding
 
 import android.os.Bundle
+import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.commit
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
@@ -27,6 +28,7 @@ import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
+import com.duckduckgo.navigation.api.getActivityParams
 import com.duckduckgo.subscriptions.impl.R
 import com.duckduckgo.subscriptions.impl.databinding.ActivitySubscriptionOnboardingBinding
 import com.duckduckgo.subscriptions.impl.ui.onboarding.SubscriptionOnboardingViewModel.Command
@@ -36,7 +38,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
 @InjectWith(ActivityScope::class)
-@ContributeToActivityStarter(SubscriptionOnboardingActivity.Companion.SubscriptionOnboardingScreenWithEmptyParams::class)
+@ContributeToActivityStarter(SubscriptionOnboardingActivity.Companion.SubscriptionOnboardingScreenWithParams::class)
 class SubscriptionOnboardingActivity : DuckDuckGoActivity(), SubscriptionOnboardingStepHost {
 
     private val binding: ActivitySubscriptionOnboardingBinding by viewBinding()
@@ -50,20 +52,34 @@ class SubscriptionOnboardingActivity : DuckDuckGoActivity(), SubscriptionOnboard
         setContentView(binding.root)
         setupToolbar(toolbar)
 
-        if (supportFragmentManager.findFragmentByTag(DETAILS_FRAGMENT_TAG) == null) {
-            supportFragmentManager.commit {
-                replace(R.id.onboardingFragmentContainer, SubscriptionOnboardingDetailsFragment(), DETAILS_FRAGMENT_TAG)
-            }
-        }
+        // Back (system + toolbar up arrow, which routes through onBackPressed) walks the session stack.
+        onBackPressedDispatcher.addCallback(
+            this,
+            object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() = viewModel.onBackStep()
+            },
+        )
 
         viewModel.commands()
             .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
             .onEach { processCommand(it) }
             .launchIn(lifecycleScope)
+
+        val origin = intent.getActivityParams(SubscriptionOnboardingScreenWithParams::class.java)?.origin
+            ?: SubscriptionOnboardingOrigin.PURCHASE
+        viewModel.start(origin)
     }
 
     override fun onStepCompleted() {
         viewModel.onStepCompleted()
+    }
+
+    override fun onNextStep() {
+        viewModel.onNextStep()
+    }
+
+    override fun onBackStep() {
+        viewModel.onBackStep()
     }
 
     private fun processCommand(command: Command) {
@@ -80,11 +96,10 @@ class SubscriptionOnboardingActivity : DuckDuckGoActivity(), SubscriptionOnboard
     }
 
     companion object {
-        private const val DETAILS_FRAGMENT_TAG = "subscriptionOnboardingDetails"
         private const val STEP_FRAGMENT_TAG = "subscriptionOnboardingStep"
 
-        data object SubscriptionOnboardingScreenWithEmptyParams : GlobalActivityStarter.ActivityParams {
-            private fun readResolve(): Any = SubscriptionOnboardingScreenWithEmptyParams
-        }
+        data class SubscriptionOnboardingScreenWithParams(
+            val origin: SubscriptionOnboardingOrigin,
+        ) : GlobalActivityStarter.ActivityParams
     }
 }

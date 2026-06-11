@@ -30,6 +30,7 @@ import com.duckduckgo.common.utils.plugins.ActivePluginPoint
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.subscriptions.api.SubscriptionOnboardingStepNavigator
 import com.duckduckgo.subscriptions.api.SubscriptionOnboardingStepPlugin
+import com.duckduckgo.subscriptions.api.SubscriptionOnboardingStepType.INTRO
 import com.duckduckgo.subscriptions.impl.R
 import com.duckduckgo.subscriptions.impl.databinding.FragmentSubscriptionOnboardingStepBinding
 import kotlinx.coroutines.launch
@@ -60,14 +61,21 @@ class SubscriptionOnboardingStepFragment : DuckDuckGoFragment(R.layout.fragment_
     private fun bindStep(plugin: SubscriptionOnboardingStepPlugin) {
         (requireActivity() as? AppCompatActivity)?.supportActionBar?.setTitle(plugin.toolbarTitle)
 
-        val navigator = SubscriptionOnboardingStepNavigator {
-            (requireActivity() as SubscriptionOnboardingStepHost).onStepCompleted()
+        val host = requireActivity() as SubscriptionOnboardingStepHost
+        val navigator = object : SubscriptionOnboardingStepNavigator {
+            override fun onStepCompleted() = host.onStepCompleted()
+            override fun onNextStep() = host.onNextStep()
+            override fun onBackStep() = host.onBackStep()
         }
         binding.stepContainer.removeAllViews()
         binding.stepContainer.addView(
             plugin.getOnboardingStepView(requireContext(), navigator),
             FrameLayout.LayoutParams(MATCH_PARENT, MATCH_PARENT),
         )
+
+        if (plugin.stepType == INTRO) {
+            binding.konfettiView.launchOnboardingConfetti()
+        }
     }
 
     companion object {

@@ -22,27 +22,37 @@ import androidx.annotation.StringRes
 import com.duckduckgo.common.utils.plugins.ActivePlugin
 
 /**
- * A single step in the native subscription onboarding flow.
+ * A single screen in the native subscription onboarding flow.
  *
- * Steps are contributed as plugins (from any module) so that each feature — VPN, Duck.ai, etc. —
- * can showcase itself. Steps are displayed in order of their plugin `priority`. The host screen is
- * intentionally thin: it owns only the toolbar title and hosts the plugin's view. The plugin owns
- * its entire layout (icon, headline, subtitle, any "Learn More" links, feature content and the
- * buttons) and decides when the step is finished by calling [SubscriptionOnboardingStepNavigator].
+ * Screens are contributed as plugins (from any module) so that each feature — VPN, Duck.ai, etc. —
+ * can showcase itself. They are displayed in order: the [SubscriptionOnboardingStepType.INTRO]
+ * first, then the [SubscriptionOnboardingStepType.STEP]s by plugin `priority`, then the
+ * [SubscriptionOnboardingStepType.SUMMARY] last.
+ *
+ * The host screen is intentionally thin: it owns only the toolbar title (and confetti for INTRO).
+ * The plugin owns its entire layout (header, content, buttons) and decides when the screen is
+ * finished by calling [SubscriptionOnboardingStepNavigator].
  */
 interface SubscriptionOnboardingStepPlugin : ActivePlugin {
 
-    /** Stable id used to re-resolve this step after fragment/process recreation. */
+    /** Stable id used to re-resolve this screen after fragment/process recreation and to persist progress. */
     val name: String
 
-    /** Title shown in the host toolbar while this step is active. */
+    /** Title shown in the host toolbar while this screen is active. */
     @get:StringRes
     val toolbarTitle: Int
 
     /**
+     * Whether this is the intro screen, a real (counting) step, or the final summary. Only
+     * [SubscriptionOnboardingStepType.STEP] screens count toward the completion percentage.
+     */
+    val stepType: SubscriptionOnboardingStepType
+        get() = SubscriptionOnboardingStepType.STEP
+
+    /**
      * The plugin's entire view: header, feature content and buttons. The plugin owns this layout,
      * any link navigation and any module-specific button actions. It fills the whole host body and
-     * calls [navigator] when the step is finished.
+     * drives the flow through [navigator].
      */
     fun getOnboardingStepView(
         context: Context,
@@ -50,13 +60,31 @@ interface SubscriptionOnboardingStepPlugin : ActivePlugin {
     ): View
 }
 
+enum class SubscriptionOnboardingStepType {
+    /** Shown only when onboarding is entered after a purchase. Does NOT count toward completion. */
+    INTRO,
+
+    /** A real onboarding step. Counts toward the completion percentage. */
+    STEP,
+
+    /** The final summary screen showing total completion. Does NOT count toward completion. */
+    SUMMARY,
+}
+
 /**
- * Passed by the host into each step's view so the step can advance the flow.
+ * Passed by the host into each screen's view so the screen can drive the flow.
  */
-fun interface SubscriptionOnboardingStepNavigator {
+interface SubscriptionOnboardingStepNavigator {
+
     /**
-     * Call when this step is finished — after any module-specific action, synchronously or async.
-     * Advances to the next ordered step, or closes the onboarding screen if this was the last one.
+     * Mark the current step as completed (persisted across sessions) AND advance to the next screen.
+     * Has no completion effect on INTRO/SUMMARY screens — it just advances.
      */
-    fun onStepComplete()
+    fun onStepCompleted()
+
+    /** Advance to the next screen WITHOUT marking the current step completed (e.g. a "skip" button). */
+    fun onNextStep()
+
+    /** Go back to the previous screen visited in this session (also triggered by the toolbar back arrow). */
+    fun onBackStep()
 }

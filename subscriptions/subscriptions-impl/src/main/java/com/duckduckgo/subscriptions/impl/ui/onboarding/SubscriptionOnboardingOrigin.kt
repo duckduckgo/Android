@@ -17,16 +17,8 @@
 package com.duckduckgo.subscriptions.impl.ui.onboarding
 
 /**
- * Implemented by the activity hosting the onboarding steps. A step fragment casts its host activity
- * to this and calls these to drive the flow.
+ * Where the onboarding flow was entered from.
+ * - [PURCHASE]: just bought a subscription — start at the intro (with confetti).
+ * - [SETTINGS]: re-entered from Subscription Settings — skip the intro and resume at the last step.
  */
-interface SubscriptionOnboardingStepHost {
-    /** Mark the current step completed (persisted) and advance. */
-    fun onStepCompleted()
-
-    /** Advance without completing the current step. */
-    fun onNextStep()
-
-    /** Go back to the previous screen in this session. */
-    fun onBackStep()
-}
+enum class SubscriptionOnboardingOrigin { PURCHASE, SETTINGS }

@@ -37,14 +37,22 @@
     <string name="subscriptionExpirationReminderNotificationDescription">Tap to review your subscription and stay protected.</string>
 
     <!-- Subscription onboarding -->
-    <string name="subscriptionOnboardingDetailsTitle">Subscription details</string>
-    <string name="subscriptionOnboardingContinueButton">Continue</string>
     <string name="subscriptionOnboardingEntryPoint">Onboarding</string>
-    <!-- Sample onboarding step (internal only, placeholder) -->
-    <string name="subscriptionOnboardingSampleToolbarTitle">Welcome</string>
+    <!-- Onboarding placeholder screens (internal only, to be replaced by real steps) -->
+    <string name="subscriptionOnboardingIntroToolbarTitle">Welcome</string>
+    <string name="subscriptionOnboardingIntroTitle">You\'re subscribed!</string>
+    <string name="subscriptionOnboardingIntroSubtitle">Placeholder intro screen shown after purchase, with a confetti celebration.</string>
+    <string name="subscriptionOnboardingIntroButton">Get started</string>
+    <string name="subscriptionOnboardingSampleToolbarTitle">Sample step</string>
+    <string name="subscriptionOnboardingSampleTwoToolbarTitle">Sample step 2</string>
     <string name="subscriptionOnboardingSampleTitle">Sample step</string>
     <string name="subscriptionOnboardingSampleSubtitle">This is a placeholder onboarding step used to verify the plugin flow.</string>
     <string name="subscriptionOnboardingSampleLearnMore">Learn More</string>
     <string name="subscriptionOnboardingSamplePrimaryButton">Next</string>
+    <string name="subscriptionOnboardingSampleSecondaryButton">Skip</string>
+    <string name="subscriptionOnboardingSummaryToolbarTitle">All done</string>
+    <string name="subscriptionOnboardingSummaryTitle">Onboarding complete</string>
+    <string name="subscriptionOnboardingSummaryPercent" instruction="Placeholder is a completion percentage between 0 and 100">%1$d%% complete</string>
+    <string name="subscriptionOnboardingSummaryButton">Done</string>
 
 </resources>

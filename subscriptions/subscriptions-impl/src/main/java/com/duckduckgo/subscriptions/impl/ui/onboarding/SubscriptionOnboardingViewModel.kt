@@ -22,6 +22,11 @@ import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.plugins.ActivePluginPoint
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.subscriptions.api.SubscriptionOnboardingStepPlugin
+import com.duckduckgo.subscriptions.api.SubscriptionOnboardingStepType
+import com.duckduckgo.subscriptions.api.SubscriptionOnboardingStepType.INTRO
+import com.duckduckgo.subscriptions.api.SubscriptionOnboardingStepType.STEP
+import com.duckduckgo.subscriptions.api.SubscriptionOnboardingStepType.SUMMARY
+import com.duckduckgo.subscriptions.impl.store.SubscriptionOnboardingDataStore
 import com.duckduckgo.subscriptions.impl.ui.onboarding.SubscriptionOnboardingViewModel.Command.CloseOnboarding
 import com.duckduckgo.subscriptions.impl.ui.onboarding.SubscriptionOnboardingViewModel.Command.ShowStep
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
@@ -32,33 +37,105 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 /**
- * Drives the order-based step sequence after the (concrete) details screen.
+ * Orchestrates the onboarding flow: an ordered list of screens (an optional [INTRO], the real
+ * [STEP]s by priority, then an optional [SUMMARY]).
  *
- * The first screen shown by the activity is the details fragment (`currentIndex == -1`). Each time a
- * step finishes, [onStepCompleted] advances to the next ordered plugin, or closes onboarding when
- * there are no more plugins.
+ * - From [SubscriptionOnboardingOrigin.PURCHASE] the flow starts at the first screen (the INTRO when present).
+ * - From [SubscriptionOnboardingOrigin.SETTINGS] the INTRO is skipped and the flow resumes at the last visited step.
+ *
+ * Completion of a STEP is persisted via [SubscriptionOnboardingDataStore]. A session back stack
+ * supports the toolbar back arrow (which can return onto an already-completed step).
  */
 @ContributesViewModel(ActivityScope::class)
 class SubscriptionOnboardingViewModel @Inject constructor(
     private val stepPlugins: ActivePluginPoint<SubscriptionOnboardingStepPlugin>,
+    private val dataStore: SubscriptionOnboardingDataStore,
 ) : ViewModel() {
+
+    private data class Screen(val name: String, val type: SubscriptionOnboardingStepType)
 
     private val command = Channel<Command>(1, DROP_OLDEST)
     internal fun commands(): Flow<Command> = command.receiveAsFlow()
 
-    private var steps: List<String>? = null
-    private var currentIndex = -1
+    private var screens: List<Screen> = emptyList()
+    private val backStack = mutableListOf<Int>()
+    private var started = false
+
+    fun start(origin: SubscriptionOnboardingOrigin) {
+        if (started) return
+        started = true
+        viewModelScope.launch {
+            screens = buildScreens()
+            val startIndex = startIndexFor(origin)
+            if (startIndex == null) {
+                command.send(CloseOnboarding)
+                return@launch
+            }
+            goTo(startIndex)
+        }
+    }
 
     fun onStepCompleted() {
         viewModelScope.launch {
-            val orderedSteps = steps ?: stepPlugins.getPlugins().map { it.name }.also { steps = it }
-            currentIndex++
-            val next = if (currentIndex <= orderedSteps.lastIndex) {
-                ShowStep(orderedSteps[currentIndex])
+            currentScreen()?.let { if (it.type == STEP) dataStore.markCompleted(it.name) }
+            advance()
+        }
+    }
+
+    fun onNextStep() {
+        viewModelScope.launch { advance() }
+    }
+
+    fun onBackStep() {
+        viewModelScope.launch {
+            if (backStack.size > 1) {
+                backStack.removeAt(backStack.lastIndex)
+                goToCurrent()
             } else {
-                CloseOnboarding
+                command.send(CloseOnboarding)
             }
-            command.send(next)
+        }
+    }
+
+    private suspend fun advance() {
+        val nextIndex = (backStack.lastOrNull() ?: -1) + 1
+        if (nextIndex <= screens.lastIndex) {
+            backStack.add(nextIndex)
+            goToCurrent()
+        } else {
+            command.send(CloseOnboarding)
+        }
+    }
+
+    private suspend fun goTo(index: Int) {
+        backStack.add(index)
+        goToCurrent()
+    }
+
+    private suspend fun goToCurrent() {
+        val screen = currentScreen() ?: return
+        dataStore.lastVisitedStep = screen.name
+        command.send(ShowStep(screen.name))
+    }
+
+    private fun currentScreen(): Screen? = backStack.lastOrNull()?.let { screens.getOrNull(it) }
+
+    private suspend fun buildScreens(): List<Screen> {
+        val plugins = stepPlugins.getPlugins()
+        val ordered = plugins.filter { it.stepType == INTRO } +
+            plugins.filter { it.stepType == STEP } +
+            plugins.filter { it.stepType == SUMMARY }
+        return ordered.map { Screen(it.name, it.stepType) }
+    }
+
+    private fun startIndexFor(origin: SubscriptionOnboardingOrigin): Int? {
+        if (screens.isEmpty()) return null
+        return when (origin) {
+            SubscriptionOnboardingOrigin.PURCHASE -> 0
+            SubscriptionOnboardingOrigin.SETTINGS -> {
+                val resume = screens.indexOfFirst { it.name == dataStore.lastVisitedStep && it.type != INTRO }
+                if (resume != -1) resume else screens.indexOfFirst { it.type != INTRO }.takeIf { it != -1 }
+            }
         }
     }
 
