@@ -60,6 +60,7 @@ data class DaxSubscriptionBrandDesignUpdateBubbleCta(
     onboardingImprovementsV2Enabled = onboardingImprovementsV2Enabled,
 ),
     DaxBubbleCta.ShowsWavingDax {
+    override val backgroundFillSpec = BackgroundFillSpec(fillHeightDp = 190f, tabletFillHeightDp = 280f, maxHeightFraction = 0.4f)
     override val activeIncludeId: Int = R.id.primaryCta
     override val showArrow: Boolean = true
     override val restartWavingDax: Boolean = true
