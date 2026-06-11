@@ -149,7 +149,6 @@ interface DuckChatPixels {
     fun reportNativeStorageReaderUsed(native: Boolean)
     fun reportNativeStorageDeletionUsed(native: Boolean)
     fun reportVoiceSessionStarted()
-    fun reportVoiceNotificationOpenChatTapped()
     fun reportVoiceNotificationEndChatTapped()
     fun reportVoiceServiceStarted()
     fun reportVoiceServiceKilled()
@@ -408,10 +407,6 @@ class RealDuckChatPixels @Inject constructor(
 
     override fun reportVoiceSessionStarted() {
         pixel.fire(DuckChatPixelName.DUCK_CHAT_VOICE_SESSION_STARTED)
-    }
-
-    override fun reportVoiceNotificationOpenChatTapped() {
-        pixel.fire(DuckChatPixelName.DUCK_CHAT_VOICE_NOTIFICATION_OPEN_CHAT_TAPPED)
     }
 
     override fun reportVoiceNotificationEndChatTapped() {
