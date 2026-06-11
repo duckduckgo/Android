@@ -17,6 +17,7 @@
 package com.duckduckgo.duckchat.impl.contextual
 
 import android.content.Context
+import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.annotation.VisibleForTesting
 import androidx.core.net.toUri
@@ -81,10 +82,24 @@ class DuckChatContextualViewModel @Inject constructor(
         WEBVIEW,
     }
 
-    enum class QuickActionState(@StringRes val labelResId: Int) {
-        LEGACY_SUMMARIZE(R.string.duckAIContextualPromptSummarize),
-        ASK_ABOUT_PAGE(R.string.duckAIContextualPromptAskAboutPage),
-        SUBMIT_SUMMARIZE(R.string.duckAIContextualPromptSummarize),
+    enum class QuickActionState(
+        @StringRes val labelResId: Int,
+        @DrawableRes val iconResId: Int,
+    ) {
+        LEGACY_SUMMARIZE(
+            labelResId = R.string.duckAIContextualPromptSummarize,
+            iconResId = com.duckduckgo.mobile.android.R.drawable.ic_arrow_down_right_16,
+        ),
+        ASK_ABOUT_PAGE(
+            labelResId = R.string.duckAIContextualPromptAskAboutPage,
+            iconResId = R.drawable.ic_context_action_16,
+        ),
+
+        // TODO: swap to dedicated summarize icon when SVG is available
+        SUBMIT_SUMMARIZE(
+            labelResId = R.string.duckAIContextualPromptSummarize,
+            iconResId = R.drawable.ic_context_action_16,
+        ),
     }
 
     private var fullModeUrl: String = ""
@@ -123,7 +138,6 @@ class DuckChatContextualViewModel @Inject constructor(
                 prompt = "",
                 isFireButtonEnabled = false,
                 quickActionState = QuickActionState.LEGACY_SUMMARIZE,
-                chatHintResId = R.string.input_screen_chat_hint,
             ),
         )
     val viewState: StateFlow<ViewState> = _viewState.asStateFlow()

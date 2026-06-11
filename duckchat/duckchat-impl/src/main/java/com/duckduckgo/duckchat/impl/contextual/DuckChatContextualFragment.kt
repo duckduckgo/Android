@@ -666,6 +666,7 @@ class DuckChatContextualFragment :
         }
 
         binding.contextualPromptQuickAction.setText(viewState.quickActionState.labelResId)
+        binding.contextualPromptQuickAction.setCompoundDrawablesRelativeWithIntrinsicBounds(viewState.quickActionState.iconResId, 0, 0, 0)
         binding.inputField.setHint(viewState.chatHintResId)
 
         when (viewState.sheetMode) {
@@ -679,7 +680,10 @@ class DuckChatContextualFragment :
 
                 renderPageContext(viewState.contextTitle, viewState.contextUrl, viewState.tabId)
 
-                if (viewState.showContext) {
+                if (viewState.quickActionState == DuckChatContextualViewModel.QuickActionState.ASK_ABOUT_PAGE) {
+                    binding.duckAiContextualLayout.gone()
+                    binding.duckAiAttachContextLayout.gone()
+                } else if (viewState.showContext) {
                     binding.duckAiContextualLayout.show()
                     binding.duckAiAttachContextLayout.gone()
                 } else {
