@@ -37,7 +37,15 @@ import javax.inject.Inject
 class RealDownloadsFileActions @Inject constructor(private val appBuildConfig: AppBuildConfig) : DownloadsFileActions {
 
     override fun openFile(applicationContext: Context, file: File): Boolean {
-        val intent = createIntentToOpenFile(applicationContext, file)
+        return openFileAtPath(applicationContext, file.absolutePath)
+    }
+
+    override fun shareFile(applicationContext: Context, file: File): Boolean {
+        return shareFileAtPath(applicationContext, file.absolutePath)
+    }
+
+    override fun openFileAtPath(applicationContext: Context, filePath: String): Boolean {
+        val intent = createIntentToOpenFile(applicationContext, filePath)
         return applicationContext.packageManager?.let { packageManager ->
             if (intent.resolveActivity(packageManager) != null) {
                 startActivity(applicationContext, intent)
@@ -49,8 +57,8 @@ class RealDownloadsFileActions @Inject constructor(private val appBuildConfig: A
             ?: false
     }
 
-    override fun shareFile(applicationContext: Context, file: File): Boolean {
-        val intent = createShareIntent(applicationContext, file)
+    override fun shareFileAtPath(applicationContext: Context, filePath: String): Boolean {
+        val intent = createShareIntent(applicationContext, filePath)
         return if (intent != null) startActivity(applicationContext, intent) else false
     }
 
@@ -64,8 +72,8 @@ class RealDownloadsFileActions @Inject constructor(private val appBuildConfig: A
         }
     }
 
-    private fun createIntentToOpenFile(applicationContext: Context, file: File): Intent {
-        val fileUri = getFilePathUri(applicationContext, file)
+    private fun createIntentToOpenFile(applicationContext: Context, filePath: String): Intent {
+        val fileUri = getFilePathUri(applicationContext, filePath)
         return Intent().apply {
             setDataAndType(fileUri, applicationContext.contentResolver?.getType(fileUri))
             action = Intent.ACTION_VIEW
@@ -73,12 +81,16 @@ class RealDownloadsFileActions @Inject constructor(private val appBuildConfig: A
         }
     }
 
-    private fun getFilePathUri(context: Context, file: File): Uri {
-        return FileProvider.getUriForFile(context, "${appBuildConfig.applicationId}.provider", file)
+    private fun getFilePathUri(context: Context, filePath: String): Uri {
+        return if (filePath.startsWith(CONTENT_URI_PREFIX)) {
+            Uri.parse(filePath)
+        } else {
+            FileProvider.getUriForFile(context, "${appBuildConfig.applicationId}.provider", File(filePath))
+        }
     }
 
-    private fun createShareIntent(applicationContext: Context, file: File): Intent? {
-        val fileUri = getFilePathUri(applicationContext, file)
+    private fun createShareIntent(applicationContext: Context, filePath: String): Intent? {
+        val fileUri = getFilePathUri(applicationContext, filePath)
         val intent =
             Intent().apply {
                 setDataAndType(fileUri, applicationContext.contentResolver?.getType(fileUri))
@@ -92,10 +104,13 @@ class RealDownloadsFileActions @Inject constructor(private val appBuildConfig: A
         )
             .apply {
                 if (appBuildConfig.sdkInt >= Build.VERSION_CODES.Q) {
-                    // Show a thumbnail preview of the file to be shared on Android Q and above.
                     clipData = ClipData.newRawUri(fileUri.toString(), fileUri)
                 }
                 flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_GRANT_READ_URI_PERMISSION
             }
+    }
+
+    companion object {
+        private const val CONTENT_URI_PREFIX = "content://"
     }
 }

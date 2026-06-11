@@ -25,19 +25,39 @@ import java.io.File
 import javax.inject.Inject
 
 interface MediaScanner {
-    /**
-     * Triggers the Media Store scanner so that the newly added [File] is immediately visible to the user.
-     */
-    fun scan(file: File)
+    fun scan(storagePath: String, mimeType: String? = null)
+
+    fun fileLength(storagePath: String): Long
 }
 
 @ContributesBinding(AppScope::class)
 class MediaScannerImpl @Inject constructor(
     private val context: Context,
 ) : MediaScanner {
-    override fun scan(file: File) {
+    override fun scan(storagePath: String, mimeType: String?) {
+        if (storagePath.startsWith(CONTENT_URI_PREFIX)) {
+            // MediaScannerConnection.scanFile expects filesystem paths, not content:// URIs.
+            // For SAF content URIs, the document provider handles indexing if it's in a scanned directory.
+            return
+        }
+
+        val file = File(storagePath)
         val mediaScanIntent = Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE)
         mediaScanIntent.data = Uri.fromFile(file)
         context.sendBroadcast(mediaScanIntent)
+    }
+
+    override fun fileLength(storagePath: String): Long {
+        return if (storagePath.startsWith(CONTENT_URI_PREFIX)) {
+            context.contentResolver.openFileDescriptor(Uri.parse(storagePath), "r")?.use { descriptor ->
+                descriptor.statSize
+            } ?: 0L
+        } else {
+            File(storagePath).length()
+        }
+    }
+
+    companion object {
+        private const val CONTENT_URI_PREFIX = "content://"
     }
 }

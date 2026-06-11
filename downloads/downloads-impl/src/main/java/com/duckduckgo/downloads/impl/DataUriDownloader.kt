@@ -23,18 +23,18 @@ import com.duckduckgo.downloads.api.DownloadFailReason
 import com.duckduckgo.downloads.api.DownloadFailReason.DataUriParseException
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
 import com.duckduckgo.downloads.api.model.DownloadItem
-import com.duckduckgo.downloads.impl.DataUriParser.GeneratedFilename
 import com.duckduckgo.downloads.impl.DataUriParser.ParseResult
+import com.duckduckgo.downloads.impl.location.DownloadFileWriter
+import com.duckduckgo.downloads.impl.location.writeBytes
 import com.duckduckgo.downloads.store.DownloadStatus.STARTED
 import logcat.asLog
 import logcat.logcat
-import java.io.File
-import java.io.IOException
 import javax.inject.Inject
 import kotlin.random.Random
 
 class DataUriDownloader @Inject constructor(
     private val dataUriParser: DataUriParser,
+    private val downloadFileWriter: DownloadFileWriter,
 ) {
 
     @WorkerThread
@@ -47,58 +47,56 @@ class DataUriDownloader @Inject constructor(
                 is ParseResult.Invalid -> {
                     logcat { "Failed to extract data from data URI" }
                     callback.onError(url = pending.url, reason = DataUriParseException)
-                    return
                 }
                 is ParseResult.ParsedDataUri -> {
-                    val file = initialiseFilesOnDisk(pending, parsedDataUri.filename)
+                    val fileName = downloadFileWriter.resolveUniqueFileName(pending, parsedDataUri.filename.toString())
+                    val writeTarget = downloadFileWriter.prepareTarget(pending, fileName)
+                    if (writeTarget == null) {
+                        callback.onError(url = pending.url, reason = DownloadFailReason.DataUriParseException)
+                        return
+                    }
+
                     val downloadId = Random.nextLong()
                     callback.onStart(
                         DownloadItem(
                             downloadId = downloadId,
                             downloadStatus = STARTED,
-                            fileName = file.name,
+                            fileName = writeTarget.fileName,
                             contentLength = 0L,
-                            filePath = file.absolutePath,
+                            filePath = writeTarget.storagePath,
                             createdAt = DatabaseDateFormatter.timestamp(),
                         ),
                     )
 
                     runCatching {
-                        writeBytesToFiles(parsedDataUri.data, file)
+                        val imageByteArray = Base64.decode(parsedDataUri.data, Base64.DEFAULT)
+                        writeTarget.writeBytes(imageByteArray)
                     }
-                        .onSuccess {
-                            logcat { "Succeeded to decode Base64" }
-                            callback.onSuccess(downloadId = downloadId, contentLength = file.length(), file = file, mimeType = parsedDataUri.mimeType)
+                        .onSuccess { success ->
+                            if (success) {
+                                logcat { "Succeeded to decode Base64" }
+                                callback.onSuccess(
+                                    downloadId = downloadId,
+                                    contentLength = downloadFileWriter.contentLength(writeTarget.storagePath),
+                                    storagePath = writeTarget.storagePath,
+                                    fileName = writeTarget.fileName,
+                                    mimeType = parsedDataUri.mimeType,
+                                )
+                            } else {
+                                writeTarget.cleanup()
+                                callback.onError(url = pending.url, downloadId = downloadId, reason = DownloadFailReason.DataUriParseException)
+                            }
                         }
                         .onFailure {
                             logcat { "Failed to decode Base64: ${it.asLog()}" }
+                            writeTarget.cleanup()
                             callback.onError(url = pending.url, downloadId = downloadId, reason = DownloadFailReason.DataUriParseException)
                         }
                 }
             }
-        } catch (e: IOException) {
+        } catch (e: Exception) {
             logcat { "Failed to save data uri: ${e.asLog()}" }
             callback.onError(url = pending.url, reason = DownloadFailReason.DataUriParseException)
         }
-    }
-
-    private fun writeBytesToFiles(
-        data: String?,
-        file: File,
-    ) {
-        val imageByteArray = Base64.decode(data, Base64.DEFAULT)
-        file.writeBytes(imageByteArray)
-    }
-
-    private fun initialiseFilesOnDisk(
-        pending: PendingFileDownload,
-        generatedFilename: GeneratedFilename,
-    ): File {
-        val downloadDirectory = pending.directory
-        val file = File(downloadDirectory, generatedFilename.toString())
-
-        if (!downloadDirectory.exists()) downloadDirectory.mkdirs()
-        if (!file.exists()) file.createNewFile()
-        return file
     }
 }

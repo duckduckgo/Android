@@ -27,6 +27,7 @@ import javax.inject.Inject
 
 class FilenameExtractor @Inject constructor(
     private val pixel: Pixel,
+    private val downloadFileWriter: com.duckduckgo.downloads.impl.location.DownloadFileWriter,
 ) {
 
     fun extract(pendingDownload: PendingFileDownload): FilenameExtractionResult {
@@ -44,7 +45,7 @@ class FilenameExtractor @Inject constructor(
             guesses.latestGuess = guessFilename(baseUrl + "/" + pathSegments.rebuildUrl(), contentDisposition, mimeType)
         }
 
-        return bestGuess(guesses, pendingDownload.directory)
+        return bestGuess(guesses, pendingDownload)
     }
 
     private fun evaluateGuessQuality(
@@ -81,12 +82,14 @@ class FilenameExtractor @Inject constructor(
         return guessedFilename
     }
 
-    private fun bestGuess(guesses: Guesses, directory: File): FilenameExtractionResult {
+    private fun bestGuess(guesses: Guesses, pendingDownload: PendingFileDownload): FilenameExtractionResult {
         val guess = guesses.bestGuess ?: guesses.latestGuess
-        if (!guess.contains(".")) {
-            return FilenameExtractionResult.Guess(handleDuplicates(guess, directory))
+        val resolvedName = downloadFileWriter.resolveUniqueFileName(pendingDownload, guess)
+        return if (!guess.contains(".")) {
+            FilenameExtractionResult.Guess(resolvedName)
+        } else {
+            FilenameExtractionResult.Extracted(resolvedName)
         }
-        return FilenameExtractionResult.Extracted(handleDuplicates(guess, directory))
     }
 
     private fun pathSegments(url: String): List<String> {

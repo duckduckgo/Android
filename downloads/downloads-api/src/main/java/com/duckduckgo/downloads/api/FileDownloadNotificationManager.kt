@@ -36,6 +36,8 @@ interface FileDownloadNotificationManager {
     @AnyThread
     fun showDownloadFinishedNotification(downloadId: Long, file: File, mimeType: String?)
 
+    fun showDownloadFinishedNotification(downloadId: Long, storagePath: String, fileName: String, mimeType: String?)
+
     /**
      * Call this method to show the "download failed" notification.
      * Takes as parameters the [downloadId] and the download [url].

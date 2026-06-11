@@ -17,9 +17,12 @@
 package com.duckduckgo.downloads.impl
 
 import android.webkit.MimeTypeMap
+import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
+import com.duckduckgo.downloads.impl.location.DownloadFileWriter
+import com.duckduckgo.downloads.impl.location.RealSafDownloadStorage
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -31,7 +34,9 @@ import org.robolectric.Shadows.shadowOf
 class UriUtilsFilenameExtractorTest {
 
     private val mockedPixel: Pixel = mock()
-    private val testee: FilenameExtractor = FilenameExtractor(mockedPixel)
+    private val context: android.content.Context = ApplicationProvider.getApplicationContext()
+    private val downloadFileWriter = DownloadFileWriter(context, RealSafDownloadStorage(context))
+    private val testee: FilenameExtractor = FilenameExtractor(mockedPixel, downloadFileWriter)
 
     @Test
     fun whenUrlEndsWithFilenameAsJpgNoMimeOrContentDispositionThenFilenameShouldBeExtracted() {

@@ -58,6 +58,7 @@ import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchAutofillSetti
 import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchCookiePopupProtectionScreen
 import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchDataClearingSettingsScreen
 import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchDefaultBrowser
+import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchDownloadLocationSettingsScreen
 import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchDuckChatScreen
 import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchEmailProtection
 import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchEmailProtectionNotSupported
@@ -91,6 +92,7 @@ import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.downloads.api.DownloadsScreens.DownloadLocationSettingsScreenNoParams
 import com.duckduckgo.duckchat.api.DuckChatSettingsNoParams
 import com.duckduckgo.internal.features.api.InternalFeaturePlugin
 import com.duckduckgo.mobile.android.app.tracking.ui.AppTrackingProtectionScreens.AppTrackerActivityWithEmptyParams
@@ -253,6 +255,7 @@ class SettingsActivity : DuckDuckGoActivity() {
             appearanceSetting.setClickListener { viewModel.onAppearanceSettingClicked() }
             accessibilitySetting.setClickListener { viewModel.onAccessibilitySettingClicked() }
             generalSetting.setClickListener { viewModel.onGeneralSettingClicked() }
+            downloadsSetting.setClickListener { viewModel.onDownloadsSettingClicked() }
             includeDuckChatSetting.duckChatSetting.setOnClickListener { viewModel.onDuckChatSettingClicked() }
         }
 
@@ -523,6 +526,7 @@ class SettingsActivity : DuckDuckGoActivity() {
             is LaunchAppearanceScreen -> launchScreen(AppearanceScreen.Default)
             is LaunchAboutScreen -> launchScreen(AboutScreenNoParams)
             is LaunchGeneralSettingsScreen -> launchScreen(GeneralSettingsScreenNoParams)
+            is LaunchDownloadLocationSettingsScreen -> launchScreen(DownloadLocationSettingsScreenNoParams)
             is LaunchFeedback -> launchFeedback()
             is LaunchSubscriptionUnifiedFeedback -> launchScreen(GeneralSubscriptionFeedbackScreenNoParams)
             is LaunchOtherPlatforms -> launchActivityAndFinish(

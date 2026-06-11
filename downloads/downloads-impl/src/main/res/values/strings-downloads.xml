@@ -34,4 +34,15 @@
 
     <string name="downloadConfirmationContinue">Save to Downloads</string>
     <string name="downloadConfirmationSubtitle" instruction="Placeholder is the address of a website">From: %1$s</string>
+
+    <string name="downloadsLocationActivityTitle">Downloads</string>
+    <string name="downloadsLocationSettingTitle">Download Location</string>
+    <string name="downloadsLocationDefaultSubtitle">Internal Storage (Default)</string>
+    <string name="downloadsLocationCustomSubtitle">Custom Folder</string>
+    <string name="downloadsSelectedFolderTitle">Selected Folder</string>
+    <string name="downloadsLocationDefaultFolderName">Downloads</string>
+    <string name="downloadsChangeFolderTitle">Change Folder</string>
+
+    <string name="downloadsLocationUnavailableMessage">Selected download folder is unavailable. Downloads will be saved to the default Downloads folder.</string>
+    <string name="downloadsLocationFallbackMessage">Selected download folder is unavailable. Downloads will be saved to the default Downloads folder.</string>
 </resources>

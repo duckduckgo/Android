@@ -105,7 +105,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import logcat.logcat
 import org.json.JSONObject
-import java.io.File
 import javax.inject.Inject
 import javax.inject.Named
 
@@ -879,6 +878,7 @@ class DuckChatContextualFragment :
             is DownloadCommand.ShowDownloadStartedMessage -> downloadStarted(command)
             is DownloadCommand.ShowDownloadFailedMessage -> downloadFailed(command)
             is DownloadCommand.ShowDownloadSuccessMessage -> downloadSucceeded(command)
+            is DownloadCommand.ShowDownloadLocationFallbackMessage -> downloadLocationFallback(command)
         }
     }
 
@@ -895,6 +895,10 @@ class DuckChatContextualFragment :
         root.postDelayed({ downloadFailedSnackbar?.show() }, DOWNLOAD_SNACKBAR_DELAY)
     }
 
+    private fun downloadLocationFallback(command: DownloadCommand.ShowDownloadLocationFallbackMessage) {
+        root.makeSnackbarWithNoBottomInset(getString(command.messageId), Snackbar.LENGTH_LONG)?.show()
+    }
+
     private fun downloadSucceeded(command: DownloadCommand.ShowDownloadSuccessMessage) {
         val downloadSucceededSnackbar = root.makeSnackbarWithNoBottomInset(
             getString(command.messageId, command.fileName),
@@ -902,7 +906,7 @@ class DuckChatContextualFragment :
         )
             .apply {
                 this.setAction(R.string.duck_chat_download_finished_action_name) {
-                    val result = downloadsFileActions.openFile(context, File(command.filePath))
+                    val result = downloadsFileActions.openFileAtPath(context, command.filePath)
                     if (!result) {
                         view.makeSnackbarWithNoBottomInset(getString(R.string.duck_chat_cannot_open_file_error_message), Snackbar.LENGTH_LONG).show()
                     }

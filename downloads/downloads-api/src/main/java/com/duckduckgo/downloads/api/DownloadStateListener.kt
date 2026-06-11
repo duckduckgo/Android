@@ -41,5 +41,10 @@ interface DownloadConfirmation {
 
 interface DownloadsFileActions {
     fun openFile(applicationContext: Context, file: File): Boolean
+
     fun shareFile(applicationContext: Context, file: File): Boolean
+
+    fun openFileAtPath(applicationContext: Context, filePath: String): Boolean
+
+    fun shareFileAtPath(applicationContext: Context, filePath: String): Boolean
 }

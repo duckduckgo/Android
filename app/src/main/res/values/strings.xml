@@ -160,6 +160,7 @@
     <string name="settingsPermissionsSetting">Permissions</string>
     <string name="settingsSyncSetting">Sync &amp; Backup</string>
     <string name="settingsDataClearing">Data Clearing</string>
+    <string name="settingsDownloads" instruction="List item for download location settings">Downloads</string>
     <string name="settingsAddWidget">Add Widget to Home Screen</string>
     <string name="settingsAddressBarPosition">Set Your Address Bar Position</string>
     <string name="settingsEnableVoiceSearch">Enable Private Voice Search</string>

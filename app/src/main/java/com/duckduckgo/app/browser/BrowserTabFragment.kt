@@ -2159,6 +2159,7 @@ class BrowserTabFragment :
             is DownloadCommand.ShowDownloadStartedMessage -> downloadStarted(command)
             is DownloadCommand.ShowDownloadFailedMessage -> downloadFailed(command)
             is DownloadCommand.ShowDownloadSuccessMessage -> downloadSucceeded(command)
+            is DownloadCommand.ShowDownloadLocationFallbackMessage -> downloadLocationFallback(command)
         }
     }
 
@@ -2172,6 +2173,10 @@ class BrowserTabFragment :
         view?.postDelayed({ downloadFailedSnackbar?.show() }, DOWNLOAD_SNACKBAR_DELAY)
     }
 
+    private fun downloadLocationFallback(command: DownloadCommand.ShowDownloadLocationFallbackMessage) {
+        view?.makeSnackbarWithNoBottomInset(getString(command.messageId), Snackbar.LENGTH_LONG)?.show()
+    }
+
     private fun downloadSucceeded(command: DownloadCommand.ShowDownloadSuccessMessage) {
         val downloadSucceededSnackbar =
             view
@@ -2181,7 +2186,7 @@ class BrowserTabFragment :
                 )?.apply {
                     this.setAction(R.string.downloadsDownloadFinishedActionName) {
                         activity?.let {
-                            val result = downloadsFileActions.openFile(it, File(command.filePath))
+                            val result = downloadsFileActions.openFileAtPath(it, command.filePath)
                             if (!result) {
                                 view
                                     .makeSnackbarWithNoBottomInset(

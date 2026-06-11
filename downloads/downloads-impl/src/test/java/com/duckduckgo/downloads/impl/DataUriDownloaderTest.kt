@@ -16,11 +16,14 @@
 
 package com.duckduckgo.downloads.impl
 
+import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.downloads.api.DownloadFailReason
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
 import com.duckduckgo.downloads.impl.DataUriParser.GeneratedFilename
 import com.duckduckgo.downloads.impl.DataUriParser.ParseResult
+import com.duckduckgo.downloads.impl.location.DownloadFileWriter
+import com.duckduckgo.downloads.impl.location.RealSafDownloadStorage
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -41,7 +44,12 @@ class DataUriDownloaderTest {
 
     @Before
     fun setup() {
-        dataUriDownloader = DataUriDownloader(dataUriParser = mockDataUriParser)
+        val context: android.content.Context = ApplicationProvider.getApplicationContext()
+        val downloadFileWriter = DownloadFileWriter(context, RealSafDownloadStorage(context))
+        dataUriDownloader = DataUriDownloader(
+            dataUriParser = mockDataUriParser,
+            downloadFileWriter = downloadFileWriter,
+        )
     }
 
     @Test
@@ -55,7 +63,7 @@ class DataUriDownloaderTest {
 
         verify(mockCallback).onError(url = url, reason = DownloadFailReason.DataUriParseException)
         verify(mockCallback, never()).onStart(any())
-        verify(mockCallback, never()).onSuccess(any(), any(), any(), anyOrNull())
+        verify(mockCallback, never()).onSuccess(any(), any(), any(), any(), anyOrNull())
     }
 
     @Test
@@ -76,7 +84,7 @@ class DataUriDownloaderTest {
         dataUriDownloader.download(pending, mockCallback)
 
         verify(mockCallback).onStart(any())
-        verify(mockCallback).onSuccess(downloadId = any(), contentLength = any(), file = any(), mimeType = eq("image/png"))
+        verify(mockCallback).onSuccess(downloadId = any(), contentLength = any(), storagePath = any(), fileName = any(), mimeType = eq("image/png"))
         verify(mockCallback, never()).onError(anyOrNull(), anyOrNull(), any())
     }
 
@@ -99,7 +107,7 @@ class DataUriDownloaderTest {
 
         verify(mockCallback).onStart(any())
         verify(mockCallback).onError(url = eq(url), downloadId = any(), reason = eq(DownloadFailReason.DataUriParseException))
-        verify(mockCallback, never()).onSuccess(any(), any(), any(), anyOrNull())
+        verify(mockCallback, never()).onSuccess(any(), any(), any(), any(), anyOrNull())
     }
 
     @Test
@@ -134,10 +142,10 @@ class DataUriDownloaderTest {
         verify(mockCallback).onSuccess(
             downloadId = any(),
             contentLength = any(),
-            file = check { file ->
-                assert(file.parentFile == pending.directory)
-                assert(file.name == "text.txt")
+            storagePath = check { path ->
+                assert(path.startsWith(pending.directory.absolutePath))
             },
+            fileName = eq("text.txt"),
             mimeType = eq("text/plain"),
         )
     }
