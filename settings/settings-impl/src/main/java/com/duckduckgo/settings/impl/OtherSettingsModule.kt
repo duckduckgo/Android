@@ -14,19 +14,14 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.adblocking.impl.duckplayer
+package com.duckduckgo.settings.impl
 
-import android.content.Context
-import android.view.View
-import com.duckduckgo.anvil.annotations.PriorityKey
+import com.duckduckgo.anvil.annotations.ContributesPluginPoint
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.settings.api.OtherSettingsPlugin
-import com.squareup.anvil.annotations.ContributesMultibinding
-import javax.inject.Inject
 
-@ContributesMultibinding(ActivityScope::class)
-@PriorityKey(200)
-class DuckPlayerSettingsEntry @Inject constructor() : OtherSettingsPlugin {
-
-    override fun getView(context: Context): View = DuckPlayerSettingsEntryView(context)
-}
+@ContributesPluginPoint(
+    scope = ActivityScope::class,
+    boundType = OtherSettingsPlugin::class,
+)
+private interface OtherSettingsPluginTrigger

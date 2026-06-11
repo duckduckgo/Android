@@ -16,6 +16,10 @@
 
 package com.duckduckgo.adblocking.impl.di
 
+import android.content.Context
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.preferencesDataStore
 import com.duckduckgo.adblocking.impl.store.AD_BLOCKING_EXTENSION_MIGRATIONS
 import com.duckduckgo.adblocking.impl.store.AdBlockingExtensionDao
 import com.duckduckgo.adblocking.impl.store.AdBlockingExtensionDatabase
@@ -26,10 +30,15 @@ import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
 import dagger.SingleInstanceIn
+import javax.inject.Qualifier
 
 @Module
 @ContributesTo(AppScope::class)
 object AdBlockingExtensionModule {
+
+    private val Context.adBlockingDataStore: DataStore<Preferences> by preferencesDataStore(
+        name = "ad_blocking",
+    )
 
     @SingleInstanceIn(AppScope::class)
     @Provides
@@ -47,4 +56,13 @@ object AdBlockingExtensionModule {
     @Provides
     fun provideAdBlockingExtensionDao(database: AdBlockingExtensionDatabase): AdBlockingExtensionDao =
         database.adBlockingExtensionDao()
+
+    @SingleInstanceIn(AppScope::class)
+    @Provides
+    @AdBlockingPreferences
+    fun provideAdBlockingDataStore(context: Context): DataStore<Preferences> =
+        context.adBlockingDataStore
 }
+
+@Qualifier
+internal annotation class AdBlockingPreferences

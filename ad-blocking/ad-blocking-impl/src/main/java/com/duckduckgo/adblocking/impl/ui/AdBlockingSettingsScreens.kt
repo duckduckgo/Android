@@ -14,19 +14,11 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.adblocking.impl.duckplayer
+package com.duckduckgo.adblocking.impl.ui
 
-import android.content.Context
-import android.view.View
-import com.duckduckgo.anvil.annotations.PriorityKey
-import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.settings.api.OtherSettingsPlugin
-import com.squareup.anvil.annotations.ContributesMultibinding
-import javax.inject.Inject
+import com.duckduckgo.navigation.api.GlobalActivityStarter
 
-@ContributesMultibinding(ActivityScope::class)
-@PriorityKey(200)
-class DuckPlayerSettingsEntry @Inject constructor() : OtherSettingsPlugin {
-
-    override fun getView(context: Context): View = DuckPlayerSettingsEntryView(context)
-}
+/**
+ * Use this model to launch the YouTube Ad Blocking settings screen.
+ */
+object AdBlockingSettingsNoParams : GlobalActivityStarter.ActivityParams

@@ -22,9 +22,6 @@ import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.duckduckgo.adblocking.api.duckplayer.DuckPlayer
-import com.duckduckgo.adblocking.api.duckplayer.DuckPlayer.DuckPlayerState.DISABLED_WIH_HELP_LINK
-import com.duckduckgo.adblocking.api.duckplayer.DuckPlayer.DuckPlayerState.ENABLED
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.browser.omnibar.OmnibarType
@@ -123,7 +120,6 @@ class SettingsViewModel @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
     private val autoconsent: Autoconsent,
     private val subscriptions: Subscriptions,
-    private val duckPlayer: DuckPlayer,
     private val duckChat: DuckChat,
     private val duckAiFeatureState: DuckAiFeatureState,
     private val voiceSearchAvailability: VoiceSearchAvailability,
@@ -147,7 +143,6 @@ class SettingsViewModel @Inject constructor(
         val showSyncSetting: Boolean = false,
         val isAutoconsentEnabled: Boolean = false,
         val isSubscriptionEnabled: Boolean = false,
-        val isDuckPlayerEnabled: Boolean = false,
         val isNewThreatProtectionSettingsEnabled: Boolean = false,
         val isDuckChatEnabled: Boolean = false,
         val isVoiceSearchVisible: Boolean = false,
@@ -238,7 +233,6 @@ class SettingsViewModel @Inject constructor(
                     showSyncSetting = deviceSyncState.isFeatureEnabled(),
                     isAutoconsentEnabled = autoconsent.isSettingEnabled(),
                     isSubscriptionEnabled = subscriptions.isEligible(),
-                    isDuckPlayerEnabled = duckPlayer.getDuckPlayerState().let { it == ENABLED || it == DISABLED_WIH_HELP_LINK },
                     isNewThreatProtectionSettingsEnabled = androidBrowserConfigFeature.newThreatProtectionSettings().isEnabled(),
                     isVoiceSearchVisible = voiceSearchAvailability.isVoiceSearchSupported,
                     isAddWidgetInProtectionsVisible = withContext(dispatcherProvider.io()) {
