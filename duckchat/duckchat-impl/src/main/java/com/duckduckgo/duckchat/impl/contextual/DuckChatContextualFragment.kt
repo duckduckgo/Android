@@ -603,6 +603,7 @@ class DuckChatContextualFragment :
                     }
 
                     is DuckChatContextualViewModel.Command.ChangeSheetState -> {
+                        command.prefillNativeInput?.let { binding.contextualNativeInputWidget.text = it }
                         bottomSheetBehavior.state = command.newState
                     }
                     is DuckChatContextualViewModel.Command.RequestPageContext -> {
@@ -611,10 +612,6 @@ class DuckChatContextualFragment :
 
                     is DuckChatContextualViewModel.Command.ShowFireConfirmation -> {
                         showFireConfirmationDialog()
-                    }
-
-                    is DuckChatContextualViewModel.Command.PrefillContextualNativeInput -> {
-                        binding.contextualNativeInputWidget.text = command.text
                     }
                 }
             }.launchIn(lifecycleScope)

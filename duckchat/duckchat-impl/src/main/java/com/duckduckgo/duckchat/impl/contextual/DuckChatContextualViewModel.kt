@@ -83,8 +83,8 @@ class DuckChatContextualViewModel @Inject constructor(
     }
 
     enum class QuickActionState(
-        @StringRes val labelResId: Int,
-        @DrawableRes val iconResId: Int,
+        @field:StringRes val labelResId: Int,
+        @field:DrawableRes val iconResId: Int,
     ) {
         LEGACY_SUMMARIZE(
             labelResId = R.string.duckAIContextualPromptSummarize,
@@ -116,10 +116,12 @@ class DuckChatContextualViewModel @Inject constructor(
         data class LoadUrl(val url: String) : Command()
         data object SendSubscriptionAuthUpdateEvent : Command()
         data class OpenFullscreenMode(val url: String) : Command()
-        data class ChangeSheetState(val newState: Int) : Command()
+        data class ChangeSheetState(
+            val newState: Int,
+            val prefillNativeInput: String? = null,
+        ) : Command()
         data object RequestPageContext : Command()
         data object ShowFireConfirmation : Command()
-        data class PrefillContextualNativeInput(val text: String) : Command()
     }
 
     private val _viewState: MutableStateFlow<ViewState> =
@@ -316,7 +318,8 @@ class DuckChatContextualViewModel @Inject constructor(
     ) {
         viewModelScope.launch(dispatchers.io()) {
             val contextPrompt = generateContextPrompt(prompt)
-            val prefillEvent = followUpPrefill?.takeIf { it.isNotEmpty() }?.let { generatePrefillEvent(it) }
+            val prefillText = followUpPrefill?.takeIf { it.isNotEmpty() }
+            val prefillEvent = prefillText?.let { generatePrefillEvent(it) }
             withContext(dispatchers.main()) {
                 _viewState.value =
                     _viewState.value.copy(
@@ -325,7 +328,14 @@ class DuckChatContextualViewModel @Inject constructor(
                     )
                 _subscriptionEventDataChannel.trySend(contextPrompt)
                 prefillEvent?.let { _subscriptionEventDataChannel.trySend(it) }
-                commandChannel.trySend(Command.ChangeSheetState(BottomSheetBehavior.STATE_EXPANDED))
+                // Always pass a non-null prefill: a draft preserves the typed text, empty clears the native
+                // chat input so stale text from a previous interaction doesn't reappear.
+                commandChannel.trySend(
+                    Command.ChangeSheetState(
+                        newState = BottomSheetBehavior.STATE_EXPANDED,
+                        prefillNativeInput = prefillText.orEmpty(),
+                    ),
+                )
             }
         }
     }
@@ -503,6 +513,11 @@ class DuckChatContextualViewModel @Inject constructor(
                 current.copy(
                     showContext = false,
                     userRemovedContext = true,
+                    quickActionState = if (current.quickActionState == QuickActionState.SUBMIT_SUMMARIZE) {
+                        QuickActionState.ASK_ABOUT_PAGE
+                    } else {
+                        current.quickActionState
+                    },
                 )
             }
         }
@@ -601,7 +616,6 @@ class DuckChatContextualViewModel @Inject constructor(
                     prompt = context.getString(R.string.duckAIContextualPromptSummarize),
                     followUpPrefill = currentInput.takeIf { it.isNotEmpty() },
                 )
-                commandChannel.trySend(Command.PrefillContextualNativeInput(currentInput))
             }
         }
     }

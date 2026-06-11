@@ -1763,7 +1763,7 @@ class DuckChatContextualViewModelTest {
     }
 
     @Test
-    fun `when SUBMIT_SUMMARIZE clicked with typed input then PrefillContextualNativeInput command emitted`() = runTest {
+    fun `when SUBMIT_SUMMARIZE clicked with typed input then ChangeSheetState carries prefill`() = runTest {
         whenever(contextualSheetImprovementsToggle.isEnabled()).thenReturn(true)
         val testee = buildViewModel()
         testee.onSheetOpened("tab-1")
@@ -1774,17 +1774,64 @@ class DuckChatContextualViewModelTest {
         testee.commands.test {
             testee.onQuickActionClicked("my draft")
 
-            // Drain commands until we see the prefill (other commands like ChangeSheetState may be ahead).
-            var prefill: DuckChatContextualViewModel.Command.PrefillContextualNativeInput? = null
-            while (prefill == null) {
+            var submitSheetState: DuckChatContextualViewModel.Command.ChangeSheetState? = null
+            while (submitSheetState == null) {
                 val item = awaitItem()
-                if (item is DuckChatContextualViewModel.Command.PrefillContextualNativeInput) {
-                    prefill = item
+                if (item is DuckChatContextualViewModel.Command.ChangeSheetState &&
+                    item.newState == BottomSheetBehavior.STATE_EXPANDED &&
+                    !item.prefillNativeInput.isNullOrEmpty()
+                ) {
+                    submitSheetState = item
                 }
             }
-            assertEquals("my draft", prefill.text)
+            assertEquals("my draft", submitSheetState.prefillNativeInput)
             cancelAndIgnoreRemainingEvents()
         }
+    }
+
+    @Test
+    fun `when onPromptSent without followUp prefill then ChangeSheetState clears native input`() = runTest {
+        val testee = buildViewModel()
+        testee.onSheetOpened("tab-1")
+
+        testee.commands.test {
+            testee.onPromptSent("hello")
+
+            var submitSheetState: DuckChatContextualViewModel.Command.ChangeSheetState? = null
+            while (submitSheetState == null) {
+                val item = awaitItem()
+                if (item is DuckChatContextualViewModel.Command.ChangeSheetState &&
+                    item.newState == BottomSheetBehavior.STATE_EXPANDED
+                ) {
+                    submitSheetState = item
+                }
+            }
+            assertEquals("", submitSheetState.prefillNativeInput)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `when removePageContext from SUBMIT_SUMMARIZE then quickActionState reverts to ASK_ABOUT_PAGE`() = runTest {
+        whenever(contextualSheetImprovementsToggle.isEnabled()).thenReturn(true)
+        val testee = buildViewModel()
+        testee.onSheetOpened("tab-1")
+        val pageContext = """{"title":"Page","url":"https://example.com","content":"text"}"""
+        testee.onPageContextReceived("tab-1", pageContext)
+        testee.onQuickActionClicked("") // ASK_ABOUT_PAGE -> SUBMIT_SUMMARIZE
+
+        assertEquals(
+            DuckChatContextualViewModel.QuickActionState.SUBMIT_SUMMARIZE,
+            testee.viewState.value.quickActionState,
+        )
+
+        testee.removePageContext()
+
+        assertEquals(
+            DuckChatContextualViewModel.QuickActionState.ASK_ABOUT_PAGE,
+            testee.viewState.value.quickActionState,
+        )
+        assertFalse(testee.viewState.value.showContext)
     }
 
     @Test
