@@ -23,7 +23,6 @@ import android.content.Context
 import android.content.Intent
 import android.content.Intent.EXTRA_TEXT
 import android.content.res.Configuration
-import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
@@ -34,6 +33,7 @@ import android.view.KeyEvent
 import android.view.MotionEvent
 import android.view.View
 import android.view.View.IMPORTANT_FOR_AUTOFILL_YES
+import android.view.WindowManager
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.SystemBarStyle
@@ -410,19 +410,14 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
         if (edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.BROWSER)) {
             val toolbarColor = getColorFromAttr(com.duckduckgo.mobile.android.R.attr.daxColorToolbar)
-            val statusBarStyle = if (isDarkThemeEnabled()) {
+            val barStyle = if (isDarkThemeEnabled()) {
                 SystemBarStyle.dark(toolbarColor)
             } else {
                 SystemBarStyle.light(toolbarColor, toolbarColor)
             }
-            val navBarColor = Color.TRANSPARENT
-            val navigationBarStyle = if (isDarkThemeEnabled()) {
-                SystemBarStyle.dark(navBarColor)
-            } else {
-                SystemBarStyle.light(navBarColor, navBarColor)
-            }
-            enableEdgeToEdge(statusBarStyle = statusBarStyle, navigationBarStyle = navigationBarStyle)
-            edgeToEdgeHandler.applyInsets(binding.root)
+            enableEdgeToEdge(statusBarStyle = barStyle, navigationBarStyle = barStyle)
+            edgeToEdgeHandler.applyStatusBarAndHorizontalInsets(binding.root)
+            updateLayoutForDisplayCutout(resources.configuration.orientation)
         }
 
         setContentView(binding.root)
@@ -1337,6 +1332,19 @@ open class BrowserActivity : DuckDuckGoActivity() {
         super.onConfigurationChanged(newConfig)
         if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
             viewModel.sendPixelEventForLandscapeOrientation()
+        }
+        if (edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.BROWSER)) {
+            updateLayoutForDisplayCutout(newConfig.orientation)
+        }
+    }
+
+    private fun updateLayoutForDisplayCutout(orientation: Int) {
+        window.attributes = window.attributes.apply {
+            layoutInDisplayCutoutMode = if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_NEVER
+            } else {
+                WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_DEFAULT
+            }
         }
     }
 

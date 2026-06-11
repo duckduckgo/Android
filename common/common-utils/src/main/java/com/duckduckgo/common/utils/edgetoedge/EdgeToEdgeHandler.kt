@@ -35,11 +35,10 @@ import javax.inject.Inject
  */
 class EdgeToEdgeHandler @Inject constructor() {
 
-    fun applyInsets(view: View) {
+    fun applyStatusBarAndHorizontalInsets(view: View) {
         val initialLeft = view.paddingLeft
         val initialTop = view.paddingTop
         val initialRight = view.paddingRight
-        val initialBottom = view.paddingBottom
         ViewCompat.setOnApplyWindowInsetsListener(view) { v, insets ->
             val windowInsets = insets.getInsets(
                 WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout() or WindowInsetsCompat.Type.ime(),
@@ -48,7 +47,6 @@ class EdgeToEdgeHandler @Inject constructor() {
                 left = initialLeft + windowInsets.left,
                 top = initialTop + windowInsets.top,
                 right = initialRight + windowInsets.right,
-                bottom = initialBottom + windowInsets.bottom,
             )
             insets
         }
@@ -74,7 +72,7 @@ class EdgeToEdgeHandler @Inject constructor() {
         val initialBottom = view.paddingBottom
         ViewCompat.setOnApplyWindowInsetsListener(view) { v, insets ->
             val bottom = insets.getInsets(
-                WindowInsetsCompat.Type.navigationBars() or WindowInsetsCompat.Type.displayCutout(),
+                WindowInsetsCompat.Type.navigationBars() or WindowInsetsCompat.Type.displayCutout() or WindowInsetsCompat.Type.ime(),
             ).bottom
 
             v.updatePadding(bottom = initialBottom + bottom)
