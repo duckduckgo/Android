@@ -250,6 +250,7 @@ import com.duckduckgo.browser.api.autocomplete.AutoCompleteSettings
 import com.duckduckgo.browser.api.brokensite.BrokenSiteContext
 import com.duckduckgo.browser.api.webviewcompat.WebViewCompatWrapper
 import com.duckduckgo.browser.api.wideevents.BrowserInteractionsPlugin
+import com.duckduckgo.browser.ui.autocomplete.AutocompleteHistoryDeleteFeature
 import com.duckduckgo.browser.ui.browsermenu.VpnMenuState
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.browsermode.api.BrowserModeDataProvider
@@ -672,6 +673,7 @@ class BrowserTabViewModelTest {
     private var fakeBrowserUiLockFeature = FakeFeatureToggleFactory.create(BrowserUiLockFeature::class.java)
     private var fakeFaviconFetchingFixFeature = FakeFeatureToggleFactory.create(FaviconFetchingFixFeature::class.java)
     private var fakeProgressBarUpgradeFeature = FakeFeatureToggleFactory.create(ProgressBarUpgradeFeature::class.java)
+    private val fakeAutocompleteHistoryDeleteFeature = FakeFeatureToggleFactory.create(AutocompleteHistoryDeleteFeature::class.java)
     private val mockInlinePdfHandler: InlinePdfHandler = mock()
     private val mockPdfDownloadTooltipDataStore: PdfDownloadTooltipDataStore = mock()
     private val mockCachedFileDownloader: CachedFileDownloader = mock()
@@ -703,6 +705,7 @@ class BrowserTabViewModelTest {
 
             swipingTabsFeature.self().setRawStoredState(State(enable = true))
             swipingTabsFeature.enabledForUsers().setRawStoredState(State(enable = true))
+            fakeAutocompleteHistoryDeleteFeature.self().setRawStoredState(State(enable = true))
 
             whenever(mockDuckChatJSHelper.enrichPageContextIfPossible(any(), any())).thenAnswer { it.getArgument<String>(1) }
             whenever(mockInlinePdfHandler.classifyPdfRequest(any(), anyOrNull(), any())).thenReturn(PdfRenderDecision.NotApplicable)
@@ -995,6 +998,7 @@ class BrowserTabViewModelTest {
                 downloadsRepository = mockDownloadsRepository,
                 onboardingBrandDesignUpdateToggles = mockOnboardingBrandDesignUpdateToggles,
                 onboardingStore = mockOnboardingStore,
+                autocompleteHistoryDeleteFeature = fakeAutocompleteHistoryDeleteFeature,
             )
 
         testee.loadData("abc", null, false, false)
@@ -7423,6 +7427,18 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenDeleteButtonDisabledAndUserDeletesHistorySuggestionThenDialogShownButNoDeleteButtonPixelFired() {
+        fakeAutocompleteHistoryDeleteFeature.self().setRawStoredState(State(enable = false))
+        val suggestion = AutoCompleteHistorySuggestion(phrase = "phrase", title = "title", url = "url", isAllowedInTopHits = false)
+
+        testee.onUserRequestedToDeleteAutocompleteItem(suggestion)
+
+        verify(mockPixel, never()).fire(AppPixelName.AUTOCOMPLETE_RESULT_DELETE_BUTTON_CLICKED)
+        verify(mockPixel, never()).fire(AppPixelName.AUTOCOMPLETE_RESULT_DELETE_BUTTON_CLICKED_DAILY, type = Daily())
+        assertCommandIssued<Command.ShowRemoveSearchSuggestionDialog>()
+    }
+
+    @Test
     fun whenOnRemoveSearchSuggestionConfirmedForHistorySuggestionThenPixelsFiredAndHistoryEntryRemoved() =
         runBlocking {
             val suggestion = AutoCompleteHistorySuggestion(phrase = "phrase", title = "title", url = "url", isAllowedInTopHits = false)
@@ -7448,6 +7464,30 @@ class BrowserTabViewModelTest {
             verify(mockPixel).fire(AppPixelName.AUTOCOMPLETE_RESULT_DELETED_DAILY, type = Daily())
             verify(mockNavigationHistory).removeHistoryEntryByQuery(suggestion.phrase)
             assertCommandIssued<Command.AutocompleteItemRemoved>()
+        }
+
+    @Test
+    fun whenOnRemoveSearchSuggestionConfirmedWithBlankOmnibarTextThenLiveAutocompleteQueryIsPreserved() =
+        runBlocking {
+            // With the native-input widget the live query lives in autoCompleteStateFlow while the
+            // legacy omnibar text is blank; the blank text must not overwrite the query and blank the list.
+            testee.autoCompleteStateFlow.value = "query"
+            val suggestion = AutoCompleteHistorySuggestion(phrase = "phrase", title = "title", url = "url", isAllowedInTopHits = false)
+
+            testee.onRemoveSearchSuggestionConfirmed(suggestion, omnibarText = "")
+
+            assertEquals("query", testee.autoCompleteStateFlow.value)
+        }
+
+    @Test
+    fun whenOnRemoveSearchSuggestionConfirmedWithOmnibarTextThenAutocompleteQueryRestoredFromOmnibar() =
+        runBlocking {
+            testee.autoCompleteStateFlow.value = "stale"
+            val suggestion = AutoCompleteHistorySuggestion(phrase = "phrase", title = "title", url = "url", isAllowedInTopHits = false)
+
+            testee.onRemoveSearchSuggestionConfirmed(suggestion, omnibarText = "fresh")
+
+            assertEquals("fresh", testee.autoCompleteStateFlow.value)
         }
 
     @Test

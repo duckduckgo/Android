@@ -51,7 +51,7 @@ class BrowserAutoCompleteSuggestionsAdapter(
     omnibarType: OmnibarType,
     private val hideEditQueryArrow: Boolean = false,
     private val hideSectionDividers: Boolean = false,
-    private val isDeleteButtonVisible: Boolean = true,
+    private var isDeleteButtonVisible: Boolean = true,
 ) : RecyclerView.Adapter<AutoCompleteViewHolder>() {
     private val viewHolderFactoryMap: Map<Int, SuggestionViewHolderFactory> =
         mapOf(
@@ -119,7 +119,15 @@ class BrowserAutoCompleteSuggestionsAdapter(
                 if (hideEditQueryArrow) {
                     holder.itemView.findViewById<View>(R.id.editQueryImage)?.visibility = View.GONE
                 }
-                holder.itemView.findViewById<View>(R.id.deleteSuggestionButton)?.isVisible = isDeleteButtonVisible
+                val deleteButton = holder.itemView.findViewById<View>(R.id.deleteSuggestionButton)
+                deleteButton?.isVisible = isDeleteButtonVisible
+                if (deleteButton != null && !isDeleteButtonVisible) {
+                    // Kill switch off: restore the legacy long-press-to-delete on history rows.
+                    holder.itemView.setOnLongClickListener {
+                        autoCompleteDeleteClickListener(item.value)
+                        true
+                    }
+                }
             }
         }
     }
@@ -129,6 +137,14 @@ class BrowserAutoCompleteSuggestionsAdapter(
             return 1 // Empty ViewHolder
         }
         return items.size
+    }
+
+    @UiThread
+    fun setDeleteButtonVisible(visible: Boolean) {
+        if (isDeleteButtonVisible != visible) {
+            isDeleteButtonVisible = visible
+            notifyDataSetChanged()
+        }
     }
 
     @UiThread
