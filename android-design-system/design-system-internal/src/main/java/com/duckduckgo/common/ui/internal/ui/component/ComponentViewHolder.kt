@@ -56,14 +56,14 @@ import com.duckduckgo.common.ui.compose.cards.DaxSurface
 import com.duckduckgo.common.ui.compose.checkbox.DaxCheckbox
 import com.duckduckgo.common.ui.compose.divider.DaxHorizontalDivider
 import com.duckduckgo.common.ui.compose.divider.DaxVerticalDivider
-import com.duckduckgo.common.ui.compose.infopannel.DaxAlertPanel
-import com.duckduckgo.common.ui.compose.infopannel.DaxInfoPanel
 import com.duckduckgo.common.ui.compose.message.DaxAction
 import com.duckduckgo.common.ui.compose.message.remote.DaxBigSingleActionMessage
 import com.duckduckgo.common.ui.compose.message.remote.DaxBigTwoActionsMessage
 import com.duckduckgo.common.ui.compose.message.remote.DaxMediumMessage
 import com.duckduckgo.common.ui.compose.message.remote.DaxPromoSingleActionMessage
 import com.duckduckgo.common.ui.compose.message.remote.DaxSmallMessage
+import com.duckduckgo.common.ui.compose.panel.DaxAlertPanel
+import com.duckduckgo.common.ui.compose.panel.DaxInfoPanel
 import com.duckduckgo.common.ui.compose.radiobutton.DaxRadioButton
 import com.duckduckgo.common.ui.compose.switch.DaxSwitch
 import com.duckduckgo.common.ui.compose.text.DaxText

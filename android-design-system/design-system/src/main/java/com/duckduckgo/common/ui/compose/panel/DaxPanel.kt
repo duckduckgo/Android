@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.common.ui.compose.infopannel
+package com.duckduckgo.common.ui.compose.panel
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -28,6 +28,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.LinkAnnotation
 import androidx.compose.ui.text.SpanStyle
@@ -67,7 +68,7 @@ internal fun DaxPanel(
                 .fillMaxWidth()
                 .background(
                     color = color,
-                    shape = DuckDuckGoTheme.shapes.small,
+                    shape = DaxPanelDefaults.shape,
                 )
                 .padding(dimensionResource(R.dimen.keyline_4)),
         ) {
@@ -125,4 +126,21 @@ private fun AnnotatedString.withDaxPanelLinkStyle(): AnnotatedString {
             }
         }
     }
+}
+
+internal object DaxPanelDefaults {
+    val shape
+        @Composable get() = DuckDuckGoTheme.shapes.small
+
+    val infoColor: Color
+        @Composable get() = DuckDuckGoTheme.colors.infoPanel.backgroundBlue
+
+    val infoIcon: Painter
+        @Composable get() = painterResource(R.drawable.ic_info_panel_info)
+
+    val alertColor: Color
+        @Composable get() = DuckDuckGoTheme.colors.infoPanel.backgroundYellow
+
+    val alertIcon: Painter
+        @Composable get() = painterResource(R.drawable.ic_exclamation_yellow_16)
 }

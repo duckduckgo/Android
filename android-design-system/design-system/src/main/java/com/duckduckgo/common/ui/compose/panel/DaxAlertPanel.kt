@@ -14,84 +14,81 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.common.ui.compose.infopannel
+package com.duckduckgo.common.ui.compose.panel
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.LinkAnnotation
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.withLink
 import androidx.compose.ui.tooling.preview.PreviewLightDark
-import com.duckduckgo.common.ui.compose.theme.DuckDuckGoTheme
 import com.duckduckgo.common.ui.compose.tools.PreviewBox
-import com.duckduckgo.mobile.android.R
 
 /**
- * An informational panel used to surface important, non-critical information to the user.
+ * An alert panel used to surface warnings or information that needs the user's attention.
  *
- * Displays the given text alongside an info icon on a blue background. For warnings or alerts,
- * use [DaxAlertPanel] instead.
+ * Displays the given text alongside a warning icon on a yellow background. For neutral,
+ * informational messages, use [DaxInfoPanel] instead.
  *
- * @param body The informational text to display in the panel.
+ * @param body The warning text to display in the panel.
  * @param modifier The [Modifier] to be applied to this panel.
  *
- * Asana task: https://app.asana.com/1/137249556945/project/1202857801505092/task/1215232366615036?focus=true
- * Figma reference: https://www.figma.com/design/BOHDESHODUXK7wSRNBOHdu/%F0%9F%A4%96-Android-Components?node-id=25970-57493&m=dev
+ * Asana Task: https://app.asana.com/1/137249556945/project/1202857801505092/task/1215232366680610?focus=true
+ * Figma reference: https://www.figma.com/design/BOHDESHODUXK7wSRNBOHdu/%F0%9F%A4%96-Android-Components?node-id=25970-57507&m=dev
  */
 @Composable
-fun DaxInfoPanel(
+fun DaxAlertPanel(
     body: String,
     modifier: Modifier = Modifier,
 ) {
-    DaxInfoPanel(
+    DaxAlertPanel(
         body = AnnotatedString(body),
         modifier = modifier,
     )
 }
 
 /**
- * [AnnotatedString] variant of [DaxInfoPanel]. Use this when the body needs inline styling or a
+ * [AnnotatedString] variant of [DaxAlertPanel]. Use this when the body needs inline styling or a
  * clickable link. Build the [AnnotatedString] with `buildAnnotatedString`, adding links via
  * `LinkAnnotation`.
  *
- * @param body The informational text to display in the panel, as an [AnnotatedString].
+ * @param body The warning text to display in the panel, as an [AnnotatedString].
  * @param modifier The [Modifier] to be applied to this panel.
  *
- * Asana task: https://app.asana.com/1/137249556945/project/1202857801505092/task/1215232366615036?focus=true
- * Figma reference: https://www.figma.com/design/BOHDESHODUXK7wSRNBOHdu/%F0%9F%A4%96-Android-Components?node-id=25970-57493&m=dev
+ * Asana Task: https://app.asana.com/1/137249556945/project/1202857801505092/task/1215232366680610?focus=true
+ * Figma reference: https://www.figma.com/design/BOHDESHODUXK7wSRNBOHdu/%F0%9F%A4%96-Android-Components?node-id=25970-57507&m=dev
  */
 @Composable
-fun DaxInfoPanel(
+fun DaxAlertPanel(
     body: AnnotatedString,
     modifier: Modifier = Modifier,
 ) {
     DaxPanel(
         body = body,
         modifier = modifier,
-        icon = painterResource(R.drawable.ic_info_panel_info),
-        color = DuckDuckGoTheme.colors.infoPanel.backgroundBlue,
+        icon = DaxPanelDefaults.alertIcon,
+        color = DaxPanelDefaults.alertColor,
     )
 }
 
 @PreviewLightDark
 @Composable
-private fun DaxInfoPanelPreview() {
+private fun DaxAlertPanelPreview() {
     PreviewBox {
-        DaxInfoPanel(
-            body = "This is an info panel. It can be used to show important information to the user.",
+        DaxAlertPanel(
+            body = "This is an Alert Info Panel, warning information can be shown here.",
         )
     }
 }
 
 @PreviewLightDark
 @Composable
-private fun DaxInfoPanelWithLinkPreview() {
+private fun DaxAlertPanelWithLinkPreview() {
     PreviewBox {
-        DaxInfoPanel(
+        DaxAlertPanel(
             body = buildAnnotatedString {
-                append("This info panel has a link. Visit ")
+                append("This alert panel has a link. Visit ")
                 withLink(LinkAnnotation.Url("https://duckduckgo.com")) {
                     append("duckduckgo.com")
                 }
