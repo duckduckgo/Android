@@ -35,7 +35,10 @@ import com.duckduckgo.sync.impl.AccountErrorCodes.CREATE_ACCOUNT_FAILED
 import com.duckduckgo.sync.impl.AccountErrorCodes.GENERIC_ERROR
 import com.duckduckgo.sync.impl.AccountErrorCodes.INVALID_CODE
 import com.duckduckgo.sync.impl.AccountErrorCodes.LOGIN_FAILED
+import com.duckduckgo.sync.impl.AccountErrorCodes.PAIRING_REJECTED
 import com.duckduckgo.sync.impl.AccountErrorCodes.THIRD_PARTY_ALREADY_UPGRADED
+import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Message
+import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2State
 import com.duckduckgo.sync.impl.Clipboard
 import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.RealSyncCodeDispatcher
@@ -387,6 +390,43 @@ internal class EnterCodeViewModelTest {
         testee.onPasteCodeClicked()
 
         testee.commands().test {
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenV2PairingRejectedByPeerThenShowErrorAndClearLoading() = runTest {
+        // Repro: peer rejects after this device confirmed → runner reaches Joiner.AbortedByHost with a
+        // RecoveryCodeDenied trigger → dispatcher emits Failed(PAIRING_REJECTED). Must surface a visible
+        // error and clear the Loading spinner, not hang silently.
+        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
+        whenever(syncAccountRepository.getAccountInfo()).thenReturn(noAccount)
+        val pastedCode = "https://duckduckgo.com/sync/pairing/#&code2=v2code"
+        whenever(clipboard.pasteFromClipboard()).thenReturn(pastedCode)
+        whenever(qrCode.parse(pastedCode)).thenReturn(
+            ExchangeV2CodeParseResult.LinkingV2(channelId = "c", publicKey = "k", version = "2"),
+        )
+        whenever(runner.eventsSince(any())).thenReturn(
+            flowOf(
+                ExchangeV2Event.Transition(
+                    timestampMs = 0L,
+                    from = ExchangeV2State.Joiner.Confirming,
+                    to = ExchangeV2State.Joiner.AbortedByHost,
+                    trigger = ExchangeV2Message.RecoveryCodeDenied(rawJson = "{}"),
+                    localTrigger = null,
+                ),
+            ),
+        )
+
+        testee.onPasteCodeClicked()
+
+        testee.commands().test {
+            val command = awaitItem()
+            assertTrue("expected ShowError, got $command", command is ShowError)
+            cancelAndIgnoreRemainingEvents()
+        }
+        testee.viewState().test {
+            assertTrue(awaitItem().authState is Idle)
             cancelAndIgnoreRemainingEvents()
         }
     }
