@@ -21,11 +21,13 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
+import android.os.SystemClock
 import android.view.Gravity
 import android.view.Menu
 import android.view.MenuItem
 import android.view.MotionEvent
 import android.view.View
+import android.view.ViewTreeObserver
 import android.widget.FrameLayout
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.SystemBarStyle
@@ -190,12 +192,47 @@ class TabSwitcherActivity :
                 super.onScrolled(recyclerView, dx, dy)
                 checkTrackerAnimationPanelVisibility()
             }
+
+            override fun onScrollStateChanged(
+                recyclerView: RecyclerView,
+                newState: Int,
+            ) {
+                super.onScrollStateChanged(recyclerView, newState)
+                // Record the top item so a later grid<->list toggle can restore it
+                if (newState == RecyclerView.SCROLL_STATE_IDLE) {
+                    captureScrollAnchorPosition()?.let { savedScrollAnchorPosition = it }
+                } else if (newState == RecyclerView.SCROLL_STATE_DRAGGING) {
+                    // User is scrolling, reset the toggle anchor
+                    pendingToggleScrollAnchor = null
+                }
+            }
         }
 
-    // we need to scroll to show selected tab, but only if it is the first time loading the tabs.
+    // we need to scroll to show selected tab, but only if it is the first time loading the tabs
     private var firstTimeLoadingTabsList = true
-
     private var currentLayoutType: LayoutType? = null
+    private var savedScrollAnchorPosition = RecyclerView.NO_POSITION
+    private var pendingToggleScrollAnchor: Int? = null
+    private var anchorRepinDeadlineMs = 0L
+
+    private val anchorRepinPreDrawListener =
+        ViewTreeObserver.OnPreDrawListener {
+            val anchor = pendingToggleScrollAnchor
+            if (anchor != null) {
+                if (SystemClock.uptimeMillis() > anchorRepinDeadlineMs) {
+                    pendingToggleScrollAnchor = null
+                } else {
+                    val layoutManager = tabsRecycler.layoutManager as? LinearLayoutManager
+                    val first = layoutManager?.findFirstVisibleItemPosition() ?: RecyclerView.NO_POSITION
+                    // Re-pin if the layout drifted the anchor below the top. Tolerance of one
+                    // position allows the 2-column grid's row-leader pairing
+                    if (first != RecyclerView.NO_POSITION && first < anchor - 1) {
+                        layoutManager?.scrollToPositionWithOffset(anchor, 0)
+                    }
+                }
+            }
+            true
+        }
 
     private var isOnScrolledListenerAttached = false
 
@@ -356,6 +393,7 @@ class TabSwitcherActivity :
         // the tabs recycler view is initially hidden until we know what type of layout to show
         tabsRecycler.gone()
         tabsRecycler.adapter = tabsAdapter
+        tabsRecycler.viewTreeObserver.addOnPreDrawListener(anchorRepinPreDrawListener)
 
         if (fadingInAfterRecreate) {
             tabsRecycler.alpha = 0f
@@ -524,8 +562,6 @@ class TabSwitcherActivity :
     private fun configureObservers() {
         lifecycleScope.launch {
             viewModel.viewState.flowWithLifecycle(lifecycle).collectLatest {
-                // Apply layout type first so the LayoutManager is in place before the adapter
-                // commits items and any scroll-to-active runs against the correct layout.
                 it.layoutType?.let(::updateLayoutType)
 
                 tabsRecycler.invalidateItemDecorations()
@@ -534,8 +570,11 @@ class TabSwitcherActivity :
                     (firstTimeLoadingTabsList || fadingInAfterRecreate)
 
                 tabsAdapter.updateData(it.tabSwitcherItems) {
+                    pendingToggleScrollAnchor?.let { anchor -> scrollPositionToTop(anchor) }
+
                     val scrolled = shouldTryScroll && scrollToActiveTab(it.tabSwitcherItems)
                     if (scrolled) firstTimeLoadingTabsList = false
+
                     if (fadingInAfterRecreate && !fadeInAnimationStarted && it.tabs.isNotEmpty()) {
                         fadeInAnimationStarted = true
                         tabsRecycler.show()
@@ -576,12 +615,26 @@ class TabSwitcherActivity :
             tabsRecycler.show()
             return
         }
+
+        // Preserve the user's scroll position across the grid<->list swap
+        if (savedScrollAnchorPosition == RecyclerView.NO_POSITION) {
+            savedScrollAnchorPosition = captureScrollAnchorPosition() ?: RecyclerView.NO_POSITION
+        }
+        val anchorPosition = savedScrollAnchorPosition.takeIf { it != RecyclerView.NO_POSITION }
+
         tabsRecycler.hide()
         detachOnScrolledListener()
 
         applyLayoutType(layoutType)
 
-        scrollToActiveTab(viewModel.viewState.value.tabSwitcherItems)
+        if (anchorPosition != null) {
+            pendingToggleScrollAnchor = anchorPosition
+            anchorRepinDeadlineMs = SystemClock.uptimeMillis() + ANCHOR_REPIN_WINDOW_MS
+            scrollPositionToTop(anchorPosition)
+        } else {
+            pendingToggleScrollAnchor = null
+            scrollToActiveTab(viewModel.viewState.value.tabSwitcherItems)
+        }
         attachOnScrolledListener()
 
         tabsRecycler.show()
@@ -657,6 +710,17 @@ class TabSwitcherActivity :
         return true
     }
 
+    // Aligns the given item to the top
+    private fun scrollPositionToTop(index: Int) {
+        val layoutManager = tabsRecycler.layoutManager as? LinearLayoutManager ?: return
+        val innerHeight = tabsRecycler.height - tabsRecycler.paddingTop - tabsRecycler.paddingBottom
+        if (innerHeight <= 0) {
+            tabsRecycler.doOnPreDraw { scrollPositionToTop(index) }
+            return
+        }
+        layoutManager.scrollToPositionWithOffset(index, 0)
+    }
+
     private fun scrollToPosition(index: Int) {
         val layoutManager = tabsRecycler.layoutManager as? LinearLayoutManager ?: return
         val innerHeight = tabsRecycler.height - tabsRecycler.paddingTop - tabsRecycler.paddingBottom
@@ -687,6 +751,14 @@ class TabSwitcherActivity :
             centerOffset
         }
         layoutManager.scrollToPositionWithOffset(index, offset.coerceAtLeast(0))
+    }
+
+    // Returns the first fully visible item to use as the scroll anchor for a grid<->list swap
+    private fun captureScrollAnchorPosition(): Int? {
+        val layoutManager = tabsRecycler.layoutManager as? LinearLayoutManager ?: return null
+        val completelyVisible = layoutManager.findFirstCompletelyVisibleItemPosition()
+        if (completelyVisible != RecyclerView.NO_POSITION) return completelyVisible
+        return layoutManager.findFirstVisibleItemPosition().takeIf { it != RecyclerView.NO_POSITION }
     }
 
     private fun processCommand(command: Command) {
@@ -1072,6 +1144,8 @@ class TabSwitcherActivity :
         private const val TAB_GRID_MAX_COLUMN_COUNT = 4
         private const val MODE_SWITCH_FADE_OUT_MS = 180L
         private const val MODE_SWITCH_FADE_IN_MS = 220L
+
+        private const val ANCHOR_REPIN_WINDOW_MS = 1000L
         private const val KEY_FADE_IN_AFTER_RECREATE = "fadeInAfterModeSwitchRecreate"
     }
 }
