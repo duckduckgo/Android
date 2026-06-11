@@ -161,6 +161,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
     private var suggestionButtonsAnimatorSet: AnimatorSet? = null
     private var bobbingDaxAnimator: ValueAnimator? = null
     private var backgroundAnimator: OnboardingBackgroundAnimator? = null
+    private var decorationFitCorrector: OnboardingDecorationFitCorrector? = null
     private var changeBoundsTransition: androidx.transition.Transition? = null
     private var changeBoundsTransitionListener: TransitionListenerAdapter? = null
     private var textIntroScale = 1f
@@ -529,6 +530,13 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
         binding.daxDialogCta.cardContainer.setOnClickListener { viewModel.onDialogTapped() }
         binding.root.setOnClickListener { viewModel.onBackgroundTapped() }
 
+        decorationFitCorrector = OnboardingDecorationFitCorrector(
+            root = binding.root,
+            dialog = binding.daxDialogCta.root,
+            cardContainer = binding.daxDialogCta.cardContainer,
+            onDecorationHidden = { binding.daxDialogCta.cardView.setArrowDepthFraction(0f) },
+        ).also { it.attach() }
+
         combine(viewModel.viewState, introInProgress) { state, _ -> state }
             .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
             .onEach { state ->
@@ -676,6 +684,9 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
 
     override fun onDestroyView() {
         super.onDestroyView()
+
+        decorationFitCorrector?.detach()
+        decorationFitCorrector = null
 
         introAnimatorSet?.cancel()
         introInProgress.value = false
@@ -1264,6 +1275,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                     dismissBottomWingAnimation()
                     binding.daxDialogCta.comparisonChartContent.root.isVisible = false
                     dismissLeftWingAnimation()
+                    decorationFitCorrector?.clear()
 
                     val title = if (isCustomAiOnboardingFlow) {
                         getString(R.string.preOnboardingInputModeDemoTitleCustomAi)
@@ -1936,6 +1948,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
 
                 binding.leftWingAnimation.isVisible = false
                 binding.bottomWingAnimation.isVisible = false
+                decorationFitCorrector?.clear()
 
                 backgroundAnimator?.snapTo(OnboardingBackgroundStep.InputType)
 
@@ -2175,7 +2188,13 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
         )
         if (walkingDaxHeight != null) {
             binding.welcomeScreenWalkingDax.updateLayoutParams { height = walkingDaxHeight }
+            decorationFitCorrector?.track(
+                binding.welcomeScreenWalkingDax,
+                minHeightPx = WALKING_DAX_MIN_HEIGHT_DP.toPx(),
+                maxHeightPx = WALKING_DAX_MAX_HEIGHT_DP.toPx(),
+            )
         } else {
+            decorationFitCorrector?.clear()
             binding.welcomeScreenWalkingDax.isVisible = false
             binding.daxDialogCta.root.updateLayoutParams<ConstraintLayout.LayoutParams> {
                 verticalBias = 0f
@@ -2200,6 +2219,13 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
         )
         if (height != null) {
             decorationView.updateLayoutParams { this.height = height }
+            decorationFitCorrector?.track(
+                decorationView,
+                minHeightPx = minHeightDp.toPx(),
+                maxHeightPx = maxHeightDp.toPx(),
+            )
+        } else {
+            decorationFitCorrector?.clear()
         }
         return height != null
     }

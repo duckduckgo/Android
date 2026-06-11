@@ -59,7 +59,8 @@ data class DaxDuckAiEndBrandDesignUpdateBubbleCta(
         rotationDegrees = 0f,
         translationXDp = -40f,
         translationYDp = -150f,
-        heightDp = 178f,
+        minHeightDp = 178f,
+        maxHeightDp = 178f,
         anchorToCardOnTablet = true,
     )
 
