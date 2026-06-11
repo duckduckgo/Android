@@ -1857,7 +1857,7 @@ class BrowserTabFragment :
                 viewModel.openDuckChatHistory()
             }
             onMenuItemClicked(duckChatSettingsMenuItem) {
-                viewModel.openDuckChatSettings()
+                viewModel.openDuckChatSettings(omnibar.viewMode)
             }
             onMenuItemClicked(fireMenuItem) {
                 onFireButtonPressed()

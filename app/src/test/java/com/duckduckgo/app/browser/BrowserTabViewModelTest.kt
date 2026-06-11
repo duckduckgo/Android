@@ -7259,6 +7259,19 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenTypedDuckAiUrlWithUppercaseHostThenDirectNavigationPixelsFire() {
+        whenever(mockOmnibarConverter.convertQueryToUrl("Duck.ai", null, FromUser)).thenReturn("https://Duck.ai/")
+        whenever(mockDuckChat.isEnabled()).thenReturn(true)
+
+        testee.onUserSubmittedQuery("Duck.ai", queryOrigin = FromUser)
+
+        verify(mockPixel).fire(
+            AppPixelName.AI_CHAT_DUCK_AI_DIRECT_NAVIGATION_COUNT,
+            parameters = mapOf("duck_ai_enabled" to "true"),
+        )
+    }
+
+    @Test
     fun whenTypedDuckAiUrlSubmittedFromUserAndDuckAiDisabledThenDirectNavigationPixelsFireWithEnabledFalse() {
         whenever(mockOmnibarConverter.convertQueryToUrl("duck.ai", null, FromUser)).thenReturn("https://duck.ai/")
         whenever(mockDuckChat.isEnabled()).thenReturn(false)
@@ -10069,7 +10082,7 @@ class BrowserTabViewModelTest {
         )
         whenever(mockDuckChatJSHelper.onNativeAction(NativeAction.DUCK_AI_SETTINGS)).thenReturn(expectedEvent)
 
-        testee.openDuckChatSettings()
+        testee.openDuckChatSettings(ViewMode.DuckAI)
 
         testee.subscriptionEventDataFlow.test {
             val emittedEvent = awaitItem()
@@ -10079,6 +10092,19 @@ class BrowserTabViewModelTest {
             cancelAndIgnoreRemainingEvents()
         }
 
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_DUCK_AI_SETTINGS_TAPPED)
+    }
+
+    @Test
+    fun whenDuckChatSettingsRequestedOutsideDuckAiThenSettingsUrlOpenedInNewTab() = runTest {
+        val settingsUrl = "https://duck.ai?settings=open"
+        whenever(mockDuckChat.getDuckChatSettingsUrl()).thenReturn(settingsUrl)
+
+        testee.openDuckChatSettings(ViewMode.Browser("https://example.com"))
+
+        assertCommandIssued<Command.OpenInNewTab> {
+            assertEquals(settingsUrl, query)
+        }
         verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_DUCK_AI_SETTINGS_TAPPED)
     }
 

@@ -626,6 +626,10 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
         intent.sanitize()
 
+        intent.getStringExtra(LAUNCH_FROM_NOTIFICATION_PIXEL_NAME)?.let {
+            viewModel.onLaunchedFromNotification(it)
+        }
+
         dataClearerForegroundAppRestartPixel.registerIntent(intent)
 
         if (dataClearer.dataClearerState.value == ApplicationClearDataState.FINISHED) {

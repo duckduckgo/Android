@@ -290,7 +290,7 @@ class BrowserMenuBottomSheetTest {
         assertTrue(dialog.duckAiNewChatMenuItem.isVisible)
         assertTrue(dialog.duckAiNewVoiceChatMenuItem.isVisible)
         assertTrue(dialog.duckChatHistoryMenuItem.isVisible)
-        assertFalse(dialog.duckChatSettingsMenuItem.isVisible)
+        assertTrue(dialog.duckChatSettingsMenuItem.isVisible)
     }
 
     @Test
@@ -300,6 +300,7 @@ class BrowserMenuBottomSheetTest {
         dialog.render(BrowserMenuViewState.Browser(showDuckAiSection = false))
 
         assertFalse(duckAiSection.isVisible)
+        assertFalse(dialog.duckChatSettingsMenuItem.isVisible)
     }
 
     @Test

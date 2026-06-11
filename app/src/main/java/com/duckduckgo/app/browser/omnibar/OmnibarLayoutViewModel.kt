@@ -26,6 +26,7 @@ import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.browser.AddressDisplayFormatter
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.browser.animations.AddressBarTrackersAnimationManager
+import com.duckduckgo.app.browser.customtabs.CustomTabPixelNames
 import com.duckduckgo.app.browser.menu.BrowserMenuHighlight
 import com.duckduckgo.app.browser.menu.BrowserViewMode
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode
@@ -302,6 +303,7 @@ class OmnibarLayoutViewModel @Inject constructor(
         data class LaunchInputScreen(val query: String) : Command()
         data class EasterEggLogoClicked(val url: String) : Command()
         data object FocusInputField : Command()
+        data class CopyUrlToClipboard(val url: String) : Command()
         data object CancelEasterEggLogoAnimation : Command()
     }
 
@@ -1211,6 +1213,16 @@ class OmnibarLayoutViewModel @Inject constructor(
     fun onCancelAddressBarAnimations() {
         viewModelScope.launch {
             command.send(Command.CancelEasterEggLogoAnimation)
+        }
+    }
+
+    fun onCustomTabUrlLongClicked() {
+        viewModelScope.launch {
+            val url = _viewState.value.url
+            if (url.isNotEmpty()) {
+                command.send(Command.CopyUrlToClipboard(url))
+                pixel.fire(CustomTabPixelNames.CUSTOM_TABS_COPY_URL)
+            }
         }
     }
 

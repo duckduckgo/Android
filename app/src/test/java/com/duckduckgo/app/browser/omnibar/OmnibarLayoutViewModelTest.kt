@@ -8,10 +8,12 @@ import com.duckduckgo.adblocking.api.duckplayer.DuckPlayer
 import com.duckduckgo.app.browser.AddressDisplayFormatter
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetectorImpl
 import com.duckduckgo.app.browser.animations.AddressBarTrackersAnimationManager
+import com.duckduckgo.app.browser.customtabs.CustomTabPixelNames
 import com.duckduckgo.app.browser.menu.BrowserMenuHighlight
 import com.duckduckgo.app.browser.menu.BrowserViewMode
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command
+import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command.CopyUrlToClipboard
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command.LaunchInputScreen
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.EnabledState
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.LeadingIconState
@@ -2879,6 +2881,64 @@ class OmnibarLayoutViewModelTest {
                 "Expected PrivacyShield after feature re-enabled on non-SERP site, but got ${viewState.leadingIconState}",
                 viewState.leadingIconState is LeadingIconState.PrivacyShield,
             )
+        }
+    }
+
+    @Test
+    fun whenCustomTabUrlLongClickedWithValidUrlThenCopyUrlToClipboardCommandSent() = runTest {
+        givenSiteLoaded(RANDOM_URL)
+
+        testee.onCustomTabUrlLongClicked()
+
+        testee.commands().test {
+            val command = awaitItem()
+            assertTrue(command is Command.CopyUrlToClipboard)
+            assertEquals(RANDOM_URL, (command as Command.CopyUrlToClipboard).url)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenCustomTabUrlLongClickedWithValidUrlThenCopyUrlPixelFired() = runTest {
+        givenSiteLoaded(RANDOM_URL)
+
+        testee.onCustomTabUrlLongClicked()
+
+        verify(pixel).fire(CustomTabPixelNames.CUSTOM_TABS_COPY_URL)
+    }
+
+    @Test
+    fun whenCustomTabUrlLongClickedWithEmptyUrlThenNoCommandSent() = runTest {
+        givenSiteLoaded(EMPTY_URL)
+
+        testee.onCustomTabUrlLongClicked()
+
+        testee.commands().test {
+            expectNoEvents()
+        }
+    }
+
+    @Test
+    fun whenCustomTabUrlLongClickedWithEmptyUrlThenCopyUrlPixelNotFired() = runTest {
+        givenSiteLoaded(EMPTY_URL)
+
+        testee.onCustomTabUrlLongClicked()
+
+        verify(pixel, never()).fire(CustomTabPixelNames.CUSTOM_TABS_COPY_URL)
+    }
+
+    @Test
+    fun whenCustomTabUrlLongClickedThenCommandContainsCurrentViewStateUrl() = runTest {
+        val expectedUrl = "https://example.com/test"
+        givenSiteLoaded(expectedUrl)
+
+        testee.onCustomTabUrlLongClicked()
+
+        testee.commands().test {
+            val command = awaitItem()
+            assertTrue(command is Command.CopyUrlToClipboard)
+            assertEquals(expectedUrl, (command as Command.CopyUrlToClipboard).url)
+            cancelAndIgnoreRemainingEvents()
         }
     }
 
