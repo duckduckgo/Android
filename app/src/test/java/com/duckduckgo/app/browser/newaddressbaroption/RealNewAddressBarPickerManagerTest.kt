@@ -62,6 +62,7 @@ class RealNewAddressBarPickerManagerTest {
             whenever(duckAiFeatureStateMock.showAIChatAddressBarOptionChoiceScreen).thenReturn(showPickerFlow)
             whenever(dialogFactoryMock.create(any(), any(), any())).thenReturn(dialogMock)
             whenever(appThemeMock.isLightModeEnabled()).thenReturn(true)
+            whenever(dataStoreMock.incrementDisplayCount()).thenReturn(1)
 
             testee =
                 RealNewAddressBarPickerManager(
@@ -239,6 +240,46 @@ class RealNewAddressBarPickerManagerTest {
                 mapOf("selection" to "search_only"),
                 type = Pixel.PixelType.Daily(),
             )
+        }
+
+    @Test
+    fun `when displayed reaches max count then marks as shown`() =
+        runTest {
+            setupAllConditionsMet()
+            whenever(dataStoreMock.incrementDisplayCount()).thenReturn(2)
+            var capturedCallback: NewAddressBarCallback? = null
+            whenever(dialogFactoryMock.create(any(), any(), any())).thenAnswer {
+                capturedCallback = it.getArgument<NewAddressBarCallback?>(2)
+                dialogMock
+            }
+
+            testee.showChoiceScreen(mock())
+
+            assertNotNull(capturedCallback)
+            capturedCallback!!.onDisplayed()
+            coroutineTestRule.testScope.advanceUntilIdle()
+
+            verify(dataStoreMock).setAsShown()
+        }
+
+    @Test
+    fun `when displayed below max count then does not mark as shown`() =
+        runTest {
+            setupAllConditionsMet()
+            whenever(dataStoreMock.incrementDisplayCount()).thenReturn(1)
+            var capturedCallback: NewAddressBarCallback? = null
+            whenever(dialogFactoryMock.create(any(), any(), any())).thenAnswer {
+                capturedCallback = it.getArgument<NewAddressBarCallback?>(2)
+                dialogMock
+            }
+
+            testee.showChoiceScreen(mock())
+
+            assertNotNull(capturedCallback)
+            capturedCallback!!.onDisplayed()
+            coroutineTestRule.testScope.advanceUntilIdle()
+
+            verify(dataStoreMock, never()).setAsShown()
         }
 
     private suspend fun setupAllConditionsMet() {

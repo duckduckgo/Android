@@ -117,6 +117,12 @@ class RealNewAddressBarPickerManager @Inject constructor(
                 override fun onDisplayed() {
                     pixel.fire(AppPixelName.NEW_ADDRESS_BAR_PICKER_V2_DISPLAYED_COUNT)
                     pixel.fire(AppPixelName.NEW_ADDRESS_BAR_PICKER_V2_DISPLAYED_DAILY, type = Pixel.PixelType.Daily())
+                    appCoroutineScope.launch {
+                        // After being shown MAX_DISPLAY_COUNT times without a choice, stop offering it.
+                        if (newAddressBarPickerDataStore.incrementDisplayCount() >= MAX_DISPLAY_COUNT) {
+                            newAddressBarPickerDataStore.setAsShown()
+                        }
+                    }
                 }
 
                 override fun onConfirmed(searchAndAiSelected: Boolean) {
@@ -136,6 +142,7 @@ class RealNewAddressBarPickerManager @Inject constructor(
     }
 
     private companion object {
+        private const val MAX_DISPLAY_COUNT = 2
         private const val SELECTION_PARAM = "selection"
         private const val SELECTION_SEARCH_AND_AI = "search_and_ai"
         private const val SELECTION_SEARCH_ONLY = "search_only"
