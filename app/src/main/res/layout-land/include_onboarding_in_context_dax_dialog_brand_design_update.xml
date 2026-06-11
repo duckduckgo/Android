@@ -30,7 +30,7 @@
     android:theme="@style/ThemeOverlay.DuckDuckGo.Onboarding"
     tools:alpha="1">
 
-    <ImageView
+    <com.duckduckgo.app.onboarding.ui.view.OnboardingFillImageView
         android:id="@+id/contextualBrandDesignBackground"
         android:layout_width="0dp"
         android:layout_height="0dp"
