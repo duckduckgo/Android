@@ -17,8 +17,6 @@
 package com.duckduckgo.app.browser
 
 import android.annotation.SuppressLint
-import android.app.Activity
-import android.os.Bundle
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.test.core.app.ActivityScenario
@@ -139,11 +137,5 @@ class DocumentStartJavaScriptSmokeTest {
     private companion object {
         const val CONTENT_SCOPE_OBJECT_NAME = "contentScopeAdsjs"
         const val WEBVIEW_TIMEOUT_SECONDS = 5L
-    }
-}
-
-class DocumentStartJavaScriptTestActivity : Activity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
     }
 }
