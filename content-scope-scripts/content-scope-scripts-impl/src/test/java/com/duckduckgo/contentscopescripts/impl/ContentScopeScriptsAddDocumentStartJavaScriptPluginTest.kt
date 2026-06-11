@@ -63,11 +63,11 @@ class ContentScopeScriptsAddDocumentStartJavaScriptPluginTest {
             whenever(mockActiveContentScopeExperiments.getActiveExperiments()).thenReturn(listOf(activeExperiment))
             whenever(mockWebViewCompatContentScopeScripts.isEnabled()).thenReturn(true)
             whenever(mockWebViewCapabilityChecker.isSupported(any())).thenReturn(true)
-            whenever(mockWebViewCompatContentScopeScripts.getScript(any())).thenReturn("script")
+            whenever(mockWebViewCompatContentScopeScripts.getScript(anyOrNull(), any())).thenReturn("script")
 
-            testee.addDocumentStartJavaScript(mockWebView)
+            testee.addDocumentStartJavaScript(mockWebView, false)
 
-            verify(mockWebViewCompatContentScopeScripts).getScript(listOf(activeExperiment))
+            verify(mockWebViewCompatContentScopeScripts).getScript(false, listOf(activeExperiment))
             verify(mockWebViewCompatWrapper).addDocumentStartJavaScript(mockWebView, "script", setOf("*"))
         }
 

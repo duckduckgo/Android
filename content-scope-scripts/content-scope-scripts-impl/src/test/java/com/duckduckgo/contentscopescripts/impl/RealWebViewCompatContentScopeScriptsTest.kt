@@ -368,7 +368,7 @@ class RealWebViewCompatContentScopeScriptsTest {
         whenever(mockPluginPoint.getPlugins()).thenReturn(listOf(mockPlugin1))
         whenever(mockPlugin1.config()).thenReturn(webCompatConfig)
 
-        val js = testee.getScript(listOf())
+        val js = testee.getScript(null, listOf())
 
         assertTrue(js.contains(expectedWebCompatConfig))
         assertTrue(js.contains("\"messageSecret\":\"${testee.secret}\""))
