@@ -43,11 +43,18 @@ class WebCompatContentScopeConfigPluginTest {
     }
 
     @Test
+    fun whenGetConfigWithWebShareEnabledThenReturnWebShareConfig() {
+        whenever(mockWebCompatRepository.getWebCompatEntity()).thenReturn(WebCompatEntity(json = webShareEnabledConfig))
+        assertEquals("\"webCompat\":$webShareEnabledConfig", testee.config())
+    }
+
+    @Test
     fun whenGetPreferencesThenReturnNull() {
         assertNull(testee.preferences())
     }
 
     companion object {
         const val config = "{\"key\":\"value\"}"
+        const val webShareEnabledConfig = "{\"state\":\"enabled\",\"settings\":{\"webShare\":\"enabled\"}}"
     }
 }

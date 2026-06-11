@@ -364,6 +364,21 @@ class RealWebViewCompatContentScopeScriptsTest {
     }
 
     @Test
+    fun whenGetScriptThenIncludesFeatureConfigAndMessagingParameters() = runTest {
+        whenever(mockPluginPoint.getPlugins()).thenReturn(listOf(mockPlugin1))
+        whenever(mockPlugin1.config()).thenReturn(webCompatConfig)
+
+        val js = testee.getScript(listOf())
+
+        assertTrue(js.contains(expectedWebCompatConfig))
+        assertTrue(js.contains("\"messageSecret\":\"${testee.secret}\""))
+        assertTrue(js.contains("\"messageCallback\":\"${testee.callbackName}\""))
+        assertTrue(js.contains("\"javascriptInterface\":\"${testee.javascriptInterface}\""))
+        assertFalse(js.contains("\$CONTENT_SCOPE\$"))
+        assertFalse(js.contains("\$ANDROID_MESSAGING_PARAMETERS\$"))
+    }
+
+    @Test
     fun whenGetScriptWithMixedValidAndNullCohortExperimentsThenFiltersOutNullCohorts() = runTest {
         val newRegEx = Regex(
             "^processConfig\\(\\{\"features\":\\{" +
@@ -427,6 +442,9 @@ class RealWebViewCompatContentScopeScriptsTest {
         const val exampleUrl2 = "foo.com"
         const val versionCode = 1234
         const val sessionKey = "5678"
+        const val expectedWebCompatConfig =
+            "\"webCompat\":{\"state\":\"enabled\",\"settings\":{\"webShare\":\"enabled\",\"screenLock\":\"enabled\"}}"
+        const val webCompatConfig = expectedWebCompatConfig
         val unprotectedTemporaryException = FeatureException(domain = "example.com", reason = "reason")
         val unprotectedTemporaryException2 = FeatureException(domain = "foo.com", reason = "reason2")
         val contentScopeRegex = Regex(

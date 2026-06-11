@@ -5,6 +5,7 @@ import com.duckduckgo.app.browser.api.WebViewCapabilityChecker
 import com.duckduckgo.browser.api.webviewcompat.WebViewCompatWrapper
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.contentscopescripts.api.contentscopeExperiments.ContentScopeExperiments
+import com.duckduckgo.feature.toggles.api.Toggle
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
@@ -52,6 +53,21 @@ class ContentScopeScriptsAddDocumentStartJavaScriptPluginTest {
             testee.addDocumentStartJavaScript(mockWebView, true)
 
             verify(mockWebViewCompatContentScopeScripts).getScript(true, listOf())
+            verify(mockWebViewCompatWrapper).addDocumentStartJavaScript(mockWebView, "script", setOf("*"))
+        }
+
+    @Test
+    fun whenFeatureIsEnabledThenGetScriptWithActiveExperiments() =
+        runTest {
+            val activeExperiment: Toggle = mock()
+            whenever(mockActiveContentScopeExperiments.getActiveExperiments()).thenReturn(listOf(activeExperiment))
+            whenever(mockWebViewCompatContentScopeScripts.isEnabled()).thenReturn(true)
+            whenever(mockWebViewCapabilityChecker.isSupported(any())).thenReturn(true)
+            whenever(mockWebViewCompatContentScopeScripts.getScript(any())).thenReturn("script")
+
+            testee.addDocumentStartJavaScript(mockWebView)
+
+            verify(mockWebViewCompatContentScopeScripts).getScript(listOf(activeExperiment))
             verify(mockWebViewCompatWrapper).addDocumentStartJavaScript(mockWebView, "script", setOf("*"))
         }
 
