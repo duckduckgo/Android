@@ -24,8 +24,8 @@ import dagger.SingleInstanceIn
 import javax.inject.Inject
 
 /**
- * Persists subscription onboarding progress across sessions: which steps have been completed, and
- * the last screen the user visited (used to resume the flow when re-entering from settings).
+ * Persists subscription onboarding progress across sessions: which steps have been completed. The
+ * flow resumes at the first step that isn't completed, so this is all the state it needs.
  */
 @SingleInstanceIn(AppScope::class)
 class SubscriptionOnboardingDataStore @Inject constructor(
@@ -44,13 +44,8 @@ class SubscriptionOnboardingDataStore @Inject constructor(
 
     fun isCompleted(stepName: String): Boolean = completedSteps.contains(stepName)
 
-    var lastVisitedStep: String?
-        get() = preferences.getString(KEY_LAST_VISITED_STEP, null)
-        set(value) { preferences.edit { putString(KEY_LAST_VISITED_STEP, value) } }
-
     companion object {
         const val FILENAME = "com.duckduckgo.subscriptions.onboarding"
         private const val KEY_COMPLETED_STEPS = "KEY_COMPLETED_STEPS"
-        private const val KEY_LAST_VISITED_STEP = "KEY_LAST_VISITED_STEP"
     }
 }

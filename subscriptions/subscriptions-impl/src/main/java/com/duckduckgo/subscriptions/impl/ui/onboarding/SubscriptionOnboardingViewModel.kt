@@ -114,7 +114,6 @@ class SubscriptionOnboardingViewModel @Inject constructor(
 
     private suspend fun goToCurrent() {
         val screen = currentScreen() ?: return
-        dataStore.lastVisitedStep = screen.name
         command.send(ShowStep(screen.name))
     }
 
@@ -133,8 +132,11 @@ class SubscriptionOnboardingViewModel @Inject constructor(
         return when (origin) {
             SubscriptionOnboardingOrigin.PURCHASE -> 0
             SubscriptionOnboardingOrigin.SETTINGS -> {
-                val resume = screens.indexOfFirst { it.name == dataStore.lastVisitedStep && it.type != INTRO }
-                if (resume != -1) resume else screens.indexOfFirst { it.type != INTRO }.takeIf { it != -1 }
+                // Resume at the first step the user hasn't completed (a skipped/undone step), so they
+                // land on the work that's left rather than wherever they happened to stop. If every
+                // step is completed, show the last non-intro screen (the summary).
+                val firstIncomplete = screens.indexOfFirst { it.type == STEP && !dataStore.isCompleted(it.name) }
+                if (firstIncomplete != -1) firstIncomplete else screens.indexOfLast { it.type != INTRO }.takeIf { it != -1 }
             }
         }
     }

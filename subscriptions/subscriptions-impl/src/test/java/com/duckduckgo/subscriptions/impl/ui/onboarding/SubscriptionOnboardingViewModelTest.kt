@@ -79,8 +79,10 @@ class SubscriptionOnboardingViewModelTest {
     }
 
     @Test
-    fun whenSettingsOriginThenSkipsIntroAndResumesAtLastVisitedStep() = runTest {
-        whenever(dataStore.lastVisitedStep).thenReturn("step2")
+    fun whenSettingsOriginThenSkipsIntroAndResumesAtFirstIncompleteStep() = runTest {
+        // step1 completed, step2 skipped (incomplete): reopening should land on step2, not the summary.
+        whenever(dataStore.isCompleted("step1")).thenReturn(true)
+        whenever(dataStore.isCompleted("step2")).thenReturn(false)
         whenever(stepPlugins.getPlugins()).thenReturn(
             listOf(fakeStep("intro", INTRO), fakeStep("step1"), fakeStep("step2"), fakeStep("summary", SUMMARY)),
         )
@@ -93,8 +95,7 @@ class SubscriptionOnboardingViewModelTest {
     }
 
     @Test
-    fun whenSettingsOriginAndNoLastVisitedThenStartsAtFirstStep() = runTest {
-        whenever(dataStore.lastVisitedStep).thenReturn(null)
+    fun whenSettingsOriginAndNothingCompletedThenStartsAtFirstStep() = runTest {
         whenever(stepPlugins.getPlugins()).thenReturn(
             listOf(fakeStep("intro", INTRO), fakeStep("step1"), fakeStep("summary", SUMMARY)),
         )
@@ -103,6 +104,21 @@ class SubscriptionOnboardingViewModelTest {
         viewModel.commands().test {
             viewModel.start(SubscriptionOnboardingOrigin.SETTINGS)
             assertEquals("step1", (awaitItem() as ShowStep).pluginName)
+        }
+    }
+
+    @Test
+    fun whenSettingsOriginAndAllStepsCompletedThenShowsSummary() = runTest {
+        whenever(dataStore.isCompleted("step1")).thenReturn(true)
+        whenever(dataStore.isCompleted("step2")).thenReturn(true)
+        whenever(stepPlugins.getPlugins()).thenReturn(
+            listOf(fakeStep("intro", INTRO), fakeStep("step1"), fakeStep("step2"), fakeStep("summary", SUMMARY)),
+        )
+        val viewModel = viewModel()
+
+        viewModel.commands().test {
+            viewModel.start(SubscriptionOnboardingOrigin.SETTINGS)
+            assertEquals("summary", (awaitItem() as ShowStep).pluginName)
         }
     }
 
