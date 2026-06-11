@@ -17,8 +17,10 @@
 package com.duckduckgo.common.utils.edgetoedge
 
 import android.view.View
+import android.view.ViewGroup
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.doOnAttach
 import androidx.core.view.updatePadding
 import javax.inject.Inject
 
@@ -81,6 +83,23 @@ class EdgeToEdgeHandler @Inject constructor() {
         ViewCompat.requestApplyInsets(view)
     }
 
+    fun applyNavigationBarInsetsAsMargin(view: View) {
+        val initialBottom = (view.layoutParams as? ViewGroup.MarginLayoutParams)?.bottomMargin ?: 0
+        view.applyInsets { insets ->
+            val bottom = insets.getInsets(
+                WindowInsetsCompat.Type.navigationBars() or WindowInsetsCompat.Type.displayCutout() or WindowInsetsCompat.Type.ime(),
+            ).bottom
+
+            (view.layoutParams as? ViewGroup.MarginLayoutParams)?.let { lp ->
+                val newMargin = initialBottom + bottom
+                if (lp.bottomMargin != newMargin) {
+                    lp.bottomMargin = newMargin
+                    view.requestLayout()
+                }
+            }
+        }
+    }
+
     /**
      * Horizontal inset: navigation bar + display cutout on the left and right edges. In landscape the
      * 3-button nav bar and the camera cutout move to a side edge and run the full height, so applying
@@ -102,5 +121,16 @@ class EdgeToEdgeHandler @Inject constructor() {
             insets
         }
         ViewCompat.requestApplyInsets(view)
+    }
+
+    private fun View.applyInsets(apply: (WindowInsetsCompat) -> Unit) {
+        ViewCompat.setOnApplyWindowInsetsListener(this) { _, insets ->
+            apply(insets)
+            insets
+        }
+        doOnAttach { attached ->
+            ViewCompat.getRootWindowInsets(attached)?.let(apply)
+            ViewCompat.requestApplyInsets(attached)
+        }
     }
 }

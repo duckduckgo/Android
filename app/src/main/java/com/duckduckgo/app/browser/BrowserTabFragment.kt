@@ -1222,7 +1222,7 @@ class BrowserTabFragment :
         disableViewStateSaving()
 
         if (edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.BROWSER)) {
-            edgeToEdgeHandler.applyNavigationBarInsets(binding.rootView)
+            edgeToEdgeHandler.applyNavigationBarInsetsAsMargin(binding.rootView)
         }
 
         if (savedInstanceState == null) {
