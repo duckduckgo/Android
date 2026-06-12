@@ -109,7 +109,20 @@ data class LinearOnboardingPlan(
     val onCompleted: suspend () -> Unit = {},
     val onSkipped: suspend () -> Unit = {},
     val result: suspend () -> LinearOnboardingResult? = { null },
-)
+) {
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as LinearOnboardingPlan
+
+        return id == other.id
+    }
+
+    override fun hashCode(): Int {
+        return id.hashCode()
+    }
+}
 
 /** A stable, human-readable id for a plan, handy for filtering and telemetry. Not persisted. */
 typealias LinearOnboardingPlanId = String
