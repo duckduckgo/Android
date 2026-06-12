@@ -324,13 +324,15 @@ interface AndroidBrowserConfigFeature {
     fun singleTabFireDialog(): Toggle
 
     /**
-     * Kill switch for the bounded-concurrency, time-bounded single-tab data clearing
-     * (fixes slow/stuck fire-button burns). When enabled, per-domain web-storage deletions run
-     * concurrently (bounded) with per-domain and overall timeouts.
+     * Kill switch for the non-blocking single-tab data clearing (fixes slow/stuck fire-button burns).
+     * When enabled, the fire dialog returns to browsing immediately while the per-domain web-storage
+     * clear runs on the app scope (bounded concurrency, per-domain and overall timeouts).
+     * When disabled, the clear runs synchronously and sequentially — the UI waits until the data is
+     * fully cleared before the dialog dismisses (original behaviour).
      * If the remote feature is not present defaults to `true`.
      */
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
-    fun concurrentSingleTabDataClearing(): Toggle
+    fun backgroundSingleTabDataClearing(): Toggle
 
     /**
      * Controls whether the state saving for some of the views inside the BrowserTabFragment is disabled or not

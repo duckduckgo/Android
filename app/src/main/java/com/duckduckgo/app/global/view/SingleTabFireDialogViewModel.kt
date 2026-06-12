@@ -71,6 +71,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.milliseconds
 
 @ContributesViewModel(FragmentScope::class)
 class SingleTabFireDialogViewModel @Inject constructor(
@@ -220,22 +221,22 @@ class SingleTabFireDialogViewModel @Inject constructor(
                         clearOptions = clearOptions,
                     )
                     try {
-                        val clearResult = if (origin.value == DuckAiContextualChat) {
-                            dataClearing.clearTabContextualChat(originalTabId)
+                        if (origin.value == DuckAiContextualChat) {
+                            val contextualResult = dataClearing.clearTabContextualChat(originalTabId)
+                            // Contextual-chat clear is synchronous, so finish the wide event here.
+                            when (contextualResult) {
+                                is ClearDataResult.Success -> dataClearingWideEvent.finishSuccess()
+                                is ClearDataResult.Error -> dataClearingWideEvent.finishFailure(contextualResult.exception)
+                                is ClearDataResult.FeatureNotSupported ->
+                                    dataClearingWideEvent.finishFailure(UnsupportedOperationException("DeleteBrowsingData not supported"))
+                            }
+                            contextualResult
                         } else {
                             dataClearing.clearSingleTabData(
                                 tabId = originalTabId,
                                 replaceCurrentTab = origin.value !is Hatch,
                             )
                         }
-
-                        when (clearResult) {
-                            is ClearDataResult.Success -> dataClearingWideEvent.finishSuccess()
-                            is ClearDataResult.Error -> dataClearingWideEvent.finishFailure(clearResult.exception)
-                            is ClearDataResult.FeatureNotSupported ->
-                                dataClearingWideEvent.finishFailure(UnsupportedOperationException("DeleteBrowsingData not supported"))
-                        }
-                        clearResult
                     } catch (e: CancellationException) {
                         throw e
                     } catch (e: Exception) {
@@ -335,10 +336,10 @@ class SingleTabFireDialogViewModel @Inject constructor(
 
     private suspend fun waitForTabsToUpdate(originalTabId: String?) {
         // wait for the tab selection to change before signaling completion
-        withTimeoutOrNull(TAB_UPDATE_TIMEOUT_MS) {
+        withTimeoutOrNull(TAB_UPDATE_TIMEOUT_MS.milliseconds) {
             tabRepository.flowSelectedTab.firstOrNull { it?.tabId != originalTabId }
         }
-        delay(500)
+        delay(500.milliseconds)
     }
 
     private suspend fun trySendDailyDeleteClicked() {

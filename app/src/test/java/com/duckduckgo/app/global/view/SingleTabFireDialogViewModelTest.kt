@@ -1425,7 +1425,7 @@ class SingleTabFireDialogViewModelTest {
     }
 
     @Test
-    fun `when delete this tab clicked then wide event is started with single tab entry point and finished`() = runTest {
+    fun `when delete this tab clicked then wide event is started with single tab entry point and completion delegated to data clearing`() = runTest {
         whenever(mockTabRepository.getSelectedTab()).thenReturn(
             TabEntity(tabId = "tab1", url = "https://example.com", title = "Example"),
         )
@@ -1439,28 +1439,30 @@ class SingleTabFireDialogViewModelTest {
             entryPoint = eq(DataClearingWideEvent.EntryPoint.SINGLE_TAB_FIRE_DIALOG),
             clearOptions = any(),
         )
-        verify(mockDataClearingWideEvent).finishSuccess()
+        // The single-tab clear may run in the background, so DataClearing (not the view model)
+        // completes the wide event once the clear actually finishes.
+        verify(mockDataClearingWideEvent, never()).finishSuccess()
     }
 
     @Test
-    fun `when delete this tab returns error then wide event finishes with failure`() = runTest {
+    fun `when delete this tab returns error then view model does not complete the wide event`() = runTest {
         whenever(mockTabRepository.getSelectedTab()).thenReturn(
             TabEntity(tabId = "tab1", url = "https://example.com", title = "Example"),
         )
-        val exception = RuntimeException("test")
-        whenever(mockDataClearing.clearSingleTabData(any(), any())).thenReturn(ClearDataResult.Error(exception))
+        whenever(mockDataClearing.clearSingleTabData(any(), any())).thenReturn(ClearDataResult.Error(RuntimeException("test")))
         testee = createViewModel()
 
         testee.onDeleteThisTabClicked()
 
         coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
 
-        verify(mockDataClearingWideEvent).finishFailure(exception)
+        // Wide-event completion for the single-tab clear is owned by DataClearing.
+        verify(mockDataClearingWideEvent, never()).finishFailure(any())
         verify(mockDataClearingWideEvent, never()).finishSuccess()
     }
 
     @Test
-    fun `when delete this tab returns feature not supported then wide event finishes with failure`() = runTest {
+    fun `when delete this tab returns feature not supported then view model does not complete the wide event`() = runTest {
         whenever(mockTabRepository.getSelectedTab()).thenReturn(
             TabEntity(tabId = "tab1", url = "https://example.com", title = "Example"),
         )
@@ -1471,7 +1473,8 @@ class SingleTabFireDialogViewModelTest {
 
         coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
 
-        verify(mockDataClearingWideEvent).finishFailure(any())
+        // Wide-event completion for the single-tab clear is owned by DataClearing.
+        verify(mockDataClearingWideEvent, never()).finishFailure(any())
         verify(mockDataClearingWideEvent, never()).finishSuccess()
     }
 

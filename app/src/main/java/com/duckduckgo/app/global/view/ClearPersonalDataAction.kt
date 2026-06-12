@@ -257,7 +257,7 @@ class ClearPersonalDataAction(
                     .mapNotNull { it.domain.toTldPlusOne() }
                     .toSet()
                 isConcurrentClearEnabled = androidBrowserConfigFeature
-                    .concurrentSingleTabDataClearing().isEnabled()
+                    .backgroundSingleTabDataClearing().isEnabled()
             }
 
             val domainsToClear = domains

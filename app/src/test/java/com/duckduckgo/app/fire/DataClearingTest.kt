@@ -27,6 +27,7 @@ import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchO
 import com.duckduckgo.app.generalsettings.showonapplaunch.store.ShowOnAppLaunchOptionDataStore
 import com.duckduckgo.app.global.view.ClearDataAction
 import com.duckduckgo.app.global.view.ClearDataResult
+import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.settings.clear.ClearWhenOption
 import com.duckduckgo.app.settings.clear.FireClearOption
 import com.duckduckgo.app.settings.db.SettingsDataStore
@@ -39,6 +40,8 @@ import com.duckduckgo.dataclearing.api.plugin.DataClearingTrigger
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.store.DuckChatContextualDataStore
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.history.api.NavigationHistory
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.runBlocking
@@ -110,12 +113,17 @@ class DataClearingTest {
     @Mock
     private lateinit var mockDataClearingTrigger: DataClearingTrigger
 
+    private val fakeAndroidBrowserConfigFeature = FakeFeatureToggleFactory.create(AndroidBrowserConfigFeature::class.java)
+
     private val showClearDuckAIChatHistoryFlow = MutableStateFlow(true)
     private val showOnAppLaunchOptionFlow = MutableStateFlow<ShowOnAppLaunchOption>(ShowOnAppLaunchOption.LastOpenedTab)
 
     @Before
     fun setup() {
         MockitoAnnotations.openMocks(this)
+        // Exercise the synchronous clear path so these tests can assert the returned result and the
+        // clear/teardown ordering directly. The background (default) path is covered on-device.
+        fakeAndroidBrowserConfigFeature.backgroundSingleTabDataClearing().setRawStoredState(State(enable = false))
         showClearDuckAIChatHistoryFlow.value = true
         showOnAppLaunchOptionFlow.value = ShowOnAppLaunchOption.LastOpenedTab
         whenever(mockDuckAiFeatureState.showClearDuckAIChatHistory).thenReturn(showClearDuckAIChatHistoryFlow)
@@ -140,6 +148,8 @@ class DataClearingTest {
             contextualDataStore = mockContextualDataStore,
             showOnAppLaunchOptionDataStore = mockShowOnAppLaunchOptionDataStore,
             dataClearingTrigger = mockDataClearingTrigger,
+            androidBrowserConfigFeature = fakeAndroidBrowserConfigFeature,
+            appCoroutineScope = coroutineTestRule.testScope,
         )
     }
 
@@ -768,6 +778,26 @@ class DataClearingTest {
         val result = testee.clearSingleTabData("tab1")
 
         assertEquals(ClearDataResult.Error(exception), result)
+    }
+
+    @Test
+    fun whenClearSingleTabDataSucceeds_thenWideEventFinishedWithSuccess() = runTest {
+        whenever(mockTabVisitedSitesRepository.getVisitedSites("tab1")).thenReturn(emptySet())
+
+        testee.clearSingleTabData("tab1")
+
+        verify(mockDataClearingWideEvent).finishSuccess()
+    }
+
+    @Test
+    fun whenClearSingleTabDataError_thenWideEventFinishedWithFailure() = runTest {
+        whenever(mockTabVisitedSitesRepository.getVisitedSites("tab1")).thenReturn(emptySet())
+        val exception = RuntimeException("test error")
+        whenever(mockClearDataAction.clearDataForSpecificDomains(any())).thenReturn(ClearDataResult.Error(exception))
+
+        testee.clearSingleTabData("tab1")
+
+        verify(mockDataClearingWideEvent).finishFailure(exception)
     }
 
     @Test

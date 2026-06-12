@@ -20,6 +20,7 @@ package com.duckduckgo.app.fire
 
 import android.annotation.SuppressLint
 import androidx.core.net.toUri
+import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.fire.store.FireDataStore
 import com.duckduckgo.app.fire.store.TabVisitedSitesRepository
 import com.duckduckgo.app.fire.wideevents.DataClearingWideEvent
@@ -27,6 +28,7 @@ import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchO
 import com.duckduckgo.app.generalsettings.showonapplaunch.store.ShowOnAppLaunchOptionDataStore
 import com.duckduckgo.app.global.view.ClearDataAction
 import com.duckduckgo.app.global.view.ClearDataResult
+import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.settings.clear.ClearWhenOption
 import com.duckduckgo.app.settings.clear.FireClearOption
 import com.duckduckgo.app.settings.db.SettingsDataStore
@@ -42,7 +44,9 @@ import com.duckduckgo.duckchat.impl.store.DuckChatContextualDataStore
 import com.duckduckgo.history.api.NavigationHistory
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.launch
 import logcat.LogPriority.WARN
 import logcat.logcat
 import javax.inject.Inject
@@ -75,6 +79,8 @@ class DataClearing @Inject constructor(
     private val contextualDataStore: DuckChatContextualDataStore,
     private val showOnAppLaunchOptionDataStore: ShowOnAppLaunchOptionDataStore,
     private val dataClearingTrigger: DataClearingTrigger,
+    private val androidBrowserConfigFeature: AndroidBrowserConfigFeature,
+    @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : ManualDataClearing, AutomaticDataClearing {
 
     override suspend fun clearSingleTabData(tabId: String, replaceCurrentTab: Boolean): ClearDataResult {
@@ -93,25 +99,53 @@ class DataClearing @Inject constructor(
         logcat { "Performing single tab clear for tab: $tabId" }
 
         val visitedSites = tabVisitedSitesRepository.getVisitedSites(tabId)
-        val clearDataResult = clearDataAction.clearDataForSpecificDomains(visitedSites)
         val tabUrl = tabRepository.getTab(tabId)?.url
 
-        // Reset this tab's URL before dispatching the chat clear: the tabs-cleanup plugin matches
-        // tabs by chatID, and we don't want this tab caught by that match — it stays open with a
-        // new chat URL. Other tabs at the same chatID (duplicates) do get closed, which is desired.
-        if (replaceCurrentTab) {
-            val url = getNewTabUrl(tabUrl)
-            tabOperations.replaceTabWithNewTab(tabId, url)
-        } else {
-            tabRepository.deleteTabs(listOf(tabId))
+        suspend fun tearDownTab() {
+            if (replaceCurrentTab) {
+                tabOperations.replaceTabWithNewTab(tabId, getNewTabUrl(tabUrl))
+            } else {
+                tabRepository.deleteTabs(listOf(tabId))
+            }
         }
 
-        clearDuckAiChatIfNeeded(tabUrl)
-        clearContextualChatDataIfNeeded(tabId)
-        navigationHistory.removeHistoryForTab(tabId)
+        suspend fun clearChatsAndHistory() {
+            clearDuckAiChatIfNeeded(tabUrl)
+            clearContextualChatDataIfNeeded(tabId)
+            navigationHistory.removeHistoryForTab(tabId)
+        }
 
-        logcat { "Single tab clear completed for tab: $tabId" }
-        return clearDataResult
+        suspend fun completeWideEvent(result: ClearDataResult) {
+            when (result) {
+                is ClearDataResult.Success -> dataClearingWideEvent.finishSuccess()
+                is ClearDataResult.Error -> dataClearingWideEvent.finishFailure(result.exception)
+                is ClearDataResult.FeatureNotSupported ->
+                    dataClearingWideEvent.finishFailure(UnsupportedOperationException("DeleteBrowsingData not supported"))
+            }
+        }
+
+        return if (androidBrowserConfigFeature.backgroundSingleTabDataClearing().isEnabled()) {
+            tearDownTab()
+            appCoroutineScope.launch {
+                try {
+                    val result = clearDataAction.clearDataForSpecificDomains(visitedSites)
+                    clearChatsAndHistory()
+                    completeWideEvent(result)
+                    logcat { "Single tab clear completed (background) for tab: $tabId" }
+                } catch (e: Exception) {
+                    dataClearingWideEvent.finishFailure(e)
+                    logcat(WARN) { "Background single tab clear failed for tab $tabId: ${e.message}" }
+                }
+            }
+            ClearDataResult.Success
+        } else {
+            val result = clearDataAction.clearDataForSpecificDomains(visitedSites)
+            tearDownTab()
+            clearChatsAndHistory()
+            completeWideEvent(result)
+            logcat { "Single tab clear completed for tab: $tabId" }
+            result
+        }
     }
 
     override suspend fun clearTabContextualChat(tabId: String): ClearDataResult {

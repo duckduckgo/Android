@@ -43,6 +43,7 @@ import com.duckduckgo.history.api.NavigationHistory
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.site.permissions.api.SitePermissionsManager
 import com.duckduckgo.sync.api.DeviceSyncState
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -85,7 +86,7 @@ class ClearPersonalDataActionTest {
     @Before
     fun setup() {
         whenever(mockDuckAiHostProvider.getHost()).thenReturn("duck.ai")
-        fakeAndroidBrowserConfigFeature.concurrentSingleTabDataClearing().setRawStoredState(State(enable = true))
+        fakeAndroidBrowserConfigFeature.backgroundSingleTabDataClearing().setRawStoredState(State(enable = true))
         testee = createTestee()
         whenever(mockFireproofWebsiteRepository.getFireproofWebsites()).thenReturn(fireproofWebsites)
         whenever(mockDeviceSyncState.isUserSignedInOnDevice()).thenReturn(true)
@@ -387,7 +388,7 @@ class ClearPersonalDataActionTest {
     }
 
     @Test
-    fun whenClearDataForSpecificDomainsCalledWithMixedDomainsThenOnlyNonFireproofDomainsAreCleared() = runTest {
+    fun whenClearDataForSpecificDomainsCalledWithMixedDomainsThenOnlyNonFireproofDomainsAreCleared() = runBlocking {
         whenever(mockWebViewCapabilityChecker.isSupported(DeleteBrowsingData)).thenReturn(true)
         whenever(mockFireproofWebsiteRepository.fireproofWebsitesSync()).thenReturn(
             listOf(FireproofWebsiteEntity("fireproof.com")),
@@ -402,7 +403,7 @@ class ClearPersonalDataActionTest {
     }
 
     @Test
-    fun whenClearDataForSpecificDomainsCalledWithMixedDuckDuckGoDomainsThenOnlyNonDdgDomainsAreCleared() = runTest {
+    fun whenClearDataForSpecificDomainsCalledWithMixedDuckDuckGoDomainsThenOnlyNonDdgDomainsAreCleared() = runBlocking {
         whenever(mockWebViewCapabilityChecker.isSupported(DeleteBrowsingData)).thenReturn(true)
         whenever(mockFireproofWebsiteRepository.fireproofWebsitesSync()).thenReturn(emptyList())
         val clearedDomains = mutableListOf<String>()
@@ -415,7 +416,7 @@ class ClearPersonalDataActionTest {
     }
 
     @Test
-    fun whenClearDataForSpecificDomainsCalledAndCleanerThrowsThenReturnsError() = runTest {
+    fun whenClearDataForSpecificDomainsCalledAndCleanerThrowsThenReturnsError() = runBlocking {
         whenever(mockWebViewCapabilityChecker.isSupported(DeleteBrowsingData)).thenReturn(true)
         whenever(mockFireproofWebsiteRepository.fireproofWebsitesSync()).thenReturn(emptyList())
         val testeeWithError = createTestee(
@@ -426,7 +427,7 @@ class ClearPersonalDataActionTest {
     }
 
     @Test
-    fun whenClearDataForSpecificDomainsCalledWithManyDomainsThenAllNonFilteredDomainsAreCleared() = runTest {
+    fun whenClearDataForSpecificDomainsCalledWithManyDomainsThenAllNonFilteredDomainsAreCleared() = runBlocking {
         whenever(mockWebViewCapabilityChecker.isSupported(DeleteBrowsingData)).thenReturn(true)
         whenever(mockFireproofWebsiteRepository.fireproofWebsitesSync()).thenReturn(emptyList())
         val domains = (1..25).map { "site$it.com" }.toSet()
@@ -444,7 +445,7 @@ class ClearPersonalDataActionTest {
     }
 
     @Test
-    fun whenClearDataForSpecificDomainsCalledAndOneDomainStallsThenOthersAreClearedAndReturnsSuccess() = runTest {
+    fun whenClearDataForSpecificDomainsCalledAndOneDomainStallsThenOthersAreClearedAndReturnsSuccess() = runBlocking {
         whenever(mockWebViewCapabilityChecker.isSupported(DeleteBrowsingData)).thenReturn(true)
         whenever(mockFireproofWebsiteRepository.fireproofWebsitesSync()).thenReturn(emptyList())
         val clearedDomains = java.util.Collections.synchronizedList(mutableListOf<String>())
@@ -470,7 +471,7 @@ class ClearPersonalDataActionTest {
     fun whenClearDataForSpecificDomainsCalledAndConcurrentClearingDisabledThenDomainsAreStillCleared() = runTest {
         whenever(mockWebViewCapabilityChecker.isSupported(DeleteBrowsingData)).thenReturn(true)
         whenever(mockFireproofWebsiteRepository.fireproofWebsitesSync()).thenReturn(emptyList())
-        fakeAndroidBrowserConfigFeature.concurrentSingleTabDataClearing().setRawStoredState(State(enable = false))
+        fakeAndroidBrowserConfigFeature.backgroundSingleTabDataClearing().setRawStoredState(State(enable = false))
         val clearedDomains = java.util.Collections.synchronizedList(mutableListOf<String>())
         val testeeWithCapture = createTestee(
             siteDataCleaner = { _, domain -> clearedDomains.add(domain) },

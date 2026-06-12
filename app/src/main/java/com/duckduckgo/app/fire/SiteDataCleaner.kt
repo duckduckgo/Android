@@ -35,7 +35,11 @@ class RealSiteDataCleaner @Inject constructor() : SiteDataCleaner {
     override suspend fun deleteSiteData(webStorage: WebStorage, domain: String) {
         suspendCancellableCoroutine { continuation ->
             WebStorageCompat.deleteBrowsingDataForSite(webStorage, domain) {
-                continuation.resume(Unit)
+                // The caller times out each deletion, so the continuation may already be cancelled by the
+                // time this callback fires — only resume while it's still active (see InlinePdfHandler).
+                if (continuation.isActive) {
+                    continuation.resume(Unit)
+                }
             }
         }
     }
