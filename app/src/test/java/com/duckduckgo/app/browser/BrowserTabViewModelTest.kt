@@ -5313,52 +5313,11 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenForceZoomEnabledThenEmitNewState() {
-        accessibilitySettingsDataStore.forceZoom = true
-        assertTrue(accessibilityViewState().forceZoom)
-        assertTrue(accessibilityViewState().refreshWebView)
-    }
-
-    @Test
-    fun whenForceZoomEnabledAndWebViewRefreshedThenEmitNewState() {
-        accessibilitySettingsDataStore.forceZoom = true
-        assertTrue(accessibilityViewState().forceZoom)
-        assertTrue(accessibilityViewState().refreshWebView)
-
-        testee.onWebViewRefreshed()
-
-        assertFalse(accessibilityViewState().refreshWebView)
-    }
-
-    @Test
-    fun whenFontSizeChangedThenEmitNewState() {
-        accessibilitySettingsDataStore.appFontSize = 150f
-        accessibilitySettingsDataStore.overrideSystemFontSize = false
-
-        assertFalse(accessibilityViewState().refreshWebView)
-        assertEquals(accessibilitySettingsDataStore.fontSize, accessibilityViewState().fontSize)
-    }
-
-    @Test
-    fun whenFontSizeActuallyChangesThenRefreshWebView() {
+    fun whenFontSizeChangedThenViewStateFontSizeUpdated() {
         accessibilitySettingsDataStore.overrideSystemFontSize = true
         accessibilitySettingsDataStore.appFontSize = 150f
 
         assertEquals(accessibilitySettingsDataStore.fontSize, accessibilityViewState().fontSize)
-        assertTrue(accessibilityViewState().refreshWebView)
-    }
-
-    @Test
-    fun whenAccessibilitySettingsFirstObservedWithNonDefaultFontSizeThenDoNotRefreshWebView() {
-        // Simulate a user who already has a non-default text size persisted before the tab observes settings.
-        accessibilitySettingsDataStore.overrideSystemFontSize = true
-        accessibilitySettingsDataStore.appFontSize = 150f
-        testee.onWebViewRefreshed() // clear the pending refresh caused by the change above
-
-        testee.observeAccessibilitySettings() // re-subscribe, as happens on tab init/restore
-
-        assertEquals(accessibilitySettingsDataStore.fontSize, accessibilityViewState().fontSize)
-        assertFalse(accessibilityViewState().refreshWebView)
     }
 
     @Test

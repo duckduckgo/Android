@@ -50,7 +50,6 @@ import com.duckduckgo.adblocking.api.duckplayer.DuckPlayer
 import com.duckduckgo.adblocking.api.duckplayer.DuckPlayer.DuckPlayerState.ENABLED
 import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.anvil.annotations.ContributesViewModel
-import com.duckduckgo.app.accessibility.data.AccessibilitySettings
 import com.duckduckgo.app.accessibility.data.AccessibilitySettingsDataStore
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction
 import com.duckduckgo.app.browser.SSLErrorType.EXPIRED
@@ -1063,28 +1062,14 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun observeAccessibilitySettings() {
+        // Applies the current text size to the WebView. Reloading on a change is handled separately by
+        // AccessibilityRefreshTriggerPlugin via observeRefreshTriggers().
         accessibilityObserver?.cancel()
-        var previousSettings: AccessibilitySettings? = null
         accessibilityObserver =
             accessibilitySettingsDataStore
                 .settingsFlow()
-                .combine(refreshOnViewVisible.asStateFlow(), ::Pair)
-                .onEach { (settings, viewVisible) ->
-                    logcat(VERBOSE) { "Accessibility: newSettings $settings, $viewVisible" }
-
-                    // Reload the WebView when a11y changes, so the page re-runs layout with the new zoom.
-                    // Skip the first emission so that opening a tab with a non-default text size does not trigger an unnecessary reload
-                    val settingsChanged =
-                        previousSettings?.let { it.fontSize != settings.fontSize || it.forceZoom != settings.forceZoom } ?: false
-                    previousSettings = settings
-
-                    val shouldRefreshWebview = settingsChanged || currentAccessibilityViewState().refreshWebView
-                    accessibilityViewState.value =
-                        currentAccessibilityViewState().copy(
-                            fontSize = settings.fontSize,
-                            forceZoom = settings.forceZoom,
-                            refreshWebView = shouldRefreshWebview,
-                        )
+                .onEach { settings ->
+                    accessibilityViewState.value = currentAccessibilityViewState().copy(fontSize = settings.fontSize)
                 }.launchIn(viewModelScope)
     }
 
@@ -4266,7 +4251,6 @@ class BrowserTabViewModel @Inject constructor(
         resetTrackersCount()
         refreshBrowserError()
         resetAutoConsent()
-        accessibilityViewState.value = currentAccessibilityViewState().copy(refreshWebView = false)
         canAutofillSelectCredentialsDialogCanAutomaticallyShow = true
     }
 
@@ -4681,7 +4665,7 @@ class BrowserTabViewModel @Inject constructor(
                             JSONObject(
                                 mapOf(
                                     "desktopModeEnabled" to (getSite()?.isDesktopMode ?: false),
-                                    "forcedZoomEnabled" to (accessibilityViewState.value?.forceZoom ?: false),
+                                    "forcedZoomEnabled" to accessibilitySettingsDataStore.forceZoom,
                                 ),
                             )
                         viewModelScope.launch {
@@ -4737,7 +4721,7 @@ class BrowserTabViewModel @Inject constructor(
                             params = JSONObject(
                                 mapOf(
                                     "desktopModeEnabled" to (getSite()?.isDesktopMode ?: false),
-                                    "forcedZoomEnabled" to (accessibilityViewState.value?.forceZoom ?: false),
+                                    "forcedZoomEnabled" to accessibilitySettingsDataStore.forceZoom,
                                 ),
                             ),
                             featureName = featureName,
