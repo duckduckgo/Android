@@ -1086,8 +1086,9 @@ class OmnibarLayout @JvmOverloads constructor(
     }
 
     private fun renderPulseAnimation(viewState: ViewState) {
+        val fireIconVisible = shouldShowFireIcon(viewState.showFireIcon, viewState.viewMode is ViewMode.DuckAI, viewState.isNativeInputEnabled)
         val targetView =
-            if (viewState.highlightFireButton.isHighlighted() && viewState.showFireIcon) {
+            if (viewState.highlightFireButton.isHighlighted() && fireIconVisible) {
                 fireIconImageView
             } else if (viewState.highlightPrivacyShield.isHighlighted() && viewState.leadingIconState == PrivacyShield) {
                 placeholder
