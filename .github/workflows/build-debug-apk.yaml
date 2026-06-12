@@ -13,6 +13,12 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+# TEMP (ac-step-2 smoke test): gates the Develocity Artifact Cache store step off so the
+# smoke test doesn't pollute the cache. After validation, restore the store step to
+# `if: always()` and remove this env block.
+env:
+  AC_STORE_ENABLED: 'false'
+
 jobs:
   build_debug_apk:
     name: Build debug apk (${{ matrix.di }})
@@ -59,14 +65,32 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v5
         with:
+          cache-disabled: true # Develocity Artifact Cache supersedes setup-gradle's Gradle Home caching
           cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
+
+      - name: Restore Develocity Artifact Cache
+        uses: ./.github/actions/develocity-artifact-cache
+        with:
+          command: restore
+          image-name: android-debug-apk-${{ matrix.di }}
+          develocity-access-key: ${{ secrets.DEVELOCITY_ACCESS_KEY }}
+          repo-password: ${{ secrets.DAXMOBILE_ANDROID_CACHE_TOOLS }}
 
       - name: Assemble the project
         env:
           MALICIOUS_SITE_PROTECTION_AUTH_TOKEN: ${{ secrets.MALICIOUS_SITE_PROTECTION_AUTH_TOKEN }}
           DUCKSANS_PACKAGE_AUTH_USER: ${{ secrets.DAXMOBILE_GITHUB_PACKAGES_AUTOMATION_USER }}
           DUCKSANS_PACKAGE_AUTH_TOKEN: ${{ secrets.DAXMOBILE_GITHUB_PACKAGES_AUTOMATION }}
-        run: ./gradlew assembleInternalDebug -Pforce-default-variant -Pddg.di=${{ matrix.di }}
+        run: ./gradlew assembleInternalDebug -Pforce-default-variant -Pddg.di=${{ matrix.di }} -Dscan.tag.ac-step-2 # TEMP (ac-step-2 smoke test): remove tag after validation
+
+      - name: Store Develocity Artifact Cache
+        if: ${{ always() && env.AC_STORE_ENABLED == 'true' }} # TEMP (ac-step-2 smoke test): gated off; restore to `if: always()` after validation.
+        uses: ./.github/actions/develocity-artifact-cache
+        with:
+          command: store
+          image-name: android-debug-apk-${{ matrix.di }}
+          develocity-access-key: ${{ secrets.DEVELOCITY_ACCESS_KEY }}
+          repo-password: ${{ secrets.DAXMOBILE_ANDROID_CACHE_TOOLS }}
 
       - name: Obtain debug apk
         if: always()
