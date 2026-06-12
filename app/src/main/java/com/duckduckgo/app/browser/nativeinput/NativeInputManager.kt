@@ -706,6 +706,8 @@ class RealNativeInputManager @Inject constructor(
     // only the first layout (widget just attached, or focus just cleared) needs deferring.
     private fun applyFireButtonSpotlight(widgetView: View? = widgetRoot) {
         val active = fireButtonSpotlightEnabled && omnibarController.isDuckAiMode()
+        widgetView?.let { widgetFrom(it) }?.setInteractionLocked(active)
+
         val fireMenu = widgetView?.findViewById<View?>(R.id.inputFieldFireIconMenu)
         val fireIcon = widgetView?.findViewById<View?>(R.id.inputFieldFireIconImageview)
         when {
