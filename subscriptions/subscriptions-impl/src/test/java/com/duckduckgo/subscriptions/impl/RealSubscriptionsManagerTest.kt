@@ -254,6 +254,23 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
     }
 
     @Test
+    fun whenRecoverSubscriptionFromStoreIfStoreLoginSucceedsButSubscriptionNotActiveThenDoesNotEmitPixel() = runTest {
+        givenUseQueryPurchasesEnabled()
+        givenUserIsNotSignedIn()
+        givenActivePurchase()
+        givenStoreLoginSucceeds()
+        givenSubscriptionSucceedsWithoutEntitlements(status = "Expired")
+        givenAccessTokenSucceeds()
+        givenV2AccessTokenRefreshSucceeds()
+
+        val result = subscriptionsManager.recoverSubscriptionFromStore()
+
+        assertTrue(result is RecoverSubscriptionResult.Failure)
+        assertEquals("SubscriptionNotFound", (result as RecoverSubscriptionResult.Failure).message)
+        verify(pixelSender, never()).reportRecoverSubscriptionNoActivePurchase()
+    }
+
+    @Test
     fun whenRecoverSubscriptionFromStoreIfValidateTokenFailsReturnFailure() = runTest {
         givenUserIsSignedIn()
         givenValidateTokenFails("failure")
@@ -295,6 +312,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
         assertTrue(result is RecoverSubscriptionResult.Success)
         verify(authClient).storeLogin(any(), any(), any())
         verify(playBillingManager, never()).purchaseHistory
+        verify(pixelSender, never()).reportRecoverSubscriptionNoActivePurchase()
     }
 
     @Test
@@ -308,6 +326,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
         assertTrue(result is RecoverSubscriptionResult.Failure)
         assertEquals("SubscriptionNotFound", (result as RecoverSubscriptionResult.Failure).message)
         verify(authClient, never()).storeLogin(any(), any(), any())
+        verify(pixelSender).reportRecoverSubscriptionNoActivePurchase()
     }
 
     @Test
@@ -324,6 +343,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
             (result as RecoverSubscriptionResult.Failure).message,
         )
         verify(authClient, never()).storeLogin(any(), any(), any())
+        verify(pixelSender, never()).reportRecoverSubscriptionNoActivePurchase()
     }
 
     @Test

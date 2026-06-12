@@ -995,7 +995,10 @@ class RealSubscriptionsManager @Inject constructor(
                 }
 
                 is StoreLoginResult.Failure -> when (storeLoginResult) {
-                    StoreLoginResult.Failure.NoActivePurchase -> RecoverSubscriptionResult.Failure(SUBSCRIPTION_NOT_FOUND_ERROR)
+                    StoreLoginResult.Failure.NoActivePurchase -> {
+                        pixelSender.reportRecoverSubscriptionNoActivePurchase()
+                        RecoverSubscriptionResult.Failure(SUBSCRIPTION_NOT_FOUND_ERROR)
+                    }
                     is StoreLoginResult.Failure.PurchaseInfoNotAvailable ->
                         RecoverSubscriptionResult.Failure(message = "Store login error: PurchaseInfoNotAvailable: ${storeLoginResult.cause}")
                     else -> RecoverSubscriptionResult.Failure(message = "Store login error: ${storeLoginResult.javaClass.simpleName}")
