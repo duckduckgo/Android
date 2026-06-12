@@ -66,15 +66,23 @@ class OnboardingDecorationFitCorrector(
     fun correctOnce(): Boolean {
         val deco = decoration ?: return true
         if (deco.isGone) return true
-        if (root.height == 0 || dialog.height == 0) return true
+        if (root.height == 0) return true
         if (BrandDesignUpdateOnboardingLayoutHelper.isInScrollableContainer(dialog, root)) return true
 
         val viewport = cardContainer.parent as? View ?: return true
-        if (viewport.height == 0) return true
-        val overflow = (cardContainer.height - viewport.height).coerceAtLeast(0)
+
+        // Use measured (settled) heights, not laid-out heights: during an inter-dialog ChangeBounds the
+        // laid-out height is mid-animation and still reports the previous, taller dialog, which would
+        // wrongly hide the decoration. measuredHeight reflects the post-transition target throughout.
+        val dialogHeight = dialog.measuredHeight.takeIf { it > 0 } ?: dialog.height
+        val viewportHeight = viewport.measuredHeight.takeIf { it > 0 } ?: viewport.height
+        val cardContainerHeight = cardContainer.measuredHeight.takeIf { it > 0 } ?: cardContainer.height
+        if (dialogHeight == 0 || viewportHeight == 0) return true
+
+        val overflow = (cardContainerHeight - viewportHeight).coerceAtLeast(0)
         val available = root.height - root.paddingTop - root.paddingBottom
         val dialogParams = dialog.layoutParams as ViewGroup.MarginLayoutParams
-        val dialogSpace = dialog.height + overflow + dialogParams.topMargin + dialogParams.bottomMargin
+        val dialogSpace = dialogHeight + overflow + dialogParams.topMargin + dialogParams.bottomMargin
         val decorationParams = deco.layoutParams as ViewGroup.MarginLayoutParams
 
         val target = BrandDesignUpdateOnboardingLayoutHelper.computeDecorationHeight(
