@@ -22,7 +22,7 @@
         android:id="@+id/modelPickerChip"
         style="@style/Widget.MaterialComponents.Chip.Choice"
         android:layout_width="wrap_content"
-        android:layout_height="@dimen/modelPickerChipHeight"
+        android:layout_height="@dimen/nativeInputButtonSize"
         android:layout_gravity="center_vertical"
         android:clickable="true"
         android:focusable="true"
