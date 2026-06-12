@@ -27,6 +27,7 @@ interface AutoComplete {
         suggestions: List<AutoCompleteSuggestion>,
         suggestion: AutoCompleteSuggestion,
         experimentalInputScreen: Boolean = false,
+        duckAiSurface: Boolean = false,
     )
 
     data class Config(

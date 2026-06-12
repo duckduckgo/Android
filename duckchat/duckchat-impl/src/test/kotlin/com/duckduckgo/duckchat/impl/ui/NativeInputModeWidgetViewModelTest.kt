@@ -51,10 +51,12 @@ import com.duckduckgo.duckchat.impl.models.ModelState
 import com.duckduckgo.duckchat.impl.models.ReasoningEffort
 import com.duckduckgo.duckchat.impl.models.ReasoningEffortAccess
 import com.duckduckgo.duckchat.impl.models.ReasoningMode
+import com.duckduckgo.duckchat.impl.models.Tool
 import com.duckduckgo.duckchat.impl.nativeinput.NativeInputHost
 import com.duckduckgo.duckchat.impl.nativeinput.NativeInputPlugin
 import com.duckduckgo.duckchat.impl.nativeinput.RealNativeInputStateStore
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.store.impl.DuckAiChat
 import com.duckduckgo.duckchat.store.impl.DuckAiChatStore
 import com.duckduckgo.subscriptions.api.Product
@@ -107,6 +109,7 @@ class NativeInputModeWidgetViewModelTest {
     private val duckAiChatHistoryFeature: DuckAiChatHistoryFeature = mock()
     private val inputScreenConfigResolver: InputScreenConfigResolver = mock()
     private val pixel: Pixel = mock()
+    private val duckChatPixels: DuckChatPixels = mock()
     private val modelManager: DuckAiModelManager = mock()
     private val duckAiChatStore: DuckAiChatStore = mock()
 
@@ -163,6 +166,7 @@ class NativeInputModeWidgetViewModelTest {
             dispatchers = coroutineRule.testDispatcherProvider,
             inputScreenConfigResolver = inputScreenConfigResolver,
             pixel = pixel,
+            duckChatPixels = duckChatPixels,
             nativeInputStatePublisher = nativeInputStatePublisher,
             nativeInputStateProvider = nativeInputStateProvider,
             modelManager = modelManager,
@@ -1102,7 +1106,7 @@ class NativeInputModeWidgetViewModelTest {
 
         testee.fireChatUrlSuggestionPixel(url)
 
-        verify(autoComplete).fireAutocompletePixel(eq(listOf(url)), eq(url), eq(true))
+        verify(autoComplete).fireAutocompletePixel(eq(listOf(url)), eq(url), experimentalInputScreen = eq(true), duckAiSurface = eq(true))
     }
 
     @Test
@@ -1111,7 +1115,7 @@ class NativeInputModeWidgetViewModelTest {
 
         testee.fireChatUrlSuggestionPixel(url)
 
-        verify(autoComplete).fireAutocompletePixel(eq(emptyList()), eq(url), eq(true))
+        verify(autoComplete).fireAutocompletePixel(eq(emptyList()), eq(url), experimentalInputScreen = eq(true), duckAiSurface = eq(true))
     }
 
     @Test
@@ -1125,7 +1129,7 @@ class NativeInputModeWidgetViewModelTest {
         testee.cancelChatSuggestions()
         testee.fireChatUrlSuggestionPixel(url)
 
-        verify(autoComplete).fireAutocompletePixel(eq(emptyList()), eq(url), eq(true))
+        verify(autoComplete).fireAutocompletePixel(eq(emptyList()), eq(url), experimentalInputScreen = eq(true), duckAiSurface = eq(true))
     }
 
     // endregion
@@ -1278,6 +1282,18 @@ class NativeInputModeWidgetViewModelTest {
         verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_RECENT_CHAT_SELECTED_DAILY, type = Daily())
         verify(pixel, never()).fire(DuckChatPixelName.DUCK_CHAT_RECENT_CHAT_SELECTED_PINNED_COUNT)
         verify(pixel, never()).fire(DuckChatPixelName.DUCK_CHAT_RECENT_CHAT_SELECTED_PINNED_DAILY, type = Daily())
+        verify(duckChatPixels).fireDuckAiChatHistorySuggestionClicked()
+    }
+
+    // endregion
+
+    // region duckai autocomplete-family pixels
+
+    @Test
+    fun whenFireDuckAiSearchForQuerySubmittedPixelThenFiresSearchDuckDuckGoPixel() {
+        testee.fireDuckAiSearchForQuerySubmittedPixel()
+
+        verify(duckChatPixels).fireDuckAiSearchDuckDuckGoSuggestionClicked()
     }
 
     // endregion
@@ -1302,6 +1318,97 @@ class NativeInputModeWidgetViewModelTest {
 
         val emitted = testee.state.first()
         assertEquals(NativeInputState.ToggleSelection.SEARCH, emitted.toggleSelection)
+    }
+
+    // endregion
+
+    // region fireSubmissionPixels
+
+    @Test
+    fun whenImageGenerationToolSelectedThenFiresPromptSubmittedAndImageGenerationSubmitted() = runTest {
+        val tabId = "tab-A"
+        whenever(modelManager.getSelectedModelId()).thenReturn("model-1")
+        whenever(modelManager.getResolvedReasoningEffort()).thenReturn("fast")
+        val viewModel = createViewModel()
+        viewModel.configure(tabId = tabId, isDuckAiMode = true, isBottom = false)
+        advanceUntilIdle()
+        viewModel.setSelectedTool(Tool.IMAGE_GENERATION.rawValue)
+
+        viewModel.fireSubmissionPixels(hasText = true, hasImageAttachment = true, hasFileAttachment = false)
+
+        verify(duckChatPixels).firePromptSubmitted(
+            selectedTool = "image_generation",
+            modelId = "model-1",
+            reasoningEffort = "fast",
+            hasImageAttachment = true,
+            hasFileAttachment = false,
+            hasText = true,
+        )
+        verify(duckChatPixels).fireImageGenerationSubmitted()
+        verify(duckChatPixels, never()).fireWebSearchSubmitted()
+    }
+
+    @Test
+    fun whenNoToolSelectedThenFiresPromptSubmittedWithNoneAndNoPerToolPixel() = runTest {
+        val tabId = "tab-A"
+        whenever(modelManager.getSelectedModelId()).thenReturn("model-1")
+        whenever(modelManager.getResolvedReasoningEffort()).thenReturn("fast")
+        val viewModel = createViewModel()
+        viewModel.configure(tabId = tabId, isDuckAiMode = true, isBottom = false)
+        advanceUntilIdle()
+
+        viewModel.fireSubmissionPixels(hasText = true, hasImageAttachment = false, hasFileAttachment = false)
+
+        verify(duckChatPixels).firePromptSubmitted(
+            selectedTool = "none",
+            modelId = "model-1",
+            reasoningEffort = "fast",
+            hasImageAttachment = false,
+            hasFileAttachment = false,
+            hasText = true,
+        )
+        verify(duckChatPixels, never()).fireImageGenerationSubmitted()
+        verify(duckChatPixels, never()).fireWebSearchSubmitted()
+    }
+
+    @Test
+    fun whenWebSearchToolSelectedThenFiresPromptSubmittedAndWebSearchSubmitted() = runTest {
+        val tabId = "tab-A"
+        whenever(modelManager.getSelectedModelId()).thenReturn("model-1")
+        whenever(modelManager.getResolvedReasoningEffort()).thenReturn("fast")
+        val viewModel = createViewModel()
+        viewModel.configure(tabId = tabId, isDuckAiMode = true, isBottom = false)
+        advanceUntilIdle()
+        viewModel.setSelectedTool(Tool.WEB_SEARCH.rawValue)
+
+        viewModel.fireSubmissionPixels(hasText = true, hasImageAttachment = false, hasFileAttachment = false)
+
+        verify(duckChatPixels).firePromptSubmitted(
+            selectedTool = "web_search",
+            modelId = "model-1",
+            reasoningEffort = "fast",
+            hasImageAttachment = false,
+            hasFileAttachment = false,
+            hasText = true,
+        )
+        verify(duckChatPixels).fireWebSearchSubmitted()
+        verify(duckChatPixels, never()).fireImageGenerationSubmitted()
+    }
+
+    // endregion
+
+    // region voice / stop pixels
+
+    @Test
+    fun whenVoiceTappedThenVoicePixel() {
+        testee.fireVoiceTapped()
+        verify(duckChatPixels).fireVoiceTapped()
+    }
+
+    @Test
+    fun whenStopGenerationTappedThenStopPixel() {
+        testee.fireStopGenerationTapped()
+        verify(duckChatPixels).fireStopGenerationTapped()
     }
 
     // endregion

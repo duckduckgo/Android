@@ -101,6 +101,7 @@ class InputScreenViewModelTest {
     private val omnibarRepository: OmnibarRepository = mock()
     private val queryUrlPredictor: QueryUrlPredictor = mock()
     private val tabRepository: TabRepository = mock()
+    private val tabsFlow = MutableStateFlow<List<TabEntity>>(emptyList())
     private val tabPageContextRepository: com.duckduckgo.app.tabs.model.TabPageContextRepository = mock()
     private val duckChatJSHelper: com.duckduckgo.duckchat.impl.helper.DuckChatJSHelper = mock()
 
@@ -134,6 +135,7 @@ class InputScreenViewModelTest {
             whenever(inputScreenSessionStore.hasUsedSearchMode()).thenReturn(false)
             whenever(inputScreenSessionStore.hasUsedChatMode()).thenReturn(false)
             whenever(queryUrlPredictor.isReady()).thenReturn(true)
+            whenever(tabRepository.flowTabs).thenReturn(tabsFlow)
         }
 
     private fun createViewModel(currentOmnibarText: String = ""): InputScreenViewModel =
@@ -161,6 +163,26 @@ class InputScreenViewModelTest {
             tabPageContextRepository = tabPageContextRepository,
             duckChatJSHelper = duckChatJSHelper,
         )
+
+    private fun aTab(id: String) = TabEntity(tabId = id, url = null, title = null)
+
+    @Test
+    fun `when tabs are added or removed then tabCount emits the new size`() =
+        runTest {
+            val viewModel = createViewModel()
+
+            viewModel.tabCount.test {
+                assertEquals(0, awaitItem())
+
+                tabsFlow.value = listOf(aTab("1"), aTab("2"))
+                assertEquals(2, awaitItem())
+
+                tabsFlow.value = listOf(aTab("1"))
+                assertEquals(1, awaitItem())
+
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
 
     @Test
     fun `when initialized with web URL and autocomplete enabled then autocomplete suggestions should be hidden initially`() =
@@ -1159,7 +1181,7 @@ class InputScreenViewModelTest {
             assertEquals(SubmitChat(query), viewModel.command.value)
 
             verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_OPEN_AUTOCOMPLETE_EXPERIMENTAL, params)
-            verify(autoComplete).fireAutocompletePixel(any(), any(), any())
+            verify(autoComplete).fireAutocompletePixel(any(), any(), any(), any())
         }
 
     @Test

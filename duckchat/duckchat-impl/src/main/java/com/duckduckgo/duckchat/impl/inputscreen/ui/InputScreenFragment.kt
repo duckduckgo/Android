@@ -425,6 +425,10 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
             .onEach { inputModeWidget.setBrowserMenuHighlightVisible(it) }
             .launchIn(viewLifecycleOwner.lifecycleScope)
 
+        viewModel.tabCount
+            .onEach { count -> inputModeWidget.tabSwitcherButton.count = count }
+            .launchIn(viewLifecycleOwner.lifecycleScope)
+
         if (duckChatFeature.chatTabAttachments().isEnabled()) {
             viewModel.tabAttachmentState
                 .onEach { state -> updateTabAttachmentPopup(state) }

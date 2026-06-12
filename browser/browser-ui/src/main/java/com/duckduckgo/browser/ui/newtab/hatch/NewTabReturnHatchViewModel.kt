@@ -76,7 +76,6 @@ class NewTabReturnHatchViewModel @Inject constructor(
     val commands: Flow<Command> = commandChannel.receiveAsFlow()
 
     private val pendingClose = MutableStateFlow(false)
-    private val burnTargetTabId = MutableStateFlow<String?>(null)
 
     // The tab the hatch offers to return to, captured once when the app returns from idle. Driving
     // the hatch from this snapshot (instead of the live last-accessed flow) keeps the displayed tab
@@ -96,30 +95,19 @@ class NewTabReturnHatchViewModel @Inject constructor(
                 }
             }
         }
-        // When the user burns the hatch's tab via the FireDialog, hide the hatch as soon as that
-        // tab is gone from the repository. If the FireDialog is cancelled, the tab survives and the
-        // hatch stays visible.
-        viewModelScope.launch(dispatchers.io()) {
-            combine(burnTargetTabId, tabRepository.flowTabs) { targetId, tabs ->
-                targetId != null && tabs.none { it.tabId == targetId }
-            }.collect { targetGone ->
-                if (targetGone) {
-                    pendingClose.value = true
-                    burnTargetTabId.value = null
-                }
-            }
-        }
     }
 
     // Driven by the captured [snapshotTab] (not the live last-accessed flow) so the displayed tab is
-    // stable across the close/undo toggle. Only the tabs count stays live, sourced from flowTabs.
+    // stable across the close/undo toggle. flowTabs both supplies the live tabs count and gates
+    // visibility: the hatch hides as soon as the snapshot tab leaves the repository (burned, closed,
+    // or purged), so every live ViewModel instance stays in sync without per-instance burn tracking.
     val viewState = combine(
         snapshotTab,
         pendingClose,
         tabRepository.flowTabs,
         duckChat.observeNativeInputFieldUserSettingEnabled(),
     ) { tab, closed, tabs, nativeInputEnabled ->
-        if (tab != null && !closed) {
+        if (tab != null && !closed && tabs.any { it.tabId == tab.tabId }) {
             val url = tab.url.orEmpty()
             ViewState(
                 tabTitle = tab.title.orEmpty(),
@@ -165,7 +153,6 @@ class NewTabReturnHatchViewModel @Inject constructor(
     fun onBurnTabPressed() {
         pixel.fire(NewTabReturnHatchPixelName.OPTION_SELECTED_BURN_TAB, type = Count)
         pixel.fire(NewTabReturnHatchPixelName.OPTION_SELECTED_BURN_TAB_DAILY, type = Daily())
-        burnTargetTabId.value = viewState.value.currentTabId.takeIf { it.isNotEmpty() }
     }
 
     fun onUndoCloseTab(tabId: String) {

@@ -251,6 +251,7 @@ import com.duckduckgo.autofill.api.passwordgeneration.AutomaticSavedLoginsMonito
 import com.duckduckgo.autofill.impl.AutofillFireproofDialogSuppressor
 import com.duckduckgo.brokensite.api.BrokenSitePrompt
 import com.duckduckgo.brokensite.api.RefreshPattern
+import com.duckduckgo.browser.api.BrowserRefreshTriggerPlugin
 import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.browser.api.autocomplete.AutoComplete
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteResult
@@ -609,6 +610,13 @@ class BrowserTabViewModelTest {
     private val mockTabStatsBucketing: TabStatsBucketing = mock()
     private val mockNtpAfterIdleManager: NtpAfterIdleManager = mock()
     private val mockBrowserInteractionsPlugins: PluginPoint<BrowserInteractionsPlugin> = mock()
+    private val browserRefreshTriggerFlow = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
+    private val browserRefreshTriggerPlugin: BrowserRefreshTriggerPlugin = mock {
+        on { observeRefreshRequests() } doReturn browserRefreshTriggerFlow
+    }
+    private val mockBrowserRefreshTriggerPlugins: PluginPoint<BrowserRefreshTriggerPlugin> = mock {
+        on { getPlugins() } doReturn listOf(browserRefreshTriggerPlugin)
+    }
     private val mockDuckChatJSHelper: DuckChatJSHelper = mock()
     private val swipingTabsFeature = FakeFeatureToggleFactory.create(SwipingTabsFeature::class.java)
     private val swipingTabsFeatureProvider = SwipingTabsFeatureProvider(swipingTabsFeature)
@@ -987,6 +995,7 @@ class BrowserTabViewModelTest {
                 faviconFetchingFixFeature = fakeFaviconFetchingFixFeature,
                 ntpAfterIdleManager = mockNtpAfterIdleManager,
                 browserInteractionsPlugins = mockBrowserInteractionsPlugins,
+                browserRefreshTriggerPlugins = mockBrowserRefreshTriggerPlugins,
                 inlinePdfHandler = mockInlinePdfHandler,
                 pdfDownloadTooltipDataStore = mockPdfDownloadTooltipDataStore,
                 cachedFileDownloader = mockCachedFileDownloader,
@@ -7891,6 +7900,30 @@ class BrowserTabViewModelTest {
         testee.openDuckAiChatById("https://duck.ai/chat?chatId=abc")
 
         verify(plugin).onChatSelected()
+    }
+
+    @Test
+    fun whenBrowserRefreshTriggerPluginEmitsThenNavigationRefreshCommandIssued() = runTest {
+        browserRefreshTriggerFlow.emit(Unit)
+        advanceUntilIdle()
+
+        assertCommandIssued<NavigationCommand.Refresh>()
+    }
+
+    @Test
+    fun whenBrowserRefreshTriggerPluginEmitsWhileTabHiddenThenNoRefreshUntilVisible() = runTest {
+        testee.onViewHidden()
+        advanceUntilIdle()
+
+        browserRefreshTriggerFlow.emit(Unit)
+        advanceUntilIdle()
+
+        assertCommandNotIssued<NavigationCommand.Refresh>()
+
+        testee.onViewVisible()
+        advanceUntilIdle()
+
+        assertCommandIssued<NavigationCommand.Refresh>()
     }
 
     @Test

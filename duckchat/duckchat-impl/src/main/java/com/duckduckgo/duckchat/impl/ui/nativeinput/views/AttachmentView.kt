@@ -280,7 +280,7 @@ class AttachmentView(
             ) {
                 popup.dismiss()
                 host?.showAttachmentChooser(true)
-                onCameraCaptureRequested?.invoke(buildImagePickerCallback())
+                onCameraCaptureRequested?.invoke(buildImagePickerCallback(AttachmentViewModel.ImageSource.CAMERA))
             }
 
             addMenuItem(
@@ -290,7 +290,7 @@ class AttachmentView(
             ) {
                 popup.dismiss()
                 host?.showAttachmentChooser(true)
-                onFilePickerRequested?.invoke(buildImagePickerCallback(), listOf("image/*"))
+                onFilePickerRequested?.invoke(buildImagePickerCallback(AttachmentViewModel.ImageSource.PHOTO_LIBRARY), listOf("image/*"))
             }
         }
 
@@ -335,9 +335,9 @@ class AttachmentView(
         popupWindow = null
     }
 
-    private fun buildImagePickerCallback(): ValueCallback<Array<Uri>> = ValueCallback { uris ->
+    private fun buildImagePickerCallback(source: AttachmentViewModel.ImageSource): ValueCallback<Array<Uri>> = ValueCallback { uris ->
         val list = uris?.toList()
-        if (!list.isNullOrEmpty()) viewModel?.onImagesPicked(list)
+        if (!list.isNullOrEmpty()) viewModel?.onImagesPicked(list, source)
     }
 
     private fun buildFilePickerCallback(): ValueCallback<Array<Uri>> = ValueCallback { uris ->

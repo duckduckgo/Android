@@ -31,6 +31,17 @@ sealed class UpsellCommand {
     data class LaunchUpgrade(val origin: String) : UpsellCommand()
 }
 
+internal fun UserTier.toParam(): String = when (this) {
+    UserTier.FREE -> "free"
+    UserTier.PLUS -> "plus"
+    UserTier.PRO -> "pro"
+}
+
+internal fun UpsellCommand.toFlowTypeParam(): String = when (this) {
+    is UpsellCommand.LaunchPurchase -> "purchase"
+    is UpsellCommand.LaunchUpgrade -> "upgrade"
+}
+
 /**
  * Maps a (userTier, requiredTier) pair to the upsell flow that should fire, or `null` when no
  * native subscription flow applies (FREE-required gating, or a tier transition we don't route).

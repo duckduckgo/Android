@@ -19,6 +19,8 @@ package com.duckduckgo.app.browser.nativeinput
 import android.net.Uri
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.browser.omnibar.QueryUrlPredictor
+import com.duckduckgo.app.pixels.AppPixelName
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.navigation.api.GlobalActivityStarter
@@ -44,6 +46,7 @@ class RealNativeInputManagerTest {
     private val globalActivityStarter: GlobalActivityStarter = mock()
     private val queryUrlPredictor: QueryUrlPredictor = mock()
     private val duckAiFeatureState: DuckAiFeatureState = mock()
+    private val pixel: Pixel = mock()
 
     private lateinit var testee: RealNativeInputManager
 
@@ -56,6 +59,27 @@ class RealNativeInputManagerTest {
             globalActivityStarter,
             queryUrlPredictor,
             duckAiFeatureState,
+            pixel,
+        )
+    }
+
+    @Test
+    fun whenChatHeaderUpgradeTappedByFreeUserThenPixelFiredWithFreeTier() {
+        testee.fireChatHeaderUpgradeTapped(DuckAiTier.Free)
+
+        verify(pixel).fire(
+            AppPixelName.AI_CHAT_UNIFIED_INPUT_CHAT_HEADER_UPGRADE_TAPPED,
+            mapOf("user_tier" to "free"),
+        )
+    }
+
+    @Test
+    fun whenChatHeaderUpgradeTappedByPaidUserThenPixelFiredWithPlusTier() {
+        testee.fireChatHeaderUpgradeTapped(DuckAiTier.Paid)
+
+        verify(pixel).fire(
+            AppPixelName.AI_CHAT_UNIFIED_INPUT_CHAT_HEADER_UPGRADE_TAPPED,
+            mapOf("user_tier" to "plus"),
         )
     }
 

@@ -79,9 +79,11 @@ class NewTabReturnHatchViewModelTest {
         )
     }
 
-    // Simulates returning from idle: stub the one-time last-accessed read and trigger the rising
-    // edge that captures the snapshot.
+    // Simulates returning from idle: the last-accessed tab is present in the repository (so the
+    // hatch can show it), the one-time last-accessed read is stubbed, and the rising edge triggers
+    // the snapshot capture.
     private suspend fun returnFromIdleWith(tab: TabEntity?) {
+        tabsFlow.value = listOfNotNull(tab)
         whenever(mockTabRepository.getLastAccessedTab()).thenReturn(tab)
         afterIdleReturnFlow.value = false
         afterIdleReturnFlow.value = true
@@ -417,13 +419,9 @@ class NewTabReturnHatchViewModelTest {
             testee.onBurnTabPressed()
             tabsFlow.value = emptyList()
 
-            // The viewState combine and the burn-target observer both consume flowTabs, so the
-            // order of emissions is non-deterministic. Drain until we observe the hatch hidden.
-            var hidden = !awaitItem().shouldShow
-            while (!hidden) {
-                hidden = !awaitItem().shouldShow
-            }
-            cancelAndConsumeRemainingEvents()
+            // After the FireDialog burns the tab it leaves flowTabs, and visibility tracks
+            // membership, so the hatch hides.
+            assertFalse(expectMostRecentItem().shouldShow)
         }
     }
 
@@ -439,8 +437,26 @@ class NewTabReturnHatchViewModelTest {
             testee.onBurnTabPressed()
             advanceUntilIdle()
 
-            // Burn target still present, so the hatch state is unchanged (stays visible).
+            // The tab is still in flowTabs (FireDialog not confirmed), so the hatch stays visible.
             expectNoEvents()
+        }
+    }
+
+    @Test
+    fun whenSnapshotTabRemovedFromRepositoryThenHatchHides() = runTest {
+        val tab = TabEntity(tabId = "tab1", url = "https://example.com", title = "Example")
+        tabsFlow.value = listOf(tab)
+
+        testee.viewState.test {
+            returnFromIdleWith(tab)
+            assertTrue(expectMostRecentItem().shouldShow)
+
+            // The snapshot tab leaves the repository without this instance closing or burning it
+            // (e.g. a second live hatch instance burned it, or an external close). Visibility must
+            // track flowTabs membership, so the hatch hides the moment its tab is gone.
+            tabsFlow.value = emptyList()
+
+            assertFalse(expectMostRecentItem().shouldShow)
         }
     }
 

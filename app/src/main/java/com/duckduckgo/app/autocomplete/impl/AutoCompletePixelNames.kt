@@ -38,6 +38,13 @@ enum class AutoCompletePixelNames(override val pixelName: String) : Pixel.PixelN
     AUTOCOMPLETE_DUCKAI_PROMPT_EXPERIMENTAL_SELECTION("m_autocomplete_click_duckai_experimental"),
     AUTOCOMPLETE_DUCKAI_PROMPT_LEGACY_SELECTION("m_autocomplete_click_duckai_legacy"),
     AUTOCOMPLETE_INSTALLED_APP_SELECTION("m_autocomplete_click_installed-app"),
+
+    AUTOCOMPLETE_DUCKAI_WEBSITE_SELECTION("m_autocomplete_duckai_click_website"),
+    AUTOCOMPLETE_DUCKAI_BOOKMARK_SELECTION("m_autocomplete_duckai_click_bookmark"),
+    AUTOCOMPLETE_DUCKAI_FAVORITE_SELECTION("m_autocomplete_duckai_click_favorite"),
+    AUTOCOMPLETE_DUCKAI_HISTORY_SEARCH_SELECTION("m_autocomplete_duckai_click_history_search"),
+    AUTOCOMPLETE_DUCKAI_HISTORY_SITE_SELECTION("m_autocomplete_duckai_click_history_site"),
+    AUTOCOMPLETE_DUCKAI_SWITCH_TO_TAB_SELECTION("m_autocomplete_duckai_click_switch_to_tab"),
 }
 
 @ContributesMultibinding(AppScope::class)
@@ -45,6 +52,10 @@ class AutocompleteParamRemovalPlugin @Inject constructor() : PixelParamRemovalPl
     override fun names(): List<Pair<String, Set<PixelParameter>>> {
         return listOf(
             AutoCompletePixelNames.AUTOCOMPLETE_INSTALLED_APP_SELECTION.pixelName to PixelParameter.removeAtb(),
+            // Prefix: the Duck.ai-surface autocomplete family is Duck.ai telemetry, so it drops ATB.
+            // Covers the 6 names above and the 2 Duck.ai-unique ones (chat_history, search_duckduckgo)
+            // declared in DuckChatPixelName — the interceptor matches outgoing names with startsWith.
+            "m_autocomplete_duckai_click_" to PixelParameter.removeAtb(),
         )
     }
 }
