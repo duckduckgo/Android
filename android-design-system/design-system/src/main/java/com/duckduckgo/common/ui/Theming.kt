@@ -58,26 +58,32 @@ object Theming {
     }
 }
 
-fun AppCompatActivity.applyTheme(theme: DuckDuckGoTheme): BroadcastReceiver? {
+fun AppCompatActivity.applyTheme(
+    theme: DuckDuckGoTheme,
+    isFireMode: Boolean = false,
+): BroadcastReceiver? {
     if (!FIXED_THEME_ACTIVITIES.contains(this.localClassName)) {
-        setTheme(getThemeId(theme))
+        setTheme(getThemeId(theme, isFireMode))
     }
     return registerForThemeChangeBroadcast()
 }
 
-fun AppCompatActivity.getThemeId(theme: DuckDuckGoTheme): Int {
+fun AppCompatActivity.getThemeId(
+    theme: DuckDuckGoTheme,
+    isFireMode: Boolean = false,
+): Int {
     return when (theme) {
-        SYSTEM_DEFAULT -> getSystemDefaultTheme()
-        DARK -> R.style.Theme_DuckDuckGo_Dark
-        else -> R.style.Theme_DuckDuckGo_Light
+        SYSTEM_DEFAULT -> getSystemDefaultTheme(isFireMode)
+        DARK -> if (isFireMode) R.style.Theme_DuckDuckGo_Dark_Fire else R.style.Theme_DuckDuckGo_Dark
+        else -> if (isFireMode) R.style.Theme_DuckDuckGo_Light_Fire else R.style.Theme_DuckDuckGo_Light
     }
 }
 
-private fun Context.getSystemDefaultTheme(): Int {
+private fun Context.getSystemDefaultTheme(isFireMode: Boolean): Int {
     return if (isInNightMode()) {
-        R.style.Theme_DuckDuckGo_Dark
+        if (isFireMode) R.style.Theme_DuckDuckGo_Dark_Fire else R.style.Theme_DuckDuckGo_Dark
     } else {
-        R.style.Theme_DuckDuckGo_Light
+        if (isFireMode) R.style.Theme_DuckDuckGo_Light_Fire else R.style.Theme_DuckDuckGo_Light
     }
 }
 

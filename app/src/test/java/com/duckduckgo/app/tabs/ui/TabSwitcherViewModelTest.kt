@@ -155,6 +155,8 @@ class TabSwitcherViewModelTest {
 
     private val mockOmnibarFeatureRepository: OmnibarRepository = mock()
 
+    private val mockTabTitleResolver: TabTitleResolver = mock()
+
     private val swipingTabsFeature = FakeFeatureToggleFactory.create(SwipingTabsFeature::class.java)
     private val swipingTabsFeatureProvider = SwipingTabsFeatureProvider(swipingTabsFeature)
 
@@ -194,6 +196,7 @@ class TabSwitcherViewModelTest {
         whenever(mockFireModeAvailability.isAvailable()).thenReturn(true)
         whenever(mockBrowserModeStateHolder.currentMode).thenReturn(currentModeFlow)
         whenever(mockTabRepositoryProvider.forMode(BrowserMode.REGULAR)).thenReturn(mockTabRepository)
+        whenever(mockTabTitleResolver.resolveTitle(any(), any())).thenReturn("")
 
         initializeMockTabEntitesData()
         initializeViewModel()
@@ -222,6 +225,7 @@ class TabSwitcherViewModelTest {
             savedSitesRepository,
             mockTrackersAnimationInfoPanelPixels,
             mockOmnibarFeatureRepository,
+            mockTabTitleResolver,
             coroutinesTestRule.testScope,
         )
         testee.command.observeForever(mockCommandObserver)
@@ -749,61 +753,6 @@ class TabSwitcherViewModelTest {
         testee.onTabMoved(fromIndex, toIndex)
 
         verify(mockTabRepository).updateTabPosition(fromIndex, toIndex)
-    }
-
-    @Test
-    fun whenListLayoutTypeToggledCorrectPixelsAreFired() = runTest {
-        coroutinesTestRule.testScope.launch {
-            testee.layoutType.collect()
-        }
-
-        testee.onLayoutTypeToggled()
-
-        verify(mockPixel).fire(AppPixelName.TAB_MANAGER_LIST_VIEW_BUTTON_CLICKED)
-    }
-
-    @Test
-    fun whenGridLayoutTypeToggledCorrectPixelsAreFired() = runTest {
-        whenever(mockTabRepository.tabSwitcherData).thenReturn(flowOf(tabSwitcherData.copy(layoutType = LIST)))
-
-        // we need to use the new stubbing here
-        initializeViewModel()
-
-        coroutinesTestRule.testScope.launch {
-            testee.layoutType.collect()
-        }
-
-        testee.onLayoutTypeToggled()
-
-        verify(mockPixel).fire(AppPixelName.TAB_MANAGER_GRID_VIEW_BUTTON_CLICKED)
-    }
-
-    @Test
-    fun whenListLayoutTypeToggledTheTypeIsChangedToGrid() = runTest {
-        coroutinesTestRule.testScope.launch {
-            testee.layoutType.collect()
-        }
-
-        // the default layout type is GRID
-        testee.onLayoutTypeToggled()
-
-        verify(mockTabRepository).setTabLayoutType(LIST)
-    }
-
-    @Test
-    fun whenGridLayoutTypeToggledTheTypeIsChangedToList() = runTest {
-        whenever(mockTabRepository.tabSwitcherData).thenReturn(flowOf(tabSwitcherData.copy(layoutType = LIST)))
-
-        // we need to use the new stubbing here
-        initializeViewModel()
-
-        coroutinesTestRule.testScope.launch {
-            testee.layoutType.collect()
-        }
-
-        testee.onLayoutTypeToggled()
-
-        verify(mockTabRepository).setTabLayoutType(GRID)
     }
 
     @Test
@@ -2006,6 +1955,7 @@ class TabSwitcherViewModelTest {
             savedSitesRepository,
             mockTrackersAnimationInfoPanelPixels,
             mockOmnibarFeatureRepository,
+            mockTabTitleResolver,
             coroutinesTestRule.testScope,
         )
         backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
@@ -2021,7 +1971,7 @@ class TabSwitcherViewModelTest {
     @Test
     fun `when fire mode available then isBrowserModeToggleVisible is true`() = runTest {
         // @Before sets isAvailable() = true
-        assertTrue(testee.isBrowserModeToggleVisible)
+        assertTrue(testee.viewState.value.isBrowserModeToggleVisible)
     }
 
     @Test
@@ -2048,10 +1998,11 @@ class TabSwitcherViewModelTest {
             savedSitesRepository,
             mockTrackersAnimationInfoPanelPixels,
             mockOmnibarFeatureRepository,
+            mockTabTitleResolver,
             coroutinesTestRule.testScope,
         )
 
-        assertFalse(isolatedViewModel.isBrowserModeToggleVisible)
+        assertFalse(isolatedViewModel.viewState.value.isBrowserModeToggleVisible)
     }
 
     @Test
@@ -2114,6 +2065,7 @@ class TabSwitcherViewModelTest {
             savedSitesRepository,
             mockTrackersAnimationInfoPanelPixels,
             mockOmnibarFeatureRepository,
+            mockTabTitleResolver,
             coroutinesTestRule.testScope,
         )
 

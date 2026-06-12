@@ -1,0 +1,84 @@
+<!--
+  ~ Copyright (c) 2026 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<resources>
+
+    <style name="Theme.DuckDuckGo.Light.Fire" parent="Theme.DuckDuckGo.Light">
+        <item name="daxColorTabHighlight">@color/mandarin50</item>
+
+        <item name="daxOmnibarThemeOverlay">@style/ThemeOverlay.DuckDuckGo.Omnibar.FireLight</item>
+
+        <!-- Cross-cutting fire accent: omnibar cursor, page progress bar, tab-switcher icons. -->
+        <item name="daxColorOmnibarAccent">@color/mandarin50</item>
+        <item name="daxOmnibarTextColorHighlight">@color/mandarin50_translucent</item>
+
+        <!-- Tints the framework-drawn text selection handles -->
+        <item name="colorControlActivated">@color/mandarin50</item>
+
+        <!-- Snackbars in fire-themed activities — orange action text -->
+        <item name="daxColorSnackbarAction">@color/mandarin50</item>
+
+        <item name="daxColorBackdrop">@color/omnibar_card_fire_light</item>
+        <item name="daxColorInputModeIndicatorShadow">@color/black</item>
+
+        <item name="daxIconTabSwitcher">@drawable/ic_tab_fire_mode_24</item>
+        <item name="daxDrawableTabPlaceholderPreview">@drawable/ic_fire_tab_placeholder_96</item>
+    </style>
+
+    <style name="Theme.DuckDuckGo.Dark.Fire" parent="Theme.DuckDuckGo.Dark">
+        <item name="daxColorTabHighlight">@color/mandarin40</item>
+
+        <item name="daxOmnibarThemeOverlay">@style/ThemeOverlay.DuckDuckGo.Omnibar.FireDark</item>
+
+        <item name="daxColorOmnibarAccent">@color/mandarin40</item>
+        <item name="daxOmnibarTextColorHighlight">@color/mandarin40_translucent</item>
+
+        <!-- Tints the framework-drawn text selection handles -->
+        <item name="colorControlActivated">@color/mandarin40</item>
+
+        <!-- Snackbars in fire-themed activities — orange action text -->
+        <item name="daxColorSnackbarAction">@color/mandarin40</item>
+
+        <item name="daxColorBackdrop">@color/omnibar_card_fire_dark</item>
+
+        <item name="daxIconTabSwitcher">@drawable/ic_tab_fire_mode_24</item>
+        <item name="daxDrawableTabPlaceholderPreview">@drawable/ic_fire_tab_placeholder_96</item>
+    </style>
+
+    <style name="ThemeOverlay.DuckDuckGo.Omnibar.None" parent="" />
+
+    <style name="ThemeOverlay.DuckDuckGo.Omnibar.FireLight" parent="Theme.DuckDuckGo.Dark">
+        <item name="daxColorWindow">@color/omnibar_card_fire_light</item>
+        <item name="daxColorOmnibarAccent">@color/mandarin50</item>
+        <item name="daxOmnibarTextColorHighlight">@color/mandarin50_translucent</item>
+        <item name="colorControlActivated">@color/mandarin50</item>
+    </style>
+
+    <style name="ThemeOverlay.DuckDuckGo.Omnibar.FireDark" parent="Theme.DuckDuckGo.Dark">
+        <item name="daxColorWindow">@color/omnibar_card_fire_dark</item>
+        <item name="daxColorOmnibarAccent">@color/mandarin40</item>
+        <item name="daxOmnibarTextColorHighlight">@color/mandarin40_translucent</item>
+        <item name="colorControlActivated">@color/mandarin40</item>
+    </style>
+
+    <color name="omnibar_card_fire_light">#3D3D3D</color>
+    <color name="omnibar_card_fire_dark">#1C1C1C</color>
+
+    <!-- ~20% alpha — matches the Figma "Mandarin 40, 20%" swatch for selection highlights -->
+    <color name="mandarin50_translucent">#33F05F2B</color>
+    <color name="mandarin40_translucent">#33FF8D5C</color>
+
+</resources>

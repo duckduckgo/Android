@@ -67,7 +67,7 @@
     </style>
 
     <style name="Widget.DuckDuckGo.SnackbarButton" parent="Widget.MaterialComponents.Button.TextButton.Snackbar">
-        <item name="android:textColor">?attr/daxColorAccentBlue</item>
+        <item name="android:textColor">?attr/daxColorSnackbarAction</item>
         <item name="android:textAppearance">?attr/textAppearanceButton</item>
     </style>
 

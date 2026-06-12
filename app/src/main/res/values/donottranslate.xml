@@ -111,6 +111,7 @@
     <string name="browserModeToggleFireDescription">Switch to Fire mode tabs</string>
     <string name="browserModeToggleRegularDescription">Switch to regular tabs</string>
     <string name="browserModeToggleTabCountInfinite">∞</string>
+    <string name="fireTabMenuItem">Fire Tab</string>
 
     <!-- Custom AI onboarding flow -->
     <!-- Pre-onboarding: AI comparison chart screen. -->

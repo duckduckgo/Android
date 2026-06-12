@@ -76,6 +76,8 @@
     <!-- Component Specific Colors -->
     <attr name="daxColorToolbar" format="color"/>
     <attr name="daxColorBrowserOverlay" format="color"/>
+    <attr name="daxColorOmnibarAccent" format="color"/>
+    <attr name="daxColorSnackbarAction" format="color"/>
 
     <!-- Visual Design Specific Colors -->
     <attr name="daxColorControlFillPrimary" format="color"/>
