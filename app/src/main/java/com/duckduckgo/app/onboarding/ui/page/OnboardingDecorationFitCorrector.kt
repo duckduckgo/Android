@@ -34,6 +34,7 @@ class OnboardingDecorationFitCorrector(
     private var decoration: View? = null
     private var minHeightPx = 0
     private var maxHeightPx = 0
+    private var bottomOverlapPx = 0
     private var preDrawListener: ViewTreeObserver.OnPreDrawListener? = null
 
     fun attach() {
@@ -52,10 +53,12 @@ class OnboardingDecorationFitCorrector(
         decoration: View,
         minHeightPx: Int,
         maxHeightPx: Int,
+        bottomOverlapPx: Int = 0,
     ) {
         this.decoration = decoration
         this.minHeightPx = minHeightPx
         this.maxHeightPx = maxHeightPx
+        this.bottomOverlapPx = bottomOverlapPx
     }
 
     fun clear() {
@@ -91,6 +94,7 @@ class OnboardingDecorationFitCorrector(
             decorationBottomMargin = decorationParams.bottomMargin,
             maxHeightPx = maxHeightPx,
             minHeightPx = minHeightPx,
+            bottomOverlapPx = bottomOverlapPx,
         )
 
         if (target == null) {

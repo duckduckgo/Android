@@ -58,6 +58,7 @@ class OnboardingDecorationFitCorrectorTest {
         dialogMeasuredHeight: Int = dialogHeight,
         contentMeasuredHeight: Int = contentHeight,
         viewportMeasuredHeight: Int = viewportHeight,
+        bottomOverlapPx: Int = 0,
         onDecorationHidden: () -> Unit = {},
     ): Harness {
         val root = ConstraintLayout(context)
@@ -102,7 +103,7 @@ class OnboardingDecorationFitCorrectorTest {
         decoration.layout(0, 0, 200, decorationHeight)
 
         val corrector = OnboardingDecorationFitCorrector(root, dialog, cardContainer, onDecorationHidden)
-        corrector.track(decoration, minHeightPx = minHeightPx, maxHeightPx = maxHeightPx)
+        corrector.track(decoration, minHeightPx = minHeightPx, maxHeightPx = maxHeightPx, bottomOverlapPx = bottomOverlapPx)
         return Harness(corrector, dialog, decoration)
     }
 
@@ -344,5 +345,29 @@ class OnboardingDecorationFitCorrectorTest {
 
         assertFalse(h.corrector.correctOnce())
         assertTrue(h.decoration.isGone)
+    }
+
+    @Test
+    fun whenDecorationFitsOnlyViaBottomOverlapThenItIsKept() {
+        // Input-screen left wing: without reclaiming the band the card reserves below its body for the
+        // tail, the wing misses its 130dp floor and hides; reclaiming it (minus the card gap) keeps it.
+        val tight = harness(
+            rootHeight = 2340, dialogHeight = 1722, dialogTopMargin = 128,
+            contentHeight = 1566, viewportHeight = 1566,
+            decorationHeight = 390, decorationBottomMargin = 156,
+            minHeightPx = 390, maxHeightPx = 588,
+        )
+        assertFalse(tight.corrector.correctOnce())
+        assertTrue(tight.decoration.isGone)
+
+        val withOverlap = harness(
+            rootHeight = 2340, dialogHeight = 1722, dialogTopMargin = 128,
+            contentHeight = 1566, viewportHeight = 1566,
+            decorationHeight = 390, decorationBottomMargin = 156,
+            minHeightPx = 390, maxHeightPx = 588,
+            bottomOverlapPx = 132,
+        )
+        assertTrue(withOverlap.corrector.correctOnce())
+        assertFalse(withOverlap.decoration.isGone)
     }
 }
