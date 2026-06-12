@@ -16,10 +16,13 @@
 
 package com.duckduckgo.duckchat.impl.contextual
 
+import android.content.Context
+import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.impl.DuckChatInternal
+import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.helper.DuckChatJSHelper
 import com.duckduckgo.duckchat.impl.helper.NativeAction
@@ -69,9 +72,11 @@ class DuckChatContextualViewModelTest {
     private val duckChatPixels: DuckChatPixels = mock()
     private val duckChatFeature: DuckChatFeature = mock()
     private val contextualFireButtonToggle: Toggle = mock()
+    private val contextualSheetImprovementsToggle: Toggle = mock()
     private val featureTogglesInventory: FeatureTogglesInventory = mock()
     private val modelManager: com.duckduckgo.duckchat.impl.models.DuckAiModelManager = mock()
     private val contextualNativeInputManager: ContextualNativeInputManager = mock()
+    private val context: Context = ApplicationProvider.getApplicationContext()
     private val singleTabFireDialogToggle: Toggle = mock()
     private val singleTabFireDialogFeatureName: Toggle.FeatureName = Toggle.FeatureName(
         parentName = "androidBrowserConfig",
@@ -82,6 +87,8 @@ class DuckChatContextualViewModelTest {
     fun setup() {
         whenever(duckChatFeature.contextualFireButton()).thenReturn(contextualFireButtonToggle)
         whenever(contextualFireButtonToggle.isEnabled()).thenReturn(false)
+        whenever(duckChatFeature.contextualSheetImprovements()).thenReturn(contextualSheetImprovementsToggle)
+        whenever(contextualSheetImprovementsToggle.isEnabled()).thenReturn(false)
         whenever(singleTabFireDialogToggle.featureName()).thenReturn(singleTabFireDialogFeatureName)
         whenever(singleTabFireDialogToggle.isEnabled()).thenReturn(false)
         runBlocking { whenever(featureTogglesInventory.getAllTogglesForParent("androidBrowserConfig")) }.thenReturn(listOf(singleTabFireDialogToggle))
@@ -96,20 +103,7 @@ class DuckChatContextualViewModelTest {
             ),
         )
 
-        testee = DuckChatContextualViewModel(
-            dispatchers = coroutineRule.testDispatcherProvider,
-            duckChat = duckChat,
-            duckChatInternal = duckChatInternal,
-            duckChatJSHelper = duckChatJSHelper,
-            contextualDataStore = contextualDataStore,
-            sessionTimeoutProvider = sessionTimeoutProvider,
-            timeProvider = timeProvider,
-            duckChatPixels = duckChatPixels,
-            duckChatFeature = duckChatFeature,
-            featureTogglesInventory = featureTogglesInventory,
-            modelManager = modelManager,
-            contextualNativeInputManager = contextualNativeInputManager,
-        )
+        testee = buildViewModel()
     }
 
     @Test
@@ -391,6 +385,7 @@ class DuckChatContextualViewModelTest {
                     featureTogglesInventory = featureTogglesInventory,
                     modelManager = modelManager,
                     contextualNativeInputManager = contextualNativeInputManager,
+                    context = context,
                 )
 
             val tabId = "tab-1"
@@ -800,6 +795,7 @@ class DuckChatContextualViewModelTest {
                     featureTogglesInventory = featureTogglesInventory,
                     modelManager = modelManager,
                     contextualNativeInputManager = contextualNativeInputManager,
+                    context = context,
                 )
 
             val serializedPageData =
@@ -838,6 +834,7 @@ class DuckChatContextualViewModelTest {
                     featureTogglesInventory = featureTogglesInventory,
                     modelManager = modelManager,
                     contextualNativeInputManager = contextualNativeInputManager,
+                    context = context,
                 )
 
             val serializedPageData =
@@ -1533,6 +1530,326 @@ class DuckChatContextualViewModelTest {
     }
 
     @Test
+    fun `when contextualSheetImprovements disabled then initial quickActionState is LEGACY_SUMMARIZE`() = runTest {
+        whenever(contextualSheetImprovementsToggle.isEnabled()).thenReturn(false)
+        val testee = buildViewModel()
+
+        assertEquals(DuckChatContextualViewModel.QuickActionState.LEGACY_SUMMARIZE, testee.viewState.value.quickActionState)
+    }
+
+    @Test
+    fun `when contextualSheetImprovements enabled then initial quickActionState is ASK_ABOUT_PAGE`() = runTest {
+        whenever(contextualSheetImprovementsToggle.isEnabled()).thenReturn(true)
+        val testee = buildViewModel()
+
+        assertEquals(DuckChatContextualViewModel.QuickActionState.ASK_ABOUT_PAGE, testee.viewState.value.quickActionState)
+    }
+
+    @Test
+    fun `when contextualSheetImprovements disabled then chatHintResId is legacy hint`() = runTest {
+        whenever(contextualSheetImprovementsToggle.isEnabled()).thenReturn(false)
+        val testee = buildViewModel()
+
+        assertEquals(R.string.input_screen_chat_hint, testee.viewState.value.chatHintResId)
+    }
+
+    @Test
+    fun `when contextualSheetImprovements enabled then chatHintResId is improved hint`() = runTest {
+        whenever(contextualSheetImprovementsToggle.isEnabled()).thenReturn(true)
+        val testee = buildViewModel()
+
+        assertEquals(R.string.contextualSheetImprovedHint, testee.viewState.value.chatHintResId)
+    }
+
+    @Test
+    fun `LEGACY_SUMMARIZE uses the legacy arrow icon`() {
+        assertEquals(
+            com.duckduckgo.mobile.android.R.drawable.ic_arrow_down_right_16,
+            DuckChatContextualViewModel.QuickActionState.LEGACY_SUMMARIZE.iconResId,
+        )
+    }
+
+    @Test
+    fun `ASK_ABOUT_PAGE uses the 16dp page-content-attach icon`() {
+        assertEquals(
+            R.drawable.ic_page_content_attach_16,
+            DuckChatContextualViewModel.QuickActionState.ASK_ABOUT_PAGE.iconResId,
+        )
+    }
+
+    @Test
+    fun `SUBMIT_SUMMARIZE uses the summarize icon`() {
+        assertEquals(
+            R.drawable.ic_summarize_16,
+            DuckChatContextualViewModel.QuickActionState.SUBMIT_SUMMARIZE.iconResId,
+        )
+    }
+
+    @Test
+    fun `when quick action clicked in LEGACY_SUMMARIZE then prompt is inserted into viewState`() = runTest {
+        whenever(contextualSheetImprovementsToggle.isEnabled()).thenReturn(false)
+        val testee = buildViewModel()
+
+        testee.onQuickActionClicked("")
+
+        val expected = context.getString(R.string.duckAIContextualPromptSummarize)
+        assertEquals(expected, testee.viewState.value.prompt)
+        assertEquals(DuckChatContextualViewModel.QuickActionState.LEGACY_SUMMARIZE, testee.viewState.value.quickActionState)
+    }
+
+    @Test
+    fun `when quick action clicked in ASK_ABOUT_PAGE with valid context then state transitions to SUBMIT_SUMMARIZE`() = runTest {
+        whenever(contextualSheetImprovementsToggle.isEnabled()).thenReturn(true)
+        val testee = buildViewModel()
+        testee.onSheetOpened("tab-1")
+        val pageContext = """{"title":"Page","url":"https://example.com","content":"text"}"""
+        testee.onPageContextReceived("tab-1", pageContext)
+
+        testee.onQuickActionClicked("")
+
+        assertEquals(DuckChatContextualViewModel.QuickActionState.SUBMIT_SUMMARIZE, testee.viewState.value.quickActionState)
+    }
+
+    @Test
+    fun `when quick action clicked in ASK_ABOUT_PAGE with no page context then state stays ASK_ABOUT_PAGE`() = runTest {
+        whenever(contextualSheetImprovementsToggle.isEnabled()).thenReturn(true)
+        val testee = buildViewModel()
+        testee.onSheetOpened("tab-1")
+        // No onPageContextReceived call — updatedPageContext is empty/invalid.
+
+        testee.onQuickActionClicked("")
+
+        assertEquals(DuckChatContextualViewModel.QuickActionState.ASK_ABOUT_PAGE, testee.viewState.value.quickActionState)
+        assertFalse(testee.viewState.value.showContext)
+    }
+
+    @Test
+    fun `when contextualSheetImprovements enabled and page context arrives then context is NOT auto-attached`() = runTest {
+        whenever(contextualSheetImprovementsToggle.isEnabled()).thenReturn(true)
+        val testee = buildViewModel()
+        testee.onSheetOpened("tab-1")
+        val pageContext = """{"title":"Page","url":"https://example.com","content":"text"}"""
+
+        testee.onPageContextReceived("tab-1", pageContext)
+
+        assertFalse(testee.viewState.value.showContext)
+        verify(duckChatPixels, never()).reportContextualPageContextAutoAttached()
+    }
+
+    @Test
+    fun `when contextualSheetImprovements enabled then context only attaches after ASK_ABOUT_PAGE clicked`() = runTest {
+        whenever(contextualSheetImprovementsToggle.isEnabled()).thenReturn(true)
+        val testee = buildViewModel()
+        testee.onSheetOpened("tab-1")
+        val pageContext = """{"title":"Page","url":"https://example.com","content":"text"}"""
+        testee.onPageContextReceived("tab-1", pageContext)
+        assertFalse(testee.viewState.value.showContext)
+
+        testee.onQuickActionClicked("")
+
+        assertTrue(testee.viewState.value.showContext)
+    }
+
+    @Test
+    fun `when quick action clicked in ASK_ABOUT_PAGE with valid page context then context is attached`() = runTest {
+        whenever(contextualSheetImprovementsToggle.isEnabled()).thenReturn(true)
+        val testee = buildViewModel()
+        testee.onSheetOpened("tab-1")
+        val pageContext = """{"title":"Page","url":"https://example.com","content":"text"}"""
+        testee.onPageContextReceived("tab-1", pageContext)
+
+        testee.onQuickActionClicked("")
+
+        assertTrue(testee.viewState.value.showContext)
+    }
+
+    @Test
+    fun `when quick action clicked in SUBMIT_SUMMARIZE then summarize prompt is auto-submitted`() = runTest {
+        whenever(contextualSheetImprovementsToggle.isEnabled()).thenReturn(true)
+        val testee = buildViewModel()
+        testee.onSheetOpened("tab-1")
+        val pageContext = """{"title":"Page","url":"https://example.com","content":"text"}"""
+        testee.onPageContextReceived("tab-1", pageContext)
+        testee.onQuickActionClicked("") // transition ASK_ABOUT_PAGE -> SUBMIT_SUMMARIZE
+
+        testee.subscriptionEventDataFlow.test {
+            testee.onQuickActionClicked("")
+
+            val event = awaitItem()
+            assertEquals(RealDuckChatJSHelper.DUCK_CHAT_FEATURE_NAME, event.featureName)
+            assertEquals("submitAIChatNativePrompt", event.subscriptionName)
+            val expected = context.getString(R.string.duckAIContextualPromptSummarize)
+            assertEquals(expected, event.params.getJSONObject("query").getString("prompt"))
+            cancelAndIgnoreRemainingEvents()
+        }
+        assertEquals(DuckChatContextualViewModel.SheetMode.WEBVIEW, testee.viewState.value.sheetMode)
+    }
+
+    @Test
+    fun `when SUBMIT_SUMMARIZE clicked then context-attach pixel not re-fired`() = runTest {
+        whenever(contextualSheetImprovementsToggle.isEnabled()).thenReturn(true)
+        val testee = buildViewModel()
+        testee.onSheetOpened("tab-1")
+        val pageContext = """{"title":"Page","url":"https://example.com","content":"text"}"""
+        testee.onPageContextReceived("tab-1", pageContext)
+        testee.onQuickActionClicked("") // ASK_ABOUT_PAGE -> SUBMIT_SUMMARIZE (attaches context)
+
+        testee.onQuickActionClicked("") // SUBMIT_SUMMARIZE click — should not re-attach
+
+        verify(duckChatPixels, times(1)).reportContextualPlaceholderContextTapped()
+        verify(duckChatPixels, times(1)).reportContextualPageContextManuallyAttachedNative()
+    }
+
+    @Test
+    fun `when SUBMIT_SUMMARIZE clicked after user removed context then summarize is NOT submitted`() = runTest {
+        whenever(contextualSheetImprovementsToggle.isEnabled()).thenReturn(true)
+        val testee = buildViewModel()
+        testee.onSheetOpened("tab-1")
+        val pageContext = """{"title":"Page","url":"https://example.com","content":"text"}"""
+        testee.onPageContextReceived("tab-1", pageContext)
+        testee.onQuickActionClicked("") // ASK_ABOUT_PAGE -> SUBMIT_SUMMARIZE
+        testee.removePageContext() // user dismisses the URL chip
+        assertFalse(testee.viewState.value.showContext)
+
+        testee.subscriptionEventDataFlow.test {
+            testee.onQuickActionClicked("")
+
+            expectNoEvents()
+            cancelAndIgnoreRemainingEvents()
+        }
+        // Still in input mode — no auto-submit happened.
+        assertEquals(DuckChatContextualViewModel.SheetMode.INPUT, testee.viewState.value.sheetMode)
+    }
+
+    @Test
+    fun `when new chat triggered with contextualSheetImprovements enabled then quickActionState resets to ASK_ABOUT_PAGE`() = runTest {
+        whenever(contextualSheetImprovementsToggle.isEnabled()).thenReturn(true)
+        val testee = buildViewModel()
+        testee.onSheetOpened("tab-1")
+        val pageContext = """{"title":"Page","url":"https://example.com","content":"text"}"""
+        testee.onPageContextReceived("tab-1", pageContext)
+        testee.onQuickActionClicked("") // ASK_ABOUT_PAGE -> SUBMIT_SUMMARIZE
+
+        testee.onNewChatRequested()
+
+        assertEquals(DuckChatContextualViewModel.QuickActionState.ASK_ABOUT_PAGE, testee.viewState.value.quickActionState)
+    }
+
+    @Test
+    fun `when new chat triggered with contextualSheetImprovements disabled then quickActionState stays LEGACY_SUMMARIZE`() = runTest {
+        whenever(contextualSheetImprovementsToggle.isEnabled()).thenReturn(false)
+        val testee = buildViewModel()
+        testee.onSheetOpened("tab-1")
+
+        testee.onNewChatRequested()
+
+        assertEquals(DuckChatContextualViewModel.QuickActionState.LEGACY_SUMMARIZE, testee.viewState.value.quickActionState)
+    }
+
+    @Test
+    fun `when SUBMIT_SUMMARIZE clicked with typed input then web prefill event emitted after auto-submit`() = runTest {
+        whenever(contextualSheetImprovementsToggle.isEnabled()).thenReturn(true)
+        val testee = buildViewModel()
+        testee.onSheetOpened("tab-1")
+        val pageContext = """{"title":"Page","url":"https://example.com","content":"text"}"""
+        testee.onPageContextReceived("tab-1", pageContext)
+        testee.onQuickActionClicked("") // ASK_ABOUT_PAGE -> SUBMIT_SUMMARIZE
+
+        testee.subscriptionEventDataFlow.test {
+            testee.onQuickActionClicked("my draft")
+
+            // First event: auto-submit of the summarize prompt.
+            val submitEvent = awaitItem()
+            assertEquals("submitAIChatNativePrompt", submitEvent.subscriptionName)
+            assertEquals(
+                context.getString(R.string.duckAIContextualPromptSummarize),
+                submitEvent.params.getJSONObject("query").getString("prompt"),
+            )
+            assertTrue(submitEvent.params.getJSONObject("query").getBoolean("autoSubmit"))
+
+            // Second event: prefill of the typed draft (no autoSubmit).
+            val prefillEvent = awaitItem()
+            assertEquals("submitAIChatNativePrompt", prefillEvent.subscriptionName)
+            assertEquals("my draft", prefillEvent.params.getJSONObject("query").getString("prompt"))
+            assertFalse(prefillEvent.params.getJSONObject("query").getBoolean("autoSubmit"))
+
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `when SUBMIT_SUMMARIZE clicked with typed input then ChangeSheetState carries prefill`() = runTest {
+        whenever(contextualSheetImprovementsToggle.isEnabled()).thenReturn(true)
+        val testee = buildViewModel()
+        testee.onSheetOpened("tab-1")
+        val pageContext = """{"title":"Page","url":"https://example.com","content":"text"}"""
+        testee.onPageContextReceived("tab-1", pageContext)
+        testee.onQuickActionClicked("") // ASK_ABOUT_PAGE -> SUBMIT_SUMMARIZE
+
+        testee.commands.test {
+            testee.onQuickActionClicked("my draft")
+
+            var submitSheetState: DuckChatContextualViewModel.Command.ChangeSheetState? = null
+            while (submitSheetState == null) {
+                val item = awaitItem()
+                if (item is DuckChatContextualViewModel.Command.ChangeSheetState &&
+                    item.newState == BottomSheetBehavior.STATE_EXPANDED &&
+                    !item.prefillNativeInput.isNullOrEmpty()
+                ) {
+                    submitSheetState = item
+                }
+            }
+            assertEquals("my draft", submitSheetState.prefillNativeInput)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `when onPromptSent without followUp prefill then ChangeSheetState clears native input`() = runTest {
+        val testee = buildViewModel()
+        testee.onSheetOpened("tab-1")
+
+        testee.commands.test {
+            testee.onPromptSent("hello")
+
+            var submitSheetState: DuckChatContextualViewModel.Command.ChangeSheetState? = null
+            while (submitSheetState == null) {
+                val item = awaitItem()
+                if (item is DuckChatContextualViewModel.Command.ChangeSheetState &&
+                    item.newState == BottomSheetBehavior.STATE_EXPANDED
+                ) {
+                    submitSheetState = item
+                }
+            }
+            assertEquals("", submitSheetState.prefillNativeInput)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `when removePageContext from SUBMIT_SUMMARIZE then quickActionState reverts to ASK_ABOUT_PAGE`() = runTest {
+        whenever(contextualSheetImprovementsToggle.isEnabled()).thenReturn(true)
+        val testee = buildViewModel()
+        testee.onSheetOpened("tab-1")
+        val pageContext = """{"title":"Page","url":"https://example.com","content":"text"}"""
+        testee.onPageContextReceived("tab-1", pageContext)
+        testee.onQuickActionClicked("") // ASK_ABOUT_PAGE -> SUBMIT_SUMMARIZE
+
+        assertEquals(
+            DuckChatContextualViewModel.QuickActionState.SUBMIT_SUMMARIZE,
+            testee.viewState.value.quickActionState,
+        )
+
+        testee.removePageContext()
+
+        assertEquals(
+            DuckChatContextualViewModel.QuickActionState.ASK_ABOUT_PAGE,
+            testee.viewState.value.quickActionState,
+        )
+        assertFalse(testee.viewState.value.showContext)
+    }
+
+    @Test
     fun `when fire button clicked then tapped pixel is fired`() = runTest {
         testee.onFireButtonClicked()
         verify(duckChatPixels).reportContextualFireButtonTapped()
@@ -1576,6 +1893,7 @@ class DuckChatContextualViewModelTest {
         featureTogglesInventory = featureTogglesInventory,
         modelManager = modelManager,
         contextualNativeInputManager = contextualNativeInputManager,
+        context = context,
     )
 
     private class FakeDuckChat : com.duckduckgo.duckchat.api.DuckChat {

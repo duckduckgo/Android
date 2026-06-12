@@ -556,9 +556,8 @@ class DuckChatContextualFragment :
         binding.duckAiAttachContextLayout.setOnClickListener {
             viewModel.addPageContext()
         }
-        binding.contextualPromptSummarize.setOnClickListener {
-            val prompt = getString(R.string.duckAIContextualPromptSummarize)
-            viewModel.replacePrompt(binding.inputField.text.toString(), prompt)
+        binding.contextualPromptQuickAction.setOnClickListener {
+            viewModel.onQuickActionClicked(binding.inputField.text.toString())
         }
     }
 
@@ -604,6 +603,7 @@ class DuckChatContextualFragment :
                     }
 
                     is DuckChatContextualViewModel.Command.ChangeSheetState -> {
+                        command.prefillNativeInput?.let { binding.contextualNativeInputWidget.text = it }
                         bottomSheetBehavior.state = command.newState
                     }
                     is DuckChatContextualViewModel.Command.RequestPageContext -> {
@@ -662,6 +662,10 @@ class DuckChatContextualFragment :
             binding.contextualFullScreen.gone()
         }
 
+        binding.contextualPromptQuickAction.setText(viewState.quickActionState.labelResId)
+        binding.contextualPromptQuickAction.setCompoundDrawablesRelativeWithIntrinsicBounds(viewState.quickActionState.iconResId, 0, 0, 0)
+        binding.inputField.setHint(viewState.chatHintResId)
+
         when (viewState.sheetMode) {
             DuckChatContextualViewModel.SheetMode.INPUT -> {
                 binding.contextualModeNativeContent.show()
@@ -673,7 +677,10 @@ class DuckChatContextualFragment :
 
                 renderPageContext(viewState.contextTitle, viewState.contextUrl, viewState.tabId)
 
-                if (viewState.showContext) {
+                if (viewState.quickActionState == DuckChatContextualViewModel.QuickActionState.ASK_ABOUT_PAGE) {
+                    binding.duckAiContextualLayout.gone()
+                    binding.duckAiAttachContextLayout.gone()
+                } else if (viewState.showContext) {
                     binding.duckAiContextualLayout.show()
                     binding.duckAiAttachContextLayout.gone()
                 } else {
