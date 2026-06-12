@@ -194,6 +194,33 @@ class AdBlockingExtensionJsInjectorPluginTest {
     }
 
     @Test
+    fun whenScriptletsIncludeNonJsEntriesThenOnlyJsEntriesAreInjected() {
+        scriptletsFlow.value = listOf(
+            Scriptlet(name = "a.js", content = "console.log('a')"),
+            Scriptlet(name = "rules/youtube.json", content = "{\"some\":\"json\"}"),
+            Scriptlet(name = "b.js", content = "console.log('b')"),
+        )
+
+        plugin.onPageStarted(webView, url = "https://youtube.com/page", isDesktopMode = null)
+
+        verify(webView).evaluateJavascript(
+            eq("javascript:console.log('a')\nconsole.log('b')"),
+            isNull(),
+        )
+    }
+
+    @Test
+    fun whenScriptletsAreAllNonJsEntriesThenNoInjection() {
+        scriptletsFlow.value = listOf(
+            Scriptlet(name = "rules/youtube.json", content = "{\"some\":\"json\"}"),
+        )
+
+        plugin.onPageStarted(webView, url = "https://youtube.com/page", isDesktopMode = null)
+
+        verify(webView, never()).evaluateJavascript(any(), isNull())
+    }
+
+    @Test
     fun whenOnPageFinishedCalledThenNoInjection() {
         scriptletsFlow.value = singleScriptlet
 

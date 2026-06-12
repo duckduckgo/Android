@@ -52,9 +52,11 @@ class RealScriptletUpdater @Inject constructor(
             return ScriptletUpdateResult.Success
         }
 
+        val jsScriptlets = settings.scriptlets.filterKeys { it.endsWith(".js") }
+
         val downloaded = try {
             coroutineScope {
-                settings.scriptlets.map { (name, entry) ->
+                jsScriptlets.map { (name, entry) ->
                     async {
                         logcat { "Downloading ${entry.url}" }
                         val bytes = downloader.download(entry.url).getOrElse {
