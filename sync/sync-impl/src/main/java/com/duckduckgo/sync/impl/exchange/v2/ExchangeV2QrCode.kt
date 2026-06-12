@@ -128,17 +128,12 @@ class RealExchangeV2QrCode @Inject constructor() : ExchangeV2QrCode {
      */
     private fun extractFragmentParam(text: String): String? {
         if (!text.startsWith("http://") && !text.startsWith("https://")) return null
-        val fragmentStart = text.indexOf('#').takeIf { it >= 0 } ?: return null
-        var fragment = text.substring(fragmentStart + 1)
-        if (fragment.startsWith("&")) fragment = fragment.substring(1)
-        for (pair in fragment.split('&')) {
-            val eq = pair.indexOf('=')
-            if (eq <= 0) continue
-            val key = pair.substring(0, eq)
-            val value = pair.substring(eq + 1)
-            if (key == PARAM_V2 || key == PARAM_V1) return value
-        }
-        return null
+        if ('#' !in text) return null
+        // substringAfter('#') keeps the whole fragment; a leading '&' (the v2 '#&code2=' quirk)
+        // just yields an empty first split element that firstOrNull skips.
+        return text.substringAfter('#').split('&')
+            .firstOrNull { it.startsWith("$PARAM_V2=") || it.startsWith("$PARAM_V1=") }
+            ?.substringAfter('=')
     }
 
     /** Major component of a "major.minor" version string (e.g. "2.1" → 2), or null if unparseable. */
