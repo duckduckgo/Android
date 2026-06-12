@@ -29,6 +29,7 @@ import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertFalse
@@ -487,6 +488,24 @@ class RealExchangeV2RunnerTest {
             .any { it.message.contains("boom") }
         assertTrue("expected a SessionError from the failed poll loop", errored)
         assertNull(runner.currentState) // session torn down, not left hanging
+    }
+
+    @Test fun `polled messages are processed in wire order (hello before request reaches Host_Confirming)`() = runTest {
+        whenever(syncStore.userId).thenReturn("my-user")
+        // The poll flow delivers a 2-message batch in seq order. recovery_code_request is only
+        // valid AFTER hello has moved us out of Bootstrapped; if processed first it would abort.
+        whenever(channel.poll(any(), any())).thenReturn(
+            flowOf(
+                Hello("""{"type":"hello"}"""),
+                RecoveryCodeRequest(rawJson = "{}", name = "Joiner", kind = "ddg"),
+            ),
+        )
+
+        val runner = newRunner()
+        runner.startPresent() // Bootstrapped → poll loop drains the batch in order
+
+        // hello: Bootstrapped → Negotiating; request: records peer + auto-elects Host → Host.Confirming.
+        assertSame(ExchangeV2State.Host.Confirming, runner.currentState)
     }
 
     @Test fun `cancel during an open poll does not surface a spurious error`() = runTest {
