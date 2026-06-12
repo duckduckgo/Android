@@ -58,8 +58,11 @@ import com.duckduckgo.onboarding.api.LinearOnboardingTransition.Stay
 import com.duckduckgo.onboarding.api.LinearOnboardingTransition.SwitchTo
 import com.duckduckgo.sync.api.SyncAutoRestore
 import dagger.SingleInstanceIn
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
+import logcat.LogPriority
+import logcat.logcat
 import javax.inject.Inject
 
 /**
@@ -139,7 +142,18 @@ class NewUserOnboardingPlanProvider @Inject constructor(
 
     private suspend fun resolveFirstDialog(ctx: NewUserOnboardingPlanContext): FirstDialog =
         withContext(dispatchers.io()) {
-            val canRestore = withTimeoutOrNull(BLOCK_STORE_TIMEOUT_MS) { syncAutoRestore.canRestore() } ?: false
+            val canRestore = withTimeoutOrNull(BLOCK_STORE_TIMEOUT_MS) {
+                try {
+                    logcat { "Sync-AutoRestore: checking canRestore..." }
+                    val result = syncAutoRestore.canRestore()
+                    logcat(LogPriority.INFO) { "Sync-AutoRestore: canRestore=$result" }
+                    result
+                } catch (t: Throwable) {
+                    coroutineContext.ensureActive()
+                    logcat(LogPriority.WARN) { "Sync-AutoRestore: canRestore check failed - ${t.message}" }
+                    false
+                }
+            } ?: false
             // Side-effecting (creates the DDG downloads dir, persists reinstall state) and must always run
             val isReinstall = appBuildConfig.isAppReinstall()
             ctx.isReinstall = isReinstall
