@@ -265,7 +265,7 @@ def privacyTestDefaults = { config ->
     config.environmentVariables.set(["clearPackageData": "true"])
     config.devices.set([["model": "MediumPhone.arm", "version": "34"]])
     config.localResultsDir.set("fladleResults")
-    config.flakyTestAttempts.set(2)
+    config.flakyTestAttempts.set(1)
     config.testShards.set(1)
 }
 
