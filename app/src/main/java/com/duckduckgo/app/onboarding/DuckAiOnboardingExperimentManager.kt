@@ -40,6 +40,12 @@ interface DuckAiOnboardingExperimentManager {
      */
     suspend fun enroll(): DuckAiOnboardingExperimentVariant?
 
+    /**
+     * Returns true when the experiment is currently active and the user is already enrolled (assigned
+     * to any cohort, including control). This is a read-only check: it never enrolls the user.
+     */
+    suspend fun isEnrolledInActiveExperiment(): Boolean
+
     enum class DuckAiOnboardingExperimentVariant {
         CONTROL,
         TREATMENT_WITH_DUCK_AI_DEFAULT,
@@ -68,6 +74,11 @@ class DuckAiOnboardingExperimentManagerImpl @Inject constructor(
         } else {
             null
         }
+    }
+
+    override suspend fun isEnrolledInActiveExperiment(): Boolean = withContext(dispatcherProvider.io()) {
+        val toggle = extendedOnboardingFeatureToggles.onboardingDuckAiExperimentMay26()
+        toggle.getRawStoredState()?.assignedCohort != null && toggle.isEnabled()
     }
 
     private fun arePrerequisitesMet(): Boolean =

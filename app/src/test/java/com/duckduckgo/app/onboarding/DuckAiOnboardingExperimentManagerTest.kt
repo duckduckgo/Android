@@ -28,7 +28,9 @@ import com.duckduckgo.common.utils.device.DeviceInfo.FormFactor
 import com.duckduckgo.feature.toggles.api.Toggle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -179,6 +181,55 @@ class DuckAiOnboardingExperimentManagerTest {
 
         assertNull(result)
         verify(experimentToggle).enroll()
+    }
+
+    @Test
+    fun whenExperimentActiveAndUserEnrolledThenIsEnrolledInActiveExperimentTrueAndDoesNotEnroll() = runTest {
+        whenever(experimentToggle.isEnabled()).thenReturn(true)
+        whenever(experimentToggle.getRawStoredState()).thenReturn(
+            Toggle.State(assignedCohort = Toggle.State.Cohort(name = DuckAiOnboardingExperimentCohort.CONTROL.cohortName, weight = 1)),
+        )
+
+        val result = testee.isEnrolledInActiveExperiment()
+
+        assertTrue(result)
+        verify(experimentToggle, never()).enroll()
+        verify(experimentToggle, never()).getCohort()
+    }
+
+    @Test
+    fun whenExperimentActiveAndUserNotEnrolledThenIsEnrolledInActiveExperimentFalse() = runTest {
+        whenever(experimentToggle.isEnabled()).thenReturn(true)
+        whenever(experimentToggle.getRawStoredState()).thenReturn(Toggle.State(assignedCohort = null))
+
+        val result = testee.isEnrolledInActiveExperiment()
+
+        assertFalse(result)
+        verify(experimentToggle, never()).enroll()
+    }
+
+    @Test
+    fun whenExperimentInactiveAndUserEnrolledThenIsEnrolledInActiveExperimentFalse() = runTest {
+        whenever(experimentToggle.isEnabled()).thenReturn(false)
+        whenever(experimentToggle.getRawStoredState()).thenReturn(
+            Toggle.State(assignedCohort = Toggle.State.Cohort(name = DuckAiOnboardingExperimentCohort.CONTROL.cohortName, weight = 1)),
+        )
+
+        val result = testee.isEnrolledInActiveExperiment()
+
+        assertFalse(result)
+        verify(experimentToggle, never()).enroll()
+    }
+
+    @Test
+    fun whenExperimentInactiveAndUserNotEnrolledThenIsEnrolledInActiveExperimentFalse() = runTest {
+        whenever(experimentToggle.isEnabled()).thenReturn(false)
+        whenever(experimentToggle.getRawStoredState()).thenReturn(null)
+
+        val result = testee.isEnrolledInActiveExperiment()
+
+        assertFalse(result)
+        verify(experimentToggle, never()).enroll()
     }
 
     private suspend fun givenPrerequisitesMet() {

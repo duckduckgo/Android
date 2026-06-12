@@ -32,6 +32,7 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.utils.AppUrl
 import com.duckduckgo.common.utils.AppUrl.ParamKey.QUERY
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.cookies.api.CookieManagerProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
@@ -46,6 +47,7 @@ import com.duckduckgo.duckchat.impl.inputscreen.newaddressbaroption.NewAddressBa
 import com.duckduckgo.duckchat.impl.inputscreen.newaddressbaroption.NewAddressBarOptionBottomSheetDialogFactory
 import com.duckduckgo.duckchat.impl.inputscreen.newaddressbaroption.NewAddressBarSelection
 import com.duckduckgo.duckchat.impl.inputscreen.newaddressbaroption.NewAddressBarSelection.SEARCH_AND_AI
+import com.duckduckgo.duckchat.impl.nativeinput.NativeInputFieldSuppressor
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_NEW_ADDRESS_BAR_PICKER_CANCELLED
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_NEW_ADDRESS_BAR_PICKER_CONFIRMED
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_NEW_ADDRESS_BAR_PICKER_DISPLAYED
@@ -367,6 +369,7 @@ class RealDuckChat @Inject constructor(
     private val duckAiHostProvider: DuckAiHostProvider,
     private val appBuildConfig: AppBuildConfig,
     private val voiceSessionStateManager: VoiceSessionStateManager,
+    private val nativeInputFieldSuppressors: PluginPoint<NativeInputFieldSuppressor>,
 ) : DuckChatInternal,
     DuckAiFeatureState,
     DuckChatInputModeState,
@@ -894,7 +897,8 @@ class RealDuckChat @Inject constructor(
             _allowDuckAiAsDigitalAssistant.emit(featureEnabled && duckChatFeature.digitalAssistantDuckAi().isEnabled())
             isImageUploadEnabled = imageUploadFeature.self().isEnabled()
             isStandaloneMigrationEnabled = duckChatFeature.standaloneMigration().isEnabled()
-            _nativeInputFieldEnabled.value = duckChatFeature.nativeInputField().isEnabled()
+            val nativeInputFieldSuppressed = nativeInputFieldSuppressors.getPlugins().any { it.isNativeInputFieldSuppressed() }
+            _nativeInputFieldEnabled.value = duckChatFeature.nativeInputField().isEnabled() && !nativeInputFieldSuppressed
 
             keepSessionAliveInMinutes = settingsJson?.sessionTimeoutMinutes ?: DEFAULT_SESSION_ALIVE
 
