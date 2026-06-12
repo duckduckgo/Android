@@ -19,14 +19,21 @@ package com.duckduckgo.adblocking.impl.store
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
 
 @Database(
     exportSchema = true,
-    version = 2,
+    version = 3,
     entities = [ScriptletEntity::class, ScriptletMetadataEntity::class],
 )
 abstract class AdBlockingExtensionDatabase : RoomDatabase() {
     abstract fun adBlockingExtensionDao(): AdBlockingExtensionDao
 }
 
-val AD_BLOCKING_EXTENSION_MIGRATIONS = emptyArray<Migration>()
+private val MIGRATION_2_TO_3 = object : Migration(2, 3) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL("DELETE FROM ad_blocking_scriptlets WHERE name NOT LIKE '%.js'")
+    }
+}
+
+val AD_BLOCKING_EXTENSION_MIGRATIONS = arrayOf<Migration>(MIGRATION_2_TO_3)
