@@ -78,7 +78,9 @@ class DuckAiOnboardingExperimentManagerImpl @Inject constructor(
 
     override suspend fun isEnrolledInActiveExperiment(): Boolean = withContext(dispatcherProvider.io()) {
         val toggle = extendedOnboardingFeatureToggles.onboardingDuckAiExperimentMay26()
-        toggle.getRawStoredState()?.assignedCohort != null && toggle.isEnabled()
+        DuckAiOnboardingExperimentCohort.entries.any { cohort ->
+            toggle.isEnrolledAndEnabled(cohort)
+        }
     }
 
     private fun arePrerequisitesMet(): Boolean =

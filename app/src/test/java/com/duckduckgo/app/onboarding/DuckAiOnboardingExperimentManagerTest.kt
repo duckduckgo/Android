@@ -184,47 +184,38 @@ class DuckAiOnboardingExperimentManagerTest {
     }
 
     @Test
-    fun whenExperimentActiveAndUserEnrolledThenIsEnrolledInActiveExperimentTrueAndDoesNotEnroll() = runTest {
-        whenever(experimentToggle.isEnabled()).thenReturn(true)
-        whenever(experimentToggle.getRawStoredState()).thenReturn(
-            Toggle.State(assignedCohort = Toggle.State.Cohort(name = DuckAiOnboardingExperimentCohort.CONTROL.cohortName, weight = 1)),
-        )
+    fun whenEnrolledAndEnabledInControlThenIsEnrolledInActiveExperimentTrueAndDoesNotEnroll() = runTest {
+        givenEnrolledAndEnabledIn(DuckAiOnboardingExperimentCohort.CONTROL)
 
         val result = testee.isEnrolledInActiveExperiment()
 
         assertTrue(result)
         verify(experimentToggle, never()).enroll()
-        verify(experimentToggle, never()).getCohort()
     }
 
     @Test
-    fun whenExperimentActiveAndUserNotEnrolledThenIsEnrolledInActiveExperimentFalse() = runTest {
-        whenever(experimentToggle.isEnabled()).thenReturn(true)
-        whenever(experimentToggle.getRawStoredState()).thenReturn(Toggle.State(assignedCohort = null))
+    fun whenEnrolledAndEnabledInTreatmentWithDuckAiDefaultThenIsEnrolledInActiveExperimentTrue() = runTest {
+        givenEnrolledAndEnabledIn(DuckAiOnboardingExperimentCohort.TREATMENT_WITH_DUCK_AI_DEFAULT)
 
         val result = testee.isEnrolledInActiveExperiment()
 
-        assertFalse(result)
+        assertTrue(result)
         verify(experimentToggle, never()).enroll()
     }
 
     @Test
-    fun whenExperimentInactiveAndUserEnrolledThenIsEnrolledInActiveExperimentFalse() = runTest {
-        whenever(experimentToggle.isEnabled()).thenReturn(false)
-        whenever(experimentToggle.getRawStoredState()).thenReturn(
-            Toggle.State(assignedCohort = Toggle.State.Cohort(name = DuckAiOnboardingExperimentCohort.CONTROL.cohortName, weight = 1)),
-        )
+    fun whenEnrolledAndEnabledInTreatmentWithSearchDefaultThenIsEnrolledInActiveExperimentTrue() = runTest {
+        givenEnrolledAndEnabledIn(DuckAiOnboardingExperimentCohort.TREATMENT_WITH_SEARCH_DEFAULT)
 
         val result = testee.isEnrolledInActiveExperiment()
 
-        assertFalse(result)
+        assertTrue(result)
         verify(experimentToggle, never()).enroll()
     }
 
     @Test
-    fun whenExperimentInactiveAndUserNotEnrolledThenIsEnrolledInActiveExperimentFalse() = runTest {
-        whenever(experimentToggle.isEnabled()).thenReturn(false)
-        whenever(experimentToggle.getRawStoredState()).thenReturn(null)
+    fun whenNotEnrolledAndEnabledInAnyCohortThenIsEnrolledInActiveExperimentFalse() = runTest {
+        givenEnrolledAndEnabledIn(null)
 
         val result = testee.isEnrolledInActiveExperiment()
 
@@ -242,5 +233,11 @@ class DuckAiOnboardingExperimentManagerTest {
     private suspend fun givenCohort(name: String) {
         whenever(experimentToggle.isEnabled()).thenReturn(true)
         whenever(experimentToggle.getCohort()).thenReturn(Toggle.State.Cohort(name = name, weight = 1))
+    }
+
+    private suspend fun givenEnrolledAndEnabledIn(enrolledCohort: DuckAiOnboardingExperimentCohort?) {
+        DuckAiOnboardingExperimentCohort.entries.forEach { cohort ->
+            whenever(experimentToggle.isEnrolledAndEnabled(cohort)).thenReturn(cohort == enrolledCohort)
+        }
     }
 }
