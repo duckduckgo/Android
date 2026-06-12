@@ -40,7 +40,7 @@ import javax.inject.Inject
  *
  * A run is a stack of plan frames ([backStack], bottom = root plan); [onEvent] applies the transition the top
  * step returns, pushing a side plan on [LinearOnboardingTransition.SwitchTo] and popping on
- * [LinearOnboardingTransition.Return]. Running off the end of a frame completes the whole run via the root
+ * [LinearOnboardingTransition.ReturnAndAdvance]. Running off the end of a frame completes the whole run via the root
  * plan; only an explicit Return resumes a caller.
  *
  * [backStack] and [_state] are always written together (stack reassigned wholesale, never mutated in place),
@@ -89,7 +89,7 @@ class LinearOnboardingOrchestratorImpl @Inject constructor() : LinearOnboardingO
                 is LinearOnboardingTransition.SwitchTo ->
                     advance(frames + Frame(transition.plan, index = 0), fromIndex = 0)
 
-                LinearOnboardingTransition.Return -> {
+                LinearOnboardingTransition.ReturnAndAdvance -> {
                     // Returning from the root frame is a programming error; treat as no-op.
                     if (frames.size <= 1) return
                     val caller = frames.dropLast(1)

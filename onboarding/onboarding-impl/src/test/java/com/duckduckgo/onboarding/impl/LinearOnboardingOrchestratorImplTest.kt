@@ -30,7 +30,7 @@ import com.duckduckgo.onboarding.api.LinearOnboardingStepId
 import com.duckduckgo.onboarding.api.LinearOnboardingTransition
 import com.duckduckgo.onboarding.api.LinearOnboardingTransition.AbortPlan
 import com.duckduckgo.onboarding.api.LinearOnboardingTransition.Advance
-import com.duckduckgo.onboarding.api.LinearOnboardingTransition.Return
+import com.duckduckgo.onboarding.api.LinearOnboardingTransition.ReturnAndAdvance
 import com.duckduckgo.onboarding.api.LinearOnboardingTransition.Stay
 import com.duckduckgo.onboarding.api.LinearOnboardingTransition.SwitchTo
 import kotlinx.coroutines.test.runTest
@@ -360,7 +360,7 @@ class LinearOnboardingOrchestratorImplTest {
 
     @Test
     fun `when return from side plan then resumes caller past switching step`() = runTest {
-        val sidePlan = LinearOnboardingPlan(id = SIDE_PLAN_ID, steps = listOf(step("side", transition = { Return })))
+        val sidePlan = LinearOnboardingPlan(id = SIDE_PLAN_ID, steps = listOf(step("side", transition = { ReturnAndAdvance })))
         testee.startPlan(
             LinearOnboardingPlan(
                 id = PLAN_ID,

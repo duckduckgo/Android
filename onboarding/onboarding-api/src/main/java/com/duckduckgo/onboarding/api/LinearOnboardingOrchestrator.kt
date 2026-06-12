@@ -22,59 +22,55 @@ import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterIsInstance
 
 /**
- * Drives one linear onboarding run at a time.
+ * Drives one linear onboarding run at a time. It walks a [LinearOnboardingPlan]'s steps, skips any whose
+ * [LinearOnboardingStep.precondition] is false, and publishes the current position as [state]. A step can branch
+ * by returning a [LinearOnboardingTransition]. [LinearOnboardingTransition.SwitchTo] pushes a side plan, and
+ * [LinearOnboardingTransition.ReturnAndAdvance] pops back to its caller.
  *
- * A run is a [LinearOnboardingPlan] (ordered steps plus terminal callbacks). The orchestrator walks it,
- * skipping steps whose [LinearOnboardingStep.precondition] is false, and exposes the current position as
- * [state]. A step can branch by returning a [LinearOnboardingTransition]: [LinearOnboardingTransition.SwitchTo]
- * pushes a side plan, [LinearOnboardingTransition.Return] pops back to its caller.
+ * It never touches UI. Renderers observe [state] and report user actions through [onEvent].
  *
- * It never touches UI: renderers observe [state] and report user actions via [onEvent].
- *
- * Implementations are thread-safe and serialise calls. Step and plan callbacks run inside that
- * serialization, so they must not call back into [startPlan] / [onEvent] — a reentrant call throws
- * IllegalStateException rather than deadlocking.
+ * Implementations are thread-safe and run calls one at a time. Step and plan callbacks run inside that same
+ * serialization, so they must not call back into [startPlan] or [onEvent]. A reentrant call throws
+ * IllegalStateException instead of deadlocking.
  */
 interface LinearOnboardingOrchestrator {
     /**
-     * Current position. [LinearOnboardingState.NotStarted] until the first [startPlan], then
-     * [LinearOnboardingState.InProgress] through to a terminal [LinearOnboardingState.Completed] /
-     * [LinearOnboardingState.Skipped]; restarting from a terminal state returns to InProgress. Never
-     * NotStarted again once started.
+     * Where the run currently is. It starts as [LinearOnboardingState.NotStarted], becomes
+     * [LinearOnboardingState.InProgress] on the first [startPlan], and ends at [LinearOnboardingState.Completed]
+     * or [LinearOnboardingState.Skipped]. Starting again from a terminal state goes back to InProgress. Once a
+     * run has started it is never NotStarted again.
      */
     val state: StateFlow<LinearOnboardingState>
 
     /**
-     * Begins a run with [plan] from its first eligible step; [state] is up to date by the time this returns
-     * (InProgress, or terminal if no step is eligible). Allowed from NotStarted or a terminal state; no-op
-     * while a run is in progress.
+     * Starts a run with [plan] from its first eligible step. [state] is up to date by the time this returns.
+     * You can call it from NotStarted or a terminal state. It does nothing while a run is already in progress.
      */
     suspend fun startPlan(plan: LinearOnboardingPlan)
 
     /**
-     * Forwards [event] to the current step's [LinearOnboardingStep.transition] and applies the result.
-     * No-op before start or after terminal.
+     * Passes [event] to the current step's [LinearOnboardingStep.transition] and applies the result.
+     * Does nothing before the run starts or after it ends.
      */
     suspend fun onEvent(event: LinearOnboardingEvent)
 }
 
-/** Where a run is: not yet started, mid-flow on a given step, or finished (completed / skipped). */
+/** Where a run is. Either not yet started, paused on a step, or finished (completed or skipped). */
 sealed interface LinearOnboardingState {
-    /** No run has started. */
     data object NotStarted : LinearOnboardingState
 
     /**
-     * A run that has started (in progress or finished). [rootPlanId] is the root (bottom-of-stack) plan's id,
-     * the flow this run belongs to, so a consumer can scope to one flow regardless of the current step or
-     * side plan.
+     * A run that has started, whether in progress or finished. [rootPlanId] is the id of the root plan, the one
+     * at the bottom of the stack. It stays the same across side plans, so a consumer can scope to a single flow
+     * no matter which step is current.
      */
     sealed interface Started : LinearOnboardingState {
         val rootPlanId: LinearOnboardingPlanId
     }
 
     /**
-     * Paused on [currentStep] (the [currentStepIndex]-th step of [currentPlan]) awaiting the next event.
-     * [currentPlan] is the top-of-stack frame, which may be a side plan; [rootPlanId] is the root.
+     * Paused on [currentStep], the [currentStepIndex]-th step of [currentPlan], waiting for the next event.
+     * [currentPlan] is the frame on top of the stack and may be a side plan. [rootPlanId] is the root plan.
      */
     data class InProgress(
         override val rootPlanId: LinearOnboardingPlanId,
@@ -86,30 +82,26 @@ sealed interface LinearOnboardingState {
     }
 
     /**
-     * Reached by walking off the end of the root plan. [result] is the root plan's outcome (e.g. a query to
-     * launch on handoff to the browser), or null. Terminal until a new run starts.
+     * Reached by running past the last step of the top plan. [result] is the root plan's outcome, such as a
+     * query to launch when handing off to the browser, or null. This state is terminal.
      */
     data class Completed(
         override val rootPlanId: LinearOnboardingPlanId,
         val result: LinearOnboardingResult? = null,
     ) : Started
 
-    /** The run finished early via [LinearOnboardingTransition.AbortPlan]. Terminal until a new run is started. */
+    /** Reached through [LinearOnboardingTransition.AbortPlan], which clears the whole frame stack. This state is terminal. */
     data class Skipped(override val rootPlanId: LinearOnboardingPlanId) : Started
 }
 
-/**
- * Opaque marker for what a completed run produced (e.g. a pending query). The orchestrator only carries the
- * root plan's [LinearOnboardingPlan.result] into [LinearOnboardingState.Completed.result]; concrete types
- * live with the plan provider.
- */
+/** A marker for whatever a completed run produced, such as a pending query. Concrete types live with the plan provider. */
 interface LinearOnboardingResult
 
 /**
- * Ordered [steps] plus terminal callbacks. [onCompleted] / [onSkipped] run before the matching terminal state
- * is emitted, and on completion [result] is carried into [LinearOnboardingState.Completed.result].
- * Only the root plan's callbacks and [result] fire.
- * A side plan (pushed via [LinearOnboardingTransition.SwitchTo]) that aborts or exhausts surfaces through the root.
+ * An ordered list of [steps] with callbacks for the end of the run. [onCompleted] and [onSkipped] run just
+ * before the matching terminal state, and on completion [result] is passed into
+ * [LinearOnboardingState.Completed.result]. Only the root plan's callbacks and [result] run. When a side plan
+ * aborts or runs out of steps, that outcome surfaces through the root.
  */
 data class LinearOnboardingPlan(
     val id: LinearOnboardingPlanId,
@@ -119,66 +111,60 @@ data class LinearOnboardingPlan(
     val result: suspend () -> LinearOnboardingResult? = { null },
 )
 
-/** Stable, human-readable identifier for a plan (e.g. for filtering/telemetry). Not persisted. */
+/** A stable, human-readable id for a plan, handy for filtering and telemetry. Not persisted. */
 typealias LinearOnboardingPlanId = String
 
-/** Stable, human-readable identifier for a step (e.g. for logging/telemetry). Not persisted. */
+/** A stable, human-readable id for a step, handy for logging and telemetry. Not persisted. */
 typealias LinearOnboardingStepId = String
 
 /**
- * One step of a plan. Concrete steps live with the plan provider; this is the minimum the
- * orchestrator needs to walk a plan. Renderer-specific data (which dialog to show, etc.) is added by
- * host-specific subtypes the renderer downcasts to.
+ * The least the orchestrator needs to walk a plan. Concrete steps live with the plan provider. Anything a
+ * renderer needs, like which dialog to show, goes on host-specific subtypes that the renderer downcasts to.
  */
 interface LinearOnboardingStep {
-    /** Identifies the step within its plan. See [LinearOnboardingStepId]. */
     val id: LinearOnboardingStepId
 
-    /** Which host renders this step. The orchestrator carries it so a renderer can route the handoff. */
     val host: LinearOnboardingHost
 
-    /** Evaluated as the orchestrator advances; when false the step is skipped (not shown). */
+    /** Checked as the orchestrator advances. When it returns false the step is skipped and not shown. */
     val precondition: suspend () -> Boolean
 
-    /** Maps an incoming event to the next [LinearOnboardingTransition]. Returns [LinearOnboardingTransition.Stay] to ignore it. */
+    /** Turns an incoming event into the next [LinearOnboardingTransition]. Return [LinearOnboardingTransition.Stay] to ignore the event. */
     val transition: suspend (LinearOnboardingEvent) -> LinearOnboardingTransition
 }
 
-/** The screen that renders a step. The orchestrator only tags steps with it; routing is the caller's job. */
+/** The screen that renders a step. The orchestrator only tags steps with it. Routing is up to the caller. */
 enum class LinearOnboardingHost {
     OnboardingActivity,
     BrowserActivity,
 }
 
-/**
- * Opaque marker; the orchestrator only routes events to [LinearOnboardingStep.transition]. Concrete event
- * types live with the plan provider.
- */
+/** A marker for events. Concrete event types live with the plan provider. The orchestrator only routes them to [LinearOnboardingStep.transition]. */
 interface LinearOnboardingEvent
 
 sealed interface LinearOnboardingTransition {
-    /** Move to the next eligible step in the current plan; with none left, the run completes via the root plan. */
+    /** Move to the next eligible step in the current plan. If none are left, the run completes through the root plan. */
     data object Advance : LinearOnboardingTransition
 
     /**
-     * Push a new frame and run [plan] from its first eligible step. The side plan resumes the caller only via
-     * [Return]; running off its end (no [Return]) completes the whole run via the root plan.
+     * Push a new frame and run [plan] from its first eligible step. The caller only resumes if the side plan
+     * ends with [ReturnAndAdvance]. If the side plan runs past its last step without a [ReturnAndAdvance], the whole run completes
+     * through the root plan.
      */
     data class SwitchTo(val plan: LinearOnboardingPlan) : LinearOnboardingTransition
 
-    /** Pop the top frame; advance the caller past the step that pushed. */
-    data object Return : LinearOnboardingTransition
+    /** Pop the top frame and advance the caller past the step that pushed it. */
+    data object ReturnAndAdvance : LinearOnboardingTransition
 
-    /** Terminate the entire flow as Skipped (clears the whole frame stack). */
+    /** End the entire flow as Skipped and clear the whole frame stack. */
     data object AbortPlan : LinearOnboardingTransition
 
-    /** Explicit no-op. */
     data object Stay : LinearOnboardingTransition
 }
 
 /**
- * States of the run for [planId], in-progress and terminal; [LinearOnboardingState.NotStarted] and other
- * plans' states never match. A new collector receives the current matching state on subscription.
+ * The states of the run for [planId], both in-progress and terminal. [LinearOnboardingState.NotStarted] and
+ * states from other plans never match. A new collector gets the current matching state as soon as it subscribes.
  */
 fun Flow<LinearOnboardingState>.forPlan(planId: LinearOnboardingPlanId): Flow<LinearOnboardingState.Started> =
     filterIsInstance<LinearOnboardingState.Started>().filter { it.rootPlanId == planId }
