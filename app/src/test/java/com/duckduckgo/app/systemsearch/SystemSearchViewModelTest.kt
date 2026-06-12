@@ -563,29 +563,29 @@ class SystemSearchViewModelTest {
     }
 
     @Test
-    fun whenUserClickedDeleteOnHistorySuggestionThenPixelFiredAndShowRemoveSearchSuggestionDialogCommandIssued() {
+    fun whenDeleteButtonEnabledAndUserDeletesHistorySuggestionThenRemovedImmediatelyWithoutDialog() = runBlocking {
         val suggestion = AutoCompleteHistorySuggestion(phrase = "phrase", title = "title", url = "url", isAllowedInTopHits = false)
 
         testee.onUserRequestedToDeleteAutocompleteItem(suggestion)
 
         verify(mockPixel).fire(AUTOCOMPLETE_RESULT_DELETE_BUTTON_CLICKED)
         verify(mockPixel).fire(AUTOCOMPLETE_RESULT_DELETE_BUTTON_CLICKED_DAILY, type = Daily())
-        verify(commandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
-        val issuedCommand = commandCaptor.allValues.find { it is ShowRemoveSearchSuggestionDialog }
-        assertEquals(suggestion, (issuedCommand as ShowRemoveSearchSuggestionDialog).suggestion)
+        verify(mockHistory).removeHistoryEntryByUrl(suggestion.url)
+        assertCommandIssued<AutocompleteItemRemoved>()
+        assertCommandNotIssued<ShowRemoveSearchSuggestionDialog>()
     }
 
     @Test
-    fun whenUserClickedDeleteOnHistorySearchSuggestionThenPixelFiredAndShowRemoveSearchSuggestionDialogCommandIssued() {
+    fun whenDeleteButtonEnabledAndUserDeletesHistorySearchSuggestionThenRemovedImmediatelyWithoutDialog() = runBlocking {
         val suggestion = AutoCompleteHistorySearchSuggestion(phrase = "phrase", isAllowedInTopHits = false)
 
         testee.onUserRequestedToDeleteAutocompleteItem(suggestion)
 
         verify(mockPixel).fire(AUTOCOMPLETE_RESULT_DELETE_BUTTON_CLICKED)
         verify(mockPixel).fire(AUTOCOMPLETE_RESULT_DELETE_BUTTON_CLICKED_DAILY, type = Daily())
-        verify(commandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
-        val issuedCommand = commandCaptor.allValues.find { it is ShowRemoveSearchSuggestionDialog }
-        assertEquals(suggestion, (issuedCommand as ShowRemoveSearchSuggestionDialog).suggestion)
+        verify(mockHistory).removeHistoryEntryByQuery(suggestion.phrase)
+        assertCommandIssued<AutocompleteItemRemoved>()
+        assertCommandNotIssued<ShowRemoveSearchSuggestionDialog>()
     }
 
     @Test

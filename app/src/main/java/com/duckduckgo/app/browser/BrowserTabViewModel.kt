@@ -1341,11 +1341,17 @@ class BrowserTabViewModel @Inject constructor(
             is AutoCompleteHistorySuggestion, is AutoCompleteHistorySearchSuggestion -> {
                 appCoroutineScope.launch(dispatchers.io()) {
                     if (autocompleteHistoryDeleteFeature.self().isEnabled()) {
+                        // Explicit delete button: remove immediately, no confirmation dialog.
                         pixel.fire(AUTOCOMPLETE_RESULT_DELETE_BUTTON_CLICKED)
                         pixel.fire(AUTOCOMPLETE_RESULT_DELETE_BUTTON_CLICKED_DAILY, type = Daily())
+                        withContext(dispatchers.main()) {
+                            onRemoveSearchSuggestionConfirmed(suggestion, autoCompleteStateFlow.value)
+                        }
+                    } else {
+                        // Legacy hidden long-press: confirm before removing.
+                        showRemoveSearchSuggestionDialog(suggestion)
                     }
                 }
-                showRemoveSearchSuggestionDialog(suggestion)
             }
             else -> return
         }

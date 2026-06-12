@@ -7463,30 +7463,32 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenUserClickedDeleteOnHistorySuggestionThenPixelFiredAndShowRemoveSearchSuggestionDialogCommandIssued() {
-        val suggestion = AutoCompleteHistorySuggestion(phrase = "phrase", title = "title", url = "url", isAllowedInTopHits = false)
+    fun whenDeleteButtonEnabledAndUserDeletesHistorySuggestionThenRemovedImmediatelyWithoutDialog() =
+        runBlocking {
+            val suggestion = AutoCompleteHistorySuggestion(phrase = "phrase", title = "title", url = "url", isAllowedInTopHits = false)
 
-        testee.onUserRequestedToDeleteAutocompleteItem(suggestion)
+            testee.onUserRequestedToDeleteAutocompleteItem(suggestion)
 
-        verify(mockPixel).fire(AppPixelName.AUTOCOMPLETE_RESULT_DELETE_BUTTON_CLICKED)
-        verify(mockPixel).fire(AppPixelName.AUTOCOMPLETE_RESULT_DELETE_BUTTON_CLICKED_DAILY, type = Daily())
-        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
-        val issuedCommand = commandCaptor.allValues.find { it is Command.ShowRemoveSearchSuggestionDialog }
-        assertEquals(suggestion, (issuedCommand as Command.ShowRemoveSearchSuggestionDialog).suggestion)
-    }
+            verify(mockPixel).fire(AppPixelName.AUTOCOMPLETE_RESULT_DELETE_BUTTON_CLICKED)
+            verify(mockPixel).fire(AppPixelName.AUTOCOMPLETE_RESULT_DELETE_BUTTON_CLICKED_DAILY, type = Daily())
+            verify(mockNavigationHistory).removeHistoryEntryByUrl(suggestion.url)
+            assertCommandIssued<Command.AutocompleteItemRemoved>()
+            assertCommandNotIssued<Command.ShowRemoveSearchSuggestionDialog>()
+        }
 
     @Test
-    fun whenUserClickedDeleteOnHistorySearchSuggestionThenPixelFiredAndShowRemoveSearchSuggestionDialogCommandIssued() {
-        val suggestion = AutoCompleteHistorySearchSuggestion(phrase = "phrase", isAllowedInTopHits = false)
+    fun whenDeleteButtonEnabledAndUserDeletesHistorySearchSuggestionThenRemovedImmediatelyWithoutDialog() =
+        runBlocking {
+            val suggestion = AutoCompleteHistorySearchSuggestion(phrase = "phrase", isAllowedInTopHits = false)
 
-        testee.onUserRequestedToDeleteAutocompleteItem(suggestion)
+            testee.onUserRequestedToDeleteAutocompleteItem(suggestion)
 
-        verify(mockPixel).fire(AppPixelName.AUTOCOMPLETE_RESULT_DELETE_BUTTON_CLICKED)
-        verify(mockPixel).fire(AppPixelName.AUTOCOMPLETE_RESULT_DELETE_BUTTON_CLICKED_DAILY, type = Daily())
-        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
-        val issuedCommand = commandCaptor.allValues.find { it is Command.ShowRemoveSearchSuggestionDialog }
-        assertEquals(suggestion, (issuedCommand as Command.ShowRemoveSearchSuggestionDialog).suggestion)
-    }
+            verify(mockPixel).fire(AppPixelName.AUTOCOMPLETE_RESULT_DELETE_BUTTON_CLICKED)
+            verify(mockPixel).fire(AppPixelName.AUTOCOMPLETE_RESULT_DELETE_BUTTON_CLICKED_DAILY, type = Daily())
+            verify(mockNavigationHistory).removeHistoryEntryByQuery(suggestion.phrase)
+            assertCommandIssued<Command.AutocompleteItemRemoved>()
+            assertCommandNotIssued<Command.ShowRemoveSearchSuggestionDialog>()
+        }
 
     @Test
     fun whenUserClickedDeleteOnOtherSuggestionThenDoNothing() {
