@@ -1564,6 +1564,7 @@ class OmnibarLayout @JvmOverloads constructor(
         applyEnabled(duckAISidebar, nonFireEnabled)
         applyEnabled(duckAIHeader, nonFireEnabled)
         applyEnabled(shieldIcon, nonFireEnabled)
+        applyEnabled(plusIconMenu, nonFireEnabled)
         applyEnabled(fireIconMenu, fireEnabled)
         omnibarTextInput.alpha = if (nonFireEnabled) 1.0f else LOCKED_INPUT_ALPHA
 
