@@ -102,9 +102,9 @@ interface ExchangeV2Runner {
      */
     suspend fun cancel()
 
-    fun deliverIncomingMessage(message: ExchangeV2Message)
+    suspend fun deliverIncomingMessage(message: ExchangeV2Message)
 
-    fun deliverIncomingMessageJson(rawJson: String)
+    suspend fun deliverIncomingMessageJson(rawJson: String)
 
     fun localTrigger(trigger: LocalTrigger)
 
@@ -331,6 +331,11 @@ class RealExchangeV2Runner @Inject constructor(
         val key = ownKeyPair ?: return
         pollJob = appScope.launch(dispatchers.io()) {
             try {
+                // collect suspends on each deliverIncomingMessage until the message is fully
+                // processed, so envelopes are handled in the seq order poll() emits them. If a
+                // message drives the SM terminal, processIncomingLocked → cancelLocked cancels
+                // this very poll job; that self-cancellation is cooperative and the catch below
+                // rethrows the resulting CancellationException as normal teardown.
                 channel.poll(ch, key.privateKeyBase64).collect { incoming ->
                     deliverIncomingMessage(incoming)
                 }
@@ -370,10 +375,11 @@ class RealExchangeV2Runner @Inject constructor(
     // Inbound message handling + orchestration
     // -----------------------------------------------------------------------
 
-    override fun deliverIncomingMessage(message: ExchangeV2Message) {
-        appScope.launch(dispatchers.io()) {
-            mutex.withLock { processIncomingLocked(message) }
-        }
+    override suspend fun deliverIncomingMessage(message: ExchangeV2Message) {
+        // Suspends until processing completes so the poll loop (its sole production caller)
+        // processes messages strictly in wire order — a fire-and-forget launch here let a
+        // multi-message poll batch race on the mutex and reach the SM out of sequence.
+        mutex.withLock { processIncomingLocked(message) }
     }
 
     private suspend fun processIncomingLocked(message: ExchangeV2Message) {
@@ -551,7 +557,7 @@ class RealExchangeV2Runner @Inject constructor(
         }
     }
 
-    override fun deliverIncomingMessageJson(rawJson: String) {
+    override suspend fun deliverIncomingMessageJson(rawJson: String) {
         deliverIncomingMessage(messageParser.parse(rawJson))
     }
 

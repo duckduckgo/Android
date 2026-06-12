@@ -101,7 +101,7 @@ class RealExchangeV2RunnerTest {
         assertNull(runner.currentState)
     }
 
-    @Test fun `startScan called twice replaces the existing session`() {
+    @Test fun `startScan called twice replaces the existing session`() = runTest {
         val runner = newRunner()
         runner.startScan("")
         // Drive the first session along so it could leak if not cleared.
@@ -189,7 +189,7 @@ class RealExchangeV2RunnerTest {
         }
     }
 
-    @Test fun `terminal state abandons session`() {
+    @Test fun `terminal state abandons session`() = runTest {
         whenever(syncStore.userId).thenReturn(null)
         val runner = newRunner()
         runner.startScan("")
