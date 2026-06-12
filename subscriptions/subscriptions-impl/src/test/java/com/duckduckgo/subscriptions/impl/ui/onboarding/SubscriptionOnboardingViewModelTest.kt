@@ -123,6 +123,24 @@ class SubscriptionOnboardingViewModelTest {
     }
 
     @Test
+    fun whenAdvancingThenSkipsAlreadyCompletedSteps() = runTest {
+        // step2 is already completed: advancing from step1 should jump straight to step3.
+        whenever(dataStore.isCompleted("step2")).thenReturn(true)
+        whenever(stepPlugins.getPlugins()).thenReturn(
+            listOf(fakeStep("step1"), fakeStep("step2"), fakeStep("step3")),
+        )
+        val viewModel = viewModel()
+
+        viewModel.commands().test {
+            viewModel.start(SubscriptionOnboardingOrigin.PURCHASE)
+            assertEquals("step1", (awaitItem() as ShowStep).pluginName)
+
+            viewModel.onNextStep()
+            assertEquals("step3", (awaitItem() as ShowStep).pluginName)
+        }
+    }
+
+    @Test
     fun whenOnNextStepThenDoesNotPersistCompletion() = runTest {
         whenever(stepPlugins.getPlugins()).thenReturn(listOf(fakeStep("step1"), fakeStep("step2")))
         val viewModel = viewModel()

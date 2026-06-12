@@ -98,13 +98,22 @@ class SubscriptionOnboardingViewModel @Inject constructor(
     }
 
     private suspend fun advance() {
-        val nextIndex = (backStack.lastOrNull() ?: -1) + 1
+        val nextIndex = nextIncompleteIndexFrom(backStack.lastOrNull() ?: -1)
         if (nextIndex <= screens.lastIndex) {
             backStack.add(nextIndex)
             goToCurrent()
         } else {
             command.send(CloseOnboarding)
         }
+    }
+
+    /** The next screen after [index], skipping over already-completed steps (intro/summary are never skipped). */
+    private fun nextIncompleteIndexFrom(index: Int): Int {
+        var next = index + 1
+        while (next <= screens.lastIndex && screens[next].let { it.type == STEP && dataStore.isCompleted(it.name) }) {
+            next++
+        }
+        return next
     }
 
     private suspend fun goTo(index: Int) {
