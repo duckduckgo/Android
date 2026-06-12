@@ -39,8 +39,10 @@ import org.hamcrest.Matchers.allOf
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
+import org.junit.Assert.fail
 import org.junit.Rule
 import org.junit.Test
+import kotlin.random.Random
 
 class RequestBlockingTest {
 
@@ -62,6 +64,13 @@ class RequestBlockingTest {
 
     @Test @PrivacyTest
     fun whenProtectionsAreEnabledRequestBlockedCorrectly() {
+        // INTENTIONAL FLAKY TEST - remove before merge. Fails ~50% of the time to verify
+        // Develocity flaky-test reporting for the Fladle privacy suite; the deflake retry
+        // should reclassify it as FLAKY.
+        if (Random.nextBoolean()) {
+            fail("Intentional flaky failure to verify Develocity flaky-test reporting")
+        }
+
         preparationsForPrivacyTest()
 
         val results = onWebView()

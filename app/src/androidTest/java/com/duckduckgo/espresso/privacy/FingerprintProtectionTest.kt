@@ -45,8 +45,10 @@ import org.hamcrest.CoreMatchers.containsString
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
+import org.junit.Assert.fail
 import org.junit.Rule
 import org.junit.Test
+import kotlin.random.Random
 
 class FingerprintProtectionTest {
 
@@ -63,6 +65,13 @@ class FingerprintProtectionTest {
 
     @Test @PrivacyTest
     fun whenProtectionsAreFingerprintProtected() {
+        // INTENTIONAL FLAKY TEST - remove before merge. Fails ~50% of the time to verify
+        // Develocity flaky-test reporting for the Fladle privacy suite; the deflake retry
+        // should reclassify it as FLAKY.
+        if (Random.nextBoolean()) {
+            fail("Intentional flaky failure to verify Develocity flaky-test reporting")
+        }
+
         preparationsForPrivacyTest()
 
         var webView: WebView? = null
