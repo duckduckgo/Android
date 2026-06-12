@@ -358,7 +358,7 @@ class AppSyncAccountRepository @Inject constructor(
         // Sync: InviteFlow - A (https://app.asana.com/0/72649045549333/1209571867429615)
         logcat { "Sync-exchange: InviteFlow - A. Generating invitation code" }
 
-        // generate new ID and and public/private key-pair for inviter device
+        // generate new ID and public/private key-pair for inviter device
         val deviceDetailsAsInviter = kotlin.runCatching {
             generateInviterDeviceDetails()
         }.getOrElse {
