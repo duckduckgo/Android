@@ -51,24 +51,16 @@ import javax.inject.Inject
 /**
  * Drives a single Exchange V2 protocol session.
  *
- * Two entry points: [startPresent] generates a v2 linking code (the URL is surfaced via
- * [SessionStarted]); [startScan] parses a peer's code and joins their session. From there
- * the runner manages the wire I/O: bootstrap channel via PUT, send messages via POST, poll
- * own channel for incoming envelopes, decrypt, drive the SM, auto-elect role per Unified
- * Algorithm rules, and auto-send protocol messages as the SM advances.
- *
- * Manual injection paths (`deliverIncomingMessage`, `localTrigger`) remain callable from
- * the dev tool so individual SM transitions can still be exercised in isolation.
+ * Two entry points: [startPresent] generates a v2 linking code (surfaced via [SessionStarted]);
+ * [startScan] parses a peer's code and joins their session. From there the runner manages the
+ * wire I/O, drives the SM, and auto-elects role per the Unified Algorithm.
  */
 interface ExchangeV2Runner {
     val events: SharedFlow<ExchangeV2Event>
 
     /**
-     * Events emitted at or after [sinceMs]. The underlying [events] SharedFlow has a replay
-     * buffer that persists across sessions, so subscribers may see stale events from prior
-     * runs. Consumers that want to scope observation to a single session should snapshot a
-     * wall clock (`System.currentTimeMillis()`) before kicking off a new session and pass it
-     * here — events emitted with earlier timestamps (from prior sessions) are filtered out.
+     * Events emitted at or after [sinceMs]. Lets a consumer scope observation to one session,
+     * since [events] has a replay buffer that persists stale events across sessions.
      */
     fun eventsSince(sinceMs: Long): Flow<ExchangeV2Event> = events.filter { it.timestampMs >= sinceMs }
 
@@ -80,11 +72,8 @@ interface ExchangeV2Runner {
     val linkingCode: String?
 
     /**
-     * Whether this device can start as Presenter. Always true: per the Unified Algorithm spec
-     * §"Exchange Share Recovery Code" — *"If host has no account yet, create it first."* — a
-     * fresh device (no account) can become Host via the Presenter-beats-Scanner tiebreak rule
-     * and creates an account during the Exchange Share Recovery Code phase. UI may still read
-     * it to vary copy (e.g. "Pair" vs "Pair & create account").
+     * Whether this device can start as Presenter. Always true: per spec §"Exchange Share Recovery
+     * Code" a fresh device creates an account mid-flow. UI may read it to vary copy.
      */
     val canStartAsPresenter: Boolean
 
@@ -97,8 +86,7 @@ interface ExchangeV2Runner {
 
     /**
      * Tear down the active session. Suspends until done, so callers can sequence work after it
-     * (e.g. sign-out, which invalidates the recovery code). Callers that can't await — e.g.
-     * `ViewModel.onCleared` — launch it on a longer-lived scope.
+     * (e.g. sign-out, which invalidates the recovery code).
      */
     suspend fun cancel()
 
@@ -159,11 +147,9 @@ class RealExchangeV2Runner @Inject constructor(
     @Volatile private var sentOwnAvailability: Boolean = false
 
     /**
-     * Host-side messages that arrive while the Joiner is still showing the user-confirm prompt
-     * are buffered here and replayed when the user confirms (Joiner.Confirming → Joiner.Waiting).
-     * Without this, a Host with auto-approve enabled races ahead and the Joiner SM rejects the
-     * arriving finalisation messages as implicit aborts before the user has tapped Confirm.
-     * Cleared on cancel, terminal, or user-deny.
+     * Host-side messages arriving while the Joiner is still at the user-confirm prompt, buffered
+     * and replayed on confirm (Joiner.Confirming → Joiner.Waiting) so the SM doesn't reject them
+     * as implicit aborts. Cleared on cancel, terminal, or user-deny.
      */
     private val pendingJoinerWaitingMessages = mutableListOf<ExchangeV2Message>()
 
@@ -303,7 +289,7 @@ class RealExchangeV2Runner @Inject constructor(
         timeoutJob = null
         val toDelete = ownChannelId
         if (toDelete != null) {
-            // Best-effort DELETE per Tomek's 2026-05-26 ruling.
+            // Best-effort DELETE.
             appScope.launch(dispatchers.io()) {
                 runCatching { channel.deleteChannel(toDelete) }
             }
@@ -331,11 +317,9 @@ class RealExchangeV2Runner @Inject constructor(
         val key = ownKeyPair ?: return
         pollJob = appScope.launch(dispatchers.io()) {
             try {
-                // collect suspends on each deliverIncomingMessage until the message is fully
-                // processed, so envelopes are handled in the seq order poll() emits them. If a
-                // message drives the SM terminal, processIncomingLocked → cancelLocked cancels
-                // this very poll job; that self-cancellation is cooperative and the catch below
-                // rethrows the resulting CancellationException as normal teardown.
+                // collect suspends per message so envelopes are handled in poll() seq order. A
+                // message driving the SM terminal cancels this very poll job; that
+                // self-cancellation surfaces as the CancellationException caught below.
                 channel.poll(ch, key.privateKeyBase64).collect { incoming ->
                     deliverIncomingMessage(incoming)
                 }
@@ -376,9 +360,8 @@ class RealExchangeV2Runner @Inject constructor(
     // -----------------------------------------------------------------------
 
     override suspend fun deliverIncomingMessage(message: ExchangeV2Message) {
-        // Suspends until processing completes so the poll loop (its sole production caller)
-        // processes messages strictly in wire order — a fire-and-forget launch here let a
-        // multi-message poll batch race on the mutex and reach the SM out of sequence.
+        // Suspends until processing completes so the poll loop processes messages in wire order;
+        // a fire-and-forget launch here would let a poll batch race to the SM out of sequence.
         mutex.withLock { processIncomingLocked(message) }
     }
 
@@ -492,9 +475,8 @@ class RealExchangeV2Runner @Inject constructor(
     }
 
     /**
-     * Can we auto-elect a role right now? The transition must have been accepted, the SM
-     * must be in Negotiating, and we need a peer-side availability message ([RecoveryCodeAvailable]
-     * or [RecoveryCodeRequest]) — those carry the peer kind/userId we need to choose a role.
+     * Can we auto-elect a role now? Requires an accepted transition, SM in Negotiating, and a
+     * peer availability message ([RecoveryCodeAvailable]/[RecoveryCodeRequest]) carrying peer kind/userId.
      */
     private fun canAutoElectRole(
         sm: ExchangeV2StateMachine,
@@ -512,10 +494,8 @@ class RealExchangeV2Runner @Inject constructor(
     }
 
     /**
-     * Perform auto-election. Caller must have established the preconditions via
-     * [canAutoElectRole]. Drives the SM via [LocalTrigger.RoleElected] and emits the resulting
-     * transition event; also runs any side effects on the elect transition (notably
-     * [SideEffect.SendAwaitingConfirmation] for the Host branch).
+     * Perform auto-election (preconditions via [canAutoElectRole]). Drives the SM via
+     * [LocalTrigger.RoleElected], emits the transition event, and runs its side effects.
      */
     private fun autoElectRoleLocked(sm: ExchangeV2StateMachine) {
         val elected = electRole() ?: run {
@@ -594,10 +574,8 @@ class RealExchangeV2Runner @Inject constructor(
     }
 
     /**
-     * Called only when prior state was [ExchangeV2State.Joiner.Confirming] (the caller is
-     * responsible for that check). On user-confirm (transition to Joiner.Waiting), replay any
-     * host-side messages that arrived during the prompt. On user-deny (transition to
-     * Joiner.AbortedLocal) or any other exit path, discard them — the session is over.
+     * Caller must have come from [ExchangeV2State.Joiner.Confirming]. On confirm (→ Joiner.Waiting)
+     * replay buffered host-side messages; on any other exit discard them.
      */
     private suspend fun replayBufferedJoinerMessagesLocked(newState: ExchangeV2State) {
         if (pendingJoinerWaitingMessages.isEmpty()) return
@@ -657,10 +635,8 @@ class RealExchangeV2Runner @Inject constructor(
             sendOnWireAndRecord(json, peer, peerKey, ExchangeV2Message.RecoveryCodeRequest(json, DEVICE_NAME, OWN_DEVICE_KIND))
         }
         sentOwnAvailability = true
-        // Re-elect in case the peer's availability arrived before we sent ours, via the one
-        // election path ([autoElectRoleLocked]) so RoleElected's side effects run.
-        // REVIEW: likely unreachable under the current eager-send ordering (Negotiating entry and
-        // our availability send happen in one locked pass) — confirm against the ordering spec
+        // Re-elect in case the peer's availability arrived before we sent ours.
+        // REVIEW: likely unreachable under eager-send ordering — confirm against the ordering spec
         // (Unified Algorithm 1214739740392701) and delete if dead.
         val sm = session ?: return
         if (sm.currentState == ExchangeV2State.Negotiating && peerKind != null) {
@@ -677,18 +653,11 @@ class RealExchangeV2Runner @Inject constructor(
     private fun sendRecoveryCodeResponse(): Boolean {
         val peer = peerChannelId ?: return false
         val peerKey = peerPublicKey ?: return false
-        // Pick the right recovery code based on peer kind: ddg peers get our DDG recovery
-        // code; 3party peers get our 3party access credential's recovery code.
-        // Per spec §"Exchange Share Recovery Code":
-        //   "If host has no account yet, create it first."
-        //   "If this is ddg and peer is 3party, if needed, extend the account."
-        // For 3party peers: ensure ddg account exists, then ensure 3party credential exists,
-        // then fetch the 3party recovery code. For ddg peers: just ensure ddg account exists.
-        // Any provisioning failure falls through to recovery_code_unavailable below.
-        //
-        // peerKind is set during role election (which requires receiving recovery_code_request
-        // or recovery_code_available carrying `kind`). If we reach Host.Sending with no
-        // peerKind, something upstream is broken — bail rather than silently assuming ddg.
+        // Recovery code per peer kind. Per spec §"Exchange Share Recovery Code": create the host
+        // account if absent; extend it with a 3party credential when peer is 3party. Provisioning
+        // failure falls through to recovery_code_unavailable below.
+        // peerKind is set during role election; reaching Host.Sending without it means something
+        // upstream is broken — bail rather than silently assuming ddg.
         val codeResult = when (peerKind) {
             "ddg" -> provisionForDdgPeer()
             "3party" -> provisionForThirdPartyPeer()

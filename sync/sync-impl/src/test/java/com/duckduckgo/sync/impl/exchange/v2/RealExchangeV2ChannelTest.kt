@@ -41,7 +41,6 @@ class RealExchangeV2ChannelTest {
     )
 
     @Test fun `poll stops without retrying when the relay returns a non-recoverable status`() = runTest {
-        // Second stub is only reached if the loop wrongly keeps polling past the 403.
         whenever(syncApi.pollExchangeMessages(any(), any())).thenReturn(
             Result.Error(code = 403, reason = "Forbidden"),
             Result.Error(code = 404, reason = "should not be reached"),

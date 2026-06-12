@@ -54,18 +54,14 @@ class RealRecoveryCodeProviderTest {
         assertTrue(result is Result.Success)
         val v2 = decodeRecovery((result as Result.Success).data)
         assertEquals("user-123", v2.getString("user_id"))
-        // secret is re-encoded base64url but must carry the same key bytes (see the base64url test below)
         assertArrayEquals(Base64.getUrlDecoder().decode("pk-abc"), Base64.getUrlDecoder().decode(v2.getString("secret")))
         assertEquals("ddg", v2.getString("cid"))
         assertEquals("2.0", v2.getString("v"))
     }
 
     @Test fun `getDdgRecoveryCode encodes the secret as base64url per spec, not standard base64`() {
-        // Spec 1214802412121967 (Encryption Algorithms): the v2 account `secret` is base64url
-        // encoded. Android stores the primary_key as STANDARD base64 internally; we must convert
-        // at the v2 wire boundary so spec-conformant peers (macOS/iOS/FE/Windows) can base64url-
-        // decode it. Same key bytes, different alphabet. A standard-base64 emit broke macOS↔Android.
-        val standardPrimaryKey = "apZ+7PAe89rDhuG4DRyi/M3zU2/D5DZNdRsR3RM6Ujw=" // standard base64: has '+' and '/'
+        // Spec (Encryption Algorithms): the v2 account `secret` is base64url; Android stores primary_key as standard base64 internally.
+        val standardPrimaryKey = "apZ+7PAe89rDhuG4DRyi/M3zU2/D5DZNdRsR3RM6Ujw="
         val v1Json = """{"recovery":{"primary_key":"$standardPrimaryKey","user_id":"user-123"}}"""
         val v1B64 = Base64.getUrlEncoder().withoutPadding().encodeToString(v1Json.toByteArray())
         whenever(syncAccountRepository.getRecoveryCode()).thenReturn(
@@ -78,7 +74,6 @@ class RealRecoveryCodeProviderTest {
         val secret = decodeRecovery((result as Result.Success).data).getString("secret")
         assertFalse("secret must be base64url (no '+'): $secret", secret.contains('+'))
         assertFalse("secret must be base64url (no '/'): $secret", secret.contains('/'))
-        // …and it must decode back to the exact same key bytes as the standard-base64 primary_key.
         assertArrayEquals(
             Base64.getDecoder().decode(standardPrimaryKey),
             Base64.getUrlDecoder().decode(secret),
@@ -111,8 +106,7 @@ class RealRecoveryCodeProviderTest {
     // ---- getThirdPartyRecoveryCode ----
 
     @Test fun `getThirdPartyRecoveryCode returns raw rawCode untouched`() {
-        // Repo already emits v2.0 shape per [ThirdPartyCredentialManager.getRecoveryCode] —
-        // the provider must not re-wrap or re-encode.
+        // The repo already emits v2.0 shape, so the provider must not re-wrap or re-encode.
         val already3p = "already-v2-encoded-b64"
         whenever(syncAccountRepository.getThirdPartyRecoveryCode()).thenReturn(
             Result.Success(SyncAccountRepository.AuthCode(qrCode = "different-qr-form", rawCode = already3p)),
@@ -135,7 +129,7 @@ class RealRecoveryCodeProviderTest {
         assertEquals("No 3party credential", (result as Result.Error).reason)
     }
 
-    // ---- createDdgAccountIfNeeded (spec: "If host has no account yet, create it first.") ----
+    // ---- createDdgAccountIfNeeded ----
 
     @Test fun `createDdgAccountIfNeeded is a no-op when already signed in`() {
         whenever(syncStore.userId).thenReturn("existing-user")
@@ -166,7 +160,7 @@ class RealRecoveryCodeProviderTest {
         assertEquals("BE down", (result as Result.Error).reason)
     }
 
-    // ---- createThirdPartyCredentialIfNeeded (spec: "extend the account" for 3party peer) ----
+    // ---- createThirdPartyCredentialIfNeeded ----
 
     @Test fun `createThirdPartyCredentialIfNeeded is a no-op when scopedPassword already set locally`() {
         // ScopedPassword is a `value class` so Mockito can't mock it — use a real instance.

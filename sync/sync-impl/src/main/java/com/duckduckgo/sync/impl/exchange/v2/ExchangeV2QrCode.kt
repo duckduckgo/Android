@@ -31,10 +31,7 @@ import javax.inject.Inject
  *   https://duckduckgo.com/sync/pairing/#&code2=<base64(JSON)>
  *   JSON = {"version":"2", "channel_id":"<UUID>", "public_key":"<base64url SPKI DER>"}
  *
- * Spec deviation note: the TD's pseudocode reads literally `base64()` for the outer `code2`
- * value, but the deployed wire format across every client uses URL-safe + no-padding (the
- * URL fragment isn't safe for `+`/`/`/`=`). We follow the deployed convention here. If the
- * TD is later tightened to require strict base64, this needs revisiting.
+ * The outer `code2` value is URL-safe + no-padding base64 (the fragment isn't safe for `+`/`/`/`=`).
  */
 interface ExchangeV2QrCode {
     fun buildLinkingCode(channelId: String, publicKeyBase64Url: String, version: String = "2"): String
@@ -81,9 +78,7 @@ class RealExchangeV2QrCode @Inject constructor() : ExchangeV2QrCode {
         val trimmed = text.trim()
         val httpIndex = sequenceOf("https://", "http://").mapNotNull { trimmed.indexOf(it).takeIf { i -> i >= 0 } }.minOrNull()
         val candidate = if (httpIndex != null) trimmed.substring(httpIndex) else trimmed
-        // No alphabet pre-check on the bare candidate: Base64.decode + JSONObject below already
-        // reject any non-base64url / non-JSON input as Unknown, so a looksLikeBase64Url guard would
-        // be redundant. (Base64.decode skips embedded whitespace, so a line-wrapped paste decodes too.)
+        // No alphabet pre-check: the Base64.decode + JSONObject below already reject non-base64url/non-JSON as Unknown.
         val b64url = extractFragmentParam(candidate) ?: candidate
 
         val decoded = runCatching {
@@ -101,8 +96,7 @@ class RealExchangeV2QrCode @Inject constructor() : ExchangeV2QrCode {
             }
         }
 
-        // v2 linking code — accept any same-major (2.x) version per Transport TD 1214486492252757
-        // §Versioning ("same major version — proceed"). The raw version string is preserved.
+        // Accept any same-major (2.x) version per Transport TD 1214486492252757 §Versioning.
         val version = json.optString("version")
         val channelId = json.optString("channel_id")
         val publicKey = json.optString("public_key")
@@ -129,8 +123,7 @@ class RealExchangeV2QrCode @Inject constructor() : ExchangeV2QrCode {
     private fun extractFragmentParam(text: String): String? {
         if (!text.startsWith("http://") && !text.startsWith("https://")) return null
         if ('#' !in text) return null
-        // substringAfter('#') keeps the whole fragment; a leading '&' (the v2 '#&code2=' quirk)
-        // just yields an empty first split element that firstOrNull skips.
+        // A leading '&' (the v2 '#&code2=' form) yields an empty first split element that firstOrNull skips.
         return text.substringAfter('#').split('&')
             .firstOrNull { it.startsWith("$PARAM_V2=") || it.startsWith("$PARAM_V1=") }
             ?.substringAfter('=')
@@ -146,11 +139,7 @@ class RealExchangeV2QrCode @Inject constructor() : ExchangeV2QrCode {
     }
 }
 
-/**
- * v2 linking-code payload. Serialized with plain (reflective) Moshi, which reads `@field:Json`
- * and emits fields alphabetically — order is fine because the code is parse-only on every
- * platform (nothing byte-compares it). See [RealExchangeV2QrCode.buildLinkingCode].
- */
+/** v2 linking-code payload. Field order is irrelevant: the code is parse-only, never byte-compared. */
 internal data class V2LinkingCodePayload(
     val version: String,
     @field:Json(name = "channel_id") val channelId: String,

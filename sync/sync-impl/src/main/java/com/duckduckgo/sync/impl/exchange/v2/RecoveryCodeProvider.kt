@@ -29,13 +29,9 @@ import java.util.Base64
 import javax.inject.Inject
 
 /**
- * Indirection over [SyncAccountRepository] so [ExchangeV2Runner] can fetch the right recovery
- * code for the Host's `recovery_code_response` based on peer kind, without taking a direct
- * dependency on the much wider repository surface.
- *
- * Returns the b64-encoded `rawCode` form (what the spec wants on the wire), not the QR form.
- * Both raw and QR are currently the same string today, but keeping the distinction here means
- * a future spec tweak only needs editing one line.
+ * Indirection over [SyncAccountRepository] so [ExchangeV2Runner] can fetch the recovery code for
+ * a peer kind without depending on the wider repository surface. Returns the wire `rawCode` form,
+ * not the QR form (kept distinct so a future spec tweak is a one-line change).
  */
 interface RecoveryCodeProvider {
 
@@ -43,27 +39,22 @@ interface RecoveryCodeProvider {
     fun getDdgRecoveryCode(): Result<String>
 
     /**
-     * Own 3party access credential's recovery code — used when peer is a `3party` device
-     * (e.g. Duck.ai web). May fail with a generic error if the 3party credential hasn't been
-     * created yet on the account; the runner reports `recovery_code_unavailable` to the peer.
+     * Own 3party access credential's recovery code — used when peer is a `3party` device.
+     * Fails if the 3party credential doesn't exist yet; the runner then reports
+     * `recovery_code_unavailable` to the peer.
      */
     fun getThirdPartyRecoveryCode(): Result<String>
 
     /**
      * Spec: Unified Algorithm §"Exchange Share Recovery Code" — *"If host has no account yet,
-     * create it first."* Called by the runner at Host.Sending time when no ddg account exists
-     * locally. Returns [Result.Success] if the device is now signed in (whether already was, or
-     * the just-created), [Result.Error] if account creation failed.
+     * create it first."* No-op if already signed in; [Result.Error] if account creation fails.
      */
     fun createDdgAccountIfNeeded(): Result<Unit>
 
     /**
      * Spec: Unified Algorithm §"Exchange Share Recovery Code" — *"If this is ddg and peer is
-     * 3party, if needed, extend the account."* Ensures the device has a 3party credential
-     * locally, creating one on the BE if absent. Called by the runner before fetching a 3party
-     * recovery code to share with a 3party peer. No-op if a 3party credential already exists
-     * locally ([SyncStore.scopedPassword] is set). Failure surfaces as [Result.Error] and the
-     * runner falls through to `recovery_code_unavailable`.
+     * 3party, if needed, extend the account."* No-op if a 3party credential already exists locally
+     * ([SyncStore.scopedPassword] set); otherwise creates one. Failure surfaces as [Result.Error].
      */
     fun createThirdPartyCredentialIfNeeded(): Result<Unit>
 }
@@ -91,9 +82,8 @@ class RealRecoveryCodeProvider @Inject constructor(
     }
 
     /**
-     * The DDG recovery code stored on the account is v1 shape (`{recovery:{primary_key, user_id}}`).
-     * The v2 pairing wire requires v2.0 shape (`{recovery:{user_id, secret, cid, v}}`) per the
-     * Recovery Payload Shape spec. Convert here before handing off to the runner.
+     * Account stores v1 shape (`{recovery:{primary_key, user_id}}`); the v2 wire requires v2.0
+     * shape (`{recovery:{user_id, secret, cid, v}}`). Convert before handing off to the runner.
      */
     override fun getDdgRecoveryCode(): Result<String> =
         when (val r = syncAccountRepository.getRecoveryCode()) {
@@ -105,7 +95,7 @@ class RealRecoveryCodeProvider @Inject constructor(
             is Result.Error -> r
         }
 
-    /** [ThirdPartyCredentialManager.getRecoveryCode] already emits v2.0 shape — no conversion. */
+    /** Already emits v2.0 shape — no conversion. */
     override fun getThirdPartyRecoveryCode(): Result<String> =
         when (val r = syncAccountRepository.getThirdPartyRecoveryCode()) {
             is Result.Success -> Result.Success(r.data.rawCode)
@@ -116,12 +106,7 @@ class RealRecoveryCodeProvider @Inject constructor(
         val decoded = decodePermissiveBase64(v1Base64)
         val v1 = JSONObject(String(decoded, Charsets.UTF_8)).getJSONObject("recovery")
         val userId = v1.getString("user_id")
-        // The v2 wire `secret` is base64url-encoded per spec 1214802412121967 (and Gabor's sign-off
-        // on 1214804486778180: "v2 recovery keys will be base64url encoded"). Android holds the
-        // primary_key as STANDARD base64 internally, so re-encode the same key bytes to base64url
-        // here — otherwise conformant peers (macOS/iOS/FE/Windows) can't base64url-decode it, and a
-        // '+'/'/' in standard base64 also forces the org.json '\/'-escaping workaround. Moshi (not
-        // org.json) keeps the outer JSON canonical regardless.
+        // v2 wire `secret` is base64url per spec 1214802412121967; re-encode the standard-base64 primary_key.
         val secret = Base64.getUrlEncoder().withoutPadding().encodeToString(decodePermissiveBase64(v1.getString("primary_key")))
         val v2Json = recoveryCodeAdapter.toJson(
             ThirdPartyRecoveryCodeWrapper(

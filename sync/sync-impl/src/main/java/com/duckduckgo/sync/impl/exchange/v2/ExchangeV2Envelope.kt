@@ -35,19 +35,15 @@ import javax.inject.Inject
 interface ExchangeV2Envelope {
 
     /**
-     * Build an outbound envelope. [messageJson] is the inner message JSON (e.g. produced from
-     * one of the [ExchangeV2Message] subtypes). [peerPublicKeyBase64] is the recipient's
-     * session public key (from their QR code or hello). [senderChannelId] is written as the
-     * JWE `kid` header so the recipient knows which side sent the message.
+     * Build an outbound envelope encrypting [messageJson] to the recipient's [peerPublicKeyBase64].
+     * [senderChannelId] is written as the JWE `kid` header so the recipient knows the sender.
      */
     fun seal(messageJson: String, peerPublicKeyBase64: String, senderChannelId: String): ExchangeEnvelope
 
     /**
-     * Decrypt an inbound envelope using our own ephemeral private key. Returns the inner
-     * message JSON string.
+     * Decrypt an inbound envelope with our ephemeral private key, returning the inner message JSON.
      *
-     * @throws EnvelopeVersionTooNew if the envelope's `version` field has a higher major
-     *  than ours.
+     * @throws EnvelopeVersionTooNew if the envelope's major version is higher than ours.
      */
     fun open(envelope: ExchangeEnvelope, ownPrivateKeyBase64: String): String
 }
@@ -58,9 +54,8 @@ class EnvelopeVersionTooNew(val version: String) : RuntimeException(
 )
 
 /**
- * Thrown when an envelope's payload can't be decrypted or parsed (bad key, malformed JWE,
- * truncated bytes, etc.). Unlike a transient HTTP error this is permanent — the same bytes
- * will fail the same way next time — so the runner treats it as terminal rather than retrying.
+ * Thrown when an envelope's payload can't be decrypted or parsed. Permanent (the same bytes
+ * fail identically on retry), so the runner treats it as terminal rather than retrying.
  */
 class EnvelopeDecryptFailure(val seq: Int, cause: Throwable) : RuntimeException(
     "Failed to decrypt envelope seq=$seq: ${cause.message}",

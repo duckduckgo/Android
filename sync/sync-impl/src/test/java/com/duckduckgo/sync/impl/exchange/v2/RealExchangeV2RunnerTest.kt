@@ -74,8 +74,6 @@ class RealExchangeV2RunnerTest {
         )
 
     @Before fun stubWireDeps() {
-        // Tests exercise SM-driving + auto-elect behaviour, not wire I/O. Stub everything
-        // that touches the network or generates real keys.
         whenever(qrCode.parse(any())).thenReturn(
             ExchangeV2CodeParseResult.LinkingV2(channelId = "peer-channel", publicKey = "peer-pubkey", version = "2"),
         )
@@ -105,23 +103,20 @@ class RealExchangeV2RunnerTest {
     @Test fun `startScan called twice replaces the existing session`() = runTest {
         val runner = newRunner()
         runner.startScan("")
-        // Drive the first session along so it could leak if not cleared.
         runner.deliverIncomingMessage(
             ExchangeV2Message.RecoveryCodeAvailable(rawJson = "{}", userId = "peer", name = "Peer", kind = "3party"),
         )
-        // Session should now have absorbed peer context.
 
         runner.startScan("")
 
-        // After re-start, role is set fresh and SM is back in Negotiating with no peer context applied yet.
         assertSame(ExchangeV2State.Negotiating, runner.currentState)
         assertSame(PairingRole.Scanner, runner.pairingRole)
     }
 
     @Test fun `deliverIncomingMessage forwards SM event to flow`() = runTest {
-        whenever(syncStore.userId).thenReturn("my-user") // canStartAsPresenter requires a signed-in account
+        whenever(syncStore.userId).thenReturn("my-user")
         val runner = newRunner()
-        runner.startPresent() // Presenter starts in Bootstrapped — receives hello to enter Negotiating.
+        runner.startPresent()
 
         runner.events.filterIsInstance<ExchangeV2Event.Transition>().test {
             runner.deliverIncomingMessage(Hello("""{"type":"hello"}"""))
@@ -179,10 +174,9 @@ class RealExchangeV2RunnerTest {
         whenever(syncStore.userId).thenReturn("my-user")
         val runner = newRunner()
         runner.startPresent()
-        runner.deliverIncomingMessage(Hello("{}")) // → Negotiating
+        runner.deliverIncomingMessage(Hello("{}"))
 
         runner.events.filterIsInstance<ExchangeV2Event.Transition>().test {
-            // Drain replay: SessionStarted is filtered out; Negotiating transition replays.
             awaitItem()
             runner.localTrigger(LocalTrigger.RoleElected(Role.Host))
             val event = awaitItem()
@@ -239,8 +233,7 @@ class RealExchangeV2RunnerTest {
         val runner = newRunner()
         runner.startPresent()
 
-        // Per spec §"Exchange Share Recovery Code": Host may create its account during pairing.
-        // Therefore the runner must not pre-flight-block a not-signed-in device from being Presenter.
+        // Spec §"Exchange Share Recovery Code": Host may create its account during pairing.
         assertSame(PairingRole.Presenter, runner.pairingRole)
         assertSame(ExchangeV2State.Bootstrapped, runner.currentState)
     }
@@ -269,7 +262,6 @@ class RealExchangeV2RunnerTest {
             ExchangeV2Message.RecoveryCodeAvailable(rawJson = "{}", userId = "host-user", name = "Host", kind = "ddg"),
         )
 
-        // Auto-elect drives us straight to Joiner.Confirming without a manual RoleElected call.
         assertSame(ExchangeV2State.Joiner.Confirming, runner.currentState)
     }
 
@@ -296,16 +288,14 @@ class RealExchangeV2RunnerTest {
             ExchangeV2Message.RecoveryCodeRequest(rawJson = "{}", name = "Joiner", kind = "ddg"),
         )
 
-        // Per spec §"Exchange Confirmations → Host": awaiting_confirmation must be sent
-        // BEFORE the user is prompted (i.e., on entry to Confirming), so the peer can render
-        // its "confirm on the other device" UX. The user hasn't tapped UserConfirmedHost yet.
+        // Spec §"Exchange Confirmations → Host": awaiting_confirmation is sent on entry to
+        // Confirming, before the user is prompted.
         verify(channel).sendMessage(
             argThat { contains("recovery_code_awaiting_confirmation") },
             any(),
             any(),
             any(),
         )
-        // recovery_code_confirmed must NOT have been sent yet (no user confirm trigger).
         verify(channel, never()).sendMessage(
             argThat { contains("recovery_code_confirmed") },
             any(),
@@ -323,23 +313,14 @@ class RealExchangeV2RunnerTest {
         runner.deliverIncomingMessage(
             ExchangeV2Message.RecoveryCodeRequest(rawJson = "{}", name = "Joiner", kind = "ddg"),
         )
-        // Reach Host.Confirming — awaiting_confirmation has been sent once.
-        // Now user confirms locally.
         runner.localTrigger(LocalTrigger.UserConfirmedHost)
 
-        // recovery_code_confirmed was sent after UserConfirmedHost.
         verify(channel).sendMessage(
             argThat { contains("recovery_code_confirmed") && !contains("recovery_code_awaiting_confirmation") },
             any(),
             any(),
             any(),
         )
-        // awaiting_confirmation was sent only ONCE in the whole flow (on entry to Confirming),
-        // not a second time on UserConfirmedHost. Mockito's `times(1)` would be ideal but
-        // matchers across JSON-string args make argThat-with-count flaky — use never() on a
-        // payload that is *exactly* the awaiting_confirmation JSON-with-nothing-else, ensuring
-        // we never sent it twice. (One send is matched by the prior verify; a second would
-        // mean we double-sent.)
         verify(channel, org.mockito.kotlin.times(1)).sendMessage(
             argThat { contains("recovery_code_awaiting_confirmation") },
             any(),
@@ -352,8 +333,6 @@ class RealExchangeV2RunnerTest {
         whenever(syncStore.userId).thenReturn("my-user")
         whenever(recoveryCodeProvider.createDdgAccountIfNeeded()).thenReturn(Result.Success(Unit))
         whenever(recoveryCodeProvider.getDdgRecoveryCode()).thenReturn(Result.Success("the-code"))
-        // The recovery_code_response POST fails on the relay (e.g. peer channel already TTL'd);
-        // the earlier awaiting_confirmation / confirmed sends use the default Success stub.
         whenever(
             channel.sendMessage(argThat { contains("recovery_code_response") }, any(), any(), any()),
         ).thenReturn(Result.Error(reason = "relay unreachable"))
@@ -361,10 +340,9 @@ class RealExchangeV2RunnerTest {
         val runner = newRunner()
         runner.startPresent()
         runner.deliverIncomingMessage(Hello("{}"))
-        runner.deliverIncomingMessage(RecoveryCodeRequest(rawJson = "{}", name = "Joiner", kind = "ddg")) // → Host.Confirming
-        runner.localTrigger(LocalTrigger.UserConfirmedHost) // → Host.Sending; response send then fails
+        runner.deliverIncomingMessage(RecoveryCodeRequest(rawJson = "{}", name = "Joiner", kind = "ddg"))
+        runner.localTrigger(LocalTrigger.UserConfirmedHost)
 
-        // A failed response delivery must abort, not complete: the host never delivered the code.
         val lastTransition = runner.events.replayCache.filterIsInstance<ExchangeV2Event.Transition>().last()
         assertSame(ExchangeV2State.Host.Aborted, lastTransition.to)
     }
@@ -378,7 +356,6 @@ class RealExchangeV2RunnerTest {
             ExchangeV2Message.RecoveryCodeAvailable(rawJson = "{}", userId = "peer-user", name = "Peer", kind = "3party"),
         )
 
-        // ddg-vs-3party rule wins over Presenter/Scanner — even though we scanned, ddg becomes Host.
         assertSame(ExchangeV2State.Host.Confirming, runner.currentState)
     }
 
@@ -392,7 +369,6 @@ class RealExchangeV2RunnerTest {
             val event = awaitItem()
             assertSame(ExchangeV2State.Aborted, event.to)
         }
-        // Aborted is terminal → runner clears the session (best-effort channel DELETE).
         assertNull(runner.currentState)
     }
 
@@ -408,8 +384,6 @@ class RealExchangeV2RunnerTest {
             val event = awaitItem()
             assertSame(ExchangeV2State.SameAccountAbort, event.to)
         }
-        // No follow-up Transition for RoleElected — auto-elect must skip after a rejected outcome.
-        // SameAccountAbort is terminal → runner clears the session.
         assertNull(runner.currentState)
     }
 
@@ -438,36 +412,35 @@ class RealExchangeV2RunnerTest {
         assertSame(ExchangeV2State.Joiner.Confirming, runner.currentState)
     }
 
-    // ---- Session timeout (Transport TD 1214486492252757 §Session Lifecycle: 5-min deadline) ----
+    // ---- Session timeout ----
 
     @Test fun `session times out and tears down after the deadline`() = coroutineTestRule.testScope.runTest {
         whenever(syncStore.userId).thenReturn("my-user")
         val runner = newRunner()
         runner.startPresent()
-        assertSame(ExchangeV2State.Bootstrapped, runner.currentState) // session active, awaiting a peer
+        assertSame(ExchangeV2State.Bootstrapped, runner.currentState)
 
-        advanceTimeBy(6 * 60 * 1000L) // past the 5-min session deadline (virtual time, instant)
+        advanceTimeBy(6 * 60 * 1000L) // past the 5-min session deadline
 
         val timedOut = runner.events.replayCache
             .filterIsInstance<ExchangeV2Event.SessionError>()
             .any { it.message.contains("timed out", ignoreCase = true) }
         assertTrue("expected a 'timed out' SessionError", timedOut)
-        assertNull(runner.currentState) // session torn down
+        assertNull(runner.currentState)
     }
 
     @Test fun `no timeout fires after the session already reached a terminal state`() = coroutineTestRule.testScope.runTest {
         whenever(syncStore.userId).thenReturn(null)
         val runner = newRunner()
         runner.startScan("")
-        // Drive to a terminal (Joiner.Done) well before the deadline; this must cancel the timer.
         runner.deliverIncomingMessage(
             ExchangeV2Message.RecoveryCodeAvailable(rawJson = "{}", userId = "other", name = "Peer", kind = "3party"),
-        ) // auto-elects Joiner → Joiner.Confirming
-        runner.localTrigger(LocalTrigger.UserConfirmedJoiner) // → Joiner.Waiting
-        runner.deliverIncomingMessage(RecoveryCodeResponse("{}")) // → Joiner.Done (terminal)
+        )
+        runner.localTrigger(LocalTrigger.UserConfirmedJoiner)
+        runner.deliverIncomingMessage(RecoveryCodeResponse("{}"))
         assertNull(runner.currentState)
 
-        advanceTimeBy(6 * 60 * 1000L) // past the deadline
+        advanceTimeBy(6 * 60 * 1000L)
 
         val timedOut = runner.events.replayCache
             .filterIsInstance<ExchangeV2Event.SessionError>()
@@ -475,7 +448,7 @@ class RealExchangeV2RunnerTest {
         assertFalse("a completed session must not later emit a timeout", timedOut)
     }
 
-    // ---- Poll-loop error handling (Transport TD 1214486492252757 §Session Lifecycle) ----
+    // ---- Poll-loop error handling ----
 
     @Test fun `an unexpected poll error tears down the session with a SessionError`() = runTest {
         whenever(syncStore.userId).thenReturn("my-user")
@@ -487,13 +460,11 @@ class RealExchangeV2RunnerTest {
             .filterIsInstance<ExchangeV2Event.SessionError>()
             .any { it.message.contains("boom") }
         assertTrue("expected a SessionError from the failed poll loop", errored)
-        assertNull(runner.currentState) // session torn down, not left hanging
+        assertNull(runner.currentState)
     }
 
     @Test fun `polled messages are processed in wire order (hello before request reaches Host_Confirming)`() = runTest {
         whenever(syncStore.userId).thenReturn("my-user")
-        // The poll flow delivers a 2-message batch in seq order. recovery_code_request is only
-        // valid AFTER hello has moved us out of Bootstrapped; if processed first it would abort.
         whenever(channel.poll(any(), any())).thenReturn(
             flowOf(
                 Hello("""{"type":"hello"}"""),
@@ -502,15 +473,12 @@ class RealExchangeV2RunnerTest {
         )
 
         val runner = newRunner()
-        runner.startPresent() // Bootstrapped → poll loop drains the batch in order
+        runner.startPresent()
 
-        // hello: Bootstrapped → Negotiating; request: records peer + auto-elects Host → Host.Confirming.
         assertSame(ExchangeV2State.Host.Confirming, runner.currentState)
     }
 
     @Test fun `a polled message that reaches a terminal state tears down without a spurious error`() = runTest {
-        // Same-account: Scanner already signed in as "shared" meets a peer on the same account.
-        // The peer's availability drives the SM straight to the terminal SameAccountAbort.
         whenever(syncStore.userId).thenReturn("shared")
         whenever(channel.poll(any(), any())).thenReturn(
             flowOf(
@@ -519,10 +487,8 @@ class RealExchangeV2RunnerTest {
         )
 
         val runner = newRunner()
-        runner.startScan("") // Scanner starts in Negotiating; poll loop delivers the availability
+        runner.startScan("")
 
-        // Terminal reached through the poll path: session cleared via cancelLocked (which cancels
-        // the very poll job we were collecting on) and no "Pairing failed"/error surfaced.
         assertNull(runner.currentState)
         val spurious = runner.events.replayCache
             .filterIsInstance<ExchangeV2Event.SessionError>()
@@ -536,7 +502,7 @@ class RealExchangeV2RunnerTest {
         val runner = newRunner()
         runner.startPresent()
 
-        runner.cancel() // cancels the open poll → CancellationException must propagate, not become an error
+        runner.cancel()
 
         val spurious = runner.events.replayCache
             .filterIsInstance<ExchangeV2Event.SessionError>()
@@ -551,8 +517,6 @@ class RealExchangeV2RunnerTest {
 
         val errors = runner.events.replayCache.filterIsInstance<ExchangeV2Event.SessionError>().map { it.message }
         assertTrue("expected the bootstrap error", errors.any { it.contains("Failed to create channel") })
-        // The bootstrap failure must end the launch immediately — not fall through to sendHello and
-        // emit a second, misleading "couldn't reach the Presenter" error.
         assertFalse("must not emit the misleading reach-Presenter error on a bootstrap failure", errors.any { it.contains("reach the Presenter") })
     }
 
@@ -562,7 +526,6 @@ class RealExchangeV2RunnerTest {
 
         runner.startScan("")
 
-        // _pairingRole is set before bootstrapLocked runs, so a bootstrap failure must clear it.
         assertNull("pairingRole must be cleared after a failed bootstrap", runner.pairingRole)
     }
 }

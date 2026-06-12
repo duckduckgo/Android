@@ -52,13 +52,10 @@ interface ExchangeV2Channel {
     ): Result<Unit>
 
     /**
-     * Long-running poll loop on [ownChannelId]. Emits decrypted + parsed messages as they
-     * arrive. The flow:
-     *  - Polls every 1s using cursor-as-ack semantics.
-     *  - Completes (returns) on a non-recoverable HTTP status (e.g. 404 channel gone, 401/403);
-     *    transient statuses (5xx / 429 / 418 / timeouts) keep polling.
-     *  - Throws [EnvelopeVersionTooNew] if an envelope arrives with a higher major version.
-     *  - Drops envelopes that fail to decrypt or that have unknown types (forward-compat).
+     * Poll loop on [ownChannelId], emitting decrypted + parsed messages. See spec §Polling.
+     *  - Completes on a non-recoverable HTTP status; transient statuses keep polling.
+     *  - Throws [EnvelopeVersionTooNew] (too-new version) and [EnvelopeDecryptFailure]
+     *    (decrypt failure) as terminal; drops unknown message types (forward-compat).
      */
     fun poll(ownChannelId: String, ownPrivateKeyBase64: String): Flow<ExchangeV2Message>
 
@@ -107,11 +104,10 @@ class RealExchangeV2Channel @Inject constructor(
                 }
                 is Result.Error -> {
                     if (outcome.code in NON_RECOVERABLE_HTTP_CODES) {
-                        // Re-polling won't recover; stop. The session ends via the runner's timeout.
+                        // Re-polling won't recover; stop.
                         logcat { "Sync-ExchangeV2: ending poll on $ownChannelId — non-recoverable status ${outcome.code} (${outcome.reason})" }
                         return@flow
                     }
-                    // Transient — retry on the next tick.
                     logcat(ERROR) { "Sync-ExchangeV2: transient poll error ${outcome.code}: ${outcome.reason}, retrying" }
                 }
             }
@@ -129,8 +125,7 @@ class RealExchangeV2Channel @Inject constructor(
             envelope.open(ExchangeEnvelope(entry.version, entry.payload), ownPrivateKeyBase64)
         }.getOrElse {
             if (it is EnvelopeVersionTooNew) throw it
-            // Permanent: the same bytes will fail the same way every poll. Surface as terminal
-            // so the runner can stop the loop and emit a SessionError instead of spamming logs.
+            // Permanent: the same bytes fail the same way every poll, so surface as terminal.
             logcat(ERROR) { "Sync-ExchangeV2: envelope open failed seq=${entry.seq}: ${it.message}" }
             throw EnvelopeDecryptFailure(entry.seq, it)
         }
@@ -140,9 +135,8 @@ class RealExchangeV2Channel @Inject constructor(
     companion object {
         private const val POLL_INTERVAL_MS: Long = 1_000L
 
-        // HTTP statuses that won't recover by re-polling the same channel: stop the loop instead
-        // of retrying until the 5-min session deadline. Transient statuses (5xx / 429 / 418 /
-        // timeouts / IO) are deliberately absent here so they keep polling.
+        // Statuses that won't recover by re-polling; transient ones (5xx / 429 / 418 / timeouts)
+        // are deliberately absent so they keep polling.
         private val NON_RECOVERABLE_HTTP_CODES = setOf(
             400, // Bad Request — malformed poll
             401, // Unauthorized

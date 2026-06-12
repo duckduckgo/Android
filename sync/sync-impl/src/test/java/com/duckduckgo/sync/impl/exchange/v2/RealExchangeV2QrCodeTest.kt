@@ -87,8 +87,6 @@ class RealExchangeV2QrCodeTest {
     }
 
     @Test fun `parse rejects v1 recovery codes (primary_key) so they fall through to legacy stack`() {
-        // v1 recovery uses primary_key, not secret. ExchangeV2QrCode is the v2 entry point —
-        // it should NOT claim v1 recovery codes; they need to fall through to parseSyncAuthCode.
         val payload = """{"recovery":{"primary_key":"pk","user_id":"u"}}"""
         val bareB64 = encodeUrl(payload)
 
@@ -122,15 +120,11 @@ class RealExchangeV2QrCodeTest {
     }
 
     @Test fun `parse requires version=2 (not just any version field)`() {
-        // version=3 isn't ours yet; should not be LinkingV2. Falls through to Unknown for the parser
-        // (the caller deals with version-upgrade UX separately).
         val bareB64 = encodeUrl("""{"version":"3","channel_id":"x","public_key":"k"}""")
         assertEquals(ExchangeV2CodeParseResult.Unknown, qrCode.parse(bareB64))
     }
 
     @Test fun `parse accepts a 2_x minor version as LinkingV2`() {
-        // Transport TD 1214486492252757 §Versioning: a same-major (2) code proceeds; minor bumps
-        // (2.0, 2.1, …) are tolerated. The raw version string is preserved for downstream.
         val bareB64 = encodeUrl("""{"version":"2.1","channel_id":"chan","public_key":"pub"}""")
 
         val parsed = qrCode.parse(bareB64)
@@ -143,8 +137,6 @@ class RealExchangeV2QrCodeTest {
     }
 
     @Test fun `parse rejects a v2 code with an empty public_key`() {
-        // channel_id and public_key are required + non-empty (Transport TD §QR Code); an empty one
-        // must reject at parse, not be accepted and fail later at decodePublicKey.
         val bareB64 = encodeUrl("""{"version":"2","channel_id":"chan","public_key":""}""")
         assertEquals(ExchangeV2CodeParseResult.Unknown, qrCode.parse(bareB64))
     }
@@ -171,9 +163,7 @@ class RealExchangeV2QrCodeTest {
     }
 
     @Test fun `buildLinkingCode emits the expected compact JSON shape`() {
-        // Documents the exact wire shape and catches accidental serializer drift. Field ORDER is
-        // not contractual (the code is parse-only on every platform; nothing byte-compares it) —
-        // this just pins what plain Moshi currently emits (snake_case names, alphabetical order).
+        // Field order is not contractual (codes are parse-only, never byte-compared); this pins the current serializer output.
         val built = qrCode.buildLinkingCode(channelId = "c", publicKeyBase64Url = "k", version = "2")
         val fragment = built.substringAfter("code2=")
         val decoded = String(Base64.decode(fragment, Base64.URL_SAFE or Base64.NO_PADDING or Base64.NO_WRAP))
@@ -181,8 +171,6 @@ class RealExchangeV2QrCodeTest {
     }
 
     @Test fun `buildLinkingCode does not escape forward slashes (defense-in-depth)`() {
-        // Production keys are base64url (slash-free), but the JSON is byte-compared cross-platform —
-        // it must never carry Android-only '\/' escaping should any field ever contain '/'.
         val built = qrCode.buildLinkingCode(channelId = "chan/123", publicKeyBase64Url = "pub/key+raw")
         val fragment = built.substringAfter("code2=")
         val decoded = String(Base64.decode(fragment, Base64.URL_SAFE or Base64.NO_PADDING or Base64.NO_WRAP))
@@ -193,7 +181,6 @@ class RealExchangeV2QrCodeTest {
 
     @Test fun `buildLinkingCode honours custom version`() {
         val built = qrCode.buildLinkingCode("c", "k", version = "2.1")
-        // Pins that the wire shape carries the custom version through (parse now accepts 2.x).
         val fragment = built.substringAfter("code2=")
         val decoded = Base64.decode(fragment, Base64.URL_SAFE or Base64.NO_PADDING or Base64.NO_WRAP)
         assertTrue(String(decoded).contains("\"version\":\"2.1\""))
@@ -207,7 +194,6 @@ class RealExchangeV2QrCodeTest {
 
     @Suppress("unused")
     private fun ExchangeV2CodeParseResult.assertIs(): Unit = run {
-        // helper hook for clarity in IDE; intentionally a no-op
         assertNull(null)
     }
 }
