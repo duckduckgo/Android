@@ -508,6 +508,28 @@ class RealExchangeV2RunnerTest {
         assertSame(ExchangeV2State.Host.Confirming, runner.currentState)
     }
 
+    @Test fun `a polled message that reaches a terminal state tears down without a spurious error`() = runTest {
+        // Same-account: Scanner already signed in as "shared" meets a peer on the same account.
+        // The peer's availability drives the SM straight to the terminal SameAccountAbort.
+        whenever(syncStore.userId).thenReturn("shared")
+        whenever(channel.poll(any(), any())).thenReturn(
+            flowOf(
+                ExchangeV2Message.RecoveryCodeAvailable(rawJson = "{}", userId = "shared", name = "Peer", kind = "ddg"),
+            ),
+        )
+
+        val runner = newRunner()
+        runner.startScan("") // Scanner starts in Negotiating; poll loop delivers the availability
+
+        // Terminal reached through the poll path: session cleared via cancelLocked (which cancels
+        // the very poll job we were collecting on) and no "Pairing failed"/error surfaced.
+        assertNull(runner.currentState)
+        val spurious = runner.events.replayCache
+            .filterIsInstance<ExchangeV2Event.SessionError>()
+            .any { it.message.contains("Pairing failed") || it.message.contains("timed out", ignoreCase = true) }
+        assertFalse("terminal via poll must not surface a spurious error", spurious)
+    }
+
     @Test fun `cancel during an open poll does not surface a spurious error`() = runTest {
         whenever(syncStore.userId).thenReturn("my-user")
         whenever(channel.poll(any(), any())).thenReturn(flow<ExchangeV2Message> { awaitCancellation() })
