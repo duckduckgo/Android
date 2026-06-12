@@ -1205,6 +1205,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                         binding.leftWingAnimation,
                         LEFT_WING_MAX_HEIGHT_DP,
                         LEFT_WING_MIN_HEIGHT_DP,
+                        bottomOverlapPx = leftWingBottomOverlapPx(),
                     )
                     if (!showLeftWingAnimation) {
                         binding.leftWingAnimation.isVisible = false
@@ -1815,6 +1816,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                     binding.leftWingAnimation,
                     LEFT_WING_MAX_HEIGHT_DP,
                     LEFT_WING_MIN_HEIGHT_DP,
+                    bottomOverlapPx = leftWingBottomOverlapPx(),
                 )
                 binding.leftWingAnimation.apply {
                     cancelAnimation()
@@ -2214,6 +2216,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
         decorationView: View,
         maxHeightDp: Int,
         minHeightDp: Int,
+        bottomOverlapPx: Int = 0,
     ): Boolean {
         val height = BrandDesignUpdateOnboardingLayoutHelper.calculateDecorationHeight(
             rootView = binding.root,
@@ -2221,6 +2224,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
             decorationView = decorationView,
             maxHeightPx = maxHeightDp.toPx(),
             minHeightPx = minHeightDp.toPx(),
+            bottomOverlapPx = bottomOverlapPx,
         )
         if (height != null) {
             decorationView.updateLayoutParams { this.height = height }
@@ -2228,11 +2232,22 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                 decorationView,
                 minHeightPx = minHeightDp.toPx(),
                 maxHeightPx = maxHeightDp.toPx(),
+                bottomOverlapPx = bottomOverlapPx,
             )
         } else {
             decorationFitCorrector?.clear()
         }
         return height != null
+    }
+
+    /**
+     * Px the left wing may rise into the bottom margin the card reserves for the bubble tail. The wing
+     * sits on the opposite side from the tail, so it can use that band while keeping at least
+     * [LEFT_WING_CARD_GAP_DP] clear of the card body.
+     */
+    private fun leftWingBottomOverlapPx(): Int {
+        val cardBottomMargin = (binding.daxDialogCta.cardView.layoutParams as? ViewGroup.MarginLayoutParams)?.bottomMargin ?: return 0
+        return (cardBottomMargin - LEFT_WING_CARD_GAP_DP.toPx()).coerceAtLeast(0)
     }
 
     private fun playWalkingDaxAnimation() {
@@ -2775,6 +2790,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
         private const val BOTTOM_WING_MIN_HEIGHT_DP = 130
         private const val LEFT_WING_MAX_HEIGHT_DP = 196
         private const val LEFT_WING_MIN_HEIGHT_DP = 130
+        private const val LEFT_WING_CARD_GAP_DP = 8
         private const val BOBBING_DAX_MAX_HEIGHT_DP = 156
         private const val BOBBING_DAX_MIN_HEIGHT_DP = 130
 

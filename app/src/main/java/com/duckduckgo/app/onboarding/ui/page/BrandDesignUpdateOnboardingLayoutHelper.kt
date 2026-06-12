@@ -29,8 +29,9 @@ object BrandDesignUpdateOnboardingLayoutHelper {
         decorationBottomMargin: Int,
         maxHeightPx: Int,
         minHeightPx: Int,
+        bottomOverlapPx: Int = 0,
     ): Int? = OnboardingDecorationSizing.fitHeight(
-        availablePx = availableContentHeight - dialogSpace - decorationBottomMargin,
+        availablePx = availableContentHeight - dialogSpace - decorationBottomMargin + bottomOverlapPx,
         minHeightPx = minHeightPx,
         maxHeightPx = maxHeightPx,
     )
@@ -41,6 +42,7 @@ object BrandDesignUpdateOnboardingLayoutHelper {
         decorationView: View,
         maxHeightPx: Int,
         minHeightPx: Int,
+        bottomOverlapPx: Int = 0,
     ): Int? {
         if (rootView.height == 0) return null
         if (isInScrollableContainer(dialogView, rootView)) return maxHeightPx
@@ -65,6 +67,7 @@ object BrandDesignUpdateOnboardingLayoutHelper {
             decorationBottomMargin = decorationParams.bottomMargin,
             maxHeightPx = maxHeightPx,
             minHeightPx = minHeightPx,
+            bottomOverlapPx = bottomOverlapPx,
         )
     }
 
