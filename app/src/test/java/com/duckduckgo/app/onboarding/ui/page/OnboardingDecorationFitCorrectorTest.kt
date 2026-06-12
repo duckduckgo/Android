@@ -55,6 +55,9 @@ class OnboardingDecorationFitCorrectorTest {
         minHeightPx: Int,
         maxHeightPx: Int,
         wrapDialogInScrollView: Boolean = false,
+        dialogMeasuredHeight: Int = dialogHeight,
+        contentMeasuredHeight: Int = contentHeight,
+        viewportMeasuredHeight: Int = viewportHeight,
         onDecorationHidden: () -> Unit = {},
     ): Harness {
         val root = ConstraintLayout(context)
@@ -78,6 +81,17 @@ class OnboardingDecorationFitCorrectorTest {
         }
         (dialog.layoutParams as ViewGroup.MarginLayoutParams).topMargin = dialogTopMargin
         dialog.layout(0, 0, 1920, dialogHeight)
+
+        // The corrector reads measuredHeight (the settled target), which can differ from the laid-out
+        // height mid-transition. Measure viewport first, then cardContainer (it is viewport's child, so
+        // measuring the parent would otherwise clobber it), then the dialog.
+        fun View.measureExactly(height: Int) = measure(
+            View.MeasureSpec.makeMeasureSpec(1920, View.MeasureSpec.EXACTLY),
+            View.MeasureSpec.makeMeasureSpec(height, View.MeasureSpec.EXACTLY),
+        )
+        viewport.measureExactly(viewportMeasuredHeight)
+        cardContainer.measureExactly(contentMeasuredHeight)
+        dialog.measureExactly(dialogMeasuredHeight)
 
         val decoration = View(context)
         root.addView(decoration)
@@ -282,5 +296,53 @@ class OnboardingDecorationFitCorrectorTest {
         assertTrue(h.corrector.correctOnce())
         assertEquals(250, h.decoration.layoutParams.height)
         assertFalse(h.decoration.isGone)
+    }
+
+    @Test
+    fun whenLaidOutHeightMidTransitionExceedsButMeasuredHeightFitsThenDecorationKept() {
+        // Mid inter-dialog ChangeBounds: laid-out dialog still reports the previous (taller) dialog at
+        // 1804, but the settled target measures 1410. Off measuredHeight there is room (availPx 646 >=
+        // min 390), so the decoration must be kept; off laid-out height it would wrongly hide.
+        val h = harness(
+            rootHeight = 2340,
+            dialogHeight = 1804,
+            dialogMeasuredHeight = 1410,
+            dialogTopMargin = 128,
+            contentHeight = 1589,
+            contentMeasuredHeight = 1195,
+            viewportHeight = 1589,
+            viewportMeasuredHeight = 1195,
+            decorationHeight = 468,
+            decorationBottomMargin = 156,
+            minHeightPx = 390,
+            maxHeightPx = 468,
+        )
+
+        assertTrue(h.corrector.correctOnce())
+        assertFalse(h.decoration.isGone)
+        assertEquals(468, h.decoration.layoutParams.height)
+    }
+
+    @Test
+    fun whenMeasuredHeightGenuinelyTooTallThenDecorationHidden() {
+        // The settled target itself leaves less than min below the card: the decoration must still hide,
+        // so the measured-height read does not regress genuine-overflow handling.
+        val h = harness(
+            rootHeight = 2340,
+            dialogHeight = 1804,
+            dialogMeasuredHeight = 2100,
+            dialogTopMargin = 128,
+            contentHeight = 1589,
+            contentMeasuredHeight = 1885,
+            viewportHeight = 1589,
+            viewportMeasuredHeight = 1885,
+            decorationHeight = 468,
+            decorationBottomMargin = 156,
+            minHeightPx = 390,
+            maxHeightPx = 468,
+        )
+
+        assertFalse(h.corrector.correctOnce())
+        assertTrue(h.decoration.isGone)
     }
 }
