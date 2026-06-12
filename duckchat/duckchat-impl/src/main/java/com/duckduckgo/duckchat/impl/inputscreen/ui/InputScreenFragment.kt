@@ -281,7 +281,12 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
                     )
             }
 
-        inputScreenButtons = InputScreenButtons(requireContext(), useTopBar = useTopBar)
+        // Bottom-bar buttons live inside the dark Fire card, so build them with the card's context so
+        // they pick up the dark-Fire styling. The screen background stays on the activity (light)
+        // theme. Top-bar buttons float in a separate container on the screen, so they keep the
+        // activity theme.
+        val buttonsContext = if (useTopBar) requireContext() else inputModeWidget.cardContext
+        inputScreenButtons = InputScreenButtons(buttonsContext, useTopBar = useTopBar)
 
         if (useTopBar) {
             binding.inputModeWidgetContainerTop.addView(inputModeWidget)

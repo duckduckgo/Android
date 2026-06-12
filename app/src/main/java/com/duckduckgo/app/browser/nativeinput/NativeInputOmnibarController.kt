@@ -230,8 +230,9 @@ class RealNativeInputOmnibarController(
             val isTop = omnibar.omnibarType == OmnibarType.SINGLE_TOP || omnibar.omnibarType == OmnibarType.SPLIT
             cardElevation = if (isTop) 6f.toPx() else 3f.toPx()
         }
-        omnibarView.findViewById<MaterialCardView?>(R.id.omniBarContainer)
-            ?.setCardBackgroundColor(ctx.getColorFromAttr(com.duckduckgo.mobile.android.R.attr.daxColorWindow))
+        omnibarView.findViewById<MaterialCardView?>(R.id.omniBarContainer)?.apply {
+            setCardBackgroundColor(context.getColorFromAttr(com.duckduckgo.mobile.android.R.attr.daxColorWindow))
+        }
     }
 
     private fun restoreBottomOmnibarPosition() {

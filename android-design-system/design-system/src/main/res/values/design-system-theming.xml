@@ -136,16 +136,21 @@
         <item name="daxColorDim">@color/black60</item>
         <item name="daxColorWhite">@color/white</item>
         <item name="daxColorBlack">@color/black84</item>
+        <item name="daxColorFireModeAccentLight">@color/mandarin50</item>
+        <item name="daxColorFireModeAccentDark">@color/mandarin40</item>
+        <item name="daxColorFireModeAccentLightTranslucent">@color/mandarin50_translucent</item>
+        <item name="daxColorFireModeAccentDarkTranslucent">@color/mandarin40_translucent</item>
         <item name="preferredStatusBarColor">?attr/daxColorSurface</item>
         <item name="preferredNavigationBarColor">?attr/daxColorSurface</item>
         <item name="daxColorToolbar">?attr/daxColorSurface</item>
         <item name="daxColorBrowserOverlay">?attr/daxColorSurface</item>
         <item name="daxColorOmnibarAccent">?attr/daxColorAccentBlue</item>
+        <item name="daxColorOmnibarAccentContent">@color/white</item>
         <item name="daxColorSnackbarAction">?attr/daxColorAccentBlue</item>
         <item name="daxIconTabSwitcher">@drawable/ic_tab_24</item>
         <item name="daxDrawableTabPlaceholderPreview">@drawable/ic_dax_icon_72</item>
-        <!-- No-op by default; the .Fire themes swap this for an overlay that darkens the omnibar card. -->
         <item name="daxOmnibarThemeOverlay">@style/ThemeOverlay.DuckDuckGo.Omnibar.None</item>
+        <item name="daxInputModeCardThemeOverlay">@style/ThemeOverlay.DuckDuckGo.InputModeCard.None</item>
 
         <!--disables the overlay so that elevated surfaces are always daxColorSurface-->
         <item name="elevationOverlayEnabled">false</item>

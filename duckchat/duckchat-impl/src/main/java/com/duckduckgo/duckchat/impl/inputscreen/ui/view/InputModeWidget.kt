@@ -593,6 +593,14 @@ open class InputModeWidget @JvmOverloads constructor(
 
     fun getAnchorView(): View = inputModeWidgetCard
 
+    /**
+     * Context carrying the input card's theme overlay (the dark Fire palette in Fire mode, a no-op
+     * otherwise). Inflate views that live inside the card with this so they inherit the same theme
+     * as the card's own children, while the surrounding screen keeps its theme.
+     */
+    val cardContext: Context
+        get() = inputModeWidgetCard.context
+
     fun insertTabTag(token: String, tabId: String, atIndex: Int, cursorPosition: Int) {
         val editable = inputField.text
         val end = cursorPosition.coerceAtMost(editable.length)

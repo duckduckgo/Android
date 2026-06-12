@@ -52,6 +52,7 @@
 
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/inputModeWidgetCard"
+            android:theme="?attr/daxInputModeCardThemeOverlay"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/keyline_2"
