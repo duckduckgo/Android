@@ -611,7 +611,6 @@ class DuckChatContextualViewModel @Inject constructor(
                     // Context was removed before submit; refuse to auto-submit without it.
                     return
                 }
-                addPageContext()
                 onPromptSent(
                     prompt = context.getString(R.string.duckAIContextualPromptSummarize),
                     followUpPrefill = currentInput.takeIf { it.isNotEmpty() },

@@ -1686,6 +1686,21 @@ class DuckChatContextualViewModelTest {
     }
 
     @Test
+    fun `when SUBMIT_SUMMARIZE clicked then context-attach pixel not re-fired`() = runTest {
+        whenever(contextualSheetImprovementsToggle.isEnabled()).thenReturn(true)
+        val testee = buildViewModel()
+        testee.onSheetOpened("tab-1")
+        val pageContext = """{"title":"Page","url":"https://example.com","content":"text"}"""
+        testee.onPageContextReceived("tab-1", pageContext)
+        testee.onQuickActionClicked("") // ASK_ABOUT_PAGE -> SUBMIT_SUMMARIZE (attaches context)
+
+        testee.onQuickActionClicked("") // SUBMIT_SUMMARIZE click — should not re-attach
+
+        verify(duckChatPixels, times(1)).reportContextualPlaceholderContextTapped()
+        verify(duckChatPixels, times(1)).reportContextualPageContextManuallyAttachedNative()
+    }
+
+    @Test
     fun `when SUBMIT_SUMMARIZE clicked after user removed context then summarize is NOT submitted`() = runTest {
         whenever(contextualSheetImprovementsToggle.isEnabled()).thenReturn(true)
         val testee = buildViewModel()
