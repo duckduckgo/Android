@@ -52,10 +52,12 @@ class AdBlockingExtensionJsInjectorPluginTest {
     private val webView: WebView = mock()
     private val testScope = CoroutineScope(UnconfinedTestDispatcher())
 
-    private val singleScriptlet = listOf(Scriptlet(name = "a.js", content = "console.log('a')"))
+    private val isolatedName = "scriptlets/isolated/ublock-filters.js"
+    private val mainName = "scriptlets/main/ublock-filters.js"
+    private val singleScriptlet = listOf(Scriptlet(name = isolatedName, content = "console.log('a')"))
     private val twoScriptlets = listOf(
-        Scriptlet(name = "b.js", content = "console.log('b')"),
-        Scriptlet(name = "a.js", content = "console.log('a')"),
+        Scriptlet(name = mainName, content = "console.log('b')"),
+        Scriptlet(name = isolatedName, content = "console.log('a')"),
     )
 
     private val plugin by lazy {
@@ -173,7 +175,7 @@ class AdBlockingExtensionJsInjectorPluginTest {
         scriptletsFlow.value = singleScriptlet
         plugin.onPageStarted(webView, url = "https://youtube.com/page", isDesktopMode = null)
 
-        scriptletsFlow.value = listOf(Scriptlet(name = "a.js", content = "console.log('updated')"))
+        scriptletsFlow.value = listOf(Scriptlet(name = isolatedName, content = "console.log('updated')"))
         plugin.onPageStarted(webView, url = "https://youtube.com/page", isDesktopMode = null)
 
         verify(webView).evaluateJavascript(
@@ -194,11 +196,12 @@ class AdBlockingExtensionJsInjectorPluginTest {
     }
 
     @Test
-    fun whenScriptletsIncludeNonJsEntriesThenOnlyJsEntriesAreInjected() {
+    fun whenScriptletsIncludeNamesNotInAllowlistThenOnlyAllowlistedScriptletsAreInjected() {
         scriptletsFlow.value = listOf(
-            Scriptlet(name = "a.js", content = "console.log('a')"),
+            Scriptlet(name = isolatedName, content = "console.log('a')"),
             Scriptlet(name = "rules/youtube.json", content = "{\"some\":\"json\"}"),
-            Scriptlet(name = "b.js", content = "console.log('b')"),
+            Scriptlet(name = "scriptlets/other/something.js", content = "console.log('other')"),
+            Scriptlet(name = mainName, content = "console.log('b')"),
         )
 
         plugin.onPageStarted(webView, url = "https://youtube.com/page", isDesktopMode = null)
@@ -210,9 +213,10 @@ class AdBlockingExtensionJsInjectorPluginTest {
     }
 
     @Test
-    fun whenScriptletsAreAllNonJsEntriesThenNoInjection() {
+    fun whenAllScriptletNamesAreNotInAllowlistThenNoInjection() {
         scriptletsFlow.value = listOf(
             Scriptlet(name = "rules/youtube.json", content = "{\"some\":\"json\"}"),
+            Scriptlet(name = "scriptlets/other/something.js", content = "console.log('other')"),
         )
 
         plugin.onPageStarted(webView, url = "https://youtube.com/page", isDesktopMode = null)

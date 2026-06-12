@@ -32,7 +32,16 @@ abstract class AdBlockingExtensionDatabase : RoomDatabase() {
 
 private val MIGRATION_2_TO_3 = object : Migration(2, 3) {
     override fun migrate(db: SupportSQLiteDatabase) {
-        db.execSQL("DELETE FROM ad_blocking_scriptlets WHERE name NOT LIKE '%.js'")
+        db.execSQL(
+            """
+            DELETE FROM ad_blocking_scriptlets WHERE name NOT IN (
+                'scriptlets/isolated/ublock-filters.js',
+                'scriptlets/main/ublock-filters.js',
+                'scriptlets/isolated/ublock-experimental.js',
+                'scriptlets/main/ublock-experimental.js'
+            )
+            """.trimIndent(),
+        )
     }
 }
 

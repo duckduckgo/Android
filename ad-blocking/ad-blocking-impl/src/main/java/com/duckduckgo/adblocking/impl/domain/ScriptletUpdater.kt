@@ -16,6 +16,7 @@
 
 package com.duckduckgo.adblocking.impl.domain
 
+import com.duckduckgo.adblocking.impl.ALLOWED_SCRIPTLET_NAMES
 import com.duckduckgo.adblocking.impl.AdBlockingExtensionRepository
 import com.duckduckgo.adblocking.impl.ScriptletDownloader
 import com.duckduckgo.adblocking.impl.remoteconfig.AdBlockingExtensionSettings
@@ -52,11 +53,11 @@ class RealScriptletUpdater @Inject constructor(
             return ScriptletUpdateResult.Success
         }
 
-        val jsScriptlets = settings.scriptlets.filterKeys { it.endsWith(".js") }
+        val allowedScriptlets = settings.scriptlets.filterKeys { it in ALLOWED_SCRIPTLET_NAMES }
 
         val downloaded = try {
             coroutineScope {
-                jsScriptlets.map { (name, entry) ->
+                allowedScriptlets.map { (name, entry) ->
                     async {
                         logcat { "Downloading ${entry.url}" }
                         val bytes = downloader.download(entry.url).getOrElse {
