@@ -24,6 +24,7 @@ import android.text.InputType
 import android.transition.AutoTransition
 import android.transition.TransitionManager
 import android.util.AttributeSet
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
@@ -127,6 +128,9 @@ interface NativeInputWidget {
     fun clearSelectedTool()
     fun onPromptSubmitted()
     fun setModelPickerEnabled(enabled: Boolean)
+
+    /** Block all interaction with the widget's controls and dim them, or restore. */
+    fun setInteractionLocked(locked: Boolean)
 
     /**
      * Binds a reactive source of "should the model picker be enabled?"
@@ -1380,9 +1384,26 @@ class NativeInputModeWidget @JvmOverloads constructor(
 
     private fun voiceHostButtons(): InputScreenButtons? = submitButtons
 
+    private var interactionLocked = false
+
+    // Dims only this (transparent) widget, never the parent card surface, so the bar stays
+    // colour-uniform with the page. Touch interception covers the plugin containers too.
+    override fun setInteractionLocked(locked: Boolean) {
+        if (interactionLocked == locked) return
+        interactionLocked = locked
+        alpha = if (locked) LOCKED_ALPHA else 1f
+        if (locked) {
+            clearInputFocus()
+            hideKeyboard()
+        }
+    }
+
+    override fun onInterceptTouchEvent(ev: MotionEvent?): Boolean = interactionLocked || super.onInterceptTouchEvent(ev)
+
     companion object {
         private const val MAX_LINES = 5
         private const val FOCUS_TRANSITION_DURATION_MS = 100L
+        private const val LOCKED_ALPHA = 0.4f
     }
 }
 
