@@ -63,10 +63,6 @@ sealed interface ExchangeV2CodeParseResult {
 class RealExchangeV2QrCode @Inject constructor() : ExchangeV2QrCode {
 
     override fun buildLinkingCode(channelId: String, publicKeyBase64Url: String, version: String): String {
-        // Compact JSON, no whitespace. Serialized with Moshi (not org.json) because AOSP's
-        // JSONObject.toString() escapes '/' to '\/', which non-strict cross-platform decoders
-        // reject. Consumers only ever PARSE this code and read the field values — nothing
-        // hashes or byte-compares the encoded payload — so field order is not contractual.
         val payload = linkingCodeAdapter.toJson(
             V2LinkingCodePayload(version = version, channelId = channelId, publicKey = publicKeyBase64Url),
         )
@@ -82,14 +78,13 @@ class RealExchangeV2QrCode @Inject constructor() : ExchangeV2QrCode {
     }
 
     override fun parse(text: String): ExchangeV2CodeParseResult {
-        // Tolerate common paste mishaps: leading/trailing whitespace, and a "Linking code: …"
-        // or other prefix before the actual URL. If we find an http(s):// substring, parse
-        // from there; otherwise treat the trimmed input as a bare base64url string.
         val trimmed = text.trim()
         val httpIndex = sequenceOf("https://", "http://").mapNotNull { trimmed.indexOf(it).takeIf { i -> i >= 0 } }.minOrNull()
         val candidate = if (httpIndex != null) trimmed.substring(httpIndex) else trimmed
-        val b64url = extractFragmentParam(candidate) ?: candidate.takeIf(::looksLikeBase64Url)
-            ?: return ExchangeV2CodeParseResult.Unknown
+        // No alphabet pre-check on the bare candidate: Base64.decode + JSONObject below already
+        // reject any non-base64url / non-JSON input as Unknown, so a looksLikeBase64Url guard would
+        // be redundant. (Base64.decode skips embedded whitespace, so a line-wrapped paste decodes too.)
+        val b64url = extractFragmentParam(candidate) ?: candidate
 
         val decoded = runCatching {
             Base64.decode(b64url, Base64.URL_SAFE or Base64.NO_PADDING or Base64.NO_WRAP)
@@ -149,14 +144,10 @@ class RealExchangeV2QrCode @Inject constructor() : ExchangeV2QrCode {
     /** Major component of a "major.minor" version string (e.g. "2.1" → 2), or null if unparseable. */
     private fun majorVersion(version: String): Int? = version.substringBefore(".").toIntOrNull()
 
-    private fun looksLikeBase64Url(s: String): Boolean =
-        s.length >= 8 && s.all { it in BASE64_URL_ALPHABET }
-
     companion object {
         private const val URL_PREFIX = "https://duckduckgo.com/sync/pairing/"
         private const val PARAM_V2 = "code2"
         private const val PARAM_V1 = "code"
-        private val BASE64_URL_ALPHABET = (('A'..'Z') + ('a'..'z') + ('0'..'9') + listOf('-', '_', '=')).toSet()
     }
 }
 
