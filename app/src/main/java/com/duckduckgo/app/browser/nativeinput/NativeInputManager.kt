@@ -28,11 +28,15 @@ import android.view.ViewOutlineProvider
 import android.webkit.ValueCallback
 import android.widget.FrameLayout
 import androidx.core.net.toUri
+import androidx.core.view.doOnNextLayout
+import androidx.core.view.isVisible
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.map
 import androidx.recyclerview.widget.RecyclerView
+import com.duckduckgo.app.browser.PulseAnimation
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.omnibar.Omnibar
 import com.duckduckgo.app.browser.omnibar.QueryUrlPredictor
@@ -120,6 +124,12 @@ interface NativeInputManager {
     fun onKeyboardVisibilityChanged(isVisible: Boolean)
     fun setPickingImage(picking: Boolean)
     fun setText(text: String)
+
+    /**
+     * Pulse the widget's fire button and lock the rest of the widget down to it, or clear that state.
+     * Only takes effect in Duck.ai mode (where the fire button lives in the widget); a no-op otherwise.
+     */
+    fun setFireButtonSpotlightMode(enabled: Boolean)
 }
 
 @ContributesBinding(FragmentScope::class)
@@ -142,6 +152,9 @@ class RealNativeInputManager @Inject constructor(
     private var floatingSubmitContainer: View? = null
     private var widgetRoot: View? = null
     private var lastCallbacks: NativeInputCallbacks? = null
+
+    private var pulseAnimation: PulseAnimation? = null
+    private var fireButtonSpotlightEnabled: Boolean = false
 
     private fun widgetFrom(widgetView: View): NativeInputWidget? {
         return widgetView.findViewById<View?>(R.id.inputModeWidget) as? NativeInputWidget
@@ -515,6 +528,7 @@ class RealNativeInputManager @Inject constructor(
 
     private fun removeWidget(): Boolean {
         var removed = false
+        pulseAnimation?.stop()
         rootView.findViewById<View?>(R.id.inputModeTopRoot)?.let {
             rootView.removeView(it)
             removed = true
@@ -673,11 +687,37 @@ class RealNativeInputManager @Inject constructor(
         }
 
         applyWindowChrome(widgetView, isBottom)
+        applyFireButtonSpotlight(widgetView)
 
         if (!startEnterAnimation(widgetView, isBottom)) {
             animator.applyLayoutTransitions(widgetView, isBottom)
             onEnterComplete(widgetView)
         }
+    }
+
+    override fun setFireButtonSpotlightMode(enabled: Boolean) {
+        if (fireButtonSpotlightEnabled == enabled) return
+        fireButtonSpotlightEnabled = enabled
+        applyFireButtonSpotlight()
+    }
+
+    // Pulses the leading fire button and locks the rest of the widget. The lock keeps the input
+    // unfocusable and the toggle blocked while active, so the fire button stays visible and stable —
+    // only the first layout (widget just attached, or focus just cleared) needs deferring.
+    private fun applyFireButtonSpotlight(widgetView: View? = widgetRoot) {
+        val active = fireButtonSpotlightEnabled && omnibarController.isDuckAiMode()
+        val fireMenu = widgetView?.findViewById<View?>(R.id.inputFieldFireIconMenu)
+        val fireIcon = widgetView?.findViewById<View?>(R.id.inputFieldFireIconImageview)
+        when {
+            !active || fireMenu?.isVisible != true || fireIcon == null -> pulseAnimation?.stop()
+            fireIcon.height > 0 -> ensurePulseAnimation(fireIcon)?.playOn(fireIcon)
+            else -> fireIcon.doOnNextLayout { applyFireButtonSpotlight() }
+        }
+    }
+
+    private fun ensurePulseAnimation(view: View): PulseAnimation? {
+        if (pulseAnimation == null) pulseAnimation = view.findViewTreeLifecycleOwner()?.let { PulseAnimation(it) }
+        return pulseAnimation
     }
 
     private fun suppressShadow(view: View) {
