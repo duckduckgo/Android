@@ -24,6 +24,12 @@ import javax.inject.Inject
 /**
  * Suppresses the native (unified) input field for users enrolled in the active Duck.ai onboarding
  * experiment so they keep the legacy omnibar while the experiment runs.
+ *
+ * Note: this value is only read when `RealDuckChat.cacheConfig()` runs (app init and on privacy
+ * config download), so a user who enrolls mid-session would keep the unified input until the next
+ * refresh or restart. We don't handle that case on purpose: enrollment for this experiment is
+ * closed, so the enrolled population is already assigned before the app starts and never changes
+ * within a session.
  */
 @ContributesMultibinding(AppScope::class)
 class OnboardingExperimentNativeInputFieldSuppressor @Inject constructor(
