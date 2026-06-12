@@ -141,7 +141,6 @@ class SettingsViewModelTest {
             dispatcherProvider = dispatcherProviderMock,
             autoconsent = autoconsentMock,
             subscriptions = subscriptionsMock,
-            duckPlayer = duckPlayerMock,
             duckChat = duckChatMock,
             duckAiFeatureState = mockDuckAiFeatureState,
             voiceSearchAvailability = voiceSearchAvailabilityMock,

@@ -194,6 +194,13 @@ class InputScreenViewModel @AssistedInject constructor(
     private val chatInputTextState = MutableStateFlow("")
     val chatInputText: StateFlow<String> = chatInputTextState.asStateFlow()
 
+    // Live tab count for the input screen's tab switcher button. Driven off flowTabs so it tracks
+    // tab changes while the input screen is open (e.g. burning the hatch's tab); the launch-time
+    // snapshot passed in InputScreenActivityParams would otherwise go stale.
+    val tabCount: Flow<Int> = tabRepository.flowTabs
+        .map { it.size }
+        .distinctUntilChanged()
+
     private val _submitButtonIconState = MutableStateFlow(SubmitButtonIconState(SubmitButtonIcon.SEARCH))
     val submitButtonIconState: StateFlow<SubmitButtonIconState> = _submitButtonIconState.asStateFlow()
 

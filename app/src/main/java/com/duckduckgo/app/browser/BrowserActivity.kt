@@ -146,7 +146,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -163,6 +162,7 @@ import javax.inject.Inject
 @HasMemberInjections
 @InjectWith(ActivityScope::class)
 open class BrowserActivity : DuckDuckGoActivity() {
+
     @Inject
     lateinit var settingsDataStore: SettingsDataStore
 
@@ -243,6 +243,9 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
+
+    override val applyFireTheme: Boolean
+        get() = currentBrowserMode == BrowserMode.FIRE
 
     private val lastActiveTabs = TabList()
 
@@ -650,6 +653,10 @@ open class BrowserActivity : DuckDuckGoActivity() {
         logcat(INFO) { "onNewIntent: $intent" }
 
         intent.sanitize()
+
+        intent.getStringExtra(LAUNCH_FROM_NOTIFICATION_PIXEL_NAME)?.let {
+            viewModel.onLaunchedFromNotification(it)
+        }
 
         dataClearerForegroundAppRestartPixel.registerIntent(intent)
 
@@ -1307,9 +1314,13 @@ open class BrowserActivity : DuckDuckGoActivity() {
      */
     private fun observeBrowserModeChanges() {
         lifecycleScope.launch {
-            viewModel.currentMode.drop(1).collect {
-                recreate()
-            }
+            viewModel.currentMode
+                .flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED)
+                .collect { mode ->
+                    if (mode != currentBrowserMode) {
+                        recreate()
+                    }
+                }
         }
     }
 

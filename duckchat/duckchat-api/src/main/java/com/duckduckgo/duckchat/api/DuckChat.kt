@@ -53,6 +53,12 @@ interface DuckChat {
     fun getDuckChatUrl(query: String, autoPrompt: Boolean, sidebar: Boolean = false): String
 
     /**
+     * Returns the Duck.ai URL that opens with the settings panel open (e.g. https://duck.ai?settings=open),
+     * using the configured Duck.ai host. Used to reach Duck.ai settings from outside the Duck.ai web view.
+     */
+    fun getDuckChatSettingsUrl(): String
+
+    /**
      * Determines whether a given [Uri] is a DuckChat URL.
      * There are two Duck Chat URLs
      * Legacy: https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5

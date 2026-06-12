@@ -62,6 +62,8 @@ class FakeDuckChat(
         return "https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5"
     }
 
+    override fun getDuckChatSettingsUrl(): String = "https://duck.ai?settings=open"
+
     override fun isDuckChatUrl(uri: Uri): Boolean {
         return uri.toString().contains("duckchat")
     }

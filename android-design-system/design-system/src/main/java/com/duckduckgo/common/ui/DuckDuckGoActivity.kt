@@ -44,6 +44,15 @@ abstract class DuckDuckGoActivity : DaggerActivity() {
 
     @Inject lateinit var themingDataStore: ThemingDataStore
 
+    /**
+     * Override in subclasses whose look should follow the fire-mode theme.
+     * Default `false` keeps activities mode-agnostic on the regular accent regardless
+     * of the user's browser mode.
+     *
+     * Overriding activities must inject [BrowserMode] and return the appropriate Boolean value.
+     */
+    protected open val applyFireTheme: Boolean = false
+
     private var themeChangeReceiver: BroadcastReceiver? = null
 
     @SuppressLint("MissingSuperCall")
@@ -61,7 +70,7 @@ abstract class DuckDuckGoActivity : DaggerActivity() {
         daggerInject: Boolean = true,
     ) {
         if (daggerInject) daggerInject()
-        themeChangeReceiver = applyTheme(themingDataStore.theme)
+        themeChangeReceiver = applyTheme(themingDataStore.theme, applyFireTheme)
         super.onCreate(savedInstanceState)
     }
 

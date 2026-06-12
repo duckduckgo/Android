@@ -25,6 +25,7 @@ import com.duckduckgo.duckchat.impl.models.ModelProvider
 import com.duckduckgo.duckchat.impl.models.ModelState
 import com.duckduckgo.duckchat.impl.models.Tool
 import com.duckduckgo.duckchat.impl.models.UserTier
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.ui.nativeinput.views.ModelPickerViewModel
 import com.duckduckgo.duckchat.impl.ui.nativeinput.views.PickerSurface
 import com.duckduckgo.duckchat.impl.ui.nativeinput.views.UpsellCommand
@@ -39,7 +40,9 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
@@ -51,6 +54,7 @@ class ModelPickerViewModelTest {
     val coroutineRule = CoroutineTestRule()
 
     private val modelManager: DuckAiModelManager = mock()
+    private val duckChatPixels: DuckChatPixels = mock()
     private val stateFlow = MutableStateFlow(ModelState())
 
     private lateinit var testee: ModelPickerViewModel
@@ -58,7 +62,7 @@ class ModelPickerViewModelTest {
     @Before
     fun setUp() {
         whenever(modelManager.modelState).thenReturn(stateFlow)
-        testee = ModelPickerViewModel(modelManager)
+        testee = ModelPickerViewModel(modelManager, duckChatPixels)
     }
 
     @Test
@@ -213,6 +217,45 @@ class ModelPickerViewModelTest {
             expectNoEvents()
             cancelAndConsumeRemainingEvents()
         }
+    }
+
+    @Test
+    fun whenAccessibleModelTappedWithDifferentIdThenModelSelectedPixelFired() = runTest {
+        whenever(modelManager.getSelectedModelId()).thenReturn("current")
+        val model = freeModel("new")
+
+        testee.onModelTapped(model, PickerSurface.MODEL_PICKER_ADDRESS_BAR)
+        runCurrent()
+
+        verify(duckChatPixels).fireModelSelected("new")
+    }
+
+    @Test
+    fun whenAccessibleModelTappedWithSameIdThenModelSelectedPixelNotFired() = runTest {
+        whenever(modelManager.getSelectedModelId()).thenReturn("same")
+        val model = freeModel("same")
+
+        testee.onModelTapped(model, PickerSurface.MODEL_PICKER_ADDRESS_BAR)
+        runCurrent()
+
+        verify(duckChatPixels, never()).fireModelSelected(any())
+    }
+
+    @Test
+    fun whenFreeUserTapsGatedPlusModelThenUpsellPixelFiredAndModelSelectedNotFired() = runTest {
+        stateFlow.value = ModelState(userTier = UserTier.FREE)
+        val model = plusModel("p")
+
+        testee.onModelTapped(model, PickerSurface.MODEL_PICKER_ADDRESS_BAR)
+        runCurrent()
+
+        verify(duckChatPixels).fireSubscriptionUpsellTriggered(
+            source = "model_picker",
+            currentTier = "free",
+            requiredTier = "plus",
+            flowType = "purchase",
+        )
+        verify(duckChatPixels, never()).fireModelSelected(any())
     }
 
     @Test

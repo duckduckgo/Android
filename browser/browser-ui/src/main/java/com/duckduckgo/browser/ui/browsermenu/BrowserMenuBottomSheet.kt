@@ -267,7 +267,7 @@ class BrowserMenuBottomSheet(
             showShortcuts = viewState.showDuckAiSection,
             showVoiceChat = viewState.showDuckChatVoiceOption,
             showChatHistory = viewState.showDuckChatHistoryOption,
-            showChatSettings = false,
+            showChatSettings = viewState.showDuckAiSection,
         )
 
         createAliasMenuItem.isVisible = viewState.isEmailSignedIn
@@ -335,7 +335,7 @@ class BrowserMenuBottomSheet(
             showShortcuts = viewState.showDuckAiSection,
             showVoiceChat = viewState.showDuckChatVoiceOption,
             showChatHistory = viewState.showDuckChatHistoryOption,
-            showChatSettings = false,
+            showChatSettings = viewState.showDuckAiSection,
         )
         renderVpnMenu(viewState.vpnMenuState)
         createAliasMenuItem.isVisible = viewState.isEmailSignedIn

@@ -62,6 +62,7 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     NEW_ADDRESS_BAR_PICKER_V2_CONFIRMED_DAILY("m_aichat_new_address_bar_picker_v2_confirmed_daily"),
     AI_CHAT_DUCK_AI_DIRECT_NAVIGATION_COUNT("m_aichat_duck_ai_direct_navigation_count"),
     AI_CHAT_DUCK_AI_DIRECT_NAVIGATION_DAILY("m_aichat_duck_ai_direct_navigation_daily"),
+    AI_CHAT_UNIFIED_INPUT_CHAT_HEADER_UPGRADE_TAPPED("m_aichat_unified_input_chat_header_upgrade_tapped"),
     PREONBOARDING_SKIP_ONBOARDING_PRESSED("m_preonboarding_skip-onboarding-pressed"),
     PREONBOARDING_CONFIRM_SKIP_ONBOARDING_PRESSED("m_preonboarding_confirm-skip-onboarding-pressed"),
     PREONBOARDING_RESUME_ONBOARDING_PRESSED("m_preonboarding_resume-onboarding-pressed"),

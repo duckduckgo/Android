@@ -313,6 +313,7 @@ import com.duckduckgo.autofill.api.passwordgeneration.AutomaticSavedLoginsMonito
 import com.duckduckgo.autofill.impl.AutofillFireproofDialogSuppressor
 import com.duckduckgo.brokensite.api.BrokenSitePrompt
 import com.duckduckgo.brokensite.api.RefreshPattern
+import com.duckduckgo.browser.api.BrowserRefreshTriggerPlugin
 import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.browser.api.autocomplete.AutoComplete
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteResult
@@ -432,9 +433,11 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import logcat.LogPriority.ERROR
@@ -554,6 +557,7 @@ class BrowserTabViewModel @Inject constructor(
     private val faviconFetchingFixFeature: FaviconFetchingFixFeature,
     private val ntpAfterIdleManager: NtpAfterIdleManager,
     private val browserInteractionsPlugins: PluginPoint<BrowserInteractionsPlugin>,
+    private val browserRefreshTriggerPlugins: PluginPoint<BrowserRefreshTriggerPlugin>,
     private val inlinePdfHandler: InlinePdfHandler,
     private val pdfDownloadTooltipDataStore: PdfDownloadTooltipDataStore,
     private val cachedFileDownloader: CachedFileDownloader,
@@ -731,6 +735,7 @@ class BrowserTabViewModel @Inject constructor(
     private var hasCompletedPageLoad = false
 
     private var allowlistRefreshTriggerJob: Job? = null
+    private var refreshTriggerJob: Job? = null
     private var isCustomTabScreen: Boolean = false
     private var alreadyShownKeyboard: Boolean = false
     private var pendingDuckChatAuthUpdate: Boolean = false
@@ -845,6 +850,7 @@ class BrowserTabViewModel @Inject constructor(
             }.launchIn(viewModelScope)
 
         observeAccessibilitySettings()
+        observeRefreshTriggers()
 
         savedSitesRepository
             .getFavorites()
@@ -1003,6 +1009,7 @@ class BrowserTabViewModel @Inject constructor(
 
     fun onViewRecreated() {
         observeAccessibilitySettings()
+        observeRefreshTriggers()
     }
 
     fun observeSelectedTab(isRestored: Boolean) {
@@ -1071,6 +1078,20 @@ class BrowserTabViewModel @Inject constructor(
                             refreshWebView = shouldRefreshWebview,
                         )
                 }.launchIn(viewModelScope)
+    }
+
+    fun observeRefreshTriggers() {
+        refreshTriggerJob?.cancel()
+        refreshTriggerJob = browserRefreshTriggerPlugins.getPlugins()
+            .map { plugin ->
+                plugin.observeRefreshRequests()
+                    .catch { logcat(WARN) { "Refresh trigger failed: ${it.asLog()}" } }
+            }
+            .merge()
+            .debounce(REFRESH_TRIGGER_DEBOUNCE_MILLIS)
+            .flatMapLatest { refreshOnViewVisible.asStateFlow().filter { it }.take(1) }
+            .onEach { command.value = NavigationCommand.Refresh }
+            .launchIn(viewModelScope)
     }
 
     private fun observeSyncStatusChangesForDuckChat() {
@@ -1551,8 +1572,8 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     private fun isTypedDuckAiUrl(url: String): Boolean {
-        val host = runCatching { url.toUri().host }.getOrNull() ?: return false
-        val duckAiHost = duckAiHostProvider.getHost()
+        val host = runCatching { url.toUri().host }.getOrNull()?.lowercase() ?: return false
+        val duckAiHost = duckAiHostProvider.getHost().lowercase()
         return host == duckAiHost || host == "www.$duckAiHost"
     }
 
@@ -5384,11 +5405,15 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
-    fun openDuckChatSettings() {
-        viewModelScope.launch {
-            pixel.fire(DuckChatPixelName.DUCK_CHAT_DUCK_AI_SETTINGS_TAPPED)
-            val subscriptionEvent = duckChatJSHelper.onNativeAction(NativeAction.DUCK_AI_SETTINGS)
-            _subscriptionEventDataChannel.send(subscriptionEvent)
+    fun openDuckChatSettings(viewMode: ViewMode) {
+        pixel.fire(DuckChatPixelName.DUCK_CHAT_DUCK_AI_SETTINGS_TAPPED)
+        if (viewMode == ViewMode.DuckAI) {
+            viewModelScope.launch {
+                val subscriptionEvent = duckChatJSHelper.onNativeAction(NativeAction.DUCK_AI_SETTINGS)
+                _subscriptionEventDataChannel.send(subscriptionEvent)
+            }
+        } else {
+            command.value = OpenInNewTab(duckChat.getDuckChatSettingsUrl(), tabId)
         }
     }
 
@@ -5562,6 +5587,8 @@ class BrowserTabViewModel @Inject constructor(
     companion object {
         private const val FIXED_PROGRESS = 50
         private const val UPGRADED_PROGRESS_THRESHOLD = 95
+
+        private const val REFRESH_TRIGGER_DEBOUNCE_MILLIS = 200L
 
         // Minimum progress to show web content again after decided to hide web content (possible spoofing attack).
         // We think that progress is enough to assume next site has already loaded new content.

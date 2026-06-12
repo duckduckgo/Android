@@ -251,6 +251,7 @@ import com.duckduckgo.autofill.api.passwordgeneration.AutomaticSavedLoginsMonito
 import com.duckduckgo.autofill.impl.AutofillFireproofDialogSuppressor
 import com.duckduckgo.brokensite.api.BrokenSitePrompt
 import com.duckduckgo.brokensite.api.RefreshPattern
+import com.duckduckgo.browser.api.BrowserRefreshTriggerPlugin
 import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.browser.api.autocomplete.AutoComplete
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteResult
@@ -609,6 +610,13 @@ class BrowserTabViewModelTest {
     private val mockTabStatsBucketing: TabStatsBucketing = mock()
     private val mockNtpAfterIdleManager: NtpAfterIdleManager = mock()
     private val mockBrowserInteractionsPlugins: PluginPoint<BrowserInteractionsPlugin> = mock()
+    private val browserRefreshTriggerFlow = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
+    private val browserRefreshTriggerPlugin: BrowserRefreshTriggerPlugin = mock {
+        on { observeRefreshRequests() } doReturn browserRefreshTriggerFlow
+    }
+    private val mockBrowserRefreshTriggerPlugins: PluginPoint<BrowserRefreshTriggerPlugin> = mock {
+        on { getPlugins() } doReturn listOf(browserRefreshTriggerPlugin)
+    }
     private val mockDuckChatJSHelper: DuckChatJSHelper = mock()
     private val swipingTabsFeature = FakeFeatureToggleFactory.create(SwipingTabsFeature::class.java)
     private val swipingTabsFeatureProvider = SwipingTabsFeatureProvider(swipingTabsFeature)
@@ -992,6 +1000,7 @@ class BrowserTabViewModelTest {
                 faviconFetchingFixFeature = fakeFaviconFetchingFixFeature,
                 ntpAfterIdleManager = mockNtpAfterIdleManager,
                 browserInteractionsPlugins = mockBrowserInteractionsPlugins,
+                browserRefreshTriggerPlugins = mockBrowserRefreshTriggerPlugins,
                 inlinePdfHandler = mockInlinePdfHandler,
                 pdfDownloadTooltipDataStore = mockPdfDownloadTooltipDataStore,
                 cachedFileDownloader = mockCachedFileDownloader,
@@ -7259,6 +7268,19 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenTypedDuckAiUrlWithUppercaseHostThenDirectNavigationPixelsFire() {
+        whenever(mockOmnibarConverter.convertQueryToUrl("Duck.ai", null, FromUser)).thenReturn("https://Duck.ai/")
+        whenever(mockDuckChat.isEnabled()).thenReturn(true)
+
+        testee.onUserSubmittedQuery("Duck.ai", queryOrigin = FromUser)
+
+        verify(mockPixel).fire(
+            AppPixelName.AI_CHAT_DUCK_AI_DIRECT_NAVIGATION_COUNT,
+            parameters = mapOf("duck_ai_enabled" to "true"),
+        )
+    }
+
+    @Test
     fun whenTypedDuckAiUrlSubmittedFromUserAndDuckAiDisabledThenDirectNavigationPixelsFireWithEnabledFalse() {
         whenever(mockOmnibarConverter.convertQueryToUrl("duck.ai", null, FromUser)).thenReturn("https://duck.ai/")
         whenever(mockDuckChat.isEnabled()).thenReturn(false)
@@ -7861,6 +7883,30 @@ class BrowserTabViewModelTest {
         testee.openDuckAiChatById("https://duck.ai/chat?chatId=abc")
 
         verify(plugin).onChatSelected()
+    }
+
+    @Test
+    fun whenBrowserRefreshTriggerPluginEmitsThenNavigationRefreshCommandIssued() = runTest {
+        browserRefreshTriggerFlow.emit(Unit)
+        advanceUntilIdle()
+
+        assertCommandIssued<NavigationCommand.Refresh>()
+    }
+
+    @Test
+    fun whenBrowserRefreshTriggerPluginEmitsWhileTabHiddenThenNoRefreshUntilVisible() = runTest {
+        testee.onViewHidden()
+        advanceUntilIdle()
+
+        browserRefreshTriggerFlow.emit(Unit)
+        advanceUntilIdle()
+
+        assertCommandNotIssued<NavigationCommand.Refresh>()
+
+        testee.onViewVisible()
+        advanceUntilIdle()
+
+        assertCommandIssued<NavigationCommand.Refresh>()
     }
 
     @Test
@@ -10069,7 +10115,7 @@ class BrowserTabViewModelTest {
         )
         whenever(mockDuckChatJSHelper.onNativeAction(NativeAction.DUCK_AI_SETTINGS)).thenReturn(expectedEvent)
 
-        testee.openDuckChatSettings()
+        testee.openDuckChatSettings(ViewMode.DuckAI)
 
         testee.subscriptionEventDataFlow.test {
             val emittedEvent = awaitItem()
@@ -10079,6 +10125,19 @@ class BrowserTabViewModelTest {
             cancelAndIgnoreRemainingEvents()
         }
 
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_DUCK_AI_SETTINGS_TAPPED)
+    }
+
+    @Test
+    fun whenDuckChatSettingsRequestedOutsideDuckAiThenSettingsUrlOpenedInNewTab() = runTest {
+        val settingsUrl = "https://duck.ai?settings=open"
+        whenever(mockDuckChat.getDuckChatSettingsUrl()).thenReturn(settingsUrl)
+
+        testee.openDuckChatSettings(ViewMode.Browser("https://example.com"))
+
+        assertCommandIssued<Command.OpenInNewTab> {
+            assertEquals(settingsUrl, query)
+        }
         verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_DUCK_AI_SETTINGS_TAPPED)
     }
 

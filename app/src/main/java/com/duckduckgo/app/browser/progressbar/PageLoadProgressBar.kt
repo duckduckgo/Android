@@ -45,7 +45,7 @@ class PageLoadProgressBar @JvmOverloads constructor(
 
     private val engine = ProgressPhaseEngine(config, timeProvider)
 
-    private val barColor = context.getColorFromAttr(com.duckduckgo.mobile.android.R.attr.daxColorAccentBlue)
+    private val barColor = context.getColorFromAttr(com.duckduckgo.mobile.android.R.attr.daxColorOmnibarAccent)
 
     private val shimmerRenderer = ShimmerRenderer(
         config = config,

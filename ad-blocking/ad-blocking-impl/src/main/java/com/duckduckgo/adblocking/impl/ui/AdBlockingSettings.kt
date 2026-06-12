@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 DuckDuckGo
+ * Copyright (c) 2026 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,14 +14,19 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.settings.impl
+package com.duckduckgo.adblocking.impl.ui
 
-import com.duckduckgo.anvil.annotations.ContributesPluginPoint
+import android.content.Context
+import android.view.View
+import com.duckduckgo.anvil.annotations.PriorityKey
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.settings.api.DuckPlayerSettingsPlugin
+import com.duckduckgo.settings.api.OtherSettingsPlugin
+import com.squareup.anvil.annotations.ContributesMultibinding
+import javax.inject.Inject
 
-@ContributesPluginPoint(
-    scope = ActivityScope::class,
-    boundType = DuckPlayerSettingsPlugin::class,
-)
-private interface DuckPlayerSettingsPluginTrigger
+@ContributesMultibinding(ActivityScope::class)
+@PriorityKey(100)
+class AdBlockingSettingsEntry @Inject constructor() : OtherSettingsPlugin {
+
+    override fun getView(context: Context): View = AdBlockingSettingsEntryView(context)
+}

@@ -1433,6 +1433,22 @@ class RealDuckChatTest {
     }
 
     @Test
+    fun `when get duck chat settings url then return settings url with configured host`() = runTest {
+        val url = testee.getDuckChatSettingsUrl()
+
+        assertTrue(url == "https://duck.ai?settings=open")
+    }
+
+    @Test
+    fun `when get duck chat settings url with custom host then use that host`() = runTest {
+        whenever(mockDuckAiHostProvider.getHost()).thenReturn("staging.duck.ai")
+
+        val url = testee.getDuckChatSettingsUrl()
+
+        assertTrue(url == "https://staging.duck.ai?settings=open")
+    }
+
+    @Test
     fun `when get duck chat url with empty query and autoprompt then return correct url`() = runTest {
         val url = testee.getDuckChatUrl(query = "", autoPrompt = true, sidebar = false)
 
