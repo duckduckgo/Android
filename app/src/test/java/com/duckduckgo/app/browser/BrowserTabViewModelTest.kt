@@ -821,12 +821,7 @@ class BrowserTabViewModelTest {
                     deviceInfo = mockDeviceInfo,
                 )
 
-            accessibilitySettingsDataStore =
-                AccessibilitySettingsSharedPreferences(
-                    context,
-                    coroutineRule.testDispatcherProvider,
-                    coroutineRule.testScope,
-                )
+            accessibilitySettingsDataStore = AccessibilitySettingsSharedPreferences(context)
 
             whenever(mockOmnibarConverter.convertQueryToUrl(any(), any(), any(), any())).thenReturn("duckduckgo.com")
             whenever(mockTabRepository.liveSelectedTab).thenReturn(selectedTabLiveData)
