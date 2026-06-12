@@ -44,6 +44,7 @@ import com.duckduckgo.duckchat.impl.store.DuckChatContextualDataStore
 import com.duckduckgo.history.api.NavigationHistory
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
@@ -132,6 +133,8 @@ class DataClearing @Inject constructor(
                     clearChatsAndHistory()
                     completeWideEvent(result)
                     logcat { "Single tab clear completed (background) for tab: $tabId" }
+                } catch (e: CancellationException) {
+                    throw e
                 } catch (e: Exception) {
                     dataClearingWideEvent.finishFailure(e)
                     logcat(WARN) { "Background single tab clear failed for tab $tabId: ${e.message}" }
