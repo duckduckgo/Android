@@ -1164,6 +1164,7 @@ class OmnibarLayout @JvmOverloads constructor(
                     trackersAnimationView = trackersAnimation,
                     omnibarViews = omnibarViews(),
                     entities = events,
+                    useLightAnimation = if (browserMode == BrowserMode.FIRE) false else null,
                 )
             }
         } else if (omnibarRepository.isNewCustomTabEnabled) {
