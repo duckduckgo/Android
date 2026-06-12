@@ -46,6 +46,7 @@ import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import logcat.LogPriority.WARN
@@ -125,11 +126,23 @@ class DataClearing @Inject constructor(
             }
         }
 
+        suspend fun clearSiteDataWithRetry(): ClearDataResult {
+            var result = clearDataAction.clearDataForSpecificDomains(visitedSites)
+            var attempt = 1
+            while (result is ClearDataResult.Error && attempt < MAX_BACKGROUND_CLEAR_ATTEMPTS) {
+                logcat(WARN) { "Background site data clear attempt $attempt failed for tab $tabId; retrying" }
+                delay(BACKGROUND_CLEAR_RETRY_DELAY_MS * attempt)
+                result = clearDataAction.clearDataForSpecificDomains(visitedSites)
+                attempt++
+            }
+            return result
+        }
+
         return if (androidBrowserConfigFeature.backgroundSingleTabDataClearing().isEnabled()) {
             tearDownTab()
             appCoroutineScope.launch {
                 try {
-                    val result = clearDataAction.clearDataForSpecificDomains(visitedSites)
+                    val result = clearSiteDataWithRetry()
                     clearChatsAndHistory()
                     completeWideEvent(result)
                     logcat { "Single tab clear completed (background) for tab: $tabId" }
@@ -309,5 +322,13 @@ class DataClearing @Inject constructor(
         }
 
         logcat { "Granular clear completed" }
+    }
+
+    private companion object {
+        // Total attempts (1 initial + retries) for the background single-tab site-data clear.
+        private const val MAX_BACKGROUND_CLEAR_ATTEMPTS = 3
+
+        // Base backoff between background clear retries; multiplied by the attempt number.
+        private const val BACKGROUND_CLEAR_RETRY_DELAY_MS = 1_000L
     }
 }

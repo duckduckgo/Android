@@ -45,6 +45,7 @@ import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.history.api.NavigationHistory
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -60,6 +61,7 @@ import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.isNull
 import org.mockito.kotlin.never
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
@@ -797,6 +799,36 @@ class DataClearingTest {
 
         testee.clearSingleTabData("tab1")
 
+        verify(mockDataClearingWideEvent).finishFailure(exception)
+    }
+
+    @Test
+    fun whenBackgroundClearFailsThenSucceedsOnRetry_thenWideEventFinishedWithSuccess() = runTest {
+        fakeAndroidBrowserConfigFeature.backgroundSingleTabDataClearing().setRawStoredState(State(enable = true))
+        whenever(mockTabVisitedSitesRepository.getVisitedSites("tab1")).thenReturn(emptySet())
+        whenever(mockClearDataAction.clearDataForSpecificDomains(any()))
+            .thenReturn(ClearDataResult.Error(RuntimeException("transient")))
+            .thenReturn(ClearDataResult.Success)
+
+        testee.clearSingleTabData("tab1")
+        coroutineTestRule.testScope.advanceUntilIdle()
+
+        verify(mockClearDataAction, times(2)).clearDataForSpecificDomains(any())
+        verify(mockDataClearingWideEvent).finishSuccess()
+        verify(mockDataClearingWideEvent, never()).finishFailure(any())
+    }
+
+    @Test
+    fun whenBackgroundClearKeepsFailing_thenRetriesUpToMaxAndWideEventFinishedWithFailure() = runTest {
+        fakeAndroidBrowserConfigFeature.backgroundSingleTabDataClearing().setRawStoredState(State(enable = true))
+        whenever(mockTabVisitedSitesRepository.getVisitedSites("tab1")).thenReturn(emptySet())
+        val exception = RuntimeException("persistent")
+        whenever(mockClearDataAction.clearDataForSpecificDomains(any())).thenReturn(ClearDataResult.Error(exception))
+
+        testee.clearSingleTabData("tab1")
+        coroutineTestRule.testScope.advanceUntilIdle()
+
+        verify(mockClearDataAction, times(3)).clearDataForSpecificDomains(any())
         verify(mockDataClearingWideEvent).finishFailure(exception)
     }
 
