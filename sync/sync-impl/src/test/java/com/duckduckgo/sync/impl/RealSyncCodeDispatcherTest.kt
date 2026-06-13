@@ -608,6 +608,44 @@ class RealSyncCodeDispatcherTest {
         assertEquals(DispatchOutcome.LoggedIn, outcome)
     }
 
+    @Test fun `presentV2 maps a version-too-new SessionError to UpgradeRequired`() = runTest {
+        // The runner emits this exact message when a peer envelope needs a higher protocol major
+        // (ExchangeV2Runner: "Peer requires protocol v<N>; please update this app"). The Presenter
+        // polls just like the Scanner, so it must surface UpgradeRequired, not a generic Failed.
+        val outcome = withTimeoutOrNull(1000) {
+            val job = async(start = kotlinx.coroutines.CoroutineStart.UNDISPATCHED) { dispatcher.presentV2().first() }
+            runnerEventsFlow.emit(
+                ExchangeV2Event.SessionError(
+                    timestampMs = System.currentTimeMillis(),
+                    message = "Peer requires protocol v3; please update this app",
+                ),
+            )
+            job.await()
+        }
+        assertEquals(DispatchOutcome.UpgradeRequired(codeMajor = 3), outcome)
+    }
+
+    @Test fun `route LinkingV2 maps a version-too-new SessionError to UpgradeRequired`() = runTest {
+        // Locks the existing Scanner-side behaviour (previously untested) so it can't regress when
+        // the mapping is shared with the Presenter side.
+        setV2(true)
+        whenever(qrCode.parse(any())).thenReturn(
+            ExchangeV2CodeParseResult.LinkingV2(channelId = "c", publicKey = "k", version = "2"),
+        )
+        val outcome = withTimeoutOrNull(1000) {
+            val flow = (dispatcher.route("v2-url") as RouteDecision.V2InProgress).outcomes
+            val job = async(start = kotlinx.coroutines.CoroutineStart.UNDISPATCHED) { flow.first() }
+            runnerEventsFlow.emit(
+                ExchangeV2Event.SessionError(
+                    timestampMs = System.currentTimeMillis(),
+                    message = "Peer requires protocol v3; please update this app",
+                ),
+            )
+            job.await()
+        }
+        assertEquals(DispatchOutcome.UpgradeRequired(codeMajor = 3), outcome)
+    }
+
     @Test fun `presentV2 emits Failed user_denied when Host_Aborted carries UserDeniedHost trigger`() = runTest {
         val outcome = withTimeoutOrNull(1000) {
             val job = async(start = kotlinx.coroutines.CoroutineStart.UNDISPATCHED) { dispatcher.presentV2().first() }

@@ -150,7 +150,7 @@ class RealSyncCodeDispatcher @Inject constructor(
             ExchangeV2State.Aborted -> DispatchOutcome.Failed("negotiation_aborted", NEGOTIATION_ABORTED.code)
             else -> null
         }
-        is ExchangeV2Event.SessionError -> DispatchOutcome.Failed(event.message, PAIRING_FAILED.code)
+        is ExchangeV2Event.SessionError -> sessionErrorToOutcome(event.message)
         else -> null
     }
 
@@ -333,15 +333,19 @@ class RealSyncCodeDispatcher @Inject constructor(
             ExchangeV2State.Aborted -> DispatchOutcome.Failed("negotiation_aborted", NEGOTIATION_ABORTED.code)
             else -> null
         }
-        is ExchangeV2Event.SessionError -> {
-            val match = VERSION_TOO_NEW_REGEX.find(event.message)
-            if (match != null) {
-                DispatchOutcome.UpgradeRequired(codeMajor = match.groupValues[1].toIntOrNull() ?: -1)
-            } else {
-                DispatchOutcome.Failed(event.message, PAIRING_FAILED.code)
-            }
-        }
+        is ExchangeV2Event.SessionError -> sessionErrorToOutcome(event.message)
         else -> null
+    }
+
+    /** A version-too-new SessionError (peer needs a higher protocol major) becomes an upgrade
+     *  prompt; anything else is a generic failure. Shared so the Present/Scanner mappers can't drift. */
+    private fun sessionErrorToOutcome(message: String): DispatchOutcome {
+        val match = VERSION_TOO_NEW_REGEX.find(message)
+        return if (match != null) {
+            DispatchOutcome.UpgradeRequired(codeMajor = match.groupValues[1].toIntOrNull() ?: -1)
+        } else {
+            DispatchOutcome.Failed(message, PAIRING_FAILED.code)
+        }
     }
 
     /**
