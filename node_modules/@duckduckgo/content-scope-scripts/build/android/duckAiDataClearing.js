@@ -218,6 +218,9 @@
     }
   };
   function processAttr(configSetting, defaultValue) {
+    if (typeof defaultValue === "number" && isNaN(defaultValue)) {
+      defaultValue = void 0;
+    }
     if (configSetting === void 0) {
       return defaultValue;
     }
@@ -3220,9 +3223,10 @@
       const conditionalChanges = this._getFeatureSettings()?.[featureKeyName] || [];
       return conditionalChanges.filter((rule) => {
         let condition = rule.condition;
-        if (condition === void 0 && "domain" in rule) {
+        if (condition === void 0 && rule.domain !== void 0) {
           condition = this._domainToConditonBlocks(rule.domain);
         }
+        if (condition === void 0) return true;
         return this._matchConditionalBlockOrArray(condition);
       });
     }
@@ -4000,15 +4004,19 @@
   // src/features/duck-ai-data-clearing.js
   var DuckAiDataClearing = class extends ContentFeature {
     init() {
-      this.messaging.subscribe("duckAiClearData", (params) => this.clearData(params));
+      this.messaging.subscribe("duckAiClearData", (params) => {
+        void this.clearData(params);
+      });
       this.notify("duckAiClearDataReady");
     }
     /**
-     * @param {object} [params]
-     * @param {string} [params.chatId] - If provided, only delete this specific chat; otherwise clear all data
+     * @param {unknown} [params]
      */
     clearData(params) {
-      const chatId = params?.chatId;
+      const chatId = params !== null && typeof params === "object" && "chatId" in params ? (
+        /** @type {{ chatId?: string }} */
+        params.chatId
+      ) : void 0;
       if (chatId) {
         return this.deleteSingleChat(chatId);
       } else {
@@ -4062,7 +4070,7 @@
         try {
           operation(key);
         } catch (error) {
-          errors.push(error);
+          errors.push(error instanceof Error ? error : new Error(String(error)));
           this.log.error("Error in localStorage operation:", error);
         }
       }
@@ -4080,7 +4088,7 @@
             operation(objectStore, transaction, dbName, storeName);
           });
         } catch (error) {
-          errors.push(error);
+          errors.push(error instanceof Error ? error : new Error(String(error)));
           this.log.error("Error in IndexedDB operation:", error);
         }
       }
@@ -4125,6 +4133,9 @@
         this.log.info(`Chat '${chatId}' not found in '${localStorageKey}'`);
       }
     }
+    /**
+     * @param {string} localStorageKey
+     */
     clearSavedAIChats(localStorageKey) {
       this.log.info(`Clearing '${localStorageKey}'`);
       window.localStorage.removeItem(localStorageKey);

@@ -1742,6 +1742,9 @@
     }
   };
   function processAttr(configSetting, defaultValue) {
+    if (typeof defaultValue === "number" && isNaN(defaultValue)) {
+      defaultValue = void 0;
+    }
     if (configSetting === void 0) {
       return defaultValue;
     }
@@ -4822,9 +4825,10 @@
       const conditionalChanges = this._getFeatureSettings()?.[featureKeyName] || [];
       return conditionalChanges.filter((rule) => {
         let condition2 = rule.condition;
-        if (condition2 === void 0 && "domain" in rule) {
+        if (condition2 === void 0 && rule.domain !== void 0) {
           condition2 = this._domainToConditonBlocks(rule.domain);
         }
+        if (condition2 === void 0) return true;
         return this._matchConditionalBlockOrArray(condition2);
       });
     }

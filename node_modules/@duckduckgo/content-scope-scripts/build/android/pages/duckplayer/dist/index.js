@@ -2987,7 +2987,7 @@
   }
   function getErrorType(windowObject, signInRequiredSelector, logger) {
     const currentWindow = (
-      /** @type {Window & typeof globalThis & { ytcfg: object }} */
+      /** @type {Window & typeof globalThis & { ytcfg?: { get: (key: string) => unknown } }} */
       windowObject
     );
     const currentDocument = currentWindow.document;
@@ -3002,9 +3002,13 @@
       logger?.log("Got ytcfg", currentWindow.ytcfg);
     }
     try {
-      const playerResponseJSON = currentWindow.ytcfg?.get("PLAYER_VARS")?.embedded_player_response;
+      const playVars = currentWindow.ytcfg?.get("PLAYER_VARS");
+      const raw = typeof playVars === "object" && playVars !== null && "embedded_player_response" in playVars ? playVars.embedded_player_response : void 0;
+      const playerResponseJSON = typeof raw === "string" ? raw : void 0;
       logger?.log("Player response", playerResponseJSON);
-      playerResponse = JSON.parse(playerResponseJSON);
+      if (playerResponseJSON) {
+        playerResponse = JSON.parse(playerResponseJSON);
+      }
     } catch (e3) {
       logger?.log("Could not parse player response", e3);
     }
@@ -3300,7 +3304,7 @@
     /**
      * Convert a relative pathname into VideoParams
      *
-     * @param pathname
+     * @param {string} pathname
      * @returns {VideoParams|null}
      */
     static fromPathname(pathname) {
@@ -3316,7 +3320,7 @@
      * Convert a href into valid video params. Those can then be converted into a private player
      * link when needed
      *
-     * @param href
+     * @param {string} href
      * @returns {VideoParams|null}
      */
     static fromHref(href) {

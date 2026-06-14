@@ -1098,6 +1098,9 @@
     }
   };
   function processAttr(configSetting, defaultValue) {
+    if (typeof defaultValue === "number" && isNaN(defaultValue)) {
+      defaultValue = void 0;
+    }
     if (configSetting === void 0) {
       return defaultValue;
     }
@@ -4695,9 +4698,10 @@
       const conditionalChanges = this._getFeatureSettings()?.[featureKeyName] || [];
       return conditionalChanges.filter((rule) => {
         let condition = rule.condition;
-        if (condition === void 0 && "domain" in rule) {
+        if (condition === void 0 && rule.domain !== void 0) {
           condition = this._domainToConditonBlocks(rule.domain);
         }
+        if (condition === void 0) return true;
         return this._matchConditionalBlockOrArray(condition);
       });
     }
@@ -6574,6 +6578,9 @@
   var hideTimeouts = [0, 100, 300, 500, 1e3, 2e3, 3e3];
   var unhideTimeouts = [1250, 2250, 3e3];
   var featureInstance;
+  function hasSelector(rule) {
+    return "selector" in rule;
+  }
   function collapseDomNode(element, rule, previousElement) {
     if (!element) {
       return;
@@ -6715,16 +6722,9 @@
     let selector = "";
     rules.forEach((rule, i) => {
       if (i !== rules.length - 1) {
-        selector = selector.concat(
-          /** @type {ElementHidingRuleHide | ElementHidingRuleModify} */
-          rule.selector,
-          ","
-        );
+        selector = selector.concat(rule.selector, ",");
       } else {
-        selector = selector.concat(
-          /** @type {ElementHidingRuleHide | ElementHidingRuleModify} */
-          rule.selector
-        );
+        selector = selector.concat(rule.selector);
       }
     });
     const styleTagProperties = "display:none!important;min-height:0!important;height:0!important;";
@@ -6734,11 +6734,8 @@
   }
   function hideAdNodes(rules) {
     const document2 = globalThis.document;
-    rules.forEach((rule) => {
-      const selector = forgivingSelector(
-        /** @type {ElementHidingRuleHide | ElementHidingRuleModify} */
-        rule.selector
-      );
+    rules.filter(hasSelector).forEach((rule) => {
+      const selector = forgivingSelector(rule.selector);
       const matchingElementArray = [...document2.querySelectorAll(selector)];
       matchingElementArray.forEach((element) => {
         collapseDomNode(element, rule);
@@ -6778,14 +6775,15 @@
         shouldInjectStyleTag = this.matchConditionalFeatureSetting("styleTagExceptions").length === 0;
       }
       const activeDomainRules = this.matchConditionalFeatureSetting("domains").flatMap((item) => {
-        return (
+        return Array.isArray(item.rules) ? (
           /** @type {ElementHidingRule[]} */
-          item.rules || []
-        );
+          item.rules
+        ) : [];
       });
-      const overrideRules = activeDomainRules.filter((rule) => {
-        return rule.type === "override";
-      });
+      const overrideRules = activeDomainRules.filter(
+        /** @returns {rule is ElementHidingRuleHide} */
+        (rule) => rule.type === "override"
+      );
       const disableDefault = activeDomainRules.some((rule) => {
         return rule.type === "disable-default";
       });
@@ -6798,7 +6796,7 @@
       }
       overrideRules.forEach((override) => {
         activeRules = activeRules.filter((rule) => {
-          return rule.selector !== override.selector;
+          return !hasSelector(rule) || rule.selector !== override.selector;
         });
       });
       const applyRules = this.applyRules.bind(this);
@@ -9645,14 +9643,24 @@
      * @param {(userValues: import("../duck-player.js").UserValues) => void} cb
      */
     onUserValuesChanged(cb) {
-      return this.messaging.subscribe("onUserValuesChanged", cb);
+      return this.messaging.subscribe("onUserValuesChanged", (value) => {
+        cb(
+          /** @type {import("../duck-player.js").UserValues} */
+          value
+        );
+      });
     }
     /**
      * Get notification when ui settings changed
      * @param {(userValues: import("../duck-player.js").UISettings) => void} cb
      */
     onUIValuesChanged(cb) {
-      return this.messaging.subscribe("onUIValuesChanged", cb);
+      return this.messaging.subscribe("onUIValuesChanged", (value) => {
+        cb(
+          /** @type {import("../duck-player.js").UISettings} */
+          value
+        );
+      });
     }
     /**
      * This allows our SERP to interact with Duck Player settings.
@@ -9896,7 +9904,7 @@
     /**
      * Convert a relative pathname into VideoParams
      *
-     * @param pathname
+     * @param {string} pathname
      * @returns {VideoParams|null}
      */
     static fromPathname(pathname) {
@@ -9912,7 +9920,7 @@
      * Convert a href into valid video params. Those can then be converted into a private player
      * link when needed
      *
-     * @param href
+     * @param {string} href
      * @returns {VideoParams|null}
      */
     static fromHref(href) {
@@ -9943,12 +9951,16 @@
   var DomState = class {
     constructor() {
       __publicField(this, "loaded", false);
+      /** @type {Array<() => void>} */
       __publicField(this, "loadedCallbacks", []);
       window.addEventListener("DOMContentLoaded", () => {
         this.loaded = true;
         this.loadedCallbacks.forEach((cb) => cb());
       });
     }
+    /**
+     * @param {() => void} loadedCallback
+     */
     onLoaded(loadedCallback) {
       if (this.loaded) return loadedCallback();
       this.loadedCallbacks.push(loadedCallback);
@@ -10397,10 +10409,17 @@
       }
       return window.location.href;
     }
+    /**
+     * @param {string} videoId
+     * @returns {string}
+     */
     getLargeThumbnailSrc(videoId) {
       const url = new URL(`/vi/${videoId}/maxresdefault.jpg`, "https://i.ytimg.com");
       return url.href;
     }
+    /**
+     * @param {string} href
+     */
     setHref(href) {
       window.location.href = href;
     }
@@ -10476,8 +10495,12 @@
         });
         let clicked = false;
         const clickHandler = (e) => {
-          const overlay = icon.getHoverOverlay();
-          if (overlay?.contains(e.target)) {
+          const overlay = (
+            /** @type {HTMLElement | null} */
+            icon.getHoverOverlay()
+          );
+          const target = e.target;
+          if (overlay && target instanceof Node && overlay.contains(target)) {
           } else if (overlay) {
             clicked = true;
             icon.hideOverlay(overlay);
@@ -10489,7 +10512,10 @@
         };
         parentNode.addEventListener("click", clickHandler, true);
         const removeOverlay = () => {
-          const overlay = icon.getHoverOverlay();
+          const overlay = (
+            /** @type {HTMLElement | null} */
+            icon.getHoverOverlay()
+          );
           if (overlay) {
             icon.hideOverlay(overlay);
             icon.hoverOverlayVisible = false;
@@ -10513,10 +10539,11 @@
           if (!hoverElement.querySelector("img")) {
             return removeOverlay();
           }
-          if (e.target === hoverElement || hoverElement?.contains(e.target)) {
+          const target = e.target;
+          if (target === hoverElement || target instanceof Node && hoverElement?.contains(target)) {
             return appendOverlay(hoverElement);
           }
-          const matched = selectors.allowedEventTargets.find((css) => e.target.matches(css));
+          const matched = target instanceof Element && selectors.allowedEventTargets.find((css) => target.matches(css));
           if (matched) {
             appendOverlay(hoverElement);
           }
@@ -10561,10 +10588,11 @@
           if (!validLink) {
             return;
           }
-          if (e.target === elementInStack || elementInStack?.contains(e.target)) {
+          const target = e.target;
+          if (target === elementInStack || target instanceof Node && elementInStack?.contains(target)) {
             return block(validLink);
           }
-          const matched = selectors.allowedEventTargets.find((css) => e.target.matches(css));
+          const matched = target instanceof Element && selectors.allowedEventTargets.find((css) => target.matches(css));
           if (matched) {
             block(validLink);
           }
@@ -10603,8 +10631,10 @@
       return false;
     });
     if (existsInExcludedParent) return null;
-    if (!("href" in element)) return null;
-    return VideoParams.fromHref(element.href)?.toPrivatePlayerUrl();
+    if (!("href" in element) || typeof element.href !== "string") return null;
+    const href = element.href;
+    if (typeof href !== "string") return null;
+    return VideoParams.fromHref(href)?.toPrivatePlayerUrl();
   }
 
   // src/features/duckplayer/video-overlay.js
@@ -11424,8 +11454,8 @@
      */
     appendThumbnail(overlayElement) {
       const params = VideoParams.forWatchPage(this.environment.getPlayerPageHref());
-      const videoId = params?.id;
-      const imageUrl = this.environment.getLargeThumbnailSrc(videoId);
+      if (!params) return;
+      const imageUrl = this.environment.getLargeThumbnailSrc(params.id);
       appendImageAsBackground(overlayElement, ".ddg-vpo-bg", imageUrl);
     }
     /**
