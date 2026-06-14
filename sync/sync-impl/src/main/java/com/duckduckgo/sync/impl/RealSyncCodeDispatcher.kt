@@ -124,11 +124,7 @@ class RealSyncCodeDispatcher @Inject constructor(
             ExchangeV2State.Host.Confirming ->
                 DispatchOutcome.HostConfirmationRequested(peerName = runner.peerName)
             ExchangeV2State.Host.Done -> DispatchOutcome.LoggedIn
-            ExchangeV2State.Host.Aborted -> when (event.localTrigger) {
-                LocalTrigger.UserDeniedHost -> DispatchOutcome.Failed("user_denied", PAIRING_CANCELLED.code)
-                LocalTrigger.HostUnavailable -> DispatchOutcome.Failed("host_unavailable", PAIRING_UNAVAILABLE.code)
-                else -> DispatchOutcome.Failed("host_aborted", NEGOTIATION_ABORTED.code)
-            }
+            ExchangeV2State.Host.Aborted -> hostAbortedToOutcome(event.localTrigger)
             ExchangeV2State.SameAccountAbort -> DispatchOutcome.AlreadyConnected
             ExchangeV2State.Joiner.Done -> {
                 val received = (event.trigger as? ExchangeV2Message.RecoveryCodeResponse)?.recoveryCode
@@ -325,7 +321,7 @@ class RealSyncCodeDispatcher @Inject constructor(
                 else -> DispatchOutcome.Failed("Pairing aborted by peer", PAIRING_REJECTED.code)
             }
             ExchangeV2State.Joiner.AbortedLocal -> DispatchOutcome.Failed("Pairing cancelled on this device", PAIRING_CANCELLED.code)
-            ExchangeV2State.Host.Aborted -> DispatchOutcome.Failed("Pairing aborted", NEGOTIATION_ABORTED.code)
+            ExchangeV2State.Host.Aborted -> hostAbortedToOutcome(event.localTrigger)
             // Per spec §"Same-account case": not an abort; both devices share an account already.
             ExchangeV2State.SameAccountAbort -> DispatchOutcome.AlreadyConnected
             // Elected Host and shared a recovery code — success from this device's perspective.
@@ -346,6 +342,15 @@ class RealSyncCodeDispatcher @Inject constructor(
         } else {
             DispatchOutcome.Failed(message, PAIRING_FAILED.code)
         }
+    }
+
+    /** Host abort reason → outcome: user-denied vs host-can't-share carry distinct codes
+     *  (spec: recovery_code_denied vs recovery_code_unavailable). Shared so the Present/Scanner
+     *  mappers can't drift. */
+    private fun hostAbortedToOutcome(localTrigger: LocalTrigger?): DispatchOutcome = when (localTrigger) {
+        LocalTrigger.UserDeniedHost -> DispatchOutcome.Failed("user_denied", PAIRING_CANCELLED.code)
+        LocalTrigger.HostUnavailable -> DispatchOutcome.Failed("host_unavailable", PAIRING_UNAVAILABLE.code)
+        else -> DispatchOutcome.Failed("host_aborted", NEGOTIATION_ABORTED.code)
     }
 
     /**

@@ -646,6 +646,46 @@ class RealSyncCodeDispatcherTest {
         assertEquals(DispatchOutcome.UpgradeRequired(codeMajor = 3), outcome)
     }
 
+    @Test fun `route LinkingV2 - Host_Aborted with UserDeniedHost maps to Failed PAIRING_CANCELLED`() = runTest {
+        setV2(true)
+        whenever(qrCode.parse(any())).thenReturn(
+            ExchangeV2CodeParseResult.LinkingV2(channelId = "c", publicKey = "k", version = "2"),
+        )
+        val outcome = withTimeoutOrNull(1000) {
+            val flow = (dispatcher.route("v2-url") as RouteDecision.V2InProgress).outcomes
+            val job = async(start = kotlinx.coroutines.CoroutineStart.UNDISPATCHED) { flow.first() }
+            runnerEventsFlow.emit(
+                transition(
+                    from = ExchangeV2State.Host.Confirming,
+                    to = ExchangeV2State.Host.Aborted,
+                    localTrigger = LocalTrigger.UserDeniedHost,
+                ),
+            )
+            job.await()
+        }
+        assertEquals(DispatchOutcome.Failed("user_denied", PAIRING_CANCELLED.code), outcome)
+    }
+
+    @Test fun `route LinkingV2 - Host_Aborted with HostUnavailable maps to Failed PAIRING_UNAVAILABLE`() = runTest {
+        setV2(true)
+        whenever(qrCode.parse(any())).thenReturn(
+            ExchangeV2CodeParseResult.LinkingV2(channelId = "c", publicKey = "k", version = "2"),
+        )
+        val outcome = withTimeoutOrNull(1000) {
+            val flow = (dispatcher.route("v2-url") as RouteDecision.V2InProgress).outcomes
+            val job = async(start = kotlinx.coroutines.CoroutineStart.UNDISPATCHED) { flow.first() }
+            runnerEventsFlow.emit(
+                transition(
+                    from = ExchangeV2State.Host.Sending,
+                    to = ExchangeV2State.Host.Aborted,
+                    localTrigger = LocalTrigger.HostUnavailable,
+                ),
+            )
+            job.await()
+        }
+        assertEquals(DispatchOutcome.Failed("host_unavailable", PAIRING_UNAVAILABLE.code), outcome)
+    }
+
     @Test fun `presentV2 emits Failed user_denied when Host_Aborted carries UserDeniedHost trigger`() = runTest {
         val outcome = withTimeoutOrNull(1000) {
             val job = async(start = kotlinx.coroutines.CoroutineStart.UNDISPATCHED) { dispatcher.presentV2().first() }
