@@ -68,17 +68,9 @@ class RealSyncCodeDispatcher @Inject constructor(
     }
 
     /**
-     * Drive a v2 Presenter session. Mirrors [driveV2Linking] but for the Presenter side:
-     * starts the runner via [ExchangeV2Runner.startPresent], scopes to events emitted after
-     * session start (defensive against the runner's SharedFlow replay cache), and maps each
-     * event to a [DispatchOutcome] via [mapV2PresentEventToOutcome].
-     *
-     * Today's callers include both the signed-in `SyncWithAnotherActivityViewModel` and the
-     * signed-out `SyncConnectViewModel` (per M1.5, Asana subtask `1215246284113165`). Role
-     * election in the runner can elect this device as Host (signed-in surface, or signed-out
-     * against a signed-out peer with account-creation-on-demand at Host.Sending — see
-     * `1215168582640073`) or as Joiner (signed-out surface against a signed-in or 3party peer).
-     * All terminal mappings are first-class; see `mapV2PresentEventToOutcome` for the table.
+     * Drive a v2 Presenter session: start the runner via [ExchangeV2Runner.startPresent] and map
+     * each event to a [DispatchOutcome] via [mapV2PresentEventToOutcome]. Role election may elect
+     * this device as either Host or Joiner.
      */
     override fun presentV2(): Flow<DispatchOutcome> = flow {
         val sessionStartMs = System.currentTimeMillis()
@@ -88,13 +80,8 @@ class RealSyncCodeDispatcher @Inject constructor(
         emitAll(
             runner.eventsSince(sessionStartMs)
                 .transformWhile { event ->
-                    // Latch our session's channelId on the first SessionStarted. If a later
-                    // SessionStarted arrives with a different channelId, the shared runner has
-                    // been preempted by another caller (route()/startScan from EnterCode, for
-                    // example). Terminate silently without emitting any DispatchOutcome — the
-                    // new caller's Flow now owns the runner. Defence-in-depth against the
-                    // duplicate-login race; the activity-side lifecycle scope normally prevents
-                    // this from happening at all, but this catches the transition window.
+                    // A later SessionStarted with a different channelId means another caller has
+                    // preempted the shared runner; terminate silently so its Flow owns the runner.
                     if (event is ExchangeV2Event.SessionStarted) {
                         if (ownChannelId == null) {
                             ownChannelId = event.ownChannelId
@@ -111,9 +98,8 @@ class RealSyncCodeDispatcher @Inject constructor(
         logcat { "$TAG: V2 Presenter flow completed" }
     }.onCompletion { cause ->
         if (cause != null) {
-            // Flow cancelled or threw before reaching a terminal SM state — tear down the
-            // runner session so the channel DELETE fires (best-effort).
-            // Spec: Unified Algorithm §Aborting; Track B subtask 1215139308232508.
+            // Cancelled/threw before a terminal state — tear down the session so the channel
+            // DELETE fires. Spec: Unified Algorithm §Aborting.
             logcat { "$TAG: V2 Presenter flow completed with cause=${cause::class.simpleName}; cancelling runner" }
             runner.cancel()
         }
@@ -121,17 +107,8 @@ class RealSyncCodeDispatcher @Inject constructor(
 
     /**
      * Translate one runner event into a [DispatchOutcome] for the v2 Presenter flow,
-     * or null for intermediate events the caller should ignore.
-     *
-     * The Joiner.* branches were defensive stubs in M1 (the signed-in surface always elects
-     * Host via role-election rule 1: account-beats-no-account). M1.5 wires `SyncConnectViewModel`
-     * (signed-out surface) to `presentV2`, so a signed-out Presenter facing a signed-in peer
-     * is now elected Joiner — these branches are first-class. Mirrors mapV2LinkingEventToOutcome
-     * behaviour (login on Joiner.Done; preserve abort reason).
-     *
-     * See Asana subtask `1215246284113165` for the M1.5 wire-up and `1215168582640073` for the
-     * runner-side account-provisioning at Host.Sending (used by signed-out Presenter ↔ signed-out
-     * peer scenarios where this device wins Presenter-beats-Scanner).
+     * or null for intermediate events the caller should ignore. Both Host and Joiner roles are
+     * reachable here; mirrors [mapV2LinkingEventToOutcome] (login on Joiner.Done, preserve abort reason).
      */
     private fun mapV2PresentEventToOutcome(event: ExchangeV2Event): DispatchOutcome? = when (event) {
         is ExchangeV2Event.SessionStarted -> event.linkingCode?.let { DispatchOutcome.LinkingCodeReady(it) }
@@ -171,8 +148,7 @@ class RealSyncCodeDispatcher @Inject constructor(
         val v2Enabled = syncFeature.canUseV2ConnectFlow().isEnabled()
         logcat { "$TAG: route() called, canUseV2ConnectFlow=$v2Enabled" }
         if (!v2Enabled) {
-            // Flag off → never look at v2 shapes. Behaviour is byte-identical to direct
-            // parseSyncAuthCode + the caller's existing handling.
+            // Flag off → never look at v2 shapes; defer entirely to the v1 path.
             return legacy(pastedCode, reason = "FF off")
         }
         return classifyV2(pastedCode)
@@ -235,10 +211,8 @@ class RealSyncCodeDispatcher @Inject constructor(
             }
             CID_3PARTY -> {
                 // joinAccountFromThirdPartyRecoveryCode takes the bare b64 code; re-encode the
-                // inner recovery JSON so we don't need to crack the original URL fragment. Mint via
-                // Moshi (NOT org.json) so we never emit AOSP JSONObject.toString()'s '/' -> '\/'
-                // escaping; the consumer (parseThirdPartyRecoveryCode) is Moshi too. Real 3party
-                // secrets are base64url (slash-free) but this keeps every v2 producer consistent.
+                // inner recovery JSON. Mint via Moshi (not org.json) to match the Moshi consumer
+                // parseThirdPartyRecoveryCode and avoid non-canonical JSON escaping.
                 val rewrapped = thirdPartyRecoveryCodeAdapter.toJson(
                     ThirdPartyRecoveryCodeWrapper(
                         recovery = ThirdPartyRecoveryCode(
@@ -264,18 +238,10 @@ class RealSyncCodeDispatcher @Inject constructor(
     }
 
     /**
-     * V2 LinkingV2 (`code2=…`) scanner side. Kicks off [ExchangeV2Runner.startScan] and observes
-     * its event stream — scoped via [ExchangeV2Runner.eventsSince] to ignore stale replayed
-     * events from prior sessions — emitting outcomes as the SM progresses:
-     *
-     *  - [DispatchOutcome.JoinerConfirmationRequested] when the SM reaches Joiner.Confirming
-     *    (caller must show a prompt and call [confirmJoiner] / [denyJoiner])
-     *  - [DispatchOutcome.HostConfirmationRequested] when the SM reaches Host.Confirming
-     *    (caller must show a prompt and call [confirmHost] / [denyHost])
-     *  - A single terminal outcome ([LoggedIn] / [Failed] / etc.), after which the Flow completes
-     *
-     * Intermediate events (non-terminal transitions, MessageSent, etc.) are filtered via
-     * [mapV2LinkingEventToOutcome] returning null and don't trigger emissions.
+     * V2 LinkingV2 (`code2=…`) scanner side. Starts [ExchangeV2Runner.startScan] and maps its
+     * events to outcomes via [mapV2LinkingEventToOutcome]: confirmation requests (caller shows a
+     * prompt and calls [confirmJoiner]/[denyJoiner] or [confirmHost]/[denyHost]) then a single
+     * terminal outcome that completes the Flow.
      */
     private fun driveV2Linking(pastedCode: String): Flow<DispatchOutcome> = flow {
         val sessionStartMs = System.currentTimeMillis()
@@ -285,8 +251,8 @@ class RealSyncCodeDispatcher @Inject constructor(
         emitAll(
             runner.eventsSince(sessionStartMs)
                 .transformWhile { event ->
-                    // Same preemption guard as presentV2(). Defence-in-depth against another
-                    // caller invoking startScan or startPresent on the shared runner mid-flow.
+                    // Same preemption guard as presentV2(): bail if another caller takes over the
+                    // shared runner mid-flow.
                     if (event is ExchangeV2Event.SessionStarted) {
                         if (ownChannelId == null) {
                             ownChannelId = event.ownChannelId
@@ -303,9 +269,8 @@ class RealSyncCodeDispatcher @Inject constructor(
         logcat { "$TAG: V2 LinkingV2 flow completed" }
     }.onCompletion { cause ->
         if (cause != null) {
-            // Flow cancelled or threw before reaching a terminal SM state — tear down the
-            // runner session so the channel DELETE fires (best-effort).
-            // Spec: Unified Algorithm §Aborting; Track B subtask 1215139308232508.
+            // Cancelled/threw before a terminal state — tear down the session so the channel
+            // DELETE fires. Spec: Unified Algorithm §Aborting.
             logcat { "$TAG: V2 LinkingV2 flow completed with cause=${cause::class.simpleName}; cancelling runner" }
             runner.cancel()
         }
@@ -347,11 +312,9 @@ class RealSyncCodeDispatcher @Inject constructor(
             }
             ExchangeV2State.Joiner.AbortedLocal -> DispatchOutcome.Failed("Pairing cancelled on this device")
             ExchangeV2State.Host.Aborted -> DispatchOutcome.Failed("Pairing aborted")
-            // Per spec §"Same-account case": NOT an abort. Surface as a friendly "Connected"
-            // finish — both devices are already on the same account, nothing to do.
+            // Per spec §"Same-account case": not an abort; both devices share an account already.
             ExchangeV2State.SameAccountAbort -> DispatchOutcome.AlreadyConnected
-            // Scanner-side Host.Done means we were elected Host and have shared a recovery
-            // code with the peer — successful pairing from this device's perspective.
+            // Elected Host and shared a recovery code — success from this device's perspective.
             ExchangeV2State.Host.Done -> DispatchOutcome.LoggedIn
             ExchangeV2State.Aborted -> DispatchOutcome.Failed("negotiation_aborted")
             else -> null
@@ -368,14 +331,10 @@ class RealSyncCodeDispatcher @Inject constructor(
     }
 
     /**
-     * Apply a v2 recovery code received over the LinkingV2 channel. The received string is the
-     * raw base64-encoded v2 recovery payload (`{recovery:{user_id, secret, cid, v}}`).
-     *
-     * Per spec §"Exchange Share Recovery Code → Joiner":
-     *   - cid=ddg: log in directly (processCode with v1 Recovery shape, same primary_key+user_id fields)
-     *   - cid=3party: upgrade the account (joinAccountFromThirdPartyRecoveryCode wraps the
-     *     "Native joining a 3party account" subroutine — POST /access-credentials/ddg, re-encrypt
-     *     keys, log in with ddg credentials)
+     * Apply a v2 recovery code received over the LinkingV2 channel (raw base64
+     * `{recovery:{user_id, secret, cid, v}}`). Per spec §"Exchange Share Recovery Code → Joiner":
+     * cid=ddg logs in directly; cid=3party upgrades the account via
+     * [SyncAccountRepository.joinAccountFromThirdPartyRecoveryCode].
      */
     private fun loginWithV2RecoveryCode(b64: String): DispatchOutcome {
         val parsed = decodeV2Recovery(b64) ?: return DispatchOutcome.Failed("Couldn't parse received recovery code as v2.0")
@@ -416,12 +375,9 @@ class RealSyncCodeDispatcher @Inject constructor(
     }.getOrNull()
 
     /**
-     * The v2 wire `secret` is base64url-encoded per spec 1214802412121967; Android's native v1
-     * login (SyncNativeLib.decodeKey → android.util.Base64 standard) decodes the primary_key as
-     * STANDARD base64. Re-encode the same key bytes to canonical standard base64 at the v2->v1
-     * boundary, otherwise a conformant peer's base64url secret (macOS/iOS/FE) throws "bad base-64"
-     * (LOGIN_FAILED). Normalising the alphabet first also tolerates an already-standard secret from
-     * a non-conformant/older Android peer. Returns null if the secret isn't valid base64 at all.
+     * v2 wire `secret` is base64url (spec 1214802412121967); re-encode to standard base64 for the
+     * v1 native login, normalising the alphabet first to also tolerate an already-standard secret.
+     * Returns null if the secret isn't valid base64.
      */
     private fun v2SecretToV1PrimaryKey(secret: String): String? = runCatching {
         val bytes = Base64.decode(secret.replace('-', '+').replace('_', '/'), Base64.NO_WRAP)
@@ -431,15 +387,13 @@ class RealSyncCodeDispatcher @Inject constructor(
     /**
      * Map a repo [Result] to a [DispatchOutcome].
      *
-     * If [codeForAccountSwitch] is supplied AND the repo failed with [ALREADY_SIGNED_IN], the
-     * dispatcher transparently calls [SyncAccountRepository.logoutAndJoinNewAccount] with the
-     * supplied code and emits the result. No user prompt — per spec the Confirmations phase
-     * (or the act of pasting a recovery code) is already the consent step, so the v1-style
-     * `AskToSwitchAccount` dialog does not apply.
+     * If [codeForAccountSwitch] is supplied and the repo failed with [ALREADY_SIGNED_IN], switch
+     * accounts transparently via [SyncAccountRepository.logoutAndJoinNewAccount] with no prompt:
+     * the Confirmations phase is already the consent step, so the v1 `AskToSwitchAccount` dialog
+     * does not apply.
      *
-     * [codeForAccountSwitch] must be in a shape that [SyncAccountRepository.logoutAndJoinNewAccount]
-     * can re-parse via [SyncAccountRepository.parseSyncAuthCode] — that's v1-only, so v2
-     * callers must convert to v1 b64 shape first (see [encodeV1RecoveryCodeAsB64]).
+     * [codeForAccountSwitch] must be a v1 b64 shape [SyncAccountRepository.parseSyncAuthCode] can
+     * re-parse, so v2 callers convert first (see [encodeV1RecoveryCodeAsB64]).
      */
     private fun Result<Boolean>.toOutcome(
         label: String,
@@ -471,16 +425,12 @@ class RealSyncCodeDispatcher @Inject constructor(
 
     /**
      * Re-encode a v2 ddg recovery (userId + secret) as a v1-shape `{recovery:{primary_key,
-     * user_id}}` base64-url string, so the existing [SyncAccountRepository.logoutAndJoinNewAccount]
-     * (which uses v1-only [SyncAccountRepository.parseSyncAuthCode]) can consume it when the
-     * user accepts the account-switch prompt.
+     * user_id}}` base64-url string so [SyncAccountRepository.logoutAndJoinNewAccount] (v1-only
+     * [SyncAccountRepository.parseSyncAuthCode]) can consume it on account switch.
      */
     private fun encodeV1RecoveryCodeAsB64(userId: String, secret: String): String {
-        // Mint via Moshi (NOT org.json): the ddg secret is standard base64 and routinely contains
-        // '/', and AOSP's JSONObject.toString() escapes it to '\/'. Reusing the same LinkCode shape
-        // the v1 stack uses to MINT recovery codes keeps this byte-identical to a genuine v1 code,
-        // so the local logoutAndJoinNewAccount → parseSyncAuthCode round-trip stays robust without
-        // depending on the consumer to tolerate non-canonical escaping.
+        // Mint via Moshi (not org.json) and reuse the v1 LinkCode shape, keeping this byte-identical
+        // to a genuine v1 code so the parseSyncAuthCode round-trip stays robust.
         val v1Json = v1RecoveryCodeAdapter.toJson(LinkCode(recovery = RecoveryCode(primaryKey = secret, userId = userId)))
         return Base64.encodeToString(
             v1Json.toByteArray(Charsets.UTF_8),
@@ -501,8 +451,7 @@ class RealSyncCodeDispatcher @Inject constructor(
         private const val CID_DDG = "ddg"
         private const val CID_3PARTY = "3party"
 
-        // Matches the SessionError message format thrown when EnvelopeVersionTooNew bubbles up
-        // from the runner's poll loop ("Peer requires protocol v3; please update this app").
+        // Extracts the major version from the EnvelopeVersionTooNew SessionError message.
         private val VERSION_TOO_NEW_REGEX = Regex("""protocol v(\d+)""")
     }
 }

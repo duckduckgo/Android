@@ -19,29 +19,16 @@ package com.duckduckgo.sync.impl
 import kotlinx.coroutines.flow.Flow
 
 /**
- * Routes a pasted/scanned sync code to either the existing v1 stack or the new v2 exchange
- * protocol, based on the [SyncFeature.canUseV2ConnectFlow] flag. The router is designed so
- * that **with the flag off, behaviour is identical to direct calls to
- * [SyncAccountRepository.parseSyncAuthCode]** — same return value, same side effects (none),
- * same downstream processing. Callers keep their existing v1 handling intact and only need
- * to add a new branch for [RouteDecision.V2InProgress] when they want to opt into v2.
- *
- * Why this split: v2 codes need richer outcomes (e.g. an in-flight pairing session, an
- * upgrade prompt for v3 codes that arrive at a v2 client) that don't map onto the existing
- * [SyncAuthCode] type. v1 codes still flow through the well-trodden production paths
- * unchanged.
+ * Routes a pasted/scanned sync code to either the v1 stack or the v2 exchange protocol, gated by
+ * [SyncFeature.canUseV2ConnectFlow]. With the flag off, [route] behaves identically to
+ * [SyncAccountRepository.parseSyncAuthCode]; v2 work is exposed via [RouteDecision.V2InProgress].
  */
 interface SyncCodeDispatcher {
 
     /**
-     * Inspect the pasted code and decide who handles it.
-     *
-     *  - [RouteDecision.Legacy]: caller processes the returned [SyncAuthCode] exactly as today
-     *    ([SyncAccountRepository.processCode], etc.).
-     *  - [RouteDecision.V2InProgress]: dispatcher owns the work end-to-end; caller collects the
-     *    returned [Flow] which emits zero or one [DispatchOutcome.JoinerConfirmationRequested] /
-     *    [DispatchOutcome.HostConfirmationRequested] prompt requests (which the VM should surface
-     *    as a dialog), followed by exactly one terminal outcome.
+     * Inspects the pasted code and decides who handles it: [RouteDecision.Legacy] (caller processes
+     * the [SyncAuthCode] as today) or [RouteDecision.V2InProgress] (dispatcher owns the work; caller
+     * collects the returned Flow). See [DispatchOutcome] for the v2 emitted sequence.
      */
     fun route(pastedCode: String): RouteDecision
 
@@ -71,20 +58,9 @@ interface SyncCodeDispatcher {
 
     /**
      * Starts a v2 Presenter session. The returned Flow emits exactly one
-     * [DispatchOutcome.LinkingCodeReady] once the v2 channel is established (caller renders
-     * the URL as a QR), then zero or one [DispatchOutcome.HostConfirmationRequested] prompt
-     * (caller surfaces a dialog and resumes via [confirmHost] / [denyHost]), then exactly
-     * one terminal outcome ([LoggedIn] for Host.Done, [AlreadyConnected] for SameAccountAbort,
-     * [Failed] otherwise).
-     *
-     * Cancelling the collecting coroutine cancels the underlying runner session
-     * (best-effort channel DELETE).
-     *
-     * As of M1.5 (subtask `1215246284113165`), this method is called from both the signed-in
-     * `SyncWithAnotherActivityViewModel` and the signed-out `SyncConnectViewModel`. Role election
-     * runs in the runner — the Presenter can end up as Host (signed-in surface, or signed-out
-     * surface with a signed-out peer) or as Joiner (signed-out surface with a signed-in peer,
-     * or with a 3party peer). All terminal mappings are first-class; none are defensive.
+     * [DispatchOutcome.LinkingCodeReady] (the URL to render as a QR), then the v2 emitted sequence
+     * (see [DispatchOutcome]). Role election runs in the runner, so the Presenter may be elected
+     * Host or Joiner. Cancelling the collecting coroutine cancels the underlying runner session.
      */
     fun presentV2(): Flow<DispatchOutcome>
 }
@@ -94,40 +70,29 @@ sealed interface RouteDecision {
     data class Legacy(val authCode: SyncAuthCode) : RouteDecision
 
     /**
-     * Dispatcher has accepted ownership. [outcomes] is a cold Flow that, when collected,
-     * drives the v2 work and emits **exactly one** [DispatchOutcome] before completing.
-     * Cancelling the collecting coroutine cancels any in-flight v2 work the dispatcher started.
+     * Dispatcher owns the work. [outcomes] is a cold Flow that drives the v2 work when collected
+     * (see [DispatchOutcome] for the emitted sequence). Cancelling the collector cancels the work.
      */
     data class V2InProgress(val outcomes: Flow<DispatchOutcome>) : RouteDecision
 }
 
 /**
- * Outcomes emitted by a v2-owned dispatch. Used by both [SyncCodeDispatcher.route]
- * (Scanner side) and [SyncCodeDispatcher.presentV2] (Presenter side); the emitted
- * sequence differs by side.
+ * Outcomes emitted by a v2-owned dispatch, used by both [SyncCodeDispatcher.route] (Scanner) and
+ * [SyncCodeDispatcher.presentV2] (Presenter). Emitted sequence per side:
  *
- * Scanner side (returned via [RouteDecision.V2InProgress.outcomes]): zero or one
- * [JoinerConfirmationRequested] / [HostConfirmationRequested] (intermediate — caller
- * must show a prompt and call [SyncCodeDispatcher.confirmJoiner] / [denyJoiner] /
- * [confirmHost] / [denyHost] to resume the SM), followed by exactly one terminal
- * ([LoggedIn] / [UpgradeRequired] / [Failed]).
+ * Scanner (via [RouteDecision.V2InProgress.outcomes]): zero or one [JoinerConfirmationRequested] /
+ * [HostConfirmationRequested] (caller prompts and resumes via the confirm/deny calls), then exactly
+ * one terminal ([LoggedIn] / [UpgradeRequired] / [Failed]).
  *
- * Presenter side: exactly one [LinkingCodeReady] first (the URL to render as a QR),
- * then zero or one [HostConfirmationRequested] (caller surfaces a dialog and resumes
- * via [confirmHost] / [denyHost]), then exactly one terminal ([LoggedIn] for Host.Done,
- * [AlreadyConnected] for SameAccountAbort, [Failed] otherwise). [JoinerConfirmationRequested]
- * is also possible on the Presenter side as of M1.5 (subtask
- * `1215246284113165`) when a signed-out Presenter is elected Joiner via role-election rule 1
- * (account beats no-account) against a signed-in peer.
+ * Presenter: exactly one [LinkingCodeReady], then zero or one [JoinerConfirmationRequested] /
+ * [HostConfirmationRequested] (role is elected by the runner), then exactly one terminal
+ * ([LoggedIn] / [AlreadyConnected] / [Failed]).
  *
- * For v2 RecoveryCode flows (cid=ddg, cid=3party) there's no confirmation phase — only
- * a single terminal outcome.
+ * v2 RecoveryCode flows (cid=ddg, cid=3party) have no confirmation phase — only a terminal outcome.
  *
- * Note: v2 does **not** surface a v1-style `AskToSwitchAccount` prompt. The spec's
- * Confirmations phase is the consent step ("Sync your data with [peer]?"); by the
- * time login runs, the user has already opted out of any existing account. When the
- * BE returns `ALREADY_SIGNED_IN`, the dispatcher performs the logout-and-rejoin
- * transparently and emits [LoggedIn] (or [Failed] if the switch itself fails).
+ * v2 does not surface a v1-style `AskToSwitchAccount` prompt; the spec's Confirmations phase is the
+ * consent step. On `ALREADY_SIGNED_IN` the dispatcher logs out and rejoins transparently, emitting
+ * [LoggedIn] (or [Failed] if the switch fails).
  */
 sealed interface DispatchOutcome {
     /**
@@ -153,9 +118,8 @@ sealed interface DispatchOutcome {
     data object LoggedIn : DispatchOutcome
 
     /**
-     * Terminal — peer and this device are already on the same account. Per spec
-     * §"Same-account case", this is **not a failure** — show a friendly "Connected"
-     * confirmation and finish. No account state change happened or is needed.
+     * Terminal — peer and this device are already on the same account. Per spec §"Same-account
+     * case" this is not a failure: show a "Connected" confirmation. No account state change.
      */
     data object AlreadyConnected : DispatchOutcome
 

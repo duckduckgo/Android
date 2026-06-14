@@ -58,15 +58,9 @@ class RealSyncCodeDispatcherTest {
     private val syncAccountRepository: SyncAccountRepository = mock()
     private val qrCode: ExchangeV2QrCode = mock()
 
-    // Backing flow that the mocked runner exposes through `events`/`eventsSince`. Keeping it as a
-    // standalone reference (rather than reading `mock.events` inside answer lambdas) avoids a
-    // Mockito matcher-state issue where re-entrant getter calls during answer dispatch cause
-    // ArrayIndexOutOfBoundsException on `invocation.getArgument`.
     private val runnerEventsFlow = MutableSharedFlow<com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Event>(replay = 0)
     private val runner: ExchangeV2Runner = mock<ExchangeV2Runner>().also {
         whenever(it.events).thenReturn(runnerEventsFlow)
-        // Mockito doesn't call interface default methods automatically; wire eventsSince to
-        // match the default impl on the interface (filter by timestamp).
         whenever(it.eventsSince(any())).thenAnswer { invocation ->
             val sinceMs = invocation.getArgument<Long>(0)
             runnerEventsFlow.filter { event -> event.timestampMs >= sinceMs }
@@ -84,8 +78,6 @@ class RealSyncCodeDispatcherTest {
         whenever(syncFeature.canUseV2ConnectFlow()).thenReturn(canUseV2)
         whenever(canUseV2.isEnabled()).thenReturn(enabled)
     }
-
-    // ---- FF off: byte-identical to direct parseSyncAuthCode ----
 
     @Test fun `FF off - returns Legacy with whatever parseSyncAuthCode returned, and never touches qrCode parse`() {
         setV2(false)
@@ -129,9 +121,6 @@ class RealSyncCodeDispatcherTest {
     }
 
     @Test fun `FF off - even a v2-shaped code is routed via legacy parseSyncAuthCode (no v2 parser touched)`() {
-        // Critical safety property: when FF is off, v2 detection is COMPLETELY skipped.
-        // A v2 code pasted under FF off becomes Unknown via parseSyncAuthCode - same as
-        // production behaviour today.
         setV2(false)
         whenever(syncAccountRepository.parseSyncAuthCode(any())).thenReturn(SyncAuthCode.Unknown("v2-shaped-input"))
 
@@ -140,8 +129,6 @@ class RealSyncCodeDispatcherTest {
         verify(qrCode, never()).parse(any())
         verify(syncAccountRepository).parseSyncAuthCode("https://duckduckgo.com/sync/pairing/#&code2=anything")
     }
-
-    // ---- FF on: v1 shapes still go through legacy stack ----
 
     @Test fun `FF on but v2 parser returns LinkingV1 - falls back to legacy stack`() {
         setV2(true)
@@ -164,8 +151,6 @@ class RealSyncCodeDispatcherTest {
 
         assertSame(recovery, decision.authCode)
     }
-
-    // ---- FF on: v2 paths take ownership ----
 
     @Test fun `FF on, v2 LinkingV2 - returns V2InProgress and does NOT call parseSyncAuthCode`() {
         setV2(true)
@@ -197,13 +182,9 @@ class RealSyncCodeDispatcherTest {
     }
 
     @Test fun `FF on, v2 RecoveryCode cid=ddg - base64url secret is normalised to standard base64 for v1 login`() = runTest {
-        // Spec 1214802412121967: the v2 wire `secret` is base64url. Android's native v1 login
-        // (SyncNativeLib.decodeKey) decodes the primary_key as STANDARD base64, so the dispatcher
-        // must convert at the v2->v1 boundary. A base64url secret from a conformant peer (macOS/
-        // iOS/FE) fed verbatim to prepareForLogin throws "bad base-64" (LOGIN_FAILED). Same key
-        // bytes, different alphabet.
+        // Spec 1214802412121967: the v2 wire `secret` is base64url; v1 login decodes as standard base64.
         setV2(true)
-        val base64urlSecret = "rUzlGqLLlbonAC_zIeh1nrCmuDsDAn6UooUUDz-6x3o" // spec example: base64url, has '_' and '-'
+        val base64urlSecret = "rUzlGqLLlbonAC_zIeh1nrCmuDsDAn6UooUUDz-6x3o"
         val expectedBytes = java.util.Base64.getUrlDecoder().decode(base64urlSecret)
         val rawJson = JSONObject().apply {
             put("user_id", "u-1")
@@ -228,7 +209,7 @@ class RealSyncCodeDispatcherTest {
         val rawJson = JSONObject().apply {
             put("secret", "s-1")
             put("cid", "ddg")
-        } // no user_id
+        }
         whenever(qrCode.parse(any())).thenReturn(ExchangeV2CodeParseResult.RecoveryCode(rawJson))
 
         val decision = dispatcher.route("any") as RouteDecision.V2InProgress
@@ -257,9 +238,6 @@ class RealSyncCodeDispatcherTest {
     }
 
     @Test fun `FF on, v2 RecoveryCode cid=3party - re-encoded code is canonical JSON without escaped slashes`() = runTest {
-        // Real 3party secrets are base64url (slash-free), but the re-wrapped code handed to
-        // joinAccountFromThirdPartyRecoveryCode must never carry AOSP org.json '\/' escaping should
-        // any field contain '/'. Defence-in-depth, consistent with the other v2 wire-JSON producers.
         setV2(true)
         val secretWithSlashes = "apZ+7PAe89rDhuG4DRyi/M3zU2/D5DZNdRsR3RM6Ujw="
         val rawJson = JSONObject().apply {
@@ -277,7 +255,6 @@ class RealSyncCodeDispatcherTest {
         verify(syncAccountRepository).joinAccountFromThirdPartyRecoveryCode(captor.capture())
         val decodedJson = String(java.util.Base64.getUrlDecoder().decode(captor.firstValue), Charsets.UTF_8)
         assertFalse("re-wrapped 3party JSON must not contain escaped slashes (\\/): $decodedJson", decodedJson.contains("\\/"))
-        // …and the wrapped recovery must round-trip back to the original fields.
         val recovery = JSONObject(decodedJson).getJSONObject("recovery")
         assertEquals(secretWithSlashes, recovery.getString("secret"))
         assertEquals("u-3p", recovery.getString("user_id"))
@@ -286,13 +263,8 @@ class RealSyncCodeDispatcherTest {
     }
 
     @Test fun `FF on, v2 RecoveryCode cid=ddg - ALREADY_SIGNED_IN triggers logoutAndJoinNewAccount and emits LoggedIn`() = runTest {
-        // Per spec, the v2 path does NOT surface a v1-style AskToSwitchAccount prompt - the
-        // Confirmations phase (or the act of pasting a recovery code) is already the consent
-        // step. So when processCode reports ALREADY_SIGNED_IN, the dispatcher transparently
-        // calls logoutAndJoinNewAccount with a re-encoded v1-shape recovery code and emits
-        // LoggedIn (success) without bubbling AccountSwitchingRequired up to the VM.
         setV2(true)
-        val base64urlSecret = "rUzlGqLLlbonAC_zIeh1nrCmuDsDAn6UooUUDz-6x3o" // spec base64url secret
+        val base64urlSecret = "rUzlGqLLlbonAC_zIeh1nrCmuDsDAn6UooUUDz-6x3o"
         val rawJson = JSONObject().apply {
             put("user_id", "u-other")
             put("secret", base64urlSecret)
@@ -311,9 +283,6 @@ class RealSyncCodeDispatcherTest {
 
         assertEquals(DispatchOutcome.LoggedIn, outcome)
 
-        // Verify the v1-shape recovery code passed to logoutAndJoinNewAccount: base64url-encoded
-        // JSON with primary_key+user_id (so the v1-only parseSyncAuthCode inside the repo can
-        // re-parse it). The primary_key is the secret normalised to STANDARD base64 (v1 form).
         val captor = org.mockito.kotlin.argumentCaptor<String>()
         verify(syncAccountRepository).logoutAndJoinNewAccount(captor.capture())
         val decoded = java.util.Base64.getUrlDecoder().decode(captor.firstValue)
@@ -326,9 +295,6 @@ class RealSyncCodeDispatcherTest {
     }
 
     @Test fun `FF on, v2 RecoveryCode cid=ddg - account-switch code is canonical v1 JSON without escaped slashes`() = runTest {
-        // The ddg secret is standard base64 and routinely contains '/'. The re-encoded v1 code fed
-        // to logoutAndJoinNewAccount must be canonical (Moshi, no AOSP org.json '\/' escaping) so it
-        // is byte-identical to genuine v1 codes and never depends on a lenient consumer to unescape.
         setV2(true)
         val secretWithSlashes = "apZ+7PAe89rDhuG4DRyi/M3zU2/D5DZNdRsR3RM6Ujw="
         val rawJson = JSONObject().apply {
@@ -351,7 +317,6 @@ class RealSyncCodeDispatcherTest {
         verify(syncAccountRepository).logoutAndJoinNewAccount(captor.capture())
         val decodedJson = String(java.util.Base64.getUrlDecoder().decode(captor.firstValue), Charsets.UTF_8)
         assertFalse("v1 account-switch JSON must not contain escaped slashes (\\/): $decodedJson", decodedJson.contains("\\/"))
-        // …and it must still round-trip back to the exact secret.
         val recovery = JSONObject(decodedJson).getJSONObject("recovery")
         assertEquals(secretWithSlashes, recovery.getString("primary_key"))
         assertEquals("u-other", recovery.getString("user_id"))
@@ -384,9 +349,6 @@ class RealSyncCodeDispatcherTest {
     }
 
     @Test fun `FF on, v2 RecoveryCode cid=3party - ALREADY_SIGNED_IN does NOT trigger transparent switch (fails as Failed)`() = runTest {
-        // 3party upgrade uses a different subroutine (POST /access-credentials/ddg + re-encrypt
-        // keys); we can't safely substitute a plain logoutAndJoinNewAccount for it. Spec stays
-        // silent on this edge, so we fail rather than guess.
         setV2(true)
         val rawJson = JSONObject().apply {
             put("user_id", "u-3p")
@@ -414,7 +376,7 @@ class RealSyncCodeDispatcherTest {
         setV2(true)
         val rawJson = JSONObject().apply {
             put("user_id", "u")
-            put("secret", "AQID") // valid base64 so we reach processCode (the error path under test)
+            put("secret", "AQID") // valid base64 so decoding succeeds and processCode is reached
             put("cid", "ddg")
         }
         whenever(qrCode.parse(any())).thenReturn(ExchangeV2CodeParseResult.RecoveryCode(rawJson))
@@ -459,8 +421,6 @@ class RealSyncCodeDispatcherTest {
         assertTrue((outcome as DispatchOutcome.Failed).reason.contains("future-credential"))
     }
 
-    // ---- Pixel + side effects: dispatcher must NOT fire any of these ----
-
     @Test fun `Legacy path - dispatcher never invokes processCode (caller owns that)`() {
         setV2(false)
         whenever(syncAccountRepository.parseSyncAuthCode(any())).thenReturn(SyncAuthCode.Recovery(mock()))
@@ -481,19 +441,12 @@ class RealSyncCodeDispatcherTest {
     }
 
     @Test fun `FF on, LinkingV2 - ignores stale terminal events from prior sessions in the replay cache`() = runTest {
-        // Regression: previously the dispatcher would pick up a Joiner.Done event sitting in
-        // the runner's events replay cache from a prior successful pairing, treat it as the
-        // outcome of THIS session, and call processCode immediately - logging the user in
-        // without ever showing the user-confirmation step of the new session.
         setV2(true)
         whenever(qrCode.parse(any())).thenReturn(
             ExchangeV2CodeParseResult.LinkingV2(channelId = "c", publicKey = "k", version = "2"),
         )
-        // Pre-seed the class-level events flow with a stale Joiner.Done from a prior session
-        // (timestampMs well before this test starts). The class-level eventsSince stub will
-        // filter it out based on the dispatcher's sessionStart timestamp.
         val staleJoinerDone = com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Event.Transition(
-            timestampMs = 1L, // ancient
+            timestampMs = 1L,
             from = com.duckduckgo.sync.impl.exchange.v2.ExchangeV2State.Joiner.Waiting,
             to = com.duckduckgo.sync.impl.exchange.v2.ExchangeV2State.Joiner.Done,
             trigger = com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Message.RecoveryCodeResponse(
@@ -502,7 +455,6 @@ class RealSyncCodeDispatcherTest {
             ),
             localTrigger = null,
         )
-        // Make the backing flow replay-enabled so the stale event is observable.
         val staleFlow = MutableSharedFlow<com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Event>(replay = 10)
         staleFlow.tryEmit(staleJoinerDone)
         whenever(runner.events).thenReturn(staleFlow)
@@ -513,13 +465,8 @@ class RealSyncCodeDispatcherTest {
 
         val decision = dispatcher.route("v2-url") as RouteDecision.V2InProgress
 
-        // Race the dispatcher's flow against a timeout - without the fix, .first() would
-        // immediately pick up the stale Joiner.Done from replay and emit LoggedIn.
-        // With the fix, the flow filters out events older than session start and waits
-        // for genuine new-session events that never arrive in this test setup.
         val outcome = kotlinx.coroutines.withTimeoutOrNull(100) { decision.outcomes.first() }
-        assertEquals(null, outcome) // no premature emission
-        // And processCode must NOT have been called for the stale code.
+        assertEquals(null, outcome)
         verify(syncAccountRepository, never()).processCode(any(), anyOrNull())
     }
 
@@ -531,29 +478,20 @@ class RealSyncCodeDispatcherTest {
 
         val decision = dispatcher.route("v2-url") as RouteDecision.V2InProgress
 
-        // Returning V2InProgress alone must not start the session - the caller hasn't decided to
-        // commit yet. The runner is only kicked off when the Flow is collected. This matters for
-        // safety: callers that do dispatcher.route(...) for inspection won't accidentally bootstrap
-        // a channel.
         verify(runner, never()).startScan(any())
 
-        // Now actually collect - but cancel after seeing zero emissions (since runner.events is
-        // an empty SharedFlow in this test). We just verify startScan was hit on first collection.
         kotlinx.coroutines.withTimeoutOrNull(50) { decision.outcomes.first() }
         verify(runner).startScan(eq("v2-url"))
     }
 
     @Test fun `FF on, LinkingV2 exchange - base64url recovery secret is normalised to standard base64 for v1 login`() = runTest {
-        // The actual macOS↔Android failure: Joiner reaches Done with a RecoveryCodeResponse whose
-        // payload carries a base64url secret (spec 1214802412121967). loginWithV2RecoveryCode must
-        // normalise it to standard base64 before the native v1 login, or prepareForLogin throws
-        // "bad base-64" (LOGIN_FAILED). Same key bytes, different alphabet.
+        // Spec 1214802412121967: the v2 wire `secret` is base64url; v1 login decodes as standard base64.
         setV2(true)
         whenever(qrCode.parse(any())).thenReturn(
             ExchangeV2CodeParseResult.LinkingV2(channelId = "c", publicKey = "k", version = "2"),
         )
         whenever(syncAccountRepository.processCode(any(), anyOrNull())).thenReturn(Result.Success(true))
-        val base64urlSecret = "rUzlGqLLlbonAC_zIeh1nrCmuDsDAn6UooUUDz-6x3o" // spec example: base64url, has '_' and '-'
+        val base64urlSecret = "rUzlGqLLlbonAC_zIeh1nrCmuDsDAn6UooUUDz-6x3o"
         val payloadJson = JSONObject().apply {
             put(
                 "recovery",
@@ -594,8 +532,6 @@ class RealSyncCodeDispatcherTest {
         )
     }
 
-    // ---- presentV2() — Presenter-side mapping ----
-
     private fun transition(
         from: ExchangeV2State,
         to: ExchangeV2State,
@@ -619,7 +555,6 @@ class RealSyncCodeDispatcherTest {
 
     @Test fun `presentV2 emits LinkingCodeReady when runner emits SessionStarted with a linkingCode`() = runTest {
         val flow = dispatcher.presentV2()
-        // Start collection in the background; emit the session event after a tiny delay.
         val outcomes = mutableListOf<DispatchOutcome>()
         val job = launch(start = kotlinx.coroutines.CoroutineStart.UNDISPATCHED) {
             flow.take(1).collect { outcomes += it }
@@ -635,16 +570,12 @@ class RealSyncCodeDispatcherTest {
     }
 
     @Test fun `presentV2 ignores SessionStarted with null linkingCode (Scanner side leakage protection)`() = runTest {
-        // Defensive — startPresent() should always produce a non-null linkingCode, but if the
-        // runner ever emits SessionStarted with null we don't want to emit a malformed outcome.
         val outcomes = mutableListOf<DispatchOutcome>()
         val job = launch(start = kotlinx.coroutines.CoroutineStart.UNDISPATCHED) { dispatcher.presentV2().take(1).collect { outcomes += it } }
         runnerEventsFlow.emit(sessionStarted(linkingCode = null))
-        // Send a follow-up terminal so collection completes.
         runnerEventsFlow.emit(transition(from = ExchangeV2State.Negotiating, to = ExchangeV2State.Host.Done))
         job.join()
 
-        // First outcome should be LoggedIn (from Host.Done), not a malformed LinkingCodeReady(null/empty).
         assertEquals(DispatchOutcome.LoggedIn, outcomes.single())
     }
 
@@ -732,7 +663,6 @@ class RealSyncCodeDispatcherTest {
 
     @Test fun `presentV2 emits LoggedIn when Joiner_Done carries a cid=ddg recovery code`() = runTest {
         setV2(true)
-        // Build a v2 recovery code payload with cid=ddg.
         val recoveryJson = JSONObject().apply {
             put(
                 "recovery",
@@ -770,7 +700,6 @@ class RealSyncCodeDispatcherTest {
             job.await()
         }
         assertEquals(DispatchOutcome.LoggedIn, outcome)
-        // Confirm the v1 Recovery shape was constructed and the login was attempted.
         verify(syncAccountRepository).processCode(any(), anyOrNull())
         verify(syncAccountRepository, never()).joinAccountFromThirdPartyRecoveryCode(any())
     }
@@ -837,7 +766,6 @@ class RealSyncCodeDispatcherTest {
         val flow = dispatcher.presentV2()
         verify(runner, never()).startPresent()
 
-        // Collect briefly (no events emitted → first() never resolves; rely on timeout).
         withTimeoutOrNull(50) { flow.first() }
         verify(runner).startPresent()
     }
@@ -881,9 +809,7 @@ class RealSyncCodeDispatcherTest {
         val job = launch(start = kotlinx.coroutines.CoroutineStart.UNDISPATCHED) {
             dispatcher.presentV2().toList(outcomes)
         }
-        // First SessionStarted establishes the Flow's own channel.
         runnerEventsFlow.emit(sessionStarted(linkingCode = "code-for-own-channel"))
-        // Second SessionStarted with a different channel — simulates preemption by another caller.
         runnerEventsFlow.emit(
             ExchangeV2Event.SessionStarted(
                 timestampMs = System.currentTimeMillis(),
@@ -894,7 +820,6 @@ class RealSyncCodeDispatcherTest {
         )
         job.join()
 
-        // The Flow should have completed silently after emitting just the first LinkingCodeReady.
         assertEquals(1, outcomes.size)
         assertEquals(DispatchOutcome.LinkingCodeReady("code-for-own-channel"), outcomes.single())
     }
@@ -914,7 +839,6 @@ class RealSyncCodeDispatcherTest {
         val job = launch(start = kotlinx.coroutines.CoroutineStart.UNDISPATCHED) {
             decision.outcomes.toList(outcomes)
         }
-        // First SessionStarted establishes the Scanner's own channel.
         runnerEventsFlow.emit(
             ExchangeV2Event.SessionStarted(
                 timestampMs = System.currentTimeMillis(),
@@ -923,7 +847,6 @@ class RealSyncCodeDispatcherTest {
                 linkingCode = null,
             ),
         )
-        // Second SessionStarted with a different channel — simulates preemption.
         runnerEventsFlow.emit(
             ExchangeV2Event.SessionStarted(
                 timestampMs = System.currentTimeMillis(),
@@ -934,8 +857,6 @@ class RealSyncCodeDispatcherTest {
         )
         job.join()
 
-        // The Flow should have completed silently — no outcomes emitted (Scanner side never
-        // emits anything for the initial SessionStarted because linkingCode=null on its side).
         assertTrue("expected no outcomes, got $outcomes", outcomes.isEmpty())
     }
 
@@ -967,7 +888,6 @@ class RealSyncCodeDispatcherTest {
     }
 
     @Test fun `presentV2 filters out events from before session start`() = runTest {
-        // Seed a stale Host_Done from a prior session with timestamp=1L (well before now).
         val staleFlow = MutableSharedFlow<ExchangeV2Event>(replay = 10)
         staleFlow.tryEmit(
             ExchangeV2Event.Transition(
@@ -984,7 +904,6 @@ class RealSyncCodeDispatcherTest {
             staleFlow.filter { it.timestampMs >= since }
         }
 
-        // No fresh event emitted; outcome should never arrive within timeout.
         val outcome = withTimeoutOrNull(100) { dispatcher.presentV2().first() }
         assertEquals(null, outcome)
     }
