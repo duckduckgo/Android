@@ -93,9 +93,8 @@ class SyncWithAnotherActivityViewModel @Inject constructor(
     private var canTimeout = false
     private var isDeepLink = false
 
-    // Start the session exactly once per ViewModel instance. viewState.onStart re-fires on every
-    // re-collection (background→foreground, config-change, navigate-return); without this guard each
-    // re-fire regenerates the invitation/channel and orphans the code the user already shared.
+    // viewState.onStart re-fires on every re-collection; guard so the session starts once and
+    // re-fires don't regenerate the invitation/channel, orphaning the code the user already shared.
     private var sessionStarted = false
 
     private val viewState = MutableStateFlow(ViewState())
@@ -149,16 +148,7 @@ class SyncWithAnotherActivityViewModel @Inject constructor(
         syncFeature.canUseV2ConnectFlow().isEnabled() &&
             syncFeature.canShowV2ConnectCode().isEnabled()
 
-    /**
-     * Drive a v2 Presenter session through the dispatcher. As of M1.5 (Asana subtask
-     * `1215246284113165`), `presentV2()` is also called from the signed-out `SyncConnectViewModel`,
-     * so the Joiner.* branches mapped in [SyncCodeDispatcher.presentV2] are first-class and not
-     * defensive. On THIS signed-in surface, the device always has a ddg account (activity
-     * precondition), so role election still elects this device as Host. The signed-out variant
-     * is what exercises the Joiner.* branches in practice — see subtask `1215168582640073` for
-     * the runner-side account-provisioning at Host.Sending used by signed-out Presenter ↔
-     * signed-out peer pairings.
-     */
+    /** Drive a v2 Presenter session via the dispatcher. On this signed-in surface role election elects Host. */
     private suspend fun startV2Present() {
         val previousPrimaryKey = syncAccountRepository.getAccountInfo().primaryKey
         codeDispatcher.presentV2().collect { outcome ->
@@ -253,9 +243,8 @@ class SyncWithAnotherActivityViewModel @Inject constructor(
     fun onQRCodeScanned(qrCode: String) {
         viewModelScope.launch(dispatchers.io()) {
             val previousPrimaryKey = syncAccountRepository.getAccountInfo().primaryKey
-            // Route via SyncCodeDispatcher. FF off → Legacy(parseSyncAuthCode(...)), so the body
-            // below runs byte-identical to pre-dispatcher production. FF on → v2-shaped codes are
-            // taken into ownership and surfaced through DispatchOutcome.
+            // Route via SyncCodeDispatcher. FF off → Legacy(parseSyncAuthCode(...)); FF on →
+            // v2-shaped codes are taken into ownership and surfaced through DispatchOutcome.
             when (val decision = codeDispatcher.route(qrCode)) {
                 is RouteDecision.Legacy -> {
                     logcat { "Sync-CodeDispatch: SyncWithAnotherActivityViewModel handling Legacy(${decision.authCode::class.simpleName})" }
@@ -285,19 +274,13 @@ class SyncWithAnotherActivityViewModel @Inject constructor(
         }
     }
 
-    /**
-     * Map one v2 [DispatchOutcome] onto this VM's existing command pipeline. LoggedIn mirrors
-     * v1 Connect post-success semantics: show recovery to fresh devices (no prior primary key),
-     * skip the recovery screen for account-switchers. Errors funnel through [emitError] with a
-     * generic CONNECT_FAILED code so the existing error-dialog mapping picks them up.
-     */
+    /** Map one v2 [DispatchOutcome] onto this VM's existing command pipeline. */
     private suspend fun handleV2Outcome(
         outcome: DispatchOutcome,
         previousPrimaryKey: String,
         qrCode: String,
     ) {
-        // Cancel deep-link timeout only on terminal outcomes — keep the timeout running across
-        // confirmation prompts so a stalled session still eventually surfaces an error.
+        // Cancel the deep-link timeout only on terminal outcomes; keep it running across confirmation prompts.
         when (outcome) {
             is DispatchOutcome.LoggedIn -> {
                 cancelTimeout()
@@ -306,8 +289,7 @@ class SyncWithAnotherActivityViewModel @Inject constructor(
             }
             is DispatchOutcome.AlreadyConnected -> {
                 cancelTimeout()
-                // Spec §"Same-account case": friendly finish, no account change. Skip recovery
-                // screen since nothing actually moved (we were already on this account).
+                // Spec §"Same-account case": friendly finish, no account change, no recovery screen.
                 onLoginSuccess(previousPrimaryKey, showRecovery = false)
             }
             is DispatchOutcome.UpgradeRequired -> {

@@ -59,9 +59,6 @@ class SyncLoginViewModelTest {
     private val syncRepostitory: SyncAccountRepository = mock()
     private val syncPixels: SyncPixels = mock()
     private val syncFeature = FakeFeatureToggleFactory.create(SyncFeature::class.java)
-
-    // canUseV2ConnectFlow stays FALSE → dispatcher's Legacy path returns parseSyncAuthCode
-    // unchanged, so the existing test setup mirrors pre-dispatcher production.
     private val qrCode: ExchangeV2QrCode = mock()
     private val runner: ExchangeV2Runner = mock()
     private val codeDispatcher = RealSyncCodeDispatcher(
@@ -104,8 +101,6 @@ class SyncLoginViewModelTest {
 
     @Test
     fun whenV2CodeRequiresNewerProtocolThenShowUpdateError() = runTest {
-        // A peer requiring a newer protocol major must surface a visible "please update" error,
-        // not silently do nothing (UpgradeRequired previously fell through to a no-op).
         syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
         val scanned = "https://duckduckgo.com/sync/pairing/#&code2=v2code"
         whenever(qrCode.parse(scanned)).thenReturn(

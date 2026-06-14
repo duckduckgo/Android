@@ -114,11 +114,8 @@ class SyncWithAnotherDeviceActivity : DuckDuckGoActivity() {
     private fun observeUiEvents() {
         viewModel
             .viewState(isDeepLink = isDeepLinkSetup())
-            // viewState at CREATED (production behaviour). The session is started exactly once by
-            // the ViewModel's sessionStarted guard, so we must NOT use STARTED here: STARTED cancels
-            // + re-subscribes on every background→foreground, which re-fired viewState.onStart and
-            // regenerated the pairing code, orphaning a code the user had already shared. Commands
-            // also stay at CREATED so terminal commands aren't dropped.
+            // Observe at CREATED, not STARTED: STARTED re-subscribes on every foreground, re-firing
+            // viewState.onStart and regenerating the pairing code. CREATED also avoids dropping terminal commands.
             .flowWithLifecycle(lifecycle, Lifecycle.State.CREATED)
             .onEach { render(it) }
             .launchIn(lifecycleScope)

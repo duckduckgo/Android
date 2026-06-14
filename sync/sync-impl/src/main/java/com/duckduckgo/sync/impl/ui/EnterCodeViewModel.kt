@@ -116,9 +116,7 @@ class EnterCodeViewModel @Inject constructor(
         pastedCode: String,
     ) {
         val previousPrimaryKey = syncAccountRepository.getAccountInfo().primaryKey
-        // Route via SyncCodeDispatcher. FF off → returns Legacy(parseSyncAuthCode(...)) so the
-        // block below runs byte-identical to pre-dispatcher production. FF on → v2 codes are
-        // taken into ownership via V2InProgress and surfaced through DispatchOutcome.
+        // FF off → Legacy (v1 path below); FF on → v2 codes surface as DispatchOutcome.
         when (val decision = codeDispatcher.route(pastedCode)) {
             is RouteDecision.Legacy -> {
                 logcat { "Sync-CodeDispatch: EnterCodeViewModel handling Legacy(${decision.authCode::class.simpleName})" }
@@ -143,11 +141,7 @@ class EnterCodeViewModel @Inject constructor(
         }
     }
 
-    /**
-     * Translate one [DispatchOutcome] from the v2 dispatcher into the existing command/error
-     * pipeline. Each outcome maps to the same UI hook the v1 path uses for its equivalent
-     * end state — keeps the user-facing behaviour consistent between v1 and v2.
-     */
+    /** Map a v2 [DispatchOutcome] onto the same command/error hooks the v1 path uses. */
     private suspend fun handleV2Outcome(
         outcome: DispatchOutcome,
         previousPrimaryKey: String,
@@ -157,9 +151,7 @@ class EnterCodeViewModel @Inject constructor(
             is DispatchOutcome.LoggedIn -> onLoginSuccess(previousPrimaryKey)
             // Spec §"Same-account case": friendly finish, no account change. Surface as success.
             is DispatchOutcome.AlreadyConnected -> onLoginSuccess(previousPrimaryKey)
-            // Peer needs a newer protocol major than we support — show a visible "please update"
-            // error rather than the generic-error no-op processError gives an uncoded error.
-            // (Richer version-too-new UX tracked in Asana 1215484651575360.)
+            // Peer needs a newer protocol major — show a visible "please update" error. (follow-up: 1215484651575360)
             is DispatchOutcome.UpgradeRequired -> command.send(
                 Command.ShowError(
                     message = R.string.sync_flows_disabled_new_version,
@@ -240,8 +232,7 @@ class EnterCodeViewModel @Inject constructor(
                 CONNECT_FAILED.code -> R.string.sync_connect_generic_error
                 CREATE_ACCOUNT_FAILED.code -> R.string.sync_create_account_generic_error
                 INVALID_CODE.code -> R.string.sync_invalid_code_error
-                // 3party→ddg upgrade on an already-upgraded account (REC-4). Generic error for now;
-                // spec-specific copy ("use an already-connected Native app") tracked in 1215295182909247.
+                // 3party→ddg upgrade on an already-upgraded account; generic error for now. (follow-up: 1215295182909247)
                 THIRD_PARTY_ALREADY_UPGRADED.code -> R.string.sync_connect_generic_error
                 else -> null
             }?.let { message ->

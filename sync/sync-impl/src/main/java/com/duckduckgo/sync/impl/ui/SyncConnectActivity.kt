@@ -131,12 +131,8 @@ class SyncConnectActivity : DuckDuckGoActivity() {
     private fun observeUiEvents() {
         viewModel
             .viewState(extractSource())
-            // viewState at CREATED (production behaviour). The session is started exactly once by
-            // the ViewModel's sessionStarted guard, so we must NOT use STARTED here: STARTED cancels
-            // + re-subscribes on every background→foreground, which re-fired viewState.onStart and
-            // regenerated the pairing code, orphaning a code the user had already shared. Commands
-            // stay at CREATED too so terminal commands (LoginSuccess, ShowError) aren't dropped
-            // during transitions.
+            // Observe at CREATED, not STARTED: STARTED re-subscribes on every foreground, re-firing
+            // viewState.onStart and regenerating the pairing code. CREATED also avoids dropping terminal commands.
             .flowWithLifecycle(lifecycle, Lifecycle.State.CREATED)
             .onEach { render(it) }
             .launchIn(lifecycleScope)

@@ -80,8 +80,6 @@ internal class EnterCodeViewModelTest {
     private val clipboard: Clipboard = mock()
     private val syncFeature = FakeFeatureToggleFactory.create(SyncFeature::class.java).apply {
         this.seamlessAccountSwitching().setRawStoredState(State(true))
-        // canUseV2ConnectFlow stays FALSE by default → dispatcher's Legacy path returns the
-        // SyncAuthCode straight from parseSyncAuthCode, byte-identical to pre-dispatcher production.
     }
     private val syncPixels: SyncPixels = mock()
     private val qrCode: ExchangeV2QrCode = mock()
@@ -129,9 +127,6 @@ internal class EnterCodeViewModelTest {
 
     @Test
     fun whenV2ThirdPartyRecoveryAlreadyUpgradedThenShowError() = runTest {
-        // REC-4: pasting a 3party recovery code for an account that already has a ddg credential must
-        // surface an error dialog, not fail silently (the upgrade can only run once). The distinct
-        // THIRD_PARTY_ALREADY_UPGRADED type is mapped to a (generic, for now) ShowError.
         syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
         whenever(syncAccountRepository.getAccountInfo()).thenReturn(noAccount)
         val pastedCode = "https://duckduckgo.com/sync/pairing/#&code2=3party-recovery"
@@ -158,8 +153,6 @@ internal class EnterCodeViewModelTest {
 
     @Test
     fun whenV2CodeRequiresNewerProtocolThenShowUpdateError() = runTest {
-        // A peer requiring a newer protocol major must surface a visible "please update" error,
-        // not silently do nothing (UpgradeRequired previously fell through to a no-op).
         syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
         whenever(syncAccountRepository.getAccountInfo()).thenReturn(noAccount)
         val pastedCode = "https://duckduckgo.com/sync/pairing/#&code2=v2code"

@@ -81,8 +81,6 @@ class SyncConnectViewModelTest {
 
     private val syncFeature = com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory.create(SyncFeature::class.java)
 
-    // Backing flow that the mocked runner exposes via events/eventsSince. Mirrors the
-    // pattern used in RealSyncCodeDispatcherTest and SyncWithAnotherDeviceViewModelTest.
     private val runnerEventsFlow = kotlinx.coroutines.flow.MutableSharedFlow<com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Event>(replay = 0)
     private val qrCode: com.duckduckgo.sync.impl.exchange.v2.ExchangeV2QrCode = mock()
     private val runner: com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Runner = mock<com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Runner>().also {
@@ -111,9 +109,6 @@ class SyncConnectViewModelTest {
 
     @Before
     fun setup() {
-        // SyncConnect VM short-circuits pollConnectionKeys() if the user is already signed in
-        // (returning from a successful EnterCode pair). Default to "no account" so existing
-        // tests that exercise the QR/v2-present flow still run their setup path.
         whenever(syncRepository.getAccountInfo()).thenReturn(AccountInfo())
     }
 
@@ -336,8 +331,6 @@ class SyncConnectViewModelTest {
         }
     }
 
-    // ---- M1.5: signed-out v2 Presenter path ----
-
     private fun enableV2(displayOn: Boolean) {
         syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
         syncFeature.canShowV2ConnectCode().setRawStoredState(State(displayOn))
@@ -372,7 +365,7 @@ class SyncConnectViewModelTest {
 
         testee.viewState(source = null).test {
             runnerEventsFlow.emit(presenterSessionStarted())
-            awaitItem() // initial empty
+            awaitItem()
             val withQr = awaitItem()
             Assert.assertEquals(bitmap, withQr.qrCodeBitmap)
             cancelAndIgnoreRemainingEvents()
@@ -430,7 +423,7 @@ class SyncConnectViewModelTest {
 
         testee.onCopyCodeClicked()
         verify(clipboard).copyToClipboard(url)
-        verify(syncRepository, never()).getConnectQR() // v2 path bypasses v1 fetch
+        verify(syncRepository, never()).getConnectQR()
     }
 
     @Test
@@ -569,8 +562,6 @@ class SyncConnectViewModelTest {
 
     @Test
     fun whenV2LinkingCodeScannedThenRoutedThroughDispatcherAndLoginSuccess() = runTest {
-        // Regression: signed-out Connect camera scan must route v2 codes through the dispatcher
-        // (BUG-A / SURF-3). Previously onQRCodeScanned parsed v1-only and rejected v2 as invalid.
         enableV2(displayOn = true)
         val scannedUrl = "https://duckduckgo.com/sync/pairing/#&code2=scan-me"
         whenever(qrCode.parse(scannedUrl)).thenReturn(

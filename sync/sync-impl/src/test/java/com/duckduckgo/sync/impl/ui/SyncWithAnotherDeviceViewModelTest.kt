@@ -94,14 +94,9 @@ class SyncWithAnotherDeviceViewModelTest {
     private val syncFeature = FakeFeatureToggleFactory.create(SyncFeature::class.java).apply {
         this.seamlessAccountSwitching().setRawStoredState(State(true))
         this.exchangeKeysToSyncWithAnotherDevice().setRawStoredState(State(false))
-        // canUseV2ConnectFlow stays FALSE → dispatcher's Legacy path returns parseSyncAuthCode
-        // unchanged, so the existing test setup mirrors pre-dispatcher production.
     }
     private val qrCode: ExchangeV2QrCode = mock()
 
-    // Backing flow that the mocked runner exposes via events/eventsSince. See
-    // RealSyncCodeDispatcherTest for why this is held as a standalone field (Mockito matcher
-    // state issue with re-entrant getter calls during answer dispatch).
     private val runnerEventsFlow = kotlinx.coroutines.flow.MutableSharedFlow<com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Event>(replay = 0)
     private val runner: ExchangeV2Runner = mock<ExchangeV2Runner>().also {
         whenever(it.events).thenReturn(runnerEventsFlow)
@@ -461,8 +456,6 @@ class SyncWithAnotherDeviceViewModelTest {
         return Pair(bitmap, authCodeToUse)
     }
 
-    // ---- M1: v2 Presenter QR display ----
-
     private fun enableV2(displayOn: Boolean) {
         syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
         syncFeature.canShowV2ConnectCode().setRawStoredState(State(displayOn))
@@ -491,13 +484,12 @@ class SyncWithAnotherDeviceViewModelTest {
     @Test
     fun whenBothV2FlagsOnThenRunnerStartPresentInvokedAndV1RecoveryNotCalled() = runTest {
         enableV2(displayOn = true)
-        // startV2Present() reads getAccountInfo().primaryKey upfront; stub it to avoid NPE.
         whenever(syncRepository.getAccountInfo()).thenReturn(accountA)
         val bitmap = TestSyncFixtures.qrBitmap()
         whenever(qrEncoder.encodeAsBitmap(any(), any(), any())).thenReturn(bitmap)
 
         testee.viewState().test {
-            awaitItem() // initial empty state (ensures the v2 collector subscribed)
+            awaitItem()
             runnerEventsFlow.emit(presenterSessionStarted())
             val withQr = awaitItem()
             Assert.assertEquals(bitmap, withQr.qrCodeBitmap)
@@ -526,7 +518,6 @@ class SyncWithAnotherDeviceViewModelTest {
 
     @Test
     fun whenMasterFlagOffThenV1PathTakenRegardlessOfDisplayFlag() = runTest {
-        // Display flag on but master off → master kill switch wins.
         syncFeature.canUseV2ConnectFlow().setRawStoredState(State(false))
         syncFeature.canShowV2ConnectCode().setRawStoredState(State(true))
         val bitmap = TestSyncFixtures.qrBitmap()
@@ -544,16 +535,15 @@ class SyncWithAnotherDeviceViewModelTest {
     @Test
     fun whenLinkingCodeReadyThenBarcodeContentsPopulatedAndCopyEmitsUrl() = runTest {
         enableV2(displayOn = true)
-        // startV2Present() reads getAccountInfo().primaryKey upfront; stub it to avoid NPE.
         whenever(syncRepository.getAccountInfo()).thenReturn(accountA)
         val url = "https://duckduckgo.com/sync/pairing?code2=copy-me"
         val bitmap = TestSyncFixtures.qrBitmap()
         whenever(qrEncoder.encodeAsBitmap(eq(url), any(), any())).thenReturn(bitmap)
 
         testee.viewState().test {
-            awaitItem() // initial empty (ensures the v2 collector subscribed)
+            awaitItem()
             runnerEventsFlow.emit(presenterSessionStarted(linkingCode = url))
-            awaitItem() // with QR
+            awaitItem()
             cancelAndIgnoreRemainingEvents()
         }
 
@@ -564,15 +554,14 @@ class SyncWithAnotherDeviceViewModelTest {
     @Test
     fun whenHostConfirmingDuringV2PresentThenAskHostConfirmationCommandEmitted() = runTest {
         enableV2(displayOn = true)
-        // startV2Present() reads getAccountInfo().primaryKey upfront; stub it to avoid NPE.
         whenever(syncRepository.getAccountInfo()).thenReturn(accountA)
         whenever(runner.peerName).thenReturn("Peer Phone")
         whenever(qrEncoder.encodeAsBitmap(any(), any(), any())).thenReturn(TestSyncFixtures.qrBitmap())
 
         testee.viewState().test {
-            awaitItem() // initial
+            awaitItem()
             runnerEventsFlow.emit(presenterSessionStarted())
-            awaitItem() // with QR
+            awaitItem()
             runnerEventsFlow.emit(
                 transition(from = ExchangeV2State.Negotiating, to = ExchangeV2State.Host.Confirming),
             )
@@ -590,7 +579,7 @@ class SyncWithAnotherDeviceViewModelTest {
     @Test
     fun whenHostDoneDuringV2PresentThenLoginSuccessShowRecoveryFalse() = runTest {
         enableV2(displayOn = true)
-        whenever(syncRepository.getAccountInfo()).thenReturn(accountA) // signed in, non-empty primaryKey
+        whenever(syncRepository.getAccountInfo()).thenReturn(accountA)
         whenever(qrEncoder.encodeAsBitmap(any(), any(), any())).thenReturn(TestSyncFixtures.qrBitmap())
 
         testee.viewState().test {
@@ -687,8 +676,7 @@ class SyncWithAnotherDeviceViewModelTest {
 
     @Test
     fun whenViewStateReCollectedThenExchangeInvitationGeneratedOnce() = runTest {
-        configureExchangeKeysSupported() // v1 exchange path: generate→Success, poll→Success(true)
-        // Two collections simulate a background→foreground re-subscription.
+        configureExchangeKeysSupported()
         testee.viewState().test {
             awaitItem()
             cancelAndIgnoreRemainingEvents()

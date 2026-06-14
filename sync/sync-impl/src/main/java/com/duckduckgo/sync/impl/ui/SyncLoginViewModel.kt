@@ -99,9 +99,7 @@ class SyncLoginViewModel @Inject constructor(
 
     fun onQRCodeScanned(qrCode: String) {
         viewModelScope.launch(dispatchers.io()) {
-            // Route via SyncCodeDispatcher. FF off → Legacy(parseSyncAuthCode(...)) so the
-            // existing v1 control flow runs byte-identical to pre-dispatcher production.
-            // FF on → v2-shaped codes are taken into ownership and surfaced via DispatchOutcome.
+            // FF off → Legacy runs the existing v1 control flow; FF on → v2 codes surface via DispatchOutcome.
             when (val decision = codeDispatcher.route(qrCode)) {
                 is RouteDecision.Legacy -> {
                     logcat { "Sync-CodeDispatch: SyncLoginViewModel handling Legacy(${decision.authCode::class.simpleName})" }
@@ -126,11 +124,7 @@ class SyncLoginViewModel @Inject constructor(
         }
     }
 
-    /**
-     * Map one v2 [DispatchOutcome] onto this VM's existing command pipeline. Mirrors the
-     * polling-loop terminal handling in [pollForRecoveryKey] so v1 and v2 success/error UX
-     * lands on the same screens.
-     */
+    /** Map one v2 [DispatchOutcome] onto this VM's existing command pipeline. */
     private suspend fun handleV2Outcome(outcome: DispatchOutcome) {
         when (outcome) {
             is DispatchOutcome.LoggedIn -> {
@@ -142,9 +136,7 @@ class SyncLoginViewModel @Inject constructor(
                 command.send(LoginSucess)
             }
             is DispatchOutcome.UpgradeRequired -> {
-                // Peer needs a newer protocol major than we support — show a visible "please
-                // update" error rather than the no-op processError gives an uncoded error.
-                // (Richer version-too-new UX tracked in Asana 1215484651575360.)
+                // Peer needs a newer protocol major — show a visible "please update" error. (follow-up: 1215484651575360)
                 command.send(ShowError(message = R.string.sync_flows_disabled_new_version, reason = "Code requires protocol v${outcome.codeMajor}"))
             }
             is DispatchOutcome.Failed -> {

@@ -80,12 +80,10 @@ class SyncConnectViewModel @Inject constructor(
     private val command = Channel<Command>(1, DROP_OLDEST)
     fun commands(): Flow<Command> = command.receiveAsFlow()
 
-    // M1.5: cached v2 linking code so onCopyCodeClicked can return it for the v2 path.
-    // Null when the v1 path is active.
+    // Cached v2 linking code so onCopyCodeClicked can return it for the v2 path. Null on the v1 path.
     private var v2LinkingCode: String? = null
 
-    // Start the session exactly once per ViewModel instance — see SyncWithAnotherActivityViewModel.
-    // The existing signed-in guard below stays as belt-and-suspenders.
+    // Start the session exactly once per ViewModel instance.
     private var sessionStarted = false
 
     private val viewState = MutableStateFlow(ViewState())
@@ -97,13 +95,8 @@ class SyncConnectViewModel @Inject constructor(
         if (sessionStarted) return
         sessionStarted = true
         viewModelScope.launch(dispatchers.io()) {
-            // SyncConnect is the signed-out entry point. The user can pair via EnterCode (a
-            // child activity) which signs the device in; the launcher callback then finishes
-            // this activity via onLoginSuccess(). In the brief window between EnterCode-success
-            // and this activity finishing, viewState re-enters STARTED and onStart re-fires —
-            // we don't want to spin up a fresh v2 session for a user who's already signed in.
-            // The signed-in M1 sibling (SyncWithAnotherActivityViewModel) has no analogous guard
-            // because that surface is signed-in-only by design.
+            // Don't start a fresh v2 session for a user already signed in via EnterCode while this
+            // activity is mid-finish (onStart can re-fire before onLoginSuccess() finishes it).
             if (syncAccountRepository.getAccountInfo().isSignedIn) {
                 logcat { "Sync: SyncConnect already signed in; skipping new session" }
                 return@launch
@@ -139,22 +132,12 @@ class SyncConnectViewModel @Inject constructor(
         syncFeature.canUseV2ConnectFlow().isEnabled() &&
             syncFeature.canShowV2ConnectCode().isEnabled()
 
-    /**
-     * Drive a v2 Presenter session through the dispatcher. M1.5 (subtask `1215246284113165`)
-     * extends M1's signed-in pattern to this signed-out surface. Role election may make this
-     * device Joiner (peer has account: Scenario A — Native; Scenario C — 3party) or Host
-     * (both signed-out: Scenario B, with account-creation-on-demand at Host.Sending via
-     * `RecoveryCodeProvider.createDdgAccountIfNeeded()` per subtask `1215168582640073`).
-     */
+    /** Drive a v2 Presenter session via the dispatcher. Role election may elect this device Host or Joiner. */
     private suspend fun startV2Present() {
         codeDispatcher.presentV2().collect { handleV2Outcome(it) }
     }
 
-    /**
-     * Map one v2 [DispatchOutcome] onto this VM's command pipeline. Shared by the Presenter
-     * (QR-display) path [startV2Present] and the Scanner path [onQRCodeScanned] — both observe
-     * the same dispatcher outcome stream.
-     */
+    /** Map one v2 [DispatchOutcome] onto this VM's command pipeline. Shared by the Presenter and Scanner paths. */
     private suspend fun handleV2Outcome(outcome: DispatchOutcome) {
         when (outcome) {
             is DispatchOutcome.LinkingCodeReady -> renderV2QrCode(outcome.linkingCode)
@@ -267,10 +250,7 @@ class SyncConnectViewModel @Inject constructor(
 
     fun onQRCodeScanned(qrCode: String) {
         viewModelScope.launch(dispatchers.io()) {
-            // Route via SyncCodeDispatcher. FF off → Legacy(parseSyncAuthCode(...)) so the body
-            // below runs byte-identical to pre-dispatcher production. FF on → v2-shaped codes are
-            // taken into ownership and surfaced through DispatchOutcome. Before this, the signed-out
-            // Connect camera scan parsed v1-only and rejected v2 codes as "invalid" (BUG-A / SURF-3).
+            // Route via SyncCodeDispatcher: FF off → Legacy (v1 path unchanged); FF on → v2 codes surface via DispatchOutcome.
             when (val decision = codeDispatcher.route(qrCode)) {
                 is RouteDecision.Legacy -> {
                     val codeType = decision.authCode.also { it.onCodeScanned() }
