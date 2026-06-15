@@ -16,4 +16,28 @@
 
 package com.duckduckgo.adblocking.impl
 
-object AdBlockingPixelNames
+import com.duckduckgo.app.statistics.pixels.Pixel
+
+enum class AdBlockingPixelNames(override val pixelName: String) : Pixel.PixelName {
+    AD_BLOCKING_SETTINGS_OPENED_DAILY("adBlocking_settings_opened_daily"),
+    AD_BLOCKING_SETTINGS_OPENED_COUNT("adBlocking_settings_opened_count"),
+
+    // Daily report of the current ad blocking state, fired at app launch.
+    AD_BLOCKING_STATE_DAILY("adBlocking_state_daily"),
+
+    // User enabled/disabled YouTube ad blocking in settings.
+    AD_BLOCKING_ENABLED_DAILY("adBlocking_enabled_daily"),
+    AD_BLOCKING_ENABLED_COUNT("adBlocking_enabled_count"),
+    AD_BLOCKING_DISABLED_DAILY("adBlocking_disabled_daily"),
+    AD_BLOCKING_DISABLED_COUNT("adBlocking_disabled_count"),
+
+    // Scriptlet update lifecycle: fetch -> validation -> install.
+    AD_BLOCKING_SCRIPTLETS_FETCH_ERROR_DAILY("adBlocking_scriptlets_fetch_error_daily"),
+    AD_BLOCKING_SCRIPTLETS_FETCH_ERROR_COUNT("adBlocking_scriptlets_fetch_error_count"),
+    AD_BLOCKING_SCRIPTLETS_VALIDATION_ERROR_DAILY("adBlocking_scriptlets_validation_error_daily"),
+    AD_BLOCKING_SCRIPTLETS_VALIDATION_ERROR_COUNT("adBlocking_scriptlets_validation_error_count"),
+    AD_BLOCKING_SCRIPTLETS_INSTALLED_DAILY("adBlocking_scriptlets_installed_daily"),
+    AD_BLOCKING_SCRIPTLETS_INSTALLED_COUNT("adBlocking_scriptlets_installed_count"),
+    AD_BLOCKING_SCRIPTLETS_INSTALL_ERROR_DAILY("adBlocking_scriptlets_install_error_daily"),
+    AD_BLOCKING_SCRIPTLETS_INSTALL_ERROR_COUNT("adBlocking_scriptlets_install_error_count"),
+}

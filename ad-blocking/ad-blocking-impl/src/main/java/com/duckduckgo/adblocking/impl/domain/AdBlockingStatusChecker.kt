@@ -33,6 +33,16 @@ import javax.inject.Inject
 
 interface AdBlockingStatusChecker {
     fun canInject(): Boolean
+
+    /**
+     * Reactive equivalent of [canInject]: emits whether ad blocking is currently active (remote
+     * config kill-switch on, not in contingency mode, and the user/default setting on). Unlike
+     * [canInject] — whose snapshot is seeded `false` until the DataStore-backed user setting
+     * resolves — collecting this waits for a real value, so it is safe for one-shot reads at app
+     * start.
+     */
+    fun observeCanInject(): Flow<Boolean>
+
     fun isShownInSettings(): Boolean
 
     /**
@@ -68,12 +78,8 @@ class RealAdBlockingStatusChecker @Inject constructor(
     @AppCoroutineScope appScope: CoroutineScope,
 ) : AdBlockingStatusChecker {
 
-    private val userEnabled: StateFlow<Boolean> = combine(
-        settingsRepository.isEnabledFlow(),
-        feature.enabledByDefault().enabled(),
-    ) { stored, enabledByDefault ->
-        stored ?: enabledByDefault
-    }.stateIn(appScope, SharingStarted.Eagerly, initialValue = false)
+    private val state: StateFlow<AdBlockingState> = observeState()
+        .stateIn(appScope, SharingStarted.Eagerly, AdBlockingState.Uninitialized)
 
     override fun canInject(): Boolean {
         if (!feature.self().isEnabled()) {
@@ -84,12 +90,22 @@ class RealAdBlockingStatusChecker @Inject constructor(
             logcat { "Contingency mode is on" }
             return false
         }
-        if (!userEnabled.value) {
+        if (state.value !is AdBlockingState.Enabled) {
             logcat { "User disabled ad blocking" }
             return false
         }
         return true
     }
+
+    override fun observeCanInject(): Flow<Boolean> =
+        combine(
+            feature.self().enabled(),
+            feature.enableContingencyMode().enabled(),
+            settingsRepository.isEnabledFlow(),
+            feature.enabledByDefault().enabled(),
+        ) { killSwitchOn, contingencyModeOn, stored, enabledByDefault ->
+            killSwitchOn && !contingencyModeOn && (stored ?: enabledByDefault)
+        }
 
     override fun isShownInSettings(): Boolean = feature.self().isEnabled()
 
@@ -110,8 +126,6 @@ class RealAdBlockingStatusChecker @Inject constructor(
                 }
             }
         }
-    private val state: StateFlow<AdBlockingState> = observeState()
-        .stateIn(appScope, SharingStarted.Eagerly, AdBlockingState.Uninitialized)
 
     override fun currentState(): AdBlockingState = state.value
 }
