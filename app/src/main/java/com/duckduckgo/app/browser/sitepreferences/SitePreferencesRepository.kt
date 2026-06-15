@@ -53,7 +53,7 @@ interface SitePreferencesRepository {
     suspend fun clearAllButFireproofed(fireproofedDomains: Set<String>)
 }
 
-@ContributesBinding(AppScope::class)
+@ContributesBinding(AppScope::class, boundType = SitePreferencesRepository::class)
 @ContributesMultibinding(AppScope::class, boundType = MainProcessLifecycleObserver::class)
 @SingleInstanceIn(AppScope::class)
 class RealSitePreferencesRepository @Inject constructor(
