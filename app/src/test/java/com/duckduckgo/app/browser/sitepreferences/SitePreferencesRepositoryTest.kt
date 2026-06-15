@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.browser.sitepreferences
 
+import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.room.Room
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
@@ -37,6 +38,10 @@ class SitePreferencesRepositoryTest {
     @get:Rule
     @Suppress("unused")
     val coroutineRule = CoroutineTestRule()
+
+    @get:Rule
+    @Suppress("unused")
+    val instantTaskExecutorRule = InstantTaskExecutorRule()
 
     private lateinit var db: AppDatabase
     private lateinit var dao: SitePreferencesDao
