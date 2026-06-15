@@ -22,7 +22,7 @@ import androidx.room.migration.Migration
 
 @Database(
     exportSchema = true,
-    version = 2,
+    version = 3,
     entities = [ScriptletEntity::class, ScriptletMetadataEntity::class],
 )
 abstract class AdBlockingExtensionDatabase : RoomDatabase() {

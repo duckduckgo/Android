@@ -138,6 +138,37 @@ class RealScriptletUpdaterTest {
     }
 
     @Test
+    fun whenScriptletsContainNamesNotInAllowlistThenOnlyAllowlistedEntriesAreDownloadedAndStored() = runTest {
+        val rulesPath = "rules/youtube.json"
+        val rulesEntry = ScriptletEntry(url = "https://cdn.example/rules.json", signature = "rules-sig")
+        val unknownJsPath = "scriptlets/other/something.js"
+        val unknownJsEntry = ScriptletEntry(url = "https://cdn.example/other.js", signature = "other-sig")
+        val settings = validSettings.copy(
+            scriptlets = mapOf(
+                isolatedPath to isolatedEntry,
+                rulesPath to rulesEntry,
+                unknownJsPath to unknownJsEntry,
+                mainPath to mainEntry,
+            ),
+        )
+        whenever(repository.getStoredVersion()).thenReturn("0.0.0")
+        whenever(downloader.download(isolatedEntry.url)).thenReturn(kotlin.Result.success(isolatedBytes))
+        whenever(downloader.download(mainEntry.url)).thenReturn(kotlin.Result.success(mainBytes))
+        whenever(validator.validate(isolatedBytes, isolatedEntry.signature)).thenReturn(ScriptletValidationResult.Valid)
+        whenever(validator.validate(mainBytes, mainEntry.signature)).thenReturn(ScriptletValidationResult.Valid)
+
+        assertEquals(ScriptletUpdateResult.Success, updater.update(settings))
+        verify(downloader, never()).download(rulesEntry.url)
+        verify(downloader, never()).download(unknownJsEntry.url)
+        verify(repository).storeScriptlets(
+            eq("2026.3.9"),
+            check { stored ->
+                assertEquals(setOf(isolatedPath, mainPath), stored.keys)
+            },
+        )
+    }
+
+    @Test
     fun whenOneDownloadFailsThenUpdateShortCircuitsAndCancelsInFlightDownloads() = runTest {
         whenever(repository.getStoredVersion()).thenReturn("0.0.0")
         val isolatedDownloadStarted = CompletableDeferred<Unit>()
