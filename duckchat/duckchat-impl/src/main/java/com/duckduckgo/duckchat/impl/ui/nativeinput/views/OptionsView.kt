@@ -177,7 +177,7 @@ class OptionsView(context: Context, private val host: NativeInputHost) : LinearL
     }
 
     private fun buildOptionsButton(): ImageView {
-        val iconSize = context.resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.toolbarIcon)
+        val iconSize = context.resources.getDimensionPixelSize(R.dimen.nativeInputButtonSize)
         return ImageView(context).apply {
             layoutParams = LayoutParams(iconSize, iconSize)
             setBackgroundResource(com.duckduckgo.mobile.android.R.drawable.selectable_item_rounded_corner_background)
