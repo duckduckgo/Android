@@ -40,40 +40,11 @@
         android:layout_height="wrap_content"
         app:primaryText="@string/contextualSheetChatsPopupRecentSection" />
 
-    <com.duckduckgo.common.ui.view.PopupMenuItemView
-        android:id="@+id/contextualChatsPopupRow1"
+    <LinearLayout
+        android:id="@+id/contextualChatsPopupRecentContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:visibility="gone"
-        app:primaryText="@string/duck_ai_chat_history_untitled" />
-
-    <com.duckduckgo.common.ui.view.PopupMenuItemView
-        android:id="@+id/contextualChatsPopupRow2"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:visibility="gone"
-        app:primaryText="@string/duck_ai_chat_history_untitled" />
-
-    <com.duckduckgo.common.ui.view.PopupMenuItemView
-        android:id="@+id/contextualChatsPopupRow3"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:visibility="gone"
-        app:primaryText="@string/duck_ai_chat_history_untitled" />
-
-    <com.duckduckgo.common.ui.view.PopupMenuItemView
-        android:id="@+id/contextualChatsPopupRow4"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:visibility="gone"
-        app:primaryText="@string/duck_ai_chat_history_untitled" />
-
-    <com.duckduckgo.common.ui.view.PopupMenuItemView
-        android:id="@+id/contextualChatsPopupRow5"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:visibility="gone"
-        app:primaryText="@string/duck_ai_chat_history_untitled" />
+        android:orientation="vertical" />
 
     <com.duckduckgo.common.ui.view.divider.HorizontalDivider
         android:id="@+id/contextualChatsPopupFooterDivider"

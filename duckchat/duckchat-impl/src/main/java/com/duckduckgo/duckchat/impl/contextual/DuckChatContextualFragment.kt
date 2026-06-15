@@ -42,6 +42,7 @@ import android.webkit.ValueCallback
 import android.webkit.WebChromeClient
 import android.webkit.WebSettings
 import android.webkit.WebView
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
 import androidx.annotation.AnyThread
@@ -751,25 +752,20 @@ class DuckChatContextualFragment :
             popup.onMenuItemClicked(newChatRow) { viewModel.onNewChatRequested() }
         }
 
-        val rowIds = listOf(
-            R.id.contextualChatsPopupRow1,
-            R.id.contextualChatsPopupRow2,
-            R.id.contextualChatsPopupRow3,
-            R.id.contextualChatsPopupRow4,
-            R.id.contextualChatsPopupRow5,
-        )
-        rowIds.forEachIndexed { index, id ->
-            val row = content.findViewById<PopupMenuItemView>(id)
-            val chat = recentChats.getOrNull(index)
-            if (chat == null) {
-                row.visibility = View.GONE
-            } else {
-                row.visibility = View.VISIBLE
-                row.setPrimaryText(chat.displayTitle)
-                row.setLeadingIconResource(chat.type.iconRes(chat.pinned))
-                row.applyMaxLines(MAX_CHAT_TITLE_LINES)
-                popup.onMenuItemClicked(row) { viewModel.onRecentChatClicked(chat.chatId) }
+        val recentContainer = content.findViewById<LinearLayout>(R.id.contextualChatsPopupRecentContainer)
+        recentContainer.removeAllViews()
+        recentChats.forEach { chat ->
+            val row = PopupMenuItemView(requireContext()).apply {
+                layoutParams = LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT,
+                )
+                setPrimaryText(chat.displayTitle)
+                setLeadingIconResource(chat.type.iconRes(chat.pinned))
+                applyMaxLines(MAX_CHAT_TITLE_LINES)
             }
+            popup.onMenuItemClicked(row) { viewModel.onRecentChatClicked(chat.chatId) }
+            recentContainer.addView(row)
         }
 
         val viewAllRow = content.findViewById<PopupMenuItemView>(R.id.contextualChatsPopupViewAll)
