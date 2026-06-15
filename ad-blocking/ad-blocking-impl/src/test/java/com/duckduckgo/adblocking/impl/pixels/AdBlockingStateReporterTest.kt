@@ -51,7 +51,7 @@ class AdBlockingStateReporterTest {
 
         verify(pixel).fire(
             AD_BLOCKING_STATE_DAILY,
-            parameters = mapOf("is_enabled" to "true", "analytics_enabled" to "true"),
+            parameters = mapOf("is_enabled" to "true", "user_opted_in" to "true"),
             type = Pixel.PixelType.Daily(),
         )
     }
@@ -65,7 +65,7 @@ class AdBlockingStateReporterTest {
 
         verify(pixel).fire(
             AD_BLOCKING_STATE_DAILY,
-            parameters = mapOf("is_enabled" to "true", "analytics_enabled" to "false"),
+            parameters = mapOf("is_enabled" to "true", "user_opted_in" to "false"),
             type = Pixel.PixelType.Daily(),
         )
     }
@@ -79,7 +79,7 @@ class AdBlockingStateReporterTest {
 
         verify(pixel).fire(
             AD_BLOCKING_STATE_DAILY,
-            parameters = mapOf("is_enabled" to "false", "analytics_enabled" to "true"),
+            parameters = mapOf("is_enabled" to "false", "user_opted_in" to "true"),
             type = Pixel.PixelType.Daily(),
         )
     }
@@ -93,7 +93,7 @@ class AdBlockingStateReporterTest {
 
         verify(pixel).fire(
             AD_BLOCKING_STATE_DAILY,
-            parameters = mapOf("is_enabled" to "false", "analytics_enabled" to "false"),
+            parameters = mapOf("is_enabled" to "false", "user_opted_in" to "false"),
             type = Pixel.PixelType.Daily(),
         )
     }

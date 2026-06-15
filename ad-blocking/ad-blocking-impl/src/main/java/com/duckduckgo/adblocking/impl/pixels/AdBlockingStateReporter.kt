@@ -54,7 +54,7 @@ class AdBlockingStateReporter @Inject constructor(
                 AD_BLOCKING_STATE_DAILY,
                 parameters = mapOf(
                     PARAM_IS_ENABLED to isActive.toString(),
-                    PARAM_ANALYTICS_ENABLED to (userState is AdBlockingState.Enabled.UserEnabled).toString(),
+                    PARAM_USER_OPTED_IN to (userState is AdBlockingState.Enabled.UserEnabled).toString(),
                 ),
                 type = Pixel.PixelType.Daily(),
             )
@@ -63,6 +63,6 @@ class AdBlockingStateReporter @Inject constructor(
 
     private companion object {
         private const val PARAM_IS_ENABLED = "is_enabled"
-        private const val PARAM_ANALYTICS_ENABLED = "analytics_enabled"
+        private const val PARAM_USER_OPTED_IN = "user_opted_in"
     }
 }

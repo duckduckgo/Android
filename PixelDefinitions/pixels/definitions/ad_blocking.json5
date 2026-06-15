@@ -27,7 +27,7 @@
                 "description": "Whether ad blocking is currently active (requires the feature enabled in remote config — kill-switch on and not in contingency mode — in addition to the user/default setting being on)"
             },
             {
-                "key": "analytics_enabled",
+                "key": "user_opted_in",
                 "type": "boolean",
                 "description": "Whether the user has explicitly opted in (turned the ad blocking setting on)"
             }
