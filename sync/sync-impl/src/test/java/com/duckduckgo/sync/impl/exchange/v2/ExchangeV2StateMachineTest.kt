@@ -285,6 +285,58 @@ class ExchangeV2StateMachineTest {
         assertSame(ExchangeV2State.Joiner.AbortedLocal, machine.currentState)
     }
 
+    @Test fun `when denied received in Joiner Confirming then transitions to Joiner AbortedByHost`() {
+        val machine = inJoinerConfirming()
+        val result = machine.receive(RecoveryCodeDenied("{}"))
+
+        assertSame(TransitionOutcome.Accepted, result.outcome)
+        assertSame(ExchangeV2State.Joiner.AbortedByHost, machine.currentState)
+    }
+
+    @Test fun `when unavailable received in Joiner Confirming then transitions to Joiner AbortedByHost`() {
+        val machine = inJoinerConfirming()
+        val result = machine.receive(RecoveryCodeUnavailable("{}"))
+
+        assertSame(TransitionOutcome.Accepted, result.outcome)
+        assertSame(ExchangeV2State.Joiner.AbortedByHost, machine.currentState)
+    }
+
+    @Test fun `when host success-phase message received in Joiner Confirming then aborts and stays put`() {
+        val hostSuccessPhase: List<ExchangeV2Message> = listOf(
+            RecoveryCodeAwaitingConfirmation("{}"),
+            RecoveryCodeConfirmed("{}"),
+            RecoveryCodeResponse("{}"),
+        )
+        for (msg in hostSuccessPhase) {
+            val machine = inJoinerConfirming()
+            val result = machine.receive(msg)
+            assertTrue("recv $msg in Joiner.Confirming should abort, got ${result.outcome}", result.outcome is TransitionOutcome.Aborted)
+            assertEquals(RejectReason.ImplicitAbort, (result.outcome as TransitionOutcome.Aborted).reason)
+            assertSame("recv $msg should leave the SM in Joiner.Confirming", ExchangeV2State.Joiner.Confirming, machine.currentState)
+        }
+    }
+
+    @Test fun `when negotiation-phase message received in Joiner Confirming then aborts`() {
+        val negotiationPhase: List<ExchangeV2Message> = listOf(
+            Hello("{}"),
+            availableFromPeer(),
+            requestFromPeer(),
+        )
+        for (msg in negotiationPhase) {
+            val machine = inJoinerConfirming()
+            val result = machine.receive(msg)
+            assertTrue("recv $msg in Joiner.Confirming should abort, got ${result.outcome}", result.outcome is TransitionOutcome.Aborted)
+        }
+    }
+
+    @Test fun `when unknown message received in Joiner Confirming then dropped`() {
+        val machine = inJoinerConfirming()
+        val result = machine.receive(Unknown("{}", "future"))
+
+        assertSame(TransitionOutcome.Dropped, result.outcome)
+        assertSame(ExchangeV2State.Joiner.Confirming, machine.currentState)
+    }
+
     @Test fun `when awaiting_confirmation received in Joiner Waiting then stays in Joiner Waiting`() {
         val machine = inJoinerWaiting()
         val result = machine.receive(RecoveryCodeAwaitingConfirmation("{}"))
