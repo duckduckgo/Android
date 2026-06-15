@@ -35,6 +35,13 @@ import javax.inject.Inject
 class OnboardingExperimentNativeInputFieldSuppressor @Inject constructor(
     private val duckAiOnboardingExperimentManager: DuckAiOnboardingExperimentManager,
 ) : NativeInputFieldSuppressor {
+    /**
+     * This works as expected for users enrolled in the active Duck.ai onboarding experiment.
+     * User enrolling mid-session will keep the unified input until the next refresh/restart.
+     * Accepted on purpose — experiment enrollment is closed, so the population is fixed before app start.
+     * This implementation will be removed once the experiment is disabled (ETA Jun 17th)
+     *
+     */
     override suspend fun isNativeInputFieldSuppressed(): Boolean =
         duckAiOnboardingExperimentManager.isEnrolledInActiveExperiment()
 }
