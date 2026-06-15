@@ -345,6 +345,9 @@ fladle {
             localResultsDir.set("fladleResults")
             // retry once, if it succeeds it will be reported as a flaky test
             flakyTestAttempts.set(1)
+            // Emit the full merged JUnit report so it retains every execution,
+            // including the failed attempt + passed rerun of a flaky test.
+            fullJunitResult.set(true)
         }
     }
 }
@@ -357,11 +360,7 @@ afterEvaluate {
                 tasks.named(it),
                 ANDROID_FIREBASE
         ).configure {
-            reports.setFrom(
-                    fileTree("build/fladle/fladleResults") {
-                        include "**/test_result_*.xml"
-                    }
-            )
+            reports.setFrom(file("build/fladle/fladleResults/JUnitReport.xml"))
         }
     }
 }
