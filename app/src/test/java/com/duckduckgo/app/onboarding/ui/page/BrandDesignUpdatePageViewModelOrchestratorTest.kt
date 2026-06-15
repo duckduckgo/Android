@@ -16,45 +16,29 @@
 
 package com.duckduckgo.app.onboarding.ui.page
 
+import android.annotation.SuppressLint
 import app.cash.turbine.test
-import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.browser.omnibar.OmnibarType
-import com.duckduckgo.app.global.DefaultRoleBrowserDialog
-import com.duckduckgo.app.global.install.AppInstallStore
-import com.duckduckgo.app.onboarding.CustomDuckAiOnboardingFeature
-import com.duckduckgo.app.onboarding.DuckAiOnboardingExperimentManager
 import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingActivityDialog
 import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingActivityStep
 import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingEvent
 import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingPlanProvider
 import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingResult
+import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingStepIds
 import com.duckduckgo.app.onboarding.store.OnboardingStore
-import com.duckduckgo.app.onboardingquicksetup.OnboardingQuickSetupExperimentManager
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_COMPARISON_CHART_SHOWN_UNIQUE
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_INTRO_SHOWN_UNIQUE
-import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
-import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
-import com.duckduckgo.app.widget.ui.WidgetCapabilities
-import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.test.CoroutineTestRule
-import com.duckduckgo.duckchat.api.DuckChat
-import com.duckduckgo.duckchat.impl.inputscreen.wideevents.InputScreenOnboardingWideEvent
-import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.onboarding.api.LinearOnboardingEvent
-import com.duckduckgo.onboarding.api.LinearOnboardingOrchestrator
 import com.duckduckgo.onboarding.api.LinearOnboardingPlan
-import com.duckduckgo.onboarding.api.LinearOnboardingState
-import com.duckduckgo.onboarding.api.LinearOnboardingState.InProgress
-import com.duckduckgo.onboarding.api.LinearOnboardingStep
+import com.duckduckgo.onboarding.api.LinearOnboardingResult
 import com.duckduckgo.onboarding.api.LinearOnboardingTransition
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
+import com.duckduckgo.onboarding.impl.LinearOnboardingOrchestratorImpl
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -62,6 +46,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
+@SuppressLint("DenyListedApi")
 class BrandDesignUpdatePageViewModelOrchestratorTest {
 
     @get:Rule
@@ -69,88 +54,77 @@ class BrandDesignUpdatePageViewModelOrchestratorTest {
 
     private val pixel: Pixel = mock()
     private val onboardingStore: OnboardingStore = mock()
-    private val defaultRoleBrowserDialog: DefaultRoleBrowserDialog = mock()
-    private val customDuckAiOnboardingFeature: CustomDuckAiOnboardingFeature = mock()
-    private val customAiToggle: Toggle = mock()
-    private val fakeOrchestrator = FakeOrchestrator()
+    private val orchestrator = LinearOnboardingOrchestratorImpl()
+    private val recordedEvents = mutableListOf<LinearOnboardingEvent>()
 
-    private class FakeOrchestrator : LinearOnboardingOrchestrator {
-        val stateFlow = MutableStateFlow<LinearOnboardingState>(LinearOnboardingState.NotStarted)
-        override val state: StateFlow<LinearOnboardingState> = stateFlow
-        val events = mutableListOf<LinearOnboardingEvent>()
-        override suspend fun startPlan(plan: LinearOnboardingPlan) = Unit
-        override suspend fun onEvent(event: LinearOnboardingEvent) {
-            events.add(event)
-        }
+    // Default step transition: record the event the view model emitted and stay on the same dialog.
+    private val recordAndStay: suspend (LinearOnboardingEvent) -> LinearOnboardingTransition = { event ->
+        recordedEvents.add(event)
+        LinearOnboardingTransition.Stay
     }
 
     @Before
     fun setup() {
-        whenever(customDuckAiOnboardingFeature.introAnimation()).thenReturn(customAiToggle)
-        whenever(customAiToggle.isEnabled()).thenReturn(false)
         whenever(onboardingStore.getSearchOptions()).thenReturn(emptyList())
         whenever(onboardingStore.getChatSuggestions()).thenReturn(emptyList())
     }
 
-    private fun step(dialog: NewUserOnboardingActivityDialog, id: String = "step"): LinearOnboardingStep =
-        NewUserOnboardingActivityStep(id = id, transition = { LinearOnboardingTransition.Stay }, resolveDialog = { dialog })
+    // A one-step plan that renders [dialog]. By default the step records every event it is handed and stays put,
+    // so the view model keeps showing [dialog] across callbacks and the test can assert what it emitted. Override
+    // [transition] (and [result]) to drive the run to a terminal state instead.
+    private fun planAt(
+        dialog: NewUserOnboardingActivityDialog,
+        id: String = "step",
+        transition: suspend (LinearOnboardingEvent) -> LinearOnboardingTransition = recordAndStay,
+        result: suspend () -> LinearOnboardingResult? = { null },
+    ): LinearOnboardingPlan =
+        LinearOnboardingPlan(
+            id = NewUserOnboardingPlanProvider.ROOT_PLAN_ID,
+            steps = listOf(NewUserOnboardingActivityStep(id = id, transition = transition, resolveDialog = { dialog })),
+            result = result,
+        )
 
-    private fun inProgressWith(dialog: NewUserOnboardingActivityDialog, id: String = "step"): InProgress {
-        val plan = LinearOnboardingPlan(id = "test_plan", steps = listOf(step(dialog, id)))
-        return InProgress(rootPlanId = NewUserOnboardingPlanProvider.ROOT_PLAN_ID, currentPlan = plan, currentStepIndex = 0)
+    // Starts the real orchestrator on [planAt] and builds the view model, which enters orchestrator mode because
+    // a run is already in progress and immediately renders the started step.
+    private suspend fun startAt(
+        dialog: NewUserOnboardingActivityDialog,
+        id: String = "step",
+        transition: suspend (LinearOnboardingEvent) -> LinearOnboardingTransition = recordAndStay,
+        result: suspend () -> LinearOnboardingResult? = { null },
+    ): BrandDesignUpdatePageViewModel {
+        orchestrator.startPlan(planAt(dialog, id, transition, result))
+        return createViewModel()
     }
 
-    // Constructs the VM in orchestrator mode. Seeds the orchestrator at the given dialog first, because the VM both
-    // derives its mode (orchestrator.state != NotStarted) and renders the current dialog from the observed state.
-    private fun createViewModelAt(
-        startingDialog: NewUserOnboardingActivityDialog,
-        id: String = "step",
-    ): BrandDesignUpdatePageViewModel {
-        fakeOrchestrator.stateFlow.value = inProgressWith(startingDialog, id)
-        return BrandDesignUpdatePageViewModel(
-            defaultRoleBrowserDialog = defaultRoleBrowserDialog,
+    private fun createViewModel(): BrandDesignUpdatePageViewModel =
+        BrandDesignUpdatePageViewModel(
+            defaultRoleBrowserDialog = mock(),
             context = mock(),
             pixel = pixel,
-            appInstallStore = mock<AppInstallStore>(),
-            settingsDataStore = mock<SettingsDataStore>(),
+            appInstallStore = mock(),
+            settingsDataStore = mock(),
             dispatchers = coroutineRule.testDispatcherProvider,
-            appBuildConfig = mock<AppBuildConfig>(),
+            appBuildConfig = mock(),
             onboardingStore = onboardingStore,
-            androidBrowserConfigFeature = mock<AndroidBrowserConfigFeature>(),
-            duckChat = mock<DuckChat>(),
-            inputScreenOnboardingWideEvent = mock<InputScreenOnboardingWideEvent>(),
-            duckAiOnboardingExperimentManager = mock<DuckAiOnboardingExperimentManager>(),
-            onboardingQuickSetupExperimentManager = mock<OnboardingQuickSetupExperimentManager>(),
-            defaultBrowserDetector = mock<DefaultBrowserDetector>(),
-            widgetCapabilities = mock<WidgetCapabilities>(),
+            androidBrowserConfigFeature = mock(),
+            duckChat = mock(),
+            inputScreenOnboardingWideEvent = mock(),
+            duckAiOnboardingExperimentManager = mock(),
+            onboardingQuickSetupExperimentManager = mock(),
+            defaultBrowserDetector = mock(),
+            widgetCapabilities = mock(),
             syncAutoRestore = mock(),
             quickSetupPixelSender = mock(),
-            customDuckAiOnboardingFeature = customDuckAiOnboardingFeature,
-            orchestrator = fakeOrchestrator,
+            customDuckAiOnboardingFeature = mock(),
+            orchestrator = orchestrator,
         )
-    }
 
     @Test
-    fun `when state is initial then view state shows initial and fires shown pixel`() = runTest {
-        val testee = createViewModelAt(NewUserOnboardingActivityDialog.Initial)
-        advanceUntilIdle()
-
-        assertEquals(PreOnboardingDialogType.INITIAL, testee.viewState.value.currentDialog)
-        verify(pixel).fire(PREONBOARDING_INTRO_SHOWN_UNIQUE, type = Unique())
-    }
-
-    @Test
-    fun `when state is comparison chart then view state shows comparison chart`() = runTest {
-        val testee = createViewModelAt(NewUserOnboardingActivityDialog.ComparisonChart)
-        advanceUntilIdle()
-
-        assertEquals(PreOnboardingDialogType.COMPARISON_CHART, testee.viewState.value.currentDialog)
-        verify(pixel).fire(PREONBOARDING_COMPARISON_CHART_SHOWN_UNIQUE, type = Unique())
-    }
-
-    @Test
-    fun `when intro animation dialog then plays intro animation`() = runTest {
-        val testee = createViewModelAt(NewUserOnboardingActivityDialog.IntroAnimation(withDuckAi = false), id = "intro_animation")
+    fun `when intro animation step then plays intro animation`() = runTest {
+        val testee = startAt(
+            NewUserOnboardingActivityDialog.IntroAnimation(withDuckAi = false),
+            id = NewUserOnboardingStepIds.INTRO_ANIMATION,
+        )
         testee.commands.test {
             advanceUntilIdle()
             assertEquals(
@@ -161,129 +135,173 @@ class BrandDesignUpdatePageViewModelOrchestratorTest {
     }
 
     @Test
-    fun `when continue methods then emit continue clicked`() = runTest {
-        val testee = createViewModelAt(NewUserOnboardingActivityDialog.Initial)
-        advanceUntilIdle()
-        testee.onPrimaryCtaClicked()
-
-        fakeOrchestrator.stateFlow.value = inProgressWith(NewUserOnboardingActivityDialog.ComparisonChart)
-        advanceUntilIdle()
-        testee.onPrimaryCtaClicked()
-
-        fakeOrchestrator.stateFlow.value = inProgressWith(NewUserOnboardingActivityDialog.InputScreenPreview(isSearchDefault = false))
-        advanceUntilIdle()
-        testee.onPrimaryCtaClicked()
+    fun `when state is initial then view state shows initial and fires shown pixel`() = runTest {
+        val testee = startAt(NewUserOnboardingActivityDialog.Initial)
         advanceUntilIdle()
 
-        assertEquals(
-            listOf(
-                NewUserOnboardingEvent.ContinueClicked,
-                NewUserOnboardingEvent.ContinueClicked,
-                NewUserOnboardingEvent.ContinueClicked,
-            ),
-            fakeOrchestrator.events,
-        )
+        assertEquals(PreOnboardingDialogType.INITIAL, testee.viewState.value.currentDialog)
+        verify(pixel).fire(PREONBOARDING_INTRO_SHOWN_UNIQUE, type = Unique())
+    }
+
+    @Test
+    fun `when state is comparison chart then view state shows comparison chart and fires shown pixel`() = runTest {
+        val testee = startAt(NewUserOnboardingActivityDialog.ComparisonChart)
+        advanceUntilIdle()
+
+        assertEquals(PreOnboardingDialogType.COMPARISON_CHART, testee.viewState.value.currentDialog)
+        verify(pixel).fire(PREONBOARDING_COMPARISON_CHART_SHOWN_UNIQUE, type = Unique())
+    }
+
+    @Test
+    fun `when continue clicked on initial then emits continue clicked`() = runTest {
+        val testee = startAt(NewUserOnboardingActivityDialog.Initial)
+        advanceUntilIdle()
+
+        testee.onPrimaryCtaClicked()
+        advanceUntilIdle()
+
+        assertEquals(listOf(NewUserOnboardingEvent.ContinueClicked), recordedEvents)
+    }
+
+    @Test
+    fun `when continue clicked on comparison chart then emits continue clicked`() = runTest {
+        val testee = startAt(NewUserOnboardingActivityDialog.ComparisonChart)
+        advanceUntilIdle()
+
+        testee.onPrimaryCtaClicked()
+        advanceUntilIdle()
+
+        assertEquals(listOf(NewUserOnboardingEvent.ContinueClicked), recordedEvents)
     }
 
     @Test
     fun `when address bar confirmed then emits with selected type`() = runTest {
-        val testee = createViewModelAt(NewUserOnboardingActivityDialog.AddressBarPosition(showSplitOption = false))
+        val testee = startAt(NewUserOnboardingActivityDialog.AddressBarPosition(showSplitOption = false))
         advanceUntilIdle()
+
         testee.onAddressBarPositionOptionSelected(OmnibarType.SINGLE_BOTTOM)
         testee.onPrimaryCtaClicked()
         advanceUntilIdle()
 
-        assertEquals(listOf(NewUserOnboardingEvent.AddressBarConfirmed(OmnibarType.SINGLE_BOTTOM)), fakeOrchestrator.events)
+        assertEquals(listOf(NewUserOnboardingEvent.AddressBarConfirmed(OmnibarType.SINGLE_BOTTOM)), recordedEvents)
     }
 
     @Test
     fun `when input mode confirmed then emits with selection`() = runTest {
-        val testee = createViewModelAt(NewUserOnboardingActivityDialog.InputScreen)
+        val testee = startAt(NewUserOnboardingActivityDialog.InputScreen)
         advanceUntilIdle()
+
         testee.onInputScreenOptionSelected(withAi = false)
         testee.onPrimaryCtaClicked()
         advanceUntilIdle()
 
-        assertEquals(listOf(NewUserOnboardingEvent.InputModeConfirmed(withAi = false)), fakeOrchestrator.events)
+        assertEquals(listOf(NewUserOnboardingEvent.InputModeConfirmed(withAi = false)), recordedEvents)
     }
 
     @Test
-    fun `when skip resume restore methods then emit matching events`() = runTest {
-        val testee = createViewModelAt(NewUserOnboardingActivityDialog.SyncRestore)
+    fun `when restore then skip on sync restore then emits restore requested then skip requested`() = runTest {
+        val testee = startAt(NewUserOnboardingActivityDialog.SyncRestore)
         advanceUntilIdle()
-        testee.onPrimaryCtaClicked()
-        testee.onSecondaryCtaClicked()
 
-        fakeOrchestrator.stateFlow.value = inProgressWith(NewUserOnboardingActivityDialog.InitialReinstallUser)
-        advanceUntilIdle()
-        testee.onSecondaryCtaClicked()
-
-        fakeOrchestrator.stateFlow.value = inProgressWith(NewUserOnboardingActivityDialog.SkipNewUserOnboardingOption)
-        advanceUntilIdle()
         testee.onPrimaryCtaClicked()
         testee.onSecondaryCtaClicked()
         advanceUntilIdle()
 
         assertEquals(
-            listOf(
-                NewUserOnboardingEvent.RestoreRequested,
-                NewUserOnboardingEvent.SkipRequested,
-                NewUserOnboardingEvent.SkipRequested,
-                NewUserOnboardingEvent.SkipConfirmed,
-                NewUserOnboardingEvent.ResumeRequested,
-            ),
-            fakeOrchestrator.events,
+            listOf(NewUserOnboardingEvent.RestoreRequested, NewUserOnboardingEvent.SkipRequested),
+            recordedEvents,
         )
     }
 
     @Test
-    fun `when completed with no result then sends plain finish`() = runTest {
-        val testee = createViewModelAt(NewUserOnboardingActivityDialog.Initial)
+    fun `when skip on reinstall user then emits skip requested`() = runTest {
+        val testee = startAt(NewUserOnboardingActivityDialog.InitialReinstallUser)
+        advanceUntilIdle()
+
+        testee.onSecondaryCtaClicked()
+        advanceUntilIdle()
+
+        assertEquals(listOf(NewUserOnboardingEvent.SkipRequested), recordedEvents)
+    }
+
+    @Test
+    fun `when skip confirmed then resume on skip option then emits skip confirmed then resume requested`() = runTest {
+        val testee = startAt(NewUserOnboardingActivityDialog.SkipNewUserOnboardingOption)
+        advanceUntilIdle()
+
+        testee.onPrimaryCtaClicked()
+        testee.onSecondaryCtaClicked()
+        advanceUntilIdle()
+
+        assertEquals(
+            listOf(NewUserOnboardingEvent.SkipConfirmed, NewUserOnboardingEvent.ResumeRequested),
+            recordedEvents,
+        )
+    }
+
+    @Test
+    fun `when demo query submitted then forwards event`() = runTest {
+        val testee = startAt(NewUserOnboardingActivityDialog.InputScreenPreview(isSearchDefault = false))
+        advanceUntilIdle()
+
+        testee.onInputModeDemoQuerySubmitted(query = "cats", isChat = true)
+        advanceUntilIdle()
+
+        assertEquals(listOf(NewUserOnboardingEvent.InputDemoQuerySubmitted(query = "cats", isChat = true)), recordedEvents)
+    }
+
+    @Test
+    fun `when run completes with no result then sends plain finish`() = runTest {
+        val testee = startAt(NewUserOnboardingActivityDialog.Initial, transition = { LinearOnboardingTransition.Advance })
         testee.commands.test {
-            fakeOrchestrator.stateFlow.value = LinearOnboardingState.Completed(rootPlanId = NewUserOnboardingPlanProvider.ROOT_PLAN_ID)
+            advanceUntilIdle()
+            orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked) // -> Advance -> run completes
             advanceUntilIdle()
             assertEquals(BrandDesignUpdatePageViewModel.Command.Finish, awaitItem())
         }
     }
 
     @Test
-    fun `when completed with launch search result then submits search query`() = runTest {
-        val testee = createViewModelAt(NewUserOnboardingActivityDialog.Initial)
+    fun `when run completes with launch search result then submits search query`() = runTest {
+        val testee = startAt(
+            NewUserOnboardingActivityDialog.Initial,
+            transition = { LinearOnboardingTransition.Advance },
+            result = { NewUserOnboardingResult.LaunchSearch(query = "weather") },
+        )
         testee.commands.test {
-            fakeOrchestrator.stateFlow.value = LinearOnboardingState.Completed(
-                rootPlanId = NewUserOnboardingPlanProvider.ROOT_PLAN_ID,
-                result = NewUserOnboardingResult.LaunchSearch(query = "weather"),
-            )
+            advanceUntilIdle()
+            orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked)
             advanceUntilIdle()
             assertEquals(BrandDesignUpdatePageViewModel.Command.FinishAndSubmitSearchQuery(query = "weather"), awaitItem())
         }
     }
 
     @Test
-    fun `when skipped then sends onboarding skipped`() = runTest {
-        val testee = createViewModelAt(NewUserOnboardingActivityDialog.Initial)
+    fun `when run completes with launch chat result then submits chat prompt`() = runTest {
+        val testee = startAt(
+            NewUserOnboardingActivityDialog.InputScreenPreview(isSearchDefault = false),
+            transition = { LinearOnboardingTransition.Advance },
+            result = { NewUserOnboardingResult.LaunchChat(prompt = "cats") },
+        )
         testee.commands.test {
-            fakeOrchestrator.stateFlow.value = LinearOnboardingState.Skipped(rootPlanId = NewUserOnboardingPlanProvider.ROOT_PLAN_ID)
             advanceUntilIdle()
-            assertEquals(BrandDesignUpdatePageViewModel.Command.OnboardingSkipped, awaitItem())
+            orchestrator.onEvent(NewUserOnboardingEvent.InputDemoQuerySubmitted(query = "cats", isChat = true))
+            advanceUntilIdle()
+            assertEquals(BrandDesignUpdatePageViewModel.Command.FinishAndSubmitChatPrompt(prompt = "cats"), awaitItem())
         }
     }
 
     @Test
-    fun `when demo query submitted then forwards event and completed result drives finish`() = runTest {
-        val testee = createViewModelAt(NewUserOnboardingActivityDialog.InputScreenPreview(isSearchDefault = false))
+    fun `when run aborted then sends onboarding skipped`() = runTest {
+        val testee = startAt(
+            NewUserOnboardingActivityDialog.SkipNewUserOnboardingOption,
+            transition = { LinearOnboardingTransition.AbortPlan },
+        )
         testee.commands.test {
-            testee.onInputModeDemoQuerySubmitted(query = "cats", isChat = true)
             advanceUntilIdle()
-
-            // The VM forwards the query as an event; the orchestrator surfaces it on Completed.result.
-            fakeOrchestrator.stateFlow.value = LinearOnboardingState.Completed(
-                rootPlanId = NewUserOnboardingPlanProvider.ROOT_PLAN_ID,
-                result = NewUserOnboardingResult.LaunchChat(prompt = "cats"),
-            )
+            orchestrator.onEvent(NewUserOnboardingEvent.SkipConfirmed) // -> AbortPlan -> run skipped
             advanceUntilIdle()
-            assertEquals(BrandDesignUpdatePageViewModel.Command.FinishAndSubmitChatPrompt(prompt = "cats"), awaitItem())
+            assertEquals(BrandDesignUpdatePageViewModel.Command.OnboardingSkipped, awaitItem())
         }
-        assertTrue(fakeOrchestrator.events.contains(NewUserOnboardingEvent.InputDemoQuerySubmitted(query = "cats", isChat = true)))
     }
 }
