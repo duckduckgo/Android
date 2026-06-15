@@ -80,6 +80,8 @@ class FakeDuckChat(
         inputScreenUserSettingEnabled.value = enabled
     }
 
+    override suspend fun isInputScreenEverEnabled(): Boolean = false
+
     override suspend fun setCosmeticInputScreenUserSetting(enabled: Boolean) {
         cosmeticInputScreenUserSettingEnabled.value = enabled
     }
@@ -117,6 +119,8 @@ class FakeDuckChat(
     override fun endVoiceChatSession(tabId: String) { }
 
     override suspend fun isChatHistoryAvailable(): Boolean = false
+
+    override suspend fun onAddressBarPickerDuckAiSelected() { }
 
     fun setEnabled(enabled: Boolean) {
         this.enabled = enabled

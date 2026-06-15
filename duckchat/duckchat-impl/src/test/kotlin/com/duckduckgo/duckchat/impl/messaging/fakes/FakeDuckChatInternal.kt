@@ -83,6 +83,8 @@ class FakeDuckChatInternal(
         inputScreenUserSettingEnabled.value = enabled
     }
 
+    override suspend fun isInputScreenEverEnabled(): Boolean = false
+
     override suspend fun setCosmeticInputScreenUserSetting(enabled: Boolean) {
         cosmeticInputScreenUserSettingEnabled.value = enabled
     }
@@ -196,6 +198,8 @@ class FakeDuckChatInternal(
     override fun endVoiceChatSession(tabId: String) { }
 
     override suspend fun isChatHistoryAvailable(): Boolean = false
+
+    override suspend fun onAddressBarPickerDuckAiSelected() { }
 
     override fun buildChatUrl(chatId: String): String = "https://duck.ai?chatID=$chatId"
 
