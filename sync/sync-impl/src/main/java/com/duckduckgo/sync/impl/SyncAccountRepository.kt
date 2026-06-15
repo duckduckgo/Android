@@ -282,8 +282,8 @@ class AppSyncAccountRepository @Inject constructor(
      * code, null otherwise. Errors (bad base64, bad JSON, missing fields) are swallowed and turned
      * into null — callers translate null into a user-facing error.
      *
-     * Discrimination: `recovery.cid == "3party"` AND `recovery.v` starts with "2." (clients in
-     * major version 2 accept any 2.x code) AND `secret`/`user_id` are non-empty.
+     * Discrimination: `recovery.cid == "3party"` AND `recovery.v` is major version 2 — bare "2"
+     * (the common shorthand) or any "2.x" — AND `secret`/`user_id` are non-empty.
      */
     private fun parseThirdPartyRecoveryCode(pastedCode: String): ThirdPartyRecoveryCode? {
         return kotlin.runCatching {
@@ -291,7 +291,7 @@ class AppSyncAccountRepository @Inject constructor(
             val decodedJson = decodedBytes.toString(Charsets.UTF_8)
             val parsed = Adapters.thirdPartyRecoveryCodeAdapter.fromJson(decodedJson)?.recovery ?: return@runCatching null
             if (parsed.cid != CREDENTIAL_ID_3PARTY) return@runCatching null
-            if (!parsed.v.startsWith("2.")) return@runCatching null
+            if (parsed.v.substringBefore(".") != RECOVERY_CODE_MAJOR_V2) return@runCatching null
             if (parsed.secret.isEmpty() || parsed.userId.isEmpty()) return@runCatching null
             parsed
         }.getOrNull()
@@ -1475,6 +1475,7 @@ internal const val SYNC_SCOPE_AI_CHATS = "ai_chats"
 // (Asana 1214804486778180). Format is "major.minor" — clients in major version 2 accept 2.x
 // codes (ignoring unknown fields) and must reject codes with major version >2.
 internal const val RECOVERY_CODE_V2 = "2.0"
+internal const val RECOVERY_CODE_MAJOR_V2 = "2"
 
 internal fun SyncCryptoResult.checkResult(errorMessage: String) {
     if (result != 0) {

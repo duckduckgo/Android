@@ -1479,6 +1479,16 @@ class AppSyncAccountRepositoryTest {
     }
 
     @Test
+    fun whenJoinAccountFromThirdPartyAndCodeIsBareMajorVersionThenAccepted() {
+        // "2" is the spec's common shorthand for "2.0" (Transport TD 1214486492252757).
+        val pastedCode = prepareForJoinAccountFromThirdPartyRecoveryCode(version = "2")
+
+        val result = syncRepo.joinAccountFromThirdPartyRecoveryCode(pastedCode)
+
+        assertTrue(result is Success)
+    }
+
+    @Test
     fun whenJoinAccountFromThirdPartyAndCodeIsMajorVersion3ThenRejectedWithoutNetwork() {
         val pastedCode = prepareForJoinAccountFromThirdPartyRecoveryCode(version = "3.0")
 
