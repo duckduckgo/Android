@@ -740,12 +740,12 @@ class MigrationsProvider(val context: Context, val settingsDataStore: SettingsDa
         }
     }
 
-    private val MIGRATION_61_TO_62: Migration = object : Migration(61, 62) {
+    val MIGRATION_61_TO_62: Migration = object : Migration(61, 62) {
         override fun migrate(database: SupportSQLiteDatabase) {
             database.execSQL(
                 "CREATE TABLE IF NOT EXISTS `site_preferences` (" +
                     "`domain` TEXT NOT NULL, " +
-                    "`desktopModeEnabled` INTEGER NOT NULL DEFAULT 0, " +
+                    "`desktopModeEnabled` INTEGER NOT NULL, " +
                     "PRIMARY KEY(`domain`))",
             )
         }

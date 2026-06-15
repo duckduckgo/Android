@@ -20,8 +20,8 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 
 /**
- * Per-site user preferences, keyed by registrable domain (eTLD+1). Currently holds only the
- * "remember desktop mode" choice; additional per-site preference columns can be added here over time.
+ * Per-site user preferences, keyed by registrable domain (eTLD+1, or the raw host when there is no
+ * registrable domain — IPs, localhost). Currently holds only the "remember desktop mode" choice.
  */
 @Entity(tableName = "site_preferences")
 data class SitePreferencesEntity(

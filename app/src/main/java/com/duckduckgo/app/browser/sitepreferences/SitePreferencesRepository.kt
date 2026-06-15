@@ -23,27 +23,27 @@ import com.duckduckgo.common.utils.extensions.toTldPlusOne
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
-import java.util.concurrent.CopyOnWriteArraySet
-import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.util.concurrent.CopyOnWriteArraySet
+import javax.inject.Inject
 
 interface SitePreferencesRepository {
 
     /**
      * Synchronous, in-memory check — safe to call on the WebView network thread.
-     * @param domain a registrable domain (eTLD+1).
+     * @param domain a site key: eTLD+1, or the raw host when there is no registrable domain.
      */
     fun isDesktopModeRemembered(domain: String): Boolean
 
-    /** Remember that [domain] (eTLD+1) should always open in desktop mode. */
+    /** Remember that [domain] (site key) should always open in desktop mode. */
     fun rememberDesktopMode(domain: String)
 
-    /** Forget the desktop-mode preference for [domain] (eTLD+1). */
+    /** Forget the desktop-mode preference for [domain] (site key). */
     fun forgetDesktopMode(domain: String)
 
-    /** Forget the desktop-mode preference for all of [domains] (eTLD+1) — used by single-tab burn. */
+    /** Forget the desktop-mode preference for all of [domains] (site keys) — used by single-tab burn. */
     suspend fun forgetDesktopMode(domains: Set<String>)
 
     /** Forget every preference except those for [fireproofedDomains] (eTLD+1) — used by the fire button. */
@@ -79,8 +79,6 @@ class RealSitePreferencesRepository @Inject constructor(
 
     override fun rememberDesktopMode(domain: String) {
         // Optimistic update so the immediate post-toggle reload's interceptor read sees the new value.
-        // Accepted race: a Flow emission computed before the DB write below lands can momentarily revert
-        // the cache; the insert's own emission converges it. No locking for this quick win.
         desktopModeDomains.add(domain)
         appCoroutineScope.launch(dispatcherProvider.io()) {
             sitePreferencesDao.insert(SitePreferencesEntity(domain = domain, desktopModeEnabled = true))

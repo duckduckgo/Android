@@ -1691,16 +1691,19 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
-    override suspend fun isDesktopSiteEnabled(url: String): Boolean = withContext(dispatchers.io()) {
+    override fun isDesktopSiteEnabled(url: String): Boolean =
         if (rememberDesktopModeFeature.self().isEnabled()) {
             isDesktopModeRememberedForUrl(url)
         } else {
             currentBrowserViewState().isDesktopBrowsingMode
         }
-    }
 
     private fun isDesktopModeRememberedForUrl(url: String): Boolean =
-        url.toUri().host?.toTldPlusOne()?.let { sitePreferencesRepository.isDesktopModeRemembered(it) } ?: false
+        url.toUri().host?.let { sitePreferencesRepository.isDesktopModeRemembered(it.desktopModeSiteKey()) } ?: false
+
+    // eTLD+1 when available, otherwise the raw host (IPs, localhost, single-label intranet hosts have no
+    // registrable domain). Matches the visited-sites key idiom so desktop mode works for those hosts too.
+    private fun String.desktopModeSiteKey(): String = toTldPlusOne() ?: this
 
     override fun isTabInForeground(): Boolean =
         if (swipingTabsFeature.isEnabled) {
@@ -3332,15 +3335,16 @@ class BrowserTabViewModel @Inject constructor(
 
         val uri = site?.uri ?: return
 
-        // Persist the choice per-domain (eTLD+1). uri.host is the pre-rewrite host (e.g. m.example.com),
-        // whose eTLD+1 (example.com) matches the key the desktop-rewritten URL produces. The optimistic
-        // cache update means the reload triggered below already sees the new value.
+        // Persist the choice per-site. uri.host is the pre-rewrite host (e.g. m.example.com), whose eTLD+1
+        // (example.com) matches the key the desktop-rewritten URL produces; hosts without a registrable
+        // domain (IPs, localhost) fall back to the raw host. The optimistic cache update means the reload
+        // triggered below already sees the new value.
         if (rememberDesktopModeFeature.self().isEnabled()) {
-            uri.host?.toTldPlusOne()?.let { domain ->
+            uri.host?.desktopModeSiteKey()?.let { key ->
                 if (desktopSiteRequested) {
-                    sitePreferencesRepository.rememberDesktopMode(domain)
+                    sitePreferencesRepository.rememberDesktopMode(key)
                 } else {
-                    sitePreferencesRepository.forgetDesktopMode(domain)
+                    sitePreferencesRepository.forgetDesktopMode(key)
                 }
             }
         }
