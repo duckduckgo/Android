@@ -888,6 +888,10 @@ class AppSyncAccountRepository @Inject constructor(
         syncStore.protectedKeysJson = protectedKeysJson
 
         logcat { "Sync-ScopedToken: 3party→ddg upgrade complete; account joined as ddg" }
+
+        appCoroutineScope.launch(dispatcherProvider.io()) {
+            syncEngine.triggerSync(ACCOUNT_LOGIN)
+        }
         return Success(true)
     }
 
