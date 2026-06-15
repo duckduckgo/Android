@@ -31,6 +31,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.mock
 
 @RunWith(AndroidJUnit4::class)
 class SitePreferencesRepositoryTest {
@@ -45,7 +46,7 @@ class SitePreferencesRepositoryTest {
 
     private lateinit var db: AppDatabase
     private lateinit var dao: SitePreferencesDao
-    private lateinit var repository: SitePreferencesRepository
+    private lateinit var repository: RealSitePreferencesRepository
 
     @Before
     fun before() {
@@ -54,6 +55,7 @@ class SitePreferencesRepositoryTest {
             .build()
         dao = db.sitePreferencesDao()
         repository = RealSitePreferencesRepository(dao, TestScope(), coroutineRule.testDispatcherProvider, isMainProcess = true)
+        repository.onCreate(mock()) // start the cache-priming collector, as the app does at startup
     }
 
     @After

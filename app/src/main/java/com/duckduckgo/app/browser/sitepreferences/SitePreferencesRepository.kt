@@ -16,12 +16,15 @@
 
 package com.duckduckgo.app.browser.sitepreferences
 
+import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.di.IsMainProcess
+import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.extensions.toTldPlusOne
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
+import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -51,26 +54,28 @@ interface SitePreferencesRepository {
 }
 
 @ContributesBinding(AppScope::class)
+@ContributesMultibinding(AppScope::class, boundType = MainProcessLifecycleObserver::class)
 @SingleInstanceIn(AppScope::class)
 class RealSitePreferencesRepository @Inject constructor(
     private val sitePreferencesDao: SitePreferencesDao,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
-    @IsMainProcess isMainProcess: Boolean,
-) : SitePreferencesRepository {
+    @IsMainProcess private val isMainProcess: Boolean,
+) : SitePreferencesRepository, MainProcessLifecycleObserver {
 
     private val desktopModeDomains = CopyOnWriteArraySet<String>()
 
-    init {
+    // Prime the cache at app startup (this observer is constructed eagerly on the main process) rather
+    // than lazily on first read, so a remembered site loads in the correct mode from the first navigation.
+    override fun onCreate(owner: LifecycleOwner) {
+        if (!isMainProcess) return
         appCoroutineScope.launch(dispatcherProvider.io()) {
-            if (isMainProcess) {
-                // Warm OkHttp's PublicSuffixDatabase: the first toTldPlusOne() call reads the suffix
-                // list from disk on the calling thread, which would otherwise block the network thread.
-                "example.com".toTldPlusOne()
-                sitePreferencesDao.desktopModeDomainsFlow().collect { domains ->
-                    desktopModeDomains.clear()
-                    desktopModeDomains.addAll(domains)
-                }
+            // Warm OkHttp's PublicSuffixDatabase: the first toTldPlusOne() call reads the suffix
+            // list from disk on the calling thread, which would otherwise block the network thread.
+            "example.com".toTldPlusOne()
+            sitePreferencesDao.desktopModeDomainsFlow().collect { domains ->
+                desktopModeDomains.clear()
+                desktopModeDomains.addAll(domains)
             }
         }
     }
