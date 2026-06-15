@@ -28,7 +28,6 @@ import android.os.Environment
 import android.os.Message
 import android.provider.MediaStore
 import android.text.Editable
-import android.text.TextUtils
 import android.text.TextWatcher
 import android.view.KeyEvent
 import android.view.MotionEvent
@@ -749,7 +748,6 @@ class DuckChatContextualFragment :
 
         val newChatRow = content.findViewById<PopupMenuItemView>(R.id.contextualChatsPopupNewChat)
         val headerDivider = content.findViewById<View>(R.id.contextualChatsPopupHeaderDivider)
-        newChatRow.applyMaxLines(MAX_CHAT_TITLE_LINES)
         newChatRow.visibility = if (showNewChatHeader) View.VISIBLE else View.GONE
         headerDivider.visibility = if (showNewChatHeader) View.VISIBLE else View.GONE
         if (showNewChatHeader) {
@@ -766,7 +764,6 @@ class DuckChatContextualFragment :
                 )
                 setPrimaryText(chat.displayTitle)
                 setLeadingIconResource(chat.type.iconRes(chat.pinned))
-                applyMaxLines(MAX_CHAT_TITLE_LINES)
             }
             popup.onMenuItemClicked(row) { viewModel.onRecentChatClicked(chat.chatId) }
             recentContainer.addView(row)
@@ -775,7 +772,6 @@ class DuckChatContextualFragment :
         val viewAllRow = content.findViewById<PopupMenuItemView>(R.id.contextualChatsPopupViewAll)
         val footerDivider = content.findViewById<View>(R.id.contextualChatsPopupFooterDivider)
         val showFooter = recentChats.isNotEmpty()
-        viewAllRow.applyMaxLines(MAX_CHAT_TITLE_LINES)
         viewAllRow.visibility = if (showFooter) View.VISIBLE else View.GONE
         footerDivider.visibility = if (showFooter) View.VISIBLE else View.GONE
         if (showFooter) {
@@ -783,13 +779,6 @@ class DuckChatContextualFragment :
         }
 
         popup.showAnchoredView(requireActivity(), binding.root, binding.contextualNewChat)
-    }
-
-    private fun PopupMenuItemView.applyMaxLines(maxLines: Int) {
-        findViewById<TextView>(com.duckduckgo.mobile.android.R.id.label)?.apply {
-            this.maxLines = maxLines
-            ellipsize = TextUtils.TruncateAt.END
-        }
     }
 
     private fun observeSubscriptionEventDataChannel() {
