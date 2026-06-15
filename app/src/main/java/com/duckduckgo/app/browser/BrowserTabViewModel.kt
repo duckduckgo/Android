@@ -737,8 +737,8 @@ class BrowserTabViewModel @Inject constructor(
     private var allowlistRefreshTriggerJob: Job? = null
     private var refreshTriggerJob: Job? = null
 
-    /** Non-null while this tab is displayed inside a Custom Tab. Captures the verified calling
-     *  package (when known) used by [handleAppLink]'s trusted-caller carve-out. */
+    /** Non-null while this tab is displayed inside a Custom Tab. Captures the verified
+     * calling package (when known) used by [handleAppLink]'s trusted-caller carve-out. */
     private data class CustomTabContext(val clientPackage: String?)
     private var customTab: CustomTabContext? = null
 
