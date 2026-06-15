@@ -35,6 +35,7 @@
 
     <!-- Shared width for the native input widget popup menus (options, model picker, attachment) -->
     <dimen name="nativeInputMenuWidth">260dp</dimen>
+    <dimen name="nativeInputButtonSize">36dp</dimen>
 
     <!-- Reasoning Mode Picker -->
     <dimen name="reasoningModePickerMenuWidth">220dp</dimen>
