@@ -81,7 +81,6 @@ class RealPirScanScheduler @Inject constructor(
         val constraints =
             Constraints
                 .Builder()
-                .setRequiresCharging(true)
                 .setRequiredNetworkType(NetworkType.CONNECTED)
                 .build()
 
