@@ -249,6 +249,7 @@ class OmnibarLayout @JvmOverloads constructor(
     private val customTabToolbarContainerWrapper: ViewGroup by lazy { findViewById(R.id.customTabToolbarContainerWrapper) }
     private val leadingIconContainer: View by lazy { findViewById(R.id.omnibarIconContainer) }
     private val duckAIHeader: View by lazy { findViewById(R.id.duckAIHeader) }
+    private val duckAIFreePill: View by lazy { findViewById(R.id.duckAIFreePill) }
     private val duckAISidebar: View by lazy { findViewById(R.id.duckAiSidebar) }
     private val duckAIBack: View by lazy { findViewById(R.id.duckAiBack) }
 
@@ -1563,6 +1564,7 @@ class OmnibarLayout @JvmOverloads constructor(
         applyEnabled(clearTextButton, nonFireEnabled)
         applyEnabled(duckAISidebar, nonFireEnabled)
         applyEnabled(duckAIHeader, nonFireEnabled)
+        applyEnabled(duckAIFreePill, nonFireEnabled)
         applyEnabled(shieldIcon, nonFireEnabled)
         applyEnabled(plusIconMenu, nonFireEnabled)
         applyEnabled(fireIconMenu, fireEnabled)
