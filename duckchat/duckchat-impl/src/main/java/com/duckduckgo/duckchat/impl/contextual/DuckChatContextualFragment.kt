@@ -88,6 +88,7 @@ import com.duckduckgo.duckchat.impl.helper.DuckChatJSHelper
 import com.duckduckgo.duckchat.impl.helper.Mode
 import com.duckduckgo.duckchat.impl.helper.RealDuckChatJSHelper
 import com.duckduckgo.duckchat.impl.history.ChatHistoryItem
+import com.duckduckgo.duckchat.impl.models.iconRes
 import com.duckduckgo.duckchat.impl.ui.DuckChatWebViewClient
 import com.duckduckgo.duckchat.impl.ui.filechooser.FileChooserIntentBuilder
 import com.duckduckgo.duckchat.impl.ui.filechooser.capture.camera.CameraHardwareChecker
@@ -763,6 +764,7 @@ class DuckChatContextualFragment :
             } else {
                 row.visibility = View.VISIBLE
                 row.setPrimaryText(chat.displayTitle)
+                row.setLeadingIconResource(chat.type.iconRes(chat.pinned))
                 popup.onMenuItemClicked(row) { viewModel.onRecentChatClicked(chat.chatId) }
             }
         }
