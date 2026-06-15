@@ -421,9 +421,16 @@ class TabSwitcherViewModel @Inject constructor(
                 pixel.fire(AppPixelName.TAB_MANAGER_MENU_CLOSE_ALL_TABS_CONFIRMED)
                 pixel.fire(AppPixelName.TAB_MANAGER_MENU_CLOSE_ALL_TABS_CONFIRMED_DAILY, type = Daily())
 
-                // mark tabs as deletable, the undo snackbar will be displayed when the tab switcher is closed
                 tabRepository.markDeletable(tabIds)
-                command.value = Command.CloseAndShowUndoMessage(tabIds)
+
+                if (fireModeAvailable && currentMode.value == BrowserMode.FIRE) {
+                    // emptying all Fire tabs returns the user to Regular mode, matching the single-tab
+                    // close path; the tab switcher stays open instead of closing with an undo snackbar
+                    command.value = Command.SwitchToRegularMode
+                } else {
+                    // the undo snackbar will be displayed when the tab switcher is closed
+                    command.value = Command.CloseAndShowUndoMessage(tabIds)
+                }
             } else {
                 pixel.fire(AppPixelName.TAB_MANAGER_CLOSE_TABS_CONFIRMED)
                 pixel.fire(AppPixelName.TAB_MANAGER_CLOSE_TABS_CONFIRMED_DAILY, type = Daily())

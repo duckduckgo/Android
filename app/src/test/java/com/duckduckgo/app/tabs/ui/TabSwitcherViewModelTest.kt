@@ -2000,6 +2000,32 @@ class TabSwitcherViewModelTest {
     }
 
     @Test
+    fun `when closing all fire tabs then switches to regular mode instead of showing undo`() = runTest {
+        val fireTabs = listOf(
+            TabEntity("fire-1", url = "https://fire.example/1", position = 1),
+            TabEntity("fire-2", url = "https://fire.example/2", position = 2),
+        )
+        whenever(mockTabRepositoryProvider.forMode(BrowserMode.FIRE)).thenReturn(mockFireTabRepository)
+        whenever(mockFireTabRepository.flowTabs).thenReturn(flowOf(fireTabs))
+        whenever(mockFireTabRepository.flowSelectedTab).thenReturn(flowOf(fireTabs.first()))
+        whenever(mockFireTabRepository.flowDeletableTabs).thenReturn(flowOf(emptyList()))
+        whenever(mockFireTabRepository.tabSwitcherData).thenReturn(flowOf(tabSwitcherData))
+
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+            testee.viewState.collect()
+        }
+        currentModeFlow.value = BrowserMode.FIRE
+        advanceUntilIdle()
+
+        testee.onCloseAllTabsConfirmed()
+        advanceUntilIdle()
+
+        verify(mockFireTabRepository).markDeletable(fireTabs.map { it.tabId })
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        assertEquals(Command.SwitchToRegularMode, commandCaptor.lastValue)
+    }
+
+    @Test
     fun `when fire mode unavailable then disabled viewmodel ignores state holder and only resolves regular repo`() = runTest {
         // Use isolated mocks so the @Before viewmodel (which subscribed to currentModeFlow) does not interfere.
         val isolatedProvider = mock<BrowserModeDataProvider<TabRepository>>()
