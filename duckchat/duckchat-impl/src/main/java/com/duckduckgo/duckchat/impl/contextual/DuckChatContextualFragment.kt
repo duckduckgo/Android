@@ -28,6 +28,7 @@ import android.os.Environment
 import android.os.Message
 import android.provider.MediaStore
 import android.text.Editable
+import android.text.TextUtils
 import android.text.TextWatcher
 import android.view.KeyEvent
 import android.view.MotionEvent
@@ -743,6 +744,7 @@ class DuckChatContextualFragment :
 
         val newChatRow = content.findViewById<PopupMenuItemView>(R.id.contextualChatsPopupNewChat)
         val headerDivider = content.findViewById<View>(R.id.contextualChatsPopupHeaderDivider)
+        newChatRow.applyMaxLines(MAX_CHAT_TITLE_LINES)
         newChatRow.visibility = if (showNewChatHeader) View.VISIBLE else View.GONE
         headerDivider.visibility = if (showNewChatHeader) View.VISIBLE else View.GONE
         if (showNewChatHeader) {
@@ -765,6 +767,7 @@ class DuckChatContextualFragment :
                 row.visibility = View.VISIBLE
                 row.setPrimaryText(chat.displayTitle)
                 row.setLeadingIconResource(chat.type.iconRes(chat.pinned))
+                row.applyMaxLines(MAX_CHAT_TITLE_LINES)
                 popup.onMenuItemClicked(row) { viewModel.onRecentChatClicked(chat.chatId) }
             }
         }
@@ -772,6 +775,7 @@ class DuckChatContextualFragment :
         val viewAllRow = content.findViewById<PopupMenuItemView>(R.id.contextualChatsPopupViewAll)
         val footerDivider = content.findViewById<View>(R.id.contextualChatsPopupFooterDivider)
         val showFooter = recentChats.isNotEmpty()
+        viewAllRow.applyMaxLines(MAX_CHAT_TITLE_LINES)
         viewAllRow.visibility = if (showFooter) View.VISIBLE else View.GONE
         footerDivider.visibility = if (showFooter) View.VISIBLE else View.GONE
         if (showFooter) {
@@ -779,6 +783,13 @@ class DuckChatContextualFragment :
         }
 
         popup.showAnchoredView(requireActivity(), binding.root, binding.contextualNewChat)
+    }
+
+    private fun PopupMenuItemView.applyMaxLines(maxLines: Int) {
+        findViewById<TextView>(com.duckduckgo.mobile.android.R.id.label)?.apply {
+            this.maxLines = maxLines
+            ellipsize = TextUtils.TruncateAt.END
+        }
     }
 
     private fun observeSubscriptionEventDataChannel() {
@@ -1083,6 +1094,7 @@ class DuckChatContextualFragment :
     }
 
     companion object {
+        private const val MAX_CHAT_TITLE_LINES = 3
         private const val PERMISSION_REQUEST_WRITE_EXTERNAL_STORAGE = 200
         private const val CUSTOM_UA =
             "Mozilla/5.0 (Linux; Android 16) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/124.0.0.0 Mobile DuckDuckGo/5 Safari/537.36"
