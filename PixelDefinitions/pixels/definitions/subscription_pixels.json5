@@ -145,5 +145,12 @@
         "triggers": ["other"],
         "suffixes": ["form_factor"],
         "parameters": ["appVersion", "petal", "osVersion"]
+    },
+    "m_privacy-pro_app_recover-subscription_no-active-purchase": {
+        "description": "Fired when Billing client reports no active purchase during restore flow and the automatic recovery attempt during purchase.",
+        "owners": ["karlenDimla"],
+        "triggers": ["other"],
+        "suffixes": ["daily_count_short", "form_factor"],
+        "parameters": ["appVersion"]
     }
 }
