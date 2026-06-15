@@ -2732,12 +2732,13 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenDesktopToggledOnHostWithoutRegistrableDomainThenPreferenceNotPersistedButRefreshStillIssued() {
+    fun whenDesktopToggledOnHostWithoutRegistrableDomainThenPersistedUnderRawHost() {
+        // IPs / localhost / single-label intranet hosts have no eTLD+1, so they key on the raw host
+        // (so desktop mode still works for e.g. router admin pages on 192.168.x.x).
         loadUrl("http://localhost")
         setDesktopBrowsingMode(false)
         testee.onChangeBrowserModeClicked()
-        // No eTLD+1 → nothing persisted, but the rest of the handler still runs.
-        verify(mockSitePreferencesRepository, never()).rememberDesktopMode(any())
+        verify(mockSitePreferencesRepository).rememberDesktopMode("localhost")
         verify(mockPixel).fire(AppPixelName.MENU_ACTION_DESKTOP_SITE_ENABLE_PRESSED)
     }
 

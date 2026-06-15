@@ -470,6 +470,11 @@ class AppDatabaseTest {
     }
 
     @Test
+    fun whenMigratingFromVersion61To62ThenValidationSucceeds() {
+        createDatabaseAndMigrate(61, 62, migrationsProvider.MIGRATION_61_TO_62)
+    }
+
+    @Test
     fun whenMigratingFromVersion42To43IfUserHasLoginDetectionEnabledThenMapToAskEveryTime() {
         whenever(mockSettingsDataStore.appLoginDetection).thenReturn(true)
         createDatabaseAndMigrate(42, 43, migrationsProvider.MIGRATION_42_TO_43)

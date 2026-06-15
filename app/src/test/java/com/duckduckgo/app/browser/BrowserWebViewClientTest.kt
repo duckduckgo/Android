@@ -296,22 +296,13 @@ class BrowserWebViewClientTest {
     }
 
     @Test
-    fun whenOnPageStartedThenContentScopeDesktopModeResolvedPerUrlNotFromStaleSite() = runTest {
-        // Site still references the previous page at onPageStarted time; the C-S-S flag must come from the URL.
-        whenever(listener.isDesktopSiteEnabled(EXAMPLE_URL)).thenReturn(true)
-
-        testee.onPageStarted(webView, EXAMPLE_URL, null)
-
-        assertEquals(true, jsPlugins.plugin.lastDesktopMode)
-    }
-
-    @Test
-    fun whenOnPageStartedWithNullUrlThenContentScopeDesktopModeFallsBackToSite() {
+    fun whenOnPageStartedThenContentScopeDesktopModeComesFromCurrentSite() {
+        // pageChanged stamps site.isDesktopMode per-domain before this runs, so the C-S-S flag is read from getSite().
         val site = mock<Site>()
         whenever(site.isDesktopMode).thenReturn(true)
         whenever(listener.getSite()).thenReturn(site)
 
-        testee.onPageStarted(webView, null, null)
+        testee.onPageStarted(webView, EXAMPLE_URL, null)
 
         assertEquals(true, jsPlugins.plugin.lastDesktopMode)
     }

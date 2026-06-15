@@ -89,6 +89,18 @@ class SitePreferencesRepositoryTest {
     }
 
     @Test
+    fun whenClearAllButFireproofedWithEmptySetThenEverythingForgotten() = runTest {
+        // The common full-fire case: no fireproofed sites. Exercises the empty `NOT IN ()` query path.
+        repository.rememberDesktopMode("a.com")
+        repository.rememberDesktopMode("b.com")
+
+        repository.clearAllButFireproofed(emptySet())
+
+        assertFalse(repository.isDesktopModeRemembered("a.com"))
+        assertFalse(repository.isDesktopModeRemembered("b.com"))
+    }
+
+    @Test
     fun whenBulkForgetThenAllGivenDomainsRemoved() = runTest {
         repository.rememberDesktopMode("a.com")
         repository.rememberDesktopMode("b.com")
