@@ -74,6 +74,8 @@ class NativeInputCallbacks(
     ) -> Unit,
     val onChatSuggestionSelected: (String) -> Unit,
     val onDuckAiQuerySubmitted: (query: String) -> Unit = {},
+    /** User picked a model in the native picker (→ submitChangeModelAction). */
+    val onChangeModelSubmitted: (modelId: String) -> Unit = {},
     val onChatUrlSuggestionClicked: (AutoCompleteSuggestion) -> Unit = {},
     val onChatHistoryShortcutClicked: () -> Unit = {},
     val onClearAutocomplete: () -> Unit,
@@ -467,6 +469,7 @@ class RealNativeInputManager @Inject constructor(
                         filesJson,
                     )
                     widget.clearSelectedTool()
+                    widget.onPromptSubmitted()
                 } else if (queryUrlPredictor.isUrl(query)) {
                     // Not in a Duck.ai chat (e.g. on the NTP with the Duck.ai toggle selected): a
                     // URL is an address, so navigate to it exactly like Search mode rather than
@@ -496,6 +499,7 @@ class RealNativeInputManager @Inject constructor(
                 }
             },
         )
+        widget.onChangeModelSubmitted = { modelId -> callbacks.onChangeModelSubmitted(modelId) }
         widget.onBack = {
             widget.hideKeyboard()
             hideNativeInput()

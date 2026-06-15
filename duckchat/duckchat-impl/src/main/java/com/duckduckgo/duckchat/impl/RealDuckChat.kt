@@ -70,6 +70,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -216,6 +217,16 @@ interface DuckChatInternal : DuckChat {
      * Returns the current chat state.
      */
     val chatState: StateFlow<ChatState>
+
+    /**
+     * Requests the native model picker to open for [tabId].
+     */
+    fun requestShowModelPicker(tabId: String)
+
+    /**
+     * Events asking the native input to open the model picker.
+     */
+    val showModelPickerEvents: Flow<String>
 
     /**
      * Returns whether image upload is enabled or not.
@@ -390,6 +401,7 @@ class RealDuckChat @Inject constructor(
     private val _showMainButtonsInInputScreen = MutableStateFlow(false)
 
     private val _chatState = MutableStateFlow(ChatState.HIDE)
+    private val _showModelPickerEvents = MutableSharedFlow<String>(extraBufferCapacity = 1)
     private val _nativeInputFieldEnabled = MutableStateFlow(false)
     private val _showInputScreenOnSystemSearchLaunch = MutableStateFlow(false)
     private val _showVoiceSearchToggle = MutableStateFlow(false)
@@ -567,6 +579,12 @@ class RealDuckChat @Inject constructor(
     override fun updateChatState(state: ChatState) {
         _chatState.value = state
     }
+
+    override fun requestShowModelPicker(tabId: String) {
+        _showModelPickerEvents.tryEmit(tabId)
+    }
+
+    override val showModelPickerEvents: Flow<String> = _showModelPickerEvents.asSharedFlow()
 
     override val showSettings: StateFlow<Boolean> = _showSettings.asStateFlow()
 

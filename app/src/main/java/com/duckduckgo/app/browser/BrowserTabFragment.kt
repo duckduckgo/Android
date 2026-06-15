@@ -1452,6 +1452,18 @@ class BrowserTabFragment :
                         ),
                     )
                 },
+                onChangeModelSubmitted = { modelId ->
+                    contentScopeScripts.sendSubscriptionEvent(
+                        SubscriptionEventData(
+                            featureName = "aiChat",
+                            subscriptionName = "submitChangeModelAction",
+                            params = JSONObject().apply {
+                                put("platform", "android")
+                                put("modelId", modelId)
+                            },
+                        ),
+                    )
+                },
                 onFireButtonPressed = { onFireButtonPressed() },
                 onVoiceSearchPressed = { isChatTab ->
                     val mode = if (isChatTab) VoiceSearchMode.DUCK_AI else VoiceSearchMode.SEARCH
