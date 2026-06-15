@@ -20,6 +20,7 @@ jobs:
           action: 'find-asana-task-id'
 
       - name: Add comment with PR link in Asana task
+        continue-on-error: true
         if: ${{ github.actor == github.event.pull_request.user.login && ( github.event.action == 'opened' || github.event.action == 'reopened') }}
         uses: duckduckgo/native-github-asana-sync@v2.0
         with:
