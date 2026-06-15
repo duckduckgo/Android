@@ -357,7 +357,11 @@ afterEvaluate {
                 tasks.named(it),
                 ANDROID_FIREBASE
         ).configure {
-            reports.from(file("build/fladle/fladleResults/JUnitReport.xml"))
+            reports.setFrom(
+                    fileTree("build/fladle/fladleResults") {
+                        include "**/test_result_*.xml"
+                    }
+            )
         }
     }
 }
