@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.browser.applinks
 
+import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType.AppLink
 import com.duckduckgo.app.browser.UriString
 import com.duckduckgo.common.utils.extractDomain
 import com.duckduckgo.di.scopes.AppScope
@@ -25,7 +26,9 @@ import javax.inject.Inject
 interface AppLinksHandler {
     fun handleAppLink(
         isForMainFrame: Boolean,
-        urlString: String,
+        appLink: AppLink,
+        hasGesture: Boolean,
+        clientPackage: String?,
         appLinksEnabled: Boolean,
         shouldHaltWebNavigation: Boolean,
         launchAppLink: () -> Unit,
@@ -46,7 +49,9 @@ class DuckDuckGoAppLinksHandler @Inject constructor() : AppLinksHandler {
 
     override fun handleAppLink(
         isForMainFrame: Boolean,
-        urlString: String,
+        appLink: AppLink,
+        hasGesture: Boolean,
+        clientPackage: String?,
         appLinksEnabled: Boolean,
         shouldHaltWebNavigation: Boolean,
         launchAppLink: () -> Unit,
@@ -55,6 +60,16 @@ class DuckDuckGoAppLinksHandler @Inject constructor() : AppLinksHandler {
             return false
         }
 
+        // HTTP navigations shouldn't launch apps unless started with a user gesture. That is unless
+        // the "trusted-caller" carve-out applies - if an app opens a Custom Tab, App Links that
+        // point back to that same app should be allowed even without user interaction.
+        val targetPackage = appLink.appIntent?.component?.packageName ?: appLink.appIntent?.`package`
+        val isTrustedCaller = targetPackage != null && clientPackage == targetPackage
+        if (!hasGesture && !isAUserQuery && !isTrustedCaller) {
+            return false
+        }
+
+        val urlString = appLink.uriString
         previousUrl?.let {
             if (isSameOrSubdomain(it, urlString)) {
                 val shouldTrigger = alwaysTriggerList.contains(urlString.extractDomain())

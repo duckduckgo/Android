@@ -3700,18 +3700,14 @@ class BrowserTabViewModel @Inject constructor(
         isForMainFrame: Boolean,
         hasGesture: Boolean,
     ): Boolean {
-        // HTTP navigations shouldn't launch apps unless started with a user gesture. That is unless
-        // the "trusted-caller" carve-out applies - if an app opens a Custom Tab, App Links that
-        // point back to that same app should be allowed even without user interaction.
-        val targetPackage = appLink.appIntent?.component?.packageName ?: appLink.appIntent?.`package`
-        val isTrustedCaller = targetPackage != null && customTab?.clientPackage == targetPackage
-        return (hasGesture || appLinksHandler.isUserQuery() || isTrustedCaller) &&
-            appLinksHandler.handleAppLink(
-                isForMainFrame,
-                appLink.uriString,
-                appSettingsPreferencesStore.appLinksEnabled,
-                !appSettingsPreferencesStore.showAppLinksPrompt,
-            ) { appLinkClicked(appLink) }
+        return appLinksHandler.handleAppLink(
+            isForMainFrame,
+            appLink,
+            hasGesture,
+            customTab?.clientPackage,
+            appSettingsPreferencesStore.appLinksEnabled,
+            !appSettingsPreferencesStore.showAppLinksPrompt,
+        ) { appLinkClicked(appLink) }
     }
 
     fun openAppLink() {
