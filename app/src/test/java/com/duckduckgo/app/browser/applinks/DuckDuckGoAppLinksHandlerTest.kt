@@ -20,6 +20,9 @@ import android.content.ComponentName
 import android.content.Intent
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType.AppLink
+import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.feature.toggles.api.Toggle.State
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertFalse
 import junit.framework.TestCase.assertTrue
@@ -37,9 +40,13 @@ class DuckDuckGoAppLinksHandlerTest {
 
     private var mockCallback: () -> Unit = mock()
 
+    private val androidBrowserConfigFeature: AndroidBrowserConfigFeature =
+        FakeFeatureToggleFactory.create(AndroidBrowserConfigFeature::class.java)
+
     @Before
     fun setup() {
-        testee = DuckDuckGoAppLinksHandler()
+        androidBrowserConfigFeature.customTabEndlessLoopFix().setRawStoredState(State(true))
+        testee = DuckDuckGoAppLinksHandler(androidBrowserConfigFeature)
         testee.previousUrl = "example.com"
     }
 
@@ -345,10 +352,10 @@ class DuckDuckGoAppLinksHandlerTest {
     }
 
     @Test
-    fun whenNoGestureButIsUserQueryThenLaunchAppLink() {
+    fun whenNoGestureAndIsUserQueryAndNotTrustedCallerThenReturnFalseAndDoNotLaunch() {
         testee.isAUserQuery = true
         testee.previousUrl = "foo.com"
-        assertTrue(
+        assertFalse(
             testee.handleAppLink(
                 isForMainFrame = true,
                 appLink = AppLink(uriString = "example.com"),
@@ -359,7 +366,7 @@ class DuckDuckGoAppLinksHandlerTest {
                 appLinksEnabled = true,
             ),
         )
-        verify(mockCallback).invoke()
+        verifyNoInteractions(mockCallback)
     }
 
     @Test
@@ -417,5 +424,44 @@ class DuckDuckGoAppLinksHandlerTest {
             ),
         )
         verifyNoInteractions(mockCallback)
+    }
+
+    @Test
+    fun whenFixDisabledThenNoGestureAndNotTrustedCallerStillLaunchesAppLink() {
+        androidBrowserConfigFeature.customTabEndlessLoopFix().setRawStoredState(State(false))
+        testee.isAUserQuery = false
+        testee.previousUrl = "foo.com"
+        assertTrue(
+            testee.handleAppLink(
+                isForMainFrame = true,
+                appLink = AppLink(uriString = "example.com"),
+                hasGesture = false,
+                clientPackage = null,
+                launchAppLink = mockCallback,
+                shouldHaltWebNavigation = true,
+                appLinksEnabled = true,
+            ),
+        )
+        verify(mockCallback).invoke()
+    }
+
+    @Test
+    fun whenFixDisabledThenNoGestureAndClientPackageMismatchStillLaunchesAppLink() {
+        androidBrowserConfigFeature.customTabEndlessLoopFix().setRawStoredState(State(false))
+        testee.isAUserQuery = false
+        testee.previousUrl = "foo.com"
+        val appIntent = Intent().setComponent(ComponentName("com.example.app", "com.example.app.MainActivity"))
+        assertTrue(
+            testee.handleAppLink(
+                isForMainFrame = true,
+                appLink = AppLink(uriString = "example.com", appIntent = appIntent),
+                hasGesture = false,
+                clientPackage = "com.different.app",
+                launchAppLink = mockCallback,
+                shouldHaltWebNavigation = true,
+                appLinksEnabled = true,
+            ),
+        )
+        verify(mockCallback).invoke()
     }
 }
