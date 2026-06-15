@@ -47,9 +47,9 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
@@ -192,8 +192,14 @@ class DuckChatContextualViewModel @Inject constructor(
     }
 
     private fun observeRecentChats() {
-        chatHistoryRepository.observeChats()
-            .map { chats -> chats.sortedByDescending { it.lastEditMillis }.take(MAX_RECENT_CHATS) }
+        combine(chatHistoryRepository.observeChats(), _chatId) { chats, currentChatId ->
+            chats
+                .asSequence()
+                .filterNot { it.chatId == currentChatId }
+                .sortedByDescending { it.lastEditMillis }
+                .take(MAX_RECENT_CHATS)
+                .toList()
+        }
             .flowOn(dispatchers.io())
             .onEach { recent -> _viewState.update { it.copy(recentChats = recent) } }
             .launchIn(viewModelScope)

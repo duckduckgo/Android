@@ -1954,6 +1954,24 @@ class DuckChatContextualViewModelTest {
     }
 
     @Test
+    fun `when current chat is loaded then it is excluded from recent chats`() = runTest {
+        whenever(contextualSheetImprovementsToggle.isEnabled()).thenReturn(true)
+        recentChatsFlow.value = listOf(
+            fakeChat("current", "Current chat", 10L),
+            fakeChat("a", "A", 5L),
+            fakeChat("b", "B", 3L),
+        )
+        val testee = buildViewModel()
+        testee.onSheetOpened("tab-1")
+        testee.onPromptSent("hi") // moves into WEBVIEW; onChatPageLoaded below sets chatId
+        testee.onChatPageLoaded("https://duckduckgo.com/?chatID=current")
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+        val ids = testee.viewState.value.recentChats.map { it.chatId }
+        assertEquals(listOf("a", "b"), ids)
+    }
+
+    @Test
     fun `when recent chats updates then view state is capped at 5 sorted by lastEdit desc`() = runTest {
         whenever(contextualSheetImprovementsToggle.isEnabled()).thenReturn(true)
         recentChatsFlow.value = listOf(

@@ -740,7 +740,11 @@ class DuckChatContextualFragment :
 
     private fun showChatsPopup(showNewChatHeader: Boolean, recentChats: List<ChatHistoryItem>) {
         logcat { "Duck.ai Contextual: showChatsPopup header=$showNewChatHeader chats=${recentChats.size}" }
-        val popup = PopupMenu(layoutInflater, R.layout.popup_contextual_chats_menu)
+        val popup = PopupMenu(
+            layoutInflater = layoutInflater,
+            resourceId = R.layout.popup_contextual_chats_menu,
+            width = resources.getDimensionPixelSize(R.dimen.contextualChatsPopupMenuWidth),
+        )
         val content = popup.contentView
 
         val newChatRow = content.findViewById<PopupMenuItemView>(R.id.contextualChatsPopupNewChat)
