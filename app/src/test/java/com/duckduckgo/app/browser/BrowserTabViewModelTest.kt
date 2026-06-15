@@ -2685,33 +2685,33 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenUserSelectsDesktopSiteWhenNotOnMobileSpecificSiteThenUrlNotModified() {
+    fun whenUserSelectsDesktopSiteWhenNotOnMobileSpecificSiteThenNavigatesToSameUrl() {
         loadUrl(exampleUrl)
         setDesktopBrowsingMode(false)
         testee.onChangeBrowserModeClicked()
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
-        val ultimateCommand = commandCaptor.lastValue
-        assertTrue(ultimateCommand == NavigationCommand.Refresh)
+        val ultimateCommand = commandCaptor.lastValue as Navigate
+        assertEquals(exampleUrl, ultimateCommand.url)
     }
 
     @Test
-    fun whenUserSelectsMobileSiteWhenOnMobileSpecificSiteThenUrlNotModified() {
+    fun whenUserSelectsMobileSiteWhenOnMobileSpecificSiteThenNavigatesToSameUrl() {
         loadUrl("http://m.example.com")
         setDesktopBrowsingMode(true)
         testee.onChangeBrowserModeClicked()
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
-        val ultimateCommand = commandCaptor.lastValue
-        assertTrue(ultimateCommand == NavigationCommand.Refresh)
+        val ultimateCommand = commandCaptor.lastValue as Navigate
+        assertEquals("http://m.example.com", ultimateCommand.url)
     }
 
     @Test
-    fun whenUserSelectsMobileSiteWhenNotOnMobileSpecificSiteThenUrlNotModified() {
+    fun whenUserSelectsMobileSiteWhenNotOnMobileSpecificSiteThenNavigatesToSameUrl() {
         loadUrl(exampleUrl)
         setDesktopBrowsingMode(true)
         testee.onChangeBrowserModeClicked()
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
-        val ultimateCommand = commandCaptor.lastValue
-        assertTrue(ultimateCommand == NavigationCommand.Refresh)
+        val ultimateCommand = commandCaptor.lastValue as Navigate
+        assertEquals(exampleUrl, ultimateCommand.url)
     }
 
     @Test
