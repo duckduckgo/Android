@@ -42,6 +42,7 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
@@ -298,6 +299,44 @@ class RealPirScanSchedulerTest {
             any(),
             any<PeriodicWorkRequest>(),
         )
+    }
+
+    @Test
+    fun whenReschedulePirScansThenSchedulesScheduledScanWorkerWithUpdatePolicy() {
+        testee.reschedulePirScans()
+
+        verify(mockWorkManager).enqueueUniquePeriodicWork(
+            eq(PirScheduledScanRemoteWorker.TAG_SCHEDULED_SCAN),
+            eq(ExistingPeriodicWorkPolicy.UPDATE),
+            any<PeriodicWorkRequest>(),
+        )
+    }
+
+    @Test
+    fun whenReschedulePirScansThenOnlySchedulesScheduledScanWorker() {
+        testee.reschedulePirScans()
+
+        verify(mockWorkManager, times(1)).enqueueUniquePeriodicWork(
+            any(),
+            any(),
+            any<PeriodicWorkRequest>(),
+        )
+    }
+
+    @Test
+    fun whenReschedulePirScansThenDoesNotReportScheduledScanPixel() {
+        testee.reschedulePirScans()
+
+        verify(mockPirPixelSender, never()).reportScheduledScanScheduled()
+    }
+
+    @Test
+    fun whenReschedulePirScansThenDoesNotSaveEventLog() = runTest {
+        testee.reschedulePirScans()
+
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        verify(mockEventsRepository, never()).saveEventLog(any())
     }
 
     @Test

@@ -26,6 +26,7 @@ import com.duckduckgo.pir.impl.PirFeatureDataCleaner
 import com.duckduckgo.pir.impl.checker.PirEligibility
 import com.duckduckgo.pir.impl.checker.PirWorkHandler
 import com.duckduckgo.pir.impl.pixels.PirPixelSender
+import com.duckduckgo.pir.impl.scan.PirScanScheduler
 import com.duckduckgo.pir.impl.store.PirRepository
 import com.duckduckgo.pir.impl.wideevents.PirScanWideEvent.CancellationReason
 import com.squareup.anvil.annotations.ContributesMultibinding
@@ -48,6 +49,7 @@ class PirDataUpdateObserver @Inject constructor(
     private val pirRepository: PirRepository,
     private val currentTimeProvider: CurrentTimeProvider,
     private val pirPixelSender: PirPixelSender,
+    private val pirScanScheduler: PirScanScheduler,
 ) : MainProcessLifecycleObserver {
     override fun onCreate(owner: LifecycleOwner) {
         coroutineScope.launch(dispatcherProvider.io()) {
@@ -69,6 +71,12 @@ class PirDataUpdateObserver @Inject constructor(
                                 logcat { "PIR-update: Update successfully completed." }
                             } else {
                                 logcat { "PIR-update: Failed to complete." }
+                            }
+
+                            // Re-apply the periodic scan schedule so changes to the interval/constraints
+                            // (e.g. after an app update) are picked up by already-enrolled users
+                            if (pirRepository.getValidUserProfileQueries().isNotEmpty()) {
+                                pirScanScheduler.reschedulePirScans()
                             }
                         }
 
