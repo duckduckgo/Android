@@ -1901,15 +1901,19 @@ class DuckChatContextualViewModelTest {
     }
 
     @Test
-    fun `when chats icon clicked with no recent chats then new chat is requested`() = runTest {
+    fun `when chats icon clicked with no recent chats then chat history is launched`() = runTest {
         whenever(contextualSheetImprovementsToggle.isEnabled()).thenReturn(true)
         recentChatsFlow.value = emptyList()
         val testee = buildViewModel()
         testee.onSheetOpened("tab-1")
 
-        testee.onChatsIconClicked()
+        testee.commands.test {
+            expectMostRecentItem() // drain onSheetOpened commands
+            testee.onChatsIconClicked()
 
-        verify(duckChatPixels).reportContextualSheetNewChat()
+            assertTrue(awaitItem() is DuckChatContextualViewModel.Command.LaunchChatHistory)
+            cancelAndIgnoreRemainingEvents()
+        }
     }
 
     @Test

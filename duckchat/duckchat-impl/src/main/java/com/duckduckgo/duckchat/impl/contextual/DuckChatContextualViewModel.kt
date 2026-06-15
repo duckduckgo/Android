@@ -782,7 +782,7 @@ class DuckChatContextualViewModel @Inject constructor(
             return
         }
         if (state.recentChats.isEmpty()) {
-            onNewChatRequested()
+            onViewAllChatsClicked()
         } else {
             commandChannel.trySend(
                 Command.ShowChatsPopup(
