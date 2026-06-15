@@ -3,5 +3,10 @@
     "op": "replace",
     "path": "/features/adBlockingExtension/state",
     "value": "enabled"
+  },
+  {
+    "op": "replace",
+    "path": "/features/adBlockingExtension/minSupportedVersion",
+    "value": 0
   }
 ]
