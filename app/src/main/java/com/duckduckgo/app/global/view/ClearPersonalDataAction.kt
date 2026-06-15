@@ -266,13 +266,15 @@ class ClearPersonalDataAction(
     }
 
     // Shared preamble for full-fire paths: clears cookies and the per-site stores that must keep
-    // fireproofed domains. Site permissions match on raw host; site preferences on eTLD+1.
+    // fireproofed domains. Site permissions match on raw host; site preferences on the same site key
+    // used when persisting desktop mode — eTLD+1, falling back to the raw host (IPs, localhost) so a
+    // fireproofed host without a registrable domain keeps its remembered desktop preference.
     private suspend fun clearFireproofExemptData() {
         val fireproofEntities = fireproofWebsiteRepository.fireproofWebsitesSync()
         cookieManager.flush()
         sitePermissionsManager.clearAllButFireproof(fireproofEntities.map { it.domain })
         sitePreferencesRepository.clearAllButFireproofed(
-            fireproofEntities.mapNotNull { it.domain.toTldPlusOne() }.toSet(),
+            fireproofEntities.map { it.domain.toTldPlusOne() ?: it.domain }.toSet(),
         )
         thirdPartyCookieManager.clearAllData()
     }
