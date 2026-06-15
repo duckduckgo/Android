@@ -34,6 +34,8 @@ import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.helper.DuckChatJSHelper
 import com.duckduckgo.duckchat.impl.helper.NativeAction
 import com.duckduckgo.duckchat.impl.helper.RealDuckChatJSHelper
+import com.duckduckgo.duckchat.impl.history.ChatHistoryItem
+import com.duckduckgo.duckchat.impl.history.ChatHistoryRepository
 import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.store.DuckChatContextualDataStore
@@ -45,6 +47,10 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -68,6 +74,7 @@ class DuckChatContextualViewModel @Inject constructor(
     private val featureTogglesInventory: FeatureTogglesInventory,
     private val modelManager: DuckAiModelManager,
     private val contextualNativeInputManager: ContextualNativeInputManager,
+    private val chatHistoryRepository: ChatHistoryRepository,
     private val context: Context,
 ) : ViewModel() {
 
@@ -122,6 +129,15 @@ class DuckChatContextualViewModel @Inject constructor(
         ) : Command()
         data object RequestPageContext : Command()
         data object ShowFireConfirmation : Command()
+        data class ShowChatsPopup(
+            val showNewChatHeader: Boolean,
+            val recentChats: List<ChatHistoryItem>,
+        ) : Command()
+        data class OpenChatUrl(
+            val url: String,
+            val sourceTabId: String,
+        ) : Command()
+        data object LaunchChatHistory : Command()
     }
 
     private val _viewState: MutableStateFlow<ViewState> =
@@ -166,9 +182,21 @@ class DuckChatContextualViewModel @Inject constructor(
                     isFireButtonEnabled = duckChatFeature.contextualFireButton().isEnabled() && isSingleTabFireEnabled,
                     quickActionState = initialQuickActionState,
                     chatHintResId = chatHintResId,
+                    showChatsIcon = isContextualSheetImprovementsEnabled,
                 )
             }
+            if (isContextualSheetImprovementsEnabled) {
+                observeRecentChats()
+            }
         }
+    }
+
+    private fun observeRecentChats() {
+        chatHistoryRepository.observeChats()
+            .map { chats -> chats.sortedByDescending { it.lastEditMillis }.take(MAX_RECENT_CHATS) }
+            .flowOn(dispatchers.io())
+            .onEach { recent -> _viewState.update { it.copy(recentChats = recent) } }
+            .launchIn(viewModelScope)
     }
 
     data class ViewState(
@@ -184,6 +212,9 @@ class DuckChatContextualViewModel @Inject constructor(
         val isFireButtonEnabled: Boolean = false,
         val quickActionState: QuickActionState = QuickActionState.LEGACY_SUMMARIZE,
         @StringRes val chatHintResId: Int = R.string.input_screen_chat_hint,
+        // When true, the legacy "+" icon is replaced by the chats icon and shown regardless of sheet mode.
+        val showChatsIcon: Boolean = false,
+        val recentChats: List<ChatHistoryItem> = emptyList(),
     )
 
     fun onSheetReopened() {
@@ -740,6 +771,38 @@ class DuckChatContextualViewModel @Inject constructor(
         duckChatPixels.reportContextualSheetNewChat()
     }
 
+    fun onChatsIconClicked() {
+        val state = _viewState.value
+        logcat {
+            "Duck.ai Contextual: onChatsIconClicked improvementsEnabled=$isContextualSheetImprovementsEnabled " +
+                "recentChats=${state.recentChats.size} sheetMode=${state.sheetMode}"
+        }
+        if (!isContextualSheetImprovementsEnabled) {
+            onNewChatRequested()
+            return
+        }
+        if (state.recentChats.isEmpty()) {
+            onNewChatRequested()
+        } else {
+            commandChannel.trySend(
+                Command.ShowChatsPopup(
+                    showNewChatHeader = state.sheetMode == SheetMode.WEBVIEW,
+                    recentChats = state.recentChats,
+                ),
+            )
+        }
+    }
+
+    fun onRecentChatClicked(chatId: String) {
+        val url = duckChatInternal.buildChatUrl(chatId)
+        val sourceTabId = _viewState.value.tabId
+        commandChannel.trySend(Command.OpenChatUrl(url = url, sourceTabId = sourceTabId))
+    }
+
+    fun onViewAllChatsClicked() {
+        commandChannel.trySend(Command.LaunchChatHistory)
+    }
+
     fun onFireButtonClicked() {
         duckChatPixels.reportContextualFireButtonTapped()
         viewModelScope.launch {
@@ -827,5 +890,9 @@ class DuckChatContextualViewModel @Inject constructor(
                 commandChannel.trySend(Command.RequestPageContext)
             }
         }
+    }
+
+    companion object {
+        const val MAX_RECENT_CHATS = 5
     }
 }

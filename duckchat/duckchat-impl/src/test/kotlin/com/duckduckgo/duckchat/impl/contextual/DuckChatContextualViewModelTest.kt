@@ -27,6 +27,9 @@ import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.helper.DuckChatJSHelper
 import com.duckduckgo.duckchat.impl.helper.NativeAction
 import com.duckduckgo.duckchat.impl.helper.RealDuckChatJSHelper
+import com.duckduckgo.duckchat.impl.history.ChatHistoryItem
+import com.duckduckgo.duckchat.impl.history.ChatHistoryRepository
+import com.duckduckgo.duckchat.impl.models.ChatType
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.store.DuckChatContextualDataStore
 import com.duckduckgo.feature.toggles.api.FeatureTogglesInventory
@@ -76,6 +79,8 @@ class DuckChatContextualViewModelTest {
     private val featureTogglesInventory: FeatureTogglesInventory = mock()
     private val modelManager: com.duckduckgo.duckchat.impl.models.DuckAiModelManager = mock()
     private val contextualNativeInputManager: ContextualNativeInputManager = mock()
+    private val chatHistoryRepository: ChatHistoryRepository = mock()
+    private val recentChatsFlow = MutableStateFlow<List<ChatHistoryItem>>(emptyList())
     private val context: Context = ApplicationProvider.getApplicationContext()
     private val singleTabFireDialogToggle: Toggle = mock()
     private val singleTabFireDialogFeatureName: Toggle.FeatureName = Toggle.FeatureName(
@@ -92,6 +97,7 @@ class DuckChatContextualViewModelTest {
         whenever(singleTabFireDialogToggle.featureName()).thenReturn(singleTabFireDialogFeatureName)
         whenever(singleTabFireDialogToggle.isEnabled()).thenReturn(false)
         runBlocking { whenever(featureTogglesInventory.getAllTogglesForParent("androidBrowserConfig")) }.thenReturn(listOf(singleTabFireDialogToggle))
+        whenever(chatHistoryRepository.observeChats()).thenReturn(recentChatsFlow)
         whenever(duckChatInternal.isAutomaticContextAttachmentEnabled()).thenReturn(true)
         whenever(
             duckChatJSHelper.onNativeAction(NativeAction.NEW_CHAT),
@@ -385,6 +391,7 @@ class DuckChatContextualViewModelTest {
                     featureTogglesInventory = featureTogglesInventory,
                     modelManager = modelManager,
                     contextualNativeInputManager = contextualNativeInputManager,
+                    chatHistoryRepository = chatHistoryRepository,
                     context = context,
                 )
 
@@ -795,6 +802,7 @@ class DuckChatContextualViewModelTest {
                     featureTogglesInventory = featureTogglesInventory,
                     modelManager = modelManager,
                     contextualNativeInputManager = contextualNativeInputManager,
+                    chatHistoryRepository = chatHistoryRepository,
                     context = context,
                 )
 
@@ -834,6 +842,7 @@ class DuckChatContextualViewModelTest {
                     featureTogglesInventory = featureTogglesInventory,
                     modelManager = modelManager,
                     contextualNativeInputManager = contextualNativeInputManager,
+                    chatHistoryRepository = chatHistoryRepository,
                     context = context,
                 )
 
@@ -1880,6 +1889,144 @@ class DuckChatContextualViewModelTest {
         }
     }
 
+    @Test
+    fun `when chats icon clicked and improvements disabled then new chat is requested`() = runTest {
+        whenever(contextualSheetImprovementsToggle.isEnabled()).thenReturn(false)
+        val testee = buildViewModel()
+        testee.onSheetOpened("tab-1")
+
+        testee.onChatsIconClicked()
+
+        verify(duckChatPixels).reportContextualSheetNewChat()
+    }
+
+    @Test
+    fun `when chats icon clicked with no recent chats then new chat is requested`() = runTest {
+        whenever(contextualSheetImprovementsToggle.isEnabled()).thenReturn(true)
+        recentChatsFlow.value = emptyList()
+        val testee = buildViewModel()
+        testee.onSheetOpened("tab-1")
+
+        testee.onChatsIconClicked()
+
+        verify(duckChatPixels).reportContextualSheetNewChat()
+    }
+
+    @Test
+    fun `when chats icon clicked with recent chats in INPUT mode then ShowChatsPopup command emitted without new chat header`() = runTest {
+        whenever(contextualSheetImprovementsToggle.isEnabled()).thenReturn(true)
+        recentChatsFlow.value = listOf(fakeChat("c1", "Chat 1", 100L))
+        val testee = buildViewModel()
+        testee.onSheetOpened("tab-1")
+
+        testee.commands.test {
+            expectMostRecentItem() // drain onSheetOpened
+            testee.onChatsIconClicked()
+
+            val command = awaitItem() as DuckChatContextualViewModel.Command.ShowChatsPopup
+            assertFalse(command.showNewChatHeader)
+            assertEquals(1, command.recentChats.size)
+            assertEquals("c1", command.recentChats[0].chatId)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `when chats icon clicked with recent chats in WEBVIEW mode then ShowChatsPopup command includes new chat header`() = runTest {
+        whenever(contextualSheetImprovementsToggle.isEnabled()).thenReturn(true)
+        recentChatsFlow.value = listOf(fakeChat("c1", "Chat 1", 100L))
+        val testee = buildViewModel()
+        testee.onSheetOpened("tab-1")
+        testee.onPromptSent("hello") // transitions to WEBVIEW
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+        testee.commands.test {
+            testee.onChatsIconClicked()
+
+            val command = expectMostRecentItem() as DuckChatContextualViewModel.Command.ShowChatsPopup
+            assertTrue(command.showNewChatHeader)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `when recent chats updates then view state is capped at 5 sorted by lastEdit desc`() = runTest {
+        whenever(contextualSheetImprovementsToggle.isEnabled()).thenReturn(true)
+        recentChatsFlow.value = listOf(
+            fakeChat("a", "A", 1L),
+            fakeChat("b", "B", 5L),
+            fakeChat("c", "C", 3L),
+            fakeChat("d", "D", 7L),
+            fakeChat("e", "E", 2L),
+            fakeChat("f", "F", 6L),
+            fakeChat("g", "G", 4L),
+        )
+        val testee = buildViewModel()
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+        val ids = testee.viewState.value.recentChats.map { it.chatId }
+        assertEquals(listOf("d", "f", "b", "g", "c"), ids)
+    }
+
+    @Test
+    fun `when recent chat clicked then OpenChatUrl command emitted with built url`() = runTest {
+        whenever(contextualSheetImprovementsToggle.isEnabled()).thenReturn(true)
+        whenever(duckChatInternal.buildChatUrl("c1")).thenReturn("https://duckduckgo.com/?chat_id=c1")
+        recentChatsFlow.value = listOf(fakeChat("c1", "Chat 1", 100L))
+        val testee = buildViewModel()
+        testee.onSheetOpened("tab-1")
+
+        testee.commands.test {
+            expectMostRecentItem()
+            testee.onRecentChatClicked("c1")
+
+            val command = awaitItem() as DuckChatContextualViewModel.Command.OpenChatUrl
+            assertEquals("https://duckduckgo.com/?chat_id=c1", command.url)
+            assertEquals("tab-1", command.sourceTabId)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `when view all chats clicked then LaunchChatHistory command emitted`() = runTest {
+        whenever(contextualSheetImprovementsToggle.isEnabled()).thenReturn(true)
+        val testee = buildViewModel()
+
+        testee.commands.test {
+            testee.onViewAllChatsClicked()
+            assertTrue(awaitItem() is DuckChatContextualViewModel.Command.LaunchChatHistory)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `when improvements enabled then showChatsIcon is true`() = runTest {
+        whenever(contextualSheetImprovementsToggle.isEnabled()).thenReturn(true)
+        val testee = buildViewModel()
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+        assertTrue(testee.viewState.value.showChatsIcon)
+    }
+
+    @Test
+    fun `when improvements disabled then showChatsIcon is false`() = runTest {
+        whenever(contextualSheetImprovementsToggle.isEnabled()).thenReturn(false)
+        val testee = buildViewModel()
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+        assertFalse(testee.viewState.value.showChatsIcon)
+    }
+
+    private fun fakeChat(id: String, title: String, lastEditMillis: Long): ChatHistoryItem =
+        ChatHistoryItem(
+            chatId = id,
+            displayTitle = title,
+            type = ChatType.Discussion,
+            model = "",
+            pinned = false,
+            lastEditMillis = lastEditMillis,
+        )
+
     private fun buildViewModel() = DuckChatContextualViewModel(
         dispatchers = coroutineRule.testDispatcherProvider,
         duckChat = duckChat,
@@ -1893,6 +2040,7 @@ class DuckChatContextualViewModelTest {
         featureTogglesInventory = featureTogglesInventory,
         modelManager = modelManager,
         contextualNativeInputManager = contextualNativeInputManager,
+        chatHistoryRepository = chatHistoryRepository,
         context = context,
     )
 
