@@ -169,9 +169,10 @@ class RealDuckChatJSHelper @Inject constructor(
                     val usage = AIChatAttachmentUsage(
                         imagesUsed = attachments.optInt("imagesUsed", 0),
                         filesUsed = attachments.optInt("filesUsed", 0),
-                        fileSizeBytesUsed = attachments.optInt("fileSizeBytesUsed", 0),
+                        fileSizeBytesUsed = attachments.optLong("fileSizeBytesUsed", 0L),
                     )
                     limitsHandler.setConversationImagesUsed(usage.imagesUsed)
+                    limitsHandler.setConversationFilesUsed(usage.filesUsed, usage.fileSizeBytesUsed)
                 }
                 null
             }
@@ -217,17 +218,17 @@ class RealDuckChatJSHelper @Inject constructor(
                                 if (duckChat.isAutomaticContextAttachmentEnabled()) {
                                     getPageContextResponse(featureName, method, it, pageContext, tabId)
                                 } else {
-                                    null
+                                    getEmptyPageContextResponse(featureName, method, it)
                                 }
                             }
 
                             else -> {
-                                null
+                                getEmptyPageContextResponse(featureName, method, it)
                             }
                         }
                     } else {
                         logcat { "Duck.ai Contextual: page context is empty, can't add it" }
-                        null
+                        getEmptyPageContextResponse(featureName, method, it)
                     }
                 }
             }
@@ -370,8 +371,8 @@ class RealDuckChatJSHelper @Inject constructor(
                 put(IS_HANDOFF_ENABLED, duckChat.isDuckChatFeatureEnabled())
                 put(SUPPORTS_CLOSING_AI_CHAT, true)
                 put(SUPPORTS_OPENING_SETTINGS, true)
-                put(SUPPORTS_NATIVE_CHAT_INPUT, dataStore.isNativeInputFieldUserSettingEnabled())
-                put(SUPPORTS_NATIVE_PROMPT, dataStore.isNativeInputFieldUserSettingEnabled())
+                put(SUPPORTS_NATIVE_CHAT_INPUT, duckChatFeature.nativeInputField().isEnabled())
+                put(SUPPORTS_NATIVE_PROMPT, duckChatFeature.nativeInputField().isEnabled())
                 put(SUPPORTS_CHAT_ID_RESTORATION, duckChat.isDuckChatFullScreenModeEnabled())
                 put(SUPPORTS_IMAGE_UPLOAD, duckChat.isImageUploadEnabled())
                 put(SUPPORTS_STANDALONE_MIGRATION, duckChat.isStandaloneMigrationEnabled())
@@ -407,6 +408,12 @@ class RealDuckChatJSHelper @Inject constructor(
                         if (pending.modelId != null) {
                             put("modelId", pending.modelId)
                         }
+                        if (pending.reasoningEffort != null) {
+                            put("reasoningEffort", pending.reasoningEffort)
+                        }
+                        if (pending.selectedTool != null) {
+                            put("toolChoice", JSONArray().apply { put(pending.selectedTool) })
+                        }
                         if (pending.images.isNotEmpty()) {
                             put(
                                 "images",
@@ -422,11 +429,38 @@ class RealDuckChatJSHelper @Inject constructor(
                                 },
                             )
                         }
+                        if (pending.files.isNotEmpty()) {
+                            put(
+                                "files",
+                                JSONArray().apply {
+                                    pending.files.forEach { file ->
+                                        put(
+                                            JSONObject().apply {
+                                                put("data", file.base64Data)
+                                                put("fileName", file.fileName)
+                                                put("mimeType", file.mimeType)
+                                            },
+                                        )
+                                    }
+                                },
+                            )
+                        }
                     },
                 )
             }
         }
         return JsCallbackData(jsonPayload, featureName, method, id)
+    }
+
+    private fun getEmptyPageContextResponse(
+        featureName: String,
+        method: String,
+        id: String,
+    ): JsCallbackData {
+        val params = JSONObject().apply {
+            put(PAGE_CONTEXT, JSONObject.NULL)
+        }
+        return JsCallbackData(params, featureName, method, id)
     }
 
     private suspend fun getPageContextResponse(

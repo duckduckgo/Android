@@ -18,13 +18,10 @@ package com.duckduckgo.app.accessibility.data
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.content.SharedPreferences.OnSharedPreferenceChangeListener
 import androidx.core.content.edit
-import com.duckduckgo.common.utils.DispatcherProvider
-import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.launch
-import logcat.LogPriority.VERBOSE
-import logcat.logcat
 
 interface AccessibilitySettingsDataStore {
     val systemFontSize: Float
@@ -37,19 +34,12 @@ interface AccessibilitySettingsDataStore {
 
 class AccessibilitySettingsSharedPreferences(
     private val context: Context,
-    private val dispatcherProvider: DispatcherProvider,
-    private val appCoroutineScope: CoroutineScope,
 ) : AccessibilitySettingsDataStore {
 
-    private val accessibilityStateFlow = MutableStateFlow(
-        AccessibilitySettings(
-            overrideSystemFontSize = false,
-            fontSize = FONT_SIZE_DEFAULT,
-            forceZoom = false,
-        ),
-    )
-
     private val preferences: SharedPreferences by lazy { context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE) }
+
+    override val systemFontSize: Float
+        get() = context.resources.configuration.fontScale * FONT_SIZE_DEFAULT
 
     override val fontSize: Float
         get() {
@@ -60,40 +50,33 @@ class AccessibilitySettingsSharedPreferences(
             }
         }
 
-    override val systemFontSize: Float
-        get() = context.resources.configuration.fontScale * FONT_SIZE_DEFAULT
-
     override var appFontSize: Float
         get() = preferences.getFloat(KEY_FONT_SIZE, FONT_SIZE_DEFAULT)
         set(value) {
             preferences.edit { putFloat(KEY_FONT_SIZE, value) }
-            emitNewValues()
         }
 
     override var forceZoom: Boolean
         get() = preferences.getBoolean(KEY_FORCE_ZOOM, false)
         set(enabled) {
             preferences.edit { putBoolean(KEY_FORCE_ZOOM, enabled) }
-            emitNewValues()
         }
 
     override var overrideSystemFontSize: Boolean
         get() = preferences.getBoolean(KEY_OVERRIDE_SYSTEM_FONT_SIZE, false)
         set(enabled) {
             preferences.edit { putBoolean(KEY_OVERRIDE_SYSTEM_FONT_SIZE, enabled) }
-            emitNewValues()
         }
 
-    override fun settingsFlow() = accessibilityStateFlow.asStateFlow().onSubscription {
-        emitNewValues()
-    }
+    override fun settingsFlow(): Flow<AccessibilitySettings> = callbackFlow {
+        val listener = OnSharedPreferenceChangeListener { _, _ -> trySend(currentSettings) }
+        preferences.registerOnSharedPreferenceChangeListener(listener)
+        trySend(currentSettings)
+        awaitClose { preferences.unregisterOnSharedPreferenceChangeListener(listener) }
+    }.distinctUntilChanged()
 
-    private fun emitNewValues() {
-        appCoroutineScope.launch(dispatcherProvider.io()) {
-            accessibilityStateFlow.emit(AccessibilitySettings(overrideSystemFontSize, fontSize, forceZoom))
-            logcat(VERBOSE) { "AccessibilityActSettings: new value emitted ${AccessibilitySettings(overrideSystemFontSize, fontSize, forceZoom)}" }
-        }
-    }
+    private val currentSettings: AccessibilitySettings
+        get() = AccessibilitySettings(overrideSystemFontSize, fontSize, forceZoom)
 
     companion object {
         const val FILENAME = "com.duckduckgo.app.accessibility.settings"

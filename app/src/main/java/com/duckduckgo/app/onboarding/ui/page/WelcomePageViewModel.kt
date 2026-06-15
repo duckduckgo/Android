@@ -28,13 +28,16 @@ import com.duckduckgo.app.global.DefaultRoleBrowserDialog
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.onboarding.DuckAiOnboardingExperimentManager
 import com.duckduckgo.app.onboarding.DuckAiOnboardingExperimentManager.DuckAiOnboardingExperimentVariant.*
+import com.duckduckgo.app.onboarding.DuckAiOnboardingExperimentMetrics
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.ADDRESS_BAR_POSITION
+import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.AI_COMPARISON_CHART
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.COMPARISON_CHART
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.INITIAL
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.INITIAL_REINSTALL_USER
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.INPUT_SCREEN
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.INPUT_SCREEN_PREVIEW
+import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.QUICK_SETUP
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.SKIP_ONBOARDING_OPTION
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.SYNC_RESTORE
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.Finish
@@ -106,13 +109,13 @@ class WelcomePageViewModel @Inject constructor(
     private val deviceInfo: DeviceInfo,
     private val syncAutoRestore: SyncAutoRestore,
     private val duckAiOnboardingExperimentManager: DuckAiOnboardingExperimentManager,
+    private val duckAiOnboardingExperimentMetrics: DuckAiOnboardingExperimentMetrics,
 ) : ViewModel() {
     private val _commands = Channel<Command>(1, DROP_OLDEST)
     val commands: Flow<Command> = _commands.receiveAsFlow()
 
     private var addressBarPositionOption: OmnibarType = OmnibarType.SINGLE_TOP
     private var inputScreenSelected: Boolean = true
-    private var maxPageCount: Int = 2
     private var reinstallUser: Boolean = false
 
     private val canRestoreDeferred: Deferred<Boolean> = viewModelScope.async(dispatchers.io()) {
@@ -125,16 +128,6 @@ class WelcomePageViewModel @Inject constructor(
             coroutineContext.ensureActive()
             logcat(LogPriority.WARN) { "Sync-AutoRestore: canRestore check failed - ${t.message}" }
             false
-        }
-    }
-
-    init {
-        viewModelScope.launch(dispatchers.io()) {
-            maxPageCount = if (androidBrowserConfigFeature.showInputScreenOnboarding().isEnabled()) {
-                3
-            } else {
-                2
-            }
         }
     }
 
@@ -166,6 +159,10 @@ class WelcomePageViewModel @Inject constructor(
         ) : Command
 
         data object Finish : Command
+
+        data class FinishAndSubmitSearchQuery(val query: String) : Command
+
+        data class FinishAndSubmitChatPrompt(val prompt: String) : Command
 
         data object OnboardingSkipped : Command
 
@@ -220,6 +217,10 @@ class WelcomePageViewModel @Inject constructor(
                 }
             }
 
+            AI_COMPARISON_CHART -> {
+                // no-op, only used in BrandDesignUpdate path
+            }
+
             SKIP_ONBOARDING_OPTION -> {
                 viewModelScope.launch {
                     _commands.send(OnboardingSkipped)
@@ -249,11 +250,7 @@ class WelcomePageViewModel @Inject constructor(
                             // Top is the default, no pixel needed
                         }
                     }
-                    if (androidBrowserConfigFeature.showInputScreenOnboarding().isEnabled()) {
-                        _commands.send(Command.ShowInputScreenDialog(showDuckAiCopy = isDuckAiCopyEnabled()))
-                    } else {
-                        _commands.send(Finish)
-                    }
+                    _commands.send(Command.ShowInputScreenDialog(showDuckAiCopy = isDuckAiCopyEnabled()))
                 }
             }
 
@@ -295,6 +292,9 @@ class WelcomePageViewModel @Inject constructor(
                     _commands.send(Finish)
                 }
             }
+
+            QUICK_SETUP -> {
+            }
         }
     }
 
@@ -320,7 +320,7 @@ class WelcomePageViewModel @Inject constructor(
                 // no-op
             }
 
-            COMPARISON_CHART -> {
+            COMPARISON_CHART, AI_COMPARISON_CHART -> {
                 // no-op
             }
 
@@ -340,6 +340,10 @@ class WelcomePageViewModel @Inject constructor(
             }
 
             INPUT_SCREEN_PREVIEW -> {
+                // no-op
+            }
+
+            QUICK_SETUP -> {
                 // no-op
             }
         }
@@ -390,6 +394,9 @@ class WelcomePageViewModel @Inject constructor(
             COMPARISON_CHART -> {
                 pixel.fire(PREONBOARDING_COMPARISON_CHART_SHOWN_UNIQUE, type = Unique())
             }
+            AI_COMPARISON_CHART -> {
+                // no pixel yet
+            }
             SKIP_ONBOARDING_OPTION -> pixel.fire(PREONBOARDING_SKIP_ONBOARDING_SHOWN_UNIQUE, type = Unique())
             ADDRESS_BAR_POSITION -> {
                 pixel.fire(PREONBOARDING_ADDRESS_BAR_POSITION_SHOWN_UNIQUE, type = Unique())
@@ -399,6 +406,9 @@ class WelcomePageViewModel @Inject constructor(
             }
             INPUT_SCREEN_PREVIEW -> {
                 // no pixel yet
+            }
+
+            QUICK_SETUP -> {
             }
         }
     }
@@ -414,9 +424,7 @@ class WelcomePageViewModel @Inject constructor(
         inputScreenSelected = withAi
     }
 
-    fun getMaxPageCount(): Int {
-        return maxPageCount
-    }
+    fun getMaxPageCount(): Int = MAX_PAGE_COUNT
 
     fun loadDaxDialog() {
         viewModelScope.launch {
@@ -442,6 +450,7 @@ class WelcomePageViewModel @Inject constructor(
 
     companion object {
         private const val BLOCK_STORE_TIMEOUT_MS = 3_000L
+        private const val MAX_PAGE_COUNT = 3
     }
 
     private suspend fun isDuckAiCopyEnabled(): Boolean = withContext(dispatchers.io()) {
@@ -453,6 +462,21 @@ class WelcomePageViewModel @Inject constructor(
         withContext(dispatchers.io()) {
             appBuildConfig.isAppReinstall()
         }
+
+    /**
+     * @param optionIndex 1, 2 or 3 if the user tapped one of the preset suggestions; null if they submitted a custom query.
+     */
+    fun onInputModeDemoQuerySubmitted(query: String, isChat: Boolean, optionIndex: Int?) {
+        viewModelScope.launch {
+            if (isChat) {
+                duckAiOnboardingExperimentMetrics.fireAiChatType(optionIndex)
+                _commands.send(Command.FinishAndSubmitChatPrompt(prompt = query))
+            } else {
+                duckAiOnboardingExperimentMetrics.fireSearchType(optionIndex)
+                _commands.send(Command.FinishAndSubmitSearchQuery(query = query))
+            }
+        }
+    }
 
     private fun isSplitOmnibarEnabled(): Boolean =
         androidBrowserConfigFeature.splitOmnibar().isEnabled() &&

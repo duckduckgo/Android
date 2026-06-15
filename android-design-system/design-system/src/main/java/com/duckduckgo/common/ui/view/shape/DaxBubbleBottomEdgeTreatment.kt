@@ -28,9 +28,11 @@ import com.google.android.material.shape.ShapePath
  * @param heightPx the height of the tail in pixels. The tail will scale proportionally on
  *   both axes.
  */
-class DaxBubbleBottomEdgeTreatment(
-    private val heightPx: Int = ORIGINAL_BOTTOM_ARROW_HEIGHT_DP.toPx(),
+open class DaxBubbleBottomEdgeTreatment(
+    protected val heightPx: Int = ORIGINAL_BOTTOM_ARROW_HEIGHT_DP.toPx(),
 ) : EdgeTreatment() {
+
+    var depthFraction: Float = 1f
 
     override fun getEdgePath(
         length: Float,
@@ -38,8 +40,8 @@ class DaxBubbleBottomEdgeTreatment(
         interpolation: Float,
         shapePath: ShapePath,
     ) {
-        val scaleFactor = heightPx.toFloat() / ORIGINAL_BOTTOM_ARROW_HEIGHT_DP
-        val arrowWidth = 47.14058f * scaleFactor
+        val scaleFactor = (heightPx.toFloat() / ORIGINAL_BOTTOM_ARROW_HEIGHT_DP) * depthFraction
+        val arrowWidth = ORIGINAL_BOTTOM_ARROW_WIDTH_DP * scaleFactor
         val arrowStart = center - (arrowWidth / 2)
 
         shapePath.lineTo(arrowStart, 0f)
@@ -130,5 +132,6 @@ class DaxBubbleBottomEdgeTreatment(
 
     companion object {
         const val ORIGINAL_BOTTOM_ARROW_HEIGHT_DP = 30
+        const val ORIGINAL_BOTTOM_ARROW_WIDTH_DP = 47.14058f
     }
 }

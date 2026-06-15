@@ -41,6 +41,7 @@ dependencies {
     implementation project(path: ':duckchat-api')
     implementation project(path: ':duckchat-impl')
     implementation project(path: ':duckchat-store')
+    implementation project(path: ':test-seeder-api')
     implementation project(path: ':content-scope-scripts-api')
     implementation project(path: ':content-scope-scripts-impl')
     implementation project(path: ':di')

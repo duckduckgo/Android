@@ -27,11 +27,15 @@ import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.browsermode.api.BrowserMode
+import com.duckduckgo.browsermode.api.BrowserModeDataProvider
+import com.duckduckgo.browsermode.api.BrowserModeStateHolder
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.customtabs.api.CustomTabDetector
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.newtabpage.api.NtpAfterIdleManager
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -41,6 +45,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
@@ -61,6 +66,13 @@ class FirstScreenHandlerImplTest {
     private val appBuildConfig: AppBuildConfig = mock()
     private val duckChat: DuckChat = mock()
     private val tabRepository: TabRepository = mock()
+    private val browserModeFlow = MutableStateFlow(BrowserMode.REGULAR)
+    private val browserModeStateHolder: BrowserModeStateHolder = mock {
+        on { currentMode } doReturn browserModeFlow
+    }
+    private val tabRepositoryProvider: BrowserModeDataProvider<TabRepository> = mock {
+        on { forMode(any()) } doReturn tabRepository
+    }
     private val systemAutofillEngagement: SystemAutofillEngagement = mock()
     private val customTabDetector: CustomTabDetector = mock()
     private val idleReturnToggle: Toggle = mock()
@@ -91,7 +103,8 @@ class FirstScreenHandlerImplTest {
             showOnAppLaunchOptionDataStore = showOnAppLaunchOptionDataStore,
             appBuildConfig = appBuildConfig,
             duckChat = duckChat,
-            tabRepository = tabRepository,
+            tabRepositoryProvider = tabRepositoryProvider,
+            browserModeStateHolder = browserModeStateHolder,
             ntpAfterIdleManager = ntpAfterIdleManager,
             systemAutofillEngagement = systemAutofillEngagement,
             customTabDetector = customTabDetector,

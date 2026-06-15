@@ -62,6 +62,14 @@ class DevTabsActivity : DuckDuckGoActivity() {
             viewModel.clearTabs()
         }
 
+        binding.addFireTabsButton.setOnClickListener {
+            viewModel.addFireTabs(binding.fireTabCount.text.toInt())
+        }
+
+        binding.clearFireTabsButton.setOnClickListener {
+            viewModel.clearFireTabs()
+        }
+
         binding.addBookmarksButton.setOnClickListener {
             viewModel.addBookmarks(binding.bookmarksCount.text.toInt())
         }
@@ -94,6 +102,7 @@ class DevTabsActivity : DuckDuckGoActivity() {
 
     private fun render(viewState: ViewState) {
         binding.tabCountHeader.text = getString(R.string.devSettingsTabsScreenHeader, viewState.tabCount)
+        binding.fireTabCountHeader.text = getString(R.string.devSettingsFireTabsScreenHeader, viewState.fireTabCount)
         binding.bookmarksCountHeader.text = getString(R.string.devSettingsTabsBookmarksScreenHeader, viewState.bookmarkCount)
         binding.favoritesCountHeader.text = getString(R.string.devSettingsTabsFavoritesScreenHeader, viewState.favoritesCount)
     }

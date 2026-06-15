@@ -26,6 +26,7 @@ import androidx.core.net.toUri
 import androidx.room.Room
 import androidx.test.annotation.UiThreadTest
 import androidx.test.platform.app.InstrumentationRegistry
+import com.duckduckgo.adblocking.api.duckplayer.DuckPlayer
 import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.app.browser.WebViewRequestInterceptor
 import com.duckduckgo.app.browser.useragent.provideUserAgentOverridePluginPoint
@@ -56,7 +57,6 @@ import com.duckduckgo.app.trackerdetection.db.TdsEntityDao
 import com.duckduckgo.app.trackerdetection.db.WebTrackersBlockedDao
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.FileUtilities
-import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.FeatureException
 import com.duckduckgo.feature.toggles.api.FeatureToggle
@@ -65,6 +65,7 @@ import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.httpsupgrade.api.HttpsUpgrader
 import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.privacy.config.impl.features.contentblocking.RealContentBlocking
+import com.duckduckgo.privacy.config.impl.features.trackerallowlist.OptimizeTrackerAllowListRCWrapper
 import com.duckduckgo.privacy.config.impl.features.trackerallowlist.RealTrackerAllowlist
 import com.duckduckgo.privacy.config.impl.features.trackerallowlist.TrackerAllowlistFeature
 import com.duckduckgo.privacy.config.impl.features.unprotectedtemporary.RealUnprotectedTemporary
@@ -314,7 +315,13 @@ class RequestBlocklistReferenceTest(private val testCase: TestCase) {
         val entities = tdsJson.jsonToEntities()
         val domainEntities = tdsJson.jsonToDomainEntities()
         val cnameEntities = tdsJson.jsonToCnameEntities()
-        val client = TdsClient(Client.ClientName.TDS, trackers, RealUrlToTypeMapper(), false)
+        val client = TdsClient(
+            name = Client.ClientName.TDS,
+            trackers = trackers,
+            urlToTypeMapper = RealUrlToTypeMapper(),
+            optimizeTrackerEvaluationV3 = false,
+            precompileRegex = false,
+        )
 
         tdsEntityDao.insertAll(entities)
         tdsDomainEntityDao.insertAll(domainEntities)
@@ -367,7 +374,10 @@ class RequestBlocklistReferenceTest(private val testCase: TestCase) {
         } ?: emptyList()
 
         whenever(trackerAllowlistRepository.exceptions).thenReturn(CopyOnWriteArrayList(allowlistEntries))
-        trackerAllowlist = RealTrackerAllowlist(trackerAllowlistRepository, fakeToggle)
+        val precompileWrapper = object : OptimizeTrackerAllowListRCWrapper {
+            override val enabled: Boolean = false
+        }
+        trackerAllowlist = RealTrackerAllowlist(trackerAllowlistRepository, fakeToggle, precompileWrapper)
     }
 
     private fun setupUserAllowList() {

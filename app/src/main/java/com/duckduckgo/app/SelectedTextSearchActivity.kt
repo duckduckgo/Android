@@ -21,6 +21,7 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.duckduckgo.app.browser.BrowserActivity
+import com.duckduckgo.app.browser.mode.SelectedTextSearch
 import logcat.LogPriority.WARN
 import logcat.logcat
 
@@ -34,7 +35,15 @@ class SelectedTextSearchActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         val query = extractQuery(intent)
-        startActivity(BrowserActivity.intent(this, queryExtra = query, selectedText = true, interstitialScreen = true))
+        startActivity(
+            BrowserActivity.intent(
+                this,
+                launchSource = SelectedTextSearch,
+                queryExtra = query,
+                selectedText = true,
+                interstitialScreen = true,
+            ),
+        )
         finish()
     }
 

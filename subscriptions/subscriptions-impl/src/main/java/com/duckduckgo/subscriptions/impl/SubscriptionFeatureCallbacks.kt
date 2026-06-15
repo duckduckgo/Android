@@ -72,6 +72,6 @@ class SubscriptionFeatureCallbacks @Inject constructor(
 
     private companion object {
         const val KEY_MODEL_TIER = "modelTier"
-        val MODEL_TIERS_PAID: Set<String> = setOf("plus")
+        val MODEL_TIERS_PAID: Set<String> = setOf("plus", "pro")
     }
 }

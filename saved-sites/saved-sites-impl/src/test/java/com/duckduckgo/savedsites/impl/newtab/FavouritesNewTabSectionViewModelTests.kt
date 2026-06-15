@@ -21,7 +21,9 @@ import app.cash.turbine.test
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.newtabpage.api.interactions.HatchInteractionsPlugin
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
 import com.duckduckgo.savedsites.impl.SavedSitesPixelName
@@ -56,6 +58,7 @@ class FavouritesNewTabSectionViewModelTests {
     private val pixel: Pixel = mock()
     private val feature: FavouritesNewTabSectionFixFeature = mock()
     private val featureToggle: com.duckduckgo.feature.toggles.api.Toggle = mock()
+    private val hatchInteractionsPlugins: PluginPoint<HatchInteractionsPlugin> = mock()
 
     private lateinit var testee: FavouritesNewTabSectionViewModel
 
@@ -74,6 +77,7 @@ class FavouritesNewTabSectionViewModelTests {
             faviconManager,
             syncEngine,
             feature,
+            hatchInteractionsPlugins,
         )
     }
 
@@ -96,6 +100,7 @@ class FavouritesNewTabSectionViewModelTests {
             faviconManager,
             syncEngine,
             feature,
+            hatchInteractionsPlugins,
         )
 
         testeeWithFavourites.viewState.test {
@@ -317,6 +322,7 @@ class FavouritesNewTabSectionViewModelTests {
             faviconManager,
             syncEngine,
             feature,
+            hatchInteractionsPlugins,
         )
 
         viewModelWithFixDisabled.viewState.test {

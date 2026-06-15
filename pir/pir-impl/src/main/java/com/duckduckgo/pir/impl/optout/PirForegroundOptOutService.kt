@@ -28,8 +28,10 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.di.scopes.ServiceScope
 import com.duckduckgo.pir.impl.PirFeatureDataCleaner
 import com.duckduckgo.pir.impl.R
+import com.duckduckgo.pir.impl.checker.PirEligibility
 import com.duckduckgo.pir.impl.checker.PirWorkHandler
 import com.duckduckgo.pir.impl.notifications.PirNotificationManager
+import com.duckduckgo.pir.impl.wideevents.PirScanWideEvent.CancellationReason
 import dagger.android.AndroidInjection
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
@@ -94,9 +96,10 @@ class PirForegroundOptOutService : Service(), CoroutineScope by MainScope() {
         }
 
         launch {
-            if (pirWorkHandler.canRunPir().firstOrNull() == false) {
+            val eligibility = pirWorkHandler.canRunPir().firstOrNull()
+            if (eligibility is PirEligibility.Disabled) {
                 logcat { "PIR-OPT-OUT: PIR opt-out not allowed to run!" }
-                pirWorkHandler.cancelWork()
+                pirWorkHandler.cancelWork(CancellationReason.fromDisabledReason(eligibility.reason))
                 pirFeatureDataCleaner.removeAllData()
                 stopSelf()
                 return@launch

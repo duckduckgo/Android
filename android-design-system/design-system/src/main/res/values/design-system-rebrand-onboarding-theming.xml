@@ -14,7 +14,7 @@
   ~ limitations under the License.
   -->
 
-<resources xmlns:tools="http://schemas.android.com/tools">
+<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="NewApi">
 
     <attr name="onboardingTextPrimary" format="color" />
     <attr name="onboardingTextSecondary" format="color" />
@@ -31,11 +31,17 @@
     <attr name="onboardingAccentSecondary" format="color" />
     <attr name="onboardingAccentGlowPrimary" format="color" />
     <attr name="onboardingAccentTextPrimary" format="color" />
+    <attr name="onboardingAccentTextAlt" format="color" />
     <attr name="onboardingIconsPrimary" format="color" />
     <attr name="onboardingIconsSecondary" format="color" />
     <attr name="onboardingIconsTertiary" format="color" />
     <attr name="onboardingControlFillTertiary" format="color" />
+    <attr name="onboardingShadowPurple" format="color" />
+    <attr name="onboardingShadowBlue" format="color" />
     <color name="onboardingBubbleShadowColor">#08000000</color>
+
+    <!-- Quick setup -->
+    <attr name="quickSetupStepNumberText" format="color" />
 
     <attr name="selectionButtonStyle" format="reference"/>
 
@@ -57,7 +63,13 @@
         <item name="onboardingAccentSecondary">@color/mandarin60</item>
         <item name="onboardingAccentGlowPrimary">#332F95EE</item> <!--20% Alpha-->
         <item name="onboardingAccentTextPrimary">@color/pondwater60</item>
+        <item name="onboardingAccentTextAlt">@color/pondwater60</item>
         <item name="onboardingControlFillTertiary">@color/black12</item>
+        <item name="onboardingShadowPurple">#0F3E228C</item> <!--6% Alpha-->
+        <item name="onboardingShadowBlue">#171E42A4</item> <!--9% Alpha-->
+
+        <!--Quick setup-->
+        <item name="quickSetupStepNumberText">@color/pondwater70</item>
 
         <!--Icons-->
         <item name="onboardingIconsPrimary">#D6242323</item> <!--84% Alpha-->
@@ -120,7 +132,13 @@
         <item name="onboardingAccentSecondary">@color/pollen40</item>
         <item name="onboardingAccentGlowPrimary">#2975B6EB</item> <!--16% Alpha-->
         <item name="onboardingAccentTextPrimary">@color/pondwater40</item>
+        <item name="onboardingAccentTextAlt">@color/mandarin30</item>
         <item name="onboardingControlFillTertiary">@color/white24</item>
+        <item name="onboardingShadowPurple">#0F070019</item> <!--6% Alpha-->
+        <item name="onboardingShadowBlue">#17051133</item> <!--9% Alpha-->
+
+        <!--Quick setup-->
+        <item name="quickSetupStepNumberText">@color/pondwater0</item>
 
         <!--Icons-->
         <item name="onboardingIconsPrimary">#D6FBFAF9</item> <!--84% Alpha-->
@@ -174,7 +192,8 @@
     <style name="Typography.DuckDuckGo.Onboarding.WelcomeTitle">
         <item name="android:textSize">44sp</item>
         <item name="android:textColor">?attr/onboardingTextPrimary</item>
-        <item name="android:lineSpacingExtra">-10sp</item>
+        <item name="android:lineHeight">44sp</item>
+        <item name="android:lineSpacingExtra">0sp</item>
         <item name="android:fontFamily">@font/ducksansdisplay_medium</item>
     </style>
 

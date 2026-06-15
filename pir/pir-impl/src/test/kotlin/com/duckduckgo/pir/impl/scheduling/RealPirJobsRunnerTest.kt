@@ -1316,7 +1316,7 @@ class RealPirJobsRunnerTest {
         verify(mockPirScanWideEvent).onOptOutCompleted(any(), any())
         verify(mockPirScanWideEvent, never()).onOptOutSkipped(any())
         verify(mockPirScanWideEvent, never()).onRunFailed(any(), any())
-        verify(mockPirScanWideEvent, never()).onRunCancelled(any())
+        verify(mockPirScanWideEvent, never()).onRunCancelled(any(), any())
     }
 
     @Test
@@ -1478,7 +1478,7 @@ class RealPirJobsRunnerTest {
             notificationsPermissionGranted = false,
             isTrackerBlockingEnabled = false,
         )
-        verify(mockPirScanWideEvent).onRunCancelled(any())
+        verify(mockPirScanWideEvent).onRunCancelled(any(), any())
         verify(mockPirScanWideEvent, never()).onScanCompleted(any())
         verify(mockPirScanWideEvent, never()).onRunFailed(any(), any())
     }
@@ -1528,7 +1528,7 @@ class RealPirJobsRunnerTest {
         )
         verify(mockPirScanWideEvent).onRunFailed(any(), eq(FailureReason.ILLEGAL_STATE_EXCEPTION))
         verify(mockPirScanWideEvent, never()).onScanCompleted(any())
-        verify(mockPirScanWideEvent, never()).onRunCancelled(any())
+        verify(mockPirScanWideEvent, never()).onRunCancelled(any(), any())
     }
 
     @Test
@@ -1572,7 +1572,7 @@ class RealPirJobsRunnerTest {
 
         // Then
         verify(mockPirScanWideEvent).onRunFailed(any(), eq(FailureReason.TIMEOUT_CANCELLATION_EXCEPTION))
-        verify(mockPirScanWideEvent, never()).onRunCancelled(any())
+        verify(mockPirScanWideEvent, never()).onRunCancelled(any(), any())
     }
 
     @Test
@@ -1610,6 +1610,6 @@ class RealPirJobsRunnerTest {
         verify(mockPirScanWideEvent).onOptOutStarted(any())
         verify(mockPirScanWideEvent).onRunFailed(any(), eq(FailureReason.ILLEGAL_STATE_EXCEPTION))
         verify(mockPirScanWideEvent, never()).onOptOutCompleted(any(), any())
-        verify(mockPirScanWideEvent, never()).onRunCancelled(any())
+        verify(mockPirScanWideEvent, never()).onRunCancelled(any(), any())
     }
 }

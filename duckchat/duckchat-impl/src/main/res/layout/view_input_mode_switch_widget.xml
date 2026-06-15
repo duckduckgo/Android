@@ -96,8 +96,9 @@
             android:layout_height="wrap_content"
             android:clipChildren="false"
             android:clipToPadding="false"
+            android:theme="?attr/daxInputModeCardThemeOverlay"
             app:cardElevation="0dp"
-            app:strokeColor="?attr/daxColorAccentBlue"
+            app:strokeColor="?attr/daxColorOmnibarAccent"
             app:strokeWidth="@dimen/omnibarOutlineWidth"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -202,6 +203,15 @@
                         android:layout_marginEnd="@dimen/keyline_1"
                         android:gravity="center_vertical"
                         android:orientation="horizontal">
+
+                        <FrameLayout
+                            android:id="@id/reasoningModePickerContainer"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_vertical"
+                            android:layout_marginEnd="@dimen/keyline_1"
+                            android:visibility="gone"
+                            tools:visibility="visible" />
 
                         <FrameLayout
                             android:id="@id/modelPickerContainer"

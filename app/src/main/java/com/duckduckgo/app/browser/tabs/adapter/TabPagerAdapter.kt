@@ -129,7 +129,7 @@ class TabPagerAdapter(
     }
 
     fun getTabIdAtPosition(position: Int): String? {
-        return if (position < tabs.size) {
+        return if (position >= 0 && position < tabs.size) {
             tabs[position].tabId
         } else {
             null

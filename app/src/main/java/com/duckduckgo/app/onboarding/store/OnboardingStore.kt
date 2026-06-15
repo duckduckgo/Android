@@ -28,4 +28,13 @@ interface OnboardingStore {
     fun getInputScreenSelection(): Boolean?
     fun isInputScreenSelectionOverriddenByUser(): Boolean
     fun setInputScreenSelectionOverriddenByUser()
+    fun setDuckAiOnboardingFlow()
+    fun isDuckAiOnboardingFlow(): Boolean
+
+    /**
+     * `true` if the user installs through AI referral link
+     *
+     * **Note: this feature is WIP, details to follow during the rest of integration**
+     */
+    fun isCustomAiOnboardingFlow(): Boolean
 }

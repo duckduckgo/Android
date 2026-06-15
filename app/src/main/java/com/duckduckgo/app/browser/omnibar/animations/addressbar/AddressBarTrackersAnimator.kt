@@ -32,6 +32,7 @@ import androidx.core.animation.addListener
 import androidx.core.graphics.ColorUtils
 import androidx.core.transition.addListener
 import com.airbnb.lottie.LottieAnimationView
+import com.airbnb.lottie.RenderMode
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.common.ui.DuckDuckGoActivity
@@ -63,6 +64,7 @@ class AddressBarTrackersAnimator @Inject constructor(
         shieldViews: List<View>,
         entities: List<Entity>?,
         customBackgroundColor: Int?,
+        useSoftwareRenderingMode: Boolean,
         onAnimationComplete: () -> Unit,
     ) {
         if (isAnimationRunning) return
@@ -80,13 +82,18 @@ class AddressBarTrackersAnimator @Inject constructor(
         this.onAnimationComplete = onAnimationComplete
         this.customBackgroundColor = customBackgroundColor
 
+        addressBarTrackersBlockedAnimationShieldIcon.renderMode = if (useSoftwareRenderingMode) {
+            RenderMode.SOFTWARE
+        } else {
+            RenderMode.AUTOMATIC
+        }
         addressBarTrackersBlockedAnimationShieldIcon.show()
         addressBarTrackersBlockedAnimationShieldIcon.progress = 0F
 
         val slideInTrackersTransition: Transition = createSlideTransition()
         val slideOutTrackersTransition: Transition = createSlideTransition()
 
-        val inflater = LayoutInflater.from(context)
+        val inflater = LayoutInflater.from(sceneRoot.context)
         val scene1Layout = inflater.inflate(R.layout.address_bar_trackers_animation_scene_1, sceneRoot, false)
         val scene2Layout = inflater.inflate(R.layout.address_bar_trackers_animation_scene_2, sceneRoot, false)
 

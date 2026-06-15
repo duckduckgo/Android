@@ -21,12 +21,14 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Rect
 import android.os.Bundle
+import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.TouchDelegate
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.annotation.AttrRes
 import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
@@ -106,6 +108,7 @@ class TabSwitcherAdapter(
 
     @Volatile
     var isFullUrlEnabled: Boolean = true
+
     private var layoutType: LayoutType = GRID
     private var onAnimationTileCloseClickListener: (() -> Unit)? = null
 
@@ -225,7 +228,7 @@ class TabSwitcherAdapter(
         holder.cancelLoadJobs()
         val context = holder.rootView.context
         val glide = Glide.with(context)
-        holder.title.text = extractTabTitle(tab.tabEntity, context)
+        holder.title.text = tab.title
         holder.url.text = formatUrl(tab.tabEntity.url)
         holder.url.visibility = if (tab.tabEntity.url.isNullOrEmpty()) View.GONE else View.VISIBLE
         updateUnreadIndicator(holder, tab.tabEntity)
@@ -242,7 +245,7 @@ class TabSwitcherAdapter(
         holder.cancelLoadJobs()
         val context = holder.rootView.context
         val glide = Glide.with(context)
-        holder.title.text = extractTabTitle(tab.tabEntity, context)
+        holder.title.text = tab.title
         updateUnreadIndicator(holder, tab.tabEntity)
         loadFavicon(tab.tabEntity, glide, holder.favicon, holder)
         loadTabPreviewImage(tab.tabEntity, glide, holder.tabPreview, holder)
@@ -258,7 +261,7 @@ class TabSwitcherAdapter(
         holder.cancelLoadJobs()
         val context = holder.rootView.context
         val glide = Glide.with(context)
-        holder.title.text = extractTabTitle(tab.tabEntity, context)
+        holder.title.text = tab.title
         holder.favicon.setImageResource(CommonR.drawable.ic_duck_ai_color_24)
         updateUnreadIndicator(holder, tab.tabEntity)
         loadTabPreviewImage(tab.tabEntity, glide, holder.tabPreview, holder)
@@ -327,12 +330,6 @@ class TabSwitcherAdapter(
         }
     }
 
-    private fun extractTabTitle(tab: TabEntity, context: Context): String {
-        var title = tab.displayTitle(context)
-        title = title.removeSuffix(DUCKDUCKGO_TITLE_SUFFIX)
-        return title
-    }
-
     private fun formatUrl(url: String?): String {
         if (url.isNullOrEmpty()) return ""
         return if (isFullUrlEnabled) url else addressDisplayFormatter.getShortUrl(url)
@@ -398,7 +395,7 @@ class TabSwitcherAdapter(
             }
 
             if (bundle.containsKey(DIFF_KEY_TITLE)) {
-                viewHolder.title.text = extractTabTitle(tab.tabEntity, viewHolder.rootView.context)
+                viewHolder.title.text = tab.title
             }
 
             if (bundle.containsKey(DIFF_KEY_SELECTION)) {
@@ -430,7 +427,7 @@ class TabSwitcherAdapter(
             }
 
             if (bundle.containsKey(DIFF_KEY_TITLE)) {
-                viewHolder.title.text = extractTabTitle(tab.tabEntity, viewHolder.rootView.context)
+                viewHolder.title.text = tab.title
             }
 
             if (bundle.containsKey(DIFF_KEY_SELECTION)) {
@@ -457,7 +454,7 @@ class TabSwitcherAdapter(
                 loadTabPreviewImage(tab.tabEntity, Glide.with(viewHolder.rootView), viewHolder.tabPreview, viewHolder)
             }
             if (bundle.containsKey(DIFF_KEY_TITLE)) {
-                viewHolder.title.text = extractTabTitle(tab.tabEntity, viewHolder.rootView.context)
+                viewHolder.title.text = tab.title
             }
             if (bundle.containsKey(DIFF_KEY_SELECTION)) {
                 loadSelectionState(viewHolder, tab)
@@ -537,7 +534,8 @@ class TabSwitcherAdapter(
 
         val previewFile = tab.tabPreviewFile
         if (tab.url.isNullOrBlank() && !tab.isAboutBlank) {
-            glide.load(AndroidR.drawable.ic_dax_icon_72)
+            val placeholder = tabPreview.resolveThemedDrawableAttr(CommonR.attr.daxDrawableTabPlaceholderPreview)
+            glide.load(placeholder)
                 .into(tabPreview)
         } else if (previewFile != null) {
             holder.trackJob(
@@ -638,8 +636,10 @@ class TabSwitcherAdapter(
         onAnimationTileCloseClickListener = onClick
     }
 
-    companion object {
-        private const val DUCKDUCKGO_TITLE_SUFFIX = "at DuckDuckGo"
+    private fun View.resolveThemedDrawableAttr(@AttrRes attr: Int): Int {
+        val typedValue = TypedValue()
+        context.theme.resolveAttribute(attr, typedValue, true)
+        return typedValue.resourceId
     }
 
     sealed class TabSwitcherViewHolder(rootView: View) : ViewHolder(rootView) {
@@ -666,8 +666,6 @@ class TabSwitcherAdapter(
             const val SELECTABLE_DUCK_AI_LIST = 6
 
             const val EXTRA_CLOSE_BUTTON_TOUCH_AREA = 6 // dp
-
-            const val MAX_TITLE_LENGTH = 50
         }
 
         interface TabViewHolder {

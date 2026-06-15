@@ -87,6 +87,23 @@
                 tools:ignore="DeprecatedWidgetInXml,InvalidColorAttribute" />
 
             <com.airbnb.lottie.LottieAnimationView
+                android:id="@+id/duckAiIntroAnimation"
+                android:layout_width="wrap_content"
+                android:layout_height="90sp"
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginTop="12dp"
+                android:adjustViewBounds="true"
+                android:importantForAccessibility="no"
+                android:visibility="invisible"
+                app:layout_constraintTop_toBottomOf="@id/welcomeTitle"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:lottie_loop="false"
+                app:lottie_rawRes="@raw/onboarding_welcome_duck_ai_intro"
+                tools:lottie_progress="1"
+                tools:visibility="visible" />
+
+            <com.airbnb.lottie.LottieAnimationView
                 android:id="@+id/backgroundPrimary"
                 android:layout_width="0dp"
                 android:layout_height="0dp"

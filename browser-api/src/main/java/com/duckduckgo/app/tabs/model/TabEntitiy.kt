@@ -24,6 +24,10 @@ import androidx.room.TypeConverter
 import com.duckduckgo.common.utils.formatters.time.DatabaseDateFormatter
 import java.time.LocalDateTime
 
+/**
+ * Shared by `AppDatabase` and `FireModeDatabase`. Any schema change here requires a migration in
+ * BOTH databases — forgetting one will result in a runtime crash for the affected users.
+ */
 @Entity(
     tableName = "tabs",
     foreignKeys = [

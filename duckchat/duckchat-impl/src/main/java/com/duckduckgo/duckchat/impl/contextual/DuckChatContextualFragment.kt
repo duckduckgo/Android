@@ -56,6 +56,8 @@ import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.browsermode.api.BrowserMode
+import com.duckduckgo.browsermode.api.WebViewModeInitializer
 import com.duckduckgo.common.ui.DuckDuckGoFragment
 import com.duckduckgo.common.ui.view.dialog.ActionBottomSheetDialog
 import com.duckduckgo.common.ui.view.gone
@@ -184,6 +186,12 @@ class DuckChatContextualFragment :
     @Inject
     lateinit var contextualNativeInputManager: ContextualNativeInputManager
 
+    @Inject
+    lateinit var webViewModeInitializer: WebViewModeInitializer
+
+    @Inject
+    lateinit var browserMode: BrowserMode
+
     private val cookieManager: CookieManager by lazy { CookieManager.getInstance() }
 
     private var pendingFileDownload: FileDownloader.PendingFileDownload? = null
@@ -252,6 +260,8 @@ class DuckChatContextualFragment :
         cookieManager.setAcceptThirdPartyCookies(simpleWebview, true)
 
         simpleWebview.let {
+            webViewModeInitializer.bind(it, browserMode)
+
             it.webViewClient = webViewClient
             webViewClient
                 .onPageFinishedListener = { url ->
@@ -424,11 +434,16 @@ class DuckChatContextualFragment :
 
         configureBottomSheet(view)
         setupBackPressHandling()
+        val tabId = requireNotNull(requireArguments().getString(KEY_DUCK_AI_CONTEXTUAL_TAB_ID)) {
+            "DuckChatContextualFragment requires $KEY_DUCK_AI_CONTEXTUAL_TAB_ID argument"
+        }
         contextualNativeInputManager.init(
+            tabId = tabId,
             card = binding.contextualNativeInputCard,
             widget = binding.contextualNativeInputWidget,
             jsMessaging = contentScopeScripts,
             lifecycleOwner = viewLifecycleOwner,
+            chatIdFlow = viewModel.chatId,
             onSearchSubmitted = { query ->
                 viewModel.onContextualClose()
                 startActivity(browserNav.openInNewTab(requireContext(), query))
@@ -442,10 +457,8 @@ class DuckChatContextualFragment :
         )
         observeViewModel()
 
-        requireArguments().getString(KEY_DUCK_AI_CONTEXTUAL_TAB_ID)?.let { tabId ->
-            viewModel.onSheetOpened(tabId)
-            setupKeyboardVisibilityListener()
-        }
+        viewModel.onSheetOpened(tabId)
+        setupKeyboardVisibilityListener()
     }
 
     private fun configureBottomSheet(view: View) {
@@ -543,9 +556,8 @@ class DuckChatContextualFragment :
         binding.duckAiAttachContextLayout.setOnClickListener {
             viewModel.addPageContext()
         }
-        binding.contextualPromptSummarize.setOnClickListener {
-            val prompt = getString(R.string.duckAIContextualPromptSummarize)
-            viewModel.replacePrompt(binding.inputField.text.toString(), prompt)
+        binding.contextualPromptQuickAction.setOnClickListener {
+            viewModel.onQuickActionClicked(binding.inputField.text.toString())
         }
     }
 
@@ -591,6 +603,7 @@ class DuckChatContextualFragment :
                     }
 
                     is DuckChatContextualViewModel.Command.ChangeSheetState -> {
+                        command.prefillNativeInput?.let { binding.contextualNativeInputWidget.text = it }
                         bottomSheetBehavior.state = command.newState
                     }
                     is DuckChatContextualViewModel.Command.RequestPageContext -> {
@@ -649,6 +662,10 @@ class DuckChatContextualFragment :
             binding.contextualFullScreen.gone()
         }
 
+        binding.contextualPromptQuickAction.setText(viewState.quickActionState.labelResId)
+        binding.contextualPromptQuickAction.setCompoundDrawablesRelativeWithIntrinsicBounds(viewState.quickActionState.iconResId, 0, 0, 0)
+        binding.inputField.setHint(viewState.chatHintResId)
+
         when (viewState.sheetMode) {
             DuckChatContextualViewModel.SheetMode.INPUT -> {
                 binding.contextualModeNativeContent.show()
@@ -660,7 +677,10 @@ class DuckChatContextualFragment :
 
                 renderPageContext(viewState.contextTitle, viewState.contextUrl, viewState.tabId)
 
-                if (viewState.showContext) {
+                if (viewState.quickActionState == DuckChatContextualViewModel.QuickActionState.ASK_ABOUT_PAGE) {
+                    binding.duckAiContextualLayout.gone()
+                    binding.duckAiAttachContextLayout.gone()
+                } else if (viewState.showContext) {
                     binding.duckAiContextualLayout.show()
                     binding.duckAiAttachContextLayout.gone()
                 } else {

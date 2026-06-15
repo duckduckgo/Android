@@ -17,13 +17,17 @@
 package com.duckduckgo.app.browser.nativeinput
 
 import android.app.Activity
+import android.content.res.Configuration
+import android.graphics.Outline
 import android.net.Uri
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewOutlineProvider
 import android.webkit.ValueCallback
 import android.widget.FrameLayout
+import androidx.core.net.toUri
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.lifecycleScope
@@ -32,21 +36,27 @@ import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.omnibar.Omnibar
 import com.duckduckgo.app.browser.omnibar.QueryUrlPredictor
+import com.duckduckgo.app.pixels.AppPixelName
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion
+import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.duckchat.api.toChatIdOrNull
 import com.duckduckgo.duckchat.impl.ui.nativeinput.views.NativeInputWidget
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionPurchase
 import com.duckduckgo.voice.api.VoiceSearchAvailability
 import com.google.android.material.card.MaterialCardView
 import com.squareup.anvil.annotations.ContributesBinding
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import org.json.JSONArray
 import javax.inject.Inject
@@ -54,14 +64,31 @@ import javax.inject.Inject
 class NativeInputCallbacks(
     val onSearchTextChanged: (String) -> Unit,
     val onSearchSubmitted: (String) -> Unit,
-    val onDuckAiChatSubmitted: (query: String, modelId: String?, imagesJson: JSONArray?) -> Unit,
+    val onDuckAiChatSubmitted: (
+        query: String,
+        modelId: String?,
+        reasoningEffort: String?,
+        selectedTool: String?,
+        imagesJson: JSONArray?,
+        filesJson: JSONArray?,
+    ) -> Unit,
     val onChatSuggestionSelected: (String) -> Unit,
+    val onDuckAiQuerySubmitted: (query: String) -> Unit = {},
     val onChatUrlSuggestionClicked: (AutoCompleteSuggestion) -> Unit = {},
+    val onChatHistoryShortcutClicked: () -> Unit = {},
     val onClearAutocomplete: () -> Unit,
     val onStopTapped: () -> Unit,
+    val onFireButtonPressed: () -> Unit = {},
     val onVoiceSearchPressed: (isChatTab: Boolean) -> Unit = {},
     val onCameraCaptureRequested: (ValueCallback<Array<Uri>>) -> Unit = {},
     val onFilePickerRequested: (ValueCallback<Array<Uri>>, List<String>) -> Unit = { _, _ -> },
+    /**
+     * Restore the autocomplete view state from the always-on cache the viewmodel keeps for
+     * the omnibar's text. Returns true when the cache matched [forQuery] and was applied;
+     * the caller uses the return value to decide whether to re-show the suggestions list.
+     */
+    val restoreOmnibarAutocomplete: (forQuery: String) -> Boolean = { _ -> false },
+    val onContextualSheetRequested: () -> Unit = {},
 )
 
 interface NativeInputManager {
@@ -78,9 +105,11 @@ interface NativeInputManager {
     fun isChatTabSelected(): Boolean
 
     fun showNativeInput(
+        tabId: String,
         layoutInflater: LayoutInflater,
         lifecycleOwner: LifecycleOwner,
         tabs: LiveData<List<TabEntity>>,
+        currentTabUrl: Flow<String?>,
         query: String = "",
         callbacks: NativeInputCallbacks,
     )
@@ -88,6 +117,7 @@ interface NativeInputManager {
     fun handleDuckAiVoiceResult(query: String)
     fun onKeyboardVisibilityChanged(isVisible: Boolean)
     fun setPickingImage(picking: Boolean)
+    fun setText(text: String)
 }
 
 @ContributesBinding(FragmentScope::class)
@@ -98,6 +128,7 @@ class RealNativeInputManager @Inject constructor(
     private val globalActivityStarter: GlobalActivityStarter,
     private val queryUrlPredictor: QueryUrlPredictor,
     private val duckAiFeatureState: DuckAiFeatureState,
+    private val pixel: Pixel,
 ) : NativeInputManager {
     private lateinit var omnibarController: NativeInputOmnibarController
     private lateinit var rootView: ViewGroup
@@ -105,8 +136,10 @@ class RealNativeInputManager @Inject constructor(
     private var isNativeInputFieldEnabled: Boolean = false
     private var isExiting: Boolean = false
     private var isPickingImage: Boolean = false
+    private var duckAiToolbarHidden: Boolean = false
     private var floatingSubmitContainer: View? = null
     private var widgetRoot: View? = null
+    private var lastCallbacks: NativeInputCallbacks? = null
 
     private fun widgetFrom(widgetView: View): NativeInputWidget? {
         return widgetView.findViewById<View?>(R.id.inputModeWidget) as? NativeInputWidget
@@ -141,6 +174,12 @@ class RealNativeInputManager @Inject constructor(
         isPickingImage = picking
     }
 
+    override fun setText(text: String) {
+        if (!::rootView.isInitialized) return
+        val widget = widgetFrom(rootView) ?: return
+        widget.text = text
+    }
+
     override fun handleDuckAiVoiceResult(query: String) {
         val widget = widgetFrom(rootView)
         if (widget != null) {
@@ -169,15 +208,25 @@ class RealNativeInputManager @Inject constructor(
         rootView.findViewById<View?>(R.id.autoCompleteSuggestionsList)?.gone()
         rootView.findViewById<View?>(R.id.focusedView)?.gone()
 
+        // Reveal the browser behind the closing widget so the exit animation plays over the
+        // live page instead of the NTP background that showNtp swapped in.
+        if (omnibarController.isBrowserMode()) {
+            hideNtp()
+        }
+
+        // Roll the autocomplete cache back to the omnibar's text so in-widget typing is
+        // dismissed. Skip on navigation paths: submit/voice-result/etc. leave the cache to
+        // follow the destination, not the pre-submit omnibar state.
+        if (!isNavigation) {
+            lastCallbacks?.restoreOmnibarAutocomplete?.invoke(omnibarController.getText())
+        }
+
         if (!animate) {
             animator.cancelAnimation()
             isExiting = false
             omnibarController.restore()
             omnibarController.show()
             removeWidget()
-            if (omnibarController.isBrowserMode()) {
-                hideNtp()
-            }
             return !omnibarController.isDuckAiMode()
         }
 
@@ -187,10 +236,26 @@ class RealNativeInputManager @Inject constructor(
         val isBottom = widgetFrom(widgetView)?.isWidgetBottom() ?: false
         isExiting = true
         if (!omnibarController.isDuckAiMode() && card != null && omnibarCard != null && omnibarCard.width > 0) {
-            animator.animateExit(card, widgetView, omnibarCard, isBottom) {
-                isExiting = false
-                onHide()
+            if (isBottom) {
+                // Bottom omnibar: trigger IME hide synchronously so the activity resizes
+                // (adjustResize), letting the bottom-anchored widgetView descend to its
+                // post-IME-hide layout position before the exit animation captures its snapshot.
+                widgetFrom(widgetView)?.hideKeyboard()
             }
+            layoutCoordinator.setWidgetAnimating(true)
+            animator.animateExit(
+                widgetCard = card,
+                widgetView = widgetView,
+                omnibarCard = omnibarCard,
+                isBottom = isBottom,
+                onUpdate = { layoutCoordinator.onWidgetAnimationFrame(card) },
+                onCancel = { layoutCoordinator.setWidgetAnimating(false) },
+                onComplete = {
+                    layoutCoordinator.setWidgetAnimating(false)
+                    isExiting = false
+                    onHide()
+                },
+            )
         } else {
             isExiting = false
             onHide()
@@ -212,16 +277,10 @@ class RealNativeInputManager @Inject constructor(
                 .withEndAction {
                     widgetCard.alpha = 1f
                     removeWidget()
-                    if (omnibarController.isBrowserMode()) {
-                        hideNtp()
-                    }
                 }
                 .start()
         } else {
             removeWidget()
-            if (omnibarController.isBrowserMode()) {
-                hideNtp()
-            }
         }
     }
 
@@ -244,7 +303,14 @@ class RealNativeInputManager @Inject constructor(
     }
 
     private fun onKeyboardShown(widgetRoot: View?) {
-        if (omnibarController.isDuckAiMode() || omnibarController.isSplitMode()) return
+        if (omnibarController.isSplitMode()) return
+        if (omnibarController.isDuckAiMode()) {
+            if (isLandscape()) {
+                omnibarController.hide()
+                duckAiToolbarHidden = true
+            }
+            return
+        }
         omnibarController.hide()
         widgetRoot?.translationZ = 0f
     }
@@ -253,9 +319,17 @@ class RealNativeInputManager @Inject constructor(
         if (widget.isModelMenuVisible) return
         if (isPickingImage) return
         if (omnibarController.isDuckAiMode()) {
+            if (duckAiToolbarHidden) {
+                omnibarController.show()
+                omnibarController.hideBackground()
+                duckAiToolbarHidden = false
+            }
             updateWidgetFocus(widget)
         }
     }
+
+    private fun isLandscape(): Boolean =
+        rootView.resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
 
     private fun updateWidgetFocus(widget: NativeInputWidget) {
         val focusedView = rootView.findFocus()
@@ -280,9 +354,11 @@ class RealNativeInputManager @Inject constructor(
     }
 
     override fun showNativeInput(
+        tabId: String,
         layoutInflater: LayoutInflater,
         lifecycleOwner: LifecycleOwner,
         tabs: LiveData<List<TabEntity>>,
+        currentTabUrl: Flow<String?>,
         query: String,
         callbacks: NativeInputCallbacks,
     ) {
@@ -296,6 +372,9 @@ class RealNativeInputManager @Inject constructor(
             omnibarController.forceToTop()
         }
         removeWidget()
+        // Assign after removeWidget — removeWidget clears lastCallbacks to drop references
+        // to the previous widget's closures.
+        lastCallbacks = callbacks
         if (omnibarController.isDuckAiMode()) {
             omnibarController.show()
             omnibarController.hideBackground()
@@ -303,15 +382,29 @@ class RealNativeInputManager @Inject constructor(
         val isBottom = omnibarController.isDuckAiMode() || omnibarController.isOmnibarBottom()
         val widgetView = createWidgetView(layoutInflater, isBottom)
         val prefillText = query.ifEmpty { omnibarController.getText() }
-        bindWidget(widgetView, lifecycleOwner, tabs, callbacks, isBottom)
+        bindWidget(widgetView, lifecycleOwner, tabs, currentTabUrl, callbacks, isBottom)
         if (!omnibarController.isDuckAiMode() && prefillText.isNotEmpty()) {
-            callbacks.onClearAutocomplete()
+            // Restore the cache before setting text — triggerAutocomplete preserves the
+            // current searchResults, so a stale cache (post-submit reset, or overwritten by
+            // a previous in-widget query) would otherwise flash the list empty.
+            val cacheRestored = callbacks.restoreOmnibarAutocomplete(prefillText)
             widgetFrom(widgetView)?.apply {
                 text = prefillText
                 selectAllText()
             }
+            // hideNativeInput hid the list directly without touching autoCompleteViewState,
+            // so renderIfChanged skips re-showing on reopen. Surface it manually when the
+            // cache is for the current prefill; otherwise leave it hidden so a different
+            // query's stale items don't flash.
+            if (cacheRestored) {
+                rootView.findViewById<RecyclerView?>(R.id.autoCompleteSuggestionsList)?.let { list ->
+                    if ((list.adapter?.itemCount ?: 0) > 0) {
+                        list.show()
+                    }
+                }
+            }
         }
-        attachWidget(widgetView, isBottom)
+        attachWidget(widgetView, isBottom, tabId)
         val isNewTab = query.isEmpty() && omnibarController.getText().isEmpty()
         applyInitialTabSelection(widgetView, isNewTab)
         if (omnibarController.isDuckAiMode()) {
@@ -340,16 +433,30 @@ class RealNativeInputManager @Inject constructor(
                 callbacks.onSearchSubmitted(query)
             },
             onChatSubmitted = { query ->
-                if (queryUrlPredictor.isUrl(query)) {
-                    hideNativeInput(isNavigation = true)
-                    callbacks.onSearchSubmitted(query)
-                } else if (omnibarController.isDuckAiMode()) {
+                if (omnibarController.isDuckAiMode()) {
+                    // Already in a Duck.ai chat — every submission, URL or not, is a chat prompt
+                    // that reaches the Duck.ai webview.
                     widget.saveLastUsedTogglePosition(isChat = true)
                     val imagesJson = widget.getImageAttachmentsJson()
+                    val filesJson = widget.getFileAttachmentsJson()
                     widget.text = ""
-                    widget.clearImageAttachments()
+                    widget.clearAttachments()
                     widget.hideKeyboard()
-                    callbacks.onDuckAiChatSubmitted(query, widget.getSelectedModelId(), imagesJson)
+                    callbacks.onDuckAiChatSubmitted(
+                        query,
+                        widget.getSelectedModelId(),
+                        widget.getResolvedReasoningEffort(),
+                        widget.getSelectedTool(),
+                        imagesJson,
+                        filesJson,
+                    )
+                    widget.clearSelectedTool()
+                } else if (queryUrlPredictor.isUrl(query)) {
+                    // Not in a Duck.ai chat (e.g. on the NTP with the Duck.ai toggle selected): a
+                    // URL is an address, so navigate to it exactly like Search mode rather than
+                    // opening the Duck.ai contextual sheet.
+                    hideNativeInput(isNavigation = true)
+                    callbacks.onSearchSubmitted(query)
                 } else {
                     widget.saveLastUsedTogglePosition(isChat = true)
                     widget.storePendingPrompt(query)
@@ -360,9 +467,16 @@ class RealNativeInputManager @Inject constructor(
                     omnibarController.restore()
                     omnibarController.show()
                     removeWidget()
-                    hideNtp()
+                    // Only tear down the NTP layer if we were over the browser. Under fullscreen
+                    // mode the host opens the chat in a new tab (or reuses the NTP tab); under
+                    // legacy mode the URL is intercepted by SpecialUrlDetector and opens an
+                    // overlay fragment without webview navigation. Either way the underlying
+                    // view must stay visible while we hand off.
+                    if (omnibarController.isBrowserMode()) {
+                        hideNtp()
+                    }
                     isExiting = false
-                    callbacks.onSearchSubmitted(duckChat.getDuckChatUrl(query, true))
+                    callbacks.onDuckAiQuerySubmitted(query)
                 }
             },
         )
@@ -410,6 +524,9 @@ class RealNativeInputManager @Inject constructor(
             floatingSubmitContainer = null
         }
         if (removed) widgetRoot = null
+        duckAiToolbarHidden = false
+        // Drop Fragment-scoped callback closures so they don't outlive the widget.
+        lastCallbacks = null
         return removed
     }
 
@@ -427,11 +544,13 @@ class RealNativeInputManager @Inject constructor(
         widgetView: View,
         lifecycleOwner: LifecycleOwner,
         tabs: LiveData<List<TabEntity>>,
+        currentTabUrl: Flow<String?>,
         callbacks: NativeInputCallbacks,
         isBottom: Boolean,
     ) {
         widgetFrom(widgetView)?.apply {
             onStopTapped = callbacks.onStopTapped
+            onFireButtonTapped = callbacks.onFireButtonPressed
             bindTabCount(lifecycleOwner, tabs.map { it.size })
             hideMainButtons()
             onAttachmentChooserStateChanged = { showing -> isPickingImage = showing }
@@ -441,18 +560,26 @@ class RealNativeInputManager @Inject constructor(
             )
             onPaidTierChanged = { isPaid ->
                 val tier = if (isPaid) DuckAiTier.Paid else DuckAiTier.Free
-                omnibarController.updateTierTitle(tier) { launchUpgrade() }
+                omnibarController.updateTierTitle(tier) {
+                    fireChatHeaderUpgradeTapped(tier)
+                    launchPurchase()
+                }
             }
             if (!isBottom) {
                 setFloatingSubmitContainer(createFloatingSubmitContainer())
             }
+            // Per-tab chatId (null on new chats) published into NativeInputState for
+            // consumers (reasoning picker, submission) to resolve per-chat state.
+            val chatIdFlow = currentTabUrl.map { extractDuckAiChatId(it) }
+            // Picker tied to whether the current tab is a Duck.ai page that already has a chatId (existing chat) or new chat.
+            bindModelPickerEnabledSource(chatIdFlow.map { it == null })
+            bindChatIdSource(chatIdFlow)
         }
         bindSearchCallbacks(widgetView, callbacks)
         bindAutocompleteVisibility(widgetView)
         bindChatSuggestions(widgetView, lifecycleOwner, callbacks)
         bindSearchTabAutocompleteClearing(widgetView, callbacks.onClearAutocomplete)
         bindVoiceButtons(widgetView, callbacks)
-        layoutCoordinator.applyBottomCardShape(widgetView, isBottom)
     }
 
     private fun bindVoiceButtons(
@@ -481,21 +608,15 @@ class RealNativeInputManager @Inject constructor(
     }
 
     private fun updateVoiceButtons(widget: NativeInputWidget) {
-        val isOnActiveDuckChat = omnibarController.isDuckAiMode()
-        val voiceSearchAvailable = voiceSearchAvailability.isVoiceSearchAvailable
-        val voiceSearchDuckAiAvailable = duckAiFeatureState.showVoiceSearchToggle.value
-        val voiceChatEntryAvailable = duckAiFeatureState.showVoiceChatEntry.value
-
-        if (isOnActiveDuckChat) {
-            widget.setVoiceSearchAvailable(voiceSearchAvailable && voiceSearchDuckAiAvailable)
-            widget.setVoiceChatAvailable(false)
-            return
-        }
-
-        val isDuckAiTabSelected = widget.isChatTabSelected()
-        val shouldShowVoiceSearchForDuckAi = !voiceChatEntryAvailable && voiceSearchDuckAiAvailable
-        widget.setVoiceSearchAvailable(voiceSearchAvailable && (!isDuckAiTabSelected || shouldShowVoiceSearchForDuckAi))
-        widget.setVoiceChatAvailable(isDuckAiTabSelected && voiceChatEntryAvailable)
+        val state = computeVoiceButtonAvailability(
+            isOnActiveDuckChat = omnibarController.isDuckAiMode(),
+            isVoiceSearchDeviceAvailable = voiceSearchAvailability.isVoiceSearchAvailable,
+            isVoiceSearchDuckAiEnabled = duckAiFeatureState.showVoiceSearchToggle.value,
+            isVoiceChatEntryEnabled = duckAiFeatureState.showVoiceChatEntry.value,
+            isDuckAiTabSelected = widget.isChatTabSelected(),
+        )
+        widget.setVoiceSearchAvailable(state.voiceSearchAvailable)
+        widget.setVoiceChatAvailable(state.voiceChatAvailable)
     }
 
     private fun bindSearchTabAutocompleteClearing(
@@ -538,13 +659,13 @@ class RealNativeInputManager @Inject constructor(
         }
     }
 
-    private fun attachWidget(widgetView: View, isBottom: Boolean) {
+    private fun attachWidget(widgetView: View, isBottom: Boolean, tabId: String) {
         rootView.addView(widgetView, layoutCoordinator.buildWidgetLayoutParams(isBottom))
         widgetRoot = widgetView
 
         widgetFrom(widgetView)?.apply {
             setWidgetRootView(widgetView)
-            configure(isDuckAiMode = omnibarController.isDuckAiMode(), isBottom = isBottom)
+            configure(tabId = tabId, isDuckAiMode = omnibarController.isDuckAiMode(), isBottom = isBottom)
         }
 
         applyWindowChrome(widgetView, isBottom)
@@ -555,10 +676,32 @@ class RealNativeInputManager @Inject constructor(
         }
     }
 
+    private fun suppressShadow(view: View) {
+        view.outlineProvider = object : ViewOutlineProvider() {
+            override fun getOutline(v: View, outline: Outline) {
+                outline.setRect(0, 0, v.width, v.height)
+                outline.alpha = 0f
+            }
+        }
+    }
+
     private fun applyWindowChrome(widgetView: View, isBottom: Boolean) {
         widgetView.translationZ = WIDGET_ELEVATION_DP.toPx()
         if (isBottom) {
             rootView.findViewById<View?>(R.id.navigationBar)?.gone()
+            rootView.findViewById<View?>(R.id.bottomBrowserOutlineStroke)?.gone()
+            if (omnibarController.isBrowserMode()) {
+                widgetView.setBackgroundColor(
+                    widgetView.context.getColorFromAttr(com.duckduckgo.mobile.android.R.attr.daxColorBackground),
+                )
+            } else if (omnibarController.isDuckAiMode()) {
+                widgetView.setBackgroundColor(
+                    widgetView.context.getColorFromAttr(
+                        com.duckduckgo.mobile.android.R.attr.daxColorDuckAiBackground,
+                    ),
+                )
+                suppressShadow(widgetView)
+            }
             rootView.findViewById<View?>(R.id.browserLayout)?.let {
                 it.setPadding(it.paddingLeft, it.paddingTop, it.paddingRight, 0)
             }
@@ -572,17 +715,54 @@ class RealNativeInputManager @Inject constructor(
         if (omnibarController.isDuckAiMode()) return false
         val widgetCard = widgetView.findViewById<View?>(R.id.inputModeWidgetCard) ?: return false
         val omnibarCard = omnibarController.getCardView() ?: return false
+        // Apply focused-state layout so the widget is measured at its final size; otherwise
+        // padding/bottom-row/toggle-row visibility land after the 200ms enter as a second step.
+        widgetFrom(widgetView)?.beginEnterAnimationPreview(isBottom)
         val margins = animator.init(widgetCard, omnibarCard, omnibarCard.width, omnibarCard.height, isBottom)
             ?: return false
 
-        animator.animateEnter(widgetCard, omnibarCard, widgetView, margins) { onEnterComplete(widgetView) }
+        layoutCoordinator.setWidgetAnimating(true)
+        animator.animateEnter(
+            widgetCard = widgetCard,
+            omnibarCard = omnibarCard,
+            widgetView = widgetView,
+            margins = margins,
+            onUpdate = { layoutCoordinator.onWidgetAnimationFrame(widgetCard) },
+            onCancel = {
+                layoutCoordinator.setWidgetAnimating(false)
+                widgetFrom(widgetView)?.let { widget ->
+                    widget.endEnterAnimationPreview()
+                    // Symmetric teardown for bottom mode: beginEnterAnimationPreview's
+                    // showKeyboard() requested focus + raised the IME. onEnterComplete is what
+                    // "owns" the focused state on success, so on cancel we undo it here —
+                    // otherwise the widget is left half-entered (focused, IME up) without the
+                    // animation having completed.
+                    if (widget.isWidgetBottom()) {
+                        widget.hideKeyboard()
+                        widget.clearInputFocus()
+                    }
+                }
+            },
+            onComplete = {
+                layoutCoordinator.setWidgetAnimating(false)
+                onEnterComplete(widgetView)
+            },
+        )
         return true
     }
 
     private fun onEnterComplete(widgetView: View) {
+        layoutCoordinator.enableContentLayoutTransition()
         if (omnibarController.isDuckAiMode()) return
+        // Skip the IME-raising work if the widget has been detached before the animation
+        // finished (e.g. fragment-manager transient detach during a tab switch). Otherwise
+        // focusInput would raise the keyboard on whatever tab is now in front.
+        if (!widgetView.isAttachedToWindow) return
         omnibarController.hide()
-        widgetFrom(widgetView)?.focusInput(rootView.context as? Activity)
+        widgetFrom(widgetView)?.apply {
+            focusInput(rootView.context as? Activity)
+            endEnterAnimationPreview()
+        }
     }
 
     private fun bindChatSuggestions(
@@ -609,6 +789,10 @@ class RealNativeInputManager @Inject constructor(
             onSearchForQuerySubmitted = { query ->
                 hideNativeInput(isNavigation = true)
                 callbacks.onSearchSubmitted(query)
+            },
+            onChatHistoryShortcutClicked = {
+                hideNativeInput(isNavigation = true)
+                callbacks.onChatHistoryShortcutClicked()
             },
             onShowSuggestions = { chatAdapter ->
                 if (autoCompleteList.adapter === chatAdapter) {
@@ -657,8 +841,27 @@ class RealNativeInputManager @Inject constructor(
         }
     }
 
-    private fun launchUpgrade() {
+    private fun launchPurchase() {
         globalActivityStarter.start(rootView.context, SubscriptionPurchase(featurePage = DUCK_AI_FEATURE_PAGE))
+    }
+
+    /**
+     * Fired when the user taps the "Upgrade" pill in the Duck.ai omnibar header. The pill is only shown
+     * for [DuckAiTier.Free] (subscription inactive), so this is the chat-header upgrade entry point.
+     */
+    internal fun fireChatHeaderUpgradeTapped(tier: DuckAiTier) {
+        val userTier = if (tier is DuckAiTier.Paid) "plus" else "free"
+        pixel.fire(AppPixelName.AI_CHAT_UNIFIED_INPUT_CHAT_HEADER_UPGRADE_TAPPED, mapOf("user_tier" to userTier))
+    }
+
+    /** True if [rawUrl] points at an in-progress Duck.ai chat (Duck.ai URL with a non-blank `chatID`). */
+    internal fun isExistingDuckAiChat(rawUrl: String?): Boolean = extractDuckAiChatId(rawUrl) != null
+
+    /** Returns the `chatID` query param if [rawUrl] is a Duck.ai chat URL, else `null`. */
+    internal fun extractDuckAiChatId(rawUrl: String?): String? {
+        if (rawUrl.isNullOrBlank()) return null
+        val uri = runCatching { rawUrl.toUri() }.getOrNull() ?: return null
+        return uri.toChatIdOrNull(duckChat)
     }
 
     companion object {
@@ -666,4 +869,40 @@ class RealNativeInputManager @Inject constructor(
         private const val FADE_OUT_DURATION_MS = 150L
         private const val DUCK_AI_FEATURE_PAGE = "duckai"
     }
+}
+
+internal data class VoiceButtonAvailability(
+    val voiceSearchAvailable: Boolean,
+    val voiceChatAvailable: Boolean,
+)
+
+/**
+ * Pure decision logic for which voice entry points the unified input should expose.
+ *
+ * Rules:
+ * - On an active Duck.ai chat page, voice chat is suppressed (you're already in the chat). Voice
+ *   search is offered only if both the device supports it and the Duck.ai voice-search flag is on.
+ * - Otherwise (NTP / search omnibar with the Search↔Duck.ai toggle):
+ *   - Search tab: voice search if device-available.
+ *   - Duck.ai tab: voice search if device-available AND [isVoiceSearchDuckAiEnabled]; voice chat
+ *     if [isVoiceChatEntryEnabled]. The two are independent now that they occupy separate slots
+ *     (in-field microphone vs. bottom-row chip).
+ */
+internal fun computeVoiceButtonAvailability(
+    isOnActiveDuckChat: Boolean,
+    isVoiceSearchDeviceAvailable: Boolean,
+    isVoiceSearchDuckAiEnabled: Boolean,
+    isVoiceChatEntryEnabled: Boolean,
+    isDuckAiTabSelected: Boolean,
+): VoiceButtonAvailability {
+    if (isOnActiveDuckChat) {
+        return VoiceButtonAvailability(
+            voiceSearchAvailable = isVoiceSearchDeviceAvailable && isVoiceSearchDuckAiEnabled,
+            voiceChatAvailable = false,
+        )
+    }
+    return VoiceButtonAvailability(
+        voiceSearchAvailable = isVoiceSearchDeviceAvailable && (!isDuckAiTabSelected || isVoiceSearchDuckAiEnabled),
+        voiceChatAvailable = isDuckAiTabSelected && isVoiceChatEntryEnabled,
+    )
 }

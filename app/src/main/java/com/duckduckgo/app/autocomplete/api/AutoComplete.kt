@@ -42,6 +42,9 @@ import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggesti
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteUrlSuggestion.AutoCompleteBookmarkSuggestion
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteUrlSuggestion.AutoCompleteSwitchToTabSuggestion
 import com.duckduckgo.browser.api.autocomplete.AutoCompleteFactory
+import com.duckduckgo.browsermode.api.BrowserMode
+import com.duckduckgo.browsermode.api.BrowserModeDataProvider
+import com.duckduckgo.browsermode.api.BrowserModeStateHolder
 import com.duckduckgo.common.utils.AppUrl
 import com.duckduckgo.common.utils.AppUrl.Url
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -61,9 +64,12 @@ import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
 import com.squareup.anvil.annotations.ContributesBinding
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
@@ -85,12 +91,14 @@ class DefaultAutoComplete @Inject constructor(
     private val factory: AutoCompleteFactory,
 ) : AutoComplete by factory.create(AutoComplete.Config())
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class AutoCompleteApi constructor(
     private val autoCompleteService: AutoCompleteService,
     private val savedSitesRepository: SavedSitesRepository,
     private val navigationHistory: NavigationHistory,
     private val autoCompleteScorer: AutoCompleteScorer,
-    private val tabRepository: TabRepository,
+    private val tabRepositoryProvider: BrowserModeDataProvider<TabRepository>,
+    private val browserModeStateHolder: BrowserModeStateHolder,
     private val autocompleteTabsFeature: AutocompleteTabsFeature,
     private val duckChat: DuckChat,
     private val history: NavigationHistory,
@@ -100,6 +108,11 @@ class AutoCompleteApi constructor(
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
     private val config: AutoComplete.Config,
 ) : AutoComplete {
+
+    private val currentMode: StateFlow<BrowserMode> = browserModeStateHolder.currentMode
+
+    private val tabRepository: TabRepository
+        get() = tabRepositoryProvider.forMode(currentMode.value)
 
     private var isAutocompleteTabsFeatureEnabled: Boolean? = null
 
@@ -251,6 +264,7 @@ class AutoCompleteApi constructor(
         suggestions: List<AutoCompleteSuggestion>,
         suggestion: AutoCompleteSuggestion,
         experimentalInputScreen: Boolean,
+        duckAiSurface: Boolean,
     ) {
         val hasBookmarks = withContext(dispatchers.io()) {
             savedSitesRepository.hasBookmarks()
@@ -280,12 +294,10 @@ class AutoCompleteApi constructor(
             PixelParameter.SHOWED_SWITCH_TO_TAB to hasSwitchToTabResults.toString(),
         )
         val pixelName = when (suggestion) {
-            is AutoCompleteBookmarkSuggestion -> {
-                if (suggestion.isFavorite) {
-                    AutoCompletePixelNames.AUTOCOMPLETE_FAVORITE_SELECTION
-                } else {
-                    AutoCompletePixelNames.AUTOCOMPLETE_BOOKMARK_SELECTION
-                }
+            is AutoCompleteBookmarkSuggestion -> if (suggestion.isFavorite) {
+                AutoCompletePixelNames.AUTOCOMPLETE_FAVORITE_SELECTION
+            } else {
+                AutoCompletePixelNames.AUTOCOMPLETE_BOOKMARK_SELECTION
             }
 
             is AutoCompleteSearchSuggestion -> if (suggestion.isUrl) {
@@ -310,7 +322,19 @@ class AutoCompleteApi constructor(
             else -> return
         }
 
-        pixel.fire(pixelName, params)
+        // On the Duck.ai tab the same suggestion taps are attributed to a separate
+        // m_autocomplete_duckai_click_* family so they aren't conflated with search-mode taps.
+        pixel.fire(if (duckAiSurface) pixelName.toDuckAiSurface() else pixelName, params)
+    }
+
+    private fun AutoCompletePixelNames.toDuckAiSurface(): AutoCompletePixelNames = when (this) {
+        AutoCompletePixelNames.AUTOCOMPLETE_FAVORITE_SELECTION -> AutoCompletePixelNames.AUTOCOMPLETE_DUCKAI_FAVORITE_SELECTION
+        AutoCompletePixelNames.AUTOCOMPLETE_BOOKMARK_SELECTION -> AutoCompletePixelNames.AUTOCOMPLETE_DUCKAI_BOOKMARK_SELECTION
+        AutoCompletePixelNames.AUTOCOMPLETE_SEARCH_WEBSITE_SELECTION -> AutoCompletePixelNames.AUTOCOMPLETE_DUCKAI_WEBSITE_SELECTION
+        AutoCompletePixelNames.AUTOCOMPLETE_HISTORY_SITE_SELECTION -> AutoCompletePixelNames.AUTOCOMPLETE_DUCKAI_HISTORY_SITE_SELECTION
+        AutoCompletePixelNames.AUTOCOMPLETE_HISTORY_SEARCH_SELECTION -> AutoCompletePixelNames.AUTOCOMPLETE_DUCKAI_HISTORY_SEARCH_SELECTION
+        AutoCompletePixelNames.AUTOCOMPLETE_SWITCH_TO_TAB_SELECTION -> AutoCompletePixelNames.AUTOCOMPLETE_DUCKAI_SWITCH_TO_TAB_SELECTION
+        else -> this
     }
 
     private fun isAllowedInTopHits(entry: HistoryEntry): Boolean {
@@ -320,11 +344,11 @@ class AutoCompleteApi constructor(
     private fun getAutocompleteSwitchToTabResults(query: String): Flow<List<RankedSuggestion<AutoCompleteSwitchToTabSuggestion>>> =
         runCatching {
             if (autocompleteTabsEnabled) {
-                combine(
-                    tabRepository.flowTabs,
-                    tabRepository.flowSelectedTab,
-                ) { tabs, selectedTab ->
-                    rankTabs(query, tabs.filter { it.tabId != selectedTab?.tabId })
+                currentMode.flatMapLatest { mode ->
+                    val repo = tabRepositoryProvider.forMode(mode)
+                    combine(repo.flowTabs, repo.flowSelectedTab) { tabs, selectedTab ->
+                        rankTabs(query, tabs.filter { it.tabId != selectedTab?.tabId })
+                    }
                 }.distinctUntilChanged()
             } else {
                 flowOf(emptyList())

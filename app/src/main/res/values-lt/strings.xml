@@ -77,6 +77,7 @@
     <string name="options">Parinktys</string>
     <string name="shareLink">Bendrinti nuorodą</string>
     <string name="copyUrl">Kopijuoti nuorodos adresą</string>
+    <string name="urlCopiedToClipboard">URL nukopijuotas į iškarpinę</string>
 
     <!-- Find in page -->
     <string name="nextSearchTermDescription">Rasti kitą</string>
@@ -273,6 +274,7 @@
     <string name="singleTabFireDialogDeleteAll">Ištrinti viską</string>
     <string name="singleTabFireDialogDeleteThisTab">Ištrink šį skirtuką</string>
     <string name="singleTabFireDialogDeleteChat">Ištrinti pokalbį</string>
+    <string name="singleTabFireDialogDeleteChats">Ištrinti pokalbius</string>
     <string name="singleTabFireDialogTitleDuckAi">Ištrinti šį pokalbį?</string>
     <string name="singleTabFireDialogSubtitleSiteData">Ištrynus svetainės duomenis, galite būti atjungti nuo paskyrų.</string>
     <string name="singleTabFireDialogSubtitleDownloads">Tai atšauks vykdomus atsisiuntimus.</string>
@@ -597,6 +599,7 @@
     <!-- Fire Animation settings -->
     <string name="settingsFireAnimation">Mygtuko „Fire“ animacija</string>
     <string name="settingsHeroFireAnimation">„Inferno“</string>
+    <string name="settingsHeroFireAnimationClassic">Klasikinė pragariška ugnis</string>
     <string name="settingsHeroWaterAnimation">„Whirlpool“</string>
     <string name="settingsHeroAbstractAnimation">„Airstream“</string>
     <string name="settingsNoneAnimation">Jokie</string>
@@ -880,6 +883,9 @@
     <string name="preOnboardingDaxDialog3Button">Pradėti naršyti</string>
     <string name="preOnboardingAddressBarTitle">Kur turėčiau nustatyti jūsų adreso juostą?</string>
     <string name="preOnboardingAddressBarOkButton">Kitas</string>
+    <string name="preOnboardingAddressBarPositionTop">Viršus</string>
+    <string name="preOnboardingAddressBarPositionBottom">Apačia</string>
+    <string name="preOnboardingAddressBarPositionSplit">Padalintas</string>
     <string name="highlightsPreOnboardingAddressBarOption1Title">Viršuje (numatytasis nustatymas)</string>
     <string name="highlightsPreOnboardingAddressBarOption1Description">Lengva pamatyti</string>
     <string name="highlightsPreOnboardingAddressBarOption2Title">Apačia</string>
@@ -902,6 +908,8 @@
     <string name="onboardingSitesDaxDialogOption3">ebay.com</string>
     <string name="onboardingSitesDaxDialogOption4">Nustebink mane!</string>
     <string name="onboardingSerpDaxDialogDescription"><![CDATA[Tai „<b>DuckDuckGo Search</b>“! Privati. Sparti. Mažiau reklamų.]]></string>
+    <string name="onboardingSerpDaxDialogBrandDesignTitle">Čia – paieška „DuckDuckGo Search“!</string>
+    <string name="onboardingSerpDaxDialogBrandDesignDescription">Privati. Sparti. Mažiau reklamų.</string>
     <string name="onboardingSerpDaxDialogButton">Supratau!</string>
     <string name="onboardingSitesSuggestionsDaxDialogTitle">Pabandyk apsilankyti svetainėje!</string>
     <plurals name="onboardingTrackersBlockedDialogDescription">
@@ -936,6 +944,26 @@
     <string name="preOnboardingInputScreenTitleUpdated" translatable="false">Want easy access to private AI chat in the address bar?</string>
     <string name="preOnboardingInputScreenButton">Kitas</string>
     <string name="preOnboardingInputScreenDescription"><![CDATA[DI funkcijos yra privačios ir neprivalomos. Galite atlikti pakeitimus <b>Nustatymai > DI funkcijos</b>.]]></string>
+
+    <!--Onboarding Reinstall Quick Setup-->
+    <string name="preOnboardingReinstallQuickSetupTitle">Smagu, kad grįžai!&lt;br/&gt;Nori ką nors tinkinti?</string>
+    <string name="preOnboardingReinstallSetDefaultLabel">Nustatyti „DuckDuckGo“ kaip numatytąją</string>
+    <string name="preOnboardingReinstallAddHomeScreenWidgetLabel">Pridėti pradžios ekrano valdiklį</string>
+    <string name="preOnboardingReinstallAddressBarLabel">Adreso juostos vieta</string>
+    <string name="preOnboardingReinstallAddressBarSearchOptionsLabel">Adreso juostos paieškos parinktys</string>
+    <string name="preOnboardingReinstallStartBrowsing">Pradėti naršyti</string>
+
+    <!-- Quick setup bottom sheets -->
+    <string name="quickSetupAddressBarPositionTitle">Kur nori matyti adreso juostą?</string>
+    <string name="quickSetupAddressBarPositionCaption"><![CDATA[Jei nori tai pakeisti, pasirink <b>Nuostatos > Išvaizda</b>.]]></string>
+    <string name="quickSetupSearchOptionsTitle">Nori adreso juostoje matyti paiešką ir DI pokalbius?</string>
+    <string name="quickSetupBottomSheetDone">Atlikta</string>
+    <string name="quickSetupInputScreenSearchOnly">Tik paieška</string>
+    <string name="quickSetupInputScreenSearchAndDuckAi">Paieška ir „Duck.ai“</string>
+    <string name="quickSetupRemoveHomeScreenWidgetTitle">Kaip pašalinti pradžios ekrano valdiklį</string>
+    <string name="quickSetupRemoveHomeScreenWidgetStep1">Eik į pradžios ekraną</string>
+    <string name="quickSetupRemoveHomeScreenWidgetStep2">Paliesk ir palaikyk valdiklį</string>
+    <string name="quickSetupRemoveHomeScreenWidgetStep3">Paliesk arba nuvilk, kad pašalintum</string>
 
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Adreso juosta</string>
@@ -1024,6 +1052,10 @@
     <string name="syncRestoreDialogPrimaryCta">Atkurti mano duomenis</string>
     <string name="syncRestoreDialogSecondaryCta">Praleisti</string>
 
+    <!-- Sync Restore (brand-design onboarding) -->
+    <string name="syncRestoreDialogBrandDesignTitle">Pratęskime nuo ten, kur baigėte naudotis „DuckDuckGo“.</string>
+    <string name="syncRestoreDialogBrandDesignBody1">Jau paruoštos jūsų išsaugotos žymės, slaptažodžiai ir kita.</string>
+
     <!-- PDF download tooltip -->
     <string name="pdfDownloadTooltipText">Atsisiųsti PDF</string>
 
@@ -1031,4 +1063,14 @@
     <string name="copyLinkText">Kopijuoti nuorodos tekstą</string>
     <string name="linkTextCopied">Nuorodos tekstas nukopijuotas</string>
     <string name="linkTextCopyFailed">Nepavyko nukopijuoti nuorodos teksto</string>
+
+    <string name="preOnboardingWelcomeDialogTitle">Sveiki!</string>
+    <string name="preOnboardingWelcomeDialogBody1">Ar nori spartesnės naršyklės, kurią valdai tu?</string>
+    <string name="preOnboardingWelcomeDialogBody2">DI neprivalomas, o privatumo apsauga – visada įjungta.</string>
+    <string name="onboardingStepIndicatorText" instruction="a counter above our instructions in onboarding that tells a user what step they are on">%1$d iš %2$d</string>
+    <string name="onboardingSearchDaxDialogOption1Quoted" instruction="translate &apos;duck&apos; too.">kaip angliškai pasakyti „antis“</string>
+    <string name="onboardingSearchDaxDialogOption1EnglishQuoted" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">kaip ispaniškai pasakyti „antis“</string>
+
+    <string name="input_screen_user_pref_without_ai_updated">Tik paieška</string>
+    <string name="input_screen_user_pref_with_ai_updated">Perjungti\npaiešką ir „Duck.ai“</string>
 </resources>

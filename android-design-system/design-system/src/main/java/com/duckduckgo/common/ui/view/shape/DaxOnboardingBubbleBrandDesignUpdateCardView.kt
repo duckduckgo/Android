@@ -20,6 +20,7 @@ import android.content.Context
 import android.content.res.ColorStateList
 import android.content.res.Configuration
 import android.graphics.Outline
+import android.graphics.RectF
 import android.os.Build
 import android.util.AttributeSet
 import android.util.TypedValue
@@ -45,7 +46,10 @@ constructor(
     private var animatableEdgeTreatment: AnimatableOffsetEdgeTreatment? = null
     private val cornerRadius: Float
     private var showArrow: Boolean = true
+    private var arrowOffsetStartPx: Int = 0
+    private var arrowOffsetEndPx: Int = 0
     private var bottomEdgeTreatment: EdgeTreatment
+    private val baseBottomEdgeTreatment: DaxBubbleBottomEdgeTreatment
     private var originalBottomMargin: Int? = null
 
     private val arrowMinMargin: Int
@@ -72,6 +76,9 @@ constructor(
         )
         attr.recycle()
 
+        arrowOffsetStartPx = offsetStart
+        arrowOffsetEndPx = offsetEnd
+
         if (offsetStart != 0 && offsetEnd != 0) {
             throw IllegalArgumentException("Only one of arrowOffsetStart or arrowOffsetEnd can be set")
         }
@@ -84,6 +91,7 @@ constructor(
         strokeWidth = resources.getDimensionPixelSize(R.dimen.dax_brand_design_bubble_stroke_width)
 
         val edgeTreatment = DaxBubbleBottomEdgeTreatment()
+        baseBottomEdgeTreatment = edgeTreatment
         bottomEdgeTreatment = if (offsetStart != 0) {
             AnimatableOffsetEdgeTreatment(edgeTreatment, offsetStart.toFloat()).also {
                 animatableEdgeTreatment = it
@@ -162,6 +170,15 @@ constructor(
         }
     }
 
+    val arrowDepthFraction: Float
+        get() = baseBottomEdgeTreatment.depthFraction
+
+    fun setArrowDepthFraction(fraction: Float) {
+        if (!showArrow) return
+        baseBottomEdgeTreatment.depthFraction = fraction
+        shapeAppearanceModel = shapeAppearanceModel
+    }
+
     /**
      * Set the target position for the arrow animation.
      *
@@ -213,6 +230,25 @@ constructor(
                 layoutParams = params
             }
         }
+    }
+
+    /**
+     * Full-depth bounding box of the bubble tail (fin) in this view's local coordinates.
+     * `top` is where the fin joins the card body, `bottom` is the fin tip. Full depth
+     * (independent of the animated [arrowDepthFraction]) so callers get a stable reference
+     * while the fin animates. Null when the arrow is disabled.
+     */
+    fun arrowBounds(): RectF? {
+        if (!showArrow) return null
+        val finHeight = DaxBubbleBottomEdgeTreatment.ORIGINAL_BOTTOM_ARROW_HEIGHT_DP.toPx().toFloat()
+        val finWidth = DaxBubbleBottomEdgeTreatment.ORIGINAL_BOTTOM_ARROW_WIDTH_DP *
+            (finHeight / DaxBubbleBottomEdgeTreatment.ORIGINAL_BOTTOM_ARROW_HEIGHT_DP)
+        val centerX = when {
+            arrowOffsetStartPx != 0 -> arrowOffsetStartPx.toFloat()
+            arrowOffsetEndPx != 0 -> width - arrowOffsetEndPx.toFloat()
+            else -> width / 2f
+        }
+        return RectF(centerX - finWidth / 2f, height.toFloat(), centerX + finWidth / 2f, height + finHeight)
     }
 
     private fun resolveOnboardingTheme(context: Context): Context {

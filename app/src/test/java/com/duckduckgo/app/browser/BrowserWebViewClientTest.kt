@@ -33,7 +33,17 @@ import android.webkit.WebViewClient.ERROR_HOST_LOOKUP
 import android.webkit.WebViewClient.ERROR_UNKNOWN
 import android.webkit.WebViewClient.ERROR_UNSUPPORTED_SCHEME
 import androidx.core.net.toUri
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.LifecycleRegistry
+import androidx.lifecycle.setViewTreeLifecycleOwner
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.duckduckgo.adblocking.api.duckplayer.DuckPlayer
+import com.duckduckgo.adblocking.api.duckplayer.DuckPlayer.DuckPlayerOrigin.SERP_AUTO
+import com.duckduckgo.adblocking.api.duckplayer.DuckPlayer.OpenDuckPlayerInNewTab
+import com.duckduckgo.adblocking.api.duckplayer.DuckPlayer.OpenDuckPlayerInNewTab.Off
+import com.duckduckgo.adblocking.api.duckplayer.DuckPlayer.OpenDuckPlayerInNewTab.On
+import com.duckduckgo.adblocking.api.duckplayer.DuckPlayer.OpenDuckPlayerInNewTab.Unavailable
 import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.anrs.api.CrashLogger
 import com.duckduckgo.anrs.api.CrashLogger.Crash
@@ -74,12 +84,6 @@ import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.contentscopescripts.api.contentscopeExperiments.ContentScopeExperiments
 import com.duckduckgo.cookies.api.CookieManagerProvider
 import com.duckduckgo.duckchat.api.DuckChat
-import com.duckduckgo.duckplayer.api.DuckPlayer
-import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerOrigin.SERP_AUTO
-import com.duckduckgo.duckplayer.api.DuckPlayer.OpenDuckPlayerInNewTab
-import com.duckduckgo.duckplayer.api.DuckPlayer.OpenDuckPlayerInNewTab.Off
-import com.duckduckgo.duckplayer.api.DuckPlayer.OpenDuckPlayerInNewTab.On
-import com.duckduckgo.duckplayer.api.DuckPlayer.OpenDuckPlayerInNewTab.Unavailable
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.privacy.config.api.AmpLinks
 import com.duckduckgo.subscriptions.api.Subscriptions
@@ -180,6 +184,7 @@ class BrowserWebViewClientTest {
     fun setup() =
         runTest {
             webView = TestWebView(context)
+            webView.setViewTreeLifecycleOwner(startedLifecycleOwner())
             whenever(mockDuckPlayer.observeShouldOpenInNewTab()).thenReturn(openInNewTabFlow)
             whenever(mockContentScopeExperiments.getActiveExperiments()).thenReturn(listOf(mockToggle))
             val enabledToggle: Toggle = mock()
@@ -1731,6 +1736,12 @@ class BrowserWebViewClientTest {
         override fun getOriginalUrl(): String = EXAMPLE_URL
 
         override fun getProgress(): Int = 100
+    }
+
+    private fun startedLifecycleOwner(): LifecycleOwner = object : LifecycleOwner {
+        override val lifecycle: Lifecycle = LifecycleRegistry(this).apply {
+            currentState = Lifecycle.State.STARTED
+        }
     }
 
     private class FakePluginPoint : PluginPoint<JsInjectorPlugin> {

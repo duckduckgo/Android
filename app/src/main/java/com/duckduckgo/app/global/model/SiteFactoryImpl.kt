@@ -19,6 +19,7 @@ package com.duckduckgo.app.global.model
 import android.util.LruCache
 import androidx.annotation.AnyThread
 import androidx.annotation.WorkerThread
+import com.duckduckgo.adblocking.api.duckplayer.DuckPlayer
 import com.duckduckgo.app.brokensite.RealBrokenSiteContext
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.browser.certificates.BypassedSSLCertificatesRepository
@@ -28,7 +29,6 @@ import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.trackerdetection.EntityLookup
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.privacy.config.api.ContentBlocking
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn

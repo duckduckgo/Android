@@ -4,14 +4,18 @@ import android.view.MotionEvent
 import androidx.core.net.toUri
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
+import com.duckduckgo.adblocking.api.duckplayer.DuckPlayer
 import com.duckduckgo.app.browser.AddressDisplayFormatter
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetectorImpl
 import com.duckduckgo.app.browser.animations.AddressBarTrackersAnimationManager
+import com.duckduckgo.app.browser.customtabs.CustomTabPixelNames
 import com.duckduckgo.app.browser.menu.BrowserMenuHighlight
 import com.duckduckgo.app.browser.menu.BrowserViewMode
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command
+import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command.CopyUrlToClipboard
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command.LaunchInputScreen
+import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.EnabledState
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.LeadingIconState
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.LeadingIconState.Search
 import com.duckduckgo.app.browser.omnibar.model.Decoration
@@ -40,7 +44,6 @@ import com.duckduckgo.common.utils.baseHost
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
-import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.FakeToggleStore
 import com.duckduckgo.feature.toggles.api.FeatureToggles
@@ -115,7 +118,10 @@ class OmnibarLayoutViewModelTest {
     private val favouriteLogoFlow = MutableStateFlow<String?>(null)
     private val setFavouriteFeatureEnabledFlow = MutableStateFlow(false)
 
-    private val addressBarTrackersAnimationManager: AddressBarTrackersAnimationManager = mock()
+    private val softwareRenderingModeEnabledFlow = MutableStateFlow(false)
+    private val addressBarTrackersAnimationManager: AddressBarTrackersAnimationManager = mock {
+        on { softwareRenderingModeEnabled } doReturn softwareRenderingModeEnabledFlow
+    }
     private val fakeProgressBarUpgradeFeature = FakeFeatureToggleFactory.create(ProgressBarUpgradeFeature::class.java)
 
     private lateinit var fakeStandardizedLeadingIconToggle: StandardizedLeadingIconFeatureToggle
@@ -1127,6 +1133,29 @@ class OmnibarLayoutViewModelTest {
     }
 
     @Test
+    fun whenOmnibarFocusedAndExternalOmnibarStateChangedThenUserTextAndCursorPreserved() = runTest {
+        testee.onExternalStateChange(
+            StateChange.OmnibarStateChange(
+                OmnibarViewState(omnibarText = "ducks", queryOrFullUrl = "ducks", forceExpand = false),
+            ),
+        )
+        testee.onOmnibarFocusChanged(hasFocus = true, inputFieldText = "ducks")
+        testee.onInputStateChanged(query = "newquery", hasFocus = true, clearQuery = false, deleteLastCharacter = false)
+
+        testee.onExternalStateChange(
+            StateChange.OmnibarStateChange(
+                OmnibarViewState(omnibarText = "ducks", queryOrFullUrl = "ducks", forceExpand = false),
+            ),
+        )
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertEquals("newquery", viewState.omnibarText)
+            assertFalse(viewState.updateOmnibarText)
+        }
+    }
+
+    @Test
     fun whenOmnibarFocusedAndLoadingStateChangesThenViewStateCorrect() = runTest {
         val omnibarState = OmnibarViewState(
             navigationChange = false,
@@ -1180,6 +1209,48 @@ class OmnibarLayoutViewModelTest {
 
         testee.commands().test {
             awaitItem().assertCommand(Command.StartTrackersAnimation::class)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenSoftwareRenderingModeEnabledThenStartTrackersAnimationCommandForwardsFlag() = runTest {
+        softwareRenderingModeEnabledFlow.value = true
+        initializeViewModel()
+
+        testee.viewState.test {
+            awaitItem()
+        }
+
+        testee.onOmnibarFocusChanged(false, SERP_URL)
+        val trackers = givenSomeTrackers()
+        testee.onAnimationStarted(Decoration.LaunchTrackersAnimation(trackers))
+
+        testee.commands().test {
+            val command = awaitItem()
+            assertTrue(command is Command.StartTrackersAnimation)
+            assertTrue((command as Command.StartTrackersAnimation).useSoftwareRenderingMode)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenSoftwareRenderingModeDisabledThenStartTrackersAnimationCommandForwardsFlag() = runTest {
+        softwareRenderingModeEnabledFlow.value = false
+        initializeViewModel()
+
+        testee.viewState.test {
+            awaitItem()
+        }
+
+        testee.onOmnibarFocusChanged(false, SERP_URL)
+        val trackers = givenSomeTrackers()
+        testee.onAnimationStarted(Decoration.LaunchTrackersAnimation(trackers))
+
+        testee.commands().test {
+            val command = awaitItem()
+            assertTrue(command is Command.StartTrackersAnimation)
+            assertFalse((command as Command.StartTrackersAnimation).useSoftwareRenderingMode)
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -1526,69 +1597,6 @@ class OmnibarLayoutViewModelTest {
         testee.viewState.test {
             val viewState = expectMostRecentItem()
             assertTrue(viewState.showTextInputClickCatcher)
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenNativeInputEnabledAndAiToggleDisabledThenIsDuckAiBackAvailableTrue() = runTest {
-        nativeInputFieldSettingFlow.value = true
-        inputScreenUserSettingFlow.value = false
-
-        testee.viewState.test {
-            val viewState = expectMostRecentItem()
-            assertTrue(viewState.isDuckAiBackAvailable)
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenNativeInputEnabledAndAiToggleEnabledThenIsDuckAiBackAvailableFalse() = runTest {
-        nativeInputFieldSettingFlow.value = true
-        inputScreenUserSettingFlow.value = true
-
-        testee.viewState.test {
-            val viewState = expectMostRecentItem()
-            assertFalse(viewState.isDuckAiBackAvailable)
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenNativeInputDisabledAndAiToggleDisabledThenIsDuckAiBackAvailableFalse() = runTest {
-        nativeInputFieldSettingFlow.value = false
-        inputScreenUserSettingFlow.value = false
-
-        testee.viewState.test {
-            val viewState = expectMostRecentItem()
-            assertFalse(viewState.isDuckAiBackAvailable)
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenNativeInputDisabledAndAiToggleEnabledThenIsDuckAiBackAvailableFalse() = runTest {
-        nativeInputFieldSettingFlow.value = false
-        inputScreenUserSettingFlow.value = true
-
-        testee.viewState.test {
-            val viewState = expectMostRecentItem()
-            assertFalse(viewState.isDuckAiBackAvailable)
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenAiToggleFlipsOffWhileNativeInputEnabledThenIsDuckAiBackAvailableBecomesTrue() = runTest {
-        nativeInputFieldSettingFlow.value = true
-        inputScreenUserSettingFlow.value = true
-
-        testee.viewState.test {
-            assertFalse(expectMostRecentItem().isDuckAiBackAvailable)
-
-            inputScreenUserSettingFlow.value = false
-
-            assertTrue(expectMostRecentItem().isDuckAiBackAvailable)
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -2873,6 +2881,132 @@ class OmnibarLayoutViewModelTest {
                 "Expected PrivacyShield after feature re-enabled on non-SERP site, but got ${viewState.leadingIconState}",
                 viewState.leadingIconState is LeadingIconState.PrivacyShield,
             )
+        }
+    }
+
+    @Test
+    fun whenCustomTabUrlLongClickedWithValidUrlThenCopyUrlToClipboardCommandSent() = runTest {
+        givenSiteLoaded(RANDOM_URL)
+
+        testee.onCustomTabUrlLongClicked()
+
+        testee.commands().test {
+            val command = awaitItem()
+            assertTrue(command is Command.CopyUrlToClipboard)
+            assertEquals(RANDOM_URL, (command as Command.CopyUrlToClipboard).url)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenCustomTabUrlLongClickedWithValidUrlThenCopyUrlPixelFired() = runTest {
+        givenSiteLoaded(RANDOM_URL)
+
+        testee.onCustomTabUrlLongClicked()
+
+        verify(pixel).fire(CustomTabPixelNames.CUSTOM_TABS_COPY_URL)
+    }
+
+    @Test
+    fun whenCustomTabUrlLongClickedWithEmptyUrlThenNoCommandSent() = runTest {
+        givenSiteLoaded(EMPTY_URL)
+
+        testee.onCustomTabUrlLongClicked()
+
+        testee.commands().test {
+            expectNoEvents()
+        }
+    }
+
+    @Test
+    fun whenCustomTabUrlLongClickedWithEmptyUrlThenCopyUrlPixelNotFired() = runTest {
+        givenSiteLoaded(EMPTY_URL)
+
+        testee.onCustomTabUrlLongClicked()
+
+        verify(pixel, never()).fire(CustomTabPixelNames.CUSTOM_TABS_COPY_URL)
+    }
+
+    @Test
+    fun whenCustomTabUrlLongClickedThenCommandContainsCurrentViewStateUrl() = runTest {
+        val expectedUrl = "https://example.com/test"
+        givenSiteLoaded(expectedUrl)
+
+        testee.onCustomTabUrlLongClicked()
+
+        testee.commands().test {
+            val command = awaitItem()
+            assertTrue(command is Command.CopyUrlToClipboard)
+            assertEquals(expectedUrl, (command as Command.CopyUrlToClipboard).url)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenSetLockedTrueAndFireButtonNotHighlightedThenEnabledStateIsNone() = runTest {
+        testee.setLocked(true)
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertEquals(EnabledState.NONE, viewState.enabledState)
+        }
+    }
+
+    @Test
+    fun whenSetLockedTrueAndFireButtonHighlightedThenEnabledStateIsFireButtonOnly() = runTest {
+        testee.onHighlightItem(Decoration.HighlightOmnibarItem(fireButton = true, privacyShield = false))
+        testee.setLocked(true)
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertEquals(EnabledState.FIRE_BUTTON_ONLY, viewState.enabledState)
+        }
+    }
+
+    @Test
+    fun whenSetLockedFalseThenEnabledStateIsAll() = runTest {
+        testee.setLocked(true)
+        testee.setLocked(false)
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertEquals(EnabledState.ALL, viewState.enabledState)
+        }
+    }
+
+    @Test
+    fun whenFireIconPressedAndLockedThenHighlightPreserved() = runTest {
+        testee.onHighlightItem(Decoration.HighlightOmnibarItem(fireButton = true, privacyShield = false))
+        testee.setLocked(true)
+        testee.onFireIconPressed(true)
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertTrue(
+                viewState.highlightFireButton == HighlightableButton.Visible(
+                    enabled = true,
+                    highlighted = true,
+                ),
+            )
+            assertFalse(viewState.scrollingEnabled)
+            assertEquals(EnabledState.FIRE_BUTTON_ONLY, viewState.enabledState)
+        }
+    }
+
+    @Test
+    fun whenFireIconPressedAndNotLockedForOnboardingThenHighlightCleared() = runTest {
+        testee.onHighlightItem(Decoration.HighlightOmnibarItem(fireButton = true, privacyShield = false))
+        testee.onFireIconPressed(true)
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertTrue(
+                viewState.highlightFireButton == HighlightableButton.Visible(
+                    enabled = true,
+                    highlighted = false,
+                ),
+            )
+            assertTrue(viewState.scrollingEnabled)
         }
     }
 }

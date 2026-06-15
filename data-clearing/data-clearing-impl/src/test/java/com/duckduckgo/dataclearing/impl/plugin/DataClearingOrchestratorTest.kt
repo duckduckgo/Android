@@ -62,7 +62,7 @@ class DataClearingOrchestratorTest {
         val plugin = recordingPlugin(receivedTypes)
         val orchestrator = createOrchestrator(plugin)
 
-        val types = setOf<ClearableData>(ClearableData.Tabs.Single("tab1"), ClearableData.DuckChats.Single("url"))
+        val types = setOf<ClearableData>(ClearableData.Tabs.Single("tab1"), ClearableData.DuckChats.Selected(setOf("url")))
         orchestrator.clearData(types)
 
         assertEquals(1, receivedTypes.size)

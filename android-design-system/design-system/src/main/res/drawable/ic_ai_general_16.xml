@@ -1,0 +1,37 @@
+<!--
+  ~ Copyright (C) 2026 The Android Open Source Project
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~      http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="18dp"
+    android:height="18dp"
+    android:viewportWidth="18"
+    android:viewportHeight="18">
+  <path
+      android:pathData="M7.664,1.729C7.866,0.924 9.009,0.924 9.211,1.729L9.656,3.512C10.251,5.891 12.109,7.749 14.488,8.344L16.271,8.789C17.076,8.991 17.076,10.134 16.271,10.335L14.488,10.781L14.377,10.81C12.051,11.434 10.242,13.271 9.656,15.613L9.211,17.396L9.2,17.434C8.978,18.189 7.897,18.189 7.674,17.434L7.664,17.396L7.219,15.613C6.633,13.271 4.824,11.434 2.498,10.81L2.387,10.781L0.604,10.335C-0.201,10.134 -0.201,8.991 0.604,8.789L2.387,8.344C4.729,7.758 6.566,5.949 7.19,3.623L7.219,3.512L7.664,1.729ZM8.438,4.362C7.645,6.832 5.707,8.77 3.237,9.562C5.707,10.355 7.645,12.293 8.438,14.763C9.23,12.293 11.168,10.355 13.638,9.562C11.168,8.77 9.23,6.832 8.438,4.362ZM14.93,0.201C14.997,-0.067 15.378,-0.067 15.445,0.201L15.594,0.796C15.792,1.589 16.411,2.208 17.204,2.406L17.799,2.555C18.067,2.622 18.067,3.003 17.799,3.07L17.204,3.219L17.13,3.239C16.373,3.456 15.786,4.061 15.594,4.829L15.479,5.286L15.445,5.424L15.438,5.448C15.357,5.684 15.018,5.684 14.937,5.448L14.93,5.424L14.895,5.286L14.781,4.829C14.589,4.061 14.002,3.456 13.245,3.239L13.171,3.219L12.576,3.07C12.308,3.003 12.308,2.622 12.576,2.555L12.714,2.52L13.171,2.406C13.939,2.214 14.544,1.627 14.761,0.87L14.781,0.796L14.93,0.201Z"
+      android:fillAlpha="0.84">
+    <aapt:attr name="android:fillColor">
+      <gradient
+          android:startX="9"
+          android:startY="0"
+          android:endX="9"
+          android:endY="18"
+          android:type="linear">
+        <item android:offset="0" android:color="#FFAC33DF"/>
+        <item android:offset="1" android:color="#FF5881E5"/>
+      </gradient>
+    </aapt:attr>
+  </path>
+</vector>

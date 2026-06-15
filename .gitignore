@@ -17,6 +17,7 @@ out/
 .gradle/
 build/
 .externalNativeBuild/
+.kotlin/
 
 #Autoconsent
 /node_modules/@duckduckgo/autoconsent/
@@ -110,4 +111,5 @@ PixelDefinitions/node_modules/
 # LLM
 .claude/settings.local.json
 /.claude/worktrees/*
+CLAUDE.local.md
 docs/*

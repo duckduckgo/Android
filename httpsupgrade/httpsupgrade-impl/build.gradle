@@ -62,7 +62,7 @@ dependencies {
 }
 
 android {
-    ndkVersion '21.4.7075529'
+    ndkVersion '28.2.13676358'
     namespace 'com.duckduckgo.httpsupgrade.impl'
     anvil {
         generateDaggerFactories = true // default is false

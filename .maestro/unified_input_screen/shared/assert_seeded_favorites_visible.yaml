@@ -1,0 +1,12 @@
+appId: com.duckduckgo.mobile.android
+---
+- extendedWaitUntil:
+    visible:
+      text: "example.com"
+    timeout: 10000
+- assertVisible:
+    text: "example.com"
+- assertVisible:
+    text: "duckduckgo.com"
+- assertVisible:
+    text: "privacytest.com"

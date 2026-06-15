@@ -29,6 +29,7 @@ import androidx.core.content.FileProvider
 import androidx.core.net.toUri
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.browser.mode.FavoritesWidget
 import com.duckduckgo.app.global.DuckDuckGoApplication
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.baseHost
@@ -191,6 +192,10 @@ class FavoritesWidgetItemFactory(
         bundle.putBoolean(BrowserActivity.NEW_SEARCH_EXTRA, false)
         bundle.putBoolean(BrowserActivity.LAUNCH_FROM_FAVORITES_WIDGET, true)
         bundle.putBoolean(BrowserActivity.NOTIFY_DATA_CLEARED_EXTRA, false)
+        bundle.putBoolean(
+            BrowserActivity.LAUNCH_REQUIRES_REGULAR_MODE,
+            FavoritesWidget.requiresRegularMode,
+        )
         val intent = Intent()
         intent.putExtras(bundle)
         remoteViews.setOnClickFillInIntent(R.id.quickAccessFaviconContainer, intent)

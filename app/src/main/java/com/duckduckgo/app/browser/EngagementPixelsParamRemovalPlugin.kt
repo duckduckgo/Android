@@ -26,6 +26,8 @@ import com.duckduckgo.app.pixels.AppPixelName.ADDRESS_BAR_WEBSITE_CANCELLED
 import com.duckduckgo.app.pixels.AppPixelName.ADDRESS_BAR_WEBSITE_CLICKED
 import com.duckduckgo.app.pixels.AppPixelName.ADDRESS_BAR_WEBSITE_ENTRY_CLEARED
 import com.duckduckgo.app.pixels.AppPixelName.ADD_BOOKMARK_CONFIRM_EDITED
+import com.duckduckgo.app.pixels.AppPixelName.AI_CHAT_DUCK_AI_DIRECT_NAVIGATION_COUNT
+import com.duckduckgo.app.pixels.AppPixelName.AI_CHAT_DUCK_AI_DIRECT_NAVIGATION_DAILY
 import com.duckduckgo.app.pixels.AppPixelName.KEYBOARD_GO_NEW_TAB_CLICKED
 import com.duckduckgo.app.pixels.AppPixelName.KEYBOARD_GO_SERP_CLICKED
 import com.duckduckgo.app.pixels.AppPixelName.KEYBOARD_GO_WEBSITE_CLICKED
@@ -83,6 +85,8 @@ class EngagementPixelsParamRemovalPlugin @Inject constructor() : PixelParamRemov
             TAB_MANAGER_MENU_SETTINGS_PRESSED.pixelName to PixelParameter.removeAtb(),
             ADD_BOOKMARK_CONFIRM_EDITED.pixelName to PixelParameter.removeAtb(),
             LONG_PRESS_COPY_LINK_TEXT.pixelName to PixelParameter.removeAtb(),
+            AI_CHAT_DUCK_AI_DIRECT_NAVIGATION_COUNT.pixelName to PixelParameter.removeAtb(),
+            AI_CHAT_DUCK_AI_DIRECT_NAVIGATION_DAILY.pixelName to PixelParameter.removeAtb(),
         )
     }
 }

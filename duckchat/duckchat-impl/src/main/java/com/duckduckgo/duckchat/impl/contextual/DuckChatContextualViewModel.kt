@@ -16,6 +16,9 @@
 
 package com.duckduckgo.duckchat.impl.contextual
 
+import android.content.Context
+import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
 import androidx.annotation.VisibleForTesting
 import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
@@ -24,12 +27,14 @@ import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.duckchat.api.DuckChat
-import com.duckduckgo.duckchat.impl.DuckChatConstants.CHAT_ID_PARAM
+import com.duckduckgo.duckchat.api.toChatIdOrNull
 import com.duckduckgo.duckchat.impl.DuckChatInternal
+import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.helper.DuckChatJSHelper
 import com.duckduckgo.duckchat.impl.helper.NativeAction
 import com.duckduckgo.duckchat.impl.helper.RealDuckChatJSHelper
+import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.store.DuckChatContextualDataStore
 import com.duckduckgo.feature.toggles.api.FeatureTogglesInventory
@@ -45,6 +50,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import logcat.logcat
+import org.json.JSONException
 import org.json.JSONObject
 import javax.inject.Inject
 
@@ -60,6 +66,9 @@ class DuckChatContextualViewModel @Inject constructor(
     private val duckChatPixels: DuckChatPixels,
     private val duckChatFeature: DuckChatFeature,
     private val featureTogglesInventory: FeatureTogglesInventory,
+    private val modelManager: DuckAiModelManager,
+    private val contextualNativeInputManager: ContextualNativeInputManager,
+    private val context: Context,
 ) : ViewModel() {
 
     private val commandChannel = Channel<Command>(capacity = 1, onBufferOverflow = DROP_OLDEST)
@@ -73,9 +82,32 @@ class DuckChatContextualViewModel @Inject constructor(
         WEBVIEW,
     }
 
+    enum class QuickActionState(
+        @field:StringRes val labelResId: Int,
+        @field:DrawableRes val iconResId: Int,
+    ) {
+        LEGACY_SUMMARIZE(
+            labelResId = R.string.duckAIContextualPromptSummarize,
+            iconResId = com.duckduckgo.mobile.android.R.drawable.ic_arrow_down_right_16,
+        ),
+        ASK_ABOUT_PAGE(
+            labelResId = R.string.duckAIContextualPromptAskAboutPage,
+            iconResId = R.drawable.ic_page_content_attach_16,
+        ),
+        SUBMIT_SUMMARIZE(
+            labelResId = R.string.duckAIContextualPromptSummarize,
+            iconResId = R.drawable.ic_summarize_16,
+        ),
+    }
+
     private var fullModeUrl: String = ""
     var updatedPageContext: String = ""
     var sheetTabId: String = ""
+
+    // Chat id currently shown in the contextual webview, derived from the URL query param.
+    // Null when in INPUT mode (composing a new chat) or when the URL has no chatID yet.
+    private val _chatId = MutableStateFlow<String?>(null)
+    val chatId: StateFlow<String?> = _chatId.asStateFlow()
 
     @VisibleForTesting
     internal var isPageContextRequested: Boolean = false
@@ -84,7 +116,10 @@ class DuckChatContextualViewModel @Inject constructor(
         data class LoadUrl(val url: String) : Command()
         data object SendSubscriptionAuthUpdateEvent : Command()
         data class OpenFullscreenMode(val url: String) : Command()
-        data class ChangeSheetState(val newState: Int) : Command()
+        data class ChangeSheetState(
+            val newState: Int,
+            val prefillNativeInput: String? = null,
+        ) : Command()
         data object RequestPageContext : Command()
         data object ShowFireConfirmation : Command()
     }
@@ -102,9 +137,12 @@ class DuckChatContextualViewModel @Inject constructor(
                 tabId = "",
                 prompt = "",
                 isFireButtonEnabled = false,
+                quickActionState = QuickActionState.LEGACY_SUMMARIZE,
             ),
         )
     val viewState: StateFlow<ViewState> = _viewState.asStateFlow()
+
+    private var isContextualSheetImprovementsEnabled: Boolean = false
 
     init {
         viewModelScope.launch(dispatchers.io()) {
@@ -112,8 +150,23 @@ class DuckChatContextualViewModel @Inject constructor(
                 .getAllTogglesForParent("androidBrowserConfig")
                 .find { it.featureName().name == "singleTabFireDialog" }
                 ?.isEnabled() == true
+            isContextualSheetImprovementsEnabled = duckChatFeature.contextualSheetImprovements().isEnabled()
+            val initialQuickActionState = if (isContextualSheetImprovementsEnabled) {
+                QuickActionState.ASK_ABOUT_PAGE
+            } else {
+                QuickActionState.LEGACY_SUMMARIZE
+            }
+            val chatHintResId = if (isContextualSheetImprovementsEnabled) {
+                R.string.contextualSheetImprovedHint
+            } else {
+                R.string.input_screen_chat_hint
+            }
             _viewState.update {
-                it.copy(isFireButtonEnabled = duckChatFeature.contextualFireButton().isEnabled() && isSingleTabFireEnabled)
+                it.copy(
+                    isFireButtonEnabled = duckChatFeature.contextualFireButton().isEnabled() && isSingleTabFireEnabled,
+                    quickActionState = initialQuickActionState,
+                    chatHintResId = chatHintResId,
+                )
             }
         }
     }
@@ -129,6 +182,8 @@ class DuckChatContextualViewModel @Inject constructor(
         val tabId: String = "",
         val prompt: String = "",
         val isFireButtonEnabled: Boolean = false,
+        val quickActionState: QuickActionState = QuickActionState.LEGACY_SUMMARIZE,
+        @StringRes val chatHintResId: Int = R.string.input_screen_chat_hint,
     )
 
     fun onSheetReopened() {
@@ -169,6 +224,7 @@ class DuckChatContextualViewModel @Inject constructor(
         if (existingChatUrl == null) {
             val urlToLoad = duckChat.getDuckChatUrl("", false, sidebar = true)
             withContext(dispatchers.main()) {
+                setSheetUrl(urlToLoad)
                 commandChannel.trySend(Command.LoadUrl(urlToLoad))
                 _viewState.update { state ->
                     state.copy(
@@ -179,6 +235,7 @@ class DuckChatContextualViewModel @Inject constructor(
             }
         } else {
             withContext(dispatchers.main()) {
+                setSheetUrl(existingChatUrl)
                 _viewState.update { state ->
                     state.copy(
                         sheetMode = SheetMode.WEBVIEW,
@@ -230,6 +287,7 @@ class DuckChatContextualViewModel @Inject constructor(
                 val hasChatHistory = hasChatId(existingChatUrl)
 
                 withContext(dispatchers.main()) {
+                    setSheetUrl(existingChatUrl)
                     _viewState.update { current ->
                         current.copy(
                             sheetMode = SheetMode.WEBVIEW,
@@ -254,9 +312,14 @@ class DuckChatContextualViewModel @Inject constructor(
         duckChatPixels.reportContextualSheetOpened()
     }
 
-    fun onPromptSent(prompt: String) {
+    fun onPromptSent(
+        prompt: String,
+        followUpPrefill: String? = null,
+    ) {
         viewModelScope.launch(dispatchers.io()) {
             val contextPrompt = generateContextPrompt(prompt)
+            val prefillText = followUpPrefill?.takeIf { it.isNotEmpty() }
+            val prefillEvent = prefillText?.let { generatePrefillEvent(it) }
             withContext(dispatchers.main()) {
                 _viewState.value =
                     _viewState.value.copy(
@@ -264,9 +327,36 @@ class DuckChatContextualViewModel @Inject constructor(
                         prompt = "",
                     )
                 _subscriptionEventDataChannel.trySend(contextPrompt)
-                commandChannel.trySend(Command.ChangeSheetState(BottomSheetBehavior.STATE_EXPANDED))
+                prefillEvent?.let { _subscriptionEventDataChannel.trySend(it) }
+                // Always pass a non-null prefill: a draft preserves the typed text, empty clears the native
+                // chat input so stale text from a previous interaction doesn't reappear.
+                commandChannel.trySend(
+                    Command.ChangeSheetState(
+                        newState = BottomSheetBehavior.STATE_EXPANDED,
+                        prefillNativeInput = prefillText.orEmpty(),
+                    ),
+                )
             }
         }
+    }
+
+    private fun generatePrefillEvent(text: String): SubscriptionEventData {
+        val params = JSONObject().apply {
+            put("platform", "android")
+            put("tool", "query")
+            put(
+                "query",
+                JSONObject().apply {
+                    put("prompt", text)
+                    put("autoSubmit", false)
+                },
+            )
+        }
+        return SubscriptionEventData(
+            featureName = RealDuckChatJSHelper.DUCK_CHAT_FEATURE_NAME,
+            subscriptionName = "submitAIChatNativePrompt",
+            params = params,
+        )
     }
 
     fun onChatPageLoaded(url: String?) {
@@ -274,9 +364,9 @@ class DuckChatContextualViewModel @Inject constructor(
         if (url == null) {
             return
         } else {
-            fullModeUrl = url
             val sheetMode = _viewState.value.sheetMode
             if (sheetMode == SheetMode.WEBVIEW) {
+                setSheetUrl(url)
                 val hasChatId = hasChatId(url)
 
                 viewModelScope.launch {
@@ -318,6 +408,8 @@ class DuckChatContextualViewModel @Inject constructor(
             duckChatPixels.reportContextualPromptSubmittedWithContextNative()
         }
 
+        val modelId = modelManager.getSelectedModelId()
+        val reasoningEffort = modelManager.getResolvedReasoningEffort()
         val params =
             JSONObject().apply {
                 put("platform", "android")
@@ -327,6 +419,12 @@ class DuckChatContextualViewModel @Inject constructor(
                     JSONObject().apply {
                         put("prompt", prompt)
                         put("autoSubmit", true)
+                        if (modelId != null) {
+                            put("modelId", modelId)
+                        }
+                        if (reasoningEffort != null) {
+                            put("reasoningEffort", reasoningEffort)
+                        }
                     },
                 )
                 pageContext?.let { put("pageContext", it) }
@@ -393,6 +491,7 @@ class DuckChatContextualViewModel @Inject constructor(
         isPageContextRequested = false
         persistTabClosed()
         duckChatPixels.reportContextualSheetDismissed()
+        contextualNativeInputManager.onContextualClosed(sheetTabId)
     }
 
     private fun persistTabClosed() {
@@ -414,6 +513,11 @@ class DuckChatContextualViewModel @Inject constructor(
                 current.copy(
                     showContext = false,
                     userRemovedContext = true,
+                    quickActionState = if (current.quickActionState == QuickActionState.SUBMIT_SUMMARIZE) {
+                        QuickActionState.ASK_ABOUT_PAGE
+                    } else {
+                        current.quickActionState
+                    },
                 )
             }
         }
@@ -448,7 +552,13 @@ class DuckChatContextualViewModel @Inject constructor(
             if (reportInvalidPixels) duckChatPixels.reportContextualPageContextInvalidEmpty()
             return false
         }
-        val json = JSONObject(pageContext)
+        val json = try {
+            JSONObject(pageContext)
+        } catch (_: JSONException) {
+            logcat { "Duck.ai: pageContext is not valid JSON" }
+            if (reportInvalidPixels) duckChatPixels.reportContextualPageContextCollectionEmpty()
+            return false
+        }
         val title = json.optString("title").takeIf { it.isNotBlank() }
         val content = json.optString("content").takeIf { it.isNotBlank() }
         if (reportInvalidPixels) {
@@ -474,6 +584,36 @@ class DuckChatContextualViewModel @Inject constructor(
                 current.copy(
                     prompt = newPrompt,
                     showContext = isContextValid(updatedPageContext),
+                )
+            }
+        }
+    }
+
+    fun onQuickActionClicked(currentInput: String) {
+        when (_viewState.value.quickActionState) {
+            QuickActionState.LEGACY_SUMMARIZE -> {
+                replacePrompt(currentInput, context.getString(R.string.duckAIContextualPromptSummarize))
+            }
+
+            QuickActionState.ASK_ABOUT_PAGE -> {
+                if (!isContextValid(updatedPageContext)) {
+                    // Page context not ready yet; stay in ASK_ABOUT_PAGE so the user can retry.
+                    return
+                }
+                addPageContext()
+                viewModelScope.launch {
+                    _viewState.update { it.copy(quickActionState = QuickActionState.SUBMIT_SUMMARIZE) }
+                }
+            }
+
+            QuickActionState.SUBMIT_SUMMARIZE -> {
+                if (!_viewState.value.showContext) {
+                    // Context was removed before submit; refuse to auto-submit without it.
+                    return
+                }
+                onPromptSent(
+                    prompt = context.getString(R.string.duckAIContextualPromptSummarize),
+                    followUpPrefill = currentInput.takeIf { it.isNotEmpty() },
                 )
             }
         }
@@ -533,7 +673,7 @@ class DuckChatContextualViewModel @Inject constructor(
             return
         }
 
-        if (isContextValid(pageContext)) {
+        if (isContextValid(pageContext, reportInvalidPixels = true)) {
             updatedPageContext = pageContext
             val json = JSONObject(updatedPageContext)
             val title = json.optString("title")
@@ -550,7 +690,7 @@ class DuckChatContextualViewModel @Inject constructor(
                         tabId = tabId,
                         allowsAutomaticContextAttachment = allowsAutomaticContextAttachment,
                         showContext =
-                        if (allowsAutomaticContextAttachment) {
+                        if (allowsAutomaticContextAttachment && !isContextualSheetImprovementsEnabled) {
                             !inputMode.userRemovedContext
                         } else {
                             inputMode.showContext
@@ -578,7 +718,6 @@ class DuckChatContextualViewModel @Inject constructor(
             }
         } else {
             updatedPageContext = ""
-            duckChatPixels.reportContextualPageContextCollectionEmpty()
         }
     }
 
@@ -620,11 +759,18 @@ class DuckChatContextualViewModel @Inject constructor(
                 contextualDataStore.clearTabChatUrl(currentTabId)
 
                 withContext(dispatchers.main()) {
+                    clearSheetUrl()
+                    val resetQuickActionState = if (isContextualSheetImprovementsEnabled) {
+                        QuickActionState.ASK_ABOUT_PAGE
+                    } else {
+                        QuickActionState.LEGACY_SUMMARIZE
+                    }
                     _viewState.update {
                         it.copy(
                             sheetMode = SheetMode.INPUT,
                             showFullscreen = true,
                             prompt = "",
+                            quickActionState = resetQuickActionState,
                         )
                     }
                     commandChannel.trySend(Command.ChangeSheetState(sheetState))
@@ -639,10 +785,22 @@ class DuckChatContextualViewModel @Inject constructor(
         }
     }
 
-    private fun hasChatId(url: String?): Boolean {
-        return url?.toUri()?.getQueryParameter(CHAT_ID_PARAM)
-            .orEmpty()
-            .isNotBlank()
+    private fun hasChatId(url: String?): Boolean = !extractChatId(url).isNullOrBlank()
+
+    private fun extractChatId(url: String?): String? {
+        val uri = url?.toUri() ?: return null
+        return uri.toChatIdOrNull(duckChat)
+    }
+
+    // Owns the coupled (fullModeUrl, _chatId) invariant: _chatId is always extractChatId(fullModeUrl).
+    private fun setSheetUrl(url: String) {
+        fullModeUrl = url
+        _chatId.value = extractChatId(url)
+    }
+
+    private fun clearSheetUrl() {
+        fullModeUrl = ""
+        _chatId.value = null
     }
 
     private suspend fun shouldReuseStoredChatUrl(tabId: String): Boolean {

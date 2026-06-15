@@ -66,6 +66,7 @@ import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_OPTOUT_STAGE_CAPTCHA_SOLVE
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_OPTOUT_STAGE_CONDITION_FOUND
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_OPTOUT_STAGE_CONDITION_NOT_FOUND
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_OPTOUT_STAGE_EMAIL_GENERATE
+import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_OPTOUT_STAGE_EMAIL_GET_DATA
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_OPTOUT_STAGE_FILLFORM
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_OPTOUT_STAGE_FINISH
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_OPTOUT_STAGE_PENDING_EMAIL_CONFIRMATION
@@ -76,6 +77,7 @@ import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_OPTOUT_SUBMIT_FAILURE
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_OPTOUT_SUBMIT_SUCCESS
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_SCAN_INVALID_EVENT
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_SCAN_STAGE
+import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_SCAN_STAGE_EMAIL_GET_DATA
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_SCAN_STAGE_RESULT_ERROR
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_SCAN_STAGE_RESULT_MATCHES
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_SCAN_STAGE_RESULT_NO_MATCH
@@ -458,6 +460,15 @@ interface PirPixelSender {
         actionType: String,
     )
 
+    fun reportScanStageEmailGetData(
+        brokerUrl: String,
+        parentUrl: String,
+        brokerVersion: String,
+        durationMs: Long,
+        tries: Int,
+        actionId: String,
+    )
+
     suspend fun reportScanMatches(
         brokerUrl: String,
         totalMatches: Int,
@@ -494,6 +505,15 @@ interface PirPixelSender {
     )
 
     fun reportOptOutStageEmailGenerate(
+        brokerUrl: String,
+        parentUrl: String,
+        brokerVersion: String,
+        durationMs: Long,
+        tries: Int,
+        actionId: String,
+    )
+
+    fun reportOptOutStageEmailGetData(
         brokerUrl: String,
         parentUrl: String,
         brokerVersion: String,
@@ -1069,6 +1089,27 @@ class RealPirPixelSender @Inject constructor(
         fire(PIR_SCAN_STAGE, params)
     }
 
+    override fun reportScanStageEmailGetData(
+        brokerUrl: String,
+        parentUrl: String,
+        brokerVersion: String,
+        durationMs: Long,
+        tries: Int,
+        actionId: String,
+    ) {
+        fire(
+            PIR_SCAN_STAGE_EMAIL_GET_DATA,
+            getFullStageParams(
+                brokerUrl = brokerUrl,
+                parentUrl = parentUrl,
+                brokerVersion = brokerVersion,
+                durationMs = durationMs,
+                tries = tries,
+                actionId = actionId,
+            ),
+        )
+    }
+
     override suspend fun reportScanMatches(
         brokerUrl: String,
         totalMatches: Int,
@@ -1164,6 +1205,27 @@ class RealPirPixelSender @Inject constructor(
     ) {
         fire(
             PIR_OPTOUT_STAGE_EMAIL_GENERATE,
+            getFullStageParams(
+                brokerUrl = brokerUrl,
+                parentUrl = parentUrl,
+                brokerVersion = brokerVersion,
+                durationMs = durationMs,
+                tries = tries,
+                actionId = actionId,
+            ),
+        )
+    }
+
+    override fun reportOptOutStageEmailGetData(
+        brokerUrl: String,
+        parentUrl: String,
+        brokerVersion: String,
+        durationMs: Long,
+        tries: Int,
+        actionId: String,
+    ) {
+        fire(
+            PIR_OPTOUT_STAGE_EMAIL_GET_DATA,
             getFullStageParams(
                 brokerUrl = brokerUrl,
                 parentUrl = parentUrl,
@@ -1355,7 +1417,7 @@ class RealPirPixelSender @Inject constructor(
             PARAM_KEY_BROKER to brokerUrl,
             PARAM_KEY_PARENT to parentUrl,
             PARAM_BROKER_VERSION to brokerVersion,
-            PARAM_DURATION to durationMs.toString(),
+            PARAM_DURATION to durationMs.roundToNearest10Ms().toString(),
             PARAM_TRIES to tries.toString(),
             PARAM_ACTION_ID to actionId,
         )
@@ -1568,6 +1630,8 @@ class RealPirPixelSender @Inject constructor(
         PirExecutionType.MANUAL_EDIT_PROFILE -> "profile_edit"
         PirExecutionType.SCHEDULED -> "scheduled"
     }
+
+    private fun Long.roundToNearest10Ms(): Long = ((this + 5) / 10) * 10
 
     companion object {
         private const val PARAM_KEY_TOTAL_TIME = "totalTimeInMillis"

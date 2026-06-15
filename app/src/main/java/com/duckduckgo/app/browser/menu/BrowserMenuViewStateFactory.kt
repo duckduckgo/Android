@@ -101,6 +101,9 @@ class RealBrowserMenuViewStateFactory @Inject constructor(
     ): BrowserMenuViewState.NewTabPage {
         return BrowserMenuViewState.NewTabPage(
             showDuckChatOption = browserViewState.showDuckChatOption,
+            showDuckChatHistoryOption = browserViewState.showDuckChatHistoryOption,
+            showDuckAiSection = duckAiFeatureState.showPopupMenuShortcut.value,
+            showDuckChatVoiceOption = duckAiFeatureState.showVoiceChatEntry.value,
             vpnMenuState = browserViewState.vpnMenuState,
             isEmailSignedIn = browserViewState.isEmailSignedIn,
             showAutofill = browserViewState.showAutofill,
@@ -119,6 +122,9 @@ class RealBrowserMenuViewStateFactory @Inject constructor(
             canReportSite = browserViewState.canReportSite,
             showAutofill = browserViewState.showAutofill,
             showDownloadDot = downloadMenuStateProvider.hasNewDownload(),
+            showDuckChatHistoryOption = browserViewState.showDuckChatHistoryOption,
+            showDuckAiSection = duckAiFeatureState.showPopupMenuShortcut.value,
+            showDuckChatVoiceOption = duckAiFeatureState.showVoiceChatEntry.value,
             pageContextHeader = PageContextHeaderState.DuckAi(title = title, tabId = tabId),
         )
     }
@@ -132,12 +138,13 @@ class RealBrowserMenuViewStateFactory @Inject constructor(
         serpLogoUrl: String? = null,
         siteUrl: String? = null,
     ): BrowserMenuViewState.Browser {
-        val isDuckAIFullscreenModeEnabled = duckAiFeatureState.showFullScreenMode.value
         return BrowserMenuViewState.Browser(
             canGoBack = browserViewState.canGoBack,
             canGoForward = browserViewState.canGoForward,
-            showDuckChatOption = browserViewState.showDuckChatOption && !isDuckAIFullscreenModeEnabled,
-            showNewDuckChatTabOption = isDuckAIFullscreenModeEnabled,
+            showDuckChatOption = browserViewState.showDuckChatOption,
+            showDuckChatHistoryOption = browserViewState.showDuckChatHistoryOption,
+            showDuckAiSection = duckAiFeatureState.showPopupMenuShortcut.value,
+            showDuckChatVoiceOption = duckAiFeatureState.showVoiceChatEntry.value,
             canSharePage = browserViewState.canSharePage,
             showSelectDefaultBrowserMenuItem = browserViewState.showSelectDefaultBrowserMenuItem,
             canSaveSite = browserViewState.canSaveSite,

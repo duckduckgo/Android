@@ -21,8 +21,8 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.databinding.ItemChatSuggestionBinding
+import com.duckduckgo.duckchat.impl.models.iconRes
 
 class ChatSuggestionsAdapter(
     private val onChatClicked: (ChatSuggestion) -> Unit,
@@ -47,13 +47,7 @@ class ChatSuggestionsAdapter(
 
         fun bind(suggestion: ChatSuggestion, onChatClicked: (ChatSuggestion) -> Unit) {
             binding.chatSuggestionTitle.text = suggestion.title
-
-            val iconRes = if (suggestion.pinned) {
-                R.drawable.ic_chat_pin_24
-            } else {
-                R.drawable.ic_chat_24
-            }
-            binding.chatSuggestionIcon.setImageResource(iconRes)
+            binding.chatSuggestionIcon.setImageResource(suggestion.type.iconRes(suggestion.pinned))
 
             binding.root.setOnClickListener {
                 onChatClicked(suggestion)

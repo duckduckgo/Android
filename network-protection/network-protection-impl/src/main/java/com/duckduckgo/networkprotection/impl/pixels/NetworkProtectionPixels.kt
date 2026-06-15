@@ -266,6 +266,8 @@ interface NetworkProtectionPixels {
     fun reportFailureRecoveryCompletedWithDifferentTunnelAddress()
 
     fun reportAccessRevokedDialogShown()
+    fun reportAccessRevokedDialogSubscribeClicked()
+    fun reportAccessRevokedDialogDismissClicked()
     fun reportSubscriptionPromotionDialogShown()
     fun reportVpnBetaStoppedWhenSubscriptionUpdatedAndEnabled()
 
@@ -544,6 +546,16 @@ class RealNetworkProtectionPixel @Inject constructor(
     override fun reportAccessRevokedDialogShown() {
         firePixel(NETP_ACCESS_REVOKED_DIALOG_SHOWN)
         tryToFireDailyPixel(NETP_ACCESS_REVOKED_DIALOG_SHOWN_DAILY)
+    }
+
+    override fun reportAccessRevokedDialogSubscribeClicked() {
+        firePixel(NETP_ACCESS_REVOKED_DIALOG_SUBSCRIBE_CLICKED)
+        tryToFireDailyPixel(NETP_ACCESS_REVOKED_DIALOG_SUBSCRIBE_CLICKED_DAILY)
+    }
+
+    override fun reportAccessRevokedDialogDismissClicked() {
+        firePixel(NETP_ACCESS_REVOKED_DIALOG_DISMISS_CLICKED)
+        tryToFireDailyPixel(NETP_ACCESS_REVOKED_DIALOG_DISMISS_CLICKED_DAILY)
     }
 
     override fun reportSubscriptionPromotionDialogShown() {

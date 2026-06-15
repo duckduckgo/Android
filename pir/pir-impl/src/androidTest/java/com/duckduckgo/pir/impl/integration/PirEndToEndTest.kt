@@ -31,6 +31,7 @@ import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStepActions.OptOut
 import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStepActions.ScanStepActions
 import com.duckduckgo.pir.impl.common.PirRunStateHandler
 import com.duckduckgo.pir.impl.common.RealBrokerStepsParser
+import com.duckduckgo.pir.impl.common.RealEmailDataResolver
 import com.duckduckgo.pir.impl.common.RealPirRunStateHandler
 import com.duckduckgo.pir.impl.common.actions.BrokerActionFailedEventHandler
 import com.duckduckgo.pir.impl.common.actions.BrokerStepCompletedEventHandler
@@ -314,6 +315,7 @@ class PirEndToEndTest {
             pirDetachedWebViewProvider = fakePirDetachedWebViewProvider,
             brokerActionProcessor = brokerActionProcessor,
             nativeBrokerActionHandler = fakeNativeBrokerActionHandler,
+            emailDataResolver = RealEmailDataResolver(fakeDbpService, dispatcherProvider, moshi),
             engineFactory = engineFactory,
             coroutineScope = testScope,
         )
@@ -1015,7 +1017,9 @@ class PirEndToEndTest {
         override suspend fun onOptOutCompleted(executionType: PirExecutionType, totalOptOutJobs: Int) = Unit
         override suspend fun onOptOutSkipped(executionType: PirExecutionType) = Unit
         override suspend fun onRunFailed(executionType: PirExecutionType, reason: PirScanWideEvent.FailureReason) = Unit
-        override suspend fun onRunCancelled(executionType: PirExecutionType) = Unit
+        override suspend fun onRunCancelled(executionType: PirExecutionType, reason: PirScanWideEvent.CancellationReason) = Unit
+        override suspend fun onWorkCancelled(reason: PirScanWideEvent.CancellationReason) = Unit
+        override suspend fun onRunCancelledBeforeStart(executionType: PirExecutionType, reason: PirScanWideEvent.CancellationReason) = Unit
         override suspend fun onUserReset() = Unit
     }
 

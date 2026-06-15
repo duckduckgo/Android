@@ -19,6 +19,8 @@ package com.duckduckgo.newtabpage.impl
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Count
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
+import com.duckduckgo.common.utils.plugins.PluginPoint
+import com.duckduckgo.newtabpage.api.interactions.HatchInteractionsPlugin
 import com.duckduckgo.newtabpage.impl.pixels.HatchPixels
 import com.duckduckgo.newtabpage.impl.pixels.NtpAfterIdlePixelName.BAR_USED_FROM_NTP_AFTER_IDLE
 import com.duckduckgo.newtabpage.impl.pixels.NtpAfterIdlePixelName.BAR_USED_FROM_NTP_AFTER_IDLE_DAILY
@@ -38,17 +40,19 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
+import org.mockito.kotlin.whenever
 
 class NtpAfterIdleManagerImplTest {
 
     private val pixel: Pixel = mock()
     private val hatchPixels: HatchPixels = mock()
+    private val hatchInteractionsPlugins: PluginPoint<HatchInteractionsPlugin> = mock()
 
     private lateinit var testee: NtpAfterIdleManagerImpl
 
     @Before
     fun setup() {
-        testee = NtpAfterIdleManagerImpl(pixel, hatchPixels)
+        testee = NtpAfterIdleManagerImpl(pixel, hatchPixels, hatchInteractionsPlugins)
     }
 
     // --- onNtpShown classification ---
@@ -84,6 +88,18 @@ class NtpAfterIdleManagerImplTest {
         verify(pixel).fire(NTP_SHOWN_AFTER_IDLE_DAILY, type = Daily())
         verify(pixel).fire(NTP_SHOWN_USER_INITIATED, type = Count)
         verify(pixel).fire(NTP_SHOWN_USER_INITIATED_DAILY, type = Daily())
+    }
+
+    // --- onTabSwitcherSelected forwarding ---
+
+    @Test
+    fun whenOnTabSwitcherSelectedThenForwardsToHatchPlugins() {
+        val plugin: HatchInteractionsPlugin = mock()
+        whenever(hatchInteractionsPlugins.getPlugins()).thenReturn(listOf(plugin))
+
+        testee.onTabSwitcherSelected()
+
+        verify(plugin).onTabSwitcherSelected()
     }
 
     // --- onReturnToPageTapped classification ---

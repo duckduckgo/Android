@@ -97,6 +97,7 @@ interface Pixel {
         const val DAX_SUBSCRIPTION = "privacy_pro"
         const val MODAL_SUBSCRIPTION_CTA = "subscription_modal"
         const val FIRE_ANIMATION_INFERNO = "fai"
+        const val FIRE_ANIMATION_INFERNO_NEW = "inferno"
         const val FIRE_ANIMATION_AIRSTREAM = "faas"
         const val FIRE_ANIMATION_WHIRLPOOL = "fawp"
         const val FIRE_ANIMATION_NONE = "fann"

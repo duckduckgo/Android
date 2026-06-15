@@ -26,21 +26,35 @@ import android.widget.Toast
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.rememberModalBottomSheetState
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.fragment.app.Fragment
-import com.duckduckgo.common.ui.compose.button.DaxButtonSize.Large
+import com.duckduckgo.common.ui.compose.button.DaxButtonSize
+import com.duckduckgo.common.ui.compose.button.DaxDestructiveGhostAltButton
+import com.duckduckgo.common.ui.compose.button.DaxDestructivePrimaryButton
 import com.duckduckgo.common.ui.compose.button.DaxGhostButton
 import com.duckduckgo.common.ui.compose.button.DaxPrimaryButton
 import com.duckduckgo.common.ui.compose.button.DaxSecondaryButton
+import com.duckduckgo.common.ui.compose.dialog.DaxAlertDialog
+import com.duckduckgo.common.ui.compose.dialog.DaxDestructiveStackedButtons
+import com.duckduckgo.common.ui.compose.dialog.DaxPrimaryStackedButtons
+import com.duckduckgo.common.ui.compose.dialog.DaxRadioOption
+import com.duckduckgo.common.ui.compose.dialog.DaxRadioOptions
+import com.duckduckgo.common.ui.compose.dialog.DaxStackedButton
+import com.duckduckgo.common.ui.compose.dialog.DaxTextAlertDialog
+import com.duckduckgo.common.ui.compose.dialog.DaxTextAlertDialogCheckboxState
 import com.duckduckgo.common.ui.compose.listitem.DaxOneLineListItem
 import com.duckduckgo.common.ui.compose.sheets.DaxActionBottomSheetDialog
 import com.duckduckgo.common.ui.compose.sheets.DaxPromoBottomSheetDialog
+import com.duckduckgo.common.ui.compose.text.DaxText
 import com.duckduckgo.common.ui.internal.R
 import com.duckduckgo.common.ui.internal.ui.appComponentsViewModel
 import com.duckduckgo.common.ui.internal.ui.setupThemedComposeView
@@ -55,6 +69,7 @@ import com.duckduckgo.common.ui.view.dialog.RadioListAlertDialogBuilder
 import com.duckduckgo.common.ui.view.dialog.StackedAlertDialogBuilder
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -83,6 +98,14 @@ class DialogsFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         val isDarkTheme = runBlocking { appComponentsViewModel.themeFlow.first() } == AppTheme.DARK
 
+        // Common string resources used across dialog demos
+        val dialogTitle = getString(CommonR.string.text_dialog_title)
+        val dialogMessage = getString(CommonR.string.text_dialog_message)
+        val positiveButtonText = getString(CommonR.string.text_dialog_positive)
+        val negativeButtonText = getString(CommonR.string.text_dialog_negative)
+        val optionText = getString(CommonR.string.text_dialog_option)
+        val checkboxText = getString(CommonR.string.text_dialog_checkbox)
+
         view.findViewById<Button>(R.id.textAlertDialogWithImageButton)?.let {
             it.setOnClickListener {
                 TextAlertDialogBuilder(requireContext())
@@ -104,6 +127,19 @@ class DialogsFragment : Fragment() {
                     )
                     .show()
             }
+        }
+
+        view.setupComposeDialogShowcase(R.id.composeTextAlertDialogWithImageButton, isDarkTheme, "Text Alert Dialog With Image") { onDismiss ->
+            DaxTextAlertDialog(
+                onDismissRequest = onDismiss,
+                title = dialogTitle,
+                message = dialogMessage,
+                headerImage = painterResource(CommonR.drawable.ic_dax_icon),
+                positiveButtonText = positiveButtonText,
+                onPositiveClick = { showToast("Positive Button Clicked") },
+                negativeButtonText = negativeButtonText,
+                onNegativeClick = { showToast("Negative Button Clicked") },
+            )
         }
 
         view.findViewById<Button>(R.id.radioButtonAlertDialog)?.let {
@@ -131,6 +167,35 @@ class DialogsFragment : Fragment() {
             }
         }
 
+        view.setupComposeDialogShowcase(R.id.composeRadioButtonAlertDialog, isDarkTheme, "Single Choice Alert Dialog") { onDismiss ->
+            var selectedIndex by rememberSaveable { mutableIntStateOf(-1) }
+            val options = List(3) { index ->
+                DaxRadioOption(text = optionText, onSelected = { selectedIndex = index })
+            }.toImmutableList()
+            DaxAlertDialog(
+                onDismissRequest = onDismiss,
+                title = dialogTitle,
+                message = { DaxText(text = dialogMessage) },
+                content = {
+                    DaxRadioOptions(
+                        options = options,
+                        selectedIndex = selectedIndex,
+                    )
+                },
+                buttons = {
+                    DaxGhostButton(text = negativeButtonText, onClick = onDismiss)
+                    DaxPrimaryButton(
+                        text = positiveButtonText,
+                        enabled = selectedIndex >= 0,
+                        onClick = {
+                            showToast("Radio Button $selectedIndex selected")
+                            onDismiss()
+                        },
+                    )
+                },
+            )
+        }
+
         view.findViewById<Button>(R.id.radioButtonDestructiveAlertDialog)?.let {
             it.setOnClickListener {
                 RadioListAlertDialogBuilder(requireContext())
@@ -148,6 +213,39 @@ class DialogsFragment : Fragment() {
                     )
                     .show()
             }
+        }
+
+        view.setupComposeDialogShowcase(
+            R.id.composeRadioButtonDestructiveAlertDialog,
+            isDarkTheme,
+            "Single Choice Destructive Alert Dialog",
+        ) { onDismiss ->
+            var selectedIndex by rememberSaveable { mutableIntStateOf(-1) }
+            val options = List(3) { index ->
+                DaxRadioOption(text = optionText, onSelected = { selectedIndex = index })
+            }.toImmutableList()
+            DaxAlertDialog(
+                onDismissRequest = onDismiss,
+                title = dialogTitle,
+                message = { DaxText(text = dialogMessage) },
+                content = {
+                    DaxRadioOptions(
+                        options = options,
+                        selectedIndex = selectedIndex,
+                    )
+                },
+                buttons = {
+                    DaxDestructiveGhostAltButton(text = negativeButtonText, onClick = onDismiss)
+                    DaxDestructivePrimaryButton(
+                        text = positiveButtonText,
+                        enabled = selectedIndex >= 0,
+                        onClick = {
+                            showToast("Radio Button $selectedIndex selected")
+                            onDismiss()
+                        },
+                    )
+                },
+            )
         }
 
         view.findViewById<Button>(R.id.textAlertDialogButton)?.let {
@@ -172,6 +270,18 @@ class DialogsFragment : Fragment() {
             }
         }
 
+        view.setupComposeDialogShowcase(R.id.composeTextAlertDialogButton, isDarkTheme, "Text Alert Dialog") { onDismiss ->
+            DaxTextAlertDialog(
+                onDismissRequest = onDismiss,
+                title = dialogTitle,
+                message = dialogMessage,
+                positiveButtonText = positiveButtonText,
+                onPositiveClick = { showToast("Positive Button Clicked") },
+                negativeButtonText = negativeButtonText,
+                onNegativeClick = { showToast("Negative Button Clicked") },
+            )
+        }
+
         view.findViewById<Button>(R.id.textAlertDestructiveDialogButton)?.let {
             it.setOnClickListener {
                 TextAlertDialogBuilder(requireContext())
@@ -194,6 +304,30 @@ class DialogsFragment : Fragment() {
             }
         }
 
+        view.setupComposeDialogShowcase(R.id.composeTextAlertDestructiveDialogButton, isDarkTheme, "Text Alert Destructive Dialog") { onDismiss ->
+            DaxAlertDialog(
+                onDismissRequest = onDismiss,
+                title = dialogTitle,
+                message = { DaxText(text = dialogMessage) },
+                buttons = {
+                    DaxDestructiveGhostAltButton(
+                        text = negativeButtonText,
+                        onClick = {
+                            showToast("Negative Button Clicked")
+                            onDismiss()
+                        },
+                    )
+                    DaxDestructivePrimaryButton(
+                        text = positiveButtonText,
+                        onClick = {
+                            showToast("Positive Button Clicked")
+                            onDismiss()
+                        },
+                    )
+                },
+            )
+        }
+
         view.findViewById<Button>(R.id.textAlertSingleDialogButton)?.let {
             it.setOnClickListener {
                 TextAlertDialogBuilder(requireContext())
@@ -213,6 +347,23 @@ class DialogsFragment : Fragment() {
                     )
                     .show()
             }
+        }
+
+        view.setupComposeDialogShowcase(R.id.composeTextAlertSingleDialogButton, isDarkTheme, "Text Alert Single Button Dialog") { onDismiss ->
+            DaxAlertDialog(
+                onDismissRequest = onDismiss,
+                title = dialogTitle,
+                message = { DaxText(text = dialogMessage) },
+                buttons = {
+                    DaxGhostButton(
+                        text = positiveButtonText,
+                        onClick = {
+                            showToast("Positive Button Clicked")
+                            onDismiss()
+                        },
+                    )
+                },
+            )
         }
 
         view.findViewById<Button>(R.id.textAlertDialogCancellable)?.let {
@@ -242,6 +393,19 @@ class DialogsFragment : Fragment() {
             }
         }
 
+        view.setupComposeDialogShowcase(R.id.composeTextAlertDialogCancellable, isDarkTheme, "Text Alert Dialog Cancellable") { onDismiss ->
+            DaxTextAlertDialog(
+                onDismissRequest = onDismiss,
+                title = dialogTitle,
+                message = dialogMessage,
+                cancellable = true,
+                positiveButtonText = positiveButtonText,
+                onPositiveClick = { showToast("Positive Button Clicked") },
+                negativeButtonText = negativeButtonText,
+                onNegativeClick = { showToast("Negative Button Clicked") },
+            )
+        }
+
         view.findViewById<Button>(R.id.textAlertDialogOneButton)?.let {
             it.setOnClickListener {
                 TextAlertDialogBuilder(requireContext())
@@ -258,6 +422,17 @@ class DialogsFragment : Fragment() {
                     )
                     .show()
             }
+        }
+
+        view.setupComposeDialogShowcase(R.id.composeTextAlertDialogOneButton, isDarkTheme, "Text Alert Dialog With One Button") { onDismiss ->
+            DaxTextAlertDialog(
+                onDismissRequest = onDismiss,
+                title = dialogTitle,
+                message = dialogMessage,
+                cancellable = true,
+                positiveButtonText = positiveButtonText,
+                onPositiveClick = { showToast("Positive Button Clicked") },
+            )
         }
 
         view.findViewById<Button>(R.id.textAlertDialogCheckbox)?.let {
@@ -288,6 +463,33 @@ class DialogsFragment : Fragment() {
             }
         }
 
+        view.setupThemedComposeView(R.id.composeTextAlertDialogCheckbox, isDarkTheme) {
+            var showDialog by remember { mutableStateOf(false) }
+            var checkboxChecked by remember { mutableStateOf(false) }
+            DaxSecondaryButton(
+                text = "Text Alert Dialog With CheckBox",
+                onClick = { showDialog = true },
+                size = DaxButtonSize.Large,
+                modifier = Modifier.fillMaxWidth(),
+            )
+            if (showDialog) {
+                DaxTextAlertDialog(
+                    onDismissRequest = { showDialog = false },
+                    title = dialogTitle,
+                    message = dialogMessage,
+                    positiveButtonText = positiveButtonText,
+                    onPositiveClick = { showToast("Positive Button Clicked, Checked $checkboxChecked") },
+                    negativeButtonText = negativeButtonText,
+                    onNegativeClick = { showToast("Negative Button Clicked, Checked $checkboxChecked") },
+                    checkbox = DaxTextAlertDialogCheckboxState(
+                        text = checkboxText,
+                        checked = checkboxChecked,
+                        onCheckedChange = { checkboxChecked = it },
+                    ),
+                )
+            }
+        }
+
         view.findViewById<Button>(R.id.stackedAlertDialogWithImageButton)?.let {
             it.setOnClickListener {
                 StackedAlertDialogBuilder(requireContext())
@@ -310,439 +512,539 @@ class DialogsFragment : Fragment() {
                     )
                     .show()
             }
+        }
 
-            view.findViewById<Button>(R.id.stackedAlertDialogWithButtons)?.let {
-                it.setOnClickListener {
-                    StackedAlertDialogBuilder(requireContext())
-                        .setTitle(CommonR.string.text_dialog_title)
-                        .setMessage(CommonR.string.text_dialog_message)
-                        .setStackedButtons(
-                            listOf(
-                                CommonR.string.text_dialog_positive,
-                                CommonR.string.text_dialog_positive,
-                                CommonR.string.text_dialog_positive,
-                                CommonR.string.text_dialog_positive,
-                            ),
-                        )
-                        .addEventListener(
-                            object : StackedAlertDialogBuilder.EventListener() {
-                                override fun onButtonClicked(position: Int) {
-                                    Snackbar.make(it, "Button $position Clicked", Snackbar.LENGTH_SHORT).show()
-                                }
-                            },
-                        )
-                        .show()
-                }
-
-                view.findViewById<Button>(R.id.stackedAlertDestructiveDialogWithButtons)?.let {
-                    it.setOnClickListener {
-                        StackedAlertDialogBuilder(requireContext())
-                            .setTitle(CommonR.string.text_dialog_title)
-                            .setMessage(CommonR.string.text_dialog_message)
-                            .setStackedButtons(
-                                listOf(
-                                    CommonR.string.text_dialog_positive,
-                                    CommonR.string.text_dialog_positive,
-                                    CommonR.string.text_dialog_positive,
-                                    CommonR.string.text_dialog_positive,
-                                ),
-                            )
-                            .setDestructiveButtons(true)
-                            .addEventListener(
-                                object : StackedAlertDialogBuilder.EventListener() {
-                                    override fun onButtonClicked(position: Int) {
-                                        Snackbar.make(it, "Button $position Clicked", Snackbar.LENGTH_SHORT).show()
-                                    }
+        view.setupComposeDialogShowcase(
+            R.id.composeStackedAlertDialogWithImageButton,
+            isDarkTheme,
+            "Stacked Text Alert Dialog With Image and 3 buttons",
+        ) { onDismiss ->
+            DaxAlertDialog(
+                onDismissRequest = onDismiss,
+                title = dialogTitle,
+                message = { DaxText(text = dialogMessage) },
+                headerImage = painterResource(CommonR.drawable.ic_dax_icon),
+                buttons = {
+                    DaxPrimaryStackedButtons(
+                        buttons = List(3) { index ->
+                            DaxStackedButton(
+                                text = positiveButtonText,
+                                onClick = {
+                                    showToast("Button $index Clicked")
+                                    onDismiss()
                                 },
                             )
-                            .show()
-                    }
+                        }.toImmutableList(),
+                    )
+                },
+            )
+        }
 
-                    view.findViewById<Button>(R.id.actionBottomSheetButton)?.let { button ->
-                        button.setOnClickListener {
-                            ActionBottomSheetDialog.Builder(requireContext())
-                                .setPrimaryItem("Primary Item")
-                                .setSecondaryItem("Secondary Item")
-                                .addEventListener(
-                                    object : ActionBottomSheetDialog.EventListener() {
-                                        override fun onPrimaryItemClicked() {
-                                            Toast.makeText(context, "Primary Item Clicked", Toast.LENGTH_SHORT).show()
-                                        }
+        view.findViewById<Button>(R.id.stackedAlertDialogWithButtons)?.let {
+            it.setOnClickListener {
+                StackedAlertDialogBuilder(requireContext())
+                    .setTitle(CommonR.string.text_dialog_title)
+                    .setMessage(CommonR.string.text_dialog_message)
+                    .setStackedButtons(
+                        listOf(
+                            CommonR.string.text_dialog_positive,
+                            CommonR.string.text_dialog_positive,
+                            CommonR.string.text_dialog_positive,
+                            CommonR.string.text_dialog_positive,
+                        ),
+                    )
+                    .addEventListener(
+                        object : StackedAlertDialogBuilder.EventListener() {
+                            override fun onButtonClicked(position: Int) {
+                                Snackbar.make(it, "Button $position Clicked", Snackbar.LENGTH_SHORT).show()
+                            }
+                        },
+                    )
+                    .show()
+            }
+        }
 
-                                        override fun onSecondaryItemClicked() {
-                                            Toast.makeText(context, "Secondary Item Clicked", Toast.LENGTH_SHORT).show()
-                                        }
-                                    },
-                                )
-                                .show()
-                        }
-                    }
-
-                    view.setupThemedComposeView(R.id.composeActionBottomSheetButton, isDarkTheme) {
-                        val sheetState = rememberModalBottomSheetState()
-                        val scope = rememberCoroutineScope()
-                        var showBottomSheet by remember { mutableStateOf(false) }
-                        DaxSecondaryButton(
-                            text = "Action Bottom Sheet",
-                            onClick = { showBottomSheet = true },
-                            size = Large,
-                            modifier = Modifier.fillMaxWidth(),
-                        )
-                        if (showBottomSheet) {
-                            DaxActionBottomSheetDialog(
-                                title = null,
-                                sheetState = sheetState,
-                                onDismissRequest = {
-                                    scope.launch { sheetState.hide() }.invokeOnCompletion {
-                                        if (!sheetState.isVisible) {
-                                            showBottomSheet = false
-                                        }
-                                    }
-                                },
-                                content = {
-                                    item {
-                                        DaxOneLineListItem("Primary Item")
-                                    }
-                                    item {
-                                        DaxOneLineListItem("Secondary Item")
-                                    }
+        view.setupComposeDialogShowcase(
+            R.id.composeStackedAlertDialogWithButtons,
+            isDarkTheme,
+            "Stacked Text Alert Dialog With 4 buttons",
+        ) { onDismiss ->
+            DaxAlertDialog(
+                onDismissRequest = onDismiss,
+                title = dialogTitle,
+                message = { DaxText(text = dialogMessage) },
+                buttons = {
+                    DaxPrimaryStackedButtons(
+                        buttons = List(4) { index ->
+                            DaxStackedButton(
+                                text = positiveButtonText,
+                                onClick = {
+                                    showToast("Button $index Clicked")
+                                    onDismiss()
                                 },
                             )
-                        }
-                    }
+                        }.toImmutableList(),
+                    )
+                },
+            )
+        }
 
-                    view.findViewById<Button>(R.id.actionBottomSheetButtonWithTitle)?.let { button ->
-                        button.setOnClickListener {
-                            ActionBottomSheetDialog.Builder(requireContext())
-                                .setTitle("Title")
-                                .setPrimaryItem("Primary Item", CommonR.drawable.ic_add_16)
-                                .setSecondaryItem("Secondary Item", CommonR.drawable.ic_add_16)
-                                .addEventListener(
-                                    object : ActionBottomSheetDialog.EventListener() {
-                                        override fun onPrimaryItemClicked() {
-                                            Toast.makeText(context, "Primary Item Clicked", Toast.LENGTH_SHORT).show()
-                                        }
+        view.findViewById<Button>(R.id.stackedAlertDestructiveDialogWithButtons)?.let {
+            it.setOnClickListener {
+                StackedAlertDialogBuilder(requireContext())
+                    .setTitle(CommonR.string.text_dialog_title)
+                    .setMessage(CommonR.string.text_dialog_message)
+                    .setStackedButtons(
+                        listOf(
+                            CommonR.string.text_dialog_positive,
+                            CommonR.string.text_dialog_positive,
+                            CommonR.string.text_dialog_positive,
+                            CommonR.string.text_dialog_positive,
+                        ),
+                    )
+                    .setDestructiveButtons(true)
+                    .addEventListener(
+                        object : StackedAlertDialogBuilder.EventListener() {
+                            override fun onButtonClicked(position: Int) {
+                                Snackbar.make(it, "Button $position Clicked", Snackbar.LENGTH_SHORT).show()
+                            }
+                        },
+                    )
+                    .show()
+            }
+        }
 
-                                        override fun onSecondaryItemClicked() {
-                                            Toast.makeText(context, "Secondary Item Clicked", Toast.LENGTH_SHORT).show()
-                                        }
-                                    },
-                                )
-                                .show()
-                        }
-                    }
-
-                    view.setupThemedComposeView(R.id.composeActionBottomSheetButtonWithTitle, isDarkTheme) {
-                        val sheetState = rememberModalBottomSheetState()
-                        val scope = rememberCoroutineScope()
-                        var showBottomSheet by remember { mutableStateOf(false) }
-                        DaxSecondaryButton(
-                            text = "Action Bottom Sheet with title and icons",
-                            onClick = {
-                                showBottomSheet = true
-                            },
-                            size = Large,
-                            modifier = Modifier.fillMaxWidth(),
-                        )
-                        if (showBottomSheet) {
-                            DaxActionBottomSheetDialog(
-                                title = "Title",
-                                sheetState = sheetState,
-                                onDismissRequest = {
-                                    scope.launch { sheetState.hide() }.invokeOnCompletion {
-                                        if (!sheetState.isVisible) {
-                                            showBottomSheet = false
-                                        }
-                                    }
-                                },
-                                content = {
-                                    item {
-                                        DaxOneLineListItem(
-                                            text = "Primary Item",
-                                            leadingIcon = {
-                                                DaxListItemTrailingIcon(
-                                                    painter = painterResource(CommonR.drawable.ic_add_24),
-                                                    contentDescription = null,
-                                                )
-                                            },
-                                        )
-                                    }
-                                    item {
-                                        DaxOneLineListItem(
-                                            text = "Secondary Item",
-                                            leadingIcon = {
-                                                DaxListItemTrailingIcon(
-                                                    painter = painterResource(CommonR.drawable.ic_add_24),
-                                                    contentDescription = null,
-                                                )
-                                            },
-                                        )
-                                    }
+        view.setupComposeDialogShowcase(
+            R.id.composeStackedAlertDestructiveDialogWithButtons,
+            isDarkTheme,
+            "Stacked Text Alert Destructive Dialog With 4 buttons",
+        ) { onDismiss ->
+            DaxAlertDialog(
+                onDismissRequest = onDismiss,
+                title = dialogTitle,
+                message = { DaxText(text = dialogMessage) },
+                buttons = {
+                    DaxDestructiveStackedButtons(
+                        buttons = List(4) { index ->
+                            DaxStackedButton(
+                                text = positiveButtonText,
+                                onClick = {
+                                    showToast("Button $index Clicked")
+                                    onDismiss()
                                 },
                             )
-                        }
-                    }
+                        }.toImmutableList(),
+                    )
+                },
+            )
+        }
 
-                    view.findViewById<Button>(R.id.promoBottomSheetButton)?.let { button ->
-                        button.setOnClickListener {
-                            PromoBottomSheetDialog.Builder(requireContext())
-                                .setContent("Add our search widget to your home screen for quick, easy access.")
-                                .setPrimaryButton("Button")
-                                .setSecondaryButton("Button")
-                                .addEventListener(
-                                    object : PromoBottomSheetDialog.EventListener() {
-                                        override fun onPrimaryButtonClicked() {
-                                            super.onPrimaryButtonClicked()
-                                            Toast.makeText(context, "Primary Item Clicked", Toast.LENGTH_SHORT).show()
-                                        }
+        view.findViewById<Button>(R.id.actionBottomSheetButton)?.let { button ->
+            button.setOnClickListener {
+                ActionBottomSheetDialog.Builder(requireContext())
+                    .setPrimaryItem("Primary Item")
+                    .setSecondaryItem("Secondary Item")
+                    .addEventListener(
+                        object : ActionBottomSheetDialog.EventListener() {
+                            override fun onPrimaryItemClicked() {
+                                Toast.makeText(context, "Primary Item Clicked", Toast.LENGTH_SHORT).show()
+                            }
 
-                                        override fun onSecondaryButtonClicked() {
-                                            super.onSecondaryButtonClicked()
-                                            Toast.makeText(context, "Secondary Item Clicked", Toast.LENGTH_SHORT).show()
-                                        }
-                                    },
-                                )
-                                .show()
-                        }
-                    }
+                            override fun onSecondaryItemClicked() {
+                                Toast.makeText(context, "Secondary Item Clicked", Toast.LENGTH_SHORT).show()
+                            }
+                        },
+                    )
+                    .show()
+            }
+        }
 
-                    view.setupThemedComposeView(R.id.composePromoBottomSheetButton, isDarkTheme) {
-                        val sheetState = rememberModalBottomSheetState()
-                        val scope = rememberCoroutineScope()
-                        var showBottomSheet by remember { mutableStateOf(false) }
-                        val dismiss = {
-                            scope.launch { sheetState.hide() }.invokeOnCompletion {
-                                if (!sheetState.isVisible) {
-                                    showBottomSheet = false
-                                }
+        view.setupThemedComposeView(R.id.composeActionBottomSheetButton, isDarkTheme) {
+            val sheetState = rememberModalBottomSheetState()
+            val scope = rememberCoroutineScope()
+            var showBottomSheet by remember { mutableStateOf(false) }
+            DaxSecondaryButton(
+                text = "Action Bottom Sheet",
+                onClick = { showBottomSheet = true },
+                size = DaxButtonSize.Large,
+                modifier = Modifier.fillMaxWidth(),
+            )
+            if (showBottomSheet) {
+                DaxActionBottomSheetDialog(
+                    title = null,
+                    sheetState = sheetState,
+                    onDismissRequest = {
+                        scope.launch { sheetState.hide() }.invokeOnCompletion {
+                            if (!sheetState.isVisible) {
+                                showBottomSheet = false
                             }
                         }
-                        DaxSecondaryButton(
-                            text = "Promo Bottom Sheet",
-                            onClick = {
-                                showBottomSheet = true
-                            },
-                            size = Large,
-                            modifier = Modifier.fillMaxWidth(),
-                        )
-                        if (showBottomSheet) {
-                            DaxPromoBottomSheetDialog(
-                                title = null,
-                                description = "Add our search widget to your home screen for quick, easy access.",
-                                promoIcon = null,
-                                onDismissRequest = dismiss::invoke,
-                                buttons = {
-                                    DaxGhostButton(text = "Button", onClick = dismiss::invoke)
-                                    DaxPrimaryButton(text = "Button", onClick = dismiss::invoke)
-                                },
-                            )
+                    },
+                    content = {
+                        item {
+                            DaxOneLineListItem("Primary Item")
                         }
-                    }
-
-                    view.findViewById<Button>(R.id.promoBottomSheetButtonWithTitle)?.let { button ->
-                        button.setOnClickListener {
-                            PromoBottomSheetDialog.Builder(requireContext())
-                                .setTitle("Title")
-                                .setContent("Add our search widget to your home screen for quick, easy access.")
-                                .setPrimaryButton("Button")
-                                .setSecondaryButton("Button")
-                                .addEventListener(
-                                    object : PromoBottomSheetDialog.EventListener() {
-                                        override fun onPrimaryButtonClicked() {
-                                            super.onPrimaryButtonClicked()
-                                            Toast.makeText(context, "Primary Item Clicked", Toast.LENGTH_SHORT).show()
-                                        }
-
-                                        override fun onSecondaryButtonClicked() {
-                                            super.onSecondaryButtonClicked()
-                                            Toast.makeText(context, "Secondary Item Clicked", Toast.LENGTH_SHORT).show()
-                                        }
-                                    },
-                                )
-                                .show()
+                        item {
+                            DaxOneLineListItem("Secondary Item")
                         }
-                    }
+                    },
+                )
+            }
+        }
 
-                    view.setupThemedComposeView(R.id.composePromoBottomSheetButtonWithTitle, isDarkTheme) {
-                        val sheetState = rememberModalBottomSheetState()
-                        val scope = rememberCoroutineScope()
-                        var showBottomSheet by remember { mutableStateOf(false) }
-                        val dismiss = {
-                            scope.launch { sheetState.hide() }.invokeOnCompletion {
-                                if (!sheetState.isVisible) {
-                                    showBottomSheet = false
-                                }
+        view.findViewById<Button>(R.id.actionBottomSheetButtonWithTitle)?.let { button ->
+            button.setOnClickListener {
+                ActionBottomSheetDialog.Builder(requireContext())
+                    .setTitle("Title")
+                    .setPrimaryItem("Primary Item", CommonR.drawable.ic_add_16)
+                    .setSecondaryItem("Secondary Item", CommonR.drawable.ic_add_16)
+                    .addEventListener(
+                        object : ActionBottomSheetDialog.EventListener() {
+                            override fun onPrimaryItemClicked() {
+                                Toast.makeText(context, "Primary Item Clicked", Toast.LENGTH_SHORT).show()
+                            }
+
+                            override fun onSecondaryItemClicked() {
+                                Toast.makeText(context, "Secondary Item Clicked", Toast.LENGTH_SHORT).show()
+                            }
+                        },
+                    )
+                    .show()
+            }
+        }
+
+        view.setupThemedComposeView(R.id.composeActionBottomSheetButtonWithTitle, isDarkTheme) {
+            val sheetState = rememberModalBottomSheetState()
+            val scope = rememberCoroutineScope()
+            var showBottomSheet by remember { mutableStateOf(false) }
+            DaxSecondaryButton(
+                text = "Action Bottom Sheet with title and icons",
+                onClick = {
+                    showBottomSheet = true
+                },
+                size = DaxButtonSize.Large,
+                modifier = Modifier.fillMaxWidth(),
+            )
+            if (showBottomSheet) {
+                DaxActionBottomSheetDialog(
+                    title = "Title",
+                    sheetState = sheetState,
+                    onDismissRequest = {
+                        scope.launch { sheetState.hide() }.invokeOnCompletion {
+                            if (!sheetState.isVisible) {
+                                showBottomSheet = false
                             }
                         }
-                        DaxSecondaryButton(
-                            text = "Promo Bottom Sheet with title",
-                            onClick = {
-                                showBottomSheet = true
-                            },
-                            size = Large,
-                            modifier = Modifier.fillMaxWidth(),
-                        )
-                        if (showBottomSheet) {
-                            DaxPromoBottomSheetDialog(
-                                title = "Title",
-                                description = "Add our search widget to your home screen for quick, easy access.",
-                                promoIcon = null,
-                                onDismissRequest = dismiss::invoke,
-                                buttons = {
-                                    DaxGhostButton(text = "Button", onClick = dismiss::invoke)
-                                    DaxPrimaryButton(text = "Button", onClick = dismiss::invoke)
+                    },
+                    content = {
+                        item {
+                            DaxOneLineListItem(
+                                text = "Primary Item",
+                                leadingIcon = {
+                                    DaxListItemTrailingIcon(
+                                        painter = painterResource(CommonR.drawable.ic_add_24),
+                                        contentDescription = null,
+                                    )
                                 },
                             )
                         }
-                    }
-
-                    view.findViewById<Button>(R.id.promoBottomSheetButtonWithImage)?.let { button ->
-                        button.setOnClickListener {
-                            PromoBottomSheetDialog.Builder(requireContext())
-                                .setIcon(CommonR.drawable.ic_bottom_sheet_promo_icon)
-                                .setTitle("Title")
-                                .setContent("Add our search widget to your home screen for quick, easy access.")
-                                .setPrimaryButton("Button")
-                                .setSecondaryButton("Button")
-                                .addEventListener(
-                                    object : PromoBottomSheetDialog.EventListener() {
-                                        override fun onPrimaryButtonClicked() {
-                                            super.onPrimaryButtonClicked()
-                                            Toast.makeText(context, "Primary Item Clicked", Toast.LENGTH_SHORT).show()
-                                        }
-
-                                        override fun onSecondaryButtonClicked() {
-                                            super.onSecondaryButtonClicked()
-                                            Toast.makeText(context, "Secondary Item Clicked", Toast.LENGTH_SHORT).show()
-                                        }
-                                    },
-                                )
-                                .show()
-                        }
-                    }
-
-                    view.setupThemedComposeView(R.id.composePromoBottomSheetButtonWithImage, isDarkTheme) {
-                        val sheetState = rememberModalBottomSheetState()
-                        val scope = rememberCoroutineScope()
-                        var showBottomSheet by remember { mutableStateOf(false) }
-                        val dismiss = {
-                            scope.launch { sheetState.hide() }.invokeOnCompletion {
-                                if (!sheetState.isVisible) {
-                                    showBottomSheet = false
-                                }
-                            }
-                        }
-                        DaxSecondaryButton(
-                            text = "Promo Bottom Sheet with image",
-                            onClick = {
-                                showBottomSheet = true
-                            },
-                            size = Large,
-                            modifier = Modifier.fillMaxWidth(),
-                        )
-                        if (showBottomSheet) {
-                            DaxPromoBottomSheetDialog(
-                                title = "Title",
-                                description = "Add our search widget to your home screen for quick, easy access.",
-                                promoIcon = painterResource(CommonR.drawable.ic_bottom_sheet_promo_icon),
-                                onDismissRequest = dismiss::invoke,
-                                buttons = {
-                                    DaxGhostButton(text = "Button", onClick = dismiss::invoke)
-                                    DaxPrimaryButton(text = "Button", onClick = dismiss::invoke)
+                        item {
+                            DaxOneLineListItem(
+                                text = "Secondary Item",
+                                leadingIcon = {
+                                    DaxListItemTrailingIcon(
+                                        painter = painterResource(CommonR.drawable.ic_add_24),
+                                        contentDescription = null,
+                                    )
                                 },
                             )
                         }
-                    }
+                    },
+                )
+            }
+        }
 
-                    view.findViewById<Button>(R.id.animated_button)?.let {
-                        it.setOnClickListener {
-                            activity?.supportFragmentManager?.let { fragmentManager ->
-                                TypewriterDaxDialog.newInstance(
-                                    daxText = "This is an example of a Dax dialog with an animated text",
-                                    primaryButtonText = "Primary CTA",
-                                    secondaryButtonText = "Secondary CTA",
-                                    hideButtonText = "Hide",
-                                    toolbarDimmed = true,
-                                ).show(fragmentManager, "dialog")
+        view.findViewById<Button>(R.id.promoBottomSheetButton)?.let { button ->
+            button.setOnClickListener {
+                PromoBottomSheetDialog.Builder(requireContext())
+                    .setContent("Add our search widget to your home screen for quick, easy access.")
+                    .setPrimaryButton("Button")
+                    .setSecondaryButton("Button")
+                    .addEventListener(
+                        object : PromoBottomSheetDialog.EventListener() {
+                            override fun onPrimaryButtonClicked() {
+                                super.onPrimaryButtonClicked()
+                                Toast.makeText(context, "Primary Item Clicked", Toast.LENGTH_SHORT).show()
                             }
-                        }
-                    }
 
-                    view.findViewById<Button>(R.id.not_dimmed_button)?.let {
-                        it.setOnClickListener {
-                            activity?.supportFragmentManager?.let { fragmentManager ->
-                                TypewriterDaxDialog.newInstance(
-                                    daxText = "This is an example of a Dax dialog with toolbar location not dimmed",
-                                    primaryButtonText = "Primary CTA",
-                                    secondaryButtonText = "Secondary CTA",
-                                    hideButtonText = "Hide",
-                                    toolbarDimmed = false,
-                                ).show(fragmentManager, "dialog")
+                            override fun onSecondaryButtonClicked() {
+                                super.onSecondaryButtonClicked()
+                                Toast.makeText(context, "Secondary Item Clicked", Toast.LENGTH_SHORT).show()
                             }
-                        }
-                    }
+                        },
+                    )
+                    .show()
+            }
+        }
 
-                    view.findViewById<Button>(R.id.dismissible_button)?.let {
-                        it.setOnClickListener {
-                            activity?.supportFragmentManager?.let { fragmentManager ->
-                                TypewriterDaxDialog.newInstance(
-                                    daxText = "This is an example of a Dax dialog that can be dimissed by clicking anywhere in the screen.",
-                                    primaryButtonText = "Primary CTA",
-                                    secondaryButtonText = "Secondary CTA",
-                                    hideButtonText = "Hide",
-                                    toolbarDimmed = true,
-                                    dismissible = true,
-                                ).show(fragmentManager, "dialog")
-                            }
-                        }
-                    }
-
-                    view.findViewById<Button>(R.id.no_hide_button)?.let {
-                        it.setOnClickListener {
-                            activity?.supportFragmentManager?.let { fragmentManager ->
-                                TypewriterDaxDialog.newInstance(
-                                    daxText = "This is an example of a Dax dialog without hide button.",
-                                    primaryButtonText = "Primary CTA",
-                                    secondaryButtonText = "Secondary CTA",
-                                    hideButtonText = "Hide",
-                                    toolbarDimmed = true,
-                                    showHideButton = false,
-                                ).show(fragmentManager, "dialog")
-                            }
-                        }
-                    }
-
-                    view.findViewById<Button>(R.id.custom_typing_button)?.let {
-                        it.setOnClickListener {
-                            activity?.supportFragmentManager?.let { fragmentManager ->
-                                TypewriterDaxDialog.newInstance(
-                                    daxText = "This is an example of a Dax dialog with a custom typing delay of 200ms.",
-                                    primaryButtonText = "Primary CTA",
-                                    secondaryButtonText = "Secondary CTA",
-                                    hideButtonText = "Hide",
-                                    toolbarDimmed = true,
-                                    typingDelayInMs = 200L,
-                                ).show(fragmentManager, "dialog")
-                            }
-                        }
-                    }
-
-                    view.findViewById<Button>(R.id.cookie_content)?.let {
-                        it.setOnClickListener {
-                            activity?.supportFragmentManager?.let { fragmentManager ->
-                                LottieDaxDialog.newInstance(
-                                    titleText = "Cookie Prompt",
-                                    descriptionText = "This is an example of a Dax dialog with a custom animation",
-                                    lottieRes = CommonR.raw.cookie_banner_dark,
-                                    primaryButtonText = "Primary CTA",
-                                    secondaryButtonText = "Secondary CTA",
-                                    hideButtonText = "Hide",
-                                    showHideButton = false,
-                                ).show(fragmentManager, "dialog")
-                            }
-                        }
+        view.setupThemedComposeView(R.id.composePromoBottomSheetButton, isDarkTheme) {
+            val sheetState = rememberModalBottomSheetState()
+            val scope = rememberCoroutineScope()
+            var showBottomSheet by remember { mutableStateOf(false) }
+            val dismiss = {
+                scope.launch { sheetState.hide() }.invokeOnCompletion {
+                    if (!sheetState.isVisible) {
+                        showBottomSheet = false
                     }
                 }
+            }
+            DaxSecondaryButton(
+                text = "Promo Bottom Sheet",
+                onClick = {
+                    showBottomSheet = true
+                },
+                size = DaxButtonSize.Large,
+                modifier = Modifier.fillMaxWidth(),
+            )
+            if (showBottomSheet) {
+                DaxPromoBottomSheetDialog(
+                    title = null,
+                    description = "Add our search widget to your home screen for quick, easy access.",
+                    promoIcon = null,
+                    onDismissRequest = dismiss::invoke,
+                    buttons = {
+                        DaxGhostButton(text = "Button", onClick = dismiss::invoke)
+                        DaxPrimaryButton(text = "Button", onClick = dismiss::invoke)
+                    },
+                )
+            }
+        }
+
+        view.findViewById<Button>(R.id.promoBottomSheetButtonWithTitle)?.let { button ->
+            button.setOnClickListener {
+                PromoBottomSheetDialog.Builder(requireContext())
+                    .setTitle("Title")
+                    .setContent("Add our search widget to your home screen for quick, easy access.")
+                    .setPrimaryButton("Button")
+                    .setSecondaryButton("Button")
+                    .addEventListener(
+                        object : PromoBottomSheetDialog.EventListener() {
+                            override fun onPrimaryButtonClicked() {
+                                super.onPrimaryButtonClicked()
+                                Toast.makeText(context, "Primary Item Clicked", Toast.LENGTH_SHORT).show()
+                            }
+
+                            override fun onSecondaryButtonClicked() {
+                                super.onSecondaryButtonClicked()
+                                Toast.makeText(context, "Secondary Item Clicked", Toast.LENGTH_SHORT).show()
+                            }
+                        },
+                    )
+                    .show()
+            }
+        }
+
+        view.setupThemedComposeView(R.id.composePromoBottomSheetButtonWithTitle, isDarkTheme) {
+            val sheetState = rememberModalBottomSheetState()
+            val scope = rememberCoroutineScope()
+            var showBottomSheet by remember { mutableStateOf(false) }
+            val dismiss = {
+                scope.launch { sheetState.hide() }.invokeOnCompletion {
+                    if (!sheetState.isVisible) {
+                        showBottomSheet = false
+                    }
+                }
+            }
+            DaxSecondaryButton(
+                text = "Promo Bottom Sheet with title",
+                onClick = {
+                    showBottomSheet = true
+                },
+                size = DaxButtonSize.Large,
+                modifier = Modifier.fillMaxWidth(),
+            )
+            if (showBottomSheet) {
+                DaxPromoBottomSheetDialog(
+                    title = "Title",
+                    description = "Add our search widget to your home screen for quick, easy access.",
+                    promoIcon = null,
+                    onDismissRequest = dismiss::invoke,
+                    buttons = {
+                        DaxGhostButton(text = "Button", onClick = dismiss::invoke)
+                        DaxPrimaryButton(text = "Button", onClick = dismiss::invoke)
+                    },
+                )
+            }
+        }
+
+        view.findViewById<Button>(R.id.promoBottomSheetButtonWithImage)?.let { button ->
+            button.setOnClickListener {
+                PromoBottomSheetDialog.Builder(requireContext())
+                    .setIcon(CommonR.drawable.ic_bottom_sheet_promo_icon)
+                    .setTitle("Title")
+                    .setContent("Add our search widget to your home screen for quick, easy access.")
+                    .setPrimaryButton("Button")
+                    .setSecondaryButton("Button")
+                    .addEventListener(
+                        object : PromoBottomSheetDialog.EventListener() {
+                            override fun onPrimaryButtonClicked() {
+                                super.onPrimaryButtonClicked()
+                                Toast.makeText(context, "Primary Item Clicked", Toast.LENGTH_SHORT).show()
+                            }
+
+                            override fun onSecondaryButtonClicked() {
+                                super.onSecondaryButtonClicked()
+                                Toast.makeText(context, "Secondary Item Clicked", Toast.LENGTH_SHORT).show()
+                            }
+                        },
+                    )
+                    .show()
+            }
+        }
+
+        view.setupThemedComposeView(R.id.composePromoBottomSheetButtonWithImage, isDarkTheme) {
+            val sheetState = rememberModalBottomSheetState()
+            val scope = rememberCoroutineScope()
+            var showBottomSheet by remember { mutableStateOf(false) }
+            val dismiss = {
+                scope.launch { sheetState.hide() }.invokeOnCompletion {
+                    if (!sheetState.isVisible) {
+                        showBottomSheet = false
+                    }
+                }
+            }
+            DaxSecondaryButton(
+                text = "Promo Bottom Sheet with image",
+                onClick = {
+                    showBottomSheet = true
+                },
+                size = DaxButtonSize.Large,
+                modifier = Modifier.fillMaxWidth(),
+            )
+            if (showBottomSheet) {
+                DaxPromoBottomSheetDialog(
+                    title = "Title",
+                    description = "Add our search widget to your home screen for quick, easy access.",
+                    promoIcon = painterResource(CommonR.drawable.ic_bottom_sheet_promo_icon),
+                    onDismissRequest = dismiss::invoke,
+                    buttons = {
+                        DaxGhostButton(text = "Button", onClick = dismiss::invoke)
+                        DaxPrimaryButton(text = "Button", onClick = dismiss::invoke)
+                    },
+                )
+            }
+        }
+
+        view.findViewById<Button>(R.id.animated_button)?.let {
+            it.setOnClickListener {
+                activity?.supportFragmentManager?.let { fragmentManager ->
+                    TypewriterDaxDialog.newInstance(
+                        daxText = "This is an example of a Dax dialog with an animated text",
+                        primaryButtonText = "Primary CTA",
+                        secondaryButtonText = "Secondary CTA",
+                        hideButtonText = "Hide",
+                        toolbarDimmed = true,
+                    ).show(fragmentManager, "dialog")
+                }
+            }
+        }
+
+        view.findViewById<Button>(R.id.not_dimmed_button)?.let {
+            it.setOnClickListener {
+                activity?.supportFragmentManager?.let { fragmentManager ->
+                    TypewriterDaxDialog.newInstance(
+                        daxText = "This is an example of a Dax dialog with toolbar location not dimmed",
+                        primaryButtonText = "Primary CTA",
+                        secondaryButtonText = "Secondary CTA",
+                        hideButtonText = "Hide",
+                        toolbarDimmed = false,
+                    ).show(fragmentManager, "dialog")
+                }
+            }
+        }
+
+        view.findViewById<Button>(R.id.dismissible_button)?.let {
+            it.setOnClickListener {
+                activity?.supportFragmentManager?.let { fragmentManager ->
+                    TypewriterDaxDialog.newInstance(
+                        daxText = "This is an example of a Dax dialog that can be dimissed by clicking anywhere in the screen.",
+                        primaryButtonText = "Primary CTA",
+                        secondaryButtonText = "Secondary CTA",
+                        hideButtonText = "Hide",
+                        toolbarDimmed = true,
+                        dismissible = true,
+                    ).show(fragmentManager, "dialog")
+                }
+            }
+        }
+
+        view.findViewById<Button>(R.id.no_hide_button)?.let {
+            it.setOnClickListener {
+                activity?.supportFragmentManager?.let { fragmentManager ->
+                    TypewriterDaxDialog.newInstance(
+                        daxText = "This is an example of a Dax dialog without hide button.",
+                        primaryButtonText = "Primary CTA",
+                        secondaryButtonText = "Secondary CTA",
+                        hideButtonText = "Hide",
+                        toolbarDimmed = true,
+                        showHideButton = false,
+                    ).show(fragmentManager, "dialog")
+                }
+            }
+        }
+
+        view.findViewById<Button>(R.id.custom_typing_button)?.let {
+            it.setOnClickListener {
+                activity?.supportFragmentManager?.let { fragmentManager ->
+                    TypewriterDaxDialog.newInstance(
+                        daxText = "This is an example of a Dax dialog with a custom typing delay of 200ms.",
+                        primaryButtonText = "Primary CTA",
+                        secondaryButtonText = "Secondary CTA",
+                        hideButtonText = "Hide",
+                        toolbarDimmed = true,
+                        typingDelayInMs = 200L,
+                    ).show(fragmentManager, "dialog")
+                }
+            }
+        }
+
+        view.findViewById<Button>(R.id.cookie_content)?.let {
+            it.setOnClickListener {
+                activity?.supportFragmentManager?.let { fragmentManager ->
+                    LottieDaxDialog.newInstance(
+                        titleText = "Cookie Prompt",
+                        descriptionText = "This is an example of a Dax dialog with a custom animation",
+                        lottieRes = CommonR.raw.cookie_banner_dark,
+                        primaryButtonText = "Primary CTA",
+                        secondaryButtonText = "Secondary CTA",
+                        hideButtonText = "Hide",
+                        showHideButton = false,
+                    ).show(fragmentManager, "dialog")
+                }
+            }
+        }
+    }
+
+    private fun showToast(message: String) {
+        Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+    }
+
+    private fun View.setupComposeDialogShowcase(
+        viewId: Int,
+        isDarkTheme: Boolean,
+        buttonText: String,
+        dialogContent: @Composable (onDismiss: () -> Unit) -> Unit,
+    ) {
+        setupThemedComposeView(viewId, isDarkTheme) {
+            var showDialog by remember { mutableStateOf(false) }
+            DaxSecondaryButton(
+                text = buttonText,
+                onClick = { showDialog = true },
+                size = DaxButtonSize.Large,
+                modifier = Modifier.fillMaxWidth(),
+            )
+            if (showDialog) {
+                dialogContent { showDialog = false }
             }
         }
     }

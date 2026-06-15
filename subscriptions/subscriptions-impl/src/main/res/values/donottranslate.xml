@@ -31,4 +31,9 @@
     <string name="vpnReminderNotificationTitle">Don\'t forget to set up your VPN</string>
     <string name="vpnReminderNotificationDescription">Block harmful sites and scams, hide your location, and shield your online activity now.</string>
 
+    <!-- Subscription Expiration Reminder Notification -->
+    <string name="subscriptionExpirationReminderNotificationChannelName">Subscription Reminders</string>
+    <string name="subscriptionExpirationReminderNotificationTitle">Your Privacy Pro subscription is ending soon</string>
+    <string name="subscriptionExpirationReminderNotificationDescription">Tap to review your subscription and stay protected.</string>
+
 </resources>

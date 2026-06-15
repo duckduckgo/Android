@@ -389,6 +389,49 @@ class RealContentScopeScriptsTest {
         verifyJsScript(js, expectedRegEx)
     }
 
+    @Test
+    fun whenPluginReturnsEmptyConfigBetweenOthersThenNoDanglingCommaInFeatures() {
+        val firstNonEmpty: ContentScopeConfigPlugin = mock()
+        val emptyConfig: ContentScopeConfigPlugin = mock()
+        val secondNonEmpty: ContentScopeConfigPlugin = mock()
+        whenever(firstNonEmpty.config()).thenReturn(config1)
+        whenever(emptyConfig.config()).thenReturn("")
+        whenever(secondNonEmpty.config()).thenReturn(config2)
+        whenever(mockPluginPoint.getPlugins()).thenReturn(listOf(firstNonEmpty, emptyConfig, secondNonEmpty))
+
+        val js = testee.getScript(null, listOf())
+
+        assertFalse("features must not contain a double comma", js.contains(",,"))
+        assertTrue(js.contains("\"features\":{$config1,$config2}"))
+    }
+
+    @Test
+    fun whenFirstPluginReturnsEmptyConfigThenNoLeadingCommaInFeatures() {
+        val emptyConfig: ContentScopeConfigPlugin = mock()
+        val firstNonEmpty: ContentScopeConfigPlugin = mock()
+        val secondNonEmpty: ContentScopeConfigPlugin = mock()
+        whenever(emptyConfig.config()).thenReturn("")
+        whenever(firstNonEmpty.config()).thenReturn(config1)
+        whenever(secondNonEmpty.config()).thenReturn(config2)
+        whenever(mockPluginPoint.getPlugins()).thenReturn(listOf(emptyConfig, firstNonEmpty, secondNonEmpty))
+
+        val js = testee.getScript(null, listOf())
+
+        assertFalse("features must not contain a double comma", js.contains(",,"))
+        assertTrue(js.contains("\"features\":{$config1,$config2}"))
+    }
+
+    @Test
+    fun whenPluginReturnsEmptyPreferencesThenNoDanglingCommaInPreferences() {
+        whenever(mockPlugin1.preferences()).thenReturn("\"globalPrivacyControlValue\":true")
+        whenever(mockPlugin2.preferences()).thenReturn("")
+
+        val js = testee.getScript(null, listOf())
+
+        assertFalse("preferences must not contain a double comma", js.contains(",,"))
+        assertTrue(js.contains("\"globalPrivacyControlValue\":true"))
+    }
+
     private fun verifyJsScript(js: String, regex: Regex = contentScopeRegex) {
         val matchResult = regex.find(js)
         val messageSecret = matchResult!!.groupValues[1]

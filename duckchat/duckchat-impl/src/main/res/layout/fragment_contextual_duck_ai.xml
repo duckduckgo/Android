@@ -138,14 +138,14 @@
             app:layout_constraintTop_toBottomOf="@+id/contextualModeInputSpacer">
 
             <com.duckduckgo.common.ui.view.text.DaxTextView
-                android:id="@+id/contextualPromptSummarize"
+                android:id="@+id/contextualPromptQuickAction"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@drawable/duck_ai_prompt_background"
                 android:drawableStart="@drawable/ic_arrow_down_right_16"
                 android:drawablePadding="@dimen/keyline_2"
                 android:padding="@dimen/keyline_2"
-                android:text="@string/duckAIContextualPromptSummarize"
+                tools:text="@string/duckAIContextualPromptSummarize"
                 app:typography="body2_bold" />
 
         </LinearLayout>
@@ -153,6 +153,7 @@
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/inputModeWidgetCard"
             style="@style/Widget.DuckDuckGo.OmnibarCardView"
+            android:theme="?attr/daxInputModeCardThemeOverlay"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="@dimen/keyline_4"
@@ -164,7 +165,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/contextualModePrompts"
-            app:strokeColor="?attr/daxColorAccentBlue"
+            app:strokeColor="?attr/daxColorOmnibarAccent"
             app:strokeWidth="@dimen/omnibarOutlineWidth">
 
             <LinearLayout
@@ -332,12 +333,12 @@
                         app:layout_constraintTop_toTopOf="parent"
                         app:layout_constraintBottom_toBottomOf="parent"
                         android:background="@drawable/background_input_screen_button"
-                        android:backgroundTint="?attr/daxColorButtonPrimaryContainer"
+                        android:backgroundTint="?attr/daxColorOmnibarAccent"
                         android:foreground="@drawable/selectable_circular_ripple"
                         android:importantForAccessibility="no"
                         android:scaleType="centerInside"
                         android:src="@drawable/ic_arrow_up_24"
-                        app:tint="?attr/daxColorWhite" />
+                        app:tint="?attr/daxColorOmnibarAccentContent" />
 
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
@@ -361,6 +362,7 @@
 
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/contextualNativeInputCard"
+            android:theme="?attr/daxInputModeCardThemeOverlay"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
@@ -371,6 +373,7 @@
             <com.duckduckgo.duckchat.impl.ui.nativeinput.views.NativeInputModeWidget
                 android:id="@+id/contextualNativeInputWidget"
                 android:paddingHorizontal="8dp"
+                android:paddingVertical="4dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
 

@@ -32,10 +32,22 @@ data class RemoteAIChatModel(
     @field:Json(name = "entityHasAccess") val entityHasAccess: Boolean = false,
     @field:Json(name = "provider") val provider: String? = null,
     @field:Json(name = "supportsImageUpload") val supportsImageUpload: Boolean = false,
+    @field:Json(name = "supportedFileTypes") val supportedFileTypes: List<String>? = null,
+    @field:Json(name = "supportedReasoningEffort") val supportedReasoningEffort: List<String>? = null,
+    @field:Json(name = "reasoningEffortAccess") val reasoningEffortAccess: List<RemoteReasoningEffortAccess>? = null,
+    @field:Json(name = "supportedTools") val supportedTools: List<String>? = null,
 )
 
 data class RemoteTierAttachmentLimits(
+    val files: RemoteFileLimits? = null,
     val images: RemoteImageLimits? = null,
+)
+
+data class RemoteFileLimits(
+    val maxPerConversation: Int? = null,
+    val maxFileSizeMB: Int? = null,
+    val maxTotalFileSizeBytes: Long? = null,
+    val maxPagesPerFile: Int? = null,
 )
 
 data class RemoteImageLimits(
@@ -45,8 +57,22 @@ data class RemoteImageLimits(
 )
 
 data class AttachmentLimits(
+    val files: FileLimits = FileLimits(),
     val images: ImageLimits = ImageLimits(),
 )
+
+data class FileLimits(
+    val maxPerConversation: Int = DEFAULT_FILE_MAX_PER_CONVERSATION,
+    val maxFileSizeBytes: Long = DEFAULT_FILE_MAX_SIZE_BYTES,
+    val maxTotalFileSizeBytes: Long = DEFAULT_FILE_MAX_SIZE_BYTES,
+    val maxPagesPerFile: Int = DEFAULT_FILE_MAX_PAGES,
+) {
+    companion object {
+        const val DEFAULT_FILE_MAX_PER_CONVERSATION = 3
+        const val DEFAULT_FILE_MAX_SIZE_BYTES = 5L * 1024 * 1024
+        const val DEFAULT_FILE_MAX_PAGES = 8
+    }
+}
 
 data class ImageLimits(
     val maxPerTurn: Int = DEFAULT_IMAGE_MAX_PER_TURN,
@@ -63,7 +89,13 @@ data class ImageLimits(
 data class AIChatAttachmentUsage(
     val imagesUsed: Int = 0,
     val filesUsed: Int = 0,
-    val fileSizeBytesUsed: Int = 0,
+    val fileSizeBytesUsed: Long = 0L,
+)
+
+data class RemoteReasoningEffortAccess(
+    val id: String,
+    @field:Json(name = "accessTier") val accessTier: List<String>? = null,
+    @field:Json(name = "entityHasAccess") val entityHasAccess: Boolean = false,
 )
 
 data class AIChatModel(
@@ -76,7 +108,19 @@ data class AIChatModel(
     val provider: ModelProvider = ModelProvider.UNKNOWN,
     val supportsImageUpload: Boolean = false,
     val supportedImageFormats: List<String> = emptyList(),
+    val supportedFileTypes: List<String> = emptyList(),
+    val supportedReasoningEfforts: List<ReasoningEffort> = emptyList(),
+    val reasoningEffortAccess: List<ReasoningEffortAccess> = emptyList(),
+    val supportedTools: List<Tool> = emptyList(),
 ) {
+    val supportsFileUpload: Boolean
+        get() = supportedFileTypes.isNotEmpty()
+
+    fun supportsTool(tool: Tool): Boolean = supportedTools.contains(tool)
+
+    val requiredTier: UserTier?
+        get() = lowestRequiredTier(accessTier, isAccessible)
+
     companion object {
         val NATIVE_SUPPORTED_IMAGE_FORMATS = listOf("png", "jpeg", "webp")
     }
@@ -86,6 +130,20 @@ enum class UserTier(val rawValue: String) {
     FREE("free"),
     PLUS("plus"),
     PRO("pro"),
+    ;
+
+    companion object {
+        fun from(raw: String?): UserTier? = entries.firstOrNull { it.rawValue == raw }
+    }
+}
+
+/** Lowest public [UserTier] in [accessTier]; falls back to FREE when the list is empty and [isAccessible], else `null`. */
+internal fun lowestRequiredTier(accessTier: List<String>, isAccessible: Boolean): UserTier? = when {
+    accessTier.contains(UserTier.FREE.rawValue) -> UserTier.FREE
+    accessTier.contains(UserTier.PLUS.rawValue) -> UserTier.PLUS
+    accessTier.contains(UserTier.PRO.rawValue) -> UserTier.PRO
+    accessTier.isEmpty() && isAccessible -> UserTier.FREE
+    else -> null
 }
 
 enum class ModelProvider {
@@ -101,7 +159,7 @@ enum class ModelProvider {
         fun from(id: String, providerString: String?): ModelProvider {
             return when {
                 id.startsWith("meta-llama/") || id.startsWith("meta-llama_") || providerString == "azure" -> META
-                id.startsWith("mistralai/") || id.startsWith("mistralai_") -> MISTRAL
+                id.startsWith("mistralai/") || id.startsWith("mistralai_") || providerString == "mistral" -> MISTRAL
                 id.contains("gpt-oss") -> OSS
                 providerString == "anthropic" -> ANTHROPIC
                 providerString == "openai" -> OPENAI

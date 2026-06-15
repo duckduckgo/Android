@@ -18,7 +18,9 @@ package com.duckduckgo.duckchat.impl.ui.inputscreen.suggestions.reader
 
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.impl.feature.DuckAiChatHistoryFeature
+import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.reader.ChatSuggestionsNativeReader
+import com.duckduckgo.duckchat.impl.models.ChatType
 import com.duckduckgo.duckchat.store.impl.DuckAiChat
 import com.duckduckgo.duckchat.store.impl.DuckAiChatStore
 import com.duckduckgo.feature.toggles.api.Toggle
@@ -40,14 +42,18 @@ class ChatSuggestionsNativeReaderTest {
 
     private val store: DuckAiChatStore = mock()
     private val feature: DuckAiChatHistoryFeature = mock()
+    private val duckChatFeature: DuckChatFeature = mock()
     private val toggle: Toggle = mock()
+    private val typeIconToggle: Toggle = mock()
     private lateinit var reader: ChatSuggestionsNativeReader
 
     @Before
     fun setup() {
         whenever(feature.self()).thenReturn(toggle)
         whenever(toggle.getSettings()).thenReturn("""{"maxHistoryCount":5}""")
-        reader = ChatSuggestionsNativeReader(store, feature)
+        whenever(duckChatFeature.chatSuggestionTypeIcon()).thenReturn(typeIconToggle)
+        whenever(typeIconToggle.isEnabled()).thenReturn(true)
+        reader = ChatSuggestionsNativeReader(store, feature, duckChatFeature)
     }
 
     @Test
@@ -123,16 +129,53 @@ class ChatSuggestionsNativeReaderTest {
         reader.tearDown() // should not throw
     }
 
+    @Test
+    fun `fetchSuggestions maps isImageGeneration flag to ChatType_ImageGeneration`() = runTest {
+        val chat = chatWithLastEdit(Instant.now().minus(1, ChronoUnit.DAYS).toString(), isImageGeneration = true)
+        whenever(store.getChats()).thenReturn(listOf(chat))
+
+        assertEquals(ChatType.ImageGeneration, reader.fetchSuggestions(query = "").single().type)
+    }
+
+    @Test
+    fun `fetchSuggestions maps isVoice flag to ChatType_Voice`() = runTest {
+        val chat = chatWithLastEdit(Instant.now().minus(1, ChronoUnit.DAYS).toString(), isVoice = true)
+        whenever(store.getChats()).thenReturn(listOf(chat))
+
+        assertEquals(ChatType.Voice, reader.fetchSuggestions(query = "").single().type)
+    }
+
+    @Test
+    fun `fetchSuggestions defaults to ChatType_Discussion when no flag is set`() = runTest {
+        val chat = chatWithLastEdit(Instant.now().minus(1, ChronoUnit.DAYS).toString())
+        whenever(store.getChats()).thenReturn(listOf(chat))
+
+        assertEquals(ChatType.Discussion, reader.fetchSuggestions(query = "").single().type)
+    }
+
+    @Test
+    fun `fetchSuggestions forces Discussion when chatSuggestionTypeIcon toggle is disabled`() = runTest {
+        whenever(typeIconToggle.isEnabled()).thenReturn(false)
+        val chat = chatWithLastEdit(Instant.now().minus(1, ChronoUnit.DAYS).toString(), isImageGeneration = true)
+        whenever(store.getChats()).thenReturn(listOf(chat))
+
+        assertEquals(ChatType.Discussion, reader.fetchSuggestions(query = "").single().type)
+    }
+
     private fun chatWithLastEdit(
         lastEdit: String,
         chatId: String = "chat-1",
         title: String = "Test",
         pinned: Boolean = false,
+        isImageGeneration: Boolean = false,
+        isVoice: Boolean = false,
     ) = DuckAiChat(
         chatId = chatId,
         title = title,
         model = "gpt-5-mini",
         lastEdit = lastEdit,
         pinned = pinned,
+        isImageGeneration = isImageGeneration,
+        isVoice = isVoice,
     )
 }

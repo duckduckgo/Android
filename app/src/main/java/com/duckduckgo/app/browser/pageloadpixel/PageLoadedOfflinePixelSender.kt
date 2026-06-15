@@ -29,7 +29,7 @@ import javax.inject.Inject
 private const val ELAPSED_TIME = "elapsed_time"
 private const val WEBVIEW_VERSION = "webview_version"
 private const val CPM_ENABLED = "cpm_enabled"
-private const val TRACKER_OPTIMIZATION_ENABLED_V2 = "tracker_optimization_enabled_v2"
+private const val TRACKER_OPTIMIZATION_ENABLED_V3 = "tracker_optimization_enabled_v3"
 private const val IS_TAB_IN_FOREGROUND_ON_FINISH = "is_tab_in_foreground_on_finish"
 private const val ACTIVE_REQUESTS_ON_LOAD_START = "active_requests_on_load_start"
 private const val CONCURRENT_REQUESTS_ON_FINISH = "concurrent_requests_on_finish"
@@ -53,7 +53,7 @@ class PageLoadedOfflinePixelSender @Inject constructor(
                     ELAPSED_TIME to it.elapsedTime.toString(),
                     WEBVIEW_VERSION to it.webviewVersion,
                     CPM_ENABLED to it.cpmEnabled.toString(),
-                    TRACKER_OPTIMIZATION_ENABLED_V2 to it.trackerOptimizationEnabled.toString(),
+                    TRACKER_OPTIMIZATION_ENABLED_V3 to it.trackerOptimizationEnabled.toString(),
                     IS_TAB_IN_FOREGROUND_ON_FINISH to it.isTabInForegroundOnFinish.toString(),
                     ACTIVE_REQUESTS_ON_LOAD_START to it.activeRequestsOnLoadStart.toString(),
                     CONCURRENT_REQUESTS_ON_FINISH to it.concurrentRequestsOnFinish.toString(),

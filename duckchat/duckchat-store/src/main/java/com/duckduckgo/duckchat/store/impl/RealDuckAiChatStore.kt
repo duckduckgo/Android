@@ -24,16 +24,18 @@ import com.duckduckgo.duckchat.store.impl.store.DuckAiBridgeFileMetaDao
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.Lazy
 import dagger.SingleInstanceIn
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import logcat.logcat
 import org.json.JSONObject
 import java.io.File
+import java.util.Base64
 import javax.inject.Inject
 
 /**
  * Stable metadata extracted from FE-owned chat JSON.
- * Only top-level fields that are unlikely to change are parsed here.
- * Message content is intentionally excluded — it is complex and FE-owned.
+ * The raw message tree is not exposed — consumers get precomputed classification flags instead.
  */
 data class DuckAiChat(
     val chatId: String,
@@ -44,6 +46,22 @@ data class DuckAiChat(
     val pinned: Boolean,
     /** UUIDs of files referenced by this chat, stored in the native file store */
     val fileRefs: List<String> = emptyList(),
+    /** Reasoning mode chosen for this chat, or `null` if the FE didn't record one. */
+    val reasoningMode: String? = null,
+    /** True when any assistant message contains a `ui-component` part named `generate-image` (FE-owned rule). */
+    val isImageGeneration: Boolean = false,
+    /** True when [model] equals `voice-mode`. */
+    val isVoice: Boolean = false,
+)
+
+/**
+ * Decoded payload of a chat fileRef — base64-decoded [bytes] plus FE-supplied [fileName] /
+ * [mimeType] (either may be null when the FE omitted them).
+ */
+data class FileRefContent(
+    val fileName: String?,
+    val mimeType: String?,
+    val bytes: ByteArray,
 )
 
 interface DuckAiChatStore {
@@ -53,11 +71,36 @@ interface DuckAiChatStore {
     /** Returns all chats currently in the native store. Skips entries with malformed JSON or missing chatId. */
     suspend fun getChats(): List<DuckAiChat>
 
+    /** Returns the chat with [chatId], or `null` if it doesn't exist or its stored JSON is malformed. */
+    suspend fun getChatById(chatId: String): DuckAiChat?
+
+    /** Reactive equivalent of [getChats]. Re-emits on insert/update/delete via Room's Flow contract. */
+    fun getChatsFlow(): Flow<List<DuckAiChat>>
+
     /** Deletes the chat with [chatId] and its associated files. Returns true if the chat existed, false if not found. */
     suspend fun deleteChat(chatId: String): Boolean
 
     /** Deletes all chats and their associated files. */
     suspend fun deleteAllChats()
+
+    /** Renames [chatId] in the FE-owned JSON blob. Returns true if the chat existed and was updated, false otherwise. */
+    suspend fun renameChat(chatId: String, newTitle: String): Boolean
+
+    /** Pins [chatId]. Silent no-op if the chat is not found or the stored JSON is malformed. */
+    suspend fun pinChat(chatId: String)
+
+    /** Unpins [chatId]. Silent no-op if the chat is not found or the stored JSON is malformed. */
+    suspend fun unpinChat(chatId: String)
+
+    /** Returns the raw FE-owned JSON blob stored for [chatId], or null if the chat does not exist. */
+    suspend fun getChatContent(chatId: String): String?
+
+    /**
+     * Reads the FE-written JSON envelope for [uuid] (a fileRef from [DuckAiChat.fileRefs]),
+     * base64-decoding the `data` field. Returns null when the file is missing, the JSON is
+     * malformed, the `data` field is absent, or [uuid] resolves outside the chat-files directory.
+     */
+    suspend fun readFileRef(uuid: String): FileRefContent?
 }
 
 @SingleInstanceIn(AppScope::class)
@@ -77,6 +120,12 @@ class RealDuckAiChatStore @Inject constructor(
 
     override suspend fun getChats(): List<DuckAiChat> =
         withContext(dispatchers.io()) { chatsDao.getAll().mapNotNull { it.toDuckAiChat() } }
+
+    override suspend fun getChatById(chatId: String): DuckAiChat? =
+        withContext(dispatchers.io()) { chatsDao.getById(chatId)?.toDuckAiChat() }
+
+    override fun getChatsFlow(): Flow<List<DuckAiChat>> =
+        chatsDao.getAllAsFlow().map { entities -> entities.mapNotNull { it.toDuckAiChat() } }
 
     override suspend fun deleteChat(chatId: String): Boolean =
         withContext(dispatchers.io()) {
@@ -121,18 +170,106 @@ class RealDuckAiChatStore @Inject constructor(
         }
     }
 
+    override suspend fun renameChat(chatId: String, newTitle: String): Boolean =
+        withContext(dispatchers.io()) {
+            logcat { "DuckAI: RealDuckAiChatStore.renameChat($chatId)" }
+            val entity = chatsDao.getById(chatId) ?: return@withContext false
+            val updatedJson = runCatching {
+                JSONObject(entity.data).put("title", newTitle).toString()
+            }.getOrNull() ?: return@withContext false
+            chatsDao.upsert(entity.copy(data = updatedJson))
+            true
+        }
+
+    override suspend fun pinChat(chatId: String) = setPinned(chatId, pinned = true)
+
+    override suspend fun unpinChat(chatId: String) = setPinned(chatId, pinned = false)
+
+    private suspend fun setPinned(chatId: String, pinned: Boolean) {
+        withContext(dispatchers.io()) {
+            logcat { "DuckAI: RealDuckAiChatStore.setPinned($chatId, $pinned)" }
+            val entity = chatsDao.getById(chatId) ?: return@withContext
+            val updatedJson = runCatching {
+                JSONObject(entity.data).put("pinned", pinned).toString()
+            }.getOrNull() ?: return@withContext
+            chatsDao.upsert(entity.copy(data = updatedJson))
+        }
+    }
+
+    override suspend fun getChatContent(chatId: String): String? =
+        withContext(dispatchers.io()) { chatsDao.getById(chatId)?.data }
+
+    override suspend fun readFileRef(uuid: String): FileRefContent? =
+        withContext(dispatchers.io()) {
+            val filesDir = filesDirLazy.get()
+            val file = File(filesDir, uuid)
+            // Same path-traversal guard as deleteChat — reject anything resolving outside the dir.
+            if (!file.canonicalPath.startsWith(filesDir.canonicalPath + File.separator)) {
+                logcat { "DuckAI: RealDuckAiChatStore.readFileRef -- invalid uuid=$uuid" }
+                return@withContext null
+            }
+            if (!file.exists()) return@withContext null
+            runCatching {
+                val json = JSONObject(file.readText())
+                val rawData = json.optString("data").takeIf { it.isNotEmpty() } ?: return@runCatching null
+                // Accept both plain base64 and `data:<mime>;base64,<payload>` data URLs.
+                val base64 = if (rawData.startsWith("data:")) {
+                    rawData.substringAfter(',', missingDelimiterValue = "")
+                } else {
+                    rawData
+                }
+                if (base64.isEmpty()) return@runCatching null
+                FileRefContent(
+                    fileName = json.optString("fileName").ifEmpty { null },
+                    mimeType = json.optString("mimeType").ifEmpty { null },
+                    bytes = Base64.getDecoder().decode(base64),
+                )
+            }.getOrNull()
+        }
+
     private fun DuckAiBridgeChatEntity.toDuckAiChat(): DuckAiChat? = runCatching {
         val json = JSONObject(data)
         val chatId = json.optString("chatId").takeIf { it.isNotEmpty() } ?: return@runCatching null
+        val model = json.optString("model")
         DuckAiChat(
             chatId = chatId,
             title = json.optString("title").ifEmpty { "Untitled Chat" },
-            model = json.optString("model"),
+            model = model,
             lastEdit = json.optString("lastEdit"),
             pinned = json.optBoolean("pinned", false),
             fileRefs = json.optJSONArray("fileRefs")?.let { arr ->
                 (0 until arr.length()).map { arr.getString(it) }
             } ?: emptyList(),
+            reasoningMode = if (json.isNull("reasoningMode")) {
+                null
+            } else {
+                json.optString("reasoningMode").takeIf { it.isNotEmpty() }
+            },
+            isImageGeneration = json.hasGenerateImageUiComponent(),
+            isVoice = model == VOICE_MODEL,
         )
     }.getOrNull()
+
+    private fun JSONObject.hasGenerateImageUiComponent(): Boolean {
+        val messages = optJSONArray("messages") ?: return false
+        for (i in 0 until messages.length()) {
+            val message = messages.optJSONObject(i) ?: continue
+            if (message.optString("role") != ASSISTANT_ROLE) continue
+            val parts = message.optJSONArray("parts") ?: continue
+            for (j in 0 until parts.length()) {
+                val part = parts.optJSONObject(j) ?: continue
+                if (part.optString("type") == UI_COMPONENT_TYPE && part.optString("name") == GENERATE_IMAGE_NAME) {
+                    return true
+                }
+            }
+        }
+        return false
+    }
+
+    private companion object {
+        const val VOICE_MODEL = "voice-mode"
+        const val ASSISTANT_ROLE = "assistant"
+        const val UI_COMPONENT_TYPE = "ui-component"
+        const val GENERATE_IMAGE_NAME = "generate-image"
+    }
 }

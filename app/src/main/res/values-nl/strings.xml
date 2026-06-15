@@ -75,6 +75,7 @@
     <string name="options">Opties</string>
     <string name="shareLink">Link delen</string>
     <string name="copyUrl">Adres link kopiëren</string>
+    <string name="urlCopiedToClipboard">URL gekopieerd naar klembord</string>
 
     <!-- Find in page -->
     <string name="nextSearchTermDescription">Volgende zoeken</string>
@@ -265,6 +266,7 @@
     <string name="singleTabFireDialogDeleteAll">Alles verwijderen</string>
     <string name="singleTabFireDialogDeleteThisTab">Dit tabblad verwijderen</string>
     <string name="singleTabFireDialogDeleteChat">Chat verwijderen</string>
+    <string name="singleTabFireDialogDeleteChats">Chats verwijderen</string>
     <string name="singleTabFireDialogTitleDuckAi">Deze chat verwijderen?</string>
     <string name="singleTabFireDialogSubtitleSiteData">Als je sitegegevens verwijdert, kun je uitloggen bij je accounts.</string>
     <string name="singleTabFireDialogSubtitleDownloads">Hiermee worden lopende downloads geannuleerd.</string>
@@ -587,6 +589,7 @@
     <!-- Fire Animation settings -->
     <string name="settingsFireAnimation">Animatie vuurknop</string>
     <string name="settingsHeroFireAnimation">Vuurzee</string>
+    <string name="settingsHeroFireAnimationClassic">Vuurzee Klassiek</string>
     <string name="settingsHeroWaterAnimation">Draaikolk</string>
     <string name="settingsHeroAbstractAnimation">Luchtstroom</string>
     <string name="settingsNoneAnimation">Geen</string>
@@ -844,6 +847,9 @@
     <string name="preOnboardingDaxDialog3Button">Beginnen met browsen</string>
     <string name="preOnboardingAddressBarTitle">Waar moet ik je adresbalk plaatsen?</string>
     <string name="preOnboardingAddressBarOkButton">Volgende</string>
+    <string name="preOnboardingAddressBarPositionTop">Boven</string>
+    <string name="preOnboardingAddressBarPositionBottom">Onderkant</string>
+    <string name="preOnboardingAddressBarPositionSplit">Splitsen</string>
     <string name="highlightsPreOnboardingAddressBarOption1Title">Bovenaan (standaard)</string>
     <string name="highlightsPreOnboardingAddressBarOption1Description">Gemakkelijk te zien</string>
     <string name="highlightsPreOnboardingAddressBarOption2Title">Onderkant</string>
@@ -866,6 +872,8 @@
     <string name="onboardingSitesDaxDialogOption3">ebay.com</string>
     <string name="onboardingSitesDaxDialogOption4">Verras me!</string>
     <string name="onboardingSerpDaxDialogDescription"><![CDATA[Dat is <b>DuckDuckGo Search</b>! Privé. Snel. Minder advertenties.]]></string>
+    <string name="onboardingSerpDaxDialogBrandDesignTitle">Dat is DuckDuckGo Search!</string>
+    <string name="onboardingSerpDaxDialogBrandDesignDescription">Privé. Snel. Minder advertenties.</string>
     <string name="onboardingSerpDaxDialogButton">Ik snap het!</string>
     <string name="onboardingSitesSuggestionsDaxDialogTitle">Probeer nu een site te bezoeken!</string>
     <plurals name="onboardingTrackersBlockedDialogDescription">
@@ -896,6 +904,26 @@
     <string name="preOnboardingInputScreenTitleUpdated" translatable="false">Want easy access to private AI chat in the address bar?</string>
     <string name="preOnboardingInputScreenButton">Volgende</string>
     <string name="preOnboardingInputScreenDescription"><![CDATA[AI-functies zijn privé en optioneel. Je kunt wijzigingen aanbrengen in <b>Instellingen > AI-functies</b>.]]></string>
+
+    <!--Onboarding Reinstall Quick Setup-->
+    <string name="preOnboardingReinstallQuickSetupTitle">Welkom terug!&lt;br/&gt;Wil je iets aanpassen?</string>
+    <string name="preOnboardingReinstallSetDefaultLabel">DuckDuckGo instellen als standaard</string>
+    <string name="preOnboardingReinstallAddHomeScreenWidgetLabel">Widget toevoegen aan het startscherm</string>
+    <string name="preOnboardingReinstallAddressBarLabel">Positie van adresbalk</string>
+    <string name="preOnboardingReinstallAddressBarSearchOptionsLabel">Opties voor zoeken in de adresbalk</string>
+    <string name="preOnboardingReinstallStartBrowsing">Beginnen met browsen</string>
+
+    <!-- Quick setup bottom sheets -->
+    <string name="quickSetupAddressBarPositionTitle">Waar wil je je adresbalk hebben?</string>
+    <string name="quickSetupAddressBarPositionCaption"><![CDATA[Je kunt wijzigingen aanbrengen in <b>Instellingen > Uiterlijk</b>.]]></string>
+    <string name="quickSetupSearchOptionsTitle">Wil je de zoek- en AI-chatfunctie in de adresbalk?</string>
+    <string name="quickSetupBottomSheetDone">Klaar</string>
+    <string name="quickSetupInputScreenSearchOnly">Alleen zoeken</string>
+    <string name="quickSetupInputScreenSearchAndDuckAi">Zoeken en Duck.ai</string>
+    <string name="quickSetupRemoveHomeScreenWidgetTitle">Zo verwijder je de widget van het startscherm</string>
+    <string name="quickSetupRemoveHomeScreenWidgetStep1">Ga naar je beginscherm</string>
+    <string name="quickSetupRemoveHomeScreenWidgetStep2">Raak de widget aan en houd hem vast</string>
+    <string name="quickSetupRemoveHomeScreenWidgetStep3">Tik of sleep om hem te verwijderen</string>
 
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Adresbalk</string>
@@ -984,6 +1012,10 @@
     <string name="syncRestoreDialogPrimaryCta">Herstel mijn gegevens</string>
     <string name="syncRestoreDialogSecondaryCta">Overslaan</string>
 
+    <!-- Sync Restore (brand-design onboarding) -->
+    <string name="syncRestoreDialogBrandDesignTitle">Laten we verdergaan waar je gebleven was op DuckDuckGo.</string>
+    <string name="syncRestoreDialogBrandDesignBody1">Je opgeslagen bladwijzers, wachtwoorden en meer staan klaar.</string>
+
     <!-- PDF download tooltip -->
     <string name="pdfDownloadTooltipText">PDF downloaden</string>
 
@@ -991,4 +1023,14 @@
     <string name="copyLinkText">Linktekst kopiëren</string>
     <string name="linkTextCopied">Linktekst gekopieerd</string>
     <string name="linkTextCopyFailed">Linktekst kon niet worden gekopieerd.</string>
+
+    <string name="preOnboardingWelcomeDialogTitle">Hoi.</string>
+    <string name="preOnboardingWelcomeDialogBody1">Ben je klaar voor een snellere browser waarmee jij de controle hebt?</string>
+    <string name="preOnboardingWelcomeDialogBody2">AI is altijd optioneel en privacybescherming staat altijd aan.</string>
+    <string name="onboardingStepIndicatorText" instruction="a counter above our instructions in onboarding that tells a user what step they are on">%1$d van %2$d</string>
+    <string name="onboardingSearchDaxDialogOption1Quoted" instruction="translate &apos;duck&apos; too.">hoe zeg je \'eend\' in het Engels?</string>
+    <string name="onboardingSearchDaxDialogOption1EnglishQuoted" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">hoe zeg je \'eend\' in het Nederlands</string>
+
+    <string name="input_screen_user_pref_without_ai_updated">Alleen zoeken</string>
+    <string name="input_screen_user_pref_with_ai_updated">Schakelen tussen\nzoeken en Duck.ai</string>
 </resources>

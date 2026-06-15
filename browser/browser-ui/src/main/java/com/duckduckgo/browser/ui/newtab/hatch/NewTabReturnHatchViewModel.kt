@@ -23,14 +23,23 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
+import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Count
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
+import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.newtabpage.api.NtpAfterIdleManager
+import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -43,6 +52,7 @@ class NewTabReturnHatchViewModel @Inject constructor(
     private val duckChat: DuckChat,
     private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
     private val ntpAfterIdleManager: NtpAfterIdleManager,
+    private val pixel: Pixel,
 ) : ViewModel(), DefaultLifecycleObserver {
 
     data class ViewState(
@@ -53,33 +63,125 @@ class NewTabReturnHatchViewModel @Inject constructor(
         val shouldShow: Boolean = false,
         val isDuckChat: Boolean = false,
         val isSerp: Boolean = false,
+        val tabs: Int = 0,
+        val showTabsButton: Boolean = false,
     )
 
+    sealed class Command {
+        data object LaunchTabSwitcher : Command()
+        data class ShowTabClosedSnackbar(val tabId: String) : Command()
+    }
+
+    private val commandChannel = Channel<Command>(capacity = 1, onBufferOverflow = DROP_OLDEST)
+    val commands: Flow<Command> = commandChannel.receiveAsFlow()
+
+    private val pendingClose = MutableStateFlow(false)
+
+    // The tab the hatch offers to return to, captured once when the app returns from idle. Driving
+    // the hatch from this snapshot (instead of the live last-accessed flow) keeps the displayed tab
+    // stable: it never switches to another tab while up, and survives the close/undo toggle.
+    private val snapshotTab = MutableStateFlow<TabEntity?>(null)
+
+    init {
+        // Capture the last-accessed tab once per idle-return; reset on a fresh return so the hatch
+        // can re-appear for the next one.
+        viewModelScope.launch(dispatchers.io()) {
+            ntpAfterIdleManager.isAfterIdleReturn.collect { afterIdle ->
+                if (afterIdle) {
+                    snapshotTab.value = tabRepository.getLastAccessedTab()
+                    pendingClose.value = false
+                } else {
+                    snapshotTab.value = null
+                }
+            }
+        }
+    }
+
+    // Driven by the captured [snapshotTab] (not the live last-accessed flow) so the displayed tab is
+    // stable across the close/undo toggle. flowTabs both supplies the live tabs count and gates
+    // visibility: the hatch hides as soon as the snapshot tab leaves the repository (burned, closed,
+    // or purged), so every live ViewModel instance stays in sync without per-instance burn tracking.
     val viewState = combine(
-        tabRepository.flowLastAccessedTab,
-        ntpAfterIdleManager.isAfterIdleReturn,
-    ) { lastTab, afterIdle ->
-        if (lastTab != null && afterIdle) {
-            val url = lastTab.url.orEmpty()
+        snapshotTab,
+        pendingClose,
+        tabRepository.flowTabs,
+        duckChat.observeNativeInputFieldUserSettingEnabled(),
+    ) { tab, closed, tabs, nativeInputEnabled ->
+        if (tab != null && !closed && tabs.any { it.tabId == tab.tabId }) {
+            val url = tab.url.orEmpty()
             ViewState(
-                tabTitle = lastTab.title.orEmpty(),
+                tabTitle = tab.title.orEmpty(),
                 url = url,
-                tabId = lastTab.tabId,
-                currentTabId = lastTab.tabId,
+                tabId = tab.tabId,
+                currentTabId = tab.tabId,
                 shouldShow = true,
                 isDuckChat = url.isNotEmpty() && duckChat.isDuckChatUrl(Uri.parse(url)),
                 isSerp = url.isNotEmpty() && duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url),
+                tabs = tabs.size,
+                showTabsButton = nativeInputEnabled,
             )
         } else {
-            ViewState(shouldShow = false)
+            ViewState(
+                shouldShow = false,
+                tabs = tabs.size,
+                showTabsButton = nativeInputEnabled,
+            )
         }
     }
         .flowOn(dispatchers.io())
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), ViewState())
 
     fun onHatchPressed() {
+        pixel.fire(NewTabReturnHatchPixelName.OPTION_SELECTED_RETURN_TAB, type = Count)
+        pixel.fire(NewTabReturnHatchPixelName.OPTION_SELECTED_RETURN_TAB_DAILY, type = Daily())
+    }
+
+    fun closeTab() {
+        pixel.fire(NewTabReturnHatchPixelName.OPTION_SELECTED_CLOSE_TAB, type = Count)
+        pixel.fire(NewTabReturnHatchPixelName.OPTION_SELECTED_CLOSE_TAB_DAILY, type = Daily())
+        val tabId = viewState.value.currentTabId
+        if (tabId.isEmpty()) return
+        // Mark the tab deletable now so it disappears from the tab list/switcher immediately
+        // (recoverable via undo); the actual delete is committed when the snackbar is dismissed.
         viewModelScope.launch(dispatchers.io()) {
-            tabRepository.select(viewState.value.currentTabId)
+            tabRepository.markDeletable(listOf(tabId))
         }
+        pendingClose.value = true
+        commandChannel.trySend(Command.ShowTabClosedSnackbar(tabId))
+    }
+
+    fun onBurnTabPressed() {
+        pixel.fire(NewTabReturnHatchPixelName.OPTION_SELECTED_BURN_TAB, type = Count)
+        pixel.fire(NewTabReturnHatchPixelName.OPTION_SELECTED_BURN_TAB_DAILY, type = Daily())
+    }
+
+    fun onUndoCloseTab(tabId: String) {
+        // Restore the tab that was marked deletable on close, and re-show the hatch with the same
+        // snapshot (no recompute, so it doesn't jump to a different tab).
+        viewModelScope.launch(dispatchers.io()) {
+            tabRepository.undoDeletable(listOf(tabId))
+        }
+        pendingClose.value = false
+    }
+
+    fun onTabClosedSnackbarDismissed(tabId: String) {
+        // The tab was already marked deletable on close; commit the deletion now.
+        viewModelScope.launch(dispatchers.io()) {
+            tabRepository.purgeDeletableTabs()
+        }
+        // pendingClose intentionally not reset: once the user commits to closing the hatch's tab,
+        // the hatch should not reappear until a fresh idle-return.
+    }
+
+    fun onTabManagerPressed() {
+        pixel.fire(NewTabReturnHatchPixelName.OPTION_SELECTED_TAB_SWITCHER, type = Count)
+        pixel.fire(NewTabReturnHatchPixelName.OPTION_SELECTED_TAB_SWITCHER_DAILY, type = Daily())
+        ntpAfterIdleManager.onTabSwitcherSelected()
+        commandChannel.trySend(Command.LaunchTabSwitcher)
+    }
+
+    fun onAfterInactivityPressed() {
+        pixel.fire(NewTabReturnHatchPixelName.OPTION_SELECTED_AFTER_INACTIVITY, type = Count)
+        pixel.fire(NewTabReturnHatchPixelName.OPTION_SELECTED_AFTER_INACTIVITY_DAILY, type = Daily())
     }
 }

@@ -35,6 +35,8 @@ sealed class PirScriptRequestData {
     data class UserProfile(
         val userProfile: ProfileQuery? = null,
         val extractedProfile: ExtractedProfileParams? = null,
+        val fetchedEmail: FetchedEmail? = null,
+        val emailData: Map<String, String>? = null,
     ) : PirScriptRequestData()
 }
 
@@ -44,4 +46,9 @@ data class ExtractedProfileParams(
     val profileUrl: String? = null,
     val email: String? = null,
     val fullName: String? = null,
+)
+
+// Wraps the generated email as { "email": "..." } so C-S-S can resolve it via data[dataSource].email.
+data class FetchedEmail(
+    val email: String,
 )

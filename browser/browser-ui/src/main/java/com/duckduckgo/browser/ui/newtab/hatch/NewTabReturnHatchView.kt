@@ -18,6 +18,7 @@ package com.duckduckgo.browser.ui.newtab.hatch
 
 import android.content.Context
 import android.util.AttributeSet
+import android.view.LayoutInflater
 import android.widget.FrameLayout
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.findViewTreeLifecycleOwner
@@ -26,15 +27,17 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.favicon.FaviconManager
+import com.duckduckgo.browser.api.ui.BrowserScreens.TabSwitcherScreenNoParams
 import com.duckduckgo.browser.ui.R
 import com.duckduckgo.browser.ui.databinding.ViewNewTabHatchBinding
+import com.duckduckgo.common.ui.menu.PopupMenu
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.ViewViewModelFactory
-import com.duckduckgo.common.utils.extractDomain
 import com.duckduckgo.di.scopes.ViewScope
+import com.duckduckgo.navigation.api.GlobalActivityStarter
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -52,6 +55,13 @@ class NewTabReturnHatchView @JvmOverloads constructor(
     interface HatchListener {
         fun onHatchPressed()
         fun onHatchRendered(visible: Boolean)
+        fun onBurnTabPressed()
+        fun onAfterInactivityPressed()
+
+        // The host shows the "tab closed" snackbar so it can parent it to the activity content
+        // (above the floating native input) and anchor it to the omnibar, matching the burn-tab
+        // snackbar. onUndo restores the tab; onCommit commits the deletion.
+        fun onTabClosed(tabId: String, onUndo: () -> Unit, onCommit: () -> Unit)
     }
 
     @Inject
@@ -59,6 +69,9 @@ class NewTabReturnHatchView @JvmOverloads constructor(
 
     @Inject
     lateinit var faviconManager: FaviconManager
+
+    @Inject
+    lateinit var globalActivityStarter: GlobalActivityStarter
 
     private val binding: ViewNewTabHatchBinding by viewBinding()
 
@@ -71,6 +84,10 @@ class NewTabReturnHatchView @JvmOverloads constructor(
         ViewModelProvider(findViewTreeViewModelStoreOwner()!!, viewModelFactory)[NewTabReturnHatchViewModel::class.java]
     }
 
+    private val popupMenu by lazy {
+        PopupMenu(LayoutInflater.from(context), R.layout.popup_hatch_menu)
+    }
+
     override fun onAttachedToWindow() {
         AndroidSupportInjection.inject(this)
         super.onAttachedToWindow()
@@ -80,6 +97,25 @@ class NewTabReturnHatchView @JvmOverloads constructor(
         conflatedJob += viewModel.viewState
             .onEach { render(it) }
             .launchIn(findViewTreeLifecycleOwner()?.lifecycleScope!!)
+
+        viewModel.commands
+            .onEach { processCommand(it) }
+            .launchIn(findViewTreeLifecycleOwner()?.lifecycleScope!!)
+
+        initPopupMenu()
+    }
+
+    private fun processCommand(command: NewTabReturnHatchViewModel.Command) {
+        when (command) {
+            NewTabReturnHatchViewModel.Command.LaunchTabSwitcher ->
+                globalActivityStarter.start(context, TabSwitcherScreenNoParams)
+            is NewTabReturnHatchViewModel.Command.ShowTabClosedSnackbar ->
+                hatchHatchListener?.onTabClosed(
+                    command.tabId,
+                    onUndo = { viewModel.onUndoCloseTab(command.tabId) },
+                    onCommit = { viewModel.onTabClosedSnackbarDismissed(command.tabId) },
+                )
+        }
     }
 
     override fun onDetachedFromWindow() {
@@ -98,19 +134,38 @@ class NewTabReturnHatchView @JvmOverloads constructor(
         if (state.shouldShow) {
             binding.returnHatchSiteTitle.text = state.titleOrPlaceholder()
             if (state.isDuckChat) {
-                binding.returnHatchSiteURL.text = context.getString(R.string.input_mode_chat_tab)
                 binding.returnHatchFavicon.setImageResource(CommonR.drawable.ic_duckai)
             } else {
-                binding.returnHatchSiteURL.text = state.url.extractDomain()
                 faviconJob += viewModel.viewModelScope.launch {
                     faviconManager.loadToViewFromLocalWithRetry(state.tabId, state.url, binding.returnHatchFavicon)
                 }
+            }
+
+            if (state.showTabsButton) {
+                binding.returnHatchTabsMenu.count = state.tabs
+                binding.returnHatchTabsMenu.show()
+            } else {
+                binding.returnHatchTabsMenu.gone()
             }
             binding.returnHatchRoot.show()
         } else {
             binding.returnHatchRoot.gone()
         }
         hatchHatchListener?.onHatchRendered(state.shouldShow)
+    }
+
+    private fun initPopupMenu() {
+        popupMenu.onMenuItemClicked(popupMenu.contentView.findViewById(R.id.hatchMenuReturnToTab)) {
+            viewModel.onHatchPressed()
+            hatchHatchListener?.onHatchPressed()
+        }
+        popupMenu.onMenuItemClicked(popupMenu.contentView.findViewById(R.id.hatchMenuCloseTab)) {
+            viewModel.closeTab()
+        }
+        popupMenu.onMenuItemClicked(popupMenu.contentView.findViewById(R.id.hatchMenuAfterInactivity)) {
+            viewModel.onAfterInactivityPressed()
+            hatchHatchListener?.onAfterInactivityPressed()
+        }
     }
 
     private fun NewTabReturnHatchViewModel.ViewState.titleOrPlaceholder(): String {
@@ -124,6 +179,16 @@ class NewTabReturnHatchView @JvmOverloads constructor(
         hatchHatchListener = hatchListener
         binding.returnHatchRoot.setOnClickListener {
             hatchHatchListener?.onHatchPressed()
+        }
+        binding.returnHatchFireButton.setOnClickListener {
+            viewModel.onBurnTabPressed()
+            hatchHatchListener?.onBurnTabPressed()
+        }
+        binding.returnHatchOptions.setOnClickListener { view ->
+            popupMenu.show(binding.root, view)
+        }
+        binding.returnHatchTabsMenu.setOnClickListener { view ->
+            viewModel.onTabManagerPressed()
         }
     }
 }

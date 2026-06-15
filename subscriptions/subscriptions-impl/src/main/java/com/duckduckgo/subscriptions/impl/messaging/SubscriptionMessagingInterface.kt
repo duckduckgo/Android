@@ -156,6 +156,8 @@ class SubscriptionMessagingInterface @Inject constructor(
             "activateSubscription",
             "featureSelected",
             "backToSettingsActivateSuccess",
+            "getUserSettings",
+            "requestNotificationsPermission",
         )
     }
 

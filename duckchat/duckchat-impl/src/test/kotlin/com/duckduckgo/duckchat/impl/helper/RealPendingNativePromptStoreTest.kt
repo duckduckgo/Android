@@ -31,31 +31,71 @@ class RealPendingNativePromptStoreTest {
 
     @Test
     fun whenPromptStoredThenConsumeReturnsPromptAndId() {
-        testee.store("hello", "model")
+        testee.store("hello", "model", null)
 
         val result = testee.consume()
 
         assertEquals("hello", result?.prompt)
         assertEquals("model", result?.modelId)
+        assertNull(result?.reasoningEffort)
     }
 
     @Test
     fun whenPromptStoredWithNullModelIdThenConsumeReturnsNullModelId() {
-        testee.store("hello", null)
+        testee.store("hello", null, null)
 
         val result = testee.consume()
 
         assertEquals("hello", result?.prompt)
         assertNull(result?.modelId)
+        assertNull(result?.reasoningEffort)
     }
 
     @Test
     fun whenConsumedThenSecondConsumeReturnsNull() {
-        testee.store("hello", "model")
+        testee.store("hello", "model", null)
 
         testee.consume()
         val result = testee.consume()
 
         assertNull(result)
+    }
+
+    @Test
+    fun whenPromptStoredWithReasoningEffortThenConsumeReturnsEffort() {
+        testee.store("hello", "model", "low")
+
+        val result = testee.consume()
+
+        assertEquals("hello", result?.prompt)
+        assertEquals("model", result?.modelId)
+        assertEquals("low", result?.reasoningEffort)
+    }
+
+    @Test
+    fun whenPromptStoredWithoutReasoningEffortThenConsumeReturnsNullEffort() {
+        testee.store("hello", "model", null)
+
+        val result = testee.consume()
+
+        assertNull(result?.reasoningEffort)
+    }
+
+    @Test
+    fun whenPromptStoredWithSelectedToolThenConsumeReturnsTool() {
+        testee.store("hello", "model", null, selectedTool = "WebSearch")
+
+        val result = testee.consume()
+
+        assertEquals("WebSearch", result?.selectedTool)
+    }
+
+    @Test
+    fun whenPromptStoredWithoutSelectedToolThenConsumeReturnsNullTool() {
+        testee.store("hello", "model", null)
+
+        val result = testee.consume()
+
+        assertNull(result?.selectedTool)
     }
 }

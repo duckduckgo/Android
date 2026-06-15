@@ -1,0 +1,23 @@
+{
+    "m_netp_ev_vpn_access_revoked_dialog_shown": {
+        "description": "Fired when the VPN access revoked dialog is shown",
+        "owners": ["nalcalag"],
+        "triggers": ["other"],
+        "suffixes": ["daily_count_short"],
+        "parameters": ["appVersion"]
+    },
+    "m_netp_ev_vpn_access_revoked_dialog_subscribe_clicked": {
+        "description": "Fired when the user taps the 'Subscribe' button on the VPN access revoked dialog",
+        "owners": ["nalcalag"],
+        "triggers": ["other"],
+        "suffixes": ["daily_count_short"],
+        "parameters": ["appVersion"]
+    },
+    "m_netp_ev_vpn_access_revoked_dialog_dismiss_clicked": {
+        "description": "Fired when the user taps the 'Dismiss' button on the VPN access revoked dialog",
+        "owners": ["nalcalag"],
+        "triggers": ["other"],
+        "suffixes": ["daily_count_short"],
+        "parameters": ["appVersion"]
+    }
+}

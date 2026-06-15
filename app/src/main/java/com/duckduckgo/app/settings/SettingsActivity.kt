@@ -36,6 +36,7 @@ import com.duckduckgo.app.appearance.AppearanceScreen
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ActivitySettingsNewBinding
+import com.duckduckgo.app.browser.mode.InAppNavigation
 import com.duckduckgo.app.desktopbrowser.GetDesktopBrowserActivityParams
 import com.duckduckgo.app.email.ui.EmailProtectionUnsupportedScreenNoParams
 import com.duckduckgo.app.firebutton.DataClearingSettingsScreenNoParams
@@ -98,7 +99,7 @@ import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
 import com.duckduckgo.remote.messaging.impl.modal.ModalSurfaceActivityFromMessageId
 import com.duckduckgo.settings.api.CompleteSetupSettingsPlugin
-import com.duckduckgo.settings.api.DuckPlayerSettingsPlugin
+import com.duckduckgo.settings.api.OtherSettingsPlugin
 import com.duckduckgo.settings.api.ProSettingsPlugin
 import com.duckduckgo.settings.api.ThreatProtectionSettingsPlugin
 import com.duckduckgo.subscriptions.api.SubscriptionFeedbackScreens.GeneralSubscriptionFeedbackScreenNoParams
@@ -142,9 +143,9 @@ class SettingsActivity : DuckDuckGoActivity() {
     }
 
     @Inject
-    lateinit var _duckPlayerSettingsPlugin: PluginPoint<DuckPlayerSettingsPlugin>
-    private val duckPlayerSettingsPlugin by lazy {
-        _duckPlayerSettingsPlugin.getPlugins()
+    lateinit var _otherSettingsPlugin: PluginPoint<OtherSettingsPlugin>
+    private val otherSettingsPlugin by lazy {
+        _otherSettingsPlugin.getPlugins()
     }
 
     @Inject
@@ -284,12 +285,8 @@ class SettingsActivity : DuckDuckGoActivity() {
             }
         }
 
-        if (duckPlayerSettingsPlugin.isEmpty()) {
-            viewsMain.settingsSectionDuckPlayer.gone()
-        } else {
-            duckPlayerSettingsPlugin.forEach { plugin ->
-                viewsMain.settingsSectionDuckPlayer.addView(plugin.getView(this))
-            }
+        otherSettingsPlugin.forEach { plugin ->
+            viewsMain.root.addView(plugin.getView(this))
         }
 
         if (threatProtectionSettingsPlugin.isEmpty()) {
@@ -329,7 +326,6 @@ class SettingsActivity : DuckDuckGoActivity() {
                     updateSyncSetting(visible = it.showSyncSetting)
                     updateAutoconsent(it.isAutoconsentEnabled)
                     updateSubscription(it.isSubscriptionEnabled)
-                    updateDuckPlayer(it.isDuckPlayerEnabled)
                     updateThreatProtection(it.isNewThreatProtectionSettingsEnabled)
                     updateDuckChat(it.isDuckChatEnabled)
                     updateVoiceSearchVisibility(it.isVoiceSearchVisible)
@@ -353,14 +349,6 @@ class SettingsActivity : DuckDuckGoActivity() {
             viewsPro.show()
         } else {
             viewsPro.gone()
-        }
-    }
-
-    private fun updateDuckPlayer(isDuckPlayerEnabled: Boolean) {
-        if (isDuckPlayerEnabled) {
-            viewsMain.settingsSectionDuckPlayer.show()
-        } else {
-            viewsMain.settingsSectionDuckPlayer.gone()
         }
     }
 
@@ -506,7 +494,9 @@ class SettingsActivity : DuckDuckGoActivity() {
             is LaunchAccessibilitySettings -> launchScreen(AccessibilityScreens.Default)
             is LaunchAppTPTrackersScreen -> launchScreen(AppTrackerActivityWithEmptyParams)
             is LaunchAppTPOnboarding -> launchScreen(AppTrackerOnboardingActivityWithEmptyParamsParams)
-            is LaunchEmailProtection -> launchActivityAndFinish(BrowserActivity.intent(this, it.url, interstitialScreen = true))
+            is LaunchEmailProtection -> launchActivityAndFinish(
+                BrowserActivity.intent(this, launchSource = InAppNavigation, queryExtra = it.url, interstitialScreen = true),
+            )
             is LaunchEmailProtectionNotSupported -> launchScreen(EmailProtectionUnsupportedScreenNoParams)
             is LaunchAddHomeScreenWidget -> launchAddHomeScreenWidget()
             is LaunchSyncSettings -> launchScreen(SyncActivityWithEmptyParams)
@@ -522,7 +512,9 @@ class SettingsActivity : DuckDuckGoActivity() {
             is LaunchGeneralSettingsScreen -> launchScreen(GeneralSettingsScreenNoParams)
             is LaunchFeedback -> launchFeedback()
             is LaunchSubscriptionUnifiedFeedback -> launchScreen(GeneralSubscriptionFeedbackScreenNoParams)
-            is LaunchOtherPlatforms -> launchActivityAndFinish(BrowserActivity.intent(context = this, queryExtra = OTHER_PLATFORMS_URL))
+            is LaunchOtherPlatforms -> launchActivityAndFinish(
+                BrowserActivity.intent(context = this, launchSource = InAppNavigation, queryExtra = OTHER_PLATFORMS_URL),
+            )
             is Command.LaunchGetDesktopBrowser -> launchScreen(GetDesktopBrowserActivityParams(source = GetDesktopBrowserActivityParams.Source.OTHER))
             is Command.LaunchWhatsNew -> launchScreen(ModalSurfaceActivityFromMessageId(it.messageId, it.messageType))
         }

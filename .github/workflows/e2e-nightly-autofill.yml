@@ -44,6 +44,7 @@ jobs:
           maestro_test_name: autofill_critical_path_${{ github.sha }}
           maestro_timeout: ${{ vars.ROBIN_TIMEOUT_MINUTES }}
           maestro_app_file: ${{ steps.assemble.outputs.play_apk_path }}
+          maestro_api_level: '34'
           maestro_include_tags: autofillNoAuthTests
           asana_pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
           asana_project_id: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
@@ -60,6 +61,7 @@ jobs:
           maestro_test_name: autofill_secondary_functionality_${{ github.sha }}
           maestro_timeout: ${{ vars.ROBIN_TIMEOUT_MINUTES }}
           maestro_app_file: ${{ steps.assemble.outputs.play_apk_path }}
+          maestro_api_level: '34'
           maestro_include_tags: autofillBackfillingUsername,autofillPasswordGeneration
           asana_pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
           asana_project_id: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}

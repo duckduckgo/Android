@@ -1,0 +1,460 @@
+{
+  "name": "Public Record Reports",
+  "url": "publicrecordreports.com",
+  "version": "0.2.0",
+  "parent": "spyfly.com",
+  "addedDatetime": 1778777242134,
+  "optOutUrl": "https://www.publicrecordreports.com/help-center/privacy-requests",
+  "steps": [
+    {
+      "stepType": "scan",
+      "scanType": "templatedUrl",
+      "actions": [
+        {
+          "actionType": "navigate",
+          "url": "https://www.publicrecordreports.com/help-center/privacy-requests",
+          "id": "ffe7e4bc-b43a-44cb-a532-126a00a326ec"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": ".main"
+            }
+          ],
+          "id": "ee227ef6-7fa6-412d-9fc2-1ac80f8121ff"
+        },
+        {
+          "actionType": "fillForm",
+          "selector": ".form-contact-help form",
+          "dataSource": "userProfile",
+          "elements": [
+            {
+              "type": "firstName",
+              "selector": "#firstName"
+            },
+            {
+              "type": "lastName",
+              "selector": ".//input[@placeholder='Last Name']"
+            },
+            {
+              "type": "city",
+              "selector": "#city"
+            },
+            {
+              "type": "fullState",
+              "selector": "#states"
+            },
+            {
+              "type": "$generated_zip_code$",
+              "selector": "#zip"
+            },
+            {
+              "type": "age",
+              "selector": "#age"
+            }
+          ],
+          "id": "8f1c1b5b-fc29-4606-9b6c-462c5ad8e962"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": ".//input[@name='cf-turnstile-response' and @value and @value != '']",
+              "parent": ".form__captcha"
+            }
+          ],
+          "id": "3a1f60ab-5ca3-4743-9bd0-ce948d3b9166"
+        },
+        {
+          "actionType": "click",
+          "elements": [
+            {
+              "type": "button",
+              "selector": ".//button[@type='submit']"
+            }
+          ],
+          "id": "d8da8542-9913-4a27-a291-ae91a01b47ac"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "#email-address"
+            }
+          ],
+          "id": "89f2b451-846d-46fe-8d5a-6e85f796f859"
+        },
+        {
+          "actionType": "generateEmail",
+          "id": "6ced2fc6-0c4c-4187-8a8f-47d5283c84ea"
+        },
+        {
+          "actionType": "fillForm",
+          "selector": ".form-contact-help form",
+          "dataSource": "fetchedEmail",
+          "elements": [
+            {
+              "type": "email",
+              "selector": "#email-address"
+            }
+          ],
+          "id": "3711bff9-3de8-401b-99cf-dc006ede18f9"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": ".//input[@name='cf-turnstile-response' and @value and @value != '']",
+              "parent": ".form__captcha"
+            }
+          ],
+          "id": "254a2f5b-dc24-4efe-88c6-11666a8dfadc"
+        },
+        {
+          "actionType": "click",
+          "elements": [
+            {
+              "type": "button",
+              "selector": "#continue-button"
+            }
+          ],
+          "id": "5fcf3918-c648-48f6-a897-1692234a5695"
+        },
+        {
+          "actionType": "getEmailData",
+          "pollingTime": 3,
+          "extract": ["verificationCode"],
+          "id": "854a3430-be71-47a7-bc67-90406d7e90cd"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "#unique-code"
+            }
+          ],
+          "id": "3047d132-bae5-4c43-81e7-889a2ead2486"
+        },
+        {
+          "actionType": "fillForm",
+          "selector": ".form-contact-help form",
+          "dataSource": "emailData",
+          "elements": [
+            {
+              "type": "verificationCode",
+              "selector": "#unique-code"
+            }
+          ],
+          "id": "4fc6d8f6-0b8e-4e54-b4ee-27f35d969cd0"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": ".//input[@name='cf-turnstile-response' and @value and @value != '']",
+              "parent": ".form__captcha"
+            }
+          ],
+          "id": "4368046d-2d4f-43b0-8439-a09543ab5413"
+        },
+        {
+          "actionType": "click",
+          "elements": [
+            {
+              "type": "button",
+              "selector": "#continue-button"
+            }
+          ],
+          "id": "ae49542f-89bb-4e5c-9fce-95c7d41d7356"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "text",
+              "selector": ".section__head h1",
+              "expect": "Select Data for Removal"
+            }
+          ],
+          "id": "779ec355-552e-4da1-b7fb-b746bbd3d395"
+        },
+        {
+          "actionType": "extract",
+          "selector": ".result-item",
+          "noResultsSelector": "//h1[contains(., 'Sorry, we were unable to find any results')]",
+          "profile": {
+            "name": {
+              "selector": "h2"
+            },
+            "age": {
+              "selector": ".//p[contains(., 'Age')]",
+              "afterText": "Age: "
+            },
+            "addressCityStateList": {
+              "selector": ".//p[contains(., 'Location')]//following-sibling::ul[contains(@class, 'result-list')]//li",
+              "findElements": true
+            },
+            "relativesList": {
+              "selector": ".//p[contains(., 'Relatives')]//following-sibling::ul[contains(@class, 'result-list')]//li",
+              "findElements": true
+            },
+            "profileUrl": {
+              "identifierType": "hash"
+            }
+          },
+          "id": "d82b5b92-310c-42be-b9f1-ae01c2a0e7c6"
+        }
+      ]
+    },
+    {
+      "stepType": "optOut",
+      "optOutType": "formOptOut",
+      "actions": [
+        {
+          "actionType": "navigate",
+          "url": "https://www.publicrecordreports.com/help-center/privacy-requests",
+          "id": "4a168bc3-8530-46f4-949d-7bddedb1b43d"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": ".main"
+            }
+          ],
+          "id": "48c0af01-182c-49a9-a4f1-2e9caa04bfb7"
+        },
+        {
+          "actionType": "fillForm",
+          "selector": ".form-contact-help form",
+          "dataSource": "userProfile",
+          "elements": [
+            {
+              "type": "firstName",
+              "selector": "#firstName"
+            },
+            {
+              "type": "lastName",
+              "selector": ".//input[@placeholder='Last Name']"
+            },
+            {
+              "type": "city",
+              "selector": "#city"
+            },
+            {
+              "type": "fullState",
+              "selector": "#states"
+            },
+            {
+              "type": "$generated_zip_code$",
+              "selector": "#zip"
+            },
+            {
+              "type": "age",
+              "selector": "#age"
+            }
+          ],
+          "id": "0edc6f09-eed8-4334-9ed0-cd8848b925c3"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": ".//input[@name='cf-turnstile-response' and @value and @value != '']",
+              "parent": ".form__captcha"
+            }
+          ],
+          "id": "9da356d2-e068-4b7c-aa66-48de9a707276"
+        },
+        {
+          "actionType": "click",
+          "elements": [
+            {
+              "type": "button",
+              "selector": ".//button[@type='submit']"
+            }
+          ],
+          "id": "a4260025-dc5b-4728-a889-e41e902899f0"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "#email-address"
+            }
+          ],
+          "id": "8442cd28-1a3a-4334-add7-8149b6fdc0c9"
+        },
+        {
+          "actionType": "generateEmail",
+          "id": "97db03ed-205b-4950-b72f-19cea4652ece"
+        },
+        {
+          "actionType": "fillForm",
+          "selector": ".form-contact-help form",
+          "dataSource": "fetchedEmail",
+          "elements": [
+            {
+              "type": "email",
+              "selector": "#email-address"
+            }
+          ],
+          "id": "c81d58ad-7b62-451b-ab0c-b8965df42450"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": ".//input[@name='cf-turnstile-response' and @value and @value != '']",
+              "parent": ".form__captcha"
+            }
+          ],
+          "id": "f60bfbfd-becf-4bc9-9223-3be2b4f55c52"
+        },
+        {
+          "actionType": "click",
+          "elements": [
+            {
+              "type": "button",
+              "selector": "#continue-button"
+            }
+          ],
+          "id": "77325f49-c7d3-4cbd-b2d5-0a82978391c7"
+        },
+        {
+          "actionType": "getEmailData",
+          "pollingTime": 3,
+          "extract": ["verificationCode"],
+          "id": "07950f37-d242-424c-874a-9beea55c4a94"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "#unique-code"
+            }
+          ],
+          "id": "7506729a-2dd5-4b71-8c93-9d0c5a179609"
+        },
+        {
+          "actionType": "fillForm",
+          "selector": ".form-contact-help form",
+          "dataSource": "emailData",
+          "elements": [
+            {
+              "type": "verificationCode",
+              "selector": "#unique-code"
+            }
+          ],
+          "id": "a334df44-13f7-4fec-85ef-d75cc6962eba"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": ".//input[@name='cf-turnstile-response' and @value and @value != '']",
+              "parent": ".form__captcha"
+            }
+          ],
+          "id": "f046b61b-c5ad-4d09-a64b-3618f34d9897"
+        },
+        {
+          "actionType": "click",
+          "elements": [
+            {
+              "type": "button",
+              "selector": "#continue-button"
+            }
+          ],
+          "id": "bff6572f-7051-4122-a208-d5da8327cfe2"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "text",
+              "selector": ".section__head h1",
+              "expect": "Select Data for Removal"
+            }
+          ],
+          "id": "33a8ae87-e54f-4ac5-8ae8-9cd2020bf249"
+        },
+        {
+          "actionType": "click",
+          "elements": [
+            {
+              "type": "button",
+              "selector": ".btn",
+              "parent": {
+                "profileMatch": {
+                  "selector": ".result-item",
+                  "profile": {
+                    "name": {
+                      "selector": "h2"
+                    },
+                    "age": {
+                      "selector": ".//p[contains(., 'Age')]",
+                      "afterText": "Age: "
+                    },
+                    "addressCityStateList": {
+                      "selector": ".//p[contains(., 'Location')]//following-sibling::ul[contains(@class, 'result-list')]//li",
+                      "findElements": true
+                    }
+                  }
+                }
+              }
+            }
+          ],
+          "id": "c4e9cab3-95fb-4895-a2a5-499a04a8e3c6"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "text",
+              "selector": ".section__head h1",
+              "expect": "Request Submitted"
+            }
+          ],
+          "id": "96d66bd9-970e-4b5a-aa9e-6c1f602d489a"
+        },
+        {
+          "actionType": "emailConfirmation",
+          "pollingTime": 30,
+          "id": "5f4cfdfa-33c5-4a30-bd67-ae2244171272"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "text",
+              "selector": ".section__head h1",
+              "expect": "Verification Complete"
+            }
+          ],
+          "id": "38be83f0-c7e6-416a-87f9-5af3cee7e2f7"
+        }
+      ]
+    }
+  ],
+  "schedulingConfig": {
+    "retryError": 48,
+    "confirmOptOutScan": 72,
+    "maintenanceScan": 120,
+    "maxAttempts": -1
+  },
+  "removedAt": null
+}

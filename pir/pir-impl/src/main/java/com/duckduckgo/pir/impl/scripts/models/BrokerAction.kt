@@ -115,6 +115,16 @@ sealed class BrokerAction(
         val expectations: List<ExpectationSelector>,
         val actions: List<BrokerAction>,
     ) : BrokerAction(id)
+
+    data class GenerateEmail(
+        override val id: String,
+    ) : BrokerAction(id)
+
+    data class GetEmailData(
+        override val id: String,
+        val pollingTime: String,
+        val extract: List<String>,
+    ) : BrokerAction(id)
 }
 
 data class ExtractProfileSelectors(
@@ -169,6 +179,14 @@ enum class DataSource {
     // Uses the profile scraped via the extract action
     @Json(name = "extractedProfile")
     EXTRACTED_PROFILE,
+
+    // Uses the email address generated via the generateEmail action
+    @Json(name = "fetchedEmail")
+    FETCHED_EMAIL,
+
+    // Uses the data extracted from an email (e.g. verification code) via the getEmailData action
+    @Json(name = "emailData")
+    EMAIL_DATA,
 }
 
 fun BrokerAction.asActionType(): String {
@@ -182,5 +200,7 @@ fun BrokerAction.asActionType(): String {
         is SolveCaptcha -> "solveCaptcha"
         is EmailConfirmation -> "emailConfirmation"
         is Condition -> "condition"
+        is BrokerAction.GenerateEmail -> "generateEmail"
+        is BrokerAction.GetEmailData -> "getEmailData"
     }
 }

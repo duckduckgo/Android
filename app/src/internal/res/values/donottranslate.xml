@@ -51,6 +51,10 @@
     <string name="devSettingsTabsScreenTabsToAdd">Tabs to add</string>
     <string name="devSettingsTabsScreenAddTabsButtonText">Add Tabs</string>
     <string name="devSettingsTabsScreenClearTabsButtonText">Clear Tabs</string>
+    <string name="devSettingsFireTabsScreenHeader" instruction="Not translated">Current fire tab count: %1$d</string>
+    <string name="devSettingsFireTabsScreenTabsToAdd">Fire tabs to add</string>
+    <string name="devSettingsFireTabsScreenAddTabsButtonText">Add Fire Tabs</string>
+    <string name="devSettingsFireTabsScreenClearTabsButtonText">Clear Fire Tabs</string>
     <string name="devSettingsTabsBookmarksScreenHeader" instruction="Not translated">Current bookmarks count: %1$d</string>
     <string name="devSettingsTabsFavoritesScreenHeader" instruction="Not translated">Current favorites count: %1$d</string>
     <string name="devSettingsTabsScreenBookmarksToAdd">Bookmarks to add</string>

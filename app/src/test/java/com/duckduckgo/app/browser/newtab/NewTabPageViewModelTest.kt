@@ -22,7 +22,9 @@ import com.duckduckgo.app.browser.newtab.NewTabPageViewModel.Command
 import com.duckduckgo.app.browser.remotemessage.CommandActionMapper
 import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.CtaId.DAX_END
+import com.duckduckgo.app.cta.ui.CtaViewModel
 import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.ExtendedOnboardingFeatureToggles
+import com.duckduckgo.app.onboardingbranddesignupdate.OnboardingBrandDesignUpdateToggles
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.test.CoroutineTestRule
@@ -74,6 +76,8 @@ class NewTabPageViewModelTest {
     private val mockLowPriorityMessagingModel: LowPriorityMessagingModel = mock()
     private val mockAppTrackingProtection: AppTrackingProtection = mock()
     private val pixel: Pixel = mock()
+    private val mockOnboardingBrandDesignUpdateToggles: OnboardingBrandDesignUpdateToggles = mock()
+    private val mockCtaViewModel: CtaViewModel = mock()
 
     private lateinit var testee: NewTabPageViewModel
 
@@ -81,6 +85,7 @@ class NewTabPageViewModelTest {
     fun setUp() = runTest {
         val mockDisabledToggle: Toggle = mock { on { it.isEnabled() } doReturn false }
         whenever(mockExtendedOnboardingFeatureToggles.noBrowserCtas()).thenReturn(mockDisabledToggle)
+        whenever(mockOnboardingBrandDesignUpdateToggles.brandDesignUpdate()).thenReturn(mockDisabledToggle)
         whenever(mockSavedSitesRepository.getFavorites()).thenReturn(flowOf(emptyList()))
         whenever(mockRemoteMessageModel.observeActiveMessages()).thenReturn(flowOf(null))
         whenever(mockAppTrackingProtection.isEnabled()).thenReturn(false)
@@ -103,6 +108,8 @@ class NewTabPageViewModelTest {
             lowPriorityMessagingModel = mockLowPriorityMessagingModel,
             appTrackingProtection = mockAppTrackingProtection,
             pixel = pixel,
+            onboardingBrandDesignUpdateToggles = mockOnboardingBrandDesignUpdateToggles,
+            ctaViewModel = mockCtaViewModel,
         )
     }
 
@@ -157,6 +164,43 @@ class NewTabPageViewModelTest {
                 assertTrue(it.newMessage)
                 assertTrue(it.onboardingComplete)
                 assertNull(it.messageImageFilePath)
+            }
+        }
+    }
+
+    @Test
+    fun whenBrandDesignUpdateEnabledAndBubbleDaxDialogsNotCompleteThenOnboardingNotComplete() = runTest {
+        val mockEnabledToggle: Toggle = mock { on { it.isEnabled() } doReturn true }
+        whenever(mockOnboardingBrandDesignUpdateToggles.brandDesignUpdate()).thenReturn(mockEnabledToggle)
+        whenever(mockCtaViewModel.areBubbleDaxDialogsCompleted()).thenReturn(false)
+        val remoteMessage = RemoteMessage("id1", Content.Small("", ""), emptyList(), emptyList(), listOf(Surface.NEW_TAB_PAGE))
+        whenever(mockRemoteMessageModel.observeActiveMessages()).thenReturn(flowOf(remoteMessage))
+        whenever(mockDismissedCtaDao.exists(DAX_END)).thenReturn(true)
+
+        testee = createTestee()
+        testee.onStart(mockLifecycleOwner)
+
+        testee.viewState.test {
+            expectMostRecentItem().also {
+                assertFalse(it.onboardingComplete)
+            }
+        }
+    }
+
+    @Test
+    fun whenBrandDesignUpdateEnabledAndBubbleDaxDialogsCompleteThenOnboardingComplete() = runTest {
+        val mockEnabledToggle: Toggle = mock { on { it.isEnabled() } doReturn true }
+        whenever(mockOnboardingBrandDesignUpdateToggles.brandDesignUpdate()).thenReturn(mockEnabledToggle)
+        whenever(mockCtaViewModel.areBubbleDaxDialogsCompleted()).thenReturn(true)
+        val remoteMessage = RemoteMessage("id1", Content.Small("", ""), emptyList(), emptyList(), listOf(Surface.NEW_TAB_PAGE))
+        whenever(mockRemoteMessageModel.observeActiveMessages()).thenReturn(flowOf(remoteMessage))
+
+        testee = createTestee()
+        testee.onStart(mockLifecycleOwner)
+
+        testee.viewState.test {
+            expectMostRecentItem().also {
+                assertTrue(it.onboardingComplete)
             }
         }
     }

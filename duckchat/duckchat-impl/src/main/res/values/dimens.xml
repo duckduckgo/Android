@@ -19,6 +19,7 @@
     <dimen name="inputScreenOmnibarCardExtendedMarginHorizontal">@dimen/omnibarCardMarginHorizontal</dimen>
     <dimen name="inputScreenOmnibarCardMarginHorizontal">4dp</dimen>
     <dimen name="inputScreenMarginHorizontal">0dp</dimen>
+    <dimen name="nativeInputModeWidgetMarginHorizontal">4dp</dimen>
     <dimen name="inputScreenAutocompleteListBottomSpace">64dp</dimen>
     <dimen name="inputScreenContentSeparatorHeight">0.5dp</dimen>
     <dimen name="contextualBottomSheetTopOffset">80dp</dimen>
@@ -28,9 +29,18 @@
     <dimen name="inputScreenHatchTopMarginWithTopBar">136dp</dimen>
 
     <!-- Model Picker -->
-    <dimen name="modelPickerChipHeight">32dp</dimen>
-    <dimen name="modelPickerChipCornerRadius">16dp</dimen>
-    <dimen name="modelPickerChipStrokeWidth">1dp</dimen>
+    <dimen name="modelPickerChipHeight">36dp</dimen>
     <dimen name="modelPickerChipTextSize">13sp</dimen>
     <dimen name="modelPickerMenuElevation">6dp</dimen>
+
+    <!-- Shared width for the native input widget popup menus (options, model picker, attachment) -->
+    <dimen name="nativeInputMenuWidth">260dp</dimen>
+
+    <!-- Reasoning Mode Picker -->
+    <dimen name="reasoningModePickerMenuWidth">220dp</dimen>
+
+    <!-- Chip-->
+    <dimen name="chipCornerRadius">16dp</dimen>
+    <dimen name="chipStrokeWidth">1dp</dimen>
+    <dimen name="chipImageCornerRadius">6dp</dimen>
 </resources>

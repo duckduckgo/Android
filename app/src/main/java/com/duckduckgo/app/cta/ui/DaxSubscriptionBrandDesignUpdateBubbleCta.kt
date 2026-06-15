@@ -23,21 +23,29 @@ import android.widget.TextView
 import androidx.core.view.isVisible
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.cta.model.CtaId
+import com.duckduckgo.app.cta.ui.DaxBubbleCta.WavingDaxSpec
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.common.utils.device.DeviceInfo
 import com.google.android.material.button.MaterialButton
 
 data class DaxSubscriptionBrandDesignUpdateBubbleCta(
     override val onboardingStore: OnboardingStore,
     override val appInstallStore: AppInstallStore,
     override val isLightTheme: Boolean,
+    override val deviceInfo: DeviceInfo,
     val isFreeTrialCopy: Boolean,
+    override val onboardingImprovementsEnabled: Boolean,
 ) : DaxBubbleCta.BrandDesignUpdateBubbleCta(
     ctaId = CtaId.DAX_INTRO_PRIVACY_PRO,
     title = R.string.onboardingPrivacyProDaxDialogTitle,
-    description = R.string.onboardingPrivacyProDaxDialogDescription,
+    description = if (onboardingStore.isCustomAiOnboardingFlow()) {
+        R.string.onboardingPrivacyProCustomAiFlowDaxDialogDescription
+    } else {
+        R.string.onboardingPrivacyProDaxDialogDescription
+    },
     backgroundRes = R.drawable.bg_onboarding_subscription,
     shownPixel = AppPixelName.ONBOARDING_DAX_CTA_SHOWN,
     okPixel = AppPixelName.ONBOARDING_DAX_CTA_OK_BUTTON,
@@ -45,8 +53,21 @@ data class DaxSubscriptionBrandDesignUpdateBubbleCta(
     onboardingStore = onboardingStore,
     appInstallStore = appInstallStore,
     isLightTheme = isLightTheme,
-) {
+    deviceInfo = deviceInfo,
+    onboardingImprovementsEnabled = onboardingImprovementsEnabled,
+),
+    DaxBubbleCta.ShowsWavingDax {
     override val activeIncludeId: Int = R.id.primaryCta
+    override val showArrow: Boolean = true
+    override val restartWavingDax: Boolean = true
+
+    override val wavingDaxSpec = WavingDaxSpec(
+        rotationDegrees = 22.62f,
+        translationXDp = -114f,
+        translationYDp = -288f,
+        heightDp = 267f,
+        anchorToCardOnTablet = false,
+    )
 
     override fun configureContentViews(view: View) {
         view.findViewById<ImageView>(R.id.brandDesignHeaderImage)?.isVisible = true

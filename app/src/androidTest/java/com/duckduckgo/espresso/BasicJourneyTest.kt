@@ -18,7 +18,6 @@ package com.duckduckgo.espresso
 
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
-import androidx.test.espresso.matcher.RootMatchers.isDialog
 import androidx.test.espresso.matcher.ViewMatchers.isClickable
 import androidx.test.espresso.matcher.ViewMatchers.isRoot
 import androidx.test.espresso.matcher.ViewMatchers.withId
@@ -41,8 +40,7 @@ class BasicJourneyTest {
 
     @Test @UserJourney
     fun browser_openPopUp() {
-        // dismiss any first-run dialogs (e.g., widget promo)
-        dismissBlockingDialogs()
+        dismissWidgetPromoIfPresent()
 
         // since we use a fake toolbar, we want to wait until the real one is visible
         onView(isRoot()).perform(waitForView(withId(R.id.browserMenu)))
@@ -52,14 +50,5 @@ class BasicJourneyTest {
 
         // check that the forward button is visible
         clickMenuItem(withId(BrowserUiR.id.forwardMenuItem))
-    }
-
-    private fun dismissBlockingDialogs() {
-        // dismiss the home screen widget promo if present
-        runCatching {
-            onView(isRoot()).inRoot(isDialog())
-                .perform(waitForView(withId(R.id.homeScreenWidgetBottomSheetDialogGhostButton), timeout = 3000))
-            onView(withId(R.id.homeScreenWidgetBottomSheetDialogGhostButton)).perform(click())
-        }
     }
 }

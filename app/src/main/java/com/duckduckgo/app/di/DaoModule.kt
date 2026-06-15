@@ -21,6 +21,7 @@ import com.duckduckgo.app.bookmarks.db.BookmarksDao
 import com.duckduckgo.app.bookmarks.db.FavoritesDao
 import com.duckduckgo.app.browser.cookies.db.AuthCookiesAllowedDomainsDao
 import com.duckduckgo.app.cta.db.DismissedCtaDao
+import com.duckduckgo.app.fire.db.FireModeDatabase
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteDao
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.global.events.db.UserEventsDao
@@ -41,6 +42,8 @@ import com.duckduckgo.app.trackerdetection.db.TdsTrackerDao
 import com.duckduckgo.app.trackerdetection.db.WebTrackersBlockedDao
 import com.duckduckgo.app.usage.app.AppDaysUsedDao
 import com.duckduckgo.app.usage.search.SearchCountDao
+import com.duckduckgo.browsermode.api.FireMode
+import com.duckduckgo.browsermode.api.RegularMode
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.savedsites.store.SavedSitesEntitiesDao
 import com.duckduckgo.savedsites.store.SavedSitesRelationsDao
@@ -80,7 +83,12 @@ object DaoModule {
     fun providesBookmarkFoldersDao(database: AppDatabase): BookmarkFoldersDao = database.bookmarkFoldersDao()
 
     @Provides
-    fun providesTabsDao(database: AppDatabase): TabsDao = database.tabsDao()
+    @RegularMode
+    fun providesRegularTabsDao(database: AppDatabase): TabsDao = database.tabsDao()
+
+    @Provides
+    @FireMode
+    fun providesFireTabsDao(database: FireModeDatabase): TabsDao = database.tabsDao()
 
     @Provides
     fun providesTabPageContextDao(database: AppDatabase): TabPageContextDao = database.tabPageContextDao()

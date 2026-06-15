@@ -57,6 +57,28 @@ class SubscriptionPurchaseWideEventTest {
     }
 
     @Test
+    @SuppressLint("DenyListedApi")
+    fun `onPurchaseFlowStarted includes use_query_purchases true when feature flag enabled`() =
+        runTest {
+            subscriptionsFeature.useQueryPurchases().setRawStoredState(Toggle.State(true))
+            whenever(wideEventClient.flowStart(any(), any(), any(), any()))
+                .thenReturn(Result.success(321L))
+
+            subscriptionPurchaseWideEvent.onPurchaseFlowStarted("sub_id", true, "app_settings")
+
+            verify(wideEventClient).flowStart(
+                name = "subscription-purchase",
+                flowEntryPoint = "app_settings",
+                metadata = mapOf(
+                    "subscription_identifier" to "sub_id",
+                    "free_trial_eligible" to "true",
+                    "use_query_purchases" to "true",
+                ),
+                cleanupPolicy = CleanupPolicy.OnProcessStart(ignoreIfIntervalTimeoutPresent = true),
+            )
+        }
+
+    @Test
     fun `onPurchaseFlowStarted starts a new flow`() =
         runTest {
             whenever(wideEventClient.flowStart(any(), any(), any(), any()))
@@ -70,6 +92,7 @@ class SubscriptionPurchaseWideEventTest {
                 metadata = mapOf(
                     "subscription_identifier" to "sub_id",
                     "free_trial_eligible" to "true",
+                    "use_query_purchases" to "false",
                 ),
                 cleanupPolicy = CleanupPolicy.OnProcessStart(ignoreIfIntervalTimeoutPresent = true),
             )
@@ -175,6 +198,216 @@ class SubscriptionPurchaseWideEventTest {
                 wideEventId = 111L,
                 status = FlowStatus.Failure("init-error"),
                 metadata = emptyMap(),
+            )
+        }
+
+    @Test
+    fun `onBillingFlowInitFailure without failureContext sends empty-metadata flowStep`() =
+        runTest {
+            whenever(wideEventClient.flowStart(any(), any(), any(), any()))
+                .thenReturn(Result.success(123L))
+            subscriptionPurchaseWideEvent.onPurchaseFlowStarted("sub_id", true, "app_settings")
+
+            subscriptionPurchaseWideEvent.onBillingFlowInitFailure(
+                error = "Billing error: SERVICE_UNAVAILABLE",
+                failureContext = null,
+            )
+
+            verify(wideEventClient).flowStep(
+                wideEventId = 123L,
+                stepName = "billing_flow_init",
+                success = false,
+                metadata = emptyMap(),
+            )
+            verify(wideEventClient).flowFinish(
+                wideEventId = 123L,
+                status = FlowStatus.Failure(reason = "Billing error: SERVICE_UNAVAILABLE"),
+                metadata = emptyMap(),
+            )
+        }
+
+    @Test
+    fun `onBillingFlowInitFailure with failureContext and empty loadedProductIds emits no_products_loaded reason`() =
+        runTest {
+            whenever(wideEventClient.flowStart(any(), any(), any(), any()))
+                .thenReturn(Result.success(123L))
+            subscriptionPurchaseWideEvent.onPurchaseFlowStarted("sub_id", true, "app_settings")
+
+            subscriptionPurchaseWideEvent.onBillingFlowInitFailure(
+                error = "Missing product details",
+                failureContext = BillingFlowInitFailureContext(
+                    reason = BillingFlowInitFailureContext.Reason.NO_PRODUCTS_LOADED,
+                    requestedProductId = "ddg_privacy_pro",
+                    requestedPlanId = "ddg-privacy-pro-monthly-renews-us",
+                    requestedOfferId = null,
+                    loadedProductIds = emptyList(),
+                    billingClientReady = false,
+                    lastLoadProductsOutcome = LastLoadProductsOutcome.NeverAttempted,
+                ),
+            )
+
+            verify(wideEventClient).flowStep(
+                wideEventId = 123L,
+                stepName = "billing_flow_init",
+                success = false,
+                metadata = mapOf(
+                    "missing_product_failure_reason" to "no_products_loaded",
+                    "requested_product_id" to "ddg_privacy_pro",
+                    "requested_plan_id" to "ddg-privacy-pro-monthly-renews-us",
+                    "requested_offer_id" to "none",
+                    "loaded_products_count" to "0",
+                    "billing_client_ready" to "false",
+                    "last_load_products_outcome" to "never_attempted",
+                ),
+            )
+            verify(wideEventClient).flowFinish(
+                wideEventId = 123L,
+                status = FlowStatus.Failure(reason = "Missing product details"),
+                metadata = emptyMap(),
+            )
+        }
+
+    @Test
+    fun `onBillingFlowInitFailure with failureContext where requestedProductId not in loadedProductIds emits product_id_not_found reason`() =
+        runTest {
+            whenever(wideEventClient.flowStart(any(), any(), any(), any()))
+                .thenReturn(Result.success(123L))
+            subscriptionPurchaseWideEvent.onPurchaseFlowStarted("sub_id", true, "app_settings")
+
+            subscriptionPurchaseWideEvent.onBillingFlowInitFailure(
+                error = "Missing product details",
+                failureContext = BillingFlowInitFailureContext(
+                    reason = BillingFlowInitFailureContext.Reason.PRODUCT_ID_NOT_FOUND,
+                    requestedProductId = "ddg_privacy_pro",
+                    requestedPlanId = "ddg-privacy-pro-monthly-renews-us",
+                    requestedOfferId = null,
+                    loadedProductIds = listOf("other_product"),
+                    billingClientReady = true,
+                    lastLoadProductsOutcome = LastLoadProductsOutcome.Success(1),
+                ),
+            )
+
+            verify(wideEventClient).flowStep(
+                wideEventId = 123L,
+                stepName = "billing_flow_init",
+                success = false,
+                metadata = mapOf(
+                    "missing_product_failure_reason" to "product_id_not_found",
+                    "requested_product_id" to "ddg_privacy_pro",
+                    "requested_plan_id" to "ddg-privacy-pro-monthly-renews-us",
+                    "requested_offer_id" to "none",
+                    "loaded_products_count" to "1",
+                    "billing_client_ready" to "true",
+                    "last_load_products_outcome" to "success_n=1",
+                ),
+            )
+        }
+
+    @Test
+    fun `onBillingFlowInitFailure with failureContext where requestedProductId is in loadedProductIds emits offer_not_found reason`() =
+        runTest {
+            whenever(wideEventClient.flowStart(any(), any(), any(), any()))
+                .thenReturn(Result.success(123L))
+            subscriptionPurchaseWideEvent.onPurchaseFlowStarted("sub_id", true, "app_settings")
+
+            subscriptionPurchaseWideEvent.onBillingFlowInitFailure(
+                error = "Missing product details",
+                failureContext = BillingFlowInitFailureContext(
+                    reason = BillingFlowInitFailureContext.Reason.OFFER_NOT_FOUND,
+                    requestedProductId = "ddg_privacy_pro",
+                    requestedPlanId = "ddg-privacy-pro-monthly-renews-us",
+                    requestedOfferId = null,
+                    loadedProductIds = listOf("ddg_privacy_pro"),
+                    billingClientReady = true,
+                    lastLoadProductsOutcome = LastLoadProductsOutcome.Success(1),
+                ),
+            )
+
+            verify(wideEventClient).flowStep(
+                wideEventId = 123L,
+                stepName = "billing_flow_init",
+                success = false,
+                metadata = mapOf(
+                    "missing_product_failure_reason" to "offer_not_found",
+                    "requested_product_id" to "ddg_privacy_pro",
+                    "requested_plan_id" to "ddg-privacy-pro-monthly-renews-us",
+                    "requested_offer_id" to "none",
+                    "loaded_products_count" to "1",
+                    "billing_client_ready" to "true",
+                    "last_load_products_outcome" to "success_n=1",
+                ),
+            )
+        }
+
+    @Test
+    fun `onBillingFlowInitFailure serializes lastLoadProductsOutcome Failure to failure_BILLING_UNAVAILABLE`() =
+        runTest {
+            whenever(wideEventClient.flowStart(any(), any(), any(), any()))
+                .thenReturn(Result.success(123L))
+            subscriptionPurchaseWideEvent.onPurchaseFlowStarted("sub_id", true, "app_settings")
+
+            subscriptionPurchaseWideEvent.onBillingFlowInitFailure(
+                error = "Missing product details",
+                failureContext = BillingFlowInitFailureContext(
+                    reason = BillingFlowInitFailureContext.Reason.NO_PRODUCTS_LOADED,
+                    requestedProductId = "ddg_privacy_pro",
+                    requestedPlanId = "ddg-privacy-pro-monthly-renews-us",
+                    requestedOfferId = null,
+                    loadedProductIds = emptyList(),
+                    billingClientReady = false,
+                    lastLoadProductsOutcome = LastLoadProductsOutcome.Failure("BILLING_UNAVAILABLE"),
+                ),
+            )
+
+            verify(wideEventClient).flowStep(
+                wideEventId = 123L,
+                stepName = "billing_flow_init",
+                success = false,
+                metadata = mapOf(
+                    "missing_product_failure_reason" to "no_products_loaded",
+                    "requested_product_id" to "ddg_privacy_pro",
+                    "requested_plan_id" to "ddg-privacy-pro-monthly-renews-us",
+                    "requested_offer_id" to "none",
+                    "loaded_products_count" to "0",
+                    "billing_client_ready" to "false",
+                    "last_load_products_outcome" to "failure_BILLING_UNAVAILABLE",
+                ),
+            )
+        }
+
+    @Test
+    fun `onBillingFlowInitFailure forwards non-null offerId verbatim`() =
+        runTest {
+            whenever(wideEventClient.flowStart(any(), any(), any(), any()))
+                .thenReturn(Result.success(123L))
+            subscriptionPurchaseWideEvent.onPurchaseFlowStarted("sub_id", true, "app_settings")
+
+            subscriptionPurchaseWideEvent.onBillingFlowInitFailure(
+                error = "Missing product details",
+                failureContext = BillingFlowInitFailureContext(
+                    reason = BillingFlowInitFailureContext.Reason.OFFER_NOT_FOUND,
+                    requestedProductId = "ddg_privacy_pro",
+                    requestedPlanId = "ddg-privacy-pro-monthly-renews-us",
+                    requestedOfferId = "free-trial",
+                    loadedProductIds = listOf("ddg_privacy_pro"),
+                    billingClientReady = true,
+                    lastLoadProductsOutcome = LastLoadProductsOutcome.Success(1),
+                ),
+            )
+
+            verify(wideEventClient).flowStep(
+                wideEventId = 123L,
+                stepName = "billing_flow_init",
+                success = false,
+                metadata = mapOf(
+                    "missing_product_failure_reason" to "offer_not_found",
+                    "requested_product_id" to "ddg_privacy_pro",
+                    "requested_plan_id" to "ddg-privacy-pro-monthly-renews-us",
+                    "requested_offer_id" to "free-trial",
+                    "loaded_products_count" to "1",
+                    "billing_client_ready" to "true",
+                    "last_load_products_outcome" to "success_n=1",
+                ),
             )
         }
 

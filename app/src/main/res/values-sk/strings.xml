@@ -77,6 +77,7 @@
     <string name="options">Možnosti</string>
     <string name="shareLink">Zdieľať odkaz</string>
     <string name="copyUrl">Kopírovať adresu odkazu</string>
+    <string name="urlCopiedToClipboard">URL adresa bola skopírovaná do schránky</string>
 
     <!-- Find in page -->
     <string name="nextSearchTermDescription">Hľadať ďalšie</string>
@@ -273,6 +274,7 @@
     <string name="singleTabFireDialogDeleteAll">Odstrániť všetko</string>
     <string name="singleTabFireDialogDeleteThisTab">Vymazať túto záložku</string>
     <string name="singleTabFireDialogDeleteChat">Zmazať chat</string>
+    <string name="singleTabFireDialogDeleteChats">Zmazať čety</string>
     <string name="singleTabFireDialogTitleDuckAi">Zmazať tento chat?</string>
     <string name="singleTabFireDialogSubtitleSiteData">Odstránením údajov z webových stránok sa môžeš odhlásiť z účtov.</string>
     <string name="singleTabFireDialogSubtitleDownloads">Tým sa zrušia prebiehajúce sťahovania.</string>
@@ -597,6 +599,7 @@
     <!-- Fire Animation settings -->
     <string name="settingsFireAnimation">Animácia tlačidla ohňa</string>
     <string name="settingsHeroFireAnimation">Peklo</string>
+    <string name="settingsHeroFireAnimationClassic">Klasické inferno</string>
     <string name="settingsHeroWaterAnimation">Vodný vír</string>
     <string name="settingsHeroAbstractAnimation">Prúd vzduchu</string>
     <string name="settingsNoneAnimation">Žiadne</string>
@@ -880,6 +883,9 @@
     <string name="preOnboardingDaxDialog3Button">Začnite prehliadať</string>
     <string name="preOnboardingAddressBarTitle">Kam mám umiestniť váš riadok s adresou?</string>
     <string name="preOnboardingAddressBarOkButton">Ďalšie</string>
+    <string name="preOnboardingAddressBarPositionTop">Hore</string>
+    <string name="preOnboardingAddressBarPositionBottom">Spodná časť</string>
+    <string name="preOnboardingAddressBarPositionSplit">Rozdelenie</string>
     <string name="highlightsPreOnboardingAddressBarOption1Title">Hore (predvolené)</string>
     <string name="highlightsPreOnboardingAddressBarOption1Description">Ľahko viditeľné</string>
     <string name="highlightsPreOnboardingAddressBarOption2Title">Spodná časť</string>
@@ -902,6 +908,8 @@
     <string name="onboardingSitesDaxDialogOption3">ebay.com</string>
     <string name="onboardingSitesDaxDialogOption4">Prekvapte ma!</string>
     <string name="onboardingSerpDaxDialogDescription"><![CDATA[To je <b>DuckDuckGo vyhľadávanie</b>! Súkromne. Rýchlo. Menej reklám.]]></string>
+    <string name="onboardingSerpDaxDialogBrandDesignTitle">To je DuckDuckGo Search!</string>
+    <string name="onboardingSerpDaxDialogBrandDesignDescription">Súkromne. Rýchlo. Menej reklám.</string>
     <string name="onboardingSerpDaxDialogButton">Rozumiem!</string>
     <string name="onboardingSitesSuggestionsDaxDialogTitle">Nabudúce skúste navštíviť webovú stránku!</string>
     <plurals name="onboardingTrackersBlockedDialogDescription">
@@ -936,6 +944,26 @@
     <string name="preOnboardingInputScreenTitleUpdated" translatable="false">Want easy access to private AI chat in the address bar?</string>
     <string name="preOnboardingInputScreenButton">Ďalšie</string>
     <string name="preOnboardingInputScreenDescription"><![CDATA[Funkcie AI sú súkromné a voliteľné. Môžeš urobiť zmeny v&nbsp;<b>Nastaveniach >&nbsp;Funkcie AI</b>.]]></string>
+
+    <!--Onboarding Reinstall Quick Setup-->
+    <string name="preOnboardingReinstallQuickSetupTitle">Vitaj späť!&lt;br/&gt;Chceš si niečo prispôsobiť?</string>
+    <string name="preOnboardingReinstallSetDefaultLabel">Nastaviť DuckDuckGo ako predvolený</string>
+    <string name="preOnboardingReinstallAddHomeScreenWidgetLabel">Pridať miniaplikáciu na úvodnú obrazovku</string>
+    <string name="preOnboardingReinstallAddressBarLabel">Poloha riadku s adresou</string>
+    <string name="preOnboardingReinstallAddressBarSearchOptionsLabel">Možnosti vyhľadávania v adresnom paneli</string>
+    <string name="preOnboardingReinstallStartBrowsing">Začni prehliadať</string>
+
+    <!-- Quick setup bottom sheets -->
+    <string name="quickSetupAddressBarPositionTitle">Kam chceš umiestniť riadok adresy?</string>
+    <string name="quickSetupAddressBarPositionCaption"><![CDATA[Zmeny môžeš vykonať v časti <b>Nastavenia > Vzhľad</b>.]]></string>
+    <string name="quickSetupSearchOptionsTitle">Chceš mať vyhľadávanie a AI chat v adresnom riadku?</string>
+    <string name="quickSetupBottomSheetDone">Hotovo</string>
+    <string name="quickSetupInputScreenSearchOnly">Len vyhľadávanie</string>
+    <string name="quickSetupInputScreenSearchAndDuckAi">Vyhľadať a Duck.ai</string>
+    <string name="quickSetupRemoveHomeScreenWidgetTitle">Ako odstrániť miniaplikáciu z úvodnej obrazovky</string>
+    <string name="quickSetupRemoveHomeScreenWidgetStep1">Prejdi na úvodnú obrazovku</string>
+    <string name="quickSetupRemoveHomeScreenWidgetStep2">Dotkni sa a podrž miniaplikáciu</string>
+    <string name="quickSetupRemoveHomeScreenWidgetStep3">Klepni alebo potiahni, aby si to odstránil/-a</string>
 
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Riadok adresy</string>
@@ -1024,6 +1052,10 @@
     <string name="syncRestoreDialogPrimaryCta">Obnoviť moje veci</string>
     <string name="syncRestoreDialogSecondaryCta">Preskočiť</string>
 
+    <!-- Sync Restore (brand-design onboarding) -->
+    <string name="syncRestoreDialogBrandDesignTitle">Poďme pokračovať tam, kde si na DuckDuckGo skončil.</string>
+    <string name="syncRestoreDialogBrandDesignBody1">Tvoje uložené záložky, heslá a ďalšie údaje sú pripravené.</string>
+
     <!-- PDF download tooltip -->
     <string name="pdfDownloadTooltipText">Stiahnuť PDF</string>
 
@@ -1031,4 +1063,14 @@
     <string name="copyLinkText">Kopírovať text odkazu</string>
     <string name="linkTextCopied">Skopírovaný text prepojenia</string>
     <string name="linkTextCopyFailed">Nepodarilo sa skopírovať text odkazu</string>
+
+    <string name="preOnboardingWelcomeDialogTitle">Dobrý deň.</string>
+    <string name="preOnboardingWelcomeDialogBody1">Si pripravený/-á na rýchlejší prehliadač,\nktorý ti dáva kontrolu?</string>
+    <string name="preOnboardingWelcomeDialogBody2">Umelá inteligencia je vždy voliteľná a ochrana súkromia je vždy zapnutá.</string>
+    <string name="onboardingStepIndicatorText" instruction="a counter above our instructions in onboarding that tells a user what step they are on">%1$d %2$d</string>
+    <string name="onboardingSearchDaxDialogOption1Quoted" instruction="translate &apos;duck&apos; too.">Ako povedať „kačica“ v angličtine</string>
+    <string name="onboardingSearchDaxDialogOption1EnglishQuoted" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">Ako povedať „kačica“ po španielsky</string>
+
+    <string name="input_screen_user_pref_without_ai_updated">Len vyhľadávanie</string>
+    <string name="input_screen_user_pref_with_ai_updated">Prepínať medzi\nvyhľadávaním a Duck.ai</string>
 </resources>

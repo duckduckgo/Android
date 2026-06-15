@@ -39,6 +39,7 @@ import com.duckduckgo.subscriptions.api.Product
 import com.duckduckgo.subscriptions.api.Product.DuckAiPlus
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.api.Subscriptions
+import com.duckduckgo.subscriptions.api.model.Entitlement
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.PRIVACY_SUBSCRIPTIONS_PATH
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.SUBSCRIPTIONS_ETLD
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.SUBSCRIPTIONS_PATH
@@ -165,6 +166,10 @@ class RealSubscriptions @Inject constructor(
         return subscriptionsManager.isFreeTrialEligible()
     }
 
+    override fun getEntitlements(): Flow<Set<Entitlement>> {
+        return subscriptionsManager.entitlementSet
+    }
+
     private fun buildSubscriptionUrl(uri: Uri?): String {
         val queryParams = uri?.query
         return if (!queryParams.isNullOrBlank()) {
@@ -279,6 +284,25 @@ interface SubscriptionsFeature {
     @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.FALSE)
     fun vpnReminderNotification(): Toggle
 
+    /**
+     * When enabled, a local reminder notification can be scheduled by the subscription page
+     * to fire ahead of the subscription's expiry/renewal date.
+     */
+    @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.FALSE)
+    fun subscriptionExpirationReminderNotification(): Toggle
+
+    /**
+     * Kill switch for `getUserSettings` JS message
+     */
+    @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.FALSE)
+    fun userSettingsMessaging(): Toggle
+
+    /**
+     * Kill switch for the `requestNotificationsPermission` JS message
+     */
+    @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.FALSE)
+    fun notificationsPermissionMessaging(): Toggle
+
     @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.TRUE)
     fun handleExpiredStateWhenSubscriptionChangeSelected(): Toggle
 
@@ -287,6 +311,9 @@ interface SubscriptionsFeature {
 
     @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.TRUE)
     fun schedulePaywallNotSeenPixels(): Toggle
+
+    @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.FALSE)
+    fun useQueryPurchases(): Toggle
 }
 
 @ContributesBinding(AppScope::class)

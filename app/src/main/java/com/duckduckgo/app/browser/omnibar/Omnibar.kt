@@ -69,6 +69,8 @@ class Omnibar(
 
         fun onFireButtonPressed()
 
+        fun onPlusButtonPressed(anchor: View)
+
         fun onBrowserMenuPressed()
 
         fun onPrivacyShieldPressed()
@@ -395,6 +397,7 @@ class Omnibar(
                 privacyShield = viewState.showPrivacyShield.isHighlighted(),
             ),
         )
+        omnibarView.decorate(Decoration.LockForOnboarding(viewState.isOmnibarLockedForOnboarding))
     }
 
     fun createCookiesAnimation(isCosmetic: Boolean) {

@@ -17,6 +17,7 @@
 package com.duckduckgo.app.cta.ui
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import com.duckduckgo.adblocking.api.duckplayer.DuckPlayer
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.CtaId.DAX_DIALOG_NETWORK
@@ -28,6 +29,7 @@ import com.duckduckgo.app.cta.model.CtaId.DAX_FIRE_BUTTON
 import com.duckduckgo.app.cta.model.CtaId.DAX_INTRO_PRIVACY_PRO
 import com.duckduckgo.app.cta.model.CtaId.DAX_INTRO_VISIT_SITE
 import com.duckduckgo.app.global.install.AppInstallStore
+import com.duckduckgo.app.onboarding.DuckAiOnboardingExperimentMetrics
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.store.UserStageStore
@@ -36,14 +38,14 @@ import com.duckduckgo.app.onboardingbranddesignupdate.OnboardingBrandDesignUpdat
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.tabs.model.TabRepository
+import com.duckduckgo.app.tabs.model.AggregateTabProvider
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import com.duckduckgo.brokensite.api.BrokenSitePrompt
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.ui.store.AppTheme
+import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.duckchat.api.DuckChat
-import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.subscriptions.api.SubscriptionPromoCtaShownPlugin
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
@@ -79,7 +81,7 @@ class OnboardingDaxDialogTests {
     private val settingsDataStore: SettingsDataStore = mock()
     private val onboardingStore: OnboardingStore = mock()
     private val userStageStore: UserStageStore = mock()
-    private val tabRepository: TabRepository = mock()
+    private val aggregateTabProvider: AggregateTabProvider = mock()
     private val extendedOnboardingFeatureToggles: ExtendedOnboardingFeatureToggles = mock()
     private val mockDuckPlayer: DuckPlayer = mock()
     private val mockBrokenSitePrompt: BrokenSitePrompt = mock()
@@ -88,6 +90,7 @@ class OnboardingDaxDialogTests {
     private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector = mock()
     private val mockOnboardingBrandDesignUpdateToggles: OnboardingBrandDesignUpdateToggles = mock()
     private val mockAppTheme: AppTheme = org.mockito.kotlin.mock { on { isLightModeEnabled() } doReturn true }
+    private val mockDeviceInfo: DeviceInfo = mock()
 
     val mockEnabledToggle: Toggle = org.mockito.kotlin.mock { on { it.isEnabled() } doReturn true }
     val mockDisabledToggle: Toggle = org.mockito.kotlin.mock { on { it.isEnabled() } doReturn false }
@@ -111,7 +114,7 @@ class OnboardingDaxDialogTests {
             settingsDataStore,
             onboardingStore,
             userStageStore,
-            tabRepository,
+            aggregateTabProvider,
             coroutineRule.testDispatcherProvider,
             mockDuckChat,
             duckDuckGoUrlDetector,
@@ -124,6 +127,8 @@ class OnboardingDaxDialogTests {
             },
             mockOnboardingBrandDesignUpdateToggles,
             mockAppTheme,
+            mock(DuckAiOnboardingExperimentMetrics::class.java),
+            mockDeviceInfo,
         )
     }
 

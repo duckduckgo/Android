@@ -20,6 +20,7 @@ import android.app.Application
 import android.content.Intent
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.duckduckgo.app.onboarding.OnboardingFlowChecker
 import com.duckduckgo.app.survey.ui.SurveyActivity
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.modalcoordinator.api.ModalEvaluator
@@ -46,17 +47,38 @@ class DefaultBrowserChangedSurveyEvaluatorImplTest {
 
     private val applicationContext: Application = ApplicationProvider.getApplicationContext()
     private val surveyManager: DefaultBrowserChangedSurveyManager = mock()
+    private val sampler: DefaultBrowserChangedSurveySampler = mock()
+    private val onboardingFlowChecker: OnboardingFlowChecker = mock()
 
     private val testee = DefaultBrowserChangedSurveyEvaluatorImpl(
         appCoroutineScope = coroutinesTestRule.testScope,
         applicationContext = applicationContext,
         surveyManager = surveyManager,
+        surveySampler = sampler,
         dispatchers = coroutinesTestRule.testDispatcherProvider,
+        onboardingFlowChecker = onboardingFlowChecker,
     )
 
     @Before
     fun setUp() {
         shadowOf(applicationContext).clearNextStartedActivities()
+        runTest {
+            whenever(onboardingFlowChecker.isOnboardingComplete()).thenReturn(true)
+        }
+    }
+
+    @Test
+    fun whenOnboardingNotCompleteThenEvaluationIsSkipped() = runTest {
+        whenever(onboardingFlowChecker.isOnboardingComplete()).thenReturn(false)
+
+        val result = testee.evaluate()
+
+        assertEquals(ModalEvaluator.EvaluationResult.Skipped, result)
+        verify(surveyManager, never()).shouldTriggerSurvey()
+        verify(sampler, never()).isInSample()
+        verify(surveyManager, never()).markSurveyShown()
+        coroutinesTestRule.testScope.testScheduler.advanceUntilIdle()
+        assertNull(shadowOf(applicationContext).nextStartedActivity)
     }
 
     @Test
@@ -72,8 +94,31 @@ class DefaultBrowserChangedSurveyEvaluatorImplTest {
     }
 
     @Test
-    fun whenSurveyShouldTriggerThenEvaluationReturnsModalShown() = runTest {
+    fun whenSurveyShouldNotTriggerThenSamplerIsNotConsulted() = runTest {
+        whenever(surveyManager.shouldTriggerSurvey()).thenReturn(false)
+
+        testee.evaluate()
+
+        verify(sampler, never()).isInSample()
+    }
+
+    @Test
+    fun whenSurveyShouldTriggerButNotInSampleThenEvaluationIsSkipped() = runTest {
         whenever(surveyManager.shouldTriggerSurvey()).thenReturn(true)
+        whenever(sampler.isInSample()).thenReturn(false)
+
+        val result = testee.evaluate()
+
+        assertEquals(ModalEvaluator.EvaluationResult.Skipped, result)
+        verify(surveyManager, never()).markSurveyShown()
+        coroutinesTestRule.testScope.testScheduler.advanceUntilIdle()
+        assertNull(shadowOf(applicationContext).nextStartedActivity)
+    }
+
+    @Test
+    fun whenSurveyShouldTriggerAndInSampleThenEvaluationReturnsModalShown() = runTest {
+        whenever(surveyManager.shouldTriggerSurvey()).thenReturn(true)
+        whenever(sampler.isInSample()).thenReturn(true)
         whenever(surveyManager.buildSurveyUrl("in-app")).thenReturn("https://example.com/survey")
 
         val result = testee.evaluate()
@@ -82,8 +127,9 @@ class DefaultBrowserChangedSurveyEvaluatorImplTest {
     }
 
     @Test
-    fun whenSurveyShouldTriggerThenSurveyIsMarkedShown() = runTest {
+    fun whenSurveyShouldTriggerAndInSampleThenSurveyIsMarkedShown() = runTest {
         whenever(surveyManager.shouldTriggerSurvey()).thenReturn(true)
+        whenever(sampler.isInSample()).thenReturn(true)
         whenever(surveyManager.buildSurveyUrl("in-app")).thenReturn("https://example.com/survey")
 
         testee.evaluate()
@@ -92,8 +138,9 @@ class DefaultBrowserChangedSurveyEvaluatorImplTest {
     }
 
     @Test
-    fun whenSurveyShouldTriggerThenSurveyActivityIsStartedWithExpectedFlags() = runTest {
+    fun whenSurveyShouldTriggerAndInSampleThenSurveyActivityIsStartedWithExpectedFlags() = runTest {
         whenever(surveyManager.shouldTriggerSurvey()).thenReturn(true)
+        whenever(sampler.isInSample()).thenReturn(true)
         whenever(surveyManager.buildSurveyUrl("in-app")).thenReturn("https://example.com/survey")
 
         testee.evaluate()

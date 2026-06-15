@@ -58,6 +58,7 @@ import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.PURCHASE_FAILU
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.PURCHASE_FAILURE_STORE
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.PURCHASE_SUCCESS
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.PURCHASE_SUCCESS_ORIGIN
+import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.RECOVER_SUBSCRIPTION_NO_ACTIVE_PURCHASE
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.RESTORE_AFTER_PURCHASE_ATTEMPT_SUCCESS
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.RESTORE_USING_EMAIL_SUCCESS
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.RESTORE_USING_STORE_FAILURE_OTHER
@@ -101,6 +102,7 @@ interface SubscriptionPixelSender {
     fun reportRestoreUsingStoreSuccess()
     fun reportRestoreUsingStoreFailureSubscriptionNotFound()
     fun reportRestoreUsingStoreFailureOther()
+    fun reportRecoverSubscriptionNoActivePurchase()
     fun reportRestoreAfterPurchaseAttemptSuccess()
     fun reportSubscriptionActivated()
     fun reportOnboardingAddDeviceClick()
@@ -184,7 +186,13 @@ class SubscriptionPixelSenderImpl @Inject constructor(
         fire(PURCHASE_FAILURE_ACCOUNT_CREATION)
 
     override fun reportPurchaseSuccess(isFreeTrial: Boolean) =
-        fire(PURCHASE_SUCCESS, mapOf(SubscriptionPixelParameter.FREE_TRIAL to isFreeTrial.toString()))
+        fire(
+            PURCHASE_SUCCESS,
+            mapOf(
+                SubscriptionPixelParameter.FREE_TRIAL to isFreeTrial.toString(),
+                SubscriptionPixelParameter.OS_VERSION to appBuildConfig.sdkInt.toString(),
+            ),
+        )
 
     override fun reportPurchaseSuccessOrigin(origin: String?, isFreeTrial: Boolean) {
         val map = mutableMapOf(
@@ -217,6 +225,9 @@ class SubscriptionPixelSenderImpl @Inject constructor(
 
     override fun reportRestoreUsingStoreFailureOther() =
         fire(RESTORE_USING_STORE_FAILURE_OTHER)
+
+    override fun reportRecoverSubscriptionNoActivePurchase() =
+        fire(RECOVER_SUBSCRIPTION_NO_ACTIVE_PURCHASE)
 
     override fun reportRestoreAfterPurchaseAttemptSuccess() =
         fire(RESTORE_AFTER_PURCHASE_ATTEMPT_SUCCESS)

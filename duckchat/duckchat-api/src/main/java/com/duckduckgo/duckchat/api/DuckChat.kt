@@ -53,6 +53,12 @@ interface DuckChat {
     fun getDuckChatUrl(query: String, autoPrompt: Boolean, sidebar: Boolean = false): String
 
     /**
+     * Returns the Duck.ai URL that opens with the settings panel open (e.g. https://duck.ai?settings=open),
+     * using the configured Duck.ai host. Used to reach Duck.ai settings from outside the Duck.ai web view.
+     */
+    fun getDuckChatSettingsUrl(): String
+
+    /**
      * Determines whether a given [Uri] is a DuckChat URL.
      * There are two Duck Chat URLs
      * Legacy: https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5
@@ -136,4 +142,17 @@ interface DuckChat {
      * end-voice-session JS event when their id is emitted.
      */
     fun observeTriggerVoiceChatSessionEnd(): Flow<String>
+
+    /**
+     * Requests that the active voice session on the tab with the given [tabId] end. This drives the web
+     * frontend to tear down the session (stop recording, release the mic) and report it ended, which in
+     * turn releases the native voice resources.
+     */
+    fun endVoiceChatSession(tabId: String)
+
+    /**
+     * Returns `true` when the native Duck.ai chat history surface is enabled by all gating feature flags.
+     * Suspending because the underlying feature-flag reads must not block the main thread.
+     */
+    suspend fun isChatHistoryAvailable(): Boolean
 }

@@ -132,6 +132,7 @@ class RealNativeInputOmnibarController(
         omnibarView.findViewById<View?>(R.id.shieldIcon)?.gone()
         omnibarView.findViewById<View?>(R.id.omnibarTextInput)?.gone()
         omnibarView.findViewById<View?>(R.id.pageLoadingIndicator)?.gone()
+        omnibarView.findViewById<View?>(R.id.pageLoadProgressBar)?.gone()
     }
 
     private var currentTier: DuckAiTier = DuckAiTier.Unknown
@@ -201,6 +202,8 @@ class RealNativeInputOmnibarController(
         restoreBottomOmnibarPosition()
         if (omnibar.omnibarType == OmnibarType.SPLIT) {
             rootView.findViewById<View?>(R.id.navigationBar)?.show()
+        } else {
+            rootView.findViewById<View?>(R.id.bottomBrowserOutlineStroke)?.show()
         }
         omnibar.isScrollingEnabled = true
     }
@@ -227,8 +230,9 @@ class RealNativeInputOmnibarController(
             val isTop = omnibar.omnibarType == OmnibarType.SINGLE_TOP || omnibar.omnibarType == OmnibarType.SPLIT
             cardElevation = if (isTop) 6f.toPx() else 3f.toPx()
         }
-        omnibarView.findViewById<MaterialCardView?>(R.id.omniBarContainer)
-            ?.setCardBackgroundColor(ctx.getColorFromAttr(com.duckduckgo.mobile.android.R.attr.daxColorWindow))
+        omnibarView.findViewById<MaterialCardView?>(R.id.omniBarContainer)?.apply {
+            setCardBackgroundColor(context.getColorFromAttr(com.duckduckgo.mobile.android.R.attr.daxColorWindow))
+        }
     }
 
     private fun restoreBottomOmnibarPosition() {

@@ -41,6 +41,7 @@ dependencies {
     implementation project(path: ':navigation-api')
     implementation project(':saved-sites-api')
     implementation project(':saved-sites-impl')
+    implementation project(':test-seeder-api')
 
     ksp project(path: ':anvil-ksp')
     implementation project(path: ':anvil-annotations')
@@ -58,4 +59,11 @@ dependencies {
     implementation "com.google.android.material:material:_"
     implementation "androidx.constraintlayout:constraintlayout:_"
     implementation project(path: ':design-system')
+
+    testImplementation Testing.junit4
+    testImplementation "org.mockito.kotlin:mockito-kotlin:_"
+    testImplementation project(path: ':common-test')
+    testImplementation(KotlinX.coroutines.test) {
+        exclude group: "org.jetbrains.kotlinx", module: "kotlinx-coroutines-debug"
+    }
 }

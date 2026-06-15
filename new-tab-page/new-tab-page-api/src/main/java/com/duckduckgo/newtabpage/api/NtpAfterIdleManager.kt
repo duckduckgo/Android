@@ -31,6 +31,9 @@ interface NtpAfterIdleManager {
     /** Called when the user taps the return-to-page hatch on the NTP. */
     fun onReturnToPageTapped()
 
+    /** Called when the user opens the tab switcher from the hatch. */
+    fun onTabSwitcherSelected()
+
     /** Called when the user submits a search from the NTP. */
     fun onNtpSearchSubmitted()
 

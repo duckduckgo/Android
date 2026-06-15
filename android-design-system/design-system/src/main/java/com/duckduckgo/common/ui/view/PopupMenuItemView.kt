@@ -17,11 +17,13 @@
 package com.duckduckgo.common.ui.view
 
 import android.content.Context
+import android.content.res.ColorStateList
 import android.graphics.drawable.Drawable
 import android.text.SpannableString
 import android.text.style.ForegroundColorSpan
 import android.util.AttributeSet
 import android.widget.LinearLayout
+import androidx.annotation.ColorInt
 import androidx.annotation.DrawableRes
 import androidx.core.content.ContextCompat
 import com.duckduckgo.common.ui.view.PopupMenuItemView.PopupMenuItemType.DESTRUCTIVE
@@ -58,6 +60,14 @@ constructor(
                     else -> PRIMARY
                 }
                 setPrimaryTextType(primaryTextType)
+            }
+
+            if (hasValue(R.styleable.PopupMenuItemView_leadingIcon)) {
+                setLeadingIconDrawable(getDrawable(R.styleable.PopupMenuItemView_leadingIcon)!!)
+            }
+
+            if (hasValue(R.styleable.PopupMenuItemView_leadingIconTint)) {
+                setLeadingIconTint(getColor(R.styleable.PopupMenuItemView_leadingIconTint, 0))
             }
 
             if (hasValue(R.styleable.PopupMenuItemView_trailingIcon)) {
@@ -103,6 +113,28 @@ constructor(
         spannable.setSpan(ForegroundColorSpan(binding.root.context.getColorFromAttr(textColorAttr)), 0, spannable.length, 0)
         setPrimaryText(spannable)
         isEnabled = false
+    }
+
+    fun setLeadingIconDrawable(drawable: Drawable) {
+        binding.leadingIcon.setImageDrawable(drawable)
+        setLeadingIconVisibility(true)
+    }
+
+    fun setLeadingIconResource(@DrawableRes resource: Int) {
+        binding.leadingIcon.setImageResource(resource)
+        setLeadingIconVisibility(true)
+    }
+
+    fun setLeadingIconVisibility(visible: Boolean) {
+        if (visible) {
+            binding.leadingIcon.show()
+        } else {
+            binding.leadingIcon.gone()
+        }
+    }
+
+    fun setLeadingIconTint(@ColorInt color: Int) {
+        binding.leadingIcon.imageTintList = ColorStateList.valueOf(color)
     }
 
     fun setTrailingIconDrawable(drawable: Drawable) {

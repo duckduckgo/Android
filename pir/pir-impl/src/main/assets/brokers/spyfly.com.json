@@ -1,7 +1,7 @@
 {
   "name": "SpyFly",
   "url": "spyfly.com",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "addedDatetime": 1775214750818,
   "optOutUrl": "https://www.spyfly.com/help-center/privacy-requests",
   "steps": [
@@ -190,7 +190,7 @@
           "expectations": [
             {
               "type": "text",
-              "selector": "h1",
+              "selector": ".section__head h1",
               "expect": "Select Data for Removal"
             }
           ],
@@ -397,7 +397,7 @@
           "expectations": [
             {
               "type": "text",
-              "selector": "h1",
+              "selector": ".section__head h1",
               "expect": "Select Data for Removal"
             }
           ],
@@ -437,7 +437,7 @@
           "expectations": [
             {
               "type": "text",
-              "selector": "h1",
+              "selector": ".section__head h1",
               "expect": "Request Submitted"
             }
           ],
@@ -455,7 +455,7 @@
           "expectations": [
             {
               "type": "text",
-              "selector": "h1",
+              "selector": ".section__head h1",
               "expect": "Verification Complete"
             }
           ],

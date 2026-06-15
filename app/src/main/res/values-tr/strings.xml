@@ -75,6 +75,7 @@
     <string name="options">Seçenekler</string>
     <string name="shareLink">Bağlantıyı paylaş</string>
     <string name="copyUrl">Bağlantı Adresini Kopyala</string>
+    <string name="urlCopiedToClipboard">URL panoya kopyalandı</string>
 
     <!-- Find in page -->
     <string name="nextSearchTermDescription">Sonrakini bul</string>
@@ -265,6 +266,7 @@
     <string name="singleTabFireDialogDeleteAll">Tümünü Sil</string>
     <string name="singleTabFireDialogDeleteThisTab">Bu Sekmeyi Sil</string>
     <string name="singleTabFireDialogDeleteChat">Sohbeti Sil</string>
+    <string name="singleTabFireDialogDeleteChats">Sohbetleri Sil</string>
     <string name="singleTabFireDialogTitleDuckAi">Bu sohbet silinsin mi?</string>
     <string name="singleTabFireDialogSubtitleSiteData">Site verilerini silmek, hesaplarınızdan çıkış yapmanıza neden olabilir.</string>
     <string name="singleTabFireDialogSubtitleDownloads">Bu işlem devam eden indirmeleri iptal edecektir.</string>
@@ -587,6 +589,7 @@
     <!-- Fire Animation settings -->
     <string name="settingsFireAnimation">Yangın Düğmesi Animasyonu</string>
     <string name="settingsHeroFireAnimation">Ateş</string>
+    <string name="settingsHeroFireAnimationClassic">Inferno Klasik</string>
     <string name="settingsHeroWaterAnimation">Girdap</string>
     <string name="settingsHeroAbstractAnimation">Hava</string>
     <string name="settingsNoneAnimation">Yok</string>
@@ -844,6 +847,9 @@
     <string name="preOnboardingDaxDialog3Button">Gezinmeye Başla</string>
     <string name="preOnboardingAddressBarTitle">Adres çubuğu nereye yerleştirilsin?</string>
     <string name="preOnboardingAddressBarOkButton">Sonraki</string>
+    <string name="preOnboardingAddressBarPositionTop">Başa dön</string>
+    <string name="preOnboardingAddressBarPositionBottom">Alt</string>
+    <string name="preOnboardingAddressBarPositionSplit">Böl</string>
     <string name="highlightsPreOnboardingAddressBarOption1Title">Üst (Varsayılan)</string>
     <string name="highlightsPreOnboardingAddressBarOption1Description">Görmesi kolay</string>
     <string name="highlightsPreOnboardingAddressBarOption2Title">Alt</string>
@@ -866,6 +872,8 @@
     <string name="onboardingSitesDaxDialogOption3">ebay.com</string>
     <string name="onboardingSitesDaxDialogOption4">Şaşırt beni!</string>
     <string name="onboardingSerpDaxDialogDescription"><![CDATA[<b>DuckDuckGo Search</b> işte bu! Özel. Hızlı. Daha az reklam.]]></string>
+    <string name="onboardingSerpDaxDialogBrandDesignTitle">İşte DuckDuckGo Search!</string>
+    <string name="onboardingSerpDaxDialogBrandDesignDescription">Gizli. Hızlı. Daha az reklam.</string>
     <string name="onboardingSerpDaxDialogButton">Anladım!</string>
     <string name="onboardingSitesSuggestionsDaxDialogTitle">Sonra, bir siteyi ziyaret etmeyi deneyin!</string>
     <plurals name="onboardingTrackersBlockedDialogDescription">
@@ -896,6 +904,26 @@
     <string name="preOnboardingInputScreenTitleUpdated" translatable="false">Want easy access to private AI chat in the address bar?</string>
     <string name="preOnboardingInputScreenButton">Sonraki</string>
     <string name="preOnboardingInputScreenDescription"><![CDATA[AI özellikleri gizli ve isteğe bağlıdır. Değişiklikleri <b>Ayarlar > AI Özellikleri</b> bölümünden yapabilirsiniz.]]></string>
+
+    <!--Onboarding Reinstall Quick Setup-->
+    <string name="preOnboardingReinstallQuickSetupTitle">Tekrar hoşgeldiniz!&lt;br/&gt;Özelleştirmek istediğiniz bir var mı?</string>
+    <string name="preOnboardingReinstallSetDefaultLabel">DuckDuckGo\'yu varsayılan olarak ayarla</string>
+    <string name="preOnboardingReinstallAddHomeScreenWidgetLabel">Ana ekran widget\'ını ekle</string>
+    <string name="preOnboardingReinstallAddressBarLabel">Adres çubuğu konumu</string>
+    <string name="preOnboardingReinstallAddressBarSearchOptionsLabel">Adres çubuğu arama seçenekleri</string>
+    <string name="preOnboardingReinstallStartBrowsing">Gezinmeye Başla</string>
+
+    <!-- Quick setup bottom sheets -->
+    <string name="quickSetupAddressBarPositionTitle">Adres çubuğu nerede olsun?</string>
+    <string name="quickSetupAddressBarPositionCaption"><![CDATA[Değişiklikleri <b>Ayarlar > Görünüm</b> bölümünden yapabilirsiniz.]]></string>
+    <string name="quickSetupSearchOptionsTitle">Adres çubuğunda Arama ve Yapay Zeka sohbeti olsun mu?</string>
+    <string name="quickSetupBottomSheetDone">Bitti</string>
+    <string name="quickSetupInputScreenSearchOnly">Yalnızca Arama</string>
+    <string name="quickSetupInputScreenSearchAndDuckAi">Arama ve Duck.ai</string>
+    <string name="quickSetupRemoveHomeScreenWidgetTitle">Ana ekran widget\'ı nasıl kaldırılır?</string>
+    <string name="quickSetupRemoveHomeScreenWidgetStep1">Ana ekranınıza gidin</string>
+    <string name="quickSetupRemoveHomeScreenWidgetStep2">Widget\'a dokunun ve basılı tutun</string>
+    <string name="quickSetupRemoveHomeScreenWidgetStep3">Kaldırmak için dokunun veya sürükleyin</string>
 
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Adres Çubuğu</string>
@@ -984,6 +1012,10 @@
     <string name="syncRestoreDialogPrimaryCta">Geri Yükle</string>
     <string name="syncRestoreDialogSecondaryCta">Atla</string>
 
+    <!-- Sync Restore (brand-design onboarding) -->
+    <string name="syncRestoreDialogBrandDesignTitle">DuckDuckGo\'da kaldığınız yerden devam edelim.</string>
+    <string name="syncRestoreDialogBrandDesignBody1">Kaydedilmiş yer işaretleriniz, şifreleriniz ve daha fazlası hazır.</string>
+
     <!-- PDF download tooltip -->
     <string name="pdfDownloadTooltipText">PDF indir</string>
 
@@ -991,4 +1023,14 @@
     <string name="copyLinkText">Bağlantı Metnini Kopyala</string>
     <string name="linkTextCopied">Bağlantı metni kopyalandı</string>
     <string name="linkTextCopyFailed">Bağlantı metni kopyalanamadı</string>
+
+    <string name="preOnboardingWelcomeDialogTitle">Merhaba.</string>
+    <string name="preOnboardingWelcomeDialogBody1">Kontrolü size verecek daha hızlı bir tarayıcıya hazır mısınız?</string>
+    <string name="preOnboardingWelcomeDialogBody2">Yapay zekâ her zaman isteğe bağlıdır ve gizlilik koruması her zaman etkindir.</string>
+    <string name="onboardingStepIndicatorText" instruction="a counter above our instructions in onboarding that tells a user what step they are on">%1$d / %2$d</string>
+    <string name="onboardingSearchDaxDialogOption1Quoted" instruction="translate &apos;duck&apos; too.">ingilizcede \"ördek\" nasıl denir?</string>
+    <string name="onboardingSearchDaxDialogOption1EnglishQuoted" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">ispanyolcada \"ördek\" nasıl denir?</string>
+
+    <string name="input_screen_user_pref_without_ai_updated">Yalnızca Arama</string>
+    <string name="input_screen_user_pref_with_ai_updated">Arama ile\nDuck.ai arasında geçiş yapın</string>
 </resources>

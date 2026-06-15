@@ -31,8 +31,10 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
@@ -67,6 +69,7 @@ class DuckChatDataClearingPluginTest {
         verify(duckChatDeleter).deleteAllChats()
         verify(duckChatSyncRepository).recordDuckAiChatsDeleted(any())
         verify(duckChatSyncRepository).clearPendingChatDeletions()
+        verify(duckChatSyncRepository).clearPendingChatUpdates()
         verify(syncEngine).triggerSync(SyncEngine.SyncTrigger.DATA_CHANGE)
     }
 
@@ -100,16 +103,17 @@ class DuckChatDataClearingPluginTest {
         verify(duckChatDeleter).deleteAllChats()
         verify(duckChatSyncRepository, never()).recordDuckAiChatsDeleted(any())
         verify(duckChatSyncRepository, never()).clearPendingChatDeletions()
+        verify(duckChatSyncRepository, never()).clearPendingChatUpdates()
         verify(syncEngine, never()).triggerSync(any())
     }
 
     @Test
-    fun `deleteSingleChat extracts chatId and deletes`() = runTest {
+    fun `Selected with one chat extracts chatId and deletes`() = runTest {
         val chatUrl = "https://duckduckgo.com/?ia=chat&chatID=abc-123"
         whenever(duckChat.isDuckChatUrl(Uri.parse(chatUrl))).thenReturn(true)
         whenever(duckChatDeleter.deleteChat("abc-123")).thenReturn(true)
 
-        plugin.onClearData(setOf(ClearableData.DuckChats.Single(chatUrl)))
+        plugin.onClearData(setOf(ClearableData.DuckChats.Selected(setOf(chatUrl))))
 
         verify(duckChatDeleter).deleteChat("abc-123")
         verify(duckChatSyncRepository).recordSingleChatDeletion("abc-123")
@@ -117,36 +121,74 @@ class DuckChatDataClearingPluginTest {
     }
 
     @Test
-    fun `deleteSingleChat does nothing when url is not a duck chat url`() = runTest {
+    fun `Selected with one chat does nothing when url is not a duck chat url`() = runTest {
         val chatUrl = "https://example.com/?chatID=abc-123"
         whenever(duckChat.isDuckChatUrl(Uri.parse(chatUrl))).thenReturn(false)
 
-        plugin.onClearData(setOf(ClearableData.DuckChats.Single(chatUrl)))
+        plugin.onClearData(setOf(ClearableData.DuckChats.Selected(setOf(chatUrl))))
 
         verify(duckChatDeleter, never()).deleteChat(any())
         verify(syncEngine, never()).triggerSync(any())
     }
 
     @Test
-    fun `deleteSingleChat does nothing when chatId is missing`() = runTest {
+    fun `Selected with one chat does nothing when chatId is missing`() = runTest {
         val chatUrl = "https://duckduckgo.com/?ia=chat"
         whenever(duckChat.isDuckChatUrl(Uri.parse(chatUrl))).thenReturn(true)
 
-        plugin.onClearData(setOf(ClearableData.DuckChats.Single(chatUrl)))
+        plugin.onClearData(setOf(ClearableData.DuckChats.Selected(setOf(chatUrl))))
 
         verify(duckChatDeleter, never()).deleteChat(any())
         verify(syncEngine, never()).triggerSync(any())
     }
 
     @Test
-    fun `deleteSingleChat does not record sync when deletion fails`() = runTest {
+    fun `Selected with one chat does not record sync when deletion fails`() = runTest {
         val chatUrl = "https://duckduckgo.com/?ia=chat&chatID=abc-123"
         whenever(duckChat.isDuckChatUrl(Uri.parse(chatUrl))).thenReturn(true)
         whenever(duckChatDeleter.deleteChat("abc-123")).thenReturn(false)
 
-        plugin.onClearData(setOf(ClearableData.DuckChats.Single(chatUrl)))
+        plugin.onClearData(setOf(ClearableData.DuckChats.Selected(setOf(chatUrl))))
 
         verify(duckChatDeleter).deleteChat("abc-123")
+        verify(duckChatSyncRepository, never()).recordSingleChatDeletion(any())
+        verify(syncEngine, never()).triggerSync(any())
+    }
+
+    @Test
+    fun `Selected deletes each chat in the set and records per-chat sync deletions`() = runTest {
+        whenever(duckChat.isDuckChatUrl(eq(Uri.parse("https://duck.ai?chatID=alpha")))).thenReturn(true)
+        whenever(duckChat.isDuckChatUrl(eq(Uri.parse("https://duck.ai?chatID=beta")))).thenReturn(true)
+        whenever(duckChatDeleter.deleteChat("alpha")).thenReturn(true)
+        whenever(duckChatDeleter.deleteChat("beta")).thenReturn(true)
+
+        plugin.onClearData(
+            setOf(ClearableData.DuckChats.Selected(setOf("https://duck.ai?chatID=alpha", "https://duck.ai?chatID=beta"))),
+        )
+
+        verify(duckChatDeleter).deleteChat("alpha")
+        verify(duckChatDeleter).deleteChat("beta")
+        verify(duckChatSyncRepository).recordSingleChatDeletion("alpha")
+        verify(duckChatSyncRepository).recordSingleChatDeletion("beta")
+        // Batched sync trigger — one event for the whole subset, not one per chat.
+        verify(syncEngine, times(1)).triggerSync(any())
+    }
+
+    @Test
+    fun `Selected does not call deleteAllChats`() = runTest {
+        whenever(duckChat.isDuckChatUrl(any())).thenReturn(true)
+        whenever(duckChatDeleter.deleteChat(any())).thenReturn(true)
+
+        plugin.onClearData(setOf(ClearableData.DuckChats.Selected(setOf("https://duck.ai?chatID=x"))))
+
+        verify(duckChatDeleter, never()).deleteAllChats()
+    }
+
+    @Test
+    fun `Selected with empty url set is a no-op`() = runTest {
+        plugin.onClearData(setOf(ClearableData.DuckChats.Selected(emptySet())))
+
+        verify(duckChatDeleter, never()).deleteChat(any())
         verify(duckChatSyncRepository, never()).recordSingleChatDeletion(any())
         verify(syncEngine, never()).triggerSync(any())
     }
@@ -157,5 +199,57 @@ class DuckChatDataClearingPluginTest {
 
         verify(duckChatDeleter, never()).deleteAllChats()
         verify(duckChatDeleter, never()).deleteChat(any())
+    }
+
+    @Test
+    fun `DuckChats Selected deletes each chat in the set and records per-chat sync deletions`() = runTest {
+        whenever(duckChat.isDuckChatUrl(eq(Uri.parse("https://duck.ai?chatID=alpha")))).thenReturn(true)
+        whenever(duckChat.isDuckChatUrl(eq(Uri.parse("https://duck.ai?chatID=beta")))).thenReturn(true)
+        whenever(duckChatDeleter.deleteChat("alpha")).thenReturn(true)
+        whenever(duckChatDeleter.deleteChat("beta")).thenReturn(true)
+
+        plugin.onClearData(
+            setOf(ClearableData.DuckChats.Selected(setOf("https://duck.ai?chatID=alpha", "https://duck.ai?chatID=beta"))),
+        )
+
+        verify(duckChatDeleter).deleteChat("alpha")
+        verify(duckChatDeleter).deleteChat("beta")
+        verify(duckChatSyncRepository).recordSingleChatDeletion("alpha")
+        verify(duckChatSyncRepository).recordSingleChatDeletion("beta")
+        // Batched sync trigger — one event for the whole subset, not one per chat.
+        verify(syncEngine, org.mockito.kotlin.times(1)).triggerSync(any())
+    }
+
+    @Test
+    fun `DuckChats Selected does not call deleteAllChats`() = runTest {
+        whenever(duckChat.isDuckChatUrl(any())).thenReturn(true)
+        whenever(duckChatDeleter.deleteChat(any())).thenReturn(true)
+
+        plugin.onClearData(setOf(ClearableData.DuckChats.Selected(setOf("https://duck.ai?chatID=x"))))
+
+        verify(duckChatDeleter, never()).deleteAllChats()
+    }
+
+    @Test
+    fun `DuckChats Selected with empty url set is a no-op`() = runTest {
+        plugin.onClearData(setOf(ClearableData.DuckChats.Selected(emptySet())))
+
+        verify(duckChatDeleter, never()).deleteChat(any())
+        verify(duckChatSyncRepository, never()).recordSingleChatDeletion(any())
+        verify(syncEngine, never()).triggerSync(any())
+    }
+
+    @Test
+    fun `DuckChats Selected skips urls that are not duck chat urls`() = runTest {
+        whenever(duckChat.isDuckChatUrl(eq(Uri.parse("https://duck.ai?chatID=alpha")))).thenReturn(true)
+        whenever(duckChat.isDuckChatUrl(eq(Uri.parse("https://example.com")))).thenReturn(false)
+        whenever(duckChatDeleter.deleteChat("alpha")).thenReturn(true)
+
+        plugin.onClearData(
+            setOf(ClearableData.DuckChats.Selected(setOf("https://duck.ai?chatID=alpha", "https://example.com"))),
+        )
+
+        verify(duckChatDeleter).deleteChat("alpha")
+        verify(duckChatDeleter, never()).deleteChat(eq(""))
     }
 }

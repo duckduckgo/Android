@@ -116,7 +116,8 @@ object NotificationModule {
         factory: NotificationFactory,
         notificationDao: NotificationDao,
         pluginPoint: PluginPoint<SchedulableNotificationPlugin>,
+        launchIntentBuilder: NotificationLaunchIntentBuilder,
     ): NotificationSender {
-        return AppNotificationSender(context, manager, factory, notificationDao, pluginPoint)
+        return AppNotificationSender(context, manager, factory, notificationDao, pluginPoint, launchIntentBuilder)
     }
 }

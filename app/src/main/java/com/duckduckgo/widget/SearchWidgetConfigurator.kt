@@ -23,6 +23,7 @@ import android.view.View
 import android.widget.RemoteViews
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.browser.mode.SearchWidgetDuckAi
 import com.duckduckgo.app.systemsearch.SystemSearchActivity
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.duckchat.api.DuckChat
@@ -90,7 +91,12 @@ class SearchWidgetConfigurator @Inject constructor(
     private fun buildDuckAiPendingIntent(
         context: Context,
     ): PendingIntent {
-        val intent = BrowserActivity.intent(context, openDuckChat = true, duckChatSessionActive = true).also { it.action = Intent.ACTION_VIEW }
+        val intent = BrowserActivity.intent(
+            context,
+            launchSource = SearchWidgetDuckAi,
+            openDuckChat = true,
+            duckChatSessionActive = true,
+        ).also { it.action = Intent.ACTION_VIEW }
         val requestCode = REQUEST_CODE_WIDGET_DUCK_AI_INTENT
         return PendingIntent.getActivity(context, requestCode, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
     }

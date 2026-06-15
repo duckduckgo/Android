@@ -75,6 +75,7 @@
     <string name="options">Opciones</string>
     <string name="shareLink">Compartir enlace</string>
     <string name="copyUrl">Copiar dirección de enlace</string>
+    <string name="urlCopiedToClipboard">URL copiada en el portapapeles</string>
 
     <!-- Find in page -->
     <string name="nextSearchTermDescription">Buscar siguiente</string>
@@ -265,6 +266,7 @@
     <string name="singleTabFireDialogDeleteAll">Eliminar todo</string>
     <string name="singleTabFireDialogDeleteThisTab">Eliminar esta pestaña</string>
     <string name="singleTabFireDialogDeleteChat">Borrar chat</string>
+    <string name="singleTabFireDialogDeleteChats">Borrar chats</string>
     <string name="singleTabFireDialogTitleDuckAi">¿Borrar este chat?</string>
     <string name="singleTabFireDialogSubtitleSiteData">Eliminar datos del sitio puede hacer que cierres sesión en tus cuentas.</string>
     <string name="singleTabFireDialogSubtitleDownloads">Esta acción cancelará las descargas en curso.</string>
@@ -587,6 +589,7 @@
     <!-- Fire Animation settings -->
     <string name="settingsFireAnimation">Animación del botón Fuego</string>
     <string name="settingsHeroFireAnimation">Infierno</string>
+    <string name="settingsHeroFireAnimationClassic">Infierno Clásico</string>
     <string name="settingsHeroWaterAnimation">Remolino</string>
     <string name="settingsHeroAbstractAnimation">Corriente de aire</string>
     <string name="settingsNoneAnimation">Ninguna</string>
@@ -844,6 +847,9 @@
     <string name="preOnboardingDaxDialog3Button">Empezar a navegar</string>
     <string name="preOnboardingAddressBarTitle">¿Dónde debo poner tu barra de direcciones?</string>
     <string name="preOnboardingAddressBarOkButton">Siguiente</string>
+    <string name="preOnboardingAddressBarPositionTop">Arriba</string>
+    <string name="preOnboardingAddressBarPositionBottom">Inferior</string>
+    <string name="preOnboardingAddressBarPositionSplit">Dividir</string>
     <string name="highlightsPreOnboardingAddressBarOption1Title">Arriba (predeterminado)</string>
     <string name="highlightsPreOnboardingAddressBarOption1Description">Fácil de ver</string>
     <string name="highlightsPreOnboardingAddressBarOption2Title">Inferior</string>
@@ -866,6 +872,8 @@
     <string name="onboardingSitesDaxDialogOption3">ebay.com</string>
     <string name="onboardingSitesDaxDialogOption4">¡Sorpréndeme!</string>
     <string name="onboardingSerpDaxDialogDescription"><![CDATA[¡Eso es <b>DuckDuckGo Search</b>! Privado. Rápido. Menos anuncios.]]></string>
+    <string name="onboardingSerpDaxDialogBrandDesignTitle">¡Así es DuckDuckGo Search!</string>
+    <string name="onboardingSerpDaxDialogBrandDesignDescription">Privado. Rápido. Menos anuncios.</string>
     <string name="onboardingSerpDaxDialogButton">Entendido</string>
     <string name="onboardingSitesSuggestionsDaxDialogTitle">¡A continuación, intenta visitar un sitio!</string>
     <plurals name="onboardingTrackersBlockedDialogDescription">
@@ -896,6 +904,26 @@
     <string name="preOnboardingInputScreenTitleUpdated" translatable="false">Want easy access to private AI chat in the address bar?</string>
     <string name="preOnboardingInputScreenButton">Siguiente</string>
     <string name="preOnboardingInputScreenDescription"><![CDATA[Las funciones de IA son privadas y opcionales. Puedes realizar cambios en <b>Ajustes > Funciones de</b> IA.]]></string>
+
+    <!--Onboarding Reinstall Quick Setup-->
+    <string name="preOnboardingReinstallQuickSetupTitle">¡Te damos de nuevo la bienvenida!&lt;br/&gt;¿Quieres personalizar algo?</string>
+    <string name="preOnboardingReinstallSetDefaultLabel">Establecer DuckDuckGo como predeterminado</string>
+    <string name="preOnboardingReinstallAddHomeScreenWidgetLabel">Añadir widget a la pantalla de inicio</string>
+    <string name="preOnboardingReinstallAddressBarLabel">Posición de la barra de direcciones</string>
+    <string name="preOnboardingReinstallAddressBarSearchOptionsLabel">Opciones de búsqueda en la barra de direcciones</string>
+    <string name="preOnboardingReinstallStartBrowsing">Empezar a navegar</string>
+
+    <!-- Quick setup bottom sheets -->
+    <string name="quickSetupAddressBarPositionTitle">¿Dónde quieres tu barra de direcciones?</string>
+    <string name="quickSetupAddressBarPositionCaption"><![CDATA[Puedes realizar cambios en <b>Ajustes > Apariencia</b>.]]></string>
+    <string name="quickSetupSearchOptionsTitle">¿Quieres la búsqueda y chat de IA en la barra de direcciones? </string>
+    <string name="quickSetupBottomSheetDone">Hecho</string>
+    <string name="quickSetupInputScreenSearchOnly">Solo buscar</string>
+    <string name="quickSetupInputScreenSearchAndDuckAi">Búsqueda y Duck.ai</string>
+    <string name="quickSetupRemoveHomeScreenWidgetTitle">Cómo eliminar el widget de la pantalla de inicio</string>
+    <string name="quickSetupRemoveHomeScreenWidgetStep1">Ve a tu pantalla de inicio</string>
+    <string name="quickSetupRemoveHomeScreenWidgetStep2">Toca y mantén pulsado el widget</string>
+    <string name="quickSetupRemoveHomeScreenWidgetStep3">Toca o arrastra para eliminarlo</string>
 
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Barra de direcciones</string>
@@ -984,6 +1012,10 @@
     <string name="syncRestoreDialogPrimaryCta">Restaura mis cosas</string>
     <string name="syncRestoreDialogSecondaryCta">Omitir</string>
 
+    <!-- Sync Restore (brand-design onboarding) -->
+    <string name="syncRestoreDialogBrandDesignTitle">Vamos a continuar donde lo dejaste en DuckDuckGo.</string>
+    <string name="syncRestoreDialogBrandDesignBody1">Tus marcadores, contraseñas y más están listos.</string>
+
     <!-- PDF download tooltip -->
     <string name="pdfDownloadTooltipText">Descargar PDF</string>
 
@@ -991,4 +1023,14 @@
     <string name="copyLinkText">Copiar texto del enlace</string>
     <string name="linkTextCopied">Texto del enlace copiado</string>
     <string name="linkTextCopyFailed">No se pudo copiar el texto del enlace</string>
+
+    <string name="preOnboardingWelcomeDialogTitle">Hola.</string>
+    <string name="preOnboardingWelcomeDialogBody1">¿Todo listo para un navegador más rápido que\nte da el control?</string>
+    <string name="preOnboardingWelcomeDialogBody2">La IA es siempre opcional y la protección de privacidad está siempre activada.</string>
+    <string name="onboardingStepIndicatorText" instruction="a counter above our instructions in onboarding that tells a user what step they are on">%1$d de %2$d</string>
+    <string name="onboardingSearchDaxDialogOption1Quoted" instruction="translate &apos;duck&apos; too.">cómo se dice «duck» en inglés</string>
+    <string name="onboardingSearchDaxDialogOption1EnglishQuoted" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">cómo se dice «duck» en español</string>
+
+    <string name="input_screen_user_pref_without_ai_updated">Solo buscar</string>
+    <string name="input_screen_user_pref_with_ai_updated">Alterna entre la búsqueda y Duck.ai</string>
 </resources>

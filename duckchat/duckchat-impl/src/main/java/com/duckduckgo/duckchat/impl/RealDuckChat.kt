@@ -107,11 +107,6 @@ interface DuckChatInternal : DuckChat {
     suspend fun setAutomaticPageContextUserSetting(isEnabled: Boolean)
 
     /**
-     * Set user setting to determine whether the native input field should be used.
-     */
-    suspend fun setNativeInputFieldUserSetting(isEnabled: Boolean)
-
-    /**
      * Sets the user's preferred default toggle position.
      */
     suspend fun setDefaultTogglePosition(position: DefaultTogglePosition)
@@ -177,6 +172,9 @@ interface DuckChatInternal : DuckChat {
      * Opens DuckChat with a new session.
      */
     fun openNewDuckChatSession()
+
+    /** Single source of truth for the Duck.ai chat URL shape. */
+    fun buildChatUrl(chatId: String): String
 
     /**
      * Calls onClose when a close event is emitted.
@@ -327,6 +325,7 @@ enum class ReportMetric(
 enum class ModelTier(val model: String) {
     FREE("free"),
     PLUS("plus"),
+    PRO("pro"),
     INTERNAL("internal"),
     UNKNOWN("unknown"),
     ;
@@ -385,6 +384,7 @@ class RealDuckChat @Inject constructor(
     private val _showMainButtonsInInputScreen = MutableStateFlow(false)
 
     private val _chatState = MutableStateFlow(ChatState.HIDE)
+    private val _nativeInputFieldEnabled = MutableStateFlow(false)
     private val _showInputScreenOnSystemSearchLaunch = MutableStateFlow(false)
     private val _showVoiceSearchToggle = MutableStateFlow(false)
     private val _showVoiceChatEntry = MutableStateFlow(false)
@@ -422,6 +422,7 @@ class RealDuckChat @Inject constructor(
     private var isAutomaticContextAttachmentEnabled: Boolean = false
     private var duckAiNativeStorage: Boolean = false
     private var areMultipleContentAttachmentsEnabled: Boolean = false
+    private var isNativeInputFieldEnabled: Boolean = false
 
     init {
         if (isMainProcess) {
@@ -478,13 +479,6 @@ class RealDuckChat @Inject constructor(
         }
     }
 
-    override suspend fun setNativeInputFieldUserSetting(isEnabled: Boolean) {
-        withContext(dispatchers.io()) {
-            duckChatFeatureRepository.setNativeInputFieldUserSetting(isEnabled)
-            cacheUserSettings()
-        }
-    }
-
     override fun isEnabled(): Boolean = isDuckChatFeatureEnabled && isDuckChatUserEnabled
 
     override fun isInputScreenFeatureAvailable(): Boolean = duckAiInputScreen
@@ -512,8 +506,7 @@ class RealDuckChat @Inject constructor(
     override fun observeAutomaticContextAttachmentUserSettingEnabled(): Flow<Boolean> =
         duckChatFeatureRepository.observeAutomaticContextAttachmentUserSettingEnabled()
 
-    override fun observeNativeInputFieldUserSettingEnabled(): Flow<Boolean> =
-        duckChatFeatureRepository.observeNativeInputFieldUserSettingEnabled()
+    override fun observeNativeInputFieldUserSettingEnabled(): Flow<Boolean> = _nativeInputFieldEnabled.asStateFlow()
 
     override fun observeShowInBrowserMenuUserSetting(): Flow<Boolean> = duckChatFeatureRepository.observeShowInBrowserMenu()
 
@@ -630,10 +623,11 @@ class RealDuckChat @Inject constructor(
         autoPrompt: Boolean,
         sidebar: Boolean,
     ): String {
-        val parameters = addChatParameters(query, autoPrompt = autoPrompt, sidebar = sidebar)
-        val url = appendParameters(parameters, getDuckChatLink())
-        return url
+        val parameters = addChatParameters(query, autoPrompt = autoPrompt, sidebar = sidebar) + nativeInputParameters()
+        return appendParameters(parameters, getDuckChatLink())
     }
+
+    override fun getDuckChatSettingsUrl(): String = resolveDuckAiUrl(DUCK_CHAT_SETTINGS_WEB_LINK)
 
     private fun addChatParameters(
         query: String,
@@ -677,7 +671,7 @@ class RealDuckChat @Inject constructor(
         parameters: Map<String, String>,
         forceNewSession: Boolean = false,
     ) {
-        val url = appendParameters(parameters, getDuckChatLink())
+        val url = appendParameters(parameters + nativeInputParameters(), getDuckChatLink())
         appCoroutineScope.launch(dispatchers.io()) {
             val hasSessionActive =
                 when {
@@ -706,9 +700,14 @@ class RealDuckChat @Inject constructor(
             }
     }
 
-    private fun getDuckChatLink(): String {
-        return duckChatLink.toUri().buildUpon().authority(duckAiHostProvider.getHost()).build().toString()
-    }
+    private fun getDuckChatLink(): String = resolveDuckAiUrl(duckChatLink)
+
+    /** Resolves [link] against the configured Duck.ai host by swapping its authority (e.g. for internal/staging overrides). */
+    private fun resolveDuckAiUrl(link: String): String =
+        link.toUri().buildUpon().authority(duckAiHostProvider.getHost()).build().toString()
+
+    private fun nativeInputParameters(): Map<String, String> =
+        if (isNativeInputFieldEnabled) mapOf(NATIVE_INPUT_QUERY_NAME to NATIVE_INPUT_QUERY_VALUE) else emptyMap()
 
     private fun appendParameters(
         parameters: Map<String, String>,
@@ -810,6 +809,18 @@ class RealDuckChat @Inject constructor(
 
     override fun observeTriggerVoiceChatSessionEnd(): Flow<String> = voiceSessionStateManager.observeTriggerVoiceSessionEnd()
 
+    override fun endVoiceChatSession(tabId: String) = voiceSessionStateManager.triggerVoiceSessionEnd(tabId)
+
+    override suspend fun isChatHistoryAvailable(): Boolean = withContext(dispatchers.io()) {
+        isEnabled() &&
+            duckChatFeature.useNativeStorageChatData().isEnabled() &&
+            duckChatFeature.historyScreen().isEnabled()
+    }
+
+    override fun buildChatUrl(chatId: String): String {
+        return appendParameters(mapOf(CHAT_ID_QUERY_NAME to chatId) + nativeInputParameters(), getDuckChatLink())
+    }
+
     override suspend fun setDefaultTogglePosition(position: DefaultTogglePosition) {
         duckChatFeatureRepository.setDefaultTogglePosition(position.name)
     }
@@ -883,6 +894,7 @@ class RealDuckChat @Inject constructor(
             _allowDuckAiAsDigitalAssistant.emit(featureEnabled && duckChatFeature.digitalAssistantDuckAi().isEnabled())
             isImageUploadEnabled = imageUploadFeature.self().isEnabled()
             isStandaloneMigrationEnabled = duckChatFeature.standaloneMigration().isEnabled()
+            _nativeInputFieldEnabled.value = duckChatFeature.nativeInputField().isEnabled()
 
             keepSessionAliveInMinutes = settingsJson?.sessionTimeoutMinutes ?: DEFAULT_SESSION_ALIVE
 
@@ -894,7 +906,7 @@ class RealDuckChat @Inject constructor(
         withContext(dispatchers.io()) {
             isDuckChatUserEnabled = duckChatFeatureRepository.isDuckChatUserEnabled()
 
-            val isNativeInputFieldEnabled = duckChatFeatureRepository.isNativeInputFieldUserSettingEnabled()
+            isNativeInputFieldEnabled = _nativeInputFieldEnabled.value
             val showInputScreen =
                 isInputScreenFeatureAvailable() && isDuckChatFeatureEnabled && isDuckChatUserEnabled &&
                     duckChatFeatureRepository.isInputScreenUserSettingEnabled() && !isNativeInputFieldEnabled
@@ -934,7 +946,10 @@ class RealDuckChat @Inject constructor(
                     isDuckChatFeatureEnabled && isDuckChatUserEnabled && isVoiceChatEntryPointEnabled
             _showVoiceChatEntry.emit(showVoiceChatEntry)
 
-            val showFullScreenMode = isDuckChatFeatureEnabled && isDuckChatUserEnabled &&
+            // Full screen mode (new Duck.ai header, unified input, hamburger menu) is intentionally NOT gated on
+            // isDuckChatUserEnabled: users who disabled Duck.ai still get the new UX when navigating directly to a
+            // duck.ai tab. It remains gated on the feature rollout flag/setting only.
+            val showFullScreenMode = isDuckChatFeatureEnabled &&
                 (duckChatFeature.fullscreenMode().isEnabled() || duckChatFeatureRepository.isFullScreenModeUserSettingEnabled())
             isFullscreenModeEnabled = showFullScreenMode
             _showFullScreenMode.emit(showFullScreenMode)
@@ -962,9 +977,11 @@ class RealDuckChat @Inject constructor(
 
     companion object {
         private const val DUCK_CHAT_WEB_LINK = "https://duck.ai/chat?duckai=5"
+        private const val DUCK_CHAT_SETTINGS_WEB_LINK = "https://duck.ai?settings=open"
         private const val DUCKDUCKGO_HOST = "duckduckgo.com"
         private const val CHAT_QUERY_NAME = "ia"
         private const val CHAT_QUERY_VALUE = "chat"
+        private const val CHAT_ID_QUERY_NAME = "chatID"
         private const val PROMPT_QUERY_NAME = "prompt"
         private const val PROMPT_QUERY_VALUE = "1"
         private const val PLACEMENT_QUERY_NAME = "placement"
@@ -973,6 +990,8 @@ class RealDuckChat @Inject constructor(
         private const val BANG_QUERY_VALUE = "true"
         private const val MODE_QUERY_NAME = "mode"
         private const val VOICE_MODE_QUERY_VALUE = "voice-mode"
+        private const val NATIVE_INPUT_QUERY_NAME = "native-input"
+        private const val NATIVE_INPUT_QUERY_VALUE = "true"
         private const val DEFAULT_SESSION_ALIVE = 60
         private const val REVOKE_URL = "https://duckduckgo.com/revoke-duckai-access"
     }

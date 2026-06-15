@@ -77,6 +77,7 @@
     <string name="options">Opcije</string>
     <string name="shareLink">Podijeli poveznicu</string>
     <string name="copyUrl">Kopiraj adresu poveznice</string>
+    <string name="urlCopiedToClipboard">URL je kopiran u međuspremnik</string>
 
     <!-- Find in page -->
     <string name="nextSearchTermDescription">Pronađi sljedeće</string>
@@ -273,6 +274,7 @@
     <string name="singleTabFireDialogDeleteAll">Izbriši sve</string>
     <string name="singleTabFireDialogDeleteThisTab">Izbriši ovu karticu</string>
     <string name="singleTabFireDialogDeleteChat">Izbriši čavrljanje</string>
+    <string name="singleTabFireDialogDeleteChats">Izbriši čavrljanja</string>
     <string name="singleTabFireDialogTitleDuckAi">Izbrisati ovo čavrljanje?</string>
     <string name="singleTabFireDialogSubtitleSiteData">Brisanje podataka mrežnih lokacija može te odjaviti s računa.</string>
     <string name="singleTabFireDialogSubtitleDownloads">Ovo će otkazati preuzimanja u tijeku.</string>
@@ -597,6 +599,7 @@
     <!-- Fire Animation settings -->
     <string name="settingsFireAnimation">Animacija gumba Vatre</string>
     <string name="settingsHeroFireAnimation">Pakao</string>
+    <string name="settingsHeroFireAnimationClassic">Inferno Classic</string>
     <string name="settingsHeroWaterAnimation">Vrtlog</string>
     <string name="settingsHeroAbstractAnimation">Zračna struja</string>
     <string name="settingsNoneAnimation">Nijedno</string>
@@ -880,6 +883,9 @@
     <string name="preOnboardingDaxDialog3Button">Započni pretraživanje</string>
     <string name="preOnboardingAddressBarTitle">Gdje trebam staviti tvoju adresnu traku?</string>
     <string name="preOnboardingAddressBarOkButton">Dalje</string>
+    <string name="preOnboardingAddressBarPositionTop">Vrh</string>
+    <string name="preOnboardingAddressBarPositionBottom">Dno</string>
+    <string name="preOnboardingAddressBarPositionSplit">Podijeli</string>
     <string name="highlightsPreOnboardingAddressBarOption1Title">Vrh (zadano)</string>
     <string name="highlightsPreOnboardingAddressBarOption1Description">Lako se vidi</string>
     <string name="highlightsPreOnboardingAddressBarOption2Title">Dno</string>
@@ -902,6 +908,8 @@
     <string name="onboardingSitesDaxDialogOption3">ebay.com</string>
     <string name="onboardingSitesDaxDialogOption4">Iznenadi me!</string>
     <string name="onboardingSerpDaxDialogDescription"><![CDATA[To je <b>DuckDuckGo Search</b>! Privatno. Brzo. Manje oglasa.]]></string>
+    <string name="onboardingSerpDaxDialogBrandDesignTitle">To je DuckDuckGo Search!</string>
+    <string name="onboardingSerpDaxDialogBrandDesignDescription">Privatno. Brzo. Manje oglasa.</string>
     <string name="onboardingSerpDaxDialogButton">Shvaćam!</string>
     <string name="onboardingSitesSuggestionsDaxDialogTitle">Nakon toga pokušaj posjetiti neko web-mjesto!</string>
     <plurals name="onboardingTrackersBlockedDialogDescription">
@@ -936,6 +944,26 @@
     <string name="preOnboardingInputScreenTitleUpdated" translatable="false">Want easy access to private AI chat in the address bar?</string>
     <string name="preOnboardingInputScreenButton">Dalje</string>
     <string name="preOnboardingInputScreenDescription"><![CDATA[Značajke umjetne inteligencije privatne su i neobavezne. Izmjene možeš napraviti u izborniku <b>Postavke > AI značajke</b>.]]></string>
+
+    <!--Onboarding Reinstall Quick Setup-->
+    <string name="preOnboardingReinstallQuickSetupTitle">Dobrodošao natrag!&lt;br/&gt;Želiš li nešto prilagoditi?</string>
+    <string name="preOnboardingReinstallSetDefaultLabel">Postavi DuckDuckGo kao zadanu tražilicu</string>
+    <string name="preOnboardingReinstallAddHomeScreenWidgetLabel">Dodaj widget na početni zaslon</string>
+    <string name="preOnboardingReinstallAddressBarLabel">Položaj adresne trake</string>
+    <string name="preOnboardingReinstallAddressBarSearchOptionsLabel">Opcije pretraživanja adresne trake</string>
+    <string name="preOnboardingReinstallStartBrowsing">Započni pretraživanje</string>
+
+    <!-- Quick setup bottom sheets -->
+    <string name="quickSetupAddressBarPositionTitle">Gdje želiš svoju adresnu traku?</string>
+    <string name="quickSetupAddressBarPositionCaption"><![CDATA[Promjene možeš napraviti u <b>Postavke > Izgled</b>.]]></string>
+    <string name="quickSetupSearchOptionsTitle">Želiš pretraživanje i AI čavrljanje u adresnoj traci?</string>
+    <string name="quickSetupBottomSheetDone">Gotovo</string>
+    <string name="quickSetupInputScreenSearchOnly">Samo pretraživanje</string>
+    <string name="quickSetupInputScreenSearchAndDuckAi">Pretraživanje i Duck.ai</string>
+    <string name="quickSetupRemoveHomeScreenWidgetTitle">Kako ukloniti widget s početnog zaslona</string>
+    <string name="quickSetupRemoveHomeScreenWidgetStep1">Idi na početni zaslon</string>
+    <string name="quickSetupRemoveHomeScreenWidgetStep2">Dodirni i drži widget</string>
+    <string name="quickSetupRemoveHomeScreenWidgetStep3">Dodirni ili povuci da ga ukloniš</string>
 
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Adresna traka</string>
@@ -1024,6 +1052,10 @@
     <string name="syncRestoreDialogPrimaryCta">Vrati mi stvari</string>
     <string name="syncRestoreDialogSecondaryCta">Preskoči</string>
 
+    <!-- Sync Restore (brand-design onboarding) -->
+    <string name="syncRestoreDialogBrandDesignTitle">Nastavimo tamo gdje si stao na DuckDuckGou.</string>
+    <string name="syncRestoreDialogBrandDesignBody1">Tvoje spremljene oznake, lozinke (i još mnogo toga) su spremne.</string>
+
     <!-- PDF download tooltip -->
     <string name="pdfDownloadTooltipText">Preuzmi PDF</string>
 
@@ -1031,4 +1063,14 @@
     <string name="copyLinkText">Kopiraj tekst poveznice</string>
     <string name="linkTextCopied">Tekst poveznice je kopiran</string>
     <string name="linkTextCopyFailed">Nije moguće kopirati tekst poveznice</string>
+
+    <string name="preOnboardingWelcomeDialogTitle">Pozdrav!</string>
+    <string name="preOnboardingWelcomeDialogBody1">Jesi li spreman za brži preglednik koji te stavlja za upravljač?</string>
+    <string name="preOnboardingWelcomeDialogBody2">Umjetna inteligencija uvijek je neobavezna, a zaštita privatnosti uvijek aktivna.</string>
+    <string name="onboardingStepIndicatorText" instruction="a counter above our instructions in onboarding that tells a user what step they are on">%1$d od %2$d</string>
+    <string name="onboardingSearchDaxDialogOption1Quoted" instruction="translate &apos;duck&apos; too.">kako se kaže \"patka\" na engleskom</string>
+    <string name="onboardingSearchDaxDialogOption1EnglishQuoted" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">kako se kaže \"patka\" na španjolskom</string>
+
+    <string name="input_screen_user_pref_without_ai_updated">Samo pretraživanje</string>
+    <string name="input_screen_user_pref_with_ai_updated">Prebacuj se između pretraživanja i Duck.ai</string>
 </resources>

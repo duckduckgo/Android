@@ -5,7 +5,6 @@
         "triggers": ["user_submitted"],
         "suffixes": ["form_factor"],
         "parameters": [
-            "atb",
             "appVersion",
             "remoteConfigEtag",
             {
@@ -215,7 +214,6 @@
         "triggers": ["user_submitted"],
         "suffixes": ["form_factor"],
         "parameters": [
-            "atb",
             "appVersion",
             "remoteConfigEtag",
             {
@@ -356,7 +354,6 @@
         "suffixes": ["form_factor"],
         "parameters": [
             "appVersion",
-            "atb",
             {
                 "key": "opener",
                 "description": "Where the report UI was opened from.",
@@ -371,7 +368,6 @@
         "suffixes": ["form_factor"],
         "parameters": [
             "appVersion",
-            "atb",
             {
                 "key": "opener",
                 "description": "Where the report UI was opened from.",
@@ -384,20 +380,20 @@
         "owners": ["laghee"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
-        "parameters": ["appVersion", "atb"]
+        "parameters": ["appVersion"]
     },
     "m_site-not-working_shown": {
         "description": "User was shown the prompt to send a broken site report after reloading a website three times in 20 seconds.",
         "owners": ["laghee"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
-        "parameters": ["appVersion", "atb"]
+        "parameters": ["appVersion"]
     },
     "m_site-not-working_website-is-broken": {
         "description": "User agreed to send a broken site report when prompted, after they reloaded a website three times in 20 seconds.",
         "owners": ["laghee"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
-        "parameters": ["appVersion", "atb"]
+        "parameters": ["appVersion"]
     }
 }

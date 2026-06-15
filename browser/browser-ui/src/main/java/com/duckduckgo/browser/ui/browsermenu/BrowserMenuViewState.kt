@@ -22,7 +22,9 @@ sealed class BrowserMenuViewState {
         val canGoBack: Boolean = false,
         val canGoForward: Boolean = false,
         val showDuckChatOption: Boolean = false,
-        val showNewDuckChatTabOption: Boolean = false,
+        val showDuckChatHistoryOption: Boolean = false,
+        val showDuckAiSection: Boolean = false,
+        val showDuckChatVoiceOption: Boolean = false,
         val canSharePage: Boolean = false,
         val showSelectDefaultBrowserMenuItem: Boolean = false,
         val canSaveSite: Boolean = false,
@@ -64,6 +66,9 @@ sealed class BrowserMenuViewState {
     data class NewTabPage(
         val canGoForward: Boolean = false,
         val showDuckChatOption: Boolean = false,
+        val showDuckChatHistoryOption: Boolean = false,
+        val showDuckAiSection: Boolean = false,
+        val showDuckChatVoiceOption: Boolean = false,
         val isEmailSignedIn: Boolean = false,
         val vpnMenuState: VpnMenuState = VpnMenuState.Hidden,
         val showAutofill: Boolean = false,
@@ -75,6 +80,9 @@ sealed class BrowserMenuViewState {
         val canReportSite: Boolean = false,
         val showAutofill: Boolean = false,
         val showDownloadDot: Boolean = false,
+        val showDuckChatHistoryOption: Boolean = false,
+        val showDuckAiSection: Boolean = false,
+        val showDuckChatVoiceOption: Boolean = false,
         val pageContextHeader: PageContextHeaderState = PageContextHeaderState.Hidden,
     ) : BrowserMenuViewState()
 }

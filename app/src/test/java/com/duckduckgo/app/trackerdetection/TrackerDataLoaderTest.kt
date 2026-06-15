@@ -20,6 +20,7 @@ import android.content.Context
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.pixels.remoteconfig.OptimizeTrackerEvaluationRCWrapper
+import com.duckduckgo.app.pixels.remoteconfig.PrecompileTdsRegexRCWrapper
 import com.duckduckgo.app.trackerdetection.api.TdsJson
 import com.duckduckgo.app.trackerdetection.api.TdsJsonEntity
 import com.duckduckgo.app.trackerdetection.api.TdsJsonTracker
@@ -63,6 +64,7 @@ class TrackerDataLoaderTest {
     private val mockContext: Context = mock()
     private val mockAppDatabase: AppDatabase = mock()
     private val mockUrlToTypeMapper: UrlToTypeMapper = mock()
+    private val mockEntityLookupRefresher: EntityLookupRefresher = mock()
 
     private val runnableCaptor = argumentCaptor<Runnable>()
     private val tdsMetaDataCaptor = argumentCaptor<TdsMetadata>()
@@ -81,8 +83,13 @@ class TrackerDataLoaderTest {
             appDatabase = mockAppDatabase,
             moshi = Moshi.Builder().build(),
             urlToTypeMapper = mockUrlToTypeMapper,
-            coroutineRule.testDispatcherProvider,
-            object : OptimizeTrackerEvaluationRCWrapper {
+            entityLookupRefresher = mockEntityLookupRefresher,
+            dispatcherProvider = coroutineRule.testDispatcherProvider,
+            optimizeTrackerEvaluationRCWrapper = object : OptimizeTrackerEvaluationRCWrapper {
+                override val enabled: Boolean
+                    get() = false
+            },
+            precompileTdsRegexRCWrapper = object : PrecompileTdsRegexRCWrapper {
                 override val enabled: Boolean
                     get() = false
             },

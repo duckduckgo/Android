@@ -18,4 +18,5 @@
     <dimen name="sslWarningTextWidth">628dp</dimen>
     <dimen name="toolbar_horizontal_margin">0dp</dimen>
     <dimen name="onboardingBackgroundMaxHeight">252dp</dimen>
+    <dimen name="preOnboardingDaxCtaPaddingTop">24dp</dimen>
 </resources>

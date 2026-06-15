@@ -29,13 +29,19 @@ interface ManualDataClearing {
      */
     suspend fun clearDataUsingManualFireOptions(shouldRestartIfRequired: Boolean = false, wasAppUsedSinceLastClear: Boolean = false)
 
+    /** Deletes only the chats addressed by [chatUrls] and closes any browser tabs pointing at them. */
+    suspend fun clearSelectedDuckAiChats(chatUrls: Set<String>)
+
     /**
      * Clears all data associated with tab:
      * site browsing data (via WebStorageCompat), tab-specific history,
      * Duck.ai chat (if applicable), and the tab itself.
      * @param tabId the tab to burn
+     * @param replaceCurrentTab when true (default), the tab is replaced with a fresh new tab. When false,
+     *  the data is cleared but the tab record is deleted (used by the Hatch flow, where the user
+     *  is on the NTP and shouldn't be redirected back into the deleted tab's URL).
      * @return [ClearDataResult] indicating whether the operation succeeded or the feature is not supported
      */
-    suspend fun clearSingleTabData(tabId: String): ClearDataResult
+    suspend fun clearSingleTabData(tabId: String, replaceCurrentTab: Boolean = true): ClearDataResult
     suspend fun clearTabContextualChat(tabId: String): ClearDataResult
 }

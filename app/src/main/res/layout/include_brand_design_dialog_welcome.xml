@@ -48,15 +48,27 @@
     </FrameLayout>
 
     <com.duckduckgo.common.ui.view.text.DaxTextView
-        android:id="@+id/bodyText"
+        android:id="@+id/bodyText1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="20dp"
         android:alpha="0"
         android:gravity="center"
         android:includeFontPadding="false"
-        android:text="@string/preOnboardingWelcomeDialogBody"
         app:typography="onboarding_body"
-        tools:alpha="1" />
+        tools:alpha="1"
+        tools:text="@string/preOnboardingWelcomeDialogBody1" />
+
+    <com.duckduckgo.common.ui.view.text.DaxTextView
+        android:id="@+id/bodyText2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:alpha="0"
+        android:gravity="center"
+        android:includeFontPadding="false"
+        app:typography="onboarding_body"
+        tools:alpha="1"
+        tools:text="@string/preOnboardingWelcomeDialogBody2" />
 
 </LinearLayout>

@@ -24,14 +24,19 @@ import com.duckduckgo.duckchat.store.impl.store.DuckAiBridgeChatsDao
 import com.duckduckgo.duckchat.store.impl.store.DuckAiBridgeFileMetaDao
 import com.duckduckgo.duckchat.store.impl.store.DuckAiBridgeFileMetaEntity
 import dagger.Lazy
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.test.runTest
+import org.json.JSONObject
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.any
+import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
@@ -111,6 +116,63 @@ class RealDuckAiChatStoreTest {
     }
 
     @Test
+    fun `getChats parses reasoningMode when present`() = runTest {
+        val json = """{"chatId":"abc","title":"Test","model":"gpt-5-mini","lastEdit":"x","pinned":false,"reasoningMode":"reasoning"}"""
+        whenever(chatsDao.getAll()).thenReturn(listOf(DuckAiBridgeChatEntity("abc", json)))
+
+        assertEquals("reasoning", store.getChats()[0].reasoningMode)
+    }
+
+    @Test
+    fun `getChats returns null reasoningMode when field missing`() = runTest {
+        val json = """{"chatId":"abc","title":"Test","model":"gpt-5-mini","lastEdit":"x","pinned":false}"""
+        whenever(chatsDao.getAll()).thenReturn(listOf(DuckAiBridgeChatEntity("abc", json)))
+
+        assertNull(store.getChats()[0].reasoningMode)
+    }
+
+    @Test
+    fun `getChats returns null reasoningMode when field is empty string`() = runTest {
+        val json = """{"chatId":"abc","title":"Test","model":"gpt-5-mini","lastEdit":"x","pinned":false,"reasoningMode":""}"""
+        whenever(chatsDao.getAll()).thenReturn(listOf(DuckAiBridgeChatEntity("abc", json)))
+
+        assertNull(store.getChats()[0].reasoningMode)
+    }
+
+    @Test
+    fun `getChats returns null reasoningMode when field is JSON null`() = runTest {
+        // JSONObject.optString returns the literal string "null" for explicit JSON null; guard via isNull.
+        val json = """{"chatId":"abc","title":"Test","model":"gpt-5-mini","lastEdit":"x","pinned":false,"reasoningMode":null}"""
+        whenever(chatsDao.getAll()).thenReturn(listOf(DuckAiBridgeChatEntity("abc", json)))
+
+        assertNull(store.getChats()[0].reasoningMode)
+    }
+
+    @Test
+    fun `getChatById returns parsed chat when found`() = runTest {
+        val json = """{"chatId":"abc","title":"Test","model":"gpt-5-mini","lastEdit":"x","pinned":false,"reasoningMode":"reasoning"}"""
+        whenever(chatsDao.getById("abc")).thenReturn(DuckAiBridgeChatEntity("abc", json))
+
+        val chat = store.getChatById("abc")
+
+        assertEquals("abc", chat?.chatId)
+        assertEquals("gpt-5-mini", chat?.model)
+        assertEquals("reasoning", chat?.reasoningMode)
+    }
+
+    @Test
+    fun `getChatById returns null when chat not found`() = runTest {
+        whenever(chatsDao.getById("missing")).thenReturn(null)
+        assertNull(store.getChatById("missing"))
+    }
+
+    @Test
+    fun `getChatById returns null when stored JSON is malformed`() = runTest {
+        whenever(chatsDao.getById("abc")).thenReturn(DuckAiBridgeChatEntity("abc", "not json"))
+        assertNull(store.getChatById("abc"))
+    }
+
+    @Test
     fun `getChats uses Untitled Chat for missing title`() = runTest {
         val json = """{"chatId":"abc","model":"gpt-5-mini","lastEdit":"2026-04-01T21:31:54.260Z","pinned":false}"""
         whenever(chatsDao.getAll()).thenReturn(listOf(DuckAiBridgeChatEntity("abc", json)))
@@ -135,6 +197,201 @@ class RealDuckAiChatStoreTest {
     fun `getChats returns empty list when store is empty`() = runTest {
         whenever(chatsDao.getAll()).thenReturn(emptyList())
         assertTrue(store.getChats().isEmpty())
+    }
+
+    // --- derived classification flags ---
+
+    @Test
+    fun `getChats sets isImageGeneration when assistant message has generate-image ui-component part`() = runTest {
+        val json = """
+            {
+              "chatId": "abc",
+              "title": "Image",
+              "model": "gpt-5-mini",
+              "lastEdit": "2026-05-15T14:23:16.313Z",
+              "pinned": false,
+              "messages": [
+                { "role": "user", "content": "draw a cat" },
+                {
+                  "role": "assistant",
+                  "parts": [
+                    { "type": "ui-component", "name": "generate-image" }
+                  ]
+                }
+              ]
+            }
+        """.trimIndent()
+        whenever(chatsDao.getAll()).thenReturn(listOf(DuckAiBridgeChatEntity("abc", json)))
+
+        assertTrue(store.getChats()[0].isImageGeneration)
+    }
+
+    @Test
+    fun `getChats does not set isImageGeneration when generate-image part is on a non-assistant message`() = runTest {
+        val json = """
+            {
+              "chatId": "abc",
+              "title": "x",
+              "model": "gpt-5-mini",
+              "lastEdit": "2026-05-15T14:23:16.313Z",
+              "pinned": false,
+              "messages": [
+                {
+                  "role": "user",
+                  "parts": [
+                    { "type": "ui-component", "name": "generate-image" }
+                  ]
+                }
+              ]
+            }
+        """.trimIndent()
+        whenever(chatsDao.getAll()).thenReturn(listOf(DuckAiBridgeChatEntity("abc", json)))
+
+        assertFalse(store.getChats()[0].isImageGeneration)
+    }
+
+    @Test
+    fun `getChats does not set isImageGeneration for other ui-component names`() = runTest {
+        val json = """
+            {
+              "chatId": "abc",
+              "title": "x",
+              "model": "gpt-5-mini",
+              "lastEdit": "2026-05-15T14:23:16.313Z",
+              "pinned": false,
+              "messages": [
+                {
+                  "role": "assistant",
+                  "parts": [
+                    { "type": "ui-component", "name": "something-else" }
+                  ]
+                }
+              ]
+            }
+        """.trimIndent()
+        whenever(chatsDao.getAll()).thenReturn(listOf(DuckAiBridgeChatEntity("abc", json)))
+
+        assertFalse(store.getChats()[0].isImageGeneration)
+    }
+
+    @Test
+    fun `getChats does not set isImageGeneration when part type is not ui-component`() = runTest {
+        val json = """
+            {
+              "chatId": "abc",
+              "title": "x",
+              "model": "gpt-5-mini",
+              "lastEdit": "2026-05-15T14:23:16.313Z",
+              "pinned": false,
+              "messages": [
+                {
+                  "role": "assistant",
+                  "parts": [
+                    { "type": "text", "name": "generate-image" }
+                  ]
+                }
+              ]
+            }
+        """.trimIndent()
+        whenever(chatsDao.getAll()).thenReturn(listOf(DuckAiBridgeChatEntity("abc", json)))
+
+        assertFalse(store.getChats()[0].isImageGeneration)
+    }
+
+    @Test
+    fun `getChats defaults isImageGeneration to false when messages is missing`() = runTest {
+        val json = """{"chatId":"abc","title":"x","model":"gpt-5-mini","lastEdit":"2026-05-15T14:23:16.313Z","pinned":false}"""
+        whenever(chatsDao.getAll()).thenReturn(listOf(DuckAiBridgeChatEntity("abc", json)))
+
+        assertFalse(store.getChats()[0].isImageGeneration)
+    }
+
+    @Test
+    fun `getChats defaults isImageGeneration to false when parts is missing on assistant message`() = runTest {
+        val json = """
+            {
+              "chatId": "abc",
+              "title": "x",
+              "model": "gpt-5-mini",
+              "lastEdit": "2026-05-15T14:23:16.313Z",
+              "pinned": false,
+              "messages": [
+                { "role": "assistant", "content": "hi" }
+              ]
+            }
+        """.trimIndent()
+        whenever(chatsDao.getAll()).thenReturn(listOf(DuckAiBridgeChatEntity("abc", json)))
+
+        assertFalse(store.getChats()[0].isImageGeneration)
+    }
+
+    @Test
+    fun `getChats sets isVoice when model is voice-mode`() = runTest {
+        val json = """{"chatId":"abc","title":"v","model":"voice-mode","lastEdit":"2026-05-15T14:23:16.313Z","pinned":false}"""
+        whenever(chatsDao.getAll()).thenReturn(listOf(DuckAiBridgeChatEntity("abc", json)))
+
+        val chat = store.getChats()[0]
+        assertTrue(chat.isVoice)
+        assertFalse(chat.isImageGeneration)
+    }
+
+    @Test
+    fun `getChats does not set isVoice for other models`() = runTest {
+        val json = """{"chatId":"abc","title":"x","model":"gpt-5-mini","lastEdit":"2026-05-15T14:23:16.313Z","pinned":false}"""
+        whenever(chatsDao.getAll()).thenReturn(listOf(DuckAiBridgeChatEntity("abc", json)))
+
+        assertFalse(store.getChats()[0].isVoice)
+    }
+
+    @Test
+    fun `getChatsFlow emits mapped business model on each DAO emission`() = runTest {
+        val json = """{"chatId":"abc","title":"Test","model":"gpt-5-mini","lastEdit":"2026-04-01T21:31:54.260Z","pinned":true}"""
+        val source = MutableStateFlow(listOf(DuckAiBridgeChatEntity("abc", json)))
+        whenever(chatsDao.getAllAsFlow()).thenReturn(source)
+
+        val first = store.getChatsFlow().firstOrNull().orEmpty()
+
+        assertEquals(1, first.size)
+        assertEquals("abc", first[0].chatId)
+        assertEquals("Test", first[0].title)
+        assertTrue(first[0].pinned)
+    }
+
+    @Test
+    fun `getChatsFlow re-emits after deletions`() = runTest {
+        val json1 = """{"chatId":"abc","title":"A","model":"m","lastEdit":"2026-04-01T00:00:00.000Z","pinned":false}"""
+        val json2 = """{"chatId":"def","title":"B","model":"m","lastEdit":"2026-04-02T00:00:00.000Z","pinned":false}"""
+        val source = MutableStateFlow(listOf(DuckAiBridgeChatEntity("abc", json1), DuckAiBridgeChatEntity("def", json2)))
+        whenever(chatsDao.getAllAsFlow()).thenReturn(source)
+
+        val flow = store.getChatsFlow()
+        assertEquals(2, flow.firstOrNull().orEmpty().size)
+
+        source.value = listOf(DuckAiBridgeChatEntity("abc", json1))
+        assertEquals(listOf("abc"), flow.firstOrNull().orEmpty().map { it.chatId })
+    }
+
+    @Test
+    fun `getChatsFlow emits empty list after deleteAll`() = runTest {
+        val source = MutableStateFlow<List<DuckAiBridgeChatEntity>>(emptyList())
+        whenever(chatsDao.getAllAsFlow()).thenReturn(source)
+
+        assertTrue(store.getChatsFlow().firstOrNull().orEmpty().isEmpty())
+    }
+
+    @Test
+    fun `getChatsFlow drops malformed entries on every emission`() = runTest {
+        val good = """{"chatId":"abc","title":"Test","model":"m","lastEdit":"2026-04-01T00:00:00.000Z","pinned":false}"""
+        val source = MutableStateFlow(
+            listOf(
+                DuckAiBridgeChatEntity("abc", good),
+                DuckAiBridgeChatEntity("bad", "not json"),
+            ),
+        )
+        whenever(chatsDao.getAllAsFlow()).thenReturn(source)
+
+        val emitted = store.getChatsFlow().firstOrNull().orEmpty()
+        assertEquals(listOf("abc"), emitted.map { it.chatId })
     }
 
     // --- deleteChat ---
@@ -224,6 +481,47 @@ class RealDuckAiChatStoreTest {
         verify(chatsDao).deleteAll()
     }
 
+    // --- renameChat ---
+
+    @Test
+    fun `renameChat returns false when chat not found`() = runTest {
+        whenever(chatsDao.getById("missing")).thenReturn(null)
+
+        assertFalse(store.renameChat("missing", "New title"))
+        verify(chatsDao, never()).upsert(any())
+    }
+
+    @Test
+    fun `renameChat updates only the title and preserves other JSON fields`() = runTest {
+        val originalJson = """
+            {"chatId":"abc","title":"Old","model":"gpt-5-mini","lastEdit":"2026-04-01T21:31:54.260Z","pinned":true,"fileRefs":["uuid1"],"messages":[{"role":"user","text":"hi"}]}
+        """.trimIndent()
+        whenever(chatsDao.getById("abc")).thenReturn(DuckAiBridgeChatEntity("abc", originalJson))
+
+        assertTrue(store.renameChat("abc", "Brand new title"))
+
+        val entityCaptor = argumentCaptor<DuckAiBridgeChatEntity>()
+        verify(chatsDao).upsert(entityCaptor.capture())
+        val captured = entityCaptor.firstValue
+        assertEquals("abc", captured.chatId)
+        val json = JSONObject(captured.data)
+        assertEquals("Brand new title", json.getString("title"))
+        assertEquals("abc", json.getString("chatId"))
+        assertEquals("gpt-5-mini", json.getString("model"))
+        assertEquals("2026-04-01T21:31:54.260Z", json.getString("lastEdit"))
+        assertTrue(json.getBoolean("pinned"))
+        assertEquals("uuid1", json.getJSONArray("fileRefs").getString(0))
+        assertEquals("hi", json.getJSONArray("messages").getJSONObject(0).getString("text"))
+    }
+
+    @Test
+    fun `renameChat returns false when stored JSON is malformed`() = runTest {
+        whenever(chatsDao.getById("abc")).thenReturn(DuckAiBridgeChatEntity("abc", "not a json"))
+
+        assertFalse(store.renameChat("abc", "New title"))
+        verify(chatsDao, never()).upsert(any())
+    }
+
     @Test
     fun `deleteAllChats ignores path traversal fileRefs`() = runTest {
         val safeFile = File(filesDir, "uuid1").also { it.writeText("data") }
@@ -239,5 +537,141 @@ class RealDuckAiChatStoreTest {
         assertFalse(safeFile.exists())
         // traversal file should not be deleted — it's outside filesDir
         verify(chatsDao).deleteAll()
+    }
+
+    // --- pinChat / unpinChat ---
+
+    @Test
+    fun `pinChat is a no-op when chat not found`() = runTest {
+        whenever(chatsDao.getById("missing")).thenReturn(null)
+
+        store.pinChat("missing")
+
+        verify(chatsDao, never()).upsert(any())
+    }
+
+    @Test
+    fun `pinChat sets pinned to true and preserves other JSON fields`() = runTest {
+        val originalJson = """
+            {"chatId":"abc","title":"Old","model":"gpt-5-mini","lastEdit":"2026-04-01T21:31:54.260Z","pinned":false,"fileRefs":["uuid1"],"messages":[{"role":"user","text":"hi"}]}
+        """.trimIndent()
+        whenever(chatsDao.getById("abc")).thenReturn(DuckAiBridgeChatEntity("abc", originalJson))
+
+        store.pinChat("abc")
+
+        val entityCaptor = argumentCaptor<DuckAiBridgeChatEntity>()
+        verify(chatsDao).upsert(entityCaptor.capture())
+        val json = JSONObject(entityCaptor.firstValue.data)
+        assertTrue(json.getBoolean("pinned"))
+        assertEquals("Old", json.getString("title"))
+        assertEquals("abc", json.getString("chatId"))
+        assertEquals("gpt-5-mini", json.getString("model"))
+        assertEquals("2026-04-01T21:31:54.260Z", json.getString("lastEdit"))
+        assertEquals("uuid1", json.getJSONArray("fileRefs").getString(0))
+        assertEquals("hi", json.getJSONArray("messages").getJSONObject(0).getString("text"))
+    }
+
+    @Test
+    fun `unpinChat sets pinned to false`() = runTest {
+        val originalJson = """
+            {"chatId":"abc","title":"Old","model":"gpt-5-mini","lastEdit":"2026-04-01T21:31:54.260Z","pinned":true}
+        """.trimIndent()
+        whenever(chatsDao.getById("abc")).thenReturn(DuckAiBridgeChatEntity("abc", originalJson))
+
+        store.unpinChat("abc")
+
+        val entityCaptor = argumentCaptor<DuckAiBridgeChatEntity>()
+        verify(chatsDao).upsert(entityCaptor.capture())
+        val json = JSONObject(entityCaptor.firstValue.data)
+        assertFalse(json.getBoolean("pinned"))
+    }
+
+    @Test
+    fun `pinChat is a no-op when stored JSON is malformed`() = runTest {
+        whenever(chatsDao.getById("abc")).thenReturn(DuckAiBridgeChatEntity("abc", "not a json"))
+
+        store.pinChat("abc")
+
+        verify(chatsDao, never()).upsert(any())
+    }
+
+    // --- getChatContent ---
+
+    @Test
+    fun `getChatContent returns raw JSON blob when chat exists`() = runTest {
+        val json = """{"chatId":"abc","title":"Test","messages":[]}"""
+        whenever(chatsDao.getById("abc")).thenReturn(DuckAiBridgeChatEntity("abc", json))
+
+        assertEquals(json, store.getChatContent("abc"))
+    }
+
+    @Test
+    fun `getChatContent returns null when chat not found`() = runTest {
+        whenever(chatsDao.getById("missing")).thenReturn(null)
+
+        assertEquals(null, store.getChatContent("missing"))
+    }
+
+    @Test
+    fun `readFileRef decodes the base64 data field into raw bytes`() = runTest {
+        val uuid = "82d44a67-0f52-4147-bb51-c0f1cb36f527"
+        // FE stores the entire `params` JSON via writeText — "data" carries base64-encoded bytes.
+        val envelope = JSONObject()
+            .put("uuid", uuid)
+            .put("chatId", "abc")
+            .put("fileName", "image-1.jpeg")
+            .put("mimeType", "image/jpeg")
+            .put("data", java.util.Base64.getEncoder().encodeToString("hello".toByteArray()))
+            .toString()
+        File(filesDir, uuid).writeText(envelope)
+
+        val result = store.readFileRef(uuid)
+
+        assertEquals("image-1.jpeg", result?.fileName)
+        assertEquals("image/jpeg", result?.mimeType)
+        assertEquals("hello", result?.bytes?.toString(Charsets.UTF_8))
+    }
+
+    @Test
+    fun `readFileRef strips the data URL prefix before decoding`() = runTest {
+        val uuid = "82d44a67-0f52-4147-bb51-c0f1cb36f527"
+        val base64 = java.util.Base64.getEncoder().encodeToString("world".toByteArray())
+        val envelope = JSONObject()
+            .put("uuid", uuid)
+            .put("fileName", "image-1.jpeg")
+            .put("mimeType", "image/jpeg")
+            .put("data", "data:image/jpeg;base64,$base64")
+            .toString()
+        File(filesDir, uuid).writeText(envelope)
+
+        val result = store.readFileRef(uuid)
+
+        assertEquals("world", result?.bytes?.toString(Charsets.UTF_8))
+    }
+
+    @Test
+    fun `readFileRef returns null when the on-disk file is missing`() = runTest {
+        assertNull(store.readFileRef("does-not-exist"))
+    }
+
+    @Test
+    fun `readFileRef returns null when the file is not valid JSON`() = runTest {
+        val uuid = "82d44a67-0f52-4147-bb51-c0f1cb36f527"
+        File(filesDir, uuid).writeText("not json")
+
+        assertNull(store.readFileRef(uuid))
+    }
+
+    @Test
+    fun `readFileRef returns null when the data field is missing`() = runTest {
+        val uuid = "82d44a67-0f52-4147-bb51-c0f1cb36f527"
+        File(filesDir, uuid).writeText(JSONObject().put("uuid", uuid).toString())
+
+        assertNull(store.readFileRef(uuid))
+    }
+
+    @Test
+    fun `readFileRef refuses path traversal in the uuid`() = runTest {
+        assertNull(store.readFileRef("../../etc/passwd"))
     }
 }

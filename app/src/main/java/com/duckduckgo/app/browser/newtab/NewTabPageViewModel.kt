@@ -25,7 +25,9 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.app.browser.remotemessage.CommandActionMapper
 import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.CtaId
+import com.duckduckgo.app.cta.ui.CtaViewModel
 import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.ExtendedOnboardingFeatureToggles
+import com.duckduckgo.app.onboardingbranddesignupdate.OnboardingBrandDesignUpdateToggles
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -73,6 +75,8 @@ class NewTabPageViewModel @AssistedInject constructor(
     private val lowPriorityMessagingModel: LowPriorityMessagingModel,
     private val appTrackingProtection: AppTrackingProtection,
     private val pixel: Pixel,
+    private val onboardingBrandDesignUpdateToggles: OnboardingBrandDesignUpdateToggles,
+    private val ctaViewModel: CtaViewModel,
 ) : ViewModel(), DefaultLifecycleObserver {
 
     data class ViewState(
@@ -177,9 +181,14 @@ class NewTabPageViewModel @AssistedInject constructor(
 
     // We only want to show New Tab when the Home CTAs from Onboarding has finished
     // https://app.asana.com/0/1157893581871903/1207769731595075/f
-    private fun isHomeOnboardingComplete(): Boolean {
+    private suspend fun isHomeOnboardingComplete(): Boolean {
         val noBrowserCtaExperiment = extendedOnboardingFeatureToggles.noBrowserCtas().isEnabled()
-        return dismissedCtaDao.exists(CtaId.DAX_END) ||
+        val lastDialogShown = if (onboardingBrandDesignUpdateToggles.brandDesignUpdate().isEnabled()) {
+            ctaViewModel.areBubbleDaxDialogsCompleted()
+        } else {
+            dismissedCtaDao.exists(CtaId.DAX_END)
+        }
+        return lastDialogShown ||
             noBrowserCtaExperiment ||
             settingsDataStore.hideTips ||
             dismissedCtaDao.exists(CtaId.ADD_WIDGET)

@@ -20,7 +20,10 @@ import android.animation.LayoutTransition
 import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewTreeObserver
+import android.widget.FrameLayout
 import androidx.coordinatorlayout.widget.CoordinatorLayout
+import androidx.core.view.updateLayoutParams
 import com.duckduckgo.app.browser.R
 import com.google.android.material.card.MaterialCardView
 
@@ -31,6 +34,20 @@ class NativeInputLayoutCoordinator(
     private data class Padding(val left: Int, val top: Int, val right: Int, val bottom: Int)
 
     private fun View.snapshotPadding() = Padding(paddingLeft, paddingTop, paddingRight, paddingBottom)
+
+    private var pendingContentLayoutTransition: Pair<ViewGroup, LayoutTransition>? = null
+
+    /** Set in [configureContentOffset]; invoked per-frame from the enter/exit animators. */
+    private var widgetAnimationFrameHandler: ((card: View) -> Unit)? = null
+
+    /**
+     * While true, the [configureContentOffset] layout listener no-ops. Set by the manager
+     * around `animateEnter` / `animateExit` so the snapshot/setup phases of those animators
+     * (which briefly mutate the card's layoutParams before translation is applied) don't
+     * cause the content offset to snap to an intermediate state. During the actual animation,
+     * [onWidgetAnimationFrame] drives the offset from the animator's `onUpdate`.
+     */
+    private var isWidgetAnimating: Boolean = false
 
     fun buildWidgetLayoutParams(isBottom: Boolean): ViewGroup.LayoutParams {
         return CoordinatorLayout.LayoutParams(
@@ -70,6 +87,16 @@ class NativeInputLayoutCoordinator(
     fun configureAutocompleteLayout(widgetView: View, isBottom: Boolean) {
         val autoCompleteList = rootView.findViewById<View?>(R.id.autoCompleteSuggestionsList) ?: return
         val focusedView = rootView.findViewById<View?>(R.id.focusedView)
+
+        // In duck.ai mode the legacy AppBar stays visible; float overlays over it so AppBar
+        // behavior/elevation doesn't push or cover them. Restored on widget detach.
+        val restoreFloats: List<() -> Unit> = if (omnibarState.isDuckAiMode()) {
+            listOfNotNull(autoCompleteList, focusedView).map { it.floatOverLegacyOmnibar() }
+        } else {
+            emptyList()
+        }
+
+        // Keep widget above the (possibly raised) overlay views.
         val baseElevation = maxOf(autoCompleteList.elevation, focusedView?.elevation ?: 0f)
         val targetElevation = baseElevation + widgetView.resources.displayMetrics.density
         widgetView.elevation = maxOf(widgetView.elevation, targetElevation)
@@ -113,6 +140,7 @@ class NativeInputLayoutCoordinator(
 
                 override fun onViewDetachedFromWindow(v: View) {
                     applyPadding(deltaTop = 0, deltaBottom = 0)
+                    restoreFloats.forEach { it() }
                     v.removeOnLayoutChangeListener(layoutListener)
                     autoCompleteList.removeOnLayoutChangeListener(layoutListener)
                     focusedView?.removeOnLayoutChangeListener(layoutListener)
@@ -120,6 +148,20 @@ class NativeInputLayoutCoordinator(
                 }
             },
         )
+    }
+
+    // Clears the CoordinatorLayout behavior and raises elevation so the view floats over
+    // the legacy AppBar. Returns a lambda that restores the previous state.
+    private fun View.floatOverLegacyOmnibar(): () -> Unit {
+        val previousBehavior = (layoutParams as? CoordinatorLayout.LayoutParams)?.behavior
+        val previousElevation = elevation
+        val raisedElevation = resources.getDimension(com.duckduckgo.mobile.android.R.dimen.omnibarFloatElevation)
+        updateLayoutParams<CoordinatorLayout.LayoutParams> { behavior = null }
+        elevation = maxOf(elevation, raisedElevation)
+        return {
+            updateLayoutParams<CoordinatorLayout.LayoutParams> { behavior = previousBehavior }
+            elevation = previousElevation
+        }
     }
 
     fun configureContentOffset(widgetView: View, isBottom: Boolean) {
@@ -135,47 +177,67 @@ class NativeInputLayoutCoordinator(
         if (targets.isEmpty()) return
         val anchor = widgetView.findViewById(R.id.inputModeWidgetCard) ?: widgetView
 
-        val overlap = widgetView.resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.keyline_5)
+        // Resolved once here instead of per call inside isLogoOnlyContent: that runs from the global
+        // layout listener below on every window layout pass, and findViewById walks the tree each
+        // time. These views inflate alongside newTabContent, so caching the references is safe;
+        // their live visibility/height are still read on each pass.
+        val ddgLogoView = rootView.findViewById<View?>(R.id.ddgLogo)
+        val returnHatchView = rootView.findViewById<View?>(R.id.newTabReturnHatchView)
 
         // Animate child reflows when the widget toggles Search ↔ DuckAI changes our padding.
+        // The transition is staged here but only assigned to the parent once the enter animation
+        // completes (see enableContentLayoutTransition). Otherwise the per-frame setPadding
+        // calls during the enter animation would each spawn a fresh CHANGING animator and the
+        // content would visibly lag behind the widget growth.
         val ntpGroup = newTabContent as? ViewGroup
         val previousNtpTransition = ntpGroup?.layoutTransition
-        ntpGroup?.layoutTransition = LayoutTransition().apply {
-            disableTransitionType(LayoutTransition.APPEARING)
-            disableTransitionType(LayoutTransition.DISAPPEARING)
-            disableTransitionType(LayoutTransition.CHANGE_APPEARING)
-            disableTransitionType(LayoutTransition.CHANGE_DISAPPEARING)
-            enableTransitionType(LayoutTransition.CHANGING)
-            setDuration(RealNativeInputAnimator.ANIMATION_DURATION_MS)
-            setAnimateParentHierarchy(false)
+        if (ntpGroup != null) {
+            pendingContentLayoutTransition =
+                ntpGroup to
+                LayoutTransition().apply {
+                    disableTransitionType(LayoutTransition.APPEARING)
+                    disableTransitionType(LayoutTransition.DISAPPEARING)
+                    disableTransitionType(LayoutTransition.CHANGE_APPEARING)
+                    disableTransitionType(LayoutTransition.CHANGE_DISAPPEARING)
+                    enableTransitionType(LayoutTransition.CHANGING)
+                    setDuration(RealNativeInputAnimator.ANIMATION_DURATION_MS)
+                    setAnimateParentHierarchy(false)
+                }
         }
 
         fun applyPadding(view: View, padding: Padding, deltaTop: Int, deltaBottom: Int) {
-            view.setPadding(
-                padding.left,
-                padding.top + deltaTop,
-                padding.right,
-                padding.bottom + deltaBottom,
-            )
+            val newTop = padding.top + deltaTop
+            val newBottom = padding.bottom + deltaBottom
+            if (view.paddingTop == newTop && view.paddingBottom == newBottom) return
+            view.setPadding(padding.left, newTop, padding.right, newBottom)
+            // Force a layout pass for children (e.g. WebView) that cache their measured size and
+            // otherwise leave a gap until the next user interaction.
+            view.post { view.requestLayout() }
         }
 
-        fun isLogoVisible(view: View): Boolean {
-            return view == newTabContent &&
-                rootView.findViewById<View?>(R.id.ddgLogo)?.visibility == View.VISIBLE
+        fun isLogoOnlyContent(view: View): Boolean {
+            if (view != newTabContent) return false
+            val logoVisible = ddgLogoView?.visibility == View.VISIBLE
+            val hatchHeightPx = returnHatchView?.height ?: 0
+            return isLogoOnly(logoVisible, hatchHeightPx)
         }
 
         fun computeDeltaTop(view: View, anchorBottomInWindow: Int): Int {
-            if (isBottom || isLogoVisible(view)) return 0
+            if (isBottom || isLogoOnlyContent(view)) return 0
             val viewLocation = IntArray(2).also { view.getLocationInWindow(it) }
             return maxOf(0, anchorBottomInWindow - viewLocation[1])
         }
 
         fun computeDeltaBottom(): Int {
             if (!isBottom) return 0
-            return if (omnibarState.isOmnibarBottom()) {
-                maxOf(0, overlap)
-            } else {
-                maxOf(0, anchor.height - overlap)
+            return maxOf(0, widgetView.height)
+        }
+
+        fun applyOffsetWithBottom(anchorBottomInWindow: Int) {
+            val deltaBottom = computeDeltaBottom()
+            targets.forEach { target ->
+                val deltaTop = computeDeltaTop(target.view, anchorBottomInWindow)
+                applyPadding(target.view, target.basePadding, deltaTop, deltaBottom)
             }
         }
 
@@ -186,35 +248,89 @@ class NativeInputLayoutCoordinator(
             }
             val anchorLocation = IntArray(2).also { anchor.getLocationInWindow(it) }
             val anchorBottomInWindow = anchorLocation[1] + anchor.height
-            val deltaBottom = computeDeltaBottom()
-            targets.forEach { target ->
-                val deltaTop = computeDeltaTop(target.view, anchorBottomInWindow)
-                applyPadding(target.view, target.basePadding, deltaTop, deltaBottom)
+            applyOffsetWithBottom(anchorBottomInWindow)
+        }
+
+        // Called from the enter/exit animators' onUpdate, BEFORE the layout pass that
+        // processes the new card layoutParams. We project the card's current visual bottom
+        // from the values the animator has just written (layoutParams + translation), so the
+        // setPadding here and the card's own requestLayout coalesce into the same
+        // measure/layout pass — content tracks the widget's growth/shrinkage in the same
+        // frame instead of lagging by one.
+        widgetAnimationFrameHandler = lambda@{ card ->
+            if (!widgetView.isShown) return@lambda
+            val parent = card.parent as? View ?: return@lambda
+            val params = card.layoutParams as? FrameLayout.LayoutParams
+            if (params == null) {
+                // Layout params don't carry position info we can project — fall back to reading
+                // the anchor's actual position for this frame.
+                applyOffset()
+                return@lambda
             }
+            val parentLocation = IntArray(2).also { parent.getLocationInWindow(it) }
+            val cardVisualTopInWindow = parentLocation[1] + params.topMargin + card.translationY.toInt()
+            val cardVisualBottomInWindow = cardVisualTopInWindow + params.height
+            applyOffsetWithBottom(cardVisualBottomInWindow)
         }
 
         widgetView.post { applyOffset() }
         val layoutListener =
             View.OnLayoutChangeListener { _, _, _, _, _, _, _, _, _ ->
+                if (isWidgetAnimating) return@OnLayoutChangeListener
                 applyOffset()
             }
         widgetView.addOnLayoutChangeListener(layoutListener)
         rootView.addOnLayoutChangeListener(layoutListener)
+
+        // Several inputs to the offset change asynchronously without moving rootView/widgetView —
+        // the return hatch showing/hiding (its height feeds isLogoOnlyContent), the logo's
+        // visibility, and NTP content reflow shifting the content's window position. The per-view
+        // OnLayoutChange listeners above don't fire for those, so we need a post-layout signal that
+        // covers the whole NTP. viewTreeObserver is the window-shared one, so this fires on every
+        // global layout pass (keyboard, scroll, etc.); that breadth is deliberate — a listener
+        // scoped to just the hatch misses the logo/content cases and fires mid-layout with stale
+        // sibling positions. Kept cheap: skipped while animating (isWidgetAnimating), a no-op when
+        // padding is unchanged (applyPadding), and the lookups it needs are cached above.
+        val ntpContentView = newTabContent?.takeIf { !isBottom }
+        val globalLayoutListener =
+            ViewTreeObserver.OnGlobalLayoutListener {
+                if (isWidgetAnimating) return@OnGlobalLayoutListener
+                applyOffset()
+            }
+        ntpContentView?.viewTreeObserver?.addOnGlobalLayoutListener(globalLayoutListener)
         widgetView.addOnAttachStateChangeListener(
             object : View.OnAttachStateChangeListener {
                 override fun onViewAttachedToWindow(v: View) = Unit
 
                 override fun onViewDetachedFromWindow(v: View) {
                     ntpGroup?.layoutTransition = previousNtpTransition
+                    pendingContentLayoutTransition = null
+                    widgetAnimationFrameHandler = null
+                    isWidgetAnimating = false
                     targets.forEach { target ->
                         applyPadding(target.view, target.basePadding, deltaTop = 0, deltaBottom = 0)
                     }
                     v.removeOnLayoutChangeListener(layoutListener)
                     rootView.removeOnLayoutChangeListener(layoutListener)
+                    ntpContentView?.viewTreeObserver?.takeIf { it.isAlive }?.removeOnGlobalLayoutListener(globalLayoutListener)
                     v.removeOnAttachStateChangeListener(this)
                 }
             },
         )
+    }
+
+    fun onWidgetAnimationFrame(card: View) {
+        widgetAnimationFrameHandler?.invoke(card)
+    }
+
+    fun setWidgetAnimating(animating: Boolean) {
+        isWidgetAnimating = animating
+    }
+
+    fun enableContentLayoutTransition() {
+        val (ntpGroup, transition) = pendingContentLayoutTransition ?: return
+        ntpGroup.layoutTransition = transition
+        pendingContentLayoutTransition = null
     }
 
     fun applyForcedBottomTranslation(widgetView: View, isBottom: Boolean) {
@@ -247,3 +363,17 @@ class NativeInputLayoutCoordinator(
         )
     }
 }
+
+/**
+ * Whether the new-tab page's only content is the dax logo. When true the content is NOT offset below
+ * the input widget (it stays centered), so the logo keeps a fixed vertical position regardless of the
+ * widget's height — otherwise it would sit lower on the Duck.ai tab (whose widget is taller than
+ * Search's) and appear to shift when switching tabs.
+ *
+ * A real return-hatch is detected via [hatchHeightPx] rather than visibility: the NewTabReturnHatchView
+ * container is always VISIBLE and merely collapses to zero height when no hatch is shown (its inner
+ * content is what's toggled), so a visibility check would always report "hatch present" and defeat
+ * this guard.
+ */
+internal fun isLogoOnly(logoVisible: Boolean, hatchHeightPx: Int): Boolean =
+    logoVisible && hatchHeightPx <= 0

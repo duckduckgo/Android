@@ -9,6 +9,11 @@
         "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+(\\.[0-9]+)?$",
         "examples": ["0.89.3"]
     },
+    "osVersion": {
+        "key": "os_version",
+        "type": "integer",
+        "description": "OS version of the device"
+    },
     "atb": {
         "key": "atb",
         "type": "string",
@@ -123,5 +128,21 @@
         "key": "free_trial",
         "type": "boolean",
         "description": "Whether the subscription purchase is a free trial"
+    },
+    "pirCancellationReason": {
+        "key": "feature.data.ext.cancellation_reason",
+        "type": "string",
+        "description": "Reason a PIR run was cancelled. Only present on CANCELLED events. superseded_by_profile_edit (a profile-edit re-scan replaced this run), superseded_by_new_run (any other newer run replaced it), profile_deleted/foreground_start_failed and the eligibility reasons (feature_disabled, subscription_expired, entitlement_lost, repository_unavailable) are client-attributed; work_stopped is a generic coroutine/WorkManager cancellation. The phase the run was in when it was cancelled is recoverable from last_step.",
+        "enum": [
+            "superseded_by_new_run",
+            "superseded_by_profile_edit",
+            "profile_deleted",
+            "feature_disabled",
+            "subscription_expired",
+            "entitlement_lost",
+            "repository_unavailable",
+            "foreground_start_failed",
+            "work_stopped"
+        ]
     }
 }

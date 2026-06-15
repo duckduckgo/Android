@@ -1,0 +1,460 @@
+{
+  "name": "Public Data Check",
+  "url": "publicdatacheck.com",
+  "version": "0.2.0",
+  "parent": "spyfly.com",
+  "addedDatetime": 1778777242134,
+  "optOutUrl": "https://www.publicdatacheck.com/help-center/privacy-requests",
+  "steps": [
+    {
+      "stepType": "scan",
+      "scanType": "templatedUrl",
+      "actions": [
+        {
+          "actionType": "navigate",
+          "url": "https://www.publicdatacheck.com/help-center/privacy-requests",
+          "id": "16b8ebc5-afbe-4309-8677-d50f2ddac56d"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": ".main"
+            }
+          ],
+          "id": "f0abc890-b94a-436a-badb-01fa5c2c022a"
+        },
+        {
+          "actionType": "fillForm",
+          "selector": ".form-contact-help form",
+          "dataSource": "userProfile",
+          "elements": [
+            {
+              "type": "firstName",
+              "selector": "#firstName"
+            },
+            {
+              "type": "lastName",
+              "selector": ".//input[@placeholder='Last Name']"
+            },
+            {
+              "type": "city",
+              "selector": "#city"
+            },
+            {
+              "type": "fullState",
+              "selector": "#states"
+            },
+            {
+              "type": "$generated_zip_code$",
+              "selector": "#zip"
+            },
+            {
+              "type": "age",
+              "selector": "#age"
+            }
+          ],
+          "id": "19920e38-7265-4bc5-857e-c0cc4a33a4df"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": ".//input[@name='cf-turnstile-response' and @value and @value != '']",
+              "parent": ".form__captcha"
+            }
+          ],
+          "id": "dbb50c04-48e9-4039-98fe-92880cb9a44b"
+        },
+        {
+          "actionType": "click",
+          "elements": [
+            {
+              "type": "button",
+              "selector": ".//button[@type='submit']"
+            }
+          ],
+          "id": "a7024123-d145-40f5-a98d-e18f444ce76d"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "#email-address"
+            }
+          ],
+          "id": "753ab729-85cb-42c9-97e1-00ca23079920"
+        },
+        {
+          "actionType": "generateEmail",
+          "id": "88b47f1d-af9a-46b2-be49-3151854b8557"
+        },
+        {
+          "actionType": "fillForm",
+          "selector": ".form-contact-help form",
+          "dataSource": "fetchedEmail",
+          "elements": [
+            {
+              "type": "email",
+              "selector": "#email-address"
+            }
+          ],
+          "id": "9e16ba9a-f5f3-46b1-8afd-e1849d560c3c"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": ".//input[@name='cf-turnstile-response' and @value and @value != '']",
+              "parent": ".form__captcha"
+            }
+          ],
+          "id": "56cd0d0d-22dd-43f8-a65e-1513831a77b6"
+        },
+        {
+          "actionType": "click",
+          "elements": [
+            {
+              "type": "button",
+              "selector": "#continue-button"
+            }
+          ],
+          "id": "27667068-ca68-4f68-9be2-55c53d87a05c"
+        },
+        {
+          "actionType": "getEmailData",
+          "pollingTime": 3,
+          "extract": ["verificationCode"],
+          "id": "447885fc-609b-4a02-a45d-ea0372a02cc7"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "#unique-code"
+            }
+          ],
+          "id": "673fb221-a548-4e64-ac4e-9016555de3f1"
+        },
+        {
+          "actionType": "fillForm",
+          "selector": ".form-contact-help form",
+          "dataSource": "emailData",
+          "elements": [
+            {
+              "type": "verificationCode",
+              "selector": "#unique-code"
+            }
+          ],
+          "id": "3428b55b-53d8-47eb-82cc-6024601dd5a2"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": ".//input[@name='cf-turnstile-response' and @value and @value != '']",
+              "parent": ".form__captcha"
+            }
+          ],
+          "id": "bdf95164-b8e9-4043-a58e-65de0d900666"
+        },
+        {
+          "actionType": "click",
+          "elements": [
+            {
+              "type": "button",
+              "selector": "#continue-button"
+            }
+          ],
+          "id": "27c4e3f5-8dfa-45e3-aa6f-90b68b1f160d"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "text",
+              "selector": ".section__head h1",
+              "expect": "Select Data for Removal"
+            }
+          ],
+          "id": "33a52736-da2d-4292-92d4-ba485711743f"
+        },
+        {
+          "actionType": "extract",
+          "selector": ".result-item",
+          "noResultsSelector": "//h1[contains(., 'Sorry, we were unable to find any results')]",
+          "profile": {
+            "name": {
+              "selector": "h2"
+            },
+            "age": {
+              "selector": ".//p[contains(., 'Age')]",
+              "afterText": "Age: "
+            },
+            "addressCityStateList": {
+              "selector": ".//p[contains(., 'Location')]//following-sibling::ul[contains(@class, 'result-list')]//li",
+              "findElements": true
+            },
+            "relativesList": {
+              "selector": ".//p[contains(., 'Relatives')]//following-sibling::ul[contains(@class, 'result-list')]//li",
+              "findElements": true
+            },
+            "profileUrl": {
+              "identifierType": "hash"
+            }
+          },
+          "id": "a6bf4ba0-21f9-4428-a724-038e07db4cc1"
+        }
+      ]
+    },
+    {
+      "stepType": "optOut",
+      "optOutType": "formOptOut",
+      "actions": [
+        {
+          "actionType": "navigate",
+          "url": "https://www.publicdatacheck.com/help-center/privacy-requests",
+          "id": "24d46c0d-da23-4606-8880-9383ede6b0fb"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": ".main"
+            }
+          ],
+          "id": "71509921-e351-4b33-a018-41e84645308b"
+        },
+        {
+          "actionType": "fillForm",
+          "selector": ".form-contact-help form",
+          "dataSource": "userProfile",
+          "elements": [
+            {
+              "type": "firstName",
+              "selector": "#firstName"
+            },
+            {
+              "type": "lastName",
+              "selector": ".//input[@placeholder='Last Name']"
+            },
+            {
+              "type": "city",
+              "selector": "#city"
+            },
+            {
+              "type": "fullState",
+              "selector": "#states"
+            },
+            {
+              "type": "$generated_zip_code$",
+              "selector": "#zip"
+            },
+            {
+              "type": "age",
+              "selector": "#age"
+            }
+          ],
+          "id": "30e8042e-e085-4358-bfca-82b72c8db0b8"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": ".//input[@name='cf-turnstile-response' and @value and @value != '']",
+              "parent": ".form__captcha"
+            }
+          ],
+          "id": "7771e80f-1465-46e5-8783-0c97adb91bd1"
+        },
+        {
+          "actionType": "click",
+          "elements": [
+            {
+              "type": "button",
+              "selector": ".//button[@type='submit']"
+            }
+          ],
+          "id": "96d21d70-729e-40e4-9d6d-6804a996272b"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "#email-address"
+            }
+          ],
+          "id": "95405418-3e85-4493-ac22-067d2c2ba73a"
+        },
+        {
+          "actionType": "generateEmail",
+          "id": "2a05a32e-d57d-48eb-a305-eda6204967a9"
+        },
+        {
+          "actionType": "fillForm",
+          "selector": ".form-contact-help form",
+          "dataSource": "fetchedEmail",
+          "elements": [
+            {
+              "type": "email",
+              "selector": "#email-address"
+            }
+          ],
+          "id": "a4cd4034-75a0-45b7-9765-2e6d18705daf"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": ".//input[@name='cf-turnstile-response' and @value and @value != '']",
+              "parent": ".form__captcha"
+            }
+          ],
+          "id": "7491c371-48f3-4c0b-b173-7814f4c90cb7"
+        },
+        {
+          "actionType": "click",
+          "elements": [
+            {
+              "type": "button",
+              "selector": "#continue-button"
+            }
+          ],
+          "id": "c3593195-abfa-4492-8a60-e6947777e787"
+        },
+        {
+          "actionType": "getEmailData",
+          "pollingTime": 3,
+          "extract": ["verificationCode"],
+          "id": "594bdae7-693a-42a3-8775-2622faee55e2"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "#unique-code"
+            }
+          ],
+          "id": "88e0bbd7-4779-44f5-a40b-a4feb6f18b54"
+        },
+        {
+          "actionType": "fillForm",
+          "selector": ".form-contact-help form",
+          "dataSource": "emailData",
+          "elements": [
+            {
+              "type": "verificationCode",
+              "selector": "#unique-code"
+            }
+          ],
+          "id": "58950ae1-62a7-4e4b-b933-bf1b4e7f79fd"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": ".//input[@name='cf-turnstile-response' and @value and @value != '']",
+              "parent": ".form__captcha"
+            }
+          ],
+          "id": "8c5a9fe9-359d-4bcd-ba05-3a687ad7df39"
+        },
+        {
+          "actionType": "click",
+          "elements": [
+            {
+              "type": "button",
+              "selector": "#continue-button"
+            }
+          ],
+          "id": "f27b0dae-cfcc-473e-be5c-a420177a8819"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "text",
+              "selector": ".section__head h1",
+              "expect": "Select Data for Removal"
+            }
+          ],
+          "id": "73cc7194-1dd7-4630-b2f6-88fde48f7bcb"
+        },
+        {
+          "actionType": "click",
+          "elements": [
+            {
+              "type": "button",
+              "selector": ".btn",
+              "parent": {
+                "profileMatch": {
+                  "selector": ".result-item",
+                  "profile": {
+                    "name": {
+                      "selector": "h2"
+                    },
+                    "age": {
+                      "selector": ".//p[contains(., 'Age')]",
+                      "afterText": "Age: "
+                    },
+                    "addressCityStateList": {
+                      "selector": ".//p[contains(., 'Location')]//following-sibling::ul[contains(@class, 'result-list')]//li",
+                      "findElements": true
+                    }
+                  }
+                }
+              }
+            }
+          ],
+          "id": "fafc1b71-7f82-435b-822e-1dde6689bcb8"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "text",
+              "selector": ".section__head h1",
+              "expect": "Request Submitted"
+            }
+          ],
+          "id": "d049175b-e41a-4736-ba29-29b60d2d2788"
+        },
+        {
+          "actionType": "emailConfirmation",
+          "pollingTime": 30,
+          "id": "d3bc1138-c001-49a5-a908-a8be6b0c4db3"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "text",
+              "selector": ".section__head h1",
+              "expect": "Verification Complete"
+            }
+          ],
+          "id": "355d44c5-22f4-4120-bb5d-0f4a51d05e70"
+        }
+      ]
+    }
+  ],
+  "schedulingConfig": {
+    "retryError": 48,
+    "confirmOptOutScan": 72,
+    "maintenanceScan": 120,
+    "maxAttempts": -1
+  },
+  "removedAt": null
+}

@@ -44,7 +44,6 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.SingleLiveEvent
 import com.duckduckgo.common.utils.extensions.toBinaryString
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
-import com.duckduckgo.duckchat.impl.DuckChatConstants.CHAT_ID_PARAM
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.feature.DuckAiChatHistoryFeature
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
@@ -195,6 +194,13 @@ class InputScreenViewModel @AssistedInject constructor(
     private val chatInputTextState = MutableStateFlow("")
     val chatInputText: StateFlow<String> = chatInputTextState.asStateFlow()
 
+    // Live tab count for the input screen's tab switcher button. Driven off flowTabs so it tracks
+    // tab changes while the input screen is open (e.g. burning the hatch's tab); the launch-time
+    // snapshot passed in InputScreenActivityParams would otherwise go stale.
+    val tabCount: Flow<Int> = tabRepository.flowTabs
+        .map { it.size }
+        .distinctUntilChanged()
+
     private val _submitButtonIconState = MutableStateFlow(SubmitButtonIconState(SubmitButtonIcon.SEARCH))
     val submitButtonIconState: StateFlow<SubmitButtonIconState> = _submitButtonIconState.asStateFlow()
 
@@ -204,6 +210,9 @@ class InputScreenViewModel @AssistedInject constructor(
     private val _tabAttachmentState = MutableStateFlow(TabAttachmentState())
     val tabAttachmentState: StateFlow<TabAttachmentState> = _tabAttachmentState.asStateFlow()
     private var cachedTabs: List<TabAttachmentItem> = emptyList()
+
+    private val _isHistoryAvailable = MutableStateFlow(false)
+    val isHistoryAvailable: StateFlow<Boolean> = _isHistoryAvailable.asStateFlow()
 
     private val refreshSuggestions = MutableSharedFlow<Unit>()
 
@@ -427,6 +436,10 @@ class InputScreenViewModel @AssistedInject constructor(
                 }
             }
             .launchIn(viewModelScope)
+
+        viewModelScope.launch {
+            _isHistoryAvailable.value = duckChat.isChatHistoryAvailable()
+        }
     }
 
     fun onActivityResume() {
@@ -846,6 +859,11 @@ class InputScreenViewModel @AssistedInject constructor(
         command.value = Command.MenuRequested
     }
 
+    fun onChatHistoryShortcutClicked() {
+        pixel.fire(DuckChatPixelName.DUCK_CHAT_SETTINGS_SIDEBAR_TAPPED)
+        command.value = Command.LaunchDuckChatHistory
+    }
+
     fun onClearTextTapped() {
         val params = inputScreenPixelsModeParam(isSearchMode = visibilityState.value.searchMode)
         pixel.fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_CLEAR_BUTTON_PRESSED, parameters = params)
@@ -863,12 +881,7 @@ class InputScreenViewModel @AssistedInject constructor(
         saveLastUsedTogglePosition()
         duckChatJSHelper.clearTabContextPromptEvent()
         viewModelScope.launch {
-            val url = duckChat.getDuckChatUrl("", false)
-                .toUri()
-                .buildUpon()
-                .appendQueryParameter(CHAT_ID_PARAM, chatId)
-                .build()
-                .toString()
+            val url = duckChat.buildChatUrl(chatId)
             command.value = Command.SubmitSearch(url)
 
             if (pinned) {
