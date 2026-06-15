@@ -28,7 +28,9 @@ import com.duckduckgo.common.utils.device.DeviceInfo.FormFactor
 import com.duckduckgo.feature.toggles.api.Toggle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -181,6 +183,46 @@ class DuckAiOnboardingExperimentManagerTest {
         verify(experimentToggle).enroll()
     }
 
+    @Test
+    fun whenEnrolledAndEnabledInControlThenIsEnrolledInActiveExperimentTrueAndDoesNotEnroll() = runTest {
+        givenEnrolledAndEnabledIn(DuckAiOnboardingExperimentCohort.CONTROL)
+
+        val result = testee.isEnrolledInActiveExperiment()
+
+        assertTrue(result)
+        verify(experimentToggle, never()).enroll()
+    }
+
+    @Test
+    fun whenEnrolledAndEnabledInTreatmentWithDuckAiDefaultThenIsEnrolledInActiveExperimentTrue() = runTest {
+        givenEnrolledAndEnabledIn(DuckAiOnboardingExperimentCohort.TREATMENT_WITH_DUCK_AI_DEFAULT)
+
+        val result = testee.isEnrolledInActiveExperiment()
+
+        assertTrue(result)
+        verify(experimentToggle, never()).enroll()
+    }
+
+    @Test
+    fun whenEnrolledAndEnabledInTreatmentWithSearchDefaultThenIsEnrolledInActiveExperimentTrue() = runTest {
+        givenEnrolledAndEnabledIn(DuckAiOnboardingExperimentCohort.TREATMENT_WITH_SEARCH_DEFAULT)
+
+        val result = testee.isEnrolledInActiveExperiment()
+
+        assertTrue(result)
+        verify(experimentToggle, never()).enroll()
+    }
+
+    @Test
+    fun whenNotEnrolledAndEnabledInAnyCohortThenIsEnrolledInActiveExperimentFalse() = runTest {
+        givenEnrolledAndEnabledIn(null)
+
+        val result = testee.isEnrolledInActiveExperiment()
+
+        assertFalse(result)
+        verify(experimentToggle, never()).enroll()
+    }
+
     private suspend fun givenPrerequisitesMet() {
         whenever(appBuildConfig.isDefaultVariantForced).thenReturn(false)
         whenever(singleTabFireDialogToggle.isEnabled()).thenReturn(true)
@@ -191,5 +233,11 @@ class DuckAiOnboardingExperimentManagerTest {
     private suspend fun givenCohort(name: String) {
         whenever(experimentToggle.isEnabled()).thenReturn(true)
         whenever(experimentToggle.getCohort()).thenReturn(Toggle.State.Cohort(name = name, weight = 1))
+    }
+
+    private suspend fun givenEnrolledAndEnabledIn(enrolledCohort: DuckAiOnboardingExperimentCohort?) {
+        DuckAiOnboardingExperimentCohort.entries.forEach { cohort ->
+            whenever(experimentToggle.isEnrolledAndEnabled(cohort)).thenReturn(cohort == enrolledCohort)
+        }
     }
 }
