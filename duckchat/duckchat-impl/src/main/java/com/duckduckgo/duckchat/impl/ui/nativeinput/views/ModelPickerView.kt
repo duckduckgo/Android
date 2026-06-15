@@ -102,8 +102,8 @@ class ModelPickerView @JvmOverloads constructor(
     private var inputContextJob: Job? = null
     private var commandJob: Job? = null
     private var modelChangeJob: Job? = null
+    private var effectiveModelJob: Job? = null
     private var popupWindow: PopupWindow? = null
-    private var lastObservedModelId: String? = null
     private var lastNativeInputState: NativeInputState? = null
 
     // Mirrors the input context from the per-tab native input state so currentSurface() can be
@@ -178,16 +178,15 @@ class ModelPickerView @JvmOverloads constructor(
     private fun observeState() {
         val scope = findViewTreeLifecycleOwner()?.lifecycleScope ?: return
         stateJob?.cancel()
-        lastObservedModelId = viewModel.state.value.selectedModelId
         stateJob = viewModel.state
-            .onEach { state ->
-                updateVisibility()
-                val newId = state.selectedModelId
-                if (newId != null && newId != lastObservedModelId) {
-                    lastObservedModelId = newId
-                    onModelSelected?.invoke()
-                }
-            }
+            .onEach { updateVisibility() }
+            .launchIn(scope)
+
+        // Refresh option tool-visibility whenever the effective (chat-aware / recovery) model
+        // changes, not only on global model changes — otherwise options reflect the wrong model.
+        effectiveModelJob?.cancel()
+        effectiveModelJob = viewModel.effectiveModelId
+            .onEach { onModelSelected?.invoke() }
             .launchIn(scope)
 
         chipLabelJob?.cancel()
@@ -304,6 +303,8 @@ class ModelPickerView @JvmOverloads constructor(
         commandJob = null
         modelChangeJob?.cancel()
         modelChangeJob = null
+        effectiveModelJob?.cancel()
+        effectiveModelJob = null
         lastNativeInputState = null
         dismissPopup()
     }

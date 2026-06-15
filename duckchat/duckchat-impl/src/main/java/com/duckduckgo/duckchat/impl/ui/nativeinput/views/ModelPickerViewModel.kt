@@ -94,22 +94,33 @@ class ModelPickerViewModel @Inject constructor(
     }
 
     /**
-     * Chat-aware chip label: in an ongoing chat (chatId set) shows that chat's model short name,
-     * falling back to the global selection when the chat's model isn't in the list (e.g. lost
-     * access). For a new chat (chatId null) it shows the global selection.
+     * The model the chip displays and whose capabilities the options should reflect: a just-picked
+     * recovery model, else the active chat's model (when in the list, e.g. not lost access), else
+     * the global selection. Single source of truth for [chipLabel] and [getSelectedModel].
      */
-    val chipLabel: StateFlow<String?> = combine(
+    val effectiveModelId: StateFlow<String?> = combine(
         modelManager.modelState,
         nativeInputStateProvider.state,
         currentChat,
         recoverySelectedModelId,
     ) { modelState, nativeState, chat, recoveryId ->
-        // A just-picked recovery model wins (only for display, before the chat's model syncs back).
-        val recoveryShortName = recoveryId?.let { id -> modelState.models.firstOrNull { it.id == id }?.shortName }
-        if (recoveryShortName != null) return@combine recoveryShortName
+        val modelIds = modelState.models.mapTo(HashSet()) { it.id }
+        // A just-picked recovery model wins (display, before the chat's model syncs back).
+        recoveryId?.takeIf { it in modelIds }?.let { return@combine it }
         val activeChat = chat?.takeIf { it.chatId == nativeState.chatId }
-        val chatShortName = activeChat?.let { c -> modelState.models.firstOrNull { it.id == c.model }?.shortName }
-        chatShortName ?: modelState.selectedModelShortName
+        activeChat?.model?.takeIf { it in modelIds } ?: modelState.selectedModelId
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.Eagerly,
+        initialValue = modelManager.modelState.value.selectedModelId,
+    )
+
+    /**
+     * Chat-aware chip label derived from [effectiveModelId]: that model's short name, falling back
+     * to the global selection's short name when it isn't in the list.
+     */
+    val chipLabel: StateFlow<String?> = combine(modelManager.modelState, effectiveModelId) { modelState, id ->
+        modelState.models.firstOrNull { it.id == id }?.shortName ?: modelState.selectedModelShortName
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.Eagerly,
@@ -135,7 +146,7 @@ class ModelPickerViewModel @Inject constructor(
 
     fun getSelectedModelId(): String? = modelManager.getSelectedModelId()
 
-    fun getSelectedModel(): AIChatModel? = state.value.run { models.find { it.id == selectedModelId } }
+    fun getSelectedModel(): AIChatModel? = state.value.models.firstOrNull { it.id == effectiveModelId.value }
 
     fun isImageGenerationSupported(): Boolean = getSelectedModel()?.supportsTool(Tool.IMAGE_GENERATION) ?: true
 

@@ -557,6 +557,48 @@ class ModelPickerViewModelTest {
     }
 
     @Test
+    fun whenOngoingChatThenCapabilitiesReflectChatModelNotGlobal() = runTest {
+        stateFlow.value = ModelState(
+            models = listOf(
+                freeModel(id = "global-model", shortName = "Global", supportedTools = emptyList()),
+                freeModel(id = "chat-model", shortName = "Chat", supportedTools = listOf(Tool.IMAGE_GENERATION)),
+            ),
+            selectedModelId = "global-model",
+            selectedModelShortName = "Global",
+        )
+        whenever(duckAiChatStore.getChatById("c1")).thenReturn(
+            DuckAiChat(chatId = "c1", title = "t", model = "chat-model", lastEdit = "now", pinned = false),
+        )
+        nativeInputState.value = nativeInputState.value.copy(chatId = "c1")
+        advanceUntilIdle()
+
+        assertEquals("chat-model", testee.getSelectedModel()?.id)
+        assertTrue(testee.isImageGenerationSupported())
+    }
+
+    @Test
+    fun whenRecoveryModelPickedThenCapabilitiesReflectRecoveryModel() = runTest {
+        val recoveryModel = freeModel(id = "recovery-model", shortName = "Recovery", supportedTools = listOf(Tool.WEB_SEARCH))
+        stateFlow.value = ModelState(
+            models = listOf(
+                freeModel(id = "global-model", shortName = "Global", supportedTools = listOf(Tool.IMAGE_GENERATION)),
+                recoveryModel,
+            ),
+            selectedModelId = "global-model",
+            selectedModelShortName = "Global",
+        )
+        nativeInputState.value = nativeInputState.value.copy(chatId = "c1", modelChangeMode = true)
+        advanceUntilIdle()
+
+        testee.onModelTapped(recoveryModel, PickerSurface.MODEL_PICKER_ADDRESS_BAR)
+        advanceUntilIdle()
+
+        assertEquals("recovery-model", testee.getSelectedModel()?.id)
+        assertTrue(testee.isWebSearchSupported())
+        assertFalse(testee.isImageGenerationSupported())
+    }
+
+    @Test
     fun whenOngoingChatThenChipLabelIsChatModelShortName() = runTest {
         stateFlow.value = ModelState(
             models = listOf(freeModel(id = "chat-model", shortName = "Chat Model")),
