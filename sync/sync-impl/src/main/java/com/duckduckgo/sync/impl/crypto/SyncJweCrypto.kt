@@ -92,6 +92,8 @@ data class RsaKeyPair(
 @ContributesBinding(AppScope::class)
 class RealSyncJweCrypto @Inject constructor() : SyncJweCrypto {
 
+    private val secureRandom = SecureRandom()
+
     override fun generateRsaKeyPair(): RsaKeyPair {
         logcat { "Sync-ScopedToken: generating RSA-$RSA_KEY_SIZE keypair" }
         val keyPairGenerator = KeyPairGenerator.getInstance("RSA")
@@ -139,14 +141,14 @@ class RealSyncJweCrypto @Inject constructor() : SyncJweCrypto {
         val publicKey = decodePublicKey(recipientPublicKeyBase64)
         // Compact JSON, no whitespace — must be deterministic for AAD.
         val headerJson = JSONObject().apply {
-            put("alg", "RSA-OAEP-256")
-            put("enc", "A256GCM")
-            put("kid", kid)
+            put(JWE_HEADER_ALG, JWE_ALG_RSA_OAEP_256)
+            put(JWE_HEADER_ENC, JWE_ENC_A256GCM)
+            put(JWE_HEADER_KID, kid)
         }.toString()
         val headerB64 = b64UrlEncode(headerJson.toByteArray(Charsets.UTF_8))
 
-        val aesKey = ByteArray(AES_KEY_BYTES).also { SecureRandom().nextBytes(it) }
-        val iv = ByteArray(GCM_IV_BYTES).also { SecureRandom().nextBytes(it) }
+        val aesKey = ByteArray(AES_KEY_BYTES).also { secureRandom.nextBytes(it) }
+        val iv = ByteArray(GCM_IV_BYTES).also { secureRandom.nextBytes(it) }
 
         val aesCipher = Cipher.getInstance(AES_GCM_TRANSFORMATION)
         aesCipher.init(Cipher.ENCRYPT_MODE, SecretKeySpec(aesKey, "AES"), GCMParameterSpec(GCM_TAG_BITS, iv))
@@ -169,14 +171,14 @@ class RealSyncJweCrypto @Inject constructor() : SyncJweCrypto {
         val parts = jweCompact.split('.')
         require(parts.size == 5) { "Malformed JWE compact: expected 5 parts, got ${parts.size}" }
         val headerB64 = parts[0]
-        val encKey = Base64.getUrlDecoder().decode(parts[1])
-        val iv = Base64.getUrlDecoder().decode(parts[2])
-        val ct = Base64.getUrlDecoder().decode(parts[3])
-        val tag = Base64.getUrlDecoder().decode(parts[4])
+        val encKey = b64UrlDecode(parts[1])
+        val iv = b64UrlDecode(parts[2])
+        val ct = b64UrlDecode(parts[3])
+        val tag = b64UrlDecode(parts[4])
 
-        val header = JSONObject(String(Base64.getUrlDecoder().decode(headerB64), Charsets.UTF_8))
-        require(header.optString("alg") == "RSA-OAEP-256") { "Unsupported alg: ${header.optString("alg")}" }
-        require(header.optString("enc") == "A256GCM") { "Unsupported enc: ${header.optString("enc")}" }
+        val header = JSONObject(String(b64UrlDecode(headerB64), Charsets.UTF_8))
+        require(header.optString(JWE_HEADER_ALG) == JWE_ALG_RSA_OAEP_256) { "Unsupported alg: ${header.optString(JWE_HEADER_ALG)}" }
+        require(header.optString(JWE_HEADER_ENC) == JWE_ENC_A256GCM) { "Unsupported enc: ${header.optString(JWE_HEADER_ENC)}" }
 
         val rsaCipher = Cipher.getInstance(RSA_OAEP_TRANSFORMATION)
         rsaCipher.init(Cipher.DECRYPT_MODE, privateKey, oaepSha256Spec())
@@ -196,6 +198,9 @@ class RealSyncJweCrypto @Inject constructor() : SyncJweCrypto {
     private fun b64UrlEncode(bytes: ByteArray): String =
         Base64.getUrlEncoder().withoutPadding().encodeToString(bytes)
 
+    private fun b64UrlDecode(value: String): ByteArray =
+        Base64.getUrlDecoder().decode(value)
+
     override fun extractJwkComponents(publicKeyBase64: String): Pair<String, String> {
         val rsaPublicKey = decodePublicKey(publicKeyBase64) as RSAPublicKey
         val nBytes = rsaPublicKey.modulus.toByteArray().dropLeadingZero()
@@ -211,13 +216,13 @@ class RealSyncJweCrypto @Inject constructor() : SyncJweCrypto {
         if (size > 1 && this[0] == 0.toByte()) copyOfRange(1, size) else this
 
     private fun decodePublicKey(base64: String): PublicKey {
-        val keyBytes = Base64.getUrlDecoder().decode(base64)
+        val keyBytes = b64UrlDecode(base64)
         val keySpec = X509EncodedKeySpec(keyBytes)
         return KeyFactory.getInstance("RSA").generatePublic(keySpec)
     }
 
     private fun decodePrivateKey(base64: String): PrivateKey {
-        val keyBytes = Base64.getUrlDecoder().decode(base64)
+        val keyBytes = b64UrlDecode(base64)
         val keySpec = PKCS8EncodedKeySpec(keyBytes)
         return KeyFactory.getInstance("RSA").generatePrivate(keySpec)
     }
@@ -245,5 +250,12 @@ class RealSyncJweCrypto @Inject constructor() : SyncJweCrypto {
         private const val GCM_TAG_BITS = 128
         private const val AES_GCM_TRANSFORMATION = "AES/GCM/NoPadding"
         private const val RSA_OAEP_TRANSFORMATION = "RSA/ECB/OAEPWithSHA-256AndMGF1Padding"
+
+        // JWE header fields and values — shared by the RSA-OAEP encrypt/decrypt paths so they can't drift.
+        private const val JWE_HEADER_ALG = "alg"
+        private const val JWE_HEADER_ENC = "enc"
+        private const val JWE_HEADER_KID = "kid"
+        private const val JWE_ALG_RSA_OAEP_256 = "RSA-OAEP-256"
+        private const val JWE_ENC_A256GCM = "A256GCM"
     }
 }
