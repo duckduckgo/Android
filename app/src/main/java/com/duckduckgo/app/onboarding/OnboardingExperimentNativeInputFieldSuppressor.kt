@@ -17,7 +17,7 @@
 package com.duckduckgo.app.onboarding
 
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.duckchat.impl.nativeinput.NativeInputFieldSuppressor
+import com.duckduckgo.duckchat.api.nativeinput.NativeInputFieldSuppressor
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 

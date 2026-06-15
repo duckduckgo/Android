@@ -14,15 +14,12 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.duckchat.impl.nativeinput
-
-import com.duckduckgo.anvil.annotations.ContributesPluginPoint
-import com.duckduckgo.di.scopes.AppScope
+package com.duckduckgo.duckchat.api.nativeinput
 
 /**
  * Lets other modules force-disable the native (unified) input field regardless of the
- * `nativeInputField` user setting. This is the single gate read by [com.duckduckgo.duckchat.impl.RealDuckChat]
- * so every consumer of `observeNativeInputFieldUserSettingEnabled()` sees a consistent value.
+ * `nativeInputField` user setting. This is the single gate read by `RealDuckChat` so every
+ * consumer of `observeNativeInputFieldUserSettingEnabled()` sees a consistent value.
  *
  * Used to exclude users enrolled in the active Duck.ai onboarding experiment so they keep the
  * legacy omnibar while the experiment runs.
@@ -31,10 +28,3 @@ interface NativeInputFieldSuppressor {
     /** Return true to suppress the native input field for the current user. */
     suspend fun isNativeInputFieldSuppressed(): Boolean
 }
-
-@ContributesPluginPoint(
-    scope = AppScope::class,
-    boundType = NativeInputFieldSuppressor::class,
-)
-@Suppress("unused")
-private interface UnusedNativeInputFieldSuppressorPluginPoint
