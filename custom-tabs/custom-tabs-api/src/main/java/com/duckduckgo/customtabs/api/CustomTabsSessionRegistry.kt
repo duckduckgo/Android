@@ -19,18 +19,11 @@ package com.duckduckgo.customtabs.api
 import androidx.browser.customtabs.CustomTabsSessionToken
 
 /**
- * Tracks verified Custom Tabs sessions (token -> calling package), populated from
- * DuckDuckGoCustomTabService.newSession() and read by IntentDispatcherViewModel
- * to support handleAppLink's trusted-caller carve-out.
+ * Read-only view of verified Custom Tabs sessions (token -> calling package), used by
+ * IntentDispatcherViewModel to support handleAppLink's trusted-caller carve-out.
  */
 interface CustomTabsSessionRegistry {
 
-    /** Records a verified (session token -> calling package) binding. Called from newSession(). */
-    fun recordSession(sessionToken: CustomTabsSessionToken, packageName: String)
-
     /** Returns the verified calling package for the session, or null if no verified binding exists. */
     fun lookupClientPackage(sessionToken: CustomTabsSessionToken): String?
-
-    /** Removes the binding for a session, e.g. on cleanUpSession() when the client disconnects. */
-    fun clearSession(sessionToken: CustomTabsSessionToken)
 }

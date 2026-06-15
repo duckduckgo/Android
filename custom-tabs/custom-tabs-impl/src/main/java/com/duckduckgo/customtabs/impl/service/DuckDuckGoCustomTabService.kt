@@ -22,7 +22,6 @@ import android.os.Bundle
 import androidx.browser.customtabs.CustomTabsService
 import androidx.browser.customtabs.CustomTabsSessionToken
 import com.duckduckgo.anvil.annotations.InjectWith
-import com.duckduckgo.customtabs.api.CustomTabsSessionRegistry
 import com.duckduckgo.di.scopes.ServiceScope
 import dagger.android.AndroidInjection
 import logcat.logcat
@@ -32,7 +31,7 @@ import javax.inject.Inject
 class DuckDuckGoCustomTabService : CustomTabsService() {
 
     @Inject
-    lateinit var sessionRegistry: CustomTabsSessionRegistry
+    lateinit var sessionRegistry: InternalCustomTabsSessionRegistry
 
     override fun onCreate() {
         super.onCreate()

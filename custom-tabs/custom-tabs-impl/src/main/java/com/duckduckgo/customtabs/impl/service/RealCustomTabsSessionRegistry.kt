@@ -24,9 +24,15 @@ import dagger.SingleInstanceIn
 import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
 
-@ContributesBinding(scope = AppScope::class)
+interface InternalCustomTabsSessionRegistry : CustomTabsSessionRegistry {
+    fun recordSession(sessionToken: CustomTabsSessionToken, packageName: String)
+    fun clearSession(sessionToken: CustomTabsSessionToken)
+}
+
+@ContributesBinding(scope = AppScope::class, boundType = CustomTabsSessionRegistry::class)
+@ContributesBinding(scope = AppScope::class, boundType = InternalCustomTabsSessionRegistry::class)
 @SingleInstanceIn(AppScope::class)
-class RealCustomTabsSessionRegistry @Inject constructor() : CustomTabsSessionRegistry {
+class RealCustomTabsSessionRegistry @Inject constructor() : InternalCustomTabsSessionRegistry {
 
     private val packageBySession = ConcurrentHashMap<CustomTabsSessionToken, String>()
 
