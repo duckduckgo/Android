@@ -55,6 +55,7 @@ jobs:
           asana_project_id: ${{ secrets.DUCK_PLAYER_AOR_PROJECT_ID }}
           asana_section_id: ${{ secrets.DUCK_PLAYER_AOR_INCOMING_ID }}
           test_suite_name: Duck Player
+          maestro_api_level: 34
 
       - name: Create Asana task when workflow failed
         if: ${{ failure() && github.event_name != 'workflow_dispatch' && steps.maestro-cloud-asana.outputs.flow_summary_status != 'failure'}}
