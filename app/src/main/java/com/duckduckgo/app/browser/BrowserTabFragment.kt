@@ -5970,20 +5970,12 @@ class BrowserTabFragment :
             logcat(INFO) { "Accessibility: render state applyAccessibilitySettings $viewState" }
             val webView = webView ?: return
 
+            // Apply the text size in place. Reloading the page so the layout reflows with the new zoom is
+            // handled by AccessibilityRefreshTriggerPlugin (a debounced refresh, deferred until visible).
             val fontSizeChanged = webView.settings.textZoom != viewState.fontSize.toInt()
             if (fontSizeChanged) {
-                logcat(INFO) {
-                    "Accessibility: UpdateAccessibilitySetting fontSizeChanged " +
-                        "from ${webView.settings.textZoom} to ${viewState.fontSize.toInt()}"
-                }
-
+                logcat(INFO) { "Accessibility: textZoom from ${webView.settings.textZoom} to ${viewState.fontSize.toInt()}" }
                 webView.settings.textZoom = viewState.fontSize.toInt()
-            }
-
-            if (this@BrowserTabFragment.isHidden && viewState.refreshWebView) return
-            if (viewState.refreshWebView) {
-                logcat(INFO) { "Accessibility: UpdateAccessibilitySetting forceZoomChanged" }
-                refresh()
             }
         }
 

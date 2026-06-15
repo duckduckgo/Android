@@ -1062,21 +1062,14 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun observeAccessibilitySettings() {
+        // Applies the current text size to the WebView. Reloading on a change is handled separately by
+        // AccessibilityRefreshTriggerPlugin via observeRefreshTriggers().
         accessibilityObserver?.cancel()
         accessibilityObserver =
             accessibilitySettingsDataStore
                 .settingsFlow()
-                .combine(refreshOnViewVisible.asStateFlow(), ::Pair)
-                .onEach { (settings, viewVisible) ->
-                    logcat(VERBOSE) { "Accessibility: newSettings $settings, $viewVisible" }
-                    val shouldRefreshWebview =
-                        (currentAccessibilityViewState().forceZoom != settings.forceZoom) || currentAccessibilityViewState().refreshWebView
-                    accessibilityViewState.value =
-                        currentAccessibilityViewState().copy(
-                            fontSize = settings.fontSize,
-                            forceZoom = settings.forceZoom,
-                            refreshWebView = shouldRefreshWebview,
-                        )
+                .onEach { settings ->
+                    accessibilityViewState.value = currentAccessibilityViewState().copy(fontSize = settings.fontSize)
                 }.launchIn(viewModelScope)
     }
 
@@ -3317,13 +3310,16 @@ class BrowserTabViewModel @Inject constructor(
             },
         )
 
-        if (desktopSiteRequested && uri.isMobileSite) {
-            val desktopUrl = uri.toDesktopUri().toString()
-            logcat(INFO) { "Original URL $url - attempting $desktopUrl with desktop site UA string" }
-            command.value = NavigationCommand.Navigate(desktopUrl, getUrlHeaders(desktopUrl))
+        // Re-load via Navigate (loadUrl) rather than Refresh (reload) so the WebView performs a fresh
+        // layout and re-applies overview mode (loadWithOverviewMode + useWideViewPort). reload() keeps the
+        // previous zoom scale, which would leave the wider desktop layout rendered at the old mobile scale.
+        val targetUrl = if (desktopSiteRequested && uri.isMobileSite) {
+            uri.toDesktopUri().toString()
         } else {
-            command.value = NavigationCommand.Refresh
+            uri.toString()
         }
+        logcat(INFO) { "Original URL $url - reloading $targetUrl with ${if (desktopSiteRequested) "desktop" else "mobile"} site UA string" }
+        command.value = NavigationCommand.Navigate(targetUrl, getUrlHeaders(targetUrl))
     }
 
     private fun initializeViewStates() {
@@ -4258,7 +4254,6 @@ class BrowserTabViewModel @Inject constructor(
         resetTrackersCount()
         refreshBrowserError()
         resetAutoConsent()
-        accessibilityViewState.value = currentAccessibilityViewState().copy(refreshWebView = false)
         canAutofillSelectCredentialsDialogCanAutomaticallyShow = true
     }
 
@@ -4673,7 +4668,7 @@ class BrowserTabViewModel @Inject constructor(
                             JSONObject(
                                 mapOf(
                                     "desktopModeEnabled" to (getSite()?.isDesktopMode ?: false),
-                                    "forcedZoomEnabled" to (accessibilityViewState.value?.forceZoom ?: false),
+                                    "forcedZoomEnabled" to accessibilitySettingsDataStore.forceZoom,
                                 ),
                             )
                         viewModelScope.launch {
@@ -4729,7 +4724,7 @@ class BrowserTabViewModel @Inject constructor(
                             params = JSONObject(
                                 mapOf(
                                     "desktopModeEnabled" to (getSite()?.isDesktopMode ?: false),
-                                    "forcedZoomEnabled" to (accessibilityViewState.value?.forceZoom ?: false),
+                                    "forcedZoomEnabled" to accessibilitySettingsDataStore.forceZoom,
                                 ),
                             ),
                             featureName = featureName,

@@ -829,12 +829,7 @@ class BrowserTabViewModelTest {
                     deviceInfo = mockDeviceInfo,
                 )
 
-            accessibilitySettingsDataStore =
-                AccessibilitySettingsSharedPreferences(
-                    context,
-                    coroutineRule.testDispatcherProvider,
-                    coroutineRule.testScope,
-                )
+            accessibilitySettingsDataStore = AccessibilitySettingsSharedPreferences(context)
 
             whenever(mockOmnibarConverter.convertQueryToUrl(any(), any(), any(), any())).thenReturn("duckduckgo.com")
             whenever(mockTabRepository.liveSelectedTab).thenReturn(selectedTabLiveData)
@@ -2690,33 +2685,33 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenUserSelectsDesktopSiteWhenNotOnMobileSpecificSiteThenUrlNotModified() {
+    fun whenUserSelectsDesktopSiteWhenNotOnMobileSpecificSiteThenNavigatesToSameUrl() {
         loadUrl(exampleUrl)
         setDesktopBrowsingMode(false)
         testee.onChangeBrowserModeClicked()
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
-        val ultimateCommand = commandCaptor.lastValue
-        assertTrue(ultimateCommand == NavigationCommand.Refresh)
+        val ultimateCommand = commandCaptor.lastValue as Navigate
+        assertEquals(exampleUrl, ultimateCommand.url)
     }
 
     @Test
-    fun whenUserSelectsMobileSiteWhenOnMobileSpecificSiteThenUrlNotModified() {
+    fun whenUserSelectsMobileSiteWhenOnMobileSpecificSiteThenNavigatesToSameUrl() {
         loadUrl("http://m.example.com")
         setDesktopBrowsingMode(true)
         testee.onChangeBrowserModeClicked()
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
-        val ultimateCommand = commandCaptor.lastValue
-        assertTrue(ultimateCommand == NavigationCommand.Refresh)
+        val ultimateCommand = commandCaptor.lastValue as Navigate
+        assertEquals("http://m.example.com", ultimateCommand.url)
     }
 
     @Test
-    fun whenUserSelectsMobileSiteWhenNotOnMobileSpecificSiteThenUrlNotModified() {
+    fun whenUserSelectsMobileSiteWhenNotOnMobileSpecificSiteThenNavigatesToSameUrl() {
         loadUrl(exampleUrl)
         setDesktopBrowsingMode(true)
         testee.onChangeBrowserModeClicked()
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
-        val ultimateCommand = commandCaptor.lastValue
-        assertTrue(ultimateCommand == NavigationCommand.Refresh)
+        val ultimateCommand = commandCaptor.lastValue as Navigate
+        assertEquals(exampleUrl, ultimateCommand.url)
     }
 
     @Test
@@ -5318,29 +5313,10 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenForceZoomEnabledThenEmitNewState() {
-        accessibilitySettingsDataStore.forceZoom = true
-        assertTrue(accessibilityViewState().forceZoom)
-        assertTrue(accessibilityViewState().refreshWebView)
-    }
-
-    @Test
-    fun whenForceZoomEnabledAndWebViewRefreshedThenEmitNewState() {
-        accessibilitySettingsDataStore.forceZoom = true
-        assertTrue(accessibilityViewState().forceZoom)
-        assertTrue(accessibilityViewState().refreshWebView)
-
-        testee.onWebViewRefreshed()
-
-        assertFalse(accessibilityViewState().refreshWebView)
-    }
-
-    @Test
-    fun whenFontSizeChangedThenEmitNewState() {
+    fun whenFontSizeChangedThenViewStateFontSizeUpdated() {
+        accessibilitySettingsDataStore.overrideSystemFontSize = true
         accessibilitySettingsDataStore.appFontSize = 150f
-        accessibilitySettingsDataStore.overrideSystemFontSize = false
 
-        assertFalse(accessibilityViewState().refreshWebView)
         assertEquals(accessibilitySettingsDataStore.fontSize, accessibilityViewState().fontSize)
     }
 

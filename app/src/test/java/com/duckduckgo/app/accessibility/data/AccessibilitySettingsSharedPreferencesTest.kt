@@ -24,7 +24,6 @@ import app.cash.turbine.test
 import com.duckduckgo.app.accessibility.data.AccessibilitySettingsSharedPreferences.Companion.FONT_SIZE_DEFAULT
 import com.duckduckgo.common.test.CoroutineTestRule
 import junit.framework.Assert.*
-import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Rule
@@ -41,7 +40,7 @@ class AccessibilitySettingsSharedPreferencesTest {
 
     private val context = ApplicationProvider.getApplicationContext<Context>()
 
-    private val testee = AccessibilitySettingsSharedPreferences(context, coroutineRule.testDispatcherProvider, TestScope())
+    private val testee = AccessibilitySettingsSharedPreferences(context)
 
     @After
     fun after() {
@@ -128,6 +127,21 @@ class AccessibilitySettingsSharedPreferencesTest {
             accessibilitySetting = accessibilitySetting.copy(overrideSystemFontSize = false, fontSize = 100f)
             assertEquals(accessibilitySetting, awaitItem())
 
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @SuppressLint("DenyListedApi")
+    @Test
+    fun whenPersistedSettingsAreNonDefaultThenFirstEmittedValueReflectsThem() = runTest {
+        context.getSharedPreferences(AccessibilitySettingsSharedPreferences.FILENAME, Context.MODE_PRIVATE)
+            .edit()
+            .putBoolean(AccessibilitySettingsSharedPreferences.KEY_OVERRIDE_SYSTEM_FONT_SIZE, true)
+            .putFloat(AccessibilitySettingsSharedPreferences.KEY_FONT_SIZE, 150f)
+            .commit()
+
+        AccessibilitySettingsSharedPreferences(context).settingsFlow().test {
+            assertEquals(AccessibilitySettings(overrideSystemFontSize = true, fontSize = 140f, forceZoom = false), awaitItem())
             cancelAndConsumeRemainingEvents()
         }
     }
