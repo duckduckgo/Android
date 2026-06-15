@@ -18,11 +18,12 @@ package com.duckduckgo.duckchat.api.nativeinput
 
 /**
  * Lets other modules force-disable the native (unified) input field regardless of the
- * `nativeInputField` user setting. This is the single gate read by `RealDuckChat` so every
+ * `nativeInputField` user setting. This is the single gate read by `RealDuckChat`, so every
  * consumer of `observeNativeInputFieldUserSettingEnabled()` sees a consistent value.
  *
- * Used to exclude users enrolled in the active Duck.ai onboarding experiment so they keep the
- * legacy omnibar while the experiment runs.
+ * Temporary: added only to exclude users in the active Duck.ai onboarding experiment, removed once
+ * it's cleaned up. Not reactive — suppressors are read only when `RealDuckChat.cacheConfig()` runs
+ * (app init and privacy-config download), so use this only for state fixed before app start.
  */
 interface NativeInputFieldSuppressor {
     /** Return true to suppress the native input field for the current user. */
