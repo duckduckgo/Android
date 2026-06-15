@@ -17,6 +17,7 @@
 package com.duckduckgo.adblocking.impl
 
 import android.annotation.SuppressLint
+import androidx.lifecycle.LifecycleOwner
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
 import com.duckduckgo.adblocking.impl.remoteconfig.AdBlockingExtensionFeature
@@ -32,6 +33,7 @@ import org.junit.Assert.assertNull
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.mock
 
 @SuppressLint("DenyListedApi") // setRawStoredState
 @RunWith(AndroidJUnit4::class)
@@ -41,6 +43,7 @@ class AdBlockingExtensionConfigProviderTest {
     val coroutineRule = CoroutineTestRule()
 
     private val feature = FakeFeatureToggleFactory.create(AdBlockingExtensionFeature::class.java)
+    private val lifecycleOwner: LifecycleOwner = mock()
     private val provider = RealAdBlockingExtensionConfigProvider(feature, coroutineRule.testScope, coroutineRule.testDispatcherProvider)
 
     private val validSettingsJson = """
@@ -108,9 +111,10 @@ class AdBlockingExtensionConfigProviderTest {
     }
 
     @Test
-    fun whenSettingsAreValidAtConstructionThenScriptletsSettingsEmitsInitialValue() = runTest {
+    fun whenSettingsAreValidAtOnCreateThenScriptletsSettingsEmitsInitialValue() = runTest {
         feature.self().setRawStoredState(Toggle.State(remoteEnableState = true, settings = validSettingsJson))
         val freshProvider = RealAdBlockingExtensionConfigProvider(feature, coroutineRule.testScope, coroutineRule.testDispatcherProvider)
+        freshProvider.onCreate(lifecycleOwner)
 
         freshProvider.scriptletsSettings.filterNotNull().test {
             assertEquals("2026.3.9", awaitItem().version)
@@ -122,6 +126,7 @@ class AdBlockingExtensionConfigProviderTest {
     fun whenOnPrivacyConfigDownloadedFiresAfterSettingsChangeThenScriptletsSettingsEmitsNewValue() = runTest {
         feature.self().setRawStoredState(Toggle.State(remoteEnableState = true, settings = validSettingsJson))
         val freshProvider = RealAdBlockingExtensionConfigProvider(feature, coroutineRule.testScope, coroutineRule.testDispatcherProvider)
+        freshProvider.onCreate(lifecycleOwner)
 
         freshProvider.scriptletsSettings.filterNotNull().test {
             assertEquals("2026.3.9", awaitItem().version)
@@ -139,6 +144,7 @@ class AdBlockingExtensionConfigProviderTest {
     fun whenOnPrivacyConfigDownloadedFiresWithUnchangedSettingsThenScriptletsSettingsDoesNotEmitDuplicates() = runTest {
         feature.self().setRawStoredState(Toggle.State(remoteEnableState = true, settings = validSettingsJson))
         val freshProvider = RealAdBlockingExtensionConfigProvider(feature, coroutineRule.testScope, coroutineRule.testDispatcherProvider)
+        freshProvider.onCreate(lifecycleOwner)
 
         freshProvider.scriptletsSettings.filterNotNull().test {
             assertEquals("2026.3.9", awaitItem().version)
