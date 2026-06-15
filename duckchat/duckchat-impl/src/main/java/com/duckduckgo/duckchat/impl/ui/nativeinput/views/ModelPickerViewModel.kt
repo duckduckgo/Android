@@ -22,6 +22,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.di.scopes.ViewScope
+import com.duckduckgo.duckchat.api.nativeinput.NativeInputStateProvider
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.models.AIChatModel
 import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
@@ -30,24 +31,105 @@ import com.duckduckgo.duckchat.impl.models.ModelState
 import com.duckduckgo.duckchat.impl.models.Tool
 import com.duckduckgo.duckchat.impl.models.UserTier
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
+import com.duckduckgo.duckchat.store.impl.DuckAiChat
+import com.duckduckgo.duckchat.store.impl.DuckAiChatStore
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import logcat.logcat
 import javax.inject.Inject
 
 data class ModelSection(@StringRes val headerRes: Int?, val models: List<AIChatModel>)
 
+/** Emitted when the user picks a model during the FE recovery model-change flow. */
+sealed class PickerModelChange {
+    data class ChangeModel(val modelId: String) : PickerModelChange()
+}
+
 @ContributesViewModel(ViewScope::class)
 class ModelPickerViewModel @Inject constructor(
     private val modelManager: DuckAiModelManager,
     private val duckChatPixels: DuckChatPixels,
+    private val nativeInputStateProvider: NativeInputStateProvider,
+    private val duckAiChatStore: DuckAiChatStore,
 ) : ViewModel() {
 
     val state: StateFlow<ModelState> = modelManager.modelState
+
+    private val currentChat = MutableStateFlow<DuckAiChat?>(null)
+
+    private var modelChangeMode: Boolean = false
+
+    // The model picked during the current recovery flow. Display-only: it drives the chip and the
+    // picker's selected tick immediately, without waiting for the FE to sync the chat's model back
+    // to native storage. Cleared when the recovery window ends.
+    private val recoverySelectedModelId = MutableStateFlow<String?>(null)
+
+    init {
+        viewModelScope.launch {
+            // collectLatest: cancel in-flight lookup on chatId flip to avoid stale currentChat.
+            nativeInputStateProvider.state
+                .map { it.chatId }
+                .distinctUntilChanged()
+                .collectLatest { chatId ->
+                    currentChat.value = if (chatId == null) null else duckAiChatStore.getChatById(chatId)
+                }
+        }
+        viewModelScope.launch {
+            nativeInputStateProvider.state.collect { state ->
+                modelChangeMode = state.modelChangeMode
+                if (!state.modelChangeMode) recoverySelectedModelId.value = null
+            }
+        }
+    }
+
+    /**
+     * Chat-aware chip label: in an ongoing chat (chatId set) shows that chat's model short name,
+     * falling back to the global selection when the chat's model isn't in the list (e.g. lost
+     * access). For a new chat (chatId null) it shows the global selection.
+     */
+    val chipLabel: StateFlow<String?> = combine(
+        modelManager.modelState,
+        nativeInputStateProvider.state,
+        currentChat,
+        recoverySelectedModelId,
+    ) { modelState, nativeState, chat, recoveryId ->
+        // A just-picked recovery model wins (only for display, before the chat's model syncs back).
+        val recoveryShortName = recoveryId?.let { id -> modelState.models.firstOrNull { it.id == id }?.shortName }
+        if (recoveryShortName != null) return@combine recoveryShortName
+        val activeChat = chat?.takeIf { it.chatId == nativeState.chatId }
+        val chatShortName = activeChat?.let { c -> modelState.models.firstOrNull { it.id == c.model }?.shortName }
+        chatShortName ?: modelState.selectedModelShortName
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.Eagerly,
+        initialValue = modelManager.modelState.value.selectedModelShortName,
+    )
+
+    /** True once a model was picked during the current recovery window (set synchronously in onModelTapped). */
+    fun hasPendingRecoverySelection(): Boolean = recoverySelectedModelId.value != null
+
+    /**
+     * Model id the picker should mark with the selected tick: prioritizes the recovery model if any,
+     * then the active chat's model during recovery, then
+     * the global selection (normal new-chat behaviour).
+     */
+    fun selectedModelIdForMenu(): String? {
+        recoverySelectedModelId.value?.let { return it }
+        val chat = currentChat.value
+        if (modelChangeMode && chat != null) return chat.model
+        return modelManager.modelState.value.selectedModelId
+    }
 
     var menuShowing = false
 
@@ -68,12 +150,23 @@ class ModelPickerViewModel @Inject constructor(
     private val command = Channel<UpsellCommand>(capacity = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
     val commands: Flow<UpsellCommand> = command.receiveAsFlow()
 
+    private val modelChangeChannel = Channel<PickerModelChange>(capacity = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
+    val modelChanges: Flow<PickerModelChange> = modelChangeChannel.receiveAsFlow()
+
     fun onModelTapped(model: AIChatModel, surface: PickerSurface) {
         if (model.isAccessible) {
-            if (model.id != modelManager.getSelectedModelId()) {
-                duckChatPixels.fireModelSelected(model.id)
+            if (modelChangeMode) {
+                // FE recovery flow: report the chosen model to the FE instead of changing the
+                // global default. FE owns the chat's model; native storage syncs back. Show the
+                // pick immediately on the chip + tick rather than waiting for that sync.
+                recoverySelectedModelId.value = model.id
+                modelChangeChannel.trySend(PickerModelChange.ChangeModel(model.id))
+            } else {
+                if (model.id != modelManager.getSelectedModelId()) {
+                    duckChatPixels.fireModelSelected(model.id)
+                }
+                viewModelScope.launch { modelManager.selectModel(model) }
             }
-            viewModelScope.launch { modelManager.selectModel(model) }
             return
         }
         val userTier = modelManager.modelState.value.userTier

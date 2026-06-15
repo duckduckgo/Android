@@ -25,6 +25,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.Lifecycle.State.CREATED
 import androidx.lifecycle.testing.TestLifecycleOwner
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import app.cash.turbine.test
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
@@ -1916,6 +1917,15 @@ class RealDuckChatTest {
         coroutineRule.testScope.advanceUntilIdle()
 
         assertFalse(testee.isChatHistoryAvailable())
+    }
+
+    @Test
+    fun whenRequestShowModelPickerThenEventEmittedWithTabId() = runTest {
+        testee.showModelPickerEvents.test {
+            testee.requestShowModelPicker("tab-1")
+            assertEquals("tab-1", awaitItem())
+            cancelAndConsumeRemainingEvents()
+        }
     }
 
     private suspend fun enableChatHistoryFlags() {

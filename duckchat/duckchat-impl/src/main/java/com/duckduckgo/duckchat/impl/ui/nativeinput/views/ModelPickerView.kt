@@ -29,6 +29,7 @@ import android.widget.PopupWindow
 import android.widget.ScrollView
 import androidx.annotation.DrawableRes
 import androidx.appcompat.content.res.AppCompatResources
+import androidx.core.view.doOnLayout
 import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
 import androidx.lifecycle.ViewModelProvider
@@ -63,11 +64,20 @@ interface ModelPicker {
     var onMenuShown: (() -> Unit)?
     var onMenuDismissed: (() -> Unit)?
     var onModelSelected: (() -> Unit)?
+
+    /** Invoked when the user picks a model during the FE recovery model-change flow. */
+    var onChangeModelSubmitted: ((modelId: String) -> Unit)?
     fun getSelectedModelId(): String?
     fun isImageGenerationSupported(): Boolean
     fun isWebSearchSupported(): Boolean
     fun setPickerEnabled(enabled: Boolean)
     fun setHost(host: NativeInputHost)
+
+    /** Programmatically open the selection list (FE recovery: showModelPicker). */
+    fun openPicker()
+
+    /** True if a model was picked during the current recovery window (set synchronously on tap). */
+    fun hasPendingRecoverySelection(): Boolean
 }
 
 @InjectWith(ViewScope::class)
@@ -88,8 +98,10 @@ class ModelPickerView @JvmOverloads constructor(
     }
     private val chip: Chip by lazy { findViewById(R.id.modelPickerChip) }
     private var stateJob: Job? = null
+    private var chipLabelJob: Job? = null
     private var inputContextJob: Job? = null
     private var commandJob: Job? = null
+    private var modelChangeJob: Job? = null
     private var popupWindow: PopupWindow? = null
     private var lastObservedModelId: String? = null
     private var lastNativeInputState: NativeInputState? = null
@@ -101,6 +113,7 @@ class ModelPickerView @JvmOverloads constructor(
     override var onMenuShown: (() -> Unit)? = null
     override var onMenuDismissed: (() -> Unit)? = null
     override var onModelSelected: (() -> Unit)? = null
+    override var onChangeModelSubmitted: ((modelId: String) -> Unit)? = null
 
     init {
         inflate(context, R.layout.view_model_picker, this)
@@ -168,7 +181,6 @@ class ModelPickerView @JvmOverloads constructor(
         lastObservedModelId = viewModel.state.value.selectedModelId
         stateJob = viewModel.state
             .onEach { state ->
-                state.selectedModelShortName?.let { chip.text = it }
                 updateVisibility()
                 val newId = state.selectedModelId
                 if (newId != null && newId != lastObservedModelId) {
@@ -178,10 +190,34 @@ class ModelPickerView @JvmOverloads constructor(
             }
             .launchIn(scope)
 
+        chipLabelJob?.cancel()
+        chipLabelJob = viewModel.chipLabel
+            .onEach { label -> label?.let { chip.text = it } }
+            .launchIn(scope)
+
         commandJob?.cancel()
         commandJob = viewModel.commands
             .onEach { processCommand(it) }
             .launchIn(scope)
+
+        modelChangeJob?.cancel()
+        modelChangeJob = viewModel.modelChanges
+            .onEach { change ->
+                when (change) {
+                    is PickerModelChange.ChangeModel -> {
+                        onChangeModelSubmitted?.invoke(change.modelId)
+                        dismissPopup()
+                    }
+                }
+            }
+            .launchIn(scope)
+    }
+
+    override fun hasPendingRecoverySelection(): Boolean = viewModel.hasPendingRecoverySelection()
+
+    override fun openPicker() {
+        if (!isAttachedToWindow) return
+        chip.doOnLayout { if (isAttachedToWindow) showMenu() }
     }
 
     private fun processCommand(command: UpsellCommand) {
@@ -200,6 +236,7 @@ class ModelPickerView @JvmOverloads constructor(
         }
 
     private fun showMenu() {
+        if (popupWindow?.isShowing == true) return
         val state = viewModel.state.value
         if (state.models.isEmpty()) return
 
@@ -259,10 +296,14 @@ class ModelPickerView @JvmOverloads constructor(
         super.onDetachedFromWindow()
         stateJob?.cancel()
         stateJob = null
+        chipLabelJob?.cancel()
+        chipLabelJob = null
         inputContextJob?.cancel()
         inputContextJob = null
         commandJob?.cancel()
         commandJob = null
+        modelChangeJob?.cancel()
+        modelChangeJob = null
         lastNativeInputState = null
         dismissPopup()
     }
@@ -277,11 +318,12 @@ class ModelPickerView @JvmOverloads constructor(
     }
 
     private fun LinearLayout.populateMenu(state: ModelState, popup: PopupWindow) {
+        val selectedId = viewModel.selectedModelIdForMenu()
         viewModel.buildSections(state).forEachIndexed { index, section ->
             if (index > 0) addDivider()
             section.headerRes?.let { addSectionHeader(context.getString(it)) }
             for (model in section.models) {
-                addModelItem(model, selected = model.id == state.selectedModelId, popup)
+                addModelItem(model, selected = model.id == selectedId, popup)
             }
         }
     }
