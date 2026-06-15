@@ -419,8 +419,8 @@ class WebViewRequestInterceptor(
         return if (request.isForMainFrame && request.method == "GET") {
             val url = request.url ?: return null
             if (requestWasInTheStack(url, webView)) return null
-            val desktopSiteEnabled = webViewClientListener?.isDesktopSiteEnabled() == true
-            val currentAgent = withContext(dispatchers.main()) { webView.settings?.userAgentString }
+            val desktopSiteEnabled = webViewClientListener?.isDesktopSiteEnabled(url.toString()) == true
+            val currentAgent = withContext(dispatchers.main()) { webView.settings.userAgentString }
             val newAgent = userAgentProvider.userAgent(url.toString(), desktopSiteEnabled)
             return if (currentAgent != newAgent) {
                 newAgent

@@ -527,8 +527,10 @@ class BrowserWebViewClient @Inject constructor(
         appCoroutineScope.launch(dispatcherProvider.main()) {
             val activeExperiments = contentScopeExperiments.getActiveExperiments()
             webViewClientListener?.pageStarted(WebViewNavigationState(navigationList), activeExperiments)
+            val desktopModeEnabled = url?.let { webViewClientListener?.isDesktopSiteEnabled(it) }
+                ?: webViewClientListener?.getSite()?.isDesktopMode
             jsPlugins.getPlugins().forEach {
-                it.onPageStarted(webView, url, webViewClientListener?.getSite()?.isDesktopMode, activeExperiments)
+                it.onPageStarted(webView, url, desktopModeEnabled, activeExperiments)
             }
         }
         if (url != null && url == lastPageStarted) {

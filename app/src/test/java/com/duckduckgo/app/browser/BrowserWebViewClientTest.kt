@@ -296,6 +296,27 @@ class BrowserWebViewClientTest {
     }
 
     @Test
+    fun whenOnPageStartedThenContentScopeDesktopModeResolvedPerUrlNotFromStaleSite() = runTest {
+        // Site still references the previous page at onPageStarted time; the C-S-S flag must come from the URL.
+        whenever(listener.isDesktopSiteEnabled(EXAMPLE_URL)).thenReturn(true)
+
+        testee.onPageStarted(webView, EXAMPLE_URL, null)
+
+        assertEquals(true, jsPlugins.plugin.lastDesktopMode)
+    }
+
+    @Test
+    fun whenOnPageStartedWithNullUrlThenContentScopeDesktopModeFallsBackToSite() {
+        val site = mock<Site>()
+        whenever(site.isDesktopMode).thenReturn(true)
+        whenever(listener.getSite()).thenReturn(site)
+
+        testee.onPageStarted(webView, null, null)
+
+        assertEquals(true, jsPlugins.plugin.lastDesktopMode)
+    }
+
+    @Test
     fun whenOnPageStartedCalledThenProcessUriForThirdPartyCookiesCalled() =
         runTest {
             testee.onPageStarted(webView, EXAMPLE_URL, null)
@@ -1741,6 +1762,7 @@ class BrowserWebViewClientTest {
     private class FakeJsInjectorPlugin : JsInjectorPlugin {
         var countFinished = 0
         var countStarted = 0
+        var lastDesktopMode: Boolean? = null
 
         override fun onPageStarted(
             webView: WebView,
@@ -1749,6 +1771,7 @@ class BrowserWebViewClientTest {
             activeExperiments: List<Toggle>,
         ) {
             countStarted++
+            lastDesktopMode = isDesktopMode
         }
 
         override fun onPageFinished(

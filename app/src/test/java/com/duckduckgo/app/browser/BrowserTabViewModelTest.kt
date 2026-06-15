@@ -147,6 +147,8 @@ import com.duckduckgo.app.browser.progressbar.ProgressBarUpgradeFeature
 import com.duckduckgo.app.browser.refreshpixels.RefreshPixelSender
 import com.duckduckgo.app.browser.santize.NonHttpAppLinkChecker
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
+import com.duckduckgo.app.browser.sitepreferences.RememberDesktopModeFeature
+import com.duckduckgo.app.browser.sitepreferences.SitePreferencesRepository
 import com.duckduckgo.app.browser.tabs.TabManager
 import com.duckduckgo.app.browser.trafficquality.AndroidFeaturesHeaderPlugin.Companion.X_DUCKDUCKGO_ANDROID_HEADER
 import com.duckduckgo.app.browser.uilock.BROWSER_UI_LOCK_FEATURE_NAME
@@ -682,6 +684,8 @@ class BrowserTabViewModelTest {
     private var fakeBrowserUiLockFeature = FakeFeatureToggleFactory.create(BrowserUiLockFeature::class.java)
     private var fakeFaviconFetchingFixFeature = FakeFeatureToggleFactory.create(FaviconFetchingFixFeature::class.java)
     private var fakeProgressBarUpgradeFeature = FakeFeatureToggleFactory.create(ProgressBarUpgradeFeature::class.java)
+    private val mockSitePreferencesRepository: SitePreferencesRepository = mock()
+    private val fakeRememberDesktopModeFeature = FakeFeatureToggleFactory.create(RememberDesktopModeFeature::class.java)
     private val mockInlinePdfHandler: InlinePdfHandler = mock()
     private val mockPdfDownloadTooltipDataStore: PdfDownloadTooltipDataStore = mock()
     private val mockCachedFileDownloader: CachedFileDownloader = mock()
@@ -713,6 +717,8 @@ class BrowserTabViewModelTest {
 
             swipingTabsFeature.self().setRawStoredState(State(enable = true))
             swipingTabsFeature.enabledForUsers().setRawStoredState(State(enable = true))
+
+            fakeRememberDesktopModeFeature.self().setRawStoredState(State(enable = true))
 
             whenever(mockDuckChatJSHelper.enrichPageContextIfPossible(any(), any())).thenAnswer { it.getArgument<String>(1) }
             whenever(mockInlinePdfHandler.classifyPdfRequest(any(), anyOrNull(), any())).thenReturn(PdfRenderDecision.NotApplicable)
@@ -1008,6 +1014,8 @@ class BrowserTabViewModelTest {
                 downloadsRepository = mockDownloadsRepository,
                 onboardingBrandDesignUpdateToggles = mockOnboardingBrandDesignUpdateToggles,
                 onboardingStore = mockOnboardingStore,
+                sitePreferencesRepository = mockSitePreferencesRepository,
+                rememberDesktopModeFeature = fakeRememberDesktopModeFeature,
             )
 
         testee.loadData("abc", null, false, false)
@@ -2371,6 +2379,7 @@ class BrowserTabViewModelTest {
         testee.onChangeBrowserModeClicked()
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         verify(mockPixel).fire(AppPixelName.MENU_ACTION_DESKTOP_SITE_ENABLE_PRESSED)
+        verify(mockSitePreferencesRepository).rememberDesktopMode("example.com")
         assertTrue(browserViewState().isDesktopBrowsingMode)
         val site = testee.siteLiveData.value
         assertTrue(site?.isDesktopMode == true)
@@ -2382,6 +2391,7 @@ class BrowserTabViewModelTest {
         setDesktopBrowsingMode(true)
         testee.onChangeBrowserModeClicked()
         verify(mockPixel).fire(AppPixelName.MENU_ACTION_DESKTOP_SITE_DISABLE_PRESSED)
+        verify(mockSitePreferencesRepository).forgetDesktopMode("example.com")
         assertFalse(browserViewState().isDesktopBrowsingMode)
         val site = testee.siteLiveData.value
         assertFalse(site?.isDesktopMode == true)
@@ -2687,6 +2697,8 @@ class BrowserTabViewModelTest {
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         val ultimateCommand = commandCaptor.lastValue as Navigate
         assertEquals(exampleUrl, ultimateCommand.url)
+        // eTLD+1 of m.example.com collapses to the same key as the desktop-rewritten URL
+        verify(mockSitePreferencesRepository).rememberDesktopMode("example.com")
     }
 
     @Test
@@ -2717,6 +2729,30 @@ class BrowserTabViewModelTest {
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         val ultimateCommand = commandCaptor.lastValue
         assertTrue(ultimateCommand == NavigationCommand.Refresh)
+    }
+
+    @Test
+    fun whenDesktopToggledOnHostWithoutRegistrableDomainThenPreferenceNotPersistedButRefreshStillIssued() {
+        loadUrl("http://localhost")
+        setDesktopBrowsingMode(false)
+        testee.onChangeBrowserModeClicked()
+        // No eTLD+1 → nothing persisted, but the rest of the handler still runs.
+        verify(mockSitePreferencesRepository, never()).rememberDesktopMode(any())
+        verify(mockPixel).fire(AppPixelName.MENU_ACTION_DESKTOP_SITE_ENABLE_PRESSED)
+    }
+
+    @Test
+    fun whenNavigatingToNonRememberedSiteThenDesktopModeResetAndNotInheritedFromPreviousSite() {
+        whenever(mockSitePreferencesRepository.isDesktopModeRemembered("a.com")).thenReturn(true)
+        whenever(mockSitePreferencesRepository.isDesktopModeRemembered("b.com")).thenReturn(false)
+
+        loadUrl("http://a.com")
+        assertTrue(browserViewState().isDesktopBrowsingMode)
+        assertTrue(testee.siteLiveData.value?.isDesktopMode == true)
+
+        loadUrl("http://b.com")
+        assertFalse(browserViewState().isDesktopBrowsingMode)
+        assertFalse(testee.siteLiveData.value?.isDesktopMode == true)
     }
 
     @Test

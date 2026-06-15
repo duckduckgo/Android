@@ -217,6 +217,8 @@ import com.duckduckgo.app.browser.progressbar.ProgressBarUpgradeFeature
 import com.duckduckgo.app.browser.refreshpixels.RefreshPixelSender
 import com.duckduckgo.app.browser.santize.NonHttpAppLinkChecker
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
+import com.duckduckgo.app.browser.sitepreferences.RememberDesktopModeFeature
+import com.duckduckgo.app.browser.sitepreferences.SitePreferencesRepository
 import com.duckduckgo.app.browser.tabs.TabManager
 import com.duckduckgo.app.browser.uilock.BROWSER_UI_LOCK_FEATURE_NAME
 import com.duckduckgo.app.browser.uilock.BrowserUiLockFeature
@@ -565,6 +567,8 @@ class BrowserTabViewModel @Inject constructor(
     private val downloadsRepository: DownloadsRepository,
     private val onboardingBrandDesignUpdateToggles: OnboardingBrandDesignUpdateToggles,
     private val onboardingStore: OnboardingStore,
+    private val sitePreferencesRepository: SitePreferencesRepository,
+    private val rememberDesktopModeFeature: RememberDesktopModeFeature,
 ) : ViewModel(),
     WebViewClientListener,
     EditSavedSiteListener,
@@ -1687,7 +1691,16 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
-    override fun isDesktopSiteEnabled(): Boolean = currentBrowserViewState().isDesktopBrowsingMode
+    override suspend fun isDesktopSiteEnabled(url: String): Boolean = withContext(dispatchers.io()) {
+        if (rememberDesktopModeFeature.self().isEnabled()) {
+            isDesktopModeRememberedForUrl(url)
+        } else {
+            currentBrowserViewState().isDesktopBrowsingMode
+        }
+    }
+
+    private fun isDesktopModeRememberedForUrl(url: String): Boolean =
+        url.toUri().host?.toTldPlusOne()?.let { sitePreferencesRepository.isDesktopModeRemembered(it) } ?: false
 
     override fun isTabInForeground(): Boolean =
         if (swipingTabsFeature.isEnabled) {
@@ -2055,6 +2068,16 @@ class BrowserTabViewModel @Inject constructor(
         cleanupBlobDownloadReplyProxyMaps(url)
 
         hasCtaBeenShownForCurrentPage.set(false)
+
+        // Resolve desktop mode per-domain BEFORE buildSiteFactory(), which synchronously stamps
+        // site.isDesktopMode from isDesktopBrowsingMode. This both applies a remembered preference and
+        // resets desktop mode when navigating to a non-remembered site (stops cross-site inheritance).
+        if (rememberDesktopModeFeature.self().isEnabled()) {
+            browserViewState.value = currentBrowserViewState().copy(
+                isDesktopBrowsingMode = isDesktopModeRememberedForUrl(url),
+            )
+        }
+
         buildSiteFactory(url, title, urlUnchangedForExternalLaunchPurposes(site?.url, url))
         setAdClickActiveTabData(url)
 
@@ -3308,6 +3331,19 @@ class BrowserTabViewModel @Inject constructor(
         site?.isDesktopMode = desktopSiteRequested
 
         val uri = site?.uri ?: return
+
+        // Persist the choice per-domain (eTLD+1). uri.host is the pre-rewrite host (e.g. m.example.com),
+        // whose eTLD+1 (example.com) matches the key the desktop-rewritten URL produces. The optimistic
+        // cache update means the reload triggered below already sees the new value.
+        if (rememberDesktopModeFeature.self().isEnabled()) {
+            uri.host?.toTldPlusOne()?.let { domain ->
+                if (desktopSiteRequested) {
+                    sitePreferencesRepository.rememberDesktopMode(domain)
+                } else {
+                    sitePreferencesRepository.forgetDesktopMode(domain)
+                }
+            }
+        }
 
         pixel.fire(
             if (desktopSiteRequested) {

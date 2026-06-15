@@ -21,6 +21,7 @@ import com.duckduckgo.app.browser.WebDataManager
 import com.duckduckgo.app.browser.api.WebViewCapabilityChecker
 import com.duckduckgo.app.browser.cookies.ThirdPartyCookieManager
 import com.duckduckgo.app.browser.favicon.FaviconManager
+import com.duckduckgo.app.browser.sitepreferences.SitePreferencesRepository
 import com.duckduckgo.app.fire.AndroidAppCacheClearer
 import com.duckduckgo.app.fire.AppCacheClearer
 import com.duckduckgo.app.fire.BackgroundTimeKeeper
@@ -84,6 +85,7 @@ object PrivacyModule {
         webViewCapabilityChecker: WebViewCapabilityChecker,
         duckAiHostProvider: DuckAiHostProvider,
         siteDataCleaner: SiteDataCleaner,
+        sitePreferencesRepository: SitePreferencesRepository,
     ): ClearDataAction {
         // TODO: Burns currently only clear @RegularMode tabs. Cross-mode tab clearing will be
         // handled as part of the data-clearing fire-mode work.
@@ -107,6 +109,7 @@ object PrivacyModule {
             webViewCapabilityChecker,
             duckAiHostProvider,
             siteDataCleaner,
+            sitePreferencesRepository,
         )
     }
 

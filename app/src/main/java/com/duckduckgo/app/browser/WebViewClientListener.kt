@@ -105,7 +105,7 @@ interface WebViewClientListener {
 
     fun surrogateDetected(surrogate: SurrogateResponse)
 
-    fun isDesktopSiteEnabled(): Boolean
+    suspend fun isDesktopSiteEnabled(url: String): Boolean
 
     fun isTabInForeground(): Boolean
 
