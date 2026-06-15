@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.subscriptions.impl.ui.onboarding.steps
+package com.duckduckgo.subscriptions.impl.ui.onboarding.screens
 
 import android.content.Context
 import android.view.View

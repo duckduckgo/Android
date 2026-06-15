@@ -14,80 +14,64 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.subscriptions.impl.ui.onboarding.steps
+package com.duckduckgo.subscriptions.impl.ui.onboarding.screens
 
 import android.content.Context
 import android.util.AttributeSet
 import android.view.View
 import android.widget.LinearLayout
 import com.duckduckgo.anvil.annotations.ContributesActivePlugin
-import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.di.scopes.ViewScope
-import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.subscriptions.api.SubscriptionOnboardingStepNavigator
 import com.duckduckgo.subscriptions.api.SubscriptionOnboardingStepPlugin
 import com.duckduckgo.subscriptions.api.SubscriptionOnboardingStepType
-import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionsSettingsScreenWithEmptyParams
 import com.duckduckgo.subscriptions.impl.R
-import com.duckduckgo.subscriptions.impl.databinding.ViewSampleOnboardingStepBinding
-import dagger.android.support.AndroidSupportInjection
+import com.duckduckgo.subscriptions.impl.databinding.ViewIntroOnboardingStepBinding
 import javax.inject.Inject
 
 /**
- * Sample onboarding STEP used to exercise the flow end-to-end on internal builds. The primary button
- * completes the step (persisted) and advances; the secondary button skips to the next without
- * completing; the "Learn More" link navigates to a native screen. Safe to delete once real feature
- * steps (VPN, Duck.ai, …) are contributed.
+ * Placeholder INTRO screen (confetti + subscription details). Shown only when onboarding is entered
+ * after a purchase; skipped when re-entering from settings. Confetti is rendered by the host
+ * fragment for INTRO screens. Safe to delete with the other placeholders.
  */
 @ContributesActivePlugin(
     AppScope::class,
     boundType = SubscriptionOnboardingStepPlugin::class,
-    priority = 10,
-    featureName = "pluginSampleSubscriptionOnboardingStep",
+    priority = 0,
+    featureName = "pluginIntroSubscriptionOnboardingStep",
     parentFeatureName = "pluginPointSubscriptionOnboardingStep",
 )
-class SampleStepPlugin @Inject constructor() : SubscriptionOnboardingStepPlugin {
+class IntroStepPlugin @Inject constructor() : SubscriptionOnboardingStepPlugin {
 
-    override val name = "sampleStep"
+    override val name = "introStep"
 
-    override val toolbarTitle = R.string.subscriptionOnboardingSampleToolbarTitle
+    override val toolbarTitle = R.string.subscriptionOnboardingIntroToolbarTitle
 
-    override val stepType = SubscriptionOnboardingStepType.STEP
+    override val stepType = SubscriptionOnboardingStepType.INTRO
 
     override fun getOnboardingStepView(
         context: Context,
         navigator: SubscriptionOnboardingStepNavigator,
-    ): View = SampleStepView(context).apply { this.navigator = navigator }
+    ): View = IntroStepView(context).apply { this.navigator = navigator }
 }
 
-@InjectWith(ViewScope::class)
-class SampleStepView @JvmOverloads constructor(
+class IntroStepView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyle: Int = 0,
 ) : LinearLayout(context, attrs, defStyle) {
 
-    @Inject
-    lateinit var globalActivityStarter: GlobalActivityStarter
-
     var navigator: SubscriptionOnboardingStepNavigator? = null
 
-    private val binding: ViewSampleOnboardingStepBinding by viewBinding()
+    private val binding: ViewIntroOnboardingStepBinding by viewBinding()
 
     init {
         orientation = VERTICAL
     }
 
     override fun onAttachedToWindow() {
-        AndroidSupportInjection.inject(this)
         super.onAttachedToWindow()
-
-        binding.learnMore.setOnClickListener {
-            globalActivityStarter.start(context, SubscriptionsSettingsScreenWithEmptyParams)
-        }
-        binding.primaryButton.setOnClickListener { navigator?.onStepCompleted() }
-        binding.secondaryButton.setOnClickListener { navigator?.onNextStep() }
+        binding.primaryButton.setOnClickListener { navigator?.onNextStep() }
     }
 }

@@ -103,3 +103,25 @@ class SubscriptionOnboardingActivity : DuckDuckGoActivity(), SubscriptionOnboard
         ) : GlobalActivityStarter.ActivityParams
     }
 }
+
+/**
+ * Where the onboarding flow was entered from.
+ * - [PURCHASE]: just bought a subscription — start at the intro (with confetti).
+ * - [SETTINGS]: re-entered from Subscription Settings — skip the intro and resume at the first incomplete step.
+ */
+enum class SubscriptionOnboardingOrigin { PURCHASE, SETTINGS }
+
+/**
+ * Implemented by [SubscriptionOnboardingActivity]; a step fragment casts its host activity to this
+ * and calls these to drive the flow.
+ */
+interface SubscriptionOnboardingStepHost {
+    /** Mark the current step completed (persisted) and advance. */
+    fun onStepCompleted()
+
+    /** Advance without completing the current step. */
+    fun onNextStep()
+
+    /** Go back to the previous screen in this session. */
+    fun onBackStep()
+}

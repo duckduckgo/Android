@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.subscriptions.impl.ui.onboarding.steps
+package com.duckduckgo.subscriptions.impl.ui.onboarding.screens
 
 import android.content.Context
 import android.util.AttributeSet
@@ -27,12 +27,12 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.di.scopes.ViewScope
-import com.duckduckgo.subscriptions.api.SubscriptionOnboardingProgress
 import com.duckduckgo.subscriptions.api.SubscriptionOnboardingStepNavigator
 import com.duckduckgo.subscriptions.api.SubscriptionOnboardingStepPlugin
 import com.duckduckgo.subscriptions.api.SubscriptionOnboardingStepType
 import com.duckduckgo.subscriptions.impl.R
 import com.duckduckgo.subscriptions.impl.databinding.ViewSummaryOnboardingStepBinding
+import com.duckduckgo.subscriptions.impl.ui.onboarding.SubscriptionOnboardingProgress
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.coroutines.launch
 import javax.inject.Inject

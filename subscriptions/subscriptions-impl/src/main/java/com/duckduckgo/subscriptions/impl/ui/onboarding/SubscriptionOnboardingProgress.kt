@@ -19,13 +19,29 @@ package com.duckduckgo.subscriptions.impl.ui.onboarding
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.plugins.ActivePluginPoint
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.subscriptions.api.SubscriptionOnboardingProgress
 import com.duckduckgo.subscriptions.api.SubscriptionOnboardingStepPlugin
 import com.duckduckgo.subscriptions.api.SubscriptionOnboardingStepType.STEP
 import com.duckduckgo.subscriptions.impl.store.SubscriptionOnboardingDataStore
 import com.squareup.anvil.annotations.ContributesBinding
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
+
+/**
+ * Read-only access to the user's total (cross-session) onboarding progress, used by the summary
+ * screen. Only [SubscriptionOnboardingStepType.STEP] screens count; the total is derived from the
+ * number of registered step plugins.
+ */
+interface SubscriptionOnboardingProgress {
+
+    /** Number of distinct steps the user has completed (across all sessions). */
+    suspend fun completedStepCount(): Int
+
+    /** Total number of real steps in the flow (registered STEP plugins). */
+    suspend fun totalStepCount(): Int
+
+    /** Completion as a 0..100 percentage. Returns 0 when there are no steps. */
+    suspend fun completionPercent(): Int
+}
 
 @ContributesBinding(AppScope::class)
 class RealSubscriptionOnboardingProgress @Inject constructor(
