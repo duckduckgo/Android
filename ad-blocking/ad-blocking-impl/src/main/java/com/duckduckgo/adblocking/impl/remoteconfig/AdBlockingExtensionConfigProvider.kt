@@ -16,6 +16,8 @@
 
 package com.duckduckgo.adblocking.impl.remoteconfig
 
+import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.config.api.PrivacyConfigCallbackPlugin
 import com.squareup.anvil.annotations.ContributesBinding
@@ -25,9 +27,11 @@ import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import dagger.SingleInstanceIn
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 import logcat.LogPriority.WARN
 import logcat.asLog
 import logcat.logcat
@@ -56,20 +60,22 @@ interface AdBlockingExtensionConfigProvider {
 @ContributesMultibinding(scope = AppScope::class, boundType = PrivacyConfigCallbackPlugin::class)
 class RealAdBlockingExtensionConfigProvider @Inject constructor(
     private val feature: AdBlockingExtensionFeature,
+    @AppCoroutineScope private val appScope: CoroutineScope,
+    private val dispatchers: DispatcherProvider,
 ) : AdBlockingExtensionConfigProvider, PrivacyConfigCallbackPlugin {
 
     private val settingsAdapter by lazy { buildJsonAdapter() }
     private val scriptletsFlow = MutableStateFlow<AdBlockingExtensionSettings?>(null)
 
     init {
-        refresh()
+        appScope.launch(dispatchers.io()) { refresh() }
     }
 
     override val scriptletsSettings: StateFlow<AdBlockingExtensionSettings?> = scriptletsFlow.asStateFlow()
 
     override fun onPrivacyConfigDownloaded() {
         logcat { "onPrivacyConfigDownloaded" }
-        refresh()
+        appScope.launch(dispatchers.io()) { refresh() }
     }
 
     private fun refresh() {
