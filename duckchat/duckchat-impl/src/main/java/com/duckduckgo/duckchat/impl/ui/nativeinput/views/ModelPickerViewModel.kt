@@ -170,6 +170,10 @@ class ModelPickerViewModel @Inject constructor(
                 // FE recovery flow: report the chosen model to the FE instead of changing the
                 // global default. FE owns the chat's model; native storage syncs back. Show the
                 // pick immediately on the chip + tick rather than waiting for that sync.
+                // Fire the same selection pixel as the normal flow (skip a re-tap of the same pick).
+                if (model.id != recoverySelectedModelId.value) {
+                    duckChatPixels.fireModelSelected(model.id)
+                }
                 recoverySelectedModelId.value = model.id
                 modelChangeChannel.trySend(PickerModelChange.ChangeModel(model.id))
             } else {
