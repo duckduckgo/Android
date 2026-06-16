@@ -53,6 +53,7 @@ import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command
 import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command.AskHostConfirmation
 import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command.AskJoinerConfirmation
 import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command.LoginSuccess
+import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command.ShowAlreadyConnected
 import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command.ShowError
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flowOf
@@ -783,6 +784,28 @@ class SyncConnectViewModelTest {
             testee.onQRCodeScanned(scannedCode)
             val command = awaitItem()
             assertTrue("expected ShowError, got $command", command is ShowError)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenV2PresentSameAccountThenShowAlreadyConnected() = runTest {
+        enableV2(displayOn = true)
+        whenever(qrEncoder.encodeAsBitmap(any(), any(), any())).thenReturn(TestSyncFixtures.qrBitmap())
+
+        testee.viewState(source = null).test {
+            awaitItem()
+            runnerEventsFlow.emit(presenterSessionStarted())
+            awaitItem()
+            runnerEventsFlow.emit(
+                transition(from = ExchangeV2State.Negotiating, to = ExchangeV2State.SameAccountAbort),
+            )
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        testee.commands().test {
+            val command = awaitItem()
+            assertTrue("expected ShowAlreadyConnected, got $command", command is ShowAlreadyConnected)
             cancelAndIgnoreRemainingEvents()
         }
     }

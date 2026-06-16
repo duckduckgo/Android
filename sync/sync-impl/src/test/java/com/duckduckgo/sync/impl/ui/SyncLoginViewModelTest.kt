@@ -162,6 +162,32 @@ class SyncLoginViewModelTest {
     }
 
     @Test
+    fun whenV2SameAccountThenShowAlreadyConnected() = runTest {
+        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
+        val scanned = "https://duckduckgo.com/sync/pairing/#&code2=v2code"
+        whenever(qrCode.parse(scanned)).thenReturn(
+            ExchangeV2CodeParseResult.LinkingV2(channelId = "c", publicKey = "k", version = "2"),
+        )
+        whenever(runner.eventsSince(any())).thenReturn(
+            flowOf(
+                ExchangeV2Event.Transition(
+                    timestampMs = 0L,
+                    from = ExchangeV2State.Negotiating,
+                    to = ExchangeV2State.SameAccountAbort,
+                    trigger = null,
+                    localTrigger = null,
+                ),
+            ),
+        )
+
+        testee.commands().test {
+            testee.onQRCodeScanned(scanned)
+            assertTrue(awaitItem() is Command.ShowAlreadyConnected)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
     fun whenAlreadyConnectedAcknowledgedThenLoginSuccess() = runTest {
         whenever(syncRepostitory.getAccountInfo()).thenReturn(AccountInfo())
 
