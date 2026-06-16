@@ -20,6 +20,7 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.impl.Result
+import com.duckduckgo.sync.impl.SyncDeviceIds
 import com.duckduckgo.sync.impl.crypto.RsaKeyPair
 import com.duckduckgo.sync.impl.crypto.SyncJweCrypto
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2State.Host
@@ -110,6 +111,7 @@ class RealExchangeV2Runner @Inject constructor(
     private val channel: ExchangeV2Channel,
     private val qrCode: ExchangeV2QrCode,
     private val recoveryCodeProvider: RecoveryCodeProvider,
+    private val syncDeviceIds: SyncDeviceIds,
     @AppCoroutineScope private val appScope: CoroutineScope,
     private val dispatchers: DispatcherProvider,
 ) : ExchangeV2Runner {
@@ -618,21 +620,22 @@ class RealExchangeV2Runner @Inject constructor(
         val peer = peerChannelId ?: return
         val peerKey = peerPublicKey ?: return
         val userId = syncStore.userId
+        val deviceName = syncDeviceIds.deviceName()
         if (userId != null) {
             val json = JSONObject().apply {
                 put("type", "recovery_code_available")
-                put("name", DEVICE_NAME)
+                put("name", deviceName)
                 put("kind", OWN_DEVICE_KIND)
                 put("user_id", userId)
             }.toString()
-            sendOnWireAndRecord(json, peer, peerKey, ExchangeV2Message.RecoveryCodeAvailable(json, userId, DEVICE_NAME, OWN_DEVICE_KIND))
+            sendOnWireAndRecord(json, peer, peerKey, ExchangeV2Message.RecoveryCodeAvailable(json, userId, deviceName, OWN_DEVICE_KIND))
         } else {
             val json = JSONObject().apply {
                 put("type", "recovery_code_request")
-                put("name", DEVICE_NAME)
+                put("name", deviceName)
                 put("kind", OWN_DEVICE_KIND)
             }.toString()
-            sendOnWireAndRecord(json, peer, peerKey, ExchangeV2Message.RecoveryCodeRequest(json, DEVICE_NAME, OWN_DEVICE_KIND))
+            sendOnWireAndRecord(json, peer, peerKey, ExchangeV2Message.RecoveryCodeRequest(json, deviceName, OWN_DEVICE_KIND))
         }
         sentOwnAvailability = true
         // Re-elect in case the peer's availability arrived before we sent ours.
@@ -800,7 +803,6 @@ class RealExchangeV2Runner @Inject constructor(
 
         // Android is always a ddg-kind device.
         private const val OWN_DEVICE_KIND = "ddg"
-        private const val DEVICE_NAME = "Android"
         private const val MAX_CHANNEL_CREATE_RETRIES = 3
         private const val HTTP_CONFLICT = 409
     }

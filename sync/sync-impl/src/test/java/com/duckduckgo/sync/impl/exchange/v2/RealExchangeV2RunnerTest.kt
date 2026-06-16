@@ -19,6 +19,7 @@ package com.duckduckgo.sync.impl.exchange.v2
 import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.sync.impl.Result
+import com.duckduckgo.sync.impl.SyncDeviceIds
 import com.duckduckgo.sync.impl.crypto.RsaKeyPair
 import com.duckduckgo.sync.impl.crypto.SyncJweCrypto
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Message.Hello
@@ -58,6 +59,7 @@ class RealExchangeV2RunnerTest {
     private val channel: ExchangeV2Channel = mock()
     private val qrCode: ExchangeV2QrCode = mock()
     private val recoveryCodeProvider: RecoveryCodeProvider = mock()
+    private val syncDeviceIds: SyncDeviceIds = mock()
 
     private fun newRunner(): RealExchangeV2Runner =
         RealExchangeV2Runner(
@@ -69,6 +71,7 @@ class RealExchangeV2RunnerTest {
             channel = channel,
             qrCode = qrCode,
             recoveryCodeProvider = recoveryCodeProvider,
+            syncDeviceIds = syncDeviceIds,
             appScope = coroutineTestRule.testScope,
             dispatchers = coroutineTestRule.testDispatcherProvider,
         )
@@ -83,6 +86,7 @@ class RealExchangeV2RunnerTest {
         whenever(channel.poll(any(), any())).thenReturn(emptyFlow())
         whenever(channel.sendMessage(any(), any(), any(), any())).thenReturn(Result.Success(Unit))
         whenever(channel.deleteChannel(any())).thenReturn(Result.Success(Unit))
+        whenever(syncDeviceIds.deviceName()).thenReturn("This Device")
     }
 
     @Test fun `startScan creates a session in Negotiating (Scanner already knows the peer)`() {
@@ -208,6 +212,38 @@ class RealExchangeV2RunnerTest {
             val event = awaitItem()
             assertSame(ExchangeV2State.SameAccountAbort, event.to)
         }
+    }
+
+    @Test fun `availability without an account carries this device's real name, not a hardcoded platform string`() = runTest {
+        whenever(syncStore.userId).thenReturn(null)
+        whenever(syncDeviceIds.deviceName()).thenReturn("google Pixel 7")
+        val runner = newRunner()
+
+        runner.startScan("")
+
+        // The peer shows this name on its security-confirmation screen, so it must be the real
+        // device name (e.g. "google Pixel 7"), never a generic "Android".
+        verify(channel).sendMessage(
+            argThat { contains("recovery_code_request") && contains("\"name\":\"google Pixel 7\"") },
+            any(),
+            any(),
+            any(),
+        )
+    }
+
+    @Test fun `availability with an account carries this device's real name, not a hardcoded platform string`() = runTest {
+        whenever(syncStore.userId).thenReturn("my-user")
+        whenever(syncDeviceIds.deviceName()).thenReturn("google Pixel 7")
+        val runner = newRunner()
+
+        runner.startScan("")
+
+        verify(channel).sendMessage(
+            argThat { contains("recovery_code_available") && contains("\"name\":\"google Pixel 7\"") },
+            any(),
+            any(),
+            any(),
+        )
     }
 
     // ---- Auto role election ----
