@@ -21,15 +21,15 @@
     android:layout_height="wrap_content"
     android:background="?attr/selectableItemBackground"
     tools:ignore="Overdraw"
-    android:paddingVertical="?attr/autocompleteListItemVerticalPadding"
     android:paddingStart="?attr/autocompleteListItemStartPadding"
-    android:paddingEnd="?attr/autocompleteListItemWithoutTrailIconEndPadding">
+    android:paddingEnd="?attr/autocompleteListItemEndPadding">
 
     <ImageView
         android:id="@+id/phraseOrUrlIndicator"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:importantForAccessibility="no"
+        android:paddingVertical="?attr/autocompleteListItemVerticalPadding"
         android:src="@drawable/ic_history_24"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -45,9 +45,21 @@
         android:includeFontPadding="false"
         android:maxLines="1"
         app:layout_constraintBottom_toBottomOf="@id/phraseOrUrlIndicator"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/deleteSuggestionButton"
         app:layout_constraintStart_toEndOf="@id/phraseOrUrlIndicator"
         app:layout_constraintTop_toTopOf="@id/phraseOrUrlIndicator"
         tools:text="phrase or URL suggestion" />
+
+    <ImageView
+        android:id="@+id/deleteSuggestionButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/selectable_item_rounded_corner_background"
+        android:contentDescription="@string/autocompleteRemoveItemRemove"
+        android:padding="@dimen/keyline_2"
+        android:src="@drawable/ic_close_circle_small_secondary_16"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

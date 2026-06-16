@@ -157,5 +157,12 @@
         "triggers": ["other"],
         "suffixes": ["form_factor"],
         "parameters": ["appVersion"]
+    },
+    "autocomplete_result_delete_button_clicked": {
+        "description": "User tapped the explicit X (clear) button on a history autocomplete suggestion to delete it.",
+        "owners": ["0nko"],
+        "triggers": ["other"],
+        "suffixes": [["form_factor"], ["first_daily_count", "form_factor"]],
+        "parameters": ["appVersion"]
     }
 }

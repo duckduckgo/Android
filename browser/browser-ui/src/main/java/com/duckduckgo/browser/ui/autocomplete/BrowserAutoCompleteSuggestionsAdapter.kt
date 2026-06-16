@@ -19,6 +19,7 @@ package com.duckduckgo.browser.ui.autocomplete
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.UiThread
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion
@@ -46,10 +47,11 @@ private val AutoCompleteSuggestion.isSearchItem: Boolean
 class BrowserAutoCompleteSuggestionsAdapter(
     private val immediateSearchClickListener: (AutoCompleteSuggestion) -> Unit,
     private val editableSearchClickListener: (AutoCompleteSuggestion) -> Unit,
-    private val autoCompleteLongPressClickListener: (AutoCompleteSuggestion) -> Unit,
+    private val autoCompleteDeleteClickListener: (AutoCompleteSuggestion) -> Unit,
     omnibarType: OmnibarType,
     private val hideEditQueryArrow: Boolean = false,
     private val hideSectionDividers: Boolean = false,
+    private var isDeleteButtonVisible: Boolean = true,
 ) : RecyclerView.Adapter<AutoCompleteViewHolder>() {
     private val viewHolderFactoryMap: Map<Int, SuggestionViewHolderFactory> =
         mapOf(
@@ -112,10 +114,19 @@ class BrowserAutoCompleteSuggestionsAdapter(
                         phrase,
                         immediateSearchClickListener,
                         editableSearchClickListener,
-                        autoCompleteLongPressClickListener,
+                        autoCompleteDeleteClickListener,
                     )
                 if (hideEditQueryArrow) {
                     holder.itemView.findViewById<View>(R.id.editQueryImage)?.visibility = View.GONE
+                }
+                val deleteButton = holder.itemView.findViewById<View>(R.id.deleteSuggestionButton)
+                deleteButton?.isVisible = isDeleteButtonVisible
+                if (deleteButton != null && !isDeleteButtonVisible) {
+                    // Kill switch off: restore the legacy long-press-to-delete on history rows.
+                    holder.itemView.setOnLongClickListener {
+                        autoCompleteDeleteClickListener(item.value)
+                        true
+                    }
                 }
             }
         }
@@ -126,6 +137,14 @@ class BrowserAutoCompleteSuggestionsAdapter(
             return 1 // Empty ViewHolder
         }
         return items.size
+    }
+
+    @UiThread
+    fun setDeleteButtonVisible(visible: Boolean) {
+        if (isDeleteButtonVisible != visible) {
+            isDeleteButtonVisible = visible
+            notifyDataSetChanged()
+        }
     }
 
     @UiThread
