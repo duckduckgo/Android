@@ -29,6 +29,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -50,6 +51,8 @@ import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
+import com.duckduckgo.common.ui.compose.appbars.DaxSearchTopAppBar
+import com.duckduckgo.common.ui.compose.appbars.DaxTopAppBar
 import com.duckduckgo.common.ui.compose.button.DaxIconButton
 import com.duckduckgo.common.ui.compose.cards.DaxCard
 import com.duckduckgo.common.ui.compose.cards.DaxSurface
@@ -93,8 +96,60 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
     class ButtonComponentViewHolder(parent: ViewGroup) :
         ComponentViewHolder(inflate(parent, R.layout.component_buttons))
 
-    class TopAppBarComponentViewHolder(parent: ViewGroup) :
-        ComponentViewHolder(inflate(parent, R.layout.component_top_app_bar))
+    class TopAppBarComponentViewHolder(
+        parent: ViewGroup,
+        private val isDarkTheme: Boolean,
+    ) : ComponentViewHolder(inflate(parent, R.layout.component_top_app_bar)) {
+        override fun bind(component: Component) {
+            view.setupThemedComposeView(id = R.id.composeDaxTopAppBar, isDarkTheme = isDarkTheme) {
+                val searchState = rememberTextFieldState()
+                var searchActive by remember { mutableStateOf(false) }
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    DaxSearchTopAppBar(
+                        title = "Search bar",
+                        navigationIcon = {
+                            Back { }
+                        },
+                        searchActive = searchActive,
+                        searchState = searchState,
+                        searchPlaceholder = "Search…",
+                        onSearchBack = { searchActive = false },
+                        actions = {
+                            DaxIconButton(
+                                onClick = { },
+                                iconPainter = painterResource(CommonR.drawable.ic_ai_chat_24_solid_color),
+                                contentDescription = "Duck.ai",
+                            )
+                            DaxIconButton(
+                                onClick = { searchActive = true },
+                                iconPainter = painterResource(CommonR.drawable.ic_find_search_24),
+                                contentDescription = "Search",
+                            )
+                        },
+                    )
+                    DaxTopAppBar(
+                        title = "Top bar",
+                        shadow = true,
+                        navigationIcon = {
+                            Close { }
+                        },
+                        actions = {
+                            DaxIconButton(
+                                onClick = { },
+                                iconPainter = painterResource(CommonR.drawable.ic_add_24),
+                                contentDescription = "Add",
+                            )
+                            DaxIconButton(
+                                onClick = { },
+                                iconPainter = painterResource(CommonR.drawable.ic_ai_chat_24_solid_color),
+                                contentDescription = "Duck.ai",
+                            )
+                        },
+                    )
+                }
+            }
+        }
+    }
 
     class SwitchComponentViewHolder(
         parent: ViewGroup,
@@ -770,7 +825,7 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
         ): ComponentViewHolder {
             return when (Component.values()[viewType]) {
                 Component.BUTTON -> ButtonComponentViewHolder(parent)
-                Component.TOP_APP_BAR -> TopAppBarComponentViewHolder(parent)
+                Component.TOP_APP_BAR -> TopAppBarComponentViewHolder(parent, isDarkTheme)
                 Component.SWITCH -> SwitchComponentViewHolder(parent, isDarkTheme)
                 Component.RADIO_BUTTON -> RadioButtonComponentViewHolder(parent, isDarkTheme)
                 Component.CHECKBOX -> CheckboxComponentViewHolder(parent, isDarkTheme)
