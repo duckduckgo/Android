@@ -35,7 +35,34 @@ class AiConfigChecker(private val repoRoot: File) {
         return checkClaudeMd() +
             checkDanglingReferences(modules) +
             checkSymlinkParity() +
-            checkSkillSymlinkParity()
+            checkSkillSymlinkParity() +
+            checkVolatileFacts()
+    }
+
+    /**
+     * AGENTS.md (the shared base config) intentionally states no tool version numbers — versions live
+     * in the build files and are pointed to, not restated, so they cannot go stale. Flag any known tool
+     * name immediately followed by a semver to keep that invariant from eroding. Scoped to AGENTS.md
+     * only: the rule files legitimately contain example versions (e.g. dependency-updates.mdc's library
+     * table), which must not be flagged.
+     */
+    private fun checkVolatileFacts(): List<Violation> {
+        val violations = mutableListOf<Violation>()
+        var inFence = false
+        agentsMd.readLines().forEachIndexed { index, line ->
+            if (line.trimStart().startsWith("```")) {
+                inFence = !inFence
+                return@forEachIndexed
+            }
+            if (inFence) return@forEachIndexed
+            VOLATILE_FACT_REGEX.findAll(line).forEach { m ->
+                violations += Violation(
+                    "Restated tool version in AGENTS.md: '${m.value.trim()}' — remove it and point to the source of truth (versions live in the build files)",
+                    "AGENTS.md:${index + 1}",
+                )
+            }
+        }
+        return violations
     }
 
     /**
@@ -253,6 +280,10 @@ class AiConfigChecker(private val repoRoot: File) {
     companion object {
         private val RULE_PATH_REGEX = Regex("`(\\.cursor/rules/[^`]+\\.mdc)`")
         private val INCLUDE_REGEX = Regex("(?:^|\\s)@([^\\s]+)")
+        // A known tool name immediately followed by a semver (x.y or x.y.z). Single integers
+        // (e.g. "JDK 21", "JVM target 17") are intentionally not matched.
+        private val VOLATILE_FACT_REGEX =
+            Regex("""(?i)\b(kotlin|gradle|ktlint|google java format|agp)\b\s*\(?\s*v?\d+\.\d+(?:\.\d+)?\)?""")
         private val MD_LINK_REGEX = Regex("\\[[^\\]]*]\\(([^)]+)\\)")
         private val INLINE_CODE_REGEX = Regex("`([^`]+)`")
         private val MODULE_REGEX = Regex("^:[a-z0-9]+(-[a-z0-9]+)*(:[a-z0-9]+(-[a-z0-9]+)*)*$")

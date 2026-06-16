@@ -2,3 +2,11 @@ self-hosted-runner:
     labels:
         # Stops incorrect warning of android-large-runner being used
         - android-large-runner
+
+paths:
+    # gh-aw agentic workflows compile to `*.lock.yml` (generated, "DO NOT EDIT").
+    # The shell they emit trips shellcheck style/info rules (SC2086, SC2129); we don't
+    # hand-edit generated files, so suppress shellcheck for them.
+    .github/workflows/*.lock.yml:
+        ignore:
+            - "shellcheck reported issue"
