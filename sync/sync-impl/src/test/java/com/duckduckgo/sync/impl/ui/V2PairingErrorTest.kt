@@ -30,26 +30,39 @@ import org.junit.Test
 class V2PairingErrorTest {
 
     @Test
-    fun whenCodeIsAKnownPairingAbortThenReturnsSyncWithAnotherDeviceError() {
-        listOf(
-            PAIRING_REJECTED,
-            PAIRING_UNAVAILABLE,
-            PAIRING_CANCELLED,
-            NEGOTIATION_ABORTED,
-            NO_RECOVERY_CODE,
-            PAIRING_FAILED,
-        ).forEach { code ->
+    fun whenCodeIsPairingRejectedThenCanceledFromOtherDeviceCopy() {
+        val content = PAIRING_REJECTED.code.toV2PairingError()
+        assertEquals(R.string.sync_dialog_error_title, content.title)
+        assertEquals(R.string.sync_v2_error_pairing_rejected, content.message)
+    }
+
+    @Test
+    fun whenCodeIsPairingCancelledThenCanceledCopy() {
+        val content = PAIRING_CANCELLED.code.toV2PairingError()
+        assertEquals(R.string.sync_dialog_error_title, content.title)
+        assertEquals(R.string.sync_v2_error_pairing_canceled, content.message)
+    }
+
+    @Test
+    fun whenCodeIsAnyOtherAbortThenSyncFailedCopy() {
+        listOf(PAIRING_UNAVAILABLE, NEGOTIATION_ABORTED, NO_RECOVERY_CODE, PAIRING_FAILED).forEach { code ->
             assertEquals(
-                "code $code should map to the pairing error string",
-                R.string.sync_connect_login_error,
-                code.code.toV2PairingErrorMessage(),
+                "code $code should map to Sync failed.",
+                R.string.sync_v2_error_pairing_failed,
+                code.code.toV2PairingError().message,
             )
         }
     }
 
     @Test
-    fun whenCodeIsUnknownThenReturnsGenericError() {
-        assertEquals(R.string.sync_connect_generic_error, GENERIC_ERROR.code.toV2PairingErrorMessage())
-        assertEquals(R.string.sync_connect_generic_error, 9999.toV2PairingErrorMessage())
+    fun whenCodeIsGenericOrUnknownThenSyncFailedCopy() {
+        assertEquals(R.string.sync_v2_error_pairing_failed, GENERIC_ERROR.code.toV2PairingError().message)
+        assertEquals(R.string.sync_v2_error_pairing_failed, 9999.toV2PairingError().message)
+    }
+
+    @Test
+    fun whenUpgradeRequiredThenUpdateBrowserCopy() {
+        assertEquals(R.string.sync_dialog_error_title, v2UpgradeRequiredError.title)
+        assertEquals(R.string.sync_v2_error_upgrade_required, v2UpgradeRequiredError.message)
     }
 }

@@ -162,9 +162,10 @@ class EnterCodeViewModel @Inject constructor(
                 ),
             )
             is DispatchOutcome.Failed -> {
-                // Always surface v2 failures via the helper; bypass the v1 catch-all (silent no-op) and AskToSwitchAccount.
+                // Always surface v2 failures via the mapper; bypass the v1 catch-all (silent no-op) and AskToSwitchAccount.
                 viewState.value = viewState.value.copy(authState = AuthState.Idle)
-                command.send(ShowError(message = outcome.code.toV2PairingErrorMessage(), reason = outcome.reason))
+                val content = outcome.code.toV2PairingError()
+                command.send(ShowError(message = content.message, title = content.title))
             }
             is DispatchOutcome.JoinerConfirmationRequested ->
                 command.send(Command.AskJoinerConfirmation(outcome.peerName))

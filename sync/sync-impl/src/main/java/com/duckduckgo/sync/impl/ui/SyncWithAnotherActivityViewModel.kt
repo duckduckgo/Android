@@ -303,8 +303,8 @@ class SyncWithAnotherActivityViewModel @Inject constructor(
             }
             is DispatchOutcome.Failed -> {
                 cancelTimeout()
-                // Always surface v2 failures via the helper; bypass the v1 catch-all (silent no-op) and AskToSwitchAccount.
-                command.send(ShowError(message = outcome.code.toV2PairingErrorMessage(), reason = outcome.reason))
+                val content = outcome.code.toV2PairingError()
+                command.send(ShowError(message = content.message, title = content.title))
             }
             is DispatchOutcome.JoinerConfirmationRequested ->
                 command.send(Command.AskJoinerConfirmation(outcome.peerName))

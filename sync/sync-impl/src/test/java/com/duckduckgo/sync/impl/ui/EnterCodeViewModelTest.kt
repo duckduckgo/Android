@@ -149,6 +149,7 @@ internal class EnterCodeViewModelTest {
         testee.commands().test {
             val command = awaitItem()
             assertTrue("expected ShowError, got $command", command is ShowError)
+            assertEquals(R.string.sync_v2_error_pairing_failed, (command as ShowError).message)
             cancelAndIgnoreRemainingEvents()
         }
     }

@@ -144,8 +144,9 @@ class SyncLoginViewModel @Inject constructor(
                 command.send(ShowError(message = R.string.sync_flows_disabled_new_version, reason = "Code requires protocol v${outcome.codeMajor}"))
             }
             is DispatchOutcome.Failed -> {
-                // Always surface v2 failures via the helper; bypass the v1 catch-all (silent no-op) and AskToSwitchAccount.
-                command.send(ShowError(message = outcome.code.toV2PairingErrorMessage(), reason = outcome.reason))
+                // Always surface v2 failures via the mapper; bypass the v1 catch-all (silent no-op) and AskToSwitchAccount.
+                val content = outcome.code.toV2PairingError()
+                command.send(ShowError(message = content.message, title = content.title))
             }
             is DispatchOutcome.JoinerConfirmationRequested ->
                 command.send(Command.AskJoinerConfirmation(outcome.peerName))

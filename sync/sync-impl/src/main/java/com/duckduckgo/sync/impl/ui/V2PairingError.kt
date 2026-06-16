@@ -17,29 +17,30 @@
 package com.duckduckgo.sync.impl.ui
 
 import androidx.annotation.StringRes
-import com.duckduckgo.sync.impl.AccountErrorCodes.NEGOTIATION_ABORTED
-import com.duckduckgo.sync.impl.AccountErrorCodes.NO_RECOVERY_CODE
 import com.duckduckgo.sync.impl.AccountErrorCodes.PAIRING_CANCELLED
-import com.duckduckgo.sync.impl.AccountErrorCodes.PAIRING_FAILED
 import com.duckduckgo.sync.impl.AccountErrorCodes.PAIRING_REJECTED
-import com.duckduckgo.sync.impl.AccountErrorCodes.PAIRING_UNAVAILABLE
 import com.duckduckgo.sync.impl.R
 
+/** Title + message for a v2 pairing dialog. */
+internal data class V2PairingErrorContent(
+    @StringRes val title: Int,
+    @StringRes val message: Int,
+)
+
 /**
- * Maps a v2 pairing [com.duckduckgo.sync.impl.DispatchOutcome.Failed] error code to a user-facing
- * message resource. Single source for the v2 connect-flow ViewModels so the mapping cannot diverge
- * again (divergence was the root of the silent-hang bug, 2026-06-11). NEVER returns null — every v2
- * failure surfaces a visible error. The specific `reason` string is shown as the detail line;
- * per-code copy is a follow-up.
+ * Maps a v2 pairing [com.duckduckgo.sync.impl.DispatchOutcome.Failed] error code to dialog copy.
+ * Single source for the v2 connect-flow ViewModels so the mapping cannot diverge again (divergence
+ * was the root of the silent-hang bug, 2026-06-11). NEVER returns null. The six distinct codes
+ * intentionally collapse to three messages here; the codes survive for logs/telemetry.
  */
-@StringRes
-internal fun Int.toV2PairingErrorMessage(): Int = when (this) {
-    PAIRING_REJECTED.code,
-    PAIRING_UNAVAILABLE.code,
-    PAIRING_CANCELLED.code,
-    NEGOTIATION_ABORTED.code,
-    NO_RECOVERY_CODE.code,
-    PAIRING_FAILED.code,
-    -> R.string.sync_connect_login_error
-    else -> R.string.sync_connect_generic_error
+internal fun Int.toV2PairingError(): V2PairingErrorContent = when (this) {
+    PAIRING_REJECTED.code -> V2PairingErrorContent(R.string.sync_dialog_error_title, R.string.sync_v2_error_pairing_rejected)
+    PAIRING_CANCELLED.code -> V2PairingErrorContent(R.string.sync_dialog_error_title, R.string.sync_v2_error_pairing_canceled)
+    else -> V2PairingErrorContent(R.string.sync_dialog_error_title, R.string.sync_v2_error_pairing_failed)
 }
+
+/** Fixed copy for the non-Failed [com.duckduckgo.sync.impl.DispatchOutcome.UpgradeRequired] outcome. */
+internal val v2UpgradeRequiredError = V2PairingErrorContent(
+    title = R.string.sync_dialog_error_title,
+    message = R.string.sync_v2_error_upgrade_required,
+)
