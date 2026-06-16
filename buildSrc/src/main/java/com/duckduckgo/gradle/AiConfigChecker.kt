@@ -27,16 +27,15 @@ class AiConfigChecker(private val repoRoot: File) {
 
     private val agentsMd = File(repoRoot, "AGENTS.md")
     private val rulesDir = File(repoRoot, ".cursor/rules")
-    private val skillsDir = File(repoRoot, ".claude/skills")
 
     fun check(): List<Violation> {
         if (!agentsMd.exists()) return listOf(Violation("AGENTS.md not found at repo root"))
         val agentsText = agentsMd.readText()
         val modules = discoverModules()
         return checkRulesIndex(agentsText) +
-            checkSkillsIndex(agentsText) +
             checkDanglingReferences(modules) +
-            checkSymlinkParity()
+            checkSymlinkParity() +
+            checkSkillSymlinkParity()
     }
 
     private fun checkRulesIndex(agentsText: String): List<Violation> {
@@ -53,29 +52,6 @@ class AiConfigChecker(private val repoRoot: File) {
         for (path in indexed.sorted()) {
             if (!File(repoRoot, path).exists()) {
                 violations += Violation("Indexed rule missing: $path is listed in AGENTS.md but does not exist")
-            }
-        }
-        return violations
-    }
-
-    private fun checkSkillsIndex(agentsText: String): List<Violation> {
-        val violations = mutableListOf<Violation>()
-        val indexed = SKILL_PATH_REGEX.findAll(agentsText).map { it.groupValues[1] }.toSet()
-
-        val skillDirs = skillsDir.listFiles { f -> f.isDirectory }?.sortedBy { it.name } ?: emptyList()
-        for (dir in skillDirs) {
-            val rel = ".claude/skills/${dir.name}"
-            if (!File(dir, "SKILL.md").exists()) {
-                violations += Violation("Skill missing SKILL.md: $rel/")
-            }
-            if (rel !in indexed) {
-                violations += Violation("Skill not indexed: $rel/ has no row in the AGENTS.md \"Skills\" table")
-            }
-        }
-        for (path in indexed.sorted()) {
-            val dir = File(repoRoot, path)
-            if (!dir.isDirectory || !File(dir, "SKILL.md").exists()) {
-                violations += Violation("Indexed skill missing: $path is listed in AGENTS.md but has no directory containing SKILL.md")
             }
         }
         return violations
@@ -130,6 +106,42 @@ class AiConfigChecker(private val repoRoot: File) {
         for (entry in claudeEntries) {
             if (!Files.isSymbolicLink(entry.toPath())) {
                 violations += Violation("Not a symlink: .claude/rules/${entry.name} must be a symlink into .cursor/rules/")
+            }
+        }
+        return violations
+    }
+
+    private fun checkSkillSymlinkParity(): List<Violation> {
+        val violations = mutableListOf<Violation>()
+        val claudeSkillsDir = File(repoRoot, ".claude/skills")
+        val cursorSkillsDir = File(repoRoot, ".cursor/skills")
+
+        // 1. Every source skill (.claude/skills/<name>/SKILL.md) must have a valid Cursor mirror symlink.
+        val skillDirs = claudeSkillsDir.listFiles { f -> f.isDirectory && File(f, "SKILL.md").exists() }?.sortedBy { it.name } ?: emptyList()
+        for (dir in skillDirs) {
+            val name = dir.name
+            val expected = "../../../.claude/skills/$name/SKILL.md"
+            val link = File(cursorSkillsDir, "$name/SKILL.md")
+            if (!Files.isSymbolicLink(link.toPath())) {
+                violations += Violation("Missing skill symlink: .cursor/skills/$name/SKILL.md should be a symlink to $expected")
+                continue
+            }
+            val target = Files.readSymbolicLink(link.toPath()).toString()
+            if (target != expected) {
+                violations += Violation("Wrong skill symlink target: .cursor/skills/$name/SKILL.md -> $target (expected $expected)")
+            }
+        }
+
+        // 2. Every .cursor/skills/<name> must mirror a real source skill via a symlinked SKILL.md (no regular files, no orphans).
+        val cursorSkillDirs = cursorSkillsDir.listFiles { f -> f.isDirectory }?.sortedBy { it.name } ?: emptyList()
+        for (dir in cursorSkillDirs) {
+            val name = dir.name
+            if (!File(claudeSkillsDir, "$name/SKILL.md").exists()) {
+                violations += Violation("Orphaned skill mirror: .cursor/skills/$name has no matching source at .claude/skills/$name/SKILL.md")
+            }
+            val link = File(dir, "SKILL.md")
+            if (link.exists() && !Files.isSymbolicLink(link.toPath())) {
+                violations += Violation("Not a symlink: .cursor/skills/$name/SKILL.md must be a symlink into .claude/skills/")
             }
         }
         return violations
@@ -192,7 +204,7 @@ class AiConfigChecker(private val repoRoot: File) {
         return repoRoot.walkTopDown()
             .maxDepth(2)
             .onEnter { it.name != "build" && it.name != ".git" && it.name != "node_modules" }
-            .filter { it.isDirectory && File(it, "build.gradle").exists() }
+            .filter { it.isDirectory && (File(it, "build.gradle").exists() || File(it, "build.gradle.kts").exists()) }
             .map { it.name }
             .toSet()
     }
@@ -205,7 +217,6 @@ class AiConfigChecker(private val repoRoot: File) {
 
     companion object {
         private val RULE_PATH_REGEX = Regex("`(\\.cursor/rules/[^`]+\\.mdc)`")
-        private val SKILL_PATH_REGEX = Regex("`(\\.claude/skills/[^`/]+)/?`")
         private val MD_LINK_REGEX = Regex("\\[[^\\]]*]\\(([^)]+)\\)")
         private val INLINE_CODE_REGEX = Regex("`([^`]+)`")
         private val MODULE_REGEX = Regex("^:[a-z0-9]+(-[a-z0-9]+)*(:[a-z0-9]+(-[a-z0-9]+)*)*$")

@@ -33,9 +33,9 @@ It is required by the refreshVersions plugin at build time. If missing, the buil
 
 This is the most important rule when evaluating a library update.
 
-**The project currently uses Kotlin 2.2.21** (`version.kotlin` in `versions.properties`;
-`languageVersion` is pinned to `KOTLIN_2_2` in the root `build.gradle`). Some libraries have
-started publishing releases compiled with a newer Kotlin (2.3.x). These cause a build failure
+**The project's Kotlin version** is declared by `version.kotlin` in `versions.properties`, with
+`languageVersion` pinned in the root `build.gradle`. Some libraries have started publishing
+releases compiled with a newer Kotlin than the project targets. These cause a build failure
 at KSP time:
 
 ```
@@ -47,7 +47,7 @@ The binary version of its metadata is 2.3.0, expected version is 2.2.0.
 
 **Do not auto-revert.** Instead, **ask the engineer**:
 
-> "Library X update from A → B requires Kotlin 2.3.x (currently on 2.2.21).
+> "Library X update from A → B requires a newer Kotlin than the project currently targets.
 > Do you want to:
 > 1. Skip this update for now
 > 2. Include it as a separate task to upgrade Kotlin first"

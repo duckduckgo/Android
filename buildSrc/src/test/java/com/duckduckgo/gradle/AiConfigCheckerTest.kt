@@ -41,15 +41,16 @@ class AiConfigCheckerTest {
         Files.createSymbolicLink(link.toPath(), Paths.get(target))
     }
 
-    /** A fully consistent repo: every rule/skill indexed, every reference resolves, symlinks valid. */
+    /** A fully consistent repo: every rule indexed, every reference resolves, symlinks valid. */
     private fun validRepo() {
         write(".cursor/rules/architecture.mdc", "---\nalwaysApply: true\n---\n# Arch\nSee `app/build.gradle` and module `:di`.\n")
         write(".cursor/rules/pixels.mdc", "# Pixels\n")
         symlink(".claude/rules/architecture.md", "../../.cursor/rules/architecture.mdc")
         symlink(".claude/rules/pixels.md", "../../.cursor/rules/pixels.mdc")
+        write(".claude/skills/my-skill/SKILL.md", "---\nname: my-skill\ndescription: example skill\n---\nbody\n")
+        symlink(".cursor/skills/my-skill/SKILL.md", "../../../.claude/skills/my-skill/SKILL.md")
         write("app/build.gradle", "// app\n")
         write("di/build.gradle", "// di module\n")
-        write(".claude/skills/my-skill/SKILL.md", "---\nname: my-skill\ndescription: x\n---\n")
         write(
             "AGENTS.md",
             """
@@ -59,12 +60,6 @@ class AiConfigCheckerTest {
             ||---|---|
             || `.cursor/rules/architecture.mdc` | arch |
             || `.cursor/rules/pixels.mdc` | pixels |
-            |
-            |## Skills
-            |
-            || Skill | Purpose |
-            ||---|---|
-            || `.claude/skills/my-skill/` | does things |
             """.trimMargin(),
         )
     }
@@ -100,38 +95,6 @@ class AiConfigCheckerTest {
         agents.writeText(agents.readText() + "\n| `.cursor/rules/ghost.mdc` | ghost |\n")
         val violations = AiConfigChecker(repo).check()
         assertTrue(violations.any { it.message.contains("Indexed rule missing") && it.message.contains("ghost.mdc") }, "got: $violations")
-    }
-
-    @Test
-    fun whenAllSkillsIndexedAndHaveSkillMdThenNoSkillViolations() {
-        validRepo()
-        val violations = AiConfigChecker(repo).check()
-        assertTrue(violations.none { it.message.contains("Skill") }, "unexpected: $violations")
-    }
-
-    @Test
-    fun whenSkillMissingSkillMdThenViolation() {
-        validRepo()
-        File(repo, ".claude/skills/broken").mkdirs() // dir but no SKILL.md
-        val violations = AiConfigChecker(repo).check()
-        assertTrue(violations.any { it.message.contains("Skill missing SKILL.md") && it.message.contains("broken") }, "got: $violations")
-    }
-
-    @Test
-    fun whenSkillNotIndexedThenViolation() {
-        validRepo()
-        write(".claude/skills/unlisted/SKILL.md", "---\nname: unlisted\n---\n") // valid skill, absent from table
-        val violations = AiConfigChecker(repo).check()
-        assertTrue(violations.any { it.message.contains("Skill not indexed") && it.message.contains("unlisted") }, "got: $violations")
-    }
-
-    @Test
-    fun whenTableListsMissingSkillThenViolation() {
-        validRepo()
-        val agents = File(repo, "AGENTS.md")
-        agents.writeText(agents.readText() + "\n| `.claude/skills/ghost-skill/` | ghost |\n")
-        val violations = AiConfigChecker(repo).check()
-        assertTrue(violations.any { it.message.contains("Indexed skill missing") && it.message.contains("ghost-skill") }, "got: $violations")
     }
 
     @Test
@@ -202,6 +165,15 @@ class AiConfigCheckerTest {
     }
 
     @Test
+    fun whenModuleDefinedWithKotlinBuildScriptThenResolves() {
+        validRepo()
+        write("kts-feature/build.gradle.kts", "// kts module\n")
+        write(".cursor/rules/architecture.mdc", "# Arch\nDepends on `:kts-feature`.\n")
+        val violations = AiConfigChecker(repo).check()
+        assertTrue(violations.none { it.message.contains("Dangling reference") }, "unexpected: $violations")
+    }
+
+    @Test
     fun whenXmlNamespaceAttributeThenNotTreatedAsModule() {
         validRepo()
         write(".cursor/rules/architecture.mdc", "# Arch\nUse `app:buttonSize` and `android:text` attributes.\n")
@@ -249,5 +221,46 @@ class AiConfigCheckerTest {
         write(".claude/rules/notes.md", "regular file\n")
         val violations = AiConfigChecker(repo).check()
         assertTrue(violations.any { it.message.contains("Not a symlink") && it.message.contains("notes.md") }, "got: $violations")
+    }
+
+    @Test
+    fun whenSkillSymlinkMissingThenViolation() {
+        validRepo()
+        File(repo, ".cursor/skills/my-skill/SKILL.md").delete()
+        val violations = AiConfigChecker(repo).check()
+        assertTrue(violations.any { it.message.contains("Missing skill symlink") && it.message.contains("my-skill") }, "got: $violations")
+    }
+
+    @Test
+    fun whenSkillSymlinkTargetWrongThenViolation() {
+        validRepo()
+        File(repo, ".cursor/skills/my-skill/SKILL.md").delete()
+        symlink(".cursor/skills/my-skill/SKILL.md", "../../../.claude/skills/wrong/SKILL.md")
+        val violations = AiConfigChecker(repo).check()
+        assertTrue(violations.any { it.message.contains("Wrong skill symlink target") && it.message.contains("my-skill") }, "got: $violations")
+    }
+
+    @Test
+    fun whenCursorSkillEntryIsRegularFileThenViolation() {
+        validRepo()
+        write(".claude/skills/regular-skill/SKILL.md", "---\nname: regular-skill\ndescription: x\n---\n")
+        write(".cursor/skills/regular-skill/SKILL.md", "regular file, not a symlink\n")
+        val violations = AiConfigChecker(repo).check()
+        assertTrue(violations.any { it.message.contains("Not a symlink") && it.message.contains("regular-skill") }, "got: $violations")
+    }
+
+    @Test
+    fun whenCursorSkillHasNoSourceThenOrphanViolation() {
+        validRepo()
+        symlink(".cursor/skills/ghost/SKILL.md", "../../../.claude/skills/ghost/SKILL.md")
+        val violations = AiConfigChecker(repo).check()
+        assertTrue(violations.any { it.message.contains("Orphaned skill mirror") && it.message.contains("ghost") }, "got: $violations")
+    }
+
+    @Test
+    fun whenSkillSymlinksValidThenNoSkillViolations() {
+        validRepo()
+        val violations = AiConfigChecker(repo).check()
+        assertTrue(violations.none { it.message.contains("skill") }, "unexpected: $violations")
     }
 }
