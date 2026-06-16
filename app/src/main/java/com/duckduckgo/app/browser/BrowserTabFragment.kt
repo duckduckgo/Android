@@ -306,6 +306,9 @@ import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.common.utils.KeyboardVisibilityUtil
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.common.utils.extensions.hideKeyboard
 import com.duckduckgo.common.utils.extensions.html
 import com.duckduckgo.common.utils.extensions.showKeyboard
@@ -682,6 +685,12 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var clipboardInteractor: ClipboardInteractor
+
+    @Inject
+    lateinit var edgeToEdgeProvider: EdgeToEdgeProvider
+
+    @Inject
+    lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
 
     /**
      * We use this to monitor whether the user was seeing the in-context Email Protection signup prompt
@@ -1215,6 +1224,10 @@ class BrowserTabFragment :
         configureBrowserTabKeyboardListener()
 
         disableViewStateSaving()
+
+        if (edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.BROWSER)) {
+            edgeToEdgeHandler.applyNavigationBarInsetsAsMargin(binding.rootView)
+        }
 
         if (savedInstanceState == null) {
             viewModel.setIsCustomTab(tabDisplayedInCustomTabScreen)

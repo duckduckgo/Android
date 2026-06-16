@@ -33,8 +33,11 @@ import android.view.KeyEvent
 import android.view.MotionEvent
 import android.view.View
 import android.view.View.IMPORTANT_FOR_AUTOFILL_YES
+import android.view.WindowManager
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
+import androidx.activity.SystemBarStyle
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
@@ -108,12 +111,16 @@ import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.tabs.SwipingTabsFeatureProvider
 import com.duckduckgo.common.ui.view.addBottomShadow
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
+import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.isFullScreen
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.common.utils.extensions.hideKeyboard
 import com.duckduckgo.common.utils.playstore.PlayStoreUtils
 import com.duckduckgo.dataclearing.api.fire.FireDialog
@@ -229,6 +236,12 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var currentBrowserMode: BrowserMode
+
+    @Inject
+    lateinit var edgeToEdgeProvider: EdgeToEdgeProvider
+
+    @Inject
+    lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
 
     override val applyFireTheme: Boolean
         get() = currentBrowserMode == BrowserMode.FIRE
@@ -395,6 +408,18 @@ open class BrowserActivity : DuckDuckGoActivity() {
         }
 
         bindMockupToolbars()
+
+        if (edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.BROWSER)) {
+            val toolbarColor = getColorFromAttr(com.duckduckgo.mobile.android.R.attr.daxColorToolbar)
+            val barStyle = if (isDarkThemeEnabled()) {
+                SystemBarStyle.dark(toolbarColor)
+            } else {
+                SystemBarStyle.light(toolbarColor, toolbarColor)
+            }
+            enableEdgeToEdge(statusBarStyle = barStyle, navigationBarStyle = barStyle)
+            edgeToEdgeHandler.applyStatusBarAndHorizontalInsets(binding.root)
+            updateLayoutForDisplayCutout(resources.configuration.orientation)
+        }
 
         setContentView(binding.root)
 
@@ -1313,6 +1338,21 @@ open class BrowserActivity : DuckDuckGoActivity() {
         super.onConfigurationChanged(newConfig)
         if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
             viewModel.sendPixelEventForLandscapeOrientation()
+        }
+        if (edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.BROWSER)) {
+            updateLayoutForDisplayCutout(newConfig.orientation)
+        }
+    }
+
+    private fun updateLayoutForDisplayCutout(orientation: Int) {
+        if (Build.VERSION.SDK_INT >= 28) {
+            window.attributes = window.attributes.apply {
+                layoutInDisplayCutoutMode = if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                    WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_NEVER
+                } else {
+                    WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_DEFAULT
+                }
+            }
         }
     }
 
