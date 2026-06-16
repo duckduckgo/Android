@@ -26,35 +26,70 @@ data class Violation(val message: String, val location: String? = null) {
 class AiConfigChecker(private val repoRoot: File) {
 
     private val agentsMd = File(repoRoot, "AGENTS.md")
+    private val claudeMd = File(repoRoot, "CLAUDE.md")
     private val rulesDir = File(repoRoot, ".cursor/rules")
 
     fun check(): List<Violation> {
         if (!agentsMd.exists()) return listOf(Violation("AGENTS.md not found at repo root"))
-        val agentsText = agentsMd.readText()
         val modules = discoverModules()
-        return checkRulesIndex(agentsText) +
+        return checkClaudeMd() +
             checkDanglingReferences(modules) +
             checkSymlinkParity() +
             checkSkillSymlinkParity()
     }
 
-    private fun checkRulesIndex(agentsText: String): List<Violation> {
-        val violations = mutableListOf<Violation>()
-        val indexed = RULE_PATH_REGEX.findAll(agentsText).map { it.groupValues[1] }.toSet()
+    /**
+     * Cursor auto-loads `.cursor/rules/<name>.mdc` natively, but Claude does not (it cannot read the `.mdc`
+     * extension), so the rules only reach Claude through what CLAUDE.md exposes. CLAUDE.md must therefore
+     * (a) import AGENTS.md via `@AGENTS.md` so it inherits the shared base config, and (b) index every rule
+     * file. `@file` includes are resolved first, so the index rows may live in an imported file.
+     */
+    private fun checkClaudeMd(): List<Violation> {
+        if (!claudeMd.exists()) return listOf(Violation("CLAUDE.md not found at repo root"))
 
+        val violations = mutableListOf<Violation>()
+        if (!importsAgentsMd(claudeMd)) {
+            violations += Violation("CLAUDE.md must import AGENTS.md via `@AGENTS.md` so Claude inherits the shared base config")
+        }
+
+        val indexed = RULE_PATH_REGEX.findAll(resolveIncludes(claudeMd, mutableSetOf())).map { it.groupValues[1] }.toSet()
         val mdcFiles = rulesDir.listFiles { f -> f.isFile && f.extension == "mdc" }?.sortedBy { it.name } ?: emptyList()
         for (file in mdcFiles) {
             val rel = ".cursor/rules/${file.name}"
             if (rel !in indexed) {
-                violations += Violation("Rule file not indexed: $rel has no row in the AGENTS.md \"Detailed Rules\" table")
+                violations += Violation("Rule file not indexed: $rel has no row in the CLAUDE.md \"Detailed Rules\" table")
             }
         }
         for (path in indexed.sorted()) {
             if (!File(repoRoot, path).exists()) {
-                violations += Violation("Indexed rule missing: $path is listed in AGENTS.md but does not exist")
+                violations += Violation("Indexed rule missing: $path is listed in CLAUDE.md but does not exist")
             }
         }
         return violations
+    }
+
+    /** True if [file] imports AGENTS.md via an `@AGENTS.md` reference (Claude Code's import syntax). */
+    private fun importsAgentsMd(file: File): Boolean {
+        return file.readLines().any { line ->
+            INCLUDE_REGEX.findAll(line).any { m -> File(file.parentFile, m.groupValues[1]).canonicalPath == agentsMd.canonicalPath }
+        }
+    }
+
+    /**
+     * Returns [file]'s text with `@path` includes (Claude Code's import syntax, e.g. `@AGENTS.md`) inlined.
+     * Only includes that resolve to an existing file are expanded; [seen] guards against include cycles.
+     */
+    private fun resolveIncludes(file: File, seen: MutableSet<String>): String {
+        if (!file.exists() || !seen.add(file.canonicalPath)) return ""
+        val sb = StringBuilder()
+        for (line in file.readLines()) {
+            sb.appendLine(line)
+            INCLUDE_REGEX.findAll(line).forEach { m ->
+                val included = File(file.parentFile, m.groupValues[1])
+                if (included.isFile) sb.appendLine(resolveIncludes(included, seen))
+            }
+        }
+        return sb.toString()
     }
 
     private enum class RefKind { MODULE, PATH }
@@ -217,6 +252,7 @@ class AiConfigChecker(private val repoRoot: File) {
 
     companion object {
         private val RULE_PATH_REGEX = Regex("`(\\.cursor/rules/[^`]+\\.mdc)`")
+        private val INCLUDE_REGEX = Regex("(?:^|\\s)@([^\\s]+)")
         private val MD_LINK_REGEX = Regex("\\[[^\\]]*]\\(([^)]+)\\)")
         private val INLINE_CODE_REGEX = Regex("`([^`]+)`")
         private val MODULE_REGEX = Regex("^:[a-z0-9]+(-[a-z0-9]+)*(:[a-z0-9]+(-[a-z0-9]+)*)*$")

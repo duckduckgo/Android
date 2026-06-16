@@ -41,7 +41,7 @@ class AiConfigCheckerTest {
         Files.createSymbolicLink(link.toPath(), Paths.get(target))
     }
 
-    /** A fully consistent repo: every rule indexed, every reference resolves, symlinks valid. */
+    /** A fully consistent repo: CLAUDE.md imports AGENTS.md and indexes every rule, refs resolve, symlinks valid. */
     private fun validRepo() {
         write(".cursor/rules/architecture.mdc", "---\nalwaysApply: true\n---\n# Arch\nSee `app/build.gradle` and module `:di`.\n")
         write(".cursor/rules/pixels.mdc", "# Pixels\n")
@@ -51,11 +51,15 @@ class AiConfigCheckerTest {
         symlink(".cursor/skills/my-skill/SKILL.md", "../../../.claude/skills/my-skill/SKILL.md")
         write("app/build.gradle", "// app\n")
         write("di/build.gradle", "// di module\n")
+        // AGENTS.md carries no rules table: Cursor auto-loads .cursor/rules/*.mdc natively.
+        write("AGENTS.md", "# AGENTS\n\nProject overview, build commands, architecture.\n")
+        // CLAUDE.md imports AGENTS.md and indexes every rule, since Claude cannot auto-load the .mdc files.
         write(
-            "AGENTS.md",
+            "CLAUDE.md",
             """
-            |# AGENTS
+            |@AGENTS.md
             |
+            |## Detailed Rules
             || File | Covers |
             ||---|---|
             || `.cursor/rules/architecture.mdc` | arch |
@@ -91,10 +95,94 @@ class AiConfigCheckerTest {
     fun whenTableListsMissingRuleThenViolation() {
         validRepo()
         // add a table row pointing at a rule file that does not exist
-        val agents = File(repo, "AGENTS.md")
-        agents.writeText(agents.readText() + "\n| `.cursor/rules/ghost.mdc` | ghost |\n")
+        val claude = File(repo, "CLAUDE.md")
+        claude.writeText(claude.readText() + "\n| `.cursor/rules/ghost.mdc` | ghost |\n")
         val violations = AiConfigChecker(repo).check()
         assertTrue(violations.any { it.message.contains("Indexed rule missing") && it.message.contains("ghost.mdc") }, "got: $violations")
+    }
+
+    @Test
+    fun whenClaudeMdIndexesAllRulesThenNoViolation() {
+        validRepo() // CLAUDE.md imports AGENTS.md and indexes every rule
+        val violations = AiConfigChecker(repo).check()
+        assertTrue(violations.none { it.message.contains("Rule file not indexed") }, "unexpected: $violations")
+        assertTrue(violations.none { it.message.contains("Indexed rule missing") }, "unexpected: $violations")
+    }
+
+    @Test
+    fun whenClaudeMdMissingRuleThenViolationNamesClaudeMd() {
+        validRepo()
+        write(
+            "CLAUDE.md",
+            """
+            |@AGENTS.md
+            |
+            || File | Covers |
+            ||---|---|
+            || `.cursor/rules/architecture.mdc` | arch |
+            """.trimMargin(), // omits pixels.mdc
+        )
+        val violations = AiConfigChecker(repo).check()
+        assertTrue(
+            violations.any {
+                it.message.contains("Rule file not indexed") && it.message.contains("pixels.mdc") && it.message.contains("CLAUDE.md")
+            },
+            "got: $violations",
+        )
+    }
+
+    @Test
+    fun whenClaudeMdMissingThenViolation() {
+        validRepo()
+        File(repo, "CLAUDE.md").delete()
+        val violations = AiConfigChecker(repo).check()
+        assertTrue(violations.any { it.message.contains("CLAUDE.md not found") }, "got: $violations")
+    }
+
+    @Test
+    fun whenClaudeMdDoesNotImportAgentsThenViolation() {
+        validRepo()
+        // Full rules table, but no `@AGENTS.md` import.
+        write(
+            "CLAUDE.md",
+            """
+            |# Claude
+            |
+            || File | Covers |
+            ||---|---|
+            || `.cursor/rules/architecture.mdc` | arch |
+            || `.cursor/rules/pixels.mdc` | pixels |
+            """.trimMargin(),
+        )
+        val violations = AiConfigChecker(repo).check()
+        assertTrue(violations.any { it.message.contains("CLAUDE.md must import AGENTS.md") }, "got: $violations")
+    }
+
+    @Test
+    fun whenClaudeMdImportsAgentsThenNoImportViolation() {
+        validRepo() // CLAUDE.md starts with `@AGENTS.md`
+        val violations = AiConfigChecker(repo).check()
+        assertTrue(violations.none { it.message.contains("must import AGENTS.md") }, "unexpected: $violations")
+    }
+
+    @Test
+    fun whenRulesTableLivesInImportedAgentsMdThenNoViolation() {
+        validRepo()
+        // The index rows may live in AGENTS.md (a .md file Claude reads via the import) instead of CLAUDE.md.
+        write(
+            "AGENTS.md",
+            """
+            |# AGENTS
+            |
+            || File | Covers |
+            ||---|---|
+            || `.cursor/rules/architecture.mdc` | arch |
+            || `.cursor/rules/pixels.mdc` | pixels |
+            """.trimMargin(),
+        )
+        write("CLAUDE.md", "@AGENTS.md\n\n# Claude extras\n")
+        val violations = AiConfigChecker(repo).check()
+        assertTrue(violations.none { it.message.contains("Rule file not indexed") }, "unexpected: $violations")
     }
 
     @Test
