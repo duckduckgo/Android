@@ -1033,4 +1033,7 @@
 
     <string name="input_screen_user_pref_without_ai_updated">Solo buscar</string>
     <string name="input_screen_user_pref_with_ai_updated">Alterna entre la búsqueda y Duck.ai</string>
+
+    <!-- New Address Bar Picker -->
+    <string name="newAddressBarPickerDuckDuckGo" translatable="false">DuckDuckGo</string>
 </resources>
