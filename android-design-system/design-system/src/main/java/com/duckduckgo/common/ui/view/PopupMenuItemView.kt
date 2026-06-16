@@ -20,6 +20,7 @@ import android.content.Context
 import android.content.res.ColorStateList
 import android.graphics.drawable.Drawable
 import android.text.SpannableString
+import android.text.TextUtils.TruncateAt
 import android.text.style.ForegroundColorSpan
 import android.util.AttributeSet
 import android.widget.LinearLayout
@@ -76,6 +77,22 @@ constructor(
                 setTrailingIconVisibility(false)
             }
 
+            if (hasValue(R.styleable.PopupMenuItemView_primaryTextMaxLines)) {
+                setPrimaryTextMaxLines(getInt(R.styleable.PopupMenuItemView_primaryTextMaxLines, 1))
+            }
+
+            if (hasValue(R.styleable.PopupMenuItemView_primaryTextEllipsize)) {
+                setPrimaryTextEllipsize(
+                    when (getInt(R.styleable.PopupMenuItemView_primaryTextEllipsize, 0)) {
+                        1 -> TruncateAt.START
+                        2 -> TruncateAt.MIDDLE
+                        3 -> TruncateAt.END
+                        4 -> TruncateAt.MARQUEE
+                        else -> null
+                    },
+                )
+            }
+
             binding.label.text = getString(R.styleable.PopupMenuItemView_primaryText) ?: ""
             updateContentDescription()
             recycle()
@@ -94,6 +111,14 @@ constructor(
     fun setPrimaryText(label: () -> String) {
         binding.label.text = label()
         updateContentDescription()
+    }
+
+    fun setPrimaryTextMaxLines(maxLines: Int) {
+        binding.label.maxLines = maxLines
+    }
+
+    fun setPrimaryTextEllipsize(ellipsize: TruncateAt?) {
+        binding.label.ellipsize = ellipsize
     }
 
     fun setPrimaryTextType(type: PopupMenuItemType) {
