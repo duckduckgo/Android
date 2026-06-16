@@ -17,10 +17,10 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
-    <string name="ad_blocking_settings_title">YouTube-advertentieblokkering</string>
-    <string name="ad_blocking_settings_toggle_title">Advertenties op YouTube blokkeren</string>
-    <string name="ad_blocking_settings_description_with_consent">DuckDuckGo blokkeert videoadvertenties op YouTube, zodat je video\'s zonder onderbreking kunt bekijken.\n\nAls deze optie is ingeschakeld, detecteert DuckDuckGo anoniem verstoring van advertentieblokkeringen of YouTube-fouten, om de ervaring voor iedereen te verbeteren. DuckDuckGo ziet niet welke video\'s je bekijkt en heeft geen toegang tot je persoonlijk identificeerbare informatie. <annotation type="learn_more_link">Meer informatie</annotation></string>
-    <string name="ad_blocking_settings_description">DuckDuckGo blokkeert videoadvertenties op YouTube, zodat je video\'s zonder onderbreking kunt bekijken. <annotation type="learn_more_link">Meer informatie</annotation></string>
+    <string name="ad_blocking_settings_title">Blokkering van YouTube-advertenties</string>
+    <string name="ad_blocking_settings_toggle_title">Blokkeer advertenties op YouTube</string>
+    <string name="ad_blocking_settings_description_with_consent">DuckDuckGo verwijdert videoadvertenties op YouTube, zodat je ongestoord video\'s kunt bekijken.\n\nAls deze optie is ingeschakeld, detecteert DuckDuckGo anoniem verstoring van advertentieblokkeringen of YouTube-fouten, om de ervaring voor iedereen te verbeteren. DuckDuckGo ziet niet welke video\'s je bekijkt of en heeft geen toegang tot je persoonlijk identificeerbare informatie. <annotation type="learn_more_link">Meer informatie</annotation></string>
+    <string name="ad_blocking_settings_description">DuckDuckGo verwijdert videoadvertenties op YouTube, zodat je ongestoord video\'s kunt bekijken. <annotation type="learn_more_link">Meer informatie</annotation></string>
     <string name="ad_blocking_settings_duck_player_header">Duck Player</string>
-    <string name="ad_blocking_settings_duck_player_description">Opent video\'s in een bioscoopmodus die voorkomt dat wat je bekijkt je YouTube-feed beïnvloedt.</string>
+    <string name="ad_blocking_settings_duck_player_description">Opent video\'s in een afleidingsvrije theatermodus die voorkomt dat wat je bekijkt je YouTube-feed beïnvloedt.</string>
 </resources>
