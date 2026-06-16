@@ -18,7 +18,6 @@ package com.duckduckgo.app.onboarding.ui
 
 import android.annotation.SuppressLint
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import com.duckduckgo.app.browser.newaddressbaroption.RealNewAddressBarOptionManager
 import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.cta.model.DismissedCta
@@ -63,8 +62,6 @@ class OnboardingViewModelTest {
 
     private val appBuildConfig: AppBuildConfig = mock()
 
-    private val newAddressBarOptionManager: RealNewAddressBarOptionManager = mock()
-
     private val dismissedCtaDao: DismissedCtaDao = mock()
 
     private val onboardingStore: OnboardingStore = mock()
@@ -80,7 +77,6 @@ class OnboardingViewModelTest {
             dispatchers = coroutineRule.testDispatcherProvider,
             onboardingSkipper = onboardingSkipper,
             appBuildConfig = appBuildConfig,
-            newAddressBarOptionManager = newAddressBarOptionManager,
             dismissedCtaDao = dismissedCtaDao,
             onboardingStore = onboardingStore,
             onboardingBrandDesignUpdateToggles = onboardingBrandDesignUpdateToggles,
@@ -150,11 +146,10 @@ class OnboardingViewModelTest {
     }
 
     @Test
-    fun whenDevOnlyFullyCompleteAllOnboardingCalledThenMarkOnboardingAsCompletedAndSetAsShown() = runTest {
+    fun whenDevOnlyFullyCompleteAllOnboardingCalledThenMarkOnboardingAsCompleted() = runTest {
         testee.devOnlyFullyCompleteAllOnboarding()
 
         verify(onboardingSkipper).markOnboardingAsCompleted()
-        verify(newAddressBarOptionManager).setAsShown()
     }
 
     @Test
