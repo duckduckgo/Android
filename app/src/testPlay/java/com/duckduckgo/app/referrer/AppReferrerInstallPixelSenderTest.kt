@@ -1,7 +1,6 @@
 package com.duckduckgo.app.referrer
 
 import com.duckduckgo.app.pixels.AppPixelName.REFERRAL_INSTALL_UTM_CAMPAIGN
-import com.duckduckgo.app.referral.AppReferrerDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
@@ -10,6 +9,7 @@ import com.duckduckgo.referral.AppReferrerInstallPixelSender
 import com.duckduckgo.referral.AppReferrerInstallPixelSender.Companion.PIXEL_PARAM_LOCALE
 import com.duckduckgo.referral.AppReferrerInstallPixelSender.Companion.PIXEL_PARAM_ORIGIN
 import com.duckduckgo.referral.AppReferrerInstallPixelSender.Companion.PIXEL_PARAM_RETURNING_USER
+import com.duckduckgo.referral.api.AppReferrer
 import com.duckduckgo.verifiedinstallation.installsource.VerificationCheckPlayStoreInstall
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
@@ -33,7 +33,7 @@ class AppReferrerInstallPixelSenderTest {
 
     private val pixel: Pixel = mock()
     private val appBuildConfig: AppBuildConfig = mock()
-    private val appReferrerDataStore: AppReferrerDataStore = mock()
+    private val appReferrer: AppReferrer = mock()
     private val playStoreInstallChecker: VerificationCheckPlayStoreInstall = mock()
     private val captor = argumentCaptor<Map<String, String>>()
 
@@ -45,7 +45,7 @@ class AppReferrerInstallPixelSenderTest {
     }
 
     private val testee = AppReferrerInstallPixelSender(
-        appReferrerDataStore = appReferrerDataStore,
+        appReferrer = appReferrer,
         pixel = pixel,
         appCoroutineScope = coroutineTestRule.testScope,
         dispatchers = coroutineTestRule.testDispatcherProvider,
@@ -92,7 +92,7 @@ class AppReferrerInstallPixelSenderTest {
     }
 
     private fun configureReferrerCampaign(campaign: String?) {
-        whenever(appReferrerDataStore.utmOriginAttributeCampaign).thenReturn(campaign)
+        whenever(appReferrer.getOriginAttributeCampaign()).thenReturn(campaign)
     }
 
     private fun verifyCorrectPixelSent(

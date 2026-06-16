@@ -20,10 +20,6 @@ import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 
-interface VerificationCheckPlayStoreInstall {
-    fun installedFromPlayStore(): Boolean
-}
-
 @ContributesBinding(AppScope::class)
 class VerificationCheckPlayStoreInstallImpl @Inject constructor(
     private val installSourceExtractor: InstallSourceExtractor,
