@@ -32,6 +32,36 @@ def wait_for_job(client: asana.ApiClient, job_gid: str, timeout: int = 30, inter
     raise TimeoutError(f"Job {job_gid} did not complete within {timeout}s")
 
 
+def build_release_task_links_html(task_links: List[AsanaTaskLink]) -> str:
+    """
+    Build HTML list items for release task notes.
+
+    Use explicit href links instead of data-asana-gid anchors so the request
+    does not fail if Asana cannot auto-resolve an object ID.
+    """
+    items = []
+
+    for link in task_links:
+        if not link.url:
+            continue
+
+        try:
+            task_id = extract_task_id_from_url(link.url)
+        except Exception as e:
+            log(f"Skipping malformed Asana URL '{link.url}': {e}")
+            continue
+
+        if not task_id:
+            log(f"Skipping Asana URL with no task ID: {link.url}")
+            continue
+
+        items.append(
+            f'<li><a href="https://app.asana.com/0/0/{task_id}/f">{task_id}</a></li>'
+        )
+
+    return "".join(items)
+
+
 def create_asana_release_task(client: asana.ApiClient,
                               workspace_id: str,
                               release_tag: str,
@@ -72,11 +102,7 @@ def create_asana_release_task(client: asana.ApiClient,
     current_notes = task.get('html_notes', '')
 
     # Build the task links bullet points
-    task_links_html = ""
-    for link in task_links:
-        if link.url:
-            task_id = extract_task_id_from_url(link.url)
-            task_links_html += f'<li><a data-asana-gid="{task_id}"/></li>'
+    task_links_html = build_release_task_links_html(task_links)
 
     # Replace the placeholder section with actual task links using regex to handle newlines
     placeholder_pattern = r"<strong>This release includes:</strong>\s*<ul><li>Add Asana tasks in release here and tag them with release number e\.g android-release-5\.9\.0</li></ul>"
@@ -188,17 +214,17 @@ def main():
     parser.add_argument('--template-task-id', required=True, help='Asana template task ID to duplicate')
 
     args = parser.parse_args()
-    
+
     try:
         # Get environment variables
         asana_api_key = os.getenv(args.asana_api_key_env_var)
-        
+
         # Validate environment variables
         if not asana_api_key:
             log("Error: Missing required environment variable")
             log(f"Please set {args.asana_api_key_env_var}")
             return 1
-    
+
         configuration = asana.Configuration()
         configuration.access_token = asana_api_key
         client = asana.ApiClient(configuration)
@@ -207,13 +233,13 @@ def main():
         if not start_tag:
             log(f"Error: No previous public release tag found before {args.tag}")
             return 1
-        
+
         log(f"Using tag {start_tag} as start commit")
         log(f"Using tag {args.tag} as end commit")
-        
+
         # Get commits between the tags
         commits = get_commits_between(args.android_repo_path, start_tag, args.tag)
-        
+
         log(f"Extracting task links from {len(commits)} commits")
         # Extract Asana task links from commit messages
         task_links = extract_asana_task_links(commits, args.trigger_phrase)
@@ -242,10 +268,10 @@ def main():
         remove_tasks_from_project(client, task_links, args.asana_project_id)
 
         task_url = f"https://app.asana.com/1/{args.asana_workspace_id}/project/{args.asana_project_id}/task/{task_id}"
-        print(task_url) # Only the URL is ever printed to stdout
+        print(task_url)  # Only the URL is ever printed to stdout
 
         return 0
-        
+
     except Exception as e:
         import traceback
         log(f"Unexpected error: {e}")
