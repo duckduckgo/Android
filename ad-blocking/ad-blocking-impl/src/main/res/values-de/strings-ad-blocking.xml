@@ -17,10 +17,10 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
-    <string name="ad_blocking_settings_title">YouTube-Werbeblocker</string>
+    <string name="ad_blocking_settings_title">YouTube-Werbung blockieren</string>
     <string name="ad_blocking_settings_toggle_title">Werbung auf YouTube blockieren</string>
-    <string name="ad_blocking_settings_description_with_consent">DuckDuckGo blockiert Video-Werbung auf YouTube, sodass du Videos ohne Unterbrechungen ansehen kannst.\n\nWenn diese Funktion aktiviert ist, erkennt DuckDuckGo anonym, ob Werbeblocker stören oder YouTube-Fehler auftreten, um das Erlebnis für alle zu verbessern. DuckDuckGo sieht niemals, welche Videos du dir ansiehst, und erhält auch keine personenbezogenen Daten. <annotation type="learn_more_link">Mehr erfahren</annotation></string>
-    <string name="ad_blocking_settings_description">DuckDuckGo blockiert Video-Werbung auf YouTube, sodass du Videos ohne Unterbrechungen ansehen kannst. <annotation type="learn_more_link">Mehr erfahren</annotation></string>
+    <string name="ad_blocking_settings_description_with_consent">DuckDuckGo entfernt Video-Werbung auf YouTube, sodass du Videos ohne Unterbrechungen ansehen kannst.\n\nWenn diese Funktion aktiviert ist, erkennt DuckDuckGo anonym, ob Werbeblocker stören oder YouTube-Fehler auftreten, um das Erlebnis für alle zu verbessern. DuckDuckGo sieht niemals, welche Videos du dir ansiehst, und erhält auch keine personenbezogenen Daten. <annotation type="learn_more_link">Mehr erfahren</annotation></string>
+    <string name="ad_blocking_settings_description">DuckDuckGo entfernt Video-Werbung auf YouTube, sodass du Videos ohne Unterbrechungen ansehen kannst. <annotation type="learn_more_link">Mehr erfahren</annotation></string>
     <string name="ad_blocking_settings_duck_player_header">Duck Player</string>
-    <string name="ad_blocking_settings_duck_player_description">Öffnet Videos im Theatermodus, der verhindert, dass das, was du ansiehst, deinen YouTube-Feed beeinflusst.</string>
+    <string name="ad_blocking_settings_duck_player_description">Öffnet Videos in einem ablenkungsfreien Theatermodus, der verhindert, dass das, was du ansiehst, deinen YouTube-Feed beeinflusst.</string>
 </resources>
