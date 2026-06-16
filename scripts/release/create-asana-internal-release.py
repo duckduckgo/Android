@@ -28,10 +28,21 @@ def create_asana_task(client: asana.ApiClient,
     description = "<body>"
     description += "<h2>Included Tasks</h2>"
     for link in task_links:
+        # Use an explicit href link instead of a data-asana-gid anchor so the
+        # request does not fail if Asana cannot auto-resolve an object ID.
+        task_link = "no task"
         if link.url:
-            task_link = f"<a data-asana-gid=\"{extract_task_id_from_url(link.url)}\"/>"
-        else:
-            task_link = "no task"
+            try:
+                task_id = extract_task_id_from_url(link.url)
+            except Exception as e:
+                log(f"Skipping malformed Asana URL '{link.url}': {e}")
+                task_id = None
+
+            if task_id:
+                task_link = f'<a href="https://app.asana.com/0/0/{task_id}/f">{task_id}</a>'
+            else:
+                log(f"Skipping Asana URL with no task ID: {link.url}")
+
         commit_url = f"https://github.com/duckduckgo/Android/commit/{link.commit_hash}"
         description += f"- {task_link} - <a href=\"{commit_url}\">{link.commit_hash[:9]}</a>\n"
     
