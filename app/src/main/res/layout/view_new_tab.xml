@@ -22,6 +22,12 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
+    <include
+        android:id="@+id/fireTabEmptyState"
+        layout="@layout/view_fire_new_tab_empty_state"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
     <com.duckduckgo.app.browser.indonesiamessage.IndonesiaNewTabSectionView
         android:id="@+id/indonesiaNewTabSectionView"
         android:layout_width="match_parent"

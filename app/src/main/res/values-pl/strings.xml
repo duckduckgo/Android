@@ -77,6 +77,7 @@
     <string name="options">Opcje</string>
     <string name="shareLink">Udostępnij link</string>
     <string name="copyUrl">Skopiuj adres linku</string>
+    <string name="urlCopiedToClipboard">URL skopiowany do schowka</string>
 
     <!-- Find in page -->
     <string name="nextSearchTermDescription">Znajdź następny element</string>
@@ -1072,4 +1073,8 @@
 
     <string name="input_screen_user_pref_without_ai_updated">Tylko wyszukiwanie</string>
     <string name="input_screen_user_pref_with_ai_updated">Przełącz między\nwyszukiwaniem a Duck.ai</string>
+
+    <!-- New Address Bar Picker -->
+    <string name="newAddressBarPickerDuckDuckGo" translatable="false">DuckDuckGo</string>
+    <string name="newAddressBarPickerConfirm">Potwierdź</string>
 </resources>

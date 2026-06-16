@@ -62,6 +62,8 @@ class FakeDuckChat(
         return "https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5"
     }
 
+    override fun getDuckChatSettingsUrl(): String = "https://duck.ai?settings=open"
+
     override fun isDuckChatUrl(uri: Uri): Boolean {
         return uri.toString().contains("duckchat")
     }
@@ -77,6 +79,8 @@ class FakeDuckChat(
     override suspend fun setInputScreenUserSetting(enabled: Boolean) {
         inputScreenUserSettingEnabled.value = enabled
     }
+
+    override suspend fun isInputScreenEverEnabled(): Boolean = false
 
     override suspend fun setCosmeticInputScreenUserSetting(enabled: Boolean) {
         cosmeticInputScreenUserSettingEnabled.value = enabled
@@ -115,6 +119,8 @@ class FakeDuckChat(
     override fun endVoiceChatSession(tabId: String) { }
 
     override suspend fun isChatHistoryAvailable(): Boolean = false
+
+    override suspend fun onAddressBarPickerDuckAiSelected() { }
 
     fun setEnabled(enabled: Boolean) {
         this.enabled = enabled

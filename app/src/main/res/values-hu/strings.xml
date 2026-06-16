@@ -75,6 +75,7 @@
     <string name="options">Opciók</string>
     <string name="shareLink">Link megosztása</string>
     <string name="copyUrl">Link címének másolása</string>
+    <string name="urlCopiedToClipboard">URL a vágólapra másolva</string>
 
     <!-- Find in page -->
     <string name="nextSearchTermDescription">Következő keresése</string>
@@ -1032,4 +1033,8 @@
 
     <string name="input_screen_user_pref_without_ai_updated">Csak keresés</string>
     <string name="input_screen_user_pref_with_ai_updated">Váltás a keresés\nés a Duck.ai között</string>
+
+    <!-- New Address Bar Picker -->
+    <string name="newAddressBarPickerDuckDuckGo" translatable="false">DuckDuckGo</string>
+    <string name="newAddressBarPickerConfirm">Megerősítés</string>
 </resources>

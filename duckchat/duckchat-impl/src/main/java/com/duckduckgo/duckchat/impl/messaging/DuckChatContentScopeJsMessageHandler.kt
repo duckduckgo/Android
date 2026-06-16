@@ -68,6 +68,9 @@ class DuckChatContentScopeJsMessageHandler @Inject constructor(
                     "voiceSessionStarted",
                     "voiceSessionEnded",
                     "responseReceived",
+                    "showModelPicker",
+                    "disableChatInput",
+                    "enableChatInput",
                 )
         }
 }

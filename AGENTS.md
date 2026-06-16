@@ -1,27 +1,15 @@
 # AGENTS.md — DuckDuckGo Android Browser
 
-## Detailed Rules
-
-The following rule files contain detailed guidance for specific topics. Read them before working in those areas — do not rely on summaries here.
-
-| File | Covers |
-|---|---|
-| `.cursor/rules/architecture.mdc` | Module structure, dependency injection, plugin system, ViewModels, URL classification, testing, git workflow |
-| `.cursor/rules/android-design-system.mdc` | ADS components, buttons, text, inputs, switches, list items, dialogs, bottom sheets, colors, spacing, lint rules |
-| `.cursor/rules/maestro-ui-tests.mdc` | Maestro test setup, organization, tags, running locally and in CI |
-| `.cursor/rules/wide-events.mdc` | Wide event API, FlowStatus, CleanupPolicy, implementation patterns |
-| `.cursor/rules/dependency-updates.mdc` | How to safely update Android library dependencies |
-| `.cursor/rules/contributions.mdc` | Branch naming, commit messages, PR creation workflow |
-
----
-
 ## Project Overview
 
 DuckDuckGo Android is a privacy-focused browser with 100+ Gradle modules. The app provides built-in search, tracker blocking, HTTPS enforcement, and other privacy features.
 
-**SDK targets:** minSdk 26, targetSdk 35, compileSdk 35
-**Language:** Kotlin (1.9.24), Java 17 (JVM toolchain)
-**Build:** Gradle 7.6, AGP via refreshVersions, Anvil (Dagger2)
+**Versions** (SDK levels, Kotlin, Gradle, libraries) live in the build files — don't restate them here:
+`min_sdk` / `target_sdk` / `compile_sdk` in `build.gradle`, `version.kotlin` in `versions.properties`,
+and the Gradle version in `gradle/wrapper/gradle-wrapper.properties`.
+**Build:** AGP via refreshVersions. DI is Anvil/Dagger2 today, with a migration to **Metro** in flight
+(dual-build selected by the `ddg.di` Gradle property; see `build.gradle`).
+**Toolchain:** Kotlin JVM target 17; building requires **JDK 21** (Metro compiler plugin).
 
 ---
 
@@ -159,8 +147,8 @@ These rules are enforced in the root `build.gradle`. Violations fail the build.
 
 ## Code Formatting
 
-- **Spotless** with ktlint (0.50.0) for Kotlin
-- Google Java Format (1.22.0) in AOSP style for Java
+- **Spotless** with ktlint for Kotlin
+- Google Java Format in AOSP style for Java
 - Max line length: 150 characters
 - Ratchet from `origin/develop` (only enforces formatting on changed code)
 
@@ -181,13 +169,6 @@ The `lint-rules` module enforces at compile time:
 
 ## Key Dependencies
 
-| Category | Library |
-|---|---|
-| DI | Dagger2 + Square Anvil |
-| Database | Room (with RxJava2 support) |
-| Network | Retrofit2 + OkHttp3 + Moshi |
-| Async | Kotlin Coroutines |
-| UI | Jetpack Compose (selective), Material Design |
-| Scheduling | WorkManager |
-| Logging | logcat (Square) |
-| Annotation Processing | KSP |
+Declared in `versions.properties` and module `build.gradle` files. Notable choices: DI via
+Anvil/Dagger2 (migrating to Metro), Room, Retrofit/OkHttp/Moshi, Coroutines, Jetpack Compose
+(selective), WorkManager, `logcat` (Square), and KSP for annotation processing.

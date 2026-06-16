@@ -31,7 +31,7 @@ jobs:
           gradle_encryption_key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
           # Disable the 50/50 onboardingQuickSetupExperimentJun3 A/B experiment so the
           # preonboarding tests don't randomly fail when enrolled in the TREATMENT cohort
-          gradle_flags: '-Pconfig_patches=.maestro/onboarding/remote_config_patches/disable_onboarding_quick_setup_experiment.json'
+          gradle_flags: '-Pconfig_patches=.maestro/onboarding/remote_config_patches/disable_onboarding_quick_setup_experiment.json,.maestro/duckplayer/patches/ad_blocking_enabled_patch.json'
           develocity_access_key: ${{ secrets.DEVELOCITY_ACCESS_KEY }}
           ducksans_package_auth_user: ${{ secrets.DAXMOBILE_GITHUB_PACKAGES_AUTOMATION_USER }}
           ducksans_package_auth_token: ${{ secrets.DAXMOBILE_GITHUB_PACKAGES_AUTOMATION }}
@@ -46,7 +46,7 @@ jobs:
           maestro_test_name: binary_internal_upload_${{ github.sha }}
           maestro_timeout: ${{ vars.ROBIN_TIMEOUT_MINUTES }}
           maestro_app_file: ${{ steps.assemble.outputs.internal_apk_path }}
-          maestro_api_level: 35
+          maestro_api_level: 34
           maestro_include_tags: binaryUpload
           asana_pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
           asana_project_id: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
@@ -63,7 +63,7 @@ jobs:
           maestro_test_name: binary_release_upload_${{ github.sha }}
           maestro_timeout: ${{ vars.ROBIN_TIMEOUT_MINUTES }}
           maestro_app_file: ${{ steps.assemble.outputs.play_apk_path }}
-          maestro_api_level: 35
+          maestro_api_level: 34
           maestro_include_tags: binaryUpload
           asana_pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
           asana_project_id: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
@@ -81,7 +81,7 @@ jobs:
           maestro_timeout: ${{ vars.ROBIN_TIMEOUT_MINUTES }}
           maestro_app_binary_id: ${{ steps.maestro-upload-release-binary.outputs.maestro_app_binary_id }}
           maestro_include_tags: omnibarTest
-          maestro_api_level: 35
+          maestro_api_level: 34
           asana_pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
           asana_project_id: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
           asana_section_id: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
@@ -98,6 +98,7 @@ jobs:
           maestro_timeout: ${{ vars.ROBIN_TIMEOUT_MINUTES }}
           maestro_app_binary_id: ${{ steps.maestro-upload-internal-binary.outputs.maestro_app_binary_id }}
           maestro_include_tags: duckplayer
+          maestro_api_level: 34
           asana_pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
           asana_project_id: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
           asana_section_id: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
@@ -115,7 +116,7 @@ jobs:
           maestro_app_binary_id: ${{ steps.maestro-upload-internal-binary.outputs.maestro_app_binary_id }}
           maestro_include_tags: androidDesignSystemTest
           asana_pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
-          maestro_api_level: 35
+          maestro_api_level: 34
           asana_project_id: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
           asana_section_id: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
           test_suite_name: Android Design System (Nightly)
@@ -132,7 +133,7 @@ jobs:
           maestro_app_binary_id: ${{ steps.maestro-upload-internal-binary.outputs.maestro_app_binary_id }}
           maestro_include_tags: unifiedInputTest
           asana_pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
-          maestro_api_level: 35
+          maestro_api_level: 34
           asana_project_id: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
           asana_section_id: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
           test_suite_name: Unified Input Field
@@ -148,7 +149,7 @@ jobs:
           maestro_timeout: ${{ vars.ROBIN_TIMEOUT_MINUTES }}
           maestro_app_binary_id: ${{ steps.maestro-upload-internal-binary.outputs.maestro_app_binary_id }}
           maestro_include_tags: preonboardingTest
-          maestro_api_level: 35
+          maestro_api_level: 34
           asana_pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
           asana_project_id: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
           asana_section_id: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}

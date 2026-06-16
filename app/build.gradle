@@ -301,8 +301,7 @@ dependencies {
 	implementation project(":malicious-site-protection-api")
 	implementation project(":custom-tabs-impl")
 	implementation project(":custom-tabs-api")
-	implementation project(":duckplayer-impl")
-	implementation project(":duckplayer-api")
+	implementation project(":ad-blocking-api")
 	implementation project(":history-impl")
 	implementation project(":history-api")
 	implementation project(":data-store-impl")
@@ -691,6 +690,7 @@ tasks.register('android_checks') {
 
 tasks.register('jvm_checks') {
     dependsOn 'spotlessCheck', 'lint', 'testPlayDebugUnitTest'
+    dependsOn rootProject.tasks.named('aiConfigCheck')
 }
 
 tasks.register('lint_check') {

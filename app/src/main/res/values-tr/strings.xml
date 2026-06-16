@@ -75,6 +75,7 @@
     <string name="options">Seçenekler</string>
     <string name="shareLink">Bağlantıyı paylaş</string>
     <string name="copyUrl">Bağlantı Adresini Kopyala</string>
+    <string name="urlCopiedToClipboard">URL panoya kopyalandı</string>
 
     <!-- Find in page -->
     <string name="nextSearchTermDescription">Sonrakini bul</string>
@@ -1032,4 +1033,8 @@
 
     <string name="input_screen_user_pref_without_ai_updated">Yalnızca Arama</string>
     <string name="input_screen_user_pref_with_ai_updated">Arama ile\nDuck.ai arasında geçiş yapın</string>
+
+    <!-- New Address Bar Picker -->
+    <string name="newAddressBarPickerDuckDuckGo" translatable="false">DuckDuckGo</string>
+    <string name="newAddressBarPickerConfirm">Onayla</string>
 </resources>

@@ -25,8 +25,10 @@ import com.duckduckgo.duckchat.impl.ChatState
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.store.DefaultTogglePosition
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
 
@@ -71,6 +73,8 @@ class FakeDuckChatInternal(
         return "https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5"
     }
 
+    override fun getDuckChatSettingsUrl(): String = "https://duck.ai?settings=open"
+
     override fun isDuckChatUrl(uri: Uri): Boolean = false
 
     override suspend fun wasOpenedBefore(): Boolean = false
@@ -80,6 +84,8 @@ class FakeDuckChatInternal(
     override suspend fun setInputScreenUserSetting(enabled: Boolean) {
         inputScreenUserSettingEnabled.value = enabled
     }
+
+    override suspend fun isInputScreenEverEnabled(): Boolean = false
 
     override suspend fun setCosmeticInputScreenUserSetting(enabled: Boolean) {
         cosmeticInputScreenUserSettingEnabled.value = enabled
@@ -158,6 +164,14 @@ class FakeDuckChatInternal(
 
     override val chatState: StateFlow<ChatState> = _chatState
 
+    private val _showModelPickerEvents = MutableSharedFlow<String>(extraBufferCapacity = 1)
+
+    override fun requestShowModelPicker(tabId: String) {
+        _showModelPickerEvents.tryEmit(tabId)
+    }
+
+    override val showModelPickerEvents: Flow<String> = _showModelPickerEvents.asSharedFlow()
+
     override fun isImageUploadEnabled(): Boolean = false
 
     override fun isStandaloneMigrationEnabled(): Boolean = false
@@ -194,6 +208,8 @@ class FakeDuckChatInternal(
     override fun endVoiceChatSession(tabId: String) { }
 
     override suspend fun isChatHistoryAvailable(): Boolean = false
+
+    override suspend fun onAddressBarPickerDuckAiSelected() { }
 
     override fun buildChatUrl(chatId: String): String = "https://duck.ai?chatID=$chatId"
 

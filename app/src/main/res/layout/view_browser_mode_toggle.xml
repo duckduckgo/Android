@@ -46,7 +46,7 @@
                 android:layout_height="24dp"
                 android:layout_gravity="center"
                 android:importantForAccessibility="no"
-                android:src="@drawable/ic_fire_tabs_24" />
+                android:src="@drawable/ic_tabs_fire_mode_24" />
 
         </FrameLayout>
 

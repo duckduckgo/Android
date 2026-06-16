@@ -40,6 +40,9 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.LinkAnnotation
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.withLink
 import androidx.compose.ui.unit.dp
 import androidx.recyclerview.widget.RecyclerView
 import coil3.compose.rememberAsyncImagePainter
@@ -59,6 +62,8 @@ import com.duckduckgo.common.ui.compose.message.remote.DaxBigTwoActionsMessage
 import com.duckduckgo.common.ui.compose.message.remote.DaxMediumMessage
 import com.duckduckgo.common.ui.compose.message.remote.DaxPromoSingleActionMessage
 import com.duckduckgo.common.ui.compose.message.remote.DaxSmallMessage
+import com.duckduckgo.common.ui.compose.panel.DaxAlertPanel
+import com.duckduckgo.common.ui.compose.panel.DaxInfoPanel
 import com.duckduckgo.common.ui.compose.radiobutton.DaxRadioButton
 import com.duckduckgo.common.ui.compose.switch.DaxSwitch
 import com.duckduckgo.common.ui.compose.text.DaxText
@@ -216,7 +221,35 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
 
     class InfoPanelComponentViewHolder(
         parent: ViewGroup,
-    ) : ComponentViewHolder(inflate(parent, R.layout.component_info_panel))
+        private val isDarkTheme: Boolean,
+    ) : ComponentViewHolder(inflate(parent, R.layout.component_info_panel)) {
+
+        init {
+            view.setupThemedComposeView(R.id.info_panel_tooltip_compose, isDarkTheme = isDarkTheme) {
+                DaxInfoPanel(
+                    body = "This is a Tooltip Compose Info Panel, interesting information can be shown here",
+                )
+            }
+
+            view.setupThemedComposeView(R.id.info_panel_alert_compose, isDarkTheme = isDarkTheme) {
+                DaxAlertPanel(
+                    body = "This is an Alert Compose Info Panel, warning information can be shown here",
+                )
+            }
+
+            view.setupThemedComposeView(R.id.info_panel_link_compose, isDarkTheme = isDarkTheme) {
+                DaxInfoPanel(
+                    body = buildAnnotatedString {
+                        append("This info panel has a link. Visit ")
+                        withLink(LinkAnnotation.Url("https://duckduckgo.com")) {
+                            append("duckduckgo.com")
+                        }
+                        append(" to learn more.")
+                    },
+                )
+            }
+        }
+    }
 
     class RemoteMessageComponentViewHolder(
         parent: ViewGroup,
@@ -743,7 +776,7 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
                 Component.CHECKBOX -> CheckboxComponentViewHolder(parent, isDarkTheme)
                 Component.SLIDER -> SliderComponentViewHolder(parent)
                 Component.SNACKBAR -> SnackbarComponentViewHolder(parent)
-                Component.INFO_PANEL -> InfoPanelComponentViewHolder(parent)
+                Component.INFO_PANEL -> InfoPanelComponentViewHolder(parent, isDarkTheme)
                 Component.REMOTE_MESSAGE -> RemoteMessageComponentViewHolder(parent, isDarkTheme)
                 Component.SEARCH_BAR -> SearchBarComponentViewHolder(parent)
                 Component.MENU_ITEM -> MenuItemComponentViewHolder(parent)

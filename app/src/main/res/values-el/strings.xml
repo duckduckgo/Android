@@ -75,6 +75,7 @@
     <string name="options">Επιλογές</string>
     <string name="shareLink">Κοινή χρήση συνδέσμου</string>
     <string name="copyUrl">Αντιγραφή διεύθυνσης συνδέσμου</string>
+    <string name="urlCopiedToClipboard">Έγινε αντιγραφή της διεύθυνσης URL στο πρόχειρο</string>
 
     <!-- Find in page -->
     <string name="nextSearchTermDescription">Εύρεση επόμενου</string>
@@ -1032,4 +1033,8 @@
 
     <string name="input_screen_user_pref_without_ai_updated">Αναζήτηση μόνο</string>
     <string name="input_screen_user_pref_with_ai_updated">Εναλλαγή μεταξύ\nΑναζήτησης και Duck.ai</string>
+
+    <!-- New Address Bar Picker -->
+    <string name="newAddressBarPickerDuckDuckGo" translatable="false">DuckDuckGo</string>
+    <string name="newAddressBarPickerConfirm">Επιβεβαίωση</string>
 </resources>

@@ -19,8 +19,8 @@
 
     <ImageView
         android:id="@+id/reasoningModePickerButton"
-        android:layout_width="@dimen/toolbarIcon"
-        android:layout_height="@dimen/toolbarIcon"
+        android:layout_width="@dimen/nativeInputButtonSize"
+        android:layout_height="@dimen/nativeInputButtonSize"
         android:background="@drawable/selectable_item_rounded_corner_background"
         android:contentDescription="@string/duckChatReasoningModeContentDescription"
         android:scaleType="centerInside"

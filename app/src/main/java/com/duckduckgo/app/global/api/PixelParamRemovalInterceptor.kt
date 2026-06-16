@@ -17,6 +17,7 @@
 package com.duckduckgo.app.global.api
 
 import com.duckduckgo.app.browser.WebViewPixelName
+import com.duckduckgo.app.browser.customtabs.CustomTabPixelNames
 import com.duckduckgo.app.browser.httperrors.HttpErrorPixelName
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.SITE_NOT_WORKING_SHOWN
@@ -156,7 +157,6 @@ object PixelInterceptorPixelsRequiringDataCleaning : PixelParamRemovalPlugin {
             AppPixelName.PREONBOARDING_SKIP_ONBOARDING_PRESSED.pixelName to PixelParameter.removeAtb(),
             AppPixelName.PREONBOARDING_CONFIRM_SKIP_ONBOARDING_PRESSED.pixelName to PixelParameter.removeAtb(),
             AppPixelName.PREONBOARDING_RESUME_ONBOARDING_PRESSED.pixelName to PixelParameter.removeAtb(),
-            AppPixelName.PREONBOARDING_DEFAULT_BROWSER_PAGE_SHOWN_UNIQUE.pixelName to PixelParameter.removeAtb(),
             AppPixelName.PREONBOARDING_CHOOSE_SEARCH_EXPERIENCE_IMPRESSIONS_UNIQUE.pixelName to PixelParameter.removeAtb(),
             AppPixelName.PREONBOARDING_AICHAT_SELECTED.pixelName to PixelParameter.removeAtb(),
             AppPixelName.PREONBOARDING_SEARCH_ONLY_SELECTED.pixelName to PixelParameter.removeAtb(),
@@ -257,6 +257,7 @@ object PixelInterceptorPixelsRequiringDataCleaning : PixelParamRemovalPlugin {
             AppPixelName.DUCKAI_ONLY_WIDGET_ADDED.pixelName to PixelParameter.removeAtb(),
             AppPixelName.SEARCH_ONLY_WIDGET_ADDED.pixelName to PixelParameter.removeAtb(),
             AppPixelName.SEARCH_ONLY_WIDGET_DELETED.pixelName to PixelParameter.removeAtb(),
+            CustomTabPixelNames.CUSTOM_TABS_COPY_URL.pixelName to PixelParameter.removeAtb(),
         )
     }
 }

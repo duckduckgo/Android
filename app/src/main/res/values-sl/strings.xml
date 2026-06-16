@@ -77,6 +77,7 @@
     <string name="options">Možnosti</string>
     <string name="shareLink">Daj povezavo v skupno rabo</string>
     <string name="copyUrl">Kopiraj naslov povezave</string>
+    <string name="urlCopiedToClipboard">URL je kopiran v odložišče</string>
 
     <!-- Find in page -->
     <string name="nextSearchTermDescription">Najdi naslednje</string>
@@ -1072,4 +1073,8 @@
 
     <string name="input_screen_user_pref_without_ai_updated">Samo iskanje</string>
     <string name="input_screen_user_pref_with_ai_updated">Preklopite med\niskanjem in Duck.ai</string>
+
+    <!-- New Address Bar Picker -->
+    <string name="newAddressBarPickerDuckDuckGo" translatable="false">DuckDuckGo</string>
+    <string name="newAddressBarPickerConfirm">Potrdi</string>
 </resources>

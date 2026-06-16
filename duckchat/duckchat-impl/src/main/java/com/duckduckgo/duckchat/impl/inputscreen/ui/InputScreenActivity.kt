@@ -22,6 +22,7 @@ import android.os.Bundle
 import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.api.inputscreen.BrowserAndInputScreenTransitionProvider
@@ -49,6 +50,12 @@ class InputScreenActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var inputScreenOnboardingWideEvent: InputScreenOnboardingWideEvent
+
+    @Inject
+    lateinit var browserMode: BrowserMode
+
+    override val applyFireTheme: Boolean
+        get() = browserMode == BrowserMode.FIRE
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

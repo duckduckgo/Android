@@ -26,20 +26,18 @@ import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Count
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
+import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.newtabpage.api.NtpAfterIdleManager
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
@@ -78,54 +76,56 @@ class NewTabReturnHatchViewModel @Inject constructor(
     val commands: Flow<Command> = commandChannel.receiveAsFlow()
 
     private val pendingClose = MutableStateFlow(false)
-    private val burnTargetTabId = MutableStateFlow<String?>(null)
+
+    // The tab the hatch offers to return to, captured once when the app returns from idle. Driving
+    // the hatch from this snapshot (instead of the live last-accessed flow) keeps the displayed tab
+    // stable: it never switches to another tab while up, and survives the close/undo toggle.
+    private val snapshotTab = MutableStateFlow<TabEntity?>(null)
 
     init {
-        // When the user burns the hatch's tab via the FireDialog, hide the hatch as soon as that
-        // tab is gone from the repository. If the FireDialog is cancelled, the tab survives and the
-        // hatch stays visible.
+        // Capture the last-accessed tab once per idle-return; reset on a fresh return so the hatch
+        // can re-appear for the next one.
         viewModelScope.launch(dispatchers.io()) {
-            combine(burnTargetTabId, tabRepository.flowTabs) { targetId, tabs ->
-                targetId != null && tabs.none { it.tabId == targetId }
-            }.collect { targetGone ->
-                if (targetGone) {
-                    pendingClose.value = true
-                    burnTargetTabId.value = null
+            ntpAfterIdleManager.isAfterIdleReturn.collect { afterIdle ->
+                if (afterIdle) {
+                    snapshotTab.value = tabRepository.getLastAccessedTab()
+                    pendingClose.value = false
+                } else {
+                    snapshotTab.value = null
                 }
             }
         }
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
-    val viewState = pendingClose.flatMapLatest { isClosed ->
-        if (isClosed) {
-            // Once the user closes the hatch, freeze it: stop observing upstream flows so the
-            // post-deletion re-emission from flowLastAccessedTab doesn't trigger another render.
-            flowOf(ViewState(shouldShow = false))
+    // Driven by the captured [snapshotTab] (not the live last-accessed flow) so the displayed tab is
+    // stable across the close/undo toggle. flowTabs both supplies the live tabs count and gates
+    // visibility: the hatch hides as soon as the snapshot tab leaves the repository (burned, closed,
+    // or purged), so every live ViewModel instance stays in sync without per-instance burn tracking.
+    val viewState = combine(
+        snapshotTab,
+        pendingClose,
+        tabRepository.flowTabs,
+        duckChat.observeNativeInputFieldUserSettingEnabled(),
+    ) { tab, closed, tabs, nativeInputEnabled ->
+        if (tab != null && !closed && tabs.any { it.tabId == tab.tabId }) {
+            val url = tab.url.orEmpty()
+            ViewState(
+                tabTitle = tab.title.orEmpty(),
+                url = url,
+                tabId = tab.tabId,
+                currentTabId = tab.tabId,
+                shouldShow = true,
+                isDuckChat = url.isNotEmpty() && duckChat.isDuckChatUrl(Uri.parse(url)),
+                isSerp = url.isNotEmpty() && duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url),
+                tabs = tabs.size,
+                showTabsButton = nativeInputEnabled,
+            )
         } else {
-            combine(
-                tabRepository.flowLastAccessedTab,
-                tabRepository.flowTabs,
-                ntpAfterIdleManager.isAfterIdleReturn,
-                duckChat.observeNativeInputFieldUserSettingEnabled(),
-            ) { lastTab, tabs, afterIdle, nativeInputEnabled ->
-                if (lastTab != null && afterIdle) {
-                    val url = lastTab.url.orEmpty()
-                    ViewState(
-                        tabTitle = lastTab.title.orEmpty(),
-                        url = url,
-                        tabId = lastTab.tabId,
-                        currentTabId = lastTab.tabId,
-                        shouldShow = true,
-                        isDuckChat = url.isNotEmpty() && duckChat.isDuckChatUrl(Uri.parse(url)),
-                        isSerp = url.isNotEmpty() && duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url),
-                        tabs = tabs.size,
-                        showTabsButton = nativeInputEnabled,
-                    )
-                } else {
-                    ViewState(shouldShow = false)
-                }
-            }
+            ViewState(
+                shouldShow = false,
+                tabs = tabs.size,
+                showTabsButton = nativeInputEnabled,
+            )
         }
     }
         .flowOn(dispatchers.io())
@@ -141,6 +141,11 @@ class NewTabReturnHatchViewModel @Inject constructor(
         pixel.fire(NewTabReturnHatchPixelName.OPTION_SELECTED_CLOSE_TAB_DAILY, type = Daily())
         val tabId = viewState.value.currentTabId
         if (tabId.isEmpty()) return
+        // Mark the tab deletable now so it disappears from the tab list/switcher immediately
+        // (recoverable via undo); the actual delete is committed when the snackbar is dismissed.
+        viewModelScope.launch(dispatchers.io()) {
+            tabRepository.markDeletable(listOf(tabId))
+        }
         pendingClose.value = true
         commandChannel.trySend(Command.ShowTabClosedSnackbar(tabId))
     }
@@ -148,24 +153,30 @@ class NewTabReturnHatchViewModel @Inject constructor(
     fun onBurnTabPressed() {
         pixel.fire(NewTabReturnHatchPixelName.OPTION_SELECTED_BURN_TAB, type = Count)
         pixel.fire(NewTabReturnHatchPixelName.OPTION_SELECTED_BURN_TAB_DAILY, type = Daily())
-        burnTargetTabId.value = viewState.value.currentTabId.takeIf { it.isNotEmpty() }
     }
 
     fun onUndoCloseTab(tabId: String) {
+        // Restore the tab that was marked deletable on close, and re-show the hatch with the same
+        // snapshot (no recompute, so it doesn't jump to a different tab).
+        viewModelScope.launch(dispatchers.io()) {
+            tabRepository.undoDeletable(listOf(tabId))
+        }
         pendingClose.value = false
     }
 
     fun onTabClosedSnackbarDismissed(tabId: String) {
+        // The tab was already marked deletable on close; commit the deletion now.
         viewModelScope.launch(dispatchers.io()) {
-            tabRepository.deleteTabs(listOf(tabId))
+            tabRepository.purgeDeletableTabs()
         }
         // pendingClose intentionally not reset: once the user commits to closing the hatch's tab,
-        // the hatch should not reappear with a different last-accessed tab.
+        // the hatch should not reappear until a fresh idle-return.
     }
 
     fun onTabManagerPressed() {
         pixel.fire(NewTabReturnHatchPixelName.OPTION_SELECTED_TAB_SWITCHER, type = Count)
         pixel.fire(NewTabReturnHatchPixelName.OPTION_SELECTED_TAB_SWITCHER_DAILY, type = Daily())
+        ntpAfterIdleManager.onTabSwitcherSelected()
         commandChannel.trySend(Command.LaunchTabSwitcher)
     }
 

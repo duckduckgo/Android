@@ -53,6 +53,12 @@ interface DuckChat {
     fun getDuckChatUrl(query: String, autoPrompt: Boolean, sidebar: Boolean = false): String
 
     /**
+     * Returns the Duck.ai URL that opens with the settings panel open (e.g. https://duck.ai?settings=open),
+     * using the configured Duck.ai host. Used to reach Duck.ai settings from outside the Duck.ai web view.
+     */
+    fun getDuckChatSettingsUrl(): String
+
+    /**
      * Determines whether a given [Uri] is a DuckChat URL.
      * There are two Duck Chat URLs
      * Legacy: https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5
@@ -76,6 +82,12 @@ interface DuckChat {
      * Set user setting to determine whether dedicated Duck.ai input screen with a mode switch should be used.
      */
     suspend fun setInputScreenUserSetting(enabled: Boolean)
+
+    /**
+     * Returns `true` if the user has ever interacted with the Duck.ai input screen toggle — enabled it
+     * explicitly, or had a value written implicitly (e.g. the onboarding selection). Sticky once set.
+     */
+    suspend fun isInputScreenEverEnabled(): Boolean
 
     /**
      * Cosmetically sets the input screen user setting.
@@ -149,4 +161,11 @@ interface DuckChat {
      * Suspending because the underlying feature-flag reads must not block the main thread.
      */
     suspend fun isChatHistoryAvailable(): Boolean
+
+    /**
+     * Records that the user selected the "Search + Duck.ai" option on the new address bar picker, so the
+     * first prompt submitted from the Duck.ai toggle input field within the attribution window can be
+     * attributed back to the picker.
+     */
+    suspend fun onAddressBarPickerDuckAiSelected()
 }

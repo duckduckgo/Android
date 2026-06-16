@@ -76,6 +76,7 @@
     <string name="options">Opțiuni</string>
     <string name="shareLink">Trimite linkul</string>
     <string name="copyUrl">Copiază adresa linkului</string>
+    <string name="urlCopiedToClipboard">Adresa URL a fost copiată în clipboard</string>
 
     <!-- Find in page -->
     <string name="nextSearchTermDescription">Arată rezultatul următor</string>
@@ -1052,4 +1053,8 @@
 
     <string name="input_screen_user_pref_without_ai_updated">Doar căutare</string>
     <string name="input_screen_user_pref_with_ai_updated">Comută între Căutare și Duck.ai</string>
+
+    <!-- New Address Bar Picker -->
+    <string name="newAddressBarPickerDuckDuckGo" translatable="false">DuckDuckGo</string>
+    <string name="newAddressBarPickerConfirm">Confirmă</string>
 </resources>

@@ -19,6 +19,9 @@ package com.duckduckgo.app.cta.ui
 import androidx.annotation.VisibleForTesting
 import androidx.annotation.WorkerThread
 import androidx.core.net.toUri
+import com.duckduckgo.adblocking.api.duckplayer.DuckPlayer
+import com.duckduckgo.adblocking.api.duckplayer.DuckPlayer.DuckPlayerState
+import com.duckduckgo.adblocking.api.duckplayer.PrivatePlayerMode.AlwaysAsk
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.CtaId
@@ -51,9 +54,6 @@ import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckChat
-import com.duckduckgo.duckplayer.api.DuckPlayer
-import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState
-import com.duckduckgo.duckplayer.api.PrivatePlayerMode.AlwaysAsk
 import com.duckduckgo.subscriptions.api.SubscriptionPromoCtaShownPlugin
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.api.Subscriptions
@@ -117,6 +117,10 @@ class CtaViewModel @Inject constructor(
 
     private suspend fun isBrandDesignUpdateEnabled(): Boolean = withContext(dispatchers.io()) {
         onboardingBrandDesignUpdateToggles.brandDesignUpdate().isEnabled()
+    }
+
+    private suspend fun isOnboardingImprovementsEnabled(): Boolean = withContext(dispatchers.io()) {
+        onboardingBrandDesignUpdateToggles.onboardingImprovements().isEnabled()
     }
 
     // Exposed for onboarding dev settings and tests. Used internally for completion checks
@@ -365,7 +369,13 @@ class CtaViewModel @Inject constructor(
             // Site suggestions
             canShowDaxIntroVisitSiteCta() && !extendedOnboardingFeatureToggles.noBrowserCtas().isEnabled() -> {
                 if (isBrandDesignUpdateEnabled()) {
-                    DaxVisitSiteOptionsBrandDesignUpdateBubbleCta(onboardingStore, appInstallStore, appTheme.isLightModeEnabled(), deviceInfo)
+                    DaxVisitSiteOptionsBrandDesignUpdateBubbleCta(
+                        onboardingStore,
+                        appInstallStore,
+                        appTheme.isLightModeEnabled(),
+                        deviceInfo,
+                        onboardingImprovementsEnabled = isOnboardingImprovementsEnabled(),
+                    )
                 } else {
                     DaxBubbleCta.DaxIntroVisitSiteOptionsCta(onboardingStore, appInstallStore)
                 }
@@ -374,7 +384,13 @@ class CtaViewModel @Inject constructor(
             // End
             canShowDaxCtaEndOfJourney() && !extendedOnboardingFeatureToggles.noBrowserCtas().isEnabled() -> {
                 if (isBrandDesignUpdateEnabled()) {
-                    DaxEndBrandDesignUpdateBubbleCta(onboardingStore, appInstallStore, appTheme.isLightModeEnabled(), deviceInfo)
+                    DaxEndBrandDesignUpdateBubbleCta(
+                        onboardingStore,
+                        appInstallStore,
+                        appTheme.isLightModeEnabled(),
+                        deviceInfo,
+                        onboardingImprovementsEnabled = isOnboardingImprovementsEnabled(),
+                    )
                 } else {
                     DaxBubbleCta.DaxEndCta(onboardingStore, appInstallStore)
                 }
@@ -389,6 +405,7 @@ class CtaViewModel @Inject constructor(
                         appTheme.isLightModeEnabled(),
                         deviceInfo,
                         isFreeTrialCopy = freeTrialCopyAvailable(),
+                        onboardingImprovementsEnabled = isOnboardingImprovementsEnabled(),
                     )
                 } else {
                     DaxBubbleCta.DaxSubscriptionCta(

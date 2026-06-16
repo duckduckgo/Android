@@ -79,6 +79,7 @@ class AdBlockingExtensionJsInjectorPlugin @Inject constructor(
 
     private fun buildScript(scriptlets: List<Scriptlet>): String? =
         scriptlets
+            .filter { it.name in ALLOWED_SCRIPTLET_NAMES }
             .takeUnless { it.isEmpty() }
             ?.sortedBy { it.name }
             ?.joinToString(separator = "\n") { it.content }

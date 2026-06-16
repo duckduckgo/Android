@@ -112,7 +112,7 @@ class AttachmentView(
     fun clearAttachmentsForNewChat() = viewModel?.clearAttachmentsForNewChat()
 
     private fun buildAttachButton(): ImageView {
-        val iconSize = context.resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.toolbarIcon)
+        val iconSize = context.resources.getDimensionPixelSize(R.dimen.nativeInputButtonSize)
         return ImageView(context).apply {
             layoutParams = LayoutParams(iconSize, iconSize)
             setBackgroundResource(com.duckduckgo.mobile.android.R.drawable.selectable_item_rounded_corner_background)
@@ -280,7 +280,7 @@ class AttachmentView(
             ) {
                 popup.dismiss()
                 host?.showAttachmentChooser(true)
-                onCameraCaptureRequested?.invoke(buildImagePickerCallback())
+                onCameraCaptureRequested?.invoke(buildImagePickerCallback(AttachmentViewModel.ImageSource.CAMERA))
             }
 
             addMenuItem(
@@ -290,7 +290,7 @@ class AttachmentView(
             ) {
                 popup.dismiss()
                 host?.showAttachmentChooser(true)
-                onFilePickerRequested?.invoke(buildImagePickerCallback(), listOf("image/*"))
+                onFilePickerRequested?.invoke(buildImagePickerCallback(AttachmentViewModel.ImageSource.PHOTO_LIBRARY), listOf("image/*"))
             }
         }
 
@@ -335,9 +335,9 @@ class AttachmentView(
         popupWindow = null
     }
 
-    private fun buildImagePickerCallback(): ValueCallback<Array<Uri>> = ValueCallback { uris ->
+    private fun buildImagePickerCallback(source: AttachmentViewModel.ImageSource): ValueCallback<Array<Uri>> = ValueCallback { uris ->
         val list = uris?.toList()
-        if (!list.isNullOrEmpty()) viewModel?.onImagesPicked(list)
+        if (!list.isNullOrEmpty()) viewModel?.onImagesPicked(list, source)
     }
 
     private fun buildFilePickerCallback(): ValueCallback<Array<Uri>> = ValueCallback { uris ->

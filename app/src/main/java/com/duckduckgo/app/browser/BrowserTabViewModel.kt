@@ -46,6 +46,8 @@ import androidx.lifecycle.asFlow
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import androidx.webkit.JavaScriptReplyProxy
+import com.duckduckgo.adblocking.api.duckplayer.DuckPlayer
+import com.duckduckgo.adblocking.api.duckplayer.DuckPlayer.DuckPlayerState.ENABLED
 import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.accessibility.data.AccessibilitySettingsDataStore
@@ -311,6 +313,7 @@ import com.duckduckgo.autofill.api.passwordgeneration.AutomaticSavedLoginsMonito
 import com.duckduckgo.autofill.impl.AutofillFireproofDialogSuppressor
 import com.duckduckgo.brokensite.api.BrokenSitePrompt
 import com.duckduckgo.brokensite.api.RefreshPattern
+import com.duckduckgo.browser.api.BrowserRefreshTriggerPlugin
 import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.browser.api.autocomplete.AutoComplete
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteResult
@@ -353,6 +356,7 @@ import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
 import com.duckduckgo.downloads.api.model.DownloadItem
 import com.duckduckgo.downloads.store.DownloadStatus
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
+import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.contextual.PageContextJSHelper
 import com.duckduckgo.duckchat.impl.contextual.RealPageContextJSHelper.Companion.PAGE_CONTEXT_FEATURE_NAME
@@ -361,8 +365,6 @@ import com.duckduckgo.duckchat.impl.helper.NativeAction
 import com.duckduckgo.duckchat.impl.helper.RealDuckChatJSHelper.Companion.DUCK_CHAT_FEATURE_NAME
 import com.duckduckgo.duckchat.impl.messaging.sync.SyncStatusChangedObserver
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
-import com.duckduckgo.duckplayer.api.DuckPlayer
-import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState.ENABLED
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.history.api.NavigationHistory
 import com.duckduckgo.js.messaging.api.JsCallbackData
@@ -431,9 +433,11 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import logcat.LogPriority.ERROR
@@ -513,6 +517,7 @@ class BrowserTabViewModel @Inject constructor(
     private val httpErrorPixels: Lazy<HttpErrorPixels>,
     private val duckPlayer: DuckPlayer,
     private val duckChat: DuckChat,
+    private val duckAiHostProvider: DuckAiHostProvider,
     private val duckAiFeatureState: DuckAiFeatureState,
     private val duckPlayerJSHelper: DuckPlayerJSHelper,
     private val refreshPixelSender: RefreshPixelSender,
@@ -552,6 +557,7 @@ class BrowserTabViewModel @Inject constructor(
     private val faviconFetchingFixFeature: FaviconFetchingFixFeature,
     private val ntpAfterIdleManager: NtpAfterIdleManager,
     private val browserInteractionsPlugins: PluginPoint<BrowserInteractionsPlugin>,
+    private val browserRefreshTriggerPlugins: PluginPoint<BrowserRefreshTriggerPlugin>,
     private val inlinePdfHandler: InlinePdfHandler,
     private val pdfDownloadTooltipDataStore: PdfDownloadTooltipDataStore,
     private val cachedFileDownloader: CachedFileDownloader,
@@ -729,6 +735,7 @@ class BrowserTabViewModel @Inject constructor(
     private var hasCompletedPageLoad = false
 
     private var allowlistRefreshTriggerJob: Job? = null
+    private var refreshTriggerJob: Job? = null
     private var isCustomTabScreen: Boolean = false
     private var alreadyShownKeyboard: Boolean = false
     private var pendingDuckChatAuthUpdate: Boolean = false
@@ -843,6 +850,7 @@ class BrowserTabViewModel @Inject constructor(
             }.launchIn(viewModelScope)
 
         observeAccessibilitySettings()
+        observeRefreshTriggers()
 
         savedSitesRepository
             .getFavorites()
@@ -1001,6 +1009,7 @@ class BrowserTabViewModel @Inject constructor(
 
     fun onViewRecreated() {
         observeAccessibilitySettings()
+        observeRefreshTriggers()
     }
 
     fun observeSelectedTab(isRestored: Boolean) {
@@ -1053,22 +1062,29 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun observeAccessibilitySettings() {
+        // Applies the current text size to the WebView. Reloading on a change is handled separately by
+        // AccessibilityRefreshTriggerPlugin via observeRefreshTriggers().
         accessibilityObserver?.cancel()
         accessibilityObserver =
             accessibilitySettingsDataStore
                 .settingsFlow()
-                .combine(refreshOnViewVisible.asStateFlow(), ::Pair)
-                .onEach { (settings, viewVisible) ->
-                    logcat(VERBOSE) { "Accessibility: newSettings $settings, $viewVisible" }
-                    val shouldRefreshWebview =
-                        (currentAccessibilityViewState().forceZoom != settings.forceZoom) || currentAccessibilityViewState().refreshWebView
-                    accessibilityViewState.value =
-                        currentAccessibilityViewState().copy(
-                            fontSize = settings.fontSize,
-                            forceZoom = settings.forceZoom,
-                            refreshWebView = shouldRefreshWebview,
-                        )
+                .onEach { settings ->
+                    accessibilityViewState.value = currentAccessibilityViewState().copy(fontSize = settings.fontSize)
                 }.launchIn(viewModelScope)
+    }
+
+    fun observeRefreshTriggers() {
+        refreshTriggerJob?.cancel()
+        refreshTriggerJob = browserRefreshTriggerPlugins.getPlugins()
+            .map { plugin ->
+                plugin.observeRefreshRequests()
+                    .catch { logcat(WARN) { "Refresh trigger failed: ${it.asLog()}" } }
+            }
+            .merge()
+            .debounce(REFRESH_TRIGGER_DEBOUNCE_MILLIS)
+            .flatMapLatest { refreshOnViewVisible.asStateFlow().filter { it }.take(1) }
+            .onEach { command.value = NavigationCommand.Refresh }
+            .launchIn(viewModelScope)
     }
 
     private fun observeSyncStatusChangesForDuckChat() {
@@ -1457,6 +1473,10 @@ class BrowserTabViewModel @Inject constructor(
         val verticalParameter = extractVerticalParameter(url)
         var urlToNavigate = queryUrlConverter.convertQueryToUrl(trimmedInput, verticalParameter, queryOrigin)
 
+        if (queryOrigin is QueryOrigin.FromUser && isTypedDuckAiUrl(urlToNavigate)) {
+            fireDuckAiDirectNavigationPixel()
+        }
+
         when (val type = specialUrlDetector.determineType(trimmedInput)) {
             is ShouldLaunchDuckChatLink -> {
                 runCatching {
@@ -1542,6 +1562,18 @@ class BrowserTabViewModel @Inject constructor(
             )
         autoCompleteViewState.value =
             currentAutoCompleteViewState().copy(showSuggestions = false, showFocusedView = false, searchResults = AutoCompleteResult("", emptyList()))
+    }
+
+    private fun isTypedDuckAiUrl(url: String): Boolean {
+        val host = runCatching { url.toUri().host }.getOrNull()?.lowercase() ?: return false
+        val duckAiHost = duckAiHostProvider.getHost().lowercase()
+        return host == duckAiHost || host == "www.$duckAiHost"
+    }
+
+    private fun fireDuckAiDirectNavigationPixel() {
+        val params = mapOf("duck_ai_enabled" to duckChat.isEnabled().toString())
+        pixel.fire(AppPixelName.AI_CHAT_DUCK_AI_DIRECT_NAVIGATION_COUNT, parameters = params)
+        pixel.fire(AppPixelName.AI_CHAT_DUCK_AI_DIRECT_NAVIGATION_DAILY, parameters = params, type = Daily())
     }
 
     private fun getUrlHeaders(url: String?): Map<String, String> = url?.let { customHeadersProvider.getCustomHeaders(it) } ?: emptyMap()
@@ -3278,13 +3310,16 @@ class BrowserTabViewModel @Inject constructor(
             },
         )
 
-        if (desktopSiteRequested && uri.isMobileSite) {
-            val desktopUrl = uri.toDesktopUri().toString()
-            logcat(INFO) { "Original URL $url - attempting $desktopUrl with desktop site UA string" }
-            command.value = NavigationCommand.Navigate(desktopUrl, getUrlHeaders(desktopUrl))
+        // Re-load via Navigate (loadUrl) rather than Refresh (reload) so the WebView performs a fresh
+        // layout and re-applies overview mode (loadWithOverviewMode + useWideViewPort). reload() keeps the
+        // previous zoom scale, which would leave the wider desktop layout rendered at the old mobile scale.
+        val targetUrl = if (desktopSiteRequested && uri.isMobileSite) {
+            uri.toDesktopUri().toString()
         } else {
-            command.value = NavigationCommand.Refresh
+            uri.toString()
         }
+        logcat(INFO) { "Original URL $url - reloading $targetUrl with ${if (desktopSiteRequested) "desktop" else "mobile"} site UA string" }
+        command.value = NavigationCommand.Navigate(targetUrl, getUrlHeaders(targetUrl))
     }
 
     private fun initializeViewStates() {
@@ -4219,7 +4254,6 @@ class BrowserTabViewModel @Inject constructor(
         resetTrackersCount()
         refreshBrowserError()
         resetAutoConsent()
-        accessibilityViewState.value = currentAccessibilityViewState().copy(refreshWebView = false)
         canAutofillSelectCredentialsDialogCanAutomaticallyShow = true
     }
 
@@ -4634,7 +4668,7 @@ class BrowserTabViewModel @Inject constructor(
                             JSONObject(
                                 mapOf(
                                     "desktopModeEnabled" to (getSite()?.isDesktopMode ?: false),
-                                    "forcedZoomEnabled" to (accessibilityViewState.value?.forceZoom ?: false),
+                                    "forcedZoomEnabled" to accessibilitySettingsDataStore.forceZoom,
                                 ),
                             )
                         viewModelScope.launch {
@@ -4690,7 +4724,7 @@ class BrowserTabViewModel @Inject constructor(
                             params = JSONObject(
                                 mapOf(
                                     "desktopModeEnabled" to (getSite()?.isDesktopMode ?: false),
-                                    "forcedZoomEnabled" to (accessibilityViewState.value?.forceZoom ?: false),
+                                    "forcedZoomEnabled" to accessibilitySettingsDataStore.forceZoom,
                                 ),
                             ),
                             featureName = featureName,
@@ -5289,6 +5323,7 @@ class BrowserTabViewModel @Inject constructor(
      * fullscreen mode we fall back to the legacy Intent-based path.
      */
     fun openDuckAiQuery(query: String, autoPrompt: Boolean) {
+        browserInteractionsPlugins.getPlugins().forEach { it.onInputSubmitted() }
         if (!duckAiFeatureState.showFullScreenMode.value) {
             if (autoPrompt) {
                 duckChat.openDuckChatWithAutoPrompt(query)
@@ -5307,6 +5342,7 @@ class BrowserTabViewModel @Inject constructor(
      * routed through the normal submit path which lands in the legacy Intent flow.
      */
     fun openDuckAiChatById(chatUrl: String) {
+        browserInteractionsPlugins.getPlugins().forEach { it.onChatSelected() }
         if (!duckAiFeatureState.showFullScreenMode.value) {
             onUserSubmittedQuery(chatUrl)
             return
@@ -5364,11 +5400,15 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
-    fun openDuckChatSettings() {
-        viewModelScope.launch {
-            pixel.fire(DuckChatPixelName.DUCK_CHAT_DUCK_AI_SETTINGS_TAPPED)
-            val subscriptionEvent = duckChatJSHelper.onNativeAction(NativeAction.DUCK_AI_SETTINGS)
-            _subscriptionEventDataChannel.send(subscriptionEvent)
+    fun openDuckChatSettings(viewMode: ViewMode) {
+        pixel.fire(DuckChatPixelName.DUCK_CHAT_DUCK_AI_SETTINGS_TAPPED)
+        if (viewMode == ViewMode.DuckAI) {
+            viewModelScope.launch {
+                val subscriptionEvent = duckChatJSHelper.onNativeAction(NativeAction.DUCK_AI_SETTINGS)
+                _subscriptionEventDataChannel.send(subscriptionEvent)
+            }
+        } else {
+            command.value = OpenInNewTab(duckChat.getDuckChatSettingsUrl(), tabId)
         }
     }
 
@@ -5542,6 +5582,8 @@ class BrowserTabViewModel @Inject constructor(
     companion object {
         private const val FIXED_PROGRESS = 50
         private const val UPGRADED_PROGRESS_THRESHOLD = 95
+
+        private const val REFRESH_TRIGGER_DEBOUNCE_MILLIS = 200L
 
         // Minimum progress to show web content again after decided to hide web content (possible spoofing attack).
         // We think that progress is enough to assume next site has already loaded new content.

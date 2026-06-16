@@ -39,6 +39,7 @@ import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.widget.Toolbar
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.content.ContextCompat
@@ -102,11 +103,13 @@ import com.duckduckgo.app.browser.omnibar.model.Decoration.PrivacyShieldChanged
 import com.duckduckgo.app.browser.omnibar.model.Decoration.QueueCookiesAnimation
 import com.duckduckgo.app.browser.omnibar.model.StateChange
 import com.duckduckgo.app.browser.progressbar.PageLoadProgressBar
+import com.duckduckgo.app.clipboard.ClipboardInteractor
 import com.duckduckgo.app.global.view.renderIfChanged
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.browser.ui.tabs.TabSwitcherButton
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.KeyboardAwareEditText
 import com.duckduckgo.common.ui.view.KeyboardAwareEditText.ShowSuggestionsListener
@@ -208,6 +211,12 @@ class OmnibarLayout @JvmOverloads constructor(
 
     @Inject
     lateinit var omnibarRepository: OmnibarRepository
+
+    @Inject
+    lateinit var clipboardInteractor: ClipboardInteractor
+
+    @Inject
+    lateinit var browserMode: BrowserMode
 
     private var previousTransitionState: TransitionState? = null
     private var lastAppliedShowContextualSheetIcon: Boolean? = null
@@ -742,6 +751,17 @@ class OmnibarLayout @JvmOverloads constructor(
             }
 
             is Command.CancelEasterEggLogoAnimation -> cancelEasterEggLogoAnimation()
+
+            is Command.CopyUrlToClipboard -> {
+                copyUrlToClipboardAndShowToast(command)
+            }
+        }
+    }
+
+    private fun copyUrlToClipboardAndShowToast(command: Command.CopyUrlToClipboard) {
+        val notificationShownAutomatically = clipboardInteractor.copyToClipboard(toCopy = command.url, isSensitive = false)
+        if (!notificationShownAutomatically) {
+            Toast.makeText(context, R.string.urlCopiedToClipboard, Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -1144,6 +1164,7 @@ class OmnibarLayout @JvmOverloads constructor(
                     trackersAnimationView = trackersAnimation,
                     omnibarViews = omnibarViews(),
                     entities = events,
+                    useLightAnimation = if (browserMode == BrowserMode.FIRE) false else null,
                 )
             }
         } else if (omnibarRepository.isNewCustomTabEnabled) {
@@ -1188,15 +1209,14 @@ class OmnibarLayout @JvmOverloads constructor(
                     customTabToolbarContainer.customTabShieldIcon
                 }
 
-            // For new custom tabs, determine light/dark variant based on container color
-            // Shield sits on customTabToolbarColor background, so invert: light bg needs dark shield
-            val useLightAnimation = if (viewMode is ViewMode.CustomTab &&
-                omnibarRepository.isNewCustomTabEnabled &&
-                !isDefaultToolbarColor(customTabToolbarColor)
-            ) {
-                isColorLight(customTabToolbarColor)
-            } else {
-                null // Use default theme-based selection
+            val useLightAnimation = when {
+                // Fire mode forces a dark omnibar even in light app theme — use the dark shield
+                browserMode == BrowserMode.FIRE -> false
+                // For new custom tabs, determine light/dark variant based on container color
+                viewMode is ViewMode.CustomTab &&
+                    omnibarRepository.isNewCustomTabEnabled &&
+                    !isDefaultToolbarColor(customTabToolbarColor) -> isColorLight(customTabToolbarColor)
+                else -> null // Use default theme-based selection
             }
 
             privacyShieldView.setAnimationView(shieldIconView, privacyShieldState, viewMode, useLightAnimation)
@@ -1247,6 +1267,11 @@ class OmnibarLayout @JvmOverloads constructor(
 
                     customTabShieldIcon.setOnClickListener { _ ->
                         omnibarItemPressedListener?.onCustomTabPrivacyDashboardPressed()
+                    }
+
+                    customTabToolbar.setOnLongClickListener {
+                        viewModel.onCustomTabUrlLongClicked()
+                        true
                     }
                 }
             }

@@ -25,15 +25,18 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.Lifecycle.State.CREATED
 import androidx.lifecycle.testing.TestLifecycleOwner
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import app.cash.turbine.test
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.AppUrl
+import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.cookies.api.CookieManagerProvider
 import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import com.duckduckgo.duckchat.api.DuckChatSettingsNoParams
 import com.duckduckgo.duckchat.api.InputMode
+import com.duckduckgo.duckchat.api.nativeinput.NativeInputFieldSuppressor
 import com.duckduckgo.duckchat.impl.feature.AIChatImageUploadFeature
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.inputscreen.newaddressbaroption.NewAddressBarCallback
@@ -46,6 +49,7 @@ import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_NEW_ADDRES
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_NEW_ADDRESS_BAR_PICKER_DISPLAYED
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_NEW_ADDRESS_BAR_PICKER_NOT_NOW
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelParameters.NEW_ADDRESS_BAR_SELECTION
+import com.duckduckgo.duckchat.impl.repository.AddressBarPickerAttributionRepository
 import com.duckduckgo.duckchat.impl.repository.DuckChatFeatureRepository
 import com.duckduckgo.duckchat.impl.store.DefaultTogglePosition
 import com.duckduckgo.duckchat.impl.voice.VoiceSessionStateManager
@@ -91,6 +95,7 @@ class RealDuckChatTest {
     var coroutineRule = CoroutineTestRule()
 
     private val mockDuckChatFeatureRepository: DuckChatFeatureRepository = mock()
+    private val mockAddressBarPickerAttributionRepository: AddressBarPickerAttributionRepository = mock()
     private val duckChatFeature = FakeFeatureToggleFactory.create(DuckChatFeature::class.java)
     private val moshi: Moshi = Moshi.Builder().build()
     private val dispatcherProvider = coroutineRule.testDispatcherProvider
@@ -107,6 +112,15 @@ class RealDuckChatTest {
     private val mockDuckAiHostProvider: DuckAiHostProvider = mock()
     private val mockAppBuildConfig: AppBuildConfig = mock()
     private val mockVoiceSessionStateManager: VoiceSessionStateManager = mock()
+
+    private var nativeInputFieldSuppressed = false
+    private val nativeInputFieldSuppressors = object : PluginPoint<NativeInputFieldSuppressor> {
+        override fun getPlugins(): Collection<NativeInputFieldSuppressor> = listOf(
+            object : NativeInputFieldSuppressor {
+                override suspend fun isNativeInputFieldSuppressed(): Boolean = nativeInputFieldSuppressed
+            },
+        )
+    }
 
     private lateinit var testee: RealDuckChat
 
@@ -132,6 +146,7 @@ class RealDuckChatTest {
         testee = spy(
             RealDuckChat(
                 mockDuckChatFeatureRepository,
+                mockAddressBarPickerAttributionRepository,
                 duckChatFeature,
                 moshi,
                 dispatcherProvider,
@@ -148,6 +163,7 @@ class RealDuckChatTest {
                 mockDuckAiHostProvider,
                 mockAppBuildConfig,
                 mockVoiceSessionStateManager,
+                nativeInputFieldSuppressors,
             ),
         )
         coroutineRule.testScope.advanceUntilIdle()
@@ -303,6 +319,28 @@ class RealDuckChatTest {
         advanceUntilIdle()
 
         assertFalse(testee.observeNativeInputFieldUserSettingEnabled().first())
+    }
+
+    @Test
+    fun whenNativeInputFieldEnabledButSuppressedThenObserveEmitsFalse() = runTest {
+        duckChatFeature.nativeInputField().setRawStoredState(State(enable = true))
+        nativeInputFieldSuppressed = true
+
+        testee.onPrivacyConfigDownloaded()
+        advanceUntilIdle()
+
+        assertFalse(testee.observeNativeInputFieldUserSettingEnabled().first())
+    }
+
+    @Test
+    fun whenNativeInputFieldEnabledAndNotSuppressedThenObserveEmitsTrue() = runTest {
+        duckChatFeature.nativeInputField().setRawStoredState(State(enable = true))
+        nativeInputFieldSuppressed = false
+
+        testee.onPrivacyConfigDownloaded()
+        advanceUntilIdle()
+
+        assertTrue(testee.observeNativeInputFieldUserSettingEnabled().first())
     }
 
     @Test
@@ -674,6 +712,51 @@ class RealDuckChatTest {
             duckChatUrl = "https://duck.ai/chat?q=example&prompt=1&duckai=5",
         )
         verify(mockContext).startActivity(mockIntent)
+    }
+
+    @Test
+    fun whenOnAddressBarPickerDuckAiSelectedThenDelegatesToRepository() = runTest {
+        testee.onAddressBarPickerDuckAiSelected()
+
+        verify(mockAddressBarPickerAttributionRepository).onPickerDuckAiSelected()
+    }
+
+    @Test
+    fun whenNativeInputEnabledAndAttributedToPickerThenUrlContainsOrigin() = runTest {
+        duckChatFeature.nativeInputField().setRawStoredState(State(enable = true))
+        testee.onPrivacyConfigDownloaded()
+        coroutineRule.testScope.advanceUntilIdle()
+        whenever(mockAddressBarPickerAttributionRepository.consumeAttributionToPicker()).thenReturn(true)
+
+        val url = testee.getDuckChatUrl(query = "query", autoPrompt = true)
+
+        assertEquals(
+            "https://duck.ai/chat?q=query&prompt=1&native-input=true&origin=funnel_addressbar_android__aitoggle&duckai=5",
+            url,
+        )
+    }
+
+    @Test
+    fun whenNativeInputEnabledAndNotAttributedThenUrlHasNoOrigin() = runTest {
+        duckChatFeature.nativeInputField().setRawStoredState(State(enable = true))
+        testee.onPrivacyConfigDownloaded()
+        coroutineRule.testScope.advanceUntilIdle()
+        whenever(mockAddressBarPickerAttributionRepository.consumeAttributionToPicker()).thenReturn(false)
+
+        val url = testee.getDuckChatUrl(query = "query", autoPrompt = true)
+
+        assertEquals("https://duck.ai/chat?q=query&prompt=1&native-input=true&duckai=5", url)
+    }
+
+    @Test
+    fun whenNativeInputDisabledThenUrlHasNoOriginParam() = runTest {
+        duckChatFeature.nativeInputField().setRawStoredState(State(enable = false))
+        testee.onPrivacyConfigDownloaded()
+        coroutineRule.testScope.advanceUntilIdle()
+
+        val url = testee.getDuckChatUrl(query = "query", autoPrompt = true)
+
+        assertEquals("https://duck.ai/chat?q=query&prompt=1&duckai=5", url)
     }
 
     @Test
@@ -1168,12 +1251,25 @@ class RealDuckChatTest {
     @Test
     fun `when showAIChatAddressBarChoiceScreen enabled then showNewAddressBarOptionChoiceScreen emits true`() = runTest {
         duckChatFeature.showAIChatAddressBarChoiceScreen().setRawStoredState(State(enable = true))
+        duckChatFeature.showNewAddressBarPickerScreen().setRawStoredState(State(enable = false))
         whenever(mockDuckChatFeatureRepository.isDuckChatUserEnabled()).thenReturn(true)
         whenever(mockDuckChatFeatureRepository.shouldShowInAddressBar()).thenReturn(true)
 
         testee.onPrivacyConfigDownloaded()
 
         assertTrue(testee.showNewAddressBarOptionChoiceScreen.value)
+    }
+
+    @Test
+    fun `when V2 picker enabled then showNewAddressBarOptionChoiceScreen emits false even if V1 enabled`() = runTest {
+        duckChatFeature.showAIChatAddressBarChoiceScreen().setRawStoredState(State(enable = true))
+        duckChatFeature.showNewAddressBarPickerScreen().setRawStoredState(State(enable = true))
+        whenever(mockDuckChatFeatureRepository.isDuckChatUserEnabled()).thenReturn(true)
+        whenever(mockDuckChatFeatureRepository.shouldShowInAddressBar()).thenReturn(true)
+
+        testee.onPrivacyConfigDownloaded()
+
+        assertFalse(testee.showNewAddressBarOptionChoiceScreen.value)
     }
 
     @Test
@@ -1430,6 +1526,22 @@ class RealDuckChatTest {
         val url = testee.getDuckChatUrl(query = "", autoPrompt = false, sidebar = false)
 
         assertTrue(url == "https://duck.ai/chat?duckai=5")
+    }
+
+    @Test
+    fun `when get duck chat settings url then return settings url with configured host`() = runTest {
+        val url = testee.getDuckChatSettingsUrl()
+
+        assertTrue(url == "https://duck.ai?settings=open")
+    }
+
+    @Test
+    fun `when get duck chat settings url with custom host then use that host`() = runTest {
+        whenever(mockDuckAiHostProvider.getHost()).thenReturn("staging.duck.ai")
+
+        val url = testee.getDuckChatSettingsUrl()
+
+        assertTrue(url == "https://staging.duck.ai?settings=open")
     }
 
     @Test
@@ -1900,6 +2012,15 @@ class RealDuckChatTest {
         coroutineRule.testScope.advanceUntilIdle()
 
         assertFalse(testee.isChatHistoryAvailable())
+    }
+
+    @Test
+    fun whenRequestShowModelPickerThenEventEmittedWithTabId() = runTest {
+        testee.showModelPickerEvents.test {
+            testee.requestShowModelPicker("tab-1")
+            assertEquals("tab-1", awaitItem())
+            cancelAndConsumeRemainingEvents()
+        }
     }
 
     private suspend fun enableChatHistoryFlags() {

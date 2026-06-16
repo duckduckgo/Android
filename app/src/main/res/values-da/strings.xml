@@ -75,6 +75,7 @@
     <string name="options">Valgmuligheder</string>
     <string name="shareLink">Del link</string>
     <string name="copyUrl">Kopiér linkadresse</string>
+    <string name="urlCopiedToClipboard">URL kopieret til udklipsholder</string>
 
     <!-- Find in page -->
     <string name="nextSearchTermDescription">Find næste</string>
@@ -1032,4 +1033,8 @@
 
     <string name="input_screen_user_pref_without_ai_updated">Kun søgning</string>
     <string name="input_screen_user_pref_with_ai_updated">Skift mellem\nSøgning og Duck.ai</string>
+
+    <!-- New Address Bar Picker -->
+    <string name="newAddressBarPickerDuckDuckGo" translatable="false">DuckDuckGo</string>
+    <string name="newAddressBarPickerConfirm">Bekræft</string>
 </resources>

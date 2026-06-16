@@ -61,6 +61,12 @@
             android:background="?attr/daxColorShadeSolid"
             android:layout_gravity="bottom" />
 
+        <include
+            android:id="@+id/fireTabsEmptyState"
+            layout="@layout/view_fire_tabs_empty_state"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
     </FrameLayout>
 
     <include

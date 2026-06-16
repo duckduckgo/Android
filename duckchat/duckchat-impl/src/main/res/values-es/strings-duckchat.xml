@@ -116,6 +116,13 @@
     <!-- Duck AI Voice Chat Shortcut Setting -->
     <string name="duckAiVoiceChatVisibilitySetting" instruction="Voice Chat is a feature that lets users talk to Duck.ai using their voice instead of typing.">Chat de voz</string>
 
+    <!-- Duck.ai voice microphone foreground service notification -->
+    <string name="duckAiVoiceNotificationTitle" instruction="Title shown in the notification when Duck.ai Voice Chat is active and using the microphone.">Chat de voz de Duck.ai activo</string>
+    <string name="duckAiVoiceNotificationMessage" instruction="Message shown in the notification explaining that the microphone is being used by Duck.ai.">Micrófono utilizado por Duck.ai</string>
+    <string name="duckAiVoiceNotificationChannelName" instruction="Name of the Android notification channel for the Duck.ai Voice Chat foreground service.">Chat de voz de Duck.ai</string>
+    <string name="duckAiVoiceNotificationActionOpenChat" instruction="Notification action button that opens the active Duck.ai chat.">Abrir chat</string>
+    <string name="duckAiVoiceNotificationActionEndSession" instruction="Notification action button that ends the active Duck.ai voice chat session.">Finalizar chat</string>
+
     <!-- Duck AI Chat Suggestions -->
     <string name="duckAiChatHistoryViewAllChats">Ver todos los chats</string>
 

@@ -49,6 +49,7 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewGroup.LayoutParams
+import android.view.ViewTreeObserver
 import android.webkit.PermissionRequest
 import android.webkit.SslErrorHandler
 import android.webkit.ValueCallback
@@ -102,6 +103,8 @@ import androidx.webkit.WebMessageCompat
 import androidx.webkit.WebSettingsCompat
 import androidx.webkit.WebViewCompat
 import androidx.webkit.WebViewFeature
+import com.duckduckgo.adblocking.api.duckplayer.DuckPlayer
+import com.duckduckgo.adblocking.api.duckplayer.DuckPlayerSettingsNoParams
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.accessibility.data.AccessibilitySettingsDataStore
 import com.duckduckgo.app.bookmarks.dialog.BookmarkAddedConfirmationDialog
@@ -151,6 +154,7 @@ import com.duckduckgo.app.browser.nativeinput.NativeInputManager
 import com.duckduckgo.app.browser.navigation.bar.BrowserNavigationBarViewIntegration
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarObserver
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarView
+import com.duckduckgo.app.browser.newaddressbaroption.NewAddressBarPickerManager
 import com.duckduckgo.app.browser.omnibar.Omnibar
 import com.duckduckgo.app.browser.omnibar.Omnibar.FindInPageListener
 import com.duckduckgo.app.browser.omnibar.Omnibar.ItemPressedListener
@@ -302,6 +306,9 @@ import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.common.utils.KeyboardVisibilityUtil
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.common.utils.extensions.hideKeyboard
 import com.duckduckgo.common.utils.extensions.html
 import com.duckduckgo.common.utils.extensions.showKeyboard
@@ -333,8 +340,6 @@ import com.duckduckgo.duckchat.impl.contextual.DuckChatContextualFragment.Compan
 import com.duckduckgo.duckchat.impl.contextual.DuckChatContextualFragment.Companion.KEY_DUCK_AI_URL
 import com.duckduckgo.duckchat.impl.contextual.DuckChatContextualSharedViewModel
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
-import com.duckduckgo.duckplayer.api.DuckPlayer
-import com.duckduckgo.duckplayer.api.DuckPlayerSettingsNoParams
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessaging
@@ -637,6 +642,9 @@ class BrowserTabFragment :
     lateinit var duckChat: DuckChat
 
     @Inject
+    lateinit var newAddressBarPickerManager: NewAddressBarPickerManager
+
+    @Inject
     lateinit var fireModeAvailability: FireModeAvailability
 
     @Inject
@@ -677,6 +685,12 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var clipboardInteractor: ClipboardInteractor
+
+    @Inject
+    lateinit var edgeToEdgeProvider: EdgeToEdgeProvider
+
+    @Inject
+    lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
 
     /**
      * We use this to monitor whether the user was seeing the in-context Email Protection signup prompt
@@ -804,10 +818,10 @@ class BrowserTabFragment :
                 duckChat.openVoiceDuckChat()
             }
             onMenuItemClicked(contentView.findViewById(com.duckduckgo.duckchat.impl.R.id.chatMenuPopupNewTab)) {
-                browserActivity?.launchNewTab()
+                browserActivity?.launchNewTab(browserMode = BrowserMode.REGULAR)
             }
             onMenuItemClicked(contentView.findViewById(com.duckduckgo.duckchat.impl.R.id.chatMenuPopupNewFireTab)) {
-                browserActivity?.launchNewTab()
+                browserActivity?.launchNewTab(browserMode = BrowserMode.FIRE)
             }
         }
     }
@@ -1211,6 +1225,10 @@ class BrowserTabFragment :
 
         disableViewStateSaving()
 
+        if (edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.BROWSER)) {
+            edgeToEdgeHandler.applyNavigationBarInsetsAsMargin(binding.rootView)
+        }
+
         if (savedInstanceState == null) {
             viewModel.setIsCustomTab(tabDisplayedInCustomTabScreen)
             messageFromPreviousTab?.let {
@@ -1370,7 +1388,7 @@ class BrowserTabFragment :
     private fun configureInputScreenLauncher() {
         omnibar.configureInputScreenLaunchListener { query ->
             if (!nativeInputManager.isNativeInputEnabled()) {
-                launchInputScreen(query)
+                launchInputScreen(query, isNewTab = omnibar.viewMode == NewTab)
             } else {
                 removeDuckChatContextualSheet()
                 showNativeInput(query)
@@ -1444,6 +1462,18 @@ class BrowserTabFragment :
                             featureName = "aiChat",
                             subscriptionName = "submitPromptInterruption",
                             params = JSONObject("{}"),
+                        ),
+                    )
+                },
+                onChangeModelSubmitted = { modelId ->
+                    contentScopeScripts.sendSubscriptionEvent(
+                        SubscriptionEventData(
+                            featureName = "aiChat",
+                            subscriptionName = "submitChangeModelAction",
+                            params = JSONObject().apply {
+                                put("platform", "android")
+                                put("modelId", modelId)
+                            },
                         ),
                     )
                 },
@@ -1856,7 +1886,7 @@ class BrowserTabFragment :
                 viewModel.openDuckChatHistory()
             }
             onMenuItemClicked(duckChatSettingsMenuItem) {
-                viewModel.openDuckChatSettings()
+                viewModel.openDuckChatSettings(omnibar.viewMode)
             }
             onMenuItemClicked(fireMenuItem) {
                 onFireButtonPressed()
@@ -2045,6 +2075,7 @@ class BrowserTabFragment :
         }
         contextualSheetBottomSheetCallback = null
         browserNavigationBarIntegration.onDestroyView()
+        renderer.removeBrandDesignFitListener()
         super.onDestroyView()
     }
 
@@ -2238,6 +2269,9 @@ class BrowserTabFragment :
         hidePdf()
 
         browserNavigationBarIntegration.configureNewTabViewMode()
+        viewLifecycleOwner.lifecycleScope.launch {
+            newAddressBarPickerManager.showChoiceScreen(requireActivity() as DuckDuckGoActivity)
+        }
     }
 
     private fun showBrowser() {
@@ -3738,6 +3772,19 @@ class BrowserTabFragment :
                     // no-op
                 }
 
+                override fun onTabClosed(
+                    tabId: String,
+                    onUndo: () -> Unit,
+                    onCommit: () -> Unit,
+                ) {
+                    browserActivity?.showUndoableSnackbar(
+                        message = getString(com.duckduckgo.browser.ui.R.string.newTabReturnHatchTabClosed),
+                        actionLabel = getString(com.duckduckgo.browser.ui.R.string.newTabReturnHatchUndo),
+                        onAction = onUndo,
+                        onDismiss = onCommit,
+                    )
+                }
+
                 override fun onBurnTabPressed() {
                     viewLifecycleOwner.lifecycleScope.launch {
                         val dialog = fireDialogProvider.createFireDialog(FireDialogOrigin.Hatch(newTabReturnHatchView.tabId))
@@ -4248,6 +4295,7 @@ class BrowserTabFragment :
 
     private fun hideDaxBubbleCta(cta: DaxBubbleCta?) {
         (cta as? DaxBubbleCta.BrandDesignUpdateBubbleCta)?.cancelRunningAnimations()
+        renderer.removeBrandDesignFitListener()
         newBrowserTab.browserBackground.setImageResource(0)
         val wasBrandDesign = newBrowserTab.rebrandBrowserBackground.isVisible
         newBrowserTab.rebrandBrowserBackground.apply {
@@ -4553,7 +4601,7 @@ class BrowserTabFragment :
         val distanceToTrigger = (DEFAULT_CIRCLE_TARGET_TIMES_1_5 * metrics.density).toInt()
         binding.swipeRefreshContainer.setDistanceToTriggerSync(distanceToTrigger)
         binding.swipeRefreshContainer.setColorSchemeColors(
-            requireContext().getColorFromAttr(com.duckduckgo.mobile.android.R.attr.daxColorAccentBlue),
+            requireContext().getColorFromAttr(com.duckduckgo.mobile.android.R.attr.daxColorOmnibarAccent),
         )
 
         binding.swipeRefreshContainer.setOnRefreshListener {
@@ -4959,6 +5007,9 @@ class BrowserTabFragment :
         renderer.renderHomeCta()
         recreateBrowserMenu()
         viewModel.onConfigurationChanged(orientationChanged)
+        if (orientationChanged) {
+            renderer.reapplyBubbleForOrientation()
+        }
     }
 
     fun onBackPressed(isCustomTab: Boolean = false): Boolean {
@@ -5723,6 +5774,7 @@ class BrowserTabFragment :
         private var lastSeenAutoCompleteViewState: AutoCompleteViewState? = null
         private var lastSeenCtaViewState: CtaViewState? = null
         private var lastSeenPrivacyShieldViewState: PrivacyShieldViewState? = null
+        private var brandDesignFitLayoutListener: ViewTreeObserver.OnGlobalLayoutListener? = null
 
         fun renderPrivacyShield(viewState: PrivacyShieldViewState) {
             renderIfChanged(viewState, lastSeenPrivacyShieldViewState) {
@@ -5950,20 +6002,12 @@ class BrowserTabFragment :
             logcat(INFO) { "Accessibility: render state applyAccessibilitySettings $viewState" }
             val webView = webView ?: return
 
+            // Apply the text size in place. Reloading the page so the layout reflows with the new zoom is
+            // handled by AccessibilityRefreshTriggerPlugin (a debounced refresh, deferred until visible).
             val fontSizeChanged = webView.settings.textZoom != viewState.fontSize.toInt()
             if (fontSizeChanged) {
-                logcat(INFO) {
-                    "Accessibility: UpdateAccessibilitySetting fontSizeChanged " +
-                        "from ${webView.settings.textZoom} to ${viewState.fontSize.toInt()}"
-                }
-
+                logcat(INFO) { "Accessibility: textZoom from ${webView.settings.textZoom} to ${viewState.fontSize.toInt()}" }
                 webView.settings.textZoom = viewState.fontSize.toInt()
-            }
-
-            if (this@BrowserTabFragment.isHidden && viewState.refreshWebView) return
-            if (viewState.refreshWebView) {
-                logcat(INFO) { "Accessibility: UpdateAccessibilitySetting forceZoomChanged" }
-                refresh()
             }
         }
 
@@ -6087,10 +6131,33 @@ class BrowserTabFragment :
             if (configuration is DaxBubbleCta.BrandDesignUpdateBubbleCta) {
                 setBrowserBackgroundRes(configuration.backgroundRes, useRebrandBackground = true)
                 setNewTabBackgroundColor(com.duckduckgo.mobile.android.R.attr.onboardingSurfaceBackdrop)
+                configureBrandDesignFitListener()
+                brandDesignDialogScrollView.post { configuration.applyFit() }
             } else {
+                removeBrandDesignFitListener()
                 viewModel.setBrowserBackground(appTheme.isLightModeEnabled())
             }
             viewModel.onCtaShown()
+        }
+
+        fun configureBrandDesignFitListener() {
+            removeBrandDesignFitListener()
+            val listener = ViewTreeObserver.OnGlobalLayoutListener {
+                (lastSeenCtaViewState?.cta as? DaxBubbleCta.BrandDesignUpdateBubbleCta)?.applyFit()
+            }
+            brandDesignFitLayoutListener = listener
+            brandDesignDialogScrollView.viewTreeObserver.addOnGlobalLayoutListener(listener)
+        }
+
+        fun removeBrandDesignFitListener() {
+            brandDesignFitLayoutListener?.let {
+                brandDesignDialogScrollView.viewTreeObserver.removeOnGlobalLayoutListener(it)
+            }
+            brandDesignFitLayoutListener = null
+        }
+
+        fun reapplyBubbleForOrientation() {
+            (lastSeenCtaViewState?.cta as? DaxBubbleCta.BrandDesignUpdateBubbleCta)?.onOrientationChanged()
         }
 
         private fun showPrivacyProSkippedOnboardingBottomSheet(configuration: SubscriptionPromoModalCta) {
