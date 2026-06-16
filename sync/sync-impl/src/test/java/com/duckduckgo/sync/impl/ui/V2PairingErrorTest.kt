@@ -23,6 +23,7 @@ import com.duckduckgo.sync.impl.AccountErrorCodes.PAIRING_CANCELLED
 import com.duckduckgo.sync.impl.AccountErrorCodes.PAIRING_FAILED
 import com.duckduckgo.sync.impl.AccountErrorCodes.PAIRING_REJECTED
 import com.duckduckgo.sync.impl.AccountErrorCodes.PAIRING_UNAVAILABLE
+import com.duckduckgo.sync.impl.AccountErrorCodes.THIRD_PARTY_ALREADY_UPGRADED
 import com.duckduckgo.sync.impl.R
 import org.junit.Assert.assertEquals
 import org.junit.Test
@@ -41,6 +42,13 @@ class V2PairingErrorTest {
         val content = PAIRING_CANCELLED.code.toV2PairingError()
         assertEquals(R.string.sync_dialog_error_title, content.title)
         assertEquals(R.string.sync_v2_error_pairing_canceled, content.message)
+    }
+
+    @Test
+    fun whenCodeIsThirdPartyAlreadyUpgradedThenSyncFromConnectedBrowserCopy() {
+        val content = THIRD_PARTY_ALREADY_UPGRADED.code.toV2PairingError()
+        assertEquals(R.string.sync_dialog_error_title, content.title)
+        assertEquals(R.string.sync_v2_error_third_party_already_upgraded, content.message)
     }
 
     @Test

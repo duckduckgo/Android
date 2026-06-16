@@ -33,6 +33,7 @@
     <string name="sync_v2_error_pairing_rejected">Sync canceled from your other device.</string>
     <string name="sync_v2_error_pairing_canceled">Sync canceled</string>
     <string name="sync_v2_error_upgrade_required">Update the DuckDuckGo browser and try again.</string>
+    <string name="sync_v2_error_third_party_already_upgraded">Please Sync this device from an already-connected DuckDuckGo browser on another device</string>
     <string name="sync_v2_already_paired_title">Already Paired</string>
     <string name="sync_v2_already_paired_message">You\'re already paired with this account on both devices.</string>
 </resources>
