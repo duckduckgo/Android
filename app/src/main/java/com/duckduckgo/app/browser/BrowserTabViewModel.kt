@@ -96,6 +96,7 @@ import com.duckduckgo.app.browser.commands.Command.EscapeMaliciousSite
 import com.duckduckgo.app.browser.commands.Command.ExtractSerpLogo
 import com.duckduckgo.app.browser.commands.Command.ExtractUrlFromCloakedAmpLink
 import com.duckduckgo.app.browser.commands.Command.FindInPageCommand
+import com.duckduckgo.app.browser.commands.Command.FinishCustomTab
 import com.duckduckgo.app.browser.commands.Command.GenerateWebViewPreviewImage
 import com.duckduckgo.app.browser.commands.Command.HandleNonHttpAppLink
 import com.duckduckgo.app.browser.commands.Command.HideBrokenSitePromptCta
@@ -1481,12 +1482,7 @@ class BrowserTabViewModel @Inject constructor(
             is ShouldLaunchDuckChatLink -> {
                 runCatching {
                     logcat { "Duck.ai: ShouldLaunchDuckChatLink $urlToNavigate" }
-                    val queryParameter = urlToNavigate.toUri().getQueryParameter(QUERY)
-                    if (queryParameter != null) {
-                        duckChat.openDuckChatWithPrefill(queryParameter)
-                    } else {
-                        duckChat.openDuckChat()
-                    }
+                    openDuckChatForUrl(urlToNavigate.toUri())
                     return
                 }
             }
@@ -3773,6 +3769,26 @@ class BrowserTabViewModel @Inject constructor(
 
     override fun openLinkInNewTab(uri: Uri) {
         command.value = OpenInNewTab(uri.toString(), tabId)
+    }
+
+    override fun handleDuckChatUrlInCustomTab(uri: Uri): Boolean {
+        if (!isCustomTabScreen) return false
+        if (!androidBrowserConfig.redirectDuckAiLinksFromCustomTab().isEnabled()) return false
+
+        openDuckChatForUrl(uri)
+        // Finish only the custom tab activity (not the whole task) so we don't tear down the Duck Chat
+        // host activity, which the singleTask BrowserActivity may launch into the same task.
+        command.value = FinishCustomTab
+        return true
+    }
+
+    private fun openDuckChatForUrl(uri: Uri) {
+        val queryParameter = uri.getQueryParameter(QUERY)
+        if (queryParameter != null) {
+            duckChat.openDuckChatWithPrefill(queryParameter)
+        } else {
+            duckChat.openDuckChat()
+        }
     }
 
     override fun recoverFromRenderProcessGone() {

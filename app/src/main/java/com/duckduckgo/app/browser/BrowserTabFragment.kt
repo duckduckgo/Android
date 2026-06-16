@@ -2463,6 +2463,10 @@ class BrowserTabFragment :
         (activity as? CustomTabActivity)?.finishAndRemoveTask()
     }
 
+    private fun finishCustomTab() {
+        (activity as? CustomTabActivity)?.finish()
+    }
+
     private fun onBypassMaliciousWarning(
         url: Uri,
         feed: Feed,
@@ -2935,6 +2939,7 @@ class BrowserTabFragment :
             is Command.HideWarningMaliciousSite -> hideMaliciousWarning(it.canGoBack)
             is Command.EscapeMaliciousSite -> onEscapeMaliciousSite()
             is Command.CloseCustomTab -> closeCustomTab()
+            is Command.FinishCustomTab -> finishCustomTab()
             is Command.BypassMaliciousSiteWarning -> onBypassMaliciousWarning(it.url, it.feed)
             is OpenBrokenSiteLearnMore -> openBrokenSiteLearnMore(it.url)
             is ReportBrokenSiteError -> openBrokenSiteReportError(it.url)
