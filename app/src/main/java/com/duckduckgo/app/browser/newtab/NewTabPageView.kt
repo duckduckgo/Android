@@ -272,6 +272,8 @@ class NewTabPageView @JvmOverloads constructor(
             return
         }
         binding.fireTabEmptyState.root.gone()
+        binding.indonesiaNewTabSectionView.show()
+        binding.appTrackingProtectionStateView.show()
 
         if (viewState.shouldShowLogo) {
             homeBackgroundLogo.showLogo()
