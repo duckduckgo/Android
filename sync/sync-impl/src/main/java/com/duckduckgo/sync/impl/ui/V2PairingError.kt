@@ -38,7 +38,11 @@ internal fun Int.toV2PairingError(): V2PairingErrorContent = when (this) {
     PAIRING_REJECTED.code -> V2PairingErrorContent(R.string.sync_dialog_error_title, R.string.sync_v2_error_pairing_rejected)
     PAIRING_CANCELLED.code -> V2PairingErrorContent(R.string.sync_dialog_error_title, R.string.sync_v2_error_pairing_canceled)
     // Joined from a 3rd-party recovery code but the account already holds a ddg credential — can't re-upgrade.
-    THIRD_PARTY_ALREADY_UPGRADED.code -> V2PairingErrorContent(R.string.sync_dialog_error_title, R.string.sync_v2_error_third_party_already_upgraded)
+    // Title is "Sync failed." (reuses sync_v2_error_pairing_failed); the instruction is the body.
+    THIRD_PARTY_ALREADY_UPGRADED.code -> V2PairingErrorContent(
+        R.string.sync_v2_error_pairing_failed,
+        R.string.sync_v2_error_third_party_already_upgraded,
+    )
     else -> V2PairingErrorContent(R.string.sync_dialog_error_title, R.string.sync_v2_error_pairing_failed)
 }
 

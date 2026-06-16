@@ -47,7 +47,7 @@ class V2PairingErrorTest {
     @Test
     fun whenCodeIsThirdPartyAlreadyUpgradedThenSyncFromConnectedBrowserCopy() {
         val content = THIRD_PARTY_ALREADY_UPGRADED.code.toV2PairingError()
-        assertEquals(R.string.sync_dialog_error_title, content.title)
+        assertEquals(R.string.sync_v2_error_pairing_failed, content.title)
         assertEquals(R.string.sync_v2_error_third_party_already_upgraded, content.message)
     }
 
