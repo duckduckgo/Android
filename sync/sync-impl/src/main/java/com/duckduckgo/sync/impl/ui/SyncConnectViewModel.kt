@@ -235,7 +235,11 @@ class SyncConnectViewModel @Inject constructor(
         data object LoginSuccess : Command()
         data class ShowMessage(val messageId: Int) : Command()
         data object FinishWithError : Command()
-        data class ShowError(@StringRes val message: Int, val reason: String = "") : Command()
+        data class ShowError(
+            @StringRes val message: Int,
+            val reason: String = "",
+            @StringRes val title: Int = R.string.sync_dialog_error_title,
+        ) : Command()
 
         /** v2 §"Exchange Confirmations": prompt user "Sync your data with [peerName]?". */
         data class AskJoinerConfirmation(val peerName: String?) : Command()

@@ -217,6 +217,7 @@ class SyncWithAnotherActivityViewModel @Inject constructor(
         data class ShowError(
             @StringRes val message: Int,
             val reason: String = "",
+            @StringRes val title: Int = R.string.sync_dialog_error_title,
         ) : Command()
 
         data class AskToSwitchAccount(val encodedStringCode: String) : Command()
