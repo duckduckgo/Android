@@ -137,7 +137,6 @@ class RealNativeInputManager @Inject constructor(
     private lateinit var layoutCoordinator: NativeInputLayoutCoordinator
     private var isNativeInputFieldEnabled: Boolean = false
     private var isExiting: Boolean = false
-    private var isHidingWidget: Boolean = false
     private var isPickingImage: Boolean = false
     private var duckAiToolbarHidden: Boolean = false
     private var floatingSubmitContainer: View? = null
@@ -273,31 +272,17 @@ class RealNativeInputManager @Inject constructor(
 
         val widgetCard = rootView.findViewById<View?>(R.id.inputModeWidgetCard)
         if (widgetCard != null) {
-            if (isHidingWidget) return
-            isHidingWidget = true
             (widgetCard as? MaterialCardView)?.cardElevation = 0f
             widgetCard.animate()
                 .alpha(0f)
                 .setDuration(FADE_OUT_DURATION_MS)
                 .withEndAction {
                     widgetCard.alpha = 1f
-                    if (isHidingWidget) {
-                        isHidingWidget = false
-                        removeWidget()
-                    }
+                    removeWidget()
                 }
                 .start()
         } else {
             removeWidget()
-        }
-    }
-
-    private fun cancelPendingHide() {
-        if (!isHidingWidget) return
-        isHidingWidget = false
-        rootView.findViewById<View?>(R.id.inputModeWidgetCard)?.let { card ->
-            card.animate().cancel()
-            card.alpha = 1f
         }
     }
 
@@ -381,9 +366,8 @@ class RealNativeInputManager @Inject constructor(
     ) {
         if (!isNativeInputFieldEnabled) return
 
-        if (omnibarController.isDuckAiMode() && rootView.findViewById<View?>(R.id.inputModeWidget) != null && !isHidingWidget) return
+        if (omnibarController.isDuckAiMode() && rootView.findViewById<View?>(R.id.inputModeWidget) != null) return
 
-        cancelPendingHide()
         animator.cancelAnimation()
         isExiting = false
         if (omnibarController.isDuckAiMode()) {
@@ -544,7 +528,6 @@ class RealNativeInputManager @Inject constructor(
             floatingSubmitContainer = null
         }
         if (removed) widgetRoot = null
-        isHidingWidget = false
         duckAiToolbarHidden = false
         // Drop Fragment-scoped callback closures so they don't outlive the widget.
         lastCallbacks = null
