@@ -22,6 +22,8 @@ import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.cta.model.DismissedCta
 import com.duckduckgo.app.global.DefaultRoleBrowserDialog
+import com.duckduckgo.app.onboarding.CustomAiOnboardingStore
+import com.duckduckgo.app.onboarding.DuckAiOnboardingDemo
 import com.duckduckgo.app.onboarding.DuckAiOnboardingExperimentManager
 import com.duckduckgo.app.onboarding.DuckAiOnboardingExperimentManager.DuckAiOnboardingExperimentVariant
 import com.duckduckgo.app.onboarding.DuckAiOnboardingExperimentManager.DuckAiOnboardingExperimentVariant.TREATMENT_WITH_DUCK_AI_DEFAULT
@@ -93,16 +95,21 @@ class NewUserOnboardingPlanProvider @Inject constructor(
     private val pixel: Pixel,
     private val dispatchers: DispatcherProvider,
     private val dismissedCtaDao: DismissedCtaDao,
+    private val customAiOnboardingStore: CustomAiOnboardingStore,
+    private val duckAiOnboardingDemo: DuckAiOnboardingDemo,
 ) {
 
     suspend fun buildRootPlan(
         onCompleted: suspend () -> Unit,
         onSkipped: suspend () -> Unit,
     ): LinearOnboardingPlan =
-        if (onboardingStore.isCustomAiOnboardingFlow()) {
+        if (customAiOnboardingStore.isEnabled()) {
             // in custom AI onboarding path, the input toggle is enabled by default
             duckChat.setCosmeticInputScreenUserSetting(enabled = true)
             onboardingStore.storeInputScreenSelection(selected = true)
+
+            // prepare in-context CTAs
+            duckAiOnboardingDemo.arm()
 
             buildCustomAiPlan(onCompleted, onSkipped)
         } else {
@@ -160,7 +167,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
         }
         val markInputToLaunchOnChat = {
             // The custom-AI flow always finishes on the Duck.ai (chat) tab
-            onboardingStore.setOpenInputOnDuckAiTab()
+            customAiOnboardingStore.setOpenInputOnDuckAiTab()
         }
         val onCompleted = suspend {
             dismissDuckAiFireCta()
@@ -445,9 +452,14 @@ class NewUserOnboardingPlanProvider @Inject constructor(
     )
 
     // Chat-only preview: the toggle is hidden and the demo defaults to chat. Captures the prompt for the
-    // duck_ai_demo step. Does NOT arm the demo — arming happens in BrowserActivity when the demo runs.
+    // duck_ai_demo step.
     private fun customAiInputScreenPreviewStep(ctx: NewUserOnboardingPlanContext) = NewUserOnboardingActivityStep(
         id = NewUserOnboardingStepIds.INPUT_SCREEN_PREVIEW,
+        precondition = {
+            withContext(dispatchers.io()) {
+                androidBrowserConfigFeature.singleTabFireDialog().isEnabled()
+            }
+        },
         showsStepIndicator = true,
         resolveDialog = { NewUserOnboardingActivityDialog.InputScreenPreview(isSearchDefault = false) },
         transition = { event ->
@@ -463,6 +475,11 @@ class NewUserOnboardingPlanProvider @Inject constructor(
 
     private fun duckAiDemoStep(ctx: NewUserOnboardingPlanContext) = NewUserBrowserActivityStep(
         id = NewUserOnboardingStepIds.DUCK_AI_DEMO,
+        precondition = {
+            withContext(dispatchers.io()) {
+                androidBrowserConfigFeature.singleTabFireDialog().isEnabled()
+            }
+        },
         resolveAction = { NewUserBrowserActivityAction.RunDuckAiOnboardingDemo(prompt = ctx.pendingDuckAiPrompt.orEmpty()) },
         transition = { event ->
             when {

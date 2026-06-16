@@ -34,11 +34,12 @@ data class DaxEndBrandDesignUpdateBubbleCta(
     override val appInstallStore: AppInstallStore,
     override val isLightTheme: Boolean,
     override val deviceInfo: DeviceInfo,
+    val isCustomAiOnboardingFlow: Boolean,
     override val onboardingImprovementsEnabled: Boolean,
 ) : DaxBubbleCta.BrandDesignUpdateBubbleCta(
     ctaId = CtaId.DAX_END,
     title = R.string.onboardingEndDaxDialogTitle,
-    description = if (onboardingStore.isCustomAiOnboardingFlow()) {
+    description = if (isCustomAiOnboardingFlow) {
         R.string.onboardingEndCustomAiFlowDaxDialogDescription
     } else {
         R.string.onboardingEndDaxDialogDescription
@@ -69,7 +70,7 @@ data class DaxEndBrandDesignUpdateBubbleCta(
     }
 
     override fun decorateDescription(context: Context, text: CharSequence): CharSequence =
-        if (onboardingStore.isCustomAiOnboardingFlow()) {
+        if (isCustomAiOnboardingFlow) {
             context.appendIconToText(text, CommonR.drawable.ic_ai_chat_16)
         } else {
             text

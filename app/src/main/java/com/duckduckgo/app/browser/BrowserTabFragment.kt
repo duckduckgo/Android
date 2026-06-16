@@ -220,7 +220,7 @@ import com.duckduckgo.app.global.model.orderedTrackerBlockedEntities
 import com.duckduckgo.app.global.view.NonDismissibleBehavior
 import com.duckduckgo.app.global.view.launchDefaultAppActivity
 import com.duckduckgo.app.global.view.renderIfChanged
-import com.duckduckgo.app.onboarding.store.OnboardingStore
+import com.duckduckgo.app.onboarding.CustomAiOnboardingStore
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.settings.db.SettingsDataStore
@@ -697,7 +697,7 @@ class BrowserTabFragment :
     lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
 
     @Inject
-    lateinit var onboardingStore: OnboardingStore
+    lateinit var customAiOnboardingStore: CustomAiOnboardingStore
 
     /**
      * We use this to monitor whether the user was seeing the in-context Email Protection signup prompt
@@ -1411,7 +1411,7 @@ class BrowserTabFragment :
             tabs = viewModel.tabs,
             currentTabUrl = viewModel.siteLiveData.asFlow().map { it?.url },
             query = query,
-            initialInputMode = if (onboardingStore.consumeOpenInputOnDuckAiTab()) {
+            initialInputMode = if (customAiOnboardingStore.consumeOpenInputOnDuckAiTab()) {
                 InputMode.DUCK_AI
             } else {
                 null

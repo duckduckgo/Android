@@ -34,6 +34,7 @@ import com.duckduckgo.app.global.install.daysInstalled
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.domain
 import com.duckduckgo.app.global.model.orderedTrackerBlockedEntities
+import com.duckduckgo.app.onboarding.CustomAiOnboardingStore
 import com.duckduckgo.app.onboarding.DuckAiOnboardingExperimentMetrics
 import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingPlanProvider
 import com.duckduckgo.app.onboarding.store.AppStage
@@ -91,6 +92,7 @@ class CtaViewModel @Inject constructor(
     private val userAllowListRepository: UserAllowListRepository,
     private val settingsDataStore: SettingsDataStore,
     private val onboardingStore: OnboardingStore,
+    private val customAiOnboarding: CustomAiOnboardingStore,
     private val userStageStore: UserStageStore,
     private val aggregateTabProvider: AggregateTabProvider,
     private val dispatchers: DispatcherProvider,
@@ -413,6 +415,7 @@ class CtaViewModel @Inject constructor(
                         appInstallStore,
                         appTheme.isLightModeEnabled(),
                         deviceInfo,
+                        isCustomAiOnboardingFlow = customAiOnboarding.isEnabled(),
                         onboardingImprovementsEnabled = isOnboardingImprovementsEnabled(),
                     )
                 } else {
@@ -428,6 +431,7 @@ class CtaViewModel @Inject constructor(
                         appInstallStore,
                         appTheme.isLightModeEnabled(),
                         deviceInfo,
+                        isCustomAiOnboardingFlow = customAiOnboarding.isEnabled(),
                         isFreeTrialCopy = freeTrialCopyAvailable(),
                         onboardingImprovementsEnabled = isOnboardingImprovementsEnabled(),
                     )

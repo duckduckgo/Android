@@ -191,6 +191,7 @@ class BrandDesignUpdateBubbleCtaTest {
             appInstallStore = appInstallStore,
             isLightTheme = true,
             deviceInfo = mockDeviceInfo,
+            isCustomAiOnboardingFlow = false,
             isFreeTrialCopy = false,
             onboardingImprovementsEnabled = true,
         )
@@ -230,6 +231,7 @@ class BrandDesignUpdateBubbleCtaTest {
             appInstallStore = appInstallStore,
             isLightTheme = true,
             deviceInfo = mockDeviceInfo,
+            isCustomAiOnboardingFlow = false,
             isFreeTrialCopy = false,
             onboardingImprovementsEnabled = true,
         )
@@ -253,6 +255,60 @@ class BrandDesignUpdateBubbleCtaTest {
         whenever(resources.displayMetrics).thenReturn(android.util.DisplayMetrics().apply { density = 1f })
         whenever(mockDeviceInfo.formFactor()).thenReturn(formFactor)
         return lp
+    }
+
+    @Test
+    fun whenDaxEndCustomAiOnboardingFlowThenDescriptionIsCustomAi() {
+        val cta = DaxEndBrandDesignUpdateBubbleCta(
+            onboardingStore = onboardingStore,
+            appInstallStore = appInstallStore,
+            isLightTheme = true,
+            deviceInfo = mockDeviceInfo,
+            isCustomAiOnboardingFlow = true,
+            onboardingImprovementsEnabled = true,
+        )
+        assertEquals(R.string.onboardingEndCustomAiFlowDaxDialogDescription, cta.description)
+    }
+
+    @Test
+    fun whenDaxEndStandardFlowThenDescriptionIsStandard() {
+        val cta = DaxEndBrandDesignUpdateBubbleCta(
+            onboardingStore = onboardingStore,
+            appInstallStore = appInstallStore,
+            isLightTheme = true,
+            deviceInfo = mockDeviceInfo,
+            isCustomAiOnboardingFlow = false,
+            onboardingImprovementsEnabled = true,
+        )
+        assertEquals(R.string.onboardingEndDaxDialogDescription, cta.description)
+    }
+
+    @Test
+    fun whenDaxSubscriptionCustomAiOnboardingFlowThenDescriptionIsCustomAi() {
+        val cta = DaxSubscriptionBrandDesignUpdateBubbleCta(
+            onboardingStore = onboardingStore,
+            appInstallStore = appInstallStore,
+            isLightTheme = true,
+            deviceInfo = mockDeviceInfo,
+            isCustomAiOnboardingFlow = true,
+            isFreeTrialCopy = false,
+            onboardingImprovementsEnabled = true,
+        )
+        assertEquals(R.string.onboardingPrivacyProCustomAiFlowDaxDialogDescription, cta.description)
+    }
+
+    @Test
+    fun whenDaxSubscriptionStandardFlowThenDescriptionIsStandard() {
+        val cta = DaxSubscriptionBrandDesignUpdateBubbleCta(
+            onboardingStore = onboardingStore,
+            appInstallStore = appInstallStore,
+            isLightTheme = true,
+            deviceInfo = mockDeviceInfo,
+            isCustomAiOnboardingFlow = false,
+            isFreeTrialCopy = false,
+            onboardingImprovementsEnabled = true,
+        )
+        assertEquals(R.string.onboardingPrivacyProDaxDialogDescription, cta.description)
     }
 
     private inner class TestableBubbleCta(

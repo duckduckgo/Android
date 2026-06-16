@@ -36,6 +36,7 @@ import com.duckduckgo.app.cta.model.DismissedCta
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.model.Site
+import com.duckduckgo.app.onboarding.CustomAiOnboardingStore
 import com.duckduckgo.app.onboarding.DuckAiOnboardingExperimentMetrics
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.OnboardingStore
@@ -116,6 +117,8 @@ class CtaViewModelTest {
 
     private val mockOnboardingStore: OnboardingStore = mock()
 
+    private val mockCustomAiOnboarding: CustomAiOnboardingStore = mock()
+
     private val mockUserAllowListRepository: UserAllowListRepository = mock()
 
     private val mockUserStageStore: UserStageStore = mock()
@@ -185,6 +188,7 @@ class CtaViewModelTest {
         whenever(mockBrokenSitePrompt.isFeatureEnabled()).thenReturn(false)
         whenever(mockBrokenSitePrompt.getUserRefreshPatterns()).thenReturn(emptySet())
         whenever(mockSubscriptions.isEligible()).thenReturn(false)
+        whenever(mockCustomAiOnboarding.isEnabled()).thenReturn(false)
         whenever(mockOnboardingBrandDesignUpdateToggles.brandDesignUpdate()).thenReturn(mockDisabledToggle)
         whenever(mockOnboardingBrandDesignUpdateToggles.onboardingImprovements()).thenReturn(mockEnabledToggle)
 
@@ -196,6 +200,7 @@ class CtaViewModelTest {
             userAllowListRepository = mockUserAllowListRepository,
             settingsDataStore = mockSettingsDataStore,
             onboardingStore = mockOnboardingStore,
+            customAiOnboarding = mockCustomAiOnboarding,
             userStageStore = mockUserStageStore,
             aggregateTabProvider = mockAggregateTabProvider,
             dispatchers = coroutineRule.testDispatcherProvider,

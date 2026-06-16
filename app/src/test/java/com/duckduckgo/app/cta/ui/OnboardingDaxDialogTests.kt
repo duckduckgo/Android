@@ -116,6 +116,7 @@ class OnboardingDaxDialogTests {
             userAllowListRepository,
             settingsDataStore,
             onboardingStore,
+            mock(),
             userStageStore,
             aggregateTabProvider,
             coroutineRule.testDispatcherProvider,
