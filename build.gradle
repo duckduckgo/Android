@@ -364,8 +364,7 @@ afterEvaluate {
             // Flank emit this extra report carrying the flaky markers (failure nodes on
             // passed-after-retry tests) that the ANDROID_FIREBASE dialect needs to detect
             // flaky tests; the plain JUnitReport.xml has no such markers (imports fine but
-            // always reports 0 flaky). setFrom REPLACES the default report set (the Flank
-            // task's whole output tree) so no other files are parsed.
+            // always reports 0 flaky).
             reports.setFrom(file("build/fladle/fladleResults/FullJUnitReport.xml"))
         }
     }

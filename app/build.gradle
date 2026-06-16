@@ -266,6 +266,9 @@ def privacyTestDefaults = { config ->
     config.devices.set([["model": "MediumPhone.arm", "version": "34"]])
     config.localResultsDir.set("fladleResults")
     config.flakyTestAttempts.set(1)
+    // Emit the full merged JUnit report so it retains every execution,
+    // including the failed attempt + passed rerun of a flaky test.
+    config.fullJunitResult.set(true)
     config.testShards.set(1)
 }
 
