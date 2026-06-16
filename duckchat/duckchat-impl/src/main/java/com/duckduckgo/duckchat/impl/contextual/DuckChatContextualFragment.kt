@@ -28,6 +28,7 @@ import android.os.Environment
 import android.os.Message
 import android.provider.MediaStore
 import android.text.Editable
+import android.text.TextUtils
 import android.text.TextWatcher
 import android.view.KeyEvent
 import android.view.MotionEvent
@@ -764,6 +765,8 @@ class DuckChatContextualFragment :
                 )
                 setPrimaryText(chat.displayTitle)
                 setLeadingIconResource(chat.type.iconRes(chat.pinned))
+                setPrimaryTextMaxLines(MAX_CHAT_TITLE_LINES)
+                setPrimaryTextEllipsize(TextUtils.TruncateAt.END)
             }
             popup.onMenuItemClicked(row) { viewModel.onRecentChatClicked(chat.chatId) }
             recentContainer.addView(row)
@@ -1083,7 +1086,7 @@ class DuckChatContextualFragment :
     }
 
     companion object {
-        private const val MAX_CHAT_TITLE_LINES = 3
+        private const val MAX_CHAT_TITLE_LINES = 1
         private const val PERMISSION_REQUEST_WRITE_EXTERNAL_STORAGE = 200
         private const val CUSTOM_UA =
             "Mozilla/5.0 (Linux; Android 16) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/124.0.0.0 Mobile DuckDuckGo/5 Safari/537.36"
