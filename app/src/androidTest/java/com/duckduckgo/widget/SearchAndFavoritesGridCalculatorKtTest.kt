@@ -22,7 +22,6 @@ import org.junit.Test
 import org.junit.experimental.runners.Enclosed
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
-import kotlin.random.Random
 
 @RunWith(Enclosed::class)
 class SearchAndFavoritesGridCalculatorKtTest {
@@ -36,13 +35,6 @@ class SearchAndFavoritesGridCalculatorKtTest {
 
         @Test
         fun calculateColumnsBasedOnAvailableWidth() {
-            // INTENTIONAL FLAKY TEST - remove before merge. Fails ~50% of the time (per
-            // parameter case) to verify Develocity flaky-test reporting for the non-privacy
-            // Fladle suite; the deflake retry should reclassify it as FLAKY.
-            if (Random.nextBoolean()) {
-                fail("Intentional flaky failure to verify Develocity flaky-test reporting")
-            }
-
             val columns = testee.calculateColumns(context, testCase.width)
 
             assertEquals(testCase.expectedColumns, columns)

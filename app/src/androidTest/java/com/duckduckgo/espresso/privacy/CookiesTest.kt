@@ -38,10 +38,8 @@ import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import org.hamcrest.CoreMatchers.containsString
 import org.junit.Assert.assertNull
-import org.junit.Assert.fail
 import org.junit.Rule
 import org.junit.Test
-import kotlin.random.Random
 
 class CookiesTest {
 
@@ -56,13 +54,6 @@ class CookiesTest {
 
     @Test @PrivacyTest
     fun whenProtectionsAreEnabledCookiesStoredAndRetrievedCorrectly() {
-        // INTENTIONAL FLAKY TEST - remove before merge. Fails ~50% of the time to verify
-        // Develocity flaky-test reporting for the Fladle privacy suite; the deflake retry
-        // should reclassify it as FLAKY.
-        if (Random.nextBoolean()) {
-            fail("Intentional flaky failure to verify Develocity flaky-test reporting")
-        }
-
         preparationsForPrivacyTest()
 
         var webView: WebView? = null
