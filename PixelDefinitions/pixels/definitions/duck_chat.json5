@@ -1061,5 +1061,29 @@
                 "enum": ["purchase", "upgrade"]
             }
         ]
+    },
+    "aichat_unified_input_show_model_picker": {
+        "description": "FE recovery flow: the native model picker was opened in response to a showModelPicker message",
+        "owners": ["YoussefKeyrouz"],
+        "triggers": ["other"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "aichat_unified_input_submit_change_model": {
+        "description": "FE recovery flow: the user's chosen model was reported to the FE via submitChangeModelAction",
+        "owners": ["YoussefKeyrouz"],
+        "triggers": ["other"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": [
+            "appVersion",
+            { "key": "model_id", "type": "string", "description": "Identifier of the model the user recovered to" }
+        ]
+    },
+    "aichat_unified_input_submit_change_model_prompt_sent": {
+        "description": "FE recovery flow: a prompt was submitted after recovering the chat's model",
+        "owners": ["YoussefKeyrouz"],
+        "triggers": ["other"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": ["appVersion"]
     }
 }
