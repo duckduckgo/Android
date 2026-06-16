@@ -32,15 +32,14 @@ def wait_for_job(client: asana.ApiClient, job_gid: str, timeout: int = 30, inter
     raise TimeoutError(f"Job {job_gid} did not complete within {timeout}s")
 
 
-def build_release_task_links_html(task_links: List[AsanaTaskLink]) -> str:
+def iter_valid_task_ids(task_links: List[AsanaTaskLink]):
     """
-    Build HTML list items for release task notes.
+    Yield resolvable Asana task IDs from the given links.
 
-    Use explicit href links instead of data-asana-gid anchors so the request
-    does not fail if Asana cannot auto-resolve an object ID.
+    Links with no URL, a malformed URL, or no extractable task ID are skipped
+    (and logged) instead of raising, so a single bad URL never aborts the
+    workflow.
     """
-    items = []
-
     for link in task_links:
         if not link.url:
             continue
@@ -55,9 +54,20 @@ def build_release_task_links_html(task_links: List[AsanaTaskLink]) -> str:
             log(f"Skipping Asana URL with no task ID: {link.url}")
             continue
 
-        items.append(
-            f'<li><a href="https://app.asana.com/0/0/{task_id}/f">{task_id}</a></li>'
-        )
+        yield task_id
+
+
+def build_release_task_links_html(task_links: List[AsanaTaskLink]) -> str:
+    """
+    Build HTML list items for release task notes.
+
+    Use explicit href links instead of data-asana-gid anchors so the request
+    does not fail if Asana cannot auto-resolve an object ID.
+    """
+    items = [
+        f'<li><a href="https://app.asana.com/0/0/{task_id}/f">{task_id}</a></li>'
+        for task_id in iter_valid_task_ids(task_links)
+    ]
 
     return "".join(items)
 
@@ -169,14 +179,12 @@ def tag_tasks(client: asana.ApiClient, workspace_id: str, task_links: List[Asana
     tasks_api = asana.TasksApi(client)
 
     tagged_count = 0
-    for link in task_links:
-        if link.url:
-            task_id = extract_task_id_from_url(link.url)
-            try:
-                tasks_api.add_tag_for_task({"data": {"tag": tag_id}}, task_id)
-                tagged_count += 1
-            except Exception as e:
-                log(f"Error tagging task {task_id}: {e}")
+    for task_id in iter_valid_task_ids(task_links):
+        try:
+            tasks_api.add_tag_for_task({"data": {"tag": tag_id}}, task_id)
+            tagged_count += 1
+        except Exception as e:
+            log(f"Error tagging task {task_id}: {e}")
 
     log(f"Tagged {tagged_count} tasks with '{tag_name}'")
 
@@ -190,14 +198,12 @@ def remove_tasks_from_project(client: asana.ApiClient, task_links: List[AsanaTas
     tasks_api = asana.TasksApi(client)
 
     removed_count = 0
-    for link in task_links:
-        if link.url:
-            task_id = extract_task_id_from_url(link.url)
-            try:
-                tasks_api.remove_project_for_task({"data": {"project": project_id}}, task_id)
-                removed_count += 1
-            except Exception as e:
-                log(f"Error removing task {task_id} from project: {e}")
+    for task_id in iter_valid_task_ids(task_links):
+        try:
+            tasks_api.remove_project_for_task({"data": {"project": project_id}}, task_id)
+            removed_count += 1
+        except Exception as e:
+            log(f"Error removing task {task_id} from project: {e}")
 
     log(f"Removed {removed_count} tasks from project")
 
