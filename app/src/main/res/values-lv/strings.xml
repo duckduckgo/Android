@@ -1056,4 +1056,5 @@
 
     <!-- New Address Bar Picker -->
     <string name="newAddressBarPickerDuckDuckGo" translatable="false">DuckDuckGo</string>
+    <string name="newAddressBarPickerConfirm">Apstiprināt</string>
 </resources>
