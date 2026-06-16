@@ -41,6 +41,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.FIRE_ANIMATION
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.app.tabs.model.TabRepository
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.utils.DateProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.dataclearing.api.fire.FireDialogProvider.FireDialogOrigin
@@ -87,7 +88,10 @@ class SingleTabFireDialogViewModel @Inject constructor(
     private val downloadsRepository: DownloadsRepository,
     private val duckChat: DuckChat,
     private val brandDesignUpdateToggles: OnboardingBrandDesignUpdateToggles,
+    private val browserMode: BrowserMode,
 ) : ViewModel() {
+
+    private val isFireMode: Boolean get() = browserMode == BrowserMode.FIRE
 
     var shouldRestartAfterClearing: Boolean = true
         private set
@@ -123,6 +127,14 @@ class SingleTabFireDialogViewModel @Inject constructor(
     }
 
     fun onDeleteAllClicked() {
+        if (isFireMode) {
+            onDeleteAllClickedInFireMode()
+        } else {
+            onDeleteAllClickedInRegularMode()
+        }
+    }
+
+    private fun onDeleteAllClickedInRegularMode() {
         viewModelScope.launch {
             command.send(Command.OnClearStarted)
             trySendDailyDeleteClicked()
@@ -159,6 +171,23 @@ class SingleTabFireDialogViewModel @Inject constructor(
                     throw e
                 }
             }
+
+            command.send(Command.ClearingComplete)
+        }
+    }
+
+    private fun onDeleteAllClickedInFireMode() {
+        viewModelScope.launch {
+            command.send(Command.OnClearStarted)
+
+            val fireAnimationEnabled = withContext(dispatcherProvider.io()) {
+                settingsDataStore.fireAnimationEnabled
+            }
+            if (fireAnimationEnabled) {
+                command.send(Command.PlayAnimation)
+            }
+
+            // TODO: clear all Fire tabs and their data only (handled in the follow-up PR)
 
             command.send(Command.ClearingComplete)
         }
@@ -211,6 +240,7 @@ class SingleTabFireDialogViewModel @Inject constructor(
                 resolveTargetTabId(origin.value)
             }
 
+            // TODO: when isFireMode, the clear must target Fire-tab data (done in a follow-up PR)
             val result = withContext(dispatcherProvider.io()) {
                 if (originalTabId != null) {
                     if (origin.value == DuckAiContextualChat) {
@@ -280,6 +310,7 @@ class SingleTabFireDialogViewModel @Inject constructor(
                 val titleResId = when {
                     isDuckAiTab && isDeleteThisTabAvailable -> R.string.singleTabFireDialogTitleDuckAi
                     isDuckAiChatsSelected -> R.string.singleTabFireDialogTitleWithChats
+                    isFireMode -> R.string.singleTabFireDialogTitleFireMode
                     else -> R.string.singleTabFireDialogTitle
                 }
                 TitleSource.Static(titleResId)
