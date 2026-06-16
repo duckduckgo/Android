@@ -67,4 +67,10 @@
     <string name="duckAIUpdateTitle">Duck.ai PoC</string>
     <string name="duckAIUpdateMessage">This feature is in active development, intended for feedback purposes.</string>
 
+    <!-- TopApp Bars -->
+    <string name="dax_top_app_bar_back_content_description">Back</string>
+    <string name="dax_top_app_bar_close_content_description">Close</string>
+    <string name="dax_top_app_bar_clear_search_content_description">Clear search</string>
+    <string name="dax_top_app_bar_exit_search_content_description">Exit search</string>
+
 </resources>
