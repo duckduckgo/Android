@@ -53,7 +53,6 @@ import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command
 import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command.AskHostConfirmation
 import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command.AskJoinerConfirmation
 import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command.LoginSuccess
-import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command.ShowAlreadyConnected
 import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command.ShowError
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flowOf
@@ -789,7 +788,7 @@ class SyncConnectViewModelTest {
     }
 
     @Test
-    fun whenV2PresentSameAccountThenShowAlreadyConnected() = runTest {
+    fun whenV2PresentSameAccountThenShowAlreadyPaired() = runTest {
         enableV2(displayOn = true)
         whenever(qrEncoder.encodeAsBitmap(any(), any(), any())).thenReturn(TestSyncFixtures.qrBitmap())
 
@@ -805,19 +804,8 @@ class SyncConnectViewModelTest {
 
         testee.commands().test {
             val command = awaitItem()
-            assertTrue("expected ShowAlreadyConnected, got $command", command is ShowAlreadyConnected)
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenAlreadyConnectedAcknowledgedThenLoginSuccess() = runTest {
-        whenever(syncRepository.getAccountInfo()).thenReturn(AccountInfo())
-
-        testee.onAlreadyConnectedAcknowledged()
-
-        testee.commands().test {
-            assertTrue(awaitItem() is LoginSuccess)
+            assertTrue("expected ShowError, got $command", command is ShowError)
+            assertEquals(R.string.sync_v2_already_paired_message, (command as ShowError).message)
             cancelAndIgnoreRemainingEvents()
         }
     }

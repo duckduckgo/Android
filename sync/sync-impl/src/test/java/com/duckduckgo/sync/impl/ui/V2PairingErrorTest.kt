@@ -73,4 +73,10 @@ class V2PairingErrorTest {
         assertEquals(R.string.sync_dialog_error_title, v2UpgradeRequiredError.title)
         assertEquals(R.string.sync_v2_error_upgrade_required, v2UpgradeRequiredError.message)
     }
+
+    @Test
+    fun whenAlreadyPairedThenAlreadyPairedCopy() {
+        assertEquals(R.string.sync_v2_already_paired_title, v2AlreadyPairedError.title)
+        assertEquals(R.string.sync_v2_already_paired_message, v2AlreadyPairedError.message)
+    }
 }

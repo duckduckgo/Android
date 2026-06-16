@@ -86,7 +86,6 @@ class SyncWithAnotherActivityViewModel @Inject constructor(
     fun commands(): Flow<Command> = command.receiveAsFlow()
 
     private var barcodeContents: AuthCode? = null
-    private var alreadyConnectedPreviousPrimaryKey: String = ""
 
     // this can be true during deep linking setup.
     // when the timeout expires, an error message will show to the user
@@ -228,9 +227,6 @@ class SyncWithAnotherActivityViewModel @Inject constructor(
 
         /** v2 §"Exchange Confirmations": prompt user "Allow [peerName] to join your sync?". */
         data class AskHostConfirmation(val peerName: String?) : Command()
-
-        /** v2 §"Same-account case": inform the user then land connected on OK. */
-        data object ShowAlreadyConnected : Command()
     }
 
     fun onReadTextCodeClicked() {
@@ -279,11 +275,7 @@ class SyncWithAnotherActivityViewModel @Inject constructor(
         }
     }
 
-    /**
-     * Map one v2 [DispatchOutcome] onto this VM's command pipeline. LoggedIn mirrors v1 Connect
-     * post-success semantics: show recovery to fresh devices (no prior primary key), skip it for
-     * account-switchers.
-     */
+    /** Map one v2 [DispatchOutcome] onto this VM's existing command pipeline. */
     private suspend fun handleV2Outcome(
         outcome: DispatchOutcome,
         previousPrimaryKey: String,
@@ -297,8 +289,7 @@ class SyncWithAnotherActivityViewModel @Inject constructor(
             }
             is DispatchOutcome.AlreadyConnected -> {
                 cancelTimeout()
-                alreadyConnectedPreviousPrimaryKey = previousPrimaryKey
-                command.send(Command.ShowAlreadyConnected)
+                command.send(ShowError(message = v2AlreadyPairedError.message, title = v2AlreadyPairedError.title))
             }
             is DispatchOutcome.UpgradeRequired -> {
                 cancelTimeout()
@@ -322,12 +313,6 @@ class SyncWithAnotherActivityViewModel @Inject constructor(
     fun onJoinerDenied() { codeDispatcher.denyJoiner() }
     fun onHostConfirmed() { codeDispatcher.confirmHost() }
     fun onHostDenied() { codeDispatcher.denyHost() }
-
-    fun onAlreadyConnectedAcknowledged() {
-        viewModelScope.launch(dispatchers.io()) {
-            onLoginSuccess(alreadyConnectedPreviousPrimaryKey, showRecovery = false)
-        }
-    }
 
     private suspend fun onLoginSuccess(previousPrimaryKey: String, showRecovery: Boolean) {
         val postProcessCodePK = syncAccountRepository.getAccountInfo().primaryKey

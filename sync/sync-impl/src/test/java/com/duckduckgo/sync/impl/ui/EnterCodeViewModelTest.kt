@@ -57,7 +57,6 @@ import com.duckduckgo.sync.impl.ui.EnterCodeViewModel.AuthState
 import com.duckduckgo.sync.impl.ui.EnterCodeViewModel.AuthState.Idle
 import com.duckduckgo.sync.impl.ui.EnterCodeViewModel.Command.AskToSwitchAccount
 import com.duckduckgo.sync.impl.ui.EnterCodeViewModel.Command.LoginSuccess
-import com.duckduckgo.sync.impl.ui.EnterCodeViewModel.Command.ShowAlreadyConnected
 import com.duckduckgo.sync.impl.ui.EnterCodeViewModel.Command.ShowError
 import com.duckduckgo.sync.impl.ui.EnterCodeViewModel.Command.SwitchAccountSuccess
 import kotlinx.coroutines.flow.flowOf
@@ -396,7 +395,7 @@ internal class EnterCodeViewModelTest {
     }
 
     @Test
-    fun whenV2SameAccountThenShowAlreadyConnected() = runTest {
+    fun whenV2SameAccountThenShowAlreadyPaired() = runTest {
         syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
         whenever(syncAccountRepository.getAccountInfo()).thenReturn(noAccount)
         val pastedCode = "https://duckduckgo.com/sync/pairing/#&code2=v2code"
@@ -419,28 +418,15 @@ internal class EnterCodeViewModelTest {
         testee.onPasteCodeClicked()
 
         testee.commands().test {
-            assertTrue(awaitItem() is ShowAlreadyConnected)
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenAlreadyConnectedAcknowledgedThenLoginSuccess() = runTest {
-        whenever(syncAccountRepository.getAccountInfo()).thenReturn(noAccount)
-
-        testee.onAlreadyConnectedAcknowledged()
-
-        testee.commands().test {
-            assertTrue(awaitItem() is LoginSuccess)
+            val command = awaitItem()
+            assertTrue("expected ShowError, got $command", command is ShowError)
+            assertEquals(R.string.sync_v2_already_paired_message, (command as ShowError).message)
             cancelAndIgnoreRemainingEvents()
         }
     }
 
     @Test
     fun whenV2PairingRejectedByPeerThenShowErrorAndClearLoading() = runTest {
-        // Repro: peer rejects after this device confirmed → runner reaches Joiner.AbortedByHost with a
-        // RecoveryCodeDenied trigger → dispatcher emits Failed(PAIRING_REJECTED). Must surface a visible
-        // error and clear the Loading spinner, not hang silently.
         syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
         whenever(syncAccountRepository.getAccountInfo()).thenReturn(noAccount)
         val pastedCode = "https://duckduckgo.com/sync/pairing/#&code2=v2code"

@@ -333,8 +333,6 @@ class RealSyncCodeDispatcher @Inject constructor(
         else -> null
     }
 
-    /** A version-too-new SessionError (peer needs a higher protocol major) becomes an upgrade
-     *  prompt; anything else is a generic failure. Shared so the Present/Scanner mappers can't drift. */
     private fun sessionErrorToOutcome(message: String): DispatchOutcome {
         val match = VERSION_TOO_NEW_REGEX.find(message)
         return if (match != null) {
@@ -344,9 +342,6 @@ class RealSyncCodeDispatcher @Inject constructor(
         }
     }
 
-    /** Host abort reason → outcome: user-denied vs host-can't-share carry distinct codes
-     *  (spec: recovery_code_denied vs recovery_code_unavailable). Shared so the Present/Scanner
-     *  mappers can't drift. */
     private fun hostAbortedToOutcome(localTrigger: LocalTrigger?): DispatchOutcome = when (localTrigger) {
         LocalTrigger.UserDeniedHost -> DispatchOutcome.Failed("user_denied", PAIRING_CANCELLED.code)
         LocalTrigger.HostUnavailable -> DispatchOutcome.Failed("host_unavailable", PAIRING_UNAVAILABLE.code)

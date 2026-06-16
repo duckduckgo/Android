@@ -171,7 +171,6 @@ class SyncConnectActivity : DuckDuckGoActivity() {
             is ShowError -> showError(it)
             is AskJoinerConfirmation -> askJoinerConfirmation(it.peerName)
             is AskHostConfirmation -> askHostConfirmation(it.peerName)
-            is Command.ShowAlreadyConnected -> showAlreadyConnected()
         }
     }
 
@@ -182,20 +181,6 @@ class SyncConnectActivity : DuckDuckGoActivity() {
                 viewModel.onReadTextCodeClicked()
             }
         }
-    }
-
-    private fun showAlreadyConnected() {
-        TextAlertDialogBuilder(this)
-            .setTitle(R.string.sync_v2_already_paired_title)
-            .setMessage(R.string.sync_v2_already_paired_message)
-            .setPositiveButton(R.string.sync_dialog_error_ok)
-            .addEventListener(
-                object : TextAlertDialogBuilder.EventListener() {
-                    override fun onPositiveButtonClicked() {
-                        viewModel.onAlreadyConnectedAcknowledged()
-                    }
-                },
-            ).show()
     }
 
     private fun showError(it: ShowError) {

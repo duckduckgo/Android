@@ -609,9 +609,6 @@ class RealSyncCodeDispatcherTest {
     }
 
     @Test fun `presentV2 maps a version-too-new SessionError to UpgradeRequired`() = runTest {
-        // The runner emits this exact message when a peer envelope needs a higher protocol major
-        // (ExchangeV2Runner: "Peer requires protocol v<N>; please update this app"). The Presenter
-        // polls just like the Scanner, so it must surface UpgradeRequired, not a generic Failed.
         val outcome = withTimeoutOrNull(1000) {
             val job = async(start = kotlinx.coroutines.CoroutineStart.UNDISPATCHED) { dispatcher.presentV2().first() }
             runnerEventsFlow.emit(
@@ -626,8 +623,6 @@ class RealSyncCodeDispatcherTest {
     }
 
     @Test fun `route LinkingV2 maps a version-too-new SessionError to UpgradeRequired`() = runTest {
-        // Locks the existing Scanner-side behaviour (previously untested) so it can't regress when
-        // the mapping is shared with the Presenter side.
         setV2(true)
         whenever(qrCode.parse(any())).thenReturn(
             ExchangeV2CodeParseResult.LinkingV2(channelId = "c", publicKey = "k", version = "2"),
@@ -993,8 +988,6 @@ class RealSyncCodeDispatcherTest {
         val outcome = withTimeoutOrNull(100) { dispatcher.presentV2().first() }
         assertEquals(null, outcome)
     }
-
-    // ---- v2 abort error codes (linking / scanner side) ----
 
     private fun startLinking(): kotlinx.coroutines.flow.Flow<DispatchOutcome> {
         setV2(true)

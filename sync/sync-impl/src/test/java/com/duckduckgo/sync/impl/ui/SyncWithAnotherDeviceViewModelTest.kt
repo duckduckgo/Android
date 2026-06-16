@@ -73,7 +73,6 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
@@ -607,7 +606,7 @@ class SyncWithAnotherDeviceViewModelTest {
     }
 
     @Test
-    fun whenSameAccountAbortDuringV2PresentThenShowAlreadyConnected() = runTest {
+    fun whenSameAccountAbortDuringV2PresentThenShowAlreadyPaired() = runTest {
         enableV2(displayOn = true)
         whenever(syncRepository.getAccountInfo()).thenReturn(accountA)
         whenever(qrEncoder.encodeAsBitmap(any(), any(), any())).thenReturn(TestSyncFixtures.qrBitmap())
@@ -624,21 +623,8 @@ class SyncWithAnotherDeviceViewModelTest {
 
         testee.commands().test {
             val command = awaitItem()
-            assertTrue("expected ShowAlreadyConnected, got $command", command is Command.ShowAlreadyConnected)
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenAlreadyConnectedAcknowledgedThenLoginSuccessWithoutRecovery() = runTest {
-        whenever(syncRepository.getAccountInfo()).thenReturn(noAccount)
-
-        testee.onAlreadyConnectedAcknowledged()
-
-        testee.commands().test {
-            val command = awaitItem()
-            assertTrue(command is LoginSuccess)
-            assertFalse((command as LoginSuccess).showRecovery)
+            assertTrue("expected ShowError, got $command", command is ShowError)
+            assertEquals(R.string.sync_v2_already_paired_message, (command as ShowError).message)
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -723,13 +709,8 @@ class SyncWithAnotherDeviceViewModelTest {
         verify(runner, times(1)).startPresent()
     }
 
-    // ---- v2 Joiner: abort-error codes surfaced through onQRCodeScanned ----
-
     @Test
     fun whenV2PairingRejectedByPeerThenShowError() = runTest {
-        // Signed-in device elected Joiner against a signed-in peer; peer rejects → Failed(PAIRING_REJECTED).
-        // Must show a visible error. (Previously force-mapped to CONNECT_FAILED, discarding the code;
-        // guards the visible-error contract once the real code is passed through.)
         syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
         whenever(syncRepository.getAccountInfo()).thenReturn(accountA)
         val scannedCode = "https://duckduckgo.com/sync/pairing/#&code2=v2code"

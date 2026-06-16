@@ -77,7 +77,6 @@ class EnterCodeViewModel @Inject constructor(
 
     private val viewState = MutableStateFlow(ViewState())
     private var codeType: Code = Code.RECOVERY_CODE
-    private var alreadyConnectedPreviousPrimaryKey: String = ""
 
     fun viewState(): Flow<ViewState> = viewState
 
@@ -108,8 +107,8 @@ class EnterCodeViewModel @Inject constructor(
         /** v2 §"Exchange Confirmations": prompt user "Allow [peerName] to join your sync?". */
         data class AskHostConfirmation(val peerName: String?) : Command()
 
-        /** v2 §"Same-account case": inform the user then land connected on OK. */
-        data object ShowAlreadyConnected : Command()
+        /** Dismiss the dialog and close the flow with RESULT_CANCELED */
+        data object FinishWithError : Command()
     }
 
     fun onPasteCodeClicked() {
@@ -157,16 +156,15 @@ class EnterCodeViewModel @Inject constructor(
         when (outcome) {
             is DispatchOutcome.LoggedIn -> onLoginSuccess(previousPrimaryKey)
             is DispatchOutcome.AlreadyConnected -> {
-                alreadyConnectedPreviousPrimaryKey = previousPrimaryKey
                 viewState.value = viewState.value.copy(authState = AuthState.Idle)
-                command.send(Command.ShowAlreadyConnected)
+                command.send(ShowError(message = v2AlreadyPairedError.message, title = v2AlreadyPairedError.title))
             }
             is DispatchOutcome.UpgradeRequired -> {
+                viewState.value = viewState.value.copy(authState = AuthState.Idle)
                 logcat { "Sync v2: upgrade required, peer needs protocol v${outcome.codeMajor}" }
                 command.send(ShowError(message = v2UpgradeRequiredError.message, title = v2UpgradeRequiredError.title))
             }
             is DispatchOutcome.Failed -> {
-                // Always surface v2 failures via the mapper; bypass the v1 catch-all (silent no-op) and AskToSwitchAccount.
                 viewState.value = viewState.value.copy(authState = AuthState.Idle)
                 val content = outcome.code.toV2PairingError()
                 command.send(ShowError(message = content.message, title = content.title))
@@ -184,9 +182,9 @@ class EnterCodeViewModel @Inject constructor(
     fun onHostConfirmed() { codeDispatcher.confirmHost() }
     fun onHostDenied() { codeDispatcher.denyHost() }
 
-    fun onAlreadyConnectedAcknowledged() {
+    fun onErrorDialogDismissed() {
         viewModelScope.launch(dispatchers.io()) {
-            onLoginSuccess(alreadyConnectedPreviousPrimaryKey)
+            command.send(Command.FinishWithError)
         }
     }
 

@@ -147,7 +147,8 @@ class SyncConnectViewModel @Inject constructor(
                 fireLoginPixels()
                 command.send(LoginSuccess)
             }
-            is DispatchOutcome.AlreadyConnected -> command.send(Command.ShowAlreadyConnected)
+            is DispatchOutcome.AlreadyConnected ->
+                command.send(ShowError(message = v2AlreadyPairedError.message, title = v2AlreadyPairedError.title))
             is DispatchOutcome.UpgradeRequired -> {
                 logcat { "Sync v2: upgrade required, peer needs protocol v${outcome.codeMajor}" }
                 command.send(ShowError(message = v2UpgradeRequiredError.message, title = v2UpgradeRequiredError.title))
@@ -210,13 +211,6 @@ class SyncConnectViewModel @Inject constructor(
         }
     }
 
-    fun onAlreadyConnectedAcknowledged() {
-        viewModelScope.launch(dispatchers.io()) {
-            fireLoginPixels()
-            command.send(LoginSuccess)
-        }
-    }
-
     fun onCopyCodeClicked() {
         viewModelScope.launch(dispatchers.io()) {
             val v2Code = v2LinkingCode
@@ -255,9 +249,6 @@ class SyncConnectViewModel @Inject constructor(
 
         /** v2 §"Exchange Confirmations": prompt user "Allow [peerName] to join your sync?". */
         data class AskHostConfirmation(val peerName: String?) : Command()
-
-        /** v2 §"Same-account case": inform the user then land connected on OK. */
-        data object ShowAlreadyConnected : Command()
     }
 
     fun onReadTextCodeClicked() {

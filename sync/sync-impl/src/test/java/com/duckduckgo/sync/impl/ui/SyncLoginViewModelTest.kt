@@ -24,7 +24,6 @@ import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.sync.TestSyncFixtures.jsonRecoveryKey
 import com.duckduckgo.sync.TestSyncFixtures.jsonRecoveryKeyEncoded
 import com.duckduckgo.sync.TestSyncFixtures.primaryKey
-import com.duckduckgo.sync.impl.AccountInfo
 import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.RealSyncCodeDispatcher
 import com.duckduckgo.sync.impl.RecoveryCode
@@ -162,7 +161,7 @@ class SyncLoginViewModelTest {
     }
 
     @Test
-    fun whenV2SameAccountThenShowAlreadyConnected() = runTest {
+    fun whenV2SameAccountThenShowAlreadyPaired() = runTest {
         syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
         val scanned = "https://duckduckgo.com/sync/pairing/#&code2=v2code"
         whenever(qrCode.parse(scanned)).thenReturn(
@@ -182,19 +181,9 @@ class SyncLoginViewModelTest {
 
         testee.commands().test {
             testee.onQRCodeScanned(scanned)
-            assertTrue(awaitItem() is Command.ShowAlreadyConnected)
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenAlreadyConnectedAcknowledgedThenLoginSuccess() = runTest {
-        whenever(syncRepostitory.getAccountInfo()).thenReturn(AccountInfo())
-
-        testee.onAlreadyConnectedAcknowledged()
-
-        testee.commands().test {
-            assertTrue(awaitItem() is LoginSucess)
+            val command = awaitItem()
+            assertTrue("expected ShowError, got $command", command is Command.ShowError)
+            assertEquals(R.string.sync_v2_already_paired_message, (command as Command.ShowError).message)
             cancelAndIgnoreRemainingEvents()
         }
     }

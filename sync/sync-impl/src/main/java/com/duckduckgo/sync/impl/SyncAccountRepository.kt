@@ -1575,8 +1575,6 @@ enum class AccountErrorCodes(val code: Int) {
     INVALID_CODE(55),
     EXCHANGE_FAILED(56),
     THIRD_PARTY_ALREADY_UPGRADED(57),
-
-    // v2 pairing aborts (each a distinct, structured terminal — see RealSyncCodeDispatcher mappers).
     PAIRING_REJECTED(58),
     PAIRING_UNAVAILABLE(59),
     PAIRING_CANCELLED(60),
