@@ -1388,7 +1388,7 @@ class BrowserTabFragment :
     private fun configureInputScreenLauncher() {
         omnibar.configureInputScreenLaunchListener { query ->
             if (!nativeInputManager.isNativeInputEnabled()) {
-                launchInputScreen(query)
+                launchInputScreen(query, isNewTab = omnibar.viewMode == NewTab)
             } else {
                 removeDuckChatContextualSheet()
                 showNativeInput(query)
