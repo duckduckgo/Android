@@ -42,8 +42,6 @@ import com.duckduckgo.adblocking.api.duckplayer.PrivatePlayerMode.Disabled
 import com.duckduckgo.adblocking.api.duckplayer.PrivatePlayerMode.Enabled
 import com.duckduckgo.adblocking.api.duckplayer.YOUTUBE_HOST
 import com.duckduckgo.adblocking.api.duckplayer.YOUTUBE_MOBILE_HOST
-import com.duckduckgo.adblocking.impl.domain.AdBlockingState
-import com.duckduckgo.adblocking.impl.domain.AdBlockingStatusChecker
 import com.duckduckgo.adblocking.impl.duckplayer.DuckPlayerPixelName.DUCK_PLAYER_DAILY_UNIQUE_VIEW
 import com.duckduckgo.adblocking.impl.duckplayer.DuckPlayerPixelName.DUCK_PLAYER_NEWTAB_SETTING_OFF
 import com.duckduckgo.adblocking.impl.duckplayer.DuckPlayerPixelName.DUCK_PLAYER_NEWTAB_SETTING_ON
@@ -56,10 +54,12 @@ import com.duckduckgo.adblocking.impl.duckplayer.DuckPlayerPixelName.DUCK_PLAYER
 import com.duckduckgo.adblocking.impl.duckplayer.DuckPlayerPixelName.DUCK_PLAYER_WATCH_ON_YOUTUBE
 import com.duckduckgo.adblocking.impl.duckplayer.ui.DuckPlayerPrimeBottomSheet
 import com.duckduckgo.adblocking.impl.duckplayer.ui.DuckPlayerPrimeDialogFragment
+import com.duckduckgo.adblocking.impl.remoteconfig.AdBlockingExtensionFeature
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.di.IsMainProcess
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.UrlScheme.Companion.duck
 import com.duckduckgo.common.utils.UrlScheme.Companion.https
@@ -69,10 +69,8 @@ import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -121,7 +119,8 @@ class RealDuckPlayer @Inject constructor(
     private val duckPlayerLocalFilesPath: DuckPlayerLocalFilesPath,
     private val mimeTypeMap: MimeTypeMap,
     private val dispatchers: DispatcherProvider,
-    private val adBlockingStatusChecker: AdBlockingStatusChecker,
+    private val adBlockingExtensionFeature: AdBlockingExtensionFeature,
+    private val appBuildConfig: AppBuildConfig,
     @IsMainProcess private val isMainProcess: Boolean,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : DuckPlayerInternal, PrivacyConfigCallbackPlugin {
@@ -135,11 +134,38 @@ class RealDuckPlayer @Inject constructor(
     init {
         if (isMainProcess) {
             loadToMemory()
+            appCoroutineScope.launch {
+                combine(
+                    duckPlayerFeatureRepository.observeUserPreferences(),
+                    adBlockingExtensionFeature.self().enabled(),
+                    adBlockingExtensionFeature.enabledByDefault().enabled(),
+                    ::Triple,
+                ).collect { (stored, selfEnabled, enabledByDefault) ->
+                    applyAdBlockingRolloutDefaultIfEligible(stored, selfEnabled, enabledByDefault)
+                }
+            }
         }
     }
 
     override fun onPrivacyConfigDownloaded() {
         loadToMemory()
+    }
+
+    private suspend fun applyAdBlockingRolloutDefaultIfEligible(
+        stored: StoredUserPreferences,
+        selfEnabled: Boolean,
+        enabledByDefault: Boolean,
+    ) {
+        if (!appBuildConfig.isNewInstall()) return
+        if (stored.privatePlayerMode != null) return
+        if (!selfEnabled) return
+        if (!enabledByDefault) return
+        duckPlayerFeatureRepository.setUserPreferences(
+            UserPreferences(
+                overlayInteracted = stored.overlayInteracted,
+                privatePlayerMode = Disabled,
+            ),
+        )
     }
 
     override fun getDuckPlayerState(): DuckPlayerState {
@@ -181,16 +207,10 @@ class RealDuckPlayer @Inject constructor(
     }
 
     override fun getUserPreferences(): UserPreferences {
-        val defaultPlayerMode =
-            if (adBlockingStatusChecker.isShownInSettings() && adBlockingStatusChecker.currentState() is AdBlockingState.Enabled) {
-                Disabled
-            } else {
-                AlwaysAsk
-            }
         val stored = duckPlayerFeatureRepository.getUserPreferences()
         return UserPreferences(
             overlayInteracted = stored.overlayInteracted,
-            privatePlayerMode = stored.privatePlayerMode ?: defaultPlayerMode,
+            privatePlayerMode = stored.privatePlayerMode ?: AlwaysAsk,
         )
     }
 
@@ -212,19 +232,9 @@ class RealDuckPlayer @Inject constructor(
         shouldForceYTNavigation = false
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     override fun observeUserPreferences(): Flow<UserPreferences> {
-        return combine(
-            adBlockingStatusChecker.isShownInSettingsFlow(),
-            adBlockingStatusChecker.observeState(),
-        ) { isShownInSettings, currentState ->
-            isShownInSettings && currentState is AdBlockingState.Enabled
-        }
-            .flatMapLatest { consentGated ->
-                val defaultPlayerMode = if (consentGated) Disabled else AlwaysAsk
-                duckPlayerFeatureRepository.observeUserPreferences()
-                    .map { UserPreferences(it.overlayInteracted, it.privatePlayerMode ?: defaultPlayerMode) }
-            }
+        return duckPlayerFeatureRepository.observeUserPreferences()
+            .map { UserPreferences(it.overlayInteracted, it.privatePlayerMode ?: AlwaysAsk) }
     }
 
     override suspend fun sendDuckPlayerPixel(
