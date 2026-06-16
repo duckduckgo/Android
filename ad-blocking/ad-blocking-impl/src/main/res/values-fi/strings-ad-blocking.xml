@@ -19,8 +19,8 @@
 <resources>
     <string name="ad_blocking_settings_title">YouTube-mainosten esto</string>
     <string name="ad_blocking_settings_toggle_title">Estä mainokset YouTubessa</string>
-    <string name="ad_blocking_settings_description_with_consent">DuckDuckGo estää videomainokset YouTubessa, joten voit katsoa videoita keskeytyksettä.\n\nKun tämä toiminto on käytössä, DuckDuckGo tunnistaa nimettömästi mainosten eston aiheuttamat häiriöt tai YouTube-virheet parantaakseen kaikkien käyttökokemusta. DuckDuckGo ei koskaan näe, mitä videoita katsot tai mitään henkilökohtaisesti tunnistettavia tietoja. <annotation type="learn_more_link">Lue lisää</annotation></string>
-    <string name="ad_blocking_settings_description">DuckDuckGo estää videomainokset YouTubessa, joten voit katsoa videoita keskeytyksettä. <annotation type="learn_more_link">Lue lisää</annotation></string>
+    <string name="ad_blocking_settings_description_with_consent">DuckDuckGo poistaa videomainokset YouTubesta, joten voit katsoa videoita keskeytyksettä.\n\nKun tämä toiminto on käytössä, DuckDuckGo tunnistaa nimettömästi mainosten eston aiheuttamat häiriöt tai YouTube-virheet parantaakseen kaikkien käyttökokemusta. DuckDuckGo ei koskaan näe, mitä videoita katsot tai mitään henkilökohtaisesti tunnistettavia tietoja. <annotation type="learn_more_link">Lue lisää</annotation></string>
+    <string name="ad_blocking_settings_description">DuckDuckGo poistaa videomainokset YouTubesta, joten voit katsoa videoita keskeytyksettä. <annotation type="learn_more_link">Lue lisää</annotation></string>
     <string name="ad_blocking_settings_duck_player_header">Duck Player</string>
-    <string name="ad_blocking_settings_duck_player_description">Avaa videot teatteritilassa, jolloin katsomasi sisältö ei vaikuta YouTube-syötteeseesi.</string>
+    <string name="ad_blocking_settings_duck_player_description">Avaa videot häiriöttömässä teatteritilassa, jolloin katsomasi sisältö ei vaikuta YouTube-syötteeseesi.</string>
 </resources>
