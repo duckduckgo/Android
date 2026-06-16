@@ -25,6 +25,7 @@ import com.duckduckgo.sync.TestSyncFixtures.jsonRecoveryKey
 import com.duckduckgo.sync.TestSyncFixtures.jsonRecoveryKeyEncoded
 import com.duckduckgo.sync.TestSyncFixtures.primaryKey
 import com.duckduckgo.sync.impl.R
+import com.duckduckgo.sync.impl.AccountInfo
 import com.duckduckgo.sync.impl.RealSyncCodeDispatcher
 import com.duckduckgo.sync.impl.RecoveryCode
 import com.duckduckgo.sync.impl.Result.Success
@@ -39,6 +40,7 @@ import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Runner
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2State
 import com.duckduckgo.sync.impl.pixels.SyncPixels
 import com.duckduckgo.sync.impl.ui.SyncLoginViewModel.Command
+import com.duckduckgo.sync.impl.ui.SyncLoginViewModel.Command.LoginSucess
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -155,6 +157,18 @@ class SyncLoginViewModelTest {
             val command = awaitItem()
             assertTrue(command is Command.LoginSucess)
             verify(syncPixels).fireLoginPixel()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenAlreadyConnectedAcknowledgedThenLoginSuccess() = runTest {
+        whenever(syncRepostitory.getAccountInfo()).thenReturn(AccountInfo())
+
+        testee.onAlreadyConnectedAcknowledged()
+
+        testee.commands().test {
+            assertTrue(awaitItem() is LoginSucess)
             cancelAndIgnoreRemainingEvents()
         }
     }

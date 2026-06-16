@@ -165,6 +165,7 @@ class SyncWithAnotherDeviceActivity : DuckDuckGoActivity() {
             }
             is Command.AskJoinerConfirmation -> askJoinerConfirmation(it.peerName)
             is Command.AskHostConfirmation -> askHostConfirmation(it.peerName)
+            is Command.ShowAlreadyConnected -> showAlreadyConnected()
         }
     }
 
@@ -241,6 +242,20 @@ class SyncWithAnotherDeviceActivity : DuckDuckGoActivity() {
                         if (isDeepLinkSetup()) {
                             finish()
                         }
+                    }
+                },
+            ).show()
+    }
+
+    private fun showAlreadyConnected() {
+        TextAlertDialogBuilder(this)
+            .setTitle(R.string.sync_v2_already_paired_title)
+            .setMessage(R.string.sync_v2_already_paired_message)
+            .setPositiveButton(R.string.sync_dialog_error_ok)
+            .addEventListener(
+                object : TextAlertDialogBuilder.EventListener() {
+                    override fun onPositiveButtonClicked() {
+                        viewModel.onAlreadyConnectedAcknowledged()
                     }
                 },
             ).show()

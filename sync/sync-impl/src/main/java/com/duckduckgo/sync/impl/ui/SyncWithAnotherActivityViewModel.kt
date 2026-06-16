@@ -86,6 +86,7 @@ class SyncWithAnotherActivityViewModel @Inject constructor(
     fun commands(): Flow<Command> = command.receiveAsFlow()
 
     private var barcodeContents: AuthCode? = null
+    private var alreadyConnectedPreviousPrimaryKey: String = ""
 
     // this can be true during deep linking setup.
     // when the timeout expires, an error message will show to the user
@@ -227,6 +228,9 @@ class SyncWithAnotherActivityViewModel @Inject constructor(
 
         /** v2 §"Exchange Confirmations": prompt user "Allow [peerName] to join your sync?". */
         data class AskHostConfirmation(val peerName: String?) : Command()
+
+        /** v2 §"Same-account case": inform the user then land connected on OK. */
+        data object ShowAlreadyConnected : Command()
     }
 
     fun onReadTextCodeClicked() {
@@ -293,8 +297,8 @@ class SyncWithAnotherActivityViewModel @Inject constructor(
             }
             is DispatchOutcome.AlreadyConnected -> {
                 cancelTimeout()
-                // Spec §"Same-account case": friendly finish, no account change, no recovery screen.
-                onLoginSuccess(previousPrimaryKey, showRecovery = false)
+                alreadyConnectedPreviousPrimaryKey = previousPrimaryKey
+                command.send(Command.ShowAlreadyConnected)
             }
             is DispatchOutcome.UpgradeRequired -> {
                 cancelTimeout()
@@ -318,6 +322,12 @@ class SyncWithAnotherActivityViewModel @Inject constructor(
     fun onJoinerDenied() { codeDispatcher.denyJoiner() }
     fun onHostConfirmed() { codeDispatcher.confirmHost() }
     fun onHostDenied() { codeDispatcher.denyHost() }
+
+    fun onAlreadyConnectedAcknowledged() {
+        viewModelScope.launch(dispatchers.io()) {
+            onLoginSuccess(alreadyConnectedPreviousPrimaryKey, showRecovery = false)
+        }
+    }
 
     private suspend fun onLoginSuccess(previousPrimaryKey: String, showRecovery: Boolean) {
         val postProcessCodePK = syncAccountRepository.getAccountInfo().primaryKey

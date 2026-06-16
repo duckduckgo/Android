@@ -788,6 +788,18 @@ class SyncConnectViewModelTest {
     }
 
     @Test
+    fun whenAlreadyConnectedAcknowledgedThenLoginSuccess() = runTest {
+        whenever(syncRepository.getAccountInfo()).thenReturn(AccountInfo())
+
+        testee.onAlreadyConnectedAcknowledged()
+
+        testee.commands().test {
+            assertTrue(awaitItem() is LoginSuccess)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
     fun whenV2UpgradeRequiredThenShowUpdateError() = runTest {
         syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
         whenever(syncRepository.getAccountInfo()).thenReturn(AccountInfo())

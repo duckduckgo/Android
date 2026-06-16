@@ -122,6 +122,7 @@ class EnterCodeActivity : DuckDuckGoActivity() {
             }
             is Command.AskJoinerConfirmation -> askJoinerConfirmation(command.peerName)
             is Command.AskHostConfirmation -> askHostConfirmation(command.peerName)
+            is Command.ShowAlreadyConnected -> showAlreadyConnected()
         }
     }
 
@@ -159,6 +160,20 @@ class EnterCodeActivity : DuckDuckGoActivity() {
                 object : TextAlertDialogBuilder.EventListener() {
                     override fun onPositiveButtonClicked() { viewModel.onHostConfirmed() }
                     override fun onNegativeButtonClicked() { viewModel.onHostDenied() }
+                },
+            ).show()
+    }
+
+    private fun showAlreadyConnected() {
+        TextAlertDialogBuilder(this)
+            .setTitle(R.string.sync_v2_already_paired_title)
+            .setMessage(R.string.sync_v2_already_paired_message)
+            .setPositiveButton(R.string.sync_dialog_error_ok)
+            .addEventListener(
+                object : TextAlertDialogBuilder.EventListener() {
+                    override fun onPositiveButtonClicked() {
+                        viewModel.onAlreadyConnectedAcknowledged()
+                    }
                 },
             ).show()
     }

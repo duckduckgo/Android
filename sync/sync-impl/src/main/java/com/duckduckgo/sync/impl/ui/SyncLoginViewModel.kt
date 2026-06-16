@@ -80,6 +80,9 @@ class SyncLoginViewModel @Inject constructor(
 
         /** v2 §"Exchange Confirmations": prompt user "Allow [peerName] to join your sync?". */
         data class AskHostConfirmation(val peerName: String?) : Command()
+
+        /** v2 §"Same-account case": inform the user then land connected on OK. */
+        data object ShowAlreadyConnected : Command()
     }
 
     fun onReadTextCodeClicked() {
@@ -135,10 +138,7 @@ class SyncLoginViewModel @Inject constructor(
                 syncPixels.fireLoginPixel()
                 command.send(LoginSucess)
             }
-            is DispatchOutcome.AlreadyConnected -> {
-                // Spec §"Same-account case": treat as success. No new login (account is unchanged).
-                command.send(LoginSucess)
-            }
+            is DispatchOutcome.AlreadyConnected -> command.send(Command.ShowAlreadyConnected)
             is DispatchOutcome.UpgradeRequired -> {
                 logcat { "Sync v2: upgrade required, peer needs protocol v${outcome.codeMajor}" }
                 command.send(ShowError(message = v2UpgradeRequiredError.message, title = v2UpgradeRequiredError.title))
@@ -160,6 +160,12 @@ class SyncLoginViewModel @Inject constructor(
     fun onJoinerDenied() { codeDispatcher.denyJoiner() }
     fun onHostConfirmed() { codeDispatcher.confirmHost() }
     fun onHostDenied() { codeDispatcher.denyHost() }
+
+    fun onAlreadyConnectedAcknowledged() {
+        viewModelScope.launch {
+            command.send(LoginSucess)
+        }
+    }
 
     private suspend fun processError(result: Error) {
         when (result.code) {

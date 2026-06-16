@@ -77,6 +77,7 @@ class EnterCodeViewModel @Inject constructor(
 
     private val viewState = MutableStateFlow(ViewState())
     private var codeType: Code = Code.RECOVERY_CODE
+    private var alreadyConnectedPreviousPrimaryKey: String = ""
 
     fun viewState(): Flow<ViewState> = viewState
 
@@ -106,6 +107,9 @@ class EnterCodeViewModel @Inject constructor(
 
         /** v2 §"Exchange Confirmations": prompt user "Allow [peerName] to join your sync?". */
         data class AskHostConfirmation(val peerName: String?) : Command()
+
+        /** v2 §"Same-account case": inform the user then land connected on OK. */
+        data object ShowAlreadyConnected : Command()
     }
 
     fun onPasteCodeClicked() {
@@ -152,8 +156,11 @@ class EnterCodeViewModel @Inject constructor(
     ) {
         when (outcome) {
             is DispatchOutcome.LoggedIn -> onLoginSuccess(previousPrimaryKey)
-            // Spec §"Same-account case": friendly finish, no account change. Surface as success.
-            is DispatchOutcome.AlreadyConnected -> onLoginSuccess(previousPrimaryKey)
+            is DispatchOutcome.AlreadyConnected -> {
+                alreadyConnectedPreviousPrimaryKey = previousPrimaryKey
+                viewState.value = viewState.value.copy(authState = AuthState.Idle)
+                command.send(Command.ShowAlreadyConnected)
+            }
             is DispatchOutcome.UpgradeRequired -> {
                 logcat { "Sync v2: upgrade required, peer needs protocol v${outcome.codeMajor}" }
                 command.send(ShowError(message = v2UpgradeRequiredError.message, title = v2UpgradeRequiredError.title))
@@ -176,6 +183,12 @@ class EnterCodeViewModel @Inject constructor(
     fun onJoinerDenied() { codeDispatcher.denyJoiner() }
     fun onHostConfirmed() { codeDispatcher.confirmHost() }
     fun onHostDenied() { codeDispatcher.denyHost() }
+
+    fun onAlreadyConnectedAcknowledged() {
+        viewModelScope.launch(dispatchers.io()) {
+            onLoginSuccess(alreadyConnectedPreviousPrimaryKey)
+        }
+    }
 
     private suspend fun onLoginSuccess(previousPrimaryKey: String) {
         val postProcessCodePK = syncAccountRepository.getAccountInfo().primaryKey

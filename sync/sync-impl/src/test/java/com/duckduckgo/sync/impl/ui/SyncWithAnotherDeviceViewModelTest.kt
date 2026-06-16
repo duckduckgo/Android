@@ -73,6 +73,7 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
@@ -606,7 +607,7 @@ class SyncWithAnotherDeviceViewModelTest {
     }
 
     @Test
-    fun whenSameAccountAbortDuringV2PresentThenLoginSuccessShowRecoveryFalse() = runTest {
+    fun whenSameAccountAbortDuringV2PresentThenShowAlreadyConnected() = runTest {
         enableV2(displayOn = true)
         whenever(syncRepository.getAccountInfo()).thenReturn(accountA)
         whenever(qrEncoder.encodeAsBitmap(any(), any(), any())).thenReturn(TestSyncFixtures.qrBitmap())
@@ -623,8 +624,21 @@ class SyncWithAnotherDeviceViewModelTest {
 
         testee.commands().test {
             val command = awaitItem()
-            assertTrue("expected LoginSuccess (friendly finish), got $command", command is LoginSuccess)
-            Assert.assertEquals(false, (command as LoginSuccess).showRecovery)
+            assertTrue("expected ShowAlreadyConnected, got $command", command is Command.ShowAlreadyConnected)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenAlreadyConnectedAcknowledgedThenLoginSuccessWithoutRecovery() = runTest {
+        whenever(syncRepository.getAccountInfo()).thenReturn(noAccount)
+
+        testee.onAlreadyConnectedAcknowledged()
+
+        testee.commands().test {
+            val command = awaitItem()
+            assertTrue(command is LoginSuccess)
+            assertFalse((command as LoginSuccess).showRecovery)
             cancelAndIgnoreRemainingEvents()
         }
     }
