@@ -154,13 +154,10 @@ class EnterCodeViewModel @Inject constructor(
             is DispatchOutcome.LoggedIn -> onLoginSuccess(previousPrimaryKey)
             // Spec §"Same-account case": friendly finish, no account change. Surface as success.
             is DispatchOutcome.AlreadyConnected -> onLoginSuccess(previousPrimaryKey)
-            // Peer needs a newer protocol major — show a visible "please update" error. (follow-up: 1215484651575360)
-            is DispatchOutcome.UpgradeRequired -> command.send(
-                Command.ShowError(
-                    message = R.string.sync_flows_disabled_new_version,
-                    reason = "Code requires protocol v${outcome.codeMajor}",
-                ),
-            )
+            is DispatchOutcome.UpgradeRequired -> {
+                logcat { "Sync v2: upgrade required, peer needs protocol v${outcome.codeMajor}" }
+                command.send(ShowError(message = v2UpgradeRequiredError.message, title = v2UpgradeRequiredError.title))
+            }
             is DispatchOutcome.Failed -> {
                 // Always surface v2 failures via the mapper; bypass the v1 catch-all (silent no-op) and AskToSwitchAccount.
                 viewState.value = viewState.value.copy(authState = AuthState.Idle)

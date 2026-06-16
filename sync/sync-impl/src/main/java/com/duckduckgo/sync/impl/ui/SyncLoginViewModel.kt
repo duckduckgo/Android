@@ -140,8 +140,8 @@ class SyncLoginViewModel @Inject constructor(
                 command.send(LoginSucess)
             }
             is DispatchOutcome.UpgradeRequired -> {
-                // Peer needs a newer protocol major — show a visible "please update" error. (follow-up: 1215484651575360)
-                command.send(ShowError(message = R.string.sync_flows_disabled_new_version, reason = "Code requires protocol v${outcome.codeMajor}"))
+                logcat { "Sync v2: upgrade required, peer needs protocol v${outcome.codeMajor}" }
+                command.send(ShowError(message = v2UpgradeRequiredError.message, title = v2UpgradeRequiredError.title))
             }
             is DispatchOutcome.Failed -> {
                 // Always surface v2 failures via the mapper; bypass the v1 catch-all (silent no-op) and AskToSwitchAccount.

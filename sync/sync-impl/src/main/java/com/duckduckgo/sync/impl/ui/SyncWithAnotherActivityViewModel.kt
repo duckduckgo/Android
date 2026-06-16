@@ -298,8 +298,8 @@ class SyncWithAnotherActivityViewModel @Inject constructor(
             }
             is DispatchOutcome.UpgradeRequired -> {
                 cancelTimeout()
-                // Peer needs a newer protocol major — show the "please update" string like EnterCode/SyncLogin.
-                command.send(ShowError(R.string.sync_flows_disabled_new_version, "Code requires protocol v${outcome.codeMajor}"))
+                logcat { "Sync v2: upgrade required, peer needs protocol v${outcome.codeMajor}" }
+                command.send(ShowError(message = v2UpgradeRequiredError.message, title = v2UpgradeRequiredError.title))
             }
             is DispatchOutcome.Failed -> {
                 cancelTimeout()

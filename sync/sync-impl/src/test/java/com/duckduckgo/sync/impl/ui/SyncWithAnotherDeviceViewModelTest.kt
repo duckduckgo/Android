@@ -756,7 +756,7 @@ class SyncWithAnotherDeviceViewModelTest {
             testee.onQRCodeScanned(scannedCode)
             val command = awaitItem()
             assertTrue("expected ShowError, got $command", command is ShowError)
-            assertEquals(R.string.sync_flows_disabled_new_version, (command as ShowError).message)
+            assertEquals(R.string.sync_v2_error_upgrade_required, (command as ShowError).message)
             cancelAndIgnoreRemainingEvents()
         }
     }
