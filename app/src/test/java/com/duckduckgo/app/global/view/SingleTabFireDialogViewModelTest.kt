@@ -1130,6 +1130,30 @@ class SingleTabFireDialogViewModelTest {
     }
 
     @Test
+    fun `when in fire mode and duck ai chats are selected then title is fire mode title`() = runTest {
+        whenever(mockFireDataStore.isManualClearOptionSelected(FireClearOption.DUCKAI_CHATS)).thenReturn(true)
+        whenever(mockTabRepository.getOpenTabCount()).thenReturn(1)
+        whenever(mockTabRepository.getSelectedTab()).thenReturn(
+            TabEntity(tabId = "tab1", url = "https://website.com/page", title = "Website"),
+        )
+        whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(false)
+
+        testee = createViewModel(browserMode = BrowserMode.FIRE)
+        testee.setOrigin(FireDialogOrigin.Browser)
+
+        testee.viewState.filterIsInstance<SingleTabFireDialogViewModel.ViewState.Loaded>().test {
+            val state = awaitItem()
+
+            assertEquals(
+                SingleTabFireDialogViewModel.TitleSource.Static(R.string.singleTabFireDialogTitleFireMode),
+                state.stateData.titleSource,
+            )
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
     fun `when in fire mode and duck ai tab then title is still duck ai title`() = runTest {
         whenever(mockTabRepository.getOpenTabCount()).thenReturn(1)
         whenever(mockWebViewCapabilityChecker.isSupported(DeleteBrowsingData)).thenReturn(true)

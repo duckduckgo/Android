@@ -309,8 +309,8 @@ class SingleTabFireDialogViewModel @Inject constructor(
             else -> {
                 val titleResId = when {
                     isDuckAiTab && isDeleteThisTabAvailable -> R.string.singleTabFireDialogTitleDuckAi
-                    isDuckAiChatsSelected -> R.string.singleTabFireDialogTitleWithChats
                     isFireMode -> R.string.singleTabFireDialogTitleFireMode
+                    isDuckAiChatsSelected -> R.string.singleTabFireDialogTitleWithChats
                     else -> R.string.singleTabFireDialogTitle
                 }
                 TitleSource.Static(titleResId)
