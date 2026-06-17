@@ -20,9 +20,13 @@ import android.content.SharedPreferences
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.test.api.InMemorySharedPreferences
 import com.duckduckgo.common.utils.formatters.time.DatabaseDateFormatter
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.sync.api.engine.SyncableType
 import com.duckduckgo.sync.impl.API_CODE
 import com.duckduckgo.sync.impl.Result.Error
+import com.duckduckgo.sync.impl.SyncFeature
+import com.duckduckgo.sync.impl.pixels.SyncPixels.ScreenType
 import com.duckduckgo.sync.impl.stats.DailyStats
 import com.duckduckgo.sync.impl.stats.SyncStatsRepository
 import com.duckduckgo.sync.store.SharedPrefsProvider
@@ -40,6 +44,7 @@ class RealSyncPixelsTest {
     private var pixel: Pixel = mock()
     private var syncStatsRepository: SyncStatsRepository = mock()
     private var sharedPrefsProv: SharedPrefsProvider = mock()
+    private val syncFeature = FakeFeatureToggleFactory.create(SyncFeature::class.java)
 
     private lateinit var sharedPreferences: SharedPreferences
     private lateinit var testee: RealSyncPixels
@@ -55,6 +60,7 @@ class RealSyncPixelsTest {
             pixel,
             syncStatsRepository,
             sharedPrefsProv,
+            syncFeature,
         )
     }
 
@@ -118,6 +124,70 @@ class RealSyncPixelsTest {
     fun whenSignupConnectPixelCalledWithSourceThenPixelFiredIncludesSource() {
         testee.fireSignupConnectPixel(source = "foo")
         verify(pixel).fire(SyncPixelName.SYNC_SIGNUP_CONNECT, mapOf("source" to "foo"))
+    }
+
+    @Test
+    fun whenBarcodeScreenShownAndV2FlowEnabledThenPixelFiredWithV2AndDdg() {
+        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
+
+        testee.fireSyncBarcodeScreenShown(ScreenType.SYNC_CONNECT)
+
+        verify(pixel).fire(
+            SyncPixelName.SYNC_SETUP_BARCODE_SCREEN_SHOWN,
+            mapOf(
+                SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to "connect",
+                SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to "v2",
+                SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
+            ),
+        )
+    }
+
+    @Test
+    fun whenBarcodeScreenShownAndV2FlowDisabledThenPixelFiredWithV1AndDdg() {
+        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(false))
+
+        testee.fireSyncBarcodeScreenShown(ScreenType.SYNC_EXCHANGE)
+
+        verify(pixel).fire(
+            SyncPixelName.SYNC_SETUP_BARCODE_SCREEN_SHOWN,
+            mapOf(
+                SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to "exchange",
+                SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to "v1",
+                SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
+            ),
+        )
+    }
+
+    @Test
+    fun whenManualCodeEntryScreenShownAndV2FlowEnabledThenPixelFiredWithV2AndDdg() {
+        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
+
+        testee.fireSyncSetupManualCodeScreenShown(ScreenType.SYNC_EXCHANGE)
+
+        verify(pixel).fire(
+            SyncPixelName.SYNC_SETUP_MANUAL_CODE_ENTRY_SCREEN_SHOWN,
+            mapOf(
+                SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to "exchange",
+                SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to "v2",
+                SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
+            ),
+        )
+    }
+
+    @Test
+    fun whenManualCodeEntryScreenShownAndV2FlowDisabledThenPixelFiredWithV1AndDdg() {
+        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(false))
+
+        testee.fireSyncSetupManualCodeScreenShown(ScreenType.SYNC_CONNECT)
+
+        verify(pixel).fire(
+            SyncPixelName.SYNC_SETUP_MANUAL_CODE_ENTRY_SCREEN_SHOWN,
+            mapOf(
+                SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to "connect",
+                SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to "v1",
+                SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
+            ),
+        )
     }
 
     @Test

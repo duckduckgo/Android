@@ -27,11 +27,14 @@ import com.duckduckgo.sync.api.engine.DeletableType
 import com.duckduckgo.sync.api.engine.SyncFeatureType
 import com.duckduckgo.sync.impl.API_CODE
 import com.duckduckgo.sync.impl.Result.Error
+import com.duckduckgo.sync.impl.SyncFeature
 import com.duckduckgo.sync.impl.pixels.SyncPixelName.SYNC_DAILY
 import com.duckduckgo.sync.impl.pixels.SyncPixelName.SYNC_DAILY_SUCCESS_RATE_PIXEL
 import com.duckduckgo.sync.impl.pixels.SyncPixelName.SYNC_OBJECT_LIMIT_EXCEEDED_DAILY
 import com.duckduckgo.sync.impl.pixels.SyncPixelParameters.CONNECTED_DEVICES_WHEN_DELETING
 import com.duckduckgo.sync.impl.pixels.SyncPixelParameters.SYNC_FEATURE_PROMOTION_SOURCE
+import com.duckduckgo.sync.impl.pixels.SyncPixelParameters.SYNC_SETUP_FLOW_VERSION
+import com.duckduckgo.sync.impl.pixels.SyncPixelParameters.SYNC_SETUP_MY_KIND
 import com.duckduckgo.sync.impl.pixels.SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE
 import com.duckduckgo.sync.impl.pixels.SyncPixels.ScreenType
 import com.duckduckgo.sync.impl.stats.SyncStatsRepository
@@ -145,11 +148,24 @@ class RealSyncPixels @Inject constructor(
     private val pixel: Pixel,
     private val statsRepository: SyncStatsRepository,
     private val sharedPrefsProvider: SharedPrefsProvider,
+    private val syncFeature: SyncFeature,
 ) : SyncPixels {
 
     private val preferences: SharedPreferences by lazy {
         sharedPrefsProvider.getSharedPrefs(SYNC_PIXELS_PREF_FILE)
     }
+
+    /**
+     * Common metadata describing the setup flow this device is opening:
+     * - [SYNC_SETUP_FLOW_VERSION]: "v2" when the device is on the v2 connect/exchange stack
+     *   ([SyncFeature.canUseV2ConnectFlow]), "v1" otherwise. Independent of which code version is
+     *   actually displayed (that is gated separately by [SyncFeature.canShowV2ConnectCode]).
+     * - [SYNC_SETUP_MY_KIND]: always "ddg" — this is the native DuckDuckGo client.
+     */
+    private fun setupFlowMetadata(): Map<String, String> = mapOf(
+        SYNC_SETUP_FLOW_VERSION to if (syncFeature.canUseV2ConnectFlow().isEnabled()) FLOW_VERSION_V2 else FLOW_VERSION_V1,
+        SYNC_SETUP_MY_KIND to MY_KIND_DDG,
+    )
 
     override fun fireDailyPixel() {
         tryToFireDailyPixel(SYNC_DAILY)
@@ -378,7 +394,7 @@ class RealSyncPixels @Inject constructor(
     }
 
     override fun fireSyncBarcodeScreenShown(screenType: ScreenType) {
-        val params = mapOf(SYNC_SETUP_SCREEN_TYPE to screenType.value)
+        val params = mapOf(SYNC_SETUP_SCREEN_TYPE to screenType.value) + setupFlowMetadata()
         pixel.fire(SyncPixelName.SYNC_SETUP_BARCODE_SCREEN_SHOWN, parameters = params)
     }
 
@@ -393,7 +409,7 @@ class RealSyncPixels @Inject constructor(
     }
 
     override fun fireSyncSetupManualCodeScreenShown(screenType: ScreenType) {
-        val params = mapOf(SYNC_SETUP_SCREEN_TYPE to screenType.value)
+        val params = mapOf(SYNC_SETUP_SCREEN_TYPE to screenType.value) + setupFlowMetadata()
         pixel.fire(SyncPixelName.SYNC_SETUP_MANUAL_CODE_ENTRY_SCREEN_SHOWN, parameters = params)
     }
 
@@ -506,6 +522,9 @@ class RealSyncPixels @Inject constructor(
 
     companion object {
         private const val SYNC_PIXELS_PREF_FILE = "com.duckduckgo.sync.pixels.v1"
+        private const val FLOW_VERSION_V1 = "v1"
+        private const val FLOW_VERSION_V2 = "v2"
+        private const val MY_KIND_DDG = "ddg"
     }
 }
 
@@ -615,6 +634,8 @@ object SyncPixelParameters {
     const val SYNC_FEATURE_PROMOTION_SOURCE = "source"
     const val GET_OTHER_DEVICES_SCREEN_LAUNCH_SOURCE = "source"
     const val SYNC_SETUP_SCREEN_TYPE = "source"
+    const val SYNC_SETUP_FLOW_VERSION = "flow_version"
+    const val SYNC_SETUP_MY_KIND = "my_kind"
     const val CONNECTED_DEVICES_WHEN_DELETING = "connected_devices"
 
     const val AUTO_RESTORE_SOURCE = "source"
