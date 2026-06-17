@@ -5037,6 +5037,9 @@ class BrowserTabFragment :
 
     fun onBackPressed(isCustomTab: Boolean = false): Boolean {
         if (!isAdded) return false
+        // During the locked Duck.ai onboarding demo, don't navigate within the app — returning false
+        // lets BrowserActivity exit (close the app). The user progresses by tapping the fire button.
+        if (viewModel.isOmnibarLockedForOnboarding()) return false
         if (nativeInputManager.hideNativeInput()) return true
         if (isPdfVisible()) {
             hidePdf()
