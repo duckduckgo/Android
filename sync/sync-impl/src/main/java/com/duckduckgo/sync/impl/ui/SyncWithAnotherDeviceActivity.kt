@@ -156,6 +156,7 @@ class SyncWithAnotherDeviceActivity : DuckDuckGoActivity() {
 
             is ShowMessage -> Snackbar.make(binding.root, it.messageId, Snackbar.LENGTH_SHORT).show()
             is ShowError -> showError(it)
+            is Command.ShowV2Error -> showV2PairingError(it.content) { viewModel.onErrorDialogDismissed() }
             is AskToSwitchAccount -> askUserToSwitchAccount(it)
             SwitchAccountSuccess -> {
                 val resultIntent = Intent()

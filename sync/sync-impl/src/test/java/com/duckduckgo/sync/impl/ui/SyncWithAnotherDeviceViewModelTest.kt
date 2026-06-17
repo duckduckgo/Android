@@ -36,12 +36,14 @@ import com.duckduckgo.sync.TestSyncFixtures.primaryKey
 import com.duckduckgo.sync.TestSyncFixtures.validLoginKeys
 import com.duckduckgo.sync.impl.AccountErrorCodes.ALREADY_SIGNED_IN
 import com.duckduckgo.sync.impl.AccountErrorCodes.LOGIN_FAILED
+import com.duckduckgo.sync.impl.AccountErrorCodes.PAIRING_CANCELLED
+import com.duckduckgo.sync.impl.AccountErrorCodes.PAIRING_FAILED
+import com.duckduckgo.sync.impl.AccountErrorCodes.PAIRING_REJECTED
 import com.duckduckgo.sync.impl.Clipboard
 import com.duckduckgo.sync.impl.ExchangeResult.AccountSwitchingRequired
 import com.duckduckgo.sync.impl.ExchangeResult.LoggedIn
 import com.duckduckgo.sync.impl.InvitationCode
 import com.duckduckgo.sync.impl.QREncoder
-import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.RealSyncCodeDispatcher
 import com.duckduckgo.sync.impl.RecoveryCode
 import com.duckduckgo.sync.impl.Result
@@ -67,6 +69,7 @@ import com.duckduckgo.sync.impl.ui.SyncWithAnotherActivityViewModel.Command.AskH
 import com.duckduckgo.sync.impl.ui.SyncWithAnotherActivityViewModel.Command.AskToSwitchAccount
 import com.duckduckgo.sync.impl.ui.SyncWithAnotherActivityViewModel.Command.LoginSuccess
 import com.duckduckgo.sync.impl.ui.SyncWithAnotherActivityViewModel.Command.ShowError
+import com.duckduckgo.sync.impl.ui.SyncWithAnotherActivityViewModel.Command.ShowV2Error
 import com.duckduckgo.sync.impl.ui.SyncWithAnotherActivityViewModel.Command.SwitchAccountSuccess
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flowOf
@@ -623,8 +626,8 @@ class SyncWithAnotherDeviceViewModelTest {
 
         testee.commands().test {
             val command = awaitItem()
-            assertTrue("expected ShowError, got $command", command is ShowError)
-            assertEquals(R.string.sync_v2_already_paired_message, (command as ShowError).message)
+            assertTrue("expected ShowV2Error, got $command", command is ShowV2Error)
+            assertEquals(v2AlreadyPairedError, (command as ShowV2Error).content)
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -651,7 +654,8 @@ class SyncWithAnotherDeviceViewModelTest {
 
         testee.commands().test {
             val command = awaitItem()
-            assertTrue("expected ShowError, got $command", command is ShowError)
+            assertTrue("expected ShowV2Error, got $command", command is ShowV2Error)
+            assertEquals(PAIRING_CANCELLED.code.toV2PairingError(), (command as ShowV2Error).content)
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -674,7 +678,8 @@ class SyncWithAnotherDeviceViewModelTest {
 
         testee.commands().test {
             val command = awaitItem()
-            assertTrue("expected ShowError, got $command", command is ShowError)
+            assertTrue("expected ShowV2Error, got $command", command is ShowV2Error)
+            assertEquals(PAIRING_FAILED.code.toV2PairingError(), (command as ShowV2Error).content)
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -730,7 +735,8 @@ class SyncWithAnotherDeviceViewModelTest {
                 ),
             )
             val command = awaitItem()
-            assertTrue("expected ShowError, got $command", command is ShowError)
+            assertTrue("expected ShowV2Error, got $command", command is ShowV2Error)
+            assertEquals(PAIRING_REJECTED.code.toV2PairingError(), (command as ShowV2Error).content)
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -750,8 +756,8 @@ class SyncWithAnotherDeviceViewModelTest {
         testee.commands().test {
             testee.onQRCodeScanned(scannedCode)
             val command = awaitItem()
-            assertTrue("expected ShowError, got $command", command is ShowError)
-            assertEquals(R.string.sync_v2_error_upgrade_required, (command as ShowError).message)
+            assertTrue("expected ShowV2Error, got $command", command is ShowV2Error)
+            assertEquals(v2UpgradeRequiredError, (command as ShowV2Error).content)
             cancelAndIgnoreRemainingEvents()
         }
     }
