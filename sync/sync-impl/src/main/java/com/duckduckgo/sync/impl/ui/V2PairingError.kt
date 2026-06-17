@@ -25,7 +25,7 @@ import com.duckduckgo.sync.impl.AccountErrorCodes.THIRD_PARTY_ALREADY_UPGRADED
 import com.duckduckgo.sync.impl.R
 
 /** Dialog copy for a v2 pairing terminal outcome. A null [message] renders a title-only dialog. */
-data class V2PairingErrorContent(
+internal data class V2PairingErrorContent(
     @StringRes val title: Int,
     @StringRes val message: Int?,
 )
@@ -34,7 +34,7 @@ data class V2PairingErrorContent(
  * Maps a v2 pairing [com.duckduckgo.sync.impl.DispatchOutcome.Failed] error code to dialog copy.
  * The scenario line is the title; the message is a short supporting line or null (title-only).
  */
-fun Int.toV2PairingError(): V2PairingErrorContent = when (this) {
+internal fun Int.toV2PairingError(): V2PairingErrorContent = when (this) {
     PAIRING_REJECTED.code -> V2PairingErrorContent(
         title = R.string.sync_v2_error_pairing_rejected,
         message = R.string.sync_v2_error_try_again,
@@ -54,13 +54,13 @@ fun Int.toV2PairingError(): V2PairingErrorContent = when (this) {
 }
 
 /** Fixed copy for [com.duckduckgo.sync.impl.DispatchOutcome.UpgradeRequired] outcome (title-only). */
-val v2UpgradeRequiredError = V2PairingErrorContent(
+internal val v2UpgradeRequiredError = V2PairingErrorContent(
     title = R.string.sync_v2_error_upgrade_required,
     message = null,
 )
 
 /** Fixed copy for the same-account [com.duckduckgo.sync.impl.DispatchOutcome.AlreadyConnected] outcome. */
-val v2AlreadyPairedError = V2PairingErrorContent(
+internal val v2AlreadyPairedError = V2PairingErrorContent(
     title = R.string.sync_v2_already_paired_title,
     message = R.string.sync_v2_already_paired_message,
 )
@@ -71,7 +71,7 @@ val v2AlreadyPairedError = V2PairingErrorContent(
  * title-only dialog (the builder hides the message view when it is empty). [onDismissed] runs on
  * the positive-button tap, mirroring the v1 path's `viewModel.onErrorDialogDismissed()`.
  */
-fun Context.showV2PairingError(
+internal fun Context.showV2PairingError(
     content: V2PairingErrorContent,
     onDismissed: () -> Unit,
 ) {

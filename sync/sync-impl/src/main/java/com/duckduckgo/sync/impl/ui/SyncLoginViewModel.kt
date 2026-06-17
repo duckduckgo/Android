@@ -82,7 +82,7 @@ class SyncLoginViewModel @Inject constructor(
         data class AskHostConfirmation(val peerName: String?) : Command()
 
         /** v2 pairing terminal-outcome dialog: title-primary copy, optional message, "Got It" button. */
-        data class ShowV2Error(val content: V2PairingErrorContent) : Command()
+        internal data class ShowV2Error(val content: V2PairingErrorContent) : Command()
     }
 
     fun onReadTextCodeClicked() {

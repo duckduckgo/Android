@@ -111,7 +111,7 @@ class EnterCodeViewModel @Inject constructor(
         data object FinishWithError : Command()
 
         /** v2 pairing terminal-outcome dialog: title-primary copy, optional message, "Got It" button. */
-        data class ShowV2Error(val content: V2PairingErrorContent) : Command()
+        internal data class ShowV2Error(val content: V2PairingErrorContent) : Command()
     }
 
     fun onPasteCodeClicked() {
