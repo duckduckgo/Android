@@ -238,8 +238,11 @@ class PirInitialScanCompletionWideEventImpl @Inject constructor(
             6.hours,
             12.hours,
             1.days,
+            2.days,
             3.days,
+            5.days,
             7.days,
+            10.days,
             14.days,
         )
 
