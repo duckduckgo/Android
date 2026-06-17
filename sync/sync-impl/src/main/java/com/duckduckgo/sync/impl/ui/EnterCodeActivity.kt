@@ -113,6 +113,8 @@ class EnterCodeActivity : DuckDuckGoActivity() {
                 showError(command)
             }
 
+            is Command.ShowV2Error -> showV2PairingError(command.content) { viewModel.onErrorDialogDismissed() }
+
             is AskToSwitchAccount -> askUserToSwitchAccount(command)
             SwitchAccountSuccess -> {
                 val resultIntent = Intent()

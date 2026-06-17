@@ -109,6 +109,9 @@ class EnterCodeViewModel @Inject constructor(
 
         /** Dismiss the dialog and close the flow with RESULT_CANCELED */
         data object FinishWithError : Command()
+
+        /** v2 pairing terminal-outcome dialog: title-primary copy, optional message, "Got It" button. */
+        data class ShowV2Error(val content: V2PairingErrorContent) : Command()
     }
 
     fun onPasteCodeClicked() {
@@ -157,17 +160,16 @@ class EnterCodeViewModel @Inject constructor(
             is DispatchOutcome.LoggedIn -> onLoginSuccess(previousPrimaryKey)
             is DispatchOutcome.AlreadyConnected -> {
                 viewState.value = viewState.value.copy(authState = AuthState.Idle)
-                command.send(ShowError(message = v2AlreadyPairedError.message, title = v2AlreadyPairedError.title))
+                command.send(Command.ShowV2Error(v2AlreadyPairedError))
             }
             is DispatchOutcome.UpgradeRequired -> {
                 viewState.value = viewState.value.copy(authState = AuthState.Idle)
                 logcat { "Sync v2: upgrade required, peer needs protocol v${outcome.codeMajor}" }
-                command.send(ShowError(message = v2UpgradeRequiredError.message, title = v2UpgradeRequiredError.title))
+                command.send(Command.ShowV2Error(v2UpgradeRequiredError))
             }
             is DispatchOutcome.Failed -> {
                 viewState.value = viewState.value.copy(authState = AuthState.Idle)
-                val content = outcome.code.toV2PairingError()
-                command.send(ShowError(message = content.message, title = content.title))
+                command.send(Command.ShowV2Error(outcome.code.toV2PairingError()))
             }
             is DispatchOutcome.JoinerConfirmationRequested ->
                 command.send(Command.AskJoinerConfirmation(outcome.peerName))

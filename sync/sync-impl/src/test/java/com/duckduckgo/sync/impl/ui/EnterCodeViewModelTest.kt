@@ -35,9 +35,9 @@ import com.duckduckgo.sync.impl.AccountErrorCodes.CREATE_ACCOUNT_FAILED
 import com.duckduckgo.sync.impl.AccountErrorCodes.GENERIC_ERROR
 import com.duckduckgo.sync.impl.AccountErrorCodes.INVALID_CODE
 import com.duckduckgo.sync.impl.AccountErrorCodes.LOGIN_FAILED
+import com.duckduckgo.sync.impl.AccountErrorCodes.PAIRING_REJECTED
 import com.duckduckgo.sync.impl.AccountErrorCodes.THIRD_PARTY_ALREADY_UPGRADED
 import com.duckduckgo.sync.impl.Clipboard
-import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.RealSyncCodeDispatcher
 import com.duckduckgo.sync.impl.RecoveryCode
 import com.duckduckgo.sync.impl.Result.Error
@@ -58,6 +58,7 @@ import com.duckduckgo.sync.impl.ui.EnterCodeViewModel.AuthState.Idle
 import com.duckduckgo.sync.impl.ui.EnterCodeViewModel.Command.AskToSwitchAccount
 import com.duckduckgo.sync.impl.ui.EnterCodeViewModel.Command.LoginSuccess
 import com.duckduckgo.sync.impl.ui.EnterCodeViewModel.Command.ShowError
+import com.duckduckgo.sync.impl.ui.EnterCodeViewModel.Command.ShowV2Error
 import com.duckduckgo.sync.impl.ui.EnterCodeViewModel.Command.SwitchAccountSuccess
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
@@ -148,8 +149,8 @@ internal class EnterCodeViewModelTest {
 
         testee.commands().test {
             val command = awaitItem()
-            assertTrue("expected ShowError, got $command", command is ShowError)
-            assertEquals(R.string.sync_v2_error_third_party_already_upgraded, (command as ShowError).message)
+            assertTrue("expected ShowV2Error, got $command", command is ShowV2Error)
+            assertEquals(THIRD_PARTY_ALREADY_UPGRADED.code.toV2PairingError(), (command as ShowV2Error).content)
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -171,8 +172,8 @@ internal class EnterCodeViewModelTest {
 
         testee.commands().test {
             val command = awaitItem()
-            assertTrue("expected ShowError, got $command", command is ShowError)
-            assertEquals(R.string.sync_v2_error_upgrade_required, (command as ShowError).message)
+            assertTrue("expected ShowV2Error, got $command", command is ShowV2Error)
+            assertEquals(v2UpgradeRequiredError, (command as ShowV2Error).content)
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -419,8 +420,8 @@ internal class EnterCodeViewModelTest {
 
         testee.commands().test {
             val command = awaitItem()
-            assertTrue("expected ShowError, got $command", command is ShowError)
-            assertEquals(R.string.sync_v2_already_paired_message, (command as ShowError).message)
+            assertTrue("expected ShowV2Error, got $command", command is ShowV2Error)
+            assertEquals(v2AlreadyPairedError, (command as ShowV2Error).content)
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -450,7 +451,8 @@ internal class EnterCodeViewModelTest {
 
         testee.commands().test {
             val command = awaitItem()
-            assertTrue("expected ShowError, got $command", command is ShowError)
+            assertTrue("expected ShowV2Error, got $command", command is ShowV2Error)
+            assertEquals(PAIRING_REJECTED.code.toV2PairingError(), (command as ShowV2Error).content)
             cancelAndIgnoreRemainingEvents()
         }
         testee.viewState().test {
