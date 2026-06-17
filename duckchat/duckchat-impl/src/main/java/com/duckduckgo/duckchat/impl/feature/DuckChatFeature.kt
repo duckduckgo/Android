@@ -133,6 +133,7 @@ interface DuckChatFeature {
     /**
      * @return `true` when the Native Input Field should be used instead of the web-based input.
      */
+    @InternalAlwaysEnabled
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun nativeInputField(): Toggle
 
