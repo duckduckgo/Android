@@ -27,6 +27,7 @@ import com.duckduckgo.appbuildconfig.api.isInternalBuild
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
+import com.duckduckgo.pir.impl.pixels.PirInteractionReporter
 import com.duckduckgo.pir.impl.pixels.PirPixelSender
 import com.duckduckgo.pir.impl.store.PirRepository
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
@@ -41,6 +42,7 @@ import javax.inject.Inject
 @ContributesViewModel(ActivityScope::class)
 class PirDashboardWebViewViewModel @Inject constructor(
     private val pirPixelSender: PirPixelSender,
+    private val pirInteractionReporter: PirInteractionReporter,
     private val appBuildConfig: AppBuildConfig,
     private val pirRepository: PirRepository,
 ) : ViewModel(), DefaultLifecycleObserver {
@@ -60,6 +62,9 @@ class PirDashboardWebViewViewModel @Inject constructor(
     override fun onStart(owner: LifecycleOwner) {
         super.onStart(owner)
         pirPixelSender.reportDashboardOpened()
+        viewModelScope.launch {
+            pirInteractionReporter.attemptFirePixel()
+        }
 
         if (appBuildConfig.isInternalBuild()) {
             viewModelScope.launch {

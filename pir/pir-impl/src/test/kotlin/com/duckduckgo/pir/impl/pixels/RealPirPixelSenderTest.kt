@@ -1159,4 +1159,72 @@ class RealPirPixelSenderTest {
         assert(paramsCaptor.firstValue["vpn_connection_state"] == "connected")
         assert(paramsCaptor.firstValue["notifications_permission_granted"] == "false")
     }
+
+    @Test
+    fun whenReportInteractionDAUThenEnqueuesPixelWithAuthParams() = runTest {
+        testee.reportInteractionDAU()
+
+        val paramsCaptor = argumentCaptor<Map<String, String>>()
+        verify(mockPixelSender).enqueueFire(
+            pixelName = any(),
+            parameters = paramsCaptor.capture(),
+            encodedParameters = any(),
+            type = any(),
+        )
+
+        assert(paramsCaptor.firstValue["is_authenticated"] == "true")
+        assert(paramsCaptor.firstValue["free_scan"] == "false")
+    }
+
+    @Test
+    fun whenReportInteractionWAUThenEnqueuesPixelWithAuthParams() = runTest {
+        testee.reportInteractionWAU()
+
+        val paramsCaptor = argumentCaptor<Map<String, String>>()
+        verify(mockPixelSender).enqueueFire(
+            pixelName = any(),
+            parameters = paramsCaptor.capture(),
+            encodedParameters = any(),
+            type = any(),
+        )
+
+        assert(paramsCaptor.firstValue["is_authenticated"] == "true")
+        assert(paramsCaptor.firstValue["free_scan"] == "false")
+    }
+
+    @Test
+    fun whenReportInteractionMAUThenEnqueuesPixelWithAuthParams() = runTest {
+        testee.reportInteractionMAU()
+
+        val paramsCaptor = argumentCaptor<Map<String, String>>()
+        verify(mockPixelSender).enqueueFire(
+            pixelName = any(),
+            parameters = paramsCaptor.capture(),
+            encodedParameters = any(),
+            type = any(),
+        )
+
+        assert(paramsCaptor.firstValue["is_authenticated"] == "true")
+        assert(paramsCaptor.firstValue["free_scan"] == "false")
+    }
+
+    @Test
+    fun whenReportFirstScanStartedThenEnqueuesUniquePixelWithAuthParams() = runTest {
+        testee.reportFirstScanStarted()
+
+        val pixelNameCaptor = argumentCaptor<String>()
+        val paramsCaptor = argumentCaptor<Map<String, String>>()
+        val typeCaptor = argumentCaptor<Pixel.PixelType>()
+        verify(mockPixelSender).enqueueFire(
+            pixelName = pixelNameCaptor.capture(),
+            parameters = paramsCaptor.capture(),
+            encodedParameters = any(),
+            type = typeCaptor.capture(),
+        )
+
+        assert(pixelNameCaptor.firstValue == "m_dbp_first_scan_u")
+        assert(typeCaptor.firstValue is Pixel.PixelType.Unique)
+        assert(paramsCaptor.firstValue["is_authenticated"] == "true")
+        assert(paramsCaptor.firstValue["free_scan"] == "false")
+    }
 }

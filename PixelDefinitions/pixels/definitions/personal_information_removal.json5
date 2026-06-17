@@ -288,6 +288,82 @@
         "suffixes": ["daily_count_short", "form_factor"],
         "parameters": ["appVersion"]
     },
+    "m_dbp_interaction_dau": {
+        "description": "Pixel for PIR user-interacted daily active users. Fired when the PIR dashboard is presented to the user.",
+        "owners": ["landomen"],
+        "triggers": ["other"],
+        "suffixes": ["daily_count_short", "form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "is_authenticated",
+                "description": "Whether the user is authenticated (has an active subscription). Always true on Android, which has no freemium PIR.",
+                "type": "boolean"
+            },
+            {
+                "key": "free_scan",
+                "description": "Whether this is a freemium (unauthenticated) scan. Always false on Android, which has no freemium PIR.",
+                "type": "boolean"
+            }
+        ]
+    },
+    "m_dbp_interaction_wau": {
+        "description": "Pixel for PIR user-interacted weekly active users. Fired when the PIR dashboard is presented to the user.",
+        "owners": ["landomen"],
+        "triggers": ["other"],
+        "suffixes": ["daily_count_short", "form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "is_authenticated",
+                "description": "Whether the user is authenticated (has an active subscription). Always true on Android, which has no freemium PIR.",
+                "type": "boolean"
+            },
+            {
+                "key": "free_scan",
+                "description": "Whether this is a freemium (unauthenticated) scan. Always false on Android, which has no freemium PIR.",
+                "type": "boolean"
+            }
+        ]
+    },
+    "m_dbp_interaction_mau": {
+        "description": "Pixel for PIR user-interacted monthly active users. Fired when the PIR dashboard is presented to the user.",
+        "owners": ["landomen"],
+        "triggers": ["other"],
+        "suffixes": ["daily_count_short", "form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "is_authenticated",
+                "description": "Whether the user is authenticated (has an active subscription). Always true on Android, which has no freemium PIR.",
+                "type": "boolean"
+            },
+            {
+                "key": "free_scan",
+                "description": "Whether this is a freemium (unauthenticated) scan. Always false on Android, which has no freemium PIR.",
+                "type": "boolean"
+            }
+        ]
+    },
+    "m_dbp_first_scan_u": {
+        "description": "Fired once per install when the user starts their first PIR scan.",
+        "owners": ["landomen"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "is_authenticated",
+                "description": "Whether the user is authenticated (has an active subscription). Always true on Android, which has no freemium PIR.",
+                "type": "boolean"
+            },
+            {
+                "key": "free_scan",
+                "description": "Whether this is a freemium (unauthenticated) scan. Always false on Android, which has no freemium PIR.",
+                "type": "boolean"
+            }
+        ]
+    },
     "m_dbp_weekly_child-broker_orphaned-optouts": {
         "description": "Pixel to know orphaned opt-out records on child data brokers that don't have matching profiles on their parent broker.",
         "owners": ["karlenDimla", "landomen"],
