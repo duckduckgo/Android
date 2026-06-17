@@ -22,7 +22,6 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.pm.ActivityInfo
 import android.graphics.Color
-import android.os.Build
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
@@ -120,9 +119,8 @@ abstract class DuckDuckGoActivity : DaggerActivity() {
     }
 
     /**
-     * Enables edge-to-edge with fully transparent system bars. The navigation bar stays transparent
-     * in gesture navigation; in 2/3-button navigation the system draws a contrast scrim so the
-     * buttons remain legible. Call from [onCreate] when edge-to-edge is enabled for the screen.
+     * Enables edge-to-edge with fully transparent system bars. Call from [onCreate] when
+     * edge-to-edge is enabled for the screen.
      */
     protected fun enableTransparentEdgeToEdge() {
         val barStyle = if (isDarkThemeEnabled()) {
@@ -131,9 +129,6 @@ abstract class DuckDuckGoActivity : DaggerActivity() {
             SystemBarStyle.light(Color.TRANSPARENT, Color.TRANSPARENT)
         }
         enableEdgeToEdge(statusBarStyle = barStyle, navigationBarStyle = barStyle)
-        if (Build.VERSION.SDK_INT >= 29) {
-            window.isNavigationBarContrastEnforced = true
-        }
     }
 
     protected inline fun <reified V : ViewModel> bindViewModel() = lazy {
