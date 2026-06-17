@@ -26,56 +26,58 @@ import com.duckduckgo.sync.impl.AccountErrorCodes.PAIRING_UNAVAILABLE
 import com.duckduckgo.sync.impl.AccountErrorCodes.THIRD_PARTY_ALREADY_UPGRADED
 import com.duckduckgo.sync.impl.R
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Test
 
 class V2PairingErrorTest {
 
     @Test
-    fun whenCodeIsPairingRejectedThenCanceledFromOtherDeviceCopy() {
+    fun whenCodeIsPairingRejectedThenCanceledFromOtherDeviceTitleWithTryAgain() {
         val content = PAIRING_REJECTED.code.toV2PairingError()
-        assertEquals(R.string.sync_dialog_error_title, content.title)
-        assertEquals(R.string.sync_v2_error_pairing_rejected, content.message)
+        assertEquals(R.string.sync_v2_error_pairing_rejected, content.title)
+        assertEquals(R.string.sync_v2_error_try_again, content.message)
     }
 
     @Test
-    fun whenCodeIsPairingCancelledThenCanceledCopy() {
+    fun whenCodeIsPairingCancelledThenCanceledTitleOnly() {
         val content = PAIRING_CANCELLED.code.toV2PairingError()
-        assertEquals(R.string.sync_dialog_error_title, content.title)
-        assertEquals(R.string.sync_v2_error_pairing_canceled, content.message)
+        assertEquals(R.string.sync_v2_error_pairing_canceled, content.title)
+        assertNull(content.message)
     }
 
     @Test
-    fun whenCodeIsThirdPartyAlreadyUpgradedThenSyncFromConnectedBrowserCopy() {
+    fun whenCodeIsThirdPartyAlreadyUpgradedThenSyncFailedTitleWithUpgradeMessage() {
         val content = THIRD_PARTY_ALREADY_UPGRADED.code.toV2PairingError()
         assertEquals(R.string.sync_v2_error_pairing_failed, content.title)
         assertEquals(R.string.sync_v2_error_third_party_already_upgraded, content.message)
     }
 
     @Test
-    fun whenCodeIsAnyOtherAbortThenSyncFailedCopy() {
+    fun whenCodeIsAnyOtherAbortThenSyncFailedTitleWithTryAgain() {
         listOf(PAIRING_UNAVAILABLE, NEGOTIATION_ABORTED, NO_RECOVERY_CODE, PAIRING_FAILED).forEach { code ->
-            assertEquals(
-                "code $code should map to Sync failed.",
-                R.string.sync_v2_error_pairing_failed,
-                code.code.toV2PairingError().message,
-            )
+            val content = code.code.toV2PairingError()
+            assertEquals("code $code title", R.string.sync_v2_error_pairing_failed, content.title)
+            assertEquals("code $code message", R.string.sync_v2_error_try_again, content.message)
         }
     }
 
     @Test
-    fun whenCodeIsGenericOrUnknownThenSyncFailedCopy() {
-        assertEquals(R.string.sync_v2_error_pairing_failed, GENERIC_ERROR.code.toV2PairingError().message)
-        assertEquals(R.string.sync_v2_error_pairing_failed, 9999.toV2PairingError().message)
+    fun whenCodeIsGenericOrUnknownThenSyncFailedTitleWithTryAgain() {
+        listOf(GENERIC_ERROR.code, 9999).forEach { code ->
+            val content = code.toV2PairingError()
+            assertEquals(R.string.sync_v2_error_pairing_failed, content.title)
+            assertEquals(R.string.sync_v2_error_try_again, content.message)
+        }
     }
 
     @Test
-    fun whenUpgradeRequiredThenUpdateBrowserCopy() {
-        assertEquals(R.string.sync_dialog_error_title, v2UpgradeRequiredError.title)
-        assertEquals(R.string.sync_v2_error_upgrade_required, v2UpgradeRequiredError.message)
+    fun whenUpgradeRequiredThenUpdateBrowserTitleOnly() {
+        assertEquals(R.string.sync_v2_error_upgrade_required, v2UpgradeRequiredError.title)
+        assertNull(v2UpgradeRequiredError.message)
     }
 
     @Test
-    fun whenAlreadyPairedThenAlreadyPairedCopy() {
+    fun whenAlreadyPairedThenAlreadySyncedTitleWithMessage() {
         assertEquals(R.string.sync_v2_already_paired_title, v2AlreadyPairedError.title)
         assertEquals(R.string.sync_v2_already_paired_message, v2AlreadyPairedError.message)
     }

@@ -16,38 +16,75 @@
 
 package com.duckduckgo.sync.impl.ui
 
+import android.content.Context
 import androidx.annotation.StringRes
+import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.sync.impl.AccountErrorCodes.PAIRING_CANCELLED
 import com.duckduckgo.sync.impl.AccountErrorCodes.PAIRING_REJECTED
 import com.duckduckgo.sync.impl.AccountErrorCodes.THIRD_PARTY_ALREADY_UPGRADED
 import com.duckduckgo.sync.impl.R
 
-internal data class V2PairingErrorContent(
+/** Dialog copy for a v2 pairing terminal outcome. A null [message] renders a title-only dialog. */
+data class V2PairingErrorContent(
     @StringRes val title: Int,
-    @StringRes val message: Int,
+    @StringRes val message: Int?,
 )
 
 /**
  * Maps a v2 pairing [com.duckduckgo.sync.impl.DispatchOutcome.Failed] error code to dialog copy.
+ * The scenario line is the title; the message is a short supporting line or null (title-only).
  */
-internal fun Int.toV2PairingError(): V2PairingErrorContent = when (this) {
-    PAIRING_REJECTED.code -> V2PairingErrorContent(R.string.sync_dialog_error_title, R.string.sync_v2_error_pairing_rejected)
-    PAIRING_CANCELLED.code -> V2PairingErrorContent(R.string.sync_dialog_error_title, R.string.sync_v2_error_pairing_canceled)
-    THIRD_PARTY_ALREADY_UPGRADED.code -> V2PairingErrorContent(
-        R.string.sync_v2_error_pairing_failed,
-        R.string.sync_v2_error_third_party_already_upgraded,
+fun Int.toV2PairingError(): V2PairingErrorContent = when (this) {
+    PAIRING_REJECTED.code -> V2PairingErrorContent(
+        title = R.string.sync_v2_error_pairing_rejected,
+        message = R.string.sync_v2_error_try_again,
     )
-    else -> V2PairingErrorContent(R.string.sync_dialog_error_title, R.string.sync_v2_error_pairing_failed)
+    PAIRING_CANCELLED.code -> V2PairingErrorContent(
+        title = R.string.sync_v2_error_pairing_canceled,
+        message = null,
+    )
+    THIRD_PARTY_ALREADY_UPGRADED.code -> V2PairingErrorContent(
+        title = R.string.sync_v2_error_pairing_failed,
+        message = R.string.sync_v2_error_third_party_already_upgraded,
+    )
+    else -> V2PairingErrorContent(
+        title = R.string.sync_v2_error_pairing_failed,
+        message = R.string.sync_v2_error_try_again,
+    )
 }
 
-/** Fixed copy for [com.duckduckgo.sync.impl.DispatchOutcome.UpgradeRequired] outcome. */
-internal val v2UpgradeRequiredError = V2PairingErrorContent(
-    title = R.string.sync_dialog_error_title,
-    message = R.string.sync_v2_error_upgrade_required,
+/** Fixed copy for [com.duckduckgo.sync.impl.DispatchOutcome.UpgradeRequired] outcome (title-only). */
+val v2UpgradeRequiredError = V2PairingErrorContent(
+    title = R.string.sync_v2_error_upgrade_required,
+    message = null,
 )
 
 /** Fixed copy for the same-account [com.duckduckgo.sync.impl.DispatchOutcome.AlreadyConnected] outcome. */
-internal val v2AlreadyPairedError = V2PairingErrorContent(
+val v2AlreadyPairedError = V2PairingErrorContent(
     title = R.string.sync_v2_already_paired_title,
     message = R.string.sync_v2_already_paired_message,
 )
+
+/**
+ * Renders a v2 pairing error dialog: the scenario line as the title, an optional supporting
+ * [V2PairingErrorContent.message], and the shared v2 "Got It" button. A null message yields a
+ * title-only dialog (the builder hides the message view when it is empty). [onDismissed] runs on
+ * the positive-button tap, mirroring the v1 path's `viewModel.onErrorDialogDismissed()`.
+ */
+fun Context.showV2PairingError(
+    content: V2PairingErrorContent,
+    onDismissed: () -> Unit,
+) {
+    TextAlertDialogBuilder(this)
+        .setTitle(content.title)
+        .apply { content.message?.let { setMessage(it) } }
+        .setPositiveButton(R.string.sync_v2_error_got_it)
+        .addEventListener(
+            object : TextAlertDialogBuilder.EventListener() {
+                override fun onPositiveButtonClicked() {
+                    onDismissed()
+                }
+            },
+        )
+        .show()
+}
