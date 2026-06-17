@@ -51,6 +51,7 @@ import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2State
 import com.duckduckgo.sync.impl.exchange.v2.LocalTrigger
 import com.duckduckgo.sync.impl.exchange.v2.PairingRole
 import com.duckduckgo.sync.impl.pixels.SyncPixels
+import com.duckduckgo.sync.impl.pixels.SyncPixels.CancellationReason
 import com.duckduckgo.sync.impl.pixels.SyncPixels.CodeVersion
 import com.duckduckgo.sync.impl.pixels.SyncPixels.ScreenType.SYNC_CONNECT
 import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupFailureReason
@@ -309,7 +310,7 @@ class SyncConnectViewModelTest {
     @Test
     fun whenUserCancelsThenAbandonedPixelFired() = runTest {
         testee.onUserCancelledWithoutSyncSetup()
-        verify(syncPixels).fireSyncSetupAbandoned(eq(SYNC_CONNECT))
+        verify(syncPixels).fireSyncSetupAbandoned(eq(SYNC_CONNECT), eq(CancellationReason.SCANNING_CANCELLED))
     }
 
     @Test
@@ -738,6 +739,18 @@ class SyncConnectViewModelTest {
             assertEquals(PAIRING_CANCELLED.code.toV2PairingError(), (command as ShowV2Error).content)
             cancelAndIgnoreRemainingEvents()
         }
+
+        // Denying the confirmation (PAIRING_CANCELLED) fires the cancellation pixel, not the failed one.
+        verify(syncPixels).fireSyncSetupAbandoned(eq(SYNC_CONNECT), eq(CancellationReason.CONFIRMATION_DENIED))
+    }
+
+    @Test
+    fun whenUserCancelsMidExchangeThenAbandonedWithCancelledBeforeFinished() = runTest {
+        whenever(runner.currentState).thenReturn(ExchangeV2State.Negotiating)
+
+        testee.onUserCancelledWithoutSyncSetup()
+
+        verify(syncPixels).fireSyncSetupAbandoned(eq(SYNC_CONNECT), eq(CancellationReason.CANCELLED_BEFORE_FINISHED))
     }
 
     @Test

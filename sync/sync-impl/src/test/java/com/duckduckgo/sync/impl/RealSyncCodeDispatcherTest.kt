@@ -175,6 +175,17 @@ class RealSyncCodeDispatcherTest {
         verify(syncAccountRepository, never()).parseSyncAuthCode(any())
     }
 
+    @Test fun `isV2ExchangeUnderway is false at Bootstrapped or no session, true once exchanging`() {
+        whenever(runner.currentState).thenReturn(null)
+        assertFalse(dispatcher.isV2ExchangeUnderway())
+        whenever(runner.currentState).thenReturn(ExchangeV2State.Bootstrapped)
+        assertFalse(dispatcher.isV2ExchangeUnderway())
+        whenever(runner.currentState).thenReturn(ExchangeV2State.Negotiating)
+        assertTrue(dispatcher.isV2ExchangeUnderway())
+        whenever(runner.currentState).thenReturn(ExchangeV2State.Joiner.Waiting)
+        assertTrue(dispatcher.isV2ExchangeUnderway())
+    }
+
     @Test fun `FF on, v2 RecoveryCode cid=ddg - flow emits LoggedIn after processCode succeeds`() = runTest {
         setV2(true)
         val rawJson = JSONObject().apply {

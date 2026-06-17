@@ -158,6 +158,11 @@ class RealSyncCodeDispatcher @Inject constructor(
         else -> null
     }
 
+    override fun isV2ExchangeUnderway(): Boolean = when (runner.currentState) {
+        null, ExchangeV2State.Bootstrapped -> false
+        else -> true
+    }
+
     override fun route(pastedCode: String): RouteDecision {
         val v2Enabled = syncFeature.canUseV2ConnectFlow().isEnabled()
         logcat { "$TAG: route() called, canUseV2ConnectFlow=$v2Enabled" }

@@ -29,6 +29,7 @@ import com.duckduckgo.sync.impl.DispatchOutcome
 import com.duckduckgo.sync.impl.Result.Error
 import com.duckduckgo.sync.impl.SyncCodeType
 import com.duckduckgo.sync.impl.SyncFeature
+import com.duckduckgo.sync.impl.pixels.SyncPixels.CancellationReason
 import com.duckduckgo.sync.impl.pixels.SyncPixels.CodeVersion
 import com.duckduckgo.sync.impl.pixels.SyncPixels.PeerKind
 import com.duckduckgo.sync.impl.pixels.SyncPixels.ScreenType
@@ -442,6 +443,73 @@ class RealSyncPixelsTest {
     fun whenFireSetupFailedForCancellationCodesThenPixelNotFired() {
         testee.fireSetupFailed(DispatchOutcome.Failed(reason = "user", code = AccountErrorCodes.PAIRING_CANCELLED.code))
         testee.fireSetupFailed(DispatchOutcome.Failed(reason = "peer", code = AccountErrorCodes.PAIRING_REJECTED.code))
+
+        verifyNoInteractions(pixel)
+    }
+
+    @Test
+    fun whenSetupAbandonedWithReasonThenPixelFiredWithReasonAndFlowMetadata() {
+        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
+
+        testee.fireSyncSetupAbandoned(ScreenType.SYNC_CONNECT, CancellationReason.CANCELLED_BEFORE_FINISHED)
+
+        verify(pixel).fire(
+            SyncPixelName.SYNC_SETUP_ENDED_ABANDONED,
+            mapOf(
+                SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to "connect",
+                SyncPixelParameters.SYNC_SETUP_REASON to "cancelled_before_finished",
+                SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to "v2",
+                SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
+            ),
+        )
+    }
+
+    @Test
+    fun whenSetupAbandonedWithoutReasonThenReasonOmitted() {
+        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(false))
+
+        testee.fireSyncSetupAbandoned(ScreenType.SYNC_EXCHANGE)
+
+        verify(pixel).fire(
+            SyncPixelName.SYNC_SETUP_ENDED_ABANDONED,
+            mapOf(
+                SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to "exchange",
+                SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to "v1",
+                SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
+            ),
+        )
+    }
+
+    @Test
+    fun whenFireSetupCancelledIfDeniedForPairingCancelledThenAbandonedFired() {
+        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
+
+        testee.fireSetupCancelledIfDenied(
+            DispatchOutcome.Failed(reason = "user_denied", code = AccountErrorCodes.PAIRING_CANCELLED.code),
+            ScreenType.SYNC_CONNECT,
+        )
+
+        verify(pixel).fire(
+            SyncPixelName.SYNC_SETUP_ENDED_ABANDONED,
+            mapOf(
+                SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to "connect",
+                SyncPixelParameters.SYNC_SETUP_REASON to "sync_confirmation_denied",
+                SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to "v2",
+                SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
+            ),
+        )
+    }
+
+    @Test
+    fun whenFireSetupCancelledIfDeniedForPeerRejectionOrOtherThenNotFired() {
+        testee.fireSetupCancelledIfDenied(
+            DispatchOutcome.Failed(reason = "peer", code = AccountErrorCodes.PAIRING_REJECTED.code),
+            ScreenType.SYNC_CONNECT,
+        )
+        testee.fireSetupCancelledIfDenied(
+            DispatchOutcome.Failed(reason = "boom", code = AccountErrorCodes.PAIRING_FAILED.code),
+            ScreenType.SYNC_CONNECT,
+        )
 
         verifyNoInteractions(pixel)
     }

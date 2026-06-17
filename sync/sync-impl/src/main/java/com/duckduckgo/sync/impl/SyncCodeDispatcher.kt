@@ -66,6 +66,12 @@ interface SyncCodeDispatcher {
      * Host or Joiner. Cancelling the collecting coroutine cancels the underlying runner session.
      */
     fun presentV2(): Flow<DispatchOutcome>
+
+    /**
+     * Whether a v2 exchange has engaged a peer and is mid-protocol (past Bootstrapped, before a
+     * terminal).
+     */
+    fun isV2ExchangeUnderway(): Boolean
 }
 
 sealed interface RouteDecision {

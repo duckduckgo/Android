@@ -49,8 +49,10 @@ import com.duckduckgo.sync.impl.getOrNull
 import com.duckduckgo.sync.impl.onFailure
 import com.duckduckgo.sync.impl.onSuccess
 import com.duckduckgo.sync.impl.pixels.SyncPixels
+import com.duckduckgo.sync.impl.pixels.SyncPixels.CancellationReason
 import com.duckduckgo.sync.impl.pixels.SyncPixels.CodeVersion
 import com.duckduckgo.sync.impl.pixels.SyncPixels.ScreenType.SYNC_CONNECT
+import com.duckduckgo.sync.impl.pixels.fireSetupCancelledIfDenied
 import com.duckduckgo.sync.impl.pixels.fireSetupFailed
 import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command.FinishWithError
 import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command.LoginSuccess
@@ -142,6 +144,7 @@ class SyncConnectViewModel @Inject constructor(
     /** Map one v2 [DispatchOutcome] onto this VM's command pipeline. Shared by the Presenter and Scanner paths. */
     private suspend fun handleV2Outcome(outcome: DispatchOutcome) {
         syncPixels.fireSetupFailed(outcome)
+        syncPixels.fireSetupCancelledIfDenied(outcome, SYNC_CONNECT)
         when (outcome) {
             is DispatchOutcome.LinkingCodeReady -> renderV2QrCode(outcome.linkingCode)
             is DispatchOutcome.HostConfirmationRequested -> command.send(Command.AskHostConfirmation(outcome.peerName))
@@ -292,7 +295,12 @@ class SyncConnectViewModel @Inject constructor(
     }
 
     fun onUserCancelledWithoutSyncSetup() {
-        syncPixels.fireSyncSetupAbandoned(SYNC_CONNECT)
+        val reason = if (codeDispatcher.isV2ExchangeUnderway()) {
+            CancellationReason.CANCELLED_BEFORE_FINISHED
+        } else {
+            CancellationReason.SCANNING_CANCELLED
+        }
+        syncPixels.fireSyncSetupAbandoned(SYNC_CONNECT, reason)
     }
 
     private suspend fun processError(result: Error) {

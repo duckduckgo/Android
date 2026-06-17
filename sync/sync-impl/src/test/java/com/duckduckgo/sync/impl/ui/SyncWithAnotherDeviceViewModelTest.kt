@@ -63,6 +63,7 @@ import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2State
 import com.duckduckgo.sync.impl.exchange.v2.LocalTrigger
 import com.duckduckgo.sync.impl.exchange.v2.PairingRole
 import com.duckduckgo.sync.impl.pixels.SyncPixels
+import com.duckduckgo.sync.impl.pixels.SyncPixels.CancellationReason
 import com.duckduckgo.sync.impl.pixels.SyncPixels.CodeVersion
 import com.duckduckgo.sync.impl.pixels.SyncPixels.ScreenType.SYNC_EXCHANGE
 import com.duckduckgo.sync.impl.ui.SyncWithAnotherActivityViewModel.Command
@@ -443,7 +444,7 @@ class SyncWithAnotherDeviceViewModelTest {
     @Test
     fun whenUserCancelsThenAbandonedPixelFired() = runTest {
         testee.onUserCancelledWithoutSyncSetup()
-        verify(syncPixels).fireSyncSetupAbandoned(eq(SYNC_EXCHANGE))
+        verify(syncPixels).fireSyncSetupAbandoned(eq(SYNC_EXCHANGE), eq(CancellationReason.SCANNING_CANCELLED))
     }
 
     @Test

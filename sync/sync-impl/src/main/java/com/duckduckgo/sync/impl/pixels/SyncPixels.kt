@@ -45,6 +45,7 @@ import com.duckduckgo.sync.impl.pixels.SyncPixelParameters.SYNC_SETUP_PATH
 import com.duckduckgo.sync.impl.pixels.SyncPixelParameters.SYNC_SETUP_PEER_KIND
 import com.duckduckgo.sync.impl.pixels.SyncPixelParameters.SYNC_SETUP_REASON
 import com.duckduckgo.sync.impl.pixels.SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE
+import com.duckduckgo.sync.impl.pixels.SyncPixels.CancellationReason
 import com.duckduckgo.sync.impl.pixels.SyncPixels.CodeVersion
 import com.duckduckgo.sync.impl.pixels.SyncPixels.PeerKind
 import com.duckduckgo.sync.impl.pixels.SyncPixels.ScreenType
@@ -121,7 +122,7 @@ interface SyncPixels {
         myRole: SetupRole? = null,
         peerKind: PeerKind? = null,
     )
-    fun fireSyncSetupAbandoned(screenType: ScreenType)
+    fun fireSyncSetupAbandoned(screenType: ScreenType, reason: CancellationReason? = null)
     fun fireSyncSetupManualCodeScreenShown(screenType: ScreenType)
     fun fireSyncSetupCodePastedParseSuccess(screenType: ScreenType, codeVersion: CodeVersion, codeType: SyncCodeType? = null)
     fun fireSyncSetupCodePastedParseFailure(screenType: ScreenType)
@@ -167,6 +168,17 @@ interface SyncPixels {
     enum class PeerKind(val value: String) {
         DDG("ddg"),
         THIRD_PARTY("3party"),
+    }
+
+    /**
+     * Why a setup was cancelled, per the "Cancellation" telemetry. Based on the v2 protocol state at
+     * the moment of cancellation: [SCANNING_CANCELLED] before the exchange engages a peer,
+     * [CANCELLED_BEFORE_FINISHED] mid-exchange, [CONFIRMATION_DENIED] when this device denied the prompt.
+     */
+    enum class CancellationReason(val value: String) {
+        SCANNING_CANCELLED("scanning_cancelled"),
+        CONFIRMATION_DENIED("sync_confirmation_denied"),
+        CANCELLED_BEFORE_FINISHED("cancelled_before_finished"),
     }
 
     /** Why a v2 setup failed, per the "Setup failed" telemetry. Aligned with the error codes we handle. */
@@ -502,8 +514,12 @@ class RealSyncPixels @Inject constructor(
         pixel.fire(SyncPixelName.SYNC_SETUP_BARCODE_SCREEN_SHOWN, parameters = params)
     }
 
-    override fun fireSyncSetupAbandoned(screenType: ScreenType) {
-        val params = mapOf(SYNC_SETUP_SCREEN_TYPE to screenType.value)
+    override fun fireSyncSetupAbandoned(screenType: ScreenType, reason: CancellationReason?) {
+        val params = buildMap {
+            put(SYNC_SETUP_SCREEN_TYPE, screenType.value)
+            if (reason != null) put(SYNC_SETUP_REASON, reason.value)
+            putAll(setupFlowMetadata())
+        }
         pixel.fire(SyncPixelName.SYNC_SETUP_ENDED_ABANDONED, parameters = params)
     }
 
@@ -824,6 +840,7 @@ internal fun Int.toSetupFailureReason(): SetupFailureReason = when (this) {
  * cancellations (`PAIRING_CANCELLED`, `PAIRING_REJECTED`) are intentionally skipped — they are not
  * setup errors (the latter pending the cancellation-telemetry follow-up).
  */
+
 internal fun SyncPixels.fireSetupFailed(outcome: DispatchOutcome) {
     when (outcome) {
         is DispatchOutcome.UpgradeRequired ->
@@ -835,5 +852,16 @@ internal fun SyncPixels.fireSetupFailed(outcome: DispatchOutcome) {
             fireSyncSetupFailed(outcome.code.toSetupFailureReason(), outcome.path, outcome.myRole, outcome.peerKind)
         }
         else -> {}
+    }
+}
+
+/**
+ * Fire the "Cancellation" pixel (sync_setup_ended_abandoned) when a v2 outcome is this device's own
+ * confirmation denial ([AccountErrorCodes.PAIRING_CANCELLED]). Peer denials (`PAIRING_REJECTED`) are
+ * intentionally ignored — the peer reports its own cancel. No-op for any other outcome.
+ */
+internal fun SyncPixels.fireSetupCancelledIfDenied(outcome: DispatchOutcome, screenType: SyncPixels.ScreenType) {
+    if (outcome is DispatchOutcome.Failed && outcome.code == AccountErrorCodes.PAIRING_CANCELLED.code) {
+        fireSyncSetupAbandoned(screenType, CancellationReason.CONFIRMATION_DENIED)
     }
 }

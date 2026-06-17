@@ -49,11 +49,13 @@ import com.duckduckgo.sync.impl.SyncFeature
 import com.duckduckgo.sync.impl.onFailure
 import com.duckduckgo.sync.impl.onSuccess
 import com.duckduckgo.sync.impl.pixels.SyncPixels
+import com.duckduckgo.sync.impl.pixels.SyncPixels.CancellationReason
 import com.duckduckgo.sync.impl.pixels.SyncPixels.CodeVersion
 import com.duckduckgo.sync.impl.pixels.SyncPixels.PeerKind
 import com.duckduckgo.sync.impl.pixels.SyncPixels.ScreenType.SYNC_EXCHANGE
 import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupPath
 import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupRole
+import com.duckduckgo.sync.impl.pixels.fireSetupCancelledIfDenied
 import com.duckduckgo.sync.impl.pixels.fireSetupFailed
 import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Companion.POLLING_INTERVAL_EXCHANGE_FLOW
 import com.duckduckgo.sync.impl.ui.SyncWithAnotherActivityViewModel.Command.AskToSwitchAccount
@@ -290,6 +292,7 @@ class SyncWithAnotherActivityViewModel @Inject constructor(
         previousPrimaryKey: String,
     ) {
         syncPixels.fireSetupFailed(outcome)
+        syncPixels.fireSetupCancelledIfDenied(outcome, SYNC_EXCHANGE)
         // Cancel the deep-link timeout only on terminal outcomes; keep it running across confirmation prompts.
         when (outcome) {
             is DispatchOutcome.LoggedIn -> {
@@ -468,7 +471,12 @@ class SyncWithAnotherActivityViewModel @Inject constructor(
         if (isDeepLink) {
             syncPixels.fireSetupDeepLinkFlowAbandoned()
         } else {
-            syncPixels.fireSyncSetupAbandoned(SYNC_EXCHANGE)
+            val reason = if (codeDispatcher.isV2ExchangeUnderway()) {
+                CancellationReason.CANCELLED_BEFORE_FINISHED
+            } else {
+                CancellationReason.SCANNING_CANCELLED
+            }
+            syncPixels.fireSyncSetupAbandoned(SYNC_EXCHANGE, reason)
         }
     }
 
