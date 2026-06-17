@@ -16,8 +16,6 @@
 
 package com.duckduckgo.app.browser.threatprotection
 
-import android.graphics.Color
-import android.os.Build
 import android.os.Bundle
 import android.text.SpannableStringBuilder
 import android.text.method.LinkMovementMethod
@@ -25,8 +23,6 @@ import android.text.style.URLSpan
 import android.view.View
 import android.view.ViewGroup
 import android.widget.CompoundButton
-import androidx.activity.SystemBarStyle
-import androidx.activity.enableEdgeToEdge
 import androidx.annotation.StringRes
 import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
@@ -83,17 +79,7 @@ class ThreatProtectionSettingsActivity : DuckDuckGoActivity() {
 
         val edgeToEdgeEnabled = edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.SETTINGS)
         if (edgeToEdgeEnabled) {
-            val barStyle = if (isDarkThemeEnabled()) {
-                SystemBarStyle.dark(Color.TRANSPARENT)
-            } else {
-                SystemBarStyle.light(Color.TRANSPARENT, Color.TRANSPARENT)
-            }
-            enableEdgeToEdge(statusBarStyle = barStyle, navigationBarStyle = barStyle)
-            // Keep the navigation bar transparent in gesture nav; let the system draw a contrast
-            // scrim only in 2/3-button nav so the buttons stay legible.
-            if (Build.VERSION.SDK_INT >= 29) {
-                window.isNavigationBarContrastEnforced = true
-            }
+            enableTransparentEdgeToEdge()
         }
 
         setContentView(binding.root)

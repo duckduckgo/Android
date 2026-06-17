@@ -19,13 +19,9 @@ package com.duckduckgo.app.firebutton
 import android.app.ActivityOptions
 import android.content.Context
 import android.content.Intent
-import android.graphics.Color
-import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.widget.CompoundButton
-import androidx.activity.SystemBarStyle
-import androidx.activity.enableEdgeToEdge
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -77,17 +73,7 @@ class DataClearingSettingsActivity : DuckDuckGoActivity() {
 
         val edgeToEdgeEnabled = edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.SETTINGS)
         if (edgeToEdgeEnabled) {
-            val barStyle = if (isDarkThemeEnabled()) {
-                SystemBarStyle.dark(Color.TRANSPARENT)
-            } else {
-                SystemBarStyle.light(Color.TRANSPARENT, Color.TRANSPARENT)
-            }
-            enableEdgeToEdge(statusBarStyle = barStyle, navigationBarStyle = barStyle)
-            // Keep the navigation bar transparent in gesture nav; let the system draw a contrast
-            // scrim only in 2/3-button nav so the buttons stay legible.
-            if (Build.VERSION.SDK_INT >= 29) {
-                window.isNavigationBarContrastEnforced = true
-            }
+            enableTransparentEdgeToEdge()
         }
 
         setContentView(binding.root)
