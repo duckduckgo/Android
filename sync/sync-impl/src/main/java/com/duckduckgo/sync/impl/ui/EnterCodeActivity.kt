@@ -171,8 +171,8 @@ class EnterCodeActivity : DuckDuckGoActivity() {
 
     private fun showError(it: ShowError) {
         TextAlertDialogBuilder(this)
-            .setTitle(it.title)
-            .setMessage(if (it.reason.isBlank()) getString(it.message) else getString(it.message) + "\n" + it.reason)
+            .setTitle(R.string.sync_dialog_error_title)
+            .setMessage(getString(it.message) + "\n" + it.reason)
             .setPositiveButton(R.string.sync_dialog_error_ok)
             .addEventListener(
                 object : TextAlertDialogBuilder.EventListener() {
