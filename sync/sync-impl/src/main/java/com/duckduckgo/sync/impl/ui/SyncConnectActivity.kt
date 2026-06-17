@@ -31,6 +31,9 @@ import com.duckduckgo.common.ui.view.button.DaxButtonGhost
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.databinding.IncludeDefaultToolbarBinding
 import com.duckduckgo.sync.impl.R
@@ -64,6 +67,12 @@ class SyncConnectActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var dispatcherProvider: DispatcherProvider
 
+    @Inject
+    lateinit var edgeToEdgeProvider: EdgeToEdgeProvider
+
+    @Inject
+    lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
+
     private lateinit var binding: ConnectSyncBinding
     private val viewModel: SyncConnectViewModel by bindViewModel()
 
@@ -78,6 +87,8 @@ class SyncConnectActivity : DuckDuckGoActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        val edgeToEdgeEnabled = edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.SYNC)
+
         lifecycleScope.launch {
             withContext(dispatcherProvider.io()) {
                 syncFeature.useExpandableBarcodeConnectSyncLayout().isEnabled()
@@ -91,8 +102,16 @@ class SyncConnectActivity : DuckDuckGoActivity() {
                         ConnectSyncBinding.OldBinding(viewBinding)
                     }
 
+                    if (edgeToEdgeEnabled) {
+                        enableTransparentEdgeToEdge()
+                    }
+
                     setContentView(binding.root)
                     setupToolbar(binding.includeToolbar.toolbar)
+
+                    if (edgeToEdgeEnabled) {
+                        configureEdgeToEdgeInsets()
+                    }
 
                     onBackPressedDispatcher.addCallback(this@SyncConnectActivity) {
                         onUserCancelled()
@@ -105,6 +124,12 @@ class SyncConnectActivity : DuckDuckGoActivity() {
                     }
                 }
         }
+    }
+
+    private fun configureEdgeToEdgeInsets() {
+        edgeToEdgeHandler.applyHorizontalSystemBarInsets(binding.root)
+        edgeToEdgeHandler.applyStatusBarInsets(binding.includeToolbar.appBarLayout)
+        edgeToEdgeHandler.applyNavigationBarInsets(binding.contentView, drawBehindGestureNav = true)
     }
 
     override fun onResume() {
@@ -207,6 +232,7 @@ class SyncConnectActivity : DuckDuckGoActivity() {
 private sealed interface ConnectSyncBinding {
     val root: View
     val includeToolbar: IncludeDefaultToolbarBinding
+    val contentView: View
     val qrCodeReader: SyncBarcodeView
     val qrCodeImageView: ImageView
     val copyCodeButton: DaxButtonGhost
@@ -214,6 +240,7 @@ private sealed interface ConnectSyncBinding {
     data class OldBinding(private val binding: ActivityConnectSyncBinding) : ConnectSyncBinding {
         override val root: View get() = binding.root
         override val includeToolbar: IncludeDefaultToolbarBinding get() = binding.includeToolbar
+        override val contentView: View get() = binding.contentScrollView
         override val qrCodeReader: SyncBarcodeView get() = binding.qrCodeReader
         override val qrCodeImageView: ImageView get() = binding.qrCodeImageView
         override val copyCodeButton: DaxButtonGhost get() = binding.copyCodeButton
@@ -222,6 +249,7 @@ private sealed interface ConnectSyncBinding {
     data class NewBinding(private val binding: ActivityConnectSyncNewBinding) : ConnectSyncBinding {
         override val root: View get() = binding.root
         override val includeToolbar: IncludeDefaultToolbarBinding get() = binding.includeToolbar
+        override val contentView: View get() = binding.contentScrollView
         override val qrCodeReader: SyncBarcodeView get() = binding.qrCodeReader
         override val qrCodeImageView: ImageView get() = binding.qrCodeImageView
         override val copyCodeButton: DaxButtonGhost get() = binding.copyCodeButton

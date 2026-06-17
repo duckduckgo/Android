@@ -23,4 +23,5 @@ enum class EdgeToEdgeBucket {
     BROWSER,
     SETTINGS,
     AUTOFILL,
+    SYNC,
 }

@@ -47,6 +47,7 @@ class RealEdgeToEdgeProvider @Inject constructor(
                 edgeToEdgeFeature.browser().isEnabled()
                 edgeToEdgeFeature.settings().isEnabled()
                 edgeToEdgeFeature.autofill().isEnabled()
+                edgeToEdgeFeature.sync().isEnabled()
             }
         }
     }
@@ -56,6 +57,7 @@ class RealEdgeToEdgeProvider @Inject constructor(
             EdgeToEdgeBucket.BROWSER -> edgeToEdgeFeature.browser()
             EdgeToEdgeBucket.SETTINGS -> edgeToEdgeFeature.settings()
             EdgeToEdgeBucket.AUTOFILL -> edgeToEdgeFeature.autofill()
+            EdgeToEdgeBucket.SYNC -> edgeToEdgeFeature.sync()
         }
         bucketToggle.isEnabled()
     } else {
