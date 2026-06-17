@@ -35,4 +35,7 @@ interface EdgeToEdgeFeature {
 
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun settings(): Toggle
+
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun autofill(): Toggle
 }

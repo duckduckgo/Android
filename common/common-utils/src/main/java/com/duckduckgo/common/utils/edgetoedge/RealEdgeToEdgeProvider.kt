@@ -46,6 +46,7 @@ class RealEdgeToEdgeProvider @Inject constructor(
                 edgeToEdgeFeature.self().isEnabled()
                 edgeToEdgeFeature.browser().isEnabled()
                 edgeToEdgeFeature.settings().isEnabled()
+                edgeToEdgeFeature.autofill().isEnabled()
             }
         }
     }
@@ -54,6 +55,7 @@ class RealEdgeToEdgeProvider @Inject constructor(
         val bucketToggle = when (bucket) {
             EdgeToEdgeBucket.BROWSER -> edgeToEdgeFeature.browser()
             EdgeToEdgeBucket.SETTINGS -> edgeToEdgeFeature.settings()
+            EdgeToEdgeBucket.AUTOFILL -> edgeToEdgeFeature.autofill()
         }
         bucketToggle.isEnabled()
     } else {

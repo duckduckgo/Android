@@ -22,4 +22,5 @@ package com.duckduckgo.common.utils.edgetoedge
 enum class EdgeToEdgeBucket {
     BROWSER,
     SETTINGS,
+    AUTOFILL,
 }
