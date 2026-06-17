@@ -450,7 +450,7 @@ class RealSyncPixels @Inject constructor(
     }
 
     override fun fireSyncSetupCodePastedParseFailure(screenType: ScreenType) {
-        val params = mapOf(SYNC_SETUP_SCREEN_TYPE to screenType.value)
+        val params = mapOf(SYNC_SETUP_SCREEN_TYPE to screenType.value) + setupFlowMetadata()
         pixel.fire(SyncPixelName.SYNC_SETUP_MANUAL_CODE_ENTERED_FAILED, parameters = params)
     }
 
@@ -465,7 +465,7 @@ class RealSyncPixels @Inject constructor(
     }
 
     override fun fireBarcodeScannerParseError(screenType: ScreenType) {
-        val params = mapOf(SYNC_SETUP_SCREEN_TYPE to screenType.value)
+        val params = mapOf(SYNC_SETUP_SCREEN_TYPE to screenType.value) + setupFlowMetadata()
         pixel.fire(SyncPixelName.SYNC_SETUP_BARCODE_SCANNER_FAILED, parameters = params)
     }
 
