@@ -23,13 +23,16 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.input.rememberTextFieldState
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -59,6 +62,7 @@ import com.duckduckgo.common.ui.compose.cards.DaxSurface
 import com.duckduckgo.common.ui.compose.checkbox.DaxCheckbox
 import com.duckduckgo.common.ui.compose.divider.DaxHorizontalDivider
 import com.duckduckgo.common.ui.compose.divider.DaxVerticalDivider
+import com.duckduckgo.common.ui.compose.layout.DaxScaffold
 import com.duckduckgo.common.ui.compose.message.DaxAction
 import com.duckduckgo.common.ui.compose.message.remote.DaxBigSingleActionMessage
 import com.duckduckgo.common.ui.compose.message.remote.DaxBigTwoActionsMessage
@@ -808,6 +812,49 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
         }
     }
 
+    class ScaffoldComponentViewHolder(
+        parent: ViewGroup,
+        private val isDarkTheme: Boolean,
+    ) : ComponentViewHolder(inflate(parent, R.layout.component_scaffold)) {
+        @OptIn(ExperimentalMaterial3Api::class)
+        override fun bind(component: Component) {
+            view.setupThemedComposeView(R.id.composeScaffold, isDarkTheme) {
+                val searchState = rememberTextFieldState()
+                var searchActive by remember { mutableStateOf(false) }
+                DaxScaffold(
+                    modifier = Modifier.height(400.dp),
+                    topBar = {
+                        DaxSearchTopAppBar(
+                            title = "Bookmarks",
+                            navigationIcon = {
+                                Back { }
+                            },
+                            shadow = true,
+                            searchActive = searchActive,
+                            searchState = searchState,
+                            searchPlaceholder = "Search…",
+                            onSearchBack = { searchActive = false },
+                            actions = {
+                                DaxIconButton(
+                                    onClick = { searchActive = true },
+                                    iconPainter = painterResource(CommonR.drawable.ic_find_search_24),
+                                    contentDescription = "Search",
+                                )
+                            },
+                        )
+                    },
+                ) { paddingValues ->
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        DaxText(text = "Content goes here")
+                    }
+                }
+            }
+        }
+    }
+
     class SettingsListItemComponentViewHolder(parent: ViewGroup) :
         ComponentViewHolder(inflate(parent, R.layout.component_settings)) {
         override fun bind(component: Component) {
@@ -841,6 +888,7 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
                 Component.TWO_LINE_LIST_ITEM -> TwoLineItemComponentViewHolder(parent)
                 Component.SECTION_DIVIDER -> DividerComponentViewHolder(parent, isDarkTheme)
                 Component.CARD -> CardComponentViewHolder(parent, isDarkTheme)
+                Component.SCAFFOLD -> ScaffoldComponentViewHolder(parent, isDarkTheme)
                 Component.SETTINGS_LIST_ITEM -> SettingsListItemComponentViewHolder(parent)
                 else -> {
                     TODO()
