@@ -14,27 +14,20 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.referral
+package com.duckduckgo.referral.impl
 
-import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.content.edit
 import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.browser.api.referrer.AppReferrer
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.referral.api.AppReferrer
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-
-interface AppReferrerDataStore {
-    var referrerCheckedPreviously: Boolean
-    var campaignSuffix: String?
-    var installedFromEuAuction: Boolean
-    var utmOriginAttributeCampaign: String?
-}
 
 @ContributesBinding(
     scope = AppScope::class,
@@ -45,8 +38,8 @@ interface AppReferrerDataStore {
     boundType = AppReferrer::class,
 )
 @SingleInstanceIn(AppScope::class)
-class AppReferenceSharePreferences @Inject constructor(
-    private val context: Context,
+class AppReferrerSharedPreferences @Inject constructor(
+    private val sharedPreferencesProvider: SharedPreferencesProvider,
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
 ) : AppReferrerDataStore, AppReferrer {
@@ -58,6 +51,8 @@ class AppReferenceSharePreferences @Inject constructor(
     }
 
     override fun getOriginAttributeCampaign(): String? = utmOriginAttributeCampaign
+
+    override fun isInstalledFromEuAuction(): Boolean = installedFromEuAuction
 
     override var campaignSuffix: String?
         get() = preferences.getString(KEY_CAMPAIGN_SUFFIX, null)
@@ -75,7 +70,7 @@ class AppReferenceSharePreferences @Inject constructor(
         get() = preferences.getBoolean(KEY_INSTALLED_FROM_EU_AUCTION, false)
         set(value) = preferences.edit(true) { putBoolean(KEY_INSTALLED_FROM_EU_AUCTION, value) }
 
-    private val preferences: SharedPreferences by lazy { context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE) }
+    private val preferences: SharedPreferences by lazy { sharedPreferencesProvider.getSharedPreferences(FILENAME) }
 
     companion object {
         const val FILENAME = "com.duckduckgo.app.referral"

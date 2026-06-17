@@ -14,23 +14,15 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.referral
+package com.duckduckgo.referral.impl
 
 import com.duckduckgo.app.statistics.AtbInitializerListener
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.referral.api.AppInstallationReferrerStateListener
+import com.duckduckgo.referral.api.ParsedReferrerResult
 import dagger.SingleInstanceIn
 import logcat.logcat
 import javax.inject.Inject
-
-interface AppInstallationReferrerStateListener {
-
-    fun initialiseReferralRetrieval()
-    suspend fun waitForReferrerCode(): ParsedReferrerResult
-
-    companion object {
-        const val MAX_REFERRER_WAIT_TIME_MS = 1_500L
-    }
-}
 
 @SingleInstanceIn(AppScope::class)
 class EmptyReferrerStateListener @Inject constructor() : AppInstallationReferrerStateListener, AtbInitializerListener {
@@ -42,7 +34,7 @@ class EmptyReferrerStateListener @Inject constructor() : AppInstallationReferrer
      */
     override fun initialiseReferralRetrieval() {
         logcat { "Empty referrer, nothing to do here" }
-        referralResult = ParsedReferrerResult.ReferrerNotFound()
+        referralResult = ParsedReferrerResult.ReferrerNotFound
     }
 
     /**

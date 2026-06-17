@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.referral
+package com.duckduckgo.referral.impl
 
 import android.content.ComponentName
 import android.content.Context
@@ -29,31 +29,29 @@ import com.android.installreferrer.api.InstallReferrerClient.InstallReferrerResp
 import com.android.installreferrer.api.InstallReferrerClient.InstallReferrerResponse.SERVICE_DISCONNECTED
 import com.android.installreferrer.api.InstallReferrerClient.InstallReferrerResponse.SERVICE_UNAVAILABLE
 import com.android.installreferrer.api.InstallReferrerStateListener
-import com.duckduckgo.app.referral.AppInstallationReferrerParser
-import com.duckduckgo.app.referral.AppInstallationReferrerStateListener
-import com.duckduckgo.app.referral.AppInstallationReferrerStateListener.Companion.MAX_REFERRER_WAIT_TIME_MS
-import com.duckduckgo.app.referral.AppReferrerDataStore
-import com.duckduckgo.app.referral.ParseFailureReason
-import com.duckduckgo.app.referral.ParseFailureReason.DeveloperError
-import com.duckduckgo.app.referral.ParseFailureReason.FeatureNotSupported
-import com.duckduckgo.app.referral.ParseFailureReason.ReferralServiceUnavailable
-import com.duckduckgo.app.referral.ParseFailureReason.ServiceDisconnected
-import com.duckduckgo.app.referral.ParseFailureReason.ServiceUnavailable
-import com.duckduckgo.app.referral.ParseFailureReason.UnknownError
-import com.duckduckgo.app.referral.ParsedReferrerResult
-import com.duckduckgo.app.referral.ParsedReferrerResult.CampaignReferrerFound
-import com.duckduckgo.app.referral.ParsedReferrerResult.EuAuctionBrowserChoiceReferrerFound
-import com.duckduckgo.app.referral.ParsedReferrerResult.EuAuctionSearchChoiceReferrerFound
-import com.duckduckgo.app.referral.ParsedReferrerResult.ParseFailure
-import com.duckduckgo.app.referral.ParsedReferrerResult.ReferrerInitialising
-import com.duckduckgo.app.referral.ParsedReferrerResult.ReferrerNotFound
 import com.duckduckgo.app.statistics.AtbInitializerListener
 import com.duckduckgo.common.utils.playstore.PlayStoreAndroidUtils.Companion.PLAY_STORE_PACKAGE
 import com.duckduckgo.common.utils.playstore.PlayStoreAndroidUtils.Companion.PLAY_STORE_REFERRAL_SERVICE
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.experiments.api.VariantManager
-import com.duckduckgo.experiments.impl.VariantManagerImpl.Companion.RESERVED_EU_BROWSER_CHOICE_AUCTION_VARIANT
-import com.duckduckgo.experiments.impl.VariantManagerImpl.Companion.RESERVED_EU_SEARCH_CHOICE_AUCTION_VARIANT
+import com.duckduckgo.experiments.api.VariantManager.Companion.RESERVED_EU_BROWSER_CHOICE_AUCTION_VARIANT
+import com.duckduckgo.experiments.api.VariantManager.Companion.RESERVED_EU_SEARCH_CHOICE_AUCTION_VARIANT
+import com.duckduckgo.referral.api.AppInstallationReferrerStateListener
+import com.duckduckgo.referral.api.AppInstallationReferrerStateListener.Companion.MAX_REFERRER_WAIT_TIME_MS
+import com.duckduckgo.referral.api.ParseFailureReason
+import com.duckduckgo.referral.api.ParseFailureReason.DeveloperError
+import com.duckduckgo.referral.api.ParseFailureReason.FeatureNotSupported
+import com.duckduckgo.referral.api.ParseFailureReason.ReferralServiceUnavailable
+import com.duckduckgo.referral.api.ParseFailureReason.ServiceDisconnected
+import com.duckduckgo.referral.api.ParseFailureReason.ServiceUnavailable
+import com.duckduckgo.referral.api.ParseFailureReason.UnknownError
+import com.duckduckgo.referral.api.ParsedReferrerResult
+import com.duckduckgo.referral.api.ParsedReferrerResult.CampaignReferrerFound
+import com.duckduckgo.referral.api.ParsedReferrerResult.EuAuctionBrowserChoiceReferrerFound
+import com.duckduckgo.referral.api.ParsedReferrerResult.EuAuctionSearchChoiceReferrerFound
+import com.duckduckgo.referral.api.ParsedReferrerResult.ParseFailure
+import com.duckduckgo.referral.api.ParsedReferrerResult.ReferrerInitialising
+import com.duckduckgo.referral.api.ParsedReferrerResult.ReferrerNotFound
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.delay
 import logcat.LogPriority.ERROR
@@ -87,7 +85,7 @@ class PlayStoreAppReferrerStateListener @Inject constructor(
 
             if (appReferrerDataStore.referrerCheckedPreviously) {
                 referralResult = if (appReferrerDataStore.installedFromEuAuction) {
-                    EuAuctionSearchChoiceReferrerFound(fromCache = true)
+                    EuAuctionSearchChoiceReferrerFound
                 } else {
                     loadPreviousReferrerData()
                 }
@@ -111,10 +109,10 @@ class PlayStoreAppReferrerStateListener @Inject constructor(
         val suffix = loadFromDataStore()
         return if (suffix == null) {
             logcat(INFO) { "Already saw referrer data, but no campaign suffix saved" }
-            ReferrerNotFound(fromCache = true)
+            ReferrerNotFound
         } else {
             logcat(INFO) { "Already have referrer data from previous run - $suffix" }
-            CampaignReferrerFound(suffix, fromCache = true)
+            CampaignReferrerFound(suffix)
         }
     }
 

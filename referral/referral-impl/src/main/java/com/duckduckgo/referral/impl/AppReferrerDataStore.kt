@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 DuckDuckGo
+ * Copyright (c) 2019 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,18 +14,18 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.browser.api.referrer
+package com.duckduckgo.referral.impl
 
-/** Public interface for app referral parameters */
-interface AppReferrer {
+/** Persisted Play Store install-referrer attribution data. */
+interface AppReferrerDataStore {
+    /** Whether the install referrer has already been retrieved, so it is not fetched again. */
+    var referrerCheckedPreviously: Boolean
 
-    /**
-     * Sets the attribute campaign origin.
-     */
-    fun setOriginAttributeCampaign(origin: String?)
+    /** Two-character campaign code extracted from the referrer, if any. */
+    var campaignSuffix: String?
 
-    /**
-     * Returns campaign origin if it exists.
-     */
-    fun getOriginAttributeCampaign(): String?
+    var installedFromEuAuction: Boolean
+
+    /** Value of the referrer `origin` attribution parameter, if any. */
+    var utmOriginAttributeCampaign: String?
 }

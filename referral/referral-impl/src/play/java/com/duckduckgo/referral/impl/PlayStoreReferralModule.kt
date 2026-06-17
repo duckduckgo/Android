@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 DuckDuckGo
+ * Copyright (c) 2019 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.di
+package com.duckduckgo.referral.impl
 
-import com.duckduckgo.app.referral.*
 import com.duckduckgo.app.statistics.AtbInitializerListener
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.referral.api.AppInstallationReferrerStateListener
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
@@ -26,18 +26,21 @@ import dagger.SingleInstanceIn
 import dagger.multibindings.IntoSet
 
 @Module
-@ContributesTo(AppScope::class)
-object StoreReferralModule {
+@ContributesTo(
+    scope = AppScope::class,
+    replaces = [StoreReferralModule::class],
+)
+class PlayStoreReferralModule {
 
     @Provides
     @SingleInstanceIn(AppScope::class)
     fun appInstallationReferrerStateListener(
-        referrerStateListener: EmptyReferrerStateListener,
-    ): AppInstallationReferrerStateListener = referrerStateListener
+        playStoreAppReferrerStateListener: PlayStoreAppReferrerStateListener,
+    ): AppInstallationReferrerStateListener = playStoreAppReferrerStateListener
 
     @Provides
     @IntoSet
     fun providedReferrerAtbInitializerListener(
-        referrerStateListener: EmptyReferrerStateListener,
-    ): AtbInitializerListener = referrerStateListener
+        playStoreAppReferrerStateListener: PlayStoreAppReferrerStateListener,
+    ): AtbInitializerListener = playStoreAppReferrerStateListener
 }

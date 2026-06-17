@@ -14,13 +14,16 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.referral
+package com.duckduckgo.referral.impl
 
-import com.duckduckgo.app.referral.ParsedReferrerResult.CampaignReferrerFound
-import com.duckduckgo.app.referral.ParsedReferrerResult.EuAuctionBrowserChoiceReferrerFound
-import com.duckduckgo.app.referral.ParsedReferrerResult.EuAuctionSearchChoiceReferrerFound
-import com.duckduckgo.app.referral.ParsedReferrerResult.ReferrerNotFound
+import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.referral.api.ParsedReferrerResult
+import com.duckduckgo.referral.api.ParsedReferrerResult.CampaignReferrerFound
+import com.duckduckgo.referral.api.ParsedReferrerResult.EuAuctionBrowserChoiceReferrerFound
+import com.duckduckgo.referral.api.ParsedReferrerResult.EuAuctionSearchChoiceReferrerFound
+import com.duckduckgo.referral.api.ParsedReferrerResult.ReferrerNotFound
+import com.duckduckgo.referral.api.ReferrerParserPlugin
 import com.squareup.anvil.annotations.ContributesBinding
 import logcat.LogPriority.INFO
 import logcat.LogPriority.VERBOSE
@@ -28,25 +31,21 @@ import logcat.LogPriority.WARN
 import logcat.logcat
 import javax.inject.Inject
 
-interface AppInstallationReferrerParser {
-
-    fun parse(referrer: String): ParsedReferrerResult
-}
-
 @Suppress("SameParameterValue")
 @ContributesBinding(AppScope::class)
 class QueryParamReferrerParser @Inject constructor(
-    private val originAttributeHandler: ReferrerOriginAttributeHandler,
+    private val referrerParserPlugins: PluginPoint<ReferrerParserPlugin>,
 ) : AppInstallationReferrerParser {
 
     override fun parse(referrer: String): ParsedReferrerResult {
         logcat(VERBOSE) { "Full referrer string: $referrer" }
 
         val referrerParts = splitIntoConstituentParts(referrer)
-        if (referrerParts.isEmpty()) return ReferrerNotFound(fromCache = false)
+        if (referrerParts.isEmpty()) return ReferrerNotFound
 
-        // processing this doesn't change anything with the ATB-based campaign referrer or EU search/ballot logic
-        originAttributeHandler.process(referrerParts)
+        // side-effecting parsers (origin, onboarding, ...) persist their own data
+        val referrerParams = referrerParts.toReferrerParams()
+        referrerParserPlugins.getPlugins().forEach { it.process(referrerParams) }
 
         val auctionReferrer = extractEuAuctionReferrer(referrerParts)
         if (auctionReferrer is EuAuctionSearchChoiceReferrerFound || auctionReferrer is EuAuctionBrowserChoiceReferrerFound) {
@@ -62,16 +61,16 @@ class QueryParamReferrerParser @Inject constructor(
             logcat(VERBOSE) { "Analysing query param part: $part" }
             if (part.startsWith(INSTALLATION_SOURCE_KEY) && part.endsWith(INSTALLATION_SEARCH_CHOICE_SOURCE_EU_AUCTION_VALUE)) {
                 logcat(INFO) { "App installed as a result of the EU auction - Search Choice" }
-                return EuAuctionSearchChoiceReferrerFound()
+                return EuAuctionSearchChoiceReferrerFound
             }
             if (part.startsWith(INSTALLATION_SOURCE_KEY) && part.endsWith(INSTALLATION_BROWSER_CHOICE_SOURCE_EU_AUCTION_VALUE)) {
                 logcat(INFO) { "App installed as a result of the EU auction - Browser Choice" }
-                return EuAuctionBrowserChoiceReferrerFound()
+                return EuAuctionBrowserChoiceReferrerFound
             }
         }
 
         logcat { "No EU referrer data found; app not installed as a result of EU auction or choice screen" }
-        return ReferrerNotFound()
+        return ReferrerNotFound
     }
 
     private fun extractCampaignReferrer(referrerParts: List<String>): ParsedReferrerResult {
@@ -84,7 +83,7 @@ class QueryParamReferrerParser @Inject constructor(
         }
 
         logcat { "Referrer information does not contain inspected campaign names" }
-        return ReferrerNotFound()
+        return ReferrerNotFound
     }
 
     private fun extractCampaignNameSuffix(
@@ -96,7 +95,7 @@ class QueryParamReferrerParser @Inject constructor(
 
         if (suffix.length < 2) {
             logcat(WARN) { "Unexpected suffix length for campaign" }
-            return ReferrerNotFound(fromCache = false)
+            return ReferrerNotFound
         }
 
         val condensedSuffix = suffix.take(2)
@@ -115,6 +114,9 @@ class QueryParamReferrerParser @Inject constructor(
         return referrer?.split("&") ?: emptyList()
     }
 
+    private fun List<String>.toReferrerParams(): Map<String, String> =
+        filter { it.contains("=") }.associate { it.substringBefore("=") to it.substringAfter("=") }
+
     companion object {
         private const val CAMPAIGN_NAME_PREFIX = "DDGRA"
 
@@ -122,26 +124,4 @@ class QueryParamReferrerParser @Inject constructor(
         private const val INSTALLATION_SEARCH_CHOICE_SOURCE_EU_AUCTION_VALUE = "eea-search-choice"
         private const val INSTALLATION_BROWSER_CHOICE_SOURCE_EU_AUCTION_VALUE = "eea-browser-choice"
     }
-}
-
-sealed class ParsedReferrerResult(open val fromCache: Boolean = false) {
-    data class EuAuctionSearchChoiceReferrerFound(override val fromCache: Boolean = false) : ParsedReferrerResult(fromCache)
-    data class EuAuctionBrowserChoiceReferrerFound(override val fromCache: Boolean = false) : ParsedReferrerResult(fromCache)
-    data class CampaignReferrerFound(
-        val campaignSuffix: String,
-        override val fromCache: Boolean = false,
-    ) : ParsedReferrerResult(fromCache)
-
-    data class ReferrerNotFound(override val fromCache: Boolean = false) : ParsedReferrerResult(fromCache)
-    data class ParseFailure(val reason: ParseFailureReason) : ParsedReferrerResult()
-    data object ReferrerInitialising : ParsedReferrerResult()
-}
-
-sealed class ParseFailureReason {
-    data object FeatureNotSupported : ParseFailureReason()
-    data object ServiceUnavailable : ParseFailureReason()
-    data object DeveloperError : ParseFailureReason()
-    data object ServiceDisconnected : ParseFailureReason()
-    data object UnknownError : ParseFailureReason()
-    data object ReferralServiceUnavailable : ParseFailureReason()
 }
