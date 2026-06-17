@@ -268,8 +268,8 @@ class CtaViewModel @Inject constructor(
 
             dismissedCtaDao.insert(DismissedCta(CtaId.DAX_DUCK_AI_END))
             completeStageIfDaxOnboardingCompleted()
-            if (canSendShownPixel(onboardingStore, DUCK_AI_END_CTA_PIXEL_PARAM)) {
-                val journey = addCtaToHistory(onboardingStore, appInstallStore, DUCK_AI_END_CTA_PIXEL_PARAM)
+            if (canSendShownPixel(onboardingStore, Pixel.PixelValues.DUCK_AI_END_CTA)) {
+                val journey = addCtaToHistory(onboardingStore, appInstallStore, Pixel.PixelValues.DUCK_AI_END_CTA)
                 pixel.fire(AppPixelName.ONBOARDING_DAX_CTA_SHOWN, mapOf(Pixel.PixelParameter.CTA_SHOWN to journey))
             }
             duckAiOnboardingExperimentMetrics.fireFinalDialogImpression()
@@ -284,7 +284,7 @@ class CtaViewModel @Inject constructor(
 
     suspend fun onDuckAiEndCtaInteraction(okClicked: Boolean) {
         withContext(dispatchers.io()) {
-            val params = mapOf(Pixel.PixelParameter.CTA_SHOWN to DUCK_AI_END_CTA_PIXEL_PARAM)
+            val params = mapOf(Pixel.PixelParameter.CTA_SHOWN to Pixel.PixelValues.DUCK_AI_END_CTA)
             if (okClicked) {
                 pixel.fire(AppPixelName.ONBOARDING_DAX_CTA_OK_BUTTON, params)
                 duckAiOnboardingExperimentMetrics.fireFinalDialogPressed()
@@ -789,6 +789,5 @@ class CtaViewModel @Inject constructor(
     companion object {
         private const val MAX_TABS_OPEN_FIRE_EDUCATION = 2
         private const val SUBSCRIPTION_SKIPPED_ONBOARDING_MIN_DAYS = 7L
-        private const val DUCK_AI_END_CTA_PIXEL_PARAM = "duck_ai_end_cta"
     }
 }

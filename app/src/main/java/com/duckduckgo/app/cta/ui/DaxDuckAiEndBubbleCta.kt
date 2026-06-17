@@ -23,6 +23,7 @@ import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.pixels.AppPixelName
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.ui.view.TypeAnimationTextView
 import com.duckduckgo.common.ui.view.appendIconToText
 import com.duckduckgo.mobile.android.R as CommonR
@@ -37,7 +38,7 @@ data class DaxDuckAiEndBubbleCta(
     primaryCta = R.string.onboardingDuckAiEndCtaButton,
     shownPixel = AppPixelName.ONBOARDING_DAX_CTA_SHOWN,
     okPixel = AppPixelName.ONBOARDING_DAX_CTA_OK_BUTTON,
-    ctaPixelParam = "duck_ai_end_cta",
+    ctaPixelParam = Pixel.PixelValues.DUCK_AI_END_CTA,
     onboardingStore = onboardingStore,
     appInstallStore = appInstallStore,
 ) {
