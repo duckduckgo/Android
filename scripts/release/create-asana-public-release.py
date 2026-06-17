@@ -12,7 +12,7 @@ from asana_release_utils import (
     log,
     get_commits_between,
     extract_asana_task_links,
-    extract_task_id_from_url,
+    resolve_task_id,
     get_public_release_tag_before,
 )
 
@@ -41,20 +41,9 @@ def iter_valid_task_ids(task_links: List[AsanaTaskLink]):
     workflow.
     """
     for link in task_links:
-        if not link.url:
-            continue
-
-        try:
-            task_id = extract_task_id_from_url(link.url)
-        except Exception as e:
-            log(f"Skipping malformed Asana URL '{link.url}': {e}")
-            continue
-
-        if not task_id:
-            log(f"Skipping Asana URL with no task ID: {link.url}")
-            continue
-
-        yield task_id
+        task_id = resolve_task_id(link)
+        if task_id:
+            yield task_id
 
 
 def build_release_task_links_html(task_links: List[AsanaTaskLink]) -> str:
@@ -65,8 +54,9 @@ def build_release_task_links_html(task_links: List[AsanaTaskLink]) -> str:
     does not fail if Asana cannot auto-resolve an object ID.
     """
     items = [
-        f'<li><a href="https://app.asana.com/0/0/{task_id}/f">{task_id}</a></li>'
-        for task_id in iter_valid_task_ids(task_links)
+        f'<li><a href="{link.url}">{task_id}</a></li>'
+        for link in task_links
+        if (task_id := resolve_task_id(link))
     ]
 
     return "".join(items)
