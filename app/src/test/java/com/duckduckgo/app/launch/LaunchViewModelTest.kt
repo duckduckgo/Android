@@ -22,12 +22,20 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.Observer
 import com.duckduckgo.app.launch.LaunchViewModel.Command.Home
 import com.duckduckgo.app.launch.LaunchViewModel.Command.Onboarding
+import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingPlanBootstrapper
+import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingPlanBootstrapper.OnboardingPlanStartResult
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.referral.StubAppReferrerFoundStateListener
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.onboarding.api.LinearOnboardingEvent
+import com.duckduckgo.onboarding.api.LinearOnboardingHost
+import com.duckduckgo.onboarding.api.LinearOnboardingPlan
+import com.duckduckgo.onboarding.api.LinearOnboardingState
+import com.duckduckgo.onboarding.api.LinearOnboardingStep
+import com.duckduckgo.onboarding.api.LinearOnboardingTransition
 import com.duckduckgo.testseeder.api.TestScenarioSeeder
 import kotlinx.coroutines.test.runTest
 import org.junit.After
@@ -54,6 +62,9 @@ class LaunchViewModelTest {
     private val mockCommandObserver: Observer<LaunchViewModel.Command> = mock()
     private val pixel: Pixel = mock()
     private val testScenarioSeeder: TestScenarioSeeder = mock()
+    private val newUserOnboardingPlanBootstrapper: NewUserOnboardingPlanBootstrapper = mock {
+        onBlocking { startNewUserOnboardingPlanIfEnabled() }.thenReturn(OnboardingPlanStartResult.Disabled)
+    }
 
     private lateinit var testee: LaunchViewModel
 
@@ -69,6 +80,7 @@ class LaunchViewModelTest {
             StubAppReferrerFoundStateListener("xx"),
             pixel = pixel,
             testScenarioSeeder = testScenarioSeeder,
+            newUserOnboardingPlanBootstrapper = newUserOnboardingPlanBootstrapper,
         )
         whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.NEW)
         testee.command.observeForever(mockCommandObserver)
@@ -86,6 +98,7 @@ class LaunchViewModelTest {
             StubAppReferrerFoundStateListener("xx", mockDelayMs = 1_000),
             pixel = pixel,
             testScenarioSeeder = testScenarioSeeder,
+            newUserOnboardingPlanBootstrapper = newUserOnboardingPlanBootstrapper,
         )
         whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.NEW)
         testee.command.observeForever(mockCommandObserver)
@@ -103,8 +116,34 @@ class LaunchViewModelTest {
             StubAppReferrerFoundStateListener("xx", mockDelayMs = Long.MAX_VALUE),
             pixel = pixel,
             testScenarioSeeder = testScenarioSeeder,
+            newUserOnboardingPlanBootstrapper = newUserOnboardingPlanBootstrapper,
         )
         whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.NEW)
+        testee.command.observeForever(mockCommandObserver)
+
+        testee.start(mock<Intent>())
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+        verify(mockCommandObserver).onChanged(any<Onboarding>())
+    }
+
+    @Test
+    fun whenOrchestratorEngagedWithOnboardingActivityHostThenCommandIsOnboarding() = runTest {
+        whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.NEW)
+        val inProgress = LinearOnboardingState.InProgress(
+            rootPlanId = "test_plan",
+            currentPlan = LinearOnboardingPlan(id = "test_plan", steps = listOf(stepHostedIn(LinearOnboardingHost.OnboardingActivity))),
+            currentStepIndex = 0,
+        )
+        whenever(newUserOnboardingPlanBootstrapper.startNewUserOnboardingPlanIfEnabled())
+            .thenReturn(OnboardingPlanStartResult.Enabled(currentState = inProgress))
+        testee = LaunchViewModel(
+            userStageStore,
+            StubAppReferrerFoundStateListener("xx"),
+            pixel = pixel,
+            testScenarioSeeder = testScenarioSeeder,
+            newUserOnboardingPlanBootstrapper = newUserOnboardingPlanBootstrapper,
+        )
         testee.command.observeForever(mockCommandObserver)
 
         testee.start(mock<Intent>())
@@ -120,6 +159,7 @@ class LaunchViewModelTest {
             StubAppReferrerFoundStateListener("xx"),
             pixel = pixel,
             testScenarioSeeder = testScenarioSeeder,
+            newUserOnboardingPlanBootstrapper = newUserOnboardingPlanBootstrapper,
         )
         whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.DAX_ONBOARDING)
         testee.command.observeForever(mockCommandObserver)
@@ -136,6 +176,7 @@ class LaunchViewModelTest {
             StubAppReferrerFoundStateListener("xx", mockDelayMs = 1_000),
             pixel = pixel,
             testScenarioSeeder = testScenarioSeeder,
+            newUserOnboardingPlanBootstrapper = newUserOnboardingPlanBootstrapper,
         )
         whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.DAX_ONBOARDING)
         testee.command.observeForever(mockCommandObserver)
@@ -152,6 +193,7 @@ class LaunchViewModelTest {
             StubAppReferrerFoundStateListener("xx", mockDelayMs = Long.MAX_VALUE),
             pixel = pixel,
             testScenarioSeeder = testScenarioSeeder,
+            newUserOnboardingPlanBootstrapper = newUserOnboardingPlanBootstrapper,
         )
         whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.DAX_ONBOARDING)
         testee.command.observeForever(mockCommandObserver)
@@ -168,6 +210,7 @@ class LaunchViewModelTest {
             StubAppReferrerFoundStateListener("xx", mockDelayMs = Long.MAX_VALUE),
             pixel = pixel,
             testScenarioSeeder = testScenarioSeeder,
+            newUserOnboardingPlanBootstrapper = newUserOnboardingPlanBootstrapper,
         )
 
         testee.start(mock<Intent>())
@@ -183,6 +226,7 @@ class LaunchViewModelTest {
             StubAppReferrerFoundStateListener("xx"),
             pixel = pixel,
             testScenarioSeeder = testScenarioSeeder,
+            newUserOnboardingPlanBootstrapper = newUserOnboardingPlanBootstrapper,
         )
         val intent = intentWithExtras(
             "isMaestro" to "true",
@@ -215,6 +259,7 @@ class LaunchViewModelTest {
             StubAppReferrerFoundStateListener("xx"),
             pixel = pixel,
             testScenarioSeeder = testScenarioSeeder,
+            newUserOnboardingPlanBootstrapper = newUserOnboardingPlanBootstrapper,
         )
         whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.DAX_ONBOARDING)
         whenever(testScenarioSeeder.seedIfNeeded(anyOrNull())).thenThrow(RuntimeException("seed failed"))
@@ -233,6 +278,7 @@ class LaunchViewModelTest {
             StubAppReferrerFoundStateListener("xx"),
             pixel = pixel,
             testScenarioSeeder = testScenarioSeeder,
+            newUserOnboardingPlanBootstrapper = newUserOnboardingPlanBootstrapper,
         )
         whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.DAX_ONBOARDING)
         testee.command.observeForever(mockCommandObserver)
@@ -244,6 +290,13 @@ class LaunchViewModelTest {
             verify(testScenarioSeeder).seedIfNeeded(anyOrNull())
             verify(mockCommandObserver).onChanged(any<Home>())
         }
+    }
+
+    private fun stepHostedIn(stepHost: LinearOnboardingHost): LinearOnboardingStep = object : LinearOnboardingStep {
+        override val id: String = "step"
+        override val host: LinearOnboardingHost = stepHost
+        override val precondition: suspend () -> Boolean = { true }
+        override val transition: suspend (LinearOnboardingEvent) -> LinearOnboardingTransition = { LinearOnboardingTransition.Stay }
     }
 
     private fun intentWithExtras(vararg pairs: Pair<String, String>): Intent {
