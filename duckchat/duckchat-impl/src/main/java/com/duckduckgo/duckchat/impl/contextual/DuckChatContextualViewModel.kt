@@ -187,8 +187,40 @@ class DuckChatContextualViewModel @Inject constructor(
             }
             if (isContextualSheetImprovementsEnabled) {
                 observeRecentChats()
+                observeCurrentChatDeletion()
             }
         }
+    }
+
+    // Last chat id we confirmed exists in history. A brand-new chat sets _chatId (from the loaded
+    // URL) before it is persisted, so "absent from history" only means "deleted" once we've actually
+    // seen it present — this field is what distinguishes the two.
+    private var lastSeenChatId: String? = null
+
+    private fun observeCurrentChatDeletion() {
+        combine(chatHistoryRepository.observeChats(), _chatId) { chats, currentChatId ->
+            currentChatId to chats.any { it.chatId == currentChatId }
+        }
+            .flowOn(dispatchers.io())
+            .onEach { (currentChatId, isPresent) ->
+                if (isPresent) {
+                    lastSeenChatId = currentChatId
+                } else if (currentChatId != null && currentChatId == lastSeenChatId && _viewState.value.sheetMode == SheetMode.WEBVIEW) {
+                    // A chat we had seen in history is now gone -> deleted elsewhere. Clear
+                    // synchronously so repeat emissions for the same id don't retrigger before the
+                    // reset propagates to _chatId/sheetMode.
+                    lastSeenChatId = null
+                    handleLoadedChatDeleted()
+                }
+            }
+            .launchIn(viewModelScope)
+    }
+
+    private fun handleLoadedChatDeleted() {
+        logcat { "Duck.ai Contextual: loaded chat deleted elsewhere, resetting sheet" }
+        // Reset session/state but leave the sheet position untouched (sheetState = null):
+        // if visible it swaps to INPUT in place; if hidden it stays hidden and opens fresh next time.
+        renderNewChatState(sheetState = null)
     }
 
     private fun observeRecentChats() {
@@ -821,7 +853,9 @@ class DuckChatContextualViewModel @Inject constructor(
         renderNewChatState(sheetState = BottomSheetBehavior.STATE_HIDDEN)
     }
 
-    private fun renderNewChatState(sheetState: Int = BottomSheetBehavior.STATE_HALF_EXPANDED) {
+    // sheetState == null leaves the bottom sheet position untouched (used when resetting after the
+    // loaded chat is deleted elsewhere, so we don't pop a dismissed sheet back open).
+    private fun renderNewChatState(sheetState: Int? = BottomSheetBehavior.STATE_HALF_EXPANDED) {
         viewModelScope.launch(dispatchers.io()) {
             val currentTabId = _viewState.value.tabId
             if (currentTabId.isNotBlank()) {
@@ -842,14 +876,14 @@ class DuckChatContextualViewModel @Inject constructor(
                             quickActionState = resetQuickActionState,
                         )
                     }
-                    commandChannel.trySend(Command.ChangeSheetState(sheetState))
+                    sheetState?.let { commandChannel.trySend(Command.ChangeSheetState(it)) }
 
                     val subscriptionEvent = duckChatJSHelper.onNativeAction(NativeAction.NEW_CHAT)
                     _subscriptionEventDataChannel.trySend(subscriptionEvent)
                 }
             }
         }
-        if (sheetState != BottomSheetBehavior.STATE_HIDDEN) {
+        if (sheetState == BottomSheetBehavior.STATE_HALF_EXPANDED) {
             duckChatPixels.reportContextualPlaceholderContextShown()
         }
     }
