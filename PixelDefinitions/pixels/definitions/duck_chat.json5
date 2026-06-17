@@ -1085,5 +1085,61 @@
         "triggers": ["other"],
         "suffixes": ["first_daily_count", "form_factor"],
         "parameters": ["appVersion"]
+    },
+    "m_aichat_contextual_quick_action_ask_about_page_selected_count": {
+        "description": "User tapped the Ask About Page quick action in the Contextual sheet",
+        "owners": ["karlenDimla"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_contextual_quick_action_ask_about_page_selected_daily": {
+        "description": "(Daily Pixel) User tapped the Ask About Page quick action in the Contextual sheet",
+        "owners": ["karlenDimla"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_contextual_recent_chats_popup_displayed_count": {
+        "description": "Recent chats popup menu was displayed from the chats icon in the Contextual sheet",
+        "owners": ["karlenDimla"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_contextual_recent_chats_popup_displayed_daily": {
+        "description": "(Daily Pixel) Recent chats popup menu was displayed from the chats icon in the Contextual sheet",
+        "owners": ["karlenDimla"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_contextual_recent_chat_selected_count": {
+        "description": "User selected a recent chat from the recent chats popup menu in the Contextual sheet",
+        "owners": ["karlenDimla"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_contextual_recent_chat_selected_daily": {
+        "description": "(Daily Pixel) User selected a recent chat from the recent chats popup menu in the Contextual sheet",
+        "owners": ["karlenDimla"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_contextual_view_all_chats_tapped_count": {
+        "description": "User tapped View All Chats from the recent chats popup menu in the Contextual sheet",
+        "owners": ["karlenDimla"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_contextual_view_all_chats_tapped_daily": {
+        "description": "(Daily Pixel) User tapped View All Chats from the recent chats popup menu in the Contextual sheet",
+        "owners": ["karlenDimla"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
     }
 }

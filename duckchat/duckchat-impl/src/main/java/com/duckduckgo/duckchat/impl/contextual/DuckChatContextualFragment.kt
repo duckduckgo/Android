@@ -561,7 +561,7 @@ class DuckChatContextualFragment :
             viewModel.removePageContext()
         }
         binding.duckAiAttachContextLayout.setOnClickListener {
-            viewModel.addPageContext()
+            viewModel.addPageContext(fromPlaceholderTap = true)
         }
         binding.contextualPromptQuickAction.setOnClickListener {
             viewModel.onQuickActionClicked(binding.inputField.text.toString())

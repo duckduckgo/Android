@@ -508,7 +508,7 @@ class DuckChatContextualViewModelTest {
                 }
                 """.trimIndent()
 
-            testee.addPageContext()
+            testee.addPageContext(fromPlaceholderTap = true)
             coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
 
             val state = testee.viewState.value
@@ -575,7 +575,7 @@ class DuckChatContextualViewModelTest {
                 }
                 """.trimIndent()
 
-            testee.addPageContext()
+            testee.addPageContext(fromPlaceholderTap = true)
             coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
 
             val state = testee.viewState.value
@@ -976,10 +976,48 @@ class DuckChatContextualViewModelTest {
         }
 
     @Test
-    fun `when replace prompt then summarize prompt selected pixel fired`() = runTest {
+    fun `when replace prompt then summarize prompt selected pixel not fired`() = runTest {
         testee.replacePrompt("", "summarize this")
 
+        verify(duckChatPixels, never()).reportContextualSummarizePromptSelected()
+    }
+
+    @Test
+    fun `when summarize quick action clicked in legacy mode then summarize prompt selected pixel fired`() = runTest {
+        whenever(contextualSheetImprovementsToggle.isEnabled()).thenReturn(false)
+        val testee = buildViewModel()
+
+        testee.onQuickActionClicked("")
+
+        assertEquals(DuckChatContextualViewModel.QuickActionState.LEGACY_SUMMARIZE, testee.viewState.value.quickActionState)
         verify(duckChatPixels).reportContextualSummarizePromptSelected()
+    }
+
+    @Test
+    fun `when summarize quick action clicked in submit mode then summarize prompt selected pixel fired`() = runTest {
+        whenever(contextualSheetImprovementsToggle.isEnabled()).thenReturn(true)
+        val testee = buildViewModel()
+        testee.onSheetOpened("tab-1")
+        val pageContext = """{"title":"Page","url":"https://example.com","content":"text"}"""
+        testee.onPageContextReceived("tab-1", pageContext)
+        testee.onQuickActionClicked("") // ASK_ABOUT_PAGE -> SUBMIT_SUMMARIZE (no summarize pixel)
+
+        testee.onQuickActionClicked("") // SUBMIT_SUMMARIZE click -> fires summarize pixel
+
+        verify(duckChatPixels).reportContextualSummarizePromptSelected()
+    }
+
+    @Test
+    fun `when ask about page quick action clicked then summarize prompt selected pixel not fired`() = runTest {
+        whenever(contextualSheetImprovementsToggle.isEnabled()).thenReturn(true)
+        val testee = buildViewModel()
+        testee.onSheetOpened("tab-1")
+        val pageContext = """{"title":"Page","url":"https://example.com","content":"text"}"""
+        testee.onPageContextReceived("tab-1", pageContext)
+
+        testee.onQuickActionClicked("") // ASK_ABOUT_PAGE -> SUBMIT_SUMMARIZE
+
+        verify(duckChatPixels, never()).reportContextualSummarizePromptSelected()
     }
 
     @Test
@@ -1705,7 +1743,9 @@ class DuckChatContextualViewModelTest {
 
         testee.onQuickActionClicked("") // SUBMIT_SUMMARIZE click — should not re-attach
 
-        verify(duckChatPixels, times(1)).reportContextualPlaceholderContextTapped()
+        // ASK_ABOUT_PAGE attaches context internally; it is not a placeholder tap, so the
+        // placeholder-tapped pixel must not fire on this path.
+        verify(duckChatPixels, never()).reportContextualPlaceholderContextTapped()
         verify(duckChatPixels, times(1)).reportContextualPageContextManuallyAttachedNative()
     }
 
@@ -1873,6 +1913,45 @@ class DuckChatContextualViewModelTest {
     @Test
     fun `when fire confirmed then placeholder shown pixel is not fired`() = runTest {
         testee.onContextualFireConfirmed()
+        verify(duckChatPixels, never()).reportContextualPlaceholderContextShown()
+    }
+
+    @Test
+    fun `when sheet opened in ASK_ABOUT_PAGE state then placeholder shown pixel is not fired`() = runTest {
+        whenever(contextualSheetImprovementsToggle.isEnabled()).thenReturn(true)
+        val testee = buildViewModel()
+
+        testee.onSheetOpened("tab-1")
+
+        assertEquals(DuckChatContextualViewModel.QuickActionState.ASK_ABOUT_PAGE, testee.viewState.value.quickActionState)
+        verify(duckChatPixels, never()).reportContextualPlaceholderContextShown()
+    }
+
+    @Test
+    fun `when new chat triggered in ASK_ABOUT_PAGE state then placeholder shown pixel is not fired`() = runTest {
+        whenever(contextualSheetImprovementsToggle.isEnabled()).thenReturn(true)
+        val testee = buildViewModel()
+        testee.onSheetOpened("tab-1")
+
+        testee.onNewChatRequested()
+
+        assertEquals(DuckChatContextualViewModel.QuickActionState.ASK_ABOUT_PAGE, testee.viewState.value.quickActionState)
+        verify(duckChatPixels, never()).reportContextualPlaceholderContextShown()
+    }
+
+    @Test
+    fun `when removePageContext reverts to ASK_ABOUT_PAGE then placeholder shown pixel is not fired but removed pixel is`() = runTest {
+        whenever(contextualSheetImprovementsToggle.isEnabled()).thenReturn(true)
+        val testee = buildViewModel()
+        testee.onSheetOpened("tab-1")
+        val pageContext = """{"title":"Page","url":"https://example.com","content":"text"}"""
+        testee.onPageContextReceived("tab-1", pageContext)
+        testee.onQuickActionClicked("") // ASK_ABOUT_PAGE -> SUBMIT_SUMMARIZE
+
+        testee.removePageContext()
+
+        assertEquals(DuckChatContextualViewModel.QuickActionState.ASK_ABOUT_PAGE, testee.viewState.value.quickActionState)
+        verify(duckChatPixels).reportContextualPageContextRemovedNative()
         verify(duckChatPixels, never()).reportContextualPlaceholderContextShown()
     }
 
