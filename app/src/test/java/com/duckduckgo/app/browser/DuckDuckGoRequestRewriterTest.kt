@@ -21,7 +21,6 @@ import android.net.Uri
 import androidx.core.net.toUri
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
-import com.duckduckgo.app.referral.AppReferrerDataStore
 import com.duckduckgo.app.statistics.model.Atb
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.common.utils.AppUrl.ParamKey
@@ -30,6 +29,7 @@ import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.experiments.api.VariantManager
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
+import com.duckduckgo.referral.api.AppReferrer
 import com.duckduckgo.settings.api.SerpSettingsFeature
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -47,7 +47,7 @@ class DuckDuckGoRequestRewriterTest {
     private lateinit var testee: DuckDuckGoRequestRewriter
     private val mockStatisticsStore: StatisticsDataStore = mock()
     private val mockVariantManager: VariantManager = mock()
-    private val mockAppReferrerDataStore: AppReferrerDataStore = mock()
+    private val mockAppReferrer: AppReferrer = mock()
     private val duckChat: DuckChat = mock()
     private val serpSettingsFeature: SerpSettingsFeature = FakeFeatureToggleFactory.create(SerpSettingsFeature::class.java)
     private val androidBrowserConfigFeature: AndroidBrowserConfigFeature = FakeFeatureToggleFactory.create(AndroidBrowserConfigFeature::class.java)
@@ -56,7 +56,7 @@ class DuckDuckGoRequestRewriterTest {
     @Before
     fun before() {
         whenever(mockVariantManager.getVariantKey()).thenReturn("")
-        whenever(mockAppReferrerDataStore.installedFromEuAuction).thenReturn(false)
+        whenever(mockAppReferrer.isInstalledFromEuAuction()).thenReturn(false)
         whenever(duckChat.isEnabled()).thenReturn(true)
 
         androidBrowserConfigFeature.hideDuckAiInSerpKillSwitch().setRawStoredState(State(true))
@@ -65,7 +65,7 @@ class DuckDuckGoRequestRewriterTest {
             DuckDuckGoUrlDetectorImpl(),
             mockStatisticsStore,
             mockVariantManager,
-            mockAppReferrerDataStore,
+            mockAppReferrer,
             duckChat,
             androidBrowserConfigFeature,
             serpSettingsFeature,
@@ -83,7 +83,7 @@ class DuckDuckGoRequestRewriterTest {
 
     @Test
     fun whenAddingCustomParamsAndUserSourcedFromEuAuctionThenEuSourceParameterIsAdded() {
-        whenever(mockAppReferrerDataStore.installedFromEuAuction).thenReturn(true)
+        whenever(mockAppReferrer.isInstalledFromEuAuction()).thenReturn(true)
         testee.addCustomQueryParams(builder)
         val uri = builder.build()
         assertTrue(uri.queryParameterNames.contains(ParamKey.SOURCE))

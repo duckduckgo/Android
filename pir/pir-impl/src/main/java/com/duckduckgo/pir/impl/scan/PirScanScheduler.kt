@@ -56,6 +56,12 @@ import javax.inject.Inject
 interface PirScanScheduler {
     fun scheduleScans()
 
+    /**
+     * Re-applies the scheduled scan work spec (interval / constraints) to the already-enqueued
+     * periodic scan so that changes are picked up by already-enrolled users after an app update.
+     */
+    fun reschedulePirScans()
+
     fun cancelScheduledScans(context: Context)
 }
 
@@ -77,11 +83,29 @@ class RealPirScanScheduler @Inject constructor(
         scheduleBackgroundScanStats()
     }
 
+    override fun reschedulePirScans() {
+        logcat { "PIR-SCHEDULED: Re-applying scheduled scan work spec appId: ${appBuildConfig.applicationId}" }
+        enqueueScheduledScanWork()
+    }
+
     private fun schedulePirScans() {
+        pirPixelSender.reportScheduledScanScheduled()
+        coroutineScope.launch {
+            eventsRepository.saveEventLog(
+                PirEventLog(
+                    eventTimeInMillis = currentTimeProvider.currentTimeMillis(),
+                    eventType = EventType.SCHEDULED_SCAN_SCHEDULED,
+                ),
+            )
+        }
+
+        enqueueScheduledScanWork()
+    }
+
+    private fun enqueueScheduledScanWork() {
         val constraints =
             Constraints
                 .Builder()
-                .setRequiresCharging(true)
                 .setRequiredNetworkType(NetworkType.CONNECTED)
                 .build()
 
@@ -95,16 +119,6 @@ class RealPirScanScheduler @Inject constructor(
                 .setConstraints(constraints)
                 .setInitialDelay(SCHEDULED_SCAN_INTERVAL_HOURS, TimeUnit.HOURS)
                 .build()
-
-        pirPixelSender.reportScheduledScanScheduled()
-        coroutineScope.launch {
-            eventsRepository.saveEventLog(
-                PirEventLog(
-                    eventTimeInMillis = currentTimeProvider.currentTimeMillis(),
-                    eventType = EventType.SCHEDULED_SCAN_SCHEDULED,
-                ),
-            )
-        }
 
         workManager.enqueueUniquePeriodicWork(
             TAG_SCHEDULED_SCAN,

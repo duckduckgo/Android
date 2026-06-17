@@ -22,6 +22,7 @@ import com.duckduckgo.common.ui.view.encodeBitmapToBase64
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.duckchat.api.nativeinput.NativeInputStatePublisher
 import com.duckduckgo.duckchat.impl.ChatState
 import com.duckduckgo.duckchat.impl.ChatState.HIDE
 import com.duckduckgo.duckchat.impl.ChatState.SHOW
@@ -100,6 +101,7 @@ class RealDuckChatJSHelper @Inject constructor(
     private val duckChatFeature: DuckChatFeature,
     private val voiceSessionStateManager: VoiceSessionStateManager,
     private val limitsHandler: LimitsHandler,
+    private val nativeInputStatePublisher: NativeInputStatePublisher,
 ) : DuckChatJSHelper {
 
     private val registerOpenedJob = ConflatedJob()
@@ -184,6 +186,22 @@ class RealDuckChatJSHelper @Inject constructor(
 
             METHOD_SHOW_CHAT_INPUT -> {
                 duckChat.updateChatState(SHOW)
+                null
+            }
+            METHOD_DISABLE_CHAT_INPUT -> {
+                // submitEnabled is per-tab state and we have the tabId here, so we write it directly via
+                // the publisher. The widget VM reads it from NativeInputState.
+                if (tabId.isNotEmpty()) nativeInputStatePublisher.update(tabId) { it.copy(submitEnabled = false) }
+                null
+            }
+
+            METHOD_ENABLE_CHAT_INPUT -> {
+                if (tabId.isNotEmpty()) nativeInputStatePublisher.update(tabId) { it.copy(submitEnabled = true) }
+                null
+            }
+
+            METHOD_SHOW_MODEL_PICKER -> {
+                if (tabId.isNotEmpty()) duckChat.requestShowModelPicker(tabId)
                 null
             }
 
@@ -531,6 +549,9 @@ class RealDuckChatJSHelper @Inject constructor(
         private const val METHOD_RESPONSE_STATE = "responseState"
         private const val METHOD_HIDE_CHAT_INPUT = "hideChatInput"
         private const val METHOD_SHOW_CHAT_INPUT = "showChatInput"
+        private const val METHOD_DISABLE_CHAT_INPUT = "disableChatInput"
+        private const val METHOD_ENABLE_CHAT_INPUT = "enableChatInput"
+        private const val METHOD_SHOW_MODEL_PICKER = "showModelPicker"
         const val METHOD_GET_PAGE_CONTEXT = "getAIChatPageContext"
         const val METHOD_OPEN_KEYBOARD = "openKeyboard"
         private const val METHOD_TOGGLE_PAGE_CONTEXT = "togglePageContextTelemetry"

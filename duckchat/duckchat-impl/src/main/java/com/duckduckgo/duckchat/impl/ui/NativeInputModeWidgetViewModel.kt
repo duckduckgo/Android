@@ -72,6 +72,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flatMapLatest
@@ -152,7 +153,23 @@ class NativeInputModeWidgetViewModel @Inject constructor(
         viewModelScope.launch {
             _isHistoryAvailable.value = duckChatInternal.isChatHistoryAvailable()
         }
+        viewModelScope.launch {
+            // FE recovery "Switch Model": enter the model-change mode, but only when the event
+            // targets this widget's tab. The event carries a tabId, so other tabs' VMs ignore it.
+            duckChatInternal.showModelPickerEvents.collect { eventTabId ->
+                if (eventTabId == activeTabId.value) {
+                    nativeInputStatePublisher.update(eventTabId) { it.copy(modelChangeMode = true) }
+                }
+            }
+        }
     }
+
+    /**
+     * Events asking the widget to open the model picker (e.g. for the FE recovery flow) for the related tabId.
+     */
+    val showModelPickerEvents: Flow<Unit> = duckChatInternal.showModelPickerEvents
+        .filter { it == activeTabId.value }
+        .map { }
 
     fun setModelPickerEnabled(enabled: Boolean) {
         _modelPickerEnabled.value = enabled
@@ -262,6 +279,18 @@ class NativeInputModeWidgetViewModel @Inject constructor(
         .map { it.chatId }
         .distinctUntilChanged()
 
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val submitEnabled: Flow<Boolean> = activeTabId.filterNotNull()
+        .flatMapLatest { tabId -> nativeInputStateProvider.stateForTab(tabId) }
+        .map { it.submitEnabled }
+        .distinctUntilChanged()
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val modelChangeMode: Flow<Boolean> = activeTabId.filterNotNull()
+        .flatMapLatest { tabId -> nativeInputStateProvider.stateForTab(tabId) }
+        .map { it.modelChangeMode }
+        .distinctUntilChanged()
+
     val state: SharedFlow<NativeInputState> = combine(
         baseState,
         duckChatInternal.chatState,
@@ -341,6 +370,26 @@ class NativeInputModeWidgetViewModel @Inject constructor(
         nativeInputStatePublisher.update(tabId) { it.copy(selectedTool = tool) }
     }
 
+    /**
+     * Called when a prompt is submitted
+     * */
+    fun onPromptSubmitted() {
+        // Ends the FE recovery model-change window for the active tab.
+        endModelChangeMode()
+    }
+
+    /**
+     * Called when the recovery model picker is dismissed without picking a model.
+     */
+    fun exitModelChangeMode() {
+        endModelChangeMode()
+    }
+
+    private fun endModelChangeMode() {
+        val tabId = activeTabId.value ?: return
+        nativeInputStatePublisher.update(tabId) { it.copy(modelChangeMode = false) }
+    }
+
     fun setActiveChatId(chatId: String?) {
         val tabId = activeTabId.value
         if (tabId == null) {
@@ -353,7 +402,12 @@ class NativeInputModeWidgetViewModel @Inject constructor(
     }
 
     private fun applyChatId(tabId: String, chatId: String?) {
-        nativeInputStatePublisher.update(tabId) { it.copy(chatId = chatId) }
+        nativeInputStatePublisher.update(tabId) { current ->
+            // Reset submitEnabled to true if we changed chats.
+            // Always end the model-change window since it's per-visit.
+            val submitEnabled = if (current.chatId != chatId) true else current.submitEnabled
+            current.copy(chatId = chatId, submitEnabled = submitEnabled, modelChangeMode = false)
+        }
         currentChatJob?.cancel()
         currentChat.value = null
         currentChatJob = viewModelScope.launch {

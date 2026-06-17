@@ -1916,12 +1916,9 @@ class DuckChatContextualViewModelTest {
         override fun isDuckChatUrl(uri: android.net.Uri): Boolean =
             uri.host == "duck.ai" || uri.host == "duckduckgo.com"
         override suspend fun wasOpenedBefore(): Boolean = false
-        override fun showNewAddressBarOptionChoiceScreen(
-            context: android.content.Context,
-            isDarkThemeEnabled: Boolean,
-        ) = Unit
 
         override suspend fun setInputScreenUserSetting(enabled: Boolean) = Unit
+        override suspend fun isInputScreenEverEnabled(): Boolean = false
         override suspend fun setCosmeticInputScreenUserSetting(enabled: Boolean) = Unit
         override fun observeInputScreenUserSettingEnabled(): Flow<Boolean> = kotlinx.coroutines.flow.emptyFlow()
         override fun observeCosmeticInputScreenUserSettingEnabled(): Flow<Boolean?> = kotlinx.coroutines.flow.emptyFlow()
@@ -1936,6 +1933,7 @@ class DuckChatContextualViewModelTest {
         override fun observeTriggerVoiceChatSessionEnd(): Flow<String> = kotlinx.coroutines.flow.emptyFlow()
         override fun endVoiceChatSession(tabId: String) { }
         override suspend fun isChatHistoryAvailable(): Boolean = false
+        override suspend fun onAddressBarPickerDuckAiSelected() = Unit
     }
 
     private class FakeDuckChatContextualDataStore : DuckChatContextualDataStore {

@@ -152,7 +152,6 @@ class AppShortcutCreator @Inject constructor(
         val browserActivity = BrowserActivity.intent(
             context = context,
             launchSource = AppShortcutBookmarks,
-            isLaunchFromBookmarksAppShortcut = true,
         ).also { it.action = Intent.ACTION_VIEW }
         val bookmarksActivity = BookmarksActivity.intent(context).also { it.action = Intent.ACTION_VIEW }
 

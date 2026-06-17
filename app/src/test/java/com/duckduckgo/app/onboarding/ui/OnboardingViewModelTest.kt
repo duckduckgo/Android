@@ -18,7 +18,6 @@ package com.duckduckgo.app.onboarding.ui
 
 import android.annotation.SuppressLint
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import com.duckduckgo.app.browser.newaddressbaroption.RealNewAddressBarOptionManager
 import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.cta.model.DismissedCta
@@ -71,8 +70,6 @@ class OnboardingViewModelTest {
 
     private val appBuildConfig: AppBuildConfig = mock()
 
-    private val newAddressBarOptionManager: RealNewAddressBarOptionManager = mock()
-
     private val dismissedCtaDao: DismissedCtaDao = mock()
 
     private val onboardingStore: OnboardingStore = mock()
@@ -93,7 +90,6 @@ class OnboardingViewModelTest {
             dispatchers = coroutineRule.testDispatcherProvider,
             onboardingSkipper = onboardingSkipper,
             appBuildConfig = appBuildConfig,
-            newAddressBarOptionManager = newAddressBarOptionManager,
             dismissedCtaDao = dismissedCtaDao,
             onboardingStore = onboardingStore,
             onboardingBrandDesignUpdateToggles = onboardingBrandDesignUpdateToggles,
@@ -184,19 +180,18 @@ class OnboardingViewModelTest {
     }
 
     @Test
-    fun whenDevSkipAndOrchestratorNotEngagedThenMarkOnboardingAsCompletedAndSetAsShownAndNotDriven() = runTest {
+    fun whenDevSkipAndOrchestratorNotEngagedThenMarkOnboardingAsCompletedAndNotDriven() = runTest {
         orchestratorState.value = LinearOnboardingState.NotStarted
 
         testee.devOnlyFullyCompleteAllOnboarding()
 
         assertFalse(testee.orchestratorDriven)
         verify(onboardingSkipper).markOnboardingAsCompleted()
-        verify(newAddressBarOptionManager).setAsShown()
         verify(linearOnboardingOrchestrator, never()).onEvent(any())
     }
 
     @Test
-    fun whenDevSkipAndOrchestratorEngagedThenAbortsOrchestratorAndSetAsShownAndDriven() = runTest {
+    fun whenDevSkipAndOrchestratorEngagedThenAbortsOrchestratorAndDriven() = runTest {
         orchestratorState.value = LinearOnboardingState.InProgress(
             rootPlanId = "test_plan",
             currentPlan = LinearOnboardingPlan(id = "test_plan", steps = emptyList()),
@@ -206,7 +201,6 @@ class OnboardingViewModelTest {
         testee.devOnlyFullyCompleteAllOnboarding()
 
         assertTrue(testee.orchestratorDriven)
-        verify(newAddressBarOptionManager).setAsShown()
         verify(linearOnboardingOrchestrator).onEvent(NewUserOnboardingEvent.SkipNewUserOnboardingDevOptionClicked)
         verify(onboardingSkipper, never()).markOnboardingAsCompleted()
     }

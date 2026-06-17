@@ -26,12 +26,12 @@ import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingPlanBootstrap
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.onboarding.store.isNewUser
 import com.duckduckgo.app.pixels.AppPixelName
-import com.duckduckgo.app.referral.AppInstallationReferrerStateListener
-import com.duckduckgo.app.referral.AppInstallationReferrerStateListener.Companion.MAX_REFERRER_WAIT_TIME_MS
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.utils.SingleLiveEvent
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.onboarding.api.LinearOnboardingHost
+import com.duckduckgo.referral.api.AppInstallationReferrerStateListener
+import com.duckduckgo.referral.api.AppInstallationReferrerStateListener.Companion.MAX_REFERRER_WAIT_TIME_MS
 import com.duckduckgo.testseeder.api.TestScenarioSeeder
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive

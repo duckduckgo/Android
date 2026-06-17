@@ -16,12 +16,21 @@
 
 package com.duckduckgo.adblocking.impl
 
+import com.duckduckgo.adblocking.impl.AdBlockingPixelNames.AD_BLOCKING_SCRIPTLETS_FETCH_ERROR_COUNT
+import com.duckduckgo.adblocking.impl.AdBlockingPixelNames.AD_BLOCKING_SCRIPTLETS_FETCH_ERROR_DAILY
+import com.duckduckgo.adblocking.impl.AdBlockingPixelNames.AD_BLOCKING_SCRIPTLETS_INSTALLED_COUNT
+import com.duckduckgo.adblocking.impl.AdBlockingPixelNames.AD_BLOCKING_SCRIPTLETS_INSTALLED_DAILY
+import com.duckduckgo.adblocking.impl.AdBlockingPixelNames.AD_BLOCKING_SCRIPTLETS_INSTALL_ERROR_COUNT
+import com.duckduckgo.adblocking.impl.AdBlockingPixelNames.AD_BLOCKING_SCRIPTLETS_INSTALL_ERROR_DAILY
+import com.duckduckgo.adblocking.impl.AdBlockingPixelNames.AD_BLOCKING_SCRIPTLETS_VALIDATION_ERROR_COUNT
+import com.duckduckgo.adblocking.impl.AdBlockingPixelNames.AD_BLOCKING_SCRIPTLETS_VALIDATION_ERROR_DAILY
 import com.duckduckgo.adblocking.impl.domain.RealScriptletUpdater
 import com.duckduckgo.adblocking.impl.domain.ScriptletSignatureValidator
 import com.duckduckgo.adblocking.impl.domain.ScriptletUpdateResult
 import com.duckduckgo.adblocking.impl.domain.ScriptletValidationResult
 import com.duckduckgo.adblocking.impl.remoteconfig.AdBlockingExtensionSettings
 import com.duckduckgo.adblocking.impl.remoteconfig.ScriptletEntry
+import com.duckduckgo.app.statistics.pixels.Pixel
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.test.runTest
@@ -33,7 +42,9 @@ import org.mockito.kotlin.check
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoMoreInteractions
 import org.mockito.kotlin.whenever
 import java.io.IOException
 
@@ -42,8 +53,9 @@ class RealScriptletUpdaterTest {
     private val repository: AdBlockingExtensionRepository = mock()
     private val downloader: ScriptletDownloader = mock()
     private val validator: ScriptletSignatureValidator = mock()
+    private val pixel: Pixel = mock()
 
-    private val updater = RealScriptletUpdater(repository, downloader, validator)
+    private val updater = RealScriptletUpdater(repository, downloader, validator, pixel)
 
     private val isolatedPath = "scriptlets/isolated/ublock-filters.js"
     private val mainPath = "scriptlets/main/ublock-filters.js"
@@ -75,6 +87,8 @@ class RealScriptletUpdaterTest {
 
         assertEquals(ScriptletUpdateResult.Retry, updater.update(validSettings))
         verify(repository, never()).storeScriptlets(any(), any())
+        verify(pixel).enqueueFire(AD_BLOCKING_SCRIPTLETS_FETCH_ERROR_DAILY, type = Pixel.PixelType.Daily())
+        verify(pixel).enqueueFire(AD_BLOCKING_SCRIPTLETS_FETCH_ERROR_COUNT)
     }
 
     @Test
@@ -88,6 +102,50 @@ class RealScriptletUpdaterTest {
 
         assertEquals(ScriptletUpdateResult.Retry, updater.update(validSettings))
         verify(repository, never()).storeScriptlets(any(), any())
+        verify(pixel).enqueueFire(
+            AD_BLOCKING_SCRIPTLETS_VALIDATION_ERROR_DAILY,
+            parameters = mapOf("reason" to "SignatureVerificationFailed"),
+            type = Pixel.PixelType.Daily(),
+        )
+        verify(pixel).enqueueFire(
+            AD_BLOCKING_SCRIPTLETS_VALIDATION_ERROR_COUNT,
+            parameters = mapOf("reason" to "SignatureVerificationFailed"),
+        )
+    }
+
+    @Test
+    fun whenMultipleDownloadsFailThenFetchErrorPixelsFiredOnlyOnce() = runTest {
+        whenever(repository.getStoredVersion()).thenReturn("0.0.0")
+        whenever(downloader.download(isolatedEntry.url)).thenReturn(kotlin.Result.failure(IOException("boom1")))
+        whenever(downloader.download(mainEntry.url)).thenReturn(kotlin.Result.failure(IOException("boom2")))
+
+        assertEquals(ScriptletUpdateResult.Retry, updater.update(validSettings))
+        verify(pixel, times(1)).enqueueFire(AD_BLOCKING_SCRIPTLETS_FETCH_ERROR_DAILY, type = Pixel.PixelType.Daily())
+        verify(pixel, times(1)).enqueueFire(AD_BLOCKING_SCRIPTLETS_FETCH_ERROR_COUNT)
+        verifyNoMoreInteractions(pixel)
+    }
+
+    @Test
+    fun whenMultipleValidationsFailThenValidationErrorPixelsFiredOnlyOnce() = runTest {
+        whenever(repository.getStoredVersion()).thenReturn("0.0.0")
+        whenever(downloader.download(isolatedEntry.url)).thenReturn(kotlin.Result.success(isolatedBytes))
+        whenever(downloader.download(mainEntry.url)).thenReturn(kotlin.Result.success(mainBytes))
+        whenever(validator.validate(isolatedBytes, isolatedEntry.signature))
+            .thenReturn(ScriptletValidationResult.Invalid.SignatureVerificationFailed)
+        whenever(validator.validate(mainBytes, mainEntry.signature))
+            .thenReturn(ScriptletValidationResult.Invalid.SignatureVerificationFailed)
+
+        assertEquals(ScriptletUpdateResult.Retry, updater.update(validSettings))
+        verify(pixel, times(1)).enqueueFire(
+            AD_BLOCKING_SCRIPTLETS_VALIDATION_ERROR_DAILY,
+            parameters = mapOf("reason" to "SignatureVerificationFailed"),
+            type = Pixel.PixelType.Daily(),
+        )
+        verify(pixel, times(1)).enqueueFire(
+            AD_BLOCKING_SCRIPTLETS_VALIDATION_ERROR_COUNT,
+            parameters = mapOf("reason" to "SignatureVerificationFailed"),
+        )
+        verifyNoMoreInteractions(pixel)
     }
 
     @Test
@@ -107,6 +165,51 @@ class RealScriptletUpdaterTest {
                 assertEquals(String(mainBytes), String(stored.getValue(mainPath)))
             },
         )
+        verify(pixel).enqueueFire(
+            AD_BLOCKING_SCRIPTLETS_INSTALLED_DAILY,
+            parameters = mapOf("version" to "2026.3.9"),
+            type = Pixel.PixelType.Daily(),
+        )
+        verify(pixel).enqueueFire(
+            AD_BLOCKING_SCRIPTLETS_INSTALLED_COUNT,
+            parameters = mapOf("version" to "2026.3.9"),
+        )
+    }
+
+    @Test
+    fun whenStoredVersionIsNullThenSuccessfulUpdateFiresInstalledPixel() = runTest {
+        whenever(repository.getStoredVersion()).thenReturn(null)
+        whenever(downloader.download(isolatedEntry.url)).thenReturn(kotlin.Result.success(isolatedBytes))
+        whenever(downloader.download(mainEntry.url)).thenReturn(kotlin.Result.success(mainBytes))
+        whenever(validator.validate(isolatedBytes, isolatedEntry.signature)).thenReturn(ScriptletValidationResult.Valid)
+        whenever(validator.validate(mainBytes, mainEntry.signature)).thenReturn(ScriptletValidationResult.Valid)
+
+        assertEquals(ScriptletUpdateResult.Success, updater.update(validSettings))
+        verify(repository).storeScriptlets(eq("2026.3.9"), any())
+        verify(pixel).enqueueFire(
+            AD_BLOCKING_SCRIPTLETS_INSTALLED_DAILY,
+            parameters = mapOf("version" to "2026.3.9"),
+            type = Pixel.PixelType.Daily(),
+        )
+        verify(pixel).enqueueFire(
+            AD_BLOCKING_SCRIPTLETS_INSTALLED_COUNT,
+            parameters = mapOf("version" to "2026.3.9"),
+        )
+    }
+
+    @Test
+    fun whenStoringScriptletsFailsThenUpdateReturnsRetryAndFiresInstallError() = runTest {
+        whenever(repository.getStoredVersion()).thenReturn("0.0.0")
+        whenever(downloader.download(isolatedEntry.url)).thenReturn(kotlin.Result.success(isolatedBytes))
+        whenever(downloader.download(mainEntry.url)).thenReturn(kotlin.Result.success(mainBytes))
+        whenever(validator.validate(isolatedBytes, isolatedEntry.signature)).thenReturn(ScriptletValidationResult.Valid)
+        whenever(validator.validate(mainBytes, mainEntry.signature)).thenReturn(ScriptletValidationResult.Valid)
+        whenever(repository.storeScriptlets(any(), any())).thenThrow(RuntimeException("db boom"))
+
+        assertEquals(ScriptletUpdateResult.Retry, updater.update(validSettings))
+        verify(pixel).enqueueFire(AD_BLOCKING_SCRIPTLETS_INSTALL_ERROR_DAILY, type = Pixel.PixelType.Daily())
+        verify(pixel).enqueueFire(AD_BLOCKING_SCRIPTLETS_INSTALL_ERROR_COUNT)
+        verify(pixel, never()).enqueueFire(AD_BLOCKING_SCRIPTLETS_INSTALLED_DAILY, type = Pixel.PixelType.Daily())
     }
 
     @Test
@@ -182,7 +285,7 @@ class RealScriptletUpdaterTest {
                 else -> error("unexpected url: $url")
             }
         }
-        val shortCircuitingUpdater = RealScriptletUpdater(repository, shortCircuitingDownloader, validator)
+        val shortCircuitingUpdater = RealScriptletUpdater(repository, shortCircuitingDownloader, validator, pixel)
 
         assertEquals(ScriptletUpdateResult.Retry, shortCircuitingUpdater.update(validSettings))
         assertTrue("isolated download should have started in parallel", isolatedDownloadStarted.isCompleted)

@@ -35,6 +35,14 @@
         <attr name="leadingIcon" />
         <attr name="leadingIconTint" />
         <attr name="trailingIcon" />
+        <attr name="primaryTextMaxLines" format="integer" />
+        <attr name="primaryTextEllipsize">
+            <enum name="none" value="0" />
+            <enum name="start" value="1" />
+            <enum name="middle" value="2" />
+            <enum name="end" value="3" />
+            <enum name="marquee" value="4" />
+        </attr>
     </declare-styleable>
 
 </resources>

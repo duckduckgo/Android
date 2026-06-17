@@ -111,7 +111,9 @@
                     "emailConfirmation",
                     "getCaptchaInfo",
                     "solveCaptcha",
-                    "condition"
+                    "condition",
+                    "getEmailData",
+                    "generateEmail"
                 ]
             },
             {
@@ -369,7 +371,9 @@
                     "emailConfirmation",
                     "getCaptchaInfo",
                     "solveCaptcha",
-                    "condition"
+                    "condition",
+                    "getEmailData",
+                    "generateEmail"
                 ]
             }
         ]
@@ -527,7 +531,9 @@
                     "emailConfirmation",
                     "getCaptchaInfo",
                     "solveCaptcha",
-                    "condition"
+                    "condition",
+                    "getEmailData",
+                    "generateEmail"
                 ]
             },
             {
@@ -610,7 +616,9 @@
                     "emailConfirmation",
                     "getCaptchaInfo",
                     "solveCaptcha",
-                    "condition"
+                    "condition",
+                    "getEmailData",
+                    "generateEmail"
                 ]
             },
             {
@@ -2716,8 +2724,11 @@
                     "21600000",
                     "43200000",
                     "86400000",
+                    "172800000",
                     "259200000",
+                    "432000000",
                     "604800000",
+                    "864000000",
                     "1209600000"
                 ]
             }

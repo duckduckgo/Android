@@ -25,6 +25,7 @@ import com.duckduckgo.pir.impl.checker.DisabledReason
 import com.duckduckgo.pir.impl.checker.PirEligibility
 import com.duckduckgo.pir.impl.checker.PirWorkHandler
 import com.duckduckgo.pir.impl.pixels.PirPixelSender
+import com.duckduckgo.pir.impl.scan.PirScanScheduler
 import com.duckduckgo.pir.impl.store.PirRepository
 import com.duckduckgo.pir.impl.wideevents.PirScanWideEvent.CancellationReason
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -52,6 +53,7 @@ class PirDataUpdateObserverTest {
     private val pirRepository: PirRepository = mock()
     private val currentTimeProvider: CurrentTimeProvider = mock()
     private val pirPixelSender: PirPixelSender = mock()
+    private val pirScanScheduler: PirScanScheduler = mock()
     private val canRunPirFlow = MutableStateFlow<PirEligibility>(PirEligibility.Disabled(DisabledReason.FEATURE_DISABLED))
 
     private lateinit var pirDataUpdateObserver: PirDataUpdateObserver
@@ -61,6 +63,7 @@ class PirDataUpdateObserverTest {
         lifecycleOwner = TestLifecycleOwner(initialState = INITIALIZED)
         whenever(pirWorkHandler.canRunPir()).thenReturn(canRunPirFlow)
         whenever(pirRepository.getFeatureReceivedMs()).thenReturn(0L)
+        whenever(pirRepository.getValidUserProfileQueries()).thenReturn(emptyList())
         whenever(currentTimeProvider.currentTimeMillis()).thenReturn(1000L)
 
         pirDataUpdateObserver = PirDataUpdateObserver(
@@ -72,6 +75,7 @@ class PirDataUpdateObserverTest {
             pirRepository = pirRepository,
             currentTimeProvider = currentTimeProvider,
             pirPixelSender = pirPixelSender,
+            pirScanScheduler = pirScanScheduler,
         )
     }
 
@@ -151,6 +155,38 @@ class PirDataUpdateObserverTest {
         verify(brokerJsonUpdater).update()
         verify(pirWorkHandler, never()).cancelWork(any())
         verifyNoInteractions(pirFeatureDataCleaner)
+    }
+
+    @Test
+    fun whenPirEnabledAndValidProfileExistsThenReschedulesScans() = runTest {
+        whenever(brokerJsonUpdater.update()).thenReturn(true)
+        whenever(pirRepository.getValidUserProfileQueries()).thenReturn(listOf(mock()))
+        canRunPirFlow.value = PirEligibility.Enabled
+
+        pirDataUpdateObserver.onCreate(lifecycleOwner)
+
+        verify(pirScanScheduler).reschedulePirScans()
+    }
+
+    @Test
+    fun whenPirEnabledButNoValidProfileThenDoesNotRescheduleScans() = runTest {
+        whenever(brokerJsonUpdater.update()).thenReturn(true)
+        whenever(pirRepository.getValidUserProfileQueries()).thenReturn(emptyList())
+        canRunPirFlow.value = PirEligibility.Enabled
+
+        pirDataUpdateObserver.onCreate(lifecycleOwner)
+
+        verify(pirScanScheduler, never()).reschedulePirScans()
+    }
+
+    @Test
+    fun whenPirDisabledThenDoesNotRescheduleScans() = runTest {
+        whenever(pirRepository.getValidUserProfileQueries()).thenReturn(listOf(mock()))
+
+        pirDataUpdateObserver.onCreate(lifecycleOwner)
+        canRunPirFlow.value = PirEligibility.Disabled(DisabledReason.FEATURE_DISABLED)
+
+        verify(pirScanScheduler, never()).reschedulePirScans()
     }
 
     @Test

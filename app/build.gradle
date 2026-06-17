@@ -265,7 +265,10 @@ def privacyTestDefaults = { config ->
     config.environmentVariables.set(["clearPackageData": "true"])
     config.devices.set([["model": "MediumPhone.arm", "version": "34"]])
     config.localResultsDir.set("fladleResults")
-    config.flakyTestAttempts.set(2)
+    config.flakyTestAttempts.set(1)
+    // Emit the full merged JUnit report so it retains every execution,
+    // including the failed attempt + passed rerun of a flaky test.
+    config.fullJunitResult.set(true)
     config.testShards.set(1)
 }
 
@@ -316,6 +319,9 @@ dependencies {
 
 	implementation project(":verified-installation-impl")
 	implementation project(":verified-installation-api")
+
+	implementation project(':referral-api')
+	implementation project(':referral-impl')
 
 	implementation project(":modal-coordinator-impl")
 	implementation project(":modal-coordinator-api")
@@ -612,9 +618,6 @@ dependencies {
     // Security crypto
     implementation AndroidX.security.crypto
 
-    // Play Store referrer library
-    playImplementation("com.android.installreferrer:installreferrer:_")
-
     // HTML
     implementation 'org.jsoup:jsoup:_'
 
@@ -692,6 +695,7 @@ tasks.register('android_checks') {
 
 tasks.register('jvm_checks') {
     dependsOn 'spotlessCheck', 'lint', 'testPlayDebugUnitTest'
+    dependsOn rootProject.tasks.named('aiConfigCheck')
 }
 
 tasks.register('lint_check') {

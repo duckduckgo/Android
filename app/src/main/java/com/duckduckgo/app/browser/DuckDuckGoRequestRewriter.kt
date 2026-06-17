@@ -18,12 +18,12 @@ package com.duckduckgo.app.browser
 
 import android.net.Uri
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
-import com.duckduckgo.app.referral.AppReferrerDataStore
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.common.utils.AppUrl.ParamKey
 import com.duckduckgo.common.utils.AppUrl.ParamValue
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.experiments.api.VariantManager
+import com.duckduckgo.referral.api.AppReferrer
 import com.duckduckgo.settings.api.SerpSettingsFeature
 import logcat.logcat
 
@@ -37,7 +37,7 @@ class DuckDuckGoRequestRewriter(
     private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
     private val statisticsStore: StatisticsDataStore,
     private val variantManager: VariantManager,
-    private val appReferrerDataStore: AppReferrerDataStore,
+    private val appReferrer: AppReferrer,
     private val duckChat: DuckChat,
     private val androidConfigFeatures: AndroidBrowserConfigFeature,
     private val serpSettingsFeature: SerpSettingsFeature,
@@ -79,7 +79,7 @@ class DuckDuckGoRequestRewriter(
             builder.appendQueryParameter(ParamKey.ATB, atb.formatWithVariant(variantManager.getVariantKey()))
         }
 
-        val sourceValue = if (appReferrerDataStore.installedFromEuAuction) ParamValue.SOURCE_EU_AUCTION else ParamValue.SOURCE
+        val sourceValue = if (appReferrer.isInstalledFromEuAuction()) ParamValue.SOURCE_EU_AUCTION else ParamValue.SOURCE
 
         builder.appendQueryParameter(ParamKey.HIDE_SERP, ParamValue.HIDE_SERP)
         if (!serpSettingsFeature.storeSerpSettings().isEnabled()) {
