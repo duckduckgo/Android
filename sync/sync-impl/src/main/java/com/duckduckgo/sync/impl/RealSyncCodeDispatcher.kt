@@ -165,12 +165,12 @@ class RealSyncCodeDispatcher @Inject constructor(
         return when (parsed) {
             is ExchangeV2CodeParseResult.LinkingV2 -> {
                 logcat { "$TAG: routing → V2 LinkingV2 (runner.startScan)" }
-                RouteDecision.V2InProgress(driveV2Linking(pastedCode))
+                RouteDecision.V2InProgress(SyncCodeType.LINKING, driveV2Linking(pastedCode))
             }
             is ExchangeV2CodeParseResult.RecoveryCode -> {
                 val cid = parsed.rawJson.optString("cid", "ddg")
                 logcat { "$TAG: routing → V2 RecoveryCode (cid=$cid)" }
-                RouteDecision.V2InProgress(driveV2Recovery(parsed, cid))
+                RouteDecision.V2InProgress(SyncCodeType.RECOVERY, driveV2Recovery(parsed, cid))
             }
             ExchangeV2CodeParseResult.LinkingV1,
             ExchangeV2CodeParseResult.Unknown,

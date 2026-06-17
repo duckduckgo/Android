@@ -168,6 +168,7 @@ class RealSyncCodeDispatcherTest {
         val decision = dispatcher.route("v2-link-url")
 
         assertTrue("expected V2InProgress, got $decision", decision is RouteDecision.V2InProgress)
+        assertEquals(SyncCodeType.LINKING, (decision as RouteDecision.V2InProgress).codeType)
         verify(syncAccountRepository, never()).parseSyncAuthCode(any())
     }
 
@@ -182,6 +183,7 @@ class RealSyncCodeDispatcherTest {
         whenever(syncAccountRepository.processCode(any(), anyOrNull())).thenReturn(Result.Success(true))
 
         val decision = dispatcher.route("any") as RouteDecision.V2InProgress
+        assertEquals(SyncCodeType.RECOVERY, decision.codeType)
         val outcomes = decision.outcomes.toList()
 
         assertEquals(1, outcomes.size)

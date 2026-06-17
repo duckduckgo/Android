@@ -44,6 +44,7 @@ import com.duckduckgo.sync.impl.SyncFeature
 import com.duckduckgo.sync.impl.onFailure
 import com.duckduckgo.sync.impl.onSuccess
 import com.duckduckgo.sync.impl.pixels.SyncPixels
+import com.duckduckgo.sync.impl.pixels.SyncPixels.CodeVersion
 import com.duckduckgo.sync.impl.pixels.SyncPixels.ScreenType
 import com.duckduckgo.sync.impl.ui.EnterCodeActivity.Companion.Code
 import com.duckduckgo.sync.impl.ui.EnterCodeViewModel.Command.AskToSwitchAccount
@@ -139,6 +140,7 @@ class EnterCodeViewModel @Inject constructor(
             }
             is RouteDecision.V2InProgress -> {
                 logcat { "Sync-CodeDispatch: EnterCodeViewModel observing V2InProgress" }
+                syncPixels.fireSyncSetupCodePastedParseSuccess(codeType.asScreenType(), CodeVersion.V2, decision.codeType)
                 decision.outcomes.collect { outcome -> handleV2Outcome(outcome, previousPrimaryKey) }
             }
         }
@@ -302,7 +304,7 @@ class EnterCodeViewModel @Inject constructor(
     private fun SyncAuthCode.onCodePasted() {
         when (this) {
             is SyncAuthCode.Unknown -> syncPixels.fireSyncSetupCodePastedParseFailure(codeType.asScreenType())
-            else -> syncPixels.fireSyncSetupCodePastedParseSuccess(codeType.asScreenType())
+            else -> syncPixels.fireSyncSetupCodePastedParseSuccess(codeType.asScreenType(), CodeVersion.V1)
         }
     }
 

@@ -25,7 +25,9 @@ import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.sync.api.engine.SyncableType
 import com.duckduckgo.sync.impl.API_CODE
 import com.duckduckgo.sync.impl.Result.Error
+import com.duckduckgo.sync.impl.SyncCodeType
 import com.duckduckgo.sync.impl.SyncFeature
+import com.duckduckgo.sync.impl.pixels.SyncPixels.CodeVersion
 import com.duckduckgo.sync.impl.pixels.SyncPixels.ScreenType
 import com.duckduckgo.sync.impl.stats.DailyStats
 import com.duckduckgo.sync.impl.stats.SyncStatsRepository
@@ -184,6 +186,76 @@ class RealSyncPixelsTest {
             SyncPixelName.SYNC_SETUP_MANUAL_CODE_ENTRY_SCREEN_SHOWN,
             mapOf(
                 SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to "connect",
+                SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to "v1",
+                SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
+            ),
+        )
+    }
+
+    @Test
+    fun whenBarcodeScannerParseSuccessOnLegacyPathThenPixelFiredWithV1AndNoCodeType() {
+        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(false))
+
+        testee.fireBarcodeScannerParseSuccess(ScreenType.SYNC_CONNECT, CodeVersion.V1)
+
+        verify(pixel).fire(
+            SyncPixelName.SYNC_SETUP_BARCODE_SCANNER_SUCCESS,
+            mapOf(
+                SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to "connect",
+                SyncPixelParameters.SYNC_SETUP_CODE_VERSION to "v1",
+                SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to "v1",
+                SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
+            ),
+        )
+    }
+
+    @Test
+    fun whenBarcodeScannerParseSuccessForV2RecoveryCodeThenPixelFiredWithCodeMetadata() {
+        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
+
+        testee.fireBarcodeScannerParseSuccess(ScreenType.SYNC_EXCHANGE, CodeVersion.V2, SyncCodeType.RECOVERY)
+
+        verify(pixel).fire(
+            SyncPixelName.SYNC_SETUP_BARCODE_SCANNER_SUCCESS,
+            mapOf(
+                SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to "exchange",
+                SyncPixelParameters.SYNC_SETUP_CODE_VERSION to "v2",
+                SyncPixelParameters.SYNC_SETUP_CODE_TYPE to "recovery",
+                SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to "v2",
+                SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
+            ),
+        )
+    }
+
+    @Test
+    fun whenManualCodeEnteredSuccessForV2LinkingCodeThenPixelFiredWithCodeMetadata() {
+        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
+
+        testee.fireSyncSetupCodePastedParseSuccess(ScreenType.SYNC_CONNECT, CodeVersion.V2, SyncCodeType.LINKING)
+
+        verify(pixel).fire(
+            SyncPixelName.SYNC_SETUP_MANUAL_CODE_ENTERED_SUCCESS,
+            mapOf(
+                SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to "connect",
+                SyncPixelParameters.SYNC_SETUP_CODE_VERSION to "v2",
+                SyncPixelParameters.SYNC_SETUP_CODE_TYPE to "linking",
+                SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to "v2",
+                SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
+            ),
+        )
+    }
+
+    @Test
+    fun whenManualCodeEnteredSuccessOnLegacyPathThenPixelFiredWithV1AndNoCodeType() {
+        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(false))
+
+        testee.fireSyncSetupCodePastedParseSuccess(ScreenType.SYNC_EXCHANGE, CodeVersion.V1)
+
+        verify(pixel).fire(
+            SyncPixelName.SYNC_SETUP_MANUAL_CODE_ENTERED_SUCCESS,
+            mapOf(
+                SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to "exchange",
+                SyncPixelParameters.SYNC_SETUP_CODE_VERSION to "v1",
                 SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to "v1",
                 SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
             ),

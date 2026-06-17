@@ -70,11 +70,17 @@ sealed interface RouteDecision {
     data class Legacy(val authCode: SyncAuthCode) : RouteDecision
 
     /**
-     * Dispatcher owns the work. [outcomes] is a cold Flow that drives the v2 work when collected
-     * (see [DispatchOutcome] for the emitted sequence). Cancelling the collector cancels the work.
+     * Dispatcher owns the work. [codeType] is the kind of v2 code that was recognized.
+     * [outcomes] is a cold Flow that drives the v2 work when collected (see [DispatchOutcome] for the
+     * emitted sequence). Cancelling the collector cancels the work.
      */
-    data class V2InProgress(val outcomes: Flow<DispatchOutcome>) : RouteDecision
+    data class V2InProgress(
+        val codeType: SyncCodeType,
+        val outcomes: Flow<DispatchOutcome>,
+    ) : RouteDecision
 }
+
+enum class SyncCodeType { RECOVERY, LINKING }
 
 /**
  * Outcomes emitted by a v2-owned dispatch, used by both [SyncCodeDispatcher.route] (Scanner) and

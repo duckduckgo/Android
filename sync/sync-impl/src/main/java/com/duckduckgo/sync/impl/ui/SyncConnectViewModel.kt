@@ -49,6 +49,7 @@ import com.duckduckgo.sync.impl.getOrNull
 import com.duckduckgo.sync.impl.onFailure
 import com.duckduckgo.sync.impl.onSuccess
 import com.duckduckgo.sync.impl.pixels.SyncPixels
+import com.duckduckgo.sync.impl.pixels.SyncPixels.CodeVersion
 import com.duckduckgo.sync.impl.pixels.SyncPixels.ScreenType.SYNC_CONNECT
 import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command.FinishWithError
 import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command.LoginSuccess
@@ -276,6 +277,7 @@ class SyncConnectViewModel @Inject constructor(
                 }
                 is RouteDecision.V2InProgress -> {
                     logcat { "Sync-CodeDispatch: SyncConnectViewModel observing V2InProgress" }
+                    syncPixels.fireBarcodeScannerParseSuccess(SYNC_CONNECT, CodeVersion.V2, decision.codeType)
                     decision.outcomes.collect { handleV2Outcome(it) }
                 }
             }
@@ -323,7 +325,7 @@ class SyncConnectViewModel @Inject constructor(
     private fun SyncAuthCode.onCodeScanned() {
         when (this) {
             is Unknown -> syncPixels.fireBarcodeScannerParseError(SYNC_CONNECT)
-            else -> syncPixels.fireBarcodeScannerParseSuccess(SYNC_CONNECT)
+            else -> syncPixels.fireBarcodeScannerParseSuccess(SYNC_CONNECT, CodeVersion.V1)
         }
     }
 

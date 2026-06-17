@@ -42,6 +42,7 @@ import com.duckduckgo.sync.impl.SyncAccountRepository
 import com.duckduckgo.sync.impl.SyncAccountRepository.AuthCode
 import com.duckduckgo.sync.impl.SyncAuthCode.Connect
 import com.duckduckgo.sync.impl.SyncAuthCode.Recovery
+import com.duckduckgo.sync.impl.SyncCodeType
 import com.duckduckgo.sync.impl.SyncFeature
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2CodeParseResult
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Event
@@ -50,6 +51,7 @@ import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2State
 import com.duckduckgo.sync.impl.exchange.v2.LocalTrigger
 import com.duckduckgo.sync.impl.exchange.v2.PairingRole
 import com.duckduckgo.sync.impl.pixels.SyncPixels
+import com.duckduckgo.sync.impl.pixels.SyncPixels.CodeVersion
 import com.duckduckgo.sync.impl.pixels.SyncPixels.ScreenType.SYNC_CONNECT
 import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command
 import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command.AskHostConfirmation
@@ -70,6 +72,7 @@ import org.junit.runner.RunWith
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.eq
+import org.mockito.kotlin.isNull
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.times
@@ -226,7 +229,7 @@ class SyncConnectViewModelTest {
             testee.onQRCodeScanned(jsonConnectKeyEncoded)
             val command = awaitItem()
             assertTrue(command is Command.LoginSuccess)
-            verify(syncPixels).fireBarcodeScannerParseSuccess(eq(SyncPixels.ScreenType.SYNC_CONNECT))
+            verify(syncPixels).fireBarcodeScannerParseSuccess(eq(SyncPixels.ScreenType.SYNC_CONNECT), eq(CodeVersion.V1), isNull())
             verify(syncPixels).fireLoginPixel()
             verify(syncPixels).fireSyncSetupFinishedSuccessfully(eq(SyncPixels.ScreenType.SYNC_CONNECT))
             cancelAndIgnoreRemainingEvents()
@@ -241,7 +244,7 @@ class SyncConnectViewModelTest {
             testee.onQRCodeScanned(jsonRecoveryKeyEncoded)
             val command = awaitItem()
             assertTrue(command is Command.ShowError)
-            verify(syncPixels).fireBarcodeScannerParseSuccess(eq(SyncPixels.ScreenType.SYNC_CONNECT))
+            verify(syncPixels).fireBarcodeScannerParseSuccess(eq(SyncPixels.ScreenType.SYNC_CONNECT), eq(CodeVersion.V1), isNull())
             verify(syncPixels, never()).fireLoginPixel()
             verify(syncPixels, never()).fireSyncSetupFinishedSuccessfully(any())
             cancelAndIgnoreRemainingEvents()
@@ -257,9 +260,33 @@ class SyncConnectViewModelTest {
             testee.onQRCodeScanned(jsonConnectKeyEncoded)
             val command = awaitItem()
             assertTrue(command is Command.ShowError)
-            verify(syncPixels).fireBarcodeScannerParseSuccess(eq(SyncPixels.ScreenType.SYNC_CONNECT))
+            verify(syncPixels).fireBarcodeScannerParseSuccess(eq(SyncPixels.ScreenType.SYNC_CONNECT), eq(CodeVersion.V1), isNull())
             verify(syncPixels, never()).fireLoginPixel()
             verify(syncPixels, never()).fireSyncSetupFinishedSuccessfully(any())
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenUserScansV2RecoveryCodeThenBarcodeScannerParseSuccessFiredWithV2Recovery() = runTest {
+        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
+        val rawJson = org.json.JSONObject().apply {
+            put("user_id", "u-1")
+            put("secret", "s-1")
+            put("cid", "ddg")
+        }
+        whenever(qrCode.parse(any())).thenReturn(ExchangeV2CodeParseResult.RecoveryCode(rawJson))
+        whenever(syncRepository.processCode(any(), anyOrNull())).thenReturn(Result.Success(true))
+
+        testee.commands().test {
+            testee.onQRCodeScanned("v2-recovery-code")
+            val command = awaitItem()
+            assertTrue("expected LoginSuccess, got $command", command is LoginSuccess)
+            verify(syncPixels).fireBarcodeScannerParseSuccess(
+                eq(SyncPixels.ScreenType.SYNC_CONNECT),
+                eq(CodeVersion.V2),
+                eq(SyncCodeType.RECOVERY),
+            )
             cancelAndIgnoreRemainingEvents()
         }
     }

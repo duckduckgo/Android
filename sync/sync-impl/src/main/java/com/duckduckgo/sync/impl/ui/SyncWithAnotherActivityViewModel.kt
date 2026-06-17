@@ -49,6 +49,7 @@ import com.duckduckgo.sync.impl.SyncFeature
 import com.duckduckgo.sync.impl.onFailure
 import com.duckduckgo.sync.impl.onSuccess
 import com.duckduckgo.sync.impl.pixels.SyncPixels
+import com.duckduckgo.sync.impl.pixels.SyncPixels.CodeVersion
 import com.duckduckgo.sync.impl.pixels.SyncPixels.ScreenType.SYNC_EXCHANGE
 import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Companion.POLLING_INTERVAL_EXCHANGE_FLOW
 import com.duckduckgo.sync.impl.ui.SyncWithAnotherActivityViewModel.Command.AskToSwitchAccount
@@ -270,6 +271,9 @@ class SyncWithAnotherActivityViewModel @Inject constructor(
                 }
                 is RouteDecision.V2InProgress -> {
                     logcat { "Sync-CodeDispatch: SyncWithAnotherActivityViewModel observing V2InProgress" }
+                    if (!isDeepLink) {
+                        syncPixels.fireBarcodeScannerParseSuccess(SYNC_EXCHANGE, CodeVersion.V2, decision.codeType)
+                    }
                     decision.outcomes.collect { handleV2Outcome(it, previousPrimaryKey) }
                 }
             }
@@ -457,7 +461,7 @@ class SyncWithAnotherActivityViewModel @Inject constructor(
 
         when (this) {
             is Unknown -> syncPixels.fireBarcodeScannerParseError(SYNC_EXCHANGE)
-            else -> syncPixels.fireBarcodeScannerParseSuccess(SYNC_EXCHANGE)
+            else -> syncPixels.fireBarcodeScannerParseSuccess(SYNC_EXCHANGE, CodeVersion.V1)
         }
     }
 

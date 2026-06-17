@@ -63,6 +63,7 @@ import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2State
 import com.duckduckgo.sync.impl.exchange.v2.LocalTrigger
 import com.duckduckgo.sync.impl.exchange.v2.PairingRole
 import com.duckduckgo.sync.impl.pixels.SyncPixels
+import com.duckduckgo.sync.impl.pixels.SyncPixels.CodeVersion
 import com.duckduckgo.sync.impl.pixels.SyncPixels.ScreenType.SYNC_EXCHANGE
 import com.duckduckgo.sync.impl.ui.SyncWithAnotherActivityViewModel.Command
 import com.duckduckgo.sync.impl.ui.SyncWithAnotherActivityViewModel.Command.AskHostConfirmation
@@ -83,6 +84,7 @@ import org.junit.runner.RunWith
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.eq
+import org.mockito.kotlin.isNull
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.times
@@ -263,7 +265,7 @@ class SyncWithAnotherDeviceViewModelTest {
             testee.onQRCodeScanned(jsonRecoveryKeyEncoded)
             val command = awaitItem()
             assertTrue(command is Command.ShowError)
-            verify(syncPixels).fireBarcodeScannerParseSuccess(eq(SyncPixels.ScreenType.SYNC_EXCHANGE))
+            verify(syncPixels).fireBarcodeScannerParseSuccess(eq(SyncPixels.ScreenType.SYNC_EXCHANGE), eq(CodeVersion.V1), isNull())
             verify(syncPixels, never()).fireLoginPixel()
             verify(syncPixels, never()).fireSyncSetupFinishedSuccessfully(any())
             cancelAndIgnoreRemainingEvents()
@@ -281,7 +283,7 @@ class SyncWithAnotherDeviceViewModelTest {
             testee.onQRCodeScanned(jsonRecoveryKeyEncoded)
             val command = awaitItem()
             assertTrue(command is Command.ShowError)
-            verify(syncPixels).fireBarcodeScannerParseSuccess(eq(SyncPixels.ScreenType.SYNC_EXCHANGE))
+            verify(syncPixels).fireBarcodeScannerParseSuccess(eq(SyncPixels.ScreenType.SYNC_EXCHANGE), eq(CodeVersion.V1), isNull())
             verify(syncPixels, never()).fireLoginPixel()
             verify(syncPixels, never()).fireSyncSetupFinishedSuccessfully(any())
             cancelAndIgnoreRemainingEvents()
@@ -297,7 +299,7 @@ class SyncWithAnotherDeviceViewModelTest {
             testee.onQRCodeScanned(jsonRecoveryKeyEncoded)
             val command = awaitItem()
             assertTrue(command is Command.AskToSwitchAccount)
-            verify(syncPixels).fireBarcodeScannerParseSuccess(eq(SyncPixels.ScreenType.SYNC_EXCHANGE))
+            verify(syncPixels).fireBarcodeScannerParseSuccess(eq(SyncPixels.ScreenType.SYNC_EXCHANGE), eq(CodeVersion.V1), isNull())
             verify(syncPixels, never()).fireLoginPixel()
             verify(syncPixels, never()).fireSyncSetupFinishedSuccessfully(any())
             cancelAndIgnoreRemainingEvents()
@@ -314,7 +316,7 @@ class SyncWithAnotherDeviceViewModelTest {
             testee.onQRCodeScanned(jsonRecoveryKeyEncoded)
             val command = awaitItem()
             assertTrue(command is Command.AskToSwitchAccount)
-            verify(syncPixels).fireBarcodeScannerParseSuccess(eq(SyncPixels.ScreenType.SYNC_EXCHANGE))
+            verify(syncPixels).fireBarcodeScannerParseSuccess(eq(SyncPixels.ScreenType.SYNC_EXCHANGE), eq(CodeVersion.V1), isNull())
             verify(syncPixels, never()).fireLoginPixel()
             verify(syncPixels, never()).fireSyncSetupFinishedSuccessfully(any())
             cancelAndIgnoreRemainingEvents()
@@ -431,7 +433,7 @@ class SyncWithAnotherDeviceViewModelTest {
             testee.onQRCodeScanned(jsonRecoveryKeyEncoded)
             val command = awaitItem()
             assertTrue(command is Command.ShowError)
-            verify(syncPixels).fireBarcodeScannerParseSuccess(eq(SyncPixels.ScreenType.SYNC_EXCHANGE))
+            verify(syncPixels).fireBarcodeScannerParseSuccess(eq(SyncPixels.ScreenType.SYNC_EXCHANGE), eq(CodeVersion.V1), isNull())
             verify(syncPixels, never()).fireLoginPixel()
             verify(syncPixels, never()).fireSyncSetupFinishedSuccessfully(any())
             cancelAndIgnoreRemainingEvents()

@@ -27,15 +27,19 @@ import com.duckduckgo.sync.api.engine.DeletableType
 import com.duckduckgo.sync.api.engine.SyncFeatureType
 import com.duckduckgo.sync.impl.API_CODE
 import com.duckduckgo.sync.impl.Result.Error
+import com.duckduckgo.sync.impl.SyncCodeType
 import com.duckduckgo.sync.impl.SyncFeature
 import com.duckduckgo.sync.impl.pixels.SyncPixelName.SYNC_DAILY
 import com.duckduckgo.sync.impl.pixels.SyncPixelName.SYNC_DAILY_SUCCESS_RATE_PIXEL
 import com.duckduckgo.sync.impl.pixels.SyncPixelName.SYNC_OBJECT_LIMIT_EXCEEDED_DAILY
 import com.duckduckgo.sync.impl.pixels.SyncPixelParameters.CONNECTED_DEVICES_WHEN_DELETING
 import com.duckduckgo.sync.impl.pixels.SyncPixelParameters.SYNC_FEATURE_PROMOTION_SOURCE
+import com.duckduckgo.sync.impl.pixels.SyncPixelParameters.SYNC_SETUP_CODE_TYPE
+import com.duckduckgo.sync.impl.pixels.SyncPixelParameters.SYNC_SETUP_CODE_VERSION
 import com.duckduckgo.sync.impl.pixels.SyncPixelParameters.SYNC_SETUP_FLOW_VERSION
 import com.duckduckgo.sync.impl.pixels.SyncPixelParameters.SYNC_SETUP_MY_KIND
 import com.duckduckgo.sync.impl.pixels.SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE
+import com.duckduckgo.sync.impl.pixels.SyncPixels.CodeVersion
 import com.duckduckgo.sync.impl.pixels.SyncPixels.ScreenType
 import com.duckduckgo.sync.impl.stats.SyncStatsRepository
 import com.duckduckgo.sync.store.SharedPrefsProvider
@@ -104,15 +108,21 @@ interface SyncPixels {
     fun fireSyncSetupFinishedSuccessfully(screenType: ScreenType)
     fun fireSyncSetupAbandoned(screenType: ScreenType)
     fun fireSyncSetupManualCodeScreenShown(screenType: ScreenType)
-    fun fireSyncSetupCodePastedParseSuccess(screenType: ScreenType)
+    fun fireSyncSetupCodePastedParseSuccess(screenType: ScreenType, codeVersion: CodeVersion, codeType: SyncCodeType? = null)
     fun fireSyncSetupCodePastedParseFailure(screenType: ScreenType)
     fun fireSyncSetupCodeCopiedToClipboard(screenType: ScreenType)
     fun fireBarcodeScannerParseError(screenType: ScreenType)
-    fun fireBarcodeScannerParseSuccess(screenType: ScreenType)
+    fun fireBarcodeScannerParseSuccess(screenType: ScreenType, codeVersion: CodeVersion, codeType: SyncCodeType? = null)
 
     enum class ScreenType(val value: String) {
         SYNC_CONNECT("connect"),
         SYNC_EXCHANGE("exchange"),
+    }
+
+    /** Protocol version of the code that was scanned/pasted, per the "Code recognized" telemetry. */
+    enum class CodeVersion(val value: String) {
+        V1("v1"),
+        V2("v2"),
     }
     fun fireSetupDeepLinkFlowStarted()
     fun fireSetupDeepLinkFlowSuccess()
@@ -166,6 +176,27 @@ class RealSyncPixels @Inject constructor(
         SYNC_SETUP_FLOW_VERSION to if (syncFeature.canUseV2ConnectFlow().isEnabled()) FLOW_VERSION_V2 else FLOW_VERSION_V1,
         SYNC_SETUP_MY_KIND to MY_KIND_DDG,
     )
+
+    /**
+     * Params for the "Code recognized" pixels (scanner/manual-entry success): the screen [source],
+     * the recognized [codeVersion] (what was scanned/pasted), the common [setupFlowMetadata]
+     * (flow_version + my_kind), and — only when known — the [codeType]. The legacy/v1 path does not
+     * report a code type, so [codeType] is omitted there; the v2 path always supplies it.
+     */
+    private fun recognizedCodeParams(
+        screenType: ScreenType,
+        codeVersion: CodeVersion,
+        codeType: SyncCodeType?,
+    ): Map<String, String> = buildMap {
+        put(SYNC_SETUP_SCREEN_TYPE, screenType.value)
+        put(SYNC_SETUP_CODE_VERSION, codeVersion.value)
+        when (codeType) {
+            SyncCodeType.RECOVERY -> put(SYNC_SETUP_CODE_TYPE, CODE_TYPE_RECOVERY)
+            SyncCodeType.LINKING -> put(SYNC_SETUP_CODE_TYPE, CODE_TYPE_LINKING)
+            null -> {}
+        }
+        putAll(setupFlowMetadata())
+    }
 
     override fun fireDailyPixel() {
         tryToFireDailyPixel(SYNC_DAILY)
@@ -413,8 +444,8 @@ class RealSyncPixels @Inject constructor(
         pixel.fire(SyncPixelName.SYNC_SETUP_MANUAL_CODE_ENTRY_SCREEN_SHOWN, parameters = params)
     }
 
-    override fun fireSyncSetupCodePastedParseSuccess(screenType: ScreenType) {
-        val params = mapOf(SYNC_SETUP_SCREEN_TYPE to screenType.value)
+    override fun fireSyncSetupCodePastedParseSuccess(screenType: ScreenType, codeVersion: CodeVersion, codeType: SyncCodeType?) {
+        val params = recognizedCodeParams(screenType, codeVersion, codeType)
         pixel.fire(SyncPixelName.SYNC_SETUP_MANUAL_CODE_ENTERED_SUCCESS, parameters = params)
     }
 
@@ -428,8 +459,8 @@ class RealSyncPixels @Inject constructor(
         pixel.fire(SyncPixelName.SYNC_SETUP_BARCODE_CODE_COPIED, parameters = params)
     }
 
-    override fun fireBarcodeScannerParseSuccess(screenType: ScreenType) {
-        val params = mapOf(SYNC_SETUP_SCREEN_TYPE to screenType.value)
+    override fun fireBarcodeScannerParseSuccess(screenType: ScreenType, codeVersion: CodeVersion, codeType: SyncCodeType?) {
+        val params = recognizedCodeParams(screenType, codeVersion, codeType)
         pixel.fire(SyncPixelName.SYNC_SETUP_BARCODE_SCANNER_SUCCESS, parameters = params)
     }
 
@@ -525,6 +556,8 @@ class RealSyncPixels @Inject constructor(
         private const val FLOW_VERSION_V1 = "v1"
         private const val FLOW_VERSION_V2 = "v2"
         private const val MY_KIND_DDG = "ddg"
+        private const val CODE_TYPE_RECOVERY = "recovery"
+        private const val CODE_TYPE_LINKING = "linking"
     }
 }
 
@@ -636,6 +669,8 @@ object SyncPixelParameters {
     const val SYNC_SETUP_SCREEN_TYPE = "source"
     const val SYNC_SETUP_FLOW_VERSION = "flow_version"
     const val SYNC_SETUP_MY_KIND = "my_kind"
+    const val SYNC_SETUP_CODE_VERSION = "code_version"
+    const val SYNC_SETUP_CODE_TYPE = "code_type"
     const val CONNECTED_DEVICES_WHEN_DELETING = "connected_devices"
 
     const val AUTO_RESTORE_SOURCE = "source"
