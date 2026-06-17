@@ -32,6 +32,9 @@ import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Runner
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2State
 import com.duckduckgo.sync.impl.exchange.v2.LocalTrigger
 import com.duckduckgo.sync.impl.exchange.v2.PairingRole
+import com.duckduckgo.sync.impl.pixels.SyncPixels.PeerKind
+import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupPath
+import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupRole
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.filter
@@ -187,7 +190,7 @@ class RealSyncCodeDispatcherTest {
         val outcomes = decision.outcomes.toList()
 
         assertEquals(1, outcomes.size)
-        assertEquals(DispatchOutcome.LoggedIn, outcomes.single())
+        assertEquals(DispatchOutcome.LoggedIn(SetupPath.RECOVERY), outcomes.single())
     }
 
     @Test fun `FF on, v2 RecoveryCode cid=ddg - base64url secret is normalised to standard base64 for v1 login`() = runTest {
@@ -241,7 +244,7 @@ class RealSyncCodeDispatcherTest {
         val decision = dispatcher.route("any") as RouteDecision.V2InProgress
         val outcomes = decision.outcomes.toList()
 
-        assertEquals(DispatchOutcome.LoggedIn, outcomes.single())
+        assertEquals(DispatchOutcome.LoggedIn(SetupPath.RECOVERY), outcomes.single())
         verify(syncAccountRepository).joinAccountFromThirdPartyRecoveryCode(any())
         verify(syncAccountRepository, never()).processCode(any(), anyOrNull())
     }
@@ -290,7 +293,7 @@ class RealSyncCodeDispatcherTest {
 
         val outcome = (dispatcher.route("any") as RouteDecision.V2InProgress).outcomes.first()
 
-        assertEquals(DispatchOutcome.LoggedIn, outcome)
+        assertEquals(DispatchOutcome.LoggedIn(SetupPath.RECOVERY), outcome)
 
         val captor = org.mockito.kotlin.argumentCaptor<String>()
         verify(syncAccountRepository).logoutAndJoinNewAccount(captor.capture())
@@ -586,7 +589,7 @@ class RealSyncCodeDispatcherTest {
         runnerEventsFlow.emit(transition(from = ExchangeV2State.Negotiating, to = ExchangeV2State.Host.Done))
         job.join()
 
-        assertEquals(DispatchOutcome.LoggedIn, outcomes.single())
+        assertEquals(DispatchOutcome.LoggedIn(SetupPath.PAIRING, SetupRole.HOST), outcomes.single())
     }
 
     @Test fun `presentV2 emits HostConfirmationRequested with peerName when runner reaches Host_Confirming`() = runTest {
@@ -599,7 +602,8 @@ class RealSyncCodeDispatcherTest {
         assertEquals(DispatchOutcome.HostConfirmationRequested(peerName = "Peer Phone"), outcomes.single())
     }
 
-    @Test fun `presentV2 emits LoggedIn when runner reaches Host_Done`() = runTest {
+    @Test fun `presentV2 emits LoggedIn with Host role and peer kind when runner reaches Host_Done`() = runTest {
+        whenever(runner.peerKind).thenReturn("3party")
         val outcome = withTimeoutOrNull(1000) {
             val job = async(start = kotlinx.coroutines.CoroutineStart.UNDISPATCHED) {
                 dispatcher.presentV2().first { it is DispatchOutcome.LoggedIn || it is DispatchOutcome.Failed }
@@ -607,7 +611,7 @@ class RealSyncCodeDispatcherTest {
             runnerEventsFlow.emit(transition(from = ExchangeV2State.Host.Sending, to = ExchangeV2State.Host.Done))
             job.await()
         }
-        assertEquals(DispatchOutcome.LoggedIn, outcome)
+        assertEquals(DispatchOutcome.LoggedIn(SetupPath.PAIRING, SetupRole.HOST, PeerKind.THIRD_PARTY), outcome)
     }
 
     @Test fun `presentV2 maps a version-too-new SessionError to UpgradeRequired`() = runTest {
@@ -766,6 +770,7 @@ class RealSyncCodeDispatcherTest {
             recoveryCode = b64,
         )
         whenever(syncAccountRepository.processCode(any(), anyOrNull())).thenReturn(Result.Success(true))
+        whenever(runner.peerKind).thenReturn("ddg")
 
         val outcome = withTimeoutOrNull(1000) {
             val job = async(start = kotlinx.coroutines.CoroutineStart.UNDISPATCHED) {
@@ -782,7 +787,7 @@ class RealSyncCodeDispatcherTest {
             )
             job.await()
         }
-        assertEquals(DispatchOutcome.LoggedIn, outcome)
+        assertEquals(DispatchOutcome.LoggedIn(SetupPath.PAIRING, SetupRole.JOINER, PeerKind.DDG), outcome)
         verify(syncAccountRepository).processCode(any(), anyOrNull())
         verify(syncAccountRepository, never()).joinAccountFromThirdPartyRecoveryCode(any())
     }
@@ -825,7 +830,7 @@ class RealSyncCodeDispatcherTest {
             )
             job.await()
         }
-        assertEquals(DispatchOutcome.LoggedIn, outcome)
+        assertEquals(DispatchOutcome.LoggedIn(SetupPath.PAIRING, SetupRole.JOINER), outcome)
         verify(syncAccountRepository).joinAccountFromThirdPartyRecoveryCode(any())
         verify(syncAccountRepository, never()).processCode(any(), anyOrNull())
     }

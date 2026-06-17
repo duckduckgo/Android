@@ -16,6 +16,9 @@
 
 package com.duckduckgo.sync.impl
 
+import com.duckduckgo.sync.impl.pixels.SyncPixels.PeerKind
+import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupPath
+import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupRole
 import kotlinx.coroutines.flow.Flow
 
 /**
@@ -120,8 +123,16 @@ sealed interface DispatchOutcome {
      */
     data class LinkingCodeReady(val linkingCode: String) : DispatchOutcome
 
-    /** Terminal — login completed (recovery code applied; account state updated). */
-    data object LoggedIn : DispatchOutcome
+    /**
+     * Terminal — login completed (recovery code applied; account state updated). Carries telemetry
+     * for the "Setup success" pixel: [path] (recovery vs pairing) and, for a pairing, the elected
+     * [myRole] and the [peerKind]. [myRole]/[peerKind] are null for recovery.
+     */
+    data class LoggedIn(
+        val path: SetupPath,
+        val myRole: SetupRole? = null,
+        val peerKind: PeerKind? = null,
+    ) : DispatchOutcome
 
     /**
      * Terminal — peer and this device are already on the same account. Per spec §"Same-account

@@ -231,7 +231,7 @@ class SyncConnectViewModelTest {
             assertTrue(command is Command.LoginSuccess)
             verify(syncPixels).fireBarcodeScannerParseSuccess(eq(SyncPixels.ScreenType.SYNC_CONNECT), eq(CodeVersion.V1), isNull())
             verify(syncPixels).fireLoginPixel()
-            verify(syncPixels).fireSyncSetupFinishedSuccessfully(eq(SyncPixels.ScreenType.SYNC_CONNECT))
+            verify(syncPixels).fireSyncSetupFinishedSuccessfully(eq(SyncPixels.ScreenType.SYNC_CONNECT), isNull(), isNull(), isNull())
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -246,7 +246,7 @@ class SyncConnectViewModelTest {
             assertTrue(command is Command.ShowError)
             verify(syncPixels).fireBarcodeScannerParseSuccess(eq(SyncPixels.ScreenType.SYNC_CONNECT), eq(CodeVersion.V1), isNull())
             verify(syncPixels, never()).fireLoginPixel()
-            verify(syncPixels, never()).fireSyncSetupFinishedSuccessfully(any())
+            verify(syncPixels, never()).fireSyncSetupFinishedSuccessfully(any(), anyOrNull(), anyOrNull(), anyOrNull())
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -262,7 +262,7 @@ class SyncConnectViewModelTest {
             assertTrue(command is Command.ShowError)
             verify(syncPixels).fireBarcodeScannerParseSuccess(eq(SyncPixels.ScreenType.SYNC_CONNECT), eq(CodeVersion.V1), isNull())
             verify(syncPixels, never()).fireLoginPixel()
-            verify(syncPixels, never()).fireSyncSetupFinishedSuccessfully(any())
+            verify(syncPixels, never()).fireSyncSetupFinishedSuccessfully(any(), anyOrNull(), anyOrNull(), anyOrNull())
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -298,7 +298,8 @@ class SyncConnectViewModelTest {
             val command = awaitItem()
             assertTrue(command is Command.LoginSuccess)
             verify(syncPixels).fireLoginPixel()
-            verify(syncPixels).fireSyncSetupFinishedSuccessfully(eq(SyncPixels.ScreenType.SYNC_CONNECT))
+            // Manual entry fires "Setup success" from EnterCodeViewModel, not here.
+            verify(syncPixels, never()).fireSyncSetupFinishedSuccessfully(any(), anyOrNull(), anyOrNull(), anyOrNull())
             cancelAndIgnoreRemainingEvents()
         }
     }

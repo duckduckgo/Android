@@ -50,7 +50,10 @@ import com.duckduckgo.sync.impl.onFailure
 import com.duckduckgo.sync.impl.onSuccess
 import com.duckduckgo.sync.impl.pixels.SyncPixels
 import com.duckduckgo.sync.impl.pixels.SyncPixels.CodeVersion
+import com.duckduckgo.sync.impl.pixels.SyncPixels.PeerKind
 import com.duckduckgo.sync.impl.pixels.SyncPixels.ScreenType.SYNC_EXCHANGE
+import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupPath
+import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupRole
 import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Companion.POLLING_INTERVAL_EXCHANGE_FLOW
 import com.duckduckgo.sync.impl.ui.SyncWithAnotherActivityViewModel.Command.AskToSwitchAccount
 import com.duckduckgo.sync.impl.ui.SyncWithAnotherActivityViewModel.Command.FinishWithError
@@ -290,7 +293,7 @@ class SyncWithAnotherActivityViewModel @Inject constructor(
             is DispatchOutcome.LoggedIn -> {
                 cancelTimeout()
                 val showRecovery = previousPrimaryKey.isEmpty()
-                onLoginSuccess(previousPrimaryKey, showRecovery)
+                onLoginSuccess(previousPrimaryKey, showRecovery, outcome.path, outcome.myRole, outcome.peerKind)
             }
             is DispatchOutcome.AlreadyConnected -> {
                 cancelTimeout()
@@ -318,9 +321,15 @@ class SyncWithAnotherActivityViewModel @Inject constructor(
     fun onHostConfirmed() { codeDispatcher.confirmHost() }
     fun onHostDenied() { codeDispatcher.denyHost() }
 
-    private suspend fun onLoginSuccess(previousPrimaryKey: String, showRecovery: Boolean) {
+    private suspend fun onLoginSuccess(
+        previousPrimaryKey: String,
+        showRecovery: Boolean,
+        path: SetupPath? = null,
+        myRole: SetupRole? = null,
+        peerKind: PeerKind? = null,
+    ) {
         val postProcessCodePK = syncAccountRepository.getAccountInfo().primaryKey
-        fireLoginPixels()
+        fireLoginPixels(path, myRole, peerKind)
         val userSwitchedAccount = previousPrimaryKey.isNotBlank() && previousPrimaryKey != postProcessCodePK
         val commandSuccess = if (userSwitchedAccount) {
             syncPixels.fireUserSwitchedAccount()
@@ -331,13 +340,17 @@ class SyncWithAnotherActivityViewModel @Inject constructor(
         command.send(commandSuccess)
     }
 
-    private fun fireLoginPixels() {
+    private fun fireLoginPixels(
+        path: SetupPath? = null,
+        myRole: SetupRole? = null,
+        peerKind: PeerKind? = null,
+    ) {
         syncPixels.fireLoginPixel()
 
         if (isDeepLink) {
             syncPixels.fireSetupDeepLinkFlowSuccess()
         } else {
-            syncPixels.fireSyncSetupFinishedSuccessfully(SYNC_EXCHANGE)
+            syncPixels.fireSyncSetupFinishedSuccessfully(SYNC_EXCHANGE, path, myRole, peerKind)
         }
     }
 
@@ -425,11 +438,12 @@ class SyncWithAnotherActivityViewModel @Inject constructor(
             when (result) {
                 EnterCodeContractOutput.Error -> {}
                 EnterCodeContractOutput.LoginSuccess -> {
-                    fireLoginPixels()
+                    // Manual entry: EnterCodeViewModel fires "Setup success"; only fire login pixel here.
+                    syncPixels.fireLoginPixel()
                     command.send(LoginSuccess(showRecovery = true))
                 }
                 EnterCodeContractOutput.SwitchAccountSuccess -> {
-                    fireLoginPixels()
+                    syncPixels.fireLoginPixel()
                     command.send(SwitchAccountSuccess)
                 }
             }

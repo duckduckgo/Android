@@ -45,7 +45,10 @@ import com.duckduckgo.sync.impl.onFailure
 import com.duckduckgo.sync.impl.onSuccess
 import com.duckduckgo.sync.impl.pixels.SyncPixels
 import com.duckduckgo.sync.impl.pixels.SyncPixels.CodeVersion
+import com.duckduckgo.sync.impl.pixels.SyncPixels.PeerKind
 import com.duckduckgo.sync.impl.pixels.SyncPixels.ScreenType
+import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupPath
+import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupRole
 import com.duckduckgo.sync.impl.ui.EnterCodeActivity.Companion.Code
 import com.duckduckgo.sync.impl.ui.EnterCodeViewModel.Command.AskToSwitchAccount
 import com.duckduckgo.sync.impl.ui.EnterCodeViewModel.Command.LoginSuccess
@@ -152,7 +155,7 @@ class EnterCodeViewModel @Inject constructor(
         previousPrimaryKey: String,
     ) {
         when (outcome) {
-            is DispatchOutcome.LoggedIn -> onLoginSuccess(previousPrimaryKey)
+            is DispatchOutcome.LoggedIn -> onLoginSuccess(previousPrimaryKey, outcome.path, outcome.myRole, outcome.peerKind)
             is DispatchOutcome.AlreadyConnected -> {
                 viewState.value = viewState.value.copy(authState = AuthState.Idle)
                 command.send(Command.ShowV2Error(v2AlreadyPairedError))
@@ -185,7 +188,12 @@ class EnterCodeViewModel @Inject constructor(
         }
     }
 
-    private suspend fun onLoginSuccess(previousPrimaryKey: String) {
+    private suspend fun onLoginSuccess(
+        previousPrimaryKey: String,
+        path: SetupPath? = null,
+        myRole: SetupRole? = null,
+        peerKind: PeerKind? = null,
+    ) {
         val postProcessCodePK = syncAccountRepository.getAccountInfo().primaryKey
         val userSwitchedAccount = previousPrimaryKey.isNotBlank() && previousPrimaryKey != postProcessCodePK
         val commandSuccess = if (userSwitchedAccount) {
@@ -194,6 +202,9 @@ class EnterCodeViewModel @Inject constructor(
         } else {
             LoginSuccess
         }
+        // Owns the "Setup success" pixel for codes entered here; the launching screen fires only its
+        // login pixel on the result, so this does not double-count.
+        syncPixels.fireSyncSetupFinishedSuccessfully(codeType.asScreenType(), path, myRole, peerKind)
         command.send(commandSuccess)
     }
 

@@ -38,9 +38,15 @@ import com.duckduckgo.sync.impl.pixels.SyncPixelParameters.SYNC_SETUP_CODE_TYPE
 import com.duckduckgo.sync.impl.pixels.SyncPixelParameters.SYNC_SETUP_CODE_VERSION
 import com.duckduckgo.sync.impl.pixels.SyncPixelParameters.SYNC_SETUP_FLOW_VERSION
 import com.duckduckgo.sync.impl.pixels.SyncPixelParameters.SYNC_SETUP_MY_KIND
+import com.duckduckgo.sync.impl.pixels.SyncPixelParameters.SYNC_SETUP_MY_ROLE
+import com.duckduckgo.sync.impl.pixels.SyncPixelParameters.SYNC_SETUP_PATH
+import com.duckduckgo.sync.impl.pixels.SyncPixelParameters.SYNC_SETUP_PEER_KIND
 import com.duckduckgo.sync.impl.pixels.SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE
 import com.duckduckgo.sync.impl.pixels.SyncPixels.CodeVersion
+import com.duckduckgo.sync.impl.pixels.SyncPixels.PeerKind
 import com.duckduckgo.sync.impl.pixels.SyncPixels.ScreenType
+import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupPath
+import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupRole
 import com.duckduckgo.sync.impl.stats.SyncStatsRepository
 import com.duckduckgo.sync.store.SharedPrefsProvider
 import com.squareup.anvil.annotations.ContributesBinding
@@ -105,7 +111,12 @@ interface SyncPixels {
     fun fireUserSwitchedLoginError()
     fun fireTimeoutOnDeepLinkSetup()
     fun fireSyncBarcodeScreenShown(screenType: ScreenType)
-    fun fireSyncSetupFinishedSuccessfully(screenType: ScreenType)
+    fun fireSyncSetupFinishedSuccessfully(
+        screenType: ScreenType,
+        path: SetupPath? = null,
+        myRole: SetupRole? = null,
+        peerKind: PeerKind? = null,
+    )
     fun fireSyncSetupAbandoned(screenType: ScreenType)
     fun fireSyncSetupManualCodeScreenShown(screenType: ScreenType)
     fun fireSyncSetupCodePastedParseSuccess(screenType: ScreenType, codeVersion: CodeVersion, codeType: SyncCodeType? = null)
@@ -123,6 +134,24 @@ interface SyncPixels {
     enum class CodeVersion(val value: String) {
         V1("v1"),
         V2("v2"),
+    }
+
+    /** Whether a successful setup was a recovery-code login or a device pairing. v2 only. */
+    enum class SetupPath(val value: String) {
+        RECOVERY("recovery"),
+        PAIRING("pairing"),
+    }
+
+    /** This device's elected role in a v2 pairing. */
+    enum class SetupRole(val value: String) {
+        HOST("host"),
+        JOINER("joiner"),
+    }
+
+    /** The peer device's credential kind in a v2 pairing. */
+    enum class PeerKind(val value: String) {
+        DDG("ddg"),
+        THIRD_PARTY("3party"),
     }
     fun fireSetupDeepLinkFlowStarted()
     fun fireSetupDeepLinkFlowSuccess()
@@ -195,6 +224,24 @@ class RealSyncPixels @Inject constructor(
             SyncCodeType.LINKING -> put(SYNC_SETUP_CODE_TYPE, CODE_TYPE_LINKING)
             null -> {}
         }
+        putAll(setupFlowMetadata())
+    }
+
+    /**
+     * Params for the "Setup success" pixel: the screen [source], the common [setupFlowMetadata]
+     * (flow_version + my_kind), and — v2 only — the [path] (recovery/pairing) plus, for pairing, the
+     * elected [myRole] and the [peerKind]. Each is omitted when null.
+     */
+    private fun setupSuccessParams(
+        screenType: ScreenType,
+        path: SetupPath?,
+        myRole: SetupRole?,
+        peerKind: PeerKind?,
+    ): Map<String, String> = buildMap {
+        put(SYNC_SETUP_SCREEN_TYPE, screenType.value)
+        if (path != null) put(SYNC_SETUP_PATH, path.value)
+        if (myRole != null) put(SYNC_SETUP_MY_ROLE, myRole.value)
+        if (peerKind != null) put(SYNC_SETUP_PEER_KIND, peerKind.value)
         putAll(setupFlowMetadata())
     }
 
@@ -434,8 +481,13 @@ class RealSyncPixels @Inject constructor(
         pixel.fire(SyncPixelName.SYNC_SETUP_ENDED_ABANDONED, parameters = params)
     }
 
-    override fun fireSyncSetupFinishedSuccessfully(screenType: ScreenType) {
-        val params = mapOf(SYNC_SETUP_SCREEN_TYPE to screenType.value)
+    override fun fireSyncSetupFinishedSuccessfully(
+        screenType: ScreenType,
+        path: SetupPath?,
+        myRole: SetupRole?,
+        peerKind: PeerKind?,
+    ) {
+        val params = setupSuccessParams(screenType, path, myRole, peerKind)
         pixel.fire(SyncPixelName.SYNC_SETUP_ENDED_SUCCESS, parameters = params)
     }
 
@@ -671,6 +723,9 @@ object SyncPixelParameters {
     const val SYNC_SETUP_MY_KIND = "my_kind"
     const val SYNC_SETUP_CODE_VERSION = "code_version"
     const val SYNC_SETUP_CODE_TYPE = "code_type"
+    const val SYNC_SETUP_PATH = "path"
+    const val SYNC_SETUP_MY_ROLE = "my_role"
+    const val SYNC_SETUP_PEER_KIND = "peer_kind"
     const val CONNECTED_DEVICES_WHEN_DELETING = "connected_devices"
 
     const val AUTO_RESTORE_SOURCE = "source"

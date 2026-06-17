@@ -28,7 +28,10 @@ import com.duckduckgo.sync.impl.Result.Error
 import com.duckduckgo.sync.impl.SyncCodeType
 import com.duckduckgo.sync.impl.SyncFeature
 import com.duckduckgo.sync.impl.pixels.SyncPixels.CodeVersion
+import com.duckduckgo.sync.impl.pixels.SyncPixels.PeerKind
 import com.duckduckgo.sync.impl.pixels.SyncPixels.ScreenType
+import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupPath
+import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupRole
 import com.duckduckgo.sync.impl.stats.DailyStats
 import com.duckduckgo.sync.impl.stats.SyncStatsRepository
 import com.duckduckgo.sync.store.SharedPrefsProvider
@@ -288,6 +291,63 @@ class RealSyncPixelsTest {
             SyncPixelName.SYNC_SETUP_MANUAL_CODE_ENTERED_FAILED,
             mapOf(
                 SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to "exchange",
+                SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to "v2",
+                SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
+            ),
+        )
+    }
+
+    @Test
+    fun whenSetupFinishedV1ThenPixelFiredWithFlowMetadataOnly() {
+        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(false))
+
+        testee.fireSyncSetupFinishedSuccessfully(ScreenType.SYNC_CONNECT)
+
+        verify(pixel).fire(
+            SyncPixelName.SYNC_SETUP_ENDED_SUCCESS,
+            mapOf(
+                SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to "connect",
+                SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to "v1",
+                SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
+            ),
+        )
+    }
+
+    @Test
+    fun whenSetupFinishedV2RecoveryThenPixelFiredWithPathNoRoleOrPeer() {
+        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
+
+        testee.fireSyncSetupFinishedSuccessfully(ScreenType.SYNC_EXCHANGE, SetupPath.RECOVERY)
+
+        verify(pixel).fire(
+            SyncPixelName.SYNC_SETUP_ENDED_SUCCESS,
+            mapOf(
+                SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to "exchange",
+                SyncPixelParameters.SYNC_SETUP_PATH to "recovery",
+                SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to "v2",
+                SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
+            ),
+        )
+    }
+
+    @Test
+    fun whenSetupFinishedV2PairingThenPixelFiredWithPathRoleAndPeer() {
+        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
+
+        testee.fireSyncSetupFinishedSuccessfully(
+            ScreenType.SYNC_CONNECT,
+            SetupPath.PAIRING,
+            SetupRole.HOST,
+            PeerKind.THIRD_PARTY,
+        )
+
+        verify(pixel).fire(
+            SyncPixelName.SYNC_SETUP_ENDED_SUCCESS,
+            mapOf(
+                SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to "connect",
+                SyncPixelParameters.SYNC_SETUP_PATH to "pairing",
+                SyncPixelParameters.SYNC_SETUP_MY_ROLE to "host",
+                SyncPixelParameters.SYNC_SETUP_PEER_KIND to "3party",
                 SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to "v2",
                 SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
             ),

@@ -267,7 +267,7 @@ class SyncWithAnotherDeviceViewModelTest {
             assertTrue(command is Command.ShowError)
             verify(syncPixels).fireBarcodeScannerParseSuccess(eq(SyncPixels.ScreenType.SYNC_EXCHANGE), eq(CodeVersion.V1), isNull())
             verify(syncPixels, never()).fireLoginPixel()
-            verify(syncPixels, never()).fireSyncSetupFinishedSuccessfully(any())
+            verify(syncPixels, never()).fireSyncSetupFinishedSuccessfully(any(), anyOrNull(), anyOrNull(), anyOrNull())
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -285,7 +285,7 @@ class SyncWithAnotherDeviceViewModelTest {
             assertTrue(command is Command.ShowError)
             verify(syncPixels).fireBarcodeScannerParseSuccess(eq(SyncPixels.ScreenType.SYNC_EXCHANGE), eq(CodeVersion.V1), isNull())
             verify(syncPixels, never()).fireLoginPixel()
-            verify(syncPixels, never()).fireSyncSetupFinishedSuccessfully(any())
+            verify(syncPixels, never()).fireSyncSetupFinishedSuccessfully(any(), anyOrNull(), anyOrNull(), anyOrNull())
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -301,7 +301,7 @@ class SyncWithAnotherDeviceViewModelTest {
             assertTrue(command is Command.AskToSwitchAccount)
             verify(syncPixels).fireBarcodeScannerParseSuccess(eq(SyncPixels.ScreenType.SYNC_EXCHANGE), eq(CodeVersion.V1), isNull())
             verify(syncPixels, never()).fireLoginPixel()
-            verify(syncPixels, never()).fireSyncSetupFinishedSuccessfully(any())
+            verify(syncPixels, never()).fireSyncSetupFinishedSuccessfully(any(), anyOrNull(), anyOrNull(), anyOrNull())
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -318,7 +318,7 @@ class SyncWithAnotherDeviceViewModelTest {
             assertTrue(command is Command.AskToSwitchAccount)
             verify(syncPixels).fireBarcodeScannerParseSuccess(eq(SyncPixels.ScreenType.SYNC_EXCHANGE), eq(CodeVersion.V1), isNull())
             verify(syncPixels, never()).fireLoginPixel()
-            verify(syncPixels, never()).fireSyncSetupFinishedSuccessfully(any())
+            verify(syncPixels, never()).fireSyncSetupFinishedSuccessfully(any(), anyOrNull(), anyOrNull(), anyOrNull())
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -435,7 +435,7 @@ class SyncWithAnotherDeviceViewModelTest {
             assertTrue(command is Command.ShowError)
             verify(syncPixels).fireBarcodeScannerParseSuccess(eq(SyncPixels.ScreenType.SYNC_EXCHANGE), eq(CodeVersion.V1), isNull())
             verify(syncPixels, never()).fireLoginPixel()
-            verify(syncPixels, never()).fireSyncSetupFinishedSuccessfully(any())
+            verify(syncPixels, never()).fireSyncSetupFinishedSuccessfully(any(), anyOrNull(), anyOrNull(), anyOrNull())
             cancelAndIgnoreRemainingEvents()
         }
     }

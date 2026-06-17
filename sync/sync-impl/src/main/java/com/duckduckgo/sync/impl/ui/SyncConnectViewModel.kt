@@ -145,7 +145,8 @@ class SyncConnectViewModel @Inject constructor(
             is DispatchOutcome.HostConfirmationRequested -> command.send(Command.AskHostConfirmation(outcome.peerName))
             is DispatchOutcome.JoinerConfirmationRequested -> command.send(Command.AskJoinerConfirmation(outcome.peerName))
             is DispatchOutcome.LoggedIn -> {
-                fireLoginPixels()
+                syncPixels.fireLoginPixel()
+                syncPixels.fireSyncSetupFinishedSuccessfully(SYNC_CONNECT, outcome.path, outcome.myRole, outcome.peerKind)
                 command.send(LoginSuccess)
             }
             is DispatchOutcome.AlreadyConnected ->
@@ -307,7 +308,9 @@ class SyncConnectViewModel @Inject constructor(
 
     fun onLoginSuccess() {
         viewModelScope.launch {
-            fireLoginPixels()
+            // Manual code entry: EnterCodeViewModel fires the "Setup success" pixel (it has the v2
+            // path/role/peer); here we only fire the login pixel to avoid double-counting.
+            syncPixels.fireLoginPixel()
             command.send(LoginSuccess)
         }
     }
