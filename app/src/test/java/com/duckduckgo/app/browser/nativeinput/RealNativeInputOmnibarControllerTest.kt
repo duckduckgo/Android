@@ -20,14 +20,17 @@ import android.content.Context
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
+import android.widget.TextView
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.omnibar.Omnibar
+import com.duckduckgo.app.browser.omnibar.OmnibarView
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 
 @RunWith(AndroidJUnit4::class)
 class RealNativeInputOmnibarControllerTest {
@@ -43,11 +46,16 @@ class RealNativeInputOmnibarControllerTest {
     private val tabsMenu = View(context).apply { id = R.id.tabsMenu }
     private val browserMenu = View(context).apply { id = R.id.browserMenu }
 
-    private val omnibarView = FrameLayout(context).apply {
+    private val aiTitle = TextView(context).apply { id = R.id.aiTitle }
+    private val duckAIFreePill = View(context).apply { id = R.id.duckAIFreePill }
+
+    private val omnibarView = object : FrameLayout(context), OmnibarView by mock() {}.apply {
         addView(fireIconMenu)
         addView(plusIconMenu)
         addView(tabsMenu)
         addView(browserMenu)
+        addView(aiTitle)
+        addView(duckAIFreePill)
     }
 
     @Test
@@ -78,5 +86,38 @@ class RealNativeInputOmnibarControllerTest {
         assertEquals(View.GONE, fireIconMenu.visibility)
         assertEquals(View.GONE, tabsMenu.visibility)
         assertEquals(View.GONE, browserMenu.visibility)
+    }
+
+    @Test
+    fun whenTierUpdatedToFreeWithoutOverlayActiveThenFreePillStaysHidden() {
+        whenever(omnibar.omnibarView).thenReturn(omnibarView)
+        duckAIFreePill.visibility = View.VISIBLE
+
+        testee.updateTierTitle(DuckAiTier.Free) {}
+
+        assertEquals(View.GONE, duckAIFreePill.visibility)
+    }
+
+    @Test
+    fun whenOverlayActiveAndTierFreeThenFreePillShown() {
+        whenever(omnibar.omnibarView).thenReturn(omnibarView)
+        testee.updateTierTitle(DuckAiTier.Free) {}
+
+        testee.hideBackground()
+
+        assertEquals(View.VISIBLE, duckAIFreePill.visibility)
+    }
+
+    @Test
+    fun whenOverlayRestoredThenLaterFreeTierUpdateDoesNotResurrectFreePill() {
+        whenever(omnibar.omnibarView).thenReturn(omnibarView)
+        testee.updateTierTitle(DuckAiTier.Free) {}
+        testee.hideBackground()
+        assertEquals(View.VISIBLE, duckAIFreePill.visibility)
+
+        testee.restore()
+        testee.updateTierTitle(DuckAiTier.Free) {}
+
+        assertEquals(View.GONE, duckAIFreePill.visibility)
     }
 }

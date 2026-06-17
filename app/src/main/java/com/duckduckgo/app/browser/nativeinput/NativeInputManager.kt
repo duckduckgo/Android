@@ -276,12 +276,15 @@ class RealNativeInputManager @Inject constructor(
         val widgetCard = rootView.findViewById<View?>(R.id.inputModeWidgetCard)
         if (widgetCard != null) {
             (widgetCard as? MaterialCardView)?.cardElevation = 0f
+            val animatingRoot = widgetRoot
             widgetCard.animate()
                 .alpha(0f)
                 .setDuration(FADE_OUT_DURATION_MS)
                 .withEndAction {
                     widgetCard.alpha = 1f
-                    removeWidget()
+                    if (widgetRoot === animatingRoot) {
+                        removeWidget()
+                    }
                 }
                 .start()
         } else {
