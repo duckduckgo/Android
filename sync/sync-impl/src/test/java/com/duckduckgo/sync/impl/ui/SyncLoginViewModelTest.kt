@@ -24,7 +24,7 @@ import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.sync.TestSyncFixtures.jsonRecoveryKey
 import com.duckduckgo.sync.TestSyncFixtures.jsonRecoveryKeyEncoded
 import com.duckduckgo.sync.TestSyncFixtures.primaryKey
-import com.duckduckgo.sync.impl.R
+import com.duckduckgo.sync.impl.AccountErrorCodes.PAIRING_REJECTED
 import com.duckduckgo.sync.impl.RealSyncCodeDispatcher
 import com.duckduckgo.sync.impl.RecoveryCode
 import com.duckduckgo.sync.impl.Result.Success
@@ -40,6 +40,7 @@ import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2State
 import com.duckduckgo.sync.impl.pixels.SyncPixels
 import com.duckduckgo.sync.impl.ui.SyncLoginViewModel.Command
 import com.duckduckgo.sync.impl.ui.SyncLoginViewModel.Command.LoginSucess
+import com.duckduckgo.sync.impl.ui.SyncLoginViewModel.Command.ShowV2Error
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -116,8 +117,8 @@ class SyncLoginViewModelTest {
         testee.commands().test {
             testee.onQRCodeScanned(scanned)
             val command = awaitItem()
-            assertTrue("expected ShowError, got $command", command is Command.ShowError)
-            assertEquals(R.string.sync_v2_error_upgrade_required, (command as Command.ShowError).message)
+            assertTrue("expected ShowV2Error, got $command", command is ShowV2Error)
+            assertEquals(v2UpgradeRequiredError, (command as ShowV2Error).content)
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -144,7 +145,8 @@ class SyncLoginViewModelTest {
         testee.commands().test {
             testee.onQRCodeScanned(scannedCode)
             val command = awaitItem()
-            assertTrue("expected ShowError, got $command", command is Command.ShowError)
+            assertTrue("expected ShowV2Error, got $command", command is ShowV2Error)
+            assertEquals(PAIRING_REJECTED.code.toV2PairingError(), (command as ShowV2Error).content)
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -182,8 +184,8 @@ class SyncLoginViewModelTest {
         testee.commands().test {
             testee.onQRCodeScanned(scanned)
             val command = awaitItem()
-            assertTrue("expected ShowError, got $command", command is Command.ShowError)
-            assertEquals(R.string.sync_v2_already_paired_message, (command as Command.ShowError).message)
+            assertTrue("expected ShowV2Error, got $command", command is ShowV2Error)
+            assertEquals(v2AlreadyPairedError, (command as ShowV2Error).content)
             cancelAndIgnoreRemainingEvents()
         }
     }

@@ -80,6 +80,9 @@ class SyncLoginViewModel @Inject constructor(
 
         /** v2 §"Exchange Confirmations": prompt user "Allow [peerName] to join your sync?". */
         data class AskHostConfirmation(val peerName: String?) : Command()
+
+        /** v2 pairing terminal-outcome dialog: title-primary copy, optional message, "Got It" button. */
+        data class ShowV2Error(val content: V2PairingErrorContent) : Command()
     }
 
     fun onReadTextCodeClicked() {
@@ -136,14 +139,14 @@ class SyncLoginViewModel @Inject constructor(
                 command.send(LoginSucess)
             }
             is DispatchOutcome.AlreadyConnected ->
-                command.send(ShowError(message = v2AlreadyPairedError.message, title = v2AlreadyPairedError.title))
+                command.send(Command.ShowV2Error(v2AlreadyPairedError))
             is DispatchOutcome.UpgradeRequired -> {
                 logcat { "Sync v2: upgrade required, peer needs protocol v${outcome.codeMajor}" }
-                command.send(ShowError(message = v2UpgradeRequiredError.message, title = v2UpgradeRequiredError.title))
+                command.send(Command.ShowV2Error(v2UpgradeRequiredError))
             }
             is DispatchOutcome.Failed -> {
                 val content = outcome.code.toV2PairingError()
-                command.send(ShowError(message = content.message, title = content.title))
+                command.send(Command.ShowV2Error(content))
             }
             is DispatchOutcome.JoinerConfirmationRequested ->
                 command.send(Command.AskJoinerConfirmation(outcome.peerName))

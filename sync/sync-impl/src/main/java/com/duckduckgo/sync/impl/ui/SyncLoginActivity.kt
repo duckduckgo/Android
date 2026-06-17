@@ -95,6 +95,7 @@ class SyncLoginActivity : DuckDuckGoActivity() {
             }
 
             is ShowError -> showError(it)
+            is Command.ShowV2Error -> showV2PairingError(it.content) { viewModel.onErrorDialogDismissed() }
             is Command.AskJoinerConfirmation -> askJoinerConfirmation(it.peerName)
             is Command.AskHostConfirmation -> askHostConfirmation(it.peerName)
         }
