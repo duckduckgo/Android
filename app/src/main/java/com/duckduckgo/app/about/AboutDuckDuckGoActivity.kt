@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.about
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.text.Annotation
 import android.text.SpannableString
@@ -26,7 +27,10 @@ import android.text.style.ClickableSpan
 import android.text.style.ForegroundColorSpan
 import android.text.style.UnderlineSpan
 import android.view.View
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.platform.ComposeView
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
@@ -40,12 +44,14 @@ import com.duckduckgo.app.about.AboutDuckDuckGoViewModel.Command.LaunchWebViewWi
 import com.duckduckgo.app.about.AboutDuckDuckGoViewModel.Command.LaunchWebViewWithPrivacyPolicyUrl
 import com.duckduckgo.app.about.AboutDuckDuckGoViewModel.Command.LaunchWebViewWithSubscriptionUrl
 import com.duckduckgo.app.about.AboutDuckDuckGoViewModel.Command.LaunchWebViewWithVPNUrl
+import com.duckduckgo.app.about.compose.AboutScreen
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ActivityAboutDuckDuckGoBinding
 import com.duckduckgo.app.browser.mode.InAppNavigation
 import com.duckduckgo.browser.api.ui.BrowserScreens.WebViewActivityWithParams
 import com.duckduckgo.common.ui.DuckDuckGoActivity
+import com.duckduckgo.common.ui.compose.theme.DuckDuckGoTheme
 import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.AppUrl.Url
@@ -78,16 +84,23 @@ class AboutDuckDuckGoActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var globalActivityStarter: GlobalActivityStarter
 
+    @Inject
+    lateinit var aboutScreenComposeFeature: AboutScreenComposeFeature
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        if (aboutScreenComposeFeature.self().isEnabled()) {
+            setContentInCompose()
+        } else {
+            setContentView(binding.root)
+            setupToolbar(binding.includeToolbar.toolbar)
+            supportActionBar?.setTitle(R.string.aboutActivityTitleNew)
+            configureUiEventHandlers()
+            observeXmlViewState()
+            configureClickableLinks()
+        }
 
-        setContentView(binding.root)
-        setupToolbar(binding.includeToolbar.toolbar)
-        supportActionBar?.setTitle(R.string.aboutActivityTitleNew)
-
-        configureUiEventHandlers()
-        observeViewModel()
-        configureClickableLinks()
+        observeCommands()
     }
 
     override fun onResume() {
@@ -184,15 +197,15 @@ class AboutDuckDuckGoActivity : DuckDuckGoActivity() {
         }
     }
 
-    private fun observeViewModel() {
+    private fun observeXmlViewState() {
         viewModel.viewState()
             .flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED)
             .onEach { viewState ->
-                viewState.let {
-                    binding.includeContent.aboutVersion.setSecondaryText(it.version)
-                }
+                binding.includeContent.aboutVersion.setSecondaryText(viewState.version)
             }.launchIn(lifecycleScope)
+    }
 
+    private fun observeCommands() {
         viewModel.commands()
             .flowWithLifecycle(lifecycle, Lifecycle.State.CREATED)
             .onEach { processCommand(it) }
@@ -246,6 +259,38 @@ class AboutDuckDuckGoActivity : DuckDuckGoActivity() {
             this,
             GeneralSubscriptionFeedbackScreenNoParams,
         )
+    }
+
+    @SuppressLint("NoSetContentUsage")
+    private fun setContentInCompose() {
+        setContentView(
+            ComposeView(this).apply {
+                setContent {
+                    DuckDuckGoTheme {
+                        val state by viewModel.viewState().collectAsStateWithLifecycle(
+                            initialValue = AboutDuckDuckGoViewModel.ViewState(),
+                        )
+                        AboutScreen(
+                            version = state.version,
+                            onBack = { finish() },
+                            onLinkClick = ::onAboutLinkClicked,
+                            onPrivacyPolicyClick = viewModel::onPrivacyPolicyClicked,
+                            onVersionClick = viewModel::onVersionClicked,
+                        )
+                    }
+                }
+            },
+        )
+    }
+
+    private fun onAboutLinkClicked(tag: String) {
+        when (tag) {
+            COMPARISON_CHART_ANNOTATION -> viewModel.onComparisonChartLinkClicked()
+            SUBSCRIPTION_ANNOTATION -> viewModel.onSubscriptionHelpPageLinkClicked()
+            VPN_ANNOTATION -> viewModel.onVPNHelpPageLinkClicked()
+            PRIVACY_PROTECTION_ANNOTATION -> viewModel.onPrivacyProtectionsLinkClicked()
+            LEARN_MORE_ANNOTATION -> viewModel.onLearnMoreLinkClicked()
+        }
     }
 
     companion object {
