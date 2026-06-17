@@ -24,12 +24,15 @@ import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.sync.api.engine.SyncableType
 import com.duckduckgo.sync.impl.API_CODE
+import com.duckduckgo.sync.impl.AccountErrorCodes
+import com.duckduckgo.sync.impl.DispatchOutcome
 import com.duckduckgo.sync.impl.Result.Error
 import com.duckduckgo.sync.impl.SyncCodeType
 import com.duckduckgo.sync.impl.SyncFeature
 import com.duckduckgo.sync.impl.pixels.SyncPixels.CodeVersion
 import com.duckduckgo.sync.impl.pixels.SyncPixels.PeerKind
 import com.duckduckgo.sync.impl.pixels.SyncPixels.ScreenType
+import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupFailureReason
 import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupPath
 import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupRole
 import com.duckduckgo.sync.impl.stats.DailyStats
@@ -352,6 +355,95 @@ class RealSyncPixelsTest {
                 SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
             ),
         )
+    }
+
+    @Test
+    fun whenSetupFailedWithAllDimsThenPixelFiredWithReasonPathRoleAndPeer() {
+        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
+
+        testee.fireSyncSetupFailed(
+            SetupFailureReason.TRANSPORT_FAILURE,
+            SetupPath.PAIRING,
+            SetupRole.JOINER,
+            PeerKind.DDG,
+        )
+
+        verify(pixel).fire(
+            SyncPixelName.SYNC_SETUP_ENDED_FAILED,
+            mapOf(
+                SyncPixelParameters.SYNC_SETUP_REASON to "transport_failure",
+                SyncPixelParameters.SYNC_SETUP_PATH to "pairing",
+                SyncPixelParameters.SYNC_SETUP_MY_ROLE to "joiner",
+                SyncPixelParameters.SYNC_SETUP_PEER_KIND to "ddg",
+                SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to "v2",
+                SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
+            ),
+        )
+    }
+
+    @Test
+    fun whenSetupFailedWithReasonOnlyThenOptionalDimsOmitted() {
+        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
+
+        testee.fireSyncSetupFailed(SetupFailureReason.UNEXPECTED_FAILURE)
+
+        verify(pixel).fire(
+            SyncPixelName.SYNC_SETUP_ENDED_FAILED,
+            mapOf(
+                SyncPixelParameters.SYNC_SETUP_REASON to "unexpected_failure",
+                SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to "v2",
+                SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
+            ),
+        )
+    }
+
+    @Test
+    fun whenFireSetupFailedForUpgradeRequiredThenNeedsUpgrade() {
+        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
+
+        testee.fireSetupFailed(DispatchOutcome.UpgradeRequired(codeMajor = 3, path = SetupPath.PAIRING, myRole = SetupRole.HOST))
+
+        verify(pixel).fire(
+            SyncPixelName.SYNC_SETUP_ENDED_FAILED,
+            mapOf(
+                SyncPixelParameters.SYNC_SETUP_REASON to "needs_upgrade",
+                SyncPixelParameters.SYNC_SETUP_PATH to "pairing",
+                SyncPixelParameters.SYNC_SETUP_MY_ROLE to "host",
+                SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to "v2",
+                SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
+            ),
+        )
+    }
+
+    @Test
+    fun whenFireSetupFailedForFailedOutcomeThenReasonMappedFromCode() {
+        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
+
+        testee.fireSetupFailed(
+            DispatchOutcome.Failed(
+                reason = "boom",
+                code = AccountErrorCodes.INVALID_CODE.code,
+                path = SetupPath.RECOVERY,
+            ),
+        )
+
+        verify(pixel).fire(
+            SyncPixelName.SYNC_SETUP_ENDED_FAILED,
+            mapOf(
+                SyncPixelParameters.SYNC_SETUP_REASON to "invalid_credentials",
+                SyncPixelParameters.SYNC_SETUP_PATH to "recovery",
+                SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to "v2",
+                SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
+            ),
+        )
+    }
+
+    @Test
+    fun whenFireSetupFailedForCancellationCodesThenPixelNotFired() {
+        testee.fireSetupFailed(DispatchOutcome.Failed(reason = "user", code = AccountErrorCodes.PAIRING_CANCELLED.code))
+        testee.fireSetupFailed(DispatchOutcome.Failed(reason = "peer", code = AccountErrorCodes.PAIRING_REJECTED.code))
+
+        verifyNoInteractions(pixel)
     }
 
     @Test

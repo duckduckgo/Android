@@ -140,16 +140,29 @@ sealed interface DispatchOutcome {
      */
     data object AlreadyConnected : DispatchOutcome
 
-    /** Terminal — the pasted code requires a protocol major version higher than this app supports. */
-    data class UpgradeRequired(val codeMajor: Int) : DispatchOutcome
+    /**
+     * Terminal — the pasted code requires a protocol major version higher than this app supports.
+     * [path]/[myRole]/[peerKind] are best-effort telemetry for the "Setup failed" pixel (see [Failed]).
+     */
+    data class UpgradeRequired(
+        val codeMajor: Int,
+        val path: SetupPath? = null,
+        val myRole: SetupRole? = null,
+        val peerKind: PeerKind? = null,
+    ) : DispatchOutcome
 
     /**
      * Terminal — transport error, missing credentials on this device, BE rejection, denial, etc.
      * [code] carries the originating [AccountErrorCodes] code (defaults to GENERIC_ERROR) so callers
      * can map specific failures (e.g. THIRD_PARTY_ALREADY_UPGRADED) to user-facing copy.
+     * [path]/[myRole]/[peerKind] are best-effort telemetry for the "Setup failed" pixel: [path] is the
+     * flow kind, and [myRole]/[peerKind] are populated when known at the point of failure.
      */
     data class Failed(
         val reason: String,
         val code: Int = AccountErrorCodes.GENERIC_ERROR.code,
+        val path: SetupPath? = null,
+        val myRole: SetupRole? = null,
+        val peerKind: PeerKind? = null,
     ) : DispatchOutcome
 }

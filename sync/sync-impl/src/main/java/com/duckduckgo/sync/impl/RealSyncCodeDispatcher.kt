@@ -41,6 +41,7 @@ import dagger.SingleInstanceIn
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.transformWhile
 import logcat.logcat
@@ -103,7 +104,8 @@ class RealSyncCodeDispatcher @Inject constructor(
                         }
                     }
                     runner.peerKind.toPeerKind()?.let { peerKind = it }
-                    val outcome = mapV2PresentEventToOutcome(event, peerKind) ?: return@transformWhile true
+                    val outcome = (mapV2PresentEventToOutcome(event, peerKind) ?: return@transformWhile true)
+                        .withFailureContext(SetupPath.PAIRING, roleFromTerminalState(event), peerKind)
                     emit(outcome)
                     !outcome.isTerminal()
                 },
@@ -252,7 +254,7 @@ class RealSyncCodeDispatcher @Inject constructor(
                 emit(DispatchOutcome.Failed("Unknown v2 credential type: $cid"))
             }
         }
-    }
+    }.map { it.withFailureContext(SetupPath.RECOVERY, myRole = null, peerKind = null) }
 
     /**
      * V2 LinkingV2 (`code2=…`) scanner side. Starts [ExchangeV2Runner.startScan] and maps its
@@ -282,7 +284,8 @@ class RealSyncCodeDispatcher @Inject constructor(
                         }
                     }
                     runner.peerKind.toPeerKind()?.let { peerKind = it }
-                    val outcome = mapV2LinkingEventToOutcome(event, peerKind) ?: return@transformWhile true
+                    val outcome = (mapV2LinkingEventToOutcome(event, peerKind) ?: return@transformWhile true)
+                        .withFailureContext(SetupPath.PAIRING, roleFromTerminalState(event), peerKind)
                     emit(outcome)
                     !outcome.isTerminal()
                 },
@@ -441,6 +444,28 @@ class RealSyncCodeDispatcher @Inject constructor(
         CID_DDG -> PeerKind.DDG
         CID_3PARTY -> PeerKind.THIRD_PARTY
         else -> null
+    }
+
+    /** Elected role implied by a terminal transition's target state, for "Setup failed" telemetry. */
+    private fun roleFromTerminalState(event: ExchangeV2Event): SetupRole? =
+        when ((event as? ExchangeV2Event.Transition)?.to) {
+            is ExchangeV2State.Host -> SetupRole.HOST
+            is ExchangeV2State.Joiner -> SetupRole.JOINER
+            else -> null
+        }
+
+    /**
+     * Attach best-effort failure telemetry ([path]/[myRole]/[peerKind]) to a terminal error outcome.
+     * No-op for non-error outcomes, so a [DispatchOutcome.LoggedIn] keeps the context set at its source.
+     */
+    private fun DispatchOutcome.withFailureContext(
+        path: SetupPath,
+        myRole: SetupRole?,
+        peerKind: PeerKind?,
+    ): DispatchOutcome = when (this) {
+        is DispatchOutcome.Failed -> copy(path = path, myRole = myRole, peerKind = peerKind)
+        is DispatchOutcome.UpgradeRequired -> copy(path = path, myRole = myRole, peerKind = peerKind)
+        else -> this
     }
 
     private fun Result<Boolean>.toOutcome(

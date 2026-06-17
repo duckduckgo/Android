@@ -26,6 +26,8 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.api.engine.DeletableType
 import com.duckduckgo.sync.api.engine.SyncFeatureType
 import com.duckduckgo.sync.impl.API_CODE
+import com.duckduckgo.sync.impl.AccountErrorCodes
+import com.duckduckgo.sync.impl.DispatchOutcome
 import com.duckduckgo.sync.impl.Result.Error
 import com.duckduckgo.sync.impl.SyncCodeType
 import com.duckduckgo.sync.impl.SyncFeature
@@ -41,10 +43,12 @@ import com.duckduckgo.sync.impl.pixels.SyncPixelParameters.SYNC_SETUP_MY_KIND
 import com.duckduckgo.sync.impl.pixels.SyncPixelParameters.SYNC_SETUP_MY_ROLE
 import com.duckduckgo.sync.impl.pixels.SyncPixelParameters.SYNC_SETUP_PATH
 import com.duckduckgo.sync.impl.pixels.SyncPixelParameters.SYNC_SETUP_PEER_KIND
+import com.duckduckgo.sync.impl.pixels.SyncPixelParameters.SYNC_SETUP_REASON
 import com.duckduckgo.sync.impl.pixels.SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE
 import com.duckduckgo.sync.impl.pixels.SyncPixels.CodeVersion
 import com.duckduckgo.sync.impl.pixels.SyncPixels.PeerKind
 import com.duckduckgo.sync.impl.pixels.SyncPixels.ScreenType
+import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupFailureReason
 import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupPath
 import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupRole
 import com.duckduckgo.sync.impl.stats.SyncStatsRepository
@@ -125,6 +129,17 @@ interface SyncPixels {
     fun fireBarcodeScannerParseError(screenType: ScreenType)
     fun fireBarcodeScannerParseSuccess(screenType: ScreenType, codeVersion: CodeVersion, codeType: SyncCodeType? = null)
 
+    /**
+     * "Setup failed" — a v2 setup that started (code recognized) then failed with an error (not a
+     * user cancellation). [path]/[myRole]/[peerKind] are best-effort and omitted when unknown.
+     */
+    fun fireSyncSetupFailed(
+        reason: SetupFailureReason,
+        path: SetupPath? = null,
+        myRole: SetupRole? = null,
+        peerKind: PeerKind? = null,
+    )
+
     enum class ScreenType(val value: String) {
         SYNC_CONNECT("connect"),
         SYNC_EXCHANGE("exchange"),
@@ -152,6 +167,17 @@ interface SyncPixels {
     enum class PeerKind(val value: String) {
         DDG("ddg"),
         THIRD_PARTY("3party"),
+    }
+
+    /** Why a v2 setup failed, per the "Setup failed" telemetry. Aligned with the error codes we handle. */
+    enum class SetupFailureReason(val value: String) {
+        NEEDS_UPGRADE("needs_upgrade"),
+        ALREADY_UPGRADED("already_upgraded"),
+        INVALID_CREDENTIALS("invalid_credentials"),
+        PAIRING_UNAVAILABLE("pairing_unavailable"),
+        PROTOCOL_ERROR("protocol_error"),
+        TRANSPORT_FAILURE("transport_failure"),
+        UNEXPECTED_FAILURE("unexpected_failure"),
     }
     fun fireSetupDeepLinkFlowStarted()
     fun fireSetupDeepLinkFlowSuccess()
@@ -491,6 +517,22 @@ class RealSyncPixels @Inject constructor(
         pixel.fire(SyncPixelName.SYNC_SETUP_ENDED_SUCCESS, parameters = params)
     }
 
+    override fun fireSyncSetupFailed(
+        reason: SetupFailureReason,
+        path: SetupPath?,
+        myRole: SetupRole?,
+        peerKind: PeerKind?,
+    ) {
+        val params = buildMap {
+            put(SYNC_SETUP_REASON, reason.value)
+            if (path != null) put(SYNC_SETUP_PATH, path.value)
+            if (myRole != null) put(SYNC_SETUP_MY_ROLE, myRole.value)
+            if (peerKind != null) put(SYNC_SETUP_PEER_KIND, peerKind.value)
+            putAll(setupFlowMetadata())
+        }
+        pixel.fire(SyncPixelName.SYNC_SETUP_ENDED_FAILED, parameters = params)
+    }
+
     override fun fireSyncSetupManualCodeScreenShown(screenType: ScreenType) {
         val params = mapOf(SYNC_SETUP_SCREEN_TYPE to screenType.value) + setupFlowMetadata()
         pixel.fire(SyncPixelName.SYNC_SETUP_MANUAL_CODE_ENTRY_SCREEN_SHOWN, parameters = params)
@@ -677,6 +719,7 @@ enum class SyncPixelName(override val pixelName: String) : Pixel.PixelName {
     SYNC_SETUP_MANUAL_CODE_ENTERED_FAILED("sync_setup_manual_code_entered_failed"),
     SYNC_SETUP_ENDED_ABANDONED("sync_setup_ended_abandoned"),
     SYNC_SETUP_ENDED_SUCCESS("sync_setup_ended_successful"),
+    SYNC_SETUP_ENDED_FAILED("sync_setup_ended_failed"),
     SYNC_USER_CONFIRMED_TO_TURN_OFF_SYNC("sync_disabled"),
     SYNC_USER_CONFIRMED_TO_TURN_OFF_SYNC_AND_DELETE("sync_disabledanddeleted"),
     SYNC_SETUP_PROMO_BOOKMARK_ADDED_DIALOG_SHOWN("sync_setup_promo_bookmark_added_dialog_shown"),
@@ -726,6 +769,7 @@ object SyncPixelParameters {
     const val SYNC_SETUP_PATH = "path"
     const val SYNC_SETUP_MY_ROLE = "my_role"
     const val SYNC_SETUP_PEER_KIND = "peer_kind"
+    const val SYNC_SETUP_REASON = "reason"
     const val CONNECTED_DEVICES_WHEN_DELETING = "connected_devices"
 
     const val AUTO_RESTORE_SOURCE = "source"
@@ -753,5 +797,43 @@ object SyncPixelsRequiringDataCleaning : PixelParamRemovalPlugin {
             SyncPixelName.SYNC_RESCOPE_TOKEN_FAILURE.pixelName to removeAtb(),
             SyncPixelName.SYNC_AI_CHAT_ACTIVE.pixelName to removeAtb(),
         )
+    }
+}
+
+/**
+ * Maps a v2 [com.duckduckgo.sync.impl.DispatchOutcome.Failed] error code to the "Setup failed"
+ * telemetry [SetupFailureReason], aligned with the error codes we already handle. Cancellation codes
+ * (`PAIRING_CANCELLED`, `PAIRING_REJECTED`) are excluded by the caller, so they fall to the catch-all.
+ */
+internal fun Int.toSetupFailureReason(): SetupFailureReason = when (this) {
+    AccountErrorCodes.THIRD_PARTY_ALREADY_UPGRADED.code -> SetupFailureReason.ALREADY_UPGRADED
+    AccountErrorCodes.LOGIN_FAILED.code,
+    AccountErrorCodes.INVALID_CODE.code,
+    AccountErrorCodes.EXCHANGE_FAILED.code,
+    -> SetupFailureReason.INVALID_CREDENTIALS
+    AccountErrorCodes.PAIRING_UNAVAILABLE.code -> SetupFailureReason.PAIRING_UNAVAILABLE
+    AccountErrorCodes.NEGOTIATION_ABORTED.code,
+    AccountErrorCodes.NO_RECOVERY_CODE.code,
+    -> SetupFailureReason.PROTOCOL_ERROR
+    AccountErrorCodes.PAIRING_FAILED.code -> SetupFailureReason.TRANSPORT_FAILURE
+    else -> SetupFailureReason.UNEXPECTED_FAILURE
+}
+
+/**
+ * Fire the "Setup failed" pixel for a v2 error [outcome]. No-op for non-error outcomes. User
+ * cancellations (`PAIRING_CANCELLED`, `PAIRING_REJECTED`) are intentionally skipped — they are not
+ * setup errors (the latter pending the cancellation-telemetry follow-up).
+ */
+internal fun SyncPixels.fireSetupFailed(outcome: DispatchOutcome) {
+    when (outcome) {
+        is DispatchOutcome.UpgradeRequired ->
+            fireSyncSetupFailed(SetupFailureReason.NEEDS_UPGRADE, outcome.path, outcome.myRole, outcome.peerKind)
+        is DispatchOutcome.Failed -> {
+            if (outcome.code == AccountErrorCodes.PAIRING_CANCELLED.code || outcome.code == AccountErrorCodes.PAIRING_REJECTED.code) {
+                return
+            }
+            fireSyncSetupFailed(outcome.code.toSetupFailureReason(), outcome.path, outcome.myRole, outcome.peerKind)
+        }
+        else -> {}
     }
 }

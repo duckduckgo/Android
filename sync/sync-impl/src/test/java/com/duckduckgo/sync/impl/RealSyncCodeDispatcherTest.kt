@@ -355,7 +355,7 @@ class RealSyncCodeDispatcherTest {
         val outcome = (dispatcher.route("any") as RouteDecision.V2InProgress).outcomes.first()
 
         assertEquals(
-            DispatchOutcome.Failed("Login failed", com.duckduckgo.sync.impl.AccountErrorCodes.LOGIN_FAILED.code),
+            DispatchOutcome.Failed("Login failed", com.duckduckgo.sync.impl.AccountErrorCodes.LOGIN_FAILED.code, path = SetupPath.RECOVERY),
             outcome,
         )
     }
@@ -378,7 +378,11 @@ class RealSyncCodeDispatcherTest {
         val outcome = (dispatcher.route("any") as RouteDecision.V2InProgress).outcomes.first()
 
         assertEquals(
-            DispatchOutcome.Failed("Already signed in", com.duckduckgo.sync.impl.AccountErrorCodes.ALREADY_SIGNED_IN.code),
+            DispatchOutcome.Failed(
+                "Already signed in",
+                com.duckduckgo.sync.impl.AccountErrorCodes.ALREADY_SIGNED_IN.code,
+                path = SetupPath.RECOVERY,
+            ),
             outcome,
         )
         verify(syncAccountRepository, never()).logoutAndJoinNewAccount(any())
@@ -398,7 +402,7 @@ class RealSyncCodeDispatcherTest {
 
         val outcome = (dispatcher.route("any") as RouteDecision.V2InProgress).outcomes.first()
 
-        assertEquals(DispatchOutcome.Failed("Some other error"), outcome)
+        assertEquals(DispatchOutcome.Failed("Some other error", path = SetupPath.RECOVERY), outcome)
     }
 
     @Test fun `FF on, v2 RecoveryCode cid=3party - repository error becomes Failed with reason preserved`() = runTest {
@@ -415,7 +419,7 @@ class RealSyncCodeDispatcherTest {
 
         val outcome = (dispatcher.route("any") as RouteDecision.V2InProgress).outcomes.first()
 
-        assertEquals(DispatchOutcome.Failed("BE rejected"), outcome)
+        assertEquals(DispatchOutcome.Failed("BE rejected", path = SetupPath.RECOVERY), outcome)
     }
 
     @Test fun `FF on, v2 RecoveryCode with unknown cid - emits Failed with the cid in the reason`() = runTest {
@@ -625,7 +629,7 @@ class RealSyncCodeDispatcherTest {
             )
             job.await()
         }
-        assertEquals(DispatchOutcome.UpgradeRequired(codeMajor = 3), outcome)
+        assertEquals(DispatchOutcome.UpgradeRequired(codeMajor = 3, path = SetupPath.PAIRING), outcome)
     }
 
     @Test fun `route LinkingV2 maps a version-too-new SessionError to UpgradeRequired`() = runTest {
@@ -644,7 +648,7 @@ class RealSyncCodeDispatcherTest {
             )
             job.await()
         }
-        assertEquals(DispatchOutcome.UpgradeRequired(codeMajor = 3), outcome)
+        assertEquals(DispatchOutcome.UpgradeRequired(codeMajor = 3, path = SetupPath.PAIRING), outcome)
     }
 
     @Test fun `route LinkingV2 - Host_Aborted with UserDeniedHost maps to Failed PAIRING_CANCELLED`() = runTest {
@@ -664,7 +668,10 @@ class RealSyncCodeDispatcherTest {
             )
             job.await()
         }
-        assertEquals(DispatchOutcome.Failed("user_denied", PAIRING_CANCELLED.code), outcome)
+        assertEquals(
+            DispatchOutcome.Failed("user_denied", PAIRING_CANCELLED.code, path = SetupPath.PAIRING, myRole = SetupRole.HOST),
+            outcome,
+        )
     }
 
     @Test fun `route LinkingV2 - Host_Aborted with HostUnavailable maps to Failed PAIRING_UNAVAILABLE`() = runTest {
@@ -684,7 +691,10 @@ class RealSyncCodeDispatcherTest {
             )
             job.await()
         }
-        assertEquals(DispatchOutcome.Failed("host_unavailable", PAIRING_UNAVAILABLE.code), outcome)
+        assertEquals(
+            DispatchOutcome.Failed("host_unavailable", PAIRING_UNAVAILABLE.code, path = SetupPath.PAIRING, myRole = SetupRole.HOST),
+            outcome,
+        )
     }
 
     @Test fun `presentV2 emits Failed user_denied when Host_Aborted carries UserDeniedHost trigger`() = runTest {
@@ -699,7 +709,10 @@ class RealSyncCodeDispatcherTest {
             )
             job.await()
         }
-        assertEquals(DispatchOutcome.Failed("user_denied", PAIRING_CANCELLED.code), outcome)
+        assertEquals(
+            DispatchOutcome.Failed("user_denied", PAIRING_CANCELLED.code, path = SetupPath.PAIRING, myRole = SetupRole.HOST),
+            outcome,
+        )
     }
 
     @Test fun `presentV2 emits Failed host_unavailable when Host_Aborted carries HostUnavailable trigger`() = runTest {
@@ -714,7 +727,10 @@ class RealSyncCodeDispatcherTest {
             )
             job.await()
         }
-        assertEquals(DispatchOutcome.Failed("host_unavailable", PAIRING_UNAVAILABLE.code), outcome)
+        assertEquals(
+            DispatchOutcome.Failed("host_unavailable", PAIRING_UNAVAILABLE.code, path = SetupPath.PAIRING, myRole = SetupRole.HOST),
+            outcome,
+        )
     }
 
     @Test fun `presentV2 emits AlreadyConnected when runner reaches SameAccountAbort`() = runTest {
@@ -734,7 +750,7 @@ class RealSyncCodeDispatcherTest {
             )
             job.await()
         }
-        assertEquals(DispatchOutcome.Failed("channel 5xx", PAIRING_FAILED.code), outcome)
+        assertEquals(DispatchOutcome.Failed("channel 5xx", PAIRING_FAILED.code, path = SetupPath.PAIRING), outcome)
     }
 
     @Test fun `presentV2 emits Failed when Joiner_Done arrives without a recovery code`() = runTest {
@@ -745,7 +761,15 @@ class RealSyncCodeDispatcherTest {
             runnerEventsFlow.emit(transition(from = ExchangeV2State.Joiner.Waiting, to = ExchangeV2State.Joiner.Done))
             job.await()
         }
-        assertEquals(DispatchOutcome.Failed("Pairing completed without a recovery code", NO_RECOVERY_CODE.code), outcome)
+        assertEquals(
+            DispatchOutcome.Failed(
+                "Pairing completed without a recovery code",
+                NO_RECOVERY_CODE.code,
+                path = SetupPath.PAIRING,
+                myRole = SetupRole.JOINER,
+            ),
+            outcome,
+        )
     }
 
     @Test fun `presentV2 emits LoggedIn when Joiner_Done carries a cid=ddg recovery code`() = runTest {
@@ -847,7 +871,15 @@ class RealSyncCodeDispatcherTest {
             )
             job.await()
         }
-        assertEquals(DispatchOutcome.Failed("Pairing cancelled on this device", PAIRING_CANCELLED.code), outcome)
+        assertEquals(
+            DispatchOutcome.Failed(
+                "Pairing cancelled on this device",
+                PAIRING_CANCELLED.code,
+                path = SetupPath.PAIRING,
+                myRole = SetupRole.JOINER,
+            ),
+            outcome,
+        )
     }
 
     @Test fun `presentV2 calls runner_startPresent when Flow is collected`() = runTest {

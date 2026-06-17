@@ -678,12 +678,12 @@ class AppSyncAccountRepository @Inject constructor(
         // SP travels in the recovery code as base64url; nativeLib + hkdfDerive* helpers expect
         // standard base64. Compute once at the boundary, reuse for all derivations.
         val spStandardB64 = kotlin.runCatching { base64UrlStringToStandardBase64(parsed.secret) }
-            .getOrElse { return Error(reason = "Upgrade: failed to decode SP: ${it.message}") }
+            .getOrElse { return Error(reason = "Upgrade: failed to decode SP") }
         val hkdfSalt = parsed.userId.toByteArray(Charsets.UTF_8)
 
         // SP-derived MEK: used to decrypt FE-written (JWE) keys we received from /sync/login.
         val spMek = kotlin.runCatching { syncJweCrypto.hkdfDeriveBytes(spStandardB64, hkdfSalt, "Main Key", 32) }
-            .getOrElse { return Error(reason = "Upgrade: failed to derive SP MEK: ${it.message}") }
+            .getOrElse { return Error(reason = "Upgrade: failed to derive SP MEK") }
 
         // Fresh DDG credential generated locally. nativeLib.generateAccountKeys returns a tuple
         // where `primaryKey` is the new account's MP (the seed for all spec-side derivations) and
@@ -699,14 +699,14 @@ class AppSyncAccountRepository @Inject constructor(
         // DDG's MEK?", this is HKDF(MP, salt=user_id, info="Main Key", 32 bytes) imported as
         // AES-GCM-256. Pinned against the TD's test3 vector in SyncJweCryptoTdVectorsTest.
         val ddgMek = kotlin.runCatching { syncJweCrypto.hkdfDeriveBytes(newDdgKeys.primaryKey, hkdfSalt, "Main Key", 32) }
-            .getOrElse { return Error(reason = "Upgrade: failed to derive DDG MEK: ${it.message}") }
+            .getOrElse { return Error(reason = "Upgrade: failed to derive DDG MEK") }
 
         // encrypted_3party_credential: JWE compact (alg=dir, enc=A256GCM, kid="ddg") of the SP
         // base64url STRING (matches the reverse direction in createThirdPartyCredential, which
         // encrypts the base64url SP string — not the raw SP bytes — so the wire is symmetrical).
         val encryptedThreePartyCredential = kotlin.runCatching {
             syncJweCrypto.jweEncryptSymmetric(parsed.secret.toByteArray(Charsets.UTF_8), ddgMek, kid = CREDENTIAL_ID_DDG)
-        }.getOrElse { return Error(reason = "Upgrade: failed to encrypt encrypted_3party_credential: ${it.message}") }
+        }.getOrElse { return Error(reason = "Upgrade: failed to encrypt encrypted_3party_credential") }
 
         // Re-wrap each FE-written key from /sync/login. Decrypt via JWE using SP MEK, then
         // re-encrypt with libsodium-secretbox using the new DDG secretKey, matching the Native

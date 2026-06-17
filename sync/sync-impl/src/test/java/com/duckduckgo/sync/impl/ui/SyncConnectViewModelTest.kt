@@ -53,6 +53,8 @@ import com.duckduckgo.sync.impl.exchange.v2.PairingRole
 import com.duckduckgo.sync.impl.pixels.SyncPixels
 import com.duckduckgo.sync.impl.pixels.SyncPixels.CodeVersion
 import com.duckduckgo.sync.impl.pixels.SyncPixels.ScreenType.SYNC_CONNECT
+import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupFailureReason
+import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupPath
 import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command
 import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command.AskHostConfirmation
 import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command.AskJoinerConfirmation
@@ -759,6 +761,13 @@ class SyncConnectViewModelTest {
             assertEquals(PAIRING_FAILED.code.toV2PairingError(), (command as ShowV2Error).content)
             cancelAndIgnoreRemainingEvents()
         }
+
+        verify(syncPixels).fireSyncSetupFailed(
+            eq(SetupFailureReason.TRANSPORT_FAILURE),
+            eq(SetupPath.PAIRING),
+            isNull(),
+            isNull(),
+        )
     }
 
     @Test

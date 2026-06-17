@@ -255,7 +255,7 @@ class RealExchangeV2Runner @Inject constructor(
                     if (r.code == HTTP_CONFLICT) {
                         logcat { "Sync-ExchangeV2: channel_id $candidate already taken, retrying (${attempt + 1}/$MAX_CHANNEL_CREATE_RETRIES)" }
                     } else {
-                        emitSessionError("Failed to create channel: ${r.reason}")
+                        emitSessionError("Failed to create channel")
                         return null
                     }
                 }
@@ -743,7 +743,7 @@ class RealExchangeV2Runner @Inject constructor(
                 true
             }
             is Result.Error -> {
-                emitSessionError("Failed to send ${outboundMessage.messageType}: ${r.reason}")
+                emitSessionError("Failed to send message to peer over channel")
                 false
             }
         }
