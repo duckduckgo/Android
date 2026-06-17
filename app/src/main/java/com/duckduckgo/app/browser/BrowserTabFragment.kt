@@ -1060,7 +1060,10 @@ class BrowserTabFragment :
 
                 InputScreenActivityResultCodes.SWITCH_TO_TAB_REQUESTED -> {
                     data?.getStringExtra(InputScreenActivityResultParams.TAB_ID_PARAM)?.let { tabId ->
-                        browserActivity?.openExistingTab(tabId)
+                        val mode = data.getStringExtra(InputScreenActivityResultParams.TAB_MODE_PARAM)
+                            ?.let { runCatching { BrowserMode.valueOf(it) }.getOrNull() }
+                            ?: browserMode
+                        browserActivity?.openExistingTabInMode(mode, tabId)
                     }
                 }
 
@@ -3802,7 +3805,7 @@ class BrowserTabFragment :
                 override fun onHatchPressed() {
                     hideKeyboard()
                     ntpAfterIdleManager.onReturnToPageTapped()
-                    browserActivity?.openExistingTab(newTabReturnHatchView.tabId)
+                    browserActivity?.openExistingTabInMode(newTabReturnHatchView.targetMode, newTabReturnHatchView.tabId)
                 }
 
                 override fun onHatchRendered(visible: Boolean) {

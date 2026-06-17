@@ -21,6 +21,7 @@
 
     <string name="tabSwitcherContentDescription">Tabs</string>
     <string name="newTabReturnHatchText">Return to…</string>
+    <string name="newTabReturnHatchFireTabTitle">Last used Fire Tab</string>
     <string name="duck_ai_tab_label">Duck.ai</string>
     <string name="duck_ai_tab_icon_content_description">Duck.ai icon</string>
     <string name="hatchMenuReturnTab">Return to Tab</string>

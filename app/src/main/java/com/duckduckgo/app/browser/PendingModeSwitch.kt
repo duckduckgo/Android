@@ -39,6 +39,7 @@ internal sealed class PendingAction {
         val skipHome: Boolean,
         val isExternal: Boolean,
     ) : PendingAction()
+    data class OpenExistingTab(val tabId: String) : PendingAction()
 }
 
 /** A [PendingAction] paired with the [BrowserMode] it must run in. */
@@ -61,6 +62,10 @@ internal fun PendingModeSwitch.toBundle(): Bundle {
             bundle.putBoolean(KEY_SKIP_HOME, pendingAction.skipHome)
             bundle.putBoolean(KEY_IS_EXTERNAL, pendingAction.isExternal)
         }
+        is PendingAction.OpenExistingTab -> {
+            bundle.putString(KEY_ACTION, ACTION_OPEN_EXISTING_TAB)
+            bundle.putString(KEY_EXISTING_TAB_ID, pendingAction.tabId)
+        }
     }
     return bundle
 }
@@ -78,6 +83,9 @@ internal fun Bundle.toPendingModeSwitch(): PendingModeSwitch? {
             skipHome = getBoolean(KEY_SKIP_HOME),
             isExternal = getBoolean(KEY_IS_EXTERNAL),
         )
+        ACTION_OPEN_EXISTING_TAB -> PendingAction.OpenExistingTab(
+            tabId = getString(KEY_EXISTING_TAB_ID) ?: return null,
+        )
         else -> return null
     }
     return PendingModeSwitch(targetMode, action)
@@ -90,5 +98,7 @@ private const val KEY_QUERY = "pendingModeSwitchQuery"
 private const val KEY_SOURCE_TAB_ID = "pendingModeSwitchSourceTabId"
 private const val KEY_SKIP_HOME = "pendingModeSwitchSkipHome"
 private const val KEY_IS_EXTERNAL = "pendingModeSwitchIsExternal"
+private const val KEY_EXISTING_TAB_ID = "pendingModeSwitchExistingTabId"
 private const val ACTION_PROCESS_INTENT = "processIntent"
 private const val ACTION_OPEN_NEW_TAB = "openNewTab"
+private const val ACTION_OPEN_EXISTING_TAB = "openExistingTab"

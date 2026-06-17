@@ -17,6 +17,7 @@
 package com.duckduckgo.app.generalsettings.showonapplaunch
 
 import com.duckduckgo.app.browser.autofill.SystemAutofillEngagement
+import com.duckduckgo.app.browser.state.ModeSwitchRecreateSignal
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption.NewTabPage
 import com.duckduckgo.app.generalsettings.showonapplaunch.store.ShowOnAppLaunchOptionDataStore
@@ -60,6 +61,7 @@ class FirstScreenHandlerImpl @Inject constructor(
     private val systemAutofillEngagement: SystemAutofillEngagement,
     private val customTabDetector: CustomTabDetector,
     private val browserModeStateHolder: BrowserModeStateHolder,
+    private val modeSwitchRecreateSignal: ModeSwitchRecreateSignal,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : BrowserLifecycleObserver {
 
@@ -67,6 +69,11 @@ class FirstScreenHandlerImpl @Inject constructor(
         get() = tabRepositoryProvider.forMode(browserModeStateHolder.currentMode.value)
 
     override fun onOpen(isFreshLaunch: Boolean) {
+        // A programmatic mode switch recreates BrowserActivity, which fires onClose+onOpen as if the
+        // app reopened. Skip launch handling for that recreate so it doesn't add a spurious NTP that
+        // clobbers the action carried across the switch (e.g. the escape hatch's OpenExistingTab).
+        if (modeSwitchRecreateSignal.consumePending()) return
+
         // Notify the NtpAfterIdleManager synchronously on a fresh launch when the currently
         // selected tab is already an NTP: BrowserViewModel's flowSelectedTab subscription will
         // fire onNtpShown immediately on activity recreation, and the async handler path below
