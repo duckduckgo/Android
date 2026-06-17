@@ -1839,6 +1839,8 @@ class BrowserTabViewModel @Inject constructor(
         return normalizedOldUrl == normalizedNewUrl
     }
 
+    fun isOmnibarLockedForOnboarding(): Boolean = currentBrowserViewState().isOmnibarLockedForOnboarding
+
     /**
      * Handles back navigation. Returns false if navigation could not be
      * handled at this level, giving system an opportunity to handle it
