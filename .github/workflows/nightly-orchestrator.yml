@@ -116,7 +116,7 @@ jobs:
           echo "task_ids=$TASK_IDS" >> $GITHUB_OUTPUT
 
   move_tasks_in_lgc:
-    name: Move tasks to release candidate section
+    name: Tag tasks as LGC
     runs-on: ubuntu-latest
     needs: [ collect_lgc_tasks ]
     if: ${{ success() && needs.collect_lgc_tasks.outputs.task_ids != '[]' }}
@@ -125,6 +125,14 @@ jobs:
         task_id: ${{ fromJson(needs.collect_lgc_tasks.outputs.task_ids) }}
       fail-fast: false
     steps:
+      - name: Tag task as LGC
+        uses: duckduckgo/native-github-asana-sync@v2.5.1
+        with:
+          asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
+          asana-project: ${{ vars.GH_ANDROID_RELEASE_BOARD_PROJECT_ID }}
+          asana-section: ${{ vars.GH_ANDROID_RELEASE_BOARD_WAITING_FOR_RELEASE_SECTION_ID }}
+          asana-task-id: ${{ matrix.task_id }}
+          action: 'add-task-asana-project'
       - name: Tag task as LGC
         uses: duckduckgo/native-github-asana-sync@v2.5.1
         with:
