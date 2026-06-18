@@ -32,7 +32,6 @@ internal data class V2PairingErrorContent(
 
 /**
  * Maps a v2 pairing [com.duckduckgo.sync.impl.DispatchOutcome.Failed] error code to dialog copy.
- * The scenario line is the title; the message is a short supporting line or null (title-only).
  */
 internal fun Int.toV2PairingError(): V2PairingErrorContent = when (this) {
     PAIRING_REJECTED.code -> V2PairingErrorContent(
@@ -53,7 +52,7 @@ internal fun Int.toV2PairingError(): V2PairingErrorContent = when (this) {
     )
 }
 
-/** Fixed copy for [com.duckduckgo.sync.impl.DispatchOutcome.UpgradeRequired] outcome (title-only). */
+/** Fixed copy for [com.duckduckgo.sync.impl.DispatchOutcome.UpgradeRequired] */
 internal val v2UpgradeRequiredError = V2PairingErrorContent(
     title = R.string.sync_v2_error_upgrade_required,
     message = null,
@@ -67,9 +66,7 @@ internal val v2AlreadyPairedError = V2PairingErrorContent(
 
 /**
  * Renders a v2 pairing error dialog: the scenario line as the title, an optional supporting
- * [V2PairingErrorContent.message], and the shared v2 "Got It" button. A null message yields a
- * title-only dialog (the builder hides the message view when it is empty). [onDismissed] runs on
- * the positive-button tap, mirroring the v1 path's `viewModel.onErrorDialogDismissed()`.
+ * [V2PairingErrorContent.message].
  */
 internal fun Context.showV2PairingError(
     content: V2PairingErrorContent,

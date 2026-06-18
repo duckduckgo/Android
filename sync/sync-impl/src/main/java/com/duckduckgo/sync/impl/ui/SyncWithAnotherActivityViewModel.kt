@@ -227,7 +227,6 @@ class SyncWithAnotherActivityViewModel @Inject constructor(
         /** v2 §"Exchange Confirmations": prompt user "Allow [peerName] to join your sync?". */
         data class AskHostConfirmation(val peerName: String?) : Command()
 
-        /** v2 pairing terminal-outcome dialog: title-primary copy, optional message, "Got It" button. */
         internal data class ShowV2Error(val content: V2PairingErrorContent) : Command()
     }
 

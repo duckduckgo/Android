@@ -139,7 +139,6 @@ class RealSyncCodeDispatcher @Inject constructor(
                     DispatchOutcome.Failed("Pairing declined by peer", PAIRING_REJECTED.code)
                 is ExchangeV2Message.RecoveryCodeUnavailable ->
                     DispatchOutcome.Failed("Peer has no recovery code", PAIRING_UNAVAILABLE.code)
-                // AbortedByHost is only reachable via those two host messages; default defensively to rejected.
                 else -> DispatchOutcome.Failed("Pairing aborted by peer", PAIRING_REJECTED.code)
             }
             ExchangeV2State.Joiner.AbortedLocal -> DispatchOutcome.Failed("Pairing cancelled on this device", PAIRING_CANCELLED.code)
@@ -317,7 +316,6 @@ class RealSyncCodeDispatcher @Inject constructor(
                     DispatchOutcome.Failed("Pairing declined by peer", PAIRING_REJECTED.code)
                 is ExchangeV2Message.RecoveryCodeUnavailable ->
                     DispatchOutcome.Failed("Peer has no recovery code", PAIRING_UNAVAILABLE.code)
-                // AbortedByHost is only reachable via those two host messages; default defensively to rejected.
                 else -> DispatchOutcome.Failed("Pairing aborted by peer", PAIRING_REJECTED.code)
             }
             ExchangeV2State.Joiner.AbortedLocal -> DispatchOutcome.Failed("Pairing cancelled on this device", PAIRING_CANCELLED.code)
