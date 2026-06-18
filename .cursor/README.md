@@ -1,1 +1,1 @@
-../../.claude/README.md
+../.claude/README.md
