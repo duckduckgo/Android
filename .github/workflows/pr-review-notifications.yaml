@@ -1,12 +1,18 @@
-name: Pull Request Reviewed -> Sync With Asana
+name: Pull Request Review/Comment -> Sync With Asana
 
 on:
   pull_request_review:
     types: [submitted]
+  pull_request_review_comment:
+    types: [created]
 
 jobs:
+  # Existing behaviour: post canned approved / changes-requested / dismissed
+  # status notes to the linked Asana task. Unchanged, but now guarded so it
+  # only runs for the review event (the workflow also fires on comments now).
   pr-reviewed:
     name: Add PR reviewed comment
+    if: github.event_name == 'pull_request_review'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout native actions repo
@@ -22,3 +28,188 @@ jobs:
         with:
           trigger-phrase: "Task/Issue URL:"
           asana_pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
+
+  # New: forward the actual reviewer text (review summary body AND inline
+  # review comments) to the linked Asana task, but ONLY when the comment
+  # @-mentions a user present in GH_ANDROID_USER_MAP. The mention is rendered
+  # as a real Asana @-mention so the tagged person gets notified in Asana.
+  sync-tagged-comment:
+    name: Forward @-mentioned review comments to Asana
+    runs-on: ubuntu-latest
+    # This job only talks to Asana via fetch; it never uses GITHUB_TOKEN.
+    permissions: {}
+    steps:
+      - name: Post to Asana if a mapped user is @-mentioned
+        uses: actions/github-script@v7
+        env:
+          USER_MAP: ${{ vars.GH_ANDROID_USER_MAP }}
+          ASANA_PAT: ${{ secrets.ASANA_ACCESS_TOKEN }}
+          ASANA_WORKSPACE_ID: ${{ secrets.GH_ASANA_WORKSPACE_ID }}
+          ASANA_CODE_REVIEWS_PROJECT_ID: ${{ vars.GH_ASANA_CODE_REVIEWS_PROJECT_ID }}
+        with:
+          script: |
+            const {eventName, payload} = context
+
+            // 1) Pull the comment text + metadata for whichever event fired.
+            let body, permalink
+            if (eventName === 'pull_request_review') {
+              body = payload.review.body || ''
+              permalink = payload.review.html_url
+            } else if (eventName === 'pull_request_review_comment') {
+              body = payload.comment.body || ''
+              permalink = payload.comment.html_url
+            } else {
+              core.info(`Unsupported event ${eventName}; skipping.`)
+              return
+            }
+
+            if (!body.trim()) {
+              core.info('Empty comment body; nothing to forward.')
+              return
+            }
+
+            // 2) Load the GitHub-login -> Asana-GID map.
+            let map = {}
+            try {
+              map = JSON.parse(process.env.USER_MAP || '{}')
+            } catch (e) {
+              core.warning(`Could not parse GH_ANDROID_USER_MAP: ${e}`)
+            }
+            const mapLower = {}
+            for (const [login, gid] of Object.entries(map)) {
+              mapLower[login.toLowerCase()] = gid
+            }
+
+            // 3) Collect @-mentions, keep only those present in the map.
+            //    The leading boundary avoids matching the local part of emails.
+            const mentioned = new Set()
+            const re = /(^|[^A-Za-z0-9_@/])@([A-Za-z0-9](?:[A-Za-z0-9-]{0,38}))/g
+            let m
+            while ((m = re.exec(body)) !== null) {
+              mentioned.add(m[2].toLowerCase())
+            }
+            const tagged = [...mentioned]
+              .filter(login => mapLower[login])
+              .map(login => ({login, gid: mapLower[login]}))
+
+            if (tagged.length === 0) {
+              core.info('No mapped user @-mentioned; skipping Asana sync.')
+              return
+            }
+
+            // 4) Find the per-PR *code-review* task by its "Github URL" custom
+            //    field == PR URL, then post the comment. Mirrors pr-asana-sync's
+            //    findPRTask so comments land on the code-review task. This is
+            //    BEST-EFFORT: a missing task or a transient Asana error (incl.
+            //    429s from parallel inline comments) must never fail the PR, so
+            //    everything below is wrapped and downgraded to a warning.
+            try {
+              const prUrl = payload.pull_request.html_url
+              const ws = process.env.ASANA_WORKSPACE_ID
+              const reviewsProject = process.env.ASANA_CODE_REVIEWS_PROJECT_ID
+
+              const asanaGet = async path => {
+                const r = await fetch(`https://app.asana.com/api/1.0${path}`, {
+                  headers: {Authorization: `Bearer ${process.env.ASANA_PAT}`}
+                })
+                if (!r.ok) {
+                  throw new Error(`Asana GET ${path} -> ${r.status}: ${await r.text()}`)
+                }
+                return r.json()
+              }
+
+              // Resolve the "Github URL" custom field gid (paginated).
+              let urlFieldGid
+              let offset = ''
+              do {
+                const page = await asanaGet(
+                  `/workspaces/${ws}/custom_fields?opt_fields=name&limit=100` +
+                  (offset ? `&offset=${offset}` : '')
+                )
+                const hit = (page.data || []).find(f => f.name === 'Github URL')
+                if (hit) {
+                  urlFieldGid = hit.gid
+                  break
+                }
+                offset = page.next_page?.offset || ''
+              } while (offset)
+
+              if (!urlFieldGid) {
+                core.warning('No "Github URL" custom field in workspace; skipping.')
+                return
+              }
+
+              // Locate the code-review task by PR URL. The task is created when
+              // the PR is opened, so it normally already exists; but Asana's
+              // search index lags ~10-60s, so retry a few times for PRs reviewed
+              // moments after opening.
+              const findTaskId = async () => {
+                const search = await asanaGet(
+                  `/workspaces/${ws}/tasks/search` +
+                  `?custom_fields.${urlFieldGid}.value=${encodeURIComponent(prUrl)}` +
+                  `&opt_fields=name&limit=20`
+                )
+                if (search.data && search.data.length > 0) return search.data[0].gid
+                if (!reviewsProject) return undefined
+                // Fallback: exact-match scan of the code-reviews project.
+                const proj = await asanaGet(
+                  `/projects/${reviewsProject}/tasks?opt_fields=custom_fields&limit=100`
+                )
+                return (proj.data || []).find(t =>
+                  (t.custom_fields || []).some(
+                    cf => cf.gid === urlFieldGid && cf.display_value === prUrl
+                  )
+                )?.gid
+              }
+
+              let taskId
+              for (let attempt = 0; attempt < 3 && !taskId; attempt++) {
+                if (attempt > 0) await new Promise(r => setTimeout(r, 5000))
+                taskId = await findTaskId()
+              }
+
+              if (!taskId) {
+                core.warning(`No code-review task found for ${prUrl}; skipping.`)
+                return
+              }
+
+              // 5) Build the Asana story with real @-mentions (html_text).
+              //    Escape every interpolated value (text AND the URL) so user
+              //    content can't break Asana's HTML parser.
+              const esc = s => String(s)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+              const mentionsHtml = tagged
+                .map(u => `<a data-asana-gid="${u.gid}"/>`)
+                .join(' ')
+              const htmlText =
+                `<body>${mentionsHtml} has been mentioned in a ` +
+                `<a href="${esc(permalink)}">PR review comment</a>.</body>`
+
+              // 6) Post the story to the Asana task.
+              const res = await fetch(
+                `https://app.asana.com/api/1.0/tasks/${taskId}/stories`,
+                {
+                  method: 'POST',
+                  headers: {
+                    Authorization: `Bearer ${process.env.ASANA_PAT}`,
+                    'Content-Type': 'application/json'
+                  },
+                  body: JSON.stringify({
+                    data: {html_text: htmlText, is_pinned: false}
+                  })
+                }
+              )
+              if (!res.ok) {
+                core.warning(`Asana POST failed ${res.status}: ${await res.text()}`)
+                return
+              }
+              core.info(
+                `Posted Asana comment to task ${taskId}; mentioned: ` +
+                tagged.map(u => u.login).join(', ')
+              )
+            } catch (e) {
+              // Best-effort: never red-X a PR because a notification failed.
+              core.warning(`Asana sync skipped: ${e.message}`)
+            }
