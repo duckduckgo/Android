@@ -904,6 +904,12 @@ class DuckChatContextualViewModel @Inject constructor(
                             showFullscreen = true,
                             prompt = "",
                             quickActionState = resetQuickActionState,
+                            // Reset the page-context attachment so a fresh chat doesn't silently inherit
+                            // the previous chat's context: generateContextPrompt() keys off showContext, and
+                            // resetQuickActionState hides the attached-context chip, so a stale showContext
+                            // would attach context with no visual indication.
+                            showContext = false,
+                            userRemovedContext = false,
                         )
                     }
                     sheetState?.let { commandChannel.trySend(Command.ChangeSheetState(it)) }

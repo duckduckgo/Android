@@ -1344,6 +1344,38 @@ class DuckChatContextualViewModelTest {
     }
 
     @Test
+    fun `when new chat requested then attached page context is reset`() = runTest {
+        val tabId = "tab-1"
+        val pageContext = """{"title":"Page","url":"https://example.com","content":"text"}"""
+        testee.onSheetOpened(tabId)
+        testee.onPageContextReceived(tabId, pageContext)
+        testee.addPageContext()
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+        assertTrue(testee.viewState.value.showContext)
+
+        testee.onNewChatRequested()
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+        assertFalse(testee.viewState.value.showContext)
+        assertFalse(testee.viewState.value.userRemovedContext)
+    }
+
+    @Test
+    fun `when new chat requested then a removed context flag is reset`() = runTest {
+        val tabId = "tab-1"
+        testee.onSheetOpened(tabId)
+        testee.removePageContext()
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+        assertTrue(testee.viewState.value.userRemovedContext)
+
+        testee.onNewChatRequested()
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+        assertFalse(testee.viewState.value.userRemovedContext)
+        assertFalse(testee.viewState.value.showContext)
+    }
+
+    @Test
     fun `onContextualClose in input mode does not store last closed timestamp`() = runTest {
         val tabId = "tab-1"
         val now = 55_000L
