@@ -147,8 +147,6 @@ import com.duckduckgo.app.browser.progressbar.ProgressBarUpgradeFeature
 import com.duckduckgo.app.browser.refreshpixels.RefreshPixelSender
 import com.duckduckgo.app.browser.santize.NonHttpAppLinkChecker
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
-import com.duckduckgo.app.browser.sitepreferences.RememberDesktopModeFeature
-import com.duckduckgo.app.browser.sitepreferences.SitePreferencesRepository
 import com.duckduckgo.app.browser.tabs.TabManager
 import com.duckduckgo.app.browser.trafficquality.AndroidFeaturesHeaderPlugin.Companion.X_DUCKDUCKGO_ANDROID_HEADER
 import com.duckduckgo.app.browser.uilock.BROWSER_UI_LOCK_FEATURE_NAME
@@ -331,6 +329,8 @@ import com.duckduckgo.site.permissions.api.SitePermissionsManager
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.LocationPermissionRequest
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissionQueryResponse
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissions
+import com.duckduckgo.site.preferences.api.DesktopModeSettings
+import com.duckduckgo.site.preferences.impl.RememberDesktopModeFeature
 import com.duckduckgo.subscriptions.api.SUBSCRIPTIONS_FEATURE_NAME
 import com.duckduckgo.subscriptions.api.SubscriptionPromoCtaShownPlugin
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
@@ -687,7 +687,7 @@ class BrowserTabViewModelTest {
     private var fakeFaviconFetchingFixFeature = FakeFeatureToggleFactory.create(FaviconFetchingFixFeature::class.java)
     private var fakeProgressBarUpgradeFeature = FakeFeatureToggleFactory.create(ProgressBarUpgradeFeature::class.java)
     private val fakeAutocompleteHistoryDeleteFeature = FakeFeatureToggleFactory.create(AutocompleteHistoryDeleteFeature::class.java)
-    private val mockSitePreferencesRepository: SitePreferencesRepository = mock()
+    private val mockDesktopModeSettings: DesktopModeSettings = mock()
     private val fakeRememberDesktopModeFeature = FakeFeatureToggleFactory.create(RememberDesktopModeFeature::class.java)
     private val mockInlinePdfHandler: InlinePdfHandler = mock()
     private val mockPdfDownloadTooltipDataStore: PdfDownloadTooltipDataStore = mock()
@@ -1014,7 +1014,7 @@ class BrowserTabViewModelTest {
                 onboardingBrandDesignUpdateToggles = mockOnboardingBrandDesignUpdateToggles,
                 onboardingStore = mockOnboardingStore,
                 autocompleteHistoryDeleteFeature = fakeAutocompleteHistoryDeleteFeature,
-                sitePreferencesRepository = mockSitePreferencesRepository,
+                desktopModeSettings = mockDesktopModeSettings,
                 rememberDesktopModeFeature = fakeRememberDesktopModeFeature,
             )
 
@@ -2379,7 +2379,7 @@ class BrowserTabViewModelTest {
         testee.onChangeBrowserModeClicked()
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         verify(mockPixel).fire(AppPixelName.MENU_ACTION_DESKTOP_SITE_ENABLE_PRESSED)
-        verify(mockSitePreferencesRepository).rememberDesktopMode("example.com")
+        verify(mockDesktopModeSettings).rememberDesktopMode("example.com")
         assertTrue(browserViewState().isDesktopBrowsingMode)
         val site = testee.siteLiveData.value
         assertTrue(site?.isDesktopMode == true)
@@ -2391,7 +2391,7 @@ class BrowserTabViewModelTest {
         setDesktopBrowsingMode(true)
         testee.onChangeBrowserModeClicked()
         verify(mockPixel).fire(AppPixelName.MENU_ACTION_DESKTOP_SITE_DISABLE_PRESSED)
-        verify(mockSitePreferencesRepository).forgetDesktopMode("example.com")
+        verify(mockDesktopModeSettings).forgetDesktopMode("example.com")
         assertFalse(browserViewState().isDesktopBrowsingMode)
         val site = testee.siteLiveData.value
         assertFalse(site?.isDesktopMode == true)
@@ -2698,7 +2698,7 @@ class BrowserTabViewModelTest {
         val ultimateCommand = commandCaptor.lastValue as Navigate
         assertEquals(exampleUrl, ultimateCommand.url)
         // eTLD+1 of m.example.com collapses to the same key as the desktop-rewritten URL
-        verify(mockSitePreferencesRepository).rememberDesktopMode("example.com")
+        verify(mockDesktopModeSettings).rememberDesktopMode("example.com")
     }
 
     @Test
@@ -2738,14 +2738,14 @@ class BrowserTabViewModelTest {
         loadUrl("http://localhost")
         setDesktopBrowsingMode(false)
         testee.onChangeBrowserModeClicked()
-        verify(mockSitePreferencesRepository).rememberDesktopMode("localhost")
+        verify(mockDesktopModeSettings).rememberDesktopMode("localhost")
         verify(mockPixel).fire(AppPixelName.MENU_ACTION_DESKTOP_SITE_ENABLE_PRESSED)
     }
 
     @Test
     fun whenNavigatingToNonRememberedSiteThenDesktopModeResetAndNotInheritedFromPreviousSite() {
-        whenever(mockSitePreferencesRepository.isDesktopModeRememberedInCache("a.com")).thenReturn(true)
-        whenever(mockSitePreferencesRepository.isDesktopModeRememberedInCache("b.com")).thenReturn(false)
+        whenever(mockDesktopModeSettings.isDesktopModeRememberedInCache("a.com")).thenReturn(true)
+        whenever(mockDesktopModeSettings.isDesktopModeRememberedInCache("b.com")).thenReturn(false)
 
         loadUrl("http://a.com")
         assertTrue(browserViewState().isDesktopBrowsingMode)
@@ -2760,7 +2760,7 @@ class BrowserTabViewModelTest {
     fun whenRememberDesktopModeEnabledThenIsDesktopSiteEnabledUsesPrimingAwareRead() = runTest {
         // The interceptor-facing read must use the canonical, priming-aware lookup so the first load of
         // a remembered site picks desktop mode even before the in-memory cache has been primed.
-        whenever(mockSitePreferencesRepository.isDesktopModeRemembered("example.com")).thenReturn(true)
+        whenever(mockDesktopModeSettings.isDesktopModeRemembered("example.com")).thenReturn(true)
 
         assertTrue(testee.isDesktopSiteEnabled("http://example.com/some/path"))
     }

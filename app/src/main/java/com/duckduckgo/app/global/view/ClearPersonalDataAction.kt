@@ -23,7 +23,6 @@ import com.duckduckgo.app.browser.WebDataManager
 import com.duckduckgo.app.browser.api.WebViewCapabilityChecker
 import com.duckduckgo.app.browser.api.WebViewCapabilityChecker.WebViewCapability.DeleteBrowsingData
 import com.duckduckgo.app.browser.cookies.ThirdPartyCookieManager
-import com.duckduckgo.app.browser.sitepreferences.SitePreferencesRepository
 import com.duckduckgo.app.fire.AppCacheClearer
 import com.duckduckgo.app.fire.FireActivity
 import com.duckduckgo.app.fire.SiteDataCleaner
@@ -41,6 +40,7 @@ import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import com.duckduckgo.history.api.NavigationHistory
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.site.permissions.api.SitePermissionsManager
+import com.duckduckgo.site.preferences.api.SitePreferencesDataClearer
 import com.duckduckgo.sync.api.DeviceSyncState
 import kotlinx.coroutines.withContext
 import logcat.LogPriority.INFO
@@ -137,7 +137,7 @@ class ClearPersonalDataAction(
     private val webViewCapabilityChecker: WebViewCapabilityChecker,
     duckAiHostProvider: DuckAiHostProvider,
     private val siteDataCleaner: SiteDataCleaner,
-    private val sitePreferencesRepository: SitePreferencesRepository,
+    private val sitePreferencesDataClearer: SitePreferencesDataClearer,
 ) : ClearDataAction {
 
     override fun killAndRestartProcess(notifyDataCleared: Boolean, enableTransitionAnimation: Boolean, deletedTabCount: Int) {
@@ -254,7 +254,7 @@ class ClearPersonalDataAction(
 
             // Burning a site is a fire for that site: forget its remembered desktop-mode preference too.
             // domains are already eTLD+1, matching the key used by the site-preferences store.
-            sitePreferencesRepository.forgetDesktopMode(domainsToClear)
+            sitePreferencesDataClearer.forgetDesktopMode(domainsToClear)
 
             ClearDataResult.Success
         } catch (e: CancellationException) {
@@ -273,7 +273,7 @@ class ClearPersonalDataAction(
         val fireproofEntities = fireproofWebsiteRepository.fireproofWebsitesSync()
         cookieManager.flush()
         sitePermissionsManager.clearAllButFireproof(fireproofEntities.map { it.domain })
-        sitePreferencesRepository.clearAllButFireproofed(
+        sitePreferencesDataClearer.clearAllButFireproofed(
             fireproofEntities.map { it.domain.toTldPlusOne() ?: it.domain }.toSet(),
         )
         thirdPartyCookieManager.clearAllData()

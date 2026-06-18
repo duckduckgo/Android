@@ -21,7 +21,6 @@ import com.duckduckgo.app.browser.WebDataManager
 import com.duckduckgo.app.browser.api.WebViewCapabilityChecker
 import com.duckduckgo.app.browser.cookies.ThirdPartyCookieManager
 import com.duckduckgo.app.browser.favicon.FaviconManager
-import com.duckduckgo.app.browser.sitepreferences.SitePreferencesRepository
 import com.duckduckgo.app.fire.AndroidAppCacheClearer
 import com.duckduckgo.app.fire.AppCacheClearer
 import com.duckduckgo.app.fire.BackgroundTimeKeeper
@@ -52,6 +51,7 @@ import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import com.duckduckgo.history.api.NavigationHistory
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.site.permissions.api.SitePermissionsManager
+import com.duckduckgo.site.preferences.api.SitePreferencesDataClearer
 import com.duckduckgo.sync.api.DeviceSyncState
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Lazy
@@ -85,7 +85,7 @@ object PrivacyModule {
         webViewCapabilityChecker: WebViewCapabilityChecker,
         duckAiHostProvider: DuckAiHostProvider,
         siteDataCleaner: SiteDataCleaner,
-        sitePreferencesRepository: SitePreferencesRepository,
+        sitePreferencesDataClearer: SitePreferencesDataClearer,
     ): ClearDataAction {
         // TODO: Burns currently only clear @RegularMode tabs. Cross-mode tab clearing will be
         // handled as part of the data-clearing fire-mode work.
@@ -109,7 +109,7 @@ object PrivacyModule {
             webViewCapabilityChecker,
             duckAiHostProvider,
             siteDataCleaner,
-            sitePreferencesRepository,
+            sitePreferencesDataClearer,
         )
     }
 

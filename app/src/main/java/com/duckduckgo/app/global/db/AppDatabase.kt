@@ -33,8 +33,6 @@ import com.duckduckgo.app.browser.pageloadpixel.PageLoadedPixelEntity
 import com.duckduckgo.app.browser.pageloadpixel.firstpaint.PagePaintedPixelDao
 import com.duckduckgo.app.browser.pageloadpixel.firstpaint.PagePaintedPixelEntity
 import com.duckduckgo.app.browser.rating.db.*
-import com.duckduckgo.app.browser.sitepreferences.SitePreferencesDao
-import com.duckduckgo.app.browser.sitepreferences.SitePreferencesEntity
 import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.DismissedCta
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteDao
@@ -85,7 +83,7 @@ import com.duckduckgo.savedsites.store.SavedSitesRelationsDao
  */
 @Database(
     exportSchema = true,
-    version = 62,
+    version = 61,
     entities = [
         TdsTracker::class,
         TdsEntity::class,
@@ -120,7 +118,6 @@ import com.duckduckgo.savedsites.store.SavedSitesRelationsDao
         Entity::class,
         Relation::class,
         DefaultBrowserPromptsAppUsageEntity::class,
-        SitePreferencesEntity::class,
     ],
 )
 @TypeConverters(
@@ -175,8 +172,6 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun syncRelationsDao(): SavedSitesRelationsDao
 
     abstract fun defaultBrowserPromptsAppUsageDao(): DefaultBrowserPromptsAppUsageDao
-
-    abstract fun sitePreferencesDao(): SitePreferencesDao
 }
 
 @Suppress("PropertyName")
@@ -740,17 +735,6 @@ class MigrationsProvider(val context: Context, val settingsDataStore: SettingsDa
         }
     }
 
-    val MIGRATION_61_TO_62: Migration = object : Migration(61, 62) {
-        override fun migrate(database: SupportSQLiteDatabase) {
-            database.execSQL(
-                "CREATE TABLE IF NOT EXISTS `site_preferences` (" +
-                    "`domain` TEXT NOT NULL, " +
-                    "`desktopModeEnabled` INTEGER NOT NULL, " +
-                    "PRIMARY KEY(`domain`))",
-            )
-        }
-    }
-
     /**
      * WARNING ⚠️
      * This needs to happen because Room doesn't support UNIQUE (...) ON CONFLICT REPLACE when creating the bookmarks table.
@@ -837,7 +821,6 @@ class MigrationsProvider(val context: Context, val settingsDataStore: SettingsDa
             MIGRATION_58_TO_59,
             MIGRATION_59_TO_60,
             MIGRATION_60_TO_61,
-            MIGRATION_61_TO_62,
         )
 
     @Deprecated(

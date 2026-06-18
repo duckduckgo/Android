@@ -23,7 +23,6 @@ import com.duckduckgo.app.browser.WebDataManager
 import com.duckduckgo.app.browser.api.WebViewCapabilityChecker
 import com.duckduckgo.app.browser.api.WebViewCapabilityChecker.WebViewCapability.DeleteBrowsingData
 import com.duckduckgo.app.browser.cookies.ThirdPartyCookieManager
-import com.duckduckgo.app.browser.sitepreferences.SitePreferencesRepository
 import com.duckduckgo.app.fire.AppCacheClearer
 import com.duckduckgo.app.fire.SiteDataCleaner
 import com.duckduckgo.app.fire.UnsentForgetAllPixelStore
@@ -38,6 +37,7 @@ import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import com.duckduckgo.history.api.NavigationHistory
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.site.permissions.api.SitePermissionsManager
+import com.duckduckgo.site.preferences.api.SitePreferencesDataClearer
 import com.duckduckgo.sync.api.DeviceSyncState
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -70,7 +70,7 @@ class ClearPersonalDataActionTest {
     private val mockTabVisitedSitesRepository: TabVisitedSitesRepository = mock()
     private val mockWebViewCapabilityChecker: WebViewCapabilityChecker = mock()
     private val mockDuckAiHostProvider: DuckAiHostProvider = mock()
-    private val mockSitePreferencesRepository: SitePreferencesRepository = mock()
+    private val mockSitePreferencesDataClearer: SitePreferencesDataClearer = mock()
 
     private val fireproofWebsites: LiveData<List<FireproofWebsiteEntity>> = MutableLiveData()
 
@@ -105,7 +105,7 @@ class ClearPersonalDataActionTest {
         webViewCapabilityChecker = mockWebViewCapabilityChecker,
         duckAiHostProvider = mockDuckAiHostProvider,
         siteDataCleaner = siteDataCleaner,
-        sitePreferencesRepository = mockSitePreferencesRepository,
+        sitePreferencesDataClearer = mockSitePreferencesDataClearer,
     )
 
     @Test
@@ -147,13 +147,13 @@ class ClearPersonalDataActionTest {
     @Test
     fun whenClearTabsAndAllDataThenDesktopPreferencesClearedExceptFireproofed() = runTest {
         testee.clearTabsAndAllDataAsync(appInForeground = false, shouldFireDataClearPixel = false)
-        verify(mockSitePreferencesRepository).clearAllButFireproofed(any())
+        verify(mockSitePreferencesDataClearer).clearAllButFireproofed(any())
     }
 
     @Test
     fun whenClearBrowserDataOnlyThenDesktopPreferencesClearedExceptFireproofed() = runTest {
         testee.clearBrowserDataOnly(shouldFireDataClearPixel = false)
-        verify(mockSitePreferencesRepository).clearAllButFireproofed(any())
+        verify(mockSitePreferencesDataClearer).clearAllButFireproofed(any())
     }
 
     @Test
@@ -412,7 +412,7 @@ class ClearPersonalDataActionTest {
             listOf(FireproofWebsiteEntity("fireproof.com")),
         )
         testee.clearDataForSpecificDomains(domains = setOf("fireproof.com", "clearable.com"))
-        verify(mockSitePreferencesRepository).forgetDesktopMode(setOf("clearable.com"))
+        verify(mockSitePreferencesDataClearer).forgetDesktopMode(setOf("clearable.com"))
     }
 
     @Test

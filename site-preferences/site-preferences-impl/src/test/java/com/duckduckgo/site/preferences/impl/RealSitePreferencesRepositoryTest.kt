@@ -39,6 +39,7 @@ import org.mockito.kotlin.mock
 class RealSitePreferencesRepositoryTest {
 
     @get:Rule @Suppress("unused") val coroutineRule = CoroutineTestRule()
+
     @get:Rule @Suppress("unused") val instantTaskExecutorRule = InstantTaskExecutorRule()
 
     private lateinit var db: SitePreferencesDatabase

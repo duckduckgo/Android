@@ -217,8 +217,6 @@ import com.duckduckgo.app.browser.progressbar.ProgressBarUpgradeFeature
 import com.duckduckgo.app.browser.refreshpixels.RefreshPixelSender
 import com.duckduckgo.app.browser.santize.NonHttpAppLinkChecker
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
-import com.duckduckgo.app.browser.sitepreferences.RememberDesktopModeFeature
-import com.duckduckgo.app.browser.sitepreferences.SitePreferencesRepository
 import com.duckduckgo.app.browser.tabs.TabManager
 import com.duckduckgo.app.browser.uilock.BROWSER_UI_LOCK_FEATURE_NAME
 import com.duckduckgo.app.browser.uilock.BrowserUiLockFeature
@@ -405,6 +403,8 @@ import com.duckduckgo.site.permissions.api.SitePermissionsManager
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.LocationPermissionRequest
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissionQueryResponse
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissions
+import com.duckduckgo.site.preferences.api.DesktopModeSettings
+import com.duckduckgo.site.preferences.impl.RememberDesktopModeFeature
 import com.duckduckgo.subscriptions.api.SUBSCRIPTIONS_FEATURE_NAME
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.subscriptions.api.SubscriptionsJSHelper
@@ -572,7 +572,7 @@ class BrowserTabViewModel @Inject constructor(
     private val onboardingBrandDesignUpdateToggles: OnboardingBrandDesignUpdateToggles,
     private val onboardingStore: OnboardingStore,
     private val autocompleteHistoryDeleteFeature: AutocompleteHistoryDeleteFeature,
-    private val sitePreferencesRepository: SitePreferencesRepository,
+    private val desktopModeSettings: DesktopModeSettings,
     private val rememberDesktopModeFeature: RememberDesktopModeFeature,
 ) : ViewModel(),
     WebViewClientListener,
@@ -1712,14 +1712,14 @@ class BrowserTabViewModel @Inject constructor(
 
     override suspend fun isDesktopSiteEnabled(url: String): Boolean =
         if (rememberDesktopModeFeature.self().isEnabled()) {
-            url.toUri().host?.let { sitePreferencesRepository.isDesktopModeRemembered(it.desktopModeSiteKey()) } ?: false
+            url.toUri().host?.let { desktopModeSettings.isDesktopModeRemembered(it.desktopModeSiteKey()) } ?: false
         } else {
             currentBrowserViewState().isDesktopBrowsingMode
         }
 
     // Synchronous, main-thread variant for pageChanged() (see isDesktopSiteEnabled for the load path).
     private fun isDesktopModeRememberedForUrl(url: String): Boolean =
-        url.toUri().host?.let { sitePreferencesRepository.isDesktopModeRememberedInCache(it.desktopModeSiteKey()) } ?: false
+        url.toUri().host?.let { desktopModeSettings.isDesktopModeRememberedInCache(it.desktopModeSiteKey()) } ?: false
 
     // eTLD+1 when available, otherwise the raw host (IPs, localhost, single-label intranet hosts have no
     // registrable domain). Matches the visited-sites key idiom so desktop mode works for those hosts too.
@@ -3355,9 +3355,9 @@ class BrowserTabViewModel @Inject constructor(
         if (rememberDesktopModeFeature.self().isEnabled()) {
             uri.host?.desktopModeSiteKey()?.let { key ->
                 if (desktopSiteRequested) {
-                    sitePreferencesRepository.rememberDesktopMode(key)
+                    desktopModeSettings.rememberDesktopMode(key)
                 } else {
-                    sitePreferencesRepository.forgetDesktopMode(key)
+                    desktopModeSettings.forgetDesktopMode(key)
                 }
             }
         }

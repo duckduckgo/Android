@@ -20,7 +20,6 @@ import com.duckduckgo.app.bookmarks.db.BookmarkFoldersDao
 import com.duckduckgo.app.bookmarks.db.BookmarksDao
 import com.duckduckgo.app.bookmarks.db.FavoritesDao
 import com.duckduckgo.app.browser.cookies.db.AuthCookiesAllowedDomainsDao
-import com.duckduckgo.app.browser.sitepreferences.SitePreferencesDao
 import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.fire.db.FireModeDatabase
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteDao
@@ -70,9 +69,6 @@ object DaoModule {
 
     @Provides
     fun providesUserAllowList(database: AppDatabase): UserAllowListDao = database.userAllowListDao()
-
-    @Provides
-    fun providesSitePreferencesDao(database: AppDatabase): SitePreferencesDao = database.sitePreferencesDao()
 
     @Provides
     fun providesNetworkLeaderboardDao(database: AppDatabase): NetworkLeaderboardDao = database.networkLeaderboardDao()
