@@ -167,7 +167,7 @@ class CtaViewModel @Inject constructor(
                     pixel.fire(it, cta.pixelShownParameters())
                 }
             }
-            if (cta is OnboardingDaxDialogCta.DaxDuckAiFireButtonCta) {
+            if (cta is OnboardingDaxDialogCta.DaxDuckAiFireButtonCta || cta is DaxDuckAiFireButtonBrandDesignUpdateContextualCta) {
                 duckAiOnboardingExperimentMetrics.fireFireDialogImpression()
             }
             if (cta is DaxCta && cta.markAsReadOnShow) {
@@ -502,6 +502,14 @@ class CtaViewModel @Inject constructor(
             if (duckChat.isDuckChatUrl(it.url.toUri())) {
                 if (onboardingStore.isDuckAiOnboardingFlow() && !suppressDuckAiOnboardingCta) {
                     if (!duckAiFireButtonShown()) {
+                        if (isBrandDesignUpdateEnabled()) {
+                            return DaxDuckAiFireButtonBrandDesignUpdateContextualCta(
+                                onboardingStore = onboardingStore,
+                                appInstallStore = appInstallStore,
+                                isLightTheme = appTheme.isLightModeEnabled(),
+                                deviceInfo = deviceInfo,
+                            )
+                        }
                         return OnboardingDaxDialogCta.DaxDuckAiFireButtonCta(onboardingStore, appInstallStore)
                     }
                 }
