@@ -828,6 +828,11 @@ class DuckChatContextualViewModel @Inject constructor(
         duckChatPixels.reportContextualSheetNewChat()
     }
 
+    fun onNewChatRequestedFromPopup() {
+        renderNewChatState()
+        duckChatPixels.reportContextualSheetNewChatFromPopup()
+    }
+
     fun onChatsIconClicked() {
         val state = _viewState.value
         logcat {

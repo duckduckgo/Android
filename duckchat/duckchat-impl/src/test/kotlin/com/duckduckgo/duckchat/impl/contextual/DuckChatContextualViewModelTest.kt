@@ -1212,6 +1212,23 @@ class DuckChatContextualViewModelTest {
     }
 
     @Test
+    fun `onNewChatRequestedFromPopup emits new chat subscription and reports popup pixel`() = runTest {
+        testee.subscriptionEventDataFlow.test {
+            testee.onSheetOpened("tab-1")
+            testee.onNewChatRequestedFromPopup()
+
+            val event = awaitItem()
+            assertEquals("submitNewChatAction", event.subscriptionName)
+            assertEquals(RealDuckChatJSHelper.DUCK_CHAT_FEATURE_NAME, event.featureName)
+
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        verify(duckChatPixels).reportContextualSheetNewChatFromPopup()
+        verify(duckChatPixels, never()).reportContextualSheetNewChat()
+    }
+
+    @Test
     fun `onChatPageLoaded in Input Mode doesn't store url`() = runTest {
         val tabId = "tab-1"
         val url = "https://duck.ai/chat?chatID=123"

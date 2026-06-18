@@ -752,7 +752,7 @@ class DuckChatContextualFragment :
         newChatRow.visibility = if (showNewChatHeader) View.VISIBLE else View.GONE
         headerDivider.visibility = if (showNewChatHeader) View.VISIBLE else View.GONE
         if (showNewChatHeader) {
-            popup.onMenuItemClicked(newChatRow) { viewModel.onNewChatRequested() }
+            popup.onMenuItemClicked(newChatRow) { viewModel.onNewChatRequestedFromPopup() }
         }
 
         val recentContainer = content.findViewById<LinearLayout>(R.id.contextualChatsPopupRecentContainer)

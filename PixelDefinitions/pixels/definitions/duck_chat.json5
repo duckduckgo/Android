@@ -99,6 +99,20 @@
         "suffixes": ["form_factor"],
         "parameters": ["appVersion"]
     },
+    "m_aichat_contextual_new_chat_menu_tapped_count": {
+        "description": "User started a new chat from the recent chats popup menu in the contextual sheet",
+        "owners": ["karlenDimla"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_contextual_new_chat_menu_tapped_daily": {
+        "description": "(Daily Pixel) User started a new chat from the recent chats popup menu in the contextual sheet",
+        "owners": ["karlenDimla"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
     "m_aichat_contextual_quick_action_summarize_selected_count": {
         "description": "User used the summarize prompt presented in the Contextual sheet",
         "owners": ["malmstein"],
@@ -1100,14 +1114,14 @@
         "suffixes": ["form_factor"],
         "parameters": ["appVersion"]
     },
-    "m_aichat_contextual_chats_menu_tapped_count": {
+    "m_aichat_contextual_chats_button_tapped_count": {
         "description": "User tapped the chats menu icon in the Contextual sheet, regardless of whether the recent chats popup or chat history opened",
         "owners": ["karlenDimla"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
         "parameters": ["appVersion"]
     },
-    "m_aichat_contextual_chats_menu_tapped_daily": {
+    "m_aichat_contextual_chats_button_tapped_daily": {
         "description": "(Daily Pixel) User tapped the chats menu icon in the Contextual sheet, regardless of whether the recent chats popup or chat history opened",
         "owners": ["karlenDimla"],
         "triggers": ["other"],
