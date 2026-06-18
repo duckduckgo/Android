@@ -515,7 +515,7 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
 
     private fun processCommand(command: Command) {
         when (command) {
-            is BackToSettings, BackToSettingsActivateSuccess -> backToSettings()
+            is BackToSettings, BackToSettingsActivateSuccess -> finishToSettings()
             is SendJsEvent -> sendJsEvent(command.event)
             is SendResponseToJs -> sendResponseToJs(command.data)
             is SubscriptionSelected -> selectSubscription(command.id, command.offerId, command.experimentName, command.experimentCohort)
@@ -614,7 +614,7 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
             .addEventListener(
                 object : TextAlertDialogBuilder.EventListener() {
                     override fun onPositiveButtonClicked() {
-                        finish()
+                        finishToSettings()
                     }
                 },
             )
@@ -632,7 +632,7 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
                         if (subscriptionEventData != null) {
                             subscriptionJsMessaging.sendSubscriptionEvent(subscriptionEventData)
                         } else {
-                            finish()
+                            finishToSettings()
                         }
                     }
                 },
@@ -682,16 +682,20 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
         subscriptionJsMessaging.onResponse(data)
     }
 
-    private fun backToSettings() {
+    private fun finishToSettings() {
         if (params.url == subscriptionsUrlProvider.activateUrl) {
             setResult(RESULT_OK)
         } else {
-            // Completion path (purchase success / restore): Settings is a forward destination reached
-            // only on completion, so we open it explicitly here.
             globalActivityStarter.start(this, SettingsScreenNoParams)
         }
         finish()
     }
+
+    private fun hasCompletedPurchaseFlow(): Boolean =
+        when (viewModel.currentPurchaseViewState.value.purchaseState) {
+            is PurchaseStateView.Success, PurchaseStateView.Waiting, PurchaseStateView.Recovered -> true
+            else -> false
+        }
 
     private val startForResultRestore = registerForActivityResult(StartActivityForResult()) { result: ActivityResult ->
         if (result.resultCode == RESULT_OK) {
@@ -729,6 +733,8 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
     override fun onBackPressed() {
         if (canGoBack()) {
             binding.webview.goBack()
+        } else if (hasCompletedPurchaseFlow()) {
+            finishToSettings()
         } else {
             super.onBackPressed()
         }
