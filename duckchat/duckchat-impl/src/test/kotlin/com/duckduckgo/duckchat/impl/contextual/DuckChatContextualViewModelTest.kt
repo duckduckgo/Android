@@ -1993,6 +1993,9 @@ class DuckChatContextualViewModelTest {
             assertTrue(awaitItem() is DuckChatContextualViewModel.Command.LaunchChatHistory)
             cancelAndIgnoreRemainingEvents()
         }
+
+        verify(duckChatPixels).reportContextualChatsMenuTapped()
+        verify(duckChatPixels, never()).reportContextualViewAllChatsTapped()
     }
 
     @Test
@@ -2012,6 +2015,8 @@ class DuckChatContextualViewModelTest {
             assertEquals("c1", command.recentChats[0].chatId)
             cancelAndIgnoreRemainingEvents()
         }
+
+        verify(duckChatPixels).reportContextualChatsMenuTapped()
     }
 
     @Test

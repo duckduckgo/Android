@@ -1100,6 +1100,20 @@
         "suffixes": ["form_factor"],
         "parameters": ["appVersion"]
     },
+    "m_aichat_contextual_chats_menu_tapped_count": {
+        "description": "User tapped the chats menu icon in the Contextual sheet, regardless of whether the recent chats popup or chat history opened",
+        "owners": ["karlenDimla"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_contextual_chats_menu_tapped_daily": {
+        "description": "(Daily Pixel) User tapped the chats menu icon in the Contextual sheet, regardless of whether the recent chats popup or chat history opened",
+        "owners": ["karlenDimla"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
     "m_aichat_contextual_recent_chats_popup_displayed_count": {
         "description": "Recent chats popup menu was displayed from the chats icon in the Contextual sheet",
         "owners": ["karlenDimla"],

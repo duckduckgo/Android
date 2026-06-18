@@ -838,8 +838,11 @@ class DuckChatContextualViewModel @Inject constructor(
             onNewChatRequested()
             return
         }
+        duckChatPixels.reportContextualChatsMenuTapped()
         if (state.recentChats.isEmpty()) {
-            onViewAllChatsClicked()
+            // No recent chats means there's no popup to show, so go straight to chat history.
+            // Don't report a "View All" tap here — that pixel tracks taps from within the popup menu.
+            commandChannel.trySend(Command.LaunchChatHistory)
         } else {
             duckChatPixels.reportContextualRecentChatsPopupDisplayed()
             commandChannel.trySend(
