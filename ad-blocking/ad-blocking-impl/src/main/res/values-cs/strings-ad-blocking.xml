@@ -19,8 +19,8 @@
 <resources>
     <string name="ad_blocking_settings_title">Blokování reklam na YouTube</string>
     <string name="ad_blocking_settings_toggle_title">Blokovat reklamy na YouTube</string>
-    <string name="ad_blocking_settings_description_with_consent">DuckDuckGo odstraňuje při sledování videí na YouTube reklamy, takže se můžeš dívat bez přerušení.\n\nKdyž je tato funkce zapnutá, DuckDuckGo anonymně detekuje rušení blokováním reklam nebo chyby YouTube a vylepšuje zážitek pro všechny. DuckDuckGo nikdy nevidí, která videa si prohlížíš ani žádné osobní údaje. <annotation type="learn_more_link">Další informace</annotation></string>
-    <string name="ad_blocking_settings_description">DuckDuckGo odstraňuje při sledování videí na YouTube reklamy, takže se můžeš dívat bez přerušení. <annotation type="learn_more_link">Další informace</annotation></string>
+    <string name="ad_blocking_settings_description_with_consent">DuckDuckGo blokuje při sledování videí na YouTube reklamy, takže se můžeš dívat bez přerušení.\n\nKdyž je toto zapnuté, DuckDuckGo anonymně detekuje rušení blokováním reklam nebo chyby YouTube a vylepšuje zážitek pro všechny. DuckDuckGo nikdy nevidí, která videa si prohlížíš ani žádné osobní údaje. <annotation type="learn_more_link">Více informací</annotation></string>
+    <string name="ad_blocking_settings_description">DuckDuckGo blokuje při sledování videí na YouTube reklamy, takže se můžeš dívat bez přerušení. <annotation type="learn_more_link">Více informací</annotation></string>
     <string name="ad_blocking_settings_duck_player_header">Duck Player</string>
-    <string name="ad_blocking_settings_duck_player_description">Otevírá videa v režimu kina, který brání tomu, aby sledovaná videa ovlivňovala tvůj feed na YouTube.</string>
+    <string name="ad_blocking_settings_duck_player_description">Otevírat videa v režimu kina, který brání tomu, aby sledovaná videa ovlivňovala tvůj feed na YouTube.</string>
 </resources>

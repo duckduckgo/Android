@@ -19,8 +19,8 @@
 <resources>
     <string name="ad_blocking_settings_title">YouTube reklāmu bloķēšana</string>
     <string name="ad_blocking_settings_toggle_title">Bloķēt reklāmas pakalpojumā YouTube</string>
-    <string name="ad_blocking_settings_description_with_consent">DuckDuckGo noņem videoreklāmas pakalpojumā YouTube, lai tu varētu skatīties videoklipus bez pārtraukumiem.\n\nKad šī funkcija ir ieslēgta, DuckDuckGo anonīmi nosaka reklāmu bloķēšanas traucējumus vai YouTube kļūdas, lai uzlabotu tavu pieredzi. DuckDuckGo nekad neredz, kādus videoklipus skaties, vai jebkādu personu identificējamu informāciju. <annotation type="learn_more_link">Uzzināt vairāk</annotation></string>
-    <string name="ad_blocking_settings_description">DuckDuckGo noņem videoreklāmas pakalpojumā YouTube, lai tu varētu skatīties videoklipus bez pārtraukumiem. <annotation type="learn_more_link">Uzzināt vairāk</annotation></string>
+    <string name="ad_blocking_settings_description_with_consent">DuckDuckGo bloķē videoreklāmas pakalpojumā YouTube, lai tu varētu skatīties videoklipus bez pārtraukumiem.\n\nKad DuckDuckGo ir ieslēgts, tas anonīmi noteiks reklāmu bloķēšanas traucējumus vai YouTube kļūdas, lai uzlabotu pieredzi visiem. DuckDuckGo nekad neredz, kādus videoklipus skaties, vai jebkādu personiski identificējamu informāciju. <annotation type="learn_more_link">Uzzināt vairāk</annotation></string>
+    <string name="ad_blocking_settings_description">DuckDuckGo bloķē videoreklāmas pakalpojumā YouTube, lai tu varētu skatīties videoklipus bez pārtraukumiem. <annotation type="learn_more_link">Uzzināt vairāk</annotation></string>
     <string name="ad_blocking_settings_duck_player_header">Duck Player</string>
-    <string name="ad_blocking_settings_duck_player_description">Atver videoklipus teātra režīmā bez uzmanības novēršanas, kas neļauj skatītajam ietekmēt tavu YouTube plūsmu.</string>
+    <string name="ad_blocking_settings_duck_player_description">Atver videoklipus kino režīmā, kas neļauj tam, ko tu skaties, ietekmēt tavu YouTube plūsmu.</string>
 </resources>
