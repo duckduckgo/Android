@@ -24,4 +24,5 @@ enum class EdgeToEdgeBucket {
     SETTINGS,
     AUTOFILL,
     SYNC,
+    VPN,
 }

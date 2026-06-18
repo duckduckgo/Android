@@ -41,4 +41,7 @@ interface EdgeToEdgeFeature {
 
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun sync(): Toggle
+
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun vpn(): Toggle
 }

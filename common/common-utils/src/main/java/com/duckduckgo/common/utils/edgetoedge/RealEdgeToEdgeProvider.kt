@@ -48,6 +48,7 @@ class RealEdgeToEdgeProvider @Inject constructor(
                 edgeToEdgeFeature.settings().isEnabled()
                 edgeToEdgeFeature.autofill().isEnabled()
                 edgeToEdgeFeature.sync().isEnabled()
+                edgeToEdgeFeature.vpn().isEnabled()
             }
         }
     }
@@ -58,6 +59,7 @@ class RealEdgeToEdgeProvider @Inject constructor(
             EdgeToEdgeBucket.SETTINGS -> edgeToEdgeFeature.settings()
             EdgeToEdgeBucket.AUTOFILL -> edgeToEdgeFeature.autofill()
             EdgeToEdgeBucket.SYNC -> edgeToEdgeFeature.sync()
+            EdgeToEdgeBucket.VPN -> edgeToEdgeFeature.vpn()
         }
         bucketToggle.isEnabled()
     } else {
