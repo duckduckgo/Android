@@ -1112,7 +1112,7 @@ class BrowserTabViewModelTest {
 
             testee.onViewVisible()
 
-            assertCommandIssued<HideKeyboard>()
+            assertCommandIssued<Command.DropAddressBarFocus>()
         }
 
     @Test
