@@ -1710,15 +1710,16 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
-    override fun isDesktopSiteEnabled(url: String): Boolean =
+    override suspend fun isDesktopSiteEnabled(url: String): Boolean =
         if (rememberDesktopModeFeature.self().isEnabled()) {
-            isDesktopModeRememberedForUrl(url)
+            url.toUri().host?.let { sitePreferencesRepository.isDesktopModeRemembered(it.desktopModeSiteKey()) } ?: false
         } else {
             currentBrowserViewState().isDesktopBrowsingMode
         }
 
+    // Synchronous, main-thread variant for pageChanged() (see isDesktopSiteEnabled for the load path).
     private fun isDesktopModeRememberedForUrl(url: String): Boolean =
-        url.toUri().host?.let { sitePreferencesRepository.isDesktopModeRemembered(it.desktopModeSiteKey()) } ?: false
+        url.toUri().host?.let { sitePreferencesRepository.isDesktopModeRememberedInCache(it.desktopModeSiteKey()) } ?: false
 
     // eTLD+1 when available, otherwise the raw host (IPs, localhost, single-label intranet hosts have no
     // registrable domain). Matches the visited-sites key idiom so desktop mode works for those hosts too.
@@ -2091,9 +2092,6 @@ class BrowserTabViewModel @Inject constructor(
 
         hasCtaBeenShownForCurrentPage.set(false)
 
-        // Resolve desktop mode per-domain BEFORE buildSiteFactory(), which synchronously stamps
-        // site.isDesktopMode from isDesktopBrowsingMode. This both applies a remembered preference and
-        // resets desktop mode when navigating to a non-remembered site (stops cross-site inheritance).
         if (rememberDesktopModeFeature.self().isEnabled()) {
             browserViewState.value = currentBrowserViewState().copy(
                 isDesktopBrowsingMode = isDesktopModeRememberedForUrl(url),
@@ -3354,10 +3352,6 @@ class BrowserTabViewModel @Inject constructor(
 
         val uri = site?.uri ?: return
 
-        // Persist the choice per-site. uri.host is the pre-rewrite host (e.g. m.example.com), whose eTLD+1
-        // (example.com) matches the key the desktop-rewritten URL produces; hosts without a registrable
-        // domain (IPs, localhost) fall back to the raw host. The optimistic cache update means the reload
-        // triggered below already sees the new value.
         if (rememberDesktopModeFeature.self().isEnabled()) {
             uri.host?.desktopModeSiteKey()?.let { key ->
                 if (desktopSiteRequested) {
@@ -3377,8 +3371,7 @@ class BrowserTabViewModel @Inject constructor(
         )
 
         // Re-load via Navigate (loadUrl) rather than Refresh (reload) so the WebView performs a fresh
-        // layout and re-applies overview mode (loadWithOverviewMode + useWideViewPort). reload() keeps the
-        // previous zoom scale, which would leave the wider desktop layout rendered at the old mobile scale.
+        // layout and re-applies overview mode
         val targetUrl = if (desktopSiteRequested && uri.isMobileSite) {
             uri.toDesktopUri().toString()
         } else {

@@ -40,6 +40,9 @@ interface SitePreferencesDao {
     @Query("SELECT domain FROM site_preferences WHERE desktopModeEnabled = 1")
     fun desktopModeDomainsFlow(): Flow<List<String>>
 
+    @Query("SELECT EXISTS(SELECT 1 FROM site_preferences WHERE domain = :domain AND desktopModeEnabled = 1)")
+    fun isDesktopModeEnabled(domain: String): Boolean
+
     @Query("DELETE FROM site_preferences")
     fun deleteAll()
 }

@@ -422,7 +422,7 @@ class WebViewRequestInterceptor(
             val desktopSiteEnabled = webViewClientListener?.isDesktopSiteEnabled(url.toString()) == true
             val currentAgent = withContext(dispatchers.main()) { webView.settings.userAgentString }
             val newAgent = userAgentProvider.userAgent(url.toString(), desktopSiteEnabled)
-            return if (currentAgent != newAgent) {
+            if (currentAgent != newAgent) {
                 newAgent
             } else {
                 null

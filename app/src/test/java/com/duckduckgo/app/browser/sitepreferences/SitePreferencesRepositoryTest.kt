@@ -79,9 +79,31 @@ class SitePreferencesRepositoryTest {
     }
 
     @Test
-    fun whenCachePrimedFromDbThenIsRememberedReflectsExistingRows() {
+    fun whenCachePrimedFromDbThenInCacheReflectsExistingRows() {
         dao.insert(SitePreferencesEntity(domain = "seeded.com", desktopModeEnabled = true))
-        assertTrue(repository.isDesktopModeRemembered("seeded.com"))
+        assertTrue(repository.isDesktopModeRememberedInCache("seeded.com"))
+    }
+
+    @Test
+    fun whenCacheNotYetPrimedThenIsDesktopModeRememberedStillResolvesValueFromDb() = runTest {
+        // Reproduces the race: a navigation reaches the interceptor before the startup priming
+        // collector has populated the in-memory cache. Build a repository WITHOUT calling onCreate(),
+        // so the cache is empty, and seed the DB directly.
+        val unprimed = RealSitePreferencesRepository(dao, TestScope(), coroutineRule.testDispatcherProvider, isMainProcess = true)
+        dao.insert(SitePreferencesEntity(domain = "seeded.com", desktopModeEnabled = true))
+
+        // The synchronous in-memory snapshot misses because the cache is still empty.
+        assertFalse(unprimed.isDesktopModeRememberedInCache("seeded.com"))
+        // The canonical read must NOT miss: it falls back to the DB so the first load is correct.
+        assertTrue(unprimed.isDesktopModeRemembered("seeded.com"))
+    }
+
+    @Test
+    fun whenCachePrimedThenIsDesktopModeRememberedReflectsCache() = runTest {
+        repository.rememberDesktopMode("example.com")
+
+        assertTrue(repository.isDesktopModeRemembered("example.com"))
+        assertFalse(repository.isDesktopModeRemembered("not-remembered.com"))
     }
 
     @Test

@@ -2744,8 +2744,8 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenNavigatingToNonRememberedSiteThenDesktopModeResetAndNotInheritedFromPreviousSite() {
-        whenever(mockSitePreferencesRepository.isDesktopModeRemembered("a.com")).thenReturn(true)
-        whenever(mockSitePreferencesRepository.isDesktopModeRemembered("b.com")).thenReturn(false)
+        whenever(mockSitePreferencesRepository.isDesktopModeRememberedInCache("a.com")).thenReturn(true)
+        whenever(mockSitePreferencesRepository.isDesktopModeRememberedInCache("b.com")).thenReturn(false)
 
         loadUrl("http://a.com")
         assertTrue(browserViewState().isDesktopBrowsingMode)
@@ -2754,6 +2754,15 @@ class BrowserTabViewModelTest {
         loadUrl("http://b.com")
         assertFalse(browserViewState().isDesktopBrowsingMode)
         assertFalse(testee.siteLiveData.value?.isDesktopMode == true)
+    }
+
+    @Test
+    fun whenRememberDesktopModeEnabledThenIsDesktopSiteEnabledUsesPrimingAwareRead() = runTest {
+        // The interceptor-facing read must use the canonical, priming-aware lookup so the first load of
+        // a remembered site picks desktop mode even before the in-memory cache has been primed.
+        whenever(mockSitePreferencesRepository.isDesktopModeRemembered("example.com")).thenReturn(true)
+
+        assertTrue(testee.isDesktopSiteEnabled("http://example.com/some/path"))
     }
 
     @Test
