@@ -12,12 +12,6 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
-# TEMP (ac-step-2 smoke test): gates the Develocity Artifact Cache store step off so the
-# smoke test doesn't pollute the cache. After validation, restore each store step to
-# `if: always()` and remove this env block.
-env:
-  AC_STORE_ENABLED: 'false'
-
 jobs:
   check_changes:
     name: Check Changed Files
@@ -78,28 +72,10 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v5
         with:
-          cache-disabled: true # Develocity Artifact Cache supersedes setup-gradle's Gradle Home caching
           cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
 
-      - name: Restore Develocity Artifact Cache
-        uses: ./.github/actions/develocity-artifact-cache
-        with:
-          command: restore
-          image-name: android-code-formatting
-          develocity-access-key: ${{ secrets.DEVELOCITY_ACCESS_KEY }}
-          repo-password: ${{ secrets.DAXMOBILE_ANDROID_CACHE_TOOLS }}
-
       - name: Run Code Formatting Checks
-        run: ./gradlew spotlessCheck -Dscan.tag.ac-step-2 # TEMP (ac-step-2 smoke test): remove tag after validation
-
-      - name: Store Develocity Artifact Cache
-        if: ${{ always() && env.AC_STORE_ENABLED == 'true' }} # TEMP (ac-step-2 smoke test): gated off; restore to `if: always()` after validation.
-        uses: ./.github/actions/develocity-artifact-cache
-        with:
-          command: store
-          image-name: android-code-formatting
-          develocity-access-key: ${{ secrets.DEVELOCITY_ACCESS_KEY }}
-          repo-password: ${{ secrets.DAXMOBILE_ANDROID_CACHE_TOOLS }}
+        run: ./gradlew spotlessCheck
 
   unit_tests:
     name: ${{ matrix.di == 'AnvilDagger' && 'Unit tests' || format('Unit tests ({0})', matrix.di) }}
@@ -127,28 +103,10 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v5
         with:
-          cache-disabled: true # Develocity Artifact Cache supersedes setup-gradle's Gradle Home caching
           cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
 
-      - name: Restore Develocity Artifact Cache
-        uses: ./.github/actions/develocity-artifact-cache
-        with:
-          command: restore
-          image-name: android-unit-tests-${{ matrix.di }}
-          develocity-access-key: ${{ secrets.DEVELOCITY_ACCESS_KEY }}
-          repo-password: ${{ secrets.DAXMOBILE_ANDROID_CACHE_TOOLS }}
-
       - name: JVM tests
-        run: ./gradlew jvm_tests -Pddg.di=${{ matrix.di }} ${{ github.event_name != 'pull_request' && '-Dpts.enabled=false' || '' }} -Dscan.tag.ac-step-2 # TEMP (ac-step-2 smoke test): remove tag after validation
-
-      - name: Store Develocity Artifact Cache
-        if: ${{ always() && env.AC_STORE_ENABLED == 'true' }} # TEMP (ac-step-2 smoke test): gated off; restore to `if: always()` after validation.
-        uses: ./.github/actions/develocity-artifact-cache
-        with:
-          command: store
-          image-name: android-unit-tests-${{ matrix.di }}
-          develocity-access-key: ${{ secrets.DEVELOCITY_ACCESS_KEY }}
-          repo-password: ${{ secrets.DAXMOBILE_ANDROID_CACHE_TOOLS }}
+        run: ./gradlew jvm_tests -Pddg.di=${{ matrix.di }} ${{ github.event_name != 'pull_request' && '-Dpts.enabled=false' || '' }}
 
       - name: Bundle the JVM checks report
         if: always()
@@ -189,28 +147,10 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v5
         with:
-          cache-disabled: true # Develocity Artifact Cache supersedes setup-gradle's Gradle Home caching
           cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
 
-      - name: Restore Develocity Artifact Cache
-        uses: ./.github/actions/develocity-artifact-cache
-        with:
-          command: restore
-          image-name: android-lint
-          develocity-access-key: ${{ secrets.DEVELOCITY_ACCESS_KEY }}
-          repo-password: ${{ secrets.DAXMOBILE_ANDROID_CACHE_TOOLS }}
-
       - name: Lint
-        run: ./gradlew lint -Dscan.tag.ac-step-2 # TEMP (ac-step-2 smoke test): remove tag after validation
-
-      - name: Store Develocity Artifact Cache
-        if: ${{ always() && env.AC_STORE_ENABLED == 'true' }} # TEMP (ac-step-2 smoke test): gated off; restore to `if: always()` after validation.
-        uses: ./.github/actions/develocity-artifact-cache
-        with:
-          command: store
-          image-name: android-lint
-          develocity-access-key: ${{ secrets.DEVELOCITY_ACCESS_KEY }}
-          repo-password: ${{ secrets.DAXMOBILE_ANDROID_CACHE_TOOLS }}
+        run: ./gradlew lint
 
       - name: Bundle the lint report
         if: always()
@@ -261,28 +201,10 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v5
         with:
-          cache-disabled: true # Develocity Artifact Cache supersedes setup-gradle's Gradle Home caching
           cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
 
-      - name: Restore Develocity Artifact Cache
-        uses: ./.github/actions/develocity-artifact-cache
-        with:
-          command: restore
-          image-name: android-instrumented-tests
-          develocity-access-key: ${{ secrets.DEVELOCITY_ACCESS_KEY }}
-          repo-password: ${{ secrets.DAXMOBILE_ANDROID_CACHE_TOOLS }}
-
       - name: Build
-        run: ./gradlew androidTestsBuild -Dscan.tag.ac-step-2 # TEMP (ac-step-2 smoke test): remove tag after validation
-
-      - name: Store Develocity Artifact Cache
-        if: ${{ always() && env.AC_STORE_ENABLED == 'true' }} # TEMP (ac-step-2 smoke test): gated off; restore to `if: always()` after validation.
-        uses: ./.github/actions/develocity-artifact-cache
-        with:
-          command: store
-          image-name: android-instrumented-tests
-          develocity-access-key: ${{ secrets.DEVELOCITY_ACCESS_KEY }}
-          repo-password: ${{ secrets.DAXMOBILE_ANDROID_CACHE_TOOLS }}
+        run: ./gradlew androidTestsBuild
 
       - name: Find test APK path
         id: find-apk
