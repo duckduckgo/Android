@@ -37,7 +37,11 @@ data class DaxDuckAiEndBrandDesignUpdateBubbleCta(
 ) : DaxBubbleCta.BrandDesignUpdateBubbleCta(
     ctaId = CtaId.DAX_DUCK_AI_END,
     title = R.string.onboardingDuckAiEndCtaTitle,
-    description = R.string.onboardingDuckAiEndCtaDescription,
+    description = if (onboardingStore.isCustomAiOnboardingFlow()) {
+        R.string.onboardingEndCustomAiFlowDaxDialogDescription
+    } else {
+        R.string.onboardingDuckAiEndCtaDescription
+    },
     backgroundRes = CommonR.drawable.bg_onboarding_end,
     shownPixel = AppPixelName.ONBOARDING_DAX_CTA_SHOWN,
     okPixel = AppPixelName.ONBOARDING_DAX_CTA_OK_BUTTON,
