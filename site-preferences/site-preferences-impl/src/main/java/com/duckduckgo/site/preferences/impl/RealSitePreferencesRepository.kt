@@ -65,7 +65,6 @@ class RealSitePreferencesRepository @Inject constructor(
 
     override suspend fun isDesktopModeRemembered(domain: String): Boolean {
         if (cachePrimed) return desktopModeDomains.contains(domain)
-        if (desktopModeDomains.contains(domain)) return true
         return withContext(dispatcherProvider.io()) { sitePreferencesDao.isDesktopModeEnabled(domain) }
     }
 
