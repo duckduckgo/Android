@@ -114,13 +114,13 @@ sealed interface DispatchOutcome {
      * SM reached Joiner.Confirming. Caller must prompt the user ("Sync your data with [peerName]?")
      * then call [SyncCodeDispatcher.confirmJoiner] or [SyncCodeDispatcher.denyJoiner] to resume.
      */
-    data class JoinerConfirmationRequested(val peerName: String?) : DispatchOutcome
+    data class JoinerConfirmationRequested(val peerName: String?, val peerKind: PeerKind? = null) : DispatchOutcome
 
     /**
      * SM reached Host.Confirming. Caller must prompt the user ("Allow [peerName] to join your
      * sync & backup?") then call [SyncCodeDispatcher.confirmHost] or [SyncCodeDispatcher.denyHost].
      */
-    data class HostConfirmationRequested(val peerName: String?) : DispatchOutcome
+    data class HostConfirmationRequested(val peerName: String?, val peerKind: PeerKind? = null) : DispatchOutcome
 
     /**
      * Emitted once per [SyncCodeDispatcher.presentV2] session, before any confirmation or
