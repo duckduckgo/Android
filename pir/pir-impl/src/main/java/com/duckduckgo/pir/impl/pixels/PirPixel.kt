@@ -181,6 +181,26 @@ enum class PirPixel(
         type = Count,
     ),
 
+    PIR_INTERACTION_DAU(
+        baseName = "m_dbp_interaction_dau",
+        type = Count,
+    ),
+
+    PIR_INTERACTION_WAU(
+        baseName = "m_dbp_interaction_wau",
+        type = Count,
+    ),
+
+    PIR_INTERACTION_MAU(
+        baseName = "m_dbp_interaction_mau",
+        type = Count,
+    ),
+
+    PIR_FIRST_SCAN_STARTED(
+        baseName = "m_dbp_first_scan",
+        type = Unique(),
+    ),
+
     PIR_WEEKLY_CHILD_ORPHANED_OPTOUTS(
         baseName = "m_dbp_weekly_child-broker_orphaned-optouts",
         type = Count,
