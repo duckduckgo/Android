@@ -103,10 +103,10 @@ class EnterCodeViewModel @Inject constructor(
         data object SwitchAccountSuccess : Command()
 
         /** v2 §"Exchange Confirmations": prompt user "Sync your data with [peerName]?". */
-        data class AskJoinerConfirmation(val peerName: String?) : Command()
+        data class AskJoinerConfirmation(val peerName: String?, val peerKind: PeerKind? = null) : Command()
 
         /** v2 §"Exchange Confirmations": prompt user "Allow [peerName] to join your sync?". */
-        data class AskHostConfirmation(val peerName: String?) : Command()
+        data class AskHostConfirmation(val peerName: String?, val peerKind: PeerKind? = null) : Command()
 
         data object FinishWithError : Command()
         internal data class ShowV2Error(val content: V2PairingErrorContent) : Command()
@@ -172,9 +172,9 @@ class EnterCodeViewModel @Inject constructor(
                 command.send(Command.ShowV2Error(outcome.code.toV2PairingError()))
             }
             is DispatchOutcome.JoinerConfirmationRequested ->
-                command.send(Command.AskJoinerConfirmation(outcome.peerName))
+                command.send(Command.AskJoinerConfirmation(outcome.peerName, outcome.peerKind))
             is DispatchOutcome.HostConfirmationRequested ->
-                command.send(Command.AskHostConfirmation(outcome.peerName))
+                command.send(Command.AskHostConfirmation(outcome.peerName, outcome.peerKind))
             is DispatchOutcome.LinkingCodeReady -> {} // No-op; used only by presentV2() flow
         }
     }

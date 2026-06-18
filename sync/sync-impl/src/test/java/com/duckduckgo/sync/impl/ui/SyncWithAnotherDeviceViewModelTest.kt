@@ -65,6 +65,7 @@ import com.duckduckgo.sync.impl.exchange.v2.PairingRole
 import com.duckduckgo.sync.impl.pixels.SyncPixels
 import com.duckduckgo.sync.impl.pixels.SyncPixels.CancellationReason
 import com.duckduckgo.sync.impl.pixels.SyncPixels.CodeVersion
+import com.duckduckgo.sync.impl.pixels.SyncPixels.PeerKind
 import com.duckduckgo.sync.impl.pixels.SyncPixels.ScreenType.SYNC_EXCHANGE
 import com.duckduckgo.sync.impl.ui.SyncWithAnotherActivityViewModel.Command
 import com.duckduckgo.sync.impl.ui.SyncWithAnotherActivityViewModel.Command.AskHostConfirmation
@@ -567,6 +568,7 @@ class SyncWithAnotherDeviceViewModelTest {
         enableV2(displayOn = true)
         whenever(syncRepository.getAccountInfo()).thenReturn(accountA)
         whenever(runner.peerName).thenReturn("Peer Phone")
+        whenever(runner.peerKind).thenReturn("3party")
         whenever(qrEncoder.encodeAsBitmap(any(), any(), any())).thenReturn(TestSyncFixtures.qrBitmap())
 
         testee.viewState().test {
@@ -583,6 +585,7 @@ class SyncWithAnotherDeviceViewModelTest {
             val command = awaitItem()
             assertTrue("expected AskHostConfirmation, got $command", command is AskHostConfirmation)
             Assert.assertEquals("Peer Phone", (command as AskHostConfirmation).peerName)
+            Assert.assertEquals(PeerKind.THIRD_PARTY, (command as AskHostConfirmation).peerKind)
             cancelAndIgnoreRemainingEvents()
         }
     }

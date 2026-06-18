@@ -51,6 +51,7 @@ import com.duckduckgo.sync.impl.onSuccess
 import com.duckduckgo.sync.impl.pixels.SyncPixels
 import com.duckduckgo.sync.impl.pixels.SyncPixels.CancellationReason
 import com.duckduckgo.sync.impl.pixels.SyncPixels.CodeVersion
+import com.duckduckgo.sync.impl.pixels.SyncPixels.PeerKind
 import com.duckduckgo.sync.impl.pixels.SyncPixels.ScreenType.SYNC_CONNECT
 import com.duckduckgo.sync.impl.pixels.fireSetupCancelledIfDenied
 import com.duckduckgo.sync.impl.pixels.fireSetupFailed
@@ -147,8 +148,8 @@ class SyncConnectViewModel @Inject constructor(
         syncPixels.fireSetupCancelledIfDenied(outcome, SYNC_CONNECT)
         when (outcome) {
             is DispatchOutcome.LinkingCodeReady -> renderV2QrCode(outcome.linkingCode)
-            is DispatchOutcome.HostConfirmationRequested -> command.send(Command.AskHostConfirmation(outcome.peerName))
-            is DispatchOutcome.JoinerConfirmationRequested -> command.send(Command.AskJoinerConfirmation(outcome.peerName))
+            is DispatchOutcome.HostConfirmationRequested -> command.send(Command.AskHostConfirmation(outcome.peerName, outcome.peerKind))
+            is DispatchOutcome.JoinerConfirmationRequested -> command.send(Command.AskJoinerConfirmation(outcome.peerName, outcome.peerKind))
             is DispatchOutcome.LoggedIn -> {
                 syncPixels.fireLoginPixel()
                 syncPixels.fireSyncSetupFinishedSuccessfully(SYNC_CONNECT, outcome.path, outcome.myRole, outcome.peerKind)
@@ -246,10 +247,10 @@ class SyncConnectViewModel @Inject constructor(
         data class ShowError(@StringRes val message: Int, val reason: String = "") : Command()
 
         /** v2 §"Exchange Confirmations": prompt user "Sync your data with [peerName]?". */
-        data class AskJoinerConfirmation(val peerName: String?) : Command()
+        data class AskJoinerConfirmation(val peerName: String?, val peerKind: PeerKind? = null) : Command()
 
         /** v2 §"Exchange Confirmations": prompt user "Allow [peerName] to join your sync?". */
-        data class AskHostConfirmation(val peerName: String?) : Command()
+        data class AskHostConfirmation(val peerName: String?, val peerKind: PeerKind? = null) : Command()
 
         internal data class ShowV2Error(val content: V2PairingErrorContent) : Command()
     }

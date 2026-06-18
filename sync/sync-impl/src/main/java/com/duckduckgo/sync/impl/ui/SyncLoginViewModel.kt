@@ -41,6 +41,7 @@ import com.duckduckgo.sync.impl.SyncCodeDispatcher
 import com.duckduckgo.sync.impl.onFailure
 import com.duckduckgo.sync.impl.onSuccess
 import com.duckduckgo.sync.impl.pixels.SyncPixels
+import com.duckduckgo.sync.impl.pixels.SyncPixels.PeerKind
 import com.duckduckgo.sync.impl.pixels.fireSetupFailed
 import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Companion.POLLING_INTERVAL_EXCHANGE_FLOW
 import com.duckduckgo.sync.impl.ui.SyncLoginViewModel.Command.LoginSucess
@@ -73,10 +74,10 @@ class SyncLoginViewModel @Inject constructor(
         data class ShowError(@StringRes val message: Int, val reason: String = "") : Command()
 
         /** v2 §"Exchange Confirmations": prompt user "Sync your data with [peerName]?". */
-        data class AskJoinerConfirmation(val peerName: String?) : Command()
+        data class AskJoinerConfirmation(val peerName: String?, val peerKind: PeerKind? = null) : Command()
 
         /** v2 §"Exchange Confirmations": prompt user "Allow [peerName] to join your sync?". */
-        data class AskHostConfirmation(val peerName: String?) : Command()
+        data class AskHostConfirmation(val peerName: String?, val peerKind: PeerKind? = null) : Command()
 
         internal data class ShowV2Error(val content: V2PairingErrorContent) : Command()
     }
@@ -146,9 +147,9 @@ class SyncLoginViewModel @Inject constructor(
                 command.send(Command.ShowV2Error(content))
             }
             is DispatchOutcome.JoinerConfirmationRequested ->
-                command.send(Command.AskJoinerConfirmation(outcome.peerName))
+                command.send(Command.AskJoinerConfirmation(outcome.peerName, outcome.peerKind))
             is DispatchOutcome.HostConfirmationRequested ->
-                command.send(Command.AskHostConfirmation(outcome.peerName))
+                command.send(Command.AskHostConfirmation(outcome.peerName, outcome.peerKind))
             is DispatchOutcome.LinkingCodeReady -> {} // No-op; used only by presentV2() flow
         }
     }
