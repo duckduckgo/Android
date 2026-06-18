@@ -17,11 +17,11 @@
 <resources>
     <!-- v2 Exchange confirmation prompts (spec §"Exchange Confirmations") -->
     <string name="sync_v2_joiner_confirmation_title">Sync your data?</string>
-    <string name="sync_v2_joiner_confirmation_positive">Sync</string>
+    <string name="sync_v2_joiner_confirmation_positive">Sync Now</string>
     <string name="sync_v2_joiner_confirmation_negative">Cancel</string>
 
-    <string name="sync_v2_host_confirmation_title">Allow new device to sync?</string>
-    <string name="sync_v2_host_confirmation_positive">Allow</string>
+    <string name="sync_v2_host_confirmation_title">Sync your data?</string>
+    <string name="sync_v2_host_confirmation_positive">Sync Now</string>
     <string name="sync_v2_host_confirmation_negative">Cancel</string>
 
     <!-- v2 consent-dialog data-access copy (kind-specific; shared by joiner & host) -->
