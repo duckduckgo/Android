@@ -19,7 +19,6 @@ package com.duckduckgo.subscriptions.impl.billing
 import android.app.Activity
 import com.android.billingclient.api.ProductDetails
 import com.android.billingclient.api.Purchase
-import com.android.billingclient.api.PurchaseHistoryRecord
 
 interface BillingClientAdapter {
     val ready: Boolean
@@ -30,12 +29,6 @@ interface BillingClientAdapter {
     ): BillingInitResult
 
     suspend fun getSubscriptions(productIds: List<String>): SubscriptionsResult
-
-    @Deprecated(
-        message = "purchaseHistory API is deprecated and removed in the Billing Library v8",
-        replaceWith = ReplaceWith("queryPurchases"),
-    )
-    suspend fun getSubscriptionsPurchaseHistory(): SubscriptionsPurchaseHistoryResult
 
     suspend fun queryPurchases(): QueryPurchasesResult
 
@@ -68,11 +61,6 @@ sealed class SubscriptionsResult {
         val billingError: BillingError? = null,
         val debugMessage: String? = null,
     ) : SubscriptionsResult()
-}
-
-sealed class SubscriptionsPurchaseHistoryResult {
-    data class Success(val history: List<PurchaseHistoryRecord>) : SubscriptionsPurchaseHistoryResult()
-    data object Failure : SubscriptionsPurchaseHistoryResult()
 }
 
 sealed class QueryPurchasesResult {
