@@ -22,8 +22,10 @@ import com.duckduckgo.app.statistics.wideevents.WideEventClient
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.pir.impl.PirRemoteFeatures
+import com.duckduckgo.pir.impl.common.BrokerStepsParser
 import com.duckduckgo.pir.impl.scheduling.PirExecutionType
 import com.duckduckgo.pir.impl.store.PirDataStore
+import com.duckduckgo.pir.impl.store.PirRepository
 import com.duckduckgo.pir.impl.store.PirSchedulingRepository
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
@@ -66,7 +68,10 @@ interface PirInitialScanCompletionWideEvent {
 
     /**
      * Called by `PirJobsRunner` after the scan phase of a run completes. If a flow is open and
-     * every valid scan job now has a `lastScanDateInMillis > 0`, finishes the flow with Success.
+     * every scan job for a currently-active, scannable broker (one whose scan steps parse into
+     * runnable actions) now has a `lastScanDateInMillis > 0`, finishes the flow with Success. Jobs
+     * for brokers that are inactive or whose steps don't parse are ignored, since the scanner never
+     * runs them and they would otherwise block completion indefinitely.
      */
     suspend fun onScanCompleted()
 
@@ -84,6 +89,8 @@ class PirInitialScanCompletionWideEventImpl @Inject constructor(
     private val pirRemoteFeatures: PirRemoteFeatures,
     private val pirDataStore: PirDataStore,
     private val pirSchedulingRepository: PirSchedulingRepository,
+    private val pirRepository: PirRepository,
+    private val brokerStepsParser: BrokerStepsParser,
     private val dispatchers: DispatcherProvider,
 ) : PirInitialScanCompletionWideEvent {
 
@@ -164,7 +171,9 @@ class PirInitialScanCompletionWideEventImpl @Inject constructor(
                 val flowId = pirDataStore.initialScanCompletionFlowId
                 if (flowId == 0L) return@withLock
 
+                val scannableBrokers = getScannableActiveBrokerNames()
                 val scanJobs = pirSchedulingRepository.getAllValidScanJobRecords()
+                    .filter { it.brokerName in scannableBrokers }
                 if (scanJobs.isEmpty()) return@withLock
                 if (scanJobs.any { it.lastScanDateInMillis == 0L }) return@withLock
 
@@ -197,6 +206,12 @@ class PirInitialScanCompletionWideEventImpl @Inject constructor(
         }
     }
 
+    private suspend fun getScannableActiveBrokerNames(): Set<String> =
+        pirRepository.getAllActiveBrokerObjects().mapNotNullTo(hashSetOf()) { broker ->
+            val stepsJson = pirRepository.getBrokerScanSteps(broker.name) ?: return@mapNotNullTo null
+            if (brokerStepsParser.parseStep(broker, stepsJson).isNotEmpty()) broker.name else null
+        }
+
     private suspend fun isFeatureEnabled(): Boolean = withContext(dispatchers.io()) {
         pirRemoteFeatures.sendScanWideEvent().isEnabled()
     }
@@ -209,17 +224,10 @@ class PirInitialScanCompletionWideEventImpl @Inject constructor(
         const val WIDE_EVENT_NAME = "pir-time-to-first-scan-complete"
         const val ENTRY_POINT = "funnel_pir_time_to_first_scan_complete_android"
 
-        val COMPLETION_FLOW_TIMEOUT = 30.days
+        val COMPLETION_FLOW_TIMEOUT = 14.days
 
         const val INTERVAL_TOTAL_DURATION = "total_duration_ms_bucketed"
 
-        /**
-         * Bucket boundaries for the total-duration interval. The default `DEFAULT_INTERVAL_BUCKETS`
-         * caps at 10 minutes, which would collapse this multi-day metric into a single "10m+" bucket.
-         * This set spans 1 minute up to 30 days (matching the [COMPLETION_FLOW_TIMEOUT] cleanup
-         * window) and aligns with the enum in `PixelDefinitions/.../personal_information_removal.json5`.
-         * Durations below 1 minute are recorded as "0".
-         */
         val COMPLETION_INTERVAL_BUCKETS = setOf(
             1.minutes,
             5.minutes,
@@ -230,10 +238,12 @@ class PirInitialScanCompletionWideEventImpl @Inject constructor(
             6.hours,
             12.hours,
             1.days,
+            2.days,
             3.days,
+            5.days,
             7.days,
+            10.days,
             14.days,
-            30.days,
         )
 
         const val KEY_PROFILE_QUERIES_COUNT = "profile_queries_count"

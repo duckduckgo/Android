@@ -129,11 +129,6 @@ class SharedPreferencesDuckChatDataStoreTest {
     }
 
     @Test
-    fun `when isNativeInputFieldUserSettingEnabled then return default value`() = runTest {
-        assertFalse(testee.isNativeInputFieldUserSettingEnabled())
-    }
-
-    @Test
     fun `when isInputScreenUserSettingEnabled then return default value`() = runTest {
         assertFalse(testee.isInputScreenUserSettingEnabled())
     }
@@ -189,12 +184,6 @@ class SharedPreferencesDuckChatDataStoreTest {
     fun `when setCosmeticInputScreenUserSetting then cosmetic value is stored`() = runTest {
         testee.setCosmeticInputScreenUserSetting(true)
         assertTrue(testee.isCosmeticInputScreenUserSettingEnabled())
-    }
-
-    @Test
-    fun `when setNativeInputFieldUserSetting then return value`() = runTest {
-        testee.setNativeInputFieldUserSetting(true)
-        assertTrue(testee.isNativeInputFieldUserSettingEnabled())
     }
 
     @Test
@@ -351,21 +340,6 @@ class SharedPreferencesDuckChatDataStoreTest {
         }
 
         testee.setAutomaticPageContextAttachment(true)
-        job.join()
-
-        assertEquals(listOf(false, true), results)
-    }
-
-    @Test
-    fun `when observeNativeInputFieldUserSettingEnabled then receive updates`() = runTest {
-        val results = mutableListOf<Boolean>()
-        val job = launch {
-            testee.observeNativeInputFieldUserSettingEnabled()
-                .take(2)
-                .toList(results)
-        }
-
-        testee.setNativeInputFieldUserSetting(true)
         job.join()
 
         assertEquals(listOf(false, true), results)
@@ -546,5 +520,26 @@ class SharedPreferencesDuckChatDataStoreTest {
         testee.setSelectedReasoningMode("fast")
         testee.setSelectedReasoningMode(null)
         assertNull(testee.getSelectedReasoningMode())
+    }
+
+    @Test
+    fun `when storeAddressBarPickerSelectedAt then getAddressBarPickerSelectedAt returns stored value`() = runTest {
+        testee.storeAddressBarPickerSelectedAt(12345L)
+
+        assertEquals(12345L, testee.getAddressBarPickerSelectedAt())
+    }
+
+    @Test
+    fun `when nothing stored then getAddressBarPickerSelectedAt returns null`() = runTest {
+        assertNull(testee.getAddressBarPickerSelectedAt())
+    }
+
+    @Test
+    fun `when clearAddressBarPickerSelectedAt then getAddressBarPickerSelectedAt returns null`() = runTest {
+        testee.storeAddressBarPickerSelectedAt(12345L)
+
+        testee.clearAddressBarPickerSelectedAt()
+
+        assertNull(testee.getAddressBarPickerSelectedAt())
     }
 }

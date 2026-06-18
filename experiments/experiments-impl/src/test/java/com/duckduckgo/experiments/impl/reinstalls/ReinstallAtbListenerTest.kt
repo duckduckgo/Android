@@ -19,6 +19,8 @@ package com.duckduckgo.experiments.impl.reinstalls
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.feature.toggles.api.Toggle
+import com.squareup.moshi.Moshi
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
@@ -35,17 +37,28 @@ class ReinstallAtbListenerTest {
     private val mockBackupDataStore: BackupServiceDataStore = mock()
     private val mockStatisticsDataStore: StatisticsDataStore = mock()
     private val mockAppBuildConfig: AppBuildConfig = mock()
+    private val mockReinstallerVariantProtectionFeature: ReinstallerVariantProtectionFeature = mock()
+    private val mockSelfToggle: Toggle = mock()
+    private val mockProtectVariantsToggle: Toggle = mock()
+    private val moshi: Moshi = Moshi.Builder().build()
 
     @get:Rule
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
     @Before
     fun before() {
+        whenever(mockReinstallerVariantProtectionFeature.self()).thenReturn(mockSelfToggle)
+        whenever(mockReinstallerVariantProtectionFeature.protectVariants()).thenReturn(mockProtectVariantsToggle)
+        whenever(mockSelfToggle.isEnabled()).thenReturn(false)
+        whenever(mockProtectVariantsToggle.isEnabled()).thenReturn(false)
+
         testee = ReinstallAtbListener(
             mockBackupDataStore,
             mockStatisticsDataStore,
             mockAppBuildConfig,
             coroutineTestRule.testDispatcherProvider,
+            mockReinstallerVariantProtectionFeature,
+            moshi,
         )
     }
 
@@ -74,5 +87,96 @@ class ReinstallAtbListenerTest {
         testee.beforeAtbInit()
 
         verify(mockStatisticsDataStore, never()).variant = REINSTALL_VARIANT
+    }
+
+    @Test
+    fun whenIsAppReinstallAndProtectionFeatureDisabledThenUpdateVariantEvenIfMatchingExistingValue() = runTest {
+        whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(true)
+        whenever(mockStatisticsDataStore.variant).thenReturn("de")
+        whenever(mockSelfToggle.isEnabled()).thenReturn(false)
+        whenever(mockProtectVariantsToggle.isEnabled()).thenReturn(true)
+        whenever(mockProtectVariantsToggle.getSettings()).thenReturn("""{"variants":["de","df"]}""")
+
+        testee.beforeAtbInit()
+
+        verify(mockStatisticsDataStore).variant = REINSTALL_VARIANT
+    }
+
+    @Test
+    fun whenIsAppReinstallAndProtectVariantsDisabledThenUpdateVariantEvenIfMatchingExistingValue() = runTest {
+        whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(true)
+        whenever(mockStatisticsDataStore.variant).thenReturn("de")
+        whenever(mockSelfToggle.isEnabled()).thenReturn(true)
+        whenever(mockProtectVariantsToggle.isEnabled()).thenReturn(false)
+        whenever(mockProtectVariantsToggle.getSettings()).thenReturn("""{"variants":["de","df"]}""")
+
+        testee.beforeAtbInit()
+
+        verify(mockStatisticsDataStore).variant = REINSTALL_VARIANT
+    }
+
+    @Test
+    fun whenIsAppReinstallAndProtectionEnabledAndCurrentVariantIsProtectedThenDoNotOverwrite() = runTest {
+        whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(true)
+        whenever(mockStatisticsDataStore.variant).thenReturn("de")
+        whenever(mockSelfToggle.isEnabled()).thenReturn(true)
+        whenever(mockProtectVariantsToggle.isEnabled()).thenReturn(true)
+        whenever(mockProtectVariantsToggle.getSettings()).thenReturn("""{"variants":["de","df"]}""")
+
+        testee.beforeAtbInit()
+
+        verify(mockStatisticsDataStore, never()).variant = REINSTALL_VARIANT
+    }
+
+    @Test
+    fun whenIsAppReinstallAndProtectionEnabledAndCurrentVariantIsNotProtectedThenOverwrite() = runTest {
+        whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(true)
+        whenever(mockStatisticsDataStore.variant).thenReturn("mq")
+        whenever(mockSelfToggle.isEnabled()).thenReturn(true)
+        whenever(mockProtectVariantsToggle.isEnabled()).thenReturn(true)
+        whenever(mockProtectVariantsToggle.getSettings()).thenReturn("""{"variants":["de","df"]}""")
+
+        testee.beforeAtbInit()
+
+        verify(mockStatisticsDataStore).variant = REINSTALL_VARIANT
+    }
+
+    @Test
+    fun whenIsAppReinstallAndProtectionEnabledAndCurrentVariantIsNullThenOverwrite() = runTest {
+        whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(true)
+        whenever(mockStatisticsDataStore.variant).thenReturn(null)
+        whenever(mockSelfToggle.isEnabled()).thenReturn(true)
+        whenever(mockProtectVariantsToggle.isEnabled()).thenReturn(true)
+        whenever(mockProtectVariantsToggle.getSettings()).thenReturn("""{"variants":["de","df"]}""")
+
+        testee.beforeAtbInit()
+
+        verify(mockStatisticsDataStore).variant = REINSTALL_VARIANT
+    }
+
+    @Test
+    fun whenIsAppReinstallAndProtectionEnabledButSettingsAreNullThenOverwrite() = runTest {
+        whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(true)
+        whenever(mockStatisticsDataStore.variant).thenReturn("de")
+        whenever(mockSelfToggle.isEnabled()).thenReturn(true)
+        whenever(mockProtectVariantsToggle.isEnabled()).thenReturn(true)
+        whenever(mockProtectVariantsToggle.getSettings()).thenReturn(null)
+
+        testee.beforeAtbInit()
+
+        verify(mockStatisticsDataStore).variant = REINSTALL_VARIANT
+    }
+
+    @Test
+    fun whenIsAppReinstallAndProtectionEnabledButProtectedListIsEmptyThenOverwrite() = runTest {
+        whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(true)
+        whenever(mockStatisticsDataStore.variant).thenReturn("de")
+        whenever(mockSelfToggle.isEnabled()).thenReturn(true)
+        whenever(mockProtectVariantsToggle.isEnabled()).thenReturn(true)
+        whenever(mockProtectVariantsToggle.getSettings()).thenReturn("""{"variants":[]}""")
+
+        testee.beforeAtbInit()
+
+        verify(mockStatisticsDataStore).variant = REINSTALL_VARIANT
     }
 }

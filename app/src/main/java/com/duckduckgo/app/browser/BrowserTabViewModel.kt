@@ -46,6 +46,8 @@ import androidx.lifecycle.asFlow
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import androidx.webkit.JavaScriptReplyProxy
+import com.duckduckgo.adblocking.api.duckplayer.DuckPlayer
+import com.duckduckgo.adblocking.api.duckplayer.DuckPlayer.DuckPlayerState.ENABLED
 import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.accessibility.data.AccessibilitySettingsDataStore
@@ -244,6 +246,7 @@ import com.duckduckgo.app.cta.ui.BrokenSitePromptDialogCta
 import com.duckduckgo.app.cta.ui.Cta
 import com.duckduckgo.app.cta.ui.CtaViewModel
 import com.duckduckgo.app.cta.ui.DaxBubbleCta
+import com.duckduckgo.app.cta.ui.DaxDuckAiFireButtonBrandDesignUpdateContextualCta
 import com.duckduckgo.app.cta.ui.DaxEndBrandDesignUpdateBubbleCta
 import com.duckduckgo.app.cta.ui.DaxFireButtonBrandDesignUpdateContextualCta
 import com.duckduckgo.app.cta.ui.DaxMainNetworkBrandDesignUpdateContextualCta
@@ -275,10 +278,13 @@ import com.duckduckgo.app.global.model.domain
 import com.duckduckgo.app.global.model.domainMatchesUrl
 import com.duckduckgo.app.global.model.orderedTrackerBlockedEntities
 import com.duckduckgo.app.location.data.LocationPermissionType
+import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboardingbranddesignupdate.OnboardingBrandDesignUpdateToggles
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_RESULT_DELETED
 import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_RESULT_DELETED_DAILY
+import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_RESULT_DELETE_BUTTON_CLICKED
+import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_RESULT_DELETE_BUTTON_CLICKED_DAILY
 import com.duckduckgo.app.pixels.AppPixelName.ONBOARDING_SEARCH_CUSTOM
 import com.duckduckgo.app.pixels.AppPixelName.ONBOARDING_VISIT_SITE_CUSTOM
 import com.duckduckgo.app.pixels.AppPixelName.TAB_MANAGER_CLICKED_DAILY
@@ -310,6 +316,7 @@ import com.duckduckgo.autofill.api.passwordgeneration.AutomaticSavedLoginsMonito
 import com.duckduckgo.autofill.impl.AutofillFireproofDialogSuppressor
 import com.duckduckgo.brokensite.api.BrokenSitePrompt
 import com.duckduckgo.brokensite.api.RefreshPattern
+import com.duckduckgo.browser.api.BrowserRefreshTriggerPlugin
 import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.browser.api.autocomplete.AutoComplete
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteResult
@@ -326,6 +333,7 @@ import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow.MENU
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow.RELOAD_THREE_TIMES_WITHIN_20_SECONDS
 import com.duckduckgo.browser.api.webviewcompat.WebViewCompatWrapper
 import com.duckduckgo.browser.api.wideevents.BrowserInteractionsPlugin
+import com.duckduckgo.browser.ui.autocomplete.AutocompleteHistoryDeleteFeature
 import com.duckduckgo.browser.ui.browsermenu.VpnMenuState
 import com.duckduckgo.common.ui.tabs.SwipingTabsFeatureProvider
 import com.duckduckgo.common.utils.AppUrl
@@ -352,6 +360,7 @@ import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
 import com.duckduckgo.downloads.api.model.DownloadItem
 import com.duckduckgo.downloads.store.DownloadStatus
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
+import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.contextual.PageContextJSHelper
 import com.duckduckgo.duckchat.impl.contextual.RealPageContextJSHelper.Companion.PAGE_CONTEXT_FEATURE_NAME
@@ -360,8 +369,6 @@ import com.duckduckgo.duckchat.impl.helper.NativeAction
 import com.duckduckgo.duckchat.impl.helper.RealDuckChatJSHelper.Companion.DUCK_CHAT_FEATURE_NAME
 import com.duckduckgo.duckchat.impl.messaging.sync.SyncStatusChangedObserver
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
-import com.duckduckgo.duckplayer.api.DuckPlayer
-import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState.ENABLED
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.history.api.NavigationHistory
 import com.duckduckgo.js.messaging.api.JsCallbackData
@@ -430,9 +437,11 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import logcat.LogPriority.ERROR
@@ -512,6 +521,7 @@ class BrowserTabViewModel @Inject constructor(
     private val httpErrorPixels: Lazy<HttpErrorPixels>,
     private val duckPlayer: DuckPlayer,
     private val duckChat: DuckChat,
+    private val duckAiHostProvider: DuckAiHostProvider,
     private val duckAiFeatureState: DuckAiFeatureState,
     private val duckPlayerJSHelper: DuckPlayerJSHelper,
     private val refreshPixelSender: RefreshPixelSender,
@@ -551,12 +561,15 @@ class BrowserTabViewModel @Inject constructor(
     private val faviconFetchingFixFeature: FaviconFetchingFixFeature,
     private val ntpAfterIdleManager: NtpAfterIdleManager,
     private val browserInteractionsPlugins: PluginPoint<BrowserInteractionsPlugin>,
+    private val browserRefreshTriggerPlugins: PluginPoint<BrowserRefreshTriggerPlugin>,
     private val inlinePdfHandler: InlinePdfHandler,
     private val pdfDownloadTooltipDataStore: PdfDownloadTooltipDataStore,
     private val cachedFileDownloader: CachedFileDownloader,
     private val downloadMenuStateProvider: DownloadMenuStateProvider,
     private val downloadsRepository: DownloadsRepository,
     private val onboardingBrandDesignUpdateToggles: OnboardingBrandDesignUpdateToggles,
+    private val onboardingStore: OnboardingStore,
+    private val autocompleteHistoryDeleteFeature: AutocompleteHistoryDeleteFeature,
 ) : ViewModel(),
     WebViewClientListener,
     EditSavedSiteListener,
@@ -692,7 +705,9 @@ class BrowserTabViewModel @Inject constructor(
     @FlowPreview
     private val showPulseAnimation: LiveData<Boolean> =
         combine(
-            ctaViewState.asFlow().map { it.cta is OnboardingDaxDialogCta.DaxDuckAiFireButtonCta }.distinctUntilChanged(),
+            ctaViewState.asFlow().map {
+                it.cta is OnboardingDaxDialogCta.DaxDuckAiFireButtonCta || it.cta is DaxDuckAiFireButtonBrandDesignUpdateContextualCta
+            }.distinctUntilChanged(),
             ctaViewModel.showFireButtonPulseAnimation,
         ) { isShowingDuckAiFireButtonCta, showPulseAnimation -> isShowingDuckAiFireButtonCta || showPulseAnimation }
             .asLiveData(context = viewModelScope.coroutineContext)
@@ -727,13 +742,10 @@ class BrowserTabViewModel @Inject constructor(
     private var hasCompletedPageLoad = false
 
     private var allowlistRefreshTriggerJob: Job? = null
+    private var refreshTriggerJob: Job? = null
     private var isCustomTabScreen: Boolean = false
     private var alreadyShownKeyboard: Boolean = false
     private var pendingDuckChatAuthUpdate: Boolean = false
-
-    @Volatile
-    var isSerpLogoInMenuEnabled: Boolean = true
-        private set
 
     private val pdfDownloadCommandFlow = MutableSharedFlow<DownloadCommand>(extraBufferCapacity = 1)
 
@@ -827,10 +839,6 @@ class BrowserTabViewModel @Inject constructor(
             addressBarTrackersAnimationManager.fetchFeatureState()
         }
 
-        viewModelScope.launch(dispatchers.io()) {
-            isSerpLogoInMenuEnabled = androidBrowserConfig.serpLogoInMenu().isEnabled()
-        }
-
         observeSyncStatusChangesForDuckChat()
         observeSubscriptionChangesForDuckChat()
 
@@ -849,6 +857,7 @@ class BrowserTabViewModel @Inject constructor(
             }.launchIn(viewModelScope)
 
         observeAccessibilitySettings()
+        observeRefreshTriggers()
 
         savedSitesRepository
             .getFavorites()
@@ -1007,6 +1016,7 @@ class BrowserTabViewModel @Inject constructor(
 
     fun onViewRecreated() {
         observeAccessibilitySettings()
+        observeRefreshTriggers()
     }
 
     fun observeSelectedTab(isRestored: Boolean) {
@@ -1049,8 +1059,9 @@ class BrowserTabViewModel @Inject constructor(
                             // unless an onboarding promo message is displayed
                             val hasPendingOnboardingPromo = ctaViewModel.isPromoOnboardingDialogShowing()
                             if (!hasPendingOnboardingPromo) {
-                                val showDuckAiEndCta = ctaViewModel.prepareAndMarkDuckAiEndCtaForInputScreen()
-                                command.value = LaunchInputScreen(showDuckAiEndCta = showDuckAiEndCta)
+                                val duckAiEndCtaVariant = ctaViewModel.prepareAndMarkDuckAiEndCtaForInputScreen()
+                                val launchOnChat = onboardingStore.consumeOpenInputOnDuckAiTab()
+                                command.value = LaunchInputScreen(duckAiEndCtaVariant = duckAiEndCtaVariant, launchOnChat = launchOnChat)
                             }
                         }
                     }
@@ -1059,22 +1070,29 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun observeAccessibilitySettings() {
+        // Applies the current text size to the WebView. Reloading on a change is handled separately by
+        // AccessibilityRefreshTriggerPlugin via observeRefreshTriggers().
         accessibilityObserver?.cancel()
         accessibilityObserver =
             accessibilitySettingsDataStore
                 .settingsFlow()
-                .combine(refreshOnViewVisible.asStateFlow(), ::Pair)
-                .onEach { (settings, viewVisible) ->
-                    logcat(VERBOSE) { "Accessibility: newSettings $settings, $viewVisible" }
-                    val shouldRefreshWebview =
-                        (currentAccessibilityViewState().forceZoom != settings.forceZoom) || currentAccessibilityViewState().refreshWebView
-                    accessibilityViewState.value =
-                        currentAccessibilityViewState().copy(
-                            fontSize = settings.fontSize,
-                            forceZoom = settings.forceZoom,
-                            refreshWebView = shouldRefreshWebview,
-                        )
+                .onEach { settings ->
+                    accessibilityViewState.value = currentAccessibilityViewState().copy(fontSize = settings.fontSize)
                 }.launchIn(viewModelScope)
+    }
+
+    fun observeRefreshTriggers() {
+        refreshTriggerJob?.cancel()
+        refreshTriggerJob = browserRefreshTriggerPlugins.getPlugins()
+            .map { plugin ->
+                plugin.observeRefreshRequests()
+                    .catch { logcat(WARN) { "Refresh trigger failed: ${it.asLog()}" } }
+            }
+            .merge()
+            .debounce(REFRESH_TRIGGER_DEBOUNCE_MILLIS)
+            .flatMapLatest { refreshOnViewVisible.asStateFlow().filter { it }.take(1) }
+            .onEach { command.value = NavigationCommand.Refresh }
+            .launchIn(viewModelScope)
     }
 
     private fun observeSyncStatusChangesForDuckChat() {
@@ -1333,9 +1351,26 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
-    fun userLongPressedAutocomplete(suggestion: AutoCompleteSuggestion) {
+    suspend fun isAutocompleteHistoryDeleteButtonEnabled(): Boolean =
+        withContext(dispatchers.io()) { autocompleteHistoryDeleteFeature.self().isEnabled() }
+
+    fun onUserRequestedToDeleteAutocompleteItem(suggestion: AutoCompleteSuggestion) {
         when (suggestion) {
-            is AutoCompleteHistorySuggestion, is AutoCompleteHistorySearchSuggestion -> showRemoveSearchSuggestionDialog(suggestion)
+            is AutoCompleteHistorySuggestion, is AutoCompleteHistorySearchSuggestion -> {
+                appCoroutineScope.launch(dispatchers.io()) {
+                    if (autocompleteHistoryDeleteFeature.self().isEnabled()) {
+                        // Explicit delete button: remove immediately, no confirmation dialog.
+                        pixel.fire(AUTOCOMPLETE_RESULT_DELETE_BUTTON_CLICKED)
+                        pixel.fire(AUTOCOMPLETE_RESULT_DELETE_BUTTON_CLICKED_DAILY, type = Daily())
+                        withContext(dispatchers.main()) {
+                            onRemoveSearchSuggestionConfirmed(suggestion, autoCompleteStateFlow.value)
+                        }
+                    } else {
+                        // Legacy hidden long-press: confirm before removing.
+                        showRemoveSearchSuggestionDialog(suggestion)
+                    }
+                }
+            }
             else -> return
         }
     }
@@ -1368,7 +1403,9 @@ class BrowserTabViewModel @Inject constructor(
                 else -> {}
             }
             withContext(dispatchers.main()) {
-                autoCompleteStateFlow.value = omnibarText
+                if (omnibarText.isNotBlank()) {
+                    autoCompleteStateFlow.value = omnibarText
+                }
                 command.value = AutocompleteItemRemoved
             }
         }
@@ -1463,6 +1500,10 @@ class BrowserTabViewModel @Inject constructor(
         val verticalParameter = extractVerticalParameter(url)
         var urlToNavigate = queryUrlConverter.convertQueryToUrl(trimmedInput, verticalParameter, queryOrigin)
 
+        if (queryOrigin is QueryOrigin.FromUser && isTypedDuckAiUrl(urlToNavigate)) {
+            fireDuckAiDirectNavigationPixel()
+        }
+
         when (val type = specialUrlDetector.determineType(trimmedInput)) {
             is ShouldLaunchDuckChatLink -> {
                 runCatching {
@@ -1523,10 +1564,18 @@ class BrowserTabViewModel @Inject constructor(
 
         globalLayoutState.value = Browser(isNewTabState = false)
         findInPageViewState.value = FindInPageViewState(visible = false)
+        // A submitted Duck.ai URL opens in full-screen Duck.ai mode (empty address bar), so never
+        // paint its URL into the omnibar — otherwise it flashes for the brief window between submit
+        // and full-screen mode engaging, and lingers if the user navigates back during that window.
+        val isDuckChatUrl = duckChat.isDuckChatUrl(trimmedInput.toUri())
         omnibarViewState.value =
             currentOmnibarViewState().copy(
-                omnibarText = if (isFullUrlEnabled.value) trimmedInput else addressDisplayFormatter.getShortUrl(trimmedInput),
-                queryOrFullUrl = trimmedInput,
+                omnibarText = when {
+                    isDuckChatUrl -> ""
+                    isFullUrlEnabled.value -> trimmedInput
+                    else -> addressDisplayFormatter.getShortUrl(trimmedInput)
+                },
+                queryOrFullUrl = if (isDuckChatUrl) "" else trimmedInput,
                 forceExpand = true,
             )
         browserViewState.value =
@@ -1540,6 +1589,18 @@ class BrowserTabViewModel @Inject constructor(
             )
         autoCompleteViewState.value =
             currentAutoCompleteViewState().copy(showSuggestions = false, showFocusedView = false, searchResults = AutoCompleteResult("", emptyList()))
+    }
+
+    private fun isTypedDuckAiUrl(url: String): Boolean {
+        val host = runCatching { url.toUri().host }.getOrNull()?.lowercase() ?: return false
+        val duckAiHost = duckAiHostProvider.getHost().lowercase()
+        return host == duckAiHost || host == "www.$duckAiHost"
+    }
+
+    private fun fireDuckAiDirectNavigationPixel() {
+        val params = mapOf("duck_ai_enabled" to duckChat.isEnabled().toString())
+        pixel.fire(AppPixelName.AI_CHAT_DUCK_AI_DIRECT_NAVIGATION_COUNT, parameters = params)
+        pixel.fire(AppPixelName.AI_CHAT_DUCK_AI_DIRECT_NAVIGATION_DAILY, parameters = params, type = Daily())
     }
 
     private fun getUrlHeaders(url: String?): Map<String, String> = url?.let { customHeadersProvider.getCustomHeaders(it) } ?: emptyMap()
@@ -1846,6 +1907,11 @@ class BrowserTabViewModel @Inject constructor(
         isLinkOpenedInNewTab && hasSourceTab && !isCustomTab && site?.url.isNullOrEmpty()
 
     private fun navigateHome() {
+        // Going home reuses this tab, so an active Duck.ai voice session would keep
+        // running with the mic open. End it here so the frontend cleans it up.
+        if (duckChat.isVoiceChatSessionActive(tabId)) {
+            duckChat.endVoiceChatSession(tabId)
+        }
         pdfDownloadJob.cancel()
         site = null
         onSiteChanged()
@@ -2290,6 +2356,7 @@ class BrowserTabViewModel @Inject constructor(
         showFullUrl: Boolean,
     ): String {
         if (url == null) return ""
+        if (duckChat.isDuckChatUrl(url.toUri())) return ""
 
         return if (duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url)) {
             duckDuckGoUrlDetector.extractQuery(url) ?: url
@@ -3270,13 +3337,16 @@ class BrowserTabViewModel @Inject constructor(
             },
         )
 
-        if (desktopSiteRequested && uri.isMobileSite) {
-            val desktopUrl = uri.toDesktopUri().toString()
-            logcat(INFO) { "Original URL $url - attempting $desktopUrl with desktop site UA string" }
-            command.value = NavigationCommand.Navigate(desktopUrl, getUrlHeaders(desktopUrl))
+        // Re-load via Navigate (loadUrl) rather than Refresh (reload) so the WebView performs a fresh
+        // layout and re-applies overview mode (loadWithOverviewMode + useWideViewPort). reload() keeps the
+        // previous zoom scale, which would leave the wider desktop layout rendered at the old mobile scale.
+        val targetUrl = if (desktopSiteRequested && uri.isMobileSite) {
+            uri.toDesktopUri().toString()
         } else {
-            command.value = NavigationCommand.Refresh
+            uri.toString()
         }
+        logcat(INFO) { "Original URL $url - reloading $targetUrl with ${if (desktopSiteRequested) "desktop" else "mobile"} site UA string" }
+        command.value = NavigationCommand.Navigate(targetUrl, getUrlHeaders(targetUrl))
     }
 
     private fun initializeViewStates() {
@@ -3710,10 +3780,11 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun onPrintSelected() {
-        url?.let {
-            pixel.fire(AppPixelName.MENU_ACTION_PRINT_PRESSED)
-            command.value = PrintLink(removeAtbAndSourceParamsFromSearch(it), defaultMediaSize())
-        }
+        val documentName = url?.let { removeAtbAndSourceParamsFromSearch(it) }?.takeIf { it.isNotBlank() }
+            ?: currentBrowserViewState().currentPdfFileName?.takeIf { it.isNotBlank() }
+            ?: return
+        pixel.fire(AppPixelName.MENU_ACTION_PRINT_PRESSED)
+        command.value = PrintLink(documentName, defaultMediaSize())
     }
 
     fun printFromWebView() {
@@ -4210,7 +4281,6 @@ class BrowserTabViewModel @Inject constructor(
         resetTrackersCount()
         refreshBrowserError()
         resetAutoConsent()
-        accessibilityViewState.value = currentAccessibilityViewState().copy(refreshWebView = false)
         canAutofillSelectCredentialsDialogCanAutomaticallyShow = true
     }
 
@@ -4625,7 +4695,7 @@ class BrowserTabViewModel @Inject constructor(
                             JSONObject(
                                 mapOf(
                                     "desktopModeEnabled" to (getSite()?.isDesktopMode ?: false),
-                                    "forcedZoomEnabled" to (accessibilityViewState.value?.forceZoom ?: false),
+                                    "forcedZoomEnabled" to accessibilitySettingsDataStore.forceZoom,
                                 ),
                             )
                         viewModelScope.launch {
@@ -4681,7 +4751,7 @@ class BrowserTabViewModel @Inject constructor(
                             params = JSONObject(
                                 mapOf(
                                     "desktopModeEnabled" to (getSite()?.isDesktopMode ?: false),
-                                    "forcedZoomEnabled" to (accessibilityViewState.value?.forceZoom ?: false),
+                                    "forcedZoomEnabled" to accessibilitySettingsDataStore.forceZoom,
                                 ),
                             ),
                             featureName = featureName,
@@ -5071,8 +5141,15 @@ class BrowserTabViewModel @Inject constructor(
             is DaxSubscriptionBrandDesignUpdateBubbleCta,
             -> {
                 viewModelScope.launch {
-                    val origin = "funnel_onboarding_android"
-                    command.value = LaunchSubscription("https://duckduckgo.com/pro?origin=$origin".toUri())
+                    val uri = "https://duckduckgo.com/pro".toUri().buildUpon()
+                        .appendQueryParameter("origin", "funnel_onboarding_android")
+                        .apply {
+                            if (onboardingStore.isCustomAiOnboardingFlow()) {
+                                appendQueryParameter("featurePage", "duckai")
+                            }
+                        }
+                        .build()
+                    command.value = LaunchSubscription(uri)
                 }
             }
             is DaxBubbleCta.DaxEndCta,
@@ -5100,7 +5177,7 @@ class BrowserTabViewModel @Inject constructor(
         val cta = currentCtaViewState().cta
 
         // Defer cleanup (CTA dismiss, highlight removal) until the fire action actually completes.
-        if (cta is OnboardingDaxDialogCta.DaxDuckAiFireButtonCta) {
+        if (cta is OnboardingDaxDialogCta.DaxDuckAiFireButtonCta || cta is DaxDuckAiFireButtonBrandDesignUpdateContextualCta) {
             viewModelScope.launch {
                 ctaViewModel.onDuckAiFireButtonCtaPressed()
             }
@@ -5257,11 +5334,55 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     private fun onUserTappedDuckAiPromptAutocomplete(prompt: String) {
-        command.value = Command.SubmitChat(prompt)
+        openDuckAiQuery(prompt, autoPrompt = true)
 
         viewModelScope.launch {
             val params = duckChat.createWasUsedBeforePixelParams()
             pixel.fire(DuckChatPixelName.DUCK_CHAT_OPEN_AUTOCOMPLETE_LEGACY, parameters = params)
+        }
+    }
+
+    /**
+     * Entry point for "open Duck.ai with a query" from the unified input — the Search/Duck.ai
+     * toggle when Duck.ai is selected, and the "Ask Duck.ai" autocomplete row when Search is
+     * selected. Under fullscreen mode the query opens in a new tab so the current tab is
+     * preserved; on the NTP we reuse the empty tab instead of spawning another. Outside
+     * fullscreen mode we fall back to the legacy Intent-based path.
+     */
+    fun openDuckAiQuery(query: String, autoPrompt: Boolean) {
+        browserInteractionsPlugins.getPlugins().forEach { it.onInputSubmitted() }
+        if (!duckAiFeatureState.showFullScreenMode.value) {
+            if (autoPrompt) {
+                duckChat.openDuckChatWithAutoPrompt(query)
+            } else {
+                duckChat.openDuckChatWithPrefill(query)
+            }
+            return
+        }
+        navigateToDuckAi(duckChat.getDuckChatUrl(query, autoPrompt))
+    }
+
+    /**
+     * Entry point for "open an existing Duck.ai chat" from the unified input — taps on a
+     * chat-history suggestion which already carries a Duck.ai URL with the chatId. Same
+     * new-tab-or-stay-on-NTP rule as [openDuckAiQuery]; outside fullscreen mode the URL is
+     * routed through the normal submit path which lands in the legacy Intent flow.
+     */
+    fun openDuckAiChatById(chatUrl: String) {
+        browserInteractionsPlugins.getPlugins().forEach { it.onChatSelected() }
+        if (!duckAiFeatureState.showFullScreenMode.value) {
+            onUserSubmittedQuery(chatUrl)
+            return
+        }
+        navigateToDuckAi(chatUrl)
+    }
+
+    private fun navigateToDuckAi(url: String) {
+        if (!currentBrowserViewState().browserShowing) {
+            // On NTP: reuse this tab — don't spawn another empty one.
+            onUserSubmittedQuery(url)
+        } else {
+            command.value = OpenInNewTab(query = url, sourceTabId = tabId)
         }
     }
 
@@ -5306,11 +5427,15 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
-    fun openDuckChatSettings() {
-        viewModelScope.launch {
-            pixel.fire(DuckChatPixelName.DUCK_CHAT_DUCK_AI_SETTINGS_TAPPED)
-            val subscriptionEvent = duckChatJSHelper.onNativeAction(NativeAction.DUCK_AI_SETTINGS)
-            _subscriptionEventDataChannel.send(subscriptionEvent)
+    fun openDuckChatSettings(viewMode: ViewMode) {
+        pixel.fire(DuckChatPixelName.DUCK_CHAT_DUCK_AI_SETTINGS_TAPPED)
+        if (viewMode == ViewMode.DuckAI) {
+            viewModelScope.launch {
+                val subscriptionEvent = duckChatJSHelper.onNativeAction(NativeAction.DUCK_AI_SETTINGS)
+                _subscriptionEventDataChannel.send(subscriptionEvent)
+            }
+        } else {
+            command.value = OpenInNewTab(duckChat.getDuckChatSettingsUrl(), tabId)
         }
     }
 
@@ -5471,11 +5596,15 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun dismissDuckAiFireOnboardingCta() {
-        ctaViewState.value?.cta
-            ?.let { it as? OnboardingDaxDialogCta.DaxDuckAiFireButtonCta }
-            ?.let { duckAiFireCta ->
-                viewModelScope.launch { ctaViewModel.onUserDismissedCta(cta = duckAiFireCta) }
-            }
+        // Custom AI onboarding defers dismissal to the end of the linear orchestrator
+        // run, so the CTA survives if the app is killed mid-onboarding and the flow
+        // has to re-run on next launch.
+        if (onboardingStore.isCustomAiOnboardingFlow()) return
+
+        val cta = ctaViewState.value?.cta ?: return
+        if (cta is OnboardingDaxDialogCta.DaxDuckAiFireButtonCta || cta is DaxDuckAiFireButtonBrandDesignUpdateContextualCta) {
+            viewModelScope.launch { ctaViewModel.onUserDismissedCta(cta = cta) }
+        }
     }
 
     private fun trackersCount(): String =
@@ -5484,6 +5613,8 @@ class BrowserTabViewModel @Inject constructor(
     companion object {
         private const val FIXED_PROGRESS = 50
         private const val UPGRADED_PROGRESS_THRESHOLD = 95
+
+        private const val REFRESH_TRIGGER_DEBOUNCE_MILLIS = 200L
 
         // Minimum progress to show web content again after decided to hide web content (possible spoofing attack).
         // We think that progress is enough to assume next site has already loaded new content.

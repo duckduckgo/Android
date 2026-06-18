@@ -358,15 +358,6 @@ interface AndroidBrowserConfigFeature {
     fun storePageContext(): Toggle
 
     /**
-     * Kill switch for SERP logo display in the browser menu header.
-     * @return `true` when the remote config has the global "serpLogoInMenu" androidBrowserConfig
-     * sub-feature flag enabled
-     * If the remote feature is not present defaults to `true`
-     */
-    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
-    fun serpLogoInMenu(): Toggle
-
-    /**
      * Controls whether the tab state restoration fix is enabled for swiping tabs.
      * When enabled, the adapter populates tabs before restoring state to prevent
      * garbage collection.

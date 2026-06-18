@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.global
 
+import android.os.Build
 import android.os.StrictMode
 import android.os.StrictMode.ThreadPolicy
 import androidx.lifecycle.ProcessLifecycleOwner
@@ -26,9 +27,9 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.app.lifecycle.PirProcessLifecycleObserver
 import com.duckduckgo.app.lifecycle.VpnProcessLifecycleObserver
-import com.duckduckgo.app.referral.AppInstallationReferrerStateListener
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.plugins.PluginPoint
+import com.duckduckgo.referral.api.AppInstallationReferrerStateListener
 import dagger.android.AndroidInjector
 import dagger.android.HasDaggerInjector
 import dagger.android.getFactory
@@ -176,6 +177,15 @@ open class DuckDuckGoApplication : HasDaggerInjector, MultiProcessApplication() 
                     .penaltyDropBox()
                     .build(),
             )
+            if (Build.VERSION.SDK_INT >= 31) {
+                StrictMode.setVmPolicy(
+                    StrictMode.VmPolicy.Builder()
+                        .detectUnsafeIntentLaunch()
+                        .penaltyLog()
+                        .penaltyDeath()
+                        .build(),
+                )
+            }
         }
     }
 

@@ -111,7 +111,9 @@
                     "emailConfirmation",
                     "getCaptchaInfo",
                     "solveCaptcha",
-                    "condition"
+                    "condition",
+                    "getEmailData",
+                    "generateEmail"
                 ]
             },
             {
@@ -369,7 +371,9 @@
                     "emailConfirmation",
                     "getCaptchaInfo",
                     "solveCaptcha",
-                    "condition"
+                    "condition",
+                    "getEmailData",
+                    "generateEmail"
                 ]
             }
         ]
@@ -527,7 +531,9 @@
                     "emailConfirmation",
                     "getCaptchaInfo",
                     "solveCaptcha",
-                    "condition"
+                    "condition",
+                    "getEmailData",
+                    "generateEmail"
                 ]
             },
             {
@@ -610,7 +616,9 @@
                     "emailConfirmation",
                     "getCaptchaInfo",
                     "solveCaptcha",
-                    "condition"
+                    "condition",
+                    "getEmailData",
+                    "generateEmail"
                 ]
             },
             {
@@ -2213,6 +2221,7 @@
                     "unknown_error"
                 ]
             },
+            "pirCancellationReason",
             {
                 "key": "feature.data.ext.step.started",
                 "description": "Parameter present when the run body actually begins (after the no-profiles early return)",
@@ -2471,6 +2480,7 @@
                     "unknown_error"
                 ]
             },
+            "pirCancellationReason",
             {
                 "key": "feature.data.ext.step.started",
                 "description": "Parameter present when the run body actually begins (after the no-profiles early return)",
@@ -2714,10 +2724,12 @@
                     "21600000",
                     "43200000",
                     "86400000",
+                    "172800000",
                     "259200000",
+                    "432000000",
                     "604800000",
-                    "1209600000",
-                    "2592000000"
+                    "864000000",
+                    "1209600000"
                 ]
             }
         ]

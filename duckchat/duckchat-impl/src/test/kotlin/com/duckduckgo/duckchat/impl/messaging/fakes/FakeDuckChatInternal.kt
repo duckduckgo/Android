@@ -16,7 +16,6 @@
 
 package com.duckduckgo.duckchat.impl.messaging.fakes
 
-import android.content.Context
 import android.net.Uri
 import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.duckchat.api.DuckChatInputModeState
@@ -25,8 +24,10 @@ import com.duckduckgo.duckchat.impl.ChatState
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.store.DefaultTogglePosition
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
 
@@ -56,7 +57,6 @@ class FakeDuckChatInternal(
     // DuckChat interface methods
     override fun isEnabled(): Boolean = enabled
 
-    val openWithChatIdCalls: MutableList<String> = mutableListOf()
     var openDuckChatCalls: Int = 0
         private set
 
@@ -72,15 +72,17 @@ class FakeDuckChatInternal(
         return "https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5"
     }
 
+    override fun getDuckChatSettingsUrl(): String = "https://duck.ai?settings=open"
+
     override fun isDuckChatUrl(uri: Uri): Boolean = false
 
     override suspend fun wasOpenedBefore(): Boolean = false
 
-    override fun showNewAddressBarOptionChoiceScreen(context: Context, isDarkThemeEnabled: Boolean) { }
-
     override suspend fun setInputScreenUserSetting(enabled: Boolean) {
         inputScreenUserSettingEnabled.value = enabled
     }
+
+    override suspend fun isInputScreenEverEnabled(): Boolean = false
 
     override suspend fun setCosmeticInputScreenUserSetting(enabled: Boolean) {
         cosmeticInputScreenUserSettingEnabled.value = enabled
@@ -123,8 +125,8 @@ class FakeDuckChatInternal(
         automaticContextAttachmentUserSettingEnabled.value = isEnabled
     }
 
-    override suspend fun setNativeInputFieldUserSetting(enabled: Boolean) {
-        nativeInputFieldUserSettingEnabled.value = enabled
+    fun setNativeInputFieldEnabled(isEnabled: Boolean) {
+        nativeInputFieldUserSettingEnabled.value = isEnabled
     }
 
     override fun observeEnableDuckChatUserSetting(): Flow<Boolean> = enableDuckChatUserSetting
@@ -159,6 +161,14 @@ class FakeDuckChatInternal(
 
     override val chatState: StateFlow<ChatState> = _chatState
 
+    private val _showModelPickerEvents = MutableSharedFlow<String>(extraBufferCapacity = 1)
+
+    override fun requestShowModelPicker(tabId: String) {
+        _showModelPickerEvents.tryEmit(tabId)
+    }
+
+    override val showModelPickerEvents: Flow<String> = _showModelPickerEvents.asSharedFlow()
+
     override fun isImageUploadEnabled(): Boolean = false
 
     override fun isStandaloneMigrationEnabled(): Boolean = false
@@ -192,12 +202,11 @@ class FakeDuckChatInternal(
     override fun isVoiceChatSessionActive(tabId: String): Boolean = false
     override val activeVoiceChatSessions: Flow<Set<String>> = MutableStateFlow(emptySet())
     override fun observeTriggerVoiceChatSessionEnd(): Flow<String> = kotlinx.coroutines.flow.emptyFlow()
+    override fun endVoiceChatSession(tabId: String) { }
 
     override suspend fun isChatHistoryAvailable(): Boolean = false
 
-    override fun openWithChatId(chatId: String) {
-        openWithChatIdCalls += chatId
-    }
+    override suspend fun onAddressBarPickerDuckAiSelected() { }
 
     override fun buildChatUrl(chatId: String): String = "https://duck.ai?chatID=$chatId"
 

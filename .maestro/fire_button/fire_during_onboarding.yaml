@@ -1,4 +1,5 @@
 appId: com.duckduckgo.mobile.android
+androidWebViewHierarchy: devtools
 name: "ReleaseTest: Fire button is working"
 tags:
     - releaseTest
@@ -17,7 +18,7 @@ tags:
       - inputText: "https://privacy-test-pages.site"
       - pressKey: Enter
       - assertVisible:
-          text: ".*keep browsing.*"
+          text: ".*keep.browsing.*"
       - tapOn:
           text: "got it"
       - assertVisible:

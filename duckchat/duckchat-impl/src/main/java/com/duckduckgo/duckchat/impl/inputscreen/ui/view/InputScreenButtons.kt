@@ -87,16 +87,13 @@ class InputScreenButtons @JvmOverloads constructor(
 
     fun showStopButton() {
         actionSend.isEnabled = true
+        actionSend.alpha = ENABLED_ALPHA
         actionSend.setImageResource(R.drawable.ic_stop_16)
-        actionSend.backgroundTintList = resolveThemeColorStateList(CommonR.attr.daxColorButtonDestructiveContainer)
         actionSend.setOnClickListener { onStopClick?.invoke() }
     }
 
     fun showSendButton() {
-        actionSend.setImageResource(R.drawable.ic_arrow_right_24_inverted)
-        actionSend.backgroundTintList = resolveThemeColorStateList(
-            if (actionSend.isEnabled) CommonR.attr.daxColorButtonPrimaryContainer else CommonR.attr.daxColorContainerDisabled,
-        )
+        actionSend.setImageResource(CommonR.drawable.ic_arrow_right_24)
         actionSend.setOnClickListener { sendIfEnabled() }
     }
 
@@ -104,18 +101,9 @@ class InputScreenButtons @JvmOverloads constructor(
         if (actionSend.isEnabled) onSendClick?.invoke()
     }
 
-    private fun resolveThemeColorStateList(attr: Int): android.content.res.ColorStateList? {
-        val attributes = context.obtainStyledAttributes(intArrayOf(attr))
-        val colorStateList = attributes.getColorStateList(0)
-        attributes.recycle()
-        return colorStateList
-    }
-
     fun setSendButtonEnabled(enabled: Boolean) {
         actionSend.isEnabled = enabled
-        actionSend.backgroundTintList = resolveThemeColorStateList(
-            if (enabled) CommonR.attr.daxColorButtonPrimaryContainer else CommonR.attr.daxColorContainerDisabled,
-        )
+        actionSend.alpha = if (enabled) ENABLED_ALPHA else DISABLED_ALPHA
     }
 
     fun setSendButtonVisible(visible: Boolean) {
@@ -170,5 +158,10 @@ class InputScreenButtons @JvmOverloads constructor(
         actionNewLine.foreground = circularRippleDrawable
         actionVoiceSearch?.foreground = circularRippleDrawable
         actionVoiceChat?.foreground = circularRippleDrawable
+    }
+
+    companion object {
+        private const val ENABLED_ALPHA = 1f
+        private const val DISABLED_ALPHA = 0.4f
     }
 }

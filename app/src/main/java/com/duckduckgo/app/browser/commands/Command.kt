@@ -47,6 +47,7 @@ import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData
+import com.duckduckgo.duckchat.api.inputscreen.DuckAiOnboardingEndCtaVariant
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed
@@ -162,7 +163,7 @@ sealed class Command {
     ) : Command()
 
     class PrintLink(
-        val url: String,
+        val documentName: String,
         val mediaSize: MediaSize,
     ) : Command()
 
@@ -240,10 +241,6 @@ sealed class Command {
 
     class SubmitUrl(
         val url: String,
-    ) : Command()
-
-    class SubmitChat(
-        val query: String,
     ) : Command()
 
     class LaunchPlayStore(
@@ -494,7 +491,10 @@ sealed class Command {
 
     data object RefreshOmnibar : Command()
 
-    data class LaunchInputScreen(val showDuckAiEndCta: Boolean = false) : Command()
+    data class LaunchInputScreen(
+        val duckAiEndCtaVariant: DuckAiOnboardingEndCtaVariant = DuckAiOnboardingEndCtaVariant.NONE,
+        val launchOnChat: Boolean = false,
+    ) : Command()
 
     data object LaunchDuckChatHistory : Command()
 

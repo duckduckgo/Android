@@ -1,0 +1,168 @@
+// See https://app.asana.com/1/137249556945/project/1202552961248957/task/1206816228247404?focus=true
+{
+    "m_autocomplete_displayed_bookmark": {
+        "description": "An autocomplete suggestion originating from a local bookmark was rendered to the user.",
+        "owners": ["CrisBarreiro"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_autocomplete_displayed_favorite": {
+        "description": "An autocomplete suggestion originating from a local favorite was rendered to the user.",
+        "owners": ["CrisBarreiro"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_autocomplete_displayed_website": {
+        "description": "A local (non-history) website autocomplete suggestion (e.g. stored/known site) was rendered to the user.",
+        "owners": ["CrisBarreiro"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_autocomplete_displayed_history_site": {
+        "description": "A site (URL/domain) suggestion sourced from browsing history was rendered to the user.",
+        "owners": ["CrisBarreiro"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_autocomplete_displayed_history_search": {
+        "description": "A search query suggestion sourced from browsing history was rendered to the user.",
+        "owners": ["CrisBarreiro"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_autocomplete_displayed_switch_to_tab": {
+        "description": "A 'switch to tab' suggestion (indicating an already open tab) was rendered to the user.",
+        "owners": ["CrisBarreiro"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_autocomplete_duckai_click_website": {
+        "description": "User tapped a website autocomplete suggestion in the Duck.ai Unified Input.",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            { "key": "sb", "description": "A bookmark suggestion row was shown in the results", "type": "boolean" },
+            { "key": "sf", "description": "A favorite suggestion row was shown in the results", "type": "boolean" },
+            { "key": "sh", "description": "A history suggestion row was shown in the results", "type": "boolean" },
+            { "key": "showed_switch_to_tab", "description": "A switch-to-tab suggestion row was shown in the results", "type": "boolean" },
+            { "key": "bc", "description": "The user has bookmarks", "type": "boolean" },
+            { "key": "fc", "description": "The user has favorites", "type": "boolean" },
+            { "key": "hc", "description": "The user has history", "type": "boolean" },
+            { "key": "switch_to_tab_capable", "description": "More than one tab is open", "type": "boolean" }
+        ]
+    },
+    "m_autocomplete_duckai_click_bookmark": {
+        "description": "User tapped a bookmark autocomplete suggestion in the Duck.ai Unified Input.",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            { "key": "sb", "description": "A bookmark suggestion row was shown in the results", "type": "boolean" },
+            { "key": "sf", "description": "A favorite suggestion row was shown in the results", "type": "boolean" },
+            { "key": "sh", "description": "A history suggestion row was shown in the results", "type": "boolean" },
+            { "key": "showed_switch_to_tab", "description": "A switch-to-tab suggestion row was shown in the results", "type": "boolean" },
+            { "key": "bc", "description": "The user has bookmarks", "type": "boolean" },
+            { "key": "fc", "description": "The user has favorites", "type": "boolean" },
+            { "key": "hc", "description": "The user has history", "type": "boolean" },
+            { "key": "switch_to_tab_capable", "description": "More than one tab is open", "type": "boolean" }
+        ]
+    },
+    "m_autocomplete_duckai_click_favorite": {
+        "description": "User tapped a favorite autocomplete suggestion in the Duck.ai Unified Input.",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            { "key": "sb", "description": "A bookmark suggestion row was shown in the results", "type": "boolean" },
+            { "key": "sf", "description": "A favorite suggestion row was shown in the results", "type": "boolean" },
+            { "key": "sh", "description": "A history suggestion row was shown in the results", "type": "boolean" },
+            { "key": "showed_switch_to_tab", "description": "A switch-to-tab suggestion row was shown in the results", "type": "boolean" },
+            { "key": "bc", "description": "The user has bookmarks", "type": "boolean" },
+            { "key": "fc", "description": "The user has favorites", "type": "boolean" },
+            { "key": "hc", "description": "The user has history", "type": "boolean" },
+            { "key": "switch_to_tab_capable", "description": "More than one tab is open", "type": "boolean" }
+        ]
+    },
+    "m_autocomplete_duckai_click_history_search": {
+        "description": "User tapped a history search-query autocomplete suggestion in the Duck.ai Unified Input.",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            { "key": "sb", "description": "A bookmark suggestion row was shown in the results", "type": "boolean" },
+            { "key": "sf", "description": "A favorite suggestion row was shown in the results", "type": "boolean" },
+            { "key": "sh", "description": "A history suggestion row was shown in the results", "type": "boolean" },
+            { "key": "showed_switch_to_tab", "description": "A switch-to-tab suggestion row was shown in the results", "type": "boolean" },
+            { "key": "bc", "description": "The user has bookmarks", "type": "boolean" },
+            { "key": "fc", "description": "The user has favorites", "type": "boolean" },
+            { "key": "hc", "description": "The user has history", "type": "boolean" },
+            { "key": "switch_to_tab_capable", "description": "More than one tab is open", "type": "boolean" }
+        ]
+    },
+    "m_autocomplete_duckai_click_history_site": {
+        "description": "User tapped a history site autocomplete suggestion in the Duck.ai Unified Input.",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            { "key": "sb", "description": "A bookmark suggestion row was shown in the results", "type": "boolean" },
+            { "key": "sf", "description": "A favorite suggestion row was shown in the results", "type": "boolean" },
+            { "key": "sh", "description": "A history suggestion row was shown in the results", "type": "boolean" },
+            { "key": "showed_switch_to_tab", "description": "A switch-to-tab suggestion row was shown in the results", "type": "boolean" },
+            { "key": "bc", "description": "The user has bookmarks", "type": "boolean" },
+            { "key": "fc", "description": "The user has favorites", "type": "boolean" },
+            { "key": "hc", "description": "The user has history", "type": "boolean" },
+            { "key": "switch_to_tab_capable", "description": "More than one tab is open", "type": "boolean" }
+        ]
+    },
+    "m_autocomplete_duckai_click_switch_to_tab": {
+        "description": "User tapped a 'switch to tab' autocomplete suggestion in the Duck.ai Unified Input.",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            { "key": "sb", "description": "A bookmark suggestion row was shown in the results", "type": "boolean" },
+            { "key": "sf", "description": "A favorite suggestion row was shown in the results", "type": "boolean" },
+            { "key": "sh", "description": "A history suggestion row was shown in the results", "type": "boolean" },
+            { "key": "showed_switch_to_tab", "description": "A switch-to-tab suggestion row was shown in the results", "type": "boolean" },
+            { "key": "bc", "description": "The user has bookmarks", "type": "boolean" },
+            { "key": "fc", "description": "The user has favorites", "type": "boolean" },
+            { "key": "hc", "description": "The user has history", "type": "boolean" },
+            { "key": "switch_to_tab_capable", "description": "More than one tab is open", "type": "boolean" }
+        ]
+    },
+    "m_autocomplete_duckai_click_chat_history": {
+        "description": "User tapped a chat history autocomplete suggestion in the Duck.ai Unified Input.",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_autocomplete_duckai_click_search_duckduckgo": {
+        "description": "User tapped a 'search DuckDuckGo' autocomplete suggestion in the Duck.ai Unified Input.",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "autocomplete_result_delete_button_clicked": {
+        "description": "User tapped the explicit X (clear) button on a history autocomplete suggestion to delete it.",
+        "owners": ["0nko"],
+        "triggers": ["other"],
+        "suffixes": [["form_factor"], ["first_daily_count", "form_factor"]],
+        "parameters": ["appVersion"]
+    }
+}

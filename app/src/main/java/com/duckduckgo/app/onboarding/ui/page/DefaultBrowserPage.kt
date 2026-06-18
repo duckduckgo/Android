@@ -92,23 +92,9 @@ class DefaultBrowserPage : OnboardingPageFragment(R.layout.content_onboarding_de
         setButtonsBehaviour()
     }
 
-    @Suppress("DEPRECATION")
-    override fun setUserVisibleHint(isVisibleToUser: Boolean) {
-        super.setUserVisibleHint(isVisibleToUser)
-        maybeReportPageShown()
-    }
-
     override fun onResume() {
         super.onResume()
-        maybeReportPageShown()
         viewModel.loadUI()
-    }
-
-    @Suppress("DEPRECATION")
-    private fun maybeReportPageShown() {
-        if (userVisibleHint && isResumed && view != null) {
-            viewModel.onPageShown()
-        }
     }
 
     override fun onStop() {

@@ -75,6 +75,7 @@
     <string name="options">Opties</string>
     <string name="shareLink">Link delen</string>
     <string name="copyUrl">Adres link kopiëren</string>
+    <string name="urlCopiedToClipboard">URL gekopieerd naar klembord</string>
 
     <!-- Find in page -->
     <string name="nextSearchTermDescription">Volgende zoeken</string>
@@ -265,6 +266,7 @@
     <string name="singleTabFireDialogDeleteAll">Alles verwijderen</string>
     <string name="singleTabFireDialogDeleteThisTab">Dit tabblad verwijderen</string>
     <string name="singleTabFireDialogDeleteChat">Chat verwijderen</string>
+    <string name="singleTabFireDialogDeleteChats">Chats verwijderen</string>
     <string name="singleTabFireDialogTitleDuckAi">Deze chat verwijderen?</string>
     <string name="singleTabFireDialogSubtitleSiteData">Als je sitegegevens verwijdert, kun je uitloggen bij je accounts.</string>
     <string name="singleTabFireDialogSubtitleDownloads">Hiermee worden lopende downloads geannuleerd.</string>
@@ -903,6 +905,26 @@
     <string name="preOnboardingInputScreenButton">Volgende</string>
     <string name="preOnboardingInputScreenDescription"><![CDATA[AI-functies zijn privé en optioneel. Je kunt wijzigingen aanbrengen in <b>Instellingen > AI-functies</b>.]]></string>
 
+    <!--Onboarding Reinstall Quick Setup-->
+    <string name="preOnboardingReinstallQuickSetupTitle">Welkom terug!&lt;br/&gt;Wil je iets aanpassen?</string>
+    <string name="preOnboardingReinstallSetDefaultLabel">DuckDuckGo instellen als standaard</string>
+    <string name="preOnboardingReinstallAddHomeScreenWidgetLabel">Widget toevoegen aan het startscherm</string>
+    <string name="preOnboardingReinstallAddressBarLabel">Positie van adresbalk</string>
+    <string name="preOnboardingReinstallAddressBarSearchOptionsLabel">Opties voor zoeken in de adresbalk</string>
+    <string name="preOnboardingReinstallStartBrowsing">Beginnen met browsen</string>
+
+    <!-- Quick setup bottom sheets -->
+    <string name="quickSetupAddressBarPositionTitle">Waar wil je je adresbalk hebben?</string>
+    <string name="quickSetupAddressBarPositionCaption"><![CDATA[Je kunt wijzigingen aanbrengen in <b>Instellingen > Uiterlijk</b>.]]></string>
+    <string name="quickSetupSearchOptionsTitle">Wil je de zoek- en AI-chatfunctie in de adresbalk?</string>
+    <string name="quickSetupBottomSheetDone">Klaar</string>
+    <string name="quickSetupInputScreenSearchOnly">Alleen zoeken</string>
+    <string name="quickSetupInputScreenSearchAndDuckAi">Zoeken en Duck.ai</string>
+    <string name="quickSetupRemoveHomeScreenWidgetTitle">Zo verwijder je de widget van het startscherm</string>
+    <string name="quickSetupRemoveHomeScreenWidgetStep1">Ga naar je beginscherm</string>
+    <string name="quickSetupRemoveHomeScreenWidgetStep2">Raak de widget aan en houd hem vast</string>
+    <string name="quickSetupRemoveHomeScreenWidgetStep3">Tik of sleep om hem te verwijderen</string>
+
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Adresbalk</string>
     <string name="settingsAddressBarPositionHeaderTitle">Positie van adresbalk</string>
@@ -1007,5 +1029,12 @@
     <string name="preOnboardingWelcomeDialogBody2">AI is altijd optioneel en privacybescherming staat altijd aan.</string>
     <string name="onboardingStepIndicatorText" instruction="a counter above our instructions in onboarding that tells a user what step they are on">%1$d van %2$d</string>
     <string name="onboardingSearchDaxDialogOption1Quoted" instruction="translate &apos;duck&apos; too.">hoe zeg je \'eend\' in het Engels?</string>
-    <string name="onboardingSearchDaxDialogOption1EnglishQuoted" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">hoe zeg je \'eend\' in het Spaans</string>
+    <string name="onboardingSearchDaxDialogOption1EnglishQuoted" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">hoe zeg je \'eend\' in het Nederlands</string>
+
+    <string name="input_screen_user_pref_without_ai_updated">Alleen zoeken</string>
+    <string name="input_screen_user_pref_with_ai_updated">Schakelen tussen\nzoeken en Duck.ai</string>
+
+    <!-- New Address Bar Picker -->
+    <string name="newAddressBarPickerDuckDuckGo" translatable="false">DuckDuckGo</string>
+    <string name="newAddressBarPickerConfirm">Bevestigen</string>
 </resources>

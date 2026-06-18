@@ -16,7 +16,6 @@
 
 package com.duckduckgo.duckchat.api
 
-import android.content.Context
 import android.net.Uri
 import kotlinx.coroutines.flow.Flow
 
@@ -53,6 +52,12 @@ interface DuckChat {
     fun getDuckChatUrl(query: String, autoPrompt: Boolean, sidebar: Boolean = false): String
 
     /**
+     * Returns the Duck.ai URL that opens with the settings panel open (e.g. https://duck.ai?settings=open),
+     * using the configured Duck.ai host. Used to reach Duck.ai settings from outside the Duck.ai web view.
+     */
+    fun getDuckChatSettingsUrl(): String
+
+    /**
      * Determines whether a given [Uri] is a DuckChat URL.
      * There are two Duck Chat URLs
      * Legacy: https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5
@@ -68,14 +73,15 @@ interface DuckChat {
     suspend fun wasOpenedBefore(): Boolean
 
     /**
-     * Displays the new address bar option choice screen.
-     */
-    fun showNewAddressBarOptionChoiceScreen(context: Context, isDarkThemeEnabled: Boolean)
-
-    /**
      * Set user setting to determine whether dedicated Duck.ai input screen with a mode switch should be used.
      */
     suspend fun setInputScreenUserSetting(enabled: Boolean)
+
+    /**
+     * Returns `true` if the user has ever interacted with the Duck.ai input screen toggle — enabled it
+     * explicitly, or had a value written implicitly (e.g. the onboarding selection). Sticky once set.
+     */
+    suspend fun isInputScreenEverEnabled(): Boolean
 
     /**
      * Cosmetically sets the input screen user setting.
@@ -138,8 +144,22 @@ interface DuckChat {
     fun observeTriggerVoiceChatSessionEnd(): Flow<String>
 
     /**
+     * Requests that the active voice session on the tab with the given [tabId] end. This drives the web
+     * frontend to tear down the session (stop recording, release the mic) and report it ended, which in
+     * turn releases the native voice resources.
+     */
+    fun endVoiceChatSession(tabId: String)
+
+    /**
      * Returns `true` when the native Duck.ai chat history surface is enabled by all gating feature flags.
      * Suspending because the underlying feature-flag reads must not block the main thread.
      */
     suspend fun isChatHistoryAvailable(): Boolean
+
+    /**
+     * Records that the user selected the "Search + Duck.ai" option on the new address bar picker, so the
+     * first prompt submitted from the Duck.ai toggle input field within the attribution window can be
+     * attributed back to the picker.
+     */
+    suspend fun onAddressBarPickerDuckAiSelected()
 }

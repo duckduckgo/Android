@@ -21,6 +21,7 @@ import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggesti
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteSearchSuggestion
 import com.duckduckgo.browser.api.autocomplete.AutoCompleteFactory
 import com.duckduckgo.browser.api.autocomplete.AutoCompleteSettings
+import com.duckduckgo.browser.ui.autocomplete.AutocompleteHistoryDeleteFeature
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.extensions.toBinaryString
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
@@ -101,6 +102,7 @@ class InputScreenViewModelTest {
     private val omnibarRepository: OmnibarRepository = mock()
     private val queryUrlPredictor: QueryUrlPredictor = mock()
     private val tabRepository: TabRepository = mock()
+    private val tabsFlow = MutableStateFlow<List<TabEntity>>(emptyList())
     private val tabPageContextRepository: com.duckduckgo.app.tabs.model.TabPageContextRepository = mock()
     private val duckChatJSHelper: com.duckduckgo.duckchat.impl.helper.DuckChatJSHelper = mock()
 
@@ -108,6 +110,7 @@ class InputScreenViewModelTest {
     private val chatSuggestionsReader: com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.reader.ChatSuggestionsReader = mock()
     private val duckChatFeature = FakeFeatureToggleFactory.create(DuckChatFeature::class.java)
     private val duckAiChatHistoryFeature = FakeFeatureToggleFactory.create(DuckAiChatHistoryFeature::class.java)
+    private val autocompleteHistoryDeleteFeature = FakeFeatureToggleFactory.create(AutocompleteHistoryDeleteFeature::class.java)
     private val fullScreenModeDisabledFlow = MutableStateFlow(false)
     private val fullScreenModeEnabledFlow = MutableStateFlow(true)
     private val duckChatURL = "https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5"
@@ -134,6 +137,7 @@ class InputScreenViewModelTest {
             whenever(inputScreenSessionStore.hasUsedSearchMode()).thenReturn(false)
             whenever(inputScreenSessionStore.hasUsedChatMode()).thenReturn(false)
             whenever(queryUrlPredictor.isReady()).thenReturn(true)
+            whenever(tabRepository.flowTabs).thenReturn(tabsFlow)
         }
 
     private fun createViewModel(currentOmnibarText: String = ""): InputScreenViewModel =
@@ -160,7 +164,28 @@ class InputScreenViewModelTest {
             tabRepository = tabRepository,
             tabPageContextRepository = tabPageContextRepository,
             duckChatJSHelper = duckChatJSHelper,
+            autocompleteHistoryDeleteFeature = autocompleteHistoryDeleteFeature,
         )
+
+    private fun aTab(id: String) = TabEntity(tabId = id, url = null, title = null)
+
+    @Test
+    fun `when tabs are added or removed then tabCount emits the new size`() =
+        runTest {
+            val viewModel = createViewModel()
+
+            viewModel.tabCount.test {
+                assertEquals(0, awaitItem())
+
+                tabsFlow.value = listOf(aTab("1"), aTab("2"))
+                assertEquals(2, awaitItem())
+
+                tabsFlow.value = listOf(aTab("1"))
+                assertEquals(1, awaitItem())
+
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
 
     @Test
     fun `when initialized with web URL and autocomplete enabled then autocomplete suggestions should be hidden initially`() =
@@ -1159,7 +1184,7 @@ class InputScreenViewModelTest {
             assertEquals(SubmitChat(query), viewModel.command.value)
 
             verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_OPEN_AUTOCOMPLETE_EXPERIMENTAL, params)
-            verify(autoComplete).fireAutocompletePixel(any(), any(), any())
+            verify(autoComplete).fireAutocompletePixel(any(), any(), any(), any())
         }
 
     @Test

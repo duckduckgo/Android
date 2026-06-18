@@ -46,6 +46,7 @@ import com.duckduckgo.lint.strings.MissingSmartlingRequiredDirectivesDetector.Co
 import com.duckduckgo.lint.strings.PlaceholderDetector.Companion.PLACEHOLDER_MISSING_POSITION
 import com.duckduckgo.lint.ui.ColorAttributeInXmlDetector.Companion.INVALID_COLOR_ATTRIBUTE
 import com.duckduckgo.lint.ui.DaxButtonStylingDetector.Companion.INVALID_DAX_BUTTON_PROPERTY
+import com.duckduckgo.lint.ui.DaxDividerColorUsageDetector.Companion.INVALID_DAX_DIVIDER_COLOR_USAGE
 import com.duckduckgo.lint.ui.DaxTextColorUsageDetector.Companion.INVALID_DAX_TEXT_COLOR_USAGE
 import com.duckduckgo.lint.ui.NoRawM3AlertDialogUsageDetector.Companion.NO_RAW_M3_ALERT_DIALOG_USAGE
 import com.duckduckgo.lint.ui.NoRawM3ButtonUsageDetector.Companion.NO_RAW_M3_BUTTON_USAGE
@@ -53,6 +54,8 @@ import com.duckduckgo.lint.ui.NoRawM3SurfaceUsageDetector.Companion.NO_RAW_M3_SU
 import com.duckduckgo.lint.ui.DaxTextFieldTrailingIconDetector.Companion.INVALID_DAX_TEXT_FIELD_TRAILING_ICON_USAGE
 import com.duckduckgo.lint.ui.DaxSecureTextFieldTrailingIconDetector.Companion.INVALID_DAX_SECURE_TEXT_FIELD_TRAILING_ICON_USAGE
 import com.duckduckgo.lint.ui.NoMaterial3CheckboxUsageDetector.Companion.NO_MATERIAL3_CHECKBOX_USAGE
+import com.duckduckgo.lint.ui.NoMaterial3DividerUsageDetector.Companion.NO_MATERIAL3_HORIZONTAL_DIVIDER_USAGE
+import com.duckduckgo.lint.ui.NoMaterial3DividerUsageDetector.Companion.NO_MATERIAL3_VERTICAL_DIVIDER_USAGE
 import com.duckduckgo.lint.ui.NoMaterial3RadioButtonUsageDetector.Companion.NO_MATERIAL3_RADIO_BUTTON_USAGE
 import com.duckduckgo.lint.ui.NoMaterial3SwitchUsageDetector.Companion.NO_MATERIAL3_SWITCH_USAGE
 import com.duckduckgo.lint.ui.DaxTextViewStylingDetector.Companion.INVALID_DAX_TEXT_VIEW_PROPERTY
@@ -112,11 +115,14 @@ class DuckDuckGoIssueRegistry : IssueRegistry() {
             NO_COMPOSE_VIEW_USAGE,
             NO_SET_CONTENT_USAGE,
             INVALID_DAX_TEXT_COLOR_USAGE,
+            INVALID_DAX_DIVIDER_COLOR_USAGE,
             INVALID_DAX_TEXT_FIELD_TRAILING_ICON_USAGE,
             INVALID_DAX_SECURE_TEXT_FIELD_TRAILING_ICON_USAGE,
             NO_MATERIAL3_SWITCH_USAGE,
             NO_MATERIAL3_RADIO_BUTTON_USAGE,
             NO_MATERIAL3_CHECKBOX_USAGE,
+            NO_MATERIAL3_HORIZONTAL_DIVIDER_USAGE,
+            NO_MATERIAL3_VERTICAL_DIVIDER_USAGE,
             NO_RAW_M3_BUTTON_USAGE,
             NO_RAW_M3_ALERT_DIALOG_USAGE,
             NO_RAW_M3_SURFACE_USAGE,

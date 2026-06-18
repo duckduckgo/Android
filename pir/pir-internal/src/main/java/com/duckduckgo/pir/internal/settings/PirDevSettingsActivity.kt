@@ -28,6 +28,7 @@ import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
 import com.duckduckgo.pir.impl.checker.PirWorkHandler
+import com.duckduckgo.pir.impl.checker.isEnabled
 import com.duckduckgo.pir.impl.dashboard.PirDashboardUrlProvider
 import com.duckduckgo.pir.impl.dashboard.messaging.PirDashboardWebConstants
 import com.duckduckgo.pir.impl.notifications.PirNotificationManager
@@ -116,7 +117,8 @@ class PirDevSettingsActivity : DuckDuckGoActivity() {
 
     private fun bindViews() {
         lifecycleScope.launch {
-            pirWorkHandler.canRunPir().collectLatest { canRunPir ->
+            pirWorkHandler.canRunPir().collectLatest { eligibility ->
+                val canRunPir = eligibility.isEnabled
                 binding.pirDebugScan.isEnabled = canRunPir
                 binding.pirDebugOptOut.isEnabled = canRunPir && repository.getBrokersForOptOut(true).isNotEmpty()
             }

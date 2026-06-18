@@ -50,18 +50,19 @@ import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.ChatSuggestion
 import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.reader.ChatSuggestionsReader
 import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
 import com.duckduckgo.duckchat.impl.models.ReasoningResolver
+import com.duckduckgo.duckchat.impl.models.Tool
 import com.duckduckgo.duckchat.impl.nativeinput.NativeInputPlugin
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.store.DefaultTogglePosition
 import com.duckduckgo.duckchat.store.impl.DuckAiChat
 import com.duckduckgo.duckchat.store.impl.DuckAiChatStore
 import com.duckduckgo.subscriptions.api.Product
 import com.duckduckgo.subscriptions.api.Subscriptions
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
-import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
-import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -70,10 +71,12 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -98,6 +101,7 @@ class NativeInputModeWidgetViewModel @Inject constructor(
     private val dispatchers: DispatcherProvider,
     private val inputScreenConfigResolver: InputScreenConfigResolver,
     private val pixel: Pixel,
+    private val duckChatPixels: DuckChatPixels,
     private val nativeInputStatePublisher: NativeInputStatePublisher,
     private val nativeInputStateProvider: NativeInputStateProvider,
     private val modelManager: DuckAiModelManager,
@@ -114,9 +118,16 @@ class NativeInputModeWidgetViewModel @Inject constructor(
     @Volatile
     private var lastChatUrlSuggestions: List<AutoCompleteSuggestion> = emptyList()
 
-    sealed class Command {
-        data class UpdatePluginVisibility(val containerIds: List<Int>, val visible: Boolean) : Command()
-    }
+    // Whether the most recent empty-query chat-history fetch returned any chats. Read synchronously
+    // (via [hadRecentChats]) by the widget to decide whether to show the suggestions cover when the
+    // Duck.ai tab is selected with empty input. Covering only when content will actually appear keeps
+    // the morphing logo from being briefly covered then revealed (a flash) when there are no chats.
+    // Stale until the first empty-query fetch completes, so the first such transition will not cover.
+    @Volatile
+    private var lastEmptyQueryHadChats: Boolean = false
+
+    /** @see lastEmptyQueryHadChats */
+    fun hadRecentChats(): Boolean = lastEmptyQueryHadChats
 
     private val _plugins = MutableStateFlow<List<NativeInputPlugin>>(emptyList())
     val plugins: StateFlow<List<NativeInputPlugin>> = _plugins.asStateFlow()
@@ -135,9 +146,6 @@ class NativeInputModeWidgetViewModel @Inject constructor(
     private var pendingChatId: String? = null
     private var hasPendingChatId = false
 
-    private val commandChannel = Channel<Command>(capacity = 1, onBufferOverflow = DROP_OLDEST)
-    val commands = commandChannel.receiveAsFlow()
-
     init {
         viewModelScope.launch {
             _plugins.value = nativeInputPlugins.getPlugins().toList()
@@ -145,14 +153,23 @@ class NativeInputModeWidgetViewModel @Inject constructor(
         viewModelScope.launch {
             _isHistoryAvailable.value = duckChatInternal.isChatHistoryAvailable()
         }
-    }
-
-    fun updatePluginContainerVisibility(isChatTab: Boolean) {
-        val containerIds = _plugins.value.map { it.containerId }
-        if (containerIds.isNotEmpty()) {
-            commandChannel.trySend(Command.UpdatePluginVisibility(containerIds, isChatTab))
+        viewModelScope.launch {
+            // FE recovery "Switch Model": enter the model-change mode, but only when the event
+            // targets this widget's tab. The event carries a tabId, so other tabs' VMs ignore it.
+            duckChatInternal.showModelPickerEvents.collect { eventTabId ->
+                if (eventTabId == activeTabId.value) {
+                    nativeInputStatePublisher.update(eventTabId) { it.copy(modelChangeMode = true) }
+                }
+            }
         }
     }
+
+    /**
+     * Events asking the widget to open the model picker (e.g. for the FE recovery flow) for the related tabId.
+     */
+    val showModelPickerEvents: Flow<Unit> = duckChatInternal.showModelPickerEvents
+        .filter { it == activeTabId.value }
+        .map { }
 
     fun setModelPickerEnabled(enabled: Boolean) {
         _modelPickerEnabled.value = enabled
@@ -190,6 +207,41 @@ class NativeInputModeWidgetViewModel @Inject constructor(
         return nativeInputStateProvider.stateForTab(tabId).value.selectedTool
     }
 
+    /**
+     * Fires the unified prompt-submitted pixel plus, when a tool is selected, the matching per-tool
+     * submitted pixel. Called exactly once per Duck.ai (AI-chat) submission by the widget. Attachment
+     * presence is passed in because the attachment lists live in the widget's AttachmentView, not here.
+     */
+    fun fireSubmissionPixels(
+        hasText: Boolean,
+        hasImageAttachment: Boolean,
+        hasFileAttachment: Boolean,
+    ) {
+        val tool = getSelectedTool()?.let { Tool.from(it) }
+        val selectedToolParam = when (tool) {
+            Tool.IMAGE_GENERATION -> "image_generation"
+            Tool.WEB_SEARCH -> "web_search"
+            null -> "none"
+        }
+        duckChatPixels.firePromptSubmitted(
+            selectedTool = selectedToolParam,
+            modelId = getSelectedModelId(),
+            reasoningEffort = getResolvedReasoningEffort(),
+            hasImageAttachment = hasImageAttachment,
+            hasFileAttachment = hasFileAttachment,
+            hasText = hasText,
+        )
+        when (tool) {
+            Tool.IMAGE_GENERATION -> duckChatPixels.fireImageGenerationSubmitted()
+            Tool.WEB_SEARCH -> duckChatPixels.fireWebSearchSubmitted()
+            null -> {}
+        }
+    }
+
+    fun fireVoiceTapped() = duckChatPixels.fireVoiceTapped()
+
+    fun fireStopGenerationTapped() = duckChatPixels.fireStopGenerationTapped()
+
     private data class WidgetConfig(
         val inputContext: NativeInputState.InputContext = NativeInputState.InputContext.BROWSER,
         val inputPosition: NativeInputState.InputPosition = NativeInputState.InputPosition.TOP,
@@ -203,7 +255,7 @@ class NativeInputModeWidgetViewModel @Inject constructor(
 
     private val activeTabId = MutableStateFlow<String?>(null)
 
-    val state: SharedFlow<NativeInputState> = combine(
+    private val baseState: Flow<NativeInputState> = combine(
         duckAiFeatureState.showSettings,
         duckChatInternal.observeEnableDuckChatUserSetting(),
         duckChatInternal.observeInputScreenUserSettingEnabled(),
@@ -215,6 +267,38 @@ class NativeInputModeWidgetViewModel @Inject constructor(
             inputContext = config.inputContext,
             inputPosition = config.inputPosition,
             toggleSelection = config.toggleSelection ?: NativeInputState.defaultToggleFor(config.inputContext),
+        )
+    }
+
+    // chatId lives in the per-tab provider state (written by applyChatId), not in baseState. Fold it
+    // back in here so widget UI that depends on it (e.g. the chat input hint) sees the real value
+    // rather than the baseState default of null. flatMapLatest re-targets on tab switch.
+    @OptIn(ExperimentalCoroutinesApi::class)
+    private val activeChatId: Flow<String?> = activeTabId.filterNotNull()
+        .flatMapLatest { tabId -> nativeInputStateProvider.stateForTab(tabId) }
+        .map { it.chatId }
+        .distinctUntilChanged()
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val submitEnabled: Flow<Boolean> = activeTabId.filterNotNull()
+        .flatMapLatest { tabId -> nativeInputStateProvider.stateForTab(tabId) }
+        .map { it.submitEnabled }
+        .distinctUntilChanged()
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val modelChangeMode: Flow<Boolean> = activeTabId.filterNotNull()
+        .flatMapLatest { tabId -> nativeInputStateProvider.stateForTab(tabId) }
+        .map { it.modelChangeMode }
+        .distinctUntilChanged()
+
+    val state: SharedFlow<NativeInputState> = combine(
+        baseState,
+        duckChatInternal.chatState,
+        activeChatId,
+    ) { state, chatState, chatId ->
+        state.copy(
+            isChatStreaming = chatState == ChatState.STREAMING || chatState == ChatState.LOADING,
+            chatId = chatId,
         )
     }.shareIn(
         scope = viewModelScope,
@@ -240,12 +324,14 @@ class NativeInputModeWidgetViewModel @Inject constructor(
                             inputContext = snapshot.inputContext,
                             inputPosition = snapshot.inputPosition,
                             toggleSelection = snapshot.toggleSelection,
+                            isChatStreaming = snapshot.isChatStreaming,
                         )
                     }
                 }
         }
     }
 
+    // Kept for the widget's observeChatState() which handles HIDE/SHOW/READY root-visibility transitions.
     val chatState: Flow<ChatState> = duckChatInternal.chatState
 
     val isPaidTier: Flow<Boolean> = subscriptions.getEntitlementStatus()
@@ -284,6 +370,26 @@ class NativeInputModeWidgetViewModel @Inject constructor(
         nativeInputStatePublisher.update(tabId) { it.copy(selectedTool = tool) }
     }
 
+    /**
+     * Called when a prompt is submitted
+     * */
+    fun onPromptSubmitted() {
+        // Ends the FE recovery model-change window for the active tab.
+        endModelChangeMode()
+    }
+
+    /**
+     * Called when the recovery model picker is dismissed without picking a model.
+     */
+    fun exitModelChangeMode() {
+        endModelChangeMode()
+    }
+
+    private fun endModelChangeMode() {
+        val tabId = activeTabId.value ?: return
+        nativeInputStatePublisher.update(tabId) { it.copy(modelChangeMode = false) }
+    }
+
     fun setActiveChatId(chatId: String?) {
         val tabId = activeTabId.value
         if (tabId == null) {
@@ -296,7 +402,12 @@ class NativeInputModeWidgetViewModel @Inject constructor(
     }
 
     private fun applyChatId(tabId: String, chatId: String?) {
-        nativeInputStatePublisher.update(tabId) { it.copy(chatId = chatId) }
+        nativeInputStatePublisher.update(tabId) { current ->
+            // Reset submitEnabled to true if we changed chats.
+            // Always end the model-change window since it's per-visit.
+            val submitEnabled = if (current.chatId != chatId) true else current.submitEnabled
+            current.copy(chatId = chatId, submitEnabled = submitEnabled, modelChangeMode = false)
+        }
         currentChatJob?.cancel()
         currentChat.value = null
         currentChatJob = viewModelScope.launch {
@@ -373,8 +484,13 @@ class NativeInputModeWidgetViewModel @Inject constructor(
                 AutoCompleteResult(query, emptyList())
             }
         }
+        val chatHistory = chatHistoryDeferred.await()
+        if (query.isEmpty()) {
+            // Remember whether an empty query yields chats so the cover decision can predict it next time.
+            lastEmptyQueryHadChats = chatHistory.isNotEmpty()
+        }
         val result = ChatTabSuggestions(
-            chatHistory = chatHistoryDeferred.await(),
+            chatHistory = chatHistory,
             urlSuggestions = urlSuggestionsDeferred.await(),
         )
         lastChatUrlSuggestions = result.urlSuggestions.suggestions
@@ -385,7 +501,7 @@ class NativeInputModeWidgetViewModel @Inject constructor(
         val suggestionsShown = lastChatUrlSuggestions
         // Use appCoroutineScope so the pixel fire survives the widget detach
         appCoroutineScope.launch(dispatchers.io()) {
-            autoComplete.fireAutocompletePixel(suggestionsShown, suggestion, experimentalInputScreen = true)
+            autoComplete.fireAutocompletePixel(suggestionsShown, suggestion, experimentalInputScreen = true, duckAiSurface = true)
         }
     }
 
@@ -397,6 +513,13 @@ class NativeInputModeWidgetViewModel @Inject constructor(
             pixel.fire(DuckChatPixelName.DUCK_CHAT_RECENT_CHAT_SELECTED_COUNT)
             pixel.fire(DuckChatPixelName.DUCK_CHAT_RECENT_CHAT_SELECTED_DAILY, type = Daily())
         }
+        // The autocomplete-family pixel sits alongside the RECENT_CHAT_SELECTED metrics above: those
+        // measure recent-chat re-entry, this one credits the Duck.ai-tab autocomplete surface.
+        duckChatPixels.fireDuckAiChatHistorySuggestionClicked()
+    }
+
+    fun fireDuckAiSearchForQuerySubmittedPixel() {
+        duckChatPixels.fireDuckAiSearchDuckDuckGoSuggestionClicked()
     }
 
     fun buildChatSuggestionUrl(suggestion: ChatSuggestion): String =

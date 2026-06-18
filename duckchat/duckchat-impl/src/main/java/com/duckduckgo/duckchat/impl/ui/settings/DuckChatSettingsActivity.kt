@@ -43,6 +43,9 @@ import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.common.ui.view.addClickableSpan
 import com.duckduckgo.common.ui.view.dialog.RadioListAlertDialogBuilder
 import com.duckduckgo.common.ui.viewbinding.viewBinding
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.api.DuckChatNativeSettingsNoParams
 import com.duckduckgo.duckchat.api.DuckChatSettingsNoParams
@@ -90,12 +93,6 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
             updateWidgets()
         }
 
-    private val userEnabledNativeInputFieldToggleListener =
-        CompoundButton.OnCheckedChangeListener { _, isChecked ->
-            viewModel.onNativeInputFieldToggled(isChecked)
-            updateWidgets()
-        }
-
     @Inject
     lateinit var globalActivityStarter: GlobalActivityStarter
 
@@ -114,17 +111,38 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var inputScreenDiscoveryFunnel: InputScreenDiscoveryFunnel
 
+    @Inject
+    lateinit var edgeToEdgeProvider: EdgeToEdgeProvider
+
+    @Inject
+    lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        val edgeToEdgeEnabled = edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.SETTINGS)
+        if (edgeToEdgeEnabled) {
+            enableTransparentEdgeToEdge()
+        }
 
         setContentView(binding.root)
 
         setupToolbar(binding.includeToolbar.toolbar)
 
+        if (edgeToEdgeEnabled) {
+            configureEdgeToEdgeInsets()
+        }
+
         observeViewModel()
 
         pixel.fire(DUCK_CHAT_SETTINGS_DISPLAYED)
         inputScreenDiscoveryFunnel.onDuckAiSettingsSeen()
+    }
+
+    private fun configureEdgeToEdgeInsets() {
+        edgeToEdgeHandler.applyHorizontalSystemBarInsets(binding.root)
+        edgeToEdgeHandler.applyStatusBarInsets(binding.includeToolbar.appBarLayout)
+        edgeToEdgeHandler.applyNavigationBarInsets(binding.contentScrollView, drawBehindGestureNav = true)
     }
 
     private fun observeViewModel() {
@@ -145,9 +163,6 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
         binding.duckAIAutomaticContext.isVisible = viewState.isAutomaticContextVisible
         binding.duckAIAutomaticContext.quietlySetIsChecked(viewState.isAutomaticContextEnabled, userEnabledAutomaticPageContextToggleListener)
 
-        binding.duckAiNativeInputField.isVisible = viewState.isNativeInputFieldVisible
-        binding.duckAiNativeInputField.quietlySetIsChecked(viewState.isNativeInputFieldEnabled, userEnabledNativeInputFieldToggleListener)
-
         // align content with the main Duck.ai toggle's text
         val offset =
             resources.getDimensionPixelSize(CommonR.dimen.listItemImageContainerSize) +
@@ -164,7 +179,6 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
         binding.duckAiInputScreenDescription.updatePadding(left = offset)
         binding.duckAiShortcuts.updatePadding(left = offset)
         binding.duckAIAutomaticContext.updatePadding(left = offset)
-        binding.duckAiNativeInputField.updatePadding(left = offset)
 
         binding.duckChatSettingsText.addClickableSpan(
             textSequence = getText(R.string.duck_chat_settings_activity_description),

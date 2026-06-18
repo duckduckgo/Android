@@ -1,4 +1,5 @@
 appId: com.duckduckgo.mobile.android
+androidWebViewHierarchy: devtools
 name: "ReleaseTest: General website browsing works"
 tags:
   - releaseTest

@@ -48,7 +48,14 @@
                 "key": "feature.data.ext.status_reason",
                 "type": "string",
                 "description": "Reason the session ended",
-                "enum": ["bar_used", "return_to_page_tapped", "tab_switcher_selected", "app_backgrounded", "favorite_selected"]
+                "enum": [
+                    "bar_used",
+                    "chat_selected",
+                    "return_to_page_tapped",
+                    "tab_switcher_selected",
+                    "app_backgrounded",
+                    "favorite_selected"
+                ]
             },
             {
                 "key": "feature.data.ext.session_duration_ms_bucketed",

@@ -19,18 +19,23 @@ package com.duckduckgo.app.cta.ui
 import androidx.annotation.VisibleForTesting
 import androidx.annotation.WorkerThread
 import androidx.core.net.toUri
+import com.duckduckgo.adblocking.api.duckplayer.DuckPlayer
+import com.duckduckgo.adblocking.api.duckplayer.DuckPlayer.DuckPlayerState
+import com.duckduckgo.adblocking.api.duckplayer.PrivatePlayerMode.AlwaysAsk
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.cta.model.DismissedCta
 import com.duckduckgo.app.cta.ui.HomePanelCta.AddWidgetAutoOnboarding
 import com.duckduckgo.app.cta.ui.HomePanelCta.AddWidgetInstructions
+import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.install.daysInstalled
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.domain
 import com.duckduckgo.app.global.model.orderedTrackerBlockedEntities
 import com.duckduckgo.app.onboarding.DuckAiOnboardingExperimentMetrics
+import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingPlanProvider
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.store.UserStageStore
@@ -51,21 +56,25 @@ import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckChat
-import com.duckduckgo.duckplayer.api.DuckPlayer
-import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState
-import com.duckduckgo.duckplayer.api.PrivatePlayerMode.AlwaysAsk
+import com.duckduckgo.duckchat.api.inputscreen.DuckAiOnboardingEndCtaVariant
+import com.duckduckgo.onboarding.api.LinearOnboardingOrchestrator
+import com.duckduckgo.onboarding.api.LinearOnboardingState
+import com.duckduckgo.onboarding.api.forPlan
 import com.duckduckgo.subscriptions.api.SubscriptionPromoCtaShownPlugin
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.api.Subscriptions
 import dagger.SingleInstanceIn
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.withContext
@@ -96,6 +105,8 @@ class CtaViewModel @Inject constructor(
     private val appTheme: AppTheme,
     private val duckAiOnboardingExperimentMetrics: DuckAiOnboardingExperimentMetrics,
     private val deviceInfo: DeviceInfo,
+    @AppCoroutineScope private val coroutineScope: CoroutineScope,
+    linearOnboardingOrchestrator: LinearOnboardingOrchestrator,
 ) {
     @ExperimentalCoroutinesApi
     @VisibleForTesting
@@ -112,11 +123,23 @@ class CtaViewModel @Inject constructor(
                 }
             }
 
+    init {
+        linearOnboardingOrchestrator.state
+            .forPlan(NewUserOnboardingPlanProvider.ROOT_PLAN_ID)
+            .filterIsInstance<LinearOnboardingState.Completed>()
+            .onEach { completeStageIfDaxOnboardingCompleted() }
+            .launchIn(coroutineScope)
+    }
+
     private suspend fun isSubscriptionCtaAvailable(): Boolean =
         subscriptions.isEligible() && hasNoSubscription() && extendedOnboardingFeatureToggles.privacyProCta().isEnabled()
 
     private suspend fun isBrandDesignUpdateEnabled(): Boolean = withContext(dispatchers.io()) {
         onboardingBrandDesignUpdateToggles.brandDesignUpdate().isEnabled()
+    }
+
+    private suspend fun isOnboardingImprovementsEnabled(): Boolean = withContext(dispatchers.io()) {
+        onboardingBrandDesignUpdateToggles.onboardingImprovements().isEnabled()
     }
 
     // Exposed for onboarding dev settings and tests. Used internally for completion checks
@@ -163,7 +186,7 @@ class CtaViewModel @Inject constructor(
                     pixel.fire(it, cta.pixelShownParameters())
                 }
             }
-            if (cta is OnboardingDaxDialogCta.DaxDuckAiFireButtonCta) {
+            if (cta is OnboardingDaxDialogCta.DaxDuckAiFireButtonCta || cta is DaxDuckAiFireButtonBrandDesignUpdateContextualCta) {
                 duckAiOnboardingExperimentMetrics.fireFireDialogImpression()
             }
             if (cta is DaxCta && cta.markAsReadOnShow) {
@@ -225,19 +248,24 @@ class CtaViewModel @Inject constructor(
         }
     }
 
-    suspend fun prepareAndMarkDuckAiEndCtaForInputScreen(): Boolean {
+    suspend fun prepareAndMarkDuckAiEndCtaForInputScreen(): DuckAiOnboardingEndCtaVariant {
         return withContext(dispatchers.io()) {
-            val shouldShow = canShowDuckAiEndCta() && !extendedOnboardingFeatureToggles.noBrowserCtas().isEnabled()
-            if (shouldShow) {
-                dismissedCtaDao.insert(DismissedCta(CtaId.DAX_DUCK_AI_END))
-                completeStageIfDaxOnboardingCompleted()
-                if (canSendShownPixel(onboardingStore, DUCK_AI_END_CTA_PIXEL_PARAM)) {
-                    val journey = addCtaToHistory(onboardingStore, appInstallStore, DUCK_AI_END_CTA_PIXEL_PARAM)
-                    pixel.fire(AppPixelName.ONBOARDING_DAX_CTA_SHOWN, mapOf(Pixel.PixelParameter.CTA_SHOWN to journey))
-                }
-                duckAiOnboardingExperimentMetrics.fireFinalDialogImpression()
+            val shouldShow = canShowDuckAiEndCta() && !extendedOnboardingFeatureToggles.noBrowserCtas().isEnabled() && !settingsDataStore.hideTips
+            if (!shouldShow) return@withContext DuckAiOnboardingEndCtaVariant.NONE
+
+            dismissedCtaDao.insert(DismissedCta(CtaId.DAX_DUCK_AI_END))
+            completeStageIfDaxOnboardingCompleted()
+            if (canSendShownPixel(onboardingStore, DUCK_AI_END_CTA_PIXEL_PARAM)) {
+                val journey = addCtaToHistory(onboardingStore, appInstallStore, DUCK_AI_END_CTA_PIXEL_PARAM)
+                pixel.fire(AppPixelName.ONBOARDING_DAX_CTA_SHOWN, mapOf(Pixel.PixelParameter.CTA_SHOWN to journey))
             }
-            shouldShow
+            duckAiOnboardingExperimentMetrics.fireFinalDialogImpression()
+
+            if (isBrandDesignUpdateEnabled()) {
+                DuckAiOnboardingEndCtaVariant.BRAND_DESIGN_UPDATE
+            } else {
+                DuckAiOnboardingEndCtaVariant.LEGACY
+            }
         }
     }
 
@@ -365,7 +393,13 @@ class CtaViewModel @Inject constructor(
             // Site suggestions
             canShowDaxIntroVisitSiteCta() && !extendedOnboardingFeatureToggles.noBrowserCtas().isEnabled() -> {
                 if (isBrandDesignUpdateEnabled()) {
-                    DaxVisitSiteOptionsBrandDesignUpdateBubbleCta(onboardingStore, appInstallStore, appTheme.isLightModeEnabled(), deviceInfo)
+                    DaxVisitSiteOptionsBrandDesignUpdateBubbleCta(
+                        onboardingStore,
+                        appInstallStore,
+                        appTheme.isLightModeEnabled(),
+                        deviceInfo,
+                        onboardingImprovementsEnabled = isOnboardingImprovementsEnabled(),
+                    )
                 } else {
                     DaxBubbleCta.DaxIntroVisitSiteOptionsCta(onboardingStore, appInstallStore)
                 }
@@ -374,7 +408,13 @@ class CtaViewModel @Inject constructor(
             // End
             canShowDaxCtaEndOfJourney() && !extendedOnboardingFeatureToggles.noBrowserCtas().isEnabled() -> {
                 if (isBrandDesignUpdateEnabled()) {
-                    DaxEndBrandDesignUpdateBubbleCta(onboardingStore, appInstallStore, appTheme.isLightModeEnabled(), deviceInfo)
+                    DaxEndBrandDesignUpdateBubbleCta(
+                        onboardingStore,
+                        appInstallStore,
+                        appTheme.isLightModeEnabled(),
+                        deviceInfo,
+                        onboardingImprovementsEnabled = isOnboardingImprovementsEnabled(),
+                    )
                 } else {
                     DaxBubbleCta.DaxEndCta(onboardingStore, appInstallStore)
                 }
@@ -389,6 +429,7 @@ class CtaViewModel @Inject constructor(
                         appTheme.isLightModeEnabled(),
                         deviceInfo,
                         isFreeTrialCopy = freeTrialCopyAvailable(),
+                        onboardingImprovementsEnabled = isOnboardingImprovementsEnabled(),
                     )
                 } else {
                     DaxBubbleCta.DaxSubscriptionCta(
@@ -485,6 +526,14 @@ class CtaViewModel @Inject constructor(
             if (duckChat.isDuckChatUrl(it.url.toUri())) {
                 if (onboardingStore.isDuckAiOnboardingFlow() && !suppressDuckAiOnboardingCta) {
                     if (!duckAiFireButtonShown()) {
+                        if (isBrandDesignUpdateEnabled()) {
+                            return DaxDuckAiFireButtonBrandDesignUpdateContextualCta(
+                                onboardingStore = onboardingStore,
+                                appInstallStore = appInstallStore,
+                                isLightTheme = appTheme.isLightModeEnabled(),
+                                deviceInfo = deviceInfo,
+                            )
+                        }
                         return OnboardingDaxDialogCta.DaxDuckAiFireButtonCta(onboardingStore, appInstallStore)
                     }
                 }

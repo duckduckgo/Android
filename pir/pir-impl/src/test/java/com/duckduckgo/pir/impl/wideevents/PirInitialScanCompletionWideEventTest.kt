@@ -24,9 +24,14 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.pir.impl.PirRemoteFeatures
+import com.duckduckgo.pir.impl.common.BrokerStepsParser
+import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStep.ScanStep
+import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStepActions.ScanStepActions
+import com.duckduckgo.pir.impl.models.Broker
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord.ScanJobRecord
 import com.duckduckgo.pir.impl.scheduling.PirExecutionType
 import com.duckduckgo.pir.impl.store.PirDataStore
+import com.duckduckgo.pir.impl.store.PirRepository
 import com.duckduckgo.pir.impl.store.PirSchedulingRepository
 import com.duckduckgo.pir.impl.wideevents.PirInitialScanCompletionWideEventImpl.Companion.COMPLETION_FLOW_TIMEOUT
 import com.duckduckgo.pir.impl.wideevents.PirInitialScanCompletionWideEventImpl.Companion.COMPLETION_INTERVAL_BUCKETS
@@ -53,6 +58,8 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
@@ -66,6 +73,8 @@ class PirInitialScanCompletionWideEventTest {
 
     private val wideEventClient: WideEventClient = mock()
     private val pirSchedulingRepository: PirSchedulingRepository = mock()
+    private val pirRepository: PirRepository = mock()
+    private val brokerStepsParser: BrokerStepsParser = mock()
     private val dataStore = FakePirDataStore()
 
     @SuppressLint("DenyListedApi")
@@ -83,9 +92,44 @@ class PirInitialScanCompletionWideEventTest {
             pirRemoteFeatures = pirRemoteFeatures,
             pirDataStore = dataStore,
             pirSchedulingRepository = pirSchedulingRepository,
+            pirRepository = pirRepository,
+            brokerStepsParser = brokerStepsParser,
             dispatchers = coroutineRule.testDispatcherProvider,
         )
     }
+
+    /**
+     * Marks [scannableNames] as active brokers whose scan steps parse to runnable actions, mirroring
+     * `RealPirDashboardInitialScanStateProviderTest.setupBrokersWithScannableSteps`. Any broker not
+     * listed here is treated as not scannable (inactive or unparseable steps).
+     */
+    private suspend fun setupScannableBrokers(scannableNames: List<String>) {
+        val brokers = scannableNames.map { broker(it) }
+        whenever(pirRepository.getAllActiveBrokerObjects()).thenReturn(brokers)
+        brokers.forEach { markScannable(it) }
+    }
+
+    private suspend fun markScannable(broker: Broker) {
+        whenever(pirRepository.getBrokerScanSteps(broker.name)).thenReturn("{steps:${broker.name}}")
+        whenever(brokerStepsParser.parseStep(eq(broker), any(), anyOrNull())).thenReturn(
+            listOf(
+                ScanStep(
+                    broker = broker,
+                    step = ScanStepActions(stepType = "scan", actions = emptyList(), scanType = "data"),
+                ),
+            ),
+        )
+    }
+
+    private fun broker(name: String): Broker = Broker(
+        name = name,
+        fileName = name,
+        url = name,
+        version = "1.0",
+        parent = null,
+        addedDatetime = 0L,
+        removedAt = 0L,
+    )
 
     private suspend fun runStarted(
         executionType: PirExecutionType = PirExecutionType.MANUAL_INITIAL,
@@ -236,6 +280,7 @@ class PirInitialScanCompletionWideEventTest {
                 ScanJobRecord(brokerName = "b2", userProfileId = 1, lastScanDateInMillis = 2000L),
             ),
         )
+        setupScannableBrokers(listOf("b1", "b2"))
 
         testee.onScanCompleted()
 
@@ -257,6 +302,73 @@ class PirInitialScanCompletionWideEventTest {
     }
 
     @Test
+    fun whenUnscannedJobBelongsToInactiveBrokerThenFlowStillFinishesSuccess() = runTest {
+        whenever(wideEventClient.flowStart(any(), any(), any(), any())).thenReturn(Result.success(99L))
+        runStarted(executionType = PirExecutionType.MANUAL_INITIAL)
+        // b3 was never scanned, but its broker is no longer active so the scanner will never run it.
+        // It must not block the journey from completing.
+        whenever(pirSchedulingRepository.getAllValidScanJobRecords()).thenReturn(
+            listOf(
+                ScanJobRecord(brokerName = "b1", userProfileId = 1, lastScanDateInMillis = 1000L),
+                ScanJobRecord(brokerName = "b2", userProfileId = 1, lastScanDateInMillis = 2000L),
+                ScanJobRecord(brokerName = "b3", userProfileId = 1, lastScanDateInMillis = 0L),
+            ),
+        )
+        setupScannableBrokers(listOf("b1", "b2"))
+
+        testee.onScanCompleted()
+
+        verify(wideEventClient).intervalEnd(wideEventId = 99L, key = INTERVAL_TOTAL_DURATION)
+        verify(wideEventClient).flowFinish(
+            wideEventId = 99L,
+            status = FlowStatus.Success,
+            metadata = mapOf(
+                KEY_TOTAL_SCAN_JOBS_AT_FINISH to "2",
+                KEY_FOREGROUND_RUN_COUNT to "1",
+                KEY_SCHEDULED_RUN_COUNT to "0",
+            ),
+        )
+        assertEquals(0L, dataStore.initialScanCompletionFlowId)
+    }
+
+    @Test
+    fun whenUnscannedJobBelongsToUnparseableBrokerThenFlowStillFinishesSuccess() = runTest {
+        whenever(wideEventClient.flowStart(any(), any(), any(), any())).thenReturn(Result.success(99L))
+        runStarted(executionType = PirExecutionType.MANUAL_INITIAL)
+        // b3 is active but its scan steps don't parse, so the scanner silently skips it and its job
+        // stays unscanned forever. It must not block the journey from completing.
+        whenever(pirSchedulingRepository.getAllValidScanJobRecords()).thenReturn(
+            listOf(
+                ScanJobRecord(brokerName = "b1", userProfileId = 1, lastScanDateInMillis = 1000L),
+                ScanJobRecord(brokerName = "b2", userProfileId = 1, lastScanDateInMillis = 2000L),
+                ScanJobRecord(brokerName = "b3", userProfileId = 1, lastScanDateInMillis = 0L),
+            ),
+        )
+        val b1 = broker("b1")
+        val b2 = broker("b2")
+        val b3 = broker("b3")
+        whenever(pirRepository.getAllActiveBrokerObjects()).thenReturn(listOf(b1, b2, b3))
+        markScannable(b1)
+        markScannable(b2)
+        // b3 is active but its steps fail to parse (parseStep returns empty), so it is not scannable.
+        whenever(pirRepository.getBrokerScanSteps("b3")).thenReturn("{steps:b3}")
+        whenever(brokerStepsParser.parseStep(eq(b3), any(), anyOrNull())).thenReturn(emptyList())
+
+        testee.onScanCompleted()
+
+        verify(wideEventClient).flowFinish(
+            wideEventId = 99L,
+            status = FlowStatus.Success,
+            metadata = mapOf(
+                KEY_TOTAL_SCAN_JOBS_AT_FINISH to "2",
+                KEY_FOREGROUND_RUN_COUNT to "1",
+                KEY_SCHEDULED_RUN_COUNT to "0",
+            ),
+        )
+        assertEquals(0L, dataStore.initialScanCompletionFlowId)
+    }
+
+    @Test
     fun whenScanCompletedAndSomeJobsNotDoneThenFlowRemainsOpen() = runTest {
         whenever(wideEventClient.flowStart(any(), any(), any(), any())).thenReturn(Result.success(99L))
         runStarted(executionType = PirExecutionType.MANUAL_INITIAL)
@@ -266,6 +378,7 @@ class PirInitialScanCompletionWideEventTest {
                 ScanJobRecord(brokerName = "b2", userProfileId = 1, lastScanDateInMillis = 0L),
             ),
         )
+        setupScannableBrokers(listOf("b1", "b2"))
 
         testee.onScanCompleted()
 
@@ -342,6 +455,7 @@ class PirInitialScanCompletionWideEventTest {
                 ScanJobRecord(brokerName = "b3", userProfileId = 1, lastScanDateInMillis = 3000L),
             ),
         )
+        setupScannableBrokers(listOf("b1", "b2", "b3"))
 
         testee.onScanCompleted()
 

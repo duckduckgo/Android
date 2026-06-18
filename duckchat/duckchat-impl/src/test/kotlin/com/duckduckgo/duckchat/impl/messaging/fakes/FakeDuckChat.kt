@@ -16,7 +16,6 @@
 
 package com.duckduckgo.duckchat.impl.messaging.fakes
 
-import android.content.Context
 import android.net.Uri
 import com.duckduckgo.duckchat.api.DuckChat
 import kotlinx.coroutines.flow.Flow
@@ -62,6 +61,8 @@ class FakeDuckChat(
         return "https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5"
     }
 
+    override fun getDuckChatSettingsUrl(): String = "https://duck.ai?settings=open"
+
     override fun isDuckChatUrl(uri: Uri): Boolean {
         return uri.toString().contains("duckchat")
     }
@@ -70,13 +71,11 @@ class FakeDuckChat(
         return wasOpenedBeforeValue
     }
 
-    override fun showNewAddressBarOptionChoiceScreen(context: Context, isDarkThemeEnabled: Boolean) {
-        // No-op for testing
-    }
-
     override suspend fun setInputScreenUserSetting(enabled: Boolean) {
         inputScreenUserSettingEnabled.value = enabled
     }
+
+    override suspend fun isInputScreenEverEnabled(): Boolean = false
 
     override suspend fun setCosmeticInputScreenUserSetting(enabled: Boolean) {
         cosmeticInputScreenUserSettingEnabled.value = enabled
@@ -112,8 +111,11 @@ class FakeDuckChat(
     override fun isVoiceChatSessionActive(tabId: String): Boolean = false
     override val activeVoiceChatSessions: Flow<Set<String>> = MutableStateFlow(emptySet())
     override fun observeTriggerVoiceChatSessionEnd(): Flow<String> = kotlinx.coroutines.flow.emptyFlow()
+    override fun endVoiceChatSession(tabId: String) { }
 
     override suspend fun isChatHistoryAvailable(): Boolean = false
+
+    override suspend fun onAddressBarPickerDuckAiSelected() { }
 
     fun setEnabled(enabled: Boolean) {
         this.enabled = enabled

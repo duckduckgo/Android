@@ -98,6 +98,7 @@
                         style="@style/Widget.DuckDuckGo.OmnibarCardView"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
+                        android:theme="?attr/daxOmnibarThemeOverlay"
                         app:cardElevation="0dp"
                         app:strokeWidth="0dp">
 
@@ -199,7 +200,8 @@
                                     android:importantForAccessibility="no"
                                     android:padding="@dimen/keyline_2"
                                     android:scaleType="center"
-                                    android:src="@drawable/ic_find_search_small_24" />
+                                    android:src="@drawable/ic_find_search_small_24"
+                                    app:tint="?attr/daxColorPrimaryIcon" />
 
                                 <ImageView
                                     android:id="@+id/backIcon"
@@ -212,7 +214,8 @@
                                     android:padding="@dimen/keyline_2"
                                     android:scaleType="center"
                                     android:src="@drawable/ic_arrow_left_small_24"
-                                    android:visibility="gone" />
+                                    android:visibility="gone"
+                                    app:tint="?attr/daxColorPrimaryIcon" />
 
                                 <ImageView
                                     android:id="@+id/globeIcon"
@@ -223,7 +226,8 @@
                                     android:padding="@dimen/keyline_2"
                                     android:scaleType="center"
                                     android:visibility="gone"
-                                    app:srcCompat="@drawable/ic_globe_24" />
+                                    app:srcCompat="@drawable/ic_globe_24"
+                                    app:tint="?attr/daxColorPrimaryIcon" />
 
                                 <FrameLayout
                                     android:id="@+id/sceneRoot"
@@ -243,7 +247,6 @@
                                 android:layout_height="match_parent"
                                 android:orientation="horizontal"
                                 android:gravity="center"
-                                android:background="?daxColorWindow"
                                 app:layout_constraintEnd_toEndOf="parent"
                                 app:layout_constraintStart_toStartOf="parent"
                                 app:layout_constraintBottom_toBottomOf="parent"
@@ -350,6 +353,7 @@
                                     app:layout_constraintBottom_toBottomOf="parent"
                                     app:layout_constraintEnd_toStartOf="@id/voiceSearchButton"
                                     app:layout_constraintTop_toTopOf="parent"
+                                    app:tint="?attr/daxColorPrimaryIcon"
                                     tools:visibility="visible" />
 
                                 <ImageView
@@ -364,6 +368,7 @@
                                     app:layout_constraintEnd_toStartOf="@id/verticalDivider"
                                     app:layout_constraintTop_toTopOf="parent"
                                     app:srcCompat="@drawable/ic_microphone_24"
+                                    app:tint="?attr/daxColorPrimaryIcon"
                                     tools:visibility="visible" />
 
                                 <View
@@ -391,6 +396,7 @@
                                     app:layout_constraintBottom_toBottomOf="parent"
                                     app:layout_constraintEnd_toEndOf="parent"
                                     app:layout_constraintTop_toTopOf="parent"
+                                    app:tint="?attr/daxColorPrimaryIcon"
                                     tools:visibility="visible" />
 
                             </androidx.constraintlayout.widget.ConstraintLayout>
@@ -496,8 +502,16 @@
                     android:layout_height="@dimen/toolbarIcon"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toStartOf="@id/browserMenu"
-                    app:layout_constraintStart_toEndOf="@id/fireIconMenu"
+                    app:layout_constraintStart_toEndOf="@id/leadingIconBarrier"
                     app:layout_constraintTop_toTopOf="parent" />
+
+                <androidx.constraintlayout.widget.Barrier
+                    android:id="@+id/leadingIconBarrier"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:barrierAllowsGoneWidgets="false"
+                    app:barrierDirection="end"
+                    app:constraint_referenced_ids="fireIconMenu,plusIconMenu" />
 
                 <FrameLayout
                     android:id="@+id/browserMenu"
@@ -535,7 +549,6 @@
                     android:layout_height="@dimen/toolbarIcon"
                     android:background="@drawable/selectable_item_rounded_corner_background"
                     app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toStartOf="@id/tabsMenu"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent">
 
@@ -547,6 +560,26 @@
                         android:contentDescription="@string/fireMenu"
                         android:scaleType="center"
                         android:src="@drawable/ic_fire_24" />
+                </FrameLayout>
+
+                <FrameLayout
+                    android:id="@+id/plusIconMenu"
+                    android:layout_width="@dimen/toolbarIcon"
+                    android:layout_height="@dimen/toolbarIcon"
+                    android:background="@drawable/selectable_item_rounded_corner_background"
+                    android:visibility="gone"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                    <ImageView
+                        android:id="@+id/plusIconImageView"
+                        android:layout_width="@dimen/bottomNavIcon"
+                        android:layout_height="@dimen/bottomNavIcon"
+                        android:layout_gravity="center"
+                        android:contentDescription="@string/duckChatPlusButtonContentDescription"
+                        android:scaleType="center"
+                        android:src="@drawable/ic_add_24" />
                 </FrameLayout>
 
                 <Space

@@ -33,6 +33,7 @@ import android.widget.FrameLayout
 import android.widget.Toast
 import android.widget.Toast.LENGTH_SHORT
 import androidx.activity.OnBackPressedCallback
+import androidx.core.view.doOnNextLayout
 import androidx.core.view.isNotEmpty
 import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
@@ -52,6 +53,7 @@ import com.duckduckgo.browser.ui.newtab.hatch.NewTabReturnHatchView
 import com.duckduckgo.common.ui.DuckDuckGoFragment
 import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.common.ui.view.appendIconToText
+import com.duckduckgo.common.ui.view.text.DaxTextView
 import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.extensions.hideKeyboard
@@ -62,6 +64,8 @@ import com.duckduckgo.dataclearing.api.fire.FireDialogProvider.FireDialogOrigin
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChatHistoryNoParams
+import com.duckduckgo.duckchat.api.InputMode
+import com.duckduckgo.duckchat.api.inputscreen.DuckAiOnboardingEndCtaVariant
 import com.duckduckgo.duckchat.api.inputscreen.InputScreenActivityParams
 import com.duckduckgo.duckchat.api.inputscreen.InputScreenActivityResultCodes
 import com.duckduckgo.duckchat.api.inputscreen.InputScreenActivityResultParams
@@ -105,6 +109,8 @@ import com.duckduckgo.voice.api.VoiceSearchLauncher.Event.VoiceRecognitionSucces
 import com.duckduckgo.voice.api.VoiceSearchLauncher.Event.VoiceSearchDisabled
 import com.duckduckgo.voice.api.VoiceSearchLauncher.Source.BROWSER
 import com.duckduckgo.voice.api.VoiceSearchLauncher.VoiceSearchMode
+import com.google.android.material.snackbar.BaseTransientBottomBar
+import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
@@ -112,6 +118,7 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import logcat.logcat
 import javax.inject.Inject
+import com.duckduckgo.browser.ui.R as BrowserUiR
 import com.duckduckgo.mobile.android.R as CommonR
 
 @InjectWith(FragmentScope::class)
@@ -176,6 +183,7 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
     private var tabAttachmentPopup: TabAttachmentPopup? = null
     private var duckAiEndCtaOkClicked: Boolean? = null
     private var duckAiEndCtaVisible: Boolean = false
+    private var activeDuckAiEndCtaRoot: View? = null
 
     private val pageChangeCallback =
         object : OnPageChangeCallback() {
@@ -278,7 +286,12 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
                     )
             }
 
-        inputScreenButtons = InputScreenButtons(requireContext(), useTopBar = useTopBar)
+        // Bottom-bar buttons live inside the dark Fire card, so build them with the card's context so
+        // they pick up the dark-Fire styling. The screen background stays on the activity (light)
+        // theme. Top-bar buttons float in a separate container on the screen, so they keep the
+        // activity theme.
+        val buttonsContext = if (useTopBar) requireContext() else inputModeWidget.cardContext
+        inputScreenButtons = InputScreenButtons(buttonsContext, useTopBar = useTopBar)
 
         if (useTopBar) {
             binding.inputModeWidgetContainerTop.addView(inputModeWidget)
@@ -314,11 +327,16 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
         configureLogoAnimation()
         configureKeyboardListener()
 
-        val launchOnChat = if (duckChatFeature.rememberTogglePosition().isEnabled() && params?.isNewTab == true) {
-            viewModel.getNewTabTogglePosition() == DefaultTogglePosition.DUCK_AI
-        } else {
-            params?.launchOnChat ?: false
+        val launchOnChat = when (params?.initialInputMode) {
+            InputMode.SEARCH -> false
+            InputMode.DUCK_AI -> true
+            null -> if (duckChatFeature.rememberTogglePosition().isEnabled() && params?.isNewTab == true) {
+                viewModel.getNewTabTogglePosition() == DefaultTogglePosition.DUCK_AI
+            } else {
+                false
+            }
         }
+
         if (launchOnChat) {
             inputModeWidget.initOnChat(animate = false)
         } else {
@@ -326,8 +344,16 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
         }
         updateMenuIconButton()
 
-        if (params?.showDuckAiOnboardingEndCta == true) {
-            showDuckAiEndCta()
+        when (params?.duckAiOnboardingEndCta) {
+            DuckAiOnboardingEndCtaVariant.LEGACY -> showDuckAiEndCta(
+                DuckAiOnboardingEndCtaVariant.LEGACY,
+                useCustomAiOnboardingFlowCopy = launchOnChat,
+            )
+            DuckAiOnboardingEndCtaVariant.BRAND_DESIGN_UPDATE -> showDuckAiEndCta(
+                DuckAiOnboardingEndCtaVariant.BRAND_DESIGN_UPDATE,
+                useCustomAiOnboardingFlowCopy = launchOnChat,
+            )
+            DuckAiOnboardingEndCtaVariant.NONE, null -> Unit
         }
 
         requireActivity().onBackPressedDispatcher.addCallback(
@@ -420,6 +446,10 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
 
         browserMenuHighlight.shouldShowHighlightForMode(BrowserViewMode.NewTab)
             .onEach { inputModeWidget.setBrowserMenuHighlightVisible(it) }
+            .launchIn(viewLifecycleOwner.lifecycleScope)
+
+        viewModel.tabCount
+            .onEach { count -> inputModeWidget.tabSwitcherButton.count = count }
             .launchIn(viewLifecycleOwner.lifecycleScope)
 
         if (duckChatFeature.chatTabAttachments().isEnabled()) {
@@ -616,6 +646,25 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
                             restoreLogoTopMargin(visible)
                         }
                     }
+                }
+
+                override fun onTabClosed(
+                    tabId: String,
+                    onUndo: () -> Unit,
+                    onCommit: () -> Unit,
+                ) {
+                    // Parent to the screen root (resolves to the resizing activity content, so it
+                    // clears the keyboard) and anchor above the input widget when it's at the bottom.
+                    val anchor = if (useTopBar) null else binding.inputModeWidgetContainerBottom
+                    Snackbar.make(binding.root, BrowserUiR.string.newTabReturnHatchTabClosed, Snackbar.LENGTH_LONG)
+                        .apply { anchor?.let { setAnchorView(it) } }
+                        .setAction(BrowserUiR.string.newTabReturnHatchUndo) { onUndo() }
+                        .addCallback(object : Snackbar.Callback() {
+                            override fun onDismissed(snackbar: Snackbar, event: Int) {
+                                if (event != BaseTransientBottomBar.BaseCallback.DISMISS_EVENT_ACTION) onCommit()
+                            }
+                        })
+                        .show()
                 }
 
                 override fun onBurnTabPressed() {
@@ -966,7 +1015,7 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
         binding.chatSuggestionsBottomFadeContainer.getChildAt(0)?.invalidate()
     }
 
-    private fun showDuckAiEndCta() {
+    private fun showDuckAiEndCta(variant: DuckAiOnboardingEndCtaVariant, useCustomAiOnboardingFlowCopy: Boolean) {
         duckAiEndCtaVisible = true
         duckAiEndCtaOkClicked = false
         binding.ddgLogoContainer.isVisible = false
@@ -978,19 +1027,42 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
         binding.viewPager.visibility = View.INVISIBLE
         binding.newTabContainerScrollView.isVisible = false
 
-        val backgroundRes = if (appTheme.isLightModeEnabled()) {
-            CommonR.drawable.onboarding_background_bitmap_light
+        val description = if (useCustomAiOnboardingFlowCopy) {
+            getString(R.string.duckAiEndCtaDescriptionCustomAi)
         } else {
-            CommonR.drawable.onboarding_background_bitmap_dark
+            getString(R.string.duckAiEndCtaDescription)
         }
-        binding.onboardingBackground.setImageResource(backgroundRes)
-        binding.onboardingBackground.isVisible = true
+        val descriptionHtml = Html.fromHtml(description, Html.FROM_HTML_MODE_COMPACT)
+        val descriptionWithIcon = requireContext().appendIconToText(descriptionHtml, CommonR.drawable.ic_ai_chat_16)
 
-        val descriptionHtml = Html.fromHtml(getString(R.string.duckAiEndCtaDescription), Html.FROM_HTML_MODE_COMPACT)
-        binding.duckAiEndCta.duckAiEndCtaDescription.text =
-            requireContext().appendIconToText(descriptionHtml, CommonR.drawable.ic_ai_chat_16)
+        val ctaView: View
+        val descriptionView: DaxTextView
+        val okButton: View
+        when (variant) {
+            DuckAiOnboardingEndCtaVariant.BRAND_DESIGN_UPDATE -> {
+                binding.onboardingBackdropBrandDesign.isVisible = true
+                binding.onboardingBackgroundBrandDesign.setImageResource(CommonR.drawable.bg_onboarding_end)
+                binding.onboardingBackgroundBrandDesign.isVisible = true
+                ctaView = binding.duckAiEndCtaBrandDesign.root
+                descriptionView = binding.duckAiEndCtaBrandDesign.duckAiEndCtaBrandDesignDescription
+                okButton = binding.duckAiEndCtaBrandDesign.duckAiEndCtaBrandDesignOkButton
+            }
+            else -> {
+                val backgroundRes = if (appTheme.isLightModeEnabled()) {
+                    CommonR.drawable.onboarding_background_bitmap_light
+                } else {
+                    CommonR.drawable.onboarding_background_bitmap_dark
+                }
+                binding.onboardingBackground.setImageResource(backgroundRes)
+                binding.onboardingBackground.isVisible = true
+                ctaView = binding.duckAiEndCta.root
+                descriptionView = binding.duckAiEndCta.duckAiEndCtaDescription
+                okButton = binding.duckAiEndCta.duckAiEndCtaOkButton
+            }
+        }
 
-        val ctaView = binding.duckAiEndCta.root
+        descriptionView.text = descriptionWithIcon
+        activeDuckAiEndCtaRoot = ctaView
         ctaView.alpha = 0f
         ctaView.isVisible = true
         ctaView.animate()
@@ -999,7 +1071,12 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
             .setStartDelay(400)
             .start()
 
-        binding.duckAiEndCta.duckAiEndCtaOkButton.setOnClickListener {
+        // DaxButtonPrimary (a MaterialButton) positions its text during onMeasure. The CTA is shown on the same frame the
+        // ViewPager switches to the chat page, so the button's first layout pass can land at a transient width and leave its text
+        // start-aligned instead of centered. Force one more measure once the width is final so the text re-centers.
+        okButton.doOnNextLayout { it.requestLayout() }
+
+        okButton.setOnClickListener {
             duckAiEndCtaOkClicked = true
             hideDuckAiEndCta()
         }
@@ -1007,18 +1084,23 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
 
     private fun hideDuckAiEndCta() {
         duckAiEndCtaVisible = false
-        binding.duckAiEndCta.root.animate()
+        val ctaView = activeDuckAiEndCtaRoot ?: return
+        ctaView.animate()
             .alpha(0f)
             .setDuration(OVERLAY_ANIMATION_DURATION)
             .withEndAction {
                 if (view == null) return@withEndAction
-                binding.duckAiEndCta.root.isVisible = false
+                ctaView.isVisible = false
                 binding.onboardingBackground.isVisible = false
                 binding.onboardingBackground.setImageResource(0)
+                binding.onboardingBackdropBrandDesign.isVisible = false
+                binding.onboardingBackgroundBrandDesign.isVisible = false
+                binding.onboardingBackgroundBrandDesign.setImageResource(0)
                 binding.ddgLogoContainer.isVisible = true
                 binding.viewPager.isVisible = true
                 val state = viewModel.visibilityState.value
                 updateFavoritesVisibility(state.searchMode, !state.autoCompleteSuggestionsVisible)
+                activeDuckAiEndCtaRoot = null
             }
             .start()
     }

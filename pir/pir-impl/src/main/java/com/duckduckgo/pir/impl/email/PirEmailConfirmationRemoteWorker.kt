@@ -24,7 +24,9 @@ import com.duckduckgo.anvil.annotations.ContributesWorker
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.pir.impl.PirFeatureDataCleaner
+import com.duckduckgo.pir.impl.checker.PirEligibility
 import com.duckduckgo.pir.impl.checker.PirWorkHandler
+import com.duckduckgo.pir.impl.wideevents.PirScanWideEvent.CancellationReason
 import kotlinx.coroutines.flow.firstOrNull
 import logcat.logcat
 import javax.inject.Inject
@@ -49,9 +51,10 @@ class PirEmailConfirmationRemoteWorker(
     override suspend fun doRemoteWork(): Result {
         logcat { "PIR-WORKER ($this}: doRemoteWork ${Process.myPid()}" }
         return try {
-            if (pirWorkHandler.canRunPir().firstOrNull() == false) {
+            val eligibility = pirWorkHandler.canRunPir().firstOrNull()
+            if (eligibility is PirEligibility.Disabled) {
                 logcat { "PIR-WORKER ($this}: PIR not allowed to run!" }
-                pirWorkHandler.cancelWork()
+                pirWorkHandler.cancelWork(CancellationReason.fromDisabledReason(eligibility.reason))
                 pirFeatureDataCleaner.removeAllData()
                 return Result.failure()
             }

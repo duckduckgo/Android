@@ -89,6 +89,9 @@ import com.duckduckgo.common.ui.view.listitem.OneLineListItem
 import com.duckduckgo.common.ui.view.listitem.TwoLineListItem
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.api.DuckChatSettingsNoParams
@@ -99,7 +102,7 @@ import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
 import com.duckduckgo.remote.messaging.impl.modal.ModalSurfaceActivityFromMessageId
 import com.duckduckgo.settings.api.CompleteSetupSettingsPlugin
-import com.duckduckgo.settings.api.DuckPlayerSettingsPlugin
+import com.duckduckgo.settings.api.OtherSettingsPlugin
 import com.duckduckgo.settings.api.ProSettingsPlugin
 import com.duckduckgo.settings.api.ThreatProtectionSettingsPlugin
 import com.duckduckgo.subscriptions.api.SubscriptionFeedbackScreens.GeneralSubscriptionFeedbackScreenNoParams
@@ -125,6 +128,12 @@ class SettingsActivity : DuckDuckGoActivity() {
     lateinit var pixel: Pixel
 
     @Inject
+    lateinit var edgeToEdgeProvider: EdgeToEdgeProvider
+
+    @Inject
+    lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
+
+    @Inject
     lateinit var internalFeaturePlugins: PluginPoint<InternalFeaturePlugin>
 
     @Inject
@@ -143,9 +152,9 @@ class SettingsActivity : DuckDuckGoActivity() {
     }
 
     @Inject
-    lateinit var _duckPlayerSettingsPlugin: PluginPoint<DuckPlayerSettingsPlugin>
-    private val duckPlayerSettingsPlugin by lazy {
-        _duckPlayerSettingsPlugin.getPlugins()
+    lateinit var _otherSettingsPlugin: PluginPoint<OtherSettingsPlugin>
+    private val otherSettingsPlugin by lazy {
+        _otherSettingsPlugin.getPlugins()
     }
 
     @Inject
@@ -194,8 +203,17 @@ class SettingsActivity : DuckDuckGoActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        val edgeToEdgeEnabled = edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.SETTINGS)
+        if (edgeToEdgeEnabled) {
+            enableTransparentEdgeToEdge()
+        }
+
         setContentView(binding.root)
         setupToolbar(binding.includeToolbar.toolbar)
+
+        if (edgeToEdgeEnabled) {
+            configureEdgeToEdgeInsets()
+        }
 
         configureUiEventHandlers()
         configureInternalFeatures()
@@ -222,6 +240,12 @@ class SettingsActivity : DuckDuckGoActivity() {
 
         items.forEach { viewsMain.settingsSectionGeneral.removeView(it) }
         items.forEach { viewsMain.settingsSectionGeneral.addView(it) }
+    }
+
+    private fun configureEdgeToEdgeInsets() {
+        edgeToEdgeHandler.applyHorizontalSystemBarInsets(binding.root)
+        edgeToEdgeHandler.applyStatusBarInsets(binding.includeToolbar.appBarLayout)
+        edgeToEdgeHandler.applyNavigationBarInsets(binding.includeSettings.root, drawBehindGestureNav = true)
     }
 
     private fun configureCompleteSetupSettings() {
@@ -285,12 +309,8 @@ class SettingsActivity : DuckDuckGoActivity() {
             }
         }
 
-        if (duckPlayerSettingsPlugin.isEmpty()) {
-            viewsMain.settingsSectionDuckPlayer.gone()
-        } else {
-            duckPlayerSettingsPlugin.forEach { plugin ->
-                viewsMain.settingsSectionDuckPlayer.addView(plugin.getView(this))
-            }
+        otherSettingsPlugin.forEach { plugin ->
+            viewsMain.root.addView(plugin.getView(this))
         }
 
         if (threatProtectionSettingsPlugin.isEmpty()) {
@@ -330,7 +350,6 @@ class SettingsActivity : DuckDuckGoActivity() {
                     updateSyncSetting(visible = it.showSyncSetting)
                     updateAutoconsent(it.isAutoconsentEnabled)
                     updateSubscription(it.isSubscriptionEnabled)
-                    updateDuckPlayer(it.isDuckPlayerEnabled)
                     updateThreatProtection(it.isNewThreatProtectionSettingsEnabled)
                     updateDuckChat(it.isDuckChatEnabled)
                     updateVoiceSearchVisibility(it.isVoiceSearchVisible)
@@ -354,14 +373,6 @@ class SettingsActivity : DuckDuckGoActivity() {
             viewsPro.show()
         } else {
             viewsPro.gone()
-        }
-    }
-
-    private fun updateDuckPlayer(isDuckPlayerEnabled: Boolean) {
-        if (isDuckPlayerEnabled) {
-            viewsMain.settingsSectionDuckPlayer.show()
-        } else {
-            viewsMain.settingsSectionDuckPlayer.gone()
         }
     }
 

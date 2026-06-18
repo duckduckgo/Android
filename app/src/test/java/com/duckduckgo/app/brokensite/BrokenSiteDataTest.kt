@@ -17,6 +17,7 @@
 package com.duckduckgo.app.brokensite
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.duckduckgo.adblocking.api.duckplayer.DuckPlayer
 import com.duckduckgo.app.browser.certificates.BypassedSSLCertificatesRepository
 import com.duckduckgo.app.browser.omnibar.StandardizedLeadingIconFeatureToggle
 import com.duckduckgo.app.global.model.Site
@@ -31,7 +32,6 @@ import com.duckduckgo.browser.api.brokensite.BrokenSiteData
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow.MENU
 import com.duckduckgo.browser.api.brokensite.BrokenSiteOpenerContext
 import com.duckduckgo.common.test.CoroutineTestRule
-import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.privacy.config.api.ContentBlocking
 import org.junit.Assert.*
 import org.junit.Before

@@ -129,6 +129,20 @@
                 android:visibility="gone"
                 tools:visibility="gone" />
 
+            <!--
+              ~ Padding compensator for CTAs that have no in-card content slot. The card container
+              ~ uses paddingTop=keyline_6 vs paddingBottom=20dp; other slots' button mass masks the
+              ~ 12dp asymmetry, but no-content CTAs have no button to compensate, so this Space
+              ~ adds the missing keyline_3 when it's the active slot. Portrait only — landscape's
+              ~ container padding is already symmetric.
+              -->
+            <Space
+                android:id="@+id/contextualBrandDesignNoCtaContent"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/keyline_3"
+                android:visibility="gone"
+                tools:visibility="gone" />
+
         </com.duckduckgo.app.onboarding.ui.view.TouchInterceptingLinearLayout>
 
     </com.duckduckgo.common.ui.view.shape.DaxOnboardingBubbleBrandDesignUpdateCardView>

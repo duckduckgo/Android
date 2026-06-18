@@ -24,6 +24,18 @@ data class NativeInputState(
     val selectedTool: String? = null,
     /** Set when the active tab is a Duck.ai page already attached to an existing chat. */
     val chatId: String? = null,
+    /** True while the active chat is streaming a response (ChatState.STREAMING or LOADING). */
+    val isChatStreaming: Boolean = false,
+    /**
+     * Set when we are in model change mode in ongoing chats
+     * (between `showModelPicker` message and the next prompt submit, chat change, or dismissal without selection).
+     * Routes picker taps to `submitChangeModelAction` instead of normal behaviour.
+     */
+    val modelChangeMode: Boolean = false,
+    /**
+     * Whether the native input submit button is enabled for this tab.
+     */
+    val submitEnabled: Boolean = true,
 ) {
     enum class InputMode {
         SEARCH_AND_DUCK_AI,

@@ -28,6 +28,7 @@ import android.os.Environment
 import android.os.Message
 import android.provider.MediaStore
 import android.text.Editable
+import android.text.TextUtils
 import android.text.TextWatcher
 import android.view.KeyEvent
 import android.view.MotionEvent
@@ -41,6 +42,7 @@ import android.webkit.ValueCallback
 import android.webkit.WebChromeClient
 import android.webkit.WebSettings
 import android.webkit.WebView
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
 import androidx.annotation.AnyThread
@@ -59,6 +61,8 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.browsermode.api.WebViewModeInitializer
 import com.duckduckgo.common.ui.DuckDuckGoFragment
+import com.duckduckgo.common.ui.menu.PopupMenu
+import com.duckduckgo.common.ui.view.PopupMenuItemView
 import com.duckduckgo.common.ui.view.dialog.ActionBottomSheetDialog
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.makeSnackbarWithNoBottomInset
@@ -76,6 +80,7 @@ import com.duckduckgo.downloads.api.DownloadConfirmationDialogListener
 import com.duckduckgo.downloads.api.DownloadStateListener
 import com.duckduckgo.downloads.api.DownloadsFileActions
 import com.duckduckgo.downloads.api.FileDownloader
+import com.duckduckgo.duckchat.api.DuckChatHistoryNoParams
 import com.duckduckgo.duckchat.api.viewmodel.DuckChatSharedViewModel
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.R
@@ -84,6 +89,8 @@ import com.duckduckgo.duckchat.impl.feature.AIChatDownloadFeature
 import com.duckduckgo.duckchat.impl.helper.DuckChatJSHelper
 import com.duckduckgo.duckchat.impl.helper.Mode
 import com.duckduckgo.duckchat.impl.helper.RealDuckChatJSHelper
+import com.duckduckgo.duckchat.impl.history.ChatHistoryItem
+import com.duckduckgo.duckchat.impl.models.iconRes
 import com.duckduckgo.duckchat.impl.ui.DuckChatWebViewClient
 import com.duckduckgo.duckchat.impl.ui.filechooser.FileChooserIntentBuilder
 import com.duckduckgo.duckchat.impl.ui.filechooser.capture.camera.CameraHardwareChecker
@@ -497,7 +504,7 @@ class DuckChatContextualFragment :
         }
         binding.contextualNewChat.setOnClickListener {
             hideKeyboard(binding.inputField)
-            viewModel.onNewChatRequested()
+            viewModel.onChatsIconClicked()
         }
         binding.contextualFire.setOnClickListener {
             viewModel.onFireButtonClicked()
@@ -556,9 +563,8 @@ class DuckChatContextualFragment :
         binding.duckAiAttachContextLayout.setOnClickListener {
             viewModel.addPageContext()
         }
-        binding.contextualPromptSummarize.setOnClickListener {
-            val prompt = getString(R.string.duckAIContextualPromptSummarize)
-            viewModel.replacePrompt(binding.inputField.text.toString(), prompt)
+        binding.contextualPromptQuickAction.setOnClickListener {
+            viewModel.onQuickActionClicked(binding.inputField.text.toString())
         }
     }
 
@@ -604,6 +610,7 @@ class DuckChatContextualFragment :
                     }
 
                     is DuckChatContextualViewModel.Command.ChangeSheetState -> {
+                        command.prefillNativeInput?.let { binding.contextualNativeInputWidget.text = it }
                         bottomSheetBehavior.state = command.newState
                     }
                     is DuckChatContextualViewModel.Command.RequestPageContext -> {
@@ -612,6 +619,20 @@ class DuckChatContextualFragment :
 
                     is DuckChatContextualViewModel.Command.ShowFireConfirmation -> {
                         showFireConfirmationDialog()
+                    }
+
+                    is DuckChatContextualViewModel.Command.ShowChatsPopup -> {
+                        showChatsPopup(command.showNewChatHeader, command.recentChats)
+                    }
+
+                    is DuckChatContextualViewModel.Command.OpenChatUrl -> {
+                        viewModel.onContextualClose()
+                        startActivity(browserNav.openInNewTab(requireContext(), command.url, command.sourceTabId))
+                    }
+
+                    is DuckChatContextualViewModel.Command.LaunchChatHistory -> {
+                        viewModel.onContextualClose()
+                        globalActivityStarter.start(requireContext(), DuckChatHistoryNoParams)
                     }
                 }
             }.launchIn(lifecycleScope)
@@ -662,18 +683,33 @@ class DuckChatContextualFragment :
             binding.contextualFullScreen.gone()
         }
 
+        binding.contextualPromptQuickAction.setText(viewState.quickActionState.labelResId)
+        binding.contextualPromptQuickAction.setCompoundDrawablesRelativeWithIntrinsicBounds(viewState.quickActionState.iconResId, 0, 0, 0)
+        binding.inputField.setHint(viewState.chatHintResId)
+
+        if (viewState.showChatsIcon) {
+            binding.contextualNewChat.setImageResource(com.duckduckgo.mobile.android.R.drawable.ic_chats_24)
+        }
+
         when (viewState.sheetMode) {
             DuckChatContextualViewModel.SheetMode.INPUT -> {
                 binding.contextualModeNativeContent.show()
                 binding.contextualWebviewContainer.gone()
                 contextualNativeInputManager.onInputMode()
 
-                binding.contextualNewChat.gone()
+                if (viewState.showChatsIcon) {
+                    binding.contextualNewChat.show()
+                } else {
+                    binding.contextualNewChat.gone()
+                }
                 binding.contextualFire.gone()
 
                 renderPageContext(viewState.contextTitle, viewState.contextUrl, viewState.tabId)
 
-                if (viewState.showContext) {
+                if (viewState.quickActionState == DuckChatContextualViewModel.QuickActionState.ASK_ABOUT_PAGE) {
+                    binding.duckAiContextualLayout.gone()
+                    binding.duckAiAttachContextLayout.gone()
+                } else if (viewState.showContext) {
                     binding.duckAiContextualLayout.show()
                     binding.duckAiAttachContextLayout.gone()
                 } else {
@@ -700,6 +736,52 @@ class DuckChatContextualFragment :
 
     private fun showFireConfirmationDialog() {
         duckChatSharedViewModel.onContextualFireButtonClicked()
+    }
+
+    private fun showChatsPopup(showNewChatHeader: Boolean, recentChats: List<ChatHistoryItem>) {
+        logcat { "Duck.ai Contextual: showChatsPopup header=$showNewChatHeader chats=${recentChats.size}" }
+        val popup = PopupMenu(
+            layoutInflater = layoutInflater,
+            resourceId = R.layout.popup_contextual_chats_menu,
+            width = resources.getDimensionPixelSize(R.dimen.contextualChatsPopupMenuWidth),
+        )
+        val content = popup.contentView
+
+        val newChatRow = content.findViewById<PopupMenuItemView>(R.id.contextualChatsPopupNewChat)
+        val headerDivider = content.findViewById<View>(R.id.contextualChatsPopupHeaderDivider)
+        newChatRow.visibility = if (showNewChatHeader) View.VISIBLE else View.GONE
+        headerDivider.visibility = if (showNewChatHeader) View.VISIBLE else View.GONE
+        if (showNewChatHeader) {
+            popup.onMenuItemClicked(newChatRow) { viewModel.onNewChatRequested() }
+        }
+
+        val recentContainer = content.findViewById<LinearLayout>(R.id.contextualChatsPopupRecentContainer)
+        recentContainer.removeAllViews()
+        recentChats.forEach { chat ->
+            val row = PopupMenuItemView(requireContext()).apply {
+                layoutParams = LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT,
+                )
+                setPrimaryText(chat.displayTitle)
+                setLeadingIconResource(chat.type.iconRes(chat.pinned))
+                setPrimaryTextMaxLines(MAX_CHAT_TITLE_LINES)
+                setPrimaryTextEllipsize(TextUtils.TruncateAt.END)
+            }
+            popup.onMenuItemClicked(row) { viewModel.onRecentChatClicked(chat.chatId) }
+            recentContainer.addView(row)
+        }
+
+        val viewAllRow = content.findViewById<PopupMenuItemView>(R.id.contextualChatsPopupViewAll)
+        val footerDivider = content.findViewById<View>(R.id.contextualChatsPopupFooterDivider)
+        val showFooter = recentChats.isNotEmpty()
+        viewAllRow.visibility = if (showFooter) View.VISIBLE else View.GONE
+        footerDivider.visibility = if (showFooter) View.VISIBLE else View.GONE
+        if (showFooter) {
+            popup.onMenuItemClicked(viewAllRow) { viewModel.onViewAllChatsClicked() }
+        }
+
+        popup.showAnchoredView(requireActivity(), binding.root, binding.contextualNewChat)
     }
 
     private fun observeSubscriptionEventDataChannel() {
@@ -1004,6 +1086,7 @@ class DuckChatContextualFragment :
     }
 
     companion object {
+        private const val MAX_CHAT_TITLE_LINES = 1
         private const val PERMISSION_REQUEST_WRITE_EXTERNAL_STORAGE = 200
         private const val CUSTOM_UA =
             "Mozilla/5.0 (Linux; Android 16) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/124.0.0.0 Mobile DuckDuckGo/5 Safari/537.36"

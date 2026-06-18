@@ -75,6 +75,7 @@
     <string name="options">Valikud</string>
     <string name="shareLink">Jaga linki</string>
     <string name="copyUrl">Kopeeri lingi aadress</string>
+    <string name="urlCopiedToClipboard">URL kopeeriti lõikelauale</string>
 
     <!-- Find in page -->
     <string name="nextSearchTermDescription">Otsi järgmine</string>
@@ -265,6 +266,7 @@
     <string name="singleTabFireDialogDeleteAll">Kustuta kõik</string>
     <string name="singleTabFireDialogDeleteThisTab">Kustuta see vahekaart</string>
     <string name="singleTabFireDialogDeleteChat">Kustuta vestlus</string>
+    <string name="singleTabFireDialogDeleteChats">Kustuta vestlused</string>
     <string name="singleTabFireDialogTitleDuckAi">Kustutada see vestlus?</string>
     <string name="singleTabFireDialogSubtitleSiteData">Saidi andmete kustutamine võib sind kontodelt välja logida.</string>
     <string name="singleTabFireDialogSubtitleDownloads">See tühistab pooleliolevad allalaadimised.</string>
@@ -903,6 +905,26 @@
     <string name="preOnboardingInputScreenButton">Järgmine</string>
     <string name="preOnboardingInputScreenDescription"><![CDATA[Tehisintellekti funktsioonid on privaatsed ja valikulised. Saate muudatusi teha suvandis <b>Seaded > Tehisintellekti funktsioonid</b>.]]></string>
 
+    <!--Onboarding Reinstall Quick Setup-->
+    <string name="preOnboardingReinstallQuickSetupTitle">Tere tulemast tagasi!&lt;br/&gt;Kas soovid midagi kohandada?</string>
+    <string name="preOnboardingReinstallSetDefaultLabel">Määra DuckDuckGo vaikeotsinguks</string>
+    <string name="preOnboardingReinstallAddHomeScreenWidgetLabel">Lisa avalehe vidin</string>
+    <string name="preOnboardingReinstallAddressBarLabel">Aadressiriba asukoht</string>
+    <string name="preOnboardingReinstallAddressBarSearchOptionsLabel">Aadressiriba otsinguvõimalused</string>
+    <string name="preOnboardingReinstallStartBrowsing">Alusta sirvimist</string>
+
+    <!-- Quick setup bottom sheets -->
+    <string name="quickSetupAddressBarPositionTitle">Kuhu sa oma aadressiriba paigutada soovid?</string>
+    <string name="quickSetupAddressBarPositionCaption"><![CDATA[Muudatusi saad teha <b>menüüs Seaded > Välimus</b>.]]></string>
+    <string name="quickSetupSearchOptionsTitle">Kas soovid otsingut ja tehisintellektiga vestlust aadressiribale?</string>
+    <string name="quickSetupBottomSheetDone">Valmis</string>
+    <string name="quickSetupInputScreenSearchOnly">Ainult otsing</string>
+    <string name="quickSetupInputScreenSearchAndDuckAi">Otsing ja Duck.ai</string>
+    <string name="quickSetupRemoveHomeScreenWidgetTitle">Kuidas avalehe vidinat eemaldada</string>
+    <string name="quickSetupRemoveHomeScreenWidgetStep1">Mine oma avalehele</string>
+    <string name="quickSetupRemoveHomeScreenWidgetStep2">Puuduta ja hoia vidinat</string>
+    <string name="quickSetupRemoveHomeScreenWidgetStep3">Eemalda see puudutades või lohistades</string>
+
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Aadressiriba</string>
     <string name="settingsAddressBarPositionHeaderTitle">Aadressiriba asukoht</string>
@@ -1003,9 +1025,16 @@
     <string name="linkTextCopyFailed">Lingi teksti ei saanud kopeerida</string>
 
     <string name="preOnboardingWelcomeDialogTitle">Tere!</string>
-    <string name="preOnboardingWelcomeDialogBody1">Kas oled valmis kasutama kiiremat brauserit,\nmis annab sulle kontrolli?</string>
-    <string name="preOnboardingWelcomeDialogBody2">Tehisintellekt on alati valikuline ja\nprivaatsuskaitse on alati sisse lülitatud.</string>
+    <string name="preOnboardingWelcomeDialogBody1">Kas oled valmis kasutama kiiremat brauserit, mis annab sulle kontrolli?</string>
+    <string name="preOnboardingWelcomeDialogBody2">Tehisintellekt on alati valikuline ja privaatsuskaitse on alati sisse lülitatud.</string>
     <string name="onboardingStepIndicatorText" instruction="a counter above our instructions in onboarding that tells a user what step they are on">%1$d/%2$d</string>
     <string name="onboardingSearchDaxDialogOption1Quoted" instruction="translate &apos;duck&apos; too.">Kuidas öelda „part“ inglise keeles</string>
     <string name="onboardingSearchDaxDialogOption1EnglishQuoted" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">Kuidas öelda „part“ hispaania keeles</string>
+
+    <string name="input_screen_user_pref_without_ai_updated">Ainult otsi</string>
+    <string name="input_screen_user_pref_with_ai_updated">Lülita \n otsingu ja Duck.ai vahel</string>
+
+    <!-- New Address Bar Picker -->
+    <string name="newAddressBarPickerDuckDuckGo" translatable="false">DuckDuckGo</string>
+    <string name="newAddressBarPickerConfirm">Kinnita</string>
 </resources>

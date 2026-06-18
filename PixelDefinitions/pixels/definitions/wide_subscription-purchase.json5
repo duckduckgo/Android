@@ -37,6 +37,11 @@
                 "type": "boolean"
             },
             {
+                "key": "feature.data.ext.use_query_purchases",
+                "description": "Value of the `useQueryPurchases` feature flag at flow start. When true, storeLogin() reads from PlayBillingManager.getLatestPurchase() (queryPurchases, active subscriptions only) and may surface the new NoActivePurchase / PurchaseInfoNotAvailable failure types. When false, the legacy purchaseHistory path is used.",
+                "type": "boolean"
+            },
+            {
                 "key": "feature.data.ext.creation_latency_ms_bucketed",
                 "description": "Duration of the account-creation step in milliseconds, bucketed using the lower bucket boundary",
                 "enum": ["0", "1000", "5000", "10000", "30000", "60000", "300000", "600000"]

@@ -84,12 +84,12 @@ interface DuckChatFeature {
     fun inputScreenBottomBarSupport(): Toggle
 
     /**
-     * @return `true` when the new address bar option choice screen should be shown
-     * If the remote feature is not present defaults to `internal`
+     * @return `true` when the new address bar option choice screen should be shown.
+     * If the remote feature is not present defaults to `internal`.
      */
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     @InternalAlwaysEnabled
-    fun showAIChatAddressBarChoiceScreen(): Toggle
+    fun showNewAddressBarPickerScreen(): Toggle
 
     /**
      * @return `true` when the Setting for allowing Duck.ai chats to be deleted with the Fire Button is enabled
@@ -131,8 +131,9 @@ interface DuckChatFeature {
     fun showHideAiGeneratedImages(): Toggle
 
     /**
-     * @return `true` when the "Native Input Field" option should be visible in AI Features Settings.
+     * @return `true` when the Native Input Field should be used instead of the web-based input.
      */
+    @InternalAlwaysEnabled
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun nativeInputField(): Toggle
 
@@ -264,4 +265,18 @@ interface DuckChatFeature {
      */
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun duckAiVoiceChatService(): Toggle
+
+    /**
+     * @return `true` when the contextual Duck.ai sheet improvements are enabled.
+     * If the remote feature is not present defaults to `false`
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun contextualSheetImprovements(): Toggle
+
+    /**
+     * @return `true` when the native controls for AI Features are enabled in the app.
+     * If the remote feature is not present defaults to `internal`
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun aiFeaturesNativeControls(): Toggle
 }

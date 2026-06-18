@@ -729,67 +729,6 @@ class RealDuckAiModelManagerTest {
     }
 
     @Test
-    fun whenModelIsGpt52AndServerProvidesAccessForExtendedCandidateThenHardcodeDoesNotOverwriteIt() = runTest {
-        // Guards the merge: when the backend ships an entry for an EXTENDED candidate, the hardcode
-        // must defer to it. MEDIUM has no server entry, so the hardcode still fills that gap.
-        whenever(dataStore.getSelectedModel()).thenReturn(null)
-        whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)
-        whenever(modelsService.getModels(any())).thenReturn(
-            AIChatModelsResponse(
-                listOf(
-                    remoteModel(
-                        "gpt-5.2",
-                        accessTier = listOf("free", "plus", "pro"),
-                        entityHasAccess = true,
-                        supportedReasoningEffort = listOf("medium", "high"),
-                        reasoningEffortAccess = listOf(
-                            RemoteReasoningEffortAccess(id = "high", accessTier = listOf("free", "plus", "pro"), entityHasAccess = true),
-                        ),
-                    ),
-                ),
-            ),
-        )
-
-        testee = createManager()
-        testee.fetchModels()
-
-        val access = testee.modelState.value.models.single().reasoningEffortAccess
-        val high = access.single { it.effort == ReasoningEffort.HIGH }
-        val medium = access.single { it.effort == ReasoningEffort.MEDIUM }
-        assertEquals(listOf("free", "plus", "pro"), high.accessTier)
-        assertEquals(listOf("pro"), medium.accessTier)
-    }
-
-    @Test
-    fun whenModelIsGpt52ThenExtendedReasoningCandidatesAreHardcodedToPro() = runTest {
-        // Locks in the temporary hardcoded gate for gpt-5.2 — catches a slug rename or refactor that
-        // silently drops the gate. Remove this test when `withHardcodedReasoningGates` is removed.
-        whenever(dataStore.getSelectedModel()).thenReturn(null)
-        whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)
-        whenever(modelsService.getModels(any())).thenReturn(
-            AIChatModelsResponse(
-                listOf(
-                    remoteModel(
-                        "gpt-5.2",
-                        accessTier = listOf("free", "plus", "pro"),
-                        entityHasAccess = true,
-                        supportedReasoningEffort = listOf("none", "low", "medium", "high"),
-                    ),
-                ),
-            ),
-        )
-
-        testee = createManager()
-        testee.fetchModels()
-
-        val access = testee.modelState.value.models.single().reasoningEffortAccess
-        ReasoningMode.EXTENDED_REASONING.candidateEfforts.forEach { effort ->
-            val entry = access.single { it.effort == effort }
-            assertEquals(listOf("pro"), entry.accessTier)
-        }
-    }
-
-    @Test
     fun whenRemoteReasoningEffortAccessMissingThenDomainListIsEmpty() = runTest {
         whenever(dataStore.getSelectedModel()).thenReturn(null)
         whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)

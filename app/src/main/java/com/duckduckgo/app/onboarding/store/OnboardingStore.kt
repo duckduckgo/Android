@@ -30,4 +30,24 @@ interface OnboardingStore {
     fun setInputScreenSelectionOverriddenByUser()
     fun setDuckAiOnboardingFlow()
     fun isDuckAiOnboardingFlow(): Boolean
+
+    /**
+     * `true` if the user installs through AI referral link
+     *
+     * **Note: this feature is WIP, details to follow during the rest of integration**
+     */
+    fun isCustomAiOnboardingFlow(): Boolean
+
+    /**
+     * Arms a one-shot signal that the next auto-launched input screen should open on the Duck.ai (chat) tab.
+     * Set when the custom-AI onboarding finishes (completed or skipped); consumed once by
+     * [consumeOpenInputOnDuckAiTab].
+     */
+    fun setOpenInputOnDuckAiTab()
+
+    /**
+     * Returns whether the next auto-launched input screen should open on the Duck.ai (chat) tab, clearing the
+     * signal so subsequent launches behave normally. Returns `false` when not armed.
+     */
+    fun consumeOpenInputOnDuckAiTab(): Boolean
 }

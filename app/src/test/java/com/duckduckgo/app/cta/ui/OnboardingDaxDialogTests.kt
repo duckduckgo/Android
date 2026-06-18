@@ -17,6 +17,7 @@
 package com.duckduckgo.app.cta.ui
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import com.duckduckgo.adblocking.api.duckplayer.DuckPlayer
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.CtaId.DAX_DIALOG_NETWORK
@@ -45,11 +46,13 @@ import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.duckchat.api.DuckChat
-import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.onboarding.api.LinearOnboardingOrchestrator
+import com.duckduckgo.onboarding.api.LinearOnboardingState
 import com.duckduckgo.subscriptions.api.SubscriptionPromoCtaShownPlugin
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.api.Subscriptions
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
@@ -129,6 +132,10 @@ class OnboardingDaxDialogTests {
             mockAppTheme,
             mock(DuckAiOnboardingExperimentMetrics::class.java),
             mockDeviceInfo,
+            coroutineRule.testScope,
+            mock(LinearOnboardingOrchestrator::class.java).apply {
+                whenever(state).thenReturn(MutableStateFlow(LinearOnboardingState.NotStarted))
+            },
         )
     }
 

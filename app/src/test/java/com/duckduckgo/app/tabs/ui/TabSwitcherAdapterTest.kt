@@ -147,21 +147,18 @@ class TabSwitcherAdapterTest {
     // --- Title rendering on payload-based bind (regression: stale title kept after URL changed) ---
 
     @Test
-    fun `payload with null title re-derives title from entity instead of leaving stale text`() {
+    fun `payload with title change writes resolved tab title instead of leaving stale text`() {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
         val entity = TabEntity(tabId = "1", url = "https://clicks.easyjet.com/redirect", title = null, position = 0)
-        adapter.updateData(listOf(NormalTab(entity = entity, isActive = false)))
+        adapter.updateData(listOf(NormalTab(entity = entity, isActive = false, title = "clicks.easyjet.com")))
         adapter.onLayoutTypeChanged(LIST)
 
         val holder = listHolderWithStaleTitle(context, staleTitle = "How can we help? | Huel ES")
 
-        // The diff callback writes the new title (null) under DIFF_KEY_TITLE - this is the buggy
-        // bundle that previously caused the holder's TextView to keep its prior text.
         val payload = Bundle().apply { putString(DIFF_KEY_TITLE, null) }
 
         adapter.onBindViewHolder(holder, 0, mutableListOf(payload))
 
-        // displayTitle() falls back to URL host when title is null
         assertEquals("clicks.easyjet.com", holder.title.text.toString())
     }
 
@@ -169,7 +166,7 @@ class TabSwitcherAdapterTest {
     fun `payload with non-null title still updates TextView`() {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
         val entity = TabEntity(tabId = "1", url = "https://example.com", title = "Fresh Title", position = 0)
-        adapter.updateData(listOf(NormalTab(entity = entity, isActive = false)))
+        adapter.updateData(listOf(NormalTab(entity = entity, isActive = false, title = "Fresh Title")))
         adapter.onLayoutTypeChanged(LIST)
 
         val holder = listHolderWithStaleTitle(context, staleTitle = "Old Title")

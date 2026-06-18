@@ -23,6 +23,7 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
 import androidx.work.WorkManager
+import com.duckduckgo.adblocking.api.duckplayer.DuckPlayer
 import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.anvil.annotations.ContributesPluginPoint
 import com.duckduckgo.app.bookmarks.BookmarkAddedDialogPlugin
@@ -73,7 +74,6 @@ import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.privacy.db.PrivacyProtectionCountDao
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
-import com.duckduckgo.app.referral.AppReferrerDataStore
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
@@ -93,7 +93,6 @@ import com.duckduckgo.downloads.impl.FileDownloadCallback
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import com.duckduckgo.duckchat.api.DuckChat
-import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.experiments.api.VariantManager
 import com.duckduckgo.httpsupgrade.api.HttpsUpgrader
 import com.duckduckgo.privacy.config.api.AmpLinks
@@ -101,6 +100,7 @@ import com.duckduckgo.privacy.config.api.ContentBlocking
 import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.privacy.config.api.TrackerAllowlist
 import com.duckduckgo.privacy.config.api.TrackingParameters
+import com.duckduckgo.referral.api.AppReferrer
 import com.duckduckgo.request.filterer.api.RequestFilterer
 import com.duckduckgo.request.interception.api.RequestBlocklist
 import com.duckduckgo.settings.api.SerpSettingsFeature
@@ -125,7 +125,7 @@ class BrowserModule {
         urlDetector: DuckDuckGoUrlDetector,
         statisticsStore: StatisticsDataStore,
         variantManager: VariantManager,
-        appReferrerDataStore: AppReferrerDataStore,
+        appReferrer: AppReferrer,
         duckChat: DuckChat,
         androidBrowserConfigFeature: AndroidBrowserConfigFeature,
         serpSettingsFeature: SerpSettingsFeature,
@@ -134,7 +134,7 @@ class BrowserModule {
             urlDetector,
             statisticsStore,
             variantManager,
-            appReferrerDataStore,
+            appReferrer,
             duckChat,
             androidBrowserConfigFeature,
             serpSettingsFeature,

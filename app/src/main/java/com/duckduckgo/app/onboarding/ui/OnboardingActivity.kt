@@ -96,6 +96,11 @@ class OnboardingActivity : DuckDuckGoActivity() {
         }
     }
 
+    fun handOffToBrowserActivity() {
+        startActivity(BrowserActivity.intent(this@OnboardingActivity, launchSource = Onboarding))
+        finish()
+    }
+
     fun finishAndSubmitChatPrompt(prompt: String) {
         lifecycleScope.launch {
             viewModel.onOnboardingDone(extendedOnboardingFlow = DUCK_AI_FOCUSED)
@@ -147,9 +152,13 @@ class OnboardingActivity : DuckDuckGoActivity() {
     private fun configureSkipButton() {
         binding.skipOnboardingButton.setOnClickListener {
             lifecycleScope.launch {
+                // When the orchestrator is driving onboarding it owns the skip: it terminates to
+                // Skipped and the active page navigates. Only navigate here when it isn't engaged.
                 viewModel.devOnlyFullyCompleteAllOnboarding()
-                startActivity(BrowserActivity.intent(this@OnboardingActivity, launchSource = Onboarding))
-                finish()
+                if (!viewModel.orchestratorDriven) {
+                    startActivity(BrowserActivity.intent(this@OnboardingActivity, launchSource = Onboarding))
+                    finish()
+                }
             }
         }
         viewModel.initializeOnboardingSkipper()

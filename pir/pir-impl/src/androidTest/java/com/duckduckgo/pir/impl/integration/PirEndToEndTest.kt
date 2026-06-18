@@ -1017,7 +1017,9 @@ class PirEndToEndTest {
         override suspend fun onOptOutCompleted(executionType: PirExecutionType, totalOptOutJobs: Int) = Unit
         override suspend fun onOptOutSkipped(executionType: PirExecutionType) = Unit
         override suspend fun onRunFailed(executionType: PirExecutionType, reason: PirScanWideEvent.FailureReason) = Unit
-        override suspend fun onRunCancelled(executionType: PirExecutionType) = Unit
+        override suspend fun onRunCancelled(executionType: PirExecutionType, reason: PirScanWideEvent.CancellationReason) = Unit
+        override suspend fun onWorkCancelled(reason: PirScanWideEvent.CancellationReason) = Unit
+        override suspend fun onRunCancelledBeforeStart(executionType: PirExecutionType, reason: PirScanWideEvent.CancellationReason) = Unit
         override suspend fun onUserReset() = Unit
     }
 

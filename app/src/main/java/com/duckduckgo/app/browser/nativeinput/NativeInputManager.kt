@@ -17,11 +17,14 @@
 package com.duckduckgo.app.browser.nativeinput
 
 import android.app.Activity
+import android.content.res.Configuration
+import android.graphics.Outline
 import android.net.Uri
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewOutlineProvider
 import android.webkit.ValueCallback
 import android.widget.FrameLayout
 import androidx.core.net.toUri
@@ -33,14 +36,18 @@ import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.omnibar.Omnibar
 import com.duckduckgo.app.browser.omnibar.QueryUrlPredictor
+import com.duckduckgo.app.pixels.AppPixelName
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion
+import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.duckchat.api.InputMode
 import com.duckduckgo.duckchat.api.toChatIdOrNull
 import com.duckduckgo.duckchat.impl.ui.nativeinput.views.NativeInputWidget
 import com.duckduckgo.navigation.api.GlobalActivityStarter
@@ -67,10 +74,14 @@ class NativeInputCallbacks(
         filesJson: JSONArray?,
     ) -> Unit,
     val onChatSuggestionSelected: (String) -> Unit,
+    val onDuckAiQuerySubmitted: (query: String) -> Unit = {},
+    /** User picked a model in the native picker (→ submitChangeModelAction). */
+    val onChangeModelSubmitted: (modelId: String) -> Unit = {},
     val onChatUrlSuggestionClicked: (AutoCompleteSuggestion) -> Unit = {},
     val onChatHistoryShortcutClicked: () -> Unit = {},
     val onClearAutocomplete: () -> Unit,
     val onStopTapped: () -> Unit,
+    val onFireButtonPressed: () -> Unit = {},
     val onVoiceSearchPressed: (isChatTab: Boolean) -> Unit = {},
     val onCameraCaptureRequested: (ValueCallback<Array<Uri>>) -> Unit = {},
     val onFilePickerRequested: (ValueCallback<Array<Uri>>, List<String>) -> Unit = { _, _ -> },
@@ -104,7 +115,9 @@ interface NativeInputManager {
         currentTabUrl: Flow<String?>,
         query: String = "",
         callbacks: NativeInputCallbacks,
+        initialInputMode: InputMode? = null,
     )
+
     fun hideNativeInput(animate: Boolean = true, isNavigation: Boolean = false): Boolean
     fun handleDuckAiVoiceResult(query: String)
     fun onKeyboardVisibilityChanged(isVisible: Boolean)
@@ -120,6 +133,7 @@ class RealNativeInputManager @Inject constructor(
     private val globalActivityStarter: GlobalActivityStarter,
     private val queryUrlPredictor: QueryUrlPredictor,
     private val duckAiFeatureState: DuckAiFeatureState,
+    private val pixel: Pixel,
 ) : NativeInputManager {
     private lateinit var omnibarController: NativeInputOmnibarController
     private lateinit var rootView: ViewGroup
@@ -127,6 +141,7 @@ class RealNativeInputManager @Inject constructor(
     private var isNativeInputFieldEnabled: Boolean = false
     private var isExiting: Boolean = false
     private var isPickingImage: Boolean = false
+    private var duckAiToolbarHidden: Boolean = false
     private var floatingSubmitContainer: View? = null
     private var widgetRoot: View? = null
     private var lastCallbacks: NativeInputCallbacks? = null
@@ -293,7 +308,14 @@ class RealNativeInputManager @Inject constructor(
     }
 
     private fun onKeyboardShown(widgetRoot: View?) {
-        if (omnibarController.isDuckAiMode() || omnibarController.isSplitMode()) return
+        if (omnibarController.isSplitMode()) return
+        if (omnibarController.isDuckAiMode()) {
+            if (isLandscape()) {
+                omnibarController.hide()
+                duckAiToolbarHidden = true
+            }
+            return
+        }
         omnibarController.hide()
         widgetRoot?.translationZ = 0f
     }
@@ -302,9 +324,17 @@ class RealNativeInputManager @Inject constructor(
         if (widget.isModelMenuVisible) return
         if (isPickingImage) return
         if (omnibarController.isDuckAiMode()) {
+            if (duckAiToolbarHidden) {
+                omnibarController.show()
+                omnibarController.hideBackground()
+                duckAiToolbarHidden = false
+            }
             updateWidgetFocus(widget)
         }
     }
+
+    private fun isLandscape(): Boolean =
+        rootView.resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
 
     private fun updateWidgetFocus(widget: NativeInputWidget) {
         val focusedView = rootView.findFocus()
@@ -336,6 +366,7 @@ class RealNativeInputManager @Inject constructor(
         currentTabUrl: Flow<String?>,
         query: String,
         callbacks: NativeInputCallbacks,
+        initialInputMode: InputMode?,
     ) {
         if (!isNativeInputFieldEnabled) return
 
@@ -381,7 +412,7 @@ class RealNativeInputManager @Inject constructor(
         }
         attachWidget(widgetView, isBottom, tabId)
         val isNewTab = query.isEmpty() && omnibarController.getText().isEmpty()
-        applyInitialTabSelection(widgetView, isNewTab)
+        applyInitialTabSelection(widgetView, isNewTab, initialInputMode)
         if (omnibarController.isDuckAiMode()) {
             widgetFrom(widgetView)?.setToggleVisible(false)
         } else {
@@ -409,9 +440,8 @@ class RealNativeInputManager @Inject constructor(
             },
             onChatSubmitted = { query ->
                 if (omnibarController.isDuckAiMode()) {
-                    // In Duck.ai context the user is actively chatting — a pasted URL is a chat
-                    // message, never a contextual-sheet trigger or a navigation. Fall through to
-                    // the standard chat-submit path so the message reaches the Duck.ai webview.
+                    // Already in a Duck.ai chat — every submission, URL or not, is a chat prompt
+                    // that reaches the Duck.ai webview.
                     widget.saveLastUsedTogglePosition(isChat = true)
                     val imagesJson = widget.getImageAttachmentsJson()
                     val filesJson = widget.getFileAttachmentsJson()
@@ -427,9 +457,13 @@ class RealNativeInputManager @Inject constructor(
                         filesJson,
                     )
                     widget.clearSelectedTool()
+                    widget.onPromptSubmitted()
                 } else if (queryUrlPredictor.isUrl(query)) {
+                    // Not in a Duck.ai chat (e.g. on the NTP with the Duck.ai toggle selected): a
+                    // URL is an address, so navigate to it exactly like Search mode rather than
+                    // opening the Duck.ai contextual sheet.
                     hideNativeInput(isNavigation = true)
-                    callbacks.onContextualSheetRequested()
+                    callbacks.onSearchSubmitted(query)
                 } else {
                     widget.saveLastUsedTogglePosition(isChat = true)
                     widget.storePendingPrompt(query)
@@ -440,17 +474,20 @@ class RealNativeInputManager @Inject constructor(
                     omnibarController.restore()
                     omnibarController.show()
                     removeWidget()
-                    // Only tear down the NTP layer if we were over the browser — the submitted
-                    // Duck.ai URL is intercepted by SpecialUrlDetector and opens an overlay
-                    // fragment without webview navigation, so the underlying view must stay.
+                    // Only tear down the NTP layer if we were over the browser. Under fullscreen
+                    // mode the host opens the chat in a new tab (or reuses the NTP tab); under
+                    // legacy mode the URL is intercepted by SpecialUrlDetector and opens an
+                    // overlay fragment without webview navigation. Either way the underlying
+                    // view must stay visible while we hand off.
                     if (omnibarController.isBrowserMode()) {
                         hideNtp()
                     }
                     isExiting = false
-                    callbacks.onSearchSubmitted(duckChat.getDuckChatUrl(query, true))
+                    callbacks.onDuckAiQuerySubmitted(query)
                 }
             },
         )
+        widget.onChangeModelSubmitted = { modelId -> callbacks.onChangeModelSubmitted(modelId) }
         widget.onBack = {
             widget.hideKeyboard()
             hideNativeInput()
@@ -495,6 +532,7 @@ class RealNativeInputManager @Inject constructor(
             floatingSubmitContainer = null
         }
         if (removed) widgetRoot = null
+        duckAiToolbarHidden = false
         // Drop Fragment-scoped callback closures so they don't outlive the widget.
         lastCallbacks = null
         return removed
@@ -520,6 +558,7 @@ class RealNativeInputManager @Inject constructor(
     ) {
         widgetFrom(widgetView)?.apply {
             onStopTapped = callbacks.onStopTapped
+            onFireButtonTapped = callbacks.onFireButtonPressed
             bindTabCount(lifecycleOwner, tabs.map { it.size })
             hideMainButtons()
             onAttachmentChooserStateChanged = { showing -> isPickingImage = showing }
@@ -529,7 +568,10 @@ class RealNativeInputManager @Inject constructor(
             )
             onPaidTierChanged = { isPaid ->
                 val tier = if (isPaid) DuckAiTier.Paid else DuckAiTier.Free
-                omnibarController.updateTierTitle(tier) { launchPurchase() }
+                omnibarController.updateTierTitle(tier) {
+                    fireChatHeaderUpgradeTapped(tier)
+                    launchPurchase()
+                }
             }
             if (!isBottom) {
                 setFloatingSubmitContainer(createFloatingSubmitContainer())
@@ -602,12 +644,16 @@ class RealNativeInputManager @Inject constructor(
         }
     }
 
-    private fun applyInitialTabSelection(widgetView: View, isNewTab: Boolean) {
+    private fun applyInitialTabSelection(widgetView: View, isNewTab: Boolean, initialInputMode: InputMode?) {
         val widget = widgetFrom(widgetView) ?: return
-        if (omnibarController.isDuckAiMode()) {
-            widget.selectChatTab()
-        } else if (isNewTab) {
-            widget.applyDefaultTogglePosition()
+        when (initialInputMode) {
+            InputMode.DUCK_AI -> widget.selectChatTab()
+            InputMode.SEARCH -> widget.selectSearchTab()
+            null -> if (omnibarController.isDuckAiMode()) {
+                widget.selectChatTab()
+            } else if (isNewTab) {
+                widget.applyDefaultTogglePosition()
+            }
         }
     }
 
@@ -642,10 +688,32 @@ class RealNativeInputManager @Inject constructor(
         }
     }
 
+    private fun suppressShadow(view: View) {
+        view.outlineProvider = object : ViewOutlineProvider() {
+            override fun getOutline(v: View, outline: Outline) {
+                outline.setRect(0, 0, v.width, v.height)
+                outline.alpha = 0f
+            }
+        }
+    }
+
     private fun applyWindowChrome(widgetView: View, isBottom: Boolean) {
         widgetView.translationZ = WIDGET_ELEVATION_DP.toPx()
         if (isBottom) {
             rootView.findViewById<View?>(R.id.navigationBar)?.gone()
+            rootView.findViewById<View?>(R.id.bottomBrowserOutlineStroke)?.gone()
+            if (omnibarController.isBrowserMode()) {
+                widgetView.setBackgroundColor(
+                    widgetView.context.getColorFromAttr(com.duckduckgo.mobile.android.R.attr.daxColorBackground),
+                )
+            } else if (omnibarController.isDuckAiMode()) {
+                widgetView.setBackgroundColor(
+                    widgetView.context.getColorFromAttr(
+                        com.duckduckgo.mobile.android.R.attr.daxColorDuckAiBackground,
+                    ),
+                )
+                suppressShadow(widgetView)
+            }
             rootView.findViewById<View?>(R.id.browserLayout)?.let {
                 it.setPadding(it.paddingLeft, it.paddingTop, it.paddingRight, 0)
             }
@@ -787,6 +855,15 @@ class RealNativeInputManager @Inject constructor(
 
     private fun launchPurchase() {
         globalActivityStarter.start(rootView.context, SubscriptionPurchase(featurePage = DUCK_AI_FEATURE_PAGE))
+    }
+
+    /**
+     * Fired when the user taps the "Upgrade" pill in the Duck.ai omnibar header. The pill is only shown
+     * for [DuckAiTier.Free] (subscription inactive), so this is the chat-header upgrade entry point.
+     */
+    internal fun fireChatHeaderUpgradeTapped(tier: DuckAiTier) {
+        val userTier = if (tier is DuckAiTier.Paid) "plus" else "free"
+        pixel.fire(AppPixelName.AI_CHAT_UNIFIED_INPUT_CHAT_HEADER_UPGRADE_TAPPED, mapOf("user_tier" to userTier))
     }
 
     /** True if [rawUrl] points at an in-progress Duck.ai chat (Duck.ai URL with a non-blank `chatID`). */

@@ -20,6 +20,7 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.Gravity
 import android.view.LayoutInflater
+import android.view.View
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.LinearLayout
@@ -35,6 +36,7 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.view.text.DaxTextView
 import com.duckduckgo.common.utils.ViewViewModelFactory
 import com.duckduckgo.di.scopes.ViewScope
+import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState.InputContext
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputStateProvider
 import com.duckduckgo.duckchat.impl.DuckChatConstants.DUCK_AI_FEATURE_PAGE
@@ -74,6 +76,7 @@ class ReasoningModePickerView @JvmOverloads constructor(
     // Mirrors the input context from the per-tab native input state so currentSurface() can be
     // read synchronously from popup callbacks. Updated by observeInputContext().
     private var lastInputContext: InputContext = InputContext.BROWSER
+    private var lastNativeInputState: NativeInputState? = null
 
     init {
         inflate(context, R.layout.view_reasoning_mode_picker, this)
@@ -95,6 +98,7 @@ class ReasoningModePickerView @JvmOverloads constructor(
         inputContextJob = null
         commandJob?.cancel()
         commandJob = null
+        lastNativeInputState = null
         dismissPopup()
     }
 
@@ -102,8 +106,22 @@ class ReasoningModePickerView @JvmOverloads constructor(
         val scope = findViewTreeLifecycleOwner()?.lifecycleScope ?: return
         inputContextJob?.cancel()
         inputContextJob = nativeInputStateProvider.state
-            .onEach { lastInputContext = it.inputContext }
+            .onEach { state ->
+                lastInputContext = state.inputContext
+                lastNativeInputState = state
+                applyVisibility(viewModel.state.value.visible)
+            }
             .launchIn(scope)
+    }
+
+    private fun applyVisibility(pickerVisible: Boolean) {
+        val nativeState = lastNativeInputState
+        val show = pickerVisible && nativeState?.shouldShowPluginControls() == true
+        isVisible = show
+        (parent as? View)?.isVisible = show
+        // Popup is positioned by screen coordinates, not parented to the button. Dismiss
+        // it explicitly when picker hides or stale rows stay tappable for the new chat.
+        if (!show) dismissPopup()
     }
 
     private fun observeState() {
@@ -111,10 +129,7 @@ class ReasoningModePickerView @JvmOverloads constructor(
         stateJob?.cancel()
         stateJob = viewModel.state
             .onEach { state ->
-                isVisible = state.visible
-                // Popup is positioned by screen coordinates, not parented to the button. Dismiss
-                // it explicitly when picker hides or stale rows stay tappable for the new chat.
-                if (!state.visible) dismissPopup()
+                applyVisibility(state.visible)
                 state.displayedMode?.let { mode ->
                     button.setImageResource(viewModel.iconResFor(mode))
                 }
