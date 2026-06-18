@@ -1,24 +1,32 @@
-name: Pull Request Reviewed -> Sync With Asana
+name: Pull Request Review/Mentions -> Sync With Asana
 
 on:
   pull_request_review:
     types: [submitted]
+  pull_request_review_comment:
+    types: [created]
 
 jobs:
-  pr-reviewed:
-    name: Add PR reviewed comment
+  sync:
+    name: Sync PR review/mentions with Asana
     runs-on: ubuntu-latest
     steps:
       - name: Checkout native actions repo
         uses: actions/checkout@v4
         with:
-            ref: v1.9
-            # Do not change the below path (downstream actions expect it)
-            path: native-github-asana-sync
-            repository: duckduckgo/native-github-asana-sync
+          # TODO: switch to a release tag (e.g. v2.6) once the user-map support
+          # in pr-review-notifications is merged + released upstream.
+          ref: aibrahim/forward-review-mention-comments
+          # Do not change the below path (the composite expects it)
+          path: native-github-asana-sync
+          repository: duckduckgo/native-github-asana-sync
 
-      - name: Trigger PR review workflow
+      # Posts canned approved/changes-requested/dismissed notes (review events),
+      # and — because user-map is supplied — also forwards review summaries and
+      # inline comments that @-mention a mapped user as a real Asana @-mention.
+      - name: Sync PR review/mentions with Asana
         uses: ./native-github-asana-sync/.github/actions/pr-review-notifications
         with:
           trigger-phrase: "Task/Issue URL:"
           asana_pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
+          user-map: ${{ vars.GH_ANDROID_USER_MAP }}
