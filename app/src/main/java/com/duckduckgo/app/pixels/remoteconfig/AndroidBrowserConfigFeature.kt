@@ -394,6 +394,6 @@ interface AndroidBrowserConfigFeature {
      * sub-feature flag enabled
      * If the remote feature is not present defaults to `true`
      */
-    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun webViewSessionPersistence(): Toggle
 }
