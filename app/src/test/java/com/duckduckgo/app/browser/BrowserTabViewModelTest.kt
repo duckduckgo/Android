@@ -290,6 +290,7 @@ import com.duckduckgo.downloads.store.DownloadStatus
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.duckchat.api.inputscreen.DuckAiOnboardingEndCtaVariant
 import com.duckduckgo.duckchat.impl.contextual.PageContextJSHelper
 import com.duckduckgo.duckchat.impl.contextual.RealPageContextJSHelper.Companion.PAGE_CONTEXT_FEATURE_NAME
 import com.duckduckgo.duckchat.impl.helper.DuckChatJSHelper
@@ -9050,7 +9051,7 @@ class BrowserTabViewModelTest {
             val launch = commandCaptor.allValues.filterIsInstance<Command.LaunchInputScreen>().last()
             assertTrue("expected launchOnChat=true when the one-shot is armed", launch.launchOnChat)
             // launchOnChat must be decoupled from showDuckAiEndCta (no end CTA shown on this path).
-            assertFalse("launchOnChat must not depend on showDuckAiEndCta", launch.showDuckAiEndCta)
+            assertEquals(DuckAiOnboardingEndCtaVariant.NONE, launch.duckAiEndCtaVariant)
         }
 
     @Test
