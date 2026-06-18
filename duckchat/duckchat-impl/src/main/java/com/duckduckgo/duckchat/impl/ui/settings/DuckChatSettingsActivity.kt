@@ -51,6 +51,7 @@ import com.duckduckgo.duckchat.api.DuckChatNativeSettingsNoParams
 import com.duckduckgo.duckchat.api.DuckChatSettingsNoParams
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.databinding.ActivityDuckChatSettingsBinding
+import com.duckduckgo.duckchat.impl.databinding.IncludeDuckAiInputScreenSettingsBinding
 import com.duckduckgo.duckchat.impl.inputscreen.ui.metrics.discovery.InputScreenDiscoveryFunnel
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_SETTINGS_DISPLAYED
 import com.duckduckgo.duckchat.impl.store.DefaultTogglePosition
@@ -75,6 +76,10 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
     lateinit var duckChatSettingsViewModelFactory: DuckChatSettingsViewModelFactory
 
     private val binding: ActivityDuckChatSettingsBinding by viewBinding()
+
+    private val inputScreenSettingsBinding: IncludeDuckAiInputScreenSettingsBinding by lazy {
+        IncludeDuckAiInputScreenSettingsBinding.bind(binding.root)
+    }
 
     private val viewModel by lazy {
         val activityParams = intent.getActivityParams(GlobalActivityStarter.ActivityParams::class.java)!!
@@ -160,15 +165,18 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
     private fun renderViewState(viewState: ViewState) {
         binding.userEnabledDuckChatToggle.quietlySetIsChecked(viewState.isDuckChatUserEnabled, userEnabledDuckChatToggleListener)
 
-        binding.duckAIAutomaticContext.isVisible = viewState.isAutomaticContextVisible
-        binding.duckAIAutomaticContext.quietlySetIsChecked(viewState.isAutomaticContextEnabled, userEnabledAutomaticPageContextToggleListener)
+        inputScreenSettingsBinding.duckAIAutomaticContext.isVisible = viewState.isAutomaticContextVisible
+        inputScreenSettingsBinding.duckAIAutomaticContext.quietlySetIsChecked(
+            viewState.isAutomaticContextEnabled,
+            userEnabledAutomaticPageContextToggleListener,
+        )
 
         // align content with the main Duck.ai toggle's text
         val offset =
             resources.getDimensionPixelSize(CommonR.dimen.listItemImageContainerSize) +
                 resources.getDimensionPixelSize(CommonR.dimen.keyline_4)
         val orientation = resources.configuration.orientation
-        binding.duckAiInputScreenToggleContainer.updatePadding(
+        inputScreenSettingsBinding.duckAiInputScreenToggleContainer.updatePadding(
             left =
             if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
                 0
@@ -176,9 +184,9 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
                 offset
             },
         )
-        binding.duckAiInputScreenDescription.updatePadding(left = offset)
-        binding.duckAiShortcuts.updatePadding(left = offset)
-        binding.duckAIAutomaticContext.updatePadding(left = offset)
+        inputScreenSettingsBinding.duckAiInputScreenDescription.updatePadding(left = offset)
+        inputScreenSettingsBinding.duckAiShortcuts.updatePadding(left = offset)
+        inputScreenSettingsBinding.duckAIAutomaticContext.updatePadding(left = offset)
 
         binding.duckChatSettingsText.addClickableSpan(
             textSequence = getText(R.string.duck_chat_settings_activity_description),
@@ -193,27 +201,27 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
             ),
         )
 
-        binding.duckAiInputScreenToggleContainer.isVisible = viewState.shouldShowInputScreenToggle
+        inputScreenSettingsBinding.duckAiInputScreenToggleContainer.isVisible = viewState.shouldShowInputScreenToggle
         configureInputScreenToggle(
             withoutAi = InputScreenToggleButton.WithoutAi(isActive = !viewState.isInputScreenEnabled, appTheme.isLightModeEnabled()),
             withAi = InputScreenToggleButton.WithAi(isActive = viewState.isInputScreenEnabled, appTheme.isLightModeEnabled()),
         )
 
-        binding.duckAiDefaultTogglePosition.isVisible = viewState.isDefaultTogglePositionVisible
-        binding.duckAiDefaultTogglePosition.setSecondaryText(
+        inputScreenSettingsBinding.duckAiDefaultTogglePosition.isVisible = viewState.isDefaultTogglePositionVisible
+        inputScreenSettingsBinding.duckAiDefaultTogglePosition.setSecondaryText(
             when (viewState.defaultTogglePosition) {
                 DefaultTogglePosition.SEARCH -> getString(R.string.duckAiDefaultTogglePositionSearch)
                 DefaultTogglePosition.DUCK_AI -> getString(R.string.duckAiDefaultTogglePositionDuckAi)
                 DefaultTogglePosition.LAST_USED -> getString(R.string.duckAiDefaultTogglePositionLastUsed)
             },
         )
-        binding.duckAiDefaultTogglePosition.setOnClickListener {
+        inputScreenSettingsBinding.duckAiDefaultTogglePosition.setOnClickListener {
             viewModel.onDefaultTogglePositionClicked()
         }
-        binding.duckAiDefaultTogglePosition.updatePadding(left = offset)
+        inputScreenSettingsBinding.duckAiDefaultTogglePosition.updatePadding(left = offset)
 
-        binding.duckAiInputScreenDescription.isVisible = viewState.shouldShowInputScreenToggle
-        binding.duckAiInputScreenDescription.addClickableSpan(
+        inputScreenSettingsBinding.duckAiInputScreenDescription.isVisible = viewState.shouldShowInputScreenToggle
+        inputScreenSettingsBinding.duckAiInputScreenDescription.addClickableSpan(
             textSequence = getText(R.string.input_screen_user_pref_description),
             spans =
             listOf(
@@ -226,17 +234,17 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
             ),
         )
 
-        binding.duckAiShortcuts.isVisible = viewState.shouldShowShortcuts
-        binding.duckAiShortcuts.setOnClickListener {
+        inputScreenSettingsBinding.duckAiShortcuts.isVisible = viewState.shouldShowShortcuts
+        inputScreenSettingsBinding.duckAiShortcuts.setOnClickListener {
             viewModel.onDuckAiShortcutsClicked()
         }
 
         renderSearchSettingsSection(viewState)
 
-        binding.duckAiInputScreenWithoutAiContainer.setOnClickListener {
+        inputScreenSettingsBinding.duckAiInputScreenWithoutAiContainer.setOnClickListener {
             viewModel.onDuckAiInputScreenWithoutAiSelected()
         }
-        binding.duckAiInputScreenWithAiContainer.setOnClickListener {
+        inputScreenSettingsBinding.duckAiInputScreenWithAiContainer.setOnClickListener {
             viewModel.onDuckAiInputScreenWithAiSelected()
         }
     }
@@ -265,7 +273,7 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
                     duckAiHideAiGeneratedImagesLink.isGone = true
                 }
             } else {
-                divider2.isGone = true
+                inputScreenSettingsBinding.divider2.isGone = true
                 searchSettingsSectionHeader.isGone = true
                 showDuckChatSearchSettingsLink.isGone = true
                 duckAiHideAiGeneratedImagesLink.isGone = true
@@ -338,7 +346,7 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
     private fun configureInputScreenToggle(
         withoutAi: InputScreenToggleButton,
         withAi: InputScreenToggleButton,
-    ) = with(binding) {
+    ) = with(inputScreenSettingsBinding) {
         val context = this@DuckChatSettingsActivity
         duckAiInputScreenToggleWithoutAiImage.setImageDrawable(ContextCompat.getDrawable(context, withoutAi.imageRes))
         duckAiInputScreenToggleWithoutAiCheck.setImageDrawable(ContextCompat.getDrawable(context, withoutAi.checkRes))
