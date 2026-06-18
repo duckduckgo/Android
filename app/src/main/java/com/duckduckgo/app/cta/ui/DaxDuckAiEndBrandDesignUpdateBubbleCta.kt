@@ -34,10 +34,15 @@ data class DaxDuckAiEndBrandDesignUpdateBubbleCta(
     override val appInstallStore: AppInstallStore,
     override val isLightTheme: Boolean,
     override val deviceInfo: DeviceInfo,
+    val isCustomAiOnboardingFlow: Boolean,
 ) : DaxBubbleCta.BrandDesignUpdateBubbleCta(
     ctaId = CtaId.DAX_DUCK_AI_END,
     title = R.string.onboardingDuckAiEndCtaTitle,
-    description = R.string.onboardingDuckAiEndCtaDescription,
+    description = if (isCustomAiOnboardingFlow) {
+        R.string.onboardingEndCustomAiFlowDaxDialogDescription
+    } else {
+        R.string.onboardingDuckAiEndCtaDescription
+    },
     backgroundRes = CommonR.drawable.bg_onboarding_end,
     shownPixel = AppPixelName.ONBOARDING_DAX_CTA_SHOWN,
     okPixel = AppPixelName.ONBOARDING_DAX_CTA_OK_BUTTON,
