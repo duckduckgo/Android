@@ -22,6 +22,7 @@ import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.cta.model.DismissedCta
 import com.duckduckgo.app.global.DefaultRoleBrowserDialog
+import com.duckduckgo.app.onboarding.CustomAiOnboardingResolver
 import com.duckduckgo.app.onboarding.CustomAiOnboardingStore
 import com.duckduckgo.app.onboarding.DuckAiOnboardingDemo
 import com.duckduckgo.app.onboarding.DuckAiOnboardingExperimentManager
@@ -96,6 +97,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
     private val dispatchers: DispatcherProvider,
     private val dismissedCtaDao: DismissedCtaDao,
     private val customAiOnboardingStore: CustomAiOnboardingStore,
+    private val customAiOnboardingResolver: CustomAiOnboardingResolver,
     private val duckAiOnboardingDemo: DuckAiOnboardingDemo,
 ) {
 
@@ -103,7 +105,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
         onCompleted: suspend () -> Unit,
         onSkipped: suspend () -> Unit,
     ): LinearOnboardingPlan =
-        if (customAiOnboardingStore.isEnabled()) {
+        if (customAiOnboardingResolver.resolve()) {
             // in custom AI onboarding path, the input toggle is enabled by default
             duckChat.setCosmeticInputScreenUserSetting(enabled = true)
             onboardingStore.storeInputScreenSelection(selected = true)

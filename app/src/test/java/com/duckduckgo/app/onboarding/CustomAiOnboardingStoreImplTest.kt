@@ -79,72 +79,126 @@ class CustomAiOnboardingStoreImplTest {
     }
 
     @Test
-    fun whenReferrerContainsOnboardingAiAndFeaturesEnabledThenEnabled() = runTest {
+    fun `when referrer contains onboarding ai and features enabled then resolves true`() = runTest {
         val store = store()
         store.process(mapOf("origin" to "funnel_playstore", "onboarding" to "ai"))
+        assertTrue(store.resolve())
+    }
+
+    @Test
+    fun `when referrer ai but custom ai feature disabled then resolves false`() = runTest {
+        whenever(customDuckAiOnboardingFeature.self()).thenReturn(disabledToggle)
+        val store = store()
+        store.process(mapOf("origin" to "funnel_playstore", "onboarding" to "ai"))
+        assertFalse(store.resolve())
+    }
+
+    @Test
+    fun `when referrer ai but orchestrator disabled then resolves false`() = runTest {
+        whenever(orchestratorFeature.self()).thenReturn(disabledToggle)
+        val store = store()
+        store.process(mapOf("origin" to "funnel_playstore", "onboarding" to "ai"))
+        assertFalse(store.resolve())
+    }
+
+    @Test
+    fun `when referrer ai but brand design disabled then resolves false`() = runTest {
+        whenever(brandDesignUpdateToggles.brandDesignUpdate()).thenReturn(disabledToggle)
+        val store = store()
+        store.process(mapOf("origin" to "funnel_playstore", "onboarding" to "ai"))
+        assertFalse(store.resolve())
+    }
+
+    @Test
+    fun `when referrer has no onboarding param then resolves false`() = runTest {
+        val store = store()
+        store.process(mapOf("origin" to "funnel_playstore"))
+        assertFalse(store.resolve())
+    }
+
+    @Test
+    fun `when onboarding value empty or unknown then resolves false`() = runTest {
+        val store = store()
+        store.process(mapOf("onboarding" to ""))
+        assertFalse(store.resolve())
+        store.process(mapOf("onboarding" to "somethingelse"))
+        assertFalse(store.resolve())
+    }
+
+    @Test
+    fun `when onboarding value wrong case then resolves false`() = runTest {
+        val store = store()
+        store.process(mapOf("onboarding" to "AI"))
+        assertFalse(store.resolve())
+    }
+
+    @Test
+    fun `when referrer never resolves then resolves false after timeout`() = runTest {
+        // referrer never resolves -> resolve must not hang; returns false after the bounded wait
+        assertFalse(store(neverResolvingListener).resolve())
+    }
+
+    @Test
+    fun `when resolve not called then isEnabled returns false`() = runTest {
+        // isEnabled is a pure read of the persisted decision; without resolve there is nothing to read
+        val store = store()
+        store.process(mapOf("origin" to "funnel_playstore", "onboarding" to "ai"))
+        assertFalse(store.isEnabled())
+    }
+
+    @Test
+    fun `when resolved true then isEnabled returns true`() = runTest {
+        val store = store()
+        store.process(mapOf("origin" to "funnel_playstore", "onboarding" to "ai"))
+        store.resolve()
         assertTrue(store.isEnabled())
     }
 
     @Test
-    fun whenReferrerAiButFeatureDisabledThenNotEnabled() = runTest {
-        whenever(customDuckAiOnboardingFeature.self()).thenReturn(disabledToggle)
+    fun `when resolved false then isEnabled returns false`() = runTest {
+        val store = store()
+        store.resolve()
+        assertFalse(store.isEnabled())
+    }
+
+    @Test
+    fun `when referral arrives after resolve then isEnabled stays frozen`() = runTest {
+        // Reviewer scenario: the run is chosen once by resolve(). A late-arriving referral signal must
+        // NOT flip isEnabled(), or end-of-journey CTAs would show custom-AI copy during the default plan.
+        val store = store()
+        assertFalse(store.resolve()) // referral not present at decision time -> default plan
+        store.process(mapOf("origin" to "funnel_playstore", "onboarding" to "ai")) // arrives too late
+        assertFalse(store.isEnabled()) // frozen: still the default-plan decision
+    }
+
+    @Test
+    fun `when precondition flips after resolve then isEnabled stays frozen`() = runTest {
         val store = store()
         store.process(mapOf("origin" to "funnel_playstore", "onboarding" to "ai"))
-        assertFalse(store.isEnabled())
+        store.resolve()
+        assertTrue(store.isEnabled())
+
+        whenever(customDuckAiOnboardingFeature.self()).thenReturn(disabledToggle) // flips after the decision
+        assertTrue(store.isEnabled()) // read does not re-evaluate preconditions
     }
 
     @Test
-    fun whenReferrerAiButOrchestratorDisabledThenNotEnabled() = runTest {
-        whenever(orchestratorFeature.self()).thenReturn(disabledToggle)
-        val store = store()
-        store.process(mapOf("origin" to "funnel_playstore", "onboarding" to "ai"))
-        assertFalse(store.isEnabled())
+    fun `when resolved then decision persists across instances`() = runTest {
+        store().also {
+            it.process(mapOf("origin" to "funnel_playstore", "onboarding" to "ai"))
+            it.resolve()
+        }
+        // a fresh instance backed by the same storage reads the persisted decision
+        assertTrue(store().isEnabled())
     }
 
     @Test
-    fun whenReferrerAiButBrandDesignDisabledThenNotEnabled() = runTest {
-        whenever(brandDesignUpdateToggles.brandDesignUpdate()).thenReturn(disabledToggle)
-        val store = store()
-        store.process(mapOf("origin" to "funnel_playstore", "onboarding" to "ai"))
-        assertFalse(store.isEnabled())
-    }
-
-    @Test
-    fun whenReferrerHasNoOnboardingParamThenNotEnabled() = runTest {
-        val store = store()
-        store.process(mapOf("origin" to "funnel_playstore"))
-        assertFalse(store.isEnabled())
-    }
-
-    @Test
-    fun whenOnboardingValueEmptyOrUnknownThenNotEnabled() = runTest {
-        val store = store()
-        store.process(mapOf("onboarding" to ""))
-        assertFalse(store.isEnabled())
-        store.process(mapOf("onboarding" to "somethingelse"))
-        assertFalse(store.isEnabled())
-    }
-
-    @Test
-    fun whenOnboardingValueWrongCaseThenNotEnabled() = runTest {
-        val store = store()
-        store.process(mapOf("onboarding" to "AI"))
-        assertFalse(store.isEnabled())
-    }
-
-    @Test
-    fun whenReferrerNeverResolvesThenNotEnabledAfterTimeout() = runTest {
-        // referrer never resolves -> isEnabled must not hang; returns false (standard) after the bounded wait
-        assertFalse(store(neverResolvingListener).isEnabled())
-    }
-
-    @Test
-    fun whenNotArmedThenConsumeOpenInputReturnsFalse() {
+    fun `when not armed then consume open input returns false`() {
         assertFalse(store().consumeOpenInputOnDuckAiTab())
     }
 
     @Test
-    fun whenArmedThenConsumeOpenInputReturnsTrueOnceAndSelfClears() {
+    fun `when armed then consume open input returns true once and self clears`() {
         val store = store()
         store.setOpenInputOnDuckAiTab()
 

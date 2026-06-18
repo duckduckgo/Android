@@ -28,6 +28,8 @@ import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.Lazy
 import dagger.SingleInstanceIn
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import logcat.LogPriority.INFO
@@ -37,11 +39,10 @@ import javax.inject.Inject
 
 interface CustomAiOnboardingStore {
     /**
-     * Awaits Play Install Referrer resolution (bounded by a built-in timeout).
-     * If the app was installed via the custom AI onboarding referral link (`onboarding=ai`),
-     * and other associated preconditions are met, returns whether custom AI onboarding plan should be used.
+     * Returns whether the custom AI onboarding plan is engaged.
      *
-     * Timeout / non-Play-build / referrer failure / preconditions not met -> `false`.
+     * The decision persisted by [CustomAiOnboardingResolver.resolve] at an onboarding plan build time.
+     * Calling [isEnabled] does not re-evaluate.
      */
     suspend fun isEnabled(): Boolean
 
@@ -59,13 +60,23 @@ interface CustomAiOnboardingStore {
     fun consumeOpenInputOnDuckAiTab(): Boolean
 }
 
-/**
- * Writer AND readiness-gated reader for the custom AI onboarding signal. [process] runs during
- * referrer parsing (first launch) and persists a flag when the Play Install Referrer carries
- * `onboarding=ai`; [isEnabled] reads it back and checks alongside preconditions.
- */
+interface CustomAiOnboardingResolver {
+    /**
+     * Computes the custom AI onboarding decision once and persists it as the single source of truth.
+     *
+     * Awaits Play Install Referrer resolution (bounded by a built-in timeout), then ANDs the referral
+     * signal (`onboarding=ai`) with the feature preconditions. Timeout / non-Play-build / referrer
+     * failure / preconditions not met -> `false`. The result is persisted so later [CustomAiOnboardingStore.isEnabled]
+     * reads return this same value without re-evaluating.
+     *
+     * Should be called once at an onboarding plan build time to pick the onboarding run. Re-invoking recomputes and overwrites.
+     */
+    suspend fun resolve(): Boolean
+}
+
 @SingleInstanceIn(scope = AppScope::class)
 @ContributesBinding(scope = AppScope::class, boundType = CustomAiOnboardingStore::class)
+@ContributesBinding(scope = AppScope::class, boundType = CustomAiOnboardingResolver::class)
 @ContributesMultibinding(scope = AppScope::class, boundType = ReferrerParserPlugin::class)
 class CustomAiOnboardingStoreImpl @Inject constructor(
     private val sharedPreferencesProvider: SharedPreferencesProvider,
@@ -74,27 +85,42 @@ class CustomAiOnboardingStoreImpl @Inject constructor(
     private val customDuckAiOnboardingFeature: CustomDuckAiOnboardingFeature,
     private val orchestratorFeature: LinearOnboardingOrchestratorFeature,
     private val brandDesignUpdateToggles: OnboardingBrandDesignUpdateToggles,
-) : CustomAiOnboardingStore, ReferrerParserPlugin {
+) : CustomAiOnboardingStore, CustomAiOnboardingResolver, ReferrerParserPlugin {
 
     private val preferences by lazy { sharedPreferencesProvider.getSharedPreferences(PREFS_FILENAME) }
+
+    private val resolveMutex = Mutex()
 
     override fun process(referrerParams: Map<String, String>) {
         runCatching {
             if (referrerParams[REFERRAL_KEY] == REFERRAL_VALUE_AI) {
                 logcat(INFO) { "Custom AI onboarding referral detected" }
-                preferences.edit { putBoolean(PREFS_KEY, true) }
+                preferences.edit { putBoolean(PREFS_KEY_REFERRAL_PARAM_PRESENT, true) }
             }
         }.onFailure { logcat(WARN) { "Failed to persist custom AI onboarding flag: ${it.message}" } }
     }
 
-    override suspend fun isEnabled(): Boolean = withContext(dispatcherProvider.io()) {
-        // Ensure the install referrer (and therefore the processing function) has resolved before reading.
-        withTimeoutOrNull(MAX_REFERRER_WAIT_TIME_MS) { referrerStateListener.get().waitForReferrerCode() }
-        val referrerExists = preferences.getBoolean(PREFS_KEY, false)
-        val customAiOnboardingEnabled = customDuckAiOnboardingFeature.self().isEnabled()
-        val orchestratorEnabled = orchestratorFeature.self().isEnabled()
-        val brandDesignEnabled = brandDesignUpdateToggles.brandDesignUpdate().isEnabled()
-        return@withContext referrerExists && customAiOnboardingEnabled && orchestratorEnabled && brandDesignEnabled
+    override suspend fun resolve() = resolveMutex.withLock {
+        withContext(dispatcherProvider.io()) {
+            // Ensure the install referrer (and therefore the processing function) has resolved before reading.
+            withTimeoutOrNull(MAX_REFERRER_WAIT_TIME_MS) { referrerStateListener.get().waitForReferrerCode() }
+            val referrerExists = preferences.getBoolean(PREFS_KEY_REFERRAL_PARAM_PRESENT, false)
+
+            val customAiOnboardingEnabled = customDuckAiOnboardingFeature.self().isEnabled()
+            val orchestratorEnabled = orchestratorFeature.self().isEnabled()
+            val brandDesignEnabled = brandDesignUpdateToggles.brandDesignUpdate().isEnabled()
+
+            val resolution = referrerExists && customAiOnboardingEnabled && orchestratorEnabled && brandDesignEnabled
+            preferences.edit { putBoolean(PREFS_KEY_ENABLED, resolution) }
+
+            return@withContext resolution
+        }
+    }
+
+    override suspend fun isEnabled(): Boolean = resolveMutex.withLock {
+        withContext(dispatcherProvider.io()) {
+            preferences.getBoolean(PREFS_KEY_ENABLED, false)
+        }
     }
 
     // Deliberately not persisted: a one-shot that should only influence the input screen launched
@@ -117,6 +143,8 @@ class CustomAiOnboardingStoreImpl @Inject constructor(
         private const val REFERRAL_VALUE_AI = "ai"
 
         private const val PREFS_FILENAME = "com.duckduckgo.app.onboarding.customai"
-        private const val PREFS_KEY = "customAiOnboardingFlow"
+        private const val PREFS_KEY_REFERRAL_PARAM_PRESENT = "customAiOnboardingReferralParamPresent"
+
+        private const val PREFS_KEY_ENABLED = "customAiOnboardingEnabled"
     }
 }
