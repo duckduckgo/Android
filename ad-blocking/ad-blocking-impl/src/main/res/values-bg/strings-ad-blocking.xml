@@ -18,9 +18,9 @@
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
     <string name="ad_blocking_settings_title">Блокиране на реклами в YouTube</string>
-    <string name="ad_blocking_settings_toggle_title">Блокирай рекламите в YouTube</string>
-    <string name="ad_blocking_settings_description_with_consent">DuckDuckGo премахва рекламите на видеоклипове в YouTube, за да можеш да гледаш видеоклипове без прекъсване.\n\nКогато е включен, DuckDuckGo анонимно ще открива смущения от блокиране на реклами или грешки в YouTube, за да подобри изживяването за всички. DuckDuckGo никога не вижда кои видеоклипове гледаш или каквато и да е лична информация. <annotation type="learn_more_link">Научете повече</annotation></string>
-    <string name="ad_blocking_settings_description">DuckDuckGo премахва рекламите на видеоклипове в YouTube, за да можеш да гледаш видеоклипове без прекъсване. <annotation type="learn_more_link">Научете повече</annotation></string>
+    <string name="ad_blocking_settings_toggle_title">Блокирайте рекламите в YouTube</string>
+    <string name="ad_blocking_settings_description_with_consent">DuckDuckGo блокира рекламите на видеоклипове в YouTube, за да можете да ги гледате без прекъсване. Когато функцията е включена, DuckDuckGo анонимно ще открива смущения от блокиране на реклами или грешки в YouTube, за да подобри изживяването за всички. DuckDuckGo никога не вижда кои видеоклипове гледате или каквато и да е лична информация. <annotation type="learn_more_link">Научете повече</annotation></string>
+    <string name="ad_blocking_settings_description">DuckDuckGo премахва рекламите на видеоклипове в YouTube, за да можете да гледате видеоклипове без прекъсване. <annotation type="learn_more_link">Научете повече</annotation></string>
     <string name="ad_blocking_settings_duck_player_header">Duck Player</string>
-    <string name="ad_blocking_settings_duck_player_description">Отваря видеоклипове в режим на киносалон, който предотвратява влиянието на гледаното от теб съдържание върху емисията ти в YouTube.</string>
+    <string name="ad_blocking_settings_duck_player_description">Отваря видеоклипове в режим на киносалон без разсейване, който предотвратява влиянието на гледаното съдържание върху емисията в YouTube.</string>
 </resources>
