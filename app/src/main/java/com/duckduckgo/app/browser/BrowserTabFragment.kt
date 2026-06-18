@@ -151,7 +151,6 @@ import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.model.LongPressTarget
 import com.duckduckgo.app.browser.nativeinput.NativeInputCallbacks
 import com.duckduckgo.app.browser.nativeinput.NativeInputManager
-import com.duckduckgo.app.browser.nativeinput.NativeInputManager.EnabledState
 import com.duckduckgo.app.browser.navigation.bar.BrowserNavigationBarViewIntegration
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarObserver
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarView
@@ -6000,13 +5999,8 @@ class BrowserTabFragment :
 
                 browserNavigationBarIntegration.configureFireButtonHighlight(highlighted = viewState.fireButton.isHighlighted())
                 browserNavigationBarIntegration.configureLockForOnboarding(locked = viewState.isOmnibarLockedForOnboarding)
-                nativeInputManager.setEnabledState(
-                    when {
-                        !viewState.isOmnibarLockedForOnboarding -> EnabledState.ENABLED
-                        viewState.fireButton.isHighlighted() -> EnabledState.FIRE_BUTTON_SPOTLIGHT
-                        else -> EnabledState.DISABLED
-                    },
-                )
+                nativeInputManager.setInteractionLocked(locked = viewState.isOmnibarLockedForOnboarding)
+                nativeInputManager.setDuckAiFireButtonHighlighted(highlighted = viewState.fireButton.isHighlighted())
 
                 renderBrowserMenu(viewState)
 

@@ -34,6 +34,7 @@ import android.widget.EditText
 import android.widget.FrameLayout
 import androidx.annotation.StringRes
 import androidx.core.view.doOnAttach
+import androidx.core.view.doOnNextLayout
 import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
 import androidx.core.widget.doOnTextChanged
@@ -47,6 +48,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion
+import com.duckduckgo.browser.ui.PulseAnimation
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.ViewViewModelFactory
 import com.duckduckgo.common.utils.extensions.hideKeyboard
@@ -74,7 +76,6 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import logcat.logcat
@@ -152,6 +153,12 @@ interface NativeInputWidget {
      */
     fun bindChatIdSource(source: Flow<String?>)
 
+    /** Binds a reactive source for the onboarding interaction lock (whole field non-interactive + dimmed). */
+    fun bindInteractionLockSource(source: Flow<Boolean>)
+
+    /** Binds a reactive source for emphasising the leading fire button (rendered only in Duck.ai mode). */
+    fun bindDuckAiFireButtonHighlightSource(source: Flow<Boolean>)
+
     fun bindAttachmentCallbacks(
         onCameraCaptureRequested: (ValueCallback<Array<Uri>>) -> Unit,
         onFilePickerRequested: (ValueCallback<Array<Uri>>, List<String>) -> Unit,
@@ -224,6 +231,11 @@ class NativeInputModeWidget @JvmOverloads constructor(
     private var modelPickerEnabledSource: Flow<Boolean>? = null
     private var chatIdJob: Job? = null
     private var chatIdSource: Flow<String?>? = null
+    private var interactionLockJob: Job? = null
+    private var interactionLockSource: Flow<Boolean>? = null
+    private var duckAiFireButtonHighlightJob: Job? = null
+    private var duckAiFireButtonHighlightSource: Flow<Boolean>? = null
+    private var pulseAnimation: PulseAnimation? = null
     private var submitEnabledJob: Job? = null
     private var openModelPickerJob: Job? = null
     private var submitAllowed: Boolean = true
@@ -304,6 +316,8 @@ class NativeInputModeWidget @JvmOverloads constructor(
         setupPlugins()
         observeModelPickerEnabledSource()
         observeChatIdSource()
+        observeInteractionLockSource()
+        observeDuckAiFireButtonHighlightSource()
         applyNativeStyling()
         observeChatState()
         observeChatSuggestionsEnabled()
@@ -427,6 +441,11 @@ class NativeInputModeWidget @JvmOverloads constructor(
         modelPickerEnabledJob = null
         chatIdJob?.cancel()
         chatIdJob = null
+        interactionLockJob?.cancel()
+        interactionLockJob = null
+        duckAiFireButtonHighlightJob?.cancel()
+        duckAiFireButtonHighlightJob = null
+        pulseAnimation?.stop()
         submitEnabledJob?.cancel()
         submitEnabledJob = null
         openModelPickerJob?.cancel()
@@ -621,6 +640,8 @@ class NativeInputModeWidget @JvmOverloads constructor(
         }
         updateBackButtons(state)
         updateFireButtonVisibility(state)
+        updateDuckAiFireButtonHighlight(state)
+        setInteractionLocked(state.interactionLocked)
         updateBottomRowVisibility()
         applyVerticalPaddingForFocus()
         updateNewLineButtonVisibility()
@@ -676,6 +697,28 @@ class NativeInputModeWidget @JvmOverloads constructor(
         leadingFireButtonView()?.visibility = if (showLeading) VISIBLE else GONE
         findViewById<View?>(R.id.inputFieldFireButton)?.visibility =
             if (state.shouldShowTrailingFireButton()) VISIBLE else GONE
+    }
+
+    // Onboarding emphasis for the leading (Duck.ai) fire button.
+    // Highlighted -> bright + pulsing (exempt from the lock); locked but not highlighted -> dimmed/disabled;
+    // otherwise -> normal.
+    private fun updateDuckAiFireButtonHighlight(state: NativeInputState) {
+        val fireMenu = leadingFireButtonView() ?: return
+        val fireIcon = fireMenu.findViewById<View?>(R.id.inputFieldFireIconImageview)
+        val duckAiFireButtonInteractionLocked = state.interactionLocked && !state.duckAiFireButtonHighlighted
+        fireMenu.isEnabled = !duckAiFireButtonInteractionLocked
+        // The whole-widget dim from setInteractionLocked can't reach this view, because it lives in a sibling layout
+        fireMenu.alpha = if (duckAiFireButtonInteractionLocked) LOCKED_FIRE_ALPHA else 1f
+        when {
+            !state.duckAiFireButtonHighlighted || !fireMenu.isVisible || fireIcon == null -> pulseAnimation?.stop()
+            fireIcon.height > 0 -> ensurePulseAnimation(fireIcon)?.playOn(fireIcon)
+            else -> fireIcon.doOnNextLayout { nativeInputState?.let { updateDuckAiFireButtonHighlight(it) } }
+        }
+    }
+
+    private fun ensurePulseAnimation(view: View): PulseAnimation? {
+        if (pulseAnimation == null) pulseAnimation = view.findViewTreeLifecycleOwner()?.let { PulseAnimation(it) }
+        return pulseAnimation
     }
 
     private fun removeMargins() {
@@ -1002,6 +1045,36 @@ class NativeInputModeWidget @JvmOverloads constructor(
         chatIdJob = source
             .distinctUntilChanged()
             .onEach { viewModel.setActiveChatId(it) }
+            .launchIn(scope)
+    }
+
+    override fun bindInteractionLockSource(source: Flow<Boolean>) {
+        interactionLockSource = source
+        if (isAttachedToWindow) observeInteractionLockSource()
+    }
+
+    private fun observeInteractionLockSource() {
+        val source = interactionLockSource ?: return
+        val scope = findViewTreeLifecycleOwner()?.lifecycleScope ?: return
+        interactionLockJob?.cancel()
+        interactionLockJob = source
+            .distinctUntilChanged()
+            .onEach { viewModel.setInteractionLocked(it) }
+            .launchIn(scope)
+    }
+
+    override fun bindDuckAiFireButtonHighlightSource(source: Flow<Boolean>) {
+        duckAiFireButtonHighlightSource = source
+        if (isAttachedToWindow) observeDuckAiFireButtonHighlightSource()
+    }
+
+    private fun observeDuckAiFireButtonHighlightSource() {
+        val source = duckAiFireButtonHighlightSource ?: return
+        val scope = findViewTreeLifecycleOwner()?.lifecycleScope ?: return
+        duckAiFireButtonHighlightJob?.cancel()
+        duckAiFireButtonHighlightJob = source
+            .distinctUntilChanged()
+            .onEach { viewModel.setDuckAiFireButtonHighlighted(it) }
             .launchIn(scope)
     }
 
@@ -1404,6 +1477,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
         private const val MAX_LINES = 5
         private const val FOCUS_TRANSITION_DURATION_MS = 100L
         private const val LOCKED_ALPHA = 0.4f
+        private const val LOCKED_FIRE_ALPHA = 0.4f
     }
 }
 
