@@ -64,6 +64,7 @@ import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.duckchat.api.inputscreen.DuckAiOnboardingEndCtaVariant
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.onboarding.api.LinearOnboardingOrchestrator
 import com.duckduckgo.onboarding.api.LinearOnboardingState
@@ -1380,12 +1381,22 @@ class CtaViewModelTest {
     }
 
     @Test
-    fun whenPrepareDuckAiEndCtaAndEligibleThenReturnsTrue() = runTest {
+    fun whenPrepareDuckAiEndCtaAndEligibleAndBrandDesignDisabledThenReturnsLegacyVariant() = runTest {
         givenCanShowDuckAiEndCta()
 
         val result = testee.prepareAndMarkDuckAiEndCtaForInputScreen()
 
-        assertTrue(result)
+        assertEquals(DuckAiOnboardingEndCtaVariant.LEGACY, result)
+    }
+
+    @Test
+    fun whenPrepareDuckAiEndCtaAndEligibleAndBrandDesignEnabledThenReturnsBrandDesignVariant() = runTest {
+        givenCanShowDuckAiEndCta()
+        whenever(mockOnboardingBrandDesignUpdateToggles.brandDesignUpdate()).thenReturn(mockEnabledToggle)
+
+        val result = testee.prepareAndMarkDuckAiEndCtaForInputScreen()
+
+        assertEquals(DuckAiOnboardingEndCtaVariant.BRAND_DESIGN_UPDATE, result)
     }
 
     @Test
@@ -1425,37 +1436,37 @@ class CtaViewModelTest {
     }
 
     @Test
-    fun whenPrepareDuckAiEndCtaAndNoBrowserCtasEnabledThenReturnsFalseAndNoSideEffects() = runTest {
+    fun whenPrepareDuckAiEndCtaAndNoBrowserCtasEnabledThenReturnsNoneAndNoSideEffects() = runTest {
         givenCanShowDuckAiEndCta()
         whenever(mockExtendedOnboardingFeatureToggles.noBrowserCtas()).thenReturn(mockEnabledToggle)
 
         val result = testee.prepareAndMarkDuckAiEndCtaForInputScreen()
 
-        assertFalse(result)
+        assertEquals(DuckAiOnboardingEndCtaVariant.NONE, result)
         verify(mockPixel, never()).fire(eq(ONBOARDING_DAX_CTA_SHOWN), any(), any(), eq(Count))
         verify(mockDismissedCtaDao, never()).insert(DismissedCta(CtaId.DAX_DUCK_AI_END))
     }
 
     @Test
-    fun whenPrepareDuckAiEndCtaAndAlreadyShownThenReturnsFalseAndNoSideEffects() = runTest {
+    fun whenPrepareDuckAiEndCtaAndAlreadyShownThenReturnsNoneAndNoSideEffects() = runTest {
         givenCanShowDuckAiEndCta()
         whenever(mockDismissedCtaDao.exists(CtaId.DAX_DUCK_AI_END)).thenReturn(true)
 
         val result = testee.prepareAndMarkDuckAiEndCtaForInputScreen()
 
-        assertFalse(result)
+        assertEquals(DuckAiOnboardingEndCtaVariant.NONE, result)
         verify(mockPixel, never()).fire(eq(ONBOARDING_DAX_CTA_SHOWN), any(), any(), eq(Count))
         verify(mockDismissedCtaDao, never()).insert(DismissedCta(CtaId.DAX_DUCK_AI_END))
     }
 
     @Test
-    fun whenPrepareDuckAiEndCtaAndNotInDuckAiFlowThenReturnsFalseAndNoSideEffects() = runTest {
+    fun whenPrepareDuckAiEndCtaAndNotInDuckAiFlowThenReturnsNoneAndNoSideEffects() = runTest {
         givenCanShowDuckAiEndCta()
         whenever(mockOnboardingStore.isDuckAiOnboardingFlow()).thenReturn(false)
 
         val result = testee.prepareAndMarkDuckAiEndCtaForInputScreen()
 
-        assertFalse(result)
+        assertEquals(DuckAiOnboardingEndCtaVariant.NONE, result)
         verify(mockPixel, never()).fire(eq(ONBOARDING_DAX_CTA_SHOWN), any(), any(), eq(Count))
         verify(mockDismissedCtaDao, never()).insert(DismissedCta(CtaId.DAX_DUCK_AI_END))
     }

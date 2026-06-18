@@ -175,6 +175,7 @@ import com.duckduckgo.app.cta.ui.Cta
 import com.duckduckgo.app.cta.ui.CtaViewModel
 import com.duckduckgo.app.cta.ui.DaxBubbleCta
 import com.duckduckgo.app.cta.ui.DaxBubbleCta.DaxIntroSearchOptionsCta
+import com.duckduckgo.app.cta.ui.DaxDuckAiFireButtonBrandDesignUpdateContextualCta
 import com.duckduckgo.app.cta.ui.DaxTryASearchBrandDesignUpdateBubbleCta
 import com.duckduckgo.app.cta.ui.HomePanelCta
 import com.duckduckgo.app.cta.ui.OnboardingDaxDialogCta.DaxDuckAiFireButtonCta
@@ -8973,6 +8974,17 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenFireMenuSelectedAndDuckAiFireButtonBrandDesignUpdateCtaShownThenFireFireButtonPressedMetric() = runTest {
+        testee.browserViewState.value = browserViewState()
+        testee.ctaViewState.value = ctaViewState().copy(cta = brandDesignDuckAiFireButtonCta())
+
+        testee.onFireMenuSelected(Omnibar.ViewMode.Browser(exampleUrl))
+        advanceUntilIdle()
+
+        verify(mockDuckAiOnboardingExperimentMetrics).fireFireButtonPressed()
+    }
+
+    @Test
     fun whenFireMenuSelectedAndNoDuckAiFireButtonCtaThenDoNotFireFireButtonPressedMetric() = runTest {
         testee.browserViewState.value = browserViewState()
         testee.ctaViewState.value = ctaViewState().copy(cta = null)
@@ -9862,6 +9874,13 @@ class BrowserTabViewModelTest {
     private fun ctaViewState() = testee.ctaViewState.value!!
 
     private fun browserViewState() = testee.browserViewState.value!!
+
+    private fun brandDesignDuckAiFireButtonCta() = DaxDuckAiFireButtonBrandDesignUpdateContextualCta(
+        onboardingStore = mockOnboardingStore,
+        appInstallStore = mockAppInstallStore,
+        isLightTheme = true,
+        deviceInfo = mockDeviceInfo,
+    )
 
     private fun omnibarViewState() = testee.omnibarViewState.value!!
 
@@ -11496,6 +11515,19 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenDaxDuckAiFireButtonBrandDesignUpdateCtaShownThenFireButtonHighlighted() = runTest {
+        val observer = ValueCaptorObserver<BrowserViewState>(false)
+        testee.browserViewState.observeForever(observer)
+        dismissedCtaDaoChannel.send(emptyList())
+
+        testee.ctaViewState.value = ctaViewState().copy(cta = brandDesignDuckAiFireButtonCta())
+
+        advanceUntilIdle()
+
+        assertTrue((browserViewState().fireButton as HighlightableButton.Visible).highlighted)
+    }
+
+    @Test
     fun whenDaxDuckAiFireButtonCtaDismissedThenFireButtonNotHighlighted() = runTest {
         val observer = ValueCaptorObserver<BrowserViewState>(false)
         testee.browserViewState.observeForever(observer)
@@ -11504,6 +11536,21 @@ class BrowserTabViewModelTest {
         testee.ctaViewState.value = ctaViewState().copy(
             cta = DaxDuckAiFireButtonCta(mockOnboardingStore, mockAppInstallStore),
         )
+        advanceUntilIdle()
+
+        testee.ctaViewState.value = ctaViewState().copy(cta = null)
+        advanceUntilIdle()
+
+        assertFalse((browserViewState().fireButton as HighlightableButton.Visible).highlighted)
+    }
+
+    @Test
+    fun whenDaxDuckAiFireButtonBrandDesignUpdateCtaDismissedThenFireButtonNotHighlighted() = runTest {
+        val observer = ValueCaptorObserver<BrowserViewState>(false)
+        testee.browserViewState.observeForever(observer)
+        dismissedCtaDaoChannel.send(emptyList())
+
+        testee.ctaViewState.value = ctaViewState().copy(cta = brandDesignDuckAiFireButtonCta())
         advanceUntilIdle()
 
         testee.ctaViewState.value = ctaViewState().copy(cta = null)
@@ -11586,6 +11633,17 @@ class BrowserTabViewModelTest {
         dismissedCtaDaoChannel.send(emptyList())
         val cta = DaxDuckAiFireButtonCta(mockOnboardingStore, mockAppInstallStore)
         testee.ctaViewState.value = ctaViewState().copy(cta = cta)
+
+        testee.dismissDuckAiFireOnboardingCta()
+        advanceUntilIdle()
+
+        verify(mockDismissedCtaDao).insert(DismissedCta(CtaId.DAX_DUCK_AI_FIRE_BUTTON))
+    }
+
+    @Test
+    fun whenDismissDuckAiFireOnboardingCtaCalledWithBrandDesignUpdateCtaThenCtaDismissed() = runTest {
+        dismissedCtaDaoChannel.send(emptyList())
+        testee.ctaViewState.value = ctaViewState().copy(cta = brandDesignDuckAiFireButtonCta())
 
         testee.dismissDuckAiFireOnboardingCta()
         advanceUntilIdle()

@@ -78,15 +78,28 @@ class EdgeToEdgeHandler @Inject constructor() {
     }
 
     /**
-     * Pads [view]'s bottom by the navigation-bar + cutout + IME inset.
+     * Pads [view]'s bottom by the navigation-bar (plus display cutout and IME) inset.
+     *
+     * When [drawBehindGestureNav] is true, the padding uses the *tappable* navigation inset, which is
+     * 0 in gesture navigation (so content draws edge-to-edge behind the transparent gesture handle) and
+     * the button-bar height in 2/3-button navigation (so content sits above the buttons). When false it
+     * uses the full navigation-bar inset, keeping content clear of the bar in every navigation mode.
      *
      * @param view The view to pad at the bottom edge.
      */
-    fun applyNavigationBarInsets(view: View) {
+    fun applyNavigationBarInsets(
+        view: View,
+        drawBehindGestureNav: Boolean = false,
+    ) {
         val initialBottom = view.paddingBottom
         ViewCompat.setOnApplyWindowInsetsListener(view) { v, insets ->
+            val bottomType = if (drawBehindGestureNav) {
+                WindowInsetsCompat.Type.tappableElement()
+            } else {
+                WindowInsetsCompat.Type.navigationBars()
+            }
             val bottom = insets.getInsets(
-                WindowInsetsCompat.Type.navigationBars() or WindowInsetsCompat.Type.displayCutout() or WindowInsetsCompat.Type.ime(),
+                bottomType or WindowInsetsCompat.Type.displayCutout() or WindowInsetsCompat.Type.ime(),
             ).bottom
 
             v.updatePadding(bottom = initialBottom + bottom)

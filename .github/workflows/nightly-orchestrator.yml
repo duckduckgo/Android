@@ -1,4 +1,4 @@
-name: Nightly orchestrator
+name: Generate LGC if release blocking checks are successful
 
 on:
   schedule:
@@ -125,11 +125,10 @@ jobs:
         task_id: ${{ fromJson(needs.collect_lgc_tasks.outputs.task_ids) }}
       fail-fast: false
     steps:
-      - name: Add task to release board in the release candidate section
-        uses: duckduckgo/native-github-asana-sync@v2.0
+      - name: Tag task as LGC
+        uses: duckduckgo/native-github-asana-sync@v2.5.1
         with:
           asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
-          asana-project: ${{ vars.GH_ANDROID_RELEASE_BOARD_PROJECT_ID }}
-          asana-section: ${{ vars.GH_ANDROID_RELEASE_BOARD_LGC_SECTION_ID }}
           asana-task-id: ${{ matrix.task_id }}
-          action: 'add-task-asana-project'
+          asana-task-custom-fields: '{"${{ vars.GH_ANDROID_RELEASE_BOARD_RELEASE_STATUS_FIELD_KEY_ID }}":"${{ vars.GH_ANDROID_RELEASE_BOARD_RELEASE_STATUS_FIELD_CONTAINED_IN_LGC_VALUE_ID }}"}'
+          action: 'update-task-custom-fields'

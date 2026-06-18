@@ -43,7 +43,7 @@ data class DaxEndBrandDesignUpdateBubbleCta(
     } else {
         R.string.onboardingEndDaxDialogDescription
     },
-    backgroundRes = R.drawable.bg_onboarding_end,
+    backgroundRes = CommonR.drawable.bg_onboarding_end,
     shownPixel = AppPixelName.ONBOARDING_DAX_CTA_SHOWN,
     okPixel = AppPixelName.ONBOARDING_DAX_CTA_OK_BUTTON,
     ctaPixelParam = Pixel.PixelValues.DAX_END_CTA,

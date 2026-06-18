@@ -135,5 +135,28 @@ def extract_task_id_from_url(url: str) -> str:
     # If the last part is 'f', get the previous part
     if task_id == 'f':
         task_id = parts[-2]
-    
+
+    return task_id
+
+
+def resolve_task_id(link: AsanaTaskLink) -> str | None:
+    """
+    Safely resolve an Asana task ID from a link.
+
+    Returns None (and logs) for a missing or malformed URL, so a single bad
+    link never aborts the workflow.
+    """
+    if not link.url:
+        return None
+
+    try:
+        task_id = extract_task_id_from_url(link.url)
+    except Exception as e:
+        log(f"Skipping malformed Asana URL '{link.url}': {e}")
+        return None
+
+    if not task_id:
+        log(f"Skipping Asana URL with no task ID: {link.url}")
+        return None
+
     return task_id

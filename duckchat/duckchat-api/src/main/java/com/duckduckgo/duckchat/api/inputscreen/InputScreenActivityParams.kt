@@ -31,6 +31,9 @@ import java.io.Serializable
  * @param showInstalledApps whether apps installed on the device should appear in autocomplete results
  * @param launchWithVoice whether to immediately launch voice input on activity start, if supported and enabled
  * @param isNewTab whether the input screen is being launched as part of a new tab creation action
+ * @param duckAiOnboardingEndCta which variant of the Duck.AI onboarding end CTA to render — [DuckAiOnboardingEndCtaVariant.NONE]
+ *  to suppress it, [DuckAiOnboardingEndCtaVariant.LEGACY] for the original visual, or [DuckAiOnboardingEndCtaVariant.BRAND_DESIGN_UPDATE]
+ *  for the redesigned variant.
  * @param initialInputMode if null, falls back to user preference (Search / Chat / Last Used)
  */
 data class InputScreenActivityParams(
@@ -42,8 +45,22 @@ data class InputScreenActivityParams(
     val initialInputMode: InputMode? = null,
     val showReturnHatch: Boolean = false,
     val isNewTab: Boolean = false,
-    val showDuckAiOnboardingEndCta: Boolean = false,
+    val duckAiOnboardingEndCta: DuckAiOnboardingEndCtaVariant = DuckAiOnboardingEndCtaVariant.NONE,
 ) : GlobalActivityStarter.ActivityParams
+
+/**
+ * Which variant of the Duck.AI onboarding end CTA the Input Screen should render.
+ */
+enum class DuckAiOnboardingEndCtaVariant {
+    /** Don't render the end CTA. */
+    NONE,
+
+    /** Legacy visual style. */
+    LEGACY,
+
+    /** Brand-design redesign of the end CTA. */
+    BRAND_DESIGN_UPDATE,
+}
 
 /**
  * Result codes returned by the Input Screen activity's [ActivityResult].
