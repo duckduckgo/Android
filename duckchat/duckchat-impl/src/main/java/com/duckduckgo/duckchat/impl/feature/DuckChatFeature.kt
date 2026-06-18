@@ -270,7 +270,7 @@ interface DuckChatFeature {
      * @return `true` when the contextual Duck.ai sheet improvements are enabled.
      * If the remote feature is not present defaults to `false`
      */
-    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun contextualSheetImprovements(): Toggle
 
     /**
