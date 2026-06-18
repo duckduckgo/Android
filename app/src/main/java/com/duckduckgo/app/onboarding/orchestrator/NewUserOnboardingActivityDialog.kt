@@ -20,12 +20,13 @@ package com.duckduckgo.app.onboarding.orchestrator
  * What the [com.duckduckgo.app.onboarding.ui.OnboardingActivity] renderer should present for the current step.
  */
 sealed interface NewUserOnboardingActivityDialog {
-    data class IntroAnimation(val withDuckAi: Boolean) : NewUserOnboardingActivityDialog
+    data class IntroAnimation(val withDuckAi: Boolean = false) : NewUserOnboardingActivityDialog
     data object NotificationPermission : NewUserOnboardingActivityDialog
     data object SyncRestore : NewUserOnboardingActivityDialog
     data object InitialReinstallUser : NewUserOnboardingActivityDialog
     data object Initial : NewUserOnboardingActivityDialog
     data object ComparisonChart : NewUserOnboardingActivityDialog
+    data object AiComparisonChart : NewUserOnboardingActivityDialog
     data object DefaultBrowserPrompt : NewUserOnboardingActivityDialog
     data class AddressBarPosition(val showSplitOption: Boolean) : NewUserOnboardingActivityDialog
     data object InputScreen : NewUserOnboardingActivityDialog

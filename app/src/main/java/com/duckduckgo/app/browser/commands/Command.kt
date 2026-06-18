@@ -493,6 +493,7 @@ sealed class Command {
 
     data class LaunchInputScreen(
         val duckAiEndCtaVariant: DuckAiOnboardingEndCtaVariant = DuckAiOnboardingEndCtaVariant.NONE,
+        val launchOnChat: Boolean = false,
     ) : Command()
 
     data object LaunchDuckChatHistory : Command()

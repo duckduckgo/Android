@@ -110,6 +110,7 @@ interface NativeInputWidget {
     fun hideKeyboard()
     fun showKeyboard()
     fun selectChatTab()
+    fun selectSearchTab()
     fun applyDefaultTogglePosition()
     fun saveLastUsedTogglePosition(isChat: Boolean)
     fun isChatTabSelected(): Boolean
@@ -890,6 +891,13 @@ class NativeInputModeWidget @JvmOverloads constructor(
         val toggle = findViewById<TabLayout?>(R.id.inputModeSwitch) ?: return
         if (toggle.selectedTabPosition != 1) {
             toggle.getTabAt(1)?.select()
+        }
+    }
+
+    override fun selectSearchTab() {
+        val toggle = findViewById<TabLayout?>(R.id.inputModeSwitch) ?: return
+        if (toggle.selectedTabPosition != 0) {
+            toggle.getTabAt(0)?.select()
         }
     }
 

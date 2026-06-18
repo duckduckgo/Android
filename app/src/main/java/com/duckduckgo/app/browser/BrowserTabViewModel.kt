@@ -1060,7 +1060,8 @@ class BrowserTabViewModel @Inject constructor(
                             val hasPendingOnboardingPromo = ctaViewModel.isPromoOnboardingDialogShowing()
                             if (!hasPendingOnboardingPromo) {
                                 val duckAiEndCtaVariant = ctaViewModel.prepareAndMarkDuckAiEndCtaForInputScreen()
-                                command.value = LaunchInputScreen(duckAiEndCtaVariant = duckAiEndCtaVariant)
+                                val launchOnChat = onboardingStore.consumeOpenInputOnDuckAiTab()
+                                command.value = LaunchInputScreen(duckAiEndCtaVariant = duckAiEndCtaVariant, launchOnChat = launchOnChat)
                             }
                         }
                     }
@@ -5595,6 +5596,11 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun dismissDuckAiFireOnboardingCta() {
+        // Custom AI onboarding defers dismissal to the end of the linear orchestrator
+        // run, so the CTA survives if the app is killed mid-onboarding and the flow
+        // has to re-run on next launch.
+        if (onboardingStore.isCustomAiOnboardingFlow()) return
+
         val cta = ctaViewState.value?.cta ?: return
         if (cta is OnboardingDaxDialogCta.DaxDuckAiFireButtonCta || cta is DaxDuckAiFireButtonBrandDesignUpdateContextualCta) {
             viewModelScope.launch { ctaViewModel.onUserDismissedCta(cta = cta) }

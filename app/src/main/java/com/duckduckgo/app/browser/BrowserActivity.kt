@@ -90,6 +90,8 @@ import com.duckduckgo.app.global.view.ClearDataAction
 import com.duckduckgo.app.global.view.ORIGIN_DUCK_AI_CONTEXTUAL_CHAT
 import com.duckduckgo.app.global.view.ORIGIN_HATCH
 import com.duckduckgo.app.global.view.renderIfChanged
+import com.duckduckgo.app.onboarding.orchestrator.NewUserBrowserOnboardingViewModel
+import com.duckduckgo.app.onboarding.ui.OnboardingActivity
 import com.duckduckgo.app.onboarding.ui.page.DefaultBrowserPage
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.FIRE_DIALOG_CANCEL
@@ -275,6 +277,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
         }
 
     private val viewModel: BrowserViewModel by bindViewModel()
+    private val onboardingHostViewModel: NewUserBrowserOnboardingViewModel by bindViewModel()
     private val duckChatViewModel: DuckChatSharedViewModel by viewModels()
 
     private var instanceStateBundles: CombinedInstanceState? = null
@@ -429,6 +432,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
             .launchIn(lifecycleScope)
 
         observeDuckChatSharedCommands()
+        observeOnboardingHost()
         observeBrowserModeChanges()
 
         viewModel.awaitClearDataFinishedNotification()
@@ -528,6 +532,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
                     if (pendingDuckAiOnboardingFire) {
                         pendingDuckAiOnboardingFire = false
                         closeDuckChatFullScreen()
+                        onboardingHostViewModel.onDuckAiFireCompleted()
                     }
                 }
                 FireDialog.EVENT_ON_SINGLE_TAB_CLEAR_FEATURE_NOT_SUPPORTED -> {
@@ -535,6 +540,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
                     if (pendingDuckAiOnboardingFire) {
                         pendingDuckAiOnboardingFire = false
                         closeDuckChatFullScreen()
+                        onboardingHostViewModel.onDuckAiFireCompleted()
                     }
                 }
                 FireDialog.EVENT_ON_SINGLE_TAB_CLEAR_ERROR -> {
@@ -542,6 +548,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
                     if (pendingDuckAiOnboardingFire) {
                         pendingDuckAiOnboardingFire = false
                         closeDuckChatFullScreen()
+                        onboardingHostViewModel.onDuckAiFireCompleted()
                     }
                 }
             }
@@ -851,26 +858,9 @@ open class BrowserActivity : DuckDuckGoActivity() {
         }
 
         if (intent.getBooleanExtra(OPEN_DUCK_CHAT, false)) {
-            isDuckChatVisible = true
-            if (duckAiFeatureState.showInputScreenAutomaticallyOnNewTab.value) {
-                externalIntentProcessingState.onIntentRequestToOpenDuckAi()
-            }
-
-            if (duckAiFeatureState.showFullScreenMode.value) {
-                val url = intent.getStringExtra(DUCK_CHAT_URL) ?: duckChat.getDuckChatUrl("", false)
-                // The tab to return to when this Duck.ai tab is closed.
-                // Use to the current tab if no explicit tab id is passed.
-                // Falls back to NTP otherwise.
-                val sourceTabId = intent.getStringExtra(SOURCE_TAB_ID_EXTRA) ?: currentTab?.tabId
-                if (swipingTabsFeature.isEnabled) {
-                    launchNewTab(query = url, skipHome = false, sourceTabId = sourceTabId)
-                } else {
-                    lifecycleScope.launch { viewModel.onOpenInNewTabRequested(query = url, sourceTabId = sourceTabId, skipHome = false) }
-                }
-            } else {
-                val duckChatSessionActive = intent.getBooleanExtra(DUCK_CHAT_SESSION_ACTIVE, false)
-                viewModel.openDuckChat(intent.getStringExtra(DUCK_CHAT_URL), duckChatSessionActive, withTransition = duckAiShouldAnimate)
-            }
+            val duckChatSessionActive = intent.getBooleanExtra(DUCK_CHAT_SESSION_ACTIVE, false)
+            val sourceTabId = intent.getStringExtra(SOURCE_TAB_ID_EXTRA)
+            launchDuckAi(url = intent.getStringExtra(DUCK_CHAT_URL), duckChatSessionActive = duckChatSessionActive, sourceTabId = sourceTabId)
             return
         }
 
@@ -1101,6 +1091,28 @@ open class BrowserActivity : DuckDuckGoActivity() {
         globalActivityStarter.start(this, DownloadsScreenNoParams)
     }
 
+    private fun launchDuckAi(url: String?, duckChatSessionActive: Boolean = false, sourceTabId: String? = null) {
+        isDuckChatVisible = true
+        if (duckAiFeatureState.showInputScreenAutomaticallyOnNewTab.value) {
+            externalIntentProcessingState.onIntentRequestToOpenDuckAi()
+        }
+
+        if (duckAiFeatureState.showFullScreenMode.value) {
+            // The tab to return to when this Duck.ai tab is closed.
+            // Use to the current tab if no explicit tab id is passed.
+            // Falls back to NTP otherwise.
+            val sourceTabId = sourceTabId ?: currentTab?.tabId
+            val fullScreenUrl = url ?: duckChat.getDuckChatUrl("", false)
+            if (swipingTabsFeature.isEnabled) {
+                launchNewTab(query = fullScreenUrl, skipHome = false, sourceTabId = sourceTabId)
+            } else {
+                lifecycleScope.launch { viewModel.onOpenInNewTabRequested(query = fullScreenUrl, sourceTabId = sourceTabId, skipHome = false) }
+            }
+        } else {
+            viewModel.openDuckChat(url, duckChatSessionActive, withTransition = duckAiShouldAnimate)
+        }
+    }
+
     fun closeDuckChatFullScreen() {
         isDuckChatVisible = false
         externalIntentProcessingState.onDuckAiClosed()
@@ -1290,6 +1302,24 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
                         is DuckChatSharedViewModel.Command.OpenTab -> {
                             openExistingTab(command.tabId)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private fun observeOnboardingHost() {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                onboardingHostViewModel.commands.collect { command ->
+                    when (command) {
+                        NewUserBrowserOnboardingViewModel.Command.HandOffToOnboardingActivity -> {
+                            startActivity(OnboardingActivity.intent(this@BrowserActivity))
+                            finish()
+                        }
+                        is NewUserBrowserOnboardingViewModel.Command.OpenDuckAiOnboardingDemo -> {
+                            launchDuckAi(url = command.url)
                         }
                     }
                 }

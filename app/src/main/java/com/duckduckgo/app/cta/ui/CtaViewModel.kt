@@ -28,12 +28,14 @@ import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.cta.model.DismissedCta
 import com.duckduckgo.app.cta.ui.HomePanelCta.AddWidgetAutoOnboarding
 import com.duckduckgo.app.cta.ui.HomePanelCta.AddWidgetInstructions
+import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.install.daysInstalled
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.domain
 import com.duckduckgo.app.global.model.orderedTrackerBlockedEntities
 import com.duckduckgo.app.onboarding.DuckAiOnboardingExperimentMetrics
+import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingPlanProvider
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.store.UserStageStore
@@ -55,18 +57,24 @@ import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.api.inputscreen.DuckAiOnboardingEndCtaVariant
+import com.duckduckgo.onboarding.api.LinearOnboardingOrchestrator
+import com.duckduckgo.onboarding.api.LinearOnboardingState
+import com.duckduckgo.onboarding.api.forPlan
 import com.duckduckgo.subscriptions.api.SubscriptionPromoCtaShownPlugin
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.api.Subscriptions
 import dagger.SingleInstanceIn
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.withContext
@@ -97,6 +105,8 @@ class CtaViewModel @Inject constructor(
     private val appTheme: AppTheme,
     private val duckAiOnboardingExperimentMetrics: DuckAiOnboardingExperimentMetrics,
     private val deviceInfo: DeviceInfo,
+    @AppCoroutineScope private val coroutineScope: CoroutineScope,
+    linearOnboardingOrchestrator: LinearOnboardingOrchestrator,
 ) {
     @ExperimentalCoroutinesApi
     @VisibleForTesting
@@ -112,6 +122,14 @@ class CtaViewModel @Inject constructor(
                     false -> flowOf(false)
                 }
             }
+
+    init {
+        linearOnboardingOrchestrator.state
+            .forPlan(NewUserOnboardingPlanProvider.ROOT_PLAN_ID)
+            .filterIsInstance<LinearOnboardingState.Completed>()
+            .onEach { completeStageIfDaxOnboardingCompleted() }
+            .launchIn(coroutineScope)
+    }
 
     private suspend fun isSubscriptionCtaAvailable(): Boolean =
         subscriptions.isEligible() && hasNoSubscription() && extendedOnboardingFeatureToggles.privacyProCta().isEnabled()
@@ -232,7 +250,7 @@ class CtaViewModel @Inject constructor(
 
     suspend fun prepareAndMarkDuckAiEndCtaForInputScreen(): DuckAiOnboardingEndCtaVariant {
         return withContext(dispatchers.io()) {
-            val shouldShow = canShowDuckAiEndCta() && !extendedOnboardingFeatureToggles.noBrowserCtas().isEnabled()
+            val shouldShow = canShowDuckAiEndCta() && !extendedOnboardingFeatureToggles.noBrowserCtas().isEnabled() && !settingsDataStore.hideTips
             if (!shouldShow) return@withContext DuckAiOnboardingEndCtaVariant.NONE
 
             dismissedCtaDao.insert(DismissedCta(CtaId.DAX_DUCK_AI_END))

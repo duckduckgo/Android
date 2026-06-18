@@ -28,6 +28,8 @@ internal object NewUserOnboardingStepIds {
     const val INITIAL_REINSTALL_USER: LinearOnboardingStepId = "initial_reinstall_user"
     const val INITIAL: LinearOnboardingStepId = "initial"
     const val COMPARISON_CHART: LinearOnboardingStepId = "comparison_chart"
+    const val AI_COMPARISON_CHART: LinearOnboardingStepId = "ai_comparison_chart"
+    const val DUCK_AI_DEMO: LinearOnboardingStepId = "duck_ai_demo"
     const val DEFAULT_BROWSER_PROMPT: LinearOnboardingStepId = "default_browser_prompt"
     const val ADDRESS_BAR_POSITION: LinearOnboardingStepId = "address_bar_position"
     const val INPUT_SCREEN: LinearOnboardingStepId = "input_screen"
