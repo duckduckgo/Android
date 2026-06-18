@@ -19,8 +19,8 @@
 <resources>
     <string name="ad_blocking_settings_title">Blokiranje YouTube oglasa</string>
     <string name="ad_blocking_settings_toggle_title">Blokiraj oglase na YouTubeu</string>
-    <string name="ad_blocking_settings_description_with_consent">DuckDuckGo blokira video oglase na YouTubeu, tako da možeš gledati videozapise bez prekida.\n\nKad je uključen, DuckDuckGo će anonimno otkriti smetnje u blokiranju oglasa ili pogreške na YouTubeu kako bi poboljšao iskustvo za sve. DuckDuckGo nikad ne vidi koje videozapise gledaš niti bilo kakve osobne podatke. <annotation type="learn_more_link">Saznaj više</annotation></string>
-    <string name="ad_blocking_settings_description">DuckDuckGo blokira video oglase na YouTubeu, tako da možeš gledati videozapise bez prekida. <annotation type="learn_more_link">Saznaj više</annotation></string>
+    <string name="ad_blocking_settings_description_with_consent">DuckDuckGo blokira video oglase na YouTubeu, tako da videozapise možeš gledati bez prekida. \n\nKada je uključen, DuckDuckGo će anonimno otkriti smetnje u blokiranju oglasa ili pogreške na YouTubeu kako bi poboljšao doživljaj za sve. DuckDuckGo nikada ne vidi koje videozapise gledaš niti bilo kakve osobne podatke. <annotation type="learn_more_link">Saznaj više</annotation></string>
+    <string name="ad_blocking_settings_description">DuckDuckGo blokira video oglase na YouTubeu, tako da videozapise možeš gledati bez prekida. <annotation type="learn_more_link">Saznaj više</annotation></string>
     <string name="ad_blocking_settings_duck_player_header">Duck Player</string>
-    <string name="ad_blocking_settings_duck_player_description">Otvara videozapise u načinu rada kina koji sprječava da ono što gledaš utječe na tvoj YouTube feed.</string>
+    <string name="ad_blocking_settings_duck_player_description">Otvara videozapise u kino načinu rada bez ometanja koji sprječava da ono što gledaš utječe na tvoj YouTube feed.</string>
 </resources>
