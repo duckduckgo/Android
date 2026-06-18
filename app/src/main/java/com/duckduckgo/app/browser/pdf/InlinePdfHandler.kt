@@ -22,6 +22,7 @@ import android.net.http.SslCertificate
 import android.os.BadParcelableException
 import android.os.Build
 import android.os.Parcel
+import android.provider.OpenableColumns
 import androidx.annotation.VisibleForTesting
 import androidx.core.net.toUri
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
@@ -93,6 +94,16 @@ interface InlinePdfHandler {
      * @param url the URL of the PDF document
      */
     fun extractFileName(url: String): String
+
+    /**
+     * Copies an already-local PDF at [uri] (a content:// or file:// URI delivered by an
+     * external "Open with" intent) into the internal pdf_cache for inline rendering.
+     *
+     * Must be called while the caller still holds the intent's read-URI grant. Validates the
+     * copied file starts with %PDF- magic bytes and enforces the same LRU cache budget as
+     * [downloadToCache]. No network, cookies, or SSL certificate handling.
+     */
+    suspend fun cacheLocalPdf(uri: Uri): LocalPdfResult
 }
 
 sealed class PdfRenderDecision {
@@ -104,6 +115,11 @@ sealed class PdfRenderDecision {
 sealed class PdfDownloadResult {
     data class Success(val uri: Uri, val certificate: SslCertificate? = null) : PdfDownloadResult()
     data class Failure(val errorType: PdfErrorType) : PdfDownloadResult()
+}
+
+sealed class LocalPdfResult {
+    data class Success(val uri: Uri, val displayName: String) : LocalPdfResult()
+    data class Failure(val errorType: PdfErrorType) : LocalPdfResult()
 }
 
 enum class PdfErrorType(val paramValue: String) {
@@ -335,6 +351,63 @@ class RealInlinePdfHandler @Inject constructor(
             sanitized
         } else {
             "$sanitized.pdf"
+        }
+    }
+
+    override suspend fun cacheLocalPdf(uri: Uri): LocalPdfResult = withContext(dispatcherProvider.io()) {
+        val displayName = resolveDisplayName(uri)
+        // Prefix with the source URI hash so two sources sharing a display name don't collide.
+        val targetFile = File(cacheDir, "${uri.toString().hashCode()}-$displayName")
+        try {
+            context.contentResolver.openInputStream(uri)?.use { input ->
+                targetFile.outputStream().use { output -> input.copyTo(output) }
+            } ?: run {
+                logcat { "Local PDF copy failed: null input stream" }
+                targetFile.delete()
+                return@withContext LocalPdfResult.Failure(PdfErrorType.IO_ERROR)
+            }
+
+            if (!hasPdfMagicBytes(targetFile)) {
+                logcat { "Local PDF rejected: file does not start with %PDF magic bytes" }
+                targetFile.delete()
+                return@withContext LocalPdfResult.Failure(PdfErrorType.UNKNOWN)
+            }
+
+            enforceCacheBudget(keepFile = targetFile, maxFiles = MAX_CACHED_FILES)
+            LocalPdfResult.Success(Uri.fromFile(targetFile), displayName)
+        } catch (e: IOException) {
+            logcat { "Local PDF copy failed: ${e.message}" }
+            targetFile.delete()
+            LocalPdfResult.Failure(PdfErrorType.IO_ERROR)
+        } catch (e: SecurityException) {
+            logcat { "Local PDF copy denied: ${e.message}" }
+            targetFile.delete()
+            LocalPdfResult.Failure(PdfErrorType.SECURITY_ERROR)
+        }
+    }
+
+    private fun resolveDisplayName(uri: Uri): String {
+        val raw = when (uri.scheme?.lowercase()) {
+            "content" -> queryContentDisplayName(uri) ?: uri.lastPathSegment
+            else -> uri.lastPathSegment
+        } ?: "document.pdf"
+        val sanitized = raw.replace(Regex("[^a-zA-Z0-9._-]"), "_")
+        return if (sanitized.endsWith(".pdf", ignoreCase = true)) sanitized else "$sanitized.pdf"
+    }
+
+    private fun queryContentDisplayName(uri: Uri): String? {
+        return try {
+            context.contentResolver.query(uri, arrayOf(OpenableColumns.DISPLAY_NAME), null, null, null)?.use { cursor ->
+                if (cursor.moveToFirst()) {
+                    val index = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
+                    if (index >= 0) cursor.getString(index) else null
+                } else {
+                    null
+                }
+            }
+        } catch (e: Exception) {
+            logcat { "Local PDF display name lookup failed: ${e.message}" }
+            null
         }
     }
 
