@@ -25,6 +25,8 @@ import com.duckduckgo.sync.impl.RouteDecision
 import com.duckduckgo.sync.impl.SyncAccountRepository
 import com.duckduckgo.sync.impl.SyncAuthCode
 import com.duckduckgo.sync.impl.SyncCodeDispatcher
+import com.duckduckgo.sync.impl.SyncCodeType
+import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupPath
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Event
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Message
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Message.Hello
@@ -207,7 +209,10 @@ class SyncV2PairingDebugViewModelTest {
 
     @Test fun `V2InProgress — collects the outcomes Flow without calling parseSyncAuthCode`() {
         whenever(dispatcher.route(any())).thenReturn(
-            RouteDecision.V2InProgress(outcomes = flowOf(DispatchOutcome.LoggedIn)),
+            RouteDecision.V2InProgress(
+                codeType = SyncCodeType.RECOVERY,
+                outcomes = flowOf(DispatchOutcome.LoggedIn(path = SetupPath.RECOVERY)),
+            ),
         )
         val viewModel = newViewModel()
 
@@ -219,7 +224,10 @@ class SyncV2PairingDebugViewModelTest {
 
     @Test fun `V2InProgress with Failed outcome — does NOT crash and does NOT fall back to legacy`() {
         whenever(dispatcher.route(any())).thenReturn(
-            RouteDecision.V2InProgress(outcomes = flowOf(DispatchOutcome.Failed("BE rejected"))),
+            RouteDecision.V2InProgress(
+                codeType = SyncCodeType.RECOVERY,
+                outcomes = flowOf(DispatchOutcome.Failed("BE rejected")),
+            ),
         )
         val viewModel = newViewModel()
 
