@@ -47,6 +47,7 @@ import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.SpecialUrlDetector
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.browser.api.ui.BrowserScreens.SettingsScreenNoParams
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.view.hide
@@ -684,6 +685,10 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
     private fun backToSettings() {
         if (params.url == subscriptionsUrlProvider.activateUrl) {
             setResult(RESULT_OK)
+        } else {
+            // Completion path (purchase success / restore): Settings is a forward destination reached
+            // only on completion, so we open it explicitly here.
+            globalActivityStarter.start(this, SettingsScreenNoParams)
         }
         finish()
     }
