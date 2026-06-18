@@ -792,6 +792,30 @@ class NativeInputModeWidgetViewModelTest {
     }
 
     @Test
+    fun whenPromptSubmittedDuringRecoveryThenSubmitChangeModelPromptSentPixelFired() = runTest {
+        val viewModel = createViewModel()
+        viewModel.configure(tabId = "tab-A", isDuckAiMode = true, isBottom = false)
+        advanceUntilIdle()
+        showModelPickerEvents.tryEmit("tab-A")
+        advanceUntilIdle()
+
+        viewModel.onPromptSubmitted()
+
+        verify(duckChatPixels).fireSubmitChangeModelPromptSent()
+    }
+
+    @Test
+    fun whenPromptSubmittedOutsideRecoveryThenSubmitChangeModelPromptSentPixelNotFired() = runTest {
+        val viewModel = createViewModel()
+        viewModel.configure(tabId = "tab-A", isDuckAiMode = true, isBottom = false)
+        advanceUntilIdle()
+
+        viewModel.onPromptSubmitted()
+
+        verify(duckChatPixels, never()).fireSubmitChangeModelPromptSent()
+    }
+
+    @Test
     fun whenChatIdChangesThenSubmitEnabledResetsToTrue() = runTest {
         val viewModel = createViewModel()
         viewModel.configure(tabId = "tab-A", isDuckAiMode = true, isBottom = false)

@@ -1137,6 +1137,20 @@ class RealDuckChatJSHelperTest {
     }
 
     @Test
+    fun whenShowModelPickerThenShowModelPickerPixelFired() = runTest {
+        testee.processJsCallbackMessage("aiChat", "showModelPicker", "123", null, tabId = "tab-1")
+
+        verify(mockDuckChatPixels).fireShowModelPicker()
+    }
+
+    @Test
+    fun whenShowModelPickerWithEmptyTabIdThenShowModelPickerPixelNotFired() = runTest {
+        testee.processJsCallbackMessage("aiChat", "showModelPicker", "123", null, tabId = "")
+
+        verify(mockDuckChatPixels, never()).fireShowModelPicker()
+    }
+
+    @Test
     fun whenGetAIChatNativeConfigValuesAndSupportsImageUploadThenReturnJsCallbackDataWithSupportsImageUploadEnabled() = runTest {
         val featureName = "aiChat"
         val method = "getAIChatNativeConfigValues"

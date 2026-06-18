@@ -300,6 +300,17 @@ class ModelPickerViewModelTest {
     }
 
     @Test
+    fun whenAccessibleModelTappedInModelChangeModeThenSubmitChangeModelPixelFired() = runTest {
+        nativeInputState.value = nativeInputState.value.copy(chatId = "c1", modelChangeMode = true)
+        advanceUntilIdle()
+        val model = freeModel(id = "new-model", shortName = "New")
+
+        testee.onModelTapped(model, PickerSurface.MODEL_PICKER_ADDRESS_BAR)
+
+        verify(duckChatPixels).fireSubmitChangeModel("new-model")
+    }
+
+    @Test
     fun whenAccessibleModelTappedNotInModelChangeModeThenSelectModelCalled() = runTest {
         nativeInputState.value = nativeInputState.value.copy(chatId = null, modelChangeMode = false)
         advanceUntilIdle()

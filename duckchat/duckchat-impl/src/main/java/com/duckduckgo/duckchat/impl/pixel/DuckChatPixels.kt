@@ -161,6 +161,16 @@ interface DuckChatPixels {
     )
     fun fireModelSelected(modelId: String)
     fun fireReasoningEffortSelected(effortLevel: String)
+
+    /** FE recovery flow: native model picker opened in response to a `showModelPicker` message. */
+    fun fireShowModelPicker()
+
+    /** FE recovery flow: the chosen model reported back to the FE via `submitChangeModelAction`. */
+    fun fireSubmitChangeModel(modelId: String)
+
+    /** FE recovery flow: a prompt submitted after recovering the chat's model. */
+    fun fireSubmitChangeModelPromptSent()
+
     fun fireSubscriptionUpsellTriggered(source: String, currentTier: String, requiredTier: String, flowType: String)
     fun fireImageAttached(source: String)
     fun fireImageValidationFailed(reason: String)
@@ -517,6 +527,28 @@ class RealDuckChatPixels @Inject constructor(
         }
     }
 
+    override fun fireShowModelPicker() {
+        fireCountAndDaily(
+            DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_SHOW_MODEL_PICKER_COUNT,
+            DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_SHOW_MODEL_PICKER_DAILY,
+        )
+    }
+
+    override fun fireSubmitChangeModel(modelId: String) {
+        fireCountAndDaily(
+            DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_SUBMIT_CHANGE_MODEL_COUNT,
+            DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_SUBMIT_CHANGE_MODEL_DAILY,
+            parameters = mapOf(DuckChatPixelParameters.MODEL_ID to modelId),
+        )
+    }
+
+    override fun fireSubmitChangeModelPromptSent() {
+        fireCountAndDaily(
+            DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_SUBMIT_CHANGE_MODEL_PROMPT_SENT_COUNT,
+            DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_SUBMIT_CHANGE_MODEL_PROMPT_SENT_DAILY,
+        )
+    }
+
     override fun fireSubscriptionUpsellTriggered(source: String, currentTier: String, requiredTier: String, flowType: String) {
         appCoroutineScope.launch(dispatcherProvider.io()) {
             pixel.fire(
@@ -787,6 +819,12 @@ enum class DuckChatPixelName(override val pixelName: String) : Pixel.PixelName {
     DUCK_CHAT_UNIFIED_INPUT_MODEL_SELECTED("m_aichat_unified_input_model_selected"),
     DUCK_CHAT_UNIFIED_INPUT_REASONING_EFFORT_SELECTED("m_aichat_unified_input_reasoning_effort_selected"),
     DUCK_CHAT_UNIFIED_INPUT_SUBSCRIPTION_UPSELL_TRIGGERED("m_aichat_unified_input_subscription_upsell_triggered"),
+    DUCK_CHAT_UNIFIED_INPUT_SHOW_MODEL_PICKER_COUNT("aichat_unified_input_show_model_picker_count"),
+    DUCK_CHAT_UNIFIED_INPUT_SHOW_MODEL_PICKER_DAILY("aichat_unified_input_show_model_picker_daily"),
+    DUCK_CHAT_UNIFIED_INPUT_SUBMIT_CHANGE_MODEL_COUNT("aichat_unified_input_submit_change_model_count"),
+    DUCK_CHAT_UNIFIED_INPUT_SUBMIT_CHANGE_MODEL_DAILY("aichat_unified_input_submit_change_model_daily"),
+    DUCK_CHAT_UNIFIED_INPUT_SUBMIT_CHANGE_MODEL_PROMPT_SENT_COUNT("aichat_unified_input_submit_change_model_prompt_sent_count"),
+    DUCK_CHAT_UNIFIED_INPUT_SUBMIT_CHANGE_MODEL_PROMPT_SENT_DAILY("aichat_unified_input_submit_change_model_prompt_sent_daily"),
     DUCK_CHAT_UNIFIED_INPUT_IMAGE_ATTACHED_COUNT("m_aichat_unified_input_image_attached_count"),
     DUCK_CHAT_UNIFIED_INPUT_IMAGE_ATTACHED_DAILY("m_aichat_unified_input_image_attached_daily"),
     DUCK_CHAT_UNIFIED_INPUT_IMAGE_REMOVED_COUNT("m_aichat_unified_input_image_removed_count"),
@@ -1003,6 +1041,8 @@ class DuckChatParamRemovalPlugin @Inject constructor() : PixelParamRemovalPlugin
             // upsell, attachments, voice, stop) AND the app-side chat_header_upgrade_tapped, which
             // shares the prefix — the interceptor matches outgoing pixel names with startsWith.
             "m_aichat_unified_input_" to PixelParameter.removeAtb(),
+            // Same coverage for unified_input pixels added without the legacy m_ prefix.
+            "aichat_unified_input_" to PixelParameter.removeAtb(),
         )
     }
 }
