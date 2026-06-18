@@ -18,12 +18,19 @@ package com.duckduckgo.adblocking.impl.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.duckduckgo.adblocking.impl.AdBlockingPixelNames.AD_BLOCKING_DISABLED_COUNT
+import com.duckduckgo.adblocking.impl.AdBlockingPixelNames.AD_BLOCKING_DISABLED_DAILY
+import com.duckduckgo.adblocking.impl.AdBlockingPixelNames.AD_BLOCKING_ENABLED_COUNT
+import com.duckduckgo.adblocking.impl.AdBlockingPixelNames.AD_BLOCKING_ENABLED_DAILY
+import com.duckduckgo.adblocking.impl.AdBlockingPixelNames.AD_BLOCKING_SETTINGS_OPENED_COUNT
+import com.duckduckgo.adblocking.impl.AdBlockingPixelNames.AD_BLOCKING_SETTINGS_OPENED_DAILY
 import com.duckduckgo.adblocking.impl.AdBlockingSettingsRepository
 import com.duckduckgo.adblocking.impl.domain.AdBlockingState
 import com.duckduckgo.adblocking.impl.domain.AdBlockingStatusChecker
 import com.duckduckgo.adblocking.impl.ui.AdBlockingSettingsViewModel.Command.OpenDuckPlayerSettings
 import com.duckduckgo.adblocking.impl.ui.AdBlockingSettingsViewModel.Command.OpenLearnMore
 import com.duckduckgo.anvil.annotations.ContributesViewModel
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.ActivityScope
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
@@ -40,7 +47,13 @@ import javax.inject.Inject
 class AdBlockingSettingsViewModel @Inject constructor(
     statusChecker: AdBlockingStatusChecker,
     private val repository: AdBlockingSettingsRepository,
+    private val pixel: Pixel,
 ) : ViewModel() {
+
+    init {
+        pixel.fire(AD_BLOCKING_SETTINGS_OPENED_DAILY, type = Pixel.PixelType.Daily())
+        pixel.fire(AD_BLOCKING_SETTINGS_OPENED_COUNT)
+    }
 
     data class ViewState(
         val isEnabled: Boolean = false,
@@ -72,6 +85,13 @@ class AdBlockingSettingsViewModel @Inject constructor(
     fun onBlockAdsToggled(enabled: Boolean) {
         viewModelScope.launch {
             repository.setEnabled(enabled)
+            if (enabled) {
+                pixel.fire(AD_BLOCKING_ENABLED_DAILY, type = Pixel.PixelType.Daily())
+                pixel.fire(AD_BLOCKING_ENABLED_COUNT)
+            } else {
+                pixel.fire(AD_BLOCKING_DISABLED_DAILY, type = Pixel.PixelType.Daily())
+                pixel.fire(AD_BLOCKING_DISABLED_COUNT)
+            }
         }
     }
 

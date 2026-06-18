@@ -1033,4 +1033,8 @@
 
     <string name="input_screen_user_pref_without_ai_updated">Само търсене</string>
     <string name="input_screen_user_pref_with_ai_updated">Превключвайте между\nТърсене и Duck.ai</string>
+
+    <!-- New Address Bar Picker -->
+    <string name="newAddressBarPickerDuckDuckGo" translatable="false">DuckDuckGo</string>
+    <string name="newAddressBarPickerConfirm">Потвърждаване</string>
 </resources>

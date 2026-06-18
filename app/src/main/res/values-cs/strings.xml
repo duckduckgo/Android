@@ -1073,4 +1073,8 @@
 
     <string name="input_screen_user_pref_without_ai_updated">Jen vyhledávání</string>
     <string name="input_screen_user_pref_with_ai_updated">Přepínej mezi\nHledáním a Duck.ai</string>
+
+    <!-- New Address Bar Picker -->
+    <string name="newAddressBarPickerDuckDuckGo" translatable="false">DuckDuckGo</string>
+    <string name="newAddressBarPickerConfirm">Potvrdit</string>
 </resources>

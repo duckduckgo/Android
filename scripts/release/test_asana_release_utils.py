@@ -8,6 +8,7 @@ from asana_release_utils import (
     get_latest_public_release_tag,
     get_public_release_tag_before,
     extract_asana_task_links,
+    resolve_task_id,
     _build_flexible_prefix_pattern,
     AsanaTaskLink,
 )
@@ -199,6 +200,34 @@ class TestExtractAsanaTaskLinks:
         commits = [_fake_commit("ppp", message)]
         result = extract_asana_task_links(commits, STANDARD_PREFIX)
         assert result[0].url == "https://app.asana.com/0/123/456"
+
+
+# --- resolve_task_id ---
+
+
+class TestResolveTaskId:
+    def test_resolves_id_from_valid_url(self):
+        link = AsanaTaskLink(url="https://app.asana.com/0/123/456", commit_hash="aaa")
+        assert resolve_task_id(link) == "456"
+
+    def test_resolves_id_from_new_style_url(self):
+        url = "https://app.asana.com/1/137249556945/project/1209107918776641/task/1210066941136479?focus=true"
+        link = AsanaTaskLink(url=url, commit_hash="bbb")
+        assert resolve_task_id(link) == "1210066941136479"
+
+    def test_returns_none_when_no_url(self):
+        link = AsanaTaskLink(url=None, commit_hash="ccc")
+        assert resolve_task_id(link) is None
+
+    @patch("asana_release_utils.extract_task_id_from_url", side_effect=IndexError("boom"))
+    def test_returns_none_on_malformed_url(self, _mock_extract):
+        link = AsanaTaskLink(url="https://app.asana.com/", commit_hash="ddd")
+        assert resolve_task_id(link) is None
+
+    @patch("asana_release_utils.extract_task_id_from_url", return_value="")
+    def test_returns_none_when_extracted_id_is_empty(self, _mock_extract):
+        link = AsanaTaskLink(url="https://app.asana.com/0/0", commit_hash="eee")
+        assert resolve_task_id(link) is None
 
 
 # --- _build_flexible_prefix_pattern ---

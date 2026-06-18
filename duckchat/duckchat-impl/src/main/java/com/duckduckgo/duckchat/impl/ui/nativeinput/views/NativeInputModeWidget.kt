@@ -68,10 +68,12 @@ import com.google.android.material.tabs.TabLayout
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import logcat.logcat
@@ -92,6 +94,9 @@ interface NativeInputWidget {
     var onImageClick: (() -> Unit)?
     var onPaidTierChanged: ((Boolean) -> Unit)?
     var onAttachmentChooserStateChanged: ((Boolean) -> Unit)?
+
+    /** Fired when the user picks a model in the model-change flow (→ submitChangeModelAction). */
+    var onChangeModelSubmitted: ((modelId: String) -> Unit)?
     val isModelMenuVisible: Boolean
 
     fun onBackPressed()
@@ -119,6 +124,7 @@ interface NativeInputWidget {
     fun getResolvedReasoningEffort(): String?
     fun getSelectedTool(): String?
     fun clearSelectedTool()
+    fun onPromptSubmitted()
     fun setModelPickerEnabled(enabled: Boolean)
 
     /**
@@ -213,6 +219,9 @@ class NativeInputModeWidget @JvmOverloads constructor(
     private var modelPickerEnabledSource: Flow<Boolean>? = null
     private var chatIdJob: Job? = null
     private var chatIdSource: Flow<String?>? = null
+    private var submitEnabledJob: Job? = null
+    private var openModelPickerJob: Job? = null
+    private var submitAllowed: Boolean = true
     private var modelPickerView: ModelPicker? = null
     private var optionsView: OptionsView? = null
     private var chatSuggestionsUserEnabled: Boolean = true
@@ -227,6 +236,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
     private var voiceChatAvailable: Boolean = false
     private var widgetRoot: View? = null
     override var onStopTapped: (() -> Unit)? = null
+    override var onChangeModelSubmitted: ((modelId: String) -> Unit)? = null
     override var onImageClick: (() -> Unit)? = null
     override var onVoiceSearchClick: (() -> Unit)? = null
         set(value) {
@@ -293,6 +303,8 @@ class NativeInputModeWidget @JvmOverloads constructor(
         observeChatState()
         observeChatSuggestionsEnabled()
         observeNativeInputState()
+        observeSubmitEnabled()
+        observeOpenModelPicker()
         bindLeadingFireButtonClick()
         if (onPaidTierChanged != null) observeTier()
     }
@@ -350,9 +362,13 @@ class NativeInputModeWidget @JvmOverloads constructor(
                 }
             }
             launch {
-                viewModel.modelPickerEnabled.collect { enabled ->
-                    modelPickerView?.setPickerEnabled(enabled)
-                }
+                // Chip is enabled when new chat OR during the FE recovery flow (changing models).
+                combine(
+                    viewModel.modelPickerEnabled,
+                    viewModel.modelChangeMode,
+                ) { base, inRecovery -> base || inRecovery }
+                    .distinctUntilChanged()
+                    .collect { enabled -> modelPickerView?.setPickerEnabled(enabled) }
             }
         }
     }
@@ -367,10 +383,16 @@ class NativeInputModeWidget @JvmOverloads constructor(
         }
         (pluginView as? ModelPicker)?.let { picker ->
             picker.onMenuShown = { isModelMenuVisible = true }
-            picker.onMenuDismissed = { isModelMenuVisible = false }
+            picker.onMenuDismissed = {
+                isModelMenuVisible = false
+                // FE recovery: dismissing without picking a model reverts the change window so the
+                // chip hides again (nothing changed). A selection keeps the chip until submit.
+                if (!picker.hasPendingRecoverySelection()) viewModel.exitModelChangeMode()
+            }
             picker.onModelSelected = {
                 optionsView?.updateCapabilitiesFrom(picker)
             }
+            picker.onChangeModelSubmitted = { modelId -> onChangeModelSubmitted?.invoke(modelId) }
         }
     }
 
@@ -400,6 +422,10 @@ class NativeInputModeWidget @JvmOverloads constructor(
         modelPickerEnabledJob = null
         chatIdJob?.cancel()
         chatIdJob = null
+        submitEnabledJob?.cancel()
+        submitEnabledJob = null
+        openModelPickerJob?.cancel()
+        openModelPickerJob = null
         modelPickerView = null
         optionsView = null
         widgetRoot = null
@@ -551,7 +577,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
         val visible = isChatTabSelected() && hasContent
         submitButtons?.setSendButtonVisible(visible)
         if (!isStreaming) {
-            submitButtons?.setSendButtonEnabled(hasContent && !attachmentLimitExceeded)
+            submitButtons?.setSendButtonEnabled(submitAllowed && hasContent && !attachmentLimitExceeded)
         }
     }
 
@@ -929,6 +955,10 @@ class NativeInputModeWidget @JvmOverloads constructor(
         optionsView?.clearSelection()
     }
 
+    override fun onPromptSubmitted() {
+        viewModel.onPromptSubmitted()
+    }
+
     override fun setModelPickerEnabled(enabled: Boolean) {
         viewModel.setModelPickerEnabled(enabled)
     }
@@ -1141,6 +1171,35 @@ class NativeInputModeWidget @JvmOverloads constructor(
         chatSuggestionsSettingJob = viewModel.chatSuggestionsUserEnabled
             .onEach { enabled -> chatSuggestionsUserEnabled = enabled }
             .launchIn(findViewTreeLifecycleOwner()?.lifecycleScope ?: return)
+    }
+
+    // FE recovery: force-disable the submit button while the active chat's model is unavailable.
+    private fun observeSubmitEnabled() {
+        submitEnabledJob?.cancel()
+        submitEnabledJob = viewModel.submitEnabled
+            .onEach { enabled ->
+                submitAllowed = enabled
+                updateSendButtonVisibility()
+            }
+            .launchIn(findViewTreeLifecycleOwner()?.lifecycleScope ?: return)
+    }
+
+    // FE recovery "Switch Model": open the picker on every event (not on the modelChangeMode flag
+    // transition), so a repeated tap re-opens the picker after it was dismissed. The chip is shown
+    // via the modelChangeMode combine in setupPlugins; openPicker() waits for that layout pass.
+    private fun observeOpenModelPicker() {
+        openModelPickerJob?.cancel()
+        val scope = findViewTreeLifecycleOwner()?.lifecycleScope
+        openModelPickerJob = viewModel.showModelPickerEvents
+            .onEach {
+                // The picker chip lives in the bottom row, which is only laid out while the input is
+                // focused (updateBottomRowVisibility). On an ongoing chat opened from history the
+                // input is unfocused, so the chip is GONE and openPicker()'s doOnLayout would never
+                // fire. Request focus first to expand the row, then open the picker.
+                requestInputFocus()
+                modelPickerView?.openPicker()
+            }
+            .launchIn(scope ?: return)
     }
 
     private fun observeNativeInputState() {

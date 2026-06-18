@@ -21,9 +21,12 @@ import android.app.UiModeManager
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.pm.ActivityInfo
+import android.graphics.Color
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
+import androidx.activity.SystemBarStyle
+import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.widget.Toolbar
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -44,6 +47,15 @@ abstract class DuckDuckGoActivity : DaggerActivity() {
 
     @Inject lateinit var themingDataStore: ThemingDataStore
 
+    /**
+     * Override in subclasses whose look should follow the fire-mode theme.
+     * Default `false` keeps activities mode-agnostic on the regular accent regardless
+     * of the user's browser mode.
+     *
+     * Overriding activities must inject [BrowserMode] and return the appropriate Boolean value.
+     */
+    protected open val applyFireTheme: Boolean = false
+
     private var themeChangeReceiver: BroadcastReceiver? = null
 
     @SuppressLint("MissingSuperCall")
@@ -61,7 +73,7 @@ abstract class DuckDuckGoActivity : DaggerActivity() {
         daggerInject: Boolean = true,
     ) {
         if (daggerInject) daggerInject()
-        themeChangeReceiver = applyTheme(themingDataStore.theme)
+        themeChangeReceiver = applyTheme(themingDataStore.theme, applyFireTheme)
         super.onCreate(savedInstanceState)
     }
 
@@ -104,6 +116,19 @@ abstract class DuckDuckGoActivity : DaggerActivity() {
             DARK -> true
             else -> false
         }
+    }
+
+    /**
+     * Enables edge-to-edge with fully transparent system bars. Call from [onCreate] when
+     * edge-to-edge is enabled for the screen.
+     */
+    protected fun enableTransparentEdgeToEdge() {
+        val barStyle = if (isDarkThemeEnabled()) {
+            SystemBarStyle.dark(Color.TRANSPARENT)
+        } else {
+            SystemBarStyle.light(Color.TRANSPARENT, Color.TRANSPARENT)
+        }
+        enableEdgeToEdge(statusBarStyle = barStyle, navigationBarStyle = barStyle)
     }
 
     protected inline fun <reified V : ViewModel> bindViewModel() = lazy {

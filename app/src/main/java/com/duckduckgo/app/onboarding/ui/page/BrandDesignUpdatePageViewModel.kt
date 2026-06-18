@@ -32,6 +32,12 @@ import com.duckduckgo.app.onboarding.DuckAiOnboardingExperimentManager
 import com.duckduckgo.app.onboarding.DuckAiOnboardingExperimentManager.DuckAiOnboardingExperimentVariant.CONTROL
 import com.duckduckgo.app.onboarding.DuckAiOnboardingExperimentManager.DuckAiOnboardingExperimentVariant.TREATMENT_WITH_DUCK_AI_DEFAULT
 import com.duckduckgo.app.onboarding.DuckAiOnboardingExperimentManager.DuckAiOnboardingExperimentVariant.TREATMENT_WITH_SEARCH_DEFAULT
+import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingActivityDialog
+import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingActivityStep
+import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingEvent
+import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingPlanProvider
+import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingResult
+import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingStepIds
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.*
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.ADDRESS_BAR_POSITION
@@ -74,6 +80,9 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.inputscreen.wideevents.InputScreenOnboardingWideEvent
+import com.duckduckgo.onboarding.api.LinearOnboardingOrchestrator
+import com.duckduckgo.onboarding.api.LinearOnboardingState
+import com.duckduckgo.onboarding.api.forPlan
 import com.duckduckgo.sync.api.SyncAutoRestore
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
@@ -84,6 +93,8 @@ import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -115,18 +126,22 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
     private val syncAutoRestore: SyncAutoRestore,
     private val quickSetupPixelSender: QuickSetupPixelSender,
     private val customDuckAiOnboardingFeature: CustomDuckAiOnboardingFeature,
+    private val orchestrator: LinearOnboardingOrchestrator,
 ) : ViewModel() {
 
-    private val canRestoreDeferred: Deferred<Boolean> = viewModelScope.async(dispatchers.io()) {
-        try {
-            logcat { "Sync-AutoRestore: checking canRestore..." }
-            val result = syncAutoRestore.canRestore()
-            logcat(LogPriority.INFO) { "Sync-AutoRestore: canRestore=$result" }
-            result
-        } catch (t: Throwable) {
-            coroutineContext.ensureActive()
-            logcat(LogPriority.WARN) { "Sync-AutoRestore: canRestore check failed - ${t.message}" }
-            false
+    // Lazy so it never starts in orchestrator mode (there the sync_restore precondition owns canRestore).
+    private val canRestoreDeferred: Deferred<Boolean> by lazy {
+        viewModelScope.async(dispatchers.io()) {
+            try {
+                logcat { "Sync-AutoRestore: checking canRestore..." }
+                val result = syncAutoRestore.canRestore()
+                logcat(LogPriority.INFO) { "Sync-AutoRestore: canRestore=$result" }
+                result
+            } catch (t: Throwable) {
+                coroutineContext.ensureActive()
+                logcat(LogPriority.WARN) { "Sync-AutoRestore: canRestore check failed - ${t.message}" }
+                false
+            }
         }
     }
 
@@ -159,12 +174,16 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
 
     private var notificationPermissionFlowStarted = false
 
+    // Which flow drives this run, chosen once at construction. Legacy = the in-VM state machine;
+    // Orchestrator = translate fragment callbacks to LinearOnboardingOrchestrator events and render its
+    // state. Either way the intra-dialog interaction methods below are shared and behave identically.
+    // After the orchestrator rollout, delete LegacyFlow (and the now-unused legacy-only helpers) and make
+    // this always OrchestratorFlow.
+    private val flow: OnboardingFlow =
+        if (orchestrator.state.value is LinearOnboardingState.NotStarted) LegacyFlow() else OrchestratorFlow()
+
     init {
-        viewModelScope.launch(dispatchers.io()) {
-            val introAnimationEnabled = customDuckAiOnboardingFeature.introAnimation().isEnabled()
-            _viewState.update { it.copy(isDuckAiIntroAnimationEnabled = introAnimationEnabled) }
-            _commands.send(Command.PlayIntroAnimation(withDuckAi = introAnimationEnabled))
-        }
+        flow.start()
     }
 
     sealed interface Command {
@@ -247,207 +266,33 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
         _viewState.update { it.copy(hasPlayedIntroAnimation = true) }
     }
 
-    fun onIntroAnimationFinished() {
-        if (notificationPermissionFlowStarted) return
-        notificationPermissionFlowStarted = true
-        viewModelScope.launch {
-            delay(2.seconds)
-            _commands.send(Command.RequestNotificationPermissions)
-        }
-    }
+    fun onIntroAnimationFinished() = flow.onIntroAnimationFinished()
 
-    fun loadDaxDialog() {
-        viewModelScope.launch {
-            val canRestore = withTimeoutOrNull(BLOCK_STORE_TIMEOUT_MS) {
-                canRestoreDeferred.await()
-            } ?: false
-
-            // Always call isAppReinstall() — it has side effects (creates DDG downloads directory, persists reinstall state)
-            val isReinstall = isAppReinstall()
-
-            val dialogType = when {
-                canRestore -> {
-                    logcat(LogPriority.INFO) { "Sync-AutoRestore: first dialog=SYNC_RESTORE" }
-                    SYNC_RESTORE
-                }
-                isReinstall -> INITIAL_REINSTALL_USER
-                else -> INITIAL
-            }
-            _viewState.update {
-                it.copy(
-                    isReinstallUser = isReinstall,
-                    currentDialog = dialogType,
-                    hasAnimatedCurrentDialog = false,
-                )
-            }
-            fireDialogShownPixel(dialogType)
-        }
-    }
+    fun loadDaxDialog() = flow.loadDaxDialog()
 
     fun onPrimaryCtaClicked() {
         val currentDialog = _viewState.value.currentDialog ?: return
-        when (currentDialog) {
-            SYNC_RESTORE -> {
-                viewModelScope.launch {
-                    logcat { "Sync-AutoRestore: user accepted restore, calling restoreSyncAccount()" }
-                    pixel.fire(PREONBOARDING_SYNC_RESTORE_TAPPED_UNIQUE, type = Unique())
-                    syncAutoRestore.restoreSyncAccount()
-                    setCurrentDialog(COMPARISON_CHART)
-                }
-            }
+        flow.onPrimaryCta(currentDialog)
+    }
 
-            INITIAL_REINSTALL_USER, INITIAL -> {
-                setCurrentDialog(COMPARISON_CHART)
-            }
-
-            COMPARISON_CHART -> {
-                viewModelScope.launch {
-                    val isDDGDefaultBrowser =
-                        if (defaultRoleBrowserDialog.shouldShowDialog()) {
-                            val intent = defaultRoleBrowserDialog.createIntent(context)
-                            if (intent != null) {
-                                _commands.send(Command.ShowDefaultBrowserDialog(intent))
-                            } else {
-                                pixel.fire(AppPixelName.DEFAULT_BROWSER_DIALOG_NOT_SHOWN)
-                                _viewState.update { it.copy(showSplitOption = isSplitOmnibarEnabled()) }
-                                setCurrentDialog(ADDRESS_BAR_POSITION)
-                            }
-                            false
-                        } else {
-                            _commands.send(Command.Finish)
-                            true
-                        }
-                    pixel.fire(
-                        PREONBOARDING_CHOOSE_BROWSER_PRESSED,
-                        mapOf(PixelParameter.DEFAULT_BROWSER to isDDGDefaultBrowser.toString()),
-                    )
-                }
-            }
-
-            AI_COMPARISON_CHART -> {
-                // TODO handle primary CTA when trigger is wired
-            }
-
-            SKIP_ONBOARDING_OPTION -> {
-                viewModelScope.launch {
-                    _commands.send(Command.OnboardingSkipped)
-                    pixel.fire(PREONBOARDING_CONFIRM_SKIP_ONBOARDING_PRESSED)
-                    duckChat.setInputScreenUserSetting(true)
-                }
-            }
-
-            ADDRESS_BAR_POSITION -> {
-                viewModelScope.launch {
-                    applyAddressBarPositionSelection()
-                    setCurrentDialog(INPUT_SCREEN)
-                }
-            }
-
-            INPUT_SCREEN -> {
-                viewModelScope.launch {
-                    applyInputScreenSelection()
-                    if (_viewState.value.inputScreenSelected) {
-                        when (duckAiOnboardingExperimentManager.enroll()) {
-                            null,
-                            CONTROL,
-                            -> _commands.send(Command.Finish)
-
-                            TREATMENT_WITH_DUCK_AI_DEFAULT -> setInputScreenPreviewDialog(isSearchDefault = false)
-                            TREATMENT_WITH_SEARCH_DEFAULT -> setInputScreenPreviewDialog(isSearchDefault = true)
-                        }
-                    } else {
-                        _commands.send(Command.Finish)
-                    }
-                }
-            }
-
-            INPUT_SCREEN_PREVIEW -> {
-                viewModelScope.launch {
-                    _commands.send(Command.Finish)
-                }
-            }
-
-            QUICK_SETUP -> {
-                viewModelScope.launch {
-                    applyAddressBarPositionSelection(fireTelemetry = false)
-                    applyInputScreenSelection(fireTelemetry = false)
-                    val state = _viewState.value
-                    quickSetupPixelSender.fireClicked(
-                        isReinstallUser = state.isReinstallUser,
-                        addressBarPosition = state.selectedAddressBarPosition,
-                        inputScreenSelected = state.inputScreenSelected,
-                    )
-                    _commands.send(Command.OnboardingSkipped)
-                }
-            }
-        }
+    fun onSecondaryCtaClicked() {
+        val currentDialog = _viewState.value.currentDialog ?: return
+        flow.onSecondaryCta(currentDialog)
     }
 
     fun onInputModeDemoQuerySubmitted(
         query: String,
         isChat: Boolean,
-    ) {
-        viewModelScope.launch {
-            if (isChat) {
-                _commands.send(Command.FinishAndSubmitChatPrompt(prompt = query))
-            } else {
-                _commands.send(Command.FinishAndSubmitSearchQuery(query = query))
-            }
-        }
-    }
-
-    fun onSecondaryCtaClicked() {
-        val currentDialog = _viewState.value.currentDialog ?: return
-        when (currentDialog) {
-            INITIAL_REINSTALL_USER -> {
-                _viewState.update { it.copy(isReinstallUser = true) }
-                viewModelScope.launch {
-                    pixel.fire(PREONBOARDING_SKIP_ONBOARDING_PRESSED)
-                    if (onboardingQuickSetupExperimentManager.enroll() == QuickSetupExperimentVariant.TREATMENT) {
-                        showQuickSetupDialog()
-                    } else {
-                        setCurrentDialog(SKIP_ONBOARDING_OPTION)
-                    }
-                }
-            }
-
-            SKIP_ONBOARDING_OPTION -> {
-                setCurrentDialog(COMPARISON_CHART)
-                pixel.fire(PREONBOARDING_RESUME_ONBOARDING_PRESSED)
-            }
-
-            SYNC_RESTORE -> {
-                viewModelScope.launch {
-                    logcat { "Sync-AutoRestore: user skipped restore" }
-                    pixel.fire(PREONBOARDING_SYNC_SKIP_RESTORE_TAPPED_UNIQUE, type = Unique())
-                    if (onboardingQuickSetupExperimentManager.enroll() == QuickSetupExperimentVariant.TREATMENT) {
-                        showQuickSetupDialog()
-                    } else {
-                        setCurrentDialog(SKIP_ONBOARDING_OPTION)
-                    }
-                }
-            }
-
-            INITIAL, COMPARISON_CHART, AI_COMPARISON_CHART, ADDRESS_BAR_POSITION, INPUT_SCREEN, INPUT_SCREEN_PREVIEW, QUICK_SETUP -> {
-                // no-op
-            }
-        }
-    }
+    ) = flow.onInputModeDemoQuerySubmitted(query = query, isChat = isChat)
 
     fun onDefaultBrowserSet() {
         recordDefaultBrowserDialogResult(isSet = true)
-        viewModelScope.launch {
-            _viewState.update { it.copy(showSplitOption = isSplitOmnibarEnabled()) }
-            setCurrentDialog(ADDRESS_BAR_POSITION)
-        }
+        flow.onDefaultBrowserResult(isDefaultBrowser = true)
     }
 
     fun onDefaultBrowserNotSet() {
         recordDefaultBrowserDialogResult(isSet = false)
-        viewModelScope.launch {
-            _viewState.update { it.copy(showSplitOption = isSplitOmnibarEnabled()) }
-            setCurrentDialog(ADDRESS_BAR_POSITION)
-        }
+        flow.onDefaultBrowserResult(isDefaultBrowser = false)
     }
 
     fun onQuickSetupDefaultBrowserSet() {
@@ -633,6 +478,362 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
     private fun skipDialogAnimations() {
         viewModelScope.launch {
             _commands.send(Command.SkipDialogAnimation)
+        }
+    }
+
+    // Drives how the page advances between dialogs. The intra-dialog interaction methods above
+    // (quick-setup rows, widgets, animations, notification callbacks) are shared and behave the same
+    // regardless of which flow is active.
+    private interface OnboardingFlow {
+        fun start()
+        fun onIntroAnimationFinished()
+        fun loadDaxDialog()
+        fun onPrimaryCta(dialog: PreOnboardingDialogType)
+        fun onSecondaryCta(dialog: PreOnboardingDialogType)
+        fun onInputModeDemoQuerySubmitted(query: String, isChat: Boolean)
+        fun onDefaultBrowserResult(isDefaultBrowser: Boolean)
+    }
+
+    // The legacy in-VM state machine. Behaviour unchanged from before the orchestrator migration.
+    private inner class LegacyFlow : OnboardingFlow {
+
+        override fun start() {
+            viewModelScope.launch(dispatchers.io()) {
+                val introAnimationEnabled = customDuckAiOnboardingFeature.introAnimation().isEnabled()
+                _viewState.update { it.copy(isDuckAiIntroAnimationEnabled = introAnimationEnabled) }
+                _commands.send(Command.PlayIntroAnimation(withDuckAi = introAnimationEnabled))
+            }
+        }
+
+        override fun onIntroAnimationFinished() {
+            if (notificationPermissionFlowStarted) return
+            notificationPermissionFlowStarted = true
+            viewModelScope.launch {
+                delay(2.seconds)
+                _commands.send(Command.RequestNotificationPermissions)
+            }
+        }
+
+        override fun loadDaxDialog() {
+            viewModelScope.launch {
+                val canRestore = withTimeoutOrNull(BLOCK_STORE_TIMEOUT_MS) {
+                    canRestoreDeferred.await()
+                } ?: false
+
+                // Always call isAppReinstall() — it has side effects (creates DDG downloads directory, persists reinstall state)
+                val isReinstall = isAppReinstall()
+
+                val dialogType = when {
+                    canRestore -> {
+                        logcat(LogPriority.INFO) { "Sync-AutoRestore: first dialog=SYNC_RESTORE" }
+                        SYNC_RESTORE
+                    }
+                    isReinstall -> INITIAL_REINSTALL_USER
+                    else -> INITIAL
+                }
+                _viewState.update {
+                    it.copy(
+                        isReinstallUser = isReinstall,
+                        currentDialog = dialogType,
+                        hasAnimatedCurrentDialog = false,
+                    )
+                }
+                fireDialogShownPixel(dialogType)
+            }
+        }
+
+        override fun onPrimaryCta(dialog: PreOnboardingDialogType) {
+            when (dialog) {
+                SYNC_RESTORE -> {
+                    viewModelScope.launch {
+                        logcat { "Sync-AutoRestore: user accepted restore, calling restoreSyncAccount()" }
+                        pixel.fire(PREONBOARDING_SYNC_RESTORE_TAPPED_UNIQUE, type = Unique())
+                        syncAutoRestore.restoreSyncAccount()
+                        setCurrentDialog(COMPARISON_CHART)
+                    }
+                }
+
+                INITIAL, INITIAL_REINSTALL_USER -> setCurrentDialog(COMPARISON_CHART)
+
+                COMPARISON_CHART -> {
+                    viewModelScope.launch {
+                        val isDDGDefaultBrowser =
+                            if (defaultRoleBrowserDialog.shouldShowDialog()) {
+                                val intent = defaultRoleBrowserDialog.createIntent(context)
+                                if (intent != null) {
+                                    _commands.send(Command.ShowDefaultBrowserDialog(intent))
+                                } else {
+                                    pixel.fire(AppPixelName.DEFAULT_BROWSER_DIALOG_NOT_SHOWN)
+                                    _viewState.update { it.copy(showSplitOption = isSplitOmnibarEnabled()) }
+                                    setCurrentDialog(ADDRESS_BAR_POSITION)
+                                }
+                                false
+                            } else {
+                                _commands.send(Command.Finish)
+                                true
+                            }
+                        pixel.fire(
+                            PREONBOARDING_CHOOSE_BROWSER_PRESSED,
+                            mapOf(PixelParameter.DEFAULT_BROWSER to isDDGDefaultBrowser.toString()),
+                        )
+                    }
+                }
+
+                AI_COMPARISON_CHART -> {
+                    // Unreachable in both paths today (no AI_COMPARISON_CHART step / trigger).
+                }
+
+                SKIP_ONBOARDING_OPTION -> {
+                    viewModelScope.launch {
+                        _commands.send(Command.OnboardingSkipped)
+                        pixel.fire(PREONBOARDING_CONFIRM_SKIP_ONBOARDING_PRESSED)
+                        duckChat.setInputScreenUserSetting(true)
+                    }
+                }
+
+                ADDRESS_BAR_POSITION -> {
+                    viewModelScope.launch {
+                        applyAddressBarPositionSelection()
+                        setCurrentDialog(INPUT_SCREEN)
+                    }
+                }
+
+                INPUT_SCREEN -> {
+                    viewModelScope.launch {
+                        applyInputScreenSelection()
+                        if (_viewState.value.inputScreenSelected) {
+                            when (duckAiOnboardingExperimentManager.enroll()) {
+                                null,
+                                CONTROL,
+                                -> _commands.send(Command.Finish)
+
+                                TREATMENT_WITH_DUCK_AI_DEFAULT -> setInputScreenPreviewDialog(isSearchDefault = false)
+                                TREATMENT_WITH_SEARCH_DEFAULT -> setInputScreenPreviewDialog(isSearchDefault = true)
+                            }
+                        } else {
+                            _commands.send(Command.Finish)
+                        }
+                    }
+                }
+
+                INPUT_SCREEN_PREVIEW -> {
+                    viewModelScope.launch {
+                        _commands.send(Command.Finish)
+                    }
+                }
+
+                QUICK_SETUP -> {
+                    viewModelScope.launch {
+                        applyAddressBarPositionSelection(fireTelemetry = false)
+                        applyInputScreenSelection(fireTelemetry = false)
+                        val state = _viewState.value
+                        quickSetupPixelSender.fireClicked(
+                            isReinstallUser = state.isReinstallUser,
+                            addressBarPosition = state.selectedAddressBarPosition,
+                            inputScreenSelected = state.inputScreenSelected,
+                        )
+                        _commands.send(Command.OnboardingSkipped)
+                    }
+                }
+            }
+        }
+
+        override fun onSecondaryCta(dialog: PreOnboardingDialogType) {
+            when (dialog) {
+                INITIAL_REINSTALL_USER -> {
+                    _viewState.update { it.copy(isReinstallUser = true) }
+                    viewModelScope.launch {
+                        pixel.fire(PREONBOARDING_SKIP_ONBOARDING_PRESSED)
+                        if (onboardingQuickSetupExperimentManager.enroll() == QuickSetupExperimentVariant.TREATMENT) {
+                            showQuickSetupDialog()
+                        } else {
+                            setCurrentDialog(SKIP_ONBOARDING_OPTION)
+                        }
+                    }
+                }
+
+                SKIP_ONBOARDING_OPTION -> {
+                    setCurrentDialog(COMPARISON_CHART)
+                    pixel.fire(PREONBOARDING_RESUME_ONBOARDING_PRESSED)
+                }
+
+                SYNC_RESTORE -> {
+                    viewModelScope.launch {
+                        logcat { "Sync-AutoRestore: user skipped restore" }
+                        pixel.fire(PREONBOARDING_SYNC_SKIP_RESTORE_TAPPED_UNIQUE, type = Unique())
+                        if (onboardingQuickSetupExperimentManager.enroll() == QuickSetupExperimentVariant.TREATMENT) {
+                            showQuickSetupDialog()
+                        } else {
+                            setCurrentDialog(SKIP_ONBOARDING_OPTION)
+                        }
+                    }
+                }
+
+                INITIAL, COMPARISON_CHART, AI_COMPARISON_CHART, ADDRESS_BAR_POSITION, INPUT_SCREEN, INPUT_SCREEN_PREVIEW, QUICK_SETUP -> {
+                    // no-op
+                }
+            }
+        }
+
+        override fun onInputModeDemoQuerySubmitted(query: String, isChat: Boolean) {
+            viewModelScope.launch {
+                if (isChat) {
+                    _commands.send(Command.FinishAndSubmitChatPrompt(prompt = query))
+                } else {
+                    _commands.send(Command.FinishAndSubmitSearchQuery(query = query))
+                }
+            }
+        }
+
+        override fun onDefaultBrowserResult(isDefaultBrowser: Boolean) {
+            viewModelScope.launch {
+                _viewState.update { it.copy(showSplitOption = isSplitOmnibarEnabled()) }
+                setCurrentDialog(ADDRESS_BAR_POSITION)
+            }
+        }
+    }
+
+    // Translates fragment callbacks into LinearOnboardingOrchestrator events and renders the orchestrator's
+    // current step back onto the same viewState/commands the fragment already uses.
+    private inner class OrchestratorFlow : OnboardingFlow {
+
+        override fun start() {
+            seedHasPlayedIntroAnimation()
+            observeOrchestratorState()
+        }
+
+        override fun onIntroAnimationFinished() = emit(NewUserOnboardingEvent.IntroAnimationFinished)
+
+        // Legacy name: the fragment calls this once the notification-permission flow has finished
+        // (requested from onIntroAnimationFinished) to load the next dax dialog. In orchestrator mode
+        // the orchestrator owns which first dialog comes next via step preconditions, so this call
+        // only signals that the notification_permission step is done -> Advance.
+        override fun loadDaxDialog() = emit(NewUserOnboardingEvent.NotificationPermissionFinished)
+
+        override fun onPrimaryCta(dialog: PreOnboardingDialogType) {
+            when (dialog) {
+                SYNC_RESTORE -> emit(NewUserOnboardingEvent.RestoreRequested)
+                INITIAL, INITIAL_REINSTALL_USER, COMPARISON_CHART, INPUT_SCREEN_PREVIEW ->
+                    emit(NewUserOnboardingEvent.ContinueClicked)
+                SKIP_ONBOARDING_OPTION -> emit(NewUserOnboardingEvent.SkipConfirmed)
+                ADDRESS_BAR_POSITION ->
+                    emit(NewUserOnboardingEvent.AddressBarConfirmed(_viewState.value.selectedAddressBarPosition))
+                INPUT_SCREEN ->
+                    emit(NewUserOnboardingEvent.InputModeConfirmed(_viewState.value.inputScreenSelected))
+                QUICK_SETUP -> {
+                    val state = _viewState.value
+                    emit(NewUserOnboardingEvent.QuickSetupConfirmed(state.selectedAddressBarPosition, state.inputScreenSelected))
+                }
+                AI_COMPARISON_CHART -> Unit
+            }
+        }
+
+        override fun onSecondaryCta(dialog: PreOnboardingDialogType) {
+            when (dialog) {
+                INITIAL_REINSTALL_USER, SYNC_RESTORE -> emit(NewUserOnboardingEvent.SkipRequested)
+                SKIP_ONBOARDING_OPTION -> emit(NewUserOnboardingEvent.ResumeRequested)
+                INITIAL, COMPARISON_CHART, AI_COMPARISON_CHART, ADDRESS_BAR_POSITION, INPUT_SCREEN, INPUT_SCREEN_PREVIEW, QUICK_SETUP -> Unit
+            }
+        }
+
+        // The step records the query into the run; the Completed handler reads it off state.result.
+        override fun onInputModeDemoQuerySubmitted(query: String, isChat: Boolean) =
+            emit(NewUserOnboardingEvent.InputDemoQuerySubmitted(query = query, isChat = isChat))
+
+        override fun onDefaultBrowserResult(isDefaultBrowser: Boolean) =
+            emit(NewUserOnboardingEvent.DefaultBrowserPromptFinished(isDefaultBrowser = isDefaultBrowser))
+
+        // The fragment-scoped VM is recreated on every OnboardingActivity entry. Seed past-intro state
+        // synchronously so a mid-flow re-entry does not replay the intro before the collector catches up.
+        private fun seedHasPlayedIntroAnimation() {
+            val pastIntro = when (val state = orchestrator.state.value) {
+                is LinearOnboardingState.InProgress ->
+                    (state.currentStep as? NewUserOnboardingActivityStep)?.id != NewUserOnboardingStepIds.INTRO_ANIMATION
+                is LinearOnboardingState.Completed, is LinearOnboardingState.Skipped -> true
+                LinearOnboardingState.NotStarted -> false
+            }
+            if (pastIntro) {
+                _viewState.update { it.copy(hasPlayedIntroAnimation = true) }
+            }
+        }
+
+        private fun observeOrchestratorState() {
+            orchestrator.state
+                .forPlan(NewUserOnboardingPlanProvider.ROOT_PLAN_ID)
+                .onEach { state ->
+                    when (state) {
+                        is LinearOnboardingState.InProgress ->
+                            (state.currentStep as? NewUserOnboardingActivityStep)?.let { applyDialog(it.resolveDialog()) }
+                        is LinearOnboardingState.Completed -> {
+                            when (val result = state.result as? NewUserOnboardingResult) {
+                                is NewUserOnboardingResult.LaunchChat -> _commands.send(Command.FinishAndSubmitChatPrompt(prompt = result.prompt))
+                                is NewUserOnboardingResult.LaunchSearch -> _commands.send(Command.FinishAndSubmitSearchQuery(query = result.query))
+                                null -> _commands.send(Command.Finish)
+                            }
+                        }
+                        is LinearOnboardingState.Skipped -> _commands.send(Command.OnboardingSkipped)
+                    }
+                }
+                .launchIn(viewModelScope)
+        }
+
+        // Maps the current step's dialog onto the same viewState/commands the fragment already renders.
+        // Reuses setCurrentDialog / setInputScreenPreviewDialog so shown pixels fire exactly as in legacy.
+        private suspend fun applyDialog(dialog: NewUserOnboardingActivityDialog) {
+            when (dialog) {
+                is NewUserOnboardingActivityDialog.IntroAnimation -> {
+                    _viewState.update { it.copy(isDuckAiIntroAnimationEnabled = dialog.withDuckAi) }
+                    _commands.send(Command.PlayIntroAnimation(withDuckAi = dialog.withDuckAi))
+                }
+                NewUserOnboardingActivityDialog.NotificationPermission -> {
+                    if (!notificationPermissionFlowStarted) {
+                        notificationPermissionFlowStarted = true
+                        viewModelScope.launch {
+                            delay(2.seconds)
+                            _commands.send(Command.RequestNotificationPermissions)
+                        }
+                    }
+                }
+                NewUserOnboardingActivityDialog.SyncRestore -> setCurrentDialog(SYNC_RESTORE)
+                NewUserOnboardingActivityDialog.InitialReinstallUser -> {
+                    _viewState.update { it.copy(isReinstallUser = true) }
+                    setCurrentDialog(INITIAL_REINSTALL_USER)
+                }
+                NewUserOnboardingActivityDialog.Initial -> setCurrentDialog(INITIAL)
+                NewUserOnboardingActivityDialog.ComparisonChart -> setCurrentDialog(COMPARISON_CHART)
+                NewUserOnboardingActivityDialog.DefaultBrowserPrompt -> {
+                    val intent = defaultRoleBrowserDialog.createIntent(context)
+                    if (intent != null) {
+                        _commands.send(Command.ShowDefaultBrowserDialog(intent))
+                    } else {
+                        pixel.fire(AppPixelName.DEFAULT_BROWSER_DIALOG_NOT_SHOWN)
+                        orchestrator.onEvent(NewUserOnboardingEvent.DefaultBrowserPromptFinished(isDefaultBrowser = false))
+                    }
+                }
+                is NewUserOnboardingActivityDialog.AddressBarPosition -> {
+                    _viewState.update { it.copy(showSplitOption = dialog.showSplitOption) }
+                    setCurrentDialog(ADDRESS_BAR_POSITION)
+                }
+                NewUserOnboardingActivityDialog.InputScreen -> setCurrentDialog(INPUT_SCREEN)
+                is NewUserOnboardingActivityDialog.InputScreenPreview ->
+                    setInputScreenPreviewDialog(isSearchDefault = dialog.isSearchDefault)
+                NewUserOnboardingActivityDialog.SkipNewUserOnboardingOption -> setCurrentDialog(SKIP_ONBOARDING_OPTION)
+                is NewUserOnboardingActivityDialog.QuickSetup -> {
+                    _viewState.update {
+                        it.copy(
+                            showSplitOption = dialog.showSplitOption,
+                            hideSetDefaultBrowserRow = dialog.hideSetDefaultBrowserRow,
+                            hideAddWidgetRow = dialog.hideAddWidgetRow,
+                            isReinstallUser = dialog.isReinstallUser,
+                        )
+                    }
+                    setCurrentDialog(QUICK_SETUP)
+                }
+            }
+        }
+
+        private fun emit(event: NewUserOnboardingEvent) {
+            viewModelScope.launch { orchestrator.onEvent(event) }
         }
     }
 

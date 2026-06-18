@@ -16,7 +16,6 @@
 
 package com.duckduckgo.duckchat.api
 
-import android.content.Context
 import android.net.Uri
 import kotlinx.coroutines.flow.Flow
 
@@ -74,14 +73,15 @@ interface DuckChat {
     suspend fun wasOpenedBefore(): Boolean
 
     /**
-     * Displays the new address bar option choice screen.
-     */
-    fun showNewAddressBarOptionChoiceScreen(context: Context, isDarkThemeEnabled: Boolean)
-
-    /**
      * Set user setting to determine whether dedicated Duck.ai input screen with a mode switch should be used.
      */
     suspend fun setInputScreenUserSetting(enabled: Boolean)
+
+    /**
+     * Returns `true` if the user has ever interacted with the Duck.ai input screen toggle — enabled it
+     * explicitly, or had a value written implicitly (e.g. the onboarding selection). Sticky once set.
+     */
+    suspend fun isInputScreenEverEnabled(): Boolean
 
     /**
      * Cosmetically sets the input screen user setting.
@@ -155,4 +155,11 @@ interface DuckChat {
      * Suspending because the underlying feature-flag reads must not block the main thread.
      */
     suspend fun isChatHistoryAvailable(): Boolean
+
+    /**
+     * Records that the user selected the "Search + Duck.ai" option on the new address bar picker, so the
+     * first prompt submitted from the Duck.ai toggle input field within the attribution window can be
+     * attributed back to the picker.
+     */
+    suspend fun onAddressBarPickerDuckAiSelected()
 }

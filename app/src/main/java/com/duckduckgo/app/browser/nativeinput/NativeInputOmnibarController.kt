@@ -23,6 +23,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.ViewOutlineProvider
 import android.widget.TextView
+import androidx.annotation.VisibleForTesting
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.view.updateLayoutParams
 import com.duckduckgo.app.browser.R
@@ -96,14 +97,22 @@ class RealNativeInputOmnibarController(
         }
     }
 
-    private fun showOmnibarButtons(omnibarView: View) {
-        omnibarView.findViewById<View?>(R.id.fireIconMenu)?.show()
+    @VisibleForTesting
+    internal fun showOmnibarButtons(omnibarView: View) {
+        // Only reached for a Duck.ai chat in split mode with native input enabled. The leading slot
+        // shows the "+" (new chat), never the fire button — fire already lives next to the native
+        // input field at the bottom, so showing it here too would duplicate it. Mirrors the fire→+
+        // swap the OmnibarLayout applies via shouldShowPlusIcon in non-split positions.
+        omnibarView.findViewById<View?>(R.id.fireIconMenu)?.gone()
+        omnibarView.findViewById<View?>(R.id.plusIconMenu)?.show()
         omnibarView.findViewById<View?>(R.id.tabsMenu)?.show()
         omnibarView.findViewById<View?>(R.id.browserMenu)?.show()
     }
 
-    private fun hideOmnibarButtons(omnibarView: View) {
+    @VisibleForTesting
+    internal fun hideOmnibarButtons(omnibarView: View) {
         omnibarView.findViewById<View?>(R.id.fireIconMenu)?.gone()
+        omnibarView.findViewById<View?>(R.id.plusIconMenu)?.gone()
         omnibarView.findViewById<View?>(R.id.tabsMenu)?.gone()
         omnibarView.findViewById<View?>(R.id.browserMenu)?.gone()
     }
@@ -230,8 +239,9 @@ class RealNativeInputOmnibarController(
             val isTop = omnibar.omnibarType == OmnibarType.SINGLE_TOP || omnibar.omnibarType == OmnibarType.SPLIT
             cardElevation = if (isTop) 6f.toPx() else 3f.toPx()
         }
-        omnibarView.findViewById<MaterialCardView?>(R.id.omniBarContainer)
-            ?.setCardBackgroundColor(ctx.getColorFromAttr(com.duckduckgo.mobile.android.R.attr.daxColorWindow))
+        omnibarView.findViewById<MaterialCardView?>(R.id.omniBarContainer)?.apply {
+            setCardBackgroundColor(context.getColorFromAttr(com.duckduckgo.mobile.android.R.attr.daxColorWindow))
+        }
     }
 
     private fun restoreBottomOmnibarPosition() {

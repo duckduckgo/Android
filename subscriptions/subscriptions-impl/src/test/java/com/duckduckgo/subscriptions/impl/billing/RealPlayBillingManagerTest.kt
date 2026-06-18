@@ -532,7 +532,7 @@ class RealPlayBillingManagerTest {
         // do not connect the billing client (no lifecycle transition to CREATED/RESUMED)
         val result = subject.getLatestPurchase()
 
-        assertEquals(LatestPurchaseResult.Unknown, result)
+        assertEquals(LatestPurchaseResult.Unknown(cause = "billing_client_not_ready"), result)
     }
 }
 

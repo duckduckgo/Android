@@ -33,14 +33,16 @@ import android.view.KeyEvent
 import android.view.MotionEvent
 import android.view.View
 import android.view.View.IMPORTANT_FOR_AUTOFILL_YES
+import android.view.WindowManager
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
+import androidx.activity.SystemBarStyle
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.activity.viewModels
 import androidx.annotation.VisibleForTesting
-import androidx.core.os.BundleCompat
 import androidx.core.view.isVisible
 import androidx.core.view.postDelayed
 import androidx.lifecycle.Lifecycle
@@ -66,7 +68,6 @@ import com.duckduckgo.app.browser.databinding.IncludeOmnibarToolbarMockupBottomB
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.ui.DefaultBrowserBottomSheetDialog
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.ui.DefaultBrowserBottomSheetDialog.EventListener
 import com.duckduckgo.app.browser.mode.BrowserLaunchSource
-import com.duckduckgo.app.browser.newaddressbaroption.NewAddressBarOptionManager
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.browser.shortcut.ShortcutBuilder
@@ -109,12 +110,16 @@ import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.tabs.SwipingTabsFeatureProvider
 import com.duckduckgo.common.ui.view.addBottomShadow
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
+import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.isFullScreen
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.common.utils.extensions.hideKeyboard
 import com.duckduckgo.common.utils.playstore.PlayStoreUtils
 import com.duckduckgo.dataclearing.api.fire.FireDialog
@@ -139,7 +144,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -156,6 +160,7 @@ import javax.inject.Inject
 @HasMemberInjections
 @InjectWith(ActivityScope::class)
 open class BrowserActivity : DuckDuckGoActivity() {
+
     @Inject
     lateinit var settingsDataStore: SettingsDataStore
 
@@ -223,13 +228,19 @@ open class BrowserActivity : DuckDuckGoActivity() {
     lateinit var omnibarEntryConverter: OmnibarEntryConverter
 
     @Inject
-    lateinit var newAddressBarOptionManager: NewAddressBarOptionManager
-
-    @Inject
     lateinit var fireDialogProvider: FireDialogProvider
 
     @Inject
     lateinit var currentBrowserMode: BrowserMode
+
+    @Inject
+    lateinit var edgeToEdgeProvider: EdgeToEdgeProvider
+
+    @Inject
+    lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
+
+    override val applyFireTheme: Boolean
+        get() = currentBrowserMode == BrowserMode.FIRE
 
     private val lastActiveTabs = TabList()
 
@@ -275,11 +286,12 @@ open class BrowserActivity : DuckDuckGoActivity() {
     private var lastIntent: Intent? = null
 
     /**
-     * Holds an [Intent] that arrived while in [BrowserMode.FIRE] and must be processed in
-     * [BrowserMode.REGULAR]. Read once by [BrowserStateRenderer.showWebContent] and cleared;
-     * takes precedence over [lastIntent].
+     * Holds an action deferred across a browser-mode switch. Switching mode recreates the activity
+     * (see [observeBrowserModeChanges]), which cancels [lifecycleScope], so the action is stashed
+     * here, carried across the recreate via [onSaveInstanceState], and replayed on the recreated,
+     * target-mode instance by [BrowserStateRenderer.showWebContent]. See [switchModeThen].
      */
-    private var pendingFireToRegularIntent: Intent? = null
+    private var pendingModeSwitch: PendingModeSwitch? = null
 
     // we don't store isExternal in the tab model, as it's only meant for the first time the tab is loaded.
     private val externalLaunchTabIds = mutableSetOf<String>()
@@ -381,9 +393,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
         renderer = BrowserStateRenderer()
         val newInstanceState = if (dataClearer.isFreshAppLaunch) null else savedInstanceState
         instanceStateBundles = CombinedInstanceState(originalInstanceState = savedInstanceState, newInstanceState = newInstanceState)
-        pendingFireToRegularIntent = newInstanceState?.let {
-            BundleCompat.getParcelable(it, KEY_PENDING_FIRE_TO_REGULAR_INTENT, Intent::class.java)
-        }
+        pendingModeSwitch = newInstanceState?.getBundle(KEY_PENDING_MODE_SWITCH)?.toPendingModeSwitch()
 
         super.onCreate(savedInstanceState = newInstanceState, daggerInject = false)
 
@@ -394,6 +404,18 @@ open class BrowserActivity : DuckDuckGoActivity() {
         }
 
         bindMockupToolbars()
+
+        if (edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.BROWSER)) {
+            val toolbarColor = getColorFromAttr(com.duckduckgo.mobile.android.R.attr.daxColorToolbar)
+            val barStyle = if (isDarkThemeEnabled()) {
+                SystemBarStyle.dark(toolbarColor)
+            } else {
+                SystemBarStyle.light(toolbarColor, toolbarColor)
+            }
+            enableEdgeToEdge(statusBarStyle = barStyle, navigationBarStyle = barStyle)
+            edgeToEdgeHandler.applyStatusBarAndHorizontalInsets(binding.root)
+            updateLayoutForDisplayCutout(resources.configuration.orientation)
+        }
 
         setContentView(binding.root)
 
@@ -416,7 +438,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
             viewModel.onLaunchedFromNotification(it)
         }
         configureOnBackPressedListener()
-        showNewAddressBarOptionChoiceScreen()
         checkForLanscapeOrientation()
 
         if (savedInstanceState == null) {
@@ -439,7 +460,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
         if (swipingTabsFeature.isEnabled) {
             outState.putParcelable(KEY_TAB_PAGER_STATE, tabPagerAdapter.saveState())
         }
-        pendingFireToRegularIntent?.let { outState.putParcelable(KEY_PENDING_FIRE_TO_REGULAR_INTENT, it) }
+        pendingModeSwitch?.let { outState.putBundle(KEY_PENDING_MODE_SWITCH, it.toBundle()) }
     }
 
     private suspend fun configureFlowCollectors() {
@@ -739,14 +760,11 @@ open class BrowserActivity : DuckDuckGoActivity() {
         }
 
         // Intents stamped with LAUNCH_REQUIRES_REGULAR_MODE must reach BrowserActivity in REGULAR
-        // mode. Stash the intent and carry it to the recreated REGULAR-bound instance.
+        // mode. Switch first (recreating the activity) and process the intent on the REGULAR instance.
         val requiresRegularBrowserMode = intent.getBooleanExtra(LAUNCH_REQUIRES_REGULAR_MODE, false)
         if (requiresRegularBrowserMode && currentBrowserMode != BrowserMode.REGULAR) {
             logcat(INFO) { "Intent requires REGULAR mode while in a non-regular mode — switching before processing" }
-            pendingFireToRegularIntent = intent
-            lifecycleScope.launch {
-                viewModel.switchToMode(BrowserMode.REGULAR)
-            }
+            switchModeThen(BrowserMode.REGULAR, PendingAction.ProcessIntent(intent))
             return
         }
 
@@ -1286,9 +1304,13 @@ open class BrowserActivity : DuckDuckGoActivity() {
      */
     private fun observeBrowserModeChanges() {
         lifecycleScope.launch {
-            viewModel.currentMode.drop(1).collect {
-                recreate()
-            }
+            viewModel.currentMode
+                .flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED)
+                .collect { mode ->
+                    if (mode != currentBrowserMode) {
+                        recreate()
+                    }
+                }
         }
     }
 
@@ -1311,6 +1333,21 @@ open class BrowserActivity : DuckDuckGoActivity() {
         super.onConfigurationChanged(newConfig)
         if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
             viewModel.sendPixelEventForLandscapeOrientation()
+        }
+        if (edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.BROWSER)) {
+            updateLayoutForDisplayCutout(newConfig.orientation)
+        }
+    }
+
+    private fun updateLayoutForDisplayCutout(orientation: Int) {
+        if (Build.VERSION.SDK_INT >= 28) {
+            window.attributes = window.attributes.apply {
+                layoutInDisplayCutoutMode = if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                    WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_NEVER
+                } else {
+                    WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_DEFAULT
+                }
+            }
         }
     }
 
@@ -1351,12 +1388,10 @@ open class BrowserActivity : DuckDuckGoActivity() {
             isExternal: Boolean = false,
             interstitialScreen: Boolean = false,
             openExistingTabId: String? = null,
-            isLaunchFromClearDataAction: Boolean = false,
             openDuckChat: Boolean = false,
             closeDuckChat: Boolean = false,
             duckChatUrl: String? = null,
             duckChatSessionActive: Boolean = false,
-            isLaunchFromBookmarksAppShortcut: Boolean = false,
             deletedTabCount: Int = 0,
         ): Intent {
             val intent = Intent(context, BrowserActivity::class.java)
@@ -1369,12 +1404,10 @@ open class BrowserActivity : DuckDuckGoActivity() {
             intent.putExtra(LAUNCH_FROM_EXTERNAL_EXTRA, isExternal)
             intent.putExtra(LAUNCH_FROM_INTERSTITIAL_EXTRA, interstitialScreen)
             intent.putExtra(OPEN_EXISTING_TAB_ID_EXTRA, openExistingTabId)
-            intent.putExtra(LAUNCH_FROM_CLEAR_DATA_ACTION, isLaunchFromClearDataAction)
             intent.putExtra(OPEN_DUCK_CHAT, openDuckChat)
             intent.putExtra(CLOSE_DUCK_CHAT, closeDuckChat)
             intent.putExtra(DUCK_CHAT_URL, duckChatUrl)
             intent.putExtra(DUCK_CHAT_SESSION_ACTIVE, duckChatSessionActive)
-            intent.putExtra(LAUNCH_FROM_BOOKMARKS_APP_SHORTCUT_EXTRA, isLaunchFromBookmarksAppShortcut)
             intent.putExtra(DELETED_TAB_COUNT_EXTRA, deletedTabCount)
             intent.putExtra(LAUNCH_REQUIRES_REGULAR_MODE, launchSource.requiresRegularMode)
             return intent
@@ -1385,7 +1418,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
         const val NOTIFY_DATA_CLEARED_EXTRA = "NOTIFY_DATA_CLEARED_EXTRA"
         const val LAUNCH_FROM_DEFAULT_BROWSER_DIALOG = "LAUNCH_FROM_DEFAULT_BROWSER_DIALOG"
         const val LAUNCH_FROM_FAVORITES_WIDGET = "LAUNCH_FROM_FAVORITES_WIDGET"
-        const val LAUNCH_FROM_BOOKMARKS_APP_SHORTCUT_EXTRA = "LAUNCH_FROM_BOOKMARKS_APP_SHORTCUT_EXTRA"
         const val LAUNCH_FROM_NOTIFICATION_PIXEL_NAME = "LAUNCH_FROM_NOTIFICATION_PIXEL_NAME"
         const val OPEN_IN_CURRENT_TAB_EXTRA = "OPEN_IN_CURRENT_TAB_EXTRA"
         const val SELECTED_TEXT_EXTRA = "SELECTED_TEXT_EXTRA"
@@ -1400,7 +1432,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
          */
         const val LAUNCH_REQUIRES_REGULAR_MODE = "LAUNCH_REQUIRES_REGULAR_MODE"
 
-        private const val LAUNCH_FROM_CLEAR_DATA_ACTION = "LAUNCH_FROM_CLEAR_DATA_ACTION"
         private const val OPEN_DUCK_CHAT = "OPEN_DUCK_CHAT_EXTRA"
         private const val CLOSE_DUCK_CHAT = "CLOSE_DUCK_CHAT_EXTRA"
         private const val DUCK_CHAT_URL = "DUCK_CHAT_URL"
@@ -1408,8 +1439,9 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
         private const val MAX_ACTIVE_TABS = 40
         private const val KEY_TAB_PAGER_STATE = "tabPagerState"
-        private const val KEY_PENDING_FIRE_TO_REGULAR_INTENT = "pendingFireToRegularIntent"
         private const val KEY_SAVED_BROWSER_MODE = "savedBrowserMode"
+
+        private const val KEY_PENDING_MODE_SWITCH = "pendingModeSwitch"
 
         private const val DISABLE_SWIPING_DELAY = 1000L
 
@@ -1450,11 +1482,11 @@ open class BrowserActivity : DuckDuckGoActivity() {
             configureObservers()
             binding.clearingInProgressView.gone()
 
-            pendingFireToRegularIntent?.let { pending ->
-                logcat(INFO) { "Intent deferred across FIRE→REGULAR recreate; handling now" }
-                pendingFireToRegularIntent = null
+            pendingModeSwitch?.let { pending ->
+                logcat(INFO) { "Action deferred across mode-switch recreate; handling now" }
+                pendingModeSwitch = null
                 processedOriginalIntent = true
-                launchNewSearchOrQuery(pending)
+                switchModeThen(pending.targetMode, pending.action)
                 return
             }
 
@@ -1470,22 +1502,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
                 launchNewSearchOrQuery(intent)
                 processedOriginalIntent = true
             }
-        }
-    }
-
-    private fun showNewAddressBarOptionChoiceScreen() {
-        lifecycleScope.launch(dispatcherProvider.io()) {
-            newAddressBarOptionManager.showChoiceScreen(
-                activity = this@BrowserActivity,
-                isLaunchedFromExternal = intent.getBooleanExtra(LAUNCH_FROM_EXTERNAL_EXTRA, false) ||
-                    intent.getBooleanExtra(LAUNCH_FROM_CLEAR_DATA_ACTION, false) ||
-                    intent.getBooleanExtra(NOTIFY_DATA_CLEARED_EXTRA, false) ||
-                    intent.getBooleanExtra(LAUNCH_FROM_INTERSTITIAL_EXTRA, false) ||
-                    intent.getBooleanExtra(OPEN_DUCK_CHAT, false) ||
-                    intent.getBooleanExtra(LAUNCH_FROM_FAVORITES_WIDGET, false) ||
-                    intent.getBooleanExtra(LAUNCH_FROM_BOOKMARKS_APP_SHORTCUT_EXTRA, false) ||
-                    intent.getBooleanExtra(NEW_SEARCH_EXTRA, false),
-            )
         }
     }
 
@@ -1695,6 +1711,57 @@ open class BrowserActivity : DuckDuckGoActivity() {
         sourceTabId: String? = null,
         skipHome: Boolean = false,
         isExternal: Boolean = false,
+        browserMode: BrowserMode = currentBrowserMode,
+    ) {
+        switchModeThen(browserMode, PendingAction.OpenNewTab(query, sourceTabId, skipHome, isExternal))
+    }
+
+    /**
+     * Switches to [targetMode] (in either direction) and then runs [action]. If [targetMode] is
+     * already current, the action runs immediately. Otherwise switchToMode — a synchronous mutation
+     * of the app-scoped mode holder — recreates the activity in the target mode (see
+     * [observeBrowserModeChanges]), cancelling [lifecycleScope], so the action is stashed in
+     * [pendingModeSwitch], carried across the recreate via [onSaveInstanceState], and replayed by
+     * [BrowserStateRenderer.showWebContent].
+     *
+     * The replay calls this same method, so it is self-correcting: on the recreated instance the
+     * mode matches and the action runs; were it ever to run before the recreate, it simply re-stashes.
+     */
+    private fun switchModeThen(targetMode: BrowserMode, action: PendingAction) {
+        if (targetMode == currentBrowserMode) {
+            runAction(action)
+            return
+        }
+        if (viewModel.switchToMode(targetMode)) {
+            pendingModeSwitch = PendingModeSwitch(targetMode, action)
+        } else {
+            // Switch rejected (e.g. Fire mode unavailable); run the action in the current mode.
+            runAction(action)
+        }
+    }
+
+    private fun runAction(action: PendingAction) {
+        when (action) {
+            // Security invariant: a carried Intent is only ever *consumed* here (its extras read by
+            // processIntent), never re-launched via startActivity/startService. Launching an Intent
+            // sourced from our (externally reachable) launch Intent would be an intent-redirection
+            // sink — see https://developer.android.com/privacy-and-security/risks/intent-redirection.
+            // Any future PendingAction that needs to launch a target must allowlist it first.
+            is PendingAction.ProcessIntent -> processIntent(action.intent)
+            is PendingAction.OpenNewTab -> openNewTabInCurrentMode(
+                action.query,
+                action.sourceTabId,
+                action.skipHome,
+                action.isExternal,
+            )
+        }
+    }
+
+    private fun openNewTabInCurrentMode(
+        query: String?,
+        sourceTabId: String?,
+        skipHome: Boolean,
+        isExternal: Boolean,
     ) {
         lifecycleScope.launch {
             if (swipingTabsFeature.isEnabled) {

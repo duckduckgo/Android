@@ -63,7 +63,10 @@ import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.inputscreen.wideevents.InputScreenOnboardingWideEvent
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.onboarding.api.LinearOnboardingOrchestrator
+import com.duckduckgo.onboarding.api.LinearOnboardingState
 import com.duckduckgo.sync.api.SyncAutoRestore
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -72,6 +75,7 @@ import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
@@ -106,6 +110,11 @@ class BrandDesignUpdatePageViewModelTest {
     private val mockSyncAutoRestore: SyncAutoRestore = mock()
     private val mockQuickSetupPixelSender: QuickSetupPixelSender = mock()
 
+    // Legacy mode: the VM derives its mode from orchestrator.state, which this mock holds at NotStarted.
+    private val mockOrchestrator: LinearOnboardingOrchestrator = mock {
+        on { state } doReturn MutableStateFlow(LinearOnboardingState.NotStarted)
+    }
+
     private fun createViewModel(): BrandDesignUpdatePageViewModel {
         return BrandDesignUpdatePageViewModel(
             mockDefaultRoleBrowserDialog,
@@ -126,6 +135,7 @@ class BrandDesignUpdatePageViewModelTest {
             mockSyncAutoRestore,
             mockQuickSetupPixelSender,
             mockCustomDuckAiOnboardingFeature,
+            mockOrchestrator,
         )
     }
 

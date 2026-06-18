@@ -54,6 +54,8 @@
     <color name="mandarin80">#671907</color>
     <color name="mandarin90">#47140B</color>
     <color name="mandarin100">#290E0A</color>
+    <color name="mandarin40_translucent">#33FF8D5C</color>
+    <color name="mandarin50_translucent">#33F05F2B</color>
 
     <!-- Pondwater -->
     <color name="pondwater0">#F5FBFE</color>

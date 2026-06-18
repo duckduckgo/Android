@@ -18,6 +18,8 @@ package com.duckduckgo.duckchat.impl.ui
 
 import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
+import com.duckduckgo.duckchat.api.nativeinput.NativeInputStateProvider
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.models.AIChatModel
 import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
@@ -27,10 +29,14 @@ import com.duckduckgo.duckchat.impl.models.Tool
 import com.duckduckgo.duckchat.impl.models.UserTier
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.ui.nativeinput.views.ModelPickerViewModel
+import com.duckduckgo.duckchat.impl.ui.nativeinput.views.PickerModelChange
 import com.duckduckgo.duckchat.impl.ui.nativeinput.views.PickerSurface
 import com.duckduckgo.duckchat.impl.ui.nativeinput.views.UpsellCommand
+import com.duckduckgo.duckchat.store.impl.DuckAiChat
+import com.duckduckgo.duckchat.store.impl.DuckAiChatStore
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -56,13 +62,23 @@ class ModelPickerViewModelTest {
     private val modelManager: DuckAiModelManager = mock()
     private val duckChatPixels: DuckChatPixels = mock()
     private val stateFlow = MutableStateFlow(ModelState())
+    private val nativeInputState = MutableStateFlow(NativeInputState.zero())
+    private val nativeInputStateProvider: NativeInputStateProvider = mock<NativeInputStateProvider>().also {
+        whenever(it.state).thenReturn(nativeInputState)
+    }
+    private val duckAiChatStore: DuckAiChatStore = mock()
 
     private lateinit var testee: ModelPickerViewModel
 
     @Before
     fun setUp() {
         whenever(modelManager.modelState).thenReturn(stateFlow)
-        testee = ModelPickerViewModel(modelManager, duckChatPixels)
+        testee = ModelPickerViewModel(
+            modelManager = modelManager,
+            duckChatPixels = duckChatPixels,
+            nativeInputStateProvider = nativeInputStateProvider,
+            duckAiChatStore = duckAiChatStore,
+        )
     }
 
     @Test
@@ -256,6 +272,43 @@ class ModelPickerViewModelTest {
             flowType = "purchase",
         )
         verify(duckChatPixels, never()).fireModelSelected(any())
+    }
+
+    @Test
+    fun whenAccessibleModelTappedInModelChangeModeThenChangeModelEmittedAndSelectModelNotCalled() = runTest {
+        nativeInputState.value = nativeInputState.value.copy(chatId = "c1", modelChangeMode = true)
+        advanceUntilIdle()
+        val model = freeModel(id = "new-model", shortName = "New")
+
+        testee.modelChanges.test {
+            testee.onModelTapped(model, PickerSurface.MODEL_PICKER_ADDRESS_BAR)
+            assertEquals(PickerModelChange.ChangeModel("new-model"), awaitItem())
+            cancelAndConsumeRemainingEvents()
+        }
+        verify(modelManager, never()).selectModel(any())
+    }
+
+    @Test
+    fun whenAccessibleModelTappedInModelChangeModeThenModelSelectedPixelFired() = runTest {
+        nativeInputState.value = nativeInputState.value.copy(chatId = "c1", modelChangeMode = true)
+        advanceUntilIdle()
+        val model = freeModel(id = "new-model", shortName = "New")
+
+        testee.onModelTapped(model, PickerSurface.MODEL_PICKER_ADDRESS_BAR)
+
+        verify(duckChatPixels).fireModelSelected("new-model")
+    }
+
+    @Test
+    fun whenAccessibleModelTappedNotInModelChangeModeThenSelectModelCalled() = runTest {
+        nativeInputState.value = nativeInputState.value.copy(chatId = null, modelChangeMode = false)
+        advanceUntilIdle()
+        val model = freeModel(id = "new-model", shortName = "New")
+
+        testee.onModelTapped(model, PickerSurface.MODEL_PICKER_ADDRESS_BAR)
+        advanceUntilIdle()
+
+        verify(modelManager).selectModel(model)
     }
 
     @Test
@@ -512,6 +565,198 @@ class ModelPickerViewModelTest {
         stateFlow.value = ModelState(models = emptyList(), selectedModelId = null)
 
         assertTrue(testee.isWebSearchSupported())
+    }
+
+    @Test
+    fun whenOngoingChatThenCapabilitiesReflectChatModelNotGlobal() = runTest {
+        stateFlow.value = ModelState(
+            models = listOf(
+                freeModel(id = "global-model", shortName = "Global", supportedTools = emptyList()),
+                freeModel(id = "chat-model", shortName = "Chat", supportedTools = listOf(Tool.IMAGE_GENERATION)),
+            ),
+            selectedModelId = "global-model",
+            selectedModelShortName = "Global",
+        )
+        whenever(duckAiChatStore.getChatById("c1")).thenReturn(
+            DuckAiChat(chatId = "c1", title = "t", model = "chat-model", lastEdit = "now", pinned = false),
+        )
+        nativeInputState.value = nativeInputState.value.copy(chatId = "c1")
+        advanceUntilIdle()
+
+        assertEquals("chat-model", testee.getSelectedModel()?.id)
+        assertTrue(testee.isImageGenerationSupported())
+    }
+
+    @Test
+    fun whenRecoveryModelPickedThenCapabilitiesReflectRecoveryModel() = runTest {
+        val recoveryModel = freeModel(id = "recovery-model", shortName = "Recovery", supportedTools = listOf(Tool.WEB_SEARCH))
+        stateFlow.value = ModelState(
+            models = listOf(
+                freeModel(id = "global-model", shortName = "Global", supportedTools = listOf(Tool.IMAGE_GENERATION)),
+                recoveryModel,
+            ),
+            selectedModelId = "global-model",
+            selectedModelShortName = "Global",
+        )
+        nativeInputState.value = nativeInputState.value.copy(chatId = "c1", modelChangeMode = true)
+        advanceUntilIdle()
+
+        testee.onModelTapped(recoveryModel, PickerSurface.MODEL_PICKER_ADDRESS_BAR)
+        advanceUntilIdle()
+
+        assertEquals("recovery-model", testee.getSelectedModel()?.id)
+        assertTrue(testee.isWebSearchSupported())
+        assertFalse(testee.isImageGenerationSupported())
+    }
+
+    @Test
+    fun whenOngoingChatThenChipLabelIsChatModelShortName() = runTest {
+        stateFlow.value = ModelState(
+            models = listOf(freeModel(id = "chat-model", shortName = "Chat Model")),
+            selectedModelId = "global-model",
+            selectedModelShortName = "Global Model",
+        )
+        whenever(duckAiChatStore.getChatById("c1")).thenReturn(
+            DuckAiChat(chatId = "c1", title = "t", model = "chat-model", lastEdit = "now", pinned = false),
+        )
+        nativeInputState.value = nativeInputState.value.copy(chatId = "c1")
+        advanceUntilIdle()
+
+        assertEquals("Chat Model", testee.chipLabel.value)
+    }
+
+    @Test
+    fun whenNewChatThenChipLabelIsGlobalShortName() = runTest {
+        stateFlow.value = ModelState(
+            models = listOf(freeModel(id = "global-model", shortName = "Global Model")),
+            selectedModelId = "global-model",
+            selectedModelShortName = "Global Model",
+        )
+        nativeInputState.value = nativeInputState.value.copy(chatId = null)
+        advanceUntilIdle()
+
+        assertEquals("Global Model", testee.chipLabel.value)
+    }
+
+    @Test
+    fun whenChatModelNotInListThenChipLabelFallsBackToGlobal() = runTest {
+        stateFlow.value = ModelState(
+            models = listOf(freeModel(id = "global-model", shortName = "Global Model")),
+            selectedModelId = "global-model",
+            selectedModelShortName = "Global Model",
+        )
+        whenever(duckAiChatStore.getChatById("c1")).thenReturn(
+            DuckAiChat(chatId = "c1", title = "t", model = "lost-access-model", lastEdit = "now", pinned = false),
+        )
+        nativeInputState.value = nativeInputState.value.copy(chatId = "c1")
+        advanceUntilIdle()
+
+        assertEquals("Global Model", testee.chipLabel.value)
+    }
+
+    @Test
+    fun whenModelPickedInRecoveryThenChipLabelShowsPickedModelImmediately() = runTest {
+        stateFlow.value = ModelState(
+            models = listOf(freeModel(id = "new-model", shortName = "New Model")),
+            selectedModelShortName = "Global Model",
+        )
+        nativeInputState.value = nativeInputState.value.copy(chatId = "c1", modelChangeMode = true)
+        advanceUntilIdle()
+
+        testee.onModelTapped(freeModel(id = "new-model", shortName = "New Model"), PickerSurface.MODEL_PICKER_ADDRESS_BAR)
+        advanceUntilIdle()
+
+        assertEquals("New Model", testee.chipLabel.value)
+    }
+
+    @Test
+    fun whenRecoveryEndsThenChipLabelRevertsFromPickedModel() = runTest {
+        stateFlow.value = ModelState(
+            models = listOf(freeModel(id = "new-model", shortName = "New Model")),
+            selectedModelShortName = "Global Model",
+        )
+        nativeInputState.value = nativeInputState.value.copy(chatId = null, modelChangeMode = true)
+        advanceUntilIdle()
+        testee.onModelTapped(freeModel(id = "new-model", shortName = "New Model"), PickerSurface.MODEL_PICKER_ADDRESS_BAR)
+        advanceUntilIdle()
+        assertEquals("New Model", testee.chipLabel.value)
+
+        nativeInputState.value = nativeInputState.value.copy(modelChangeMode = false)
+        advanceUntilIdle()
+
+        assertEquals("Global Model", testee.chipLabel.value)
+    }
+
+    @Test
+    fun whenNoRecoveryPickThenHasPendingRecoverySelectionFalse() = runTest {
+        nativeInputState.value = nativeInputState.value.copy(chatId = "c1", modelChangeMode = true)
+        advanceUntilIdle()
+
+        assertFalse(testee.hasPendingRecoverySelection())
+    }
+
+    @Test
+    fun whenModelPickedInRecoveryThenHasPendingRecoverySelectionTrue() = runTest {
+        stateFlow.value = ModelState(models = listOf(freeModel(id = "new-model")))
+        nativeInputState.value = nativeInputState.value.copy(chatId = "c1", modelChangeMode = true)
+        advanceUntilIdle()
+
+        testee.onModelTapped(freeModel(id = "new-model"), PickerSurface.MODEL_PICKER_ADDRESS_BAR)
+
+        assertTrue(testee.hasPendingRecoverySelection())
+    }
+
+    @Test
+    fun whenRecoveryEndsThenHasPendingRecoverySelectionFalse() = runTest {
+        stateFlow.value = ModelState(models = listOf(freeModel(id = "new-model")))
+        nativeInputState.value = nativeInputState.value.copy(chatId = "c1", modelChangeMode = true)
+        advanceUntilIdle()
+        testee.onModelTapped(freeModel(id = "new-model"), PickerSurface.MODEL_PICKER_ADDRESS_BAR)
+        assertTrue(testee.hasPendingRecoverySelection())
+
+        nativeInputState.value = nativeInputState.value.copy(modelChangeMode = false)
+        advanceUntilIdle()
+
+        assertFalse(testee.hasPendingRecoverySelection())
+    }
+
+    @Test
+    fun whenModelPickedInRecoveryThenSelectedModelIdForMenuIsPickedModel() = runTest {
+        stateFlow.value = ModelState(models = listOf(freeModel(id = "new-model")))
+        nativeInputState.value = nativeInputState.value.copy(chatId = "c1", modelChangeMode = true)
+        advanceUntilIdle()
+
+        testee.onModelTapped(freeModel(id = "new-model"), PickerSurface.MODEL_PICKER_ADDRESS_BAR)
+        advanceUntilIdle()
+
+        assertEquals("new-model", testee.selectedModelIdForMenu())
+    }
+
+    @Test
+    fun whenInRecoveryAndNoPickThenSelectedModelIdForMenuIsChatModelNotGlobal() = runTest {
+        stateFlow.value = ModelState(
+            models = listOf(freeModel(id = "global-model")),
+            selectedModelId = "global-model",
+        )
+        whenever(duckAiChatStore.getChatById("c1")).thenReturn(
+            DuckAiChat(chatId = "c1", title = "t", model = "lost-access-model", lastEdit = "now", pinned = false),
+        )
+        nativeInputState.value = nativeInputState.value.copy(chatId = "c1", modelChangeMode = true)
+        advanceUntilIdle()
+
+        assertEquals("lost-access-model", testee.selectedModelIdForMenu())
+    }
+
+    @Test
+    fun whenNotInRecoveryThenSelectedModelIdForMenuIsGlobal() = runTest {
+        stateFlow.value = ModelState(
+            models = listOf(freeModel(id = "global-model")),
+            selectedModelId = "global-model",
+        )
+        nativeInputState.value = nativeInputState.value.copy(chatId = null, modelChangeMode = false)
+        advanceUntilIdle()
+
+        assertEquals("global-model", testee.selectedModelIdForMenu())
     }
 
     private fun freeModel(

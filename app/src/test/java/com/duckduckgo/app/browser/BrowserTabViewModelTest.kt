@@ -177,6 +177,7 @@ import com.duckduckgo.app.cta.ui.Cta
 import com.duckduckgo.app.cta.ui.CtaViewModel
 import com.duckduckgo.app.cta.ui.DaxBubbleCta
 import com.duckduckgo.app.cta.ui.DaxBubbleCta.DaxIntroSearchOptionsCta
+import com.duckduckgo.app.cta.ui.DaxDuckAiFireButtonBrandDesignUpdateContextualCta
 import com.duckduckgo.app.cta.ui.DaxTryASearchBrandDesignUpdateBubbleCta
 import com.duckduckgo.app.cta.ui.HomePanelCta
 import com.duckduckgo.app.cta.ui.OnboardingDaxDialogCta.DaxDuckAiFireButtonCta
@@ -265,6 +266,7 @@ import com.duckduckgo.browser.api.autocomplete.AutoCompleteSettings
 import com.duckduckgo.browser.api.brokensite.BrokenSiteContext
 import com.duckduckgo.browser.api.webviewcompat.WebViewCompatWrapper
 import com.duckduckgo.browser.api.wideevents.BrowserInteractionsPlugin
+import com.duckduckgo.browser.ui.autocomplete.AutocompleteHistoryDeleteFeature
 import com.duckduckgo.browser.ui.browsermenu.VpnMenuState
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.browsermode.api.BrowserModeDataProvider
@@ -684,6 +686,7 @@ class BrowserTabViewModelTest {
     private var fakeBrowserUiLockFeature = FakeFeatureToggleFactory.create(BrowserUiLockFeature::class.java)
     private var fakeFaviconFetchingFixFeature = FakeFeatureToggleFactory.create(FaviconFetchingFixFeature::class.java)
     private var fakeProgressBarUpgradeFeature = FakeFeatureToggleFactory.create(ProgressBarUpgradeFeature::class.java)
+    private val fakeAutocompleteHistoryDeleteFeature = FakeFeatureToggleFactory.create(AutocompleteHistoryDeleteFeature::class.java)
     private val mockSitePreferencesRepository: SitePreferencesRepository = mock()
     private val fakeRememberDesktopModeFeature = FakeFeatureToggleFactory.create(RememberDesktopModeFeature::class.java)
     private val mockInlinePdfHandler: InlinePdfHandler = mock()
@@ -717,6 +720,7 @@ class BrowserTabViewModelTest {
 
             swipingTabsFeature.self().setRawStoredState(State(enable = true))
             swipingTabsFeature.enabledForUsers().setRawStoredState(State(enable = true))
+            fakeAutocompleteHistoryDeleteFeature.self().setRawStoredState(State(enable = true))
 
             fakeRememberDesktopModeFeature.self().setRawStoredState(State(enable = true))
 
@@ -835,12 +839,7 @@ class BrowserTabViewModelTest {
                     deviceInfo = mockDeviceInfo,
                 )
 
-            accessibilitySettingsDataStore =
-                AccessibilitySettingsSharedPreferences(
-                    context,
-                    coroutineRule.testDispatcherProvider,
-                    coroutineRule.testScope,
-                )
+            accessibilitySettingsDataStore = AccessibilitySettingsSharedPreferences(context)
 
             whenever(mockOmnibarConverter.convertQueryToUrl(any(), any(), any(), any())).thenReturn("duckduckgo.com")
             whenever(mockTabRepository.liveSelectedTab).thenReturn(selectedTabLiveData)
@@ -1014,6 +1013,7 @@ class BrowserTabViewModelTest {
                 downloadsRepository = mockDownloadsRepository,
                 onboardingBrandDesignUpdateToggles = mockOnboardingBrandDesignUpdateToggles,
                 onboardingStore = mockOnboardingStore,
+                autocompleteHistoryDeleteFeature = fakeAutocompleteHistoryDeleteFeature,
                 sitePreferencesRepository = mockSitePreferencesRepository,
                 rememberDesktopModeFeature = fakeRememberDesktopModeFeature,
             )
@@ -2702,33 +2702,33 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenUserSelectsDesktopSiteWhenNotOnMobileSpecificSiteThenUrlNotModified() {
+    fun whenUserSelectsDesktopSiteWhenNotOnMobileSpecificSiteThenNavigatesToSameUrl() {
         loadUrl(exampleUrl)
         setDesktopBrowsingMode(false)
         testee.onChangeBrowserModeClicked()
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
-        val ultimateCommand = commandCaptor.lastValue
-        assertTrue(ultimateCommand == NavigationCommand.Refresh)
+        val ultimateCommand = commandCaptor.lastValue as Navigate
+        assertEquals(exampleUrl, ultimateCommand.url)
     }
 
     @Test
-    fun whenUserSelectsMobileSiteWhenOnMobileSpecificSiteThenUrlNotModified() {
+    fun whenUserSelectsMobileSiteWhenOnMobileSpecificSiteThenNavigatesToSameUrl() {
         loadUrl("http://m.example.com")
         setDesktopBrowsingMode(true)
         testee.onChangeBrowserModeClicked()
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
-        val ultimateCommand = commandCaptor.lastValue
-        assertTrue(ultimateCommand == NavigationCommand.Refresh)
+        val ultimateCommand = commandCaptor.lastValue as Navigate
+        assertEquals("http://m.example.com", ultimateCommand.url)
     }
 
     @Test
-    fun whenUserSelectsMobileSiteWhenNotOnMobileSpecificSiteThenUrlNotModified() {
+    fun whenUserSelectsMobileSiteWhenNotOnMobileSpecificSiteThenNavigatesToSameUrl() {
         loadUrl(exampleUrl)
         setDesktopBrowsingMode(true)
         testee.onChangeBrowserModeClicked()
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
-        val ultimateCommand = commandCaptor.lastValue
-        assertTrue(ultimateCommand == NavigationCommand.Refresh)
+        val ultimateCommand = commandCaptor.lastValue as Navigate
+        assertEquals(exampleUrl, ultimateCommand.url)
     }
 
     @Test
@@ -5355,29 +5355,10 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenForceZoomEnabledThenEmitNewState() {
-        accessibilitySettingsDataStore.forceZoom = true
-        assertTrue(accessibilityViewState().forceZoom)
-        assertTrue(accessibilityViewState().refreshWebView)
-    }
-
-    @Test
-    fun whenForceZoomEnabledAndWebViewRefreshedThenEmitNewState() {
-        accessibilitySettingsDataStore.forceZoom = true
-        assertTrue(accessibilityViewState().forceZoom)
-        assertTrue(accessibilityViewState().refreshWebView)
-
-        testee.onWebViewRefreshed()
-
-        assertFalse(accessibilityViewState().refreshWebView)
-    }
-
-    @Test
-    fun whenFontSizeChangedThenEmitNewState() {
+    fun whenFontSizeChangedThenViewStateFontSizeUpdated() {
+        accessibilitySettingsDataStore.overrideSystemFontSize = true
         accessibilitySettingsDataStore.appFontSize = 150f
-        accessibilitySettingsDataStore.overrideSystemFontSize = false
 
-        assertFalse(accessibilityViewState().refreshWebView)
         assertEquals(accessibilitySettingsDataStore.fontSize, accessibilityViewState().fontSize)
     }
 
@@ -7505,34 +7486,54 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenUserLongPressedOnHistorySuggestionThenShowRemoveSearchSuggestionDialogCommandIssued() {
-        val suggestion = AutoCompleteHistorySuggestion(phrase = "phrase", title = "title", url = "url", isAllowedInTopHits = false)
+    fun whenDeleteButtonEnabledAndUserDeletesHistorySuggestionThenRemovedImmediatelyWithoutDialog() =
+        runBlocking {
+            val suggestion = AutoCompleteHistorySuggestion(phrase = "phrase", title = "title", url = "url", isAllowedInTopHits = false)
 
-        testee.userLongPressedAutocomplete(suggestion)
+            testee.onUserRequestedToDeleteAutocompleteItem(suggestion)
 
-        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
-        val issuedCommand = commandCaptor.allValues.find { it is Command.ShowRemoveSearchSuggestionDialog }
-        assertEquals(suggestion, (issuedCommand as Command.ShowRemoveSearchSuggestionDialog).suggestion)
-    }
-
-    @Test
-    fun whenUserLongPressedOnHistorySearchSuggestionThenShowRemoveSearchSuggestionDialogCommandIssued() {
-        val suggestion = AutoCompleteHistorySearchSuggestion(phrase = "phrase", isAllowedInTopHits = false)
-
-        testee.userLongPressedAutocomplete(suggestion)
-
-        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
-        val issuedCommand = commandCaptor.allValues.find { it is Command.ShowRemoveSearchSuggestionDialog }
-        assertEquals(suggestion, (issuedCommand as Command.ShowRemoveSearchSuggestionDialog).suggestion)
-    }
+            verify(mockPixel).fire(AppPixelName.AUTOCOMPLETE_RESULT_DELETE_BUTTON_CLICKED)
+            verify(mockPixel).fire(AppPixelName.AUTOCOMPLETE_RESULT_DELETE_BUTTON_CLICKED_DAILY, type = Daily())
+            verify(mockNavigationHistory).removeHistoryEntryByUrl(suggestion.url)
+            assertCommandIssued<Command.AutocompleteItemRemoved>()
+            assertCommandNotIssued<Command.ShowRemoveSearchSuggestionDialog>()
+        }
 
     @Test
-    fun whenUserLongPressedOnOtherSuggestionThenDoNothing() {
+    fun whenDeleteButtonEnabledAndUserDeletesHistorySearchSuggestionThenRemovedImmediatelyWithoutDialog() =
+        runBlocking {
+            val suggestion = AutoCompleteHistorySearchSuggestion(phrase = "phrase", isAllowedInTopHits = false)
+
+            testee.onUserRequestedToDeleteAutocompleteItem(suggestion)
+
+            verify(mockPixel).fire(AppPixelName.AUTOCOMPLETE_RESULT_DELETE_BUTTON_CLICKED)
+            verify(mockPixel).fire(AppPixelName.AUTOCOMPLETE_RESULT_DELETE_BUTTON_CLICKED_DAILY, type = Daily())
+            verify(mockNavigationHistory).removeHistoryEntryByQuery(suggestion.phrase)
+            assertCommandIssued<Command.AutocompleteItemRemoved>()
+            assertCommandNotIssued<Command.ShowRemoveSearchSuggestionDialog>()
+        }
+
+    @Test
+    fun whenUserClickedDeleteOnOtherSuggestionThenDoNothing() {
         val suggestion = AutoCompleteDefaultSuggestion(phrase = "phrase")
 
-        testee.userLongPressedAutocomplete(suggestion)
+        testee.onUserRequestedToDeleteAutocompleteItem(suggestion)
 
         assertCommandNotIssued<Command.ShowRemoveSearchSuggestionDialog>()
+        verify(mockPixel, never()).fire(AppPixelName.AUTOCOMPLETE_RESULT_DELETE_BUTTON_CLICKED)
+        verify(mockPixel, never()).fire(AppPixelName.AUTOCOMPLETE_RESULT_DELETE_BUTTON_CLICKED_DAILY, type = Daily())
+    }
+
+    @Test
+    fun whenDeleteButtonDisabledAndUserDeletesHistorySuggestionThenDialogShownButNoDeleteButtonPixelFired() {
+        fakeAutocompleteHistoryDeleteFeature.self().setRawStoredState(State(enable = false))
+        val suggestion = AutoCompleteHistorySuggestion(phrase = "phrase", title = "title", url = "url", isAllowedInTopHits = false)
+
+        testee.onUserRequestedToDeleteAutocompleteItem(suggestion)
+
+        verify(mockPixel, never()).fire(AppPixelName.AUTOCOMPLETE_RESULT_DELETE_BUTTON_CLICKED)
+        verify(mockPixel, never()).fire(AppPixelName.AUTOCOMPLETE_RESULT_DELETE_BUTTON_CLICKED_DAILY, type = Daily())
+        assertCommandIssued<Command.ShowRemoveSearchSuggestionDialog>()
     }
 
     @Test
@@ -7561,6 +7562,30 @@ class BrowserTabViewModelTest {
             verify(mockPixel).fire(AppPixelName.AUTOCOMPLETE_RESULT_DELETED_DAILY, type = Daily())
             verify(mockNavigationHistory).removeHistoryEntryByQuery(suggestion.phrase)
             assertCommandIssued<Command.AutocompleteItemRemoved>()
+        }
+
+    @Test
+    fun whenOnRemoveSearchSuggestionConfirmedWithBlankOmnibarTextThenLiveAutocompleteQueryIsPreserved() =
+        runBlocking {
+            // With the native-input widget the live query lives in autoCompleteStateFlow while the
+            // legacy omnibar text is blank; the blank text must not overwrite the query and blank the list.
+            testee.autoCompleteStateFlow.value = "query"
+            val suggestion = AutoCompleteHistorySuggestion(phrase = "phrase", title = "title", url = "url", isAllowedInTopHits = false)
+
+            testee.onRemoveSearchSuggestionConfirmed(suggestion, omnibarText = "")
+
+            assertEquals("query", testee.autoCompleteStateFlow.value)
+        }
+
+    @Test
+    fun whenOnRemoveSearchSuggestionConfirmedWithOmnibarTextThenAutocompleteQueryRestoredFromOmnibar() =
+        runBlocking {
+            testee.autoCompleteStateFlow.value = "stale"
+            val suggestion = AutoCompleteHistorySuggestion(phrase = "phrase", title = "title", url = "url", isAllowedInTopHits = false)
+
+            testee.onRemoveSearchSuggestionConfirmed(suggestion, omnibarText = "fresh")
+
+            assertEquals("fresh", testee.autoCompleteStateFlow.value)
         }
 
     @Test
@@ -8980,6 +9005,17 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenFireMenuSelectedAndDuckAiFireButtonBrandDesignUpdateCtaShownThenFireFireButtonPressedMetric() = runTest {
+        testee.browserViewState.value = browserViewState()
+        testee.ctaViewState.value = ctaViewState().copy(cta = brandDesignDuckAiFireButtonCta())
+
+        testee.onFireMenuSelected(Omnibar.ViewMode.Browser(exampleUrl))
+        advanceUntilIdle()
+
+        verify(mockDuckAiOnboardingExperimentMetrics).fireFireButtonPressed()
+    }
+
+    @Test
     fun whenFireMenuSelectedAndNoDuckAiFireButtonCtaThenDoNotFireFireButtonPressedMetric() = runTest {
         testee.browserViewState.value = browserViewState()
         testee.ctaViewState.value = ctaViewState().copy(cta = null)
@@ -9844,6 +9880,13 @@ class BrowserTabViewModelTest {
     private fun ctaViewState() = testee.ctaViewState.value!!
 
     private fun browserViewState() = testee.browserViewState.value!!
+
+    private fun brandDesignDuckAiFireButtonCta() = DaxDuckAiFireButtonBrandDesignUpdateContextualCta(
+        onboardingStore = mockOnboardingStore,
+        appInstallStore = mockAppInstallStore,
+        isLightTheme = true,
+        deviceInfo = mockDeviceInfo,
+    )
 
     private fun omnibarViewState() = testee.omnibarViewState.value!!
 
@@ -11478,6 +11521,19 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenDaxDuckAiFireButtonBrandDesignUpdateCtaShownThenFireButtonHighlighted() = runTest {
+        val observer = ValueCaptorObserver<BrowserViewState>(false)
+        testee.browserViewState.observeForever(observer)
+        dismissedCtaDaoChannel.send(emptyList())
+
+        testee.ctaViewState.value = ctaViewState().copy(cta = brandDesignDuckAiFireButtonCta())
+
+        advanceUntilIdle()
+
+        assertTrue((browserViewState().fireButton as HighlightableButton.Visible).highlighted)
+    }
+
+    @Test
     fun whenDaxDuckAiFireButtonCtaDismissedThenFireButtonNotHighlighted() = runTest {
         val observer = ValueCaptorObserver<BrowserViewState>(false)
         testee.browserViewState.observeForever(observer)
@@ -11486,6 +11542,21 @@ class BrowserTabViewModelTest {
         testee.ctaViewState.value = ctaViewState().copy(
             cta = DaxDuckAiFireButtonCta(mockOnboardingStore, mockAppInstallStore),
         )
+        advanceUntilIdle()
+
+        testee.ctaViewState.value = ctaViewState().copy(cta = null)
+        advanceUntilIdle()
+
+        assertFalse((browserViewState().fireButton as HighlightableButton.Visible).highlighted)
+    }
+
+    @Test
+    fun whenDaxDuckAiFireButtonBrandDesignUpdateCtaDismissedThenFireButtonNotHighlighted() = runTest {
+        val observer = ValueCaptorObserver<BrowserViewState>(false)
+        testee.browserViewState.observeForever(observer)
+        dismissedCtaDaoChannel.send(emptyList())
+
+        testee.ctaViewState.value = ctaViewState().copy(cta = brandDesignDuckAiFireButtonCta())
         advanceUntilIdle()
 
         testee.ctaViewState.value = ctaViewState().copy(cta = null)
@@ -11568,6 +11639,17 @@ class BrowserTabViewModelTest {
         dismissedCtaDaoChannel.send(emptyList())
         val cta = DaxDuckAiFireButtonCta(mockOnboardingStore, mockAppInstallStore)
         testee.ctaViewState.value = ctaViewState().copy(cta = cta)
+
+        testee.dismissDuckAiFireOnboardingCta()
+        advanceUntilIdle()
+
+        verify(mockDismissedCtaDao).insert(DismissedCta(CtaId.DAX_DUCK_AI_FIRE_BUTTON))
+    }
+
+    @Test
+    fun whenDismissDuckAiFireOnboardingCtaCalledWithBrandDesignUpdateCtaThenCtaDismissed() = runTest {
+        dismissedCtaDaoChannel.send(emptyList())
+        testee.ctaViewState.value = ctaViewState().copy(cta = brandDesignDuckAiFireButtonCta())
 
         testee.dismissDuckAiFireOnboardingCta()
         advanceUntilIdle()

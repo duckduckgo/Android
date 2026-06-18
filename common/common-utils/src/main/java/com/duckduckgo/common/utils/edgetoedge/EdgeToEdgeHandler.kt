@@ -17,8 +17,10 @@
 package com.duckduckgo.common.utils.edgetoedge
 
 import android.view.View
+import android.view.ViewGroup
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.doOnAttach
 import androidx.core.view.updatePadding
 import javax.inject.Inject
 
@@ -35,6 +37,34 @@ import javax.inject.Inject
  */
 class EdgeToEdgeHandler @Inject constructor() {
 
+    /**
+     * Pads [view]'s top (status bar + cutout) and left/right (side system bars + cutout) edges.
+     *
+     * @param view The view to pad, typically the screen's root.
+     */
+    fun applyStatusBarAndHorizontalInsets(view: View) {
+        val initialLeft = view.paddingLeft
+        val initialTop = view.paddingTop
+        val initialRight = view.paddingRight
+        ViewCompat.setOnApplyWindowInsetsListener(view) { v, insets ->
+            val windowInsets = insets.getInsets(
+                WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout() or WindowInsetsCompat.Type.ime(),
+            )
+            v.updatePadding(
+                left = initialLeft + windowInsets.left,
+                top = initialTop + windowInsets.top,
+                right = initialRight + windowInsets.right,
+            )
+            insets
+        }
+        ViewCompat.requestApplyInsets(view)
+    }
+
+    /**
+     * Pads [view]'s top by the status-bar + cutout inset.
+     *
+     * @param view The view to pad at the top edge.
+     */
     fun applyStatusBarInsets(view: View) {
         val initialTop = view.paddingTop
         ViewCompat.setOnApplyWindowInsetsListener(view) { v, insets ->
@@ -48,13 +78,28 @@ class EdgeToEdgeHandler @Inject constructor() {
     }
 
     /**
-     * Bottom inset: navigation bar + display cutout, bottom edge only
+     * Pads [view]'s bottom by the navigation-bar (plus display cutout and IME) inset.
+     *
+     * When [drawBehindGestureNav] is true, the padding uses the *tappable* navigation inset, which is
+     * 0 in gesture navigation (so content draws edge-to-edge behind the transparent gesture handle) and
+     * the button-bar height in 2/3-button navigation (so content sits above the buttons). When false it
+     * uses the full navigation-bar inset, keeping content clear of the bar in every navigation mode.
+     *
+     * @param view The view to pad at the bottom edge.
      */
-    fun applyNavigationBarInsets(view: View) {
+    fun applyNavigationBarInsets(
+        view: View,
+        drawBehindGestureNav: Boolean = false,
+    ) {
         val initialBottom = view.paddingBottom
         ViewCompat.setOnApplyWindowInsetsListener(view) { v, insets ->
+            val bottomType = if (drawBehindGestureNav) {
+                WindowInsetsCompat.Type.tappableElement()
+            } else {
+                WindowInsetsCompat.Type.navigationBars()
+            }
             val bottom = insets.getInsets(
-                WindowInsetsCompat.Type.navigationBars() or WindowInsetsCompat.Type.displayCutout(),
+                bottomType or WindowInsetsCompat.Type.displayCutout() or WindowInsetsCompat.Type.ime(),
             ).bottom
 
             v.updatePadding(bottom = initialBottom + bottom)
@@ -64,11 +109,31 @@ class EdgeToEdgeHandler @Inject constructor() {
     }
 
     /**
-     * Horizontal inset: navigation bar + display cutout on the left and right edges. In landscape the
-     * 3-button nav bar and the camera cutout move to a side edge and run the full height, so applying
-     * this to a screen's root insets the whole column (toolbar, content, bottom bar) at once. No-op in
-     * portrait. The listener is non-consuming, so child views still receive insets for their own
-     * top/bottom handling.
+     * Adds the navigation-bar + cutout + IME inset as [view]'s bottom margin, so a scrolling bottom bar clips at the nav-bar edge when hidden.
+     *
+     * @param view The view whose bottom margin is updated; must use [ViewGroup.MarginLayoutParams].
+     */
+    fun applyNavigationBarInsetsAsMargin(view: View) {
+        val initialBottom = (view.layoutParams as? ViewGroup.MarginLayoutParams)?.bottomMargin ?: 0
+        view.applyInsets { insets ->
+            val bottom = insets.getInsets(
+                WindowInsetsCompat.Type.navigationBars() or WindowInsetsCompat.Type.displayCutout() or WindowInsetsCompat.Type.ime(),
+            ).bottom
+
+            (view.layoutParams as? ViewGroup.MarginLayoutParams)?.let { lp ->
+                val newMargin = initialBottom + bottom
+                if (lp.bottomMargin != newMargin) {
+                    lp.bottomMargin = newMargin
+                    view.requestLayout()
+                }
+            }
+        }
+    }
+
+    /**
+     * Pads [view]'s left/right by the side navigation-bar + cutout inset (landscape only; no-op in portrait).
+     *
+     * @param view The view to pad on the left/right edges.
      */
     fun applyHorizontalSystemBarInsets(view: View) {
         val initialLeft = view.paddingLeft
@@ -84,5 +149,16 @@ class EdgeToEdgeHandler @Inject constructor() {
             insets
         }
         ViewCompat.requestApplyInsets(view)
+    }
+
+    private fun View.applyInsets(apply: (WindowInsetsCompat) -> Unit) {
+        ViewCompat.setOnApplyWindowInsetsListener(this) { _, insets ->
+            apply(insets)
+            insets
+        }
+        doOnAttach { attached ->
+            ViewCompat.getRootWindowInsets(attached)?.let(apply)
+            ViewCompat.requestApplyInsets(attached)
+        }
     }
 }

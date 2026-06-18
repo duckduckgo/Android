@@ -436,7 +436,7 @@ class RealPlayBillingManager @Inject constructor(
     }
 
     override suspend fun getLatestPurchase(): LatestPurchaseResult = withContext(dispatcherProvider.io()) {
-        if (!billingClient.ready) return@withContext LatestPurchaseResult.Unknown
+        if (!billingClient.ready) return@withContext LatestPurchaseResult.Unknown(cause = "billing_client_not_ready")
 
         when (val result = billingClient.queryPurchases()) {
             is QueryPurchasesResult.Success -> {
@@ -450,7 +450,7 @@ class RealPlayBillingManager @Inject constructor(
             }
             is QueryPurchasesResult.Failure -> {
                 logcat { "Billing: getLatestPurchase query failed: ${result.billingError} - ${result.debugMessage}" }
-                LatestPurchaseResult.Unknown
+                LatestPurchaseResult.Unknown(cause = "query_purchases_failed:${result.billingError?.name ?: "unknown"}")
             }
         }
     }
@@ -466,8 +466,9 @@ sealed class LatestPurchaseResult {
     /**
      * No confirmed answer yet — either we have not queried Play Billing yet,
      * or the last query failed (connection error, service unavailable, etc.).
+     * [cause] is a low-cardinality tag identifying which path produced the Unknown result.
      */
-    data object Unknown : LatestPurchaseResult()
+    data class Unknown(val cause: String) : LatestPurchaseResult()
 }
 
 sealed class PurchaseState {

@@ -71,4 +71,11 @@
 
     <!-- Duck.ai header -->
     <string name="duckChatPlusButtonContentDescription">Open Duck.ai menu</string>
+
+    <!-- Contextual sheet quick action -->
+    <string name="duckAIContextualPromptAskAboutPage">Ask about page</string>
+
+    <!-- Contextual sheet input hint (contextualSheetImprovements flag) -->
+    <string name="contextualSheetImprovedHint">Ask anything privately</string>
+    <string name="contextualSheetChatsPopupRecentSection" instruction="Section header above the list of recent Duck.ai chats in the contextual sheet overflow menu.">Recent chats</string>
 </resources>

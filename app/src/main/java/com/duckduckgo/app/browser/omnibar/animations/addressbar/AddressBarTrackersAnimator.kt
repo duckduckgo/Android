@@ -93,7 +93,7 @@ class AddressBarTrackersAnimator @Inject constructor(
         val slideInTrackersTransition: Transition = createSlideTransition()
         val slideOutTrackersTransition: Transition = createSlideTransition()
 
-        val inflater = LayoutInflater.from(context)
+        val inflater = LayoutInflater.from(sceneRoot.context)
         val scene1Layout = inflater.inflate(R.layout.address_bar_trackers_animation_scene_1, sceneRoot, false)
         val scene2Layout = inflater.inflate(R.layout.address_bar_trackers_animation_scene_2, sceneRoot, false)
 

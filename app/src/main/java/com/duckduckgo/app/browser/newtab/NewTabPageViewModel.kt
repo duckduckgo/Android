@@ -30,6 +30,7 @@ import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.ExtendedOnboardi
 import com.duckduckgo.app.onboardingbranddesignupdate.OnboardingBrandDesignUpdateToggles
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.playstore.PlayStoreUtils
 import com.duckduckgo.mobile.android.app.tracking.AppTrackingProtection
@@ -77,11 +78,13 @@ class NewTabPageViewModel @AssistedInject constructor(
     private val pixel: Pixel,
     private val onboardingBrandDesignUpdateToggles: OnboardingBrandDesignUpdateToggles,
     private val ctaViewModel: CtaViewModel,
+    browserMode: BrowserMode,
 ) : ViewModel(), DefaultLifecycleObserver {
 
     data class ViewState(
         private val showDaxLogo: Boolean,
         private val appTpEnabled: Boolean = false,
+        val isFireMode: Boolean = false,
         val message: RemoteMessage? = null,
         val messageImageFilePath: String? = null,
         val newMessage: Boolean = false,
@@ -96,8 +99,11 @@ class NewTabPageViewModel @AssistedInject constructor(
             favourites?.isNotEmpty() == true
         private val hasLowPriorityMessage = lowPriorityMessage != null
 
-        val shouldShowLogo = !isLoadingContent && !hasContentThatDisplacesHomeLogo && showDaxLogo
-        val hasContent = isLoadingContent || (shouldShowLogo || hasContentThatDisplacesHomeLogo || appTpEnabled || hasLowPriorityMessage)
+        val showFireTabEmptyState = isFireMode
+        val shouldShowLogo = !isFireMode && !isLoadingContent && !hasContentThatDisplacesHomeLogo && showDaxLogo
+        val hasContent = isFireMode ||
+            isLoadingContent ||
+            (shouldShowLogo || hasContentThatDisplacesHomeLogo || appTpEnabled || hasLowPriorityMessage)
     }
 
     private data class ViewStateSnapshot(
@@ -125,7 +131,9 @@ class NewTabPageViewModel @AssistedInject constructor(
     }
 
     private var lastRemoteMessageSeen: RemoteMessage? = null
-    private val _viewState = MutableStateFlow(ViewState(showDaxLogo = showDaxLogo))
+    private val _viewState = MutableStateFlow(
+        ViewState(showDaxLogo = showDaxLogo, isFireMode = browserMode == BrowserMode.FIRE),
+    )
     val viewState = _viewState.asStateFlow()
 
     private val command = Channel<Command>(1, BufferOverflow.DROP_OLDEST)

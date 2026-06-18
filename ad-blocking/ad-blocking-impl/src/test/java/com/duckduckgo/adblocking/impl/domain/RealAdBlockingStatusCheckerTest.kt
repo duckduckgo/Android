@@ -45,6 +45,7 @@ class RealAdBlockingStatusCheckerTest {
 
     private val killSwitchEnabledFlow = MutableStateFlow(true)
     private val enabledByDefaultFlow = MutableStateFlow(false)
+    private val contingencyModeEnabledFlow = MutableStateFlow(false)
 
     private val selfToggle: Toggle = mock {
         on { isEnabled() } doAnswer { killSwitchEnabled }
@@ -52,6 +53,7 @@ class RealAdBlockingStatusCheckerTest {
     }
     private val contingencyModeToggle: Toggle = mock {
         on { isEnabled() } doAnswer { contingencyModeEnabled }
+        on { enabled() } doReturn contingencyModeEnabledFlow
     }
     private val enabledByDefaultToggle: Toggle = mock {
         on { isEnabled() } doAnswer { enabledByDefaultFlow.value }
@@ -131,6 +133,40 @@ class RealAdBlockingStatusCheckerTest {
 
         enabledByDefaultFlow.value = true
         assertTrue(checker.canInject())
+    }
+
+    @Test
+    fun whenKillSwitchOnContingencyOffAndUserEnabledThenObserveCanInjectEmitsTrue() = runTest {
+        assertTrue(checker.observeCanInject().first())
+    }
+
+    @Test
+    fun whenKillSwitchOffThenObserveCanInjectEmitsFalse() = runTest {
+        killSwitchEnabledFlow.value = false
+
+        assertFalse(checker.observeCanInject().first())
+    }
+
+    @Test
+    fun whenContingencyModeOnThenObserveCanInjectEmitsFalse() = runTest {
+        contingencyModeEnabledFlow.value = true
+
+        assertFalse(checker.observeCanInject().first())
+    }
+
+    @Test
+    fun whenUserHasDisabledThenObserveCanInjectEmitsFalse() = runTest {
+        userEnabledFlow.value = false
+
+        assertFalse(checker.observeCanInject().first())
+    }
+
+    @Test
+    fun whenUserHasNoPreferenceAndEnabledByDefaultThenObserveCanInjectEmitsTrue() = runTest {
+        userEnabledFlow.value = null
+        enabledByDefaultFlow.value = true
+
+        assertTrue(checker.observeCanInject().first())
     }
 
     @Test

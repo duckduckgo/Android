@@ -112,6 +112,11 @@ enum class SubscriptionPixel(
         types = setOf(Count, Daily()),
         includedParameters = setOf(ATB, APP_VERSION),
     ),
+    RECOVER_SUBSCRIPTION_NO_ACTIVE_PURCHASE(
+        baseName = "m_privacy-pro_app_recover-subscription_no-active-purchase",
+        types = setOf(Count, Daily()),
+        includedParameters = setOf(APP_VERSION),
+    ),
     RESTORE_AFTER_PURCHASE_ATTEMPT_SUCCESS(
         baseName = "m_privacy-pro_app_subscription-restore-after-purchase-attempt_success",
         type = Count,

@@ -23,13 +23,11 @@ import androidx.work.WorkManager
 import com.duckduckgo.adblocking.impl.remoteconfig.AdBlockingExtensionConfigProvider
 import com.duckduckgo.adblocking.impl.remoteconfig.AdBlockingExtensionFeature
 import com.duckduckgo.adblocking.impl.remoteconfig.AdBlockingExtensionSettings
+import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.Toggle
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
-import org.junit.After
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
@@ -42,6 +40,9 @@ import org.mockito.kotlin.verify
 @OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(AndroidJUnit4::class)
 class ScriptletDownloadWorkerSchedulerTest {
+
+    @get:Rule
+    val coroutineRule = CoroutineTestRule()
 
     private val workManager: WorkManager = mock()
 
@@ -63,21 +64,16 @@ class ScriptletDownloadWorkerSchedulerTest {
         on { scriptletsSettings } doReturn settingsFlow
     }
     private val lifecycleOwner: LifecycleOwner = mock()
-    private val testScope = CoroutineScope(UnconfinedTestDispatcher())
 
     private val scriptletsSettings = AdBlockingExtensionSettings(version = "2026.5.14", scriptlets = emptyMap())
-
-    @After
-    fun tearDown() {
-        testScope.cancel()
-    }
 
     private fun startScheduler() {
         ScriptletDownloadWorkerScheduler(
             workManager = workManager,
             configProvider = configProvider,
             feature = feature,
-            appScope = testScope,
+            appScope = coroutineRule.testScope,
+            dispatchers = coroutineRule.testDispatcherProvider,
         ).onCreate(lifecycleOwner)
     }
 

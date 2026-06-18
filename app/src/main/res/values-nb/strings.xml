@@ -1033,4 +1033,8 @@
 
     <string name="input_screen_user_pref_without_ai_updated">Bare søk</string>
     <string name="input_screen_user_pref_with_ai_updated">Bytt mellom\nsøk og Duck.ai</string>
+
+    <!-- New Address Bar Picker -->
+    <string name="newAddressBarPickerDuckDuckGo" translatable="false">DuckDuckGo</string>
+    <string name="newAddressBarPickerConfirm">Bekreft</string>
 </resources>

@@ -63,6 +63,7 @@ import com.duckduckgo.subscriptions.api.Product
 import com.duckduckgo.subscriptions.api.Subscriptions
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
@@ -127,6 +128,7 @@ class NativeInputModeWidgetViewModelTest {
     private val chatStateFlow = MutableStateFlow(ChatState.READY)
     private val chatSuggestionsUserEnabledFlow = MutableStateFlow(true)
     private val entitlementsFlow = MutableStateFlow<List<Product>>(emptyList())
+    private val showModelPickerEvents = MutableSharedFlow<String>(extraBufferCapacity = 1)
 
     private var fakePlugins: List<NativeInputPlugin> = emptyList()
     private val fakePluginPoint = object : ActivePluginPoint<NativeInputPlugin> {
@@ -142,6 +144,7 @@ class NativeInputModeWidgetViewModelTest {
         whenever(duckChatInternal.observeInputScreenUserSettingEnabled()).thenReturn(inputScreenUserSettingFlow)
         whenever(duckChatInternal.observeChatSuggestionsUserSettingEnabled()).thenReturn(chatSuggestionsUserEnabledFlow)
         whenever(duckChatInternal.chatState).thenReturn(chatStateFlow)
+        whenever(duckChatInternal.showModelPickerEvents).thenReturn(showModelPickerEvents)
         whenever(subscriptions.getEntitlementStatus()).thenReturn(entitlementsFlow)
         whenever(autoCompleteFactory.create(any())).thenReturn(autoComplete)
         whenever(autoCompleteSettings.autoCompleteSuggestionsEnabled).thenReturn(false)
@@ -721,6 +724,102 @@ class NativeInputModeWidgetViewModelTest {
         advanceUntilIdle()
 
         assertNull(viewModel.getSelectedModelId())
+    }
+
+    @Test
+    fun whenShowModelPickerEventThenModelChangeModeSetTrueOnActiveTab() = runTest {
+        val viewModel = createViewModel()
+        viewModel.configure(tabId = "tab-A", isDuckAiMode = true, isBottom = false)
+        advanceUntilIdle()
+
+        showModelPickerEvents.tryEmit("tab-A")
+        advanceUntilIdle()
+
+        assertTrue(nativeInputStateProvider.stateForTab("tab-A").value.modelChangeMode)
+    }
+
+    @Test
+    fun whenShowModelPickerEventForOtherTabThenModelChangeModeNotSet() = runTest {
+        val viewModel = createViewModel()
+        viewModel.configure(tabId = "tab-A", isDuckAiMode = true, isBottom = false)
+        advanceUntilIdle()
+
+        showModelPickerEvents.tryEmit("tab-B")
+        advanceUntilIdle()
+
+        assertFalse(nativeInputStateProvider.stateForTab("tab-A").value.modelChangeMode)
+    }
+
+    @Test
+    fun whenChatIdChangesThenModelChangeModeCleared() = runTest {
+        val viewModel = createViewModel()
+        viewModel.configure(tabId = "tab-A", isDuckAiMode = true, isBottom = false)
+        advanceUntilIdle()
+        showModelPickerEvents.tryEmit("tab-A")
+        advanceUntilIdle()
+        assertTrue(nativeInputStateProvider.stateForTab("tab-A").value.modelChangeMode)
+
+        viewModel.setActiveChatId("new-chat")
+        advanceUntilIdle()
+
+        assertFalse(nativeInputStateProvider.stateForTab("tab-A").value.modelChangeMode)
+    }
+
+    @Test
+    fun whenPromptSubmittedThenModelChangeModeClearedOnActiveTab() = runTest {
+        val viewModel = createViewModel()
+        viewModel.configure(tabId = "tab-A", isDuckAiMode = true, isBottom = false)
+        advanceUntilIdle()
+        showModelPickerEvents.tryEmit("tab-A")
+        advanceUntilIdle()
+
+        viewModel.onPromptSubmitted()
+
+        assertFalse(nativeInputStateProvider.stateForTab("tab-A").value.modelChangeMode)
+    }
+
+    @Test
+    fun whenExitModelChangeModeThenModelChangeModeClearedOnActiveTab() = runTest {
+        val viewModel = createViewModel()
+        viewModel.configure(tabId = "tab-A", isDuckAiMode = true, isBottom = false)
+        advanceUntilIdle()
+        showModelPickerEvents.tryEmit("tab-A")
+        advanceUntilIdle()
+
+        viewModel.exitModelChangeMode()
+
+        assertFalse(nativeInputStateProvider.stateForTab("tab-A").value.modelChangeMode)
+    }
+
+    @Test
+    fun whenChatIdChangesThenSubmitEnabledResetsToTrue() = runTest {
+        val viewModel = createViewModel()
+        viewModel.configure(tabId = "tab-A", isDuckAiMode = true, isBottom = false)
+        viewModel.setActiveChatId("chat-X")
+        advanceUntilIdle()
+        // Simulate the FE having disabled submit for the previous (unsupported-model) chat.
+        nativeInputStatePublisher.update("tab-A") { it.copy(submitEnabled = false) }
+
+        viewModel.setActiveChatId("new-chat")
+        advanceUntilIdle()
+
+        assertTrue(nativeInputStateProvider.stateForTab("tab-A").value.submitEnabled)
+    }
+
+    @Test
+    fun whenSameChatIdReappliedThenSubmitEnabledPreserved() = runTest {
+        val viewModel = createViewModel()
+        viewModel.configure(tabId = "tab-A", isDuckAiMode = true, isBottom = false)
+        viewModel.setActiveChatId("chat-X")
+        advanceUntilIdle()
+        // FE disabled submit for chat-X (unsupported model).
+        nativeInputStatePublisher.update("tab-A") { it.copy(submitEnabled = false) }
+
+        // Re-applying the same chatId (e.g. tab re-selection / widget re-attach) must not re-enable.
+        viewModel.setActiveChatId("chat-X")
+        advanceUntilIdle()
+
+        assertFalse(nativeInputStateProvider.stateForTab("tab-A").value.submitEnabled)
     }
 
     @Test

@@ -20,3 +20,10 @@ data class Scriptlet(
     val name: String,
     val content: String,
 )
+
+internal val ALLOWED_SCRIPTLET_NAMES = setOf(
+    "scriptlets/isolated/ublock-filters.js",
+    "scriptlets/main/ublock-filters.js",
+    "scriptlets/isolated/ublock-experimental.js",
+    "scriptlets/main/ublock-experimental.js",
+)

@@ -254,6 +254,23 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
     }
 
     @Test
+    fun whenRecoverSubscriptionFromStoreIfStoreLoginSucceedsButSubscriptionNotActiveThenDoesNotEmitPixel() = runTest {
+        givenUseQueryPurchasesEnabled()
+        givenUserIsNotSignedIn()
+        givenActivePurchase()
+        givenStoreLoginSucceeds()
+        givenSubscriptionSucceedsWithoutEntitlements(status = "Expired")
+        givenAccessTokenSucceeds()
+        givenV2AccessTokenRefreshSucceeds()
+
+        val result = subscriptionsManager.recoverSubscriptionFromStore()
+
+        assertTrue(result is RecoverSubscriptionResult.Failure)
+        assertEquals("SubscriptionNotFound", (result as RecoverSubscriptionResult.Failure).message)
+        verify(pixelSender, never()).reportRecoverSubscriptionNoActivePurchase()
+    }
+
+    @Test
     fun whenRecoverSubscriptionFromStoreIfValidateTokenFailsReturnFailure() = runTest {
         givenUserIsSignedIn()
         givenValidateTokenFails("failure")
@@ -295,6 +312,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
         assertTrue(result is RecoverSubscriptionResult.Success)
         verify(authClient).storeLogin(any(), any(), any())
         verify(playBillingManager, never()).purchaseHistory
+        verify(pixelSender, never()).reportRecoverSubscriptionNoActivePurchase()
     }
 
     @Test
@@ -308,6 +326,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
         assertTrue(result is RecoverSubscriptionResult.Failure)
         assertEquals("SubscriptionNotFound", (result as RecoverSubscriptionResult.Failure).message)
         verify(authClient, never()).storeLogin(any(), any(), any())
+        verify(pixelSender).reportRecoverSubscriptionNoActivePurchase()
     }
 
     @Test
@@ -320,10 +339,11 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
 
         assertTrue(result is RecoverSubscriptionResult.Failure)
         assertEquals(
-            "Store login error: PurchaseInfoNotAvailable",
+            "Store login error: PurchaseInfoNotAvailable: billing_client_not_ready",
             (result as RecoverSubscriptionResult.Failure).message,
         )
         verify(authClient, never()).storeLogin(any(), any(), any())
+        verify(pixelSender, never()).reportRecoverSubscriptionNoActivePurchase()
     }
 
     @Test
@@ -2008,8 +2028,8 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
         whenever(playBillingManager.getLatestPurchase()).thenReturn(LatestPurchaseResult.Absent)
     }
 
-    private suspend fun givenPurchaseInfoUnknown() {
-        whenever(playBillingManager.getLatestPurchase()).thenReturn(LatestPurchaseResult.Unknown)
+    private suspend fun givenPurchaseInfoUnknown(cause: String = "billing_client_not_ready") {
+        whenever(playBillingManager.getLatestPurchase()).thenReturn(LatestPurchaseResult.Unknown(cause = cause))
     }
 
     private suspend fun givenStoreLoginSucceeds(newAccessToken: String = FAKE_ACCESS_TOKEN_V2) {

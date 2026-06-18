@@ -105,12 +105,13 @@ class ScriptletDownloadWorkerScheduler @Inject constructor(
     private val configProvider: AdBlockingExtensionConfigProvider,
     private val feature: AdBlockingExtensionFeature,
     @AppCoroutineScope private val appScope: CoroutineScope,
+    private val dispatchers: DispatcherProvider,
 ) : MainProcessLifecycleObserver {
 
     private val settingsAdapter by lazy { buildJsonAdapter() }
 
     override fun onCreate(owner: LifecycleOwner) {
-        appScope.launch {
+        appScope.launch(dispatchers.io()) {
             combine(
                 feature.self().enabled(),
                 feature.enableContingencyMode().enabled(),

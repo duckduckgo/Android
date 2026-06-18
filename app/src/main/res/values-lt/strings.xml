@@ -1073,4 +1073,8 @@
 
     <string name="input_screen_user_pref_without_ai_updated">Tik paieška</string>
     <string name="input_screen_user_pref_with_ai_updated">Perjungti\npaiešką ir „Duck.ai“</string>
+
+    <!-- New Address Bar Picker -->
+    <string name="newAddressBarPickerDuckDuckGo" translatable="false">DuckDuckGo</string>
+    <string name="newAddressBarPickerConfirm">Patvirtinti</string>
 </resources>

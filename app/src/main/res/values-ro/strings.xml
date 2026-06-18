@@ -1053,4 +1053,8 @@
 
     <string name="input_screen_user_pref_without_ai_updated">Doar căutare</string>
     <string name="input_screen_user_pref_with_ai_updated">Comută între Căutare și Duck.ai</string>
+
+    <!-- New Address Bar Picker -->
+    <string name="newAddressBarPickerDuckDuckGo" translatable="false">DuckDuckGo</string>
+    <string name="newAddressBarPickerConfirm">Confirmă</string>
 </resources>
