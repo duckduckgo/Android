@@ -54,6 +54,7 @@ import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.duckchat.api.inputscreen.DuckAiOnboardingEndCtaVariant
 import com.duckduckgo.subscriptions.api.SubscriptionPromoCtaShownPlugin
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.api.Subscriptions
@@ -229,19 +230,24 @@ class CtaViewModel @Inject constructor(
         }
     }
 
-    suspend fun prepareAndMarkDuckAiEndCtaForInputScreen(): Boolean {
+    suspend fun prepareAndMarkDuckAiEndCtaForInputScreen(): DuckAiOnboardingEndCtaVariant {
         return withContext(dispatchers.io()) {
             val shouldShow = canShowDuckAiEndCta() && !extendedOnboardingFeatureToggles.noBrowserCtas().isEnabled()
-            if (shouldShow) {
-                dismissedCtaDao.insert(DismissedCta(CtaId.DAX_DUCK_AI_END))
-                completeStageIfDaxOnboardingCompleted()
-                if (canSendShownPixel(onboardingStore, DUCK_AI_END_CTA_PIXEL_PARAM)) {
-                    val journey = addCtaToHistory(onboardingStore, appInstallStore, DUCK_AI_END_CTA_PIXEL_PARAM)
-                    pixel.fire(AppPixelName.ONBOARDING_DAX_CTA_SHOWN, mapOf(Pixel.PixelParameter.CTA_SHOWN to journey))
-                }
-                duckAiOnboardingExperimentMetrics.fireFinalDialogImpression()
+            if (!shouldShow) return@withContext DuckAiOnboardingEndCtaVariant.NONE
+
+            dismissedCtaDao.insert(DismissedCta(CtaId.DAX_DUCK_AI_END))
+            completeStageIfDaxOnboardingCompleted()
+            if (canSendShownPixel(onboardingStore, DUCK_AI_END_CTA_PIXEL_PARAM)) {
+                val journey = addCtaToHistory(onboardingStore, appInstallStore, DUCK_AI_END_CTA_PIXEL_PARAM)
+                pixel.fire(AppPixelName.ONBOARDING_DAX_CTA_SHOWN, mapOf(Pixel.PixelParameter.CTA_SHOWN to journey))
             }
-            shouldShow
+            duckAiOnboardingExperimentMetrics.fireFinalDialogImpression()
+
+            if (isBrandDesignUpdateEnabled()) {
+                DuckAiOnboardingEndCtaVariant.BRAND_DESIGN_UPDATE
+            } else {
+                DuckAiOnboardingEndCtaVariant.LEGACY
+            }
         }
     }
 

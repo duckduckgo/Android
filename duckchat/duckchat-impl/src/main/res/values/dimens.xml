@@ -27,6 +27,7 @@
     <dimen name="inputScreenLogoTopBarTopMargin">180dp</dimen>
     <dimen name="inputScreenLogoTopBarWithHatchTopMargin">260dp</dimen>
     <dimen name="inputScreenHatchTopMarginWithTopBar">136dp</dimen>
+    <dimen name="onboardingBackgroundMaxHeight">126dp</dimen>
 
     <!-- Model Picker -->
     <dimen name="modelPickerChipHeight">36dp</dimen>
