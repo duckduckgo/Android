@@ -21,11 +21,13 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.pir.impl.store.PirRepository
 import com.squareup.anvil.annotations.ContributesBinding
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 import java.time.Instant
 import java.time.ZoneId
 import java.time.temporal.ChronoUnit
 import javax.inject.Inject
+import kotlin.random.Random
 
 /**
  * Reports user-interacted DAU/WAU/MAU pixels for PIR. Unlike [PirEngagementReporter] (which reports
@@ -58,6 +60,7 @@ class RealPirInteractionReporter @Inject constructor(
 
         if (!hasDateElapsed(DIFF_DATE_DAU, lastPixelMs, nowMs)) return
 
+        delayToReduceSessioning()
         pirPixelSender.reportInteractionDAU()
         pirRepository.setLastPirInteractionDauPixelTimeMs(nowMs)
     }
@@ -67,6 +70,7 @@ class RealPirInteractionReporter @Inject constructor(
 
         if (!hasDateElapsed(DIFF_DATE_WAU, lastPixelMs, nowMs)) return
 
+        delayToReduceSessioning()
         pirPixelSender.reportInteractionWAU()
         pirRepository.setLastPirInteractionWauPixelTimeMs(nowMs)
     }
@@ -76,8 +80,16 @@ class RealPirInteractionReporter @Inject constructor(
 
         if (!hasDateElapsed(DIFF_DATE_MAU, lastPixelMs, nowMs)) return
 
+        delayToReduceSessioning()
         pirPixelSender.reportInteractionMAU()
         pirRepository.setLastPirInteractionMauPixelTimeMs(nowMs)
+    }
+
+    /**
+     * Waits a random 0.5–5s before firing each interaction pixel.
+     */
+    private suspend fun delayToReduceSessioning() {
+        delay(Random.nextLong(MIN_INTER_PIXEL_DELAY_MS, MAX_INTER_PIXEL_DELAY_MS))
     }
 
     private fun hasDateElapsed(
@@ -96,5 +108,8 @@ class RealPirInteractionReporter @Inject constructor(
         private const val DIFF_DATE_DAU = 1L
         private const val DIFF_DATE_WAU = 7L
         private const val DIFF_DATE_MAU = 28L
+
+        private const val MIN_INTER_PIXEL_DELAY_MS = 500L
+        private const val MAX_INTER_PIXEL_DELAY_MS = 5_000L
     }
 }

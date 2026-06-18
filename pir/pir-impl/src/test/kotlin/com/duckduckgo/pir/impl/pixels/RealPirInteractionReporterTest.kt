@@ -58,7 +58,7 @@ class RealPirInteractionReporterTest {
     private val twentyEightDaysLaterMs = baseDate.plusDays(28).atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
 
     @Test
-    fun whenNoLastPixelForAnyThenFiresAllPixels() = runTest {
+    fun whenNoLastPixelForAnyThenFiresAllPixels() = coroutineRule.testScope.runTest {
         whenever(mockPirRepository.getLastPirInteractionDauPixelTimeMs()).thenReturn(0L)
         whenever(mockPirRepository.getLastPirInteractionWauPixelTimeMs()).thenReturn(0L)
         whenever(mockPirRepository.getLastPirInteractionMauPixelTimeMs()).thenReturn(0L)
@@ -75,7 +75,7 @@ class RealPirInteractionReporterTest {
     }
 
     @Test
-    fun whenOneDayPassedThenFiresDauPixelOnly() = runTest {
+    fun whenOneDayPassedThenFiresDauPixelOnly() = coroutineRule.testScope.runTest {
         whenever(mockPirRepository.getLastPirInteractionDauPixelTimeMs()).thenReturn(baseDateMs)
         whenever(mockPirRepository.getLastPirInteractionWauPixelTimeMs()).thenReturn(baseDateMs)
         whenever(mockPirRepository.getLastPirInteractionMauPixelTimeMs()).thenReturn(baseDateMs)
@@ -91,7 +91,7 @@ class RealPirInteractionReporterTest {
     }
 
     @Test
-    fun whenSameDayThenDoesNotFireAnyPixel() = runTest {
+    fun whenSameDayThenDoesNotFireAnyPixel() = coroutineRule.testScope.runTest {
         whenever(mockPirRepository.getLastPirInteractionDauPixelTimeMs()).thenReturn(baseDateMs)
         whenever(mockPirRepository.getLastPirInteractionWauPixelTimeMs()).thenReturn(baseDateMs)
         whenever(mockPirRepository.getLastPirInteractionMauPixelTimeMs()).thenReturn(baseDateMs)
@@ -106,7 +106,7 @@ class RealPirInteractionReporterTest {
     }
 
     @Test
-    fun whenSevenDaysPassedThenFiresWauPixel() = runTest {
+    fun whenSevenDaysPassedThenFiresWauPixel() = coroutineRule.testScope.runTest {
         whenever(mockPirRepository.getLastPirInteractionDauPixelTimeMs()).thenReturn(sevenDaysLaterMs) // Emitted already
         whenever(mockPirRepository.getLastPirInteractionWauPixelTimeMs()).thenReturn(baseDateMs)
         whenever(mockPirRepository.getLastPirInteractionMauPixelTimeMs()).thenReturn(baseDateMs)
@@ -122,7 +122,7 @@ class RealPirInteractionReporterTest {
     }
 
     @Test
-    fun whenTwentyEightDaysPassedThenFiresMauPixel() = runTest {
+    fun whenTwentyEightDaysPassedThenFiresMauPixel() = coroutineRule.testScope.runTest {
         whenever(mockPirRepository.getLastPirInteractionDauPixelTimeMs()).thenReturn(twentyEightDaysLaterMs) // Emitted already
         whenever(mockPirRepository.getLastPirInteractionWauPixelTimeMs()).thenReturn(twentyEightDaysLaterMs) // Emitted already
         whenever(mockPirRepository.getLastPirInteractionMauPixelTimeMs()).thenReturn(baseDateMs)
@@ -138,7 +138,7 @@ class RealPirInteractionReporterTest {
     }
 
     @Test
-    fun whenAllPixelsEligibleThenFiresAllPixels() = runTest {
+    fun whenAllPixelsEligibleThenFiresAllPixels() = coroutineRule.testScope.runTest {
         whenever(mockPirRepository.getLastPirInteractionDauPixelTimeMs()).thenReturn(baseDateMs)
         whenever(mockPirRepository.getLastPirInteractionWauPixelTimeMs()).thenReturn(baseDateMs)
         whenever(mockPirRepository.getLastPirInteractionMauPixelTimeMs()).thenReturn(baseDateMs)
@@ -152,7 +152,7 @@ class RealPirInteractionReporterTest {
     }
 
     @Test
-    fun whenLastPixelInFutureThenDoesNotFirePixels() = runTest {
+    fun whenLastPixelInFutureThenDoesNotFirePixels() = coroutineRule.testScope.runTest {
         val futureDateMs = baseDate.plusDays(1).atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
         whenever(mockPirRepository.getLastPirInteractionDauPixelTimeMs()).thenReturn(futureDateMs)
         whenever(mockPirRepository.getLastPirInteractionWauPixelTimeMs()).thenReturn(futureDateMs)
@@ -162,5 +162,23 @@ class RealPirInteractionReporterTest {
         testee.attemptFirePixel()
 
         verifyNoInteractions(mockPirPixelSender)
+    }
+
+    @Test
+    fun whenPixelsFireThenEachIsPrecededByAntiSessioningDelay() = coroutineRule.testScope.runTest {
+        whenever(mockPirRepository.getLastPirInteractionDauPixelTimeMs()).thenReturn(0L)
+        whenever(mockPirRepository.getLastPirInteractionWauPixelTimeMs()).thenReturn(0L)
+        whenever(mockPirRepository.getLastPirInteractionMauPixelTimeMs()).thenReturn(0L)
+        whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(baseDateMs)
+
+        val startVirtualTime = testScheduler.currentTime
+        testee.attemptFirePixel()
+        val elapsed = testScheduler.currentTime - startVirtualTime
+
+        // All three pixels fire, each preceded by a jitter delay of at least the 500ms minimum.
+        verify(mockPirPixelSender).reportInteractionDAU()
+        verify(mockPirPixelSender).reportInteractionWAU()
+        verify(mockPirPixelSender).reportInteractionMAU()
+        assert(elapsed >= 3 * 500L)
     }
 }
