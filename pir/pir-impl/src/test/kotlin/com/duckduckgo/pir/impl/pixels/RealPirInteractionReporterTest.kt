@@ -19,12 +19,14 @@ package com.duckduckgo.pir.impl.pixels
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.pir.impl.store.PirRepository
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.verifyNoMoreInteractions
@@ -180,5 +182,27 @@ class RealPirInteractionReporterTest {
         verify(mockPirPixelSender).reportInteractionWAU()
         verify(mockPirPixelSender).reportInteractionMAU()
         assert(elapsed >= 3 * 500L)
+    }
+
+    @Test
+    fun whenTwoOverlappingAttemptsThenDauPixelFiresOnce() = coroutineRule.testScope.runTest {
+        // Stateful DAU timestamp so the re-check after the jitter delay reflects the first fire.
+        var dauStored = 0L
+        whenever(mockPirRepository.getLastPirInteractionDauPixelTimeMs()).thenAnswer { dauStored }
+        whenever(mockPirRepository.setLastPirInteractionDauPixelTimeMs(any())).thenAnswer { invocation ->
+            dauStored = invocation.getArgument(0)
+            Unit
+        }
+        // Keep WAU/MAU ineligible so the test focuses on the DAU dedup race.
+        whenever(mockPirRepository.getLastPirInteractionWauPixelTimeMs()).thenReturn(baseDateMs)
+        whenever(mockPirRepository.getLastPirInteractionMauPixelTimeMs()).thenReturn(baseDateMs)
+        whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(baseDateMs)
+
+        val first = launch { testee.attemptFirePixel() }
+        val second = launch { testee.attemptFirePixel() }
+        first.join()
+        second.join()
+
+        verify(mockPirPixelSender, times(1)).reportInteractionDAU()
     }
 }

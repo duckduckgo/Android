@@ -21,7 +21,10 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.pir.impl.store.PirRepository
 import com.squareup.anvil.annotations.ContributesBinding
+import dagger.SingleInstanceIn
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import java.time.Instant
 import java.time.ZoneId
@@ -39,6 +42,7 @@ interface PirInteractionReporter {
     suspend fun attemptFirePixel()
 }
 
+@SingleInstanceIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class RealPirInteractionReporter @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
@@ -46,6 +50,9 @@ class RealPirInteractionReporter @Inject constructor(
     private val currentTimeProvider: CurrentTimeProvider,
     private val pirPixelSender: PirPixelSender,
 ) : PirInteractionReporter {
+
+    private val mutex = Mutex()
+
     override suspend fun attemptFirePixel() {
         withContext(dispatcherProvider.io()) {
             val nowMs = currentTimeProvider.currentTimeMillis()
@@ -56,33 +63,39 @@ class RealPirInteractionReporter @Inject constructor(
     }
 
     private suspend fun attemptToFireDauPixel(nowMs: Long) {
-        val lastPixelMs = pirRepository.getLastPirInteractionDauPixelTimeMs()
-
-        if (!hasDateElapsed(DIFF_DATE_DAU, lastPixelMs, nowMs)) return
+        if (!hasDateElapsed(DIFF_DATE_DAU, pirRepository.getLastPirInteractionDauPixelTimeMs(), nowMs)) return
 
         delayToReduceSessioning()
-        pirPixelSender.reportInteractionDAU()
-        pirRepository.setLastPirInteractionDauPixelTimeMs(nowMs)
+
+        mutex.withLock {
+            if (!hasDateElapsed(DIFF_DATE_DAU, pirRepository.getLastPirInteractionDauPixelTimeMs(), nowMs)) return@withLock
+            pirPixelSender.reportInteractionDAU()
+            pirRepository.setLastPirInteractionDauPixelTimeMs(nowMs)
+        }
     }
 
     private suspend fun attemptToFireWauPixel(nowMs: Long) {
-        val lastPixelMs = pirRepository.getLastPirInteractionWauPixelTimeMs()
-
-        if (!hasDateElapsed(DIFF_DATE_WAU, lastPixelMs, nowMs)) return
+        if (!hasDateElapsed(DIFF_DATE_WAU, pirRepository.getLastPirInteractionWauPixelTimeMs(), nowMs)) return
 
         delayToReduceSessioning()
-        pirPixelSender.reportInteractionWAU()
-        pirRepository.setLastPirInteractionWauPixelTimeMs(nowMs)
+
+        mutex.withLock {
+            if (!hasDateElapsed(DIFF_DATE_WAU, pirRepository.getLastPirInteractionWauPixelTimeMs(), nowMs)) return@withLock
+            pirPixelSender.reportInteractionWAU()
+            pirRepository.setLastPirInteractionWauPixelTimeMs(nowMs)
+        }
     }
 
     private suspend fun attemptToFireMauPixel(nowMs: Long) {
-        val lastPixelMs = pirRepository.getLastPirInteractionMauPixelTimeMs()
-
-        if (!hasDateElapsed(DIFF_DATE_MAU, lastPixelMs, nowMs)) return
+        if (!hasDateElapsed(DIFF_DATE_MAU, pirRepository.getLastPirInteractionMauPixelTimeMs(), nowMs)) return
 
         delayToReduceSessioning()
-        pirPixelSender.reportInteractionMAU()
-        pirRepository.setLastPirInteractionMauPixelTimeMs(nowMs)
+
+        mutex.withLock {
+            if (!hasDateElapsed(DIFF_DATE_MAU, pirRepository.getLastPirInteractionMauPixelTimeMs(), nowMs)) return@withLock
+            pirPixelSender.reportInteractionMAU()
+            pirRepository.setLastPirInteractionMauPixelTimeMs(nowMs)
+        }
     }
 
     /**
