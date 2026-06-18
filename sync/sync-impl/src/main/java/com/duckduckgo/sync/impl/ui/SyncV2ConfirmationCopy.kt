@@ -21,8 +21,6 @@ import androidx.annotation.StringRes
 import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.pixels.SyncPixels.PeerKind
 
-// A 3party peer can access Duck.ai chats only; a ddg peer (or unknown kind — the safe default,
-// so we never under-state access) the full synced set. Role-agnostic: joiner and host share it.
 @StringRes
 internal fun syncV2ConfirmationMessageRes(
     unknownPeer: Boolean,

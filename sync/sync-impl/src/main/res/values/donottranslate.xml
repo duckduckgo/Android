@@ -24,7 +24,7 @@
     <string name="sync_v2_host_confirmation_positive">Allow</string>
     <string name="sync_v2_host_confirmation_negative">Cancel</string>
 
-    <!-- v2 consent-dialog data-access copy (kind-specific; shared by joiner & host). English-only. -->
+    <!-- v2 consent-dialog data-access copy (kind-specific; shared by joiner & host) -->
     <string name="sync_v2_confirmation_message_ddg" instruction="Placeholder is a peer device name, e.g. Samsung S23.">\"%1$s\" will be able to access your synced DuckDuckGo passwords, autofill data, and Duck.ai chats.</string>
     <string name="sync_v2_confirmation_message_3p" instruction="Placeholder is a peer device name, e.g. Samsung S23.">\"%1$s\" will be able to access your synced Duck.ai chats.</string>
     <string name="sync_v2_confirmation_message_unknown_peer_ddg">The other device will be able to access your synced DuckDuckGo passwords, autofill data, and Duck.ai chats.</string>
