@@ -18,9 +18,9 @@
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
     <string name="ad_blocking_settings_title">Blokering af YouTube-annoncer</string>
-    <string name="ad_blocking_settings_toggle_title">Bloker annoncer på YouTube</string>
-    <string name="ad_blocking_settings_description_with_consent">DuckDuckGo blokerer videoannoncer på YouTube, så du kan se videoer uden afbrydelser.\n\nNår funktionen er aktiveret, registrerer DuckDuckGo anonymt forstyrrelser fra annonceblokkere eller fejl på YouTube for at forbedre oplevelsen for alle. DuckDuckGo ser aldrig, hvilke videoer du ser, eller andre personligt identificerbare oplysninger. <annotation type="learn_more_link">Mere info</annotation></string>
-    <string name="ad_blocking_settings_description">DuckDuckGo blokerer videoannoncer på YouTube, så du kan se videoer uden afbrydelser. <annotation type="learn_more_link">Mere info</annotation></string>
+    <string name="ad_blocking_settings_toggle_title">Blokér annoncer på YouTube</string>
+    <string name="ad_blocking_settings_description_with_consent">DuckDuckGo blokerer videoannoncer på YouTube, så du kan se videoer uden afbrydelser. \n\nNår funktionen er aktiveret, registrerer DuckDuckGo anonymt forstyrrelser fra annonceblokkere eller fejl på YouTube for at forbedre oplevelsen for alle. DuckDuckGo ser aldrig, hvilke videoer du ser, eller andre personligt identificerbare oplysninger. <annotation type="learn_more_link">Læs mere</annotation></string>
+    <string name="ad_blocking_settings_description">DuckDuckGo blokerer videoannoncer på YouTube, så du kan se videoer uden afbrydelser. <annotation type="learn_more_link">Læs mere</annotation></string>
     <string name="ad_blocking_settings_duck_player_header">Duck Player</string>
-    <string name="ad_blocking_settings_duck_player_description">Åbner videoer i biograftilstand, så det, du ser, ikke påvirker dit YouTube-feed.</string>
+    <string name="ad_blocking_settings_duck_player_description">Åbner videoer i en distraktionsfri biograftilstand, der forhindrer, at det, du ser, påvirker dit YouTube-feed.</string>
 </resources>
