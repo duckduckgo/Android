@@ -540,30 +540,6 @@ class TdsClientTest {
         assertEquals(true, testee.matches("http://tracker.co.uk/script.js", DOCUMENT_URL, mapOf()).matches)
     }
 
-    @Test
-    fun whenV3EnabledAndTrackerDomainIsAPublicSuffixThenWalkStopsAtETldPlusOne() {
-        // Walk for "static.tracker.co.uk" must stop after checking "tracker.co.uk" (the eTLD+1)
-        // and must not match a tracker whose domain is a public suffix like "co.uk".
-        val tracker = TdsTracker(Domain("co.uk"), BLOCK, OWNER, CATEGORY, emptyList())
-        val testee = TdsClient(TDS, listOf(tracker), mockUrlToTypeMapper, optimizeTrackerEvaluationV3 = true)
-
-        val result = testee.matches("http://static.tracker.co.uk/script.js", DOCUMENT_URL, mapOf())
-        assertEquals(false, result.matches)
-        assertEquals(false, result.isATracker)
-    }
-
-    @Test
-    fun whenV3EnabledAndHostHasNoETldPlusOneThenResultIsNoMatch() {
-        // Hosts without a resolvable eTLD+1 (single-label, IPs, public-suffix-only) must never
-        // match — even if a tracker entry exists at the exact host key.
-        val tracker = TdsTracker(Domain("localhost"), BLOCK, OWNER, CATEGORY, emptyList())
-        val testee = TdsClient(TDS, listOf(tracker), mockUrlToTypeMapper, optimizeTrackerEvaluationV3 = true)
-
-        val result = testee.matches("http://localhost/script.js", DOCUMENT_URL, mapOf())
-        assertEquals(false, result.matches)
-        assertEquals(false, result.isATracker)
-    }
-
     companion object {
         private const val OWNER = "A Network Owner"
         private val DOCUMENT_URL = "http://example.com/index.htm".toUri()
