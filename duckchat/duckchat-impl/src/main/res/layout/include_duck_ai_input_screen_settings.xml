@@ -20,6 +20,19 @@
     android:layout_height="wrap_content"
     android:orientation="vertical">
 
+    <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+        android:visibility="gone"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/duckAiSectionTopDivider"/>
+
+    <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
+        android:id="@+id/duckAiSectionHeader"
+        android:visibility="gone"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:primaryText="@string/duckAiDuckAiSectionHeader" />
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/duckAiInputScreenToggleContainer"
         android:layout_width="match_parent"

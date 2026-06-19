@@ -83,4 +83,7 @@
     <!-- In-context onboarding. -->
     <string name="duckAiEndCtaDescriptionCustomAi"><![CDATA[Start a private AI chat with Duck.ai or toggle to Search for protected browsing.<br/><br/>You can use Duck.ai from anywhere you see the chat icon]]></string>
 
+    <!-- Duck AI Duck.ai Section Header -->
+    <string name="duckAiDuckAiSectionHeader">Duck.ai</string>
+
 </resources>

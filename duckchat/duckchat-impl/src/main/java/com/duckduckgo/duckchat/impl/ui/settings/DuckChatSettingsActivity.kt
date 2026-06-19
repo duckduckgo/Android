@@ -170,6 +170,12 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
             moveInputScreenSettingsToEnd()
         }
 
+        // The Duck.ai section header and its top divider are only shown when the block lives at the end of the
+        // layout (native controls enabled) and Duck.ai is enabled by the user.
+        val showDuckAiSectionHeader = viewState.isNativeControlsEnabled && viewState.isDuckChatUserEnabled
+        inputScreenSettingsBinding.duckAiSectionTopDivider.isVisible = showDuckAiSectionHeader
+        inputScreenSettingsBinding.duckAiSectionHeader.isVisible = showDuckAiSectionHeader
+
         binding.userEnabledDuckChatToggle.quietlySetIsChecked(viewState.isDuckChatUserEnabled, userEnabledDuckChatToggleListener)
 
         inputScreenSettingsBinding.duckAIAutomaticContext.isVisible = viewState.isAutomaticContextVisible
@@ -293,6 +299,12 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
                 searchSettingsSectionHeader.isGone = true
                 showDuckChatSearchSettingsLink.isGone = true
                 duckAiHideAiGeneratedImagesLink.isGone = true
+            }
+
+            // When native controls are enabled the block (with its own Duck.ai header) moves to the end,
+            // so the search-settings section header is redundant and should be hidden.
+            if (viewState.isNativeControlsEnabled) {
+                searchSettingsSectionHeader.isGone = true
             }
         }
     }
