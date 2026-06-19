@@ -1071,6 +1071,12 @@
     <string name="onboardingSearchDaxDialogOption1Quoted" instruction="translate &apos;duck&apos; too.">jak się mówi „duck” po angielsku</string>
     <string name="onboardingSearchDaxDialogOption1EnglishQuoted" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">jak się mówi \"duck\" po hiszpańsku</string>
 
+    <string name="onboardingDuckAiFireButtonDaxDialogTitle">To jest Duck.ai!</string>
+    <string name="onboardingDuckAiFireButtonDaxDialogDescription"><![CDATA[Prywatne czaty AI, które możesz usunąć w dowolnym momencie za pomocą <b>Fire Button</b>. Spróbuj! 🔥]]></string>
+    <string name="onboardingDuckAiEndCtaTitle">Udało się!</string>
+    <string name="onboardingDuckAiEndCtaDescription"><![CDATA[Używaj paska adresu, aby wyszukiwać i odwiedzać witryny lub przełącz się na Duck.ai, aby prowadzić prywatny czat AI.<br/><br/>Możesz korzystać z Duck.ai z dowolnego miejsca, w którym widzisz ikonę czatu]]></string>
+    <string name="onboardingDuckAiEndCtaButton">Piątka!</string>
+
     <string name="input_screen_user_pref_without_ai_updated">Tylko wyszukiwanie</string>
     <string name="input_screen_user_pref_with_ai_updated">Przełącz między\nwyszukiwaniem a Duck.ai</string>
 
