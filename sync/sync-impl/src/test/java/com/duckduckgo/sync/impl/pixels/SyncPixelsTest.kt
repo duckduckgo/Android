@@ -20,9 +20,22 @@ import android.content.SharedPreferences
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.test.api.InMemorySharedPreferences
 import com.duckduckgo.common.utils.formatters.time.DatabaseDateFormatter
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.sync.api.engine.SyncableType
 import com.duckduckgo.sync.impl.API_CODE
+import com.duckduckgo.sync.impl.AccountErrorCodes
+import com.duckduckgo.sync.impl.DispatchOutcome
 import com.duckduckgo.sync.impl.Result.Error
+import com.duckduckgo.sync.impl.SyncCodeType
+import com.duckduckgo.sync.impl.SyncFeature
+import com.duckduckgo.sync.impl.pixels.SyncPixels.CancellationReason
+import com.duckduckgo.sync.impl.pixels.SyncPixels.CodeVersion
+import com.duckduckgo.sync.impl.pixels.SyncPixels.PeerKind
+import com.duckduckgo.sync.impl.pixels.SyncPixels.ScreenType
+import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupFailureReason
+import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupPath
+import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupRole
 import com.duckduckgo.sync.impl.stats.DailyStats
 import com.duckduckgo.sync.impl.stats.SyncStatsRepository
 import com.duckduckgo.sync.store.SharedPrefsProvider
@@ -40,6 +53,7 @@ class RealSyncPixelsTest {
     private var pixel: Pixel = mock()
     private var syncStatsRepository: SyncStatsRepository = mock()
     private var sharedPrefsProv: SharedPrefsProvider = mock()
+    private val syncFeature = FakeFeatureToggleFactory.create(SyncFeature::class.java)
 
     private lateinit var sharedPreferences: SharedPreferences
     private lateinit var testee: RealSyncPixels
@@ -55,6 +69,7 @@ class RealSyncPixelsTest {
             pixel,
             syncStatsRepository,
             sharedPrefsProv,
+            syncFeature,
         )
     }
 
@@ -118,6 +133,385 @@ class RealSyncPixelsTest {
     fun whenSignupConnectPixelCalledWithSourceThenPixelFiredIncludesSource() {
         testee.fireSignupConnectPixel(source = "foo")
         verify(pixel).fire(SyncPixelName.SYNC_SIGNUP_CONNECT, mapOf("source" to "foo"))
+    }
+
+    @Test
+    fun whenBarcodeScreenShownAndV2FlowEnabledThenPixelFiredWithV2AndDdg() {
+        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
+
+        testee.fireSyncBarcodeScreenShown(ScreenType.SYNC_CONNECT)
+
+        verify(pixel).fire(
+            SyncPixelName.SYNC_SETUP_BARCODE_SCREEN_SHOWN,
+            mapOf(
+                SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to "connect",
+                SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to "v2",
+                SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
+            ),
+        )
+    }
+
+    @Test
+    fun whenBarcodeScreenShownAndV2FlowDisabledThenPixelFiredWithV1AndDdg() {
+        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(false))
+
+        testee.fireSyncBarcodeScreenShown(ScreenType.SYNC_EXCHANGE)
+
+        verify(pixel).fire(
+            SyncPixelName.SYNC_SETUP_BARCODE_SCREEN_SHOWN,
+            mapOf(
+                SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to "exchange",
+                SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to "v1",
+                SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
+            ),
+        )
+    }
+
+    @Test
+    fun whenManualCodeEntryScreenShownAndV2FlowEnabledThenPixelFiredWithV2AndDdg() {
+        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
+
+        testee.fireSyncSetupManualCodeScreenShown(ScreenType.SYNC_EXCHANGE)
+
+        verify(pixel).fire(
+            SyncPixelName.SYNC_SETUP_MANUAL_CODE_ENTRY_SCREEN_SHOWN,
+            mapOf(
+                SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to "exchange",
+                SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to "v2",
+                SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
+            ),
+        )
+    }
+
+    @Test
+    fun whenManualCodeEntryScreenShownAndV2FlowDisabledThenPixelFiredWithV1AndDdg() {
+        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(false))
+
+        testee.fireSyncSetupManualCodeScreenShown(ScreenType.SYNC_CONNECT)
+
+        verify(pixel).fire(
+            SyncPixelName.SYNC_SETUP_MANUAL_CODE_ENTRY_SCREEN_SHOWN,
+            mapOf(
+                SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to "connect",
+                SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to "v1",
+                SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
+            ),
+        )
+    }
+
+    @Test
+    fun whenBarcodeScannerParseSuccessOnLegacyPathThenPixelFiredWithV1AndNoCodeType() {
+        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(false))
+
+        testee.fireBarcodeScannerParseSuccess(ScreenType.SYNC_CONNECT, CodeVersion.V1)
+
+        verify(pixel).fire(
+            SyncPixelName.SYNC_SETUP_BARCODE_SCANNER_SUCCESS,
+            mapOf(
+                SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to "connect",
+                SyncPixelParameters.SYNC_SETUP_CODE_VERSION to "v1",
+                SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to "v1",
+                SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
+            ),
+        )
+    }
+
+    @Test
+    fun whenBarcodeScannerParseSuccessForV2RecoveryCodeThenPixelFiredWithCodeMetadata() {
+        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
+
+        testee.fireBarcodeScannerParseSuccess(ScreenType.SYNC_EXCHANGE, CodeVersion.V2, SyncCodeType.RECOVERY)
+
+        verify(pixel).fire(
+            SyncPixelName.SYNC_SETUP_BARCODE_SCANNER_SUCCESS,
+            mapOf(
+                SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to "exchange",
+                SyncPixelParameters.SYNC_SETUP_CODE_VERSION to "v2",
+                SyncPixelParameters.SYNC_SETUP_CODE_TYPE to "recovery",
+                SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to "v2",
+                SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
+            ),
+        )
+    }
+
+    @Test
+    fun whenManualCodeEnteredSuccessForV2LinkingCodeThenPixelFiredWithCodeMetadata() {
+        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
+
+        testee.fireSyncSetupCodePastedParseSuccess(ScreenType.SYNC_CONNECT, CodeVersion.V2, SyncCodeType.LINKING)
+
+        verify(pixel).fire(
+            SyncPixelName.SYNC_SETUP_MANUAL_CODE_ENTERED_SUCCESS,
+            mapOf(
+                SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to "connect",
+                SyncPixelParameters.SYNC_SETUP_CODE_VERSION to "v2",
+                SyncPixelParameters.SYNC_SETUP_CODE_TYPE to "linking",
+                SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to "v2",
+                SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
+            ),
+        )
+    }
+
+    @Test
+    fun whenManualCodeEnteredSuccessOnLegacyPathThenPixelFiredWithV1AndNoCodeType() {
+        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(false))
+
+        testee.fireSyncSetupCodePastedParseSuccess(ScreenType.SYNC_EXCHANGE, CodeVersion.V1)
+
+        verify(pixel).fire(
+            SyncPixelName.SYNC_SETUP_MANUAL_CODE_ENTERED_SUCCESS,
+            mapOf(
+                SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to "exchange",
+                SyncPixelParameters.SYNC_SETUP_CODE_VERSION to "v1",
+                SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to "v1",
+                SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
+            ),
+        )
+    }
+
+    @Test
+    fun whenBarcodeScannerParseErrorThenPixelFiredWithFlowMetadata() {
+        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(false))
+
+        testee.fireBarcodeScannerParseError(ScreenType.SYNC_CONNECT)
+
+        verify(pixel).fire(
+            SyncPixelName.SYNC_SETUP_BARCODE_SCANNER_FAILED,
+            mapOf(
+                SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to "connect",
+                SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to "v1",
+                SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
+            ),
+        )
+    }
+
+    @Test
+    fun whenManualCodeEnteredFailureThenPixelFiredWithFlowMetadata() {
+        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
+
+        testee.fireSyncSetupCodePastedParseFailure(ScreenType.SYNC_EXCHANGE)
+
+        verify(pixel).fire(
+            SyncPixelName.SYNC_SETUP_MANUAL_CODE_ENTERED_FAILED,
+            mapOf(
+                SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to "exchange",
+                SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to "v2",
+                SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
+            ),
+        )
+    }
+
+    @Test
+    fun whenSetupFinishedV1ThenPixelFiredWithFlowMetadataOnly() {
+        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(false))
+
+        testee.fireSyncSetupFinishedSuccessfully(ScreenType.SYNC_CONNECT)
+
+        verify(pixel).fire(
+            SyncPixelName.SYNC_SETUP_ENDED_SUCCESS,
+            mapOf(
+                SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to "connect",
+                SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to "v1",
+                SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
+            ),
+        )
+    }
+
+    @Test
+    fun whenSetupFinishedV2RecoveryThenPixelFiredWithPathNoRoleOrPeer() {
+        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
+
+        testee.fireSyncSetupFinishedSuccessfully(ScreenType.SYNC_EXCHANGE, SetupPath.RECOVERY)
+
+        verify(pixel).fire(
+            SyncPixelName.SYNC_SETUP_ENDED_SUCCESS,
+            mapOf(
+                SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to "exchange",
+                SyncPixelParameters.SYNC_SETUP_PATH to "recovery",
+                SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to "v2",
+                SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
+            ),
+        )
+    }
+
+    @Test
+    fun whenSetupFinishedV2PairingThenPixelFiredWithPathRoleAndPeer() {
+        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
+
+        testee.fireSyncSetupFinishedSuccessfully(
+            ScreenType.SYNC_CONNECT,
+            SetupPath.PAIRING,
+            SetupRole.HOST,
+            PeerKind.THIRD_PARTY,
+        )
+
+        verify(pixel).fire(
+            SyncPixelName.SYNC_SETUP_ENDED_SUCCESS,
+            mapOf(
+                SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to "connect",
+                SyncPixelParameters.SYNC_SETUP_PATH to "pairing",
+                SyncPixelParameters.SYNC_SETUP_MY_ROLE to "host",
+                SyncPixelParameters.SYNC_SETUP_PEER_KIND to "3party",
+                SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to "v2",
+                SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
+            ),
+        )
+    }
+
+    @Test
+    fun whenSetupFailedWithAllDimsThenPixelFiredWithReasonPathRoleAndPeer() {
+        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
+
+        testee.fireSyncSetupFailed(
+            SetupFailureReason.TRANSPORT_FAILURE,
+            SetupPath.PAIRING,
+            SetupRole.JOINER,
+            PeerKind.DDG,
+        )
+
+        verify(pixel).fire(
+            SyncPixelName.SYNC_SETUP_ENDED_FAILED,
+            mapOf(
+                SyncPixelParameters.SYNC_SETUP_REASON to "transport_failure",
+                SyncPixelParameters.SYNC_SETUP_PATH to "pairing",
+                SyncPixelParameters.SYNC_SETUP_MY_ROLE to "joiner",
+                SyncPixelParameters.SYNC_SETUP_PEER_KIND to "ddg",
+                SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to "v2",
+                SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
+            ),
+        )
+    }
+
+    @Test
+    fun whenSetupFailedWithReasonOnlyThenOptionalDimsOmitted() {
+        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
+
+        testee.fireSyncSetupFailed(SetupFailureReason.UNEXPECTED_FAILURE)
+
+        verify(pixel).fire(
+            SyncPixelName.SYNC_SETUP_ENDED_FAILED,
+            mapOf(
+                SyncPixelParameters.SYNC_SETUP_REASON to "unexpected_failure",
+                SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to "v2",
+                SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
+            ),
+        )
+    }
+
+    @Test
+    fun whenFireSetupFailedForUpgradeRequiredThenNeedsUpgrade() {
+        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
+
+        testee.fireSetupFailed(DispatchOutcome.UpgradeRequired(codeMajor = 3, path = SetupPath.PAIRING, myRole = SetupRole.HOST))
+
+        verify(pixel).fire(
+            SyncPixelName.SYNC_SETUP_ENDED_FAILED,
+            mapOf(
+                SyncPixelParameters.SYNC_SETUP_REASON to "needs_upgrade",
+                SyncPixelParameters.SYNC_SETUP_PATH to "pairing",
+                SyncPixelParameters.SYNC_SETUP_MY_ROLE to "host",
+                SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to "v2",
+                SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
+            ),
+        )
+    }
+
+    @Test
+    fun whenFireSetupFailedForFailedOutcomeThenReasonMappedFromCode() {
+        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
+
+        testee.fireSetupFailed(
+            DispatchOutcome.Failed(
+                reason = "boom",
+                code = AccountErrorCodes.INVALID_CODE.code,
+                path = SetupPath.RECOVERY,
+            ),
+        )
+
+        verify(pixel).fire(
+            SyncPixelName.SYNC_SETUP_ENDED_FAILED,
+            mapOf(
+                SyncPixelParameters.SYNC_SETUP_REASON to "invalid_credentials",
+                SyncPixelParameters.SYNC_SETUP_PATH to "recovery",
+                SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to "v2",
+                SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
+            ),
+        )
+    }
+
+    @Test
+    fun whenFireSetupFailedForCancellationCodesThenPixelNotFired() {
+        testee.fireSetupFailed(DispatchOutcome.Failed(reason = "user", code = AccountErrorCodes.PAIRING_CANCELLED.code))
+        testee.fireSetupFailed(DispatchOutcome.Failed(reason = "peer", code = AccountErrorCodes.PAIRING_REJECTED.code))
+
+        verifyNoInteractions(pixel)
+    }
+
+    @Test
+    fun whenSetupAbandonedWithReasonThenPixelFiredWithReasonAndFlowMetadata() {
+        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
+
+        testee.fireSyncSetupAbandoned(ScreenType.SYNC_CONNECT, CancellationReason.CANCELLED_BEFORE_FINISHED)
+
+        verify(pixel).fire(
+            SyncPixelName.SYNC_SETUP_ENDED_ABANDONED,
+            mapOf(
+                SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to "connect",
+                SyncPixelParameters.SYNC_SETUP_REASON to "cancelled_before_finished",
+                SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to "v2",
+                SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
+            ),
+        )
+    }
+
+    @Test
+    fun whenSetupAbandonedWithoutReasonThenReasonOmitted() {
+        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(false))
+
+        testee.fireSyncSetupAbandoned(ScreenType.SYNC_EXCHANGE)
+
+        verify(pixel).fire(
+            SyncPixelName.SYNC_SETUP_ENDED_ABANDONED,
+            mapOf(
+                SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to "exchange",
+                SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to "v1",
+                SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
+            ),
+        )
+    }
+
+    @Test
+    fun whenFireSetupCancelledIfDeniedForPairingCancelledThenAbandonedFired() {
+        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
+
+        testee.fireSetupCancelledIfDenied(
+            DispatchOutcome.Failed(reason = "user_denied", code = AccountErrorCodes.PAIRING_CANCELLED.code),
+            ScreenType.SYNC_CONNECT,
+        )
+
+        verify(pixel).fire(
+            SyncPixelName.SYNC_SETUP_ENDED_ABANDONED,
+            mapOf(
+                SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to "connect",
+                SyncPixelParameters.SYNC_SETUP_REASON to "sync_confirmation_denied",
+                SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to "v2",
+                SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
+            ),
+        )
+    }
+
+    @Test
+    fun whenFireSetupCancelledIfDeniedForPeerRejectionOrOtherThenNotFired() {
+        testee.fireSetupCancelledIfDenied(
+            DispatchOutcome.Failed(reason = "peer", code = AccountErrorCodes.PAIRING_REJECTED.code),
+            ScreenType.SYNC_CONNECT,
+        )
+        testee.fireSetupCancelledIfDenied(
+            DispatchOutcome.Failed(reason = "boom", code = AccountErrorCodes.PAIRING_FAILED.code),
+            ScreenType.SYNC_CONNECT,
+        )
+
+        verifyNoInteractions(pixel)
     }
 
     @Test

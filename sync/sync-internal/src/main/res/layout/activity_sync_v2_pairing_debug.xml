@@ -71,13 +71,6 @@
                 app:primaryText="3party credential"
                 tools:secondaryText="Not created" />
 
-            <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
-                android:id="@+id/statusAiChatsKey"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:primaryText="ai_chats protected key"
-                tools:secondaryText="Not created" />
-
             <com.duckduckgo.common.ui.view.divider.HorizontalDivider
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />

@@ -63,6 +63,9 @@ import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2State
 import com.duckduckgo.sync.impl.exchange.v2.LocalTrigger
 import com.duckduckgo.sync.impl.exchange.v2.PairingRole
 import com.duckduckgo.sync.impl.pixels.SyncPixels
+import com.duckduckgo.sync.impl.pixels.SyncPixels.CancellationReason
+import com.duckduckgo.sync.impl.pixels.SyncPixels.CodeVersion
+import com.duckduckgo.sync.impl.pixels.SyncPixels.PeerKind
 import com.duckduckgo.sync.impl.pixels.SyncPixels.ScreenType.SYNC_EXCHANGE
 import com.duckduckgo.sync.impl.ui.SyncWithAnotherActivityViewModel.Command
 import com.duckduckgo.sync.impl.ui.SyncWithAnotherActivityViewModel.Command.AskHostConfirmation
@@ -83,6 +86,7 @@ import org.junit.runner.RunWith
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.eq
+import org.mockito.kotlin.isNull
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.times
@@ -263,9 +267,9 @@ class SyncWithAnotherDeviceViewModelTest {
             testee.onQRCodeScanned(jsonRecoveryKeyEncoded)
             val command = awaitItem()
             assertTrue(command is Command.ShowError)
-            verify(syncPixels).fireBarcodeScannerParseSuccess(eq(SyncPixels.ScreenType.SYNC_EXCHANGE))
+            verify(syncPixels).fireBarcodeScannerParseSuccess(eq(SyncPixels.ScreenType.SYNC_EXCHANGE), eq(CodeVersion.V1), isNull())
             verify(syncPixels, never()).fireLoginPixel()
-            verify(syncPixels, never()).fireSyncSetupFinishedSuccessfully(any())
+            verify(syncPixels, never()).fireSyncSetupFinishedSuccessfully(any(), anyOrNull(), anyOrNull(), anyOrNull())
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -281,9 +285,9 @@ class SyncWithAnotherDeviceViewModelTest {
             testee.onQRCodeScanned(jsonRecoveryKeyEncoded)
             val command = awaitItem()
             assertTrue(command is Command.ShowError)
-            verify(syncPixels).fireBarcodeScannerParseSuccess(eq(SyncPixels.ScreenType.SYNC_EXCHANGE))
+            verify(syncPixels).fireBarcodeScannerParseSuccess(eq(SyncPixels.ScreenType.SYNC_EXCHANGE), eq(CodeVersion.V1), isNull())
             verify(syncPixels, never()).fireLoginPixel()
-            verify(syncPixels, never()).fireSyncSetupFinishedSuccessfully(any())
+            verify(syncPixels, never()).fireSyncSetupFinishedSuccessfully(any(), anyOrNull(), anyOrNull(), anyOrNull())
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -297,9 +301,9 @@ class SyncWithAnotherDeviceViewModelTest {
             testee.onQRCodeScanned(jsonRecoveryKeyEncoded)
             val command = awaitItem()
             assertTrue(command is Command.AskToSwitchAccount)
-            verify(syncPixels).fireBarcodeScannerParseSuccess(eq(SyncPixels.ScreenType.SYNC_EXCHANGE))
+            verify(syncPixels).fireBarcodeScannerParseSuccess(eq(SyncPixels.ScreenType.SYNC_EXCHANGE), eq(CodeVersion.V1), isNull())
             verify(syncPixels, never()).fireLoginPixel()
-            verify(syncPixels, never()).fireSyncSetupFinishedSuccessfully(any())
+            verify(syncPixels, never()).fireSyncSetupFinishedSuccessfully(any(), anyOrNull(), anyOrNull(), anyOrNull())
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -314,9 +318,9 @@ class SyncWithAnotherDeviceViewModelTest {
             testee.onQRCodeScanned(jsonRecoveryKeyEncoded)
             val command = awaitItem()
             assertTrue(command is Command.AskToSwitchAccount)
-            verify(syncPixels).fireBarcodeScannerParseSuccess(eq(SyncPixels.ScreenType.SYNC_EXCHANGE))
+            verify(syncPixels).fireBarcodeScannerParseSuccess(eq(SyncPixels.ScreenType.SYNC_EXCHANGE), eq(CodeVersion.V1), isNull())
             verify(syncPixels, never()).fireLoginPixel()
-            verify(syncPixels, never()).fireSyncSetupFinishedSuccessfully(any())
+            verify(syncPixels, never()).fireSyncSetupFinishedSuccessfully(any(), anyOrNull(), anyOrNull(), anyOrNull())
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -431,9 +435,9 @@ class SyncWithAnotherDeviceViewModelTest {
             testee.onQRCodeScanned(jsonRecoveryKeyEncoded)
             val command = awaitItem()
             assertTrue(command is Command.ShowError)
-            verify(syncPixels).fireBarcodeScannerParseSuccess(eq(SyncPixels.ScreenType.SYNC_EXCHANGE))
+            verify(syncPixels).fireBarcodeScannerParseSuccess(eq(SyncPixels.ScreenType.SYNC_EXCHANGE), eq(CodeVersion.V1), isNull())
             verify(syncPixels, never()).fireLoginPixel()
-            verify(syncPixels, never()).fireSyncSetupFinishedSuccessfully(any())
+            verify(syncPixels, never()).fireSyncSetupFinishedSuccessfully(any(), anyOrNull(), anyOrNull(), anyOrNull())
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -441,7 +445,7 @@ class SyncWithAnotherDeviceViewModelTest {
     @Test
     fun whenUserCancelsThenAbandonedPixelFired() = runTest {
         testee.onUserCancelledWithoutSyncSetup()
-        verify(syncPixels).fireSyncSetupAbandoned(eq(SYNC_EXCHANGE))
+        verify(syncPixels).fireSyncSetupAbandoned(eq(SYNC_EXCHANGE), eq(CancellationReason.SCANNING_CANCELLED))
     }
 
     @Test
@@ -564,6 +568,7 @@ class SyncWithAnotherDeviceViewModelTest {
         enableV2(displayOn = true)
         whenever(syncRepository.getAccountInfo()).thenReturn(accountA)
         whenever(runner.peerName).thenReturn("Peer Phone")
+        whenever(runner.peerKind).thenReturn("3party")
         whenever(qrEncoder.encodeAsBitmap(any(), any(), any())).thenReturn(TestSyncFixtures.qrBitmap())
 
         testee.viewState().test {
@@ -580,6 +585,7 @@ class SyncWithAnotherDeviceViewModelTest {
             val command = awaitItem()
             assertTrue("expected AskHostConfirmation, got $command", command is AskHostConfirmation)
             Assert.assertEquals("Peer Phone", (command as AskHostConfirmation).peerName)
+            Assert.assertEquals(PeerKind.THIRD_PARTY, (command as AskHostConfirmation).peerKind)
             cancelAndIgnoreRemainingEvents()
         }
     }

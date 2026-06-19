@@ -32,12 +32,16 @@ import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2QrCode
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Runner
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2State
 import com.duckduckgo.sync.impl.exchange.v2.LocalTrigger
+import com.duckduckgo.sync.impl.pixels.SyncPixels.PeerKind
+import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupPath
+import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupRole
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.Moshi
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.transformWhile
 import logcat.logcat
@@ -83,6 +87,9 @@ class RealSyncCodeDispatcher @Inject constructor(
         logcat { "$TAG: V2 Presenter starting runner.startPresent (scoped to events since $sessionStartMs)" }
         runner.startPresent()
         var ownChannelId: String? = null
+        // Snapshot the peer kind while the session is live; the runner clears it on terminal teardown,
+        // so by the time we map the terminal event runner.peerKind is already null.
+        var peerKind: PeerKind? = null
         emitAll(
             runner.eventsSince(sessionStartMs)
                 .transformWhile { event ->
@@ -96,7 +103,9 @@ class RealSyncCodeDispatcher @Inject constructor(
                             return@transformWhile false
                         }
                     }
-                    val outcome = mapV2PresentEventToOutcome(event) ?: return@transformWhile true
+                    runner.peerKind.toPeerKind()?.let { peerKind = it }
+                    val outcome = (mapV2PresentEventToOutcome(event, peerKind) ?: return@transformWhile true)
+                        .withFailureContext(SetupPath.PAIRING, roleFromTerminalState(event), peerKind)
                     emit(outcome)
                     !outcome.isTerminal()
                 },
@@ -116,14 +125,14 @@ class RealSyncCodeDispatcher @Inject constructor(
      * or null for intermediate events the caller should ignore. Both Host and Joiner roles are
      * reachable here; mirrors [mapV2LinkingEventToOutcome] (login on Joiner.Done, preserve abort reason).
      */
-    private fun mapV2PresentEventToOutcome(event: ExchangeV2Event): DispatchOutcome? = when (event) {
+    private fun mapV2PresentEventToOutcome(event: ExchangeV2Event, peerKind: PeerKind?): DispatchOutcome? = when (event) {
         is ExchangeV2Event.SessionStarted -> event.linkingCode?.let { DispatchOutcome.LinkingCodeReady(it) }
         is ExchangeV2Event.Transition -> when (event.to) {
             ExchangeV2State.Joiner.Confirming ->
-                DispatchOutcome.JoinerConfirmationRequested(peerName = runner.peerName)
+                DispatchOutcome.JoinerConfirmationRequested(peerName = runner.peerName, peerKind = peerKind)
             ExchangeV2State.Host.Confirming ->
-                DispatchOutcome.HostConfirmationRequested(peerName = runner.peerName)
-            ExchangeV2State.Host.Done -> DispatchOutcome.LoggedIn
+                DispatchOutcome.HostConfirmationRequested(peerName = runner.peerName, peerKind = peerKind)
+            ExchangeV2State.Host.Done -> DispatchOutcome.LoggedIn(SetupPath.PAIRING, SetupRole.HOST, peerKind)
             ExchangeV2State.Host.Aborted -> hostAbortedToOutcome(event.localTrigger)
             ExchangeV2State.SameAccountAbort -> DispatchOutcome.AlreadyConnected
             ExchangeV2State.Joiner.Done -> {
@@ -131,7 +140,7 @@ class RealSyncCodeDispatcher @Inject constructor(
                 if (received.isNullOrBlank()) {
                     DispatchOutcome.Failed("Pairing completed without a recovery code", NO_RECOVERY_CODE.code)
                 } else {
-                    loginWithV2RecoveryCode(received)
+                    loginWithV2RecoveryCode(received, peerKind)
                 }
             }
             ExchangeV2State.Joiner.AbortedByHost -> when (event.trigger) {
@@ -147,6 +156,11 @@ class RealSyncCodeDispatcher @Inject constructor(
         }
         is ExchangeV2Event.SessionError -> sessionErrorToOutcome(event.message)
         else -> null
+    }
+
+    override fun isV2ExchangeUnderway(): Boolean = when (runner.currentState) {
+        null, ExchangeV2State.Bootstrapped -> false
+        else -> true
     }
 
     override fun route(pastedCode: String): RouteDecision {
@@ -165,12 +179,12 @@ class RealSyncCodeDispatcher @Inject constructor(
         return when (parsed) {
             is ExchangeV2CodeParseResult.LinkingV2 -> {
                 logcat { "$TAG: routing → V2 LinkingV2 (runner.startScan)" }
-                RouteDecision.V2InProgress(driveV2Linking(pastedCode))
+                RouteDecision.V2InProgress(SyncCodeType.LINKING, driveV2Linking(pastedCode))
             }
             is ExchangeV2CodeParseResult.RecoveryCode -> {
                 val cid = parsed.rawJson.optString("cid", "ddg")
                 logcat { "$TAG: routing → V2 RecoveryCode (cid=$cid)" }
-                RouteDecision.V2InProgress(driveV2Recovery(parsed, cid))
+                RouteDecision.V2InProgress(SyncCodeType.RECOVERY, driveV2Recovery(parsed, cid))
             }
             ExchangeV2CodeParseResult.LinkingV1,
             ExchangeV2CodeParseResult.Unknown,
@@ -210,6 +224,7 @@ class RealSyncCodeDispatcher @Inject constructor(
                 emit(
                     syncAccountRepository.processCode(authCode, existingDeviceId = null).toOutcome(
                         label = "v2 recovery (ddg)",
+                        path = SetupPath.RECOVERY,
                         codeForAccountSwitch = encodeV1RecoveryCodeAsB64(userId = userId, secret = primaryKey),
                     ),
                 )
@@ -233,14 +248,18 @@ class RealSyncCodeDispatcher @Inject constructor(
                     Base64.URL_SAFE or Base64.NO_PADDING or Base64.NO_WRAP,
                 )
                 logcat { "$TAG: v2 recovery (3party) → joinAccountFromThirdPartyRecoveryCode" }
-                emit(syncAccountRepository.joinAccountFromThirdPartyRecoveryCode(b64).toOutcome(label = "v2 recovery (3party)"))
+                emit(
+                    syncAccountRepository.joinAccountFromThirdPartyRecoveryCode(
+                        b64,
+                    ).toOutcome(label = "v2 recovery (3party)", path = SetupPath.RECOVERY),
+                )
             }
             else -> {
                 logcat { "$TAG: v2 recovery: unknown cid='$cid'" }
                 emit(DispatchOutcome.Failed("Unknown v2 credential type: $cid"))
             }
         }
-    }
+    }.map { it.withFailureContext(SetupPath.RECOVERY, myRole = null, peerKind = null) }
 
     /**
      * V2 LinkingV2 (`code2=…`) scanner side. Starts [ExchangeV2Runner.startScan] and maps its
@@ -253,6 +272,9 @@ class RealSyncCodeDispatcher @Inject constructor(
         logcat { "$TAG: V2 LinkingV2 starting runner.startScan (scoped to events since $sessionStartMs)" }
         runner.startScan(pastedCode)
         var ownChannelId: String? = null
+        // Snapshot the peer kind while the session is live (see presentV2): the runner clears it on
+        // terminal teardown, before we map the terminal event.
+        var peerKind: PeerKind? = null
         emitAll(
             runner.eventsSince(sessionStartMs)
                 .transformWhile { event ->
@@ -266,7 +288,9 @@ class RealSyncCodeDispatcher @Inject constructor(
                             return@transformWhile false
                         }
                     }
-                    val outcome = mapV2LinkingEventToOutcome(event) ?: return@transformWhile true
+                    runner.peerKind.toPeerKind()?.let { peerKind = it }
+                    val outcome = (mapV2LinkingEventToOutcome(event, peerKind) ?: return@transformWhile true)
+                        .withFailureContext(SetupPath.PAIRING, roleFromTerminalState(event), peerKind)
                     emit(outcome)
                     !outcome.isTerminal()
                 },
@@ -297,18 +321,18 @@ class RealSyncCodeDispatcher @Inject constructor(
      * Translate one runner event into a terminal [DispatchOutcome] for the v2 scanner flow,
      * or null for intermediate events the caller should ignore.
      */
-    private fun mapV2LinkingEventToOutcome(event: ExchangeV2Event): DispatchOutcome? = when (event) {
+    private fun mapV2LinkingEventToOutcome(event: ExchangeV2Event, peerKind: PeerKind?): DispatchOutcome? = when (event) {
         is ExchangeV2Event.Transition -> when (event.to) {
             ExchangeV2State.Joiner.Confirming ->
-                DispatchOutcome.JoinerConfirmationRequested(peerName = runner.peerName)
+                DispatchOutcome.JoinerConfirmationRequested(peerName = runner.peerName, peerKind = peerKind)
             ExchangeV2State.Host.Confirming ->
-                DispatchOutcome.HostConfirmationRequested(peerName = runner.peerName)
+                DispatchOutcome.HostConfirmationRequested(peerName = runner.peerName, peerKind = peerKind)
             ExchangeV2State.Joiner.Done -> {
                 val received = (event.trigger as? ExchangeV2Message.RecoveryCodeResponse)?.recoveryCode
                 if (received.isNullOrBlank()) {
                     DispatchOutcome.Failed("Pairing completed without a recovery code", NO_RECOVERY_CODE.code)
                 } else {
-                    loginWithV2RecoveryCode(received)
+                    loginWithV2RecoveryCode(received, peerKind)
                 }
             }
             ExchangeV2State.Joiner.AbortedByHost -> when (event.trigger) {
@@ -323,7 +347,7 @@ class RealSyncCodeDispatcher @Inject constructor(
             // Per spec §"Same-account case": not an abort; both devices share an account already.
             ExchangeV2State.SameAccountAbort -> DispatchOutcome.AlreadyConnected
             // Elected Host and shared a recovery code — success from this device's perspective.
-            ExchangeV2State.Host.Done -> DispatchOutcome.LoggedIn
+            ExchangeV2State.Host.Done -> DispatchOutcome.LoggedIn(SetupPath.PAIRING, SetupRole.HOST, peerKind)
             ExchangeV2State.Aborted -> DispatchOutcome.Failed("negotiation_aborted", NEGOTIATION_ABORTED.code)
             else -> null
         }
@@ -352,23 +376,32 @@ class RealSyncCodeDispatcher @Inject constructor(
      * cid=ddg logs in directly; cid=3party upgrades the account via
      * [SyncAccountRepository.joinAccountFromThirdPartyRecoveryCode].
      */
-    private fun loginWithV2RecoveryCode(b64: String): DispatchOutcome {
+    private fun loginWithV2RecoveryCode(b64: String, peerKind: PeerKind?): DispatchOutcome {
         val parsed = decodeV2Recovery(b64) ?: return DispatchOutcome.Failed("Couldn't parse received recovery code as v2.0")
         return when (parsed.cid) {
             CID_DDG -> {
                 val primaryKey = v2SecretToV1PrimaryKey(parsed.secret)
                     ?: return DispatchOutcome.Failed("Received recovery code has a malformed secret")
                 val recovery = SyncAuthCode.Recovery(RecoveryCode(primaryKey = primaryKey, userId = parsed.userId))
+                logcat { "$TAG: v2 LinkingV2 received ddg code → $recovery" }
                 syncAccountRepository.processCode(recovery, existingDeviceId = null)
                     .toOutcome(
                         label = "v2 LinkingV2 login (ddg)",
+                        path = SetupPath.PAIRING,
+                        myRole = SetupRole.JOINER,
+                        peerKind = peerKind,
                         codeForAccountSwitch = encodeV1RecoveryCodeAsB64(userId = parsed.userId, secret = primaryKey),
                     )
             }
             CID_3PARTY -> {
                 logcat { "$TAG: v2 LinkingV2 received 3party code → joinAccountFromThirdPartyRecoveryCode" }
                 syncAccountRepository.joinAccountFromThirdPartyRecoveryCode(b64)
-                    .toOutcome(label = "v2 LinkingV2 login (3party upgrade)")
+                    .toOutcome(
+                        label = "v2 LinkingV2 login (3party upgrade)",
+                        path = SetupPath.PAIRING,
+                        myRole = SetupRole.JOINER,
+                        peerKind = peerKind,
+                    )
             }
             else -> DispatchOutcome.Failed("Received unknown credential type '${parsed.cid}' over v2 linking")
         }
@@ -411,13 +444,45 @@ class RealSyncCodeDispatcher @Inject constructor(
      * [codeForAccountSwitch] must be a v1 b64 shape [SyncAccountRepository.parseSyncAuthCode] can
      * re-parse, so v2 callers convert first (see [encodeV1RecoveryCodeAsB64]).
      */
+    /** Map the runner's raw peer credential id ("ddg"/"3party") to the telemetry [PeerKind], or null. */
+    private fun String?.toPeerKind(): PeerKind? = when (this) {
+        CID_DDG -> PeerKind.DDG
+        CID_3PARTY -> PeerKind.THIRD_PARTY
+        else -> null
+    }
+
+    /** Elected role implied by a terminal transition's target state, for "Setup failed" telemetry. */
+    private fun roleFromTerminalState(event: ExchangeV2Event): SetupRole? =
+        when ((event as? ExchangeV2Event.Transition)?.to) {
+            is ExchangeV2State.Host -> SetupRole.HOST
+            is ExchangeV2State.Joiner -> SetupRole.JOINER
+            else -> null
+        }
+
+    /**
+     * Attach best-effort failure telemetry ([path]/[myRole]/[peerKind]) to a terminal error outcome.
+     * No-op for non-error outcomes, so a [DispatchOutcome.LoggedIn] keeps the context set at its source.
+     */
+    private fun DispatchOutcome.withFailureContext(
+        path: SetupPath,
+        myRole: SetupRole?,
+        peerKind: PeerKind?,
+    ): DispatchOutcome = when (this) {
+        is DispatchOutcome.Failed -> copy(path = path, myRole = myRole, peerKind = peerKind)
+        is DispatchOutcome.UpgradeRequired -> copy(path = path, myRole = myRole, peerKind = peerKind)
+        else -> this
+    }
+
     private fun Result<Boolean>.toOutcome(
         label: String,
+        path: SetupPath,
+        myRole: SetupRole? = null,
+        peerKind: PeerKind? = null,
         codeForAccountSwitch: String? = null,
     ): DispatchOutcome = when (this) {
         is Result.Success -> {
             logcat { "$TAG: $label → success" }
-            DispatchOutcome.LoggedIn
+            DispatchOutcome.LoggedIn(path, myRole, peerKind)
         }
         is Result.Error -> {
             logcat { "$TAG: $label → error: $reason (code=$code)" }
@@ -426,7 +491,7 @@ class RealSyncCodeDispatcher @Inject constructor(
                 when (val switched = syncAccountRepository.logoutAndJoinNewAccount(codeForAccountSwitch)) {
                     is Result.Success -> {
                         logcat { "$TAG: $label → logout+rejoin success" }
-                        DispatchOutcome.LoggedIn
+                        DispatchOutcome.LoggedIn(path, myRole, peerKind)
                     }
                     is Result.Error -> {
                         logcat { "$TAG: $label → logout+rejoin failed: ${switched.reason} (code=${switched.code})" }

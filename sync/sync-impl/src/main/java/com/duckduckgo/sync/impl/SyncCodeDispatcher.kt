@@ -16,6 +16,9 @@
 
 package com.duckduckgo.sync.impl
 
+import com.duckduckgo.sync.impl.pixels.SyncPixels.PeerKind
+import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupPath
+import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupRole
 import kotlinx.coroutines.flow.Flow
 
 /**
@@ -63,6 +66,12 @@ interface SyncCodeDispatcher {
      * Host or Joiner. Cancelling the collecting coroutine cancels the underlying runner session.
      */
     fun presentV2(): Flow<DispatchOutcome>
+
+    /**
+     * Whether a v2 exchange has engaged a peer and is mid-protocol (past Bootstrapped, before a
+     * terminal).
+     */
+    fun isV2ExchangeUnderway(): Boolean
 }
 
 sealed interface RouteDecision {
@@ -70,11 +79,17 @@ sealed interface RouteDecision {
     data class Legacy(val authCode: SyncAuthCode) : RouteDecision
 
     /**
-     * Dispatcher owns the work. [outcomes] is a cold Flow that drives the v2 work when collected
-     * (see [DispatchOutcome] for the emitted sequence). Cancelling the collector cancels the work.
+     * Dispatcher owns the work. [codeType] is the kind of v2 code that was recognized.
+     * [outcomes] is a cold Flow that drives the v2 work when collected (see [DispatchOutcome] for the
+     * emitted sequence). Cancelling the collector cancels the work.
      */
-    data class V2InProgress(val outcomes: Flow<DispatchOutcome>) : RouteDecision
+    data class V2InProgress(
+        val codeType: SyncCodeType,
+        val outcomes: Flow<DispatchOutcome>,
+    ) : RouteDecision
 }
+
+enum class SyncCodeType { RECOVERY, LINKING }
 
 /**
  * Outcomes emitted by a v2-owned dispatch, used by both [SyncCodeDispatcher.route] (Scanner) and
@@ -99,13 +114,13 @@ sealed interface DispatchOutcome {
      * SM reached Joiner.Confirming. Caller must prompt the user ("Sync your data with [peerName]?")
      * then call [SyncCodeDispatcher.confirmJoiner] or [SyncCodeDispatcher.denyJoiner] to resume.
      */
-    data class JoinerConfirmationRequested(val peerName: String?) : DispatchOutcome
+    data class JoinerConfirmationRequested(val peerName: String?, val peerKind: PeerKind? = null) : DispatchOutcome
 
     /**
      * SM reached Host.Confirming. Caller must prompt the user ("Allow [peerName] to join your
      * sync & backup?") then call [SyncCodeDispatcher.confirmHost] or [SyncCodeDispatcher.denyHost].
      */
-    data class HostConfirmationRequested(val peerName: String?) : DispatchOutcome
+    data class HostConfirmationRequested(val peerName: String?, val peerKind: PeerKind? = null) : DispatchOutcome
 
     /**
      * Emitted once per [SyncCodeDispatcher.presentV2] session, before any confirmation or
@@ -114,8 +129,16 @@ sealed interface DispatchOutcome {
      */
     data class LinkingCodeReady(val linkingCode: String) : DispatchOutcome
 
-    /** Terminal — login completed (recovery code applied; account state updated). */
-    data object LoggedIn : DispatchOutcome
+    /**
+     * Terminal — login completed (recovery code applied; account state updated). Carries telemetry
+     * for the "Setup success" pixel: [path] (recovery vs pairing) and, for a pairing, the elected
+     * [myRole] and the [peerKind]. [myRole]/[peerKind] are null for recovery.
+     */
+    data class LoggedIn(
+        val path: SetupPath,
+        val myRole: SetupRole? = null,
+        val peerKind: PeerKind? = null,
+    ) : DispatchOutcome
 
     /**
      * Terminal — peer and this device are already on the same account. Per spec §"Same-account
@@ -123,16 +146,29 @@ sealed interface DispatchOutcome {
      */
     data object AlreadyConnected : DispatchOutcome
 
-    /** Terminal — the pasted code requires a protocol major version higher than this app supports. */
-    data class UpgradeRequired(val codeMajor: Int) : DispatchOutcome
+    /**
+     * Terminal — the pasted code requires a protocol major version higher than this app supports.
+     * [path]/[myRole]/[peerKind] are best-effort telemetry for the "Setup failed" pixel (see [Failed]).
+     */
+    data class UpgradeRequired(
+        val codeMajor: Int,
+        val path: SetupPath? = null,
+        val myRole: SetupRole? = null,
+        val peerKind: PeerKind? = null,
+    ) : DispatchOutcome
 
     /**
      * Terminal — transport error, missing credentials on this device, BE rejection, denial, etc.
      * [code] carries the originating [AccountErrorCodes] code (defaults to GENERIC_ERROR) so callers
      * can map specific failures (e.g. THIRD_PARTY_ALREADY_UPGRADED) to user-facing copy.
+     * [path]/[myRole]/[peerKind] are best-effort telemetry for the "Setup failed" pixel: [path] is the
+     * flow kind, and [myRole]/[peerKind] are populated when known at the point of failure.
      */
     data class Failed(
         val reason: String,
         val code: Int = AccountErrorCodes.GENERIC_ERROR.code,
+        val path: SetupPath? = null,
+        val myRole: SetupRole? = null,
+        val peerKind: PeerKind? = null,
     ) : DispatchOutcome
 }
