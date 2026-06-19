@@ -57,6 +57,7 @@ class SyncPixelParamRemovalPlugin @Inject constructor() : PixelParamRemovalPlugi
             SyncPixelName.SYNC_SETUP_MANUAL_CODE_ENTERED_SUCCESS.pixelName to PixelParameter.removeAtb(),
             SyncPixelName.SYNC_SETUP_ENDED_ABANDONED.pixelName to PixelParameter.removeAtb(),
             SyncPixelName.SYNC_SETUP_ENDED_SUCCESS.pixelName to PixelParameter.removeAtb(),
+            SyncPixelName.SYNC_SETUP_ENDED_FAILED.pixelName to PixelParameter.removeAtb(),
 
             SyncPixelName.SYNC_AUTO_RESTORE_TOGGLE_SHOWN.pixelName to PixelParameter.removeAtb(),
             SyncPixelName.SYNC_AUTO_RESTORE_TOGGLE_OPTED_OUT.pixelName to PixelParameter.removeAtb(),

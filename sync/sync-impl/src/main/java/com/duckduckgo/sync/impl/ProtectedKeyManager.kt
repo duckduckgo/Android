@@ -42,9 +42,14 @@ interface ProtectedKeyManager {
      * Generates an RSA keypair for [purpose] (e.g. "ai_chats"), libsodium-encrypts the private key
      * with the account secret key, and POSTs the entry via /sync/keys/.../set-if-absent.
      *
-     * No-op success if the server already has a key for [purpose] (set-if-absent semantics).
+     * Returns the authoritative [ProtectedKeyEntry] taken from the server's response. In the
+     * we-wrote-it case the returned entry equals the one we POSTed; in the race-loser case the
+     * server's `set-if-absent` returns its pre-existing entry instead, and we surface that so
+     * the caller reflects the truth on the server rather than the local key we minted.
+     *
+     * Returns the entry for [purpose] only — not all keys for the account.
      */
-    fun create(purpose: String): Result<Boolean>
+    fun create(purpose: String): Result<ProtectedKeyEntry>
 }
 
 @ContributesBinding(AppScope::class)
@@ -58,7 +63,7 @@ class RealProtectedKeyManager @Inject constructor(
     private val syncFeature: SyncFeature,
 ) : ProtectedKeyManager {
 
-    override fun create(purpose: String): Result<Boolean> {
+    override fun create(purpose: String): Result<ProtectedKeyEntry> {
         if (!syncFeature.canUseV2ConnectFlow().isEnabled()) {
             return Error(reason = "Scoped access credentials feature is disabled")
         }
@@ -97,10 +102,21 @@ class RealProtectedKeyManager @Inject constructor(
             publicKey = RsaJwk(n = n, e = e),
         )
 
-        return when (val result = syncApi.setProtectedKeyIfAbsent(token, purpose, key)) {
+        return when (val result = syncApi.setProtectedKeyIfAbsent(token, purpose, listOf(key))) {
             is Success -> {
-                logcat { "Sync-ScopedToken: protected key for $purpose created (kid=$kid)" }
-                Success(true)
+                val entry = result.data.firstOrNull { it.purpose == purpose && it.encryptedWith == CREDENTIAL_ID_DDG }
+                    ?: return Error(reason = "CreateProtectedKey: server response missing created key for $purpose")
+                if (entry.kid != kid) {
+                    // Server returned a pre-existing entry — another device created the key for this
+                    // purpose between our (implicit) check and our POST. The server's entry wins.
+                    logcat {
+                        "Sync-ScopedToken: protected key for $purpose already existed on server " +
+                            "(server kid=${entry.kid}, our kid=$kid) — adopting server entry"
+                    }
+                } else {
+                    logcat { "Sync-ScopedToken: protected key for $purpose created (kid=$kid)" }
+                }
+                Success(entry)
             }
             is Error -> {
                 logcat(ERROR) { "Sync-ScopedToken: failed to create protected key: ${result.reason}" }
