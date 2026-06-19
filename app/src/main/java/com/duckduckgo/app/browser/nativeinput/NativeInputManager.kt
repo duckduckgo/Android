@@ -132,6 +132,9 @@ interface NativeInputManager {
 
     /** Show pulse animation around the Duck.ai fire button. */
     fun setDuckAiFireButtonHighlighted(highlighted: Boolean)
+
+    /** Hide/show the subscription-tier indicator in the Duck.ai header (hidden during the onboarding lock). */
+    fun setDuckAiTierVisible(visible: Boolean)
 }
 
 @ContributesBinding(FragmentScope::class)
@@ -732,6 +735,10 @@ class RealNativeInputManager @Inject constructor(
 
     override fun setDuckAiFireButtonHighlighted(highlighted: Boolean) {
         duckAiFireButtonHighlightSource.value = highlighted
+    }
+
+    override fun setDuckAiTierVisible(visible: Boolean) {
+        if (::omnibarController.isInitialized) omnibarController.setTierVisible(visible)
     }
 
     private fun suppressShadow(view: View) {

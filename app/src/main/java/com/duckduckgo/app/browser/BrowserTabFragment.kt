@@ -6027,6 +6027,7 @@ class BrowserTabFragment :
                     },
                 )
                 nativeInputManager.setDuckAiFireButtonHighlighted(highlighted = viewState.fireButton.isHighlighted())
+                nativeInputManager.setDuckAiTierVisible(visible = !viewState.isOmnibarLockedForOnboarding)
 
                 renderBrowserMenu(viewState)
 
