@@ -112,7 +112,6 @@ class AppSyncDeviceIdsTest {
             override var secretKey: String? = "secretKey"
             override var credentialId: String? = null
             override var scopedPassword: ScopedPassword? = null
-            override var protectedKeysJson: String? = null
             override fun isEncryptionSupported() = true
 
             override fun isSignedInFlow() = emptyFlow<Boolean>()
@@ -147,7 +146,6 @@ class AppSyncDeviceIdsTest {
             override var secretKey: String? = null
             override var credentialId: String? = null
             override var scopedPassword: ScopedPassword? = null
-            override var protectedKeysJson: String? = null
             override fun isEncryptionSupported() = true
 
             override fun isSignedInFlow() = emptyFlow<Boolean>()

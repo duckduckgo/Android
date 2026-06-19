@@ -120,7 +120,7 @@ interface SyncApi {
     fun getProtectedKeys(token: String): Result<List<ProtectedKeyEntry>>
 
     /** Atomically claim [purpose] with [key] or no-op if one already exists. */
-    fun setProtectedKeyIfAbsent(token: String, purpose: String, keys: List<ProtectedKeyEntry>) : Result<List<ProtectedKeyEntry>>
+    fun setProtectedKeyIfAbsent(token: String, purpose: String, keys: List<ProtectedKeyEntry>): Result<List<ProtectedKeyEntry>>
 
     fun getAccessCredentials(token: String): Result<List<AccessCredentialEntry>>
 
