@@ -126,6 +126,12 @@
     <!-- Duck AI Chat Suggestions -->
     <string name="duckAiChatHistoryViewAllChats">Vaata kõiki vestlusi</string>
 
+    <!-- Duck.ai onboarding end CTA -->
+    <string name="duckAiEndCtaTitle">Said selle!</string>
+    <string name="duckAiEndCtaDescription"><![CDATA[Kasuta aadressiriba, et otsida ja külastada saite või alusta privaatset AI-vestlust Duck.ai abil.<br/><br/>Saad Duck.ai\'t kasutada kõikjal, kus näed vestluse ikooni]]></string>
+    <string name="duckAiEndCtaButton">Viska viis!</string>
+    <string name="duckAiEndCtaDescriptionCustomAi"><![CDATA[Alusta privaatset AI-vestlust Duck.ai-ga või lülita sisse, et otsida kaitstud sirvimist.<br/><br/>Saad Duck.ai\'t kasutada kõikjal, kus näed vestluse ikooni]]></string>
+
     <!-- Native Duck.ai chat history -->
     <string name="duck_ai_chat_history_title">Vestlused</string>
     <string name="duck_ai_chat_history_section_pinned">Kinnitatud</string>
