@@ -33,6 +33,7 @@ import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.databinding.ActivityConnectSyncBinding
+import com.duckduckgo.sync.impl.pixels.SyncPixels.PeerKind
 import com.duckduckgo.sync.impl.ui.EnterCodeActivity.Companion.Code.RECOVERY_CODE
 import com.duckduckgo.sync.impl.ui.SyncWithAnotherActivityViewModel.Command
 import com.duckduckgo.sync.impl.ui.SyncWithAnotherActivityViewModel.Command.AskToSwitchAccount
@@ -114,6 +115,8 @@ class SyncWithAnotherDeviceActivity : DuckDuckGoActivity() {
     private fun observeUiEvents() {
         viewModel
             .viewState(isDeepLink = isDeepLinkSetup())
+            // Observe at CREATED, not STARTED: STARTED re-subscribes on every foreground, re-firing
+            // viewState.onStart and regenerating the pairing code. CREATED also avoids dropping terminal commands.
             .flowWithLifecycle(lifecycle, Lifecycle.State.CREATED)
             .onEach { render(it) }
             .launchIn(lifecycleScope)
@@ -154,6 +157,7 @@ class SyncWithAnotherDeviceActivity : DuckDuckGoActivity() {
 
             is ShowMessage -> Snackbar.make(binding.root, it.messageId, Snackbar.LENGTH_SHORT).show()
             is ShowError -> showError(it)
+            is Command.ShowV2Error -> showV2PairingError(it.content) { viewModel.onErrorDialogDismissed() }
             is AskToSwitchAccount -> askUserToSwitchAccount(it)
             SwitchAccountSuccess -> {
                 val resultIntent = Intent()
@@ -161,7 +165,37 @@ class SyncWithAnotherDeviceActivity : DuckDuckGoActivity() {
                 setResult(RESULT_OK, resultIntent)
                 finish()
             }
+            is Command.AskJoinerConfirmation -> askJoinerConfirmation(it.peerName, it.peerKind)
+            is Command.AskHostConfirmation -> askHostConfirmation(it.peerName, it.peerKind)
         }
+    }
+
+    private fun askJoinerConfirmation(peerName: String?, peerKind: PeerKind?) {
+        TextAlertDialogBuilder(this)
+            .setTitle(R.string.sync_v2_joiner_confirmation_title)
+            .setMessage(syncV2ConfirmationMessage(peerName, peerKind))
+            .setPositiveButton(R.string.sync_v2_joiner_confirmation_positive)
+            .setNegativeButton(R.string.sync_v2_joiner_confirmation_negative)
+            .addEventListener(
+                object : TextAlertDialogBuilder.EventListener() {
+                    override fun onPositiveButtonClicked() { viewModel.onJoinerConfirmed() }
+                    override fun onNegativeButtonClicked() { viewModel.onJoinerDenied() }
+                },
+            ).show()
+    }
+
+    private fun askHostConfirmation(peerName: String?, peerKind: PeerKind?) {
+        TextAlertDialogBuilder(this)
+            .setTitle(R.string.sync_v2_host_confirmation_title)
+            .setMessage(syncV2ConfirmationMessage(peerName, peerKind))
+            .setPositiveButton(R.string.sync_v2_host_confirmation_positive)
+            .setNegativeButton(R.string.sync_v2_host_confirmation_negative)
+            .addEventListener(
+                object : TextAlertDialogBuilder.EventListener() {
+                    override fun onPositiveButtonClicked() { viewModel.onHostConfirmed() }
+                    override fun onNegativeButtonClicked() { viewModel.onHostDenied() }
+                },
+            ).show()
     }
 
     private fun configureListeners() {

@@ -35,6 +35,7 @@ import com.duckduckgo.sync.impl.Result.Error
 import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.impl.SyncAccountRepository
 import com.duckduckgo.sync.impl.SyncApi
+import com.duckduckgo.sync.impl.SyncAuthCode
 import com.duckduckgo.sync.impl.SyncFeature
 import com.duckduckgo.sync.impl.autorestore.SyncAutoRestoreManager
 import com.duckduckgo.sync.impl.autorestore.SyncRecoveryPersistentStorageKey
@@ -396,7 +397,23 @@ constructor(
 
     fun useRecoveryCode(recoveryCode: String) {
         viewModelScope.launch(dispatchers.io()) {
-            authFlow(recoveryCode)
+            // 3party recovery codes are intentionally rejected by parseSyncAuthCode (production
+            // paste/scan paths must not accept them). For the dev-tool entrypoint we explicitly
+            // try the 3party→ddg upgrade path when the existing parser doesn't recognize the code.
+            val codeType = syncAccountRepository.parseSyncAuthCode(recoveryCode)
+            if (codeType is SyncAuthCode.Unknown) {
+                when (val joinResult = syncAccountRepository.joinAccountFromThirdPartyRecoveryCode(recoveryCode)) {
+                    is Success -> {
+                        command.send(Command.LoginSuccess)
+                        updateViewState()
+                    }
+                    is Error -> {
+                        command.send(Command.ShowMessage("$joinResult"))
+                    }
+                }
+            } else {
+                authFlow(recoveryCode)
+            }
         }
     }
 
@@ -500,7 +517,6 @@ constructor(
     private fun buildV2StoreFieldsText(): String = buildString {
         appendLine("credentialId: ${syncStore.credentialId ?: "(not set)"}")
         appendLine("scopedPassword: ${syncStore.scopedPassword?.raw?.take(40)?.let { "$it..." } ?: "(not set)"}")
-        appendLine("protectedKeysJson: ${syncStore.protectedKeysJson?.take(60)?.let { "$it..." } ?: "(not set)"}")
     }.trim().also { logcat { "Sync-ScopedToken: v2 store fields:\n$it" } }
 
     fun onCreateThirdPartyCredentialClicked() {

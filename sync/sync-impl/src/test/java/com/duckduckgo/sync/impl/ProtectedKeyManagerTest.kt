@@ -91,23 +91,76 @@ class ProtectedKeyManagerTest {
         whenever(syncJweCrypto.generateRsaKeyPair()).thenReturn(RsaKeyPair("pubKey", "cHJpdktleQ"))
         whenever(syncJweCrypto.extractJwkComponents(anyString())).thenReturn("modulus" to "AQAB")
         whenever(nativeLib.encryptData(any<ByteArray>(), eq(secretKey))).thenReturn(EncryptBytesResult(0, "encrypted".toByteArray()))
-        whenever(syncApi.setProtectedKeyIfAbsent(eq(token), eq("ai_chats"), any())).thenReturn(Success(true))
+        // Happy path: server's response contains our entry (we wrote it).
+        val serverKey = ProtectedKeyEntry(
+            kid = "server-kid",
+            purpose = "ai_chats",
+            encryptedWith = "ddg",
+            encryptedPrivateKey = "encrypted",
+            publicKey = RsaJwk(n = "modulus", e = "AQAB"),
+        )
+        whenever(syncApi.setProtectedKeyIfAbsent(eq(token), eq("ai_chats"), any())).thenReturn(Success(listOf(serverKey)))
 
         val result = manager.create("ai_chats")
 
         assertTrue(result is Success)
-        // create() returns the created entry, not a bare boolean.
-        assertEquals("ai_chats", (result as Success).data.purpose)
-        assertEquals("ddg", result.data.encryptedWith)
+        // create() returns the server's authoritative entry, not the local one.
+        assertEquals(serverKey, (result as Success).data)
         verify(syncApi).setProtectedKeyIfAbsent(
             eq(token),
             eq("ai_chats"),
             check { sent ->
-                assertEquals("ai_chats", sent.purpose)
-                assertEquals("ddg", sent.encryptedWith)
-                assertEquals(RsaJwk(n = "modulus", e = "AQAB"), sent.publicKey)
+                assertEquals(1, sent.size)
+                val first = sent.first()
+                assertEquals("ai_chats", first.purpose)
+                assertEquals("ddg", first.encryptedWith)
+                assertEquals(RsaJwk(n = "modulus", e = "AQAB"), first.publicKey)
             },
         )
+    }
+
+    @Test
+    fun whenSetProtectedKeyIfAbsentReturnsExistingServerEntryThenCreateReturnsServerEntry() {
+        // Race-loser: server returns a different kid for the same (purpose, encrypted_with).
+        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
+        whenever(syncStore.token).thenReturn(token)
+        whenever(syncStore.primaryKey).thenReturn(primaryKey)
+        whenever(syncStore.secretKey).thenReturn(secretKey)
+        whenever(nativeLib.prepareForLogin(primaryKey)).thenReturn(validLoginKeys)
+        whenever(syncJweCrypto.generateRsaKeyPair()).thenReturn(RsaKeyPair("pubKey", "cHJpdktleQ"))
+        whenever(syncJweCrypto.extractJwkComponents(anyString())).thenReturn("modulus" to "AQAB")
+        whenever(nativeLib.encryptData(any<ByteArray>(), eq(secretKey))).thenReturn(EncryptBytesResult(0, "encrypted".toByteArray()))
+        val serverKey = ProtectedKeyEntry(
+            kid = "kid-from-server",
+            purpose = "ai_chats",
+            encryptedWith = "ddg",
+            encryptedPrivateKey = "server-jwe",
+            publicKey = RsaJwk(n = "server-modulus", e = "AQAB"),
+        )
+        whenever(syncApi.setProtectedKeyIfAbsent(eq(token), eq("ai_chats"), any())).thenReturn(Success(listOf(serverKey)))
+
+        val result = manager.create("ai_chats")
+
+        assertTrue(result is Success)
+        assertEquals(serverKey, (result as Success).data)
+    }
+
+    @Test
+    fun whenServerResponseMissingPurposeEntryThenError() {
+        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
+        whenever(syncStore.token).thenReturn(token)
+        whenever(syncStore.primaryKey).thenReturn(primaryKey)
+        whenever(syncStore.secretKey).thenReturn(secretKey)
+        whenever(nativeLib.prepareForLogin(primaryKey)).thenReturn(validLoginKeys)
+        whenever(syncJweCrypto.generateRsaKeyPair()).thenReturn(RsaKeyPair("pubKey", "cHJpdktleQ"))
+        whenever(syncJweCrypto.extractJwkComponents(anyString())).thenReturn("modulus" to "AQAB")
+        whenever(nativeLib.encryptData(any<ByteArray>(), eq(secretKey))).thenReturn(EncryptBytesResult(0, "encrypted".toByteArray()))
+        // Server returns a list that doesn't include an entry for our (purpose, ddg) slot.
+        whenever(syncApi.setProtectedKeyIfAbsent(eq(token), eq("ai_chats"), any())).thenReturn(Success(emptyList()))
+
+        val result = manager.create("ai_chats")
+
+        assertTrue(result is Error)
     }
 
     @Test
