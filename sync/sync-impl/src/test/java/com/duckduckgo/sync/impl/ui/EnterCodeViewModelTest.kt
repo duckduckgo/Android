@@ -35,9 +35,9 @@ import com.duckduckgo.sync.impl.AccountErrorCodes.CREATE_ACCOUNT_FAILED
 import com.duckduckgo.sync.impl.AccountErrorCodes.GENERIC_ERROR
 import com.duckduckgo.sync.impl.AccountErrorCodes.INVALID_CODE
 import com.duckduckgo.sync.impl.AccountErrorCodes.LOGIN_FAILED
+import com.duckduckgo.sync.impl.AccountErrorCodes.PAIRING_REJECTED
 import com.duckduckgo.sync.impl.AccountErrorCodes.THIRD_PARTY_ALREADY_UPGRADED
 import com.duckduckgo.sync.impl.Clipboard
-import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.RealSyncCodeDispatcher
 import com.duckduckgo.sync.impl.RecoveryCode
 import com.duckduckgo.sync.impl.Result.Error
@@ -48,14 +48,17 @@ import com.duckduckgo.sync.impl.SyncAuthCode.Unknown
 import com.duckduckgo.sync.impl.SyncFeature
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2CodeParseResult
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Event
+import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Message
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2QrCode
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Runner
+import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2State
 import com.duckduckgo.sync.impl.pixels.SyncPixels
 import com.duckduckgo.sync.impl.ui.EnterCodeViewModel.AuthState
 import com.duckduckgo.sync.impl.ui.EnterCodeViewModel.AuthState.Idle
 import com.duckduckgo.sync.impl.ui.EnterCodeViewModel.Command.AskToSwitchAccount
 import com.duckduckgo.sync.impl.ui.EnterCodeViewModel.Command.LoginSuccess
 import com.duckduckgo.sync.impl.ui.EnterCodeViewModel.Command.ShowError
+import com.duckduckgo.sync.impl.ui.EnterCodeViewModel.Command.ShowV2Error
 import com.duckduckgo.sync.impl.ui.EnterCodeViewModel.Command.SwitchAccountSuccess
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
@@ -146,7 +149,8 @@ internal class EnterCodeViewModelTest {
 
         testee.commands().test {
             val command = awaitItem()
-            assertTrue("expected ShowError, got $command", command is ShowError)
+            assertTrue("expected ShowV2Error, got $command", command is ShowV2Error)
+            assertEquals(THIRD_PARTY_ALREADY_UPGRADED.code.toV2PairingError(), (command as ShowV2Error).content)
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -168,8 +172,8 @@ internal class EnterCodeViewModelTest {
 
         testee.commands().test {
             val command = awaitItem()
-            assertTrue("expected ShowError, got $command", command is ShowError)
-            assertEquals(R.string.sync_flows_disabled_new_version, (command as ShowError).message)
+            assertTrue("expected ShowV2Error, got $command", command is ShowV2Error)
+            assertEquals(v2UpgradeRequiredError, (command as ShowV2Error).content)
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -387,6 +391,72 @@ internal class EnterCodeViewModelTest {
         testee.onPasteCodeClicked()
 
         testee.commands().test {
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenV2SameAccountThenShowAlreadyPaired() = runTest {
+        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
+        whenever(syncAccountRepository.getAccountInfo()).thenReturn(noAccount)
+        val pastedCode = "https://duckduckgo.com/sync/pairing/#&code2=v2code"
+        whenever(clipboard.pasteFromClipboard()).thenReturn(pastedCode)
+        whenever(qrCode.parse(pastedCode)).thenReturn(
+            ExchangeV2CodeParseResult.LinkingV2(channelId = "c", publicKey = "k", version = "2"),
+        )
+        whenever(runner.eventsSince(any())).thenReturn(
+            flowOf(
+                ExchangeV2Event.Transition(
+                    timestampMs = 0L,
+                    from = ExchangeV2State.Negotiating,
+                    to = ExchangeV2State.SameAccountAbort,
+                    trigger = null,
+                    localTrigger = null,
+                ),
+            ),
+        )
+
+        testee.onPasteCodeClicked()
+
+        testee.commands().test {
+            val command = awaitItem()
+            assertTrue("expected ShowV2Error, got $command", command is ShowV2Error)
+            assertEquals(v2AlreadyPairedError, (command as ShowV2Error).content)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenV2PairingRejectedByPeerThenShowErrorAndClearLoading() = runTest {
+        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
+        whenever(syncAccountRepository.getAccountInfo()).thenReturn(noAccount)
+        val pastedCode = "https://duckduckgo.com/sync/pairing/#&code2=v2code"
+        whenever(clipboard.pasteFromClipboard()).thenReturn(pastedCode)
+        whenever(qrCode.parse(pastedCode)).thenReturn(
+            ExchangeV2CodeParseResult.LinkingV2(channelId = "c", publicKey = "k", version = "2"),
+        )
+        whenever(runner.eventsSince(any())).thenReturn(
+            flowOf(
+                ExchangeV2Event.Transition(
+                    timestampMs = 0L,
+                    from = ExchangeV2State.Joiner.Confirming,
+                    to = ExchangeV2State.Joiner.AbortedByHost,
+                    trigger = ExchangeV2Message.RecoveryCodeDenied(rawJson = "{}"),
+                    localTrigger = null,
+                ),
+            ),
+        )
+
+        testee.onPasteCodeClicked()
+
+        testee.commands().test {
+            val command = awaitItem()
+            assertTrue("expected ShowV2Error, got $command", command is ShowV2Error)
+            assertEquals(PAIRING_REJECTED.code.toV2PairingError(), (command as ShowV2Error).content)
+            cancelAndIgnoreRemainingEvents()
+        }
+        testee.viewState().test {
+            assertTrue(awaitItem().authState is Idle)
             cancelAndIgnoreRemainingEvents()
         }
     }

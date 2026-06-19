@@ -41,6 +41,8 @@ import com.duckduckgo.sync.impl.SyncCodeDispatcher
 import com.duckduckgo.sync.impl.onFailure
 import com.duckduckgo.sync.impl.onSuccess
 import com.duckduckgo.sync.impl.pixels.SyncPixels
+import com.duckduckgo.sync.impl.pixels.SyncPixels.PeerKind
+import com.duckduckgo.sync.impl.pixels.fireSetupFailed
 import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Companion.POLLING_INTERVAL_EXCHANGE_FLOW
 import com.duckduckgo.sync.impl.ui.SyncLoginViewModel.Command.LoginSucess
 import com.duckduckgo.sync.impl.ui.SyncLoginViewModel.Command.ReadTextCode
@@ -72,10 +74,12 @@ class SyncLoginViewModel @Inject constructor(
         data class ShowError(@StringRes val message: Int, val reason: String = "") : Command()
 
         /** v2 §"Exchange Confirmations": prompt user "Sync your data with [peerName]?". */
-        data class AskJoinerConfirmation(val peerName: String?) : Command()
+        data class AskJoinerConfirmation(val peerName: String?, val peerKind: PeerKind? = null) : Command()
 
         /** v2 §"Exchange Confirmations": prompt user "Allow [peerName] to join your sync?". */
-        data class AskHostConfirmation(val peerName: String?) : Command()
+        data class AskHostConfirmation(val peerName: String?, val peerKind: PeerKind? = null) : Command()
+
+        internal data class ShowV2Error(val content: V2PairingErrorContent) : Command()
     }
 
     fun onReadTextCodeClicked() {
@@ -126,26 +130,26 @@ class SyncLoginViewModel @Inject constructor(
 
     /** Map one v2 [DispatchOutcome] onto this VM's existing command pipeline. */
     private suspend fun handleV2Outcome(outcome: DispatchOutcome) {
+        syncPixels.fireSetupFailed(outcome)
         when (outcome) {
             is DispatchOutcome.LoggedIn -> {
                 syncPixels.fireLoginPixel()
                 command.send(LoginSucess)
             }
-            is DispatchOutcome.AlreadyConnected -> {
-                // Spec §"Same-account case": treat as success. No new login (account is unchanged).
-                command.send(LoginSucess)
-            }
+            is DispatchOutcome.AlreadyConnected ->
+                command.send(Command.ShowV2Error(v2AlreadyPairedError))
             is DispatchOutcome.UpgradeRequired -> {
-                // Peer needs a newer protocol major — show a visible "please update" error. (follow-up: 1215484651575360)
-                command.send(ShowError(message = R.string.sync_flows_disabled_new_version, reason = "Code requires protocol v${outcome.codeMajor}"))
+                logcat { "Sync v2: upgrade required, peer needs protocol v${outcome.codeMajor}" }
+                command.send(Command.ShowV2Error(v2UpgradeRequiredError))
             }
             is DispatchOutcome.Failed -> {
-                processError(Error(reason = outcome.reason))
+                val content = outcome.code.toV2PairingError()
+                command.send(Command.ShowV2Error(content))
             }
             is DispatchOutcome.JoinerConfirmationRequested ->
-                command.send(Command.AskJoinerConfirmation(outcome.peerName))
+                command.send(Command.AskJoinerConfirmation(outcome.peerName, outcome.peerKind))
             is DispatchOutcome.HostConfirmationRequested ->
-                command.send(Command.AskHostConfirmation(outcome.peerName))
+                command.send(Command.AskHostConfirmation(outcome.peerName, outcome.peerKind))
             is DispatchOutcome.LinkingCodeReady -> {} // No-op; used only by presentV2() flow
         }
     }

@@ -33,6 +33,7 @@ import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.databinding.ActivityConnectSyncBinding
+import com.duckduckgo.sync.impl.pixels.SyncPixels.PeerKind
 import com.duckduckgo.sync.impl.ui.EnterCodeActivity.Companion.Code.RECOVERY_CODE
 import com.duckduckgo.sync.impl.ui.SyncWithAnotherActivityViewModel.Command
 import com.duckduckgo.sync.impl.ui.SyncWithAnotherActivityViewModel.Command.AskToSwitchAccount
@@ -156,6 +157,7 @@ class SyncWithAnotherDeviceActivity : DuckDuckGoActivity() {
 
             is ShowMessage -> Snackbar.make(binding.root, it.messageId, Snackbar.LENGTH_SHORT).show()
             is ShowError -> showError(it)
+            is Command.ShowV2Error -> showV2PairingError(it.content) { viewModel.onErrorDialogDismissed() }
             is AskToSwitchAccount -> askUserToSwitchAccount(it)
             SwitchAccountSuccess -> {
                 val resultIntent = Intent()
@@ -163,20 +165,15 @@ class SyncWithAnotherDeviceActivity : DuckDuckGoActivity() {
                 setResult(RESULT_OK, resultIntent)
                 finish()
             }
-            is Command.AskJoinerConfirmation -> askJoinerConfirmation(it.peerName)
-            is Command.AskHostConfirmation -> askHostConfirmation(it.peerName)
+            is Command.AskJoinerConfirmation -> askJoinerConfirmation(it.peerName, it.peerKind)
+            is Command.AskHostConfirmation -> askHostConfirmation(it.peerName, it.peerKind)
         }
     }
 
-    private fun askJoinerConfirmation(peerName: String?) {
-        val message = if (peerName.isNullOrBlank()) {
-            getString(R.string.sync_v2_joiner_confirmation_message_unknown_peer)
-        } else {
-            getString(R.string.sync_v2_joiner_confirmation_message, peerName)
-        }
+    private fun askJoinerConfirmation(peerName: String?, peerKind: PeerKind?) {
         TextAlertDialogBuilder(this)
             .setTitle(R.string.sync_v2_joiner_confirmation_title)
-            .setMessage(message)
+            .setMessage(syncV2ConfirmationMessage(peerName, peerKind))
             .setPositiveButton(R.string.sync_v2_joiner_confirmation_positive)
             .setNegativeButton(R.string.sync_v2_joiner_confirmation_negative)
             .addEventListener(
@@ -187,15 +184,10 @@ class SyncWithAnotherDeviceActivity : DuckDuckGoActivity() {
             ).show()
     }
 
-    private fun askHostConfirmation(peerName: String?) {
-        val message = if (peerName.isNullOrBlank()) {
-            getString(R.string.sync_v2_host_confirmation_message_unknown_peer)
-        } else {
-            getString(R.string.sync_v2_host_confirmation_message, peerName)
-        }
+    private fun askHostConfirmation(peerName: String?, peerKind: PeerKind?) {
         TextAlertDialogBuilder(this)
             .setTitle(R.string.sync_v2_host_confirmation_title)
-            .setMessage(message)
+            .setMessage(syncV2ConfirmationMessage(peerName, peerKind))
             .setPositiveButton(R.string.sync_v2_host_confirmation_positive)
             .setNegativeButton(R.string.sync_v2_host_confirmation_negative)
             .addEventListener(

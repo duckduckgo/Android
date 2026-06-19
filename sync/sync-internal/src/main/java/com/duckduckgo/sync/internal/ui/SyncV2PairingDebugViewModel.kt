@@ -79,7 +79,6 @@ class SyncV2PairingDebugViewModel @Inject constructor(
         val signedIn: Boolean,
         val userId: String?,
         val thirdPartyCredentialCreated: Boolean,
-        val aiChatsProtectedKeyCreated: Boolean,
     )
 
     data class ViewState(
@@ -87,7 +86,7 @@ class SyncV2PairingDebugViewModel @Inject constructor(
         val linkingCode: String? = null,
         val rows: List<LogRow> = emptyList(),
         val autoApproveConfirmation: Boolean = true,
-        val accountStatus: AccountStatus = AccountStatus(false, null, false, false),
+        val accountStatus: AccountStatus = AccountStatus(false, null, false),
     )
 
     /**
@@ -535,23 +534,14 @@ class SyncV2PairingDebugViewModel @Inject constructor(
         }
     }
 
-    /**
-     * All three flags read from [SyncStore]. The cache is kept in sync with the server by the
-     * upstream Track A code paths (signup, login, Create Protected Key, Fetch Keys, 3party
-     * upgrade). Crude string match on `purpose` is fine here — the JSON shape is a list of
-     * `{kid, purpose, ...}` and "ai_chats" won't appear in other field values.
-     */
     private fun readAccountStatus(): AccountStatus {
         val userId = syncStore.userId
         val signedIn = userId != null
         val thirdParty = syncStore.scopedPassword != null
-        val keysJson = syncStore.protectedKeysJson.orEmpty()
-        val aiChats = signedIn && keysJson.contains("\"ai_chats\"")
         return AccountStatus(
             signedIn = signedIn,
             userId = userId,
             thirdPartyCredentialCreated = signedIn && thirdParty,
-            aiChatsProtectedKeyCreated = aiChats,
         )
     }
 
