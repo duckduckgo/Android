@@ -126,6 +126,12 @@
     <!-- Duck AI Chat Suggestions -->
     <string name="duckAiChatHistoryViewAllChats">Összes csevegés megtekintése</string>
 
+    <!-- Duck.ai onboarding end CTA -->
+    <string name="duckAiEndCtaTitle">Menni fog!</string>
+    <string name="duckAiEndCtaDescription"><![CDATA[A címsávban kereshetsz, webhelyeket nyithatsz meg, vagy átválthatsz a Duck.ai-ra privát MI-beszélgetéshez.<br/><br/>A Duck.ai-t bárhol használhatod, ahol látod a beszélgetés ikonját]]></string>
+    <string name="duckAiEndCtaButton">Pacsi!</string>
+    <string name="duckAiEndCtaDescriptionCustomAi"><![CDATA[Indíts privát MI-beszélgetést a Duck.ai-jal, vagy válts a Keresésre a védett böngészéshez.<br/><br/>A Duck.ai-t bárhol használhatod, ahol látod a beszélgetés ikonját]]></string>
+
     <!-- Native Duck.ai chat history -->
     <string name="duck_ai_chat_history_title">Csevegések</string>
     <string name="duck_ai_chat_history_section_pinned">Kitűzött</string>
