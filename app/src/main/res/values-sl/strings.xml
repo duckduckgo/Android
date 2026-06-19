@@ -1071,6 +1071,12 @@
     <string name="onboardingSearchDaxDialogOption1Quoted" instruction="translate &apos;duck&apos; too.">Kako reči »raca« v angleščini</string>
     <string name="onboardingSearchDaxDialogOption1EnglishQuoted" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">Kako reči »raca« v španščini</string>
 
+    <string name="onboardingDuckAiFireButtonDaxDialogTitle">To je Duck.ai!</string>
+    <string name="onboardingDuckAiFireButtonDaxDialogDescription"><![CDATA[Zasebni klepeti z umetno inteligenco, ki jih lahko kadar koli izbrišete z gumbom <b>Fire Button</b>. Preizkusite! 🔥]]></string>
+    <string name="onboardingDuckAiEndCtaTitle">Uspelo vam bo!</string>
+    <string name="onboardingDuckAiEndCtaDescription"><![CDATA[Za iskanje in obisk spletnih mest uporabite naslovno vrstico ali preklopite na Duck.ai za zasebni klepet z umetno inteligenco.<br/><br/>Duck.ai lahko uporabljate kjer koli, kjer vidite ikono klepeta]]></string>
+    <string name="onboardingDuckAiEndCtaButton">Petka!</string>
+
     <string name="input_screen_user_pref_without_ai_updated">Samo iskanje</string>
     <string name="input_screen_user_pref_with_ai_updated">Preklopite med\niskanjem in Duck.ai</string>
 
