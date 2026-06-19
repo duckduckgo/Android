@@ -19,8 +19,8 @@
 <resources>
     <string name="ad_blocking_settings_title">Blokovanie reklám na YouTube</string>
     <string name="ad_blocking_settings_toggle_title">Blokuje reklamy na YouTube</string>
-    <string name="ad_blocking_settings_description_with_consent">DuckDuckGo blokuje videoreklamy na YouTube, takže môžeš sledovať videá bez prerušenia.\n\nKeď je zapnutá, DuckDuckGo anonymne zistí rušenie blokovania reklám alebo chyby na YouTube, aby zlepšil používateľský zážitok pre všetkých. DuckDuckGo nikdy nevidí, ktoré videá si pozeráš, ani žiadne osobné údaje. <annotation type="learn_more_link">Zisti viac</annotation></string>
+    <string name="ad_blocking_settings_description_with_consent">DuckDuckGo blokuje videoreklamy na YouTube, takže môžeš sledovať videá bez prerušenia.\n\nKeď je táto funkcia zapnutá, DuckDuckGo bude anonymne zisťovať rušenie blokovania reklám alebo chyby na YouTube, aby zlepšil používateľský zážitok pre všetkých. DuckDuckGo nikdy nevidí, ktoré videá si pozeráš, ani žiadne osobné údaje. <annotation type="learn_more_link">Zisti viac</annotation></string>
     <string name="ad_blocking_settings_description">DuckDuckGo blokuje videoreklamy na YouTube, takže môžeš sledovať videá bez prerušenia. <annotation type="learn_more_link">Zisti viac</annotation></string>
     <string name="ad_blocking_settings_duck_player_header">Duck Player</string>
-    <string name="ad_blocking_settings_duck_player_description">Otvára videá v režime prehrávania so súkromím, ktorý zabraňuje tomu, aby sledované položky ovplyvňovali tvoj YouTube kanál.</string>
+    <string name="ad_blocking_settings_duck_player_description">Otvára videá v režime kina bez rušivých vplyvov, ktorý zabraňuje tomu, aby sledované položky ovplyvňovali tvoj kanál YouTube.</string>
 </resources>
