@@ -126,6 +126,12 @@
     <!-- Duck AI Chat Suggestions -->
     <string name="duckAiChatHistoryViewAllChats">Skatīt visas tērzēšanas sarunas</string>
 
+    <!-- Duck.ai onboarding end CTA -->
+    <string name="duckAiEndCtaTitle">Izdevās!</string>
+    <string name="duckAiEndCtaDescription"><![CDATA[Izmanto adreses joslu, lai meklētu un apmeklētu vietnes, vai pārslēdzies uz Duck.ai privātai MI tērzēšanai.<br/><br/>Tu vari izmantot Duck.ai no jebkuras vietas, kur redzi tērzēšanas ikonu.]]></string>
+    <string name="duckAiEndCtaButton">Dod pieci!</string>
+    <string name="duckAiEndCtaDescriptionCustomAi"><![CDATA[Sāc privātu MI tērzēšanu ar Duck.ai vai pārslēdzies uz meklēšanu aizsargātai pārlūkošanai.<br/><br/>Tu vari izmantot Duck.ai no jebkuras vietas, kur redzi tērzēšanas ikonu.]]></string>
+
     <!-- Native Duck.ai chat history -->
     <string name="duck_ai_chat_history_title">Tērzēšanas</string>
     <string name="duck_ai_chat_history_section_pinned">Piesprausts</string>
