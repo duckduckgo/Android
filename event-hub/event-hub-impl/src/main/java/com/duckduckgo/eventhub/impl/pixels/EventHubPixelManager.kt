@@ -33,6 +33,7 @@ import kotlinx.coroutines.launch
 import logcat.LogPriority.DEBUG
 import logcat.LogPriority.VERBOSE
 import logcat.logcat
+import org.json.JSONArray
 import org.json.JSONObject
 import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
@@ -125,7 +126,12 @@ class RealEventHubPixelManager @Inject constructor(
 
         if (!isEnabled()) return
 
+        val eventData = data.optJSONObject("data")
+
         appCoroutineScope.launch(pixelDispatcher) {
+            // Immediate pixels fire right away on a matching event: no period, persistence, dedup, or foreground gating.
+            fireImmediatePixels(eventType, eventData)
+
             val nowMillis = timeProvider.currentTimeMillis()
 
             for (pixelState in repository.getAllPixelStates()) {
@@ -150,6 +156,11 @@ class RealEventHubPixelManager @Inject constructor(
                         val newValue = paramState.value + 1
                         updatedParams[paramName] = paramState.copy(value = newValue)
                         logcat(VERBOSE) { "EventHub: ${pixelState.pixelName}.$paramName incremented to $newValue" }
+                    } else if (paramConfig.isData && paramConfig.source == eventType) {
+                        // Aggregate data params keep the most recent value seen on the matching source event.
+                        val paramState = updatedParams[paramName] ?: ParamState(0)
+                        updatedParams[paramName] = paramState.copy(lastDataValue = extractDataParam(eventData, paramConfig.dataKey))
+                        changed = true
                     }
                 }
 
@@ -157,6 +168,18 @@ class RealEventHubPixelManager @Inject constructor(
                     repository.savePixelState(pixelState.copy(params = updatedParams))
                 }
             }
+        }
+    }
+
+    private fun fireImmediatePixels(eventType: String, eventData: JSONObject?) {
+        for (config in getTelemetryConfigs()) {
+            if (!config.isEnabled || !config.trigger.isImmediate || config.trigger.source != eventType) continue
+            logcat(DEBUG) { "EventHub: firing immediate pixel ${config.name}" }
+            pixel.enqueueFire(
+                pixelName = config.name,
+                parameters = emptyMap(),
+                encodedParameters = buildDataParams(config, eventData),
+            )
         }
     }
 
@@ -192,6 +215,7 @@ class RealEventHubPixelManager @Inject constructor(
     private fun initMissingPixels(): Long {
         var nextDeadline = Long.MAX_VALUE
         for (pixelConfig in getTelemetryConfigs()) {
+            if (!pixelConfig.trigger.isPeriod) continue
             if (repository.getPixelState(pixelConfig.name) == null) {
                 val deadline = startNewPeriod(pixelConfig)
                 if (deadline != null) {
@@ -222,6 +246,7 @@ class RealEventHubPixelManager @Inject constructor(
                 nextDeadline = minOf(nextDeadline, pixelState.periodEndMillis)
             }
             for (pixelConfig in telemetry) {
+                if (!pixelConfig.trigger.isPeriod) continue
                 if (repository.getPixelState(pixelConfig.name) == null) {
                     val deadline = startNewPeriod(pixelConfig)
                     if (deadline != null) {
@@ -254,20 +279,21 @@ class RealEventHubPixelManager @Inject constructor(
     }
 
     private fun fireTelemetry(pixelState: PixelState): Long? {
-        val pixelData = buildPixel(pixelState)
+        val (parameters, encodedParameters) = buildPixel(pixelState)
 
-        if (pixelData.isNotEmpty()) {
-            val additionalParams = mapOf(
+        if (parameters.isNotEmpty() || encodedParameters.isNotEmpty()) {
+            val attributionParams = mapOf(
                 PARAM_ATTRIBUTION_PERIOD to calculateAttributionPeriod(
                     pixelState.periodStartMillis,
                     pixelState.config.trigger.period,
                 ).toString(),
             )
-            val allParams = pixelData + additionalParams
-            logcat(DEBUG) { "EventHub: firing pixel ${pixelState.pixelName} params=$allParams" }
+            val allParams = parameters + attributionParams
+            logcat(DEBUG) { "EventHub: firing pixel ${pixelState.pixelName} params=$allParams encoded=$encodedParameters" }
             pixel.enqueueFire(
                 pixelName = pixelState.pixelName,
                 parameters = allParams,
+                encodedParameters = encodedParameters,
             )
         } else {
             logcat(VERBOSE) { "EventHub: skipping pixel ${pixelState.pixelName}, no params" }
@@ -302,24 +328,57 @@ class RealEventHubPixelManager @Inject constructor(
         return periodEndMillis
     }
 
-    private fun buildPixel(pixelState: PixelState): Map<String, String> {
-        val pixelData = mutableMapOf<String, String>()
+    private fun buildPixel(pixelState: PixelState): Pair<Map<String, String>, Map<String, String>> {
+        val parameters = mutableMapOf<String, String>()
+        val encodedParameters = mutableMapOf<String, String>()
 
         for ((paramName, paramConfig) in pixelState.config.parameters) {
             if (paramConfig.isCounter) {
                 val value = (pixelState.params[paramName] ?: ParamState(0)).value
                 val bucketName = BucketCounter.bucketCount(value, paramConfig.buckets)
                 if (bucketName != null) {
-                    pixelData[paramName] = bucketName
+                    parameters[paramName] = bucketName
                 }
+            } else if (paramConfig.isData) {
+                pixelState.params[paramName]?.lastDataValue?.let { encodedParameters[paramName] = it }
             }
         }
 
-        return pixelData
+        return parameters to encodedParameters
+    }
+
+    private fun buildDataParams(config: TelemetryPixelConfig, eventData: JSONObject?): Map<String, String> {
+        val encodedParameters = mutableMapOf<String, String>()
+        for ((paramName, paramConfig) in config.parameters) {
+            if (!paramConfig.isData) continue
+            extractDataParam(eventData, paramConfig.dataKey)?.let { encodedParameters[paramName] = it }
+        }
+        return encodedParameters
+    }
+
+    /**
+     * Reads [dataKey] from a webEvent's `data` payload and returns the compact-JSON value %-encoded, or null
+     * when the key is absent (so the parameter is omitted). Mirrors the encoding used elsewhere for detection data.
+     */
+    private fun extractDataParam(eventData: JSONObject?, dataKey: String?): String? {
+        if (eventData == null || dataKey == null || !eventData.has(dataKey)) return null
+        val compactJson = if (eventData.isNull(dataKey)) {
+            "null"
+        } else {
+            when (val value = eventData.get(dataKey)) {
+                is JSONObject, is JSONArray -> value.toString()
+                is String -> JSONObject.quote(value)
+                else -> value.toString()
+            }
+        }
+        return percentEncode(compactJson)
     }
 
     companion object {
         const val PARAM_ATTRIBUTION_PERIOD = "attributionPeriod"
+
+        // RFC 3986 unreserved characters pass through; everything else is %-encoded.
+        private const val UNRESERVED = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_.~"
 
         fun calculateAttributionPeriod(periodStartMillis: Long, period: TelemetryPeriodConfig): Long {
             return toStartOfInterval(periodStartMillis, period.periodSeconds)
@@ -328,6 +387,23 @@ class RealEventHubPixelManager @Inject constructor(
         fun toStartOfInterval(timestampMillis: Long, periodSeconds: Long): Long {
             val epochSeconds = timestampMillis / 1000
             return (epochSeconds / periodSeconds) * periodSeconds
+        }
+
+        /**
+         * Percent-encodes [value] per RFC 3986. The data-template payload is already a compact-JSON string; this
+         * encodes it once so it can be sent verbatim as an encoded pixel parameter without double-encoding.
+         */
+        fun percentEncode(value: String): String {
+            val builder = StringBuilder()
+            for (byte in value.toByteArray(Charsets.UTF_8)) {
+                val code = byte.toInt() and 0xFF
+                if (code.toChar() in UNRESERVED) {
+                    builder.append(code.toChar())
+                } else {
+                    builder.append('%').append("%02X".format(code))
+                }
+            }
+            return builder.toString()
         }
     }
 }

@@ -26,8 +26,13 @@ data class TelemetryPixelConfig(
 }
 
 data class TelemetryTriggerConfig(
-    val period: TelemetryPeriodConfig,
-)
+    val type: String = "period",
+    val period: TelemetryPeriodConfig = TelemetryPeriodConfig(),
+    val source: String? = null,
+) {
+    val isImmediate: Boolean get() = type == "immediate"
+    val isPeriod: Boolean get() = type == "period"
+}
 
 data class TelemetryPeriodConfig(
     val seconds: Int = 0,
@@ -41,10 +46,12 @@ data class TelemetryPeriodConfig(
 
 data class TelemetryParameterConfig(
     val template: String,
-    val source: String,
-    val buckets: Map<String, BucketConfig>,
+    val source: String? = null,
+    val dataKey: String? = null,
+    val buckets: Map<String, BucketConfig> = emptyMap(),
 ) {
     val isCounter: Boolean get() = template == "counter"
+    val isData: Boolean get() = template == "data"
 }
 
 data class BucketConfig(
@@ -52,7 +59,11 @@ data class BucketConfig(
     val lt: Int?,
 )
 
-data class ParamState(val value: Int, val stopCounting: Boolean = false)
+data class ParamState(
+    val value: Int,
+    val stopCounting: Boolean = false,
+    val lastDataValue: String? = null,
+)
 
 data class PixelState(
     val pixelName: String,
