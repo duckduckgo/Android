@@ -290,6 +290,7 @@ class TabSwitcherActivity :
                 SystemBarStyle.light(Color.TRANSPARENT, Color.TRANSPARENT)
             }
             enableEdgeToEdge(statusBarStyle = barStyle, navigationBarStyle = barStyle)
+            updateLayoutForDisplayCutout(resources.configuration.orientation)
         }
 
         setContentView(binding.root)
@@ -329,7 +330,7 @@ class TabSwitcherActivity :
         when (settingsDataStore.omnibarType) {
             OmnibarType.SINGLE_TOP -> {
                 edgeToEdgeHandler.applyStatusBarInsets(binding.tabSwitcherToolbarTop.root)
-                edgeToEdgeHandler.applyNavigationBarInsets(tabsContainer)
+                edgeToEdgeHandler.applyNavigationBarInsets(tabsContainer, drawBehindGestureNav = true)
             }
             OmnibarType.SINGLE_BOTTOM -> {
                 edgeToEdgeHandler.applyStatusBarInsets(tabsContainer)
