@@ -113,7 +113,7 @@
                     android:alpha="0"
                     android:includeFontPadding="false"
                     android:paddingHorizontal="24dp"
-                    android:text="@string/preOnboardingDaxDialog1Button"
+                    android:text="@string/preOnboardingDaxDialog1ButtonBrandDesign"
                     android:textAppearance="@style/Typography.DuckDuckGo.Onboarding.Button"
                     tools:alpha="1"
                     tools:ignore="DeprecatedWidgetInXml,InvalidDaxButtonProperty" />
