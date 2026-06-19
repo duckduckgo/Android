@@ -1031,6 +1031,12 @@
     <string name="onboardingSearchDaxDialogOption1Quoted" instruction="translate &apos;duck&apos; too.">miten sanotaan \"ankka\" englanniksi</string>
     <string name="onboardingSearchDaxDialogOption1EnglishQuoted" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">miten sanotaan \"ankka\" espanjaksi</string>
 
+    <string name="onboardingDuckAiFireButtonDaxDialogTitle">Se on Duck.ai!</string>
+    <string name="onboardingDuckAiFireButtonDaxDialogDescription"><![CDATA[Yksityiset tekoälykeskustelut, jotka voit poistaa milloin tahansa <b>Fire Button</b> -painikkeella. Kokeile nyt! 🔥]]></string>
+    <string name="onboardingDuckAiEndCtaTitle">Hyvin menee!</string>
+    <string name="onboardingDuckAiEndCtaDescription"><![CDATA[Hae sivustoja ja vieraile niillä osoiteriviltä tai aloita yksityinen tekoälykeskustelu siirtymällä Duck.ai:hin.<br/><br/>Voit käyttää Duck.ai:ta mistä tahansa, missä näet chat-kuvakkeen]]></string>
+    <string name="onboardingDuckAiEndCtaButton">Ylävitonen!</string>
+
     <string name="input_screen_user_pref_without_ai_updated">Vain haku</string>
     <string name="input_screen_user_pref_with_ai_updated">Vaihda haun ja\nDuck.ai:n välillä</string>
 

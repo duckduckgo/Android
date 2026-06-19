@@ -1031,6 +1031,12 @@
     <string name="onboardingSearchDaxDialogOption1Quoted" instruction="translate &apos;duck&apos; too.">hogyan mondják angolul, hogy „kacsa”</string>
     <string name="onboardingSearchDaxDialogOption1EnglishQuoted" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">hogyan mondják spanyolul, hogy „kacsa”</string>
 
+    <string name="onboardingDuckAiFireButtonDaxDialogTitle">Ez itt a Duck.ai!</string>
+    <string name="onboardingDuckAiFireButtonDaxDialogDescription"><![CDATA[Privát MI-beszélgetések, amelyeket bármikor törölhetsz a <b>Fire Button</b> segítségével. Próbáld ki! 🔥]]></string>
+    <string name="onboardingDuckAiEndCtaTitle">Menni fog!</string>
+    <string name="onboardingDuckAiEndCtaDescription"><![CDATA[A címsávban kereshetsz, webhelyeket nyithatsz meg, vagy átválthatsz a Duck.ai-ra privát MI-beszélgetéshez.<br/><br/>A Duck.ai-t bárhol használhatod, ahol látod a beszélgetés ikonját]]></string>
+    <string name="onboardingDuckAiEndCtaButton">Pacsi!</string>
+
     <string name="input_screen_user_pref_without_ai_updated">Csak keresés</string>
     <string name="input_screen_user_pref_with_ai_updated">Váltás a keresés\nés a Duck.ai között</string>
 
