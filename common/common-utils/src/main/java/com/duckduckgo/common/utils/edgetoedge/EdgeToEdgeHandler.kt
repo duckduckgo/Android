@@ -16,12 +16,8 @@
 
 package com.duckduckgo.common.utils.edgetoedge
 
-import android.content.res.Configuration
-import android.os.Build
 import android.view.View
 import android.view.ViewGroup
-import android.view.Window
-import android.view.WindowManager
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.doOnAttach
@@ -153,29 +149,6 @@ class EdgeToEdgeHandler @Inject constructor() {
             insets
         }
         ViewCompat.requestApplyInsets(view)
-    }
-
-    /**
-     * Sets [window]'s display-cutout mode from [orientation]: in landscape the window avoids the
-     * cutout (the notch/camera area is reserved as a black letterbox), in portrait it keeps the
-     * default behaviour and draws normally around the (typically top-centre) cutout.
-     *
-     * @param window The activity window whose layout params are updated.
-     * @param orientation A [Configuration] orientation, e.g. [Configuration.ORIENTATION_LANDSCAPE].
-     */
-    fun applyDisplayCutoutMode(
-        window: Window,
-        orientation: Int,
-    ) {
-        if (Build.VERSION.SDK_INT >= 28) {
-            window.attributes = window.attributes.apply {
-                layoutInDisplayCutoutMode = if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                    WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_NEVER
-                } else {
-                    WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_DEFAULT
-                }
-            }
-        }
     }
 
     private fun View.applyInsets(apply: (WindowInsetsCompat) -> Unit) {

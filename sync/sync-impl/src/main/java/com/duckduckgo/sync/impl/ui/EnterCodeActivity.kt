@@ -87,7 +87,7 @@ class EnterCodeActivity : DuckDuckGoActivity() {
     private fun configureEdgeToEdgeInsets() {
         edgeToEdgeHandler.applyHorizontalSystemBarInsets(binding.root)
         edgeToEdgeHandler.applyStatusBarInsets(binding.includeToolbar.appBarLayout)
-        edgeToEdgeHandler.applyNavigationBarInsets(binding.pasteCodeButton, drawBehindGestureNav = true)
+        edgeToEdgeHandler.applyNavigationBarInsetsAsMargin(binding.pasteCodeButton)
     }
 
     private fun configureListeners() {
