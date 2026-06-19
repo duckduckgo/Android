@@ -470,7 +470,7 @@ class CtaViewModel @Inject constructor(
 
     @WorkerThread
     private suspend fun canShowDuckAiEndCta(): Boolean =
-        onboardingStore.isDuckAiOnboardingFlow() && duckAiFireButtonShown() && !duckAiEndShown()
+        onboardingStore.isDuckAiOnboardingFlow() && duckAiFireButtonShown() && !duckAiEndShown() && !hideTips()
 
     @WorkerThread
     private suspend fun canShowSubscriptionCta(): Boolean {
