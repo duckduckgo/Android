@@ -81,6 +81,9 @@ interface ExchangeV2Runner {
     /** Peer device's human-readable name, learned from `recovery_code_available` / `recovery_code_request`. */
     val peerName: String?
 
+    /** Peer device's credential kind ("ddg" / "3party"), learned during role election. Null before then. */
+    val peerKind: String?
+
     fun startScan(pastedUrl: String)
 
     fun startPresent()
@@ -134,7 +137,7 @@ class RealExchangeV2Runner @Inject constructor(
 
     @Volatile private var peerPublicKey: String? = null
 
-    @Volatile private var peerKind: String? = null
+    @Volatile private var _peerKind: String? = null
 
     @Volatile private var peerUserId: String? = null
 
@@ -160,6 +163,7 @@ class RealExchangeV2Runner @Inject constructor(
     override val linkingCode: String? get() = _linkingCode
     override val canStartAsPresenter: Boolean get() = true
     override val peerName: String? get() = _peerName
+    override val peerKind: String? get() = _peerKind
 
     // -----------------------------------------------------------------------
     // Entry points
@@ -251,7 +255,7 @@ class RealExchangeV2Runner @Inject constructor(
                     if (r.code == HTTP_CONFLICT) {
                         logcat { "Sync-ExchangeV2: channel_id $candidate already taken, retrying (${attempt + 1}/$MAX_CHANNEL_CREATE_RETRIES)" }
                     } else {
-                        emitSessionError("Failed to create channel: ${r.reason}")
+                        emitSessionError("Failed to create channel")
                         return null
                     }
                 }
@@ -302,7 +306,7 @@ class RealExchangeV2Runner @Inject constructor(
         ownKeyPair = null
         peerChannelId = null
         peerPublicKey = null
-        peerKind = null
+        _peerKind = null
         peerUserId = null
         _peerName = null
         _linkingCode = null
@@ -463,12 +467,12 @@ class RealExchangeV2Runner @Inject constructor(
                 peerPublicKey = message.publicKey
             }
             is ExchangeV2Message.RecoveryCodeAvailable -> {
-                peerKind = message.kind
+                _peerKind = message.kind
                 peerUserId = message.userId
                 _peerName = message.name
             }
             is ExchangeV2Message.RecoveryCodeRequest -> {
-                peerKind = message.kind
+                _peerKind = message.kind
                 peerUserId = null
                 _peerName = message.name
             }
@@ -501,12 +505,12 @@ class RealExchangeV2Runner @Inject constructor(
      */
     private fun autoElectRoleLocked(sm: ExchangeV2StateMachine) {
         val elected = electRole() ?: run {
-            logcat { "Sync-ExchangeV2: cannot auto-elect role yet (role=${_pairingRole}, peerKind=$peerKind)" }
+            logcat { "Sync-ExchangeV2: cannot auto-elect role yet (role=${_pairingRole}, peerKind=$_peerKind)" }
             return
         }
         logcat {
             "Sync-ExchangeV2: auto-electing $elected " +
-                "(own role=${_pairingRole}, own userId=${syncStore.userId}, peer kind=$peerKind, peer userId=$peerUserId)"
+                "(own role=${_pairingRole}, own userId=${syncStore.userId}, peer kind=$_peerKind, peer userId=$peerUserId)"
         }
         val electResult = sm.localTrigger(LocalTrigger.RoleElected(elected))
         emit(electResult.event)
@@ -527,7 +531,7 @@ class RealExchangeV2Runner @Inject constructor(
     private fun electRole(): Role? {
         val ownRole = _pairingRole ?: return null
         val ownUserId = syncStore.userId
-        val pKind = peerKind ?: return null
+        val pKind = _peerKind ?: return null
         val pUserId = peerUserId
         return when {
             ownUserId != null && pUserId == null -> Role.Host
@@ -642,7 +646,7 @@ class RealExchangeV2Runner @Inject constructor(
         // REVIEW: likely unreachable under eager-send ordering — confirm against the ordering spec
         // (Unified Algorithm 1214739740392701) and delete if dead.
         val sm = session ?: return
-        if (sm.currentState == ExchangeV2State.Negotiating && peerKind != null) {
+        if (sm.currentState == ExchangeV2State.Negotiating && _peerKind != null) {
             autoElectRoleLocked(sm)
         }
     }
@@ -661,11 +665,11 @@ class RealExchangeV2Runner @Inject constructor(
         // failure falls through to recovery_code_unavailable below.
         // peerKind is set during role election; reaching Host.Sending without it means something
         // upstream is broken — bail rather than silently assuming ddg.
-        val codeResult = when (peerKind) {
+        val codeResult = when (_peerKind) {
             "ddg" -> provisionForDdgPeer()
             "3party" -> provisionForThirdPartyPeer()
             null -> Result.Error(reason = "Host.Sending reached without a known peer kind")
-            else -> Result.Error(reason = "Unsupported peer kind '$peerKind'")
+            else -> Result.Error(reason = "Unsupported peer kind '$_peerKind'")
         }
         return when (codeResult) {
             is Result.Success -> {
@@ -678,7 +682,7 @@ class RealExchangeV2Runner @Inject constructor(
                 sendOnWireAndRecord(json, peer, peerKey, ExchangeV2Message.RecoveryCodeResponse(json, recoveryCode))
             }
             is Result.Error -> {
-                logcat(ERROR) { "Sync-ExchangeV2: recovery code unavailable for peerKind=$peerKind: ${codeResult.reason}" }
+                logcat(ERROR) { "Sync-ExchangeV2: recovery code unavailable for peerKind=$_peerKind: ${codeResult.reason}" }
                 val json = """{"type":"recovery_code_unavailable"}"""
                 sendOnWireAndRecord(json, peer, peerKey, ExchangeV2Message.RecoveryCodeUnavailable(json))
                 emitSessionError("Couldn't generate a recovery code: ${codeResult.reason}")
@@ -739,7 +743,7 @@ class RealExchangeV2Runner @Inject constructor(
                 true
             }
             is Result.Error -> {
-                emitSessionError("Failed to send ${outboundMessage.messageType}: ${r.reason}")
+                emitSessionError("Failed to send message to peer over channel")
                 false
             }
         }

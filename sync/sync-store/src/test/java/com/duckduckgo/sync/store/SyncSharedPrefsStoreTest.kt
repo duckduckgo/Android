@@ -134,25 +134,13 @@ class SyncSharedPrefsStoreTest {
     }
 
     @Test
-    fun whenProtectedKeysJsonStoredThenValueUpdatedInPrefsStore() {
-        assertNull(store.protectedKeysJson)
-        val keysJson = """[{"kid":"k1","purpose":"ai_chats","encrypted_with":"ddg","encrypted_private_key":"jwe_data"}]"""
-        store.protectedKeysJson = keysJson
-        assertEquals(keysJson, store.protectedKeysJson)
-        store.protectedKeysJson = null
-        assertNull(store.protectedKeysJson)
-    }
-
-    @Test
     fun whenClearAllThenV2FieldsAlsoCleared() {
         store.credentialId = "ddg"
         store.scopedPassword = ScopedPassword("encrypted_sp")
-        store.protectedKeysJson = """[{"kid":"k1"}]"""
 
         store.clearAll()
 
         assertNull(store.credentialId)
         assertNull(store.scopedPassword)
-        assertNull(store.protectedKeysJson)
     }
 }

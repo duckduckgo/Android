@@ -30,9 +30,6 @@ interface SyncStore {
     /** Scoped password (SP primary key) for the 3party credential. Only present when a 3party credential exists. */
     var scopedPassword: ScopedPassword?
 
-    /** JSON array of protected keys with kid, purpose, encrypted_with, encrypted_private_key. */
-    var protectedKeysJson: String?
-
     fun isEncryptionSupported(): Boolean
     fun isSignedInFlow(): Flow<Boolean>
     fun isSignedIn(): Boolean
@@ -166,14 +163,6 @@ constructor(
             }
         }
 
-    override var protectedKeysJson: String?
-        get() = encryptedPreferences?.getString(KEY_PROTECTED_KEYS_JSON, null)
-        set(value) {
-            encryptedPreferences?.edit(commit = true) {
-                if (value == null) remove(KEY_PROTECTED_KEYS_JSON) else putString(KEY_PROTECTED_KEYS_JSON, value)
-            }
-        }
-
     override fun isEncryptionSupported(): Boolean = encryptedPreferences != null
 
     override fun isSignedInFlow(): Flow<Boolean> = isSignedInStateFlow
@@ -218,6 +207,5 @@ constructor(
         private const val KEY_SK = "KEY_SK"
         private const val KEY_CREDENTIAL_ID = "KEY_CREDENTIAL_ID"
         private const val KEY_SCOPED_PASSWORD = "KEY_SCOPED_PASSWORD"
-        private const val KEY_PROTECTED_KEYS_JSON = "KEY_PROTECTED_KEYS_JSON"
     }
 }
