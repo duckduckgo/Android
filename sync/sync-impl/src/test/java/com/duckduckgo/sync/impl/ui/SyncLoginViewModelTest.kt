@@ -19,16 +19,31 @@ package com.duckduckgo.sync.impl.ui
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.sync.TestSyncFixtures.jsonRecoveryKey
 import com.duckduckgo.sync.TestSyncFixtures.jsonRecoveryKeyEncoded
 import com.duckduckgo.sync.TestSyncFixtures.primaryKey
+import com.duckduckgo.sync.impl.AccountErrorCodes.PAIRING_REJECTED
+import com.duckduckgo.sync.impl.RealSyncCodeDispatcher
 import com.duckduckgo.sync.impl.RecoveryCode
 import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.impl.SyncAccountRepository
 import com.duckduckgo.sync.impl.SyncAuthCode.Recovery
+import com.duckduckgo.sync.impl.SyncFeature
+import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2CodeParseResult
+import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Event
+import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Message
+import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2QrCode
+import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Runner
+import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2State
 import com.duckduckgo.sync.impl.pixels.SyncPixels
 import com.duckduckgo.sync.impl.ui.SyncLoginViewModel.Command
+import com.duckduckgo.sync.impl.ui.SyncLoginViewModel.Command.LoginSucess
+import com.duckduckgo.sync.impl.ui.SyncLoginViewModel.Command.ShowV2Error
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
@@ -47,11 +62,21 @@ class SyncLoginViewModelTest {
 
     private val syncRepostitory: SyncAccountRepository = mock()
     private val syncPixels: SyncPixels = mock()
+    private val syncFeature = FakeFeatureToggleFactory.create(SyncFeature::class.java)
+    private val qrCode: ExchangeV2QrCode = mock()
+    private val runner: ExchangeV2Runner = mock()
+    private val codeDispatcher = RealSyncCodeDispatcher(
+        syncFeature = syncFeature,
+        syncAccountRepository = syncRepostitory,
+        qrCode = qrCode,
+        runner = runner,
+    )
 
     private val testee = SyncLoginViewModel(
         syncRepostitory,
         syncPixels,
         coroutineTestRule.testDispatcherProvider,
+        codeDispatcher = codeDispatcher,
     )
 
     @Test
@@ -79,12 +104,88 @@ class SyncLoginViewModelTest {
     }
 
     @Test
+    fun whenV2CodeRequiresNewerProtocolThenShowUpdateError() = runTest {
+        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
+        val scanned = "https://duckduckgo.com/sync/pairing/#&code2=v2code"
+        whenever(qrCode.parse(scanned)).thenReturn(
+            ExchangeV2CodeParseResult.LinkingV2(channelId = "c", publicKey = "k", version = "2"),
+        )
+        whenever(runner.eventsSince(any())).thenReturn(
+            flowOf(ExchangeV2Event.SessionError(timestampMs = 0L, message = "Peer requires protocol v3; please update this app")),
+        )
+
+        testee.commands().test {
+            testee.onQRCodeScanned(scanned)
+            val command = awaitItem()
+            assertTrue("expected ShowV2Error, got $command", command is ShowV2Error)
+            assertEquals(v2UpgradeRequiredError, (command as ShowV2Error).content)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenV2PairingRejectedByPeerThenShowError() = runTest {
+        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
+        val scannedCode = "https://duckduckgo.com/sync/pairing/#&code2=v2code"
+        whenever(qrCode.parse(scannedCode)).thenReturn(
+            ExchangeV2CodeParseResult.LinkingV2(channelId = "c", publicKey = "k", version = "2"),
+        )
+        whenever(runner.eventsSince(any())).thenReturn(
+            flowOf(
+                ExchangeV2Event.Transition(
+                    timestampMs = 0L,
+                    from = ExchangeV2State.Joiner.Confirming,
+                    to = ExchangeV2State.Joiner.AbortedByHost,
+                    trigger = ExchangeV2Message.RecoveryCodeDenied(rawJson = "{}"),
+                    localTrigger = null,
+                ),
+            ),
+        )
+
+        testee.commands().test {
+            testee.onQRCodeScanned(scannedCode)
+            val command = awaitItem()
+            assertTrue("expected ShowV2Error, got $command", command is ShowV2Error)
+            assertEquals(PAIRING_REJECTED.code.toV2PairingError(), (command as ShowV2Error).content)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
     fun whenOnLoginSuccessThenCommandIsLoginSuccess() = runTest {
         testee.commands().test {
             testee.onLoginSuccess()
             val command = awaitItem()
             assertTrue(command is Command.LoginSucess)
             verify(syncPixels).fireLoginPixel()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenV2SameAccountThenShowAlreadyPaired() = runTest {
+        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
+        val scanned = "https://duckduckgo.com/sync/pairing/#&code2=v2code"
+        whenever(qrCode.parse(scanned)).thenReturn(
+            ExchangeV2CodeParseResult.LinkingV2(channelId = "c", publicKey = "k", version = "2"),
+        )
+        whenever(runner.eventsSince(any())).thenReturn(
+            flowOf(
+                ExchangeV2Event.Transition(
+                    timestampMs = 0L,
+                    from = ExchangeV2State.Negotiating,
+                    to = ExchangeV2State.SameAccountAbort,
+                    trigger = null,
+                    localTrigger = null,
+                ),
+            ),
+        )
+
+        testee.commands().test {
+            testee.onQRCodeScanned(scanned)
+            val command = awaitItem()
+            assertTrue("expected ShowV2Error, got $command", command is ShowV2Error)
+            assertEquals(v2AlreadyPairedError, (command as ShowV2Error).content)
             cancelAndIgnoreRemainingEvents()
         }
     }

@@ -27,17 +27,22 @@ import com.duckduckgo.sync.impl.AccountErrorCodes.CONNECT_FAILED
 import com.duckduckgo.sync.impl.AccountErrorCodes.CREATE_ACCOUNT_FAILED
 import com.duckduckgo.sync.impl.AccountErrorCodes.INVALID_CODE
 import com.duckduckgo.sync.impl.AccountErrorCodes.LOGIN_FAILED
+import com.duckduckgo.sync.impl.DispatchOutcome
 import com.duckduckgo.sync.impl.ExchangeResult.AccountSwitchingRequired
 import com.duckduckgo.sync.impl.ExchangeResult.LoggedIn
 import com.duckduckgo.sync.impl.ExchangeResult.Pending
 import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.Result.Error
 import com.duckduckgo.sync.impl.Result.Success
+import com.duckduckgo.sync.impl.RouteDecision
 import com.duckduckgo.sync.impl.SyncAccountRepository
 import com.duckduckgo.sync.impl.SyncAuthCode
+import com.duckduckgo.sync.impl.SyncCodeDispatcher
 import com.duckduckgo.sync.impl.onFailure
 import com.duckduckgo.sync.impl.onSuccess
 import com.duckduckgo.sync.impl.pixels.SyncPixels
+import com.duckduckgo.sync.impl.pixels.SyncPixels.PeerKind
+import com.duckduckgo.sync.impl.pixels.fireSetupFailed
 import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Companion.POLLING_INTERVAL_EXCHANGE_FLOW
 import com.duckduckgo.sync.impl.ui.SyncLoginViewModel.Command.LoginSucess
 import com.duckduckgo.sync.impl.ui.SyncLoginViewModel.Command.ReadTextCode
@@ -46,8 +51,10 @@ import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
+import logcat.logcat
 import javax.inject.*
 
 @ContributesViewModel(ActivityScope::class)
@@ -55,6 +62,7 @@ class SyncLoginViewModel @Inject constructor(
     private val syncAccountRepository: SyncAccountRepository,
     private val syncPixels: SyncPixels,
     private val dispatchers: DispatcherProvider,
+    private val codeDispatcher: SyncCodeDispatcher,
 ) : ViewModel() {
     private val command = Channel<Command>(1, DROP_OLDEST)
     fun commands(): Flow<Command> = command.receiveAsFlow()
@@ -64,6 +72,14 @@ class SyncLoginViewModel @Inject constructor(
         data object LoginSucess : Command()
         data object Error : Command()
         data class ShowError(@StringRes val message: Int, val reason: String = "") : Command()
+
+        /** v2 §"Exchange Confirmations": prompt user "Sync your data with [peerName]?". */
+        data class AskJoinerConfirmation(val peerName: String?, val peerKind: PeerKind? = null) : Command()
+
+        /** v2 §"Exchange Confirmations": prompt user "Allow [peerName] to join your sync?". */
+        data class AskHostConfirmation(val peerName: String?, val peerKind: PeerKind? = null) : Command()
+
+        internal data class ShowV2Error(val content: V2PairingErrorContent) : Command()
     }
 
     fun onReadTextCodeClicked() {
@@ -87,23 +103,61 @@ class SyncLoginViewModel @Inject constructor(
 
     fun onQRCodeScanned(qrCode: String) {
         viewModelScope.launch(dispatchers.io()) {
-            val codeType = syncAccountRepository.parseSyncAuthCode(qrCode)
-            when (val result = syncAccountRepository.processCode(codeType)) {
-                is Error -> {
-                    processError(result)
-                }
-
-                is Success -> {
-                    if (codeType is SyncAuthCode.Exchange) {
-                        pollForRecoveryKey()
-                    } else {
-                        syncPixels.fireLoginPixel()
-                        command.send(LoginSucess)
+            // FF off → Legacy runs the existing v1 control flow; FF on → v2 codes surface via DispatchOutcome.
+            when (val decision = codeDispatcher.route(qrCode)) {
+                is RouteDecision.Legacy -> {
+                    logcat { "Sync-CodeDispatch: SyncLoginViewModel handling Legacy(${decision.authCode::class.simpleName})" }
+                    val codeType = decision.authCode
+                    when (val result = syncAccountRepository.processCode(codeType)) {
+                        is Error -> processError(result)
+                        is Success -> {
+                            if (codeType is SyncAuthCode.Exchange) {
+                                pollForRecoveryKey()
+                            } else {
+                                syncPixels.fireLoginPixel()
+                                command.send(LoginSucess)
+                            }
+                        }
                     }
+                }
+                is RouteDecision.V2InProgress -> {
+                    logcat { "Sync-CodeDispatch: SyncLoginViewModel observing V2InProgress" }
+                    decision.outcomes.collect { outcome -> handleV2Outcome(outcome) }
                 }
             }
         }
     }
+
+    /** Map one v2 [DispatchOutcome] onto this VM's existing command pipeline. */
+    private suspend fun handleV2Outcome(outcome: DispatchOutcome) {
+        syncPixels.fireSetupFailed(outcome)
+        when (outcome) {
+            is DispatchOutcome.LoggedIn -> {
+                syncPixels.fireLoginPixel()
+                command.send(LoginSucess)
+            }
+            is DispatchOutcome.AlreadyConnected ->
+                command.send(Command.ShowV2Error(v2AlreadyPairedError))
+            is DispatchOutcome.UpgradeRequired -> {
+                logcat { "Sync v2: upgrade required, peer needs protocol v${outcome.codeMajor}" }
+                command.send(Command.ShowV2Error(v2UpgradeRequiredError))
+            }
+            is DispatchOutcome.Failed -> {
+                val content = outcome.code.toV2PairingError()
+                command.send(Command.ShowV2Error(content))
+            }
+            is DispatchOutcome.JoinerConfirmationRequested ->
+                command.send(Command.AskJoinerConfirmation(outcome.peerName, outcome.peerKind))
+            is DispatchOutcome.HostConfirmationRequested ->
+                command.send(Command.AskHostConfirmation(outcome.peerName, outcome.peerKind))
+            is DispatchOutcome.LinkingCodeReady -> {} // No-op; used only by presentV2() flow
+        }
+    }
+
+    fun onJoinerConfirmed() { codeDispatcher.confirmJoiner() }
+    fun onJoinerDenied() { codeDispatcher.denyJoiner() }
+    fun onHostConfirmed() { codeDispatcher.confirmHost() }
+    fun onHostDenied() { codeDispatcher.denyHost() }
 
     private suspend fun processError(result: Error) {
         when (result.code) {
