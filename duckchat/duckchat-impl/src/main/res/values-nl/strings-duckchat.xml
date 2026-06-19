@@ -126,6 +126,12 @@
     <!-- Duck AI Chat Suggestions -->
     <string name="duckAiChatHistoryViewAllChats">Alle chats weergeven</string>
 
+    <!-- Duck.ai onboarding end CTA -->
+    <string name="duckAiEndCtaTitle">Je kunt het!</string>
+    <string name="duckAiEndCtaDescription"><![CDATA[Gebruik de adresbalk om websites te zoeken en te bezoeken, of schakel over naar Duck.ai voor een privé-chat met AI.<br/><br/>Je kunt Duck.ai gebruiken vanaf elke plek waar je het chatpictogram ziet.]]></string>
+    <string name="duckAiEndCtaButton">High five!</string>
+    <string name="duckAiEndCtaDescriptionCustomAi"><![CDATA[Start een privé AI-chat met Duck.ai of schakel over naar Zoeken voor beschermd browsen.<br/><br/>Je kunt Duck.ai gebruiken vanaf elke plek waar je het chatpictogram ziet.]]></string>
+
     <!-- Native Duck.ai chat history -->
     <string name="duck_ai_chat_history_title">Chats</string>
     <string name="duck_ai_chat_history_section_pinned">Vastgezet</string>
