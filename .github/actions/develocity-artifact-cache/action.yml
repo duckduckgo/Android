@@ -69,7 +69,7 @@ runs:
         # Honour a custom Gradle User Home; default to the conventional location so this
         # works on both GitHub-hosted and self-hosted runners (not just /home/runner).
         GRADLE_HOME_DIR="${GRADLE_USER_HOME:-$HOME/.gradle}"
-        # ac-step-3: test the artifact cache in isolation by disabling the setup cache.
+        # ac-step-4: test the artifact cache in isolation by disabling the setup cache.
         # To test the setup cache separately later, swap --disable-setup-cache for --disable-artifact-cache.
         echo "ARTIFACT_CACHE_CMD_OPTS=--dv-server=${{ inputs.dv-server }} --image-name=${{ inputs.image-name }} --gradle-home=$GRADLE_HOME_DIR --disable-setup-cache" >> "$GITHUB_ENV"
 
