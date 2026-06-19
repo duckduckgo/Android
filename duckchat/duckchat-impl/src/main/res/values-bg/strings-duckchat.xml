@@ -126,6 +126,12 @@
     <!-- Duck AI Chat Suggestions -->
     <string name="duckAiChatHistoryViewAllChats">Преглед на всички чатове</string>
 
+    <!-- Duck.ai onboarding end CTA -->
+    <string name="duckAiEndCtaTitle">Справихте се!</string>
+    <string name="duckAiEndCtaDescription"><![CDATA[Използвайте адресната лента, за да търсите и посещавате сайтове, или превключете към Duck.ai за поверителен чат с AI.<br/><br/>Можете да използвате Duck.ai от всяко място, където видите иконата за чат]]></string>
+    <string name="duckAiEndCtaButton">Поздравления!</string>
+    <string name="duckAiEndCtaDescriptionCustomAi"><![CDATA[Започнете поверителен чат с AI с Duck.ai или превключете към „Търсене“ за защитено сърфиране.<br/><br/>Можете да използвате Duck.ai от всяко място, където видите иконата за чат]]></string>
+
     <!-- Native Duck.ai chat history -->
     <string name="duck_ai_chat_history_title">Чатове</string>
     <string name="duck_ai_chat_history_section_pinned">Закачени</string>
