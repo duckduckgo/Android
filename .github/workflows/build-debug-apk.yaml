@@ -76,14 +76,14 @@ jobs:
           MALICIOUS_SITE_PROTECTION_AUTH_TOKEN: ${{ secrets.MALICIOUS_SITE_PROTECTION_AUTH_TOKEN }}
           DUCKSANS_PACKAGE_AUTH_USER: ${{ secrets.DAXMOBILE_GITHUB_PACKAGES_AUTOMATION_USER }}
           DUCKSANS_PACKAGE_AUTH_TOKEN: ${{ secrets.DAXMOBILE_GITHUB_PACKAGES_AUTOMATION }}
-        run: ./gradlew assembleInternalDebug -Pforce-default-variant -Pddg.di=${{ matrix.di }}${{ matrix.di == 'AnvilDagger' && ' -Dscan.tag.ac-step-5' || '' }} # TEMP (ac-step-5 experiment): tag only the AnvilDagger build, which runs the artifact cache
+        run: ./gradlew assembleInternalDebug -Pforce-default-variant -Pddg.di=${{ matrix.di }}${{ matrix.di == 'AnvilDagger' && ' -Dscan.tag.ac-step-4' || '' }} # TEMP (ac-step-5 experiment): tag only the AnvilDagger build, which runs the artifact cache
 
       - name: Store Develocity Artifact Cache
         if: always() && matrix.di == 'AnvilDagger' # artifact cache runs on AnvilDagger only (avoid conflict with Metro)
         uses: ./.github/actions/develocity-artifact-cache
         with:
           command: store
-          image-name: android-debug-apk-${{ matrix.di }}-v2 # bumped suffix forces a clean AC cache for the step-3 re-run (no prior image -> "Nothing to restore")
+          image-name: android-debug-apk-${{ matrix.di }}-v3 # bumped suffix forces a clean AC cache for the step-3 re-run (no prior image -> "Nothing to restore")
           develocity-access-key: ${{ secrets.DEVELOCITY_ACCESS_KEY }}
           repo-password: ${{ secrets.DAXMOBILE_ANDROID_CACHE_TOOLS }}
 
