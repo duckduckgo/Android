@@ -72,7 +72,7 @@ jobs:
           asana-section: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
           asana-task-name: Update content scope scripts to version ${{ steps.extract-release-version.outputs._1}}
           asana-task-description: |
-            Content scope scripts have been updated and a PR created.
+            Content scope scripts have been updated and a PR will be created.
 
             Tests will **only** run if something has changed in the `node_modules/@duckduckgo/content-scope-scripts` folder.
 
