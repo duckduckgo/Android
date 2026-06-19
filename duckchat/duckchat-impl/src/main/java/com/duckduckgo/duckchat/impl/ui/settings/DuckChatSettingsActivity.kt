@@ -23,6 +23,7 @@ import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
 import android.widget.CompoundButton
+import androidx.annotation.StringRes
 import androidx.core.content.ContextCompat
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
@@ -56,6 +57,7 @@ import com.duckduckgo.duckchat.impl.databinding.IncludeDuckAiInputScreenSettings
 import com.duckduckgo.duckchat.impl.inputscreen.ui.metrics.discovery.InputScreenDiscoveryFunnel
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_SETTINGS_DISPLAYED
 import com.duckduckgo.duckchat.impl.store.DefaultTogglePosition
+import com.duckduckgo.duckchat.impl.store.SearchAssistVisibility
 import com.duckduckgo.duckchat.impl.store.getDefaultTogglePositionForIndex
 import com.duckduckgo.duckchat.impl.ui.settings.DuckChatSettingsViewModel.DuckChatSettingsViewModelFactory
 import com.duckduckgo.duckchat.impl.ui.settings.DuckChatSettingsViewModel.ViewState
@@ -276,6 +278,10 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
             if (viewState.isSearchSectionVisible) {
                 with(showDuckChatSearchSettingsLink) {
                     isVisible = true
+                    setSecondaryText(
+                        viewState.searchAssistVisibility?.let { getString(it.toDisplayNameRes()) }
+                            ?: getString(R.string.duck_chat_assist_settings_description),
+                    )
                     setOnClickListener {
                         viewModel.duckChatSearchAISettingsClicked()
                     }
@@ -346,6 +352,10 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
             is DuckChatSettingsViewModel.Command.ShowDefaultTogglePositionDialog -> {
                 showDefaultTogglePositionDialog(command.currentPosition)
             }
+
+            is DuckChatSettingsViewModel.Command.ShowSearchAssistDialog -> {
+                showSearchAssistVisibilityDialog(command.currentVisibility)
+            }
         }
     }
 
@@ -366,6 +376,50 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
                 object : RadioListAlertDialogBuilder.EventListener() {
                     override fun onPositiveButtonClicked(selectedItem: Int) {
                         viewModel.onDefaultTogglePositionSelected(selectedItem.getDefaultTogglePositionForIndex())
+                    }
+                },
+            ).show()
+    }
+
+    // The order Search Assist options are presented in the dialog. Change this freely — pre-selection and
+    // the chosen result are both derived from this list, so they stay in sync. It is independent of the
+    // SERP `kbe` encoding, which only governs how the web value is read.
+    private val searchAssistVisibilityOptions: List<SearchAssistVisibility> = listOf(
+        SearchAssistVisibility.NEVER,
+        SearchAssistVisibility.ON_DEMAND,
+        SearchAssistVisibility.SOMETIMES,
+        SearchAssistVisibility.OFTEN,
+    )
+
+    @StringRes
+    private fun SearchAssistVisibility.toDisplayNameRes(): Int =
+        when (this) {
+            SearchAssistVisibility.NEVER -> R.string.duckAiSearchAssistVisibilityNever
+            SearchAssistVisibility.ON_DEMAND -> R.string.duckAiSearchAssistVisibilityOnDemand
+            SearchAssistVisibility.SOMETIMES -> R.string.duckAiSearchAssistVisibilitySometimes
+            SearchAssistVisibility.OFTEN -> R.string.duckAiSearchAssistVisibilityOften
+        }
+
+    private fun showSearchAssistVisibilityDialog(currentVisibility: SearchAssistVisibility?) {
+        // `options` is the single source of truth for the dialog's order. RadioListAlertDialogBuilder
+        // assigns radio ids as (listIndex + 1); deriving both the pre-selected id and the chosen result
+        // from this same list keeps them correct no matter how the options are ordered.
+        val options = searchAssistVisibilityOptions
+        RadioListAlertDialogBuilder(this)
+            .setTitle(R.string.duckAiSearchAssistVisibilityTitle)
+            .setMessage(R.string.duckAiSearchAssistVisibilitySubtitle)
+            .setOptions(
+                options.map { it.toDisplayNameRes() },
+                currentVisibility?.let { options.indexOf(it).takeIf { index -> index >= 0 }?.plus(1) },
+            )
+            .setPositiveButton(CommonR.string.dialogSave)
+            .setNegativeButton(CommonR.string.cancel)
+            .addEventListener(
+                object : RadioListAlertDialogBuilder.EventListener() {
+                    override fun onPositiveButtonClicked(selectedItem: Int) {
+                        options.getOrNull(selectedItem - 1)?.let {
+                            viewModel.onSearchAssistVisibilitySelected(it)
+                        }
                     }
                 },
             ).show()

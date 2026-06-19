@@ -115,4 +115,14 @@ class SerpSettingsPrefsDataStoreTest {
 
         assertNull(result)
     }
+
+    @Test
+    fun whenObserveSerpSettingsThenEmitsLatestStoredValue() = runTest {
+        assertNull(testee.observeSerpSettings().first())
+
+        val settings = """{"kbe":"3"}"""
+        testee.setSerpSettings(settings)
+
+        assertEquals(settings, testee.observeSerpSettings().first())
+    }
 }

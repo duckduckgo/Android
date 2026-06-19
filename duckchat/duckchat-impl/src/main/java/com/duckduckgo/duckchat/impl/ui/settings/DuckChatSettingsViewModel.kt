@@ -32,9 +32,11 @@ import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelParameters
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.pixel.fireCountAndDaily
 import com.duckduckgo.duckchat.impl.store.DefaultTogglePosition
+import com.duckduckgo.duckchat.impl.store.SearchAssistVisibility
 import com.duckduckgo.duckchat.impl.ui.settings.DuckChatSettingsViewModel.Command.OpenLink
 import com.duckduckgo.duckchat.impl.ui.settings.DuckChatSettingsViewModel.Command.OpenLinkInNewTab
 import com.duckduckgo.duckchat.impl.ui.settings.DuckChatSettingsViewModel.Command.OpenShortcutSettings
+import com.duckduckgo.duckchat.impl.ui.settings.DuckChatSettingsViewModel.Command.ShowSearchAssistDialog
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.settings.api.SettingsPageFeature
 import dagger.assisted.Assisted
@@ -76,6 +78,7 @@ class DuckChatSettingsViewModel @AssistedInject constructor(
         val isDefaultTogglePositionVisible: Boolean = false,
         val defaultTogglePosition: DefaultTogglePosition = DefaultTogglePosition.SEARCH,
         val isNativeControlsEnabled: Boolean = false,
+        val searchAssistVisibility: SearchAssistVisibility? = null,
     )
 
     private data class FeatureState(
@@ -122,7 +125,8 @@ class DuckChatSettingsViewModel @AssistedInject constructor(
             featureState,
             featureVisibility,
             duckChat.observeDefaultTogglePosition(),
-        ) { featureState, featureVisibility, defaultTogglePosition ->
+            duckChat.observeSearchAssistVisibility(),
+        ) { featureState, featureVisibility, defaultTogglePosition, searchAssistVisibility ->
             val isDuckChatUserEnabled = featureState.isDuckChatUserEnabled
             val isInputScreenEnabled = featureState.isCosmeticInputScreenEnabled ?: featureState.isInputScreenEnabled
             ViewState(
@@ -138,6 +142,7 @@ class DuckChatSettingsViewModel @AssistedInject constructor(
                     duckChat.isInputScreenFeatureAvailable() && featureVisibility.isRememberTogglePositionVisible,
                 defaultTogglePosition = defaultTogglePosition,
                 isNativeControlsEnabled = featureVisibility.isNativeControlsEnabled,
+                searchAssistVisibility = searchAssistVisibility,
             )
         }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ViewState())
 
@@ -157,6 +162,10 @@ class DuckChatSettingsViewModel @AssistedInject constructor(
 
         data class ShowDefaultTogglePositionDialog(
             val currentPosition: DefaultTogglePosition,
+        ) : Command()
+
+        data class ShowSearchAssistDialog(
+            val currentVisibility: SearchAssistVisibility?,
         ) : Command()
     }
 
@@ -201,7 +210,9 @@ class DuckChatSettingsViewModel @AssistedInject constructor(
                 duckChatFeature.showHideAiGeneratedImages().isEnabled()
             }
 
-            if (settingsPageFeature.embeddedSettingsWebView().isEnabled()) {
+            if (duckChatFeature.aiFeaturesNativeControls().isEnabled()) {
+                commandChannel.send(ShowSearchAssistDialog(viewState.value.searchAssistVisibility))
+            } else if (settingsPageFeature.embeddedSettingsWebView().isEnabled()) {
                 commandChannel.send(
                     OpenLink(
                         link = if (showHideAiGeneratedImages) {
@@ -276,6 +287,12 @@ class DuckChatSettingsViewModel @AssistedInject constructor(
             dailyPixel = DuckChatPixelName.DUCK_CHAT_SETTINGS_DEFAULT_TOGGLE_POSITION_CHANGED_DAILY,
             parameters = mapOf(DuckChatPixelParameters.DEFAULT_TOGGLE_POSITION_VALUE to position.pixelValue),
         )
+    }
+
+    fun onSearchAssistVisibilitySelected(visibility: SearchAssistVisibility) {
+        viewModelScope.launch {
+            duckChat.setSearchAssistVisibility(visibility)
+        }
     }
 
     fun duckAiInputScreenShareFeedbackClicked() {

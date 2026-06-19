@@ -17,18 +17,22 @@
 package com.duckduckgo.settings.impl.serpsettings.fakes
 
 import com.duckduckgo.settings.impl.serpsettings.store.SerpSettingsDataStore
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 
 class FakeSerpSettingsDataStore : SerpSettingsDataStore {
 
-    private var settings: String? = null
+    private val settings = MutableStateFlow<String?>(null)
 
     override suspend fun setSerpSettings(value: String) {
-        settings = value
+        settings.value = value
     }
 
-    override suspend fun getSerpSettings(): String? = settings
+    override suspend fun getSerpSettings(): String? = settings.value
+
+    override fun observeSerpSettings(): Flow<String?> = settings
 
     fun reset() {
-        settings = null
+        settings.value = null
     }
 }

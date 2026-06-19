@@ -29,11 +29,13 @@ import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelParameters
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.store.DefaultTogglePosition
+import com.duckduckgo.duckchat.impl.store.SearchAssistVisibility
 import com.duckduckgo.duckchat.impl.ui.settings.DuckChatSettingsViewModel.Command.LaunchFeedback
 import com.duckduckgo.duckchat.impl.ui.settings.DuckChatSettingsViewModel.Command.OpenLink
 import com.duckduckgo.duckchat.impl.ui.settings.DuckChatSettingsViewModel.Command.OpenLinkInNewTab
 import com.duckduckgo.duckchat.impl.ui.settings.DuckChatSettingsViewModel.Command.OpenShortcutSettings
 import com.duckduckgo.duckchat.impl.ui.settings.DuckChatSettingsViewModel.Command.ShowDefaultTogglePositionDialog
+import com.duckduckgo.duckchat.impl.ui.settings.DuckChatSettingsViewModel.Command.ShowSearchAssistDialog
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.settings.api.SettingsPageFeature
@@ -75,6 +77,7 @@ class DuckChatSettingsViewModelTest {
             whenever(duckChat.observeInputScreenUserSettingEnabled()).thenReturn(flowOf(false))
             whenever(duckChat.observeAutomaticContextAttachmentUserSettingEnabled()).thenReturn(flowOf(false))
             whenever(duckChat.observeDefaultTogglePosition()).thenReturn(flowOf(DefaultTogglePosition.SEARCH))
+            whenever(duckChat.observeSearchAssistVisibility()).thenReturn(flowOf(null))
             testee = DuckChatSettingsViewModel(
                 duckChatActivityParams = DuckChatSettingsNoParams,
                 duckChat = duckChat,
@@ -929,5 +932,82 @@ class DuckChatSettingsViewModelTest {
                 parameters = mapOf(DuckChatPixelParameters.DEFAULT_TOGGLE_POSITION_VALUE to "duckAI"),
                 type = Pixel.PixelType.Daily(),
             )
+        }
+
+    @Test
+    fun `when search assist settings clicked and native controls enabled then ShowSearchAssistDialog command emitted with current visibility`() =
+        runTest {
+            @Suppress("DenyListedApi")
+            duckChatFeature.aiFeaturesNativeControls().setRawStoredState(State(enable = true))
+
+            testee.viewState.test {
+                awaitItem()
+                testee.duckChatSearchAISettingsClicked()
+
+                testee.commands.test {
+                    val command = awaitItem()
+                    assertTrue(command is ShowSearchAssistDialog)
+                    assertEquals(null, (command as ShowSearchAssistDialog).currentVisibility)
+                    cancelAndIgnoreRemainingEvents()
+                }
+            }
+        }
+
+    @Test
+    fun `when search assist visibility selected then persisted via duckChat`() =
+        runTest {
+            testee.onSearchAssistVisibilitySelected(SearchAssistVisibility.OFTEN)
+            verify(duckChat).setSearchAssistVisibility(SearchAssistVisibility.OFTEN)
+        }
+
+    @Test
+    fun `when search assist visibility already stored then viewState reflects it`() =
+        runTest {
+            whenever(duckChat.observeSearchAssistVisibility()).thenReturn(flowOf(SearchAssistVisibility.SOMETIMES))
+            testee = DuckChatSettingsViewModel(
+                duckChatActivityParams = DuckChatSettingsNoParams,
+                duckChat = duckChat,
+                pixel = mockPixel,
+                inputScreenDiscoveryFunnel = mockInputScreenDiscoveryFunnel,
+                settingsPageFeature = settingsPageFeature,
+                duckChatPixels = mockDuckChatPixels,
+                dispatcherProvider = coroutineRule.testDispatcherProvider,
+                duckChatFeature = duckChatFeature,
+            )
+
+            testee.viewState.test {
+                assertEquals(SearchAssistVisibility.SOMETIMES, awaitItem().searchAssistVisibility)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `when search assist visibility already stored then ShowSearchAssistDialog carries current visibility`() =
+        runTest {
+            @Suppress("DenyListedApi")
+            duckChatFeature.aiFeaturesNativeControls().setRawStoredState(State(enable = true))
+            whenever(duckChat.observeSearchAssistVisibility()).thenReturn(flowOf(SearchAssistVisibility.SOMETIMES))
+            testee = DuckChatSettingsViewModel(
+                duckChatActivityParams = DuckChatSettingsNoParams,
+                duckChat = duckChat,
+                pixel = mockPixel,
+                inputScreenDiscoveryFunnel = mockInputScreenDiscoveryFunnel,
+                settingsPageFeature = settingsPageFeature,
+                duckChatPixels = mockDuckChatPixels,
+                dispatcherProvider = coroutineRule.testDispatcherProvider,
+                duckChatFeature = duckChatFeature,
+            )
+
+            testee.viewState.test {
+                awaitItem()
+                testee.duckChatSearchAISettingsClicked()
+
+                testee.commands.test {
+                    val command = awaitItem()
+                    assertTrue(command is ShowSearchAssistDialog)
+                    assertEquals(SearchAssistVisibility.SOMETIMES, (command as ShowSearchAssistDialog).currentVisibility)
+                    cancelAndIgnoreRemainingEvents()
+                }
+            }
         }
 }

@@ -45,9 +45,11 @@ import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.repository.AddressBarPickerAttributionRepository
 import com.duckduckgo.duckchat.impl.repository.DuckChatFeatureRepository
 import com.duckduckgo.duckchat.impl.store.DefaultTogglePosition
+import com.duckduckgo.duckchat.impl.store.SearchAssistVisibility
 import com.duckduckgo.duckchat.impl.voice.VoiceSessionStateManager
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.privacy.config.api.PrivacyConfigCallbackPlugin
+import com.duckduckgo.settings.api.SerpSettingsDataProvider
 import com.duckduckgo.sync.api.DeviceSyncState
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
@@ -108,6 +110,16 @@ interface DuckChatInternal : DuckChat {
      * Observes the user's preferred default toggle position.
      */
     fun observeDefaultTogglePosition(): Flow<DefaultTogglePosition>
+
+    /**
+     * Sets the user's preferred Search Assist visibility.
+     */
+    suspend fun setSearchAssistVisibility(visibility: SearchAssistVisibility)
+
+    /**
+     * Observes the user's preferred Search Assist visibility. Emits null until the user has made a selection.
+     */
+    fun observeSearchAssistVisibility(): Flow<SearchAssistVisibility?>
 
     /**
      * Saves the last used toggle position. Called on submission from the input screen.
@@ -383,6 +395,7 @@ class RealDuckChat @Inject constructor(
     private val duckAiHostProvider: DuckAiHostProvider,
     private val appBuildConfig: AppBuildConfig,
     private val voiceSessionStateManager: VoiceSessionStateManager,
+    private val serpSettingsDataProvider: SerpSettingsDataProvider,
 ) : DuckChatInternal,
     DuckAiFeatureState,
     DuckChatInputModeState,
@@ -837,6 +850,15 @@ class RealDuckChat @Inject constructor(
     override fun observeDefaultTogglePosition(): Flow<DefaultTogglePosition> =
         duckChatFeatureRepository.observeDefaultTogglePosition()
             .map { DefaultTogglePosition.fromName(it) }
+
+    override suspend fun setSearchAssistVisibility(visibility: SearchAssistVisibility) {
+        // The SERP blob is the single source of truth, so the web reflects this on its next getNativeSettings.
+        serpSettingsDataProvider.setSetting(SearchAssistVisibility.SERP_SETTINGS_KEY, visibility.serpCode)
+    }
+
+    override fun observeSearchAssistVisibility(): Flow<SearchAssistVisibility?> =
+        serpSettingsDataProvider.observeSetting(SearchAssistVisibility.SERP_SETTINGS_KEY)
+            .map { SearchAssistVisibility.fromSerpCode(it) }
 
     override suspend fun saveLastUsedTogglePosition(position: String) {
         duckChatFeatureRepository.setLastUsedTogglePosition(position)

@@ -24,7 +24,10 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.settings.impl.serpsettings.di.SerpSettings
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 interface SerpSettingsDataStore {
@@ -32,6 +35,8 @@ interface SerpSettingsDataStore {
     suspend fun setSerpSettings(value: String)
 
     suspend fun getSerpSettings(): String?
+
+    fun observeSerpSettings(): Flow<String?>
 }
 
 @ContributesBinding(AppScope::class)
@@ -45,6 +50,11 @@ class SerpSettingsPrefsDataStore @Inject constructor(
     }
 
     override suspend fun getSerpSettings(): String? = store.data.firstOrNull()?.let { it[SERP_SETTINGS] }
+
+    override fun observeSerpSettings(): Flow<String?> =
+        store.data
+            .map { prefs -> prefs[SERP_SETTINGS] }
+            .distinctUntilChanged()
 
     private companion object {
         private val SERP_SETTINGS = stringPreferencesKey(name = "SERP_SETTINGS")
