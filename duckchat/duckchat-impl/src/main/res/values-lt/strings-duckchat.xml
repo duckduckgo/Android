@@ -126,6 +126,12 @@
     <!-- Duck AI Chat Suggestions -->
     <string name="duckAiChatHistoryViewAllChats">Peržiūrėti visus pokalbius</string>
 
+    <!-- Duck.ai onboarding end CTA -->
+    <string name="duckAiEndCtaTitle">Jums pavyks!</string>
+    <string name="duckAiEndCtaDescription"><![CDATA[Naudokite adreso juostą paieškai ir svetainių lankymui arba perjunkite į „Duck.ai“ privačiam pokalbiui su DI.<br/><br/>„Duck.ai“ galite naudoti bet kur, kur matote pokalbių piktogramą]]></string>
+    <string name="duckAiEndCtaButton">Duok penkis!</string>
+    <string name="duckAiEndCtaDescriptionCustomAi"><![CDATA[Pradėkite privatų pokalbį su DI naudodami „Duck.ai“ arba perjunkite į paiešką, kad naršytumėte saugiai.<br/><br/>„Duck.ai“ galite naudoti bet kur, kur matote pokalbių piktogramą]]></string>
+
     <!-- Native Duck.ai chat history -->
     <string name="duck_ai_chat_history_title">Pokalbiai</string>
     <string name="duck_ai_chat_history_section_pinned">Prisegti</string>
