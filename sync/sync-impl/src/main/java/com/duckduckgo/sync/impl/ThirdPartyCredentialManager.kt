@@ -233,7 +233,10 @@ class RealThirdPartyCredentialManager @Inject constructor(
             }
         }
 
-        if (ddgKeys.isEmpty()) {
+        val keysEmpty = ddgKeys.isEmpty()
+        val aiScopeExists = ddgKeys.firstOrNull { it.purpose == SYNC_SCOPE_AI_CHATS && it.encryptedWith == CREDENTIAL_ID_DDG }
+
+        if (keysEmpty || aiScopeExists == null) {
             logcat { "Sync-ScopedToken: no ddg protected keys; generating $SYNC_SCOPE_AI_CHATS key before 3party extend" }
             ddgKeys = when (val gen = protectedKeyManager.create(SYNC_SCOPE_AI_CHATS)) {
                 is Success -> listOf(gen.data)

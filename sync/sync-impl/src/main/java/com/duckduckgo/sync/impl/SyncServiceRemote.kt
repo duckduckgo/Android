@@ -120,7 +120,7 @@ interface SyncApi {
     fun getProtectedKeys(token: String): Result<List<ProtectedKeyEntry>>
 
     /** Atomically claim [purpose] with [key] or no-op if one already exists. */
-    fun setProtectedKeyIfAbsent(token: String, purpose: String, key: ProtectedKeyEntry): Result<Boolean>
+    fun setProtectedKeyIfAbsent(token: String, purpose: String, keys: List<ProtectedKeyEntry>) : Result<List<ProtectedKeyEntry>>
 
     fun getAccessCredentials(token: String): Result<List<AccessCredentialEntry>>
 
@@ -539,16 +539,17 @@ class SyncServiceRemote @Inject constructor(
         }
     }
 
-    override fun setProtectedKeyIfAbsent(token: String, purpose: String, key: ProtectedKeyEntry): Result<Boolean> {
+    override fun setProtectedKeyIfAbsent(token: String, purpose: String, keys: List<ProtectedKeyEntry>): Result<List<ProtectedKeyEntry>> {
         val response = runCatching {
-            val call = syncService.setProtectedKeyIfAbsent("Bearer $token", purpose, SetProtectedKeyIfAbsentRequest(key))
+            val call = syncService.setProtectedKeyIfAbsent("Bearer $token", purpose, SetProtectedKeyIfAbsentRequest(keys))
             call.execute()
         }.getOrElse { throwable ->
             return Result.Error(reason = throwable.message.toString())
         }
 
         return onSuccess(response) {
-            Result.Success(true)
+            val keys = response.body()?.keys ?: emptyList()
+            Result.Success(keys)
         }
     }
 
