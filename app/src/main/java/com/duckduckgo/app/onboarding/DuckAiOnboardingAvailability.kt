@@ -17,8 +17,10 @@
 package com.duckduckgo.app.onboarding
 
 import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.ExtendedOnboardingFeatureToggles
+import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.duckchat.api.DuckChat
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.withContext
@@ -32,8 +34,14 @@ interface DuckAiOnboardingAvailability {
 @ContributesBinding(AppScope::class)
 class RealDuckAiOnboardingAvailability @Inject constructor(
     private val toggles: ExtendedOnboardingFeatureToggles,
+    private val duckChat: DuckChat,
+    private val browserConfig: AndroidBrowserConfigFeature,
     private val dispatcherProvider: DispatcherProvider,
 ) : DuckAiOnboardingAvailability {
     override suspend fun isDuckAiOnboardingEnabled(): Boolean =
-        withContext(dispatcherProvider.io()) { toggles.duckAiOnboarding().isEnabled() }
+        withContext(dispatcherProvider.io()) {
+            duckChat.isEnabled() &&
+                browserConfig.singleTabFireDialog().isEnabled() &&
+                toggles.duckAiOnboarding().isEnabled()
+        }
 }
