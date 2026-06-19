@@ -38,7 +38,6 @@ import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.onboarding.CustomAiOnboardingStore
-import com.duckduckgo.app.onboarding.DuckAiOnboardingExperimentMetrics
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.store.UserStageStore
@@ -148,8 +147,6 @@ class CtaViewModelTest {
 
     private val mockAppTheme: AppTheme = mock { on { isLightModeEnabled() } doReturn true }
 
-    private val mockDuckAiOnboardingExperimentMetrics: DuckAiOnboardingExperimentMetrics = mock()
-
     private val mockDeviceInfo: DeviceInfo = mock()
 
     private val showInputScreenFlow = MutableStateFlow(true)
@@ -220,7 +217,6 @@ class CtaViewModelTest {
             subscriptionPromoCtaShownPlugins = mockSubscriptionPromoCtaShownPlugins,
             onboardingBrandDesignUpdateToggles = mockOnboardingBrandDesignUpdateToggles,
             appTheme = mockAppTheme,
-            duckAiOnboardingExperimentMetrics = mockDuckAiOnboardingExperimentMetrics,
             deviceInfo = mockDeviceInfo,
             coroutineScope = coroutineRule.testScope,
             linearOnboardingOrchestrator = mock<LinearOnboardingOrchestrator> {
@@ -264,20 +260,6 @@ class CtaViewModelTest {
     fun whenCtaShownAndCtaIsNotDaxThenPixelIsFired() = runTest {
         testee.onCtaShown(HomePanelCta.AddWidgetAutoOnboarding)
         verify(mockPixel).fire(eq(WIDGET_CTA_SHOWN), any(), any(), eq(Count))
-    }
-
-    @Test
-    fun whenDuckAiFireButtonCtaShownThenFireFireDialogImpressionMetric() = runTest {
-        testee.onCtaShown(OnboardingDaxDialogCta.DaxDuckAiFireButtonCta(mockOnboardingStore, mockAppInstallStore))
-
-        verify(mockDuckAiOnboardingExperimentMetrics).fireFireDialogImpression()
-    }
-
-    @Test
-    fun whenNonDuckAiFireButtonCtaShownThenDoNotFireFireDialogImpressionMetric() = runTest {
-        testee.onCtaShown(HomePanelCta.AddWidgetAutoOnboarding)
-
-        verify(mockDuckAiOnboardingExperimentMetrics, never()).fireFireDialogImpression()
     }
 
     @Test
@@ -1484,25 +1466,6 @@ class CtaViewModelTest {
         verify(mockDismissedCtaDao, never()).insert(DismissedCta(CtaId.DAX_DUCK_AI_END))
     }
 
-    @Test
-    fun whenPrepareDuckAiEndCtaAndEligibleThenFireFinalDialogImpressionMetric() = runTest {
-        givenCanShowDuckAiEndCta()
-
-        testee.prepareAndMarkDuckAiEndCtaForInputScreen()
-
-        verify(mockDuckAiOnboardingExperimentMetrics).fireFinalDialogImpression()
-    }
-
-    @Test
-    fun whenPrepareDuckAiEndCtaAndNotEligibleThenDoNotFireFinalDialogImpressionMetric() = runTest {
-        givenCanShowDuckAiEndCta()
-        whenever(mockExtendedOnboardingFeatureToggles.noBrowserCtas()).thenReturn(mockEnabledToggle)
-
-        testee.prepareAndMarkDuckAiEndCtaForInputScreen()
-
-        verify(mockDuckAiOnboardingExperimentMetrics, never()).fireFinalDialogImpression()
-    }
-
     // region DAX_DUCK_AI_END home bubble (nativeInputField path)
 
     @Test
@@ -1552,7 +1515,7 @@ class CtaViewModelTest {
     }
 
     @Test
-    fun whenDaxDuckAiEndBubbleCtaShownThenFinalDialogImpressionFiredAndCtaInsertedAndStageCompletes() = runTest {
+    fun whenDaxDuckAiEndBubbleCtaShownThenCtaInsertedAndStageCompletes() = runTest {
         givenDaxOnboardingActive()
         whenever(mockDismissedCtaDao.exists(any())).thenReturn(true)
         whenever(mockDismissedCtaDao.exists(CtaId.DAX_DUCK_AI_END)).thenReturn(false)
@@ -1560,12 +1523,11 @@ class CtaViewModelTest {
         val cta = DaxDuckAiEndBubbleCta(mockOnboardingStore, mockAppInstallStore)
         testee.onCtaShown(cta)
 
-        verify(mockDuckAiOnboardingExperimentMetrics).fireFinalDialogImpression()
         verify(mockDismissedCtaDao).insert(DismissedCta(CtaId.DAX_DUCK_AI_END))
     }
 
     @Test
-    fun whenDaxDuckAiEndBrandDesignBubbleCtaShownThenFinalDialogImpressionFiredAndCtaInserted() = runTest {
+    fun whenDaxDuckAiEndBrandDesignBubbleCtaShownThenCtaInserted() = runTest {
         givenDaxOnboardingActive()
         whenever(mockDismissedCtaDao.exists(any())).thenReturn(true)
         whenever(mockDismissedCtaDao.exists(CtaId.DAX_DUCK_AI_END)).thenReturn(false)
@@ -1579,7 +1541,6 @@ class CtaViewModelTest {
         )
         testee.onCtaShown(cta)
 
-        verify(mockDuckAiOnboardingExperimentMetrics).fireFinalDialogImpression()
         verify(mockDismissedCtaDao).insert(DismissedCta(CtaId.DAX_DUCK_AI_END))
     }
 
@@ -1610,13 +1571,6 @@ class CtaViewModelTest {
     // endregion
 
     @Test
-    fun whenOnDuckAiFireButtonCtaPressedThenFireFireButtonPressedMetric() = runTest {
-        testee.onDuckAiFireButtonCtaPressed()
-
-        verify(mockDuckAiOnboardingExperimentMetrics).fireFireButtonPressed()
-    }
-
-    @Test
     fun whenOnDuckAiEndCtaInteractionOkThenOkPixelFired() = runTest {
         testee.onDuckAiEndCtaInteraction(okClicked = true)
 
@@ -1630,13 +1584,6 @@ class CtaViewModelTest {
     }
 
     @Test
-    fun whenOnDuckAiEndCtaInteractionOkThenFireFinalDialogPressedMetric() = runTest {
-        testee.onDuckAiEndCtaInteraction(okClicked = true)
-
-        verify(mockDuckAiOnboardingExperimentMetrics).fireFinalDialogPressed()
-    }
-
-    @Test
     fun whenOnDuckAiEndCtaInteractionDismissThenDismissPixelFired() = runTest {
         testee.onDuckAiEndCtaInteraction(okClicked = false)
 
@@ -1647,13 +1594,6 @@ class CtaViewModelTest {
             eq(Count),
         )
         verify(mockPixel, never()).fire(eq(ONBOARDING_DAX_CTA_OK_BUTTON), any(), any(), eq(Count))
-    }
-
-    @Test
-    fun whenOnDuckAiEndCtaInteractionDismissThenDoNotFireFinalDialogPressedMetric() = runTest {
-        testee.onDuckAiEndCtaInteraction(okClicked = false)
-
-        verify(mockDuckAiOnboardingExperimentMetrics, never()).fireFinalDialogPressed()
     }
 
     private fun givenCanShowDuckAiEndCta() {
