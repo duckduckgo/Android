@@ -1051,6 +1051,12 @@
     <string name="onboardingSearchDaxDialogOption1Quoted" instruction="translate &apos;duck&apos; too.">kā angliski pateikt “duck”</string>
     <string name="onboardingSearchDaxDialogOption1EnglishQuoted" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">kā spāniski pateikt “pīle”</string>
 
+    <string name="onboardingDuckAiFireButtonDaxDialogTitle">Tas ir Duck.ai!</string>
+    <string name="onboardingDuckAiFireButtonDaxDialogDescription"><![CDATA[Privātas MI tērzēšanas, ko vari jebkurā laikā izdzēst, izmantojot <b>Fire Button</b>. Izmēģini! 🔥]]></string>
+    <string name="onboardingDuckAiEndCtaTitle">Izdevās!</string>
+    <string name="onboardingDuckAiEndCtaDescription"><![CDATA[Izmanto adreses joslu, lai meklētu un apmeklētu vietnes, vai pārslēdzies uz Duck.ai privātai MI tērzēšanai.<br/><br/>Tu vari izmantot Duck.ai no jebkuras vietas, kur redzi tērzēšanas ikonu.]]></string>
+    <string name="onboardingDuckAiEndCtaButton">Dod pieci!</string>
+
     <string name="input_screen_user_pref_without_ai_updated">Meklēt tikai</string>
     <string name="input_screen_user_pref_with_ai_updated">Pārslēdzies starp\nmeklēšanu un Duck.ai</string>
 
