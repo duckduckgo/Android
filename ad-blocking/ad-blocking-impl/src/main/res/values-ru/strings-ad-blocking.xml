@@ -19,8 +19,8 @@
 <resources>
     <string name="ad_blocking_settings_title">Блокировка рекламы на YouTube</string>
     <string name="ad_blocking_settings_toggle_title">Блокировать рекламу на YouTube</string>
-    <string name="ad_blocking_settings_description_with_consent">DuckDuckGo блокирует видеорекламу на YouTube, чтобы вы могли смотреть видео без перерывов.\n\nЕсли функция включена, DuckDuckGo будет анонимно выявлять проблемы при блокировке рекламы и ошибки YouTube, чтобы улучшить работу сервиса для всех. DuckDuckGo не получает данные о просмотренных вами видео или ваши персональные данные. <annotation type="learn_more_link">Подробнее</annotation></string>
+    <string name="ad_blocking_settings_description_with_consent">DuckDuckGo блокирует видеорекламу на YouTube, чтобы вы могли смотреть видео без перерывов. \n\nКогда эта функция включена, DuckDuckGo анонимно обнаруживает помехи при блокировке рекламы или ошибки YouTube, чтобы сделать работу удобнее для всех. DuckDuckGo никогда не видит, какие видео вы просматриваете, и не отслеживает никакую личную информацию, по которой вас можно идентифицировать. <annotation type="learn_more_link">Подробнее</annotation></string>
     <string name="ad_blocking_settings_description">DuckDuckGo блокирует видеорекламу на YouTube, чтобы вы могли смотреть видео без перерывов. <annotation type="learn_more_link">Подробнее</annotation></string>
     <string name="ad_blocking_settings_duck_player_header">Проигрыватель Duck Player</string>
-    <string name="ad_blocking_settings_duck_player_description">Открывает видео в режиме кинотеатра: ваши просмотры не влияют на ленту рекомендаций YouTube.</string>
+    <string name="ad_blocking_settings_duck_player_description">Открывает видео в режиме кинотеатра без отвлекающих элементов, чтобы просмотренные видео не влияли на вашу ленту YouTube.</string>
 </resources>
