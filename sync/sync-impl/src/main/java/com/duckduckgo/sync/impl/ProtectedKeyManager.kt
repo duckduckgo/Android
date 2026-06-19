@@ -25,9 +25,6 @@ import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.impl.crypto.SyncJweCrypto
 import com.duckduckgo.sync.store.SyncStore
 import com.squareup.anvil.annotations.ContributesBinding
-import com.squareup.moshi.JsonAdapter
-import com.squareup.moshi.Moshi
-import com.squareup.moshi.Types
 import dagger.SingleInstanceIn
 import logcat.LogPriority.ERROR
 import logcat.logcat
@@ -45,11 +42,12 @@ interface ProtectedKeyManager {
      * Generates an RSA keypair for [purpose] (e.g. "ai_chats"), libsodium-encrypts the private key
      * with the account secret key, and POSTs the entry via /sync/keys/.../set-if-absent.
      *
-     * Returns the created [ProtectedKeyEntry] (the locally-generated, ddg-wrapped key) on success so
-     * callers can use it without a read-after-write GET /keys round-trip (which can lag right after
-     * the write). No-op success semantics for set-if-absent: in the newly-created case (the only case
-     * the 3party-extend caller hits, since it generates only when no keys exist) the returned entry is
-     * authoritative.
+     * Returns the authoritative [ProtectedKeyEntry] taken from the server's response. In the
+     * we-wrote-it case the returned entry equals the one we POSTed; in the race-loser case the
+     * server's `set-if-absent` returns its pre-existing entry instead, and we surface that so
+     * the caller reflects the truth on the server rather than the local key we minted.
+     *
+     * Returns the entry for [purpose] only — not all keys for the account.
      */
     fun create(purpose: String): Result<ProtectedKeyEntry>
 }
@@ -104,39 +102,26 @@ class RealProtectedKeyManager @Inject constructor(
             publicKey = RsaJwk(n = n, e = e),
         )
 
-        return when (val result = syncApi.setProtectedKeyIfAbsent(token, purpose, key)) {
+        return when (val result = syncApi.setProtectedKeyIfAbsent(token, purpose, listOf(key))) {
             is Success -> {
-                logcat { "Sync-ScopedToken: protected key for $purpose created (kid=$kid)" }
-                // Per the Access Credentials TD, the local cache should mirror what's on the
-                // server after every mutation. Append the new entry so callers don't have to
-                // re-hit /sync/keys to find it.
-                cacheLocalProtectedKey(key)
-                Success(key)
+                val entry = result.data.firstOrNull { it.purpose == purpose && it.encryptedWith == CREDENTIAL_ID_DDG }
+                    ?: return Error(reason = "CreateProtectedKey: server response missing created key for $purpose")
+                if (entry.kid != kid) {
+                    // Server returned a pre-existing entry — another device created the key for this
+                    // purpose between our (implicit) check and our POST. The server's entry wins.
+                    logcat {
+                        "Sync-ScopedToken: protected key for $purpose already existed on server " +
+                            "(server kid=${entry.kid}, our kid=$kid) — adopting server entry"
+                    }
+                } else {
+                    logcat { "Sync-ScopedToken: protected key for $purpose created (kid=$kid)" }
+                }
+                Success(entry)
             }
             is Error -> {
                 logcat(ERROR) { "Sync-ScopedToken: failed to create protected key: ${result.reason}" }
                 result
             }
         }
-    }
-
-    private fun cacheLocalProtectedKey(newEntry: ProtectedKeyEntry) {
-        val existing = syncStore.protectedKeysJson
-            ?.let { runCatching { protectedKeysAdapter.fromJson(it) }.getOrNull() }
-            ?: emptyList()
-        // De-dup on kid in case the same key is re-created (shouldn't happen but defensive).
-        val merged = existing.filterNot { it.kid == newEntry.kid } + newEntry
-        // Best-effort cache: the key was already created on the server and is returned to the caller,
-        // so a serialization failure here must not fail create().
-        runCatching { protectedKeysAdapter.toJson(merged) }
-            .onSuccess { syncStore.protectedKeysJson = it }
-            .onFailure { logcat(ERROR) { "Sync-ScopedToken: failed to serialize protected keys cache: ${it.message}" } }
-    }
-
-    private companion object {
-        private val protectedKeysAdapter: JsonAdapter<List<ProtectedKeyEntry>> =
-            Moshi.Builder().build().adapter(
-                Types.newParameterizedType(List::class.java, ProtectedKeyEntry::class.java),
-            )
     }
 }

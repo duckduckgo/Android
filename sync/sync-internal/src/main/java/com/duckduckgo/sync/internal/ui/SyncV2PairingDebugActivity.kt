@@ -319,13 +319,6 @@ class SyncV2PairingDebugActivity : DuckDuckGoActivity() {
                 else -> "Not created; needed before pairing with 3party peers"
             },
         )
-        binding.statusAiChatsKey.setSecondaryText(
-            when {
-                !status.signedIn -> "(not signed in)"
-                status.aiChatsProtectedKeyCreated -> "Yes"
-                else -> "Not created; needed for ai_chats sync"
-            },
-        )
     }
 
     private companion object {
