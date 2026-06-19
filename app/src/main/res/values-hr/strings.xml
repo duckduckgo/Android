@@ -1071,6 +1071,12 @@
     <string name="onboardingSearchDaxDialogOption1Quoted" instruction="translate &apos;duck&apos; too.">kako se kaže \"patka\" na engleskom</string>
     <string name="onboardingSearchDaxDialogOption1EnglishQuoted" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">kako se kaže \"patka\" na španjolskom</string>
 
+    <string name="onboardingDuckAiFireButtonDaxDialogTitle">To je Duck.ai!</string>
+    <string name="onboardingDuckAiFireButtonDaxDialogDescription"><![CDATA[Privatna AI čavrljanja koja možeš izbrisati u bilo kojem trenutku pomoću <b>Fire Buttona</b>. Pokušaj! 🔥]]></string>
+    <string name="onboardingDuckAiEndCtaTitle">Možeš ti to!</string>
+    <string name="onboardingDuckAiEndCtaDescription"><![CDATA[Koristi adresnu traku za pretraživanje i posjećivanje web-mjesta ili se prebaci na Duck.ai za privatno AI čavrljanje.<br/><br/>Duck.ai možeš koristiti na svakom mjestu na kojem je ikona za čavrljanje]]></string>
+    <string name="onboardingDuckAiEndCtaButton">Daj pet!</string>
+
     <string name="input_screen_user_pref_without_ai_updated">Samo pretraživanje</string>
     <string name="input_screen_user_pref_with_ai_updated">Prebacuj se između pretraživanja i Duck.ai</string>
 

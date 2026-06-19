@@ -1031,6 +1031,12 @@
     <string name="onboardingSearchDaxDialogOption1Quoted" instruction="translate &apos;duck&apos; too.">vad heter ”anka” på engelska</string>
     <string name="onboardingSearchDaxDialogOption1EnglishQuoted" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">vad heter ”anka” på spanska</string>
 
+    <string name="onboardingDuckAiFireButtonDaxDialogTitle">Det är Duck.ai!</string>
+    <string name="onboardingDuckAiFireButtonDaxDialogDescription"><![CDATA[Privata AI-chattar som du kan radera när som helst med <b>Fire Button</b>. Prova! 🔥]]></string>
+    <string name="onboardingDuckAiEndCtaTitle">Det här går bra!</string>
+    <string name="onboardingDuckAiEndCtaDescription"><![CDATA[Använd adressfältet för att söka efter och besöka webbplatser eller byt till Duck.ai för privat AI-chatt.<br/><br/>Du kan använda Duck.ai överallt där du ser chattikonen]]></string>
+    <string name="onboardingDuckAiEndCtaButton">High Five!</string>
+
     <string name="input_screen_user_pref_without_ai_updated">Endast sökning</string>
     <string name="input_screen_user_pref_with_ai_updated">Växla mellan\nsökning och Duck.ai</string>
 
