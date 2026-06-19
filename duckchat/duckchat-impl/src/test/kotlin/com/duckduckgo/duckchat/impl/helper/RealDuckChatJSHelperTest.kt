@@ -42,6 +42,7 @@ import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.json.JSONObject
@@ -50,6 +51,7 @@ import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -112,6 +114,13 @@ class RealDuckChatJSHelperTest {
                 }
                 """.trimIndent()
         }
+
+    @Before
+    fun setup() {
+        // Default to terms accepted so the native-prompt pull path behaves as before; the
+        // fresh-install (terms-not-accepted) behaviour is covered by dedicated tests.
+        runBlocking { whenever(mockDataStore.hasUserAcceptedTerms()).thenReturn(true) }
+    }
 
     @Test
     fun whenMethodIsUnknownThenReturnNull() = runTest {
@@ -1757,6 +1766,66 @@ class RealDuckChatJSHelperTest {
         )
 
         assertNull(result)
+    }
+
+    @Test
+    fun whenGetAIChatNativePromptAndTermsNotAcceptedThenPromptPreservedAndNotReturned() = runTest {
+        whenever(mockDataStore.hasUserAcceptedTerms()).thenReturn(false)
+
+        val result = testee.processJsCallbackMessage(
+            "aiChat",
+            "getAIChatNativePrompt",
+            "123",
+            null,
+            pageContext = viewModel.updatedPageContext,
+        )
+
+        assertNotNull(result)
+        assertEquals("android", result!!.params.getString("platform"))
+        assertFalse(result.params.has("tool"))
+        assertFalse(result.params.has("query"))
+        // The pending prompt must NOT be consumed before terms are accepted, so it can be
+        // delivered via the terms-accepted push instead.
+        verify(mockPendingNativePromptStore, never()).consume()
+    }
+
+    @Test
+    fun whenTermsAcceptedMetricWithPendingPromptThenReturnsSubmitNativePromptSubscription() {
+        val pending = PendingNativePrompt("test prompt", "model", "medium")
+        whenever(mockPendingNativePromptStore.consume()).thenReturn(pending)
+        val data = JSONObject().apply { put("metricName", "userDidAcceptTermsAndConditions") }
+
+        val event = testee.consumeNativePromptOnTermsAccepted("reportMetric", data)
+
+        assertNotNull(event)
+        assertEquals("aiChat", event!!.featureName)
+        assertEquals("submitAIChatNativePrompt", event.subscriptionName)
+        assertEquals("query", event.params.getString("tool"))
+        val query = event.params.getJSONObject("query")
+        assertEquals("test prompt", query.getString("prompt"))
+        assertTrue(query.getBoolean("autoSubmit"))
+        assertEquals("model", query.getString("modelId"))
+        assertEquals("medium", query.getString("reasoningEffort"))
+    }
+
+    @Test
+    fun whenTermsAcceptedMetricWithNoPendingPromptThenReturnsNull() {
+        whenever(mockPendingNativePromptStore.consume()).thenReturn(null)
+        val data = JSONObject().apply { put("metricName", "userDidAcceptTermsAndConditions") }
+
+        val event = testee.consumeNativePromptOnTermsAccepted("reportMetric", data)
+
+        assertNull(event)
+    }
+
+    @Test
+    fun whenDifferentMetricThenConsumeNativePromptOnTermsAcceptedReturnsNullAndDoesNotConsume() {
+        val data = JSONObject().apply { put("metricName", "userDidSubmitPrompt") }
+
+        val event = testee.consumeNativePromptOnTermsAccepted("reportMetric", data)
+
+        assertNull(event)
+        verify(mockPendingNativePromptStore, never()).consume()
     }
 
     @Test

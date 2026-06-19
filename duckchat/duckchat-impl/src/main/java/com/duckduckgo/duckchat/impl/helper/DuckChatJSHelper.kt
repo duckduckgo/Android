@@ -74,6 +74,19 @@ interface DuckChatJSHelper {
     fun clearTabContextPromptEvent()
 
     fun consumeTabContextPromptOnHandoff(method: String): SubscriptionEventData?
+
+    /**
+     * On a fresh install the Duck.ai web frontend shows the terms/conditions landing page before any
+     * chat is available, so a pending native prompt cannot be auto-submitted on first load. Once the
+     * user accepts the conditions (reported via the [ReportMetric.USER_DID_ACCEPT_TERMS_AND_CONDITIONS]
+     * metric) the chat becomes ready, so we push the pending prompt to the frontend via the
+     * [SUBSCRIPTION_SUBMIT_NATIVE_PROMPT] subscription. Returns null when this isn't the terms-accepted
+     * message or there is no pending prompt to deliver.
+     */
+    fun consumeNativePromptOnTermsAccepted(
+        method: String,
+        data: JSONObject?,
+    ): SubscriptionEventData?
 }
 
 enum class Mode {
@@ -411,58 +424,83 @@ class RealDuckChatJSHelper @Inject constructor(
         return JsCallbackData(jsonPayload, featureName, method, id)
     }
 
-    private fun getAIChatNativePrompt(
+    private suspend fun getAIChatNativePrompt(
         featureName: String,
         method: String,
         id: String,
     ): JsCallbackData {
-        val pending = pendingNativePromptStore.consume()
+        // Until the user has accepted the Duck.ai terms, the frontend is on the landing page and can't
+        // auto-submit. Keep the pending prompt in the store so it isn't lost — it is delivered instead
+        // via the SUBSCRIPTION_SUBMIT_NATIVE_PROMPT push once terms are accepted (see
+        // consumeNativePromptOnTermsAccepted).
+        val pending = if (dataStore.hasUserAcceptedTerms()) pendingNativePromptStore.consume() else null
         val jsonPayload = JSONObject().apply {
             put(PLATFORM, ANDROID)
             if (pending != null) {
                 put("tool", "query")
+                put("query", buildNativePromptQuery(pending))
+            }
+        }
+        return JsCallbackData(jsonPayload, featureName, method, id)
+    }
+
+    override fun consumeNativePromptOnTermsAccepted(
+        method: String,
+        data: JSONObject?,
+    ): SubscriptionEventData? {
+        if (method != REPORT_METRIC) return null
+        if (data?.optString("metricName") != ReportMetric.USER_DID_ACCEPT_TERMS_AND_CONDITIONS.metric) return null
+        val pending = pendingNativePromptStore.consume() ?: return null
+        val params = JSONObject().apply {
+            put(PLATFORM, ANDROID)
+            put("tool", "query")
+            put("query", buildNativePromptQuery(pending))
+        }
+        return SubscriptionEventData(
+            featureName = DUCK_CHAT_FEATURE_NAME,
+            subscriptionName = SUBSCRIPTION_SUBMIT_NATIVE_PROMPT,
+            params = params,
+        )
+    }
+
+    private fun buildNativePromptQuery(pending: PendingNativePrompt): JSONObject =
+        JSONObject().apply {
+            put("prompt", pending.prompt)
+            put("autoSubmit", true)
+            if (pending.modelId != null) {
+                put("modelId", pending.modelId)
+            }
+            if (pending.reasoningEffort != null) {
+                put("reasoningEffort", pending.reasoningEffort)
+            }
+            if (pending.selectedTool != null) {
+                put("toolChoice", JSONArray().apply { put(pending.selectedTool) })
+            }
+            if (pending.images.isNotEmpty()) {
                 put(
-                    "query",
-                    JSONObject().apply {
-                        put("prompt", pending.prompt)
-                        put("autoSubmit", true)
-                        if (pending.modelId != null) {
-                            put("modelId", pending.modelId)
-                        }
-                        if (pending.reasoningEffort != null) {
-                            put("reasoningEffort", pending.reasoningEffort)
-                        }
-                        if (pending.selectedTool != null) {
-                            put("toolChoice", JSONArray().apply { put(pending.selectedTool) })
-                        }
-                        if (pending.images.isNotEmpty()) {
+                    "images",
+                    JSONArray().apply {
+                        pending.images.forEach { image ->
                             put(
-                                "images",
-                                JSONArray().apply {
-                                    pending.images.forEach { image ->
-                                        put(
-                                            JSONObject().apply {
-                                                put("data", image.base64Data)
-                                                put("format", image.format)
-                                            },
-                                        )
-                                    }
+                                JSONObject().apply {
+                                    put("data", image.base64Data)
+                                    put("format", image.format)
                                 },
                             )
                         }
-                        if (pending.files.isNotEmpty()) {
+                    },
+                )
+            }
+            if (pending.files.isNotEmpty()) {
+                put(
+                    "files",
+                    JSONArray().apply {
+                        pending.files.forEach { file ->
                             put(
-                                "files",
-                                JSONArray().apply {
-                                    pending.files.forEach { file ->
-                                        put(
-                                            JSONObject().apply {
-                                                put("data", file.base64Data)
-                                                put("fileName", file.fileName)
-                                                put("mimeType", file.mimeType)
-                                            },
-                                        )
-                                    }
+                                JSONObject().apply {
+                                    put("data", file.base64Data)
+                                    put("fileName", file.fileName)
+                                    put("mimeType", file.mimeType)
                                 },
                             )
                         }
@@ -470,8 +508,6 @@ class RealDuckChatJSHelper @Inject constructor(
                 )
             }
         }
-        return JsCallbackData(jsonPayload, featureName, method, id)
-    }
 
     private fun getEmptyPageContextResponse(
         featureName: String,

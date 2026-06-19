@@ -310,6 +310,13 @@ open class DuckChatWebViewFragment : DuckDuckGoFragment(R.layout.activity_duck_c
                                             contentScopeScripts.sendSubscriptionEvent(event)
                                         }
                                     }
+                                    duckChatJSHelper.consumeNativePromptOnTermsAccepted(method, data)?.let { event ->
+                                        // Fresh install: the prompt couldn't be auto-submitted while the
+                                        // terms landing page was showing; deliver it now that terms are accepted.
+                                        withContext(dispatcherProvider.main()) {
+                                            contentScopeScripts.sendSubscriptionEvent(event)
+                                        }
+                                    }
                                 }
                             }
 
