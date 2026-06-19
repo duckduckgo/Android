@@ -218,8 +218,65 @@ class SyncJweCryptoTdVectorsTest {
         assertEquals("enc", reserialized.getString("use"))
     }
 
+    // ----- TD test5: RSA-OAEP-256 + A256GCM envelope (chat / v2 exchange envelope format) ---------
+
+    // Spec "Bonus: How to encrypt using RSA keys" keypair.
+    // NOTE: the TD gives these in *standard* base64, but jweEncryptRsaOaep/jweDecryptRsaOaep take *base64url* keys (to match
+    // generateRsaKeyPair's output), so each test bridges the encoding via [stdB64ToUrl].
+    private val rsaPublicKeySpkiB64Std =
+        "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAyfTHjoOeYSw3P8LFqgfB/byzUVoxNMv13P6DswZFiAc3XEWcwe4fwuCRoyj40HIzqn3JtZnxWN2hfWz/4x+9FSovvimhQ4CqgxAnF7HV4OiISL8sBIf07bN/TM96Cgp3cxkfg46An7XDuI+5Na3YiIfaegsBoen3kDKl6BsNJaChRImNMiHoabvhZN0aa6cuA3IAKWZCk066DhIdQaubmLSM0eNKjMrmEXdJkXMfwaZlAXzPRg7c0noV3TBihizlRFhWB6uT4uz+eTe/eN//AwUh/dOC/sOxt1Yv85kxS/F1Dp6lTCJKubgU7Xk5Fj/UzDDXnYMssyjRMXT0P+i3SQIDAQAB"
+    private val rsaPrivateKeyPkcs8B64Std =
+        "MIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQDJ9MeOg55hLDc/wsWqB8H9vLNRWjE0y/Xc/oOzBkWIBzdcRZzB7h/C4JGjKPjQcjOqfcm1mfFY3aF9bP/jH70VKi++KaFDgKqDECcXsdXg6IhIvywEh/Tts39Mz3oKCndzGR+DjoCftcO4j7k1rdiIh9p6CwGh6feQMqXoGw0loKFEiY0yIehpu+Fk3Rprpy4DcgApZkKTTroOEh1Bq5uYtIzR40qMyuYRd0mRcx/BpmUBfM9GDtzSehXdMGKGLOVEWFYHq5Pi7P55N7943/8DBSH904L+w7G3Vi/zmTFL8XUOnqVMIkq5uBTteTkWP9TMMNedgyyzKNExdPQ/6LdJAgMBAAECggEAAJkn4hcNXWpDchlSIlnTfHHAYOxp/V/4njY20tuFvJaC6/VkjkeSOoZhZweplXBik3RV96+jaD12it9QLJ17g8Trm69HAbhBQCr8liQ9SMVBzEhMEU/B7IzEoH/syhzHaJOywhXUkD4JroRFVMjRQS/0BoQcrGiOuZcw5MRdfRwXtAHi07rfwCexIuQ8zDLoMSFnd1yLEv+jPqOwGWdD29w6FjowxC4VxLd96hp5GZ2vxN9sPZXVExFF9EfOgtDCCbFPMsZ78vEnaaCNSqbejOCac4pu8JH4bJiQF7ATqXEk9GTtCBmr3G4y8gMmsIbnb54ZZCB55l+0CKdLGDsHAQKBgQD290CGq736Z/wXH7VvGm+qWBw0zlFIvkX90jn/fABnE++Q5NjjgFyIlIUPrfK2D0jbFMYlOjfAgbX7Dr8/zXvswOxalN7+PIgoKRtxfqVT2tqVj9FLP1h1DlKLFFm9SIk8TAtMYzp9Ozpm6cP4YXspERDuqo8Hhoa5ILN6rbXESQKBgQDRWAci2z+5WJphi0ZlF/ECQvVuuiAdw5zeRkACNINxAm/3fLcLmzVJhkwXUgddBaPQn8eT0hRNBcmgEWbtx36ce7Yp5B4rwfxSQIFC2TqK3hKQMhDxjrZNK93uWOFVgHLQumHAvYnrv758aoSbYEvfDIh3NSUOqzZNojuEIAVbAQKBgQCj4aUG+LZjkVc+fQMny/Inprpo7DQSQnktmrBz8fROcnM5wjKOnSJKW8wEgJib6X6eKqXmFEDk1O5OwBV3IENI8yikXz+uk7qCc+zLHpBVGdiNANeQyGNJogxyUDnQmm6+/XNN6FbqvT/fBObPTtisgq+qwLGS+9kwxhtzoAwLSQKBgAUQ7ktHpwkjPckyh6eWprx5RltBodlWjItMg+wJvUyU1ITWvc9IGEgJOfougAMeSdKYq0nGgbtDcpevFCCY/VVoIQZugNRqQ2LyMK6fdy05JpXawFI4M+02LI7CE+Hv09d9SzRQ4e+UmlWEdmUUNYHWWc8YuCbcudmzHWGbLMYBAoGBAPVUeXIg2NzhMKwZ445H3y5PPNc5Km0ogtpGdLVkDTu5T89gIwxzDAdgPYcyzywDM1SX8llz+a1pYXkB+N0nO7+xJYiViJNOCvzP8vIu/hAzH0aqgJESrCmYjKThGkKBTlgr+qRh4fV1tFmhPed77jR5ez2PafWs7+UbQSBc4ES0"
+
+    @Test
+    fun tdTest5_decryptFeProducedRsaEnvelopeReturnsMessage() {
+        // Spec test5: a fixed RSA-OAEP-256 + A256GCM envelope produced by the FE reference impl,
+        // decrypted with the spec's RSA private key. Strongest cross-platform pin — proves Android
+        // reads FE-produced RSA envelopes byte-for-byte. (RSA-OAEP is non-deterministic, so the TD
+        // supplies this fixed envelope rather than expecting reproducible ciphertext.)
+        val expectedMessage = "And the stars look very different today"
+        val tdEnvelope =
+            "eyJhbGciOiJSU0EtT0FFUC0yNTYiLCJlbmMiOiJBMjU2R0NNIiwia2lkIjoiY2JjNjI0YzEtZDJlYS00NjNlLThhNTYtYzA1NWM4MjkxNDg0In0" +
+                ".LABustvPzyt_NRUpAoda5g_of0dzrxVB86JPoiQJwghdfYC9_TxpImc7Emv3nNtyNe0j7KzaRBzSDuZ7zGPBDbVzunJYp1LE6HZjFJ1MOaeZNiGZuR7_B38nBO14yl-r8by4EismJpo4VpVN_ky_qfvoqdnwhfjPkmAUHtbHmdj6vRDBNDr9b2RQDloovWjCMkah8-7JvoCBb1tLj1CbN_xhklHbJaouz2itcWnDTaxWXAp3ysUaizOGgWDqURNj0ah2JQmOkNEK7HRZ6OZSdfmWb_UETMCHuvkVNpDu6MTlqByZCmQ_ZWUYVAT_TtYk6kLxThpwKHwD8jdwxEJuVA" +
+                ".T3YdDBZKlI1UCkNP" +
+                ".Trxol28Tgp6eJBIdUCP1O7pUFguCsFFlPWKI6K6OMnc_r0y8qUNv" +
+                ".yegFdotSLB_dQiOpx_44zA"
+
+        val decrypted = String(crypto.jweDecryptRsaOaep(tdEnvelope, stdB64ToUrl(rsaPrivateKeyPkcs8B64Std)), Charsets.UTF_8)
+
+        assertEquals(expectedMessage, decrypted)
+    }
+
+    @Test
+    fun tdTest5_androidRsaEncryptThenDecryptRoundTrips() {
+        // RSA-OAEP encryption is non-deterministic (random ephemeral AES key + IV), so we round-trip
+        // rather than pin bytes: encrypt to the spec public key, decrypt with the matching private key.
+        val message = "And the stars look very different today"
+
+        val envelope = crypto.jweEncryptRsaOaep(message.toByteArray(Charsets.UTF_8), stdB64ToUrl(rsaPublicKeySpkiB64Std), kid = "channel-1")
+        val decrypted = String(crypto.jweDecryptRsaOaep(envelope, stdB64ToUrl(rsaPrivateKeyPkcs8B64Std)), Charsets.UTF_8)
+
+        assertEquals(message, decrypted)
+    }
+
+    @Test
+    fun tdTest5_rsaEnvelopeHeaderHasExpectedFields() {
+        // Header MUST be {"alg":"RSA-OAEP-256","enc":"A256GCM","kid":<kid>}; header bytes are the AAD.
+        // 5 dot-separated segments, and unlike alg=dir the wrapped-key segment is non-empty.
+        val envelope = crypto.jweEncryptRsaOaep("payload".toByteArray(), stdB64ToUrl(rsaPublicKeySpkiB64Std), kid = "channel-1")
+
+        val header = JSONObject(String(Base64.getUrlDecoder().decode(envelope.substringBefore('.')), Charsets.UTF_8))
+        assertEquals("RSA-OAEP-256", header.getString("alg"))
+        assertEquals("A256GCM", header.getString("enc"))
+        assertEquals("channel-1", header.getString("kid"))
+        val segments = envelope.split('.')
+        assertEquals(5, segments.size)
+        assertNotEquals("", segments[1])
+    }
+
     // ----- helpers --------------------------------------------------------------------------------
 
     private fun base64UrlDecode(s: String): ByteArray = Base64.getUrlDecoder().decode(s)
     private fun base64UrlEncode(b: ByteArray): String = Base64.getUrlEncoder().withoutPadding().encodeToString(b)
+    private fun stdB64ToUrl(std: String): String = Base64.getUrlEncoder().withoutPadding().encodeToString(Base64.getDecoder().decode(std))
 }
