@@ -16,6 +16,7 @@
 
 package com.duckduckgo.remote.messaging.impl.modal.evaluator
 
+import android.app.ActivityOptions
 import android.content.Context
 import android.content.Intent
 import android.os.SystemClock
@@ -99,7 +100,8 @@ class RemoteMessageModalSurfaceEvaluatorImpl @Inject constructor(
                 delay(MODAL_DISPLAY_DELAY)
                 appCoroutineScope.launch(dispatchers.main()) {
                     intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP
-                    applicationContext.startActivity(intent)
+                    val options = ActivityOptions.makeCustomAnimation(applicationContext, 0, 0).toBundle()
+                    applicationContext.startActivity(intent, options)
                 }
 
                 // Record this message as shown, and clear background timestamp

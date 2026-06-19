@@ -16,6 +16,7 @@
 
 package com.duckduckgo.remote.messaging.impl.modal
 
+import android.os.Build.VERSION.SDK_INT
 import android.os.Bundle
 import androidx.activity.addCallback
 import androidx.lifecycle.Lifecycle
@@ -41,9 +42,17 @@ class ModalSurfaceActivity : DuckDuckGoActivity(), CardsListRemoteMessageView.Ca
     private val viewModel: ModalSurfaceViewModel by bindViewModel()
     private val binding: ActivityModalSurfaceBinding by viewBinding()
 
+    private var launchedFromSettings: Boolean = false
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
+
+        launchedFromSettings = intent.getActivityParams(ModalSurfaceActivityFromMessageId::class.java)?.launchedFromSettings ?: false
+
+        if (!launchedFromSettings && SDK_INT >= 34) {
+            overrideActivityTransition(OVERRIDE_TRANSITION_CLOSE, 0, 0)
+        }
 
         initialise()
         setupObservers()
@@ -84,6 +93,10 @@ class ModalSurfaceActivity : DuckDuckGoActivity(), CardsListRemoteMessageView.Ca
         when (command) {
             is Command.DismissMessage -> {
                 finish()
+                if (!launchedFromSettings && SDK_INT < 34) {
+                    @Suppress("DEPRECATION")
+                    overridePendingTransition(0, 0)
+                }
             }
         }
     }

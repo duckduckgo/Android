@@ -16,6 +16,7 @@
 
 package com.duckduckgo.daxprompts.impl
 
+import android.app.ActivityOptions
 import android.content.Context
 import android.content.Intent
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
@@ -76,7 +77,8 @@ class ReEngagementPromptEvaluatorImpl @Inject constructor(
             delay(MODAL_DISPLAY_DELAY)
             appCoroutineScope.launch(dispatchers.main()) {
                 intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP
-                applicationContext.startActivity(intent)
+                val options = ActivityOptions.makeCustomAnimation(applicationContext, 0, 0).toBundle()
+                applicationContext.startActivity(intent, options)
             }
 
             return@withContext ModalEvaluator.EvaluationResult.ModalShown
