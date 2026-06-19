@@ -36,6 +36,9 @@ import com.duckduckgo.sync.TestSyncFixtures.primaryKey
 import com.duckduckgo.sync.TestSyncFixtures.validLoginKeys
 import com.duckduckgo.sync.impl.AccountErrorCodes.ALREADY_SIGNED_IN
 import com.duckduckgo.sync.impl.AccountErrorCodes.LOGIN_FAILED
+import com.duckduckgo.sync.impl.AccountErrorCodes.PAIRING_CANCELLED
+import com.duckduckgo.sync.impl.AccountErrorCodes.PAIRING_FAILED
+import com.duckduckgo.sync.impl.AccountErrorCodes.PAIRING_REJECTED
 import com.duckduckgo.sync.impl.Clipboard
 import com.duckduckgo.sync.impl.ExchangeResult.AccountSwitchingRequired
 import com.duckduckgo.sync.impl.ExchangeResult.LoggedIn
@@ -51,23 +54,31 @@ import com.duckduckgo.sync.impl.SyncAuthCode.Exchange
 import com.duckduckgo.sync.impl.SyncAuthCode.Recovery
 import com.duckduckgo.sync.impl.SyncFeature
 import com.duckduckgo.sync.impl.encodeB64
+import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2CodeParseResult
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Event
+import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Message
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2QrCode
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Runner
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2State
 import com.duckduckgo.sync.impl.exchange.v2.LocalTrigger
 import com.duckduckgo.sync.impl.exchange.v2.PairingRole
 import com.duckduckgo.sync.impl.pixels.SyncPixels
+import com.duckduckgo.sync.impl.pixels.SyncPixels.CancellationReason
+import com.duckduckgo.sync.impl.pixels.SyncPixels.CodeVersion
+import com.duckduckgo.sync.impl.pixels.SyncPixels.PeerKind
 import com.duckduckgo.sync.impl.pixels.SyncPixels.ScreenType.SYNC_EXCHANGE
 import com.duckduckgo.sync.impl.ui.SyncWithAnotherActivityViewModel.Command
 import com.duckduckgo.sync.impl.ui.SyncWithAnotherActivityViewModel.Command.AskHostConfirmation
 import com.duckduckgo.sync.impl.ui.SyncWithAnotherActivityViewModel.Command.AskToSwitchAccount
 import com.duckduckgo.sync.impl.ui.SyncWithAnotherActivityViewModel.Command.LoginSuccess
 import com.duckduckgo.sync.impl.ui.SyncWithAnotherActivityViewModel.Command.ShowError
+import com.duckduckgo.sync.impl.ui.SyncWithAnotherActivityViewModel.Command.ShowV2Error
 import com.duckduckgo.sync.impl.ui.SyncWithAnotherActivityViewModel.Command.SwitchAccountSuccess
 import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
@@ -75,6 +86,7 @@ import org.junit.runner.RunWith
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.eq
+import org.mockito.kotlin.isNull
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.times
@@ -255,9 +267,9 @@ class SyncWithAnotherDeviceViewModelTest {
             testee.onQRCodeScanned(jsonRecoveryKeyEncoded)
             val command = awaitItem()
             assertTrue(command is Command.ShowError)
-            verify(syncPixels).fireBarcodeScannerParseSuccess(eq(SyncPixels.ScreenType.SYNC_EXCHANGE))
+            verify(syncPixels).fireBarcodeScannerParseSuccess(eq(SyncPixels.ScreenType.SYNC_EXCHANGE), eq(CodeVersion.V1), isNull())
             verify(syncPixels, never()).fireLoginPixel()
-            verify(syncPixels, never()).fireSyncSetupFinishedSuccessfully(any())
+            verify(syncPixels, never()).fireSyncSetupFinishedSuccessfully(any(), anyOrNull(), anyOrNull(), anyOrNull())
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -273,9 +285,9 @@ class SyncWithAnotherDeviceViewModelTest {
             testee.onQRCodeScanned(jsonRecoveryKeyEncoded)
             val command = awaitItem()
             assertTrue(command is Command.ShowError)
-            verify(syncPixels).fireBarcodeScannerParseSuccess(eq(SyncPixels.ScreenType.SYNC_EXCHANGE))
+            verify(syncPixels).fireBarcodeScannerParseSuccess(eq(SyncPixels.ScreenType.SYNC_EXCHANGE), eq(CodeVersion.V1), isNull())
             verify(syncPixels, never()).fireLoginPixel()
-            verify(syncPixels, never()).fireSyncSetupFinishedSuccessfully(any())
+            verify(syncPixels, never()).fireSyncSetupFinishedSuccessfully(any(), anyOrNull(), anyOrNull(), anyOrNull())
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -289,9 +301,9 @@ class SyncWithAnotherDeviceViewModelTest {
             testee.onQRCodeScanned(jsonRecoveryKeyEncoded)
             val command = awaitItem()
             assertTrue(command is Command.AskToSwitchAccount)
-            verify(syncPixels).fireBarcodeScannerParseSuccess(eq(SyncPixels.ScreenType.SYNC_EXCHANGE))
+            verify(syncPixels).fireBarcodeScannerParseSuccess(eq(SyncPixels.ScreenType.SYNC_EXCHANGE), eq(CodeVersion.V1), isNull())
             verify(syncPixels, never()).fireLoginPixel()
-            verify(syncPixels, never()).fireSyncSetupFinishedSuccessfully(any())
+            verify(syncPixels, never()).fireSyncSetupFinishedSuccessfully(any(), anyOrNull(), anyOrNull(), anyOrNull())
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -306,9 +318,9 @@ class SyncWithAnotherDeviceViewModelTest {
             testee.onQRCodeScanned(jsonRecoveryKeyEncoded)
             val command = awaitItem()
             assertTrue(command is Command.AskToSwitchAccount)
-            verify(syncPixels).fireBarcodeScannerParseSuccess(eq(SyncPixels.ScreenType.SYNC_EXCHANGE))
+            verify(syncPixels).fireBarcodeScannerParseSuccess(eq(SyncPixels.ScreenType.SYNC_EXCHANGE), eq(CodeVersion.V1), isNull())
             verify(syncPixels, never()).fireLoginPixel()
-            verify(syncPixels, never()).fireSyncSetupFinishedSuccessfully(any())
+            verify(syncPixels, never()).fireSyncSetupFinishedSuccessfully(any(), anyOrNull(), anyOrNull(), anyOrNull())
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -423,9 +435,9 @@ class SyncWithAnotherDeviceViewModelTest {
             testee.onQRCodeScanned(jsonRecoveryKeyEncoded)
             val command = awaitItem()
             assertTrue(command is Command.ShowError)
-            verify(syncPixels).fireBarcodeScannerParseSuccess(eq(SyncPixels.ScreenType.SYNC_EXCHANGE))
+            verify(syncPixels).fireBarcodeScannerParseSuccess(eq(SyncPixels.ScreenType.SYNC_EXCHANGE), eq(CodeVersion.V1), isNull())
             verify(syncPixels, never()).fireLoginPixel()
-            verify(syncPixels, never()).fireSyncSetupFinishedSuccessfully(any())
+            verify(syncPixels, never()).fireSyncSetupFinishedSuccessfully(any(), anyOrNull(), anyOrNull(), anyOrNull())
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -433,7 +445,7 @@ class SyncWithAnotherDeviceViewModelTest {
     @Test
     fun whenUserCancelsThenAbandonedPixelFired() = runTest {
         testee.onUserCancelledWithoutSyncSetup()
-        verify(syncPixels).fireSyncSetupAbandoned(eq(SYNC_EXCHANGE))
+        verify(syncPixels).fireSyncSetupAbandoned(eq(SYNC_EXCHANGE), eq(CancellationReason.SCANNING_CANCELLED))
     }
 
     @Test
@@ -556,6 +568,7 @@ class SyncWithAnotherDeviceViewModelTest {
         enableV2(displayOn = true)
         whenever(syncRepository.getAccountInfo()).thenReturn(accountA)
         whenever(runner.peerName).thenReturn("Peer Phone")
+        whenever(runner.peerKind).thenReturn("3party")
         whenever(qrEncoder.encodeAsBitmap(any(), any(), any())).thenReturn(TestSyncFixtures.qrBitmap())
 
         testee.viewState().test {
@@ -572,6 +585,7 @@ class SyncWithAnotherDeviceViewModelTest {
             val command = awaitItem()
             assertTrue("expected AskHostConfirmation, got $command", command is AskHostConfirmation)
             Assert.assertEquals("Peer Phone", (command as AskHostConfirmation).peerName)
+            Assert.assertEquals(PeerKind.THIRD_PARTY, (command as AskHostConfirmation).peerKind)
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -601,7 +615,7 @@ class SyncWithAnotherDeviceViewModelTest {
     }
 
     @Test
-    fun whenSameAccountAbortDuringV2PresentThenLoginSuccessShowRecoveryFalse() = runTest {
+    fun whenSameAccountAbortDuringV2PresentThenShowAlreadyPaired() = runTest {
         enableV2(displayOn = true)
         whenever(syncRepository.getAccountInfo()).thenReturn(accountA)
         whenever(qrEncoder.encodeAsBitmap(any(), any(), any())).thenReturn(TestSyncFixtures.qrBitmap())
@@ -618,8 +632,8 @@ class SyncWithAnotherDeviceViewModelTest {
 
         testee.commands().test {
             val command = awaitItem()
-            assertTrue("expected LoginSuccess (friendly finish), got $command", command is LoginSuccess)
-            Assert.assertEquals(false, (command as LoginSuccess).showRecovery)
+            assertTrue("expected ShowV2Error, got $command", command is ShowV2Error)
+            assertEquals(v2AlreadyPairedError, (command as ShowV2Error).content)
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -646,7 +660,8 @@ class SyncWithAnotherDeviceViewModelTest {
 
         testee.commands().test {
             val command = awaitItem()
-            assertTrue("expected ShowError, got $command", command is ShowError)
+            assertTrue("expected ShowV2Error, got $command", command is ShowV2Error)
+            assertEquals(PAIRING_CANCELLED.code.toV2PairingError(), (command as ShowV2Error).content)
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -669,7 +684,8 @@ class SyncWithAnotherDeviceViewModelTest {
 
         testee.commands().test {
             val command = awaitItem()
-            assertTrue("expected ShowError, got $command", command is ShowError)
+            assertTrue("expected ShowV2Error, got $command", command is ShowV2Error)
+            assertEquals(PAIRING_FAILED.code.toV2PairingError(), (command as ShowV2Error).content)
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -702,5 +718,53 @@ class SyncWithAnotherDeviceViewModelTest {
             cancelAndIgnoreRemainingEvents()
         }
         verify(runner, times(1)).startPresent()
+    }
+
+    @Test
+    fun whenV2PairingRejectedByPeerThenShowError() = runTest {
+        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
+        whenever(syncRepository.getAccountInfo()).thenReturn(accountA)
+        val scannedCode = "https://duckduckgo.com/sync/pairing/#&code2=v2code"
+        whenever(qrCode.parse(scannedCode)).thenReturn(
+            ExchangeV2CodeParseResult.LinkingV2(channelId = "c", publicKey = "k", version = "2"),
+        )
+
+        testee.commands().test {
+            testee.onQRCodeScanned(scannedCode)
+            runnerEventsFlow.emit(
+                ExchangeV2Event.Transition(
+                    timestampMs = System.currentTimeMillis(),
+                    from = ExchangeV2State.Joiner.Confirming,
+                    to = ExchangeV2State.Joiner.AbortedByHost,
+                    trigger = ExchangeV2Message.RecoveryCodeDenied(rawJson = "{}"),
+                    localTrigger = null,
+                ),
+            )
+            val command = awaitItem()
+            assertTrue("expected ShowV2Error, got $command", command is ShowV2Error)
+            assertEquals(PAIRING_REJECTED.code.toV2PairingError(), (command as ShowV2Error).content)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenV2UpgradeRequiredThenShowUpdateError() = runTest {
+        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
+        whenever(syncRepository.getAccountInfo()).thenReturn(accountA)
+        val scannedCode = "https://duckduckgo.com/sync/pairing/#&code2=v2code"
+        whenever(qrCode.parse(scannedCode)).thenReturn(
+            ExchangeV2CodeParseResult.LinkingV2(channelId = "c", publicKey = "k", version = "2"),
+        )
+        whenever(runner.eventsSince(any())).thenReturn(
+            flowOf(ExchangeV2Event.SessionError(timestampMs = 0L, message = "Peer requires protocol v3; please update this app")),
+        )
+
+        testee.commands().test {
+            testee.onQRCodeScanned(scannedCode)
+            val command = awaitItem()
+            assertTrue("expected ShowV2Error, got $command", command is ShowV2Error)
+            assertEquals(v2UpgradeRequiredError, (command as ShowV2Error).content)
+            cancelAndIgnoreRemainingEvents()
+        }
     }
 }

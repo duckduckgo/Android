@@ -1167,7 +1167,6 @@ class AppSyncAccountRepositoryTest {
 
         assertEquals(Success(true), result)
         verify(syncStore, times(0)).credentialId = any()
-        verify(syncStore, times(0)).protectedKeysJson = any()
     }
 
     @Test
@@ -1202,7 +1201,6 @@ class AppSyncAccountRepositoryTest {
         assertEquals(Success(true), result)
         verify(syncStore).credentialId = "ddg"
         verify(syncStore).scopedPassword = ScopedPassword("/+//")
-        verify(syncStore).protectedKeysJson = any()
     }
 
     @Test

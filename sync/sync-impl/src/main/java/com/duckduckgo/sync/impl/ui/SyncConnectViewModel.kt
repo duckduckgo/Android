@@ -49,7 +49,12 @@ import com.duckduckgo.sync.impl.getOrNull
 import com.duckduckgo.sync.impl.onFailure
 import com.duckduckgo.sync.impl.onSuccess
 import com.duckduckgo.sync.impl.pixels.SyncPixels
+import com.duckduckgo.sync.impl.pixels.SyncPixels.CancellationReason
+import com.duckduckgo.sync.impl.pixels.SyncPixels.CodeVersion
+import com.duckduckgo.sync.impl.pixels.SyncPixels.PeerKind
 import com.duckduckgo.sync.impl.pixels.SyncPixels.ScreenType.SYNC_CONNECT
+import com.duckduckgo.sync.impl.pixels.fireSetupCancelledIfDenied
+import com.duckduckgo.sync.impl.pixels.fireSetupFailed
 import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command.FinishWithError
 import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command.LoginSuccess
 import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command.ReadTextCode
@@ -139,19 +144,25 @@ class SyncConnectViewModel @Inject constructor(
 
     /** Map one v2 [DispatchOutcome] onto this VM's command pipeline. Shared by the Presenter and Scanner paths. */
     private suspend fun handleV2Outcome(outcome: DispatchOutcome) {
+        syncPixels.fireSetupFailed(outcome)
+        syncPixels.fireSetupCancelledIfDenied(outcome, SYNC_CONNECT)
         when (outcome) {
             is DispatchOutcome.LinkingCodeReady -> renderV2QrCode(outcome.linkingCode)
-            is DispatchOutcome.HostConfirmationRequested -> command.send(Command.AskHostConfirmation(outcome.peerName))
-            is DispatchOutcome.JoinerConfirmationRequested -> command.send(Command.AskJoinerConfirmation(outcome.peerName))
-            is DispatchOutcome.LoggedIn,
-            is DispatchOutcome.AlreadyConnected,
-            -> {
-                fireLoginPixels()
+            is DispatchOutcome.HostConfirmationRequested -> command.send(Command.AskHostConfirmation(outcome.peerName, outcome.peerKind))
+            is DispatchOutcome.JoinerConfirmationRequested -> command.send(Command.AskJoinerConfirmation(outcome.peerName, outcome.peerKind))
+            is DispatchOutcome.LoggedIn -> {
+                syncPixels.fireLoginPixel()
+                syncPixels.fireSyncSetupFinishedSuccessfully(SYNC_CONNECT, outcome.path, outcome.myRole, outcome.peerKind)
                 command.send(LoginSuccess)
             }
-            is DispatchOutcome.UpgradeRequired,
-            is DispatchOutcome.Failed,
-            -> command.send(ShowError(R.string.sync_connect_login_error))
+            is DispatchOutcome.AlreadyConnected ->
+                command.send(Command.ShowV2Error(v2AlreadyPairedError))
+            is DispatchOutcome.UpgradeRequired -> {
+                logcat { "Sync v2: upgrade required, peer needs protocol v${outcome.codeMajor}" }
+                command.send(Command.ShowV2Error(v2UpgradeRequiredError))
+            }
+            is DispatchOutcome.Failed ->
+                command.send(Command.ShowV2Error(outcome.code.toV2PairingError()))
         }
     }
 
@@ -236,10 +247,12 @@ class SyncConnectViewModel @Inject constructor(
         data class ShowError(@StringRes val message: Int, val reason: String = "") : Command()
 
         /** v2 §"Exchange Confirmations": prompt user "Sync your data with [peerName]?". */
-        data class AskJoinerConfirmation(val peerName: String?) : Command()
+        data class AskJoinerConfirmation(val peerName: String?, val peerKind: PeerKind? = null) : Command()
 
         /** v2 §"Exchange Confirmations": prompt user "Allow [peerName] to join your sync?". */
-        data class AskHostConfirmation(val peerName: String?) : Command()
+        data class AskHostConfirmation(val peerName: String?, val peerKind: PeerKind? = null) : Command()
+
+        internal data class ShowV2Error(val content: V2PairingErrorContent) : Command()
     }
 
     fun onReadTextCodeClicked() {
@@ -271,6 +284,7 @@ class SyncConnectViewModel @Inject constructor(
                 }
                 is RouteDecision.V2InProgress -> {
                     logcat { "Sync-CodeDispatch: SyncConnectViewModel observing V2InProgress" }
+                    syncPixels.fireBarcodeScannerParseSuccess(SYNC_CONNECT, CodeVersion.V2, decision.codeType)
                     decision.outcomes.collect { handleV2Outcome(it) }
                 }
             }
@@ -282,7 +296,12 @@ class SyncConnectViewModel @Inject constructor(
     }
 
     fun onUserCancelledWithoutSyncSetup() {
-        syncPixels.fireSyncSetupAbandoned(SYNC_CONNECT)
+        val reason = if (codeDispatcher.isV2ExchangeUnderway()) {
+            CancellationReason.CANCELLED_BEFORE_FINISHED
+        } else {
+            CancellationReason.SCANNING_CANCELLED
+        }
+        syncPixels.fireSyncSetupAbandoned(SYNC_CONNECT, reason)
     }
 
     private suspend fun processError(result: Error) {
@@ -300,7 +319,9 @@ class SyncConnectViewModel @Inject constructor(
 
     fun onLoginSuccess() {
         viewModelScope.launch {
-            fireLoginPixels()
+            // Manual code entry: EnterCodeViewModel fires the "Setup success" pixel (it has the v2
+            // path/role/peer); here we only fire the login pixel to avoid double-counting.
+            syncPixels.fireLoginPixel()
             command.send(LoginSuccess)
         }
     }
@@ -318,7 +339,7 @@ class SyncConnectViewModel @Inject constructor(
     private fun SyncAuthCode.onCodeScanned() {
         when (this) {
             is Unknown -> syncPixels.fireBarcodeScannerParseError(SYNC_CONNECT)
-            else -> syncPixels.fireBarcodeScannerParseSuccess(SYNC_CONNECT)
+            else -> syncPixels.fireBarcodeScannerParseSuccess(SYNC_CONNECT, CodeVersion.V1)
         }
     }
 
