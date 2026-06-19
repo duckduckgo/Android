@@ -73,7 +73,7 @@ interface SyncApi {
 
     fun deleteAccount(token: String): Result<Boolean>
 
-    fun getDevices(token: String): Result<List<Device>>
+    fun getDevices(token: String): Result<DeviceEntries>
 
     fun getBookmarks(
         token: String,
@@ -193,7 +193,7 @@ class SyncServiceRemote @Inject constructor(
         }
     }
 
-    override fun getDevices(token: String): Result<List<Device>> {
+    override fun getDevices(token: String): Result<DeviceEntries> {
         val response = runCatching {
             val logoutCall = syncService.getDevices("Bearer $token")
             logoutCall.execute()
@@ -202,7 +202,7 @@ class SyncServiceRemote @Inject constructor(
         }
 
         return onSuccess(response) {
-            val devices = response.body()?.devices?.entries ?: return@onSuccess Result.Error(reason = "getDevices: empty body")
+            val devices = response.body()?.devices ?: return@onSuccess Result.Error(reason = "getDevices: empty body")
             Result.Success(devices)
         }
     }

@@ -156,6 +156,7 @@ class AppSyncAccountRepository @Inject constructor(
     private val syncJweCrypto: SyncJweCrypto,
     private val thirdPartyCredentialManager: ThirdPartyCredentialManager,
     private val protectedKeyManager: ProtectedKeyManager,
+    private val thirdPartyDeviceListDecryptor: ThirdPartyDeviceListDecryptor,
 ) : SyncAccountRepository {
 
     /**
@@ -662,46 +663,93 @@ class AppSyncAccountRepository @Inject constructor(
         val primaryKey = syncStore.primaryKey.takeUnless { it.isNullOrEmpty() }
             ?: return Error(reason = "PrimaryKey not found")
 
-        return when (val result = syncApi.getDevices(token)) {
-            is Error -> {
-                connectedDevicesCached.clear()
-                result.alsoFireAccountErrorPixel().copy(code = GENERIC_ERROR.code)
-            }
-
-            is Success -> {
-                return Success(
-                    result.data.mapNotNull { device ->
-                        try {
-                            val decryptedDeviceName = nativeLib.decryptData(device.deviceName, primaryKey).decryptedData
-                            val decryptedDeviceType = device.deviceType.takeUnless { it.isNullOrEmpty() }?.let { encryptedDeviceType ->
-                                DeviceType(nativeLib.decryptData(encryptedDeviceType, primaryKey).decryptedData)
-                            } ?: DeviceType()
-
-                            ConnectedDevice(
-                                thisDevice = syncStore.deviceId == device.deviceId,
-                                deviceName = decryptedDeviceName,
-                                deviceId = device.deviceId,
-                                deviceType = decryptedDeviceType,
-                            )
-                        } catch (throwable: Throwable) {
-                            throwable.asErrorResult().alsoFireAccountErrorPixel()
-                            if (syncStore.deviceId != device.deviceId) {
-                                logout(device.deviceId)
-                            }
-                            null
-                        }
-                    }.sortedWith { a, b ->
-                        if (a.thisDevice) -1 else 1
-                    }.also { devices ->
-                        connectedDevicesCached.apply {
-                            clear()
-                            addAll(devices)
-                        }
-                        connectedDevicesObserver.onDevicesUpdated(devices)
-                    },
-                )
-            }
+        return if (syncFeature.canUseV2ConnectFlow().isEnabled()) {
+            getConnectedDevicesV2(token, primaryKey)
+        } else {
+            getConnectedDevicesLegacy(token, primaryKey)
         }
+    }
+
+    private fun getConnectedDevicesV2(
+        token: String,
+        primaryKey: String,
+    ): Result<List<ConnectedDevice>> = when (val result = syncApi.getDevices(token)) {
+        is Error -> {
+            connectedDevicesCached.clear()
+            result.alsoFireAccountErrorPixel().copy(code = GENERIC_ERROR.code)
+        }
+        is Success -> {
+            val entriesV2 = result.data.entriesV2
+            val devices = if (entriesV2 != null) {
+                val decryptResult = thirdPartyDeviceListDecryptor.decryptAll(entriesV2)
+                logoutFailedV2Devices(decryptResult.undecryptable)
+                decryptResult.decrypted.map { it.toConnectedDevice() }
+            } else {
+                // entries_v2 missing
+                decryptLegacyEntries(result.data.entries, primaryKey)
+            }
+            finishWith(devices)
+        }
+    }
+
+    private fun logoutFailedV2Devices(deviceIds: List<String>) {
+        val thisDeviceId = syncStore.deviceId
+        deviceIds.forEach { id ->
+            if (id != thisDeviceId) logout(id)
+        }
+    }
+
+    private fun getConnectedDevicesLegacy(
+        token: String,
+        primaryKey: String,
+    ): Result<List<ConnectedDevice>> = when (val result = syncApi.getDevices(token)) {
+        is Error -> {
+            connectedDevicesCached.clear()
+            result.alsoFireAccountErrorPixel().copy(code = GENERIC_ERROR.code)
+        }
+        is Success -> finishWith(decryptLegacyEntries(result.data.entries, primaryKey))
+    }
+
+    private fun decryptLegacyEntries(
+        devices: List<Device>,
+        primaryKey: String,
+    ): List<ConnectedDevice> = devices.mapNotNull { device ->
+        try {
+            val decryptedDeviceName = nativeLib.decryptData(device.deviceName, primaryKey).decryptedData
+            val decryptedDeviceType = device.deviceType.takeUnless { it.isNullOrEmpty() }?.let { encryptedDeviceType ->
+                DeviceType(nativeLib.decryptData(encryptedDeviceType, primaryKey).decryptedData)
+            } ?: DeviceType()
+
+            ConnectedDevice(
+                thisDevice = syncStore.deviceId == device.deviceId,
+                deviceName = decryptedDeviceName,
+                deviceId = device.deviceId,
+                deviceType = decryptedDeviceType,
+            )
+        } catch (throwable: Throwable) {
+            throwable.asErrorResult().alsoFireAccountErrorPixel()
+            if (syncStore.deviceId != device.deviceId) {
+                logout(device.deviceId)
+            }
+            null
+        }
+    }
+
+    private fun DecryptedDevice.toConnectedDevice(): ConnectedDevice = ConnectedDevice(
+        thisDevice = syncStore.deviceId == deviceId,
+        deviceName = name,
+        deviceId = deviceId,
+        deviceType = type?.takeUnless { it.isEmpty() }?.let { DeviceType(it) } ?: DeviceType(),
+    )
+
+    private fun finishWith(devices: List<ConnectedDevice>): Result<List<ConnectedDevice>> {
+        val sorted = devices.sortedWith { a, _ -> if (a.thisDevice) -1 else 1 }
+        connectedDevicesCached.apply {
+            clear()
+            addAll(sorted)
+        }
+        connectedDevicesObserver.onDevicesUpdated(sorted)
+        return Success(sorted)
     }
 
     override fun isSignedIn() = syncStore.isSignedIn()
