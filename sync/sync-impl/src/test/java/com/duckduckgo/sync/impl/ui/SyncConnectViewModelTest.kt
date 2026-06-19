@@ -53,6 +53,7 @@ import com.duckduckgo.sync.impl.exchange.v2.PairingRole
 import com.duckduckgo.sync.impl.pixels.SyncPixels
 import com.duckduckgo.sync.impl.pixels.SyncPixels.CancellationReason
 import com.duckduckgo.sync.impl.pixels.SyncPixels.CodeVersion
+import com.duckduckgo.sync.impl.pixels.SyncPixels.PeerKind
 import com.duckduckgo.sync.impl.pixels.SyncPixels.ScreenType.SYNC_CONNECT
 import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupFailureReason
 import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupPath
@@ -468,6 +469,7 @@ class SyncConnectViewModelTest {
     fun whenJoinerConfirmingDuringV2PresentThenAskJoinerConfirmationCommandEmitted() = runTest {
         enableV2(displayOn = true)
         whenever(runner.peerName).thenReturn("Peer Phone")
+        whenever(runner.peerKind).thenReturn("ddg")
         whenever(qrEncoder.encodeAsBitmap(any(), any(), any())).thenReturn(TestSyncFixtures.qrBitmap())
 
         testee.viewState(source = null).test {
@@ -484,6 +486,7 @@ class SyncConnectViewModelTest {
             val command = awaitItem()
             assertTrue("expected AskJoinerConfirmation, got $command", command is AskJoinerConfirmation)
             Assert.assertEquals("Peer Phone", (command as AskJoinerConfirmation).peerName)
+            Assert.assertEquals(PeerKind.DDG, (command as AskJoinerConfirmation).peerKind)
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -492,6 +495,7 @@ class SyncConnectViewModelTest {
     fun whenHostConfirmingDuringV2PresentThenAskHostConfirmationCommandEmitted() = runTest {
         enableV2(displayOn = true)
         whenever(runner.peerName).thenReturn("Peer Phone")
+        whenever(runner.peerKind).thenReturn("3party")
         whenever(qrEncoder.encodeAsBitmap(any(), any(), any())).thenReturn(TestSyncFixtures.qrBitmap())
 
         testee.viewState(source = null).test {
@@ -508,6 +512,7 @@ class SyncConnectViewModelTest {
             val command = awaitItem()
             assertTrue("expected AskHostConfirmation, got $command", command is AskHostConfirmation)
             Assert.assertEquals("Peer Phone", (command as AskHostConfirmation).peerName)
+            Assert.assertEquals(PeerKind.THIRD_PARTY, (command as AskHostConfirmation).peerKind)
             cancelAndIgnoreRemainingEvents()
         }
     }

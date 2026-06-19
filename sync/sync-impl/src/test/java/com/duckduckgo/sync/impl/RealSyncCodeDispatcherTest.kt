@@ -617,6 +617,34 @@ class RealSyncCodeDispatcherTest {
         assertEquals(DispatchOutcome.HostConfirmationRequested(peerName = "Peer Phone"), outcomes.single())
     }
 
+    @Test fun `presentV2 carries third-party peer kind on HostConfirmationRequested`() = runTest {
+        whenever(runner.peerName).thenReturn("Peer Phone")
+        whenever(runner.peerKind).thenReturn("3party")
+        val outcomes = mutableListOf<DispatchOutcome>()
+        val job = launch(start = kotlinx.coroutines.CoroutineStart.UNDISPATCHED) { dispatcher.presentV2().take(1).collect { outcomes += it } }
+        runnerEventsFlow.emit(transition(from = ExchangeV2State.Negotiating, to = ExchangeV2State.Host.Confirming))
+        job.join()
+
+        assertEquals(
+            DispatchOutcome.HostConfirmationRequested(peerName = "Peer Phone", peerKind = PeerKind.THIRD_PARTY),
+            outcomes.single(),
+        )
+    }
+
+    @Test fun `presentV2 carries ddg peer kind on JoinerConfirmationRequested`() = runTest {
+        whenever(runner.peerName).thenReturn("Peer Phone")
+        whenever(runner.peerKind).thenReturn("ddg")
+        val outcomes = mutableListOf<DispatchOutcome>()
+        val job = launch(start = kotlinx.coroutines.CoroutineStart.UNDISPATCHED) { dispatcher.presentV2().take(1).collect { outcomes += it } }
+        runnerEventsFlow.emit(transition(from = ExchangeV2State.Negotiating, to = ExchangeV2State.Joiner.Confirming))
+        job.join()
+
+        assertEquals(
+            DispatchOutcome.JoinerConfirmationRequested(peerName = "Peer Phone", peerKind = PeerKind.DDG),
+            outcomes.single(),
+        )
+    }
+
     @Test fun `presentV2 emits LoggedIn with Host role and peer kind when runner reaches Host_Done`() = runTest {
         whenever(runner.peerKind).thenReturn("3party")
         val outcome = withTimeoutOrNull(1000) {

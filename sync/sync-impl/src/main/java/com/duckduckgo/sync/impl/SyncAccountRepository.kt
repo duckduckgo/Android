@@ -873,8 +873,6 @@ class AppSyncAccountRepository @Inject constructor(
         // pre-upgrade until this block runs.
         val spStandardB64 = kotlin.runCatching { base64UrlStringToStandardBase64(parsed.secret) }
             .getOrElse { return Error(reason = "JoinFrom3party: failed to decode SP: ${it.message}") }
-        val protectedKeysJson = kotlin.runCatching { Adapters.protectedKeysAdapter.toJson(upgradePackage.rewrappedKeys) }
-            .getOrElse { return Error(reason = "JoinFrom3party: failed to serialize protected keys: ${it.message}") }
         syncStore.storeCredentials(
             userId = parsed.userId,
             deviceId = deviceId,
@@ -885,7 +883,6 @@ class AppSyncAccountRepository @Inject constructor(
         )
         syncStore.credentialId = CREDENTIAL_ID_DDG
         syncStore.scopedPassword = ScopedPassword(spStandardB64)
-        syncStore.protectedKeysJson = protectedKeysJson
 
         logcat { "Sync-ScopedToken: 3party→ddg upgrade complete; account joined as ddg" }
 
@@ -1354,10 +1351,6 @@ class AppSyncAccountRepository @Inject constructor(
                     }
                     result.data.keys?.let { keys ->
                         logcat { "Sync-ScopedToken: ${keys.size} protected key(s) in response" }
-                        val ddgKeys = keys.filter { it.encryptedWith == CREDENTIAL_ID_DDG }
-                        runCatching { Adapters.protectedKeysAdapter.toJson(ddgKeys) }
-                            .onSuccess { syncStore.protectedKeysJson = it }
-                            .onFailure { logcat(ERROR) { "Sync-ScopedToken: failed to serialize protected keys from login: ${it.message}" } }
                     }
                 }
 
@@ -1458,8 +1451,6 @@ class AppSyncAccountRepository @Inject constructor(
 
             val invitationCodeAdapter: JsonAdapter<InvitationCodeWrapper> = moshi.adapter(InvitationCodeWrapper::class.java)
             val invitedDeviceAdapter: JsonAdapter<InvitedDeviceDetails> = moshi.adapter(InvitedDeviceDetails::class.java)
-            val protectedKeysAdapter: JsonAdapter<List<ProtectedKeyEntry>> =
-                moshi.adapter(Types.newParameterizedType(List::class.java, ProtectedKeyEntry::class.java))
         }
     }
 }

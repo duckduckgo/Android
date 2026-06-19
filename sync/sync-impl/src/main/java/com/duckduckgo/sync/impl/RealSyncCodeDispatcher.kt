@@ -129,9 +129,9 @@ class RealSyncCodeDispatcher @Inject constructor(
         is ExchangeV2Event.SessionStarted -> event.linkingCode?.let { DispatchOutcome.LinkingCodeReady(it) }
         is ExchangeV2Event.Transition -> when (event.to) {
             ExchangeV2State.Joiner.Confirming ->
-                DispatchOutcome.JoinerConfirmationRequested(peerName = runner.peerName)
+                DispatchOutcome.JoinerConfirmationRequested(peerName = runner.peerName, peerKind = peerKind)
             ExchangeV2State.Host.Confirming ->
-                DispatchOutcome.HostConfirmationRequested(peerName = runner.peerName)
+                DispatchOutcome.HostConfirmationRequested(peerName = runner.peerName, peerKind = peerKind)
             ExchangeV2State.Host.Done -> DispatchOutcome.LoggedIn(SetupPath.PAIRING, SetupRole.HOST, peerKind)
             ExchangeV2State.Host.Aborted -> hostAbortedToOutcome(event.localTrigger)
             ExchangeV2State.SameAccountAbort -> DispatchOutcome.AlreadyConnected
@@ -324,9 +324,9 @@ class RealSyncCodeDispatcher @Inject constructor(
     private fun mapV2LinkingEventToOutcome(event: ExchangeV2Event, peerKind: PeerKind?): DispatchOutcome? = when (event) {
         is ExchangeV2Event.Transition -> when (event.to) {
             ExchangeV2State.Joiner.Confirming ->
-                DispatchOutcome.JoinerConfirmationRequested(peerName = runner.peerName)
+                DispatchOutcome.JoinerConfirmationRequested(peerName = runner.peerName, peerKind = peerKind)
             ExchangeV2State.Host.Confirming ->
-                DispatchOutcome.HostConfirmationRequested(peerName = runner.peerName)
+                DispatchOutcome.HostConfirmationRequested(peerName = runner.peerName, peerKind = peerKind)
             ExchangeV2State.Joiner.Done -> {
                 val received = (event.trigger as? ExchangeV2Message.RecoveryCodeResponse)?.recoveryCode
                 if (received.isNullOrBlank()) {

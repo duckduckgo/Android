@@ -233,10 +233,12 @@ class RealThirdPartyCredentialManager @Inject constructor(
             }
         }
 
-        if (ddgKeys.isEmpty()) {
-            logcat { "Sync-ScopedToken: no ddg protected keys; generating $SYNC_SCOPE_AI_CHATS key before 3party extend" }
-            ddgKeys = when (val gen = protectedKeyManager.create(SYNC_SCOPE_AI_CHATS)) {
-                is Success -> listOf(gen.data)
+        // We ensure ai_chats (the scope's required purpose) exists, then re-wrap every
+        // ddg-wrapped key — preserving any other purposes already on the account.
+        if (ddgKeys.none { it.purpose == SYNC_SCOPE_AI_CHATS }) {
+            logcat { "Sync-ScopedToken: no ddg $SYNC_SCOPE_AI_CHATS key; generating before 3party extend" }
+            when (val gen = protectedKeyManager.create(SYNC_SCOPE_AI_CHATS)) {
+                is Success -> ddgKeys = ddgKeys + gen.data
                 is Error -> {
                     logcat(ERROR) { "Sync-ScopedToken: failed to generate $SYNC_SCOPE_AI_CHATS protected key: ${gen.reason}" }
                     return Error(code = gen.code, reason = "CreateThirdPartyCredential: generate $SYNC_SCOPE_AI_CHATS key failed: ${gen.reason}")

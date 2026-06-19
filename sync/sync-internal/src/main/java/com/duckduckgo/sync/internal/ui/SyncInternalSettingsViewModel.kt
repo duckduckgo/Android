@@ -30,7 +30,6 @@ import com.duckduckgo.persistentstorage.api.PersistentStorage
 import com.duckduckgo.persistentstorage.api.PersistentStorageAvailability
 import com.duckduckgo.sync.api.favicons.FaviconsFetchingStore
 import com.duckduckgo.sync.impl.ConnectedDevice
-import com.duckduckgo.sync.impl.ProtectedKeyEntry
 import com.duckduckgo.sync.impl.Result
 import com.duckduckgo.sync.impl.Result.Error
 import com.duckduckgo.sync.impl.Result.Success
@@ -51,9 +50,6 @@ import com.duckduckgo.sync.internal.ui.SyncInternalSettingsViewModel.Command.Rea
 import com.duckduckgo.sync.internal.ui.SyncInternalSettingsViewModel.Command.ShowMessage
 import com.duckduckgo.sync.internal.ui.SyncInternalSettingsViewModel.Command.ShowQR
 import com.duckduckgo.sync.store.*
-import com.squareup.moshi.JsonAdapter
-import com.squareup.moshi.Moshi
-import com.squareup.moshi.Types
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
@@ -521,7 +517,6 @@ constructor(
     private fun buildV2StoreFieldsText(): String = buildString {
         appendLine("credentialId: ${syncStore.credentialId ?: "(not set)"}")
         appendLine("scopedPassword: ${syncStore.scopedPassword?.raw?.take(40)?.let { "$it..." } ?: "(not set)"}")
-        appendLine("protectedKeysJson: ${syncStore.protectedKeysJson?.take(60)?.let { "$it..." } ?: "(not set)"}")
     }.trim().also { logcat { "Sync-ScopedToken: v2 store fields:\n$it" } }
 
     fun onCreateThirdPartyCredentialClicked() {
@@ -598,9 +593,6 @@ constructor(
                     }
                 }
                 logcat { "Sync-ScopedToken: keys:\n$text" }
-                // Refresh the local cache to match the server — per Access Credentials TD,
-                // the cache is the device's last-known view of /sync/keys.
-                syncStore.protectedKeysJson = protectedKeysAdapter.toJson(result.data)
                 viewState.update { it.copy(keysText = text) }
             }
             is Error -> {
@@ -806,12 +798,5 @@ constructor(
     private fun isDeviceSecureLockEnabled(): Boolean {
         val keyguardManager = context.getSystemService(KeyguardManager::class.java)
         return keyguardManager?.isDeviceSecure == true
-    }
-
-    private companion object {
-        private val protectedKeysAdapter: JsonAdapter<List<ProtectedKeyEntry>> =
-            Moshi.Builder().build().adapter(
-                Types.newParameterizedType(List::class.java, ProtectedKeyEntry::class.java),
-            )
     }
 }
