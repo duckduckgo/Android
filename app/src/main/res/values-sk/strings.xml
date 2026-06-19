@@ -1071,6 +1071,12 @@
     <string name="onboardingSearchDaxDialogOption1Quoted" instruction="translate &apos;duck&apos; too.">Ako povedať „kačica“ v angličtine</string>
     <string name="onboardingSearchDaxDialogOption1EnglishQuoted" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">Ako povedať „kačica“ po španielsky</string>
 
+    <string name="onboardingDuckAiFireButtonDaxDialogTitle">To je Duck.ai!</string>
+    <string name="onboardingDuckAiFireButtonDaxDialogDescription"><![CDATA[Súkromné čety s umelou inteligenciou, ktoré môžeš kedykoľvek odstrániť pomocou <b>Fire Button</b>. Vyskúšaj to! 🔥]]></string>
+    <string name="onboardingDuckAiEndCtaTitle">Hotovo!</string>
+    <string name="onboardingDuckAiEndCtaDescription"><![CDATA[Použi panel s adresou na vyhľadávanie a otváranie stránok alebo prepni na Duck.ai, ak chceš súkromne četovať s umelou inteligenciou.<br/><br/>Duck.ai môžeš používať odkiaľkoľvek, kde vidíš ikonu četu]]></string>
+    <string name="onboardingDuckAiEndCtaButton">Ruku na to!</string>
+
     <string name="input_screen_user_pref_without_ai_updated">Len vyhľadávanie</string>
     <string name="input_screen_user_pref_with_ai_updated">Prepínať medzi\nvyhľadávaním a Duck.ai</string>
 
