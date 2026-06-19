@@ -17,6 +17,7 @@
 package com.duckduckgo.sync.impl
 
 import android.util.Base64
+import androidx.annotation.VisibleForTesting
 import androidx.annotation.WorkerThread
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.crypto.SyncLib
@@ -71,7 +72,12 @@ class RealThirdPartyCredentialManager @Inject constructor(
     private val syncJweCrypto: SyncJweCrypto,
     private val nativeLib: SyncLib,
     private val syncFeature: SyncFeature,
+    private val protectedKeyManager: ProtectedKeyManager,
 ) : ThirdPartyCredentialManager {
+
+    /** Base linear-backoff between rate-limit retries. Overridable in tests to keep them fast. */
+    @VisibleForTesting
+    internal var rateLimitRetryDelayMillis: Long = DEFAULT_RATE_LIMIT_RETRY_DELAY_MILLIS
 
     override fun create(): Result<Boolean> {
         val inputs = when (val r = validateCreatePreconditions()) {
@@ -218,12 +224,25 @@ class RealThirdPartyCredentialManager @Inject constructor(
         val accountSecretKey = syncStore.secretKey
             ?: return Error(reason = "CreateThirdPartyCredential: no account secret key for ddg-side decrypt")
 
-        val ddgKeys = when (val r = syncApi.getProtectedKeys(token)) {
+        var ddgKeys = when (val r = retryingOnRateLimit { syncApi.getProtectedKeys(token) }) {
             is Success -> r.data.filter { it.encryptedWith == CREDENTIAL_ID_DDG }
             is Error -> {
                 // Fail rather than create a credential without its protected keys.
-                logcat(ERROR) { "Sync-ScopedToken: getKeys failed, aborting 3party credential creation: ${r.reason}" }
-                return Error(reason = "CreateThirdPartyCredential: getKeys failed: ${r.reason}")
+                logcat(ERROR) { "Sync-ScopedToken: getKeys failed (code=${r.code}), aborting 3party credential creation: ${r.reason}" }
+                return Error(code = r.code, reason = "CreateThirdPartyCredential: getKeys failed (code=${r.code}): ${r.reason}")
+            }
+        }
+
+        // We ensure ai_chats (the scope's required purpose) exists, then re-wrap every
+        // ddg-wrapped key — preserving any other purposes already on the account.
+        if (ddgKeys.none { it.purpose == SYNC_SCOPE_AI_CHATS }) {
+            logcat { "Sync-ScopedToken: no ddg $SYNC_SCOPE_AI_CHATS key; generating before 3party extend" }
+            when (val gen = protectedKeyManager.create(SYNC_SCOPE_AI_CHATS)) {
+                is Success -> ddgKeys = ddgKeys + gen.data
+                is Error -> {
+                    logcat(ERROR) { "Sync-ScopedToken: failed to generate $SYNC_SCOPE_AI_CHATS protected key: ${gen.reason}" }
+                    return Error(code = gen.code, reason = "CreateThirdPartyCredential: generate $SYNC_SCOPE_AI_CHATS key failed: ${gen.reason}")
+                }
             }
         }
         logcat { "Sync-ScopedToken: ${ddgKeys.size} ddg key(s) to re-encrypt for 3party" }
@@ -373,5 +392,30 @@ class RealThirdPartyCredentialManager @Inject constructor(
 
     private val recoveryCodeAdapter by lazy {
         Moshi.Builder().build().adapter(ThirdPartyRecoveryCodeWrapper::class.java)
+    }
+
+    /**
+     * Retry an idempotent scoped-credential call on rate-limit.
+     * A bounded linear backoff recovers since the limit is per-window and the call is idempotent.
+     */
+    private fun <T> retryingOnRateLimit(block: () -> Result<T>): Result<T> {
+        var attempt = 0
+        while (true) {
+            val result = block()
+            val code = (result as? Error)?.code
+            val rateLimited = code == API_CODE.TOO_MANY_REQUESTS_1.code || code == API_CODE.TOO_MANY_REQUESTS_2.code
+            if (rateLimited && attempt < MAX_RATE_LIMIT_RETRIES) {
+                attempt++
+                logcat { "Sync-ScopedToken: rate-limited (code=$code); retry $attempt/$MAX_RATE_LIMIT_RETRIES" }
+                runCatching { Thread.sleep(rateLimitRetryDelayMillis * attempt) }
+                continue
+            }
+            return result
+        }
+    }
+
+    companion object {
+        const val MAX_RATE_LIMIT_RETRIES = 3
+        private const val DEFAULT_RATE_LIMIT_RETRY_DELAY_MILLIS = 1_000L
     }
 }

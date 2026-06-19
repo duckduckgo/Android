@@ -37,8 +37,11 @@ import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.SyncFeature
 import com.duckduckgo.sync.impl.databinding.ActivityConnectSyncBinding
 import com.duckduckgo.sync.impl.databinding.ActivityConnectSyncNewBinding
+import com.duckduckgo.sync.impl.pixels.SyncPixels.PeerKind
 import com.duckduckgo.sync.impl.ui.EnterCodeActivity.Companion.Code.CONNECT_CODE
 import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command
+import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command.AskHostConfirmation
+import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command.AskJoinerConfirmation
 import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command.FinishWithError
 import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command.LoginSuccess
 import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command.ReadTextCode
@@ -129,6 +132,8 @@ class SyncConnectActivity : DuckDuckGoActivity() {
     private fun observeUiEvents() {
         viewModel
             .viewState(extractSource())
+            // Observe at CREATED, not STARTED: STARTED re-subscribes on every foreground, re-firing
+            // viewState.onStart and regenerating the pairing code. CREATED also avoids dropping terminal commands.
             .flowWithLifecycle(lifecycle, Lifecycle.State.CREATED)
             .onEach { render(it) }
             .launchIn(lifecycleScope)
@@ -165,6 +170,9 @@ class SyncConnectActivity : DuckDuckGoActivity() {
 
             is ShowMessage -> Snackbar.make(binding.root, it.messageId, Snackbar.LENGTH_SHORT).show()
             is ShowError -> showError(it)
+            is Command.ShowV2Error -> showV2PairingError(it.content) { viewModel.onErrorDialogDismissed() }
+            is AskJoinerConfirmation -> askJoinerConfirmation(it.peerName, it.peerKind)
+            is AskHostConfirmation -> askHostConfirmation(it.peerName, it.peerKind)
         }
     }
 
@@ -187,6 +195,34 @@ class SyncConnectActivity : DuckDuckGoActivity() {
                     override fun onPositiveButtonClicked() {
                         viewModel.onErrorDialogDismissed()
                     }
+                },
+            ).show()
+    }
+
+    private fun askJoinerConfirmation(peerName: String?, peerKind: PeerKind?) {
+        TextAlertDialogBuilder(this)
+            .setTitle(R.string.sync_v2_joiner_confirmation_title)
+            .setMessage(syncV2ConfirmationMessage(peerName, peerKind))
+            .setPositiveButton(R.string.sync_v2_joiner_confirmation_positive)
+            .setNegativeButton(R.string.sync_v2_joiner_confirmation_negative)
+            .addEventListener(
+                object : TextAlertDialogBuilder.EventListener() {
+                    override fun onPositiveButtonClicked() { viewModel.onJoinerConfirmed() }
+                    override fun onNegativeButtonClicked() { viewModel.onJoinerDenied() }
+                },
+            ).show()
+    }
+
+    private fun askHostConfirmation(peerName: String?, peerKind: PeerKind?) {
+        TextAlertDialogBuilder(this)
+            .setTitle(R.string.sync_v2_host_confirmation_title)
+            .setMessage(syncV2ConfirmationMessage(peerName, peerKind))
+            .setPositiveButton(R.string.sync_v2_host_confirmation_positive)
+            .setNegativeButton(R.string.sync_v2_host_confirmation_negative)
+            .addEventListener(
+                object : TextAlertDialogBuilder.EventListener() {
+                    override fun onPositiveButtonClicked() { viewModel.onHostConfirmed() }
+                    override fun onNegativeButtonClicked() { viewModel.onHostDenied() }
                 },
             ).show()
     }

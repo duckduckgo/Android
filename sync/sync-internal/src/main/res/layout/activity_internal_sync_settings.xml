@@ -99,6 +99,13 @@
             app:primaryText="canShowV2ConnectCode (display, requires canUseV2ConnectFlow)" />
 
         <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
+            android:id="@+id/openV2PairingDebugButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:text="V2 Pairing Debug" />
+
+        <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
             android:id="@+id/fetchAccessCredentialsButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

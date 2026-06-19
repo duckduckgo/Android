@@ -60,4 +60,16 @@ dependencies {
     implementation "com.google.zxing:core:_"
 
     implementation "com.squareup.logcat:logcat:_"
+
+    // Testing dependencies
+    testImplementation "org.mockito.kotlin:mockito-kotlin:_"
+    testImplementation Testing.junit4
+    testImplementation AndroidX.test.ext.junit
+    testImplementation Testing.robolectric
+    testImplementation CashApp.turbine
+    testImplementation AndroidX.archCore.testing
+    testImplementation project(path: ':common-test')
+    testImplementation(KotlinX.coroutines.test) {
+        exclude group: "org.jetbrains.kotlinx", module: "kotlinx-coroutines-debug"
+    }
 }
