@@ -97,6 +97,7 @@ import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.doAnswer
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
@@ -129,6 +130,7 @@ class AppSyncAccountRepositoryTest {
     private val syncJweCrypto: SyncJweCrypto = mock()
     private val thirdPartyCredentialManager: ThirdPartyCredentialManager = mock()
     private val protectedKeyManager: ProtectedKeyManager = mock()
+    private val thirdPartyDeviceListDecryptor: ThirdPartyDeviceListDecryptor = mock()
 
     @Before
     fun before() {
@@ -149,6 +151,7 @@ class AppSyncAccountRepositoryTest {
             syncJweCrypto = syncJweCrypto,
             thirdPartyCredentialManager = thirdPartyCredentialManager,
             protectedKeyManager = protectedKeyManager,
+            thirdPartyDeviceListDecryptor = thirdPartyDeviceListDecryptor,
         )
 
         // passthrough by default (no modifications)
@@ -424,7 +427,7 @@ class AppSyncAccountRepositoryTest {
         for (i in 1..numberOfDevices) {
             devices.add(Device(deviceId = "$deviceId-$i", deviceName = "$deviceName-$i", jwIat = "", deviceType = deviceFactor))
         }
-        whenever(syncApi.getDevices(token)).thenReturn(Success(devices))
+        whenever(syncApi.getDevices(token)).thenReturn(Success(DeviceEntries(entries = devices, entriesV2 = null)))
         whenever(syncApi.logout(token, deviceId)).thenReturn(Success(Logout(deviceId)))
         syncRepo.getConnectedDevices()
     }
@@ -622,7 +625,9 @@ class AppSyncAccountRepositoryTest {
         val thisDevice = Device(deviceId = deviceId, deviceName = deviceName, jwIat = "", deviceType = deviceFactor)
         val anotherDevice = Device(deviceId = "anotherDeviceId", deviceName = deviceName, jwIat = "", deviceType = deviceFactor)
         val anotherRemoteDevice = Device(deviceId = "anotherRemoteDeviceId", deviceName = deviceName, jwIat = "", deviceType = deviceFactor)
-        whenever(syncApi.getDevices(anyString())).thenReturn(Success(listOf(anotherDevice, anotherRemoteDevice, thisDevice)))
+        whenever(syncApi.getDevices(anyString())).thenReturn(
+            Success(DeviceEntries(entries = listOf(anotherDevice, anotherRemoteDevice, thisDevice), entriesV2 = null)),
+        )
 
         val result = syncRepo.getConnectedDevices() as Success
 
@@ -651,12 +656,125 @@ class AppSyncAccountRepositoryTest {
         whenever(syncStore.deviceId).thenReturn(deviceId)
         whenever(syncStore.primaryKey).thenReturn(primaryKey)
         whenever(nativeLib.decryptData(anyString(), anyString())).thenThrow(NegativeArraySizeException())
-        whenever(syncApi.getDevices(anyString())).thenReturn(Success(listOf(thisDevice, otherDevice)))
+        whenever(syncApi.getDevices(anyString())).thenReturn(
+            Success(DeviceEntries(entries = listOf(thisDevice, otherDevice), entriesV2 = null)),
+        )
         whenever(syncApi.logout("token", "otherDeviceId")).thenReturn(Success(Logout("otherDeviceId")))
 
         val result = syncRepo.getConnectedDevices() as Success
         verify(syncApi).logout("token", "otherDeviceId")
         assertTrue(result.data.isEmpty())
+    }
+
+    // ----- entries_v2 device-list path (Track C) ----------------------------------------------
+
+    @Test
+    fun whenV2FlagOnAndEntriesV2PresentThenUsesV2Decryptor() {
+        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
+        whenever(syncStore.token).thenReturn(token)
+        whenever(syncStore.primaryKey).thenReturn(primaryKey)
+        whenever(syncStore.deviceId).thenReturn(deviceId)
+        val v2Entry = DeviceV2(deviceId = "d1", deviceName = "ENC", deviceType = "ENC_T", credentialId = "3party")
+        whenever(syncApi.getDevices(anyString())).thenReturn(
+            Success(DeviceEntries(entries = emptyList(), entriesV2 = listOf(v2Entry))),
+        )
+        whenever(thirdPartyDeviceListDecryptor.decryptAll(listOf(v2Entry))).thenReturn(
+            DecryptAllResult(
+                decrypted = listOf(DecryptedDevice(deviceId = "d1", name = "Chrome/148", type = "Browser")),
+                undecryptable = emptyList(),
+            ),
+        )
+
+        val result = syncRepo.getConnectedDevices() as Success
+
+        assertEquals(1, result.data.size)
+        assertEquals("Chrome/148", result.data[0].deviceName)
+        verify(thirdPartyDeviceListDecryptor).decryptAll(listOf(v2Entry))
+        verify(syncApi, never()).logout(anyString(), anyString())
+    }
+
+    @Test
+    fun whenV2FlagOnAndEntriesV2NullThenFallsBackToLegacyDecryptOfEntries() {
+        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
+        givenAuthenticatedDevice()
+        prepareForEncryption()
+        val ddgDevice = Device(deviceId = deviceId, deviceName = deviceName, jwIat = "", deviceType = deviceFactor)
+        whenever(syncApi.getDevices(anyString())).thenReturn(
+            Success(DeviceEntries(entries = listOf(ddgDevice), entriesV2 = null)),
+        )
+
+        val result = syncRepo.getConnectedDevices() as Success
+
+        // Fell back to legacy decrypt — same library path as the legacy `entries`-only response.
+        assertEquals(1, result.data.size)
+        verify(thirdPartyDeviceListDecryptor, never()).decryptAll(any())
+    }
+
+    @Test
+    fun whenV2FlagOnAndDeviceListApiFailsThenReturnsGenericError() {
+        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
+        whenever(syncStore.token).thenReturn(token)
+        whenever(syncStore.primaryKey).thenReturn(primaryKey)
+        whenever(syncApi.getDevices(anyString())).thenReturn(Error(reason = "boom"))
+
+        val result = syncRepo.getConnectedDevices() as Error
+
+        assertEquals(GENERIC_ERROR.code, result.code)
+    }
+
+    @Test
+    fun whenV2FlagOnAndDecryptorReportsLogoutThenLogoutIsCalledForOtherDevices() {
+        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
+        whenever(syncStore.token).thenReturn(token)
+        whenever(syncStore.primaryKey).thenReturn(primaryKey)
+        whenever(syncStore.deviceId).thenReturn(deviceId)
+        val v2Entry = DeviceV2(deviceId = "d-other", deviceName = "BAD", credentialId = "3party")
+        whenever(syncApi.getDevices(anyString())).thenReturn(
+            Success(DeviceEntries(entries = emptyList(), entriesV2 = listOf(v2Entry))),
+        )
+        whenever(thirdPartyDeviceListDecryptor.decryptAll(any())).thenReturn(
+            DecryptAllResult(decrypted = emptyList(), undecryptable = listOf("d-other")),
+        )
+        whenever(syncApi.logout(eq(token), eq("d-other"))).thenReturn(Success(Logout("d-other")))
+
+        val result = syncRepo.getConnectedDevices() as Success
+
+        assertTrue(result.data.isEmpty())
+        verify(syncApi).logout(eq(token), eq("d-other"))
+    }
+
+    @Test
+    fun whenV2FlagOnAndDecryptFailsForThisDeviceThenDoesNotLogoutSelf() {
+        // Safety: never log out the local device, even if decrypt fails for it.
+        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
+        whenever(syncStore.token).thenReturn(token)
+        whenever(syncStore.primaryKey).thenReturn(primaryKey)
+        whenever(syncStore.deviceId).thenReturn(deviceId)
+        val v2Entry = DeviceV2(deviceId = deviceId, deviceName = "BAD", credentialId = "3party")
+        whenever(syncApi.getDevices(anyString())).thenReturn(
+            Success(DeviceEntries(entries = emptyList(), entriesV2 = listOf(v2Entry))),
+        )
+        whenever(thirdPartyDeviceListDecryptor.decryptAll(any())).thenReturn(
+            DecryptAllResult(decrypted = emptyList(), undecryptable = listOf(deviceId)),
+        )
+
+        syncRepo.getConnectedDevices()
+
+        verify(syncApi, never()).logout(anyString(), eq(deviceId))
+    }
+
+    @Test
+    fun whenV2FlagOffThenLegacyPathUntouchedAndV2DecryptorNotCalled() {
+        // Sanity: with flag off, behaviour matches pre-Track-C.
+        whenever(syncStore.token).thenReturn(token)
+        whenever(syncStore.primaryKey).thenReturn(primaryKey)
+        whenever(syncStore.deviceId).thenReturn(deviceId)
+        prepareForEncryption()
+        whenever(syncApi.getDevices(anyString())).thenReturn(getDevicesSuccess)
+
+        syncRepo.getConnectedDevices()
+
+        verify(thirdPartyDeviceListDecryptor, never()).decryptAll(any())
     }
 
     @Test
@@ -1022,7 +1140,7 @@ class AppSyncAccountRepositoryTest {
         for (i in 0 until size) {
             listOfDevices.add(aDevice.copy(deviceId = "device$i"))
         }
-        whenever(syncApi.getDevices(anyString())).thenReturn(Success(listOfDevices))
+        whenever(syncApi.getDevices(anyString())).thenReturn(Success(DeviceEntries(entries = listOfDevices, entriesV2 = null)))
 
         syncRepo.getConnectedDevices() as Success
     }

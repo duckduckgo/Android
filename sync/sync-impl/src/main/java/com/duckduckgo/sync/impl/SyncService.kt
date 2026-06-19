@@ -201,6 +201,8 @@ data class AccountCreatedResponse(
     val token: String,
 )
 
+// Server sends a `devices_v2` field here too; intentionally not parsed because nothing consumes
+// `devices` from this response either — the device list is sourced from GET /devices instead.
 data class LoginResponse(
     val token: String,
     val protected_encryption_key: String,
@@ -215,6 +217,7 @@ data class DeviceResponse(
 
 data class DeviceEntries(
     val entries: List<Device>,
+    @field:Json(name = "entries_v2") val entriesV2: List<DeviceV2>? = null,
 )
 
 data class Device(
@@ -222,6 +225,15 @@ data class Device(
     @field:Json(name = "name") val deviceName: String,
     @field:Json(name = "type") val deviceType: String?,
     @field:Json(name = "jw_iat") val jwIat: String,
+)
+
+// `name` and `type` are encrypted with the credential in `credentialId`.
+data class DeviceV2(
+    @field:Json(name = "id") val deviceId: String? = null,
+    @field:Json(name = "name") val deviceName: String? = null,
+    @field:Json(name = "type") val deviceType: String? = null,
+    @field:Json(name = "jw_iat") val jwIat: String? = null,
+    @field:Json(name = "credential_id") val credentialId: String? = null,
 )
 
 data class ErrorResponse(

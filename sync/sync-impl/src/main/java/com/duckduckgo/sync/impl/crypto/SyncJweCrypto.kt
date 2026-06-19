@@ -119,7 +119,6 @@ class RealSyncJweCrypto @Inject constructor() : SyncJweCrypto {
     }
 
     override fun jweDecryptSymmetric(jweCompact: String, symmetricKey: ByteArray): ByteArray {
-        logcat { "Sync-ScopedToken: JWE decrypting with symmetric key" }
         val secretKey = SecretKeySpec(symmetricKey, "AES")
 
         return Jwts.parser()
