@@ -21,6 +21,7 @@ import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
 import android.view.View
+import android.view.ViewGroup
 import android.widget.CompoundButton
 import androidx.core.content.ContextCompat
 import androidx.core.view.isGone
@@ -77,9 +78,11 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
 
     private val binding: ActivityDuckChatSettingsBinding by viewBinding()
 
-    private val inputScreenSettingsBinding: IncludeDuckAiInputScreenSettingsBinding by lazy {
-        IncludeDuckAiInputScreenSettingsBinding.bind(binding.root)
-    }
+    private val inputScreenSettingsBinding: IncludeDuckAiInputScreenSettingsBinding
+        get() = binding.inputScreenSettings
+
+    // Guards the one-time relocation of the input screen settings block to the end of the layout.
+    private var inputScreenSettingsMovedToEnd = false
 
     private val viewModel by lazy {
         val activityParams = intent.getActivityParams(GlobalActivityStarter.ActivityParams::class.java)!!
@@ -163,6 +166,10 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
     }
 
     private fun renderViewState(viewState: ViewState) {
+        if (viewState.isNativeControlsEnabled) {
+            moveInputScreenSettingsToEnd()
+        }
+
         binding.userEnabledDuckChatToggle.quietlySetIsChecked(viewState.isDuckChatUserEnabled, userEnabledDuckChatToggleListener)
 
         inputScreenSettingsBinding.duckAIAutomaticContext.isVisible = viewState.isAutomaticContextVisible
@@ -247,6 +254,15 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
         inputScreenSettingsBinding.duckAiInputScreenWithAiContainer.setOnClickListener {
             viewModel.onDuckAiInputScreenWithAiSelected()
         }
+    }
+
+    private fun moveInputScreenSettingsToEnd() {
+        if (inputScreenSettingsMovedToEnd) return
+        val container = inputScreenSettingsBinding.root
+        val parent = container.parent as? ViewGroup ?: return
+        parent.removeView(container)
+        parent.addView(container)
+        inputScreenSettingsMovedToEnd = true
     }
 
     private fun renderSearchSettingsSection(viewState: ViewState) {

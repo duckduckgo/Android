@@ -83,7 +83,9 @@
                 app:secondaryText="@string/duck_chat_enable_duck_ai_setting_description"
                 app:showSwitch="true" />
 
-            <include layout="@layout/include_duck_ai_input_screen_settings" />
+            <include
+                android:id="@+id/inputScreenSettings"
+                layout="@layout/include_duck_ai_input_screen_settings" />
 
             <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
                 android:id="@+id/searchSettingsSectionHeader"

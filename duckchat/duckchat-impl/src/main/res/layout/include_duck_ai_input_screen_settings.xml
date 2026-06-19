@@ -14,8 +14,11 @@
   ~ limitations under the License.
   -->
 
-<merge xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/duckAiInputScreenToggleContainer"
@@ -161,4 +164,4 @@
         android:layout_height="wrap_content"
         android:id="@+id/divider2"/>
 
-</merge>
+</LinearLayout>
