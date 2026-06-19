@@ -1333,9 +1333,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
         if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
             viewModel.sendPixelEventForLandscapeOrientation()
         }
-        if (edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.BROWSER)) {
-            applyDisplayCutoutMode(newConfig.orientation)
-        }
     }
 
     private fun hideMockupOmnibar() {

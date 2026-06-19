@@ -18,7 +18,6 @@ package com.duckduckgo.app.browser.customtabs
 
 import android.content.Context
 import android.content.Intent
-import android.content.res.Configuration
 import android.os.Bundle
 import android.os.Message
 import androidx.activity.OnBackPressedCallback
@@ -132,13 +131,6 @@ class CustomTabActivity : DuckDuckGoActivity() {
         val transaction = supportFragmentManager.beginTransaction()
         transaction.replace(R.id.fragmentTabContainer, fragment, viewState.tabId)
         transaction.commit()
-    }
-
-    override fun onConfigurationChanged(newConfig: Configuration) {
-        super.onConfigurationChanged(newConfig)
-        if (edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.BROWSER)) {
-            applyDisplayCutoutMode(newConfig.orientation)
-        }
     }
 
     companion object {
