@@ -22,6 +22,7 @@ import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.cta.model.DismissedCta
 import com.duckduckgo.app.global.DefaultRoleBrowserDialog
+import com.duckduckgo.app.onboarding.CustomAiOnboardingPixelName
 import com.duckduckgo.app.onboarding.CustomAiOnboardingResolver
 import com.duckduckgo.app.onboarding.CustomAiOnboardingStore
 import com.duckduckgo.app.onboarding.DuckAiOnboardingAvailability
@@ -110,6 +111,8 @@ class NewUserOnboardingPlanProvider @Inject constructor(
             // prepare in-context CTAs
             duckAiOnboardingDemo.arm()
 
+            pixel.fire(CustomAiOnboardingPixelName.PLAN_STARTED, type = Unique())
+
             buildCustomAiPlan(onCompleted, onSkipped)
         } else {
             buildDefaultPlan(onCompleted, onSkipped)
@@ -152,7 +155,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
         rootOnSkipped: suspend () -> Unit,
     ): LinearOnboardingPlan {
         val ctx = NewUserOnboardingPlanContext()
-        val firstDialog = SuspendMemo { resolveFirstDialog(ctx, isCustomAiPlan = true) }
+        val firstDialog = SuspendMemo { resolveFirstDialog(ctx) }
 
         val skipPlan = skipPlan()
         val quickSetupPlan = quickSetupPlan(ctx)
@@ -186,7 +189,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
             steps = listOf(
                 introAnimationStep(withDuckAi = true),
                 notificationPermissionStep(),
-                initialReinstallUserStep(firstDialog, skipPlan, quickSetupPlan),
+                initialReinstallUserStep(firstDialog, skipPlan, quickSetupPlan, isCustomAiPlan = true),
                 initialStep(firstDialog),
                 aiComparisonChartStep(),
                 customAiInputScreenPreviewStep(ctx),
@@ -237,9 +240,9 @@ class NewUserOnboardingPlanProvider @Inject constructor(
             }
         }
 
-    private suspend fun resolveFirstDialog(ctx: NewUserOnboardingPlanContext, isCustomAiPlan: Boolean = false): FirstDialog =
+    private suspend fun resolveFirstDialog(ctx: NewUserOnboardingPlanContext): FirstDialog =
         withContext(dispatchers.io()) {
-            val canRestore = !isCustomAiPlan && withTimeoutOrNull(BLOCK_STORE_TIMEOUT_MS) {
+            val canRestore = withTimeoutOrNull(BLOCK_STORE_TIMEOUT_MS) {
                 try {
                     logcat { "Sync-AutoRestore: checking canRestore..." }
                     val result = syncAutoRestore.canRestore()
@@ -315,9 +318,23 @@ class NewUserOnboardingPlanProvider @Inject constructor(
         firstDialog: SuspendMemo<FirstDialog>,
         skipPlan: LinearOnboardingPlan,
         quickSetupPlan: LinearOnboardingPlan,
+        isCustomAiPlan: Boolean = false,
     ) = NewUserOnboardingActivityStep(
         id = NewUserOnboardingStepIds.INITIAL_REINSTALL_USER,
-        precondition = { firstDialog() == FirstDialog.REINSTALL },
+        precondition = {
+            when (firstDialog()) {
+                FirstDialog.SYNC_RESTORE -> {
+                    if (isCustomAiPlan) {
+                        pixel.fire(CustomAiOnboardingPixelName.RETURNING_SYNC_USER_IGNORED, type = Unique())
+                        true
+                    } else {
+                        false
+                    }
+                }
+                FirstDialog.REINSTALL -> true
+                FirstDialog.INITIAL -> false
+            }
+        },
         resolveDialog = { NewUserOnboardingActivityDialog.InitialReinstallUser },
         transition = { event ->
             when (event) {
@@ -588,9 +605,9 @@ class NewUserOnboardingPlanProvider @Inject constructor(
 
     companion object {
 
-        const val ROOT_PLAN_ID = "new_user_onboarding"
-        const val SKIP_PLAN_ID = "skip"
-        const val QUICK_SETUP_PLAN_ID = "quick_setup"
+        const val ROOT_PLAN_ID = "new-user_onboarding"
+        const val SKIP_PLAN_ID = "new-user_skip"
+        const val QUICK_SETUP_PLAN_ID = "new-user_quick-setup"
 
         private const val BLOCK_STORE_TIMEOUT_MS = 3_000L
     }

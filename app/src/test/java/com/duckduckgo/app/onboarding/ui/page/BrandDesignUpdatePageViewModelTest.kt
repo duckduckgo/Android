@@ -25,8 +25,12 @@ import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.cta.ui.DaxBubbleCta.DaxDialogIntroOption
 import com.duckduckgo.app.global.DefaultRoleBrowserDialog
 import com.duckduckgo.app.global.install.AppInstallStore
+import com.duckduckgo.app.onboarding.CustomAiOnboardingPixelName
 import com.duckduckgo.app.onboarding.CustomAiOnboardingStore
 import com.duckduckgo.app.onboarding.DuckAiOnboardingAvailability
+import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingActivityDialog
+import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingActivityStep
+import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingPlanProvider
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.ui.page.BrandDesignUpdatePageViewModel.Command
 import com.duckduckgo.app.onboardingquicksetup.OnboardingQuickSetupExperimentManager
@@ -63,7 +67,9 @@ import com.duckduckgo.duckchat.impl.inputscreen.wideevents.InputScreenOnboarding
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.onboarding.api.LinearOnboardingOrchestrator
+import com.duckduckgo.onboarding.api.LinearOnboardingPlan
 import com.duckduckgo.onboarding.api.LinearOnboardingState
+import com.duckduckgo.onboarding.api.LinearOnboardingTransition
 import com.duckduckgo.sync.api.SyncAutoRestore
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.runBlocking
@@ -109,9 +115,9 @@ class BrandDesignUpdatePageViewModelTest {
     private val mockQuickSetupPixelSender: QuickSetupPixelSender = mock()
     private val mockCustomAiOnboardingStore: CustomAiOnboardingStore = mock()
 
-    // Legacy mode: the VM derives its mode from orchestrator.state, which this mock holds at NotStarted.
+    private val orchestratorState = MutableStateFlow<LinearOnboardingState>(LinearOnboardingState.NotStarted)
     private val mockOrchestrator: LinearOnboardingOrchestrator = mock {
-        on { state } doReturn MutableStateFlow(LinearOnboardingState.NotStarted)
+        on { state } doReturn orchestratorState
     }
 
     @Before
@@ -1646,6 +1652,37 @@ class BrandDesignUpdatePageViewModelTest {
         whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(true)
         whenever(mockOnboardingQuickSetupExperimentManager.enroll()).thenReturn(QuickSetupExperimentVariant.TREATMENT)
     }
+
+    // endregion
+
+    // region AI comparison chart shown pixel (orchestrator-driven flow)
+
+    @Test
+    fun whenAiComparisonChartShownThenFiresAiComparisonScreenShowPixel() = runTest {
+        whenever(mockCustomAiOnboardingStore.isEnabled()).thenReturn(true)
+        val plan = LinearOnboardingPlan(
+            id = NewUserOnboardingPlanProvider.ROOT_PLAN_ID,
+            steps = listOf(aiComparisonChartStep()),
+        )
+        orchestratorState.value = LinearOnboardingState.InProgress(
+            rootPlanId = NewUserOnboardingPlanProvider.ROOT_PLAN_ID,
+            currentPlan = plan,
+            currentStepIndex = 0,
+        )
+
+        createViewModel()
+        advanceUntilIdle()
+
+        verify(mockPixel).fire(CustomAiOnboardingPixelName.AI_COMPARISON_SCREEN_SHOW, type = Unique())
+    }
+
+    private fun aiComparisonChartStep() =
+        NewUserOnboardingActivityStep(
+            id = "ai_comparison_chart",
+            showsStepIndicator = true,
+            transition = { LinearOnboardingTransition.Stay },
+            resolveDialog = { NewUserOnboardingActivityDialog.AiComparisonChart },
+        )
 
     // endregion
 }
