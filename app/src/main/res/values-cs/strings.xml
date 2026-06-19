@@ -1071,6 +1071,12 @@
     <string name="onboardingSearchDaxDialogOption1Quoted" instruction="translate &apos;duck&apos; too.">jak se anglicky řekne „kachna“</string>
     <string name="onboardingSearchDaxDialogOption1EnglishQuoted" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">jak se španělsky řekne „kachna“</string>
 
+    <string name="onboardingDuckAiFireButtonDaxDialogTitle">To je Duck.ai!</string>
+    <string name="onboardingDuckAiFireButtonDaxDialogDescription"><![CDATA[Soukromé AI chaty, které můžeš kdykoli smazat pomocí tlačítka <b>Fire Button</b>. Zkus ji! 🔥]]></string>
+    <string name="onboardingDuckAiEndCtaTitle">To zvládneš!</string>
+    <string name="onboardingDuckAiEndCtaDescription"><![CDATA[Použij adresní řádek k vyhledávání a návštěvě webů nebo přepni na Duck.ai pro soukromý chat s umělou inteligencí.<br/><br/>Duck.ai můžeš používat odkudkoli, kde vidíš ikonu chatu.]]></string>
+    <string name="onboardingDuckAiEndCtaButton">Hezky!</string>
+
     <string name="input_screen_user_pref_without_ai_updated">Jen vyhledávání</string>
     <string name="input_screen_user_pref_with_ai_updated">Přepínej mezi\nHledáním a Duck.ai</string>
 
