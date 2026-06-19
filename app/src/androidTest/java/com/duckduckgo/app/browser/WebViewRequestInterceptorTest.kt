@@ -518,6 +518,7 @@ class WebViewRequestInterceptorTest {
         configureShouldAddGpcHeader()
         configureUrlDoesNotExistInTheStack()
         val mockWebViewClientListener: WebViewClientListener = mock()
+        whenever(mockWebViewClientListener.isDesktopSiteEnabled(any())).thenReturn(false)
 
         testee.shouldIntercept(
             request = mockRequest,
@@ -535,6 +536,7 @@ class WebViewRequestInterceptorTest {
         configureShouldAddGpcHeader()
         configureUrlDoesNotExistInTheStack()
         val mockWebViewClientListener: WebViewClientListener = mock()
+        whenever(mockWebViewClientListener.isDesktopSiteEnabled(any())).thenReturn(false)
 
         testee.shouldIntercept(
             request = mockRequest,
@@ -602,6 +604,7 @@ class WebViewRequestInterceptorTest {
         configureUrlDoesNotExistInTheStack()
 
         val mockWebViewClientListener: WebViewClientListener = mock()
+        whenever(mockWebViewClientListener.isDesktopSiteEnabled(any())).thenReturn(false)
         testee.shouldIntercept(
             request = mockRequest,
             documentUri = null,
