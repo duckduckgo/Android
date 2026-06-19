@@ -28,10 +28,7 @@ import com.duckduckgo.app.cta.ui.DaxBubbleCta.DaxDialogIntroOption
 import com.duckduckgo.app.global.DefaultRoleBrowserDialog
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.onboarding.CustomAiOnboardingStore
-import com.duckduckgo.app.onboarding.DuckAiOnboardingExperimentManager
-import com.duckduckgo.app.onboarding.DuckAiOnboardingExperimentManager.DuckAiOnboardingExperimentVariant.CONTROL
-import com.duckduckgo.app.onboarding.DuckAiOnboardingExperimentManager.DuckAiOnboardingExperimentVariant.TREATMENT_WITH_DUCK_AI_DEFAULT
-import com.duckduckgo.app.onboarding.DuckAiOnboardingExperimentManager.DuckAiOnboardingExperimentVariant.TREATMENT_WITH_SEARCH_DEFAULT
+import com.duckduckgo.app.onboarding.DuckAiOnboardingAvailability
 import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingActivityDialog
 import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingActivityStep
 import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingEvent
@@ -122,7 +119,7 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
     private val androidBrowserConfigFeature: AndroidBrowserConfigFeature,
     private val duckChat: DuckChat,
     private val inputScreenOnboardingWideEvent: InputScreenOnboardingWideEvent,
-    private val duckAiOnboardingExperimentManager: DuckAiOnboardingExperimentManager,
+    private val duckAiOnboardingAvailability: DuckAiOnboardingAvailability,
     private val onboardingQuickSetupExperimentManager: OnboardingQuickSetupExperimentManager,
     private val defaultBrowserDetector: DefaultBrowserDetector,
     private val widgetCapabilities: WidgetCapabilities,
@@ -621,15 +618,8 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
                 INPUT_SCREEN -> {
                     viewModelScope.launch {
                         applyInputScreenSelection()
-                        if (_viewState.value.inputScreenSelected) {
-                            when (duckAiOnboardingExperimentManager.enroll()) {
-                                null,
-                                CONTROL,
-                                -> _commands.send(Command.Finish)
-
-                                TREATMENT_WITH_DUCK_AI_DEFAULT -> setInputScreenPreviewDialog(isSearchDefault = false, currentPageNumber = null)
-                                TREATMENT_WITH_SEARCH_DEFAULT -> setInputScreenPreviewDialog(isSearchDefault = true, currentPageNumber = null)
-                            }
+                        if (_viewState.value.inputScreenSelected && duckAiOnboardingAvailability.isDuckAiOnboardingEnabled()) {
+                            setInputScreenPreviewDialog(isSearchDefault = true, currentPageNumber = null)
                         } else {
                             _commands.send(Command.Finish)
                         }

@@ -25,10 +25,7 @@ import com.duckduckgo.app.global.DefaultRoleBrowserDialog
 import com.duckduckgo.app.onboarding.CustomAiOnboardingResolver
 import com.duckduckgo.app.onboarding.CustomAiOnboardingStore
 import com.duckduckgo.app.onboarding.DuckAiOnboardingDemo
-import com.duckduckgo.app.onboarding.DuckAiOnboardingExperimentManager
-import com.duckduckgo.app.onboarding.DuckAiOnboardingExperimentManager.DuckAiOnboardingExperimentVariant
-import com.duckduckgo.app.onboarding.DuckAiOnboardingExperimentManager.DuckAiOnboardingExperimentVariant.TREATMENT_WITH_DUCK_AI_DEFAULT
-import com.duckduckgo.app.onboarding.DuckAiOnboardingExperimentManager.DuckAiOnboardingExperimentVariant.TREATMENT_WITH_SEARCH_DEFAULT
+import com.duckduckgo.app.onboarding.DuckAiOnboardingAvailability
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.ui.page.QuickSetupPixelSender
 import com.duckduckgo.app.onboardingquicksetup.OnboardingQuickSetupExperimentManager
@@ -87,7 +84,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
     private val onboardingStore: OnboardingStore,
     private val duckChat: DuckChat,
     private val androidBrowserConfigFeature: AndroidBrowserConfigFeature,
-    private val duckAiOnboardingExperimentManager: DuckAiOnboardingExperimentManager,
+    private val duckAiOnboardingAvailability: DuckAiOnboardingAvailability,
     private val onboardingQuickSetupExperimentManager: OnboardingQuickSetupExperimentManager,
     private val quickSetupPixelSender: QuickSetupPixelSender,
     private val inputScreenOnboardingWideEvent: InputScreenOnboardingWideEvent,
@@ -126,7 +123,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
 
         // SuspendMemos evaluate the inner lambda lazily, on first access, and store the result in-memory for subsequent access
         val firstDialog = SuspendMemo { resolveFirstDialog(ctx) }
-        val duckAiVariant = SuspendMemo { duckAiOnboardingExperimentManager.enroll() }
+        val duckAiEnabled = SuspendMemo { duckAiOnboardingAvailability.isDuckAiOnboardingEnabled() }
 
         val skipPlan = skipPlan()
         val quickSetupPlan = quickSetupPlan(ctx)
@@ -145,7 +142,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
                 defaultBrowserPromptStep(),
                 addressBarPositionStep(),
                 inputScreenStep(ctx),
-                inputScreenPreviewStep(ctx, duckAiVariant),
+                inputScreenPreviewStep(ctx, duckAiEnabled),
             ),
         )
     }
@@ -415,14 +412,14 @@ class NewUserOnboardingPlanProvider @Inject constructor(
 
     private fun inputScreenPreviewStep(
         ctx: NewUserOnboardingPlanContext,
-        duckAiVariant: SuspendMemo<DuckAiOnboardingExperimentVariant?>,
+        duckAiEnabled: SuspendMemo<Boolean>,
     ) = NewUserOnboardingActivityStep(
         id = NewUserOnboardingStepIds.INPUT_SCREEN_PREVIEW,
         precondition = {
-            ctx.inputModeWasAi && duckAiVariant() in setOf(TREATMENT_WITH_DUCK_AI_DEFAULT, TREATMENT_WITH_SEARCH_DEFAULT)
+            ctx.inputModeWasAi && duckAiEnabled()
         },
         resolveDialog = {
-            NewUserOnboardingActivityDialog.InputScreenPreview(isSearchDefault = duckAiVariant() == TREATMENT_WITH_SEARCH_DEFAULT)
+            NewUserOnboardingActivityDialog.InputScreenPreview(isSearchDefault = true)
         },
         transition = { event ->
             when (event) {

@@ -26,8 +26,7 @@ import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.cta.ui.DaxBubbleCta.DaxDialogIntroOption
 import com.duckduckgo.app.global.DefaultRoleBrowserDialog
 import com.duckduckgo.app.global.install.AppInstallStore
-import com.duckduckgo.app.onboarding.DuckAiOnboardingExperimentManager
-import com.duckduckgo.app.onboarding.DuckAiOnboardingExperimentManager.DuckAiOnboardingExperimentVariant.*
+import com.duckduckgo.app.onboarding.DuckAiOnboardingAvailability
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.ADDRESS_BAR_POSITION
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.AI_COMPARISON_CHART
@@ -107,7 +106,7 @@ class WelcomePageViewModel @Inject constructor(
     private val inputScreenOnboardingWideEvent: InputScreenOnboardingWideEvent,
     private val deviceInfo: DeviceInfo,
     private val syncAutoRestore: SyncAutoRestore,
-    private val duckAiOnboardingExperimentManager: DuckAiOnboardingExperimentManager,
+    private val duckAiOnboardingAvailability: DuckAiOnboardingAvailability,
 ) : ViewModel() {
     private val _commands = Channel<Command>(1, DROP_OLDEST)
     val commands: Flow<Command> = _commands.receiveAsFlow()
@@ -262,22 +261,12 @@ class WelcomePageViewModel @Inject constructor(
                     }
                     duckChat.setCosmeticInputScreenUserSetting(inputScreenSelected)
                     onboardingStore.storeInputScreenSelection(inputScreenSelected)
-                    val command = if (inputScreenSelected) {
-                        when (duckAiOnboardingExperimentManager.enroll()) {
-                            null,
-                            CONTROL,
-                            -> Finish
-                            TREATMENT_WITH_DUCK_AI_DEFAULT -> Command.ShowInputScreenPreviewDialog(
-                                searchSuggestions = onboardingStore.getSearchOptions(),
-                                chatSuggestions = onboardingStore.getChatSuggestions(),
-                                duckAiDefault = true,
-                            )
-                            TREATMENT_WITH_SEARCH_DEFAULT -> Command.ShowInputScreenPreviewDialog(
-                                searchSuggestions = onboardingStore.getSearchOptions(),
-                                chatSuggestions = onboardingStore.getChatSuggestions(),
-                                duckAiDefault = false,
-                            )
-                        }
+                    val command = if (inputScreenSelected && duckAiOnboardingAvailability.isDuckAiOnboardingEnabled()) {
+                        Command.ShowInputScreenPreviewDialog(
+                            searchSuggestions = onboardingStore.getSearchOptions(),
+                            chatSuggestions = onboardingStore.getChatSuggestions(),
+                            duckAiDefault = false,
+                        )
                     } else {
                         Finish
                     }
