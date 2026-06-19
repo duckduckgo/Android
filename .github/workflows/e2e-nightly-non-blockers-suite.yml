@@ -72,6 +72,8 @@ jobs:
 
       - name: Omnibar Tests
         id: maestro-omnibar
+        # Run regardless of earlier suite failures, but only if the release binary uploaded.
+        if: ${{ !cancelled() && steps.maestro-upload-release-binary.outcome == 'success' }}
         uses: ./.github/actions/maestro-cloud-asana-reporter
         timeout-minutes: 120
         with:
@@ -89,6 +91,8 @@ jobs:
 
       - name: Run Duck Player Maestro Tests
         id: maestro-cloud-asana
+        # Run regardless of earlier suite failures, but only if the internal binary uploaded.
+        if: ${{ !cancelled() && steps.maestro-upload-internal-binary.outcome == 'success' }}
         uses: ./.github/actions/maestro-cloud-asana-reporter
         timeout-minutes: 120
         with:
@@ -106,6 +110,8 @@ jobs:
 
       - name: Android Design System
         id: maestro-ads
+        # Run regardless of earlier suite failures, but only if the internal binary uploaded.
+        if: ${{ !cancelled() && steps.maestro-upload-internal-binary.outcome == 'success' }}
         uses: ./.github/actions/maestro-cloud-asana-reporter
         timeout-minutes: 120
         with:
@@ -123,6 +129,8 @@ jobs:
 
       - name: Unified Input Field
         id: maestro-uif
+        # Run regardless of earlier suite failures, but only if the internal binary uploaded.
+        if: ${{ !cancelled() && steps.maestro-upload-internal-binary.outcome == 'success' }}
         uses: ./.github/actions/maestro-cloud-asana-reporter
         timeout-minutes: 120
         with:
@@ -140,6 +148,8 @@ jobs:
 
       - name: Internal Onboarding Flows
         id: maestro-preonboarding
+        # Run regardless of earlier suite failures, but only if the internal binary uploaded.
+        if: ${{ !cancelled() && steps.maestro-upload-internal-binary.outcome == 'success' }}
         uses: ./.github/actions/maestro-cloud-asana-reporter
         timeout-minutes: 120
         with:
