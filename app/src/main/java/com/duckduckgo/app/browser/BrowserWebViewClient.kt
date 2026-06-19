@@ -234,6 +234,11 @@ class BrowserWebViewClient @Inject constructor(
                 return false
             }
 
+            // Redirect duck.ai links out of a custom tab into the Duck Chat experience instead of loading them in the custom tab.
+            if (isForMainFrame && duckChat.isDuckChatUrl(url) && webViewClientListener?.handleDuckChatUrlInCustomTab(url) == true) {
+                return true
+            }
+
             return when (val urlType = specialUrlDetector.determineType(initiatingUrl = webView.originalUrl, uri = url)) {
                 is SpecialUrlDetector.UrlType.ShouldLaunchSubscriptionLink -> {
                     subscriptions.launchSubscription(webView.context, url)
