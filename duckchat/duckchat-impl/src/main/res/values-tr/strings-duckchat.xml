@@ -126,6 +126,12 @@
     <!-- Duck AI Chat Suggestions -->
     <string name="duckAiChatHistoryViewAllChats">Tüm Sohbetleri Görüntüle</string>
 
+    <!-- Duck.ai onboarding end CTA -->
+    <string name="duckAiEndCtaTitle">İşte bu kadar!</string>
+    <string name="duckAiEndCtaDescription"><![CDATA[Siteleri aramak ve ziyaret etmek için adres çubuğunu kullanın veya gizli yapay zeka sohbeti için Duck.ai\'a geçin.<br/><br/>Sohbet simgesini gördüğünüz her yerde Duck.ai kullanabilirsiniz]]></string>
+    <string name="duckAiEndCtaButton">Tebrikler!</string>
+    <string name="duckAiEndCtaDescriptionCustomAi"><![CDATA[Duck.ai ile gizli bir yapay zeka sohbeti başlatın veya korumalı gezinme için Arama moduna geçin.<br/><br/>Sohbet simgesini gördüğünüz her yerde Duck.ai kullanabilirsiniz]]></string>
+
     <!-- Native Duck.ai chat history -->
     <string name="duck_ai_chat_history_title">Sohbetler</string>
     <string name="duck_ai_chat_history_section_pinned">Sabitlenmiş</string>
