@@ -29,6 +29,7 @@ import com.duckduckgo.sync.impl.AccountErrorCodes.CREATE_ACCOUNT_FAILED
 import com.duckduckgo.sync.impl.AccountErrorCodes.INVALID_CODE
 import com.duckduckgo.sync.impl.AccountErrorCodes.LOGIN_FAILED
 import com.duckduckgo.sync.impl.Clipboard
+import com.duckduckgo.sync.impl.DispatchOutcome
 import com.duckduckgo.sync.impl.ExchangeResult.AccountSwitchingRequired
 import com.duckduckgo.sync.impl.ExchangeResult.LoggedIn
 import com.duckduckgo.sync.impl.ExchangeResult.Pending
@@ -38,15 +39,24 @@ import com.duckduckgo.sync.impl.R.dimen
 import com.duckduckgo.sync.impl.R.string
 import com.duckduckgo.sync.impl.Result.Error
 import com.duckduckgo.sync.impl.Result.Success
+import com.duckduckgo.sync.impl.RouteDecision
 import com.duckduckgo.sync.impl.SyncAccountRepository
 import com.duckduckgo.sync.impl.SyncAccountRepository.AuthCode
 import com.duckduckgo.sync.impl.SyncAuthCode
 import com.duckduckgo.sync.impl.SyncAuthCode.Unknown
+import com.duckduckgo.sync.impl.SyncCodeDispatcher
 import com.duckduckgo.sync.impl.SyncFeature
 import com.duckduckgo.sync.impl.onFailure
 import com.duckduckgo.sync.impl.onSuccess
 import com.duckduckgo.sync.impl.pixels.SyncPixels
+import com.duckduckgo.sync.impl.pixels.SyncPixels.CancellationReason
+import com.duckduckgo.sync.impl.pixels.SyncPixels.CodeVersion
+import com.duckduckgo.sync.impl.pixels.SyncPixels.PeerKind
 import com.duckduckgo.sync.impl.pixels.SyncPixels.ScreenType.SYNC_EXCHANGE
+import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupPath
+import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupRole
+import com.duckduckgo.sync.impl.pixels.fireSetupCancelledIfDenied
+import com.duckduckgo.sync.impl.pixels.fireSetupFailed
 import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Companion.POLLING_INTERVAL_EXCHANGE_FLOW
 import com.duckduckgo.sync.impl.ui.SyncWithAnotherActivityViewModel.Command.AskToSwitchAccount
 import com.duckduckgo.sync.impl.ui.SyncWithAnotherActivityViewModel.Command.FinishWithError
@@ -77,6 +87,7 @@ class SyncWithAnotherActivityViewModel @Inject constructor(
     private val syncPixels: SyncPixels,
     private val dispatchers: DispatcherProvider,
     private val syncFeature: SyncFeature,
+    private val codeDispatcher: SyncCodeDispatcher,
 ) : ViewModel() {
     private val command = Channel<Command>(1, DROP_OLDEST)
     fun commands(): Flow<Command> = command.receiveAsFlow()
@@ -89,6 +100,10 @@ class SyncWithAnotherActivityViewModel @Inject constructor(
     private var canTimeout = false
     private var isDeepLink = false
 
+    // viewState.onStart re-fires on every re-collection; guard so the session starts once and
+    // re-fires don't regenerate the invitation/channel, orphaning the code the user already shared.
+    private var sessionStarted = false
+
     private val viewState = MutableStateFlow(ViewState())
     fun viewState(isDeepLink: Boolean = false): Flow<ViewState> = viewState.onStart {
         this@SyncWithAnotherActivityViewModel.canTimeout = isDeepLink
@@ -97,7 +112,13 @@ class SyncWithAnotherActivityViewModel @Inject constructor(
     }
 
     private fun startExchangeProcess() {
+        if (sessionStarted) return
+        sessionStarted = true
         viewModelScope.launch(dispatchers.io()) {
+            if (shouldUseV2()) {
+                startV2Present()
+                return@launch
+            }
             showQRCode()
             var polling = syncFeature.exchangeKeysToSyncWithAnotherDevice().isEnabled()
             val startTime = System.currentTimeMillis()
@@ -128,6 +149,29 @@ class SyncWithAnotherActivityViewModel @Inject constructor(
                     }
             }
         }
+    }
+
+    private fun shouldUseV2(): Boolean =
+        syncFeature.canUseV2ConnectFlow().isEnabled() &&
+            syncFeature.canShowV2ConnectCode().isEnabled()
+
+    /** Drive a v2 Presenter session via the dispatcher. On this signed-in surface role election elects Host. */
+    private suspend fun startV2Present() {
+        val previousPrimaryKey = syncAccountRepository.getAccountInfo().primaryKey
+        codeDispatcher.presentV2().collect { outcome ->
+            when (outcome) {
+                is DispatchOutcome.LinkingCodeReady -> renderV2QrCode(outcome.linkingCode)
+                else -> handleV2Outcome(outcome, previousPrimaryKey)
+            }
+        }
+    }
+
+    private suspend fun renderV2QrCode(linkingCode: String) {
+        barcodeContents = AuthCode(qrCode = linkingCode, rawCode = linkingCode)
+        val bitmap = withContext(dispatchers.io()) {
+            qrEncoder.encodeAsBitmap(linkingCode, dimen.qrSizeSmall, dimen.qrSizeSmall)
+        }
+        viewState.emit(viewState.value.copy(qrCodeBitmap = bitmap))
     }
 
     private suspend fun showQRCode() {
@@ -183,6 +227,14 @@ class SyncWithAnotherActivityViewModel @Inject constructor(
         ) : Command()
 
         data class AskToSwitchAccount(val encodedStringCode: String) : Command()
+
+        /** v2 §"Exchange Confirmations": prompt user "Sync your data with [peerName]?". */
+        data class AskJoinerConfirmation(val peerName: String?, val peerKind: PeerKind? = null) : Command()
+
+        /** v2 §"Exchange Confirmations": prompt user "Allow [peerName] to join your sync?". */
+        data class AskHostConfirmation(val peerName: String?, val peerKind: PeerKind? = null) : Command()
+
+        internal data class ShowV2Error(val content: V2PairingErrorContent) : Command()
     }
 
     fun onReadTextCodeClicked() {
@@ -200,29 +252,89 @@ class SyncWithAnotherActivityViewModel @Inject constructor(
     fun onQRCodeScanned(qrCode: String) {
         viewModelScope.launch(dispatchers.io()) {
             val previousPrimaryKey = syncAccountRepository.getAccountInfo().primaryKey
-            val codeType = syncAccountRepository.parseSyncAuthCode(qrCode).also { it.onCodeScanned() }
-            when (val result = syncAccountRepository.processCode(codeType)) {
-                is Error -> {
-                    logcat(WARN) { "Sync: error processing code ${result.reason}" }
-                    emitError(result, qrCode)
-                }
+            // Route via SyncCodeDispatcher. FF off → Legacy(parseSyncAuthCode(...)); FF on →
+            // v2-shaped codes are taken into ownership and surfaced through DispatchOutcome.
+            when (val decision = codeDispatcher.route(qrCode)) {
+                is RouteDecision.Legacy -> {
+                    logcat { "Sync-CodeDispatch: SyncWithAnotherActivityViewModel handling Legacy(${decision.authCode::class.simpleName})" }
+                    val codeType = decision.authCode.also { it.onCodeScanned() }
+                    when (val result = syncAccountRepository.processCode(codeType)) {
+                        is Error -> {
+                            logcat(WARN) { "Sync: error processing code ${result.reason}" }
+                            emitError(result, qrCode)
+                        }
 
-                is Success -> {
-                    if (codeType is SyncAuthCode.Exchange) {
-                        pollForRecoveryKey(previousPrimaryKey = previousPrimaryKey, qrCode = qrCode)
-                    } else {
-                        // Show recovery screen if QR scanned is Connect and user was not previously logged in (empty PK)
-                        val showRecovery = codeType is SyncAuthCode.Connect && previousPrimaryKey.isEmpty()
-                        onLoginSuccess(previousPrimaryKey, showRecovery)
+                        is Success -> {
+                            if (codeType is SyncAuthCode.Exchange) {
+                                pollForRecoveryKey(previousPrimaryKey = previousPrimaryKey, qrCode = qrCode)
+                            } else {
+                                // Show recovery screen if QR scanned is Connect and user was not previously logged in (empty PK)
+                                val showRecovery = codeType is SyncAuthCode.Connect && previousPrimaryKey.isEmpty()
+                                onLoginSuccess(previousPrimaryKey, showRecovery)
+                            }
+                        }
                     }
+                }
+                is RouteDecision.V2InProgress -> {
+                    logcat { "Sync-CodeDispatch: SyncWithAnotherActivityViewModel observing V2InProgress" }
+                    if (!isDeepLink) {
+                        syncPixels.fireBarcodeScannerParseSuccess(SYNC_EXCHANGE, CodeVersion.V2, decision.codeType)
+                    }
+                    decision.outcomes.collect { handleV2Outcome(it, previousPrimaryKey) }
                 }
             }
         }
     }
 
-    private suspend fun onLoginSuccess(previousPrimaryKey: String, showRecovery: Boolean) {
+    /** Map one v2 [DispatchOutcome] onto this VM's existing command pipeline. */
+    private suspend fun handleV2Outcome(
+        outcome: DispatchOutcome,
+        previousPrimaryKey: String,
+    ) {
+        syncPixels.fireSetupFailed(outcome)
+        syncPixels.fireSetupCancelledIfDenied(outcome, SYNC_EXCHANGE)
+        // Cancel the deep-link timeout only on terminal outcomes; keep it running across confirmation prompts.
+        when (outcome) {
+            is DispatchOutcome.LoggedIn -> {
+                cancelTimeout()
+                val showRecovery = previousPrimaryKey.isEmpty()
+                onLoginSuccess(previousPrimaryKey, showRecovery, outcome.path, outcome.myRole, outcome.peerKind)
+            }
+            is DispatchOutcome.AlreadyConnected -> {
+                cancelTimeout()
+                command.send(Command.ShowV2Error(v2AlreadyPairedError))
+            }
+            is DispatchOutcome.UpgradeRequired -> {
+                cancelTimeout()
+                logcat { "Sync v2: upgrade required, peer needs protocol v${outcome.codeMajor}" }
+                command.send(Command.ShowV2Error(v2UpgradeRequiredError))
+            }
+            is DispatchOutcome.Failed -> {
+                cancelTimeout()
+                command.send(Command.ShowV2Error(outcome.code.toV2PairingError()))
+            }
+            is DispatchOutcome.JoinerConfirmationRequested ->
+                command.send(Command.AskJoinerConfirmation(outcome.peerName, outcome.peerKind))
+            is DispatchOutcome.HostConfirmationRequested ->
+                command.send(Command.AskHostConfirmation(outcome.peerName, outcome.peerKind))
+            is DispatchOutcome.LinkingCodeReady -> {} // No-op; used only by presentV2() flow
+        }
+    }
+
+    fun onJoinerConfirmed() { codeDispatcher.confirmJoiner() }
+    fun onJoinerDenied() { codeDispatcher.denyJoiner() }
+    fun onHostConfirmed() { codeDispatcher.confirmHost() }
+    fun onHostDenied() { codeDispatcher.denyHost() }
+
+    private suspend fun onLoginSuccess(
+        previousPrimaryKey: String,
+        showRecovery: Boolean,
+        path: SetupPath? = null,
+        myRole: SetupRole? = null,
+        peerKind: PeerKind? = null,
+    ) {
         val postProcessCodePK = syncAccountRepository.getAccountInfo().primaryKey
-        fireLoginPixels()
+        fireLoginPixels(path, myRole, peerKind)
         val userSwitchedAccount = previousPrimaryKey.isNotBlank() && previousPrimaryKey != postProcessCodePK
         val commandSuccess = if (userSwitchedAccount) {
             syncPixels.fireUserSwitchedAccount()
@@ -233,13 +345,17 @@ class SyncWithAnotherActivityViewModel @Inject constructor(
         command.send(commandSuccess)
     }
 
-    private fun fireLoginPixels() {
+    private fun fireLoginPixels(
+        path: SetupPath? = null,
+        myRole: SetupRole? = null,
+        peerKind: PeerKind? = null,
+    ) {
         syncPixels.fireLoginPixel()
 
         if (isDeepLink) {
             syncPixels.fireSetupDeepLinkFlowSuccess()
         } else {
-            syncPixels.fireSyncSetupFinishedSuccessfully(SYNC_EXCHANGE)
+            syncPixels.fireSyncSetupFinishedSuccessfully(SYNC_EXCHANGE, path, myRole, peerKind)
         }
     }
 
@@ -327,11 +443,12 @@ class SyncWithAnotherActivityViewModel @Inject constructor(
             when (result) {
                 EnterCodeContractOutput.Error -> {}
                 EnterCodeContractOutput.LoginSuccess -> {
-                    fireLoginPixels()
+                    // Manual entry: EnterCodeViewModel fires "Setup success"; only fire login pixel here.
+                    syncPixels.fireLoginPixel()
                     command.send(LoginSuccess(showRecovery = true))
                 }
                 EnterCodeContractOutput.SwitchAccountSuccess -> {
-                    fireLoginPixels()
+                    syncPixels.fireLoginPixel()
                     command.send(SwitchAccountSuccess)
                 }
             }
@@ -354,7 +471,12 @@ class SyncWithAnotherActivityViewModel @Inject constructor(
         if (isDeepLink) {
             syncPixels.fireSetupDeepLinkFlowAbandoned()
         } else {
-            syncPixels.fireSyncSetupAbandoned(SYNC_EXCHANGE)
+            val reason = if (codeDispatcher.isV2ExchangeUnderway()) {
+                CancellationReason.CANCELLED_BEFORE_FINISHED
+            } else {
+                CancellationReason.SCANNING_CANCELLED
+            }
+            syncPixels.fireSyncSetupAbandoned(SYNC_EXCHANGE, reason)
         }
     }
 
@@ -363,7 +485,7 @@ class SyncWithAnotherActivityViewModel @Inject constructor(
 
         when (this) {
             is Unknown -> syncPixels.fireBarcodeScannerParseError(SYNC_EXCHANGE)
-            else -> syncPixels.fireBarcodeScannerParseSuccess(SYNC_EXCHANGE)
+            else -> syncPixels.fireBarcodeScannerParseSuccess(SYNC_EXCHANGE, CodeVersion.V1)
         }
     }
 

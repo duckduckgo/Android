@@ -9,6 +9,12 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
 
+/**
+ * Distinct type for the scoped password (SP) so it can't be silently swapped with the account's primary key.
+ */
+@JvmInline
+value class ScopedPassword(val raw: String)
+
 interface SyncStore {
     var syncingDataEnabled: Boolean
     var userId: String?
@@ -17,6 +23,13 @@ interface SyncStore {
     var token: String?
     var primaryKey: String?
     var secretKey: String?
+
+    /** Which access credential this device authenticated with ("ddg" or "3party"). */
+    var credentialId: String?
+
+    /** Scoped password (SP primary key) for the 3party credential. Only present when a 3party credential exists. */
+    var scopedPassword: ScopedPassword?
+
     fun isEncryptionSupported(): Boolean
     fun isSignedInFlow(): Flow<Boolean>
     fun isSignedIn(): Boolean
@@ -134,6 +147,22 @@ constructor(
             }
         }
 
+    override var credentialId: String?
+        get() = encryptedPreferences?.getString(KEY_CREDENTIAL_ID, null)
+        set(value) {
+            encryptedPreferences?.edit(commit = true) {
+                if (value == null) remove(KEY_CREDENTIAL_ID) else putString(KEY_CREDENTIAL_ID, value)
+            }
+        }
+
+    override var scopedPassword: ScopedPassword?
+        get() = encryptedPreferences?.getString(KEY_SCOPED_PASSWORD, null)?.let(::ScopedPassword)
+        set(value) {
+            encryptedPreferences?.edit(commit = true) {
+                if (value == null) remove(KEY_SCOPED_PASSWORD) else putString(KEY_SCOPED_PASSWORD, value.raw)
+            }
+        }
+
     override fun isEncryptionSupported(): Boolean = encryptedPreferences != null
 
     override fun isSignedInFlow(): Flow<Boolean> = isSignedInStateFlow
@@ -176,5 +205,7 @@ constructor(
         private const val KEY_SYNCING_DATA_ENABLED = "KEY_SYNCING_DATA_ENABLED"
         private const val KEY_PK = "KEY_PK"
         private const val KEY_SK = "KEY_SK"
+        private const val KEY_CREDENTIAL_ID = "KEY_CREDENTIAL_ID"
+        private const val KEY_SCOPED_PASSWORD = "KEY_SCOPED_PASSWORD"
     }
 }
