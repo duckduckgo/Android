@@ -126,6 +126,12 @@
     <!-- Duck AI Chat Suggestions -->
     <string name="duckAiChatHistoryViewAllChats">Ver todos os chats</string>
 
+    <!-- Duck.ai onboarding end CTA -->
+    <string name="duckAiEndCtaTitle">Tu consegues!</string>
+    <string name="duckAiEndCtaDescription"><![CDATA[Usa a barra de endereços para pesquisar e visitar sites ou alterna para Duck.ai para chat privado de IA.<br/><br/>Podes usar Duck.ai em qualquer lugar onde vejas o ícone de chat]]></string>
+    <string name="duckAiEndCtaButton">Dá cá cinco!</string>
+    <string name="duckAiEndCtaDescriptionCustomAi"><![CDATA[Inicia um chat privado de IA com Duck.ai ou muda para Pesquisar para teres uma navegação protegida.<br/><br/>Podes usar Duck.ai em qualquer lugar onde vejas o ícone de chat]]></string>
+
     <!-- Native Duck.ai chat history -->
     <string name="duck_ai_chat_history_title">Chats</string>
     <string name="duck_ai_chat_history_section_pinned">Afixado</string>
