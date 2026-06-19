@@ -105,6 +105,7 @@ class InputScreenViewModelTest {
     private val tabsFlow = MutableStateFlow<List<TabEntity>>(emptyList())
     private val tabPageContextRepository: com.duckduckgo.app.tabs.model.TabPageContextRepository = mock()
     private val duckChatJSHelper: com.duckduckgo.duckchat.impl.helper.DuckChatJSHelper = mock()
+    private val pendingNativePromptStore: com.duckduckgo.duckchat.impl.helper.PendingNativePromptStore = mock()
 
     private val duckAiFeatureState: DuckAiFeatureState = mock()
     private val chatSuggestionsReader: com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.reader.ChatSuggestionsReader = mock()
@@ -165,6 +166,7 @@ class InputScreenViewModelTest {
             tabPageContextRepository = tabPageContextRepository,
             duckChatJSHelper = duckChatJSHelper,
             autocompleteHistoryDeleteFeature = autocompleteHistoryDeleteFeature,
+            pendingNativePromptStore = pendingNativePromptStore,
         )
 
     private fun aTab(id: String) = TabEntity(tabId = id, url = null, title = null)
@@ -584,6 +586,30 @@ class InputScreenViewModelTest {
             viewModel.onChatSubmitted(query)
 
             assertEquals(SubmitChat(query), viewModel.command.value)
+        }
+
+    @Test
+    fun `when onChatSubmitted with query then prompt is stored so it survives the onboarding gate`() =
+        runTest {
+            val viewModel = createViewModel()
+            val query = "example"
+
+            viewModel.onChatSubmitted(query)
+
+            verify(pendingNativePromptStore).store(prompt = query, modelId = null, reasoningEffort = null)
+        }
+
+    @Test
+    fun `when onChatSubmitted with web url then prompt is not stored`() =
+        runTest {
+            val viewModel = createViewModel()
+            val url = "https://example.com"
+
+            whenever(queryUrlPredictor.isUrl(url)).thenReturn(true)
+
+            viewModel.onChatSubmitted(url)
+
+            verify(pendingNativePromptStore, never()).store(any(), any(), any(), any(), any(), any())
         }
 
     @Test

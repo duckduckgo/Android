@@ -50,6 +50,7 @@ import com.duckduckgo.duckchat.impl.feature.DuckAiChatHistoryFeature
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.feature.maxUrlSuggestions
 import com.duckduckgo.duckchat.impl.helper.DuckChatJSHelper
+import com.duckduckgo.duckchat.impl.helper.PendingNativePromptStore
 import com.duckduckgo.duckchat.impl.inputscreen.ui.InputScreenConfigResolver
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.EditWithSelectedQuery
@@ -158,6 +159,7 @@ class InputScreenViewModel @AssistedInject constructor(
     private val tabPageContextRepository: TabPageContextRepository,
     private val duckChatJSHelper: DuckChatJSHelper,
     private val autocompleteHistoryDeleteFeature: AutocompleteHistoryDeleteFeature,
+    private val pendingNativePromptStore: PendingNativePromptStore,
 ) : ViewModel() {
 
     private val autoComplete: AutoComplete = autoCompleteFactory.create(
@@ -995,6 +997,10 @@ class InputScreenViewModel @AssistedInject constructor(
     }
 
     private fun navigateToDuckChat(query: String) {
+        if (query.isNotEmpty()) {
+            // Store the prompt so it survives the Duck.ai terms/onboarding gate on fresh install
+            pendingNativePromptStore.store(prompt = query, modelId = null, reasoningEffort = null)
+        }
         when {
             visibilityState.value.fullScreenMode -> {
                 val url = duckChat.getDuckChatUrl(query, true)
