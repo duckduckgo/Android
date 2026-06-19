@@ -66,12 +66,14 @@ import com.duckduckgo.onboarding.api.LinearOnboardingOrchestrator
 import com.duckduckgo.onboarding.api.LinearOnboardingState
 import com.duckduckgo.sync.api.SyncAutoRestore
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.doReturn
@@ -110,6 +112,13 @@ class BrandDesignUpdatePageViewModelTest {
     // Legacy mode: the VM derives its mode from orchestrator.state, which this mock holds at NotStarted.
     private val mockOrchestrator: LinearOnboardingOrchestrator = mock {
         on { state } doReturn MutableStateFlow(LinearOnboardingState.NotStarted)
+    }
+
+    @Before
+    fun setUp() {
+        runBlocking {
+            whenever(mockDuckAiOnboardingAvailability.isDuckAiOnboardingEnabled()).thenReturn(false)
+        }
     }
 
     private fun createViewModel(): BrandDesignUpdatePageViewModel {

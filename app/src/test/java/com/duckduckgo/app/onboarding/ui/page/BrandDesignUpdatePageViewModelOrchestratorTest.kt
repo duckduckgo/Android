@@ -116,7 +116,7 @@ class BrandDesignUpdatePageViewModelOrchestratorTest {
             androidBrowserConfigFeature = mock(),
             duckChat = mock(),
             inputScreenOnboardingWideEvent = mock(),
-            duckAiOnboardingExperimentManager = mock(),
+            duckAiOnboardingAvailability = mock(),
             onboardingQuickSetupExperimentManager = mock(),
             defaultBrowserDetector = mock(),
             widgetCapabilities = mock(),
