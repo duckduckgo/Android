@@ -489,6 +489,12 @@ class RealNativeInputManager @Inject constructor(
         )
         widget.onChangeModelSubmitted = { modelId -> callbacks.onChangeModelSubmitted(modelId) }
         widget.onBack = {
+            // Clear focus before hiding the IME. In SEARCH_ONLY mode the input field still holds
+            // focus when Back is pressed, and a focused, attached EditText remains the IME target —
+            // the window re-requests the keyboard after the hide. Dropping focus first removes the
+            // target so the hide sticks. In SEARCH_AND_DUCK_AI the field has already lost focus, so
+            // this is a no-op there.
+            widget.clearInputFocus()
             widget.hideKeyboard()
             hideNativeInput()
         }
