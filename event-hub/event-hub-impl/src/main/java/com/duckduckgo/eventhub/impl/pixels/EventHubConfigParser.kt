@@ -164,7 +164,7 @@ object EventHubConfigParser {
                 TelemetryParameterConfig(template = COUNTER, source = source, buckets = buckets)
             }
             DATA -> {
-                val dataKey = json.dataKey ?: return null
+                val dataKey = json.dataKey?.takeIf { it.isNotEmpty() } ?: return null
                 // source is optional: aggregate pixels use it to select the source event; immediate pixels omit it.
                 TelemetryParameterConfig(template = DATA, source = json.source, dataKey = dataKey)
             }
