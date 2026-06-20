@@ -149,6 +149,7 @@ class RealNativeInputManager @Inject constructor(
     private lateinit var rootView: ViewGroup
     private lateinit var layoutCoordinator: NativeInputLayoutCoordinator
     private var isNativeInputFieldEnabled: Boolean = false
+    private var isNativeChatInputEnabled: Boolean = false
     private var isExiting: Boolean = false
     private var isPickingImage: Boolean = false
     private var duckAiToolbarHidden: Boolean = false
@@ -177,6 +178,9 @@ class RealNativeInputManager @Inject constructor(
                 if (isNativeInputFieldEnabled && !isEnabled) onDisabled()
                 isNativeInputFieldEnabled = isEnabled
             }
+            .launchIn(lifecycleOwner.lifecycleScope)
+        duckChat.observeNativeChatInputEnabled()
+            .onEach { isEnabled -> isNativeChatInputEnabled = isEnabled }
             .launchIn(lifecycleOwner.lifecycleScope)
     }
 
@@ -379,6 +383,13 @@ class RealNativeInputManager @Inject constructor(
         initialInputMode: InputMode?,
     ) {
         if (!isNativeInputFieldEnabled) return
+
+        // When native chat input is disabled, Duck.ai renders its own web input — don't overlay
+        // the native widget. Remove any widget left over from a previous (non-Duck.ai) state.
+        if (omnibarController.isDuckAiMode() && !isNativeChatInputEnabled) {
+            removeWidget()
+            return
+        }
 
         if (omnibarController.isDuckAiMode() && rootView.findViewById<View?>(R.id.inputModeWidget) != null) return
 

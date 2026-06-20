@@ -168,7 +168,7 @@ class RealContextualNativeInputManager @Inject constructor(
     }
 
     private fun observeNativeInputSetting(lifecycleOwner: LifecycleOwner) {
-        duckChat.observeNativeInputFieldUserSettingEnabled()
+        duckChat.observeNativeChatInputEnabled()
             .onEach { isEnabled -> isNativeInputEnabled = isEnabled }
             .launchIn(lifecycleOwner.lifecycleScope)
     }

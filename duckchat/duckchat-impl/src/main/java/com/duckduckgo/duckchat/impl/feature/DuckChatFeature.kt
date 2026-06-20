@@ -145,6 +145,17 @@ interface DuckChatFeature {
     fun customizeResponses(): Toggle
 
     /**
+     * @return `true` when Duck.ai should use the native chat input integration
+     * (the `native-input` URL param plus the `supportsNativeChatInput` /
+     * `supportsNativePrompt` JS flags). Has no effect unless [nativeInputField]
+     * is also enabled. When disabled, Duck.ai contextual and full modes fall
+     * back to the web input.
+     */
+    @InternalAlwaysEnabled
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun nativeChatInput(): Toggle
+
+    /**
      * @return `true` when the Input Screen onboarding wide event should be sent
      * If the remote feature is not present defaults to `internal`
      */
