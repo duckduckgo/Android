@@ -30,6 +30,7 @@ import androidx.core.net.toUri
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.ui.view.button.ButtonType.GHOST
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.view.toPx
@@ -66,6 +67,7 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
     private val dispatcher: DispatcherProvider,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val duckAiHostProvider: DuckAiHostProvider,
+    private val browserMode: BrowserMode,
 ) : SitePermissionsDialogLauncher {
 
     private lateinit var sitePermissionRequest: PermissionRequest
@@ -329,6 +331,9 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
         domain: String,
         drmPermission: SitePermissionAskSettingType,
     ) {
+        // Fire mode must not persist a per-site DRM choice into the shared store.
+        if (browserMode == BrowserMode.FIRE) return
+
         val sitePermissionsEntity = SitePermissionsEntity(
             domain = domain,
             askDrmSetting = drmPermission.name,
@@ -481,12 +486,16 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
 
     private fun systemPermissionGranted() {
         grantPermissions()
-        permissionsHandledByUser.forEach {
-            logcat(WARN) { "Permissions: sitePermission $it granted for $siteURL rememberChoice $permissionPermanent" }
-            if (permissionPermanent) {
-                sitePermissionsRepository.sitePermissionPermanentlySaved(siteURL, it, ALLOW_ALWAYS)
-            } else {
-                sitePermissionsRepository.sitePermissionGranted(siteURL, tabId, it)
+        // Fire mode grants the in-session WebView permission above so the page works, but must not
+        // persist the grant into the shared site-permissions store.
+        if (browserMode != BrowserMode.FIRE) {
+            permissionsHandledByUser.forEach {
+                logcat(WARN) { "Permissions: sitePermission $it granted for $siteURL rememberChoice $permissionPermanent" }
+                if (permissionPermanent) {
+                    sitePermissionsRepository.sitePermissionPermanentlySaved(siteURL, it, ALLOW_ALWAYS)
+                } else {
+                    sitePermissionsRepository.sitePermissionGranted(siteURL, tabId, it)
+                }
             }
         }
         checkIfActionNeeded()
@@ -574,7 +583,8 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
             } else {
                 sitePermissionRequest.deny()
 
-                if (rememberChoice) {
+                // Fire mode denies the in-session permission above but must not persist the choice.
+                if (rememberChoice && browserMode != BrowserMode.FIRE) {
                     sitePermissionRequest.resources.forEach { permission ->
                         sitePermissionsRepository.sitePermissionPermanentlySaved(
                             siteURL,
