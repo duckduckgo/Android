@@ -17,6 +17,9 @@
 package com.duckduckgo.duckchat.impl.clearing
 
 import androidx.core.net.toUri
+import com.duckduckgo.browsermode.api.BrowserMode
+import com.duckduckgo.browsermode.api.FireMode
+import com.duckduckgo.browsermode.api.FireModeAvailability
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.dataclearing.api.plugin.ClearableData
 import com.duckduckgo.dataclearing.api.plugin.DataClearingPlugin
@@ -25,6 +28,7 @@ import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.api.toChatIdOrNull
 import com.duckduckgo.duckchat.impl.repository.DuckChatFeatureRepository
 import com.duckduckgo.duckchat.impl.sync.DuckChatSyncRepository
+import com.duckduckgo.duckchat.store.impl.DuckAiChatStore
 import com.duckduckgo.sync.api.engine.SyncEngine
 import com.squareup.anvil.annotations.ContributesMultibinding
 import logcat.logcat
@@ -33,6 +37,8 @@ import javax.inject.Inject
 @ContributesMultibinding(AppScope::class)
 class DuckChatDataClearingPlugin @Inject constructor(
     private val duckChatDeleter: DuckChatDeleter,
+    @FireMode private val fireChatStore: DuckAiChatStore,
+    private val fireModeAvailability: FireModeAvailability,
     private val duckChatSyncRepository: DuckChatSyncRepository,
     private val syncEngine: SyncEngine,
     private val duckChat: DuckChat,
@@ -43,14 +49,29 @@ class DuckChatDataClearingPlugin @Inject constructor(
     override suspend fun onClearData(types: Set<ClearableData>) {
         types.forEach { type ->
             when (type) {
-                is ClearableData.DuckChats.All -> deleteAllChats()
-                is ClearableData.DuckChats.SelectedForMode -> deleteSelected(type.chatUrls)
+                is ClearableData.DuckChats.All -> BrowserMode.entries.forEach { deleteAllForMode(it) }
+                is ClearableData.DuckChats.AllForMode -> deleteAllForMode(type.mode)
+                is ClearableData.DuckChats.SelectedForMode -> deleteSelectedForMode(type.chatUrls, type.mode)
                 else -> { /* not handled by this plugin */ }
             }
         }
     }
 
-    private suspend fun deleteAllChats() {
+    private suspend fun deleteAllForMode(mode: BrowserMode) = when (mode) {
+        BrowserMode.REGULAR -> deleteAllRegularChats()
+        BrowserMode.FIRE -> if (fireModeAvailability.isAvailable()) fireChatStore.deleteAllChats() else Unit
+    }
+
+    private suspend fun deleteSelectedForMode(chatUrls: Set<String>, mode: BrowserMode) = when (mode) {
+        BrowserMode.REGULAR -> deleteSelectedRegular(chatUrls)
+        BrowserMode.FIRE -> if (fireModeAvailability.isAvailable()) {
+            chatUrls.forEach { url -> url.toUri().toChatIdOrNull(duckChat)?.let { fireChatStore.deleteChat(it) } }
+        } else {
+            Unit
+        }
+    }
+
+    private suspend fun deleteAllRegularChats() {
         logcat { "DuckChatDataClearingPlugin: deleting all chats" }
         val deleted = duckChatDeleter.deleteAllChats()
         if (deleted) {
@@ -70,7 +91,7 @@ class DuckChatDataClearingPlugin @Inject constructor(
         }
     }
 
-    private suspend fun deleteSelected(chatUrls: Set<String>) {
+    private suspend fun deleteSelectedRegular(chatUrls: Set<String>) {
         logcat { "DuckChatDataClearingPlugin: deleting ${chatUrls.size} selected chat(s)" }
         if (chatUrls.isEmpty()) return
         var anyDeleted = false

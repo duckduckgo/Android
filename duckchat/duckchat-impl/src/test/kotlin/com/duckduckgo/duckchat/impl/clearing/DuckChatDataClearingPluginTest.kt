@@ -19,12 +19,14 @@ package com.duckduckgo.duckchat.impl.clearing
 import android.net.Uri
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.browsermode.api.BrowserMode
+import com.duckduckgo.browsermode.api.FireModeAvailability
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.dataclearing.api.plugin.ClearableData
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.repository.DuckChatFeatureRepository
 import com.duckduckgo.duckchat.impl.sync.DuckChatSyncRepository
+import com.duckduckgo.duckchat.store.impl.DuckAiChatStore
 import com.duckduckgo.sync.api.engine.SyncEngine
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
@@ -46,6 +48,8 @@ class DuckChatDataClearingPluginTest {
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
     private val duckChatDeleter: DuckChatDeleter = mock()
+    private val fireChatStore: DuckAiChatStore = mock()
+    private val fireModeAvailability: FireModeAvailability = mock()
     private val duckChatSyncRepository: DuckChatSyncRepository = mock()
     private val syncEngine: SyncEngine = mock()
     private val duckChat: DuckChat = mock()
@@ -56,16 +60,26 @@ class DuckChatDataClearingPluginTest {
     @Before
     fun setup() {
         whenever(currentTimeProvider.currentTimeMillis()).thenReturn(1234567890L)
+        whenever(fireModeAvailability.isAvailable()).thenReturn(true)
         plugin = DuckChatDataClearingPlugin(
-            duckChatDeleter, duckChatSyncRepository, syncEngine, duckChat, currentTimeProvider, duckChatFeatureRepository,
+            duckChatDeleter,
+            fireChatStore,
+            fireModeAvailability,
+            duckChatSyncRepository,
+            syncEngine,
+            duckChat,
+            currentTimeProvider,
+            duckChatFeatureRepository,
         )
     }
 
+    // ── Regular mode via AllForMode(REGULAR) ──────────────────────────────────
+
     @Test
-    fun `deleteAllChats deletes all chats and records sync`() = runTest {
+    fun `AllForMode REGULAR deletes all chats and records sync`() = runTest {
         whenever(duckChatDeleter.deleteAllChats()).thenReturn(true)
 
-        plugin.onClearData(setOf(ClearableData.DuckChats.All))
+        plugin.onClearData(setOf(ClearableData.DuckChats.AllForMode(BrowserMode.REGULAR)))
 
         verify(duckChatDeleter).deleteAllChats()
         verify(duckChatSyncRepository).recordDuckAiChatsDeleted(any())
@@ -75,31 +89,31 @@ class DuckChatDataClearingPluginTest {
     }
 
     @Test
-    fun `deleteAllChats uses background timestamp when available`() = runTest {
+    fun `AllForMode REGULAR uses background timestamp when available`() = runTest {
         val backgroundTimestamp = 9999999999L
         whenever(duckChatDeleter.deleteAllChats()).thenReturn(true)
         whenever(duckChatFeatureRepository.getAppBackgroundTimestamp()).thenReturn(backgroundTimestamp)
 
-        plugin.onClearData(setOf(ClearableData.DuckChats.All))
+        plugin.onClearData(setOf(ClearableData.DuckChats.AllForMode(BrowserMode.REGULAR)))
 
         verify(duckChatSyncRepository).recordDuckAiChatsDeleted(backgroundTimestamp)
     }
 
     @Test
-    fun `deleteAllChats falls back to current time when no background timestamp`() = runTest {
+    fun `AllForMode REGULAR falls back to current time when no background timestamp`() = runTest {
         whenever(duckChatDeleter.deleteAllChats()).thenReturn(true)
         whenever(duckChatFeatureRepository.getAppBackgroundTimestamp()).thenReturn(null)
 
-        plugin.onClearData(setOf(ClearableData.DuckChats.All))
+        plugin.onClearData(setOf(ClearableData.DuckChats.AllForMode(BrowserMode.REGULAR)))
 
         verify(duckChatSyncRepository).recordDuckAiChatsDeleted(1234567890L)
     }
 
     @Test
-    fun `deleteAllChats does not record sync when deletion fails`() = runTest {
+    fun `AllForMode REGULAR does not record sync when deletion fails`() = runTest {
         whenever(duckChatDeleter.deleteAllChats()).thenReturn(false)
 
-        plugin.onClearData(setOf(ClearableData.DuckChats.All))
+        plugin.onClearData(setOf(ClearableData.DuckChats.AllForMode(BrowserMode.REGULAR)))
 
         verify(duckChatDeleter).deleteAllChats()
         verify(duckChatSyncRepository, never()).recordDuckAiChatsDeleted(any())
@@ -107,6 +121,101 @@ class DuckChatDataClearingPluginTest {
         verify(duckChatSyncRepository, never()).clearPendingChatUpdates()
         verify(syncEngine, never()).triggerSync(any())
     }
+
+    // ── DuckChats.All routes to both modes ────────────────────────────────────
+
+    @Test
+    fun `deleteAllChats All routes to both Regular and Fire when flag on`() = runTest {
+        whenever(duckChatDeleter.deleteAllChats()).thenReturn(true)
+
+        plugin.onClearData(setOf(ClearableData.DuckChats.All))
+
+        verify(duckChatDeleter).deleteAllChats()
+        verify(fireChatStore).deleteAllChats()
+        // Sync only for Regular path
+        verify(duckChatSyncRepository).recordDuckAiChatsDeleted(any())
+        verify(syncEngine).triggerSync(SyncEngine.SyncTrigger.DATA_CHANGE)
+    }
+
+    @Test
+    fun `deleteAllChats All routes only Regular when flag off`() = runTest {
+        whenever(fireModeAvailability.isAvailable()).thenReturn(false)
+        whenever(duckChatDeleter.deleteAllChats()).thenReturn(true)
+
+        plugin.onClearData(setOf(ClearableData.DuckChats.All))
+
+        verify(duckChatDeleter).deleteAllChats()
+        verify(fireChatStore, never()).deleteAllChats()
+    }
+
+    // ── Fire mode — AllForMode(FIRE) ──────────────────────────────────────────
+
+    @Test
+    fun `AllForMode FIRE calls fireChatStore deleteAllChats and NO sync`() = runTest {
+        plugin.onClearData(setOf(ClearableData.DuckChats.AllForMode(BrowserMode.FIRE)))
+
+        verify(fireChatStore).deleteAllChats()
+        verify(duckChatDeleter, never()).deleteAllChats()
+        verify(duckChatSyncRepository, never()).recordDuckAiChatsDeleted(any())
+        verify(duckChatSyncRepository, never()).clearPendingChatDeletions()
+        verify(duckChatSyncRepository, never()).clearPendingChatUpdates()
+        verify(syncEngine, never()).triggerSync(any())
+    }
+
+    @Test
+    fun `AllForMode FIRE is no-op when flag off`() = runTest {
+        whenever(fireModeAvailability.isAvailable()).thenReturn(false)
+
+        plugin.onClearData(setOf(ClearableData.DuckChats.AllForMode(BrowserMode.FIRE)))
+
+        verify(fireChatStore, never()).deleteAllChats()
+        verify(duckChatDeleter, never()).deleteAllChats()
+        verify(syncEngine, never()).triggerSync(any())
+    }
+
+    // ── Fire mode — SelectedForMode(FIRE) ─────────────────────────────────────
+
+    @Test
+    fun `SelectedForMode FIRE calls fireChatStore deleteChat and NO sync`() = runTest {
+        val chatUrl = "https://duckduckgo.com/?ia=chat&chatID=fire-abc"
+        whenever(duckChat.isDuckChatUrl(Uri.parse(chatUrl))).thenReturn(true)
+
+        plugin.onClearData(setOf(ClearableData.DuckChats.SelectedForMode(setOf(chatUrl), BrowserMode.FIRE)))
+
+        verify(fireChatStore).deleteChat("fire-abc")
+        verify(duckChatDeleter, never()).deleteChat(any())
+        verify(duckChatSyncRepository, never()).recordSingleChatDeletion(any())
+        verify(syncEngine, never()).triggerSync(any())
+    }
+
+    @Test
+    fun `SelectedForMode FIRE deletes each matching chat with no sync`() = runTest {
+        whenever(duckChat.isDuckChatUrl(eq(Uri.parse("https://duck.ai?chatID=alpha")))).thenReturn(true)
+        whenever(duckChat.isDuckChatUrl(eq(Uri.parse("https://duck.ai?chatID=beta")))).thenReturn(true)
+
+        plugin.onClearData(
+            setOf(ClearableData.DuckChats.SelectedForMode(setOf("https://duck.ai?chatID=alpha", "https://duck.ai?chatID=beta"), BrowserMode.FIRE)),
+        )
+
+        verify(fireChatStore).deleteChat("alpha")
+        verify(fireChatStore).deleteChat("beta")
+        verify(duckChatSyncRepository, never()).recordSingleChatDeletion(any())
+        verify(syncEngine, never()).triggerSync(any())
+    }
+
+    @Test
+    fun `SelectedForMode FIRE is no-op when flag off`() = runTest {
+        whenever(fireModeAvailability.isAvailable()).thenReturn(false)
+        val chatUrl = "https://duckduckgo.com/?ia=chat&chatID=fire-abc"
+        whenever(duckChat.isDuckChatUrl(Uri.parse(chatUrl))).thenReturn(true)
+
+        plugin.onClearData(setOf(ClearableData.DuckChats.SelectedForMode(setOf(chatUrl), BrowserMode.FIRE)))
+
+        verify(fireChatStore, never()).deleteChat(any())
+        verify(syncEngine, never()).triggerSync(any())
+    }
+
+    // ── Regular mode via SelectedForMode(REGULAR) — existing tests updated ────
 
     @Test
     fun `Selected with one chat extracts chatId and deletes`() = runTest {
