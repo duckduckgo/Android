@@ -36,6 +36,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.FIRE_ANIMATION
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.app.tabs.model.TabRepository
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.utils.DateProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.FragmentScope
@@ -69,6 +70,7 @@ class GranularFireDialogViewModel @Inject constructor(
     private val duckChat: DuckChat,
     private val navigationHistory: NavigationHistory,
     private val dateProvider: DateProvider,
+    private val browserMode: BrowserMode,
 ) : ViewModel() {
 
     data class ViewState(
@@ -193,7 +195,7 @@ class GranularFireDialogViewModel @Inject constructor(
                     clearOptions = clearOptions,
                 )
                 try {
-                    dataClearing.clearDataUsingManualFireOptions()
+                    dataClearing.clearDataUsingManualFireOptions(browserMode = browserMode)
                     dataClearingWideEvent.finishSuccess()
                 } catch (e: Exception) {
                     dataClearingWideEvent.finishFailure(e)
