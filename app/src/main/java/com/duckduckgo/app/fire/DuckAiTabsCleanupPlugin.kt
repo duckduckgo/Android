@@ -18,7 +18,9 @@ package com.duckduckgo.app.fire
 
 import androidx.core.net.toUri
 import com.duckduckgo.app.tabs.model.TabRepository
-import com.duckduckgo.browsermode.api.RegularMode
+import com.duckduckgo.browsermode.api.BrowserMode
+import com.duckduckgo.browsermode.api.BrowserModeDataProvider
+import com.duckduckgo.browsermode.api.FireModeAvailability
 import com.duckduckgo.dataclearing.api.plugin.ClearableData
 import com.duckduckgo.dataclearing.api.plugin.DataClearingPlugin
 import com.duckduckgo.di.scopes.AppScope
@@ -31,21 +33,28 @@ import javax.inject.Inject
 /** Closes Duck.ai tabs left pointing at cleared chat URLs. Never touches non-Duck.ai tabs. */
 @ContributesMultibinding(AppScope::class)
 class DuckAiTabsCleanupPlugin @Inject constructor(
-    @RegularMode private val tabRepository: TabRepository,
+    private val tabRepositoryProvider: BrowserModeDataProvider<TabRepository>,
+    private val fireModeAvailability: FireModeAvailability, // revert switch: off ⇒ Regular-only (existing)
     private val duckChat: DuckChat,
 ) : DataClearingPlugin {
+
+    // Fire is acted on only when available; Regular always. Off ⇒ existing (Regular-only) behavior.
+    private fun BrowserMode.isEnabled() = this == BrowserMode.REGULAR || fireModeAvailability.isAvailable()
 
     override suspend fun onClearData(types: Set<ClearableData>) {
         types.forEach { type ->
             when (type) {
-                is ClearableData.DuckChats.All -> closeAllDuckAiTabs()
-                is ClearableData.DuckChats.SelectedForMode -> closeTabsMatching(type.chatUrls)
-                else -> { /* not handled by this plugin */ }
+                // `All` = every enabled mode: close Duck.ai tabs in Regular (+ Fire when available).
+                is ClearableData.DuckChats.All -> BrowserMode.entries.filter { it.isEnabled() }.forEach { closeAllDuckAiTabs(it) }
+                is ClearableData.DuckChats.AllForMode -> if (type.mode.isEnabled()) closeAllDuckAiTabs(type.mode)
+                is ClearableData.DuckChats.SelectedForMode -> if (type.mode.isEnabled()) closeTabsMatching(type.chatUrls, type.mode)
+                else -> { /* not handled */ }
             }
         }
     }
 
-    private suspend fun closeAllDuckAiTabs() {
+    private suspend fun closeAllDuckAiTabs(mode: BrowserMode) {
+        val tabRepository = tabRepositoryProvider.forMode(mode)
         val ids = tabRepository.getTabs()
             .filter { tab -> tab.url?.toUri()?.let(duckChat::isDuckChatUrl) == true }
             .map { it.tabId }
@@ -60,10 +69,11 @@ class DuckAiTabsCleanupPlugin @Inject constructor(
      * extra query params accumulated during the session) so multiple tabs of the same chat would
      * otherwise miss the match.
      */
-    private suspend fun closeTabsMatching(chatUrls: Set<String>) {
+    private suspend fun closeTabsMatching(chatUrls: Set<String>, mode: BrowserMode) {
         if (chatUrls.isEmpty()) return
         val targetChatIds = chatUrls.mapNotNullTo(mutableSetOf()) { it.toUri().toChatIdOrNull(duckChat) }
         if (targetChatIds.isEmpty()) return
+        val tabRepository = tabRepositoryProvider.forMode(mode)
         val ids = tabRepository.getTabs()
             .filter { tab -> tab.url?.toUri()?.toChatIdOrNull(duckChat) in targetChatIds }
             .map { it.tabId }
