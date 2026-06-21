@@ -3856,7 +3856,10 @@ class BrowserTabViewModel @Inject constructor(
     ) {
         request.handler.proceed(credentials.username, credentials.password)
         command.value = ShowWebContent
-        command.value = SaveCredentials(request, credentials)
+        // Fire mode authenticates this session but never offers to save the credentials.
+        if (browserMode != BrowserMode.FIRE) {
+            command.value = SaveCredentials(request, credentials)
+        }
     }
 
     fun cancelAuthentication(request: BasicAuthenticationRequest) {
