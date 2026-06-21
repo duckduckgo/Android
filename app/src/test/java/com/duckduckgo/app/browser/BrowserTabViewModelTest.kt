@@ -3267,6 +3267,36 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenAuthenticationHandledInRegularModeThenOffersToSaveCredentials() {
+        browserMode = BrowserMode.REGULAR
+        resetChannels()
+        initialiseViewModel()
+        val authenticationRequest = BasicAuthenticationRequest(mock(), "example.com", "test realm", "")
+        val credentials = BasicAuthenticationCredentials(username = "user", password = "password")
+
+        testee.handleAuthentication(request = authenticationRequest, credentials = credentials)
+
+        assertCommandIssued<Command.SaveCredentials>()
+    }
+
+    @Test
+    fun whenAuthenticationHandledInFireModeThenNeverOffersToSaveCredentials() {
+        browserMode = BrowserMode.FIRE
+        resetChannels()
+        initialiseViewModel()
+        val mockHandler = mock<HttpAuthHandler>()
+        val authenticationRequest = BasicAuthenticationRequest(mockHandler, "example.com", "test realm", "")
+        val credentials = BasicAuthenticationCredentials(username = "user", password = "password")
+
+        testee.handleAuthentication(request = authenticationRequest, credentials = credentials)
+
+        // Authentication still proceeds for the session, but the save prompt is suppressed.
+        verify(mockHandler, atLeastOnce()).proceed("user", "password")
+        assertCommandIssued<Command.ShowWebContent>()
+        assertCommandNotIssued<Command.SaveCredentials>()
+    }
+
+    @Test
     fun whenAuthenticationDialogCanceledThenShowWebContent() {
         val authenticationRequest = BasicAuthenticationRequest(mock(), "example.com", "test realm", "")
 
