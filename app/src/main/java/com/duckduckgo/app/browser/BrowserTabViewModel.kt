@@ -810,6 +810,8 @@ class BrowserTabViewModel @Inject constructor(
     private val loginDetectionObserver =
         Observer<LoginDetected> { loginEvent ->
             logcat(INFO) { "LoginDetection for $loginEvent" }
+            // Fireproofing is not applicable in Fire mode, so never offer to fireproof on login.
+            if (browserMode == BrowserMode.FIRE) return@Observer
             viewModelScope.launch(dispatchers.io()) {
                 val canPromptAboutFireproofing = !autofillFireproofDialogSuppressor.isAutofillPreventingFireproofPrompts()
 
@@ -2144,7 +2146,8 @@ class BrowserTabViewModel @Inject constructor(
                 isPrivacyProtectionDisabled = false,
                 canFindInPage = true,
                 canChangeBrowsingMode = true,
-                canFireproofSite = domain != null,
+                // Fireproofing is not applicable in Fire mode — its data is ephemeral by design.
+                canFireproofSite = domain != null && browserMode != BrowserMode.FIRE,
                 isFireproofWebsite = isFireproofWebsite(),
                 canPrintPage = domain != null,
                 maliciousSiteBlocked = false,

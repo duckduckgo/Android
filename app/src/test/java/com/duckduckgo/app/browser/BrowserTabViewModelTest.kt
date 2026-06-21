@@ -3911,6 +3911,24 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenUserLoadsWebsiteInRegularModeThenCanFireproofSite() {
+        browserMode = BrowserMode.REGULAR
+        resetChannels()
+        initialiseViewModel()
+        loadUrl("http://www.example.com/path", isBrowserShowing = true)
+        assertTrue(browserViewState().canFireproofSite)
+    }
+
+    @Test
+    fun whenUserLoadsWebsiteInFireModeThenCannotFireproofSite() {
+        browserMode = BrowserMode.FIRE
+        resetChannels()
+        initialiseViewModel()
+        loadUrl("http://www.example.com/path", isBrowserShowing = true)
+        assertFalse(browserViewState().canFireproofSite)
+    }
+
+    @Test
     fun whenUserLoadsFireproofWebsiteThenFireproofWebsiteBrowserStateUpdated() {
         givenFireproofWebsiteDomain("www.example.com")
         loadUrl("http://www.example.com/path", isBrowserShowing = true)
@@ -4102,6 +4120,20 @@ class BrowserTabViewModelTest {
         whenever(mockSettingsDataStore.automaticFireproofSetting).thenReturn(AutomaticFireproofSetting.ALWAYS)
         loginEventLiveData.value = givenLoginDetected("example.com")
         assertCommandNotIssued<Command.AskToFireproofWebsite>()
+    }
+
+    @Test
+    fun whenLoginDetectedInFireModeThenNeverAskToFireproofWebsite() {
+        // Detach the default REGULAR-mode view model so it no longer observes the shared
+        // loginEventLiveData and cannot emit commands captured by mockCommandObserver.
+        testee.command.removeObserver(mockCommandObserver)
+        testee.onCleared()
+        browserMode = BrowserMode.FIRE
+        resetChannels()
+        initialiseViewModel()
+        loginEventLiveData.value = givenLoginDetected("example.com")
+        assertCommandNotIssued<Command.AskToFireproofWebsite>()
+        assertCommandNotIssued<Command.AskToAutomateFireproofWebsite>()
     }
 
     @Test
