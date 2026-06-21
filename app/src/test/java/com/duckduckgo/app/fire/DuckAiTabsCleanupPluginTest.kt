@@ -20,6 +20,7 @@ import androidx.core.net.toUri
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.dataclearing.api.plugin.ClearableData
 import com.duckduckgo.duckchat.api.DuckChat
 import kotlinx.coroutines.runBlocking
@@ -95,7 +96,7 @@ class DuckAiTabsCleanupPluginTest {
         whenever(mockDuckChat.isDuckChatUrl(eq("https://duck.ai?chatID=zzz".toUri()))).thenReturn(true)
         whenever(mockDuckChat.isDuckChatUrl(eq("https://example.com".toUri()))).thenReturn(false)
 
-        testee.onClearData(setOf(ClearableData.DuckChats.Selected(setOf("https://duck.ai?chatID=abc"))))
+        testee.onClearData(setOf(ClearableData.DuckChats.SelectedForMode(setOf("https://duck.ai?chatID=abc"), BrowserMode.REGULAR)))
 
         verify(mockTabRepository).deleteTabs(listOf("tab1"))
     }
@@ -111,7 +112,7 @@ class DuckAiTabsCleanupPluginTest {
         whenever(mockDuckChat.isDuckChatUrl(eq("https://example.com".toUri()))).thenReturn(false)
 
         testee.onClearData(
-            setOf(ClearableData.DuckChats.Selected(setOf("https://duck.ai?chatID=a", "https://duck.ai?chatID=b"))),
+            setOf(ClearableData.DuckChats.SelectedForMode(setOf("https://duck.ai?chatID=a", "https://duck.ai?chatID=b"), BrowserMode.REGULAR)),
         )
 
         verify(mockTabRepository).deleteTabs(listOf("tab1", "tab2"))
@@ -123,7 +124,7 @@ class DuckAiTabsCleanupPluginTest {
         whenever(mockTabRepository.getTabs()).thenReturn(listOf(unrelated))
         whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(true)
 
-        testee.onClearData(setOf(ClearableData.DuckChats.Selected(setOf("https://duck.ai?chatID=abc"))))
+        testee.onClearData(setOf(ClearableData.DuckChats.SelectedForMode(setOf("https://duck.ai?chatID=abc"), BrowserMode.REGULAR)))
 
         verify(mockTabRepository, never()).deleteTabs(any())
     }
@@ -136,7 +137,7 @@ class DuckAiTabsCleanupPluginTest {
         whenever(mockTabRepository.getTabs()).thenReturn(listOf(t1, t2, t3))
         whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(true)
 
-        testee.onClearData(setOf(ClearableData.DuckChats.Selected(setOf("https://duck.ai?chatID=abc"))))
+        testee.onClearData(setOf(ClearableData.DuckChats.SelectedForMode(setOf("https://duck.ai?chatID=abc"), BrowserMode.REGULAR)))
 
         verify(mockTabRepository).deleteTabs(listOf("tab1", "tab2", "tab3"))
     }
@@ -152,7 +153,7 @@ class DuckAiTabsCleanupPluginTest {
         whenever(mockTabRepository.getTabs()).thenReturn(listOf(original, withPath, withExtraParams, withFragment))
         whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(true)
 
-        testee.onClearData(setOf(ClearableData.DuckChats.Selected(setOf("https://duck.ai?chatID=abc"))))
+        testee.onClearData(setOf(ClearableData.DuckChats.SelectedForMode(setOf("https://duck.ai?chatID=abc"), BrowserMode.REGULAR)))
 
         verify(mockTabRepository).deleteTabs(listOf("tab1", "tab2", "tab3", "tab4"))
     }
@@ -163,14 +164,14 @@ class DuckAiTabsCleanupPluginTest {
         whenever(mockTabRepository.getTabs()).thenReturn(listOf(anyTab))
         whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(true)
 
-        testee.onClearData(setOf(ClearableData.DuckChats.Selected(setOf("https://duck.ai"))))
+        testee.onClearData(setOf(ClearableData.DuckChats.SelectedForMode(setOf("https://duck.ai"), BrowserMode.REGULAR)))
 
         verify(mockTabRepository, never()).deleteTabs(any())
     }
 
     @Test
     fun `DuckChats Selected with empty url set is a no-op`() = runTest {
-        testee.onClearData(setOf(ClearableData.DuckChats.Selected(emptySet())))
+        testee.onClearData(setOf(ClearableData.DuckChats.SelectedForMode(emptySet(), BrowserMode.REGULAR)))
 
         verify(mockTabRepository, never()).deleteTabs(any())
     }

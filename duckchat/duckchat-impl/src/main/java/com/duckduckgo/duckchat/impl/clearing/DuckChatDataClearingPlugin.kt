@@ -44,7 +44,7 @@ class DuckChatDataClearingPlugin @Inject constructor(
         types.forEach { type ->
             when (type) {
                 is ClearableData.DuckChats.All -> deleteAllChats()
-                is ClearableData.DuckChats.Selected -> deleteSelected(type.chatUrls)
+                is ClearableData.DuckChats.SelectedForMode -> deleteSelected(type.chatUrls)
                 else -> { /* not handled by this plugin */ }
             }
         }

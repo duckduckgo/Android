@@ -29,6 +29,7 @@ android {
 }
 
 dependencies {
+    api project(':browser-mode-api')
     implementation AndroidX.fragment.ktx
     coreLibraryDesugaring Android.tools.desugarJdkLibs
 }
