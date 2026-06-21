@@ -832,6 +832,7 @@
     <string name="preOnboardingDaxDialog1TitleDuckAi" translatable="false"><![CDATA[Hi there.<br/><br/>Ready for a faster browser that protects you and lets you decide when and how to use AI?]]></string>
     <string name="preOnboardingDaxDialog1Button">Laten we het doen!</string>
     <string name="preOnboardingDaxDialog1ButtonDuckAi" translatable="false">Let\&apos;s get started!</string>
+    <string name="preOnboardingDaxDialog1ButtonBrandDesign">Laten we beginnen!</string>
     <string name="preOnboardingDaxDialog1SecondaryButton">Overslaan</string>
     <string name="preOnboardingDaxDialog2Title">Bescherming geactiveerd!</string>
     <string name="preOnboardingDaxDialog2Button">Kies je browser</string>
@@ -896,6 +897,7 @@
     <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[DuckDuckGo heeft ook een <b>optioneel betaald abonnement</b>, met een veilig <b>VPN</b> en <b>geavanceerde, privé-AI</b>.]]></string>
     <string name="onboardingPrivacyProDaxDialogOkButton">Meer informatie</string>
     <string name="onboardingPrivacyProDaxDialogFreeTrialOkButton">Probeer het gratis!</string>
+    <string name="onboardingPrivacyProDaxDialogFreeTrialOkButtonBrandDesign">Probeer het gratis!</string>
     <string name="onboardingPrivacyProDaxDialogCancelButton">Overslaan</string>
     <string name="onboardingSkippedPrivacyProDaxDialogTitle">Wist je dat?</string>
 
@@ -1030,6 +1032,33 @@
     <string name="onboardingStepIndicatorText" instruction="a counter above our instructions in onboarding that tells a user what step they are on">%1$d van %2$d</string>
     <string name="onboardingSearchDaxDialogOption1Quoted" instruction="translate &apos;duck&apos; too.">hoe zeg je \'eend\' in het Engels?</string>
     <string name="onboardingSearchDaxDialogOption1EnglishQuoted" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">hoe zeg je \'eend\' in het Nederlands</string>
+
+    <string name="onboardingDuckAiFireButtonDaxDialogTitle">Dat is Duck.ai!</string>
+    <string name="onboardingDuckAiFireButtonDaxDialogDescription"><![CDATA[Privé AI-chats die je op elk moment kunt verwijderen met de <b>Fire Button</b>. Probeer het maar! 🔥]]></string>
+    <string name="onboardingDuckAiEndCtaTitle">Je kunt het!</string>
+    <string name="onboardingDuckAiEndCtaDescription"><![CDATA[Gebruik de adresbalk om websites te zoeken en te bezoeken, of schakel over naar Duck.ai voor een privé-chat met AI.<br/><br/>Je kunt Duck.ai gebruiken vanaf elke plek waar je het chatpictogram ziet.]]></string>
+    <string name="onboardingDuckAiEndCtaButton">High five!</string>
+
+    <!-- Custom AI onboarding flow -->
+    <!-- Pre-onboarding: initial screens -->
+    <string name="preOnboardingWelcomeDialogBodyCustomAi">Klaar om gratis privé te chatten met ChatGPT, Claude en andere AI\'s, in een browser die je actief beschermt?</string>
+    <string name="preOnboardingDaxDialog3TextCustomAi">Onthoud: je kunt Duck.ai overal gebruiken waar je het chatpictogram ziet</string>
+    <string name="preOnboardingDaxDialog3ButtonCustomAi">AI-chat starten</string>
+    <!-- Pre-onboarding: AI comparison chart screen. -->
+    <string name="preOnboardingDaxDialogAiTitle">AI-bescherming geactiveerd!</string>
+    <string name="preOnboardingAiComparisonChartPopularAis">Populaire AI\'s</string>
+    <string name="preOnboardingAiComparisonChartItem1">Alle chats zijn geanonimiseerd</string>
+    <string name="preOnboardingAiComparisonChartItem2">Geen account nodig om toegang te krijgen tot alle AI-functies</string>
+    <string name="preOnboardingAiComparisonChartItem3">Gebruikt nooit je chats om AI te trainen</string>
+    <string name="preOnboardingAiComparisonChartItem4">Toegang tot ChatGPT, Claude en meer, allemaal op één plek</string>
+    <string name="preOnboardingAiComparisonChartButton">Probeer Duck.ai eens!</string>
+    <!-- Pre-onboarding: input demo screen -->
+    <string name="preOnboardingInputModeDemoTitleCustomAi">Probeer eens een privé AI-chat!</string>
+    <!-- Pre-onboarding: browser comparison screen -->
+    <string name="preOnboardingDaxDialog2TitleCustomAi">Wil je DuckDuckGo als standaardbrowser gebruiken?</string>
+    <!-- In-context onboarding. -->
+    <string name="onboardingEndCustomAiFlowDaxDialogDescription"><![CDATA[Start een privé AI-chat met Duck.ai of schakel over naar Zoeken voor beschermd browsen.<br/><br/>Je kunt Duck.ai gebruiken vanaf elke plek waar je het chatpictogram ziet.]]></string>
+    <string name="onboardingPrivacyProCustomAiFlowDaxDialogDescription">We bieden ook een betaald abonnement met geavanceerde AI-modellen met hogere chatlimieten van GPT, Claude en Llama, een veilige VPN en meer.</string>
 
     <string name="input_screen_user_pref_without_ai_updated">Alleen zoeken</string>
     <string name="input_screen_user_pref_with_ai_updated">Schakelen tussen\nzoeken en Duck.ai</string>
