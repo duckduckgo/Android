@@ -29,8 +29,18 @@ import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.tabs.model.TabSwitcherData
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.browsermode.api.BrowserModeDataProvider
+import com.duckduckgo.browsermode.api.FireModeAvailability
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.common.utils.CurrentTimeProvider
+import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.dataclearing.api.plugin.ClearableData
+import com.duckduckgo.dataclearing.api.plugin.DataClearingPlugin
+import com.duckduckgo.dataclearing.impl.plugin.DataClearingOrchestrator
+import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.duckchat.impl.clearing.DuckChatDataClearingPlugin
+import com.duckduckgo.duckchat.impl.clearing.DuckChatDeleter
+import com.duckduckgo.duckchat.impl.repository.DuckChatFeatureRepository
+import com.duckduckgo.duckchat.impl.sync.DuckChatSyncRepository
 import com.duckduckgo.duckchat.store.impl.DuckAiBridgeStorage
 import com.duckduckgo.duckchat.store.impl.DuckAiMigrationPrefs
 import com.duckduckgo.duckchat.store.impl.RealDuckAiChatStore
@@ -39,6 +49,7 @@ import com.duckduckgo.duckchat.store.impl.store.DuckAiBridgeChatsDao
 import com.duckduckgo.duckchat.store.impl.store.DuckAiBridgeFileMetaDao
 import com.duckduckgo.duckchat.store.impl.store.DuckAiBridgeSettingsDao
 import com.duckduckgo.duckchat.store.impl.store.FireModeDuckAiDatabase
+import com.duckduckgo.sync.api.engine.SyncEngine
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.emptyFlow
@@ -50,14 +61,19 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import java.io.File
 
 /**
  * G3 — Mode isolation safety-net.
  *
- * Proves that clearing Fire-mode data through the real plugins does NOT touch Regular-mode data,
- * and vice versa. Backed by real in-memory Room databases — no logic is mocked.
+ * Proves that clearing Fire-mode data through the real orchestrator + plugins does NOT touch
+ * Regular-mode data, and vice versa. Backed by real in-memory Room databases — no logic is mocked.
+ *
+ * The orchestrator under test is wired with only [TabsDataClearingPlugin] and
+ * [DuckChatDataClearingPlugin] — WebView-backed plugins (cookies, web storage, dirs) are omitted
+ * because they require a real WebView profile and cannot run in an instrumented unit test.
  */
 class DataClearingModeIsolationTest {
 
@@ -81,9 +97,21 @@ class DataClearingModeIsolationTest {
     private lateinit var regularChatStore: RealDuckAiChatStore
     private lateinit var fireChatStore: RealDuckAiChatStore
 
-    // ---------- Plugin under test ----------
+    // ---------- Mocked collaborators for DuckChatDataClearingPlugin ----------
+
+    private val mockDuckChatDeleter: DuckChatDeleter = mock()
+    private val mockFireModeAvailability: FireModeAvailability = mock()
+    private val mockDuckChatSyncRepository: DuckChatSyncRepository = mock()
+    private val mockSyncEngine: SyncEngine = mock()
+    private val mockDuckChat: DuckChat = mock()
+    private val mockCurrentTimeProvider: CurrentTimeProvider = mock()
+    private val mockDuckChatFeatureRepository: DuckChatFeatureRepository = mock()
+
+    // ---------- Plugins + orchestrator ----------
 
     private lateinit var tabsPlugin: TabsDataClearingPlugin
+    private lateinit var duckChatPlugin: DuckChatDataClearingPlugin
+    private lateinit var orchestrator: DataClearingOrchestrator
 
     @Before
     fun setUp() {
@@ -125,11 +153,33 @@ class DataClearingModeIsolationTest {
         // Provider routes by mode to the matching DAO-backed stub
         val regularRepo = DaoBackedTabRepository(regularTabsDao)
         val fireRepo = DaoBackedTabRepository(fireTabsDao)
-        val provider = object : BrowserModeDataProvider<TabRepository> {
+        val tabsProvider = object : BrowserModeDataProvider<TabRepository> {
             override fun forMode(mode: BrowserMode): TabRepository =
                 if (mode == BrowserMode.FIRE) fireRepo else regularRepo
         }
-        tabsPlugin = TabsDataClearingPlugin(provider)
+        tabsPlugin = TabsDataClearingPlugin(tabsProvider)
+
+        // DuckChatDataClearingPlugin uses the real in-memory fire store; sync/deleter collaborators
+        // are mocked because this test only asserts DB row counts, not sync behaviour.
+        whenever(mockFireModeAvailability.isAvailable()).thenReturn(true)
+        whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(1_000_000L)
+        duckChatPlugin = DuckChatDataClearingPlugin(
+            duckChatDeleter = mockDuckChatDeleter,
+            fireChatStore = fireChatStore,
+            fireModeAvailability = mockFireModeAvailability,
+            duckChatSyncRepository = mockDuckChatSyncRepository,
+            syncEngine = mockSyncEngine,
+            duckChat = mockDuckChat,
+            currentTimeProvider = mockCurrentTimeProvider,
+            duckChatFeatureRepository = mockDuckChatFeatureRepository,
+        )
+
+        // Orchestrator wired with the two DB-backed plugins — WebView plugins omitted (need real profile).
+        orchestrator = DataClearingOrchestrator(
+            plugins = object : PluginPoint<DataClearingPlugin> {
+                override fun getPlugins(): Collection<DataClearingPlugin> = listOf(tabsPlugin, duckChatPlugin)
+            },
+        )
     }
 
     @After
@@ -141,7 +191,7 @@ class DataClearingModeIsolationTest {
     }
 
     // -----------------------------------------------------------------------
-    // Tab isolation
+    // Tab isolation — Fire-only burn
     // -----------------------------------------------------------------------
 
     @Test
@@ -151,7 +201,7 @@ class DataClearingModeIsolationTest {
         fireTabsDao.insertTab(TabEntity(tabId = "fire1", position = 0))
         fireTabsDao.insertTab(TabEntity(tabId = "fire2", position = 1))
 
-        tabsPlugin.onClearData(setOf(ClearableData.Tabs.AllForMode(BrowserMode.FIRE)))
+        orchestrator.clearData(setOf(ClearableData.Tabs.AllForMode(BrowserMode.FIRE)))
 
         assertEquals("Fire tabs should be cleared", 0, fireTabsDao.tabs().size)
         assertEquals("Regular tabs must be untouched", 2, regularTabsDao.tabs().size)
@@ -163,7 +213,7 @@ class DataClearingModeIsolationTest {
         fireTabsDao.insertTab(TabEntity(tabId = "fire1", position = 0))
         fireTabsDao.insertTab(TabEntity(tabId = "fire2", position = 1))
 
-        tabsPlugin.onClearData(setOf(ClearableData.Tabs.SingleForMode(tabId = "fire1", mode = BrowserMode.FIRE)))
+        orchestrator.clearData(setOf(ClearableData.Tabs.SingleForMode(tabId = "fire1", mode = BrowserMode.FIRE)))
 
         val remainingFireTabs = fireTabsDao.tabs()
         assertEquals("Only one fire tab should remain", 1, remainingFireTabs.size)
@@ -176,15 +226,15 @@ class DataClearingModeIsolationTest {
         regularTabsDao.insertTab(TabEntity(tabId = "reg1", position = 0))
         fireTabsDao.insertTab(TabEntity(tabId = "fire1", position = 0))
 
-        // Regular-mode all-tabs type — plugin should not act on this
-        tabsPlugin.onClearData(setOf(ClearableData.Tabs.AllForMode(BrowserMode.REGULAR)))
+        // Regular-mode all-tabs type — TabsDataClearingPlugin only handles FIRE
+        orchestrator.clearData(setOf(ClearableData.Tabs.AllForMode(BrowserMode.REGULAR)))
 
         assertEquals("Regular tabs must not be cleared by fire plugin", 1, regularTabsDao.tabs().size)
         assertEquals("Fire tabs must not be cleared when regular mode requested", 1, fireTabsDao.tabs().size)
     }
 
     // -----------------------------------------------------------------------
-    // Chat isolation
+    // Chat isolation — Fire-only burn
     // -----------------------------------------------------------------------
 
     @Test
@@ -192,7 +242,7 @@ class DataClearingModeIsolationTest {
         regularChatDb.chatsDao().upsert(DuckAiBridgeChatEntity(chatId = "chat-reg", data = chatJson("chat-reg")))
         fireChatDb.chatsDao().upsert(DuckAiBridgeChatEntity(chatId = "chat-fire", data = chatJson("chat-fire")))
 
-        fireChatStore.deleteAllChats()
+        orchestrator.clearData(setOf(ClearableData.DuckChats.AllForMode(BrowserMode.FIRE)))
 
         assertTrue("Fire chats should be deleted", fireChatDb.chatsDao().getAll().isEmpty())
         assertEquals("Regular chats must be untouched", 1, regularChatDb.chatsDao().getAll().size)
@@ -210,6 +260,63 @@ class DataClearingModeIsolationTest {
         assertEquals("Only one fire chat should remain", 1, remainingFireChats.size)
         assertEquals("The surviving fire chat should be fire-b", "fire-b", remainingFireChats.first().chatId)
         assertEquals("Regular chats must be untouched", 1, regularChatDb.chatsDao().getAll().size)
+    }
+
+    // -----------------------------------------------------------------------
+    // Cross-mode burn — Regular-origin clear (clears both modes)
+    // -----------------------------------------------------------------------
+
+    /**
+     * A Regular-origin fire produces a type set spanning both modes.
+     * The orchestrator fans out to each plugin; this test verifies:
+     *  - Fire tabs are cleared (TabsDataClearingPlugin handles AllForMode(FIRE))
+     *  - Regular tabs are untouched by the plugin (TabsDataClearingPlugin ignores AllForMode(REGULAR);
+     *    the regular-mode tab store is managed separately in production)
+     *  - Fire chats are cleared (DuckChatDataClearingPlugin handles AllForMode(FIRE) via the real store)
+     *  - Regular chat deletion is delegated to duckChatDeleter (verified via mock)
+     */
+    @Test
+    fun `regular-origin burn dispatches to both plugins for both modes`() = runTest {
+        // Stub regular-chat deletion to succeed so sync recording is triggered
+        whenever(mockDuckChatDeleter.deleteAllChats()).thenReturn(true)
+
+        // Seed tabs in both modes
+        regularTabsDao.insertTab(TabEntity(tabId = "reg-tab-1", position = 0))
+        regularTabsDao.insertTab(TabEntity(tabId = "reg-tab-2", position = 1))
+        fireTabsDao.insertTab(TabEntity(tabId = "fire-tab-1", position = 0))
+        fireTabsDao.insertTab(TabEntity(tabId = "fire-tab-2", position = 1))
+
+        // Seed chats in both modes
+        regularChatDb.chatsDao().upsert(DuckAiBridgeChatEntity(chatId = "reg-chat-1", data = chatJson("reg-chat-1")))
+        regularChatDb.chatsDao().upsert(DuckAiBridgeChatEntity(chatId = "reg-chat-2", data = chatJson("reg-chat-2")))
+        fireChatDb.chatsDao().upsert(DuckAiBridgeChatEntity(chatId = "fire-chat-1", data = chatJson("fire-chat-1")))
+        fireChatDb.chatsDao().upsert(DuckAiBridgeChatEntity(chatId = "fire-chat-2", data = chatJson("fire-chat-2")))
+
+        // The cross-mode type set a Regular-origin burn produces
+        orchestrator.clearData(
+            setOf(
+                ClearableData.Tabs.AllForMode(BrowserMode.REGULAR),
+                ClearableData.DuckChats.AllForMode(BrowserMode.REGULAR),
+                ClearableData.Tabs.AllForMode(BrowserMode.FIRE),
+                ClearableData.DuckChats.AllForMode(BrowserMode.FIRE),
+            ),
+        )
+
+        // Fire tabs: cleared by TabsDataClearingPlugin (handles AllForMode(FIRE))
+        assertEquals("Fire tabs should be cleared", 0, fireTabsDao.tabs().size)
+
+        // Regular tabs: TabsDataClearingPlugin only handles FIRE; regular-mode tab store is untouched
+        // (production regular tab clearing happens outside this plugin's responsibility)
+        assertEquals("Regular tabs are not touched by TabsDataClearingPlugin", 2, regularTabsDao.tabs().size)
+
+        // Fire chats: cleared by DuckChatDataClearingPlugin via the real in-memory fire store
+        assertTrue("Fire chats should be deleted", fireChatDb.chatsDao().getAll().isEmpty())
+
+        // Regular chats: DuckChatDataClearingPlugin delegates to duckChatDeleter for REGULAR mode
+        verify(mockDuckChatDeleter).deleteAllChats()
+
+        // Regular chat DB is unaffected because duckChatDeleter is mocked (real IDB/LevelDB in prod)
+        assertEquals("Regular chat DB rows are managed by duckChatDeleter (mocked here)", 2, regularChatDb.chatsDao().getAll().size)
     }
 
     // -----------------------------------------------------------------------
