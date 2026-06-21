@@ -32,6 +32,7 @@ import com.duckduckgo.app.settings.clear.FireClearOption
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.tabs.model.TabAtomicOperations
 import com.duckduckgo.app.tabs.model.TabRepository
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.browsermode.api.RegularMode
 import com.duckduckgo.dataclearing.api.plugin.ClearableData
 import com.duckduckgo.dataclearing.api.plugin.DataClearingTrigger
@@ -141,7 +142,7 @@ class DataClearing @Inject constructor(
     private suspend fun clearDuckAiChatIfNeeded(tabUrl: String?) {
         logcat { "clearDuckAiChatIfNeeded url=$tabUrl" }
         if (tabUrl == null) return
-        dataClearingTrigger.clearData(setOf(ClearableData.DuckChats.Selected(setOf(tabUrl))))
+        dataClearingTrigger.clearData(setOf(ClearableData.DuckChats.SelectedForMode(setOf(tabUrl), BrowserMode.REGULAR)))
     }
 
     override suspend fun clearDataUsingManualFireOptions(shouldRestartIfRequired: Boolean, wasAppUsedSinceLastClear: Boolean) {
@@ -240,7 +241,7 @@ class DataClearing @Inject constructor(
     override suspend fun clearSelectedDuckAiChats(chatUrls: Set<String>) {
         if (chatUrls.isEmpty()) return
         if (!duckAiFeatureState.showClearDuckAIChatHistory.value) return
-        dataClearingTrigger.clearData(setOf(ClearableData.DuckChats.Selected(chatUrls)))
+        dataClearingTrigger.clearData(setOf(ClearableData.DuckChats.SelectedForMode(chatUrls, BrowserMode.REGULAR)))
     }
 
     /**

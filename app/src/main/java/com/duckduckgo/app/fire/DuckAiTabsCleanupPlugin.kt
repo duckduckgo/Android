@@ -39,7 +39,7 @@ class DuckAiTabsCleanupPlugin @Inject constructor(
         types.forEach { type ->
             when (type) {
                 is ClearableData.DuckChats.All -> closeAllDuckAiTabs()
-                is ClearableData.DuckChats.Selected -> closeTabsMatching(type.chatUrls)
+                is ClearableData.DuckChats.SelectedForMode -> closeTabsMatching(type.chatUrls)
                 else -> { /* not handled by this plugin */ }
             }
         }

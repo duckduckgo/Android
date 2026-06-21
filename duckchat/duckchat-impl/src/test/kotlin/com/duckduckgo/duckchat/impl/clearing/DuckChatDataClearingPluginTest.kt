@@ -18,6 +18,7 @@ package com.duckduckgo.duckchat.impl.clearing
 
 import android.net.Uri
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.dataclearing.api.plugin.ClearableData
@@ -113,7 +114,7 @@ class DuckChatDataClearingPluginTest {
         whenever(duckChat.isDuckChatUrl(Uri.parse(chatUrl))).thenReturn(true)
         whenever(duckChatDeleter.deleteChat("abc-123")).thenReturn(true)
 
-        plugin.onClearData(setOf(ClearableData.DuckChats.Selected(setOf(chatUrl))))
+        plugin.onClearData(setOf(ClearableData.DuckChats.SelectedForMode(setOf(chatUrl), BrowserMode.REGULAR)))
 
         verify(duckChatDeleter).deleteChat("abc-123")
         verify(duckChatSyncRepository).recordSingleChatDeletion("abc-123")
@@ -125,7 +126,7 @@ class DuckChatDataClearingPluginTest {
         val chatUrl = "https://example.com/?chatID=abc-123"
         whenever(duckChat.isDuckChatUrl(Uri.parse(chatUrl))).thenReturn(false)
 
-        plugin.onClearData(setOf(ClearableData.DuckChats.Selected(setOf(chatUrl))))
+        plugin.onClearData(setOf(ClearableData.DuckChats.SelectedForMode(setOf(chatUrl), BrowserMode.REGULAR)))
 
         verify(duckChatDeleter, never()).deleteChat(any())
         verify(syncEngine, never()).triggerSync(any())
@@ -136,7 +137,7 @@ class DuckChatDataClearingPluginTest {
         val chatUrl = "https://duckduckgo.com/?ia=chat"
         whenever(duckChat.isDuckChatUrl(Uri.parse(chatUrl))).thenReturn(true)
 
-        plugin.onClearData(setOf(ClearableData.DuckChats.Selected(setOf(chatUrl))))
+        plugin.onClearData(setOf(ClearableData.DuckChats.SelectedForMode(setOf(chatUrl), BrowserMode.REGULAR)))
 
         verify(duckChatDeleter, never()).deleteChat(any())
         verify(syncEngine, never()).triggerSync(any())
@@ -148,7 +149,7 @@ class DuckChatDataClearingPluginTest {
         whenever(duckChat.isDuckChatUrl(Uri.parse(chatUrl))).thenReturn(true)
         whenever(duckChatDeleter.deleteChat("abc-123")).thenReturn(false)
 
-        plugin.onClearData(setOf(ClearableData.DuckChats.Selected(setOf(chatUrl))))
+        plugin.onClearData(setOf(ClearableData.DuckChats.SelectedForMode(setOf(chatUrl), BrowserMode.REGULAR)))
 
         verify(duckChatDeleter).deleteChat("abc-123")
         verify(duckChatSyncRepository, never()).recordSingleChatDeletion(any())
@@ -163,7 +164,7 @@ class DuckChatDataClearingPluginTest {
         whenever(duckChatDeleter.deleteChat("beta")).thenReturn(true)
 
         plugin.onClearData(
-            setOf(ClearableData.DuckChats.Selected(setOf("https://duck.ai?chatID=alpha", "https://duck.ai?chatID=beta"))),
+            setOf(ClearableData.DuckChats.SelectedForMode(setOf("https://duck.ai?chatID=alpha", "https://duck.ai?chatID=beta"), BrowserMode.REGULAR)),
         )
 
         verify(duckChatDeleter).deleteChat("alpha")
@@ -179,14 +180,14 @@ class DuckChatDataClearingPluginTest {
         whenever(duckChat.isDuckChatUrl(any())).thenReturn(true)
         whenever(duckChatDeleter.deleteChat(any())).thenReturn(true)
 
-        plugin.onClearData(setOf(ClearableData.DuckChats.Selected(setOf("https://duck.ai?chatID=x"))))
+        plugin.onClearData(setOf(ClearableData.DuckChats.SelectedForMode(setOf("https://duck.ai?chatID=x"), BrowserMode.REGULAR)))
 
         verify(duckChatDeleter, never()).deleteAllChats()
     }
 
     @Test
     fun `Selected with empty url set is a no-op`() = runTest {
-        plugin.onClearData(setOf(ClearableData.DuckChats.Selected(emptySet())))
+        plugin.onClearData(setOf(ClearableData.DuckChats.SelectedForMode(emptySet(), BrowserMode.REGULAR)))
 
         verify(duckChatDeleter, never()).deleteChat(any())
         verify(duckChatSyncRepository, never()).recordSingleChatDeletion(any())
@@ -209,7 +210,7 @@ class DuckChatDataClearingPluginTest {
         whenever(duckChatDeleter.deleteChat("beta")).thenReturn(true)
 
         plugin.onClearData(
-            setOf(ClearableData.DuckChats.Selected(setOf("https://duck.ai?chatID=alpha", "https://duck.ai?chatID=beta"))),
+            setOf(ClearableData.DuckChats.SelectedForMode(setOf("https://duck.ai?chatID=alpha", "https://duck.ai?chatID=beta"), BrowserMode.REGULAR)),
         )
 
         verify(duckChatDeleter).deleteChat("alpha")
@@ -225,14 +226,14 @@ class DuckChatDataClearingPluginTest {
         whenever(duckChat.isDuckChatUrl(any())).thenReturn(true)
         whenever(duckChatDeleter.deleteChat(any())).thenReturn(true)
 
-        plugin.onClearData(setOf(ClearableData.DuckChats.Selected(setOf("https://duck.ai?chatID=x"))))
+        plugin.onClearData(setOf(ClearableData.DuckChats.SelectedForMode(setOf("https://duck.ai?chatID=x"), BrowserMode.REGULAR)))
 
         verify(duckChatDeleter, never()).deleteAllChats()
     }
 
     @Test
     fun `DuckChats Selected with empty url set is a no-op`() = runTest {
-        plugin.onClearData(setOf(ClearableData.DuckChats.Selected(emptySet())))
+        plugin.onClearData(setOf(ClearableData.DuckChats.SelectedForMode(emptySet(), BrowserMode.REGULAR)))
 
         verify(duckChatDeleter, never()).deleteChat(any())
         verify(duckChatSyncRepository, never()).recordSingleChatDeletion(any())
@@ -246,7 +247,7 @@ class DuckChatDataClearingPluginTest {
         whenever(duckChatDeleter.deleteChat("alpha")).thenReturn(true)
 
         plugin.onClearData(
-            setOf(ClearableData.DuckChats.Selected(setOf("https://duck.ai?chatID=alpha", "https://example.com"))),
+            setOf(ClearableData.DuckChats.SelectedForMode(setOf("https://duck.ai?chatID=alpha", "https://example.com"), BrowserMode.REGULAR)),
         )
 
         verify(duckChatDeleter).deleteChat("alpha")

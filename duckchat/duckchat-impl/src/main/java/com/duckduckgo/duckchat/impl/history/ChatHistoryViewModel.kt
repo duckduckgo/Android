@@ -22,6 +22,7 @@ import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.model.TabRepository
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.browsermode.api.RegularMode
 import com.duckduckgo.dataclearing.api.plugin.ClearableData
 import com.duckduckgo.dataclearing.api.plugin.DataClearingTrigger
@@ -255,7 +256,7 @@ class ChatHistoryViewModel @Inject constructor(
         if (!duckAiFeatureState.showClearDuckAIChatHistory.value) return
         val urls = chatIds.mapTo(mutableSetOf()) { duckChat.buildChatUrl(it) }
         appScope.launch {
-            dataClearingTrigger.clearData(setOf(ClearableData.DuckChats.Selected(urls)))
+            dataClearingTrigger.clearData(setOf(ClearableData.DuckChats.SelectedForMode(urls, BrowserMode.REGULAR)))
         }
     }
 
