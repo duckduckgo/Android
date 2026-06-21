@@ -1164,13 +1164,16 @@ class BrowserTabViewModel @Inject constructor(
         viewModelScope.launch(dispatchers.io()) {
             val uri = url.toUri()
 
-            if (duckPlayer.getDuckPlayerState() == ENABLED && duckPlayer.isSimulatedYoutubeNoCookie(uri)) {
-                val duckPlayerUrl = duckPlayer.createDuckPlayerUriFromYoutubeNoCookie(uri)
-                if (duckPlayerUrl != null) {
-                    history.saveToHistory(duckPlayerUrl, title, tabId)
+            // Fire mode must leave no trace in the shared browsing history.
+            if (browserMode != BrowserMode.FIRE) {
+                if (duckPlayer.getDuckPlayerState() == ENABLED && duckPlayer.isSimulatedYoutubeNoCookie(uri)) {
+                    val duckPlayerUrl = duckPlayer.createDuckPlayerUriFromYoutubeNoCookie(uri)
+                    if (duckPlayerUrl != null) {
+                        history.saveToHistory(duckPlayerUrl, title, tabId)
+                    }
+                } else {
+                    history.saveToHistory(url, title, tabId)
                 }
-            } else {
-                history.saveToHistory(url, title, tabId)
             }
 
             if (androidBrowserConfig.singleTabFireDialog().isEnabled()) {

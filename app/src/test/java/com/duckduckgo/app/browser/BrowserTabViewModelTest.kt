@@ -554,6 +554,8 @@ class BrowserTabViewModelTest {
 
     private lateinit var testee: BrowserTabViewModel
 
+    private var browserMode: BrowserMode = BrowserMode.REGULAR
+
     private lateinit var fireproofWebsiteDao: FireproofWebsiteDao
 
     private lateinit var locationPermissionsDao: LocationPermissionsDao
@@ -10887,6 +10889,40 @@ class BrowserTabViewModelTest {
         testee.onSiteVisited("about:blank", null)
 
         verify(mockTabVisitedSitesRepository, never()).recordVisitedSite(any(), any())
+    }
+
+    @Test
+    fun whenOnSiteVisitedInRegularModeThenSavedToHistory() = runTest {
+        browserMode = BrowserMode.REGULAR
+        resetChannels()
+        initialiseViewModel()
+
+        testee.onSiteVisited("https://sub.example.com/path", null)
+
+        verify(mockNavigationHistory).saveToHistory("https://sub.example.com/path", null, "abc")
+    }
+
+    @Test
+    fun whenOnSiteVisitedInFireModeThenNotSavedToHistory() = runTest {
+        browserMode = BrowserMode.FIRE
+        resetChannels()
+        initialiseViewModel()
+
+        testee.onSiteVisited("https://sub.example.com/path", null)
+
+        verify(mockNavigationHistory, never()).saveToHistory(any(), anyOrNull(), any())
+    }
+
+    @Test
+    fun whenOnSiteVisitedInFireModeThenVisitedSiteStillRecordedForBurnScope() = runTest {
+        fakeAndroidConfigBrowserFeature.singleTabFireDialog().setRawStoredState(State(enable = true))
+        browserMode = BrowserMode.FIRE
+        resetChannels()
+        initialiseViewModel()
+
+        testee.onSiteVisited("https://sub.example.com/path", null)
+
+        verify(mockTabVisitedSitesRepository).recordVisitedSite("abc", "example.com")
     }
 
     @Test
