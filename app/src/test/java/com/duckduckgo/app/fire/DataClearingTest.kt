@@ -57,6 +57,7 @@ import org.mockito.Mock
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.argThat
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.isNull
 import org.mockito.kotlin.never
@@ -1268,6 +1269,61 @@ class DataClearingTest {
         testee.clearSelectedDuckAiChats(urls, BrowserMode.FIRE)
 
         verify(mockDataClearingTrigger).clearData(eq(setOf(ClearableData.DuckChats.SelectedForMode(urls, BrowserMode.FIRE))))
+    }
+
+    // ---------------------------------------------------------------------------------
+    // G1 gap tests — flag-off safety-net: none of these paths should ever dispatch
+    // fire-scoped data when FireModeAvailability.isAvailable() returns false.
+    // ---------------------------------------------------------------------------------
+
+    @Test
+    fun `automatic clear with flag off never dispatches fire-scoped data`() = runTest {
+        whenever(mockFireModeAvailability.isAvailable()).thenReturn(false)
+        configureAutomaticOptions(setOf(FireClearOption.TABS, FireClearOption.DATA, FireClearOption.DUCKAI_CHATS))
+
+        testee.clearDataUsingAutomaticFireOptions(killProcessIfNeeded = false)
+
+        verify(mockDataClearingTrigger, never()).clearData(argThat { hasFireScopedType() })
+    }
+
+    @Test
+    fun `single tab clear with flag off never dispatches fire-scoped data`() = runTest {
+        whenever(mockFireModeAvailability.isAvailable()).thenReturn(false)
+        whenever(mockTabVisitedSitesRepository.getVisitedSites("tab1")).thenReturn(emptySet())
+        whenever(mockTabRepository.getTab("tab1")).thenReturn(TabEntity(tabId = "tab1", url = "https://example.com", position = 0))
+
+        testee.clearSingleTabData("tab1", browserMode = BrowserMode.REGULAR)
+
+        verify(mockDataClearingTrigger, never()).clearData(argThat { hasFireScopedType() })
+    }
+
+    @Test
+    fun `clearSelectedDuckAiChats with flag off never dispatches fire-scoped data`() = runTest {
+        whenever(mockFireModeAvailability.isAvailable()).thenReturn(false)
+        val urls = setOf("https://duck.ai?chatID=x")
+
+        testee.clearSelectedDuckAiChats(urls, BrowserMode.REGULAR)
+
+        verify(mockDataClearingTrigger, never()).clearData(argThat { hasFireScopedType() })
+    }
+
+    @Test
+    fun `clearTabContextualChat with flag off never dispatches fire-scoped data`() = runTest {
+        whenever(mockFireModeAvailability.isAvailable()).thenReturn(false)
+        whenever(mockContextualDataStore.getTabChatUrl("tab1")).thenReturn("https://duck.ai?chatID=x")
+
+        testee.clearTabContextualChat("tab1", browserMode = BrowserMode.REGULAR)
+
+        verify(mockDataClearingTrigger, never()).clearData(argThat { hasFireScopedType() })
+    }
+
+    private fun Set<ClearableData>.hasFireScopedType() = any { t ->
+        (t is ClearableData.BrowserData.AllForMode && t.mode == BrowserMode.FIRE) ||
+            (t is ClearableData.BrowserData.SingleForMode && t.mode == BrowserMode.FIRE) ||
+            (t is ClearableData.Tabs.AllForMode && t.mode == BrowserMode.FIRE) ||
+            (t is ClearableData.Tabs.SingleForMode && t.mode == BrowserMode.FIRE) ||
+            (t is ClearableData.DuckChats.AllForMode && t.mode == BrowserMode.FIRE) ||
+            (t is ClearableData.DuckChats.SelectedForMode && t.mode == BrowserMode.FIRE)
     }
 
     private suspend fun configureManualOptions(options: Set<FireClearOption>) {
