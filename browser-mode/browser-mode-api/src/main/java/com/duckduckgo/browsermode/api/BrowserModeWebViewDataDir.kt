@@ -14,22 +14,18 @@
  * limitations under the License.
  */
 
-plugins {
-    id 'com.android.library'
-    id 'kotlin-android'
-}
+package com.duckduckgo.browsermode.api
 
-apply from: "$rootProject.projectDir/gradle/android-library.gradle"
+import androidx.webkit.Profile
 
-android {
-    namespace 'com.duckduckgo.browsermode.api'
-}
-
-dependencies {
-    implementation KotlinX.coroutines.core
-    implementation AndroidX.webkit
-
-    compileOnly "javax.inject:javax.inject:_"
-
-    testImplementation Testing.junit4
-}
+/**
+ * Relative on-disk WebView data directory for this mode, under the app data dir.
+ * The default profile lives at `app_webview/Default`; named profiles live under
+ * `app_webview/Profiles/<name>` (Chromium layout — verify on-device before relying on it).
+ */
+val BrowserMode.webViewDataDir: String
+    get() = if (profileName == Profile.DEFAULT_PROFILE_NAME) {
+        "app_webview/Default"
+    } else {
+        "app_webview/Profiles/$profileName"
+    }

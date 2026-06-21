@@ -14,22 +14,17 @@
  * limitations under the License.
  */
 
-plugins {
-    id 'com.android.library'
-    id 'kotlin-android'
-}
+package com.duckduckgo.browsermode.api
 
-apply from: "$rootProject.projectDir/gradle/android-library.gradle"
+import org.junit.Assert.assertEquals
+import org.junit.Test
 
-android {
-    namespace 'com.duckduckgo.browsermode.api'
-}
+class BrowserModeWebViewDataDirTest {
+    @Test fun regularUsesDefaultProfileDir() {
+        assertEquals("app_webview/Default", BrowserMode.REGULAR.webViewDataDir)
+    }
 
-dependencies {
-    implementation KotlinX.coroutines.core
-    implementation AndroidX.webkit
-
-    compileOnly "javax.inject:javax.inject:_"
-
-    testImplementation Testing.junit4
+    @Test fun fireUsesProfilesSubdir() {
+        assertEquals("app_webview/Profiles/Fire", BrowserMode.FIRE.webViewDataDir)
+    }
 }
