@@ -38,6 +38,9 @@ dependencies {
     implementation project(':statistics-api')
     implementation project(':content-scope-scripts-api')
     implementation project(':duckchat-api')
+    implementation project(':browser-mode-api')
+    implementation project(':data-clearing-api')
+    implementation AndroidX.webkit
 
     implementation "com.squareup.logcat:logcat:_"
     implementation Square.retrofit2.converter.moshi
