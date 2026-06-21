@@ -788,7 +788,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
                         clearOptions = clearOptions,
                     )
                     try {
-                        dataClearing.clearDataUsingManualFireOptions(shouldRestartIfRequired = true)
+                        dataClearing.clearDataUsingManualFireOptions(shouldRestartIfRequired = true, browserMode = currentBrowserMode)
                         dataClearingWideEvent.finishSuccess()
                     } catch (e: Exception) {
                         dataClearingWideEvent.finishFailure(e)

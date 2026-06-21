@@ -34,6 +34,7 @@ import com.duckduckgo.app.settings.clear.FireClearOption
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.FIRE_ANIMATION
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.DateProvider
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -89,6 +90,7 @@ class NonGranularFireDialogViewModelTest {
         dispatcherProvider = mockDispatcherProvider,
         dateProvider = mockDateProvider,
         dataClearingWideEvent = dataClearingWideEvent,
+        browserMode = BrowserMode.REGULAR,
     )
 
     @Test
@@ -251,7 +253,7 @@ class NonGranularFireDialogViewModelTest {
 
         coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
 
-        verify(mockDataClearing).clearDataUsingManualFireOptions()
+        verify(mockDataClearing).clearDataUsingManualFireOptions(browserMode = BrowserMode.REGULAR)
     }
 
     @Test
