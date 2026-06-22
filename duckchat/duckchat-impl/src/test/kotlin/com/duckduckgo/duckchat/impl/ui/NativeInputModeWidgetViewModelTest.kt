@@ -32,6 +32,9 @@ import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggesti
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteUrlSuggestion.AutoCompleteSwitchToTabSuggestion
 import com.duckduckgo.browser.api.autocomplete.AutoCompleteFactory
 import com.duckduckgo.browser.api.autocomplete.AutoCompleteSettings
+import com.duckduckgo.browsermode.api.BrowserMode
+import com.duckduckgo.browsermode.api.BrowserModeDataProvider
+import com.duckduckgo.browsermode.api.BrowserModeStateHolder
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.plugins.ActivePluginPoint
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
@@ -118,7 +121,16 @@ class NativeInputModeWidgetViewModelTest {
     private val tabRepository: TabRepository = mock<TabRepository>().also {
         whenever(it.flowSelectedTab).thenReturn(selectedTabFlow)
     }
-    private val realNativeInputStateStore = RealNativeInputStateStore { tabRepository }
+    private val tabRepositoryProvider = object : BrowserModeDataProvider<TabRepository> {
+        override fun forMode(mode: BrowserMode): TabRepository = tabRepository
+    }
+    private val browserModeStateHolder: BrowserModeStateHolder = mock<BrowserModeStateHolder>().also {
+        whenever(it.currentMode).thenReturn(MutableStateFlow(BrowserMode.REGULAR))
+    }
+    private val realNativeInputStateStore = RealNativeInputStateStore(
+        dagger.Lazy { tabRepositoryProvider },
+        browserModeStateHolder,
+    )
     private val nativeInputStatePublisher: NativeInputStatePublisher = realNativeInputStateStore
     private val nativeInputStateProvider: NativeInputStateProvider = realNativeInputStateStore
 

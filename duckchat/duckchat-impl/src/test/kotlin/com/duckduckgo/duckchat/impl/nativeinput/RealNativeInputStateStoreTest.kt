@@ -19,6 +19,9 @@ package com.duckduckgo.duckchat.impl.nativeinput
 import app.cash.turbine.test
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
+import com.duckduckgo.browsermode.api.BrowserMode
+import com.duckduckgo.browsermode.api.BrowserModeDataProvider
+import com.duckduckgo.browsermode.api.BrowserModeStateHolder
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState.InputContext
@@ -40,13 +43,29 @@ class RealNativeInputStateStoreTest {
     @get:Rule
     val coroutineRule = CoroutineTestRule()
 
-    private val selectedTabFlow = MutableStateFlow<TabEntity?>(null)
-    private val tabRepository: TabRepository = mock<TabRepository>().also {
-        whenever(it.flowSelectedTab).thenReturn(selectedTabFlow)
+    private val regularSelectedTabFlow = MutableStateFlow<TabEntity?>(null)
+    private val fireSelectedTabFlow = MutableStateFlow<TabEntity?>(null)
+    private val regularTabRepository: TabRepository = mock<TabRepository>().also {
+        whenever(it.flowSelectedTab).thenReturn(regularSelectedTabFlow)
     }
-    private val lazyTabRepository: dagger.Lazy<TabRepository> = dagger.Lazy { tabRepository }
+    private val fireTabRepository: TabRepository = mock<TabRepository>().also {
+        whenever(it.flowSelectedTab).thenReturn(fireSelectedTabFlow)
+    }
+    private val tabRepositoryProvider = object : BrowserModeDataProvider<TabRepository> {
+        override fun forMode(mode: BrowserMode): TabRepository = when (mode) {
+            BrowserMode.REGULAR -> regularTabRepository
+            BrowserMode.FIRE -> fireTabRepository
+        }
+    }
+    private val currentModeFlow = MutableStateFlow(BrowserMode.REGULAR)
+    private val browserModeStateHolder: BrowserModeStateHolder = mock<BrowserModeStateHolder>().also {
+        whenever(it.currentMode).thenReturn(currentModeFlow)
+    }
 
-    private val testee = RealNativeInputStateStore(lazyTabRepository)
+    private val testee = RealNativeInputStateStore(
+        dagger.Lazy { tabRepositoryProvider },
+        browserModeStateHolder,
+    )
 
     @Test
     fun whenStateForTabCalledTwiceForSameTabThenSameFlowReturned() {
@@ -179,7 +198,7 @@ class RealNativeInputStateStoreTest {
             inputContext = InputContext.DUCK_AI,
         )
         testee.publish("tab-a", published)
-        selectedTabFlow.value = tabEntity("tab-a")
+        regularSelectedTabFlow.value = tabEntity("tab-a")
 
         testee.state.test {
             assertEquals(published, awaitItem())
@@ -199,12 +218,12 @@ class RealNativeInputStateStoreTest {
         )
         testee.publish("tab-a", stateA)
         testee.publish("tab-b", stateB)
-        selectedTabFlow.value = tabEntity("tab-a")
+        regularSelectedTabFlow.value = tabEntity("tab-a")
 
         testee.state.test {
             assertEquals(stateA, awaitItem())
 
-            selectedTabFlow.value = tabEntity("tab-b")
+            regularSelectedTabFlow.value = tabEntity("tab-b")
 
             assertEquals(stateB, awaitItem())
             cancelAndIgnoreRemainingEvents()
@@ -218,7 +237,7 @@ class RealNativeInputStateStoreTest {
             inputContext = InputContext.BROWSER,
         )
         testee.publish("tab-a", initial)
-        selectedTabFlow.value = tabEntity("tab-a")
+        regularSelectedTabFlow.value = tabEntity("tab-a")
 
         testee.state.test {
             assertEquals(initial, awaitItem())
@@ -232,10 +251,57 @@ class RealNativeInputStateStoreTest {
 
     @Test
     fun whenSelectedTabIsNullThenStateDoesNotEmit() = runTest {
-        selectedTabFlow.value = null
+        regularSelectedTabFlow.value = null
 
         testee.state.test {
             expectNoEvents()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenModeIsFireThenStateFollowsFireModeSelectedTab() = runTest {
+        val regularState = NativeInputState(
+            inputMode = InputMode.SEARCH_AND_DUCK_AI,
+            inputContext = InputContext.BROWSER,
+        )
+        val fireState = NativeInputState(
+            inputMode = InputMode.SEARCH_ONLY,
+            inputContext = InputContext.DUCK_AI,
+        )
+        testee.publish("regular-tab", regularState)
+        testee.publish("fire-tab", fireState)
+        regularSelectedTabFlow.value = tabEntity("regular-tab")
+        fireSelectedTabFlow.value = tabEntity("fire-tab")
+        currentModeFlow.value = BrowserMode.FIRE
+
+        testee.state.test {
+            assertEquals(fireState, awaitItem())
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenModeSwitchesToFireThenStateReEmitsForFireSelectedTab() = runTest {
+        val regularState = NativeInputState(
+            inputMode = InputMode.SEARCH_AND_DUCK_AI,
+            inputContext = InputContext.BROWSER,
+        )
+        val fireState = NativeInputState(
+            inputMode = InputMode.SEARCH_ONLY,
+            inputContext = InputContext.DUCK_AI,
+        )
+        testee.publish("regular-tab", regularState)
+        testee.publish("fire-tab", fireState)
+        regularSelectedTabFlow.value = tabEntity("regular-tab")
+        fireSelectedTabFlow.value = tabEntity("fire-tab")
+
+        testee.state.test {
+            assertEquals(regularState, awaitItem())
+
+            currentModeFlow.value = BrowserMode.FIRE
+
+            assertEquals(fireState, awaitItem())
             cancelAndIgnoreRemainingEvents()
         }
     }
