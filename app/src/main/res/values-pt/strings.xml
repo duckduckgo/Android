@@ -1039,6 +1039,15 @@
     <string name="onboardingDuckAiEndCtaDescription"><![CDATA[Usa a barra de endereços para pesquisar e visitar sites ou alterna para Duck.ai para chat privado de IA.<br/><br/>Podes usar Duck.ai em qualquer lugar onde vejas o ícone de chat]]></string>
     <string name="onboardingDuckAiEndCtaButton">Dá cá cinco!</string>
 
+    <!-- Input Mode Demo Onboarding step -->
+    <string name="preOnboardingInputModeDemoTitle">Tudo pronto para começar?&lt;br/&gt;Experimenta uma pesquisa ou um chat de IA!</string>
+    <string name="preOnboardingInputModeDemoSearchHint">Pesquisar em privado</string>
+    <string name="preOnboardingInputModeDemoChatHint">Pergunta o que quiseres em privado</string>
+    <string name="preOnboardingInputModeDemoChatSuggestion1">Explica o mercado de ações como se tu tivesses 10 anos</string>
+    <string name="preOnboardingInputModeDemoChatSuggestion2">Planeia um dia perfeito em Londres</string>
+    <string name="preOnboardingInputModeDemoChatSuggestion3">Surpreende-me!</string>
+    <string name="preOnboardingInputModeDemoChatSuggestion3Prompt">Quais são 10 factos fascinantes sobre ciência, natureza e história?</string>
+
     <!-- Custom AI onboarding flow -->
     <!-- Pre-onboarding: initial screens -->
     <string name="preOnboardingWelcomeDialogBodyCustomAi">A postos para conversar em privado e de forma gratuita com o ChatGPT, Claude e outras IA, num navegador que te protege ativamente?</string>
@@ -1058,6 +1067,7 @@
     <string name="preOnboardingDaxDialog2TitleCustomAi">Queres tornar o DuckDuckGo o teu navegador predefinido?</string>
     <!-- In-context onboarding. -->
     <string name="onboardingEndCustomAiFlowDaxDialogDescription"><![CDATA[Inicia um chat privado de IA com o Duck.ai ou muda para \"Pesquisar\" para uma navegação protegida.<br/><br/>Podes usar o Duck.ai em qualquer lugar onde vejas o ícone de chat]]></string>
+    <string name="onboardingPrivacyProCustomAiFlowDaxDialogDescription">Também oferecemos uma subscrição paga com modelos avançados de IA com limites de chat mais elevados do GPT e Claude, uma VPN segura e muito mais.</string>
 
     <string name="input_screen_user_pref_without_ai_updated">Pesquisar apenas</string>
     <string name="input_screen_user_pref_with_ai_updated">Alternar entre\nPesquisa e Duck.ai</string>
