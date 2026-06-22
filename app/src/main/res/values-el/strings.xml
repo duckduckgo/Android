@@ -832,6 +832,7 @@
     <string name="preOnboardingDaxDialog1TitleDuckAi" translatable="false"><![CDATA[Hi there.<br/><br/>Ready for a faster browser that protects you and lets you decide when and how to use AI?]]></string>
     <string name="preOnboardingDaxDialog1Button">Ας το κάνουμε!</string>
     <string name="preOnboardingDaxDialog1ButtonDuckAi" translatable="false">Let\&apos;s get started!</string>
+    <string name="preOnboardingDaxDialog1ButtonBrandDesign">Ας ξεκινήσουμε!</string>
     <string name="preOnboardingDaxDialog1SecondaryButton">Έχω ξαναβρεθεί εδώ</string>
     <string name="preOnboardingDaxDialog2Title">Η προστασία ενεργοποιήθηκε!</string>
     <string name="preOnboardingDaxDialog2Button">Επιλέξτε το πρόγραμμα περιήγησής σας</string>
@@ -896,6 +897,7 @@
     <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[Το DuckDuckGo διαθέτει επίσης μια <b>προαιρετική επί πληρωμή συνδρομή</b>, με ασφαλές <b>VPN</b> και <b>προηγμένη, ιδιωτική τεχνητή νοημοσύνη</b>.]]></string>
     <string name="onboardingPrivacyProDaxDialogOkButton">Μάθετε περισσότερα</string>
     <string name="onboardingPrivacyProDaxDialogFreeTrialOkButton">Δοκίμασε δωρεάν!</string>
+    <string name="onboardingPrivacyProDaxDialogFreeTrialOkButtonBrandDesign">Δοκιμάστε το δωρεάν!</string>
     <string name="onboardingPrivacyProDaxDialogCancelButton">Παράλειψη</string>
     <string name="onboardingSkippedPrivacyProDaxDialogTitle">Το γνωρίζατε;</string>
 
@@ -1030,6 +1032,33 @@
     <string name="onboardingStepIndicatorText" instruction="a counter above our instructions in onboarding that tells a user what step they are on">%1$d από %2$d</string>
     <string name="onboardingSearchDaxDialogOption1Quoted" instruction="translate &apos;duck&apos; too.">πώς να πείτε «πάπια» στα αγγλικά</string>
     <string name="onboardingSearchDaxDialogOption1EnglishQuoted" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">πώς να πείτε «πάπια» στα ισπανικά</string>
+
+    <string name="onboardingDuckAiFireButtonDaxDialogTitle">Αυτό είναι το Duck.ai!</string>
+    <string name="onboardingDuckAiFireButtonDaxDialogDescription"><![CDATA[Ιδιωτικές συνομιλίες με τεχνητή νοημοσύνη που μπορείς να διαγράψεις ανά πάσα στιγμή με το <b>Fire Button</b>. Δοκίμασέ το! 🔥]]></string>
+    <string name="onboardingDuckAiEndCtaTitle">Το έχεις!</string>
+    <string name="onboardingDuckAiEndCtaDescription"><![CDATA[Χρησιμοποίησε τη γραμμή διευθύνσεων για αναζήτηση και επίσκεψη σε ιστότοπους ή πήγαινε στο Duck.ai για ιδιωτική συνομιλία με τεχνητή νοημοσύνη.<br/><br/>Μπορείς να χρησιμοποιήσεις το Duck.ai από οπουδήποτε βλέπεις το εικονίδιο συνομιλίας]]></string>
+    <string name="onboardingDuckAiEndCtaButton">Κόλλα πέντε!</string>
+
+    <!-- Custom AI onboarding flow -->
+    <!-- Pre-onboarding: initial screens -->
+    <string name="preOnboardingWelcomeDialogBodyCustomAi">Είστε έτοιμοι να συνομιλήσετε ιδιωτικά με το ChatGPT, το Claude και άλλα μοντέλα τεχνητής νοημοσύνης δωρεάν, σε ένα πρόγραμμα περιήγησης που σας προστατεύει ενεργά;</string>
+    <string name="preOnboardingDaxDialog3TextCustomAi">Θυμηθείτε: μπορείτε να χρησιμοποιήσετε το Duck.ai από οπουδήποτε βλέπετε το εικονίδιο συνομιλίας</string>
+    <string name="preOnboardingDaxDialog3ButtonCustomAi">Έναρξη συνομιλίας με τεχνητή νοημοσύνη</string>
+    <!-- Pre-onboarding: AI comparison chart screen. -->
+    <string name="preOnboardingDaxDialogAiTitle">Ενεργοποιήθηκαν οι προστασίες τεχνητής νοημοσύνης!</string>
+    <string name="preOnboardingAiComparisonChartPopularAis">Δημοφιλή μοντέλα τεχνητής νοημοσύνης</string>
+    <string name="preOnboardingAiComparisonChartItem1">Όλες οι συνομιλίες είναι ανώνυμες</string>
+    <string name="preOnboardingAiComparisonChartItem2">Δεν απαιτείται λογαριασμός για πρόσβαση σε όλες τις λειτουργίες τεχνητής νοημοσύνης</string>
+    <string name="preOnboardingAiComparisonChartItem3">Δεν χρησιμοποιεί ποτέ τις συνομιλίες σας για εκπαίδευση της τεχνητής νοημοσύνης</string>
+    <string name="preOnboardingAiComparisonChartItem4">Απόκτησε πρόσβαση στο ChatGPT, το Claude και πολλά άλλα, όλα σε ένα μέρος</string>
+    <string name="preOnboardingAiComparisonChartButton">Δοκιμάστε το Duck.ai!</string>
+    <!-- Pre-onboarding: input demo screen -->
+    <string name="preOnboardingInputModeDemoTitleCustomAi">Τώρα, δοκιμάστε μια ιδιωτική συνομιλία με τεχνητή νοημοσύνη!</string>
+    <!-- Pre-onboarding: browser comparison screen -->
+    <string name="preOnboardingDaxDialog2TitleCustomAi">Θέλετε να ορίσετε το DuckDuckGo ως το προεπιλεγμένο πρόγραμμα περιήγησής σας;</string>
+    <!-- In-context onboarding. -->
+    <string name="onboardingEndCustomAiFlowDaxDialogDescription"><![CDATA[Αρχίστε μια ιδιωτική συνομιλία με τεχνητή νοημοσύνη με το Duck.ai ή αλλάξτε στην Αναζήτηση για προστατευμένη περιήγηση.<br/><br/>Μπορείτε να χρησιμοποιήσετε το Duck.ai από οπουδήποτε βλέπετε το εικονίδιο συνομιλίας]]></string>
+    <string name="onboardingPrivacyProCustomAiFlowDaxDialogDescription">Προσφέρουμε επίσης μια συνδρομή επί πληρωμή με προηγμένα μοντέλα τεχνητής νοημοσύνης με υψηλότερα όρια συνομιλίας από τα GPT, Claude και Llama, ένα ασφαλές VPN και πολλά άλλα.</string>
 
     <string name="input_screen_user_pref_without_ai_updated">Αναζήτηση μόνο</string>
     <string name="input_screen_user_pref_with_ai_updated">Εναλλαγή μεταξύ\nΑναζήτησης και Duck.ai</string>
