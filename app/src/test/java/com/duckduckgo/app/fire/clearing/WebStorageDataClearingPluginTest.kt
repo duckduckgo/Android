@@ -71,6 +71,7 @@ class WebStorageDataClearingPluginTest {
 
     @Test fun whenRegularAllForModeThenDoesNothing() = runTest {
         testee.onClearData(setOf(ClearableData.BrowserData.AllForMode(BrowserMode.REGULAR)))
+        verify(webStorageProvider, never()).forMode(any())
         verify(siteDataCleaner, never()).deleteAllBrowsingData(any())
     }
 
