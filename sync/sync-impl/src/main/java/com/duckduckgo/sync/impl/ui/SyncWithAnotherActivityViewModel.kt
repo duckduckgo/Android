@@ -116,7 +116,9 @@ class SyncWithAnotherActivityViewModel @Inject constructor(
         sessionStarted = true
         viewModelScope.launch(dispatchers.io()) {
             if (shouldUseV2()) {
-                startV2Present()
+                if (!isDeepLink) {
+                    startV2Present()
+                }
                 return@launch
             }
             showQRCode()

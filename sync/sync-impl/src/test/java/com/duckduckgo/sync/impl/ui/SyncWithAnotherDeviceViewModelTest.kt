@@ -723,6 +723,21 @@ class SyncWithAnotherDeviceViewModelTest {
     }
 
     @Test
+    fun whenIsDeepLinkAndV2EnabledThenStartPresentNotInvoked() = runTest {
+        enableV2(displayOn = true)
+        whenever(syncRepository.getAccountInfo()).thenReturn(accountA)
+
+        testee.viewState(isDeepLink = true).test {
+            awaitItem()
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        verify(runner, never()).startPresent()
+        verify(syncRepository, never()).generateExchangeInvitationCode()
+        verify(syncRepository, never()).getRecoveryCode()
+    }
+
+    @Test
     fun whenV2PairingRejectedByPeerThenShowError() = runTest {
         syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
         whenever(syncRepository.getAccountInfo()).thenReturn(accountA)
