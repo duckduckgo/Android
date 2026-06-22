@@ -1079,6 +1079,15 @@
     <string name="onboardingDuckAiEndCtaDescription"><![CDATA[Použi panel s adresou na vyhľadávanie a otváranie stránok alebo prepni na Duck.ai, ak chceš súkromne četovať s umelou inteligenciou.<br/><br/>Duck.ai môžeš používať odkiaľkoľvek, kde vidíš ikonu četu]]></string>
     <string name="onboardingDuckAiEndCtaButton">Ruku na to!</string>
 
+    <!-- Input Mode Demo Onboarding step -->
+    <string name="preOnboardingInputModeDemoTitle">Si pripravený/-á začať?&lt;br/&gt;Skús vyhľadávanie alebo čet s umelou inteligenciou!</string>
+    <string name="preOnboardingInputModeDemoSearchHint">Vyhľadávanie v súkromí</string>
+    <string name="preOnboardingInputModeDemoChatHint">Spýtaj sa na čokoľvek súkromne</string>
+    <string name="preOnboardingInputModeDemoChatSuggestion1">Vysvetli mi akciový trh, akoby som mal 10 rokov.</string>
+    <string name="preOnboardingInputModeDemoChatSuggestion2">Naplánuj perfektný deň v Londýne</string>
+    <string name="preOnboardingInputModeDemoChatSuggestion3">Prekvap ma!</string>
+    <string name="preOnboardingInputModeDemoChatSuggestion3Prompt">Akých je 10 fascinujúcich faktov z oblasti vedy, prírody a histórie?</string>
+
     <!-- Custom AI onboarding flow -->
     <!-- Pre-onboarding: initial screens -->
     <string name="preOnboardingWelcomeDialogBodyCustomAi">Si pripravený/-á súkromne četovať s ChatGPT, Claudom a ďalšími umelými inteligenciami zadarmo v prehliadači, ktorý ťa aktívne chráni?</string>
@@ -1098,6 +1107,7 @@
     <string name="preOnboardingDaxDialog2TitleCustomAi">Chceš nastaviť DuckDuckGo ako svoj predvolený prehliadač?</string>
     <!-- In-context onboarding. -->
     <string name="onboardingEndCustomAiFlowDaxDialogDescription"><![CDATA[Začni súkromný čet s umelou inteligenciou s Duck.ai alebo prepni na vyhľadávanie pre chránené prehliadanie.<br/><br/>Duck.ai môžeš používať odkiaľkoľvek, kde vidíš ikonu četu]]></string>
+    <string name="onboardingPrivacyProCustomAiFlowDaxDialogDescription">Ponúkame tiež platené predplatné s pokročilými modelmi umelej inteligencie s vyššími limitmi chatu od GPT a Claude, bezpečnou VPN a ďalšími funkciami.</string>
 
     <string name="input_screen_user_pref_without_ai_updated">Len vyhľadávanie</string>
     <string name="input_screen_user_pref_with_ai_updated">Prepínať medzi\nvyhľadávaním a Duck.ai</string>
