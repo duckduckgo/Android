@@ -280,6 +280,68 @@ class NativeInputChatSuggestionsBinderTest {
         assertTrue(hasContent == true)
     }
 
+    @Test
+    fun whenSubmitWithQueryRunsBeforePluginsLoadThenNonQueryItemHiddenAfterLoad() = runTest {
+        val static = FakeChatItem(adapter = countingAdapter(1), supportsQuery = false)
+        binder = binderWith(fakePlugin(static))
+        val binding = createBinding()
+
+        // submit wins the race: runs before loadPluginItems, so pluginItems is still empty here.
+        submitQuery(binding, "hello")
+        binding.loadPluginItems(mock(), scope)
+
+        assertFalse(
+            "zero-state item must not be visible while typing, even when loaded after submit",
+            (binding.adapter as ConcatAdapter).adapters.contains(static.adapter),
+        )
+    }
+
+    @Test
+    fun whenSubmitEmptyRunsBeforePluginsLoadThenNonQueryItemShownAfterLoad() = runTest {
+        val static = FakeChatItem(adapter = countingAdapter(1), supportsQuery = false)
+        binder = binderWith(fakePlugin(static))
+        val binding = createBinding()
+
+        submitQuery(binding, "")
+        binding.loadPluginItems(mock(), scope)
+
+        assertEquals(static.adapter, (binding.adapter as ConcatAdapter).adapters[0])
+    }
+
+    @Test
+    fun whenSubmitWithQueryRunsBeforePluginsLoadThenQueryForwardedToQueryAwareItemAfterLoad() = runTest {
+        val queryAware = FakeChatItem(adapter = countingAdapter(1), supportsQuery = true)
+        binder = binderWith(fakePlugin(queryAware))
+        val binding = createBinding()
+
+        submitQuery(binding, "hello")
+        binding.loadPluginItems(mock(), scope)
+
+        assertEquals(listOf("hello"), queryAware.observedQueries)
+    }
+
+    @Test
+    fun whenPluginContentLoadsAfterSubmitThenOverlayReopenedViaReplay() = runTest {
+        val populated = FakeChatItem(adapter = countingAdapter(1), supportsQuery = false)
+        binder = binderWith(fakePlugin(populated))
+        val binding = createBinding()
+
+        val committed = mutableListOf<Boolean>()
+        // Empty query, no chat history: before plugins load hasContent is false (overlay would hide).
+        binding.submit(
+            suggestions = ChatTabSuggestions(
+                chatHistory = emptyList(),
+                urlSuggestions = AutoCompleteResult(query = "", suggestions = emptyList()),
+            ),
+            query = "",
+            isHistoryAvailable = true,
+            onCommit = { committed += it },
+        )
+        binding.loadPluginItems(mock(), scope)
+
+        assertEquals("first commit before load has no content, replay after load reopens", listOf(false, true), committed)
+    }
+
     private fun submitQuery(
         binding: NativeInputChatSuggestionsBinder.Binding,
         query: String,

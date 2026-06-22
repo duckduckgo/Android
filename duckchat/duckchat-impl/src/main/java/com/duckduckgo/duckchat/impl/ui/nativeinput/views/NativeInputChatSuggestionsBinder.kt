@@ -62,14 +62,19 @@ class NativeInputChatSuggestionsBinder @Inject constructor(
 
         private val pluginItems = mutableListOf<NativeInputChatTabItem>()
 
-        // Tracks the last query/empty state applied to plugin visibility, so we only add/remove
-        // non-query items at the empty <-> typing boundary rather than on every keystroke.
-        private var pluginItemsTyping: Boolean? = null
+        // The most recent submit, replayed once plugins finish loading so late-arriving items catch up
+        // to the current query/visibility/hasContent instead of racing (and losing to) the first submit.
+        private var replayLastSubmit: (() -> Unit)? = null
 
         /**
          * Fetches the enabled [NativeInputChatTabItemPlugin]s and inserts each item's adapter at the top
          * of the ConcatAdapter, preserving the plugin point's (priority) order. Safe to call once per
          * binding; [scope] is handed to each item and must outlive the binding's presentation.
+         *
+         * Loading races [submit]: both run on the main thread but in separate coroutines, so a [submit]
+         * may apply before the items exist. Once they're in we replay the latest [submit] so visibility,
+         * query forwarding and `hasContent` reflect the plugins; without it a submit that ran first would
+         * leave a zero-state item visible while typing and the overlay computed without the plugin rows.
          */
         suspend fun loadPluginItems(context: Context, scope: CoroutineScope) {
             chatItemPlugins.getPlugins().forEach { plugin ->
@@ -79,6 +84,7 @@ class NativeInputChatSuggestionsBinder @Inject constructor(
                 concatAdapter.addAdapter(pluginItems.size, item.adapter)
                 pluginItems += item
             }
+            replayLastSubmit?.invoke()
         }
 
         /**
@@ -88,6 +94,16 @@ class NativeInputChatSuggestionsBinder @Inject constructor(
          * [onCommit]'s `hasContent` reports whether the final list is non-empty.
          */
         fun submit(
+            suggestions: ChatTabSuggestions,
+            query: String,
+            isHistoryAvailable: Boolean,
+            onCommit: (hasContent: Boolean) -> Unit,
+        ) {
+            replayLastSubmit = { applySubmit(suggestions, query, isHistoryAvailable, onCommit) }
+            applySubmit(suggestions, query, isHistoryAvailable, onCommit)
+        }
+
+        private fun applySubmit(
             suggestions: ChatTabSuggestions,
             query: String,
             isHistoryAvailable: Boolean,
@@ -139,12 +155,14 @@ class NativeInputChatSuggestionsBinder @Inject constructor(
 
         /**
          * Adds/removes non-query plugin adapters so they show only while the query is empty. Query-aware
-         * items are never toggled here. Re-adding in [pluginItems] order at the running index restores
-         * the original top-of-list positions (built-in sections always follow the plugin region).
+         * items are never toggled here. Idempotent: each item moves only when its current membership
+         * differs from the desired state, so steady typing / steady empty is a no-op and only the
+         * empty<->typing transition (or a late plugin load) changes anything — no per-keystroke churn,
+         * and no stale "last state" that a late-loaded item could be skipped by. Re-adding in
+         * [pluginItems] order at the running index restores the original top-of-list positions
+         * (built-in sections always follow the plugin region).
          */
         private fun reconcilePluginVisibility(isTyping: Boolean) {
-            if (isTyping == pluginItemsTyping) return
-            pluginItemsTyping = isTyping
             pluginItems.forEachIndexed { index, item ->
                 if (item.supportsQuery) return@forEachIndexed
                 when {
