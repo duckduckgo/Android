@@ -2817,6 +2817,14 @@ class BrowserTabFragment :
                 hideKeyboard()
             }
 
+            is Command.DropAddressBarFocus -> {
+                if (nativeInputManager.isNativeInputEnabled()) {
+                    nativeInputManager.hideNativeInput()
+                } else {
+                    hideKeyboard()
+                }
+            }
+
             is Command.ShowToast -> {
                 Toast.makeText(requireActivity(), it.textResId, Toast.LENGTH_LONG).show()
             }

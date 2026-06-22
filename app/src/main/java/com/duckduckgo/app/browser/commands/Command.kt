@@ -101,6 +101,8 @@ sealed class Command {
 
     data object HideKeyboardForChat : Command()
 
+    data object DropAddressBarFocus : Command()
+
     class ShowFullScreen(
         val view: View,
     ) : Command()

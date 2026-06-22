@@ -3622,7 +3622,7 @@ class BrowserTabViewModel @Inject constructor(
         logcat { "shouldHideKeyboard: $shouldHideKeyboard" }
 
         command.value = if (shouldHideKeyboard) {
-            HideKeyboard
+            Command.DropAddressBarFocus
         } else {
             alreadyShownKeyboard = true
             ShowKeyboard
