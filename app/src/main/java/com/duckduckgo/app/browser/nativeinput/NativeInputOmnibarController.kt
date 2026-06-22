@@ -65,6 +65,7 @@ interface NativeInputOmnibarController : OmnibarState {
 class RealNativeInputOmnibarController(
     private val omnibar: Omnibar,
     private val rootView: ViewGroup,
+    private val nativeInputStateBugKillSwitch: NativeInputStateBugKillSwitch,
 ) : NativeInputOmnibarController {
 
     private var layoutListener: View.OnLayoutChangeListener? = null
@@ -169,7 +170,7 @@ class RealNativeInputOmnibarController(
     private fun applyTierText(omnibarView: View) {
         val aiTitle = omnibarView.findViewById<TextView?>(R.id.aiTitle)
         val freePill = omnibarView.findViewById<View?>(R.id.duckAIFreePill)
-        if (!overlayActive) {
+        if (nativeInputStateBugKillSwitch.self().isEnabled() && !overlayActive) {
             freePill?.gone()
             freePill?.setOnClickListener(null)
             return
@@ -194,7 +195,11 @@ class RealNativeInputOmnibarController(
         removeLayoutListener(omnibarView)
         block()
         val listener = View.OnLayoutChangeListener { _, _, _, _, _, _, _, _, _ ->
-            if (overlayActive && rootView.findViewById<View?>(R.id.inputModeWidget) != null) block()
+            if ((!nativeInputStateBugKillSwitch.self().isEnabled() || overlayActive) &&
+                rootView.findViewById<View?>(R.id.inputModeWidget) != null
+            ) {
+                block()
+            }
         }
         layoutListener = listener
         omnibarView.addOnLayoutChangeListener(listener)

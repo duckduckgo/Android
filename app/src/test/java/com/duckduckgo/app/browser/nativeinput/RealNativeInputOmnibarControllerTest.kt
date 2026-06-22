@@ -26,6 +26,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.omnibar.Omnibar
 import com.duckduckgo.app.browser.omnibar.OmnibarView
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -38,8 +39,9 @@ class RealNativeInputOmnibarControllerTest {
     private val context: Context = ApplicationProvider.getApplicationContext()
     private val omnibar: Omnibar = mock()
     private val rootView: ViewGroup = mock()
+    private val nativeInputStateBugKillSwitch = FakeFeatureToggleFactory.create(NativeInputStateBugKillSwitch::class.java)
 
-    private val testee = RealNativeInputOmnibarController(omnibar, rootView)
+    private val testee = RealNativeInputOmnibarController(omnibar, rootView, nativeInputStateBugKillSwitch)
 
     private val fireIconMenu = View(context).apply { id = R.id.fireIconMenu }
     private val plusIconMenu = View(context).apply { id = R.id.plusIconMenu }
