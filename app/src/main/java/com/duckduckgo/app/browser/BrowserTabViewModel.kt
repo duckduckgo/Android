@@ -5431,6 +5431,13 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
+    fun onCustomizeResponsesTapped() {
+        viewModelScope.launch {
+            val subscriptionEvent = duckChatJSHelper.onNativeAction(NativeAction.CUSTOMIZE_RESPONSES)
+            _subscriptionEventDataChannel.send(subscriptionEvent)
+        }
+    }
+
     fun openDuckChatHistory() {
         if (currentBrowserViewState().showDuckChatHistoryOption) {
             command.value = Command.LaunchDuckChatHistory

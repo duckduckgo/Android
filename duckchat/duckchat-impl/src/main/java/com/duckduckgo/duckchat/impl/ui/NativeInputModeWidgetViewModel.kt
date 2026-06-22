@@ -174,6 +174,10 @@ class NativeInputModeWidgetViewModel @Inject constructor(
         .filter { it == activeTabId.value }
         .map { }
 
+    val focusInputEvents: Flow<Unit> = duckChatInternal.focusInputEvents
+        .filter { it == activeTabId.value }
+        .map { }
+
     fun setModelPickerEnabled(enabled: Boolean) {
         _modelPickerEnabled.value = enabled
     }

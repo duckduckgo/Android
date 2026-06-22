@@ -1281,6 +1281,39 @@ class RealDuckChatJSHelperTest {
     }
 
     @Test
+    fun whenFocusChatInputAndNativeInputEnabledThenRequestFocusInputForTab() = runTest {
+        mockDuckChatFeature.nativeInputField().setRawStoredState(State(enable = true))
+
+        assertNull(
+            testee.processJsCallbackMessage("aiChat", "focusChatInput", "123", null, tabId = "tab-1"),
+        )
+
+        verify(mockDuckChat).requestFocusInput("tab-1")
+    }
+
+    @Test
+    fun whenFocusChatInputAndNativeInputDisabledThenRequestFocusInputNotCalled() = runTest {
+        mockDuckChatFeature.nativeInputField().setRawStoredState(State(enable = false))
+
+        assertNull(
+            testee.processJsCallbackMessage("aiChat", "focusChatInput", "123", null, tabId = "tab-1"),
+        )
+
+        verify(mockDuckChat, never()).requestFocusInput(any())
+    }
+
+    @Test
+    fun whenFocusChatInputWithEmptyTabIdThenRequestFocusInputNotCalled() = runTest {
+        mockDuckChatFeature.nativeInputField().setRawStoredState(State(enable = true))
+
+        assertNull(
+            testee.processJsCallbackMessage("aiChat", "focusChatInput", "123", null, tabId = ""),
+        )
+
+        verify(mockDuckChat, never()).requestFocusInput(any())
+    }
+
+    @Test
     fun whenGetAIChatNativeConfigValuesAndSupportsImageUploadThenReturnJsCallbackDataWithSupportsImageUploadEnabled() = runTest {
         val featureName = "aiChat"
         val method = "getAIChatNativeConfigValues"
@@ -1637,6 +1670,14 @@ class RealDuckChatJSHelperTest {
         val result = testee.onNativeAction(NativeAction.END_VOICE_SESSION)
 
         assertEquals("endVoiceSession", result.subscriptionName)
+        assertEquals(DUCK_CHAT_FEATURE_NAME, result.featureName)
+    }
+
+    @Test
+    fun whenNativeActionCustomizeResponsesRequestedThenSubscriptionDataSent() = runTest {
+        val result = testee.onNativeAction(NativeAction.CUSTOMIZE_RESPONSES)
+
+        assertEquals("submitCustomizeResponsesAction", result.subscriptionName)
         assertEquals(DUCK_CHAT_FEATURE_NAME, result.featureName)
     }
 

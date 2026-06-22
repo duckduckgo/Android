@@ -1766,6 +1766,15 @@ class RealDuckChatTest {
         }
     }
 
+    @Test
+    fun whenRequestFocusInputThenEventEmittedWithTabId() = runTest {
+        testee.focusInputEvents.test {
+            testee.requestFocusInput("tab-1")
+            assertEquals("tab-1", awaitItem())
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
     private suspend fun enableChatHistoryFlags() {
         duckChatFeature.self().setRawStoredState(State(enable = true))
         duckChatFeature.useNativeStorageChatData().setRawStoredState(State(enable = true))

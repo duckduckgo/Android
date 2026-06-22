@@ -10222,6 +10222,26 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenCustomizeResponsesTappedThenSubscriptionEventEmitted() = runTest {
+        val expectedEvent = SubscriptionEventData(
+            featureName = "aiChat",
+            subscriptionName = "submitCustomizeResponsesAction",
+            params = JSONObject(),
+        )
+        whenever(mockDuckChatJSHelper.onNativeAction(NativeAction.CUSTOMIZE_RESPONSES)).thenReturn(expectedEvent)
+
+        testee.onCustomizeResponsesTapped()
+
+        testee.subscriptionEventDataFlow.test {
+            val emittedEvent = awaitItem()
+            assertEquals(expectedEvent.featureName, emittedEvent.featureName)
+            assertEquals(expectedEvent.subscriptionName, emittedEvent.subscriptionName)
+            assertEquals(expectedEvent.params.toString(), emittedEvent.params.toString())
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
     fun whenOpenDuckChatHistoryAndAvailableThenLaunchDuckChatHistoryCommandEmitted() = runTest {
         testee.browserViewState.value = browserViewState().copy(showDuckChatHistoryOption = true)
 

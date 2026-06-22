@@ -138,6 +138,12 @@ class OptionsViewModelTest {
     }
 
     @Test
+    fun whenCustomizeResponsesSelectedThenSelectedPixel() {
+        testee.onCustomizeResponsesSelected()
+        verify(duckChatPixels).fireCustomizeResponsesSelected()
+    }
+
+    @Test
     fun whenVisibleToolsAutoClearsSelectedToolThenNoPixel() = runTest {
         val tabId = "tab-E"
         store.publish(tabId, NativeInputState.zero().copy(selectedTool = Tool.WEB_SEARCH.rawValue))

@@ -169,6 +169,14 @@ class FakeDuckChatInternal(
 
     override val showModelPickerEvents: Flow<String> = _showModelPickerEvents.asSharedFlow()
 
+    private val _focusInputEvents = MutableSharedFlow<String>(extraBufferCapacity = 1)
+
+    override fun requestFocusInput(tabId: String) {
+        _focusInputEvents.tryEmit(tabId)
+    }
+
+    override val focusInputEvents: Flow<String> = _focusInputEvents.asSharedFlow()
+
     override fun isImageUploadEnabled(): Boolean = false
 
     override fun isStandaloneMigrationEnabled(): Boolean = false

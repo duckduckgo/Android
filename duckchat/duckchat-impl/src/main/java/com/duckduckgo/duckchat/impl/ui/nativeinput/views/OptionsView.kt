@@ -135,6 +135,14 @@ class OptionsView(context: Context, private val host: NativeInputHost) : LinearL
         val show = lastNativeInputState?.shouldShowPluginControls() == true
         isVisible = show
         (parent as? View)?.isVisible = show
+        refreshOptionsButtonVisibility()
+    }
+
+    private fun isCustomizeResponsesAvailable(): Boolean =
+        lastNativeInputState?.inputContext == NativeInputState.InputContext.DUCK_AI
+
+    private fun refreshOptionsButtonVisibility() {
+        optionsButton.isVisible = viewModel.visibleTools.value.isNotEmpty() || isCustomizeResponsesAvailable()
     }
 
     private fun renderSelection(tool: Tool?) {
@@ -173,7 +181,7 @@ class OptionsView(context: Context, private val host: NativeInputHost) : LinearL
             if (selectionCleared) host.toolSelected(null)
         }
 
-        optionsButton.isVisible = visibleTools.isNotEmpty()
+        optionsButton.isVisible = visibleTools.isNotEmpty() || isCustomizeResponsesAvailable()
     }
 
     private fun buildOptionsButton(): ImageView {
@@ -233,6 +241,23 @@ class OptionsView(context: Context, private val host: NativeInputHost) : LinearL
             }
             container.addView(row)
         }
+        if (isCustomizeResponsesAvailable()) {
+            container.addView(buildCustomizeResponsesRow(container, popup))
+        }
+    }
+
+    private fun buildCustomizeResponsesRow(container: LinearLayout, popup: PopupWindow): View {
+        val row = LayoutInflater.from(context).inflate(R.layout.view_options_menu_item, container, false)
+        row.findViewById<ImageView>(R.id.optionsMenuItemIcon).setImageResource(R.drawable.ic_options_24)
+        row.findViewById<DaxTextView>(R.id.optionsMenuItemTitle).setText(R.string.duckChatOptionsMenuCustomizeResponses)
+        row.findViewById<DaxTextView>(R.id.optionsMenuItemSubtitle).setText(R.string.duckChatOptionsMenuCustomizeResponsesSubtitle)
+        row.findViewById<ImageView>(R.id.optionsMenuItemTrailingIcon).visibility = GONE
+        row.setOnClickListener {
+            viewModel.onCustomizeResponsesSelected()
+            host.customizeResponsesTapped()
+            row.postDelayed({ popup.dismiss() }, MENU_DISMISS_DELAY_MS)
+        }
+        return row
     }
 
     private fun onOptionTapped(item: MenuItem) {

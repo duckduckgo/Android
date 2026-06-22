@@ -102,6 +102,8 @@ interface NativeInputWidget {
 
     /** Fired when the user picks a model in the model-change flow (→ submitChangeModelAction). */
     var onChangeModelSubmitted: ((modelId: String) -> Unit)?
+
+    var onCustomizeResponsesTapped: (() -> Unit)?
     val isModelMenuVisible: Boolean
 
     fun onBackPressed()
@@ -241,6 +243,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
     private var pulseAnimation: PulseAnimation? = null
     private var submitEnabledJob: Job? = null
     private var openModelPickerJob: Job? = null
+    private var focusInputJob: Job? = null
     private var submitAllowed: Boolean = true
     private var modelPickerView: ModelPicker? = null
     private var optionsView: OptionsView? = null
@@ -261,6 +264,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
     private var widgetRoot: View? = null
     override var onStopTapped: (() -> Unit)? = null
     override var onChangeModelSubmitted: ((modelId: String) -> Unit)? = null
+    override var onCustomizeResponsesTapped: (() -> Unit)? = null
     override var onImageClick: (() -> Unit)? = null
     override var onVoiceSearchClick: (() -> Unit)? = null
         set(value) {
@@ -331,6 +335,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
         observeNativeInputState()
         observeSubmitEnabled()
         observeOpenModelPicker()
+        observeFocusInput()
         bindLeadingFireButtonClick()
         if (onPaidTierChanged != null) observeTier()
     }
@@ -457,6 +462,8 @@ class NativeInputModeWidget @JvmOverloads constructor(
         submitEnabledJob = null
         openModelPickerJob?.cancel()
         openModelPickerJob = null
+        focusInputJob?.cancel()
+        focusInputJob = null
         modelPickerView = null
         optionsView = null
         widgetRoot = null
@@ -478,7 +485,8 @@ class NativeInputModeWidget @JvmOverloads constructor(
                 when (state) {
                     ChatState.HIDE -> {
                         isFocussed = hasInputFocus()
-                        (context as? Activity)?.hideKeyboard()
+                        (context.getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager)
+                            ?.hideSoftInputFromWindow(windowToken, 0)
                         clearInputFocus()
                         widgetRoot?.visibility = GONE
                     }
@@ -486,7 +494,8 @@ class NativeInputModeWidget @JvmOverloads constructor(
                         widgetRoot?.visibility = VISIBLE
                         if (isFocussed) {
                             requestInputFocus()
-                            (context as? Activity)?.showKeyboard(inputField)
+                            (context.getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager)
+                                ?.showSoftInput(inputField, InputMethodManager.SHOW_IMPLICIT)
                         }
                     }
                     ChatState.READY -> {
@@ -1312,6 +1321,14 @@ class NativeInputModeWidget @JvmOverloads constructor(
             .launchIn(scope ?: return)
     }
 
+    private fun observeFocusInput() {
+        focusInputJob?.cancel()
+        val scope = findViewTreeLifecycleOwner()?.lifecycleScope
+        focusInputJob = viewModel.focusInputEvents
+            .onEach { focusInput(context as? Activity) }
+            .launchIn(scope ?: return)
+    }
+
     private fun observeNativeInputState() {
         nativeInputStateJob?.cancel()
         val lifecycleOwner = findViewTreeLifecycleOwner() ?: return
@@ -1435,6 +1452,10 @@ class NativeInputModeWidget @JvmOverloads constructor(
 
     override fun toolSelected(tool: String?) {
         viewModel.setSelectedTool(tool)
+    }
+
+    override fun customizeResponsesTapped() {
+        onCustomizeResponsesTapped?.invoke()
     }
 
     override fun showModelPicker(showing: Boolean) {

@@ -808,6 +808,20 @@
         "suffixes": ["form_factor"],
         "parameters": ["appVersion"]
     },
+    "m_aichat_unified_input_customize_responses_selected_count": {
+        "description": "User selected the Customize Responses action in the Unified Input options menu",
+        "owners": ["joshliebe"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_unified_input_customize_responses_selected_daily": {
+        "description": "(Daily Pixel) User selected the Customize Responses action in the Unified Input options menu",
+        "owners": ["joshliebe"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
     "m_aichat_unified_input_image_removed_count": {
         "description": "User removed an attached image from the Unified Input",
         "owners": ["malmstein"],

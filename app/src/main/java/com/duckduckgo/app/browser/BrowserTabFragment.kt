@@ -1490,6 +1490,7 @@ class BrowserTabFragment :
                         ),
                     )
                 },
+                onCustomizeResponsesTapped = { viewModel.onCustomizeResponsesTapped() },
                 onFireButtonPressed = { onFireButtonPressed() },
                 onVoiceSearchPressed = { isChatTab ->
                     val mode = if (isChatTab) VoiceSearchMode.DUCK_AI else VoiceSearchMode.SEARCH
