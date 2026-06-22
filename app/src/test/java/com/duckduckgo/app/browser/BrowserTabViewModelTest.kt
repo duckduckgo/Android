@@ -5573,6 +5573,54 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenHandleDuckChatUrlInCustomTabWithQueryAndFeatureEnabledThenOpenDuckChatWithPrefillAndCloseCustomTabAndReturnTrue() = runTest {
+        fakeAndroidConfigBrowserFeature.redirectDuckAiLinksFromCustomTab().setRawStoredState(State(enable = true))
+        testee.setIsCustomTab(true)
+
+        val handled = testee.handleDuckChatUrlInCustomTab("https://duck.ai/?q=hello".toUri())
+
+        assertTrue(handled)
+        verify(mockDuckChat).openDuckChatWithPrefill("hello")
+        assertTrue(captureCommands().allValues.contains(Command.FinishCustomTab))
+    }
+
+    @Test
+    fun whenHandleDuckChatUrlInCustomTabWithoutQueryAndFeatureEnabledThenOpenDuckChatAndCloseCustomTabAndReturnTrue() = runTest {
+        fakeAndroidConfigBrowserFeature.redirectDuckAiLinksFromCustomTab().setRawStoredState(State(enable = true))
+        testee.setIsCustomTab(true)
+
+        val handled = testee.handleDuckChatUrlInCustomTab("https://duck.ai/".toUri())
+
+        assertTrue(handled)
+        verify(mockDuckChat).openDuckChat()
+        assertTrue(captureCommands().allValues.contains(Command.FinishCustomTab))
+    }
+
+    @Test
+    fun whenHandleDuckChatUrlInCustomTabButNotCustomTabThenReturnFalseAndDoNotOpenDuckChat() = runTest {
+        fakeAndroidConfigBrowserFeature.redirectDuckAiLinksFromCustomTab().setRawStoredState(State(enable = true))
+        testee.setIsCustomTab(false)
+
+        val handled = testee.handleDuckChatUrlInCustomTab("https://duck.ai/?q=hello".toUri())
+
+        assertFalse(handled)
+        verify(mockDuckChat, never()).openDuckChat()
+        verify(mockDuckChat, never()).openDuckChatWithPrefill(any())
+    }
+
+    @Test
+    fun whenHandleDuckChatUrlInCustomTabButFeatureDisabledThenReturnFalseAndDoNotOpenDuckChat() = runTest {
+        fakeAndroidConfigBrowserFeature.redirectDuckAiLinksFromCustomTab().setRawStoredState(State(enable = false))
+        testee.setIsCustomTab(true)
+
+        val handled = testee.handleDuckChatUrlInCustomTab("https://duck.ai/?q=hello".toUri())
+
+        assertFalse(handled)
+        verify(mockDuckChat, never()).openDuckChat()
+        verify(mockDuckChat, never()).openDuckChatWithPrefill(any())
+    }
+
+    @Test
     fun whenHandleNewTabIfEmptyUrlAndNonNoNavigationStateThenThenDoNotSetOmnibarText() {
         loadUrl("url")
         testee.handleNewTabIfEmptyUrl()

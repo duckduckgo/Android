@@ -19,8 +19,8 @@
 <resources>
     <string name="ad_blocking_settings_title">Blocco degli annunci su YouTube</string>
     <string name="ad_blocking_settings_toggle_title">Blocca gli annunci su YouTube</string>
-    <string name="ad_blocking_settings_description_with_consent">DuckDuckGo blocca gli annunci video su YouTube, così puoi guardare video senza interruzioni.\n\nQuando questa opzione è attivata, DuckDuckGo rileverà in modo anonimo interferenze nel blocco degli annunci o errori di YouTube per migliorare l\'esperienza di tutti. DuckDuckGo non vede mai quali video visualizzi né alcuna informazione di identificazione personale. <annotation type="learn_more_link">Ulteriori informazioni</annotation></string>
+    <string name="ad_blocking_settings_description_with_consent">DuckDuckGo blocca gli annunci video su YouTube, così puoi guardare video senza interruzioni. \n\nQuando questa opzione è attivata, DuckDuckGo rileverà in modo anonimo interferenze nel blocco degli annunci o errori di YouTube per migliorare l\'esperienza di tutti. DuckDuckGo non vede mai quali video visualizzi né alcuna informazione di identificazione personale. <annotation type="learn_more_link">Ulteriori informazioni</annotation></string>
     <string name="ad_blocking_settings_description">DuckDuckGo blocca gli annunci video su YouTube, così puoi guardare video senza interruzioni. <annotation type="learn_more_link">Ulteriori informazioni</annotation></string>
     <string name="ad_blocking_settings_duck_player_header">Duck Player</string>
-    <string name="ad_blocking_settings_duck_player_description">Apre i video in una modalità cinema che impedisce a ciò che guardi di influenzare il tuo feed di YouTube.</string>
+    <string name="ad_blocking_settings_duck_player_description">Apre i video in una modalità cinema senza distrazioni che impedisce a ciò che guardi di influenzare il tuo feed di YouTube.</string>
 </resources>

@@ -18,9 +18,9 @@
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
     <string name="ad_blocking_settings_title">„YouTube“ reklamų blokavimas</string>
-    <string name="ad_blocking_settings_toggle_title">Blokuoti reklamas „YouTube“</string>
-    <string name="ad_blocking_settings_description_with_consent">„DuckDuckGo“ blokuoja vaizdo įrašų reklamas „YouTube“ platformoje, todėl galite žiūrėti vaizdo įrašus be trukdžių.\n\nKai įjungta, „DuckDuckGo“ anonimiškai aptiks skelbimų blokavimo trukdžius arba „YouTube“ klaidas, kad pagerintų patirtį visiems. „DuckDuckGo“ niekada nemato, kokius vaizdo įrašus žiūrite, ar bet kokios asmenį identifikuojančios informacijos. <annotation type="learn_more_link">Sužinoti daugiau</annotation></string>
-    <string name="ad_blocking_settings_description">„DuckDuckGo“ blokuoja vaizdo įrašų reklamas „YouTube“ platformoje, todėl galite žiūrėti vaizdo įrašus be trukdžių. <annotation type="learn_more_link">Sužinoti daugiau</annotation></string>
+    <string name="ad_blocking_settings_toggle_title">Blokuoti „YouTube“ reklamas</string>
+    <string name="ad_blocking_settings_description_with_consent">„DuckDuckGo“ blokuoja vaizdo įrašų reklamas platformoje „YouTube“, todėl galite žiūrėti vaizdo įrašus be trukdžių.\n\nKai įjungta, „DuckDuckGo“ anonimiškai aptiks skelbimų blokavimo trukdžius arba „YouTube“ klaidas, kad pagerintų patirtį visiems. „DuckDuckGo“ niekada nemato, kokius vaizdo įrašus žiūrite, ar bet kokios asmenį identifikuojančios informacijos. <annotation type="learn_more_link">Sužinokite daugiau</annotation></string>
+    <string name="ad_blocking_settings_description">„DuckDuckGo“ blokuoja vaizdo įrašų reklamas platformoje „YouTube“, todėl galite žiūrėti vaizdo įrašus be trukdžių. <annotation type="learn_more_link">Sužinokite daugiau</annotation></string>
     <string name="ad_blocking_settings_duck_player_header">Duck Player</string>
-    <string name="ad_blocking_settings_duck_player_description">Atidaro vaizdo įrašus kino teatro režimu, kad tai, ką žiūri, nedarytų įtakos tavo „YouTube“ srautui.</string>
+    <string name="ad_blocking_settings_duck_player_description">Atidaro vaizdo įrašus neblaškančiu kino teatro režimu, kad tai, ką žiūri, nedarytų įtakos tavo „YouTube“ srautui.</string>
 </resources>

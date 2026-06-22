@@ -235,6 +235,8 @@ class RealPirJobsRunnerTest {
         // Then
         verify(mockPirRepository, never()).setLatestBackgroundScanRunInMs(any())
         verify(mockPixelSender).reportManualScanStarted(any(), any(), any(), eq(MANUAL_INITIAL), any())
+        // No eligible scan jobs (no active brokers) -> first-scan activation pixel does not fire
+        verify(mockPixelSender, never()).reportFirstScanStarted()
         verify(mockPixelSender).reportManualScanCompleted(any(), any(), any(), any(), any(), any(), any(), eq(MANUAL_INITIAL), any())
         verify(mockPirScan).stop()
         verifyNoMoreInteractions(mockPixelSender)
@@ -287,6 +289,7 @@ class RealPirJobsRunnerTest {
 
         // Then
         verify(mockPixelSender).reportManualScanStarted(any(), any(), any(), eq(MANUAL_INITIAL), any())
+        verify(mockPixelSender).reportFirstScanStarted()
         // we just dont attempt what the mock for time provider is giving us
         verify(mockPixelSender).reportInitialScanDuration(eq(0L), eq(2), eq(false), eq(false), eq(1), eq(MANUAL_INITIAL), any())
         verify(mockPixelSender).reportManualScanCompleted(any(), any(), any(), any(), any(), any(), any(), eq(MANUAL_INITIAL), any())
@@ -342,6 +345,7 @@ class RealPirJobsRunnerTest {
 
         // Then
         verify(mockPixelSender).reportManualScanStarted(any(), any(), any(), eq(MANUAL_INITIAL), any())
+        verify(mockPixelSender).reportFirstScanStarted()
         verify(mockPixelSender).reportManualScanCompleted(any(), any(), any(), any(), any(), any(), any(), eq(MANUAL_INITIAL), any())
         // we just dont attempt what the mock for time provider is giving us
         verify(mockPixelSender).reportInitialScanDuration(eq(0L), eq(2), eq(false), eq(false), eq(2), eq(MANUAL_INITIAL), any())
@@ -384,6 +388,7 @@ class RealPirJobsRunnerTest {
         verify(mockPixelSender).reportManualScanStarted(any(), any(), any(), eq(MANUAL_EDIT_PROFILE), any())
         verify(mockPixelSender).reportInitialScanDuration(any(), any(), any(), any(), any(), eq(MANUAL_EDIT_PROFILE), any())
         verify(mockPixelSender).reportManualScanCompleted(any(), any(), any(), any(), any(), any(), any(), eq(MANUAL_EDIT_PROFILE), any())
+        verify(mockPixelSender, never()).reportFirstScanStarted()
     }
 
     @Test
@@ -429,6 +434,7 @@ class RealPirJobsRunnerTest {
         // Then
         verify(mockPixelSender).reportScheduledScanStarted(any(), any())
         verify(mockPixelSender).reportScheduledScanCompleted(any(), any(), any(), any(), any())
+        verify(mockPixelSender, never()).reportFirstScanStarted()
         verify(mockPirScan).executeScanForJobs(
             eq(listOf(testScanJobRecord)),
             eq(mockContext),
@@ -1211,6 +1217,8 @@ class RealPirJobsRunnerTest {
         // Then
         verify(mockBrokerJsonUpdater).update()
         verify(mockPixelSender).reportManualScanStarted(any(), any(), any(), eq(MANUAL_INITIAL), any())
+        // No eligible scan jobs (broker data still empty) -> first-scan activation pixel does not fire
+        verify(mockPixelSender, never()).reportFirstScanStarted()
         verify(mockPixelSender).reportManualScanCompleted(any(), any(), any(), any(), any(), any(), any(), eq(MANUAL_INITIAL), any())
         verifyNoMoreInteractions(mockPixelSender)
         verifyNoInteractions(mockEligibleScanJobProvider)
@@ -1264,6 +1272,8 @@ class RealPirJobsRunnerTest {
         // Then
         verifyNoInteractions(mockBrokerJsonUpdater)
         verify(mockPixelSender).reportManualScanStarted(any(), any(), any(), eq(MANUAL_INITIAL), any())
+        // No eligible scan jobs (no active brokers) -> first-scan activation pixel does not fire
+        verify(mockPixelSender, never()).reportFirstScanStarted()
         verify(mockPixelSender).reportManualScanCompleted(any(), any(), any(), any(), any(), any(), any(), eq(MANUAL_INITIAL), any())
         verifyNoMoreInteractions(mockPixelSender)
     }

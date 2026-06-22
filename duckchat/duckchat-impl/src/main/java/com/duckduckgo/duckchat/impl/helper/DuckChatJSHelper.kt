@@ -201,7 +201,10 @@ class RealDuckChatJSHelper @Inject constructor(
             }
 
             METHOD_SHOW_MODEL_PICKER -> {
-                if (tabId.isNotEmpty()) duckChat.requestShowModelPicker(tabId)
+                if (tabId.isNotEmpty()) {
+                    duckChat.requestShowModelPicker(tabId)
+                    duckChatPixels.fireShowModelPicker()
+                }
                 null
             }
 

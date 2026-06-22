@@ -19,6 +19,7 @@ package com.duckduckgo.sync.impl.ui
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.sync.TestSyncFixtures
 import com.duckduckgo.sync.TestSyncFixtures.jsonConnectKey
 import com.duckduckgo.sync.TestSyncFixtures.jsonConnectKeyEncoded
@@ -28,6 +29,10 @@ import com.duckduckgo.sync.TestSyncFixtures.primaryKey
 import com.duckduckgo.sync.impl.AccountErrorCodes.ALREADY_SIGNED_IN
 import com.duckduckgo.sync.impl.AccountErrorCodes.CONNECT_FAILED
 import com.duckduckgo.sync.impl.AccountErrorCodes.LOGIN_FAILED
+import com.duckduckgo.sync.impl.AccountErrorCodes.PAIRING_CANCELLED
+import com.duckduckgo.sync.impl.AccountErrorCodes.PAIRING_FAILED
+import com.duckduckgo.sync.impl.AccountErrorCodes.PAIRING_REJECTED
+import com.duckduckgo.sync.impl.AccountInfo
 import com.duckduckgo.sync.impl.Clipboard
 import com.duckduckgo.sync.impl.ConnectCode
 import com.duckduckgo.sync.impl.QREncoder
@@ -37,19 +42,41 @@ import com.duckduckgo.sync.impl.SyncAccountRepository
 import com.duckduckgo.sync.impl.SyncAccountRepository.AuthCode
 import com.duckduckgo.sync.impl.SyncAuthCode.Connect
 import com.duckduckgo.sync.impl.SyncAuthCode.Recovery
+import com.duckduckgo.sync.impl.SyncCodeType
+import com.duckduckgo.sync.impl.SyncFeature
+import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2CodeParseResult
+import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Event
+import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Message
+import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2State
+import com.duckduckgo.sync.impl.exchange.v2.LocalTrigger
+import com.duckduckgo.sync.impl.exchange.v2.PairingRole
 import com.duckduckgo.sync.impl.pixels.SyncPixels
+import com.duckduckgo.sync.impl.pixels.SyncPixels.CancellationReason
+import com.duckduckgo.sync.impl.pixels.SyncPixels.CodeVersion
+import com.duckduckgo.sync.impl.pixels.SyncPixels.PeerKind
 import com.duckduckgo.sync.impl.pixels.SyncPixels.ScreenType.SYNC_CONNECT
+import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupFailureReason
+import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupPath
 import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command
+import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command.AskHostConfirmation
+import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command.AskJoinerConfirmation
 import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command.LoginSuccess
+import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command.ShowError
+import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command.ShowV2Error
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.eq
+import org.mockito.kotlin.isNull
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.times
@@ -66,13 +93,38 @@ class SyncConnectViewModelTest {
     private val qrEncoder: QREncoder = mock()
     private val syncPixels: SyncPixels = mock()
 
+    private val syncFeature = com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory.create(SyncFeature::class.java)
+
+    private val runnerEventsFlow = kotlinx.coroutines.flow.MutableSharedFlow<com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Event>(replay = 0)
+    private val qrCode: com.duckduckgo.sync.impl.exchange.v2.ExchangeV2QrCode = mock()
+    private val runner: com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Runner = mock<com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Runner>().also {
+        whenever(it.events).thenReturn(runnerEventsFlow)
+        whenever(it.eventsSince(any())).thenAnswer { invocation ->
+            val sinceMs = invocation.getArgument<Long>(0)
+            runnerEventsFlow.filter { event -> event.timestampMs >= sinceMs }
+        }
+    }
+    private val codeDispatcher = com.duckduckgo.sync.impl.RealSyncCodeDispatcher(
+        syncFeature = syncFeature,
+        syncAccountRepository = syncRepository,
+        qrCode = qrCode,
+        runner = runner,
+    )
+
     private val testee = SyncConnectViewModel(
         syncRepository,
         qrEncoder,
         clipboard,
         syncPixels,
         coroutineTestRule.testDispatcherProvider,
+        syncFeature,
+        codeDispatcher,
     )
+
+    @Before
+    fun setup() {
+        whenever(syncRepository.getAccountInfo()).thenReturn(AccountInfo())
+    }
 
     @Test
     fun whenScreenStartedThenShowQRCode() = runTest {
@@ -181,9 +233,9 @@ class SyncConnectViewModelTest {
             testee.onQRCodeScanned(jsonConnectKeyEncoded)
             val command = awaitItem()
             assertTrue(command is Command.LoginSuccess)
-            verify(syncPixels).fireBarcodeScannerParseSuccess(eq(SyncPixels.ScreenType.SYNC_CONNECT))
+            verify(syncPixels).fireBarcodeScannerParseSuccess(eq(SyncPixels.ScreenType.SYNC_CONNECT), eq(CodeVersion.V1), isNull())
             verify(syncPixels).fireLoginPixel()
-            verify(syncPixels).fireSyncSetupFinishedSuccessfully(eq(SyncPixels.ScreenType.SYNC_CONNECT))
+            verify(syncPixels).fireSyncSetupFinishedSuccessfully(eq(SyncPixels.ScreenType.SYNC_CONNECT), isNull(), isNull(), isNull())
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -196,9 +248,9 @@ class SyncConnectViewModelTest {
             testee.onQRCodeScanned(jsonRecoveryKeyEncoded)
             val command = awaitItem()
             assertTrue(command is Command.ShowError)
-            verify(syncPixels).fireBarcodeScannerParseSuccess(eq(SyncPixels.ScreenType.SYNC_CONNECT))
+            verify(syncPixels).fireBarcodeScannerParseSuccess(eq(SyncPixels.ScreenType.SYNC_CONNECT), eq(CodeVersion.V1), isNull())
             verify(syncPixels, never()).fireLoginPixel()
-            verify(syncPixels, never()).fireSyncSetupFinishedSuccessfully(any())
+            verify(syncPixels, never()).fireSyncSetupFinishedSuccessfully(any(), anyOrNull(), anyOrNull(), anyOrNull())
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -212,9 +264,33 @@ class SyncConnectViewModelTest {
             testee.onQRCodeScanned(jsonConnectKeyEncoded)
             val command = awaitItem()
             assertTrue(command is Command.ShowError)
-            verify(syncPixels).fireBarcodeScannerParseSuccess(eq(SyncPixels.ScreenType.SYNC_CONNECT))
+            verify(syncPixels).fireBarcodeScannerParseSuccess(eq(SyncPixels.ScreenType.SYNC_CONNECT), eq(CodeVersion.V1), isNull())
             verify(syncPixels, never()).fireLoginPixel()
-            verify(syncPixels, never()).fireSyncSetupFinishedSuccessfully(any())
+            verify(syncPixels, never()).fireSyncSetupFinishedSuccessfully(any(), anyOrNull(), anyOrNull(), anyOrNull())
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenUserScansV2RecoveryCodeThenBarcodeScannerParseSuccessFiredWithV2Recovery() = runTest {
+        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
+        val rawJson = org.json.JSONObject().apply {
+            put("user_id", "u-1")
+            put("secret", "s-1")
+            put("cid", "ddg")
+        }
+        whenever(qrCode.parse(any())).thenReturn(ExchangeV2CodeParseResult.RecoveryCode(rawJson))
+        whenever(syncRepository.processCode(any(), anyOrNull())).thenReturn(Result.Success(true))
+
+        testee.commands().test {
+            testee.onQRCodeScanned("v2-recovery-code")
+            val command = awaitItem()
+            assertTrue("expected LoginSuccess, got $command", command is LoginSuccess)
+            verify(syncPixels).fireBarcodeScannerParseSuccess(
+                eq(SyncPixels.ScreenType.SYNC_CONNECT),
+                eq(CodeVersion.V2),
+                eq(SyncCodeType.RECOVERY),
+            )
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -226,7 +302,8 @@ class SyncConnectViewModelTest {
             val command = awaitItem()
             assertTrue(command is Command.LoginSuccess)
             verify(syncPixels).fireLoginPixel()
-            verify(syncPixels).fireSyncSetupFinishedSuccessfully(eq(SyncPixels.ScreenType.SYNC_CONNECT))
+            // Manual entry fires "Setup success" from EnterCodeViewModel, not here.
+            verify(syncPixels, never()).fireSyncSetupFinishedSuccessfully(any(), anyOrNull(), anyOrNull(), anyOrNull())
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -234,7 +311,7 @@ class SyncConnectViewModelTest {
     @Test
     fun whenUserCancelsThenAbandonedPixelFired() = runTest {
         testee.onUserCancelledWithoutSyncSetup()
-        verify(syncPixels).fireSyncSetupAbandoned(eq(SYNC_CONNECT))
+        verify(syncPixels).fireSyncSetupAbandoned(eq(SYNC_CONNECT), eq(CancellationReason.SCANNING_CANCELLED))
     }
 
     @Test
@@ -290,6 +367,530 @@ class SyncConnectViewModelTest {
             awaitItem()
             cancelAndIgnoreRemainingEvents()
             verify(syncRepository, times(2)).pollConnectionKeys()
+        }
+    }
+
+    private fun enableV2(displayOn: Boolean) {
+        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
+        syncFeature.canShowV2ConnectCode().setRawStoredState(State(displayOn))
+    }
+
+    private fun presenterSessionStarted(linkingCode: String = "https://duckduckgo.com/sync/pairing/#&code2=xyz") =
+        ExchangeV2Event.SessionStarted(
+            timestampMs = System.currentTimeMillis(),
+            pairingRole = PairingRole.Presenter,
+            ownChannelId = "own-channel",
+            linkingCode = linkingCode,
+        )
+
+    private fun transition(
+        from: ExchangeV2State,
+        to: ExchangeV2State,
+        localTrigger: LocalTrigger? = null,
+        trigger: ExchangeV2Message? = null,
+    ) = ExchangeV2Event.Transition(
+        timestampMs = System.currentTimeMillis(),
+        from = from,
+        to = to,
+        trigger = trigger,
+        localTrigger = localTrigger,
+    )
+
+    @Test
+    fun whenBothV2FlagsOnThenRunnerStartPresentInvokedAndV1ConnectQRNotCalled() = runTest {
+        enableV2(displayOn = true)
+        val bitmap = TestSyncFixtures.qrBitmap()
+        whenever(qrEncoder.encodeAsBitmap(any(), any(), any())).thenReturn(bitmap)
+
+        testee.viewState(source = null).test {
+            runnerEventsFlow.emit(presenterSessionStarted())
+            awaitItem()
+            val withQr = awaitItem()
+            Assert.assertEquals(bitmap, withQr.qrCodeBitmap)
+            cancelAndIgnoreRemainingEvents()
+        }
+        verify(runner).startPresent()
+        verify(syncRepository, never()).getConnectQR()
+    }
+
+    @Test
+    fun whenMasterFlagOnButCanShowV2OffThenV1PathTaken() = runTest {
+        enableV2(displayOn = false)
+        val bitmap = TestSyncFixtures.qrBitmap()
+        val authCode = AuthCode(qrCode = jsonConnectKeyEncoded, rawCode = "raw")
+        whenever(qrEncoder.encodeAsBitmap(eq(jsonConnectKeyEncoded), any(), any())).thenReturn(bitmap)
+        whenever(syncRepository.getConnectQR()).thenReturn(Result.Success(authCode))
+        whenever(syncRepository.pollConnectionKeys()).thenReturn(Result.Success(true))
+
+        testee.viewState(source = null).test {
+            awaitItem()
+            cancelAndIgnoreRemainingEvents()
+        }
+        verify(runner, never()).startPresent()
+        verify(syncRepository).getConnectQR()
+    }
+
+    @Test
+    fun whenMasterFlagOffThenV1PathTakenRegardlessOfDisplayFlag() = runTest {
+        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(false))
+        syncFeature.canShowV2ConnectCode().setRawStoredState(State(true))
+        val bitmap = TestSyncFixtures.qrBitmap()
+        val authCode = AuthCode(qrCode = jsonConnectKeyEncoded, rawCode = "raw")
+        whenever(qrEncoder.encodeAsBitmap(eq(jsonConnectKeyEncoded), any(), any())).thenReturn(bitmap)
+        whenever(syncRepository.getConnectQR()).thenReturn(Result.Success(authCode))
+        whenever(syncRepository.pollConnectionKeys()).thenReturn(Result.Success(true))
+
+        testee.viewState(source = null).test {
+            awaitItem()
+            cancelAndIgnoreRemainingEvents()
+        }
+        verify(runner, never()).startPresent()
+    }
+
+    @Test
+    fun whenLinkingCodeReadyThenCopyEmitsUrl() = runTest {
+        enableV2(displayOn = true)
+        val url = "https://duckduckgo.com/sync/pairing/#&code2=copy-me"
+        whenever(qrEncoder.encodeAsBitmap(eq(url), any(), any())).thenReturn(TestSyncFixtures.qrBitmap())
+
+        testee.viewState(source = null).test {
+            runnerEventsFlow.emit(presenterSessionStarted(linkingCode = url))
+            awaitItem()
+            awaitItem()
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        testee.onCopyCodeClicked()
+        verify(clipboard).copyToClipboard(url)
+        verify(syncRepository, never()).getConnectQR()
+    }
+
+    @Test
+    fun whenJoinerConfirmingDuringV2PresentThenAskJoinerConfirmationCommandEmitted() = runTest {
+        enableV2(displayOn = true)
+        whenever(runner.peerName).thenReturn("Peer Phone")
+        whenever(runner.peerKind).thenReturn("ddg")
+        whenever(qrEncoder.encodeAsBitmap(any(), any(), any())).thenReturn(TestSyncFixtures.qrBitmap())
+
+        testee.viewState(source = null).test {
+            awaitItem()
+            runnerEventsFlow.emit(presenterSessionStarted())
+            awaitItem()
+            runnerEventsFlow.emit(
+                transition(from = ExchangeV2State.Negotiating, to = ExchangeV2State.Joiner.Confirming),
+            )
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        testee.commands().test {
+            val command = awaitItem()
+            assertTrue("expected AskJoinerConfirmation, got $command", command is AskJoinerConfirmation)
+            Assert.assertEquals("Peer Phone", (command as AskJoinerConfirmation).peerName)
+            Assert.assertEquals(PeerKind.DDG, (command as AskJoinerConfirmation).peerKind)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenHostConfirmingDuringV2PresentThenAskHostConfirmationCommandEmitted() = runTest {
+        enableV2(displayOn = true)
+        whenever(runner.peerName).thenReturn("Peer Phone")
+        whenever(runner.peerKind).thenReturn("3party")
+        whenever(qrEncoder.encodeAsBitmap(any(), any(), any())).thenReturn(TestSyncFixtures.qrBitmap())
+
+        testee.viewState(source = null).test {
+            awaitItem()
+            runnerEventsFlow.emit(presenterSessionStarted())
+            awaitItem()
+            runnerEventsFlow.emit(
+                transition(from = ExchangeV2State.Negotiating, to = ExchangeV2State.Host.Confirming),
+            )
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        testee.commands().test {
+            val command = awaitItem()
+            assertTrue("expected AskHostConfirmation, got $command", command is AskHostConfirmation)
+            Assert.assertEquals("Peer Phone", (command as AskHostConfirmation).peerName)
+            Assert.assertEquals(PeerKind.THIRD_PARTY, (command as AskHostConfirmation).peerKind)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenJoinerDoneWithCidDdgRecoveryCodeThenLoginSuccess() = runTest {
+        enableV2(displayOn = true)
+        whenever(qrEncoder.encodeAsBitmap(any(), any(), any())).thenReturn(TestSyncFixtures.qrBitmap())
+        val recoveryJson = org.json.JSONObject().apply {
+            put(
+                "recovery",
+                org.json.JSONObject().apply {
+                    put("user_id", "u-1")
+                    put("secret", "s-1")
+                    put("cid", "ddg")
+                    put("v", "2.0")
+                },
+            )
+        }.toString()
+        val b64 = android.util.Base64.encodeToString(
+            recoveryJson.toByteArray(Charsets.UTF_8),
+            android.util.Base64.URL_SAFE or android.util.Base64.NO_PADDING or android.util.Base64.NO_WRAP,
+        )
+        whenever(syncRepository.processCode(any(), anyOrNull())).thenReturn(Result.Success(true))
+
+        testee.viewState(source = null).test {
+            awaitItem()
+            runnerEventsFlow.emit(presenterSessionStarted())
+            awaitItem()
+            runnerEventsFlow.emit(
+                transition(
+                    from = ExchangeV2State.Joiner.Waiting,
+                    to = ExchangeV2State.Joiner.Done,
+                    trigger = ExchangeV2Message.RecoveryCodeResponse(rawJson = "{}", recoveryCode = b64),
+                ),
+            )
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        testee.commands().test {
+            val command = awaitItem()
+            assertTrue("expected LoginSuccess, got $command", command is LoginSuccess)
+            cancelAndIgnoreRemainingEvents()
+        }
+        verify(syncRepository).processCode(any(), anyOrNull())
+    }
+
+    @Test
+    fun whenJoinerDoneViaCid3partyThenLoginSuccessAndUpgradeInvoked() = runTest {
+        enableV2(displayOn = true)
+        whenever(qrEncoder.encodeAsBitmap(any(), any(), any())).thenReturn(TestSyncFixtures.qrBitmap())
+        val recoveryJson = org.json.JSONObject().apply {
+            put(
+                "recovery",
+                org.json.JSONObject().apply {
+                    put("user_id", "u-3p")
+                    put("secret", "s-3p")
+                    put("cid", "3party")
+                    put("v", "2.0")
+                },
+            )
+        }.toString()
+        val b64 = android.util.Base64.encodeToString(
+            recoveryJson.toByteArray(Charsets.UTF_8),
+            android.util.Base64.URL_SAFE or android.util.Base64.NO_PADDING or android.util.Base64.NO_WRAP,
+        )
+        whenever(syncRepository.joinAccountFromThirdPartyRecoveryCode(any())).thenReturn(Result.Success(true))
+
+        testee.viewState(source = null).test {
+            awaitItem()
+            runnerEventsFlow.emit(presenterSessionStarted())
+            awaitItem()
+            runnerEventsFlow.emit(
+                transition(
+                    from = ExchangeV2State.Joiner.Waiting,
+                    to = ExchangeV2State.Joiner.Done,
+                    trigger = ExchangeV2Message.RecoveryCodeResponse(rawJson = "{}", recoveryCode = b64),
+                ),
+            )
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        testee.commands().test {
+            val command = awaitItem()
+            assertTrue("expected LoginSuccess, got $command", command is LoginSuccess)
+            cancelAndIgnoreRemainingEvents()
+        }
+        verify(syncRepository).joinAccountFromThirdPartyRecoveryCode(any())
+    }
+
+    @Test
+    fun whenV2LinkingCodeScannedThenRoutedThroughDispatcherAndLoginSuccess() = runTest {
+        enableV2(displayOn = true)
+        val scannedUrl = "https://duckduckgo.com/sync/pairing/#&code2=scan-me"
+        whenever(qrCode.parse(scannedUrl)).thenReturn(
+            com.duckduckgo.sync.impl.exchange.v2.ExchangeV2CodeParseResult.LinkingV2(
+                channelId = "chan",
+                publicKey = "pk",
+                version = "2",
+            ),
+        )
+        val recoveryJson = org.json.JSONObject().apply {
+            put(
+                "recovery",
+                org.json.JSONObject().apply {
+                    put("user_id", "u-1")
+                    put("secret", "s-1")
+                    put("cid", "ddg")
+                    put("v", "2.0")
+                },
+            )
+        }.toString()
+        val recoveryB64 = android.util.Base64.encodeToString(
+            recoveryJson.toByteArray(Charsets.UTF_8),
+            android.util.Base64.URL_SAFE or android.util.Base64.NO_PADDING or android.util.Base64.NO_WRAP,
+        )
+        whenever(syncRepository.processCode(any(), anyOrNull())).thenReturn(Result.Success(true))
+
+        testee.commands().test {
+            testee.onQRCodeScanned(scannedUrl)
+            runnerEventsFlow.emit(
+                transition(
+                    from = ExchangeV2State.Joiner.Waiting,
+                    to = ExchangeV2State.Joiner.Done,
+                    trigger = ExchangeV2Message.RecoveryCodeResponse(rawJson = "{}", recoveryCode = recoveryB64),
+                ),
+            )
+            val command = awaitItem()
+            assertTrue("expected LoginSuccess, got $command", command is LoginSuccess)
+            cancelAndIgnoreRemainingEvents()
+        }
+        verify(runner).startScan(scannedUrl)
+    }
+
+    @Test
+    fun whenHostDoneDuringV2PresentThenLoginSuccess() = runTest {
+        enableV2(displayOn = true)
+        whenever(qrEncoder.encodeAsBitmap(any(), any(), any())).thenReturn(TestSyncFixtures.qrBitmap())
+
+        testee.viewState(source = null).test {
+            awaitItem()
+            runnerEventsFlow.emit(presenterSessionStarted())
+            awaitItem()
+            runnerEventsFlow.emit(
+                transition(from = ExchangeV2State.Host.Sending, to = ExchangeV2State.Host.Done),
+            )
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        testee.commands().test {
+            val command = awaitItem()
+            assertTrue("expected LoginSuccess, got $command", command is LoginSuccess)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenJoinerAbortedByHostThenShowError() = runTest {
+        enableV2(displayOn = true)
+        whenever(qrEncoder.encodeAsBitmap(any(), any(), any())).thenReturn(TestSyncFixtures.qrBitmap())
+
+        testee.viewState(source = null).test {
+            awaitItem()
+            runnerEventsFlow.emit(presenterSessionStarted())
+            awaitItem()
+            runnerEventsFlow.emit(
+                transition(from = ExchangeV2State.Joiner.Waiting, to = ExchangeV2State.Joiner.AbortedByHost),
+            )
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        testee.commands().test {
+            val command = awaitItem()
+            assertTrue("expected ShowV2Error, got $command", command is ShowV2Error)
+            assertEquals(PAIRING_REJECTED.code.toV2PairingError(), (command as ShowV2Error).content)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenJoinerAbortedLocalThenShowError() = runTest {
+        enableV2(displayOn = true)
+        whenever(qrEncoder.encodeAsBitmap(any(), any(), any())).thenReturn(TestSyncFixtures.qrBitmap())
+
+        testee.viewState(source = null).test {
+            awaitItem()
+            runnerEventsFlow.emit(presenterSessionStarted())
+            awaitItem()
+            runnerEventsFlow.emit(
+                transition(
+                    from = ExchangeV2State.Joiner.Confirming,
+                    to = ExchangeV2State.Joiner.AbortedLocal,
+                    localTrigger = LocalTrigger.UserDeniedJoiner,
+                ),
+            )
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        testee.commands().test {
+            val command = awaitItem()
+            assertTrue("expected ShowV2Error, got $command", command is ShowV2Error)
+            assertEquals(PAIRING_CANCELLED.code.toV2PairingError(), (command as ShowV2Error).content)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenHostAbortedUserDeniedThenShowError() = runTest {
+        enableV2(displayOn = true)
+        whenever(qrEncoder.encodeAsBitmap(any(), any(), any())).thenReturn(TestSyncFixtures.qrBitmap())
+
+        testee.viewState(source = null).test {
+            awaitItem()
+            runnerEventsFlow.emit(presenterSessionStarted())
+            awaitItem()
+            runnerEventsFlow.emit(
+                transition(
+                    from = ExchangeV2State.Host.Confirming,
+                    to = ExchangeV2State.Host.Aborted,
+                    localTrigger = LocalTrigger.UserDeniedHost,
+                ),
+            )
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        testee.commands().test {
+            val command = awaitItem()
+            assertTrue("expected ShowV2Error, got $command", command is ShowV2Error)
+            assertEquals(PAIRING_CANCELLED.code.toV2PairingError(), (command as ShowV2Error).content)
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        // Denying the confirmation (PAIRING_CANCELLED) fires the cancellation pixel, not the failed one.
+        verify(syncPixels).fireSyncSetupAbandoned(eq(SYNC_CONNECT), eq(CancellationReason.CONFIRMATION_DENIED))
+    }
+
+    @Test
+    fun whenUserCancelsMidExchangeThenAbandonedWithCancelledBeforeFinished() = runTest {
+        whenever(runner.currentState).thenReturn(ExchangeV2State.Negotiating)
+
+        testee.onUserCancelledWithoutSyncSetup()
+
+        verify(syncPixels).fireSyncSetupAbandoned(eq(SYNC_CONNECT), eq(CancellationReason.CANCELLED_BEFORE_FINISHED))
+    }
+
+    @Test
+    fun whenSessionErrorDuringV2PresentThenShowError() = runTest {
+        enableV2(displayOn = true)
+        whenever(qrEncoder.encodeAsBitmap(any(), any(), any())).thenReturn(TestSyncFixtures.qrBitmap())
+
+        testee.viewState(source = null).test {
+            awaitItem()
+            runnerEventsFlow.emit(presenterSessionStarted())
+            awaitItem()
+            runnerEventsFlow.emit(
+                ExchangeV2Event.SessionError(timestampMs = System.currentTimeMillis(), message = "channel 5xx"),
+            )
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        testee.commands().test {
+            val command = awaitItem()
+            assertTrue("expected ShowV2Error, got $command", command is ShowV2Error)
+            assertEquals(PAIRING_FAILED.code.toV2PairingError(), (command as ShowV2Error).content)
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        verify(syncPixels).fireSyncSetupFailed(
+            eq(SetupFailureReason.TRANSPORT_FAILURE),
+            eq(SetupPath.PAIRING),
+            isNull(),
+            isNull(),
+        )
+    }
+
+    @Test
+    fun whenViewStateReCollectedThenConnectQRGeneratedOnce() = runTest {
+        val authCodeToUse = AuthCode(qrCode = jsonConnectKeyEncoded, rawCode = "raw")
+        whenever(syncRepository.getConnectQR()).thenReturn(Result.Success(authCodeToUse))
+        whenever(qrEncoder.encodeAsBitmap(eq(jsonConnectKeyEncoded), any(), any())).thenReturn(TestSyncFixtures.qrBitmap())
+        whenever(syncRepository.pollConnectionKeys()).thenReturn(Result.Success(true))
+        testee.viewState(source = null).test {
+            awaitItem()
+            cancelAndIgnoreRemainingEvents()
+        }
+        testee.viewState(source = null).test {
+            awaitItem()
+            cancelAndIgnoreRemainingEvents()
+        }
+        verify(syncRepository, times(1)).getConnectQR()
+    }
+
+    @Test
+    fun whenViewStateReCollectedThenV2PresentStartedOnce() = runTest {
+        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
+        syncFeature.canShowV2ConnectCode().setRawStoredState(State(true))
+        whenever(qrEncoder.encodeAsBitmap(any(), any(), any())).thenReturn(TestSyncFixtures.qrBitmap())
+        testee.viewState(source = null).test {
+            awaitItem()
+            cancelAndIgnoreRemainingEvents()
+        }
+        testee.viewState(source = null).test {
+            awaitItem()
+            cancelAndIgnoreRemainingEvents()
+        }
+        verify(runner, times(1)).startPresent()
+    }
+
+    @Test
+    fun whenV2PairingRejectedByPeerThenShowError() = runTest {
+        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
+        whenever(syncRepository.getAccountInfo()).thenReturn(AccountInfo())
+        val scannedCode = "https://duckduckgo.com/sync/pairing/#&code2=v2code"
+        whenever(qrCode.parse(scannedCode)).thenReturn(
+            ExchangeV2CodeParseResult.LinkingV2(channelId = "c", publicKey = "k", version = "2"),
+        )
+        whenever(runner.eventsSince(any())).thenReturn(
+            flowOf(
+                ExchangeV2Event.Transition(
+                    timestampMs = 0L,
+                    from = ExchangeV2State.Joiner.Confirming,
+                    to = ExchangeV2State.Joiner.AbortedByHost,
+                    trigger = ExchangeV2Message.RecoveryCodeDenied(rawJson = "{}"),
+                    localTrigger = null,
+                ),
+            ),
+        )
+
+        testee.commands().test {
+            testee.onQRCodeScanned(scannedCode)
+            val command = awaitItem()
+            assertTrue("expected ShowV2Error, got $command", command is ShowV2Error)
+            assertEquals(PAIRING_REJECTED.code.toV2PairingError(), (command as ShowV2Error).content)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenV2PresentSameAccountThenShowAlreadyPaired() = runTest {
+        enableV2(displayOn = true)
+        whenever(qrEncoder.encodeAsBitmap(any(), any(), any())).thenReturn(TestSyncFixtures.qrBitmap())
+
+        testee.viewState(source = null).test {
+            awaitItem()
+            runnerEventsFlow.emit(presenterSessionStarted())
+            awaitItem()
+            runnerEventsFlow.emit(
+                transition(from = ExchangeV2State.Negotiating, to = ExchangeV2State.SameAccountAbort),
+            )
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        testee.commands().test {
+            val command = awaitItem()
+            assertTrue("expected ShowV2Error, got $command", command is ShowV2Error)
+            assertEquals(v2AlreadyPairedError, (command as ShowV2Error).content)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenV2UpgradeRequiredThenShowUpdateError() = runTest {
+        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
+        whenever(syncRepository.getAccountInfo()).thenReturn(AccountInfo())
+        val scannedCode = "https://duckduckgo.com/sync/pairing/#&code2=v2code"
+        whenever(qrCode.parse(scannedCode)).thenReturn(
+            ExchangeV2CodeParseResult.LinkingV2(channelId = "c", publicKey = "k", version = "2"),
+        )
+        whenever(runner.eventsSince(any())).thenReturn(
+            flowOf(ExchangeV2Event.SessionError(timestampMs = 0L, message = "Peer requires protocol v3; please update this app")),
+        )
+
+        testee.commands().test {
+            testee.onQRCodeScanned(scannedCode)
+            val command = awaitItem()
+            assertTrue("expected ShowV2Error, got $command", command is ShowV2Error)
+            assertEquals(v2UpgradeRequiredError, (command as ShowV2Error).content)
+            cancelAndIgnoreRemainingEvents()
         }
     }
 }

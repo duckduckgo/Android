@@ -374,6 +374,12 @@ class NativeInputModeWidgetViewModel @Inject constructor(
      * Called when a prompt is submitted
      * */
     fun onPromptSubmitted() {
+        // A prompt submitted while still in the recovery window means the user sent a prompt after
+        // recovering the chat's model — report it before the window is cleared below.
+        val tabId = activeTabId.value
+        if (tabId != null && nativeInputStateProvider.stateForTab(tabId).value.modelChangeMode) {
+            duckChatPixels.fireSubmitChangeModelPromptSent()
+        }
         // Ends the FE recovery model-change window for the active tab.
         endModelChangeMode()
     }

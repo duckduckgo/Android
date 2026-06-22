@@ -1,0 +1,103 @@
+name: 'Develocity Artifact Cache'
+description: 'Provision the Develocity Artifact Cache CLI and run restore/store'
+
+inputs:
+  command:
+    description: "'restore' (run before the build) or 'store' (run after the build)"
+    required: true
+  image-name:
+    description: 'Explicit Artifact Cache image name, e.g. android-unit-tests-Metro'
+    required: true
+  develocity-access-key:
+    description: 'Develocity access key (DEVELOCITY_ACCESS_KEY)'
+    required: true
+  repo-url:
+    description: 'Base URL of the GitHub Packages repo hosting the CLI jar (ARTIFACT_CACHE_REPO)'
+    required: false
+    default: 'https://maven.pkg.github.com/duckduckgo/android-cache-tools'
+  repo-username:
+    description: 'GitHub username used to authenticate to the packages repo'
+    required: false
+    default: 'daxmobile'
+  repo-password:
+    description: 'GitHub token with read:packages for the android-cache-tools repo (secret DAXMOBILE_ANDROID_CACHE_TOOLS)'
+    required: true
+  cli-version:
+    description: 'Artifact Cache CLI version'
+    required: false
+    default: '1.3.0'
+  cli-filename:
+    description: 'Artifact Cache CLI artifact id / filename (without extension)'
+    required: false
+    default: 'develocity-artifact-cache-cli'
+  dv-server:
+    description: 'Develocity server URL'
+    required: false
+    default: 'https://duckduckgo.develocity.cloud'
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Provision and configure Artifact Cache
+      shell: bash
+      env:
+        DEVELOCITY_ACCESS_KEY: ${{ inputs.develocity-access-key }}
+        ARTIFACT_CACHE_REPO_USERNAME: ${{ inputs.repo-username }}
+        ARTIFACT_CACHE_REPO_PASSWORD: ${{ inputs.repo-password }}
+        ARTIFACT_CACHE_REPO: ${{ inputs.repo-url }}
+        ARTIFACT_CACHE_CLI_VERSION: ${{ inputs.cli-version }}
+        ARTIFACT_CACHE_CLI_FILENAME: ${{ inputs.cli-filename }}
+      run: |
+        TOOL_DIR="${{ runner.tool_cache }}/develocity/artifact-cache/${ARTIFACT_CACHE_CLI_VERSION}"
+        JAR_PATH="$TOOL_DIR/${ARTIFACT_CACHE_CLI_FILENAME}.jar"
+        mkdir -p "$TOOL_DIR"
+
+        # Download the CLI jar if it is not already cached in the runner's tool cache.
+        if [ ! -f "$JAR_PATH" ]; then
+          echo "Downloading Artifact Cache CLI v${ARTIFACT_CACHE_CLI_VERSION}..."
+          curl --location --fail --silent --show-error \
+            --connect-timeout 5 --max-time 30 \
+            --retry 3 --retry-delay 3 --retry-max-time 60 \
+            --user "$ARTIFACT_CACHE_REPO_USERNAME:$ARTIFACT_CACHE_REPO_PASSWORD" \
+            "${ARTIFACT_CACHE_REPO}/com/gradle/${ARTIFACT_CACHE_CLI_FILENAME}/${ARTIFACT_CACHE_CLI_VERSION}/${ARTIFACT_CACHE_CLI_FILENAME}-${ARTIFACT_CACHE_CLI_VERSION}.jar" \
+            --output "$JAR_PATH"
+        fi
+
+        # The CLI requires Java 21; reference it explicitly so the build's own JDK is unaffected.
+        echo "ARTIFACT_CACHE_CMD=${{ env[format('JAVA_HOME_21_{0}', runner.arch)] }}/bin/java -jar $JAR_PATH" >> "$GITHUB_ENV"
+
+        # Honour a custom Gradle User Home; default to the conventional location so this
+        # works on both GitHub-hosted and self-hosted runners (not just /home/runner).
+        GRADLE_HOME_DIR="${GRADLE_USER_HOME:-$HOME/.gradle}"
+        # Only the artifact (dependency) cache is enabled; the Develocity setup cache stays disabled for now.
+        echo "ARTIFACT_CACHE_CMD_OPTS=--dv-server=${{ inputs.dv-server }} --image-name=${{ inputs.image-name }} --gradle-home=$GRADLE_HOME_DIR --disable-setup-cache" >> "$GITHUB_ENV"
+
+    - name: Restore from Artifact Cache
+      if: inputs.command == 'restore'
+      shell: bash
+      env:
+        DEVELOCITY_ACCESS_KEY: ${{ inputs.develocity-access-key }}
+      run: |
+        # A cache miss or transient error must never fail the build.
+        if ! $ARTIFACT_CACHE_CMD restore $ARTIFACT_CACHE_CMD_OPTS; then
+          echo "::warning::Could not restore the Develocity Artifact Cache; build will proceed but may be slower."
+        fi
+
+    - name: Store to Artifact Cache
+      if: inputs.command == 'store'
+      shell: bash
+      env:
+        DEVELOCITY_ACCESS_KEY: ${{ inputs.develocity-access-key }}
+      run: |
+        if ! $ARTIFACT_CACHE_CMD store $ARTIFACT_CACHE_CMD_OPTS; then
+          echo "::warning::Failed to store in the Develocity Artifact Cache."
+        fi
+
+    - name: Persist Artifact Cache logs
+      if: inputs.command == 'store'
+      uses: actions/upload-artifact@v4
+      with:
+        name: artifact-cache-log-${{ inputs.image-name }}
+        path: '~/.develocity/artifact-cache/artifact-cache.log'
+        if-no-files-found: ignore
+        retention-days: 7
