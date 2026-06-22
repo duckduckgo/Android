@@ -1438,6 +1438,8 @@ class RealDuckChatJSHelperTest {
             put("supportsPageContext", false)
             put("supportsNativeStorage", false)
             put("supportsMultipleContexts", false)
+            put("installType", "new")
+            put("installAge", 0)
         }
 
         assertEquals(expectedPayload.toString(), result!!.params.toString())
