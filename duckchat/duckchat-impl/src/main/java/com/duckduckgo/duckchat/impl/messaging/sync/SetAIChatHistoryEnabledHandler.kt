@@ -17,11 +17,10 @@
 package com.duckduckgo.duckchat.impl.messaging.sync
 
 import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.utils.AppUrl
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.contentscopescripts.api.ContentScopeJsMessageHandlersPlugin
-import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import com.duckduckgo.duckchat.impl.DuckChatConstants
 import com.duckduckgo.duckchat.impl.repository.DuckChatFeatureRepository
@@ -36,13 +35,12 @@ import logcat.LogPriority
 import logcat.logcat
 import javax.inject.Inject
 
-@ContributesMultibinding(ActivityScope::class)
+@ContributesMultibinding(AppScope::class)
 class SetAIChatHistoryEnabledHandler @Inject constructor(
     private val duckChatFeatureRepository: DuckChatFeatureRepository,
     private val duckAiHostProvider: DuckAiHostProvider,
     private val dispatchers: DispatcherProvider,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
-    private val browserMode: BrowserMode,
 ) : ContentScopeJsMessageHandlersPlugin {
     override fun getJsMessageHandler(): JsMessageHandler =
         object : JsMessageHandler {
@@ -51,12 +49,6 @@ class SetAIChatHistoryEnabledHandler @Inject constructor(
                 jsMessaging: JsMessaging,
                 jsMessageCallback: JsMessageCallback?,
             ) {
-                // A non-syncable mode must not mutate the account-level chat-history setting.
-                if (!browserMode.isSyncable) {
-                    logcat { "DuckChat-Sync: setAIChatHistoryEnabled ignored in non-syncable mode" }
-                    return
-                }
-
                 if (!jsMessage.params.has(PARAM_ENABLED)) {
                     logcat(LogPriority.ERROR) { "DuckChat-Sync: ${jsMessage.method} called without 'enabled' parameter, taking no action" }
                     return

@@ -18,10 +18,9 @@ package com.duckduckgo.duckchat.impl.messaging.sync
 
 import android.content.Context
 import android.content.Intent
-import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.utils.AppUrl
 import com.duckduckgo.contentscopescripts.api.ContentScopeJsMessageHandlersPlugin
-import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import com.duckduckgo.duckchat.impl.DuckChatConstants
 import com.duckduckgo.js.messaging.api.JsMessage
@@ -36,13 +35,12 @@ import com.squareup.anvil.annotations.ContributesMultibinding
 import logcat.logcat
 import javax.inject.Inject
 
-@ContributesMultibinding(ActivityScope::class)
+@ContributesMultibinding(AppScope::class)
 class SetUpSyncHandler @Inject constructor(
     private val globalActivityStarter: GlobalActivityStarter,
     private val context: Context,
     private val deviceSyncState: DeviceSyncState,
     private val duckAiHostProvider: DuckAiHostProvider,
-    private val browserMode: BrowserMode,
 ) : ContentScopeJsMessageHandlersPlugin {
     override fun getJsMessageHandler(): JsMessageHandler =
         object : JsMessageHandler {
@@ -56,12 +54,6 @@ class SetUpSyncHandler @Inject constructor(
                 logcat { "DuckChat-Sync: ${jsMessage.method} called" }
 
                 val responder = SyncJsResponder(jsMessaging, jsMessage, featureName)
-
-                // A non-syncable mode must not be able to set up or open sync.
-                if (!browserMode.isSyncable) {
-                    responder.sendError(ERROR_SETUP_UNAVAILABLE)
-                    return
-                }
 
                 val setupError = validateSetupState(jsMessage.method)
                 if (setupError != null) {

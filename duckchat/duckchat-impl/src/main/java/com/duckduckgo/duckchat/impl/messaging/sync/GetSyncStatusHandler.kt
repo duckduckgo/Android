@@ -16,10 +16,9 @@
 
 package com.duckduckgo.duckchat.impl.messaging.sync
 
-import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.utils.AppUrl
 import com.duckduckgo.contentscopescripts.api.ContentScopeJsMessageHandlersPlugin
-import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import com.duckduckgo.duckchat.impl.DuckChatConstants
 import com.duckduckgo.js.messaging.api.JsCallbackData
@@ -34,11 +33,10 @@ import logcat.logcat
 import org.json.JSONObject
 import javax.inject.Inject
 
-@ContributesMultibinding(ActivityScope::class)
+@ContributesMultibinding(AppScope::class)
 class GetSyncStatusHandler @Inject constructor(
     private val syncStatusHelper: SyncStatusHelper,
     private val duckAiHostProvider: DuckAiHostProvider,
-    private val browserMode: BrowserMode,
 ) : ContentScopeJsMessageHandlersPlugin {
     override fun getJsMessageHandler(): JsMessageHandler =
         object : JsMessageHandler {
@@ -50,16 +48,6 @@ class GetSyncStatusHandler @Inject constructor(
                 if (jsMessage.id.isNullOrEmpty()) return
 
                 logcat { "DuckChat-Sync: ${jsMessage.method} called" }
-
-                // In a non-syncable mode report sync as unavailable so the FE never attempts to sync the ephemeral chats.
-                if (!browserMode.isSyncable) {
-                    val unavailableResponse = JSONObject().apply {
-                        put("ok", true)
-                        put("payload", syncStatusHelper.unavailablePayload())
-                    }
-                    jsMessaging.onResponse(JsCallbackData(unavailableResponse, featureName, jsMessage.method, jsMessage.id!!))
-                    return
-                }
 
                 // Handler is already called on worker thread, use runBlocking for suspend call
                 val jsonPayload = runCatching {

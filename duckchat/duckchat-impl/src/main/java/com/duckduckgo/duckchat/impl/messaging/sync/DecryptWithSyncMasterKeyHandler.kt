@@ -17,10 +17,9 @@
 package com.duckduckgo.duckchat.impl.messaging.sync
 
 import android.util.Base64
-import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.utils.AppUrl
 import com.duckduckgo.contentscopescripts.api.ContentScopeJsMessageHandlersPlugin
-import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import com.duckduckgo.duckchat.impl.DuckChatConstants
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
@@ -38,13 +37,12 @@ import logcat.logcat
 import org.json.JSONObject
 import javax.inject.Inject
 
-@ContributesMultibinding(ActivityScope::class)
+@ContributesMultibinding(AppScope::class)
 class DecryptWithSyncMasterKeyHandler @Inject constructor(
     private val crypto: SyncCrypto,
     private val deviceSyncState: DeviceSyncState,
     private val duckChatPixels: DuckChatPixels,
     private val duckAiHostProvider: DuckAiHostProvider,
-    private val browserMode: BrowserMode,
 ) : ContentScopeJsMessageHandlersPlugin {
 
     override fun getJsMessageHandler(): JsMessageHandler =
@@ -59,14 +57,6 @@ class DecryptWithSyncMasterKeyHandler @Inject constructor(
                 logcat { "DuckChat-Sync: ${jsMessage.method} called" }
 
                 val responder = SyncJsResponder(jsMessaging, jsMessage, featureName)
-
-                // Non-syncable modes must never sync — refuse the master key so synced chats can't be decrypted into a non-syncable mode.
-                if (!browserMode.isSyncable) {
-                    responder.sendError(ERROR_SYNC_DISABLED).also {
-                        logcat(LogPriority.WARN) { "DuckChat-Sync: decryptWithSyncMasterKey blocked in non-syncable mode" }
-                    }
-                    return
-                }
 
                 val syncError = validateSyncState()
                 if (syncError != null) {

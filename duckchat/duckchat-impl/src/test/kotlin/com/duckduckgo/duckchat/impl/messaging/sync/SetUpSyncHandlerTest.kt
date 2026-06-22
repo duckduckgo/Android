@@ -19,7 +19,6 @@ package com.duckduckgo.duckchat.impl.messaging.sync
 import android.content.Context
 import android.content.Intent
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.js.messaging.api.JsMessage
@@ -65,7 +64,6 @@ class SetUpSyncHandlerTest {
             context = mockContext,
             deviceSyncState = mockDeviceSyncState,
             duckAiHostProvider = mockDuckAiHostProvider,
-            browserMode = BrowserMode.REGULAR,
         )
     }
 
@@ -162,27 +160,6 @@ class SetUpSyncHandlerTest {
     }
 
     @Test
-    fun `when in Fire mode then setup is refused and no activity is started`() {
-        configureSyncEnabled()
-        configureSignedOut()
-        handler = SetUpSyncHandler(
-            globalActivityStarter = mockGlobalActivityStarter,
-            context = mockContext,
-            deviceSyncState = mockDeviceSyncState,
-            duckAiHostProvider = mockDuckAiHostProvider,
-            browserMode = BrowserMode.FIRE,
-        )
-        val jsMessage = createJsMessage("sendToSetupSync", "test-id")
-
-        handler.getJsMessageHandler().process(jsMessage, mockJsMessaging, null)
-
-        verify(mockJsMessaging).onResponse(callbackDataCaptor.capture())
-        verifyErrorResponse(callbackDataCaptor.firstValue.params, "setup unavailable")
-        verifyNoInteractions(mockGlobalActivityStarter)
-        verifyNoInteractions(mockContext)
-    }
-
-    @Test
     fun `when id is present and startIntent returns intent then activity is started with new task flag`() {
         configureSyncEnabled()
         configureSignedOut()
@@ -195,7 +172,7 @@ class SetUpSyncHandlerTest {
         verify(mockGlobalActivityStarter).startIntent(mockContext, SyncActivityWithEmptyParams)
         assertTrue("FLAG_ACTIVITY_NEW_TASK should be set", intent.flags and Intent.FLAG_ACTIVITY_NEW_TASK != 0)
         verify(mockContext).startActivity(intent)
-        verify(mockJsMessaging, never()).onResponse(any())
+        verifyNoInteractions(mockJsMessaging)
     }
 
     @Test
@@ -209,7 +186,7 @@ class SetUpSyncHandlerTest {
 
         verify(mockGlobalActivityStarter).startIntent(mockContext, SyncActivityWithEmptyParams)
         verify(mockContext, never()).startActivity(any())
-        verify(mockJsMessaging, never()).onResponse(any())
+        verifyNoInteractions(mockJsMessaging)
     }
 
     @Test
@@ -224,7 +201,7 @@ class SetUpSyncHandlerTest {
 
         verify(mockGlobalActivityStarter).startIntent(mockContext, SyncActivityWithEmptyParams)
         verify(mockContext).startActivity(intent)
-        verify(mockJsMessaging, never()).onResponse(any())
+        verifyNoInteractions(mockJsMessaging)
     }
 
     @Test
@@ -239,7 +216,7 @@ class SetUpSyncHandlerTest {
 
         verify(mockGlobalActivityStarter).startIntent(mockContext, SyncActivityWithEmptyParams)
         verify(mockContext).startActivity(intent)
-        verify(mockJsMessaging, never()).onResponse(any())
+        verifyNoInteractions(mockJsMessaging)
     }
 
     private fun configureSyncEnabled() {

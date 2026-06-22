@@ -17,7 +17,6 @@
 package com.duckduckgo.duckchat.impl.messaging.sync
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.duckchat.api.DuckAiHostProvider
@@ -59,7 +58,6 @@ class SetAIChatHistoryEnabledHandlerTest {
             duckAiHostProvider = mockDuckAiHostProvider,
             dispatchers = dispatchers,
             appCoroutineScope = appCoroutineScope,
-            browserMode = BrowserMode.REGULAR,
         )
     }
 
@@ -81,22 +79,6 @@ class SetAIChatHistoryEnabledHandlerTest {
         val methods = handler.getJsMessageHandler().methods
         assertEquals(1, methods.size)
         assertEquals("setAIChatHistoryEnabled", methods[0])
-    }
-
-    @Test
-    fun `when in Fire mode then repository is not called`() = runTest {
-        handler = SetAIChatHistoryEnabledHandler(
-            duckChatFeatureRepository = mockDuckChatFeatureRepository,
-            duckAiHostProvider = mockDuckAiHostProvider,
-            dispatchers = dispatchers,
-            appCoroutineScope = appCoroutineScope,
-            browserMode = BrowserMode.FIRE,
-        )
-        val jsMessage = createJsMessage(JSONObject().apply { put("enabled", true) })
-
-        handler.getJsMessageHandler().process(jsMessage, fakeJsMessaging, null)
-
-        verifyNoInteractions(mockDuckChatFeatureRepository)
     }
 
     @Test

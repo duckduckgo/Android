@@ -19,13 +19,8 @@ package com.duckduckgo.duckchat.impl.messaging.sync
 import com.duckduckgo.browsermode.api.BrowserMode
 
 /**
- * Duck.ai chats in a non-syncable [BrowserMode] must never sync. Chat content is synced by the front-end JS (it
- * obtains the account master key via [EncryptWithSyncMasterKeyHandler] and pushes to the backend itself), so storage
- * isolation alone doesn't stop it — every FE-facing sync handler must refuse when its mode is not [isSyncable].
- *
- * The Duck.ai sync handlers are activity-scoped and inject the host activity's [BrowserMode] (frozen for the
- * activity's lifetime), checking [isSyncable] here before doing any sync work. Exhaustive `when` so a new
- * [BrowserMode] is a compile error here.
+ * Whether Duck.ai chat activity in this [BrowserMode] may enter the sync pipeline. Chats in a non-syncable mode
+ * (Fire) must never sync — they stay on-device.
  */
 internal val BrowserMode.isSyncable: Boolean
     get() = when (this) {
