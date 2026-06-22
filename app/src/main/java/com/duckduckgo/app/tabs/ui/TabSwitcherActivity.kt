@@ -325,6 +325,7 @@ class TabSwitcherActivity :
 
     private fun configureEdgeToEdgeInsets() {
         edgeToEdgeHandler.applyHorizontalSystemBarInsets(binding.root)
+        applyDisplayCutoutMode(resources.configuration.orientation)
 
         when (settingsDataStore.omnibarType) {
             OmnibarType.SINGLE_TOP -> {
