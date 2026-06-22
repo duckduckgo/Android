@@ -19,8 +19,8 @@
 <resources>
     <string name="ad_blocking_settings_title">YouTube-hirdetésblokkolás</string>
     <string name="ad_blocking_settings_toggle_title">Hirdetések blokkolása a YouTube-on</string>
-    <string name="ad_blocking_settings_description_with_consent">A DuckDuckGo letiltja a videóhirdetéseket a YouTube-ról, így megszakítás nélkül nézhetsz videókat.\n\nAmikor be van kapcsolva, a DuckDuckGo névtelenül észleli a hirdetésblokkolási interferenciát vagy a YouTube-hibákat, hogy mindenki számára jobb élményt nyújtson. A DuckDuckGo soha nem látja, hogy mely videókat nézed meg, és nem fér hozzá személyazonosításra alkalmas információkhoz sem. <annotation type="learn_more_link">További részletek</annotation></string>
-    <string name="ad_blocking_settings_description">A DuckDuckGo letiltja a videóhirdetéseket a YouTube-ról, így megszakítás nélkül nézhetsz videókat. <annotation type="learn_more_link">További részletek</annotation></string>
+    <string name="ad_blocking_settings_description_with_consent">A DuckDuckGo blokkolja a videohirdetéseket a YouTube-on, így megszakítás nélkül nézhetsz videókat.\n\nAmikor be van kapcsolva, a DuckDuckGo névtelenül észleli, ha valami zavarja a hirdetésblokkolást, vagy ha YouTube-hiba lép fel, hogy mindenki számára javíthassa az élményt. A DuckDuckGo soha nem látja, hogy mely videókat nézed meg, és nem fér hozzá személyazonosításra alkalmas információkhoz sem. <annotation type="learn_more_link">További információk</annotation></string>
+    <string name="ad_blocking_settings_description">A DuckDuckGo blokkolja a videohirdetéseket a YouTube-on, így megszakítás nélkül nézhetsz videókat. <annotation type="learn_more_link">További információk</annotation></string>
     <string name="ad_blocking_settings_duck_player_header">Duck Player</string>
-    <string name="ad_blocking_settings_duck_player_description">Mozis módban nyitja meg a videókat, így a nézett tartalom nem befolyásolja a YouTube-hírfolyamodat.</string>
+    <string name="ad_blocking_settings_duck_player_description">Zavaró elemektől mentes, mozis nézetben nyitja meg a videókat, így a nézett tartalom nem befolyásolja a YouTube-hírfolyamodat.</string>
 </resources>

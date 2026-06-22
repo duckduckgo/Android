@@ -80,4 +80,41 @@ class RealDuckChatPixelsPickerTest {
             ),
         )
     }
+
+    @Test
+    fun whenShowModelPickerThenFiresCountAndDaily() = runTest {
+        testee.fireShowModelPicker()
+
+        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_SHOW_MODEL_PICKER_COUNT, parameters = emptyMap())
+        verify(pixel).fire(
+            DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_SHOW_MODEL_PICKER_DAILY,
+            parameters = emptyMap(),
+            type = Pixel.PixelType.Daily(),
+        )
+    }
+
+    @Test
+    fun whenSubmitChangeModelThenFiresCountAndDailyWithModelId() = runTest {
+        testee.fireSubmitChangeModel(modelId = "gpt-5")
+
+        val params = mapOf(DuckChatPixelParameters.MODEL_ID to "gpt-5")
+        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_SUBMIT_CHANGE_MODEL_COUNT, parameters = params)
+        verify(pixel).fire(
+            DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_SUBMIT_CHANGE_MODEL_DAILY,
+            parameters = params,
+            type = Pixel.PixelType.Daily(),
+        )
+    }
+
+    @Test
+    fun whenSubmitChangeModelPromptSentThenFiresCountAndDaily() = runTest {
+        testee.fireSubmitChangeModelPromptSent()
+
+        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_SUBMIT_CHANGE_MODEL_PROMPT_SENT_COUNT, parameters = emptyMap())
+        verify(pixel).fire(
+            DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_SUBMIT_CHANGE_MODEL_PROMPT_SENT_DAILY,
+            parameters = emptyMap(),
+            type = Pixel.PixelType.Daily(),
+        )
+    }
 }

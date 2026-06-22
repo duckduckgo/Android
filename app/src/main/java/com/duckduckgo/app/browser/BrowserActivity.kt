@@ -417,6 +417,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
             enableEdgeToEdge(statusBarStyle = barStyle, navigationBarStyle = barStyle)
             edgeToEdgeHandler.applyStatusBarAndHorizontalInsets(binding.root)
             edgeToEdgeHandler.applyNavigationBarInsets(binding.navigationBarMockup.root)
+            applyDisplayCutoutMode(resources.configuration.orientation)
         }
 
         setContentView(binding.root)

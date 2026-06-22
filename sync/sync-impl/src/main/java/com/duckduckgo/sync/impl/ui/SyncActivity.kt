@@ -34,6 +34,9 @@ import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.view.makeSnackbarWithNoBottomInset
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.di.*
 import com.duckduckgo.di.scopes.*
 import com.duckduckgo.navigation.api.GlobalActivityStarter
@@ -115,6 +118,12 @@ class SyncActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var globalActivityStarter: GlobalActivityStarter
+
+    @Inject
+    lateinit var edgeToEdgeProvider: EdgeToEdgeProvider
+
+    @Inject
+    lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
 
     private val syncedDevicesAdapter = SyncedDevicesAdapter(
         object : ConnectedDeviceClickListener {
@@ -199,8 +208,18 @@ class SyncActivity : DuckDuckGoActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        val edgeToEdgeEnabled = edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.SYNC)
+        if (edgeToEdgeEnabled) {
+            enableTransparentEdgeToEdge()
+        }
+
         setContentView(binding.root)
         setupToolbar(binding.includeToolbar.toolbar)
+
+        if (edgeToEdgeEnabled) {
+            configureEdgeToEdgeInsets()
+        }
 
         savedInstanceState?.getString(KEY_PENDING_ORIGINAL_FLOW)?.let { name ->
             pendingOriginalFlow = OriginalFlow.valueOf(name)
@@ -227,6 +246,12 @@ class SyncActivity : DuckDuckGoActivity() {
     }
 
     private fun syncSetupUrl() = intent.getActivityParams(SyncActivityFromSetupUrl::class.java)?.url
+
+    private fun configureEdgeToEdgeInsets() {
+        edgeToEdgeHandler.applyHorizontalSystemBarInsets(binding.root)
+        edgeToEdgeHandler.applyStatusBarInsets(binding.includeToolbar.appBarLayout)
+        edgeToEdgeHandler.applyNavigationBarInsets(binding.contentScrollView, drawBehindGestureNav = true)
+    }
 
     private fun registerForPermission() {
         storagePermission.registerResultsCallback(this) {

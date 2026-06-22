@@ -72,6 +72,7 @@ class CustomTabActivity : DuckDuckGoActivity() {
             }
             enableEdgeToEdge(statusBarStyle = barStyle, navigationBarStyle = barStyle)
             edgeToEdgeHandler.applyStatusBarAndHorizontalInsets(binding.root)
+            applyDisplayCutoutMode(resources.configuration.orientation)
         }
 
         setContentView(binding.root)
