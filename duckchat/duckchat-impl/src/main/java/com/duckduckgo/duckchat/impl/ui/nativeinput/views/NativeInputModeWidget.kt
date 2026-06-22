@@ -1462,6 +1462,10 @@ class NativeInputModeWidget @JvmOverloads constructor(
 
     private var interactionLocked = false
 
+    // The unlocked card elevation, captured before the first lock. The two omnibar positions wrap this
+    // widget in cards with different elevations (6dp top, 3dp bottom), so we can't hardcode the restore value.
+    private var unlockedCardElevation: Float? = null
+
     // Dims only this (transparent) widget, never the parent card surface, so the bar stays
     // colour-uniform with the page. Touch interception covers the plugin containers too.
     override fun setInteractionLocked(locked: Boolean) {
@@ -1474,6 +1478,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
             hideKeyboard()
             rootCard?.let {
                 // further de-emphasize the input field when the UI is locked
+                if (unlockedCardElevation == null) unlockedCardElevation = it.elevation
                 it.elevation = 0f
                 it.strokeWidth = 1.toPx(it.context)
                 it.strokeColor = it.context.getColorFromAttr(com.duckduckgo.mobile.android.R.attr.daxColorBackground)
@@ -1481,7 +1486,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
         } else {
             rootCard?.let {
                 // restore original values
-                it.elevation = 3f.toPx(it.context)
+                it.elevation = unlockedCardElevation ?: it.elevation
                 it.strokeWidth = 0
             }
         }
