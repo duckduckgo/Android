@@ -63,7 +63,9 @@ class SyncLoginViewModelTest {
     private val syncRepostitory: SyncAccountRepository = mock()
     private val syncPixels: SyncPixels = mock()
     private val syncFeature = FakeFeatureToggleFactory.create(SyncFeature::class.java)
-    private val qrCode: ExchangeV2QrCode = mock()
+    private val qrCode: ExchangeV2QrCode = mock<ExchangeV2QrCode>().also {
+        whenever(it.parse(any())).thenReturn(ExchangeV2CodeParseResult.Unknown)
+    }
     private val runner: ExchangeV2Runner = mock()
     private val codeDispatcher = RealSyncCodeDispatcher(
         syncFeature = syncFeature,

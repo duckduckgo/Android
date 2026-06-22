@@ -1150,6 +1150,7 @@ class AppSyncAccountRepositoryTest {
 
     @Test
     fun whenLoginWithScopedCredentialsFlagOffThenV2DataNotStored() {
+        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(false))
         prepareToProvideDeviceIds()
         prepareForEncryption()
         whenever(nativeLib.prepareForLogin(primaryKey)).thenReturn(validLoginKeys)
@@ -1233,6 +1234,7 @@ class AppSyncAccountRepositoryTest {
 
     @Test
     fun whenCreateAccountWithScopedCredentialsFlagOffThenCredentialIdNull() {
+        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(false))
         prepareToProvideDeviceIds()
         prepareForCreateAccountSuccess()
 
