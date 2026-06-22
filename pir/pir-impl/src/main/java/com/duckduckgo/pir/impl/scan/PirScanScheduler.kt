@@ -25,6 +25,7 @@ import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.NetworkType
 import androidx.work.PeriodicWorkRequest
 import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import androidx.work.multiprocess.RemoteListenableWorker
 import com.duckduckgo.app.di.AppCoroutineScope
@@ -48,6 +49,7 @@ import com.duckduckgo.pir.impl.store.db.EventType
 import com.duckduckgo.pir.impl.store.db.PirEventLog
 import com.squareup.anvil.annotations.ContributesBinding
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import logcat.logcat
 import java.util.concurrent.TimeUnit
@@ -63,6 +65,12 @@ interface PirScanScheduler {
     fun reschedulePirScans()
 
     fun cancelScheduledScans(context: Context)
+
+    /**
+     * @return true if the periodic scheduled-scan worker ([PirScheduledScanRemoteWorker]) is currently
+     * in [WorkInfo.State.RUNNING].
+     */
+    suspend fun isScheduledScanRunning(): Boolean
 }
 
 @ContributesBinding(AppScope::class)
@@ -176,6 +184,17 @@ class RealPirScanScheduler @Inject constructor(
             ExistingPeriodicWorkPolicy.UPDATE,
             periodicWorkRequest,
         )
+    }
+
+    override suspend fun isScheduledScanRunning(): Boolean {
+        return runCatching {
+            workManager.getWorkInfosForUniqueWorkFlow(TAG_SCHEDULED_SCAN)
+                .firstOrNull()
+                ?.any { it.state == WorkInfo.State.RUNNING } ?: false
+        }.getOrElse {
+            logcat { "PIR-SCHEDULED: Failed to read scheduled scan work info: $it" }
+            false
+        }
     }
 
     override fun cancelScheduledScans(context: Context) {
