@@ -10230,7 +10230,7 @@ class BrowserTabViewModelTest {
         )
         whenever(mockDuckChatJSHelper.onNativeAction(NativeAction.CUSTOMIZE_RESPONSES)).thenReturn(expectedEvent)
 
-        testee.onCustomizeResponsesTapped()
+        testee.onCustomizeResponsesClicked()
 
         testee.subscriptionEventDataFlow.test {
             val emittedEvent = awaitItem()

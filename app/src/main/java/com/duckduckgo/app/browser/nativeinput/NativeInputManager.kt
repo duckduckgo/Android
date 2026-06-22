@@ -79,7 +79,7 @@ class NativeInputCallbacks(
     val onDuckAiQuerySubmitted: (query: String) -> Unit = {},
     /** User picked a model in the native picker (→ submitChangeModelAction). */
     val onChangeModelSubmitted: (modelId: String) -> Unit = {},
-    val onCustomizeResponsesTapped: () -> Unit = {},
+    val onCustomizeResponsesClicked: () -> Unit = {},
     val onChatUrlSuggestionClicked: (AutoCompleteSuggestion) -> Unit = {},
     val onChatHistoryShortcutClicked: () -> Unit = {},
     val onClearAutocomplete: () -> Unit,
@@ -581,7 +581,7 @@ class RealNativeInputManager @Inject constructor(
         widgetFrom(widgetView)?.apply {
             onStopTapped = callbacks.onStopTapped
             onFireButtonTapped = callbacks.onFireButtonPressed
-            onCustomizeResponsesTapped = callbacks.onCustomizeResponsesTapped
+            onCustomizeResponsesClicked = callbacks.onCustomizeResponsesClicked
             bindTabCount(lifecycleOwner, tabs.map { it.size })
             hideMainButtons()
             onAttachmentChooserStateChanged = { showing -> isPickingImage = showing }

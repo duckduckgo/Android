@@ -5431,7 +5431,7 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
-    fun onCustomizeResponsesTapped() {
+    fun onCustomizeResponsesClicked() {
         viewModelScope.launch {
             val subscriptionEvent = duckChatJSHelper.onNativeAction(NativeAction.CUSTOMIZE_RESPONSES)
             _subscriptionEventDataChannel.send(subscriptionEvent)

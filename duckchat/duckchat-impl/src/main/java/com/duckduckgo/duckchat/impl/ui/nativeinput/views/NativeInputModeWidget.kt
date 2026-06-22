@@ -103,7 +103,7 @@ interface NativeInputWidget {
     /** Fired when the user picks a model in the model-change flow (→ submitChangeModelAction). */
     var onChangeModelSubmitted: ((modelId: String) -> Unit)?
 
-    var onCustomizeResponsesTapped: (() -> Unit)?
+    var onCustomizeResponsesClicked: (() -> Unit)?
     val isModelMenuVisible: Boolean
 
     fun onBackPressed()
@@ -264,7 +264,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
     private var widgetRoot: View? = null
     override var onStopTapped: (() -> Unit)? = null
     override var onChangeModelSubmitted: ((modelId: String) -> Unit)? = null
-    override var onCustomizeResponsesTapped: (() -> Unit)? = null
+    override var onCustomizeResponsesClicked: (() -> Unit)? = null
     override var onImageClick: (() -> Unit)? = null
     override var onVoiceSearchClick: (() -> Unit)? = null
         set(value) {
@@ -1455,7 +1455,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
     }
 
     override fun customizeResponsesTapped() {
-        onCustomizeResponsesTapped?.invoke()
+        onCustomizeResponsesClicked?.invoke()
     }
 
     override fun showModelPicker(showing: Boolean) {
