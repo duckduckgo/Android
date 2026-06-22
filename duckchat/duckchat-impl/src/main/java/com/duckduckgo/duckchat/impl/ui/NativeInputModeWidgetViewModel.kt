@@ -36,6 +36,7 @@ import com.duckduckgo.common.utils.plugins.ActivePluginPoint
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
+import com.duckduckgo.duckchat.api.nativeinput.NativeInputState.InteractionLock
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputStateProvider
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputStatePublisher
 import com.duckduckgo.duckchat.impl.ChatState
@@ -145,7 +146,7 @@ class NativeInputModeWidgetViewModel @Inject constructor(
     // activeTabId. Replayed inside configure / configureContextual when activeTabId becomes known.
     private var pendingChatId: String? = null
     private var hasPendingChatId = false
-    private var pendingInteractionLocked: Boolean? = null
+    private var pendingInteractionLock: InteractionLock? = null
     private var pendingDuckAiFireButtonHighlighted: Boolean? = null
 
     init {
@@ -293,13 +294,13 @@ class NativeInputModeWidgetViewModel @Inject constructor(
         .map { it.modelChangeMode }
         .distinctUntilChanged()
 
-    // interactionLocked / duckAiFireButtonHighlighted live in the per-tab provider state (written by
-    // setInteractionLocked / setDuckAiFireButtonHighlighted), not in baseState. Fold them back into `state` here
+    // interactionLock / duckAiFireButtonHighlighted live in the per-tab provider state (written by
+    // setInteractionLock / setDuckAiFireButtonHighlighted), not in baseState. Fold them back into `state` here
     // — same as chatId above — so the widget's applyState sees the published values rather than the defaults.
     @OptIn(ExperimentalCoroutinesApi::class)
-    private val interactionLocked: Flow<Boolean> = activeTabId.filterNotNull()
+    private val interactionLock: Flow<InteractionLock> = activeTabId.filterNotNull()
         .flatMapLatest { tabId -> nativeInputStateProvider.stateForTab(tabId) }
-        .map { it.interactionLocked }
+        .map { it.interactionLock }
         .distinctUntilChanged()
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -312,13 +313,13 @@ class NativeInputModeWidgetViewModel @Inject constructor(
         baseState,
         duckChatInternal.chatState,
         activeChatId,
-        interactionLocked,
+        interactionLock,
         duckAiFireButtonHighlighted,
-    ) { state, chatState, chatId, locked, fireHighlighted ->
+    ) { state, chatState, chatId, lock, fireHighlighted ->
         state.copy(
             isChatStreaming = chatState == ChatState.STREAMING || chatState == ChatState.LOADING,
             chatId = chatId,
-            interactionLocked = locked,
+            interactionLock = lock,
             duckAiFireButtonHighlighted = fireHighlighted,
         )
     }.shareIn(
@@ -391,14 +392,14 @@ class NativeInputModeWidgetViewModel @Inject constructor(
         nativeInputStatePublisher.update(tabId) { it.copy(selectedTool = tool) }
     }
 
-    fun setInteractionLocked(locked: Boolean) {
+    fun setInteractionLock(lock: InteractionLock) {
         val tabId = activeTabId.value
         if (tabId == null) {
             // configure hasn't run yet — buffer until activeTabId is known, replayed in configure.
-            pendingInteractionLocked = locked
+            pendingInteractionLock = lock
             return
         }
-        nativeInputStatePublisher.update(tabId) { it.copy(interactionLocked = locked) }
+        nativeInputStatePublisher.update(tabId) { it.copy(interactionLock = lock) }
     }
 
     fun setDuckAiFireButtonHighlighted(highlighted: Boolean) {
@@ -477,9 +478,9 @@ class NativeInputModeWidgetViewModel @Inject constructor(
             hasPendingChatId = false
             applyChatId(tabId, pending)
         }
-        pendingInteractionLocked?.let { locked ->
-            pendingInteractionLocked = null
-            nativeInputStatePublisher.update(tabId) { it.copy(interactionLocked = locked) }
+        pendingInteractionLock?.let { lock ->
+            pendingInteractionLock = null
+            nativeInputStatePublisher.update(tabId) { it.copy(interactionLock = lock) }
         }
         pendingDuckAiFireButtonHighlighted?.let { highlighted ->
             pendingDuckAiFireButtonHighlighted = null

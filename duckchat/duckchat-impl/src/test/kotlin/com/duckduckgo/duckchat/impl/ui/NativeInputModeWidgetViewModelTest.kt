@@ -727,18 +727,25 @@ class NativeInputModeWidgetViewModelTest {
     }
 
     @Test
-    fun whenSetInteractionLockedThenReflectedInState() = runTest {
+    fun whenSetInteractionLockThenReflectedInState() = runTest {
         val viewModel = createViewModel()
         viewModel.configure(tabId = "tab-A", isDuckAiMode = true, isBottom = false)
         advanceUntilIdle()
 
-        viewModel.setInteractionLocked(true)
+        viewModel.setInteractionLock(NativeInputState.InteractionLock.Locked)
         advanceUntilIdle()
-        assertTrue(viewModel.state.firstOrNull()!!.interactionLocked)
+        assertEquals(NativeInputState.InteractionLock.Locked, viewModel.state.firstOrNull()!!.interactionLock)
 
-        viewModel.setInteractionLocked(false)
+        viewModel.setInteractionLock(NativeInputState.InteractionLock.LockedExceptDuckAiFireButton)
         advanceUntilIdle()
-        assertFalse(viewModel.state.firstOrNull()!!.interactionLocked)
+        assertEquals(
+            NativeInputState.InteractionLock.LockedExceptDuckAiFireButton,
+            viewModel.state.firstOrNull()!!.interactionLock,
+        )
+
+        viewModel.setInteractionLock(NativeInputState.InteractionLock.Unlocked)
+        advanceUntilIdle()
+        assertEquals(NativeInputState.InteractionLock.Unlocked, viewModel.state.firstOrNull()!!.interactionLock)
     }
 
     @Test
@@ -757,14 +764,14 @@ class NativeInputModeWidgetViewModelTest {
     }
 
     @Test
-    fun whenSetInteractionLockedBeforeConfigureThenAppliedOnConfigure() = runTest {
+    fun whenSetInteractionLockBeforeConfigureThenAppliedOnConfigure() = runTest {
         val viewModel = createViewModel()
-        viewModel.setInteractionLocked(true)
+        viewModel.setInteractionLock(NativeInputState.InteractionLock.Locked)
 
         viewModel.configure(tabId = "tab-A", isDuckAiMode = true, isBottom = false)
         advanceUntilIdle()
 
-        assertTrue(viewModel.state.firstOrNull()!!.interactionLocked)
+        assertEquals(NativeInputState.InteractionLock.Locked, viewModel.state.firstOrNull()!!.interactionLock)
     }
 
     @Test

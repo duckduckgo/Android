@@ -36,15 +36,11 @@ data class NativeInputState(
      * Whether the native input submit button is enabled for this tab.
      */
     val submitEnabled: Boolean = true,
-    /**
-     * Whole input field is non-interactive and dimmed. Generic capability; currently set during the
-     * Duck.ai onboarding demo.
-     */
-    val interactionLocked: Boolean = false,
-    /**
-     * Emphasise the leading fire button (bright + pulsing). Rendered only where that button is shown
-     * (i.e. [InputContext.DUCK_AI]).
-     */
+
+    /**  How much of the input field is locked (non-interactive + dimmed).*/
+    val interactionLock: InteractionLock = InteractionLock.Unlocked,
+
+    /** Show pulse animation around the Duck.ai fire button. */
     val duckAiFireButtonHighlighted: Boolean = false,
 ) {
     enum class InputMode {
@@ -57,6 +53,17 @@ data class NativeInputState(
     enum class ToggleSelection { SEARCH, DUCK_AI }
 
     enum class InputPosition { TOP, BOTTOM }
+
+    enum class InteractionLock {
+        /** Fully interactive. */
+        Unlocked,
+
+        /** Whole field is non-interactive and dimmed. */
+        Locked,
+
+        /** Whole field is locked, except the Duck.ai fire button stays interactive. */
+        LockedExceptDuckAiFireButton,
+    }
 
     val toggleVisible: Boolean get() = inputMode == InputMode.SEARCH_AND_DUCK_AI && inputContext == InputContext.BROWSER
 

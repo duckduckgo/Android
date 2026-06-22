@@ -48,6 +48,7 @@ import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.api.InputMode
+import com.duckduckgo.duckchat.api.nativeinput.NativeInputState.InteractionLock
 import com.duckduckgo.duckchat.api.toChatIdOrNull
 import com.duckduckgo.duckchat.impl.ui.nativeinput.views.NativeInputWidget
 import com.duckduckgo.navigation.api.GlobalActivityStarter
@@ -125,16 +126,10 @@ interface NativeInputManager {
     fun setPickingImage(picking: Boolean)
     fun setText(text: String)
 
-    /**
-     * Lock the whole native input field (non-interactive + dimmed).
-     * Currently only used for the Duck.ai onboarding demo.
-     */
-    fun setInteractionLocked(locked: Boolean)
+    /** Lock the input field (making it non-interactive + dimmed).*/
+    fun setInteractionLock(lock: InteractionLock)
 
-    /**
-     * Emphasise (and pulse) the leading fire button during the Duck.ai onboarding fire CTA.
-     * The highlighted fire button is exempt from the interaction lock set by [setInteractionLocked].
-     */
+    /** Show pulse animation around the Duck.ai fire button. */
     fun setDuckAiFireButtonHighlighted(highlighted: Boolean)
 }
 
@@ -159,7 +154,7 @@ class RealNativeInputManager @Inject constructor(
     private var widgetRoot: View? = null
     private var lastCallbacks: NativeInputCallbacks? = null
 
-    private val interactionLockSource = MutableStateFlow(false)
+    private val interactionLockSource = MutableStateFlow(InteractionLock.Unlocked)
     private val duckAiFireButtonHighlightSource = MutableStateFlow(false)
 
     private fun widgetFrom(widgetView: View): NativeInputWidget? {
@@ -706,8 +701,8 @@ class RealNativeInputManager @Inject constructor(
         }
     }
 
-    override fun setInteractionLocked(locked: Boolean) {
-        interactionLockSource.value = locked
+    override fun setInteractionLock(lock: InteractionLock) {
+        interactionLockSource.value = lock
     }
 
     override fun setDuckAiFireButtonHighlighted(highlighted: Boolean) {

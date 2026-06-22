@@ -55,6 +55,7 @@ import com.duckduckgo.common.utils.extensions.hideKeyboard
 import com.duckduckgo.common.utils.extensions.showKeyboard
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
+import com.duckduckgo.duckchat.api.nativeinput.NativeInputState.InteractionLock
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputStateProvider
 import com.duckduckgo.duckchat.impl.ChatState
 import com.duckduckgo.duckchat.impl.R
@@ -153,8 +154,8 @@ interface NativeInputWidget {
      */
     fun bindChatIdSource(source: Flow<String?>)
 
-    /** Binds a reactive source for the onboarding interaction lock (whole field non-interactive + dimmed). */
-    fun bindInteractionLockSource(source: Flow<Boolean>)
+    /** Binds a reactive source for the onboarding interaction lock (see [InteractionLock]). */
+    fun bindInteractionLockSource(source: Flow<InteractionLock>)
 
     /** Binds a reactive source for emphasising the leading fire button (rendered only in Duck.ai mode). */
     fun bindDuckAiFireButtonHighlightSource(source: Flow<Boolean>)
@@ -232,7 +233,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
     private var chatIdJob: Job? = null
     private var chatIdSource: Flow<String?>? = null
     private var interactionLockJob: Job? = null
-    private var interactionLockSource: Flow<Boolean>? = null
+    private var interactionLockSource: Flow<InteractionLock>? = null
     private var duckAiFireButtonHighlightJob: Job? = null
     private var duckAiFireButtonHighlightSource: Flow<Boolean>? = null
     private var pulseAnimation: PulseAnimation? = null
@@ -641,7 +642,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
         updateBackButtons(state)
         updateFireButtonVisibility(state)
         updateDuckAiFireButtonHighlight(state)
-        setInteractionLocked(state.interactionLocked)
+        setInteractionLocked(state.interactionLock != InteractionLock.Unlocked)
         updateBottomRowVisibility()
         applyVerticalPaddingForFocus()
         updateNewLineButtonVisibility()
@@ -699,16 +700,16 @@ class NativeInputModeWidget @JvmOverloads constructor(
             if (state.shouldShowTrailingFireButton()) VISIBLE else GONE
     }
 
-    // Onboarding emphasis for the leading (Duck.ai) fire button.
-    // Highlighted -> bright + pulsing (exempt from the lock); locked but not highlighted -> dimmed/disabled;
-    // otherwise -> normal.
+    // Onboarding rendering for the leading (Duck.ai) fire button. The lock/dim comes from interactionLock; the
+    // pulse is driven independently by duckAiFireButtonHighlighted.
+    // Locked -> dimmed/disabled; LockedExceptDuckAiFireButton / Unlocked -> interactive. Pulse iff highlighted.
     private fun updateDuckAiFireButtonHighlight(state: NativeInputState) {
         val fireMenu = leadingFireButtonView() ?: return
         val fireIcon = fireMenu.findViewById<View?>(R.id.inputFieldFireIconImageview)
-        val duckAiFireButtonInteractionLocked = state.interactionLocked && !state.duckAiFireButtonHighlighted
-        fireMenu.isEnabled = !duckAiFireButtonInteractionLocked
+        val fireButtonLocked = state.interactionLock == InteractionLock.Locked
+        fireMenu.isEnabled = !fireButtonLocked
         // The whole-widget dim from setInteractionLocked can't reach this view, because it lives in a sibling layout
-        fireMenu.alpha = if (duckAiFireButtonInteractionLocked) LOCKED_FIRE_ALPHA else 1f
+        fireMenu.alpha = if (fireButtonLocked) LOCKED_FIRE_ALPHA else 1f
         when {
             !state.duckAiFireButtonHighlighted || !fireMenu.isVisible || fireIcon == null -> pulseAnimation?.stop()
             fireIcon.height > 0 -> ensurePulseAnimation(fireIcon)?.playOn(fireIcon)
@@ -1048,7 +1049,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
             .launchIn(scope)
     }
 
-    override fun bindInteractionLockSource(source: Flow<Boolean>) {
+    override fun bindInteractionLockSource(source: Flow<InteractionLock>) {
         interactionLockSource = source
         if (isAttachedToWindow) observeInteractionLockSource()
     }
@@ -1059,7 +1060,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
         interactionLockJob?.cancel()
         interactionLockJob = source
             .distinctUntilChanged()
-            .onEach { viewModel.setInteractionLocked(it) }
+            .onEach { viewModel.setInteractionLock(it) }
             .launchIn(scope)
     }
 
