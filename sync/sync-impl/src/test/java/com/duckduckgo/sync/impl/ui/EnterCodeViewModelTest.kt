@@ -85,7 +85,9 @@ internal class EnterCodeViewModelTest {
         this.seamlessAccountSwitching().setRawStoredState(State(true))
     }
     private val syncPixels: SyncPixels = mock()
-    private val qrCode: ExchangeV2QrCode = mock()
+    private val qrCode: ExchangeV2QrCode = mock<ExchangeV2QrCode>().also {
+        whenever(it.parse(any())).thenReturn(ExchangeV2CodeParseResult.Unknown)
+    }
     private val runner: ExchangeV2Runner = mock()
 
     private val codeDispatcher = RealSyncCodeDispatcher(

@@ -96,7 +96,9 @@ class SyncConnectViewModelTest {
     private val syncFeature = com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory.create(SyncFeature::class.java)
 
     private val runnerEventsFlow = kotlinx.coroutines.flow.MutableSharedFlow<com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Event>(replay = 0)
-    private val qrCode: com.duckduckgo.sync.impl.exchange.v2.ExchangeV2QrCode = mock()
+    private val qrCode: com.duckduckgo.sync.impl.exchange.v2.ExchangeV2QrCode = mock<com.duckduckgo.sync.impl.exchange.v2.ExchangeV2QrCode>().also {
+        whenever(it.parse(any())).thenReturn(ExchangeV2CodeParseResult.Unknown)
+    }
     private val runner: com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Runner = mock<com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Runner>().also {
         whenever(it.events).thenReturn(runnerEventsFlow)
         whenever(it.eventsSince(any())).thenAnswer { invocation ->
