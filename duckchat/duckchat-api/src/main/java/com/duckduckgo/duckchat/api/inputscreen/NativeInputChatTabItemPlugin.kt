@@ -58,12 +58,14 @@ interface NativeInputChatTabItem {
     val adapter: RecyclerView.Adapter<*>
 
     /**
-     * Whether this item's content depends on the user's query.
+     * Whether this item participates in query filtering.
      *
-     * `false` (e.g. a message card): the host renders the item statically and never calls
-     * [onQueryChanged]; the item updates itself from its own data source.
+     * `false` (e.g. a message card): the item belongs to the empty/zero state. The host shows it only
+     * while the query is empty and hides it as soon as the user starts typing; [onQueryChanged] is
+     * never called. The item updates its own content from its own data source.
      *
-     * `true`: the host calls [onQueryChanged] with the current query as the user types.
+     * `true`: the item stays visible while the user types and the host calls [onQueryChanged] with the
+     * current query so the item can filter itself.
      */
     val supportsQuery: Boolean
 

@@ -62,6 +62,10 @@ class NativeInputChatSuggestionsBinder @Inject constructor(
 
         private val pluginItems = mutableListOf<NativeInputChatTabItem>()
 
+        // Tracks the last query/empty state applied to plugin visibility, so we only add/remove
+        // non-query items at the empty <-> typing boundary rather than on every keystroke.
+        private var pluginItemsTyping: Boolean? = null
+
         /**
          * Fetches the enabled [NativeInputChatTabItemPlugin]s and inserts each item's adapter at the top
          * of the ConcatAdapter, preserving the plugin point's (priority) order. Safe to call once per
@@ -95,12 +99,15 @@ class NativeInputChatSuggestionsBinder @Inject constructor(
             val showUrl = isTyping && hasUrl
             val showShortcut = isHistoryAvailable && suggestions.chatHistory.size > ChatHistoryShortcutAdapter.VIEW_ALL_CHATS_THRESHOLD
 
-            // Forward the query only to plugins that opted in; static items are left untouched.
+            // Non-query items belong to the empty/zero state: keep them only while the query is
+            // empty so they're gone once the user starts filtering. Query-aware items stay and
+            // receive the query to filter themselves.
+            reconcilePluginVisibility(isTyping)
             pluginItems.forEach { item ->
                 if (item.supportsQuery) item.onQueryChanged(query)
             }
-            // A populated plugin item keeps the suggestions overlay open even with no chat/typing.
-            val hasPluginContent = pluginItems.any { it.adapter.itemCount > 0 }
+            // A visible, populated plugin item keeps the suggestions overlay open even with no chat/typing.
+            val hasPluginContent = pluginItems.any { it.isVisible() && it.adapter.itemCount > 0 }
             val hasContent = hasChat || isTyping || hasPluginContent
 
             chatSuggestionsAdapter.submitList(suggestions.chatHistory) {
@@ -129,6 +136,25 @@ class NativeInputChatSuggestionsBinder @Inject constructor(
             // Plugin items are not cleared here: clear() runs on tab switches and the binding is reused.
             // Each item owns its lifecycle via the scope handed to it in loadPluginItems.
         }
+
+        /**
+         * Adds/removes non-query plugin adapters so they show only while the query is empty. Query-aware
+         * items are never toggled here. Re-adding in [pluginItems] order at the running index restores
+         * the original top-of-list positions (built-in sections always follow the plugin region).
+         */
+        private fun reconcilePluginVisibility(isTyping: Boolean) {
+            if (isTyping == pluginItemsTyping) return
+            pluginItemsTyping = isTyping
+            pluginItems.forEachIndexed { index, item ->
+                if (item.supportsQuery) return@forEachIndexed
+                when {
+                    isTyping && item.isVisible() -> concatAdapter.removeAdapter(item.adapter)
+                    !isTyping && !item.isVisible() -> concatAdapter.addAdapter(index, item.adapter)
+                }
+            }
+        }
+
+        private fun NativeInputChatTabItem.isVisible(): Boolean = concatAdapter.adapters.contains(adapter)
     }
 
     fun create(

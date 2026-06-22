@@ -32,8 +32,8 @@ import javax.inject.Inject
  * It exercises the [NativeInputChatTabItemPlugin] contract end to end:
  * - the plugin is a DI-graph singleton acting as a factory; [create] returns a fresh
  *   [NativeInputChatTabItem] for each Chat-tab binding,
- * - the item is query-independent ([NativeInputChatTabItem.supportsQuery] = false), so the host never
- *   calls `onQueryChanged` and the card is unaffected by what the user types,
+ * - the item is a zero-state element ([NativeInputChatTabItem.supportsQuery] = false), so the host
+ *   shows it only while the query is empty and hides it once the user starts typing,
  * - the item owns its content: dismissing the card empties its adapter (see [ExampleMessageCardAdapter]).
  *
  * Gated `INTERNAL`, so it only appears in internal/dev builds. This is a showcase — delete it (and its

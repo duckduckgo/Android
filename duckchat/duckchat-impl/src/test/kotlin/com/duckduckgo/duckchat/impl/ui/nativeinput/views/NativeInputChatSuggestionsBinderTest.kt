@@ -224,6 +224,77 @@ class NativeInputChatSuggestionsBinderTest {
         assertFalse(hasContent == true)
     }
 
+    @Test
+    fun whenQueryNonEmptyThenNonQueryItemHiddenButQueryItemStays() = runTest {
+        val static = FakeChatItem(adapter = countingAdapter(1), supportsQuery = false)
+        val queryAware = FakeChatItem(adapter = countingAdapter(1), supportsQuery = true)
+        binder = binderWith(fakePlugin(static), fakePlugin(queryAware))
+        val binding = createBinding()
+        binding.loadPluginItems(mock(), scope)
+
+        submitQuery(binding, "hello")
+
+        val adapters = (binding.adapter as ConcatAdapter).adapters
+        assertFalse("non-query item should be hidden while typing", adapters.contains(static.adapter))
+        assertTrue("query item should stay while typing", adapters.contains(queryAware.adapter))
+    }
+
+    @Test
+    fun whenQueryClearedThenNonQueryItemRestoredToOriginalPosition() = runTest {
+        val static = FakeChatItem(adapter = countingAdapter(1), supportsQuery = false)
+        val queryAware = FakeChatItem(adapter = countingAdapter(1), supportsQuery = true)
+        binder = binderWith(fakePlugin(static), fakePlugin(queryAware))
+        val binding = createBinding()
+        binding.loadPluginItems(mock(), scope)
+
+        submitQuery(binding, "hello")
+        submitQuery(binding, "")
+
+        val adapters = (binding.adapter as ConcatAdapter).adapters
+        assertEquals(static.adapter, adapters[0])
+        assertEquals(queryAware.adapter, adapters[1])
+    }
+
+    @Test
+    fun whenNonQueryItemHiddenWhileTypingThenItDoesNotKeepOverlayOpen() = runTest {
+        val populated = FakeChatItem(adapter = countingAdapter(1), supportsQuery = false)
+        binder = binderWith(fakePlugin(populated))
+        val binding = createBinding()
+        binding.loadPluginItems(mock(), scope)
+
+        // Empty query first so the boundary transition removes it when typing starts.
+        submitQuery(binding, "")
+        var hasContent: Boolean? = null
+        binding.submit(
+            suggestions = ChatTabSuggestions(
+                chatHistory = emptyList(),
+                urlSuggestions = AutoCompleteResult(query = "x", suggestions = emptyList()),
+            ),
+            query = "x",
+            isHistoryAvailable = true,
+            onCommit = { hasContent = it },
+        )
+
+        // hasContent is true here only because isTyping is true, not because of the hidden card.
+        assertFalse((binding.adapter as ConcatAdapter).adapters.contains(populated.adapter))
+        assertTrue(hasContent == true)
+    }
+
+    private fun submitQuery(
+        binding: NativeInputChatSuggestionsBinder.Binding,
+        query: String,
+    ) {
+        binding.submit(
+            suggestions = ChatTabSuggestions(
+                chatHistory = emptyList(),
+                urlSuggestions = AutoCompleteResult(query = query, suggestions = emptyList()),
+            ),
+            query = query,
+            isHistoryAvailable = true,
+            onCommit = {},
+        )
+    }
+
     private val scope = CoroutineScope(SupervisorJob())
 
     private fun binderWith(vararg plugins: NativeInputChatTabItemPlugin): NativeInputChatSuggestionsBinder =
