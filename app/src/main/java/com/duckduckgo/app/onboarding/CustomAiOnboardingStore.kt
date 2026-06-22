@@ -93,9 +93,9 @@ class CustomAiOnboardingStoreImpl @Inject constructor(
 
     override fun process(referrerParams: Map<String, String>) {
         runCatching {
-            if (referrerParams[REFERRAL_KEY] == REFERRAL_VALUE_AI) {
-                logcat(INFO) { "Custom AI onboarding referral detected" }
-                preferences.edit { putBoolean(PREFS_KEY_REFERRAL_PARAM_PRESENT, true) }
+            if (referrerParams[REFERRER_KEY] == REFERRER_VALUE_AI) {
+                logcat(INFO) { "Custom AI onboarding referrer detected" }
+                preferences.edit { putBoolean(PREFS_KEY_REFERRER_PARAM_PRESENT, true) }
             }
         }.onFailure { logcat(WARN) { "Failed to persist custom AI onboarding flag: ${it.message}" } }
     }
@@ -104,7 +104,7 @@ class CustomAiOnboardingStoreImpl @Inject constructor(
         withContext(dispatcherProvider.io()) {
             // Ensure the install referrer (and therefore the processing function) has resolved before reading.
             withTimeoutOrNull(MAX_REFERRER_WAIT_TIME_MS) { referrerStateListener.get().waitForReferrerCode() }
-            val referrerExists = preferences.getBoolean(PREFS_KEY_REFERRAL_PARAM_PRESENT, false)
+            val referrerExists = preferences.getBoolean(PREFS_KEY_REFERRER_PARAM_PRESENT, false)
 
             val customAiOnboardingEnabled = customDuckAiOnboardingFeature.self().isEnabled()
             val orchestratorEnabled = orchestratorFeature.self().isEnabled()
@@ -137,13 +137,13 @@ class CustomAiOnboardingStoreImpl @Inject constructor(
     }
 
     companion object {
-        private const val REFERRAL_KEY = "onboarding"
+        private const val REFERRER_KEY = "onboarding"
 
         // exact lowercase value as sent in the campaign referrer link (e.g. ...&onboarding=ai)
-        private const val REFERRAL_VALUE_AI = "ai"
+        private const val REFERRER_VALUE_AI = "ai"
 
         private const val PREFS_FILENAME = "com.duckduckgo.app.onboarding.customai"
-        private const val PREFS_KEY_REFERRAL_PARAM_PRESENT = "customAiOnboardingReferralParamPresent"
+        private const val PREFS_KEY_REFERRER_PARAM_PRESENT = "customAiOnboardingReferrerParamPresent"
 
         private const val PREFS_KEY_ENABLED = "customAiOnboardingEnabled"
     }
