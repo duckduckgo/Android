@@ -33,6 +33,7 @@ import com.duckduckgo.browsermode.api.FireModeAvailability
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.plugins.PluginPoint
+import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.dataclearing.api.plugin.ClearableData
 import com.duckduckgo.dataclearing.api.plugin.DataClearingPlugin
 import com.duckduckgo.dataclearing.impl.plugin.DataClearingOrchestrator
@@ -136,18 +137,31 @@ class DataClearingModeIsolationTest {
             .allowMainThreadQueries()
             .build()
 
-        val mockMigrationPrefs: DuckAiMigrationPrefs = mock()
-        whenever(mockMigrationPrefs.isMigrationDone(DuckAiMigrationPrefs.CHATS_KEY)).thenReturn(true)
+        // Use a real DuckAiMigrationPrefs backed by real SharedPreferences — avoids mocking a final
+        // Kotlin class (which requires inline mock-maker, not configured in this target).
+        // Migration state is irrelevant here: no test calls hasMigrated().
+        val realMigrationPrefs = DuckAiMigrationPrefs(
+            object : SharedPreferencesProvider {
+                override fun getSharedPreferences(name: String, multiprocess: Boolean, migrate: Boolean) =
+                    context.getSharedPreferences(name, android.content.Context.MODE_PRIVATE)
+                override fun getEncryptedSharedPreferences(name: String, multiprocess: Boolean) =
+                    context.getSharedPreferences(name, android.content.Context.MODE_PRIVATE)
+                override suspend fun getMigratedEncryptedSharedPreferences(name: String) =
+                    context.getSharedPreferences(name, android.content.Context.MODE_PRIVATE)
+                override suspend fun getMigratedEncryptedSharedPreferences(origin: android.content.SharedPreferences, name: String) =
+                    context.getSharedPreferences(name, android.content.Context.MODE_PRIVATE)
+            },
+        )
 
         regularChatStore = RealDuckAiChatStore(
             storage = FakeDuckAiBridgeStorage(regularChatDb.chatsDao(), regularChatDb.fileMetaDao(), context),
             dispatchers = coroutineTestRule.testDispatcherProvider,
-            migrationPrefs = mockMigrationPrefs,
+            migrationPrefs = realMigrationPrefs,
         )
         fireChatStore = RealDuckAiChatStore(
             storage = FakeDuckAiBridgeStorage(fireChatDb.chatsDao(), fireChatDb.fileMetaDao(), context),
             dispatchers = coroutineTestRule.testDispatcherProvider,
-            migrationPrefs = mockMigrationPrefs,
+            migrationPrefs = realMigrationPrefs,
         )
 
         // Provider routes by mode to the matching DAO-backed stub
