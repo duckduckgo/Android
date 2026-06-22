@@ -143,6 +143,7 @@ class BrowserWebViewClient @Inject constructor(
     private var lastPageStarted: String? = null
     private var start: Long? = null
     private var lastInterceptedAppSchemeUrl: String? = null
+    private var lastCommitVisibleUrl: String? = null
 
     private val isAppSchemeInterceptionEnabled = AtomicBoolean(true)
 
@@ -461,6 +462,7 @@ class BrowserWebViewClient @Inject constructor(
         url: String,
     ) {
         logcat(VERBOSE) { "onPageCommitVisible webViewUrl: ${webView.url} URL: $url progress: ${webView.progress}" }
+        lastCommitVisibleUrl = url
         // Show only when the commit matches the tab state
         if (webView.url == url) {
             val navigationList = webView.safeCopyBackForwardList() ?: return
@@ -508,6 +510,7 @@ class BrowserWebViewClient @Inject constructor(
         }
 
         lastInterceptedAppSchemeUrl = null
+        lastCommitVisibleUrl = null
 
         url?.let {
             // See https://app.asana.com/0/0/1206159443951489/f (WebView limitations)
@@ -607,6 +610,14 @@ class BrowserWebViewClient @Inject constructor(
 
         // See https://app.asana.com/0/0/1206159443951489/f (WebView limitations)
         if (webView.progress == 100) {
+            // FALLBACK (recycled-WebView stale frame): the load finished, but if onPageCommitVisible
+            // never fired for this url the recycled WebView keeps drawing the previous navigation's
+            // frame until a re-composite (e.g. tab switch). Force it to present the new content.
+            if (url != null && url != ABOUT_BLANK && lastCommitVisibleUrl != url) {
+                logcat(VERBOSE) { "onPageCommitVisible never fired for $url; forcing present" }
+                forceWebViewPresent(webView)
+            }
+
             jsPlugins.getPlugins().forEach {
                 it.onPageFinished(
                     webView,
@@ -677,6 +688,13 @@ class BrowserWebViewClient @Inject constructor(
         val scope = webView.findViewTreeLifecycleOwner()?.lifecycleScope ?: return
         scope.launch(dispatcherProvider.io()) {
             cookieManagerProvider.get()?.flush()
+        }
+    }
+
+    private fun forceWebViewPresent(webView: WebView) {
+        webView.post {
+            webView.onPause()
+            webView.onResume()
         }
     }
 
