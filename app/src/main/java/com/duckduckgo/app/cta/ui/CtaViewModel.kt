@@ -55,6 +55,7 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.api.inputscreen.DuckAiOnboardingEndCtaVariant
 import com.duckduckgo.onboarding.api.LinearOnboardingOrchestrator
@@ -107,6 +108,7 @@ class CtaViewModel @Inject constructor(
     private val deviceInfo: DeviceInfo,
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
     linearOnboardingOrchestrator: LinearOnboardingOrchestrator,
+    private val duckAiFeatureState: DuckAiFeatureState,
 ) {
     @ExperimentalCoroutinesApi
     @VisibleForTesting
@@ -141,6 +143,12 @@ class CtaViewModel @Inject constructor(
     private suspend fun isOnboardingImprovementsEnabled(): Boolean = withContext(dispatchers.io()) {
         onboardingBrandDesignUpdateToggles.onboardingImprovements().isEnabled()
     }
+
+    /**
+     * Whether the legacy `InputScreenActivity` is in play. When false, the native input widget is shown
+     * instead (gated in `RealDuckChat.cacheUserSettings()` by `DuckChatFeature.nativeInputField()` + user settings).
+     */
+    private fun isInputScreenEnabled(): Boolean = duckAiFeatureState.showInputScreen.value
 
     // Exposed for onboarding dev settings and tests. Used internally for completion checks
     @VisibleForTesting
@@ -188,6 +196,11 @@ class CtaViewModel @Inject constructor(
             }
             if (cta is OnboardingDaxDialogCta.DaxDuckAiFireButtonCta || cta is DaxDuckAiFireButtonBrandDesignUpdateContextualCta) {
                 duckAiOnboardingExperimentMetrics.fireFireDialogImpression()
+            }
+            if (cta is DaxDuckAiEndBubbleCta || cta is DaxDuckAiEndBrandDesignUpdateBubbleCta) {
+                // Native-input bubble path: mirror prepareAndMarkDuckAiEndCtaForInputScreen's side-effects.
+                duckAiOnboardingExperimentMetrics.fireFinalDialogImpression()
+                completeStageIfDaxOnboardingCompleted()
             }
             if (cta is DaxCta && cta.markAsReadOnShow) {
                 dismissedCtaDao.insert(DismissedCta(cta.ctaId))
@@ -255,8 +268,8 @@ class CtaViewModel @Inject constructor(
 
             dismissedCtaDao.insert(DismissedCta(CtaId.DAX_DUCK_AI_END))
             completeStageIfDaxOnboardingCompleted()
-            if (canSendShownPixel(onboardingStore, DUCK_AI_END_CTA_PIXEL_PARAM)) {
-                val journey = addCtaToHistory(onboardingStore, appInstallStore, DUCK_AI_END_CTA_PIXEL_PARAM)
+            if (canSendShownPixel(onboardingStore, Pixel.PixelValues.DUCK_AI_END_CTA)) {
+                val journey = addCtaToHistory(onboardingStore, appInstallStore, Pixel.PixelValues.DUCK_AI_END_CTA)
                 pixel.fire(AppPixelName.ONBOARDING_DAX_CTA_SHOWN, mapOf(Pixel.PixelParameter.CTA_SHOWN to journey))
             }
             duckAiOnboardingExperimentMetrics.fireFinalDialogImpression()
@@ -271,7 +284,7 @@ class CtaViewModel @Inject constructor(
 
     suspend fun onDuckAiEndCtaInteraction(okClicked: Boolean) {
         withContext(dispatchers.io()) {
-            val params = mapOf(Pixel.PixelParameter.CTA_SHOWN to DUCK_AI_END_CTA_PIXEL_PARAM)
+            val params = mapOf(Pixel.PixelParameter.CTA_SHOWN to Pixel.PixelValues.DUCK_AI_END_CTA)
             if (okClicked) {
                 pixel.fire(AppPixelName.ONBOARDING_DAX_CTA_OK_BUTTON, params)
                 duckAiOnboardingExperimentMetrics.fireFinalDialogPressed()
@@ -376,9 +389,21 @@ class CtaViewModel @Inject constructor(
             }
 
             // Duck.ai onboarding end
-            canShowDuckAiEndCta() -> {
-                // Suppress home CTAs until duck.ai end CTA is shown on input screen
-                null
+            canShowDuckAiEndCta() && !extendedOnboardingFeatureToggles.noBrowserCtas().isEnabled() -> {
+                if (isInputScreenEnabled()) {
+                    // Legacy path: the input screen auto-launches with the end CTA. Suppress home
+                    // CTAs until that flow runs (see prepareAndMarkDuckAiEndCtaForInputScreen).
+                    null
+                } else if (isBrandDesignUpdateEnabled()) {
+                    DaxDuckAiEndBrandDesignUpdateBubbleCta(
+                        onboardingStore = onboardingStore,
+                        appInstallStore = appInstallStore,
+                        isLightTheme = appTheme.isLightModeEnabled(),
+                        deviceInfo = deviceInfo,
+                    )
+                } else {
+                    DaxDuckAiEndBubbleCta(onboardingStore, appInstallStore)
+                }
             }
 
             // Search suggestions
@@ -764,6 +789,5 @@ class CtaViewModel @Inject constructor(
     companion object {
         private const val MAX_TABS_OPEN_FIRE_EDUCATION = 2
         private const val SUBSCRIPTION_SKIPPED_ONBOARDING_MIN_DAYS = 7L
-        private const val DUCK_AI_END_CTA_PIXEL_PARAM = "duck_ai_end_cta"
     }
 }

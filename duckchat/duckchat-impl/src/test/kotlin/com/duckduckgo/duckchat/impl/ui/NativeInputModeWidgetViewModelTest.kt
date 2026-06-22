@@ -727,6 +727,54 @@ class NativeInputModeWidgetViewModelTest {
     }
 
     @Test
+    fun whenSetInteractionLockThenReflectedInState() = runTest {
+        val viewModel = createViewModel()
+        viewModel.configure(tabId = "tab-A", isDuckAiMode = true, isBottom = false)
+        advanceUntilIdle()
+
+        viewModel.setInteractionLock(NativeInputState.InteractionLock.Locked)
+        advanceUntilIdle()
+        assertEquals(NativeInputState.InteractionLock.Locked, viewModel.state.firstOrNull()!!.interactionLock)
+
+        viewModel.setInteractionLock(NativeInputState.InteractionLock.LockedExceptDuckAiFireButton)
+        advanceUntilIdle()
+        assertEquals(
+            NativeInputState.InteractionLock.LockedExceptDuckAiFireButton,
+            viewModel.state.firstOrNull()!!.interactionLock,
+        )
+
+        viewModel.setInteractionLock(NativeInputState.InteractionLock.Unlocked)
+        advanceUntilIdle()
+        assertEquals(NativeInputState.InteractionLock.Unlocked, viewModel.state.firstOrNull()!!.interactionLock)
+    }
+
+    @Test
+    fun whenSetDuckAiFireButtonHighlightedThenReflectedInState() = runTest {
+        val viewModel = createViewModel()
+        viewModel.configure(tabId = "tab-A", isDuckAiMode = true, isBottom = false)
+        advanceUntilIdle()
+
+        viewModel.setDuckAiFireButtonHighlighted(true)
+        advanceUntilIdle()
+        assertTrue(viewModel.state.firstOrNull()!!.duckAiFireButtonHighlighted)
+
+        viewModel.setDuckAiFireButtonHighlighted(false)
+        advanceUntilIdle()
+        assertFalse(viewModel.state.firstOrNull()!!.duckAiFireButtonHighlighted)
+    }
+
+    @Test
+    fun whenSetInteractionLockBeforeConfigureThenAppliedOnConfigure() = runTest {
+        val viewModel = createViewModel()
+        viewModel.setInteractionLock(NativeInputState.InteractionLock.Locked)
+
+        viewModel.configure(tabId = "tab-A", isDuckAiMode = true, isBottom = false)
+        advanceUntilIdle()
+
+        assertEquals(NativeInputState.InteractionLock.Locked, viewModel.state.firstOrNull()!!.interactionLock)
+    }
+
+    @Test
     fun whenShowModelPickerEventThenModelChangeModeSetTrueOnActiveTab() = runTest {
         val viewModel = createViewModel()
         viewModel.configure(tabId = "tab-A", isDuckAiMode = true, isBottom = false)

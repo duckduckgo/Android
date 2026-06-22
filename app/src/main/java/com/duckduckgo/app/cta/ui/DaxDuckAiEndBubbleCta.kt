@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.cta.ui
 
+import android.text.Html
 import android.view.View
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.cta.model.CtaId
@@ -23,42 +24,38 @@ import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.common.utils.device.DeviceInfo
-import com.google.android.material.button.MaterialButton
+import com.duckduckgo.common.ui.view.TypeAnimationTextView
+import com.duckduckgo.common.ui.view.appendIconToText
 import com.duckduckgo.mobile.android.R as CommonR
 
-data class DaxEndBrandDesignUpdateBubbleCta(
+data class DaxDuckAiEndBubbleCta(
     override val onboardingStore: OnboardingStore,
     override val appInstallStore: AppInstallStore,
-    override val isLightTheme: Boolean,
-    override val deviceInfo: DeviceInfo,
-    override val onboardingImprovementsEnabled: Boolean,
-) : DaxBubbleCta.BrandDesignUpdateBubbleCta(
-    ctaId = CtaId.DAX_END,
-    title = R.string.onboardingEndDaxDialogTitle,
-    description = R.string.onboardingEndDaxDialogDescription,
-    backgroundRes = CommonR.drawable.bg_onboarding_end,
+) : DaxBubbleCta(
+    ctaId = CtaId.DAX_DUCK_AI_END,
+    title = R.string.onboardingDuckAiEndCtaTitle,
+    description = R.string.onboardingDuckAiEndCtaDescription,
+    primaryCta = R.string.onboardingDuckAiEndCtaButton,
     shownPixel = AppPixelName.ONBOARDING_DAX_CTA_SHOWN,
     okPixel = AppPixelName.ONBOARDING_DAX_CTA_OK_BUTTON,
-    ctaPixelParam = Pixel.PixelValues.DAX_END_CTA,
+    ctaPixelParam = Pixel.PixelValues.DUCK_AI_END_CTA,
     onboardingStore = onboardingStore,
     appInstallStore = appInstallStore,
-    isLightTheme = isLightTheme,
-    deviceInfo = deviceInfo,
-    onboardingImprovementsEnabled = onboardingImprovementsEnabled,
-),
-    DaxBubbleCta.ShowsWavingDax {
-    override val activeIncludeId: Int = R.id.primaryCta
-    override val showArrow: Boolean = true
-    override val wavingDaxSpec = WavingDaxSpec(
-        rotationDegrees = 0f,
-        translationXDp = -40f,
-        translationYDp = -150f,
-        heightDp = 178f,
-        anchorToCardOnTablet = true,
-    )
+) {
+    override val markAsReadOnShow: Boolean = true
 
-    override fun configureContentViews(view: View) {
-        view.findViewById<MaterialButton>(R.id.primaryCta)?.setText(R.string.onboardingEndDaxDialogButton)
+    override fun showCta(
+        view: View,
+        onTypingAnimationFinished: () -> Unit,
+    ) {
+        // Animator types plain String only, so apply the icon-suffixed description after it finishes.
+        val wrappedCallback = {
+            val context = view.context
+            val descriptionHtml = Html.fromHtml(context.getString(R.string.onboardingDuckAiEndCtaDescription), Html.FROM_HTML_MODE_COMPACT)
+            view.findViewById<TypeAnimationTextView>(R.id.dialogTextCta)?.text =
+                context.appendIconToText(descriptionHtml, CommonR.drawable.ic_ai_chat_16)
+            onTypingAnimationFinished()
+        }
+        super.showCta(view, wrappedCallback)
     }
 }

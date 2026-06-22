@@ -568,7 +568,7 @@ sealed class OnboardingDaxDialogCta(
         AppPixelName.ONBOARDING_DAX_CTA_OK_BUTTON,
         null,
         AppPixelName.ONBOARDING_DAX_CTA_DISMISS_BUTTON,
-        "duck_ai_fire_button_cta",
+        Pixel.PixelValues.DUCK_AI_FIRE_BUTTON_CTA,
         onboardingStore,
         appInstallStore,
     ) {

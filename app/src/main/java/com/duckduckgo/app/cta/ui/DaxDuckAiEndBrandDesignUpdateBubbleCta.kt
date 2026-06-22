@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.cta.ui
 
+import android.content.Context
 import android.view.View
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.cta.model.CtaId
@@ -23,29 +24,32 @@ import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.common.ui.view.appendIconToText
 import com.duckduckgo.common.utils.device.DeviceInfo
 import com.google.android.material.button.MaterialButton
 import com.duckduckgo.mobile.android.R as CommonR
 
-data class DaxEndBrandDesignUpdateBubbleCta(
+data class DaxDuckAiEndBrandDesignUpdateBubbleCta(
     override val onboardingStore: OnboardingStore,
     override val appInstallStore: AppInstallStore,
     override val isLightTheme: Boolean,
     override val deviceInfo: DeviceInfo,
-    override val onboardingImprovementsEnabled: Boolean,
 ) : DaxBubbleCta.BrandDesignUpdateBubbleCta(
-    ctaId = CtaId.DAX_END,
-    title = R.string.onboardingEndDaxDialogTitle,
-    description = R.string.onboardingEndDaxDialogDescription,
+    ctaId = CtaId.DAX_DUCK_AI_END,
+    title = R.string.onboardingDuckAiEndCtaTitle,
+    description = if (onboardingStore.isCustomAiOnboardingFlow()) {
+        R.string.onboardingEndCustomAiFlowDaxDialogDescription
+    } else {
+        R.string.onboardingDuckAiEndCtaDescription
+    },
     backgroundRes = CommonR.drawable.bg_onboarding_end,
     shownPixel = AppPixelName.ONBOARDING_DAX_CTA_SHOWN,
     okPixel = AppPixelName.ONBOARDING_DAX_CTA_OK_BUTTON,
-    ctaPixelParam = Pixel.PixelValues.DAX_END_CTA,
+    ctaPixelParam = Pixel.PixelValues.DUCK_AI_END_CTA,
     onboardingStore = onboardingStore,
     appInstallStore = appInstallStore,
     isLightTheme = isLightTheme,
     deviceInfo = deviceInfo,
-    onboardingImprovementsEnabled = onboardingImprovementsEnabled,
 ),
     DaxBubbleCta.ShowsWavingDax {
     override val activeIncludeId: Int = R.id.primaryCta
@@ -59,6 +63,9 @@ data class DaxEndBrandDesignUpdateBubbleCta(
     )
 
     override fun configureContentViews(view: View) {
-        view.findViewById<MaterialButton>(R.id.primaryCta)?.setText(R.string.onboardingEndDaxDialogButton)
+        view.findViewById<MaterialButton>(R.id.primaryCta)?.setText(R.string.onboardingDuckAiEndCtaButton)
     }
+
+    override fun decorateDescription(context: Context, text: CharSequence): CharSequence =
+        context.appendIconToText(text, CommonR.drawable.ic_ai_chat_16)
 }

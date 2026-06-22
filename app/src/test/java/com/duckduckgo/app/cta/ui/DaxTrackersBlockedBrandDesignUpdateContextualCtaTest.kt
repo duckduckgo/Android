@@ -168,6 +168,7 @@ class DaxTrackersBlockedBrandDesignUpdateContextualCtaTest {
             linearOnboardingOrchestrator = mock<LinearOnboardingOrchestrator> {
                 on { state } doReturn MutableStateFlow(LinearOnboardingState.NotStarted)
             },
+            duckAiFeatureState = mock { on { showInputScreen } doReturn MutableStateFlow(true) },
         )
     }
 

@@ -247,6 +247,8 @@ import com.duckduckgo.app.cta.ui.BrokenSitePromptDialogCta
 import com.duckduckgo.app.cta.ui.Cta
 import com.duckduckgo.app.cta.ui.CtaViewModel
 import com.duckduckgo.app.cta.ui.DaxBubbleCta
+import com.duckduckgo.app.cta.ui.DaxDuckAiEndBrandDesignUpdateBubbleCta
+import com.duckduckgo.app.cta.ui.DaxDuckAiEndBubbleCta
 import com.duckduckgo.app.cta.ui.DaxDuckAiFireButtonBrandDesignUpdateContextualCta
 import com.duckduckgo.app.cta.ui.DaxEndBrandDesignUpdateBubbleCta
 import com.duckduckgo.app.cta.ui.DaxFireButtonBrandDesignUpdateContextualCta
@@ -1833,6 +1835,8 @@ class BrowserTabViewModel @Inject constructor(
         val normalizedNewUrl = normalizeUrl(newUrl)
         return normalizedOldUrl == normalizedNewUrl
     }
+
+    fun isOmnibarLockedForOnboarding(): Boolean = currentBrowserViewState().isOmnibarLockedForOnboarding
 
     /**
      * Handles back navigation. Returns false if navigation could not be
@@ -5170,6 +5174,8 @@ class BrowserTabViewModel @Inject constructor(
             }
             is DaxBubbleCta.DaxEndCta,
             is DaxEndBrandDesignUpdateBubbleCta,
+            is DaxDuckAiEndBubbleCta,
+            is DaxDuckAiEndBrandDesignUpdateBubbleCta,
             -> {
                 viewModelScope.launch {
                     val updatedCta = refreshCta()
