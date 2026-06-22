@@ -258,32 +258,6 @@ class BrandDesignUpdateBubbleCtaTest {
     }
 
     @Test
-    fun whenDaxEndCustomAiOnboardingFlowThenDescriptionIsCustomAi() {
-        val cta = DaxEndBrandDesignUpdateBubbleCta(
-            onboardingStore = onboardingStore,
-            appInstallStore = appInstallStore,
-            isLightTheme = true,
-            deviceInfo = mockDeviceInfo,
-            isCustomAiOnboardingFlow = true,
-            onboardingImprovementsEnabled = true,
-        )
-        assertEquals(R.string.onboardingEndCustomAiFlowDaxDialogDescription, cta.description)
-    }
-
-    @Test
-    fun whenDaxEndStandardFlowThenDescriptionIsStandard() {
-        val cta = DaxEndBrandDesignUpdateBubbleCta(
-            onboardingStore = onboardingStore,
-            appInstallStore = appInstallStore,
-            isLightTheme = true,
-            deviceInfo = mockDeviceInfo,
-            isCustomAiOnboardingFlow = false,
-            onboardingImprovementsEnabled = true,
-        )
-        assertEquals(R.string.onboardingEndDaxDialogDescription, cta.description)
-    }
-
-    @Test
     fun whenDaxSubscriptionCustomAiOnboardingFlowThenDescriptionIsCustomAi() {
         val cta = DaxSubscriptionBrandDesignUpdateBubbleCta(
             onboardingStore = onboardingStore,

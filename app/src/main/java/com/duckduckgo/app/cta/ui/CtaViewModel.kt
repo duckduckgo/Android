@@ -402,6 +402,7 @@ class CtaViewModel @Inject constructor(
                         appInstallStore = appInstallStore,
                         isLightTheme = appTheme.isLightModeEnabled(),
                         deviceInfo = deviceInfo,
+                        isCustomAiOnboardingFlow = customAiOnboarding.isEnabled(),
                     )
                 } else {
                     DaxDuckAiEndBubbleCta(onboardingStore, appInstallStore)
@@ -440,7 +441,6 @@ class CtaViewModel @Inject constructor(
                         appInstallStore,
                         appTheme.isLightModeEnabled(),
                         deviceInfo,
-                        isCustomAiOnboardingFlow = customAiOnboarding.isEnabled(),
                         onboardingImprovementsEnabled = isOnboardingImprovementsEnabled(),
                     )
                 } else {

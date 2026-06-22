@@ -3583,6 +3583,7 @@ class BrowserTabViewModelTest {
             appInstallStore = mockAppInstallStore,
             isLightTheme = true,
             deviceInfo = mockDeviceInfo,
+            isCustomAiOnboardingFlow = false,
         )
         setCta(cta)
         whenever(mockDismissedCtaDao.exists(CtaId.DAX_DUCK_AI_END)).thenReturn(true)
