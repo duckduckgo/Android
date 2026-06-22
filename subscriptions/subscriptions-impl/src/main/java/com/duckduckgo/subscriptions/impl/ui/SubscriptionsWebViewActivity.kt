@@ -686,7 +686,10 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
         if (params.url == subscriptionsUrlProvider.activateUrl) {
             setResult(RESULT_OK)
         } else {
-            globalActivityStarter.start(this, SettingsScreenNoParams)
+            globalActivityStarter.startIntent(this, SettingsScreenNoParams)?.let { intent ->
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
+                startActivity(intent)
+            }
         }
         finish()
     }
