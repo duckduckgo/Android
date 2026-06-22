@@ -578,6 +578,50 @@ class BrowserWebViewClientTest {
     }
 
     @Test
+    fun whenMainFrameDuckChatUrlAndListenerHandlesInCustomTabThenReturnTrueAndDoNotClassify() {
+        val url = "https://duck.ai/?q=example".toUri()
+        whenever(webResourceRequest.isForMainFrame).thenReturn(true)
+        whenever(webResourceRequest.url).thenReturn(url)
+        whenever(mockDuckChat.isDuckChatUrl(url)).thenReturn(true)
+        whenever(listener.handleDuckChatUrlInCustomTab(url)).thenReturn(true)
+
+        assertTrue(testee.shouldOverrideUrlLoading(webView, webResourceRequest))
+
+        verify(listener).handleDuckChatUrlInCustomTab(url)
+        verifyNoInteractions(specialUrlDetector)
+    }
+
+    @Test
+    fun whenMainFrameDuckChatUrlButListenerDoesNotHandleThenFallThroughToClassification() {
+        val url = "https://duck.ai/?q=example".toUri()
+        whenever(webResourceRequest.isForMainFrame).thenReturn(true)
+        whenever(webResourceRequest.url).thenReturn(url)
+        whenever(mockDuckChat.isDuckChatUrl(url)).thenReturn(true)
+        whenever(listener.handleDuckChatUrlInCustomTab(url)).thenReturn(false)
+        whenever(specialUrlDetector.determineType(initiatingUrl = any(), uri = any()))
+            .thenReturn(SpecialUrlDetector.UrlType.Web(url.toString()))
+
+        assertFalse(testee.shouldOverrideUrlLoading(webView, webResourceRequest))
+
+        verify(listener).handleDuckChatUrlInCustomTab(url)
+        verify(specialUrlDetector).determineType(initiatingUrl = any(), uri = any())
+    }
+
+    @Test
+    fun whenSubFrameDuckChatUrlThenListenerNotConsultedForCustomTabRedirect() {
+        val url = "https://duck.ai/?q=example".toUri()
+        whenever(webResourceRequest.isForMainFrame).thenReturn(false)
+        whenever(webResourceRequest.url).thenReturn(url)
+        whenever(mockDuckChat.isDuckChatUrl(url)).thenReturn(true)
+        whenever(specialUrlDetector.determineType(initiatingUrl = any(), uri = any()))
+            .thenReturn(SpecialUrlDetector.UrlType.Web(url.toString()))
+
+        testee.shouldOverrideUrlLoading(webView, webResourceRequest)
+
+        verify(listener, never()).handleDuckChatUrlInCustomTab(any())
+    }
+
+    @Test
     fun whenShouldOverrideWithShouldNavigateToDuckPlayerSetOriginToSerpAuto() =
         runTest {
             val urlType = SpecialUrlDetector.UrlType.ShouldLaunchDuckPlayerLink("duck://player/1234".toUri())

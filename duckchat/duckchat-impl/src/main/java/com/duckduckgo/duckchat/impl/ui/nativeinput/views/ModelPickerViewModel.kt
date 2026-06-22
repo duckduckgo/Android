@@ -174,6 +174,7 @@ class ModelPickerViewModel @Inject constructor(
                 if (model.id != recoverySelectedModelId.value) {
                     duckChatPixels.fireModelSelected(model.id)
                 }
+                duckChatPixels.fireSubmitChangeModel(model.id)
                 recoverySelectedModelId.value = model.id
                 modelChangeChannel.trySend(PickerModelChange.ChangeModel(model.id))
             } else {

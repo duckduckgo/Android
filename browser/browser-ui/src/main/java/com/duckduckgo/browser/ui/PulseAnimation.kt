@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.browser
+package com.duckduckgo.browser.ui
 
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator

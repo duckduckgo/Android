@@ -26,12 +26,14 @@ appId: com.duckduckgo.mobile.android
 - tapOn:
     id: "modelPickerChip"
 - assertVisible:
-    text: "GPT-4o mini"
+    text: "Claude Haiku 2.5"
 
-# pick GPT-4o mini and assert the chip text changes to "4o-mini"
-- tapOn: "GPT-4o mini"
-- assertVisible:
-    text: "4o-mini"
+# pick Claude Haiku 2.5 and assert the chip updated away from the default
+# (the chip short name is backend-driven, so assert it's no longer "GPT-5"
+# rather than hardcoding Haiku's truncated label)
+- tapOn: "Claude Haiku 2.5"
+- assertNotVisible:
+    text: "GPT-5"
     childOf:
       id: "modelPickerChip"
 

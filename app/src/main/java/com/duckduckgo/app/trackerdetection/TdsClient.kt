@@ -24,7 +24,6 @@ import com.duckduckgo.app.trackerdetection.model.Action.BLOCK
 import com.duckduckgo.app.trackerdetection.model.Action.IGNORE
 import com.duckduckgo.app.trackerdetection.model.Rule
 import com.duckduckgo.app.trackerdetection.model.TdsTracker
-import com.duckduckgo.common.utils.extensions.toTldPlusOne
 import logcat.logcat
 
 class TdsClient(
@@ -100,11 +99,9 @@ class TdsClient(
     }
 
     private fun findCompiledTrackerByLabelWalk(host: String): CompiledTracker? {
-        val eTldPlusOne = host.toTldPlusOne() ?: return null
         var candidate: String = host
         while (true) {
             compiledTrackerByDomain[candidate]?.let { return it }
-            if (candidate == eTldPlusOne) return null
             val dot = candidate.indexOf('.')
             if (dot < 0) return null
             candidate = candidate.substring(dot + 1)

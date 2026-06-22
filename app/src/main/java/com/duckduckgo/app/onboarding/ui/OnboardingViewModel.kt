@@ -22,6 +22,7 @@ import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.cta.model.DismissedCta
+import com.duckduckgo.app.onboarding.DuckAiOnboardingDemo
 import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingEvent
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.OnboardingStore
@@ -52,6 +53,7 @@ class OnboardingViewModel @Inject constructor(
     private val onboardingStore: OnboardingStore,
     private val onboardingBrandDesignUpdateToggles: OnboardingBrandDesignUpdateToggles,
     private val linearOnboardingOrchestrator: LinearOnboardingOrchestrator,
+    private val duckAiOnboardingDemo: DuckAiOnboardingDemo,
 ) : ViewModel() {
 
     private val _viewState = MutableStateFlow(ViewState())
@@ -91,17 +93,9 @@ class OnboardingViewModel @Inject constructor(
                 }
 
                 DUCK_AI_FOCUSED -> {
-                    // Mark this as a duck.ai onboarding path so CtaViewModel shows duck.ai-specific CTAs
-                    onboardingStore.setDuckAiOnboardingFlow()
-
-                    // Silence all standard DAX CTAs so they don't appear in the browser
-                    listOf(
-                        CtaId.DAX_INTRO,
-                        CtaId.DAX_DIALOG_SERP,
-                        CtaId.DAX_DIALOG_TRACKERS_FOUND,
-                        CtaId.DAX_FIRE_BUTTON,
-                        CtaId.DAX_END,
-                    ).forEach { dismissedCtaDao.insert(DismissedCta(it)) }
+                    // Arm the in-browser Duck.ai demo (sets the flow + silences the standard DAX CTAs).
+                    // Shared with the linear-onboarding duck_ai_demo step so both paths arm identically.
+                    duckAiOnboardingDemo.arm()
                 }
 
                 DEFAULT_WITHOUT_INTRO_CTA -> {

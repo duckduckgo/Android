@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (c) 2026 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<resources>
+    <!-- v2 Exchange confirmation prompts (spec §"Exchange Confirmations") -->
+    <string name="sync_v2_joiner_confirmation_title">Sync your data?</string>
+    <string name="sync_v2_joiner_confirmation_positive">Sync Now</string>
+    <string name="sync_v2_joiner_confirmation_negative">Cancel</string>
+
+    <string name="sync_v2_host_confirmation_title">Sync your data?</string>
+    <string name="sync_v2_host_confirmation_positive">Sync Now</string>
+    <string name="sync_v2_host_confirmation_negative">Cancel</string>
+
+    <!-- v2 consent-dialog data-access copy (kind-specific; shared by joiner & host) -->
+    <string name="sync_v2_confirmation_message_ddg" instruction="Placeholder is a peer device name, e.g. Samsung S23.">\"%1$s\" will be able to access your synced DuckDuckGo passwords, autofill data, and Duck.ai chats.</string>
+    <string name="sync_v2_confirmation_message_3p" instruction="Placeholder is a peer device name, e.g. Samsung S23.">\"%1$s\" will be able to access your synced Duck.ai chats.</string>
+    <string name="sync_v2_confirmation_message_unknown_peer_ddg">The other device will be able to access your synced DuckDuckGo passwords, autofill data, and Duck.ai chats.</string>
+    <string name="sync_v2_confirmation_message_unknown_peer_3p">The other device will be able to access your synced Duck.ai chats.</string>
+
+    <!-- v2 pairing terminal-outcome copy (interim, English-only). Spec 2026-06-17 (title-primary). -->
+    <string name="sync_v2_error_pairing_failed">Sync failed.</string>
+    <string name="sync_v2_error_pairing_rejected">Sync canceled from your other device.</string>
+    <string name="sync_v2_error_pairing_canceled">Sync canceled.</string>
+    <string name="sync_v2_error_upgrade_required">Update the DuckDuckGo browser and try again.</string>
+    <string name="sync_v2_error_third_party_already_upgraded">Please Sync this device from an already-connected DuckDuckGo browser on another device</string>
+    <string name="sync_v2_error_try_again">Please try again.</string>
+    <string name="sync_v2_error_got_it">Got It</string>
+    <string name="sync_v2_already_paired_title">Already synced.</string>
+    <string name="sync_v2_already_paired_message">These devices are already connected to Sync &amp; Backup.</string>
+</resources>

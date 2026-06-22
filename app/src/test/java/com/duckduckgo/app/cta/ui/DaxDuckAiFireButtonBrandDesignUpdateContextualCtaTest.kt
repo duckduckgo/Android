@@ -29,7 +29,7 @@ import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.cta.model.DismissedCta
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.model.Site
-import com.duckduckgo.app.onboarding.DuckAiOnboardingExperimentMetrics
+import com.duckduckgo.app.onboarding.CustomAiOnboardingStore
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.store.UserStageStore
@@ -51,9 +51,12 @@ import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.onboarding.api.LinearOnboardingOrchestrator
+import com.duckduckgo.onboarding.api.LinearOnboardingState
 import com.duckduckgo.subscriptions.api.SubscriptionPromoCtaShownPlugin
 import com.duckduckgo.subscriptions.api.Subscriptions
 import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -99,6 +102,7 @@ class DaxDuckAiFireButtonBrandDesignUpdateContextualCtaTest {
     private val mockAppInstallStore: AppInstallStore = mock()
     private val mockSettingsDataStore: SettingsDataStore = mock()
     private val mockOnboardingStore: OnboardingStore = mock()
+    private val mockCustomAiOnboarding: CustomAiOnboardingStore = mock()
     private val mockUserAllowListRepository: UserAllowListRepository = mock()
     private val mockUserStageStore: UserStageStore = mock()
     private val mockAggregateTabProvider: AggregateTabProvider = mock()
@@ -113,7 +117,6 @@ class DaxDuckAiFireButtonBrandDesignUpdateContextualCtaTest {
     private val mockDuckChat: DuckChat = mock()
     private val mockOnboardingBrandDesignUpdateToggles: OnboardingBrandDesignUpdateToggles = mock()
     private val mockAppTheme: AppTheme = mock { on { isLightModeEnabled() } doReturn true }
-    private val mockDuckAiOnboardingExperimentMetrics: DuckAiOnboardingExperimentMetrics = mock()
 
     private val mockDeviceInfo: DeviceInfo = mock()
 
@@ -154,6 +157,7 @@ class DaxDuckAiFireButtonBrandDesignUpdateContextualCtaTest {
             userAllowListRepository = mockUserAllowListRepository,
             settingsDataStore = mockSettingsDataStore,
             onboardingStore = mockOnboardingStore,
+            customAiOnboarding = mockCustomAiOnboarding,
             userStageStore = mockUserStageStore,
             aggregateTabProvider = mockAggregateTabProvider,
             dispatchers = coroutineRule.testDispatcherProvider,
@@ -166,8 +170,12 @@ class DaxDuckAiFireButtonBrandDesignUpdateContextualCtaTest {
             subscriptionPromoCtaShownPlugins = mockSubscriptionPromoCtaShownPlugins,
             onboardingBrandDesignUpdateToggles = mockOnboardingBrandDesignUpdateToggles,
             appTheme = mockAppTheme,
-            duckAiOnboardingExperimentMetrics = mockDuckAiOnboardingExperimentMetrics,
             deviceInfo = mockDeviceInfo,
+            coroutineScope = coroutineRule.testScope,
+            linearOnboardingOrchestrator = mock<LinearOnboardingOrchestrator> {
+                on { state } doReturn MutableStateFlow(LinearOnboardingState.NotStarted)
+            },
+            duckAiFeatureState = mock { on { showInputScreen } doReturn MutableStateFlow(true) },
         )
     }
 

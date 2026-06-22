@@ -375,4 +375,14 @@ interface AndroidBrowserConfigFeature {
      */
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun pdfViewer(): Toggle
+
+    /**
+     * Controls whether duck.ai links tapped inside a custom tab are redirected out of the custom
+     * tab into the Duck Chat experience (closing the custom tab) instead of loading in the custom tab.
+     * @return `true` when the remote config has the global "redirectDuckAiLinksFromCustomTab" androidBrowserConfig
+     * sub-feature flag enabled
+     * If the remote feature is not present defaults to `true`
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    fun redirectDuckAiLinksFromCustomTab(): Toggle
 }

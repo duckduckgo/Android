@@ -16,6 +16,8 @@
 
 package com.duckduckgo.duckchat.impl.sync
 
+import com.duckduckgo.browsermode.api.BrowserMode
+import com.duckduckgo.browsermode.api.BrowserModeStateHolder
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.di.scopes.AppScope
@@ -62,9 +64,11 @@ interface DuckChatSyncRepository {
 class RealDuckChatSyncRepository @Inject constructor(
     private val duckChatSyncMetadataStore: DuckChatSyncMetadataStore,
     private val dispatchers: DispatcherProvider,
+    private val browserModeStateHolder: BrowserModeStateHolder,
 ) : DuckChatSyncRepository {
 
     override suspend fun recordDuckAiChatsDeleted(timestampMillis: Long) {
+        if (isFireMode()) return
         withContext(dispatchers.io()) {
             val isoTimestamp = DatabaseDateFormatter.parseMillisIso8601(timestampMillis)
             duckChatSyncMetadataStore.deletionTimestamp = isoTimestamp
@@ -90,6 +94,7 @@ class RealDuckChatSyncRepository @Inject constructor(
     }
 
     override suspend fun recordSingleChatDeletion(chatId: String) {
+        if (isFireMode()) return
         withContext(dispatchers.io()) {
             val current = duckChatSyncMetadataStore.pendingChatDeletions
             duckChatSyncMetadataStore.pendingChatDeletions = current + chatId
@@ -119,6 +124,7 @@ class RealDuckChatSyncRepository @Inject constructor(
     }
 
     override suspend fun recordSingleChatUpdate(chatId: String) {
+        if (isFireMode()) return
         withContext(dispatchers.io()) {
             val current = duckChatSyncMetadataStore.pendingChatUpdates
             duckChatSyncMetadataStore.pendingChatUpdates = current + chatId
@@ -146,4 +152,6 @@ class RealDuckChatSyncRepository @Inject constructor(
             logcat { "DuckChat-Sync: cleared all pending chat updates" }
         }
     }
+
+    private fun isFireMode(): Boolean = browserModeStateHolder.currentMode.value == BrowserMode.FIRE
 }

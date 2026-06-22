@@ -93,6 +93,13 @@ interface WebViewClientListener {
 
     fun openLinkInNewTab(uri: Uri)
 
+    /**
+     * Called for a main-frame duck.ai navigation. When the page is shown inside a custom tab, the
+     * implementation opens the Duck Chat experience, closes the custom tab, and returns `true` so
+     * the navigation is not loaded in the custom tab. Returns `false` otherwise (let navigation proceed).
+     */
+    fun handleDuckChatUrlInCustomTab(uri: Uri): Boolean
+
     fun recoverFromRenderProcessGone()
 
     fun requiresAuthentication(request: BasicAuthenticationRequest)

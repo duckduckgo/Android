@@ -18,12 +18,15 @@ package com.duckduckgo.app.onboarding.orchestrator
 
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.browser.omnibar.OmnibarType
+import com.duckduckgo.app.cta.db.DismissedCtaDao
+import com.duckduckgo.app.cta.model.CtaId
+import com.duckduckgo.app.cta.model.DismissedCta
 import com.duckduckgo.app.global.DefaultRoleBrowserDialog
-import com.duckduckgo.app.onboarding.CustomDuckAiOnboardingFeature
-import com.duckduckgo.app.onboarding.DuckAiOnboardingExperimentManager
-import com.duckduckgo.app.onboarding.DuckAiOnboardingExperimentManager.DuckAiOnboardingExperimentVariant
-import com.duckduckgo.app.onboarding.DuckAiOnboardingExperimentManager.DuckAiOnboardingExperimentVariant.TREATMENT_WITH_DUCK_AI_DEFAULT
-import com.duckduckgo.app.onboarding.DuckAiOnboardingExperimentManager.DuckAiOnboardingExperimentVariant.TREATMENT_WITH_SEARCH_DEFAULT
+import com.duckduckgo.app.onboarding.CustomAiOnboardingPixelName
+import com.duckduckgo.app.onboarding.CustomAiOnboardingResolver
+import com.duckduckgo.app.onboarding.CustomAiOnboardingStore
+import com.duckduckgo.app.onboarding.DuckAiOnboardingAvailability
+import com.duckduckgo.app.onboarding.DuckAiOnboardingDemo
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.ui.page.QuickSetupPixelSender
 import com.duckduckgo.app.onboardingquicksetup.OnboardingQuickSetupExperimentManager
@@ -49,7 +52,9 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.inputscreen.wideevents.InputScreenOnboardingWideEvent
+import com.duckduckgo.onboarding.api.LinearOnboardingEvent
 import com.duckduckgo.onboarding.api.LinearOnboardingPlan
+import com.duckduckgo.onboarding.api.LinearOnboardingStep
 import com.duckduckgo.onboarding.api.LinearOnboardingTransition
 import com.duckduckgo.onboarding.api.LinearOnboardingTransition.AbortPlan
 import com.duckduckgo.onboarding.api.LinearOnboardingTransition.Advance
@@ -80,8 +85,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
     private val onboardingStore: OnboardingStore,
     private val duckChat: DuckChat,
     private val androidBrowserConfigFeature: AndroidBrowserConfigFeature,
-    private val customDuckAiOnboardingFeature: CustomDuckAiOnboardingFeature,
-    private val duckAiOnboardingExperimentManager: DuckAiOnboardingExperimentManager,
+    private val duckAiOnboardingAvailability: DuckAiOnboardingAvailability,
     private val onboardingQuickSetupExperimentManager: OnboardingQuickSetupExperimentManager,
     private val quickSetupPixelSender: QuickSetupPixelSender,
     private val inputScreenOnboardingWideEvent: InputScreenOnboardingWideEvent,
@@ -89,9 +93,32 @@ class NewUserOnboardingPlanProvider @Inject constructor(
     private val widgetCapabilities: WidgetCapabilities,
     private val pixel: Pixel,
     private val dispatchers: DispatcherProvider,
+    private val dismissedCtaDao: DismissedCtaDao,
+    private val customAiOnboardingStore: CustomAiOnboardingStore,
+    private val customAiOnboardingResolver: CustomAiOnboardingResolver,
+    private val duckAiOnboardingDemo: DuckAiOnboardingDemo,
 ) {
 
-    fun buildRootPlan(
+    suspend fun buildRootPlan(
+        onCompleted: suspend () -> Unit,
+        onSkipped: suspend () -> Unit,
+    ): LinearOnboardingPlan =
+        if (customAiOnboardingResolver.resolve()) {
+            // in custom AI onboarding path, the input toggle is enabled by default
+            duckChat.setCosmeticInputScreenUserSetting(enabled = true)
+            onboardingStore.storeInputScreenSelection(selected = true)
+
+            // prepare in-context CTAs
+            duckAiOnboardingDemo.arm()
+
+            pixel.fire(CustomAiOnboardingPixelName.PLAN_STARTED, type = Unique())
+
+            buildCustomAiPlan(onCompleted, onSkipped)
+        } else {
+            buildDefaultPlan(onCompleted, onSkipped)
+        }
+
+    private fun buildDefaultPlan(
         onCompleted: suspend () -> Unit,
         onSkipped: suspend () -> Unit,
     ): LinearOnboardingPlan {
@@ -99,13 +126,15 @@ class NewUserOnboardingPlanProvider @Inject constructor(
 
         // SuspendMemos evaluate the inner lambda lazily, on first access, and store the result in-memory for subsequent access
         val firstDialog = SuspendMemo { resolveFirstDialog(ctx) }
-        val duckAiVariant = SuspendMemo { duckAiOnboardingExperimentManager.enroll() }
+        val duckAiEnabled = SuspendMemo { duckAiOnboardingAvailability.isDuckAiOnboardingEnabled() }
 
-        val skipPlan = LinearOnboardingPlan(id = SKIP_PLAN_ID, steps = listOf(skipOnboardingOptionStep()).abortingOnDevSkip())
-        val quickSetupPlan = LinearOnboardingPlan(id = QUICK_SETUP_PLAN_ID, steps = listOf(quickSetupStep(ctx)).abortingOnDevSkip())
+        val skipPlan = skipPlan()
+        val quickSetupPlan = quickSetupPlan(ctx)
 
-        return LinearOnboardingPlan(
-            id = ROOT_PLAN_ID,
+        return rootPlan(
+            ctx = ctx,
+            onCompleted = onCompleted,
+            onSkipped = onSkipped,
             steps = listOf(
                 introAnimationStep(),
                 notificationPermissionStep(),
@@ -116,13 +145,81 @@ class NewUserOnboardingPlanProvider @Inject constructor(
                 defaultBrowserPromptStep(),
                 addressBarPositionStep(),
                 inputScreenStep(ctx),
-                inputScreenPreviewStep(ctx, duckAiVariant),
-            ).abortingOnDevSkip(),
+                inputScreenPreviewStep(ctx, duckAiEnabled),
+            ),
+        )
+    }
+
+    private fun buildCustomAiPlan(
+        rootOnCompleted: suspend () -> Unit,
+        rootOnSkipped: suspend () -> Unit,
+    ): LinearOnboardingPlan {
+        val ctx = NewUserOnboardingPlanContext()
+        val firstDialog = SuspendMemo { resolveFirstDialog(ctx) }
+
+        val skipPlan = skipPlan()
+        val quickSetupPlan = quickSetupPlan(ctx)
+
+        val dismissDuckAiFireCta = suspend {
+            // End-of-plan dismissal for Duck AI Fire CTA — deferred to here (vs. on user interaction)
+            // so the CTA survives an app kill and re-runs correctly on next launch, if linear onboarding wasn't finished yet.
+            withContext(dispatchers.io()) {
+                dismissedCtaDao.insert(DismissedCta(CtaId.DAX_DUCK_AI_FIRE_BUTTON))
+            }
+        }
+        val markInputToLaunchOnChat = {
+            // The custom-AI flow always finishes on the Duck.ai (chat) tab
+            customAiOnboardingStore.setOpenInputOnDuckAiTab()
+        }
+        val onCompleted = suspend {
+            dismissDuckAiFireCta()
+            markInputToLaunchOnChat()
+            rootOnCompleted()
+        }
+        val onSkipped = suspend {
+            dismissDuckAiFireCta()
+            markInputToLaunchOnChat()
+            rootOnSkipped()
+        }
+
+        return rootPlan(
+            ctx = ctx,
+            onCompleted = onCompleted,
+            onSkipped = onSkipped,
+            steps = listOf(
+                introAnimationStep(withDuckAi = true),
+                notificationPermissionStep(),
+                initialReinstallUserStep(firstDialog, skipPlan, quickSetupPlan, isCustomAiPlan = true),
+                initialStep(firstDialog),
+                aiComparisonChartStep(),
+                customAiInputScreenPreviewStep(ctx),
+                duckAiDemoStep(ctx),
+                comparisonChartStep(),
+                defaultBrowserPromptStep(),
+                addressBarPositionStep(),
+            ),
+        )
+    }
+
+    private fun rootPlan(
+        ctx: NewUserOnboardingPlanContext,
+        steps: List<LinearOnboardingStep>,
+        onCompleted: suspend () -> Unit,
+        onSkipped: suspend () -> Unit,
+    ): LinearOnboardingPlan =
+        LinearOnboardingPlan(
+            id = ROOT_PLAN_ID,
+            steps = steps.abortingOnDevSkip(),
             onCompleted = onCompleted,
             onSkipped = onSkipped,
             result = { ctx.completionResult },
         )
-    }
+
+    private fun skipPlan(): LinearOnboardingPlan =
+        LinearOnboardingPlan(id = SKIP_PLAN_ID, steps = listOf(skipOnboardingOptionStep()).abortingOnDevSkip())
+
+    private fun quickSetupPlan(ctx: NewUserOnboardingPlanContext): LinearOnboardingPlan =
+        LinearOnboardingPlan(id = QUICK_SETUP_PLAN_ID, steps = listOf(quickSetupStep(ctx)).abortingOnDevSkip())
 
     /**
      * Wraps each step so the internal dev "skip all onboarding" shortcut aborts the run from wherever
@@ -130,14 +227,17 @@ class NewUserOnboardingPlanProvider @Inject constructor(
      * the current step's transition; this keeps that cross-cutting handling in one place instead of in
      * every step factory.
      */
-    private fun List<NewUserOnboardingActivityStep>.abortingOnDevSkip(): List<NewUserOnboardingActivityStep> =
+    private fun List<LinearOnboardingStep>.abortingOnDevSkip(): List<LinearOnboardingStep> =
         map { step ->
             val original = step.transition
-            step.copy(
-                transition = { event ->
-                    if (event is NewUserOnboardingEvent.SkipNewUserOnboardingDevOptionClicked) AbortPlan else original(event)
-                },
-            )
+            val wrapped: suspend (LinearOnboardingEvent) -> LinearOnboardingTransition = { event ->
+                if (event is NewUserOnboardingEvent.SkipNewUserOnboardingDevOptionClicked) AbortPlan else original(event)
+            }
+            when (step) {
+                is NewUserOnboardingActivityStep -> step.copy(transition = wrapped)
+                is NewUserBrowserActivityStep -> step.copy(transition = wrapped)
+                else -> step
+            }
         }
 
     private suspend fun resolveFirstDialog(ctx: NewUserOnboardingPlanContext): FirstDialog =
@@ -164,12 +264,10 @@ class NewUserOnboardingPlanProvider @Inject constructor(
             }
         }
 
-    private fun introAnimationStep() = NewUserOnboardingActivityStep(
+    private fun introAnimationStep(withDuckAi: Boolean = false) = NewUserOnboardingActivityStep(
         id = NewUserOnboardingStepIds.INTRO_ANIMATION,
         resolveDialog = {
-            NewUserOnboardingActivityDialog.IntroAnimation(
-                withDuckAi = withContext(dispatchers.io()) { customDuckAiOnboardingFeature.introAnimation().isEnabled() },
-            )
+            NewUserOnboardingActivityDialog.IntroAnimation(withDuckAi)
         },
         transition = { event ->
             when {
@@ -220,9 +318,23 @@ class NewUserOnboardingPlanProvider @Inject constructor(
         firstDialog: SuspendMemo<FirstDialog>,
         skipPlan: LinearOnboardingPlan,
         quickSetupPlan: LinearOnboardingPlan,
+        isCustomAiPlan: Boolean = false,
     ) = NewUserOnboardingActivityStep(
         id = NewUserOnboardingStepIds.INITIAL_REINSTALL_USER,
-        precondition = { firstDialog() == FirstDialog.REINSTALL },
+        precondition = {
+            when (firstDialog()) {
+                FirstDialog.SYNC_RESTORE -> {
+                    if (isCustomAiPlan) {
+                        pixel.fire(CustomAiOnboardingPixelName.RETURNING_SYNC_USER_IGNORED, type = Unique())
+                        true
+                    } else {
+                        false
+                    }
+                }
+                FirstDialog.REINSTALL -> true
+                FirstDialog.INITIAL -> false
+            }
+        },
         resolveDialog = { NewUserOnboardingActivityDialog.InitialReinstallUser },
         transition = { event ->
             when (event) {
@@ -253,6 +365,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
 
     private fun comparisonChartStep() = NewUserOnboardingActivityStep(
         id = NewUserOnboardingStepIds.COMPARISON_CHART,
+        showsStepIndicator = true,
         resolveDialog = { NewUserOnboardingActivityDialog.ComparisonChart },
         transition = { event ->
             when {
@@ -283,6 +396,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
 
     private fun addressBarPositionStep() = NewUserOnboardingActivityStep(
         id = NewUserOnboardingStepIds.ADDRESS_BAR_POSITION,
+        showsStepIndicator = true,
         resolveDialog = { NewUserOnboardingActivityDialog.AddressBarPosition(showSplitOption = isSplitOmnibarEnabled()) },
         transition = { event ->
             when {
@@ -299,6 +413,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
 
     private fun inputScreenStep(ctx: NewUserOnboardingPlanContext) = NewUserOnboardingActivityStep(
         id = NewUserOnboardingStepIds.INPUT_SCREEN,
+        showsStepIndicator = true,
         resolveDialog = { NewUserOnboardingActivityDialog.InputScreen },
         transition = { event ->
             when {
@@ -314,14 +429,14 @@ class NewUserOnboardingPlanProvider @Inject constructor(
 
     private fun inputScreenPreviewStep(
         ctx: NewUserOnboardingPlanContext,
-        duckAiVariant: SuspendMemo<DuckAiOnboardingExperimentVariant?>,
+        duckAiEnabled: SuspendMemo<Boolean>,
     ) = NewUserOnboardingActivityStep(
         id = NewUserOnboardingStepIds.INPUT_SCREEN_PREVIEW,
         precondition = {
-            ctx.inputModeWasAi && duckAiVariant() in setOf(TREATMENT_WITH_DUCK_AI_DEFAULT, TREATMENT_WITH_SEARCH_DEFAULT)
+            ctx.inputModeWasAi && duckAiEnabled()
         },
         resolveDialog = {
-            NewUserOnboardingActivityDialog.InputScreenPreview(isSearchDefault = duckAiVariant() == TREATMENT_WITH_SEARCH_DEFAULT)
+            NewUserOnboardingActivityDialog.InputScreenPreview(isSearchDefault = true)
         },
         transition = { event ->
             when (event) {
@@ -335,6 +450,56 @@ class NewUserOnboardingPlanProvider @Inject constructor(
                 }
 
                 is NewUserOnboardingEvent.ContinueClicked -> Advance
+                else -> Stay
+            }
+        },
+    )
+
+    private fun aiComparisonChartStep() = NewUserOnboardingActivityStep(
+        id = NewUserOnboardingStepIds.AI_COMPARISON_CHART,
+        showsStepIndicator = true,
+        resolveDialog = { NewUserOnboardingActivityDialog.AiComparisonChart },
+        transition = { event ->
+            when {
+                event is NewUserOnboardingEvent.ContinueClicked -> Advance
+                else -> Stay
+            }
+        },
+    )
+
+    // Chat-only preview: the toggle is hidden and the demo defaults to chat. Captures the prompt for the
+    // duck_ai_demo step.
+    private fun customAiInputScreenPreviewStep(ctx: NewUserOnboardingPlanContext) = NewUserOnboardingActivityStep(
+        id = NewUserOnboardingStepIds.INPUT_SCREEN_PREVIEW,
+        precondition = {
+            withContext(dispatchers.io()) {
+                androidBrowserConfigFeature.singleTabFireDialog().isEnabled()
+            }
+        },
+        showsStepIndicator = true,
+        resolveDialog = { NewUserOnboardingActivityDialog.InputScreenPreview(isSearchDefault = false) },
+        transition = { event ->
+            when {
+                event is NewUserOnboardingEvent.InputDemoQuerySubmitted -> {
+                    ctx.pendingDuckAiPrompt = event.query
+                    Advance
+                }
+                else -> Stay
+            }
+        },
+    )
+
+    private fun duckAiDemoStep(ctx: NewUserOnboardingPlanContext) = NewUserBrowserActivityStep(
+        id = NewUserOnboardingStepIds.DUCK_AI_DEMO,
+        precondition = {
+            withContext(dispatchers.io()) {
+                androidBrowserConfigFeature.singleTabFireDialog().isEnabled()
+            }
+        },
+        resolveAction = { NewUserBrowserActivityAction.RunDuckAiOnboardingDemo(prompt = ctx.pendingDuckAiPrompt.orEmpty()) },
+        transition = { event ->
+            when {
+                event is NewUserOnboardingEvent.DuckAiFireCompleted -> Advance
                 else -> Stay
             }
         },
@@ -440,9 +605,9 @@ class NewUserOnboardingPlanProvider @Inject constructor(
 
     companion object {
 
-        const val ROOT_PLAN_ID = "new_user_onboarding"
-        const val SKIP_PLAN_ID = "skip"
-        const val QUICK_SETUP_PLAN_ID = "quick_setup"
+        const val ROOT_PLAN_ID = "new-user_onboarding"
+        const val SKIP_PLAN_ID = "new-user_skip"
+        const val QUICK_SETUP_PLAN_ID = "new-user_quick-setup"
 
         private const val BLOCK_STORE_TIMEOUT_MS = 3_000L
     }

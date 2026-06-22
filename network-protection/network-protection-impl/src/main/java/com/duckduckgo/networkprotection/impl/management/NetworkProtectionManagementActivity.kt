@@ -41,6 +41,9 @@ import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.common.utils.extensions.isPrivateDnsStrict
 import com.duckduckgo.common.utils.extensions.launchAlwaysOnSystemSettings
 import com.duckduckgo.di.scopes.ActivityScope
@@ -95,6 +98,12 @@ class NetworkProtectionManagementActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var dispatcherProvider: DispatcherProvider
 
+    @Inject
+    lateinit var edgeToEdgeProvider: EdgeToEdgeProvider
+
+    @Inject
+    lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
+
     private val binding: ActivityNetpManagementBinding by viewBinding()
     private val viewModel: NetworkProtectionManagementViewModel by bindViewModel()
     private val vpnPermissionRequestActivityResult =
@@ -115,8 +124,16 @@ class NetworkProtectionManagementActivity : DuckDuckGoActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        val edgeToEdgeEnabled = edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.VPN)
+        if (edgeToEdgeEnabled) {
+            enableTransparentEdgeToEdge()
+        }
+
         setContentView(binding.root)
         setupToolbar(binding.includeToolbar.toolbar)
+        if (edgeToEdgeEnabled) {
+            configureEdgeToEdgeInsets()
+        }
         bindViews()
         intent.getActivityParams(NetworkProtectionManagementScreenAndEnable::class.java)?.enable?.let { shouldEnable ->
             if (shouldEnable) {
@@ -130,6 +147,12 @@ class NetworkProtectionManagementActivity : DuckDuckGoActivity() {
 
         observeViewModel()
         lifecycle.addObserver(viewModel)
+    }
+
+    private fun configureEdgeToEdgeInsets() {
+        edgeToEdgeHandler.applyHorizontalSystemBarInsets(binding.root)
+        edgeToEdgeHandler.applyStatusBarInsets(binding.includeToolbar.appBarLayout)
+        edgeToEdgeHandler.applyNavigationBarInsets(binding.contentScrollView, drawBehindGestureNav = true)
     }
 
     override fun onDestroy() {

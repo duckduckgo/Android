@@ -288,6 +288,82 @@
         "suffixes": ["daily_count_short", "form_factor"],
         "parameters": ["appVersion"]
     },
+    "m_dbp_interaction_dau": {
+        "description": "Pixel for PIR user-interacted daily active users. Fired when the PIR dashboard is presented to the user.",
+        "owners": ["karlenDimla", "landomen"],
+        "triggers": ["other"],
+        "suffixes": ["daily_count_short", "form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "is_authenticated",
+                "description": "Whether the user is authenticated (has an active subscription). Always true on Android, which has no freemium PIR.",
+                "type": "boolean"
+            },
+            {
+                "key": "free_scan",
+                "description": "Whether this is a freemium (unauthenticated) scan. Always false on Android, which has no freemium PIR.",
+                "type": "boolean"
+            }
+        ]
+    },
+    "m_dbp_interaction_wau": {
+        "description": "Pixel for PIR user-interacted weekly active users. Fired when the PIR dashboard is presented to the user.",
+        "owners": ["karlenDimla", "landomen"],
+        "triggers": ["other"],
+        "suffixes": ["daily_count_short", "form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "is_authenticated",
+                "description": "Whether the user is authenticated (has an active subscription). Always true on Android, which has no freemium PIR.",
+                "type": "boolean"
+            },
+            {
+                "key": "free_scan",
+                "description": "Whether this is a freemium (unauthenticated) scan. Always false on Android, which has no freemium PIR.",
+                "type": "boolean"
+            }
+        ]
+    },
+    "m_dbp_interaction_mau": {
+        "description": "Pixel for PIR user-interacted monthly active users. Fired when the PIR dashboard is presented to the user.",
+        "owners": ["karlenDimla", "landomen"],
+        "triggers": ["other"],
+        "suffixes": ["daily_count_short", "form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "is_authenticated",
+                "description": "Whether the user is authenticated (has an active subscription). Always true on Android, which has no freemium PIR.",
+                "type": "boolean"
+            },
+            {
+                "key": "free_scan",
+                "description": "Whether this is a freemium (unauthenticated) scan. Always false on Android, which has no freemium PIR.",
+                "type": "boolean"
+            }
+        ]
+    },
+    "m_dbp_first_scan_u": {
+        "description": "Fired once per install when the user starts their first PIR scan.",
+        "owners": ["karlenDimla", "landomen"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "is_authenticated",
+                "description": "Whether the user is authenticated (has an active subscription). Always true on Android, which has no freemium PIR.",
+                "type": "boolean"
+            },
+            {
+                "key": "free_scan",
+                "description": "Whether this is a freemium (unauthenticated) scan. Always false on Android, which has no freemium PIR.",
+                "type": "boolean"
+            }
+        ]
+    },
     "m_dbp_weekly_child-broker_orphaned-optouts": {
         "description": "Pixel to know orphaned opt-out records on child data brokers that don't have matching profiles on their parent broker.",
         "owners": ["karlenDimla", "landomen"],
@@ -2208,6 +2284,25 @@
                 ]
             },
             {
+                "key": "feature.data.ext.last_step_elapsed_ms_bucketed",
+                "description": "Time from run start to when last_step was reached, bucketed using the lower bucket boundary. Recorded on every step after 'started'. On UNKNOWN/killed runs this is the only signal for how long the run had been going before termination, since the total_*_duration intervals are never recorded when a run is killed.",
+                "enum": [
+                    "0",
+                    "10000",
+                    "30000",
+                    "60000",
+                    "120000",
+                    "300000",
+                    "600000",
+                    "900000",
+                    "1800000",
+                    "3600000",
+                    "7200000",
+                    "14400000",
+                    "28800000"
+                ]
+            },
+            {
                 "key": "feature.data.ext.failure_reason",
                 "description": "Reason a run failed. Only present on FAILURE events. Specific exception types are mapped to bounded values; anything not in the known set falls back to unknown_error. The phase the run was in when it failed is recoverable from last_step.",
                 "enum": [
@@ -2341,6 +2436,44 @@
                 "key": "feature.data.ext.opt_out_duration_ms_bucketed",
                 "description": "Time spent in the opt-out scheduling phase from opt_out_started to opt_out_completed, bucketed using the lower bucket boundary",
                 "enum": ["0", "1000", "5000", "10000", "30000", "60000", "300000", "600000"]
+            },
+            {
+                "key": "feature.data.ext.total_scan_duration_ms_bucketed",
+                "description": "Time from run start to scan_completed — the full scan phase, including the final 90-100% band that the per-decile intervals don't cover — bucketed using the lower bucket boundary. Absent on runs that never reach scan_completed (e.g. UNKNOWN/killed runs).",
+                "enum": [
+                    "0",
+                    "10000",
+                    "30000",
+                    "60000",
+                    "120000",
+                    "300000",
+                    "600000",
+                    "900000",
+                    "1800000",
+                    "3600000",
+                    "7200000",
+                    "14400000",
+                    "28800000"
+                ]
+            },
+            {
+                "key": "feature.data.ext.total_flow_duration_ms_bucketed",
+                "description": "Time from run start to flow finish — end-to-end, including the opt-out scheduling phase — bucketed using the lower bucket boundary. Absent on runs finalized by the cleanup timeout (e.g. UNKNOWN/killed runs).",
+                "enum": [
+                    "0",
+                    "10000",
+                    "30000",
+                    "60000",
+                    "120000",
+                    "300000",
+                    "600000",
+                    "900000",
+                    "1800000",
+                    "3600000",
+                    "7200000",
+                    "14400000",
+                    "28800000"
+                ]
             }
         ]
     },
@@ -2467,6 +2600,25 @@
                 ]
             },
             {
+                "key": "feature.data.ext.last_step_elapsed_ms_bucketed",
+                "description": "Time from run start to when last_step was reached, bucketed using the lower bucket boundary. Recorded on every step after 'started'. On UNKNOWN/killed runs this is the only signal for how long the run had been going before termination, since the total_*_duration intervals are never recorded when a run is killed.",
+                "enum": [
+                    "0",
+                    "10000",
+                    "30000",
+                    "60000",
+                    "120000",
+                    "300000",
+                    "600000",
+                    "900000",
+                    "1800000",
+                    "3600000",
+                    "7200000",
+                    "14400000",
+                    "28800000"
+                ]
+            },
+            {
                 "key": "feature.data.ext.failure_reason",
                 "description": "Reason a run failed. Only present on FAILURE events. Specific exception types are mapped to bounded values; anything not in the known set falls back to unknown_error. The phase the run was in when it failed is recoverable from last_step.",
                 "enum": [
@@ -2600,6 +2752,44 @@
                 "key": "feature.data.ext.opt_out_duration_ms_bucketed",
                 "description": "Time spent in the opt-out scheduling phase from opt_out_started to opt_out_completed, bucketed using the lower bucket boundary",
                 "enum": ["0", "1000", "5000", "10000", "30000", "60000", "300000", "600000"]
+            },
+            {
+                "key": "feature.data.ext.total_scan_duration_ms_bucketed",
+                "description": "Time from run start to scan_completed — the full scan phase, including the final 90-100% band that the per-decile intervals don't cover — bucketed using the lower bucket boundary. Absent on runs that never reach scan_completed (e.g. UNKNOWN/killed runs).",
+                "enum": [
+                    "0",
+                    "10000",
+                    "30000",
+                    "60000",
+                    "120000",
+                    "300000",
+                    "600000",
+                    "900000",
+                    "1800000",
+                    "3600000",
+                    "7200000",
+                    "14400000",
+                    "28800000"
+                ]
+            },
+            {
+                "key": "feature.data.ext.total_flow_duration_ms_bucketed",
+                "description": "Time from run start to flow finish — end-to-end, including the opt-out scheduling phase — bucketed using the lower bucket boundary. Absent on runs finalized by the cleanup timeout (e.g. UNKNOWN/killed runs).",
+                "enum": [
+                    "0",
+                    "10000",
+                    "30000",
+                    "60000",
+                    "120000",
+                    "300000",
+                    "600000",
+                    "900000",
+                    "1800000",
+                    "3600000",
+                    "7200000",
+                    "14400000",
+                    "28800000"
+                ]
             }
         ]
     },

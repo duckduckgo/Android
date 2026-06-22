@@ -27,20 +27,29 @@ import com.duckduckgo.sync.impl.AccountErrorCodes.CONNECT_FAILED
 import com.duckduckgo.sync.impl.AccountErrorCodes.CREATE_ACCOUNT_FAILED
 import com.duckduckgo.sync.impl.AccountErrorCodes.INVALID_CODE
 import com.duckduckgo.sync.impl.AccountErrorCodes.LOGIN_FAILED
+import com.duckduckgo.sync.impl.AccountErrorCodes.THIRD_PARTY_ALREADY_UPGRADED
 import com.duckduckgo.sync.impl.Clipboard
+import com.duckduckgo.sync.impl.DispatchOutcome
 import com.duckduckgo.sync.impl.ExchangeResult.AccountSwitchingRequired
 import com.duckduckgo.sync.impl.ExchangeResult.LoggedIn
 import com.duckduckgo.sync.impl.ExchangeResult.Pending
 import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.Result
 import com.duckduckgo.sync.impl.Result.Error
+import com.duckduckgo.sync.impl.RouteDecision
 import com.duckduckgo.sync.impl.SyncAccountRepository
 import com.duckduckgo.sync.impl.SyncAuthCode
+import com.duckduckgo.sync.impl.SyncCodeDispatcher
 import com.duckduckgo.sync.impl.SyncFeature
 import com.duckduckgo.sync.impl.onFailure
 import com.duckduckgo.sync.impl.onSuccess
 import com.duckduckgo.sync.impl.pixels.SyncPixels
+import com.duckduckgo.sync.impl.pixels.SyncPixels.CodeVersion
+import com.duckduckgo.sync.impl.pixels.SyncPixels.PeerKind
 import com.duckduckgo.sync.impl.pixels.SyncPixels.ScreenType
+import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupPath
+import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupRole
+import com.duckduckgo.sync.impl.pixels.fireSetupFailed
 import com.duckduckgo.sync.impl.ui.EnterCodeActivity.Companion.Code
 import com.duckduckgo.sync.impl.ui.EnterCodeViewModel.Command.AskToSwitchAccount
 import com.duckduckgo.sync.impl.ui.EnterCodeViewModel.Command.LoginSuccess
@@ -52,8 +61,10 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
+import logcat.logcat
 import javax.inject.*
 
 @ContributesViewModel(ActivityScope::class)
@@ -63,6 +74,7 @@ class EnterCodeViewModel @Inject constructor(
     private val dispatchers: DispatcherProvider,
     private val syncFeature: SyncFeature,
     private val syncPixels: SyncPixels,
+    private val codeDispatcher: SyncCodeDispatcher,
 ) : ViewModel() {
 
     private val command = Channel<Command>(1, DROP_OLDEST)
@@ -89,6 +101,15 @@ class EnterCodeViewModel @Inject constructor(
         data class AskToSwitchAccount(val encodedStringCode: String) : Command()
         data class ShowError(@StringRes val message: Int, val reason: String = "") : Command()
         data object SwitchAccountSuccess : Command()
+
+        /** v2 §"Exchange Confirmations": prompt user "Sync your data with [peerName]?". */
+        data class AskJoinerConfirmation(val peerName: String?, val peerKind: PeerKind? = null) : Command()
+
+        /** v2 §"Exchange Confirmations": prompt user "Allow [peerName] to join your sync?". */
+        data class AskHostConfirmation(val peerName: String?, val peerKind: PeerKind? = null) : Command()
+
+        data object FinishWithError : Command()
+        internal data class ShowV2Error(val content: V2PairingErrorContent) : Command()
     }
 
     fun onPasteCodeClicked() {
@@ -103,22 +124,78 @@ class EnterCodeViewModel @Inject constructor(
         pastedCode: String,
     ) {
         val previousPrimaryKey = syncAccountRepository.getAccountInfo().primaryKey
-        val codeType = syncAccountRepository.parseSyncAuthCode(pastedCode).also { it.onCodePasted() }
-        when (val result = syncAccountRepository.processCode(codeType)) {
-            is Result.Success -> {
-                if (codeType is SyncAuthCode.Exchange) {
-                    pollForRecoveryKey(previousPrimaryKey = previousPrimaryKey, code = pastedCode)
-                } else {
-                    onLoginSuccess(previousPrimaryKey)
+        // FF off → Legacy (v1 path below); FF on → v2 codes surface as DispatchOutcome.
+        when (val decision = codeDispatcher.route(pastedCode)) {
+            is RouteDecision.Legacy -> {
+                logcat { "Sync-CodeDispatch: EnterCodeViewModel handling Legacy(${decision.authCode::class.simpleName})" }
+                val codeType = decision.authCode.also { it.onCodePasted() }
+                when (val result = syncAccountRepository.processCode(codeType)) {
+                    is Result.Success -> {
+                        if (codeType is SyncAuthCode.Exchange) {
+                            pollForRecoveryKey(previousPrimaryKey = previousPrimaryKey, code = pastedCode)
+                        } else {
+                            onLoginSuccess(previousPrimaryKey)
+                        }
+                    }
+                    is Result.Error -> {
+                        processError(result, pastedCode)
+                    }
                 }
             }
-            is Result.Error -> {
-                processError(result, pastedCode)
+            is RouteDecision.V2InProgress -> {
+                logcat { "Sync-CodeDispatch: EnterCodeViewModel observing V2InProgress" }
+                syncPixels.fireSyncSetupCodePastedParseSuccess(codeType.asScreenType(), CodeVersion.V2, decision.codeType)
+                decision.outcomes.collect { outcome -> handleV2Outcome(outcome, previousPrimaryKey) }
             }
         }
     }
 
-    private suspend fun onLoginSuccess(previousPrimaryKey: String) {
+    /** Map a v2 [DispatchOutcome] onto the same command/error hooks the v1 path uses. */
+    private suspend fun handleV2Outcome(
+        outcome: DispatchOutcome,
+        previousPrimaryKey: String,
+    ) {
+        syncPixels.fireSetupFailed(outcome)
+        when (outcome) {
+            is DispatchOutcome.LoggedIn -> onLoginSuccess(previousPrimaryKey, outcome.path, outcome.myRole, outcome.peerKind)
+            is DispatchOutcome.AlreadyConnected -> {
+                viewState.value = viewState.value.copy(authState = AuthState.Idle)
+                command.send(Command.ShowV2Error(v2AlreadyPairedError))
+            }
+            is DispatchOutcome.UpgradeRequired -> {
+                viewState.value = viewState.value.copy(authState = AuthState.Idle)
+                logcat { "Sync v2: upgrade required, peer needs protocol v${outcome.codeMajor}" }
+                command.send(Command.ShowV2Error(v2UpgradeRequiredError))
+            }
+            is DispatchOutcome.Failed -> {
+                viewState.value = viewState.value.copy(authState = AuthState.Idle)
+                command.send(Command.ShowV2Error(outcome.code.toV2PairingError()))
+            }
+            is DispatchOutcome.JoinerConfirmationRequested ->
+                command.send(Command.AskJoinerConfirmation(outcome.peerName, outcome.peerKind))
+            is DispatchOutcome.HostConfirmationRequested ->
+                command.send(Command.AskHostConfirmation(outcome.peerName, outcome.peerKind))
+            is DispatchOutcome.LinkingCodeReady -> {} // No-op; used only by presentV2() flow
+        }
+    }
+
+    fun onJoinerConfirmed() { codeDispatcher.confirmJoiner() }
+    fun onJoinerDenied() { codeDispatcher.denyJoiner() }
+    fun onHostConfirmed() { codeDispatcher.confirmHost() }
+    fun onHostDenied() { codeDispatcher.denyHost() }
+
+    fun onErrorDialogDismissed() {
+        viewModelScope.launch(dispatchers.io()) {
+            command.send(Command.FinishWithError)
+        }
+    }
+
+    private suspend fun onLoginSuccess(
+        previousPrimaryKey: String,
+        path: SetupPath? = null,
+        myRole: SetupRole? = null,
+        peerKind: PeerKind? = null,
+    ) {
         val postProcessCodePK = syncAccountRepository.getAccountInfo().primaryKey
         val userSwitchedAccount = previousPrimaryKey.isNotBlank() && previousPrimaryKey != postProcessCodePK
         val commandSuccess = if (userSwitchedAccount) {
@@ -127,6 +204,9 @@ class EnterCodeViewModel @Inject constructor(
         } else {
             LoginSuccess
         }
+        // Owns the "Setup success" pixel for codes entered here; the launching screen fires only its
+        // login pixel on the result, so this does not double-count.
+        syncPixels.fireSyncSetupFinishedSuccessfully(codeType.asScreenType(), path, myRole, peerKind)
         command.send(commandSuccess)
     }
 
@@ -178,6 +258,8 @@ class EnterCodeViewModel @Inject constructor(
                 CONNECT_FAILED.code -> R.string.sync_connect_generic_error
                 CREATE_ACCOUNT_FAILED.code -> R.string.sync_create_account_generic_error
                 INVALID_CODE.code -> R.string.sync_invalid_code_error
+                // 3party→ddg upgrade on an already-upgraded account; generic error for now. (follow-up: 1215295182909247)
+                THIRD_PARTY_ALREADY_UPGRADED.code -> R.string.sync_connect_generic_error
                 else -> null
             }?.let { message ->
                 viewState.value = viewState.value.copy(authState = AuthState.Idle)
@@ -235,7 +317,7 @@ class EnterCodeViewModel @Inject constructor(
     private fun SyncAuthCode.onCodePasted() {
         when (this) {
             is SyncAuthCode.Unknown -> syncPixels.fireSyncSetupCodePastedParseFailure(codeType.asScreenType())
-            else -> syncPixels.fireSyncSetupCodePastedParseSuccess(codeType.asScreenType())
+            else -> syncPixels.fireSyncSetupCodePastedParseSuccess(codeType.asScreenType(), CodeVersion.V1)
         }
     }
 

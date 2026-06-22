@@ -175,6 +175,8 @@ import com.duckduckgo.app.cta.ui.Cta
 import com.duckduckgo.app.cta.ui.CtaViewModel
 import com.duckduckgo.app.cta.ui.DaxBubbleCta
 import com.duckduckgo.app.cta.ui.DaxBubbleCta.DaxIntroSearchOptionsCta
+import com.duckduckgo.app.cta.ui.DaxDuckAiEndBrandDesignUpdateBubbleCta
+import com.duckduckgo.app.cta.ui.DaxDuckAiEndBubbleCta
 import com.duckduckgo.app.cta.ui.DaxDuckAiFireButtonBrandDesignUpdateContextualCta
 import com.duckduckgo.app.cta.ui.DaxTryASearchBrandDesignUpdateBubbleCta
 import com.duckduckgo.app.cta.ui.HomePanelCta
@@ -200,7 +202,7 @@ import com.duckduckgo.app.global.model.PrivacyShield.UNPROTECTED
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.SiteFactoryImpl
 import com.duckduckgo.app.location.data.LocationPermissionsDao
-import com.duckduckgo.app.onboarding.DuckAiOnboardingExperimentMetrics
+import com.duckduckgo.app.onboarding.CustomAiOnboardingStore
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.AppStage.ESTABLISHED
 import com.duckduckgo.app.onboarding.store.OnboardingStore
@@ -290,6 +292,7 @@ import com.duckduckgo.downloads.store.DownloadStatus
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.duckchat.api.inputscreen.DuckAiOnboardingEndCtaVariant
 import com.duckduckgo.duckchat.impl.contextual.PageContextJSHelper
 import com.duckduckgo.duckchat.impl.contextual.RealPageContextJSHelper.Companion.PAGE_CONTEXT_FEATURE_NAME
 import com.duckduckgo.duckchat.impl.helper.DuckChatJSHelper
@@ -308,6 +311,8 @@ import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed.MALWARE
 import com.duckduckgo.newtabpage.api.NtpAfterIdleManager
 import com.duckduckgo.newtabpage.impl.pixels.NewTabPixels
+import com.duckduckgo.onboarding.api.LinearOnboardingOrchestrator
+import com.duckduckgo.onboarding.api.LinearOnboardingState
 import com.duckduckgo.privacy.config.api.AmpLinkInfo
 import com.duckduckgo.privacy.config.api.AmpLinks
 import com.duckduckgo.privacy.config.api.ContentBlocking
@@ -455,6 +460,7 @@ class BrowserTabViewModelTest {
     private val mockAutoconsentPixelManager: AutoconsentPixelManager = mock()
 
     private val mockOnboardingStore: OnboardingStore = mock()
+    private val mockCustomAiOnboardingStore: CustomAiOnboardingStore = mock()
 
     private val mockAutoCompleteService: AutoCompleteService = mock()
 
@@ -701,7 +707,6 @@ class BrowserTabViewModelTest {
     private val favouriteLogoFlow = MutableStateFlow<String?>(null)
     private val setFavouriteEnabledFlow = MutableStateFlow(false)
     private val mockAppTheme: AppTheme = mock { on { isLightModeEnabled() } doReturn true }
-    private val mockDuckAiOnboardingExperimentMetrics: DuckAiOnboardingExperimentMetrics = mock()
 
     @Before
     fun before() =
@@ -782,6 +787,7 @@ class BrowserTabViewModelTest {
             whenever(mockUrlDisplayRepository.isFullUrlEnabled).then { isFullSiteAddressEnabledFlow }
             whenever(mockSSLCertificatesFeature.allowBypass()).thenReturn(mockEnabledToggle)
             whenever(subscriptions.shouldLaunchSubscriptionForUrl(any())).thenReturn(false)
+            whenever(mockCustomAiOnboardingStore.isEnabled()).thenReturn(false)
             whenever(mockDuckDuckGoUrlDetector.isDuckDuckGoUrl(any())).thenReturn(false)
             whenever(mockDuckPlayer.isSimulatedYoutubeNoCookie(any())).thenReturn(false)
             whenever(mockDuckPlayer.isDuckPlayerUri(anyString())).thenReturn(false)
@@ -821,6 +827,7 @@ class BrowserTabViewModelTest {
                     userAllowListRepository = mockUserAllowListRepository,
                     settingsDataStore = ctaViewModelMockSettingsStore,
                     onboardingStore = mockOnboardingStore,
+                    customAiOnboarding = mockCustomAiOnboardingStore,
                     userStageStore = mockUserStageStore,
                     aggregateTabProvider = mockAggregateTabProvider,
                     dispatchers = coroutineRule.testDispatcherProvider,
@@ -835,8 +842,12 @@ class BrowserTabViewModelTest {
                     duckChat = mockDuckChat,
                     onboardingBrandDesignUpdateToggles = mockOnboardingBrandDesignUpdateToggles,
                     appTheme = mockAppTheme,
-                    duckAiOnboardingExperimentMetrics = mockDuckAiOnboardingExperimentMetrics,
                     deviceInfo = mockDeviceInfo,
+                    coroutineScope = coroutineRule.testScope,
+                    linearOnboardingOrchestrator = mock<LinearOnboardingOrchestrator> {
+                        on { state } doReturn MutableStateFlow(LinearOnboardingState.NotStarted)
+                    },
+                    duckAiFeatureState = mockDuckAiFeatureState,
                 )
 
             accessibilitySettingsDataStore = AccessibilitySettingsSharedPreferences(context)
@@ -1014,6 +1025,7 @@ class BrowserTabViewModelTest {
                 onboardingBrandDesignUpdateToggles = mockOnboardingBrandDesignUpdateToggles,
                 onboardingStore = mockOnboardingStore,
                 autocompleteHistoryDeleteFeature = fakeAutocompleteHistoryDeleteFeature,
+                customAiOnboardingStore = mockCustomAiOnboardingStore,
                 desktopModeSettings = mockDesktopModeSettings,
                 rememberDesktopModeFeature = fakeRememberDesktopModeFeature,
             )
@@ -1113,7 +1125,7 @@ class BrowserTabViewModelTest {
 
             testee.onViewVisible()
 
-            assertCommandIssued<HideKeyboard>()
+            assertCommandIssued<Command.DropAddressBarFocus>()
         }
 
     @Test
@@ -3596,6 +3608,36 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenUserClickedDaxDuckAiEndBubbleCtaOkButtonThenCtaIsRefreshedAway() = runTest {
+        val cta = DaxDuckAiEndBubbleCta(mockOnboardingStore, mockAppInstallStore)
+        setCta(cta)
+        whenever(mockDismissedCtaDao.exists(CtaId.DAX_DUCK_AI_END)).thenReturn(true)
+
+        testee.onUserClickCtaOkButton(cta)
+        advanceUntilIdle()
+
+        assertNotEquals(cta, testee.ctaViewState.value?.cta)
+    }
+
+    @Test
+    fun whenUserClickedDaxDuckAiEndBrandDesignBubbleCtaOkButtonThenCtaIsRefreshedAway() = runTest {
+        val cta = DaxDuckAiEndBrandDesignUpdateBubbleCta(
+            onboardingStore = mockOnboardingStore,
+            appInstallStore = mockAppInstallStore,
+            isLightTheme = true,
+            deviceInfo = mockDeviceInfo,
+            isCustomAiOnboardingFlow = false,
+        )
+        setCta(cta)
+        whenever(mockDismissedCtaDao.exists(CtaId.DAX_DUCK_AI_END)).thenReturn(true)
+
+        testee.onUserClickCtaOkButton(cta)
+        advanceUntilIdle()
+
+        assertNotEquals(cta, testee.ctaViewState.value?.cta)
+    }
+
+    @Test
     fun whenUserClickedAddWidgetCtaButtonThenLaunchAddWidgetCommand() {
         val cta = HomePanelCta.AddWidgetAutoOnboarding
         setCta(cta)
@@ -3640,8 +3682,8 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenUserClickedDaxSubscriptionCtaInCustomAiOnboardingFlowThenLaunchSubscriptionWithFeaturePageDuckAi() {
-        whenever(mockOnboardingStore.isCustomAiOnboardingFlow()).thenReturn(true)
+    fun whenUserClickedDaxSubscriptionCtaInCustomAiOnboardingFlowThenLaunchSubscriptionWithFeaturePageDuckAi() = runTest {
+        whenever(mockCustomAiOnboardingStore.isEnabled()).thenReturn(true)
         val cta = DaxBubbleCta.DaxSubscriptionCta(
             mockOnboardingStore,
             mockAppInstallStore,
@@ -5604,6 +5646,54 @@ class BrowserTabViewModelTest {
 
         val command = captureCommands().lastValue as Command.ShowWebPageTitle
         assertEquals("about:blank", command.title)
+    }
+
+    @Test
+    fun whenHandleDuckChatUrlInCustomTabWithQueryAndFeatureEnabledThenOpenDuckChatWithPrefillAndCloseCustomTabAndReturnTrue() = runTest {
+        fakeAndroidConfigBrowserFeature.redirectDuckAiLinksFromCustomTab().setRawStoredState(State(enable = true))
+        testee.setIsCustomTab(true)
+
+        val handled = testee.handleDuckChatUrlInCustomTab("https://duck.ai/?q=hello".toUri())
+
+        assertTrue(handled)
+        verify(mockDuckChat).openDuckChatWithPrefill("hello")
+        assertTrue(captureCommands().allValues.contains(Command.FinishCustomTab))
+    }
+
+    @Test
+    fun whenHandleDuckChatUrlInCustomTabWithoutQueryAndFeatureEnabledThenOpenDuckChatAndCloseCustomTabAndReturnTrue() = runTest {
+        fakeAndroidConfigBrowserFeature.redirectDuckAiLinksFromCustomTab().setRawStoredState(State(enable = true))
+        testee.setIsCustomTab(true)
+
+        val handled = testee.handleDuckChatUrlInCustomTab("https://duck.ai/".toUri())
+
+        assertTrue(handled)
+        verify(mockDuckChat).openDuckChat()
+        assertTrue(captureCommands().allValues.contains(Command.FinishCustomTab))
+    }
+
+    @Test
+    fun whenHandleDuckChatUrlInCustomTabButNotCustomTabThenReturnFalseAndDoNotOpenDuckChat() = runTest {
+        fakeAndroidConfigBrowserFeature.redirectDuckAiLinksFromCustomTab().setRawStoredState(State(enable = true))
+        testee.setIsCustomTab(false)
+
+        val handled = testee.handleDuckChatUrlInCustomTab("https://duck.ai/?q=hello".toUri())
+
+        assertFalse(handled)
+        verify(mockDuckChat, never()).openDuckChat()
+        verify(mockDuckChat, never()).openDuckChatWithPrefill(any())
+    }
+
+    @Test
+    fun whenHandleDuckChatUrlInCustomTabButFeatureDisabledThenReturnFalseAndDoNotOpenDuckChat() = runTest {
+        fakeAndroidConfigBrowserFeature.redirectDuckAiLinksFromCustomTab().setRawStoredState(State(enable = false))
+        testee.setIsCustomTab(true)
+
+        val handled = testee.handleDuckChatUrlInCustomTab("https://duck.ai/?q=hello".toUri())
+
+        assertFalse(handled)
+        verify(mockDuckChat, never()).openDuckChat()
+        verify(mockDuckChat, never()).openDuckChatWithPrefill(any())
     }
 
     @Test
@@ -9003,39 +9093,6 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenFireMenuSelectedAndDuckAiFireButtonCtaShownThenFireFireButtonPressedMetric() = runTest {
-        testee.browserViewState.value = browserViewState()
-        testee.ctaViewState.value = ctaViewState().copy(cta = DaxDuckAiFireButtonCta(mockOnboardingStore, mockAppInstallStore))
-
-        testee.onFireMenuSelected(Omnibar.ViewMode.Browser(exampleUrl))
-        advanceUntilIdle()
-
-        verify(mockDuckAiOnboardingExperimentMetrics).fireFireButtonPressed()
-    }
-
-    @Test
-    fun whenFireMenuSelectedAndDuckAiFireButtonBrandDesignUpdateCtaShownThenFireFireButtonPressedMetric() = runTest {
-        testee.browserViewState.value = browserViewState()
-        testee.ctaViewState.value = ctaViewState().copy(cta = brandDesignDuckAiFireButtonCta())
-
-        testee.onFireMenuSelected(Omnibar.ViewMode.Browser(exampleUrl))
-        advanceUntilIdle()
-
-        verify(mockDuckAiOnboardingExperimentMetrics).fireFireButtonPressed()
-    }
-
-    @Test
-    fun whenFireMenuSelectedAndNoDuckAiFireButtonCtaThenDoNotFireFireButtonPressedMetric() = runTest {
-        testee.browserViewState.value = browserViewState()
-        testee.ctaViewState.value = ctaViewState().copy(cta = null)
-
-        testee.onFireMenuSelected(Omnibar.ViewMode.Browser(exampleUrl))
-        advanceUntilIdle()
-
-        verify(mockDuckAiOnboardingExperimentMetrics, never()).fireFireButtonPressed()
-    }
-
-    @Test
     fun whenInputScreenEnabledAndSwitchToNewTabThenLaunchInputScreenCommandTriggered() =
         runTest {
             val initialTabId = "initial-tab"
@@ -9066,6 +9123,31 @@ class BrowserTabViewModelTest {
                 "LaunchInputScreen command should be triggered for null URL tab",
                 commands.any { it is Command.LaunchInputScreen },
             )
+        }
+
+    @Test
+    fun whenOpenInputScreenOnDuckAiTabArmedAndSwitchToNewTabThenLaunchInputScreenOnChat() =
+        runTest {
+            whenever(mockCustomAiOnboardingStore.consumeOpenInputOnDuckAiTab()).thenReturn(true)
+            val initialTab =
+                TabEntity(tabId = "initial-tab", url = "https://example.com", title = "EX", skipHome = false, viewed = true, position = 0)
+            val ntpTabId = "ntp-tab"
+            val ntpTab = TabEntity(tabId = ntpTabId, url = null, title = "", skipHome = false, viewed = true, position = 0)
+            whenever(mockTabRepository.getTab("initial-tab")).thenReturn(initialTab)
+            whenever(mockTabRepository.getTab(ntpTabId)).thenReturn(ntpTab)
+            flowSelectedTab.emit(initialTab)
+
+            testee.loadData(tabId = ntpTabId, initialUrl = null, skipHome = false, isExternal = false)
+            testee.observeSelectedTab(isRestored = false)
+            mockDuckAiFeatureStateInputScreenOpenAutomaticallyFlow.emit(true)
+
+            flowSelectedTab.emit(ntpTab)
+
+            verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+            val launch = commandCaptor.allValues.filterIsInstance<Command.LaunchInputScreen>().last()
+            assertTrue("expected launchOnChat=true when the one-shot is armed", launch.launchOnChat)
+            // launchOnChat must be decoupled from showDuckAiEndCta (no end CTA shown on this path).
+            assertEquals(DuckAiOnboardingEndCtaVariant.NONE, launch.duckAiEndCtaVariant)
         }
 
     @Test
@@ -11676,6 +11758,20 @@ class BrowserTabViewModelTest {
         advanceUntilIdle()
 
         verify(mockDismissedCtaDao, never()).insert(any())
+    }
+
+    @Test
+    fun whenDismissDuckAiFireOnboardingCtaInCustomAiOnboardingFlowThenCtaNotDismissed() = runTest {
+        // Custom AI onboarding defers dismissal to the end of the orchestrator run, so the CTA must survive here.
+        whenever(mockCustomAiOnboardingStore.isEnabled()).thenReturn(true)
+        dismissedCtaDaoChannel.send(emptyList())
+        val cta = DaxDuckAiFireButtonCta(mockOnboardingStore, mockAppInstallStore)
+        testee.ctaViewState.value = ctaViewState().copy(cta = cta)
+
+        testee.dismissDuckAiFireOnboardingCta()
+        advanceUntilIdle()
+
+        verify(mockDismissedCtaDao, never()).insert(DismissedCta(CtaId.DAX_DUCK_AI_FIRE_BUTTON))
     }
 
     @Test

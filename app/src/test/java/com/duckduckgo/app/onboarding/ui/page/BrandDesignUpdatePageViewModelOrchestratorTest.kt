@@ -19,6 +19,9 @@ package com.duckduckgo.app.onboarding.ui.page
 import android.annotation.SuppressLint
 import app.cash.turbine.test
 import com.duckduckgo.app.browser.omnibar.OmnibarType
+import com.duckduckgo.app.onboarding.CustomAiOnboardingStore
+import com.duckduckgo.app.onboarding.orchestrator.NewUserBrowserActivityAction
+import com.duckduckgo.app.onboarding.orchestrator.NewUserBrowserActivityStep
 import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingActivityDialog
 import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingActivityStep
 import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingEvent
@@ -36,9 +39,11 @@ import com.duckduckgo.onboarding.api.LinearOnboardingPlan
 import com.duckduckgo.onboarding.api.LinearOnboardingResult
 import com.duckduckgo.onboarding.api.LinearOnboardingTransition
 import com.duckduckgo.onboarding.impl.LinearOnboardingOrchestratorImpl
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -54,6 +59,7 @@ class BrandDesignUpdatePageViewModelOrchestratorTest {
 
     private val pixel: Pixel = mock()
     private val onboardingStore: OnboardingStore = mock()
+    private val customAiOnboardingStore: CustomAiOnboardingStore = mock()
     private val orchestrator = LinearOnboardingOrchestratorImpl()
     private val recordedEvents = mutableListOf<LinearOnboardingEvent>()
 
@@ -67,6 +73,7 @@ class BrandDesignUpdatePageViewModelOrchestratorTest {
     fun setup() {
         whenever(onboardingStore.getSearchOptions()).thenReturn(emptyList())
         whenever(onboardingStore.getChatSuggestions()).thenReturn(emptyList())
+        runBlocking { whenever(customAiOnboardingStore.isEnabled()).thenReturn(false) }
     }
 
     // A one-step plan that renders [dialog]. By default the step records every event it is handed and stays put,
@@ -109,14 +116,14 @@ class BrandDesignUpdatePageViewModelOrchestratorTest {
             androidBrowserConfigFeature = mock(),
             duckChat = mock(),
             inputScreenOnboardingWideEvent = mock(),
-            duckAiOnboardingExperimentManager = mock(),
+            duckAiOnboardingAvailability = mock(),
             onboardingQuickSetupExperimentManager = mock(),
             defaultBrowserDetector = mock(),
             widgetCapabilities = mock(),
             syncAutoRestore = mock(),
             quickSetupPixelSender = mock(),
-            customDuckAiOnboardingFeature = mock(),
             orchestrator = orchestrator,
+            customAiOnboardingStore = customAiOnboardingStore,
         )
 
     @Test
@@ -302,6 +309,87 @@ class BrandDesignUpdatePageViewModelOrchestratorTest {
             orchestrator.onEvent(NewUserOnboardingEvent.SkipConfirmed) // -> AbortPlan -> run skipped
             advanceUntilIdle()
             assertEquals(BrandDesignUpdatePageViewModel.Command.OnboardingSkipped, awaitItem())
+        }
+    }
+
+    @Test
+    fun `when custom ai onboarding flow then view state enables custom ai flow`() = runTest {
+        whenever(customAiOnboardingStore.isEnabled()).thenReturn(true)
+        val testee = startAt(NewUserOnboardingActivityDialog.Initial)
+        advanceUntilIdle()
+
+        assertTrue(testee.viewState.value.isCustomAiOnboardingFlow)
+    }
+
+    @Test
+    fun `when ai comparison chart then view state shows ai comparison chart`() = runTest {
+        val testee = startAt(NewUserOnboardingActivityDialog.AiComparisonChart, id = "ai_comparison_chart")
+        advanceUntilIdle()
+
+        assertEquals(PreOnboardingDialogType.AI_COMPARISON_CHART, testee.viewState.value.currentDialog)
+    }
+
+    @Test
+    fun `when ai comparison chart continue then emits continue clicked`() = runTest {
+        val testee = startAt(NewUserOnboardingActivityDialog.AiComparisonChart, id = "ai_comparison_chart")
+        advanceUntilIdle()
+
+        testee.onPrimaryCtaClicked()
+        advanceUntilIdle()
+
+        assertEquals(listOf(NewUserOnboardingEvent.ContinueClicked), recordedEvents)
+    }
+
+    @Test
+    fun `when input screen preview then view state derives its step number from plan position`() = runTest {
+        // Two indicator steps with the preview 2nd. The run starts on the AI comparison chart and advances to the
+        // preview, so the VM derives "2 of 2" from plan position (not the dialog).
+        val plan = LinearOnboardingPlan(
+            id = NewUserOnboardingPlanProvider.ROOT_PLAN_ID,
+            steps = listOf(
+                NewUserOnboardingActivityStep(
+                    id = "ai_comparison_chart",
+                    showsStepIndicator = true,
+                    transition = { LinearOnboardingTransition.Advance },
+                    resolveDialog = { NewUserOnboardingActivityDialog.AiComparisonChart },
+                ),
+                NewUserOnboardingActivityStep(
+                    id = "input_screen_preview",
+                    showsStepIndicator = true,
+                    transition = recordAndStay,
+                    resolveDialog = { NewUserOnboardingActivityDialog.InputScreenPreview(isSearchDefault = false) },
+                ),
+            ),
+        )
+        orchestrator.startPlan(plan)
+        val testee = createViewModel()
+        advanceUntilIdle()
+        orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked) // advance to the preview step
+        advanceUntilIdle()
+
+        assertEquals(PreOnboardingDialogType.INPUT_SCREEN_PREVIEW, testee.viewState.value.currentDialog)
+        assertEquals(2, testee.viewState.value.currentPageNumber)
+        assertEquals(2, testee.viewState.value.maxPageCount)
+    }
+
+    // Starts the real orchestrator on a single BrowserActivity-hosted step and builds the view model, which enters
+    // orchestrator mode and immediately hands off because the current step is hosted by the browser, not the activity.
+    private suspend fun startAtBrowserStep(): BrandDesignUpdatePageViewModel {
+        val browserStep = NewUserBrowserActivityStep(
+            id = "duck_ai_demo",
+            transition = { LinearOnboardingTransition.Stay },
+            resolveAction = { NewUserBrowserActivityAction.RunDuckAiOnboardingDemo("x") },
+        )
+        orchestrator.startPlan(LinearOnboardingPlan(id = NewUserOnboardingPlanProvider.ROOT_PLAN_ID, steps = listOf(browserStep)))
+        return createViewModel()
+    }
+
+    @Test
+    fun `when current step hosted by browser activity then hands off to browser`() = runTest {
+        val testee = startAtBrowserStep()
+
+        testee.commands.test {
+            assertEquals(BrandDesignUpdatePageViewModel.Command.HandOffToBrowserActivity, awaitItem())
         }
     }
 }

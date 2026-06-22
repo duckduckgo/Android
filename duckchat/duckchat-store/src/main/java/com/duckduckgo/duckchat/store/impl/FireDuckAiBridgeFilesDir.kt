@@ -14,15 +14,11 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.duckchat.impl.nativeinput
+package com.duckduckgo.duckchat.store.impl
 
-import com.duckduckgo.anvil.annotations.ContributesPluginPoint
-import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.duckchat.api.nativeinput.NativeInputFieldSuppressor
+import javax.inject.Qualifier
 
-@ContributesPluginPoint(
-    scope = AppScope::class,
-    boundType = NativeInputFieldSuppressor::class,
-)
-@Suppress("unused")
-private interface UnusedNativeInputFieldSuppressorPluginPoint
+/** Qualifies the directory holding Fire-mode Duck.ai chat-attachment files (counterpart of [DuckAiBridgeFilesDir]). */
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
+internal annotation class FireDuckAiBridgeFilesDir
