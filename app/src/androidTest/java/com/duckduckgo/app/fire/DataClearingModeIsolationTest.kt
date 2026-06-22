@@ -195,7 +195,7 @@ class DataClearingModeIsolationTest {
     // -----------------------------------------------------------------------
 
     @Test
-    fun `clearing all fire tabs leaves regular tabs untouched`() = runTest {
+    fun clearing_all_fire_tabs_leaves_regular_tabs_untouched() = runTest {
         regularTabsDao.insertTab(TabEntity(tabId = "reg1", position = 0))
         regularTabsDao.insertTab(TabEntity(tabId = "reg2", position = 1))
         fireTabsDao.insertTab(TabEntity(tabId = "fire1", position = 0))
@@ -208,7 +208,7 @@ class DataClearingModeIsolationTest {
     }
 
     @Test
-    fun `clearing a single fire tab leaves regular tabs and other fire tabs untouched`() = runTest {
+    fun clearing_a_single_fire_tab_leaves_regular_tabs_and_other_fire_tabs_untouched() = runTest {
         regularTabsDao.insertTab(TabEntity(tabId = "reg1", position = 0))
         fireTabsDao.insertTab(TabEntity(tabId = "fire1", position = 0))
         fireTabsDao.insertTab(TabEntity(tabId = "fire2", position = 1))
@@ -222,7 +222,7 @@ class DataClearingModeIsolationTest {
     }
 
     @Test
-    fun `tabs plugin ignores non-fire AllForMode type`() = runTest {
+    fun tabs_plugin_ignores_non_fire_AllForMode_type() = runTest {
         regularTabsDao.insertTab(TabEntity(tabId = "reg1", position = 0))
         fireTabsDao.insertTab(TabEntity(tabId = "fire1", position = 0))
 
@@ -238,7 +238,7 @@ class DataClearingModeIsolationTest {
     // -----------------------------------------------------------------------
 
     @Test
-    fun `clearing all fire chats leaves regular chats untouched`() = runTest {
+    fun clearing_all_fire_chats_leaves_regular_chats_untouched() = runTest {
         regularChatDb.chatsDao().upsert(DuckAiBridgeChatEntity(chatId = "chat-reg", data = chatJson("chat-reg")))
         fireChatDb.chatsDao().upsert(DuckAiBridgeChatEntity(chatId = "chat-fire", data = chatJson("chat-fire")))
 
@@ -249,7 +249,7 @@ class DataClearingModeIsolationTest {
     }
 
     @Test
-    fun `clearing a single fire chat leaves other fire chats and regular chats untouched`() = runTest {
+    fun clearing_a_single_fire_chat_leaves_other_fire_chats_and_regular_chats_untouched() = runTest {
         regularChatDb.chatsDao().upsert(DuckAiBridgeChatEntity(chatId = "chat-reg", data = chatJson("chat-reg")))
         fireChatDb.chatsDao().upsert(DuckAiBridgeChatEntity(chatId = "fire-a", data = chatJson("fire-a")))
         fireChatDb.chatsDao().upsert(DuckAiBridgeChatEntity(chatId = "fire-b", data = chatJson("fire-b")))
@@ -276,7 +276,7 @@ class DataClearingModeIsolationTest {
      *  - Regular chat deletion is delegated to duckChatDeleter (verified via mock)
      */
     @Test
-    fun `regular-origin burn dispatches to both plugins for both modes`() = runTest {
+    fun regular_origin_burn_dispatches_to_both_plugins_for_both_modes() = runTest {
         // Stub regular-chat deletion to succeed so sync recording is triggered
         whenever(mockDuckChatDeleter.deleteAllChats()).thenReturn(true)
 
