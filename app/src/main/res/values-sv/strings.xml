@@ -832,6 +832,7 @@
     <string name="preOnboardingDaxDialog1TitleDuckAi" translatable="false"><![CDATA[Hi there.<br/><br/>Ready for a faster browser that protects you and lets you decide when and how to use AI?]]></string>
     <string name="preOnboardingDaxDialog1Button">Vi gör det!</string>
     <string name="preOnboardingDaxDialog1ButtonDuckAi" translatable="false">Let\&apos;s get started!</string>
+    <string name="preOnboardingDaxDialog1ButtonBrandDesign">Då sätter vi igång!</string>
     <string name="preOnboardingDaxDialog1SecondaryButton">Jag har varit här förut</string>
     <string name="preOnboardingDaxDialog2Title">Skydd aktiverat!</string>
     <string name="preOnboardingDaxDialog2Button">Välj din webbläsare</string>
@@ -896,6 +897,7 @@
     <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[DuckDuckGo har också en <b>valfri betald prenumeration</b> med ett säkert <b>VPN</b> och <b>avancerad, privat AI</b>.]]></string>
     <string name="onboardingPrivacyProDaxDialogOkButton">Läs mer</string>
     <string name="onboardingPrivacyProDaxDialogFreeTrialOkButton">Prova gratis!</string>
+    <string name="onboardingPrivacyProDaxDialogFreeTrialOkButtonBrandDesign">Prova gratis!</string>
     <string name="onboardingPrivacyProDaxDialogCancelButton">Hoppa över</string>
     <string name="onboardingSkippedPrivacyProDaxDialogTitle">Visste du det?</string>
 
@@ -1036,6 +1038,27 @@
     <string name="onboardingDuckAiEndCtaTitle">Det här går bra!</string>
     <string name="onboardingDuckAiEndCtaDescription"><![CDATA[Använd adressfältet för att söka efter och besöka webbplatser eller byt till Duck.ai för privat AI-chatt.<br/><br/>Du kan använda Duck.ai överallt där du ser chattikonen]]></string>
     <string name="onboardingDuckAiEndCtaButton">High Five!</string>
+
+    <!-- Custom AI onboarding flow -->
+    <!-- Pre-onboarding: initial screens -->
+    <string name="preOnboardingWelcomeDialogBodyCustomAi">Är du redo att chatta privat med ChatGPT, Claude och andra AI-modeller gratis, i en webbläsare som aktivt skyddar dig?</string>
+    <string name="preOnboardingDaxDialog3TextCustomAi">Kom ihåg: du kan använda Duck.ai var du än ser chattikonen</string>
+    <string name="preOnboardingDaxDialog3ButtonCustomAi">Starta AI-chatt</string>
+    <!-- Pre-onboarding: AI comparison chart screen. -->
+    <string name="preOnboardingDaxDialogAiTitle">AI-skydd aktiverat!</string>
+    <string name="preOnboardingAiComparisonChartPopularAis">Populära AI-modeller</string>
+    <string name="preOnboardingAiComparisonChartItem1">Alla chattar är anonymiserade</string>
+    <string name="preOnboardingAiComparisonChartItem2">Inget konto behövs för att få tillgång till alla AI-funktioner</string>
+    <string name="preOnboardingAiComparisonChartItem3">Använder aldrig dina chattar för att träna AI</string>
+    <string name="preOnboardingAiComparisonChartItem4">Få tillgång till ChatGPT, Claude och mer, allt på ett ställe</string>
+    <string name="preOnboardingAiComparisonChartButton">Prova Duck.ai!</string>
+    <!-- Pre-onboarding: input demo screen -->
+    <string name="preOnboardingInputModeDemoTitleCustomAi">Prova en privat AI-chatt nu!</string>
+    <!-- Pre-onboarding: browser comparison screen -->
+    <string name="preOnboardingDaxDialog2TitleCustomAi">Vill du göra DuckDuckGo till din standardwebbläsare?</string>
+    <!-- In-context onboarding. -->
+    <string name="onboardingEndCustomAiFlowDaxDialogDescription"><![CDATA[Starta en privat AI-chatt med Duck.ai eller byt till Sök för skyddad surfning.<br/><br/>Du kan använda Duck.ai överallt där du ser chattikonen]]></string>
+    <string name="onboardingPrivacyProCustomAiFlowDaxDialogDescription">Vi erbjuder även en betald prenumeration med avancerade AI-modeller med högre chattgränser från GPT, Claude och Llama, ett säkert VPN och mer.</string>
 
     <string name="input_screen_user_pref_without_ai_updated">Endast sökning</string>
     <string name="input_screen_user_pref_with_ai_updated">Växla mellan\nsökning och Duck.ai</string>
