@@ -30,12 +30,14 @@ import com.duckduckgo.adblocking.api.duckplayer.DuckPlayer.DuckPlayerState.ENABL
 import com.duckduckgo.adblocking.api.duckplayer.DuckPlayer.UserPreferences
 import com.duckduckgo.adblocking.api.duckplayer.PrivatePlayerMode.AlwaysAsk
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetectorImpl
+import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.cta.model.DismissedCta
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.model.Site
+import com.duckduckgo.app.onboarding.CustomAiOnboardingStore
 import com.duckduckgo.app.onboarding.DuckAiOnboardingExperimentMetrics
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.OnboardingStore
@@ -117,6 +119,8 @@ class CtaViewModelTest {
 
     private val mockOnboardingStore: OnboardingStore = mock()
 
+    private val mockCustomAiOnboarding: CustomAiOnboardingStore = mock()
+
     private val mockUserAllowListRepository: UserAllowListRepository = mock()
 
     private val mockUserStageStore: UserStageStore = mock()
@@ -191,6 +195,7 @@ class CtaViewModelTest {
         whenever(mockBrokenSitePrompt.isFeatureEnabled()).thenReturn(false)
         whenever(mockBrokenSitePrompt.getUserRefreshPatterns()).thenReturn(emptySet())
         whenever(mockSubscriptions.isEligible()).thenReturn(false)
+        whenever(mockCustomAiOnboarding.isEnabled()).thenReturn(false)
         whenever(mockOnboardingBrandDesignUpdateToggles.brandDesignUpdate()).thenReturn(mockDisabledToggle)
         whenever(mockOnboardingBrandDesignUpdateToggles.onboardingImprovements()).thenReturn(mockEnabledToggle)
 
@@ -202,6 +207,7 @@ class CtaViewModelTest {
             userAllowListRepository = mockUserAllowListRepository,
             settingsDataStore = mockSettingsDataStore,
             onboardingStore = mockOnboardingStore,
+            customAiOnboarding = mockCustomAiOnboarding,
             userStageStore = mockUserStageStore,
             aggregateTabProvider = mockAggregateTabProvider,
             dispatchers = coroutineRule.testDispatcherProvider,
@@ -1569,11 +1575,36 @@ class CtaViewModelTest {
             appInstallStore = mockAppInstallStore,
             isLightTheme = true,
             deviceInfo = mockDeviceInfo,
+            isCustomAiOnboardingFlow = false,
         )
         testee.onCtaShown(cta)
 
         verify(mockDuckAiOnboardingExperimentMetrics).fireFinalDialogImpression()
         verify(mockDismissedCtaDao).insert(DismissedCta(CtaId.DAX_DUCK_AI_END))
+    }
+
+    @Test
+    fun whenDaxDuckAiEndBrandDesignBubbleCtaCustomAiOnboardingFlowThenDescriptionIsCustomAi() {
+        val cta = DaxDuckAiEndBrandDesignUpdateBubbleCta(
+            onboardingStore = mockOnboardingStore,
+            appInstallStore = mockAppInstallStore,
+            isLightTheme = true,
+            deviceInfo = mockDeviceInfo,
+            isCustomAiOnboardingFlow = true,
+        )
+        assertEquals(R.string.onboardingEndCustomAiFlowDaxDialogDescription, cta.description)
+    }
+
+    @Test
+    fun whenDaxDuckAiEndBrandDesignBubbleCtaStandardFlowThenDescriptionIsStandard() {
+        val cta = DaxDuckAiEndBrandDesignUpdateBubbleCta(
+            onboardingStore = mockOnboardingStore,
+            appInstallStore = mockAppInstallStore,
+            isLightTheme = true,
+            deviceInfo = mockDeviceInfo,
+            isCustomAiOnboardingFlow = false,
+        )
+        assertEquals(R.string.onboardingDuckAiEndCtaDescription, cta.description)
     }
 
     // endregion

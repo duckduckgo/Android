@@ -19,6 +19,7 @@ package com.duckduckgo.app.onboarding.ui.page
 import android.annotation.SuppressLint
 import app.cash.turbine.test
 import com.duckduckgo.app.browser.omnibar.OmnibarType
+import com.duckduckgo.app.onboarding.CustomAiOnboardingStore
 import com.duckduckgo.app.onboarding.orchestrator.NewUserBrowserActivityAction
 import com.duckduckgo.app.onboarding.orchestrator.NewUserBrowserActivityStep
 import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingActivityDialog
@@ -38,6 +39,7 @@ import com.duckduckgo.onboarding.api.LinearOnboardingPlan
 import com.duckduckgo.onboarding.api.LinearOnboardingResult
 import com.duckduckgo.onboarding.api.LinearOnboardingTransition
 import com.duckduckgo.onboarding.impl.LinearOnboardingOrchestratorImpl
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -57,6 +59,7 @@ class BrandDesignUpdatePageViewModelOrchestratorTest {
 
     private val pixel: Pixel = mock()
     private val onboardingStore: OnboardingStore = mock()
+    private val customAiOnboardingStore: CustomAiOnboardingStore = mock()
     private val orchestrator = LinearOnboardingOrchestratorImpl()
     private val recordedEvents = mutableListOf<LinearOnboardingEvent>()
 
@@ -70,6 +73,7 @@ class BrandDesignUpdatePageViewModelOrchestratorTest {
     fun setup() {
         whenever(onboardingStore.getSearchOptions()).thenReturn(emptyList())
         whenever(onboardingStore.getChatSuggestions()).thenReturn(emptyList())
+        runBlocking { whenever(customAiOnboardingStore.isEnabled()).thenReturn(false) }
     }
 
     // A one-step plan that renders [dialog]. By default the step records every event it is handed and stays put,
@@ -119,6 +123,7 @@ class BrandDesignUpdatePageViewModelOrchestratorTest {
             syncAutoRestore = mock(),
             quickSetupPixelSender = mock(),
             orchestrator = orchestrator,
+            customAiOnboardingStore = customAiOnboardingStore,
         )
 
     @Test
@@ -309,7 +314,7 @@ class BrandDesignUpdatePageViewModelOrchestratorTest {
 
     @Test
     fun `when custom ai onboarding flow then view state enables custom ai flow`() = runTest {
-        whenever(onboardingStore.isCustomAiOnboardingFlow()).thenReturn(true)
+        whenever(customAiOnboardingStore.isEnabled()).thenReturn(true)
         val testee = startAt(NewUserOnboardingActivityDialog.Initial)
         advanceUntilIdle()
 

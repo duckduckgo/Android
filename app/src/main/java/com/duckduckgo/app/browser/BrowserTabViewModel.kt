@@ -281,6 +281,7 @@ import com.duckduckgo.app.global.model.domain
 import com.duckduckgo.app.global.model.domainMatchesUrl
 import com.duckduckgo.app.global.model.orderedTrackerBlockedEntities
 import com.duckduckgo.app.location.data.LocationPermissionType
+import com.duckduckgo.app.onboarding.CustomAiOnboardingStore
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboardingbranddesignupdate.OnboardingBrandDesignUpdateToggles
 import com.duckduckgo.app.pixels.AppPixelName
@@ -573,6 +574,7 @@ class BrowserTabViewModel @Inject constructor(
     private val onboardingBrandDesignUpdateToggles: OnboardingBrandDesignUpdateToggles,
     private val onboardingStore: OnboardingStore,
     private val autocompleteHistoryDeleteFeature: AutocompleteHistoryDeleteFeature,
+    private val customAiOnboardingStore: CustomAiOnboardingStore,
 ) : ViewModel(),
     WebViewClientListener,
     EditSavedSiteListener,
@@ -1063,7 +1065,7 @@ class BrowserTabViewModel @Inject constructor(
                             val hasPendingOnboardingPromo = ctaViewModel.isPromoOnboardingDialogShowing()
                             if (!hasPendingOnboardingPromo) {
                                 val duckAiEndCtaVariant = ctaViewModel.prepareAndMarkDuckAiEndCtaForInputScreen()
-                                val launchOnChat = onboardingStore.consumeOpenInputOnDuckAiTab()
+                                val launchOnChat = customAiOnboardingStore.consumeOpenInputOnDuckAiTab()
                                 command.value = LaunchInputScreen(duckAiEndCtaVariant = duckAiEndCtaVariant, launchOnChat = launchOnChat)
                             }
                         }
@@ -5164,7 +5166,7 @@ class BrowserTabViewModel @Inject constructor(
                     val uri = "https://duckduckgo.com/pro".toUri().buildUpon()
                         .appendQueryParameter("origin", "funnel_onboarding_android")
                         .apply {
-                            if (onboardingStore.isCustomAiOnboardingFlow()) {
+                            if (customAiOnboardingStore.isEnabled()) {
                                 appendQueryParameter("featurePage", "duckai")
                             }
                         }
@@ -5618,14 +5620,16 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun dismissDuckAiFireOnboardingCta() {
-        // Custom AI onboarding defers dismissal to the end of the linear orchestrator
-        // run, so the CTA survives if the app is killed mid-onboarding and the flow
-        // has to re-run on next launch.
-        if (onboardingStore.isCustomAiOnboardingFlow()) return
+        viewModelScope.launch {
+            // Custom AI onboarding defers dismissal to the end of the linear orchestrator
+            // run, so the CTA survives if the app is killed mid-onboarding and the flow
+            // has to re-run on next launch.
+            if (customAiOnboardingStore.isEnabled()) return@launch
 
-        val cta = ctaViewState.value?.cta ?: return
-        if (cta is OnboardingDaxDialogCta.DaxDuckAiFireButtonCta || cta is DaxDuckAiFireButtonBrandDesignUpdateContextualCta) {
-            viewModelScope.launch { ctaViewModel.onUserDismissedCta(cta = cta) }
+            val cta = ctaViewState.value?.cta ?: return@launch
+            if (cta is OnboardingDaxDialogCta.DaxDuckAiFireButtonCta || cta is DaxDuckAiFireButtonBrandDesignUpdateContextualCta) {
+                ctaViewModel.onUserDismissedCta(cta = cta)
+            }
         }
     }
 

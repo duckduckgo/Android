@@ -34,6 +34,7 @@ import com.duckduckgo.app.global.install.daysInstalled
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.domain
 import com.duckduckgo.app.global.model.orderedTrackerBlockedEntities
+import com.duckduckgo.app.onboarding.CustomAiOnboardingStore
 import com.duckduckgo.app.onboarding.DuckAiOnboardingExperimentMetrics
 import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingPlanProvider
 import com.duckduckgo.app.onboarding.store.AppStage
@@ -92,6 +93,7 @@ class CtaViewModel @Inject constructor(
     private val userAllowListRepository: UserAllowListRepository,
     private val settingsDataStore: SettingsDataStore,
     private val onboardingStore: OnboardingStore,
+    private val customAiOnboarding: CustomAiOnboardingStore,
     private val userStageStore: UserStageStore,
     private val aggregateTabProvider: AggregateTabProvider,
     private val dispatchers: DispatcherProvider,
@@ -400,6 +402,7 @@ class CtaViewModel @Inject constructor(
                         appInstallStore = appInstallStore,
                         isLightTheme = appTheme.isLightModeEnabled(),
                         deviceInfo = deviceInfo,
+                        isCustomAiOnboardingFlow = customAiOnboarding.isEnabled(),
                     )
                 } else {
                     DaxDuckAiEndBubbleCta(onboardingStore, appInstallStore)
@@ -453,6 +456,7 @@ class CtaViewModel @Inject constructor(
                         appInstallStore,
                         appTheme.isLightModeEnabled(),
                         deviceInfo,
+                        isCustomAiOnboardingFlow = customAiOnboarding.isEnabled(),
                         isFreeTrialCopy = freeTrialCopyAvailable(),
                         onboardingImprovementsEnabled = isOnboardingImprovementsEnabled(),
                     )
@@ -491,7 +495,7 @@ class CtaViewModel @Inject constructor(
 
     @WorkerThread
     private suspend fun canShowDuckAiEndCta(): Boolean =
-        onboardingStore.isDuckAiOnboardingFlow() && duckAiFireButtonShown() && !duckAiEndShown()
+        onboardingStore.isDuckAiOnboardingFlow() && duckAiFireButtonShown() && !duckAiEndShown() && !hideTips()
 
     @WorkerThread
     private suspend fun canShowSubscriptionCta(): Boolean {

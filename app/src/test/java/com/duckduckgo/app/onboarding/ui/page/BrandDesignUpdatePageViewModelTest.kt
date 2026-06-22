@@ -25,6 +25,7 @@ import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.cta.ui.DaxBubbleCta.DaxDialogIntroOption
 import com.duckduckgo.app.global.DefaultRoleBrowserDialog
 import com.duckduckgo.app.global.install.AppInstallStore
+import com.duckduckgo.app.onboarding.CustomAiOnboardingStore
 import com.duckduckgo.app.onboarding.DuckAiOnboardingExperimentManager
 import com.duckduckgo.app.onboarding.DuckAiOnboardingExperimentManager.DuckAiOnboardingExperimentVariant
 import com.duckduckgo.app.onboarding.store.OnboardingStore
@@ -105,6 +106,7 @@ class BrandDesignUpdatePageViewModelTest {
     private val mockWidgetCapabilities: WidgetCapabilities = mock()
     private val mockSyncAutoRestore: SyncAutoRestore = mock()
     private val mockQuickSetupPixelSender: QuickSetupPixelSender = mock()
+    private val mockCustomAiOnboardingStore: CustomAiOnboardingStore = mock()
 
     // Legacy mode: the VM derives its mode from orchestrator.state, which this mock holds at NotStarted.
     private val mockOrchestrator: LinearOnboardingOrchestrator = mock {
@@ -131,6 +133,7 @@ class BrandDesignUpdatePageViewModelTest {
             mockSyncAutoRestore,
             mockQuickSetupPixelSender,
             mockOrchestrator,
+            mockCustomAiOnboardingStore,
         )
     }
 

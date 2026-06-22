@@ -27,6 +27,7 @@ import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.cta.ui.DaxBubbleCta.DaxDialogIntroOption
 import com.duckduckgo.app.global.DefaultRoleBrowserDialog
 import com.duckduckgo.app.global.install.AppInstallStore
+import com.duckduckgo.app.onboarding.CustomAiOnboardingStore
 import com.duckduckgo.app.onboarding.DuckAiOnboardingExperimentManager
 import com.duckduckgo.app.onboarding.DuckAiOnboardingExperimentManager.DuckAiOnboardingExperimentVariant.CONTROL
 import com.duckduckgo.app.onboarding.DuckAiOnboardingExperimentManager.DuckAiOnboardingExperimentVariant.TREATMENT_WITH_DUCK_AI_DEFAULT
@@ -128,6 +129,7 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
     private val syncAutoRestore: SyncAutoRestore,
     private val quickSetupPixelSender: QuickSetupPixelSender,
     private val orchestrator: LinearOnboardingOrchestrator,
+    private val customAiOnboardingStore: CustomAiOnboardingStore,
 ) : ViewModel() {
 
     // Lazy so it never starts in orchestrator mode (there the sync_restore precondition owns canRestore).
@@ -166,11 +168,7 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
         val maxPageCount: Int = DEFAULT_STEP_COUNT,
     )
 
-    private val _viewState = MutableStateFlow(
-        ViewState(
-            isCustomAiOnboardingFlow = onboardingStore.isCustomAiOnboardingFlow(),
-        ),
-    )
+    private val _viewState = MutableStateFlow(ViewState())
     val viewState = _viewState.asStateFlow()
 
     private val _commands = Channel<Command>(1, DROP_OLDEST)
@@ -721,7 +719,14 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
 
         override fun start() {
             seedHasPlayedIntroAnimation()
-            observeOrchestratorState()
+            viewModelScope.launch {
+                // Resolve the custom AI signal before collecting orchestrator state,
+                // so the flag is set before any dialog is applied.
+                // Custom AI plan gate requires orchestrator usage,
+                // so this is okay to apply only to OrchestratorFlow and ignore for LegacyFlow.
+                _viewState.update { it.copy(isCustomAiOnboardingFlow = customAiOnboardingStore.isEnabled()) }
+                observeOrchestratorState()
+            }
         }
 
         override fun onIntroAnimationFinished() = emit(NewUserOnboardingEvent.IntroAnimationFinished)

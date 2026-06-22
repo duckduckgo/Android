@@ -19,7 +19,6 @@ package com.duckduckgo.app.onboarding.orchestrator
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
-import com.duckduckgo.app.onboarding.DuckAiOnboardingDemo
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.onboarding.api.LinearOnboardingHost
@@ -41,7 +40,6 @@ import javax.inject.Inject
 @ContributesViewModel(ActivityScope::class)
 class NewUserBrowserOnboardingViewModel @Inject constructor(
     private val orchestrator: LinearOnboardingOrchestrator,
-    private val duckAiOnboardingDemo: DuckAiOnboardingDemo,
     private val duckChat: DuckChat,
 ) : ViewModel() {
 
@@ -80,7 +78,6 @@ class NewUserBrowserOnboardingViewModel @Inject constructor(
         if (step is NewUserBrowserActivityStep) {
             when (val action = step.resolveAction()) {
                 is NewUserBrowserActivityAction.RunDuckAiOnboardingDemo -> {
-                    duckAiOnboardingDemo.arm()
                     val url = duckChat.getDuckChatUrl(action.prompt, autoPrompt = true) + "&flow=mobile-app-onboarding"
                     _commands.send(Command.OpenDuckAiOnboardingDemo(url))
                 }
