@@ -5202,9 +5202,6 @@ class BrowserTabViewModel @Inject constructor(
 
         // Defer cleanup (CTA dismiss, highlight removal) until the fire action actually completes.
         if (cta is OnboardingDaxDialogCta.DaxDuckAiFireButtonCta || cta is DaxDuckAiFireButtonBrandDesignUpdateContextualCta) {
-            viewModelScope.launch {
-                ctaViewModel.onDuckAiFireButtonCtaPressed()
-            }
             return
         }
 

@@ -26,8 +26,7 @@ import com.duckduckgo.app.cta.ui.DaxBubbleCta.DaxDialogIntroOption
 import com.duckduckgo.app.global.DefaultRoleBrowserDialog
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.onboarding.CustomAiOnboardingStore
-import com.duckduckgo.app.onboarding.DuckAiOnboardingExperimentManager
-import com.duckduckgo.app.onboarding.DuckAiOnboardingExperimentManager.DuckAiOnboardingExperimentVariant
+import com.duckduckgo.app.onboarding.DuckAiOnboardingAvailability
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.ui.page.BrandDesignUpdatePageViewModel.Command
 import com.duckduckgo.app.onboardingquicksetup.OnboardingQuickSetupExperimentManager
@@ -67,12 +66,14 @@ import com.duckduckgo.onboarding.api.LinearOnboardingOrchestrator
 import com.duckduckgo.onboarding.api.LinearOnboardingState
 import com.duckduckgo.sync.api.SyncAutoRestore
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.doReturn
@@ -100,7 +101,7 @@ class BrandDesignUpdatePageViewModelTest {
     )
     private val mockDuckChat: DuckChat = mock()
     private val mockInputScreenOnboardingWideEvent: InputScreenOnboardingWideEvent = mock()
-    private val mockDuckAiOnboardingExperimentManager: DuckAiOnboardingExperimentManager = mock()
+    private val mockDuckAiOnboardingAvailability: DuckAiOnboardingAvailability = mock()
     private val mockOnboardingQuickSetupExperimentManager: OnboardingQuickSetupExperimentManager = mock()
     private val mockDefaultBrowserDetector: DefaultBrowserDetector = mock()
     private val mockWidgetCapabilities: WidgetCapabilities = mock()
@@ -111,6 +112,13 @@ class BrandDesignUpdatePageViewModelTest {
     // Legacy mode: the VM derives its mode from orchestrator.state, which this mock holds at NotStarted.
     private val mockOrchestrator: LinearOnboardingOrchestrator = mock {
         on { state } doReturn MutableStateFlow(LinearOnboardingState.NotStarted)
+    }
+
+    @Before
+    fun setUp() {
+        runBlocking {
+            whenever(mockDuckAiOnboardingAvailability.isDuckAiOnboardingEnabled()).thenReturn(false)
+        }
     }
 
     private fun createViewModel(): BrandDesignUpdatePageViewModel {
@@ -126,7 +134,7 @@ class BrandDesignUpdatePageViewModelTest {
             mockAndroidBrowserConfigFeature,
             mockDuckChat,
             mockInputScreenOnboardingWideEvent,
-            mockDuckAiOnboardingExperimentManager,
+            mockDuckAiOnboardingAvailability,
             mockOnboardingQuickSetupExperimentManager,
             mockDefaultBrowserDetector,
             mockWidgetCapabilities,
@@ -967,8 +975,8 @@ class BrandDesignUpdatePageViewModelTest {
     // region onPrimaryCtaClicked - input screen enrollment
 
     @Test
-    fun whenPrimaryCtaFromInputScreenWithAiSelectedAndEnrollReturnsNullThenFinish() = runTest {
-        whenever(mockDuckAiOnboardingExperimentManager.enroll()).thenReturn(null)
+    fun whenPrimaryCtaFromInputScreenWithAiSelectedAndDuckAiOnboardingDisabledThenFinish() = runTest {
+        whenever(mockDuckAiOnboardingAvailability.isDuckAiOnboardingEnabled()).thenReturn(false)
         val testee = createViewModel()
         testee.onDefaultBrowserSet()
         testee.onAddressBarPositionOptionSelected(OmnibarType.SINGLE_TOP)
@@ -983,49 +991,8 @@ class BrandDesignUpdatePageViewModelTest {
     }
 
     @Test
-    fun whenPrimaryCtaFromInputScreenWithAiSelectedAndEnrollReturnsControlThenFinish() = runTest {
-        whenever(mockDuckAiOnboardingExperimentManager.enroll()).thenReturn(DuckAiOnboardingExperimentVariant.CONTROL)
-        val testee = createViewModel()
-        testee.onDefaultBrowserSet()
-        testee.onAddressBarPositionOptionSelected(OmnibarType.SINGLE_TOP)
-        testee.onInputScreenOptionSelected(true)
-        testee.onPrimaryCtaClicked() // ADDRESS_BAR_POSITION -> INPUT_SCREEN
-        testee.commands.test {
-            awaitItem() // drain initial PlayIntroAnimation
-            testee.onPrimaryCtaClicked() // INPUT_SCREEN -> Finish
-            val command = awaitItem()
-            assertTrue(command is Command.Finish)
-        }
-    }
-
-    @Test
-    fun whenPrimaryCtaFromInputScreenWithAiSelectedAndEnrollReturnsTreatmentDuckAiThenShowInputScreenPreview() = runTest {
-        whenever(mockDuckAiOnboardingExperimentManager.enroll()).thenReturn(DuckAiOnboardingExperimentVariant.TREATMENT_WITH_DUCK_AI_DEFAULT)
-        val searchOptions = listOf(DaxDialogIntroOption("search1", 0, "link1"))
-        val chatSuggestions = listOf(DaxDialogIntroOption("chat1", 0, "link2"))
-        whenever(mockOnboardingStore.getSearchOptions()).thenReturn(searchOptions)
-        whenever(mockOnboardingStore.getChatSuggestions()).thenReturn(chatSuggestions)
-        val testee = createViewModel()
-        testee.onDefaultBrowserSet()
-        testee.onAddressBarPositionOptionSelected(OmnibarType.SINGLE_TOP)
-        testee.onInputScreenOptionSelected(true)
-        testee.onPrimaryCtaClicked() // ADDRESS_BAR_POSITION -> INPUT_SCREEN
-        testee.viewState.test {
-            val preInputScreen = awaitItem()
-            assertEquals(PreOnboardingDialogType.INPUT_SCREEN, preInputScreen.currentDialog)
-            testee.onPrimaryCtaClicked() // INPUT_SCREEN -> INPUT_SCREEN_PREVIEW
-            val state = awaitItem()
-            assertEquals(PreOnboardingDialogType.INPUT_SCREEN_PREVIEW, state.currentDialog)
-            assertFalse(state.inputScreenPreviewIsSearchSelected)
-            assertEquals(searchOptions, state.inputScreenPreviewSearchSuggestions)
-            assertEquals(chatSuggestions, state.inputScreenPreviewChatSuggestions)
-            cancelAndConsumeRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenPrimaryCtaFromInputScreenWithAiSelectedAndEnrollReturnsTreatmentSearchThenShowInputScreenPreviewWithSearchDefault() = runTest {
-        whenever(mockDuckAiOnboardingExperimentManager.enroll()).thenReturn(DuckAiOnboardingExperimentVariant.TREATMENT_WITH_SEARCH_DEFAULT)
+    fun whenPrimaryCtaFromInputScreenWithAiSelectedAndDuckAiOnboardingEnabledThenShowInputScreenPreviewWithSearchDefault() = runTest {
+        whenever(mockDuckAiOnboardingAvailability.isDuckAiOnboardingEnabled()).thenReturn(true)
         val searchOptions = listOf(DaxDialogIntroOption("search1", 0, "link1"))
         val chatSuggestions = listOf(DaxDialogIntroOption("chat1", 0, "link2"))
         whenever(mockOnboardingStore.getSearchOptions()).thenReturn(searchOptions)
@@ -1049,7 +1016,7 @@ class BrandDesignUpdatePageViewModelTest {
     }
 
     @Test
-    fun whenPrimaryCtaFromInputScreenWithSearchOnlySelectedThenDoNotEnrollAndFinish() = runTest {
+    fun whenPrimaryCtaFromInputScreenWithSearchOnlySelectedThenFinish() = runTest {
         val testee = createViewModel()
         testee.onDefaultBrowserSet()
         testee.onAddressBarPositionOptionSelected(OmnibarType.SINGLE_TOP)
@@ -1061,7 +1028,6 @@ class BrandDesignUpdatePageViewModelTest {
             val command = awaitItem()
             assertTrue(command is Command.Finish)
         }
-        verify(mockDuckAiOnboardingExperimentManager, never()).enroll()
     }
 
     // endregion
@@ -1070,7 +1036,7 @@ class BrandDesignUpdatePageViewModelTest {
 
     @Test
     fun whenPrimaryCtaFromInputScreenPreviewThenFinish() = runTest {
-        whenever(mockDuckAiOnboardingExperimentManager.enroll()).thenReturn(DuckAiOnboardingExperimentVariant.TREATMENT_WITH_SEARCH_DEFAULT)
+        whenever(mockDuckAiOnboardingAvailability.isDuckAiOnboardingEnabled()).thenReturn(true)
         whenever(mockOnboardingStore.getSearchOptions()).thenReturn(emptyList())
         whenever(mockOnboardingStore.getChatSuggestions()).thenReturn(emptyList())
         val testee = createViewModel()

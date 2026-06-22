@@ -22,9 +22,8 @@ import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.global.DefaultRoleBrowserDialog
 import com.duckduckgo.app.onboarding.CustomAiOnboardingResolver
 import com.duckduckgo.app.onboarding.CustomAiOnboardingStore
+import com.duckduckgo.app.onboarding.DuckAiOnboardingAvailability
 import com.duckduckgo.app.onboarding.DuckAiOnboardingDemo
-import com.duckduckgo.app.onboarding.DuckAiOnboardingExperimentManager
-import com.duckduckgo.app.onboarding.DuckAiOnboardingExperimentManager.DuckAiOnboardingExperimentVariant
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.ui.page.QuickSetupPixelSender
 import com.duckduckgo.app.onboardingquicksetup.OnboardingQuickSetupExperimentManager
@@ -77,7 +76,7 @@ class NewUserOnboardingPlanProviderTest {
     private val onboardingStore: OnboardingStore = mock()
     private val duckChat: DuckChat = mock()
     private val androidBrowserConfigFeature: AndroidBrowserConfigFeature = mock()
-    private val duckAiExperiment: DuckAiOnboardingExperimentManager = mock()
+    private val duckAiAvailability: DuckAiOnboardingAvailability = mock()
     private val quickSetupExperiment: OnboardingQuickSetupExperimentManager = mock()
     private val quickSetupPixelSender: QuickSetupPixelSender = mock()
     private val inputScreenOnboardingWideEvent: InputScreenOnboardingWideEvent = mock()
@@ -109,7 +108,7 @@ class NewUserOnboardingPlanProviderTest {
         runBlocking {
             whenever(syncAutoRestore.canRestore()).thenReturn(false)
             whenever(appBuildConfig.isAppReinstall()).thenReturn(false)
-            whenever(duckAiExperiment.enroll()).thenReturn(DuckAiOnboardingExperimentVariant.CONTROL)
+            whenever(duckAiAvailability.isDuckAiOnboardingEnabled()).thenReturn(false)
             whenever(quickSetupExperiment.enroll()).thenReturn(QuickSetupExperimentVariant.CONTROL)
             whenever(customAiOnboardingResolver.resolve()).thenReturn(false)
         }
@@ -121,7 +120,7 @@ class NewUserOnboardingPlanProviderTest {
             onboardingStore = onboardingStore,
             duckChat = duckChat,
             androidBrowserConfigFeature = androidBrowserConfigFeature,
-            duckAiOnboardingExperimentManager = duckAiExperiment,
+            duckAiOnboardingAvailability = duckAiAvailability,
             onboardingQuickSetupExperimentManager = quickSetupExperiment,
             quickSetupPixelSender = quickSetupPixelSender,
             inputScreenOnboardingWideEvent = inputScreenOnboardingWideEvent,
@@ -258,8 +257,8 @@ class NewUserOnboardingPlanProviderTest {
     }
 
     @Test
-    fun `when input mode ai and treatment search default then shows preview with search default`() = runTest {
-        whenever(duckAiExperiment.enroll()).thenReturn(DuckAiOnboardingExperimentVariant.TREATMENT_WITH_SEARCH_DEFAULT)
+    fun `when input mode ai and duck ai onboarding enabled then shows preview with search default`() = runTest {
+        whenever(duckAiAvailability.isDuckAiOnboardingEnabled()).thenReturn(true)
         start()
         orchestrator.onEvent(NewUserOnboardingEvent.IntroAnimationFinished)
         orchestrator.onEvent(NewUserOnboardingEvent.NotificationPermissionFinished)
@@ -282,8 +281,8 @@ class NewUserOnboardingPlanProviderTest {
     }
 
     @Test
-    fun `when input mode ai but control then preview skipped and completes`() = runTest {
-        whenever(duckAiExperiment.enroll()).thenReturn(DuckAiOnboardingExperimentVariant.CONTROL)
+    fun `when input mode ai but duck ai onboarding disabled then preview skipped and completes`() = runTest {
+        whenever(duckAiAvailability.isDuckAiOnboardingEnabled()).thenReturn(false)
         start()
         orchestrator.onEvent(NewUserOnboardingEvent.IntroAnimationFinished)
         orchestrator.onEvent(NewUserOnboardingEvent.NotificationPermissionFinished)
@@ -297,7 +296,7 @@ class NewUserOnboardingPlanProviderTest {
 
     @Test
     fun `when demo search query submitted on preview then completes with launch search result`() = runTest {
-        whenever(duckAiExperiment.enroll()).thenReturn(DuckAiOnboardingExperimentVariant.TREATMENT_WITH_SEARCH_DEFAULT)
+        whenever(duckAiAvailability.isDuckAiOnboardingEnabled()).thenReturn(true)
         start()
         orchestrator.onEvent(NewUserOnboardingEvent.IntroAnimationFinished)
         orchestrator.onEvent(NewUserOnboardingEvent.NotificationPermissionFinished)
@@ -318,7 +317,7 @@ class NewUserOnboardingPlanProviderTest {
 
     @Test
     fun `when demo chat query submitted on preview then completes with launch chat result`() = runTest {
-        whenever(duckAiExperiment.enroll()).thenReturn(DuckAiOnboardingExperimentVariant.TREATMENT_WITH_SEARCH_DEFAULT)
+        whenever(duckAiAvailability.isDuckAiOnboardingEnabled()).thenReturn(true)
         start()
         orchestrator.onEvent(NewUserOnboardingEvent.IntroAnimationFinished)
         orchestrator.onEvent(NewUserOnboardingEvent.NotificationPermissionFinished)
