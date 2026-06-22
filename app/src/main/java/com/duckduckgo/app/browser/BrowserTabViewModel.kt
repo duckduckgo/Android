@@ -339,6 +339,7 @@ import com.duckduckgo.browser.api.webviewcompat.WebViewCompatWrapper
 import com.duckduckgo.browser.api.wideevents.BrowserInteractionsPlugin
 import com.duckduckgo.browser.ui.autocomplete.AutocompleteHistoryDeleteFeature
 import com.duckduckgo.browser.ui.browsermenu.VpnMenuState
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.ui.tabs.SwipingTabsFeatureProvider
 import com.duckduckgo.common.utils.AppUrl
 import com.duckduckgo.common.utils.AppUrl.ParamKey.QUERY
@@ -575,6 +576,7 @@ class BrowserTabViewModel @Inject constructor(
     private val onboardingStore: OnboardingStore,
     private val autocompleteHistoryDeleteFeature: AutocompleteHistoryDeleteFeature,
     private val customAiOnboardingStore: CustomAiOnboardingStore,
+    private val browserMode: BrowserMode,
 ) : ViewModel(),
     WebViewClientListener,
     EditSavedSiteListener,
@@ -4819,6 +4821,7 @@ class BrowserTabViewModel @Inject constructor(
                         id,
                         data,
                         tabId = tabId,
+                        browserMode = browserMode,
                     )
                     withContext(dispatchers.main()) {
                         response?.let {
