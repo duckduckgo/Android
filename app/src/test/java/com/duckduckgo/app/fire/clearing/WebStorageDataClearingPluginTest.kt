@@ -57,21 +57,21 @@ class WebStorageDataClearingPluginTest {
         coroutineRule.testDispatcherProvider,
     )
 
-    @Test fun whenFireAllForModeThenDeletesFireWebStorage() = runTest {
+    @Test fun whenFireAllForModeThenDeletesAllFireBrowsingData() = runTest {
         whenever(webStorageProvider.forMode(BrowserMode.FIRE)).thenReturn(fireStorage)
         testee.onClearData(setOf(ClearableData.BrowserData.AllForMode(BrowserMode.FIRE)))
-        verify(fireStorage).deleteAllData()
+        verify(siteDataCleaner).deleteAllBrowsingData(fireStorage)
     }
 
-    @Test fun whenBrowserDataAllThenDeletesFireWebStorage() = runTest {
+    @Test fun whenBrowserDataAllThenDeletesAllFireBrowsingData() = runTest {
         whenever(webStorageProvider.forMode(BrowserMode.FIRE)).thenReturn(fireStorage)
         testee.onClearData(setOf(ClearableData.BrowserData.All))
-        verify(fireStorage).deleteAllData()
+        verify(siteDataCleaner).deleteAllBrowsingData(fireStorage)
     }
 
     @Test fun whenRegularAllForModeThenDoesNothing() = runTest {
         testee.onClearData(setOf(ClearableData.BrowserData.AllForMode(BrowserMode.REGULAR)))
-        verify(fireStorage, never()).deleteAllData()
+        verify(siteDataCleaner, never()).deleteAllBrowsingData(any())
     }
 
     @Test fun whenFireSingleForModeThenClearsVisitedDomainsExceptDdgAndFireproofed() = runTest {

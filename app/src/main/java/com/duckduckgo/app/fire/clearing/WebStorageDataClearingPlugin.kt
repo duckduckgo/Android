@@ -37,8 +37,11 @@ import javax.inject.Inject
 
 /**
  * Owns Fire site/web-storage clearing (logic kept out of `ClearDataAction`, which is slated for removal):
- *  - **full burn** (`All` / `AllForMode(FIRE)`): wipe the whole Fire-profile DOM storage — no
- *    preservation (Fire is ephemeral).
+ *  - **full burn** (`All` / `AllForMode(FIRE)`): wipe the entire Fire-profile via
+ *    `SiteDataCleaner.deleteAllBrowsingData` (→ `WebStorageCompat.deleteBrowsingData`, which clears the
+ *    profile's cache + cookies + all JavaScript-readable storage in one call) — no preservation (Fire is
+ *    ephemeral). No capability check is needed: Fire mode is only available when delete-browsing-data is
+ *    supported (see `FireModeAvailability`).
  *  - **single tab** (`SingleForMode(FIRE)`): per-site clear of the tab's visited domains via
  *    `SiteDataCleaner.deleteSiteData` (→ `WebStorageCompat.deleteBrowsingDataForSite`, which clears the
  *    site's cookies + storage + cache in the Fire profile in one call). This is a **faithful port of
@@ -71,7 +74,7 @@ class WebStorageDataClearingPlugin @Inject constructor(
     private suspend fun performFullDelete(browserMode: BrowserMode) {
         withContext(dispatchers.main()) {
             logcat { "Clearing $browserMode web storage" }
-            webStorageProvider.forMode(browserMode).deleteAllData()
+            siteDataCleaner.deleteAllBrowsingData(webStorageProvider.forMode(browserMode))
         }
     }
 
