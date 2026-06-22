@@ -407,18 +407,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
         bindMockupToolbars()
 
-        if (edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.BROWSER)) {
-            val toolbarColor = getColorFromAttr(com.duckduckgo.mobile.android.R.attr.daxColorToolbar)
-            val barStyle = if (isDarkThemeEnabled()) {
-                SystemBarStyle.dark(toolbarColor)
-            } else {
-                SystemBarStyle.light(toolbarColor, toolbarColor)
-            }
-            enableEdgeToEdge(statusBarStyle = barStyle, navigationBarStyle = barStyle)
-            edgeToEdgeHandler.applyStatusBarAndHorizontalInsets(binding.root)
-            edgeToEdgeHandler.applyNavigationBarInsets(binding.navigationBarMockup.root)
-            applyDisplayCutoutMode(resources.configuration.orientation)
-        }
+        configureEdgeToEdge()
 
         setContentView(binding.root)
 
@@ -934,6 +923,21 @@ open class BrowserActivity : DuckDuckGoActivity() {
                     }
                 }
             }
+        }
+    }
+
+    private fun configureEdgeToEdge() {
+        if (edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.BROWSER)) {
+            val toolbarColor = getColorFromAttr(com.duckduckgo.mobile.android.R.attr.daxColorToolbar)
+            val barStyle = if (isDarkThemeEnabled()) {
+                SystemBarStyle.dark(toolbarColor)
+            } else {
+                SystemBarStyle.light(toolbarColor, toolbarColor)
+            }
+            enableEdgeToEdge(statusBarStyle = barStyle, navigationBarStyle = barStyle)
+            edgeToEdgeHandler.applyStatusBarAndHorizontalInsets(binding.root)
+            edgeToEdgeHandler.applyNavigationBarInsets(binding.navigationBarMockup.root)
+            applyDisplayCutoutMode(resources.configuration.orientation)
         }
     }
 
