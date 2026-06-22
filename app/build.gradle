@@ -608,6 +608,9 @@ dependencies {
 
     // Dagger
     kapt Google.dagger.compiler
+    // Dagger 2.57+ reads Kotlin @Metadata via an external kotlin-metadata-jvm; pin it to the
+    // project Kotlin version so it understands 2.3 metadata (keep in sync with version.kotlin).
+    kapt "org.jetbrains.kotlin:kotlin-metadata-jvm:2.3.20"
     implementation Google.dagger
 
     // Glide
