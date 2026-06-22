@@ -20,6 +20,7 @@ import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.global.DefaultRoleBrowserDialog
+import com.duckduckgo.app.onboarding.CustomAiOnboardingPixelName
 import com.duckduckgo.app.onboarding.CustomAiOnboardingResolver
 import com.duckduckgo.app.onboarding.CustomAiOnboardingStore
 import com.duckduckgo.app.onboarding.DuckAiOnboardingAvailability
@@ -197,6 +198,8 @@ class NewUserOnboardingPlanProviderTest {
         verify(syncAutoRestore).restoreSyncAccount()
         // Advances past the mutually-exclusive reinstall/initial steps to comparison chart.
         assertStep(NewUserOnboardingStepIds.COMPARISON_CHART)
+        // The custom-AI "returning sync user ignored" pixel must not leak into the default plan
+        verify(pixel, never()).fire(CustomAiOnboardingPixelName.RETURNING_SYNC_USER_IGNORED, type = Unique())
     }
 
     @Test
@@ -524,5 +527,44 @@ class NewUserOnboardingPlanProviderTest {
         // Continue from the comparison chart skips both gated steps (precondition false) and lands on the next satisfied step.
         orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked)
         assertStep(NewUserOnboardingStepIds.COMPARISON_CHART)
+    }
+
+    @Test
+    fun `when custom ai path then fires plan started pixel`() = runTest {
+        whenever(customAiOnboardingResolver.resolve()).thenReturn(true)
+        start()
+        verify(pixel).fire(CustomAiOnboardingPixelName.PLAN_STARTED, type = Unique())
+    }
+
+    @Test
+    fun `when default path then does not fire plan started pixel`() = runTest {
+        start()
+        verify(pixel, never()).fire(CustomAiOnboardingPixelName.PLAN_STARTED, type = Unique())
+    }
+
+    @Test
+    fun `when custom ai path and can restore then shows reinstall dialog and fires returning sync user ignored pixel`() = runTest {
+        whenever(customAiOnboardingResolver.resolve()).thenReturn(true)
+        whenever(syncAutoRestore.canRestore()).thenReturn(true)
+        start()
+        orchestrator.onEvent(NewUserOnboardingEvent.IntroAnimationFinished)
+        orchestrator.onEvent(NewUserOnboardingEvent.NotificationPermissionFinished)
+        // The custom-AI plan has no sync-restore step, so a restore-capable user gets the reinstall dialog instead.
+        assertStep(NewUserOnboardingStepIds.INITIAL_REINSTALL_USER)
+        verify(pixel).fire(CustomAiOnboardingPixelName.RETURNING_SYNC_USER_IGNORED, type = Unique())
+        // No restore is offered: the sync-restore step does not exist on this plan.
+        verify(syncAutoRestore, never()).restoreSyncAccount()
+        orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked)
+        assertStep(NewUserOnboardingStepIds.AI_COMPARISON_CHART)
+    }
+
+    @Test
+    fun `when custom ai path and initial user then does not fire returning sync user ignored pixel`() = runTest {
+        whenever(customAiOnboardingResolver.resolve()).thenReturn(true)
+        start()
+        orchestrator.onEvent(NewUserOnboardingEvent.IntroAnimationFinished)
+        orchestrator.onEvent(NewUserOnboardingEvent.NotificationPermissionFinished)
+        assertStep(NewUserOnboardingStepIds.INITIAL)
+        verify(pixel, never()).fire(CustomAiOnboardingPixelName.RETURNING_SYNC_USER_IGNORED, type = Unique())
     }
 }
