@@ -142,6 +142,7 @@ class RealNativeInputManager @Inject constructor(
     private val queryUrlPredictor: QueryUrlPredictor,
     private val duckAiFeatureState: DuckAiFeatureState,
     private val pixel: Pixel,
+    private val nativeInputStateBugKillSwitch: NativeInputStateBugKillSwitch,
 ) : NativeInputManager {
     private lateinit var omnibarController: NativeInputOmnibarController
     private lateinit var rootView: ViewGroup
@@ -167,7 +168,7 @@ class RealNativeInputManager @Inject constructor(
         lifecycleOwner: LifecycleOwner,
         onDisabled: () -> Unit,
     ) {
-        this.omnibarController = RealNativeInputOmnibarController(omnibar, rootView)
+        this.omnibarController = RealNativeInputOmnibarController(omnibar, rootView, nativeInputStateBugKillSwitch)
         this.rootView = rootView
         this.layoutCoordinator = NativeInputLayoutCoordinator(rootView, this.omnibarController)
         duckChat.observeNativeInputFieldUserSettingEnabled()
@@ -287,12 +288,15 @@ class RealNativeInputManager @Inject constructor(
         val widgetCard = rootView.findViewById<View?>(R.id.inputModeWidgetCard)
         if (widgetCard != null) {
             (widgetCard as? MaterialCardView)?.cardElevation = 0f
+            val animatingRoot = widgetRoot
             widgetCard.animate()
                 .alpha(0f)
                 .setDuration(FADE_OUT_DURATION_MS)
                 .withEndAction {
                     widgetCard.alpha = 1f
-                    removeWidget()
+                    if (!nativeInputStateBugKillSwitch.self().isEnabled() || widgetRoot === animatingRoot) {
+                        removeWidget()
+                    }
                 }
                 .start()
         } else {
