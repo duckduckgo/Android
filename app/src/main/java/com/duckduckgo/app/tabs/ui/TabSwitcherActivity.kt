@@ -290,7 +290,6 @@ class TabSwitcherActivity :
                 SystemBarStyle.light(Color.TRANSPARENT, Color.TRANSPARENT)
             }
             enableEdgeToEdge(statusBarStyle = barStyle, navigationBarStyle = barStyle)
-            updateLayoutForDisplayCutout(resources.configuration.orientation)
         }
 
         setContentView(binding.root)

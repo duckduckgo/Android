@@ -21,13 +21,10 @@ import android.app.UiModeManager
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.pm.ActivityInfo
-import android.content.res.Configuration
 import android.graphics.Color
-import android.os.Build
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
-import android.view.WindowManager
 import androidx.activity.SystemBarStyle
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.widget.Toolbar
@@ -132,18 +129,6 @@ abstract class DuckDuckGoActivity : DaggerActivity() {
             SystemBarStyle.light(Color.TRANSPARENT, Color.TRANSPARENT)
         }
         enableEdgeToEdge(statusBarStyle = barStyle, navigationBarStyle = barStyle)
-    }
-
-    protected fun updateLayoutForDisplayCutout(orientation: Int) {
-        if (Build.VERSION.SDK_INT >= 28) {
-            window.attributes = window.attributes.apply {
-                layoutInDisplayCutoutMode = if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                    WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_NEVER
-                } else {
-                    WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_DEFAULT
-                }
-            }
-        }
     }
 
     protected inline fun <reified V : ViewModel> bindViewModel() = lazy {

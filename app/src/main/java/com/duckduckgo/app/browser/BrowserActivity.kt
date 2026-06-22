@@ -417,7 +417,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
             enableEdgeToEdge(statusBarStyle = barStyle, navigationBarStyle = barStyle)
             edgeToEdgeHandler.applyStatusBarAndHorizontalInsets(binding.root)
             edgeToEdgeHandler.applyNavigationBarInsets(binding.navigationBarMockup.root)
-            updateLayoutForDisplayCutout(resources.configuration.orientation)
         }
 
         setContentView(binding.root)
@@ -1363,9 +1362,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
         super.onConfigurationChanged(newConfig)
         if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
             viewModel.sendPixelEventForLandscapeOrientation()
-        }
-        if (edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.BROWSER)) {
-            updateLayoutForDisplayCutout(newConfig.orientation)
         }
     }
 
