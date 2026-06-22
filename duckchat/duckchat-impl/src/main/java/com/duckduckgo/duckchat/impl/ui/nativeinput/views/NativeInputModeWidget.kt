@@ -49,6 +49,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion
 import com.duckduckgo.browser.ui.PulseAnimation
+import com.duckduckgo.common.ui.view.getColorFromAttr
+import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.ViewViewModelFactory
 import com.duckduckgo.common.utils.extensions.hideKeyboard
@@ -1466,9 +1468,22 @@ class NativeInputModeWidget @JvmOverloads constructor(
         if (interactionLocked == locked) return
         interactionLocked = locked
         alpha = if (locked) LOCKED_ALPHA else 1f
+        val rootCard = widgetRoot?.findViewById<MaterialCardView>(R.id.inputModeWidgetCard)
         if (locked) {
             clearInputFocus()
             hideKeyboard()
+            rootCard?.let {
+                // further de-emphasize the input field when the UI is locked
+                it.elevation = 0f
+                it.strokeWidth = 1.toPx(it.context)
+                it.strokeColor = it.context.getColorFromAttr(com.duckduckgo.mobile.android.R.attr.daxColorBackground)
+            }
+        } else {
+            rootCard?.let {
+                // restore original values
+                it.elevation = 3f.toPx(it.context)
+                it.strokeWidth = 0
+            }
         }
     }
 
