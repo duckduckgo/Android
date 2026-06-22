@@ -1,7 +1,7 @@
 {
   "name": "ClustrMaps",
   "url": "clustrmaps.com",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "parent": "neighbor.report",
   "addedDatetime": 1692594000000,
   "optOutUrl": "https://clustrmaps.com/bl/opt-out",
@@ -72,5 +72,5 @@
     "maintenanceScan": 120,
     "maxAttempts": -1
   },
-  "removedAt": null
+  "removedAt": 1781696481849
 }
