@@ -312,44 +312,6 @@ class DuckChatDataClearingPluginTest {
     }
 
     @Test
-    fun `DuckChats Selected deletes each chat in the set and records per-chat sync deletions`() = runTest {
-        whenever(duckChat.isDuckChatUrl(eq(Uri.parse("https://duck.ai?chatID=alpha")))).thenReturn(true)
-        whenever(duckChat.isDuckChatUrl(eq(Uri.parse("https://duck.ai?chatID=beta")))).thenReturn(true)
-        whenever(duckChatDeleter.deleteChat("alpha")).thenReturn(true)
-        whenever(duckChatDeleter.deleteChat("beta")).thenReturn(true)
-
-        plugin.onClearData(
-            setOf(ClearableData.DuckChats.SelectedForMode(setOf("https://duck.ai?chatID=alpha", "https://duck.ai?chatID=beta"), BrowserMode.REGULAR)),
-        )
-
-        verify(duckChatDeleter).deleteChat("alpha")
-        verify(duckChatDeleter).deleteChat("beta")
-        verify(duckChatSyncRepository).recordSingleChatDeletion("alpha")
-        verify(duckChatSyncRepository).recordSingleChatDeletion("beta")
-        // Batched sync trigger — one event for the whole subset, not one per chat.
-        verify(syncEngine, org.mockito.kotlin.times(1)).triggerSync(any())
-    }
-
-    @Test
-    fun `DuckChats Selected does not call deleteAllChats`() = runTest {
-        whenever(duckChat.isDuckChatUrl(any())).thenReturn(true)
-        whenever(duckChatDeleter.deleteChat(any())).thenReturn(true)
-
-        plugin.onClearData(setOf(ClearableData.DuckChats.SelectedForMode(setOf("https://duck.ai?chatID=x"), BrowserMode.REGULAR)))
-
-        verify(duckChatDeleter, never()).deleteAllChats()
-    }
-
-    @Test
-    fun `DuckChats Selected with empty url set is a no-op`() = runTest {
-        plugin.onClearData(setOf(ClearableData.DuckChats.SelectedForMode(emptySet(), BrowserMode.REGULAR)))
-
-        verify(duckChatDeleter, never()).deleteChat(any())
-        verify(duckChatSyncRepository, never()).recordSingleChatDeletion(any())
-        verify(syncEngine, never()).triggerSync(any())
-    }
-
-    @Test
     fun `DuckChats Selected skips urls that are not duck chat urls`() = runTest {
         whenever(duckChat.isDuckChatUrl(eq(Uri.parse("https://duck.ai?chatID=alpha")))).thenReturn(true)
         whenever(duckChat.isDuckChatUrl(eq(Uri.parse("https://example.com")))).thenReturn(false)

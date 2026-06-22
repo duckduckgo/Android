@@ -891,6 +891,12 @@ class BrowserTabViewModelTest {
         }
 
     private fun initialiseViewModel() {
+        // Detach the previous instance's command observer before creating a new VM, so tests that
+        // call initialiseViewModel() more than once (e.g. to swap browserMode mid-test) don't leave
+        // a stale VM attached to mockCommandObserver and emitting unexpected commands.
+        val previousTestee = if (::testee.isInitialized) testee else null
+        previousTestee?.command?.removeObserver(mockCommandObserver)
+
         val siteFactory =
             SiteFactoryImpl(
                 mockEntityLookup,
@@ -4034,10 +4040,8 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenLoginDetectedInFireModeThenNeverAskToFireproofWebsite() {
-        // Detach the default REGULAR-mode view model so it no longer observes the shared
-        // loginEventLiveData and cannot emit commands captured by mockCommandObserver.
-        testee.command.removeObserver(mockCommandObserver)
-        testee.onCleared()
+        // initialiseViewModel() detaches the previous VM's observer before registering the new one,
+        // so no stale REGULAR-mode VM can emit AskToFireproofWebsite via mockCommandObserver.
         browserMode = BrowserMode.FIRE
         resetChannels()
         initialiseViewModel()

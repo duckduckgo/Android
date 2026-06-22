@@ -24,6 +24,7 @@ import com.duckduckgo.dataclearing.api.plugin.ClearableData
 import kotlinx.coroutines.test.runTest
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
@@ -50,5 +51,18 @@ class TabsDataClearingPluginTest {
     @Test fun whenRegularTabsThenDoesNothing() = runTest {
         testee.onClearData(setOf(ClearableData.Tabs.AllForMode(BrowserMode.REGULAR)))
         verify(fireTabRepository, never()).deleteAll()
+    }
+
+    @Test fun whenFireSingleForModeThenDeletesThatFireTab() = runTest {
+        whenever(provider.forMode(BrowserMode.FIRE)).thenReturn(fireTabRepository)
+        testee.onClearData(setOf(ClearableData.Tabs.SingleForMode("tabX", BrowserMode.FIRE)))
+        verify(provider).forMode(BrowserMode.FIRE)
+        verify(fireTabRepository).deleteTabs(listOf("tabX"))
+    }
+
+    @Test fun whenRegularSingleForModeThenDoesNothing() = runTest {
+        testee.onClearData(setOf(ClearableData.Tabs.SingleForMode("tabX", BrowserMode.REGULAR)))
+        verify(provider, never()).forMode(BrowserMode.REGULAR)
+        verify(fireTabRepository, never()).deleteTabs(any())
     }
 }
