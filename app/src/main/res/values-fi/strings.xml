@@ -1058,7 +1058,6 @@
     <string name="preOnboardingDaxDialog2TitleCustomAi">Asetetaanko DuckDuckGo oletusselaimeksi?</string>
     <!-- In-context onboarding. -->
     <string name="onboardingEndCustomAiFlowDaxDialogDescription"><![CDATA[Aloita yksityinen tekoälykeskustelu Duck.ai:n kanssa tai siirry suojatun selaamisen hakuun.<br/><br/>Voit käyttää Duck.ai:ta mistä tahansa, missä näet chat-kuvakkeen]]></string>
-    <string name="onboardingPrivacyProCustomAiFlowDaxDialogDescription">Tarjoamme myös maksullisen tilauksen, jossa on edistyneitä tekoälymalleja ja korkeampia chat-rajoituksia GPT:ltä, Claudelta ja Llamalta sekä suojatun VPN:n ja paljon muuta.</string>
 
     <string name="input_screen_user_pref_without_ai_updated">Vain haku</string>
     <string name="input_screen_user_pref_with_ai_updated">Vaihda haun ja\nDuck.ai:n välillä</string>

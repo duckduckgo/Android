@@ -1058,7 +1058,6 @@
     <string name="preOnboardingDaxDialog2TitleCustomAi">Vill du göra DuckDuckGo till din standardwebbläsare?</string>
     <!-- In-context onboarding. -->
     <string name="onboardingEndCustomAiFlowDaxDialogDescription"><![CDATA[Starta en privat AI-chatt med Duck.ai eller byt till Sök för skyddad surfning.<br/><br/>Du kan använda Duck.ai överallt där du ser chattikonen]]></string>
-    <string name="onboardingPrivacyProCustomAiFlowDaxDialogDescription">Vi erbjuder även en betald prenumeration med avancerade AI-modeller med högre chattgränser från GPT, Claude och Llama, ett säkert VPN och mer.</string>
 
     <string name="input_screen_user_pref_without_ai_updated">Endast sökning</string>
     <string name="input_screen_user_pref_with_ai_updated">Växla mellan\nsökning och Duck.ai</string>

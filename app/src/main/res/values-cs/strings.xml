@@ -1098,7 +1098,6 @@
     <string name="preOnboardingDaxDialog2TitleCustomAi">Chceš si z nastavit DuckDuckGo jako výchozí prohlížeč?</string>
     <!-- In-context onboarding. -->
     <string name="onboardingEndCustomAiFlowDaxDialogDescription"><![CDATA[Začni soukromý chat s AI Duck.ai, nebo přepni na Vyhledávání a začni s chráněným prohlížením.<br/><br/>Duck.ai můžeš používat odkudkoli, kde vidíš ikonu chatu.]]></string>
-    <string name="onboardingPrivacyProCustomAiFlowDaxDialogDescription">Nabízíme také placené předplatné s pokročilými modely umělé inteligence GPT, Claude a Llama s vyššími limity chatu, zabezpečenou VPN a dalšími službami.</string>
 
     <string name="input_screen_user_pref_without_ai_updated">Jen vyhledávání</string>
     <string name="input_screen_user_pref_with_ai_updated">Přepínej mezi\nHledáním a Duck.ai</string>

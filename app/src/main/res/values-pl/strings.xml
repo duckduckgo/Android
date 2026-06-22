@@ -1098,7 +1098,6 @@
     <string name="preOnboardingDaxDialog2TitleCustomAi">Chcesz ustawić DuckDuckGo jako domyślną przeglądarkę?</string>
     <!-- In-context onboarding. -->
     <string name="onboardingEndCustomAiFlowDaxDialogDescription"><![CDATA[Rozpocznij prywatny czat AI z Duck.ai lub przełącz się na wyszukiwanie, aby bezpiecznie przeglądać internet.<br/><br/>Z Duck.ai możesz korzystać wszędzie tam, gdzie widzisz ikonę czatu]]></string>
-    <string name="onboardingPrivacyProCustomAiFlowDaxDialogDescription">Oferujemy też płatną subskrypcję obejmująca zaawansowane modele AI od GPT, Claude i Llama, wyższe limity czatów, bezpieczną sieć VPN i wiele więcej.</string>
 
     <string name="input_screen_user_pref_without_ai_updated">Tylko wyszukiwanie</string>
     <string name="input_screen_user_pref_with_ai_updated">Przełącz między\nwyszukiwaniem a Duck.ai</string>

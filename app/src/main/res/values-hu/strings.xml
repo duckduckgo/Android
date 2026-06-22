@@ -1058,7 +1058,6 @@
     <string name="preOnboardingDaxDialog2TitleCustomAi">Szeretnéd alapértelmezett böngészővé tenni a DuckDuckGót?</string>
     <!-- In-context onboarding. -->
     <string name="onboardingEndCustomAiFlowDaxDialogDescription"><![CDATA[Indíts privát MI-beszélgetést a Duck.ai-jal, vagy válts a Keresésre a védett böngészéshez.<br/><br/>A Duck.ai-t bárhol használhatod, ahol látod a beszélgetés ikonját]]></string>
-    <string name="onboardingPrivacyProCustomAiFlowDaxDialogDescription">Előfizetéses csomagot is kínálunk, amely fejlett MI-modelleket, a GPT, a Claude és a Llama modelljeihez biztosított magasabb beszélgetési korlátokat, valamint biztonságos VPN-t és további funkciókat is tartalmaz.</string>
 
     <string name="input_screen_user_pref_without_ai_updated">Csak keresés</string>
     <string name="input_screen_user_pref_with_ai_updated">Váltás a keresés\nés a Duck.ai között</string>

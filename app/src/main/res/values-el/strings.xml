@@ -1058,7 +1058,6 @@
     <string name="preOnboardingDaxDialog2TitleCustomAi">Θέλετε να ορίσετε το DuckDuckGo ως το προεπιλεγμένο πρόγραμμα περιήγησής σας;</string>
     <!-- In-context onboarding. -->
     <string name="onboardingEndCustomAiFlowDaxDialogDescription"><![CDATA[Αρχίστε μια ιδιωτική συνομιλία με τεχνητή νοημοσύνη με το Duck.ai ή αλλάξτε στην Αναζήτηση για προστατευμένη περιήγηση.<br/><br/>Μπορείτε να χρησιμοποιήσετε το Duck.ai από οπουδήποτε βλέπετε το εικονίδιο συνομιλίας]]></string>
-    <string name="onboardingPrivacyProCustomAiFlowDaxDialogDescription">Προσφέρουμε επίσης μια συνδρομή επί πληρωμή με προηγμένα μοντέλα τεχνητής νοημοσύνης με υψηλότερα όρια συνομιλίας από τα GPT, Claude και Llama, ένα ασφαλές VPN και πολλά άλλα.</string>
 
     <string name="input_screen_user_pref_without_ai_updated">Αναζήτηση μόνο</string>
     <string name="input_screen_user_pref_with_ai_updated">Εναλλαγή μεταξύ\nΑναζήτησης και Duck.ai</string>

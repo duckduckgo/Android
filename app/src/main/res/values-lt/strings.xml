@@ -1098,7 +1098,6 @@
     <string name="preOnboardingDaxDialog2TitleCustomAi">Nori, kad „DuckDuckGo“ taptų tavo numatytąja naršykle?</string>
     <!-- In-context onboarding. -->
     <string name="onboardingEndCustomAiFlowDaxDialogDescription"><![CDATA[Pradėk privatų DI pokalbį su „Duck.ai“ arba perjunk į Paiešką, kad naršytum saugiai.<br/><br/>„Duck.ai“ gali naudoti visur, kur tik matai pokalbio piktogramą.]]></string>
-    <string name="onboardingPrivacyProCustomAiFlowDaxDialogDescription">Taip pat siūlome mokamą prenumeratą, kurioje – pažangūs „GPT“, „Claude“ ir „Llama“ DI modeliai su didesniais pokalbių limitais, saugus VPN ir kiti privalumai.</string>
 
     <string name="input_screen_user_pref_without_ai_updated">Tik paieška</string>
     <string name="input_screen_user_pref_with_ai_updated">Perjungti\npaiešką ir „Duck.ai“</string>

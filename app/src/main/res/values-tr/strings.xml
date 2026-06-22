@@ -1058,7 +1058,6 @@
     <string name="preOnboardingDaxDialog2TitleCustomAi">DuckDuckGo\'yu varsayılan tarayıcınız yapmak ister misiniz?</string>
     <!-- In-context onboarding. -->
     <string name="onboardingEndCustomAiFlowDaxDialogDescription"><![CDATA[Duck.ai ile gizli bir yapay zekâ sohbeti başlatın veya korumalı gezinme için Arama moduna geçin.<br/><br/>Sohbet simgesini gördüğünüz her yerden Duck.ai kullanabilirsiniz]]></string>
-    <string name="onboardingPrivacyProCustomAiFlowDaxDialogDescription">Ayrıca, GPT, Claude ve Llama\'dan daha yüksek sohbet limitlerine sahip gelişmiş yapay zekâ modelleri, güvenli bir VPN ve daha fazlasını içeren ücretli bir abonelik de sunuyoruz.</string>
 
     <string name="input_screen_user_pref_without_ai_updated">Yalnızca Arama</string>
     <string name="input_screen_user_pref_with_ai_updated">Arama ile\nDuck.ai arasında geçiş yapın</string>

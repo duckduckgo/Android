@@ -1078,7 +1078,6 @@
     <string name="preOnboardingDaxDialog2TitleCustomAi">Vai vēlies padarīt DuckDuckGo par savu noklusējuma pārlūku?</string>
     <!-- In-context onboarding. -->
     <string name="onboardingEndCustomAiFlowDaxDialogDescription"><![CDATA[Sāc privātu MI tērzēšanu ar Duck.ai vai pārslēdzies uz meklēšanu aizsargātai pārlūkošanai.<br/><br/>Tu vari izmantot Duck.ai no jebkuras vietas, kur redzi tērzēšanas ikonu.]]></string>
-    <string name="onboardingPrivacyProCustomAiFlowDaxDialogDescription">Mēs piedāvājam arī maksas abonementu ar uzlabotiem MI modeļiem ar augstākiem tērzēšanas ierobežojumu slieksniešņiem no GPT, Claude un Llama, ar drošu VPN un citiem pakalpojumiem.</string>
 
     <string name="input_screen_user_pref_without_ai_updated">Meklēt tikai</string>
     <string name="input_screen_user_pref_with_ai_updated">Pārslēdzies starp\nmeklēšanu un Duck.ai</string>

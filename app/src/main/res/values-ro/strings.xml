@@ -1078,7 +1078,6 @@
     <string name="preOnboardingDaxDialog2TitleCustomAi">Vrei să setezi DuckDuckGo ca browser implicit?</string>
     <!-- In-context onboarding. -->
     <string name="onboardingEndCustomAiFlowDaxDialogDescription"><![CDATA[Începe o conversație privată cu IA cu Duck.ai sau comută la Căutare pentru navigare protejată.<br/><br/>Poți folosi Duck.ai de oriunde vezi pictograma de chat]]></string>
-    <string name="onboardingPrivacyProCustomAiFlowDaxDialogDescription">De asemenea, oferim un abonament plătit cu modele avansate de IA, cu limite de chat mai mari de la GPT, Claude și Llama, un VPN securizat și multe altele.</string>
 
     <string name="input_screen_user_pref_without_ai_updated">Doar căutare</string>
     <string name="input_screen_user_pref_with_ai_updated">Comută între Căutare și Duck.ai</string>

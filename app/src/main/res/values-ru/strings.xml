@@ -1098,7 +1098,6 @@
     <string name="preOnboardingDaxDialog2TitleCustomAi">Хотите сделать DuckDuckGo браузером по умолчанию?</string>
     <!-- In-context onboarding. -->
     <string name="onboardingEndCustomAiFlowDaxDialogDescription"><![CDATA[Начните приватный чат с ИИ через Duck.ai или переключитесь на поиск для защищенного просмотра веб-страниц.<br/><br/>Duck.ai можно использовать в любом месте, где вы видите значок чата]]></string>
-    <string name="onboardingPrivacyProCustomAiFlowDaxDialogDescription">Мы также предлагаем платную подписку, включающую расширенные ИИ-модели с более высокими лимитами чатов с GPT, Claude и Llama, безопасный VPN и многое другое.</string>
 
     <string name="input_screen_user_pref_without_ai_updated">Только поиск</string>
     <string name="input_screen_user_pref_with_ai_updated">Переключайтесь между\nПоиском и Duck.ai</string>

@@ -1058,7 +1058,6 @@
     <string name="preOnboardingDaxDialog2TitleCustomAi">Vuoi impostare DuckDuckGo come browser predefinito?</string>
     <!-- In-context onboarding. -->
     <string name="onboardingEndCustomAiFlowDaxDialogDescription"><![CDATA[Avvia una chat privata con l\'AI con Duck.ai oppure attiva la Ricerca per navigazione protetta.<br/><br/>Puoi utilizzare Duck.ai da qualsiasi punto in cui vedi l’icona della chat]]></string>
-    <string name="onboardingPrivacyProCustomAiFlowDaxDialogDescription">Offriamo anche un abbonamento a pagamento che include modelli di AI avanzati con limiti di chat più elevati di GPT, Claude e Llama, una VPN sicura e altro ancora.</string>
 
     <string name="input_screen_user_pref_without_ai_updated">Solo ricerca</string>
     <string name="input_screen_user_pref_with_ai_updated">Alterna tra\nCerca e Duck.ai</string>

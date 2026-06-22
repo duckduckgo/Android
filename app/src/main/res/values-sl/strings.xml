@@ -1098,7 +1098,6 @@
     <string name="preOnboardingDaxDialog2TitleCustomAi">Želite DuckDuckGo nastaviti kot privzeti brskalnik?</string>
     <!-- In-context onboarding. -->
     <string name="onboardingEndCustomAiFlowDaxDialogDescription"><![CDATA[Začnite zasebni klepet z umetno inteligenco z Duck.ai ali preklopite na iskanje za zaščiteno brskanje.<br/><br/>Duck.ai lahko uporabljate kjer koli, kjer vidite ikono klepeta]]></string>
-    <string name="onboardingPrivacyProCustomAiFlowDaxDialogDescription">Ponujamo tudi plačljivo naročnino z naprednimi modeli umetne inteligence z višjimi omejitvami klepeta GPT, Claude in Llama, varnim VPN in še več.</string>
 
     <string name="input_screen_user_pref_without_ai_updated">Samo iskanje</string>
     <string name="input_screen_user_pref_with_ai_updated">Preklopite med\niskanjem in Duck.ai</string>

@@ -1098,7 +1098,6 @@
     <string name="preOnboardingDaxDialog2TitleCustomAi">Želiš li postaviti DuckDuckGo kao svoj zadani preglednik?</string>
     <!-- In-context onboarding. -->
     <string name="onboardingEndCustomAiFlowDaxDialogDescription"><![CDATA[Započni privatno AI čavrljanje uz Duck.ai ili prebaci na traženje za zaštićeno pregledavanje.<br/><br/>Duck.ai možeš koristiti na svakom mjestu na kojem je ikona za čavrljanje]]></string>
-    <string name="onboardingPrivacyProCustomAiFlowDaxDialogDescription">Također nudimo plaćenu pretplatu s naprednim AI modelima s većim količinama dopuštenog čavrljanja od GPT-a, Claudea i Llame, siguran VPN i još mnogo toga.</string>
 
     <string name="input_screen_user_pref_without_ai_updated">Samo pretraživanje</string>
     <string name="input_screen_user_pref_with_ai_updated">Prebacuj se između pretraživanja i Duck.ai</string>

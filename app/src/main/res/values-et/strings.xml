@@ -1058,7 +1058,6 @@
     <string name="preOnboardingDaxDialog2TitleCustomAi">Kas sa soovid DuckDuckGo oma vaikebrauseriks muuta?</string>
     <!-- In-context onboarding. -->
     <string name="onboardingEndCustomAiFlowDaxDialogDescription"><![CDATA[Alusta privaatset AI-vestlust Duck.ai-ga või lülita sisse, et otsida kaitstud sirvimist.<br/><br/>Saad Duck.ai\'t kasutada kõikjal, kus näed vestluse ikooni]]></string>
-    <string name="onboardingPrivacyProCustomAiFlowDaxDialogDescription">Pakume ka tasulist tellimust, mis sisaldab täiustatud tehisintellekti mudeleid, millel on kõrgemad vestluspiirangud GPT, Claude ja Llama, turvaline VPN ja palju muud.</string>
 
     <string name="input_screen_user_pref_without_ai_updated">Ainult otsi</string>
     <string name="input_screen_user_pref_with_ai_updated">Lülita \n otsingu ja Duck.ai vahel</string>

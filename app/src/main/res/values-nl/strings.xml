@@ -1058,7 +1058,6 @@
     <string name="preOnboardingDaxDialog2TitleCustomAi">Wil je DuckDuckGo als standaardbrowser gebruiken?</string>
     <!-- In-context onboarding. -->
     <string name="onboardingEndCustomAiFlowDaxDialogDescription"><![CDATA[Start een privé AI-chat met Duck.ai of schakel over naar Zoeken voor beschermd browsen.<br/><br/>Je kunt Duck.ai gebruiken vanaf elke plek waar je het chatpictogram ziet.]]></string>
-    <string name="onboardingPrivacyProCustomAiFlowDaxDialogDescription">We bieden ook een betaald abonnement met geavanceerde AI-modellen met hogere chatlimieten van GPT, Claude en Llama, een veilige VPN en meer.</string>
 
     <string name="input_screen_user_pref_without_ai_updated">Alleen zoeken</string>
     <string name="input_screen_user_pref_with_ai_updated">Schakelen tussen\nzoeken en Duck.ai</string>
