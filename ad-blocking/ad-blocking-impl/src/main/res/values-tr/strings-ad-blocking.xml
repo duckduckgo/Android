@@ -19,8 +19,8 @@
 <resources>
     <string name="ad_blocking_settings_title">YouTube\'da Reklam Engelleme</string>
     <string name="ad_blocking_settings_toggle_title">YouTube\'da Reklamları engelleyin</string>
-    <string name="ad_blocking_settings_description_with_consent">DuckDuckGo, YouTube\'daki video reklamlarını kaldırarak videoları kesintisiz izlemenizi sağlar.\n\nBu özellik etkinleştirildiğinde, DuckDuckGo herkesin deneyimini iyileştirmek için reklam engelleme müdahalesini veya YouTube hatalarını anonim olarak algılar. DuckDuckGo, hangi videoları izlediğinizi veya kişisel olarak tanımlanabilir bilgileri asla görmez. <annotation type="learn_more_link">Daha fazla bilgi</annotation></string>
-    <string name="ad_blocking_settings_description">DuckDuckGo, YouTube\'daki video reklamlarını kaldırarak videoları kesintisiz izlemenizi sağlar. <annotation type="learn_more_link">Daha fazla bilgi</annotation></string>
+    <string name="ad_blocking_settings_description_with_consent">DuckDuckGo, YouTube\'daki video reklamları engelleyerek videoları kesintisiz izlemenizi sağlar. \n\nEtkinleştirildiğinde, DuckDuckGo herkesin deneyimini iyileştirmek için reklam engelleme müdahalesini veya YouTube hatalarını anonim olarak algılar. DuckDuckGo, hangi videoları izlediğinizi veya kişisel olarak tanımlanabilir bilgileri asla görmez. <annotation type="learn_more_link">Daha fazla bilgi</annotation></string>
+    <string name="ad_blocking_settings_description">DuckDuckGo, YouTube\'daki video reklamlarını engelleyerek videoları kesintisiz izlemenizi sağlar. <annotation type="learn_more_link">Daha fazla bilgi</annotation></string>
     <string name="ad_blocking_settings_duck_player_header">Duck Player</string>
     <string name="ad_blocking_settings_duck_player_description">Videoları, izlediğiniz içeriğin YouTube akışınızı etkilemesini engelleyen, dikkat dağıtıcı unsurlardan arındırılmış bir sinema moduyla açar.</string>
 </resources>

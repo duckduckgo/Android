@@ -19,8 +19,8 @@
 <resources>
     <string name="ad_blocking_settings_title">Bloqueio de anúncios do YouTube</string>
     <string name="ad_blocking_settings_toggle_title">Bloquear anúncios no YouTube</string>
-    <string name="ad_blocking_settings_description_with_consent">O DuckDuckGo remove anúncios de vídeo no YouTube para que possas ver vídeos sem interrupções.\n\nSe esta funcionalidade estiver ativada, o DuckDuckGo irá detetar anonimamente interferências no bloqueio de anúncios ou erros no YouTube, para melhorar a experiência de todos. O DuckDuckGo nunca vê quais os vídeos que tu vês nem qualquer informação pessoalmente identificável. <annotation type="learn_more_link">Sabe mais</annotation></string>
-    <string name="ad_blocking_settings_description">O DuckDuckGo remove anúncios de vídeo no YouTube para que possas ver vídeos sem interrupções. <annotation type="learn_more_link">Sabe mais</annotation></string>
+    <string name="ad_blocking_settings_description_with_consent">O DuckDuckGo bloqueia anúncios de vídeo no YouTube para que possas ver vídeos sem interrupções.\n\nSe esta funcionalidade estiver ativada, o DuckDuckGo irá detetar anonimamente interferências no bloqueio de anúncios ou erros no YouTube, para melhorar a experiência de todos. O DuckDuckGo nunca vê quais os vídeos que tu vês nem qualquer informação pessoalmente identificável. <annotation type="learn_more_link">Sabe mais</annotation></string>
+    <string name="ad_blocking_settings_description">O DuckDuckGo bloqueia anúncios de vídeo no YouTube para que possas ver vídeos sem interrupções. <annotation type="learn_more_link">Sabe mais</annotation></string>
     <string name="ad_blocking_settings_duck_player_header">Duck Player</string>
     <string name="ad_blocking_settings_duck_player_description">Abre vídeos num modo de cinema sem distrações que impede que os vídeos que vês influenciem o teu feed do YouTube.</string>
 </resources>

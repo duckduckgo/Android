@@ -19,8 +19,8 @@
 <resources>
     <string name="ad_blocking_settings_title">Αποκλεισμός διαφημίσεων YouTube</string>
     <string name="ad_blocking_settings_toggle_title">Απόκλεισε τις διαφημίσεις στο YouTube</string>
-    <string name="ad_blocking_settings_description_with_consent">Το DuckDuckGo αφαιρεί τις διαφημίσεις βίντεο στο YouTube, ώστε να μπορείς να βλέπεις βίντεο χωρίς διακοπές.\n\nΌταν αυτή η λειτουργία είναι ενεργοποιημένη, το DuckDuckGo θα ανιχνεύει ανώνυμα παρεμβολές αποκλεισμού διαφημίσεων ή σφάλματα YouTube, για να βελτιώνει την εμπειρία για όλους. Το DuckDuckGo δεν βλέπει ποτέ ποια βίντεο παρακολουθείς ούτε τυχόν προσωπικά στοιχεία ταυτοποίησης. <annotation type="learn_more_link">Μάθε περισσότερα</annotation></string>
-    <string name="ad_blocking_settings_description">Το DuckDuckGo αφαιρεί τις διαφημίσεις βίντεο στο YouTube, ώστε να μπορείς να βλέπεις βίντεο χωρίς διακοπές. <annotation type="learn_more_link">Μάθε περισσότερα</annotation></string>
+    <string name="ad_blocking_settings_description_with_consent">Το DuckDuckGo αποκλείει τις διαφημίσεις βίντεο στο YouTube, ώστε να μπορείς να βλέπεις βίντεο χωρίς διακοπές. \n\nΌταν είναι ενεργοποιημένο, το DuckDuckGo θα ανιχνεύει ανώνυμα παρεμβολές αποκλεισμού διαφημίσεων ή σφάλματα YouTube, για να βελτιώνει την εμπειρία για όλους. Το DuckDuckGo δεν βλέπει ποτέ ποια βίντεο παρακολουθείς ούτε τυχόν προσωπικά στοιχεία ταυτοποίησης. <annotation type="learn_more_link">Μάθε περισσότερα</annotation></string>
+    <string name="ad_blocking_settings_description">Το DuckDuckGo αποκλείει τις διαφημίσεις βίντεο στο YouTube, ώστε να μπορείς να βλέπεις βίντεο χωρίς διακοπές. <annotation type="learn_more_link">Μάθε περισσότερα</annotation></string>
     <string name="ad_blocking_settings_duck_player_header">Duck Player</string>
     <string name="ad_blocking_settings_duck_player_description">Ανοίγει βίντεο σε λειτουργία κινηματογράφου χωρίς περισπάσεις, η οποία εμποδίζει το περιεχόμενο που παρακολουθείς να επηρεάσει τη ροή σου στο YouTube.</string>
 </resources>

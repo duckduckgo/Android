@@ -19,8 +19,8 @@
 <resources>
     <string name="ad_blocking_settings_title">YouTube\'i reklaamide blokeerimine</string>
     <string name="ad_blocking_settings_toggle_title">Reklaamide blokeerimine YouTube\'is</string>
-    <string name="ad_blocking_settings_description_with_consent">DuckDuckGo eemaldab YouTube\'ist videoreklaamid, et saaksid videoid katkestusteta vaadata.\n\nKui see on sisse lülitatud, tuvastab DuckDuckGo anonüümselt reklaamiblokeerimise häireid või YouTube\'i vigu, et parandada kõigi kasutuskogemust. DuckDuckGo ei näe kunagi, milliseid videoid sa vaatad, ega mingeid isikuandmeid. <annotation type="learn_more_link">Lisateave</annotation></string>
-    <string name="ad_blocking_settings_description">DuckDuckGo eemaldab YouTube\'ist videoreklaamid, et saaksid videoid katkestusteta vaadata. <annotation type="learn_more_link">Lisateave</annotation></string>
+    <string name="ad_blocking_settings_description_with_consent">DuckDuckGo blokeerib YouTube\'is videoreklaamid, nii et saad videoid katkestusteta vaadata. \n\nKui DuckDuckGo on sisse lülitatud, tuvastab see anonüümselt reklaamiblokeerimise häireid või YouTube\'i vigu, et parandada kõigi kasutuskogemust. DuckDuckGo ei näe kunagi, milliseid videoid sa vaatad, ega mingeid isikuandmeid. <annotation type="learn_more_link">Lisateave</annotation></string>
+    <string name="ad_blocking_settings_description">DuckDuckGo blokeerib YouTube\'is videoreklaamid, nii et saad videoid katkestusteta vaadata. <annotation type="learn_more_link">Lisateave</annotation></string>
     <string name="ad_blocking_settings_duck_player_header">Duck Player</string>
     <string name="ad_blocking_settings_duck_player_description">Avab videod segajatevabas kinorežiimis, mis hoiab ära selle, et vaadatav sisu mõjutaks sinu YouTube’i voogu.</string>
 </resources>

@@ -19,8 +19,8 @@
 <resources>
     <string name="ad_blocking_settings_title">Blocage des publicités sur YouTube</string>
     <string name="ad_blocking_settings_toggle_title">Bloquer les publicités sur YouTube</string>
-    <string name="ad_blocking_settings_description_with_consent">DuckDuckGo supprime les publicités vidéo sur YouTube afin que vous puissiez regarder des vidéos sans interruption.\n\nLorsque cette fonction est activée, DuckDuckGo détecte anonymement les interférences liées au blocage des publicités ou les erreurs de YouTube, afin d\'améliorer l\'expérience pour tous. DuckDuckGo ne voit jamais les vidéos que vous regardez ni aucune information permettant de vous identifier personnellement. <annotation type="learn_more_link">En savoir plus</annotation></string>
-    <string name="ad_blocking_settings_description">DuckDuckGo supprime les publicités vidéo sur YouTube afin que vous puissiez regarder des vidéos sans interruption. <annotation type="learn_more_link">En savoir plus</annotation></string>
+    <string name="ad_blocking_settings_description_with_consent">DuckDuckGo bloque les publicités vidéo sur YouTube afin que vous puissiez regarder des vidéos sans interruption.\n\nLorsque cette fonction est activée, DuckDuckGo détecte anonymement les interférences liées au blocage des publicités ou les erreurs de YouTube, afin d\'améliorer l\'expérience pour tous. DuckDuckGo ne voit jamais les vidéos que vous regardez ni aucune information permettant de vous identifier personnellement. <annotation type="learn_more_link">En savoir plus</annotation></string>
+    <string name="ad_blocking_settings_description">DuckDuckGo bloque les publicités vidéo sur YouTube, afin que vous puissiez regarder des vidéos sans interruption. <annotation type="learn_more_link">En savoir plus</annotation></string>
     <string name="ad_blocking_settings_duck_player_header">Duck Player</string>
     <string name="ad_blocking_settings_duck_player_description">Ouvre les vidéos en mode « Salle de projection sans distractions », ce qui empêche ce que vous regardez d\'influencer votre fil d\'actualité YouTube.</string>
 </resources>

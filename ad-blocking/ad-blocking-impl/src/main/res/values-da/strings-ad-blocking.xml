@@ -19,8 +19,8 @@
 <resources>
     <string name="ad_blocking_settings_title">Blokering af YouTube-annoncer</string>
     <string name="ad_blocking_settings_toggle_title">Blokér annoncer på YouTube</string>
-    <string name="ad_blocking_settings_description_with_consent">DuckDuckGo fjerner videoannoncer på YouTube, så du kan se videoer uden afbrydelser.\n\nNår dette er slået til, vil DuckDuckGo anonymt opdage interferens ved annonceblokering eller YouTube-fejl for at forbedre oplevelsen for alle. DuckDuckGo ser aldrig, hvilke videoer du ser, eller andre personligt identificerbare oplysninger. <annotation type="learn_more_link">Læs mere</annotation></string>
-    <string name="ad_blocking_settings_description">DuckDuckGo fjerner videoannoncer på YouTube, så du kan se videoer uden afbrydelser. <annotation type="learn_more_link">Læs mere</annotation></string>
+    <string name="ad_blocking_settings_description_with_consent">DuckDuckGo blokerer videoannoncer på YouTube, så du kan se videoer uden afbrydelser. \n\nNår funktionen er aktiveret, registrerer DuckDuckGo anonymt forstyrrelser fra annonceblokkere eller fejl på YouTube for at forbedre oplevelsen for alle. DuckDuckGo ser aldrig, hvilke videoer du ser, eller andre personligt identificerbare oplysninger. <annotation type="learn_more_link">Læs mere</annotation></string>
+    <string name="ad_blocking_settings_description">DuckDuckGo blokerer videoannoncer på YouTube, så du kan se videoer uden afbrydelser. <annotation type="learn_more_link">Læs mere</annotation></string>
     <string name="ad_blocking_settings_duck_player_header">Duck Player</string>
     <string name="ad_blocking_settings_duck_player_description">Åbner videoer i en distraktionsfri biograftilstand, der forhindrer, at det, du ser, påvirker dit YouTube-feed.</string>
 </resources>

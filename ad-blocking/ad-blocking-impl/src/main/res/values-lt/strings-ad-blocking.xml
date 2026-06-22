@@ -19,8 +19,8 @@
 <resources>
     <string name="ad_blocking_settings_title">„YouTube“ reklamų blokavimas</string>
     <string name="ad_blocking_settings_toggle_title">Blokuoti „YouTube“ reklamas</string>
-    <string name="ad_blocking_settings_description_with_consent">„DuckDuckGo“ pašalina vaizdo įrašų reklamas „YouTube“ platformoje, todėl gali žiūrėti vaizdo įrašus be trikdžių.\n\nKai ši funkcija įjungta, „DuckDuckGo“ anonimiškai aptiks skelbimų blokavimo trukdžius arba „YouTube“ klaidas, kad pagerintų patirtį visiems. „DuckDuckGo“ niekada nemato, kokius vaizdo įrašus žiūrite, ar bet kokios asmenį identifikuojančios informacijos. <annotation type="learn_more_link">Sužinok daugiau</annotation></string>
-    <string name="ad_blocking_settings_description">„DuckDuckGo“ pašalina vaizdo įrašų reklamas „YouTube“ platformoje, todėl gali žiūrėti vaizdo įrašus be trikdžių. <annotation type="learn_more_link">Sužinok daugiau</annotation></string>
+    <string name="ad_blocking_settings_description_with_consent">„DuckDuckGo“ blokuoja vaizdo įrašų reklamas platformoje „YouTube“, todėl galite žiūrėti vaizdo įrašus be trukdžių.Kai įjungta, „DuckDuckGo“ anonimiškai aptiks skelbimų blokavimo trukdžius arba „YouTube“ klaidas, kad pagerintų patirtį visiems. „DuckDuckGo“ niekada nemato, kokius vaizdo įrašus žiūrite, ar bet kokios asmenį identifikuojančios informacijos. <annotation type="learn_more_link">Sužinokite daugiau</annotation></string>
+    <string name="ad_blocking_settings_description">„DuckDuckGo“ blokuoja vaizdo įrašų reklamas platformoje „YouTube“, todėl galite žiūrėti vaizdo įrašus be trukdžių. <annotation type="learn_more_link">Sužinokite daugiau</annotation></string>
     <string name="ad_blocking_settings_duck_player_header">Duck Player</string>
     <string name="ad_blocking_settings_duck_player_description">Atidaro vaizdo įrašus neblaškančiu kino teatro režimu, kad tai, ką žiūri, nedarytų įtakos tavo „YouTube“ srautui.</string>
 </resources>
