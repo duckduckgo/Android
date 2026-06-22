@@ -868,6 +868,7 @@
     <string name="preOnboardingDaxDialog1TitleDuckAi" translatable="false"><![CDATA[Hi there.<br/><br/>Ready for a faster browser that protects you and lets you decide when and how to use AI?]]></string>
     <string name="preOnboardingDaxDialog1Button">Zróbmy to!</string>
     <string name="preOnboardingDaxDialog1ButtonDuckAi" translatable="false">Let\&apos;s get started!</string>
+    <string name="preOnboardingDaxDialog1ButtonBrandDesign">Zaczynajmy!</string>
     <string name="preOnboardingDaxDialog1SecondaryButton">Już to wiem</string>
     <string name="preOnboardingDaxDialog2Title">Ochrona aktywowana!</string>
     <string name="preOnboardingDaxDialog2Button">Wybierz przeglądarkę</string>
@@ -936,6 +937,7 @@
     <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[DuckDuckGo oferuje również <b>opcjonalną płatną subskrypcję</b> z bezpieczną <b>siecią VPN</b> i <b>zaawansowaną, prywatną sztuczną inteligencją</b>.]]></string>
     <string name="onboardingPrivacyProDaxDialogOkButton">Dowiedz się więcej</string>
     <string name="onboardingPrivacyProDaxDialogFreeTrialOkButton">Wypróbuj za darmo!</string>
+    <string name="onboardingPrivacyProDaxDialogFreeTrialOkButtonBrandDesign">Wypróbuj bez żadnych opłat!</string>
     <string name="onboardingPrivacyProDaxDialogCancelButton">Pomiń</string>
     <string name="onboardingSkippedPrivacyProDaxDialogTitle">Czy wiesz?</string>
 
@@ -1076,6 +1078,27 @@
     <string name="onboardingDuckAiEndCtaTitle">Udało się!</string>
     <string name="onboardingDuckAiEndCtaDescription"><![CDATA[Używaj paska adresu, aby wyszukiwać i odwiedzać witryny lub przełącz się na Duck.ai, aby prowadzić prywatny czat AI.<br/><br/>Możesz korzystać z Duck.ai z dowolnego miejsca, w którym widzisz ikonę czatu]]></string>
     <string name="onboardingDuckAiEndCtaButton">Piątka!</string>
+
+    <!-- Custom AI onboarding flow -->
+    <!-- Pre-onboarding: initial screens -->
+    <string name="preOnboardingWelcomeDialogBodyCustomAi">Chcesz bezpłatnie rozmawiać z ChatGPT, Claude i innymi AI w przeglądarce, która aktywnie chroni Twoją prywatność?</string>
+    <string name="preOnboardingDaxDialog3TextCustomAi">Pamiętaj: z Duck.ai możesz korzystać wszędzie tam, gdzie widzisz ikonę czatu</string>
+    <string name="preOnboardingDaxDialog3ButtonCustomAi">Uruchom czat AI</string>
+    <!-- Pre-onboarding: AI comparison chart screen. -->
+    <string name="preOnboardingDaxDialogAiTitle">Ochrona AI aktywowana</string>
+    <string name="preOnboardingAiComparisonChartPopularAis">Popularne AI</string>
+    <string name="preOnboardingAiComparisonChartItem1">Wszystkie czaty są anonimizowane</string>
+    <string name="preOnboardingAiComparisonChartItem2">Nie potrzebujesz konta, aby uzyskać dostęp do wszystkich funkcji AI</string>
+    <string name="preOnboardingAiComparisonChartItem3">Nigdy nie wykorzystuje Twoich rozmów do trenowania AI</string>
+    <string name="preOnboardingAiComparisonChartItem4">Dostęp do ChatGPT, Claude i innych AI w jednym miejscu</string>
+    <string name="preOnboardingAiComparisonChartButton">Wypróbuj Duck.ai</string>
+    <!-- Pre-onboarding: input demo screen -->
+    <string name="preOnboardingInputModeDemoTitleCustomAi">Wypróbuj teraz prywatny czat AI</string>
+    <!-- Pre-onboarding: browser comparison screen -->
+    <string name="preOnboardingDaxDialog2TitleCustomAi">Chcesz ustawić DuckDuckGo jako domyślną przeglądarkę?</string>
+    <!-- In-context onboarding. -->
+    <string name="onboardingEndCustomAiFlowDaxDialogDescription"><![CDATA[Rozpocznij prywatny czat AI z Duck.ai lub przełącz się na wyszukiwanie, aby bezpiecznie przeglądać internet.<br/><br/>Z Duck.ai możesz korzystać wszędzie tam, gdzie widzisz ikonę czatu]]></string>
+    <string name="onboardingPrivacyProCustomAiFlowDaxDialogDescription">Oferujemy też płatną subskrypcję obejmująca zaawansowane modele AI od GPT, Claude i Llama, wyższe limity czatów, bezpieczną sieć VPN i wiele więcej.</string>
 
     <string name="input_screen_user_pref_without_ai_updated">Tylko wyszukiwanie</string>
     <string name="input_screen_user_pref_with_ai_updated">Przełącz między\nwyszukiwaniem a Duck.ai</string>
