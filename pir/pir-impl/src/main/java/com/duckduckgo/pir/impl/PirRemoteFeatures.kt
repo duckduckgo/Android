@@ -59,7 +59,7 @@ interface PirRemoteFeatures {
      * When enabled, opening the dashboard with an interrupted initial scan (pending scan jobs,
      * no scan currently running) restarts the foreground scan to finish it.
      */
-    @DefaultValue(DefaultFeatureValue.INTERNAL)
+    @DefaultValue(DefaultFeatureValue.TRUE)
     fun resumeInitialScanOnDashboardOpen(): Toggle
 }
 
