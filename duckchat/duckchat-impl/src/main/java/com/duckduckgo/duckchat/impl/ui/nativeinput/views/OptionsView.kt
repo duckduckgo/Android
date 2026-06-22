@@ -242,13 +242,18 @@ class OptionsView(context: Context, private val host: NativeInputHost) : LinearL
             container.addView(row)
         }
         if (isCustomizeResponsesAvailable()) {
+            if (menuItems.any { it.tool in viewModel.visibleTools.value }) {
+                container.addView(
+                    LayoutInflater.from(context).inflate(R.layout.view_options_menu_divider, container, false),
+                )
+            }
             container.addView(buildCustomizeResponsesRow(container, popup))
         }
     }
 
     private fun buildCustomizeResponsesRow(container: LinearLayout, popup: PopupWindow): View {
         val row = LayoutInflater.from(context).inflate(R.layout.view_options_menu_item, container, false)
-        row.findViewById<ImageView>(R.id.optionsMenuItemIcon).setImageResource(R.drawable.ic_options_24)
+        row.findViewById<ImageView>(R.id.optionsMenuItemIcon).visibility = GONE
         row.findViewById<DaxTextView>(R.id.optionsMenuItemTitle).setText(R.string.duckChatOptionsMenuCustomizeResponses)
         row.findViewById<DaxTextView>(R.id.optionsMenuItemSubtitle).setText(R.string.duckChatOptionsMenuCustomizeResponsesSubtitle)
         row.findViewById<ImageView>(R.id.optionsMenuItemTrailingIcon).visibility = GONE
