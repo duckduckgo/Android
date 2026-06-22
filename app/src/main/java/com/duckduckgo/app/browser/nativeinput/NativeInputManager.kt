@@ -48,6 +48,7 @@ import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.api.InputMode
+import com.duckduckgo.duckchat.api.nativeinput.NativeInputState.InteractionLock
 import com.duckduckgo.duckchat.api.toChatIdOrNull
 import com.duckduckgo.duckchat.impl.ui.nativeinput.views.NativeInputWidget
 import com.duckduckgo.navigation.api.GlobalActivityStarter
@@ -56,6 +57,7 @@ import com.duckduckgo.voice.api.VoiceSearchAvailability
 import com.google.android.material.card.MaterialCardView
 import com.squareup.anvil.annotations.ContributesBinding
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
@@ -123,6 +125,12 @@ interface NativeInputManager {
     fun onKeyboardVisibilityChanged(isVisible: Boolean)
     fun setPickingImage(picking: Boolean)
     fun setText(text: String)
+
+    /** Lock the input field (making it non-interactive + dimmed).*/
+    fun setInteractionLock(lock: InteractionLock)
+
+    /** Show pulse animation around the Duck.ai fire button. */
+    fun setDuckAiFireButtonHighlighted(highlighted: Boolean)
 }
 
 @ContributesBinding(FragmentScope::class)
@@ -145,6 +153,9 @@ class RealNativeInputManager @Inject constructor(
     private var floatingSubmitContainer: View? = null
     private var widgetRoot: View? = null
     private var lastCallbacks: NativeInputCallbacks? = null
+
+    private val interactionLockSource = MutableStateFlow(InteractionLock.Unlocked)
+    private val duckAiFireButtonHighlightSource = MutableStateFlow(false)
 
     private fun widgetFrom(widgetView: View): NativeInputWidget? {
         return widgetView.findViewById<View?>(R.id.inputModeWidget) as? NativeInputWidget
@@ -582,6 +593,8 @@ class RealNativeInputManager @Inject constructor(
             // Picker tied to whether the current tab is a Duck.ai page that already has a chatId (existing chat) or new chat.
             bindModelPickerEnabledSource(chatIdFlow.map { it == null })
             bindChatIdSource(chatIdFlow)
+            bindInteractionLockSource(interactionLockSource)
+            bindDuckAiFireButtonHighlightSource(duckAiFireButtonHighlightSource)
         }
         bindSearchCallbacks(widgetView, callbacks)
         bindAutocompleteVisibility(widgetView)
@@ -686,6 +699,14 @@ class RealNativeInputManager @Inject constructor(
             animator.applyLayoutTransitions(widgetView, isBottom)
             onEnterComplete(widgetView)
         }
+    }
+
+    override fun setInteractionLock(lock: InteractionLock) {
+        interactionLockSource.value = lock
+    }
+
+    override fun setDuckAiFireButtonHighlighted(highlighted: Boolean) {
+        duckAiFireButtonHighlightSource.value = highlighted
     }
 
     private fun suppressShadow(view: View) {

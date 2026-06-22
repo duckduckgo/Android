@@ -339,6 +339,7 @@ import com.duckduckgo.duckchat.api.inputscreen.InputScreenActivityParams
 import com.duckduckgo.duckchat.api.inputscreen.InputScreenActivityResultCodes
 import com.duckduckgo.duckchat.api.inputscreen.InputScreenActivityResultParams
 import com.duckduckgo.duckchat.api.inputscreen.InputScreenBrowserButtonsConfig
+import com.duckduckgo.duckchat.api.nativeinput.NativeInputState.InteractionLock
 import com.duckduckgo.duckchat.impl.contextual.DuckChatContextualFragment
 import com.duckduckgo.duckchat.impl.contextual.DuckChatContextualFragment.Companion.KEY_DUCK_AI_CONTEXTUAL_RESULT
 import com.duckduckgo.duckchat.impl.contextual.DuckChatContextualFragment.Companion.KEY_DUCK_AI_URL
@@ -5041,6 +5042,9 @@ class BrowserTabFragment :
 
     fun onBackPressed(isCustomTab: Boolean = false): Boolean {
         if (!isAdded) return false
+        // During the locked Duck.ai onboarding demo, don't navigate within the app — returning false
+        // lets BrowserActivity exit (close the app). The user progresses by tapping the fire button.
+        if (viewModel.isOmnibarLockedForOnboarding()) return false
         if (nativeInputManager.hideNativeInput()) return true
         if (isPdfVisible()) {
             hidePdf()
@@ -6001,6 +6005,14 @@ class BrowserTabFragment :
 
                 browserNavigationBarIntegration.configureFireButtonHighlight(highlighted = viewState.fireButton.isHighlighted())
                 browserNavigationBarIntegration.configureLockForOnboarding(locked = viewState.isOmnibarLockedForOnboarding)
+                nativeInputManager.setInteractionLock(
+                    when {
+                        !viewState.isOmnibarLockedForOnboarding -> InteractionLock.Unlocked
+                        viewState.fireButton.isHighlighted() -> InteractionLock.LockedExceptDuckAiFireButton
+                        else -> InteractionLock.Locked
+                    },
+                )
+                nativeInputManager.setDuckAiFireButtonHighlighted(highlighted = viewState.fireButton.isHighlighted())
 
                 renderBrowserMenu(viewState)
 

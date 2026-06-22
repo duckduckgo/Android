@@ -36,6 +36,7 @@ import com.duckduckgo.common.utils.plugins.ActivePluginPoint
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
+import com.duckduckgo.duckchat.api.nativeinput.NativeInputState.InteractionLock
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputStateProvider
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputStatePublisher
 import com.duckduckgo.duckchat.impl.ChatState
@@ -145,6 +146,8 @@ class NativeInputModeWidgetViewModel @Inject constructor(
     // activeTabId. Replayed inside configure / configureContextual when activeTabId becomes known.
     private var pendingChatId: String? = null
     private var hasPendingChatId = false
+    private var pendingInteractionLock: InteractionLock? = null
+    private var pendingDuckAiFireButtonHighlighted: Boolean? = null
 
     init {
         viewModelScope.launch {
@@ -291,14 +294,33 @@ class NativeInputModeWidgetViewModel @Inject constructor(
         .map { it.modelChangeMode }
         .distinctUntilChanged()
 
+    // interactionLock / duckAiFireButtonHighlighted live in the per-tab provider state (written by
+    // setInteractionLock / setDuckAiFireButtonHighlighted), not in baseState. Fold them back into `state` here
+    // — same as chatId above — so the widget's applyState sees the published values rather than the defaults.
+    @OptIn(ExperimentalCoroutinesApi::class)
+    private val interactionLock: Flow<InteractionLock> = activeTabId.filterNotNull()
+        .flatMapLatest { tabId -> nativeInputStateProvider.stateForTab(tabId) }
+        .map { it.interactionLock }
+        .distinctUntilChanged()
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    private val duckAiFireButtonHighlighted: Flow<Boolean> = activeTabId.filterNotNull()
+        .flatMapLatest { tabId -> nativeInputStateProvider.stateForTab(tabId) }
+        .map { it.duckAiFireButtonHighlighted }
+        .distinctUntilChanged()
+
     val state: SharedFlow<NativeInputState> = combine(
         baseState,
         duckChatInternal.chatState,
         activeChatId,
-    ) { state, chatState, chatId ->
+        interactionLock,
+        duckAiFireButtonHighlighted,
+    ) { state, chatState, chatId, lock, fireHighlighted ->
         state.copy(
             isChatStreaming = chatState == ChatState.STREAMING || chatState == ChatState.LOADING,
             chatId = chatId,
+            interactionLock = lock,
+            duckAiFireButtonHighlighted = fireHighlighted,
         )
     }.shareIn(
         scope = viewModelScope,
@@ -370,6 +392,25 @@ class NativeInputModeWidgetViewModel @Inject constructor(
         nativeInputStatePublisher.update(tabId) { it.copy(selectedTool = tool) }
     }
 
+    fun setInteractionLock(lock: InteractionLock) {
+        val tabId = activeTabId.value
+        if (tabId == null) {
+            // configure hasn't run yet — buffer until activeTabId is known, replayed in configure.
+            pendingInteractionLock = lock
+            return
+        }
+        nativeInputStatePublisher.update(tabId) { it.copy(interactionLock = lock) }
+    }
+
+    fun setDuckAiFireButtonHighlighted(highlighted: Boolean) {
+        val tabId = activeTabId.value
+        if (tabId == null) {
+            pendingDuckAiFireButtonHighlighted = highlighted
+            return
+        }
+        nativeInputStatePublisher.update(tabId) { it.copy(duckAiFireButtonHighlighted = highlighted) }
+    }
+
     /**
      * Called when a prompt is submitted
      * */
@@ -427,15 +468,23 @@ class NativeInputModeWidgetViewModel @Inject constructor(
         val context = if (isDuckAiMode) NativeInputState.InputContext.DUCK_AI else NativeInputState.InputContext.BROWSER
         val position = if (isBottom) NativeInputState.InputPosition.BOTTOM else NativeInputState.InputPosition.TOP
         widgetConfig.value = WidgetConfig(inputContext = context, inputPosition = position)
-        replayPendingChatId(tabId)
+        replayPendingState(tabId)
     }
 
-    private fun replayPendingChatId(tabId: String) {
+    private fun replayPendingState(tabId: String) {
         if (hasPendingChatId) {
             val pending = pendingChatId
             pendingChatId = null
             hasPendingChatId = false
             applyChatId(tabId, pending)
+        }
+        pendingInteractionLock?.let { lock ->
+            pendingInteractionLock = null
+            nativeInputStatePublisher.update(tabId) { it.copy(interactionLock = lock) }
+        }
+        pendingDuckAiFireButtonHighlighted?.let { highlighted ->
+            pendingDuckAiFireButtonHighlighted = null
+            nativeInputStatePublisher.update(tabId) { it.copy(duckAiFireButtonHighlighted = highlighted) }
         }
     }
 
@@ -453,7 +502,7 @@ class NativeInputModeWidgetViewModel @Inject constructor(
     fun configureContextual(tabId: String) {
         activeTabId.value = tabId
         widgetConfig.update { it.copy(inputContext = NativeInputState.InputContext.DUCK_AI_CONTEXTUAL) }
-        replayPendingChatId(tabId)
+        replayPendingState(tabId)
     }
 
     fun cancelChatSuggestions() {
