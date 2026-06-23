@@ -1039,6 +1039,15 @@
     <string name="onboardingDuckAiEndCtaDescription"><![CDATA[A címsávban kereshetsz, webhelyeket nyithatsz meg, vagy átválthatsz a Duck.ai-ra privát MI-beszélgetéshez.<br/><br/>A Duck.ai-t bárhol használhatod, ahol látod a beszélgetés ikonját]]></string>
     <string name="onboardingDuckAiEndCtaButton">Pacsi!</string>
 
+    <!-- Input Mode Demo Onboarding step -->
+    <string name="preOnboardingInputModeDemoTitle">Készen állsz a kezdésre?\nPróbálkozz kereséssel vagy AI-csevegéssel!</string>
+    <string name="preOnboardingInputModeDemoSearchHint">Privát keresés</string>
+    <string name="preOnboardingInputModeDemoChatHint">Kérdezz bármit privátban</string>
+    <string name="preOnboardingInputModeDemoChatSuggestion1">Magyarázd el a tőzsdét úgy, mintha 10 éves lennék</string>
+    <string name="preOnboardingInputModeDemoChatSuggestion2">Tervezz meg egy tökéletes napot Londonban</string>
+    <string name="preOnboardingInputModeDemoChatSuggestion3">Lepj meg!</string>
+    <string name="preOnboardingInputModeDemoChatSuggestion3Prompt">Milyen tíz lenyűgöző tényt tudnál említeni a tudomány, a természet és a történelem területéről?</string>
+
     <!-- Custom AI onboarding flow -->
     <!-- Pre-onboarding: initial screens -->
     <string name="preOnboardingWelcomeDialogBodyCustomAi">Készen állsz arra, hogy ingyen, privát módon beszélgess a ChatGPT-vel, a Claude-dal és más MI-eszközökkel egy olyan böngészőben, amely aktívan véd?</string>
@@ -1058,6 +1067,7 @@
     <string name="preOnboardingDaxDialog2TitleCustomAi">Szeretnéd alapértelmezett böngészővé tenni a DuckDuckGót?</string>
     <!-- In-context onboarding. -->
     <string name="onboardingEndCustomAiFlowDaxDialogDescription"><![CDATA[Indíts privát MI-beszélgetést a Duck.ai-jal, vagy válts a Keresésre a védett böngészéshez.<br/><br/>A Duck.ai-t bárhol használhatod, ahol látod a beszélgetés ikonját]]></string>
+    <string name="onboardingPrivacyProCustomAiFlowDaxDialogDescription">Előfizetéses csomagot is kínálunk, amely fejlett AI-modelleket, a GPT és a Claude modelljeihez biztosított magasabb csevegési limiteket, valamint biztonságos VPN-t és további funkciókat is tartalmaz.</string>
 
     <string name="input_screen_user_pref_without_ai_updated">Csak keresés</string>
     <string name="input_screen_user_pref_with_ai_updated">Váltás a keresés\nés a Duck.ai között</string>
