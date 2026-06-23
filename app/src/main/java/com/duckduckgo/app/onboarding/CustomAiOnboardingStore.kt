@@ -18,6 +18,7 @@ package com.duckduckgo.app.onboarding
 
 import androidx.core.content.edit
 import com.duckduckgo.app.onboardingbranddesignupdate.OnboardingBrandDesignUpdateToggles
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.di.scopes.AppScope
@@ -35,6 +36,7 @@ import kotlinx.coroutines.withTimeoutOrNull
 import logcat.LogPriority.INFO
 import logcat.LogPriority.WARN
 import logcat.logcat
+import java.util.Locale
 import javax.inject.Inject
 
 interface CustomAiOnboardingStore {
@@ -82,9 +84,10 @@ class CustomAiOnboardingStoreImpl @Inject constructor(
     private val sharedPreferencesProvider: SharedPreferencesProvider,
     private val referrerStateListener: Lazy<AppInstallationReferrerStateListener>,
     private val dispatcherProvider: DispatcherProvider,
-    private val customDuckAiOnboardingFeature: CustomDuckAiOnboardingFeature,
+    private val customAiOnboardingFeature: CustomAiOnboardingFeature,
     private val orchestratorFeature: LinearOnboardingOrchestratorFeature,
     private val brandDesignUpdateToggles: OnboardingBrandDesignUpdateToggles,
+    private val appBuildConfig: AppBuildConfig,
 ) : CustomAiOnboardingStore, CustomAiOnboardingResolver, ReferrerParserPlugin {
 
     private val preferences by lazy { sharedPreferencesProvider.getSharedPreferences(PREFS_FILENAME) }
@@ -106,11 +109,13 @@ class CustomAiOnboardingStoreImpl @Inject constructor(
             withTimeoutOrNull(MAX_REFERRER_WAIT_TIME_MS) { referrerStateListener.get().waitForReferrerCode() }
             val referrerExists = preferences.getBoolean(PREFS_KEY_REFERRER_PARAM_PRESENT, false)
 
-            val customAiOnboardingEnabled = customDuckAiOnboardingFeature.self().isEnabled()
+            val customAiOnboardingEnabled = customAiOnboardingFeature.self().isEnabled()
             val orchestratorEnabled = orchestratorFeature.self().isEnabled()
             val brandDesignEnabled = brandDesignUpdateToggles.brandDesignUpdate().isEnabled()
+            // Only English strings exist for the custom AI onboarding, so restrict it to English locales for now.
+            val englishLocale = appBuildConfig.deviceLocale.language == Locale.ENGLISH.language
 
-            val resolution = referrerExists && customAiOnboardingEnabled && orchestratorEnabled && brandDesignEnabled
+            val resolution = referrerExists && customAiOnboardingEnabled && orchestratorEnabled && brandDesignEnabled && englishLocale
             preferences.edit { putBoolean(PREFS_KEY_ENABLED, resolution) }
 
             return@withContext resolution
