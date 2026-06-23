@@ -18,7 +18,6 @@ package com.duckduckgo.app.onboarding
 
 import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.ExtendedOnboardingFeatureToggles
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
-import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckChat
@@ -37,26 +36,12 @@ class RealDuckAiOnboardingAvailability @Inject constructor(
     private val toggles: ExtendedOnboardingFeatureToggles,
     private val duckChat: DuckChat,
     private val browserConfig: AndroidBrowserConfigFeature,
-    private val appBuildConfig: AppBuildConfig,
     private val dispatcherProvider: DispatcherProvider,
 ) : DuckAiOnboardingAvailability {
     override suspend fun isDuckAiOnboardingEnabled(): Boolean =
         withContext(dispatcherProvider.io()) {
             duckChat.isEnabled() &&
                 browserConfig.singleTabFireDialog().isEnabled() &&
-                toggles.duckAiOnboarding().isEnabled() &&
-                appBuildConfig.deviceLocale.language !in INCOMPLETE_TRANSLATION_LANGUAGES
+                toggles.duckAiOnboarding().isEnabled()
         }
-
-    companion object {
-        // Languages still missing some Duck.ai onboarding translations. The onboarding is hidden
-        // for these so users aren't shown a half-translated flow. Remove each as its translations
-        // land. Unsupported locales fall back to fully-English (complete) copy.
-        //
-        // Includes codes the resource resolver can map onto an incomplete folder even though
-        // deviceLocale.language differs: "no"/"nn" (Norwegian macrolanguage) -> values-nb,
-        // "mo" (deprecated Moldovan) -> values-ro. NOTE: Locale.getLanguage() returns obsolete
-        // codes (he->iw, id->in, yi->ji), so use those if ever adding Hebrew/Indonesian/Yiddish.
-        private val INCOMPLETE_TRANSLATION_LANGUAGES = setOf("de", "el", "mo", "nb", "nn", "no", "pl", "ro", "ru", "tr")
-    }
 }
