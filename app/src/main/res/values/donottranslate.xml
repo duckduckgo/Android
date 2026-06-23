@@ -87,7 +87,7 @@
     <!-- Input Mode Demo Onboarding step -->
     <string name="preOnboardingInputModeDemoTitle">Ready to get started?&lt;br/&gt;Try a search or AI chat!</string>
     <string name="preOnboardingInputModeDemoSearchHint">Search privately</string>
-    <string name="preOnboardingInputModeDemoChatHint">Ask privately</string>
+    <string name="preOnboardingInputModeDemoChatHint">Ask anything privately</string>
     <string name="preOnboardingInputModeDemoChatSuggestion1">Explain the stock market like I\'m 10</string>
     <string name="preOnboardingInputModeDemoChatSuggestion2">Plan a perfect day in London</string>
     <string name="preOnboardingInputModeDemoChatSuggestion3">Surprise me!</string>
@@ -125,6 +125,8 @@
     <string name="singleTabFireDialogTitleFireMode">Delete Fire Tabs and their data?</string>
 
     <!-- Custom AI onboarding flow -->
+    <string name="preOnboardingDaxDialog1ButtonBrandDesign">Let\'s get started!</string>
+    <string name="onboardingPrivacyProDaxDialogFreeTrialOkButtonBrandDesign">Try it free!</string>
     <!-- Pre-onboarding: AI comparison chart screen. -->
     <string name="preOnboardingDaxDialogAiTitle">AI protections activated!</string>
     <string name="preOnboardingAiComparisonChartPopularAis">Popular AIs</string>
@@ -135,7 +137,7 @@
     <string name="preOnboardingAiComparisonChartButton">Give Duck.ai a try!</string>
     <!-- In-context onboarding. -->
     <string name="onboardingEndCustomAiFlowDaxDialogDescription"><![CDATA[Start a private AI chat with Duck.ai or toggle to Search for protected browsing.<br/><br/>You can use Duck.ai from anywhere you see the chat icon]]></string>
-    <string name="onboardingPrivacyProCustomAiFlowDaxDialogDescription">We also offer a paid subscription featuring advanced AI models with higher chat limits from GPT, Claude, and Llama, a secure VPN, and more.</string>
+    <string name="onboardingPrivacyProCustomAiFlowDaxDialogDescription">We also offer a paid subscription featuring advanced AI models with higher chat limits from GPT and Claude, a secure VPN, and more.</string>
     <!-- Pre-onboarding: initial screens -->
     <string name="preOnboardingWelcomeDialogBodyCustomAi">Ready to chat privately with ChatGPT, Claude, and other AIs for free, in a browser that actively protects you?</string>
     <string name="preOnboardingDaxDialog2TitleCustomAi">Want to make DuckDuckGo your default browser?</string>
