@@ -49,6 +49,14 @@ jobs:
             exit 1
           fi
 
+      - name: Validate commit-hashes
+        run: |
+          commits=$(echo "${{ inputs.commit-hashes }}" | tr ',' ' ' | xargs)
+          if [[ -z "$commits" ]]; then
+            echo "::error::commit-hashes must contain at least one commit SHA, got '${{ inputs.commit-hashes }}'."
+            exit 1
+          fi
+
       # Submodules are intentionally not checked out: this job only does git plumbing
       # (branch, version bump, cherry-pick, push) and never reads submodule contents.
       # Populating them would leave the tree dirty when hotfix-start switches between
@@ -65,6 +73,16 @@ jobs:
           git remote set-url origin https://${{ secrets.GT_DAXMOBILE }}@github.com/duckduckgo/Android.git/
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
+
+      - name: Verify fix commits exist
+        run: |
+          commits=$(echo "${{ inputs.commit-hashes }}" | tr ',' ' ' | xargs)
+          for sha in $commits; do
+            if ! git rev-parse --verify --quiet "$sha^{commit}" >/dev/null; then
+              echo "::error::commit-hash '$sha' does not resolve to a commit in this repository."
+              exit 1
+            fi
+          done
 
       - name: Fail if tag already exists
         run: |
@@ -97,10 +115,14 @@ jobs:
 
       - name: Cherry-pick fix commits
         run: |
-          commits=$(echo "${{ inputs.commit-hashes }}" | tr ',' ' ')
+          commits=$(echo "${{ inputs.commit-hashes }}" | tr ',' ' ' | xargs)
           for sha in $commits; do
             echo "Cherry-picking $sha"
-            git cherry-pick "$sha"
+            if ! git cherry-pick "$sha"; then
+              echo "::error::Cherry-pick of '$sha' failed (likely a conflict). Aborting; no hotfix branch will be pushed."
+              git cherry-pick --abort || true
+              exit 1
+            fi
           done
 
       - name: Push hotfix branch
