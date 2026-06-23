@@ -524,6 +524,48 @@ class DuckChatSettingsViewModelTest {
         }
 
     @Test
+    fun `when aiFeaturesNativeControls is enabled then viewState shows native controls enabled`() =
+        runTest {
+            @Suppress("DenyListedApi")
+            duckChatFeature.aiFeaturesNativeControls().setRawStoredState(State(enable = true))
+            testee = DuckChatSettingsViewModel(
+                duckChatActivityParams = DuckChatSettingsNoParams,
+                duckChat = duckChat,
+                pixel = mockPixel,
+                inputScreenDiscoveryFunnel = mockInputScreenDiscoveryFunnel,
+                settingsPageFeature = settingsPageFeature,
+                duckChatPixels = mockDuckChatPixels,
+                dispatcherProvider = coroutineRule.testDispatcherProvider,
+                duckChatFeature = duckChatFeature,
+            )
+
+            testee.viewState.test {
+                assertTrue(awaitItem().isNativeControlsEnabled)
+            }
+        }
+
+    @Test
+    fun `when aiFeaturesNativeControls is disabled then viewState shows native controls disabled`() =
+        runTest {
+            @Suppress("DenyListedApi")
+            duckChatFeature.aiFeaturesNativeControls().setRawStoredState(State(enable = false))
+            testee = DuckChatSettingsViewModel(
+                duckChatActivityParams = DuckChatSettingsNoParams,
+                duckChat = duckChat,
+                pixel = mockPixel,
+                inputScreenDiscoveryFunnel = mockInputScreenDiscoveryFunnel,
+                settingsPageFeature = settingsPageFeature,
+                duckChatPixels = mockDuckChatPixels,
+                dispatcherProvider = coroutineRule.testDispatcherProvider,
+                duckChatFeature = duckChatFeature,
+            )
+
+            testee.viewState.test {
+                assertFalse(awaitItem().isNativeControlsEnabled)
+            }
+        }
+
+    @Test
     fun `when DuckChatSettingsNoParams passed then viewState shows search section visible`() =
         runTest {
             testee = DuckChatSettingsViewModel(
