@@ -18,6 +18,7 @@ package com.duckduckgo.app.global.view
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
+import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.api.WebViewCapabilityChecker
 import com.duckduckgo.app.browser.api.WebViewCapabilityChecker.WebViewCapability.DeleteBrowsingData
 import com.duckduckgo.app.fire.ManualDataClearing
@@ -44,6 +45,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.FIRE_ANIMATION
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.DateProvider
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -120,7 +122,7 @@ class SingleTabFireDialogViewModelTest {
         }
     }
 
-    private fun createViewModel() = SingleTabFireDialogViewModel(
+    private fun createViewModel(browserMode: BrowserMode = BrowserMode.REGULAR) = SingleTabFireDialogViewModel(
         fireDataStore = mockFireDataStore,
         dataClearing = mockDataClearing,
         dataClearingWideEvent = mockDataClearingWideEvent,
@@ -135,6 +137,7 @@ class SingleTabFireDialogViewModelTest {
         downloadsRepository = mockDownloadsRepository,
         duckChat = mockDuckChat,
         brandDesignUpdateToggles = mockBrandDesignUpdateToggles,
+        browserMode = browserMode,
     )
 
     // region Initialization
@@ -1093,6 +1096,131 @@ class SingleTabFireDialogViewModelTest {
             awaitItem() // Skip OnClearStarted
             awaitItem() // Skip PlayAnimation
 
+            assertEquals(Command.ClearingComplete, awaitItem())
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    // endregion
+
+    // region Fire mode
+
+    @Test
+    fun `when in fire mode and website tab from browser then title is fire mode title`() = runTest {
+        whenever(mockTabRepository.getOpenTabCount()).thenReturn(1)
+        whenever(mockTabRepository.getSelectedTab()).thenReturn(
+            TabEntity(tabId = "tab1", url = "https://website.com/page", title = "Website"),
+        )
+        whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(false)
+
+        testee = createViewModel(browserMode = BrowserMode.FIRE)
+        testee.setOrigin(FireDialogOrigin.Browser)
+
+        testee.viewState.filterIsInstance<SingleTabFireDialogViewModel.ViewState.Loaded>().test {
+            val state = awaitItem()
+
+            assertEquals(
+                SingleTabFireDialogViewModel.TitleSource.Static(R.string.singleTabFireDialogTitleFireMode),
+                state.stateData.titleSource,
+            )
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `when in fire mode and duck ai chats are selected then title is fire mode title`() = runTest {
+        whenever(mockFireDataStore.isManualClearOptionSelected(FireClearOption.DUCKAI_CHATS)).thenReturn(true)
+        whenever(mockTabRepository.getOpenTabCount()).thenReturn(1)
+        whenever(mockTabRepository.getSelectedTab()).thenReturn(
+            TabEntity(tabId = "tab1", url = "https://website.com/page", title = "Website"),
+        )
+        whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(false)
+
+        testee = createViewModel(browserMode = BrowserMode.FIRE)
+        testee.setOrigin(FireDialogOrigin.Browser)
+
+        testee.viewState.filterIsInstance<SingleTabFireDialogViewModel.ViewState.Loaded>().test {
+            val state = awaitItem()
+
+            assertEquals(
+                SingleTabFireDialogViewModel.TitleSource.Static(R.string.singleTabFireDialogTitleFireMode),
+                state.stateData.titleSource,
+            )
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `when in fire mode and duck ai tab then title is still duck ai title`() = runTest {
+        whenever(mockTabRepository.getOpenTabCount()).thenReturn(1)
+        whenever(mockWebViewCapabilityChecker.isSupported(DeleteBrowsingData)).thenReturn(true)
+        whenever(mockTabRepository.getSelectedTab()).thenReturn(
+            TabEntity(tabId = "tab1", url = "https://duck.ai/chat", title = "Duck AI"),
+        )
+        whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(true)
+
+        testee = createViewModel(browserMode = BrowserMode.FIRE)
+        testee.setOrigin(FireDialogOrigin.Browser)
+
+        testee.viewState.filterIsInstance<SingleTabFireDialogViewModel.ViewState.Loaded>().test {
+            val state = awaitItem()
+
+            assertEquals(
+                SingleTabFireDialogViewModel.TitleSource.Static(R.string.singleTabFireDialogTitleDuckAi),
+                state.stateData.titleSource,
+            )
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `when in regular mode and website tab from browser then title is default title`() = runTest {
+        whenever(mockTabRepository.getOpenTabCount()).thenReturn(1)
+        whenever(mockTabRepository.getSelectedTab()).thenReturn(
+            TabEntity(tabId = "tab1", url = "https://website.com/page", title = "Website"),
+        )
+        whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(false)
+
+        testee = createViewModel(browserMode = BrowserMode.REGULAR)
+        testee.setOrigin(FireDialogOrigin.Browser)
+
+        testee.viewState.filterIsInstance<SingleTabFireDialogViewModel.ViewState.Loaded>().test {
+            val state = awaitItem()
+
+            assertEquals(
+                SingleTabFireDialogViewModel.TitleSource.Static(R.string.singleTabFireDialogTitle),
+                state.stateData.titleSource,
+            )
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `when in fire mode delete all clicked then manual fire clear is not invoked`() = runTest {
+        testee = createViewModel(browserMode = BrowserMode.FIRE)
+
+        testee.onDeleteAllClicked()
+
+        coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
+
+        verify(mockDataClearing, never()).clearDataUsingManualFireOptions()
+    }
+
+    @Test
+    fun `when in fire mode delete all clicked with animation enabled then dialog still completes`() = runTest {
+        whenever(mockSettingsDataStore.fireAnimationEnabled).thenReturn(true)
+        testee = createViewModel(browserMode = BrowserMode.FIRE)
+
+        testee.commands().test {
+            testee.onDeleteAllClicked()
+
+            assertEquals(Command.OnClearStarted, awaitItem())
+            assertEquals(Command.PlayAnimation, awaitItem())
             assertEquals(Command.ClearingComplete, awaitItem())
 
             cancelAndConsumeRemainingEvents()
