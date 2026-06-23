@@ -986,8 +986,8 @@
             {
                 "key": "reasoning_effort",
                 "type": "string",
-                "description": "The reasoning effort level used for the prompt",
-                "enum": ["fast", "reasoning", "extended_reasoning"]
+                "description": "The resolved reasoning effort level used for the prompt",
+                "enum": ["none", "minimal", "low", "medium", "high"]
             },
             { "key": "has_image_attachment", "type": "boolean", "description": "Whether the prompt included an image attachment" },
             { "key": "has_file_attachment", "type": "boolean", "description": "Whether the prompt included a file attachment" },
@@ -1011,8 +1011,8 @@
             {
                 "key": "reasoning_effort",
                 "type": "string",
-                "description": "The reasoning effort level used for the prompt",
-                "enum": ["fast", "reasoning", "extended_reasoning"]
+                "description": "The resolved reasoning effort level used for the prompt",
+                "enum": ["none", "minimal", "low", "medium", "high"]
             },
             { "key": "has_image_attachment", "type": "boolean", "description": "Whether the prompt included an image attachment" },
             { "key": "has_file_attachment", "type": "boolean", "description": "Whether the prompt included a file attachment" },
