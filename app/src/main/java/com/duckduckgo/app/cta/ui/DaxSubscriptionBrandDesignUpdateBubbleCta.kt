@@ -74,7 +74,11 @@ data class DaxSubscriptionBrandDesignUpdateBubbleCta(
         view.findViewById<ImageView>(R.id.brandDesignHeaderImage)?.isVisible = true
 
         val buttonTextRes = if (isFreeTrialCopy) {
-            R.string.onboardingPrivacyProDaxDialogFreeTrialOkButton
+            if (isCustomAiOnboardingFlow) {
+                R.string.onboardingPrivacyProDaxDialogFreeTrialOkButtonBrandDesign
+            } else {
+                R.string.onboardingPrivacyProDaxDialogFreeTrialOkButton
+            }
         } else {
             R.string.onboardingPrivacyProDaxDialogOkButton
         }

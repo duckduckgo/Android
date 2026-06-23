@@ -21,6 +21,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.browser.api.install.AppInstall
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
@@ -1392,6 +1393,48 @@ class RealDuckChatJSHelperTest {
             put("supportsAIChatFullMode", false)
             put("supportsAIChatContextualMode", false)
             put("supportsAIChatSync", true)
+            put("supportsPageContext", false)
+            put("supportsNativeStorage", false)
+            put("supportsMultipleContexts", false)
+            put("installType", "new")
+            put("installAge", 0)
+        }
+
+        assertEquals(expectedPayload.toString(), result!!.params.toString())
+    }
+
+    @Test
+    fun whenGetAIChatNativeConfigValuesAndChatSyncEnabledButFireModeThenSupportsAIChatSyncDisabled() = runTest {
+        val featureName = "aiChat"
+        val method = "getAIChatNativeConfigValues"
+        val id = "123"
+
+        whenever(mockDuckChat.isDuckChatFeatureEnabled()).thenReturn(true)
+        whenever(mockDuckChat.isDuckChatFullScreenModeEnabled()).thenReturn(false)
+        whenever(mockDuckChat.isChatSyncFeatureEnabled()).thenReturn(true)
+
+        val result = testee.processJsCallbackMessage(
+            featureName,
+            method,
+            id,
+            null,
+            pageContext = viewModel.updatedPageContext,
+            browserMode = BrowserMode.FIRE,
+        )
+
+        val expectedPayload = JSONObject().apply {
+            put("platform", "android")
+            put("isAIChatHandoffEnabled", true)
+            put("supportsClosingAIChat", true)
+            put("supportsOpeningSettings", true)
+            put("supportsNativeChatInput", false)
+            put("supportsNativePrompt", false)
+            put("supportsURLChatIDRestoration", false)
+            put("supportsImageUpload", false)
+            put("supportsStandaloneMigration", false)
+            put("supportsAIChatFullMode", false)
+            put("supportsAIChatContextualMode", false)
+            put("supportsAIChatSync", false)
             put("supportsPageContext", false)
             put("supportsNativeStorage", false)
             put("supportsMultipleContexts", false)

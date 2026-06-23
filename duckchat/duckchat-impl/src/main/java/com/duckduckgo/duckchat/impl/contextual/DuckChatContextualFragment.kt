@@ -213,6 +213,7 @@ class DuckChatContextualFragment :
     private lateinit var backPressedCallback: OnBackPressedCallback
     internal val simpleWebview: WebView by lazy { binding.simpleWebview }
     private var isKeyboardVisible = false
+    private var chatsPopup: PopupMenu? = null
 
     private val keyboardVisibilityListener =
         ViewTreeObserver.OnGlobalLayoutListener {
@@ -378,6 +379,7 @@ class DuckChatContextualFragment :
                                             Mode.CONTEXTUAL,
                                             viewModel.updatedPageContext,
                                             viewModel.sheetTabId,
+                                            browserMode,
                                         )?.let { response ->
                                             logcat { "JS Helper: response $response" }
                                             withContext(dispatcherProvider.main()) {
@@ -781,6 +783,8 @@ class DuckChatContextualFragment :
             popup.onMenuItemClicked(viewAllRow) { viewModel.onViewAllChatsClicked() }
         }
 
+        popup.setOnDismissListener { chatsPopup = null }
+        chatsPopup = popup
         popup.showAnchoredView(requireActivity(), binding.root, binding.contextualNewChat)
     }
 
@@ -1074,6 +1078,11 @@ class DuckChatContextualFragment :
             cookieManager.flush()
         }
         super.onPause()
+    }
+
+    override fun onStop() {
+        chatsPopup?.dismiss()
+        super.onStop()
     }
 
     override fun onDestroyView() {

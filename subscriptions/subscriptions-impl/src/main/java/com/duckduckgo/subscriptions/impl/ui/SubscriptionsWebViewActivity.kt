@@ -47,6 +47,7 @@ import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.SpecialUrlDetector
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.browser.api.ui.BrowserScreens.SettingsScreenNoParams
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.view.hide
@@ -514,7 +515,7 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
 
     private fun processCommand(command: Command) {
         when (command) {
-            is BackToSettings, BackToSettingsActivateSuccess -> backToSettings()
+            is BackToSettings, BackToSettingsActivateSuccess -> finishToSettings()
             is SendJsEvent -> sendJsEvent(command.event)
             is SendResponseToJs -> sendResponseToJs(command.data)
             is SubscriptionSelected -> selectSubscription(command.id, command.offerId, command.experimentName, command.experimentCohort)
@@ -613,7 +614,7 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
             .addEventListener(
                 object : TextAlertDialogBuilder.EventListener() {
                     override fun onPositiveButtonClicked() {
-                        finish()
+                        finishToSettings()
                     }
                 },
             )
@@ -631,7 +632,7 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
                         if (subscriptionEventData != null) {
                             subscriptionJsMessaging.sendSubscriptionEvent(subscriptionEventData)
                         } else {
-                            finish()
+                            finishToSettings()
                         }
                     }
                 },
@@ -681,12 +682,23 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
         subscriptionJsMessaging.onResponse(data)
     }
 
-    private fun backToSettings() {
+    private fun finishToSettings() {
         if (params.url == subscriptionsUrlProvider.activateUrl) {
             setResult(RESULT_OK)
+        } else {
+            globalActivityStarter.startIntent(this, SettingsScreenNoParams)?.let { intent ->
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
+                startActivity(intent)
+            }
         }
         finish()
     }
+
+    private fun hasCompletedPurchaseFlow(): Boolean =
+        when (viewModel.currentPurchaseViewState.value.purchaseState) {
+            is PurchaseStateView.Success, PurchaseStateView.Waiting, PurchaseStateView.Recovered -> true
+            else -> false
+        }
 
     private val startForResultRestore = registerForActivityResult(StartActivityForResult()) { result: ActivityResult ->
         if (result.resultCode == RESULT_OK) {
@@ -724,6 +736,8 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
     override fun onBackPressed() {
         if (canGoBack()) {
             binding.webview.goBack()
+        } else if (hasCompletedPurchaseFlow()) {
+            finishToSettings()
         } else {
             super.onBackPressed()
         }

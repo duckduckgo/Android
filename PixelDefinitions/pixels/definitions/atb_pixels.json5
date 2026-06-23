@@ -26,8 +26,8 @@
                 "key": "v",
                 "description": "App version recorded at the time of the ANR (may differ from appVersion if the app has been updated since).",
                 "type": "string",
-                "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+(\\.[0-9]+)?$",
-                "examples": ["0.89.3"]
+                "pattern": "^([0-9]+\\.[0-9]+\\.[0-9]+(\\.[0-9]+)?|unknown)$",
+                "examples": ["0.89.3", "unknown"]
             }
         ]
     },
