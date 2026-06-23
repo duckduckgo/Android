@@ -1039,6 +1039,15 @@
     <string name="onboardingDuckAiEndCtaDescription"><![CDATA[Siteleri aramak ve ziyaret etmek için adres çubuğunu kullanın veya gizli yapay zeka sohbeti için Duck.ai\'a geçin.<br/><br/>Sohbet simgesini gördüğünüz her yerde Duck.ai kullanabilirsiniz]]></string>
     <string name="onboardingDuckAiEndCtaButton">Tebrikler!</string>
 
+    <!-- Input Mode Demo Onboarding step -->
+    <string name="preOnboardingInputModeDemoTitle">Başlamaya hazır mısınız?&lt;br/&gt;Arama yapmayı veya yapay zekâ sohbetini deneyin!</string>
+    <string name="preOnboardingInputModeDemoSearchHint">Gizli olarak arama yapın</string>
+    <string name="preOnboardingInputModeDemoChatHint">Gizli bir şekilde her şeyi sorabilirsiniz</string>
+    <string name="preOnboardingInputModeDemoChatSuggestion1">Borsa piyasasını 10 yaşında bir çocuğa anlatır gibi açıkla</string>
+    <string name="preOnboardingInputModeDemoChatSuggestion2">Londra\'da mükemmel bir gün planla</string>
+    <string name="preOnboardingInputModeDemoChatSuggestion3">Şaşırt beni!</string>
+    <string name="preOnboardingInputModeDemoChatSuggestion3Prompt">Bilim, doğa ve tarihle ilgili 10 büyüleyici gerçek nedir?</string>
+
     <!-- Custom AI onboarding flow -->
     <!-- Pre-onboarding: initial screens -->
     <string name="preOnboardingWelcomeDialogBodyCustomAi">Sizi aktif olarak koruyan bir tarayıcıda ChatGPT, Claude ve diğer AI\'larla ücretsiz olarak gizlice sohbet etmeye hazır mısınız?</string>
@@ -1058,6 +1067,7 @@
     <string name="preOnboardingDaxDialog2TitleCustomAi">DuckDuckGo\'yu varsayılan tarayıcınız yapmak ister misiniz?</string>
     <!-- In-context onboarding. -->
     <string name="onboardingEndCustomAiFlowDaxDialogDescription"><![CDATA[Duck.ai ile gizli bir yapay zekâ sohbeti başlatın veya korumalı gezinme için Arama moduna geçin.<br/><br/>Sohbet simgesini gördüğünüz her yerden Duck.ai kullanabilirsiniz]]></string>
+    <string name="onboardingPrivacyProCustomAiFlowDaxDialogDescription">Ayrıca, GPT ve Claude\'dan daha yüksek sohbet limitlerine sahip gelişmiş yapay zekâ modelleri, güvenli bir VPN ve daha fazlasını içeren ücretli bir abonelik de sunuyoruz.</string>
 
     <string name="input_screen_user_pref_without_ai_updated">Yalnızca Arama</string>
     <string name="input_screen_user_pref_with_ai_updated">Arama ile\nDuck.ai arasında geçiş yapın</string>
