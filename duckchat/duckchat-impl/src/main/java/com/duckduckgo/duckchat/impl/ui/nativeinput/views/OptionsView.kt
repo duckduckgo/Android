@@ -37,6 +37,7 @@ import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputStateProvider
 import com.duckduckgo.duckchat.impl.R
+import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.models.Tool
 import com.duckduckgo.duckchat.impl.nativeinput.NativeInputHost
 import dagger.android.support.AndroidSupportInjection
@@ -52,6 +53,8 @@ class OptionsView(context: Context, private val host: NativeInputHost) : LinearL
     @Inject lateinit var viewModelFactory: ViewViewModelFactory
 
     @Inject lateinit var nativeInputStateProvider: NativeInputStateProvider
+
+    @Inject lateinit var duckChatFeature: DuckChatFeature
 
     private val viewModel by lazy {
         ViewModelProvider(findViewTreeViewModelStoreOwner()!!, viewModelFactory)[OptionsViewModel::class.java]
@@ -139,7 +142,8 @@ class OptionsView(context: Context, private val host: NativeInputHost) : LinearL
     }
 
     private fun isCustomizeResponsesAvailable(): Boolean =
-        lastNativeInputState?.inputContext == NativeInputState.InputContext.DUCK_AI
+        duckChatFeature.customizeResponses().isEnabled() &&
+            lastNativeInputState?.inputContext == NativeInputState.InputContext.DUCK_AI
 
     private fun refreshOptionsButtonVisibility() {
         optionsButton.isVisible = viewModel.visibleTools.value.isNotEmpty() || isCustomizeResponsesAvailable()
