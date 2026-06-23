@@ -66,6 +66,7 @@ import com.duckduckgo.duckchat.impl.inputscreen.ui.view.InputScreenButtons
 import com.duckduckgo.duckchat.impl.nativeinput.NativeInputHost
 import com.duckduckgo.duckchat.impl.store.DefaultTogglePosition
 import com.duckduckgo.duckchat.impl.ui.NativeInputModeWidgetViewModel
+import com.duckduckgo.duckchat.impl.ui.nativeinput.attachment.PageContextAttachment
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.tabs.TabLayout
 import kotlinx.coroutines.CoroutineScope
@@ -141,6 +142,9 @@ interface NativeInputWidget {
     fun getImageAttachmentsJson(): JSONArray?
     fun getFileAttachmentsJson(): JSONArray?
     fun clearAttachments()
+    fun setPageContext(title: String, url: String, faviconUrl: String?)
+    fun clearPageContext()
+    fun getPageContext(): PageContextAttachment?
     fun storePendingPrompt(query: String)
     fun configure(tabId: String, isDuckAiMode: Boolean, isBottom: Boolean)
     fun configureContextual(tabId: String)
@@ -1086,6 +1090,16 @@ class NativeInputModeWidget @JvmOverloads constructor(
     override fun getImageAttachmentsJson(): JSONArray? = attachmentView?.getImageAttachmentsJson()
 
     override fun getFileAttachmentsJson(): JSONArray? = attachmentView?.getFileAttachmentsJson()
+
+    override fun setPageContext(title: String, url: String, faviconUrl: String?) {
+        attachmentView?.setPageContext(PageContextAttachment(title = title, url = url, faviconUrl = faviconUrl))
+    }
+
+    override fun clearPageContext() {
+        attachmentView?.clearPageContext()
+    }
+
+    override fun getPageContext(): PageContextAttachment? = attachmentView?.getPageContext()
 
     override fun clearAttachments() {
         attachmentView?.clearAttachments()
