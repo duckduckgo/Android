@@ -1039,6 +1039,15 @@
     <string name="onboardingDuckAiEndCtaDescription"><![CDATA[Kasuta aadressiriba, et otsida ja külastada saite või alusta privaatset AI-vestlust Duck.ai abil.<br/><br/>Saad Duck.ai\'t kasutada kõikjal, kus näed vestluse ikooni]]></string>
     <string name="onboardingDuckAiEndCtaButton">Viska viis!</string>
 
+    <!-- Input Mode Demo Onboarding step -->
+    <string name="preOnboardingInputModeDemoTitle">Kas oled valmis alustama?&lt;br/&gt;Proovi otsingut või tehisintellekti vestlust!</string>
+    <string name="preOnboardingInputModeDemoSearchHint">Otsi privaatselt</string>
+    <string name="preOnboardingInputModeDemoChatHint">Küsi ükskõik mida privaatselt</string>
+    <string name="preOnboardingInputModeDemoChatSuggestion1">Selgita aktsiaturgu nagu ma oleksin 10-aastane</string>
+    <string name="preOnboardingInputModeDemoChatSuggestion2">Planeeri ideaalne päev Londonis</string>
+    <string name="preOnboardingInputModeDemoChatSuggestion3">Üllata mind!</string>
+    <string name="preOnboardingInputModeDemoChatSuggestion3Prompt">Millised on 10 põnevat fakti teaduse, looduse ja ajaloo kohta?</string>
+
     <!-- Custom AI onboarding flow -->
     <!-- Pre-onboarding: initial screens -->
     <string name="preOnboardingWelcomeDialogBodyCustomAi">Kas oled valmis privaatselt ChatGPT, Claude\'i ja teiste tehisintellektidega tasuta vestlema brauseris, mis sind aktiivselt kaitseb?</string>
@@ -1058,6 +1067,7 @@
     <string name="preOnboardingDaxDialog2TitleCustomAi">Kas sa soovid DuckDuckGo oma vaikebrauseriks muuta?</string>
     <!-- In-context onboarding. -->
     <string name="onboardingEndCustomAiFlowDaxDialogDescription"><![CDATA[Alusta privaatset AI-vestlust Duck.ai-ga või lülita sisse, et otsida kaitstud sirvimist.<br/><br/>Saad Duck.ai\'t kasutada kõikjal, kus näed vestluse ikooni]]></string>
+    <string name="onboardingPrivacyProCustomAiFlowDaxDialogDescription">Pakume ka tasulist tellimust, mis sisaldab täiustatud tehisintellekti mudeleid, millel on GPT ja Claude kõrgemad vestluspiirangud, turvaline VPN ja palju muud.</string>
 
     <string name="input_screen_user_pref_without_ai_updated">Ainult otsi</string>
     <string name="input_screen_user_pref_with_ai_updated">Lülita \n otsingu ja Duck.ai vahel</string>
