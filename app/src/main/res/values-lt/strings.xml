@@ -1079,6 +1079,15 @@
     <string name="onboardingDuckAiEndCtaDescription"><![CDATA[Naudokite adreso juostą paieškai ir svetainių lankymui arba perjunkite į „Duck.ai“ privačiam pokalbiui su DI.<br/><br/>„Duck.ai“ galite naudoti bet kur, kur matote pokalbių piktogramą]]></string>
     <string name="onboardingDuckAiEndCtaButton">Duok penkis!</string>
 
+    <!-- Input Mode Demo Onboarding step -->
+    <string name="preOnboardingInputModeDemoTitle">Pasiruošei pradėti?&lt;br/&gt;Išbandyk paiešką arba DI pokalbį!</string>
+    <string name="preOnboardingInputModeDemoSearchHint">Ieškok privačiai</string>
+    <string name="preOnboardingInputModeDemoChatHint">Klausk bet ko privačiai</string>
+    <string name="preOnboardingInputModeDemoChatSuggestion1">Paaiškink akcijų rinką taip, lyg man būtų 10 metų</string>
+    <string name="preOnboardingInputModeDemoChatSuggestion2">Suplanuok tobulą dieną Londone</string>
+    <string name="preOnboardingInputModeDemoChatSuggestion3">Nustebink mane!</string>
+    <string name="preOnboardingInputModeDemoChatSuggestion3Prompt">Kokie yra 10 stulbinamų faktų apie mokslą, gamtą ir istoriją?</string>
+
     <!-- Custom AI onboarding flow -->
     <!-- Pre-onboarding: initial screens -->
     <string name="preOnboardingWelcomeDialogBodyCustomAi">Pasiruošei privačiai ir nemokamai kalbėtis su „ChatGPT“, „Claude“ ir kitais DI naršyklėje, kuri tave aktyviai saugo?</string>
@@ -1098,6 +1107,7 @@
     <string name="preOnboardingDaxDialog2TitleCustomAi">Nori, kad „DuckDuckGo“ taptų tavo numatytąja naršykle?</string>
     <!-- In-context onboarding. -->
     <string name="onboardingEndCustomAiFlowDaxDialogDescription"><![CDATA[Pradėk privatų DI pokalbį su „Duck.ai“ arba perjunk į Paiešką, kad naršytum saugiai.<br/><br/>„Duck.ai“ gali naudoti visur, kur tik matai pokalbio piktogramą.]]></string>
+    <string name="onboardingPrivacyProCustomAiFlowDaxDialogDescription">Taip pat siūlome mokamą prenumeratą, į kurią įeina pažangūs DI modeliai su didesniais GPT ir „Claude“ pokalbių limitais, saugus VPN ir dar daugiau.</string>
 
     <string name="input_screen_user_pref_without_ai_updated">Tik paieška</string>
     <string name="input_screen_user_pref_with_ai_updated">Perjungti\npaiešką ir „Duck.ai“</string>
