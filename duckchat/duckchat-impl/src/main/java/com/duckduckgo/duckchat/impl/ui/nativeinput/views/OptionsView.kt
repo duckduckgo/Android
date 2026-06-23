@@ -258,8 +258,8 @@ class OptionsView(context: Context, private val host: NativeInputHost) : LinearL
         row.findViewById<DaxTextView>(R.id.optionsMenuItemSubtitle).setText(R.string.duckChatOptionsMenuCustomizeResponsesSubtitle)
         row.findViewById<ImageView>(R.id.optionsMenuItemTrailingIcon).visibility = GONE
         row.setOnClickListener {
-            viewModel.onCustomizeResponsesSelected()
-            host.customizeResponsesTapped()
+            viewModel.onCustomizeResponsesClicked()
+            host.customizeResponsesClicked()
             row.postDelayed({ popup.dismiss() }, MENU_DISMISS_DELAY_MS)
         }
         return row

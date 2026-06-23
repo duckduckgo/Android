@@ -71,7 +71,7 @@ class OptionsViewModel @Inject constructor(
         }
     }
 
-    fun onCustomizeResponsesSelected() {
+    fun onCustomizeResponsesClicked() {
         duckChatPixels.fireCustomizeResponsesSelected()
     }
 }

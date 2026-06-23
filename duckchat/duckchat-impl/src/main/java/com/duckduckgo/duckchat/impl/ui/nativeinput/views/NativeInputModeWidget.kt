@@ -1454,7 +1454,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
         viewModel.setSelectedTool(tool)
     }
 
-    override fun customizeResponsesTapped() {
+    override fun customizeResponsesClicked() {
         onCustomizeResponsesClicked?.invoke()
     }
 

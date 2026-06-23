@@ -138,8 +138,8 @@ class OptionsViewModelTest {
     }
 
     @Test
-    fun whenCustomizeResponsesSelectedThenSelectedPixel() {
-        testee.onCustomizeResponsesSelected()
+    fun whenCustomizeResponsesClickedThenFireCustomizeResponsesPixel() {
+        testee.onCustomizeResponsesClicked()
         verify(duckChatPixels).fireCustomizeResponsesSelected()
     }
 

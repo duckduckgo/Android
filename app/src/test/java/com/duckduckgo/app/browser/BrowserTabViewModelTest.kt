@@ -10222,7 +10222,7 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenCustomizeResponsesTappedThenSubscriptionEventEmitted() = runTest {
+    fun whenCustomizeResponsesClickedThenSubscriptionEventEmitted() = runTest {
         val expectedEvent = SubscriptionEventData(
             featureName = "aiChat",
             subscriptionName = "submitCustomizeResponsesAction",
