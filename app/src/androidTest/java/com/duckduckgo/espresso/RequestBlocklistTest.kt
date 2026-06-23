@@ -18,17 +18,10 @@ package com.duckduckgo.espresso
 
 import android.view.View
 import android.webkit.WebView
-import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.IdlingRegistry
 import androidx.test.espresso.IdlingResource
 import androidx.test.espresso.UiController
 import androidx.test.espresso.ViewAction
-import androidx.test.espresso.action.ViewActions.clearText
-import androidx.test.espresso.action.ViewActions.click
-import androidx.test.espresso.action.ViewActions.pressImeActionButton
-import androidx.test.espresso.action.ViewActions.typeText
-import androidx.test.espresso.matcher.ViewMatchers.isRoot
-import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.espresso.web.model.Atoms
 import androidx.test.espresso.web.sugar.Web
 import androidx.test.ext.junit.rules.activityScenarioRule
@@ -54,7 +47,7 @@ class RequestBlocklistTest {
         BrowserActivity.intent(
             InstrumentationRegistry.getInstrumentation().targetContext,
             launchSource = InAppNavigation,
-            queryExtra = "https://privacy-test-pages.site/privacy-protections",
+            queryExtra = "https://privacy-test-pages.site/privacy-protections/request-blocklist/",
         ),
     )
 
@@ -65,37 +58,19 @@ class RequestBlocklistTest {
         registeredResources.forEach { IdlingRegistry.getInstance().unregister(it) }
     }
 
-    @Test @InternalPrivacyTest
+    @Test @PrivacyTest
     fun whenRequestBlocklistIsEnabledRequestsAreHandledCorrectly() {
         preparationsForPrivacyTest()
 
-        val grabber = WebViewGrabber()
-        onView(withId(R.id.browserWebView)).perform(grabber)
-        val webView = grabber.webView ?: error("browserWebView not present after waitForView")
+        var webView: WebView? = null
+        activityScenarioRule.scenario.onActivity {
+            webView = it.findViewById(R.id.browserWebView)
+        }
 
-        WebViewIdlingResource(webView).track()
-
-        // On internal builds native input is enabled, which disables the legacy omnibar field
-        // and routes a tap to the unified input screen. Drive that flow — open the input screen
-        // and type the URL into the native input field — instead of typing into the disabled
-        // omnibar. Loading the warm-up page first also gives the privacy config time to load
-        // before the test page fires its requests.
-        // inputField lives in :duckchat-impl; resolve its id by name so we don't import an impl
-        // R class (forbidden by the NoImplImportsInAppModule lint rule).
-        val inputFieldId = inputFieldId()
-        onView(withId(R.id.omnibarTextInputClickCatcher)).perform(click())
-        onView(isRoot()).perform(waitFor(1000))
-        onView(isRoot()).perform(waitForView(withId(inputFieldId)))
-        onView(withId(inputFieldId)).perform(
-            clearText(),
-            typeText("https://privacy-test-pages.site/privacy-protections/request-blocklist/"),
-            pressImeActionButton(),
-        )
-
-        WebViewIdlingResource(webView).track()
+        WebViewIdlingResource(webView!!).track()
 
         // window.results won't exist until the request-blocklist page's finished() fires
-        JsObjectIdlingResource(webView, "window.results").track()
+        JsObjectIdlingResource(webView!!, "window.results").track()
 
         val results = Web.onWebView()
             .perform(Atoms.script(SCRIPT))

@@ -17,14 +17,8 @@
 package com.duckduckgo.espresso.privacy
 
 import android.webkit.WebView
-import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.IdlingRegistry
 import androidx.test.espresso.IdlingResource
-import androidx.test.espresso.action.ViewActions.clearText
-import androidx.test.espresso.action.ViewActions.click
-import androidx.test.espresso.action.ViewActions.pressImeActionButton
-import androidx.test.espresso.action.ViewActions.typeText
-import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.espresso.web.assertion.WebViewAssertions.webMatches
 import androidx.test.espresso.web.model.Atoms.script
 import androidx.test.espresso.web.sugar.Web.onWebView
@@ -37,11 +31,9 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.mode.InAppNavigation
-import com.duckduckgo.espresso.InternalPrivacyTest
 import com.duckduckgo.espresso.JsObjectIdlingResource
+import com.duckduckgo.espresso.PrivacyTest
 import com.duckduckgo.espresso.WebViewIdlingResource
-import com.duckduckgo.espresso.waitFor
-import com.duckduckgo.espresso.waitForView
 import com.duckduckgo.privacy.config.impl.network.JSONObjectAdapter
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
@@ -58,13 +50,13 @@ class GpcTest {
         BrowserActivity.intent(
             InstrumentationRegistry.getInstrumentation().targetContext,
             launchSource = InAppNavigation,
-            queryExtra = "https://privacy-test-pages.site/privacy-protections",
+            queryExtra = "https://privacy-test-pages.site/privacy-protections/gpc/",
         ),
     )
 
     private val registeredResources = mutableListOf<IdlingResource>()
 
-    @Test @InternalPrivacyTest
+    @Test @PrivacyTest
     fun whenProtectionsAreEnableGpcSetCorrectly() {
         preparationsForPrivacyTest()
 
@@ -74,22 +66,6 @@ class GpcTest {
             webView = it.findViewById(R.id.browserWebView)
         }
 
-        WebViewIdlingResource(webView!!).track()
-
-        // On internal builds native input is enabled, which disables the legacy omnibar field
-        // and routes a tap to the unified input screen. Drive that flow — open the input screen
-        // and type the URL into the native input field — instead of typing into the disabled omnibar.
-        // inputField lives in :duckchat-impl; resolve its id by name so we don't import an impl
-        // R class (forbidden by the NoImplImportsInAppModule lint rule).
-        val inputFieldId = inputFieldId()
-        onView(withId(R.id.omnibarTextInputClickCatcher)).perform(click())
-        onView(isRoot()).perform(waitFor(1000))
-        onView(isRoot()).perform(waitForView(withId(inputFieldId)))
-        onView(withId(inputFieldId)).perform(
-            clearText(),
-            typeText("https://privacy-test-pages.site/privacy-protections/gpc/"),
-            pressImeActionButton(),
-        )
         WebViewIdlingResource(webView!!).track()
 
         // asserts we have injected css by querying the duckduckgo object
@@ -128,12 +104,6 @@ class GpcTest {
     private fun IdlingResource.track() = apply {
         registeredResources += this
         IdlingRegistry.getInstance().register(this)
-    }
-
-    private fun inputFieldId(): Int {
-        val context = InstrumentationRegistry.getInstrumentation().targetContext
-        return context.resources.getIdentifier("inputField", "id", context.packageName)
-            .also { require(it != 0) { "inputField id not found in ${context.packageName}" } }
     }
 
     companion object {
