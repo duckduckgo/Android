@@ -1,0 +1,66 @@
+name: Hotfix - Finish (merge and tag)
+
+on:
+  workflow_call:
+    inputs:
+      app-version:
+        description: 'Hotfix version to release (e.g. 5.284.1)'
+        required: true
+        type: string
+  workflow_dispatch:
+    inputs:
+      app-version:
+        description: 'Hotfix version to release (e.g. 5.284.1)'
+        required: true
+        type: string
+
+env:
+  ASANA_PAT: ${{ secrets.ASANA_ACCESS_TOKEN }}
+  GH_TOKEN: ${{ secrets.GT_DAXMOBILE }}
+
+jobs:
+  hotfix-finish:
+    name: Finish hotfix (merge to main and develop, tag)
+    runs-on: ubuntu-latest
+    env:
+      GIT_MERGE_AUTOEDIT: no
+
+    steps:
+      # Submodules are intentionally not checked out: this job only does git plumbing
+      # (merge to main/develop, tag, push) and never reads submodule contents.
+      # Populating them would leave the tree dirty when the lane switches branches
+      # (which can record different submodule commits), breaking the merge/tag.
+      - name: Checkout hotfix branch
+        uses: actions/checkout@v4
+        with:
+          ref: hotfix/${{ inputs.app-version }}
+          token: ${{ secrets.GT_DAXMOBILE }}
+          fetch-depth: 0
+
+      - name: Set up git config
+        run: |
+          git remote set-url origin https://${{ secrets.GT_DAXMOBILE }}@github.com/duckduckgo/Android.git/
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+
+      - name: Set up git-flow
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y git-flow
+          git config gitflow.branch.master main
+          git config gitflow.branch.develop ${{ github.event.repository.default_branch }}
+          git config gitflow.prefix.feature feature/
+          git config gitflow.prefix.release release/
+          git config gitflow.prefix.hotfix hotfix/
+          git config gitflow.prefix.support support/
+          git config gitflow.prefix.versiontag ""
+
+      - name: Set up ruby env
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 2.7.2
+          bundler-cache: true
+
+      - name: Finish hotfix (merge to main and develop, tag, push)
+        run: |
+          bundle exec fastlane hotfix-finish
