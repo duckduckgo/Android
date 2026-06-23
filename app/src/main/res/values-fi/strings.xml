@@ -1039,6 +1039,15 @@
     <string name="onboardingDuckAiEndCtaDescription"><![CDATA[Hae sivustoja ja vieraile niillä osoiteriviltä tai aloita yksityinen tekoälykeskustelu siirtymällä Duck.ai:hin.<br/><br/>Voit käyttää Duck.ai:ta mistä tahansa, missä näet chat-kuvakkeen]]></string>
     <string name="onboardingDuckAiEndCtaButton">Ylävitonen!</string>
 
+    <!-- Input Mode Demo Onboarding step -->
+    <string name="preOnboardingInputModeDemoTitle">Oletko valmis aloittamaan?&lt;br/&gt;Kokeile hakua tai tekoälykeskustelua!</string>
+    <string name="preOnboardingInputModeDemoSearchHint">Yksityinen selaus</string>
+    <string name="preOnboardingInputModeDemoChatHint">Kysy mitä tahansa yksityisesti</string>
+    <string name="preOnboardingInputModeDemoChatSuggestion1">Selitä osakemarkkinat kuin olisin 10-vuotias</string>
+    <string name="preOnboardingInputModeDemoChatSuggestion2">Suunnittele täydellinen päivä Lontoossa</string>
+    <string name="preOnboardingInputModeDemoChatSuggestion3">Yllätä minut!</string>
+    <string name="preOnboardingInputModeDemoChatSuggestion3Prompt">Mitkä ovat kymmenen kiehtovaa faktaa tieteestä, luonnosta ja historiasta?</string>
+
     <!-- Custom AI onboarding flow -->
     <!-- Pre-onboarding: initial screens -->
     <string name="preOnboardingWelcomeDialogBodyCustomAi">Oletko valmis keskustelemaan yksityisesti ChatGPT:n, Clauden ja muiden tekoälyjen kanssa ilmaiseksi selaimessa, joka suojaa sinua aktiivisesti?</string>
@@ -1058,6 +1067,7 @@
     <string name="preOnboardingDaxDialog2TitleCustomAi">Asetetaanko DuckDuckGo oletusselaimeksi?</string>
     <!-- In-context onboarding. -->
     <string name="onboardingEndCustomAiFlowDaxDialogDescription"><![CDATA[Aloita yksityinen tekoälykeskustelu Duck.ai:n kanssa tai siirry suojatun selaamisen hakuun.<br/><br/>Voit käyttää Duck.ai:ta mistä tahansa, missä näet chat-kuvakkeen]]></string>
+    <string name="onboardingPrivacyProCustomAiFlowDaxDialogDescription">Tarjoamme myös maksullisen tilauksen, joka sisältää edistyneitä tekoälymalleja, joilla on korkeammat GPT:n ja Clauden keskustelurajoitukset, turvallinen VPN ja paljon muuta.</string>
 
     <string name="input_screen_user_pref_without_ai_updated">Vain haku</string>
     <string name="input_screen_user_pref_with_ai_updated">Vaihda haun ja\nDuck.ai:n välillä</string>
