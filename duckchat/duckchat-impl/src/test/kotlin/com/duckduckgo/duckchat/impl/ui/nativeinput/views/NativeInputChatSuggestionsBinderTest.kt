@@ -151,7 +151,7 @@ class NativeInputChatSuggestionsBinderTest {
         binder = binderWith(fakePlugin(first), fakePlugin(second))
         val binding = createBinding()
 
-        binding.loadPluginItems(mock(), scope, currentQuery = { "" })
+        binding.loadPluginItems(mock(), scope)
 
         val adapters = (binding.adapter as ConcatAdapter).adapters
         assertEquals(first.adapters.single(), adapters[0])
@@ -167,7 +167,7 @@ class NativeInputChatSuggestionsBinderTest {
         binder = binderWith(fakePlugin(fakeItem(a0, a1)))
         val binding = createBinding()
 
-        binding.loadPluginItems(mock(), scope, currentQuery = { "" })
+        binding.loadPluginItems(mock(), scope)
 
         val adapters = (binding.adapter as ConcatAdapter).adapters
         assertEquals(a0, adapters[0])
@@ -176,24 +176,10 @@ class NativeInputChatSuggestionsBinderTest {
     }
 
     @Test
-    fun whenQueryChangesThenForwardedToAllItems() = runTest {
-        val first = fakeItem(countingAdapter(1))
-        val second = fakeItem(countingAdapter(1))
-        binder = binderWith(fakePlugin(first), fakePlugin(second))
-        val binding = createBinding()
-        binding.loadPluginItems(mock(), scope, currentQuery = { "" })
-
-        submitQuery(binding, "hello")
-
-        assertEquals(listOf("hello"), first.observedQueries)
-        assertEquals(listOf("hello"), second.observedQueries)
-    }
-
-    @Test
     fun whenPluginItemHasRowsThenOverlayKeptOpenWithNoChatOrTyping() = runTest {
         binder = binderWith(fakePlugin(fakeItem(countingAdapter(1))))
         val binding = createBinding()
-        binding.loadPluginItems(mock(), scope, currentQuery = { "" })
+        binding.loadPluginItems(mock(), scope)
 
         var hasContent: Boolean? = null
         binding.submit(
@@ -213,7 +199,7 @@ class NativeInputChatSuggestionsBinderTest {
     fun whenPluginItemHasNoRowsAndNoChatOrTypingThenOverlayNotKeptOpen() = runTest {
         binder = binderWith(fakePlugin(fakeItem(countingAdapter(0))))
         val binding = createBinding()
-        binding.loadPluginItems(mock(), scope, currentQuery = { "" })
+        binding.loadPluginItems(mock(), scope)
 
         var hasContent: Boolean? = null
         binding.submit(
@@ -230,33 +216,50 @@ class NativeInputChatSuggestionsBinderTest {
     }
 
     @Test
-    fun whenSubmitRunsBeforePluginsLoadThenLatestQueryForwardedAfterLoad() = runTest {
-        val item = fakeItem(countingAdapter(1))
-        binder = binderWith(fakePlugin(item))
+    fun whenPluginWithContentLoadsAfterSubmitThenOverlayRecomputed() = runTest {
+        binder = binderWith(fakePlugin(fakeItem(countingAdapter(1))))
         val binding = createBinding()
 
-        // submit wins the race: runs before loadPluginItems, so pluginItems is still empty here.
-        submitQuery(binding, "hello")
-        // The input still reads "hello" when plugins finish, so the captured submit is replayed.
-        binding.loadPluginItems(mock(), scope, currentQuery = { "hello" })
+        val committed = mutableListOf<Boolean>()
+        // Empty query, no chat history: before plugins load hasContent is false (overlay would hide).
+        binding.submit(
+            suggestions = ChatTabSuggestions(
+                chatHistory = emptyList(),
+                urlSuggestions = AutoCompleteResult(query = "", suggestions = emptyList()),
+            ),
+            query = "",
+            isHistoryAvailable = true,
+            onCommit = { committed += it },
+        )
+        binding.loadPluginItems(mock(), scope)
 
-        assertEquals(listOf("hello"), item.observedQueries)
+        // Loading folds the plugin's rows into hasContent and re-fires onCommit (recompute, not replay).
+        assertEquals(listOf(false, true), committed)
     }
 
     @Test
-    fun whenCurrentQueryDiffersFromCapturedSubmitThenReplaySkippedAfterLoad() = runTest {
-        val item = fakeItem(countingAdapter(1))
-        binder = binderWith(fakePlugin(item))
+    fun whenPluginClearsItsRowsAfterSubmitThenOverlayRecomputedAndClosed() = runTest {
+        val adapter = MutableCountingAdapter(1)
+        binder = binderWith(fakePlugin(fakeItem(adapter)))
         val binding = createBinding()
+        binding.loadPluginItems(mock(), scope)
 
-        // Empty-query submit completes, then the user types "typed" (its fetch not submitted yet).
-        submitQuery(binding, "")
-        binding.loadPluginItems(mock(), scope, currentQuery = { "typed" })
+        val committed = mutableListOf<Boolean>()
+        // Empty query, no chat: the only content is the plugin row, so the overlay opens.
+        binding.submit(
+            suggestions = ChatTabSuggestions(
+                chatHistory = emptyList(),
+                urlSuggestions = AutoCompleteResult(query = "", suggestions = emptyList()),
+            ),
+            query = "",
+            isHistoryAvailable = true,
+            onCommit = { committed += it },
+        )
 
-        // The stale empty-query submit must NOT be replayed onto the typed state.
-        assertTrue(item.observedQueries.isEmpty())
-        // The adapter is still inserted; the in-flight "typed" fetch will submit the real state.
-        assertTrue((binding.adapter as ConcatAdapter).adapters.contains(item.adapters.single()))
+        // The card clears its own rows out of band (e.g. a dismiss).
+        adapter.setCount(0)
+
+        assertEquals("submit opens (true), the self-clear closes (false)", listOf(true, false), committed)
     }
 
     @Test
@@ -264,7 +267,7 @@ class NativeInputChatSuggestionsBinderTest {
         val adapter = MutableCountingAdapter(1)
         binder = binderWith(fakePlugin(fakeItem(adapter)))
         val binding = createBinding()
-        binding.loadPluginItems(mock(), scope, currentQuery = { "" })
+        binding.loadPluginItems(mock(), scope)
 
         val committed = mutableListOf<Boolean>()
         binding.submit(
@@ -282,90 +285,6 @@ class NativeInputChatSuggestionsBinderTest {
         adapter.setCount(0)
 
         assertEquals(listOf(true), committed)
-    }
-
-    @Test
-    fun whenPluginContentLoadsAfterSubmitThenOverlayReopenedViaReplay() = runTest {
-        binder = binderWith(fakePlugin(fakeItem(countingAdapter(1))))
-        val binding = createBinding()
-
-        val committed = mutableListOf<Boolean>()
-        // Empty query, no chat history: before plugins load hasContent is false (overlay would hide).
-        binding.submit(
-            suggestions = ChatTabSuggestions(
-                chatHistory = emptyList(),
-                urlSuggestions = AutoCompleteResult(query = "", suggestions = emptyList()),
-            ),
-            query = "",
-            isHistoryAvailable = true,
-            onCommit = { committed += it },
-        )
-        binding.loadPluginItems(mock(), scope, currentQuery = { "" })
-
-        assertEquals("first commit before load has no content, replay after load reopens", listOf(false, true), committed)
-    }
-
-    @Test
-    fun whenPluginClearsItsRowsAfterSubmitThenOverlayRecomputedAndClosed() = runTest {
-        val adapter = MutableCountingAdapter(1)
-        binder = binderWith(fakePlugin(fakeItem(adapter)))
-        val binding = createBinding()
-        binding.loadPluginItems(mock(), scope, currentQuery = { "" })
-
-        val committed = mutableListOf<Boolean>()
-        // Empty query, no chat: the only content is the plugin row, so the overlay opens.
-        binding.submit(
-            suggestions = ChatTabSuggestions(
-                chatHistory = emptyList(),
-                urlSuggestions = AutoCompleteResult(query = "", suggestions = emptyList()),
-            ),
-            query = "",
-            isHistoryAvailable = true,
-            onCommit = { committed += it },
-        )
-
-        // The card dismisses itself out of band (outside any submit).
-        adapter.setCount(0)
-
-        assertEquals("submit opens (true), the self-clear closes (false)", listOf(true, false), committed)
-    }
-
-    @Test
-    fun whenPluginRowsChangeDuringSubmitThenOverlayNotRecomputedTwice() = runTest {
-        // Item hides itself (0 rows) while typing — a row change driven from within submit.
-        val adapter = MutableCountingAdapter(1)
-        binder = binderWith(fakePlugin(QueryHidingItem(adapter)))
-        val binding = createBinding()
-        binding.loadPluginItems(mock(), scope, currentQuery = { "" })
-
-        val committed = mutableListOf<Boolean>()
-        binding.submit(
-            suggestions = ChatTabSuggestions(
-                chatHistory = emptyList(),
-                urlSuggestions = AutoCompleteResult(query = "x", suggestions = emptyList()),
-            ),
-            query = "x",
-            isHistoryAvailable = true,
-            onCommit = { committed += it },
-        )
-
-        // The onQueryChanged-driven row removal must not fire the observer; only submit's own commit fires.
-        assertEquals(listOf(true), committed)
-    }
-
-    private fun submitQuery(
-        binding: NativeInputChatSuggestionsBinder.Binding,
-        query: String,
-    ) {
-        binding.submit(
-            suggestions = ChatTabSuggestions(
-                chatHistory = emptyList(),
-                urlSuggestions = AutoCompleteResult(query = query, suggestions = emptyList()),
-            ),
-            query = query,
-            isHistoryAvailable = true,
-            onCommit = {},
-        )
     }
 
     private val scope = CoroutineScope(SupervisorJob())
@@ -417,32 +336,11 @@ class NativeInputChatSuggestionsBinderTest {
 
     private fun fakeItem(vararg adapters: RecyclerView.Adapter<*>): FakeChatItem = FakeChatItem(adapters.toList())
 
-    private fun countingAdapter(count: Int): RecyclerView.Adapter<*> =
-        object : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
-            override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder =
-                throw UnsupportedOperationException("not used in tests")
-
-            override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) = Unit
-
-            override fun getItemCount(): Int = count
-        }
+    private fun countingAdapter(count: Int): RecyclerView.Adapter<*> = MutableCountingAdapter(count)
 
     private class FakeChatItem(
         override val adapters: List<RecyclerView.Adapter<*>>,
-    ) : NativeInputChatTabItem {
-        val observedQueries = mutableListOf<String>()
-        override fun onQueryChanged(query: String) {
-            observedQueries += query
-        }
-    }
-
-    // Reports no rows while the query is non-empty, mutating its adapter from within onQueryChanged.
-    private class QueryHidingItem(private val countingAdapter: MutableCountingAdapter) : NativeInputChatTabItem {
-        override val adapters: List<RecyclerView.Adapter<*>> = listOf(countingAdapter)
-        override fun onQueryChanged(query: String) {
-            countingAdapter.setCount(if (query.isEmpty()) 1 else 0)
-        }
-    }
+    ) : NativeInputChatTabItem
 
     private class MutableCountingAdapter(initial: Int) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
         private var count = initial

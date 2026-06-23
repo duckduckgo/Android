@@ -172,6 +172,7 @@ open class InputModeWidget @JvmOverloads constructor(
             override fun onTabSelected(tab: TabLayout.Tab) {
                 val mode = if (tab.position == 0) InputMode.SEARCH else InputMode.DUCK_AI
                 duckChatInternal.setSelectedMode(mode)
+                duckChatInternal.setChatQuery(if (mode == InputMode.DUCK_AI) currentChatQuery() else "")
             }
             override fun onTabUnselected(tab: TabLayout.Tab?) {}
             override fun onTabReselected(tab: TabLayout.Tab?) {}
@@ -209,11 +210,13 @@ open class InputModeWidget @JvmOverloads constructor(
         inputModeSwitch.addOnTabSelectedListener(duckChatTabSelectedListener)
         val mode = if (inputModeSwitch.selectedTabPosition == 0) InputMode.SEARCH else InputMode.DUCK_AI
         duckChatInternal.setSelectedMode(mode)
+        duckChatInternal.setChatQuery(if (mode == InputMode.DUCK_AI) currentChatQuery() else "")
     }
 
     override fun onDetachedFromWindow() {
         inputModeSwitch.removeOnTabSelectedListener(duckChatTabSelectedListener)
         duckChatInternal.setSelectedMode(InputMode.SEARCH)
+        duckChatInternal.setChatQuery("")
         super.onDetachedFromWindow()
     }
 
@@ -335,7 +338,9 @@ open class InputModeWidget @JvmOverloads constructor(
                 when (inputModeSwitch.selectedTabPosition) {
                     0 -> onSearchTextChanged?.invoke(textToSubmit?.toString().orEmpty())
                     1 -> {
-                        onChatTextChanged?.invoke(textToSubmit?.toString().orEmpty())
+                        val chatQuery = textToSubmit?.toString().orEmpty()
+                        onChatTextChanged?.invoke(chatQuery)
+                        duckChatInternal.setChatQuery(chatQuery)
                         if (tabAttachmentsEnabled) {
                             onChatTagTextChanged?.invoke(
                                 inputField.text.toString(),
@@ -488,6 +493,8 @@ open class InputModeWidget @JvmOverloads constructor(
     }
 
     fun isChatTabSelected(): Boolean = inputModeSwitch.selectedTabPosition == 1
+
+    private fun currentChatQuery(): String = inputField.text.getTextToSubmit()?.toString().orEmpty()
 
     fun setScrollPosition(
         position: Int,

@@ -58,13 +58,14 @@ interface NativeInputChatTabItemPlugin : ActivePlugin {
 }
 
 /**
- * A single contribution to the Chat-tab list. Owns its adapter(s) and view holders; the host only
- * positions it and forwards the current query.
+ * A single contribution to the Chat-tab list. Purely a rendering surface: it owns its adapter(s) and
+ * view holders, and the host only positions them.
  *
- * The host always forwards the query via [onQueryChanged] — there is no host-side "hide while typing"
- * policy. An item that should disappear while the user types reports zero rows from its adapter(s) for
- * non-empty queries (see [SingleViewChatTabItem] for that behaviour out of the box). An item with no
- * rows contributes no content and does not keep the suggestions overlay open.
+ * Input state the item needs to decide its rows — the current query, the displayed mode — is read from
+ * the shared state in this module (e.g. [com.duckduckgo.duckchat.api.DuckChatInputModeState.chatQuery]
+ * and `displayedMode`), not pushed in here. An item observes that state (combining it with its own
+ * async data) and updates its adapter(s); an item with no rows contributes no content and does not keep
+ * the suggestions overlay open. For the common single-view card see [SingleViewChatTabItem].
  */
 interface NativeInputChatTabItem {
 
@@ -74,11 +75,4 @@ interface NativeInputChatTabItem {
      * The plugin fully owns each adapter's item count and view holders.
      */
     val adapters: List<RecyclerView.Adapter<*>>
-
-    /**
-     * Called with the current query whenever it changes (including the initial empty query). The item
-     * decides what to show — e.g. filter its rows, or report zero rows to hide while the user types.
-     * Default is a no-op.
-     */
-    fun onQueryChanged(query: String) {}
 }

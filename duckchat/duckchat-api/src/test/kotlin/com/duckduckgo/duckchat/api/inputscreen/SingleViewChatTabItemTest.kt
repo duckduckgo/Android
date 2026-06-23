@@ -19,6 +19,11 @@ package com.duckduckgo.duckchat.api.inputscreen
 import android.view.View
 import android.view.ViewGroup
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -26,45 +31,52 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class SingleViewChatTabItemTest {
 
-    private class TestItem : SingleViewChatTabItem() {
+    private class TestItem(visible: Flow<Boolean>, scope: CoroutineScope) : SingleViewChatTabItem(visible, scope) {
         override fun onCreateView(parent: ViewGroup): View = View(parent.context)
         fun dismiss() = hide()
     }
 
-    private val item = TestItem()
-
-    private fun rows(): Int = item.adapters.single().itemCount
+    private fun NativeInputChatTabItem.rows(): Int = adapters.single().itemCount
 
     @Test
-    fun whenQueryEmptyThenVisible() {
-        item.onQueryChanged("")
+    fun whenVisibleTrueThenRowShown() = runTest {
+        val item = TestItem(MutableStateFlow(true), CoroutineScope(UnconfinedTestDispatcher(testScheduler)))
 
-        assertEquals(1, rows())
+        assertEquals(1, item.rows())
     }
 
     @Test
-    fun whenQueryNonEmptyThenHidden() {
-        item.onQueryChanged("hello")
+    fun whenVisibleFalseThenNoRow() = runTest {
+        val item = TestItem(MutableStateFlow(false), CoroutineScope(UnconfinedTestDispatcher(testScheduler)))
 
-        assertEquals(0, rows())
+        assertEquals(0, item.rows())
     }
 
     @Test
-    fun whenQueryClearedThenVisibleAgain() {
-        item.onQueryChanged("hello")
-        item.onQueryChanged("")
+    fun whenVisibleTogglesThenRowToggles() = runTest {
+        val visible = MutableStateFlow(true)
+        val item = TestItem(visible, CoroutineScope(UnconfinedTestDispatcher(testScheduler)))
+        assertEquals(1, item.rows())
 
-        assertEquals(1, rows())
+        visible.value = false
+        assertEquals(0, item.rows())
+
+        visible.value = true
+        assertEquals(1, item.rows())
     }
 
     @Test
-    fun whenDismissedThenStaysHiddenEvenForEmptyQuery() {
+    fun whenDismissedThenStaysHiddenEvenWhenVisibleTrue() = runTest {
+        val visible = MutableStateFlow(true)
+        val item = TestItem(visible, CoroutineScope(UnconfinedTestDispatcher(testScheduler)))
+        assertEquals(1, item.rows())
+
         item.dismiss()
+        assertEquals(0, item.rows())
 
-        assertEquals(0, rows())
-
-        item.onQueryChanged("")
-
-        assertEquals(0, rows())
+        // A later visible=true must not bring it back.
+        visible.value = false
+        visible.value = true
+        assertEquals(0, item.rows())
     }
 }

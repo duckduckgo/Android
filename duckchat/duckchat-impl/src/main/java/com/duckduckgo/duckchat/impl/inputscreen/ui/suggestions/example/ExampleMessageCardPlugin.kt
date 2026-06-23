@@ -22,12 +22,14 @@ import android.view.ViewGroup
 import com.duckduckgo.anvil.annotations.ContributesActivePlugin
 import com.duckduckgo.common.ui.view.MessageCta
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.duckchat.api.DuckChatInputModeState
 import com.duckduckgo.duckchat.api.inputscreen.NativeInputChatTabItem
 import com.duckduckgo.duckchat.api.inputscreen.NativeInputChatTabItemPlugin
 import com.duckduckgo.duckchat.api.inputscreen.SingleViewChatTabItem
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 /**
@@ -36,9 +38,10 @@ import javax.inject.Inject
  *
  * - implement [NativeInputChatTabItemPlugin] in your own module, gated by [ContributesActivePlugin]
  *   (here `INTERNAL`, so it only appears in internal/dev builds),
- * - return a [SingleViewChatTabItem] for a single static view — the base gives you zero-state behaviour
- *   (hidden once the user types) and a sticky [SingleViewChatTabItem.hide] for dismissal, so there's no
- *   adapter to write,
+ * - return a [SingleViewChatTabItem] for a single static view — no adapter to write,
+ * - drive visibility from the shared input state: here `chatQuery.map { it.isEmpty() }` makes it a
+ *   zero-state card (hidden once the user types). A card that should stay while typing would simply
+ *   not include `chatQuery` in its `visible` flow.
  * - `priority` picks the slot from [NativeInputChatTabItemPlugin]'s constants.
  *
  * This is a showcase — delete it (and its strings) once real consumers exist.
@@ -51,18 +54,25 @@ import javax.inject.Inject
     featureName = "pluginExampleMessageCardPlugin",
     parentFeatureName = "pluginPointNativeInputChatTabItemPlugin",
 )
-class ExampleMessageCardPlugin @Inject constructor() : NativeInputChatTabItemPlugin {
+class ExampleMessageCardPlugin @Inject constructor(
+    private val inputModeState: DuckChatInputModeState,
+) : NativeInputChatTabItemPlugin {
 
     override fun create(context: Context, scope: CoroutineScope): NativeInputChatTabItem =
-        ExampleMessageCardItem()
+        ExampleMessageCardItem(inputModeState, scope)
 }
 
-private class ExampleMessageCardItem : SingleViewChatTabItem() {
+private class ExampleMessageCardItem(
+    inputModeState: DuckChatInputModeState,
+    scope: CoroutineScope,
+) : SingleViewChatTabItem(
+    visible = inputModeState.chatQuery.map { it.isEmpty() }, // zero-state: shown only on empty query
+    scope = scope,
+) {
 
     override fun onCreateView(parent: ViewGroup): View {
         val context = parent.context
         return MessageCta(context).apply {
-            // The card lives in a RecyclerView; let the item own its state rather than the view tree.
             disableStateSaving()
             setMessage(
                 MessageCta.Message(
