@@ -1079,6 +1079,15 @@
     <string name="onboardingDuckAiEndCtaDescription"><![CDATA[Ищите и открывайте сайты в адресной строке или переключитесь на приватный чат с ИИ.<br/><br/>Duck.ai можно использовать везде, где есть значок чата]]></string>
     <string name="onboardingDuckAiEndCtaButton">Дай пять!</string>
 
+    <!-- Input Mode Demo Onboarding step -->
+    <string name="preOnboardingInputModeDemoTitle">Ну что, приступим?&lt;br/&gt;Попробуйте поиск или чат с ИИ</string>
+    <string name="preOnboardingInputModeDemoSearchHint">Конфиденциальный поиск</string>
+    <string name="preOnboardingInputModeDemoChatHint">Задавайте любые вопросы, сохраняя конфиденциальность</string>
+    <string name="preOnboardingInputModeDemoChatSuggestion1">Объясни, как работает фондовый рынок, так, чтобы понял 10-летний ребенок</string>
+    <string name="preOnboardingInputModeDemoChatSuggestion2">Спланируйте идеальный день в Лондоне</string>
+    <string name="preOnboardingInputModeDemoChatSuggestion3">Удиви меня!</string>
+    <string name="preOnboardingInputModeDemoChatSuggestion3Prompt">Приведи 10 любопытных фактов о науке, природе и истории</string>
+
     <!-- Custom AI onboarding flow -->
     <!-- Pre-onboarding: initial screens -->
     <string name="preOnboardingWelcomeDialogBodyCustomAi">Бесплатно общайтесь с ChatGPT, Claude и другими ИИ-моделями в браузере с активной защитой.</string>
@@ -1098,6 +1107,7 @@
     <string name="preOnboardingDaxDialog2TitleCustomAi">Хотите сделать DuckDuckGo браузером по умолчанию?</string>
     <!-- In-context onboarding. -->
     <string name="onboardingEndCustomAiFlowDaxDialogDescription"><![CDATA[Начните приватный чат с ИИ через Duck.ai или переключитесь на поиск для защищенного просмотра веб-страниц.<br/><br/>Duck.ai можно использовать в любом месте, где вы видите значок чата]]></string>
+    <string name="onboardingPrivacyProCustomAiFlowDaxDialogDescription">Мы также предлагаем платную подписку, включающую расширенные ИИ-модели с более высокими лимитами чатов с GPT и Claude, безопасный VPN и многое другое.</string>
 
     <string name="input_screen_user_pref_without_ai_updated">Только поиск</string>
     <string name="input_screen_user_pref_with_ai_updated">Переключайтесь между\nПоиском и Duck.ai</string>
