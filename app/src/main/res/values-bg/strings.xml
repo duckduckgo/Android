@@ -1039,6 +1039,15 @@
     <string name="onboardingDuckAiEndCtaDescription"><![CDATA[Използвайте адресната лента, за да търсите и посещавате сайтове, или превключете към Duck.ai за поверителен чат с AI.<br/><br/>Можете да използвате Duck.ai от всяко място, където видите иконата за чат]]></string>
     <string name="onboardingDuckAiEndCtaButton">Поздравления!</string>
 
+    <!-- Input Mode Demo Onboarding step -->
+    <string name="preOnboardingInputModeDemoTitle">Готови ли сте да започнете?&lt;br/&gt;Опитайте търсене или чат с изкуствен интелект!</string>
+    <string name="preOnboardingInputModeDemoSearchHint">Поверително търсене</string>
+    <string name="preOnboardingInputModeDemoChatHint">Задайте въпрос поверително</string>
+    <string name="preOnboardingInputModeDemoChatSuggestion1">Обясни ми фондовия пазар, така сякаш съм на 10 години</string>
+    <string name="preOnboardingInputModeDemoChatSuggestion2">Планирай перфектен ден в Лондон</string>
+    <string name="preOnboardingInputModeDemoChatSuggestion3">Изненадай ме!</string>
+    <string name="preOnboardingInputModeDemoChatSuggestion3Prompt">Кажи ми 10 интересни факта от науката, природата и историята?</string>
+
     <!-- Custom AI onboarding flow -->
     <!-- Pre-onboarding: initial screens -->
     <string name="preOnboardingWelcomeDialogBodyCustomAi">Искате ли да разговаряте поверително и безплатно с ChatGPT, Claude и други AI в браузър, който осигурява активна защита?</string>
@@ -1058,6 +1067,7 @@
     <string name="preOnboardingDaxDialog2TitleCustomAi">Искате ли да направите DuckDuckGo браузър по подразбиране?</string>
     <!-- In-context onboarding. -->
     <string name="onboardingEndCustomAiFlowDaxDialogDescription"><![CDATA[Започнете поверителен чат с AI с Duck.ai или превключете към „Търсене“ за защитено сърфиране.<br/><br/>Можете да използвате Duck.ai от всяко място, където видите иконата за чат]]></string>
+    <string name="onboardingPrivacyProCustomAiFlowDaxDialogDescription">Предлагаме и платен абонамент с усъвършенствани AI модели с по-високи лимити за чат от GPT и Claude, защитена VPN и други.</string>
 
     <string name="input_screen_user_pref_without_ai_updated">Само търсене</string>
     <string name="input_screen_user_pref_with_ai_updated">Превключвайте между\nТърсене и Duck.ai</string>
