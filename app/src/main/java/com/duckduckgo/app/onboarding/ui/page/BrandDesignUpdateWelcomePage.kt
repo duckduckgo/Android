@@ -186,6 +186,8 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
     private val requestPermission = registerForActivityResult(ActivityResultContracts.RequestPermission()) { permissionGranted ->
         if (permissionGranted) {
             viewModel.notificationRuntimePermissionGranted()
+        } else {
+            viewModel.notificationRuntimePermissionDenied()
         }
         if (view?.windowVisibility == View.VISIBLE) {
             viewModel.loadDaxDialog()

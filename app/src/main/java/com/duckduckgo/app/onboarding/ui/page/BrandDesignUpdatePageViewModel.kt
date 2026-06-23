@@ -125,10 +125,14 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
     private val defaultBrowserDetector: DefaultBrowserDetector,
     private val widgetCapabilities: WidgetCapabilities,
     private val syncAutoRestore: SyncAutoRestore,
-    private val quickSetupPixelSender: QuickSetupPixelSender,
+    private val brandDesignOnboardingPixelSender: BrandDesignOnboardingPixelSender,
     private val orchestrator: LinearOnboardingOrchestrator,
     private val customAiOnboardingStore: CustomAiOnboardingStore,
 ) : ViewModel() {
+
+    private val isReinstallDeferred: Deferred<Boolean> by lazy {
+        viewModelScope.async(dispatchers.io()) { appBuildConfig.isAppReinstall() }
+    }
 
     // Lazy so it never starts in orchestrator mode (there the sync_restore precondition owns canRestore).
     private val canRestoreDeferred: Deferred<Boolean> by lazy {
@@ -262,20 +266,39 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
     }
 
     private fun fireDialogShownPixel(dialogType: PreOnboardingDialogType) {
+        val isReinstall = _viewState.value.isReinstallUser
         when (dialogType) {
             SYNC_RESTORE -> pixel.fire(PREONBOARDING_SYNC_RESTORE_SHOWN_UNIQUE, type = Unique())
-            INITIAL_REINSTALL_USER -> pixel.fire(PREONBOARDING_INTRO_REINSTALL_USER_SHOWN_UNIQUE, type = Unique())
-            INITIAL -> pixel.fire(PREONBOARDING_INTRO_SHOWN_UNIQUE, type = Unique())
-            COMPARISON_CHART -> pixel.fire(PREONBOARDING_COMPARISON_CHART_SHOWN_UNIQUE, type = Unique())
+            INITIAL_REINSTALL_USER -> {
+                pixel.fire(PREONBOARDING_INTRO_REINSTALL_USER_SHOWN_UNIQUE, type = Unique())
+                brandDesignOnboardingPixelSender.fireWelcomeShown(isReinstall)
+            }
+            INITIAL -> {
+                pixel.fire(PREONBOARDING_INTRO_SHOWN_UNIQUE, type = Unique())
+                brandDesignOnboardingPixelSender.fireWelcomeShown(isReinstall)
+            }
+            COMPARISON_CHART -> {
+                pixel.fire(PREONBOARDING_COMPARISON_CHART_SHOWN_UNIQUE, type = Unique())
+                brandDesignOnboardingPixelSender.fireSetDefaultShown(isReinstall)
+            }
             AI_COMPARISON_CHART -> pixel.fire(CustomAiOnboardingPixelName.AI_COMPARISON_SCREEN_SHOW, type = Unique())
-            SKIP_ONBOARDING_OPTION -> pixel.fire(PREONBOARDING_SKIP_ONBOARDING_SHOWN_UNIQUE, type = Unique())
-            ADDRESS_BAR_POSITION -> pixel.fire(PREONBOARDING_ADDRESS_BAR_POSITION_SHOWN_UNIQUE, type = Unique())
-            INPUT_SCREEN -> pixel.fire(PREONBOARDING_CHOOSE_SEARCH_EXPERIENCE_IMPRESSIONS_UNIQUE, type = Unique())
+            SKIP_ONBOARDING_OPTION -> {
+                pixel.fire(PREONBOARDING_SKIP_ONBOARDING_SHOWN_UNIQUE, type = Unique())
+                brandDesignOnboardingPixelSender.fireSkipOnboardingShown(isReinstall)
+            }
+            ADDRESS_BAR_POSITION -> {
+                pixel.fire(PREONBOARDING_ADDRESS_BAR_POSITION_SHOWN_UNIQUE, type = Unique())
+                brandDesignOnboardingPixelSender.fireAddressBarPositionShown(isReinstall)
+            }
+            INPUT_SCREEN -> {
+                pixel.fire(PREONBOARDING_CHOOSE_SEARCH_EXPERIENCE_IMPRESSIONS_UNIQUE, type = Unique())
+                brandDesignOnboardingPixelSender.fireSearchExperienceShown(isReinstall)
+            }
             INPUT_SCREEN_PREVIEW -> {
             }
 
             QUICK_SETUP -> {
-                quickSetupPixelSender.fireShown(isReinstallUser = _viewState.value.isReinstallUser)
+                brandDesignOnboardingPixelSender.fireQuickSetupShown(isReinstallUser = isReinstall)
             }
         }
     }
@@ -290,12 +313,44 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
 
     fun onPrimaryCtaClicked() {
         val currentDialog = _viewState.value.currentDialog ?: return
+        fireBrandDesignPrimaryClickedPixel(currentDialog)
         flow.onPrimaryCta(currentDialog)
     }
 
     fun onSecondaryCtaClicked() {
         val currentDialog = _viewState.value.currentDialog ?: return
+        fireBrandDesignSecondaryClickedPixel(currentDialog)
         flow.onSecondaryCta(currentDialog)
+    }
+
+    private fun fireBrandDesignPrimaryClickedPixel(dialog: PreOnboardingDialogType) {
+        val isReinstall = _viewState.value.isReinstallUser
+        when (dialog) {
+            INITIAL, INITIAL_REINSTALL_USER ->
+                brandDesignOnboardingPixelSender.fireWelcomeClicked(isReinstall, engaged = true)
+            COMPARISON_CHART ->
+                brandDesignOnboardingPixelSender.fireSetDefaultClicked(isReinstall)
+            ADDRESS_BAR_POSITION ->
+                brandDesignOnboardingPixelSender.fireAddressBarPositionClicked(isReinstall, _viewState.value.selectedAddressBarPosition)
+            INPUT_SCREEN ->
+                brandDesignOnboardingPixelSender.fireSearchExperienceClicked(isReinstall, _viewState.value.inputScreenSelected)
+            SKIP_ONBOARDING_OPTION ->
+                brandDesignOnboardingPixelSender.fireSkipOnboardingClicked(isReinstall, engaged = true)
+            SYNC_RESTORE, AI_COMPARISON_CHART, INPUT_SCREEN_PREVIEW, QUICK_SETUP -> Unit
+        }
+    }
+
+    private fun fireBrandDesignSecondaryClickedPixel(dialog: PreOnboardingDialogType) {
+        val isReinstall = _viewState.value.isReinstallUser
+        when (dialog) {
+            INITIAL_REINSTALL_USER ->
+                brandDesignOnboardingPixelSender.fireWelcomeClicked(isReinstall, engaged = false)
+            SKIP_ONBOARDING_OPTION ->
+                brandDesignOnboardingPixelSender.fireSkipOnboardingClicked(isReinstall, engaged = false)
+            SYNC_RESTORE, INITIAL, COMPARISON_CHART, AI_COMPARISON_CHART, ADDRESS_BAR_POSITION,
+            INPUT_SCREEN, INPUT_SCREEN_PREVIEW, QUICK_SETUP,
+            -> Unit
+        }
     }
 
     fun onInputModeDemoQuerySubmitted(
@@ -305,12 +360,18 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
 
     fun onDefaultBrowserSet() {
         recordDefaultBrowserDialogResult(isSet = true)
+        fireBrandDesignSetDefaultResult(isDdgDefault = true)
         flow.onDefaultBrowserResult(isDefaultBrowser = true)
     }
 
     fun onDefaultBrowserNotSet() {
         recordDefaultBrowserDialogResult(isSet = false)
+        fireBrandDesignSetDefaultResult(isDdgDefault = false)
         flow.onDefaultBrowserResult(isDefaultBrowser = false)
+    }
+
+    private fun fireBrandDesignSetDefaultResult(isDdgDefault: Boolean) {
+        brandDesignOnboardingPixelSender.fireSetDefaultConfirmed(_viewState.value.isReinstallUser, isDdgDefault = isDdgDefault)
     }
 
     fun onQuickSetupDefaultBrowserSet() {
@@ -420,6 +481,11 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
 
     fun notificationRuntimePermissionRequested() {
         pixel.fire(NOTIFICATION_RUNTIME_PERMISSION_SHOWN)
+        // The notification prompt is shown before loadDaxDialog resolves reinstall status into
+        // viewState, so resolve it directly via the shared deferred to report the correct install type.
+        viewModelScope.launch {
+            brandDesignOnboardingPixelSender.fireNotificationsShown(isReinstallUser = isReinstallDeferred.await())
+        }
     }
 
     fun notificationRuntimePermissionGranted() {
@@ -427,12 +493,16 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
             AppPixelName.NOTIFICATIONS_ENABLED,
             mapOf(PixelParameter.FROM_ONBOARDING to true.toString()),
         )
+        viewModelScope.launch {
+            brandDesignOnboardingPixelSender.fireNotificationsConfirmed(isReinstallUser = isReinstallDeferred.await(), granted = true)
+        }
     }
 
-    private suspend fun isAppReinstall(): Boolean =
-        withContext(dispatchers.io()) {
-            appBuildConfig.isAppReinstall()
+    fun notificationRuntimePermissionDenied() {
+        viewModelScope.launch {
+            brandDesignOnboardingPixelSender.fireNotificationsConfirmed(isReinstallUser = isReinstallDeferred.await(), granted = false)
         }
+    }
 
     private suspend fun showQuickSetupDialog() {
         val splitEnabled = isSplitOmnibarEnabled()
@@ -536,8 +606,7 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
                     canRestoreDeferred.await()
                 } ?: false
 
-                // Always call isAppReinstall() — it has side effects (creates DDG downloads directory, persists reinstall state)
-                val isReinstall = isAppReinstall()
+                val isReinstall = isReinstallDeferred.await()
 
                 val dialogType = when {
                     canRestore -> {
@@ -636,7 +705,7 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
                         applyAddressBarPositionSelection(fireTelemetry = false)
                         applyInputScreenSelection(fireTelemetry = false)
                         val state = _viewState.value
-                        quickSetupPixelSender.fireClicked(
+                        brandDesignOnboardingPixelSender.fireQuickSetupClicked(
                             isReinstallUser = state.isReinstallUser,
                             addressBarPosition = state.selectedAddressBarPosition,
                             inputScreenSelected = state.inputScreenSelected,

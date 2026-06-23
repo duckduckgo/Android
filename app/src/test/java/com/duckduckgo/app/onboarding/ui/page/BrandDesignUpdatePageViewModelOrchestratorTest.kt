@@ -121,7 +121,7 @@ class BrandDesignUpdatePageViewModelOrchestratorTest {
             defaultBrowserDetector = mock(),
             widgetCapabilities = mock(),
             syncAutoRestore = mock(),
-            quickSetupPixelSender = mock(),
+            brandDesignOnboardingPixelSender = mock(),
             orchestrator = orchestrator,
             customAiOnboardingStore = customAiOnboardingStore,
         )

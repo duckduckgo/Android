@@ -26,7 +26,7 @@ import com.duckduckgo.app.onboarding.CustomAiOnboardingStore
 import com.duckduckgo.app.onboarding.DuckAiOnboardingAvailability
 import com.duckduckgo.app.onboarding.DuckAiOnboardingDemo
 import com.duckduckgo.app.onboarding.store.OnboardingStore
-import com.duckduckgo.app.onboarding.ui.page.QuickSetupPixelSender
+import com.duckduckgo.app.onboarding.ui.page.BrandDesignOnboardingPixelSender
 import com.duckduckgo.app.onboardingquicksetup.OnboardingQuickSetupExperimentManager
 import com.duckduckgo.app.onboardingquicksetup.OnboardingQuickSetupExperimentManager.QuickSetupExperimentVariant
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_AICHAT_SELECTED
@@ -79,7 +79,7 @@ class NewUserOnboardingPlanProviderTest {
     private val androidBrowserConfigFeature: AndroidBrowserConfigFeature = mock()
     private val duckAiAvailability: DuckAiOnboardingAvailability = mock()
     private val quickSetupExperiment: OnboardingQuickSetupExperimentManager = mock()
-    private val quickSetupPixelSender: QuickSetupPixelSender = mock()
+    private val brandDesignOnboardingPixelSender: BrandDesignOnboardingPixelSender = mock()
     private val inputScreenOnboardingWideEvent: InputScreenOnboardingWideEvent = mock()
     private val defaultBrowserDetector: DefaultBrowserDetector = mock()
     private val widgetCapabilities: WidgetCapabilities = mock()
@@ -123,7 +123,7 @@ class NewUserOnboardingPlanProviderTest {
             androidBrowserConfigFeature = androidBrowserConfigFeature,
             duckAiOnboardingAvailability = duckAiAvailability,
             onboardingQuickSetupExperimentManager = quickSetupExperiment,
-            quickSetupPixelSender = quickSetupPixelSender,
+            brandDesignOnboardingPixelSender = brandDesignOnboardingPixelSender,
             inputScreenOnboardingWideEvent = inputScreenOnboardingWideEvent,
             defaultBrowserDetector = defaultBrowserDetector,
             widgetCapabilities = widgetCapabilities,
@@ -214,7 +214,7 @@ class NewUserOnboardingPlanProviderTest {
         verify(pixel).fire(PREONBOARDING_SKIP_ONBOARDING_PRESSED)
         assertStep(NewUserOnboardingStepIds.QUICK_SETUP)
         orchestrator.onEvent(NewUserOnboardingEvent.QuickSetupConfirmed(OmnibarType.SINGLE_TOP, withAi = true))
-        verify(quickSetupPixelSender).fireClicked(
+        verify(brandDesignOnboardingPixelSender).fireQuickSetupClicked(
             isReinstallUser = true,
             addressBarPosition = OmnibarType.SINGLE_TOP,
             inputScreenSelected = true,
