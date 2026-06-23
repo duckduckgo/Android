@@ -1039,6 +1039,15 @@
     <string name="onboardingDuckAiEndCtaDescription"><![CDATA[Verwende die Adressleiste, um zu suchen und Websites zu besuchen oder für private KI-Chats zu Duck.ai zu wechseln.<br/><br/>Du kannst Duck.ai von überall dort nutzen, wo du das Chat-Symbol siehst]]></string>
     <string name="onboardingDuckAiEndCtaButton">Schlag ein!</string>
 
+    <!-- Input Mode Demo Onboarding step -->
+    <string name="preOnboardingInputModeDemoTitle">Bereit anzufangen?&lt;br/&gt;Probier die Suchfunktion oder den KI-Chat!</string>
+    <string name="preOnboardingInputModeDemoSearchHint">Privat suchen</string>
+    <string name="preOnboardingInputModeDemoChatHint">Alles privat fragen</string>
+    <string name="preOnboardingInputModeDemoChatSuggestion1">Erkläre den Aktienmarkt, als wäre ich 10</string>
+    <string name="preOnboardingInputModeDemoChatSuggestion2">Plane einen perfekten Tag in London</string>
+    <string name="preOnboardingInputModeDemoChatSuggestion3">Überrasche mich!</string>
+    <string name="preOnboardingInputModeDemoChatSuggestion3Prompt">Was sind 10 faszinierende Fakten aus Wissenschaft, Natur und Geschichte?</string>
+
     <!-- Custom AI onboarding flow -->
     <!-- Pre-onboarding: initial screens -->
     <string name="preOnboardingWelcomeDialogBodyCustomAi">Bereit, privat und kostenlos mit ChatGPT, Claude und anderen KIs zu chatten, in einem Browser, der dich aktiv schützt?</string>
@@ -1058,6 +1067,7 @@
     <string name="preOnboardingDaxDialog2TitleCustomAi">Möchtest du DuckDuckGo zu deinem Standardbrowser machen?</string>
     <!-- In-context onboarding. -->
     <string name="onboardingEndCustomAiFlowDaxDialogDescription"><![CDATA[Starte einen privaten KI-Chat mit Duck.ai oder wechsle zur Suche, um sicher zu browsen.<br/><br/>Du kannst Duck.ai von überall dort nutzen, wo du das Chat-Symbol siehst]]></string>
+    <string name="onboardingPrivacyProCustomAiFlowDaxDialogDescription">Wir bieten auch ein kostenpflichtiges Abonnement für fortschrittliche KI-Modelle mit höheren Chat-Limits von GPT und Claude, einem sicheren VPN und mehr.</string>
 
     <string name="input_screen_user_pref_without_ai_updated">Nur Suchen</string>
     <string name="input_screen_user_pref_with_ai_updated">Wechseln zwischen\nSuche und Duck.ai</string>
