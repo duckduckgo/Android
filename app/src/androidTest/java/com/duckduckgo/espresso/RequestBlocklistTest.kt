@@ -58,7 +58,7 @@ class RequestBlocklistTest {
         registeredResources.forEach { IdlingRegistry.getInstance().unregister(it) }
     }
 
-    @Test @PrivacyTest
+    @Test @InternalPrivacyTest
     fun whenRequestBlocklistIsEnabledRequestsAreHandledCorrectly() {
         preparationsForPrivacyTest()
 
