@@ -1039,6 +1039,15 @@
     <string name="onboardingDuckAiEndCtaDescription"><![CDATA[Använd adressfältet för att söka efter och besöka webbplatser eller byt till Duck.ai för privat AI-chatt.<br/><br/>Du kan använda Duck.ai överallt där du ser chattikonen]]></string>
     <string name="onboardingDuckAiEndCtaButton">High Five!</string>
 
+    <!-- Input Mode Demo Onboarding step -->
+    <string name="preOnboardingInputModeDemoTitle">Är du redo att komma igång?&lt;br/&gt;Testa en sökning eller AI-chatt!</string>
+    <string name="preOnboardingInputModeDemoSearchHint">Sök privat</string>
+    <string name="preOnboardingInputModeDemoChatHint">Fråga vad som helst privat</string>
+    <string name="preOnboardingInputModeDemoChatSuggestion1">Förklara aktiemarknaden som om jag vore 10 år</string>
+    <string name="preOnboardingInputModeDemoChatSuggestion2">Planera en perfekt dag i London</string>
+    <string name="preOnboardingInputModeDemoChatSuggestion3">Överraska mig!</string>
+    <string name="preOnboardingInputModeDemoChatSuggestion3Prompt">Vad är 10 fascinerande fakta inom vetenskap, natur och historia?</string>
+
     <!-- Custom AI onboarding flow -->
     <!-- Pre-onboarding: initial screens -->
     <string name="preOnboardingWelcomeDialogBodyCustomAi">Är du redo att chatta privat med ChatGPT, Claude och andra AI-modeller gratis, i en webbläsare som aktivt skyddar dig?</string>
@@ -1058,6 +1067,7 @@
     <string name="preOnboardingDaxDialog2TitleCustomAi">Vill du göra DuckDuckGo till din standardwebbläsare?</string>
     <!-- In-context onboarding. -->
     <string name="onboardingEndCustomAiFlowDaxDialogDescription"><![CDATA[Starta en privat AI-chatt med Duck.ai eller byt till Sök för skyddad surfning.<br/><br/>Du kan använda Duck.ai överallt där du ser chattikonen]]></string>
+    <string name="onboardingPrivacyProCustomAiFlowDaxDialogDescription">Vi erbjuder även en betald prenumeration med avancerade AI-modeller med högre chattgränser från GPT och Claude, ett säkert VPN och mer.</string>
 
     <string name="input_screen_user_pref_without_ai_updated">Endast sökning</string>
     <string name="input_screen_user_pref_with_ai_updated">Växla mellan\nsökning och Duck.ai</string>
