@@ -24,6 +24,8 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteResult
 import com.duckduckgo.browser.ui.autocomplete.BrowserAutoCompleteSuggestionsAdapter
 import com.duckduckgo.common.utils.plugins.ActivePluginPoint
+import com.duckduckgo.duckchat.api.DuckChatInputModeState
+import com.duckduckgo.duckchat.api.InputMode
 import com.duckduckgo.duckchat.api.inputscreen.NativeInputChatTabItem
 import com.duckduckgo.duckchat.api.inputscreen.NativeInputChatTabItemPlugin
 import com.duckduckgo.duckchat.impl.inputscreen.ui.InputScreenConfigResolver
@@ -35,6 +37,8 @@ import com.duckduckgo.duckchat.impl.models.ChatType
 import com.duckduckgo.duckchat.impl.ui.ChatTabSuggestions
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -263,6 +267,34 @@ class NativeInputChatSuggestionsBinderTest {
     }
 
     @Test
+    fun whenZeroStatePluginHidesBecauseUserTypedThenOverlayNotClosed() = runTest {
+        val adapter = MutableCountingAdapter(1)
+        binder = binderWith(fakePlugin(fakeItem(adapter)))
+        val binding = createBinding()
+        binding.loadPluginItems(mock(), scope)
+
+        val committed = mutableListOf<Boolean>()
+        // Empty query, no chat: only the plugin row is content, so the overlay opens.
+        binding.submit(
+            suggestions = ChatTabSuggestions(
+                chatHistory = emptyList(),
+                urlSuggestions = AutoCompleteResult(query = "", suggestions = emptyList()),
+            ),
+            query = "",
+            isHistoryAvailable = true,
+            onCommit = { committed += it },
+        )
+
+        // The user types: the live query updates before the typed query's fetch submits, and the
+        // zero-state card drops its rows in response.
+        chatQueryFlow.value = "a"
+        adapter.setCount(0)
+
+        // The recompute must read the live query (typing) and keep the overlay open, not close it.
+        assertEquals(listOf(true, true), committed)
+    }
+
+    @Test
     fun whenPluginNotifiesAfterClearThenOverlayNotRecomputed() = runTest {
         val adapter = MutableCountingAdapter(1)
         binder = binderWith(fakePlugin(fakeItem(adapter)))
@@ -289,12 +321,19 @@ class NativeInputChatSuggestionsBinderTest {
 
     private val scope = CoroutineScope(SupervisorJob())
 
+    private val chatQueryFlow = MutableStateFlow("")
+    private val inputModeState = object : DuckChatInputModeState {
+        override val displayedMode: StateFlow<InputMode> = MutableStateFlow(InputMode.SEARCH)
+        override val chatQuery: StateFlow<String> = chatQueryFlow
+    }
+
     private fun binderWith(vararg plugins: NativeInputChatTabItemPlugin): NativeInputChatSuggestionsBinder =
         NativeInputChatSuggestionsBinder(
             inputScreenConfigResolver,
             object : ActivePluginPoint<NativeInputChatTabItemPlugin> {
                 override suspend fun getPlugins(): Collection<NativeInputChatTabItemPlugin> = plugins.toList()
             },
+            inputModeState,
         )
 
     private fun createBinding(): NativeInputChatSuggestionsBinder.Binding =

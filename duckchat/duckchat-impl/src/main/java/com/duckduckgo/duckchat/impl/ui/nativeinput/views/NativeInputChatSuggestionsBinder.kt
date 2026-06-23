@@ -23,6 +23,7 @@ import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion
 import com.duckduckgo.browser.ui.autocomplete.BrowserAutoCompleteSuggestionsAdapter
 import com.duckduckgo.common.utils.plugins.ActivePluginPoint
+import com.duckduckgo.duckchat.api.DuckChatInputModeState
 import com.duckduckgo.duckchat.api.inputscreen.NativeInputChatTabItem
 import com.duckduckgo.duckchat.api.inputscreen.NativeInputChatTabItemPlugin
 import com.duckduckgo.duckchat.impl.inputscreen.ui.InputScreenConfigResolver
@@ -45,11 +46,13 @@ import javax.inject.Inject
 class NativeInputChatSuggestionsBinder @Inject constructor(
     private val inputScreenConfigResolver: InputScreenConfigResolver,
     private val chatItemPlugins: ActivePluginPoint<NativeInputChatTabItemPlugin>,
+    private val inputModeState: DuckChatInputModeState,
 ) {
 
     class Binding internal constructor(
         private val concatAdapter: ConcatAdapter,
         private val chatItemPlugins: ActivePluginPoint<NativeInputChatTabItemPlugin>,
+        private val inputModeState: DuckChatInputModeState,
         private val chatSuggestionsAdapter: ChatSuggestionsAdapter,
         private val urlAdapter: BrowserAutoCompleteSuggestionsAdapter,
         private val urlDivider: SectionDividerAdapter,
@@ -126,9 +129,11 @@ class NativeInputChatSuggestionsBinder @Inject constructor(
             val showShortcut = isHistoryAvailable && suggestions.chatHistory.size > ChatHistoryShortcutAdapter.VIEW_ALL_CHATS_THRESHOLD
 
             // hasContent counts the live plugin rows (a plugin item with any rows keeps the overlay open
-            // even with no chat/typing). Capture the recompute so an out-of-band plugin row change can
-            // re-fire onCommit with the same chat/typing state (see [onPluginContentChanged]).
-            val commit = { onCommit(hasChat || isTyping || pluginHasContent()) }
+            // even with no chat/typing). The recompute reads the LIVE query, not this submit's captured
+            // one: a zero-state item hides as soon as the user types (chatQuery updates before the typed
+            // query's fetch submits), and recomputing with a stale isTyping=false would wrongly close the
+            // overlay for a frame. The live chatQuery still distinguishes a genuine empty-state dismiss.
+            val commit = { onCommit(hasChat || inputModeState.chatQuery.value.isNotEmpty() || pluginHasContent()) }
             recomputeOverlay = commit
 
             chatSuggestionsAdapter.submitList(suggestions.chatHistory) { commit() }
@@ -197,6 +202,7 @@ class NativeInputChatSuggestionsBinder @Inject constructor(
         return Binding(
             concatAdapter = concat,
             chatItemPlugins = chatItemPlugins,
+            inputModeState = inputModeState,
             chatSuggestionsAdapter = chatSuggestionsAdapter,
             urlAdapter = urlAdapter,
             urlDivider = urlDivider,
