@@ -66,6 +66,26 @@ class NativeInputChatSuggestionsBinder @Inject constructor(
         // to the current query/visibility/hasContent instead of racing (and losing to) the first submit.
         private var replayLastSubmit: (() -> Unit)? = null
 
+        // True only while applySubmit runs, so [pluginContentObserver] ignores the row changes the host
+        // itself drives (those are already reflected in that submit's commit) and reacts only to a plugin
+        // changing its own rows out of band — e.g. a card that dismisses itself between submits.
+        private var applyingSubmit = false
+
+        // Recomputes hasContent from the latest submit's chat/typing state plus the live plugin rows and
+        // re-fires onCommit. Set by applySubmit; invoked by [pluginContentObserver].
+        private var recomputeOverlay: (() -> Unit)? = null
+
+        private val pluginContentObserver = object : RecyclerView.AdapterDataObserver() {
+            override fun onChanged() = onPluginContentChanged()
+            override fun onItemRangeInserted(positionStart: Int, itemCount: Int) = onPluginContentChanged()
+            override fun onItemRangeRemoved(positionStart: Int, itemCount: Int) = onPluginContentChanged()
+        }
+
+        private fun onPluginContentChanged() {
+            if (applyingSubmit) return
+            recomputeOverlay?.invoke()
+        }
+
         /**
          * Fetches the enabled [NativeInputChatTabItemPlugin]s and inserts each item's adapter(s) at the
          * top of the ConcatAdapter, preserving the plugin point's (priority) order and, within an item,
@@ -85,6 +105,8 @@ class NativeInputChatSuggestionsBinder @Inject constructor(
                 // their adapters keep their own order, all above the built-in sections.
                 item.adapters.forEach { adapter ->
                     concatAdapter.addAdapter(insertIndex++, adapter)
+                    // Observe so a plugin clearing its own rows (e.g. a dismiss) recomputes the overlay.
+                    adapter.registerAdapterDataObserver(pluginContentObserver)
                 }
                 pluginItems += item
             }
@@ -113,33 +135,41 @@ class NativeInputChatSuggestionsBinder @Inject constructor(
             isHistoryAvailable: Boolean,
             onCommit: (hasContent: Boolean) -> Unit,
         ) {
-            val isTyping = query.isNotEmpty()
-            val hasChat = suggestions.chatHistory.isNotEmpty()
-            val hasUrl = suggestions.urlSuggestions.suggestions.isNotEmpty()
-            val showUrl = isTyping && hasUrl
-            val showShortcut = isHistoryAvailable && suggestions.chatHistory.size > ChatHistoryShortcutAdapter.VIEW_ALL_CHATS_THRESHOLD
+            applyingSubmit = true
+            try {
+                val isTyping = query.isNotEmpty()
+                val hasChat = suggestions.chatHistory.isNotEmpty()
+                val hasUrl = suggestions.urlSuggestions.suggestions.isNotEmpty()
+                val showUrl = isTyping && hasUrl
+                val showShortcut = isHistoryAvailable && suggestions.chatHistory.size > ChatHistoryShortcutAdapter.VIEW_ALL_CHATS_THRESHOLD
 
-            // Always forward the query; each item decides what to show (e.g. a zero-state card reports
-            // no rows once the user types). The host imposes no visibility policy of its own.
-            pluginItems.forEach { it.onQueryChanged(query) }
-            // A plugin item with any rows keeps the suggestions overlay open even with no chat/typing.
-            val hasPluginContent = pluginItems.any { item -> item.adapters.any { it.itemCount > 0 } }
-            val hasContent = hasChat || isTyping || hasPluginContent
+                // Always forward the query; each item decides what to show (e.g. a zero-state card reports
+                // no rows once the user types). The host imposes no visibility policy of its own.
+                pluginItems.forEach { it.onQueryChanged(query) }
 
-            chatSuggestionsAdapter.submitList(suggestions.chatHistory) {
-                onCommit(hasContent)
+                // hasContent counts the live plugin rows (a plugin item with any rows keeps the overlay
+                // open even with no chat/typing). Capture the recompute so an out-of-band plugin change
+                // can re-fire onCommit with the same chat/typing state (see [onPluginContentChanged]).
+                val commit = { onCommit(hasChat || isTyping || pluginHasContent()) }
+                recomputeOverlay = commit
+
+                chatSuggestionsAdapter.submitList(suggestions.chatHistory) { commit() }
+                if (showUrl) {
+                    urlAdapter.updateData(suggestions.urlSuggestions.query, suggestions.urlSuggestions.suggestions)
+                } else {
+                    urlAdapter.updateData("", emptyList())
+                }
+                searchForAdapter.update(query, visible = isTyping)
+                urlDivider.setVisible(hasChat && showUrl)
+                searchDivider.setVisible((hasChat || showUrl) && isTyping)
+                historyShortcutAdapter.setVisible(showShortcut)
+                historyShortcutDivider.setVisible(showShortcut)
+            } finally {
+                applyingSubmit = false
             }
-            if (showUrl) {
-                urlAdapter.updateData(suggestions.urlSuggestions.query, suggestions.urlSuggestions.suggestions)
-            } else {
-                urlAdapter.updateData("", emptyList())
-            }
-            searchForAdapter.update(query, visible = isTyping)
-            urlDivider.setVisible(hasChat && showUrl)
-            searchDivider.setVisible((hasChat || showUrl) && isTyping)
-            historyShortcutAdapter.setVisible(showShortcut)
-            historyShortcutDivider.setVisible(showShortcut)
         }
+
+        private fun pluginHasContent(): Boolean = pluginItems.any { item -> item.adapters.any { it.itemCount > 0 } }
 
         fun clear() {
             chatSuggestionsAdapter.submitList(emptyList())

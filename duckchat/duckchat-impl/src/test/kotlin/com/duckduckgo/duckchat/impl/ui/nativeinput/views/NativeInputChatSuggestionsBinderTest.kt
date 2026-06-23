@@ -263,6 +263,54 @@ class NativeInputChatSuggestionsBinderTest {
         assertEquals("first commit before load has no content, replay after load reopens", listOf(false, true), committed)
     }
 
+    @Test
+    fun whenPluginClearsItsRowsAfterSubmitThenOverlayRecomputedAndClosed() = runTest {
+        val adapter = MutableCountingAdapter(1)
+        binder = binderWith(fakePlugin(fakeItem(adapter)))
+        val binding = createBinding()
+        binding.loadPluginItems(mock(), scope)
+
+        val committed = mutableListOf<Boolean>()
+        // Empty query, no chat: the only content is the plugin row, so the overlay opens.
+        binding.submit(
+            suggestions = ChatTabSuggestions(
+                chatHistory = emptyList(),
+                urlSuggestions = AutoCompleteResult(query = "", suggestions = emptyList()),
+            ),
+            query = "",
+            isHistoryAvailable = true,
+            onCommit = { committed += it },
+        )
+
+        // The card dismisses itself out of band (outside any submit).
+        adapter.setCount(0)
+
+        assertEquals("submit opens (true), the self-clear closes (false)", listOf(true, false), committed)
+    }
+
+    @Test
+    fun whenPluginRowsChangeDuringSubmitThenOverlayNotRecomputedTwice() = runTest {
+        // Item hides itself (0 rows) while typing — a row change driven from within submit.
+        val adapter = MutableCountingAdapter(1)
+        binder = binderWith(fakePlugin(QueryHidingItem(adapter)))
+        val binding = createBinding()
+        binding.loadPluginItems(mock(), scope)
+
+        val committed = mutableListOf<Boolean>()
+        binding.submit(
+            suggestions = ChatTabSuggestions(
+                chatHistory = emptyList(),
+                urlSuggestions = AutoCompleteResult(query = "x", suggestions = emptyList()),
+            ),
+            query = "x",
+            isHistoryAvailable = true,
+            onCommit = { committed += it },
+        )
+
+        // The onQueryChanged-driven row removal must not fire the observer; only submit's own commit fires.
+        assertEquals(listOf(true), committed)
+    }
+
     private fun submitQuery(
         binding: NativeInputChatSuggestionsBinder.Binding,
         query: String,
@@ -344,5 +392,31 @@ class NativeInputChatSuggestionsBinderTest {
         override fun onQueryChanged(query: String) {
             observedQueries += query
         }
+    }
+
+    // Reports no rows while the query is non-empty, mutating its adapter from within onQueryChanged.
+    private class QueryHidingItem(private val countingAdapter: MutableCountingAdapter) : NativeInputChatTabItem {
+        override val adapters: List<RecyclerView.Adapter<*>> = listOf(countingAdapter)
+        override fun onQueryChanged(query: String) {
+            countingAdapter.setCount(if (query.isEmpty()) 1 else 0)
+        }
+    }
+
+    private class MutableCountingAdapter(initial: Int) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+        private var count = initial
+
+        fun setCount(value: Int) {
+            val previous = count
+            if (value == previous) return
+            count = value
+            if (value > previous) notifyItemRangeInserted(previous, value - previous) else notifyItemRangeRemoved(value, previous - value)
+        }
+
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder =
+            throw UnsupportedOperationException("not used in tests")
+
+        override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) = Unit
+
+        override fun getItemCount(): Int = count
     }
 }
