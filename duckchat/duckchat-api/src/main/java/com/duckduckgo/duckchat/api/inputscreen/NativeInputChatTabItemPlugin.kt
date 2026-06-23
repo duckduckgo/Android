@@ -23,14 +23,16 @@ import kotlinx.coroutines.CoroutineScope
 
 /**
  * Lets a module contribute its own item(s) to the native-input Chat-tab suggestions list without
- * depending on `duckchat-impl`. The host slots each contribution's [RecyclerView.Adapter] into the
+ * depending on `duckchat-impl`. The host slots each contribution's [RecyclerView.Adapter]s into the
  * Chat-tab's `ConcatAdapter`.
  *
  * The plugin is a singleton in the DI graph (it is multibound); it acts as a factory because the
- * contributed adapter is stateful and bound to a single Chat-tab presentation. Implement with
+ * contributed adapters are stateful and bound to a single Chat-tab presentation. Implement with
  * `@ContributesActivePlugin`, set `parentFeatureName = "pluginPointNativeInputChatTabItemPlugin"`, and
- * use `priority` to order against other contributions (lower priority comes first / higher in the
- * list).
+ * set `priority` to one of the [companion] constants to order against other contributions.
+ *
+ * For the common case of a single static view (e.g. a card), extend [SingleViewChatTabItem] instead
+ * of implementing [NativeInputChatTabItem] directly.
  */
 interface NativeInputChatTabItemPlugin : ActivePlugin {
 
@@ -39,39 +41,44 @@ interface NativeInputChatTabItemPlugin : ActivePlugin {
      *
      * @param context a view context suitable for inflating the item's views.
      * @param scope cancelled by the host when the Chat tab is torn down. Use it to collect data into
-     * the returned adapter; do not retain it beyond the returned [NativeInputChatTabItem].
+     * the returned adapters; do not retain it beyond the returned [NativeInputChatTabItem].
      */
     fun create(context: Context, scope: CoroutineScope): NativeInputChatTabItem
+
+    companion object {
+        // Order of contributions, top to bottom. Lower value comes first (higher in the list); gaps
+        // leave room to insert new contributions; equal values are allowed and tie-break by class name.
+        // Mirrors NewTabPageSectionPlugin. The built-in sections will claim their own constants here as
+        // they migrate onto this plugin point; until then they render below all contributions.
+        const val PRIORITY_PROMO = 100
+        const val PRIORITY_CHAT_HISTORY = 200
+        const val PRIORITY_URL_SUGGESTIONS = 300
+        const val PRIORITY_SEARCH_FOR = 400
+    }
 }
 
 /**
- * A single contribution to the Chat-tab list. Owns its adapter and its view holders; the host only
- * positions it and (for query-driven items) forwards the current query.
+ * A single contribution to the Chat-tab list. Owns its adapter(s) and view holders; the host only
+ * positions it and forwards the current query.
+ *
+ * The host always forwards the query via [onQueryChanged] — there is no host-side "hide while typing"
+ * policy. An item that should disappear while the user types reports zero rows from its adapter(s) for
+ * non-empty queries (see [SingleViewChatTabItem] for that behaviour out of the box). An item with no
+ * rows contributes no content and does not keep the suggestions overlay open.
  */
 interface NativeInputChatTabItem {
 
     /**
-     * The adapter slotted into the host's `ConcatAdapter`. The plugin fully owns its item count and
-     * view holders. An empty adapter (`itemCount == 0`) contributes no content and does not keep the
-     * suggestions overlay open.
+     * The adapters slotted into the host's `ConcatAdapter`, in order. Most items contribute a single
+     * adapter; returning several lets one item own multiple sections without nesting `ConcatAdapter`s.
+     * The plugin fully owns each adapter's item count and view holders.
      */
-    val adapter: RecyclerView.Adapter<*>
+    val adapters: List<RecyclerView.Adapter<*>>
 
     /**
-     * Whether this item participates in query filtering.
-     *
-     * `false` (e.g. a message card): the item belongs to the empty/zero state. The host shows it only
-     * while the query is empty and hides it as soon as the user starts typing; [onQueryChanged] is
-     * never called. The item updates its own content from its own data source.
-     *
-     * `true`: the item stays visible while the user types and the host calls [onQueryChanged] with the
-     * current query so the item can filter itself.
-     */
-    val supportsQuery: Boolean
-
-    /**
-     * Called with the current query whenever it changes, but only when [supportsQuery] is `true`.
-     * Default is a no-op so static items don't need to implement it.
+     * Called with the current query whenever it changes (including the initial empty query). The item
+     * decides what to show — e.g. filter its rows, or report zero rows to hide while the user types.
+     * Default is a no-op.
      */
     fun onQueryChanged(query: String) {}
 }
