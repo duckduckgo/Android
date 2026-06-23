@@ -270,7 +270,7 @@ class PirScanWideEventImpl @Inject constructor(
     }
 
     private fun stateFor(executionType: PirExecutionType): RunState = when (executionType) {
-        PirExecutionType.MANUAL_INITIAL, PirExecutionType.MANUAL_EDIT_PROFILE -> manualState
+        PirExecutionType.MANUAL_INITIAL, PirExecutionType.MANUAL_EDIT_PROFILE, PirExecutionType.MANUAL_INITIAL_RESUME -> manualState
         PirExecutionType.SCHEDULED -> scheduledState
     }
 
@@ -619,17 +619,19 @@ class PirScanWideEventImpl @Inject constructor(
     private fun entryPointFor(executionType: PirExecutionType): String = when (executionType) {
         PirExecutionType.MANUAL_INITIAL -> ENTRY_POINT_MANUAL_INITIAL
         PirExecutionType.MANUAL_EDIT_PROFILE -> ENTRY_POINT_MANUAL_EDIT_PROFILE
+        PirExecutionType.MANUAL_INITIAL_RESUME -> ENTRY_POINT_MANUAL_INITIAL_RESUME
         PirExecutionType.SCHEDULED -> ENTRY_POINT_SCHEDULED
     }
 
     private fun wideEventNameFor(executionType: PirExecutionType): String = when (executionType) {
-        PirExecutionType.MANUAL_INITIAL, PirExecutionType.MANUAL_EDIT_PROFILE -> WIDE_EVENT_NAME_MANUAL
+        PirExecutionType.MANUAL_INITIAL, PirExecutionType.MANUAL_EDIT_PROFILE, PirExecutionType.MANUAL_INITIAL_RESUME -> WIDE_EVENT_NAME_MANUAL
         PirExecutionType.SCHEDULED -> WIDE_EVENT_NAME_SCHEDULED
     }
 
     private fun PirExecutionType.metadataValue(): String = when (this) {
         PirExecutionType.MANUAL_INITIAL -> EXECUTION_TYPE_MANUAL_INITIAL
         PirExecutionType.MANUAL_EDIT_PROFILE -> EXECUTION_TYPE_MANUAL_EDIT_PROFILE
+        PirExecutionType.MANUAL_INITIAL_RESUME -> EXECUTION_TYPE_MANUAL_INITIAL_RESUME
         PirExecutionType.SCHEDULED -> EXECUTION_TYPE_SCHEDULED
     }
 
@@ -647,10 +649,12 @@ class PirScanWideEventImpl @Inject constructor(
 
         const val ENTRY_POINT_MANUAL_INITIAL = "funnel_pir_initial_android"
         const val ENTRY_POINT_MANUAL_EDIT_PROFILE = "funnel_pir_edit_profile_android"
+        const val ENTRY_POINT_MANUAL_INITIAL_RESUME = "funnel_pir_initial_resume_android"
         const val ENTRY_POINT_SCHEDULED = "funnel_pir_scheduled_android"
 
         const val EXECUTION_TYPE_MANUAL_INITIAL = "manual_initial"
         const val EXECUTION_TYPE_MANUAL_EDIT_PROFILE = "manual_edit_profile"
+        const val EXECUTION_TYPE_MANUAL_INITIAL_RESUME = "manual_initial_resume"
         const val EXECUTION_TYPE_SCHEDULED = "scheduled"
 
         const val KEY_EXECUTION_TYPE = "execution_type"
