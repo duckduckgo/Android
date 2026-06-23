@@ -1140,7 +1140,9 @@ class NativeInputModeWidget @JvmOverloads constructor(
                     val pluginScope = CoroutineScope(SupervisorJob() + dispatchers.main())
                     chatItemPluginScope = pluginScope
                     owner.lifecycleScope.launch {
-                        binding.loadPluginItems(context, pluginScope)
+                        // currentQuery = the live input text, so the post-load replay is skipped if the
+                        // user has typed since the last fetch (a newer fetch will submit the real state).
+                        binding.loadPluginItems(context, pluginScope, currentQuery = { text })
                     }
                 }
             }

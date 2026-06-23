@@ -64,7 +64,10 @@ class NativeInputChatSuggestionsBinder @Inject constructor(
 
         // The most recent submit, replayed once plugins finish loading so late-arriving items catch up
         // to the current query/visibility/hasContent instead of racing (and losing to) the first submit.
+        // [lastQuery] is the query that submit captured; the replay is only valid while it still matches
+        // the live input text (otherwise a newer fetch is in flight and will submit the current state).
         private var replayLastSubmit: (() -> Unit)? = null
+        private var lastQuery: String? = null
 
         // True only while applySubmit runs, so [pluginContentObserver] ignores the row changes the host
         // itself drives (those are already reflected in that submit's commit) and reacts only to a plugin
@@ -96,8 +99,17 @@ class NativeInputChatSuggestionsBinder @Inject constructor(
          * may apply before the items exist. Once they're in we replay the latest [submit] so query
          * forwarding and `hasContent` reflect the plugins; without it a submit that ran first would forward
          * the first query to no item and compute the overlay without the plugin rows.
+         *
+         * The replay is skipped when [currentQuery] no longer matches the query that submit captured: that
+         * means the user has typed since and a newer fetch is in flight, which will submit the current
+         * state with the plugins present. Replaying the stale query here would briefly show a zero-state
+         * item while the user is typing and fire a stale onCommit.
          */
-        suspend fun loadPluginItems(context: Context, scope: CoroutineScope) {
+        suspend fun loadPluginItems(
+            context: Context,
+            scope: CoroutineScope,
+            currentQuery: () -> String,
+        ) {
             var insertIndex = 0
             chatItemPlugins.getPlugins().forEach { plugin ->
                 val item = plugin.create(context, scope)
@@ -110,7 +122,7 @@ class NativeInputChatSuggestionsBinder @Inject constructor(
                 }
                 pluginItems += item
             }
-            replayLastSubmit?.invoke()
+            if (currentQuery() == lastQuery) replayLastSubmit?.invoke()
         }
 
         /**
@@ -125,6 +137,7 @@ class NativeInputChatSuggestionsBinder @Inject constructor(
             isHistoryAvailable: Boolean,
             onCommit: (hasContent: Boolean) -> Unit,
         ) {
+            lastQuery = query
             replayLastSubmit = { applySubmit(suggestions, query, isHistoryAvailable, onCommit) }
             applySubmit(suggestions, query, isHistoryAvailable, onCommit)
         }
@@ -179,8 +192,11 @@ class NativeInputChatSuggestionsBinder @Inject constructor(
             searchDivider.setVisible(false)
             historyShortcutAdapter.setVisible(false)
             historyShortcutDivider.setVisible(false)
-            // Plugin items are not cleared here: clear() runs on tab switches and the binding is reused.
-            // Each item owns its lifecycle via the scope handed to it in loadPluginItems.
+            // Drop the overlay recompute so a plugin adapter notifying after a clear (e.g. async work
+            // finishing on a tab switch) can't re-show suggestions we just cleared. The next submit
+            // re-arms it. Plugin items themselves are not cleared — clear() runs on tab switches and
+            // the binding is reused; each item owns its lifecycle via the scope from loadPluginItems.
+            recomputeOverlay = null
         }
     }
 
