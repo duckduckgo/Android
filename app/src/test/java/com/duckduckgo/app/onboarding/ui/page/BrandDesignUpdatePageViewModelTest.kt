@@ -74,6 +74,7 @@ import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
@@ -104,7 +105,7 @@ class BrandDesignUpdatePageViewModelTest {
     private val mockDefaultBrowserDetector: DefaultBrowserDetector = mock()
     private val mockWidgetCapabilities: WidgetCapabilities = mock()
     private val mockSyncAutoRestore: SyncAutoRestore = mock()
-    private val mockQuickSetupPixelSender: QuickSetupPixelSender = mock()
+    private val mockBrandDesignOnboardingPixelSender: BrandDesignOnboardingPixelSender = mock()
 
     // Legacy mode: the VM derives its mode from orchestrator.state, which this mock holds at NotStarted.
     private val mockOrchestrator: LinearOnboardingOrchestrator = mock {
@@ -129,7 +130,7 @@ class BrandDesignUpdatePageViewModelTest {
             mockDefaultBrowserDetector,
             mockWidgetCapabilities,
             mockSyncAutoRestore,
-            mockQuickSetupPixelSender,
+            mockBrandDesignOnboardingPixelSender,
             mockOrchestrator,
         )
     }
@@ -835,20 +836,72 @@ class BrandDesignUpdatePageViewModelTest {
     // region Notification permissions
 
     @Test
-    fun whenNotificationPermissionRequestedThenPixelFired() {
+    fun whenNotificationPermissionRequestedThenPixelFired() = runTest {
+        whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(false)
         val testee = createViewModel()
         testee.notificationRuntimePermissionRequested()
+        advanceUntilIdle()
         verify(mockPixel).fire(NOTIFICATION_RUNTIME_PERMISSION_SHOWN)
     }
 
     @Test
-    fun whenNotificationPermissionGrantedThenPixelFired() {
+    fun whenNotificationPermissionGrantedThenPixelFired() = runTest {
+        whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(false)
         val testee = createViewModel()
         testee.notificationRuntimePermissionGranted()
+        advanceUntilIdle()
         verify(mockPixel).fire(
             AppPixelName.NOTIFICATIONS_ENABLED,
             mapOf(PixelParameter.FROM_ONBOARDING to true.toString()),
         )
+    }
+
+    @Test
+    fun whenNotificationPermissionRequestedThenFiresNotificationsShown() = runTest {
+        whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(false)
+        val testee = createViewModel()
+
+        testee.notificationRuntimePermissionRequested()
+        advanceUntilIdle()
+
+        verify(mockBrandDesignOnboardingPixelSender).fireNotificationsShown(isReinstallUser = false)
+    }
+
+    @Test
+    fun whenNotificationPermissionGrantedThenFiresNotificationsConfirmedGranted() = runTest {
+        whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(false)
+        val testee = createViewModel()
+
+        testee.notificationRuntimePermissionGranted()
+        advanceUntilIdle()
+
+        verify(mockBrandDesignOnboardingPixelSender).fireNotificationsConfirmed(isReinstallUser = false, granted = true)
+    }
+
+    @Test
+    fun whenNotificationPermissionDeniedThenFiresNotificationsConfirmedDenied() = runTest {
+        whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(false)
+        val testee = createViewModel()
+
+        testee.notificationRuntimePermissionDenied()
+        advanceUntilIdle()
+
+        verify(mockBrandDesignOnboardingPixelSender).fireNotificationsConfirmed(isReinstallUser = false, granted = false)
+    }
+
+    @Test
+    fun whenReinstallUserThenNotificationPixelsReportReinstallInstallType() = runTest {
+        // Notification pixels fire before loadDaxDialog resolves reinstall into viewState,
+        // so they must resolve install type directly and report reinstall for a reinstaller.
+        whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(true)
+        val testee = createViewModel()
+
+        testee.notificationRuntimePermissionRequested()
+        testee.notificationRuntimePermissionGranted()
+        advanceUntilIdle()
+
+        verify(mockBrandDesignOnboardingPixelSender).fireNotificationsShown(isReinstallUser = true)
+        verify(mockBrandDesignOnboardingPixelSender).fireNotificationsConfirmed(isReinstallUser = true, granted = true)
     }
 
     // endregion
@@ -1211,7 +1264,7 @@ class BrandDesignUpdatePageViewModelTest {
         testee.onSecondaryCtaClicked() // INITIAL_REINSTALL_USER -> QUICK_SETUP
         advanceUntilIdle()
 
-        verify(mockQuickSetupPixelSender).fireShown(isReinstallUser = true)
+        verify(mockBrandDesignOnboardingPixelSender).fireQuickSetupShown(isReinstallUser = true)
     }
 
     @Test
@@ -1227,11 +1280,96 @@ class BrandDesignUpdatePageViewModelTest {
         testee.onPrimaryCtaClicked()
         advanceUntilIdle()
 
-        verify(mockQuickSetupPixelSender).fireClicked(
+        verify(mockBrandDesignOnboardingPixelSender).fireQuickSetupClicked(
             isReinstallUser = true,
             addressBarPosition = OmnibarType.SINGLE_BOTTOM,
             inputScreenSelected = false,
         )
+    }
+
+    @Test
+    fun whenAddressBarPositionPrimaryCtaThenFiresClickedWithSelectedPosition() = runTest {
+        val testee = createViewModel()
+        testee.onDefaultBrowserSet()
+        testee.onAddressBarPositionOptionSelected(OmnibarType.SINGLE_BOTTOM)
+
+        testee.onPrimaryCtaClicked()
+
+        verify(mockBrandDesignOnboardingPixelSender).fireAddressBarPositionClicked(
+            isReinstallUser = false,
+            position = OmnibarType.SINGLE_BOTTOM,
+        )
+    }
+
+    @Test
+    fun whenSearchExperiencePrimaryCtaThenFiresClickedWithSelection() = runTest {
+        val testee = createViewModel()
+        testee.onDefaultBrowserSet()
+        testee.onAddressBarPositionOptionSelected(OmnibarType.SINGLE_TOP)
+        testee.onInputScreenOptionSelected(withAi = false)
+        testee.onPrimaryCtaClicked() // ADDRESS_BAR_POSITION -> INPUT_SCREEN
+
+        testee.onPrimaryCtaClicked()
+
+        verify(mockBrandDesignOnboardingPixelSender).fireSearchExperienceClicked(isReinstallUser = false, withAi = false)
+    }
+
+    @Test
+    fun whenSkipOnboardingPrimaryCtaThenFiresSkipClickedEngage() = runTest {
+        whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(true)
+        val testee = createViewModel()
+        testee.loadDaxDialog()
+        testee.onSecondaryCtaClicked() // INITIAL_REINSTALL_USER -> SKIP_ONBOARDING_OPTION
+        advanceUntilIdle()
+
+        testee.onPrimaryCtaClicked()
+
+        verify(mockBrandDesignOnboardingPixelSender).fireSkipOnboardingClicked(isReinstallUser = true, engaged = true)
+    }
+
+    @Test
+    fun whenSkipOnboardingSecondaryCtaThenFiresSkipClickedDismiss() = runTest {
+        whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(true)
+        val testee = createViewModel()
+        testee.loadDaxDialog()
+        testee.onSecondaryCtaClicked() // INITIAL_REINSTALL_USER -> SKIP_ONBOARDING_OPTION
+        advanceUntilIdle()
+
+        testee.onSecondaryCtaClicked()
+
+        verify(mockBrandDesignOnboardingPixelSender).fireSkipOnboardingClicked(isReinstallUser = true, engaged = false)
+    }
+
+    @Test
+    fun whenPrimaryCtaFromComparisonChartThenFiresSetDefaultClickedWithNoValue() = runTest {
+        whenever(mockDefaultRoleBrowserDialog.shouldShowDialog()).thenReturn(false)
+        whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(false)
+        val testee = createViewModel()
+        testee.loadDaxDialog()
+        testee.onPrimaryCtaClicked() // INITIAL -> COMPARISON_CHART
+        testee.onPrimaryCtaClicked() // COMPARISON_CHART "Choose your browser" -> set-default clicked
+
+        verify(mockBrandDesignOnboardingPixelSender).fireSetDefaultClicked(isReinstallUser = false)
+    }
+
+    @Test
+    fun whenDefaultBrowserSetThenFiresSetDefaultConfirmedDdgAndNotClicked() = runTest {
+        val testee = createViewModel()
+
+        testee.onDefaultBrowserSet()
+
+        verify(mockBrandDesignOnboardingPixelSender).fireSetDefaultConfirmed(isReinstallUser = false, isDdgDefault = true)
+        verify(mockBrandDesignOnboardingPixelSender, never()).fireSetDefaultClicked(any())
+    }
+
+    @Test
+    fun whenDefaultBrowserNotSetThenFiresSetDefaultConfirmedOtherAndNotClicked() = runTest {
+        val testee = createViewModel()
+
+        testee.onDefaultBrowserNotSet()
+
+        verify(mockBrandDesignOnboardingPixelSender).fireSetDefaultConfirmed(isReinstallUser = false, isDdgDefault = false)
+        verify(mockBrandDesignOnboardingPixelSender, never()).fireSetDefaultClicked(any())
     }
 
     // endregion

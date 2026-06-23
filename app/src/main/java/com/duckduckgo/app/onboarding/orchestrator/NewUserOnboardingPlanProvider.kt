@@ -27,7 +27,7 @@ import com.duckduckgo.app.onboarding.DuckAiOnboardingExperimentManager.DuckAiOnb
 import com.duckduckgo.app.onboarding.DuckAiOnboardingExperimentManager.DuckAiOnboardingExperimentVariant.TREATMENT_WITH_DUCK_AI_DEFAULT
 import com.duckduckgo.app.onboarding.DuckAiOnboardingExperimentManager.DuckAiOnboardingExperimentVariant.TREATMENT_WITH_SEARCH_DEFAULT
 import com.duckduckgo.app.onboarding.store.OnboardingStore
-import com.duckduckgo.app.onboarding.ui.page.QuickSetupPixelSender
+import com.duckduckgo.app.onboarding.ui.page.BrandDesignOnboardingPixelSender
 import com.duckduckgo.app.onboardingquicksetup.OnboardingQuickSetupExperimentManager
 import com.duckduckgo.app.onboardingquicksetup.OnboardingQuickSetupExperimentManager.QuickSetupExperimentVariant
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_AICHAT_SELECTED
@@ -86,7 +86,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
     private val androidBrowserConfigFeature: AndroidBrowserConfigFeature,
     private val duckAiOnboardingExperimentManager: DuckAiOnboardingExperimentManager,
     private val onboardingQuickSetupExperimentManager: OnboardingQuickSetupExperimentManager,
-    private val quickSetupPixelSender: QuickSetupPixelSender,
+    private val brandDesignOnboardingPixelSender: BrandDesignOnboardingPixelSender,
     private val inputScreenOnboardingWideEvent: InputScreenOnboardingWideEvent,
     private val defaultBrowserDetector: DefaultBrowserDetector,
     private val widgetCapabilities: WidgetCapabilities,
@@ -512,7 +512,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
                     val resolved = resolveOmnibarType(event.type)
                     settingsDataStore.omnibarType = resolved
                     applyInputModeSelection(ctx, event.withAi, fireTelemetry = false)
-                    quickSetupPixelSender.fireClicked(
+                    brandDesignOnboardingPixelSender.fireQuickSetupClicked(
                         isReinstallUser = ctx.isReinstall,
                         addressBarPosition = resolved,
                         inputScreenSelected = event.withAi,
