@@ -75,6 +75,7 @@ class DuckChatSettingsViewModel @AssistedInject constructor(
         val isAutomaticContextEnabled: Boolean = false,
         val isDefaultTogglePositionVisible: Boolean = false,
         val defaultTogglePosition: DefaultTogglePosition = DefaultTogglePosition.SEARCH,
+        val isNativeControlsEnabled: Boolean = false,
     )
 
     private data class FeatureState(
@@ -87,6 +88,7 @@ class DuckChatSettingsViewModel @AssistedInject constructor(
     private data class FeatureVisibility(
         val isHideGeneratedImagesOptionVisible: Boolean,
         val isRememberTogglePositionVisible: Boolean,
+        val isNativeControlsEnabled: Boolean,
     )
 
     private val featureState =
@@ -110,6 +112,7 @@ class DuckChatSettingsViewModel @AssistedInject constructor(
                 FeatureVisibility(
                     isHideGeneratedImagesOptionVisible = duckChatFeature.showHideAiGeneratedImages().isEnabled(),
                     isRememberTogglePositionVisible = duckChatFeature.rememberTogglePosition().isEnabled(),
+                    isNativeControlsEnabled = duckChatFeature.aiFeaturesNativeControls().isEnabled(),
                 ),
             )
         }.flowOn(dispatcherProvider.io())
@@ -134,6 +137,7 @@ class DuckChatSettingsViewModel @AssistedInject constructor(
                 isDefaultTogglePositionVisible = isDuckChatUserEnabled && isInputScreenEnabled &&
                     duckChat.isInputScreenFeatureAvailable() && featureVisibility.isRememberTogglePositionVisible,
                 defaultTogglePosition = defaultTogglePosition,
+                isNativeControlsEnabled = featureVisibility.isNativeControlsEnabled,
             )
         }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ViewState())
 
