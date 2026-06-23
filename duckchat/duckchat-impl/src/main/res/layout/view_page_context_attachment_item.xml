@@ -53,7 +53,7 @@
         android:layout_width="@dimen/keyline_4"
         android:layout_height="@dimen/keyline_4"
         android:layout_marginStart="@dimen/keyline_2"
-        android:contentDescription="@string/duckChatFileAttachmentRemoveContentDescription"
+        android:contentDescription="@string/duckChatPageContextRemoveContentDescription"
         android:scaleType="center"
         app:srcCompat="@drawable/ic_close_16"
         app:tint="?attr/daxColorSecondaryIcon" />
