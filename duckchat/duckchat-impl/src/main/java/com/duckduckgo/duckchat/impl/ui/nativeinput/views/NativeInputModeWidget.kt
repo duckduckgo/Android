@@ -49,8 +49,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion
 import com.duckduckgo.browser.ui.PulseAnimation
-import com.duckduckgo.common.ui.view.getColorFromAttr
-import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.ViewViewModelFactory
 import com.duckduckgo.common.utils.extensions.hideKeyboard
@@ -1462,33 +1460,15 @@ class NativeInputModeWidget @JvmOverloads constructor(
 
     private var interactionLocked = false
 
-    // The unlocked card elevation, captured before the first lock. The two omnibar positions wrap this
-    // widget in cards with different elevations (6dp top, 3dp bottom), so we can't hardcode the restore value.
-    private var unlockedCardElevation: Float? = null
-
     // Dims only this (transparent) widget, never the parent card surface, so the bar stays
     // colour-uniform with the page. Touch interception covers the plugin containers too.
     override fun setInteractionLocked(locked: Boolean) {
         if (interactionLocked == locked) return
         interactionLocked = locked
         alpha = if (locked) LOCKED_ALPHA else 1f
-        val rootCard = widgetRoot?.findViewById<MaterialCardView>(R.id.inputModeWidgetCard)
         if (locked) {
             clearInputFocus()
             hideKeyboard()
-            rootCard?.let {
-                // further de-emphasize the input field when the UI is locked
-                if (unlockedCardElevation == null) unlockedCardElevation = it.elevation
-                it.elevation = 0f
-                it.strokeWidth = 1.toPx(it.context)
-                it.strokeColor = it.context.getColorFromAttr(com.duckduckgo.mobile.android.R.attr.daxColorBackground)
-            }
-        } else {
-            rootCard?.let {
-                // restore original values
-                it.elevation = unlockedCardElevation ?: it.elevation
-                it.strokeWidth = 0
-            }
         }
     }
 
