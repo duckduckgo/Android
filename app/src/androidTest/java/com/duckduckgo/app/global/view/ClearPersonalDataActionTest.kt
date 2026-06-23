@@ -406,13 +406,31 @@ class ClearPersonalDataActionTest {
     }
 
     @Test
+    fun whenClearDataForSpecificDomainsWithFireproofedIpOrLocalhostThenThoseAreRetained() = runTest {
+        // A fireproofed IP / localhost has no registrable domain, so the keep-list must use the
+        // host-fallback key (toTldPlusOneOrSelf) — eTLD+1 alone would drop them and burn their data.
+        whenever(mockWebViewCapabilityChecker.isSupported(DeleteBrowsingData)).thenReturn(true)
+        whenever(mockFireproofWebsiteRepository.fireproofWebsitesSync()).thenReturn(
+            listOf(FireproofWebsiteEntity("192.168.1.1"), FireproofWebsiteEntity("localhost")),
+        )
+        val clearedDomains = mutableListOf<String>()
+        val testeeWithCapture = createTestee(
+            siteDataCleaner = { _, domain -> clearedDomains.add(domain) },
+        )
+        val result = testeeWithCapture.clearDataForSpecificDomains(domains = setOf("192.168.1.1", "localhost", "clearable.com"))
+        assertTrue(result is ClearDataResult.Success)
+        assertEquals(listOf("clearable.com"), clearedDomains)
+        verify(mockSitePreferencesDataClearer).clear(setOf("clearable.com"))
+    }
+
+    @Test
     fun whenClearDataForSpecificDomainsThenDesktopPreferencesForgottenForNonFireproofDomains() = runTest {
         whenever(mockWebViewCapabilityChecker.isSupported(DeleteBrowsingData)).thenReturn(true)
         whenever(mockFireproofWebsiteRepository.fireproofWebsitesSync()).thenReturn(
             listOf(FireproofWebsiteEntity("fireproof.com")),
         )
         testee.clearDataForSpecificDomains(domains = setOf("fireproof.com", "clearable.com"))
-        verify(mockSitePreferencesDataClearer).forgetDesktopMode(setOf("clearable.com"))
+        verify(mockSitePreferencesDataClearer).clear(setOf("clearable.com"))
     }
 
     @Test

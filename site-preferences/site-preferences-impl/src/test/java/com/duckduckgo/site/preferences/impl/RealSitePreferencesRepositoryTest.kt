@@ -61,66 +61,74 @@ class RealSitePreferencesRepositoryTest {
 
     @Test
     fun whenDesktopModeRememberedThenIsRememberedReturnsTrue() = runTest {
-        assertFalse(repository.isDesktopModeRemembered("example.com"))
-        repository.rememberDesktopMode("example.com")
-        assertTrue(repository.isDesktopModeRemembered("example.com"))
+        assertFalse(repository.isDesktopModeRemembered("https://example.com"))
+        repository.rememberDesktopMode("https://example.com")
+        assertTrue(repository.isDesktopModeRemembered("https://example.com"))
     }
 
     @Test
     fun whenDesktopModeForgottenThenIsRememberedReturnsFalse() = runTest {
-        repository.rememberDesktopMode("example.com")
-        assertTrue(repository.isDesktopModeRemembered("example.com"))
-        repository.forgetDesktopMode("example.com")
-        assertFalse(repository.isDesktopModeRemembered("example.com"))
+        repository.rememberDesktopMode("https://example.com")
+        assertTrue(repository.isDesktopModeRemembered("https://example.com"))
+        repository.forgetDesktopMode("https://example.com")
+        assertFalse(repository.isDesktopModeRemembered("https://example.com"))
+    }
+
+    @Test
+    fun whenUrlVariantsShareSiteKeyThenTreatedAsSameSite() = runTest {
+        // m./www./subdomains/paths all collapse to the eTLD+1 site key.
+        repository.rememberDesktopMode("https://m.example.com/some/path")
+        assertTrue(repository.isDesktopModeRemembered("https://www.example.com"))
+        assertTrue(repository.isDesktopModeRememberedInCache("https://news.example.com/article"))
     }
 
     @Test
     fun whenCachePrimedFromDbThenInCacheReflectsExistingRows() {
         dao.insert(SitePreferencesEntity(domain = "seeded.com", desktopModeEnabled = true))
-        assertTrue(repository.isDesktopModeRememberedInCache("seeded.com"))
+        assertTrue(repository.isDesktopModeRememberedInCache("https://seeded.com"))
     }
 
     @Test
     fun whenCacheNotYetPrimedThenIsDesktopModeRememberedStillResolvesValueFromDb() = runTest {
         val unprimed = RealSitePreferencesRepository(dao, TestScope(), coroutineRule.testDispatcherProvider, isMainProcess = true)
         dao.insert(SitePreferencesEntity(domain = "seeded.com", desktopModeEnabled = true))
-        assertFalse(unprimed.isDesktopModeRememberedInCache("seeded.com"))
-        assertTrue(unprimed.isDesktopModeRemembered("seeded.com"))
+        assertFalse(unprimed.isDesktopModeRememberedInCache("https://seeded.com"))
+        assertTrue(unprimed.isDesktopModeRemembered("https://seeded.com"))
     }
 
     @Test
     fun whenCachePrimedThenIsDesktopModeRememberedReflectsCache() = runTest {
-        repository.rememberDesktopMode("example.com")
-        assertTrue(repository.isDesktopModeRemembered("example.com"))
-        assertFalse(repository.isDesktopModeRemembered("not-remembered.com"))
+        repository.rememberDesktopMode("https://example.com")
+        assertTrue(repository.isDesktopModeRemembered("https://example.com"))
+        assertFalse(repository.isDesktopModeRemembered("https://not-remembered.com"))
     }
 
     @Test
     fun whenClearAllButFireproofedThenOnlyFireproofedDomainsRetained() = runTest {
-        repository.rememberDesktopMode("keep.com")
-        repository.rememberDesktopMode("drop.com")
+        repository.rememberDesktopMode("https://keep.com")
+        repository.rememberDesktopMode("https://drop.com")
         repository.clearAllButFireproofed(setOf("keep.com"))
-        assertTrue(repository.isDesktopModeRememberedInCache("keep.com"))
-        assertFalse(repository.isDesktopModeRememberedInCache("drop.com"))
+        assertTrue(repository.isDesktopModeRememberedInCache("https://keep.com"))
+        assertFalse(repository.isDesktopModeRememberedInCache("https://drop.com"))
     }
 
     @Test
     fun whenClearAllButFireproofedWithEmptySetThenEverythingForgotten() = runTest {
-        repository.rememberDesktopMode("a.com")
-        repository.rememberDesktopMode("b.com")
+        repository.rememberDesktopMode("https://a.com")
+        repository.rememberDesktopMode("https://b.com")
         repository.clearAllButFireproofed(emptySet())
-        assertFalse(repository.isDesktopModeRememberedInCache("a.com"))
-        assertFalse(repository.isDesktopModeRememberedInCache("b.com"))
+        assertFalse(repository.isDesktopModeRememberedInCache("https://a.com"))
+        assertFalse(repository.isDesktopModeRememberedInCache("https://b.com"))
     }
 
     @Test
-    fun whenBulkForgetThenAllGivenDomainsRemoved() = runTest {
-        repository.rememberDesktopMode("a.com")
-        repository.rememberDesktopMode("b.com")
-        repository.rememberDesktopMode("c.com")
-        repository.forgetDesktopMode(setOf("a.com", "b.com"))
-        assertFalse(repository.isDesktopModeRememberedInCache("a.com"))
-        assertFalse(repository.isDesktopModeRememberedInCache("b.com"))
-        assertTrue(repository.isDesktopModeRememberedInCache("c.com"))
+    fun whenClearThenAllGivenDomainsRemoved() = runTest {
+        repository.rememberDesktopMode("https://a.com")
+        repository.rememberDesktopMode("https://b.com")
+        repository.rememberDesktopMode("https://c.com")
+        repository.clear(setOf("a.com", "b.com"))
+        assertFalse(repository.isDesktopModeRememberedInCache("https://a.com"))
+        assertFalse(repository.isDesktopModeRememberedInCache("https://b.com"))
+        assertTrue(repository.isDesktopModeRememberedInCache("https://c.com"))
     }
 }

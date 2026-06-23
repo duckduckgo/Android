@@ -348,7 +348,7 @@ import com.duckduckgo.common.utils.SingleLiveEvent
 import com.duckduckgo.common.utils.baseHost
 import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.common.utils.extensions.asLocationPermissionOrigin
-import com.duckduckgo.common.utils.extensions.toTldPlusOne
+import com.duckduckgo.common.utils.extensions.toTldPlusOneOrSelf
 import com.duckduckgo.common.utils.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.common.utils.isMobileSite
 import com.duckduckgo.common.utils.plugins.PluginPoint
@@ -1173,7 +1173,7 @@ class BrowserTabViewModel @Inject constructor(
             }
 
             if (androidBrowserConfig.singleTabFireDialog().isEnabled()) {
-                val domain = uri.host?.toTldPlusOne() ?: uri.host
+                val domain = uri.host?.toTldPlusOneOrSelf()
                 if (domain != null) {
                     tabVisitedSitesRepository.recordVisitedSite(tabId, domain)
                 }
@@ -1713,18 +1713,14 @@ class BrowserTabViewModel @Inject constructor(
 
     override suspend fun isDesktopSiteEnabled(url: String): Boolean =
         if (rememberDesktopModeFeature.self().isEnabled()) {
-            url.toUri().host?.let { desktopModeSettings.isDesktopModeRemembered(it.desktopModeSiteKey()) } ?: false
+            desktopModeSettings.isDesktopModeRemembered(url)
         } else {
             currentBrowserViewState().isDesktopBrowsingMode
         }
 
     // Synchronous, main-thread variant for pageChanged() (see isDesktopSiteEnabled for the load path).
     private fun isDesktopModeRememberedForUrl(url: String): Boolean =
-        url.toUri().host?.let { desktopModeSettings.isDesktopModeRememberedInCache(it.desktopModeSiteKey()) } ?: false
-
-    // eTLD+1 when available, otherwise the raw host (IPs, localhost, single-label intranet hosts have no
-    // registrable domain). Matches the visited-sites key idiom so desktop mode works for those hosts too.
-    private fun String.desktopModeSiteKey(): String = toTldPlusOne() ?: this
+        desktopModeSettings.isDesktopModeRememberedInCache(url)
 
     override fun isTabInForeground(): Boolean =
         if (swipingTabsFeature.isEnabled) {
@@ -3356,12 +3352,10 @@ class BrowserTabViewModel @Inject constructor(
         val uri = site?.uri ?: return
 
         if (rememberDesktopModeFeature.self().isEnabled()) {
-            uri.host?.desktopModeSiteKey()?.let { key ->
-                if (desktopSiteRequested) {
-                    desktopModeSettings.rememberDesktopMode(key)
-                } else {
-                    desktopModeSettings.forgetDesktopMode(key)
-                }
+            if (desktopSiteRequested) {
+                desktopModeSettings.rememberDesktopMode(uri.toString())
+            } else {
+                desktopModeSettings.forgetDesktopMode(uri.toString())
             }
         }
 

@@ -2391,7 +2391,7 @@ class BrowserTabViewModelTest {
         testee.onChangeBrowserModeClicked()
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         verify(mockPixel).fire(AppPixelName.MENU_ACTION_DESKTOP_SITE_ENABLE_PRESSED)
-        verify(mockDesktopModeSettings).rememberDesktopMode("example.com")
+        verify(mockDesktopModeSettings).rememberDesktopMode("http://example.com")
         assertTrue(browserViewState().isDesktopBrowsingMode)
         val site = testee.siteLiveData.value
         assertTrue(site?.isDesktopMode == true)
@@ -2403,7 +2403,7 @@ class BrowserTabViewModelTest {
         setDesktopBrowsingMode(true)
         testee.onChangeBrowserModeClicked()
         verify(mockPixel).fire(AppPixelName.MENU_ACTION_DESKTOP_SITE_DISABLE_PRESSED)
-        verify(mockDesktopModeSettings).forgetDesktopMode("example.com")
+        verify(mockDesktopModeSettings).forgetDesktopMode("http://example.com")
         assertFalse(browserViewState().isDesktopBrowsingMode)
         val site = testee.siteLiveData.value
         assertFalse(site?.isDesktopMode == true)
@@ -2709,8 +2709,8 @@ class BrowserTabViewModelTest {
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         val ultimateCommand = commandCaptor.lastValue as Navigate
         assertEquals(exampleUrl, ultimateCommand.url)
-        // eTLD+1 of m.example.com collapses to the same key as the desktop-rewritten URL
-        verify(mockDesktopModeSettings).rememberDesktopMode("example.com")
+        // The raw URL is passed through; the site-preferences impl collapses m./www./paths to the site key.
+        verify(mockDesktopModeSettings).rememberDesktopMode("http://m.example.com")
     }
 
     @Test
@@ -2744,20 +2744,20 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenDesktopToggledOnHostWithoutRegistrableDomainThenPersistedUnderRawHost() {
-        // IPs / localhost / single-label intranet hosts have no eTLD+1, so they key on the raw host
-        // (so desktop mode still works for e.g. router admin pages on 192.168.x.x).
+    fun whenDesktopToggledOnHostWithoutRegistrableDomainThenUrlStillPersisted() {
+        // IPs / localhost / single-label intranet hosts have no eTLD+1; the impl keys them on the raw
+        // host so desktop mode still works (e.g. router admin pages on 192.168.x.x). The VM passes the URL.
         loadUrl("http://localhost")
         setDesktopBrowsingMode(false)
         testee.onChangeBrowserModeClicked()
-        verify(mockDesktopModeSettings).rememberDesktopMode("localhost")
+        verify(mockDesktopModeSettings).rememberDesktopMode("http://localhost")
         verify(mockPixel).fire(AppPixelName.MENU_ACTION_DESKTOP_SITE_ENABLE_PRESSED)
     }
 
     @Test
     fun whenNavigatingToNonRememberedSiteThenDesktopModeResetAndNotInheritedFromPreviousSite() {
-        whenever(mockDesktopModeSettings.isDesktopModeRememberedInCache("a.com")).thenReturn(true)
-        whenever(mockDesktopModeSettings.isDesktopModeRememberedInCache("b.com")).thenReturn(false)
+        whenever(mockDesktopModeSettings.isDesktopModeRememberedInCache("http://a.com")).thenReturn(true)
+        whenever(mockDesktopModeSettings.isDesktopModeRememberedInCache("http://b.com")).thenReturn(false)
 
         loadUrl("http://a.com")
         assertTrue(browserViewState().isDesktopBrowsingMode)
@@ -2770,9 +2770,9 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenRememberDesktopModeEnabledThenIsDesktopSiteEnabledUsesPrimingAwareRead() = runTest {
-        // The interceptor-facing read must use the canonical, priming-aware lookup so the first load of
-        // a remembered site picks desktop mode even before the in-memory cache has been primed.
-        whenever(mockDesktopModeSettings.isDesktopModeRemembered("example.com")).thenReturn(true)
+        // The interceptor-facing read passes the raw URL to the canonical, priming-aware lookup (which the
+        // impl resolves via its site key) so the first load of a remembered site picks desktop mode.
+        whenever(mockDesktopModeSettings.isDesktopModeRemembered("http://example.com/some/path")).thenReturn(true)
 
         assertTrue(testee.isDesktopSiteEnabled("http://example.com/some/path"))
     }

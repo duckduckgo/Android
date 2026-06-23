@@ -34,7 +34,7 @@ import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.trackerdetection.api.WebTrackersBlockedRepository
 import com.duckduckgo.common.utils.DefaultDispatcherProvider
 import com.duckduckgo.common.utils.DispatcherProvider
-import com.duckduckgo.common.utils.extensions.toTldPlusOne
+import com.duckduckgo.common.utils.extensions.toTldPlusOneOrSelf
 import com.duckduckgo.cookies.api.DuckDuckGoCookieManager
 import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import com.duckduckgo.history.api.NavigationHistory
@@ -234,9 +234,11 @@ class ClearPersonalDataAction(
         }
 
         return try {
+            // Keep fireproofed sites out of the burn. Use the host-fallback key (not mapNotNull/eTLD+1)
+            // so fireproofed hosts without a registrable domain — IPs, localhost — are also retained;
             val fireproofDomains = withContext(dispatchers.io()) {
                 fireproofWebsiteRepository.fireproofWebsitesSync()
-                    .mapNotNull { it.domain.toTldPlusOne() }
+                    .map { it.domain.toTldPlusOneOrSelf() }
                     .toSet()
             }
 
@@ -252,9 +254,7 @@ class ClearPersonalDataAction(
                 logcat(INFO) { "Cleared site data for ${domains.size} domains" }
             }
 
-            // Burning a site is a fire for that site: forget its remembered desktop-mode preference too.
-            // domains are already eTLD+1, matching the key used by the site-preferences store.
-            sitePreferencesDataClearer.forgetDesktopMode(domainsToClear)
+            sitePreferencesDataClearer.clear(domainsToClear)
 
             ClearDataResult.Success
         } catch (e: CancellationException) {
@@ -266,16 +266,13 @@ class ClearPersonalDataAction(
     }
 
     // Shared preamble for full-fire paths: clears cookies and the per-site stores that must keep
-    // fireproofed domains. Site permissions match on raw host; site preferences on the same site key
-    // used when persisting desktop mode — eTLD+1, falling back to the raw host (IPs, localhost) so a
-    // fireproofed host without a registrable domain keeps its remembered desktop preference.
+    // fireproofed domains. Both take raw fireproof hosts; site permissions match on raw host, while
+    // the site-preferences store normalises each to its site key (eTLD+1, host fallback) internally.
     private suspend fun clearFireproofExemptData() {
         val fireproofEntities = fireproofWebsiteRepository.fireproofWebsitesSync()
         cookieManager.flush()
         sitePermissionsManager.clearAllButFireproof(fireproofEntities.map { it.domain })
-        sitePreferencesDataClearer.clearAllButFireproofed(
-            fireproofEntities.map { it.domain.toTldPlusOne() ?: it.domain }.toSet(),
-        )
+        sitePreferencesDataClearer.clearAllButFireproofed(fireproofEntities.map { it.domain }.toSet())
         thirdPartyCookieManager.clearAllData()
     }
 

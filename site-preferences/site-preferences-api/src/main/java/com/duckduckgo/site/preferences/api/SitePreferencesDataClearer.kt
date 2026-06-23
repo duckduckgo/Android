@@ -18,13 +18,14 @@ package com.duckduckgo.site.preferences.api
 
 /**
  * Bulk teardown of stored site preferences, consumed by the fire button and single-tab burn.
- * Site keys are eTLD+1 (or raw host when there is no registrable domain).
+ * Callers pass raw hosts/domains; the implementation derives the site key (eTLD+1, or the raw host
+ * when there is no registrable domain) internally.
  */
 interface SitePreferencesDataClearer {
 
-    /** Forget preferences for all of [domains] — used by single-tab burn. */
-    suspend fun forgetDesktopMode(domains: Set<String>)
+    /** Remove all preferences for [domains] — used by single-tab burn. */
+    suspend fun clear(domains: Set<String>)
 
-    /** Forget every preference except those for [fireproofedDomains] — used by the fire button. */
+    /** Remove every preference except those for [fireproofedDomains] — used by the fire button. */
     suspend fun clearAllButFireproofed(fireproofedDomains: Set<String>)
 }

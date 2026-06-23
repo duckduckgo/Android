@@ -16,12 +16,14 @@
 
 package com.duckduckgo.site.preferences.impl
 
+import androidx.core.net.toUri
 import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.di.IsMainProcess
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.extensions.toTldPlusOne
+import com.duckduckgo.common.utils.extensions.toTldPlusOneOrSelf
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.site.preferences.api.DesktopModeSettings
 import com.duckduckgo.site.preferences.api.SitePreferencesDataClearer
@@ -63,34 +65,43 @@ class RealSitePreferencesRepository @Inject constructor(
         }
     }
 
-    override suspend fun isDesktopModeRemembered(domain: String): Boolean {
-        if (cachePrimed) return desktopModeDomains.contains(domain)
-        return withContext(dispatcherProvider.io()) { sitePreferencesDao.isDesktopModeEnabled(domain) }
+    override suspend fun isDesktopModeRemembered(url: String): Boolean {
+        val key = url.siteKeyOrNull() ?: return false
+        if (cachePrimed) return desktopModeDomains.contains(key)
+        return withContext(dispatcherProvider.io()) { sitePreferencesDao.isDesktopModeEnabled(key) }
     }
 
-    override fun isDesktopModeRememberedInCache(domain: String): Boolean = desktopModeDomains.contains(domain)
+    override fun isDesktopModeRememberedInCache(url: String): Boolean =
+        url.siteKeyOrNull()?.let { desktopModeDomains.contains(it) } ?: false
 
-    override fun rememberDesktopMode(domain: String) {
-        desktopModeDomains.add(domain)
+    override fun rememberDesktopMode(url: String) {
+        val key = url.siteKeyOrNull() ?: return
+        desktopModeDomains.add(key)
         appCoroutineScope.launch(dispatcherProvider.io()) {
-            sitePreferencesDao.insert(SitePreferencesEntity(domain = domain, desktopModeEnabled = true))
+            sitePreferencesDao.insert(SitePreferencesEntity(domain = key, desktopModeEnabled = true))
         }
     }
 
-    override fun forgetDesktopMode(domain: String) {
-        desktopModeDomains.remove(domain)
+    override fun forgetDesktopMode(url: String) {
+        val key = url.siteKeyOrNull() ?: return
+        desktopModeDomains.remove(key)
         appCoroutineScope.launch(dispatcherProvider.io()) {
-            sitePreferencesDao.delete(domain)
+            sitePreferencesDao.delete(key)
         }
     }
 
-    override suspend fun forgetDesktopMode(domains: Set<String>) {
-        desktopModeDomains.removeAll(domains)
-        withContext(dispatcherProvider.io()) { sitePreferencesDao.delete(domains) }
+    override suspend fun clear(domains: Set<String>) {
+        val keys = domains.mapTo(mutableSetOf()) { it.toTldPlusOneOrSelf() }
+        desktopModeDomains.removeAll(keys)
+        withContext(dispatcherProvider.io()) { sitePreferencesDao.delete(keys) }
     }
 
     override suspend fun clearAllButFireproofed(fireproofedDomains: Set<String>) {
-        desktopModeDomains.retainAll(fireproofedDomains)
-        withContext(dispatcherProvider.io()) { sitePreferencesDao.deleteAllExcept(fireproofedDomains) }
+        val keys = fireproofedDomains.mapTo(mutableSetOf()) { it.toTldPlusOneOrSelf() }
+        desktopModeDomains.retainAll(keys)
+        withContext(dispatcherProvider.io()) { sitePreferencesDao.deleteAllExcept(keys) }
     }
+
+    // Settings callers pass a raw page URL; derive the site key (eTLD+1, host fallback) from its host.
+    private fun String.siteKeyOrNull(): String? = toUri().host?.toTldPlusOneOrSelf()
 }

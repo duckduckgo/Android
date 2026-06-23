@@ -17,8 +17,9 @@
 package com.duckduckgo.site.preferences.api
 
 /**
- * Per-site "open in desktop mode" preference, consumed by the browser. `domain` is a site key:
- * eTLD+1, or the raw host when there is no registrable domain (IPs, localhost).
+ * Per-site "open in desktop mode" preference, consumed by the browser. Callers pass a raw page [url];
+ * the implementation derives the site key (eTLD+1, or the raw host when there is no registrable
+ * domain — IPs, localhost) internally, so call sites cannot disagree on the key.
  */
 interface DesktopModeSettings {
 
@@ -27,18 +28,18 @@ interface DesktopModeSettings {
      * window before the cache is primed at startup, falls back to a direct DB read so a remembered
      * site never loads in mobile mode by accident. Suspends — call it from a coroutine.
      */
-    suspend fun isDesktopModeRemembered(domain: String): Boolean
+    suspend fun isDesktopModeRemembered(url: String): Boolean
 
     /**
      * Synchronous, in-memory-only snapshot for callers that cannot suspend — the main-thread page-load
      * path, where Room forbids DB access. May be momentarily stale only during the startup priming
      * window; it self-corrects on the next navigation event.
      */
-    fun isDesktopModeRememberedInCache(domain: String): Boolean
+    fun isDesktopModeRememberedInCache(url: String): Boolean
 
-    /** Remember that [domain] should always open in desktop mode. */
-    fun rememberDesktopMode(domain: String)
+    /** Remember that the site at [url] should always open in desktop mode. */
+    fun rememberDesktopMode(url: String)
 
-    /** Forget the desktop-mode preference for [domain]. */
-    fun forgetDesktopMode(domain: String)
+    /** Forget the desktop-mode preference for the site at [url]. */
+    fun forgetDesktopMode(url: String)
 }
