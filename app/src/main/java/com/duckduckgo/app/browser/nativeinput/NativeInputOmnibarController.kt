@@ -65,9 +65,12 @@ interface NativeInputOmnibarController : OmnibarState {
 class RealNativeInputOmnibarController(
     private val omnibar: Omnibar,
     private val rootView: ViewGroup,
+    private val nativeInputStateBugKillSwitch: NativeInputStateBugKillSwitch,
 ) : NativeInputOmnibarController {
 
     private var layoutListener: View.OnLayoutChangeListener? = null
+
+    private var overlayActive: Boolean = false
 
     override fun isDuckAiMode(): Boolean = omnibar.viewMode == DuckAI
 
@@ -87,6 +90,7 @@ class RealNativeInputOmnibarController(
 
     override fun hideBackground() {
         val omnibarView = omnibar.omnibarView as? View ?: return
+        overlayActive = true
         applyOnLayout(omnibarView) {
             makeOmnibarTransparent(omnibarView)
             hideOmnibarContent(omnibarView)
@@ -166,6 +170,11 @@ class RealNativeInputOmnibarController(
     private fun applyTierText(omnibarView: View) {
         val aiTitle = omnibarView.findViewById<TextView?>(R.id.aiTitle)
         val freePill = omnibarView.findViewById<View?>(R.id.duckAIFreePill)
+        if (nativeInputStateBugKillSwitch.self().isEnabled() && !overlayActive) {
+            freePill?.gone()
+            freePill?.setOnClickListener(null)
+            return
+        }
         when (currentTier) {
             is DuckAiTier.Free -> {
                 aiTitle?.gone()
@@ -186,7 +195,11 @@ class RealNativeInputOmnibarController(
         removeLayoutListener(omnibarView)
         block()
         val listener = View.OnLayoutChangeListener { _, _, _, _, _, _, _, _, _ ->
-            if (rootView.findViewById<View?>(R.id.inputModeWidget) != null) block()
+            if ((!nativeInputStateBugKillSwitch.self().isEnabled() || overlayActive) &&
+                rootView.findViewById<View?>(R.id.inputModeWidget) != null
+            ) {
+                block()
+            }
         }
         layoutListener = listener
         omnibarView.addOnLayoutChangeListener(listener)
@@ -203,6 +216,7 @@ class RealNativeInputOmnibarController(
     }
 
     override fun restore() {
+        overlayActive = false
         currentTier = DuckAiTier.Unknown
         currentUpgradeClick = null
         (omnibar.omnibarView as? View)?.let { removeLayoutListener(it) }

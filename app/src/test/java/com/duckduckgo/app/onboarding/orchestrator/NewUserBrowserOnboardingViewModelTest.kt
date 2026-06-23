@@ -17,7 +17,6 @@
 package com.duckduckgo.app.onboarding.orchestrator
 
 import app.cash.turbine.test
-import com.duckduckgo.app.onboarding.DuckAiOnboardingDemo
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.onboarding.api.LinearOnboardingEvent
@@ -35,7 +34,6 @@ import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.mock
-import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 class NewUserBrowserOnboardingViewModelTest {
@@ -43,7 +41,6 @@ class NewUserBrowserOnboardingViewModelTest {
     @get:Rule
     val coroutineRule = CoroutineTestRule()
 
-    private val duckAiOnboardingDemo: DuckAiOnboardingDemo = mock()
     private val duckChat: DuckChat = mock()
     private val fakeOrchestrator = FakeOrchestrator()
 
@@ -76,7 +73,6 @@ class NewUserBrowserOnboardingViewModelTest {
 
     private fun createViewModel() = NewUserBrowserOnboardingViewModel(
         orchestrator = fakeOrchestrator,
-        duckAiOnboardingDemo = duckAiOnboardingDemo,
         duckChat = duckChat,
     )
 
@@ -93,7 +89,7 @@ class NewUserBrowserOnboardingViewModelTest {
     }
 
     @Test
-    fun `when duck ai demo step then arms demo and opens duck chat`() = runTest {
+    fun `when duck ai demo step then opens duck chat`() = runTest {
         whenever(duckChat.getDuckChatUrl("hello", autoPrompt = true)).thenReturn("https://duck.ai?q=hello")
         val demoPlan = LinearOnboardingPlan(id = NewUserOnboardingPlanProvider.ROOT_PLAN_ID, steps = listOf(duckAiDemoStep("hello")))
         fakeOrchestrator.stateFlow.value =
@@ -108,7 +104,6 @@ class NewUserBrowserOnboardingViewModelTest {
                 (command as NewUserBrowserOnboardingViewModel.Command.OpenDuckAiOnboardingDemo).url,
             )
         }
-        verify(duckAiOnboardingDemo).arm()
     }
 
     @Test

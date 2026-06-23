@@ -142,6 +142,7 @@ class RealNativeInputManager @Inject constructor(
     private val queryUrlPredictor: QueryUrlPredictor,
     private val duckAiFeatureState: DuckAiFeatureState,
     private val pixel: Pixel,
+    private val nativeInputStateBugKillSwitch: NativeInputStateBugKillSwitch,
 ) : NativeInputManager {
     private lateinit var omnibarController: NativeInputOmnibarController
     private lateinit var rootView: ViewGroup
@@ -167,7 +168,7 @@ class RealNativeInputManager @Inject constructor(
         lifecycleOwner: LifecycleOwner,
         onDisabled: () -> Unit,
     ) {
-        this.omnibarController = RealNativeInputOmnibarController(omnibar, rootView)
+        this.omnibarController = RealNativeInputOmnibarController(omnibar, rootView, nativeInputStateBugKillSwitch)
         this.rootView = rootView
         this.layoutCoordinator = NativeInputLayoutCoordinator(rootView, this.omnibarController)
         duckChat.observeNativeInputFieldUserSettingEnabled()
@@ -287,12 +288,15 @@ class RealNativeInputManager @Inject constructor(
         val widgetCard = rootView.findViewById<View?>(R.id.inputModeWidgetCard)
         if (widgetCard != null) {
             (widgetCard as? MaterialCardView)?.cardElevation = 0f
+            val animatingRoot = widgetRoot
             widgetCard.animate()
                 .alpha(0f)
                 .setDuration(FADE_OUT_DURATION_MS)
                 .withEndAction {
                     widgetCard.alpha = 1f
-                    removeWidget()
+                    if (!nativeInputStateBugKillSwitch.self().isEnabled() || widgetRoot === animatingRoot) {
+                        removeWidget()
+                    }
                 }
                 .start()
         } else {
@@ -500,6 +504,12 @@ class RealNativeInputManager @Inject constructor(
         )
         widget.onChangeModelSubmitted = { modelId -> callbacks.onChangeModelSubmitted(modelId) }
         widget.onBack = {
+            // Clear focus before hiding the IME. In SEARCH_ONLY mode the input field still holds
+            // focus when Back is pressed, and a focused, attached EditText remains the IME target —
+            // the window re-requests the keyboard after the hide. Dropping focus first removes the
+            // target so the hide sticks. In SEARCH_AND_DUCK_AI the field has already lost focus, so
+            // this is a no-op there.
+            widget.clearInputFocus()
             widget.hideKeyboard()
             hideNativeInput()
         }

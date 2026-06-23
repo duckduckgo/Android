@@ -34,7 +34,7 @@ import com.duckduckgo.app.global.install.daysInstalled
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.domain
 import com.duckduckgo.app.global.model.orderedTrackerBlockedEntities
-import com.duckduckgo.app.onboarding.DuckAiOnboardingExperimentMetrics
+import com.duckduckgo.app.onboarding.CustomAiOnboardingStore
 import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingPlanProvider
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.OnboardingStore
@@ -92,6 +92,7 @@ class CtaViewModel @Inject constructor(
     private val userAllowListRepository: UserAllowListRepository,
     private val settingsDataStore: SettingsDataStore,
     private val onboardingStore: OnboardingStore,
+    private val customAiOnboarding: CustomAiOnboardingStore,
     private val userStageStore: UserStageStore,
     private val aggregateTabProvider: AggregateTabProvider,
     private val dispatchers: DispatcherProvider,
@@ -104,7 +105,6 @@ class CtaViewModel @Inject constructor(
     private val subscriptionPromoCtaShownPlugins: PluginPoint<SubscriptionPromoCtaShownPlugin>,
     private val onboardingBrandDesignUpdateToggles: OnboardingBrandDesignUpdateToggles,
     private val appTheme: AppTheme,
-    private val duckAiOnboardingExperimentMetrics: DuckAiOnboardingExperimentMetrics,
     private val deviceInfo: DeviceInfo,
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
     linearOnboardingOrchestrator: LinearOnboardingOrchestrator,
@@ -194,12 +194,8 @@ class CtaViewModel @Inject constructor(
                     pixel.fire(it, cta.pixelShownParameters())
                 }
             }
-            if (cta is OnboardingDaxDialogCta.DaxDuckAiFireButtonCta || cta is DaxDuckAiFireButtonBrandDesignUpdateContextualCta) {
-                duckAiOnboardingExperimentMetrics.fireFireDialogImpression()
-            }
             if (cta is DaxDuckAiEndBubbleCta || cta is DaxDuckAiEndBrandDesignUpdateBubbleCta) {
                 // Native-input bubble path: mirror prepareAndMarkDuckAiEndCtaForInputScreen's side-effects.
-                duckAiOnboardingExperimentMetrics.fireFinalDialogImpression()
                 completeStageIfDaxOnboardingCompleted()
             }
             if (cta is DaxCta && cta.markAsReadOnShow) {
@@ -272,8 +268,6 @@ class CtaViewModel @Inject constructor(
                 val journey = addCtaToHistory(onboardingStore, appInstallStore, Pixel.PixelValues.DUCK_AI_END_CTA)
                 pixel.fire(AppPixelName.ONBOARDING_DAX_CTA_SHOWN, mapOf(Pixel.PixelParameter.CTA_SHOWN to journey))
             }
-            duckAiOnboardingExperimentMetrics.fireFinalDialogImpression()
-
             if (isBrandDesignUpdateEnabled()) {
                 DuckAiOnboardingEndCtaVariant.BRAND_DESIGN_UPDATE
             } else {
@@ -287,15 +281,10 @@ class CtaViewModel @Inject constructor(
             val params = mapOf(Pixel.PixelParameter.CTA_SHOWN to Pixel.PixelValues.DUCK_AI_END_CTA)
             if (okClicked) {
                 pixel.fire(AppPixelName.ONBOARDING_DAX_CTA_OK_BUTTON, params)
-                duckAiOnboardingExperimentMetrics.fireFinalDialogPressed()
             } else {
                 pixel.fire(AppPixelName.ONBOARDING_DAX_CTA_DISMISS_BUTTON, params)
             }
         }
-    }
-
-    suspend fun onDuckAiFireButtonCtaPressed() {
-        duckAiOnboardingExperimentMetrics.fireFireButtonPressed()
     }
 
     suspend fun refreshCta(
@@ -400,6 +389,7 @@ class CtaViewModel @Inject constructor(
                         appInstallStore = appInstallStore,
                         isLightTheme = appTheme.isLightModeEnabled(),
                         deviceInfo = deviceInfo,
+                        isCustomAiOnboardingFlow = customAiOnboarding.isEnabled(),
                     )
                 } else {
                     DaxDuckAiEndBubbleCta(onboardingStore, appInstallStore)
@@ -453,6 +443,7 @@ class CtaViewModel @Inject constructor(
                         appInstallStore,
                         appTheme.isLightModeEnabled(),
                         deviceInfo,
+                        isCustomAiOnboardingFlow = customAiOnboarding.isEnabled(),
                         isFreeTrialCopy = freeTrialCopyAvailable(),
                         onboardingImprovementsEnabled = isOnboardingImprovementsEnabled(),
                     )
@@ -491,7 +482,7 @@ class CtaViewModel @Inject constructor(
 
     @WorkerThread
     private suspend fun canShowDuckAiEndCta(): Boolean =
-        onboardingStore.isDuckAiOnboardingFlow() && duckAiFireButtonShown() && !duckAiEndShown()
+        onboardingStore.isDuckAiOnboardingFlow() && duckAiFireButtonShown() && !duckAiEndShown() && !hideTips()
 
     @WorkerThread
     private suspend fun canShowSubscriptionCta(): Boolean {

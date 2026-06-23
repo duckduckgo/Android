@@ -22,6 +22,7 @@ import androidx.core.content.edit
 import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
+import com.duckduckgo.browsermode.api.RegularMode
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.di.scopes.AppScope
@@ -54,9 +55,10 @@ interface DuckAiDebugServer {
 @SingleInstanceIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class RealDuckAiDebugServer @Inject constructor(
-    private val settingsDao: DuckAiBridgeSettingsDao,
-    private val chatsDao: DuckAiBridgeChatsDao,
-    private val fileMetaDao: DuckAiBridgeFileMetaDao,
+    // The debug server inspects the Regular-mode store only; it does not surface Fire-mode data.
+    @RegularMode private val settingsDao: DuckAiBridgeSettingsDao,
+    @RegularMode private val chatsDao: DuckAiBridgeChatsDao,
+    @RegularMode private val fileMetaDao: DuckAiBridgeFileMetaDao,
     private val context: Context,
     private val migrationPrefs: DuckAiMigrationPrefs,
     private val sharedPreferencesProvider: SharedPreferencesProvider,

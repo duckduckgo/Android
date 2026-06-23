@@ -107,7 +107,9 @@ class SyncWithAnotherDeviceViewModelTest {
         this.seamlessAccountSwitching().setRawStoredState(State(true))
         this.exchangeKeysToSyncWithAnotherDevice().setRawStoredState(State(false))
     }
-    private val qrCode: ExchangeV2QrCode = mock()
+    private val qrCode: ExchangeV2QrCode = mock<ExchangeV2QrCode>().also {
+        whenever(it.parse(any())).thenReturn(ExchangeV2CodeParseResult.Unknown)
+    }
 
     private val runnerEventsFlow = kotlinx.coroutines.flow.MutableSharedFlow<com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Event>(replay = 0)
     private val runner: ExchangeV2Runner = mock<ExchangeV2Runner>().also {
@@ -718,6 +720,21 @@ class SyncWithAnotherDeviceViewModelTest {
             cancelAndIgnoreRemainingEvents()
         }
         verify(runner, times(1)).startPresent()
+    }
+
+    @Test
+    fun whenIsDeepLinkAndV2EnabledThenStartPresentNotInvoked() = runTest {
+        enableV2(displayOn = true)
+        whenever(syncRepository.getAccountInfo()).thenReturn(accountA)
+
+        testee.viewState(isDeepLink = true).test {
+            awaitItem()
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        verify(runner, never()).startPresent()
+        verify(syncRepository, never()).generateExchangeInvitationCode()
+        verify(syncRepository, never()).getRecoveryCode()
     }
 
     @Test

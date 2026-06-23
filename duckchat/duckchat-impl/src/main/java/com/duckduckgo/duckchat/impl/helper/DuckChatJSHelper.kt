@@ -18,8 +18,11 @@ package com.duckduckgo.duckchat.impl.helper
 
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.browser.api.install.AppInstall
 import com.duckduckgo.common.ui.view.encodeBitmapToBase64
 import com.duckduckgo.common.utils.ConflatedJob
+import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputStatePublisher
@@ -42,9 +45,12 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import logcat.logcat
 import org.json.JSONArray
 import org.json.JSONObject
+import java.time.Instant
+import java.time.temporal.ChronoUnit
 import java.util.regex.Pattern
 import javax.inject.Inject
 
@@ -102,6 +108,9 @@ class RealDuckChatJSHelper @Inject constructor(
     private val voiceSessionStateManager: VoiceSessionStateManager,
     private val limitsHandler: LimitsHandler,
     private val nativeInputStatePublisher: NativeInputStatePublisher,
+    private val appInstall: AppInstall,
+    private val appBuildConfig: AppBuildConfig,
+    private val currentTimeProvider: CurrentTimeProvider,
 ) : DuckChatJSHelper {
 
     private val registerOpenedJob = ConflatedJob()
@@ -407,8 +416,30 @@ class RealDuckChatJSHelper @Inject constructor(
                     duckChat.isDuckChatContextualModeEnabled() &&
                         duckChat.areMultipleContentAttachmentsEnabled(),
                 )
+                put(INSTALL_TYPE, if (appBuildConfig.isAppReinstall()) INSTALL_TYPE_RETURNING else INSTALL_TYPE_NEW)
+                getInstallAgeBucket()?.let { put(INSTALL_AGE, it) }
             }.also { logcat { "DuckChat-Sync: getAIChatNativeConfigValues $it" } }
         return JsCallbackData(jsonPayload, featureName, method, id)
+    }
+
+    // Bucketed install age for the Duck.ai prompt pixel; null when the install timestamp isn't recorded
+    // yet or is in the future (clock skew), so the caller omits the param instead of sending a
+    // misleading bucket.
+    private suspend fun getInstallAgeBucket(): Int? {
+        val installTimestamp = withContext(dispatcherProvider.io()) { appInstall.getInstallationTimestamp() }
+        val nowTimestamp = currentTimeProvider.currentTimeMillis()
+        if (installTimestamp <= 0L || installTimestamp > nowTimestamp) return null
+        val installedAt = Instant.ofEpochMilli(installTimestamp)
+        val now = Instant.ofEpochMilli(nowTimestamp)
+        val days = ChronoUnit.DAYS.between(installedAt, now)
+        return when {
+            days == 0L -> 0
+            days <= 7L -> 1
+            days <= 14L -> 2
+            days <= 21L -> 3
+            days <= 28L -> 4
+            else -> 5
+        }
     }
 
     private fun getAIChatNativePrompt(
@@ -577,6 +608,10 @@ class RealDuckChatJSHelper @Inject constructor(
         private const val SUPPORTS_PAGE_CONTEXT = "supportsPageContext"
         private const val SUPPORTS_MULTIPLE_PAGE_CONTEXT = "supportsMultipleContexts"
         private const val SUPPORTS_NATIVE_STORAGE = "supportsNativeStorage"
+        private const val INSTALL_TYPE = "installType"
+        private const val INSTALL_TYPE_NEW = "new"
+        private const val INSTALL_TYPE_RETURNING = "returning"
+        private const val INSTALL_AGE = "installAge"
         private const val REPORT_METRIC = "reportMetric"
         private const val PLATFORM = "platform"
         private const val ANDROID = "android"
