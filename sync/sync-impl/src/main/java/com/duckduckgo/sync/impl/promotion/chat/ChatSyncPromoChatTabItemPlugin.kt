@@ -20,10 +20,13 @@ import android.content.Context
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.anvil.annotations.ContributesActivePlugin
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.duckchat.api.DuckChatInputModeState
 import com.duckduckgo.duckchat.api.inputscreen.NativeInputChatTabItem
 import com.duckduckgo.duckchat.api.inputscreen.NativeInputChatTabItemPlugin
 import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.launch
 import logcat.logcat
 import javax.inject.Inject
 
@@ -35,16 +38,51 @@ import javax.inject.Inject
     featureName = "pluginChatSyncPromoChatTabItemPlugin",
     parentFeatureName = "pluginPointNativeInputChatTabItemPlugin",
 )
-class ChatSyncPromoChatTabItemPlugin @Inject constructor() : NativeInputChatTabItemPlugin {
+class ChatSyncPromoChatTabItemPlugin @Inject constructor(
+    private val duckChatInput: DuckChatInputModeState,
+) : NativeInputChatTabItemPlugin {
     override fun create(
         context: Context,
         scope: CoroutineScope,
     ): NativeInputChatTabItem {
-        logcat { "Chat sync promo created" }
-        return ChatSyncChatTabItem()
+        val listener = ChatTabPluginAdapterListener()
+        val adapter = ChatSyncPromoAdapter(listener)
+
+        adapter.show()
+        scope.hideBannerOnInput(adapter)
+
+        return ChatSyncChatTabItem(adapter)
+    }
+
+    private fun CoroutineScope.hideBannerOnInput(adapter: ChatSyncPromoAdapter) {
+        launch {
+            duckChatInput.inputQuery.firstOrNull(String::isNotEmpty) ?: return@launch
+            adapter.dismiss()
+        }
     }
 }
 
-private class ChatSyncChatTabItem : NativeInputChatTabItem {
-    override val adapters: List<RecyclerView.Adapter<*>> = emptyList()
+private class ChatSyncChatTabItem(
+    private val adapter: ChatSyncPromoAdapter,
+) : NativeInputChatTabItem {
+    override val adapters: List<RecyclerView.Adapter<*>> get() = listOf(adapter)
+}
+
+private class ChatTabPluginAdapterListener : ChatSyncPromoAdapter.Listener {
+    private var didBannerShow = false
+
+    override fun onSyncWithDeviceClicked(adapter: ChatSyncPromoAdapter) {
+        adapter.dismiss()
+    }
+
+    override fun onDismissClicked(adapter: ChatSyncPromoAdapter) {
+        adapter.dismiss()
+    }
+
+    override fun onBannerShown(adapter: ChatSyncPromoAdapter) {
+        if (!didBannerShow) {
+            didBannerShow = true
+            logcat { "On banner shown" }
+        }
+    }
 }
