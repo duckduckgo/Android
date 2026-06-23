@@ -1039,6 +1039,15 @@
     <string name="onboardingDuckAiEndCtaDescription"><![CDATA[Gebruik de adresbalk om websites te zoeken en te bezoeken, of schakel over naar Duck.ai voor een privé-chat met AI.<br/><br/>Je kunt Duck.ai gebruiken vanaf elke plek waar je het chatpictogram ziet.]]></string>
     <string name="onboardingDuckAiEndCtaButton">High five!</string>
 
+    <!-- Input Mode Demo Onboarding step -->
+    <string name="preOnboardingInputModeDemoTitle">Klaar om te beginnen?&lt;br/&gt;Probeer een zoekopdracht of AI-chat!</string>
+    <string name="preOnboardingInputModeDemoSearchHint">Privé zoeken</string>
+    <string name="preOnboardingInputModeDemoChatHint">Vraag iets privé</string>
+    <string name="preOnboardingInputModeDemoChatSuggestion1">Leg de aandelenmarkt uit alsof ik 10 jaar ben</string>
+    <string name="preOnboardingInputModeDemoChatSuggestion2">Plan een perfecte dag in Londen</string>
+    <string name="preOnboardingInputModeDemoChatSuggestion3">Verras me!</string>
+    <string name="preOnboardingInputModeDemoChatSuggestion3Prompt">Wat zijn 10 fascinerende feiten over wetenschap, natuur en geschiedenis?</string>
+
     <!-- Custom AI onboarding flow -->
     <!-- Pre-onboarding: initial screens -->
     <string name="preOnboardingWelcomeDialogBodyCustomAi">Klaar om gratis privé te chatten met ChatGPT, Claude en andere AI\'s, in een browser die je actief beschermt?</string>
@@ -1058,6 +1067,7 @@
     <string name="preOnboardingDaxDialog2TitleCustomAi">Wil je DuckDuckGo als standaardbrowser gebruiken?</string>
     <!-- In-context onboarding. -->
     <string name="onboardingEndCustomAiFlowDaxDialogDescription"><![CDATA[Start een privé AI-chat met Duck.ai of schakel over naar Zoeken voor beschermd browsen.<br/><br/>Je kunt Duck.ai gebruiken vanaf elke plek waar je het chatpictogram ziet.]]></string>
+    <string name="onboardingPrivacyProCustomAiFlowDaxDialogDescription">We bieden ook een betaald abonnement aan met geavanceerde AI-modellen – met hogere chatlimieten van GPT en Claude, een veilige VPN en meer.</string>
 
     <string name="input_screen_user_pref_without_ai_updated">Alleen zoeken</string>
     <string name="input_screen_user_pref_with_ai_updated">Schakelen tussen\nzoeken en Duck.ai</string>
