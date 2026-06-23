@@ -292,6 +292,7 @@ open class DuckChatWebViewFragment : DuckDuckGoFragment(R.layout.activity_duck_c
                                         method,
                                         id,
                                         data,
+                                        browserMode = browserMode,
                                     )?.let { response ->
                                         withContext(dispatcherProvider.main()) {
                                             if (response.method == METHOD_OPEN_KEYBOARD) {

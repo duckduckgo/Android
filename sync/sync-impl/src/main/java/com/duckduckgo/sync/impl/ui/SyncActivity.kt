@@ -80,6 +80,8 @@ import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.SyncWithAnother
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.OriginalFlow
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.SetupFlows
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.ViewState
+import com.duckduckgo.sync.impl.ui.SyncSetup.WithAnotherDevice
+import com.duckduckgo.sync.impl.ui.SyncSetup.WithUrl
 import com.duckduckgo.sync.impl.ui.qrcode.SyncBarcodeUrl
 import com.duckduckgo.sync.impl.ui.setup.ConnectFlowContract
 import com.duckduckgo.sync.impl.ui.setup.ConnectFlowContractInput
@@ -109,6 +111,7 @@ import javax.inject.Inject
 @ContributeToActivityStarter(SyncActivityWithEmptyParams::class)
 @ContributeToActivityStarter(SyncActivityWithSourceParams::class)
 @ContributeToActivityStarter(SyncActivityFromSetupUrl::class)
+@ContributeToActivityStarter(SyncActivityWithAnotherDevice::class)
 class SyncActivity : DuckDuckGoActivity() {
     private val binding: ActivitySyncBinding by viewBinding()
     private val viewModel: SyncActivityViewModel by bindViewModel()
@@ -235,8 +238,12 @@ class SyncActivity : DuckDuckGoActivity() {
         setupClickListeners()
         setupRecyclerView()
 
-        syncSetupUrl()?.let { setupUrl ->
-            viewModel.processSetupDeepLink(setupUrl)
+        if (savedInstanceState == null) {
+            when (val setup = syncSetup()) {
+                is WithAnotherDevice -> viewModel.onSyncWithAnotherDevice()
+                is WithUrl -> viewModel.processSetupDeepLink(setup.url)
+                null -> Unit
+            }
         }
     }
 
@@ -244,6 +251,17 @@ class SyncActivity : DuckDuckGoActivity() {
         super.onSaveInstanceState(outState)
         pendingOriginalFlow?.let { outState.putString(KEY_PENDING_ORIGINAL_FLOW, it.name) }
     }
+
+    private fun syncSetup(): SyncSetup? {
+        val syncUrl = syncSetupUrl()
+        if (syncUrl != null) return WithUrl(syncUrl)
+
+        if (isAnotherDeviceSync()) return WithAnotherDevice
+
+        return null
+    }
+
+    private fun isAnotherDeviceSync() = intent.getActivityParams(SyncActivityWithAnotherDevice::class.java) != null
 
     private fun syncSetupUrl() = intent.getActivityParams(SyncActivityFromSetupUrl::class.java)?.url
 
@@ -624,6 +642,7 @@ class SyncActivity : DuckDuckGoActivity() {
 
     private fun extractSource(): String? {
         return intent.getActivityParams(SyncActivityWithSourceParams::class.java)?.source
+            ?: intent.getActivityParams(SyncActivityWithAnotherDevice::class.java)?.source
     }
 
     private fun launchOriginalFlow(originalFlow: OriginalFlow?) {
@@ -648,3 +667,8 @@ private fun OriginalFlow.toPixelSource(): String = when (this) {
 }
 
 data class SyncActivityWithSourceParams(val source: String?) : GlobalActivityStarter.ActivityParams
+
+private sealed interface SyncSetup {
+    data class WithUrl(val url: String) : SyncSetup
+    data object WithAnotherDevice : SyncSetup
+}

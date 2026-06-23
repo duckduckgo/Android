@@ -378,6 +378,7 @@ class DuckChatContextualFragment :
                                             Mode.CONTEXTUAL,
                                             viewModel.updatedPageContext,
                                             viewModel.sheetTabId,
+                                            browserMode,
                                         )?.let { response ->
                                             logcat { "JS Helper: response $response" }
                                             withContext(dispatcherProvider.main()) {

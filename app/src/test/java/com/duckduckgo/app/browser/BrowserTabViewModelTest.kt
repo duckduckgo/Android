@@ -1020,6 +1020,7 @@ class BrowserTabViewModelTest {
                 onboardingStore = mockOnboardingStore,
                 autocompleteHistoryDeleteFeature = fakeAutocompleteHistoryDeleteFeature,
                 customAiOnboardingStore = mockCustomAiOnboardingStore,
+                browserMode = BrowserMode.REGULAR,
             )
 
         testee.loadData("abc", null, false, false)
@@ -8161,6 +8162,7 @@ class BrowserTabViewModelTest {
                     any(),
                     anyOrNull(),
                     any(),
+                    any(),
                 ),
             ).thenReturn(jsCallbackData)
             testee.processJsCallbackMessage(
@@ -8177,6 +8179,7 @@ class BrowserTabViewModelTest {
                 anyOrNull(),
                 any(),
                 anyOrNull(),
+                any(),
                 any(),
             )
             assertCommandIssued<Command.SendResponseToJs>()
@@ -8195,6 +8198,7 @@ class BrowserTabViewModelTest {
                     any(),
                     anyOrNull(),
                     any(),
+                    any(),
                 ),
             ).thenReturn(null)
             testee.processJsCallbackMessage(
@@ -8211,6 +8215,7 @@ class BrowserTabViewModelTest {
                 anyOrNull(),
                 any(),
                 anyOrNull(),
+                any(),
                 any(),
             )
             assertCommandNotIssued<Command.SendResponseToJs>()
@@ -8811,6 +8816,7 @@ class BrowserTabViewModelTest {
                     anyString(),
                     anyOrNull(),
                     anyOrNull(),
+                    any(),
                     any(),
                     any(),
                     any(),
