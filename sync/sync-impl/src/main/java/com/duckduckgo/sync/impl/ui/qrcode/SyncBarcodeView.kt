@@ -31,6 +31,7 @@ import android.widget.FrameLayout
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.view.doOnNextLayout
+import androidx.lifecycle.LifecycleCoroutineScope
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.findViewTreeViewModelStoreOwner
@@ -42,6 +43,7 @@ import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.sync.impl.R
+import com.duckduckgo.sync.impl.SyncFeature
 import com.duckduckgo.sync.impl.databinding.ViewSquareDecoratedBarcodeBinding
 import com.duckduckgo.sync.impl.ui.qrcode.SquareDecoratedBarcodeViewModel.Command
 import com.duckduckgo.sync.impl.ui.qrcode.SquareDecoratedBarcodeViewModel.Command.CheckCameraAvailable
@@ -49,9 +51,13 @@ import com.duckduckgo.sync.impl.ui.qrcode.SquareDecoratedBarcodeViewModel.Comman
 import com.duckduckgo.sync.impl.ui.qrcode.SquareDecoratedBarcodeViewModel.Command.OpenSettings
 import com.duckduckgo.sync.impl.ui.qrcode.SquareDecoratedBarcodeViewModel.Command.RequestPermissions
 import com.duckduckgo.sync.impl.ui.qrcode.SquareDecoratedBarcodeViewModel.ViewState
+import com.google.zxing.BarcodeFormat.QR_CODE
+import com.journeyapps.barcodescanner.DefaultDecoderFactory
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 /**
@@ -87,6 +93,9 @@ constructor(
 
     @Inject
     lateinit var appBuildConfig: AppBuildConfig
+
+    @Inject
+    lateinit var syncFeature: SyncFeature
 
     private val cameraBlockedDrawable by lazy {
         ContextCompat.getDrawable(context, R.drawable.camera_blocked)
@@ -125,6 +134,19 @@ constructor(
 
         binding.goToSettingsButton.setOnClickListener {
             viewModel.goToSettings()
+        }
+
+        applyDecoderRestriction(scope)
+    }
+
+    private fun applyDecoderRestriction(scope: LifecycleCoroutineScope) {
+        scope.launch {
+            val restrictToQr = withContext(dispatchers.io()) {
+                syncFeature.restrictScannedBarcodesToQrTypes().isEnabled()
+            }
+            if (restrictToQr) {
+                binding.barcodeView.decoderFactory = DefaultDecoderFactory(listOf(QR_CODE))
+            }
         }
     }
 
