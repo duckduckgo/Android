@@ -481,15 +481,17 @@ platform :android do
         end
 
        desc "Start new hotfix"
-       lane :"hotfix-start" do
+       lane :"hotfix-start" do |options|
             UI.important("Starting a new hotfix")
 
             ensure_git_status_clean
             sh('git checkout develop && git pull')
             sh('git checkout main && git pull')
 
-            newVersion = determine_version_number()
-            releaseNotes = determine_release_notes_interactive()
+            # When :version / :release_notes are provided (e.g. from CI) the helpers skip their
+            # interactive prompts; omitting them keeps the original interactive behaviour for local use.
+            newVersion = determine_version_number(release_number: options[:version])
+            releaseNotes = determine_release_notes_interactive(release_notes: options[:release_notes])
 
             sh("git flow hotfix start #{newVersion}")
 
