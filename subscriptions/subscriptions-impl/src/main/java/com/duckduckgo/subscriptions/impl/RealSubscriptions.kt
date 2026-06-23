@@ -17,15 +17,12 @@
 package com.duckduckgo.subscriptions.impl
 
 import android.content.Context
-import android.content.Intent
 import android.content.SharedPreferences
 import android.net.Uri
-import androidx.core.content.ContextCompat
 import androidx.core.content.edit
 import androidx.core.net.toUri
 import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
 import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.browser.api.ui.BrowserScreens.SettingsScreenNoParams
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.extensions.toTldPlusOne
 import com.duckduckgo.data.store.api.SharedPreferencesProvider
@@ -128,7 +125,10 @@ class RealSubscriptions @Inject constructor(
 
     override fun launchSubscription(context: Context, uri: Uri?) {
         val origin = uri?.getQueryParameter("origin")
-        val settings = globalActivityStarter.startIntent(context, SettingsScreenNoParams) ?: return
+        // Launch the subscription web view on top of the caller's task, with no Settings screen
+        // pre-stacked beneath it. The user returns to wherever they came from on a plain back; the
+        // subscription screen navigates to Settings itself only on completion (see
+        // SubscriptionsWebViewActivity.backToSettings).
         val subscriptionIntent = globalActivityStarter.startIntent(
             context,
             SubscriptionsWebViewActivityWithParams(
@@ -136,12 +136,7 @@ class RealSubscriptions @Inject constructor(
                 origin = origin,
             ),
         ) ?: return
-        val intents: Array<Intent> = listOf(settings, subscriptionIntent).toTypedArray<Intent>()
-        intents[0] = Intent(intents[0])
-        if (!ContextCompat.startActivities(context, intents)) {
-            val topIntent = Intent(intents[intents.size - 1])
-            context.startActivity(topIntent)
-        }
+        context.startActivity(subscriptionIntent)
         pixel.reportSubscriptionRedirect()
     }
 
