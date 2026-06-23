@@ -43,6 +43,7 @@ import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.nativeinput.NativeInputHost
 import com.duckduckgo.duckchat.impl.ui.AttachmentViewModel
 import com.duckduckgo.duckchat.impl.ui.nativeinput.attachment.ImageAttachment
+import com.duckduckgo.duckchat.impl.ui.nativeinput.attachment.PageContextAttachment
 import com.duckduckgo.duckchat.impl.ui.nativeinput.file.FileAttachment
 import com.duckduckgo.duckchat.impl.ui.nativeinput.file.FileAttachmentsContainerView
 import kotlinx.coroutines.CoroutineScope
@@ -69,6 +70,7 @@ class AttachmentView(
     private var thumbnailsLayout: LinearLayout? = null
     private var imageAttachmentsContainer: ImageAttachmentsContainerView? = null
     private var fileAttachmentsContainer: FileAttachmentsContainerView? = null
+    private var pageContextContainer: PageContextAttachmentView? = null
     private var limitErrorView: TextView? = null
 
     init {
@@ -110,6 +112,12 @@ class AttachmentView(
     fun clearAttachments() = viewModel?.clearAttachments()
 
     fun clearAttachmentsForNewChat() = viewModel?.clearAttachmentsForNewChat()
+
+    fun setPageContext(attachment: PageContextAttachment) = viewModel?.setPageContext(attachment)
+
+    fun clearPageContext() = viewModel?.removePageContext()
+
+    fun getPageContext(): PageContextAttachment? = viewModel?.getPageContext()
 
     private fun buildAttachButton(): ImageView {
         val iconSize = context.resources.getDimensionPixelSize(R.dimen.nativeInputButtonSize)
@@ -158,6 +166,10 @@ class AttachmentView(
         }
         scroll.addView(row)
 
+        val pageContext = PageContextAttachmentView(context)
+        row.addView(pageContext)
+        pageContextContainer = pageContext
+
         val imagesContainer = ImageAttachmentsContainerView(context).also {
             it.onAttachmentRemoved = { id -> vm.removeImageAttachment(id) }
         }
@@ -185,6 +197,7 @@ class AttachmentView(
         val imagesView = imageAttachmentsContainer ?: return
         syncImages(imagesView, state)
         syncFiles(state)
+        syncPageContext(state)
         val errorMessage =
             state.imageLimitError
                 ?: state.fileLimitError
@@ -215,6 +228,16 @@ class AttachmentView(
         }
         (stateFileIds - containerFileIds).forEach { id ->
             state.files.find { it.id == id }?.let { filesView.addAttachment(it) }
+        }
+    }
+
+    private fun syncPageContext(state: AttachmentViewModel.AttachmentState) {
+        val view = pageContextContainer ?: return
+        val next = state.pageContext
+        if (next == null) {
+            view.hide()
+        } else if (view.current() != next) {
+            view.show(next) { viewModel?.removePageContext() }
         }
     }
 
