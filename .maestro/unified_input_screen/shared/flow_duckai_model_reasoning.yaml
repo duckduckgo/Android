@@ -10,42 +10,28 @@ appId: com.duckduckgo.mobile.android
 # as the tab title in the input mode switcher, so a text tap is unambiguous
 - tapOn: "Duck.ai"
 
-# wait for the Duck.ai bottom row to settle — model picker is the marker
+# wait for the Duck.ai bottom row to settle — model picker is the marker.
+# Generous timeout: the chip only renders once the model list loads from the
+# network, so a slow fetch on CI can otherwise leave it briefly hidden.
 - extendedWaitUntil:
     visible:
       id: "modelPickerChip"
-    timeout: 10000
+    timeout: 30000
 
-# default model is GPT-5 mini, chip text shows "GPT-5" (truncated)
-- assertVisible:
-    text: "GPT-5"
-    childOf:
-      id: "modelPickerChip"
-
-# open the model picker and assert at least one non-default model is listed
-- tapOn:
+# Capture the default model's chip label rather than hardcoding it. Model names
+# are backend-driven and have changed before (e.g. "GPT-5" -> "5.4-mini"), so we
+# read the label at runtime and assert on a *change* rather than a literal name.
+- copyTextFrom:
     id: "modelPickerChip"
-- assertVisible:
-    text: "Claude Haiku 2.5"
+- evalScript: ${output.defaultModel = maestro.copiedText}
 
-# pick Claude Haiku 2.5 and assert the chip updated away from the default
-# (the chip short name is backend-driven, so assert it's no longer "GPT-5"
-# rather than hardcoding Haiku's truncated label)
-- tapOn: "Claude Haiku 2.5"
-- assertNotVisible:
-    text: "GPT-5"
-    childOf:
-      id: "modelPickerChip"
-
-# switch back to GPT-5 mini so the reasoning picker is available
-- tapOn:
-    id: "modelPickerChip"
-- tapOn: "GPT-5 mini"
+# the default model supports reasoning, so the reasoning picker is available
 - extendedWaitUntil:
     visible:
       id: "reasoningModePickerButton"
     timeout: 5000
 
+# --- Reasoning picker: labels are local string resources, so they are stable ---
 # open the reasoning picker and assert both options are listed
 - tapOn:
     id: "reasoningModePickerButton"
@@ -69,3 +55,34 @@ appId: com.duckduckgo.mobile.android
     text: "Reasoning"
 - assertVisible:
     text: "Fast"
+# re-tap "Reasoning" (already selected, so a no-op) just to dismiss the picker
+- tapOn:
+    text: "Reasoning"
+- assertNotVisible:
+    text: "For complex tasks"
+
+# --- Model picker: verify we can switch to a different model ---
+- tapOn:
+    id: "modelPickerChip"
+# The picker renders each model as a row whose label uses id "label". Read the
+# labels straight from the list instead of hardcoding names: index 0 is the
+# selected default, index 1 is another model. Asserting they differ proves the
+# list actually offers an alternative to switch to (and fails clearly if only a
+# single model is available).
+- copyTextFrom:
+    id: "label"
+    index: 0
+- evalScript: ${output.firstModel = maestro.copiedText}
+- copyTextFrom:
+    id: "label"
+    index: 1
+- evalScript: ${output.secondModel = maestro.copiedText}
+- assertTrue: ${output.firstModel != output.secondModel}
+
+# switch to that other model and confirm the chip label moved off the default
+- tapOn:
+    id: "label"
+    index: 1
+- copyTextFrom:
+    id: "modelPickerChip"
+- assertTrue: ${maestro.copiedText != output.defaultModel}
