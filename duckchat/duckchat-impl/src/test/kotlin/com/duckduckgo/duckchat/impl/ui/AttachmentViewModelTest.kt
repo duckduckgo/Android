@@ -40,6 +40,7 @@ import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.ui.nativeinput.attachment.ConversationFileUsage
 import com.duckduckgo.duckchat.impl.ui.nativeinput.attachment.ImageAttachment
 import com.duckduckgo.duckchat.impl.ui.nativeinput.attachment.LimitsHandler
+import com.duckduckgo.duckchat.impl.ui.nativeinput.attachment.PageContextAttachment
 import com.duckduckgo.duckchat.impl.ui.nativeinput.file.FileAttachment
 import com.duckduckgo.duckchat.impl.ui.nativeinput.file.FileAttachmentProcessor
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -968,5 +969,51 @@ class AttachmentViewModelTest {
         }
 
         override suspend fun processFile(context: Context, uri: Uri): FileAttachment? = responses[uri]
+    }
+
+    @Test
+    fun whenSetPageContextThenAttachmentStateAndGetterReflectIt() = runTest {
+        val pageContext = PageContextAttachment(title = "Example", url = "https://example.com", faviconUrl = null)
+
+        viewModel.setPageContext(pageContext)
+
+        assertEquals(pageContext, viewModel.attachmentState.value.pageContext)
+        assertEquals(pageContext, viewModel.getPageContext())
+    }
+
+    @Test
+    fun whenSetPageContextTwiceThenLatestReplaces() = runTest {
+        viewModel.setPageContext(PageContextAttachment("First", "https://first.com", null))
+        val latest = PageContextAttachment("Second", "https://second.com", "https://second.com/fav.ico")
+
+        viewModel.setPageContext(latest)
+
+        assertEquals(latest, viewModel.attachmentState.value.pageContext)
+    }
+
+    @Test
+    fun whenRemovePageContextThenStateIsNull() = runTest {
+        viewModel.setPageContext(PageContextAttachment("Example", "https://example.com", null))
+
+        viewModel.removePageContext()
+
+        assertNull(viewModel.attachmentState.value.pageContext)
+        assertNull(viewModel.getPageContext())
+    }
+
+    @Test
+    fun whenOnlyPageContextPresentThenHasAttachmentsIsTrue() = runTest {
+        viewModel.setPageContext(PageContextAttachment("Example", "https://example.com", null))
+
+        assertTrue(viewModel.attachmentState.value.hasAttachments)
+    }
+
+    @Test
+    fun whenClearAttachmentsThenPageContextCleared() = runTest {
+        viewModel.setPageContext(PageContextAttachment("Example", "https://example.com", null))
+
+        viewModel.clearAttachments()
+
+        assertNull(viewModel.attachmentState.value.pageContext)
     }
 }
