@@ -1079,6 +1079,15 @@
     <string name="onboardingDuckAiEndCtaDescription"><![CDATA[Použij adresní řádek k vyhledávání a návštěvě webů nebo přepni na Duck.ai pro soukromý chat s umělou inteligencí.<br/><br/>Duck.ai můžeš používat odkudkoli, kde vidíš ikonu chatu.]]></string>
     <string name="onboardingDuckAiEndCtaButton">Hezky!</string>
 
+    <!-- Input Mode Demo Onboarding step -->
+    <string name="preOnboardingInputModeDemoTitle">Tak co, jdeš na to?&lt;br/&gt;Zkus vyhledávání nebo AI chat!</string>
+    <string name="preOnboardingInputModeDemoSearchHint">Soukromé vyhledávání</string>
+    <string name="preOnboardingInputModeDemoChatHint">Zeptej se soukromě na cokoli</string>
+    <string name="preOnboardingInputModeDemoChatSuggestion1">Vysvětli mi akciový trh, jako kdyby mi bylo 10</string>
+    <string name="preOnboardingInputModeDemoChatSuggestion2">Naplánuj mi perfektní den v Londýně</string>
+    <string name="preOnboardingInputModeDemoChatSuggestion3">Překvap mě!</string>
+    <string name="preOnboardingInputModeDemoChatSuggestion3Prompt">Řekni mi 10 fascinujících faktů z vědy, přírody a historie.</string>
+
     <!-- Custom AI onboarding flow -->
     <!-- Pre-onboarding: initial screens -->
     <string name="preOnboardingWelcomeDialogBodyCustomAi">Jsi připraven(a) chatovat soukromě s ChatGPT, Claudem a dalšími umělými inteligencemi zdarma v prohlížeči, který tě aktivně chrání?</string>
@@ -1098,6 +1107,7 @@
     <string name="preOnboardingDaxDialog2TitleCustomAi">Chceš si z nastavit DuckDuckGo jako výchozí prohlížeč?</string>
     <!-- In-context onboarding. -->
     <string name="onboardingEndCustomAiFlowDaxDialogDescription"><![CDATA[Začni soukromý chat s AI Duck.ai, nebo přepni na Vyhledávání a začni s chráněným prohlížením.<br/><br/>Duck.ai můžeš používat odkudkoli, kde vidíš ikonu chatu.]]></string>
+    <string name="onboardingPrivacyProCustomAiFlowDaxDialogDescription">Nabízíme také placené předplatné s pokročilými modely umělé inteligence s vyššími limity pro chat od GPT a Claude, zabezpečenou VPN a dalšími funkcemi.</string>
 
     <string name="input_screen_user_pref_without_ai_updated">Jen vyhledávání</string>
     <string name="input_screen_user_pref_with_ai_updated">Přepínej mezi\nHledáním a Duck.ai</string>
