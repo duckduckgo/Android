@@ -98,6 +98,17 @@ def get_latest_public_release_tag(repo_path: str) -> str | None:
     return tags[-1] if tags else None
 
 
+def is_ancestor(repo_path: str, ancestor: str, descendant: str) -> bool:
+    """
+    Return True if `ancestor` is reachable from `descendant` (i.e. all commits
+    reachable from `ancestor` are already in `descendant`'s history).
+    """
+    result = subprocess.run(
+        ["git", "-C", repo_path, "merge-base", "--is-ancestor", ancestor, descendant],
+    )
+    return result.returncode == 0
+
+
 def get_public_release_tag_before(repo_path: str, current_tag: str) -> str | None:
     """
     Return the public release tag immediately before `current_tag` by semantic version.
