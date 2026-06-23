@@ -17,6 +17,8 @@
 package com.duckduckgo.duckchat.store.impl
 
 import android.content.SharedPreferences
+import com.duckduckgo.browsermode.api.BrowserMode
+import com.duckduckgo.browsermode.api.BrowserModeDataProvider
 import com.duckduckgo.common.test.api.InMemorySharedPreferences
 import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.duckchat.api.DuckAiHostProvider
@@ -64,11 +66,20 @@ class DuckAiNativeStorageJsMessageHandlerTest {
     private val hostProvider: DuckAiHostProvider = mock<DuckAiHostProvider>().also {
         whenever(it.getHost()).thenReturn("duck.ai")
     }
+    private fun storageProviderFor(filesDir: java.io.File): BrowserModeDataProvider<DuckAiBridgeStorage> {
+        val storage = RealDuckAiBridgeStorage(settings = settingsDao, chats = chatsDao, fileMeta = fileMetaDao, filesDirLazy = Lazy { filesDir })
+        return mock<BrowserModeDataProvider<DuckAiBridgeStorage>>().also { whenever(it.forMode(any())).thenReturn(storage) }
+    }
     private val handlerPlugin by lazy {
-        DuckAiNativeStorageJsMessageHandler(settingsDao, chatsDao, fileMetaDao, Lazy { tempFolder.root }, hostProvider, migrationPrefs, pixels)
+        DuckAiNativeStorageJsMessageHandler(storageProviderFor(tempFolder.root), hostProvider, migrationPrefs, pixels, BrowserMode.REGULAR)
     }
     private val handler by lazy { handlerPlugin.getJsMessageHandler() }
     private val jsMessaging: JsMessaging = mock()
+
+    // A handler bound to Fire mode, used by the Fire-specific migration tests below.
+    private fun fireHandler() =
+        DuckAiNativeStorageJsMessageHandler(storageProviderFor(tempFolder.root), hostProvider, migrationPrefs, pixels, BrowserMode.FIRE)
+            .getJsMessageHandler()
 
     // --- metadata ---
 
@@ -109,7 +120,7 @@ class DuckAiNativeStorageJsMessageHandlerTest {
         handler.process(jsMessage("putEntry", """{"key":"theme","value":"dark"}"""), jsMessaging, null)
 
         verify(settingsDao).upsert(argThat { key == "theme" && value == "dark" })
-        verifyNoInteractions(jsMessaging)
+        verify(jsMessaging, never()).onResponse(any())
     }
 
     @Test
@@ -128,7 +139,7 @@ class DuckAiNativeStorageJsMessageHandlerTest {
         handler.process(jsMessage("replaceAllEntries", """{"entries":{"theme":"dark","lang":"en"}}"""), jsMessaging, null)
 
         verify(settingsDao).replaceAll(argThat { size == 2 })
-        verifyNoInteractions(jsMessaging)
+        verify(jsMessaging, never()).onResponse(any())
     }
 
     @Test
@@ -199,7 +210,7 @@ class DuckAiNativeStorageJsMessageHandlerTest {
 
         handler.process(jsMessage("getChat", """{"chatId":"chat-1"}""", id = null), jsMessaging, null)
 
-        verifyNoInteractions(jsMessaging)
+        verify(jsMessaging, never()).onResponse(any())
     }
 
     // --- getAllChats ---
@@ -225,7 +236,7 @@ class DuckAiNativeStorageJsMessageHandlerTest {
 
         handler.process(jsMessage("getAllChats", "{}", id = null), jsMessaging, null)
 
-        verifyNoInteractions(jsMessaging)
+        verify(jsMessaging, never()).onResponse(any())
     }
 
     // --- putChat ---
@@ -239,7 +250,7 @@ class DuckAiNativeStorageJsMessageHandlerTest {
         )
 
         verify(chatsDao).upsert(argThat { chatId == "chat-1" })
-        verifyNoInteractions(jsMessaging)
+        verify(jsMessaging, never()).onResponse(any())
     }
 
     @Test
@@ -273,7 +284,7 @@ class DuckAiNativeStorageJsMessageHandlerTest {
         verify(chatsDao).upsertAll(
             argThat { size == 2 && this[0].chatId == "chat-1" && this[1].chatId == "chat-2" },
         )
-        verifyNoInteractions(jsMessaging)
+        verify(jsMessaging, never()).onResponse(any())
     }
 
     @Test
@@ -342,7 +353,7 @@ class DuckAiNativeStorageJsMessageHandlerTest {
         handler.process(jsMessage("deleteChat", """{"chatId":"chat-1"}"""), jsMessaging, null)
 
         verify(chatsDao).delete("chat-1")
-        verifyNoInteractions(jsMessaging)
+        verify(jsMessaging, never()).onResponse(any())
     }
 
     @Test
@@ -359,7 +370,7 @@ class DuckAiNativeStorageJsMessageHandlerTest {
         handler.process(jsMessage("deleteAllChats", "{}"), jsMessaging, null)
 
         verify(chatsDao).deleteAll()
-        verifyNoInteractions(jsMessaging)
+        verify(jsMessaging, never()).onResponse(any())
     }
 
     // --- isMigrationDone ---
@@ -391,7 +402,7 @@ class DuckAiNativeStorageJsMessageHandlerTest {
     fun `isMigrationDone with no id sends no reply`() {
         handler.process(jsMessage("isMigrationDone", """{"key":"chats"}""", id = null), jsMessaging, null)
 
-        verifyNoInteractions(jsMessaging)
+        verify(jsMessaging, never()).onResponse(any())
     }
 
     // --- markMigrationDone ---
@@ -401,7 +412,7 @@ class DuckAiNativeStorageJsMessageHandlerTest {
         handler.process(jsMessage("markMigrationDone", """{"key":"chats"}"""), jsMessaging, null)
 
         assertTrue(fakePrefs.getBoolean(DuckAiMigrationPrefs.CHATS_KEY, false))
-        verifyNoInteractions(jsMessaging)
+        verify(jsMessaging, never()).onResponse(any())
     }
 
     @Test
@@ -409,7 +420,23 @@ class DuckAiNativeStorageJsMessageHandlerTest {
         handler.process(jsMessage("markMigrationDone", "{}"), jsMessaging, null)
 
         assertFalse(fakePrefs.getBoolean(DuckAiMigrationPrefs.CHATS_KEY, false))
-        verifyNoInteractions(jsMessaging)
+        verify(jsMessaging, never()).onResponse(any())
+    }
+
+    @Test
+    fun `markMigrationDone is ignored in Fire mode`() {
+        fireHandler().process(jsMessage("markMigrationDone", """{"key":"chats"}"""), jsMessaging, null)
+
+        assertFalse(fakePrefs.getBoolean(DuckAiMigrationPrefs.CHATS_KEY, false))
+    }
+
+    @Test
+    fun `isMigrationDone still reads the shared flag in Fire mode`() {
+        fakePrefs.edit().putBoolean(DuckAiMigrationPrefs.CHATS_KEY, true).commit()
+
+        fireHandler().process(jsMessage("isMigrationDone", """{"key":"chats"}""", id = "r1"), jsMessaging, null)
+
+        verify(jsMessaging).onResponse(argThat { method == "isMigrationDone" && params.getBoolean("value") })
     }
 
     @Test
@@ -436,7 +463,7 @@ class DuckAiNativeStorageJsMessageHandlerTest {
         handler.process(jsMessage("putFile", sampleParams), jsMessaging, null)
 
         assertTrue(tempFolder.root.resolve("abc-123").exists())
-        verifyNoInteractions(jsMessaging)
+        verify(jsMessaging, never()).onResponse(any())
     }
 
     @Test
@@ -495,7 +522,7 @@ class DuckAiNativeStorageJsMessageHandlerTest {
     fun `getFile with no id sends no reply`() {
         handler.process(jsMessage("getFile", """{"uuid":"abc-123"}""", id = null), jsMessaging, null)
 
-        verifyNoInteractions(jsMessaging)
+        verify(jsMessaging, never()).onResponse(any())
     }
 
     @Test
@@ -516,7 +543,7 @@ class DuckAiNativeStorageJsMessageHandlerTest {
         handler.process(jsMessage("deleteFile", """{"uuid":"abc-123"}"""), jsMessaging, null)
 
         assertFalse(tempFolder.root.resolve("abc-123").exists())
-        verifyNoInteractions(jsMessaging)
+        verify(jsMessaging, never()).onResponse(any())
     }
 
     @Test
@@ -547,7 +574,7 @@ class DuckAiNativeStorageJsMessageHandlerTest {
 
         assertFalse(fileForChat.exists())
         assertTrue(fileForOtherChat.exists())
-        verifyNoInteractions(jsMessaging)
+        verify(jsMessaging, never()).onResponse(any())
     }
 
     @Test
@@ -564,7 +591,7 @@ class DuckAiNativeStorageJsMessageHandlerTest {
         handler.process(jsMessage("deleteFiles", """{"chatId":""}"""), jsMessaging, null)
 
         verifyNoInteractions(fileMetaDao)
-        verifyNoInteractions(jsMessaging)
+        verify(jsMessaging, never()).onResponse(any())
     }
 
     @Test
@@ -574,7 +601,7 @@ class DuckAiNativeStorageJsMessageHandlerTest {
         handler.process(jsMessage("deleteAllFiles", "{}"), jsMessaging, null)
 
         assertTrue(tempFolder.root.listFiles()?.isEmpty() ?: true)
-        verifyNoInteractions(jsMessaging)
+        verify(jsMessaging, never()).onResponse(any())
     }
 
     @Test
@@ -614,7 +641,7 @@ class DuckAiNativeStorageJsMessageHandlerTest {
 
         handler.process(jsMessage("listFiles", "{}", id = null), jsMessaging, null)
 
-        verifyNoInteractions(jsMessaging)
+        verify(jsMessaging, never()).onResponse(any())
     }
 
     // --- unknown method ---
@@ -626,7 +653,7 @@ class DuckAiNativeStorageJsMessageHandlerTest {
         verifyNoInteractions(settingsDao)
         verifyNoInteractions(chatsDao)
         verifyNoInteractions(fileMetaDao)
-        verifyNoInteractions(jsMessaging)
+        verify(jsMessaging, never()).onResponse(any())
     }
 
     // --- getter error responses ---
@@ -925,13 +952,11 @@ class DuckAiNativeStorageJsMessageHandlerTest {
         }
         val throwingMigrationPrefs = DuckAiMigrationPrefs(provider)
         return DuckAiNativeStorageJsMessageHandler(
-            settingsDao,
-            chatsDao,
-            fileMetaDao,
-            Lazy { tempFolder.root },
+            storageProviderFor(tempFolder.root),
             hostProvider,
             throwingMigrationPrefs,
             pixels,
+            BrowserMode.REGULAR,
         ).getJsMessageHandler()
     }
 

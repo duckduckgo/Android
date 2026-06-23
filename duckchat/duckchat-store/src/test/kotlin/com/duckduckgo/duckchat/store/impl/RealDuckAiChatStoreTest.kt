@@ -61,7 +61,8 @@ class RealDuckAiChatStoreTest {
     @Before
     fun setup() {
         filesDir = Files.createTempDirectory("duck_ai_test").toFile()
-        store = RealDuckAiChatStore(chatsDao, fileMetaDao, Lazy { filesDir }, coroutineTestRule.testDispatcherProvider, migrationPrefs)
+        val storage = RealDuckAiBridgeStorage(settings = mock(), chats = chatsDao, fileMeta = fileMetaDao, filesDirLazy = Lazy { filesDir })
+        store = RealDuckAiChatStore(storage, coroutineTestRule.testDispatcherProvider, migrationPrefs)
     }
 
     // --- hasMigrated ---

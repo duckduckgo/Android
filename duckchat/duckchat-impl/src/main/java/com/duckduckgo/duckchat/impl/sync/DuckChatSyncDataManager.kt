@@ -19,6 +19,7 @@ package com.duckduckgo.duckchat.impl.sync
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.appbuildconfig.api.isInternalBuild
+import com.duckduckgo.browsermode.api.RegularMode
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.checkMainThread
 import com.duckduckgo.common.utils.formatters.time.SyncDateProvider
@@ -63,7 +64,11 @@ class DuckChatSyncDataManager @Inject constructor(
     private val appBuildConfig: AppBuildConfig,
     private val duckChatFeature: DuckChatFeature,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
-    private val duckAiChatStore: DuckAiChatStore,
+    // Reads the Regular store regardless of the live mode when sync runs: sync is background/WorkManager-driven and
+    // can fire while the user is in Fire mode, where the unqualified (mode-aware) store would return Fire chats and
+    // silently drop pending Regular updates. Complements the Fire guard in RealDuckChatSyncRepository (which keeps
+    // Fire chatIds out of the pending queues) — both are needed; Fire chats must never sync.
+    @RegularMode private val duckAiChatStore: DuckAiChatStore,
 ) : DeletableDataManager, SyncableDataProvider, SyncableDataPersister {
 
     override fun getDeletableType(): DeletableType = DeletableType.DUCK_AI_CHATS

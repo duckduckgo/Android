@@ -27,10 +27,9 @@ import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.cta.ui.DaxBubbleCta.DaxDialogIntroOption
 import com.duckduckgo.app.global.DefaultRoleBrowserDialog
 import com.duckduckgo.app.global.install.AppInstallStore
-import com.duckduckgo.app.onboarding.DuckAiOnboardingExperimentManager
-import com.duckduckgo.app.onboarding.DuckAiOnboardingExperimentManager.DuckAiOnboardingExperimentVariant.CONTROL
-import com.duckduckgo.app.onboarding.DuckAiOnboardingExperimentManager.DuckAiOnboardingExperimentVariant.TREATMENT_WITH_DUCK_AI_DEFAULT
-import com.duckduckgo.app.onboarding.DuckAiOnboardingExperimentManager.DuckAiOnboardingExperimentVariant.TREATMENT_WITH_SEARCH_DEFAULT
+import com.duckduckgo.app.onboarding.CustomAiOnboardingPixelName
+import com.duckduckgo.app.onboarding.CustomAiOnboardingStore
+import com.duckduckgo.app.onboarding.DuckAiOnboardingAvailability
 import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingActivityDialog
 import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingActivityStep
 import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingEvent
@@ -121,13 +120,14 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
     private val androidBrowserConfigFeature: AndroidBrowserConfigFeature,
     private val duckChat: DuckChat,
     private val inputScreenOnboardingWideEvent: InputScreenOnboardingWideEvent,
-    private val duckAiOnboardingExperimentManager: DuckAiOnboardingExperimentManager,
+    private val duckAiOnboardingAvailability: DuckAiOnboardingAvailability,
     private val onboardingQuickSetupExperimentManager: OnboardingQuickSetupExperimentManager,
     private val defaultBrowserDetector: DefaultBrowserDetector,
     private val widgetCapabilities: WidgetCapabilities,
     private val syncAutoRestore: SyncAutoRestore,
     private val brandDesignOnboardingPixelSender: BrandDesignOnboardingPixelSender,
     private val orchestrator: LinearOnboardingOrchestrator,
+    private val customAiOnboardingStore: CustomAiOnboardingStore,
 ) : ViewModel() {
 
     private val isReinstallDeferred: Deferred<Boolean> by lazy {
@@ -170,11 +170,7 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
         val maxPageCount: Int = DEFAULT_STEP_COUNT,
     )
 
-    private val _viewState = MutableStateFlow(
-        ViewState(
-            isCustomAiOnboardingFlow = onboardingStore.isCustomAiOnboardingFlow(),
-        ),
-    )
+    private val _viewState = MutableStateFlow(ViewState())
     val viewState = _viewState.asStateFlow()
 
     private val _commands = Channel<Command>(1, DROP_OLDEST)
@@ -285,9 +281,7 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
                 pixel.fire(PREONBOARDING_COMPARISON_CHART_SHOWN_UNIQUE, type = Unique())
                 brandDesignOnboardingPixelSender.fireSetDefaultShown(isReinstall)
             }
-            AI_COMPARISON_CHART -> {
-                // TODO add pixel when trigger is wired
-            }
+            AI_COMPARISON_CHART -> pixel.fire(CustomAiOnboardingPixelName.AI_COMPARISON_SCREEN_SHOW, type = Unique())
             SKIP_ONBOARDING_OPTION -> {
                 pixel.fire(PREONBOARDING_SKIP_ONBOARDING_SHOWN_UNIQUE, type = Unique())
                 brandDesignOnboardingPixelSender.fireSkipOnboardingShown(isReinstall)
@@ -692,15 +686,8 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
                 INPUT_SCREEN -> {
                     viewModelScope.launch {
                         applyInputScreenSelection()
-                        if (_viewState.value.inputScreenSelected) {
-                            when (duckAiOnboardingExperimentManager.enroll()) {
-                                null,
-                                CONTROL,
-                                -> _commands.send(Command.Finish)
-
-                                TREATMENT_WITH_DUCK_AI_DEFAULT -> setInputScreenPreviewDialog(isSearchDefault = false, currentPageNumber = null)
-                                TREATMENT_WITH_SEARCH_DEFAULT -> setInputScreenPreviewDialog(isSearchDefault = true, currentPageNumber = null)
-                            }
+                        if (_viewState.value.inputScreenSelected && duckAiOnboardingAvailability.isDuckAiOnboardingEnabled()) {
+                            setInputScreenPreviewDialog(isSearchDefault = true, currentPageNumber = null)
                         } else {
                             _commands.send(Command.Finish)
                         }
@@ -790,7 +777,14 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
 
         override fun start() {
             seedHasPlayedIntroAnimation()
-            observeOrchestratorState()
+            viewModelScope.launch {
+                // Resolve the custom AI signal before collecting orchestrator state,
+                // so the flag is set before any dialog is applied.
+                // Custom AI plan gate requires orchestrator usage,
+                // so this is okay to apply only to OrchestratorFlow and ignore for LegacyFlow.
+                _viewState.update { it.copy(isCustomAiOnboardingFlow = customAiOnboardingStore.isEnabled()) }
+                observeOrchestratorState()
+            }
         }
 
         override fun onIntroAnimationFinished() = emit(NewUserOnboardingEvent.IntroAnimationFinished)

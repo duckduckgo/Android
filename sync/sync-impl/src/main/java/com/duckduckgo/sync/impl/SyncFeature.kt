@@ -85,7 +85,7 @@ interface SyncFeature {
      * Global switch for the v2 connect/exchange stack. When disabled, the device uses the
      * v1 stack only — no v2 keys, no v2 channel, no scoped credentials.
      */
-    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun canUseV2ConnectFlow(): Toggle
 
     /**

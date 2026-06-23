@@ -29,7 +29,6 @@ import com.duckduckgo.app.cta.model.CtaId.DAX_FIRE_BUTTON
 import com.duckduckgo.app.cta.model.CtaId.DAX_INTRO_PRIVACY_PRO
 import com.duckduckgo.app.cta.model.CtaId.DAX_INTRO_VISIT_SITE
 import com.duckduckgo.app.global.install.AppInstallStore
-import com.duckduckgo.app.onboarding.DuckAiOnboardingExperimentMetrics
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.store.UserStageStore
@@ -45,6 +44,7 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.common.utils.plugins.PluginPoint
+import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.onboarding.api.LinearOnboardingOrchestrator
@@ -116,6 +116,7 @@ class OnboardingDaxDialogTests {
             userAllowListRepository,
             settingsDataStore,
             onboardingStore,
+            mock(),
             userStageStore,
             aggregateTabProvider,
             coroutineRule.testDispatcherProvider,
@@ -130,12 +131,12 @@ class OnboardingDaxDialogTests {
             },
             mockOnboardingBrandDesignUpdateToggles,
             mockAppTheme,
-            mock(DuckAiOnboardingExperimentMetrics::class.java),
             mockDeviceInfo,
             coroutineRule.testScope,
             mock(LinearOnboardingOrchestrator::class.java).apply {
                 whenever(state).thenReturn(MutableStateFlow(LinearOnboardingState.NotStarted))
             },
+            mock(DuckAiFeatureState::class.java).also { whenever(it.showInputScreen).thenReturn(MutableStateFlow(true)) },
         )
     }
 

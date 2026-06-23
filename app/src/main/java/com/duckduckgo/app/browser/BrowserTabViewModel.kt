@@ -247,6 +247,8 @@ import com.duckduckgo.app.cta.ui.BrokenSitePromptDialogCta
 import com.duckduckgo.app.cta.ui.Cta
 import com.duckduckgo.app.cta.ui.CtaViewModel
 import com.duckduckgo.app.cta.ui.DaxBubbleCta
+import com.duckduckgo.app.cta.ui.DaxDuckAiEndBrandDesignUpdateBubbleCta
+import com.duckduckgo.app.cta.ui.DaxDuckAiEndBubbleCta
 import com.duckduckgo.app.cta.ui.DaxDuckAiFireButtonBrandDesignUpdateContextualCta
 import com.duckduckgo.app.cta.ui.DaxEndBrandDesignUpdateBubbleCta
 import com.duckduckgo.app.cta.ui.DaxFireButtonBrandDesignUpdateContextualCta
@@ -279,6 +281,7 @@ import com.duckduckgo.app.global.model.domain
 import com.duckduckgo.app.global.model.domainMatchesUrl
 import com.duckduckgo.app.global.model.orderedTrackerBlockedEntities
 import com.duckduckgo.app.location.data.LocationPermissionType
+import com.duckduckgo.app.onboarding.CustomAiOnboardingStore
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboardingbranddesignupdate.OnboardingBrandDesignUpdateToggles
 import com.duckduckgo.app.pixels.AppPixelName
@@ -571,6 +574,7 @@ class BrowserTabViewModel @Inject constructor(
     private val onboardingBrandDesignUpdateToggles: OnboardingBrandDesignUpdateToggles,
     private val onboardingStore: OnboardingStore,
     private val autocompleteHistoryDeleteFeature: AutocompleteHistoryDeleteFeature,
+    private val customAiOnboardingStore: CustomAiOnboardingStore,
 ) : ViewModel(),
     WebViewClientListener,
     EditSavedSiteListener,
@@ -1061,7 +1065,7 @@ class BrowserTabViewModel @Inject constructor(
                             val hasPendingOnboardingPromo = ctaViewModel.isPromoOnboardingDialogShowing()
                             if (!hasPendingOnboardingPromo) {
                                 val duckAiEndCtaVariant = ctaViewModel.prepareAndMarkDuckAiEndCtaForInputScreen()
-                                val launchOnChat = onboardingStore.consumeOpenInputOnDuckAiTab()
+                                val launchOnChat = customAiOnboardingStore.consumeOpenInputOnDuckAiTab()
                                 command.value = LaunchInputScreen(duckAiEndCtaVariant = duckAiEndCtaVariant, launchOnChat = launchOnChat)
                             }
                         }
@@ -1833,6 +1837,8 @@ class BrowserTabViewModel @Inject constructor(
         val normalizedNewUrl = normalizeUrl(newUrl)
         return normalizedOldUrl == normalizedNewUrl
     }
+
+    fun isOmnibarLockedForOnboarding(): Boolean = currentBrowserViewState().isOmnibarLockedForOnboarding
 
     /**
      * Handles back navigation. Returns false if navigation could not be
@@ -3616,7 +3622,7 @@ class BrowserTabViewModel @Inject constructor(
         logcat { "shouldHideKeyboard: $shouldHideKeyboard" }
 
         command.value = if (shouldHideKeyboard) {
-            HideKeyboard
+            Command.DropAddressBarFocus
         } else {
             alreadyShownKeyboard = true
             ShowKeyboard
@@ -5160,7 +5166,7 @@ class BrowserTabViewModel @Inject constructor(
                     val uri = "https://duckduckgo.com/pro".toUri().buildUpon()
                         .appendQueryParameter("origin", "funnel_onboarding_android")
                         .apply {
-                            if (onboardingStore.isCustomAiOnboardingFlow()) {
+                            if (customAiOnboardingStore.isEnabled()) {
                                 appendQueryParameter("featurePage", "duckai")
                             }
                         }
@@ -5170,6 +5176,8 @@ class BrowserTabViewModel @Inject constructor(
             }
             is DaxBubbleCta.DaxEndCta,
             is DaxEndBrandDesignUpdateBubbleCta,
+            is DaxDuckAiEndBubbleCta,
+            is DaxDuckAiEndBrandDesignUpdateBubbleCta,
             -> {
                 viewModelScope.launch {
                     val updatedCta = refreshCta()
@@ -5194,9 +5202,6 @@ class BrowserTabViewModel @Inject constructor(
 
         // Defer cleanup (CTA dismiss, highlight removal) until the fire action actually completes.
         if (cta is OnboardingDaxDialogCta.DaxDuckAiFireButtonCta || cta is DaxDuckAiFireButtonBrandDesignUpdateContextualCta) {
-            viewModelScope.launch {
-                ctaViewModel.onDuckAiFireButtonCtaPressed()
-            }
             return
         }
 
@@ -5612,14 +5617,16 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun dismissDuckAiFireOnboardingCta() {
-        // Custom AI onboarding defers dismissal to the end of the linear orchestrator
-        // run, so the CTA survives if the app is killed mid-onboarding and the flow
-        // has to re-run on next launch.
-        if (onboardingStore.isCustomAiOnboardingFlow()) return
+        viewModelScope.launch {
+            // Custom AI onboarding defers dismissal to the end of the linear orchestrator
+            // run, so the CTA survives if the app is killed mid-onboarding and the flow
+            // has to re-run on next launch.
+            if (customAiOnboardingStore.isEnabled()) return@launch
 
-        val cta = ctaViewState.value?.cta ?: return
-        if (cta is OnboardingDaxDialogCta.DaxDuckAiFireButtonCta || cta is DaxDuckAiFireButtonBrandDesignUpdateContextualCta) {
-            viewModelScope.launch { ctaViewModel.onUserDismissedCta(cta = cta) }
+            val cta = ctaViewState.value?.cta ?: return@launch
+            if (cta is OnboardingDaxDialogCta.DaxDuckAiFireButtonCta || cta is DaxDuckAiFireButtonBrandDesignUpdateContextualCta) {
+                ctaViewModel.onUserDismissedCta(cta = cta)
+            }
         }
     }
 
