@@ -61,6 +61,10 @@ class AttachmentView(
     var host: NativeInputHost? = null
     var onCameraCaptureRequested: ((ValueCallback<Array<Uri>>) -> Unit)? = null
     var onFilePickerRequested: ((ValueCallback<Array<Uri>>, List<String>) -> Unit)? = null
+    var isContextual: Boolean = false
+    var onAskAboutTab: (() -> Unit)? = null
+    var onAskAboutPage: (() -> Unit)? = null
+    var onPageContextRemoved: (() -> Unit)? = null
 
     private var viewModel: AttachmentViewModel? = null
     private var supportsUpload: Boolean = false
@@ -96,7 +100,7 @@ class AttachmentView(
     }
 
     private fun updateButtonVisibility() {
-        val show = supportsUpload && lastNativeInputState?.shouldShowPluginControls() == true
+        val show = (supportsUpload || isContextual) && lastNativeInputState?.shouldShowPluginControls() == true
         isVisible = show
         (parent as? View)?.isVisible = show
     }
@@ -237,7 +241,10 @@ class AttachmentView(
         if (next == null) {
             view.hide()
         } else if (view.current() != next) {
-            view.show(next) { viewModel?.removePageContext() }
+            view.show(next) {
+                viewModel?.removePageContext()
+                onPageContextRemoved?.invoke()
+            }
         }
     }
 
@@ -275,7 +282,7 @@ class AttachmentView(
         val supportedFileTypes = state?.supportedFileTypes.orEmpty()
         val supportsImages = state?.supportsImageUpload == true
 
-        if (!supportsImages && supportedFileTypes.isEmpty()) return
+        if (!supportsImages && supportedFileTypes.isEmpty() && !isContextual) return
 
         val container = LinearLayout(context).apply {
             orientation = LinearLayout.VERTICAL
@@ -326,6 +333,22 @@ class AttachmentView(
                 popup.dismiss()
                 host?.showAttachmentChooser(true)
                 onFilePickerRequested?.invoke(buildFilePickerCallback(), supportedFileTypes)
+            }
+        }
+
+        if (isContextual) {
+            val pageContextAttached = viewModel?.getPageContext() != null
+            addMenuItem(
+                container = container,
+                iconRes = R.drawable.ic_page_content_attach_24,
+                titleRes = if (pageContextAttached) {
+                    R.string.duckChatContextualAskAboutPage
+                } else {
+                    R.string.duckChatContextualAskAboutTab
+                },
+            ) {
+                popup.dismiss()
+                if (pageContextAttached) onAskAboutPage?.invoke() else onAskAboutTab?.invoke()
             }
         }
 
