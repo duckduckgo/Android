@@ -50,6 +50,9 @@ interface ContextualNativeInputManager {
         onSearchSubmitted: (String) -> Unit,
         onCameraCaptureRequested: (ValueCallback<Array<Uri>>) -> Unit = {},
         onFilePickerRequested: (ValueCallback<Array<Uri>>, List<String>) -> Unit = { _, _ -> },
+        onAskAboutTab: () -> Unit = {},
+        onAskAboutPage: () -> Unit = {},
+        onPageContextRemoved: () -> Unit = {},
     )
 
     fun onWebViewMode()
@@ -88,13 +91,20 @@ class RealContextualNativeInputManager @Inject constructor(
         onSearchSubmitted: (String) -> Unit,
         onCameraCaptureRequested: (ValueCallback<Array<Uri>>) -> Unit,
         onFilePickerRequested: (ValueCallback<Array<Uri>>, List<String>) -> Unit,
+        onAskAboutTab: () -> Unit,
+        onAskAboutPage: () -> Unit,
+        onPageContextRemoved: () -> Unit,
     ) {
         this.card = card
         this.jsMessaging = jsMessaging
         this.widget = widget
 
         applyCardShape(card)
-        setupWidget(tabId, widget, chatIdFlow, onSearchSubmitted, onCameraCaptureRequested, onFilePickerRequested)
+        setupWidget(
+            tabId, widget, chatIdFlow, onSearchSubmitted,
+            onCameraCaptureRequested, onFilePickerRequested,
+            onAskAboutTab, onAskAboutPage, onPageContextRemoved,
+        )
         observeNativeInputSetting(lifecycleOwner)
     }
 
@@ -147,6 +157,9 @@ class RealContextualNativeInputManager @Inject constructor(
         onSearchSubmitted: (String) -> Unit,
         onCameraCaptureRequested: (ValueCallback<Array<Uri>>) -> Unit,
         onFilePickerRequested: (ValueCallback<Array<Uri>>, List<String>) -> Unit,
+        onAskAboutTab: () -> Unit,
+        onAskAboutPage: () -> Unit,
+        onPageContextRemoved: () -> Unit,
     ) {
         widget.configureContextual(tabId)
         widget.bindChatIdSource(chatIdFlow)
@@ -155,6 +168,11 @@ class RealContextualNativeInputManager @Inject constructor(
         widget.bindAttachmentCallbacks(
             onCameraCaptureRequested = onCameraCaptureRequested,
             onFilePickerRequested = onFilePickerRequested,
+        )
+        widget.setContextualAttachmentActions(
+            onAskAboutTab = onAskAboutTab,
+            onAskAboutPage = onAskAboutPage,
+            onPageContextRemoved = onPageContextRemoved,
         )
         widget.bindInputEvents(
             onSearchTextChanged = { },
