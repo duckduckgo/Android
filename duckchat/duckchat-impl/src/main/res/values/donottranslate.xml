@@ -19,4 +19,8 @@
     <!-- Remove chat history suggestion -->
     <string name="duck_chat_remove_chat_suggestion_content_description">Delete chat</string>
 
+    <!-- File/image attachment menu options -->
+    <string name="duckChatContextualAskAboutTab">Ask about tab</string>
+    <string name="duckChatContextualAskAboutPage">Ask about page</string>
+
 </resources>
