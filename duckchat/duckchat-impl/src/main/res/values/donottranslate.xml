@@ -80,4 +80,8 @@
     <string name="duckAiSearchAssistVisibilitySometimes">Sometimes</string>
     <string name="duckAiSearchAssistVisibilityOften">Often</string>
 
+    <!-- Duck AI Use Without AI Settings Option -->
+    <string name="duckAiUseWithoutAiTitle">Use DuckDuckGo Without AI</string>
+    <string name="duckAiUseWithoutAiDescription">Disables Duck.ai, hides AI-assisted answers in search, and hides AI-generated images in image search results.</string>
+
 </resources>
