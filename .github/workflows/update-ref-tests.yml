@@ -69,6 +69,30 @@ jobs:
           string: ${{steps.find-latest-release.outputs.prop}}
           split-by: '#'
 
+      - name: Create Asana task in Android App project
+        if: ${{ steps.update-check.outcome == 'failure' }}
+        id: create-task
+        uses: duckduckgo/native-github-asana-sync@v2.0
+        with:
+          asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
+          asana-project: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
+          asana-section: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
+          asana-task-name: Update reference tests to version ${{ steps.extract-release-version.outputs._1}}
+          asana-task-description: |
+            Reference tests have been updated and a PR will be created.
+
+            If tests failed check out https://app.asana.com/0/0/1203766026095653/f for further information on what to do next.
+          action: 'create-asana-task'
+
+      - name: Get Asana task permalink
+        if: ${{ steps.update-check.outcome == 'failure' }}
+        id: get-task-permalink
+        uses: duckduckgo/native-github-asana-sync@v2.0
+        with:
+          asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
+          asana-task-id: ${{ steps.create-task.outputs.taskId }}
+          action: 'get-asana-task-permalink'
+
       - name: Create Pull Request in Android repo
         if: ${{ steps.update-check.outcome == 'failure' }}
         env:
@@ -84,29 +108,14 @@ jobs:
           labels: reference tests, automated pr
           branch: automated/update-ref-tests-dependencies-${{ steps.extract-release-version.outputs._1}}
           body: |
+            Task/Issue URL: ${{ steps.get-task-permalink.outputs.asanaTaskPermalink }}
+
             - Automated reference tests dependency update
-            
+
             This PR updates the reference tests dependency to the latest available version and copies the necessary files.
             If tests have failed, see https://app.asana.com/0/0/1203766026095653/f for further information on what to do next.
-            
-            - [ ] All tests must pass
 
-      - name: Create Asana task in Android App project
-        if: ${{ steps.update-check.outcome == 'failure' }}
-        id: create-task
-        uses: duckduckgo/native-github-asana-sync@v2.0
-        with:
-          asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
-          asana-project: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
-          asana-section: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
-          asana-task-name: Update reference tests to version ${{ steps.extract-release-version.outputs._1}}
-          asana-task-description: |
-            Reference tests have been updated and a PR created.
-            
-            If tests failed check out https://app.asana.com/0/0/1203766026095653/f for further information on what to do next.
-            
-            See ${{ steps.create-pr.outputs.pull-request-url }}
-          action: 'create-asana-task'
+            - [ ] All tests must pass
 
       - name: Add Asana task to Release Board project
         if: ${{ steps.create-task.outputs.duplicate == 'false' }}
@@ -117,18 +126,6 @@ jobs:
           asana-section: ${{ vars.GH_ANDROID_RELEASE_BOARD_PR_SECTION_ID }}
           asana-task-id: ${{ steps.create-task.outputs.taskId }}
           action: 'add-task-asana-project'
-
-      - name: Update PR description with Asana task
-        if: ${{ steps.create-task.outputs.duplicate == 'false' }}
-        uses: duckduckgo/native-github-asana-sync@v2.0
-        with:
-          github-pat: ${{ secrets.GT_DAXMOBILE }}
-          github-pr: ${{ steps.create-pr.outputs.pull-request-number }}
-          github-repository: 'android'
-          github-org: 'duckduckgo'
-          asana-project: ${{ vars.GH_ANDROID_RELEASE_BOARD_PROJECT_ID }}
-          asana-task-id: ${{ steps.create-task.outputs.taskId }}
-          action: 'add-task-pr-description'
 
       - name: Create Asana task when workflow failed
         if: ${{ failure() }}
