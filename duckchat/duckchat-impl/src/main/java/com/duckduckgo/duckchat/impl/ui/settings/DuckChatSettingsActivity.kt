@@ -174,13 +174,18 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
         }
 
         binding.duckAINoAiItem.isVisible = viewState.isNativeControlsEnabled
-        // Greyed out and non-tappable while Duck.ai is turned off, with a description explaining why.
-        binding.duckAINoAiItem.isEnabled = viewState.isDuckChatUserEnabled
+        // The item represents "turn everything off". Once Duck.ai is off, Search Assist is Never and
+        // AI-generated images are hidden, there is nothing left to do, so it's greyed out, non-tappable,
+        // and explains why. Re-enabling any of the three makes it actionable again.
+        val isAlreadyWithoutAi = !viewState.isDuckChatUserEnabled &&
+            viewState.searchAssistVisibility == SearchAssistVisibility.NEVER &&
+            viewState.hideAiGeneratedImages == HideAiGeneratedImages.ON
+        binding.duckAINoAiItem.isEnabled = !isAlreadyWithoutAi
         binding.duckAINoAiItem.setSecondaryText(
-            if (viewState.isDuckChatUserEnabled) {
-                getString(R.string.duckAiUseWithoutAiDescription)
-            } else {
+            if (isAlreadyWithoutAi) {
                 getString(R.string.duckAiUseWithoutAiDisabledDescription)
+            } else {
+                getString(R.string.duckAiUseWithoutAiDescription)
             },
         )
         binding.duckAINoAiItem.setOnClickListener {
