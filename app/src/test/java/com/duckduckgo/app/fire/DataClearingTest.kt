@@ -1108,28 +1108,30 @@ class DataClearingTest {
     // --- Mode-aware granular clear contract: Regular vs Fire + Fire-availability gating ---
 
     @Test
-    fun `regular burn with fire available clears regular legacy and dispatches the fire set`() = runTest {
+    fun `regular burn with fire available clears regular legacy and dispatches the full fire set`() = runTest {
         whenever(mockFireModeAvailability.isAvailable()).thenReturn(true)
         configureManualOptions(setOf(FireClearOption.TABS, FireClearOption.DATA))
 
         testee.clearDataUsingManualFireOptions(shouldRestartIfRequired = false, wasAppUsedSinceLastClear = true, browserMode = BrowserMode.REGULAR)
 
-        // Legacy Regular path runs.
+        // Legacy Regular path runs based on the selected options.
         verify(mockClearDataAction).clearTabsOnly()
         verify(mockClearDataAction).clearBrowserDataOnly(true)
-        // Fire-scoped data is dispatched via the trigger as a single set.
+        // The full Fire set is always dispatched when Fire is available, regardless of which options
+        // were selected (note DUCKAI_CHATS was not selected, yet the Fire chat type is dispatched).
         verify(mockDataClearingTrigger).clearData(
             eq(
                 setOf(
                     ClearableData.Tabs.AllForMode(BrowserMode.FIRE),
                     ClearableData.BrowserData.AllForMode(BrowserMode.FIRE),
+                    ClearableData.DuckChats.AllForMode(BrowserMode.FIRE),
                 ),
             ),
         )
     }
 
     @Test
-    fun `regular burn with fire available and all options dispatches the full fire set`() = runTest {
+    fun `regular burn with all options dispatches both the regular chat set and the full fire set`() = runTest {
         whenever(mockFireModeAvailability.isAvailable()).thenReturn(true)
         configureManualOptions(setOf(FireClearOption.TABS, FireClearOption.DATA, FireClearOption.DUCKAI_CHATS))
 
@@ -1140,7 +1142,7 @@ class DataClearingTest {
         verify(mockClearDataAction).clearDuckAiChatsOnly()
         // Regular chats go through the legacy path + AllForMode(REGULAR) dispatch.
         verify(mockDataClearingTrigger).clearData(eq(setOf(ClearableData.DuckChats.AllForMode(BrowserMode.REGULAR))))
-        // Fire-scoped data is dispatched as a single set.
+        // Fire-scoped data is dispatched as the full set.
         verify(mockDataClearingTrigger).clearData(
             eq(
                 setOf(
@@ -1206,20 +1208,66 @@ class DataClearingTest {
     }
 
     @Test
-    fun `automatic clear uses regular mode and gates fire dispatch on availability`() = runTest {
+    fun `fire burn dispatches the full fire set even when only a subset of options is selected`() = runTest {
         whenever(mockFireModeAvailability.isAvailable()).thenReturn(true)
-        configureAutomaticOptions(setOf(FireClearOption.TABS, FireClearOption.DATA))
+        // Only TABS selected, yet a Fire burn always wipes the whole Fire profile.
+        configureManualOptions(setOf(FireClearOption.TABS))
 
-        testee.clearDataUsingAutomaticFireOptions(killProcessIfNeeded = false)
+        testee.clearDataUsingManualFireOptions(shouldRestartIfRequired = false, wasAppUsedSinceLastClear = true, browserMode = BrowserMode.FIRE)
 
-        // Automatic callers behave as a Regular burn: legacy path + Fire set when available.
-        verify(mockClearDataAction).clearTabsOnly()
-        verify(mockClearDataAction).clearBrowserDataOnly(false)
         verify(mockDataClearingTrigger).clearData(
             eq(
                 setOf(
                     ClearableData.Tabs.AllForMode(BrowserMode.FIRE),
                     ClearableData.BrowserData.AllForMode(BrowserMode.FIRE),
+                    ClearableData.DuckChats.AllForMode(BrowserMode.FIRE),
+                ),
+            ),
+        )
+    }
+
+    @Test
+    fun `fire burn restarts the process when requested regardless of the selected options`() = runTest {
+        whenever(mockFireModeAvailability.isAvailable()).thenReturn(true)
+        // TABS alone never triggers a restart in a Regular burn, but a Fire burn always restarts.
+        configureManualOptions(setOf(FireClearOption.TABS))
+
+        testee.clearDataUsingManualFireOptions(shouldRestartIfRequired = true, wasAppUsedSinceLastClear = false, browserMode = BrowserMode.FIRE)
+
+        verify(mockDataClearingWideEvent).finishSuccess()
+        verify(mockClearDataAction).killAndRestartProcess(notifyDataCleared = false)
+        verify(mockClearDataAction).setAppUsedSinceLastClearFlag(false)
+    }
+
+    @Test
+    fun `fire burn does not restart the process when not requested`() = runTest {
+        whenever(mockFireModeAvailability.isAvailable()).thenReturn(true)
+        configureManualOptions(setOf(FireClearOption.TABS, FireClearOption.DATA, FireClearOption.DUCKAI_CHATS))
+
+        testee.clearDataUsingManualFireOptions(shouldRestartIfRequired = false, wasAppUsedSinceLastClear = true, browserMode = BrowserMode.FIRE)
+
+        verify(mockClearDataAction, never()).killAndRestartProcess(any(), any(), any())
+        verify(mockClearDataAction).setAppUsedSinceLastClearFlag(true)
+    }
+
+    @Test
+    fun `automatic clear runs the regular legacy path and dispatches the full fire set when available`() = runTest {
+        whenever(mockFireModeAvailability.isAvailable()).thenReturn(true)
+        configureAutomaticOptions(setOf(FireClearOption.TABS, FireClearOption.DATA))
+
+        testee.clearDataUsingAutomaticFireOptions(killProcessIfNeeded = false)
+
+        // Automatic callers run the Regular legacy path based on the selected options...
+        verify(mockClearDataAction).clearTabsOnly()
+        verify(mockClearDataAction).clearBrowserDataOnly(false)
+        // ...and always dispatch the full Fire set when Fire mode is available, regardless of which
+        // options were selected (note DUCKAI_CHATS was not selected, yet the Fire chat type is dispatched).
+        verify(mockDataClearingTrigger).clearData(
+            eq(
+                setOf(
+                    ClearableData.Tabs.AllForMode(BrowserMode.FIRE),
+                    ClearableData.BrowserData.AllForMode(BrowserMode.FIRE),
+                    ClearableData.DuckChats.AllForMode(BrowserMode.FIRE),
                 ),
             ),
         )
