@@ -25,6 +25,7 @@ import com.duckduckgo.sync.impl.AccountErrorCodes.PAIRING_CANCELLED
 import com.duckduckgo.sync.impl.AccountErrorCodes.PAIRING_FAILED
 import com.duckduckgo.sync.impl.AccountErrorCodes.PAIRING_REJECTED
 import com.duckduckgo.sync.impl.AccountErrorCodes.PAIRING_UNAVAILABLE
+import com.duckduckgo.sync.impl.AccountErrorCodes.UNEXPECTED_EVENT
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2CodeParseResult
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Event
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Message
@@ -120,40 +121,9 @@ class RealSyncCodeDispatcher @Inject constructor(
         }
     }
 
-    /**
-     * Translate one runner event into a [DispatchOutcome] for the v2 Presenter flow,
-     * or null for intermediate events the caller should ignore. Both Host and Joiner roles are
-     * reachable here; mirrors [mapV2LinkingEventToOutcome] (login on Joiner.Done, preserve abort reason).
-     */
     private fun mapV2PresentEventToOutcome(event: ExchangeV2Event, peerKind: PeerKind?): DispatchOutcome? = when (event) {
         is ExchangeV2Event.SessionStarted -> event.linkingCode?.let { DispatchOutcome.LinkingCodeReady(it) }
-        is ExchangeV2Event.Transition -> when (event.to) {
-            ExchangeV2State.Joiner.Confirming ->
-                DispatchOutcome.JoinerConfirmationRequested(peerName = runner.peerName, peerKind = peerKind)
-            ExchangeV2State.Host.Confirming ->
-                DispatchOutcome.HostConfirmationRequested(peerName = runner.peerName, peerKind = peerKind)
-            ExchangeV2State.Host.Done -> DispatchOutcome.LoggedIn(SetupPath.PAIRING, SetupRole.HOST, peerKind)
-            ExchangeV2State.Host.Aborted -> hostAbortedToOutcome(event.localTrigger)
-            ExchangeV2State.SameAccountAbort -> DispatchOutcome.AlreadyConnected
-            ExchangeV2State.Joiner.Done -> {
-                val received = (event.trigger as? ExchangeV2Message.RecoveryCodeResponse)?.recoveryCode
-                if (received.isNullOrBlank()) {
-                    DispatchOutcome.Failed("Pairing completed without a recovery code", NO_RECOVERY_CODE.code)
-                } else {
-                    loginWithV2RecoveryCode(received, peerKind)
-                }
-            }
-            ExchangeV2State.Joiner.AbortedByHost -> when (event.trigger) {
-                is ExchangeV2Message.RecoveryCodeDenied ->
-                    DispatchOutcome.Failed("Pairing declined by peer", PAIRING_REJECTED.code)
-                is ExchangeV2Message.RecoveryCodeUnavailable ->
-                    DispatchOutcome.Failed("Peer has no recovery code", PAIRING_UNAVAILABLE.code)
-                else -> DispatchOutcome.Failed("Pairing aborted by peer", PAIRING_REJECTED.code)
-            }
-            ExchangeV2State.Joiner.AbortedLocal -> DispatchOutcome.Failed("Pairing cancelled on this device", PAIRING_CANCELLED.code)
-            ExchangeV2State.Aborted -> DispatchOutcome.Failed("negotiation_aborted", NEGOTIATION_ABORTED.code)
-            else -> null
-        }
+        is ExchangeV2Event.Transition -> mapV2Transition(event, peerKind)
         is ExchangeV2Event.SessionError -> sessionErrorToOutcome(event.message)
         else -> null
     }
@@ -317,41 +287,41 @@ class RealSyncCodeDispatcher @Inject constructor(
         -> true
     }
 
-    /**
-     * Translate one runner event into a terminal [DispatchOutcome] for the v2 scanner flow,
-     * or null for intermediate events the caller should ignore.
-     */
     private fun mapV2LinkingEventToOutcome(event: ExchangeV2Event, peerKind: PeerKind?): DispatchOutcome? = when (event) {
-        is ExchangeV2Event.Transition -> when (event.to) {
-            ExchangeV2State.Joiner.Confirming ->
-                DispatchOutcome.JoinerConfirmationRequested(peerName = runner.peerName, peerKind = peerKind)
-            ExchangeV2State.Host.Confirming ->
-                DispatchOutcome.HostConfirmationRequested(peerName = runner.peerName, peerKind = peerKind)
-            ExchangeV2State.Joiner.Done -> {
-                val received = (event.trigger as? ExchangeV2Message.RecoveryCodeResponse)?.recoveryCode
-                if (received.isNullOrBlank()) {
-                    DispatchOutcome.Failed("Pairing completed without a recovery code", NO_RECOVERY_CODE.code)
-                } else {
-                    loginWithV2RecoveryCode(received, peerKind)
-                }
-            }
-            ExchangeV2State.Joiner.AbortedByHost -> when (event.trigger) {
-                is ExchangeV2Message.RecoveryCodeDenied ->
-                    DispatchOutcome.Failed("Pairing declined by peer", PAIRING_REJECTED.code)
-                is ExchangeV2Message.RecoveryCodeUnavailable ->
-                    DispatchOutcome.Failed("Peer has no recovery code", PAIRING_UNAVAILABLE.code)
-                else -> DispatchOutcome.Failed("Pairing aborted by peer", PAIRING_REJECTED.code)
-            }
-            ExchangeV2State.Joiner.AbortedLocal -> DispatchOutcome.Failed("Pairing cancelled on this device", PAIRING_CANCELLED.code)
-            ExchangeV2State.Host.Aborted -> hostAbortedToOutcome(event.localTrigger)
-            // Per spec §"Same-account case": not an abort; both devices share an account already.
-            ExchangeV2State.SameAccountAbort -> DispatchOutcome.AlreadyConnected
-            // Elected Host and shared a recovery code — success from this device's perspective.
-            ExchangeV2State.Host.Done -> DispatchOutcome.LoggedIn(SetupPath.PAIRING, SetupRole.HOST, peerKind)
-            ExchangeV2State.Aborted -> DispatchOutcome.Failed("negotiation_aborted", NEGOTIATION_ABORTED.code)
-            else -> null
-        }
+        is ExchangeV2Event.Transition -> mapV2Transition(event, peerKind)
         is ExchangeV2Event.SessionError -> sessionErrorToOutcome(event.message)
+        else -> null
+    }
+
+    private fun mapV2Transition(
+        transition: ExchangeV2Event.Transition,
+        peerKind: PeerKind?,
+    ): DispatchOutcome? = when (transition.to) {
+        ExchangeV2State.Joiner.Confirming ->
+            DispatchOutcome.JoinerConfirmationRequested(peerName = runner.peerName, peerKind = peerKind)
+        ExchangeV2State.Host.Confirming ->
+            DispatchOutcome.HostConfirmationRequested(peerName = runner.peerName, peerKind = peerKind)
+        ExchangeV2State.Host.Done -> DispatchOutcome.LoggedIn(SetupPath.PAIRING, SetupRole.HOST, peerKind)
+        ExchangeV2State.Host.Aborted -> hostAbortedToOutcome(transition.localTrigger, transition.trigger)
+        // Per spec §"Same-account case": not an abort; both devices share an account already.
+        ExchangeV2State.SameAccountAbort -> DispatchOutcome.AlreadyConnected
+        ExchangeV2State.Joiner.Done -> {
+            val received = (transition.trigger as? ExchangeV2Message.RecoveryCodeResponse)?.recoveryCode
+            if (received.isNullOrBlank()) {
+                DispatchOutcome.Failed("joiner_done_missing_recovery_code", NO_RECOVERY_CODE.code)
+            } else {
+                loginWithV2RecoveryCode(received, peerKind)
+            }
+        }
+        ExchangeV2State.Joiner.AbortedByHost -> when (transition.trigger) {
+            is ExchangeV2Message.RecoveryCodeDenied ->
+                DispatchOutcome.Failed("peer_denied_recovery_code", PAIRING_REJECTED.code)
+            is ExchangeV2Message.RecoveryCodeUnavailable ->
+                DispatchOutcome.Failed("peer_recovery_code_unavailable", PAIRING_UNAVAILABLE.code)
+            else -> DispatchOutcome.Failed("peer_aborted", PAIRING_REJECTED.code)
+        }
+        ExchangeV2State.Joiner.AbortedLocal -> joinerAbortedLocalToOutcome(transition.localTrigger, transition.trigger)
+        ExchangeV2State.Aborted -> DispatchOutcome.Failed("negotiation_aborted", NEGOTIATION_ABORTED.code)
         else -> null
     }
 
@@ -364,10 +334,23 @@ class RealSyncCodeDispatcher @Inject constructor(
         }
     }
 
-    private fun hostAbortedToOutcome(localTrigger: LocalTrigger?): DispatchOutcome = when (localTrigger) {
-        LocalTrigger.UserDeniedHost -> DispatchOutcome.Failed("user_denied", PAIRING_CANCELLED.code)
-        LocalTrigger.HostUnavailable -> DispatchOutcome.Failed("host_unavailable", PAIRING_UNAVAILABLE.code)
+    private fun hostAbortedToOutcome(
+        localTrigger: LocalTrigger?,
+        wireTrigger: ExchangeV2Message?,
+    ): DispatchOutcome = when {
+        localTrigger == LocalTrigger.UserDeniedHost -> DispatchOutcome.Failed("user_denied", PAIRING_CANCELLED.code)
+        localTrigger == LocalTrigger.HostUnavailable -> DispatchOutcome.Failed("host_unavailable", PAIRING_UNAVAILABLE.code)
+        wireTrigger != null -> DispatchOutcome.Failed("host_protocol_error", UNEXPECTED_EVENT.code)
         else -> DispatchOutcome.Failed("host_aborted", NEGOTIATION_ABORTED.code)
+    }
+
+    private fun joinerAbortedLocalToOutcome(
+        localTrigger: LocalTrigger?,
+        wireTrigger: ExchangeV2Message?,
+    ): DispatchOutcome = when {
+        localTrigger == LocalTrigger.UserDeniedJoiner -> DispatchOutcome.Failed("user_denied_joiner", PAIRING_CANCELLED.code)
+        wireTrigger != null -> DispatchOutcome.Failed("joiner_protocol_error", UNEXPECTED_EVENT.code)
+        else -> DispatchOutcome.Failed("joiner_local_aborted", PAIRING_FAILED.code)
     }
 
     /**
@@ -433,17 +416,6 @@ class RealSyncCodeDispatcher @Inject constructor(
         Base64.encodeToString(bytes, Base64.NO_WRAP)
     }.getOrNull()
 
-    /**
-     * Map a repo [Result] to a [DispatchOutcome].
-     *
-     * If [codeForAccountSwitch] is supplied and the repo failed with [ALREADY_SIGNED_IN], switch
-     * accounts transparently via [SyncAccountRepository.logoutAndJoinNewAccount] with no prompt:
-     * the Confirmations phase is already the consent step, so the v1 `AskToSwitchAccount` dialog
-     * does not apply.
-     *
-     * [codeForAccountSwitch] must be a v1 b64 shape [SyncAccountRepository.parseSyncAuthCode] can
-     * re-parse, so v2 callers convert first (see [encodeV1RecoveryCodeAsB64]).
-     */
     /** Map the runner's raw peer credential id ("ddg"/"3party") to the telemetry [PeerKind], or null. */
     private fun String?.toPeerKind(): PeerKind? = when (this) {
         CID_DDG -> PeerKind.DDG

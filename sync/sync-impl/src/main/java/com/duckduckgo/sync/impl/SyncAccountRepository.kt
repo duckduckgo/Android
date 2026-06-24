@@ -1493,6 +1493,7 @@ enum class AccountErrorCodes(val code: Int) {
     NEGOTIATION_ABORTED(61),
     NO_RECOVERY_CODE(62),
     PAIRING_FAILED(63),
+    UNEXPECTED_EVENT(64),
 }
 
 sealed interface SyncAuthCode {

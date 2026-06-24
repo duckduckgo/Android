@@ -82,7 +82,6 @@ internal class RealExchangeV2StateMachine(
             ExchangeV2State.Negotiating -> receiveInNegotiating(state, msg)
             ExchangeV2State.Joiner.Confirming -> receiveInJoinerConfirming(state, msg)
             ExchangeV2State.Joiner.Waiting -> receiveInJoinerWaiting(state, msg)
-            // All other states: any known incoming message is an implicit abort.
             else -> abort(state, msg, RejectReason.ImplicitAbort)
         }
     }
@@ -98,7 +97,11 @@ internal class RealExchangeV2StateMachine(
     }
 
     private fun receiveInBootstrapped(state: ExchangeV2State, msg: ExchangeV2Message): TransitionResult {
-        return if (msg is Hello) accept(state, ExchangeV2State.Negotiating, msg) else abort(state, msg, RejectReason.ImplicitAbort)
+        return if (msg is Hello) {
+            accept(state, ExchangeV2State.Negotiating, msg)
+        } else {
+            abort(state, msg, RejectReason.ImplicitAbort)
+        }
     }
 
     private fun receiveInNegotiating(state: ExchangeV2State, msg: ExchangeV2Message): TransitionResult {
@@ -107,7 +110,7 @@ internal class RealExchangeV2StateMachine(
             // (Scanner: by scanning the QR; Presenter: consumed in receiveInBootstrapped).
             // Any further hello is a duplicate or the double-scan race → abort and close the
             // channel. Deliberate "record a pixel; abort (scope-cut)" (pixel deferred: Asana 1215473364991760).
-            is Hello -> abort(state, msg, RejectReason.ImplicitAbort, newState = ExchangeV2State.Aborted)
+            is Hello -> abort(state, msg, RejectReason.ImplicitAbort)
             is RecoveryCodeAvailable -> {
                 if (localUserId != null && msg.userId == localUserId) {
                     abort(state, msg, RejectReason.SameAccount, newState = ExchangeV2State.SameAccountAbort)
@@ -131,16 +134,8 @@ internal class RealExchangeV2StateMachine(
         }
     }
 
-    /**
-     * The SM-spec diagram (1215056232572322) lists no valid *incoming wire message* in
-     * Joiner.Confirming — the only expected transitions out are the local UserConfirmedJoiner /
-     * UserDeniedJoiner — so per the implicit-abort rule every received message here would abort.
-     * We extend that: if the peer explicitly tells us they're aborting (recovery_code_denied /
-     * recovery_code_unavailable), we accept it and end the session instead of making the user
-     * confirm a doomed pairing first. The remaining host-side messages (awaiting_confirmation,
-     * confirmed, response) are still rejected here; the runner buffers them and replays after
-     * the user confirms.
-     */
+    // If the peer aborts while we're still showing the confirm prompt, act on it now instead of
+    // making the user confirm a doomed pairing.
     private fun receiveInJoinerConfirming(state: ExchangeV2State, msg: ExchangeV2Message): TransitionResult {
         return when (msg) {
             is RecoveryCodeDenied -> accept(state, ExchangeV2State.Joiner.AbortedByHost, msg)
@@ -260,7 +255,7 @@ internal class RealExchangeV2StateMachine(
         from: ExchangeV2State,
         msg: ExchangeV2Message,
         reason: RejectReason,
-        newState: ExchangeV2State = from,
+        newState: ExchangeV2State = from.abortTerminal(),
     ): TransitionResult {
         currentState = newState
         val event = if (newState == from) {
@@ -285,11 +280,11 @@ internal class RealExchangeV2StateMachine(
         from: ExchangeV2State,
         trigger: LocalTrigger,
     ): TransitionResult {
-        // Local triggers that are out-of-sequence are protocol misuse from the runner. We
-        // surface them as a synthetic rejection rather than crashing
+        val newState = from.abortTerminal()
+        currentState = newState
         return TransitionResult(
-            newState = from,
-            event = ExchangeV2Event.Transition(clock.nowMs(), from, from, trigger = null, localTrigger = trigger),
+            newState = newState,
+            event = ExchangeV2Event.Transition(clock.nowMs(), from, newState, trigger = null, localTrigger = trigger),
             outcome = TransitionOutcome.Aborted(RejectReason.ImplicitAbort),
         )
     }
@@ -301,4 +296,19 @@ internal class RealExchangeV2StateMachine(
             outcome = TransitionOutcome.Dropped,
         )
     }
+}
+
+/** Terminal state to drive into on an implicit abort from [this]. Terminals return themselves. */
+private fun ExchangeV2State.abortTerminal(): ExchangeV2State = when (this) {
+    ExchangeV2State.Host.Confirming, ExchangeV2State.Host.Sending -> ExchangeV2State.Host.Aborted
+    ExchangeV2State.Joiner.Confirming, ExchangeV2State.Joiner.Waiting -> ExchangeV2State.Joiner.AbortedLocal
+    ExchangeV2State.Bootstrapped, ExchangeV2State.Negotiating -> ExchangeV2State.Aborted
+    ExchangeV2State.Aborted,
+    ExchangeV2State.SameAccountAbort,
+    ExchangeV2State.Host.Aborted,
+    ExchangeV2State.Host.Done,
+    ExchangeV2State.Joiner.AbortedByHost,
+    ExchangeV2State.Joiner.AbortedLocal,
+    ExchangeV2State.Joiner.Done,
+    -> this
 }
