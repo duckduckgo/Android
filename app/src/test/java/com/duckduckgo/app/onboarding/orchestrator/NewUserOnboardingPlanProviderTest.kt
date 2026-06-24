@@ -27,6 +27,8 @@ import com.duckduckgo.app.onboarding.DuckAiOnboardingAvailability
 import com.duckduckgo.app.onboarding.DuckAiOnboardingDemo
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.ui.page.BrandDesignOnboardingPixelSender
+import com.duckduckgo.app.onboarding.ui.page.OnboardingPixelContext
+import com.duckduckgo.app.onboarding.ui.page.OnboardingPixelEvent
 import com.duckduckgo.app.onboardingquicksetup.OnboardingQuickSetupExperimentManager
 import com.duckduckgo.app.onboardingquicksetup.OnboardingQuickSetupExperimentManager.QuickSetupExperimentVariant
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_AICHAT_SELECTED
@@ -214,10 +216,12 @@ class NewUserOnboardingPlanProviderTest {
         verify(pixel).fire(PREONBOARDING_SKIP_ONBOARDING_PRESSED)
         assertStep(NewUserOnboardingStepIds.QUICK_SETUP)
         orchestrator.onEvent(NewUserOnboardingEvent.QuickSetupConfirmed(OmnibarType.SINGLE_TOP, withAi = true))
-        verify(brandDesignOnboardingPixelSender).fireQuickSetupClicked(
-            isReinstallUser = true,
-            addressBarPosition = OmnibarType.SINGLE_TOP,
-            inputScreenSelected = true,
+        verify(brandDesignOnboardingPixelSender).fire(
+            context = OnboardingPixelContext(isReinstallUser = true),
+            event = OnboardingPixelEvent.QuickSetupClicked(
+                addressBarPosition = OmnibarType.SINGLE_TOP,
+                inputScreenSelected = true,
+            ),
         )
         assertEquals(Skipped(rootPlanId = NewUserOnboardingPlanProvider.ROOT_PLAN_ID), orchestrator.state.value)
     }

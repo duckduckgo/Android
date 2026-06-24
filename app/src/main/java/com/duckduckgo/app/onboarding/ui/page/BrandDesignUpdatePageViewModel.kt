@@ -164,6 +164,9 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
         val hideSetDefaultBrowserRow: Boolean = false,
         val hideAddWidgetRow: Boolean = false,
         val isCustomAiOnboardingFlow: Boolean = false,
+        // Duck.ai search/chat branch, set once the INPUT_SCREEN_PREVIEW branching step is reached;
+        // null before it (control / pre-branch). Carried as the conditional `variant` pixel param.
+        val onboardingBranchVariant: OnboardingBranchVariant? = null,
         val currentPageNumber: Int? = null,
         // Total steps in the indicator. Set alongside currentPageNumber from the plan-derived StepProgress
         // (orchestrator flow) or the legacy flow's fixed 3-step sequence. Only read while an indicator is shown.
@@ -258,6 +261,11 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
                 inputScreenPreviewSearchSuggestions = onboardingStore.getSearchOptions(),
                 inputScreenPreviewChatSuggestions = onboardingStore.getChatSuggestions(),
                 inputScreenPreviewIsSearchSelected = isSearchDefault,
+                onboardingBranchVariant = if (isSearchDefault) {
+                    OnboardingBranchVariant.SEARCH_PLUS_DUCKAI_SEARCH
+                } else {
+                    OnboardingBranchVariant.SEARCH_PLUS_DUCKAI_CHAT
+                },
                 currentPageNumber = currentPageNumber,
                 maxPageCount = totalSteps,
             )
@@ -266,41 +274,19 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
     }
 
     private fun fireDialogShownPixel(dialogType: PreOnboardingDialogType) {
-        val isReinstall = _viewState.value.isReinstallUser
+        val context = pixelContext()
         when (dialogType) {
             SYNC_RESTORE -> pixel.fire(PREONBOARDING_SYNC_RESTORE_SHOWN_UNIQUE, type = Unique())
-            INITIAL_REINSTALL_USER -> {
-                pixel.fire(PREONBOARDING_INTRO_REINSTALL_USER_SHOWN_UNIQUE, type = Unique())
-                brandDesignOnboardingPixelSender.fireWelcomeShown(isReinstall)
-            }
-            INITIAL -> {
-                pixel.fire(PREONBOARDING_INTRO_SHOWN_UNIQUE, type = Unique())
-                brandDesignOnboardingPixelSender.fireWelcomeShown(isReinstall)
-            }
-            COMPARISON_CHART -> {
-                pixel.fire(PREONBOARDING_COMPARISON_CHART_SHOWN_UNIQUE, type = Unique())
-                brandDesignOnboardingPixelSender.fireSetDefaultShown(isReinstall)
-            }
+            INITIAL_REINSTALL_USER -> pixel.fire(PREONBOARDING_INTRO_REINSTALL_USER_SHOWN_UNIQUE, type = Unique())
+            INITIAL -> pixel.fire(PREONBOARDING_INTRO_SHOWN_UNIQUE, type = Unique())
+            COMPARISON_CHART -> pixel.fire(PREONBOARDING_COMPARISON_CHART_SHOWN_UNIQUE, type = Unique())
             AI_COMPARISON_CHART -> pixel.fire(CustomAiOnboardingPixelName.AI_COMPARISON_SCREEN_SHOW, type = Unique())
-            SKIP_ONBOARDING_OPTION -> {
-                pixel.fire(PREONBOARDING_SKIP_ONBOARDING_SHOWN_UNIQUE, type = Unique())
-                brandDesignOnboardingPixelSender.fireSkipOnboardingShown(isReinstall)
-            }
-            ADDRESS_BAR_POSITION -> {
-                pixel.fire(PREONBOARDING_ADDRESS_BAR_POSITION_SHOWN_UNIQUE, type = Unique())
-                brandDesignOnboardingPixelSender.fireAddressBarPositionShown(isReinstall)
-            }
-            INPUT_SCREEN -> {
-                pixel.fire(PREONBOARDING_CHOOSE_SEARCH_EXPERIENCE_IMPRESSIONS_UNIQUE, type = Unique())
-                brandDesignOnboardingPixelSender.fireSearchExperienceShown(isReinstall)
-            }
-            INPUT_SCREEN_PREVIEW -> {
-            }
-
-            QUICK_SETUP -> {
-                brandDesignOnboardingPixelSender.fireQuickSetupShown(isReinstallUser = isReinstall)
-            }
+            SKIP_ONBOARDING_OPTION -> pixel.fire(PREONBOARDING_SKIP_ONBOARDING_SHOWN_UNIQUE, type = Unique())
+            ADDRESS_BAR_POSITION -> pixel.fire(PREONBOARDING_ADDRESS_BAR_POSITION_SHOWN_UNIQUE, type = Unique())
+            INPUT_SCREEN -> pixel.fire(PREONBOARDING_CHOOSE_SEARCH_EXPERIENCE_IMPRESSIONS_UNIQUE, type = Unique())
+            INPUT_SCREEN_PREVIEW, QUICK_SETUP -> Unit
         }
+        dialogType.toEvent(OnboardingAction.Shown)?.let { brandDesignOnboardingPixelSender.fire(context, it) }
     }
 
     fun onIntroAnimationStarted() {
@@ -324,39 +310,28 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
     }
 
     private fun fireBrandDesignPrimaryClickedPixel(dialog: PreOnboardingDialogType) {
-        val isReinstall = _viewState.value.isReinstallUser
-        when (dialog) {
-            INITIAL, INITIAL_REINSTALL_USER ->
-                brandDesignOnboardingPixelSender.fireWelcomeClicked(isReinstall, engaged = true)
-            COMPARISON_CHART ->
-                brandDesignOnboardingPixelSender.fireSetDefaultClicked(isReinstall)
-            ADDRESS_BAR_POSITION ->
-                brandDesignOnboardingPixelSender.fireAddressBarPositionClicked(isReinstall, _viewState.value.selectedAddressBarPosition)
-            INPUT_SCREEN ->
-                brandDesignOnboardingPixelSender.fireSearchExperienceClicked(isReinstall, _viewState.value.inputScreenSelected)
-            SKIP_ONBOARDING_OPTION ->
-                brandDesignOnboardingPixelSender.fireSkipOnboardingClicked(isReinstall, engaged = true)
-            SYNC_RESTORE, AI_COMPARISON_CHART, INPUT_SCREEN_PREVIEW, QUICK_SETUP -> Unit
-        }
+        val action = OnboardingAction.PrimaryClick(
+            addressBarPosition = _viewState.value.selectedAddressBarPosition,
+            withAi = _viewState.value.inputScreenSelected,
+        )
+        dialog.toEvent(action)?.let { brandDesignOnboardingPixelSender.fire(pixelContext(), it) }
     }
 
     private fun fireBrandDesignSecondaryClickedPixel(dialog: PreOnboardingDialogType) {
-        val isReinstall = _viewState.value.isReinstallUser
-        when (dialog) {
-            INITIAL_REINSTALL_USER ->
-                brandDesignOnboardingPixelSender.fireWelcomeClicked(isReinstall, engaged = false)
-            SKIP_ONBOARDING_OPTION ->
-                brandDesignOnboardingPixelSender.fireSkipOnboardingClicked(isReinstall, engaged = false)
-            SYNC_RESTORE, INITIAL, COMPARISON_CHART, AI_COMPARISON_CHART, ADDRESS_BAR_POSITION,
-            INPUT_SCREEN, INPUT_SCREEN_PREVIEW, QUICK_SETUP,
-            -> Unit
-        }
+        dialog.toEvent(OnboardingAction.SecondaryClick)?.let { brandDesignOnboardingPixelSender.fire(pixelContext(), it) }
     }
 
     fun onInputModeDemoQuerySubmitted(
         query: String,
         isChat: Boolean,
-    ) = flow.onInputModeDemoQuerySubmitted(query = query, isChat = isChat)
+        fromSuggestion: Boolean,
+    ) {
+        brandDesignOnboardingPixelSender.fire(
+            pixelContext(),
+            OnboardingPixelEvent.TryASearchClicked(fromSuggestion = fromSuggestion, isChat = isChat),
+        )
+        flow.onInputModeDemoQuerySubmitted(query = query, isChat = isChat)
+    }
 
     fun onDefaultBrowserSet() {
         recordDefaultBrowserDialogResult(isSet = true)
@@ -371,8 +346,18 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
     }
 
     private fun fireBrandDesignSetDefaultResult(isDdgDefault: Boolean) {
-        brandDesignOnboardingPixelSender.fireSetDefaultConfirmed(_viewState.value.isReinstallUser, isDdgDefault = isDdgDefault)
+        brandDesignOnboardingPixelSender.fire(pixelContext(), OnboardingPixelEvent.SetDefaultConfirmed(isDdgDefault = isDdgDefault))
     }
+
+    // Builds the shared onboarding pixel context from current viewState. The install-type override
+    // exists for the notification pixels, which fire before loadDaxDialog resolves reinstall status
+    // into viewState and therefore pass the value resolved via isReinstallDeferred.
+    private fun pixelContext(isReinstallUser: Boolean = _viewState.value.isReinstallUser): OnboardingPixelContext =
+        OnboardingPixelContext(
+            isReinstallUser = isReinstallUser,
+            // source/flow are resolved inside the sender from CustomAiOnboardingStore.
+            variant = _viewState.value.onboardingBranchVariant,
+        )
 
     fun onQuickSetupDefaultBrowserSet() {
         recordDefaultBrowserDialogResult(isSet = true, fireTelemetry = false)
@@ -484,7 +469,10 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
         // The notification prompt is shown before loadDaxDialog resolves reinstall status into
         // viewState, so resolve it directly via the shared deferred to report the correct install type.
         viewModelScope.launch {
-            brandDesignOnboardingPixelSender.fireNotificationsShown(isReinstallUser = isReinstallDeferred.await())
+            brandDesignOnboardingPixelSender.fire(
+                pixelContext(isReinstallUser = isReinstallDeferred.await()),
+                OnboardingPixelEvent.NotificationsShown,
+            )
         }
     }
 
@@ -494,13 +482,19 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
             mapOf(PixelParameter.FROM_ONBOARDING to true.toString()),
         )
         viewModelScope.launch {
-            brandDesignOnboardingPixelSender.fireNotificationsConfirmed(isReinstallUser = isReinstallDeferred.await(), granted = true)
+            brandDesignOnboardingPixelSender.fire(
+                pixelContext(isReinstallUser = isReinstallDeferred.await()),
+                OnboardingPixelEvent.NotificationsConfirmed(granted = true),
+            )
         }
     }
 
     fun notificationRuntimePermissionDenied() {
         viewModelScope.launch {
-            brandDesignOnboardingPixelSender.fireNotificationsConfirmed(isReinstallUser = isReinstallDeferred.await(), granted = false)
+            brandDesignOnboardingPixelSender.fire(
+                pixelContext(isReinstallUser = isReinstallDeferred.await()),
+                OnboardingPixelEvent.NotificationsConfirmed(granted = false),
+            )
         }
     }
 
@@ -705,10 +699,12 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
                         applyAddressBarPositionSelection(fireTelemetry = false)
                         applyInputScreenSelection(fireTelemetry = false)
                         val state = _viewState.value
-                        brandDesignOnboardingPixelSender.fireQuickSetupClicked(
-                            isReinstallUser = state.isReinstallUser,
-                            addressBarPosition = state.selectedAddressBarPosition,
-                            inputScreenSelected = state.inputScreenSelected,
+                        brandDesignOnboardingPixelSender.fire(
+                            context = pixelContext(),
+                            event = OnboardingPixelEvent.QuickSetupClicked(
+                                addressBarPosition = state.selectedAddressBarPosition,
+                                inputScreenSelected = state.inputScreenSelected,
+                            ),
                         )
                         _commands.send(Command.OnboardingSkipped)
                     }

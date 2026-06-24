@@ -76,13 +76,13 @@
                 "key": "source",
                 "type": "string",
                 "description": "Onboarding entry point",
-                "enum": ["default"]
+                "enum": ["default", "duckai_cpp"]
             },
             {
                 "key": "flow",
                 "type": "string",
                 "description": "Onboarding flow type",
-                "enum": ["default"]
+                "enum": ["default", "duckai"]
             },
             {
                 "key": "pixelSource",
@@ -144,8 +144,8 @@
                 "type": "integer",
                 "description": "Days since install (0-28). Omitted when more than 28 days have passed since install."
             },
-            { "key": "source", "type": "string", "description": "Onboarding entry point", "enum": ["default"] },
-            { "key": "flow", "type": "string", "description": "Onboarding flow type", "enum": ["default"] },
+            { "key": "source", "type": "string", "description": "Onboarding entry point", "enum": ["default", "duckai_cpp"] },
+            { "key": "flow", "type": "string", "description": "Onboarding flow type", "enum": ["default", "duckai"] },
             { "key": "pixelSource", "type": "string", "description": "Device form factor", "enum": ["phone", "tablet"] },
             { "key": "value", "type": "string", "description": "Only set when e=clicked.", "enum": ["engage", "dismiss"] }
         ]
@@ -169,9 +169,15 @@
                 "type": "integer",
                 "description": "Days since install (0-28). Omitted when more than 28 days have passed since install."
             },
-            { "key": "source", "type": "string", "description": "Onboarding entry point", "enum": ["default"] },
-            { "key": "flow", "type": "string", "description": "Onboarding flow type", "enum": ["default"] },
+            { "key": "source", "type": "string", "description": "Onboarding entry point", "enum": ["default", "duckai_cpp"] },
+            { "key": "flow", "type": "string", "description": "Onboarding flow type", "enum": ["default", "duckai"] },
             { "key": "pixelSource", "type": "string", "description": "Device form factor", "enum": ["phone", "tablet"] },
+            {
+                "key": "variant",
+                "type": "string",
+                "description": "Duck.ai search/chat branch. Set only in the custom Duck.ai flow, where this step fires after the search-experience preview branching step.",
+                "enum": ["search_plus_duckai-search", "search_plus_duckai-chat"]
+            },
             {
                 "key": "value",
                 "type": "string",
@@ -199,9 +205,15 @@
                 "type": "integer",
                 "description": "Days since install (0-28). Omitted when more than 28 days have passed since install."
             },
-            { "key": "source", "type": "string", "description": "Onboarding entry point", "enum": ["default"] },
-            { "key": "flow", "type": "string", "description": "Onboarding flow type", "enum": ["default"] },
+            { "key": "source", "type": "string", "description": "Onboarding entry point", "enum": ["default", "duckai_cpp"] },
+            { "key": "flow", "type": "string", "description": "Onboarding flow type", "enum": ["default", "duckai"] },
             { "key": "pixelSource", "type": "string", "description": "Device form factor", "enum": ["phone", "tablet"] },
+            {
+                "key": "variant",
+                "type": "string",
+                "description": "Duck.ai search/chat branch. Set only in the custom Duck.ai flow, where this step fires after the search-experience preview branching step.",
+                "enum": ["search_plus_duckai-search", "search_plus_duckai-chat"]
+            },
             {
                 "key": "value",
                 "type": "string",
@@ -229,8 +241,8 @@
                 "type": "integer",
                 "description": "Days since install (0-28). Omitted when more than 28 days have passed since install."
             },
-            { "key": "source", "type": "string", "description": "Onboarding entry point", "enum": ["default"] },
-            { "key": "flow", "type": "string", "description": "Onboarding flow type", "enum": ["default"] },
+            { "key": "source", "type": "string", "description": "Onboarding entry point", "enum": ["default", "duckai_cpp"] },
+            { "key": "flow", "type": "string", "description": "Onboarding flow type", "enum": ["default", "duckai"] },
             { "key": "pixelSource", "type": "string", "description": "Device form factor", "enum": ["phone", "tablet"] },
             {
                 "key": "value",
@@ -259,8 +271,8 @@
                 "type": "integer",
                 "description": "Days since install (0-28). Omitted when more than 28 days have passed since install."
             },
-            { "key": "source", "type": "string", "description": "Onboarding entry point", "enum": ["default"] },
-            { "key": "flow", "type": "string", "description": "Onboarding flow type", "enum": ["default"] },
+            { "key": "source", "type": "string", "description": "Onboarding entry point", "enum": ["default", "duckai_cpp"] },
+            { "key": "flow", "type": "string", "description": "Onboarding flow type", "enum": ["default", "duckai"] },
             { "key": "pixelSource", "type": "string", "description": "Device form factor", "enum": ["phone", "tablet"] },
             { "key": "value", "type": "string", "description": "Only set when e=clicked.", "enum": ["engage", "dismiss"] }
         ]
@@ -284,14 +296,110 @@
                 "type": "integer",
                 "description": "Days since install (0-28). Omitted when more than 28 days have passed since install."
             },
-            { "key": "source", "type": "string", "description": "Onboarding entry point", "enum": ["default"] },
-            { "key": "flow", "type": "string", "description": "Onboarding flow type", "enum": ["default"] },
+            { "key": "source", "type": "string", "description": "Onboarding entry point", "enum": ["default", "duckai_cpp"] },
+            { "key": "flow", "type": "string", "description": "Onboarding flow type", "enum": ["default", "duckai"] },
             { "key": "pixelSource", "type": "string", "description": "Device form factor", "enum": ["phone", "tablet"] },
             {
                 "key": "value",
                 "type": "string",
                 "description": "Only set when e=confirmed. Permission result.",
                 "enum": ["granted", "denied"]
+            }
+        ]
+    },
+    "onboarding_sync-restore": {
+        "description": "Sync-restore prompt step. shown when the auto-restore prompt is displayed; clicked engage when the user taps restore, dismiss when they skip. Unique once per user per (event, value).",
+        "owners": ["catalinradoiu"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "e",
+                "type": "string",
+                "description": "Event type for the onboarding instrumentation standard",
+                "enum": ["shown", "clicked"]
+            },
+            { "key": "it", "type": "string", "description": "Install type", "enum": ["new", "reinstall"] },
+            {
+                "key": "d",
+                "type": "integer",
+                "description": "Days since install (0-28). Omitted when more than 28 days have passed since install."
+            },
+            { "key": "source", "type": "string", "description": "Onboarding entry point", "enum": ["default", "duckai_cpp"] },
+            { "key": "flow", "type": "string", "description": "Onboarding flow type", "enum": ["default", "duckai"] },
+            { "key": "pixelSource", "type": "string", "description": "Device form factor", "enum": ["phone", "tablet"] },
+            {
+                "key": "value",
+                "type": "string",
+                "description": "Only set when e=clicked. engage when restore is tapped, dismiss when skipped.",
+                "enum": ["engage", "dismiss"]
+            }
+        ]
+    },
+    "onboarding_input-preview": {
+        "description": "Try-a-search preview step. shown when the input-screen preview is displayed; clicked when the user tries a query, with value encoding whether the query came from a suggestion or was custom, and whether it was a search or a Duck.ai chat. Unique once per user per (event, value).",
+        "owners": ["catalinradoiu"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "e",
+                "type": "string",
+                "description": "Event type for the onboarding instrumentation standard",
+                "enum": ["shown", "clicked"]
+            },
+            { "key": "it", "type": "string", "description": "Install type", "enum": ["new", "reinstall"] },
+            {
+                "key": "d",
+                "type": "integer",
+                "description": "Days since install (0-28). Omitted when more than 28 days have passed since install."
+            },
+            { "key": "source", "type": "string", "description": "Onboarding entry point", "enum": ["default", "duckai_cpp"] },
+            { "key": "flow", "type": "string", "description": "Onboarding flow type", "enum": ["default", "duckai"] },
+            { "key": "pixelSource", "type": "string", "description": "Device form factor", "enum": ["phone", "tablet"] },
+            {
+                "key": "variant",
+                "type": "string",
+                "description": "Duck.ai search/chat branch. Set only in the custom Duck.ai flow.",
+                "enum": ["search_plus_duckai-search", "search_plus_duckai-chat"]
+            },
+            {
+                "key": "value",
+                "type": "string",
+                "description": "Only set when e=clicked. The tried query's source (suggested/custom) and mode (search/chat).",
+                "enum": ["suggested_search", "suggested_chat", "custom_search", "custom_chat"]
+            }
+        ]
+    },
+    "onboarding_ai-comparison": {
+        "description": "AI-comparison-chart step. shown when the AI comparison chart is displayed; clicked (no value) when the user taps the primary CTA. Unique once per user per event.",
+        "owners": ["catalinradoiu"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "e",
+                "type": "string",
+                "description": "Event type for the onboarding instrumentation standard",
+                "enum": ["shown", "clicked"]
+            },
+            { "key": "it", "type": "string", "description": "Install type", "enum": ["new", "reinstall"] },
+            {
+                "key": "d",
+                "type": "integer",
+                "description": "Days since install (0-28). Omitted when more than 28 days have passed since install."
+            },
+            { "key": "source", "type": "string", "description": "Onboarding entry point", "enum": ["default", "duckai_cpp"] },
+            { "key": "flow", "type": "string", "description": "Onboarding flow type", "enum": ["default", "duckai"] },
+            { "key": "pixelSource", "type": "string", "description": "Device form factor", "enum": ["phone", "tablet"] },
+            {
+                "key": "variant",
+                "type": "string",
+                "description": "Duck.ai search/chat branch. Set only in the custom Duck.ai flow.",
+                "enum": ["search_plus_duckai-search", "search_plus_duckai-chat"]
             }
         ]
     }

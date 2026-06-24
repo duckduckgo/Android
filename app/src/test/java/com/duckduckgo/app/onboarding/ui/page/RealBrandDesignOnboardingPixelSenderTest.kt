@@ -19,12 +19,16 @@ package com.duckduckgo.app.onboarding.ui.page
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.global.install.AppInstallStore
+import com.duckduckgo.app.onboarding.CustomAiOnboardingStore
 import com.duckduckgo.app.pixels.AppPixelName.ONBOARDING_ADDRESS_BAR_POSITION
+import com.duckduckgo.app.pixels.AppPixelName.ONBOARDING_AI_COMPARISON
+import com.duckduckgo.app.pixels.AppPixelName.ONBOARDING_INPUT_PREVIEW
 import com.duckduckgo.app.pixels.AppPixelName.ONBOARDING_NOTIFICATIONS
 import com.duckduckgo.app.pixels.AppPixelName.ONBOARDING_QUICK_SETUP
 import com.duckduckgo.app.pixels.AppPixelName.ONBOARDING_SEARCH_EXPERIENCE
 import com.duckduckgo.app.pixels.AppPixelName.ONBOARDING_SET_DEFAULT
 import com.duckduckgo.app.pixels.AppPixelName.ONBOARDING_SKIP_ONBOARDING
+import com.duckduckgo.app.pixels.AppPixelName.ONBOARDING_SYNC_RESTORE
 import com.duckduckgo.app.pixels.AppPixelName.ONBOARDING_WELCOME
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
@@ -48,6 +52,9 @@ class RealBrandDesignOnboardingPixelSenderTest {
 
     private val mockPixel: Pixel = mock()
     private val mockAppInstallStore: AppInstallStore = mock()
+    private val mockCustomAiOnboardingStore: CustomAiOnboardingStore = mock {
+        onBlocking { isEnabled() } doReturn false
+    }
     private val mockDefaultBrowserDetector: DefaultBrowserDetector = mock()
     private val mockWidgetCapabilities: WidgetCapabilities = mock()
     private val mockDeviceInfo: DeviceInfo = mock {
@@ -59,6 +66,7 @@ class RealBrandDesignOnboardingPixelSenderTest {
         pixel = mockPixel,
         dispatchers = coroutineRule.testDispatcherProvider,
         appInstallStore = mockAppInstallStore,
+        customAiOnboardingStore = mockCustomAiOnboardingStore,
         defaultBrowserDetector = mockDefaultBrowserDetector,
         widgetCapabilities = mockWidgetCapabilities,
         deviceInfo = mockDeviceInfo,
@@ -68,7 +76,7 @@ class RealBrandDesignOnboardingPixelSenderTest {
     fun whenFireWelcomeShownForNewUserThenStandardShownParams() = runTest {
         whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis())
 
-        testee.fireWelcomeShown(isReinstallUser = false)
+        testee.fire(OnboardingPixelContext(isReinstallUser = false), OnboardingPixelEvent.WelcomeShown)
 
         verify(mockPixel).fire(
             ONBOARDING_WELCOME,
@@ -81,7 +89,7 @@ class RealBrandDesignOnboardingPixelSenderTest {
     fun whenFireWelcomeClickedEngagedForReinstallThenValueEngageAndTagIncludesValue() = runTest {
         whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(3))
 
-        testee.fireWelcomeClicked(isReinstallUser = true, engaged = true)
+        testee.fire(OnboardingPixelContext(isReinstallUser = true), OnboardingPixelEvent.WelcomeClicked(engaged = true))
 
         verify(mockPixel).fire(
             ONBOARDING_WELCOME,
@@ -102,7 +110,7 @@ class RealBrandDesignOnboardingPixelSenderTest {
     fun whenFireWelcomeClickedNotEngagedThenValueDismiss() = runTest {
         whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis())
 
-        testee.fireWelcomeClicked(isReinstallUser = false, engaged = false)
+        testee.fire(OnboardingPixelContext(isReinstallUser = false), OnboardingPixelEvent.WelcomeClicked(engaged = false))
 
         verify(mockPixel).fire(
             ONBOARDING_WELCOME,
@@ -123,7 +131,7 @@ class RealBrandDesignOnboardingPixelSenderTest {
     fun whenInstalledMoreThan28DaysAgoThenDaysParamOmitted() = runTest {
         whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(40))
 
-        testee.fireSkipOnboardingShown(isReinstallUser = false)
+        testee.fire(OnboardingPixelContext(isReinstallUser = false), OnboardingPixelEvent.SkipOnboardingShown)
 
         verify(mockPixel).fire(
             ONBOARDING_SKIP_ONBOARDING,
@@ -136,7 +144,7 @@ class RealBrandDesignOnboardingPixelSenderTest {
     fun whenFireAddressBarPositionClickedSplitThenValueSplit() = runTest {
         whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis())
 
-        testee.fireAddressBarPositionClicked(isReinstallUser = false, position = OmnibarType.SPLIT)
+        testee.fire(OnboardingPixelContext(isReinstallUser = false), OnboardingPixelEvent.AddressBarPositionClicked(position = OmnibarType.SPLIT))
 
         verify(mockPixel).fire(
             ONBOARDING_ADDRESS_BAR_POSITION,
@@ -157,7 +165,7 @@ class RealBrandDesignOnboardingPixelSenderTest {
     fun whenFireSearchExperienceClickedWithAiThenValueSearchPlusDuckai() = runTest {
         whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis())
 
-        testee.fireSearchExperienceClicked(isReinstallUser = false, withAi = true)
+        testee.fire(OnboardingPixelContext(isReinstallUser = false), OnboardingPixelEvent.SearchExperienceClicked(withAi = true))
 
         verify(mockPixel).fire(
             ONBOARDING_SEARCH_EXPERIENCE,
@@ -178,7 +186,7 @@ class RealBrandDesignOnboardingPixelSenderTest {
     fun whenFireSearchExperienceClickedWithoutAiThenValueSearchOnly() = runTest {
         whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis())
 
-        testee.fireSearchExperienceClicked(isReinstallUser = false, withAi = false)
+        testee.fire(OnboardingPixelContext(isReinstallUser = false), OnboardingPixelEvent.SearchExperienceClicked(withAi = false))
 
         verify(mockPixel).fire(
             ONBOARDING_SEARCH_EXPERIENCE,
@@ -199,7 +207,7 @@ class RealBrandDesignOnboardingPixelSenderTest {
     fun whenFireSetDefaultConfirmedDdgThenValueDdg() = runTest {
         whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis())
 
-        testee.fireSetDefaultConfirmed(isReinstallUser = false, isDdgDefault = true)
+        testee.fire(OnboardingPixelContext(isReinstallUser = false), OnboardingPixelEvent.SetDefaultConfirmed(isDdgDefault = true))
 
         verify(mockPixel).fire(
             ONBOARDING_SET_DEFAULT,
@@ -220,7 +228,7 @@ class RealBrandDesignOnboardingPixelSenderTest {
     fun whenFireSetDefaultConfirmedNotDdgThenValueOther() = runTest {
         whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis())
 
-        testee.fireSetDefaultConfirmed(isReinstallUser = false, isDdgDefault = false)
+        testee.fire(OnboardingPixelContext(isReinstallUser = false), OnboardingPixelEvent.SetDefaultConfirmed(isDdgDefault = false))
 
         verify(mockPixel).fire(
             ONBOARDING_SET_DEFAULT,
@@ -241,7 +249,7 @@ class RealBrandDesignOnboardingPixelSenderTest {
     fun whenFireSetDefaultClickedThenNoValueAndTagWithoutValue() = runTest {
         whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis())
 
-        testee.fireSetDefaultClicked(isReinstallUser = false)
+        testee.fire(OnboardingPixelContext(isReinstallUser = false), OnboardingPixelEvent.SetDefaultClicked)
 
         verify(mockPixel).fire(
             ONBOARDING_SET_DEFAULT,
@@ -255,7 +263,7 @@ class RealBrandDesignOnboardingPixelSenderTest {
         whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis())
         whenever(mockDeviceInfo.formFactor()).thenReturn(DeviceInfo.FormFactor.TABLET)
 
-        testee.fireNotificationsConfirmed(isReinstallUser = false, granted = false)
+        testee.fire(OnboardingPixelContext(isReinstallUser = false), OnboardingPixelEvent.NotificationsConfirmed(granted = false))
 
         verify(mockPixel).fire(
             ONBOARDING_NOTIFICATIONS,
@@ -276,7 +284,7 @@ class RealBrandDesignOnboardingPixelSenderTest {
     fun whenFireQuickSetupShownThenFiresShownPixelWithStandardParams() = runTest {
         whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(3))
 
-        testee.fireQuickSetupShown(isReinstallUser = true)
+        testee.fire(OnboardingPixelContext(isReinstallUser = true), OnboardingPixelEvent.QuickSetupShown)
 
         verify(mockPixel).fire(
             ONBOARDING_QUICK_SETUP,
@@ -291,7 +299,13 @@ class RealBrandDesignOnboardingPixelSenderTest {
         whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(false)
         whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(false)
 
-        testee.fireQuickSetupClicked(isReinstallUser = true, addressBarPosition = OmnibarType.SINGLE_TOP, inputScreenSelected = true)
+        testee.fire(
+            OnboardingPixelContext(isReinstallUser = true),
+            OnboardingPixelEvent.QuickSetupClicked(
+                addressBarPosition = OmnibarType.SINGLE_TOP,
+                inputScreenSelected = true,
+            ),
+        )
 
         verify(mockPixel).fire(
             ONBOARDING_QUICK_SETUP,
@@ -314,7 +328,13 @@ class RealBrandDesignOnboardingPixelSenderTest {
         whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(true)
         whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(false)
 
-        testee.fireQuickSetupClicked(isReinstallUser = true, addressBarPosition = OmnibarType.SINGLE_BOTTOM, inputScreenSelected = false)
+        testee.fire(
+            OnboardingPixelContext(isReinstallUser = true),
+            OnboardingPixelEvent.QuickSetupClicked(
+                addressBarPosition = OmnibarType.SINGLE_BOTTOM,
+                inputScreenSelected = false,
+            ),
+        )
 
         verify(mockPixel).fire(
             ONBOARDING_QUICK_SETUP,
@@ -337,7 +357,13 @@ class RealBrandDesignOnboardingPixelSenderTest {
         whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(false)
         whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(true)
 
-        testee.fireQuickSetupClicked(isReinstallUser = true, addressBarPosition = OmnibarType.SPLIT, inputScreenSelected = true)
+        testee.fire(
+            OnboardingPixelContext(isReinstallUser = true),
+            OnboardingPixelEvent.QuickSetupClicked(
+                addressBarPosition = OmnibarType.SPLIT,
+                inputScreenSelected = true,
+            ),
+        )
 
         verify(mockPixel).fire(
             ONBOARDING_QUICK_SETUP,
@@ -351,6 +377,217 @@ class RealBrandDesignOnboardingPixelSenderTest {
                 "value" to "set_as_default:off,widget:on,address_bar:split,input_type:search_and_duckai",
             ),
             type = Unique(tag = "onboarding_quick-setup_clicked"),
+        )
+    }
+
+    @Test
+    fun whenCustomAiFlowThenSourceDuckaiCppAndFlowDuckai() = runTest {
+        whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis())
+        whenever(mockCustomAiOnboardingStore.isEnabled()).thenReturn(true)
+
+        testee.fire(OnboardingPixelContext(isReinstallUser = false), OnboardingPixelEvent.WelcomeShown)
+
+        verify(mockPixel).fire(
+            ONBOARDING_WELCOME,
+            mapOf("it" to "new", "source" to "duckai_cpp", "flow" to "duckai", "pixelSource" to "phone", "d" to "0", "e" to "shown"),
+            type = Unique(tag = "onboarding_welcome_shown"),
+        )
+    }
+
+    @Test
+    fun whenContextHasChatVariantThenVariantParamPresent() = runTest {
+        whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis())
+        whenever(mockCustomAiOnboardingStore.isEnabled()).thenReturn(true)
+
+        testee.fire(
+            OnboardingPixelContext(
+                isReinstallUser = false,
+                variant = OnboardingBranchVariant.SEARCH_PLUS_DUCKAI_CHAT,
+            ),
+            OnboardingPixelEvent.SetDefaultShown,
+        )
+
+        verify(mockPixel).fire(
+            ONBOARDING_SET_DEFAULT,
+            mapOf(
+                "it" to "new",
+                "source" to "duckai_cpp",
+                "flow" to "duckai",
+                "variant" to "search_plus_duckai-chat",
+                "pixelSource" to "phone",
+                "d" to "0",
+                "e" to "shown",
+            ),
+            type = Unique(tag = "onboarding_set-default_shown"),
+        )
+    }
+
+    @Test
+    fun whenContextHasSearchVariantWithDefaultFlowThenVariantPresentAndFlowDefault() = runTest {
+        whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis())
+
+        testee.fire(
+            OnboardingPixelContext(
+                isReinstallUser = false,
+                variant = OnboardingBranchVariant.SEARCH_PLUS_DUCKAI_SEARCH,
+            ),
+            OnboardingPixelEvent.AddressBarPositionShown,
+        )
+
+        verify(mockPixel).fire(
+            ONBOARDING_ADDRESS_BAR_POSITION,
+            mapOf(
+                "it" to "new",
+                "source" to "default",
+                "flow" to "default",
+                "variant" to "search_plus_duckai-search",
+                "pixelSource" to "phone",
+                "d" to "0",
+                "e" to "shown",
+            ),
+            type = Unique(tag = "onboarding_address-bar-position_shown"),
+        )
+    }
+
+    @Test
+    fun whenFireSyncRestoreShownThenStandardShownParams() = runTest {
+        whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis())
+
+        testee.fire(OnboardingPixelContext(isReinstallUser = false), OnboardingPixelEvent.SyncRestoreShown)
+
+        verify(mockPixel).fire(
+            ONBOARDING_SYNC_RESTORE,
+            mapOf("it" to "new", "source" to "default", "flow" to "default", "pixelSource" to "phone", "d" to "0", "e" to "shown"),
+            type = Unique(tag = "onboarding_sync-restore_shown"),
+        )
+    }
+
+    @Test
+    fun whenFireSyncRestoreClickedEngagedThenValueEngage() = runTest {
+        whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis())
+
+        testee.fire(OnboardingPixelContext(isReinstallUser = false), OnboardingPixelEvent.SyncRestoreClicked(engaged = true))
+
+        verify(mockPixel).fire(
+            ONBOARDING_SYNC_RESTORE,
+            mapOf(
+                "it" to "new",
+                "source" to "default",
+                "flow" to "default",
+                "pixelSource" to "phone",
+                "d" to "0",
+                "e" to "clicked",
+                "value" to "engage",
+            ),
+            type = Unique(tag = "onboarding_sync-restore_clicked_engage"),
+        )
+    }
+
+    @Test
+    fun whenFireSyncRestoreClickedNotEngagedThenValueDismiss() = runTest {
+        whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis())
+
+        testee.fire(OnboardingPixelContext(isReinstallUser = false), OnboardingPixelEvent.SyncRestoreClicked(engaged = false))
+
+        verify(mockPixel).fire(
+            ONBOARDING_SYNC_RESTORE,
+            mapOf(
+                "it" to "new",
+                "source" to "default",
+                "flow" to "default",
+                "pixelSource" to "phone",
+                "d" to "0",
+                "e" to "clicked",
+                "value" to "dismiss",
+            ),
+            type = Unique(tag = "onboarding_sync-restore_clicked_dismiss"),
+        )
+    }
+
+    @Test
+    fun whenFireTryASearchShownThenStandardShownParams() = runTest {
+        whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis())
+
+        testee.fire(OnboardingPixelContext(isReinstallUser = false), OnboardingPixelEvent.TryASearchShown)
+
+        verify(mockPixel).fire(
+            ONBOARDING_INPUT_PREVIEW,
+            mapOf("it" to "new", "source" to "default", "flow" to "default", "pixelSource" to "phone", "d" to "0", "e" to "shown"),
+            type = Unique(tag = "onboarding_input-preview_shown"),
+        )
+    }
+
+    @Test
+    fun whenFireTryASearchClickedSuggestedSearchThenValueSuggestedSearch() = runTest {
+        whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis())
+
+        testee.fire(
+            OnboardingPixelContext(isReinstallUser = false),
+            OnboardingPixelEvent.TryASearchClicked(fromSuggestion = true, isChat = false),
+        )
+
+        verify(mockPixel).fire(
+            ONBOARDING_INPUT_PREVIEW,
+            mapOf(
+                "it" to "new",
+                "source" to "default",
+                "flow" to "default",
+                "pixelSource" to "phone",
+                "d" to "0",
+                "e" to "clicked",
+                "value" to "suggested_search",
+            ),
+            type = Unique(tag = "onboarding_input-preview_clicked_suggested_search"),
+        )
+    }
+
+    @Test
+    fun whenFireTryASearchClickedCustomChatThenValueCustomChat() = runTest {
+        whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis())
+
+        testee.fire(
+            OnboardingPixelContext(isReinstallUser = false),
+            OnboardingPixelEvent.TryASearchClicked(fromSuggestion = false, isChat = true),
+        )
+
+        verify(mockPixel).fire(
+            ONBOARDING_INPUT_PREVIEW,
+            mapOf(
+                "it" to "new",
+                "source" to "default",
+                "flow" to "default",
+                "pixelSource" to "phone",
+                "d" to "0",
+                "e" to "clicked",
+                "value" to "custom_chat",
+            ),
+            type = Unique(tag = "onboarding_input-preview_clicked_custom_chat"),
+        )
+    }
+
+    @Test
+    fun whenFireAiComparisonShownThenStandardShownParams() = runTest {
+        whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis())
+
+        testee.fire(OnboardingPixelContext(isReinstallUser = false), OnboardingPixelEvent.AiComparisonShown)
+
+        verify(mockPixel).fire(
+            ONBOARDING_AI_COMPARISON,
+            mapOf("it" to "new", "source" to "default", "flow" to "default", "pixelSource" to "phone", "d" to "0", "e" to "shown"),
+            type = Unique(tag = "onboarding_ai-comparison_shown"),
+        )
+    }
+
+    @Test
+    fun whenFireAiComparisonClickedThenNoValueAndTagWithoutValue() = runTest {
+        whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis())
+
+        testee.fire(OnboardingPixelContext(isReinstallUser = false), OnboardingPixelEvent.AiComparisonClicked)
+
+        verify(mockPixel).fire(
+            ONBOARDING_AI_COMPARISON,
+            mapOf("it" to "new", "source" to "default", "flow" to "default", "pixelSource" to "phone", "d" to "0", "e" to "clicked"),
+            type = Unique(tag = "onboarding_ai-comparison_clicked"),
         )
     }
 }

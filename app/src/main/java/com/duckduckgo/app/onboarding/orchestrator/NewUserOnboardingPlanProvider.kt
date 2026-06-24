@@ -29,6 +29,8 @@ import com.duckduckgo.app.onboarding.DuckAiOnboardingAvailability
 import com.duckduckgo.app.onboarding.DuckAiOnboardingDemo
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.ui.page.BrandDesignOnboardingPixelSender
+import com.duckduckgo.app.onboarding.ui.page.OnboardingPixelContext
+import com.duckduckgo.app.onboarding.ui.page.OnboardingPixelEvent
 import com.duckduckgo.app.onboardingquicksetup.OnboardingQuickSetupExperimentManager
 import com.duckduckgo.app.onboardingquicksetup.OnboardingQuickSetupExperimentManager.QuickSetupExperimentVariant
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_AICHAT_SELECTED
@@ -545,10 +547,14 @@ class NewUserOnboardingPlanProvider @Inject constructor(
                     val resolved = resolveOmnibarType(event.type)
                     settingsDataStore.omnibarType = resolved
                     applyInputModeSelection(ctx, event.withAi, fireTelemetry = false)
-                    brandDesignOnboardingPixelSender.fireQuickSetupClicked(
-                        isReinstallUser = ctx.isReinstall,
-                        addressBarPosition = resolved,
-                        inputScreenSelected = event.withAi,
+                    brandDesignOnboardingPixelSender.fire(
+                        // Quick-setup is reached via the skip fork, before any Duck.ai branch, so variant is null.
+                        // source/flow are resolved inside the sender from CustomAiOnboardingStore.
+                        context = OnboardingPixelContext(isReinstallUser = ctx.isReinstall),
+                        event = OnboardingPixelEvent.QuickSetupClicked(
+                            addressBarPosition = resolved,
+                            inputScreenSelected = event.withAi,
+                        ),
                     )
                     AbortPlan
                 }

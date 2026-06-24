@@ -84,6 +84,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
@@ -881,7 +882,7 @@ class BrandDesignUpdatePageViewModelTest {
         testee.notificationRuntimePermissionRequested()
         advanceUntilIdle()
 
-        verify(mockBrandDesignOnboardingPixelSender).fireNotificationsShown(isReinstallUser = false)
+        verify(mockBrandDesignOnboardingPixelSender).fire(OnboardingPixelContext(isReinstallUser = false), OnboardingPixelEvent.NotificationsShown)
     }
 
     @Test
@@ -892,7 +893,10 @@ class BrandDesignUpdatePageViewModelTest {
         testee.notificationRuntimePermissionGranted()
         advanceUntilIdle()
 
-        verify(mockBrandDesignOnboardingPixelSender).fireNotificationsConfirmed(isReinstallUser = false, granted = true)
+        verify(mockBrandDesignOnboardingPixelSender).fire(
+            OnboardingPixelContext(isReinstallUser = false),
+            OnboardingPixelEvent.NotificationsConfirmed(granted = true),
+        )
     }
 
     @Test
@@ -903,7 +907,10 @@ class BrandDesignUpdatePageViewModelTest {
         testee.notificationRuntimePermissionDenied()
         advanceUntilIdle()
 
-        verify(mockBrandDesignOnboardingPixelSender).fireNotificationsConfirmed(isReinstallUser = false, granted = false)
+        verify(mockBrandDesignOnboardingPixelSender).fire(
+            OnboardingPixelContext(isReinstallUser = false),
+            OnboardingPixelEvent.NotificationsConfirmed(granted = false),
+        )
     }
 
     @Test
@@ -917,8 +924,11 @@ class BrandDesignUpdatePageViewModelTest {
         testee.notificationRuntimePermissionGranted()
         advanceUntilIdle()
 
-        verify(mockBrandDesignOnboardingPixelSender).fireNotificationsShown(isReinstallUser = true)
-        verify(mockBrandDesignOnboardingPixelSender).fireNotificationsConfirmed(isReinstallUser = true, granted = true)
+        verify(mockBrandDesignOnboardingPixelSender).fire(OnboardingPixelContext(isReinstallUser = true), OnboardingPixelEvent.NotificationsShown)
+        verify(mockBrandDesignOnboardingPixelSender).fire(
+            OnboardingPixelContext(isReinstallUser = true),
+            OnboardingPixelEvent.NotificationsConfirmed(granted = true),
+        )
     }
 
     // endregion
@@ -1121,7 +1131,7 @@ class BrandDesignUpdatePageViewModelTest {
         val testee = createViewModel()
         testee.commands.test {
             awaitItem() // drain initial PlayIntroAnimation
-            testee.onInputModeDemoQuerySubmitted("hello world", isChat = true)
+            testee.onInputModeDemoQuerySubmitted("hello world", isChat = true, fromSuggestion = true)
             val command = awaitItem()
             assertTrue(command is Command.FinishAndSubmitChatPrompt)
             assertEquals("hello world", (command as Command.FinishAndSubmitChatPrompt).prompt)
@@ -1133,11 +1143,39 @@ class BrandDesignUpdatePageViewModelTest {
         val testee = createViewModel()
         testee.commands.test {
             awaitItem() // drain initial PlayIntroAnimation
-            testee.onInputModeDemoQuerySubmitted("search query", isChat = false)
+            testee.onInputModeDemoQuerySubmitted("search query", isChat = false, fromSuggestion = false)
             val command = awaitItem()
             assertTrue(command is Command.FinishAndSubmitSearchQuery)
             assertEquals("search query", (command as Command.FinishAndSubmitSearchQuery).query)
         }
+    }
+
+    @Test
+    fun whenSuggestionChatQuerySubmittedThenFiresTryASearchClickedWithSuggestionAndChat() = runTest {
+        whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(false)
+        val testee = createViewModel()
+
+        testee.onInputModeDemoQuerySubmitted("hello", isChat = true, fromSuggestion = true)
+        advanceUntilIdle()
+
+        verify(mockBrandDesignOnboardingPixelSender).fire(
+            OnboardingPixelContext(isReinstallUser = false),
+            OnboardingPixelEvent.TryASearchClicked(fromSuggestion = true, isChat = true),
+        )
+    }
+
+    @Test
+    fun whenCustomSearchQuerySubmittedThenFiresTryASearchClickedWithCustomAndSearch() = runTest {
+        whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(false)
+        val testee = createViewModel()
+
+        testee.onInputModeDemoQuerySubmitted("cats", isChat = false, fromSuggestion = false)
+        advanceUntilIdle()
+
+        verify(mockBrandDesignOnboardingPixelSender).fire(
+            OnboardingPixelContext(isReinstallUser = false),
+            OnboardingPixelEvent.TryASearchClicked(fromSuggestion = false, isChat = false),
+        )
     }
 
     // endregion
@@ -1239,7 +1277,7 @@ class BrandDesignUpdatePageViewModelTest {
         testee.onSecondaryCtaClicked() // INITIAL_REINSTALL_USER -> QUICK_SETUP
         advanceUntilIdle()
 
-        verify(mockBrandDesignOnboardingPixelSender).fireQuickSetupShown(isReinstallUser = true)
+        verify(mockBrandDesignOnboardingPixelSender).fire(OnboardingPixelContext(isReinstallUser = true), OnboardingPixelEvent.QuickSetupShown)
     }
 
     @Test
@@ -1255,10 +1293,12 @@ class BrandDesignUpdatePageViewModelTest {
         testee.onPrimaryCtaClicked()
         advanceUntilIdle()
 
-        verify(mockBrandDesignOnboardingPixelSender).fireQuickSetupClicked(
-            isReinstallUser = true,
-            addressBarPosition = OmnibarType.SINGLE_BOTTOM,
-            inputScreenSelected = false,
+        verify(mockBrandDesignOnboardingPixelSender).fire(
+            context = OnboardingPixelContext(isReinstallUser = true),
+            event = OnboardingPixelEvent.QuickSetupClicked(
+                addressBarPosition = OmnibarType.SINGLE_BOTTOM,
+                inputScreenSelected = false,
+            ),
         )
     }
 
@@ -1270,9 +1310,9 @@ class BrandDesignUpdatePageViewModelTest {
 
         testee.onPrimaryCtaClicked()
 
-        verify(mockBrandDesignOnboardingPixelSender).fireAddressBarPositionClicked(
-            isReinstallUser = false,
-            position = OmnibarType.SINGLE_BOTTOM,
+        verify(mockBrandDesignOnboardingPixelSender).fire(
+            context = OnboardingPixelContext(isReinstallUser = false),
+            event = OnboardingPixelEvent.AddressBarPositionClicked(position = OmnibarType.SINGLE_BOTTOM),
         )
     }
 
@@ -1286,7 +1326,10 @@ class BrandDesignUpdatePageViewModelTest {
 
         testee.onPrimaryCtaClicked()
 
-        verify(mockBrandDesignOnboardingPixelSender).fireSearchExperienceClicked(isReinstallUser = false, withAi = false)
+        verify(mockBrandDesignOnboardingPixelSender).fire(
+            OnboardingPixelContext(isReinstallUser = false),
+            OnboardingPixelEvent.SearchExperienceClicked(withAi = false),
+        )
     }
 
     @Test
@@ -1299,7 +1342,10 @@ class BrandDesignUpdatePageViewModelTest {
 
         testee.onPrimaryCtaClicked()
 
-        verify(mockBrandDesignOnboardingPixelSender).fireSkipOnboardingClicked(isReinstallUser = true, engaged = true)
+        verify(mockBrandDesignOnboardingPixelSender).fire(
+            OnboardingPixelContext(isReinstallUser = true),
+            OnboardingPixelEvent.SkipOnboardingClicked(engaged = true),
+        )
     }
 
     @Test
@@ -1312,7 +1358,10 @@ class BrandDesignUpdatePageViewModelTest {
 
         testee.onSecondaryCtaClicked()
 
-        verify(mockBrandDesignOnboardingPixelSender).fireSkipOnboardingClicked(isReinstallUser = true, engaged = false)
+        verify(mockBrandDesignOnboardingPixelSender).fire(
+            OnboardingPixelContext(isReinstallUser = true),
+            OnboardingPixelEvent.SkipOnboardingClicked(engaged = false),
+        )
     }
 
     @Test
@@ -1324,7 +1373,7 @@ class BrandDesignUpdatePageViewModelTest {
         testee.onPrimaryCtaClicked() // INITIAL -> COMPARISON_CHART
         testee.onPrimaryCtaClicked() // COMPARISON_CHART "Choose your browser" -> set-default clicked
 
-        verify(mockBrandDesignOnboardingPixelSender).fireSetDefaultClicked(isReinstallUser = false)
+        verify(mockBrandDesignOnboardingPixelSender).fire(OnboardingPixelContext(isReinstallUser = false), OnboardingPixelEvent.SetDefaultClicked)
     }
 
     @Test
@@ -1333,8 +1382,11 @@ class BrandDesignUpdatePageViewModelTest {
 
         testee.onDefaultBrowserSet()
 
-        verify(mockBrandDesignOnboardingPixelSender).fireSetDefaultConfirmed(isReinstallUser = false, isDdgDefault = true)
-        verify(mockBrandDesignOnboardingPixelSender, never()).fireSetDefaultClicked(any())
+        verify(mockBrandDesignOnboardingPixelSender).fire(
+            OnboardingPixelContext(isReinstallUser = false),
+            OnboardingPixelEvent.SetDefaultConfirmed(isDdgDefault = true),
+        )
+        verify(mockBrandDesignOnboardingPixelSender, never()).fire(any(), eq(OnboardingPixelEvent.SetDefaultClicked))
     }
 
     @Test
@@ -1343,8 +1395,11 @@ class BrandDesignUpdatePageViewModelTest {
 
         testee.onDefaultBrowserNotSet()
 
-        verify(mockBrandDesignOnboardingPixelSender).fireSetDefaultConfirmed(isReinstallUser = false, isDdgDefault = false)
-        verify(mockBrandDesignOnboardingPixelSender, never()).fireSetDefaultClicked(any())
+        verify(mockBrandDesignOnboardingPixelSender).fire(
+            OnboardingPixelContext(isReinstallUser = false),
+            OnboardingPixelEvent.SetDefaultConfirmed(isDdgDefault = false),
+        )
+        verify(mockBrandDesignOnboardingPixelSender, never()).fire(any(), eq(OnboardingPixelEvent.SetDefaultClicked))
     }
 
     // endregion
