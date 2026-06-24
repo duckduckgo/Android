@@ -512,6 +512,8 @@ class BrowserWebViewClient @Inject constructor(
     ) {
         logcat { "onPageStarted webViewUrl: ${webView.url} URL: $url lastPageStarted $lastPageStarted" }
 
+        pageCommitVisibleFired = false
+
         // Handle app-scheme URLs that bypass shouldOverrideUrlLoading (e.g., window.open with intent:// URLs)
         if (url != null && interceptAppSchemeUrl(webView, url)) {
             logcat { "interceptAppSchemeUrl: intercepted $url in onPageStarted, returning early" }
@@ -519,7 +521,6 @@ class BrowserWebViewClient @Inject constructor(
         }
 
         lastInterceptedAppSchemeUrl = null
-        pageCommitVisibleFired = false
 
         url?.let {
             // See https://app.asana.com/0/0/1206159443951489/f (WebView limitations)
