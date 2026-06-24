@@ -708,8 +708,10 @@ class DuckChatContextualViewModel @Inject constructor(
     }
 
     fun onAskAboutTabClicked() {
-        // Attaches the current page as context (shows the native input's page-context chip via the
-        // showContext observer). Sends no prompt. addPageContext() is a no-op if context is invalid.
+        if (!isContextValid(updatedPageContext)) {
+            // Page context not ready/valid; do nothing (and don't fire invalid-context pixels).
+            return
+        }
         addPageContext()
     }
 
