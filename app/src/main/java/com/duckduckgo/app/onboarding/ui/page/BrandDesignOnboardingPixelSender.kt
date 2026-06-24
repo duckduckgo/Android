@@ -27,19 +27,18 @@ import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
-
-data class OnboardingPixelContext(
-    val isReinstallUser: Boolean,
-)
 
 sealed interface OnboardingPixelEvent {
     data object WelcomeShown : OnboardingPixelEvent
@@ -152,10 +151,7 @@ fun PreOnboardingDialogType.toEvent(action: OnboardingAction): OnboardingPixelEv
     }
 
 interface BrandDesignOnboardingPixelSender {
-    fun fire(
-        context: OnboardingPixelContext,
-        event: OnboardingPixelEvent,
-    )
+    fun fire(event: OnboardingPixelEvent)
 }
 
 @ContributesBinding(AppScope::class)
@@ -170,100 +166,97 @@ class RealBrandDesignOnboardingPixelSender @Inject constructor(
     private val defaultBrowserDetector: DefaultBrowserDetector,
     private val widgetCapabilities: WidgetCapabilities,
     private val deviceInfo: DeviceInfo,
+    private val appBuildConfig: AppBuildConfig,
 ) : BrandDesignOnboardingPixelSender {
 
-    override fun fire(
-        context: OnboardingPixelContext,
-        event: OnboardingPixelEvent,
-    ) {
+    private val isReinstallUser: Deferred<Boolean> by lazy {
+        appCoroutineScope.async(dispatchers.io()) { appBuildConfig.isAppReinstall() }
+    }
+
+    override fun fire(event: OnboardingPixelEvent) {
         when (event) {
             OnboardingPixelEvent.WelcomeShown ->
-                fireStep(AppPixelName.ONBOARDING_WELCOME, PIXEL_EVENT_SHOWN, context = context)
+                fireStep(AppPixelName.ONBOARDING_WELCOME, PIXEL_EVENT_SHOWN)
 
             is OnboardingPixelEvent.WelcomeClicked ->
-                fireStep(AppPixelName.ONBOARDING_WELCOME, PIXEL_EVENT_CLICKED, engageOrDismiss(event.engaged), context)
+                fireStep(AppPixelName.ONBOARDING_WELCOME, PIXEL_EVENT_CLICKED, engageOrDismiss(event.engaged))
 
             OnboardingPixelEvent.SetDefaultShown ->
-                fireStep(AppPixelName.ONBOARDING_SET_DEFAULT, PIXEL_EVENT_SHOWN, context = context)
+                fireStep(AppPixelName.ONBOARDING_SET_DEFAULT, PIXEL_EVENT_SHOWN)
 
             OnboardingPixelEvent.SetDefaultClicked ->
-                fireStep(AppPixelName.ONBOARDING_SET_DEFAULT, PIXEL_EVENT_CLICKED, context = context)
+                fireStep(AppPixelName.ONBOARDING_SET_DEFAULT, PIXEL_EVENT_CLICKED)
 
             is OnboardingPixelEvent.SetDefaultConfirmed ->
                 fireStep(
                     AppPixelName.ONBOARDING_SET_DEFAULT,
                     PIXEL_EVENT_CONFIRMED,
                     if (event.isDdgDefault) VALUE_DDG else VALUE_OTHER,
-                    context,
                 )
 
             OnboardingPixelEvent.AddressBarPositionShown ->
-                fireStep(AppPixelName.ONBOARDING_ADDRESS_BAR_POSITION, PIXEL_EVENT_SHOWN, context = context)
+                fireStep(AppPixelName.ONBOARDING_ADDRESS_BAR_POSITION, PIXEL_EVENT_SHOWN)
 
             is OnboardingPixelEvent.AddressBarPositionClicked ->
-                fireStep(AppPixelName.ONBOARDING_ADDRESS_BAR_POSITION, PIXEL_EVENT_CLICKED, addressBarValue(event.position), context)
+                fireStep(AppPixelName.ONBOARDING_ADDRESS_BAR_POSITION, PIXEL_EVENT_CLICKED, addressBarValue(event.position))
 
             OnboardingPixelEvent.SearchExperienceShown ->
-                fireStep(AppPixelName.ONBOARDING_SEARCH_EXPERIENCE, PIXEL_EVENT_SHOWN, context = context)
+                fireStep(AppPixelName.ONBOARDING_SEARCH_EXPERIENCE, PIXEL_EVENT_SHOWN)
 
             is OnboardingPixelEvent.SearchExperienceClicked ->
                 fireStep(
                     AppPixelName.ONBOARDING_SEARCH_EXPERIENCE,
                     PIXEL_EVENT_CLICKED,
                     if (event.withAi) SEARCH_PLUS_DUCKAI else SEARCH_ONLY,
-                    context,
                 )
 
             OnboardingPixelEvent.SkipOnboardingShown ->
-                fireStep(AppPixelName.ONBOARDING_SKIP_ONBOARDING, PIXEL_EVENT_SHOWN, context = context)
+                fireStep(AppPixelName.ONBOARDING_SKIP_ONBOARDING, PIXEL_EVENT_SHOWN)
 
             is OnboardingPixelEvent.SkipOnboardingClicked ->
-                fireStep(AppPixelName.ONBOARDING_SKIP_ONBOARDING, PIXEL_EVENT_CLICKED, engageOrDismiss(event.engaged), context)
+                fireStep(AppPixelName.ONBOARDING_SKIP_ONBOARDING, PIXEL_EVENT_CLICKED, engageOrDismiss(event.engaged))
 
             OnboardingPixelEvent.NotificationsShown ->
-                fireStep(AppPixelName.ONBOARDING_NOTIFICATIONS, PIXEL_EVENT_SHOWN, context = context)
+                fireStep(AppPixelName.ONBOARDING_NOTIFICATIONS, PIXEL_EVENT_SHOWN)
 
             is OnboardingPixelEvent.NotificationsConfirmed ->
                 fireStep(
                     AppPixelName.ONBOARDING_NOTIFICATIONS,
                     PIXEL_EVENT_CONFIRMED,
                     if (event.granted) VALUE_GRANTED else VALUE_DENIED,
-                    context,
                 )
 
             OnboardingPixelEvent.QuickSetupShown ->
-                fireStep(AppPixelName.ONBOARDING_QUICK_SETUP, PIXEL_EVENT_SHOWN, context = context)
+                fireStep(AppPixelName.ONBOARDING_QUICK_SETUP, PIXEL_EVENT_SHOWN)
 
             is OnboardingPixelEvent.QuickSetupClicked ->
-                fireQuickSetupClicked(context, event.addressBarPosition, event.inputScreenSelected)
+                fireQuickSetupClicked(event.addressBarPosition, event.inputScreenSelected)
 
             OnboardingPixelEvent.SyncRestoreShown ->
-                fireStep(AppPixelName.ONBOARDING_WELCOME, PIXEL_EVENT_SHOWN, context = context)
+                fireStep(AppPixelName.ONBOARDING_WELCOME, PIXEL_EVENT_SHOWN)
 
             is OnboardingPixelEvent.SyncRestoreClicked ->
-                fireStep(AppPixelName.ONBOARDING_WELCOME, PIXEL_EVENT_CLICKED, engageOrDismiss(event.engaged), context)
+                fireStep(AppPixelName.ONBOARDING_WELCOME, PIXEL_EVENT_CLICKED, engageOrDismiss(event.engaged))
 
             OnboardingPixelEvent.TryASearchShown ->
-                fireStep(AppPixelName.ONBOARDING_SEARCH_CHAT_TOGGLE, PIXEL_EVENT_SHOWN, context = context)
+                fireStep(AppPixelName.ONBOARDING_SEARCH_CHAT_TOGGLE, PIXEL_EVENT_SHOWN)
 
             is OnboardingPixelEvent.TryASearchClicked ->
                 fireStep(
                     AppPixelName.ONBOARDING_SEARCH_CHAT_TOGGLE,
                     PIXEL_EVENT_CLICKED,
                     tryASearchValue(event.fromSuggestion, event.isChat),
-                    context,
                 )
 
             OnboardingPixelEvent.AiComparisonShown ->
-                fireStep(AppPixelName.ONBOARDING_AI_INTRO, PIXEL_EVENT_SHOWN, context = context)
+                fireStep(AppPixelName.ONBOARDING_AI_INTRO, PIXEL_EVENT_SHOWN)
 
             OnboardingPixelEvent.AiComparisonClicked ->
-                fireStep(AppPixelName.ONBOARDING_AI_INTRO, PIXEL_EVENT_CLICKED, context = context)
+                fireStep(AppPixelName.ONBOARDING_AI_INTRO, PIXEL_EVENT_CLICKED)
         }
     }
 
     private fun fireQuickSetupClicked(
-        context: OnboardingPixelContext,
         addressBarPosition: OmnibarType,
         inputScreenSelected: Boolean,
     ) {
@@ -276,7 +269,7 @@ class RealBrandDesignOnboardingPixelSender @Inject constructor(
                 "$PIXEL_WIDGET_VALUE_PARAM:${onOff(hasWidget)}," +
                 "$PIXEL_ADDRESS_BAR_VALUE_PARAM:${addressBarValue(addressBarPosition)}," +
                 "$PIXEL_INPUT_TYPE_VALUE_PARAM:$inputType"
-            val params = buildStandardParams(context).toMutableMap()
+            val params = buildStandardParams().toMutableMap()
             params[PIXEL_PARAM_EVENT] = PIXEL_EVENT_CLICKED
             params[PIXEL_PARAM_VALUE] = value
             pixel.fire(
@@ -291,10 +284,9 @@ class RealBrandDesignOnboardingPixelSender @Inject constructor(
         pixelName: AppPixelName,
         event: String,
         value: String? = null,
-        context: OnboardingPixelContext,
     ) {
         appCoroutineScope.launch {
-            val params = buildStandardParams(context).toMutableMap()
+            val params = buildStandardParams().toMutableMap()
             params[PIXEL_PARAM_EVENT] = event
             value?.let { params[PIXEL_PARAM_VALUE] = it }
             val tag = buildString {
@@ -305,9 +297,10 @@ class RealBrandDesignOnboardingPixelSender @Inject constructor(
         }
     }
 
-    private suspend fun buildStandardParams(context: OnboardingPixelContext): Map<String, String> {
+    private suspend fun buildStandardParams(): Map<String, String> {
         // source/flow are install-level facts: CustomAiOnboardingStore is the canonical source (a
         // side-effect-free read of the decision persisted at plan build time).
+        val reinstall = isReinstallUser.await()
         val (days, isCustomAiFlow, variant) = withContext(dispatchers.io()) {
             Triple(
                 appInstallStore.daysInstalled(),
@@ -320,7 +313,7 @@ class RealBrandDesignOnboardingPixelSender @Inject constructor(
             )
         }
         val params = mutableMapOf(
-            PIXEL_PARAM_INSTALL_TYPE to if (context.isReinstallUser) INSTALL_TYPE_REINSTALL else INSTALL_TYPE_NEW,
+            PIXEL_PARAM_INSTALL_TYPE to if (reinstall) INSTALL_TYPE_REINSTALL else INSTALL_TYPE_NEW,
             PIXEL_PARAM_SOURCE to if (isCustomAiFlow) SOURCE_DUCKAI_CPP else ONBOARDING_DEFAULT,
             PIXEL_PARAM_FLOW to if (isCustomAiFlow) FLOW_DUCKAI else ONBOARDING_DEFAULT,
             PIXEL_PARAM_PIXEL_SOURCE to deviceInfo.formFactor().description,

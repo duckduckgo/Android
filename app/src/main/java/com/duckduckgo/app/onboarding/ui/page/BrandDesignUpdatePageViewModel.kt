@@ -266,7 +266,6 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
     }
 
     private fun fireDialogShownPixel(dialogType: PreOnboardingDialogType) {
-        val context = pixelContext()
         when (dialogType) {
             SYNC_RESTORE -> pixel.fire(PREONBOARDING_SYNC_RESTORE_SHOWN_UNIQUE, type = Unique())
             INITIAL_REINSTALL_USER -> pixel.fire(PREONBOARDING_INTRO_REINSTALL_USER_SHOWN_UNIQUE, type = Unique())
@@ -278,7 +277,7 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
             INPUT_SCREEN -> pixel.fire(PREONBOARDING_CHOOSE_SEARCH_EXPERIENCE_IMPRESSIONS_UNIQUE, type = Unique())
             INPUT_SCREEN_PREVIEW, QUICK_SETUP -> Unit
         }
-        dialogType.toEvent(OnboardingAction.Shown)?.let { brandDesignOnboardingPixelSender.fire(context, it) }
+        dialogType.toEvent(OnboardingAction.Shown)?.let { brandDesignOnboardingPixelSender.fire(it) }
     }
 
     fun onIntroAnimationStarted() {
@@ -306,11 +305,11 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
             addressBarPosition = _viewState.value.selectedAddressBarPosition,
             withAi = _viewState.value.inputScreenSelected,
         )
-        dialog.toEvent(action)?.let { brandDesignOnboardingPixelSender.fire(pixelContext(), it) }
+        dialog.toEvent(action)?.let { brandDesignOnboardingPixelSender.fire(it) }
     }
 
     private fun fireBrandDesignSecondaryClickedPixel(dialog: PreOnboardingDialogType) {
-        dialog.toEvent(OnboardingAction.SecondaryClick)?.let { brandDesignOnboardingPixelSender.fire(pixelContext(), it) }
+        dialog.toEvent(OnboardingAction.SecondaryClick)?.let { brandDesignOnboardingPixelSender.fire(it) }
     }
 
     fun onInputModeDemoQuerySubmitted(
@@ -324,7 +323,6 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
             onboardingStore.setSearchOnboardingVariant()
         }
         brandDesignOnboardingPixelSender.fire(
-            pixelContext(),
             OnboardingPixelEvent.TryASearchClicked(fromSuggestion = fromSuggestion, isChat = isChat),
         )
         flow.onInputModeDemoQuerySubmitted(query = query, isChat = isChat)
@@ -343,11 +341,8 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
     }
 
     private fun fireBrandDesignSetDefaultResult(isDdgDefault: Boolean) {
-        brandDesignOnboardingPixelSender.fire(pixelContext(), OnboardingPixelEvent.SetDefaultConfirmed(isDdgDefault = isDdgDefault))
+        brandDesignOnboardingPixelSender.fire(OnboardingPixelEvent.SetDefaultConfirmed(isDdgDefault = isDdgDefault))
     }
-
-    private fun pixelContext(isReinstallUser: Boolean = _viewState.value.isReinstallUser): OnboardingPixelContext =
-        OnboardingPixelContext(isReinstallUser = isReinstallUser)
 
     fun onQuickSetupDefaultBrowserSet() {
         recordDefaultBrowserDialogResult(isSet = true, fireTelemetry = false)
@@ -457,13 +452,7 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
     fun notificationRuntimePermissionRequested() {
         pixel.fire(NOTIFICATION_RUNTIME_PERMISSION_SHOWN)
         // The notification prompt is shown before loadDaxDialog resolves reinstall status into
-        // viewState, so resolve it directly via the shared deferred to report the correct install type.
-        viewModelScope.launch {
-            brandDesignOnboardingPixelSender.fire(
-                pixelContext(isReinstallUser = isReinstallDeferred.await()),
-                OnboardingPixelEvent.NotificationsShown,
-            )
-        }
+        brandDesignOnboardingPixelSender.fire(OnboardingPixelEvent.NotificationsShown)
     }
 
     fun notificationRuntimePermissionGranted() {
@@ -471,21 +460,11 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
             AppPixelName.NOTIFICATIONS_ENABLED,
             mapOf(PixelParameter.FROM_ONBOARDING to true.toString()),
         )
-        viewModelScope.launch {
-            brandDesignOnboardingPixelSender.fire(
-                pixelContext(isReinstallUser = isReinstallDeferred.await()),
-                OnboardingPixelEvent.NotificationsConfirmed(granted = true),
-            )
-        }
+        brandDesignOnboardingPixelSender.fire(OnboardingPixelEvent.NotificationsConfirmed(granted = true))
     }
 
     fun notificationRuntimePermissionDenied() {
-        viewModelScope.launch {
-            brandDesignOnboardingPixelSender.fire(
-                pixelContext(isReinstallUser = isReinstallDeferred.await()),
-                OnboardingPixelEvent.NotificationsConfirmed(granted = false),
-            )
-        }
+        brandDesignOnboardingPixelSender.fire(OnboardingPixelEvent.NotificationsConfirmed(granted = false))
     }
 
     private suspend fun showQuickSetupDialog() {
@@ -690,8 +669,7 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
                         applyInputScreenSelection(fireTelemetry = false)
                         val state = _viewState.value
                         brandDesignOnboardingPixelSender.fire(
-                            context = pixelContext(),
-                            event = OnboardingPixelEvent.QuickSetupClicked(
+                            OnboardingPixelEvent.QuickSetupClicked(
                                 addressBarPosition = state.selectedAddressBarPosition,
                                 inputScreenSelected = state.inputScreenSelected,
                             ),

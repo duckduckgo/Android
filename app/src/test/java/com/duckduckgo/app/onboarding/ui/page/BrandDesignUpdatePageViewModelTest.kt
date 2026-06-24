@@ -82,7 +82,6 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
@@ -882,7 +881,7 @@ class BrandDesignUpdatePageViewModelTest {
         testee.notificationRuntimePermissionRequested()
         advanceUntilIdle()
 
-        verify(mockBrandDesignOnboardingPixelSender).fire(OnboardingPixelContext(isReinstallUser = false), OnboardingPixelEvent.NotificationsShown)
+        verify(mockBrandDesignOnboardingPixelSender).fire(OnboardingPixelEvent.NotificationsShown)
     }
 
     @Test
@@ -894,7 +893,6 @@ class BrandDesignUpdatePageViewModelTest {
         advanceUntilIdle()
 
         verify(mockBrandDesignOnboardingPixelSender).fire(
-            OnboardingPixelContext(isReinstallUser = false),
             OnboardingPixelEvent.NotificationsConfirmed(granted = true),
         )
     }
@@ -908,7 +906,6 @@ class BrandDesignUpdatePageViewModelTest {
         advanceUntilIdle()
 
         verify(mockBrandDesignOnboardingPixelSender).fire(
-            OnboardingPixelContext(isReinstallUser = false),
             OnboardingPixelEvent.NotificationsConfirmed(granted = false),
         )
     }
@@ -924,9 +921,8 @@ class BrandDesignUpdatePageViewModelTest {
         testee.notificationRuntimePermissionGranted()
         advanceUntilIdle()
 
-        verify(mockBrandDesignOnboardingPixelSender).fire(OnboardingPixelContext(isReinstallUser = true), OnboardingPixelEvent.NotificationsShown)
+        verify(mockBrandDesignOnboardingPixelSender).fire(OnboardingPixelEvent.NotificationsShown)
         verify(mockBrandDesignOnboardingPixelSender).fire(
-            OnboardingPixelContext(isReinstallUser = true),
             OnboardingPixelEvent.NotificationsConfirmed(granted = true),
         )
     }
@@ -1159,7 +1155,6 @@ class BrandDesignUpdatePageViewModelTest {
         advanceUntilIdle()
 
         verify(mockBrandDesignOnboardingPixelSender).fire(
-            OnboardingPixelContext(isReinstallUser = false),
             OnboardingPixelEvent.TryASearchClicked(fromSuggestion = true, isChat = true),
         )
     }
@@ -1173,7 +1168,6 @@ class BrandDesignUpdatePageViewModelTest {
         advanceUntilIdle()
 
         verify(mockBrandDesignOnboardingPixelSender).fire(
-            OnboardingPixelContext(isReinstallUser = false),
             OnboardingPixelEvent.TryASearchClicked(fromSuggestion = false, isChat = false),
         )
     }
@@ -1297,7 +1291,7 @@ class BrandDesignUpdatePageViewModelTest {
         testee.onSecondaryCtaClicked() // INITIAL_REINSTALL_USER -> QUICK_SETUP
         advanceUntilIdle()
 
-        verify(mockBrandDesignOnboardingPixelSender).fire(OnboardingPixelContext(isReinstallUser = true), OnboardingPixelEvent.QuickSetupShown)
+        verify(mockBrandDesignOnboardingPixelSender).fire(OnboardingPixelEvent.QuickSetupShown)
     }
 
     @Test
@@ -1314,7 +1308,6 @@ class BrandDesignUpdatePageViewModelTest {
         advanceUntilIdle()
 
         verify(mockBrandDesignOnboardingPixelSender).fire(
-            context = OnboardingPixelContext(isReinstallUser = true),
             event = OnboardingPixelEvent.QuickSetupClicked(
                 addressBarPosition = OmnibarType.SINGLE_BOTTOM,
                 inputScreenSelected = false,
@@ -1331,7 +1324,6 @@ class BrandDesignUpdatePageViewModelTest {
         testee.onPrimaryCtaClicked()
 
         verify(mockBrandDesignOnboardingPixelSender).fire(
-            context = OnboardingPixelContext(isReinstallUser = false),
             event = OnboardingPixelEvent.AddressBarPositionClicked(position = OmnibarType.SINGLE_BOTTOM),
         )
     }
@@ -1347,7 +1339,6 @@ class BrandDesignUpdatePageViewModelTest {
         testee.onPrimaryCtaClicked()
 
         verify(mockBrandDesignOnboardingPixelSender).fire(
-            OnboardingPixelContext(isReinstallUser = false),
             OnboardingPixelEvent.SearchExperienceClicked(withAi = false),
         )
     }
@@ -1363,7 +1354,6 @@ class BrandDesignUpdatePageViewModelTest {
         testee.onPrimaryCtaClicked()
 
         verify(mockBrandDesignOnboardingPixelSender).fire(
-            OnboardingPixelContext(isReinstallUser = true),
             OnboardingPixelEvent.SkipOnboardingClicked(engaged = true),
         )
     }
@@ -1379,7 +1369,6 @@ class BrandDesignUpdatePageViewModelTest {
         testee.onSecondaryCtaClicked()
 
         verify(mockBrandDesignOnboardingPixelSender).fire(
-            OnboardingPixelContext(isReinstallUser = true),
             OnboardingPixelEvent.SkipOnboardingClicked(engaged = false),
         )
     }
@@ -1393,7 +1382,7 @@ class BrandDesignUpdatePageViewModelTest {
         testee.onPrimaryCtaClicked() // INITIAL -> COMPARISON_CHART
         testee.onPrimaryCtaClicked() // COMPARISON_CHART "Choose your browser" -> set-default clicked
 
-        verify(mockBrandDesignOnboardingPixelSender).fire(OnboardingPixelContext(isReinstallUser = false), OnboardingPixelEvent.SetDefaultClicked)
+        verify(mockBrandDesignOnboardingPixelSender).fire(OnboardingPixelEvent.SetDefaultClicked)
     }
 
     @Test
@@ -1403,10 +1392,9 @@ class BrandDesignUpdatePageViewModelTest {
         testee.onDefaultBrowserSet()
 
         verify(mockBrandDesignOnboardingPixelSender).fire(
-            OnboardingPixelContext(isReinstallUser = false),
             OnboardingPixelEvent.SetDefaultConfirmed(isDdgDefault = true),
         )
-        verify(mockBrandDesignOnboardingPixelSender, never()).fire(any(), eq(OnboardingPixelEvent.SetDefaultClicked))
+        verify(mockBrandDesignOnboardingPixelSender, never()).fire(eq(OnboardingPixelEvent.SetDefaultClicked))
     }
 
     @Test
@@ -1416,10 +1404,9 @@ class BrandDesignUpdatePageViewModelTest {
         testee.onDefaultBrowserNotSet()
 
         verify(mockBrandDesignOnboardingPixelSender).fire(
-            OnboardingPixelContext(isReinstallUser = false),
             OnboardingPixelEvent.SetDefaultConfirmed(isDdgDefault = false),
         )
-        verify(mockBrandDesignOnboardingPixelSender, never()).fire(any(), eq(OnboardingPixelEvent.SetDefaultClicked))
+        verify(mockBrandDesignOnboardingPixelSender, never()).fire(eq(OnboardingPixelEvent.SetDefaultClicked))
     }
 
     // endregion
