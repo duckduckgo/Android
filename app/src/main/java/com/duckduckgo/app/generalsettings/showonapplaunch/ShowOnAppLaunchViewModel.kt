@@ -56,6 +56,7 @@ class ShowOnAppLaunchViewModel @Inject constructor(
         val showNTPAfterIdleReturn: Boolean = false,
         val selectedIdleThresholdSeconds: Long = FirstScreenHandlerImpl.DEFAULT_IDLE_THRESHOLD_SECONDS,
         val idleThresholdOptions: List<Long> = FirstScreenHandlerImpl.DEFAULT_IDLE_THRESHOLD_OPTIONS,
+        val returnToLastTabEnabled: Boolean = true,
     )
 
     sealed class Command {
@@ -80,7 +81,8 @@ class ShowOnAppLaunchViewModel @Inject constructor(
             showOnAppLaunchOptionDataStore.specificPageUrlFlow,
             androidBrowserConfigFeature.showNTPAfterIdleReturn().enabled(),
             userSelectedThreshold,
-        ) { option, specificPageUrl, showNTPAfterIdleReturn, userThreshold ->
+            ntpAfterIdleManager.returnToLastTabEnabled,
+        ) { option, specificPageUrl, showNTPAfterIdleReturn, userThreshold, returnToLastTabEnabled ->
             val effectiveThreshold = userThreshold
                 ?: FirstScreenHandlerImpl.parseDefaultIdleThresholdSeconds(
                     androidBrowserConfigFeature.showNTPAfterIdleReturn().getSettings(),
@@ -91,6 +93,7 @@ class ShowOnAppLaunchViewModel @Inject constructor(
                 specificPageUrl = specificPageUrl,
                 showNTPAfterIdleReturn = showNTPAfterIdleReturn,
                 selectedIdleThresholdSeconds = effectiveThreshold,
+                returnToLastTabEnabled = returnToLastTabEnabled,
             )
         }.flowOn(dispatcherProvider.io())
             .launchIn(viewModelScope)
@@ -122,6 +125,12 @@ class ShowOnAppLaunchViewModel @Inject constructor(
             userSelectedThreshold.value = seconds
             pixel.fire(SETTINGS_AFTER_INACTIVITY_TIMEOUT_CHANGED, mapOf("selectedSeconds" to seconds.toString()))
             ntpAfterIdleManager.onIdleTimeoutSelected(seconds)
+        }
+    }
+
+    fun onReturnToLastTabToggled(enabled: Boolean) {
+        viewModelScope.launch(dispatcherProvider.io()) {
+            ntpAfterIdleManager.setReturnToLastTabEnabled(enabled)
         }
     }
 }

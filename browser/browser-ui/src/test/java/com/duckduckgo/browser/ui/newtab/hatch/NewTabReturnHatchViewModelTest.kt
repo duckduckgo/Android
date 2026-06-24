@@ -28,6 +28,7 @@ import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.newtabpage.api.NtpAfterIdleManager
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
@@ -60,6 +61,7 @@ class NewTabReturnHatchViewModelTest {
     // Starts false so each test controls the idle-return rising edge that captures the snapshot.
     private val afterIdleReturnFlow = MutableStateFlow(false)
     private val nativeInputEnabledFlow = MutableStateFlow(true)
+    private val returnToLastTabEnabledFlow = MutableStateFlow(true)
 
     private lateinit var testee: NewTabReturnHatchViewModel
 
@@ -67,6 +69,7 @@ class NewTabReturnHatchViewModelTest {
     fun setup() {
         whenever(mockTabRepository.flowTabs).thenReturn(tabsFlow)
         whenever(mockNtpAfterIdleManager.isAfterIdleReturn).thenReturn(afterIdleReturnFlow)
+        whenever(mockNtpAfterIdleManager.returnToLastTabEnabled).thenReturn(returnToLastTabEnabledFlow)
         whenever(mockDuckChat.observeNativeInputFieldUserSettingEnabled()).thenReturn(nativeInputEnabledFlow)
 
         testee = NewTabReturnHatchViewModel(
@@ -112,6 +115,27 @@ class NewTabReturnHatchViewModelTest {
 
             assertFalse(expectMostRecentItem().shouldShow)
         }
+    }
+
+    @Test
+    fun whenReturnToLastTabDisabledThenHatchHiddenEvenWithTab() = runTest {
+        val tab = TabEntity(tabId = "tab1", url = "https://example.com", title = "Example")
+        returnToLastTabEnabledFlow.value = false
+
+        testee.viewState.test {
+            returnFromIdleWith(tab)
+
+            assertFalse(expectMostRecentItem().shouldShow)
+        }
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun whenDontShowThisPressedThenReturnToLastTabDisabled() = runTest {
+        testee.onDontShowThisPressed()
+        advanceUntilIdle()
+
+        verify(mockNtpAfterIdleManager).setReturnToLastTabEnabled(false)
     }
 
     @Test

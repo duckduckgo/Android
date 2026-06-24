@@ -162,6 +162,9 @@ class NewTabReturnHatchView @JvmOverloads constructor(
         popupMenu.onMenuItemClicked(popupMenu.contentView.findViewById(R.id.hatchMenuCloseTab)) {
             viewModel.closeTab()
         }
+        popupMenu.onMenuItemClicked(popupMenu.contentView.findViewById(R.id.hatchMenuDontShowThis)) {
+            viewModel.onDontShowThisPressed()
+        }
         popupMenu.onMenuItemClicked(popupMenu.contentView.findViewById(R.id.hatchMenuAfterInactivity)) {
             viewModel.onAfterInactivityPressed()
             hatchHatchListener?.onAfterInactivityPressed()

@@ -30,6 +30,7 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.newtabpage.api.NtpAfterIdleManager
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -57,6 +58,7 @@ class ShowOnAppLaunchViewModelTest {
     @Before
     fun setup() {
         whenever(settingsDataStore.userSelectedIdleThresholdSeconds).thenReturn(null)
+        whenever(ntpAfterIdleManager.returnToLastTabEnabled).thenReturn(flowOf(true))
         fakeDataStore = FakeShowOnAppLaunchOptionDataStore(LastOpenedTab)
         testee = ShowOnAppLaunchViewModel(
             dispatcherProvider,
@@ -212,6 +214,14 @@ class ShowOnAppLaunchViewModelTest {
         coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
 
         verify(ntpAfterIdleManager).onIdleTimeoutSelected(300L)
+    }
+
+    @Test
+    fun whenReturnToLastTabToggledThenSettingPersisted() = runTest {
+        testee.onReturnToLastTabToggled(false)
+        coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
+
+        verify(ntpAfterIdleManager).setReturnToLastTabEnabled(false)
     }
 
     @Test

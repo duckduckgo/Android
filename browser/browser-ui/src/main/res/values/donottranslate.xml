@@ -27,6 +27,7 @@
     <string name="hatchMenuAfterInactivitySettings">After Inactivity</string>
     <string name="hatchMenuCloseTab">Close Tab</string>
     <string name="hatchMenuBurnTab">Delete Tab</string>
+    <string name="hatchMenuDontShowThis">Don\'t Show This</string>
     <string name="newTabReturnHatchTabClosed">Tab closed</string>
     <string name="newTabReturnHatchUndo">Undo</string>
     <string name="browserMenuChats">Chats</string>
