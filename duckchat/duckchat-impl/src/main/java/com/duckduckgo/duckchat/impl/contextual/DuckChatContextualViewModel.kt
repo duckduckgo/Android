@@ -707,6 +707,20 @@ class DuckChatContextualViewModel @Inject constructor(
         }
     }
 
+    fun onAskAboutTabClicked() {
+        // Attaches the current page as context (shows the native input's page-context chip via the
+        // showContext observer). Sends no prompt. addPageContext() is a no-op if context is invalid.
+        addPageContext()
+    }
+
+    fun onAskAboutPageClicked() {
+        if (!_viewState.value.showContext) {
+            // Context not attached; nothing to ask about.
+            return
+        }
+        onPromptSent(prompt = context.getString(R.string.duckChatContextualAskAboutPage))
+    }
+
     fun onPromptCleared() {
         logcat { "Duck.ai Contextual: onPromptCleared" }
         viewModelScope.launch {
