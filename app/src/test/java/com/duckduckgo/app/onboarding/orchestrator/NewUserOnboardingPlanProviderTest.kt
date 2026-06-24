@@ -27,7 +27,6 @@ import com.duckduckgo.app.onboarding.DuckAiOnboardingAvailability
 import com.duckduckgo.app.onboarding.DuckAiOnboardingDemo
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.ui.page.BrandDesignOnboardingPixelSender
-import com.duckduckgo.app.onboarding.ui.page.OnboardingPixelContext
 import com.duckduckgo.app.onboarding.ui.page.OnboardingPixelEvent
 import com.duckduckgo.app.onboardingquicksetup.OnboardingQuickSetupExperimentManager
 import com.duckduckgo.app.onboardingquicksetup.OnboardingQuickSetupExperimentManager.QuickSetupExperimentVariant
@@ -217,7 +216,6 @@ class NewUserOnboardingPlanProviderTest {
         assertStep(NewUserOnboardingStepIds.QUICK_SETUP)
         orchestrator.onEvent(NewUserOnboardingEvent.QuickSetupConfirmed(OmnibarType.SINGLE_TOP, withAi = true))
         verify(brandDesignOnboardingPixelSender).fire(
-            context = OnboardingPixelContext(isReinstallUser = true),
             event = OnboardingPixelEvent.QuickSetupClicked(
                 addressBarPosition = OmnibarType.SINGLE_TOP,
                 inputScreenSelected = true,

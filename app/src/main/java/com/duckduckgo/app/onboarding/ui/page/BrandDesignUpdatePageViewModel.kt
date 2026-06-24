@@ -130,10 +130,6 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
     private val customAiOnboardingStore: CustomAiOnboardingStore,
 ) : ViewModel() {
 
-    private val isReinstallDeferred: Deferred<Boolean> by lazy {
-        viewModelScope.async(dispatchers.io()) { appBuildConfig.isAppReinstall() }
-    }
-
     // Lazy so it never starts in orchestrator mode (there the sync_restore precondition owns canRestore).
     private val canRestoreDeferred: Deferred<Boolean> by lazy {
         viewModelScope.async(dispatchers.io()) {
@@ -569,7 +565,8 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
                     canRestoreDeferred.await()
                 } ?: false
 
-                val isReinstall = isReinstallDeferred.await()
+                // Always call isAppReinstall() — it has side effects (creates DDG downloads directory, persists reinstall state)
+                val isReinstall = withContext(dispatchers.io()) { appBuildConfig.isAppReinstall() }
 
                 val dialogType = when {
                     canRestore -> {
