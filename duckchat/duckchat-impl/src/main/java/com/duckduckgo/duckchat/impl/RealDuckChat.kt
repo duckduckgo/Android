@@ -224,16 +224,6 @@ interface DuckChatInternal : DuckChat {
     val showModelPickerEvents: Flow<String>
 
     /**
-     * Requests the native input to take focus for [tabId].
-     */
-    fun requestFocusInput(tabId: String)
-
-    /**
-     * Events asking the native input to take focus.
-     */
-    val focusInputEvents: Flow<String>
-
-    /**
      * Returns whether image upload is enabled or not.
      */
     fun isImageUploadEnabled(): Boolean
@@ -404,7 +394,6 @@ class RealDuckChat @Inject constructor(
 
     private val _chatState = MutableStateFlow(ChatState.HIDE)
     private val _showModelPickerEvents = MutableSharedFlow<String>(extraBufferCapacity = 1)
-    private val _focusInputEvents = MutableSharedFlow<String>(extraBufferCapacity = 1)
     private val _nativeInputFieldEnabled = MutableStateFlow(false)
     private val _showInputScreenOnSystemSearchLaunch = MutableStateFlow(false)
     private val _showVoiceSearchToggle = MutableStateFlow(false)
@@ -588,12 +577,6 @@ class RealDuckChat @Inject constructor(
     }
 
     override val showModelPickerEvents: Flow<String> = _showModelPickerEvents.asSharedFlow()
-
-    override fun requestFocusInput(tabId: String) {
-        _focusInputEvents.tryEmit(tabId)
-    }
-
-    override val focusInputEvents: Flow<String> = _focusInputEvents.asSharedFlow()
 
     override val showSettings: StateFlow<Boolean> = _showSettings.asStateFlow()
 

@@ -222,13 +222,6 @@ class RealDuckChatJSHelper @Inject constructor(
                 null
             }
 
-            METHOD_FOCUS_CHAT_INPUT -> {
-                if (tabId.isNotEmpty() && duckChatFeature.nativeInputField().isEnabled()) {
-                    duckChat.requestFocusInput(tabId)
-                }
-                null
-            }
-
             METHOD_OPEN_KEYBOARD ->
                 id?.let {
                     val selector = extractOpenKeyboardSelector(data) ?: DEFAULT_SELECTOR
@@ -600,7 +593,6 @@ class RealDuckChatJSHelper @Inject constructor(
         private const val METHOD_DISABLE_CHAT_INPUT = "disableChatInput"
         private const val METHOD_ENABLE_CHAT_INPUT = "enableChatInput"
         private const val METHOD_SHOW_MODEL_PICKER = "showModelPicker"
-        private const val METHOD_FOCUS_CHAT_INPUT = "focusChatInput"
         const val METHOD_GET_PAGE_CONTEXT = "getAIChatPageContext"
         const val METHOD_OPEN_KEYBOARD = "openKeyboard"
         private const val METHOD_TOGGLE_PAGE_CONTEXT = "togglePageContextTelemetry"

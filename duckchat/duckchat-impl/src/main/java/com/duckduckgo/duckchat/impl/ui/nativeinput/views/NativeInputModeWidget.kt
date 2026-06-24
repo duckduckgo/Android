@@ -335,7 +335,6 @@ class NativeInputModeWidget @JvmOverloads constructor(
         observeNativeInputState()
         observeSubmitEnabled()
         observeOpenModelPicker()
-        observeFocusInput()
         bindLeadingFireButtonClick()
         if (onPaidTierChanged != null) observeTier()
     }
@@ -1318,14 +1317,6 @@ class NativeInputModeWidget @JvmOverloads constructor(
                 requestInputFocus()
                 modelPickerView?.openPicker()
             }
-            .launchIn(scope ?: return)
-    }
-
-    private fun observeFocusInput() {
-        focusInputJob?.cancel()
-        val scope = findViewTreeLifecycleOwner()?.lifecycleScope
-        focusInputJob = viewModel.focusInputEvents
-            .onEach { focusInput(context as? Activity) }
             .launchIn(scope ?: return)
     }
 

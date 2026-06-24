@@ -1281,39 +1281,6 @@ class RealDuckChatJSHelperTest {
     }
 
     @Test
-    fun whenFocusChatInputAndNativeInputEnabledThenRequestFocusInputForTab() = runTest {
-        mockDuckChatFeature.nativeInputField().setRawStoredState(State(enable = true))
-
-        assertNull(
-            testee.processJsCallbackMessage("aiChat", "focusChatInput", "123", null, tabId = "tab-1"),
-        )
-
-        verify(mockDuckChat).requestFocusInput("tab-1")
-    }
-
-    @Test
-    fun whenFocusChatInputAndNativeInputDisabledThenRequestFocusInputNotCalled() = runTest {
-        mockDuckChatFeature.nativeInputField().setRawStoredState(State(enable = false))
-
-        assertNull(
-            testee.processJsCallbackMessage("aiChat", "focusChatInput", "123", null, tabId = "tab-1"),
-        )
-
-        verify(mockDuckChat, never()).requestFocusInput(any())
-    }
-
-    @Test
-    fun whenFocusChatInputWithEmptyTabIdThenRequestFocusInputNotCalled() = runTest {
-        mockDuckChatFeature.nativeInputField().setRawStoredState(State(enable = true))
-
-        assertNull(
-            testee.processJsCallbackMessage("aiChat", "focusChatInput", "123", null, tabId = ""),
-        )
-
-        verify(mockDuckChat, never()).requestFocusInput(any())
-    }
-
-    @Test
     fun whenGetAIChatNativeConfigValuesAndSupportsImageUploadThenReturnJsCallbackDataWithSupportsImageUploadEnabled() = runTest {
         val featureName = "aiChat"
         val method = "getAIChatNativeConfigValues"
