@@ -173,12 +173,6 @@
             { "key": "flow", "type": "string", "description": "Onboarding flow type", "enum": ["default", "duckai"] },
             { "key": "pixelSource", "type": "string", "description": "Device form factor", "enum": ["phone", "tablet"] },
             {
-                "key": "variant",
-                "type": "string",
-                "description": "Duck.ai search/chat branch. Set only in the custom Duck.ai flow, where this step fires after the search-experience preview branching step.",
-                "enum": ["search_plus_duckai-search", "search_plus_duckai-chat"]
-            },
-            {
                 "key": "value",
                 "type": "string",
                 "description": "Only set when e=confirmed: the resulting default browser. Absent for shown and clicked.",
@@ -208,12 +202,6 @@
             { "key": "source", "type": "string", "description": "Onboarding entry point", "enum": ["default", "duckai_cpp"] },
             { "key": "flow", "type": "string", "description": "Onboarding flow type", "enum": ["default", "duckai"] },
             { "key": "pixelSource", "type": "string", "description": "Device form factor", "enum": ["phone", "tablet"] },
-            {
-                "key": "variant",
-                "type": "string",
-                "description": "Duck.ai search/chat branch. Set only in the custom Duck.ai flow, where this step fires after the search-experience preview branching step.",
-                "enum": ["search_plus_duckai-search", "search_plus_duckai-chat"]
-            },
             {
                 "key": "value",
                 "type": "string",
@@ -364,13 +352,7 @@
             },
             { "key": "source", "type": "string", "description": "Onboarding entry point", "enum": ["default", "duckai_cpp"] },
             { "key": "flow", "type": "string", "description": "Onboarding flow type", "enum": ["default", "duckai"] },
-            { "key": "pixelSource", "type": "string", "description": "Device form factor", "enum": ["phone", "tablet"] },
-            {
-                "key": "variant",
-                "type": "string",
-                "description": "Duck.ai search/chat branch. Set only in the custom Duck.ai flow.",
-                "enum": ["search_plus_duckai-search", "search_plus_duckai-chat"]
-            }
+            { "key": "pixelSource", "type": "string", "description": "Device form factor", "enum": ["phone", "tablet"] }
         ]
     }
 }
