@@ -145,8 +145,8 @@ class OptionsView(context: Context, private val host: NativeInputHost) : LinearL
         duckChatFeature.customizeResponses().isEnabled() &&
             lastNativeInputState?.inputContext == NativeInputState.InputContext.DUCK_AI
 
-    private fun refreshOptionsButtonVisibility() {
-        optionsButton.isVisible = viewModel.visibleTools.value.isNotEmpty() || isCustomizeResponsesAvailable()
+    private fun refreshOptionsButtonVisibility(visibleTools: Set<Tool> = viewModel.visibleTools.value) {
+        optionsButton.isVisible = visibleTools.isNotEmpty() || isCustomizeResponsesAvailable()
     }
 
     private fun renderSelection(tool: Tool?) {
@@ -185,7 +185,7 @@ class OptionsView(context: Context, private val host: NativeInputHost) : LinearL
             if (selectionCleared) host.toolSelected(null)
         }
 
-        optionsButton.isVisible = visibleTools.isNotEmpty() || isCustomizeResponsesAvailable()
+        refreshOptionsButtonVisibility(visibleTools)
     }
 
     private fun buildOptionsButton(): ImageView {
