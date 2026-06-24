@@ -68,6 +68,9 @@ interface ContextualNativeInputManager {
         // Invoked when the widget submits a prompt while the sheet is in INPUT mode: starts a new chat.
         // WEBVIEW-mode submissions keep going through the in-chat JS event path (see setupWidget).
         onNewPromptSubmitted: (NativeInputPrompt) -> Unit = {},
+        onAskAboutTab: () -> Unit = {},
+        onAskAboutPage: () -> Unit = {},
+        onPageContextRemoved: () -> Unit = {},
     )
 
     fun onWebViewMode()
@@ -108,13 +111,20 @@ class RealContextualNativeInputManager @Inject constructor(
         onCameraCaptureRequested: (ValueCallback<Array<Uri>>) -> Unit,
         onFilePickerRequested: (ValueCallback<Array<Uri>>, List<String>) -> Unit,
         onNewPromptSubmitted: (NativeInputPrompt) -> Unit,
+        onAskAboutTab: () -> Unit,
+        onAskAboutPage: () -> Unit,
+        onPageContextRemoved: () -> Unit,
     ) {
         this.card = card
         this.jsMessaging = jsMessaging
         this.widget = widget
 
         applyCardShape(card)
-        setupWidget(tabId, widget, chatIdFlow, onSearchSubmitted, onCameraCaptureRequested, onFilePickerRequested, onNewPromptSubmitted)
+        setupWidget(
+            tabId, widget, chatIdFlow, onSearchSubmitted,
+            onCameraCaptureRequested, onFilePickerRequested,
+            onNewPromptSubmitted, onAskAboutTab, onAskAboutPage, onPageContextRemoved,
+        )
         observeNativeInputSetting(lifecycleOwner)
     }
 
@@ -173,6 +183,9 @@ class RealContextualNativeInputManager @Inject constructor(
         onCameraCaptureRequested: (ValueCallback<Array<Uri>>) -> Unit,
         onFilePickerRequested: (ValueCallback<Array<Uri>>, List<String>) -> Unit,
         onNewChatPromptSubmitted: (NativeInputPrompt) -> Unit,
+        onAskAboutTab: () -> Unit,
+        onAskAboutPage: () -> Unit,
+        onPageContextRemoved: () -> Unit,
     ) {
         widget.configureContextual(tabId)
         widget.bindChatIdSource(chatIdFlow)
@@ -182,6 +195,11 @@ class RealContextualNativeInputManager @Inject constructor(
         widget.bindAttachmentCallbacks(
             onCameraCaptureRequested = onCameraCaptureRequested,
             onFilePickerRequested = onFilePickerRequested,
+        )
+        widget.setContextualAttachmentActions(
+            onAskAboutTab = onAskAboutTab,
+            onAskAboutPage = onAskAboutPage,
+            onPageContextRemoved = onPageContextRemoved,
         )
         widget.bindInputEvents(
             onSearchTextChanged = { },
