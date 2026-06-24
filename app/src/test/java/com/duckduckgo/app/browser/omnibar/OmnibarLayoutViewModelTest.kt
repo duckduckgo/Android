@@ -13,7 +13,6 @@ import com.duckduckgo.app.browser.menu.BrowserMenuHighlight
 import com.duckduckgo.app.browser.menu.BrowserViewMode
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command
-import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command.CopyUrlToClipboard
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command.LaunchInputScreen
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.EnabledState
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.LeadingIconState
@@ -140,7 +139,7 @@ class OmnibarLayoutViewModelTest {
         whenever(tabRepository.flowTabs).thenReturn(flowOf(emptyList()))
         whenever(tabRepository.flowSelectedTab).thenReturn(selectedTabFlow)
         whenever(voiceSearchAvailability.shouldShowVoiceSearch(any(), any(), any(), any())).thenReturn(true)
-        whenever(voiceSearchAvailability.isVoiceSearchAvailableFlow()).thenReturn(emptyFlow())
+        whenever(voiceSearchAvailability.observeVoiceSearchAvailability()).thenReturn(emptyFlow())
         whenever(duckPlayer.isDuckPlayerUri(DUCK_PLAYER_URL)).thenReturn(true)
         whenever(duckAiFeatureState.showOmnibarShortcutOnNtpAndOnFocus).thenReturn(duckAiShowOmnibarShortcutOnNtpAndOnFocusFlow)
         whenever(duckAiFeatureState.showOmnibarShortcutInAllStates).thenReturn(duckAiShowOmnibarShortcutInAllStatesFlow)

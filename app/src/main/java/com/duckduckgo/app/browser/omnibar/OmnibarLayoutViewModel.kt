@@ -343,7 +343,7 @@ class OmnibarLayoutViewModel @Inject constructor(
         // Re-evaluate the voice-search icon reactively when the user toggles "Private Voice Search",
         // so it appears/disappears immediately even while the omnibar is unfocused, rather than only
         // on the next focus or page-load event.
-        voiceSearchAvailability.isVoiceSearchAvailableFlow()
+        voiceSearchAvailability.observeVoiceSearchAvailability()
             .onEach {
                 _viewState.update { state ->
                     state.copy(
