@@ -1178,6 +1178,26 @@ class BrandDesignUpdatePageViewModelTest {
         )
     }
 
+    @Test
+    fun whenChatQuerySubmittedThenSetsChatOnboardingVariant() = runTest {
+        val testee = createViewModel()
+
+        testee.onInputModeDemoQuerySubmitted("hello", isChat = true, fromSuggestion = true)
+        advanceUntilIdle()
+
+        verify(mockOnboardingStore).setChatOnboardingVariant()
+    }
+
+    @Test
+    fun whenSearchQuerySubmittedThenSetsSearchOnboardingVariant() = runTest {
+        val testee = createViewModel()
+
+        testee.onInputModeDemoQuerySubmitted("cats", isChat = false, fromSuggestion = false)
+        advanceUntilIdle()
+
+        verify(mockOnboardingStore).setSearchOnboardingVariant()
+    }
+
     // endregion
 
     // region Quick setup experiment - onSecondaryCtaClicked

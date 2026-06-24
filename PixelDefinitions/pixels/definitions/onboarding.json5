@@ -307,38 +307,8 @@
             }
         ]
     },
-    "onboarding_sync-restore": {
-        "description": "Sync-restore prompt step. shown when the auto-restore prompt is displayed; clicked engage when the user taps restore, dismiss when they skip. Unique once per user per (event, value).",
-        "owners": ["catalinradoiu"],
-        "triggers": ["other"],
-        "suffixes": ["form_factor"],
-        "parameters": [
-            "appVersion",
-            {
-                "key": "e",
-                "type": "string",
-                "description": "Event type for the onboarding instrumentation standard",
-                "enum": ["shown", "clicked"]
-            },
-            { "key": "it", "type": "string", "description": "Install type", "enum": ["new", "reinstall"] },
-            {
-                "key": "d",
-                "type": "integer",
-                "description": "Days since install (0-28). Omitted when more than 28 days have passed since install."
-            },
-            { "key": "source", "type": "string", "description": "Onboarding entry point", "enum": ["default", "duckai_cpp"] },
-            { "key": "flow", "type": "string", "description": "Onboarding flow type", "enum": ["default", "duckai"] },
-            { "key": "pixelSource", "type": "string", "description": "Device form factor", "enum": ["phone", "tablet"] },
-            {
-                "key": "value",
-                "type": "string",
-                "description": "Only set when e=clicked. engage when restore is tapped, dismiss when skipped.",
-                "enum": ["engage", "dismiss"]
-            }
-        ]
-    },
-    "onboarding_input-preview": {
-        "description": "Try-a-search preview step. shown when the input-screen preview is displayed; clicked when the user tries a query, with value encoding whether the query came from a suggestion or was custom, and whether it was a search or a Duck.ai chat. Unique once per user per (event, value).",
+    "onboarding_search-chat-toggle": {
+        "description": "Search/chat toggle preview step. shown when the input-screen preview is displayed; clicked when the user tries a query, with value encoding whether the query came from a suggestion or was custom, and whether it was a search or a Duck.ai chat. Unique once per user per (event, value).",
         "owners": ["catalinradoiu"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
@@ -373,8 +343,8 @@
             }
         ]
     },
-    "onboarding_ai-comparison": {
-        "description": "AI-comparison-chart step. shown when the AI comparison chart is displayed; clicked (no value) when the user taps the primary CTA. Unique once per user per event.",
+    "onboarding_ai-intro": {
+        "description": "AI intro step. shown when the AI comparison chart is displayed; clicked (no value) when the user taps the primary CTA. Unique once per user per event.",
         "owners": ["catalinradoiu"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],

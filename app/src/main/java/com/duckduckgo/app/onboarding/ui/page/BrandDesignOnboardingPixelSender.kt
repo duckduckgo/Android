@@ -22,6 +22,7 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.install.daysInstalled
 import com.duckduckgo.app.onboarding.CustomAiOnboardingStore
+import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
@@ -38,20 +39,8 @@ import javax.inject.Inject
 
 data class OnboardingPixelContext(
     val isReinstallUser: Boolean,
-    val variant: OnboardingBranchVariant? = null,
 )
 
-enum class OnboardingBranchVariant(val pixelValue: String) {
-    SEARCH_PLUS_DUCKAI_SEARCH("search_plus_duckai-search"),
-    SEARCH_PLUS_DUCKAI_CHAT("search_plus_duckai-chat"),
-}
-
-/**
- * A single onboarding telemetry event: one onboarding step paired with what happened in it, plus any
- * typed context that step needs. Each step contributes one [shown][OnboardingPixelEvent] event and one
- * or more action events (clicked/confirmed). Adding a new step means adding a subclass here; the sender's
- * exhaustive `when` then fails to compile until the new event is handled.
- */
 sealed interface OnboardingPixelEvent {
     data object WelcomeShown : OnboardingPixelEvent
     data class WelcomeClicked(val engaged: Boolean) : OnboardingPixelEvent
@@ -177,6 +166,7 @@ class RealBrandDesignOnboardingPixelSender @Inject constructor(
     private val dispatchers: DispatcherProvider,
     private val appInstallStore: AppInstallStore,
     private val customAiOnboardingStore: CustomAiOnboardingStore,
+    private val onboardingStore: OnboardingStore,
     private val defaultBrowserDetector: DefaultBrowserDetector,
     private val widgetCapabilities: WidgetCapabilities,
     private val deviceInfo: DeviceInfo,
@@ -248,27 +238,27 @@ class RealBrandDesignOnboardingPixelSender @Inject constructor(
                 fireQuickSetupClicked(context, event.addressBarPosition, event.inputScreenSelected)
 
             OnboardingPixelEvent.SyncRestoreShown ->
-                fireStep(AppPixelName.ONBOARDING_SYNC_RESTORE, PIXEL_EVENT_SHOWN, context = context)
+                fireStep(AppPixelName.ONBOARDING_WELCOME, PIXEL_EVENT_SHOWN, context = context)
 
             is OnboardingPixelEvent.SyncRestoreClicked ->
-                fireStep(AppPixelName.ONBOARDING_SYNC_RESTORE, PIXEL_EVENT_CLICKED, engageOrDismiss(event.engaged), context)
+                fireStep(AppPixelName.ONBOARDING_WELCOME, PIXEL_EVENT_CLICKED, engageOrDismiss(event.engaged), context)
 
             OnboardingPixelEvent.TryASearchShown ->
-                fireStep(AppPixelName.ONBOARDING_INPUT_PREVIEW, PIXEL_EVENT_SHOWN, context = context)
+                fireStep(AppPixelName.ONBOARDING_SEARCH_CHAT_TOGGLE, PIXEL_EVENT_SHOWN, context = context)
 
             is OnboardingPixelEvent.TryASearchClicked ->
                 fireStep(
-                    AppPixelName.ONBOARDING_INPUT_PREVIEW,
+                    AppPixelName.ONBOARDING_SEARCH_CHAT_TOGGLE,
                     PIXEL_EVENT_CLICKED,
                     tryASearchValue(event.fromSuggestion, event.isChat),
                     context,
                 )
 
             OnboardingPixelEvent.AiComparisonShown ->
-                fireStep(AppPixelName.ONBOARDING_AI_COMPARISON, PIXEL_EVENT_SHOWN, context = context)
+                fireStep(AppPixelName.ONBOARDING_AI_INTRO, PIXEL_EVENT_SHOWN, context = context)
 
             OnboardingPixelEvent.AiComparisonClicked ->
-                fireStep(AppPixelName.ONBOARDING_AI_COMPARISON, PIXEL_EVENT_CLICKED, context = context)
+                fireStep(AppPixelName.ONBOARDING_AI_INTRO, PIXEL_EVENT_CLICKED, context = context)
         }
     }
 
@@ -318,8 +308,16 @@ class RealBrandDesignOnboardingPixelSender @Inject constructor(
     private suspend fun buildStandardParams(context: OnboardingPixelContext): Map<String, String> {
         // source/flow are install-level facts: CustomAiOnboardingStore is the canonical source (a
         // side-effect-free read of the decision persisted at plan build time).
-        val (days, isCustomAiFlow) = withContext(dispatchers.io()) {
-            appInstallStore.daysInstalled() to customAiOnboardingStore.isEnabled()
+        val (days, isCustomAiFlow, variant) = withContext(dispatchers.io()) {
+            Triple(
+                appInstallStore.daysInstalled(),
+                customAiOnboardingStore.isEnabled(),
+                when (onboardingStore.getOnboardingVariant()) {
+                    "search" -> VARIANT_SEARCH
+                    "chat" -> VARIANT_CHAT
+                    else -> null
+                },
+            )
         }
         val params = mutableMapOf(
             PIXEL_PARAM_INSTALL_TYPE to if (context.isReinstallUser) INSTALL_TYPE_REINSTALL else INSTALL_TYPE_NEW,
@@ -327,7 +325,7 @@ class RealBrandDesignOnboardingPixelSender @Inject constructor(
             PIXEL_PARAM_FLOW to if (isCustomAiFlow) FLOW_DUCKAI else ONBOARDING_DEFAULT,
             PIXEL_PARAM_PIXEL_SOURCE to deviceInfo.formFactor().description,
         )
-        context.variant?.let { params[PIXEL_PARAM_VARIANT] = it.pixelValue }
+        variant?.let { params[PIXEL_PARAM_VARIANT] = it }
         if (days in 0..MAX_DAYS_SINCE_INSTALL_REPORTED) {
             params[PIXEL_PARAM_DAYS_SINCE_INSTALL] = days.toString()
         }
@@ -370,6 +368,9 @@ class RealBrandDesignOnboardingPixelSender @Inject constructor(
         private const val ONBOARDING_DEFAULT = "default"
         private const val SOURCE_DUCKAI_CPP = "duckai_cpp"
         private const val FLOW_DUCKAI = "duckai"
+
+        private const val VARIANT_SEARCH = "search_plus_duckai-search"
+        private const val VARIANT_CHAT = "search_plus_duckai-chat"
 
         private const val VALUE_ENGAGE = "engage"
         private const val VALUE_DISMISS = "dismiss"

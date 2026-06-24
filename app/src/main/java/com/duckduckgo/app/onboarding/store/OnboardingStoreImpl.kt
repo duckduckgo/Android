@@ -226,11 +226,27 @@ class OnboardingStoreImpl @Inject constructor(
         return preferences.getBoolean(KEY_DUCK_AI_ONBOARDING_FLOW, false)
     }
 
+    override fun setSearchOnboardingVariant() {
+        preferences.edit { putString(KEY_ONBOARDING_VARIANT, ONBOARDING_VARIANT_SEARCH) }
+    }
+
+    override fun setChatOnboardingVariant() {
+        preferences.edit { putString(KEY_ONBOARDING_VARIANT, ONBOARDING_VARIANT_CHAT) }
+    }
+
+    override fun getOnboardingVariant(): String? {
+        return preferences.getString(KEY_ONBOARDING_VARIANT, null)
+            ?.takeIf { it == ONBOARDING_VARIANT_SEARCH || it == ONBOARDING_VARIANT_CHAT }
+    }
+
     companion object {
         const val FILENAME = "com.duckduckgo.app.onboarding.settings"
         const val ONBOARDING_JOURNEY = "onboardingJourney"
         private const val KEY_INPUT_SCREEN_SELECTION = "inputScreenSelection"
         private const val KEY_INPUT_SCREEN_SELECTION_OVERRIDDEN_BY_USER = "inputScreenSelectionOverriddenByUser"
         private const val KEY_DUCK_AI_ONBOARDING_FLOW = "duckAiOnboardingFlow"
+        private const val KEY_ONBOARDING_VARIANT = "onboardingVariant"
+        private const val ONBOARDING_VARIANT_SEARCH = "search"
+        private const val ONBOARDING_VARIANT_CHAT = "chat"
     }
 }

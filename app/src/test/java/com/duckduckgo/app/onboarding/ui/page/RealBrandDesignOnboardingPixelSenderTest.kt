@@ -20,15 +20,15 @@ import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.onboarding.CustomAiOnboardingStore
+import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.pixels.AppPixelName.ONBOARDING_ADDRESS_BAR_POSITION
-import com.duckduckgo.app.pixels.AppPixelName.ONBOARDING_AI_COMPARISON
-import com.duckduckgo.app.pixels.AppPixelName.ONBOARDING_INPUT_PREVIEW
+import com.duckduckgo.app.pixels.AppPixelName.ONBOARDING_AI_INTRO
 import com.duckduckgo.app.pixels.AppPixelName.ONBOARDING_NOTIFICATIONS
 import com.duckduckgo.app.pixels.AppPixelName.ONBOARDING_QUICK_SETUP
+import com.duckduckgo.app.pixels.AppPixelName.ONBOARDING_SEARCH_CHAT_TOGGLE
 import com.duckduckgo.app.pixels.AppPixelName.ONBOARDING_SEARCH_EXPERIENCE
 import com.duckduckgo.app.pixels.AppPixelName.ONBOARDING_SET_DEFAULT
 import com.duckduckgo.app.pixels.AppPixelName.ONBOARDING_SKIP_ONBOARDING
-import com.duckduckgo.app.pixels.AppPixelName.ONBOARDING_SYNC_RESTORE
 import com.duckduckgo.app.pixels.AppPixelName.ONBOARDING_WELCOME
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
@@ -55,6 +55,7 @@ class RealBrandDesignOnboardingPixelSenderTest {
     private val mockCustomAiOnboardingStore: CustomAiOnboardingStore = mock {
         onBlocking { isEnabled() } doReturn false
     }
+    private val mockOnboardingStore: OnboardingStore = mock()
     private val mockDefaultBrowserDetector: DefaultBrowserDetector = mock()
     private val mockWidgetCapabilities: WidgetCapabilities = mock()
     private val mockDeviceInfo: DeviceInfo = mock {
@@ -67,6 +68,7 @@ class RealBrandDesignOnboardingPixelSenderTest {
         dispatchers = coroutineRule.testDispatcherProvider,
         appInstallStore = mockAppInstallStore,
         customAiOnboardingStore = mockCustomAiOnboardingStore,
+        onboardingStore = mockOnboardingStore,
         defaultBrowserDetector = mockDefaultBrowserDetector,
         widgetCapabilities = mockWidgetCapabilities,
         deviceInfo = mockDeviceInfo,
@@ -395,17 +397,12 @@ class RealBrandDesignOnboardingPixelSenderTest {
     }
 
     @Test
-    fun whenContextHasChatVariantThenVariantParamPresent() = runTest {
+    fun whenDuckAiOnboardingFlowThenVariantParamIsChat() = runTest {
         whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis())
         whenever(mockCustomAiOnboardingStore.isEnabled()).thenReturn(true)
+        whenever(mockOnboardingStore.getOnboardingVariant()).thenReturn("chat")
 
-        testee.fire(
-            OnboardingPixelContext(
-                isReinstallUser = false,
-                variant = OnboardingBranchVariant.SEARCH_PLUS_DUCKAI_CHAT,
-            ),
-            OnboardingPixelEvent.SetDefaultShown,
-        )
+        testee.fire(OnboardingPixelContext(isReinstallUser = false), OnboardingPixelEvent.SetDefaultShown)
 
         verify(mockPixel).fire(
             ONBOARDING_SET_DEFAULT,
@@ -423,16 +420,11 @@ class RealBrandDesignOnboardingPixelSenderTest {
     }
 
     @Test
-    fun whenContextHasSearchVariantWithDefaultFlowThenVariantPresentAndFlowDefault() = runTest {
+    fun whenSearchOnboardingFlowThenVariantParamIsSearch() = runTest {
         whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis())
+        whenever(mockOnboardingStore.getOnboardingVariant()).thenReturn("search")
 
-        testee.fire(
-            OnboardingPixelContext(
-                isReinstallUser = false,
-                variant = OnboardingBranchVariant.SEARCH_PLUS_DUCKAI_SEARCH,
-            ),
-            OnboardingPixelEvent.AddressBarPositionShown,
-        )
+        testee.fire(OnboardingPixelContext(isReinstallUser = false), OnboardingPixelEvent.AddressBarPositionShown)
 
         verify(mockPixel).fire(
             ONBOARDING_ADDRESS_BAR_POSITION,
@@ -456,9 +448,9 @@ class RealBrandDesignOnboardingPixelSenderTest {
         testee.fire(OnboardingPixelContext(isReinstallUser = false), OnboardingPixelEvent.SyncRestoreShown)
 
         verify(mockPixel).fire(
-            ONBOARDING_SYNC_RESTORE,
+            ONBOARDING_WELCOME,
             mapOf("it" to "new", "source" to "default", "flow" to "default", "pixelSource" to "phone", "d" to "0", "e" to "shown"),
-            type = Unique(tag = "onboarding_sync-restore_shown"),
+            type = Unique(tag = "onboarding_welcome_shown"),
         )
     }
 
@@ -469,7 +461,7 @@ class RealBrandDesignOnboardingPixelSenderTest {
         testee.fire(OnboardingPixelContext(isReinstallUser = false), OnboardingPixelEvent.SyncRestoreClicked(engaged = true))
 
         verify(mockPixel).fire(
-            ONBOARDING_SYNC_RESTORE,
+            ONBOARDING_WELCOME,
             mapOf(
                 "it" to "new",
                 "source" to "default",
@@ -479,7 +471,7 @@ class RealBrandDesignOnboardingPixelSenderTest {
                 "e" to "clicked",
                 "value" to "engage",
             ),
-            type = Unique(tag = "onboarding_sync-restore_clicked_engage"),
+            type = Unique(tag = "onboarding_welcome_clicked_engage"),
         )
     }
 
@@ -490,7 +482,7 @@ class RealBrandDesignOnboardingPixelSenderTest {
         testee.fire(OnboardingPixelContext(isReinstallUser = false), OnboardingPixelEvent.SyncRestoreClicked(engaged = false))
 
         verify(mockPixel).fire(
-            ONBOARDING_SYNC_RESTORE,
+            ONBOARDING_WELCOME,
             mapOf(
                 "it" to "new",
                 "source" to "default",
@@ -500,7 +492,7 @@ class RealBrandDesignOnboardingPixelSenderTest {
                 "e" to "clicked",
                 "value" to "dismiss",
             ),
-            type = Unique(tag = "onboarding_sync-restore_clicked_dismiss"),
+            type = Unique(tag = "onboarding_welcome_clicked_dismiss"),
         )
     }
 
@@ -511,9 +503,9 @@ class RealBrandDesignOnboardingPixelSenderTest {
         testee.fire(OnboardingPixelContext(isReinstallUser = false), OnboardingPixelEvent.TryASearchShown)
 
         verify(mockPixel).fire(
-            ONBOARDING_INPUT_PREVIEW,
+            ONBOARDING_SEARCH_CHAT_TOGGLE,
             mapOf("it" to "new", "source" to "default", "flow" to "default", "pixelSource" to "phone", "d" to "0", "e" to "shown"),
-            type = Unique(tag = "onboarding_input-preview_shown"),
+            type = Unique(tag = "onboarding_search-chat-toggle_shown"),
         )
     }
 
@@ -527,7 +519,7 @@ class RealBrandDesignOnboardingPixelSenderTest {
         )
 
         verify(mockPixel).fire(
-            ONBOARDING_INPUT_PREVIEW,
+            ONBOARDING_SEARCH_CHAT_TOGGLE,
             mapOf(
                 "it" to "new",
                 "source" to "default",
@@ -537,7 +529,7 @@ class RealBrandDesignOnboardingPixelSenderTest {
                 "e" to "clicked",
                 "value" to "suggested_search",
             ),
-            type = Unique(tag = "onboarding_input-preview_clicked_suggested_search"),
+            type = Unique(tag = "onboarding_search-chat-toggle_clicked_suggested_search"),
         )
     }
 
@@ -551,7 +543,7 @@ class RealBrandDesignOnboardingPixelSenderTest {
         )
 
         verify(mockPixel).fire(
-            ONBOARDING_INPUT_PREVIEW,
+            ONBOARDING_SEARCH_CHAT_TOGGLE,
             mapOf(
                 "it" to "new",
                 "source" to "default",
@@ -561,7 +553,7 @@ class RealBrandDesignOnboardingPixelSenderTest {
                 "e" to "clicked",
                 "value" to "custom_chat",
             ),
-            type = Unique(tag = "onboarding_input-preview_clicked_custom_chat"),
+            type = Unique(tag = "onboarding_search-chat-toggle_clicked_custom_chat"),
         )
     }
 
@@ -572,9 +564,9 @@ class RealBrandDesignOnboardingPixelSenderTest {
         testee.fire(OnboardingPixelContext(isReinstallUser = false), OnboardingPixelEvent.AiComparisonShown)
 
         verify(mockPixel).fire(
-            ONBOARDING_AI_COMPARISON,
+            ONBOARDING_AI_INTRO,
             mapOf("it" to "new", "source" to "default", "flow" to "default", "pixelSource" to "phone", "d" to "0", "e" to "shown"),
-            type = Unique(tag = "onboarding_ai-comparison_shown"),
+            type = Unique(tag = "onboarding_ai-intro_shown"),
         )
     }
 
@@ -585,9 +577,9 @@ class RealBrandDesignOnboardingPixelSenderTest {
         testee.fire(OnboardingPixelContext(isReinstallUser = false), OnboardingPixelEvent.AiComparisonClicked)
 
         verify(mockPixel).fire(
-            ONBOARDING_AI_COMPARISON,
+            ONBOARDING_AI_INTRO,
             mapOf("it" to "new", "source" to "default", "flow" to "default", "pixelSource" to "phone", "d" to "0", "e" to "clicked"),
-            type = Unique(tag = "onboarding_ai-comparison_clicked"),
+            type = Unique(tag = "onboarding_ai-intro_clicked"),
         )
     }
 }

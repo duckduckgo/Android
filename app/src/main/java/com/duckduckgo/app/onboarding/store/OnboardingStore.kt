@@ -30,4 +30,7 @@ interface OnboardingStore {
     fun setInputScreenSelectionOverriddenByUser()
     fun setDuckAiOnboardingFlow()
     fun isDuckAiOnboardingFlow(): Boolean
+    fun setSearchOnboardingVariant()
+    fun setChatOnboardingVariant()
+    fun getOnboardingVariant(): String?
 }

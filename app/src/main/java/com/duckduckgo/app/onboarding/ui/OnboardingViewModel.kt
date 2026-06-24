@@ -96,10 +96,12 @@ class OnboardingViewModel @Inject constructor(
                     // Arm the in-browser Duck.ai demo (sets the flow + silences the standard DAX CTAs).
                     // Shared with the linear-onboarding duck_ai_demo step so both paths arm identically.
                     duckAiOnboardingDemo.arm()
+                    onboardingStore.setChatOnboardingVariant()
                 }
 
                 DEFAULT_WITHOUT_INTRO_CTA -> {
                     dismissedCtaDao.insert(DismissedCta(CtaId.DAX_INTRO))
+                    onboardingStore.setSearchOnboardingVariant()
                 }
             }
         }

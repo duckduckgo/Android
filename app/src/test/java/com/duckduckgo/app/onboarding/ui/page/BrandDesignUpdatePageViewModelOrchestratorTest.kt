@@ -370,8 +370,6 @@ class BrandDesignUpdatePageViewModelOrchestratorTest {
         assertEquals(PreOnboardingDialogType.INPUT_SCREEN_PREVIEW, testee.viewState.value.currentDialog)
         assertEquals(2, testee.viewState.value.currentPageNumber)
         assertEquals(2, testee.viewState.value.maxPageCount)
-        // Reaching the preview records the Duck.ai branch; isSearchDefault=false -> chat variant.
-        assertEquals(OnboardingBranchVariant.SEARCH_PLUS_DUCKAI_CHAT, testee.viewState.value.onboardingBranchVariant)
     }
 
     // Starts the real orchestrator on a single BrowserActivity-hosted step and builds the view model, which enters

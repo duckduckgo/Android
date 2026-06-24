@@ -164,9 +164,6 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
         val hideSetDefaultBrowserRow: Boolean = false,
         val hideAddWidgetRow: Boolean = false,
         val isCustomAiOnboardingFlow: Boolean = false,
-        // Duck.ai search/chat branch, set once the INPUT_SCREEN_PREVIEW branching step is reached;
-        // null before it (control / pre-branch). Carried as the conditional `variant` pixel param.
-        val onboardingBranchVariant: OnboardingBranchVariant? = null,
         val currentPageNumber: Int? = null,
         // Total steps in the indicator. Set alongside currentPageNumber from the plan-derived StepProgress
         // (orchestrator flow) or the legacy flow's fixed 3-step sequence. Only read while an indicator is shown.
@@ -261,11 +258,6 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
                 inputScreenPreviewSearchSuggestions = onboardingStore.getSearchOptions(),
                 inputScreenPreviewChatSuggestions = onboardingStore.getChatSuggestions(),
                 inputScreenPreviewIsSearchSelected = isSearchDefault,
-                onboardingBranchVariant = if (isSearchDefault) {
-                    OnboardingBranchVariant.SEARCH_PLUS_DUCKAI_SEARCH
-                } else {
-                    OnboardingBranchVariant.SEARCH_PLUS_DUCKAI_CHAT
-                },
                 currentPageNumber = currentPageNumber,
                 maxPageCount = totalSteps,
             )
@@ -326,6 +318,11 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
         isChat: Boolean,
         fromSuggestion: Boolean,
     ) {
+        if (isChat) {
+            onboardingStore.setChatOnboardingVariant()
+        } else {
+            onboardingStore.setSearchOnboardingVariant()
+        }
         brandDesignOnboardingPixelSender.fire(
             pixelContext(),
             OnboardingPixelEvent.TryASearchClicked(fromSuggestion = fromSuggestion, isChat = isChat),
@@ -349,15 +346,8 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
         brandDesignOnboardingPixelSender.fire(pixelContext(), OnboardingPixelEvent.SetDefaultConfirmed(isDdgDefault = isDdgDefault))
     }
 
-    // Builds the shared onboarding pixel context from current viewState. The install-type override
-    // exists for the notification pixels, which fire before loadDaxDialog resolves reinstall status
-    // into viewState and therefore pass the value resolved via isReinstallDeferred.
     private fun pixelContext(isReinstallUser: Boolean = _viewState.value.isReinstallUser): OnboardingPixelContext =
-        OnboardingPixelContext(
-            isReinstallUser = isReinstallUser,
-            // source/flow are resolved inside the sender from CustomAiOnboardingStore.
-            variant = _viewState.value.onboardingBranchVariant,
-        )
+        OnboardingPixelContext(isReinstallUser = isReinstallUser)
 
     fun onQuickSetupDefaultBrowserSet() {
         recordDefaultBrowserDialogResult(isSet = true, fireTelemetry = false)
