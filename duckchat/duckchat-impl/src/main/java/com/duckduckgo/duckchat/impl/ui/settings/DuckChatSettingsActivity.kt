@@ -183,6 +183,9 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
                 getString(R.string.duckAiUseWithoutAiDisabledDescription)
             },
         )
+        binding.duckAINoAiItem.setOnClickListener {
+            viewModel.onUseWithoutAiClicked()
+        }
 
         // The Duck.ai section header and its top divider are only shown when the block lives at the end of the
         // layout (native controls enabled) and Duck.ai is enabled by the user.

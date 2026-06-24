@@ -192,6 +192,14 @@ class DuckChatSettingsViewModel @AssistedInject constructor(
         }
     }
 
+    fun onUseWithoutAiClicked() {
+        // Turn off Duck.ai, silence Search Assist, and hide AI-generated images in one tap.
+        // The item disables itself reactively once isDuckChatUserEnabled flips to false.
+        onDuckChatUserEnabledToggled(checked = false)
+        onSearchAssistVisibilitySelected(SearchAssistVisibility.NEVER)
+        onHideAiGeneratedImagesSelected(HideAiGeneratedImages.ON)
+    }
+
     fun onAutomaticContextAttachmentToggled(checked: Boolean) {
         viewModelScope.launch {
             duckChat.setAutomaticPageContextUserSetting(checked)

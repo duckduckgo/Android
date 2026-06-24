@@ -699,6 +699,34 @@ class DuckChatSettingsViewModelTest {
         }
 
     @Test
+    fun `when onUseWithoutAiClicked then duck chat user setting disabled`() =
+        runTest {
+            testee.onUseWithoutAiClicked()
+            verify(duckChat).setEnableDuckChatUserSetting(false)
+        }
+
+    @Test
+    fun `when onUseWithoutAiClicked then disabled pixel fired`() =
+        runTest {
+            testee.onUseWithoutAiClicked()
+            verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_USER_DISABLED)
+        }
+
+    @Test
+    fun `when onUseWithoutAiClicked then search assist visibility set to never in SERP settings`() =
+        runTest {
+            testee.onUseWithoutAiClicked()
+            verify(serpSettingsDataProvider).setSetting(SearchAssistVisibility.SERP_SETTINGS_KEY, SearchAssistVisibility.NEVER.serpCode)
+        }
+
+    @Test
+    fun `when onUseWithoutAiClicked then hide ai generated images set to on in SERP settings`() =
+        runTest {
+            testee.onUseWithoutAiClicked()
+            verify(serpSettingsDataProvider).setSetting(HideAiGeneratedImages.SERP_SETTINGS_KEY, HideAiGeneratedImages.ON.serpCode)
+        }
+
+    @Test
     fun whenAutomaticContextAttachmentToggledThenSetUserSetting() =
         runTest {
             testee.onAutomaticContextAttachmentToggled(true)
