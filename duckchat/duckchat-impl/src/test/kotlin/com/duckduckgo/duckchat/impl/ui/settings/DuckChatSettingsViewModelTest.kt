@@ -935,7 +935,16 @@ class DuckChatSettingsViewModelTest {
         }
 
     @Test
-    fun `when search assist settings clicked and native controls enabled then ShowSearchAssistDialog command emitted with current visibility`() =
+    fun `when no search assist visibility synced then viewState defaults to SOMETIMES`() =
+        runTest {
+            testee.viewState.test {
+                assertEquals(SearchAssistVisibility.SOMETIMES, awaitItem().searchAssistVisibility)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `when search assist settings clicked and native controls enabled and no value synced then ShowSearchAssistDialog defaults to SOMETIMES`() =
         runTest {
             @Suppress("DenyListedApi")
             duckChatFeature.aiFeaturesNativeControls().setRawStoredState(State(enable = true))
@@ -947,7 +956,7 @@ class DuckChatSettingsViewModelTest {
                 testee.commands.test {
                     val command = awaitItem()
                     assertTrue(command is ShowSearchAssistDialog)
-                    assertEquals(null, (command as ShowSearchAssistDialog).currentVisibility)
+                    assertEquals(SearchAssistVisibility.SOMETIMES, (command as ShowSearchAssistDialog).currentVisibility)
                     cancelAndIgnoreRemainingEvents()
                 }
             }

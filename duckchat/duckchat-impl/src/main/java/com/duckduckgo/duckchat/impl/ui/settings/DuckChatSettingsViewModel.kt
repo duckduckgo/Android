@@ -78,7 +78,7 @@ class DuckChatSettingsViewModel @AssistedInject constructor(
         val isDefaultTogglePositionVisible: Boolean = false,
         val defaultTogglePosition: DefaultTogglePosition = DefaultTogglePosition.SEARCH,
         val isNativeControlsEnabled: Boolean = false,
-        val searchAssistVisibility: SearchAssistVisibility? = null,
+        val searchAssistVisibility: SearchAssistVisibility = DEFAULT_SEARCH_ASSIST_VISIBILITY,
     )
 
     private data class FeatureState(
@@ -142,7 +142,7 @@ class DuckChatSettingsViewModel @AssistedInject constructor(
                     duckChat.isInputScreenFeatureAvailable() && featureVisibility.isRememberTogglePositionVisible,
                 defaultTogglePosition = defaultTogglePosition,
                 isNativeControlsEnabled = featureVisibility.isNativeControlsEnabled,
-                searchAssistVisibility = searchAssistVisibility,
+                searchAssistVisibility = searchAssistVisibility ?: DEFAULT_SEARCH_ASSIST_VISIBILITY,
             )
         }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ViewState())
 
@@ -165,7 +165,7 @@ class DuckChatSettingsViewModel @AssistedInject constructor(
         ) : Command()
 
         data class ShowSearchAssistDialog(
-            val currentVisibility: SearchAssistVisibility?,
+            val currentVisibility: SearchAssistVisibility,
         ) : Command()
     }
 
@@ -313,6 +313,8 @@ class DuckChatSettingsViewModel @AssistedInject constructor(
     }
 
     companion object {
+        // Shown when no Search Assist value has been synced from the SERP yet.
+        private val DEFAULT_SEARCH_ASSIST_VISIBILITY = SearchAssistVisibility.SOMETIMES
         const val DUCK_CHAT_LEARN_MORE_LINK = "https://duckduckgo.com/duckduckgo-help-pages/aichat/"
         const val DUCK_CHAT_SEARCH_AI_SETTINGS_LINK = "https://duckduckgo.com/settings?ko=-1#aifeatures"
         const val LEGACY_DUCK_CHAT_SEARCH_AI_SETTINGS_LINK_EMBEDDED = "https://duckduckgo.com/settings?ko=-1&embedded=1&highlight=kbe#aifeatures"

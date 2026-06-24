@@ -278,10 +278,7 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
             if (viewState.isSearchSectionVisible) {
                 with(showDuckChatSearchSettingsLink) {
                     isVisible = true
-                    setSecondaryText(
-                        viewState.searchAssistVisibility?.let { getString(it.toDisplayNameRes()) }
-                            ?: getString(R.string.duck_chat_assist_settings_description),
-                    )
+                    setSecondaryText(getString(viewState.searchAssistVisibility.toDisplayNameRes()))
                     setOnClickListener {
                         viewModel.duckChatSearchAISettingsClicked()
                     }
@@ -400,7 +397,7 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
             SearchAssistVisibility.OFTEN -> R.string.duckAiSearchAssistVisibilityOften
         }
 
-    private fun showSearchAssistVisibilityDialog(currentVisibility: SearchAssistVisibility?) {
+    private fun showSearchAssistVisibilityDialog(currentVisibility: SearchAssistVisibility) {
         // `options` is the single source of truth for the dialog's order. RadioListAlertDialogBuilder
         // assigns radio ids as (listIndex + 1); deriving both the pre-selected id and the chosen result
         // from this same list keeps them correct no matter how the options are ordered.
@@ -410,7 +407,7 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
             .setMessage(R.string.duckAiSearchAssistVisibilitySubtitle)
             .setOptions(
                 options.map { it.toDisplayNameRes() },
-                currentVisibility?.let { options.indexOf(it).takeIf { index -> index >= 0 }?.plus(1) },
+                options.indexOf(currentVisibility).takeIf { index -> index >= 0 }?.plus(1),
             )
             .setPositiveButton(CommonR.string.dialogSave)
             .setNegativeButton(CommonR.string.cancel)
