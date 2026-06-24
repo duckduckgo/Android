@@ -53,7 +53,7 @@ import javax.inject.Inject
 @OptIn(ExperimentalCoroutinesApi::class)
 @ContributesViewModel(ViewScope::class)
 class NewTabReturnHatchViewModel @Inject constructor(
-    private val tabRepository: TabRepository,
+    private val currentTabRepository: TabRepository,
     private val tabRepositoryProvider: BrowserModeDataProvider<TabRepository>,
     private val dispatchers: DispatcherProvider,
     private val duckChat: DuckChat,
@@ -118,7 +118,7 @@ class NewTabReturnHatchViewModel @Inject constructor(
     // while the activity-mode repo supplies the tabs count shown in the tab button.
     val viewState = snapshotTarget.flatMapLatest { target ->
         if (target == null) {
-            combine(tabRepository.flowTabs, duckChat.observeNativeInputFieldUserSettingEnabled()) { tabs, nativeInputEnabled ->
+            combine(currentTabRepository.flowTabs, duckChat.observeNativeInputFieldUserSettingEnabled()) { tabs, nativeInputEnabled ->
                 ViewState(shouldShow = false, tabs = tabs.size, showTabsButton = nativeInputEnabled)
             }
         } else {
@@ -126,7 +126,7 @@ class NewTabReturnHatchViewModel @Inject constructor(
             combine(
                 pendingClose,
                 tabRepositoryProvider.forMode(target.mode).flowTabs,
-                tabRepository.flowTabs,
+                currentTabRepository.flowTabs,
                 duckChat.observeNativeInputFieldUserSettingEnabled(),
                 ntpAfterIdleManager.returnToLastTabEnabled,
             ) { closed, targetTabs, activityTabs, nativeInputEnabled, returnToLastTabEnabled ->

@@ -85,7 +85,7 @@ class NewTabReturnHatchViewModelTest {
         whenever(mockDuckChat.observeNativeInputFieldUserSettingEnabled()).thenReturn(nativeInputEnabledFlow)
 
         testee = NewTabReturnHatchViewModel(
-            tabRepository = mockTabRepository,
+            currentTabRepository = mockTabRepository,
             tabRepositoryProvider = tabRepositoryProvider,
             dispatchers = coroutinesTestRule.testDispatcherProvider,
             duckChat = mockDuckChat,
