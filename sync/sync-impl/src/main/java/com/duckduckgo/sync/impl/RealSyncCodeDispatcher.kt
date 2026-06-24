@@ -133,7 +133,7 @@ class RealSyncCodeDispatcher @Inject constructor(
             ExchangeV2State.Host.Confirming ->
                 DispatchOutcome.HostConfirmationRequested(peerName = runner.peerName, peerKind = peerKind)
             ExchangeV2State.Host.Done -> DispatchOutcome.LoggedIn(SetupPath.PAIRING, SetupRole.HOST, peerKind)
-            ExchangeV2State.Host.Aborted -> hostAbortedToOutcome(event.localTrigger)
+            ExchangeV2State.Host.Aborted -> hostAbortedToOutcome(event.localTrigger, event.trigger)
             ExchangeV2State.SameAccountAbort -> DispatchOutcome.AlreadyConnected
             ExchangeV2State.Joiner.Done -> {
                 val received = (event.trigger as? ExchangeV2Message.RecoveryCodeResponse)?.recoveryCode
@@ -150,7 +150,7 @@ class RealSyncCodeDispatcher @Inject constructor(
                     DispatchOutcome.Failed("Peer has no recovery code", PAIRING_UNAVAILABLE.code)
                 else -> DispatchOutcome.Failed("Pairing aborted by peer", PAIRING_REJECTED.code)
             }
-            ExchangeV2State.Joiner.AbortedLocal -> DispatchOutcome.Failed("Pairing cancelled on this device", PAIRING_CANCELLED.code)
+            ExchangeV2State.Joiner.AbortedLocal -> joinerAbortedLocalToOutcome(event.localTrigger, event.trigger)
             ExchangeV2State.Aborted -> DispatchOutcome.Failed("negotiation_aborted", NEGOTIATION_ABORTED.code)
             else -> null
         }
@@ -342,8 +342,8 @@ class RealSyncCodeDispatcher @Inject constructor(
                     DispatchOutcome.Failed("Peer has no recovery code", PAIRING_UNAVAILABLE.code)
                 else -> DispatchOutcome.Failed("Pairing aborted by peer", PAIRING_REJECTED.code)
             }
-            ExchangeV2State.Joiner.AbortedLocal -> DispatchOutcome.Failed("Pairing cancelled on this device", PAIRING_CANCELLED.code)
-            ExchangeV2State.Host.Aborted -> hostAbortedToOutcome(event.localTrigger)
+            ExchangeV2State.Joiner.AbortedLocal -> joinerAbortedLocalToOutcome(event.localTrigger, event.trigger)
+            ExchangeV2State.Host.Aborted -> hostAbortedToOutcome(event.localTrigger, event.trigger)
             // Per spec §"Same-account case": not an abort; both devices share an account already.
             ExchangeV2State.SameAccountAbort -> DispatchOutcome.AlreadyConnected
             // Elected Host and shared a recovery code — success from this device's perspective.
@@ -364,10 +364,34 @@ class RealSyncCodeDispatcher @Inject constructor(
         }
     }
 
-    private fun hostAbortedToOutcome(localTrigger: LocalTrigger?): DispatchOutcome = when (localTrigger) {
-        LocalTrigger.UserDeniedHost -> DispatchOutcome.Failed("user_denied", PAIRING_CANCELLED.code)
-        LocalTrigger.HostUnavailable -> DispatchOutcome.Failed("host_unavailable", PAIRING_UNAVAILABLE.code)
+    private fun hostAbortedToOutcome(
+        localTrigger: LocalTrigger?,
+        wireTrigger: ExchangeV2Message?,
+    ): DispatchOutcome = when {
+        localTrigger == LocalTrigger.UserDeniedHost -> DispatchOutcome.Failed("user_denied", PAIRING_CANCELLED.code)
+        localTrigger == LocalTrigger.HostUnavailable -> DispatchOutcome.Failed("host_unavailable", PAIRING_UNAVAILABLE.code)
+        // Wire-driven abort = peer-protocol error in Host.Confirming/Host.Sending (no valid
+        // incoming message exists for the host post-election per the SM spec). Surface the
+        // generic "Sync failed. Please try again." copy via the PAIRING_FAILED → toV2PairingError
+        // else branch, rather than the misleading user-cancellation copy.
+        wireTrigger != null -> DispatchOutcome.Failed("host_protocol_error", PAIRING_FAILED.code)
         else -> DispatchOutcome.Failed("host_aborted", NEGOTIATION_ABORTED.code)
+    }
+
+    /**
+     * [ExchangeV2State.Joiner.AbortedLocal] is reached three ways: the user declined
+     * ([LocalTrigger.UserDeniedJoiner]), a stray wire message arrived in
+     * Joiner.Confirming/Joiner.Waiting (peer-protocol error), or a runner emitted an
+     * out-of-sequence local trigger. Only the first deserves the cancellation copy; the others
+     * map to the generic "Sync failed. Please try again." copy via PAIRING_FAILED.
+     */
+    private fun joinerAbortedLocalToOutcome(
+        localTrigger: LocalTrigger?,
+        wireTrigger: ExchangeV2Message?,
+    ): DispatchOutcome = when {
+        localTrigger == LocalTrigger.UserDeniedJoiner -> DispatchOutcome.Failed("user_denied_joiner", PAIRING_CANCELLED.code)
+        wireTrigger != null -> DispatchOutcome.Failed("joiner_protocol_error", PAIRING_FAILED.code)
+        else -> DispatchOutcome.Failed("joiner_local_aborted", PAIRING_FAILED.code)
     }
 
     /**

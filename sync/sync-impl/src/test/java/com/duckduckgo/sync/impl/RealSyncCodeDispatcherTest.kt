@@ -898,7 +898,7 @@ class RealSyncCodeDispatcherTest {
         verify(syncAccountRepository, never()).processCode(any(), anyOrNull())
     }
 
-    @Test fun `presentV2 emits Failed with cancelled-on-this-device reason when Joiner reaches AbortedLocal`() = runTest {
+    @Test fun `presentV2 emits Failed PAIRING_CANCELLED when Joiner AbortedLocal carries UserDeniedJoiner`() = runTest {
         val outcome = withTimeoutOrNull(1000) {
             val job = async(start = kotlinx.coroutines.CoroutineStart.UNDISPATCHED) { dispatcher.presentV2().first() }
             runnerEventsFlow.emit(
@@ -912,13 +912,43 @@ class RealSyncCodeDispatcherTest {
         }
         assertEquals(
             DispatchOutcome.Failed(
-                "Pairing cancelled on this device",
+                "user_denied_joiner",
                 PAIRING_CANCELLED.code,
                 path = SetupPath.PAIRING,
                 myRole = SetupRole.JOINER,
             ),
             outcome,
         )
+    }
+
+    @Test fun `presentV2 emits Failed PAIRING_FAILED when Joiner AbortedLocal driven by wire message`() = runTest {
+        val outcome = withTimeoutOrNull(1000) {
+            val job = async(start = kotlinx.coroutines.CoroutineStart.UNDISPATCHED) { dispatcher.presentV2().first() }
+            runnerEventsFlow.emit(
+                transition(
+                    from = ExchangeV2State.Joiner.Waiting,
+                    to = ExchangeV2State.Joiner.AbortedLocal,
+                    trigger = ExchangeV2Message.Hello(rawJson = "{}"),
+                ),
+            )
+            job.await()
+        }
+        assertEquals(PAIRING_FAILED.code, (outcome as DispatchOutcome.Failed).code)
+    }
+
+    @Test fun `presentV2 emits Failed PAIRING_FAILED when Host Aborted driven by wire message`() = runTest {
+        val outcome = withTimeoutOrNull(1000) {
+            val job = async(start = kotlinx.coroutines.CoroutineStart.UNDISPATCHED) { dispatcher.presentV2().first() }
+            runnerEventsFlow.emit(
+                transition(
+                    from = ExchangeV2State.Host.Confirming,
+                    to = ExchangeV2State.Host.Aborted,
+                    trigger = ExchangeV2Message.RecoveryCodeResponse(rawJson = "{}"),
+                ),
+            )
+            job.await()
+        }
+        assertEquals(PAIRING_FAILED.code, (outcome as DispatchOutcome.Failed).code)
     }
 
     @Test fun `presentV2 calls runner_startPresent when Flow is collected`() = runTest {
@@ -1106,13 +1136,49 @@ class RealSyncCodeDispatcherTest {
         assertEquals(PAIRING_UNAVAILABLE.code, (outcome as DispatchOutcome.Failed).code)
     }
 
-    @Test fun `linking - Joiner AbortedLocal maps to Failed PAIRING_CANCELLED`() = runTest {
+    @Test fun `linking - Joiner AbortedLocal with UserDeniedJoiner maps to Failed PAIRING_CANCELLED`() = runTest {
         val outcome = withTimeoutOrNull(1000) {
             val job = async(start = kotlinx.coroutines.CoroutineStart.UNDISPATCHED) { startLinking().first() }
-            runnerEventsFlow.emit(transition(from = ExchangeV2State.Joiner.Confirming, to = ExchangeV2State.Joiner.AbortedLocal))
+            runnerEventsFlow.emit(
+                transition(
+                    from = ExchangeV2State.Joiner.Confirming,
+                    to = ExchangeV2State.Joiner.AbortedLocal,
+                    localTrigger = LocalTrigger.UserDeniedJoiner,
+                ),
+            )
             job.await()
         }
         assertEquals(PAIRING_CANCELLED.code, (outcome as DispatchOutcome.Failed).code)
+    }
+
+    @Test fun `linking - Joiner AbortedLocal driven by wire message maps to Failed PAIRING_FAILED`() = runTest {
+        val outcome = withTimeoutOrNull(1000) {
+            val job = async(start = kotlinx.coroutines.CoroutineStart.UNDISPATCHED) { startLinking().first() }
+            runnerEventsFlow.emit(
+                transition(
+                    from = ExchangeV2State.Joiner.Waiting,
+                    to = ExchangeV2State.Joiner.AbortedLocal,
+                    trigger = ExchangeV2Message.Hello(rawJson = "{}"),
+                ),
+            )
+            job.await()
+        }
+        assertEquals(PAIRING_FAILED.code, (outcome as DispatchOutcome.Failed).code)
+    }
+
+    @Test fun `linking - Host Aborted driven by wire message maps to Failed PAIRING_FAILED`() = runTest {
+        val outcome = withTimeoutOrNull(1000) {
+            val job = async(start = kotlinx.coroutines.CoroutineStart.UNDISPATCHED) { startLinking().first() }
+            runnerEventsFlow.emit(
+                transition(
+                    from = ExchangeV2State.Host.Confirming,
+                    to = ExchangeV2State.Host.Aborted,
+                    trigger = ExchangeV2Message.Hello(rawJson = "{}"),
+                ),
+            )
+            job.await()
+        }
+        assertEquals(PAIRING_FAILED.code, (outcome as DispatchOutcome.Failed).code)
     }
 
     @Test fun `linking - Aborted maps to Failed NEGOTIATION_ABORTED`() = runTest {
