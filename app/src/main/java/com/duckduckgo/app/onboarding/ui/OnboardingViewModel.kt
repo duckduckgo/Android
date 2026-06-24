@@ -19,10 +19,11 @@ package com.duckduckgo.app.onboarding.ui
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
-import com.duckduckgo.app.browser.newaddressbaroption.RealNewAddressBarOptionManager
 import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.cta.model.DismissedCta
+import com.duckduckgo.app.onboarding.DuckAiOnboardingDemo
+import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingEvent
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.store.UserStageStore
@@ -33,6 +34,8 @@ import com.duckduckgo.app.onboardingbranddesignupdate.OnboardingBrandDesignUpdat
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.onboarding.api.LinearOnboardingOrchestrator
+import com.duckduckgo.onboarding.api.LinearOnboardingState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -46,10 +49,11 @@ class OnboardingViewModel @Inject constructor(
     private val dispatchers: DispatcherProvider,
     private val onboardingSkipper: OnboardingSkipper,
     private val appBuildConfig: AppBuildConfig,
-    private val newAddressBarOptionManager: RealNewAddressBarOptionManager,
     private val dismissedCtaDao: DismissedCtaDao,
     private val onboardingStore: OnboardingStore,
     private val onboardingBrandDesignUpdateToggles: OnboardingBrandDesignUpdateToggles,
+    private val linearOnboardingOrchestrator: LinearOnboardingOrchestrator,
+    private val duckAiOnboardingDemo: DuckAiOnboardingDemo,
 ) : ViewModel() {
 
     private val _viewState = MutableStateFlow(ViewState())
@@ -76,7 +80,12 @@ class OnboardingViewModel @Inject constructor(
 
     suspend fun onOnboardingDone(extendedOnboardingFlow: ExtendedOnboardingFlow = DEFAULT) {
         withContext(dispatchers.io()) {
-            userStageStore.stageCompleted(AppStage.NEW)
+            // The orchestrator owns the terminal AppStage write when it drives the run; only the
+            // legacy path writes it here. The extended-flow CTA seeding below always runs (it is
+            // driven by the chosen demo query, not the orchestrator).
+            if (!orchestratorDriven) {
+                userStageStore.stageCompleted(AppStage.NEW)
+            }
 
             when (extendedOnboardingFlow) {
                 DEFAULT -> {
@@ -84,17 +93,9 @@ class OnboardingViewModel @Inject constructor(
                 }
 
                 DUCK_AI_FOCUSED -> {
-                    // Mark this as a duck.ai onboarding path so CtaViewModel shows duck.ai-specific CTAs
-                    onboardingStore.setDuckAiOnboardingFlow()
-
-                    // Silence all standard DAX CTAs so they don't appear in the browser
-                    listOf(
-                        CtaId.DAX_INTRO,
-                        CtaId.DAX_DIALOG_SERP,
-                        CtaId.DAX_DIALOG_TRACKERS_FOUND,
-                        CtaId.DAX_FIRE_BUTTON,
-                        CtaId.DAX_END,
-                    ).forEach { dismissedCtaDao.insert(DismissedCta(it)) }
+                    // Arm the in-browser Duck.ai demo (sets the flow + silences the standard DAX CTAs).
+                    // Shared with the linear-onboarding duck_ai_demo step so both paths arm identically.
+                    duckAiOnboardingDemo.arm()
                 }
 
                 DEFAULT_WITHOUT_INTRO_CTA -> {
@@ -106,9 +107,23 @@ class OnboardingViewModel @Inject constructor(
 
     fun onOnboardingSkipped() {
         viewModelScope.launch(dispatchers.io()) {
-            onboardingSkipper.markOnboardingAsCompleted()
+            // Orchestrator-driven runs already ran markOnboardingAsCompleted in onSkipped before
+            // emitting Skipped; only the legacy path writes it here.
+            if (!orchestratorDriven) {
+                onboardingSkipper.markOnboardingAsCompleted()
+            }
         }
     }
+
+    /**
+     * True once the orchestrator is driving this run (it never returns to NotStarted once started).
+     * When true the orchestrator owns the terminal "onboarding is over" writes — its onCompleted /
+     * onSkipped run before it emits the terminal state — and the active page navigates off that state,
+     * so the legacy code here skips both the writes and the dev-skip navigation. NotStarted means the
+     * orchestrator never engaged: the legacy path owns them.
+     */
+    val orchestratorDriven: Boolean
+        get() = linearOnboardingOrchestrator.state.value !is LinearOnboardingState.NotStarted
 
     fun initializeOnboardingSkipper() {
         if (!appBuildConfig.canSkipOnboarding) return
@@ -121,9 +136,19 @@ class OnboardingViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Dev-only "skip all onboarding" shortcut. When [orchestratorDriven], the orchestrator owns the skip
+     * (AbortPlan -> Skipped runs onSkipped, and the active page navigates off Skipped), so the caller
+     * checks [orchestratorDriven] to know it must not also navigate. In the legacy path this writes the
+     * terminal state directly and the caller still owns navigation.
+     */
     suspend fun devOnlyFullyCompleteAllOnboarding() {
-        onboardingSkipper.markOnboardingAsCompleted()
-        newAddressBarOptionManager.setAsShown()
+        // Apply the dev-only extra first so it lands before an orchestrator-driven page navigates.
+        if (orchestratorDriven) {
+            linearOnboardingOrchestrator.onEvent(NewUserOnboardingEvent.SkipNewUserOnboardingDevOptionClicked)
+        } else {
+            onboardingSkipper.markOnboardingAsCompleted()
+        }
     }
 
     companion object {

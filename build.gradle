@@ -345,6 +345,9 @@ fladle {
             localResultsDir.set("fladleResults")
             // retry once, if it succeeds it will be reported as a flaky test
             flakyTestAttempts.set(1)
+            // Emit the full merged JUnit report so it retains every execution,
+            // including the failed attempt + passed rerun of a flaky test.
+            fullJunitResult.set(true)
         }
     }
 }
@@ -357,7 +360,12 @@ afterEvaluate {
                 tasks.named(it),
                 ANDROID_FIREBASE
         ).configure {
-            reports.from(file("build/fladle/fladleResults/JUnitReport.xml"))
+            // Import FullJUnitReport.xml, not JUnitReport.xml. fullJunitResult=true makes
+            // Flank emit this extra report carrying the flaky markers (failure nodes on
+            // passed-after-retry tests) that the ANDROID_FIREBASE dialect needs to detect
+            // flaky tests; the plain JUnitReport.xml has no such markers (imports fine but
+            // always reports 0 flaky).
+            reports.setFrom(file("build/fladle/fladleResults/FullJUnitReport.xml"))
         }
     }
 }

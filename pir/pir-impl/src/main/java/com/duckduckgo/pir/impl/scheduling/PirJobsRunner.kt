@@ -146,6 +146,11 @@ class RealPirJobsRunner @Inject constructor(
             emptyList()
         }
 
+        // Activation pixel: once per install when the user starts their first scan.
+        if (executionType == PirExecutionType.MANUAL_INITIAL && eligibleJobs.isNotEmpty()) {
+            pixelSender.reportFirstScanStarted()
+        }
+
         val isPowerSavingEnabled = context.isPowerSavingModeEnabled()
         val isVpnConnected = networkProtectionState.safeIsVpnRunning()
         val batteryOptimizationsEnabled = !context.isIgnoringBatteryOptimizations()

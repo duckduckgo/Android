@@ -181,8 +181,8 @@ class SearchTabFragment : DuckDuckGoFragment(R.layout.fragment_search_tab) {
                 editableSearchClickListener = {
                     viewModel.onUserSelectedToEditQuery(it.phrase)
                 },
-                autoCompleteLongPressClickListener = {
-                    viewModel.userLongPressedAutocomplete(it)
+                autoCompleteDeleteClickListener = {
+                    viewModel.onUserRequestedToDeleteAutocompleteItem(it)
                 },
                 omnibarType =
                 if (inputScreenConfigResolver.useTopBar()) {
@@ -192,6 +192,9 @@ class SearchTabFragment : DuckDuckGoFragment(R.layout.fragment_search_tab) {
                 },
             )
         autoCompleteRecyclerView?.adapter = autoCompleteSuggestionsAdapter
+        viewLifecycleOwner.lifecycleScope.launch {
+            autoCompleteSuggestionsAdapter.setDeleteButtonVisible(viewModel.isAutocompleteHistoryDeleteButtonEnabled())
+        }
         autoCompleteRecyclerView?.addOnScrollListener(
             object : RecyclerView.OnScrollListener() {
                 override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {

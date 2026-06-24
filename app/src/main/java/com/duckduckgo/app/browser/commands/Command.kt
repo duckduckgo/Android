@@ -47,6 +47,7 @@ import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData
+import com.duckduckgo.duckchat.api.inputscreen.DuckAiOnboardingEndCtaVariant
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed
@@ -99,6 +100,8 @@ sealed class Command {
     data object HideKeyboard : Command()
 
     data object HideKeyboardForChat : Command()
+
+    data object DropAddressBarFocus : Command()
 
     class ShowFullScreen(
         val view: View,
@@ -480,6 +483,13 @@ sealed class Command {
 
     data object CloseCustomTab : Command()
 
+    /**
+     * Finishes only the [CustomTabActivity] (not the whole task). Used when the custom tab is being
+     * dismissed while another activity (e.g. the Duck Chat host) is being launched into the same task,
+     * where [CloseCustomTab]'s `finishAndRemoveTask()` would tear down that activity too.
+     */
+    data object FinishCustomTab : Command()
+
     data class LaunchPopupMenu(val anchorToNavigationBar: Boolean) : Command()
 
     data class ShowAutoconsentAnimation(
@@ -490,7 +500,10 @@ sealed class Command {
 
     data object RefreshOmnibar : Command()
 
-    data class LaunchInputScreen(val showDuckAiEndCta: Boolean = false) : Command()
+    data class LaunchInputScreen(
+        val duckAiEndCtaVariant: DuckAiOnboardingEndCtaVariant = DuckAiOnboardingEndCtaVariant.NONE,
+        val launchOnChat: Boolean = false,
+    ) : Command()
 
     data object LaunchDuckChatHistory : Command()
 

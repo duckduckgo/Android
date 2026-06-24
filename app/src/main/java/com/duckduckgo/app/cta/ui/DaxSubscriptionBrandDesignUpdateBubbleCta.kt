@@ -36,12 +36,13 @@ data class DaxSubscriptionBrandDesignUpdateBubbleCta(
     override val appInstallStore: AppInstallStore,
     override val isLightTheme: Boolean,
     override val deviceInfo: DeviceInfo,
+    val isCustomAiOnboardingFlow: Boolean,
     val isFreeTrialCopy: Boolean,
     override val onboardingImprovementsEnabled: Boolean,
 ) : DaxBubbleCta.BrandDesignUpdateBubbleCta(
     ctaId = CtaId.DAX_INTRO_PRIVACY_PRO,
     title = R.string.onboardingPrivacyProDaxDialogTitle,
-    description = if (onboardingStore.isCustomAiOnboardingFlow()) {
+    description = if (isCustomAiOnboardingFlow) {
         R.string.onboardingPrivacyProCustomAiFlowDaxDialogDescription
     } else {
         R.string.onboardingPrivacyProDaxDialogDescription
@@ -73,7 +74,11 @@ data class DaxSubscriptionBrandDesignUpdateBubbleCta(
         view.findViewById<ImageView>(R.id.brandDesignHeaderImage)?.isVisible = true
 
         val buttonTextRes = if (isFreeTrialCopy) {
-            R.string.onboardingPrivacyProDaxDialogFreeTrialOkButton
+            if (isCustomAiOnboardingFlow) {
+                R.string.onboardingPrivacyProDaxDialogFreeTrialOkButtonBrandDesign
+            } else {
+                R.string.onboardingPrivacyProDaxDialogFreeTrialOkButton
+            }
         } else {
             R.string.onboardingPrivacyProDaxDialogOkButton
         }

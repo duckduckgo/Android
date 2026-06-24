@@ -32,6 +32,9 @@ import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggesti
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteUrlSuggestion.AutoCompleteSwitchToTabSuggestion
 import com.duckduckgo.browser.api.autocomplete.AutoCompleteFactory
 import com.duckduckgo.browser.api.autocomplete.AutoCompleteSettings
+import com.duckduckgo.browsermode.api.BrowserMode
+import com.duckduckgo.browsermode.api.BrowserModeDataProvider
+import com.duckduckgo.browsermode.api.BrowserModeStateHolder
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.plugins.ActivePluginPoint
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
@@ -118,7 +121,16 @@ class NativeInputModeWidgetViewModelTest {
     private val tabRepository: TabRepository = mock<TabRepository>().also {
         whenever(it.flowSelectedTab).thenReturn(selectedTabFlow)
     }
-    private val realNativeInputStateStore = RealNativeInputStateStore { tabRepository }
+    private val tabRepositoryProvider = object : BrowserModeDataProvider<TabRepository> {
+        override fun forMode(mode: BrowserMode): TabRepository = tabRepository
+    }
+    private val browserModeStateHolder: BrowserModeStateHolder = mock<BrowserModeStateHolder>().also {
+        whenever(it.currentMode).thenReturn(MutableStateFlow(BrowserMode.REGULAR))
+    }
+    private val realNativeInputStateStore = RealNativeInputStateStore(
+        dagger.Lazy { tabRepositoryProvider },
+        browserModeStateHolder,
+    )
     private val nativeInputStatePublisher: NativeInputStatePublisher = realNativeInputStateStore
     private val nativeInputStateProvider: NativeInputStateProvider = realNativeInputStateStore
 
@@ -727,6 +739,54 @@ class NativeInputModeWidgetViewModelTest {
     }
 
     @Test
+    fun whenSetInteractionLockThenReflectedInState() = runTest {
+        val viewModel = createViewModel()
+        viewModel.configure(tabId = "tab-A", isDuckAiMode = true, isBottom = false)
+        advanceUntilIdle()
+
+        viewModel.setInteractionLock(NativeInputState.InteractionLock.Locked)
+        advanceUntilIdle()
+        assertEquals(NativeInputState.InteractionLock.Locked, viewModel.state.firstOrNull()!!.interactionLock)
+
+        viewModel.setInteractionLock(NativeInputState.InteractionLock.LockedExceptDuckAiFireButton)
+        advanceUntilIdle()
+        assertEquals(
+            NativeInputState.InteractionLock.LockedExceptDuckAiFireButton,
+            viewModel.state.firstOrNull()!!.interactionLock,
+        )
+
+        viewModel.setInteractionLock(NativeInputState.InteractionLock.Unlocked)
+        advanceUntilIdle()
+        assertEquals(NativeInputState.InteractionLock.Unlocked, viewModel.state.firstOrNull()!!.interactionLock)
+    }
+
+    @Test
+    fun whenSetDuckAiFireButtonHighlightedThenReflectedInState() = runTest {
+        val viewModel = createViewModel()
+        viewModel.configure(tabId = "tab-A", isDuckAiMode = true, isBottom = false)
+        advanceUntilIdle()
+
+        viewModel.setDuckAiFireButtonHighlighted(true)
+        advanceUntilIdle()
+        assertTrue(viewModel.state.firstOrNull()!!.duckAiFireButtonHighlighted)
+
+        viewModel.setDuckAiFireButtonHighlighted(false)
+        advanceUntilIdle()
+        assertFalse(viewModel.state.firstOrNull()!!.duckAiFireButtonHighlighted)
+    }
+
+    @Test
+    fun whenSetInteractionLockBeforeConfigureThenAppliedOnConfigure() = runTest {
+        val viewModel = createViewModel()
+        viewModel.setInteractionLock(NativeInputState.InteractionLock.Locked)
+
+        viewModel.configure(tabId = "tab-A", isDuckAiMode = true, isBottom = false)
+        advanceUntilIdle()
+
+        assertEquals(NativeInputState.InteractionLock.Locked, viewModel.state.firstOrNull()!!.interactionLock)
+    }
+
+    @Test
     fun whenShowModelPickerEventThenModelChangeModeSetTrueOnActiveTab() = runTest {
         val viewModel = createViewModel()
         viewModel.configure(tabId = "tab-A", isDuckAiMode = true, isBottom = false)
@@ -789,6 +849,30 @@ class NativeInputModeWidgetViewModelTest {
         viewModel.exitModelChangeMode()
 
         assertFalse(nativeInputStateProvider.stateForTab("tab-A").value.modelChangeMode)
+    }
+
+    @Test
+    fun whenPromptSubmittedDuringRecoveryThenSubmitChangeModelPromptSentPixelFired() = runTest {
+        val viewModel = createViewModel()
+        viewModel.configure(tabId = "tab-A", isDuckAiMode = true, isBottom = false)
+        advanceUntilIdle()
+        showModelPickerEvents.tryEmit("tab-A")
+        advanceUntilIdle()
+
+        viewModel.onPromptSubmitted()
+
+        verify(duckChatPixels).fireSubmitChangeModelPromptSent()
+    }
+
+    @Test
+    fun whenPromptSubmittedOutsideRecoveryThenSubmitChangeModelPromptSentPixelNotFired() = runTest {
+        val viewModel = createViewModel()
+        viewModel.configure(tabId = "tab-A", isDuckAiMode = true, isBottom = false)
+        advanceUntilIdle()
+
+        viewModel.onPromptSubmitted()
+
+        verify(duckChatPixels, never()).fireSubmitChangeModelPromptSent()
     }
 
     @Test

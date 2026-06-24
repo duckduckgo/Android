@@ -477,6 +477,9 @@ private class FakePirDataStore : PirDataStore {
     override var dauLastSentMs: Long = 0L
     override var wauLastSentMs: Long = 0L
     override var mauLastSentMs: Long = 0L
+    override var interactionDauLastSentMs: Long = 0L
+    override var interactionWauLastSentMs: Long = 0L
+    override var interactionMauLastSentMs: Long = 0L
     override var weeklyStatLastSentMs: Long = 0L
     override var hasBrokerConfigBeenManuallyUpdated: Boolean = false
     override var latestBackgroundScanRunInMs: Long = 0L
@@ -498,6 +501,9 @@ private class FakePirDataStore : PirDataStore {
         dauLastSentMs = 0L
         wauLastSentMs = 0L
         mauLastSentMs = 0L
+        interactionDauLastSentMs = 0L
+        interactionWauLastSentMs = 0L
+        interactionMauLastSentMs = 0L
         weeklyStatLastSentMs = 0L
         latestBackgroundScanRunInMs = 0L
         hasInitialScanEverStarted = false

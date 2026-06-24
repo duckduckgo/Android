@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.autocomplete.impl
 
+import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin
 import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin.PixelParameter
@@ -56,6 +57,8 @@ class AutocompleteParamRemovalPlugin @Inject constructor() : PixelParamRemovalPl
             // Covers the 6 names above and the 2 Duck.ai-unique ones (chat_history, search_duckduckgo)
             // declared in DuckChatPixelName — the interceptor matches outgoing names with startsWith.
             "m_autocomplete_duckai_click_" to PixelParameter.removeAtb(),
+            AppPixelName.AUTOCOMPLETE_RESULT_DELETE_BUTTON_CLICKED.pixelName to PixelParameter.removeAtb(),
+            AppPixelName.AUTOCOMPLETE_RESULT_DELETE_BUTTON_CLICKED_DAILY.pixelName to PixelParameter.removeAtb(),
         )
     }
 }

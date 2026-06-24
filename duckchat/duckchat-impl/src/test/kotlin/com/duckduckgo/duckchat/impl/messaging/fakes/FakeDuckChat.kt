@@ -16,7 +16,6 @@
 
 package com.duckduckgo.duckchat.impl.messaging.fakes
 
-import android.content.Context
 import android.net.Uri
 import com.duckduckgo.duckchat.api.DuckChat
 import kotlinx.coroutines.flow.Flow
@@ -70,10 +69,6 @@ class FakeDuckChat(
 
     override suspend fun wasOpenedBefore(): Boolean {
         return wasOpenedBeforeValue
-    }
-
-    override fun showNewAddressBarOptionChoiceScreen(context: Context, isDarkThemeEnabled: Boolean) {
-        // No-op for testing
     }
 
     override suspend fun setInputScreenUserSetting(enabled: Boolean) {

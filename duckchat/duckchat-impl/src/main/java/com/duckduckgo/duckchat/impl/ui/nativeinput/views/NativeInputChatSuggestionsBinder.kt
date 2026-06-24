@@ -103,10 +103,11 @@ class NativeInputChatSuggestionsBinder @Inject constructor(
         val urlAdapter = BrowserAutoCompleteSuggestionsAdapter(
             immediateSearchClickListener = { onChatUrlSuggestionClicked(it) },
             editableSearchClickListener = { },
-            autoCompleteLongPressClickListener = { },
+            autoCompleteDeleteClickListener = { },
             omnibarType = if (inputScreenConfigResolver.useTopBar()) OmnibarType.SINGLE_TOP else OmnibarType.SINGLE_BOTTOM,
             hideEditQueryArrow = true,
             hideSectionDividers = true,
+            isDeleteButtonVisible = false,
         )
         val urlDivider = SectionDividerAdapter()
         val searchDivider = SectionDividerAdapter()

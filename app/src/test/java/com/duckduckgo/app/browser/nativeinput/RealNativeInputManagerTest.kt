@@ -23,6 +23,7 @@ import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.voice.api.VoiceSearchAvailability
 import org.junit.Assert.assertEquals
@@ -47,6 +48,7 @@ class RealNativeInputManagerTest {
     private val queryUrlPredictor: QueryUrlPredictor = mock()
     private val duckAiFeatureState: DuckAiFeatureState = mock()
     private val pixel: Pixel = mock()
+    private val nativeInputStateBugKillSwitch = FakeFeatureToggleFactory.create(NativeInputStateBugKillSwitch::class.java)
 
     private lateinit var testee: RealNativeInputManager
 
@@ -60,6 +62,7 @@ class RealNativeInputManagerTest {
             queryUrlPredictor,
             duckAiFeatureState,
             pixel,
+            nativeInputStateBugKillSwitch,
         )
     }
 

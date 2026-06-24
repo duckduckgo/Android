@@ -37,6 +37,7 @@ import com.duckduckgo.sync.impl.RecoveryCodePDF
 import com.duckduckgo.sync.impl.Result.Error
 import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.impl.SyncAccountRepository
+import com.duckduckgo.sync.impl.SyncAuthCode
 import com.duckduckgo.sync.impl.SyncFeatureToggle
 import com.duckduckgo.sync.impl.auth.DeviceAuthenticator
 import com.duckduckgo.sync.impl.autorestore.SyncAutoRestoreManager
@@ -603,13 +604,28 @@ class SyncActivityViewModel @Inject constructor(
     fun processSetupDeepLink(setupUrl: String) {
         logcat { "Sync-setup: got setup deep link $setupUrl" }
         viewModelScope.launch(dispatchers.io()) {
-            // parse here to test validity before asking user to use it
             val parsed = SyncBarcodeUrl.parseUrl(setupUrl)
-
             if (parsed == null) {
                 logcat { "Sync-setup: failed to parse setup URL $setupUrl" }
-            } else {
-                command.send(Command.AskSetupSyncDeepLink(parsed))
+                return@launch
+            }
+            when (parsed.protocolVersion) {
+                SyncBarcodeUrl.ProtocolVersion.V1 -> {
+                    // V1 URL-based sync setup only accepts exchange codes
+                    if (syncAccountRepository.parseSyncAuthCode(setupUrl) !is SyncAuthCode.Exchange) {
+                        logcat { "Sync-setup: v1 deep-link URL does not carry an exchange code; ignoring silently" }
+                        return@launch
+                    }
+                    command.send(Command.AskSetupSyncDeepLink(parsed))
+                }
+                SyncBarcodeUrl.ProtocolVersion.V2 -> {
+                    // V2 exchanges have their own user confirmation built into the protocol
+                    // (the Joiner/Host confirmation surfaced by the runner)
+                    logcat { "Sync-setup: v2 deep link; bypassing legacy confirmation dialog" }
+                    requiresSetupAuthentication {
+                        command.send(Command.DeepLinkIntoSetup(parsed))
+                    }
+                }
             }
         }
     }

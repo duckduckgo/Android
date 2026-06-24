@@ -84,15 +84,7 @@ interface DuckChatFeature {
     fun inputScreenBottomBarSupport(): Toggle
 
     /**
-     * @return `true` when the new address bar option choice screen should be shown
-     * If the remote feature is not present defaults to `internal`
-     */
-    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
-    @InternalAlwaysEnabled
-    fun showAIChatAddressBarChoiceScreen(): Toggle
-
-    /**
-     * @return `true` when the V2 (refreshed) new address bar option choice screen should be shown.
+     * @return `true` when the new address bar option choice screen should be shown.
      * If the remote feature is not present defaults to `internal`.
      */
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
@@ -141,6 +133,7 @@ interface DuckChatFeature {
     /**
      * @return `true` when the Native Input Field should be used instead of the web-based input.
      */
+    @InternalAlwaysEnabled
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun nativeInputField(): Toggle
 
@@ -277,6 +270,13 @@ interface DuckChatFeature {
      * @return `true` when the contextual Duck.ai sheet improvements are enabled.
      * If the remote feature is not present defaults to `false`
      */
-    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun contextualSheetImprovements(): Toggle
+
+    /**
+     * @return `true` when the native controls for AI Features are enabled in the app.
+     * If the remote feature is not present defaults to `internal`
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun aiFeaturesNativeControls(): Toggle
 }

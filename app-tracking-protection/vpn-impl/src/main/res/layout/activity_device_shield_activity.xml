@@ -29,6 +29,7 @@
         layout="@layout/include_trackers_toolbar" />
 
     <androidx.core.widget.NestedScrollView
+        android:id="@+id/contentScrollView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:fillViewport="true">

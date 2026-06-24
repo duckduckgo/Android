@@ -52,11 +52,6 @@ interface DuckAiFeatureState {
     /**
      * Indicates whether the new address bar option choice screen feature is enabled.
      */
-    val showNewAddressBarOptionChoiceScreen: StateFlow<Boolean>
-
-    /**
-     * Indicates whether the V2 (refreshed) new address bar option choice screen feature is enabled.
-     */
     val showAIChatAddressBarOptionChoiceScreen: StateFlow<Boolean>
 
     /**

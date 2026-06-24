@@ -19,6 +19,7 @@ package com.duckduckgo.app.dispatchers
 import android.content.Intent
 import android.net.Uri
 import androidx.browser.customtabs.CustomTabsIntent
+import androidx.core.net.toUri
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
 import com.duckduckgo.adblocking.api.duckplayer.DuckPlayerSettingsNoParams
@@ -29,6 +30,7 @@ import com.duckduckgo.appbuildconfig.api.BuildFlavor
 import com.duckduckgo.autofill.api.emailprotection.EmailProtectionLinkVerifier
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.customtabs.api.CustomTabDetector
+import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.sync.api.setup.SyncUrlIdentifier
 import com.duckduckgo.sync.impl.ui.qrcode.SyncBarcodeUrl
 import kotlinx.coroutines.test.runTest
@@ -56,6 +58,7 @@ class IntentDispatcherViewModelTest {
     private val emailProtectionLinkVerifier: EmailProtectionLinkVerifier = mock()
     private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector = mock()
     private val syncUrlIdentifier: SyncUrlIdentifier = mock()
+    private val duckChat: DuckChat = mock()
     private val mockAppBuildConfig: AppBuildConfig = mock()
 
     private lateinit var testee: IntentDispatcherViewModel
@@ -68,6 +71,7 @@ class IntentDispatcherViewModelTest {
             emailProtectionLinkVerifier = emailProtectionLinkVerifier,
             duckDuckGoUrlDetector = duckDuckGoUrlDetector,
             syncUrlIdentifier = syncUrlIdentifier,
+            duckChat = duckChat,
             appBuildConfig = mockAppBuildConfig,
         )
 
@@ -226,6 +230,37 @@ class IntentDispatcherViewModelTest {
         testee.viewState.test {
             val state = awaitItem()
             assertFalse(state.customTabRequested)
+        }
+    }
+
+    @Test
+    fun `when Intent received with session and intent text is a duck ai url then custom tab is not requested`() = runTest {
+        val text = "https://duck.ai/?q=hello"
+        configureHasSession(true)
+        whenever(mockIntent.intentText).thenReturn(text)
+        whenever(duckChat.isDuckChatUrl(text.toUri())).thenReturn(true)
+
+        testee.onIntentReceived(mockIntent, isExternal = false)
+
+        testee.viewState.test {
+            val state = awaitItem()
+            assertFalse(state.customTabRequested)
+            assertEquals(text, state.intentText)
+        }
+    }
+
+    @Test
+    fun `when Intent received with session and intent text is not a duck ai url then custom tab is requested`() = runTest {
+        val text = "https://example.com"
+        configureHasSession(true)
+        whenever(mockIntent.intentText).thenReturn(text)
+        whenever(duckChat.isDuckChatUrl(text.toUri())).thenReturn(false)
+
+        testee.onIntentReceived(mockIntent, isExternal = false)
+
+        testee.viewState.test {
+            val state = awaitItem()
+            assertTrue(state.customTabRequested)
         }
     }
 

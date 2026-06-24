@@ -32,7 +32,6 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.utils.AppUrl
 import com.duckduckgo.common.utils.AppUrl.ParamKey.QUERY
 import com.duckduckgo.common.utils.DispatcherProvider
-import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.cookies.api.CookieManagerProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
@@ -41,18 +40,8 @@ import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.api.DuckChatInputModeState
 import com.duckduckgo.duckchat.api.DuckChatSettingsNoParams
 import com.duckduckgo.duckchat.api.InputMode
-import com.duckduckgo.duckchat.api.nativeinput.NativeInputFieldSuppressor
 import com.duckduckgo.duckchat.impl.feature.AIChatImageUploadFeature
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
-import com.duckduckgo.duckchat.impl.inputscreen.newaddressbaroption.NewAddressBarCallback
-import com.duckduckgo.duckchat.impl.inputscreen.newaddressbaroption.NewAddressBarOptionBottomSheetDialogFactory
-import com.duckduckgo.duckchat.impl.inputscreen.newaddressbaroption.NewAddressBarSelection
-import com.duckduckgo.duckchat.impl.inputscreen.newaddressbaroption.NewAddressBarSelection.SEARCH_AND_AI
-import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_NEW_ADDRESS_BAR_PICKER_CANCELLED
-import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_NEW_ADDRESS_BAR_PICKER_CONFIRMED
-import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_NEW_ADDRESS_BAR_PICKER_DISPLAYED
-import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_NEW_ADDRESS_BAR_PICKER_NOT_NOW
-import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelParameters.NEW_ADDRESS_BAR_SELECTION
 import com.duckduckgo.duckchat.impl.repository.AddressBarPickerAttributionRepository
 import com.duckduckgo.duckchat.impl.repository.DuckChatFeatureRepository
 import com.duckduckgo.duckchat.impl.store.DefaultTogglePosition
@@ -376,13 +365,11 @@ class RealDuckChat @Inject constructor(
     private val pixel: Pixel,
     private val imageUploadFeature: AIChatImageUploadFeature,
     private val browserNav: BrowserNav,
-    private val newAddressBarOptionBottomSheetDialogFactory: NewAddressBarOptionBottomSheetDialogFactory,
     private val deviceSyncState: DeviceSyncState,
     private val cookiesManager: CookieManagerProvider,
     private val duckAiHostProvider: DuckAiHostProvider,
     private val appBuildConfig: AppBuildConfig,
     private val voiceSessionStateManager: VoiceSessionStateManager,
-    private val nativeInputFieldSuppressors: PluginPoint<NativeInputFieldSuppressor>,
 ) : DuckChatInternal,
     DuckAiFeatureState,
     DuckChatInputModeState,
@@ -395,7 +382,6 @@ class RealDuckChat @Inject constructor(
     private val _showPopupMenuShortcut = MutableStateFlow(false)
     private val _showOmnibarShortcutOnNtpAndOnFocus = MutableStateFlow(false)
     private val _showOmnibarShortcutInAllStates = MutableStateFlow(false)
-    private val _showNewAddressBarOptionChoiceScreen = MutableStateFlow(false)
     private val _showAIChatAddressBarOptionChoiceScreen = MutableStateFlow(false)
     private val _showClearDuckAIChatHistory = MutableStateFlow(true)
     private val _showMainButtonsInInputScreen = MutableStateFlow(false)
@@ -421,7 +407,6 @@ class RealDuckChat @Inject constructor(
     private var duckAiInputScreenOpenAutomaticallyEnabled = false
     private var duckAiInputScreen = false
     private var duckAiInputScreenBottomBarEnabled = false
-    private var showAIChatAddressBarChoiceScreen = false
     private var showNewAddressBarPickerScreen = false
     private var isDuckChatUserEnabled = false
     private var isChatSyncFeatureEnabled = false
@@ -599,8 +584,6 @@ class RealDuckChat @Inject constructor(
     override val showOmnibarShortcutOnNtpAndOnFocus: StateFlow<Boolean> = _showOmnibarShortcutOnNtpAndOnFocus.asStateFlow()
 
     override val showOmnibarShortcutInAllStates: StateFlow<Boolean> = _showOmnibarShortcutInAllStates.asStateFlow()
-
-    override val showNewAddressBarOptionChoiceScreen: StateFlow<Boolean> = _showNewAddressBarOptionChoiceScreen.asStateFlow()
 
     override val showAIChatAddressBarOptionChoiceScreen: StateFlow<Boolean> = _showAIChatAddressBarOptionChoiceScreen.asStateFlow()
 
@@ -791,43 +774,6 @@ class RealDuckChat @Inject constructor(
 
     override suspend fun wasOpenedBefore(): Boolean = duckChatFeatureRepository.wasOpenedBefore()
 
-    override fun showNewAddressBarOptionChoiceScreen(
-        context: Context,
-        isDarkThemeEnabled: Boolean,
-    ) {
-        newAddressBarOptionBottomSheetDialogFactory
-            .create(
-                context = context,
-                isDarkThemeEnabled = isDarkThemeEnabled,
-                newAddressBarCallback =
-                object : NewAddressBarCallback {
-                    override fun onDisplayed() {
-                        pixel.fire(DUCK_CHAT_NEW_ADDRESS_BAR_PICKER_DISPLAYED)
-                    }
-
-                    override fun onConfirmed(selection: NewAddressBarSelection) {
-                        if (selection == SEARCH_AND_AI) {
-                            appCoroutineScope.launch {
-                                setInputScreenUserSetting(true)
-                            }
-                        }
-                        pixel.fire(
-                            pixel = DUCK_CHAT_NEW_ADDRESS_BAR_PICKER_CONFIRMED,
-                            parameters = mapOf(NEW_ADDRESS_BAR_SELECTION to selection.value),
-                        )
-                    }
-
-                    override fun onNotNow() {
-                        pixel.fire(DUCK_CHAT_NEW_ADDRESS_BAR_PICKER_NOT_NOW)
-                    }
-
-                    override fun onCancelled() {
-                        pixel.fire(DUCK_CHAT_NEW_ADDRESS_BAR_PICKER_CANCELLED)
-                    }
-                },
-            ).show()
-    }
-
     override suspend fun isStandaloneMigrationCompleted(): Boolean {
         val cookieManager = cookiesManager.get()
         val ddgCookies = cookieManager?.getCookie(AppUrl.Url.COOKIES)?.split(";").orEmpty()
@@ -903,7 +849,6 @@ class RealDuckChat @Inject constructor(
             duckAiInputScreenOpenAutomaticallyEnabled = duckChatFeature.showInputScreenAutomaticallyOnNewTab().isEnabled()
             duckAiInputScreenBottomBarEnabled = duckChatFeature.inputScreenBottomBarSupport().isEnabled()
             clearChatHistory = duckChatFeature.clearHistory().isEnabled()
-            showAIChatAddressBarChoiceScreen = duckChatFeature.showAIChatAddressBarChoiceScreen().isEnabled()
             showNewAddressBarPickerScreen = duckChatFeature.showNewAddressBarPickerScreen().isEnabled()
             showInputScreenOnSystemSearchLaunchEnabled = duckChatFeature.showInputScreenOnSystemSearchLaunch().isEnabled()
             inputScreenMainButtonsEnabled = duckChatFeature.showMainButtonsInInputScreen().isEnabled()
@@ -934,8 +879,7 @@ class RealDuckChat @Inject constructor(
             _allowDuckAiAsDigitalAssistant.emit(featureEnabled && duckChatFeature.digitalAssistantDuckAi().isEnabled())
             isImageUploadEnabled = imageUploadFeature.self().isEnabled()
             isStandaloneMigrationEnabled = duckChatFeature.standaloneMigration().isEnabled()
-            val nativeInputFieldSuppressed = nativeInputFieldSuppressors.getPlugins().any { it.isNativeInputFieldSuppressed() }
-            _nativeInputFieldEnabled.value = duckChatFeature.nativeInputField().isEnabled() && !nativeInputFieldSuppressed
+            _nativeInputFieldEnabled.value = duckChatFeature.nativeInputField().isEnabled()
 
             keepSessionAliveInMinutes = settingsJson?.sessionTimeoutMinutes ?: DEFAULT_SESSION_ALIVE
 
@@ -972,7 +916,6 @@ class RealDuckChat @Inject constructor(
             val showOmnibarShortcutInAllStates = showInAddressBar && isDuckAiInBrowserEnabled
             _showOmnibarShortcutInAllStates.emit(showOmnibarShortcutInAllStates)
 
-            _showNewAddressBarOptionChoiceScreen.emit(showAIChatAddressBarChoiceScreen && !showNewAddressBarPickerScreen)
             _showAIChatAddressBarOptionChoiceScreen.emit(showNewAddressBarPickerScreen)
 
             val showClearChatHistory = clearChatHistory

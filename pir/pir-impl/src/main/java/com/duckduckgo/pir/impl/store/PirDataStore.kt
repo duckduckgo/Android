@@ -26,6 +26,9 @@ interface PirDataStore {
     var dauLastSentMs: Long
     var wauLastSentMs: Long
     var mauLastSentMs: Long
+    var interactionDauLastSentMs: Long
+    var interactionWauLastSentMs: Long
+    var interactionMauLastSentMs: Long
     var weeklyStatLastSentMs: Long
     var hasBrokerConfigBeenManuallyUpdated: Boolean
     var latestBackgroundScanRunInMs: Long
@@ -100,6 +103,30 @@ internal class RealPirDataStore(
         set(value) {
             preferences.edit {
                 putLong(KEY_ENGAGEMENT_MAU_LAST_MS, value)
+            }
+        }
+
+    override var interactionDauLastSentMs: Long
+        get() = preferences.getLong(KEY_INTERACTION_DAU_LAST_MS, 0L)
+        set(value) {
+            preferences.edit {
+                putLong(KEY_INTERACTION_DAU_LAST_MS, value)
+            }
+        }
+
+    override var interactionWauLastSentMs: Long
+        get() = preferences.getLong(KEY_INTERACTION_WAU_LAST_MS, 0L)
+        set(value) {
+            preferences.edit {
+                putLong(KEY_INTERACTION_WAU_LAST_MS, value)
+            }
+        }
+
+    override var interactionMauLastSentMs: Long
+        get() = preferences.getLong(KEY_INTERACTION_MAU_LAST_MS, 0L)
+        set(value) {
+            preferences.edit {
+                putLong(KEY_INTERACTION_MAU_LAST_MS, value)
             }
         }
 
@@ -179,6 +206,9 @@ internal class RealPirDataStore(
         dauLastSentMs = 0L
         wauLastSentMs = 0L
         mauLastSentMs = 0L
+        interactionDauLastSentMs = 0L
+        interactionWauLastSentMs = 0L
+        interactionMauLastSentMs = 0L
         weeklyStatLastSentMs = 0L
         latestBackgroundScanRunInMs = 0L
         hasInitialScanEverStarted = false
@@ -194,6 +224,9 @@ internal class RealPirDataStore(
         private const val KEY_ENGAGEMENT_DAU_LAST_MS = "KEY_ENGAGEMENT_DAU_LAST_MS"
         private const val KEY_ENGAGEMENT_WAU_LAST_MS = "KEY_ENGAGEMENT_WAU_LAST_MS"
         private const val KEY_ENGAGEMENT_MAU_LAST_MS = "KEY_ENGAGEMENT_MAU_LAST_MS"
+        private const val KEY_INTERACTION_DAU_LAST_MS = "KEY_INTERACTION_DAU_LAST_MS"
+        private const val KEY_INTERACTION_WAU_LAST_MS = "KEY_INTERACTION_WAU_LAST_MS"
+        private const val KEY_INTERACTION_MAU_LAST_MS = "KEY_INTERACTION_MAU_LAST_MS"
         private const val KEY_WEEKLY_STATS_LAST_SENT_MS = "KEY_WEEKLY_STATS_LAST_SENT_MS"
         private const val KEY_BROKER_CONFIG_MANUALLY_UPDATED = "KEY_BROKER_CONFIG_MANUALLY_UPDATED"
         private const val KEY_LAST_BG_SCAN_RUN = "KEY_LAST_BG_SCAN_RUN_MS"

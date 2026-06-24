@@ -1,0 +1,130 @@
+name: Hotfix - Prepare branch
+
+on:
+  workflow_call:
+    inputs:
+      app-version:
+        description: 'Hotfix version to release (e.g. 5.284.1)'
+        required: true
+        type: string
+      commit-hashes:
+        description: 'Commit SHA(s) to cherry-pick into the hotfix (space- or comma-separated)'
+        required: true
+        type: string
+      release-notes:
+        description: 'Release notes for the Play Store listing'
+        required: false
+        default: 'Bug fixes and other improvements'
+        type: string
+  workflow_dispatch:
+    inputs:
+      app-version:
+        description: 'Hotfix version to release (e.g. 5.284.1)'
+        required: true
+        type: string
+      commit-hashes:
+        description: 'Commit SHA(s) to cherry-pick into the hotfix (space- or comma-separated)'
+        required: true
+        type: string
+      release-notes:
+        description: 'Release notes for the Play Store listing'
+        required: false
+        default: 'Bug fixes and other improvements'
+        type: string
+
+env:
+  ASANA_PAT: ${{ secrets.ASANA_ACCESS_TOKEN }}
+  GH_TOKEN: ${{ secrets.GT_DAXMOBILE }}
+
+jobs:
+  hotfix-prepare:
+    name: Create hotfix branch and cherry-pick fixes
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Validate app-version
+        run: |
+          if [[ ! "${{ inputs.app-version }}" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "::error::app-version must be in X.Y.Z format, got '${{ inputs.app-version }}'."
+            exit 1
+          fi
+
+      - name: Validate commit-hashes
+        run: |
+          commits=$(echo "${{ inputs.commit-hashes }}" | tr ',' ' ' | xargs)
+          if [[ -z "$commits" ]]; then
+            echo "::error::commit-hashes must contain at least one commit SHA, got '${{ inputs.commit-hashes }}'."
+            exit 1
+          fi
+
+      # Submodules are intentionally not checked out: this job only does git plumbing
+      # (branch, version bump, cherry-pick, push) and never reads submodule contents.
+      # Populating them would leave the tree dirty when hotfix-start switches between
+      # develop/main (which can record different submodule commits), breaking the lane.
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.repository.default_branch }}
+          token: ${{ secrets.GT_DAXMOBILE }}
+          fetch-depth: 0
+
+      - name: Set up git config
+        run: |
+          git remote set-url origin https://${{ secrets.GT_DAXMOBILE }}@github.com/duckduckgo/Android.git/
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+
+      - name: Verify fix commits exist
+        run: |
+          commits=$(echo "${{ inputs.commit-hashes }}" | tr ',' ' ' | xargs)
+          for sha in $commits; do
+            if ! git rev-parse --verify --quiet "$sha^{commit}" >/dev/null; then
+              echo "::error::commit-hash '$sha' does not resolve to a commit in this repository."
+              exit 1
+            fi
+          done
+
+      - name: Fail if tag already exists
+        run: |
+          if git ls-remote --exit-code --tags origin "refs/tags/${{ inputs.app-version }}" >/dev/null 2>&1; then
+            echo "::error::Tag ${{ inputs.app-version }} already exists. Aborting hotfix."
+            exit 1
+          fi
+
+      - name: Set up git-flow
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y git-flow
+          git config gitflow.branch.master main
+          git config gitflow.branch.develop ${{ github.event.repository.default_branch }}
+          git config gitflow.prefix.feature feature/
+          git config gitflow.prefix.release release/
+          git config gitflow.prefix.hotfix hotfix/
+          git config gitflow.prefix.support support/
+          git config gitflow.prefix.versiontag ""
+
+      - name: Set up ruby env
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 2.7.2
+          bundler-cache: true
+
+      - name: Start hotfix (create branch, bump version and release notes)
+        run: |
+          bundle exec fastlane hotfix-start version:${{ inputs.app-version }} release_notes:"${{ inputs.release-notes }}"
+
+      - name: Cherry-pick fix commits
+        run: |
+          commits=$(echo "${{ inputs.commit-hashes }}" | tr ',' ' ' | xargs)
+          for sha in $commits; do
+            echo "Cherry-picking $sha"
+            if ! git cherry-pick "$sha"; then
+              echo "::error::Cherry-pick of '$sha' failed (likely a conflict). Aborting; no hotfix branch will be pushed."
+              git cherry-pick --abort || true
+              exit 1
+            fi
+          done
+
+      - name: Push hotfix branch
+        run: |
+          git push origin hotfix/${{ inputs.app-version }}

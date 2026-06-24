@@ -32,12 +32,21 @@ data class SyncBarcodeUrl(
      * The human readable device name (i.e., not URL-encoded). This is optional and can be null.
      */
     val deviceName: String? = null,
+    /**
+     * Which protocol version the URL fragment carries. v1 uses `code=`, v2 uses `code2=`.
+     * Determines the param name used by [asUrl]; downstream code (the [SyncCodeDispatcher])
+     * does the actual content-level discrimination.
+     */
+    val protocolVersion: ProtocolVersion = ProtocolVersion.V1,
 ) : Parcelable {
 
+    enum class ProtocolVersion { V1, V2 }
+
     fun asUrl(): String {
+        val codeParam = if (protocolVersion == ProtocolVersion.V2) CODE_PARAM_V2 else CODE_PARAM_V1
         val sb = StringBuilder(URL_BASE)
             .append("&")
-            .append(CODE_PARAM).append("=").append(webSafeB64EncodedCode)
+            .append(codeParam).append("=").append(webSafeB64EncodedCode)
 
         // Encode device name to make it URL safe
         getEncodedDeviceName()?.let { encodedDeviceName ->
@@ -62,7 +71,8 @@ data class SyncBarcodeUrl(
 
     companion object {
         const val URL_BASE = "https://duckduckgo.com/sync/pairing/#"
-        private const val CODE_PARAM = "code"
+        private const val CODE_PARAM_V1 = "code"
+        private const val CODE_PARAM_V2 = "code2"
         private const val DEVICE_NAME_PARAM = "deviceName"
 
         fun parseUrl(fullSyncUrl: String): SyncBarcodeUrl? {
@@ -75,17 +85,26 @@ data class SyncBarcodeUrl(
                 val fragment = uri.fragment ?: return null
                 val fragmentParts = fragment.split("&")
 
-                val code = fragmentParts
-                    .find { it.startsWith("code=") }
-                    ?.substringAfter("code=")
-                    ?: return null
+                // Prefer v2 (`code2=`) when present; only fall back to v1 (`code=`) otherwise.
+                // A URL carrying both is malformed, but in that order we'd treat it as v2.
+                val v2Code = fragmentParts
+                    .find { it.startsWith("$CODE_PARAM_V2=") }
+                    ?.substringAfter("$CODE_PARAM_V2=")
+                val v1Code = fragmentParts
+                    .find { it.startsWith("$CODE_PARAM_V1=") }
+                    ?.substringAfter("$CODE_PARAM_V1=")
+                val (code, version) = when {
+                    v2Code != null -> v2Code to ProtocolVersion.V2
+                    v1Code != null -> v1Code to ProtocolVersion.V1
+                    else -> return null
+                }
 
                 val deviceName = fragmentParts
-                    .find { it.startsWith("deviceName=") }
-                    ?.substringAfter("deviceName=")
+                    .find { it.startsWith("$DEVICE_NAME_PARAM=") }
+                    ?.substringAfter("$DEVICE_NAME_PARAM=")
                     ?.urlDecode()
 
-                SyncBarcodeUrl(webSafeB64EncodedCode = code, deviceName = deviceName)
+                SyncBarcodeUrl(webSafeB64EncodedCode = code, deviceName = deviceName, protocolVersion = version)
             }.getOrNull()
         }
 

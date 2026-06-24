@@ -351,4 +351,39 @@ class AiConfigCheckerTest {
         val violations = AiConfigChecker(repo).check()
         assertTrue(violations.none { it.message.contains("skill") }, "unexpected: $violations")
     }
+
+    @Test
+    fun whenAgentsMdHasNoVersionThenNoVolatileFactViolation() {
+        validRepo() // AGENTS.md is version-free
+        val violations = AiConfigChecker(repo).check()
+        assertTrue(violations.none { it.message.contains("Restated tool version") }, "unexpected: $violations")
+    }
+
+    @Test
+    fun whenAgentsMdReintroducesToolVersionThenViolation() {
+        validRepo()
+        write("AGENTS.md", "# AGENTS\n\nBuild: Gradle 7.6, Kotlin 1.9.24.\n")
+        val violations = AiConfigChecker(repo).check()
+        assertTrue(
+            violations.any { it.message.contains("Restated tool version") && it.message.contains("Gradle 7.6") },
+            "got: $violations",
+        )
+    }
+
+    @Test
+    fun whenToolVersionLivesInRuleFileThenNotFlagged() {
+        validRepo()
+        // Rule files legitimately carry example versions; the guard is AGENTS.md-only.
+        write(".cursor/rules/architecture.mdc", "# Arch\nA library requires Kotlin 2.3.0.\n")
+        val violations = AiConfigChecker(repo).check()
+        assertTrue(violations.none { it.message.contains("Restated tool version") }, "unexpected: $violations")
+    }
+
+    @Test
+    fun whenToolVersionInsideFencedBlockInAgentsMdThenIgnored() {
+        validRepo()
+        write("AGENTS.md", "# AGENTS\n\n```\nexample: Gradle 7.6\n```\n")
+        val violations = AiConfigChecker(repo).check()
+        assertTrue(violations.none { it.message.contains("Restated tool version") }, "unexpected: $violations")
+    }
 }

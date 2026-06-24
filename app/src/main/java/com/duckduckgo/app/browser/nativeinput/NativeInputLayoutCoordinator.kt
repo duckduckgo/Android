@@ -23,6 +23,7 @@ import android.view.ViewGroup
 import android.view.ViewTreeObserver
 import android.widget.FrameLayout
 import androidx.coordinatorlayout.widget.CoordinatorLayout
+import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
 import com.duckduckgo.app.browser.R
 import com.google.android.material.card.MaterialCardView
@@ -183,6 +184,12 @@ class NativeInputLayoutCoordinator(
         // their live visibility/height are still read on each pass.
         val ddgLogoView = rootView.findViewById<View?>(R.id.ddgLogo)
         val returnHatchView = rootView.findViewById<View?>(R.id.newTabReturnHatchView)
+        // Onboarding CTA bubbles live inside newTabContent and must clear the widget, so a visible
+        // one overrides the logo-only suppression below.
+        val onboardingCtaViews = listOfNotNull(
+            rootView.findViewById(R.id.brandDesignDialogScrollView),
+            rootView.findViewById(R.id.includeOnboardingDaxDialogBubble),
+        )
 
         // Animate child reflows when the widget toggles Search ↔ DuckAI changes our padding.
         // The transition is staged here but only assigned to the parent once the enter animation
@@ -219,7 +226,8 @@ class NativeInputLayoutCoordinator(
             if (view != newTabContent) return false
             val logoVisible = ddgLogoView?.visibility == View.VISIBLE
             val hatchHeightPx = returnHatchView?.height ?: 0
-            return isLogoOnly(logoVisible, hatchHeightPx)
+            val onboardingCtaVisible = onboardingCtaViews.any { it.isVisible }
+            return isLogoOnly(logoVisible, hatchHeightPx, onboardingCtaVisible)
         }
 
         fun computeDeltaTop(view: View, anchorBottomInWindow: Int): Int {
@@ -374,6 +382,8 @@ class NativeInputLayoutCoordinator(
  * container is always VISIBLE and merely collapses to zero height when no hatch is shown (its inner
  * content is what's toggled), so a visibility check would always report "hatch present" and defeat
  * this guard.
+ *
+ * [onboardingCtaVisible] forces a non-logo-only result: a CTA bubble must be offset clear of the widget.
  */
-internal fun isLogoOnly(logoVisible: Boolean, hatchHeightPx: Int): Boolean =
-    logoVisible && hatchHeightPx <= 0
+internal fun isLogoOnly(logoVisible: Boolean, hatchHeightPx: Int, onboardingCtaVisible: Boolean): Boolean =
+    logoVisible && hatchHeightPx <= 0 && !onboardingCtaVisible

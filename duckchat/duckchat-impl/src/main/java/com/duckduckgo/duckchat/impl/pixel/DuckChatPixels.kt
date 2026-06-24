@@ -75,10 +75,6 @@ import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_IS_ENABLED
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_KEYBOARD_RETURN_PRESSED
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_MENU_SETTING_OFF
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_MENU_SETTING_ON
-import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_NEW_ADDRESS_BAR_PICKER_CANCELLED
-import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_NEW_ADDRESS_BAR_PICKER_CONFIRMED
-import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_NEW_ADDRESS_BAR_PICKER_DISPLAYED
-import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_NEW_ADDRESS_BAR_PICKER_NOT_NOW
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_OPEN
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_OPEN_BROWSER_MENU
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_OPEN_HISTORY
@@ -121,6 +117,7 @@ interface DuckChatPixels {
     fun reportContextualSheetSessionRestored()
     fun reportContextualSheetExpanded()
     fun reportContextualSheetNewChat()
+    fun reportContextualSheetNewChatFromPopup()
     fun reportContextualPageContextManuallyAttachedNative()
     fun reportContextualPageContextManuallyAttachedFrontend()
     fun reportContextualPageContextRemovedNative()
@@ -131,6 +128,11 @@ interface DuckChatPixels {
     fun reportContextualPageContextCollectionEmpty()
     fun reportContextualSettingAutomaticPageContentToggled(enabled: Boolean)
     fun reportContextualSummarizePromptSelected()
+    fun reportContextualAskAboutPageSelected()
+    fun reportContextualChatsMenuTapped()
+    fun reportContextualRecentChatsPopupDisplayed()
+    fun reportContextualRecentChatSelected()
+    fun reportContextualViewAllChatsTapped()
     fun reportContextualPlaceholderContextTapped()
     fun reportContextualPlaceholderContextShown()
     fun reportContextualPageContextInvalidEmpty()
@@ -165,6 +167,16 @@ interface DuckChatPixels {
     )
     fun fireModelSelected(modelId: String)
     fun fireReasoningEffortSelected(effortLevel: String)
+
+    /** FE recovery flow: native model picker opened in response to a `showModelPicker` message. */
+    fun fireShowModelPicker()
+
+    /** FE recovery flow: the chosen model reported back to the FE via `submitChangeModelAction`. */
+    fun fireSubmitChangeModel(modelId: String)
+
+    /** FE recovery flow: a prompt submitted after recovering the chat's model. */
+    fun fireSubmitChangeModelPromptSent()
+
     fun fireSubscriptionUpsellTriggered(source: String, currentTier: String, requiredTier: String, flowType: String)
     fun fireImageAttached(source: String)
     fun fireImageValidationFailed(reason: String)
@@ -290,6 +302,13 @@ class RealDuckChatPixels @Inject constructor(
         }
     }
 
+    override fun reportContextualSheetNewChatFromPopup() {
+        appCoroutineScope.launch(dispatcherProvider.io()) {
+            pixel.fire(DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_NEW_CHAT_MENU_TAPPED_COUNT)
+            pixel.fire(DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_NEW_CHAT_MENU_TAPPED_DAILY, type = Pixel.PixelType.Daily())
+        }
+    }
+
     override fun reportContextualPageContextManuallyAttachedNative() {
         appCoroutineScope.launch(dispatcherProvider.io()) {
             pixel.fire(DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_PAGE_CONTEXT_MANUALLY_ATTACHED_NATIVE_COUNT)
@@ -361,6 +380,41 @@ class RealDuckChatPixels @Inject constructor(
         appCoroutineScope.launch(dispatcherProvider.io()) {
             pixel.fire(DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_QUICK_ACTION_SUMMARISE_SELECTED_COUNT)
             pixel.fire(DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_QUICK_ACTION_SUMMARISE_SELECTED_DAILY, type = Pixel.PixelType.Daily())
+        }
+    }
+
+    override fun reportContextualAskAboutPageSelected() {
+        appCoroutineScope.launch(dispatcherProvider.io()) {
+            pixel.fire(DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_QUICK_ACTION_ASK_ABOUT_PAGE_SELECTED_COUNT)
+            pixel.fire(DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_QUICK_ACTION_ASK_ABOUT_PAGE_SELECTED_DAILY, type = Pixel.PixelType.Daily())
+        }
+    }
+
+    override fun reportContextualChatsMenuTapped() {
+        appCoroutineScope.launch(dispatcherProvider.io()) {
+            pixel.fire(DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_CHATS_BUTTON_TAPPED_COUNT)
+            pixel.fire(DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_CHATS_BUTTON_TAPPED_DAILY, type = Pixel.PixelType.Daily())
+        }
+    }
+
+    override fun reportContextualRecentChatsPopupDisplayed() {
+        appCoroutineScope.launch(dispatcherProvider.io()) {
+            pixel.fire(DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_RECENT_CHATS_POPUP_DISPLAYED_COUNT)
+            pixel.fire(DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_RECENT_CHATS_POPUP_DISPLAYED_DAILY, type = Pixel.PixelType.Daily())
+        }
+    }
+
+    override fun reportContextualRecentChatSelected() {
+        appCoroutineScope.launch(dispatcherProvider.io()) {
+            pixel.fire(DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_RECENT_CHAT_SELECTED_COUNT)
+            pixel.fire(DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_RECENT_CHAT_SELECTED_DAILY, type = Pixel.PixelType.Daily())
+        }
+    }
+
+    override fun reportContextualViewAllChatsTapped() {
+        appCoroutineScope.launch(dispatcherProvider.io()) {
+            pixel.fire(DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_VIEW_ALL_CHATS_TAPPED_COUNT)
+            pixel.fire(DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_VIEW_ALL_CHATS_TAPPED_DAILY, type = Pixel.PixelType.Daily())
         }
     }
 
@@ -521,6 +575,28 @@ class RealDuckChatPixels @Inject constructor(
         }
     }
 
+    override fun fireShowModelPicker() {
+        fireCountAndDaily(
+            DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_SHOW_MODEL_PICKER_COUNT,
+            DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_SHOW_MODEL_PICKER_DAILY,
+        )
+    }
+
+    override fun fireSubmitChangeModel(modelId: String) {
+        fireCountAndDaily(
+            DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_SUBMIT_CHANGE_MODEL_COUNT,
+            DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_SUBMIT_CHANGE_MODEL_DAILY,
+            parameters = mapOf(DuckChatPixelParameters.MODEL_ID to modelId),
+        )
+    }
+
+    override fun fireSubmitChangeModelPromptSent() {
+        fireCountAndDaily(
+            DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_SUBMIT_CHANGE_MODEL_PROMPT_SENT_COUNT,
+            DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_SUBMIT_CHANGE_MODEL_PROMPT_SENT_DAILY,
+        )
+    }
+
     override fun fireSubscriptionUpsellTriggered(source: String, currentTier: String, requiredTier: String, flowType: String) {
         appCoroutineScope.launch(dispatcherProvider.io()) {
             pixel.fire(
@@ -654,10 +730,6 @@ enum class DuckChatPixelName(override val pixelName: String) : Pixel.PixelName {
     DUCK_CHAT_USER_ACCEPTED_TERMS_AND_CONDITIONS("m_aichat_duckai_accepted_terms_and_conditions"),
     DUCK_CHAT_EXPERIMENTAL_OMNIBAR_DAILY_RETENTION("m_aichat_experimental_omnibar_daily_retention"),
     DUCK_CHAT_DUCKAI_DAU_TOGGLE_NEVER_ENABLED("m_aichat_duckai_dau_toggle_never_enabled"),
-    DUCK_CHAT_NEW_ADDRESS_BAR_PICKER_DISPLAYED("m_aichat_new_address_bar_picker_displayed"),
-    DUCK_CHAT_NEW_ADDRESS_BAR_PICKER_CONFIRMED("m_aichat_new_address_bar_picker_confirmed"),
-    DUCK_CHAT_NEW_ADDRESS_BAR_PICKER_NOT_NOW("m_aichat_new_address_bar_picker_not_now"),
-    DUCK_CHAT_NEW_ADDRESS_BAR_PICKER_CANCELLED("m_aichat_new_address_bar_picker_cancelled"),
     DUCK_CHAT_SETTINGS_NEW_CHAT_TAB_TAPPED("m_aichat_settings_menu_new_chat_tab_tapped"),
     DUCK_CHAT_OMNIBAR_NEW_CHAT_TAPPED("m_aichat_omnibar_new_chat_button_tapped"),
     DUCK_CHAT_OMNIBAR_SIDEBAR_TAPPED("m_aichat_omnibar_sidebar_button_tapped"),
@@ -682,8 +754,20 @@ enum class DuckChatPixelName(override val pixelName: String) : Pixel.PixelName {
     DUCK_CHAT_CONTEXTUAL_EXPANDED_DAILY("m_aichat_contextual_expand_button_tapped_daily"),
     DUCK_CHAT_CONTEXTUAL_NEW_CHAT_COUNT("m_aichat_contextual_new_chat_button_tapped_count"),
     DUCK_CHAT_CONTEXTUAL_NEW_CHAT_DAILY("m_aichat_contextual_new_chat_button_tapped_daily"),
+    DUCK_CHAT_CONTEXTUAL_NEW_CHAT_MENU_TAPPED_COUNT("m_aichat_contextual_new_chat_menu_tapped_count"),
+    DUCK_CHAT_CONTEXTUAL_NEW_CHAT_MENU_TAPPED_DAILY("m_aichat_contextual_new_chat_menu_tapped_daily"),
     DUCK_CHAT_CONTEXTUAL_QUICK_ACTION_SUMMARISE_SELECTED_COUNT("m_aichat_contextual_quick_action_summarize_selected_count"),
     DUCK_CHAT_CONTEXTUAL_QUICK_ACTION_SUMMARISE_SELECTED_DAILY("m_aichat_contextual_quick_action_summarize_selected_daily"),
+    DUCK_CHAT_CONTEXTUAL_QUICK_ACTION_ASK_ABOUT_PAGE_SELECTED_COUNT("m_aichat_contextual_quick_action_ask_about_page_selected_count"),
+    DUCK_CHAT_CONTEXTUAL_QUICK_ACTION_ASK_ABOUT_PAGE_SELECTED_DAILY("m_aichat_contextual_quick_action_ask_about_page_selected_daily"),
+    DUCK_CHAT_CONTEXTUAL_CHATS_BUTTON_TAPPED_COUNT("m_aichat_contextual_chats_button_tapped_count"),
+    DUCK_CHAT_CONTEXTUAL_CHATS_BUTTON_TAPPED_DAILY("m_aichat_contextual_chats_button_tapped_daily"),
+    DUCK_CHAT_CONTEXTUAL_RECENT_CHATS_POPUP_DISPLAYED_COUNT("m_aichat_contextual_recent_chats_popup_displayed_count"),
+    DUCK_CHAT_CONTEXTUAL_RECENT_CHATS_POPUP_DISPLAYED_DAILY("m_aichat_contextual_recent_chats_popup_displayed_daily"),
+    DUCK_CHAT_CONTEXTUAL_RECENT_CHAT_SELECTED_COUNT("m_aichat_contextual_recent_chat_selected_count"),
+    DUCK_CHAT_CONTEXTUAL_RECENT_CHAT_SELECTED_DAILY("m_aichat_contextual_recent_chat_selected_daily"),
+    DUCK_CHAT_CONTEXTUAL_VIEW_ALL_CHATS_TAPPED_COUNT("m_aichat_contextual_view_all_chats_tapped_count"),
+    DUCK_CHAT_CONTEXTUAL_VIEW_ALL_CHATS_TAPPED_DAILY("m_aichat_contextual_view_all_chats_tapped_daily"),
     DUCK_CHAT_CONTEXTUAL_PAGE_CONTEXT_PLACEHOLDER_SHOWN_COUNT("m_aichat_contextual_page_context_placeholder_shown_count"),
     DUCK_CHAT_CONTEXTUAL_PAGE_CONTEXT_PLACEHOLDER_SHOWN_DAILY("m_aichat_contextual_page_context_placeholder_shown_daily"),
     DUCK_CHAT_CONTEXTUAL_PAGE_CONTEXT_PLACEHOLDER_TAPPED_COUNT("m_aichat_contextual_page_context_placeholder_tapped_count"),
@@ -795,6 +879,12 @@ enum class DuckChatPixelName(override val pixelName: String) : Pixel.PixelName {
     DUCK_CHAT_UNIFIED_INPUT_MODEL_SELECTED("m_aichat_unified_input_model_selected"),
     DUCK_CHAT_UNIFIED_INPUT_REASONING_EFFORT_SELECTED("m_aichat_unified_input_reasoning_effort_selected"),
     DUCK_CHAT_UNIFIED_INPUT_SUBSCRIPTION_UPSELL_TRIGGERED("m_aichat_unified_input_subscription_upsell_triggered"),
+    DUCK_CHAT_UNIFIED_INPUT_SHOW_MODEL_PICKER_COUNT("aichat_unified_input_show_model_picker_count"),
+    DUCK_CHAT_UNIFIED_INPUT_SHOW_MODEL_PICKER_DAILY("aichat_unified_input_show_model_picker_daily"),
+    DUCK_CHAT_UNIFIED_INPUT_SUBMIT_CHANGE_MODEL_COUNT("aichat_unified_input_submit_change_model_count"),
+    DUCK_CHAT_UNIFIED_INPUT_SUBMIT_CHANGE_MODEL_DAILY("aichat_unified_input_submit_change_model_daily"),
+    DUCK_CHAT_UNIFIED_INPUT_SUBMIT_CHANGE_MODEL_PROMPT_SENT_COUNT("aichat_unified_input_submit_change_model_prompt_sent_count"),
+    DUCK_CHAT_UNIFIED_INPUT_SUBMIT_CHANGE_MODEL_PROMPT_SENT_DAILY("aichat_unified_input_submit_change_model_prompt_sent_daily"),
     DUCK_CHAT_UNIFIED_INPUT_IMAGE_ATTACHED_COUNT("m_aichat_unified_input_image_attached_count"),
     DUCK_CHAT_UNIFIED_INPUT_IMAGE_ATTACHED_DAILY("m_aichat_unified_input_image_attached_daily"),
     DUCK_CHAT_UNIFIED_INPUT_IMAGE_REMOVED_COUNT("m_aichat_unified_input_image_removed_count"),
@@ -898,10 +988,6 @@ class DuckChatParamRemovalPlugin @Inject constructor() : PixelParamRemovalPlugin
             DUCK_CHAT_EXPERIMENTAL_LEGACY_OMNIBAR_BACK_BUTTON_PRESSED.pixelName to PixelParameter.removeAtb(),
             DUCK_CHAT_EXPERIMENTAL_OMNIBAR_DAILY_RETENTION.pixelName to PixelParameter.removeAtb(),
             DUCK_CHAT_DUCKAI_DAU_TOGGLE_NEVER_ENABLED.pixelName to PixelParameter.removeAtb(),
-            DUCK_CHAT_NEW_ADDRESS_BAR_PICKER_DISPLAYED.pixelName to PixelParameter.removeAtb(),
-            DUCK_CHAT_NEW_ADDRESS_BAR_PICKER_CONFIRMED.pixelName to PixelParameter.removeAtb(),
-            DUCK_CHAT_NEW_ADDRESS_BAR_PICKER_NOT_NOW.pixelName to PixelParameter.removeAtb(),
-            DUCK_CHAT_NEW_ADDRESS_BAR_PICKER_CANCELLED.pixelName to PixelParameter.removeAtb(),
             DUCK_CHAT_SETTINGS_MENU_OPEN.pixelName to PixelParameter.removeAtb(),
             DUCK_CHAT_DUCK_AI_SETTINGS_TAPPED.pixelName to PixelParameter.removeAtb(),
             DUCK_CHAT_TAB_SWITCHER_OPENED.pixelName to PixelParameter.removeAtb(),
@@ -922,8 +1008,20 @@ class DuckChatParamRemovalPlugin @Inject constructor() : PixelParamRemovalPlugin
             DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_EXPANDED_DAILY.pixelName to PixelParameter.removeAtb(),
             DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_NEW_CHAT_DAILY.pixelName to PixelParameter.removeAtb(),
             DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_NEW_CHAT_COUNT.pixelName to PixelParameter.removeAtb(),
+            DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_NEW_CHAT_MENU_TAPPED_COUNT.pixelName to PixelParameter.removeAtb(),
+            DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_NEW_CHAT_MENU_TAPPED_DAILY.pixelName to PixelParameter.removeAtb(),
             DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_QUICK_ACTION_SUMMARISE_SELECTED_COUNT.pixelName to PixelParameter.removeAtb(),
             DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_QUICK_ACTION_SUMMARISE_SELECTED_DAILY.pixelName to PixelParameter.removeAtb(),
+            DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_QUICK_ACTION_ASK_ABOUT_PAGE_SELECTED_COUNT.pixelName to PixelParameter.removeAtb(),
+            DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_QUICK_ACTION_ASK_ABOUT_PAGE_SELECTED_DAILY.pixelName to PixelParameter.removeAtb(),
+            DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_CHATS_BUTTON_TAPPED_COUNT.pixelName to PixelParameter.removeAtb(),
+            DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_CHATS_BUTTON_TAPPED_DAILY.pixelName to PixelParameter.removeAtb(),
+            DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_RECENT_CHATS_POPUP_DISPLAYED_COUNT.pixelName to PixelParameter.removeAtb(),
+            DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_RECENT_CHATS_POPUP_DISPLAYED_DAILY.pixelName to PixelParameter.removeAtb(),
+            DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_RECENT_CHAT_SELECTED_COUNT.pixelName to PixelParameter.removeAtb(),
+            DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_RECENT_CHAT_SELECTED_DAILY.pixelName to PixelParameter.removeAtb(),
+            DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_VIEW_ALL_CHATS_TAPPED_COUNT.pixelName to PixelParameter.removeAtb(),
+            DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_VIEW_ALL_CHATS_TAPPED_DAILY.pixelName to PixelParameter.removeAtb(),
             DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_PAGE_CONTEXT_PLACEHOLDER_SHOWN_COUNT.pixelName to PixelParameter.removeAtb(),
             DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_PAGE_CONTEXT_PLACEHOLDER_SHOWN_DAILY.pixelName to PixelParameter.removeAtb(),
             DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_PAGE_CONTEXT_PLACEHOLDER_TAPPED_COUNT.pixelName to PixelParameter.removeAtb(),
@@ -1015,6 +1113,8 @@ class DuckChatParamRemovalPlugin @Inject constructor() : PixelParamRemovalPlugin
             // upsell, attachments, voice, stop) AND the app-side chat_header_upgrade_tapped, which
             // shares the prefix — the interceptor matches outgoing pixel names with startsWith.
             "m_aichat_unified_input_" to PixelParameter.removeAtb(),
+            // Same coverage for unified_input pixels added without the legacy m_ prefix.
+            "aichat_unified_input_" to PixelParameter.removeAtb(),
         )
     }
 }

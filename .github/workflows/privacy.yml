@@ -61,11 +61,13 @@ jobs:
             flank-task: runFlankPrivacyTests
             artifact-name: android-tests-report-privacy
             asana-task-name: GH Workflow Failure - Privacy tests
+            test-annotation: PrivacyTest
           - name: Internal Privacy Tests
             build-task: internalAndroidTestsBuild
             flank-task: runFlankInternalPrivacyTests
             artifact-name: android-tests-report-privacy-internal
             asana-task-name: GH Workflow Failure - Internal privacy tests
+            test-annotation: InternalPrivacyTest
     env:
       DEVELOCITY_ACCESS_KEY: ${{ secrets.DEVELOCITY_ACCESS_KEY }}
 
@@ -75,6 +77,22 @@ jobs:
         with:
           ref: ${{ inputs.commit || github.sha }}
           submodules: recursive
+
+      # The matrix may include an annotation for which no tests currently exist
+      # (e.g. Internal Privacy Tests).
+      # Flank fails hard with "no tests to run" in that case, so detect an empty
+      # set up front and skip the build/run/report steps below.
+      # The entry remains in the matrix and will automatically reactivate as soon
+      # as a test is tagged with that annotation again.
+      - name: Check whether any tests carry this annotation
+        id: tests-exist
+        run: |
+          if grep -rqlF "@${{ matrix.test-annotation }}" app/src/androidTest; then
+            echo "run=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "run=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::No @${{ matrix.test-annotation }} tests found — skipping ${{ matrix.name }}."
+          fi
 
       - name: Setup jq
         uses: dcarbone/install-jq-action@v1.0.1
@@ -103,26 +121,28 @@ jobs:
           cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
 
       - name: Build
+        if: ${{ steps.tests-exist.outputs.run == 'true' }}
         run: ./gradlew ${{ matrix.build-task }} -Pddg.di=${{ env.DDG_DI }}
 
       - name: Run Android Tests
+        if: ${{ steps.tests-exist.outputs.run == 'true' }}
         run: ./gradlew ${{ matrix.flank-task }} --no-configuration-cache -Pddg.di=${{ env.DDG_DI }}
 
       - name: Bundle the Android CI tests report
-        if: always()
+        if: ${{ always() && steps.tests-exist.outputs.run == 'true' }}
         run: find . -type d -name 'fladleResults' | zip -@ -r ${{ matrix.artifact-name }}${{ env.DI_HYPHEN_SUFFIX }}.zip
 
       - name: Generate json file with failures
-        if: ${{ failure() }}
+        if: ${{ failure() && steps.tests-exist.outputs.run == 'true' }}
         run: cut -d\`  -f2 < build/fladle/fladleResults/HtmlErrorReport.html >> results.json
 
       - name: Print failure report
-        if: ${{ failure() }}
+        if: ${{ failure() && steps.tests-exist.outputs.run == 'true' }}
         run: |
           jq -r '.[] | .label as $id | .items[] | "Test:", $id, "Failure:", .label, "URL:", .url, "\n"' results.json
 
       - name: Upload the Android CI tests report
-        if: always()
+        if: ${{ always() && steps.tests-exist.outputs.run == 'true' }}
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.artifact-name }}${{ env.DI_HYPHEN_SUFFIX }}

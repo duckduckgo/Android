@@ -18,8 +18,12 @@ package com.duckduckgo.duckchat.impl.helper
 
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.browser.api.install.AppInstall
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.ui.view.encodeBitmapToBase64
 import com.duckduckgo.common.utils.ConflatedJob
+import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputStatePublisher
@@ -30,6 +34,7 @@ import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.ModelTier
 import com.duckduckgo.duckchat.impl.ReportMetric
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
+import com.duckduckgo.duckchat.impl.messaging.sync.isSyncable
 import com.duckduckgo.duckchat.impl.models.AIChatAttachmentUsage
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.store.DuckChatDataStore
@@ -42,9 +47,12 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import logcat.logcat
 import org.json.JSONArray
 import org.json.JSONObject
+import java.time.Instant
+import java.time.temporal.ChronoUnit
 import java.util.regex.Pattern
 import javax.inject.Inject
 
@@ -57,6 +65,7 @@ interface DuckChatJSHelper {
         mode: Mode = Mode.FULL,
         pageContext: String = "",
         tabId: String = "",
+        browserMode: BrowserMode = BrowserMode.REGULAR,
     ): JsCallbackData?
 
     fun onNativeAction(action: NativeAction): SubscriptionEventData
@@ -102,6 +111,9 @@ class RealDuckChatJSHelper @Inject constructor(
     private val voiceSessionStateManager: VoiceSessionStateManager,
     private val limitsHandler: LimitsHandler,
     private val nativeInputStatePublisher: NativeInputStatePublisher,
+    private val appInstall: AppInstall,
+    private val appBuildConfig: AppBuildConfig,
+    private val currentTimeProvider: CurrentTimeProvider,
 ) : DuckChatJSHelper {
 
     private val registerOpenedJob = ConflatedJob()
@@ -114,6 +126,7 @@ class RealDuckChatJSHelper @Inject constructor(
         mode: Mode,
         pageContext: String,
         tabId: String,
+        browserMode: BrowserMode,
     ): JsCallbackData? {
         fun registerDuckChatIsOpenDebounced(windowMs: Long = 500L) {
             // we debounced because METHOD_GET_AI_CHAT_NATIVE_HANDOFF_DATA can be called more than once
@@ -138,7 +151,7 @@ class RealDuckChatJSHelper @Inject constructor(
 
             METHOD_GET_AI_CHAT_NATIVE_CONFIG_VALUES ->
                 id?.let {
-                    getAIChatNativeConfigValues(featureName, method, it, mode)
+                    getAIChatNativeConfigValues(featureName, method, it, mode, browserMode)
                 }
 
             METHOD_GET_AI_CHAT_NATIVE_PROMPT ->
@@ -201,7 +214,10 @@ class RealDuckChatJSHelper @Inject constructor(
             }
 
             METHOD_SHOW_MODEL_PICKER -> {
-                if (tabId.isNotEmpty()) duckChat.requestShowModelPicker(tabId)
+                if (tabId.isNotEmpty()) {
+                    duckChat.requestShowModelPicker(tabId)
+                    duckChatPixels.fireShowModelPicker()
+                }
                 null
             }
 
@@ -382,6 +398,7 @@ class RealDuckChatJSHelper @Inject constructor(
         method: String,
         id: String,
         mode: Mode,
+        browserMode: BrowserMode,
     ): JsCallbackData {
         val jsonPayload =
             JSONObject().apply {
@@ -396,7 +413,7 @@ class RealDuckChatJSHelper @Inject constructor(
                 put(SUPPORTS_STANDALONE_MIGRATION, duckChat.isStandaloneMigrationEnabled())
                 put(SUPPORTS_CHAT_FULLSCREEN_MODE, duckChat.isDuckChatFullScreenModeEnabled() && mode == Mode.FULL)
                 put(SUPPORTS_CHAT_CONTEXTUAL_MODE, duckChat.isDuckChatContextualModeEnabled() && mode == Mode.CONTEXTUAL)
-                put(SUPPORTS_CHAT_SYNC, duckChat.isChatSyncFeatureEnabled())
+                put(SUPPORTS_CHAT_SYNC, duckChat.isChatSyncFeatureEnabled() && browserMode.isSyncable)
                 put(SUPPORTS_PAGE_CONTEXT, duckChat.isDuckChatContextualModeEnabled() && mode == Mode.CONTEXTUAL)
                 put(SUPPORTS_NATIVE_STORAGE, duckChat.isNativeStorageEnabled())
                 put(
@@ -404,8 +421,30 @@ class RealDuckChatJSHelper @Inject constructor(
                     duckChat.isDuckChatContextualModeEnabled() &&
                         duckChat.areMultipleContentAttachmentsEnabled(),
                 )
+                put(INSTALL_TYPE, if (appBuildConfig.isAppReinstall()) INSTALL_TYPE_RETURNING else INSTALL_TYPE_NEW)
+                getInstallAgeBucket()?.let { put(INSTALL_AGE, it) }
             }.also { logcat { "DuckChat-Sync: getAIChatNativeConfigValues $it" } }
         return JsCallbackData(jsonPayload, featureName, method, id)
+    }
+
+    // Bucketed install age for the Duck.ai prompt pixel; null when the install timestamp isn't recorded
+    // yet or is in the future (clock skew), so the caller omits the param instead of sending a
+    // misleading bucket.
+    private suspend fun getInstallAgeBucket(): Int? {
+        val installTimestamp = withContext(dispatcherProvider.io()) { appInstall.getInstallationTimestamp() }
+        val nowTimestamp = currentTimeProvider.currentTimeMillis()
+        if (installTimestamp <= 0L || installTimestamp > nowTimestamp) return null
+        val installedAt = Instant.ofEpochMilli(installTimestamp)
+        val now = Instant.ofEpochMilli(nowTimestamp)
+        val days = ChronoUnit.DAYS.between(installedAt, now)
+        return when {
+            days == 0L -> 0
+            days <= 7L -> 1
+            days <= 14L -> 2
+            days <= 21L -> 3
+            days <= 28L -> 4
+            else -> 5
+        }
     }
 
     private fun getAIChatNativePrompt(
@@ -574,6 +613,10 @@ class RealDuckChatJSHelper @Inject constructor(
         private const val SUPPORTS_PAGE_CONTEXT = "supportsPageContext"
         private const val SUPPORTS_MULTIPLE_PAGE_CONTEXT = "supportsMultipleContexts"
         private const val SUPPORTS_NATIVE_STORAGE = "supportsNativeStorage"
+        private const val INSTALL_TYPE = "installType"
+        private const val INSTALL_TYPE_NEW = "new"
+        private const val INSTALL_TYPE_RETURNING = "returning"
+        private const val INSTALL_AGE = "installAge"
         private const val REPORT_METRIC = "reportMetric"
         private const val PLATFORM = "platform"
         private const val ANDROID = "android"

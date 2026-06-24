@@ -16,9 +16,11 @@
 
 package com.duckduckgo.duckchat.impl.sync
 
+import com.duckduckgo.browsermode.api.BrowserModeStateHolder
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.duckchat.impl.messaging.sync.isSyncable
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.withContext
@@ -62,9 +64,24 @@ interface DuckChatSyncRepository {
 class RealDuckChatSyncRepository @Inject constructor(
     private val duckChatSyncMetadataStore: DuckChatSyncMetadataStore,
     private val dispatchers: DispatcherProvider,
+    private val browserModeStateHolder: BrowserModeStateHolder,
 ) : DuckChatSyncRepository {
 
+    /*
+     * Chat activity in a non-syncable mode must never enter the sync pipeline (those chats stay on-device). Every
+     * queue/timestamp writer below guards on [BrowserMode.isSyncable] over the current mode — the single write-side
+     * choke point.
+     *
+     * Complements the `@RegularMode` store injected into `DuckChatSyncDataManager`: this guard keeps non-syncable
+     * chatIds out of the pending queues (write side), while that ensures patch content is read from the Regular store
+     * even if sync runs while the user is in a non-syncable mode (read side). Both are needed — don't drop one as
+     * "redundant".
+     */
     override suspend fun recordDuckAiChatsDeleted(timestampMillis: Long) {
+        if (!browserModeStateHolder.currentMode.value.isSyncable) {
+            logcat { "DuckChat-Sync: skipping deletion timestamp in non-syncable mode" }
+            return
+        }
         withContext(dispatchers.io()) {
             val isoTimestamp = DatabaseDateFormatter.parseMillisIso8601(timestampMillis)
             duckChatSyncMetadataStore.deletionTimestamp = isoTimestamp
@@ -90,6 +107,10 @@ class RealDuckChatSyncRepository @Inject constructor(
     }
 
     override suspend fun recordSingleChatDeletion(chatId: String) {
+        if (!browserModeStateHolder.currentMode.value.isSyncable) {
+            logcat { "DuckChat-Sync: skipping pending chat deletion for $chatId in non-syncable mode" }
+            return
+        }
         withContext(dispatchers.io()) {
             val current = duckChatSyncMetadataStore.pendingChatDeletions
             duckChatSyncMetadataStore.pendingChatDeletions = current + chatId
@@ -119,6 +140,10 @@ class RealDuckChatSyncRepository @Inject constructor(
     }
 
     override suspend fun recordSingleChatUpdate(chatId: String) {
+        if (!browserModeStateHolder.currentMode.value.isSyncable) {
+            logcat { "DuckChat-Sync: skipping pending chat update for $chatId in non-syncable mode" }
+            return
+        }
         withContext(dispatchers.io()) {
             val current = duckChatSyncMetadataStore.pendingChatUpdates
             duckChatSyncMetadataStore.pendingChatUpdates = current + chatId

@@ -29,9 +29,13 @@ import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.view.hide
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.databinding.ActivityEnterCodeBinding
+import com.duckduckgo.sync.impl.pixels.SyncPixels.PeerKind
 import com.duckduckgo.sync.impl.ui.EnterCodeViewModel.AuthState
 import com.duckduckgo.sync.impl.ui.EnterCodeViewModel.AuthState.Idle
 import com.duckduckgo.sync.impl.ui.EnterCodeViewModel.AuthState.Loading
@@ -43,24 +47,48 @@ import com.duckduckgo.sync.impl.ui.EnterCodeViewModel.Command.SwitchAccountSucce
 import com.duckduckgo.sync.impl.ui.EnterCodeViewModel.ViewState
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
 class EnterCodeActivity : DuckDuckGoActivity() {
     private val binding: ActivityEnterCodeBinding by viewBinding()
     private val viewModel: EnterCodeViewModel by bindViewModel()
 
+    @Inject
+    lateinit var edgeToEdgeProvider: EdgeToEdgeProvider
+
+    @Inject
+    lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
+
     private lateinit var codeType: Code
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         codeType = intent.getSerializableExtra(EXTRA_CODE_TYPE) as? Code ?: Code.RECOVERY_CODE
+
+        val edgeToEdgeEnabled = edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.SYNC)
+        if (edgeToEdgeEnabled) {
+            enableTransparentEdgeToEdge()
+        }
+
         setContentView(binding.root)
         setupToolbar(binding.includeToolbar.toolbar)
+
+        if (edgeToEdgeEnabled) {
+            configureEdgeToEdgeInsets()
+        }
+
         observeUiEvents()
         configureListeners()
         if (savedInstanceState == null) {
             viewModel.onEnterManualCodeScreenShown(codeType)
         }
+    }
+
+    private fun configureEdgeToEdgeInsets() {
+        edgeToEdgeHandler.applyHorizontalSystemBarInsets(binding.root)
+        edgeToEdgeHandler.applyStatusBarInsets(binding.includeToolbar.appBarLayout)
+        edgeToEdgeHandler.applyNavigationBarInsetsAsMargin(binding.pasteCodeButton)
     }
 
     private fun configureListeners() {
@@ -113,6 +141,8 @@ class EnterCodeActivity : DuckDuckGoActivity() {
                 showError(command)
             }
 
+            is Command.ShowV2Error -> showV2PairingError(command.content) { viewModel.onErrorDialogDismissed() }
+
             is AskToSwitchAccount -> askUserToSwitchAccount(command)
             SwitchAccountSuccess -> {
                 val resultIntent = Intent()
@@ -120,7 +150,41 @@ class EnterCodeActivity : DuckDuckGoActivity() {
                 setResult(RESULT_OK, resultIntent)
                 finish()
             }
+            is Command.AskJoinerConfirmation -> askJoinerConfirmation(command.peerName, command.peerKind)
+            is Command.AskHostConfirmation -> askHostConfirmation(command.peerName, command.peerKind)
+            Command.FinishWithError -> {
+                setResult(RESULT_CANCELED)
+                finish()
+            }
         }
+    }
+
+    private fun askJoinerConfirmation(peerName: String?, peerKind: PeerKind?) {
+        TextAlertDialogBuilder(this)
+            .setTitle(R.string.sync_v2_joiner_confirmation_title)
+            .setMessage(syncV2ConfirmationMessage(peerName, peerKind))
+            .setPositiveButton(R.string.sync_v2_joiner_confirmation_positive)
+            .setNegativeButton(R.string.sync_v2_joiner_confirmation_negative)
+            .addEventListener(
+                object : TextAlertDialogBuilder.EventListener() {
+                    override fun onPositiveButtonClicked() { viewModel.onJoinerConfirmed() }
+                    override fun onNegativeButtonClicked() { viewModel.onJoinerDenied() }
+                },
+            ).show()
+    }
+
+    private fun askHostConfirmation(peerName: String?, peerKind: PeerKind?) {
+        TextAlertDialogBuilder(this)
+            .setTitle(R.string.sync_v2_host_confirmation_title)
+            .setMessage(syncV2ConfirmationMessage(peerName, peerKind))
+            .setPositiveButton(R.string.sync_v2_host_confirmation_positive)
+            .setNegativeButton(R.string.sync_v2_host_confirmation_negative)
+            .addEventListener(
+                object : TextAlertDialogBuilder.EventListener() {
+                    override fun onPositiveButtonClicked() { viewModel.onHostConfirmed() }
+                    override fun onNegativeButtonClicked() { viewModel.onHostDenied() }
+                },
+            ).show()
     }
 
     private fun showError(it: ShowError) {
@@ -130,8 +194,7 @@ class EnterCodeActivity : DuckDuckGoActivity() {
             .setPositiveButton(R.string.sync_dialog_error_ok)
             .addEventListener(
                 object : TextAlertDialogBuilder.EventListener() {
-                    override fun onPositiveButtonClicked() {
-                    }
+                    override fun onPositiveButtonClicked() { viewModel.onErrorDialogDismissed() }
                 },
             ).show()
     }

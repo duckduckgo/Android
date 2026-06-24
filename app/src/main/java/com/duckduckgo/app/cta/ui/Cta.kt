@@ -568,7 +568,7 @@ sealed class OnboardingDaxDialogCta(
         AppPixelName.ONBOARDING_DAX_CTA_OK_BUTTON,
         null,
         AppPixelName.ONBOARDING_DAX_CTA_DISMISS_BUTTON,
-        "duck_ai_fire_button_cta",
+        Pixel.PixelValues.DUCK_AI_FIRE_BUTTON_CTA,
         onboardingStore,
         appInstallStore,
     ) {
@@ -650,10 +650,21 @@ sealed class OnboardingDaxDialogCta(
                 cardContainer?.interceptChildTouches = value
             }
 
-        /** Id of the content-include slot this CTA renders (e.g. [R.id.contextualBrandDesignPrimaryCtaContent]). */
-        abstract val activeIncludeId: Int
+        /**
+         * Id of the content-include slot this CTA renders (e.g. [R.id.contextualBrandDesignPrimaryCtaContent]).
+         * `null` means the CTA renders only title + description, with no in-card content slot.
+         */
+        open val activeIncludeId: Int? = null
 
         abstract val showArrow: Boolean
+
+        /**
+         * Whether the persistent top-right dismiss button is shown for this CTA. Defaults to true.
+         * Override to `false` for CTAs that have no in-dialog dismissal affordance — for instance,
+         * a contextual prompt that the user is expected to resolve by interacting with a target
+         * UI element outside the card (e.g. the fire button in the toolbar).
+         */
+        open val showDismiss: Boolean = true
 
         /**
          * Populate the card with subclass-specific content: set title/description text, configure
@@ -759,7 +770,7 @@ sealed class OnboardingDaxDialogCta(
             this.cardContainer = cardContainer
             isAnimating = true
 
-            val activeInclude = container.findViewById<View>(activeIncludeId)
+            val activeInclude: View? = activeIncludeId?.let { container.findViewById(it) }
 
             val notifySettled = {
                 if (isAnimating) {
@@ -776,9 +787,11 @@ sealed class OnboardingDaxDialogCta(
                     val animators = mutableListOf<Animator>(
                         ObjectAnimator.ofFloat(descriptionView, View.ALPHA, 1f)
                             .setDuration(DIALOG_CONTENT_FADE_IN_DURATION),
-                        ObjectAnimator.ofFloat(activeInclude, View.ALPHA, 1f)
-                            .setDuration(DIALOG_CONTENT_FADE_IN_DURATION),
                     )
+                    activeInclude?.let {
+                        animators += ObjectAnimator.ofFloat(it, View.ALPHA, 1f)
+                            .setDuration(DIALOG_CONTENT_FADE_IN_DURATION)
+                    }
                     // Dismiss button is persistent: fade it in only if it isn't already fully shown,
                     // which covers both the first-show path (alpha=0) and the case where a previous
                     // animation was cancelled mid-flight leaving it at a fractional alpha.
@@ -896,7 +909,7 @@ sealed class OnboardingDaxDialogCta(
             val descriptionView = container.findViewById<DaxTextView>(R.id.contextualBrandDesignDescription)
             val dismissButton = container.findViewById<ImageView>(R.id.contextualBrandDesignDismissButton)
             val cardContainer = container.findViewById<TouchInterceptingLinearLayout>(R.id.contextualBrandDesignCardContainer)
-            val activeInclude = container.findViewById<View>(activeIncludeId)
+            val activeInclude: View? = activeIncludeId?.let { container.findViewById(it) }
 
             applyContent(container, isContentTransition = false)
             container.alpha = 1f
@@ -933,11 +946,12 @@ sealed class OnboardingDaxDialogCta(
         private fun applyContent(container: View, isContentTransition: Boolean) {
             val titleView = container.findViewById<DaxTypeAnimationTextView>(R.id.contextualBrandDesignTitle)
             val hiddenTitle = container.findViewById<DaxTextView>(R.id.contextualBrandDesignHiddenTitle)
-            val activeInclude = container.findViewById<View>(activeIncludeId)
+            val activeInclude: View? = activeIncludeId?.let { container.findViewById(it) }
 
             resetSharedViewState(container, isContentTransition = isContentTransition)
             resetAllIncludesExcept(container, activeInclude)
             applyPrimaryCtaText(container)
+            applyDismissButtonVisibility(container)
             configureContentViews(container)
             applyWingBottomState(container)
             hiddenTitle.text = titleView.text
@@ -1063,7 +1077,7 @@ sealed class OnboardingDaxDialogCta(
             titleView: DaxTypeAnimationTextView,
             descriptionView: DaxTextView,
             dismissButton: ImageView,
-            activeInclude: View,
+            activeInclude: View?,
             cardContainer: TouchInterceptingLinearLayout,
             alreadySettled: Boolean,
             contentFadeInAnimator: AnimatorSet?,
@@ -1086,7 +1100,7 @@ sealed class OnboardingDaxDialogCta(
             }
             descriptionView.alpha = 1f
             dismissButton.alpha = 1f
-            activeInclude.alpha = 1f
+            activeInclude?.alpha = 1f
             container.alpha = 1f
             bannerFor(container)?.snapToFinalPosition()
             contentFadeInAnimator?.let { if (it.isRunning) it.end() }
@@ -1101,6 +1115,10 @@ sealed class OnboardingDaxDialogCta(
         private fun applyPrimaryCtaText(container: View) {
             val text = buttonText ?: return
             container.findViewById<DaxButtonPrimary>(R.id.contextualBrandDesignPrimaryCta)?.setText(text)
+        }
+
+        private fun applyDismissButtonVisibility(container: View) {
+            container.findViewById<View>(R.id.contextualBrandDesignDismissButton)?.isVisible = showDismiss
         }
 
         // GONE (not INVISIBLE) so the FrameLayout's marginBottom drops out of the LinearLayout
@@ -1224,15 +1242,16 @@ sealed class OnboardingDaxDialogCta(
         protected open val allContentIncludeIds: List<Int> = listOf(
             R.id.contextualBrandDesignPrimaryCtaContent,
             R.id.contextualBrandDesignOptionsContent,
+            R.id.contextualBrandDesignNoCtaContent,
         )
 
         /** Returns all content-include slots in the card. Used to hide inactive includes. */
         internal fun getAllContentIncludes(view: View): List<View> =
             allContentIncludeIds.mapNotNull { view.findViewById(it) }
 
-        internal fun resetAllIncludesExcept(view: View, active: View) {
+        internal fun resetAllIncludesExcept(view: View, active: View?) {
             getAllContentIncludes(view).forEach { include ->
-                if (include == active) {
+                if (active != null && include == active) {
                     include.show()
                     include.alpha = 0f
                 } else {

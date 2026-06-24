@@ -47,6 +47,8 @@ import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.duckchat.api.InputMode
+import com.duckduckgo.duckchat.api.nativeinput.NativeInputState.InteractionLock
 import com.duckduckgo.duckchat.api.toChatIdOrNull
 import com.duckduckgo.duckchat.impl.ui.nativeinput.views.NativeInputWidget
 import com.duckduckgo.navigation.api.GlobalActivityStarter
@@ -55,6 +57,7 @@ import com.duckduckgo.voice.api.VoiceSearchAvailability
 import com.google.android.material.card.MaterialCardView
 import com.squareup.anvil.annotations.ContributesBinding
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
@@ -114,12 +117,20 @@ interface NativeInputManager {
         currentTabUrl: Flow<String?>,
         query: String = "",
         callbacks: NativeInputCallbacks,
+        initialInputMode: InputMode? = null,
     )
+
     fun hideNativeInput(animate: Boolean = true, isNavigation: Boolean = false): Boolean
     fun handleDuckAiVoiceResult(query: String)
     fun onKeyboardVisibilityChanged(isVisible: Boolean)
     fun setPickingImage(picking: Boolean)
     fun setText(text: String)
+
+    /** Lock the input field (making it non-interactive + dimmed).*/
+    fun setInteractionLock(lock: InteractionLock)
+
+    /** Show pulse animation around the Duck.ai fire button. */
+    fun setDuckAiFireButtonHighlighted(highlighted: Boolean)
 }
 
 @ContributesBinding(FragmentScope::class)
@@ -131,6 +142,7 @@ class RealNativeInputManager @Inject constructor(
     private val queryUrlPredictor: QueryUrlPredictor,
     private val duckAiFeatureState: DuckAiFeatureState,
     private val pixel: Pixel,
+    private val nativeInputStateBugKillSwitch: NativeInputStateBugKillSwitch,
 ) : NativeInputManager {
     private lateinit var omnibarController: NativeInputOmnibarController
     private lateinit var rootView: ViewGroup
@@ -143,6 +155,9 @@ class RealNativeInputManager @Inject constructor(
     private var widgetRoot: View? = null
     private var lastCallbacks: NativeInputCallbacks? = null
 
+    private val interactionLockSource = MutableStateFlow(InteractionLock.Unlocked)
+    private val duckAiFireButtonHighlightSource = MutableStateFlow(false)
+
     private fun widgetFrom(widgetView: View): NativeInputWidget? {
         return widgetView.findViewById<View?>(R.id.inputModeWidget) as? NativeInputWidget
     }
@@ -153,7 +168,7 @@ class RealNativeInputManager @Inject constructor(
         lifecycleOwner: LifecycleOwner,
         onDisabled: () -> Unit,
     ) {
-        this.omnibarController = RealNativeInputOmnibarController(omnibar, rootView)
+        this.omnibarController = RealNativeInputOmnibarController(omnibar, rootView, nativeInputStateBugKillSwitch)
         this.rootView = rootView
         this.layoutCoordinator = NativeInputLayoutCoordinator(rootView, this.omnibarController)
         duckChat.observeNativeInputFieldUserSettingEnabled()
@@ -273,12 +288,15 @@ class RealNativeInputManager @Inject constructor(
         val widgetCard = rootView.findViewById<View?>(R.id.inputModeWidgetCard)
         if (widgetCard != null) {
             (widgetCard as? MaterialCardView)?.cardElevation = 0f
+            val animatingRoot = widgetRoot
             widgetCard.animate()
                 .alpha(0f)
                 .setDuration(FADE_OUT_DURATION_MS)
                 .withEndAction {
                     widgetCard.alpha = 1f
-                    removeWidget()
+                    if (!nativeInputStateBugKillSwitch.self().isEnabled() || widgetRoot === animatingRoot) {
+                        removeWidget()
+                    }
                 }
                 .start()
         } else {
@@ -363,6 +381,7 @@ class RealNativeInputManager @Inject constructor(
         currentTabUrl: Flow<String?>,
         query: String,
         callbacks: NativeInputCallbacks,
+        initialInputMode: InputMode?,
     ) {
         if (!isNativeInputFieldEnabled) return
 
@@ -408,7 +427,7 @@ class RealNativeInputManager @Inject constructor(
         }
         attachWidget(widgetView, isBottom, tabId)
         val isNewTab = query.isEmpty() && omnibarController.getText().isEmpty()
-        applyInitialTabSelection(widgetView, isNewTab)
+        applyInitialTabSelection(widgetView, isNewTab, initialInputMode)
         if (omnibarController.isDuckAiMode()) {
             widgetFrom(widgetView)?.setToggleVisible(false)
         } else {
@@ -485,6 +504,12 @@ class RealNativeInputManager @Inject constructor(
         )
         widget.onChangeModelSubmitted = { modelId -> callbacks.onChangeModelSubmitted(modelId) }
         widget.onBack = {
+            // Clear focus before hiding the IME. In SEARCH_ONLY mode the input field still holds
+            // focus when Back is pressed, and a focused, attached EditText remains the IME target —
+            // the window re-requests the keyboard after the hide. Dropping focus first removes the
+            // target so the hide sticks. In SEARCH_AND_DUCK_AI the field has already lost focus, so
+            // this is a no-op there.
+            widget.clearInputFocus()
             widget.hideKeyboard()
             hideNativeInput()
         }
@@ -578,6 +603,8 @@ class RealNativeInputManager @Inject constructor(
             // Picker tied to whether the current tab is a Duck.ai page that already has a chatId (existing chat) or new chat.
             bindModelPickerEnabledSource(chatIdFlow.map { it == null })
             bindChatIdSource(chatIdFlow)
+            bindInteractionLockSource(interactionLockSource)
+            bindDuckAiFireButtonHighlightSource(duckAiFireButtonHighlightSource)
         }
         bindSearchCallbacks(widgetView, callbacks)
         bindAutocompleteVisibility(widgetView)
@@ -640,12 +667,16 @@ class RealNativeInputManager @Inject constructor(
         }
     }
 
-    private fun applyInitialTabSelection(widgetView: View, isNewTab: Boolean) {
+    private fun applyInitialTabSelection(widgetView: View, isNewTab: Boolean, initialInputMode: InputMode?) {
         val widget = widgetFrom(widgetView) ?: return
-        if (omnibarController.isDuckAiMode()) {
-            widget.selectChatTab()
-        } else if (isNewTab) {
-            widget.applyDefaultTogglePosition()
+        when (initialInputMode) {
+            InputMode.DUCK_AI -> widget.selectChatTab()
+            InputMode.SEARCH -> widget.selectSearchTab()
+            null -> if (omnibarController.isDuckAiMode()) {
+                widget.selectChatTab()
+            } else if (isNewTab) {
+                widget.applyDefaultTogglePosition()
+            }
         }
     }
 
@@ -678,6 +709,14 @@ class RealNativeInputManager @Inject constructor(
             animator.applyLayoutTransitions(widgetView, isBottom)
             onEnterComplete(widgetView)
         }
+    }
+
+    override fun setInteractionLock(lock: InteractionLock) {
+        interactionLockSource.value = lock
+    }
+
+    override fun setDuckAiFireButtonHighlighted(highlighted: Boolean) {
+        duckAiFireButtonHighlightSource.value = highlighted
     }
 
     private fun suppressShadow(view: View) {

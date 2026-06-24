@@ -33,7 +33,6 @@ import android.view.KeyEvent
 import android.view.MotionEvent
 import android.view.View
 import android.view.View.IMPORTANT_FOR_AUTOFILL_YES
-import android.view.WindowManager
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.SystemBarStyle
@@ -68,7 +67,6 @@ import com.duckduckgo.app.browser.databinding.IncludeOmnibarToolbarMockupBottomB
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.ui.DefaultBrowserBottomSheetDialog
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.ui.DefaultBrowserBottomSheetDialog.EventListener
 import com.duckduckgo.app.browser.mode.BrowserLaunchSource
-import com.duckduckgo.app.browser.newaddressbaroption.NewAddressBarOptionManager
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.browser.shortcut.ShortcutBuilder
@@ -91,6 +89,8 @@ import com.duckduckgo.app.global.view.ClearDataAction
 import com.duckduckgo.app.global.view.ORIGIN_DUCK_AI_CONTEXTUAL_CHAT
 import com.duckduckgo.app.global.view.ORIGIN_HATCH
 import com.duckduckgo.app.global.view.renderIfChanged
+import com.duckduckgo.app.onboarding.orchestrator.NewUserBrowserOnboardingViewModel
+import com.duckduckgo.app.onboarding.ui.OnboardingActivity
 import com.duckduckgo.app.onboarding.ui.page.DefaultBrowserPage
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.FIRE_DIALOG_CANCEL
@@ -229,9 +229,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
     lateinit var omnibarEntryConverter: OmnibarEntryConverter
 
     @Inject
-    lateinit var newAddressBarOptionManager: NewAddressBarOptionManager
-
-    @Inject
     lateinit var fireDialogProvider: FireDialogProvider
 
     @Inject
@@ -279,6 +276,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
         }
 
     private val viewModel: BrowserViewModel by bindViewModel()
+    private val onboardingHostViewModel: NewUserBrowserOnboardingViewModel by bindViewModel()
     private val duckChatViewModel: DuckChatSharedViewModel by viewModels()
 
     private var instanceStateBundles: CombinedInstanceState? = null
@@ -409,17 +407,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
         bindMockupToolbars()
 
-        if (edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.BROWSER)) {
-            val toolbarColor = getColorFromAttr(com.duckduckgo.mobile.android.R.attr.daxColorToolbar)
-            val barStyle = if (isDarkThemeEnabled()) {
-                SystemBarStyle.dark(toolbarColor)
-            } else {
-                SystemBarStyle.light(toolbarColor, toolbarColor)
-            }
-            enableEdgeToEdge(statusBarStyle = barStyle, navigationBarStyle = barStyle)
-            edgeToEdgeHandler.applyStatusBarAndHorizontalInsets(binding.root)
-            updateLayoutForDisplayCutout(resources.configuration.orientation)
-        }
+        configureEdgeToEdge()
 
         setContentView(binding.root)
 
@@ -433,6 +421,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
             .launchIn(lifecycleScope)
 
         observeDuckChatSharedCommands()
+        observeOnboardingHost()
         observeBrowserModeChanges()
 
         viewModel.awaitClearDataFinishedNotification()
@@ -442,7 +431,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
             viewModel.onLaunchedFromNotification(it)
         }
         configureOnBackPressedListener()
-        showNewAddressBarOptionChoiceScreen()
         checkForLanscapeOrientation()
 
         if (savedInstanceState == null) {
@@ -533,6 +521,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
                     if (pendingDuckAiOnboardingFire) {
                         pendingDuckAiOnboardingFire = false
                         closeDuckChatFullScreen()
+                        onboardingHostViewModel.onDuckAiFireCompleted()
                     }
                 }
                 FireDialog.EVENT_ON_SINGLE_TAB_CLEAR_FEATURE_NOT_SUPPORTED -> {
@@ -540,6 +529,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
                     if (pendingDuckAiOnboardingFire) {
                         pendingDuckAiOnboardingFire = false
                         closeDuckChatFullScreen()
+                        onboardingHostViewModel.onDuckAiFireCompleted()
                     }
                 }
                 FireDialog.EVENT_ON_SINGLE_TAB_CLEAR_ERROR -> {
@@ -547,6 +537,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
                     if (pendingDuckAiOnboardingFire) {
                         pendingDuckAiOnboardingFire = false
                         closeDuckChatFullScreen()
+                        onboardingHostViewModel.onDuckAiFireCompleted()
                     }
                 }
             }
@@ -856,26 +847,9 @@ open class BrowserActivity : DuckDuckGoActivity() {
         }
 
         if (intent.getBooleanExtra(OPEN_DUCK_CHAT, false)) {
-            isDuckChatVisible = true
-            if (duckAiFeatureState.showInputScreenAutomaticallyOnNewTab.value) {
-                externalIntentProcessingState.onIntentRequestToOpenDuckAi()
-            }
-
-            if (duckAiFeatureState.showFullScreenMode.value) {
-                val url = intent.getStringExtra(DUCK_CHAT_URL) ?: duckChat.getDuckChatUrl("", false)
-                // The tab to return to when this Duck.ai tab is closed.
-                // Use to the current tab if no explicit tab id is passed.
-                // Falls back to NTP otherwise.
-                val sourceTabId = intent.getStringExtra(SOURCE_TAB_ID_EXTRA) ?: currentTab?.tabId
-                if (swipingTabsFeature.isEnabled) {
-                    launchNewTab(query = url, skipHome = false, sourceTabId = sourceTabId)
-                } else {
-                    lifecycleScope.launch { viewModel.onOpenInNewTabRequested(query = url, sourceTabId = sourceTabId, skipHome = false) }
-                }
-            } else {
-                val duckChatSessionActive = intent.getBooleanExtra(DUCK_CHAT_SESSION_ACTIVE, false)
-                viewModel.openDuckChat(intent.getStringExtra(DUCK_CHAT_URL), duckChatSessionActive, withTransition = duckAiShouldAnimate)
-            }
+            val duckChatSessionActive = intent.getBooleanExtra(DUCK_CHAT_SESSION_ACTIVE, false)
+            val sourceTabId = intent.getStringExtra(SOURCE_TAB_ID_EXTRA)
+            launchDuckAi(url = intent.getStringExtra(DUCK_CHAT_URL), duckChatSessionActive = duckChatSessionActive, sourceTabId = sourceTabId)
             return
         }
 
@@ -949,6 +923,21 @@ open class BrowserActivity : DuckDuckGoActivity() {
                     }
                 }
             }
+        }
+    }
+
+    private fun configureEdgeToEdge() {
+        if (edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.BROWSER)) {
+            val toolbarColor = getColorFromAttr(com.duckduckgo.mobile.android.R.attr.daxColorToolbar)
+            val barStyle = if (isDarkThemeEnabled()) {
+                SystemBarStyle.dark(toolbarColor)
+            } else {
+                SystemBarStyle.light(toolbarColor, toolbarColor)
+            }
+            enableEdgeToEdge(statusBarStyle = barStyle, navigationBarStyle = barStyle)
+            edgeToEdgeHandler.applyStatusBarAndHorizontalInsets(binding.root)
+            edgeToEdgeHandler.applyNavigationBarInsets(binding.navigationBarMockup.root)
+            applyDisplayCutoutMode(resources.configuration.orientation)
         }
     }
 
@@ -1104,6 +1093,28 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
     fun launchDownloads() {
         globalActivityStarter.start(this, DownloadsScreenNoParams)
+    }
+
+    private fun launchDuckAi(url: String?, duckChatSessionActive: Boolean = false, sourceTabId: String? = null) {
+        isDuckChatVisible = true
+        if (duckAiFeatureState.showInputScreenAutomaticallyOnNewTab.value) {
+            externalIntentProcessingState.onIntentRequestToOpenDuckAi()
+        }
+
+        if (duckAiFeatureState.showFullScreenMode.value) {
+            // The tab to return to when this Duck.ai tab is closed.
+            // Use to the current tab if no explicit tab id is passed.
+            // Falls back to NTP otherwise.
+            val sourceTabId = sourceTabId ?: currentTab?.tabId
+            val fullScreenUrl = url ?: duckChat.getDuckChatUrl("", false)
+            if (swipingTabsFeature.isEnabled) {
+                launchNewTab(query = fullScreenUrl, skipHome = false, sourceTabId = sourceTabId)
+            } else {
+                lifecycleScope.launch { viewModel.onOpenInNewTabRequested(query = fullScreenUrl, sourceTabId = sourceTabId, skipHome = false) }
+            }
+        } else {
+            viewModel.openDuckChat(url, duckChatSessionActive, withTransition = duckAiShouldAnimate)
+        }
     }
 
     fun closeDuckChatFullScreen() {
@@ -1302,6 +1313,24 @@ open class BrowserActivity : DuckDuckGoActivity() {
         }
     }
 
+    private fun observeOnboardingHost() {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                onboardingHostViewModel.commands.collect { command ->
+                    when (command) {
+                        NewUserBrowserOnboardingViewModel.Command.HandOffToOnboardingActivity -> {
+                            startActivity(OnboardingActivity.intent(this@BrowserActivity))
+                            finish()
+                        }
+                        is NewUserBrowserOnboardingViewModel.Command.OpenDuckAiOnboardingDemo -> {
+                            launchDuckAi(url = command.url)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     /**
      * Recreates the activity whenever the user switches browser mode. The activity is built for
      * one mode at a time. The previous mode's tab state is stripped from the saved bundle, and any
@@ -1338,21 +1367,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
         super.onConfigurationChanged(newConfig)
         if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
             viewModel.sendPixelEventForLandscapeOrientation()
-        }
-        if (edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.BROWSER)) {
-            updateLayoutForDisplayCutout(newConfig.orientation)
-        }
-    }
-
-    private fun updateLayoutForDisplayCutout(orientation: Int) {
-        if (Build.VERSION.SDK_INT >= 28) {
-            window.attributes = window.attributes.apply {
-                layoutInDisplayCutoutMode = if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                    WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_NEVER
-                } else {
-                    WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_DEFAULT
-                }
-            }
         }
     }
 
@@ -1393,12 +1407,10 @@ open class BrowserActivity : DuckDuckGoActivity() {
             isExternal: Boolean = false,
             interstitialScreen: Boolean = false,
             openExistingTabId: String? = null,
-            isLaunchFromClearDataAction: Boolean = false,
             openDuckChat: Boolean = false,
             closeDuckChat: Boolean = false,
             duckChatUrl: String? = null,
             duckChatSessionActive: Boolean = false,
-            isLaunchFromBookmarksAppShortcut: Boolean = false,
             deletedTabCount: Int = 0,
         ): Intent {
             val intent = Intent(context, BrowserActivity::class.java)
@@ -1411,12 +1423,10 @@ open class BrowserActivity : DuckDuckGoActivity() {
             intent.putExtra(LAUNCH_FROM_EXTERNAL_EXTRA, isExternal)
             intent.putExtra(LAUNCH_FROM_INTERSTITIAL_EXTRA, interstitialScreen)
             intent.putExtra(OPEN_EXISTING_TAB_ID_EXTRA, openExistingTabId)
-            intent.putExtra(LAUNCH_FROM_CLEAR_DATA_ACTION, isLaunchFromClearDataAction)
             intent.putExtra(OPEN_DUCK_CHAT, openDuckChat)
             intent.putExtra(CLOSE_DUCK_CHAT, closeDuckChat)
             intent.putExtra(DUCK_CHAT_URL, duckChatUrl)
             intent.putExtra(DUCK_CHAT_SESSION_ACTIVE, duckChatSessionActive)
-            intent.putExtra(LAUNCH_FROM_BOOKMARKS_APP_SHORTCUT_EXTRA, isLaunchFromBookmarksAppShortcut)
             intent.putExtra(DELETED_TAB_COUNT_EXTRA, deletedTabCount)
             intent.putExtra(LAUNCH_REQUIRES_REGULAR_MODE, launchSource.requiresRegularMode)
             return intent
@@ -1427,7 +1437,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
         const val NOTIFY_DATA_CLEARED_EXTRA = "NOTIFY_DATA_CLEARED_EXTRA"
         const val LAUNCH_FROM_DEFAULT_BROWSER_DIALOG = "LAUNCH_FROM_DEFAULT_BROWSER_DIALOG"
         const val LAUNCH_FROM_FAVORITES_WIDGET = "LAUNCH_FROM_FAVORITES_WIDGET"
-        const val LAUNCH_FROM_BOOKMARKS_APP_SHORTCUT_EXTRA = "LAUNCH_FROM_BOOKMARKS_APP_SHORTCUT_EXTRA"
         const val LAUNCH_FROM_NOTIFICATION_PIXEL_NAME = "LAUNCH_FROM_NOTIFICATION_PIXEL_NAME"
         const val OPEN_IN_CURRENT_TAB_EXTRA = "OPEN_IN_CURRENT_TAB_EXTRA"
         const val SELECTED_TEXT_EXTRA = "SELECTED_TEXT_EXTRA"
@@ -1442,7 +1451,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
          */
         const val LAUNCH_REQUIRES_REGULAR_MODE = "LAUNCH_REQUIRES_REGULAR_MODE"
 
-        private const val LAUNCH_FROM_CLEAR_DATA_ACTION = "LAUNCH_FROM_CLEAR_DATA_ACTION"
         private const val OPEN_DUCK_CHAT = "OPEN_DUCK_CHAT_EXTRA"
         private const val CLOSE_DUCK_CHAT = "CLOSE_DUCK_CHAT_EXTRA"
         private const val DUCK_CHAT_URL = "DUCK_CHAT_URL"
@@ -1513,22 +1521,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
                 launchNewSearchOrQuery(intent)
                 processedOriginalIntent = true
             }
-        }
-    }
-
-    private fun showNewAddressBarOptionChoiceScreen() {
-        lifecycleScope.launch(dispatcherProvider.io()) {
-            newAddressBarOptionManager.showChoiceScreen(
-                activity = this@BrowserActivity,
-                isLaunchedFromExternal = intent.getBooleanExtra(LAUNCH_FROM_EXTERNAL_EXTRA, false) ||
-                    intent.getBooleanExtra(LAUNCH_FROM_CLEAR_DATA_ACTION, false) ||
-                    intent.getBooleanExtra(NOTIFY_DATA_CLEARED_EXTRA, false) ||
-                    intent.getBooleanExtra(LAUNCH_FROM_INTERSTITIAL_EXTRA, false) ||
-                    intent.getBooleanExtra(OPEN_DUCK_CHAT, false) ||
-                    intent.getBooleanExtra(LAUNCH_FROM_FAVORITES_WIDGET, false) ||
-                    intent.getBooleanExtra(LAUNCH_FROM_BOOKMARKS_APP_SHORTCUT_EXTRA, false) ||
-                    intent.getBooleanExtra(NEW_SEARCH_EXTRA, false),
-            )
         }
     }
 

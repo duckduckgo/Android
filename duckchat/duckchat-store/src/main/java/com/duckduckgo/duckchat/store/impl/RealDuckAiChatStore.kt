@@ -17,13 +17,7 @@
 package com.duckduckgo.duckchat.store.impl
 
 import com.duckduckgo.common.utils.DispatcherProvider
-import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.store.impl.store.DuckAiBridgeChatEntity
-import com.duckduckgo.duckchat.store.impl.store.DuckAiBridgeChatsDao
-import com.duckduckgo.duckchat.store.impl.store.DuckAiBridgeFileMetaDao
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.Lazy
-import dagger.SingleInstanceIn
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
@@ -31,7 +25,6 @@ import logcat.logcat
 import org.json.JSONObject
 import java.io.File
 import java.util.Base64
-import javax.inject.Inject
 
 /**
  * Stable metadata extracted from FE-owned chat JSON.
@@ -103,15 +96,22 @@ interface DuckAiChatStore {
     suspend fun readFileRef(uuid: String): FileRefContent?
 }
 
-@SingleInstanceIn(AppScope::class)
-@ContributesBinding(AppScope::class)
-class RealDuckAiChatStore @Inject constructor(
-    private val chatsDao: DuckAiBridgeChatsDao,
-    private val fileMetaDao: DuckAiBridgeFileMetaDao,
-    @param:DuckAiBridgeFilesDir private val filesDirLazy: Lazy<File>,
+/**
+ * Reads/writes the native Duck.ai chat store for a single [BrowserMode], backed by the [DuckAiBridgeStorage]
+ * it is given. One instance is provided per mode (`@RegularMode` / `@FireMode`); consumers normally inject the
+ * unqualified [DuckAiChatStore] (the mode-delegating [ModeAwareDuckAiChatStore]) rather than this class directly.
+ *
+ * Migration state ([migrationPrefs]) is shared across modes — migration is a one-time, app-level event.
+ */
+class RealDuckAiChatStore(
+    private val storage: DuckAiBridgeStorage,
     private val dispatchers: DispatcherProvider,
     private val migrationPrefs: DuckAiMigrationPrefs,
 ) : DuckAiChatStore {
+
+    private val chatsDao = storage.chats
+    private val fileMetaDao = storage.fileMeta
+    private val filesDir: File get() = storage.filesDir
 
     override suspend fun hasMigrated(): Boolean =
         withContext(dispatchers.io()) {
@@ -139,7 +139,6 @@ class RealDuckAiChatStore @Inject constructor(
 
             chatsDao.delete(chatId)
 
-            val filesDir = filesDirLazy.get()
             fileRefs.forEach { uuid ->
                 val file = File(filesDir, uuid)
                 if (file.canonicalPath.startsWith(filesDir.canonicalPath + File.separator)) {
@@ -158,7 +157,6 @@ class RealDuckAiChatStore @Inject constructor(
         withContext(dispatchers.io()) {
             logcat { "DuckAI: RealDuckAiChatStore.deleteAllChats()...deleting all chats" }
             chatsDao.deleteAll()
-            val filesDir = filesDirLazy.get()
             fileMetaDao.getAll().forEach { meta ->
                 val file = File(filesDir, meta.uuid)
                 if (file.canonicalPath.startsWith(filesDir.canonicalPath + File.separator)) {
@@ -201,7 +199,6 @@ class RealDuckAiChatStore @Inject constructor(
 
     override suspend fun readFileRef(uuid: String): FileRefContent? =
         withContext(dispatchers.io()) {
-            val filesDir = filesDirLazy.get()
             val file = File(filesDir, uuid)
             // Same path-traversal guard as deleteChat — reject anything resolving outside the dir.
             if (!file.canonicalPath.startsWith(filesDir.canonicalPath + File.separator)) {

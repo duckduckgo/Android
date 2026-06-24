@@ -53,7 +53,7 @@ interface SuggestionViewHolderFactory {
         query: String,
         immediateSearchClickListener: (AutoCompleteSuggestion) -> Unit,
         editableSearchClickListener: (AutoCompleteSuggestion) -> Unit,
-        longPressClickListener: (AutoCompleteSuggestion) -> Unit = {},
+        deleteClickListener: (AutoCompleteSuggestion) -> Unit = {},
     )
 }
 
@@ -72,7 +72,7 @@ class SearchSuggestionViewHolderFactory(
         query: String,
         immediateSearchClickListener: (AutoCompleteSuggestion) -> Unit,
         editableSearchClickListener: (AutoCompleteSuggestion) -> Unit,
-        longPressClickListener: (AutoCompleteSuggestion) -> Unit,
+        deleteClickListener: (AutoCompleteSuggestion) -> Unit,
     ) {
         val searchSuggestionViewHolder = holder as AutoCompleteViewHolder.SearchSuggestionViewHolder
         searchSuggestionViewHolder.bind(
@@ -98,13 +98,13 @@ class HistorySuggestionViewHolderFactory : SuggestionViewHolderFactory {
         query: String,
         immediateSearchClickListener: (AutoCompleteSuggestion) -> Unit,
         editableSearchClickListener: (AutoCompleteSuggestion) -> Unit,
-        longPressClickListener: (AutoCompleteSuggestion) -> Unit,
+        deleteClickListener: (AutoCompleteSuggestion) -> Unit,
     ) {
         val searchSuggestionViewHolder = holder as AutoCompleteViewHolder.HistorySuggestionViewHolder
         searchSuggestionViewHolder.bind(
             suggestion as AutoCompleteHistorySuggestion,
             immediateSearchClickListener,
-            longPressClickListener,
+            deleteClickListener,
         )
     }
 }
@@ -122,13 +122,13 @@ class HistorySearchSuggestionViewHolderFactory : SuggestionViewHolderFactory {
         query: String,
         immediateSearchClickListener: (AutoCompleteSuggestion) -> Unit,
         editableSearchClickListener: (AutoCompleteSuggestion) -> Unit,
-        longPressClickListener: (AutoCompleteSuggestion) -> Unit,
+        deleteClickListener: (AutoCompleteSuggestion) -> Unit,
     ) {
         val historySearchSuggestionViewHolder = holder as AutoCompleteViewHolder.HistorySearchSuggestionViewHolder
         historySearchSuggestionViewHolder.bind(
             suggestion as AutoCompleteHistorySearchSuggestion,
             immediateSearchClickListener,
-            longPressClickListener,
+            deleteClickListener,
         )
     }
 }
@@ -146,7 +146,7 @@ class BookmarkSuggestionViewHolderFactory : SuggestionViewHolderFactory {
         query: String,
         immediateSearchClickListener: (AutoCompleteSuggestion) -> Unit,
         editableSearchClickListener: (AutoCompleteSuggestion) -> Unit,
-        longPressClickListener: (AutoCompleteSuggestion) -> Unit,
+        deleteClickListener: (AutoCompleteSuggestion) -> Unit,
     ) {
         val bookmarkSuggestionViewHolder = holder as AutoCompleteViewHolder.BookmarkSuggestionViewHolder
         bookmarkSuggestionViewHolder.bind(
@@ -169,7 +169,7 @@ class SwitchToTabSuggestionViewHolderFactory : SuggestionViewHolderFactory {
         query: String,
         immediateSearchClickListener: (AutoCompleteSuggestion) -> Unit,
         editableSearchClickListener: (AutoCompleteSuggestion) -> Unit,
-        longPressClickListener: (AutoCompleteSuggestion) -> Unit,
+        deleteClickListener: (AutoCompleteSuggestion) -> Unit,
     ) {
         val switchToTabSuggestionViewHolder = holder as AutoCompleteViewHolder.SwitchToTabSuggestionViewHolder
         switchToTabSuggestionViewHolder.bind(
@@ -196,7 +196,7 @@ class EmptySuggestionViewHolderFactory : SuggestionViewHolderFactory {
         query: String,
         immediateSearchClickListener: (AutoCompleteSuggestion) -> Unit,
         editableSearchClickListener: (AutoCompleteSuggestion) -> Unit,
-        longPressClickListener: (AutoCompleteSuggestion) -> Unit,
+        deleteClickListener: (AutoCompleteSuggestion) -> Unit,
     ) {
         // do nothing
     }
@@ -222,7 +222,7 @@ class DefaultSuggestionViewHolderFactory(
         query: String,
         immediateSearchClickListener: (AutoCompleteSuggestion) -> Unit,
         editableSearchClickListener: (AutoCompleteSuggestion) -> Unit,
-        longPressClickListener: (AutoCompleteSuggestion) -> Unit,
+        deleteClickListener: (AutoCompleteSuggestion) -> Unit,
     ) {
         val viewholder = holder as AutoCompleteViewHolder.DefaultSuggestionViewHolder
         viewholder.bind(suggestion as AutoCompleteDefaultSuggestion, query, immediateSearchClickListener, omnibarType)
@@ -242,7 +242,7 @@ class DividerViewHolderFactory : SuggestionViewHolderFactory {
         query: String,
         immediateSearchClickListener: (AutoCompleteSuggestion) -> Unit,
         editableSearchClickListener: (AutoCompleteSuggestion) -> Unit,
-        longPressClickListener: (AutoCompleteSuggestion) -> Unit,
+        deleteClickListener: (AutoCompleteSuggestion) -> Unit,
     ) {
         // do nothing
     }
@@ -261,7 +261,7 @@ class DuckAIPromptSuggestionViewHolderFactory : SuggestionViewHolderFactory {
         query: String,
         immediateSearchClickListener: (AutoCompleteSuggestion) -> Unit,
         editableSearchClickListener: (AutoCompleteSuggestion) -> Unit,
-        longPressClickListener: (AutoCompleteSuggestion) -> Unit,
+        deleteClickListener: (AutoCompleteSuggestion) -> Unit,
     ) {
         val viewHolder = holder as AutoCompleteViewHolder.DuckAIPromptViewHolder
         viewHolder.bind(
@@ -284,7 +284,7 @@ class DeviceAppSuggestionViewHolderFactory : SuggestionViewHolderFactory {
         query: String,
         immediateSearchClickListener: (AutoCompleteSuggestion) -> Unit,
         editableSearchClickListener: (AutoCompleteSuggestion) -> Unit,
-        longPressClickListener: (AutoCompleteSuggestion) -> Unit,
+        deleteClickListener: (AutoCompleteSuggestion) -> Unit,
     ) {
         val viewHolder = holder as AutoCompleteViewHolder.DeviceAppViewHolder
         viewHolder.bind(
@@ -337,15 +337,12 @@ sealed class AutoCompleteViewHolder(
         fun bind(
             item: AutoCompleteHistorySearchSuggestion,
             immediateSearchListener: (AutoCompleteSuggestion) -> Unit,
-            longPressClickListener: (AutoCompleteSuggestion) -> Unit,
+            deleteClickListener: (AutoCompleteSuggestion) -> Unit,
         ) = with(binding) {
             phrase.text = item.phrase
 
             root.setOnClickListener { immediateSearchListener(item) }
-            root.setOnLongClickListener {
-                longPressClickListener(item)
-                true
-            }
+            deleteSuggestionButton.setOnClickListener { deleteClickListener(item) }
         }
     }
 
@@ -370,16 +367,13 @@ sealed class AutoCompleteViewHolder(
         fun bind(
             item: AutoCompleteHistorySuggestion,
             immediateSearchListener: (AutoCompleteSuggestion) -> Unit,
-            longPressClickListener: (AutoCompleteSuggestion) -> Unit,
+            deleteClickListener: (AutoCompleteSuggestion) -> Unit,
         ) = with(binding) {
             title.text = item.title
             url.text = item.phrase
 
             root.setOnClickListener { immediateSearchListener(item) }
-            root.setOnLongClickListener {
-                longPressClickListener(item)
-                true
-            }
+            deleteSuggestionButton.setOnClickListener { deleteClickListener(item) }
         }
     }
 

@@ -21,14 +21,17 @@ import android.os.Bundle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
+import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingPlanBootstrapper
+import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingPlanBootstrapper.OnboardingPlanStartResult
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.onboarding.store.isNewUser
 import com.duckduckgo.app.pixels.AppPixelName
-import com.duckduckgo.app.referral.AppInstallationReferrerStateListener
-import com.duckduckgo.app.referral.AppInstallationReferrerStateListener.Companion.MAX_REFERRER_WAIT_TIME_MS
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.utils.SingleLiveEvent
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.onboarding.api.LinearOnboardingHost
+import com.duckduckgo.referral.api.AppInstallationReferrerStateListener
+import com.duckduckgo.referral.api.AppInstallationReferrerStateListener.Companion.MAX_REFERRER_WAIT_TIME_MS
 import com.duckduckgo.testseeder.api.TestScenarioSeeder
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
@@ -44,6 +47,7 @@ class LaunchViewModel @Inject constructor(
     private val appReferrerStateListener: AppInstallationReferrerStateListener,
     private val pixel: Pixel,
     private val testScenarioSeeder: TestScenarioSeeder,
+    private val newUserOnboardingPlanBootstrapper: NewUserOnboardingPlanBootstrapper,
 ) : ViewModel() {
 
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
@@ -77,7 +81,25 @@ class LaunchViewModel @Inject constructor(
 
     suspend fun showOnboardingOrHome() {
         if (userStageStore.isNewUser()) {
-            command.value = Command.Onboarding
+            when (val result = newUserOnboardingPlanBootstrapper.startNewUserOnboardingPlanIfEnabled()) {
+                OnboardingPlanStartResult.Disabled -> {
+                    logcat { "Using legacy linear onboarding controller" }
+                    command.value = Command.Onboarding
+                }
+
+                is OnboardingPlanStartResult.Enabled -> {
+                    logcat { "Using LinearOnboardingOrchestrator" }
+                    when (result.currentState.currentStep.host) {
+                        LinearOnboardingHost.OnboardingActivity -> {
+                            command.value = Command.Onboarding
+                        }
+
+                        else -> {
+                            // TODO in the future PR
+                        }
+                    }
+                }
+            }
         } else {
             command.value = Command.Home()
         }

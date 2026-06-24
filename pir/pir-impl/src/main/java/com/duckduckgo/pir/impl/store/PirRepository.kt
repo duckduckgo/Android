@@ -206,6 +206,18 @@ interface PirRepository {
 
     suspend fun setLastPirMauPixelTimeMs(timeMs: Long)
 
+    suspend fun getLastPirInteractionDauPixelTimeMs(): Long
+
+    suspend fun setLastPirInteractionDauPixelTimeMs(timeMs: Long)
+
+    suspend fun getLastPirInteractionWauPixelTimeMs(): Long
+
+    suspend fun setLastPirInteractionWauPixelTimeMs(timeMs: Long)
+
+    suspend fun getLastPirInteractionMauPixelTimeMs(): Long
+
+    suspend fun setLastPirInteractionMauPixelTimeMs(timeMs: Long)
+
     suspend fun getWeeklyStatLastSentMs(): Long
 
     suspend fun setWeeklyStatLastSentMs(timeMs: Long)
@@ -760,6 +772,36 @@ class RealPirRepository(
     override suspend fun setLastPirMauPixelTimeMs(timeMs: Long) {
         withContext(dispatcherProvider.io()) {
             pirDataStore.mauLastSentMs = timeMs
+        }
+    }
+
+    override suspend fun getLastPirInteractionDauPixelTimeMs(): Long = withContext(dispatcherProvider.io()) {
+        return@withContext pirDataStore.interactionDauLastSentMs
+    }
+
+    override suspend fun setLastPirInteractionDauPixelTimeMs(timeMs: Long) {
+        withContext(dispatcherProvider.io()) {
+            pirDataStore.interactionDauLastSentMs = timeMs
+        }
+    }
+
+    override suspend fun getLastPirInteractionWauPixelTimeMs(): Long = withContext(dispatcherProvider.io()) {
+        return@withContext pirDataStore.interactionWauLastSentMs
+    }
+
+    override suspend fun setLastPirInteractionWauPixelTimeMs(timeMs: Long) {
+        withContext(dispatcherProvider.io()) {
+            pirDataStore.interactionWauLastSentMs = timeMs
+        }
+    }
+
+    override suspend fun getLastPirInteractionMauPixelTimeMs(): Long = withContext(dispatcherProvider.io()) {
+        return@withContext pirDataStore.interactionMauLastSentMs
+    }
+
+    override suspend fun setLastPirInteractionMauPixelTimeMs(timeMs: Long) {
+        withContext(dispatcherProvider.io()) {
+            pirDataStore.interactionMauLastSentMs = timeMs
         }
     }
 

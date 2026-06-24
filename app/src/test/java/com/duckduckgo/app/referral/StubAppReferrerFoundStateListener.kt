@@ -17,6 +17,8 @@
 package com.duckduckgo.app.referral
 
 import com.duckduckgo.app.statistics.AtbInitializerListener
+import com.duckduckgo.referral.api.AppInstallationReferrerStateListener
+import com.duckduckgo.referral.api.ParsedReferrerResult
 import kotlinx.coroutines.delay
 
 class StubAppReferrerFoundStateListener(

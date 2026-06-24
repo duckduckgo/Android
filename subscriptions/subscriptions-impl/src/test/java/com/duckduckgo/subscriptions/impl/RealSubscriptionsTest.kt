@@ -23,7 +23,6 @@ import androidx.core.net.toUri
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import app.cash.turbine.test
-import com.duckduckgo.browser.api.ui.BrowserScreens.SettingsScreenNoParams
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
@@ -278,25 +277,23 @@ class RealSubscriptionsTest {
 
     @Test
     fun whenLaunchSubscriptionWithOriginThenPassTheOriginToActivity() = runTest {
-        whenever(globalActivityStarter.startIntent(any(), any<SettingsScreenNoParams>())).thenReturn(fakeIntent())
         whenever(globalActivityStarter.startIntent(any(), any<SubscriptionsWebViewActivityWithParams>())).thenReturn(fakeIntent())
 
         val captor = argumentCaptor<ActivityParams>()
         subscriptions.launchSubscription(context, "https://duckduckgo.com/pro?origin=test".toUri())
 
-        verify(globalActivityStarter, times(2)).startIntent(eq(context), captor.capture())
+        verify(globalActivityStarter, times(1)).startIntent(eq(context), captor.capture())
         assertEquals("test", (captor.lastValue as SubscriptionsWebViewActivityWithParams).origin)
     }
 
     @Test
     fun whenLaunchProUrlWithFeaturePageThenIncludeInSubscriptionURLToActivity() = runTest {
-        whenever(globalActivityStarter.startIntent(any(), any<SettingsScreenNoParams>())).thenReturn(fakeIntent())
         whenever(globalActivityStarter.startIntent(any(), any<SubscriptionsWebViewActivityWithParams>())).thenReturn(fakeIntent())
 
         val captor = argumentCaptor<ActivityParams>()
         subscriptions.launchSubscription(context, "https://duckduckgo.com/pro?featurePage=duckai".toUri())
 
-        verify(globalActivityStarter, times(2)).startIntent(eq(context), captor.capture())
+        verify(globalActivityStarter, times(1)).startIntent(eq(context), captor.capture())
         assertEquals(
             subscriptionsUrlProvider.buyUrl.appendQueryParams("featurePage=duckai"),
             (captor.lastValue as SubscriptionsWebViewActivityWithParams).url,
@@ -305,13 +302,12 @@ class RealSubscriptionsTest {
 
     @Test
     fun whenLaunchProWithMultipleQueryParametersThenTheyAreIncludedInSubscriptionURLToActivity() = runTest {
-        whenever(globalActivityStarter.startIntent(any(), any<SettingsScreenNoParams>())).thenReturn(fakeIntent())
         whenever(globalActivityStarter.startIntent(any(), any<SubscriptionsWebViewActivityWithParams>())).thenReturn(fakeIntent())
 
         val captor = argumentCaptor<ActivityParams>()
         subscriptions.launchSubscription(context, "https://duckduckgo.com/pro?usePaidDuckAi=true&featurePage=duckai".toUri())
 
-        verify(globalActivityStarter, times(2)).startIntent(eq(context), captor.capture())
+        verify(globalActivityStarter, times(1)).startIntent(eq(context), captor.capture())
         assertEquals(
             subscriptionsUrlProvider.buyUrl.appendQueryParams("usePaidDuckAi=true&featurePage=duckai"),
             (captor.lastValue as SubscriptionsWebViewActivityWithParams).url,
@@ -320,13 +316,12 @@ class RealSubscriptionsTest {
 
     @Test
     fun whenLaunchSubscriptionUrlWithFeaturePageThenIncludeInSubscriptionURLToActivity() = runTest {
-        whenever(globalActivityStarter.startIntent(any(), any<SettingsScreenNoParams>())).thenReturn(fakeIntent())
         whenever(globalActivityStarter.startIntent(any(), any<SubscriptionsWebViewActivityWithParams>())).thenReturn(fakeIntent())
 
         val captor = argumentCaptor<ActivityParams>()
         subscriptions.launchSubscription(context, "https://duckduckgo.com/subscriptions?featurePage=duckai".toUri())
 
-        verify(globalActivityStarter, times(2)).startIntent(eq(context), captor.capture())
+        verify(globalActivityStarter, times(1)).startIntent(eq(context), captor.capture())
         assertEquals(
             subscriptionsUrlProvider.buyUrl.appendQueryParams("featurePage=duckai"),
             (captor.lastValue as SubscriptionsWebViewActivityWithParams).url,
@@ -335,13 +330,12 @@ class RealSubscriptionsTest {
 
     @Test
     fun whenLaunchSubscriptionWithMultipleQueryParametersThenTheyAreIncludedInSubscriptionURLToActivity() = runTest {
-        whenever(globalActivityStarter.startIntent(any(), any<SettingsScreenNoParams>())).thenReturn(fakeIntent())
         whenever(globalActivityStarter.startIntent(any(), any<SubscriptionsWebViewActivityWithParams>())).thenReturn(fakeIntent())
 
         val captor = argumentCaptor<ActivityParams>()
         subscriptions.launchSubscription(context, "https://duckduckgo.com/subscriptions?usePaidDuckAi=true&featurePage=duckai".toUri())
 
-        verify(globalActivityStarter, times(2)).startIntent(eq(context), captor.capture())
+        verify(globalActivityStarter, times(1)).startIntent(eq(context), captor.capture())
         assertEquals(
             subscriptionsUrlProvider.buyUrl.appendQueryParams("usePaidDuckAi=true&featurePage=duckai"),
             (captor.lastValue as SubscriptionsWebViewActivityWithParams).url,
@@ -360,13 +354,12 @@ class RealSubscriptionsTest {
 
     @Test
     fun whenLaunchSubscriptionWithNoOriginThenDoNotPassTheOriginToActivity() = runTest {
-        whenever(globalActivityStarter.startIntent(any(), any<SettingsScreenNoParams>())).thenReturn(fakeIntent())
         whenever(globalActivityStarter.startIntent(any(), any<SubscriptionsWebViewActivityWithParams>())).thenReturn(fakeIntent())
 
         val captor = argumentCaptor<ActivityParams>()
         subscriptions.launchSubscription(context, "https://duckduckgo.com/pro".toUri())
 
-        verify(globalActivityStarter, times(2)).startIntent(eq(context), captor.capture())
+        verify(globalActivityStarter, times(1)).startIntent(eq(context), captor.capture())
         assertNull((captor.lastValue as SubscriptionsWebViewActivityWithParams).origin)
     }
 
