@@ -132,7 +132,7 @@ class DuckChatSettingsViewModel @AssistedInject constructor(
             featureVisibility,
             duckChat.observeDefaultTogglePosition(),
             observeSearchAssistVisibility(),
-            duckChat.observeHideAiGeneratedImages(),
+            observeHideAiGeneratedImages(),
         ) { featureState, featureVisibility, defaultTogglePosition, searchAssistVisibility, hideAiGeneratedImages ->
             val isDuckChatUserEnabled = featureState.isDuckChatUserEnabled
             val isInputScreenEnabled = featureState.isCosmeticInputScreenEnabled ?: featureState.isInputScreenEnabled
@@ -269,9 +269,15 @@ class DuckChatSettingsViewModel @AssistedInject constructor(
 
     fun onHideAiGeneratedImagesSelected(option: HideAiGeneratedImages) {
         viewModelScope.launch {
-            duckChat.setHideAiGeneratedImages(option)
+            // The SERP blob is the single source of truth, so the web reflects this on its next getNativeSettings.
+            serpSettingsDataProvider.setSetting(HideAiGeneratedImages.SERP_SETTINGS_KEY, option.serpCode)
         }
     }
+
+    // Defaults to OFF (show) until the user (or SERP) has provided a value.
+    private fun observeHideAiGeneratedImages(): Flow<HideAiGeneratedImages> =
+        serpSettingsDataProvider.observeSetting(HideAiGeneratedImages.SERP_SETTINGS_KEY)
+            .map { HideAiGeneratedImages.fromSerpCode(it) }
 
     fun onDuckAiShortcutsClicked() {
         viewModelScope.launch {

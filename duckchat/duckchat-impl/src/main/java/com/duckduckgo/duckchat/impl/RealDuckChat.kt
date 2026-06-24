@@ -45,11 +45,9 @@ import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.repository.AddressBarPickerAttributionRepository
 import com.duckduckgo.duckchat.impl.repository.DuckChatFeatureRepository
 import com.duckduckgo.duckchat.impl.store.DefaultTogglePosition
-import com.duckduckgo.duckchat.impl.store.HideAiGeneratedImages
 import com.duckduckgo.duckchat.impl.voice.VoiceSessionStateManager
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.privacy.config.api.PrivacyConfigCallbackPlugin
-import com.duckduckgo.settings.api.SerpSettingsDataProvider
 import com.duckduckgo.sync.api.DeviceSyncState
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
@@ -110,16 +108,6 @@ interface DuckChatInternal : DuckChat {
      * Observes the user's preferred default toggle position.
      */
     fun observeDefaultTogglePosition(): Flow<DefaultTogglePosition>
-
-    /**
-     * Sets whether AI-generated images are hidden from image search results.
-     */
-    suspend fun setHideAiGeneratedImages(option: HideAiGeneratedImages)
-
-    /**
-     * Observes whether AI-generated images are hidden. Defaults to OFF (show) until a value is provided.
-     */
-    fun observeHideAiGeneratedImages(): Flow<HideAiGeneratedImages>
 
     /**
      * Saves the last used toggle position. Called on submission from the input screen.
@@ -395,7 +383,6 @@ class RealDuckChat @Inject constructor(
     private val duckAiHostProvider: DuckAiHostProvider,
     private val appBuildConfig: AppBuildConfig,
     private val voiceSessionStateManager: VoiceSessionStateManager,
-    private val serpSettingsDataProvider: SerpSettingsDataProvider,
 ) : DuckChatInternal,
     DuckAiFeatureState,
     DuckChatInputModeState,
@@ -850,15 +837,6 @@ class RealDuckChat @Inject constructor(
     override fun observeDefaultTogglePosition(): Flow<DefaultTogglePosition> =
         duckChatFeatureRepository.observeDefaultTogglePosition()
             .map { DefaultTogglePosition.fromName(it) }
-
-    override suspend fun setHideAiGeneratedImages(option: HideAiGeneratedImages) {
-        // The SERP blob is the single source of truth, so the web reflects this on its next getNativeSettings.
-        serpSettingsDataProvider.setSetting(HideAiGeneratedImages.SERP_SETTINGS_KEY, option.serpCode)
-    }
-
-    override fun observeHideAiGeneratedImages(): Flow<HideAiGeneratedImages> =
-        serpSettingsDataProvider.observeSetting(HideAiGeneratedImages.SERP_SETTINGS_KEY)
-            .map { HideAiGeneratedImages.fromSerpCode(it) }
 
     override suspend fun saveLastUsedTogglePosition(position: String) {
         duckChatFeatureRepository.setLastUsedTogglePosition(position)

@@ -50,6 +50,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
@@ -82,8 +83,8 @@ class DuckChatSettingsViewModelTest {
             whenever(duckChat.observeInputScreenUserSettingEnabled()).thenReturn(flowOf(false))
             whenever(duckChat.observeAutomaticContextAttachmentUserSettingEnabled()).thenReturn(flowOf(false))
             whenever(duckChat.observeDefaultTogglePosition()).thenReturn(flowOf(DefaultTogglePosition.SEARCH))
-            whenever(duckChat.observeHideAiGeneratedImages()).thenReturn(flowOf(HideAiGeneratedImages.OFF))
-            whenever(serpSettingsDataProvider.observeSetting(SearchAssistVisibility.SERP_SETTINGS_KEY)).thenReturn(flowOf(null))
+            // Default both SERP-backed settings (kbe, kbj) to "no value synced"; individual tests override per key.
+            whenever(serpSettingsDataProvider.observeSetting(any())).thenReturn(flowOf(null))
             testee = DuckChatSettingsViewModel(
                 duckChatActivityParams = DuckChatSettingsNoParams,
                 duckChat = duckChat,
@@ -660,7 +661,8 @@ class DuckChatSettingsViewModelTest {
         runTest {
             @Suppress("DenyListedApi")
             duckChatFeature.aiFeaturesNativeControls().setRawStoredState(State(enable = true))
-            whenever(duckChat.observeHideAiGeneratedImages()).thenReturn(flowOf(HideAiGeneratedImages.ON))
+            whenever(serpSettingsDataProvider.observeSetting(HideAiGeneratedImages.SERP_SETTINGS_KEY))
+                .thenReturn(flowOf(HideAiGeneratedImages.ON.serpCode))
             testee = DuckChatSettingsViewModel(
                 duckChatActivityParams = DuckChatSettingsNoParams,
                 duckChat = duckChat,
@@ -670,6 +672,7 @@ class DuckChatSettingsViewModelTest {
                 duckChatPixels = mockDuckChatPixels,
                 dispatcherProvider = coroutineRule.testDispatcherProvider,
                 duckChatFeature = duckChatFeature,
+                serpSettingsDataProvider = serpSettingsDataProvider,
             )
 
             testee.viewState.test {
@@ -689,10 +692,10 @@ class DuckChatSettingsViewModelTest {
         }
 
     @Test
-    fun `when hide ai generated images selected then persisted via duckChat`() =
+    fun `when hide ai generated images selected then persisted to SERP settings`() =
         runTest {
             testee.onHideAiGeneratedImagesSelected(HideAiGeneratedImages.ON)
-            verify(duckChat).setHideAiGeneratedImages(HideAiGeneratedImages.ON)
+            verify(serpSettingsDataProvider).setSetting(HideAiGeneratedImages.SERP_SETTINGS_KEY, HideAiGeneratedImages.ON.serpCode)
         }
 
     @Test
