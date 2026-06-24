@@ -121,7 +121,7 @@ class RealSyncCodeDispatcher @Inject constructor(
         }
     }
 
-    private fun mapV2PresentEventToOutcome(event: ExchangeV2Event, peerKind: PeerKind?): DispatchOutcome? = when (event) {
+    private suspend fun mapV2PresentEventToOutcome(event: ExchangeV2Event, peerKind: PeerKind?): DispatchOutcome? = when (event) {
         is ExchangeV2Event.SessionStarted -> event.linkingCode?.let { DispatchOutcome.LinkingCodeReady(it) }
         is ExchangeV2Event.Transition -> mapV2Transition(event, peerKind)
         is ExchangeV2Event.SessionError -> sessionErrorToOutcome(event.message)
@@ -287,13 +287,13 @@ class RealSyncCodeDispatcher @Inject constructor(
         -> true
     }
 
-    private fun mapV2LinkingEventToOutcome(event: ExchangeV2Event, peerKind: PeerKind?): DispatchOutcome? = when (event) {
+    private suspend fun mapV2LinkingEventToOutcome(event: ExchangeV2Event, peerKind: PeerKind?): DispatchOutcome? = when (event) {
         is ExchangeV2Event.Transition -> mapV2Transition(event, peerKind)
         is ExchangeV2Event.SessionError -> sessionErrorToOutcome(event.message)
         else -> null
     }
 
-    private fun mapV2Transition(
+    private suspend fun mapV2Transition(
         transition: ExchangeV2Event.Transition,
         peerKind: PeerKind?,
     ): DispatchOutcome? = when (transition.to) {
@@ -359,7 +359,7 @@ class RealSyncCodeDispatcher @Inject constructor(
      * cid=ddg logs in directly; cid=3party upgrades the account via
      * [SyncAccountRepository.joinAccountFromThirdPartyRecoveryCode].
      */
-    private fun loginWithV2RecoveryCode(b64: String, peerKind: PeerKind?): DispatchOutcome {
+    private suspend fun loginWithV2RecoveryCode(b64: String, peerKind: PeerKind?): DispatchOutcome {
         val parsed = decodeV2Recovery(b64) ?: return DispatchOutcome.Failed("Couldn't parse received recovery code as v2.0")
         return when (parsed.cid) {
             CID_DDG -> {

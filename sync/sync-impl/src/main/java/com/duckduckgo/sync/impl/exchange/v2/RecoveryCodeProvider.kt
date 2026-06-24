@@ -56,7 +56,7 @@ interface RecoveryCodeProvider {
      * 3party, if needed, extend the account."* No-op if a 3party credential already exists locally
      * ([SyncStore.scopedPassword] set); otherwise creates one. Failure surfaces as [Result.Error].
      */
-    fun createThirdPartyCredentialIfNeeded(): Result<Unit>
+    suspend fun createThirdPartyCredentialIfNeeded(): Result<Unit>
 }
 
 @ContributesBinding(AppScope::class)
@@ -73,7 +73,7 @@ class RealRecoveryCodeProvider @Inject constructor(
         }
     }
 
-    override fun createThirdPartyCredentialIfNeeded(): Result<Unit> {
+    override suspend fun createThirdPartyCredentialIfNeeded(): Result<Unit> {
         if (syncStore.scopedPassword != null) return Result.Success(Unit)
         return when (val r = syncAccountRepository.createThirdPartyCredential()) {
             is Result.Success -> Result.Success(Unit)

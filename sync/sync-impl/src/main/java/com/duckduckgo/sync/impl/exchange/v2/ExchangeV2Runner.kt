@@ -433,8 +433,9 @@ class RealExchangeV2Runner @Inject constructor(
      * (or `recovery_code_unavailable` if it can't be produced), then advance the SM.
      */
     private fun shareRecoveryCodeAndAdvanceLocked() {
-        val responseOk = sendRecoveryCodeResponse()
         appScope.launch(dispatchers.io()) {
+            if (session == null) return@launch
+            val responseOk = sendRecoveryCodeResponse()
             mutex.withLock {
                 val s = session ?: return@withLock
                 if (s.currentState != ExchangeV2State.Host.Sending) return@withLock
@@ -657,7 +658,7 @@ class RealExchangeV2Runner @Inject constructor(
      * `recovery_code_unavailable` to the peer + emitted a SessionError event, and the SM
      * should be driven to [ExchangeV2State.Host.Aborted] rather than Done).
      */
-    private fun sendRecoveryCodeResponse(): Boolean {
+    private suspend fun sendRecoveryCodeResponse(): Boolean {
         val peer = peerChannelId ?: return false
         val peerKey = peerPublicKey ?: return false
         // Recovery code per peer kind. Per spec §"Exchange Share Recovery Code": create the host
@@ -703,7 +704,7 @@ class RealExchangeV2Runner @Inject constructor(
             }
         }
 
-    private fun provisionForThirdPartyPeer(): Result<String> {
+    private suspend fun provisionForThirdPartyPeer(): Result<String> {
         when (val ddg = recoveryCodeProvider.createDdgAccountIfNeeded()) {
             is Result.Success -> Unit
             is Result.Error -> {

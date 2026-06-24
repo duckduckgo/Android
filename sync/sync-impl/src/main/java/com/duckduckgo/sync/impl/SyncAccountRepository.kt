@@ -53,6 +53,7 @@ import com.squareup.anvil.annotations.*
 import com.squareup.moshi.*
 import dagger.*
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import logcat.LogPriority.ERROR
@@ -96,7 +97,7 @@ interface SyncAccountRepository {
      * adopted locally; otherwise a new one is created on the server. Either path leaves the
      * local store ready for [getThirdPartyRecoveryCode].
      */
-    fun createThirdPartyCredential(): Result<Boolean>
+    suspend fun createThirdPartyCredential(): Result<Boolean>
 
     /**
      * Fetches the 3party credential from the server, decrypts the SP using the account's secretKey,
@@ -127,7 +128,7 @@ interface SyncAccountRepository {
      * populated, credentialId=ddg, scopedPassword populated with SP. SyncStore is written only
      * after all three network calls succeed; observers never see an intermediate state.
      */
-    fun joinAccountFromThirdPartyRecoveryCode(pastedCode: String): Result<Boolean>
+    suspend fun joinAccountFromThirdPartyRecoveryCode(pastedCode: String): Result<Boolean>
 
     /**
      * Returns a recovery code that a 3rd-party browser can use to sign in and access this
@@ -625,7 +626,7 @@ class AppSyncAccountRepository @Inject constructor(
         }
     }
 
-    override fun createThirdPartyCredential(): Result<Boolean> = thirdPartyCredentialManager.create()
+    override suspend fun createThirdPartyCredential(): Result<Boolean> = thirdPartyCredentialManager.create()
 
     override fun refreshThirdPartyCredential(): Result<Boolean> = thirdPartyCredentialManager.refresh()
 
@@ -758,7 +759,7 @@ class AppSyncAccountRepository @Inject constructor(
         )
     }
 
-    override fun joinAccountFromThirdPartyRecoveryCode(pastedCode: String): Result<Boolean> {
+    override suspend fun joinAccountFromThirdPartyRecoveryCode(pastedCode: String): Result<Boolean> {
         if (!syncFeature.canUseV2ConnectFlow().isEnabled()) {
             return Error(reason = "JoinFrom3party: canUseV2ConnectFlow is disabled")
         }
@@ -1338,7 +1339,7 @@ class AppSyncAccountRepository @Inject constructor(
         return this
     }
 
-    private fun <T> retryingOnTransientError(block: () -> Result<T>): Result<T> {
+    private suspend fun <T> retryingOnTransientError(block: () -> Result<T>): Result<T> {
         var attempt = 0
         while (true) {
             val result = block()
@@ -1346,7 +1347,7 @@ class AppSyncAccountRepository @Inject constructor(
             if (code != null && isRetryableTransient(code) && attempt < MAX_UPGRADE_RETRIES) {
                 attempt++
                 logcat { "Sync-ScopedToken: upgrade call transient error (code=$code); retry $attempt/$MAX_UPGRADE_RETRIES" }
-                runCatching { Thread.sleep(upgradeRetryDelayMillis * attempt) }
+                delay(upgradeRetryDelayMillis * attempt)
                 continue
             }
             return result
