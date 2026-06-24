@@ -174,6 +174,15 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
         }
 
         binding.duckAINoAiItem.isVisible = viewState.isNativeControlsEnabled
+        // Greyed out and non-tappable while Duck.ai is turned off, with a description explaining why.
+        binding.duckAINoAiItem.isEnabled = viewState.isDuckChatUserEnabled
+        binding.duckAINoAiItem.setSecondaryText(
+            if (viewState.isDuckChatUserEnabled) {
+                getString(R.string.duckAiUseWithoutAiDescription)
+            } else {
+                getString(R.string.duckAiUseWithoutAiDisabledDescription)
+            },
+        )
 
         // The Duck.ai section header and its top divider are only shown when the block lives at the end of the
         // layout (native controls enabled) and Duck.ai is enabled by the user.
