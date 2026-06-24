@@ -357,7 +357,6 @@ class OmnibarLayoutViewModel @Inject constructor(
                     )
                 }
             }
-            .flowOn(dispatcherProvider.io())
             .launchIn(viewModelScope)
 
         voiceActiveOnSelectedTab.onEach { voiceActive ->
@@ -602,7 +601,7 @@ class OmnibarLayoutViewModel @Inject constructor(
         hasQueryChanged: Boolean = false,
         urlLoaded: String = "",
     ): Boolean {
-        return if (viewMode == ViewMode.DuckAI) {
+        return if (viewMode == ViewMode.DuckAI || viewMode is CustomTab) {
             false
         } else {
             voiceSearchAvailability.shouldShowVoiceSearch(

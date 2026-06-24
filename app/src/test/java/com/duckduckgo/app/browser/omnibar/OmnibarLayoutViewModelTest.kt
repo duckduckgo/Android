@@ -401,6 +401,25 @@ class OmnibarLayoutViewModelTest {
     }
 
     @Test
+    fun whenVoiceSearchAvailabilityEmitsWhileInCustomTabThenVoiceSearchStaysHidden() = runTest {
+        val voiceSearchAvailabilityFlow = MutableStateFlow(false)
+        whenever(voiceSearchAvailability.observeVoiceSearchAvailability()).thenReturn(voiceSearchAvailabilityFlow)
+        initializeViewModel()
+
+        testee.onViewModeChanged(ViewMode.CustomTab(100, "example", "example.com", showDuckPlayerIcon = false))
+
+        // User toggles "Private Voice Search" on while a custom tab is active.
+        voiceSearchAvailabilityFlow.value = true
+
+        testee.viewState.test {
+            val viewState = expectMostRecentItem()
+            assertTrue(viewState.viewMode is ViewMode.CustomTab)
+            assertFalse(viewState.showVoiceSearch)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
     fun `when custom tab title updates, update view mode state`() = runTest {
         val expectedTitle = "newTitle"
         val initialUrl = "https://example.com/page"
