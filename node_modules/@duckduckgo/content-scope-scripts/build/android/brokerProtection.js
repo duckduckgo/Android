@@ -7312,64 +7312,58 @@
 
   // src/features/broker-protection/extractors/age.js
   init_define_import_meta_trackerLookup();
-  var AgeExtractor = class {
-    /**
-     * @param {string[]} strs
-     * @param {import('../actions/extract.js').ExtractorParams} _extractorParams
-     */
-    extract(strs, _extractorParams) {
-      if (!strs[0]) return null;
-      return strs[0].match(/\d+/)?.[0] ?? null;
-    }
-  };
+  function extractAge(select2, root, spec) {
+    const [first] = selectStrings(select2, root, spec);
+    return first?.match(/\d+/)?.[0] ?? null;
+  }
 
   // src/features/broker-protection/extractors/name.js
   init_define_import_meta_trackerLookup();
-  var NameExtractor = class {
-    /**
-     * @param {string[]} strs
-     * @param {import('../actions/extract.js').ExtractorParams} _extractorParams
-     */
-    extract(strs, _extractorParams) {
-      if (!strs[0]) return null;
-      return strs[0].replace(/\n/g, " ").trim();
-    }
-  };
-  var AlternativeNamesExtractor = class {
-    /**
-     * @param {string[]} strs
-     * @param {import('../actions/extract.js').ExtractorParams} extractorParams
-     * @returns {string[]}
-     */
-    extract(strs, extractorParams) {
-      return strs.map((x2) => stringToList(x2, extractorParams.separator)).flat();
-    }
-  };
+  function extractName(select2, root, spec) {
+    const [first] = selectStrings(select2, root, spec);
+    return first ? first.replace(/\n/g, " ").trim() : null;
+  }
+  function extractAlternativeNames(select2, root, spec) {
+    return selectStrings(select2, root, spec).flatMap((value) => stringToList(value, spec.separator));
+  }
 
   // src/features/broker-protection/extractors/address.js
   init_define_import_meta_trackerLookup();
   var import_parse_address = __toESM(require_address(), 1);
-  var CityStateExtractor = class {
-    /**
-     * @param {string[]} strs
-     * @param {import('../actions/extract.js').ExtractorParams} extractorParams
-     */
-    extract(strs, extractorParams) {
-      const cityStateList = strs.map((str) => stringToList(str, extractorParams.separator)).flat();
-      return getCityStateCombos(cityStateList);
+  function extractCityState(select2, root, spec) {
+    if (isNestedCityStateSpec(spec)) {
+      const { city, state } = spec;
+      return select2(root, spec.selector, spec.findElements).flatMap(
+        (row) => cityStatePartToCombo({
+          city: firstString(selectStrings(select2, row, city)),
+          state: state ? firstString(selectStrings(select2, row, state)) : ""
+        })
+      );
     }
-  };
-  var AddressFullExtractor = class {
-    /**
-     * @param {string[]} strs
-     * @param {import('../actions/extract.js').ExtractorParams} extractorParams
-     */
-    extract(strs, extractorParams) {
-      return strs.map((str) => str.replace("\n", " ")).map((str) => stringToList(str, extractorParams.separator)).flat().map((str) => import_parse_address.default.parseLocation(str) || {}).filter((parsed) => Boolean(parsed?.city)).map((addr) => {
-        return { city: addr.city, state: addr.state || null };
-      });
-    }
-  };
+    return cityStateCombosFromStrings(selectStrings(select2, root, spec), spec.separator);
+  }
+  function isNestedCityStateSpec(spec) {
+    return Object.prototype.hasOwnProperty.call(spec, "city") && Boolean(
+      /** @type {import('../actions/extract.js').NestedCityStateSpec} */
+      spec.city?.selector
+    );
+  }
+  function cityStateCombosFromStrings(strings, separator) {
+    return strings.flatMap((value) => getCityStateCombos(stringToList(value, separator)));
+  }
+  function cityStatePartToCombo({ city, state }) {
+    const trimmedCity = city.trim();
+    if (!trimmedCity) return [];
+    const trimmedState = state.trim();
+    if (!trimmedState) return [{ city: trimmedCity, state: null }];
+    const normalized = normalizeState(trimmedState);
+    return normalized ? [{ city: trimmedCity, state: normalized }] : [];
+  }
+  function extractAddressFull(select2, root, spec) {
+    return selectStrings(select2, root, spec).map((str) => str.replace("\n", " ")).flatMap((str) => stringToList(str, spec.separator)).map((str) => import_parse_address.default.parseLocation(str) || {}).filter((parsed) => Boolean(parsed?.city)).map((addr) => {
+      return { city: addr.city, state: addr.state || null };
+    });
+  }
   function getCityStateCombos(inputList) {
     const output = [];
     for (let item of inputList) {
@@ -7384,83 +7378,98 @@
       if (words.length === 1) {
         continue;
       }
-      const state = words.pop();
+      const stateCandidate = words.pop();
       const city = words.join(" ");
-      if (state && !Object.keys(states).includes(state.toUpperCase())) {
+      const state = stateCandidate ? normalizeState(stateCandidate) : null;
+      if (stateCandidate && !state) {
         continue;
       }
-      output.push({ city, state: state || null });
+      output.push({ city, state });
     }
     return output;
+  }
+  var stateNameToAbbreviation = null;
+  function normalizeState(token) {
+    const trimmed = token.trim();
+    if (!trimmed) {
+      return null;
+    }
+    const upper = trimmed.toUpperCase();
+    if (Object.prototype.hasOwnProperty.call(states, upper)) {
+      return upper;
+    }
+    if (stateNameToAbbreviation === null) {
+      stateNameToAbbreviation = /** @type {Record<string, string>} */
+      /* @__PURE__ */ Object.create(null);
+      for (const [abbreviation, name] of Object.entries(states)) {
+        stateNameToAbbreviation[name.toLowerCase()] = abbreviation;
+      }
+    }
+    return stateNameToAbbreviation[trimmed.toLowerCase()] ?? null;
   }
 
   // src/features/broker-protection/extractors/phone.js
   init_define_import_meta_trackerLookup();
-  var PhoneExtractor = class {
-    /**
-     * @param {string[]} strs
-     * @param {import('../actions/extract.js').ExtractorParams} extractorParams
-     */
-    extract(strs, extractorParams) {
-      return strs.map((str) => stringToList(str, extractorParams.separator)).flat().map((str) => str.replace(/\D/g, ""));
-    }
-  };
+  function extractPhone(select2, root, spec) {
+    return selectStrings(select2, root, spec).flatMap((str) => stringToList(str, spec.separator)).map((str) => str.replace(/\D/g, ""));
+  }
 
   // src/features/broker-protection/extractors/relatives.js
   init_define_import_meta_trackerLookup();
-  var RelativesExtractor = class {
-    /**
-     * @param {string[]} strs
-     * @param {import('../actions/extract.js').ExtractorParams} extractorParams
-     */
-    extract(strs, extractorParams) {
-      return strs.map((x2) => stringToList(x2, extractorParams.separator)).flat().map((x2) => (
-        /** @type {string} */
-        x2.split(",")[0]
-      ));
-    }
-  };
+  function extractRelatives(select2, root, spec) {
+    return selectStrings(select2, root, spec).flatMap((value) => stringToList(value, spec.separator)).map((value) => (
+      /** @type {string} */
+      value.split(",")[0]
+    ));
+  }
 
   // src/features/broker-protection/extractors/profile-url.js
   init_define_import_meta_trackerLookup();
-  var ProfileUrlExtractor = class {
-    /**
-     * @param {string[]} strs
-     * @param {import('../actions/extract.js').ExtractorParams} extractorParams
-     */
-    extract(strs, extractorParams) {
-      if (strs.length === 0) return null;
-      const firstStr = (
-        /** @type {string} */
-        strs[0]
-      );
-      const profile = {
-        profileUrl: firstStr,
-        identifier: firstStr
-      };
-      if (!extractorParams.identifierType || !extractorParams.identifier) {
-        return profile;
-      }
-      profile.identifier = this.getIdFromProfileUrl(firstStr, extractorParams.identifierType, extractorParams.identifier);
-      return profile;
+  function extractProfileUrl(select2, root, spec) {
+    const rawUrl = spec.source === "pageUrl" ? firstString(cleanArray(globalThis.location.href)) : firstString(profileUrlStrings(select2, root, spec));
+    if (!rawUrl) return null;
+    const url = parseProfileUrl(rawUrl);
+    const profileUrl = url?.href ?? rawUrl;
+    const profile = { profileUrl, identifier: profileUrl };
+    if (spec.identifierType && spec.identifier) {
+      profile.identifier = getIdFromProfileUrl(url, spec.identifierType, spec.identifier) ?? profileUrl;
     }
-    /**
-     * Parse a profile id from a profile URL
-     * @param {string} profileUrl
-     * @param {import('../actions/extract.js').IdentifierType} identifierType
-     * @param {string} identifier
-     * @return {string}
-     */
-    getIdFromProfileUrl(profileUrl, identifierType, identifier) {
-      const parsedUrl = new URL(profileUrl);
-      const urlParams = parsedUrl.searchParams;
-      if (identifierType === "param" && urlParams.has(identifier)) {
-        const profileId = urlParams.get(identifier);
-        return profileId || profileUrl;
-      }
-      return profileUrl;
+    return profile;
+  }
+  function profileUrlStrings(select2, root, spec) {
+    return cleanArray(
+      select2(root, spec.selector, spec.findElements).map((element) => readProfileUrlValue(element, spec)).map((value) => value ? shapeString(value, spec) : value)
+    );
+  }
+  function readProfileUrlValue(element, spec) {
+    if (spec.attribute && "getAttribute" in element) {
+      return element.getAttribute?.(spec.attribute) ?? null;
     }
-  };
+    if ("href" in element && element.href) {
+      return element.href;
+    }
+    if ("innerText" in element) {
+      return element.innerText ?? null;
+    }
+    if ("textContent" in element) {
+      return element.textContent ?? null;
+    }
+    return void 0;
+  }
+  function parseProfileUrl(profileUrl) {
+    try {
+      return new URL(profileUrl, globalThis.location.href);
+    } catch {
+      return null;
+    }
+  }
+  function getIdFromProfileUrl(url, identifierType, identifier) {
+    if (!url) return null;
+    if (identifierType === "param" && url.searchParams.has(identifier)) {
+      return url.searchParams.get(identifier) || null;
+    }
+    return null;
+  }
   var ProfileHashTransformer = class {
     /**
      * @param {Record<string, any>} profile
@@ -7497,6 +7506,14 @@
       }
     });
   }
+  function select(root, selector, all = false) {
+    if (!selector) return [];
+    const node = (
+      /** @type {HTMLElement} */
+      root
+    );
+    return all ? cleanArray(getElements(node, selector)) : cleanArray(getElement(node, selector) || getElementMatches(node, selector));
+  }
   function extractProfiles(action, userData, root = document) {
     const profilesElementList = getElements(root, action.selector) ?? [];
     if (profilesElementList.length === 0) {
@@ -7510,10 +7527,7 @@
     }
     return {
       results: profilesElementList.map((element) => {
-        const elementFactory = (_2, value) => {
-          return value?.findElements ? cleanArray(getElements(element, value.selector)) : cleanArray(getElement(element, value.selector) || getElementMatches(element, value.selector));
-        };
-        const scrapedData = createProfile(elementFactory, action.profile);
+        const scrapedData = createProfile(select, element, action.profile);
         const { result, score, matchedFields } = scrapedDataMatchesUserData(userData, scrapedData);
         return new ProfileResult({
           scrapedData,
@@ -7525,41 +7539,61 @@
       })
     };
   }
-  function createProfile(elementFactory, extractData) {
+  var extractors = {
+    name: extractName,
+    age: extractAge,
+    alternativeNamesList: extractAlternativeNames,
+    relativesList: extractRelatives,
+    phone: extractPhone,
+    phoneList: extractPhone,
+    addressFull: extractAddressFull,
+    addressFullList: extractAddressFull,
+    addressCityState: extractCityState,
+    addressCityStateList: extractCityState,
+    profileUrl: extractProfileUrl
+  };
+  function createProfile(select2, root, profileSpec) {
     const output = {};
-    for (const [key, value] of Object.entries(extractData)) {
-      if (!value?.selector) {
-        output[key] = null;
-      } else {
-        const elements = elementFactory(key, value);
-        const evaluatedValues = stringValuesFromElements(elements, key, value);
-        const noneEmptyArray = cleanArray(evaluatedValues);
-        const extractedValue = extractValue(key, value, noneEmptyArray);
-        output[key] = extractedValue || null;
-      }
+    for (const [field, fieldSpec] of Object.entries(profileSpec)) {
+      const extractField = extractors[field];
+      if (!extractField) continue;
+      output[field] = extractField(select2, root, fieldSpec ?? {}) || null;
     }
     return output;
   }
-  function stringValuesFromElements(elements, key, extractField) {
+  function selectStrings(select2, root, spec) {
+    return cleanArray(stringsFromElements(select2(root, spec.selector, spec.findElements), spec));
+  }
+  function stringsFromElements(elements, spec) {
     return elements.map((element) => {
-      let elementValue;
-      if ("innerText" in element) {
-        elementValue = rules[key]?.(element) ?? element?.innerText ?? null;
-      } else if ("textContent" in element) {
-        elementValue = rules[key]?.(element) ?? element?.textContent ?? null;
-      }
-      if (!elementValue) {
-        return elementValue;
-      }
-      if (extractField?.afterText) {
-        elementValue = elementValue?.split(extractField.afterText)[1]?.trim() || elementValue;
-      }
-      if (extractField?.beforeText) {
-        elementValue = elementValue?.split(extractField.beforeText)[0].trim() || elementValue;
-      }
-      elementValue = removeCommonSuffixesAndPrefixes(elementValue);
-      return elementValue;
+      const value = readElementText(element, spec);
+      return value ? shapeString(value, spec) : value;
     });
+  }
+  function readElementText(element, spec) {
+    if (spec.attribute && "getAttribute" in element) {
+      return element.getAttribute?.(spec.attribute) ?? null;
+    }
+    if ("innerText" in element) {
+      return element.innerText ?? null;
+    }
+    if ("textContent" in element) {
+      return element.textContent ?? null;
+    }
+    return void 0;
+  }
+  function shapeString(value, spec) {
+    if (spec.afterText) {
+      value = splitOnce(value, parseRegexFromString(spec.afterText), "after")?.trim() || value;
+    }
+    if (spec.beforeText) {
+      value = splitOnce(value, parseRegexFromString(spec.beforeText), "before")?.trim() || value;
+    }
+    return removeCommonSuffixesAndPrefixes(value);
+  }
+  function firstString(strings) {
+    const [value] = strings;
+    return typeof value === "string" ? value : "";
   }
   function scrapedDataMatchesUserData(userData, scrapedData) {
     const matchedFields = [];
@@ -7616,58 +7650,34 @@
       ...profile.profileUrl
     };
   }
-  function extractValue(outputFieldKey, extractorParams, elementValues) {
-    switch (outputFieldKey) {
-      case "age":
-        return new AgeExtractor().extract(elementValues, extractorParams);
-      case "name":
-        return new NameExtractor().extract(elementValues, extractorParams);
-      // all addresses are processed the same way
-      case "addressFull":
-      case "addressFullList":
-        return new AddressFullExtractor().extract(elementValues, extractorParams);
-      case "addressCityState":
-      case "addressCityStateList":
-        return new CityStateExtractor().extract(elementValues, extractorParams);
-      case "alternativeNamesList":
-        return new AlternativeNamesExtractor().extract(elementValues, extractorParams);
-      case "relativesList":
-        return new RelativesExtractor().extract(elementValues, extractorParams);
-      case "phone":
-      case "phoneList":
-        return new PhoneExtractor().extract(elementValues, extractorParams);
-      case "profileUrl":
-        return new ProfileUrlExtractor().extract(elementValues, extractorParams);
-    }
-    return null;
-  }
-  async function applyPostTransforms(profile, params) {
+  async function applyPostTransforms(profile, profileSpec) {
     const transforms = [
       // creates a hash if needed
       new ProfileHashTransformer()
     ];
     let output = profile;
     for (const knownTransform of transforms) {
-      output = await knownTransform.transform(output, params);
+      output = await knownTransform.transform(output, profileSpec);
     }
     return output;
   }
-  function parseRegexSeparator(separator) {
-    if (typeof separator === "string" && separator.length >= 2 && separator.startsWith("/") && separator.endsWith("/")) {
-      return new RegExp(separator.slice(1, -1));
+  function parseRegexFromString(value) {
+    const match = typeof value === "string" && value.match(/^\/(.+)\/(i?)$/);
+    return match ? new RegExp(match[1], match[2]) : value;
+  }
+  function splitOnce(value, matcher, keep) {
+    if (matcher instanceof RegExp) {
+      const match = value.match(matcher);
+      if (!match || match.index === void 0) return void 0;
+      return keep === "after" ? value.slice(match.index + match[0].length) : value.slice(0, match.index);
     }
-    return separator;
+    return keep === "after" ? value.split(matcher)[1] : value.split(matcher)[0];
   }
   function stringToList(inputList, separator) {
     const defaultSeparator = /[|\n•·]/;
-    const splitOn = parseRegexSeparator(separator) || defaultSeparator;
+    const splitOn = parseRegexFromString(separator) || defaultSeparator;
     return cleanArray(inputList.split(splitOn));
   }
-  var rules = {
-    profileUrl: function(link) {
-      return link?.href ?? null;
-    }
-  };
   function removeCommonSuffixesAndPrefixes(elementValue) {
     const regexes = [
       // match text such as +3 more when it appears at the end of a string
@@ -7691,12 +7701,12 @@
       elementValue = elementValue.replace(regex, "").trim();
     }
     for (const prefix of startsWith) {
-      if (elementValue.startsWith(prefix)) {
+      if (elementValue.toLowerCase().startsWith(prefix.toLowerCase())) {
         elementValue = elementValue.slice(prefix.length).trim();
       }
     }
     for (const suffix of endsWith) {
-      if (elementValue.endsWith(suffix)) {
+      if (elementValue.toLowerCase().endsWith(suffix.toLowerCase())) {
         elementValue = elementValue.slice(0, 0 - suffix.length).trim();
       }
     }
