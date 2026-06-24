@@ -37,6 +37,13 @@ interface SerpSettingsDataStore {
     suspend fun getSerpSettings(): String?
 
     fun observeSerpSettings(): Flow<String?>
+
+    /**
+     * Atomically reads the current value, applies [transform], and stores the result within a single
+     * DataStore transaction. Use this instead of a separate get/set pair when merging into the existing
+     * blob, so a concurrent writer (e.g. the SERP's updateNativeSettings) can't cause a lost update.
+     */
+    suspend fun updateSerpSettings(transform: (String?) -> String)
 }
 
 @ContributesBinding(AppScope::class)
@@ -55,6 +62,10 @@ class SerpSettingsPrefsDataStore @Inject constructor(
         store.data
             .map { prefs -> prefs[SERP_SETTINGS] }
             .distinctUntilChanged()
+
+    override suspend fun updateSerpSettings(transform: (String?) -> String) {
+        store.edit { prefs -> prefs[SERP_SETTINGS] = transform(prefs[SERP_SETTINGS]) }
+    }
 
     private companion object {
         private val SERP_SETTINGS = stringPreferencesKey(name = "SERP_SETTINGS")

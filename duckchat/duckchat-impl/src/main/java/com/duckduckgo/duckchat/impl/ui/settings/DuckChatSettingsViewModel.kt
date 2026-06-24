@@ -206,13 +206,17 @@ class DuckChatSettingsViewModel @AssistedInject constructor(
 
     fun duckChatSearchAISettingsClicked() {
         viewModelScope.launch {
-            val showHideAiGeneratedImages = withContext(dispatcherProvider.io()) {
-                duckChatFeature.showHideAiGeneratedImages().isEnabled()
+            val (nativeControlsEnabled, embeddedSettingsEnabled, showHideAiGeneratedImages) = withContext(dispatcherProvider.io()) {
+                Triple(
+                    duckChatFeature.aiFeaturesNativeControls().isEnabled(),
+                    settingsPageFeature.embeddedSettingsWebView().isEnabled(),
+                    duckChatFeature.showHideAiGeneratedImages().isEnabled(),
+                )
             }
 
-            if (duckChatFeature.aiFeaturesNativeControls().isEnabled()) {
+            if (nativeControlsEnabled) {
                 commandChannel.send(ShowSearchAssistDialog(viewState.value.searchAssistVisibility))
-            } else if (settingsPageFeature.embeddedSettingsWebView().isEnabled()) {
+            } else if (embeddedSettingsEnabled) {
                 commandChannel.send(
                     OpenLink(
                         link = if (showHideAiGeneratedImages) {

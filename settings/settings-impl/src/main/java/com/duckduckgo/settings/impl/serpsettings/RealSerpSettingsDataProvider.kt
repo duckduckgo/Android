@@ -45,10 +45,12 @@ class RealSerpSettingsDataProvider @Inject constructor(
 
     override suspend fun setSetting(key: String, value: String) {
         withContext(dispatcherProvider.io()) {
-            val current = serpSettingsDataStore.getSerpSettings()
-            val json = runCatching { JSONObject(current ?: "{}") }.getOrElse { JSONObject() }
-            json.put(key, value)
-            serpSettingsDataStore.setSerpSettings(json.toString())
+            // Merge inside a single transaction so a concurrent SERP updateNativeSettings can't clobber this write.
+            serpSettingsDataStore.updateSerpSettings { current ->
+                val json = runCatching { JSONObject(current ?: "{}") }.getOrElse { JSONObject() }
+                json.put(key, value)
+                json.toString()
+            }
         }
     }
 

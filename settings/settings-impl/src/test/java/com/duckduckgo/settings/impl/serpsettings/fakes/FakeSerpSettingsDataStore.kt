@@ -32,6 +32,10 @@ class FakeSerpSettingsDataStore : SerpSettingsDataStore {
 
     override fun observeSerpSettings(): Flow<String?> = settings
 
+    override suspend fun updateSerpSettings(transform: (String?) -> String) {
+        settings.value = transform(settings.value)
+    }
+
     fun reset() {
         settings.value = null
     }
