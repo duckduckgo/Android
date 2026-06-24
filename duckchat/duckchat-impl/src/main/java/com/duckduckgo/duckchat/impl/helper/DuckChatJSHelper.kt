@@ -22,7 +22,6 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.browser.api.install.AppInstall
 import com.duckduckgo.common.ui.view.encodeBitmapToBase64
 import com.duckduckgo.common.utils.ConflatedJob
-import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputStatePublisher
@@ -45,12 +44,9 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
 import logcat.logcat
 import org.json.JSONArray
 import org.json.JSONObject
-import java.time.Instant
-import java.time.temporal.ChronoUnit
 import java.util.regex.Pattern
 import javax.inject.Inject
 
@@ -110,7 +106,6 @@ class RealDuckChatJSHelper @Inject constructor(
     private val nativeInputStatePublisher: NativeInputStatePublisher,
     private val appInstall: AppInstall,
     private val appBuildConfig: AppBuildConfig,
-    private val currentTimeProvider: CurrentTimeProvider,
 ) : DuckChatJSHelper {
 
     private val registerOpenedJob = ConflatedJob()
@@ -422,25 +417,19 @@ class RealDuckChatJSHelper @Inject constructor(
         return JsCallbackData(jsonPayload, featureName, method, id)
     }
 
-    // Bucketed install age for the Duck.ai prompt pixel; null when the install timestamp isn't recorded
-    // yet or is in the future (clock skew), so the caller omits the param instead of sending a
+    // Bucketed install age for the Duck.ai prompt pixel; null when there's no valid age (timestamp
+    // not recorded yet or in the future), so the caller omits the param instead of sending a
     // misleading bucket.
-    private suspend fun getInstallAgeBucket(): Int? {
-        val installTimestamp = withContext(dispatcherProvider.io()) { appInstall.getInstallationTimestamp() }
-        val nowTimestamp = currentTimeProvider.currentTimeMillis()
-        if (installTimestamp <= 0L || installTimestamp > nowTimestamp) return null
-        val installedAt = Instant.ofEpochMilli(installTimestamp)
-        val now = Instant.ofEpochMilli(nowTimestamp)
-        val days = ChronoUnit.DAYS.between(installedAt, now)
-        return when {
-            days == 0L -> 0
-            days <= 7L -> 1
-            days <= 14L -> 2
-            days <= 21L -> 3
-            days <= 28L -> 4
+    private suspend fun getInstallAgeBucket(): Int? =
+        when (appInstall.getInstallAge()?.inWholeDays) {
+            null -> null
+            0L -> 0
+            in 1L..7L -> 1
+            in 8L..14L -> 2
+            in 15L..21L -> 3
+            in 22L..28L -> 4
             else -> 5
         }
-    }
 
     private fun getAIChatNativePrompt(
         featureName: String,
