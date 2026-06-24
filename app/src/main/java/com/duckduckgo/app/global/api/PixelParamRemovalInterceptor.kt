@@ -172,6 +172,8 @@ object PixelInterceptorPixelsRequiringDataCleaning : PixelParamRemovalPlugin {
             AppPixelName.ONBOARDING_SEARCH_EXPERIENCE.pixelName to PixelParameter.removeAtb(),
             AppPixelName.ONBOARDING_SKIP_ONBOARDING.pixelName to PixelParameter.removeAtb(),
             AppPixelName.ONBOARDING_NOTIFICATIONS.pixelName to PixelParameter.removeAtb(),
+            AppPixelName.ONBOARDING_SEARCH_CHAT_TOGGLE.pixelName to PixelParameter.removeAtb(),
+            AppPixelName.ONBOARDING_AI_INTRO.pixelName to PixelParameter.removeAtb(),
             AppPixelName.SEARCH_AND_FAVORITES_WIDGET_ADDED.pixelName to PixelParameter.removeAtb(),
             AppPixelName.SEARCH_AND_FAVORITES_WIDGET_DELETED.pixelName to PixelParameter.removeAtb(),
             AppPixelName.SEARCH_WIDGET_ADDED.pixelName to PixelParameter.removeAtb(),
