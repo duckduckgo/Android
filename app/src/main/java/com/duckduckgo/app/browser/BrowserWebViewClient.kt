@@ -137,15 +137,17 @@ class BrowserWebViewClient @Inject constructor(
     private val duckChat: DuckChat,
     private val contentScopeExperiments: ContentScopeExperiments,
     private val appSchemeInterceptionFeature: AppSchemeInterceptionFeature,
+    private val forceWebViewRecompositeFeature: ForceWebViewRecompositeFeature,
 ) : WebViewClient() {
     var webViewClientListener: WebViewClientListener? = null
     var clientProvider: ClientBrandHintProvider? = null
     private var lastPageStarted: String? = null
     private var start: Long? = null
     private var lastInterceptedAppSchemeUrl: String? = null
-    private var lastCommitVisibleUrl: String? = null
+    private var pageCommitVisibleFired: Boolean = false
 
     private val isAppSchemeInterceptionEnabled = AtomicBoolean(true)
+    private val isForceRecompositeEnabled = AtomicBoolean(true)
 
     init {
         appCoroutineScope.launch(dispatcherProvider.io()) {
@@ -153,6 +155,13 @@ class BrowserWebViewClient @Inject constructor(
                 .distinctUntilChanged()
                 .collect { enabled ->
                     isAppSchemeInterceptionEnabled.set(enabled)
+                }
+        }
+        appCoroutineScope.launch(dispatcherProvider.io()) {
+            forceWebViewRecompositeFeature.self().enabled()
+                .distinctUntilChanged()
+                .collect { enabled ->
+                    isForceRecompositeEnabled.set(enabled)
                 }
         }
     }
@@ -462,7 +471,7 @@ class BrowserWebViewClient @Inject constructor(
         url: String,
     ) {
         logcat(VERBOSE) { "onPageCommitVisible webViewUrl: ${webView.url} URL: $url progress: ${webView.progress}" }
-        lastCommitVisibleUrl = url
+        pageCommitVisibleFired = true
         // Show only when the commit matches the tab state
         if (webView.url == url) {
             val navigationList = webView.safeCopyBackForwardList() ?: return
@@ -510,7 +519,7 @@ class BrowserWebViewClient @Inject constructor(
         }
 
         lastInterceptedAppSchemeUrl = null
-        lastCommitVisibleUrl = null
+        pageCommitVisibleFired = false
 
         url?.let {
             // See https://app.asana.com/0/0/1206159443951489/f (WebView limitations)
@@ -610,12 +619,14 @@ class BrowserWebViewClient @Inject constructor(
 
         // See https://app.asana.com/0/0/1206159443951489/f (WebView limitations)
         if (webView.progress == 100) {
-            // FALLBACK (recycled-WebView stale frame): the load finished, but if onPageCommitVisible
-            // never fired for this url the recycled WebView keeps drawing the previous navigation's
-            // frame until a re-composite (e.g. tab switch). Force it to present the new content.
-            if (url != null && url != ABOUT_BLANK && lastCommitVisibleUrl != url) {
-                logcat(VERBOSE) { "onPageCommitVisible never fired for $url; forcing present" }
-                forceWebViewPresent(webView)
+            // Without onPageCommitVisible a recycled WebView keeps drawing the previous
+            // navigation's frame until a re-composite. Only worth doing for a foreground tab.
+            if (url != null && url != ABOUT_BLANK && !pageCommitVisibleFired) {
+                if (isForceRecompositeEnabled.get() && webViewClientListener?.isTabInForeground() == true) {
+                    logcat(VERBOSE) { "onPageCommitVisible never fired for $url; forcing present" }
+                    pixel.fire(WebViewPixelName.WEB_VIEW_FORCED_RECOMPOSITE, type = Pixel.PixelType.Daily())
+                    forceWebViewPresent(webView)
+                }
             }
 
             jsPlugins.getPlugins().forEach {
@@ -972,6 +983,7 @@ enum class WebViewPixelName(override val pixelName: String) : Pixel.PixelName {
     WEB_RENDERER_GONE_KILLED("m_web_view_renderer_gone_killed"),
     WEB_PAGE_LOADED("m_web_view_page_loaded"),
     WEB_PAGE_PAINTED("m_web_view_page_painted"),
+    WEB_VIEW_FORCED_RECOMPOSITE("m_web_view_forced_recomposite"),
 }
 
 enum class WebViewErrorResponse(

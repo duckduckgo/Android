@@ -179,6 +179,8 @@ class BrowserWebViewClientTest {
     private val pageLoadWideEvent: PageLoadWideEvent = mock()
     private val mockAppSchemeInterceptionFeature: AppSchemeInterceptionFeature = mock()
     private val appSchemeInterceptionEnabledFlow = MutableStateFlow(true)
+    private val mockForceWebViewRecompositeFeature: ForceWebViewRecompositeFeature = mock()
+    private val forceRecompositeEnabledFlow = MutableStateFlow(true)
 
     @Before
     fun setup() =
@@ -191,6 +193,10 @@ class BrowserWebViewClientTest {
             whenever(enabledToggle.isEnabled()).thenReturn(true)
             whenever(enabledToggle.enabled()).thenReturn(appSchemeInterceptionEnabledFlow)
             whenever(mockAppSchemeInterceptionFeature.self()).thenReturn(enabledToggle)
+            val forceRecompositeToggle: Toggle = mock()
+            whenever(forceRecompositeToggle.isEnabled()).thenReturn(true)
+            whenever(forceRecompositeToggle.enabled()).thenReturn(forceRecompositeEnabledFlow)
+            whenever(mockForceWebViewRecompositeFeature.self()).thenReturn(forceRecompositeToggle)
             testee =
                 BrowserWebViewClient(
                     webViewHttpAuthStore,
@@ -226,6 +232,7 @@ class BrowserWebViewClientTest {
                     mockDuckChat,
                     mockContentScopeExperiments,
                     mockAppSchemeInterceptionFeature,
+                    mockForceWebViewRecompositeFeature,
                 )
             testee.webViewClientListener = listener
             whenever(webResourceRequest.url).thenReturn(Uri.EMPTY)
@@ -1251,6 +1258,65 @@ class BrowserWebViewClientTest {
             verify(listener).onSiteVisited(eq(EXAMPLE_URL), eq(null))
         }
     }
+
+    @Test
+    fun whenPageFinishesAndCommitVisibleNeverFiredAndTabInForegroundThenWebViewRecomposited() {
+        val mockWebView = getImmediatelyInvokedMockWebView()
+        whenever(mockWebView.progress).thenReturn(100)
+        whenever(mockWebView.safeCopyBackForwardList()).thenReturn(TestBackForwardList())
+        whenever(mockWebView.settings).thenReturn(mock())
+        whenever(listener.isTabInForeground()).thenReturn(true)
+        testee.onPageStarted(mockWebView, EXAMPLE_URL, null)
+        testee.onPageFinished(mockWebView, EXAMPLE_URL)
+        verify(mockWebView).onPause()
+        verify(mockWebView).onResume()
+        verify(pixel).fire(WebViewPixelName.WEB_VIEW_FORCED_RECOMPOSITE, type = Pixel.PixelType.Daily())
+    }
+
+    @Test
+    fun whenPageFinishesAndCommitVisibleFiredThenWebViewNotRecomposited() {
+        val mockWebView = getImmediatelyInvokedMockWebView()
+        whenever(mockWebView.progress).thenReturn(100)
+        whenever(mockWebView.safeCopyBackForwardList()).thenReturn(TestBackForwardList())
+        whenever(mockWebView.settings).thenReturn(mock())
+        whenever(listener.isTabInForeground()).thenReturn(true)
+        testee.onPageStarted(mockWebView, EXAMPLE_URL, null)
+        testee.onPageCommitVisible(mockWebView, EXAMPLE_URL)
+        testee.onPageFinished(mockWebView, EXAMPLE_URL)
+        verify(mockWebView, never()).onPause()
+        verify(mockWebView, never()).onResume()
+        verify(pixel, never()).fire(eq(WebViewPixelName.WEB_VIEW_FORCED_RECOMPOSITE), any(), any(), any())
+    }
+
+    @Test
+    fun whenPageFinishesAndCommitVisibleNeverFiredButTabNotInForegroundThenWebViewNotRecomposited() {
+        val mockWebView = getImmediatelyInvokedMockWebView()
+        whenever(mockWebView.progress).thenReturn(100)
+        whenever(mockWebView.safeCopyBackForwardList()).thenReturn(TestBackForwardList())
+        whenever(mockWebView.settings).thenReturn(mock())
+        whenever(listener.isTabInForeground()).thenReturn(false)
+        testee.onPageStarted(mockWebView, EXAMPLE_URL, null)
+        testee.onPageFinished(mockWebView, EXAMPLE_URL)
+        verify(mockWebView, never()).onPause()
+        verify(mockWebView, never()).onResume()
+        verify(pixel, never()).fire(eq(WebViewPixelName.WEB_VIEW_FORCED_RECOMPOSITE), any(), any(), any())
+    }
+
+    @Test
+    fun whenPageFinishesAndCommitVisibleNeverFiredButFeatureDisabledThenWebViewNotRecomposited() =
+        runTest {
+            forceRecompositeEnabledFlow.emit(false)
+            val mockWebView = getImmediatelyInvokedMockWebView()
+            whenever(mockWebView.progress).thenReturn(100)
+            whenever(mockWebView.safeCopyBackForwardList()).thenReturn(TestBackForwardList())
+            whenever(mockWebView.settings).thenReturn(mock())
+            whenever(listener.isTabInForeground()).thenReturn(true)
+            testee.onPageStarted(mockWebView, EXAMPLE_URL, null)
+            testee.onPageFinished(mockWebView, EXAMPLE_URL)
+            verify(mockWebView, never()).onPause()
+            verify(mockWebView, never()).onResume()
+            verify(pixel, never()).fire(eq(WebViewPixelName.WEB_VIEW_FORCED_RECOMPOSITE), any(), any(), any())
+        }
 
     @Test
     fun whenPageStartedMoreThanOnceThenStartTimeIsNotUpdated() {
