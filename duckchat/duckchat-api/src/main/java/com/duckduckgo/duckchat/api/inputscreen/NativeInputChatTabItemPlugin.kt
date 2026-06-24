@@ -62,7 +62,7 @@ interface NativeInputChatTabItemPlugin : ActivePlugin {
  * view holders, and the host only positions them.
  *
  * Input state the item needs to decide its rows — the current query, the displayed mode — is read from
- * the shared state in this module (e.g. [com.duckduckgo.duckchat.api.DuckChatInputModeState.chatQuery]
+ * the shared state in this module (e.g. [com.duckduckgo.duckchat.api.DuckChatInputModeState.inputQuery]
  * and `displayedMode`), not pushed in here. An item observes that state (combining it with its own
  * async data) and updates its adapter(s); an item with no rows contributes no content and does not keep
  * the suggestions overlay open. For the common single-view card see [SingleViewChatTabItem].

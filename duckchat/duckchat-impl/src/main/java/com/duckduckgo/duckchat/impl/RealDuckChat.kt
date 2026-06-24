@@ -127,11 +127,10 @@ interface DuckChatInternal : DuckChat {
     fun setSelectedMode(mode: InputMode)
 
     /**
-     * Updates the live Chat-tab query. Called by [InputModeWidget] as the user types on the Chat tab,
-     * and reset to [""] when the Chat tab isn't the target, to keep [DuckChatInputModeState.chatQuery]
-     * in sync with the actual widget state.
+     * Updates the live input query. Called by [InputModeWidget] as the user types (on either tab) and
+     * on attach/detach, to keep [DuckChatInputModeState.inputQuery] in sync with the shared input field.
      */
-    fun setChatQuery(query: String)
+    fun setInputQuery(query: String)
 
     /**
      * Observes whether DuckChat is user enabled or disabled.
@@ -404,7 +403,7 @@ class RealDuckChat @Inject constructor(
     private val _showContextualMode = MutableStateFlow(false)
     private val _allowDuckAiAsDigitalAssistant = MutableStateFlow(false)
     private val _displayedMode = MutableStateFlow(InputMode.SEARCH)
-    private val _chatQuery = MutableStateFlow("")
+    private val _inputQuery = MutableStateFlow("")
 
     private val jsonAdapter: JsonAdapter<DuckChatSettingJson> by lazy {
         moshi.adapter(DuckChatSettingJson::class.java)
@@ -835,10 +834,10 @@ class RealDuckChat @Inject constructor(
         _displayedMode.value = mode
     }
 
-    override val chatQuery: StateFlow<String> = _chatQuery.asStateFlow()
+    override val inputQuery: StateFlow<String> = _inputQuery.asStateFlow()
 
-    override fun setChatQuery(query: String) {
-        _chatQuery.value = query
+    override fun setInputQuery(query: String) {
+        _inputQuery.value = query
     }
 
     private suspend fun hasActiveSession(): Boolean {
