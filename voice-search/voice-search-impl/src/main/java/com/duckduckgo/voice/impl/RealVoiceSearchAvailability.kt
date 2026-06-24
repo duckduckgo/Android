@@ -23,6 +23,9 @@ import com.duckduckgo.voice.impl.remoteconfig.VoiceSearchFeature
 import com.duckduckgo.voice.impl.remoteconfig.VoiceSearchFeatureRepository
 import com.duckduckgo.voice.store.VoiceSearchRepository
 import com.squareup.anvil.annotations.ContributesBinding
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 @ContributesBinding(AppScope::class)
@@ -49,6 +52,11 @@ class RealVoiceSearchAvailability @Inject constructor(
 
     override val isVoiceSearchAvailable: Boolean
         get() = isVoiceSearchSupported && voiceSearchRepository.isVoiceSearchUserEnabled(voiceSearchRepository.getHasAcceptedRationaleDialog())
+
+    override fun isVoiceSearchAvailableFlow(): Flow<Boolean> =
+        voiceSearchRepository.voiceSearchUserEnabledFlow(voiceSearchRepository.getHasAcceptedRationaleDialog())
+            .map { userEnabled -> isVoiceSearchSupported && userEnabled }
+            .distinctUntilChanged()
 
     private fun hasValidVersion(sdkInt: Int) = voiceSearchFeatureRepository.minVersion?.let { minVersion ->
         sdkInt >= minVersion

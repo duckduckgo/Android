@@ -27,6 +27,7 @@ dependencies {
     ksp AndroidX.room.compiler
 
     implementation AndroidX.core.ktx
+    implementation KotlinX.coroutines.core
     implementation Square.moshi
     implementation "com.squareup.moshi:moshi-kotlin:_"
     implementation "com.squareup.moshi:moshi-adapters:_"

@@ -16,9 +16,18 @@
 
 package com.duckduckgo.voice.api
 
+import kotlinx.coroutines.flow.Flow
+
 interface VoiceSearchAvailability {
     val isVoiceSearchSupported: Boolean
     val isVoiceSearchAvailable: Boolean
+
+    /**
+     * Emits [isVoiceSearchAvailable] now and again whenever the user toggles "Private Voice Search",
+     * so consumers can re-evaluate visibility immediately instead of waiting for the next focus or
+     * page-load event.
+     */
+    fun isVoiceSearchAvailableFlow(): Flow<Boolean>
     fun shouldShowVoiceSearch(
         hasFocus: Boolean = false,
         query: String = "",
