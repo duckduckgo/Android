@@ -51,6 +51,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
@@ -630,7 +631,7 @@ class DuckChatSettingsViewModelTest {
         }
 
     @Test
-    fun `when onDuckAiHideAiGeneratedImagesClicked then pixel is fired`() =
+    fun `when onDuckAiHideAiGeneratedImagesClicked and native controls disabled then SERP open pixel is fired`() =
         runTest {
             testee.onDuckAiHideAiGeneratedImagesClicked()
             verify(mockPixel).fire(DuckChatPixelName.SERP_SETTINGS_OPEN_HIDE_AI_GENERATED_IMAGES)
@@ -682,6 +683,9 @@ class DuckChatSettingsViewModelTest {
                     cancelAndIgnoreRemainingEvents()
                 }
             }
+
+            // The SERP-open pixel must not fire for the native dialog; it only tracks opening the SERP webview.
+            verify(mockPixel, never()).fire(DuckChatPixelName.SERP_SETTINGS_OPEN_HIDE_AI_GENERATED_IMAGES)
         }
 
     @Test

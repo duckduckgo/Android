@@ -261,8 +261,9 @@ class DuckChatSettingsViewModel @AssistedInject constructor(
                         titleRes = R.string.duckAiSerpSettingsTitle,
                     ),
                 )
+                // Only fires when we open the SERP settings webview; the native dialog is a different surface.
+                pixel.fire(DuckChatPixelName.SERP_SETTINGS_OPEN_HIDE_AI_GENERATED_IMAGES)
             }
-            pixel.fire(DuckChatPixelName.SERP_SETTINGS_OPEN_HIDE_AI_GENERATED_IMAGES)
         }
     }
 
