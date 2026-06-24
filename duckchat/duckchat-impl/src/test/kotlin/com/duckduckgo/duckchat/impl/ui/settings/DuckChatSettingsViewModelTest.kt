@@ -29,12 +29,14 @@ import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelParameters
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.store.DefaultTogglePosition
+import com.duckduckgo.duckchat.impl.store.HideAiGeneratedImages
 import com.duckduckgo.duckchat.impl.store.SearchAssistVisibility
 import com.duckduckgo.duckchat.impl.ui.settings.DuckChatSettingsViewModel.Command.LaunchFeedback
 import com.duckduckgo.duckchat.impl.ui.settings.DuckChatSettingsViewModel.Command.OpenLink
 import com.duckduckgo.duckchat.impl.ui.settings.DuckChatSettingsViewModel.Command.OpenLinkInNewTab
 import com.duckduckgo.duckchat.impl.ui.settings.DuckChatSettingsViewModel.Command.OpenShortcutSettings
 import com.duckduckgo.duckchat.impl.ui.settings.DuckChatSettingsViewModel.Command.ShowDefaultTogglePositionDialog
+import com.duckduckgo.duckchat.impl.ui.settings.DuckChatSettingsViewModel.Command.ShowHideAiGeneratedImagesDialog
 import com.duckduckgo.duckchat.impl.ui.settings.DuckChatSettingsViewModel.Command.ShowSearchAssistDialog
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
@@ -79,6 +81,7 @@ class DuckChatSettingsViewModelTest {
             whenever(duckChat.observeInputScreenUserSettingEnabled()).thenReturn(flowOf(false))
             whenever(duckChat.observeAutomaticContextAttachmentUserSettingEnabled()).thenReturn(flowOf(false))
             whenever(duckChat.observeDefaultTogglePosition()).thenReturn(flowOf(DefaultTogglePosition.SEARCH))
+            whenever(duckChat.observeHideAiGeneratedImages()).thenReturn(flowOf(HideAiGeneratedImages.OFF))
             whenever(serpSettingsDataProvider.observeSetting(SearchAssistVisibility.SERP_SETTINGS_KEY)).thenReturn(flowOf(null))
             testee = DuckChatSettingsViewModel(
                 duckChatActivityParams = DuckChatSettingsNoParams,
@@ -649,6 +652,43 @@ class DuckChatSettingsViewModelTest {
                 assertEquals(R.string.duckAiSerpSettingsTitle, command.titleRes)
                 cancelAndIgnoreRemainingEvents()
             }
+        }
+
+    @Test
+    fun `when onDuckAiHideAiGeneratedImagesClicked and native controls enabled then ShowHideAiGeneratedImagesDialog emitted`() =
+        runTest {
+            @Suppress("DenyListedApi")
+            duckChatFeature.aiFeaturesNativeControls().setRawStoredState(State(enable = true))
+            whenever(duckChat.observeHideAiGeneratedImages()).thenReturn(flowOf(HideAiGeneratedImages.ON))
+            testee = DuckChatSettingsViewModel(
+                duckChatActivityParams = DuckChatSettingsNoParams,
+                duckChat = duckChat,
+                pixel = mockPixel,
+                inputScreenDiscoveryFunnel = mockInputScreenDiscoveryFunnel,
+                settingsPageFeature = settingsPageFeature,
+                duckChatPixels = mockDuckChatPixels,
+                dispatcherProvider = coroutineRule.testDispatcherProvider,
+                duckChatFeature = duckChatFeature,
+            )
+
+            testee.viewState.test {
+                awaitItem()
+                testee.onDuckAiHideAiGeneratedImagesClicked()
+
+                testee.commands.test {
+                    val command = awaitItem()
+                    assertTrue(command is ShowHideAiGeneratedImagesDialog)
+                    assertEquals(HideAiGeneratedImages.ON, (command as ShowHideAiGeneratedImagesDialog).current)
+                    cancelAndIgnoreRemainingEvents()
+                }
+            }
+        }
+
+    @Test
+    fun `when hide ai generated images selected then persisted via duckChat`() =
+        runTest {
+            testee.onHideAiGeneratedImagesSelected(HideAiGeneratedImages.ON)
+            verify(duckChat).setHideAiGeneratedImages(HideAiGeneratedImages.ON)
         }
 
     @Test

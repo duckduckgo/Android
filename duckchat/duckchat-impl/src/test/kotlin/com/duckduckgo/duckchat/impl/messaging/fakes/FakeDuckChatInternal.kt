@@ -23,6 +23,8 @@ import com.duckduckgo.duckchat.api.InputMode
 import com.duckduckgo.duckchat.impl.ChatState
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.store.DefaultTogglePosition
+import com.duckduckgo.duckchat.impl.store.HideAiGeneratedImages
+import com.duckduckgo.duckchat.impl.store.SearchAssistVisibility
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -223,6 +225,14 @@ class FakeDuckChatInternal(
 
     override fun observeDefaultTogglePosition(): Flow<DefaultTogglePosition> =
         _defaultTogglePosition.map { DefaultTogglePosition.fromName(it) }
+
+    private val _hideAiGeneratedImages = MutableStateFlow(HideAiGeneratedImages.OFF)
+
+    override suspend fun setHideAiGeneratedImages(option: HideAiGeneratedImages) {
+        _hideAiGeneratedImages.value = option
+    }
+
+    override fun observeHideAiGeneratedImages(): Flow<HideAiGeneratedImages> = _hideAiGeneratedImages
 
     override suspend fun saveLastUsedTogglePosition(position: String) { }
 

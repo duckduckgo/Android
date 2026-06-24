@@ -57,6 +57,7 @@ import com.duckduckgo.duckchat.impl.databinding.IncludeDuckAiInputScreenSettings
 import com.duckduckgo.duckchat.impl.inputscreen.ui.metrics.discovery.InputScreenDiscoveryFunnel
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_SETTINGS_DISPLAYED
 import com.duckduckgo.duckchat.impl.store.DefaultTogglePosition
+import com.duckduckgo.duckchat.impl.store.HideAiGeneratedImages
 import com.duckduckgo.duckchat.impl.store.SearchAssistVisibility
 import com.duckduckgo.duckchat.impl.store.getDefaultTogglePositionForIndex
 import com.duckduckgo.duckchat.impl.ui.settings.DuckChatSettingsViewModel.DuckChatSettingsViewModelFactory
@@ -295,6 +296,11 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
 
                     with(duckAiHideAiGeneratedImagesLink) {
                         isVisible = true
+                        // When native controls are on the row reflects the current On/Off state and opens the
+                        // native dialog; otherwise it keeps its static description and opens the SERP webview.
+                        if (viewState.isNativeControlsEnabled) {
+                            setSecondaryText(getString(viewState.hideAiGeneratedImages.toDisplayNameRes()))
+                        }
                         setOnClickListener {
                             viewModel.onDuckAiHideAiGeneratedImagesClicked()
                         }
@@ -359,6 +365,10 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
             is DuckChatSettingsViewModel.Command.ShowSearchAssistDialog -> {
                 showSearchAssistVisibilityDialog(command.currentVisibility)
             }
+
+            is DuckChatSettingsViewModel.Command.ShowHideAiGeneratedImagesDialog -> {
+                showHideAiGeneratedImagesDialog(command.current)
+            }
         }
     }
 
@@ -422,6 +432,42 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
                     override fun onPositiveButtonClicked(selectedItem: Int) {
                         options.getOrNull(selectedItem - 1)?.let {
                             viewModel.onSearchAssistVisibilitySelected(it)
+                        }
+                    }
+                },
+            ).show()
+    }
+
+    // The order Hide AI-Generated Images options are presented in the dialog. Pre-selection and the chosen
+    // result are both derived from this list, so they stay in sync independently of the SERP `kbj` encoding.
+    private val hideAiGeneratedImagesOptions: List<HideAiGeneratedImages> = listOf(
+        HideAiGeneratedImages.ON,
+        HideAiGeneratedImages.OFF,
+    )
+
+    @StringRes
+    private fun HideAiGeneratedImages.toDisplayNameRes(): Int =
+        when (this) {
+            HideAiGeneratedImages.ON -> CommonR.string.on
+            HideAiGeneratedImages.OFF -> CommonR.string.off
+        }
+
+    private fun showHideAiGeneratedImagesDialog(current: HideAiGeneratedImages) {
+        val options = hideAiGeneratedImagesOptions
+        RadioListAlertDialogBuilder(this)
+            .setTitle(R.string.duckAiHideAiGeneratedImagesTitle)
+            .setMessage(R.string.duckAiHideAiGeneratedImagesDescription)
+            .setOptions(
+                options.map { it.toDisplayNameRes() },
+                options.indexOf(current).takeIf { index -> index >= 0 }?.plus(1),
+            )
+            .setPositiveButton(CommonR.string.dialogSave)
+            .setNegativeButton(CommonR.string.cancel)
+            .addEventListener(
+                object : RadioListAlertDialogBuilder.EventListener() {
+                    override fun onPositiveButtonClicked(selectedItem: Int) {
+                        options.getOrNull(selectedItem - 1)?.let {
+                            viewModel.onHideAiGeneratedImagesSelected(it)
                         }
                     }
                 },

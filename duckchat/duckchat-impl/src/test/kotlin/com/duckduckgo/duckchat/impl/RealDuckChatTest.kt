@@ -40,11 +40,13 @@ import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.repository.AddressBarPickerAttributionRepository
 import com.duckduckgo.duckchat.impl.repository.DuckChatFeatureRepository
 import com.duckduckgo.duckchat.impl.store.DefaultTogglePosition
+import com.duckduckgo.duckchat.impl.store.HideAiGeneratedImages
 import com.duckduckgo.duckchat.impl.voice.VoiceSessionStateManager
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
+import com.duckduckgo.settings.api.SerpSettingsDataProvider
 import com.duckduckgo.sync.api.DeviceSyncState
 import com.squareup.moshi.Moshi
 import kotlinx.coroutines.CoroutineStart
@@ -97,6 +99,7 @@ class RealDuckChatTest {
     private val mockDuckAiHostProvider: DuckAiHostProvider = mock()
     private val mockAppBuildConfig: AppBuildConfig = mock()
     private val mockVoiceSessionStateManager: VoiceSessionStateManager = mock()
+    private val mockSerpSettingsDataProvider: SerpSettingsDataProvider = mock()
 
     private lateinit var testee: RealDuckChat
 
@@ -113,6 +116,7 @@ class RealDuckChatTest {
         whenever(mockDuckChatFeatureRepository.lastSessionTimestamp()).thenReturn(0L)
         whenever(mockContext.getString(any())).thenReturn("Duck.ai")
         whenever(mockDuckAiHostProvider.getHost()).thenReturn("duck.ai")
+        whenever(mockSerpSettingsDataProvider.observeSetting(any())).thenReturn(flowOf(null))
         duckChatFeature.self().setRawStoredState(State(enable = true))
         duckChatFeature.duckAiInputScreen().setRawStoredState(State(enable = true))
         duckChatFeature.duckAiVoiceSearch().setRawStoredState(State(enable = false))
@@ -138,6 +142,7 @@ class RealDuckChatTest {
                 mockDuckAiHostProvider,
                 mockAppBuildConfig,
                 mockVoiceSessionStateManager,
+                mockSerpSettingsDataProvider,
             ),
         )
         coroutineRule.testScope.advanceUntilIdle()
@@ -1828,6 +1833,26 @@ class RealDuckChatTest {
         testee.showModelPickerEvents.test {
             testee.requestShowModelPicker("tab-1")
             assertEquals("tab-1", awaitItem())
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenSerpProvidesHideAiImagesThenObserveReturnsMappedOption() = runTest {
+        whenever(mockSerpSettingsDataProvider.observeSetting(HideAiGeneratedImages.SERP_SETTINGS_KEY)).thenReturn(flowOf("1"))
+
+        testee.observeHideAiGeneratedImages().test {
+            assertEquals(HideAiGeneratedImages.ON, awaitItem())
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenSerpHasNoHideAiImagesValueThenObserveDefaultsToOff() = runTest {
+        whenever(mockSerpSettingsDataProvider.observeSetting(HideAiGeneratedImages.SERP_SETTINGS_KEY)).thenReturn(flowOf(null))
+
+        testee.observeHideAiGeneratedImages().test {
+            assertEquals(HideAiGeneratedImages.OFF, awaitItem())
             cancelAndConsumeRemainingEvents()
         }
     }
