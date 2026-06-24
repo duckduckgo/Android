@@ -388,6 +388,7 @@ import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
+import org.mockito.kotlin.stub
 import org.mockito.kotlin.whenever
 import org.robolectric.RuntimeEnvironment
 import org.robolectric.annotation.Config
@@ -2943,9 +2944,9 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenRestoringWebViewSessionNotRestorableThenPreviousUrlLoaded() {
+    fun whenRestoringWebViewSessionNotRestorableThenPreviousUrlLoaded() = runTest {
         whenever(mockOmnibarConverter.convertQueryToUrl("foo.com")).thenReturn("foo.com")
-        whenever(webViewSessionStorage.restoreSession(anyOrNull(), anyString())).thenReturn(false)
+        webViewSessionStorage.stub { onBlocking { restoreSession(anyOrNull(), anyString()) }.thenReturn(false) }
         testee.restoreWebViewState(null, "foo.com")
 
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
@@ -2954,17 +2955,31 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenRestoringWebViewSessionNotRestorableAndNoPreviousUrlThenNoUrlLoaded() {
-        whenever(webViewSessionStorage.restoreSession(anyOrNull(), anyString())).thenReturn(false)
+    fun whenRestoringWebViewSessionNotRestorableAndNoPreviousUrlThenNoUrlLoaded() = runTest {
+        webViewSessionStorage.stub { onBlocking { restoreSession(anyOrNull(), anyString()) }.thenReturn(false) }
         testee.restoreWebViewState(null, "")
         assertFalse(commandCaptor.allValues.any { it is Navigate })
     }
 
     @Test
-    fun whenWebViewSessionRestorableThenSessionRestored() {
-        whenever(webViewSessionStorage.restoreSession(anyOrNull(), anyString())).thenReturn(true)
+    fun whenWebViewSessionRestorableThenSessionRestored() = runTest {
+        webViewSessionStorage.stub { onBlocking { restoreSession(anyOrNull(), anyString()) }.thenReturn(true) }
         testee.restoreWebViewState(null, "")
         assertFalse(browserGlobalLayoutViewState().isNewTabState)
+    }
+
+    @Test
+    fun whenRestoringWebViewSessionNotRestorableAndLastUrlBlankThenTabEntityUrlLoaded() = runTest {
+        val tabUrl = "https://example.com/"
+        whenever(mockOmnibarConverter.convertQueryToUrl(tabUrl)).thenReturn(tabUrl)
+        testee.loadData("TAB_ID", tabUrl, skipHome = false, isExternal = false)
+        webViewSessionStorage.stub { onBlocking { restoreSession(anyOrNull(), anyString()) }.thenReturn(false) }
+
+        testee.restoreWebViewState(null, "")
+
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        val command = commandCaptor.allValues.filterIsInstance<Navigate>().last()
+        assertEquals(tabUrl, command.url)
     }
 
     @Test

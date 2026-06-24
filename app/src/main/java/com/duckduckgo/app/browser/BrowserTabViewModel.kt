@@ -1016,9 +1016,8 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun onViewReady() {
-        url?.let {
-            onUserSubmittedQuery(it)
-        }
+        // Navigation is handled by restoreWebViewState in onViewStateRestored: it either
+        // restores the persisted WebView session or falls back to navigating to TabEntity.url.
     }
 
     fun onViewRecreated() {
@@ -3462,7 +3461,7 @@ class BrowserTabViewModel @Inject constructor(
         webViewSessionStorage.saveSession(webView, tabId)
     }
 
-    fun restoreWebViewState(
+    suspend fun restoreWebViewState(
         webView: WebView?,
         lastUrl: String,
     ) {
@@ -3471,9 +3470,10 @@ class BrowserTabViewModel @Inject constructor(
             logcat(VERBOSE) { "Successfully restored session" }
             onWebSessionRestored()
         } else {
-            if (lastUrl.isNotBlank()) {
-                logcat(WARN) { "Restoring last url but page history has been lost - url=[$lastUrl]" }
-                onUserSubmittedQuery(lastUrl)
+            val fallbackUrl = lastUrl.ifBlank { url ?: "" }
+            if (fallbackUrl.isNotBlank()) {
+                logcat(WARN) { "Restoring last url but page history has been lost - url=[$fallbackUrl]" }
+                onUserSubmittedQuery(fallbackUrl)
             }
         }
     }
