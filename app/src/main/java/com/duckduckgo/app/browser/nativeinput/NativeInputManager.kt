@@ -79,6 +79,7 @@ class NativeInputCallbacks(
     val onDuckAiQuerySubmitted: (query: String) -> Unit = {},
     /** User picked a model in the native picker (→ submitChangeModelAction). */
     val onChangeModelSubmitted: (modelId: String) -> Unit = {},
+    val onCustomizeResponsesClicked: () -> Unit = {},
     val onChatUrlSuggestionClicked: (AutoCompleteSuggestion) -> Unit = {},
     val onChatHistoryShortcutClicked: () -> Unit = {},
     val onClearAutocomplete: () -> Unit,
@@ -253,12 +254,6 @@ class RealNativeInputManager @Inject constructor(
         val isBottom = widgetFrom(widgetView)?.isWidgetBottom() ?: false
         isExiting = true
         if (!omnibarController.isDuckAiMode() && card != null && omnibarCard != null && omnibarCard.width > 0) {
-            if (isBottom) {
-                // Bottom omnibar: trigger IME hide synchronously so the activity resizes
-                // (adjustResize), letting the bottom-anchored widgetView descend to its
-                // post-IME-hide layout position before the exit animation captures its snapshot.
-                widgetFrom(widgetView)?.hideKeyboard()
-            }
             layoutCoordinator.setWidgetAnimating(true)
             animator.animateExit(
                 widgetCard = card,
@@ -462,7 +457,6 @@ class RealNativeInputManager @Inject constructor(
                     val filesJson = widget.getFileAttachmentsJson()
                     widget.text = ""
                     widget.clearAttachments()
-                    widget.hideKeyboard()
                     callbacks.onDuckAiChatSubmitted(
                         query,
                         widget.getSelectedModelId(),
@@ -510,7 +504,6 @@ class RealNativeInputManager @Inject constructor(
             // target so the hide sticks. In SEARCH_AND_DUCK_AI the field has already lost focus, so
             // this is a no-op there.
             widget.clearInputFocus()
-            widget.hideKeyboard()
             hideNativeInput()
         }
         val previousOnChatSelected = widget.onChatSelected
@@ -580,6 +573,7 @@ class RealNativeInputManager @Inject constructor(
         widgetFrom(widgetView)?.apply {
             onStopTapped = callbacks.onStopTapped
             onFireButtonTapped = callbacks.onFireButtonPressed
+            onCustomizeResponsesClicked = callbacks.onCustomizeResponsesClicked
             bindTabCount(lifecycleOwner, tabs.map { it.size })
             hideMainButtons()
             onAttachmentChooserStateChanged = { showing -> isPickingImage = showing }
@@ -775,13 +769,7 @@ class RealNativeInputManager @Inject constructor(
                 layoutCoordinator.setWidgetAnimating(false)
                 widgetFrom(widgetView)?.let { widget ->
                     widget.endEnterAnimationPreview()
-                    // Symmetric teardown for bottom mode: beginEnterAnimationPreview's
-                    // showKeyboard() requested focus + raised the IME. onEnterComplete is what
-                    // "owns" the focused state on success, so on cancel we undo it here —
-                    // otherwise the widget is left half-entered (focused, IME up) without the
-                    // animation having completed.
                     if (widget.isWidgetBottom()) {
-                        widget.hideKeyboard()
                         widget.clearInputFocus()
                     }
                 }

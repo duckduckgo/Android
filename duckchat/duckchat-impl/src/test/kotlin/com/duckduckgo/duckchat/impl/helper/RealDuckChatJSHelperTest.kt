@@ -1641,6 +1641,14 @@ class RealDuckChatJSHelperTest {
     }
 
     @Test
+    fun whenNativeActionCustomizeResponsesRequestedThenSubscriptionDataSent() = runTest {
+        val result = testee.onNativeAction(NativeAction.CUSTOMIZE_RESPONSES)
+
+        assertEquals("submitCustomizeResponsesAction", result.subscriptionName)
+        assertEquals(DUCK_CHAT_FEATURE_NAME, result.featureName)
+    }
+
+    @Test
     fun whenGetAIChatNativeHandoffDataThenReportOpenIsCalled() = runTest {
         val featureName = "aiChat"
         val method = "getAIChatNativeHandoffData"

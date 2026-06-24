@@ -138,6 +138,13 @@ interface DuckChatFeature {
     fun nativeInputField(): Toggle
 
     /**
+     * @return `true` when the "Customize Responses" action is shown in the Duck.ai unified input options menu.
+     * If the remote feature is not present defaults to `internal`.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun customizeResponses(): Toggle
+
+    /**
      * @return `true` when the Input Screen onboarding wide event should be sent
      * If the remote feature is not present defaults to `internal`
      */

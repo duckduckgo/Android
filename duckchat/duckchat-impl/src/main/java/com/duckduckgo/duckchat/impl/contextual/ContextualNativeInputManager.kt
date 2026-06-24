@@ -154,7 +154,6 @@ class RealContextualNativeInputManager @Inject constructor(
         widget.bindInputEvents(
             onSearchTextChanged = { },
             onSearchSubmitted = { query ->
-                widget.hideKeyboard()
                 onSearchSubmitted(query)
             },
             onChatSubmitted = { prompt ->
