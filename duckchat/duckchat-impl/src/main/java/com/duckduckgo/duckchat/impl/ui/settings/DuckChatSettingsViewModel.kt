@@ -38,16 +38,19 @@ import com.duckduckgo.duckchat.impl.ui.settings.DuckChatSettingsViewModel.Comman
 import com.duckduckgo.duckchat.impl.ui.settings.DuckChatSettingsViewModel.Command.OpenShortcutSettings
 import com.duckduckgo.duckchat.impl.ui.settings.DuckChatSettingsViewModel.Command.ShowSearchAssistDialog
 import com.duckduckgo.navigation.api.GlobalActivityStarter
+import com.duckduckgo.settings.api.SerpSettingsDataProvider
 import com.duckduckgo.settings.api.SettingsPageFeature
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -62,6 +65,7 @@ class DuckChatSettingsViewModel @AssistedInject constructor(
     private val duckChatPixels: DuckChatPixels,
     private val dispatcherProvider: DispatcherProvider,
     private val duckChatFeature: DuckChatFeature,
+    private val serpSettingsDataProvider: SerpSettingsDataProvider,
 ) : ViewModel() {
     private val commandChannel = Channel<Command>(capacity = 1, onBufferOverflow = DROP_OLDEST)
     val commands = commandChannel.receiveAsFlow()
@@ -125,7 +129,7 @@ class DuckChatSettingsViewModel @AssistedInject constructor(
             featureState,
             featureVisibility,
             duckChat.observeDefaultTogglePosition(),
-            duckChat.observeSearchAssistVisibility(),
+            observeSearchAssistVisibility(),
         ) { featureState, featureVisibility, defaultTogglePosition, searchAssistVisibility ->
             val isDuckChatUserEnabled = featureState.isDuckChatUserEnabled
             val isInputScreenEnabled = featureState.isCosmeticInputScreenEnabled ?: featureState.isInputScreenEnabled
@@ -295,9 +299,15 @@ class DuckChatSettingsViewModel @AssistedInject constructor(
 
     fun onSearchAssistVisibilitySelected(visibility: SearchAssistVisibility) {
         viewModelScope.launch {
-            duckChat.setSearchAssistVisibility(visibility)
+            // The SERP blob is the single source of truth, so the web reflects this on its next getNativeSettings.
+            serpSettingsDataProvider.setSetting(SearchAssistVisibility.SERP_SETTINGS_KEY, visibility.serpCode)
         }
     }
+
+    // Emits null until the user (or SERP) has provided a value; callers default it.
+    private fun observeSearchAssistVisibility(): Flow<SearchAssistVisibility?> =
+        serpSettingsDataProvider.observeSetting(SearchAssistVisibility.SERP_SETTINGS_KEY)
+            .map { SearchAssistVisibility.fromSerpCode(it) }
 
     fun duckAiInputScreenShareFeedbackClicked() {
         viewModelScope.launch {

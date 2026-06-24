@@ -38,6 +38,7 @@ import com.duckduckgo.duckchat.impl.ui.settings.DuckChatSettingsViewModel.Comman
 import com.duckduckgo.duckchat.impl.ui.settings.DuckChatSettingsViewModel.Command.ShowSearchAssistDialog
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
+import com.duckduckgo.settings.api.SerpSettingsDataProvider
 import com.duckduckgo.settings.api.SettingsPageFeature
 import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.flow.flowOf
@@ -64,6 +65,7 @@ class DuckChatSettingsViewModelTest {
     private val mockDuckChatPixels: DuckChatPixels = mock()
     private val settingsPageFeature = FakeFeatureToggleFactory.create(SettingsPageFeature::class.java)
     private val duckChatFeature = FakeFeatureToggleFactory.create(DuckChatFeature::class.java)
+    private val serpSettingsDataProvider: SerpSettingsDataProvider = mock()
 
     @Before
     fun setUp() =
@@ -77,7 +79,7 @@ class DuckChatSettingsViewModelTest {
             whenever(duckChat.observeInputScreenUserSettingEnabled()).thenReturn(flowOf(false))
             whenever(duckChat.observeAutomaticContextAttachmentUserSettingEnabled()).thenReturn(flowOf(false))
             whenever(duckChat.observeDefaultTogglePosition()).thenReturn(flowOf(DefaultTogglePosition.SEARCH))
-            whenever(duckChat.observeSearchAssistVisibility()).thenReturn(flowOf(null))
+            whenever(serpSettingsDataProvider.observeSetting(SearchAssistVisibility.SERP_SETTINGS_KEY)).thenReturn(flowOf(null))
             testee = DuckChatSettingsViewModel(
                 duckChatActivityParams = DuckChatSettingsNoParams,
                 duckChat = duckChat,
@@ -87,6 +89,7 @@ class DuckChatSettingsViewModelTest {
                 duckChatPixels = mockDuckChatPixels,
                 dispatcherProvider = coroutineRule.testDispatcherProvider,
                 duckChatFeature = duckChatFeature,
+                serpSettingsDataProvider = serpSettingsDataProvider,
             )
         }
 
@@ -160,6 +163,7 @@ class DuckChatSettingsViewModelTest {
                 duckChatPixels = mockDuckChatPixels,
                 dispatcherProvider = coroutineRule.testDispatcherProvider,
                 duckChatFeature = duckChatFeature,
+                serpSettingsDataProvider = serpSettingsDataProvider,
             )
 
             testee.viewState.test {
@@ -181,6 +185,7 @@ class DuckChatSettingsViewModelTest {
                 duckChatPixels = mockDuckChatPixels,
                 dispatcherProvider = coroutineRule.testDispatcherProvider,
                 duckChatFeature = duckChatFeature,
+                serpSettingsDataProvider = serpSettingsDataProvider,
             )
 
             testee.viewState.test {
@@ -202,6 +207,7 @@ class DuckChatSettingsViewModelTest {
                 duckChatPixels = mockDuckChatPixels,
                 dispatcherProvider = coroutineRule.testDispatcherProvider,
                 duckChatFeature = duckChatFeature,
+                serpSettingsDataProvider = serpSettingsDataProvider,
             )
 
             testee.viewState.test {
@@ -223,6 +229,7 @@ class DuckChatSettingsViewModelTest {
                 duckChatPixels = mockDuckChatPixels,
                 dispatcherProvider = coroutineRule.testDispatcherProvider,
                 duckChatFeature = duckChatFeature,
+                serpSettingsDataProvider = serpSettingsDataProvider,
             )
 
             testee.viewState.test {
@@ -244,6 +251,7 @@ class DuckChatSettingsViewModelTest {
                 duckChatPixels = mockDuckChatPixels,
                 dispatcherProvider = coroutineRule.testDispatcherProvider,
                 duckChatFeature = duckChatFeature,
+                serpSettingsDataProvider = serpSettingsDataProvider,
             )
 
             testee.viewState.test {
@@ -265,6 +273,7 @@ class DuckChatSettingsViewModelTest {
                 duckChatPixels = mockDuckChatPixels,
                 dispatcherProvider = coroutineRule.testDispatcherProvider,
                 duckChatFeature = duckChatFeature,
+                serpSettingsDataProvider = serpSettingsDataProvider,
             )
 
             testee.viewState.test {
@@ -287,6 +296,7 @@ class DuckChatSettingsViewModelTest {
                 duckChatPixels = mockDuckChatPixels,
                 dispatcherProvider = coroutineRule.testDispatcherProvider,
                 duckChatFeature = duckChatFeature,
+                serpSettingsDataProvider = serpSettingsDataProvider,
             )
 
             testee.viewState.test {
@@ -310,6 +320,7 @@ class DuckChatSettingsViewModelTest {
                 duckChatPixels = mockDuckChatPixels,
                 dispatcherProvider = coroutineRule.testDispatcherProvider,
                 duckChatFeature = duckChatFeature,
+                serpSettingsDataProvider = serpSettingsDataProvider,
             )
 
             testee.viewState.test {
@@ -399,6 +410,7 @@ class DuckChatSettingsViewModelTest {
                 duckChatPixels = mockDuckChatPixels,
                 dispatcherProvider = coroutineRule.testDispatcherProvider,
                 duckChatFeature = duckChatFeature,
+                serpSettingsDataProvider = serpSettingsDataProvider,
             )
 
             testee.duckChatSearchAISettingsClicked()
@@ -496,6 +508,7 @@ class DuckChatSettingsViewModelTest {
                 duckChatPixels = mockDuckChatPixels,
                 dispatcherProvider = coroutineRule.testDispatcherProvider,
                 duckChatFeature = duckChatFeature,
+                serpSettingsDataProvider = serpSettingsDataProvider,
             )
 
             testee.viewState.test {
@@ -518,6 +531,7 @@ class DuckChatSettingsViewModelTest {
                 duckChatPixels = mockDuckChatPixels,
                 dispatcherProvider = coroutineRule.testDispatcherProvider,
                 duckChatFeature = duckChatFeature,
+                serpSettingsDataProvider = serpSettingsDataProvider,
             )
 
             testee.viewState.test {
@@ -540,6 +554,7 @@ class DuckChatSettingsViewModelTest {
                 duckChatPixels = mockDuckChatPixels,
                 dispatcherProvider = coroutineRule.testDispatcherProvider,
                 duckChatFeature = duckChatFeature,
+                serpSettingsDataProvider = serpSettingsDataProvider,
             )
 
             testee.viewState.test {
@@ -561,6 +576,7 @@ class DuckChatSettingsViewModelTest {
                 duckChatPixels = mockDuckChatPixels,
                 dispatcherProvider = coroutineRule.testDispatcherProvider,
                 duckChatFeature = duckChatFeature,
+                serpSettingsDataProvider = serpSettingsDataProvider,
             )
 
             testee.viewState.test {
@@ -580,6 +596,7 @@ class DuckChatSettingsViewModelTest {
                 duckChatPixels = mockDuckChatPixels,
                 dispatcherProvider = coroutineRule.testDispatcherProvider,
                 duckChatFeature = duckChatFeature,
+                serpSettingsDataProvider = serpSettingsDataProvider,
             )
 
             testee.viewState.test {
@@ -600,6 +617,7 @@ class DuckChatSettingsViewModelTest {
                 duckChatPixels = mockDuckChatPixels,
                 dispatcherProvider = coroutineRule.testDispatcherProvider,
                 duckChatFeature = duckChatFeature,
+                serpSettingsDataProvider = serpSettingsDataProvider,
             )
 
             testee.viewState.test {
@@ -668,6 +686,7 @@ class DuckChatSettingsViewModelTest {
                 duckChatPixels = mockDuckChatPixels,
                 dispatcherProvider = coroutineRule.testDispatcherProvider,
                 duckChatFeature = duckChatFeature,
+                serpSettingsDataProvider = serpSettingsDataProvider,
             )
 
             testee.viewState.test {
@@ -688,6 +707,7 @@ class DuckChatSettingsViewModelTest {
                 duckChatPixels = mockDuckChatPixels,
                 dispatcherProvider = coroutineRule.testDispatcherProvider,
                 duckChatFeature = duckChatFeature,
+                serpSettingsDataProvider = serpSettingsDataProvider,
             )
 
             testee.viewState.test {
@@ -711,6 +731,7 @@ class DuckChatSettingsViewModelTest {
                 duckChatPixels = mockDuckChatPixels,
                 dispatcherProvider = coroutineRule.testDispatcherProvider,
                 duckChatFeature = duckChatFeature,
+                serpSettingsDataProvider = serpSettingsDataProvider,
             )
 
             testee.viewState.test {
@@ -734,6 +755,7 @@ class DuckChatSettingsViewModelTest {
                 duckChatPixels = mockDuckChatPixels,
                 dispatcherProvider = coroutineRule.testDispatcherProvider,
                 duckChatFeature = duckChatFeature,
+                serpSettingsDataProvider = serpSettingsDataProvider,
             )
 
             testee.viewState.test {
@@ -756,6 +778,7 @@ class DuckChatSettingsViewModelTest {
                 duckChatPixels = mockDuckChatPixels,
                 dispatcherProvider = coroutineRule.testDispatcherProvider,
                 duckChatFeature = duckChatFeature,
+                serpSettingsDataProvider = serpSettingsDataProvider,
             )
 
             testee.viewState.test {
@@ -780,6 +803,7 @@ class DuckChatSettingsViewModelTest {
                 duckChatPixels = mockDuckChatPixels,
                 dispatcherProvider = coroutineRule.testDispatcherProvider,
                 duckChatFeature = duckChatFeature,
+                serpSettingsDataProvider = serpSettingsDataProvider,
             )
 
             testee.viewState.test {
@@ -804,6 +828,7 @@ class DuckChatSettingsViewModelTest {
                 duckChatPixels = mockDuckChatPixels,
                 dispatcherProvider = coroutineRule.testDispatcherProvider,
                 duckChatFeature = duckChatFeature,
+                serpSettingsDataProvider = serpSettingsDataProvider,
             )
 
             testee.viewState.test {
@@ -828,6 +853,7 @@ class DuckChatSettingsViewModelTest {
                 duckChatPixels = mockDuckChatPixels,
                 dispatcherProvider = coroutineRule.testDispatcherProvider,
                 duckChatFeature = duckChatFeature,
+                serpSettingsDataProvider = serpSettingsDataProvider,
             )
 
             testee.viewState.test {
@@ -852,6 +878,7 @@ class DuckChatSettingsViewModelTest {
                 duckChatPixels = mockDuckChatPixels,
                 dispatcherProvider = coroutineRule.testDispatcherProvider,
                 duckChatFeature = duckChatFeature,
+                serpSettingsDataProvider = serpSettingsDataProvider,
             )
 
             testee.viewState.test {
@@ -876,6 +903,7 @@ class DuckChatSettingsViewModelTest {
                 duckChatPixels = mockDuckChatPixels,
                 dispatcherProvider = coroutineRule.testDispatcherProvider,
                 duckChatFeature = duckChatFeature,
+                serpSettingsDataProvider = serpSettingsDataProvider,
             )
 
             testee.viewState.test {
@@ -896,6 +924,7 @@ class DuckChatSettingsViewModelTest {
                 duckChatPixels = mockDuckChatPixels,
                 dispatcherProvider = coroutineRule.testDispatcherProvider,
                 duckChatFeature = duckChatFeature,
+                serpSettingsDataProvider = serpSettingsDataProvider,
             )
 
             testee.viewState.test {
@@ -963,16 +992,17 @@ class DuckChatSettingsViewModelTest {
         }
 
     @Test
-    fun `when search assist visibility selected then persisted via duckChat`() =
+    fun `when search assist visibility selected then persisted to SERP settings`() =
         runTest {
             testee.onSearchAssistVisibilitySelected(SearchAssistVisibility.OFTEN)
-            verify(duckChat).setSearchAssistVisibility(SearchAssistVisibility.OFTEN)
+            verify(serpSettingsDataProvider).setSetting(SearchAssistVisibility.SERP_SETTINGS_KEY, SearchAssistVisibility.OFTEN.serpCode)
         }
 
     @Test
     fun `when search assist visibility already stored then viewState reflects it`() =
         runTest {
-            whenever(duckChat.observeSearchAssistVisibility()).thenReturn(flowOf(SearchAssistVisibility.SOMETIMES))
+            whenever(serpSettingsDataProvider.observeSetting(SearchAssistVisibility.SERP_SETTINGS_KEY))
+                .thenReturn(flowOf(SearchAssistVisibility.SOMETIMES.serpCode))
             testee = DuckChatSettingsViewModel(
                 duckChatActivityParams = DuckChatSettingsNoParams,
                 duckChat = duckChat,
@@ -982,6 +1012,7 @@ class DuckChatSettingsViewModelTest {
                 duckChatPixels = mockDuckChatPixels,
                 dispatcherProvider = coroutineRule.testDispatcherProvider,
                 duckChatFeature = duckChatFeature,
+                serpSettingsDataProvider = serpSettingsDataProvider,
             )
 
             testee.viewState.test {
@@ -995,7 +1026,8 @@ class DuckChatSettingsViewModelTest {
         runTest {
             @Suppress("DenyListedApi")
             duckChatFeature.aiFeaturesNativeControls().setRawStoredState(State(enable = true))
-            whenever(duckChat.observeSearchAssistVisibility()).thenReturn(flowOf(SearchAssistVisibility.SOMETIMES))
+            whenever(serpSettingsDataProvider.observeSetting(SearchAssistVisibility.SERP_SETTINGS_KEY))
+                .thenReturn(flowOf(SearchAssistVisibility.SOMETIMES.serpCode))
             testee = DuckChatSettingsViewModel(
                 duckChatActivityParams = DuckChatSettingsNoParams,
                 duckChat = duckChat,
@@ -1005,6 +1037,7 @@ class DuckChatSettingsViewModelTest {
                 duckChatPixels = mockDuckChatPixels,
                 dispatcherProvider = coroutineRule.testDispatcherProvider,
                 duckChatFeature = duckChatFeature,
+                serpSettingsDataProvider = serpSettingsDataProvider,
             )
 
             testee.viewState.test {

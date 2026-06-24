@@ -23,7 +23,6 @@ import com.duckduckgo.duckchat.api.InputMode
 import com.duckduckgo.duckchat.impl.ChatState
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.store.DefaultTogglePosition
-import com.duckduckgo.duckchat.impl.store.SearchAssistVisibility
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -224,15 +223,6 @@ class FakeDuckChatInternal(
 
     override fun observeDefaultTogglePosition(): Flow<DefaultTogglePosition> =
         _defaultTogglePosition.map { DefaultTogglePosition.fromName(it) }
-
-    private val _searchAssistVisibility = MutableStateFlow<String?>(null)
-
-    override suspend fun setSearchAssistVisibility(visibility: SearchAssistVisibility) {
-        _searchAssistVisibility.value = visibility.name
-    }
-
-    override fun observeSearchAssistVisibility(): Flow<SearchAssistVisibility?> =
-        _searchAssistVisibility.map { SearchAssistVisibility.fromName(it) }
 
     override suspend fun saveLastUsedTogglePosition(position: String) { }
 
