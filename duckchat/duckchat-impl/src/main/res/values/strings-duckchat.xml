@@ -47,14 +47,6 @@
     <string name="duck_ai_shortcut_settings_title">Duck.ai Shortcuts</string>
     <string name="duck_ai_shortcut_settings_description">Choose which Duck.ai shortcuts to display</string>
 
-    <!-- Search Assist Visibility -->
-    <string name="duckAiSearchAssistVisibilityTitle">Search Assist Visibility</string>
-    <string name="duckAiSearchAssistVisibilitySubtitle">Choose how often you want AI-assisted answers to appear in your searches.</string>
-    <string name="duckAiSearchAssistVisibilityNever">Never</string>
-    <string name="duckAiSearchAssistVisibilityOnDemand">On demand</string>
-    <string name="duckAiSearchAssistVisibilitySometimes">Sometimes</string>
-    <string name="duckAiSearchAssistVisibilityOften">Often</string>
-
     <!-- Default Toggle Position -->
     <string name="duckAiDefaultTogglePositionTitle" instruction="'Toggle' refers to the UI tab switcher component (Search/Duck.ai), not the verb 'to toggle'.">New tab toggle position</string>
     <string name="duckAiDefaultTogglePositionSearch">Search</string>

@@ -72,4 +72,12 @@
     <!-- Duck AI Duck.ai Section Header -->
     <string name="duckAiDuckAiSectionHeader">Duck.ai</string>
 
+    <!-- Search Assist Visibility -->
+    <string name="duckAiSearchAssistVisibilityTitle">Search Assist Visibility</string>
+    <string name="duckAiSearchAssistVisibilitySubtitle">Choose how often you want AI-assisted answers to appear in your searches.</string>
+    <string name="duckAiSearchAssistVisibilityNever">Never</string>
+    <string name="duckAiSearchAssistVisibilityOnDemand">On demand</string>
+    <string name="duckAiSearchAssistVisibilitySometimes">Sometimes</string>
+    <string name="duckAiSearchAssistVisibilityOften">Often</string>
+
 </resources>
