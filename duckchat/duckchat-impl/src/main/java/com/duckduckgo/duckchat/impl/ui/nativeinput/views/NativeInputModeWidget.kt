@@ -51,7 +51,6 @@ import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggesti
 import com.duckduckgo.browser.ui.PulseAnimation
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.ViewViewModelFactory
-import com.duckduckgo.common.utils.extensions.hideKeyboard
 import com.duckduckgo.common.utils.extensions.showKeyboard
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
@@ -114,8 +113,6 @@ interface NativeInputWidget {
     fun beginEnterAnimationPreview(isBottom: Boolean)
     fun endEnterAnimationPreview()
     fun selectAllText()
-    fun hideKeyboard()
-    fun showKeyboard()
     fun selectChatTab()
     fun selectSearchTab()
     fun applyDefaultTogglePosition()
@@ -125,7 +122,6 @@ interface NativeInputWidget {
     fun setVoiceSearchAvailable(available: Boolean)
     fun setVoiceChatAvailable(available: Boolean)
     fun submitMessage(message: String?)
-    fun submitAsChat(): Boolean
     fun setToggleVisible(visible: Boolean)
     fun setFloatingSubmitContainer(container: ViewGroup)
     fun getSelectedModelId(): String?
@@ -530,9 +526,6 @@ class NativeInputModeWidget @JvmOverloads constructor(
             updateBottomRowVisibility()
             applyVerticalPaddingForFocus()
             nativeInputState?.let { updateFireButtonVisibility(it) }
-            if (!hasFocus && isDuckAiPageContext()) {
-                hideKeyboard()
-            }
         }
     }
 
@@ -936,22 +929,14 @@ class NativeInputModeWidget @JvmOverloads constructor(
         applyVerticalPaddingForFocus()
     }
 
-    override fun hideKeyboard() {
-        if (duckChatFeature.customizeResponses().isEnabled()) {
-            (context.getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager)
-                ?.hideSoftInputFromWindow(windowToken, 0)
-        } else {
-            (context as? Activity)?.hideKeyboard(inputField)
-        }
+    fun hideKeyboard() {
+        (context.getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager)
+            ?.hideSoftInputFromWindow(windowToken, 0)
     }
 
-    override fun showKeyboard() {
-        if (duckChatFeature.customizeResponses().isEnabled()) {
-            (context.getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager)
-                ?.showSoftInput(inputField, InputMethodManager.SHOW_IMPLICIT)
-        } else {
-            (context as? Activity)?.showKeyboard(inputField)
-        }
+    fun showKeyboard() {
+        (context.getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager)
+            ?.showSoftInput(inputField, InputMethodManager.SHOW_IMPLICIT)
     }
 
     override fun selectChatTab() {
@@ -1509,7 +1494,6 @@ class NativeInputModeWidget @JvmOverloads constructor(
         alpha = if (locked) LOCKED_ALPHA else 1f
         if (locked) {
             clearInputFocus()
-            hideKeyboard()
         }
     }
 
