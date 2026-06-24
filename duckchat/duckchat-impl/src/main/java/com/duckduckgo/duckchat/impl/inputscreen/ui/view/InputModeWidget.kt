@@ -172,7 +172,11 @@ open class InputModeWidget @JvmOverloads constructor(
             override fun onTabSelected(tab: TabLayout.Tab) {
                 val mode = if (tab.position == 0) InputMode.SEARCH else InputMode.DUCK_AI
                 duckChatInternal.setSelectedMode(mode)
-                duckChatInternal.setChatQuery(if (mode == InputMode.DUCK_AI) currentChatQuery() else "")
+                // inputQuery tracks the shared input field, not the selected tab — the field is shared
+                // between Search and Chat, so the query is the same on both. Don't reset to "" on the
+                // Search tab: a chat-tab item driven by inputQuery would then go stale while Search is
+                // active and flash on switch-back. displayedMode carries the tab; inputQuery the text.
+                duckChatInternal.setInputQuery(currentInputQuery())
             }
             override fun onTabUnselected(tab: TabLayout.Tab?) {}
             override fun onTabReselected(tab: TabLayout.Tab?) {}
@@ -210,13 +214,13 @@ open class InputModeWidget @JvmOverloads constructor(
         inputModeSwitch.addOnTabSelectedListener(duckChatTabSelectedListener)
         val mode = if (inputModeSwitch.selectedTabPosition == 0) InputMode.SEARCH else InputMode.DUCK_AI
         duckChatInternal.setSelectedMode(mode)
-        duckChatInternal.setChatQuery(if (mode == InputMode.DUCK_AI) currentChatQuery() else "")
+        duckChatInternal.setInputQuery(currentInputQuery())
     }
 
     override fun onDetachedFromWindow() {
         inputModeSwitch.removeOnTabSelectedListener(duckChatTabSelectedListener)
         duckChatInternal.setSelectedMode(InputMode.SEARCH)
-        duckChatInternal.setChatQuery("")
+        duckChatInternal.setInputQuery("")
         super.onDetachedFromWindow()
     }
 
@@ -335,12 +339,20 @@ open class InputModeWidget @JvmOverloads constructor(
                 onSubmitMessageAvailable?.invoke(textToSubmit != null)
                 onVoiceInputAllowed?.invoke(!hasTextChangedFromOriginal || inputField.text.isBlank())
 
+                val liveQuery = textToSubmit?.toString().orEmpty()
+                // Keep inputQuery in sync with the shared input field on every keystroke, regardless of
+                // the active tab, so a chat-tab item driven by it settles while the Search tab is
+                // active and is already correct when the Chat tab re-renders (no flash on switch-back).
+                // Guard on attach: duckChatInternal is injected in onAttachedToWindow, but the field can
+                // be set before then (e.g. omnibar prefill); onAttachedToWindow publishes the initial
+                // query, so nothing is lost by skipping the pre-attach changes here.
+                if (isAttachedToWindow) {
+                    duckChatInternal.setInputQuery(liveQuery)
+                }
                 when (inputModeSwitch.selectedTabPosition) {
-                    0 -> onSearchTextChanged?.invoke(textToSubmit?.toString().orEmpty())
+                    0 -> onSearchTextChanged?.invoke(liveQuery)
                     1 -> {
-                        val chatQuery = textToSubmit?.toString().orEmpty()
-                        onChatTextChanged?.invoke(chatQuery)
-                        duckChatInternal.setChatQuery(chatQuery)
+                        onChatTextChanged?.invoke(liveQuery)
                         if (tabAttachmentsEnabled) {
                             onChatTagTextChanged?.invoke(
                                 inputField.text.toString(),
@@ -494,7 +506,7 @@ open class InputModeWidget @JvmOverloads constructor(
 
     fun isChatTabSelected(): Boolean = inputModeSwitch.selectedTabPosition == 1
 
-    private fun currentChatQuery(): String = inputField.text.getTextToSubmit()?.toString().orEmpty()
+    private fun currentInputQuery(): String = inputField.text.getTextToSubmit()?.toString().orEmpty()
 
     fun setScrollPosition(
         position: Int,

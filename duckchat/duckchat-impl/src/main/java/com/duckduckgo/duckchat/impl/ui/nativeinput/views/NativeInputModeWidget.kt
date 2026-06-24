@@ -1195,7 +1195,8 @@ class NativeInputModeWidget @JvmOverloads constructor(
         this.onClearSuggestions = onClearSuggestions
 
         // Lazy: bindChatSuggestions runs before attach, so @Inject fields and the ViewModel
-        // aren't ready yet. showSuggestions() only fires post-attach.
+        // aren't ready yet. The binding is created at attach (see onAttachedToWindow) or on the
+        // first showSuggestions(), whichever comes first — both run post-attach.
         fun ensureBinding(): NativeInputChatSuggestionsBinder.Binding {
             return chatSuggestionsBinding ?: chatSuggestionsBinder.create(
                 onChatSuggestionSelected = { suggestion ->
@@ -1253,6 +1254,11 @@ class NativeInputModeWidget @JvmOverloads constructor(
         this.onChatTextChanged = { text ->
             showSuggestions(text)
         }
+
+        // Load plugins at attach (or now, if already attached) rather than on the first Chat-tab show,
+        // so they're live regardless of the selected tab and their rows exist before the Chat tab first
+        // renders (otherwise a late insert flashes). ensureBinding() is idempotent.
+        doOnAttach { ensureBinding() }
     }
 
     private fun tearDownChatSuggestions() {

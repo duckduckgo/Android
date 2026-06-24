@@ -231,12 +231,12 @@ class FakeDuckChatInternal(
         _displayedMode.value = mode
     }
 
-    private val _chatQuery = MutableStateFlow("")
+    private val _inputQuery = MutableStateFlow("")
 
-    override val chatQuery: StateFlow<String> = _chatQuery.asStateFlow()
+    override val inputQuery: StateFlow<String> = _inputQuery.asStateFlow()
 
-    override fun setChatQuery(query: String) {
-        _chatQuery.value = query
+    override fun setInputQuery(query: String) {
+        _inputQuery.value = query
     }
 
     fun setDuckChatUserEnabled(enabled: Boolean) {

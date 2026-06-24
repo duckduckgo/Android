@@ -30,7 +30,7 @@ import kotlinx.coroutines.launch
  *
  * Provide the view in [onCreateView] and a [visible] flow that drives whether the row is shown. The
  * flow is the single knob: compose it from whatever state the item cares about — e.g.
- * `chatQuery.map { it.isEmpty() }` for a zero-state card that hides while the user types, the item's
+ * `inputQuery.map { it.isEmpty() }` for a zero-state card that hides while the user types, the item's
  * own data for a state-driven card, both combined, or `flowOf(true)` to always show. [hide] is a
  * sticky override (e.g. on dismiss) that wins over [visible] for the rest of the presentation.
  *

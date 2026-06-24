@@ -287,7 +287,7 @@ class NativeInputChatSuggestionsBinderTest {
 
         // The user types: the live query updates before the typed query's fetch submits, and the
         // zero-state card drops its rows in response.
-        chatQueryFlow.value = "a"
+        inputQueryFlow.value = "a"
         adapter.setCount(0)
 
         // The recompute must read the live query (typing) and keep the overlay open, not close it.
@@ -321,10 +321,10 @@ class NativeInputChatSuggestionsBinderTest {
 
     private val scope = CoroutineScope(SupervisorJob())
 
-    private val chatQueryFlow = MutableStateFlow("")
+    private val inputQueryFlow = MutableStateFlow("")
     private val inputModeState = object : DuckChatInputModeState {
         override val displayedMode: StateFlow<InputMode> = MutableStateFlow(InputMode.SEARCH)
-        override val chatQuery: StateFlow<String> = chatQueryFlow
+        override val inputQuery: StateFlow<String> = inputQueryFlow
     }
 
     private fun binderWith(vararg plugins: NativeInputChatTabItemPlugin): NativeInputChatSuggestionsBinder =

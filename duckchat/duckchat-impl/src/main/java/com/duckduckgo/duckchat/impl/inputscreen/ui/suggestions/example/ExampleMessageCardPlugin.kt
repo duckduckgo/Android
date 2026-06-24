@@ -39,9 +39,9 @@ import javax.inject.Inject
  * - implement [NativeInputChatTabItemPlugin] in your own module, gated by [ContributesActivePlugin]
  *   (here `INTERNAL`, so it only appears in internal/dev builds),
  * - return a [SingleViewChatTabItem] for a single static view — no adapter to write,
- * - drive visibility from the shared input state: here `chatQuery.map { it.isEmpty() }` makes it a
+ * - drive visibility from the shared input state: here `inputQuery.map { it.isEmpty() }` makes it a
  *   zero-state card (hidden once the user types). A card that should stay while typing would simply
- *   not include `chatQuery` in its `visible` flow.
+ *   not include `inputQuery` in its `visible` flow.
  * - `priority` picks the slot from [NativeInputChatTabItemPlugin]'s constants.
  *
  * This is a showcase — delete it (and its strings) once real consumers exist.
@@ -66,7 +66,7 @@ private class ExampleMessageCardItem(
     inputModeState: DuckChatInputModeState,
     scope: CoroutineScope,
 ) : SingleViewChatTabItem(
-    visible = inputModeState.chatQuery.map { it.isEmpty() }, // zero-state: shown only on empty query
+    visible = inputModeState.inputQuery.map { it.isEmpty() }, // zero-state: shown only on empty query
     scope = scope,
 ) {
 
