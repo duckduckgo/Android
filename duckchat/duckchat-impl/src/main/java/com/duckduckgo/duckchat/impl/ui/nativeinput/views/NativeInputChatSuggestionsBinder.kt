@@ -136,7 +136,9 @@ class NativeInputChatSuggestionsBinder @Inject constructor(
             val commit = { onCommit(hasChat || inputModeState.inputQuery.value.isNotEmpty() || pluginHasContent()) }
             recomputeOverlay = commit
 
-            chatSuggestionsAdapter.submitList(suggestions.chatHistory) { commit() }
+            chatSuggestionsAdapter.submitList(suggestions.chatHistory) {
+                commit()
+            }
             if (showUrl) {
                 urlAdapter.updateData(suggestions.urlSuggestions.query, suggestions.urlSuggestions.suggestions)
             } else {
