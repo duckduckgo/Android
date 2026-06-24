@@ -486,6 +486,7 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
 
     private fun systemPermissionGranted() {
         grantPermissions()
+
         // Fire mode grants the in-session WebView permission above so the page works, but must not
         // persist the grant into the shared site-permissions store.
         if (browserMode != BrowserMode.FIRE) {

@@ -37,7 +37,7 @@ import javax.inject.Inject
 @ContributesMultibinding(AppScope::class)
 class DuckChatDataClearingPlugin @Inject constructor(
     private val duckChatDeleter: DuckChatDeleter,
-    @FireMode private val fireChatStore: DuckAiChatStore,
+    @param:FireMode private val fireChatStore: DuckAiChatStore,
     private val fireModeAvailability: FireModeAvailability,
     private val duckChatSyncRepository: DuckChatSyncRepository,
     private val syncEngine: SyncEngine,
@@ -57,17 +57,24 @@ class DuckChatDataClearingPlugin @Inject constructor(
         }
     }
 
-    private suspend fun deleteAllForMode(mode: BrowserMode) = when (mode) {
-        BrowserMode.REGULAR -> deleteAllRegularChats()
-        BrowserMode.FIRE -> if (fireModeAvailability.isAvailable()) fireChatStore.deleteAllChats() else Unit
+    private suspend fun deleteAllForMode(mode: BrowserMode) {
+        when (mode) {
+            BrowserMode.REGULAR -> deleteAllRegularChats()
+            BrowserMode.FIRE -> if (fireModeAvailability.isAvailable()) {
+                fireChatStore.deleteAllChats()
+            }
+        }
     }
 
-    private suspend fun deleteSelectedForMode(chatUrls: Set<String>, mode: BrowserMode) = when (mode) {
-        BrowserMode.REGULAR -> deleteSelectedRegular(chatUrls)
-        BrowserMode.FIRE -> if (fireModeAvailability.isAvailable()) {
-            chatUrls.forEach { url -> url.toUri().toChatIdOrNull(duckChat)?.let { fireChatStore.deleteChat(it) } }
-        } else {
-            Unit
+
+    private suspend fun deleteSelectedForMode(chatUrls: Set<String>, mode: BrowserMode) {
+        when (mode) {
+            BrowserMode.REGULAR -> deleteSelectedRegular(chatUrls)
+            BrowserMode.FIRE -> if (fireModeAvailability.isAvailable()) {
+                chatUrls.forEach { url ->
+                    url.toUri().toChatIdOrNull(duckChat)?.let { fireChatStore.deleteChat(it) }
+                }
+            }
         }
     }
 
