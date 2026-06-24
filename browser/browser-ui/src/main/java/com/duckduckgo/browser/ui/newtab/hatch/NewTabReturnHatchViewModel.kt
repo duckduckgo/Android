@@ -106,8 +106,9 @@ class NewTabReturnHatchViewModel @Inject constructor(
         pendingClose,
         tabRepository.flowTabs,
         duckChat.observeNativeInputFieldUserSettingEnabled(),
-    ) { tab, closed, tabs, nativeInputEnabled ->
-        if (tab != null && !closed && tabs.any { it.tabId == tab.tabId }) {
+        ntpAfterIdleManager.returnToLastTabEnabled,
+    ) { tab, closed, tabs, nativeInputEnabled, returnToLastTabEnabled ->
+        if (tab != null && !closed && returnToLastTabEnabled && tabs.any { it.tabId == tab.tabId }) {
             val url = tab.url.orEmpty()
             ViewState(
                 tabTitle = tab.title.orEmpty(),
@@ -183,5 +184,12 @@ class NewTabReturnHatchViewModel @Inject constructor(
     fun onAfterInactivityPressed() {
         pixel.fire(NewTabReturnHatchPixelName.OPTION_SELECTED_AFTER_INACTIVITY, type = Count)
         pixel.fire(NewTabReturnHatchPixelName.OPTION_SELECTED_AFTER_INACTIVITY_DAILY, type = Daily())
+    }
+
+    fun onDontShowThisPressed() {
+        // Disable the hatch for future idle returns.
+        viewModelScope.launch(dispatchers.io()) {
+            ntpAfterIdleManager.setReturnToLastTabEnabled(false)
+        }
     }
 }

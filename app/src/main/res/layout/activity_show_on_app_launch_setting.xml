@@ -46,6 +46,13 @@
                 tools:secondaryText="5 minutes"
                 tools:visibility="visible" />
 
+            <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+                android:id="@+id/afterInactivityTimeoutDivider"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                tools:visibility="visible" />
+
             <com.duckduckgo.common.ui.view.text.DaxTextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -87,6 +94,23 @@
                 android:paddingBottom="@dimen/keyline_2"
                 app:type="single_line"
                 tools:ignore="HardcodedText" />
+
+            <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+                android:id="@+id/returnToLastTabDivider"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                tools:visibility="visible" />
+
+            <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+                android:id="@+id/returnToLastTabToggle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                app:primaryText="@string/returnToLastTabSettingTitle"
+                app:secondaryText="@string/returnToLastTabSettingSubtitle"
+                app:showSwitch="true"
+                tools:visibility="visible" />
 
         </LinearLayout>
     </ScrollView>

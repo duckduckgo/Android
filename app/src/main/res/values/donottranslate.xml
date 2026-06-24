@@ -145,4 +145,7 @@
     <string name="preOnboardingDaxDialog3ButtonCustomAi">Start AI Chat</string>
     <!-- Pre-onboarding: input demo screen -->
     <string name="preOnboardingInputModeDemoTitleCustomAi">Now, try a private AI chat!</string>
+    <!-- After Inactivity: return-to-last-tab hatch setting -->
+    <string name="returnToLastTabSettingTitle">Return To Last Tab</string>
+    <string name="returnToLastTabSettingSubtitle">Show a link to your last tab on the New Tab Page when you reopen the app</string>
 </resources>
