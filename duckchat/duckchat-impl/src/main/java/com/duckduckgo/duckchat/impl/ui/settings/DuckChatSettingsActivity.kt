@@ -278,7 +278,13 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
             if (viewState.isSearchSectionVisible) {
                 with(showDuckChatSearchSettingsLink) {
                     isVisible = true
-                    setSecondaryText(getString(viewState.searchAssistVisibility.toDisplayNameRes()))
+                    setSecondaryText(
+                        if (viewState.isNativeControlsEnabled) {
+                            getString(viewState.searchAssistVisibility.toDisplayNameRes())
+                        } else {
+                            getString(R.string.duck_chat_assist_settings_description)
+                        },
+                    )
                     setOnClickListener {
                         viewModel.duckChatSearchAISettingsClicked()
                     }
