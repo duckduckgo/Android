@@ -35,6 +35,16 @@ interface DuckChatInputModeState {
      * no Duck.ai input widget is attached.
      */
     val displayedMode: StateFlow<InputMode>
+
+    /**
+     * The current Chat-tab query — the text typed while the Chat tab is the input target.
+     *
+     * High-frequency (updates per keystroke), kept as its own flow so it doesn't churn
+     * [displayedMode] consumers. Holds [""] when the Chat tab isn't the target (Search tab selected
+     * or no widget attached), mirroring how [displayedMode] resets to [InputMode.SEARCH]. A sibling
+     * `searchQuery` can follow the same pattern for the Search tab.
+     */
+    val chatQuery: StateFlow<String>
 }
 
 /**

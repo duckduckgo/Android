@@ -71,6 +71,8 @@ import com.google.android.material.card.MaterialCardView
 import com.google.android.material.tabs.TabLayout
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -248,6 +250,10 @@ class NativeInputModeWidget @JvmOverloads constructor(
     private var hasAttachments: Boolean = false
     private var nativeInputState: NativeInputState? = null
     private var chatSuggestionsBinding: NativeInputChatSuggestionsBinder.Binding? = null
+
+    // Outlives a single suggestions presentation (survives clear() on tab switches); handed to chat-item
+    // plugins so they can collect into their adapters. Cancelled in tearDownChatSuggestions().
+    private var chatItemPluginScope: CoroutineScope? = null
     private var onShowSuggestions: ((RecyclerView.Adapter<*>) -> Unit)? = null
     private var onClearSuggestions: ((Boolean) -> Unit)? = null
     private var voiceSearchAvailable: Boolean = false
@@ -1205,7 +1211,17 @@ class NativeInputModeWidget @JvmOverloads constructor(
                     onSearchForQuerySubmitted(query)
                 },
                 onChatHistoryShortcutClicked = onChatHistoryShortcutClicked,
-            ).also { chatSuggestionsBinding = it }
+            ).also { binding ->
+                chatSuggestionsBinding = binding
+                val owner = findViewTreeLifecycleOwner()
+                if (owner != null) {
+                    val pluginScope = CoroutineScope(SupervisorJob() + dispatchers.main())
+                    chatItemPluginScope = pluginScope
+                    owner.lifecycleScope.launch {
+                        binding.loadPluginItems(context, pluginScope)
+                    }
+                }
+            }
         }
 
         fun showSuggestions(query: String) {
@@ -1241,6 +1257,8 @@ class NativeInputModeWidget @JvmOverloads constructor(
 
     private fun tearDownChatSuggestions() {
         hideChatSuggestions(hideList = true)
+        chatItemPluginScope?.cancel()
+        chatItemPluginScope = null
         chatSuggestionsBinding = null
         onShowSuggestions = null
         onClearSuggestions = null

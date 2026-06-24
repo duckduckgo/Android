@@ -339,6 +339,7 @@ import com.duckduckgo.browser.api.webviewcompat.WebViewCompatWrapper
 import com.duckduckgo.browser.api.wideevents.BrowserInteractionsPlugin
 import com.duckduckgo.browser.ui.autocomplete.AutocompleteHistoryDeleteFeature
 import com.duckduckgo.browser.ui.browsermenu.VpnMenuState
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.ui.tabs.SwipingTabsFeatureProvider
 import com.duckduckgo.common.utils.AppUrl
 import com.duckduckgo.common.utils.AppUrl.ParamKey.QUERY
@@ -577,6 +578,7 @@ class BrowserTabViewModel @Inject constructor(
     private val onboardingStore: OnboardingStore,
     private val autocompleteHistoryDeleteFeature: AutocompleteHistoryDeleteFeature,
     private val customAiOnboardingStore: CustomAiOnboardingStore,
+    private val browserMode: BrowserMode,
     private val desktopModeSettings: DesktopModeSettings,
     private val rememberDesktopModeFeature: RememberDesktopModeFeature,
 ) : ViewModel(),
@@ -1018,9 +1020,8 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun onViewReady() {
-        url?.let {
-            onUserSubmittedQuery(it)
-        }
+        // Navigation is handled by restoreWebViewState in onViewStateRestored: it either
+        // restores the persisted WebView session or falls back to navigating to TabEntity.url.
     }
 
     fun onViewRecreated() {
@@ -3487,7 +3488,7 @@ class BrowserTabViewModel @Inject constructor(
         webViewSessionStorage.saveSession(webView, tabId)
     }
 
-    fun restoreWebViewState(
+    suspend fun restoreWebViewState(
         webView: WebView?,
         lastUrl: String,
     ) {
@@ -3496,9 +3497,10 @@ class BrowserTabViewModel @Inject constructor(
             logcat(VERBOSE) { "Successfully restored session" }
             onWebSessionRestored()
         } else {
-            if (lastUrl.isNotBlank()) {
-                logcat(WARN) { "Restoring last url but page history has been lost - url=[$lastUrl]" }
-                onUserSubmittedQuery(lastUrl)
+            val fallbackUrl = lastUrl.ifBlank { url ?: "" }
+            if (fallbackUrl.isNotBlank()) {
+                logcat(WARN) { "Restoring last url but page history has been lost - url=[$fallbackUrl]" }
+                onUserSubmittedQuery(fallbackUrl)
             }
         }
     }
@@ -4846,6 +4848,7 @@ class BrowserTabViewModel @Inject constructor(
                         id,
                         data,
                         tabId = tabId,
+                        browserMode = browserMode,
                     )
                     withContext(dispatchers.main()) {
                         response?.let {

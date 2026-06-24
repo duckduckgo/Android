@@ -94,4 +94,12 @@ interface SyncFeature {
      */
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun canShowV2ConnectCode(): Toggle
+
+    /**
+     * When enabled, the sync barcode scanner only attempts to decode QR codes. Sync codes are
+     * always encoded as QR, so other formats only add noise (and false-positive decodes) to
+     * the scanner.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    fun restrictScannedBarcodesToQrTypes(): Toggle
 }

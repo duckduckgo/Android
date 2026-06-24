@@ -20,6 +20,7 @@ import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.browser.api.install.AppInstall
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.ui.view.encodeBitmapToBase64
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.CurrentTimeProvider
@@ -33,6 +34,7 @@ import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.ModelTier
 import com.duckduckgo.duckchat.impl.ReportMetric
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
+import com.duckduckgo.duckchat.impl.messaging.sync.isSyncable
 import com.duckduckgo.duckchat.impl.models.AIChatAttachmentUsage
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.store.DuckChatDataStore
@@ -63,6 +65,7 @@ interface DuckChatJSHelper {
         mode: Mode = Mode.FULL,
         pageContext: String = "",
         tabId: String = "",
+        browserMode: BrowserMode = BrowserMode.REGULAR,
     ): JsCallbackData?
 
     fun onNativeAction(action: NativeAction): SubscriptionEventData
@@ -123,6 +126,7 @@ class RealDuckChatJSHelper @Inject constructor(
         mode: Mode,
         pageContext: String,
         tabId: String,
+        browserMode: BrowserMode,
     ): JsCallbackData? {
         fun registerDuckChatIsOpenDebounced(windowMs: Long = 500L) {
             // we debounced because METHOD_GET_AI_CHAT_NATIVE_HANDOFF_DATA can be called more than once
@@ -147,7 +151,7 @@ class RealDuckChatJSHelper @Inject constructor(
 
             METHOD_GET_AI_CHAT_NATIVE_CONFIG_VALUES ->
                 id?.let {
-                    getAIChatNativeConfigValues(featureName, method, it, mode)
+                    getAIChatNativeConfigValues(featureName, method, it, mode, browserMode)
                 }
 
             METHOD_GET_AI_CHAT_NATIVE_PROMPT ->
@@ -394,6 +398,7 @@ class RealDuckChatJSHelper @Inject constructor(
         method: String,
         id: String,
         mode: Mode,
+        browserMode: BrowserMode,
     ): JsCallbackData {
         val jsonPayload =
             JSONObject().apply {
@@ -408,7 +413,7 @@ class RealDuckChatJSHelper @Inject constructor(
                 put(SUPPORTS_STANDALONE_MIGRATION, duckChat.isStandaloneMigrationEnabled())
                 put(SUPPORTS_CHAT_FULLSCREEN_MODE, duckChat.isDuckChatFullScreenModeEnabled() && mode == Mode.FULL)
                 put(SUPPORTS_CHAT_CONTEXTUAL_MODE, duckChat.isDuckChatContextualModeEnabled() && mode == Mode.CONTEXTUAL)
-                put(SUPPORTS_CHAT_SYNC, duckChat.isChatSyncFeatureEnabled())
+                put(SUPPORTS_CHAT_SYNC, duckChat.isChatSyncFeatureEnabled() && browserMode.isSyncable)
                 put(SUPPORTS_PAGE_CONTEXT, duckChat.isDuckChatContextualModeEnabled() && mode == Mode.CONTEXTUAL)
                 put(SUPPORTS_NATIVE_STORAGE, duckChat.isNativeStorageEnabled())
                 put(
