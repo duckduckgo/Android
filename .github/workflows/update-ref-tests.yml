@@ -104,7 +104,7 @@ jobs:
           title: Update reference tests to version ${{ steps.extract-release-version.outputs._1}}
           author: daxmobile <daxmobile@users.noreply.github.com>
           token: ${{ secrets.GT_DAXMOBILE }}
-          commit-message: Update content scope scripts to version ${{ steps.extract-release-version.outputs._1}}
+          commit-message: Update reference tests to version ${{ steps.extract-release-version.outputs._1}}
           labels: reference tests, automated pr
           branch: automated/update-ref-tests-dependencies-${{ steps.extract-release-version.outputs._1}}
           body: |
