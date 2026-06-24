@@ -343,7 +343,12 @@ open class InputModeWidget @JvmOverloads constructor(
                 // Keep inputQuery in sync with the shared input field on every keystroke, regardless of
                 // the active tab, so a chat-tab item driven by it settles while the Search tab is
                 // active and is already correct when the Chat tab re-renders (no flash on switch-back).
-                duckChatInternal.setInputQuery(liveQuery)
+                // Guard on attach: duckChatInternal is injected in onAttachedToWindow, but the field can
+                // be set before then (e.g. omnibar prefill); onAttachedToWindow publishes the initial
+                // query, so nothing is lost by skipping the pre-attach changes here.
+                if (isAttachedToWindow) {
+                    duckChatInternal.setInputQuery(liveQuery)
+                }
                 when (inputModeSwitch.selectedTabPosition) {
                     0 -> onSearchTextChanged?.invoke(liveQuery)
                     1 -> {

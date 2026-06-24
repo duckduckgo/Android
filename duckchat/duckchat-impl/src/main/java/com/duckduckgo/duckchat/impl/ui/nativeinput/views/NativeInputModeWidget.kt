@@ -254,13 +254,6 @@ class NativeInputModeWidget @JvmOverloads constructor(
     // Outlives a single suggestions presentation (survives clear() on tab switches); handed to chat-item
     // plugins so they can collect into their adapters. Cancelled in tearDownChatSuggestions().
     private var chatItemPluginScope: CoroutineScope? = null
-
-    // Creates the chat-suggestions binding and loads its chat-item plugins. Captured from
-    // bindChatSuggestions and invoked at attach so plugins are live for the whole presentation,
-    // independent of which tab is selected (they must react while the Search tab is showing, and
-    // their rows must already exist before the Chat tab first renders — otherwise a late insert on
-    // first Chat-tab show flashes). The built-in sections stay lazy, populated via submit().
-    private var ensureChatSuggestionsBinding: (() -> Unit)? = null
     private var onShowSuggestions: ((RecyclerView.Adapter<*>) -> Unit)? = null
     private var onClearSuggestions: ((Boolean) -> Unit)? = null
     private var voiceSearchAvailable: Boolean = false
@@ -335,9 +328,6 @@ class NativeInputModeWidget @JvmOverloads constructor(
         applyNativeStyling()
         observeChatState()
         observeChatSuggestionsEnabled()
-        // Create the binding and load chat-item plugins now (not on first Chat-tab show), so plugins
-        // are live regardless of the selected tab and their rows exist before the Chat tab renders.
-        ensureChatSuggestionsBinding?.invoke()
         observeNativeInputState()
         observeSubmitEnabled()
         observeOpenModelPicker()
@@ -1265,10 +1255,10 @@ class NativeInputModeWidget @JvmOverloads constructor(
             showSuggestions(text)
         }
 
-        // Load plugins eagerly: at attach if we're not attached yet (the usual case — this runs
-        // pre-attach), or right now if bind happened after attach. ensureBinding() is idempotent.
-        ensureChatSuggestionsBinding = { ensureBinding() }
-        if (isAttachedToWindow) ensureChatSuggestionsBinding?.invoke()
+        // Load plugins at attach (or now, if already attached) rather than on the first Chat-tab show,
+        // so they're live regardless of the selected tab and their rows exist before the Chat tab first
+        // renders (otherwise a late insert flashes). ensureBinding() is idempotent.
+        doOnAttach { ensureBinding() }
     }
 
     private fun tearDownChatSuggestions() {
