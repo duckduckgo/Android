@@ -810,10 +810,6 @@ class BrowserTabViewModel @Inject constructor(
     private val loginDetectionObserver =
         Observer<LoginDetected> { loginEvent ->
             logcat(INFO) { "LoginDetection for $loginEvent" }
-
-            // Fireproofing is not applicable in Fire mode, so never offer to fireproof on login.
-            if (browserMode == BrowserMode.FIRE) return@Observer
-
             viewModelScope.launch(dispatchers.io()) {
                 val canPromptAboutFireproofing = !autofillFireproofDialogSuppressor.isAutofillPreventingFireproofPrompts()
 
@@ -1168,16 +1164,13 @@ class BrowserTabViewModel @Inject constructor(
         viewModelScope.launch(dispatchers.io()) {
             val uri = url.toUri()
 
-            // Fire mode must leave no trace in the shared browsing history.
-            if (browserMode != BrowserMode.FIRE) {
-                if (duckPlayer.getDuckPlayerState() == ENABLED && duckPlayer.isSimulatedYoutubeNoCookie(uri)) {
-                    val duckPlayerUrl = duckPlayer.createDuckPlayerUriFromYoutubeNoCookie(uri)
-                    if (duckPlayerUrl != null) {
-                        history.saveToHistory(duckPlayerUrl, title, tabId)
-                    }
-                } else {
-                    history.saveToHistory(url, title, tabId)
+            if (duckPlayer.getDuckPlayerState() == ENABLED && duckPlayer.isSimulatedYoutubeNoCookie(uri)) {
+                val duckPlayerUrl = duckPlayer.createDuckPlayerUriFromYoutubeNoCookie(uri)
+                if (duckPlayerUrl != null) {
+                    history.saveToHistory(duckPlayerUrl, title, tabId)
                 }
+            } else {
+                history.saveToHistory(url, title, tabId)
             }
 
             if (androidBrowserConfig.singleTabFireDialog().isEnabled()) {
@@ -2148,7 +2141,7 @@ class BrowserTabViewModel @Inject constructor(
                 isPrivacyProtectionDisabled = false,
                 canFindInPage = true,
                 canChangeBrowsingMode = true,
-                canFireproofSite = domain != null && browserMode != BrowserMode.FIRE,
+                canFireproofSite = domain != null,
                 isFireproofWebsite = isFireproofWebsite(),
                 canPrintPage = domain != null,
                 maliciousSiteBlocked = false,
@@ -3905,11 +3898,7 @@ class BrowserTabViewModel @Inject constructor(
     ) {
         request.handler.proceed(credentials.username, credentials.password)
         command.value = ShowWebContent
-
-        // Fire mode authenticates this session but never offers to save the credentials.
-        if (browserMode != BrowserMode.FIRE) {
-            command.value = SaveCredentials(request, credentials)
-        }
+        command.value = SaveCredentials(request, credentials)
     }
 
     fun cancelAuthentication(request: BasicAuthenticationRequest) {
