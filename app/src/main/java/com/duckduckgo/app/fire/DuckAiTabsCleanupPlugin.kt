@@ -34,20 +34,27 @@ import javax.inject.Inject
 @ContributesMultibinding(AppScope::class)
 class DuckAiTabsCleanupPlugin @Inject constructor(
     private val tabRepositoryProvider: BrowserModeDataProvider<TabRepository>,
-    private val fireModeAvailability: FireModeAvailability, // revert switch: off ⇒ Regular-only (existing)
+    private val fireModeAvailability: FireModeAvailability,
     private val duckChat: DuckChat,
 ) : DataClearingPlugin {
 
-    // Fire is acted on only when available; Regular always. Off ⇒ existing (Regular-only) behavior.
-    private fun BrowserMode.isEnabled() = this == BrowserMode.REGULAR || fireModeAvailability.isAvailable()
+    private fun BrowserMode.isEnabled() = when (this) {
+        BrowserMode.REGULAR -> true
+        BrowserMode.FIRE -> fireModeAvailability.isAvailable()
+    }
 
     override suspend fun onClearData(types: Set<ClearableData>) {
         types.forEach { type ->
             when (type) {
-                // `All` = every enabled mode: close Duck.ai tabs in Regular (+ Fire when available).
-                is ClearableData.DuckChats.All -> BrowserMode.entries.filter { it.isEnabled() }.forEach { closeAllDuckAiTabs(it) }
-                is ClearableData.DuckChats.AllForMode -> if (type.mode.isEnabled()) closeAllDuckAiTabs(type.mode)
-                is ClearableData.DuckChats.SelectedForMode -> if (type.mode.isEnabled()) closeTabsMatching(type.chatUrls, type.mode)
+                is ClearableData.DuckChats.All -> BrowserMode.entries.filter {
+                    it.isEnabled() }.forEach { closeAllDuckAiTabs(it)
+                }
+                is ClearableData.DuckChats.AllForMode -> if (type.mode.isEnabled()) {
+                    closeAllDuckAiTabs(type.mode)
+                }
+                is ClearableData.DuckChats.SelectedForMode -> if (type.mode.isEnabled()) {
+                    closeTabsMatching(type.chatUrls, type.mode)
+                }
                 else -> { /* not handled */ }
             }
         }

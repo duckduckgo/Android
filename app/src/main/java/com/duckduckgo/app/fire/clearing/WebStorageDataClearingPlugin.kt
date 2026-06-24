@@ -36,18 +36,7 @@ import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import javax.inject.Inject
 
 /**
- * Owns Fire site/web-storage clearing (logic kept out of `ClearDataAction`, which is slated for removal):
- *  - **full burn** (`All` / `AllForMode(FIRE)`): wipe the entire Fire-profile via
- *    `SiteDataCleaner.deleteAllBrowsingData` (→ `WebStorageCompat.deleteBrowsingData`, which clears the
- *    profile's cache + cookies + all JavaScript-readable storage in one call) — no preservation (Fire is
- *    ephemeral). No capability check is needed: Fire mode is only available when delete-browsing-data is
- *    supported (see `FireModeAvailability`).
- *  - **single tab** (`SingleForMode(FIRE)`): per-site clear of the tab's visited domains via
- *    `SiteDataCleaner.deleteSiteData` (→ `WebStorageCompat.deleteBrowsingDataForSite`, which clears the
- *    site's cookies + storage + cache in the Fire profile in one call). This is a **faithful port of
- *    `ClearPersonalDataAction.clearDataForSpecificDomains`** — same eTLD+1 normalisation and the SAME
- *    exclusions: DuckDuckGo/duck.ai domains AND fireproofed domains are NOT cleared (mirroring the
- *    Regular single-tab burn). Only the target WebStorage (per-mode profile) differs.
+ * Owns Fire site/web-storage clearing logic.
  */
 @ContributesMultibinding(AppScope::class)
 class WebStorageDataClearingPlugin @Inject constructor(
@@ -91,8 +80,6 @@ class WebStorageDataClearingPlugin @Inject constructor(
         }
     }
 
-    // Mirrors ClearPersonalDataAction.duckDuckGoDomains — normalised to eTLD+1 so DDG/duck.ai (incl. a
-    // custom subdomain duck.ai host) match the eTLD+1 values stored in tabVisitedSitesRepository.
     private val duckDuckGoDomains: Set<String> by lazy {
         setOf("duckduckgo.com", duckAiHostProvider.getHost())
             .map { host -> "https://$host".toHttpUrlOrNull()?.topPrivateDomain() ?: host }
