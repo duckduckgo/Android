@@ -21,6 +21,7 @@ import com.duckduckgo.sync.impl.Result
 import com.duckduckgo.sync.impl.SyncAccountRepository
 import com.duckduckgo.sync.store.ScopedPassword
 import com.duckduckgo.sync.store.SyncStore
+import kotlinx.coroutines.test.runTest
 import org.json.JSONObject
 import org.junit.Assert.assertArrayEquals
 import org.junit.Assert.assertEquals
@@ -162,7 +163,7 @@ class RealRecoveryCodeProviderTest {
 
     // ---- createThirdPartyCredentialIfNeeded ----
 
-    @Test fun `createThirdPartyCredentialIfNeeded is a no-op when scopedPassword already set locally`() {
+    @Test fun `createThirdPartyCredentialIfNeeded is a no-op when scopedPassword already set locally`() = runTest {
         // ScopedPassword is a `value class` so Mockito can't mock it — use a real instance.
         whenever(syncStore.scopedPassword).thenReturn(ScopedPassword("existing"))
 
@@ -172,7 +173,7 @@ class RealRecoveryCodeProviderTest {
         verify(syncAccountRepository, org.mockito.kotlin.never()).createThirdPartyCredential()
     }
 
-    @Test fun `createThirdPartyCredentialIfNeeded extends the account when no scopedPassword locally`() {
+    @Test fun `createThirdPartyCredentialIfNeeded extends the account when no scopedPassword locally`() = runTest {
         whenever(syncStore.scopedPassword).thenReturn(null)
         whenever(syncAccountRepository.createThirdPartyCredential()).thenReturn(Result.Success(true))
 
@@ -182,7 +183,7 @@ class RealRecoveryCodeProviderTest {
         verify(syncAccountRepository).createThirdPartyCredential()
     }
 
-    @Test fun `createThirdPartyCredentialIfNeeded propagates repository error`() {
+    @Test fun `createThirdPartyCredentialIfNeeded propagates repository error`() = runTest {
         whenever(syncStore.scopedPassword).thenReturn(null)
         whenever(syncAccountRepository.createThirdPartyCredential())
             .thenReturn(Result.Error(reason = "extend failed"))

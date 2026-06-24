@@ -448,7 +448,7 @@ class RealSyncCodeDispatcherTest {
         assertTrue((outcome as DispatchOutcome.Failed).reason.contains("future-credential"))
     }
 
-    @Test fun `Legacy path - dispatcher never invokes processCode (caller owns that)`() {
+    @Test fun `Legacy path - dispatcher never invokes processCode (caller owns that)`() = runTest {
         setV2(false)
         whenever(syncAccountRepository.parseSyncAuthCode(any())).thenReturn(SyncAuthCode.Recovery(mock()))
 

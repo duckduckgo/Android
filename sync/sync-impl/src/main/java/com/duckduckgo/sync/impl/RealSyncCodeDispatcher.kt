@@ -125,7 +125,7 @@ class RealSyncCodeDispatcher @Inject constructor(
      * or null for intermediate events the caller should ignore. Both Host and Joiner roles are
      * reachable here; mirrors [mapV2LinkingEventToOutcome] (login on Joiner.Done, preserve abort reason).
      */
-    private fun mapV2PresentEventToOutcome(event: ExchangeV2Event, peerKind: PeerKind?): DispatchOutcome? = when (event) {
+    private suspend fun mapV2PresentEventToOutcome(event: ExchangeV2Event, peerKind: PeerKind?): DispatchOutcome? = when (event) {
         is ExchangeV2Event.SessionStarted -> event.linkingCode?.let { DispatchOutcome.LinkingCodeReady(it) }
         is ExchangeV2Event.Transition -> when (event.to) {
             ExchangeV2State.Joiner.Confirming ->
@@ -321,7 +321,7 @@ class RealSyncCodeDispatcher @Inject constructor(
      * Translate one runner event into a terminal [DispatchOutcome] for the v2 scanner flow,
      * or null for intermediate events the caller should ignore.
      */
-    private fun mapV2LinkingEventToOutcome(event: ExchangeV2Event, peerKind: PeerKind?): DispatchOutcome? = when (event) {
+    private suspend fun mapV2LinkingEventToOutcome(event: ExchangeV2Event, peerKind: PeerKind?): DispatchOutcome? = when (event) {
         is ExchangeV2Event.Transition -> when (event.to) {
             ExchangeV2State.Joiner.Confirming ->
                 DispatchOutcome.JoinerConfirmationRequested(peerName = runner.peerName, peerKind = peerKind)
@@ -376,7 +376,7 @@ class RealSyncCodeDispatcher @Inject constructor(
      * cid=ddg logs in directly; cid=3party upgrades the account via
      * [SyncAccountRepository.joinAccountFromThirdPartyRecoveryCode].
      */
-    private fun loginWithV2RecoveryCode(b64: String, peerKind: PeerKind?): DispatchOutcome {
+    private suspend fun loginWithV2RecoveryCode(b64: String, peerKind: PeerKind?): DispatchOutcome {
         val parsed = decodeV2Recovery(b64) ?: return DispatchOutcome.Failed("Couldn't parse received recovery code as v2.0")
         return when (parsed.cid) {
             CID_DDG -> {

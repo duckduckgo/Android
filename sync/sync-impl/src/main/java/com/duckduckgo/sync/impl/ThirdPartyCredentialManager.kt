@@ -30,6 +30,7 @@ import com.duckduckgo.sync.store.SyncStore
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.Moshi
 import dagger.SingleInstanceIn
+import kotlinx.coroutines.delay
 import logcat.LogPriority.ERROR
 import logcat.logcat
 import javax.inject.Inject
@@ -46,7 +47,7 @@ interface ThirdPartyCredentialManager {
      * already created it, the existing credential is adopted locally; otherwise a new one is created
      * on the server. Either path leaves [SyncStore.scopedPassword] populated.
      */
-    fun create(): Result<Boolean>
+    suspend fun create(): Result<Boolean>
 
     /**
      * Fetches the 3party credential from the server, decrypts its SP using the account's primary
@@ -78,7 +79,7 @@ class RealThirdPartyCredentialManager @Inject constructor(
     @VisibleForTesting
     internal var rateLimitRetryDelayMillis: Long = RATE_LIMIT_RETRY_DELAY_MILLIS
 
-    override fun create(): Result<Boolean> {
+    override suspend fun create(): Result<Boolean> {
         val inputs = when (val r = validateCreatePreconditions()) {
             is Success -> r.data
             is Error -> return r
@@ -150,7 +151,7 @@ class RealThirdPartyCredentialManager @Inject constructor(
         return AdoptResult.Adopted
     }
 
-    private fun mintAndPostNewCredential(inputs: CreateInputs): Result<Boolean> {
+    private suspend fun mintAndPostNewCredential(inputs: CreateInputs): Result<Boolean> {
         logcat { "Sync-ScopedToken: generating new 3party credential" }
 
         // Re-auth against the existing ddg credential's twice_hashed_password.
@@ -214,7 +215,7 @@ class RealThirdPartyCredentialManager @Inject constructor(
      *    the credential POST means the server writes them atomically, removing the need for a
      *    separate `POST /sync/keys/.../set-if-absent` call (and the race window that opened).
      */
-    private fun buildKeysForNewThirdPartyCredential(
+    private suspend fun buildKeysForNewThirdPartyCredential(
         token: String,
         newSpBase64: String,
         hkdfSalt: ByteArray,
@@ -317,7 +318,7 @@ class RealThirdPartyCredentialManager @Inject constructor(
         )
     }
 
-    private fun postCreateAccessCredential(
+    private suspend fun postCreateAccessCredential(
         inputs: CreateInputs,
         request: CreateAccessCredentialRequest,
         newSpBase64: String,
@@ -359,7 +360,7 @@ class RealThirdPartyCredentialManager @Inject constructor(
      * Other 409 variants (e.g. `credential_already_exists`) are NOT retried — they're returned
      * to the caller, which handles them via the adopt path.
      */
-    private fun postWithConcurrentModificationRetry(
+    private suspend fun postWithConcurrentModificationRetry(
         token: String,
         request: CreateAccessCredentialRequest,
     ): Result<Boolean> {
@@ -372,7 +373,7 @@ class RealThirdPartyCredentialManager @Inject constructor(
             if (isConcurrentMod && attempt < MAX_CONCURRENT_MODIFICATION_RETRIES) {
                 attempt++
                 logcat { "Sync-ScopedToken: 3party credential POST hit concurrent_modification; retry $attempt/$MAX_CONCURRENT_MODIFICATION_RETRIES" }
-                runCatching { Thread.sleep(CONCURRENT_MODIFICATION_RETRY_DELAY_MILLIS * attempt) }
+                delay(CONCURRENT_MODIFICATION_RETRY_DELAY_MILLIS * attempt)
                 continue
             }
             return result
@@ -476,7 +477,7 @@ class RealThirdPartyCredentialManager @Inject constructor(
      * Retry an idempotent scoped-credential call on rate-limit.
      * A bounded linear backoff recovers since the limit is per-window and the call is idempotent.
      */
-    private fun <T> retryingOnRateLimit(block: () -> Result<T>): Result<T> {
+    private suspend fun <T> retryingOnRateLimit(block: () -> Result<T>): Result<T> {
         var attempt = 0
         while (true) {
             val result = block()
@@ -485,7 +486,7 @@ class RealThirdPartyCredentialManager @Inject constructor(
             if (rateLimited && attempt < MAX_RATE_LIMIT_RETRIES) {
                 attempt++
                 logcat { "Sync-ScopedToken: rate-limited (code=$code); retry $attempt/$MAX_RATE_LIMIT_RETRIES" }
-                runCatching { Thread.sleep(rateLimitRetryDelayMillis * attempt) }
+                delay(rateLimitRetryDelayMillis * attempt)
                 continue
             }
             return result
