@@ -243,7 +243,6 @@ class NativeInputModeWidget @JvmOverloads constructor(
     private var pulseAnimation: PulseAnimation? = null
     private var submitEnabledJob: Job? = null
     private var openModelPickerJob: Job? = null
-    private var focusInputJob: Job? = null
     private var submitAllowed: Boolean = true
     private var modelPickerView: ModelPicker? = null
     private var optionsView: OptionsView? = null
@@ -461,8 +460,6 @@ class NativeInputModeWidget @JvmOverloads constructor(
         submitEnabledJob = null
         openModelPickerJob?.cancel()
         openModelPickerJob = null
-        focusInputJob?.cancel()
-        focusInputJob = null
         modelPickerView = null
         optionsView = null
         widgetRoot = null
@@ -484,8 +481,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
                 when (state) {
                     ChatState.HIDE -> {
                         isFocussed = hasInputFocus()
-                        (context.getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager)
-                            ?.hideSoftInputFromWindow(windowToken, 0)
+                        hideKeyboard()
                         clearInputFocus()
                         widgetRoot?.visibility = GONE
                     }
@@ -493,8 +489,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
                         widgetRoot?.visibility = VISIBLE
                         if (isFocussed) {
                             requestInputFocus()
-                            (context.getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager)
-                                ?.showSoftInput(inputField, InputMethodManager.SHOW_IMPLICIT)
+                            showKeyboard()
                         }
                     }
                     ChatState.READY -> {
@@ -942,11 +937,21 @@ class NativeInputModeWidget @JvmOverloads constructor(
     }
 
     override fun hideKeyboard() {
-        (context as? Activity)?.hideKeyboard(inputField)
+        if (duckChatFeature.customizeResponses().isEnabled()) {
+            (context.getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager)
+                ?.hideSoftInputFromWindow(windowToken, 0)
+        } else {
+            (context as? Activity)?.hideKeyboard(inputField)
+        }
     }
 
     override fun showKeyboard() {
-        (context as? Activity)?.showKeyboard(inputField)
+        if (duckChatFeature.customizeResponses().isEnabled()) {
+            (context.getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager)
+                ?.showSoftInput(inputField, InputMethodManager.SHOW_IMPLICIT)
+        } else {
+            (context as? Activity)?.showKeyboard(inputField)
+        }
     }
 
     override fun selectChatTab() {
