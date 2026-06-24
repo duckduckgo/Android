@@ -187,6 +187,8 @@ class NewTabReturnHatchViewModel @Inject constructor(
     }
 
     fun onDontShowThisPressed() {
+        pixel.fire(NewTabReturnHatchPixelName.HIDDEN_FROM_MENU, type = Count)
+        pixel.fire(NewTabReturnHatchPixelName.HIDDEN_FROM_MENU_DAILY, type = Daily())
         // Disable the hatch for future idle returns.
         viewModelScope.launch(dispatchers.io()) {
             ntpAfterIdleManager.setReturnToLastTabEnabled(false)
