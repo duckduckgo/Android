@@ -2791,6 +2791,7 @@ class BrowserTabViewModelTest {
         assertCommandIssued<Command.GenerateWebViewPreviewImage>()
         assertCommandIssued<Command.OpenInFireTab> {
             assertEquals("https://example.com", query)
+            assertNotNull(sourceTabId)
         }
     }
 
