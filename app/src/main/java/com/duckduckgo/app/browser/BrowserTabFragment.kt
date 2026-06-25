@@ -110,6 +110,7 @@ import com.duckduckgo.app.accessibility.data.AccessibilitySettingsDataStore
 import com.duckduckgo.app.bookmarks.dialog.BookmarkAddedConfirmationDialog
 import com.duckduckgo.app.bookmarks.dialog.BookmarkAddedConfirmationDialogFactory
 import com.duckduckgo.app.browser.BrowserTabViewModel.FileChooserRequestedParams
+import com.duckduckgo.app.browser.LongPressHandler.RequiredAction
 import com.duckduckgo.app.browser.R.string
 import com.duckduckgo.app.browser.SSLErrorType.NONE
 import com.duckduckgo.app.browser.WebViewErrorResponse.LOADING
@@ -144,6 +145,8 @@ import com.duckduckgo.app.browser.history.NavigationHistorySheet
 import com.duckduckgo.app.browser.history.NavigationHistorySheet.NavigationHistorySheetListener
 import com.duckduckgo.app.browser.httpauth.WebViewHttpAuthStore
 import com.duckduckgo.app.browser.logindetection.DOMLoginDetector
+import com.duckduckgo.app.browser.longpress.LongPressPopupMenu
+import com.duckduckgo.app.browser.longpress.longPressMenuConfigFor
 import com.duckduckgo.app.browser.menu.BrowserMenuViewStateFactory
 import com.duckduckgo.app.browser.menu.VpnMenuStore
 import com.duckduckgo.app.browser.model.BasicAuthenticationCredentials
@@ -4240,6 +4243,10 @@ class BrowserTabFragment :
 
             registerForContextMenu(it)
 
+            it.setOnLongClickListener { _ ->
+                showFireModeLongPressMenuIfAvailable()
+            }
+
             it.setFindListener(this)
             loginDetector.addLoginDetection(it) { viewModel.loginDetected() }
             emailInjector.addJsInterface(
@@ -4749,16 +4756,7 @@ class BrowserTabFragment :
     override fun onContextItemSelected(item: MenuItem): Boolean {
         if (this.isResumed) {
             if (item.itemId == WebViewLongPressHandler.CONTEXT_MENU_ID_COPY_TEXT) {
-                pixel.fire(AppPixelName.LONG_PRESS_COPY_LINK_TEXT)
-                viewLifecycleOwner.lifecycleScope.launch {
-                    val text = extractLinkText()
-                    if (text.isNullOrEmpty()) {
-                        viewModel.onLinkTextCopyFailed()
-                    } else {
-                        val wasNotificationShown = clipboardInteractor.copyToClipboard(text, false)
-                        viewModel.onLinkTextCopied(wasNotificationShown)
-                    }
-                }
+                copyLinkTextFromLongPress()
                 return true
             }
 
@@ -4774,6 +4772,86 @@ class BrowserTabFragment :
             }
         }
         return super.onContextItemSelected(item)
+    }
+
+    private fun copyLinkTextFromLongPress() {
+        pixel.fire(AppPixelName.LONG_PRESS_COPY_LINK_TEXT)
+        viewLifecycleOwner.lifecycleScope.launch {
+            val text = extractLinkText()
+            if (text.isNullOrEmpty()) {
+                viewModel.onLinkTextCopyFailed()
+            } else {
+                val wasNotificationShown = clipboardInteractor.copyToClipboard(text, false)
+                viewModel.onLinkTextCopied(wasNotificationShown)
+            }
+        }
+    }
+
+    /**
+     * When Fire Mode is available, intercepts the WebView long-press and shows the branded
+     * popup at the touch point, consuming the event so the native context menu is suppressed.
+     * Returns false otherwise so the native [onCreateContextMenu] path runs unchanged.
+     */
+    private fun showFireModeLongPressMenuIfAvailable(): Boolean {
+        if (!fireModeAvailability.isAvailable()) return false
+        val wv = webView ?: return false
+        val target = runCatching { wv.safeHitTestResult?.let { getLongPressTarget(it) } }.getOrNull() ?: return false
+        if (longPressMenuConfigFor(target.type, browserMode == BrowserMode.FIRE) == null) return false
+
+        lastLongPressUrl = target.url
+
+        val location = IntArray(2)
+        wv.getLocationOnScreen(location)
+        val screenX = location[0] + lastTouchX.toInt()
+        val screenY = location[1] + lastTouchY.toInt()
+
+        return LongPressPopupMenu(
+            layoutInflater = layoutInflater,
+            target = target,
+            isFireMode = browserMode == BrowserMode.FIRE,
+            listener = longPressMenuListener,
+        ).show(binding.rootView, screenX, screenY)
+    }
+
+    private val longPressMenuListener = object : LongPressPopupMenu.Listener {
+        override fun onOpenInNewTab(url: String) = dispatchLongPress(AppPixelName.LONG_PRESS_NEW_TAB, RequiredAction.OpenInNewTab(url))
+        override fun onOpenInFireTab(url: String) = dispatchLongPress(AppPixelName.LONG_PRESS_NEW_FIRE_TAB, RequiredAction.OpenInFireTab(url))
+        override fun onOpenInBackgroundTab(url: String) =
+            dispatchLongPress(AppPixelName.LONG_PRESS_NEW_BACKGROUND_TAB, RequiredAction.OpenInNewBackgroundTab(url))
+        override fun onCopyLinkAddress(url: String) = dispatchLongPress(AppPixelName.LONG_PRESS_COPY_URL, RequiredAction.CopyLink(url))
+        override fun onShareLink(url: String) = dispatchLongPress(AppPixelName.LONG_PRESS_SHARE, RequiredAction.ShareLink(url))
+        override fun onDownloadImage(
+            imageUrl: String,
+        ) = dispatchLongPress(AppPixelName.LONG_PRESS_DOWNLOAD_IMAGE, RequiredAction.DownloadFile(imageUrl))
+        override fun onOpenImageInNewTab(imageUrl: String) =
+            dispatchLongPress(AppPixelName.LONG_PRESS_OPEN_IMAGE_IN_BACKGROUND_TAB, RequiredAction.OpenInNewBackgroundTab(imageUrl))
+
+        override fun onCopyLinkText() = copyLinkTextFromLongPress()
+    }
+
+    /**
+     * Fires the per-row pixel and dispatches the action through the shared
+     * [BrowserTabViewModel.onLongPressRequiredAction] path used by the native context menu. The
+     * action already carries its target url/imageUrl, and the view model keys solely off the
+     * [RequiredAction]; the [LongPressTarget] is a required-but-ignored parameter we reconstruct
+     * from the action's url.
+     */
+    private fun dispatchLongPress(
+        pixelName: AppPixelName,
+        action: RequiredAction,
+    ) {
+        pixel.fire(pixelName)
+        val actionUrl = when (action) {
+            is RequiredAction.OpenInNewTab -> action.url
+            is RequiredAction.OpenInFireTab -> action.url
+            is RequiredAction.OpenInNewBackgroundTab -> action.url
+            is RequiredAction.CopyLink -> action.url
+            is RequiredAction.ShareLink -> action.url
+            is RequiredAction.DownloadFile -> action.url
+            RequiredAction.None -> null
+        }
+        val target = LongPressTarget(url = actionUrl ?: lastLongPressUrl, type = HitTestResult.SRC_ANCHOR_TYPE)
+        viewModel.onLongPressRequiredAction(target, action)
     }
 
     private suspend fun extractLinkText(): String? {
