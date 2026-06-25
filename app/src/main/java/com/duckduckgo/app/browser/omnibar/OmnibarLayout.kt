@@ -171,6 +171,7 @@ class OmnibarLayout @JvmOverloads constructor(
         val showDuckBack: Boolean,
         val isDuckAiMode: Boolean,
         val isNativeInputEnabled: Boolean,
+        val isNativeChatInputEnabled: Boolean,
     )
 
     @Inject
@@ -873,6 +874,7 @@ class OmnibarLayout @JvmOverloads constructor(
                 showDuckBack = viewState.showDuckAISidebar,
                 isDuckAiMode = viewState.viewMode is ViewMode.DuckAI,
                 isNativeInputEnabled = viewState.isNativeInputEnabled,
+                isNativeChatInputEnabled = viewState.isNativeChatInputEnabled,
             )
 
         if (omnibarAnimationManager.isFeatureEnabled() && previousTransitionState != null &&
@@ -880,6 +882,7 @@ class OmnibarLayout @JvmOverloads constructor(
                 newTransitionState.showFireIcon != previousTransitionState?.showFireIcon ||
                     newTransitionState.isDuckAiMode != previousTransitionState?.isDuckAiMode ||
                     newTransitionState.isNativeInputEnabled != previousTransitionState?.isNativeInputEnabled ||
+                    newTransitionState.isNativeChatInputEnabled != previousTransitionState?.isNativeChatInputEnabled ||
                     newTransitionState.showTabsMenu != previousTransitionState?.showTabsMenu ||
                     newTransitionState.showBrowserMenu != previousTransitionState?.showBrowserMenu ||
                     newTransitionState.showDuckSidebar != previousTransitionState?.showDuckSidebar
@@ -899,12 +902,12 @@ class OmnibarLayout @JvmOverloads constructor(
         fireIconMenu.isVisible = shouldShowFireIcon(
             showFireIcon = newTransitionState.showFireIcon,
             isDuckAiMode = newTransitionState.isDuckAiMode,
-            isNativeInputEnabled = newTransitionState.isNativeInputEnabled,
+            isNativeChatInputEnabled = newTransitionState.isNativeChatInputEnabled,
         )
         plusIconMenu.isVisible = shouldShowPlusIcon(
             showFireIcon = newTransitionState.showFireIcon,
             isDuckAiMode = newTransitionState.isDuckAiMode,
-            isNativeInputEnabled = newTransitionState.isNativeInputEnabled,
+            isNativeChatInputEnabled = newTransitionState.isNativeChatInputEnabled,
         )
         browserMenu.isVisible = newTransitionState.showBrowserMenu
         browserMenuHighlight.isVisible = newTransitionState.showBrowserMenuHighlight
@@ -1091,7 +1094,7 @@ class OmnibarLayout @JvmOverloads constructor(
     }
 
     private fun renderPulseAnimation(viewState: ViewState) {
-        val fireIconVisible = shouldShowFireIcon(viewState.showFireIcon, viewState.viewMode is ViewMode.DuckAI, viewState.isNativeInputEnabled)
+        val fireIconVisible = shouldShowFireIcon(viewState.showFireIcon, viewState.viewMode is ViewMode.DuckAI, viewState.isNativeChatInputEnabled)
         val targetView =
             if (viewState.highlightFireButton.isHighlighted() && fireIconVisible) {
                 fireIconImageView
@@ -1699,21 +1702,21 @@ class OmnibarLayout @JvmOverloads constructor(
  * Whether the fire icon should occupy the shared fire/+ leading slot in the omnibar.
  *
  * Fire is the default leading action. The + icon only replaces it inside a Duck.ai view when the
- * native input field is enabled; with the nativeInputField flag off the user keeps the fire button
- * even in a Duck.ai view.
+ * native chat input is enabled; with nativeChatInput off (the web-input fallback) the user keeps
+ * the fire button even in a Duck.ai view. nativeChatInput already implies nativeInputField.
  */
 internal fun shouldShowFireIcon(
     showFireIcon: Boolean,
     isDuckAiMode: Boolean,
-    isNativeInputEnabled: Boolean,
-): Boolean = showFireIcon && !(isDuckAiMode && isNativeInputEnabled)
+    isNativeChatInputEnabled: Boolean,
+): Boolean = showFireIcon && !(isDuckAiMode && isNativeChatInputEnabled)
 
 /**
  * Whether the + icon should occupy the shared fire/+ leading slot in the omnibar. Only shown inside
- * a Duck.ai view when the native input field is enabled.
+ * a Duck.ai view when the native chat input is enabled.
  */
 internal fun shouldShowPlusIcon(
     showFireIcon: Boolean,
     isDuckAiMode: Boolean,
-    isNativeInputEnabled: Boolean,
-): Boolean = showFireIcon && isDuckAiMode && isNativeInputEnabled
+    isNativeChatInputEnabled: Boolean,
+): Boolean = showFireIcon && isDuckAiMode && isNativeChatInputEnabled
