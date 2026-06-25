@@ -66,7 +66,6 @@ class DuckChatDataClearingPlugin @Inject constructor(
         }
     }
 
-
     private suspend fun deleteSelectedForMode(chatUrls: Set<String>, mode: BrowserMode) {
         when (mode) {
             BrowserMode.REGULAR -> deleteSelectedRegular(chatUrls)
