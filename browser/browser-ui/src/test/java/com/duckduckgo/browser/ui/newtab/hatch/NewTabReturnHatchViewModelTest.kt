@@ -25,8 +25,12 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Count
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
+import com.duckduckgo.browsermode.api.BrowserMode
+import com.duckduckgo.browsermode.api.BrowserModeDataProvider
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.newtabpage.api.EscapeHatchTarget
+import com.duckduckgo.newtabpage.api.EscapeHatchTargetResolver
 import com.duckduckgo.newtabpage.api.NtpAfterIdleManager
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -57,6 +61,13 @@ class NewTabReturnHatchViewModelTest {
     private val mockNtpAfterIdleManager: NtpAfterIdleManager = mock()
     private val mockPixel: Pixel = mock()
     private val tabsFlow = MutableStateFlow<List<TabEntity>>(emptyList())
+    private val mockResolver: EscapeHatchTargetResolver = mock()
+    private val fireTabsFlow = MutableStateFlow<List<TabEntity>>(emptyList())
+    private val mockFireTabRepository: TabRepository = mock()
+    private val tabRepositoryProvider = object : BrowserModeDataProvider<TabRepository> {
+        override fun forMode(mode: BrowserMode): TabRepository =
+            if (mode == BrowserMode.FIRE) mockFireTabRepository else mockTabRepository
+    }
 
     // Starts false so each test controls the idle-return rising edge that captures the snapshot.
     private val afterIdleReturnFlow = MutableStateFlow(false)
@@ -68,26 +79,29 @@ class NewTabReturnHatchViewModelTest {
     @Before
     fun setup() {
         whenever(mockTabRepository.flowTabs).thenReturn(tabsFlow)
+        whenever(mockFireTabRepository.flowTabs).thenReturn(fireTabsFlow)
         whenever(mockNtpAfterIdleManager.isAfterIdleReturn).thenReturn(afterIdleReturnFlow)
         whenever(mockNtpAfterIdleManager.returnToLastTabEnabled).thenReturn(returnToLastTabEnabledFlow)
         whenever(mockDuckChat.observeNativeInputFieldUserSettingEnabled()).thenReturn(nativeInputEnabledFlow)
 
         testee = NewTabReturnHatchViewModel(
-            tabRepository = mockTabRepository,
+            currentTabRepository = mockTabRepository,
+            tabRepositoryProvider = tabRepositoryProvider,
             dispatchers = coroutinesTestRule.testDispatcherProvider,
             duckChat = mockDuckChat,
             duckDuckGoUrlDetector = mockDuckDuckGoUrlDetector,
             ntpAfterIdleManager = mockNtpAfterIdleManager,
+            escapeHatchTargetResolver = mockResolver,
             pixel = mockPixel,
         )
     }
 
     // Simulates returning from idle: the last-accessed tab is present in the repository (so the
-    // hatch can show it), the one-time last-accessed read is stubbed, and the rising edge triggers
+    // hatch can show it), the one-time resolver read is stubbed, and the rising edge triggers
     // the snapshot capture.
     private suspend fun returnFromIdleWith(tab: TabEntity?) {
         tabsFlow.value = listOfNotNull(tab)
-        whenever(mockTabRepository.getLastAccessedTab()).thenReturn(tab)
+        whenever(mockResolver.resolve()).thenReturn(tab?.let { EscapeHatchTarget(it.tabId, BrowserMode.REGULAR) })
         afterIdleReturnFlow.value = false
         afterIdleReturnFlow.value = true
     }
@@ -157,7 +171,7 @@ class NewTabReturnHatchViewModelTest {
             assertEquals("tab1", expectMostRecentItem().tabId)
 
             // A new last-accessed tab without a fresh idle-return must NOT re-emit / switch tabs.
-            whenever(mockTabRepository.getLastAccessedTab()).thenReturn(tab2)
+            whenever(mockResolver.resolve()).thenReturn(EscapeHatchTarget(tab2.tabId, BrowserMode.REGULAR))
             advanceUntilIdle()
 
             expectNoEvents()
@@ -173,7 +187,10 @@ class NewTabReturnHatchViewModelTest {
             returnFromIdleWith(tab1)
             assertEquals("tab1", expectMostRecentItem().tabId)
 
-            returnFromIdleWith(tab2)
+            tabsFlow.value = listOf(tab2)
+            whenever(mockResolver.resolve()).thenReturn(EscapeHatchTarget(tab2.tabId, BrowserMode.REGULAR))
+            afterIdleReturnFlow.value = false
+            afterIdleReturnFlow.value = true
             assertEquals("tab2", expectMostRecentItem().tabId)
         }
     }
@@ -513,5 +530,103 @@ class NewTabReturnHatchViewModelTest {
         testee.onTabManagerPressed()
 
         verify(mockNtpAfterIdleManager).onTabSwitcherSelected()
+    }
+
+    @Test
+    fun whenFireTargetThenViewStateModeIsFireAndExistenceTracksFireRepo() = runTest {
+        val fireTab = TabEntity(tabId = "f1", url = "https://secret.com", title = "Secret")
+        fireTabsFlow.value = listOf(fireTab)
+        whenever(mockResolver.resolve()).thenReturn(EscapeHatchTarget("f1", BrowserMode.FIRE))
+
+        testee.viewState.test {
+            afterIdleReturnFlow.value = false
+            afterIdleReturnFlow.value = true
+
+            val state = expectMostRecentItem()
+            assertTrue(state.shouldShow)
+            assertEquals(BrowserMode.FIRE, state.mode)
+            assertEquals("f1", state.tabId)
+        }
+    }
+
+    @Test
+    fun whenFireTargetLeavesFireRepoThenHatchHides() = runTest {
+        val fireTab = TabEntity(tabId = "f1", url = "https://secret.com", title = "Secret")
+        fireTabsFlow.value = listOf(fireTab)
+        whenever(mockResolver.resolve()).thenReturn(EscapeHatchTarget("f1", BrowserMode.FIRE))
+
+        testee.viewState.test {
+            afterIdleReturnFlow.value = false
+            afterIdleReturnFlow.value = true
+            assertTrue(expectMostRecentItem().shouldShow)
+
+            fireTabsFlow.value = emptyList()
+            assertFalse(expectMostRecentItem().shouldShow)
+        }
+    }
+
+    @Test
+    fun whenFireTargetThenTitleAndUrlAreNotReadFromFireTab() = runTest {
+        val fireTab = TabEntity(tabId = "f1", url = "https://secret.com", title = "Secret")
+        fireTabsFlow.value = listOf(fireTab)
+        whenever(mockResolver.resolve()).thenReturn(EscapeHatchTarget("f1", BrowserMode.FIRE))
+
+        testee.viewState.test {
+            afterIdleReturnFlow.value = false
+            afterIdleReturnFlow.value = true
+
+            val state = expectMostRecentItem()
+            assertEquals("", state.tabTitle)
+            assertEquals("", state.url)
+        }
+    }
+
+    @Test
+    fun whenFireTargetClosedThenMarksDeletableOnFireRepoNotRegularRepo() = runTest {
+        val fireTab = TabEntity(tabId = "f1", url = "https://secret.com", title = "Secret")
+        fireTabsFlow.value = listOf(fireTab)
+        whenever(mockResolver.resolve()).thenReturn(EscapeHatchTarget("f1", BrowserMode.FIRE))
+
+        testee.viewState.test {
+            afterIdleReturnFlow.value = false
+            afterIdleReturnFlow.value = true
+            assertTrue(expectMostRecentItem().shouldShow)
+
+            testee.closeTab()
+            advanceUntilIdle()
+            // Consume the hide state emitted when pendingClose flips to true
+            assertFalse(expectMostRecentItem().shouldShow)
+        }
+
+        verify(mockFireTabRepository).markDeletable(listOf("f1"))
+        verify(mockTabRepository, never()).markDeletable(listOf("f1"))
+    }
+
+    @Test
+    fun whenFireTargetClosedThenSnapshotClearedBeforeCommitThenPurgesFireRepoNotRegular() = runTest {
+        val fireTab = TabEntity(tabId = "f1", url = "https://secret.com", title = "Secret")
+        fireTabsFlow.value = listOf(fireTab)
+        whenever(mockResolver.resolve()).thenReturn(EscapeHatchTarget("f1", BrowserMode.FIRE))
+
+        testee.viewState.test {
+            afterIdleReturnFlow.value = false
+            afterIdleReturnFlow.value = true
+            assertTrue(expectMostRecentItem().shouldShow)
+
+            testee.closeTab()
+            advanceUntilIdle()
+            assertFalse(expectMostRecentItem().shouldShow)
+
+            afterIdleReturnFlow.value = false // snapshot clears before the user commits the close
+            advanceUntilIdle()
+
+            testee.onTabClosedSnackbarDismissed("f1")
+            advanceUntilIdle()
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        verify(mockFireTabRepository).markDeletable(listOf("f1"))
+        verify(mockFireTabRepository).purgeDeletableTabs()
+        verify(mockTabRepository, never()).purgeDeletableTabs()
     }
 }
