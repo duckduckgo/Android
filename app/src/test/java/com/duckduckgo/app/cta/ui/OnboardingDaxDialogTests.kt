@@ -100,7 +100,6 @@ class OnboardingDaxDialogTests {
 
     @Before
     fun before() = runTest {
-        whenever(extendedOnboardingFeatureToggles.noBrowserCtas()).thenReturn(mockDisabledToggle)
         whenever(extendedOnboardingFeatureToggles.privacyProCta()).thenReturn(mockDisabledToggle)
         whenever(extendedOnboardingFeatureToggles.subscriptionPromoModalCta()).thenReturn(mockDisabledToggle)
         whenever(extendedOnboardingFeatureToggles.subscriptionPromoModalCtaExistingUsers()).thenReturn(mockDisabledToggle)
@@ -138,13 +137,6 @@ class OnboardingDaxDialogTests {
             },
             mock(DuckAiFeatureState::class.java).also { whenever(it.showInputScreen).thenReturn(MutableStateFlow(true)) },
         )
-    }
-
-    @Test
-    fun whenNoOnboardingExperimentEnabledThenOnboardingComplete() = runTest {
-        whenever(extendedOnboardingFeatureToggles.noBrowserCtas()).thenReturn(mockEnabledToggle)
-        val onboardingComplete = testee.areBubbleDaxDialogsCompleted()
-        assertTrue(onboardingComplete)
     }
 
     @Test
