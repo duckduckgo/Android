@@ -53,14 +53,14 @@ class FakeMessageHandlerPlugin : MessageHandlerPlugin {
 }
 
 class FakeSettingsRepository : AutoconsentSettingsRepository {
-    override var cookiePopUpPreference: CookiePopUpPreference = CookiePopUpPreference.DO_NOT_BLOCK
+    override var cookiePopUpPreference: CookiePopUpPreference = CookiePopUpPreference.off
     override var userSetting: Boolean
-        get() = cookiePopUpPreference != CookiePopUpPreference.DO_NOT_BLOCK
+        get() = cookiePopUpPreference != CookiePopUpPreference.off
         set(value) {
             cookiePopUpPreference = if (value) {
-                CookiePopUpPreference.BLOCK_STANDARD
+                CookiePopUpPreference.`default`
             } else {
-                CookiePopUpPreference.DO_NOT_BLOCK
+                CookiePopUpPreference.off
             }
         }
     override var firstPopupHandled: Boolean = false

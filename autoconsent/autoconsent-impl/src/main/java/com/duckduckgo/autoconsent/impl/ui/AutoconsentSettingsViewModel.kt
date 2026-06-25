@@ -73,7 +73,7 @@ class AutoconsentSettingsViewModel @Inject constructor(
         if (!isCookiePopUpPreferenceSettingEnabled()) return
         viewModelScope.launch {
             pixel.fire(
-                if (preference == CookiePopUpPreference.DO_NOT_BLOCK) {
+                if (preference == CookiePopUpPreference.off) {
                     SETTINGS_AUTOCONSENT_OFF
                 } else {
                     SETTINGS_AUTOCONSENT_ON
@@ -111,7 +111,7 @@ class AutoconsentSettingsViewModel @Inject constructor(
         if (!isCookiePopUpPreferenceSettingEnabled()) {
             val enabled = autoconsent.isSettingEnabled()
             return ViewState(
-                selectedPreference = if (enabled) CookiePopUpPreference.BLOCK_STANDARD else CookiePopUpPreference.DO_NOT_BLOCK,
+                selectedPreference = if (enabled) CookiePopUpPreference.`default` else CookiePopUpPreference.off,
                 autoconsentEnabled = enabled,
             )
         }

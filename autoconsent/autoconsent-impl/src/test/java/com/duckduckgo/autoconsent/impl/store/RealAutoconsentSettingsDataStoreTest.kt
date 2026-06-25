@@ -53,35 +53,35 @@ class RealAutoconsentSettingsDataStoreTest {
     fun whenLegacyUserSettingIsFalseThenMigratesToDoNotBlock() = runTest {
         preferences().edit().putBoolean(LEGACY_USER_SETTING_KEY, false).commit()
 
-        assertEquals(CookiePopUpPreference.DO_NOT_BLOCK, createDataStore().cookiePopUpPreference)
+        assertEquals(CookiePopUpPreference.off, createDataStore().cookiePopUpPreference)
     }
 
     @Test
     fun whenLegacyUserSettingIsTrueThenMigratesToBlockStandard() = runTest {
         preferences().edit().putBoolean(LEGACY_USER_SETTING_KEY, true).commit()
 
-        assertEquals(CookiePopUpPreference.BLOCK_STANDARD, createDataStore().cookiePopUpPreference)
+        assertEquals(CookiePopUpPreference.`default`, createDataStore().cookiePopUpPreference)
     }
 
     @Test
     fun whenNoLegacySettingAndOnByDefaultThenMigratesToBlockStandard() = runTest {
-        assertEquals(CookiePopUpPreference.BLOCK_STANDARD, createDataStore().cookiePopUpPreference)
+        assertEquals(CookiePopUpPreference.`default`, createDataStore().cookiePopUpPreference)
     }
 
     @Test
     fun whenNoLegacySettingAndOffByDefaultThenMigratesToDoNotBlock() = runTest {
         feature.onByDefault().setRawStoredState(Toggle.State(enable = false))
 
-        assertEquals(CookiePopUpPreference.DO_NOT_BLOCK, createDataStore().cookiePopUpPreference)
+        assertEquals(CookiePopUpPreference.off, createDataStore().cookiePopUpPreference)
     }
 
     @Test
     fun whenPreferenceAlreadyStoredThenMigrationIsIdempotent() = runTest {
         val dataStore = createDataStore()
-        dataStore.cookiePopUpPreference = CookiePopUpPreference.BLOCK_ALL
+        dataStore.cookiePopUpPreference = CookiePopUpPreference.max
         preferences().edit().putBoolean(LEGACY_USER_SETTING_KEY, false).commit()
 
-        assertEquals(CookiePopUpPreference.BLOCK_ALL, createDataStore().cookiePopUpPreference)
+        assertEquals(CookiePopUpPreference.max, createDataStore().cookiePopUpPreference)
     }
 
     @Test
