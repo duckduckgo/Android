@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (c) 2025 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/popup_menu_bg"
+    android:orientation="vertical">
+
+    <com.duckduckgo.common.ui.view.text.DaxTextView
+        android:id="@+id/longPressUrlHeader"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:minHeight="@dimen/popupMenuItemHeight"
+        android:gravity="center_vertical"
+        android:paddingStart="@dimen/keyline_4"
+        android:paddingEnd="@dimen/keyline_4"
+        android:maxLines="1"
+        android:ellipsize="end"
+        app:typography="body1"
+        app:textType="secondary"
+        tools:ignore="RtlSymmetry" />
+
+    <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:defaultPadding="false" />
+
+    <com.duckduckgo.common.ui.view.PopupMenuItemView
+        android:id="@+id/longPressDownloadImage"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:leadingIcon="@drawable/ic_downloads_24"
+        app:primaryText="@string/downloadImage" />
+
+    <com.duckduckgo.common.ui.view.PopupMenuItemView
+        android:id="@+id/longPressOpenImageInNewTab"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:leadingIcon="@drawable/ic_open_in_24"
+        app:primaryText="@string/openImageInNewTab" />
+
+    <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:defaultPadding="false" />
+
+    <com.duckduckgo.common.ui.view.PopupMenuItemView
+        android:id="@+id/longPressOpenInNewTab"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:leadingIcon="@drawable/ic_add_24"
+        app:primaryText="@string/openInNewTab" />
+
+    <com.duckduckgo.common.ui.view.PopupMenuItemView
+        android:id="@+id/longPressOpenInBackgroundTab"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:leadingIcon="@drawable/ic_open_in_24"
+        app:primaryText="@string/openInNewBackgroundTab" />
+
+    <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+        android:id="@+id/longPressFireTabDivider"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:defaultPadding="false" />
+
+    <com.duckduckgo.common.ui.view.PopupMenuItemView
+        android:id="@+id/longPressOpenInFireTab"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:leadingIcon="@drawable/ic_fire_tabs_24"
+        app:primaryText="@string/openInFireTab" />
+
+    <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+        android:id="@+id/longPressActionsDivider"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:defaultPadding="false" />
+
+    <com.duckduckgo.common.ui.view.PopupMenuItemView
+        android:id="@+id/longPressCopyLinkAddress"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:leadingIcon="@drawable/ic_copy_24"
+        app:primaryText="@string/copyUrl" />
+
+    <com.duckduckgo.common.ui.view.PopupMenuItemView
+        android:id="@+id/longPressShareLink"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:leadingIcon="@drawable/ic_share_android_24"
+        app:primaryText="@string/shareLink" />
+</LinearLayout>
