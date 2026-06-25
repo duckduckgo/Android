@@ -60,6 +60,7 @@ class NewUserBrowserOnboardingViewModelTest {
     private fun onboardingActivityStep() =
         NewUserOnboardingActivityStep(
             id = "initial",
+            shownEvent = null,
             transition = { LinearOnboardingTransition.Stay },
             resolveDialog = { NewUserOnboardingActivityDialog.Initial },
         )
@@ -67,6 +68,7 @@ class NewUserBrowserOnboardingViewModelTest {
     private fun duckAiDemoStep(prompt: String) =
         NewUserBrowserActivityStep(
             id = NewUserOnboardingStepIds.DUCK_AI_DEMO,
+            shownEvent = null,
             transition = { LinearOnboardingTransition.Stay },
             resolveAction = { NewUserBrowserActivityAction.RunDuckAiOnboardingDemo(prompt) },
         )

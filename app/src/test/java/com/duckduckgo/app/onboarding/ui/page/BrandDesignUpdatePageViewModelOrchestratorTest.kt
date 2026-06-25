@@ -64,8 +64,12 @@ class BrandDesignUpdatePageViewModelOrchestratorTest {
     private val recordedEvents = mutableListOf<LinearOnboardingEvent>()
 
     // Default step transition: record the event the view model emitted and stay on the same dialog.
+    // Presented is the VM's "step rendered" signal (fires shown pixels); these tests assert the
+    // action events the VM emits in response to CTAs, so Presented is filtered out as noise.
     private val recordAndStay: suspend (LinearOnboardingEvent) -> LinearOnboardingTransition = { event ->
-        recordedEvents.add(event)
+        if (event !is NewUserOnboardingEvent.Presented) {
+            recordedEvents.add(event)
+        }
         LinearOnboardingTransition.Stay
     }
 
@@ -87,7 +91,7 @@ class BrandDesignUpdatePageViewModelOrchestratorTest {
     ): LinearOnboardingPlan =
         LinearOnboardingPlan(
             id = NewUserOnboardingPlanProvider.ROOT_PLAN_ID,
-            steps = listOf(NewUserOnboardingActivityStep(id = id, transition = transition, resolveDialog = { dialog })),
+            steps = listOf(NewUserOnboardingActivityStep(id = id, shownEvent = null, transition = transition, resolveDialog = { dialog })),
             result = result,
         )
 
@@ -121,7 +125,6 @@ class BrandDesignUpdatePageViewModelOrchestratorTest {
             defaultBrowserDetector = mock(),
             widgetCapabilities = mock(),
             syncAutoRestore = mock(),
-            brandDesignOnboardingPixelSender = mock(),
             orchestrator = orchestrator,
             customAiOnboardingStore = customAiOnboardingStore,
         )
@@ -254,7 +257,7 @@ class BrandDesignUpdatePageViewModelOrchestratorTest {
         testee.onInputModeDemoQuerySubmitted(query = "cats", isChat = true, fromSuggestion = false)
         advanceUntilIdle()
 
-        assertEquals(listOf(NewUserOnboardingEvent.InputDemoQuerySubmitted(query = "cats", isChat = true)), recordedEvents)
+        assertEquals(listOf(NewUserOnboardingEvent.InputDemoQuerySubmitted(query = "cats", isChat = true, fromSuggestion = false)), recordedEvents)
     }
 
     @Test
@@ -292,7 +295,7 @@ class BrandDesignUpdatePageViewModelOrchestratorTest {
         )
         testee.commands.test {
             advanceUntilIdle()
-            orchestrator.onEvent(NewUserOnboardingEvent.InputDemoQuerySubmitted(query = "cats", isChat = true))
+            orchestrator.onEvent(NewUserOnboardingEvent.InputDemoQuerySubmitted(query = "cats", isChat = true, fromSuggestion = false))
             advanceUntilIdle()
             assertEquals(BrandDesignUpdatePageViewModel.Command.FinishAndSubmitChatPrompt(prompt = "cats"), awaitItem())
         }
@@ -349,12 +352,14 @@ class BrandDesignUpdatePageViewModelOrchestratorTest {
             steps = listOf(
                 NewUserOnboardingActivityStep(
                     id = "ai_comparison_chart",
+                    shownEvent = null,
                     showsStepIndicator = true,
                     transition = { LinearOnboardingTransition.Advance },
                     resolveDialog = { NewUserOnboardingActivityDialog.AiComparisonChart },
                 ),
                 NewUserOnboardingActivityStep(
                     id = "input_screen_preview",
+                    shownEvent = null,
                     showsStepIndicator = true,
                     transition = recordAndStay,
                     resolveDialog = { NewUserOnboardingActivityDialog.InputScreenPreview(isSearchDefault = false) },
@@ -377,6 +382,7 @@ class BrandDesignUpdatePageViewModelOrchestratorTest {
     private suspend fun startAtBrowserStep(): BrandDesignUpdatePageViewModel {
         val browserStep = NewUserBrowserActivityStep(
             id = "duck_ai_demo",
+            shownEvent = null,
             transition = { LinearOnboardingTransition.Stay },
             resolveAction = { NewUserBrowserActivityAction.RunDuckAiOnboardingDemo("x") },
         )

@@ -210,17 +210,17 @@ class NewUserOnboardingPlanProvider @Inject constructor(
     ): LinearOnboardingPlan =
         LinearOnboardingPlan(
             id = ROOT_PLAN_ID,
-            steps = steps.abortingOnDevSkip(),
+            steps = steps.firingShownPixels().abortingOnDevSkip(),
             onCompleted = onCompleted,
             onSkipped = onSkipped,
             result = { ctx.completionResult },
         )
 
     private fun skipPlan(): LinearOnboardingPlan =
-        LinearOnboardingPlan(id = SKIP_PLAN_ID, steps = listOf(skipOnboardingOptionStep()).abortingOnDevSkip())
+        LinearOnboardingPlan(id = SKIP_PLAN_ID, steps = listOf(skipOnboardingOptionStep()).firingShownPixels().abortingOnDevSkip())
 
     private fun quickSetupPlan(ctx: NewUserOnboardingPlanContext): LinearOnboardingPlan =
-        LinearOnboardingPlan(id = QUICK_SETUP_PLAN_ID, steps = listOf(quickSetupStep(ctx)).abortingOnDevSkip())
+        LinearOnboardingPlan(id = QUICK_SETUP_PLAN_ID, steps = listOf(quickSetupStep(ctx)).firingShownPixels().abortingOnDevSkip())
 
     /**
      * Wraps each step so the internal dev "skip all onboarding" shortcut aborts the run from wherever
@@ -233,6 +233,28 @@ class NewUserOnboardingPlanProvider @Inject constructor(
             val original = step.transition
             val wrapped: suspend (LinearOnboardingEvent) -> LinearOnboardingTransition = { event ->
                 if (event is NewUserOnboardingEvent.SkipNewUserOnboardingDevOptionClicked) AbortPlan else original(event)
+            }
+            when (step) {
+                is NewUserOnboardingActivityStep -> step.copy(transition = wrapped)
+                is NewUserBrowserActivityStep -> step.copy(transition = wrapped)
+                else -> step
+            }
+        }
+
+    /**
+     * Wraps each step so that a [NewUserOnboardingEvent.Presented] event fires the step's [shownEvent] pixel
+     * (if any) and then returns [Stay]. This is the inner wrap, applied before [abortingOnDevSkip].
+     */
+    private fun List<LinearOnboardingStep>.firingShownPixels(): List<LinearOnboardingStep> =
+        map { step ->
+            val shownEvent = (step as? NewUserOnboardingActivityStep)?.shownEvent
+                ?: (step as? NewUserBrowserActivityStep)?.shownEvent
+            val original = step.transition
+            val wrapped: suspend (LinearOnboardingEvent) -> LinearOnboardingTransition = { event ->
+                if (event is NewUserOnboardingEvent.Presented && shownEvent != null) {
+                    brandDesignOnboardingPixelSender.fire(shownEvent)
+                }
+                original(event)
             }
             when (step) {
                 is NewUserOnboardingActivityStep -> step.copy(transition = wrapped)
@@ -267,6 +289,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
 
     private fun introAnimationStep(withDuckAi: Boolean = false) = NewUserOnboardingActivityStep(
         id = NewUserOnboardingStepIds.INTRO_ANIMATION,
+        shownEvent = null,
         resolveDialog = {
             NewUserOnboardingActivityDialog.IntroAnimation(withDuckAi)
         },
@@ -280,10 +303,16 @@ class NewUserOnboardingPlanProvider @Inject constructor(
 
     private fun notificationPermissionStep() = NewUserOnboardingActivityStep(
         id = NewUserOnboardingStepIds.NOTIFICATION_PERMISSION,
+        shownEvent = OnboardingPixelEvent.NotificationsShown,
         resolveDialog = { NewUserOnboardingActivityDialog.NotificationPermission },
         transition = { event ->
             when {
-                event is NewUserOnboardingEvent.NotificationPermissionFinished -> Advance
+                event is NewUserOnboardingEvent.NotificationPermissionFinished -> {
+                    if (event.granted != null) {
+                        brandDesignOnboardingPixelSender.fire(OnboardingPixelEvent.NotificationsConfirmed(granted = event.granted))
+                    }
+                    Advance
+                }
                 else -> Stay
             }
         },
@@ -295,18 +324,21 @@ class NewUserOnboardingPlanProvider @Inject constructor(
         quickSetupPlan: LinearOnboardingPlan,
     ) = NewUserOnboardingActivityStep(
         id = NewUserOnboardingStepIds.SYNC_RESTORE,
+        shownEvent = OnboardingPixelEvent.SyncRestoreShown,
         precondition = { firstDialog() == FirstDialog.SYNC_RESTORE },
         resolveDialog = { NewUserOnboardingActivityDialog.SyncRestore },
         transition = { event ->
             when (event) {
                 is NewUserOnboardingEvent.RestoreRequested -> {
                     pixel.fire(PREONBOARDING_SYNC_RESTORE_TAPPED_UNIQUE, type = Unique())
+                    brandDesignOnboardingPixelSender.fire(OnboardingPixelEvent.SyncRestoreClicked(engaged = true))
                     syncAutoRestore.restoreSyncAccount()
                     Advance
                 }
 
                 is NewUserOnboardingEvent.SkipRequested -> {
                     pixel.fire(PREONBOARDING_SYNC_SKIP_RESTORE_TAPPED_UNIQUE, type = Unique())
+                    brandDesignOnboardingPixelSender.fire(OnboardingPixelEvent.SyncRestoreClicked(engaged = false))
                     skipFork(skipPlan, quickSetupPlan)
                 }
 
@@ -322,6 +354,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
         isCustomAiPlan: Boolean = false,
     ) = NewUserOnboardingActivityStep(
         id = NewUserOnboardingStepIds.INITIAL_REINSTALL_USER,
+        shownEvent = OnboardingPixelEvent.WelcomeShown,
         precondition = {
             when (firstDialog()) {
                 FirstDialog.SYNC_RESTORE -> {
@@ -339,9 +372,13 @@ class NewUserOnboardingPlanProvider @Inject constructor(
         resolveDialog = { NewUserOnboardingActivityDialog.InitialReinstallUser },
         transition = { event ->
             when (event) {
-                is NewUserOnboardingEvent.ContinueClicked -> Advance
+                is NewUserOnboardingEvent.ContinueClicked -> {
+                    brandDesignOnboardingPixelSender.fire(OnboardingPixelEvent.WelcomeClicked(engaged = true))
+                    Advance
+                }
                 is NewUserOnboardingEvent.SkipRequested -> {
                     pixel.fire(PREONBOARDING_SKIP_ONBOARDING_PRESSED)
+                    brandDesignOnboardingPixelSender.fire(OnboardingPixelEvent.WelcomeClicked(engaged = false))
                     skipFork(skipPlan, quickSetupPlan)
                 }
 
@@ -354,11 +391,15 @@ class NewUserOnboardingPlanProvider @Inject constructor(
         firstDialog: SuspendMemo<FirstDialog>,
     ) = NewUserOnboardingActivityStep(
         id = NewUserOnboardingStepIds.INITIAL,
+        shownEvent = OnboardingPixelEvent.WelcomeShown,
         precondition = { firstDialog() == FirstDialog.INITIAL },
         resolveDialog = { NewUserOnboardingActivityDialog.Initial },
         transition = { event ->
             when {
-                event is NewUserOnboardingEvent.ContinueClicked -> Advance
+                event is NewUserOnboardingEvent.ContinueClicked -> {
+                    brandDesignOnboardingPixelSender.fire(OnboardingPixelEvent.WelcomeClicked(engaged = true))
+                    Advance
+                }
                 else -> Stay
             }
         },
@@ -366,6 +407,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
 
     private fun comparisonChartStep() = NewUserOnboardingActivityStep(
         id = NewUserOnboardingStepIds.COMPARISON_CHART,
+        shownEvent = OnboardingPixelEvent.SetDefaultShown,
         showsStepIndicator = true,
         resolveDialog = { NewUserOnboardingActivityDialog.ComparisonChart },
         transition = { event ->
@@ -376,6 +418,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
                         PREONBOARDING_CHOOSE_BROWSER_PRESSED,
                         mapOf(PixelParameter.DEFAULT_BROWSER to (!showDefaultBrowserDialog).toString()),
                     )
+                    brandDesignOnboardingPixelSender.fire(OnboardingPixelEvent.SetDefaultClicked)
                     Advance
                 }
                 else -> Stay
@@ -385,11 +428,15 @@ class NewUserOnboardingPlanProvider @Inject constructor(
 
     private fun defaultBrowserPromptStep() = NewUserOnboardingActivityStep(
         id = NewUserOnboardingStepIds.DEFAULT_BROWSER_PROMPT,
+        shownEvent = null,
         precondition = { defaultRoleBrowserDialog.shouldShowDialog() },
         resolveDialog = { NewUserOnboardingActivityDialog.DefaultBrowserPrompt },
         transition = { event ->
             when {
-                event is NewUserOnboardingEvent.DefaultBrowserPromptFinished -> Advance
+                event is NewUserOnboardingEvent.DefaultBrowserPromptFinished -> {
+                    brandDesignOnboardingPixelSender.fire(OnboardingPixelEvent.SetDefaultConfirmed(isDdgDefault = event.isDefaultBrowser))
+                    Advance
+                }
                 else -> Stay
             }
         },
@@ -397,6 +444,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
 
     private fun addressBarPositionStep() = NewUserOnboardingActivityStep(
         id = NewUserOnboardingStepIds.ADDRESS_BAR_POSITION,
+        shownEvent = OnboardingPixelEvent.AddressBarPositionShown,
         showsStepIndicator = true,
         resolveDialog = { NewUserOnboardingActivityDialog.AddressBarPosition(showSplitOption = isSplitOmnibarEnabled()) },
         transition = { event ->
@@ -405,6 +453,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
                     val resolved = resolveOmnibarType(event.type)
                     settingsDataStore.omnibarType = resolved
                     fireAddressBarPositionPixel(resolved)
+                    brandDesignOnboardingPixelSender.fire(OnboardingPixelEvent.AddressBarPositionClicked(position = resolved))
                     Advance
                 }
                 else -> Stay
@@ -414,6 +463,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
 
     private fun inputScreenStep(ctx: NewUserOnboardingPlanContext) = NewUserOnboardingActivityStep(
         id = NewUserOnboardingStepIds.INPUT_SCREEN,
+        shownEvent = OnboardingPixelEvent.SearchExperienceShown,
         showsStepIndicator = true,
         resolveDialog = { NewUserOnboardingActivityDialog.InputScreen },
         transition = { event ->
@@ -421,6 +471,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
                 event is NewUserOnboardingEvent.InputModeConfirmed -> {
                     applyInputModeSelection(ctx, event.withAi, fireTelemetry = true)
                     ctx.inputModeWasAi = event.withAi
+                    brandDesignOnboardingPixelSender.fire(OnboardingPixelEvent.SearchExperienceClicked(withAi = event.withAi))
                     Advance
                 }
                 else -> Stay
@@ -433,6 +484,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
         duckAiEnabled: SuspendMemo<Boolean>,
     ) = NewUserOnboardingActivityStep(
         id = NewUserOnboardingStepIds.INPUT_SCREEN_PREVIEW,
+        shownEvent = OnboardingPixelEvent.TryASearchShown,
         precondition = {
             ctx.inputModeWasAi && duckAiEnabled()
         },
@@ -442,6 +494,14 @@ class NewUserOnboardingPlanProvider @Inject constructor(
         transition = { event ->
             when (event) {
                 is NewUserOnboardingEvent.InputDemoQuerySubmitted -> {
+                    if (event.isChat) {
+                        onboardingStore.setChatOnboardingVariant()
+                    } else {
+                        onboardingStore.setSearchOnboardingVariant()
+                    }
+                    brandDesignOnboardingPixelSender.fire(
+                        OnboardingPixelEvent.TryASearchClicked(fromSuggestion = event.fromSuggestion, isChat = event.isChat),
+                    )
                     ctx.completionResult = if (event.isChat) {
                         NewUserOnboardingResult.LaunchChat(prompt = event.query)
                     } else {
@@ -458,11 +518,15 @@ class NewUserOnboardingPlanProvider @Inject constructor(
 
     private fun aiComparisonChartStep() = NewUserOnboardingActivityStep(
         id = NewUserOnboardingStepIds.AI_COMPARISON_CHART,
+        shownEvent = OnboardingPixelEvent.AiComparisonShown,
         showsStepIndicator = true,
         resolveDialog = { NewUserOnboardingActivityDialog.AiComparisonChart },
         transition = { event ->
             when {
-                event is NewUserOnboardingEvent.ContinueClicked -> Advance
+                event is NewUserOnboardingEvent.ContinueClicked -> {
+                    brandDesignOnboardingPixelSender.fire(OnboardingPixelEvent.AiComparisonClicked)
+                    Advance
+                }
                 else -> Stay
             }
         },
@@ -472,6 +536,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
     // duck_ai_demo step.
     private fun customAiInputScreenPreviewStep(ctx: NewUserOnboardingPlanContext) = NewUserOnboardingActivityStep(
         id = NewUserOnboardingStepIds.INPUT_SCREEN_PREVIEW,
+        shownEvent = OnboardingPixelEvent.TryASearchShown,
         precondition = {
             withContext(dispatchers.io()) {
                 androidBrowserConfigFeature.singleTabFireDialog().isEnabled()
@@ -482,6 +547,14 @@ class NewUserOnboardingPlanProvider @Inject constructor(
         transition = { event ->
             when {
                 event is NewUserOnboardingEvent.InputDemoQuerySubmitted -> {
+                    if (event.isChat) {
+                        onboardingStore.setChatOnboardingVariant()
+                    } else {
+                        onboardingStore.setSearchOnboardingVariant()
+                    }
+                    brandDesignOnboardingPixelSender.fire(
+                        OnboardingPixelEvent.TryASearchClicked(fromSuggestion = event.fromSuggestion, isChat = event.isChat),
+                    )
                     ctx.pendingDuckAiPrompt = event.query
                     Advance
                 }
@@ -492,6 +565,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
 
     private fun duckAiDemoStep(ctx: NewUserOnboardingPlanContext) = NewUserBrowserActivityStep(
         id = NewUserOnboardingStepIds.DUCK_AI_DEMO,
+        shownEvent = null,
         precondition = {
             withContext(dispatchers.io()) {
                 androidBrowserConfigFeature.singleTabFireDialog().isEnabled()
@@ -508,17 +582,20 @@ class NewUserOnboardingPlanProvider @Inject constructor(
 
     private fun skipOnboardingOptionStep() = NewUserOnboardingActivityStep(
         id = NewUserOnboardingStepIds.SKIP_ONBOARDING_OPTION,
+        shownEvent = OnboardingPixelEvent.SkipOnboardingShown,
         resolveDialog = { NewUserOnboardingActivityDialog.SkipNewUserOnboardingOption },
         transition = { event ->
             when (event) {
                 is NewUserOnboardingEvent.SkipConfirmed -> {
                     pixel.fire(PREONBOARDING_CONFIRM_SKIP_ONBOARDING_PRESSED)
+                    brandDesignOnboardingPixelSender.fire(OnboardingPixelEvent.SkipOnboardingClicked(engaged = true))
                     duckChat.setInputScreenUserSetting(true)
                     AbortPlan
                 }
 
                 is NewUserOnboardingEvent.ResumeRequested -> {
                     pixel.fire(PREONBOARDING_RESUME_ONBOARDING_PRESSED)
+                    brandDesignOnboardingPixelSender.fire(OnboardingPixelEvent.SkipOnboardingClicked(engaged = false))
                     ReturnAndAdvance
                 }
 
@@ -529,6 +606,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
 
     private fun quickSetupStep(ctx: NewUserOnboardingPlanContext) = NewUserOnboardingActivityStep(
         id = NewUserOnboardingStepIds.QUICK_SETUP,
+        shownEvent = OnboardingPixelEvent.QuickSetupShown,
         resolveDialog = {
             val (isDefault, hasWidget) = withContext(dispatchers.io()) {
                 defaultBrowserDetector.isDefaultBrowser() to widgetCapabilities.hasInstalledWidgets
