@@ -53,7 +53,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:leadingIcon="@drawable/ic_open_in_24"
-        app:primaryText="@string/openInNewBackgroundTab" />
+        app:primaryText="@string/openInBackgroundTab" />
 
     <com.duckduckgo.common.ui.view.divider.HorizontalDivider
         android:id="@+id/longPressFireTabDivider"
