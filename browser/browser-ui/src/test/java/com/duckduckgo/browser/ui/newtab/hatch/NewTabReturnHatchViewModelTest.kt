@@ -145,11 +145,13 @@ class NewTabReturnHatchViewModelTest {
 
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun whenDontShowThisPressedThenReturnToLastTabDisabled() = runTest {
+    fun whenDontShowThisPressedThenReturnToLastTabDisabledAndPixelsFired() = runTest {
         testee.onDontShowThisPressed()
         advanceUntilIdle()
 
         verify(mockNtpAfterIdleManager).setReturnToLastTabEnabled(false)
+        verify(mockPixel).fire(NewTabReturnHatchPixelName.HIDDEN_FROM_MENU, type = Count)
+        verify(mockPixel).fire(NewTabReturnHatchPixelName.HIDDEN_FROM_MENU_DAILY, type = Daily())
     }
 
     @Test

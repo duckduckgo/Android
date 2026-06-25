@@ -25,6 +25,8 @@ import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_AFTER_INACTIVITY_TIMEOUT_
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Count
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.newtabpage.api.NtpAfterIdleManager
@@ -131,6 +133,13 @@ class ShowOnAppLaunchViewModel @Inject constructor(
     fun onReturnToLastTabToggled(enabled: Boolean) {
         viewModelScope.launch(dispatcherProvider.io()) {
             ntpAfterIdleManager.setReturnToLastTabEnabled(enabled)
+            if (enabled) {
+                pixel.fire(ShowOnAppLaunchPixelName.LAST_TAB_SHORTCUT_SETTING_ENABLED, type = Count)
+                pixel.fire(ShowOnAppLaunchPixelName.LAST_TAB_SHORTCUT_SETTING_ENABLED_DAILY, type = Daily())
+            } else {
+                pixel.fire(ShowOnAppLaunchPixelName.LAST_TAB_SHORTCUT_SETTING_DISABLED, type = Count)
+                pixel.fire(ShowOnAppLaunchPixelName.LAST_TAB_SHORTCUT_SETTING_DISABLED_DAILY, type = Daily())
+            }
         }
     }
 }
