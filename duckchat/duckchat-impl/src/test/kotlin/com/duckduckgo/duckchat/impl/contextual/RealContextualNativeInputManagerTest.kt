@@ -16,10 +16,28 @@
 
 package com.duckduckgo.duckchat.impl.contextual
 
+import android.content.res.Resources
+import android.view.View
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.LifecycleRegistry
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputStatePublisher
+import com.duckduckgo.duckchat.impl.ui.nativeinput.views.NativeInputModeWidget
+import com.duckduckgo.js.messaging.api.JsMessaging
+import com.google.android.material.card.MaterialCardView
+import com.google.android.material.shape.ShapeAppearanceModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.resetMain
+import kotlinx.coroutines.test.setMain
+import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.argumentCaptor
@@ -27,12 +45,24 @@ import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class RealContextualNativeInputManagerTest {
 
     private val duckChat: DuckChat = mock()
     private val publisher: NativeInputStatePublisher = mock()
     private val testee = RealContextualNativeInputManager(duckChat, publisher)
+
+    @Before
+    fun setUp() {
+        Dispatchers.setMain(UnconfinedTestDispatcher())
+    }
+
+    @After
+    fun tearDown() {
+        Dispatchers.resetMain()
+    }
 
     @Test
     fun `when onContextualClosed called with blank tabId then publisher is not touched`() {
@@ -77,5 +107,46 @@ class RealContextualNativeInputManagerTest {
 
         // inputMode is owned by the main widget VM; the reset must leave it alone.
         assertEquals(NativeInputState.InputMode.SEARCH_ONLY, updated.inputMode)
+    }
+
+    @Test
+    fun `when native chat input flips off in web view mode then card is hidden`() {
+        val enabled = MutableStateFlow(true)
+        whenever(duckChat.observeNativeChatInputEnabled()).thenReturn(enabled)
+        val card = mockCard()
+        val widget = mock<NativeInputModeWidget>()
+        testee.init(
+            tabId = "tab",
+            card = card,
+            widget = widget,
+            jsMessaging = mock<JsMessaging>(),
+            lifecycleOwner = lifecycleOwner(),
+            chatIdFlow = emptyFlow(),
+            onSearchSubmitted = {},
+        )
+        testee.onWebViewMode()
+
+        enabled.value = false
+
+        verify(card).visibility = View.GONE
+    }
+
+    private fun mockCard(): MaterialCardView {
+        val card = mock<MaterialCardView>()
+        val resources = mock<Resources>()
+        whenever(card.resources).thenReturn(resources)
+        whenever(resources.getDimension(any())).thenReturn(16f)
+        whenever(card.shapeAppearanceModel).thenReturn(ShapeAppearanceModel())
+        return card
+    }
+
+    private fun lifecycleOwner(): LifecycleOwner {
+        val owner = object : LifecycleOwner {
+            lateinit var registry: LifecycleRegistry
+            override val lifecycle: Lifecycle get() = registry
+        }
+        // createUnsafe bypasses the main-thread assertion so the registry can be driven from the test thread.
+        owner.registry = LifecycleRegistry.createUnsafe(owner).apply { currentState = Lifecycle.State.RESUMED }
+        return owner
     }
 }

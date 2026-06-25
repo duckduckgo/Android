@@ -180,7 +180,15 @@ class RealNativeInputManager @Inject constructor(
             }
             .launchIn(lifecycleOwner.lifecycleScope)
         duckChat.observeNativeChatInputEnabled()
-            .onEach { isEnabled -> isNativeChatInputEnabled = isEnabled }
+            .onEach { isEnabled ->
+                val wasEnabled = isNativeChatInputEnabled
+                isNativeChatInputEnabled = isEnabled
+                // If the flag turns off while Duck.ai is showing the native widget, remove it so
+                // Duck.ai's own web input is the only input — otherwise the two overlap.
+                if (wasEnabled && !isEnabled && omnibarController.isDuckAiMode()) {
+                    removeWidget()
+                }
+            }
             .launchIn(lifecycleOwner.lifecycleScope)
     }
 
