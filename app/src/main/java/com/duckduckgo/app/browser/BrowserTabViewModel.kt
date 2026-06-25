@@ -3266,7 +3266,7 @@ class BrowserTabViewModel @Inject constructor(
                     return true
                 }
                 command.value = GenerateWebViewPreviewImage
-                command.value = OpenInFireTab(query = requiredAction.url, sourceTabId = tabId)
+                command.value = OpenInFireTab(query = requiredAction.url, sourceTabId = null)
                 true
             }
 
