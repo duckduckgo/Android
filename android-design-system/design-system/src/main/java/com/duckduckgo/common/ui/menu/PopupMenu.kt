@@ -31,6 +31,32 @@ import com.duckduckgo.common.ui.view.text.DaxTextView
 import com.duckduckgo.common.ui.view.toDp
 import com.duckduckgo.mobile.android.R
 
+data class PopupTouchPosition(
+    val gravity: Int,
+    val x: Int,
+    val y: Int,
+)
+
+/**
+ * Positions a popup near a touch point. The popup expands away from the nearer screen edge:
+ * top-half touch opens downward, bottom-half upward; start-half opens toward start, end-half toward end.
+ * x/y are returned as gravity-relative offsets (already mirrored for END/BOTTOM gravity).
+ */
+fun computePopupTouchPosition(
+    touchX: Int,
+    touchY: Int,
+    screenWidth: Int,
+    screenHeight: Int,
+): PopupTouchPosition {
+    val moreToStart = touchX < screenWidth / 2
+    val moreToTop = touchY < screenHeight / 2
+    val horizontalGravity = if (moreToStart) Gravity.START else Gravity.END
+    val verticalGravity = if (moreToTop) Gravity.TOP else Gravity.BOTTOM
+    val x = if (moreToStart) touchX else screenWidth - touchX
+    val y = if (moreToTop) touchY else screenHeight - touchY
+    return PopupTouchPosition(verticalGravity or horizontalGravity, x, y)
+}
+
 open class PopupMenu(
     layoutInflater: LayoutInflater,
     resourceId: Int,
@@ -45,20 +71,45 @@ open class PopupMenu(
         applyRoundedRippleCorners()
     }
 
-    private fun applyRoundedRippleCorners() {
-        (contentView as? ViewGroup)?.let { content ->
-            for (i in 0 until content.childCount) {
-                val childLabel = (content.getChildAt(i) as? PopupMenuItemView)
-                    ?.findViewById<DaxTextView>(R.id.label)
+    fun showAtTouchPoint(
+        rootView: View,
+        screenX: Int,
+        screenY: Int,
+    ) {
+        val metrics = rootView.resources.displayMetrics
+        val position = computePopupTouchPosition(screenX, screenY, metrics.widthPixels, metrics.heightPixels)
+        showAtLocation(rootView, position.gravity, position.x, position.y)
+    }
 
-                when {
-                    content.childCount == 1 -> R.drawable.ripple_rectangle_rounded
-                    i == 0 -> R.drawable.ripple_top_rounded
-                    i == content.childCount - 1 -> R.drawable.ripple_bottom_rounded
-                    else -> null
-                }?.let { backgroundResource ->
-                    childLabel?.setBackgroundResource(backgroundResource)
-                }
+    private fun applyRoundedRippleCorners() {
+        applyRoundedRippleCornersToVisibleItems()
+    }
+
+    /**
+     * Rounds the ripple on the first and last visible [PopupMenuItemView] so touch feedback
+     * doesn't render square corners inside the rounded popup background. Non-item children
+     * (URL header, dividers) and hidden rows are skipped. Safe to call again after toggling
+     * row visibility.
+     */
+    fun applyRoundedRippleCornersToVisibleItems() {
+        val content = contentView as? ViewGroup ?: return
+        val items = (0 until content.childCount)
+            .map { content.getChildAt(it) }
+            .filterIsInstance<PopupMenuItemView>()
+            .filter { it.visibility == View.VISIBLE }
+
+        items.forEachIndexed { index, item ->
+            val label = item.findViewById<DaxTextView>(R.id.label)
+            val background = when {
+                items.size == 1 -> R.drawable.ripple_rectangle_rounded
+                index == 0 -> R.drawable.ripple_top_rounded
+                index == items.lastIndex -> R.drawable.ripple_bottom_rounded
+                else -> null
+            }
+            if (background != null) {
+                label?.setBackgroundResource(background)
+            } else {
+                label?.background = null
             }
         }
     }
