@@ -976,6 +976,10 @@ class OmnibarLayout @JvmOverloads constructor(
         logcat { "Omnibar: renderDuckAiMode $viewState" }
         renderTabIcon(viewState)
         renderOmnibarText(viewState)
+        // The shield sits outside omnibarIconContainer, so the leadingIconContainer hide in
+        // render() doesn't cover it — clear any shield left over from the previous browser page
+        // so it doesn't show alongside the Duck.ai header.
+        shieldIcon.gone()
         if (viewState.isProgressBarUpgradeEnabled) {
             updatePageLoadProgressBar(viewState)
         } else {
