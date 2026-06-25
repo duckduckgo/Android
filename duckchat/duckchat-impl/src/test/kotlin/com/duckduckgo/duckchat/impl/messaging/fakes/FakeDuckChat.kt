@@ -36,6 +36,7 @@ class FakeDuckChat(
     private val cosmeticInputScreenUserSettingEnabled = MutableStateFlow<Boolean?>(null)
     private val automaticContextAttachmentUserSettingEnabled = MutableStateFlow(false)
     private val nativeInputFieldUserSettingEnabled = MutableStateFlow(false)
+    private val nativeChatInputEnabled = MutableStateFlow(false)
     private val chatSuggestionsUserSettingEnabled = MutableStateFlow(true)
     var standaloneMigrationCompleted: Boolean = false
 
@@ -95,6 +96,10 @@ class FakeDuckChat(
 
     override fun observeNativeInputFieldUserSettingEnabled(): Flow<Boolean> {
         return nativeInputFieldUserSettingEnabled
+    }
+
+    override fun observeNativeChatInputEnabled(): Flow<Boolean> {
+        return nativeChatInputEnabled
     }
 
     override suspend fun isStandaloneMigrationCompleted(): Boolean {
