@@ -29,10 +29,11 @@ import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
-import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionsSettingsScreenWithEmptyParams
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.subscriptions.impl.R
+import com.duckduckgo.subscriptions.impl.internal.SubscriptionsUrlProvider
+import com.duckduckgo.subscriptions.impl.ui.SubscriptionsWebViewActivityWithParams
 import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
@@ -42,6 +43,7 @@ class SubscriptionExpirationReminderNotification @Inject constructor(
     private val context: Context,
     private val subscriptions: Subscriptions,
     private val dispatcherProvider: DispatcherProvider,
+    private val reminderStore: SubscriptionExpirationReminderStore,
 ) : SchedulableNotification {
 
     override val id = "com.duckduckgo.subscriptions.expiration.reminder"
@@ -61,11 +63,17 @@ class SubscriptionExpirationReminderNotification @Inject constructor(
     }
 
     override suspend fun buildSpecification(): NotificationSpec {
-        return SubscriptionExpirationReminderNotificationSpecification(context)
+        return SubscriptionExpirationReminderNotificationSpecification(
+            context = context,
+            daysBeforeCancel = reminderStore.daysBeforeCancel ?: 0,
+        )
     }
 }
 
-class SubscriptionExpirationReminderNotificationSpecification(context: Context) : NotificationSpec {
+class SubscriptionExpirationReminderNotificationSpecification(
+    context: Context,
+    daysBeforeCancel: Int,
+) : NotificationSpec {
 
     override val channel = Channel(
         id = "com.duckduckgo.subscriptions.expiration.reminder",
@@ -75,7 +83,11 @@ class SubscriptionExpirationReminderNotificationSpecification(context: Context) 
     override val systemId = NOTIFICATION_SYSTEM_ID
     override val name = "Subscription Expiration Reminder"
     override val icon = com.duckduckgo.mobile.android.R.drawable.notification_logo
-    override val title: String = context.getString(R.string.subscriptionExpirationReminderNotificationTitle)
+    override val title: String = context.resources.getQuantityString(
+        R.plurals.subscriptionExpirationReminderNotificationTitle,
+        daysBeforeCancel,
+        daysBeforeCancel,
+    )
     override val description: String = context.getString(R.string.subscriptionExpirationReminderNotificationDescription)
     override val launchButton: String? = null
     override val closeButton: String? = null
@@ -96,6 +108,7 @@ class SubscriptionExpirationReminderNotificationPlugin @Inject constructor(
     private val schedulableNotification: SubscriptionExpirationReminderNotification,
     private val globalActivityStarter: GlobalActivityStarter,
     private val pixel: Pixel,
+    private val subscriptionsUrlProvider: SubscriptionsUrlProvider,
 ) : SchedulableNotificationPlugin {
 
     override fun getSchedulableNotification(): SchedulableNotification = schedulableNotification
@@ -115,7 +128,10 @@ class SubscriptionExpirationReminderNotificationPlugin @Inject constructor(
     }
 
     override suspend fun getLaunchIntent(): Intent? {
-        return globalActivityStarter.startIntent(context, SubscriptionsSettingsScreenWithEmptyParams)
+        return globalActivityStarter.startIntent(
+            context,
+            SubscriptionsWebViewActivityWithParams(url = subscriptionsUrlProvider.buyUrl),
+        )
     }
 
     companion object {

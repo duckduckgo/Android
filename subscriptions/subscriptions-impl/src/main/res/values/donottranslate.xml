@@ -33,7 +33,10 @@
 
     <!-- Subscription Expiration Reminder Notification -->
     <string name="subscriptionExpirationReminderNotificationChannelName">Subscription Reminders</string>
-    <string name="subscriptionExpirationReminderNotificationTitle">Your Privacy Pro subscription is ending soon</string>
-    <string name="subscriptionExpirationReminderNotificationDescription">Tap to review your subscription and stay protected.</string>
+    <plurals name="subscriptionExpirationReminderNotificationTitle">
+        <item quantity="one">Your free trial ends in %d day</item>
+        <item quantity="other">Your free trial ends in %d days</item>
+    </plurals>
+    <string name="subscriptionExpirationReminderNotificationDescription">Try all your new premium protections before your trial ends!</string>
 
 </resources>
