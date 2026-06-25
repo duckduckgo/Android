@@ -129,7 +129,6 @@ class AppSyncAccountRepositoryTest {
     private val syncSetupWideEvent: SyncSetupWideEvent = mock()
     private val syncJweCrypto: SyncJweCrypto = mock()
     private val thirdPartyCredentialManager: ThirdPartyCredentialManager = mock()
-    private val protectedKeyManager: ProtectedKeyManager = mock()
     private val thirdPartyDeviceListDecryptor: ThirdPartyDeviceListDecryptor = mock()
 
     @Before
@@ -150,7 +149,6 @@ class AppSyncAccountRepositoryTest {
             syncSetupWideEvent = syncSetupWideEvent,
             syncJweCrypto = syncJweCrypto,
             thirdPartyCredentialManager = thirdPartyCredentialManager,
-            protectedKeyManager = protectedKeyManager,
             thirdPartyDeviceListDecryptor = thirdPartyDeviceListDecryptor,
         )
         (syncRepo as AppSyncAccountRepository).upgradeRetryDelayMillis = 0L // keep retry-path tests instant
@@ -1243,8 +1241,8 @@ class AppSyncAccountRepositoryTest {
         verify(syncApi).createAccount(anyString(), anyString(), anyString(), anyString(), anyString(), anyString(), eq(null))
     }
 
-    // ---- Delegation to ThirdPartyCredentialManager / ProtectedKeyManager ----
-    // Per-manager logic is covered in ThirdPartyCredentialManagerTest and ProtectedKeyManagerTest.
+    // ---- Delegation to ThirdPartyCredentialManager ----
+    // Per-manager logic is covered in ThirdPartyCredentialManagerTest.
 
     @Test
     fun whenCreateThirdPartyCredentialThenDelegatesToManager() {
@@ -1285,23 +1283,6 @@ class AppSyncAccountRepositoryTest {
         val result = syncRepo.getThirdPartyRecoveryCode()
 
         assertEquals(managerError, result)
-    }
-
-    @Test
-    fun whenCreateProtectedKeyThenDelegatesToManager() {
-        val createdKey = ProtectedKeyEntry(
-            kid = "k1",
-            purpose = "ai_chats",
-            encryptedWith = "ddg",
-            encryptedPrivateKey = "enc",
-            publicKey = RsaJwk(n = "mod", e = "AQAB"),
-        )
-        whenever(protectedKeyManager.create("ai_chats")).thenReturn(Success(createdKey))
-
-        val result = syncRepo.createProtectedKey("ai_chats")
-
-        assertEquals(Success(true), result)
-        verify(protectedKeyManager).create("ai_chats")
     }
 
     // joinAccountFromThirdPartyRecoveryCode

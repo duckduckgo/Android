@@ -136,14 +136,6 @@ interface SyncAccountRepository {
      */
     fun getThirdPartyRecoveryCode(): Result<AuthCode>
 
-    /**
-     * Creates a protected RSA keypair for the given purpose (e.g. "ai_chats") and uploads it
-     * to the server, encrypted with the ddg credential's stretchedPrimaryKey.
-     *
-     * No-op (returns existing key) if a key for the purpose already exists.
-     */
-    fun createProtectedKey(purpose: String): Result<Boolean>
-
     data class AuthCode(
         /**
          * A code that is suitable for displaying in a QR code.
@@ -176,7 +168,6 @@ class AppSyncAccountRepository @Inject constructor(
     private val syncSetupWideEvent: SyncSetupWideEvent,
     private val syncJweCrypto: SyncJweCrypto,
     private val thirdPartyCredentialManager: ThirdPartyCredentialManager,
-    private val protectedKeyManager: ProtectedKeyManager,
     private val thirdPartyDeviceListDecryptor: ThirdPartyDeviceListDecryptor,
 ) : SyncAccountRepository {
 
@@ -638,12 +629,6 @@ class AppSyncAccountRepository @Inject constructor(
 
     override fun refreshThirdPartyCredential(): Result<Boolean> = thirdPartyCredentialManager.refresh()
 
-    override fun createProtectedKey(purpose: String): Result<Boolean> =
-        when (val r = protectedKeyManager.create(purpose)) {
-            is Result.Success -> Result.Success(true)
-            is Result.Error -> r
-        }
-
     /**
      * Bundle produced by [buildThirdPartyUpgradePackage] and consumed by the upgrade POST +
      * SyncStore commit step. Keeps the locally-generated DDG account material together with the
@@ -714,7 +699,7 @@ class AppSyncAccountRepository @Inject constructor(
         // Re-wrap each FE-written key from /sync/login. Decrypt via JWE using SP MEK, then
         // re-encrypt with libsodium-secretbox using the new DDG secretKey, matching the Native
         // wire format (base64-encoded encrypted bytes with URL safety applied — mirrors
-        // createProtectedKey at line ~955 and the reverse direction at line ~770).
+        // mintDdgWrappedProtectedKey in ProtectedKeyMinting.kt).
         val rewrappedKeys = keysFromLogin.map { srcKey ->
             kotlin.runCatching {
                 // FE-only accounts always write keys with encrypted_with="3party". A defensive
