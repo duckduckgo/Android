@@ -82,7 +82,13 @@ internal class ChatSyncPromoAdapter(
                     notifyItemRemoved(0)
                 }
             }
-            State.Dismissed, State.Dismissing -> Unit
+            State.Dismissing -> {
+                if (!shouldAnimate) {
+                    state = State.Dismissed
+                    notifyItemRemoved(0)
+                }
+            }
+            State.Dismissed -> Unit
         }
     }
 
