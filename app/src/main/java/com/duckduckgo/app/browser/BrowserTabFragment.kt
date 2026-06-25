@@ -60,6 +60,7 @@ import android.webkit.WebView.FindListener
 import android.webkit.WebView.HitTestResult
 import android.webkit.WebView.HitTestResult.IMAGE_TYPE
 import android.webkit.WebView.HitTestResult.SRC_IMAGE_ANCHOR_TYPE
+import android.webkit.URLUtil
 import android.webkit.WebView.HitTestResult.UNKNOWN_TYPE
 import android.widget.FrameLayout
 import android.widget.Toast
@@ -4794,8 +4795,14 @@ class BrowserTabFragment :
      */
     private fun showFireModeLongPressMenuIfAvailable(): Boolean {
         if (!fireModeAvailability.isAvailable()) return false
+        // Custom tabs keep the native context menu (which restricts open-in-tab actions); the
+        // branded popup is for the main browser only.
+        if (isActiveCustomTab()) return false
         val wv = webView ?: return false
         val target = runCatching { wv.safeHitTestResult?.let { getLongPressTarget(it) } }.getOrNull() ?: return false
+        // Mirror WebViewLongPressHandler.isLinkSupported: only network/data URLs get a menu, so
+        // tel:/mailto:/javascript: anchors fall through to native handling (which shows nothing) as before.
+        if (!URLUtil.isNetworkUrl(target.url) && !URLUtil.isDataUrl(target.url)) return false
         if (longPressMenuConfigFor(target.type, browserMode == BrowserMode.FIRE) == null) return false
 
         lastLongPressUrl = target.url
@@ -4805,12 +4812,17 @@ class BrowserTabFragment :
         val screenX = location[0] + lastTouchX.toInt()
         val screenY = location[1] + lastTouchY.toInt()
 
-        return LongPressPopupMenu(
+        val shown = LongPressPopupMenu(
             layoutInflater = layoutInflater,
             target = target,
             isFireMode = browserMode == BrowserMode.FIRE,
             listener = longPressMenuListener,
         ).show(binding.rootView, screenX, screenY)
+        if (shown) {
+            // Parity with the native long-press menu, which fires LONG_PRESS when the menu is shown.
+            pixel.fire(AppPixelName.LONG_PRESS)
+        }
+        return shown
     }
 
     private val longPressMenuListener = object : LongPressPopupMenu.Listener {
