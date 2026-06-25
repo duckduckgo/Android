@@ -47,7 +47,9 @@ class DuckAiTabsCleanupPlugin @Inject constructor(
         types.forEach { type ->
             when (type) {
                 is ClearableData.DuckChats.All -> BrowserMode.entries.filter {
-                    it.isEnabled() }.forEach { closeAllDuckAiTabs(it)
+                    it.isEnabled()
+                }.forEach {
+                    closeAllDuckAiTabs(it)
                 }
                 is ClearableData.DuckChats.AllForMode -> if (type.mode.isEnabled()) {
                     closeAllDuckAiTabs(type.mode)
