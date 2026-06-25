@@ -79,20 +79,20 @@ class RealSitePreferencesRepositoryTest {
         // m./www./subdomains/paths all collapse to the eTLD+1 site key.
         repository.rememberDesktopMode("https://m.example.com/some/path")
         assertTrue(repository.isDesktopModeRemembered("https://www.example.com"))
-        assertTrue(repository.isDesktopModeRememberedInCache("https://news.example.com/article"))
+        assertTrue(repository.isDesktopModeRememberedSync("https://news.example.com/article"))
     }
 
     @Test
     fun whenCachePrimedFromDbThenInCacheReflectsExistingRows() {
         dao.insert(SitePreferencesEntity(domain = "seeded.com", desktopModeEnabled = true))
-        assertTrue(repository.isDesktopModeRememberedInCache("https://seeded.com"))
+        assertTrue(repository.isDesktopModeRememberedSync("https://seeded.com"))
     }
 
     @Test
     fun whenCacheNotYetPrimedThenIsDesktopModeRememberedStillResolvesValueFromDb() = runTest {
         val unprimed = RealSitePreferencesRepository(dao, TestScope(), coroutineRule.testDispatcherProvider, isMainProcess = true)
         dao.insert(SitePreferencesEntity(domain = "seeded.com", desktopModeEnabled = true))
-        assertFalse(unprimed.isDesktopModeRememberedInCache("https://seeded.com"))
+        assertFalse(unprimed.isDesktopModeRememberedSync("https://seeded.com"))
         assertTrue(unprimed.isDesktopModeRemembered("https://seeded.com"))
     }
 
@@ -108,8 +108,8 @@ class RealSitePreferencesRepositoryTest {
         repository.rememberDesktopMode("https://keep.com")
         repository.rememberDesktopMode("https://drop.com")
         repository.clearAllButFireproofed(setOf("keep.com"))
-        assertTrue(repository.isDesktopModeRememberedInCache("https://keep.com"))
-        assertFalse(repository.isDesktopModeRememberedInCache("https://drop.com"))
+        assertTrue(repository.isDesktopModeRememberedSync("https://keep.com"))
+        assertFalse(repository.isDesktopModeRememberedSync("https://drop.com"))
     }
 
     @Test
@@ -117,8 +117,8 @@ class RealSitePreferencesRepositoryTest {
         repository.rememberDesktopMode("https://a.com")
         repository.rememberDesktopMode("https://b.com")
         repository.clearAllButFireproofed(emptySet())
-        assertFalse(repository.isDesktopModeRememberedInCache("https://a.com"))
-        assertFalse(repository.isDesktopModeRememberedInCache("https://b.com"))
+        assertFalse(repository.isDesktopModeRememberedSync("https://a.com"))
+        assertFalse(repository.isDesktopModeRememberedSync("https://b.com"))
     }
 
     @Test
@@ -127,8 +127,8 @@ class RealSitePreferencesRepositoryTest {
         repository.rememberDesktopMode("https://b.com")
         repository.rememberDesktopMode("https://c.com")
         repository.clear(setOf("a.com", "b.com"))
-        assertFalse(repository.isDesktopModeRememberedInCache("https://a.com"))
-        assertFalse(repository.isDesktopModeRememberedInCache("https://b.com"))
-        assertTrue(repository.isDesktopModeRememberedInCache("https://c.com"))
+        assertFalse(repository.isDesktopModeRememberedSync("https://a.com"))
+        assertFalse(repository.isDesktopModeRememberedSync("https://b.com"))
+        assertTrue(repository.isDesktopModeRememberedSync("https://c.com"))
     }
 }

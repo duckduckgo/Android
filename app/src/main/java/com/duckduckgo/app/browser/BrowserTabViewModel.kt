@@ -1721,7 +1721,7 @@ class BrowserTabViewModel @Inject constructor(
 
     // Synchronous, main-thread variant for pageChanged() (see isDesktopSiteEnabled for the load path).
     private fun isDesktopModeRememberedForUrl(url: String): Boolean =
-        desktopModeSettings.isDesktopModeRememberedInCache(url)
+        desktopModeSettings.isDesktopModeRememberedSync(url)
 
     override fun isTabInForeground(): Boolean =
         if (swipingTabsFeature.isEnabled) {

@@ -71,7 +71,7 @@ class RealSitePreferencesRepository @Inject constructor(
         return withContext(dispatcherProvider.io()) { sitePreferencesDao.isDesktopModeEnabled(key) }
     }
 
-    override fun isDesktopModeRememberedInCache(url: String): Boolean =
+    override fun isDesktopModeRememberedSync(url: String): Boolean =
         url.siteKeyOrNull()?.let { desktopModeDomains.contains(it) } ?: false
 
     override fun rememberDesktopMode(url: String) {

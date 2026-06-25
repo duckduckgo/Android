@@ -2758,8 +2758,8 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenNavigatingToNonRememberedSiteThenDesktopModeResetAndNotInheritedFromPreviousSite() {
-        whenever(mockDesktopModeSettings.isDesktopModeRememberedInCache("http://a.com")).thenReturn(true)
-        whenever(mockDesktopModeSettings.isDesktopModeRememberedInCache("http://b.com")).thenReturn(false)
+        whenever(mockDesktopModeSettings.isDesktopModeRememberedSync("http://a.com")).thenReturn(true)
+        whenever(mockDesktopModeSettings.isDesktopModeRememberedSync("http://b.com")).thenReturn(false)
 
         loadUrl("http://a.com")
         assertTrue(browserViewState().isDesktopBrowsingMode)

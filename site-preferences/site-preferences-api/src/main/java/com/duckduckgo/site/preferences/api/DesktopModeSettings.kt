@@ -26,16 +26,15 @@ interface DesktopModeSettings {
     /**
      * Correct from the very first navigation: reads the in-memory cache and, only during the brief
      * window before the cache is primed at startup, falls back to a direct DB read so a remembered
-     * site never loads in mobile mode by accident. Suspends — call it from a coroutine.
+     * site never loads in mobile mode by accident.
      */
     suspend fun isDesktopModeRemembered(url: String): Boolean
 
     /**
-     * Synchronous, in-memory-only snapshot for callers that cannot suspend — the main-thread page-load
-     * path, where Room forbids DB access. May be momentarily stale only during the startup priming
-     * window; it self-corrects on the next navigation event.
+     * Synchronous, best-effort read for callers that cannot suspend. May be momentarily stale
+     * only during the startup priming window. It self-corrects on the next navigation event.
      */
-    fun isDesktopModeRememberedInCache(url: String): Boolean
+    fun isDesktopModeRememberedSync(url: String): Boolean
 
     /** Remember that the site at [url] should always open in desktop mode. */
     fun rememberDesktopMode(url: String)
