@@ -5,5 +5,12 @@
         "triggers": ["other"],
         "suffixes": ["form_factor"],
         "parameters": ["appVersion"]
+    },
+    "m_long_press_new_fire_tab": {
+        "description": "Fires when the user selects 'Open in Fire Tab' from the long-press context menu on a link",
+        "owners": ["0nko"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
     }
 }
