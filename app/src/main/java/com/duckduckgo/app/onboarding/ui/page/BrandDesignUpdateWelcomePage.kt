@@ -49,6 +49,7 @@ import androidx.core.view.ViewGroupCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.children
 import androidx.core.view.doOnLayout
+import androidx.core.view.doOnNextLayout
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.core.view.postDelayed
@@ -1507,6 +1508,10 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
 
         binding.daxDialogCta.primaryCta.text = getString(comparisonChartConfig.primaryCtaTextRes)
         binding.daxDialogCta.primaryCta.alpha = 0f
+        // DaxButtonPrimary (a MaterialButton) positions its text during onMeasure. The CTA card morphs its bounds during the
+        // reveal, so the button's first layout pass can land at a transient width and leave its text start-aligned instead of
+        // centered. Force one more measure once the width is final so the text re-centers.
+        binding.daxDialogCta.primaryCta.doOnNextLayout { it.requestLayout() }
     }
 
     private fun showDialogWithoutAnimation(
@@ -1642,6 +1647,9 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                 binding.daxDialogCta.stepIndicator.showStep(currentPageNumber, maxPageCount)
                 binding.daxDialogCta.primaryCta.alpha = 1f
                 binding.daxDialogCta.primaryCta.text = getString(comparisonChartConfig.primaryCtaTextRes)
+                // DaxButtonPrimary (a MaterialButton) positions its text during onMeasure. Force one more measure once the
+                // width is final so the text re-centers instead of staying start-aligned from a transient first layout pass.
+                binding.daxDialogCta.primaryCta.doOnNextLayout { it.requestLayout() }
                 binding.daxDialogCta.primaryCta.setOnClickListener { viewModel.onPrimaryCtaClicked() }
 
                 binding.daxDialogCta.root.isVisible = true
