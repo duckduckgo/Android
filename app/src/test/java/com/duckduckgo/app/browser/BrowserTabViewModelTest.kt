@@ -2782,6 +2782,19 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenOnLongPressRequiredActionWithOpenInFireTabThenGeneratePreviewThenOpenInFireTab() = runTest {
+        val target = LongPressTarget(url = "https://example.com", type = WebView.HitTestResult.SRC_ANCHOR_TYPE)
+
+        val handled = testee.onLongPressRequiredAction(target, RequiredAction.OpenInFireTab("https://example.com"))
+
+        assertTrue(handled)
+        assertCommandIssued<Command.GenerateWebViewPreviewImage>()
+        assertCommandIssued<Command.OpenInFireTab> {
+            assertEquals("https://example.com", query)
+        }
+    }
+
+    @Test
     fun whenSiteLoadedAndUserSelectsToAddBookmarkThenAddBookmarkCommandSentWithUrlAndTitle() =
         runTest {
             val url = "http://foo.com"

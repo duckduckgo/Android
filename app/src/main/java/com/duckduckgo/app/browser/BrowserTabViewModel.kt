@@ -121,6 +121,7 @@ import com.duckduckgo.app.browser.commands.Command.LaunchVpnManagement
 import com.duckduckgo.app.browser.commands.Command.LoadExtractedUrl
 import com.duckduckgo.app.browser.commands.Command.OpenAppLink
 import com.duckduckgo.app.browser.commands.Command.OpenBrokenSiteLearnMore
+import com.duckduckgo.app.browser.commands.Command.OpenInFireTab
 import com.duckduckgo.app.browser.commands.Command.OpenInNewBackgroundTab
 import com.duckduckgo.app.browser.commands.Command.OpenInNewTab
 import com.duckduckgo.app.browser.commands.Command.OpenMessageInNewTab
@@ -3241,7 +3242,13 @@ class BrowserTabViewModel @Inject constructor(
     ): Boolean {
         val requiredAction = longPressHandler.userSelectedMenuItem(longPressTarget, item)
         logcat { "Required action from long press is $requiredAction" }
+        return onLongPressRequiredAction(longPressTarget, requiredAction)
+    }
 
+    fun onLongPressRequiredAction(
+        longPressTarget: LongPressTarget,
+        requiredAction: RequiredAction,
+    ): Boolean {
         return when (requiredAction) {
             is RequiredAction.OpenInNewTab -> {
                 if (subscriptions.shouldLaunchSubscriptionForUrl(requiredAction.url)) {
@@ -3250,6 +3257,16 @@ class BrowserTabViewModel @Inject constructor(
                 }
                 command.value = GenerateWebViewPreviewImage
                 command.value = OpenInNewTab(query = requiredAction.url, sourceTabId = tabId)
+                true
+            }
+
+            is RequiredAction.OpenInFireTab -> {
+                if (subscriptions.shouldLaunchSubscriptionForUrl(requiredAction.url)) {
+                    command.value = LaunchSubscription(requiredAction.url.toUri())
+                    return true
+                }
+                command.value = GenerateWebViewPreviewImage
+                command.value = OpenInFireTab(query = requiredAction.url, sourceTabId = tabId)
                 true
             }
 
