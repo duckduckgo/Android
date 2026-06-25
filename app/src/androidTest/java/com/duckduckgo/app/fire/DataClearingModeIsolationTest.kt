@@ -14,8 +14,11 @@
  * limitations under the License.
  */
 
+@file:SuppressLint("NoImplImportsInAppModule")
+
 package com.duckduckgo.app.fire
 
+import android.annotation.SuppressLint
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.room.Room
