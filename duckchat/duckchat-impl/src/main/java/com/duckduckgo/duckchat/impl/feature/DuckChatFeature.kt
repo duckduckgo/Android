@@ -151,7 +151,6 @@ interface DuckChatFeature {
      * is also enabled. When disabled, Duck.ai contextual and full modes fall
      * back to the web input.
      */
-    @InternalAlwaysEnabled
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun nativeChatInput(): Toggle
 
