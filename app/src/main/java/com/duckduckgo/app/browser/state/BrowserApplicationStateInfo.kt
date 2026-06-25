@@ -39,6 +39,10 @@ class BrowserApplicationStateInfo @Inject constructor(
     private var isFreshLaunch: Boolean = false
     private var overrideIsFreshLaunch: Boolean = false
 
+    // True when the started-count hit 0 due to a config-change recreate (rotation / Activity.recreate()),
+    // not a real background->foreground; suppresses onClose()/onOpen() so the fg pipeline doesn't run on it.
+    private var stoppedForRecreate = false
+
     override fun onActivityCreated(
         activity: Activity,
         savedInstanceState: Bundle?,
@@ -48,8 +52,13 @@ class BrowserApplicationStateInfo @Inject constructor(
 
     override fun onActivityStarted(activity: Activity) {
         if (started++ == 0) {
-            observers.forEach { it.onOpen(isFreshLaunch) }
-            isFreshLaunch = false
+            if (stoppedForRecreate) {
+                // The recreated instance came back; this is not a real foreground.
+                stoppedForRecreate = false
+            } else {
+                observers.forEach { it.onOpen(isFreshLaunch) }
+                isFreshLaunch = false
+            }
         }
     }
 
@@ -65,7 +74,14 @@ class BrowserApplicationStateInfo @Inject constructor(
 
     override fun onActivityStopped(activity: Activity) {
         if (started > 0) (--started)
-        if (started == 0) observers.forEach { it.onClose() }
+        if (started == 0) {
+            if (activity.isChangingConfigurations) {
+                // recreate()/rotation, not a real background
+                stoppedForRecreate = true
+            } else {
+                observers.forEach { it.onClose() }
+            }
+        }
     }
 
     override fun onActivityDestroyed(activity: Activity) {

@@ -132,7 +132,7 @@ class BrowserApplicationStateInfoTest {
     }
 
     @Test
-    fun whenAllActivitiesAreDestroyedByConfigChangeAndRecreatedThenDoNotNotifyFreshAppLaunch() {
+    fun whenActivitiesStopAndRestartForConfigChangeThenDoNotNotifyCloseOrOpen() {
         activity.isConfigChange = true
 
         browserApplicationStateInfo.onActivityCreated(activity, null)
@@ -143,16 +143,56 @@ class BrowserApplicationStateInfoTest {
 
         verify(observer).onOpen(true)
 
+        // A config-change recreate stops then restarts the activities, but it is not a real
+        // background->foreground, so neither onClose() nor onOpen() should fire again.
         browserApplicationStateInfo.onActivityStopped(activity)
         browserApplicationStateInfo.onActivityStopped(activity)
-        verify(observer).onClose()
+        verify(observer, never()).onClose()
 
         browserApplicationStateInfo.onActivityDestroyed(activity)
         browserApplicationStateInfo.onActivityDestroyed(activity)
-        verify(observer).onClose()
         verify(observer, never()).onExit()
 
         browserApplicationStateInfo.onActivityStarted(activity)
+        browserApplicationStateInfo.onActivityStarted(activity)
+        // only the initial onOpen(true); the recreate restart must not fire a second onOpen
+        verify(observer, times(1)).onOpen(any())
+    }
+
+    @Test
+    fun whenConfigChangeRecreateThenSubsequentRealBackgroundThenNotifyClose() {
+        browserApplicationStateInfo.onActivityCreated(activity, null)
+        browserApplicationStateInfo.onActivityStarted(activity)
+        verify(observer).onOpen(true)
+
+        // Config-change recreate: stop + restart must not fire onClose()/onOpen().
+        activity.isConfigChange = true
+        browserApplicationStateInfo.onActivityStopped(activity)
+        browserApplicationStateInfo.onActivityStarted(activity)
+        verify(observer, never()).onClose()
+        verify(observer, times(1)).onOpen(any())
+
+        // The recreate flag must be consumed, not stuck, so a genuine background still fires onClose().
+        activity.isConfigChange = false
+        browserApplicationStateInfo.onActivityStopped(activity)
+        verify(observer).onClose()
+    }
+
+    @Test
+    fun whenConfigChangeRecreateThenRealBackgroundAndForegroundThenNotifyOpen() {
+        browserApplicationStateInfo.onActivityCreated(activity, null)
+        browserApplicationStateInfo.onActivityStarted(activity)
+        verify(observer).onOpen(true)
+
+        // Config-change recreate (no onClose()/onOpen()), then a genuine background.
+        activity.isConfigChange = true
+        browserApplicationStateInfo.onActivityStopped(activity)
+        browserApplicationStateInfo.onActivityStarted(activity)
+        activity.isConfigChange = false
+        browserApplicationStateInfo.onActivityStopped(activity)
+        verify(observer).onClose()
+
+        // A genuine foreground afterwards must fire onOpen() again (recreate flag not stuck).
         browserApplicationStateInfo.onActivityStarted(activity)
         verify(observer).onOpen(false)
     }

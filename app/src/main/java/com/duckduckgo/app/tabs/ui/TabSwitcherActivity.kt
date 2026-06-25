@@ -604,7 +604,7 @@ class TabSwitcherActivity :
                 if (it.showFireTabsEmptyState && !fadingOutForRecreate) {
                     binding.fireTabsEmptyState.root.show()
                     tabsRecycler.gone()
-                    
+
                     // No fade-in runs in the empty state, so settle the post-recreate flags here; otherwise
                     // fadingInAfterRecreate stays true forever and the mode toggle (guarded on it) is stuck disabled.
                     if (fadingInAfterRecreate) {
