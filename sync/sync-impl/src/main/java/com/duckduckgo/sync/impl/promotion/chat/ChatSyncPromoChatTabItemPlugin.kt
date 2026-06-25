@@ -16,14 +16,21 @@
 
 package com.duckduckgo.sync.impl.promotion.chat
 
+import android.annotation.SuppressLint
 import android.content.Context
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.anvil.annotations.ContributesActivePlugin
+import com.duckduckgo.common.ui.setRoundCorners
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckChatInputModeState
 import com.duckduckgo.duckchat.api.inputscreen.NativeInputChatTabItem
 import com.duckduckgo.duckchat.api.inputscreen.NativeInputChatTabItemPlugin
 import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
+import com.duckduckgo.navigation.api.GlobalActivityStarter
+import com.duckduckgo.sync.api.SyncActivityWithAnotherDevice
+import com.duckduckgo.sync.impl.databinding.DialogChatSyncPromoBinding
+import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
@@ -40,12 +47,13 @@ import javax.inject.Inject
 )
 class ChatSyncPromoChatTabItemPlugin @Inject constructor(
     private val duckChatInput: DuckChatInputModeState,
+    private val activityStarter: GlobalActivityStarter,
 ) : NativeInputChatTabItemPlugin {
     override fun create(
         context: Context,
         scope: CoroutineScope,
     ): NativeInputChatTabItem {
-        val listener = ChatTabPluginAdapterListener()
+        val listener = ChatTabPluginAdapterListener(context, activityStarter)
         val adapter = ChatSyncPromoAdapter(listener)
 
         adapter.show()
@@ -68,11 +76,21 @@ private class ChatSyncChatTabItem(
     override val adapters: List<RecyclerView.Adapter<*>> get() = listOf(adapter)
 }
 
-private class ChatTabPluginAdapterListener : ChatSyncPromoAdapter.Listener {
+private class ChatTabPluginAdapterListener(
+    private val context: Context,
+    private val activityStarter: GlobalActivityStarter,
+) : ChatSyncPromoAdapter.Listener {
     private var didBannerShow = false
 
     override fun onSyncWithDeviceClicked(adapter: ChatSyncPromoAdapter) {
         adapter.dismiss(shouldAnimate = true)
+
+        ChatSyncPromoBottomSheetDialog(
+            context = context,
+            onScanQrCodeClicked = {
+                activityStarter.start(context, SyncActivityWithAnotherDevice(source = "promotion_ai_chat"))
+            },
+        ).show()
     }
 
     override fun onDismissClicked(adapter: ChatSyncPromoAdapter) {
@@ -83,6 +101,31 @@ private class ChatTabPluginAdapterListener : ChatSyncPromoAdapter.Listener {
         if (!didBannerShow) {
             didBannerShow = true
             logcat { "On banner shown" }
+        }
+    }
+}
+
+@SuppressLint("NoBottomSheetDialog")
+private class ChatSyncPromoBottomSheetDialog(
+    context: Context,
+    onScanQrCodeClicked: () -> Unit,
+) : BottomSheetDialog(context) {
+    init {
+        val binding = DialogChatSyncPromoBinding.inflate(layoutInflater).apply {
+            scanQrCodeButton.setOnClickListener {
+                onScanQrCodeClicked()
+                dismiss()
+            }
+            notNowButton.setOnClickListener { dismiss() }
+            closeButton.setOnClickListener { dismiss() }
+        }
+        setContentView(binding.root)
+
+        behavior.state = BottomSheetBehavior.STATE_EXPANDED
+        behavior.isDraggable = false
+
+        setOnShowListener {
+            setRoundCorners()
         }
     }
 }
