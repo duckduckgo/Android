@@ -407,8 +407,7 @@ class ClearPersonalDataActionTest {
 
     @Test
     fun whenClearDataForSpecificDomainsWithFireproofedIpOrLocalhostThenThoseAreRetained() = runTest {
-        // A fireproofed IP / localhost has no registrable domain, so the keep-list must use the
-        // host-fallback key (toTldPlusOneOrSelf) — eTLD+1 alone would drop them and burn their data.
+        // A fireproofed IP / localhost must survive a burn (the keep-list uses the host-fallback key).
         whenever(mockWebViewCapabilityChecker.isSupported(DeleteBrowsingData)).thenReturn(true)
         whenever(mockFireproofWebsiteRepository.fireproofWebsitesSync()).thenReturn(
             listOf(FireproofWebsiteEntity("192.168.1.1"), FireproofWebsiteEntity("localhost")),

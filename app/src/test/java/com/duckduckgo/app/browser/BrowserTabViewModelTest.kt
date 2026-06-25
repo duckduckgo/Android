@@ -2771,6 +2771,63 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenUserRefreshesAndDesktopModeChangedSinceLoadThenFullReloadToReframe() {
+        // Mobile loaded, then desktop remembered (e.g. in another tab): a user refresh should reframe (Navigate).
+        whenever(mockDesktopModeSettings.isDesktopModeRememberedSync(exampleUrl)).thenReturn(false)
+        loadUrl(exampleUrl)
+        assertFalse(testee.siteLiveData.value?.isDesktopMode == true)
+
+        whenever(mockDesktopModeSettings.isDesktopModeRememberedSync(exampleUrl)).thenReturn(true)
+        testee.onRefreshRequested(triggeredByUser = true)
+
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        val command = commandCaptor.lastValue
+        assertTrue(command is Navigate)
+        assertEquals(exampleUrl, (command as Navigate).url)
+        assertTrue(browserViewState().isDesktopBrowsingMode)
+        assertTrue(testee.siteLiveData.value?.isDesktopMode == true)
+    }
+
+    @Test
+    fun whenUserRefreshesAndModeChangedDesktopToMobileSinceLoadThenFullReloadToReframe() {
+        // Desktop loaded, then reverted to mobile (e.g. in another tab): refresh must reframe in this direction too.
+        whenever(mockDesktopModeSettings.isDesktopModeRememberedSync(exampleUrl)).thenReturn(true)
+        loadUrl(exampleUrl)
+        assertTrue(testee.siteLiveData.value?.isDesktopMode == true)
+
+        whenever(mockDesktopModeSettings.isDesktopModeRememberedSync(exampleUrl)).thenReturn(false)
+        testee.onRefreshRequested(triggeredByUser = true)
+
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        val command = commandCaptor.lastValue
+        assertTrue(command is Navigate)
+        assertFalse(browserViewState().isDesktopBrowsingMode)
+        assertFalse(testee.siteLiveData.value?.isDesktopMode == true)
+    }
+
+    @Test
+    fun whenUserRefreshesAndDesktopModeUnchangedSinceLoadThenPlainRefresh() {
+        whenever(mockDesktopModeSettings.isDesktopModeRememberedSync(exampleUrl)).thenReturn(false)
+        loadUrl(exampleUrl)
+
+        testee.onRefreshRequested(triggeredByUser = true)
+
+        assertCommandIssued<NavigationCommand.Refresh>()
+    }
+
+    @Test
+    fun whenNonUserRefreshAndDesktopModeChangedSinceLoadThenPlainRefreshNotReframe() {
+        // The reframing full-reload only applies to user-initiated refreshes.
+        whenever(mockDesktopModeSettings.isDesktopModeRememberedSync(exampleUrl)).thenReturn(false)
+        loadUrl(exampleUrl)
+        whenever(mockDesktopModeSettings.isDesktopModeRememberedSync(exampleUrl)).thenReturn(true)
+
+        testee.onRefreshRequested(triggeredByUser = false)
+
+        assertCommandIssued<NavigationCommand.Refresh>()
+    }
+
+    @Test
     fun whenRememberDesktopModeEnabledThenIsDesktopSiteEnabledUsesPrimingAwareRead() = runTest {
         // The interceptor-facing read passes the raw URL to the canonical, priming-aware lookup (which the
         // impl resolves via its site key) so the first load of a remembered site picks desktop mode.

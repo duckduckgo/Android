@@ -1813,7 +1813,11 @@ class BrowserTabViewModel @Inject constructor(
         if (currentGlobalLayoutState() is Invalidated) {
             recoverTabWithQuery(url.orEmpty())
         } else {
-            command.value = NavigationCommand.Refresh
+            // Reframe via full reload if the site's mode changed since load (e.g. in another tab); else normal reload.
+            val reframed = triggeredByUser && reframeIfDesktopModeChanged()
+            if (!reframed) {
+                command.value = NavigationCommand.Refresh
+            }
         }
 
         if (triggeredByUser) {
@@ -1822,6 +1826,17 @@ class BrowserTabViewModel @Inject constructor(
                 brokenSitePrompt.pageRefreshed(it)
             }
         }
+    }
+
+    // Full-reloads (reframing to fit) and returns true when the site's remembered desktop/mobile preference
+    // differs from the displayed mode (e.g. changed in another tab); otherwise does nothing and returns false.
+    private fun reframeIfDesktopModeChanged(): Boolean {
+        if (!rememberDesktopModeFeature.self().isEnabled()) return false
+        val uri = site?.uri ?: return false
+        val remembered = desktopModeSettings.isDesktopModeRememberedSync(uri.toString())
+        if (remembered == (site?.isDesktopMode == true)) return false
+        reloadInMode(remembered)
+        return true
     }
 
     fun handleExternalLaunch(isExternal: Boolean) {
@@ -3344,13 +3359,8 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun onChangeBrowserModeClicked() {
-        val currentBrowserViewState = currentBrowserViewState()
-        val desktopSiteRequested = !currentBrowserViewState().isDesktopBrowsingMode
-        browserViewState.value = currentBrowserViewState.copy(isDesktopBrowsingMode = desktopSiteRequested)
-        command.value = RefreshUserAgent(site?.uri?.toString(), desktopSiteRequested)
-        site?.isDesktopMode = desktopSiteRequested
-
         val uri = site?.uri ?: return
+        val desktopSiteRequested = !currentBrowserViewState().isDesktopBrowsingMode
 
         if (rememberDesktopModeFeature.self().isEnabled()) {
             if (desktopSiteRequested) {
@@ -3368,14 +3378,19 @@ class BrowserTabViewModel @Inject constructor(
             },
         )
 
-        // Re-load via Navigate (loadUrl) rather than Refresh (reload) so the WebView performs a fresh
-        // layout and re-applies overview mode
-        val targetUrl = if (desktopSiteRequested && uri.isMobileSite) {
-            uri.toDesktopUri().toString()
-        } else {
-            uri.toString()
-        }
-        logcat(INFO) { "Original URL $url - reloading $targetUrl with ${if (desktopSiteRequested) "desktop" else "mobile"} site UA string" }
+        reloadInMode(desktopSiteRequested)
+    }
+
+    // Applies [desktop] and re-loads via Navigate (loadUrl), not Refresh (reload), so the WebView does a
+    // fresh layout that re-applies overview mode and reframes the page to fit (reload() keeps the old zoom).
+    private fun reloadInMode(desktop: Boolean) {
+        val uri = site?.uri ?: return
+        browserViewState.value = currentBrowserViewState().copy(isDesktopBrowsingMode = desktop)
+        command.value = RefreshUserAgent(uri.toString(), desktop)
+        site?.isDesktopMode = desktop
+
+        val targetUrl = if (desktop && uri.isMobileSite) uri.toDesktopUri().toString() else uri.toString()
+        logcat(INFO) { "Reloading $targetUrl in ${if (desktop) "desktop" else "mobile"} mode" }
         command.value = NavigationCommand.Navigate(targetUrl, getUrlHeaders(targetUrl))
     }
 

@@ -234,8 +234,7 @@ class ClearPersonalDataAction(
         }
 
         return try {
-            // Keep fireproofed sites out of the burn. Use the host-fallback key (not mapNotNull/eTLD+1)
-            // so fireproofed hosts without a registrable domain — IPs, localhost — are also retained;
+            // Keep fireproofed sites out of the burn; host-fallback key so IPs/localhost are retained too.
             val fireproofDomains = withContext(dispatchers.io()) {
                 fireproofWebsiteRepository.fireproofWebsitesSync()
                     .map { it.domain.toTldPlusOneOrSelf() }
