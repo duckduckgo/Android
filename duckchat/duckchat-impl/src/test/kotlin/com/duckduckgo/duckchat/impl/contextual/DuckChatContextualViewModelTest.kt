@@ -2355,6 +2355,7 @@ class DuckChatContextualViewModelTest {
         override fun observeTriggerVoiceChatSessionEnd(): Flow<String> = kotlinx.coroutines.flow.emptyFlow()
         override fun endVoiceChatSession(tabId: String) { }
         override suspend fun isChatHistoryAvailable(): Boolean = false
+        override suspend fun hasUserEnabledChatHistory(): Boolean = false
         override suspend fun onAddressBarPickerDuckAiSelected() = Unit
     }
 

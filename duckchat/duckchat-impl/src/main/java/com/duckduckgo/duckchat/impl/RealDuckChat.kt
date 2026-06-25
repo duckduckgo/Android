@@ -822,6 +822,10 @@ class RealDuckChat @Inject constructor(
             duckChatFeature.historyScreen().isEnabled()
     }
 
+    override suspend fun hasUserEnabledChatHistory(): Boolean {
+        return duckChatFeatureRepository.isAIChatHistoryEnabled()
+    }
+
     override fun buildChatUrl(chatId: String): String {
         return appendParameters(mapOf(CHAT_ID_QUERY_NAME to chatId) + nativeChatInputParameters(), getDuckChatLink())
     }

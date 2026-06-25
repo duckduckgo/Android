@@ -1832,6 +1832,13 @@ class RealDuckChatTest {
         }
     }
 
+    @Test
+    fun whenHasUserEnabledChatHistoryThenDelegatesToRepository() = runTest {
+        testee.hasUserEnabledChatHistory()
+
+        verify(mockDuckChatFeatureRepository).isAIChatHistoryEnabled()
+    }
+
     private suspend fun enableChatHistoryFlags() {
         duckChatFeature.self().setRawStoredState(State(enable = true))
         duckChatFeature.useNativeStorageChatData().setRawStoredState(State(enable = true))
