@@ -15,5 +15,13 @@
         "triggers": ["other"],
         "suffixes": ["form_factor"],
         "parameters": ["appVersion"]
+    },
+    "serp_settings_unrecognized_value": {
+        // See AiFeaturesStateDauPlugin.kt for usage.
+        "description": "(Daily Pixel) A stored SERP settings value could not be decoded to its native enum.",
+        "owners": ["anikiki"],
+        "triggers": ["scheduled"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
     }
 }

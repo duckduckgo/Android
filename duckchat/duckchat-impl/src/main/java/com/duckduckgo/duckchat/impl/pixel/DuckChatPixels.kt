@@ -710,6 +710,8 @@ enum class DuckChatPixelName(override val pixelName: String) : Pixel.PixelName {
     AI_FEATURES_HIDE_IMAGES_ON_DAILY("ai_features_hide_images_on_daily"),
     AI_FEATURES_HIDE_IMAGES_OFF_COUNT("ai_features_hide_images_off_count"),
     AI_FEATURES_HIDE_IMAGES_OFF_DAILY("ai_features_hide_images_off_daily"),
+    AI_FEATURES_STATE_DAILY("ai_features_state_daily"),
+    SERP_SETTINGS_UNRECOGNIZED_VALUE("serp_settings_unrecognized_value"),
     DUCK_CHAT_START_NEW_CONVERSATION("aichat_start_new_conversation"),
     DUCK_CHAT_START_NEW_CONVERSATION_BUTTON_CLICKED("aichat_start_new_conversation_button_clicked"),
     DUCK_CHAT_OPEN_HISTORY("aichat_open_history"),
@@ -949,6 +951,12 @@ object DuckChatPixelParameters {
     const val UPSELL_CURRENT_TIER = "current_tier"
     const val UPSELL_REQUIRED_TIER = "required_tier"
     const val UPSELL_FLOW_TYPE = "flow_type"
+
+    // ai_features_state_daily
+    const val DUCK_AI = "duck_ai"
+    const val SEARCH_ASSIST = "search_assist"
+    const val HIDE_AI_IMAGES = "hide_ai_images"
+    const val NO_AI = "no_ai"
 }
 
 @ContributesMultibinding(AppScope::class)
@@ -988,6 +996,8 @@ class DuckChatParamRemovalPlugin @Inject constructor() : PixelParamRemovalPlugin
             DuckChatPixelName.AI_FEATURES_HIDE_IMAGES_ON_DAILY.pixelName to PixelParameter.removeAtb(),
             DuckChatPixelName.AI_FEATURES_HIDE_IMAGES_OFF_COUNT.pixelName to PixelParameter.removeAtb(),
             DuckChatPixelName.AI_FEATURES_HIDE_IMAGES_OFF_DAILY.pixelName to PixelParameter.removeAtb(),
+            DuckChatPixelName.AI_FEATURES_STATE_DAILY.pixelName to PixelParameter.removeAtb(),
+            DuckChatPixelName.SERP_SETTINGS_UNRECOGNIZED_VALUE.pixelName to PixelParameter.removeAtb(),
             DUCK_CHAT_START_NEW_CONVERSATION.pixelName to PixelParameter.removeAtb(),
             DUCK_CHAT_START_NEW_CONVERSATION_BUTTON_CLICKED.pixelName to PixelParameter.removeAtb(),
             DUCK_CHAT_OPEN_HISTORY.pixelName to PixelParameter.removeAtb(),
