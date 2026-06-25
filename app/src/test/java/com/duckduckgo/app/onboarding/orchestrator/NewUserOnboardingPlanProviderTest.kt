@@ -26,8 +26,8 @@ import com.duckduckgo.app.onboarding.CustomAiOnboardingStore
 import com.duckduckgo.app.onboarding.DuckAiOnboardingAvailability
 import com.duckduckgo.app.onboarding.DuckAiOnboardingDemo
 import com.duckduckgo.app.onboarding.store.OnboardingStore
-import com.duckduckgo.app.onboarding.ui.page.BrandDesignOnboardingPixelSender
-import com.duckduckgo.app.onboarding.ui.page.OnboardingPixelEvent
+import com.duckduckgo.app.onboarding.ui.page.OnboardingPixelAction
+import com.duckduckgo.app.onboarding.ui.page.OnboardingPixelSender
 import com.duckduckgo.app.onboardingquicksetup.OnboardingQuickSetupExperimentManager
 import com.duckduckgo.app.onboardingquicksetup.OnboardingQuickSetupExperimentManager.QuickSetupExperimentVariant
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_AICHAT_SELECTED
@@ -37,6 +37,15 @@ import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_CONFIRM_SKIP_ONBOARD
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_RESUME_ONBOARDING_PRESSED
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_SKIP_ONBOARDING_PRESSED
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_SYNC_RESTORE_TAPPED_UNIQUE
+import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_ADDRESS_BAR_POSITION
+import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_AI_INTRO
+import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_NOTIFICATIONS
+import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_QUICK_SETUP
+import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_SEARCH_CHAT_TOGGLE
+import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_SEARCH_EXPERIENCE
+import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_SET_DEFAULT
+import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_SKIP_ONBOARDING
+import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_WELCOME
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -80,7 +89,7 @@ class NewUserOnboardingPlanProviderTest {
     private val androidBrowserConfigFeature: AndroidBrowserConfigFeature = mock()
     private val duckAiAvailability: DuckAiOnboardingAvailability = mock()
     private val quickSetupExperiment: OnboardingQuickSetupExperimentManager = mock()
-    private val brandDesignOnboardingPixelSender: BrandDesignOnboardingPixelSender = mock()
+    private val onboardingPixelSender: OnboardingPixelSender = mock()
     private val inputScreenOnboardingWideEvent: InputScreenOnboardingWideEvent = mock()
     private val defaultBrowserDetector: DefaultBrowserDetector = mock()
     private val widgetCapabilities: WidgetCapabilities = mock()
@@ -124,7 +133,7 @@ class NewUserOnboardingPlanProviderTest {
             androidBrowserConfigFeature = androidBrowserConfigFeature,
             duckAiOnboardingAvailability = duckAiAvailability,
             onboardingQuickSetupExperimentManager = quickSetupExperiment,
-            brandDesignOnboardingPixelSender = brandDesignOnboardingPixelSender,
+            onboardingPixelSender = onboardingPixelSender,
             inputScreenOnboardingWideEvent = inputScreenOnboardingWideEvent,
             defaultBrowserDetector = defaultBrowserDetector,
             widgetCapabilities = widgetCapabilities,
@@ -215,8 +224,9 @@ class NewUserOnboardingPlanProviderTest {
         verify(pixel).fire(PREONBOARDING_SKIP_ONBOARDING_PRESSED)
         assertStep(NewUserOnboardingStepIds.QUICK_SETUP)
         orchestrator.onEvent(NewUserOnboardingEvent.QuickSetupConfirmed(OmnibarType.SINGLE_TOP, withAi = true))
-        verify(brandDesignOnboardingPixelSender).fire(
-            event = OnboardingPixelEvent.QuickSetupClicked(
+        verify(onboardingPixelSender).fire(
+            ONBOARDING_QUICK_SETUP,
+            OnboardingPixelAction.QuickSetupClicked(
                 addressBarPosition = OmnibarType.SINGLE_TOP,
                 inputScreenSelected = true,
             ),
@@ -578,7 +588,7 @@ class NewUserOnboardingPlanProviderTest {
         orchestrator.onEvent(NewUserOnboardingEvent.IntroAnimationFinished)
         // Now at NOTIFICATION_PERMISSION — emit Presented
         orchestrator.onEvent(NewUserOnboardingEvent.Presented)
-        verify(brandDesignOnboardingPixelSender).fire(OnboardingPixelEvent.NotificationsShown)
+        verify(onboardingPixelSender).fire(ONBOARDING_NOTIFICATIONS, OnboardingPixelAction.Shown)
     }
 
     @Test
@@ -586,7 +596,7 @@ class NewUserOnboardingPlanProviderTest {
         start()
         assertStep(NewUserOnboardingStepIds.INTRO_ANIMATION)
         orchestrator.onEvent(NewUserOnboardingEvent.Presented)
-        verify(brandDesignOnboardingPixelSender, never()).fire(OnboardingPixelEvent.NotificationsShown)
+        verify(onboardingPixelSender, never()).fire(ONBOARDING_NOTIFICATIONS, OnboardingPixelAction.Shown)
     }
 
     @Test
@@ -597,7 +607,7 @@ class NewUserOnboardingPlanProviderTest {
         orchestrator.onEvent(NewUserOnboardingEvent.NotificationPermissionFinished(granted = null))
         assertStep(NewUserOnboardingStepIds.SYNC_RESTORE)
         orchestrator.onEvent(NewUserOnboardingEvent.Presented)
-        verify(brandDesignOnboardingPixelSender).fire(OnboardingPixelEvent.SyncRestoreShown)
+        verify(onboardingPixelSender).fire(ONBOARDING_WELCOME, OnboardingPixelAction.Shown)
     }
 
     @Test
@@ -607,7 +617,7 @@ class NewUserOnboardingPlanProviderTest {
         orchestrator.onEvent(NewUserOnboardingEvent.NotificationPermissionFinished(granted = null))
         assertStep(NewUserOnboardingStepIds.INITIAL)
         orchestrator.onEvent(NewUserOnboardingEvent.Presented)
-        verify(brandDesignOnboardingPixelSender).fire(OnboardingPixelEvent.WelcomeShown)
+        verify(onboardingPixelSender).fire(ONBOARDING_WELCOME, OnboardingPixelAction.Shown)
     }
 
     @Test
@@ -618,7 +628,7 @@ class NewUserOnboardingPlanProviderTest {
         orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked) // initial
         assertStep(NewUserOnboardingStepIds.COMPARISON_CHART)
         orchestrator.onEvent(NewUserOnboardingEvent.Presented)
-        verify(brandDesignOnboardingPixelSender).fire(OnboardingPixelEvent.SetDefaultShown)
+        verify(onboardingPixelSender).fire(ONBOARDING_SET_DEFAULT, OnboardingPixelAction.Shown)
     }
 
     @Test
@@ -630,9 +640,9 @@ class NewUserOnboardingPlanProviderTest {
         orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked) // comparison_chart
         assertStep(NewUserOnboardingStepIds.DEFAULT_BROWSER_PROMPT)
         orchestrator.onEvent(NewUserOnboardingEvent.Presented)
-        // shownEvent = null for this step; sender should not be called for a shown event
-        verify(brandDesignOnboardingPixelSender, never()).fire(OnboardingPixelEvent.SetDefaultConfirmed(isDdgDefault = true))
-        verify(brandDesignOnboardingPixelSender, never()).fire(OnboardingPixelEvent.SetDefaultConfirmed(isDdgDefault = false))
+        // pixelName = null for this step; sender should not be called for a shown event
+        verify(onboardingPixelSender, never()).fire(ONBOARDING_SET_DEFAULT, OnboardingPixelAction.SetDefaultConfirmed(isDdgDefault = true))
+        verify(onboardingPixelSender, never()).fire(ONBOARDING_SET_DEFAULT, OnboardingPixelAction.SetDefaultConfirmed(isDdgDefault = false))
     }
 
     @Test
@@ -645,7 +655,7 @@ class NewUserOnboardingPlanProviderTest {
         orchestrator.onEvent(NewUserOnboardingEvent.DefaultBrowserPromptFinished(isDefaultBrowser = false))
         assertStep(NewUserOnboardingStepIds.ADDRESS_BAR_POSITION)
         orchestrator.onEvent(NewUserOnboardingEvent.Presented)
-        verify(brandDesignOnboardingPixelSender).fire(OnboardingPixelEvent.AddressBarPositionShown)
+        verify(onboardingPixelSender).fire(ONBOARDING_ADDRESS_BAR_POSITION, OnboardingPixelAction.Shown)
     }
 
     @Test
@@ -659,7 +669,7 @@ class NewUserOnboardingPlanProviderTest {
         orchestrator.onEvent(NewUserOnboardingEvent.AddressBarConfirmed(OmnibarType.SINGLE_TOP))
         assertStep(NewUserOnboardingStepIds.INPUT_SCREEN)
         orchestrator.onEvent(NewUserOnboardingEvent.Presented)
-        verify(brandDesignOnboardingPixelSender).fire(OnboardingPixelEvent.SearchExperienceShown)
+        verify(onboardingPixelSender).fire(ONBOARDING_SEARCH_EXPERIENCE, OnboardingPixelAction.Shown)
     }
 
     @Test
@@ -671,7 +681,7 @@ class NewUserOnboardingPlanProviderTest {
         orchestrator.onEvent(NewUserOnboardingEvent.SkipRequested)
         assertStep(NewUserOnboardingStepIds.SKIP_ONBOARDING_OPTION)
         orchestrator.onEvent(NewUserOnboardingEvent.Presented)
-        verify(brandDesignOnboardingPixelSender).fire(OnboardingPixelEvent.SkipOnboardingShown)
+        verify(onboardingPixelSender).fire(ONBOARDING_SKIP_ONBOARDING, OnboardingPixelAction.Shown)
     }
 
     @Test
@@ -684,7 +694,7 @@ class NewUserOnboardingPlanProviderTest {
         orchestrator.onEvent(NewUserOnboardingEvent.SkipRequested)
         assertStep(NewUserOnboardingStepIds.QUICK_SETUP)
         orchestrator.onEvent(NewUserOnboardingEvent.Presented)
-        verify(brandDesignOnboardingPixelSender).fire(OnboardingPixelEvent.QuickSetupShown)
+        verify(onboardingPixelSender).fire(ONBOARDING_QUICK_SETUP, OnboardingPixelAction.Shown)
     }
 
     // endregion
@@ -696,7 +706,7 @@ class NewUserOnboardingPlanProviderTest {
         start()
         orchestrator.onEvent(NewUserOnboardingEvent.IntroAnimationFinished)
         orchestrator.onEvent(NewUserOnboardingEvent.NotificationPermissionFinished(granted = true))
-        verify(brandDesignOnboardingPixelSender).fire(OnboardingPixelEvent.NotificationsConfirmed(granted = true))
+        verify(onboardingPixelSender).fire(ONBOARDING_NOTIFICATIONS, OnboardingPixelAction.NotificationsConfirmed(granted = true))
     }
 
     @Test
@@ -704,7 +714,7 @@ class NewUserOnboardingPlanProviderTest {
         start()
         orchestrator.onEvent(NewUserOnboardingEvent.IntroAnimationFinished)
         orchestrator.onEvent(NewUserOnboardingEvent.NotificationPermissionFinished(granted = false))
-        verify(brandDesignOnboardingPixelSender).fire(OnboardingPixelEvent.NotificationsConfirmed(granted = false))
+        verify(onboardingPixelSender).fire(ONBOARDING_NOTIFICATIONS, OnboardingPixelAction.NotificationsConfirmed(granted = false))
     }
 
     @Test
@@ -712,8 +722,8 @@ class NewUserOnboardingPlanProviderTest {
         start()
         orchestrator.onEvent(NewUserOnboardingEvent.IntroAnimationFinished)
         orchestrator.onEvent(NewUserOnboardingEvent.NotificationPermissionFinished(granted = null))
-        verify(brandDesignOnboardingPixelSender, never()).fire(OnboardingPixelEvent.NotificationsConfirmed(granted = true))
-        verify(brandDesignOnboardingPixelSender, never()).fire(OnboardingPixelEvent.NotificationsConfirmed(granted = false))
+        verify(onboardingPixelSender, never()).fire(ONBOARDING_NOTIFICATIONS, OnboardingPixelAction.NotificationsConfirmed(granted = true))
+        verify(onboardingPixelSender, never()).fire(ONBOARDING_NOTIFICATIONS, OnboardingPixelAction.NotificationsConfirmed(granted = false))
     }
 
     @Test
@@ -723,7 +733,7 @@ class NewUserOnboardingPlanProviderTest {
         orchestrator.onEvent(NewUserOnboardingEvent.IntroAnimationFinished)
         orchestrator.onEvent(NewUserOnboardingEvent.NotificationPermissionFinished(granted = null))
         orchestrator.onEvent(NewUserOnboardingEvent.RestoreRequested)
-        verify(brandDesignOnboardingPixelSender).fire(OnboardingPixelEvent.SyncRestoreClicked(engaged = true))
+        verify(onboardingPixelSender).fire(ONBOARDING_WELCOME, OnboardingPixelAction.Clicked(engaged = true))
     }
 
     @Test
@@ -733,7 +743,7 @@ class NewUserOnboardingPlanProviderTest {
         orchestrator.onEvent(NewUserOnboardingEvent.IntroAnimationFinished)
         orchestrator.onEvent(NewUserOnboardingEvent.NotificationPermissionFinished(granted = null))
         orchestrator.onEvent(NewUserOnboardingEvent.SkipRequested)
-        verify(brandDesignOnboardingPixelSender).fire(OnboardingPixelEvent.SyncRestoreClicked(engaged = false))
+        verify(onboardingPixelSender).fire(ONBOARDING_WELCOME, OnboardingPixelAction.Clicked(engaged = false))
     }
 
     @Test
@@ -743,7 +753,7 @@ class NewUserOnboardingPlanProviderTest {
         orchestrator.onEvent(NewUserOnboardingEvent.NotificationPermissionFinished(granted = null))
         assertStep(NewUserOnboardingStepIds.INITIAL)
         orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked)
-        verify(brandDesignOnboardingPixelSender).fire(OnboardingPixelEvent.WelcomeClicked(engaged = true))
+        verify(onboardingPixelSender).fire(ONBOARDING_WELCOME, OnboardingPixelAction.Clicked(engaged = true))
     }
 
     @Test
@@ -754,7 +764,7 @@ class NewUserOnboardingPlanProviderTest {
         orchestrator.onEvent(NewUserOnboardingEvent.NotificationPermissionFinished(granted = null))
         assertStep(NewUserOnboardingStepIds.INITIAL_REINSTALL_USER)
         orchestrator.onEvent(NewUserOnboardingEvent.SkipRequested)
-        verify(brandDesignOnboardingPixelSender).fire(OnboardingPixelEvent.WelcomeClicked(engaged = false))
+        verify(onboardingPixelSender).fire(ONBOARDING_WELCOME, OnboardingPixelAction.Clicked(engaged = false))
     }
 
     @Test
@@ -764,7 +774,7 @@ class NewUserOnboardingPlanProviderTest {
         orchestrator.onEvent(NewUserOnboardingEvent.NotificationPermissionFinished(granted = null))
         orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked) // initial
         orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked) // comparison_chart
-        verify(brandDesignOnboardingPixelSender).fire(OnboardingPixelEvent.SetDefaultClicked)
+        verify(onboardingPixelSender).fire(ONBOARDING_SET_DEFAULT, OnboardingPixelAction.Clicked())
     }
 
     @Test
@@ -775,7 +785,7 @@ class NewUserOnboardingPlanProviderTest {
         orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked) // initial
         orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked) // comparison_chart
         orchestrator.onEvent(NewUserOnboardingEvent.DefaultBrowserPromptFinished(isDefaultBrowser = true))
-        verify(brandDesignOnboardingPixelSender).fire(OnboardingPixelEvent.SetDefaultConfirmed(isDdgDefault = true))
+        verify(onboardingPixelSender).fire(ONBOARDING_SET_DEFAULT, OnboardingPixelAction.SetDefaultConfirmed(isDdgDefault = true))
     }
 
     @Test
@@ -787,7 +797,9 @@ class NewUserOnboardingPlanProviderTest {
         orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked) // comparison_chart
         orchestrator.onEvent(NewUserOnboardingEvent.DefaultBrowserPromptFinished(isDefaultBrowser = false))
         orchestrator.onEvent(NewUserOnboardingEvent.AddressBarConfirmed(OmnibarType.SINGLE_BOTTOM))
-        verify(brandDesignOnboardingPixelSender).fire(OnboardingPixelEvent.AddressBarPositionClicked(position = OmnibarType.SINGLE_BOTTOM))
+        verify(
+            onboardingPixelSender,
+        ).fire(ONBOARDING_ADDRESS_BAR_POSITION, OnboardingPixelAction.AddressBarClicked(position = OmnibarType.SINGLE_BOTTOM))
     }
 
     @Test
@@ -800,7 +812,7 @@ class NewUserOnboardingPlanProviderTest {
         orchestrator.onEvent(NewUserOnboardingEvent.DefaultBrowserPromptFinished(isDefaultBrowser = false))
         orchestrator.onEvent(NewUserOnboardingEvent.AddressBarConfirmed(OmnibarType.SINGLE_TOP))
         orchestrator.onEvent(NewUserOnboardingEvent.InputModeConfirmed(withAi = false))
-        verify(brandDesignOnboardingPixelSender).fire(OnboardingPixelEvent.SearchExperienceClicked(withAi = false))
+        verify(onboardingPixelSender).fire(ONBOARDING_SEARCH_EXPERIENCE, OnboardingPixelAction.SearchExperienceClicked(withAi = false))
     }
 
     @Test
@@ -815,7 +827,9 @@ class NewUserOnboardingPlanProviderTest {
         orchestrator.onEvent(NewUserOnboardingEvent.AddressBarConfirmed(OmnibarType.SINGLE_TOP))
         orchestrator.onEvent(NewUserOnboardingEvent.InputModeConfirmed(withAi = true))
         orchestrator.onEvent(NewUserOnboardingEvent.InputDemoQuerySubmitted(query = "cats", isChat = false, fromSuggestion = true))
-        verify(brandDesignOnboardingPixelSender).fire(OnboardingPixelEvent.TryASearchClicked(fromSuggestion = true, isChat = false))
+        verify(
+            onboardingPixelSender,
+        ).fire(ONBOARDING_SEARCH_CHAT_TOGGLE, OnboardingPixelAction.TryASearchClicked(fromSuggestion = true, isChat = false))
     }
 
     @Test
@@ -856,7 +870,7 @@ class NewUserOnboardingPlanProviderTest {
         orchestrator.onEvent(NewUserOnboardingEvent.NotificationPermissionFinished(granted = null))
         orchestrator.onEvent(NewUserOnboardingEvent.SkipRequested)
         orchestrator.onEvent(NewUserOnboardingEvent.SkipConfirmed)
-        verify(brandDesignOnboardingPixelSender).fire(OnboardingPixelEvent.SkipOnboardingClicked(engaged = true))
+        verify(onboardingPixelSender).fire(ONBOARDING_SKIP_ONBOARDING, OnboardingPixelAction.Clicked(engaged = true))
     }
 
     @Test
@@ -867,7 +881,7 @@ class NewUserOnboardingPlanProviderTest {
         orchestrator.onEvent(NewUserOnboardingEvent.NotificationPermissionFinished(granted = null))
         orchestrator.onEvent(NewUserOnboardingEvent.SkipRequested)
         orchestrator.onEvent(NewUserOnboardingEvent.ResumeRequested)
-        verify(brandDesignOnboardingPixelSender).fire(OnboardingPixelEvent.SkipOnboardingClicked(engaged = false))
+        verify(onboardingPixelSender).fire(ONBOARDING_SKIP_ONBOARDING, OnboardingPixelAction.Clicked(engaged = false))
     }
 
     @Test
@@ -879,7 +893,7 @@ class NewUserOnboardingPlanProviderTest {
         orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked) // initial
         assertStep(NewUserOnboardingStepIds.AI_COMPARISON_CHART)
         orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked)
-        verify(brandDesignOnboardingPixelSender).fire(OnboardingPixelEvent.AiComparisonClicked)
+        verify(onboardingPixelSender).fire(ONBOARDING_AI_INTRO, OnboardingPixelAction.Clicked())
     }
 
     // endregion

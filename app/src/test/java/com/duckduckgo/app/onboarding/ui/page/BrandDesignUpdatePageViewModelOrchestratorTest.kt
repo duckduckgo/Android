@@ -91,7 +91,7 @@ class BrandDesignUpdatePageViewModelOrchestratorTest {
     ): LinearOnboardingPlan =
         LinearOnboardingPlan(
             id = NewUserOnboardingPlanProvider.ROOT_PLAN_ID,
-            steps = listOf(NewUserOnboardingActivityStep(id = id, shownEvent = null, transition = transition, resolveDialog = { dialog })),
+            steps = listOf(NewUserOnboardingActivityStep(id = id, pixelName = null, transition = transition, resolveDialog = { dialog })),
             result = result,
         )
 
@@ -352,14 +352,14 @@ class BrandDesignUpdatePageViewModelOrchestratorTest {
             steps = listOf(
                 NewUserOnboardingActivityStep(
                     id = "ai_comparison_chart",
-                    shownEvent = null,
+                    pixelName = null,
                     showsStepIndicator = true,
                     transition = { LinearOnboardingTransition.Advance },
                     resolveDialog = { NewUserOnboardingActivityDialog.AiComparisonChart },
                 ),
                 NewUserOnboardingActivityStep(
                     id = "input_screen_preview",
-                    shownEvent = null,
+                    pixelName = null,
                     showsStepIndicator = true,
                     transition = recordAndStay,
                     resolveDialog = { NewUserOnboardingActivityDialog.InputScreenPreview(isSearchDefault = false) },
@@ -382,7 +382,7 @@ class BrandDesignUpdatePageViewModelOrchestratorTest {
     private suspend fun startAtBrowserStep(): BrandDesignUpdatePageViewModel {
         val browserStep = NewUserBrowserActivityStep(
             id = "duck_ai_demo",
-            shownEvent = null,
+            pixelName = null,
             transition = { LinearOnboardingTransition.Stay },
             resolveAction = { NewUserBrowserActivityAction.RunDuckAiOnboardingDemo("x") },
         )

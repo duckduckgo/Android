@@ -1658,7 +1658,7 @@ class BrandDesignUpdatePageViewModelTest {
     private fun aiComparisonChartStep() =
         NewUserOnboardingActivityStep(
             id = "ai_comparison_chart",
-            shownEvent = null,
+            pixelName = null,
             showsStepIndicator = true,
             transition = { LinearOnboardingTransition.Stay },
             resolveDialog = { NewUserOnboardingActivityDialog.AiComparisonChart },

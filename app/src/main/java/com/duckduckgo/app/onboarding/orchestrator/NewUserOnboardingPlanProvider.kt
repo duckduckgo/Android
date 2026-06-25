@@ -28,8 +28,8 @@ import com.duckduckgo.app.onboarding.CustomAiOnboardingStore
 import com.duckduckgo.app.onboarding.DuckAiOnboardingAvailability
 import com.duckduckgo.app.onboarding.DuckAiOnboardingDemo
 import com.duckduckgo.app.onboarding.store.OnboardingStore
-import com.duckduckgo.app.onboarding.ui.page.BrandDesignOnboardingPixelSender
-import com.duckduckgo.app.onboarding.ui.page.OnboardingPixelEvent
+import com.duckduckgo.app.onboarding.ui.page.OnboardingPixelAction
+import com.duckduckgo.app.onboarding.ui.page.OnboardingPixelSender
 import com.duckduckgo.app.onboardingquicksetup.OnboardingQuickSetupExperimentManager
 import com.duckduckgo.app.onboardingquicksetup.OnboardingQuickSetupExperimentManager.QuickSetupExperimentVariant
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_AICHAT_SELECTED
@@ -42,6 +42,7 @@ import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_SKIP_ONBOARDING_PRES
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_SPLIT_ADDRESS_BAR_SELECTED_UNIQUE
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_SYNC_RESTORE_TAPPED_UNIQUE
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_SYNC_SKIP_RESTORE_TAPPED_UNIQUE
+import com.duckduckgo.app.pixels.OnboardingPixelName
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -88,7 +89,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
     private val androidBrowserConfigFeature: AndroidBrowserConfigFeature,
     private val duckAiOnboardingAvailability: DuckAiOnboardingAvailability,
     private val onboardingQuickSetupExperimentManager: OnboardingQuickSetupExperimentManager,
-    private val brandDesignOnboardingPixelSender: BrandDesignOnboardingPixelSender,
+    private val onboardingPixelSender: OnboardingPixelSender,
     private val inputScreenOnboardingWideEvent: InputScreenOnboardingWideEvent,
     private val defaultBrowserDetector: DefaultBrowserDetector,
     private val widgetCapabilities: WidgetCapabilities,
@@ -242,17 +243,18 @@ class NewUserOnboardingPlanProvider @Inject constructor(
         }
 
     /**
-     * Wraps each step so that a [NewUserOnboardingEvent.Presented] event fires the step's [shownEvent] pixel
-     * (if any) and then returns [Stay]. This is the inner wrap, applied before [abortingOnDevSkip].
+     * Wraps each step so that a [NewUserOnboardingEvent.Presented] event fires the step's shown pixel
+     * (its [NewUserOnboardingActivityStep.pixelName], if any) and then delegates to the original transition.
+     * This is the inner wrap, applied before [abortingOnDevSkip].
      */
     private fun List<LinearOnboardingStep>.firingShownPixels(): List<LinearOnboardingStep> =
         map { step ->
-            val shownEvent = (step as? NewUserOnboardingActivityStep)?.shownEvent
-                ?: (step as? NewUserBrowserActivityStep)?.shownEvent
+            val pixelName = (step as? NewUserOnboardingActivityStep)?.pixelName
+                ?: (step as? NewUserBrowserActivityStep)?.pixelName
             val original = step.transition
             val wrapped: suspend (LinearOnboardingEvent) -> LinearOnboardingTransition = { event ->
-                if (event is NewUserOnboardingEvent.Presented && shownEvent != null) {
-                    brandDesignOnboardingPixelSender.fire(shownEvent)
+                if (event is NewUserOnboardingEvent.Presented && pixelName != null) {
+                    onboardingPixelSender.fire(pixelName, OnboardingPixelAction.Shown)
                 }
                 original(event)
             }
@@ -289,7 +291,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
 
     private fun introAnimationStep(withDuckAi: Boolean = false) = NewUserOnboardingActivityStep(
         id = NewUserOnboardingStepIds.INTRO_ANIMATION,
-        shownEvent = null,
+        pixelName = null,
         resolveDialog = {
             NewUserOnboardingActivityDialog.IntroAnimation(withDuckAi)
         },
@@ -301,140 +303,159 @@ class NewUserOnboardingPlanProvider @Inject constructor(
         },
     )
 
-    private fun notificationPermissionStep() = NewUserOnboardingActivityStep(
-        id = NewUserOnboardingStepIds.NOTIFICATION_PERMISSION,
-        shownEvent = OnboardingPixelEvent.NotificationsShown,
-        resolveDialog = { NewUserOnboardingActivityDialog.NotificationPermission },
-        transition = { event ->
-            when {
-                event is NewUserOnboardingEvent.NotificationPermissionFinished -> {
-                    if (event.granted != null) {
-                        brandDesignOnboardingPixelSender.fire(OnboardingPixelEvent.NotificationsConfirmed(granted = event.granted))
+    private fun notificationPermissionStep(): NewUserOnboardingActivityStep {
+        val pixelName = OnboardingPixelName.ONBOARDING_NOTIFICATIONS
+        return NewUserOnboardingActivityStep(
+            id = NewUserOnboardingStepIds.NOTIFICATION_PERMISSION,
+            pixelName = pixelName,
+            resolveDialog = { NewUserOnboardingActivityDialog.NotificationPermission },
+            transition = { event ->
+                when {
+                    event is NewUserOnboardingEvent.NotificationPermissionFinished -> {
+                        if (event.granted != null) {
+                            onboardingPixelSender.fire(pixelName, OnboardingPixelAction.NotificationsConfirmed(granted = event.granted))
+                        }
+                        Advance
                     }
-                    Advance
+                    else -> Stay
                 }
-                else -> Stay
-            }
-        },
-    )
+            },
+        )
+    }
 
     private fun syncRestoreStep(
         firstDialog: SuspendMemo<FirstDialog>,
         skipPlan: LinearOnboardingPlan,
         quickSetupPlan: LinearOnboardingPlan,
-    ) = NewUserOnboardingActivityStep(
-        id = NewUserOnboardingStepIds.SYNC_RESTORE,
-        shownEvent = OnboardingPixelEvent.SyncRestoreShown,
-        precondition = { firstDialog() == FirstDialog.SYNC_RESTORE },
-        resolveDialog = { NewUserOnboardingActivityDialog.SyncRestore },
-        transition = { event ->
-            when (event) {
-                is NewUserOnboardingEvent.RestoreRequested -> {
-                    pixel.fire(PREONBOARDING_SYNC_RESTORE_TAPPED_UNIQUE, type = Unique())
-                    brandDesignOnboardingPixelSender.fire(OnboardingPixelEvent.SyncRestoreClicked(engaged = true))
-                    syncAutoRestore.restoreSyncAccount()
-                    Advance
-                }
+    ): NewUserOnboardingActivityStep {
+        val pixelName = OnboardingPixelName.ONBOARDING_WELCOME
+        return NewUserOnboardingActivityStep(
+            id = NewUserOnboardingStepIds.SYNC_RESTORE,
+            pixelName = pixelName,
+            precondition = { firstDialog() == FirstDialog.SYNC_RESTORE },
+            resolveDialog = { NewUserOnboardingActivityDialog.SyncRestore },
+            transition = { event ->
+                when (event) {
+                    is NewUserOnboardingEvent.RestoreRequested -> {
+                        pixel.fire(PREONBOARDING_SYNC_RESTORE_TAPPED_UNIQUE, type = Unique())
+                        onboardingPixelSender.fire(pixelName, OnboardingPixelAction.Clicked(engaged = true))
+                        syncAutoRestore.restoreSyncAccount()
+                        Advance
+                    }
 
-                is NewUserOnboardingEvent.SkipRequested -> {
-                    pixel.fire(PREONBOARDING_SYNC_SKIP_RESTORE_TAPPED_UNIQUE, type = Unique())
-                    brandDesignOnboardingPixelSender.fire(OnboardingPixelEvent.SyncRestoreClicked(engaged = false))
-                    skipFork(skipPlan, quickSetupPlan)
-                }
+                    is NewUserOnboardingEvent.SkipRequested -> {
+                        pixel.fire(PREONBOARDING_SYNC_SKIP_RESTORE_TAPPED_UNIQUE, type = Unique())
+                        onboardingPixelSender.fire(pixelName, OnboardingPixelAction.Clicked(engaged = false))
+                        skipFork(skipPlan, quickSetupPlan)
+                    }
 
-                else -> Stay
-            }
-        },
-    )
+                    else -> Stay
+                }
+            },
+        )
+    }
 
     private fun initialReinstallUserStep(
         firstDialog: SuspendMemo<FirstDialog>,
         skipPlan: LinearOnboardingPlan,
         quickSetupPlan: LinearOnboardingPlan,
         isCustomAiPlan: Boolean = false,
-    ) = NewUserOnboardingActivityStep(
-        id = NewUserOnboardingStepIds.INITIAL_REINSTALL_USER,
-        shownEvent = OnboardingPixelEvent.WelcomeShown,
-        precondition = {
-            when (firstDialog()) {
-                FirstDialog.SYNC_RESTORE -> {
-                    if (isCustomAiPlan) {
-                        pixel.fire(CustomAiOnboardingPixelName.RETURNING_SYNC_USER_IGNORED, type = Unique())
-                        true
-                    } else {
-                        false
+    ): NewUserOnboardingActivityStep {
+        val pixelName = OnboardingPixelName.ONBOARDING_WELCOME
+        return NewUserOnboardingActivityStep(
+            id = NewUserOnboardingStepIds.INITIAL_REINSTALL_USER,
+            pixelName = pixelName,
+            precondition = {
+                when (firstDialog()) {
+                    FirstDialog.SYNC_RESTORE -> {
+                        if (isCustomAiPlan) {
+                            pixel.fire(CustomAiOnboardingPixelName.RETURNING_SYNC_USER_IGNORED, type = Unique())
+                            true
+                        } else {
+                            false
+                        }
                     }
+                    FirstDialog.REINSTALL -> true
+                    FirstDialog.INITIAL -> false
                 }
-                FirstDialog.REINSTALL -> true
-                FirstDialog.INITIAL -> false
-            }
-        },
-        resolveDialog = { NewUserOnboardingActivityDialog.InitialReinstallUser },
-        transition = { event ->
-            when (event) {
-                is NewUserOnboardingEvent.ContinueClicked -> {
-                    brandDesignOnboardingPixelSender.fire(OnboardingPixelEvent.WelcomeClicked(engaged = true))
-                    Advance
-                }
-                is NewUserOnboardingEvent.SkipRequested -> {
-                    pixel.fire(PREONBOARDING_SKIP_ONBOARDING_PRESSED)
-                    brandDesignOnboardingPixelSender.fire(OnboardingPixelEvent.WelcomeClicked(engaged = false))
-                    skipFork(skipPlan, quickSetupPlan)
-                }
+            },
+            resolveDialog = { NewUserOnboardingActivityDialog.InitialReinstallUser },
+            transition = { event ->
+                when (event) {
+                    is NewUserOnboardingEvent.ContinueClicked -> {
+                        onboardingPixelSender.fire(pixelName, OnboardingPixelAction.Clicked(engaged = true))
+                        Advance
+                    }
+                    is NewUserOnboardingEvent.SkipRequested -> {
+                        pixel.fire(PREONBOARDING_SKIP_ONBOARDING_PRESSED)
+                        onboardingPixelSender.fire(pixelName, OnboardingPixelAction.Clicked(engaged = false))
+                        skipFork(skipPlan, quickSetupPlan)
+                    }
 
-                else -> Stay
-            }
-        },
-    )
+                    else -> Stay
+                }
+            },
+        )
+    }
 
     private fun initialStep(
         firstDialog: SuspendMemo<FirstDialog>,
-    ) = NewUserOnboardingActivityStep(
-        id = NewUserOnboardingStepIds.INITIAL,
-        shownEvent = OnboardingPixelEvent.WelcomeShown,
-        precondition = { firstDialog() == FirstDialog.INITIAL },
-        resolveDialog = { NewUserOnboardingActivityDialog.Initial },
-        transition = { event ->
-            when {
-                event is NewUserOnboardingEvent.ContinueClicked -> {
-                    brandDesignOnboardingPixelSender.fire(OnboardingPixelEvent.WelcomeClicked(engaged = true))
-                    Advance
+    ): NewUserOnboardingActivityStep {
+        val pixelName = OnboardingPixelName.ONBOARDING_WELCOME
+        return NewUserOnboardingActivityStep(
+            id = NewUserOnboardingStepIds.INITIAL,
+            pixelName = pixelName,
+            precondition = { firstDialog() == FirstDialog.INITIAL },
+            resolveDialog = { NewUserOnboardingActivityDialog.Initial },
+            transition = { event ->
+                when {
+                    event is NewUserOnboardingEvent.ContinueClicked -> {
+                        onboardingPixelSender.fire(pixelName, OnboardingPixelAction.Clicked(engaged = true))
+                        Advance
+                    }
+                    else -> Stay
                 }
-                else -> Stay
-            }
-        },
-    )
+            },
+        )
+    }
 
-    private fun comparisonChartStep() = NewUserOnboardingActivityStep(
-        id = NewUserOnboardingStepIds.COMPARISON_CHART,
-        shownEvent = OnboardingPixelEvent.SetDefaultShown,
-        showsStepIndicator = true,
-        resolveDialog = { NewUserOnboardingActivityDialog.ComparisonChart },
-        transition = { event ->
-            when {
-                event is NewUserOnboardingEvent.ContinueClicked -> {
-                    val showDefaultBrowserDialog = defaultRoleBrowserDialog.shouldShowDialog()
-                    pixel.fire(
-                        PREONBOARDING_CHOOSE_BROWSER_PRESSED,
-                        mapOf(PixelParameter.DEFAULT_BROWSER to (!showDefaultBrowserDialog).toString()),
-                    )
-                    brandDesignOnboardingPixelSender.fire(OnboardingPixelEvent.SetDefaultClicked)
-                    Advance
+    private fun comparisonChartStep(): NewUserOnboardingActivityStep {
+        val pixelName = OnboardingPixelName.ONBOARDING_SET_DEFAULT
+        return NewUserOnboardingActivityStep(
+            id = NewUserOnboardingStepIds.COMPARISON_CHART,
+            pixelName = pixelName,
+            showsStepIndicator = true,
+            resolveDialog = { NewUserOnboardingActivityDialog.ComparisonChart },
+            transition = { event ->
+                when {
+                    event is NewUserOnboardingEvent.ContinueClicked -> {
+                        val showDefaultBrowserDialog = defaultRoleBrowserDialog.shouldShowDialog()
+                        pixel.fire(
+                            PREONBOARDING_CHOOSE_BROWSER_PRESSED,
+                            mapOf(PixelParameter.DEFAULT_BROWSER to (!showDefaultBrowserDialog).toString()),
+                        )
+                        onboardingPixelSender.fire(pixelName, OnboardingPixelAction.Clicked())
+                        Advance
+                    }
+                    else -> Stay
                 }
-                else -> Stay
-            }
-        },
-    )
+            },
+        )
+    }
 
     private fun defaultBrowserPromptStep() = NewUserOnboardingActivityStep(
         id = NewUserOnboardingStepIds.DEFAULT_BROWSER_PROMPT,
-        shownEvent = null,
+        // No shown pixel of its own; the confirmed result belongs to the set-default pixel (started on the comparison-chart step).
+        pixelName = null,
         precondition = { defaultRoleBrowserDialog.shouldShowDialog() },
         resolveDialog = { NewUserOnboardingActivityDialog.DefaultBrowserPrompt },
         transition = { event ->
             when {
                 event is NewUserOnboardingEvent.DefaultBrowserPromptFinished -> {
-                    brandDesignOnboardingPixelSender.fire(OnboardingPixelEvent.SetDefaultConfirmed(isDdgDefault = event.isDefaultBrowser))
+                    onboardingPixelSender.fire(
+                        OnboardingPixelName.ONBOARDING_SET_DEFAULT,
+                        OnboardingPixelAction.SetDefaultConfirmed(isDdgDefault = event.isDefaultBrowser),
+                    )
                     Advance
                 }
                 else -> Stay
@@ -442,130 +463,147 @@ class NewUserOnboardingPlanProvider @Inject constructor(
         },
     )
 
-    private fun addressBarPositionStep() = NewUserOnboardingActivityStep(
-        id = NewUserOnboardingStepIds.ADDRESS_BAR_POSITION,
-        shownEvent = OnboardingPixelEvent.AddressBarPositionShown,
-        showsStepIndicator = true,
-        resolveDialog = { NewUserOnboardingActivityDialog.AddressBarPosition(showSplitOption = isSplitOmnibarEnabled()) },
-        transition = { event ->
-            when {
-                event is NewUserOnboardingEvent.AddressBarConfirmed -> {
-                    val resolved = resolveOmnibarType(event.type)
-                    settingsDataStore.omnibarType = resolved
-                    fireAddressBarPositionPixel(resolved)
-                    brandDesignOnboardingPixelSender.fire(OnboardingPixelEvent.AddressBarPositionClicked(position = resolved))
-                    Advance
+    private fun addressBarPositionStep(): NewUserOnboardingActivityStep {
+        val pixelName = OnboardingPixelName.ONBOARDING_ADDRESS_BAR_POSITION
+        return NewUserOnboardingActivityStep(
+            id = NewUserOnboardingStepIds.ADDRESS_BAR_POSITION,
+            pixelName = pixelName,
+            showsStepIndicator = true,
+            resolveDialog = { NewUserOnboardingActivityDialog.AddressBarPosition(showSplitOption = isSplitOmnibarEnabled()) },
+            transition = { event ->
+                when {
+                    event is NewUserOnboardingEvent.AddressBarConfirmed -> {
+                        val resolved = resolveOmnibarType(event.type)
+                        settingsDataStore.omnibarType = resolved
+                        fireAddressBarPositionPixel(resolved)
+                        onboardingPixelSender.fire(pixelName, OnboardingPixelAction.AddressBarClicked(position = resolved))
+                        Advance
+                    }
+                    else -> Stay
                 }
-                else -> Stay
-            }
-        },
-    )
+            },
+        )
+    }
 
-    private fun inputScreenStep(ctx: NewUserOnboardingPlanContext) = NewUserOnboardingActivityStep(
-        id = NewUserOnboardingStepIds.INPUT_SCREEN,
-        shownEvent = OnboardingPixelEvent.SearchExperienceShown,
-        showsStepIndicator = true,
-        resolveDialog = { NewUserOnboardingActivityDialog.InputScreen },
-        transition = { event ->
-            when {
-                event is NewUserOnboardingEvent.InputModeConfirmed -> {
-                    applyInputModeSelection(ctx, event.withAi, fireTelemetry = true)
-                    ctx.inputModeWasAi = event.withAi
-                    brandDesignOnboardingPixelSender.fire(OnboardingPixelEvent.SearchExperienceClicked(withAi = event.withAi))
-                    Advance
+    private fun inputScreenStep(ctx: NewUserOnboardingPlanContext): NewUserOnboardingActivityStep {
+        val pixelName = OnboardingPixelName.ONBOARDING_SEARCH_EXPERIENCE
+        return NewUserOnboardingActivityStep(
+            id = NewUserOnboardingStepIds.INPUT_SCREEN,
+            pixelName = pixelName,
+            showsStepIndicator = true,
+            resolveDialog = { NewUserOnboardingActivityDialog.InputScreen },
+            transition = { event ->
+                when {
+                    event is NewUserOnboardingEvent.InputModeConfirmed -> {
+                        applyInputModeSelection(ctx, event.withAi, fireTelemetry = true)
+                        ctx.inputModeWasAi = event.withAi
+                        onboardingPixelSender.fire(pixelName, OnboardingPixelAction.SearchExperienceClicked(withAi = event.withAi))
+                        Advance
+                    }
+                    else -> Stay
                 }
-                else -> Stay
-            }
-        },
-    )
+            },
+        )
+    }
 
     private fun inputScreenPreviewStep(
         ctx: NewUserOnboardingPlanContext,
         duckAiEnabled: SuspendMemo<Boolean>,
-    ) = NewUserOnboardingActivityStep(
-        id = NewUserOnboardingStepIds.INPUT_SCREEN_PREVIEW,
-        shownEvent = OnboardingPixelEvent.TryASearchShown,
-        precondition = {
-            ctx.inputModeWasAi && duckAiEnabled()
-        },
-        resolveDialog = {
-            NewUserOnboardingActivityDialog.InputScreenPreview(isSearchDefault = true)
-        },
-        transition = { event ->
-            when (event) {
-                is NewUserOnboardingEvent.InputDemoQuerySubmitted -> {
-                    if (event.isChat) {
-                        onboardingStore.setChatOnboardingVariant()
-                    } else {
-                        onboardingStore.setSearchOnboardingVariant()
+    ): NewUserOnboardingActivityStep {
+        val pixelName = OnboardingPixelName.ONBOARDING_SEARCH_CHAT_TOGGLE
+        return NewUserOnboardingActivityStep(
+            id = NewUserOnboardingStepIds.INPUT_SCREEN_PREVIEW,
+            pixelName = pixelName,
+            precondition = {
+                ctx.inputModeWasAi && duckAiEnabled()
+            },
+            resolveDialog = {
+                NewUserOnboardingActivityDialog.InputScreenPreview(isSearchDefault = true)
+            },
+            transition = { event ->
+                when (event) {
+                    is NewUserOnboardingEvent.InputDemoQuerySubmitted -> {
+                        if (event.isChat) {
+                            onboardingStore.setChatOnboardingVariant()
+                        } else {
+                            onboardingStore.setSearchOnboardingVariant()
+                        }
+                        onboardingPixelSender.fire(
+                            pixelName,
+                            OnboardingPixelAction.TryASearchClicked(fromSuggestion = event.fromSuggestion, isChat = event.isChat),
+                        )
+                        ctx.completionResult = if (event.isChat) {
+                            NewUserOnboardingResult.LaunchChat(prompt = event.query)
+                        } else {
+                            NewUserOnboardingResult.LaunchSearch(query = event.query)
+                        }
+                        Advance
                     }
-                    brandDesignOnboardingPixelSender.fire(
-                        OnboardingPixelEvent.TryASearchClicked(fromSuggestion = event.fromSuggestion, isChat = event.isChat),
-                    )
-                    ctx.completionResult = if (event.isChat) {
-                        NewUserOnboardingResult.LaunchChat(prompt = event.query)
-                    } else {
-                        NewUserOnboardingResult.LaunchSearch(query = event.query)
+
+                    is NewUserOnboardingEvent.ContinueClicked -> Advance
+                    else -> Stay
+                }
+            },
+        )
+    }
+
+    private fun aiComparisonChartStep(): NewUserOnboardingActivityStep {
+        val pixelName = OnboardingPixelName.ONBOARDING_AI_INTRO
+        return NewUserOnboardingActivityStep(
+            id = NewUserOnboardingStepIds.AI_COMPARISON_CHART,
+            pixelName = pixelName,
+            showsStepIndicator = true,
+            resolveDialog = { NewUserOnboardingActivityDialog.AiComparisonChart },
+            transition = { event ->
+                when {
+                    event is NewUserOnboardingEvent.ContinueClicked -> {
+                        onboardingPixelSender.fire(pixelName, OnboardingPixelAction.Clicked())
+                        Advance
                     }
-                    Advance
+                    else -> Stay
                 }
-
-                is NewUserOnboardingEvent.ContinueClicked -> Advance
-                else -> Stay
-            }
-        },
-    )
-
-    private fun aiComparisonChartStep() = NewUserOnboardingActivityStep(
-        id = NewUserOnboardingStepIds.AI_COMPARISON_CHART,
-        shownEvent = OnboardingPixelEvent.AiComparisonShown,
-        showsStepIndicator = true,
-        resolveDialog = { NewUserOnboardingActivityDialog.AiComparisonChart },
-        transition = { event ->
-            when {
-                event is NewUserOnboardingEvent.ContinueClicked -> {
-                    brandDesignOnboardingPixelSender.fire(OnboardingPixelEvent.AiComparisonClicked)
-                    Advance
-                }
-                else -> Stay
-            }
-        },
-    )
+            },
+        )
+    }
 
     // Chat-only preview: the toggle is hidden and the demo defaults to chat. Captures the prompt for the
     // duck_ai_demo step.
-    private fun customAiInputScreenPreviewStep(ctx: NewUserOnboardingPlanContext) = NewUserOnboardingActivityStep(
-        id = NewUserOnboardingStepIds.INPUT_SCREEN_PREVIEW,
-        shownEvent = OnboardingPixelEvent.TryASearchShown,
-        precondition = {
-            withContext(dispatchers.io()) {
-                androidBrowserConfigFeature.singleTabFireDialog().isEnabled()
-            }
-        },
-        showsStepIndicator = true,
-        resolveDialog = { NewUserOnboardingActivityDialog.InputScreenPreview(isSearchDefault = false) },
-        transition = { event ->
-            when {
-                event is NewUserOnboardingEvent.InputDemoQuerySubmitted -> {
-                    if (event.isChat) {
-                        onboardingStore.setChatOnboardingVariant()
-                    } else {
-                        onboardingStore.setSearchOnboardingVariant()
-                    }
-                    brandDesignOnboardingPixelSender.fire(
-                        OnboardingPixelEvent.TryASearchClicked(fromSuggestion = event.fromSuggestion, isChat = event.isChat),
-                    )
-                    ctx.pendingDuckAiPrompt = event.query
-                    Advance
+    private fun customAiInputScreenPreviewStep(ctx: NewUserOnboardingPlanContext): NewUserOnboardingActivityStep {
+        val pixelName = OnboardingPixelName.ONBOARDING_SEARCH_CHAT_TOGGLE
+        return NewUserOnboardingActivityStep(
+            id = NewUserOnboardingStepIds.INPUT_SCREEN_PREVIEW,
+            pixelName = pixelName,
+            precondition = {
+                withContext(dispatchers.io()) {
+                    androidBrowserConfigFeature.singleTabFireDialog().isEnabled()
                 }
-                else -> Stay
-            }
-        },
-    )
+            },
+            showsStepIndicator = true,
+            resolveDialog = { NewUserOnboardingActivityDialog.InputScreenPreview(isSearchDefault = false) },
+            transition = { event ->
+                when {
+                    event is NewUserOnboardingEvent.InputDemoQuerySubmitted -> {
+                        if (event.isChat) {
+                            onboardingStore.setChatOnboardingVariant()
+                        } else {
+                            onboardingStore.setSearchOnboardingVariant()
+                        }
+                        onboardingPixelSender.fire(
+                            pixelName,
+                            OnboardingPixelAction.TryASearchClicked(fromSuggestion = event.fromSuggestion, isChat = event.isChat),
+                        )
+                        ctx.pendingDuckAiPrompt = event.query
+                        Advance
+                    }
+                    else -> Stay
+                }
+            },
+        )
+    }
 
     private fun duckAiDemoStep(ctx: NewUserOnboardingPlanContext) = NewUserBrowserActivityStep(
         id = NewUserOnboardingStepIds.DUCK_AI_DEMO,
-        shownEvent = null,
+        pixelName = null,
         precondition = {
             withContext(dispatchers.io()) {
                 androidBrowserConfigFeature.singleTabFireDialog().isEnabled()
@@ -580,62 +618,69 @@ class NewUserOnboardingPlanProvider @Inject constructor(
         },
     )
 
-    private fun skipOnboardingOptionStep() = NewUserOnboardingActivityStep(
-        id = NewUserOnboardingStepIds.SKIP_ONBOARDING_OPTION,
-        shownEvent = OnboardingPixelEvent.SkipOnboardingShown,
-        resolveDialog = { NewUserOnboardingActivityDialog.SkipNewUserOnboardingOption },
-        transition = { event ->
-            when (event) {
-                is NewUserOnboardingEvent.SkipConfirmed -> {
-                    pixel.fire(PREONBOARDING_CONFIRM_SKIP_ONBOARDING_PRESSED)
-                    brandDesignOnboardingPixelSender.fire(OnboardingPixelEvent.SkipOnboardingClicked(engaged = true))
-                    duckChat.setInputScreenUserSetting(true)
-                    AbortPlan
-                }
+    private fun skipOnboardingOptionStep(): NewUserOnboardingActivityStep {
+        val pixelName = OnboardingPixelName.ONBOARDING_SKIP_ONBOARDING
+        return NewUserOnboardingActivityStep(
+            id = NewUserOnboardingStepIds.SKIP_ONBOARDING_OPTION,
+            pixelName = pixelName,
+            resolveDialog = { NewUserOnboardingActivityDialog.SkipNewUserOnboardingOption },
+            transition = { event ->
+                when (event) {
+                    is NewUserOnboardingEvent.SkipConfirmed -> {
+                        pixel.fire(PREONBOARDING_CONFIRM_SKIP_ONBOARDING_PRESSED)
+                        onboardingPixelSender.fire(pixelName, OnboardingPixelAction.Clicked(engaged = true))
+                        duckChat.setInputScreenUserSetting(true)
+                        AbortPlan
+                    }
 
-                is NewUserOnboardingEvent.ResumeRequested -> {
-                    pixel.fire(PREONBOARDING_RESUME_ONBOARDING_PRESSED)
-                    brandDesignOnboardingPixelSender.fire(OnboardingPixelEvent.SkipOnboardingClicked(engaged = false))
-                    ReturnAndAdvance
-                }
+                    is NewUserOnboardingEvent.ResumeRequested -> {
+                        pixel.fire(PREONBOARDING_RESUME_ONBOARDING_PRESSED)
+                        onboardingPixelSender.fire(pixelName, OnboardingPixelAction.Clicked(engaged = false))
+                        ReturnAndAdvance
+                    }
 
-                else -> Stay
-            }
-        },
-    )
-
-    private fun quickSetupStep(ctx: NewUserOnboardingPlanContext) = NewUserOnboardingActivityStep(
-        id = NewUserOnboardingStepIds.QUICK_SETUP,
-        shownEvent = OnboardingPixelEvent.QuickSetupShown,
-        resolveDialog = {
-            val (isDefault, hasWidget) = withContext(dispatchers.io()) {
-                defaultBrowserDetector.isDefaultBrowser() to widgetCapabilities.hasInstalledWidgets
-            }
-            NewUserOnboardingActivityDialog.QuickSetup(
-                showSplitOption = isSplitOmnibarEnabled(),
-                hideSetDefaultBrowserRow = isDefault,
-                hideAddWidgetRow = hasWidget,
-                isReinstallUser = ctx.isReinstall,
-            )
-        },
-        transition = { event ->
-            when {
-                event is NewUserOnboardingEvent.QuickSetupConfirmed -> {
-                    val resolved = resolveOmnibarType(event.type)
-                    settingsDataStore.omnibarType = resolved
-                    applyInputModeSelection(ctx, event.withAi, fireTelemetry = false)
-                    brandDesignOnboardingPixelSender.fire(
-                        OnboardingPixelEvent.QuickSetupClicked(
-                            addressBarPosition = resolved,
-                            inputScreenSelected = event.withAi,
-                        ),
-                    )
-                    AbortPlan
+                    else -> Stay
                 }
-                else -> Stay
-            }
-        },
-    )
+            },
+        )
+    }
+
+    private fun quickSetupStep(ctx: NewUserOnboardingPlanContext): NewUserOnboardingActivityStep {
+        val pixelName = OnboardingPixelName.ONBOARDING_QUICK_SETUP
+        return NewUserOnboardingActivityStep(
+            id = NewUserOnboardingStepIds.QUICK_SETUP,
+            pixelName = pixelName,
+            resolveDialog = {
+                val (isDefault, hasWidget) = withContext(dispatchers.io()) {
+                    defaultBrowserDetector.isDefaultBrowser() to widgetCapabilities.hasInstalledWidgets
+                }
+                NewUserOnboardingActivityDialog.QuickSetup(
+                    showSplitOption = isSplitOmnibarEnabled(),
+                    hideSetDefaultBrowserRow = isDefault,
+                    hideAddWidgetRow = hasWidget,
+                    isReinstallUser = ctx.isReinstall,
+                )
+            },
+            transition = { event ->
+                when {
+                    event is NewUserOnboardingEvent.QuickSetupConfirmed -> {
+                        val resolved = resolveOmnibarType(event.type)
+                        settingsDataStore.omnibarType = resolved
+                        applyInputModeSelection(ctx, event.withAi, fireTelemetry = false)
+                        onboardingPixelSender.fire(
+                            pixelName,
+                            OnboardingPixelAction.QuickSetupClicked(
+                                addressBarPosition = resolved,
+                                inputScreenSelected = event.withAi,
+                            ),
+                        )
+                        AbortPlan
+                    }
+                    else -> Stay
+                }
+            },
+        )
+    }
 
     private suspend fun skipFork(
         skipPlan: LinearOnboardingPlan,

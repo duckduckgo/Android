@@ -23,7 +23,7 @@ import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.install.daysInstalled
 import com.duckduckgo.app.onboarding.CustomAiOnboardingStore
 import com.duckduckgo.app.onboarding.store.OnboardingStore
-import com.duckduckgo.app.pixels.AppPixelName
+import com.duckduckgo.app.pixels.OnboardingPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
@@ -40,52 +40,39 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
-sealed interface OnboardingPixelEvent {
-    data object WelcomeShown : OnboardingPixelEvent
-    data class WelcomeClicked(val engaged: Boolean) : OnboardingPixelEvent
+/**
+ * What happened in an onboarding step. Models the interaction, not the screen — the screen is the
+ * [OnboardingPixelName] passed alongside it to [OnboardingPixelSender.fire]. Variants carry a typed payload only
+ * where the pixel's `value` is screen-specific; everything else is a plain [Shown] or [Clicked].
+ */
+sealed interface OnboardingPixelAction {
+    data object Shown : OnboardingPixelAction
 
-    data object SetDefaultShown : OnboardingPixelEvent
-    data object SetDefaultClicked : OnboardingPixelEvent
-    data class SetDefaultConfirmed(val isDdgDefault: Boolean) : OnboardingPixelEvent
+    /** A click/tap. [engaged] null = no value param; true/false = engage/dismiss. */
+    data class Clicked(val engaged: Boolean? = null) : OnboardingPixelAction
 
-    data object AddressBarPositionShown : OnboardingPixelEvent
-    data class AddressBarPositionClicked(val position: OmnibarType) : OnboardingPixelEvent
-
-    data object SearchExperienceShown : OnboardingPixelEvent
-    data class SearchExperienceClicked(val withAi: Boolean) : OnboardingPixelEvent
-
-    data object SkipOnboardingShown : OnboardingPixelEvent
-    data class SkipOnboardingClicked(val engaged: Boolean) : OnboardingPixelEvent
-
-    data object NotificationsShown : OnboardingPixelEvent
-    data class NotificationsConfirmed(val granted: Boolean) : OnboardingPixelEvent
-
-    data object QuickSetupShown : OnboardingPixelEvent
-    data class QuickSetupClicked(
-        val addressBarPosition: OmnibarType,
-        val inputScreenSelected: Boolean,
-    ) : OnboardingPixelEvent
-
-    data object SyncRestoreShown : OnboardingPixelEvent
-    data class SyncRestoreClicked(val engaged: Boolean) : OnboardingPixelEvent
-
-    data object TryASearchShown : OnboardingPixelEvent
+    data class SetDefaultConfirmed(val isDdgDefault: Boolean) : OnboardingPixelAction
+    data class NotificationsConfirmed(val granted: Boolean) : OnboardingPixelAction
+    data class AddressBarClicked(val position: OmnibarType) : OnboardingPixelAction
+    data class SearchExperienceClicked(val withAi: Boolean) : OnboardingPixelAction
     data class TryASearchClicked(
         val fromSuggestion: Boolean,
         val isChat: Boolean,
-    ) : OnboardingPixelEvent
+    ) : OnboardingPixelAction
 
-    data object AiComparisonShown : OnboardingPixelEvent
-    data object AiComparisonClicked : OnboardingPixelEvent
+    data class QuickSetupClicked(
+        val addressBarPosition: OmnibarType,
+        val inputScreenSelected: Boolean,
+    ) : OnboardingPixelAction
 }
 
-interface BrandDesignOnboardingPixelSender {
-    fun fire(event: OnboardingPixelEvent)
+interface OnboardingPixelSender {
+    fun fire(pixelName: OnboardingPixelName, action: OnboardingPixelAction)
 }
 
 @ContributesBinding(AppScope::class)
 @SingleInstanceIn(AppScope::class)
-class RealBrandDesignOnboardingPixelSender @Inject constructor(
+class RealOnboardingPixelSender @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val pixel: Pixel,
     private val dispatchers: DispatcherProvider,
@@ -96,96 +83,42 @@ class RealBrandDesignOnboardingPixelSender @Inject constructor(
     private val widgetCapabilities: WidgetCapabilities,
     private val deviceInfo: DeviceInfo,
     private val appBuildConfig: AppBuildConfig,
-) : BrandDesignOnboardingPixelSender {
+) : OnboardingPixelSender {
 
     private val isReinstallUser: Deferred<Boolean> by lazy {
         appCoroutineScope.async(dispatchers.io()) { appBuildConfig.isAppReinstall() }
     }
 
-    override fun fire(event: OnboardingPixelEvent) {
-        when (event) {
-            OnboardingPixelEvent.WelcomeShown ->
-                fireStep(AppPixelName.ONBOARDING_WELCOME, PIXEL_EVENT_SHOWN)
+    override fun fire(pixelName: OnboardingPixelName, action: OnboardingPixelAction) {
+        when (action) {
+            OnboardingPixelAction.Shown ->
+                fireStep(pixelName, PIXEL_EVENT_SHOWN)
 
-            is OnboardingPixelEvent.WelcomeClicked ->
-                fireStep(AppPixelName.ONBOARDING_WELCOME, PIXEL_EVENT_CLICKED, engageOrDismiss(event.engaged))
+            is OnboardingPixelAction.Clicked ->
+                fireStep(pixelName, PIXEL_EVENT_CLICKED, action.engaged?.let(::engageOrDismiss))
 
-            OnboardingPixelEvent.SetDefaultShown ->
-                fireStep(AppPixelName.ONBOARDING_SET_DEFAULT, PIXEL_EVENT_SHOWN)
+            is OnboardingPixelAction.SetDefaultConfirmed ->
+                fireStep(pixelName, PIXEL_EVENT_CONFIRMED, if (action.isDdgDefault) VALUE_DDG else VALUE_OTHER)
 
-            OnboardingPixelEvent.SetDefaultClicked ->
-                fireStep(AppPixelName.ONBOARDING_SET_DEFAULT, PIXEL_EVENT_CLICKED)
+            is OnboardingPixelAction.NotificationsConfirmed ->
+                fireStep(pixelName, PIXEL_EVENT_CONFIRMED, if (action.granted) VALUE_GRANTED else VALUE_DENIED)
 
-            is OnboardingPixelEvent.SetDefaultConfirmed ->
-                fireStep(
-                    AppPixelName.ONBOARDING_SET_DEFAULT,
-                    PIXEL_EVENT_CONFIRMED,
-                    if (event.isDdgDefault) VALUE_DDG else VALUE_OTHER,
-                )
+            is OnboardingPixelAction.AddressBarClicked ->
+                fireStep(pixelName, PIXEL_EVENT_CLICKED, addressBarValue(action.position))
 
-            OnboardingPixelEvent.AddressBarPositionShown ->
-                fireStep(AppPixelName.ONBOARDING_ADDRESS_BAR_POSITION, PIXEL_EVENT_SHOWN)
+            is OnboardingPixelAction.SearchExperienceClicked ->
+                fireStep(pixelName, PIXEL_EVENT_CLICKED, if (action.withAi) SEARCH_PLUS_DUCKAI else SEARCH_ONLY)
 
-            is OnboardingPixelEvent.AddressBarPositionClicked ->
-                fireStep(AppPixelName.ONBOARDING_ADDRESS_BAR_POSITION, PIXEL_EVENT_CLICKED, addressBarValue(event.position))
+            is OnboardingPixelAction.TryASearchClicked ->
+                fireStep(pixelName, PIXEL_EVENT_CLICKED, tryASearchValue(action.fromSuggestion, action.isChat))
 
-            OnboardingPixelEvent.SearchExperienceShown ->
-                fireStep(AppPixelName.ONBOARDING_SEARCH_EXPERIENCE, PIXEL_EVENT_SHOWN)
-
-            is OnboardingPixelEvent.SearchExperienceClicked ->
-                fireStep(
-                    AppPixelName.ONBOARDING_SEARCH_EXPERIENCE,
-                    PIXEL_EVENT_CLICKED,
-                    if (event.withAi) SEARCH_PLUS_DUCKAI else SEARCH_ONLY,
-                )
-
-            OnboardingPixelEvent.SkipOnboardingShown ->
-                fireStep(AppPixelName.ONBOARDING_SKIP_ONBOARDING, PIXEL_EVENT_SHOWN)
-
-            is OnboardingPixelEvent.SkipOnboardingClicked ->
-                fireStep(AppPixelName.ONBOARDING_SKIP_ONBOARDING, PIXEL_EVENT_CLICKED, engageOrDismiss(event.engaged))
-
-            OnboardingPixelEvent.NotificationsShown ->
-                fireStep(AppPixelName.ONBOARDING_NOTIFICATIONS, PIXEL_EVENT_SHOWN)
-
-            is OnboardingPixelEvent.NotificationsConfirmed ->
-                fireStep(
-                    AppPixelName.ONBOARDING_NOTIFICATIONS,
-                    PIXEL_EVENT_CONFIRMED,
-                    if (event.granted) VALUE_GRANTED else VALUE_DENIED,
-                )
-
-            OnboardingPixelEvent.QuickSetupShown ->
-                fireStep(AppPixelName.ONBOARDING_QUICK_SETUP, PIXEL_EVENT_SHOWN)
-
-            is OnboardingPixelEvent.QuickSetupClicked ->
-                fireQuickSetupClicked(event.addressBarPosition, event.inputScreenSelected)
-
-            OnboardingPixelEvent.SyncRestoreShown ->
-                fireStep(AppPixelName.ONBOARDING_WELCOME, PIXEL_EVENT_SHOWN)
-
-            is OnboardingPixelEvent.SyncRestoreClicked ->
-                fireStep(AppPixelName.ONBOARDING_WELCOME, PIXEL_EVENT_CLICKED, engageOrDismiss(event.engaged))
-
-            OnboardingPixelEvent.TryASearchShown ->
-                fireStep(AppPixelName.ONBOARDING_SEARCH_CHAT_TOGGLE, PIXEL_EVENT_SHOWN)
-
-            is OnboardingPixelEvent.TryASearchClicked ->
-                fireStep(
-                    AppPixelName.ONBOARDING_SEARCH_CHAT_TOGGLE,
-                    PIXEL_EVENT_CLICKED,
-                    tryASearchValue(event.fromSuggestion, event.isChat),
-                )
-
-            OnboardingPixelEvent.AiComparisonShown ->
-                fireStep(AppPixelName.ONBOARDING_AI_INTRO, PIXEL_EVENT_SHOWN)
-
-            OnboardingPixelEvent.AiComparisonClicked ->
-                fireStep(AppPixelName.ONBOARDING_AI_INTRO, PIXEL_EVENT_CLICKED)
+            is OnboardingPixelAction.QuickSetupClicked ->
+                fireQuickSetupClicked(pixelName, action.addressBarPosition, action.inputScreenSelected)
         }
     }
 
     private fun fireQuickSetupClicked(
+        pixelName: OnboardingPixelName,
         addressBarPosition: OmnibarType,
         inputScreenSelected: Boolean,
     ) {
@@ -202,15 +135,15 @@ class RealBrandDesignOnboardingPixelSender @Inject constructor(
             params[PIXEL_PARAM_EVENT] = PIXEL_EVENT_CLICKED
             params[PIXEL_PARAM_VALUE] = value
             pixel.fire(
-                pixel = AppPixelName.ONBOARDING_QUICK_SETUP,
+                pixel = pixelName,
                 parameters = params,
-                type = Unique(tag = "${AppPixelName.ONBOARDING_QUICK_SETUP.pixelName}_$PIXEL_EVENT_CLICKED"),
+                type = Unique(tag = "${pixelName.pixelName}_$PIXEL_EVENT_CLICKED"),
             )
         }
     }
 
     private fun fireStep(
-        pixelName: AppPixelName,
+        pixelName: OnboardingPixelName,
         event: String,
         value: String? = null,
     ) {

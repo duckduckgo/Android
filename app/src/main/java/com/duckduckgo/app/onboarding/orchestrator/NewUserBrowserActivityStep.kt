@@ -16,7 +16,7 @@
 
 package com.duckduckgo.app.onboarding.orchestrator
 
-import com.duckduckgo.app.onboarding.ui.page.OnboardingPixelEvent
+import com.duckduckgo.app.pixels.OnboardingPixelName
 import com.duckduckgo.onboarding.api.LinearOnboardingEvent
 import com.duckduckgo.onboarding.api.LinearOnboardingHost
 import com.duckduckgo.onboarding.api.LinearOnboardingStep
@@ -30,7 +30,7 @@ import com.duckduckgo.onboarding.api.LinearOnboardingTransition
  */
 data class NewUserBrowserActivityStep(
     override val id: LinearOnboardingStepId,
-    val shownEvent: OnboardingPixelEvent?,
+    val pixelName: OnboardingPixelName?,
     override val host: LinearOnboardingHost = LinearOnboardingHost.BrowserActivity,
     override val precondition: suspend () -> Boolean = { true },
     override val transition: suspend (LinearOnboardingEvent) -> LinearOnboardingTransition,
