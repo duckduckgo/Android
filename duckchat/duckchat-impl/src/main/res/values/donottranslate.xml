@@ -50,6 +50,8 @@
 
     <!-- File/image attachment menu options -->
     <string name="attachmentTakePhoto">Take Photo</string>
+    <string name="duckChatContextualAskAboutTab">Ask about tab</string>
+    <string name="duckChatContextualAskAboutPage">Ask about page</string>
     <string name="attachmentAttachPhoto">Add Image</string>
     <string name="attachmentAttachFile">Add File</string>
 

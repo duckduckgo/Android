@@ -707,6 +707,22 @@ class DuckChatContextualViewModel @Inject constructor(
         }
     }
 
+    fun onAskAboutTabClicked() {
+        if (!isContextValid(updatedPageContext)) {
+            // Page context not ready/valid; do nothing (and don't fire invalid-context pixels).
+            return
+        }
+        addPageContext()
+    }
+
+    fun onAskAboutPageClicked() {
+        if (!_viewState.value.showContext) {
+            // Context not attached; nothing to ask about.
+            return
+        }
+        onPromptSent(prompt = context.getString(R.string.duckChatContextualAskAboutPage))
+    }
+
     fun onPromptCleared() {
         logcat { "Duck.ai Contextual: onPromptCleared" }
         viewModelScope.launch {

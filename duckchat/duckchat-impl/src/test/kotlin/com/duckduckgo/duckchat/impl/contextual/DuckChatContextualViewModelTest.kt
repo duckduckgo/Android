@@ -2289,6 +2289,86 @@ class DuckChatContextualViewModelTest {
         assertEquals("current", testee.chatId.value)
     }
 
+    @Test
+    fun `when ask about tab clicked with valid context then showContext true and no prompt sent`() =
+        runTest {
+            val tabId = "tab-1"
+            val serializedPageData =
+                """
+                {
+                    "title": "Page Title",
+                    "url": "https://example.com",
+                    "content": "Extracted DOM text...",
+                    "truncated": false,
+                    "fullContentLength": 1234
+                }
+                """.trimIndent()
+            testee.onSheetOpened(tabId)
+            testee.onPageContextReceived(tabId, serializedPageData)
+
+            testee.subscriptionEventDataFlow.test {
+                testee.onAskAboutTabClicked()
+                expectNoEvents()
+                cancelAndIgnoreRemainingEvents()
+            }
+            assertTrue(testee.viewState.value.showContext)
+        }
+
+    @Test
+    fun `when ask about tab clicked without valid context then showContext stays false`() =
+        runTest {
+            testee.onSheetOpened("tab-1")
+            testee.updatedPageContext = ""
+
+            testee.onAskAboutTabClicked()
+
+            assertFalse(testee.viewState.value.showContext)
+        }
+
+    @Test
+    fun `when ask about page clicked with context then submits ask about page prompt with pageContext`() =
+        runTest {
+            val tabId = "tab-1"
+            val serializedPageData =
+                """
+                {
+                    "title": "Page Title",
+                    "url": "https://example.com",
+                    "content": "Extracted DOM text...",
+                    "truncated": false,
+                    "fullContentLength": 1234
+                }
+                """.trimIndent()
+            testee.onSheetOpened(tabId)
+            testee.onPageContextReceived(tabId, serializedPageData)
+            testee.addPageContext()
+
+            testee.subscriptionEventDataFlow.test {
+                testee.onAskAboutPageClicked()
+
+                val event = awaitItem()
+                assertEquals("submitAIChatNativePrompt", event.subscriptionName)
+                val params = event.params
+                val query = params.getJSONObject("query")
+                assertEquals(context.getString(R.string.duckChatContextualAskAboutPage), query.getString("prompt"))
+                val pageContext = params.getJSONObject("pageContext")
+                assertEquals("https://example.com", pageContext.getString("url"))
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `when ask about page clicked without context then no prompt sent`() =
+        runTest {
+            testee.onSheetOpened("tab-1")
+
+            testee.subscriptionEventDataFlow.test {
+                testee.onAskAboutPageClicked()
+                expectNoEvents()
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
     private fun fakeChat(id: String, title: String, lastEditMillis: Long): ChatHistoryItem =
         ChatHistoryItem(
             chatId = id,

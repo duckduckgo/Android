@@ -463,6 +463,9 @@ class DuckChatContextualFragment :
             onFilePickerRequested = { callback, mimeTypes ->
                 launchNativeFilePicker(callback, mimeTypes)
             },
+            onAskAboutTab = { viewModel.onAskAboutTabClicked() },
+            onAskAboutPage = { viewModel.onAskAboutPageClicked() },
+            onPageContextRemoved = { viewModel.removePageContext() },
         )
         observeViewModel()
 
@@ -733,6 +736,16 @@ class DuckChatContextualFragment :
                 if (viewState.isFireButtonEnabled) binding.contextualFire.show() else binding.contextualFire.gone()
                 contextualNativeInputManager.onWebViewMode()
             }
+        }
+
+        if (viewState.showContext && viewState.contextTitle.isNotEmpty()) {
+            binding.contextualNativeInputWidget.setPageContext(
+                title = viewState.contextTitle,
+                url = viewState.contextUrl,
+                faviconUrl = null,
+            )
+        } else {
+            binding.contextualNativeInputWidget.clearPageContext()
         }
     }
 
