@@ -2693,6 +2693,16 @@ class BrowserTabFragment :
                 }
             }
 
+            is Command.OpenInFireTab -> {
+                binding.focusedView.gone()
+                if (binding.autoCompleteSuggestionsList.isVisible) {
+                    viewModel.autoCompleteSuggestionsGone()
+                }
+                binding.autoCompleteSuggestionsList.gone()
+                nativeInputManager.hideNativeInput(animate = false, isNavigation = true)
+                browserActivity?.launchNewTab(it.query, it.sourceTabId, browserMode = BrowserMode.FIRE)
+            }
+
             is Command.OpenMessageInNewTab -> {
                 if (isActiveCustomTab()) {
                     (activity as CustomTabActivity).openMessageInNewFragmentInCustomTab(
