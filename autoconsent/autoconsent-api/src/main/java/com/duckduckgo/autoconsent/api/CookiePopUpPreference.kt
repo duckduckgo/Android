@@ -17,7 +17,7 @@
 package com.duckduckgo.autoconsent.api
 
 enum class CookiePopUpPreference {
-    BLOCK_ALL,
-    BLOCK_STANDARD,
-    DO_NOT_BLOCK,
+    off,
+    `default`,
+    max,
 }

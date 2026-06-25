@@ -123,13 +123,13 @@ class AutoconsentSettingsActivity : DuckDuckGoActivity() {
     private fun configureUiEventHandlers() {
         binding.autoconsentToggle.setOnCheckedChangeListener(autoconsentToggleListener)
         binding.autoconsentPreferenceBlockAll.setClickListener {
-            viewModel.onCookiePopUpPreferenceSelected(CookiePopUpPreference.BLOCK_ALL)
+            viewModel.onCookiePopUpPreferenceSelected(CookiePopUpPreference.max)
         }
         binding.autoconsentPreferenceBlockStandard.setClickListener {
-            viewModel.onCookiePopUpPreferenceSelected(CookiePopUpPreference.BLOCK_STANDARD)
+            viewModel.onCookiePopUpPreferenceSelected(CookiePopUpPreference.`default`)
         }
         binding.autoconsentPreferenceDoNotBlock.setClickListener {
-            viewModel.onCookiePopUpPreferenceSelected(CookiePopUpPreference.DO_NOT_BLOCK)
+            viewModel.onCookiePopUpPreferenceSelected(CookiePopUpPreference.off)
         }
     }
 
@@ -146,7 +146,7 @@ class AutoconsentSettingsActivity : DuckDuckGoActivity() {
     private fun render(viewState: ViewState) {
         with(binding) {
             val isProtectionEnabled = if (showCookiePopUpPreferenceSetting) {
-                viewState.selectedPreference != CookiePopUpPreference.DO_NOT_BLOCK
+                viewState.selectedPreference != CookiePopUpPreference.off
             } else {
                 viewState.autoconsentEnabled
             }
@@ -157,9 +157,9 @@ class AutoconsentSettingsActivity : DuckDuckGoActivity() {
             autoconsentToggle.isVisible = !showCookiePopUpPreferenceSetting
             cookiePopUpPreferenceContainer.isVisible = showCookiePopUpPreferenceSetting
             autoconsentToggle.quietlySetIsChecked(viewState.autoconsentEnabled, autoconsentToggleListener)
-            autoconsentPreferenceBlockAll.setChecked(viewState.selectedPreference == CookiePopUpPreference.BLOCK_ALL)
-            autoconsentPreferenceBlockStandard.setChecked(viewState.selectedPreference == CookiePopUpPreference.BLOCK_STANDARD)
-            autoconsentPreferenceDoNotBlock.setChecked(viewState.selectedPreference == CookiePopUpPreference.DO_NOT_BLOCK)
+            autoconsentPreferenceBlockAll.setChecked(viewState.selectedPreference == CookiePopUpPreference.max)
+            autoconsentPreferenceBlockStandard.setChecked(viewState.selectedPreference == CookiePopUpPreference.`default`)
+            autoconsentPreferenceDoNotBlock.setChecked(viewState.selectedPreference == CookiePopUpPreference.off)
         }
     }
 

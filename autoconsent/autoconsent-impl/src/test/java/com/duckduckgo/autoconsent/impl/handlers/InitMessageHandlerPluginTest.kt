@@ -158,7 +158,7 @@ class InitMessageHandlerPluginTest {
     @Test
     fun whenProcessMessageIfNoSettingsThenDoNotCallEvaluate() {
         settingsCache = RealAutoconsentSettingsCache()
-        settingsRepository.cookiePopUpPreference = CookiePopUpPreference.BLOCK_STANDARD
+        settingsRepository.cookiePopUpPreference = CookiePopUpPreference.`default`
 
         initHandlerPlugin.process(initHandlerPlugin.supportedTypes.first(), message(), webView, mockCallback)
 
@@ -170,7 +170,7 @@ class InitMessageHandlerPluginTest {
     @Test
     fun whenProcessMessageIfCanNotParseSettingsThenDoNotCallEvaluate() {
         settingsCache.updateSettings("{\"random\": []}")
-        settingsRepository.cookiePopUpPreference = CookiePopUpPreference.BLOCK_STANDARD
+        settingsRepository.cookiePopUpPreference = CookiePopUpPreference.`default`
 
         initHandlerPlugin.process(initHandlerPlugin.supportedTypes.first(), message(), webView, mockCallback)
 
@@ -180,8 +180,8 @@ class InitMessageHandlerPluginTest {
     }
 
     @Test
-    fun whenProcessMessageWithBlockAllPreferenceThenHeuristicDetectionEnabled() {
-        settingsRepository.cookiePopUpPreference = CookiePopUpPreference.BLOCK_ALL
+    fun whenProcessMessageWithMaxPreferenceThenHeuristicModeIsTier2() {
+        settingsRepository.cookiePopUpPreference = CookiePopUpPreference.max
         feature.heuristicAction().setRawStoredState(Toggle.State(enable = true))
         settingsCache.updateSettings("{\"disabledCMPs\": [], \"compactRuleList\": {}}")
 
@@ -192,15 +192,16 @@ class InitMessageHandlerPluginTest {
         assertTrue(initResp.config.enablePrehide)
         assertTrue(initResp.config.enabled)
         assertTrue(initResp.config.enableHeuristicDetection)
-        assertTrue(initResp.config.enableHeuristicAction)
+        assertEquals("tier2", initResp.config.heuristicMode)
         assertNotNull(initResp.rules.compact)
         assertEquals(20, initResp.config.detectRetries)
         assertEquals("initResp", initResp.type)
     }
 
     @Test
-    fun whenProcessMessageWithBlockStandardPreferenceThenHeuristicDetectionDisabled() {
-        settingsRepository.cookiePopUpPreference = CookiePopUpPreference.BLOCK_STANDARD
+    fun whenProcessMessageWithDefaultPreferenceThenHeuristicModeIsTier1() {
+        settingsRepository.cookiePopUpPreference = CookiePopUpPreference.`default`
+        feature.heuristicAction().setRawStoredState(Toggle.State(enable = true))
         settingsCache.updateSettings("{\"disabledCMPs\": [], \"compactRuleList\": {\"v\": 1, \"s\": [], \"r\": []}}")
 
         initHandlerPlugin.process(initHandlerPlugin.supportedTypes.first(), message(), webView, mockCallback)
@@ -209,8 +210,8 @@ class InitMessageHandlerPluginTest {
         assertEquals("optOut", initResp!!.config.autoAction)
         assertTrue(initResp.config.enablePrehide)
         assertTrue(initResp.config.enabled)
-        assertFalse(initResp.config.enableHeuristicDetection)
-        assertFalse(initResp.config.enableHeuristicAction)
+        assertTrue(initResp.config.enableHeuristicDetection)
+        assertEquals("tier1", initResp.config.heuristicMode)
         assertNotNull(initResp.rules.compact)
         assertEquals(20, initResp.config.detectRetries)
         assertEquals("initResp", initResp.type)
@@ -219,7 +220,7 @@ class InitMessageHandlerPluginTest {
     @Test
     @Ignore("Only valid when firstPopupHandled is being used")
     fun whenProcessMessageAndPopupHandledResponseSentIsCorrect() {
-        settingsRepository.cookiePopUpPreference = CookiePopUpPreference.BLOCK_ALL
+        settingsRepository.cookiePopUpPreference = CookiePopUpPreference.max
         settingsRepository.firstPopupHandled = true
         settingsCache.updateSettings("{\"disabledCMPs\": [], \"compactRuleList\": {\"v\": 1, \"s\": [], \"r\": []}}")
 
@@ -239,7 +240,7 @@ class InitMessageHandlerPluginTest {
 
     @Test
     fun whenProcessMessageThenOnResultReceivedCalled() {
-        settingsRepository.cookiePopUpPreference = CookiePopUpPreference.BLOCK_STANDARD
+        settingsRepository.cookiePopUpPreference = CookiePopUpPreference.`default`
 
         initHandlerPlugin.process(initHandlerPlugin.supportedTypes.first(), message(), webView, mockCallback)
 
@@ -266,7 +267,7 @@ class InitMessageHandlerPluginTest {
 
     @Test
     fun whenProcessAndAutoconsentIsEnabledThenFireInitPixel() {
-        settingsRepository.cookiePopUpPreference = CookiePopUpPreference.BLOCK_STANDARD
+        settingsRepository.cookiePopUpPreference = CookiePopUpPreference.`default`
 
         initHandlerPlugin.process(initHandlerPlugin.supportedTypes.first(), message(), webView, mockCallback)
 
@@ -322,21 +323,21 @@ class InitMessageHandlerPluginTest {
     }
 
     @Test
-    fun whenHeuristicActionToggleDisabledThenEnableHeuristicActionIsFalse() {
-        settingsRepository.cookiePopUpPreference = CookiePopUpPreference.BLOCK_ALL
+    fun whenHeuristicActionToggleDisabledThenHeuristicModeIsOff() {
+        settingsRepository.cookiePopUpPreference = CookiePopUpPreference.max
         settingsCache.updateSettings("{\"disabledCMPs\": [], \"compactRuleList\": {\"v\": 1, \"s\": [], \"r\": []}}")
 
         initHandlerPlugin.process(initHandlerPlugin.supportedTypes.first(), message(), webView, mockCallback)
 
         val result = shadowOf(webView).lastEvaluatedJavascript
         val initResp = jsonToInitResp(result)
-        assertFalse(initResp!!.config.enableHeuristicAction)
+        assertEquals("off", initResp!!.config.heuristicMode)
     }
 
     @SuppressLint("DenyListedApi")
     @Test
-    fun whenHeuristicActionToggleEnabledThenEnableHeuristicActionIsTrue() {
-        settingsRepository.cookiePopUpPreference = CookiePopUpPreference.BLOCK_ALL
+    fun whenHeuristicActionToggleEnabledThenHeuristicModeIsTier2() {
+        settingsRepository.cookiePopUpPreference = CookiePopUpPreference.max
         settingsCache.updateSettings("{\"disabledCMPs\": [], \"compactRuleList\": {\"v\": 1, \"s\": [], \"r\": []}}")
         feature.heuristicAction().setRawStoredState(Toggle.State(enable = true))
 
@@ -344,7 +345,7 @@ class InitMessageHandlerPluginTest {
 
         val result = shadowOf(webView).lastEvaluatedJavascript
         val initResp = jsonToInitResp(result)
-        assertTrue(initResp!!.config.enableHeuristicAction)
+        assertEquals("tier2", initResp!!.config.heuristicMode)
     }
 
     @Test
@@ -424,7 +425,7 @@ class InitMessageHandlerPluginTest {
 
     @Test
     fun whenRuleFilteringDisabledThenUseOriginalRuleset() {
-        settingsRepository.cookiePopUpPreference = CookiePopUpPreference.BLOCK_STANDARD
+        settingsRepository.cookiePopUpPreference = CookiePopUpPreference.`default`
         settingsCache.updateSettings(mockRulesetJson)
         feature.ruleFiltering().setRawStoredState(Toggle.State(enable = false))
 

@@ -79,12 +79,12 @@ class InitMessageHandlerPlugin @Inject constructor(
                     val preference = if (autoconsentFeature.cookiePopUpPreferenceSetting().isEnabled()) {
                         settingsRepository.cookiePopUpPreference
                     } else if (settingsRepository.userSetting) {
-                        CookiePopUpPreference.BLOCK_STANDARD
+                        CookiePopUpPreference.`default`
                     } else {
-                        CookiePopUpPreference.DO_NOT_BLOCK
+                        CookiePopUpPreference.off
                     }
 
-                    if (preference == CookiePopUpPreference.DO_NOT_BLOCK) {
+                    if (preference == CookiePopUpPreference.off) {
                         autoconsentPixelManager.fireDailyPixel(AutoConsentPixel.AUTOCONSENT_DISABLED_FOR_SITE_DAILY)
                         return@launch
                     }
@@ -104,7 +104,8 @@ class InitMessageHandlerPlugin @Inject constructor(
                     )
 
                     val settings = settingsCache.getSettings() ?: return@launch
-                    val config = buildConfig(preference, settings.disabledCMPs, webView)
+                    val cookiePopUpPreferenceSettingEnabled = autoconsentFeature.cookiePopUpPreferenceSetting().isEnabled()
+                    val config = buildConfig(preference, cookiePopUpPreferenceSettingEnabled, settings.disabledCMPs, webView)
                     val initResp = if (autoconsentFeature.ruleFiltering().isEnabled()) {
                         InitResp(config = config, rules = filterCompactRules(settings.compactRuleList, url))
                     } else {
@@ -136,10 +137,10 @@ class InitMessageHandlerPlugin @Inject constructor(
 
     private fun buildConfig(
         preference: CookiePopUpPreference,
+        cookiePopUpPreferenceSettingEnabled: Boolean,
         disabledCmps: List<String>,
         webView: WebView,
     ): Config {
-        val blockAll = preference == CookiePopUpPreference.BLOCK_ALL
         return Config(
             enabled = true,
             autoAction = getAutoAction(webView),
@@ -148,9 +149,24 @@ class InitMessageHandlerPlugin @Inject constructor(
             detectRetries = 20,
             isMainWorld = true,
             enableCosmeticRules = true,
-            enableHeuristicDetection = blockAll,
-            enableHeuristicAction = blockAll && autoconsentFeature.heuristicAction().isEnabled(),
+            enableHeuristicDetection = true,
+            heuristicMode = getHeuristicMode(preference, cookiePopUpPreferenceSettingEnabled),
         )
+    }
+
+    private fun getHeuristicMode(
+        preference: CookiePopUpPreference,
+        cookiePopUpPreferenceSettingEnabled: Boolean,
+    ): String {
+        if (!autoconsentFeature.heuristicAction().isEnabled()) {
+            return "off"
+        }
+
+        return when (preference) {
+            CookiePopUpPreference.max -> "tier2"
+            CookiePopUpPreference.`default` -> if (cookiePopUpPreferenceSettingEnabled) "tier1" else "reject"
+            CookiePopUpPreference.off -> "off"
+        }
     }
 
     private fun parseMessage(jsonString: String): InitMessage? {
@@ -255,7 +271,7 @@ class InitMessageHandlerPlugin @Inject constructor(
         val isMainWorld: Boolean,
         val enableCosmeticRules: Boolean,
         val enableHeuristicDetection: Boolean,
-        val enableHeuristicAction: Boolean,
+        val heuristicMode: String,
     )
 
     data class AutoconsentRuleset(val compact: Any?)
