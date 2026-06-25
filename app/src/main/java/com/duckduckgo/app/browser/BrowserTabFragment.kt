@@ -52,6 +52,7 @@ import android.view.ViewGroup.LayoutParams
 import android.view.ViewTreeObserver
 import android.webkit.PermissionRequest
 import android.webkit.SslErrorHandler
+import android.webkit.URLUtil
 import android.webkit.ValueCallback
 import android.webkit.WebChromeClient.FileChooserParams
 import android.webkit.WebSettings
@@ -60,7 +61,6 @@ import android.webkit.WebView.FindListener
 import android.webkit.WebView.HitTestResult
 import android.webkit.WebView.HitTestResult.IMAGE_TYPE
 import android.webkit.WebView.HitTestResult.SRC_IMAGE_ANCHOR_TYPE
-import android.webkit.URLUtil
 import android.webkit.WebView.HitTestResult.UNKNOWN_TYPE
 import android.widget.FrameLayout
 import android.widget.Toast
