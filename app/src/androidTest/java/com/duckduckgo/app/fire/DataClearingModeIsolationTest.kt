@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-@file:SuppressLint("NoImplImportsInAppModule")
+@file:SuppressLint("NoImplImportsInAppModule", "DenyListedApi")
 
 package com.duckduckgo.app.fire
 
