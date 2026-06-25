@@ -226,24 +226,6 @@ class OnboardingStoreImpl @Inject constructor(
         return preferences.getBoolean(KEY_DUCK_AI_ONBOARDING_FLOW, false)
     }
 
-    override fun isCustomAiOnboardingFlow(): Boolean {
-        return false
-    }
-
-    // Deliberately not persisted: a one-shot that should only influence the input screen launched
-    // immediately after onboarding finishes within this process. Keeping it in-memory means it can't
-    // linger across an app restart and misfire on a later, unrelated new-tab launch.
-    @Volatile
-    private var openInputOnDuckAiTab: Boolean = false
-
-    override fun setOpenInputOnDuckAiTab() {
-        openInputOnDuckAiTab = true
-    }
-
-    override fun consumeOpenInputOnDuckAiTab(): Boolean {
-        return openInputOnDuckAiTab.also { openInputOnDuckAiTab = false }
-    }
-
     companion object {
         const val FILENAME = "com.duckduckgo.app.onboarding.settings"
         const val ONBOARDING_JOURNEY = "onboardingJourney"

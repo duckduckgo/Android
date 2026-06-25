@@ -66,8 +66,7 @@
         android:id="@+id/netp_app_exclusion_list_recycler"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:clipToPadding="false"
-        android:paddingBottom="@dimen/keyline_2"
+        android:clipToPadding="true"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         tools:listItem="@layout/view_device_shield_excluded_app_entry" />
 </LinearLayout>

@@ -31,12 +31,10 @@ import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.AppUrl
-import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.cookies.api.CookieManagerProvider
 import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import com.duckduckgo.duckchat.api.DuckChatSettingsNoParams
 import com.duckduckgo.duckchat.api.InputMode
-import com.duckduckgo.duckchat.api.nativeinput.NativeInputFieldSuppressor
 import com.duckduckgo.duckchat.impl.feature.AIChatImageUploadFeature
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.repository.AddressBarPickerAttributionRepository
@@ -100,15 +98,6 @@ class RealDuckChatTest {
     private val mockAppBuildConfig: AppBuildConfig = mock()
     private val mockVoiceSessionStateManager: VoiceSessionStateManager = mock()
 
-    private var nativeInputFieldSuppressed = false
-    private val nativeInputFieldSuppressors = object : PluginPoint<NativeInputFieldSuppressor> {
-        override fun getPlugins(): Collection<NativeInputFieldSuppressor> = listOf(
-            object : NativeInputFieldSuppressor {
-                override suspend fun isNativeInputFieldSuppressed(): Boolean = nativeInputFieldSuppressed
-            },
-        )
-    }
-
     private lateinit var testee: RealDuckChat
 
     @Before
@@ -149,7 +138,6 @@ class RealDuckChatTest {
                 mockDuckAiHostProvider,
                 mockAppBuildConfig,
                 mockVoiceSessionStateManager,
-                nativeInputFieldSuppressors,
             ),
         )
         coroutineRule.testScope.advanceUntilIdle()
@@ -304,28 +292,6 @@ class RealDuckChatTest {
         advanceUntilIdle()
 
         assertFalse(testee.observeNativeInputFieldUserSettingEnabled().first())
-    }
-
-    @Test
-    fun whenNativeInputFieldEnabledButSuppressedThenObserveEmitsFalse() = runTest {
-        duckChatFeature.nativeInputField().setRawStoredState(State(enable = true))
-        nativeInputFieldSuppressed = true
-
-        testee.onPrivacyConfigDownloaded()
-        advanceUntilIdle()
-
-        assertFalse(testee.observeNativeInputFieldUserSettingEnabled().first())
-    }
-
-    @Test
-    fun whenNativeInputFieldEnabledAndNotSuppressedThenObserveEmitsTrue() = runTest {
-        duckChatFeature.nativeInputField().setRawStoredState(State(enable = true))
-        nativeInputFieldSuppressed = false
-
-        testee.onPrivacyConfigDownloaded()
-        advanceUntilIdle()
-
-        assertTrue(testee.observeNativeInputFieldUserSettingEnabled().first())
     }
 
     @Test

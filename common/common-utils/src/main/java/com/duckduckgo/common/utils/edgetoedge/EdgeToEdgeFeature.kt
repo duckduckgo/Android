@@ -35,4 +35,13 @@ interface EdgeToEdgeFeature {
 
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun settings(): Toggle
+
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun autofill(): Toggle
+
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun sync(): Toggle
+
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun vpn(): Toggle
 }

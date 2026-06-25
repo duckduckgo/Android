@@ -101,6 +101,8 @@ sealed class Command {
 
     data object HideKeyboardForChat : Command()
 
+    data object DropAddressBarFocus : Command()
+
     class ShowFullScreen(
         val view: View,
     ) : Command()
@@ -480,6 +482,13 @@ sealed class Command {
     ) : Command()
 
     data object CloseCustomTab : Command()
+
+    /**
+     * Finishes only the [CustomTabActivity] (not the whole task). Used when the custom tab is being
+     * dismissed while another activity (e.g. the Duck Chat host) is being launched into the same task,
+     * where [CloseCustomTab]'s `finishAndRemoveTask()` would tear down that activity too.
+     */
+    data object FinishCustomTab : Command()
 
     data class LaunchPopupMenu(val anchorToNavigationBar: Boolean) : Command()
 

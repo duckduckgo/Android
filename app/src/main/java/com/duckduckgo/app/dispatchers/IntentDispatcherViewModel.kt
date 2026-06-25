@@ -18,6 +18,7 @@ package com.duckduckgo.app.dispatchers
 
 import android.content.Intent
 import androidx.browser.customtabs.CustomTabsIntent
+import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.adblocking.api.duckplayer.DuckPlayerSettingsNoParams
@@ -30,6 +31,7 @@ import com.duckduckgo.autofill.api.emailprotection.EmailProtectionLinkVerifier
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.customtabs.api.CustomTabDetector
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
 import com.duckduckgo.sync.api.setup.SyncUrlIdentifier
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -46,6 +48,7 @@ class IntentDispatcherViewModel @Inject constructor(
     private val emailProtectionLinkVerifier: EmailProtectionLinkVerifier,
     private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
     private val syncUrlIdentifier: SyncUrlIdentifier,
+    private val duckChat: DuckChat,
     private val appBuildConfig: AppBuildConfig,
 ) : ViewModel() {
 
@@ -83,9 +86,9 @@ class IntentDispatcherViewModel @Inject constructor(
 
                 val isEmailProtectionLink = emailProtectionLinkVerifier.shouldDelegateToInContextView(intentText, true)
                 val isDuckDuckGoUrl = intentText?.let { duckDuckGoUrlDetector.isDuckDuckGoUrl(it) } ?: false
-
+                val isDuckAiUrl = intentText?.let { duckChat.isDuckChatUrl(it.toUri()) } ?: false
                 val isSyncPairingUrl = syncUrlIdentifier.shouldDelegateToSyncSetup(intentText)
-                val customTabRequested = hasSession && !isEmailProtectionLink && !isDuckDuckGoUrl && !isSyncPairingUrl
+                val customTabRequested = hasSession && !isEmailProtectionLink && !isDuckDuckGoUrl && !isSyncPairingUrl && !isDuckAiUrl
 
                 logcat { "Intent $intent received. Has extra session=$hasSession. Intent text=$intentText. Toolbar color=$toolbarColor" }
 

@@ -65,7 +65,6 @@ import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions.withC
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
 import com.duckduckgo.anvil.annotations.InjectWith
-import com.duckduckgo.app.browser.PulseAnimation
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.SmoothProgressAnimator
 import com.duckduckgo.app.browser.api.OmnibarRepository
@@ -108,6 +107,7 @@ import com.duckduckgo.app.global.view.renderIfChanged
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.trackerdetection.model.Entity
+import com.duckduckgo.browser.ui.PulseAnimation
 import com.duckduckgo.browser.ui.tabs.TabSwitcherButton
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.ui.DuckDuckGoActivity
@@ -249,6 +249,7 @@ class OmnibarLayout @JvmOverloads constructor(
     private val customTabToolbarContainerWrapper: ViewGroup by lazy { findViewById(R.id.customTabToolbarContainerWrapper) }
     private val leadingIconContainer: View by lazy { findViewById(R.id.omnibarIconContainer) }
     private val duckAIHeader: View by lazy { findViewById(R.id.duckAIHeader) }
+    private val duckAIFreePill: View by lazy { findViewById(R.id.duckAIFreePill) }
     private val duckAISidebar: View by lazy { findViewById(R.id.duckAiSidebar) }
     private val duckAIBack: View by lazy { findViewById(R.id.duckAiBack) }
 
@@ -1086,8 +1087,9 @@ class OmnibarLayout @JvmOverloads constructor(
     }
 
     private fun renderPulseAnimation(viewState: ViewState) {
+        val fireIconVisible = shouldShowFireIcon(viewState.showFireIcon, viewState.viewMode is ViewMode.DuckAI, viewState.isNativeInputEnabled)
         val targetView =
-            if (viewState.highlightFireButton.isHighlighted() && viewState.showFireIcon) {
+            if (viewState.highlightFireButton.isHighlighted() && fireIconVisible) {
                 fireIconImageView
             } else if (viewState.highlightPrivacyShield.isHighlighted() && viewState.leadingIconState == PrivacyShield) {
                 placeholder
@@ -1562,7 +1564,10 @@ class OmnibarLayout @JvmOverloads constructor(
         applyEnabled(clearTextButton, nonFireEnabled)
         applyEnabled(duckAISidebar, nonFireEnabled)
         applyEnabled(duckAIHeader, nonFireEnabled)
+        applyEnabled(duckAIFreePill, nonFireEnabled)
+        applyEnabled(duckAIBack, nonFireEnabled)
         applyEnabled(shieldIcon, nonFireEnabled)
+        applyEnabled(plusIconMenu, nonFireEnabled)
         applyEnabled(fireIconMenu, fireEnabled)
         omnibarTextInput.alpha = if (nonFireEnabled) 1.0f else LOCKED_INPUT_ALPHA
 
