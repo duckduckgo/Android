@@ -1325,6 +1325,20 @@ class AppSyncAccountRepositoryTest {
     }
 
     @Test
+    fun whenJoinAccountFromThirdPartySucceedsThenScopedPasswordIsWrittenFromLocalRecoveryCode() {
+        // Defensive: even if the BE response omits encrypted_3party_credential (so performLogin's
+        // server-decoded SP path is a no-op), the join should still leave scopedPassword populated
+        // from the locally-parsed recovery code.
+        val pastedCode = prepareForJoinAccountFromThirdPartyRecoveryCode()
+
+        val result = syncRepo.joinAccountFromThirdPartyRecoveryCode(pastedCode)
+
+        assertEquals(Success(true), result)
+        val expectedSp = base64UrlStringToStandardBase64("rUzlGqLLlbonAC_zIeh1nrCmuDsDAn6UooUUDz-6x3o")
+        verify(syncStore).scopedPassword = ScopedPassword(expectedSp)
+    }
+
+    @Test
     fun whenJoinAccountFromThirdPartyThenStep7aPostUpgradeLoginUsesUnrestrictedScope() {
         val pastedCode = prepareForJoinAccountFromThirdPartyRecoveryCode()
 
@@ -1524,7 +1538,7 @@ class AppSyncAccountRepositoryTest {
     private val step7aLoginSuccess = Success(
         LoginResponse(
             token = "ddg_token_step7a",
-            protected_encryption_key = null,
+            protected_encryption_key = protectedEncryptionKey,
             devices = emptyList(),
             accessCredentials = null,
             keys = null,
@@ -1551,6 +1565,11 @@ class AppSyncAccountRepositoryTest {
         whenever(syncJweCrypto.jweEncryptSymmetric(any(), any(), any())).thenReturn("encrypted_3party_credential")
         whenever(nativeLib.generateAccountKeys(userId = eq(userId), password = anyString())).thenReturn(accountKeys)
 
+        // Step 7's performLogin uses libsodium derivations on the new ddg primaryKey, then decrypts
+        // the protected_encryption_key the server echoes back to recover the secretKey.
+        whenever(nativeLib.prepareForLogin(primaryKey = primaryKey)).thenReturn(validLoginKeys)
+        whenever(nativeLib.decrypt(encryptedData = protectedEncryptionKey, secretKey = stretchedPrimaryKey)).thenReturn(decryptedSecretKey)
+
         // Step 2 response; optionally includes ddg to drive the "already upgraded" path.
         val accessCredentialsInResponse = buildList {
             add(AccessCredentialEntry(id = "3party", scope = "ai_chats"))
@@ -1567,7 +1586,7 @@ class AppSyncAccountRepositoryTest {
         val step7aResponse = step7aResult ?: Success(
             LoginResponse(
                 token = "ddg_token_step7a",
-                protected_encryption_key = null,
+                protected_encryption_key = protectedEncryptionKey,
                 devices = emptyList(),
                 accessCredentials = null,
                 keys = null,
