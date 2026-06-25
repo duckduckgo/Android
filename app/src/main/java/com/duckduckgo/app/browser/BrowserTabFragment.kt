@@ -1797,6 +1797,16 @@ class BrowserTabFragment :
                 pixel.fire(AppPixelName.BROWSING_MENU_USED, type = Count)
             },
         )
+
+        when (browserMode) {
+            BrowserMode.FIRE -> {
+                bottomSheetMenu?.newTabMenuItem?.label(getString(string.fireTabsNewTabButton))
+            }
+            BrowserMode.REGULAR -> {
+                bottomSheetMenu?.newTabMenuItem?.label(getString(string.newTabMenuItem))
+            }
+        }
+
         bottomSheetMenu?.apply {
             onMenuItemClicked(backMenuItem) {
                 onBackArrowClicked()
