@@ -181,9 +181,15 @@ internal class ChatSyncPromoViewHolder(
     // plain notifyItemRemoved() would just make the row disappear with no animation.
     fun animateOut(onComplete: () -> Unit) {
         if (dismissAnimator != null) return
-        val startHeight = knownHeight ?: return
 
-        cancelAnimation()
+        val startHeight = knownHeight
+        if (startHeight == null) {
+            // Never measured, so there's nothing to collapse. Complete immediately rather than
+            // leaving the adapter stuck in Dismissing with the row still counted.
+            onComplete()
+            return
+        }
+
         dismissAnimator = ValueAnimator.ofFloat(1f, 0f).apply {
             duration = EXIT_ANIM_DURATION
             interpolator = FastOutSlowInInterpolator()
@@ -202,6 +208,7 @@ internal class ChatSyncPromoViewHolder(
 
     fun cancelAnimation() {
         dismissAnimator?.cancel()
+        dismissAnimator = null
     }
 
     private companion object {
