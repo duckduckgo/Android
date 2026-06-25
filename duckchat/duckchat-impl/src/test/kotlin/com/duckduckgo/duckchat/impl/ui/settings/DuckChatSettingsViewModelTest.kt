@@ -699,6 +699,62 @@ class DuckChatSettingsViewModelTest {
         }
 
     @Test
+    fun `when onUseWithoutAiClicked then ai_features_disabled count and daily fired`() =
+        runTest {
+            testee.onUseWithoutAiClicked()
+            verify(mockPixel).fire(DuckChatPixelName.AI_FEATURES_DISABLED_COUNT)
+            verify(mockPixel).fire(DuckChatPixelName.AI_FEATURES_DISABLED_DAILY, type = Pixel.PixelType.Daily())
+        }
+
+    @Test
+    fun `when search assist set to never then never count and daily fired`() =
+        runTest {
+            testee.onSearchAssistVisibilitySelected(SearchAssistVisibility.NEVER)
+            verify(mockPixel).fire(DuckChatPixelName.AI_FEATURES_SEARCH_ASSIST_NEVER_COUNT)
+            verify(mockPixel).fire(DuckChatPixelName.AI_FEATURES_SEARCH_ASSIST_NEVER_DAILY, type = Pixel.PixelType.Daily())
+        }
+
+    @Test
+    fun `when search assist set to on demand then on_demand count and daily fired`() =
+        runTest {
+            testee.onSearchAssistVisibilitySelected(SearchAssistVisibility.ON_DEMAND)
+            verify(mockPixel).fire(DuckChatPixelName.AI_FEATURES_SEARCH_ASSIST_ON_DEMAND_COUNT)
+            verify(mockPixel).fire(DuckChatPixelName.AI_FEATURES_SEARCH_ASSIST_ON_DEMAND_DAILY, type = Pixel.PixelType.Daily())
+        }
+
+    @Test
+    fun `when search assist set to sometimes then sometimes count and daily fired`() =
+        runTest {
+            testee.onSearchAssistVisibilitySelected(SearchAssistVisibility.SOMETIMES)
+            verify(mockPixel).fire(DuckChatPixelName.AI_FEATURES_SEARCH_ASSIST_SOMETIMES_COUNT)
+            verify(mockPixel).fire(DuckChatPixelName.AI_FEATURES_SEARCH_ASSIST_SOMETIMES_DAILY, type = Pixel.PixelType.Daily())
+        }
+
+    @Test
+    fun `when search assist set to often then often count and daily fired`() =
+        runTest {
+            testee.onSearchAssistVisibilitySelected(SearchAssistVisibility.OFTEN)
+            verify(mockPixel).fire(DuckChatPixelName.AI_FEATURES_SEARCH_ASSIST_OFTEN_COUNT)
+            verify(mockPixel).fire(DuckChatPixelName.AI_FEATURES_SEARCH_ASSIST_OFTEN_DAILY, type = Pixel.PixelType.Daily())
+        }
+
+    @Test
+    fun `when hide images selected on then hide_images_on count and daily fired`() =
+        runTest {
+            testee.onHideAiGeneratedImagesSelected(HideAiGeneratedImages.ON)
+            verify(mockPixel).fire(DuckChatPixelName.AI_FEATURES_HIDE_IMAGES_ON_COUNT)
+            verify(mockPixel).fire(DuckChatPixelName.AI_FEATURES_HIDE_IMAGES_ON_DAILY, type = Pixel.PixelType.Daily())
+        }
+
+    @Test
+    fun `when hide images selected off then hide_images_off count and daily fired`() =
+        runTest {
+            testee.onHideAiGeneratedImagesSelected(HideAiGeneratedImages.OFF)
+            verify(mockPixel).fire(DuckChatPixelName.AI_FEATURES_HIDE_IMAGES_OFF_COUNT)
+            verify(mockPixel).fire(DuckChatPixelName.AI_FEATURES_HIDE_IMAGES_OFF_DAILY, type = Pixel.PixelType.Daily())
+        }
+
+    @Test
     fun `when onUseWithoutAiClicked then duck chat user setting disabled`() =
         runTest {
             testee.onUseWithoutAiClicked()

@@ -1183,5 +1183,54 @@
         "triggers": ["other"],
         "suffixes": ["form_factor"],
         "parameters": ["appVersion"]
+    },
+    "ai_features_disabled": {
+        "description": "User tapped the 'Disable AI Features' action, which turns off Duck.ai, sets Search Assist to Never, and hides AI-generated images.",
+        "owners": ["anikiki"],
+        "triggers": ["other"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "ai_features_search_assist_never": {
+        "description": "User set Search Assist to Never.",
+        "owners": ["anikiki"],
+        "triggers": ["other"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "ai_features_search_assist_on_demand": {
+        "description": "User set Search Assist to On demand.",
+        "owners": ["anikiki"],
+        "triggers": ["other"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "ai_features_search_assist_sometimes": {
+        "description": "User set Search Assist to Sometimes.",
+        "owners": ["anikiki"],
+        "triggers": ["other"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "ai_features_search_assist_often": {
+        "description": "User set Search Assist to Often.",
+        "owners": ["anikiki"],
+        "triggers": ["other"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "ai_features_hide_images_on": {
+        "description": "User turned Hide AI-Generated Images on (images hidden).",
+        "owners": ["anikiki"],
+        "triggers": ["other"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "ai_features_hide_images_off": {
+        "description": "User turned Hide AI-Generated Images off (images shown).",
+        "owners": ["anikiki"],
+        "triggers": ["other"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": ["appVersion"]
     }
 }
