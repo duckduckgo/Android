@@ -956,6 +956,11 @@ class BrowserTabFragment :
                 currentUrl: String,
                 credentials: LoginCredentials,
             ) {
+                // Fire mode never offers to save or update logins — its session leaves no trace.
+                if (browserMode == BrowserMode.FIRE) {
+                    return
+                }
+
                 val username = credentials.username
                 val password = credentials.password
 
