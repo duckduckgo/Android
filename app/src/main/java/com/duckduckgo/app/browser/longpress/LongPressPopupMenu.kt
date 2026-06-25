@@ -101,7 +101,18 @@ class LongPressPopupMenu(
             popup.onMenuItemClicked(row) { imageUrl?.let(listener::onOpenImageInNewTab) }
         }
 
-        popup.applyRoundedRippleCornersToVisibleItems()
+        // Clear the rounded ripple the shared PopupMenu init applied to the first/last LABELS, so
+        // every row uses a single uniform full-row ripple (the label begins after the leading icon,
+        // which split the ripple between icon and text on the first/last items).
+        val root = popup.contentView as android.view.ViewGroup
+        for (i in 0 until root.childCount) {
+            (root.getChildAt(i) as? com.duckduckgo.common.ui.view.PopupMenuItemView)
+                ?.findViewById<android.view.View>(com.duckduckgo.mobile.android.R.id.label)
+                ?.background = null
+        }
+        // Clip the popup content to its rounded background so full-row ripples don't bleed past the corners.
+        root.clipToOutline = true
+
         popup.showAtTouchPoint(rootView, screenX, screenY)
         return true
     }
