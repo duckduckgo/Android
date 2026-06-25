@@ -1029,7 +1029,7 @@ class BrowserTabViewModelTest {
                 onboardingStore = mockOnboardingStore,
                 autocompleteHistoryDeleteFeature = fakeAutocompleteHistoryDeleteFeature,
                 customAiOnboardingStore = mockCustomAiOnboardingStore,
-                browserMode = BrowserMode.REGULAR,
+                browserMode = browserMode,
             )
 
         testee.loadData("abc", null, false, false)
