@@ -29,6 +29,7 @@ import org.junit.Assert.assertNull
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import java.io.IOException
 
@@ -84,5 +85,23 @@ class SerpSettingsPrefsDataStoreErrorTest {
         assertNull(emitted)
         verify(pixel).fire(SerpSettingsPixelName.SERP_SETTINGS_KEYVALUE_STORE_READ_ERROR_COUNT)
         verify(pixel).fire(SerpSettingsPixelName.SERP_SETTINGS_KEYVALUE_STORE_READ_ERROR_DAILY, type = Pixel.PixelType.Daily())
+    }
+
+    @Test
+    fun whenMultipleObserveCollectorsAndReadKeepsFailingThenReadErrorPixelFiredOnce() = runTest {
+        val throwingStore = object : DataStore<Preferences> {
+            override val data: Flow<Preferences> = flow { throw IOException("boom") }
+            override suspend fun updateData(transform: suspend (Preferences) -> Preferences): Preferences =
+                throw IOException("unused")
+        }
+        // Same store instance (as DI provides a singleton), multiple collectors: the read-error latch must
+        // collapse the fan-out to a single count/daily pair.
+        val store = storeWith(throwingStore)
+
+        store.observeSerpSettings().first()
+        store.observeSerpSettings().first()
+
+        verify(pixel, times(1)).fire(SerpSettingsPixelName.SERP_SETTINGS_KEYVALUE_STORE_READ_ERROR_COUNT)
+        verify(pixel, times(1)).fire(SerpSettingsPixelName.SERP_SETTINGS_KEYVALUE_STORE_READ_ERROR_DAILY, type = Pixel.PixelType.Daily())
     }
 }
