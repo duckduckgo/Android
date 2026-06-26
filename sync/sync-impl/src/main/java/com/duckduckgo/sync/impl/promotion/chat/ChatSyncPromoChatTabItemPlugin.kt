@@ -40,7 +40,7 @@ import javax.inject.Inject
 @ContributesActivePlugin(
     scope = AppScope::class,
     boundType = NativeInputChatTabItemPlugin::class,
-    defaultActiveValue = DefaultFeatureValue.INTERNAL,
+    defaultActiveValue = DefaultFeatureValue.FALSE,
     priority = NativeInputChatTabItemPlugin.PRIORITY_PROMO,
     featureName = "pluginChatSyncPromoChatTabItemPlugin",
     parentFeatureName = "pluginPointNativeInputChatTabItemPlugin",
