@@ -832,6 +832,7 @@
     <string name="preOnboardingDaxDialog1TitleDuckAi" translatable="false"><![CDATA[Hi there.<br/><br/>Ready for a faster browser that protects you and lets you decide when and how to use AI?]]></string>
     <string name="preOnboardingDaxDialog1Button">Aloitetaan!</string>
     <string name="preOnboardingDaxDialog1ButtonDuckAi" translatable="false">Let\&apos;s get started!</string>
+    <string name="preOnboardingDaxDialog1ButtonBrandDesign">Aloitetaan!</string>
     <string name="preOnboardingDaxDialog1SecondaryButton">Tämä on jo entuudestaan tuttua</string>
     <string name="preOnboardingDaxDialog2Title">Suojaukset aktivoitu!</string>
     <string name="preOnboardingDaxDialog2Button">Valitse selaimesi</string>
@@ -896,6 +897,7 @@
     <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[DuckDuckGolla on myös <b>valinnainen maksullinen</b> tilaus, johon sisältyy turvallinen <b>VPN</b> ja <b>edistynyt, yksityinen tekoäly</b>.]]></string>
     <string name="onboardingPrivacyProDaxDialogOkButton">Lue lisää</string>
     <string name="onboardingPrivacyProDaxDialogFreeTrialOkButton">Kokeile ilmaiseksi!</string>
+    <string name="onboardingPrivacyProDaxDialogFreeTrialOkButtonBrandDesign">Kokeile maksutta!</string>
     <string name="onboardingPrivacyProDaxDialogCancelButton">Ohita</string>
     <string name="onboardingSkippedPrivacyProDaxDialogTitle">Tiesitkö?</string>
 
@@ -1030,6 +1032,42 @@
     <string name="onboardingStepIndicatorText" instruction="a counter above our instructions in onboarding that tells a user what step they are on">%1$d/%2$d</string>
     <string name="onboardingSearchDaxDialogOption1Quoted" instruction="translate &apos;duck&apos; too.">miten sanotaan \"ankka\" englanniksi</string>
     <string name="onboardingSearchDaxDialogOption1EnglishQuoted" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">miten sanotaan \"ankka\" espanjaksi</string>
+
+    <string name="onboardingDuckAiFireButtonDaxDialogTitle">Se on Duck.ai!</string>
+    <string name="onboardingDuckAiFireButtonDaxDialogDescription"><![CDATA[Yksityiset tekoälykeskustelut, jotka voit poistaa milloin tahansa <b>Fire Button</b> -painikkeella. Kokeile nyt! 🔥]]></string>
+    <string name="onboardingDuckAiEndCtaTitle">Hyvin menee!</string>
+    <string name="onboardingDuckAiEndCtaDescription"><![CDATA[Hae sivustoja ja vieraile niillä osoiteriviltä tai aloita yksityinen tekoälykeskustelu siirtymällä Duck.ai:hin.<br/><br/>Voit käyttää Duck.ai:ta mistä tahansa, missä näet chat-kuvakkeen]]></string>
+    <string name="onboardingDuckAiEndCtaButton">Ylävitonen!</string>
+
+    <!-- Input Mode Demo Onboarding step -->
+    <string name="preOnboardingInputModeDemoTitle">Oletko valmis aloittamaan?&lt;br/&gt;Kokeile hakua tai tekoälykeskustelua!</string>
+    <string name="preOnboardingInputModeDemoSearchHint">Yksityinen selaus</string>
+    <string name="preOnboardingInputModeDemoChatHint">Kysy mitä tahansa yksityisesti</string>
+    <string name="preOnboardingInputModeDemoChatSuggestion1">Selitä osakemarkkinat kuin olisin 10-vuotias</string>
+    <string name="preOnboardingInputModeDemoChatSuggestion2">Suunnittele täydellinen päivä Lontoossa</string>
+    <string name="preOnboardingInputModeDemoChatSuggestion3">Yllätä minut!</string>
+    <string name="preOnboardingInputModeDemoChatSuggestion3Prompt">Mitkä ovat kymmenen kiehtovaa faktaa tieteestä, luonnosta ja historiasta?</string>
+
+    <!-- Custom AI onboarding flow -->
+    <!-- Pre-onboarding: initial screens -->
+    <string name="preOnboardingWelcomeDialogBodyCustomAi">Oletko valmis keskustelemaan yksityisesti ChatGPT:n, Clauden ja muiden tekoälyjen kanssa ilmaiseksi selaimessa, joka suojaa sinua aktiivisesti?</string>
+    <string name="preOnboardingDaxDialog3TextCustomAi">Muista: voit käyttää Duck.ai:ta mistä tahansa, missä näet chat-kuvakkeen</string>
+    <string name="preOnboardingDaxDialog3ButtonCustomAi">Aloita tekoälykeskustelu</string>
+    <!-- Pre-onboarding: AI comparison chart screen. -->
+    <string name="preOnboardingDaxDialogAiTitle">Tekoälysuojaukset aktivoitu!</string>
+    <string name="preOnboardingAiComparisonChartPopularAis">Suosittuja tekoälypalveluja</string>
+    <string name="preOnboardingAiComparisonChartItem1">Kaikki keskustelut ovat anonymisoituja</string>
+    <string name="preOnboardingAiComparisonChartItem2">Tekoälyominaisuuksien käyttämiseen ei tarvita tiliä</string>
+    <string name="preOnboardingAiComparisonChartItem3">Keskustelujasi ei koskaan käytetä tekoälyn kouluttamiseen</string>
+    <string name="preOnboardingAiComparisonChartItem4">Käytä ChatGPT:tä, Claudea ja muita palveluita yhdessä paikassa</string>
+    <string name="preOnboardingAiComparisonChartButton">Kokeile Duck.ai:ta!</string>
+    <!-- Pre-onboarding: input demo screen -->
+    <string name="preOnboardingInputModeDemoTitleCustomAi">Kokeile nyt yksityistä tekoälykeskustelua!</string>
+    <!-- Pre-onboarding: browser comparison screen -->
+    <string name="preOnboardingDaxDialog2TitleCustomAi">Asetetaanko DuckDuckGo oletusselaimeksi?</string>
+    <!-- In-context onboarding. -->
+    <string name="onboardingEndCustomAiFlowDaxDialogDescription"><![CDATA[Aloita yksityinen tekoälykeskustelu Duck.ai:n kanssa tai siirry suojatun selaamisen hakuun.<br/><br/>Voit käyttää Duck.ai:ta mistä tahansa, missä näet chat-kuvakkeen]]></string>
+    <string name="onboardingPrivacyProCustomAiFlowDaxDialogDescription">Tarjoamme myös maksullisen tilauksen, joka sisältää edistyneitä tekoälymalleja, joilla on korkeammat GPT:n ja Clauden keskustelurajoitukset, turvallinen VPN ja paljon muuta.</string>
 
     <string name="input_screen_user_pref_without_ai_updated">Vain haku</string>
     <string name="input_screen_user_pref_with_ai_updated">Vaihda haun ja\nDuck.ai:n välillä</string>

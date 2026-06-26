@@ -133,6 +133,12 @@
     <!-- Duck AI Chat Suggestions -->
     <string name="duckAiChatHistoryViewAllChats">Προβολή όλων των συνομιλιών</string>
 
+    <!-- Duck.ai onboarding end CTA -->
+    <string name="duckAiEndCtaTitle">Το έχεις!</string>
+    <string name="duckAiEndCtaDescription"><![CDATA[Χρησιμοποίησε τη γραμμή διευθύνσεων για αναζήτηση και επίσκεψη σε ιστότοπους ή πήγαινε στο Duck.ai για ιδιωτική συνομιλία με τεχνητή νοημοσύνη.<br/><br/>Μπορείς να χρησιμοποιήσεις το Duck.ai από οπουδήποτε βλέπεις το εικονίδιο συνομιλίας]]></string>
+    <string name="duckAiEndCtaButton">Κόλλα πέντε!</string>
+    <string name="duckAiEndCtaDescriptionCustomAi"><![CDATA[Ξεκίνα μια ιδιωτική συνομιλία με τεχνητή νοημοσύνη (AI) με το Duck.ai ή πέρνα σε Αναζήτηση για προστατευμένη περιήγηση.<br/><br/>Μπορείς να χρησιμοποιήσεις το Duck.ai από οπουδήποτε βλέπεις το εικονίδιο συνομιλίας]]></string>
+
     <!-- Native Duck.ai chat history -->
     <string name="duck_ai_chat_history_title">Συνομιλίες</string>
     <string name="duck_ai_chat_history_section_pinned">Καρφιτσωμένες</string>
@@ -176,4 +182,10 @@
     <string name="duck_ai_chat_history_download_view">Εμφάνιση</string>
     <string name="duck_ai_chat_history_download_error">Δεν ήταν δυνατή η εξαγωγή της συνομιλίας</string>
     <string name="duck_ai_chat_history_bulk_download_error">Δεν ήταν δυνατή η εξαγωγή των συνομιλιών</string>
+
+    <!-- Example message card: internal-only showcase of NativeInputChatTabItemPlugin, not shipped to
+         users, so these are not localized (translatable="false"). Delete with the example. -->
+    <string name="duckChatExampleMessageCardTitle" translatable="false">Example message card</string>
+    <string name="duckChatExampleMessageCardSubtitle" translatable="false">Contributed by an ActivePlugin to show how other modules can add items to the Chat tab. Dismiss it to see the card remove itself.</string>
+    <string name="duckChatExampleMessageCardAction" translatable="false">Got it</string>
 </resources>

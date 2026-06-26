@@ -133,6 +133,12 @@
     <!-- Duck AI Chat Suggestions -->
     <string name="duckAiChatHistoryViewAllChats">Visa alla chattar</string>
 
+    <!-- Duck.ai onboarding end CTA -->
+    <string name="duckAiEndCtaTitle">Det här går bra!</string>
+    <string name="duckAiEndCtaDescription"><![CDATA[Använd adressfältet för att söka efter och besöka webbplatser eller byt till Duck.ai för privat AI-chatt.<br/><br/>Du kan använda Duck.ai överallt där du ser chattikonen]]></string>
+    <string name="duckAiEndCtaButton">High Five!</string>
+    <string name="duckAiEndCtaDescriptionCustomAi"><![CDATA[Starta en privat AI-chatt med Duck.ai eller byt till Sök för skyddad surfning.<br/><br/>Du kan använda Duck.ai överallt där du ser chattikonen]]></string>
+
     <!-- Native Duck.ai chat history -->
     <string name="duck_ai_chat_history_title">Chattar</string>
     <string name="duck_ai_chat_history_section_pinned">Fäst</string>
@@ -176,4 +182,10 @@
     <string name="duck_ai_chat_history_download_view">Visa</string>
     <string name="duck_ai_chat_history_download_error">Kunde inte exportera chatt</string>
     <string name="duck_ai_chat_history_bulk_download_error">Kunde inte exportera chattar</string>
+
+    <!-- Example message card: internal-only showcase of NativeInputChatTabItemPlugin, not shipped to
+         users, so these are not localized (translatable="false"). Delete with the example. -->
+    <string name="duckChatExampleMessageCardTitle" translatable="false">Example message card</string>
+    <string name="duckChatExampleMessageCardSubtitle" translatable="false">Contributed by an ActivePlugin to show how other modules can add items to the Chat tab. Dismiss it to see the card remove itself.</string>
+    <string name="duckChatExampleMessageCardAction" translatable="false">Got it</string>
 </resources>

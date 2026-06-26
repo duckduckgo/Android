@@ -832,6 +832,7 @@
     <string name="preOnboardingDaxDialog1TitleDuckAi" translatable="false"><![CDATA[Hi there.<br/><br/>Ready for a faster browser that protects you and lets you decide when and how to use AI?]]></string>
     <string name="preOnboardingDaxDialog1Button">Csináljuk!</string>
     <string name="preOnboardingDaxDialog1ButtonDuckAi" translatable="false">Let\&apos;s get started!</string>
+    <string name="preOnboardingDaxDialog1ButtonBrandDesign">Kezdjünk hozzá!</string>
     <string name="preOnboardingDaxDialog1SecondaryButton">Már jártam itt korábban</string>
     <string name="preOnboardingDaxDialog2Title">Védelem aktiválva!</string>
     <string name="preOnboardingDaxDialog2Button">Böngésző kiválasztása</string>
@@ -896,6 +897,7 @@
     <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[A DuckDuckGo emellett <b>opcionális előfizetési lehetőséget</b> is kínál, amelyhez biztonságos <b>VPN</b> és <b>fejlett, privát AI-szolgáltatás</b> tartozik.]]></string>
     <string name="onboardingPrivacyProDaxDialogOkButton">További részletek</string>
     <string name="onboardingPrivacyProDaxDialogFreeTrialOkButton">Próbáld ki ingyen!</string>
+    <string name="onboardingPrivacyProDaxDialogFreeTrialOkButtonBrandDesign">Próbáld ki ingyen!</string>
     <string name="onboardingPrivacyProDaxDialogCancelButton">Kihagyás</string>
     <string name="onboardingSkippedPrivacyProDaxDialogTitle">Tudtad?</string>
 
@@ -1030,6 +1032,42 @@
     <string name="onboardingStepIndicatorText" instruction="a counter above our instructions in onboarding that tells a user what step they are on">%1$d/%2$d</string>
     <string name="onboardingSearchDaxDialogOption1Quoted" instruction="translate &apos;duck&apos; too.">hogyan mondják angolul, hogy „kacsa”</string>
     <string name="onboardingSearchDaxDialogOption1EnglishQuoted" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">hogyan mondják spanyolul, hogy „kacsa”</string>
+
+    <string name="onboardingDuckAiFireButtonDaxDialogTitle">Ez itt a Duck.ai!</string>
+    <string name="onboardingDuckAiFireButtonDaxDialogDescription"><![CDATA[Privát MI-beszélgetések, amelyeket bármikor törölhetsz a <b>Fire Button</b> segítségével. Próbáld ki! 🔥]]></string>
+    <string name="onboardingDuckAiEndCtaTitle">Menni fog!</string>
+    <string name="onboardingDuckAiEndCtaDescription"><![CDATA[A címsávban kereshetsz, webhelyeket nyithatsz meg, vagy átválthatsz a Duck.ai-ra privát MI-beszélgetéshez.<br/><br/>A Duck.ai-t bárhol használhatod, ahol látod a beszélgetés ikonját]]></string>
+    <string name="onboardingDuckAiEndCtaButton">Pacsi!</string>
+
+    <!-- Input Mode Demo Onboarding step -->
+    <string name="preOnboardingInputModeDemoTitle">Készen állsz a kezdésre?\nPróbálkozz kereséssel vagy AI-csevegéssel!</string>
+    <string name="preOnboardingInputModeDemoSearchHint">Privát keresés</string>
+    <string name="preOnboardingInputModeDemoChatHint">Kérdezz bármit privátban</string>
+    <string name="preOnboardingInputModeDemoChatSuggestion1">Magyarázd el a tőzsdét úgy, mintha 10 éves lennék</string>
+    <string name="preOnboardingInputModeDemoChatSuggestion2">Tervezz meg egy tökéletes napot Londonban</string>
+    <string name="preOnboardingInputModeDemoChatSuggestion3">Lepj meg!</string>
+    <string name="preOnboardingInputModeDemoChatSuggestion3Prompt">Milyen tíz lenyűgöző tényt tudnál említeni a tudomány, a természet és a történelem területéről?</string>
+
+    <!-- Custom AI onboarding flow -->
+    <!-- Pre-onboarding: initial screens -->
+    <string name="preOnboardingWelcomeDialogBodyCustomAi">Készen állsz arra, hogy ingyen, privát módon beszélgess a ChatGPT-vel, a Claude-dal és más MI-eszközökkel egy olyan böngészőben, amely aktívan véd?</string>
+    <string name="preOnboardingDaxDialog3TextCustomAi">Ne feledd: a Duck.ai-t bárhol használhatod, ahol látod a beszélgetés ikonját</string>
+    <string name="preOnboardingDaxDialog3ButtonCustomAi">MI-beszélgetés indítása</string>
+    <!-- Pre-onboarding: AI comparison chart screen. -->
+    <string name="preOnboardingDaxDialogAiTitle">MI-védelem aktiválva!</string>
+    <string name="preOnboardingAiComparisonChartPopularAis">Népszerű MI-eszközök</string>
+    <string name="preOnboardingAiComparisonChartItem1">Minden beszélgetés anonimizált</string>
+    <string name="preOnboardingAiComparisonChartItem2">Az összes MI-funkció elérhető fiók nélkül is</string>
+    <string name="preOnboardingAiComparisonChartItem3">A beszélgetéseidet soha nem használjuk MI-modellek tanítására</string>
+    <string name="preOnboardingAiComparisonChartItem4">ChatGPT, Claude és más modellek – egy helyen</string>
+    <string name="preOnboardingAiComparisonChartButton">Próbáld ki a Duck.ai-t!</string>
+    <!-- Pre-onboarding: input demo screen -->
+    <string name="preOnboardingInputModeDemoTitleCustomAi">Most próbálj ki egy privát MI-beszélgetést!</string>
+    <!-- Pre-onboarding: browser comparison screen -->
+    <string name="preOnboardingDaxDialog2TitleCustomAi">Szeretnéd alapértelmezett böngészővé tenni a DuckDuckGót?</string>
+    <!-- In-context onboarding. -->
+    <string name="onboardingEndCustomAiFlowDaxDialogDescription"><![CDATA[Indíts privát MI-beszélgetést a Duck.ai-jal, vagy válts a Keresésre a védett böngészéshez.<br/><br/>A Duck.ai-t bárhol használhatod, ahol látod a beszélgetés ikonját]]></string>
+    <string name="onboardingPrivacyProCustomAiFlowDaxDialogDescription">Előfizetéses csomagot is kínálunk, amely fejlett AI-modelleket, a GPT és a Claude modelljeihez biztosított magasabb csevegési limiteket, valamint biztonságos VPN-t és további funkciókat is tartalmaz.</string>
 
     <string name="input_screen_user_pref_without_ai_updated">Csak keresés</string>
     <string name="input_screen_user_pref_with_ai_updated">Váltás a keresés\nés a Duck.ai között</string>

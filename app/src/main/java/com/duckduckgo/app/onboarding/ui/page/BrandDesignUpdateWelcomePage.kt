@@ -841,9 +841,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                     } else if (isCustomAiOnboardingFlow) {
                         binding.daxDialogCta.welcomeContent.bodyText1.text =
                             getString(R.string.preOnboardingWelcomeDialogBodyCustomAi).preventWidows().html(requireContext())
-                        binding.daxDialogCta.primaryCta.text = getString(R.string.preOnboardingDaxDialog1ButtonBrandDesign)
                     } else {
-                        binding.daxDialogCta.primaryCta.text = getString(R.string.preOnboardingDaxDialog1Button)
                         binding.daxDialogCta.welcomeContent.bodyText1.text =
                             getString(R.string.preOnboardingWelcomeDialogBody1).preventWidows()
                         binding.daxDialogCta.welcomeContent.bodyText2.text =
@@ -1564,9 +1562,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                 } else if (isCustomAiOnboardingFlow) {
                     binding.daxDialogCta.welcomeContent.bodyText1.text =
                         getString(R.string.preOnboardingWelcomeDialogBodyCustomAi).preventWidows().html(requireContext())
-                    binding.daxDialogCta.primaryCta.text = getString(R.string.preOnboardingDaxDialog1ButtonBrandDesign)
                 } else {
-                    binding.daxDialogCta.primaryCta.text = getString(R.string.preOnboardingDaxDialog1Button)
                     binding.daxDialogCta.welcomeContent.bodyText1.text =
                         getString(R.string.preOnboardingWelcomeDialogBody1).preventWidows()
                     binding.daxDialogCta.welcomeContent.bodyText2.text =
