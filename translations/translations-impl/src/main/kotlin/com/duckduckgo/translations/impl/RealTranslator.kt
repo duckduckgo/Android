@@ -26,12 +26,11 @@ import com.duckduckgo.translations.api.Translator
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import io.github.marcosholgado.translatekit.TranslateKit
-import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import logcat.logcat
-
+import javax.inject.Inject
 
 @SingleInstanceIn(AppScope::class)
 @ContributesBinding(AppScope::class)
