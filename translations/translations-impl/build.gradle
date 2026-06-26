@@ -31,7 +31,12 @@ dependencies {
     implementation project(path: ':common-utils')
     implementation project(path: ':app-build-config-api')
 
+    ksp project(':anvil-ksp')
+
     implementation "io.github.marcosholgado:translate-kit-android:0.1.0"
+
+    implementation Square.retrofit2.retrofit
+    implementation Square.retrofit2.converter.moshi
 
     implementation KotlinX.coroutines.android
     implementation AndroidX.core.ktx

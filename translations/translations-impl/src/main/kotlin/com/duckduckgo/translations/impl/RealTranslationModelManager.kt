@@ -23,6 +23,7 @@ import com.duckduckgo.translations.api.TranslationModelManager
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -31,6 +32,7 @@ import javax.inject.Inject
 @ContributesBinding(AppScope::class)
 class RealTranslationModelManager @Inject constructor(
     private val modelStore: ModelStore,
+    private val modelDownloader: ModelDownloader,
     private val dispatchers: DispatcherProvider,
 ) : TranslationModelManager {
 
@@ -40,7 +42,10 @@ class RealTranslationModelManager @Inject constructor(
         }
 
     override fun downloadModel(sourceLanguage: String, targetLanguage: String): Flow<ModelDownloadStatus> = flow {
-        // The actual GCS download is wired up in the next step.
-        emit(ModelDownloadStatus.Failed("Model download is not wired up yet"))
+        if (modelStore.isDownloaded(sourceLanguage, targetLanguage)) {
+            emit(ModelDownloadStatus.Completed)
+        } else {
+            emitAll(modelDownloader.download(sourceLanguage, targetLanguage))
+        }
     }
 }
