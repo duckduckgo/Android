@@ -165,6 +165,11 @@ interface DuckChat {
     suspend fun isChatHistoryAvailable(): Boolean
 
     /**
+     * Returns `true` when the user enabled Duck.ai chat history in settings.
+     */
+    suspend fun hasUserEnabledChatHistory(): Boolean
+
+    /**
      * Records that the user selected the "Search + Duck.ai" option on the new address bar picker, so the
      * first prompt submitted from the Duck.ai toggle input field within the attribution window can be
      * attributed back to the picker.
