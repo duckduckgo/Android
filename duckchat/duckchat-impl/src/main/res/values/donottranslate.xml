@@ -82,7 +82,7 @@
 
     <!-- Duck AI Use Without AI Settings Option -->
     <string name="duckAiUseWithoutAiTitle">Use DuckDuckGo Without AI</string>
-    <string name="duckAiUseWithoutAiDescription">Disables Duck.ai, hides AI-assisted answers in search, and hides AI-generated images in image search results.</string>
+    <string name="duckAiUseWithoutAiDescription">Disables Duck.ai, hides AI-assisted answers in search, and filters known AI spam sites in image search results.</string>
     <string name="duckAiUseWithoutAiDisabledDescription">AI is currently disabled in the Browser so you\'ll no longer see AI-assisted answers or AI-generated images in image search results.</string>
 
     <!-- Duck AI Section in AI Feature Screen -->
