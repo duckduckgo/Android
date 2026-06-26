@@ -58,7 +58,11 @@ class LongPressPopupMenu(
             LongPressMenuShape.IMAGE -> R.layout.popup_long_press_image_menu
             LongPressMenuShape.IMAGE_LINK -> R.layout.popup_long_press_image_link_menu
         }
-        val popup = PopupMenu(layoutInflater, layoutRes)
+        val popup = PopupMenu(
+            layoutInflater,
+            layoutRes,
+            width = layoutInflater.context.resources.getDimensionPixelSize(R.dimen.longPressMenuWidth),
+        )
         val content = popup.contentView
 
         content.findViewById<DaxTextView>(R.id.longPressUrlHeader)?.text = target.url ?: target.imageUrl ?: ""
