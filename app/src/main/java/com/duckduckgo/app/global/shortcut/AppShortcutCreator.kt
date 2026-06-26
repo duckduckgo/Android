@@ -140,9 +140,8 @@ class AppShortcutCreator @Inject constructor(
             .setShortLabel(context.getString(R.string.fireMenu))
             .setIcon(IconCompat.createWithResource(context, R.drawable.ic_app_shortcut_fire_adaptive))
             .setIntent(
-                BrowserActivity.intent(context, launchSource = FireRestart).also {
+                BrowserActivity.intent(context, launchSource = FireRestart, performFireOnEntry = true).also {
                     it.action = Intent.ACTION_VIEW
-                    it.putExtra(BrowserActivity.PERFORM_FIRE_ON_ENTRY_EXTRA, true)
                 },
             )
             .build().toShortcutInfo()

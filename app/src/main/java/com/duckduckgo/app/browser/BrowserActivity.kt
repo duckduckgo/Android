@@ -19,6 +19,7 @@
 package com.duckduckgo.app.browser
 
 import android.annotation.SuppressLint
+import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.content.Intent.EXTRA_TEXT
@@ -42,6 +43,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.activity.viewModels
 import androidx.annotation.VisibleForTesting
+import androidx.core.content.IntentCompat
 import androidx.core.view.isVisible
 import androidx.core.view.postDelayed
 import androidx.lifecycle.Lifecycle
@@ -778,7 +780,11 @@ open class BrowserActivity : DuckDuckGoActivity() {
             return
         }
 
-        if (intent.getBooleanExtra(PERFORM_FIRE_ON_ENTRY_EXTRA, false)) {
+        if (intent.getBooleanExtra(PERFORM_FIRE_ON_ENTRY_EXTRA, false) && !isTrustedFireOnEntryIntent(this, intent)) {
+            // Destructive request without a valid DuckDuckGo-owned verification token — likely a third-party app
+            // forging the public extra. Ignore it rather than clearing the user's data.
+            logcat(WARN) { "Ignoring untrusted $PERFORM_FIRE_ON_ENTRY_EXTRA intent (missing or invalid verification sender)" }
+        } else if (intent.getBooleanExtra(PERFORM_FIRE_ON_ENTRY_EXTRA, false)) {
             logcat(INFO) { "Clearing everything as a result of $PERFORM_FIRE_ON_ENTRY_EXTRA flag being set" }
             appCoroutineScope.launch(dispatcherProvider.io()) {
                 if (androidBrowserConfigFeature.singleTabFireDialog().isEnabled()) {
@@ -1416,8 +1422,15 @@ open class BrowserActivity : DuckDuckGoActivity() {
             duckChatUrl: String? = null,
             duckChatSessionActive: Boolean = false,
             deletedTabCount: Int = 0,
+            performFireOnEntry: Boolean = false,
         ): Intent {
             val intent = Intent(context, BrowserActivity::class.java)
+            if (performFireOnEntry) {
+                intent.putExtra(PERFORM_FIRE_ON_ENTRY_EXTRA, true)
+                // Proof that this destructive intent originated from within DuckDuckGo itself. A third-party app
+                // cannot forge a PendingIntent whose creatorPackage is ours, so it cannot replicate this.
+                intent.putExtra(FIRE_ON_ENTRY_VERIFICATION_EXTRA, createFireOnEntryVerificationSender(context))
+            }
             intent.putExtra(EXTRA_TEXT, queryExtra)
             intent.putExtra(NEW_SEARCH_EXTRA, newSearch)
             intent.putExtra(NOTIFY_DATA_CLEARED_EXTRA, notifyDataCleared)
@@ -1436,8 +1449,33 @@ open class BrowserActivity : DuckDuckGoActivity() {
             return intent
         }
 
+        /**
+         * Builds a PendingIntent owned by this app, used purely as a forgery-proof token.
+         * [BrowserActivity] only reads its [PendingIntent.getCreatorPackage]; the PendingIntent is never sent.
+         */
+        private fun createFireOnEntryVerificationSender(context: Context): PendingIntent {
+            return PendingIntent.getActivity(
+                context,
+                0,
+                Intent(context, BrowserActivity::class.java),
+                PendingIntent.FLAG_IMMUTABLE,
+            )
+        }
+
+        /**
+         * Returns true only when [intent] both requests a fire-on-entry clear and carries a verification token
+         * created by this app. This authenticates the otherwise-public [PERFORM_FIRE_ON_ENTRY_EXTRA] so that a
+         * third-party app cannot trigger destructive data clearing on an exported activity.
+         */
+        fun isTrustedFireOnEntryIntent(context: Context, intent: Intent): Boolean {
+            if (!intent.getBooleanExtra(PERFORM_FIRE_ON_ENTRY_EXTRA, false)) return false
+            val sender = IntentCompat.getParcelableExtra(intent, FIRE_ON_ENTRY_VERIFICATION_EXTRA, PendingIntent::class.java)
+            return sender?.creatorPackage == context.packageName
+        }
+
         const val NEW_SEARCH_EXTRA = "NEW_SEARCH_EXTRA"
         const val PERFORM_FIRE_ON_ENTRY_EXTRA = "PERFORM_FIRE_ON_ENTRY_EXTRA"
+        private const val FIRE_ON_ENTRY_VERIFICATION_EXTRA = "FIRE_ON_ENTRY_VERIFICATION_EXTRA"
         const val NOTIFY_DATA_CLEARED_EXTRA = "NOTIFY_DATA_CLEARED_EXTRA"
         const val LAUNCH_FROM_DEFAULT_BROWSER_DIALOG = "LAUNCH_FROM_DEFAULT_BROWSER_DIALOG"
         const val LAUNCH_FROM_FAVORITES_WIDGET = "LAUNCH_FROM_FAVORITES_WIDGET"

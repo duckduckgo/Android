@@ -43,4 +43,27 @@ class BrowserActivityIntentFactoryTest {
 
         assertFalse(intent.getBooleanExtra(BrowserActivity.LAUNCH_REQUIRES_REGULAR_MODE, true))
     }
+
+    @Test
+    fun whenFireOnEntryIntentBuiltByFactoryThenIsTrustedFireOnEntryIntent() {
+        val intent = BrowserActivity.intent(context, launchSource = InAppNavigation, performFireOnEntry = true)
+
+        assertTrue(BrowserActivity.isTrustedFireOnEntryIntent(context, intent))
+    }
+
+    @Test
+    fun whenIntentHasFireOnEntryExtraButNoVerificationSenderThenNotTrusted() {
+        // Replicates a third-party app forging the public extra without a DDG-owned verification sender.
+        val forgedIntent = BrowserActivity.intent(context, launchSource = InAppNavigation)
+            .putExtra(BrowserActivity.PERFORM_FIRE_ON_ENTRY_EXTRA, true)
+
+        assertFalse(BrowserActivity.isTrustedFireOnEntryIntent(context, forgedIntent))
+    }
+
+    @Test
+    fun whenIntentDoesNotRequestFireOnEntryThenNotTrusted() {
+        val intent = BrowserActivity.intent(context, launchSource = InAppNavigation)
+
+        assertFalse(BrowserActivity.isTrustedFireOnEntryIntent(context, intent))
+    }
 }
