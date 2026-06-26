@@ -2782,7 +2782,24 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenOnLongPressRequiredActionWithOpenInFireTabThenGeneratePreviewThenOpenInFireTab() = runTest {
+    fun whenOnLongPressRequiredActionWithOpenInFireTabInRegularModeThenOpensFreshFireTabWithoutSource() = runTest {
+        val target = LongPressTarget(url = "https://example.com", type = WebView.HitTestResult.SRC_ANCHOR_TYPE)
+
+        val handled = testee.onLongPressRequiredAction(target, RequiredAction.OpenInFireTab("https://example.com"))
+
+        assertTrue(handled)
+        assertCommandIssued<Command.GenerateWebViewPreviewImage>()
+        assertCommandIssued<Command.OpenInFireTab> {
+            assertEquals("https://example.com", query)
+            assertNull(sourceTabId)
+        }
+    }
+
+    @Test
+    fun whenOnLongPressRequiredActionWithOpenInFireTabInFireModeThenOpensFromSourceTab() = runTest {
+        browserMode = BrowserMode.FIRE
+        resetChannels()
+        initialiseViewModel()
         val target = LongPressTarget(url = "https://example.com", type = WebView.HitTestResult.SRC_ANCHOR_TYPE)
 
         val handled = testee.onLongPressRequiredAction(target, RequiredAction.OpenInFireTab("https://example.com"))
