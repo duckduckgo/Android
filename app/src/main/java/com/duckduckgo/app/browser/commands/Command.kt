@@ -167,10 +167,19 @@ sealed class Command {
         val detectedLanguage: String?,
     ) : Command()
 
-    data object ShowTranslationDownloading : Command()
+    /** Show/update the progress dialog while the model downloads. [percent] is 0..100, or null if unknown. */
+    data class ShowModelDownloadProgress(
+        val percent: Int?,
+    ) : Command()
 
-    data class ShowTranslationResult(
-        val translatedText: String,
+    /** Show a blocking spinner while the page is being translated to [targetLanguage] (ISO 639-1 code). */
+    data class ShowTranslationInProgress(
+        val targetLanguage: String,
+    ) : Command()
+
+    /** Write [translations] back into the live page's text nodes (in extraction order), in place. */
+    data class ApplyPageTranslation(
+        val translations: List<String>,
     ) : Command()
 
     data class ShowTranslationError(

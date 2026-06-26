@@ -22,6 +22,8 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
+import logcat.LogPriority.ERROR
+import logcat.asLog
 import logcat.logcat
 import java.io.File
 import java.io.IOException
@@ -73,7 +75,7 @@ class ModelDownloader @Inject constructor(
             emit(ModelDownloadStatus.Completed)
         } catch (e: Exception) {
             tmpDir.deleteRecursively()
-            logcat { "Translation model download failed for $key: ${e.message}" }
+            logcat(ERROR) { "Translation model download failed for $key: ${e.asLog()}" }
             emit(ModelDownloadStatus.Failed(e.message))
         }
     }.flowOn(dispatchers.io())

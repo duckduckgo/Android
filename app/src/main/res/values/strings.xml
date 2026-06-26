@@ -558,7 +558,12 @@
     <string name="browserMenuTranslateFailed">Translation failed: %1$s</string>
     <string name="browserMenuTranslateLanguageDetected">Language detected: %1$s</string>
     <string name="browserMenuTranslateLanguageDetectFailed">Couldn\'t auto detect language</string>
-    <string name="browserMenuTranslateDownloading">Downloading translation model…</string>
+    <string name="browserMenuTranslatePageUnavailable">Couldn\'t read the page to translate</string>
+    <string name="browserMenuTranslateDownloadingModel">Downloading translation model…</string>
+    <!-- %1$d is the download percentage, e.g. 45 -->
+    <string name="browserMenuTranslateDownloadingModelPercent">Downloading translation model… %1$d%%</string>
+    <!-- %1$s is a language name, e.g. "Spanish" -->
+    <string name="browserMenuTranslatingTo">Translating to %1$s…</string>
 
     <!-- Settings -->
     <string name="settingsPrivacyProtectionAllowlist">Unprotected Sites</string>

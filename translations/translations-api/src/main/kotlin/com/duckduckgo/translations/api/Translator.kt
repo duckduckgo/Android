@@ -56,6 +56,18 @@ interface Translator {
         targetLanguage: String,
         isHtml: Boolean = false,
     ): Result<String>
+
+    /**
+     * Translate a batch of [texts] in one call, returning the translations in the same order. Used for
+     * page translation, where each entry is the plain text of a DOM text node. Either all succeed or the
+     * call fails.
+     */
+    suspend fun translate(
+        texts: List<String>,
+        sourceLanguage: String,
+        targetLanguage: String,
+        isHtml: Boolean = false,
+    ): Result<List<String>>
 }
 
 /**

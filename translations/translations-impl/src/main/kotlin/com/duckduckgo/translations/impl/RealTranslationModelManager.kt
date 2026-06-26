@@ -25,7 +25,6 @@ import dagger.SingleInstanceIn
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
@@ -34,7 +33,6 @@ import javax.inject.Inject
 class RealTranslationModelManager @Inject constructor(
     private val modelStore: ModelStore,
     private val modelDownloader: ModelDownloader,
-    private val notifier: ModelDownloadNotifier,
     private val dispatchers: DispatcherProvider,
 ) : TranslationModelManager {
 
@@ -48,10 +46,6 @@ class RealTranslationModelManager @Inject constructor(
             emit(ModelDownloadStatus.Completed)
             return@flow
         }
-        // Surface progress + result as a status-bar notification while the download runs.
-        emitAll(
-            modelDownloader.download(sourceLanguage, targetLanguage)
-                .onEach { notifier.update(sourceLanguage, targetLanguage, it) },
-        )
+        emitAll(modelDownloader.download(sourceLanguage, targetLanguage))
     }
 }

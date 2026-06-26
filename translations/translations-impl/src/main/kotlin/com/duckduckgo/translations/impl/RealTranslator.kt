@@ -33,6 +33,8 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
+import logcat.LogPriority.ERROR
+import logcat.asLog
 import logcat.logcat
 import javax.inject.Inject
 
@@ -89,6 +91,27 @@ class RealTranslator @Inject constructor(
                 val model = loadedModelFor(sourceLanguage, targetLanguage)
                 model.translate(text, isHtml).text
             }
+        }.onFailure {
+            logcat(ERROR) { "Translation failed ($sourceLanguage-$targetLanguage): ${it.asLog()}" }
+        }
+    }
+
+    override suspend fun translate(
+        texts: List<String>,
+        sourceLanguage: String,
+        targetLanguage: String,
+        isHtml: Boolean,
+    ): Result<List<String>> = withContext(dispatchers.io()) {
+        if (!isAvailable()) {
+            return@withContext Result.failure(IllegalStateException("On-device translation engine is unavailable"))
+        }
+        runCatching {
+            modelLock.withLock {
+                val model = loadedModelFor(sourceLanguage, targetLanguage)
+                model.translate(texts, isHtml).map { it.text }
+            }
+        }.onFailure {
+            logcat(ERROR) { "Batch translation failed ($sourceLanguage-$targetLanguage, ${texts.size} nodes): ${it.asLog()}" }
         }
     }
 

@@ -72,6 +72,7 @@ import com.duckduckgo.app.browser.certificates.BypassedSSLCertificatesRepository
 import com.duckduckgo.app.browser.certificates.remoteconfig.SSLCertificatesFeature
 import com.duckduckgo.app.browser.commands.Command
 import com.duckduckgo.app.browser.commands.Command.AddHomeShortcut
+import com.duckduckgo.app.browser.commands.Command.ApplyPageTranslation
 import com.duckduckgo.app.browser.commands.Command.AskToAutomateFireproofWebsite
 import com.duckduckgo.app.browser.commands.Command.AskToDisableLoginDetection
 import com.duckduckgo.app.browser.commands.Command.AskToFireproofWebsite
@@ -156,6 +157,7 @@ import com.duckduckgo.app.browser.commands.Command.ShowFireproofWebSiteConfirmat
 import com.duckduckgo.app.browser.commands.Command.ShowFullScreen
 import com.duckduckgo.app.browser.commands.Command.ShowImageCamera
 import com.duckduckgo.app.browser.commands.Command.ShowKeyboard
+import com.duckduckgo.app.browser.commands.Command.ShowModelDownloadProgress
 import com.duckduckgo.app.browser.commands.Command.ShowPdfInTab
 import com.duckduckgo.app.browser.commands.Command.ShowRemoveSearchSuggestionDialog
 import com.duckduckgo.app.browser.commands.Command.ShowSSLError
@@ -163,9 +165,8 @@ import com.duckduckgo.app.browser.commands.Command.ShowSavedSiteAddedConfirmatio
 import com.duckduckgo.app.browser.commands.Command.ShowSitePermissionsDialog
 import com.duckduckgo.app.browser.commands.Command.ShowSoundRecorder
 import com.duckduckgo.app.browser.commands.Command.ShowTranslateLanguageDialog
-import com.duckduckgo.app.browser.commands.Command.ShowTranslationDownloading
 import com.duckduckgo.app.browser.commands.Command.ShowTranslationError
-import com.duckduckgo.app.browser.commands.Command.ShowTranslationResult
+import com.duckduckgo.app.browser.commands.Command.ShowTranslationInProgress
 import com.duckduckgo.app.browser.commands.Command.ShowUserCredentialSavedOrUpdatedConfirmation
 import com.duckduckgo.app.browser.commands.Command.ShowVideoCamera
 import com.duckduckgo.app.browser.commands.Command.ShowWarningMaliciousSite
@@ -437,13 +438,13 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
@@ -3420,9 +3421,12 @@ class BrowserTabViewModel @Inject constructor(
     // user picks a target. Falls back to English if detection was unavailable.
     private var detectedSourceLanguage: String? = null
 
-    fun onTranslateMenuClicked() {
+    fun onTranslateMenuClicked(pageText: String) {
         viewModelScope.launch(dispatchers.io()) {
-            val detectedLanguage = translator.detectLanguage(title.orEmpty()).getOrNull()?.language
+            // Detect from the visible page text (not the title): the title lives in <head> and isn't
+            // translated, so after a first translation it would still report the original language.
+            val sample = pageText.ifBlank { title.orEmpty() }
+            val detectedLanguage = translator.detectLanguage(sample).getOrNull()?.language
             detectedSourceLanguage = detectedLanguage
             withContext(dispatchers.main()) {
                 command.value = ShowTranslateLanguageDialog(detectedLanguage)
@@ -3430,27 +3434,37 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
-    fun onTranslateRequested(targetLanguage: String) {
+    fun onTranslatePageRequested(targetLanguage: String, textNodes: List<String>) {
         val sourceLanguage = detectedSourceLanguage ?: DEFAULT_SOURCE_LANGUAGE
         viewModelScope.launch(dispatchers.io()) {
-            // Models are downloaded on demand: if the pair isn't present, fetch it (surfacing progress)
-            // before translating.
+            // Models are downloaded on demand: if the pair isn't present, fetch it (surfacing progress in
+            // the dialog) before translating.
             if (!translationModelManager.isModelDownloaded(sourceLanguage, targetLanguage)) {
-                withContext(dispatchers.main()) { command.value = ShowTranslationDownloading }
-                val downloadFailure = translationModelManager.downloadModel(sourceLanguage, targetLanguage)
-                    .filterIsInstance<ModelDownloadStatus.Failed>()
-                    .firstOrNull()
-                if (downloadFailure != null) {
-                    withContext(dispatchers.main()) {
-                        command.value = ShowTranslationError(downloadFailure.reason ?: "Model download failed")
+                var downloadError: String? = null
+                translationModelManager.downloadModel(sourceLanguage, targetLanguage).collect { status ->
+                    when (status) {
+                        is ModelDownloadStatus.InProgress ->
+                            withContext(dispatchers.main()) { command.value = ShowModelDownloadProgress(status.percent) }
+                        is ModelDownloadStatus.Failed -> downloadError = status.reason ?: "Model download failed"
+                        ModelDownloadStatus.Completed -> {}
                     }
+                }
+                val error = downloadError
+                if (error != null) {
+                    withContext(dispatchers.main()) { command.value = ShowTranslationError(error) }
                     return@launch
                 }
             }
-            val result = translator.translate(text = title.orEmpty(), sourceLanguage = sourceLanguage, targetLanguage = targetLanguage)
+            withContext(dispatchers.main()) { command.value = ShowTranslationInProgress(targetLanguage) }
+            // Translate the page's text nodes (plain text); the WebView writes them back in place.
+            val result = translator.translate(
+                texts = textNodes,
+                sourceLanguage = sourceLanguage,
+                targetLanguage = targetLanguage,
+            )
             withContext(dispatchers.main()) {
                 command.value = result.fold(
-                    onSuccess = { ShowTranslationResult(it) },
+                    onSuccess = { ApplyPageTranslation(translations = it) },
                     onFailure = { ShowTranslationError(it.message ?: it.javaClass.simpleName) },
                 )
             }

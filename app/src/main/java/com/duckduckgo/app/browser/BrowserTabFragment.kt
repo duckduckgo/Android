@@ -131,6 +131,7 @@ import com.duckduckgo.app.browser.customtabs.CustomTabActivity
 import com.duckduckgo.app.browser.customtabs.CustomTabPixelNames
 import com.duckduckgo.app.browser.customtabs.CustomTabViewModel.Companion.CUSTOM_TAB_NAME_PREFIX
 import com.duckduckgo.app.browser.databinding.DialogTranslateLanguageBinding
+import com.duckduckgo.app.browser.databinding.DialogTranslationProgressBinding
 import com.duckduckgo.app.browser.databinding.FragmentBrowserTabBinding
 import com.duckduckgo.app.browser.databinding.HttpAuthenticationBinding
 import com.duckduckgo.app.browser.downloader.BlobConverterInjector
@@ -836,6 +837,9 @@ class BrowserTabFragment :
     }
 
     private var webView: DuckDuckGoWebView? = null
+
+    private var translationProgressDialog: DaxAlertDialog? = null
+    private var translationProgressBinding: DialogTranslationProgressBinding? = null
     private var isWebViewGestureInProgress = false
     private var lastTouchX: Float = 0f
     private var lastTouchY: Float = 0f
@@ -1852,7 +1856,7 @@ class BrowserTabFragment :
                 viewModel.onShareSelected()
             }
             onMenuItemClicked(translatePageMenuItem) {
-                viewModel.onTranslateMenuClicked()
+                detectPageLanguageAndShowDialog()
             }
             onMenuItemClicked(downloadPdfMenuItem) {
                 pixel.fire(PdfPixelName.PDF_DOWNLOAD_MENU_ITEM_PRESSED)
@@ -2864,10 +2868,16 @@ class BrowserTabFragment :
             is Command.DismissFindInPage -> webView?.findAllAsync("")
             is Command.ShareLink -> launchSharePageChooser(it.url, it.title)
             is Command.ShowTranslateLanguageDialog -> showTranslateLanguageDialog(it.detectedLanguage)
-            is Command.ShowTranslationDownloading -> showToast(R.string.browserMenuTranslateDownloading)
-            is Command.ShowTranslationResult -> Toast.makeText(context?.applicationContext, it.translatedText, Toast.LENGTH_LONG).show()
-            is Command.ShowTranslationError ->
+            is Command.ShowModelDownloadProgress -> showModelDownloadProgress(it.percent)
+            is Command.ShowTranslationInProgress -> showTranslatingProgress(it.targetLanguage)
+            is Command.ApplyPageTranslation -> {
+                dismissTranslationProgress()
+                applyPageTranslation(it.translations)
+            }
+            is Command.ShowTranslationError -> {
+                dismissTranslationProgress()
                 Toast.makeText(context?.applicationContext, getString(R.string.browserMenuTranslateFailed, it.reason), Toast.LENGTH_LONG).show()
+            }
             is Command.SharePromoLinkRMF -> launchSharePromoRMFPageChooser(it.url, it.shareTitle)
             is Command.CopyLink -> clipboardManager.setPrimaryClip(ClipData.newPlainText(null, it.url))
             is Command.ShowFileChooser -> launchFilePicker(it.filePathCallback, it.fileChooserParams)
@@ -3738,11 +3748,99 @@ class BrowserTabFragment :
                             showToast(R.string.browserMenuTranslateEmptyLanguage)
                             return
                         }
-                        viewModel.onTranslateRequested(targetLanguage)
+                        extractAndTranslatePage(targetLanguage)
                     }
                 },
             )
             .show()
+    }
+
+    // Samples the visible page text and asks the ViewModel to detect its language, then show the dialog.
+    private fun detectPageLanguageAndShowDialog() {
+        val wv = webView ?: return
+        wv.evaluateJavascript("(function() { return document.body ? document.body.innerText.slice(0, 5000) : ''; })();") { result ->
+            viewModel.onTranslateMenuClicked(decodeJavascriptStringResult(result).orEmpty())
+        }
+    }
+
+    // Walks the live DOM, collecting the translatable text nodes (and stashing references to them so the
+    // translations can later be written back in place), then hands the texts to the ViewModel.
+    private fun extractAndTranslatePage(targetLanguage: String) {
+        val wv = webView ?: return
+        wv.evaluateJavascript(JS_EXTRACT_TEXT_NODES) { result ->
+            val textNodes = parseJsonStringArray(result)
+            if (textNodes.isEmpty()) {
+                showToast(R.string.browserMenuTranslatePageUnavailable)
+            } else {
+                viewModel.onTranslatePageRequested(targetLanguage, textNodes)
+            }
+        }
+    }
+
+    // Shows (or reuses) a single non-cancelable progress dialog, updating its label as the flow moves
+    // from downloading the model to translating the page.
+    private fun showTranslationProgress(message: String) {
+        val existingBinding = translationProgressBinding
+        if (existingBinding != null && translationProgressDialog?.isShowing() == true) {
+            existingBinding.translationProgressText.text = message
+            return
+        }
+        val progressBinding = DialogTranslationProgressBinding.inflate(layoutInflater)
+        progressBinding.translationProgressText.text = message
+        translationProgressBinding = progressBinding
+        translationProgressDialog = CustomAlertDialogBuilder(requireContext())
+            .setView(progressBinding)
+            .apply { show() }
+    }
+
+    private fun showModelDownloadProgress(percent: Int?) {
+        val message = if (percent != null) {
+            getString(R.string.browserMenuTranslateDownloadingModelPercent, percent)
+        } else {
+            getString(R.string.browserMenuTranslateDownloadingModel)
+        }
+        showTranslationProgress(message)
+    }
+
+    private fun showTranslatingProgress(targetLanguage: String) {
+        val displayName = Locale.forLanguageTag(targetLanguage).displayLanguage.ifBlank { targetLanguage }
+        showTranslationProgress(getString(R.string.browserMenuTranslatingTo, displayName))
+    }
+
+    private fun dismissTranslationProgress() {
+        translationProgressDialog?.dismiss()
+        translationProgressDialog = null
+        translationProgressBinding = null
+    }
+
+    // Writes the [translations] back into the text nodes stashed by JS_EXTRACT_TEXT_NODES, in order.
+    private fun applyPageTranslation(translations: List<String>) {
+        val wv = webView ?: return
+        val json = JSONArray(translations).toString()
+        wv.evaluateJavascript(
+            """
+            (function() {
+                var translations = $json;
+                var nodes = window.__ddgTranslateNodes;
+                if (!nodes) { return; }
+                for (var i = 0; i < nodes.length && i < translations.length; i++) {
+                    nodes[i].nodeValue = translations[i];
+                }
+                window.__ddgTranslateNodes = null;
+            })();
+            """.trimIndent(),
+            null,
+        )
+    }
+
+    private fun parseJsonStringArray(encoded: String?): List<String> {
+        if (encoded == null || encoded.trim().let { it.isEmpty() || it == "null" }) return emptyList()
+        return try {
+            val array = JSONArray(encoded)
+            List(array.length()) { array.getString(it) }
+        } catch (_: Exception) {
+            emptyList()
+        }
     }
 
     private fun showAuthenticationDialog(request: BasicAuthenticationRequest) {
@@ -5804,6 +5902,37 @@ class BrowserTabFragment :
                     }
                 }
                 return bestText;
+            })()
+        """
+
+        // Collects the page's translatable text nodes (skipping script/style/etc.), stashes references to
+        // them on window.__ddgTranslateNodes for write-back, and returns their text in document order.
+        private const val JS_EXTRACT_TEXT_NODES = """
+            (function() {
+                var SKIP = { SCRIPT: 1, STYLE: 1, NOSCRIPT: 1, TEXTAREA: 1, CODE: 1, PRE: 1 };
+                if (!document.body) { return []; }
+                var walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, {
+                    acceptNode: function(node) {
+                        if (!node.nodeValue || node.nodeValue.trim().length === 0) {
+                            return NodeFilter.FILTER_REJECT;
+                        }
+                        for (var p = node.parentElement; p; p = p.parentElement) {
+                            if (SKIP[p.tagName]) return NodeFilter.FILTER_REJECT;
+                            if (p.getAttribute('translate') === 'no') return NodeFilter.FILTER_REJECT;
+                            if (p.isContentEditable) return NodeFilter.FILTER_REJECT;
+                        }
+                        return NodeFilter.FILTER_ACCEPT;
+                    }
+                });
+                var nodes = [];
+                var texts = [];
+                var node;
+                while ((node = walker.nextNode())) {
+                    nodes.push(node);
+                    texts.push(node.nodeValue);
+                }
+                window.__ddgTranslateNodes = nodes;
+                return texts;
             })()
         """
 
