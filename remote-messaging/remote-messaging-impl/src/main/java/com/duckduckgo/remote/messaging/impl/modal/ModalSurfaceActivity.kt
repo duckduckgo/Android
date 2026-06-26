@@ -29,6 +29,7 @@ import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.getActivityParams
+import com.duckduckgo.remote.messaging.impl.R
 import com.duckduckgo.remote.messaging.impl.databinding.ActivityModalSurfaceBinding
 import com.duckduckgo.remote.messaging.impl.modal.ModalSurfaceViewModel.Command
 import com.duckduckgo.remote.messaging.impl.modal.cardslist.CardsListRemoteMessageView
@@ -51,7 +52,7 @@ class ModalSurfaceActivity : DuckDuckGoActivity(), CardsListRemoteMessageView.Ca
         launchedFromSettings = intent.getActivityParams(ModalSurfaceActivityFromMessageId::class.java)?.launchedFromSettings ?: false
 
         if (!launchedFromSettings && SDK_INT >= 34) {
-            overrideActivityTransition(OVERRIDE_TRANSITION_CLOSE, 0, 0)
+            overrideActivityTransition(OVERRIDE_TRANSITION_CLOSE, 0, R.anim.slide_to_bottom)
         }
 
         initialise()
@@ -95,7 +96,7 @@ class ModalSurfaceActivity : DuckDuckGoActivity(), CardsListRemoteMessageView.Ca
                 finish()
                 if (!launchedFromSettings && SDK_INT < 34) {
                     @Suppress("DEPRECATION")
-                    overridePendingTransition(0, 0)
+                    overridePendingTransition(0, R.anim.slide_to_bottom)
                 }
             }
         }

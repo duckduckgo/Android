@@ -100,7 +100,7 @@ class DaxPromptBrowserComparisonActivity : DuckDuckGoActivity() {
         setContentView(binding.root)
 
         if (SDK_INT >= 34) {
-            overrideActivityTransition(OVERRIDE_TRANSITION_CLOSE, 0, 0)
+            overrideActivityTransition(OVERRIDE_TRANSITION_CLOSE, 0, R.anim.slide_to_bottom)
         }
 
         setupListeners()
@@ -159,7 +159,7 @@ class DaxPromptBrowserComparisonActivity : DuckDuckGoActivity() {
                 finish()
                 if (SDK_INT < 34) {
                     @Suppress("DEPRECATION")
-                    overridePendingTransition(0, 0)
+                    overridePendingTransition(0, R.anim.slide_to_bottom)
                 }
             }
 

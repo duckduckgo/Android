@@ -67,10 +67,10 @@ class ModalEvaluatorCoordinator @Inject constructor(
         logcat { "ModalEvaluatorCoordinator: Starting coordinated evaluation" }
 
         // Check 24-hour blocking first
-        if (completionStore.isBlockedBy24HourWindow()) {
-            logcat { "ModalEvaluatorCoordinator: Evaluation is blocked by 24-hour window" }
-            return@withLock
-        }
+        // if (completionStore.isBlockedBy24HourWindow()) {
+        //     logcat { "ModalEvaluatorCoordinator: Evaluation is blocked by 24-hour window" }
+        //     return@withLock
+        // }
 
         val evaluators = modalEvaluatorPluginPoint.getPlugins().sortedBy { it.priority }
         logcat { "ModalEvaluatorCoordinator: Found ${evaluators.size} evaluators" }

@@ -75,7 +75,7 @@ class WinBackPromptEvaluatorImpl @Inject constructor(
             delay(MODAL_DISPLAY_DELAY)
             appCoroutineScope.launch(dispatchers.main()) {
                 intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP
-                val options = ActivityOptions.makeCustomAnimation(applicationContext, 0, 0).toBundle()
+                val options = ActivityOptions.makeCustomAnimation(applicationContext, R.anim.slide_from_bottom, 0).toBundle()
                 applicationContext.startActivity(intent, options)
             }
 
