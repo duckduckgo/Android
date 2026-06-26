@@ -85,4 +85,7 @@
     <string name="duckAiUseWithoutAiDescription">Disables Duck.ai, hides AI-assisted answers in search, and hides AI-generated images in image search results.</string>
     <string name="duckAiUseWithoutAiDisabledDescription">AI is currently disabled in the Browser so you\'ll no longer see AI-assisted answers or AI-generated images in image search results.</string>
 
+    <!-- Duck AI Section in AI Feature Screen -->
+    <string name="input_screen_user_pref_toggle_between_search_and_ai">Toggle between Search and Duck.ai</string>
+
 </resources>
