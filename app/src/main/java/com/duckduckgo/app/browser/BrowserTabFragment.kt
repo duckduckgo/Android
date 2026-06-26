@@ -5941,7 +5941,7 @@ class BrowserTabFragment :
                 while (stack.length > 0) {
                     var el = stack.pop();
                     if (!el || el.nodeType !== 1) { continue; }
-                    if (SKIP[el.tagName] || el.isContentEditable || el.hasAttribute('data-tk-done')) { continue; }
+                    if (SKIP[el.tagName] || el.isContentEditable || el.hasAttribute('data-tk-done') || el.getAttribute('translate') === 'no') { continue; }
                     if (allChildrenInline(el)) {
                         if (el.textContent && el.textContent.trim().length > 0) {
                             blocks.push(el);
