@@ -60,6 +60,9 @@ sealed interface OnboardingPixelAction {
         val isChat: Boolean,
     ) : OnboardingPixelAction
 
+    /** A suggestion-screen click. value = suggested | custom. */
+    data class SuggestionClicked(val fromSuggestion: Boolean) : OnboardingPixelAction
+
     data class QuickSetupClicked(
         val addressBarPosition: OmnibarType,
         val inputScreenSelected: Boolean,
@@ -111,6 +114,9 @@ class RealOnboardingPixelSender @Inject constructor(
 
             is OnboardingPixelAction.TryASearchClicked ->
                 fireStep(pixelName, PIXEL_EVENT_CLICKED, tryASearchValue(action.fromSuggestion, action.isChat))
+
+            is OnboardingPixelAction.SuggestionClicked ->
+                fireStep(pixelName, PIXEL_EVENT_CLICKED, if (action.fromSuggestion) VALUE_SUGGESTED else VALUE_CUSTOM)
 
             is OnboardingPixelAction.QuickSetupClicked ->
                 fireQuickSetupClicked(pixelName, action.addressBarPosition, action.inputScreenSelected)
