@@ -22,7 +22,6 @@ import com.duckduckgo.app.browser.httperrors.HttpErrorPixelName
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.SITE_NOT_WORKING_SHOWN
 import com.duckduckgo.app.pixels.AppPixelName.SITE_NOT_WORKING_WEBSITE_BROKEN
-import com.duckduckgo.app.pixels.OnboardingPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames
 import com.duckduckgo.common.utils.AppUrl
@@ -166,15 +165,6 @@ object PixelInterceptorPixelsRequiringDataCleaning : PixelParamRemovalPlugin {
             AppPixelName.NEW_ADDRESS_BAR_PICKER_V2_CONFIRMED_COUNT.pixelName to PixelParameter.removeAtb(),
             AppPixelName.NEW_ADDRESS_BAR_PICKER_V2_CONFIRMED_DAILY.pixelName to PixelParameter.removeAtb(),
             AppPixelName.PREONBOARDING_SPLIT_ADDRESS_BAR_SELECTED_UNIQUE.pixelName to PixelParameter.removeAtb(),
-            OnboardingPixelName.ONBOARDING_QUICK_SETUP.pixelName to PixelParameter.removeAtb(),
-            OnboardingPixelName.ONBOARDING_WELCOME.pixelName to PixelParameter.removeAtb(),
-            OnboardingPixelName.ONBOARDING_SET_DEFAULT.pixelName to PixelParameter.removeAtb(),
-            OnboardingPixelName.ONBOARDING_ADDRESS_BAR_POSITION.pixelName to PixelParameter.removeAtb(),
-            OnboardingPixelName.ONBOARDING_SEARCH_EXPERIENCE.pixelName to PixelParameter.removeAtb(),
-            OnboardingPixelName.ONBOARDING_SKIP_ONBOARDING.pixelName to PixelParameter.removeAtb(),
-            OnboardingPixelName.ONBOARDING_NOTIFICATIONS.pixelName to PixelParameter.removeAtb(),
-            OnboardingPixelName.ONBOARDING_SEARCH_CHAT_TOGGLE.pixelName to PixelParameter.removeAtb(),
-            OnboardingPixelName.ONBOARDING_AI_INTRO.pixelName to PixelParameter.removeAtb(),
             AppPixelName.SEARCH_AND_FAVORITES_WIDGET_ADDED.pixelName to PixelParameter.removeAtb(),
             AppPixelName.SEARCH_AND_FAVORITES_WIDGET_DELETED.pixelName to PixelParameter.removeAtb(),
             AppPixelName.SEARCH_WIDGET_ADDED.pixelName to PixelParameter.removeAtb(),
