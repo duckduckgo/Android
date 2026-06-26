@@ -130,6 +130,7 @@ import com.duckduckgo.app.browser.cookies.ThirdPartyCookieManager
 import com.duckduckgo.app.browser.customtabs.CustomTabActivity
 import com.duckduckgo.app.browser.customtabs.CustomTabPixelNames
 import com.duckduckgo.app.browser.customtabs.CustomTabViewModel.Companion.CUSTOM_TAB_NAME_PREFIX
+import com.duckduckgo.app.browser.databinding.DialogTranslateLanguageBinding
 import com.duckduckgo.app.browser.databinding.FragmentBrowserTabBinding
 import com.duckduckgo.app.browser.databinding.HttpAuthenticationBinding
 import com.duckduckgo.app.browser.downloader.BlobConverterInjector
@@ -1850,6 +1851,9 @@ class BrowserTabFragment :
                 pixel.fire(AppPixelName.MENU_ACTION_SHARE_PRESSED)
                 viewModel.onShareSelected()
             }
+            onMenuItemClicked(translatePageMenuItem) {
+                viewModel.onTranslateMenuClicked()
+            }
             onMenuItemClicked(downloadPdfMenuItem) {
                 pixel.fire(PdfPixelName.PDF_DOWNLOAD_MENU_ITEM_PRESSED)
                 viewModel.onDownloadPdfMenuItemClicked()
@@ -2859,6 +2863,10 @@ class BrowserTabFragment :
             is Command.FindInPageCommand -> webView?.findAllAsync(it.searchTerm)
             is Command.DismissFindInPage -> webView?.findAllAsync("")
             is Command.ShareLink -> launchSharePageChooser(it.url, it.title)
+            is Command.ShowTranslateLanguageDialog -> showTranslateLanguageDialog(it.detectedLanguage)
+            is Command.ShowTranslationResult -> Toast.makeText(context?.applicationContext, it.translatedText, Toast.LENGTH_LONG).show()
+            is Command.ShowTranslationError ->
+                Toast.makeText(context?.applicationContext, getString(R.string.browserMenuTranslateFailed, it.reason), Toast.LENGTH_LONG).show()
             is Command.SharePromoLinkRMF -> launchSharePromoRMFPageChooser(it.url, it.shareTitle)
             is Command.CopyLink -> clipboardManager.setPrimaryClip(ClipData.newPlainText(null, it.url))
             is Command.ShowFileChooser -> launchFilePicker(it.filePathCallback, it.fileChooserParams)
@@ -3706,6 +3714,34 @@ class BrowserTabFragment :
         length: Int = Toast.LENGTH_LONG,
     ) {
         Toast.makeText(context?.applicationContext, messageId, length).show()
+    }
+
+    private fun showTranslateLanguageDialog(detectedLanguage: String?) {
+        val inputBinding = DialogTranslateLanguageBinding.inflate(layoutInflater)
+        inputBinding.detectedLanguageLabel.text = if (detectedLanguage != null) {
+            val displayName = Locale.forLanguageTag(detectedLanguage).displayLanguage.ifBlank { detectedLanguage }
+            getString(R.string.browserMenuTranslateLanguageDetected, displayName)
+        } else {
+            getString(R.string.browserMenuTranslateLanguageDetectFailed)
+        }
+        CustomAlertDialogBuilder(requireContext())
+            .setTitle(R.string.browserMenuTranslateDialogTitle)
+            .setPositiveButton(R.string.browserMenuTranslateAction)
+            .setNegativeButton(R.string.cancel)
+            .setView(inputBinding)
+            .addEventListener(
+                object : CustomAlertDialogBuilder.EventListener() {
+                    override fun onPositiveButtonClicked() {
+                        val targetLanguage = inputBinding.translateLanguageInput.text.trim()
+                        if (targetLanguage.isEmpty()) {
+                            showToast(R.string.browserMenuTranslateEmptyLanguage)
+                            return
+                        }
+                        viewModel.onTranslateRequested(targetLanguage)
+                    }
+                },
+            )
+            .show()
     }
 
     private fun showAuthenticationDialog(request: BasicAuthenticationRequest) {

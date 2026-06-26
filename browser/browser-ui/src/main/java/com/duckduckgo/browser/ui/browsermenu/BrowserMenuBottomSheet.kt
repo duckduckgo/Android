@@ -150,6 +150,9 @@ class BrowserMenuBottomSheet(
     val sharePageMenuItem: MenuItemView
         get() = binding.sharePageMenuItem
 
+    val translatePageMenuItem: MenuItemView
+        get() = binding.translatePageMenuItem
+
     val addToHomeMenuItem: MenuItemView
         get() = binding.addToHomeMenuItem
 
@@ -244,6 +247,7 @@ class BrowserMenuBottomSheet(
         printPageMenuItem.isVisible = viewState.canPrintPage
         downloadPdfMenuItem.isVisible = viewState.showDownloadPdfMenuItem
         sharePageMenuItem.isVisible = viewState.canSharePage
+        translatePageMenuItem.isVisible = viewState.canTranslate
         openInAppMenuItem.isVisible = viewState.hasPreviousAppLink
         openInDdgBrowserMenuItem.isVisible = false
         runningInDdgBrowserMenuItem.isVisible = false

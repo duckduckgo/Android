@@ -159,6 +159,22 @@ sealed class Command {
         val title: String = "",
     ) : Command()
 
+    /**
+     * Show the translate dialog. [detectedLanguage] is the ISO 639-1 code of the current page's
+     * detected language, or null when auto-detection was unavailable or failed.
+     */
+    data class ShowTranslateLanguageDialog(
+        val detectedLanguage: String?,
+    ) : Command()
+
+    data class ShowTranslationResult(
+        val translatedText: String,
+    ) : Command()
+
+    data class ShowTranslationError(
+        val reason: String,
+    ) : Command()
+
     class SharePromoLinkRMF(
         val url: String,
         val shareTitle: String,

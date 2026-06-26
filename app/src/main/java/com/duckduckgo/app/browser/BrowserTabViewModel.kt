@@ -162,6 +162,9 @@ import com.duckduckgo.app.browser.commands.Command.ShowSSLError
 import com.duckduckgo.app.browser.commands.Command.ShowSavedSiteAddedConfirmation
 import com.duckduckgo.app.browser.commands.Command.ShowSitePermissionsDialog
 import com.duckduckgo.app.browser.commands.Command.ShowSoundRecorder
+import com.duckduckgo.app.browser.commands.Command.ShowTranslateLanguageDialog
+import com.duckduckgo.app.browser.commands.Command.ShowTranslationError
+import com.duckduckgo.app.browser.commands.Command.ShowTranslationResult
 import com.duckduckgo.app.browser.commands.Command.ShowUserCredentialSavedOrUpdatedConfirmation
 import com.duckduckgo.app.browser.commands.Command.ShowVideoCamera
 import com.duckduckgo.app.browser.commands.Command.ShowWarningMaliciousSite
@@ -412,6 +415,7 @@ import com.duckduckgo.subscriptions.api.SUBSCRIPTIONS_FEATURE_NAME
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.subscriptions.api.SubscriptionsJSHelper
 import com.duckduckgo.sync.api.favicons.FaviconsFetchingPrompt
+import com.duckduckgo.translations.api.Translator
 import dagger.Lazy
 import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.CoroutineScope
@@ -577,6 +581,7 @@ class BrowserTabViewModel @Inject constructor(
     private val autocompleteHistoryDeleteFeature: AutocompleteHistoryDeleteFeature,
     private val customAiOnboardingStore: CustomAiOnboardingStore,
     private val browserMode: BrowserMode,
+    private val translator: Translator,
 ) : ViewModel(),
     WebViewClientListener,
     EditSavedSiteListener,
@@ -3402,6 +3407,27 @@ class BrowserTabViewModel @Inject constructor(
                         command.value = ShareLink(it, title.orEmpty())
                     }
                 }
+            }
+        }
+    }
+
+    fun onTranslateMenuClicked() {
+        viewModelScope.launch(dispatchers.io()) {
+            val detectedLanguage = translator.detectLanguage(title.orEmpty()).getOrNull()?.language
+            withContext(dispatchers.main()) {
+                command.value = ShowTranslateLanguageDialog(detectedLanguage)
+            }
+        }
+    }
+
+    fun onTranslateRequested(targetLanguage: String) {
+        viewModelScope.launch(dispatchers.io()) {
+            val result = translator.translate(text = title.orEmpty(), sourceLanguage = "en", targetLanguage = targetLanguage)
+            withContext(dispatchers.main()) {
+                command.value = result.fold(
+                    onSuccess = { ShowTranslationResult(it) },
+                    onFailure = { ShowTranslationError(it.message ?: it.javaClass.simpleName) },
+                )
             }
         }
     }

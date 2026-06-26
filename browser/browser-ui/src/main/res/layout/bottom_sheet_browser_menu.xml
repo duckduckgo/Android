@@ -161,6 +161,14 @@
                 app:primaryText="@string/browserMenuShare" />
 
             <com.duckduckgo.common.ui.view.MenuItemView
+                android:id="@+id/translatePageMenuItem"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:iconDrawable="@drawable/ic_globe_24"
+                app:menuSize="medium"
+                app:primaryText="@string/browserMenuTranslate" />
+
+            <com.duckduckgo.common.ui.view.MenuItemView
                 android:id="@+id/addToHomeMenuItem"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

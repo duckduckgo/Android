@@ -27,6 +27,7 @@ import com.duckduckgo.browser.ui.browsermenu.PageContextHeaderState
 import com.duckduckgo.browser.ui.browsermenu.VpnMenuState
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
+import com.duckduckgo.translations.api.Translator
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
@@ -53,6 +54,7 @@ class RealBrowserMenuViewStateFactoryTest {
     private val voiceChatEntryFlow = MutableStateFlow(false)
     private val downloadMenuStateProvider: DownloadMenuStateProvider = mock()
     private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector = mock()
+    private val translator: Translator = mock()
 
     private lateinit var testee: RealBrowserMenuViewStateFactory
 
@@ -61,7 +63,8 @@ class RealBrowserMenuViewStateFactoryTest {
         whenever(duckAiFeatureStateMock.showFullScreenMode).thenReturn(fullscreenModeFlow)
         whenever(duckAiFeatureStateMock.showPopupMenuShortcut).thenReturn(popupMenuShortcutFlow)
         whenever(duckAiFeatureStateMock.showVoiceChatEntry).thenReturn(voiceChatEntryFlow)
-        testee = RealBrowserMenuViewStateFactory(duckAiFeatureStateMock, downloadMenuStateProvider, duckDuckGoUrlDetector)
+        whenever(translator.isAvailable()).thenReturn(true)
+        testee = RealBrowserMenuViewStateFactory(duckAiFeatureStateMock, downloadMenuStateProvider, duckDuckGoUrlDetector, translator)
     }
 
     @Test
@@ -272,6 +275,7 @@ class RealBrowserMenuViewStateFactoryTest {
         assertTrue(viewState.canGoForward)
         assertTrue(viewState.showDuckChatOption)
         assertTrue(viewState.canSharePage)
+        assertTrue(viewState.canTranslate)
         assertFalse(viewState.showSelectDefaultBrowserMenuItem)
         assertTrue(viewState.canSaveSite)
         assertFalse(viewState.isBookmark)
@@ -338,6 +342,7 @@ class RealBrowserMenuViewStateFactoryTest {
         assertTrue(viewState.canGoForward)
         assertTrue(viewState.showDuckChatOption)
         assertTrue(viewState.canSharePage)
+        assertTrue(viewState.canTranslate)
         assertFalse(viewState.showSelectDefaultBrowserMenuItem)
         assertTrue(viewState.canSaveSite)
         assertFalse(viewState.isBookmark)

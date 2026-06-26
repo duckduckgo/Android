@@ -23,17 +23,6 @@ plugins {
 
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
-repositories {
-    // translate-kit-android is not yet published to a remote repository; it is consumed from the
-    // local Maven cache (~/.m2) during pre-publish validation. Scoped to its group so mavenLocal is
-    // not consulted for — and cannot shadow — any other dependency.
-    mavenLocal {
-        content {
-            includeGroup "io.github.marcosholgado"
-        }
-    }
-}
-
 dependencies {
     implementation project(':translations-api')
 

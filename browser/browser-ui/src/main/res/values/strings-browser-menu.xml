@@ -29,6 +29,7 @@
     <string name="browserMenuNewTab">New Tab</string>
     <string name="browserMenuDuckChat">Duck.ai</string>
     <string name="browserMenuShare">Share</string>
+    <string name="browserMenuTranslate">Translate</string>
     <string name="browserMenuEmailAlias">Generate Duck Address</string>
     <string name="browserMenuFindInPage">Find in Page</string>
     <string name="browserMenuPrint">Print Page</string>

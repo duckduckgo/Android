@@ -61,6 +61,15 @@ if (proprietaryFontAvailable) {
 
 allprojects {
     repositories {
+        // translate-kit-android is not yet published to a remote repository; it is consumed from the
+        // local Maven cache (~/.m2). Declared here (not just in :translations-impl) so consumers that
+        // pull it transitively — e.g. :app via :translations-impl — can resolve it too. Group-scoped so
+        // mavenLocal is never consulted for, and cannot shadow, any other dependency.
+        mavenLocal {
+            content {
+                includeGroup "io.github.marcosholgado"
+            }
+        }
         google()
         mavenCentral()
         maven { url 'https://jitpack.io' }

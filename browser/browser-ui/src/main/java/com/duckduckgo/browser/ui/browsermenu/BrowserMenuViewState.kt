@@ -26,6 +26,7 @@ sealed class BrowserMenuViewState {
         val showDuckAiSection: Boolean = false,
         val showDuckChatVoiceOption: Boolean = false,
         val canSharePage: Boolean = false,
+        val canTranslate: Boolean = false,
         val showSelectDefaultBrowserMenuItem: Boolean = false,
         val canSaveSite: Boolean = false,
         val isBookmark: Boolean = false,

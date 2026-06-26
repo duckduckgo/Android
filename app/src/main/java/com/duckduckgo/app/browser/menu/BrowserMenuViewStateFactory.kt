@@ -26,6 +26,7 @@ import com.duckduckgo.browser.ui.browsermenu.BrowserMenuViewState
 import com.duckduckgo.browser.ui.browsermenu.PageContextHeaderState
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
+import com.duckduckgo.translations.api.Translator
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import javax.inject.Inject
@@ -50,6 +51,7 @@ class RealBrowserMenuViewStateFactory @Inject constructor(
     private val duckAiFeatureState: DuckAiFeatureState,
     private val downloadMenuStateProvider: DownloadMenuStateProvider,
     private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
+    private val translator: Translator,
 ) : BrowserMenuViewStateFactory {
     override fun create(
         omnibarViewMode: Omnibar.ViewMode,
@@ -146,6 +148,7 @@ class RealBrowserMenuViewStateFactory @Inject constructor(
             showDuckAiSection = duckAiFeatureState.showPopupMenuShortcut.value,
             showDuckChatVoiceOption = duckAiFeatureState.showVoiceChatEntry.value,
             canSharePage = browserViewState.canSharePage,
+            canTranslate = browserViewState.canSharePage && translator.isAvailable(),
             showSelectDefaultBrowserMenuItem = browserViewState.showSelectDefaultBrowserMenuItem,
             canSaveSite = browserViewState.canSaveSite,
             isBookmark = browserViewState.bookmark != null,

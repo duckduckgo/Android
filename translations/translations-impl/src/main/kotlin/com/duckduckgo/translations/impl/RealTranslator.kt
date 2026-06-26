@@ -32,9 +32,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import logcat.logcat
 
-// translate-kit-android ships a native engine that requires API 28+. Below this we never touch the
-// library, so the engine is never loaded on unsupported OS versions.
-private const val MIN_SUPPORTED_SDK = 28
 
 @SingleInstanceIn(AppScope::class)
 @ContributesBinding(AppScope::class)
@@ -77,6 +74,10 @@ class RealTranslator @Inject constructor(
         // Model loading and translation are wired up in a later step.
         Result.failure(NotImplementedError("On-device translation is not wired up yet"))
     }
+
+    // translate-kit-android ships a native engine that requires API 28+. Below this we never touch the
+    // library, so the engine is never loaded on unsupported OS versions.
+    private val MIN_SUPPORTED_SDK = 28
 
     private fun isDeviceSupported(): Boolean = appBuildConfig.sdkInt >= MIN_SUPPORTED_SDK
 }

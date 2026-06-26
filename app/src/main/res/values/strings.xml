@@ -550,6 +550,15 @@
     <string name="allowlistDomainHint">www.example.com</string>
     <string name="allowlistFormatError">Please enter a domain like <b>example.com</b> and try again</string>
 
+    <!-- Translate -->
+    <string name="browserMenuTranslateDialogTitle">Translate page</string>
+    <string name="browserMenuTranslateLanguageHint">Target language (e.g. es)</string>
+    <string name="browserMenuTranslateAction">Translate</string>
+    <string name="browserMenuTranslateEmptyLanguage">Please enter a target language</string>
+    <string name="browserMenuTranslateFailed">Translation failed: %1$s</string>
+    <string name="browserMenuTranslateLanguageDetected">Language detected: %1$s</string>
+    <string name="browserMenuTranslateLanguageDetectFailed">Couldn\'t auto detect language</string>
+
     <!-- Settings -->
     <string name="settingsPrivacyProtectionAllowlist">Unprotected Sites</string>
 
