@@ -16,9 +16,12 @@
 
 package com.duckduckgo.settings.impl.serpsettings
 
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.settings.api.SerpSettingsDataProvider
+import com.duckduckgo.settings.impl.serpsettings.pixel.SerpSettingsPixelName
+import com.duckduckgo.settings.impl.serpsettings.pixel.fireSerpSettingsCountAndDaily
 import com.duckduckgo.settings.impl.serpsettings.store.SerpSettingsDataStore
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
@@ -35,6 +38,7 @@ import javax.inject.Inject
 class RealSerpSettingsDataProvider @Inject constructor(
     private val serpSettingsDataStore: SerpSettingsDataStore,
     private val dispatcherProvider: DispatcherProvider,
+    private val pixel: Pixel,
 ) : SerpSettingsDataProvider {
 
     override fun observeSetting(key: String): Flow<String?> =
@@ -47,7 +51,18 @@ class RealSerpSettingsDataProvider @Inject constructor(
         withContext(dispatcherProvider.io()) {
             // Merge inside a single transaction so a concurrent SERP updateNativeSettings can't clobber this write.
             serpSettingsDataStore.updateSerpSettings { current ->
-                val json = runCatching { JSONObject(current ?: "{}") }.getOrElse { JSONObject() }
+                val json = if (current.isNullOrEmpty()) {
+                    JSONObject()
+                } else {
+                    runCatching { JSONObject(current) }.getOrElse {
+                        // The stored blob couldn't be parsed; we discard it and start fresh.
+                        pixel.fireSerpSettingsCountAndDaily(
+                            countPixel = SerpSettingsPixelName.SERP_SETTINGS_SERIALIZATION_FAILED_COUNT,
+                            dailyPixel = SerpSettingsPixelName.SERP_SETTINGS_SERIALIZATION_FAILED_DAILY,
+                        )
+                        JSONObject()
+                    }
+                }
                 json.put(key, value)
                 json.toString()
             }

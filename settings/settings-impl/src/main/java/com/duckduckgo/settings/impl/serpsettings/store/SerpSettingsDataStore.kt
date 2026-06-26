@@ -20,11 +20,15 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.settings.impl.serpsettings.di.SerpSettings
+import com.duckduckgo.settings.impl.serpsettings.pixel.SerpSettingsPixelName
+import com.duckduckgo.settings.impl.serpsettings.pixel.fireSerpSettingsCountAndDaily
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
@@ -50,22 +54,44 @@ interface SerpSettingsDataStore {
 @SingleInstanceIn(AppScope::class)
 class SerpSettingsPrefsDataStore @Inject constructor(
     @SerpSettings private val store: DataStore<Preferences>,
+    private val pixel: Pixel,
 ) : SerpSettingsDataStore {
 
     override suspend fun setSerpSettings(value: String) {
-        store.edit { prefs -> prefs[SERP_SETTINGS] = value }
+        runCatching { store.edit { prefs -> prefs[SERP_SETTINGS] = value } }
+            .onFailure { fireWriteError() }
     }
 
-    override suspend fun getSerpSettings(): String? = store.data.firstOrNull()?.let { it[SERP_SETTINGS] }
+    override suspend fun getSerpSettings(): String? =
+        runCatching { store.data.firstOrNull()?.let { it[SERP_SETTINGS] } }
+            .getOrElse {
+                fireReadError()
+                null
+            }
 
     override fun observeSerpSettings(): Flow<String?> =
         store.data
             .map { prefs -> prefs[SERP_SETTINGS] }
+            .catch {
+                fireReadError()
+                emit(null)
+            }
             .distinctUntilChanged()
 
     override suspend fun updateSerpSettings(transform: (String?) -> String) {
-        store.edit { prefs -> prefs[SERP_SETTINGS] = transform(prefs[SERP_SETTINGS]) }
+        runCatching { store.edit { prefs -> prefs[SERP_SETTINGS] = transform(prefs[SERP_SETTINGS]) } }
+            .onFailure { fireWriteError() }
     }
+
+    private fun fireReadError() = pixel.fireSerpSettingsCountAndDaily(
+        countPixel = SerpSettingsPixelName.SERP_SETTINGS_KEYVALUE_STORE_READ_ERROR_COUNT,
+        dailyPixel = SerpSettingsPixelName.SERP_SETTINGS_KEYVALUE_STORE_READ_ERROR_DAILY,
+    )
+
+    private fun fireWriteError() = pixel.fireSerpSettingsCountAndDaily(
+        countPixel = SerpSettingsPixelName.SERP_SETTINGS_KEYVALUE_STORE_WRITE_ERROR_COUNT,
+        dailyPixel = SerpSettingsPixelName.SERP_SETTINGS_KEYVALUE_STORE_WRITE_ERROR_DAILY,
+    )
 
     private companion object {
         private val SERP_SETTINGS = stringPreferencesKey(name = "SERP_SETTINGS")
