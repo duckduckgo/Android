@@ -27,7 +27,7 @@ import com.duckduckgo.duckchat.impl.store.SearchAssistVisibility
 import com.duckduckgo.settings.api.SerpSettingsDataProvider
 import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -52,12 +52,12 @@ class AiFeaturesStateDauPlugin @Inject constructor(
     }
 
     private suspend fun fireStatePixel() {
-        val duckAiOn = duckChat.observeEnableDuckChatUserSetting().first()
+        val duckAiOn = duckChat.observeEnableDuckChatUserSetting().firstOrNull() ?: false
 
-        val rawKbe = serpSettingsDataProvider.observeSetting(SearchAssistVisibility.SERP_SETTINGS_KEY).first()
+        val rawKbe = serpSettingsDataProvider.observeSetting(SearchAssistVisibility.SERP_SETTINGS_KEY).firstOrNull()
         val searchAssist = resolveSearchAssist(rawKbe)
 
-        val rawKbj = serpSettingsDataProvider.observeSetting(HideAiGeneratedImages.SERP_SETTINGS_KEY).first()
+        val rawKbj = serpSettingsDataProvider.observeSetting(HideAiGeneratedImages.SERP_SETTINGS_KEY).firstOrNull()
         val hideImages = resolveHideImages(rawKbj)
 
         val noAi = !duckAiOn &&
