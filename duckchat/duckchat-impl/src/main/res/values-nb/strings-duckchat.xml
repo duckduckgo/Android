@@ -182,10 +182,4 @@
     <string name="duck_ai_chat_history_download_view">Vis</string>
     <string name="duck_ai_chat_history_download_error">Kunne ikke eksportere chatten</string>
     <string name="duck_ai_chat_history_bulk_download_error">Kunne ikke eksportere chattene</string>
-
-    <!-- Example message card: internal-only showcase of NativeInputChatTabItemPlugin, not shipped to
-         users, so these are not localized (translatable="false"). Delete with the example. -->
-    <string name="duckChatExampleMessageCardTitle" translatable="false">Example message card</string>
-    <string name="duckChatExampleMessageCardSubtitle" translatable="false">Contributed by an ActivePlugin to show how other modules can add items to the Chat tab. Dismiss it to see the card remove itself.</string>
-    <string name="duckChatExampleMessageCardAction" translatable="false">Got it</string>
 </resources>

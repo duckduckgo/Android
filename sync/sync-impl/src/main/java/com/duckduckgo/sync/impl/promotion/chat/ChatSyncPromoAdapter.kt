@@ -16,15 +16,25 @@
 
 package com.duckduckgo.sync.impl.promotion.chat
 
+import android.animation.ValueAnimator
+import android.os.Handler
+import android.os.Looper
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.view.ViewGroup.LayoutParams
+import androidx.core.animation.doOnEnd
+import androidx.core.view.doOnLayout
 import androidx.core.view.doOnPreDraw
+import androidx.core.view.isVisible
+import androidx.core.view.updateLayoutParams
+import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.duckduckgo.common.ui.view.MessageCta
 import com.duckduckgo.sync.impl.R.drawable
 import com.duckduckgo.sync.impl.R.string
 import com.duckduckgo.sync.impl.databinding.ItemChatSyncPromoBinding
+import kotlin.math.roundToInt
 
 internal class ChatSyncPromoAdapter(
     private val listener: Listener,
@@ -37,23 +47,56 @@ internal class ChatSyncPromoAdapter(
         fun onBannerShown(adapter: ChatSyncPromoAdapter)
     }
 
-    private var isVisible = false
+    private enum class State {
+        Dismissed,
+        Dismissing,
+        Shown,
+    }
+
+    private var state = State.Dismissed
+
+    private val mainHandler = Handler(Looper.getMainLooper())
 
     fun show() {
-        if (!isVisible) {
-            isVisible = true
-            notifyItemInserted(0)
+        when (state) {
+            State.Dismissed -> {
+                state = State.Shown
+                notifyItemInserted(0)
+            }
+            State.Dismissing -> {
+                state = State.Shown
+                notifyItemChanged(0)
+            }
+            State.Shown -> Unit
         }
     }
 
-    fun dismiss() {
-        if (isVisible) {
-            isVisible = false
-            notifyItemRemoved(0)
+    fun dismiss(shouldAnimate: Boolean) {
+        when (state) {
+            State.Shown -> {
+                if (shouldAnimate) {
+                    state = State.Dismissing
+                    notifyItemChanged(0)
+                } else {
+                    state = State.Dismissed
+                    notifyItemRemoved(0)
+                }
+            }
+            State.Dismissing -> {
+                if (!shouldAnimate) {
+                    state = State.Dismissed
+                    notifyItemRemoved(0)
+                }
+            }
+            State.Dismissed -> Unit
         }
     }
 
-    override fun getItemCount() = if (isVisible) 1 else 0
+    override fun getItemCount(): Int = when (state) {
+        State.Dismissed -> 0
+        State.Dismissing -> 1
+        State.Shown -> 1
+    }
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
@@ -72,7 +115,24 @@ internal class ChatSyncPromoAdapter(
         holder: ChatSyncPromoViewHolder,
         position: Int,
     ) {
-        holder.show()
+        when (state) {
+            State.Dismissed -> holder.hide()
+            State.Dismissing -> holder.animateOut {
+                // Defer the removal a frame: notifyItemRemoved() can't run during the RecyclerView
+                // layout/animation pass. By the time this runs the banner may have been re-shown, so
+                // re-check the state before removing.
+                mainHandler.post {
+                    if (state != State.Dismissing) return@post
+                    state = State.Dismissed
+                    notifyItemRemoved(0)
+                }
+            }
+            State.Shown -> holder.show()
+        }
+    }
+
+    override fun onViewRecycled(holder: ChatSyncPromoViewHolder) {
+        holder.cancelAnimation()
     }
 }
 
@@ -82,6 +142,9 @@ internal class ChatSyncPromoViewHolder(
     private val onDismissClicked: () -> Unit,
     private val onShown: () -> Unit,
 ) : ViewHolder(binding.root) {
+    private var knownHeight: Int? = null
+    private var dismissAnimator: ValueAnimator? = null
+
     init {
         binding.syncPromotion.apply {
             setMessage(
@@ -97,6 +160,58 @@ internal class ChatSyncPromoViewHolder(
     }
 
     fun show() {
-        binding.root.doOnPreDraw { onShown() }
+        cancelAnimation()
+        binding.root.apply {
+            alpha = 1f
+            isVisible = true
+            updateLayoutParams { height = LayoutParams.WRAP_CONTENT }
+            doOnLayout { view -> knownHeight = view.height }
+            doOnPreDraw { onShown() }
+        }
+    }
+
+    fun hide() {
+        cancelAnimation()
+        binding.root.isVisible = false
+    }
+
+    // We collapse the row (height + alpha) ourselves instead of letting RecyclerView's
+    // ItemAnimator animate the removal: the lists that host this banner disable their
+    // ItemAnimator (e.g. autoCompleteList.itemAnimator = null in NativeInputManager), so a
+    // plain notifyItemRemoved() would just make the row disappear with no animation.
+    fun animateOut(onComplete: () -> Unit) {
+        if (dismissAnimator != null) return
+
+        val startHeight = knownHeight
+        if (startHeight == null) {
+            // Never measured, so there's nothing to collapse. Complete immediately rather than
+            // leaving the adapter stuck in Dismissing with the row still counted.
+            onComplete()
+            return
+        }
+
+        dismissAnimator = ValueAnimator.ofFloat(1f, 0f).apply {
+            duration = EXIT_ANIM_DURATION
+            interpolator = FastOutSlowInInterpolator()
+            addUpdateListener { animation ->
+                val progress = animation.animatedValue as Float
+                binding.root.alpha = progress
+                binding.root.updateLayoutParams { height = (startHeight * progress).roundToInt() }
+            }
+            doOnEnd {
+                dismissAnimator = null
+                onComplete()
+            }
+            start()
+        }
+    }
+
+    fun cancelAnimation() {
+        dismissAnimator?.cancel()
+        dismissAnimator = null
+    }
+
+    private companion object {
+        const val EXIT_ANIM_DURATION = 300L
     }
 }

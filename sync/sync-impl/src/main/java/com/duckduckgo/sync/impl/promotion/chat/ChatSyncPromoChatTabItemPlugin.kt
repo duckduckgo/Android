@@ -57,7 +57,7 @@ class ChatSyncPromoChatTabItemPlugin @Inject constructor(
     private fun CoroutineScope.hideBannerOnInput(adapter: ChatSyncPromoAdapter) {
         launch {
             duckChatInput.inputQuery.firstOrNull(String::isNotEmpty) ?: return@launch
-            adapter.dismiss()
+            adapter.dismiss(shouldAnimate = false)
         }
     }
 }
@@ -72,11 +72,11 @@ private class ChatTabPluginAdapterListener : ChatSyncPromoAdapter.Listener {
     private var didBannerShow = false
 
     override fun onSyncWithDeviceClicked(adapter: ChatSyncPromoAdapter) {
-        adapter.dismiss()
+        adapter.dismiss(shouldAnimate = true)
     }
 
     override fun onDismissClicked(adapter: ChatSyncPromoAdapter) {
-        adapter.dismiss()
+        adapter.dismiss(shouldAnimate = true)
     }
 
     override fun onBannerShown(adapter: ChatSyncPromoAdapter) {
