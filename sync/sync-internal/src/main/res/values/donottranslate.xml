@@ -38,6 +38,7 @@
     <string name="sync_internal_promotions_clear_history_bookmark_added_promo">Clear history (bookmark added dialog)</string>
     <string name="sync_internal_promotions_clear_history_bookmark_screen_promo">Clear history (bookmark screen)</string>
     <string name="sync_internal_promotions_clear_history_password_screen_promo">Clear history (password screen)</string>
+    <string name="sync_internal_promotions_clear_history_chat_tab_page_promo">Clear history (chat tab page)</string>
 
     <string name="sync_internal_launch_recover_data_screen">Launch Recover Data Screen</string>
     <string name="sync_internal_block_store_write_recovery_code">Save account recovery code &amp; device ID to Block Store</string>
