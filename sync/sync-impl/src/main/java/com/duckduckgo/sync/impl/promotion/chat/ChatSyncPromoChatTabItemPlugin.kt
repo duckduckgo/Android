@@ -81,16 +81,22 @@ private class ChatTabPluginAdapterListener(
     private val activityStarter: GlobalActivityStarter,
 ) : ChatSyncPromoAdapter.Listener {
     private var didBannerShow = false
+    private var isDialogShowing = false
 
     override fun onSyncWithDeviceClicked(adapter: ChatSyncPromoAdapter) {
         adapter.dismiss(shouldAnimate = true)
 
-        ChatSyncPromoBottomSheetDialog(
-            context = context,
-            onScanQrCodeClicked = {
-                activityStarter.start(context, SyncActivityWithAnotherDevice(source = "promotion_ai_chat"))
-            },
-        ).show()
+        if (!isDialogShowing) {
+            isDialogShowing = true
+            val dialog = ChatSyncPromoBottomSheetDialog(
+                context = context,
+                onScanQrCodeClicked = {
+                    activityStarter.start(context, SyncActivityWithAnotherDevice(source = "promotion_ai_chat"))
+                },
+            )
+            dialog.setOnDismissListener { isDialogShowing = false }
+            dialog.show()
+        }
     }
 
     override fun onDismissClicked(adapter: ChatSyncPromoAdapter) {
