@@ -109,6 +109,14 @@ interface DuckChat {
      */
     fun observeNativeInputFieldUserSettingEnabled(): Flow<Boolean>
 
+    /**
+     * Observes whether the Duck.ai native chat input integration is enabled.
+     * Emits `true` only when both the native input widget and the `nativeChatInput`
+     * feature flag are enabled (and the widget is not suppressed). When `false`,
+     * Duck.ai contextual and full modes fall back to the web input.
+     */
+    fun observeNativeChatInputEnabled(): Flow<Boolean>
+
     suspend fun isStandaloneMigrationCompleted(): Boolean
 
     /**

@@ -25,6 +25,8 @@ import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_AFTER_INACTIVITY_TIMEOUT_
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Count
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.newtabpage.api.NtpAfterIdleManager
@@ -56,6 +58,7 @@ class ShowOnAppLaunchViewModel @Inject constructor(
         val showNTPAfterIdleReturn: Boolean = false,
         val selectedIdleThresholdSeconds: Long = FirstScreenHandlerImpl.DEFAULT_IDLE_THRESHOLD_SECONDS,
         val idleThresholdOptions: List<Long> = FirstScreenHandlerImpl.DEFAULT_IDLE_THRESHOLD_OPTIONS,
+        val returnToLastTabEnabled: Boolean = true,
     )
 
     sealed class Command {
@@ -80,7 +83,8 @@ class ShowOnAppLaunchViewModel @Inject constructor(
             showOnAppLaunchOptionDataStore.specificPageUrlFlow,
             androidBrowserConfigFeature.showNTPAfterIdleReturn().enabled(),
             userSelectedThreshold,
-        ) { option, specificPageUrl, showNTPAfterIdleReturn, userThreshold ->
+            ntpAfterIdleManager.returnToLastTabEnabled,
+        ) { option, specificPageUrl, showNTPAfterIdleReturn, userThreshold, returnToLastTabEnabled ->
             val effectiveThreshold = userThreshold
                 ?: FirstScreenHandlerImpl.parseDefaultIdleThresholdSeconds(
                     androidBrowserConfigFeature.showNTPAfterIdleReturn().getSettings(),
@@ -91,6 +95,7 @@ class ShowOnAppLaunchViewModel @Inject constructor(
                 specificPageUrl = specificPageUrl,
                 showNTPAfterIdleReturn = showNTPAfterIdleReturn,
                 selectedIdleThresholdSeconds = effectiveThreshold,
+                returnToLastTabEnabled = returnToLastTabEnabled,
             )
         }.flowOn(dispatcherProvider.io())
             .launchIn(viewModelScope)
@@ -122,6 +127,19 @@ class ShowOnAppLaunchViewModel @Inject constructor(
             userSelectedThreshold.value = seconds
             pixel.fire(SETTINGS_AFTER_INACTIVITY_TIMEOUT_CHANGED, mapOf("selectedSeconds" to seconds.toString()))
             ntpAfterIdleManager.onIdleTimeoutSelected(seconds)
+        }
+    }
+
+    fun onReturnToLastTabToggled(enabled: Boolean) {
+        viewModelScope.launch(dispatcherProvider.io()) {
+            ntpAfterIdleManager.setReturnToLastTabEnabled(enabled)
+            if (enabled) {
+                pixel.fire(ShowOnAppLaunchPixelName.LAST_TAB_SHORTCUT_SETTING_ENABLED, type = Count)
+                pixel.fire(ShowOnAppLaunchPixelName.LAST_TAB_SHORTCUT_SETTING_ENABLED_DAILY, type = Daily())
+            } else {
+                pixel.fire(ShowOnAppLaunchPixelName.LAST_TAB_SHORTCUT_SETTING_DISABLED, type = Count)
+                pixel.fire(ShowOnAppLaunchPixelName.LAST_TAB_SHORTCUT_SETTING_DISABLED_DAILY, type = Daily())
+            }
         }
     }
 }

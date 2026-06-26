@@ -385,4 +385,15 @@ interface AndroidBrowserConfigFeature {
      */
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun redirectDuckAiLinksFromCustomTab(): Toggle
+
+    /**
+     * Kill switch for persisting per-tab WebView session state (back/forward history) in Room.
+     * When enabled, session bundles survive process death so back navigation works after the
+     * OS kills the app. When disabled, falls back to the legacy in-memory LruCache.
+     * @return `true` when the remote config has the global "webViewSessionPersistence" androidBrowserConfig
+     * sub-feature flag enabled
+     * If the remote feature is not present defaults to `true`
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun webViewSessionPersistence(): Toggle
 }

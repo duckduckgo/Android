@@ -70,4 +70,8 @@ class OptionsViewModel @Inject constructor(
             Tool.WEB_SEARCH -> duckChatPixels.fireWebSearchDeselected()
         }
     }
+
+    fun onCustomizeResponsesClicked() {
+        duckChatPixels.fireCustomizeResponsesSelected()
+    }
 }

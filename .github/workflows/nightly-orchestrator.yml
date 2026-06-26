@@ -124,6 +124,7 @@ jobs:
       matrix:
         task_id: ${{ fromJson(needs.collect_lgc_tasks.outputs.task_ids) }}
       fail-fast: false
+      max-parallel: 1
     steps:
       - name: Add task to project (no-op if already there)
         uses: duckduckgo/native-github-asana-sync@v2.5.1

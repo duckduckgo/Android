@@ -19,6 +19,7 @@ package com.duckduckgo.app.generalsettings.showonapplaunch
 import androidx.lifecycle.MutableLiveData
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.browser.autofill.SystemAutofillEngagement
+import com.duckduckgo.app.browser.state.ModeSwitchRecreateSignal
 import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption.LastOpenedTab
 import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption.NewTabPage
 import com.duckduckgo.app.generalsettings.showonapplaunch.store.FakeShowOnAppLaunchOptionDataStore
@@ -78,6 +79,7 @@ class FirstScreenHandlerImplTest {
     private val idleReturnToggle: Toggle = mock()
     private val showOnAppLaunchToggle: Toggle = mock()
     private val ntpAfterIdleManager: NtpAfterIdleManager = mock()
+    private val modeSwitchRecreateSignal = ModeSwitchRecreateSignal()
     private val testScope = coroutineTestRule.testScope
 
     private lateinit var testee: FirstScreenHandlerImpl
@@ -108,6 +110,7 @@ class FirstScreenHandlerImplTest {
             ntpAfterIdleManager = ntpAfterIdleManager,
             systemAutofillEngagement = systemAutofillEngagement,
             customTabDetector = customTabDetector,
+            modeSwitchRecreateSignal = modeSwitchRecreateSignal,
             dispatcherProvider = coroutineTestRule.testDispatcherProvider,
             appCoroutineScope = testScope,
         )
@@ -649,5 +652,23 @@ class FirstScreenHandlerImplTest {
         testScope.testScheduler.advanceUntilIdle()
 
         verify(showOnAppLaunchOptionHandler).handleAfterInactivityOption(wasIdle = true)
+    }
+
+    // --- Mode-switch recreate guard ---
+
+    @Test
+    fun whenModeSwitchRecreateSignalPendingThenOnOpenSkipsLaunchHandling() = runTest {
+        whenever(idleReturnToggle.isEnabled()).thenReturn(true)
+        whenever(idleReturnToggle.getSettings()).thenReturn("""{"defaultIdleThresholdSeconds": 300}""")
+        val sixMinutesAgo = System.currentTimeMillis() - (6 * 60 * 1000)
+        whenever(settingsDataStore.lastSessionBackgroundTimestamp).thenReturn(sixMinutesAgo)
+        liveSelectedTab.value = TabEntity(tabId = "ntp", url = null)
+
+        modeSwitchRecreateSignal.markPending()
+        testee.onOpen(isFreshLaunch = false)
+        testScope.testScheduler.advanceUntilIdle()
+
+        verify(ntpAfterIdleManager, never()).onIdleReturnTriggered()
+        verifyNoInteractions(showOnAppLaunchOptionHandler)
     }
 }

@@ -2320,6 +2320,7 @@ class DuckChatContextualViewModelTest {
         var nextUrl: String = ""
         private val automaticContextAttachment = MutableStateFlow(true)
         private val nativeInputFieldSettingEnabled = MutableStateFlow(false)
+        private val nativeChatInputEnabled = MutableStateFlow(false)
 
         override fun isEnabled(): Boolean = true
         override fun openDuckChat() = Unit
@@ -2344,6 +2345,7 @@ class DuckChatContextualViewModelTest {
         override fun observeCosmeticInputScreenUserSettingEnabled(): Flow<Boolean?> = kotlinx.coroutines.flow.emptyFlow()
         override fun observeAutomaticContextAttachmentUserSettingEnabled(): Flow<Boolean> = automaticContextAttachment
         override fun observeNativeInputFieldUserSettingEnabled(): Flow<Boolean> = nativeInputFieldSettingEnabled
+        override fun observeNativeChatInputEnabled(): Flow<Boolean> = nativeChatInputEnabled
         override suspend fun isStandaloneMigrationCompleted(): Boolean = true
         override suspend fun setChatSuggestionsUserSetting(enabled: Boolean) = Unit
         override fun observeChatSuggestionsUserSettingEnabled(): Flow<Boolean> = flowOf(true)

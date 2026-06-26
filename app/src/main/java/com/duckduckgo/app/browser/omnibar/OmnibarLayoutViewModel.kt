@@ -257,6 +257,7 @@ class OmnibarLayoutViewModel @Inject constructor(
         val showDuckAIHeader: Boolean = false,
         val showDuckAISidebar: Boolean = false,
         val isNativeInputEnabled: Boolean = false,
+        val isNativeChatInputEnabled: Boolean = false,
         val isAddressBarTrackersAnimationEnabled: Boolean = false,
         val useSoftwareRenderingMode: Boolean = false,
         val isProgressBarUpgradeEnabled: Boolean = false,
@@ -325,11 +326,13 @@ class OmnibarLayoutViewModel @Inject constructor(
         combine(
             duckAiFeatureState.showInputScreen,
             duckChat.observeNativeInputFieldUserSettingEnabled(),
-        ) { inputScreenEnabled, nativeInputEnabled ->
+            duckChat.observeNativeChatInputEnabled(),
+        ) { inputScreenEnabled, nativeInputEnabled, nativeChatInputEnabled ->
             _viewState.update {
                 it.copy(
                     showTextInputClickCatcher = inputScreenEnabled || nativeInputEnabled,
                     isNativeInputEnabled = nativeInputEnabled,
+                    isNativeChatInputEnabled = nativeChatInputEnabled,
                 )
             }
         }.launchIn(viewModelScope)

@@ -52,14 +52,14 @@ tags:
             - action: back
             - action: back
             - tapOn:
-                id: "omnibarTextInput"
+                id: "omnibarTextInputClickCatcher"
             - copyTextFrom:
-                id: "omnibarTextInput"
+                id: "inputField"
             - action: back
             - runFlow: ../shared/browser_screen/click_on_fire_button.yaml
             - runFlow: ../shared/browser_screen/confirm_fire_dialog.yaml
             - tapOn:
-                id: "omnibarTextInput"
+                id: "omnibarTextInputClickCatcher"
             - pasteText
             - pressKey: Enter
             - assertVisible:

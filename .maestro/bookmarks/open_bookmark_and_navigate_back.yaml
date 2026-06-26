@@ -14,13 +14,14 @@ tags:
       - runFlow: ../shared/skip_all_onboarding.yaml
 
       - tapOn:
-            id: "omnibarTextInput"
+            id: "inputField"
       - inputText: "https://www.search-company.site/"
       - pressKey: Enter
       - assertVisible:
             text: "Search engine"
       - tapOn:
-            id: "omnibarTextInput"
+            id: "omnibarTextInputClickCatcher"
+      - eraseText
       - inputText: "https://privacy-test-pages.site"
       - pressKey: Enter
       - assertVisible:

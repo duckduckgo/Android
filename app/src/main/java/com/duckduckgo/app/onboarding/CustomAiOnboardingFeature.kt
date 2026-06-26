@@ -23,10 +23,10 @@ import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
 
 @ContributesRemoteFeature(
     scope = AppScope::class,
-    featureName = "customDuckAiOnboarding",
+    featureName = "customAiOnboarding",
 )
-interface CustomDuckAiOnboardingFeature {
+interface CustomAiOnboardingFeature {
 
-    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun self(): Toggle
 }

@@ -43,7 +43,6 @@ import com.duckduckgo.duckchat.impl.ui.nativeinput.attachment.LimitsHandler
 import com.duckduckgo.duckchat.impl.voice.VoiceSessionStateManager
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
-import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.advanceUntilIdle
@@ -1329,7 +1328,7 @@ class RealDuckChatJSHelperTest {
 
         whenever(mockDuckChat.isDuckChatFeatureEnabled()).thenReturn(true)
         whenever(mockDuckChat.isDuckChatFullScreenModeEnabled()).thenReturn(false)
-        mockDuckChatFeature.nativeInputField().setRawStoredState(State(enable = true))
+        whenever(mockDuckChat.isNativeChatInputEnabled()).thenReturn(true)
 
         val result = testee.processJsCallbackMessage(
             featureName,
@@ -1637,6 +1636,14 @@ class RealDuckChatJSHelperTest {
         val result = testee.onNativeAction(NativeAction.END_VOICE_SESSION)
 
         assertEquals("endVoiceSession", result.subscriptionName)
+        assertEquals(DUCK_CHAT_FEATURE_NAME, result.featureName)
+    }
+
+    @Test
+    fun whenNativeActionCustomizeResponsesRequestedThenSubscriptionDataSent() = runTest {
+        val result = testee.onNativeAction(NativeAction.CUSTOMIZE_RESPONSES)
+
+        assertEquals("submitCustomizeResponsesAction", result.subscriptionName)
         assertEquals(DUCK_CHAT_FEATURE_NAME, result.featureName)
     }
 
