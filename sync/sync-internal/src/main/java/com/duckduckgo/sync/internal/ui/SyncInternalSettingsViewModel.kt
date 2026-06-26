@@ -604,28 +604,6 @@ constructor(
         }
     }
 
-    fun onCreateProtectedKeyClicked(purpose: String) {
-        viewModelScope.launch(dispatchers.io()) {
-            logcat { "Sync-ScopedToken: creating protected key for purpose=$purpose from dev screen" }
-            if (syncStore.token.isNullOrEmpty()) {
-                logcat(LogPriority.WARN) { "Sync-ScopedToken: not signed in, skipping create protected key" }
-                command.send(ShowMessage("Not signed in"))
-                return@launch
-            }
-            if (purpose.isBlank()) {
-                command.send(ShowMessage("Purpose is required"))
-                return@launch
-            }
-            when (val result = syncAccountRepository.createProtectedKey(purpose)) {
-                is Success -> {
-                    command.send(ShowMessage("Protected key created for $purpose"))
-                    refreshKeys()
-                }
-                is Error -> command.send(ShowMessage("Create key failed: ${result.reason}"))
-            }
-        }
-    }
-
     private fun checkSyncAutoRestoreFlag() {
         val enabled = syncFeature.syncAutoRestore().isEnabled()
         viewState.update { state ->
