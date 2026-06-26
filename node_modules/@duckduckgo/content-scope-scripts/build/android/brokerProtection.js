@@ -7866,6 +7866,7 @@
     let target;
     if (el.tagName === "INPUT") target = window.HTMLInputElement;
     if (el.tagName === "SELECT") target = window.HTMLSelectElement;
+    if (el.tagName === "TEXTAREA") target = window.HTMLTextAreaElement;
     if (!target) {
       return { result: false, error: `input type was not supported: ${el.tagName}` };
     }
@@ -7874,7 +7875,7 @@
       return { result: false, error: "cannot access original value setter" };
     }
     try {
-      if (el.tagName === "INPUT") {
+      if (el.tagName === "INPUT" || el.tagName === "TEXTAREA") {
         el.dispatchEvent(new Event("keydown", { bubbles: true }));
         originalSet.call(el, val);
         const events = [
