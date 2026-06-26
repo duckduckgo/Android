@@ -821,17 +821,65 @@ class DuckChatSettingsViewModelTest {
         }
 
     @Test
-    fun `when onUseWithoutAiClicked then duck chat user setting disabled`() =
+    fun `when onUseWithoutAiClicked and duck chat enabled then duck chat user setting disabled`() =
         runTest {
-            testee.onUseWithoutAiClicked()
+            // Duck.ai is enabled by default in setUp(); collect viewState so the gate sees isDuckChatUserEnabled = true.
+            testee.viewState.test {
+                var state = awaitItem()
+                while (!state.isDuckChatUserEnabled) {
+                    state = awaitItem()
+                }
+                testee.onUseWithoutAiClicked()
+                cancelAndIgnoreRemainingEvents()
+            }
             verify(duckChat).setEnableDuckChatUserSetting(false)
         }
 
     @Test
-    fun `when onUseWithoutAiClicked then disabled pixel fired`() =
+    fun `when onUseWithoutAiClicked and duck chat enabled then disabled pixel fired`() =
         runTest {
-            testee.onUseWithoutAiClicked()
+            testee.viewState.test {
+                var state = awaitItem()
+                while (!state.isDuckChatUserEnabled) {
+                    state = awaitItem()
+                }
+                testee.onUseWithoutAiClicked()
+                cancelAndIgnoreRemainingEvents()
+            }
             verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_USER_DISABLED)
+        }
+
+    @Test
+    fun `when onUseWithoutAiClicked and duck chat already off then no disable pixel or write`() =
+        runTest {
+            // Duck.ai already off, but the action is still reachable because Search Assist is not Never.
+            whenever(duckChat.observeEnableDuckChatUserSetting()).thenReturn(flowOf(false))
+            whenever(serpSettingsDataProvider.observeSetting(SearchAssistVisibility.SERP_SETTINGS_KEY))
+                .thenReturn(flowOf(SearchAssistVisibility.SOMETIMES.serpCode))
+            testee = DuckChatSettingsViewModel(
+                duckChatActivityParams = DuckChatSettingsNoParams,
+                duckChat = duckChat,
+                pixel = mockPixel,
+                inputScreenDiscoveryFunnel = mockInputScreenDiscoveryFunnel,
+                settingsPageFeature = settingsPageFeature,
+                duckChatPixels = mockDuckChatPixels,
+                dispatcherProvider = coroutineRule.testDispatcherProvider,
+                duckChatFeature = duckChatFeature,
+                serpSettingsDataProvider = serpSettingsDataProvider,
+            )
+
+            testee.viewState.test {
+                // Resolve to the off state before acting.
+                var state = awaitItem()
+                while (state.isDuckChatUserEnabled) {
+                    state = awaitItem()
+                }
+                testee.onUseWithoutAiClicked()
+                cancelAndIgnoreRemainingEvents()
+            }
+
+            verify(mockPixel, never()).fire(DuckChatPixelName.DUCK_CHAT_USER_DISABLED)
+            verify(duckChat, never()).setEnableDuckChatUserSetting(false)
         }
 
     @Test

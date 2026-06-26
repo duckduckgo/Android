@@ -207,7 +207,11 @@ class DuckChatSettingsViewModel @AssistedInject constructor(
             countPixel = DuckChatPixelName.AI_FEATURES_DISABLED_COUNT,
             dailyPixel = DuckChatPixelName.AI_FEATURES_DISABLED_DAILY,
         )
-        onDuckChatUserEnabledToggled(checked = false)
+        // Only disable Duck.ai if it's currently on, so we don't fire a spurious aichat_disabled when
+        // the action is reachable purely because Search Assist or Hide AI Images is still non-no-AI.
+        if (viewState.value.isDuckChatUserEnabled) {
+            onDuckChatUserEnabledToggled(checked = false)
+        }
         onSearchAssistVisibilitySelected(SearchAssistVisibility.NEVER)
         onHideAiGeneratedImagesSelected(HideAiGeneratedImages.ON)
     }
