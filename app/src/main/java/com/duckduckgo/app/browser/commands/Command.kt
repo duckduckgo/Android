@@ -167,6 +167,8 @@ sealed class Command {
         val detectedLanguage: String?,
     ) : Command()
 
+    data object ShowTranslationDownloading : Command()
+
     data class ShowTranslationResult(
         val translatedText: String,
     ) : Command()

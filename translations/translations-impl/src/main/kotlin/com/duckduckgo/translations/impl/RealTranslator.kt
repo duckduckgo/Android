@@ -25,9 +25,13 @@ import com.duckduckgo.translations.api.DetectedLanguage
 import com.duckduckgo.translations.api.Translator
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
+import io.github.marcosholgado.translatekit.ModelSpec
 import io.github.marcosholgado.translatekit.TranslateKit
+import io.github.marcosholgado.translatekit.TranslationModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import logcat.logcat
 import javax.inject.Inject
@@ -39,7 +43,14 @@ class RealTranslator @Inject constructor(
     private val appBuildConfig: AppBuildConfig,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val dispatchers: DispatcherProvider,
+    private val modelStore: ModelStore,
 ) : Translator {
+
+    // A single loaded model is cached in memory; loadModel mmaps native memory, so we keep one handle
+    // and close it when switching pairs. The mutex serialises load/translate against the cached handle.
+    private val modelLock = Mutex()
+    private var loadedPairId: String? = null
+    private var loadedModel: TranslationModel? = null
 
     init {
         // Load the native engine lazily and off the main thread. init() is idempotent and crash-safe:
@@ -70,8 +81,40 @@ class RealTranslator @Inject constructor(
         targetLanguage: String,
         isHtml: Boolean,
     ): Result<String> = withContext(dispatchers.io()) {
-        // Model loading and translation are wired up in a later step.
-        Result.failure(NotImplementedError("On-device translation is not wired up yet"))
+        if (!isAvailable()) {
+            return@withContext Result.failure(IllegalStateException("On-device translation engine is unavailable"))
+        }
+        runCatching {
+            modelLock.withLock {
+                val model = loadedModelFor(sourceLanguage, targetLanguage)
+                model.translate(text, isHtml).text
+            }
+        }
+    }
+
+    // Returns the loaded handle for the pair, loading it (and closing any previously loaded one) on a
+    // cache miss. Must be called under [modelLock]. Throws if the model has not been downloaded.
+    private fun loadedModelFor(sourceLanguage: String, targetLanguage: String): TranslationModel {
+        val pairId = "${sourceLanguage.lowercase()}${targetLanguage.lowercase()}"
+        loadedModel?.let { if (loadedPairId == pairId) return it }
+
+        val files = modelStore.resolve(sourceLanguage, targetLanguage)
+            ?: throw IllegalStateException("Model not downloaded for $sourceLanguage-$targetLanguage")
+        val model = TranslateKit.loadModel(
+            ModelSpec(
+                sourceLang = sourceLanguage,
+                targetLang = targetLanguage,
+                modelPath = files.modelPath,
+                vocabPaths = files.vocabPaths,
+                shortlistPath = files.shortlistPath,
+                configYaml = null,
+            ),
+        )
+        loadedModel?.let { TranslateKit.unloadModel(it) }
+        loadedModel = model
+        loadedPairId = pairId
+        logcat { "Loaded translation model $pairId" }
+        return model
     }
 
     // translate-kit-android ships a native engine that requires API 28+. Below this we never touch the

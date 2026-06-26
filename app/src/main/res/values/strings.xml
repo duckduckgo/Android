@@ -558,6 +558,7 @@
     <string name="browserMenuTranslateFailed">Translation failed: %1$s</string>
     <string name="browserMenuTranslateLanguageDetected">Language detected: %1$s</string>
     <string name="browserMenuTranslateLanguageDetectFailed">Couldn\'t auto detect language</string>
+    <string name="browserMenuTranslateDownloading">Downloading translation model…</string>
 
     <!-- Settings -->
     <string name="settingsPrivacyProtectionAllowlist">Unprotected Sites</string>

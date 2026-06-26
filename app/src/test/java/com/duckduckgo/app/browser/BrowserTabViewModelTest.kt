@@ -340,6 +340,7 @@ import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.subscriptions.api.SubscriptionsJSHelper
 import com.duckduckgo.sync.api.favicons.FaviconsFetchingPrompt
+import com.duckduckgo.translations.api.TranslationModelManager
 import com.duckduckgo.translations.api.Translator
 import com.duckduckgo.voice.api.VoiceSearchAvailabilityPixelLogger
 import dagger.Lazy
@@ -462,6 +463,7 @@ class BrowserTabViewModelTest {
     private val mockOnboardingStore: OnboardingStore = mock()
     private val mockCustomAiOnboardingStore: CustomAiOnboardingStore = mock()
     private val mockTranslator: Translator = mock()
+    private val mockTranslationModelManager: TranslationModelManager = mock()
 
     private val mockAutoCompleteService: AutoCompleteService = mock()
 
@@ -1025,6 +1027,7 @@ class BrowserTabViewModelTest {
                 customAiOnboardingStore = mockCustomAiOnboardingStore,
                 browserMode = BrowserMode.REGULAR,
                 translator = mockTranslator,
+                translationModelManager = mockTranslationModelManager,
             )
 
         testee.loadData("abc", null, false, false)

@@ -32,7 +32,16 @@ import javax.inject.Inject
 interface ModelStore {
     fun modelDir(sourceLanguage: String, targetLanguage: String): File
     fun isDownloaded(sourceLanguage: String, targetLanguage: String): Boolean
+
+    /** Resolves the on-disk files for a downloaded pair into what the engine needs, or null if absent. */
+    fun resolve(sourceLanguage: String, targetLanguage: String): ResolvedModelFiles?
 }
+
+data class ResolvedModelFiles(
+    val modelPath: String,
+    val vocabPaths: List<String>,
+    val shortlistPath: String,
+)
 
 @ContributesBinding(AppScope::class)
 @SingleInstanceIn(AppScope::class)
@@ -48,8 +57,26 @@ class RealModelStore @Inject constructor(
 
     override fun isDownloaded(sourceLanguage: String, targetLanguage: String): Boolean {
         val dir = modelDir(sourceLanguage, targetLanguage)
-        return dir.isDirectory && dir.listFiles()?.any { it.name.endsWith(MODEL_FILE_SUFFIX) } == true
+        return dir.isDirectory && dir.listFiles()?.any { it.isModelBinary() } == true
     }
+
+    override fun resolve(sourceLanguage: String, targetLanguage: String): ResolvedModelFiles? {
+        val files = modelDir(sourceLanguage, targetLanguage).listFiles()?.toList() ?: return null
+        // Mozilla's naming: model.<pair>.intgemm.alphas.bin, lex.*.bin, and either vocab.<pair>.spm or
+        // srcvocab/trgvocab.<pair>.spm. The shortlist also ends in .bin, so the model is matched by prefix.
+        val model = files.firstOrNull { it.isModelBinary() } ?: return null
+        val shortlist = files.firstOrNull { it.name.startsWith(SHORTLIST_PREFIX) } ?: return null
+        // For src/trg pairs, "srcvocab" sorts before "trgvocab" — the source-then-target order the engine wants.
+        val vocabs = files.filter { it.name.endsWith(VOCAB_SUFFIX) }.sortedBy { it.name }
+        if (vocabs.isEmpty()) return null
+        return ResolvedModelFiles(
+            modelPath = model.absolutePath,
+            vocabPaths = vocabs.map { it.absolutePath },
+            shortlistPath = shortlist.absolutePath,
+        )
+    }
+
+    private fun File.isModelBinary(): Boolean = name.startsWith(MODEL_PREFIX) && name.endsWith(MODEL_FILE_SUFFIX)
 
     // Concatenated lowercase pair id (e.g. "enes"), matching Mozilla's model filenames.
     private fun pairId(sourceLanguage: String, targetLanguage: String): String =
@@ -57,6 +84,9 @@ class RealModelStore @Inject constructor(
 
     companion object {
         private const val MODELS_DIR_NAME = "translations"
-        const val MODEL_FILE_SUFFIX = ".bin"
+        private const val MODEL_PREFIX = "model"
+        private const val MODEL_FILE_SUFFIX = ".bin"
+        private const val SHORTLIST_PREFIX = "lex"
+        private const val VOCAB_SUFFIX = ".spm"
     }
 }

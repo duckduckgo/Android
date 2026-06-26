@@ -163,6 +163,7 @@ import com.duckduckgo.app.browser.commands.Command.ShowSavedSiteAddedConfirmatio
 import com.duckduckgo.app.browser.commands.Command.ShowSitePermissionsDialog
 import com.duckduckgo.app.browser.commands.Command.ShowSoundRecorder
 import com.duckduckgo.app.browser.commands.Command.ShowTranslateLanguageDialog
+import com.duckduckgo.app.browser.commands.Command.ShowTranslationDownloading
 import com.duckduckgo.app.browser.commands.Command.ShowTranslationError
 import com.duckduckgo.app.browser.commands.Command.ShowTranslationResult
 import com.duckduckgo.app.browser.commands.Command.ShowUserCredentialSavedOrUpdatedConfirmation
@@ -415,6 +416,8 @@ import com.duckduckgo.subscriptions.api.SUBSCRIPTIONS_FEATURE_NAME
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.subscriptions.api.SubscriptionsJSHelper
 import com.duckduckgo.sync.api.favicons.FaviconsFetchingPrompt
+import com.duckduckgo.translations.api.ModelDownloadStatus
+import com.duckduckgo.translations.api.TranslationModelManager
 import com.duckduckgo.translations.api.Translator
 import dagger.Lazy
 import io.reactivex.schedulers.Schedulers
@@ -440,6 +443,7 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
@@ -582,6 +586,7 @@ class BrowserTabViewModel @Inject constructor(
     private val customAiOnboardingStore: CustomAiOnboardingStore,
     private val browserMode: BrowserMode,
     private val translator: Translator,
+    private val translationModelManager: TranslationModelManager,
 ) : ViewModel(),
     WebViewClientListener,
     EditSavedSiteListener,
@@ -3411,9 +3416,14 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
+    // The page language detected when the translate dialog was opened, reused as the source when the
+    // user picks a target. Falls back to English if detection was unavailable.
+    private var detectedSourceLanguage: String? = null
+
     fun onTranslateMenuClicked() {
         viewModelScope.launch(dispatchers.io()) {
             val detectedLanguage = translator.detectLanguage(title.orEmpty()).getOrNull()?.language
+            detectedSourceLanguage = detectedLanguage
             withContext(dispatchers.main()) {
                 command.value = ShowTranslateLanguageDialog(detectedLanguage)
             }
@@ -3421,8 +3431,23 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun onTranslateRequested(targetLanguage: String) {
+        val sourceLanguage = detectedSourceLanguage ?: DEFAULT_SOURCE_LANGUAGE
         viewModelScope.launch(dispatchers.io()) {
-            val result = translator.translate(text = title.orEmpty(), sourceLanguage = "en", targetLanguage = targetLanguage)
+            // Models are downloaded on demand: if the pair isn't present, fetch it (surfacing progress)
+            // before translating.
+            if (!translationModelManager.isModelDownloaded(sourceLanguage, targetLanguage)) {
+                withContext(dispatchers.main()) { command.value = ShowTranslationDownloading }
+                val downloadFailure = translationModelManager.downloadModel(sourceLanguage, targetLanguage)
+                    .filterIsInstance<ModelDownloadStatus.Failed>()
+                    .firstOrNull()
+                if (downloadFailure != null) {
+                    withContext(dispatchers.main()) {
+                        command.value = ShowTranslationError(downloadFailure.reason ?: "Model download failed")
+                    }
+                    return@launch
+                }
+            }
+            val result = translator.translate(text = title.orEmpty(), sourceLanguage = sourceLanguage, targetLanguage = targetLanguage)
             withContext(dispatchers.main()) {
                 command.value = result.fold(
                     onSuccess = { ShowTranslationResult(it) },
@@ -5689,6 +5714,7 @@ class BrowserTabViewModel @Inject constructor(
         private const val CLIENT_SIDE_HIT_KEY = "clientSideHit"
 
         private const val ABOUT_BLANK = "about:blank"
+        private const val DEFAULT_SOURCE_LANGUAGE = "en"
 
         // https://www.iso.org/iso-3166-country-codes.html
         private val PRINT_LETTER_FORMAT_COUNTRIES_ISO3166_2 =

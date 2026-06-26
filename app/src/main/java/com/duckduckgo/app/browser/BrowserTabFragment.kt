@@ -2864,6 +2864,7 @@ class BrowserTabFragment :
             is Command.DismissFindInPage -> webView?.findAllAsync("")
             is Command.ShareLink -> launchSharePageChooser(it.url, it.title)
             is Command.ShowTranslateLanguageDialog -> showTranslateLanguageDialog(it.detectedLanguage)
+            is Command.ShowTranslationDownloading -> showToast(R.string.browserMenuTranslateDownloading)
             is Command.ShowTranslationResult -> Toast.makeText(context?.applicationContext, it.translatedText, Toast.LENGTH_LONG).show()
             is Command.ShowTranslationError ->
                 Toast.makeText(context?.applicationContext, getString(R.string.browserMenuTranslateFailed, it.reason), Toast.LENGTH_LONG).show()
