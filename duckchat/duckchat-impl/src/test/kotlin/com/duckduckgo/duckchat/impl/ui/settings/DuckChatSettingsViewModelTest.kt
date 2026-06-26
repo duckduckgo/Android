@@ -723,11 +723,44 @@ class DuckChatSettingsViewModelTest {
         }
 
     @Test
-    fun `when search assist set to sometimes then sometimes count and daily fired`() =
+    fun `when search assist set to sometimes from a different value then sometimes count and daily fired`() =
         runTest {
-            testee.onSearchAssistVisibilitySelected(SearchAssistVisibility.SOMETIMES)
+            whenever(serpSettingsDataProvider.observeSetting(SearchAssistVisibility.SERP_SETTINGS_KEY))
+                .thenReturn(flowOf(SearchAssistVisibility.NEVER.serpCode))
+            testee = DuckChatSettingsViewModel(
+                duckChatActivityParams = DuckChatSettingsNoParams,
+                duckChat = duckChat,
+                pixel = mockPixel,
+                inputScreenDiscoveryFunnel = mockInputScreenDiscoveryFunnel,
+                settingsPageFeature = settingsPageFeature,
+                duckChatPixels = mockDuckChatPixels,
+                dispatcherProvider = coroutineRule.testDispatcherProvider,
+                duckChatFeature = duckChatFeature,
+                serpSettingsDataProvider = serpSettingsDataProvider,
+            )
+
+            testee.viewState.test {
+                var state = awaitItem()
+                while (state.searchAssistVisibility != SearchAssistVisibility.NEVER) {
+                    state = awaitItem()
+                }
+                testee.onSearchAssistVisibilitySelected(SearchAssistVisibility.SOMETIMES)
+                cancelAndIgnoreRemainingEvents()
+            }
+
             verify(mockPixel).fire(DuckChatPixelName.AI_FEATURES_SEARCH_ASSIST_SOMETIMES_COUNT)
             verify(mockPixel).fire(DuckChatPixelName.AI_FEATURES_SEARCH_ASSIST_SOMETIMES_DAILY, type = Pixel.PixelType.Daily())
+        }
+
+    @Test
+    fun `when search assist re-selected with same value then no count or daily pixel and still persisted`() =
+        runTest {
+            // Default current value is Sometimes; re-selecting it must not fire telemetry but must still persist.
+            testee.onSearchAssistVisibilitySelected(SearchAssistVisibility.SOMETIMES)
+
+            verify(mockPixel, never()).fire(DuckChatPixelName.AI_FEATURES_SEARCH_ASSIST_SOMETIMES_COUNT)
+            verify(mockPixel, never()).fire(DuckChatPixelName.AI_FEATURES_SEARCH_ASSIST_SOMETIMES_DAILY, type = Pixel.PixelType.Daily())
+            verify(serpSettingsDataProvider).setSetting(SearchAssistVisibility.SERP_SETTINGS_KEY, SearchAssistVisibility.SOMETIMES.serpCode)
         }
 
     @Test
@@ -747,11 +780,44 @@ class DuckChatSettingsViewModelTest {
         }
 
     @Test
-    fun `when hide images selected off then hide_images_off count and daily fired`() =
+    fun `when hide images set to off from a different value then hide_images_off count and daily fired`() =
         runTest {
-            testee.onHideAiGeneratedImagesSelected(HideAiGeneratedImages.OFF)
+            whenever(serpSettingsDataProvider.observeSetting(HideAiGeneratedImages.SERP_SETTINGS_KEY))
+                .thenReturn(flowOf(HideAiGeneratedImages.ON.serpCode))
+            testee = DuckChatSettingsViewModel(
+                duckChatActivityParams = DuckChatSettingsNoParams,
+                duckChat = duckChat,
+                pixel = mockPixel,
+                inputScreenDiscoveryFunnel = mockInputScreenDiscoveryFunnel,
+                settingsPageFeature = settingsPageFeature,
+                duckChatPixels = mockDuckChatPixels,
+                dispatcherProvider = coroutineRule.testDispatcherProvider,
+                duckChatFeature = duckChatFeature,
+                serpSettingsDataProvider = serpSettingsDataProvider,
+            )
+
+            testee.viewState.test {
+                var state = awaitItem()
+                while (state.hideAiGeneratedImages != HideAiGeneratedImages.ON) {
+                    state = awaitItem()
+                }
+                testee.onHideAiGeneratedImagesSelected(HideAiGeneratedImages.OFF)
+                cancelAndIgnoreRemainingEvents()
+            }
+
             verify(mockPixel).fire(DuckChatPixelName.AI_FEATURES_HIDE_IMAGES_OFF_COUNT)
             verify(mockPixel).fire(DuckChatPixelName.AI_FEATURES_HIDE_IMAGES_OFF_DAILY, type = Pixel.PixelType.Daily())
+        }
+
+    @Test
+    fun `when hide images re-selected with same value then no count or daily pixel and still persisted`() =
+        runTest {
+            // Default current value is Off; re-selecting it must not fire telemetry but must still persist.
+            testee.onHideAiGeneratedImagesSelected(HideAiGeneratedImages.OFF)
+
+            verify(mockPixel, never()).fire(DuckChatPixelName.AI_FEATURES_HIDE_IMAGES_OFF_COUNT)
+            verify(mockPixel, never()).fire(DuckChatPixelName.AI_FEATURES_HIDE_IMAGES_OFF_DAILY, type = Pixel.PixelType.Daily())
+            verify(serpSettingsDataProvider).setSetting(HideAiGeneratedImages.SERP_SETTINGS_KEY, HideAiGeneratedImages.OFF.serpCode)
         }
 
     @Test
