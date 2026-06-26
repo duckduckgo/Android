@@ -87,5 +87,7 @@
 
     <!-- Duck AI Section in AI Feature Screen -->
     <string name="input_screen_user_pref_toggle_between_search_and_ai">Toggle between Search and Duck.ai</string>
+    <string name="duckAiDialogHideAiGeneratedImagesTitle">Hide AI-Generated Images</string>
+    <string name="duckAiDialogHideAiGeneratedImagesDescription">Filters out known AI spam sites from image search results. <annotation link="learn_more">Learn more</annotation></string>
 
 </resources>

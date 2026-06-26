@@ -291,6 +291,17 @@ class DuckChatSettingsViewModel @AssistedInject constructor(
         }
     }
 
+    fun onHideAiGeneratedImagesLearnMoreClicked() {
+        viewModelScope.launch {
+            commandChannel.send(
+                OpenLink(
+                    link = DUCK_CHAT_HIDE_GENERATED_IMAGES_LEARN_MORE_LINK,
+                    titleRes = R.string.duckAiDialogHideAiGeneratedImagesTitle,
+                ),
+            )
+        }
+    }
+
     fun onHideAiGeneratedImagesSelected(option: HideAiGeneratedImages) {
         // Only report a value change; re-selecting the current option is a no-op for telemetry.
         if (option != viewState.value.hideAiGeneratedImages) {
@@ -412,5 +423,7 @@ class DuckChatSettingsViewModel @AssistedInject constructor(
             "https://duckduckgo.com/settings?ko=-1&embedded=1&highlight=kbe&hideduckai=1#aifeatures"
         const val DUCK_CHAT_HIDE_GENERATED_IMAGES_LINK_EMBEDDED =
             "https://duckduckgo.com/settings?ko=-1&embedded=1&highlight=kbj&hideduckai=1#aifeatures"
+        const val DUCK_CHAT_HIDE_GENERATED_IMAGES_LEARN_MORE_LINK =
+            "https://duckduckgo.com/duckduckgo-help-pages/results/how-to-filter-out-ai-images-in-duckduckgo-search-results"
     }
 }

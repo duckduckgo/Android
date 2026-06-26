@@ -485,8 +485,13 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
     private fun showHideAiGeneratedImagesDialog(current: HideAiGeneratedImages) {
         val options = hideAiGeneratedImagesOptions
         RadioListAlertDialogBuilder(this)
-            .setTitle(R.string.duckAiHideAiGeneratedImagesTitle)
-            .setMessage(R.string.duckAiHideAiGeneratedImagesDescription)
+            .setTitle(R.string.duckAiDialogHideAiGeneratedImagesTitle)
+            .setClickableMessage(
+                getText(R.string.duckAiDialogHideAiGeneratedImagesDescription),
+                "learn_more",
+            ) {
+                viewModel.onHideAiGeneratedImagesLearnMoreClicked()
+            }
             .setOptions(
                 options.map { it.toDisplayNameRes() },
                 options.indexOf(current).takeIf { index -> index >= 0 }?.plus(1),
