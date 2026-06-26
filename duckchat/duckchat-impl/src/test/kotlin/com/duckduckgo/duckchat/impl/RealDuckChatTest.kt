@@ -1834,8 +1834,9 @@ class RealDuckChatTest {
 
     @Test
     fun whenHasUserEnabledChatHistoryThenDelegatesToRepository() = runTest {
-        testee.hasUserEnabledChatHistory()
+        whenever(mockDuckChatFeatureRepository.isAIChatHistoryEnabled()).thenReturn(true)
 
+        assertTrue(testee.hasUserEnabledChatHistory())
         verify(mockDuckChatFeatureRepository).isAIChatHistoryEnabled()
     }
 
