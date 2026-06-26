@@ -14,7 +14,7 @@
   ~ limitations under the License.
   -->
 
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
 
     <!-- Personal Information Removal -->
     <string name="pirStorageUnavailableDialogTitle">Temporary issue with Personal Information Removal</string>
@@ -33,9 +33,9 @@
 
     <!-- Subscription Expiration Reminder Notification -->
     <string name="subscriptionExpirationReminderNotificationChannelName">Subscription Reminders</string>
-    <plurals name="subscriptionExpirationReminderNotificationTitle">
-        <item quantity="one">Your free trial ends in %d day</item>
-        <item quantity="other">Your free trial ends in %d days</item>
+    <plurals name="subscriptionExpirationReminderNotificationTitle" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Your free trial ends in 1 day</item>
+        <item quantity="other" instruction="Placeholder is the number of days until the free trial ends">Your free trial ends in %1$d days</item>
     </plurals>
     <string name="subscriptionExpirationReminderNotificationDescription">Try all your new premium protections before your trial ends!</string>
 
