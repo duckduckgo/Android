@@ -3763,16 +3763,16 @@ class BrowserTabFragment :
         }
     }
 
-    // Walks the live DOM, collecting the translatable text nodes (and stashing references to them so the
-    // translations can later be written back in place), then hands the texts to the ViewModel.
+    // Walks the live DOM collecting block-level elements' innerHTML (stashing references for write-back),
+    // then hands those HTML fragments to the ViewModel to translate as whole fragments.
     private fun extractAndTranslatePage(targetLanguage: String) {
         val wv = webView ?: return
-        wv.evaluateJavascript(JS_EXTRACT_TEXT_NODES) { result ->
-            val textNodes = parseJsonStringArray(result)
-            if (textNodes.isEmpty()) {
+        wv.evaluateJavascript(JS_COLLECT_BLOCKS) { result ->
+            val blocks = parseJsonStringArray(result)
+            if (blocks.isEmpty()) {
                 showToast(R.string.browserMenuTranslatePageUnavailable)
             } else {
-                viewModel.onTranslatePageRequested(targetLanguage, textNodes)
+                viewModel.onTranslatePageRequested(targetLanguage, blocks)
             }
         }
     }
@@ -3813,7 +3813,8 @@ class BrowserTabFragment :
         translationProgressBinding = null
     }
 
-    // Writes the [translations] back into the text nodes stashed by JS_EXTRACT_TEXT_NODES, in order.
+    // Writes the translated HTML fragments back into the block elements stashed by JS_COLLECT_BLOCKS, in
+    // place (setting innerHTML and marking each data-tk-done so it isn't retranslated).
     private fun applyPageTranslation(translations: List<String>) {
         val wv = webView ?: return
         val json = JSONArray(translations).toString()
@@ -3821,12 +3822,13 @@ class BrowserTabFragment :
             """
             (function() {
                 var translations = $json;
-                var nodes = window.__ddgTranslateNodes;
-                if (!nodes) { return; }
-                for (var i = 0; i < nodes.length && i < translations.length; i++) {
-                    nodes[i].nodeValue = translations[i];
+                var blocks = window.__ddgTranslateBlocks;
+                if (!blocks) { return; }
+                for (var i = 0; i < blocks.length && i < translations.length; i++) {
+                    blocks[i].innerHTML = translations[i];
+                    blocks[i].setAttribute('data-tk-done', '');
                 }
-                window.__ddgTranslateNodes = null;
+                window.__ddgTranslateBlocks = null;
             })();
             """.trimIndent(),
             null,
@@ -5905,34 +5907,55 @@ class BrowserTabFragment :
             })()
         """
 
-        // Collects the page's translatable text nodes (skipping script/style/etc.), stashes references to
-        // them on window.__ddgTranslateNodes for write-back, and returns their text in document order.
-        private const val JS_EXTRACT_TEXT_NODES = """
+        // Collects the smallest elements whose child elements are ALL inline — i.e. whose innerHTML is a
+        // clean text + inline-markup fragment (a paragraph, heading, headline-in-an-anchor, list item,
+        // etc.). Each such fragment is translated whole (isHtml=true) so the engine keeps inline tags in
+        // place. Elements with block-level/custom-element children are descended into instead. Skips
+        // script/style/etc. and anything already translated. Stashes element references on
+        // window.__ddgTranslateBlocks for in-place write-back; returns each fragment's innerHTML in order.
+        private const val JS_COLLECT_BLOCKS = """
             (function() {
-                var SKIP = { SCRIPT: 1, STYLE: 1, NOSCRIPT: 1, TEXTAREA: 1, CODE: 1, PRE: 1 };
+                var INLINE = {
+                    A: 1, SPAN: 1, STRONG: 1, EM: 1, B: 1, I: 1, U: 1, S: 1, SMALL: 1, SUB: 1, SUP: 1,
+                    MARK: 1, ABBR: 1, CITE: 1, Q: 1, TIME: 1, KBD: 1, VAR: 1, SAMP: 1, BDI: 1, BDO: 1,
+                    DFN: 1, DATA: 1, INS: 1, DEL: 1, LABEL: 1, BR: 1, WBR: 1, IMG: 1, PICTURE: 1, FONT: 1,
+                    NOBR: 1, RUBY: 1, RT: 1, RP: 1, OUTPUT: 1, METER: 1, PROGRESS: 1
+                };
+                var SKIP = {
+                    SCRIPT: 1, STYLE: 1, NOSCRIPT: 1, SVG: 1, MATH: 1, CODE: 1, PRE: 1, TEXTAREA: 1,
+                    IFRAME: 1, SELECT: 1
+                };
                 if (!document.body) { return []; }
-                var walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, {
-                    acceptNode: function(node) {
-                        if (!node.nodeValue || node.nodeValue.trim().length === 0) {
-                            return NodeFilter.FILTER_REJECT;
-                        }
-                        for (var p = node.parentElement; p; p = p.parentElement) {
-                            if (SKIP[p.tagName]) return NodeFilter.FILTER_REJECT;
-                            if (p.getAttribute('translate') === 'no') return NodeFilter.FILTER_REJECT;
-                            if (p.isContentEditable) return NodeFilter.FILTER_REJECT;
-                        }
-                        return NodeFilter.FILTER_ACCEPT;
+
+                function allChildrenInline(el) {
+                    var children = el.children;
+                    for (var i = 0; i < children.length; i++) {
+                        if (!INLINE[children[i].tagName]) { return false; }
                     }
-                });
-                var nodes = [];
-                var texts = [];
-                var node;
-                while ((node = walker.nextNode())) {
-                    nodes.push(node);
-                    texts.push(node.nodeValue);
+                    return true;
                 }
-                window.__ddgTranslateNodes = nodes;
-                return texts;
+
+                var blocks = [];
+                var htmls = [];
+                var stack = [document.body];
+                while (stack.length > 0) {
+                    var el = stack.pop();
+                    if (!el || el.nodeType !== 1) { continue; }
+                    if (SKIP[el.tagName] || el.isContentEditable || el.hasAttribute('data-tk-done')) { continue; }
+                    if (allChildrenInline(el)) {
+                        if (el.textContent && el.textContent.trim().length > 0) {
+                            blocks.push(el);
+                            htmls.push(el.innerHTML);
+                        }
+                        continue; // its children are inline and part of this fragment
+                    }
+                    var children = el.children;
+                    for (var i = 0; i < children.length; i++) {
+                        stack.push(children[i]);
+                    }
+                }
+                window.__ddgTranslateBlocks = blocks;
+                return htmls;
             })()
         """
 

@@ -3434,7 +3434,7 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
-    fun onTranslatePageRequested(targetLanguage: String, textNodes: List<String>) {
+    fun onTranslatePageRequested(targetLanguage: String, blocks: List<String>) {
         val sourceLanguage = detectedSourceLanguage ?: DEFAULT_SOURCE_LANGUAGE
         viewModelScope.launch(dispatchers.io()) {
             // Models are downloaded on demand: if the pair isn't present, fetch it (surfacing progress in
@@ -3456,11 +3456,13 @@ class BrowserTabViewModel @Inject constructor(
                 }
             }
             withContext(dispatchers.main()) { command.value = ShowTranslationInProgress(targetLanguage) }
-            // Translate the page's text nodes (plain text); the WebView writes them back in place.
+            // Translate each block-level element's innerHTML as one HTML fragment, so the engine splits
+            // sentences and re-projects inline tags itself; the WebView writes the results back in place.
             val result = translator.translate(
-                texts = textNodes,
+                texts = blocks,
                 sourceLanguage = sourceLanguage,
                 targetLanguage = targetLanguage,
+                isHtml = true,
             )
             withContext(dispatchers.main()) {
                 command.value = result.fold(
