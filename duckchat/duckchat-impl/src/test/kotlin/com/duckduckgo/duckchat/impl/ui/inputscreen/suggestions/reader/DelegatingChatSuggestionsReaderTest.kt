@@ -19,6 +19,7 @@ package com.duckduckgo.duckchat.impl.ui.inputscreen.suggestions.reader
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.ChatSuggestion
+import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.RealChatHistoryStore
 import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.reader.ChatSuggestionsNativeReader
 import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.reader.DelegatingChatSuggestionsReader
 import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.reader.RealChatSuggestionsReader
@@ -48,6 +49,7 @@ class DelegatingChatSuggestionsReaderTest {
     private val feature: DuckChatFeature = mock()
     private val nativeStorageToggle: Toggle = mock()
     private val pixels: DuckChatPixels = mock()
+    private val historyStore: RealChatHistoryStore = mock()
     private lateinit var reader: DelegatingChatSuggestionsReader
 
     private val fakeSuggestion = ChatSuggestion("id", "Title", LocalDateTime.now(), false)
@@ -56,7 +58,13 @@ class DelegatingChatSuggestionsReaderTest {
     fun setup() {
         whenever(feature.useNativeStorageChatData()).thenReturn(nativeStorageToggle)
         reader = DelegatingChatSuggestionsReader(
-            nativeReader, webViewReader, store, feature, Lazy { pixels }, coroutineTestRule.testDispatcherProvider,
+            nativeReader,
+            webViewReader,
+            store,
+            feature,
+            Lazy { pixels },
+            historyStore,
+            coroutineTestRule.testDispatcherProvider,
         )
     }
 
@@ -133,6 +141,28 @@ class DelegatingChatSuggestionsReaderTest {
         reader.fetchSuggestions() // switches to nativeReader
 
         verify(webViewReader).tearDown()
+    }
+
+    @Test
+    fun `fetchSuggestions updates existing chat history`() = runTest {
+        whenever(store.hasMigrated()).thenReturn(true)
+        whenever(nativeStorageToggle.isEnabled()).thenReturn(true)
+        whenever(nativeReader.fetchSuggestions("")).thenReturn(listOf(fakeSuggestion))
+
+        reader.fetchSuggestions()
+
+        verify(historyStore).setHasChatHistory(hasHistory = true)
+    }
+
+    @Test
+    fun `fetchSuggestions updates empty chat history`() = runTest {
+        whenever(store.hasMigrated()).thenReturn(true)
+        whenever(nativeStorageToggle.isEnabled()).thenReturn(true)
+        whenever(nativeReader.fetchSuggestions("")).thenReturn(emptyList())
+
+        reader.fetchSuggestions()
+
+        verify(historyStore).setHasChatHistory(hasHistory = false)
     }
 
     @Test

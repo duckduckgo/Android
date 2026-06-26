@@ -20,6 +20,7 @@ import android.net.Uri
 import com.duckduckgo.duckchat.api.DuckChat
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.emptyFlow
 
 /**
  * Fake implementation of [DuckChat] for testing purposes.
@@ -115,8 +116,9 @@ class FakeDuckChat(
     override fun openVoiceDuckChat() { }
     override fun isVoiceChatSessionActive(tabId: String): Boolean = false
     override val activeVoiceChatSessions: Flow<Set<String>> = MutableStateFlow(emptySet())
-    override fun observeTriggerVoiceChatSessionEnd(): Flow<String> = kotlinx.coroutines.flow.emptyFlow()
+    override fun observeTriggerVoiceChatSessionEnd(): Flow<String> = emptyFlow()
     override fun endVoiceChatSession(tabId: String) { }
+    override val hasChatHistory: Flow<Boolean> = emptyFlow()
 
     override suspend fun isChatHistoryAvailable(): Boolean = false
 

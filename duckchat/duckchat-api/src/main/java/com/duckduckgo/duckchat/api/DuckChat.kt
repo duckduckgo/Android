@@ -170,6 +170,14 @@ interface DuckChat {
     suspend fun hasUserEnabledChatHistory(): Boolean
 
     /**
+     * Emits whether the user has chat history entries for their current query.
+     *
+     * Caution, collecting from this flow will suspend until the chat tab fetches suggestions.
+     * This happens when the input screen opens.
+     */
+    val hasChatHistory: Flow<Boolean>
+
+    /**
      * Records that the user selected the "Search + Duck.ai" option on the new address bar picker, so the
      * first prompt submitted from the Duck.ai toggle input field within the attribution window can be
      * attributed back to the picker.
