@@ -95,6 +95,24 @@
     <string name="duckAiHideAiGeneratedImagesTitle">Ocultar imágenes generadas por IA</string>
     <string name="duckAiHideAiGeneratedImagesDescription">Filtra las imágenes generadas por IA de los resultados de búsqueda de imágenes</string>
 
+    <!-- Search Assist Visibility -->
+    <string name="duckAiSearchAssistVisibilityTitle">Visibilidad de Search Assist</string>
+    <string name="duckAiSearchAssistVisibilitySubtitle">Elige con qué frecuencia deseas que las respuestas asistidas por IA aparezcan en tus búsquedas.</string>
+    <string name="duckAiSearchAssistVisibilityNever">Nunca</string>
+    <string name="duckAiSearchAssistVisibilityOnDemand">A la carta</string>
+    <string name="duckAiSearchAssistVisibilitySometimes">A veces</string>
+    <string name="duckAiSearchAssistVisibilityOften">A menudo</string>
+
+    <!-- Duck AI Use Without AI Settings Option -->
+    <string name="duckAiUseWithoutAiTitle">Usar DuckDuckGo sin IA</string>
+    <string name="duckAiUseWithoutAiDescription">Desactiva Duck.ai, oculta las respuestas asistidas por IA en las búsquedas y filtra los sitios de spam de IA conocidos en los resultados de búsqueda de imágenes.</string>
+    <string name="duckAiUseWithoutAiDisabledDescription">La IA está actualmente deshabilitada en el navegador, por lo que ya no verás respuestas asistidas por IA y menos imágenes generadas por IA en los resultados de búsqueda de imágenes.</string>
+
+    <!-- Duck AI Section in AI Feature Screen -->
+    <string name="input_screen_user_pref_toggle_between_search_and_ai">Alterna entre la búsqueda y Duck.ai</string>
+    <string name="duckAiDialogHideAiGeneratedImagesTitle">Ocultar imágenes generadas por IA</string>
+    <string name="duckAiDialogHideAiGeneratedImagesDescription">Filtra los sitios de spam de IA conocidos de los resultados de búsqueda de imágenes. <annotation link="learn_more">Más información</annotation></string>
+
     <!-- Duck AI Paid Settings -->
     <string name="duck_ai_paid_settings_enable_in_settings">Habilitar en la configuración de funciones de IA</string>
     <string name="duck_ai_paid_settings_manage_in_settings">Administrar en la configuración de funciones de IA</string>
@@ -182,4 +200,10 @@
     <string name="duck_ai_chat_history_download_view">Mostrar</string>
     <string name="duck_ai_chat_history_download_error">No se pudo exportar el chat</string>
     <string name="duck_ai_chat_history_bulk_download_error">No se pudieron exportar los chats</string>
+
+    <!-- Example message card: internal-only showcase of NativeInputChatTabItemPlugin, not shipped to
+         users, so these are not localized (translatable="false"). Delete with the example. -->
+    <string name="duckChatExampleMessageCardTitle" translatable="false">Example message card</string>
+    <string name="duckChatExampleMessageCardSubtitle" translatable="false">Contributed by an ActivePlugin to show how other modules can add items to the Chat tab. Dismiss it to see the card remove itself.</string>
+    <string name="duckChatExampleMessageCardAction" translatable="false">Got it</string>
 </resources>
