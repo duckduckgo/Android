@@ -95,6 +95,24 @@
     <string name="duckAiHideAiGeneratedImagesTitle">Skrýt obrázky vygenerované umělou inteligencí</string>
     <string name="duckAiHideAiGeneratedImagesDescription">Odstraní obrázky vytvořené umělou inteligencí z výsledků vyhledávání obrázků</string>
 
+    <!-- Search Assist Visibility -->
+    <string name="duckAiSearchAssistVisibilityTitle">Viditelnost Search Assist</string>
+    <string name="duckAiSearchAssistVisibilitySubtitle">Vyber, jak často chceš, aby se odpovědi s podporou umělé inteligence zobrazovaly ve tvých vyhledáváních.</string>
+    <string name="duckAiSearchAssistVisibilityNever">Nikdy</string>
+    <string name="duckAiSearchAssistVisibilityOnDemand">Na vyžádání</string>
+    <string name="duckAiSearchAssistVisibilitySometimes">Někdy</string>
+    <string name="duckAiSearchAssistVisibilityOften">Často</string>
+
+    <!-- Duck AI Use Without AI Settings Option -->
+    <string name="duckAiUseWithoutAiTitle">Používat DuckDuckGo bez umělé inteligence</string>
+    <string name="duckAiUseWithoutAiDescription">Zakáže Duck.ai, skryje ve vyhledávání odpovědi generované AI a vyfiltruje známé weby s AI spamem z výsledků vyhledávání obrázků.</string>
+    <string name="duckAiUseWithoutAiDisabledDescription">AI je v prohlížeči momentálně zakázaná. Proto v něm neuvidíš odpovědi, které generovala umělá inteligence, a zobrazí se ti méně obrázků generovaných umělou inteligencí ve výsledcích vyhledávání obrázků.</string>
+
+    <!-- Duck AI Section in AI Feature Screen -->
+    <string name="input_screen_user_pref_toggle_between_search_and_ai">Přepínání mezi vyhledáváním a Duck.ai</string>
+    <string name="duckAiDialogHideAiGeneratedImagesTitle">Skrýt obrázky vygenerované AI</string>
+    <string name="duckAiDialogHideAiGeneratedImagesDescription">Vyfiltruje známé weby s AI spamem z výsledků vyhledávání obrázků. <annotation link="learn_more">Další informace</annotation></string>
+
     <!-- Duck AI Paid Settings -->
     <string name="duck_ai_paid_settings_enable_in_settings">Povolit v nastavení funkcí AI</string>
     <string name="duck_ai_paid_settings_manage_in_settings">Spravovat v nastavení funkcí AI</string>
@@ -184,4 +202,10 @@
     <string name="duck_ai_chat_history_download_view">Zobrazit</string>
     <string name="duck_ai_chat_history_download_error">Nepodařilo se exportovat chat</string>
     <string name="duck_ai_chat_history_bulk_download_error">Nepodařilo se exportovat chaty</string>
+
+    <!-- Example message card: internal-only showcase of NativeInputChatTabItemPlugin, not shipped to
+         users, so these are not localized (translatable="false"). Delete with the example. -->
+    <string name="duckChatExampleMessageCardTitle" translatable="false">Example message card</string>
+    <string name="duckChatExampleMessageCardSubtitle" translatable="false">Contributed by an ActivePlugin to show how other modules can add items to the Chat tab. Dismiss it to see the card remove itself.</string>
+    <string name="duckChatExampleMessageCardAction" translatable="false">Got it</string>
 </resources>
