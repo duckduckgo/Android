@@ -25,6 +25,7 @@ import dagger.SingleInstanceIn
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
@@ -41,11 +42,14 @@ class RealTranslationModelManager @Inject constructor(
             modelStore.isDownloaded(sourceLanguage, targetLanguage)
         }
 
+    // flowOn(io) keeps the upstream off the caller's thread: collectors run the flow on their own
+    // dispatcher (the Fragment collects on the main thread) and the isDownloaded() presence check reads
+    // the filesystem.
     override fun downloadModel(sourceLanguage: String, targetLanguage: String): Flow<ModelDownloadStatus> = flow {
         if (modelStore.isDownloaded(sourceLanguage, targetLanguage)) {
             emit(ModelDownloadStatus.Completed)
             return@flow
         }
         emitAll(modelDownloader.download(sourceLanguage, targetLanguage))
-    }
+    }.flowOn(dispatchers.io())
 }
