@@ -16,6 +16,9 @@
 
 package com.duckduckgo.translations.api
 
+import android.webkit.WebView
+import kotlinx.coroutines.flow.Flow
+
 /**
  * On-device, offline neural machine translation and language detection.
  *
@@ -36,38 +39,29 @@ interface Translator {
     fun isAvailable(): Boolean
 
     /**
-     * Best-effort offline detection of the dominant language of [text].
+     * Best-effort offline detection of the dominant language of the page currently rendered in
+     * [webView], sampled from its visible text.
      *
-     * @return a [DetectedLanguage] on success, or a failure if the engine is unavailable or
-     * detection could not be performed.
+     * @return the [DetectedLanguage] on success (or `null` inside the result when the page had no
+     * text to sample), or a failure if the engine is unavailable or detection could not be performed.
      */
-    suspend fun detectLanguage(text: String): Result<DetectedLanguage>
+    suspend fun detectPageLanguage(webView: WebView): Result<DetectedLanguage?>
 
     /**
-     * Translate [text] from [sourceLanguage] to [targetLanguage] (ISO 639-1 codes, e.g. "en",
-     * "es"). Set [isHtml] when [text] contains HTML markup that should be preserved.
+     * Translate the page rendered in [webView] from [sourceLanguage] to [targetLanguage] (ISO 639-1
+     * codes, e.g. "en", "es"), in place. Collecting the returned flow starts the work and emits its
+     * progress: the model is downloaded on demand if missing, then the page content is translated and
+     * written back. Cancelling collection cancels the work.
      *
-     * @return the translated text on success, or a failure if the engine is unavailable, the
-     * language pair is not supported, or translation could not be performed.
+     * The DOM is mutated directly — the page is never reloaded — so render mode, running scripts,
+     * listeners and scroll position are preserved. Content already translated on a previous run is
+     * skipped, so the flow is safe to re-run.
      */
-    suspend fun translate(
-        text: String,
+    fun translatePage(
+        webView: WebView,
         sourceLanguage: String,
         targetLanguage: String,
-        isHtml: Boolean = false,
-    ): Result<String>
-
-    /**
-     * Translate a batch of [texts] in one call, returning the translations in the same order. Used for
-     * page translation, where each entry is the plain text of a DOM text node. Either all succeed or the
-     * call fails.
-     */
-    suspend fun translate(
-        texts: List<String>,
-        sourceLanguage: String,
-        targetLanguage: String,
-        isHtml: Boolean = false,
-    ): Result<List<String>>
+    ): Flow<TranslationStatus>
 }
 
 /**
@@ -80,3 +74,18 @@ data class DetectedLanguage(
     val language: String,
     val confidence: Float,
 )
+
+/** Progress of an in-place [Translator.translatePage] run. */
+sealed class TranslationStatus {
+
+    /** The language-pair model is being fetched; [percent] is 0..100, or null when the size is unknown. */
+    data class DownloadingModel(val percent: Int?) : TranslationStatus()
+
+    /** The model is ready and the page content is being translated and written back. */
+    data object Translating : TranslationStatus()
+
+    /** The page has been translated in place. */
+    data object Completed : TranslationStatus()
+
+    data class Failed(val reason: String? = null) : TranslationStatus()
+}

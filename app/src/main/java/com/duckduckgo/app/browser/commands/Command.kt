@@ -159,38 +159,6 @@ sealed class Command {
         val title: String = "",
     ) : Command()
 
-    /**
-     * Show the translate dialog. [detectedLanguage] is the ISO 639-1 code of the current page's
-     * detected language, or null when auto-detection was unavailable or failed.
-     */
-    data class ShowTranslateLanguageDialog(
-        val detectedLanguage: String?,
-    ) : Command()
-
-    /** Show/update the progress dialog while the model downloads. [percent] is 0..100, or null if unknown. */
-    data class ShowModelDownloadProgress(
-        val percent: Int?,
-    ) : Command()
-
-    /** Show a blocking spinner while the page is being translated to [targetLanguage] (ISO 639-1 code). */
-    data class ShowTranslationInProgress(
-        val targetLanguage: String,
-    ) : Command()
-
-    /**
-     * Write the translations back into the live page in place: [blockTranslations] as innerHTML for the
-     * collected block fragments, [textTranslations] as nodeValue for the orphan text nodes — both in
-     * extraction order.
-     */
-    data class ApplyPageTranslation(
-        val blockTranslations: List<String>,
-        val textTranslations: List<String>,
-    ) : Command()
-
-    data class ShowTranslationError(
-        val reason: String,
-    ) : Command()
-
     class SharePromoLinkRMF(
         val url: String,
         val shareTitle: String,

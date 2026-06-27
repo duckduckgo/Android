@@ -377,6 +377,8 @@ import com.duckduckgo.site.permissions.api.SitePermissionsDialogLauncher
 import com.duckduckgo.site.permissions.api.SitePermissionsGrantedListener
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissions
 import com.duckduckgo.subscriptions.api.Subscriptions
+import com.duckduckgo.translations.api.TranslationStatus
+import com.duckduckgo.translations.api.Translator
 import com.duckduckgo.user.agent.api.ClientBrandHintProvider
 import com.duckduckgo.user.agent.api.UserAgentProvider
 import com.duckduckgo.voice.api.VoiceSearchLauncher
@@ -443,6 +445,9 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var fireDialogProvider: FireDialogProvider
+
+    @Inject
+    lateinit var translator: Translator
 
     override val coroutineContext: CoroutineContext
         get() = supervisorJob + dispatchers.main()
@@ -840,6 +845,10 @@ class BrowserTabFragment :
 
     private var translationProgressDialog: DaxAlertDialog? = null
     private var translationProgressBinding: DialogTranslationProgressBinding? = null
+
+    // The page language detected when the translate dialog was opened, reused as the source when the user
+    // picks a target. Falls back to English if detection was unavailable.
+    private var detectedPageLanguage: String? = null
     private var isWebViewGestureInProgress = false
     private var lastTouchX: Float = 0f
     private var lastTouchY: Float = 0f
@@ -1856,7 +1865,7 @@ class BrowserTabFragment :
                 viewModel.onShareSelected()
             }
             onMenuItemClicked(translatePageMenuItem) {
-                detectPageLanguageAndShowDialog()
+                onTranslatePageMenuClicked()
             }
             onMenuItemClicked(downloadPdfMenuItem) {
                 pixel.fire(PdfPixelName.PDF_DOWNLOAD_MENU_ITEM_PRESSED)
@@ -2867,17 +2876,6 @@ class BrowserTabFragment :
             is Command.FindInPageCommand -> webView?.findAllAsync(it.searchTerm)
             is Command.DismissFindInPage -> webView?.findAllAsync("")
             is Command.ShareLink -> launchSharePageChooser(it.url, it.title)
-            is Command.ShowTranslateLanguageDialog -> showTranslateLanguageDialog(it.detectedLanguage)
-            is Command.ShowModelDownloadProgress -> showModelDownloadProgress(it.percent)
-            is Command.ShowTranslationInProgress -> showTranslatingProgress(it.targetLanguage)
-            is Command.ApplyPageTranslation -> {
-                dismissTranslationProgress()
-                applyPageTranslation(it.blockTranslations, it.textTranslations)
-            }
-            is Command.ShowTranslationError -> {
-                dismissTranslationProgress()
-                Toast.makeText(context?.applicationContext, getString(R.string.browserMenuTranslateFailed, it.reason), Toast.LENGTH_LONG).show()
-            }
             is Command.SharePromoLinkRMF -> launchSharePromoRMFPageChooser(it.url, it.shareTitle)
             is Command.CopyLink -> clipboardManager.setPrimaryClip(ClipData.newPlainText(null, it.url))
             is Command.ShowFileChooser -> launchFilePicker(it.filePathCallback, it.fileChooserParams)
@@ -3748,31 +3746,42 @@ class BrowserTabFragment :
                             showToast(R.string.browserMenuTranslateEmptyLanguage)
                             return
                         }
-                        extractAndTranslatePage(targetLanguage)
+                        translatePage(targetLanguage)
                     }
                 },
             )
             .show()
     }
 
-    // Samples the visible page text and asks the ViewModel to detect its language, then show the dialog.
-    private fun detectPageLanguageAndShowDialog() {
+    // Detects the page's language (off its visible text) and then shows the target-language picker. The
+    // detected language is held as the source for the translation the user kicks off from the dialog.
+    private fun onTranslatePageMenuClicked() {
         val wv = webView ?: return
-        wv.evaluateJavascript("(function() { return document.body ? document.body.innerText.slice(0, 5000) : ''; })();") { result ->
-            viewModel.onTranslateMenuClicked(decodeJavascriptStringResult(result).orEmpty())
+        lifecycleScope.launch {
+            detectedPageLanguage = translator.detectPageLanguage(wv).getOrNull()?.language
+            showTranslateLanguageDialog(detectedPageLanguage)
         }
     }
 
-    // Walks the live DOM collecting block fragments (innerHTML) and orphan text nodes (nodeValue),
-    // stashing references for write-back, then hands them to the ViewModel to translate.
-    private fun extractAndTranslatePage(targetLanguage: String) {
+    // Translates the live page in place to [targetLanguage], driving the progress dialog off the flow.
+    private fun translatePage(targetLanguage: String) {
         val wv = webView ?: return
-        wv.evaluateJavascript(JS_COLLECT_BLOCKS) { result ->
-            val collected = parseCollectedTranslationUnits(result)
-            if (collected.blocks.isEmpty() && collected.texts.isEmpty()) {
-                showToast(R.string.browserMenuTranslatePageUnavailable)
-            } else {
-                viewModel.onTranslatePageRequested(targetLanguage, collected.blocks, collected.texts)
+        val sourceLanguage = detectedPageLanguage ?: DEFAULT_SOURCE_LANGUAGE
+        lifecycleScope.launch {
+            translator.translatePage(wv, sourceLanguage, targetLanguage).collect { status ->
+                when (status) {
+                    is TranslationStatus.DownloadingModel -> showModelDownloadProgress(status.percent)
+                    TranslationStatus.Translating -> showTranslatingProgress(targetLanguage)
+                    TranslationStatus.Completed -> dismissTranslationProgress()
+                    is TranslationStatus.Failed -> {
+                        dismissTranslationProgress()
+                        Toast.makeText(
+                            context?.applicationContext,
+                            getString(R.string.browserMenuTranslateFailed, status.reason),
+                            Toast.LENGTH_LONG,
+                        ).show()
+                    }
+                }
             }
         }
     }
@@ -3812,63 +3821,6 @@ class BrowserTabFragment :
         translationProgressDialog = null
         translationProgressBinding = null
     }
-
-    // Writes translations back in place into the units stashed by JS_COLLECT_BLOCKS: block fragments via
-    // innerHTML (marked data-tk-done), orphan text nodes via nodeValue (flagged __tkDone) — so a re-run
-    // doesn't translate them again.
-    private fun applyPageTranslation(blockTranslations: List<String>, textTranslations: List<String>) {
-        val wv = webView ?: return
-        val blocksJson = JSONArray(blockTranslations).toString()
-        val textsJson = JSONArray(textTranslations).toString()
-        wv.evaluateJavascript(
-            """
-            (function() {
-                var blockTranslations = $blocksJson;
-                var blocks = window.__ddgTranslateBlocks;
-                if (blocks) {
-                    for (var i = 0; i < blocks.length && i < blockTranslations.length; i++) {
-                        blocks[i].innerHTML = blockTranslations[i];
-                        blocks[i].setAttribute('data-tk-done', '');
-                    }
-                }
-                var textTranslations = $textsJson;
-                var textNodes = window.__ddgTranslateTextNodes;
-                if (textNodes) {
-                    for (var k = 0; k < textNodes.length && k < textTranslations.length; k++) {
-                        textNodes[k].nodeValue = textTranslations[k];
-                        textNodes[k].__tkDone = true;
-                    }
-                }
-                window.__ddgTranslateBlocks = null;
-                window.__ddgTranslateTextNodes = null;
-            })();
-            """.trimIndent(),
-            null,
-        )
-    }
-
-    private data class CollectedTranslationUnits(
-        val blocks: List<String>,
-        val texts: List<String>,
-    )
-
-    private fun parseCollectedTranslationUnits(encoded: String?): CollectedTranslationUnits {
-        if (encoded == null || encoded.trim().let { it.isEmpty() || it == "null" }) {
-            return CollectedTranslationUnits(emptyList(), emptyList())
-        }
-        return try {
-            val obj = JSONObject(encoded)
-            CollectedTranslationUnits(
-                blocks = obj.optJSONArray("blocks").toStringList(),
-                texts = obj.optJSONArray("texts").toStringList(),
-            )
-        } catch (_: Exception) {
-            CollectedTranslationUnits(emptyList(), emptyList())
-        }
-    }
-
-    private fun JSONArray?.toStringList(): List<String> =
-        if (this == null) emptyList() else List(length()) { getString(it) }
 
     private fun showAuthenticationDialog(request: BasicAuthenticationRequest) {
         if (!isActiveCustomTab() && !isActiveTab) {
@@ -5539,6 +5491,7 @@ class BrowserTabFragment :
     }
 
     companion object {
+        private const val DEFAULT_SOURCE_LANGUAGE = "en"
         private const val CUSTOM_TAB_TOOLBAR_COLOR_ARG = "CUSTOM_TAB_TOOLBAR_COLOR_ARG"
         private const val TAB_DISPLAYED_IN_CUSTOM_TAB_SCREEN_ARG = "TAB_DISPLAYED_IN_CUSTOM_TAB_SCREEN_ARG"
         private const val TAB_ID_ARG = "TAB_ID_ARG"
@@ -5929,74 +5882,6 @@ class BrowserTabFragment :
                     }
                 }
                 return bestText;
-            })()
-        """
-
-        // Collects two kinds of translation unit, walking the DOM and skipping script/style/etc.,
-        // contentEditable, translate="no", and anything already translated:
-        //  (a) BLOCK fragments — the smallest elements whose element-children are ALL inline (so their
-        //      innerHTML is a clean text + inline-markup fragment: a paragraph, heading, headline-in-an-
-        //      anchor, list item, …). Translated whole as HTML (isHtml=true) and written back via innerHTML.
-        //  (b) ORPHAN text nodes — when descending into a mixed container (one with block-level/custom
-        //      children), its direct child text nodes with real text would otherwise be missed; collected
-        //      and translated as plain text (isHtml=false), written back via nodeValue.
-        // Element refs are stashed on window.__ddgTranslateBlocks / __ddgTranslateTextNodes for write-back;
-        // returns { blocks: [innerHTML…], texts: [nodeValue…] } in order.
-        private const val JS_COLLECT_BLOCKS = """
-            (function() {
-                var INLINE = {
-                    A: 1, SPAN: 1, STRONG: 1, EM: 1, B: 1, I: 1, U: 1, S: 1, SMALL: 1, SUB: 1, SUP: 1,
-                    MARK: 1, ABBR: 1, CITE: 1, Q: 1, TIME: 1, KBD: 1, VAR: 1, SAMP: 1, BDI: 1, BDO: 1,
-                    DFN: 1, DATA: 1, INS: 1, DEL: 1, LABEL: 1, BR: 1, WBR: 1, IMG: 1, PICTURE: 1, FONT: 1,
-                    NOBR: 1, RUBY: 1, RT: 1, RP: 1, OUTPUT: 1, METER: 1, PROGRESS: 1
-                };
-                var SKIP = {
-                    SCRIPT: 1, STYLE: 1, NOSCRIPT: 1, SVG: 1, MATH: 1, CODE: 1, PRE: 1, TEXTAREA: 1,
-                    IFRAME: 1, SELECT: 1
-                };
-                if (!document.body) { return { blocks: [], texts: [] }; }
-
-                function allChildrenInline(el) {
-                    var children = el.children;
-                    for (var i = 0; i < children.length; i++) {
-                        if (!INLINE[children[i].tagName]) { return false; }
-                    }
-                    return true;
-                }
-
-                var blocks = [];
-                var blockHtmls = [];
-                var textNodes = [];
-                var textValues = [];
-                var stack = [document.body];
-                while (stack.length > 0) {
-                    var el = stack.pop();
-                    if (!el || el.nodeType !== 1) { continue; }
-                    if (SKIP[el.tagName] || el.isContentEditable || el.hasAttribute('data-tk-done') || el.getAttribute('translate') === 'no') { continue; }
-                    if (allChildrenInline(el)) {
-                        if (el.textContent && el.textContent.trim().length > 0) {
-                            blocks.push(el);
-                            blockHtmls.push(el.innerHTML);
-                        }
-                        continue; // its children are inline and part of this fragment
-                    }
-                    // Mixed container: collect its direct (orphan) text nodes, then descend into elements.
-                    var childNodes = el.childNodes;
-                    for (var i = 0; i < childNodes.length; i++) {
-                        var n = childNodes[i];
-                        if (n.nodeType === 3 && !n.__tkDone && n.nodeValue && n.nodeValue.trim().length > 0) {
-                            textNodes.push(n);
-                            textValues.push(n.nodeValue);
-                        }
-                    }
-                    var children = el.children;
-                    for (var j = 0; j < children.length; j++) {
-                        stack.push(children[j]);
-                    }
-                }
-                window.__ddgTranslateBlocks = blocks;
-                window.__ddgTranslateTextNodes = textNodes;
-                return { blocks: blockHtmls, texts: textValues };
             })()
         """
 

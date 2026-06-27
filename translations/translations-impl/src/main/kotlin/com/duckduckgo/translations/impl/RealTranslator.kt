@@ -17,11 +17,15 @@
 package com.duckduckgo.translations.impl
 
 import android.content.Context
+import android.webkit.WebView
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.translations.api.DetectedLanguage
+import com.duckduckgo.translations.api.ModelDownloadStatus
+import com.duckduckgo.translations.api.TranslationModelManager
+import com.duckduckgo.translations.api.TranslationStatus
 import com.duckduckgo.translations.api.Translator
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
@@ -29,14 +33,21 @@ import io.github.marcosholgado.translatekit.ModelSpec
 import io.github.marcosholgado.translatekit.TranslateKit
 import io.github.marcosholgado.translatekit.TranslationModel
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import logcat.LogPriority.ERROR
 import logcat.asLog
 import logcat.logcat
+import org.json.JSONArray
+import org.json.JSONObject
+import org.json.JSONTokener
 import javax.inject.Inject
+import kotlin.coroutines.resume
 
 @SingleInstanceIn(AppScope::class)
 @ContributesBinding(AppScope::class)
@@ -46,6 +57,7 @@ class RealTranslator @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val dispatchers: DispatcherProvider,
     private val modelStore: ModelStore,
+    private val modelManager: TranslationModelManager,
 ) : Translator {
 
     // A single loaded model is cached in memory; loadModel mmaps native memory, so we keep one handle
@@ -67,7 +79,13 @@ class RealTranslator @Inject constructor(
 
     override fun isAvailable(): Boolean = isDeviceSupported() && TranslateKit.isInitialized()
 
-    override suspend fun detectLanguage(text: String): Result<DetectedLanguage> = withContext(dispatchers.io()) {
+    override suspend fun detectPageLanguage(webView: WebView): Result<DetectedLanguage?> {
+        val sample = decodeJavascriptStringResult(evaluateJavascript(webView, TranslationDomJs.DETECT_SAMPLE))
+        if (sample.isNullOrBlank()) return Result.success(null)
+        return detectLanguage(sample).map { it }
+    }
+
+    private suspend fun detectLanguage(text: String): Result<DetectedLanguage> = withContext(dispatchers.io()) {
         if (!isAvailable()) {
             return@withContext Result.failure(IllegalStateException("On-device translation engine is unavailable"))
         }
@@ -77,26 +95,58 @@ class RealTranslator @Inject constructor(
         }
     }
 
-    override suspend fun translate(
-        text: String,
+    override fun translatePage(
+        webView: WebView,
         sourceLanguage: String,
         targetLanguage: String,
-        isHtml: Boolean,
-    ): Result<String> = withContext(dispatchers.io()) {
-        if (!isAvailable()) {
-            return@withContext Result.failure(IllegalStateException("On-device translation engine is unavailable"))
-        }
-        runCatching {
-            modelLock.withLock {
-                val model = loadedModelFor(sourceLanguage, targetLanguage)
-                model.translate(text, isHtml).text
+    ): Flow<TranslationStatus> = flow {
+        // Models are downloaded on demand: if the pair isn't present, fetch it (surfacing progress) first.
+        if (!modelManager.isModelDownloaded(sourceLanguage, targetLanguage)) {
+            var downloadError: String? = null
+            modelManager.downloadModel(sourceLanguage, targetLanguage).collect { status ->
+                when (status) {
+                    is ModelDownloadStatus.InProgress -> emit(TranslationStatus.DownloadingModel(status.percent))
+                    is ModelDownloadStatus.Failed -> downloadError = status.reason ?: "Model download failed"
+                    ModelDownloadStatus.Completed -> {}
+                }
             }
-        }.onFailure {
-            logcat(ERROR) { "Translation failed ($sourceLanguage-$targetLanguage): ${it.asLog()}" }
+            downloadError?.let {
+                emit(TranslationStatus.Failed(it))
+                return@flow
+            }
+        }
+
+        emit(TranslationStatus.Translating)
+        // Walk the live DOM, collecting block fragments (innerHTML) and orphan text nodes (nodeValue) and
+        // stashing references for write-back.
+        val collected = collectTranslationUnits(webView)
+        if (collected.blocks.isEmpty() && collected.texts.isEmpty()) {
+            // Nothing translatable on the page (or everything is already translated): a no-op success.
+            emit(TranslationStatus.Completed)
+            return@flow
+        }
+
+        // Block fragments translate as HTML (engine splits sentences and re-projects inline tags); orphan
+        // text nodes are plain text. Both are written back in place via the WebView.
+        val blockResult = translateBatchOrEmpty(collected.blocks, sourceLanguage, targetLanguage, isHtml = true)
+        val textResult = translateBatchOrEmpty(collected.texts, sourceLanguage, targetLanguage, isHtml = false)
+        when {
+            blockResult.isFailure -> emit(TranslationStatus.Failed(blockResult.failureMessage()))
+            textResult.isFailure -> emit(TranslationStatus.Failed(textResult.failureMessage()))
+            else -> {
+                applyTranslations(
+                    webView,
+                    blockTranslations = blockResult.getOrDefault(emptyList()),
+                    textTranslations = textResult.getOrDefault(emptyList()),
+                )
+                emit(TranslationStatus.Completed)
+            }
         }
     }
 
-    override suspend fun translate(
+    // Translate a batch of texts in one call, returning them in order. Impl-internal: only page translation
+    // needs it, and it stays off the public Translator surface.
+    private suspend fun translateBatch(
         texts: List<String>,
         sourceLanguage: String,
         targetLanguage: String,
@@ -114,6 +164,76 @@ class RealTranslator @Inject constructor(
             logcat(ERROR) { "Batch translation failed ($sourceLanguage-$targetLanguage, ${texts.size} nodes): ${it.asLog()}" }
         }
     }
+
+    private suspend fun translateBatchOrEmpty(
+        texts: List<String>,
+        sourceLanguage: String,
+        targetLanguage: String,
+        isHtml: Boolean,
+    ): Result<List<String>> =
+        if (texts.isEmpty()) {
+            Result.success(emptyList())
+        } else {
+            translateBatch(texts, sourceLanguage, targetLanguage, isHtml)
+        }
+
+    private fun Result<List<String>>.failureMessage(): String =
+        exceptionOrNull()?.let { it.message ?: it.javaClass.simpleName } ?: "Translation failed"
+
+    private suspend fun collectTranslationUnits(webView: WebView): CollectedTranslationUnits {
+        val encoded = evaluateJavascript(webView, TranslationDomJs.COLLECT_UNITS)
+        if (encoded == null || encoded.trim().let { it.isEmpty() || it == "null" }) {
+            return CollectedTranslationUnits(emptyList(), emptyList())
+        }
+        return try {
+            val obj = JSONObject(encoded)
+            CollectedTranslationUnits(
+                blocks = obj.optJSONArray("blocks").toStringList(),
+                texts = obj.optJSONArray("texts").toStringList(),
+            )
+        } catch (_: Exception) {
+            CollectedTranslationUnits(emptyList(), emptyList())
+        }
+    }
+
+    private suspend fun applyTranslations(
+        webView: WebView,
+        blockTranslations: List<String>,
+        textTranslations: List<String>,
+    ) {
+        val blocksJson = JSONArray(blockTranslations).toString()
+        val textsJson = JSONArray(textTranslations).toString()
+        evaluateJavascript(webView, TranslationDomJs.applyTranslations(blocksJson, textsJson))
+    }
+
+    // Evaluates [js] in [webView] and resumes with the raw JSON-encoded result. evaluateJavascript must be
+    // called on the main thread; the native translate work stays off it.
+    private suspend fun evaluateJavascript(webView: WebView, js: String): String? =
+        withContext(dispatchers.main()) {
+            suspendCancellableCoroutine<String?> { continuation ->
+                webView.evaluateJavascript(js) { result ->
+                    continuation.resume(result)
+                }
+            }
+        }
+
+    /** Decodes a JSON-encoded string from [WebView.evaluateJavascript] (escapes quotes, newlines, etc.). */
+    private fun decodeJavascriptStringResult(encoded: String?): String? {
+        if (encoded == null) return null
+        val trimmed = encoded.trim()
+        if (trimmed.isEmpty() || trimmed == "null") return null
+        return try {
+            when (val value = JSONTokener(trimmed).nextValue()) {
+                is String -> value.takeIf { it.isNotEmpty() }
+                else -> null
+            }
+        } catch (_: Exception) {
+            trimmed.trim('"').takeIf { it.isNotEmpty() && it != "null" }
+        }
+    }
+
+    private fun JSONArray?.toStringList(): List<String> =
+        if (this == null) emptyList() else List(length()) { getString(it) }
 
     // Returns the loaded handle for the pair, loading it (and closing any previously loaded one) on a
     // cache miss. Must be called under [modelLock]. Throws if the model has not been downloaded.
@@ -145,4 +265,9 @@ class RealTranslator @Inject constructor(
     private val MIN_SUPPORTED_SDK = 28
 
     private fun isDeviceSupported(): Boolean = appBuildConfig.sdkInt >= MIN_SUPPORTED_SDK
+
+    private data class CollectedTranslationUnits(
+        val blocks: List<String>,
+        val texts: List<String>,
+    )
 }

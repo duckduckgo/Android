@@ -15,22 +15,22 @@
  */
 
 plugins {
-    id 'java-library'
-    id 'kotlin'
+    id 'com.android.library'
+    id 'kotlin-android'
 }
 
-apply from: "$rootProject.projectDir/code-formatting.gradle"
+apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
-java {
-    sourceCompatibility = JavaVersion.VERSION_17
-    targetCompatibility = JavaVersion.VERSION_17
-}
-
-kotlin {
-    jvmToolchain(21)
+android {
+    namespace "com.duckduckgo.translations.api"
+    compileOptions {
+        coreLibraryDesugaringEnabled = true
+    }
 }
 
 dependencies {
-    implementation Kotlin.stdlib.jdk7
     implementation KotlinX.coroutines.core
+    implementation AndroidX.appCompat
+
+    coreLibraryDesugaring Android.tools.desugarJdkLibs
 }

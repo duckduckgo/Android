@@ -72,7 +72,6 @@ import com.duckduckgo.app.browser.certificates.BypassedSSLCertificatesRepository
 import com.duckduckgo.app.browser.certificates.remoteconfig.SSLCertificatesFeature
 import com.duckduckgo.app.browser.commands.Command
 import com.duckduckgo.app.browser.commands.Command.AddHomeShortcut
-import com.duckduckgo.app.browser.commands.Command.ApplyPageTranslation
 import com.duckduckgo.app.browser.commands.Command.AskToAutomateFireproofWebsite
 import com.duckduckgo.app.browser.commands.Command.AskToDisableLoginDetection
 import com.duckduckgo.app.browser.commands.Command.AskToFireproofWebsite
@@ -157,16 +156,12 @@ import com.duckduckgo.app.browser.commands.Command.ShowFireproofWebSiteConfirmat
 import com.duckduckgo.app.browser.commands.Command.ShowFullScreen
 import com.duckduckgo.app.browser.commands.Command.ShowImageCamera
 import com.duckduckgo.app.browser.commands.Command.ShowKeyboard
-import com.duckduckgo.app.browser.commands.Command.ShowModelDownloadProgress
 import com.duckduckgo.app.browser.commands.Command.ShowPdfInTab
 import com.duckduckgo.app.browser.commands.Command.ShowRemoveSearchSuggestionDialog
 import com.duckduckgo.app.browser.commands.Command.ShowSSLError
 import com.duckduckgo.app.browser.commands.Command.ShowSavedSiteAddedConfirmation
 import com.duckduckgo.app.browser.commands.Command.ShowSitePermissionsDialog
 import com.duckduckgo.app.browser.commands.Command.ShowSoundRecorder
-import com.duckduckgo.app.browser.commands.Command.ShowTranslateLanguageDialog
-import com.duckduckgo.app.browser.commands.Command.ShowTranslationError
-import com.duckduckgo.app.browser.commands.Command.ShowTranslationInProgress
 import com.duckduckgo.app.browser.commands.Command.ShowUserCredentialSavedOrUpdatedConfirmation
 import com.duckduckgo.app.browser.commands.Command.ShowVideoCamera
 import com.duckduckgo.app.browser.commands.Command.ShowWarningMaliciousSite
@@ -417,9 +412,6 @@ import com.duckduckgo.subscriptions.api.SUBSCRIPTIONS_FEATURE_NAME
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.subscriptions.api.SubscriptionsJSHelper
 import com.duckduckgo.sync.api.favicons.FaviconsFetchingPrompt
-import com.duckduckgo.translations.api.ModelDownloadStatus
-import com.duckduckgo.translations.api.TranslationModelManager
-import com.duckduckgo.translations.api.Translator
 import dagger.Lazy
 import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.CoroutineScope
@@ -586,8 +578,6 @@ class BrowserTabViewModel @Inject constructor(
     private val autocompleteHistoryDeleteFeature: AutocompleteHistoryDeleteFeature,
     private val customAiOnboardingStore: CustomAiOnboardingStore,
     private val browserMode: BrowserMode,
-    private val translator: Translator,
-    private val translationModelManager: TranslationModelManager,
 ) : ViewModel(),
     WebViewClientListener,
     EditSavedSiteListener,
@@ -3417,77 +3407,6 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
-    // The page language detected when the translate dialog was opened, reused as the source when the
-    // user picks a target. Falls back to English if detection was unavailable.
-    private var detectedSourceLanguage: String? = null
-
-    fun onTranslateMenuClicked(pageText: String) {
-        viewModelScope.launch(dispatchers.io()) {
-            // Detect from the visible page text (not the title): the title lives in <head> and isn't
-            // translated, so after a first translation it would still report the original language.
-            val sample = pageText.ifBlank { title.orEmpty() }
-            val detectedLanguage = translator.detectLanguage(sample).getOrNull()?.language
-            detectedSourceLanguage = detectedLanguage
-            withContext(dispatchers.main()) {
-                command.value = ShowTranslateLanguageDialog(detectedLanguage)
-            }
-        }
-    }
-
-    fun onTranslatePageRequested(targetLanguage: String, blocks: List<String>, textNodes: List<String>) {
-        val sourceLanguage = detectedSourceLanguage ?: DEFAULT_SOURCE_LANGUAGE
-        viewModelScope.launch(dispatchers.io()) {
-            // Models are downloaded on demand: if the pair isn't present, fetch it (surfacing progress in
-            // the dialog) before translating.
-            if (!translationModelManager.isModelDownloaded(sourceLanguage, targetLanguage)) {
-                var downloadError: String? = null
-                translationModelManager.downloadModel(sourceLanguage, targetLanguage).collect { status ->
-                    when (status) {
-                        is ModelDownloadStatus.InProgress ->
-                            withContext(dispatchers.main()) { command.value = ShowModelDownloadProgress(status.percent) }
-                        is ModelDownloadStatus.Failed -> downloadError = status.reason ?: "Model download failed"
-                        ModelDownloadStatus.Completed -> {}
-                    }
-                }
-                val error = downloadError
-                if (error != null) {
-                    withContext(dispatchers.main()) { command.value = ShowTranslationError(error) }
-                    return@launch
-                }
-            }
-            withContext(dispatchers.main()) { command.value = ShowTranslationInProgress(targetLanguage) }
-            // Block fragments translate as HTML (engine splits sentences and re-projects inline tags);
-            // orphan text nodes are plain text. The WebView writes both back in place.
-            val blockResult = translateBatchOrEmpty(blocks, sourceLanguage, targetLanguage, isHtml = true)
-            val textResult = translateBatchOrEmpty(textNodes, sourceLanguage, targetLanguage, isHtml = false)
-            withContext(dispatchers.main()) {
-                command.value = when {
-                    blockResult.isFailure -> ShowTranslationError(blockResult.failureMessage())
-                    textResult.isFailure -> ShowTranslationError(textResult.failureMessage())
-                    else -> ApplyPageTranslation(
-                        blockTranslations = blockResult.getOrDefault(emptyList()),
-                        textTranslations = textResult.getOrDefault(emptyList()),
-                    )
-                }
-            }
-        }
-    }
-
-    private suspend fun translateBatchOrEmpty(
-        texts: List<String>,
-        sourceLanguage: String,
-        targetLanguage: String,
-        isHtml: Boolean,
-    ): Result<List<String>> =
-        if (texts.isEmpty()) {
-            Result.success(emptyList())
-        } else {
-            translator.translate(texts = texts, sourceLanguage = sourceLanguage, targetLanguage = targetLanguage, isHtml = isHtml)
-        }
-
-    private fun Result<List<String>>.failureMessage(): String =
-        exceptionOrNull()?.let { it.message ?: it.javaClass.simpleName } ?: "Translation failed"
-
     fun determineShowBrowser() {
         val showBrowser = currentBrowserViewState().browserShowing || !url.isNullOrBlank()
         browserViewState.value = currentBrowserViewState().copy(browserShowing = showBrowser)
@@ -5745,7 +5664,6 @@ class BrowserTabViewModel @Inject constructor(
         private const val CLIENT_SIDE_HIT_KEY = "clientSideHit"
 
         private const val ABOUT_BLANK = "about:blank"
-        private const val DEFAULT_SOURCE_LANGUAGE = "en"
 
         // https://www.iso.org/iso-3166-country-codes.html
         private val PRINT_LETTER_FORMAT_COUNTRIES_ISO3166_2 =
