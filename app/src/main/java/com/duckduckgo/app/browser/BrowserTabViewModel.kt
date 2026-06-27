@@ -3434,7 +3434,7 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
-    fun onTranslatePageRequested(targetLanguage: String, blocks: List<String>) {
+    fun onTranslatePageRequested(targetLanguage: String, blocks: List<String>, textNodes: List<String>) {
         val sourceLanguage = detectedSourceLanguage ?: DEFAULT_SOURCE_LANGUAGE
         viewModelScope.launch(dispatchers.io()) {
             // Models are downloaded on demand: if the pair isn't present, fetch it (surfacing progress in
@@ -3456,22 +3456,37 @@ class BrowserTabViewModel @Inject constructor(
                 }
             }
             withContext(dispatchers.main()) { command.value = ShowTranslationInProgress(targetLanguage) }
-            // Translate each block-level element's innerHTML as one HTML fragment, so the engine splits
-            // sentences and re-projects inline tags itself; the WebView writes the results back in place.
-            val result = translator.translate(
-                texts = blocks,
-                sourceLanguage = sourceLanguage,
-                targetLanguage = targetLanguage,
-                isHtml = true,
-            )
+            // Block fragments translate as HTML (engine splits sentences and re-projects inline tags);
+            // orphan text nodes are plain text. The WebView writes both back in place.
+            val blockResult = translateBatchOrEmpty(blocks, sourceLanguage, targetLanguage, isHtml = true)
+            val textResult = translateBatchOrEmpty(textNodes, sourceLanguage, targetLanguage, isHtml = false)
             withContext(dispatchers.main()) {
-                command.value = result.fold(
-                    onSuccess = { ApplyPageTranslation(translations = it) },
-                    onFailure = { ShowTranslationError(it.message ?: it.javaClass.simpleName) },
-                )
+                command.value = when {
+                    blockResult.isFailure -> ShowTranslationError(blockResult.failureMessage())
+                    textResult.isFailure -> ShowTranslationError(textResult.failureMessage())
+                    else -> ApplyPageTranslation(
+                        blockTranslations = blockResult.getOrDefault(emptyList()),
+                        textTranslations = textResult.getOrDefault(emptyList()),
+                    )
+                }
             }
         }
     }
+
+    private suspend fun translateBatchOrEmpty(
+        texts: List<String>,
+        sourceLanguage: String,
+        targetLanguage: String,
+        isHtml: Boolean,
+    ): Result<List<String>> =
+        if (texts.isEmpty()) {
+            Result.success(emptyList())
+        } else {
+            translator.translate(texts = texts, sourceLanguage = sourceLanguage, targetLanguage = targetLanguage, isHtml = isHtml)
+        }
+
+    private fun Result<List<String>>.failureMessage(): String =
+        exceptionOrNull()?.let { it.message ?: it.javaClass.simpleName } ?: "Translation failed"
 
     fun determineShowBrowser() {
         val showBrowser = currentBrowserViewState().browserShowing || !url.isNullOrBlank()

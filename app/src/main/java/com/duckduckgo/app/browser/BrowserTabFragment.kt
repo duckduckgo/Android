@@ -2872,7 +2872,7 @@ class BrowserTabFragment :
             is Command.ShowTranslationInProgress -> showTranslatingProgress(it.targetLanguage)
             is Command.ApplyPageTranslation -> {
                 dismissTranslationProgress()
-                applyPageTranslation(it.translations)
+                applyPageTranslation(it.blockTranslations, it.textTranslations)
             }
             is Command.ShowTranslationError -> {
                 dismissTranslationProgress()
@@ -3763,16 +3763,16 @@ class BrowserTabFragment :
         }
     }
 
-    // Walks the live DOM collecting block-level elements' innerHTML (stashing references for write-back),
-    // then hands those HTML fragments to the ViewModel to translate as whole fragments.
+    // Walks the live DOM collecting block fragments (innerHTML) and orphan text nodes (nodeValue),
+    // stashing references for write-back, then hands them to the ViewModel to translate.
     private fun extractAndTranslatePage(targetLanguage: String) {
         val wv = webView ?: return
         wv.evaluateJavascript(JS_COLLECT_BLOCKS) { result ->
-            val blocks = parseJsonStringArray(result)
-            if (blocks.isEmpty()) {
+            val collected = parseCollectedTranslationUnits(result)
+            if (collected.blocks.isEmpty() && collected.texts.isEmpty()) {
                 showToast(R.string.browserMenuTranslatePageUnavailable)
             } else {
-                viewModel.onTranslatePageRequested(targetLanguage, blocks)
+                viewModel.onTranslatePageRequested(targetLanguage, collected.blocks, collected.texts)
             }
         }
     }
@@ -3813,37 +3813,62 @@ class BrowserTabFragment :
         translationProgressBinding = null
     }
 
-    // Writes the translated HTML fragments back into the block elements stashed by JS_COLLECT_BLOCKS, in
-    // place (setting innerHTML and marking each data-tk-done so it isn't retranslated).
-    private fun applyPageTranslation(translations: List<String>) {
+    // Writes translations back in place into the units stashed by JS_COLLECT_BLOCKS: block fragments via
+    // innerHTML (marked data-tk-done), orphan text nodes via nodeValue (flagged __tkDone) — so a re-run
+    // doesn't translate them again.
+    private fun applyPageTranslation(blockTranslations: List<String>, textTranslations: List<String>) {
         val wv = webView ?: return
-        val json = JSONArray(translations).toString()
+        val blocksJson = JSONArray(blockTranslations).toString()
+        val textsJson = JSONArray(textTranslations).toString()
         wv.evaluateJavascript(
             """
             (function() {
-                var translations = $json;
+                var blockTranslations = $blocksJson;
                 var blocks = window.__ddgTranslateBlocks;
-                if (!blocks) { return; }
-                for (var i = 0; i < blocks.length && i < translations.length; i++) {
-                    blocks[i].innerHTML = translations[i];
-                    blocks[i].setAttribute('data-tk-done', '');
+                if (blocks) {
+                    for (var i = 0; i < blocks.length && i < blockTranslations.length; i++) {
+                        blocks[i].innerHTML = blockTranslations[i];
+                        blocks[i].setAttribute('data-tk-done', '');
+                    }
+                }
+                var textTranslations = $textsJson;
+                var textNodes = window.__ddgTranslateTextNodes;
+                if (textNodes) {
+                    for (var k = 0; k < textNodes.length && k < textTranslations.length; k++) {
+                        textNodes[k].nodeValue = textTranslations[k];
+                        textNodes[k].__tkDone = true;
+                    }
                 }
                 window.__ddgTranslateBlocks = null;
+                window.__ddgTranslateTextNodes = null;
             })();
             """.trimIndent(),
             null,
         )
     }
 
-    private fun parseJsonStringArray(encoded: String?): List<String> {
-        if (encoded == null || encoded.trim().let { it.isEmpty() || it == "null" }) return emptyList()
+    private data class CollectedTranslationUnits(
+        val blocks: List<String>,
+        val texts: List<String>,
+    )
+
+    private fun parseCollectedTranslationUnits(encoded: String?): CollectedTranslationUnits {
+        if (encoded == null || encoded.trim().let { it.isEmpty() || it == "null" }) {
+            return CollectedTranslationUnits(emptyList(), emptyList())
+        }
         return try {
-            val array = JSONArray(encoded)
-            List(array.length()) { array.getString(it) }
+            val obj = JSONObject(encoded)
+            CollectedTranslationUnits(
+                blocks = obj.optJSONArray("blocks").toStringList(),
+                texts = obj.optJSONArray("texts").toStringList(),
+            )
         } catch (_: Exception) {
-            emptyList()
+            CollectedTranslationUnits(emptyList(), emptyList())
         }
     }
+
+    private fun JSONArray?.toStringList(): List<String> =
+        if (this == null) emptyList() else List(length()) { getString(it) }
 
     private fun showAuthenticationDialog(request: BasicAuthenticationRequest) {
         if (!isActiveCustomTab() && !isActiveTab) {
@@ -5907,12 +5932,16 @@ class BrowserTabFragment :
             })()
         """
 
-        // Collects the smallest elements whose child elements are ALL inline — i.e. whose innerHTML is a
-        // clean text + inline-markup fragment (a paragraph, heading, headline-in-an-anchor, list item,
-        // etc.). Each such fragment is translated whole (isHtml=true) so the engine keeps inline tags in
-        // place. Elements with block-level/custom-element children are descended into instead. Skips
-        // script/style/etc. and anything already translated. Stashes element references on
-        // window.__ddgTranslateBlocks for in-place write-back; returns each fragment's innerHTML in order.
+        // Collects two kinds of translation unit, walking the DOM and skipping script/style/etc.,
+        // contentEditable, translate="no", and anything already translated:
+        //  (a) BLOCK fragments — the smallest elements whose element-children are ALL inline (so their
+        //      innerHTML is a clean text + inline-markup fragment: a paragraph, heading, headline-in-an-
+        //      anchor, list item, …). Translated whole as HTML (isHtml=true) and written back via innerHTML.
+        //  (b) ORPHAN text nodes — when descending into a mixed container (one with block-level/custom
+        //      children), its direct child text nodes with real text would otherwise be missed; collected
+        //      and translated as plain text (isHtml=false), written back via nodeValue.
+        // Element refs are stashed on window.__ddgTranslateBlocks / __ddgTranslateTextNodes for write-back;
+        // returns { blocks: [innerHTML…], texts: [nodeValue…] } in order.
         private const val JS_COLLECT_BLOCKS = """
             (function() {
                 var INLINE = {
@@ -5925,7 +5954,7 @@ class BrowserTabFragment :
                     SCRIPT: 1, STYLE: 1, NOSCRIPT: 1, SVG: 1, MATH: 1, CODE: 1, PRE: 1, TEXTAREA: 1,
                     IFRAME: 1, SELECT: 1
                 };
-                if (!document.body) { return []; }
+                if (!document.body) { return { blocks: [], texts: [] }; }
 
                 function allChildrenInline(el) {
                     var children = el.children;
@@ -5936,7 +5965,9 @@ class BrowserTabFragment :
                 }
 
                 var blocks = [];
-                var htmls = [];
+                var blockHtmls = [];
+                var textNodes = [];
+                var textValues = [];
                 var stack = [document.body];
                 while (stack.length > 0) {
                     var el = stack.pop();
@@ -5945,17 +5976,27 @@ class BrowserTabFragment :
                     if (allChildrenInline(el)) {
                         if (el.textContent && el.textContent.trim().length > 0) {
                             blocks.push(el);
-                            htmls.push(el.innerHTML);
+                            blockHtmls.push(el.innerHTML);
                         }
                         continue; // its children are inline and part of this fragment
                     }
+                    // Mixed container: collect its direct (orphan) text nodes, then descend into elements.
+                    var childNodes = el.childNodes;
+                    for (var i = 0; i < childNodes.length; i++) {
+                        var n = childNodes[i];
+                        if (n.nodeType === 3 && !n.__tkDone && n.nodeValue && n.nodeValue.trim().length > 0) {
+                            textNodes.push(n);
+                            textValues.push(n.nodeValue);
+                        }
+                    }
                     var children = el.children;
-                    for (var i = 0; i < children.length; i++) {
-                        stack.push(children[i]);
+                    for (var j = 0; j < children.length; j++) {
+                        stack.push(children[j]);
                     }
                 }
                 window.__ddgTranslateBlocks = blocks;
-                return htmls;
+                window.__ddgTranslateTextNodes = textNodes;
+                return { blocks: blockHtmls, texts: textValues };
             })()
         """
 

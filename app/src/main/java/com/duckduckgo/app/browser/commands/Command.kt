@@ -177,9 +177,14 @@ sealed class Command {
         val targetLanguage: String,
     ) : Command()
 
-    /** Write [translations] back into the live page's text nodes (in extraction order), in place. */
+    /**
+     * Write the translations back into the live page in place: [blockTranslations] as innerHTML for the
+     * collected block fragments, [textTranslations] as nodeValue for the orphan text nodes — both in
+     * extraction order.
+     */
     data class ApplyPageTranslation(
-        val translations: List<String>,
+        val blockTranslations: List<String>,
+        val textTranslations: List<String>,
     ) : Command()
 
     data class ShowTranslationError(
