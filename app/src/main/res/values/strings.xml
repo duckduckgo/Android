@@ -552,9 +552,8 @@
 
     <!-- Translate -->
     <string name="browserMenuTranslateDialogTitle">Translate page</string>
-    <string name="browserMenuTranslateLanguageHint">Target language (e.g. es)</string>
+    <string name="browserMenuTranslateLanguageHint">Translate to</string>
     <string name="browserMenuTranslateAction">Translate</string>
-    <string name="browserMenuTranslateEmptyLanguage">Please enter a target language</string>
     <string name="browserMenuTranslateFailed">Translation failed: %1$s</string>
     <string name="browserMenuTranslateLanguageDetected">Language detected: %1$s</string>
     <string name="browserMenuTranslateLanguageDetectFailed">Couldn\'t auto detect language</string>

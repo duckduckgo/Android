@@ -61,6 +61,7 @@ import android.webkit.WebView.HitTestResult
 import android.webkit.WebView.HitTestResult.IMAGE_TYPE
 import android.webkit.WebView.HitTestResult.SRC_IMAGE_ANCHOR_TYPE
 import android.webkit.WebView.HitTestResult.UNKNOWN_TYPE
+import android.widget.ArrayAdapter
 import android.widget.FrameLayout
 import android.widget.Toast
 import androidx.activity.result.ActivityResult
@@ -3733,6 +3734,20 @@ class BrowserTabFragment :
         } else {
             getString(R.string.browserMenuTranslateLanguageDetectFailed)
         }
+
+        // Populate the target-language dropdown and preselect the device's language, so a single tap on the
+        // action translates into what the user reads.
+        val options = targetLanguageOptions()
+        val deviceLanguage = Locale.getDefault().language
+        var selectedLanguage = options.firstOrNull { it.code == deviceLanguage }?.code ?: options.first().code
+        inputBinding.translateLanguageInput.setAdapter(
+            ArrayAdapter(requireContext(), android.R.layout.simple_list_item_1, options.map { it.displayName }),
+        )
+        inputBinding.translateLanguageInput.setText(options.first { it.code == selectedLanguage }.displayName, false)
+        inputBinding.translateLanguageInput.setOnItemClickListener { _, _, position, _ ->
+            selectedLanguage = options[position].code
+        }
+
         CustomAlertDialogBuilder(requireContext())
             .setTitle(R.string.browserMenuTranslateDialogTitle)
             .setPositiveButton(R.string.browserMenuTranslateAction)
@@ -3741,17 +3756,24 @@ class BrowserTabFragment :
             .addEventListener(
                 object : CustomAlertDialogBuilder.EventListener() {
                     override fun onPositiveButtonClicked() {
-                        val targetLanguage = inputBinding.translateLanguageInput.text.trim()
-                        if (targetLanguage.isEmpty()) {
-                            showToast(R.string.browserMenuTranslateEmptyLanguage)
-                            return
-                        }
-                        translatePage(targetLanguage)
+                        translatePage(selectedLanguage)
                     }
                 },
             )
             .show()
     }
+
+    // The target languages offered in the translate dialog, by display name (localised to the device) and
+    // ISO 639-1 code. Curated for now; ideally this would reflect the models actually available to download.
+    private fun targetLanguageOptions(): List<LanguageOption> =
+        TRANSLATABLE_LANGUAGE_CODES
+            .map { code -> LanguageOption(code, Locale(code).displayLanguage.replaceFirstChar { it.uppercase() }) }
+            .sortedBy { it.displayName }
+
+    private data class LanguageOption(
+        val code: String,
+        val displayName: String,
+    )
 
     // Detects the page's language (off its visible text) and then shows the target-language picker. The
     // detected language is held as the source for the translation the user kicks off from the dialog.
@@ -5492,6 +5514,14 @@ class BrowserTabFragment :
 
     companion object {
         private const val DEFAULT_SOURCE_LANGUAGE = "en"
+
+        // Target languages offered for page translation (ISO 639-1). Curated to ones with on-device models;
+        // see targetLanguageOptions().
+        private val TRANSLATABLE_LANGUAGE_CODES = listOf(
+            "bg", "cs", "da", "de", "el", "en", "es", "et", "fi", "fr", "hu", "id", "it",
+            "nb", "nl", "pl", "pt", "ro", "ru", "sk", "sl", "sv", "tr", "uk",
+        )
+
         private const val CUSTOM_TAB_TOOLBAR_COLOR_ARG = "CUSTOM_TAB_TOOLBAR_COLOR_ARG"
         private const val TAB_DISPLAYED_IN_CUSTOM_TAB_SCREEN_ARG = "TAB_DISPLAYED_IN_CUSTOM_TAB_SCREEN_ARG"
         private const val TAB_ID_ARG = "TAB_ID_ARG"

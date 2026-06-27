@@ -27,12 +27,20 @@
         android:layout_height="wrap_content"
         app:typography="body2" />
 
-    <com.duckduckgo.common.ui.view.text.DaxTextInput
-        android:id="@+id/translateLanguageInput"
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/translateLanguageInputLayout"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/keyline_4"
-        android:hint="@string/browserMenuTranslateLanguageHint"
-        android:inputType="text" />
+        android:hint="@string/browserMenuTranslateLanguageHint">
+
+        <com.google.android.material.textfield.MaterialAutoCompleteTextView
+            android:id="@+id/translateLanguageInput"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="none" />
+
+    </com.google.android.material.textfield.TextInputLayout>
 
 </LinearLayout>
