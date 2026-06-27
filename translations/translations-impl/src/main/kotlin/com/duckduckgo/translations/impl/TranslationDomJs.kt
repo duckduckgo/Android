@@ -20,8 +20,17 @@ package com.duckduckgo.translations.impl
  * The JavaScript that drives in-place page translation, run against the live DOM via
  * [android.webkit.WebView.evaluateJavascript]. Kept here, isolated from the orchestration, because it is
  * verified verbatim against a jsdom harness — do not reformat the algorithm.
+ *
+ * Note: this is a one-shot pass over the current DOM. Content inserted *after* translation (lazy-loaded
+ * sections, infinite scroll, SPA navigation, AJAX-injected widgets) is not picked up — covering that needs
+ * a MutationObserver that re-translates new subtrees, which is a separate follow-up.
  */
 internal object TranslationDomJs {
+
+    // Blocks that aren't laid out (display:none, detached) report a zero-size rect; we sort them last so
+    // currently-visible content is translated first, but still translate them (a collapsed carousel/menu is
+    // already in the target language by the time the user reveals it). Must match HIDDEN_BLOCK_TOP in Kotlin.
+    private const val HIDDEN_TOP = 1_000_000_000
 
     /** Samples the visible page text used for language detection. Returns a JSON-encoded string. */
     const val DETECT_SAMPLE = "(function() { return document.body ? document.body.innerText.slice(0, 5000) : ''; })();"
@@ -34,9 +43,11 @@ internal object TranslationDomJs {
     //  (b) ORPHAN text nodes — when descending into a mixed container (one with block-level/custom
     //      children), its direct child text nodes with real text would otherwise be missed; collected
     //      and translated as plain text (isHtml=false), written back via nodeValue.
-    // Element refs are stashed on window.__ddgTranslateBlocks / __ddgTranslateTextNodes for write-back;
-    // returns { blocks: [innerHTML…], texts: [nodeValue…] } in order.
-    const val COLLECT_UNITS = """
+    // Element/node refs are stashed on window.__ddgTranslateBlocks / __ddgTranslateTextNodes for write-back,
+    // keyed by index. Each block also reports its absolute document top (or HIDDEN_TOP if not laid out) so the
+    // caller can translate viewport-first. Returns
+    // { blocks: [innerHTML…], blockTops: [number…], texts: [nodeValue…], viewportTop, viewportHeight }.
+    val COLLECT_UNITS = """
         (function() {
             var INLINE = {
                 A: 1, SPAN: 1, STRONG: 1, EM: 1, B: 1, I: 1, U: 1, S: 1, SMALL: 1, SUB: 1, SUP: 1,
@@ -48,7 +59,10 @@ internal object TranslationDomJs {
                 SCRIPT: 1, STYLE: 1, NOSCRIPT: 1, SVG: 1, MATH: 1, CODE: 1, PRE: 1, TEXTAREA: 1,
                 IFRAME: 1, SELECT: 1
             };
-            if (!document.body) { return { blocks: [], texts: [] }; }
+            if (!document.body) { return { blocks: [], blockTops: [], texts: [], viewportTop: 0, viewportHeight: 0 }; }
+
+            var scrollY = window.pageYOffset || window.scrollY || 0;
+            var HIDDEN_TOP = $HIDDEN_TOP;
 
             function allChildrenInline(el) {
                 var children = el.children;
@@ -58,8 +72,15 @@ internal object TranslationDomJs {
                 return true;
             }
 
+            function documentTop(el) {
+                var rect = el.getBoundingClientRect();
+                if (rect.width === 0 && rect.height === 0) { return HIDDEN_TOP; }
+                return rect.top + scrollY;
+            }
+
             var blocks = [];
             var blockHtmls = [];
+            var blockTops = [];
             var textNodes = [];
             var textValues = [];
             var stack = [document.body];
@@ -71,6 +92,7 @@ internal object TranslationDomJs {
                     if (el.textContent && el.textContent.trim().length > 0) {
                         blocks.push(el);
                         blockHtmls.push(el.innerHTML);
+                        blockTops.push(documentTop(el));
                     }
                     continue; // its children are inline and part of this fragment
                 }
@@ -90,34 +112,57 @@ internal object TranslationDomJs {
             }
             window.__ddgTranslateBlocks = blocks;
             window.__ddgTranslateTextNodes = textNodes;
-            return { blocks: blockHtmls, texts: textValues };
+            return {
+                blocks: blockHtmls,
+                blockTops: blockTops,
+                texts: textValues,
+                viewportTop: scrollY,
+                viewportHeight: window.innerHeight || 0
+            };
         })()
     """
 
-    // Writes translations back in place into the units stashed by COLLECT_UNITS: block fragments via
-    // innerHTML (marked data-tk-done), orphan text nodes via nodeValue (flagged __tkDone) — so a re-run
-    // doesn't translate them again.
-    fun applyTranslations(blocksJson: String, textsJson: String): String =
+    // Writes a chunk of translated block fragments back in place: blocks[indices[k]].innerHTML = translations[k],
+    // marked data-tk-done so a re-run skips them. Indices address the stash from COLLECT_UNITS, so chunks can be
+    // applied in any order. The stash is left in place for later chunks; call [cleanup] when done.
+    fun applyBlocks(indicesJson: String, translationsJson: String): String =
         """
         (function() {
-            var blockTranslations = $blocksJson;
+            var indices = $indicesJson;
+            var translations = $translationsJson;
             var blocks = window.__ddgTranslateBlocks;
             if (blocks) {
-                for (var i = 0; i < blocks.length && i < blockTranslations.length; i++) {
-                    blocks[i].innerHTML = blockTranslations[i];
-                    blocks[i].setAttribute('data-tk-done', '');
+                for (var i = 0; i < indices.length && i < translations.length; i++) {
+                    var el = blocks[indices[i]];
+                    if (el) {
+                        el.innerHTML = translations[i];
+                        el.setAttribute('data-tk-done', '');
+                    }
                 }
             }
-            var textTranslations = $textsJson;
+        })();
+        """.trimIndent()
+
+    // Writes the translated orphan text nodes back via nodeValue (flagged __tkDone), in collection order.
+    fun applyTexts(translationsJson: String): String =
+        """
+        (function() {
+            var translations = $translationsJson;
             var textNodes = window.__ddgTranslateTextNodes;
             if (textNodes) {
-                for (var k = 0; k < textNodes.length && k < textTranslations.length; k++) {
-                    textNodes[k].nodeValue = textTranslations[k];
+                for (var k = 0; k < textNodes.length && k < translations.length; k++) {
+                    textNodes[k].nodeValue = translations[k];
                     textNodes[k].__tkDone = true;
                 }
             }
+        })();
+        """.trimIndent()
+
+    /** Drops the write-back stashes once every chunk has been applied. */
+    const val CLEANUP = """
+        (function() {
             window.__ddgTranslateBlocks = null;
             window.__ddgTranslateTextNodes = null;
         })();
-        """.trimIndent()
+    """
 }

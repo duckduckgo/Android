@@ -126,22 +126,63 @@ class RealTranslator @Inject constructor(
             return@flow
         }
 
-        // Block fragments translate as HTML (engine splits sentences and re-projects inline tags); orphan
-        // text nodes are plain text. Both are written back in place via the WebView.
-        val blockResult = translateBatchOrEmpty(collected.blocks, sourceLanguage, targetLanguage, isHtml = true)
-        val textResult = translateBatchOrEmpty(collected.texts, sourceLanguage, targetLanguage, isHtml = false)
-        when {
-            blockResult.isFailure -> emit(TranslationStatus.Failed(blockResult.failureMessage()))
-            textResult.isFailure -> emit(TranslationStatus.Failed(textResult.failureMessage()))
-            else -> {
-                applyTranslations(
-                    webView,
-                    blockTranslations = blockResult.getOrDefault(emptyList()),
-                    textTranslations = textResult.getOrDefault(emptyList()),
-                )
+        // Orphan text nodes are few and cheap; translate them in one batch up front (isHtml=false) so the
+        // visible page is fully translated once the first block chunk lands.
+        if (collected.texts.isNotEmpty()) {
+            val textResult = translateBatch(collected.texts, sourceLanguage, targetLanguage, isHtml = false)
+            textResult.exceptionOrNull()?.let {
+                emit(TranslationStatus.Failed(textResult.failureMessage()))
+                return@flow
+            }
+            applyTexts(webView, textResult.getOrDefault(emptyList()))
+        }
+
+        // Block fragments are the bulk of the work, so translate them viewport-first in chunks and write each
+        // chunk back as it lands (isHtml=true; the engine re-projects inline tags). The user sees the visible
+        // page translated within the first chunk; the rest — including off-screen and hidden content — streams
+        // in behind it. We report Completed once that first chunk is in place so the progress dialog can
+        // dismiss, then keep filling the page in the background.
+        val order = viewportFirstOrder(collected.blockTops, collected.viewportTop, collected.viewportHeight)
+        var reportedCompleted = false
+        for ((chunkIndex, indices) in order.chunked(BLOCK_CHUNK_SIZE).withIndex()) {
+            val chunkHtmls = indices.map { collected.blocks[it] }
+            val chunkResult = translateBatch(chunkHtmls, sourceLanguage, targetLanguage, isHtml = true)
+            if (chunkResult.isFailure) {
+                // Fail loudly only while the user is still waiting on the first (visible) chunk; once we've
+                // reported Completed the visible page is already translated, so later failures just stop.
+                if (!reportedCompleted) emit(TranslationStatus.Failed(chunkResult.failureMessage()))
+                return@flow
+            }
+            applyBlocks(webView, indices, chunkResult.getOrDefault(emptyList()))
+            if (chunkIndex == 0) {
+                reportedCompleted = true
                 emit(TranslationStatus.Completed)
             }
         }
+        evaluateJavascript(webView, TranslationDomJs.CLEANUP)
+    }
+
+    // Orders block indices so currently-visible blocks translate first, then off-screen blocks nearest the
+    // viewport, then blocks that aren't laid out (hidden) last — matching what the user is looking at.
+    private fun viewportFirstOrder(
+        blockTops: List<Double>,
+        viewportTop: Double,
+        viewportHeight: Double,
+    ): List<Int> {
+        val viewportBottom = viewportTop + viewportHeight
+        fun group(top: Double): Int = when {
+            top >= HIDDEN_BLOCK_TOP -> 2
+            top in viewportTop..viewportBottom -> 0
+            else -> 1
+        }
+        fun distance(top: Double): Double = when {
+            top < viewportTop -> viewportTop - top
+            top > viewportBottom -> top - viewportBottom
+            else -> 0.0
+        }
+        return blockTops.indices.sortedWith(
+            compareBy({ group(blockTops[it]) }, { if (group(blockTops[it]) == 1) distance(blockTops[it]) else blockTops[it] }),
+        )
     }
 
     // Translate a batch of texts in one call, returning them in order. Impl-internal: only page translation
@@ -165,45 +206,37 @@ class RealTranslator @Inject constructor(
         }
     }
 
-    private suspend fun translateBatchOrEmpty(
-        texts: List<String>,
-        sourceLanguage: String,
-        targetLanguage: String,
-        isHtml: Boolean,
-    ): Result<List<String>> =
-        if (texts.isEmpty()) {
-            Result.success(emptyList())
-        } else {
-            translateBatch(texts, sourceLanguage, targetLanguage, isHtml)
-        }
-
     private fun Result<List<String>>.failureMessage(): String =
         exceptionOrNull()?.let { it.message ?: it.javaClass.simpleName } ?: "Translation failed"
 
     private suspend fun collectTranslationUnits(webView: WebView): CollectedTranslationUnits {
         val encoded = evaluateJavascript(webView, TranslationDomJs.COLLECT_UNITS)
         if (encoded == null || encoded.trim().let { it.isEmpty() || it == "null" }) {
-            return CollectedTranslationUnits(emptyList(), emptyList())
+            return CollectedTranslationUnits()
         }
         return try {
             val obj = JSONObject(encoded)
             CollectedTranslationUnits(
                 blocks = obj.optJSONArray("blocks").toStringList(),
+                blockTops = obj.optJSONArray("blockTops").toDoubleList(),
                 texts = obj.optJSONArray("texts").toStringList(),
+                viewportTop = obj.optDouble("viewportTop", 0.0),
+                viewportHeight = obj.optDouble("viewportHeight", 0.0),
             )
         } catch (_: Exception) {
-            CollectedTranslationUnits(emptyList(), emptyList())
+            CollectedTranslationUnits()
         }
     }
 
-    private suspend fun applyTranslations(
-        webView: WebView,
-        blockTranslations: List<String>,
-        textTranslations: List<String>,
-    ) {
-        val blocksJson = JSONArray(blockTranslations).toString()
-        val textsJson = JSONArray(textTranslations).toString()
-        evaluateJavascript(webView, TranslationDomJs.applyTranslations(blocksJson, textsJson))
+    private suspend fun applyBlocks(webView: WebView, indices: List<Int>, translations: List<String>) {
+        val indicesJson = JSONArray(indices).toString()
+        val translationsJson = JSONArray(translations).toString()
+        evaluateJavascript(webView, TranslationDomJs.applyBlocks(indicesJson, translationsJson))
+    }
+
+    private suspend fun applyTexts(webView: WebView, translations: List<String>) {
+        val translationsJson = JSONArray(translations).toString()
+        evaluateJavascript(webView, TranslationDomJs.applyTexts(translationsJson))
     }
 
     // Evaluates [js] in [webView] and resumes with the raw JSON-encoded result. evaluateJavascript must be
@@ -234,6 +267,9 @@ class RealTranslator @Inject constructor(
 
     private fun JSONArray?.toStringList(): List<String> =
         if (this == null) emptyList() else List(length()) { getString(it) }
+
+    private fun JSONArray?.toDoubleList(): List<Double> =
+        if (this == null) emptyList() else List(length()) { getDouble(it) }
 
     // Returns the loaded handle for the pair, loading it (and closing any previously loaded one) on a
     // cache miss. Must be called under [modelLock]. Throws if the model has not been downloaded.
@@ -267,7 +303,18 @@ class RealTranslator @Inject constructor(
     private fun isDeviceSupported(): Boolean = appBuildConfig.sdkInt >= MIN_SUPPORTED_SDK
 
     private data class CollectedTranslationUnits(
-        val blocks: List<String>,
-        val texts: List<String>,
+        val blocks: List<String> = emptyList(),
+        val blockTops: List<Double> = emptyList(),
+        val texts: List<String> = emptyList(),
+        val viewportTop: Double = 0.0,
+        val viewportHeight: Double = 0.0,
     )
+
+    companion object {
+        // Blocks translate in chunks so the visible page lands fast and the rest streams in behind it.
+        private const val BLOCK_CHUNK_SIZE = 50
+
+        // Blocks not laid out (display:none, detached) report this top from COLLECT_UNITS and sort last.
+        private const val HIDDEN_BLOCK_TOP = 1_000_000_000.0
+    }
 }
