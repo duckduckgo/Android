@@ -1,0 +1,13 @@
+{
+  "name": "translation-dom-js-tests",
+  "version": "1.0.0",
+  "private": true,
+  "description": "jsdom behavioural tests for the page-translation JS in TranslationDomJs.kt",
+  "type": "module",
+  "scripts": {
+    "test": "node translationDomJs.test.mjs"
+  },
+  "devDependencies": {
+    "jsdom": "^24.0.0"
+  }
+}

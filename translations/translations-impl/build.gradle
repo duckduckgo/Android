@@ -75,3 +75,43 @@ android {
         coreLibraryDesugaringEnabled = true
     }
 }
+
+// TranslationDomJs.kt is browser JS (it needs a live DOM), so it can't run in the JVM unit-test
+// suite. It is covered by a jsdom harness under src/test/js instead. This task runs that harness,
+// but only when Node is on PATH — agents without Node skip it (with a warning) rather than fail, and
+// it's wired into jvm_tests/jvm_checks so it runs alongside the Kotlin tests where Node is available.
+def domJsTestDir = file("src/test/js")
+def nodeOnPath = (System.getenv("PATH") ?: "").split(File.pathSeparator).any { dir ->
+    new File(dir, "node").canExecute() || new File(dir, "node.exe").canExecute()
+}
+def domJsTaskPath = "${project.path}:testTranslationDomJs"
+
+tasks.register('testTranslationDomJs', Exec) {
+    description = 'Runs the jsdom behavioural tests for TranslationDomJs.kt (requires Node on PATH).'
+    group = 'verification'
+    workingDir = domJsTestDir
+    // npm ci installs the exact versions pinned in package-lock.json for reproducible runs.
+    commandLine 'sh', '-c', 'npm ci --silent --no-audit --no-fund && npm test'
+    onlyIf { task ->
+        if (!nodeOnPath) {
+            task.logger.warn("Skipping ${domJsTaskPath} — Node not found on PATH. Run it manually: (cd ${domJsTestDir} && npm install && npm test)")
+        }
+        nodeOnPath
+    }
+    inputs.files(
+        file("src/test/js/translationDomJs.test.mjs"),
+        file("src/test/js/package.json"),
+        file("src/test/js/package-lock.json"),
+        file("src/main/kotlin/com/duckduckgo/translations/impl/TranslationDomJs.kt"),
+    ).withPropertyName('domJsTestSources')
+    def stamp = layout.buildDirectory.file("test-results/translationDomJs/passed.stamp")
+    outputs.file(stamp)
+    doLast {
+        def file = stamp.get().asFile
+        file.parentFile.mkdirs()
+        file.text = "ok"
+    }
+}
+
+tasks.named('jvm_tests').configure { dependsOn 'testTranslationDomJs' }
+tasks.named('jvm_checks').configure { dependsOn 'testTranslationDomJs' }
