@@ -95,6 +95,24 @@
     <string name="duckAiHideAiGeneratedImagesTitle">Peida AI loodud pildid</string>
     <string name="duckAiHideAiGeneratedImagesDescription">Eemaldab tehisintellekti loodud pildid pildiotsingu tulemustest</string>
 
+    <!-- Search Assist Visibility -->
+    <string name="duckAiSearchAssistVisibilityTitle">Search Assisti nähtavus</string>
+    <string name="duckAiSearchAssistVisibilitySubtitle">Vali, kui tihti soovid tehisintellekti abil saadud vastuseid oma otsingutes kuvada.</string>
+    <string name="duckAiSearchAssistVisibilityNever">Mitte kunagi</string>
+    <string name="duckAiSearchAssistVisibilityOnDemand">Nõudmisel</string>
+    <string name="duckAiSearchAssistVisibilitySometimes">Mõnikord</string>
+    <string name="duckAiSearchAssistVisibilityOften">Sageli</string>
+
+    <!-- Duck AI Use Without AI Settings Option -->
+    <string name="duckAiUseWithoutAiTitle">Kasuta DuckDuckGo-d ilma tehisintellektita</string>
+    <string name="duckAiUseWithoutAiDescription">Keelab Duck.ai, peidab otsingus tehisintellektiga toetatud vastused ja filtreerib pildiotsingu tulemustest teadaolevaid tehisintellekti rämpsposti saite.</string>
+    <string name="duckAiUseWithoutAiDisabledDescription">Tehisintellekt on brauseris praegu keelatud, seega sa ei näe enam tehisintellekti abil saadud vastuseid ja näed pildiotsingu tulemustes vähem tehisintellekti loodud pilte.</string>
+
+    <!-- Duck AI Section in AI Feature Screen -->
+    <string name="input_screen_user_pref_toggle_between_search_and_ai">Lülita otsingu ja Duck.ai vahel</string>
+    <string name="duckAiDialogHideAiGeneratedImagesTitle">Peida tehisintellekti loodud pildid</string>
+    <string name="duckAiDialogHideAiGeneratedImagesDescription">Filtreerib pildiotsingu tulemustest välja teadaolevad tehisintellekti rämpsposti saidid. <annotation link="learn_more">Lisateave</annotation></string>
+
     <!-- Duck AI Paid Settings -->
     <string name="duck_ai_paid_settings_enable_in_settings">Luba tehisintellekti funktsioonide seadetes</string>
     <string name="duck_ai_paid_settings_manage_in_settings">Halda tehisintellekti funktsioonide seadetes</string>
@@ -182,4 +200,10 @@
     <string name="duck_ai_chat_history_download_view">Kuva</string>
     <string name="duck_ai_chat_history_download_error">Vestlust ei õnnestunud eksportida</string>
     <string name="duck_ai_chat_history_bulk_download_error">Vestlusi ei õnnestunud eksportida</string>
+
+    <!-- Example message card: internal-only showcase of NativeInputChatTabItemPlugin, not shipped to
+         users, so these are not localized (translatable="false"). Delete with the example. -->
+    <string name="duckChatExampleMessageCardTitle" translatable="false">Example message card</string>
+    <string name="duckChatExampleMessageCardSubtitle" translatable="false">Contributed by an ActivePlugin to show how other modules can add items to the Chat tab. Dismiss it to see the card remove itself.</string>
+    <string name="duckChatExampleMessageCardAction" translatable="false">Got it</string>
 </resources>
