@@ -95,6 +95,24 @@
     <string name="duckAiHideAiGeneratedImagesTitle">Skjul AI-genererte bilder</string>
     <string name="duckAiHideAiGeneratedImagesDescription">Filtrerer ut AI-genererte bilder fra bildesøkresultater</string>
 
+    <!-- Search Assist Visibility -->
+    <string name="duckAiSearchAssistVisibilityTitle">Synlighet for Search Assist</string>
+    <string name="duckAiSearchAssistVisibilitySubtitle">Velg hvor ofte du vil at AI-assisterte svar skal vises i søkene dine.</string>
+    <string name="duckAiSearchAssistVisibilityNever">Aldri</string>
+    <string name="duckAiSearchAssistVisibilityOnDemand">På forespørsel</string>
+    <string name="duckAiSearchAssistVisibilitySometimes">Noen ganger</string>
+    <string name="duckAiSearchAssistVisibilityOften">Ofte</string>
+
+    <!-- Duck AI Use Without AI Settings Option -->
+    <string name="duckAiUseWithoutAiTitle">Bruk DuckDuckGo uten AI</string>
+    <string name="duckAiUseWithoutAiDescription">Deaktiverer Duck.ai, skjuler AI-assisterte svar i søk og filtrerer ut kjente AI-søppelnettsteder i bildesøkresultatene.</string>
+    <string name="duckAiUseWithoutAiDisabledDescription">AI er for øyeblikket deaktivert i nettleseren, så du ser ikke lenger AI-assisterte svar, og du ser færre AI-genererte bilder i bildesøkresultatene.</string>
+
+    <!-- Duck AI Section in AI Feature Screen -->
+    <string name="input_screen_user_pref_toggle_between_search_and_ai">Bytt mellom søk og Duck.ai</string>
+    <string name="duckAiDialogHideAiGeneratedImagesTitle">Skjul AI-genererte bilder</string>
+    <string name="duckAiDialogHideAiGeneratedImagesDescription">Filtrerer ut kjente AI-søppelnettsteder fra bildesøkresultater. <annotation link="learn_more">Finn ut mer</annotation></string>
+
     <!-- Duck AI Paid Settings -->
     <string name="duck_ai_paid_settings_enable_in_settings">Aktiver i innstillingene for AI-funksjoner</string>
     <string name="duck_ai_paid_settings_manage_in_settings">Administrer i innstillingene for AI-funksjoner</string>
@@ -182,4 +200,10 @@
     <string name="duck_ai_chat_history_download_view">Vis</string>
     <string name="duck_ai_chat_history_download_error">Kunne ikke eksportere chatten</string>
     <string name="duck_ai_chat_history_bulk_download_error">Kunne ikke eksportere chattene</string>
+
+    <!-- Example message card: internal-only showcase of NativeInputChatTabItemPlugin, not shipped to
+         users, so these are not localized (translatable="false"). Delete with the example. -->
+    <string name="duckChatExampleMessageCardTitle" translatable="false">Example message card</string>
+    <string name="duckChatExampleMessageCardSubtitle" translatable="false">Contributed by an ActivePlugin to show how other modules can add items to the Chat tab. Dismiss it to see the card remove itself.</string>
+    <string name="duckChatExampleMessageCardAction" translatable="false">Got it</string>
 </resources>
