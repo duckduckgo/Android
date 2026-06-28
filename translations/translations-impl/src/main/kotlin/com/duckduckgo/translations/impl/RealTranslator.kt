@@ -33,6 +33,8 @@ import io.github.marcosholgado.translatekit.ModelSpec
 import io.github.marcosholgado.translatekit.TranslateKit
 import io.github.marcosholgado.translatekit.TranslationModel
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
@@ -121,8 +123,10 @@ class RealTranslator @Inject constructor(
         // stashing references for write-back.
         val collected = collectTranslationUnits(webView)
         if (collected.blocks.isEmpty() && collected.texts.isEmpty()) {
-            // Nothing translatable on the page (or everything is already translated): a no-op success.
+            // Nothing translatable yet (or everything is already translated). Still a success — and we keep
+            // watching, because a shell page may hydrate its content in afterwards.
             emit(TranslationStatus.Completed)
+            watchAndTranslateNewContent(webView, sourceLanguage, targetLanguage)
             return@flow
         }
 
@@ -159,7 +163,77 @@ class RealTranslator @Inject constructor(
                 emit(TranslationStatus.Completed)
             }
         }
-        evaluateJavascript(webView, TranslationDomJs.CLEANUP)
+
+        // The page is translated; now keep it that way. Many sites inject text after load — island hydration
+        // (the Guardian re-renders English nodes over our translation when a deferred carousel scrolls into
+        // view), lazy sections, infinite scroll. This suspends until collection is cancelled (the user
+        // navigates away, the tab is closed, the Fragment is destroyed), so it self-terminates with the page.
+        watchAndTranslateNewContent(webView, sourceLanguage, targetLanguage)
+    }
+
+    // Installs the DOM MutationObserver and polls its generation counter; on a change (debounced, since
+    // hydration arrives in bursts) re-runs collect→translate→apply over just the newly added/changed nodes.
+    // Loops until the document is replaced (poll returns -1) or the calling coroutine is cancelled.
+    private suspend fun watchAndTranslateNewContent(
+        webView: WebView,
+        sourceLanguage: String,
+        targetLanguage: String,
+    ) {
+        try {
+            evaluateJavascript(webView, TranslationDomJs.INSTALL_OBSERVER)
+            var lastGeneration = readGeneration(webView) ?: return
+            while (true) {
+                delay(OBSERVER_POLL_INTERVAL_MS)
+                val generation = readGeneration(webView) ?: break // observer gone => document replaced
+                if (generation == lastGeneration) continue
+                // Let the burst of mutations settle before scanning so we translate hydrated content once.
+                delay(OBSERVER_DEBOUNCE_MS)
+                val settled = readGeneration(webView) ?: break
+                if (settled != generation) {
+                    lastGeneration = settled // still changing; reassess on the next tick
+                    continue
+                }
+                translateNewlyAddedContent(webView, sourceLanguage, targetLanguage)
+                // Our own write-backs may have bumped the counter; resync so we don't immediately re-scan.
+                lastGeneration = readGeneration(webView) ?: break
+            }
+        } finally {
+            withContext(NonCancellable) {
+                runCatching { evaluateJavascript(webView, TranslationDomJs.DISCONNECT_OBSERVER) }
+            }
+        }
+    }
+
+    // Re-collects the (now only newly added/changed) units and translates them in place, viewport-first.
+    // Silent: the dialog is long gone, so failures are logged and the watch loop carries on.
+    private suspend fun translateNewlyAddedContent(
+        webView: WebView,
+        sourceLanguage: String,
+        targetLanguage: String,
+    ) {
+        val collected = collectTranslationUnits(webView)
+        if (collected.blocks.isEmpty() && collected.texts.isEmpty()) return
+
+        if (collected.texts.isNotEmpty()) {
+            val textResult = translateBatch(collected.texts, sourceLanguage, targetLanguage, isHtml = false)
+            if (textResult.isFailure) return
+            applyTexts(webView, textResult.getOrDefault(emptyList()))
+        }
+        val order = viewportFirstOrder(collected.blockTops, collected.viewportTop, collected.viewportHeight)
+        for (indices in order.chunked(BLOCK_CHUNK_SIZE)) {
+            val chunkHtmls = indices.map { collected.blocks[it] }
+            val chunkResult = translateBatch(chunkHtmls, sourceLanguage, targetLanguage, isHtml = true)
+            if (chunkResult.isFailure) return
+            applyBlocks(webView, indices, chunkResult.getOrDefault(emptyList()))
+        }
+    }
+
+    // Reads the observer's generation counter. null means "stop watching": the observer is gone (-1, the
+    // document was replaced) or the result was unreadable (the WebView is tearing down).
+    private suspend fun readGeneration(webView: WebView): Int? {
+        val raw = evaluateJavascript(webView, TranslationDomJs.POLL_GENERATION)?.trim() ?: return null
+        val value = raw.toDoubleOrNull()?.toInt() ?: return null
+        return value.takeIf { it >= 0 }
     }
 
     // Orders block indices so currently-visible blocks translate first, then off-screen blocks nearest the
@@ -316,5 +390,10 @@ class RealTranslator @Inject constructor(
 
         // Blocks not laid out (display:none, detached) report this top from COLLECT_UNITS and sort last.
         private const val HIDDEN_BLOCK_TOP = 1_000_000_000.0
+
+        // How often to poll the MutationObserver's generation counter while watching for new content, and how
+        // long to wait for a burst of mutations (e.g. island hydration) to settle before re-scanning.
+        private const val OBSERVER_POLL_INTERVAL_MS = 750L
+        private const val OBSERVER_DEBOUNCE_MS = 400L
     }
 }

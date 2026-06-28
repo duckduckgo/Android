@@ -21,9 +21,11 @@ package com.duckduckgo.translations.impl
  * [android.webkit.WebView.evaluateJavascript]. Kept here, isolated from the orchestration, because it is
  * verified verbatim against a jsdom harness — do not reformat the algorithm.
  *
- * Note: this is a one-shot pass over the current DOM. Content inserted *after* translation (lazy-loaded
- * sections, infinite scroll, SPA navigation, AJAX-injected widgets) is not picked up — covering that needs
- * a MutationObserver that re-translates new subtrees, which is a separate follow-up.
+ * The initial pass ([COLLECT_UNITS]) is one-shot, but [INSTALL_OBSERVER] then keeps the page in sync with
+ * content added *after* translation — island hydration (e.g. the Guardian's `gu-island deferUntil="visible"`
+ * carousels that re-render English nodes over our translation on scroll), lazy-loaded sections, infinite
+ * scroll, AJAX-injected widgets. The observer bumps a generation counter the caller polls; on a change it
+ * re-runs [COLLECT_UNITS], which skips already-translated nodes, so only the new subtrees are translated.
  */
 internal object TranslationDomJs {
 
@@ -158,9 +160,56 @@ internal object TranslationDomJs {
         })();
         """.trimIndent()
 
-    /** Drops the write-back stashes once every chunk has been applied. */
-    const val CLEANUP = """
+    // Installs a MutationObserver (once) that bumps window.__ddgTranslateGen whenever text-bearing content is
+    // added or changed, so the caller can poll for "the page changed, re-scan". Mutations under an element we
+    // already translated (data-tk-done) are ignored so our own innerHTML write-backs don't trigger a re-scan;
+    // characterData writes are likewise ignored because we set __tkDone on the node synchronously before the
+    // observer callback (delivered async) runs. Idempotent: a second install is a no-op.
+    const val INSTALL_OBSERVER = """
         (function() {
+            if (window.__ddgTranslateObserver || !document.body) { return; }
+            if (typeof window.__ddgTranslateGen !== 'number') { window.__ddgTranslateGen = 0; }
+            function hasText(node) {
+                if (node.nodeType === 3) { return !!(node.nodeValue && node.nodeValue.trim().length > 0); }
+                if (node.nodeType === 1) { return !!(node.textContent && node.textContent.trim().length > 0); }
+                return false;
+            }
+            function isDone(node) {
+                var el = node.nodeType === 1 ? node : node.parentElement;
+                return !!(el && el.closest && el.closest('[data-tk-done]'));
+            }
+            var observer = new MutationObserver(function(mutations) {
+                for (var i = 0; i < mutations.length; i++) {
+                    var m = mutations[i];
+                    if (m.type === 'childList') {
+                        for (var j = 0; j < m.addedNodes.length; j++) {
+                            var added = m.addedNodes[j];
+                            if (hasText(added) && !isDone(added)) { window.__ddgTranslateGen++; return; }
+                        }
+                    } else if (m.type === 'characterData') {
+                        var t = m.target;
+                        if (t && !t.__tkDone && t.nodeValue && t.nodeValue.trim().length > 0) { window.__ddgTranslateGen++; return; }
+                    }
+                }
+            });
+            observer.observe(document.body, { childList: true, subtree: true, characterData: true });
+            window.__ddgTranslateObserver = observer;
+        })();
+    """
+
+    // Returns the observer's generation counter so the caller can detect new content, or -1 if the observer is
+    // gone — which means the document was replaced (full navigation/reload) and the caller should stop watching.
+    const val POLL_GENERATION = """
+        (function() {
+            return window.__ddgTranslateObserver ? (window.__ddgTranslateGen || 0) : -1;
+        })();
+    """
+
+    // Disconnects the observer and drops the write-back stashes; called when watching ends.
+    const val DISCONNECT_OBSERVER = """
+        (function() {
+            if (window.__ddgTranslateObserver) { window.__ddgTranslateObserver.disconnect(); }
+            window.__ddgTranslateObserver = null;
             window.__ddgTranslateBlocks = null;
             window.__ddgTranslateTextNodes = null;
         })();
