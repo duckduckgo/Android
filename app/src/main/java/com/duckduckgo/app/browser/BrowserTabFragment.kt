@@ -5836,6 +5836,7 @@ class BrowserTabFragment :
                 lastSeenAutoCompleteViewState = null
                 return
             }
+
             renderIfChanged(viewState, lastSeenAutoCompleteViewState) {
                 lastSeenAutoCompleteViewState = viewState
 
