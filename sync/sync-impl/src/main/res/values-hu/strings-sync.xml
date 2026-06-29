@@ -241,4 +241,12 @@
     <string name="sync_recover_data_download_pdf">Letöltés PDF-ként</string>
     <string name="sync_restore_on_reinstall_title">Visszaállítás az alkalmazás újratelepítésekor</string>
     <string name="sync_restore_on_reinstall_description">Ha újratelepíted a DuckDuckGo-alkalmazást, megkérdezzük, hogy szeretnéd-e visszaállítani az adataidat ezen az eszközön.</string>
+
+    <!-- Chat sync promo -->
+    <string name="sync_chat_promo_banner_title">Hozzáférés a csevegésekhez minden eszközödön a Sync &amp; Backup használatával.</string>
+    <string name="sync_chat_promo_banner_cta_title">Szinkronizálás másik eszközzel</string>
+    <string name="sync_chat_bottom_sheet_title">Szinkronizáld a csevegéseket az eszközeid között!</string>
+    <string name="sync_chat_bottom_sheet_description">A másik eszközödön keresd meg a QR-kódot a DuckDuckGo alkalmazás Beállítások › Sync &amp; Backup › Szinkronizálás másik eszközzel menüpontjában.</string>
+    <string name="sync_chat_bottom_sheet_positive">QR-kód beolvasása</string>
+    <string name="sync_chat_bottom_sheet_negative">Most nem</string>
 </resources>
