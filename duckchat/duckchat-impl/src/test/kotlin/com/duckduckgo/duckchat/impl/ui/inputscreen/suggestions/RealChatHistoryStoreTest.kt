@@ -24,11 +24,11 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class RealChatHistoryStoreTest {
-    private val chatHistory = RealChatHistoryStore()
+    private val testee = RealChatHistoryStore()
 
     @Test
     fun `hasChatHistory does not emit any initial value`() = runTest {
-        chatHistory.hasChatHistory.test {
+        testee.hasChatHistory.test {
             expectNoEvents()
 
             cancel()
@@ -37,11 +37,11 @@ class RealChatHistoryStoreTest {
 
     @Test
     fun `hasChatHistory updates value`() = runTest {
-        chatHistory.hasChatHistory.test {
-            chatHistory.setHasChatHistory(true)
+        testee.hasChatHistory.test {
+            testee.setHasChatHistory(true)
             assertTrue(awaitItem())
 
-            chatHistory.setHasChatHistory(false)
+            testee.setHasChatHistory(false)
             assertFalse(awaitItem())
 
             cancel()
@@ -50,11 +50,11 @@ class RealChatHistoryStoreTest {
 
     @Test
     fun `hasChatHistory does not emit the same value`() = runTest {
-        chatHistory.hasChatHistory.test {
-            chatHistory.setHasChatHistory(true)
+        testee.hasChatHistory.test {
+            testee.setHasChatHistory(true)
             assertTrue(awaitItem())
 
-            chatHistory.setHasChatHistory(true)
+            testee.setHasChatHistory(true)
             expectNoEvents()
 
             cancel()
@@ -63,11 +63,23 @@ class RealChatHistoryStoreTest {
 
     @Test
     fun `hasChatHistory emits last known value`() = runTest {
-        chatHistory.setHasChatHistory(false)
-        chatHistory.setHasChatHistory(true)
+        testee.setHasChatHistory(false)
+        testee.setHasChatHistory(true)
 
-        chatHistory.hasChatHistory.test {
+        testee.hasChatHistory.test {
             assertTrue(awaitItem())
+
+            cancel()
+        }
+    }
+
+    @Test
+    fun `clearCachedValue removes last known value`() = runTest {
+        testee.setHasChatHistory(true)
+        testee.clearCachedValue()
+
+        testee.hasChatHistory.test {
+            expectNoEvents()
 
             cancel()
         }

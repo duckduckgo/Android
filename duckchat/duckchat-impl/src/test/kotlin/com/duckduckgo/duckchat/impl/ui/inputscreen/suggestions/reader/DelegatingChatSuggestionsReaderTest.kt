@@ -166,6 +166,20 @@ class DelegatingChatSuggestionsReaderTest {
     }
 
     @Test
+    fun `fetchSuggestions clears cached chat history when switching readers`() = runTest {
+        whenever(store.hasMigrated()).thenReturn(false)
+        whenever(nativeStorageToggle.isEnabled()).thenReturn(true)
+        whenever(webViewReader.fetchSuggestions("")).thenReturn(emptyList())
+        reader.fetchSuggestions() // sets webViewReader as active
+
+        whenever(store.hasMigrated()).thenReturn(true)
+        whenever(nativeReader.fetchSuggestions("")).thenReturn(emptyList())
+        reader.fetchSuggestions() // switches to nativeReader
+
+        verify(historyStore).clearCachedValue()
+    }
+
+    @Test
     fun `tearDown delegates to active reader`() = runTest {
         whenever(store.hasMigrated()).thenReturn(false)
         whenever(nativeStorageToggle.isEnabled()).thenReturn(true)
@@ -178,10 +192,23 @@ class DelegatingChatSuggestionsReaderTest {
     }
 
     @Test
+    fun `tearDown clears cached chat history value`() = runTest {
+        whenever(store.hasMigrated()).thenReturn(false)
+        whenever(nativeStorageToggle.isEnabled()).thenReturn(true)
+        whenever(webViewReader.fetchSuggestions("")).thenReturn(emptyList())
+        reader.fetchSuggestions() // caches suggestions
+
+        reader.tearDown()
+
+        verify(historyStore).clearCachedValue()
+    }
+
+    @Test
     fun `tearDown does nothing when no reader has been activated`() {
         reader.tearDown()
 
         verify(nativeReader, never()).tearDown()
         verify(webViewReader, never()).tearDown()
+        verify(historyStore, never()).clearCachedValue()
     }
 }

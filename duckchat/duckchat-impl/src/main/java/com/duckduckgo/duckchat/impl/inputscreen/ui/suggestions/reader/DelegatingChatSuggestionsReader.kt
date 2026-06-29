@@ -50,7 +50,7 @@ class DelegatingChatSuggestionsReader @Inject constructor(
 
     override suspend fun fetchSuggestions(query: String): List<ChatSuggestion> = withContext(dispatchers.io()) {
         val reader = if (store.hasMigrated() && feature.useNativeStorageChatData().isEnabled()) nativeReader else webViewReader
-        if (activeReader != null && activeReader !== reader) activeReader?.tearDown()
+        if (activeReader != null && activeReader !== reader) tearDown()
         activeReader = reader
         logcat { "DuckAI chat suggestions: using ${if (reader === nativeReader) "native store" else "WebView"} reader" }
         pixels.get().reportNativeStorageReaderUsed(native = reader === nativeReader)
@@ -60,7 +60,10 @@ class DelegatingChatSuggestionsReader @Inject constructor(
     }
 
     override fun tearDown() {
-        activeReader?.tearDown()
+        activeReader?.let { reader ->
+            reader.tearDown()
+            historyStore.clearCachedValue()
+        }
         activeReader = null
     }
 }

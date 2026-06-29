@@ -19,6 +19,7 @@ package com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -40,5 +41,10 @@ class RealChatHistoryStore @Inject constructor() : ChatHistoryStore {
 
     suspend fun setHasChatHistory(hasHistory: Boolean) {
         _hasChatHistory.emit(hasHistory)
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    fun clearCachedValue() {
+        _hasChatHistory.resetReplayCache()
     }
 }
