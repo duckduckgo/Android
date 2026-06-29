@@ -657,6 +657,24 @@ class DuckChatSettingsViewModelTest {
         }
 
     @Test
+    fun `when onHideAiGeneratedImagesLearnMoreClicked then OpenLink command with learn more link is emitted`() =
+        runTest {
+            testee.onHideAiGeneratedImagesLearnMoreClicked()
+
+            testee.commands.test {
+                val command = awaitItem()
+                assertTrue(command is OpenLink)
+                command as OpenLink
+                assertEquals(
+                    DuckChatSettingsViewModel.DUCK_CHAT_HIDE_GENERATED_IMAGES_LEARN_MORE_LINK,
+                    command.link,
+                )
+                assertEquals(R.string.duckAiDialogHideAiGeneratedImagesTitle, command.titleRes)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
     fun `when onDuckAiHideAiGeneratedImagesClicked and native controls enabled then ShowHideAiGeneratedImagesDialog emitted`() =
         runTest {
             @Suppress("DenyListedApi")

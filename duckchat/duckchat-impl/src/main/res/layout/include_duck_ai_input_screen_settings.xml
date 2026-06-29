@@ -115,6 +115,7 @@
                 android:orientation="horizontal">
 
                 <com.duckduckgo.common.ui.view.text.DaxTextView
+                    android:id="@+id/duckAiInputScreenToggleWithAiText"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:gravity="center"

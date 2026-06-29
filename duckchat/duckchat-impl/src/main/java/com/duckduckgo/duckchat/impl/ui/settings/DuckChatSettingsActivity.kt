@@ -234,6 +234,13 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
         )
 
         inputScreenSettingsBinding.duckAiInputScreenToggleContainer.isVisible = viewState.shouldShowInputScreenToggle
+        inputScreenSettingsBinding.duckAiInputScreenToggleWithAiText.text = getString(
+            if (viewState.isNativeControlsEnabled) {
+                R.string.input_screen_user_pref_toggle_between_search_and_ai
+            } else {
+                R.string.input_screen_user_pref_with_ai
+            },
+        )
         configureInputScreenToggle(
             withoutAi = InputScreenToggleButton.WithoutAi(isActive = !viewState.isInputScreenEnabled, appTheme.isLightModeEnabled()),
             withAi = InputScreenToggleButton.WithAi(isActive = viewState.isInputScreenEnabled, appTheme.isLightModeEnabled()),
@@ -478,8 +485,13 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
     private fun showHideAiGeneratedImagesDialog(current: HideAiGeneratedImages) {
         val options = hideAiGeneratedImagesOptions
         RadioListAlertDialogBuilder(this)
-            .setTitle(R.string.duckAiHideAiGeneratedImagesTitle)
-            .setMessage(R.string.duckAiHideAiGeneratedImagesDescription)
+            .setTitle(R.string.duckAiDialogHideAiGeneratedImagesTitle)
+            .setClickableMessage(
+                getText(R.string.duckAiDialogHideAiGeneratedImagesDescription),
+                "learn_more",
+            ) {
+                viewModel.onHideAiGeneratedImagesLearnMoreClicked()
+            }
             .setOptions(
                 options.map { it.toDisplayNameRes() },
                 options.indexOf(current).takeIf { index -> index >= 0 }?.plus(1),
