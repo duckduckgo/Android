@@ -96,7 +96,6 @@
     <string name="duckAiHideAiGeneratedImagesDescription">Φιλτράρει τις εικόνες που δημιουργούνται με τεχνητή νοημοσύνη από τα αποτελέσματα αναζήτησης εικόνων</string>
 
     <!-- Search Assist Visibility -->
-    <string name="duckAiSearchAssistVisibilityTitle">Ορατότητα Search Assist</string>
     <string name="duckAiSearchAssistVisibilitySubtitle">Επιλέξτε πόσο συχνά θέλετε να εμφανίζονται οι απαντήσεις που υποστηρίζονται από τεχνητή νοημοσύνη στις αναζητήσεις σας.</string>
     <string name="duckAiSearchAssistVisibilityNever">Ποτέ</string>
     <string name="duckAiSearchAssistVisibilityOnDemand">Κατ\' απαίτηση</string>

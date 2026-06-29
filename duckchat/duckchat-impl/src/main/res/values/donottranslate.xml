@@ -72,4 +72,6 @@
     <!-- Duck AI Duck.ai Section Header -->
     <string name="duckAiDuckAiSectionHeader">Duck.ai</string>
 
+    <!-- Search Assist Visibility -->
+    <string name="duckAiSearchAssistVisibilityTitle">Search Assist</string>
 </resources>
