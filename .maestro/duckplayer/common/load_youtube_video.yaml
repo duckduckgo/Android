@@ -7,6 +7,7 @@ androidWebViewHierarchy: devtools
 - tapOn:
     id: "omnibarTextInput"
 - inputText: "https://m.youtube.com/@duckduckgo2597/search?query=DuckDuckGo%20vs%20Google%3A%205%20Reasons%20You%20Should%20Switch"
+- inputText: "https://m.youtube.com/@duckduckgo/search?query=DuckDuckGo%20vs%20Google%3A%205%20Reasons%20You%20Should%20Switch"
 - pressKey: Enter
 - runFlow: handle_youtube_cookies.yaml
 - tapOn:
