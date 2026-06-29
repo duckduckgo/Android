@@ -138,6 +138,16 @@ class RealFireTabsPromosTest {
     }
 
     @Test
+    fun whenInFireModeThenCanShowTabSwitcherPromoFalse() = runTest {
+        whenever(fireModeAvailability.isAvailable()).thenReturn(true)
+        whenever(promoToggle.isEnabled()).thenReturn(true)
+        whenever(onboardingFlowChecker.isOnboardingComplete()).thenReturn(true)
+        whenever(fireDataStore.isTabSwitcherPromoDismissed()).thenReturn(false)
+        whenever(browserModeStateHolder.currentMode).thenReturn(MutableStateFlow(BrowserMode.FIRE))
+        assertFalse(testee.canShowTabSwitcherPromo())
+    }
+
+    @Test
     fun whenOnFireModeEnteredThenBothPromosDismissed() = runTest {
         testee.onFireModeEntered()
         verify(fireDataStore).setNtpPromoDismissed(true)
