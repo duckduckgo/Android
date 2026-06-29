@@ -30,7 +30,6 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.annotation.AttrRes
 import androidx.annotation.VisibleForTesting
-import androidx.core.text.HtmlCompat
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.AsyncListDiffer
@@ -49,7 +48,6 @@ import com.duckduckgo.app.browser.databinding.ItemDuckAiTabGridBinding
 import com.duckduckgo.app.browser.databinding.ItemTabGridBinding
 import com.duckduckgo.app.browser.databinding.ItemTabListBinding
 import com.duckduckgo.app.browser.databinding.ItemTabSwitcherAnimationInfoPanelBinding
-import com.duckduckgo.app.browser.databinding.ItemTabSwitcherFireTabsPromoBinding
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
 import com.duckduckgo.app.browser.tabs.adapter.TabSwitcherItemDiffCallback
@@ -66,7 +64,6 @@ import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType.LIST
 import com.duckduckgo.app.tabs.model.isAboutBlank
 import com.duckduckgo.app.tabs.ui.TabSwitcherAdapter.TabSwitcherViewHolder.Companion.DUCK_AI_GRID
 import com.duckduckgo.app.tabs.ui.TabSwitcherAdapter.TabSwitcherViewHolder.Companion.DUCK_AI_LIST
-import com.duckduckgo.app.tabs.ui.TabSwitcherAdapter.TabSwitcherViewHolder.Companion.FIRE_TABS_PROMO
 import com.duckduckgo.app.tabs.ui.TabSwitcherAdapter.TabSwitcherViewHolder.Companion.GRID_TAB
 import com.duckduckgo.app.tabs.ui.TabSwitcherAdapter.TabSwitcherViewHolder.Companion.LIST_TAB
 import com.duckduckgo.app.tabs.ui.TabSwitcherAdapter.TabSwitcherViewHolder.Companion.SELECTABLE_DUCK_AI_GRID
@@ -114,7 +111,6 @@ class TabSwitcherAdapter(
 
     private var layoutType: LayoutType = GRID
     private var onAnimationTileCloseClickListener: (() -> Unit)? = null
-    private var onFireTabsPromoCloseClickListener: (() -> Unit)? = null
 
     private val differ = AsyncListDiffer(this, TabSwitcherItemDiffCallback(isDragging = { isDragging }))
 
@@ -153,10 +149,6 @@ class TabSwitcherAdapter(
                 val binding = ItemTabSwitcherAnimationInfoPanelBinding.inflate(inflater, parent, false)
                 TabSwitcherViewHolder.TrackerAnimationInfoPanelViewHolder(binding)
             }
-            FIRE_TABS_PROMO -> {
-                val binding = ItemTabSwitcherFireTabsPromoBinding.inflate(inflater, parent, false)
-                TabSwitcherViewHolder.FireTabsPromoViewHolder(binding)
-            }
             else -> throw IllegalArgumentException("Unknown viewType: $viewType")
         }
     }
@@ -178,7 +170,6 @@ class TabSwitcherAdapter(
                 LIST -> LIST_TAB
             }
             is TabSwitcherItem.TrackersAnimationInfoPanel -> TRACKER_ANIMATION_TILE_INFO_PANEL
-            is TabSwitcherItem.FireTabsPromo -> FIRE_TABS_PROMO
         }
 
     override fun getItemCount(): Int = differ.currentList.size
@@ -214,15 +205,6 @@ class TabSwitcherAdapter(
                 )
                 holder.binding.root.setOnClickListener {
                     onAnimationTileCloseClickListener?.invoke()
-                }
-            }
-            is TabSwitcherViewHolder.FireTabsPromoViewHolder -> {
-                holder.binding.firePromoText.text = HtmlCompat.fromHtml(
-                    holder.binding.root.context.getString(R.string.fireTabsPromoTabSwitcherText),
-                    HtmlCompat.FROM_HTML_MODE_LEGACY,
-                )
-                holder.binding.firePromoClose.setOnClickListener {
-                    onFireTabsPromoCloseClickListener?.invoke()
                 }
             }
             else -> throw IllegalArgumentException("Unknown ViewHolder type: $holder")
@@ -654,10 +636,6 @@ class TabSwitcherAdapter(
         onAnimationTileCloseClickListener = onClick
     }
 
-    fun setFireTabsPromoCloseClickListener(onClick: () -> Unit) {
-        onFireTabsPromoCloseClickListener = onClick
-    }
-
     private fun View.resolveThemedDrawableAttr(@AttrRes attr: Int): Int {
         val typedValue = TypedValue()
         context.theme.resolveAttribute(attr, typedValue, true)
@@ -686,7 +664,6 @@ class TabSwitcherAdapter(
             const val DUCK_AI_LIST = 4
             const val SELECTABLE_DUCK_AI_GRID = 5
             const val SELECTABLE_DUCK_AI_LIST = 6
-            const val FIRE_TABS_PROMO = 7
 
             const val EXTRA_CLOSE_BUTTON_TOUCH_AREA = 6 // dp
         }
@@ -786,10 +763,6 @@ class TabSwitcherAdapter(
 
         data class TrackerAnimationInfoPanelViewHolder(
             val binding: ItemTabSwitcherAnimationInfoPanelBinding,
-        ) : TabSwitcherViewHolder(binding.root)
-
-        data class FireTabsPromoViewHolder(
-            val binding: ItemTabSwitcherFireTabsPromoBinding,
         ) : TabSwitcherViewHolder(binding.root)
     }
 }

@@ -36,6 +36,7 @@ import androidx.appcompat.app.AppCompatDelegate.FEATURE_SUPPORT_ACTION_BAR
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.children
 import androidx.core.view.doOnPreDraw
+import androidx.core.view.isVisible
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DefaultItemAnimator
@@ -308,7 +309,12 @@ class TabSwitcherActivity :
         tabsAdapter.setAnimationTileCloseClickListener {
             viewModel.onTrackerAnimationInfoPanelClicked()
         }
-        tabsAdapter.setFireTabsPromoCloseClickListener {
+
+        binding.fireTabsPromoBanner.firePromoText.text = androidx.core.text.HtmlCompat.fromHtml(
+            getString(R.string.fireTabsPromoTabSwitcherText),
+            androidx.core.text.HtmlCompat.FROM_HTML_MODE_LEGACY,
+        )
+        binding.fireTabsPromoBanner.firePromoClose.setOnClickListener {
             viewModel.onFireTabsPromoDismissed()
         }
 
@@ -519,6 +525,7 @@ class TabSwitcherActivity :
         val shouldHighlightFireToggle = state.browserMode == BrowserMode.REGULAR &&
             (state.isFireTabsPromoVisible || highlightFromCta)
         browserModeToggle?.setFireSegmentHighlighted(shouldHighlightFireToggle)
+        binding.fireTabsPromoBanner.root.isVisible = state.isFireTabsPromoVisible
     }
 
     private fun fadeOutTabsThenRecreate(newMode: BrowserMode) {
@@ -728,7 +735,7 @@ class TabSwitcherActivity :
                 object : SpanSizeLookup() {
                     override fun getSpanSize(position: Int): Int =
                         if (tabsAdapter.getTabSwitcherItem(position).let {
-                                it is TrackersAnimationInfoPanel || it is TabSwitcherItem.FireTabsPromo
+                                it is TrackersAnimationInfoPanel
                             }
                         ) {
                             columnCount
@@ -784,7 +791,7 @@ class TabSwitcherActivity :
         val rowHeight = tabsRecycler.children.firstOrNull {
             val pos = tabsRecycler.getChildAdapterPosition(it)
             pos != RecyclerView.NO_POSITION && tabsAdapter.getTabSwitcherItem(pos).let { item ->
-                item !is TrackersAnimationInfoPanel && item !is TabSwitcherItem.FireTabsPromo
+                item !is TrackersAnimationInfoPanel
             }
         }?.height ?: 0
         val centerOffset = (innerHeight - rowHeight) / 2
@@ -958,7 +965,6 @@ class TabSwitcherActivity :
                 }
                 is TrackersAnimationInfoPanel -> Unit
                 is SelectableTab -> Unit
-                is TabSwitcherItem.FireTabsPromo -> Unit
             }
         }
     }

@@ -39,7 +39,6 @@ import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType
 import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType.GRID
 import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType.LIST
 import com.duckduckgo.app.tabs.store.TabSwitcherDataStore
-import com.duckduckgo.app.tabs.ui.TabSwitcherItem.FireTabsPromo
 import com.duckduckgo.app.tabs.ui.TabSwitcherItem.Tab
 import com.duckduckgo.app.tabs.ui.TabSwitcherItem.Tab.DuckAiTab
 import com.duckduckgo.app.tabs.ui.TabSwitcherItem.Tab.NormalTab
@@ -163,7 +162,7 @@ class TabSwitcherViewModel @Inject constructor(
             tabSwitcherDataStore.isTrackersAnimationInfoTileHidden(),
             currentMode,
         ) { tabEntities, activeTab, viewState, isAnimationTileDismissed, browserMode ->
-            getTabItems(tabEntities, activeTab, isAnimationTileDismissed, viewState.mode, browserMode, viewState.isFireTabsPromoVisible)
+            getTabItems(tabEntities, activeTab, isAnimationTileDismissed, viewState.mode, browserMode)
         }
             .map<List<TabSwitcherItem>, TabItems> { TabItems.Loaded(it) }
             .onStart { emit(TabItems.NotInitialized) }
@@ -671,7 +670,6 @@ class TabSwitcherViewModel @Inject constructor(
         isTrackersAnimationInfoPanelHidden: Boolean,
         mode: Mode,
         browserMode: BrowserMode,
-        showFireTabsPromo: Boolean,
     ): List<TabSwitcherItem> {
         if (mode is Selection) {
             return tabEntities.map { entity ->
@@ -697,17 +695,11 @@ class TabSwitcherViewModel @Inject constructor(
             }
         }
 
-        val withTrackerPanel = if (!isTrackersAnimationInfoPanelHidden) {
+        return if (!isTrackersAnimationInfoPanelHidden) {
             val trackerCountForLast7Days = webTrackersBlockedAppRepository.getTrackerCountForLast7Days()
             listOf(TrackersAnimationInfoPanel(trackerCountForLast7Days)) + tabs
         } else {
             tabs
-        }
-
-        return if (showFireTabsPromo && browserMode == BrowserMode.REGULAR) {
-            listOf(FireTabsPromo) + withTrackerPanel
-        } else {
-            withTrackerPanel
         }
     }
 
