@@ -405,6 +405,12 @@
             android:theme="@style/Theme.DuckDuckGo.Dark"
             android:process="@string/fireProcessName" />
         <activity
+            android:name="com.duckduckgo.app.global.shortcut.FireShortcutTrampolineActivity"
+            android:exported="false"
+            android:excludeFromRecents="true"
+            android:noHistory="true"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+        <activity
             android:name="com.duckduckgo.app.icon.ui.ChangeIconActivity"
             android:exported="false"
             android:label="@string/changeIconActivityTitle"
