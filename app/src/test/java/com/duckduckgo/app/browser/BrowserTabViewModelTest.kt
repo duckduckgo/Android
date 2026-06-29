@@ -554,6 +554,8 @@ class BrowserTabViewModelTest {
 
     private lateinit var testee: BrowserTabViewModel
 
+    private var browserMode: BrowserMode = BrowserMode.REGULAR
+
     private lateinit var fireproofWebsiteDao: FireproofWebsiteDao
 
     private lateinit var locationPermissionsDao: LocationPermissionsDao
@@ -1032,7 +1034,7 @@ class BrowserTabViewModelTest {
                 onboardingStore = mockOnboardingStore,
                 autocompleteHistoryDeleteFeature = fakeAutocompleteHistoryDeleteFeature,
                 customAiOnboardingStore = mockCustomAiOnboardingStore,
-                browserMode = BrowserMode.REGULAR,
+                browserMode = browserMode,
                 desktopModeSettings = mockDesktopModeSettings,
                 rememberDesktopModeFeature = fakeRememberDesktopModeFeature,
             )
@@ -2876,6 +2878,37 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenOnLongPressRequiredActionWithOpenInFireTabInRegularModeThenOpensFreshFireTabWithoutSource() = runTest {
+        val target = LongPressTarget(url = "https://example.com", type = WebView.HitTestResult.SRC_ANCHOR_TYPE)
+
+        val handled = testee.onLongPressRequiredAction(target, RequiredAction.OpenInFireTab("https://example.com"))
+
+        assertTrue(handled)
+        assertCommandIssued<Command.GenerateWebViewPreviewImage>()
+        assertCommandIssued<Command.OpenInFireTab> {
+            assertEquals("https://example.com", query)
+            assertNull(sourceTabId)
+        }
+    }
+
+    @Test
+    fun whenOnLongPressRequiredActionWithOpenInFireTabInFireModeThenOpensFromSourceTab() = runTest {
+        browserMode = BrowserMode.FIRE
+        resetChannels()
+        initialiseViewModel()
+        val target = LongPressTarget(url = "https://example.com", type = WebView.HitTestResult.SRC_ANCHOR_TYPE)
+
+        val handled = testee.onLongPressRequiredAction(target, RequiredAction.OpenInFireTab("https://example.com"))
+
+        assertTrue(handled)
+        assertCommandIssued<Command.GenerateWebViewPreviewImage>()
+        assertCommandIssued<Command.OpenInFireTab> {
+            assertEquals("https://example.com", query)
+            assertNotNull(sourceTabId)
+        }
+    }
+
+    @Test
     fun whenSiteLoadedAndUserSelectsToAddBookmarkThenAddBookmarkCommandSentWithUrlAndTitle() =
         runTest {
             val url = "http://foo.com"
@@ -3268,6 +3301,36 @@ class BrowserTabViewModelTest {
         testee.handleAuthentication(request = authenticationRequest, credentials = credentials)
 
         assertCommandIssued<Command.ShowWebContent>()
+    }
+
+    @Test
+    fun whenAuthenticationHandledInRegularModeThenOffersToSaveCredentials() {
+        browserMode = BrowserMode.REGULAR
+        resetChannels()
+        initialiseViewModel()
+        val authenticationRequest = BasicAuthenticationRequest(mock(), "example.com", "test realm", "")
+        val credentials = BasicAuthenticationCredentials(username = "user", password = "password")
+
+        testee.handleAuthentication(request = authenticationRequest, credentials = credentials)
+
+        assertCommandIssued<Command.SaveCredentials>()
+    }
+
+    @Test
+    fun whenAuthenticationHandledInFireModeThenNeverOffersToSaveCredentials() {
+        browserMode = BrowserMode.FIRE
+        resetChannels()
+        initialiseViewModel()
+        val mockHandler = mock<HttpAuthHandler>()
+        val authenticationRequest = BasicAuthenticationRequest(mockHandler, "example.com", "test realm", "")
+        val credentials = BasicAuthenticationCredentials(username = "user", password = "password")
+
+        testee.handleAuthentication(request = authenticationRequest, credentials = credentials)
+
+        // Authentication still proceeds for the session, but the save prompt is suppressed.
+        verify(mockHandler, atLeastOnce()).proceed("user", "password")
+        assertCommandIssued<Command.ShowWebContent>()
+        assertCommandNotIssued<Command.SaveCredentials>()
     }
 
     @Test
@@ -3885,6 +3948,24 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenUserLoadsWebsiteInRegularModeThenCanFireproofSite() {
+        browserMode = BrowserMode.REGULAR
+        resetChannels()
+        initialiseViewModel()
+        loadUrl("http://www.example.com/path", isBrowserShowing = true)
+        assertTrue(browserViewState().canFireproofSite)
+    }
+
+    @Test
+    fun whenUserLoadsWebsiteInFireModeThenCannotFireproofSite() {
+        browserMode = BrowserMode.FIRE
+        resetChannels()
+        initialiseViewModel()
+        loadUrl("http://www.example.com/path", isBrowserShowing = true)
+        assertFalse(browserViewState().canFireproofSite)
+    }
+
+    @Test
     fun whenUserLoadsFireproofWebsiteThenFireproofWebsiteBrowserStateUpdated() {
         givenFireproofWebsiteDomain("www.example.com")
         loadUrl("http://www.example.com/path", isBrowserShowing = true)
@@ -4076,6 +4157,18 @@ class BrowserTabViewModelTest {
         whenever(mockSettingsDataStore.automaticFireproofSetting).thenReturn(AutomaticFireproofSetting.ALWAYS)
         loginEventLiveData.value = givenLoginDetected("example.com")
         assertCommandNotIssued<Command.AskToFireproofWebsite>()
+    }
+
+    @Test
+    fun whenLoginDetectedInFireModeThenNeverAskToFireproofWebsite() {
+        // initialiseViewModel() detaches the previous VM's observer before registering the new one,
+        // so no stale REGULAR-mode VM can emit AskToFireproofWebsite via mockCommandObserver.
+        browserMode = BrowserMode.FIRE
+        resetChannels()
+        initialiseViewModel()
+        loginEventLiveData.value = givenLoginDetected("example.com")
+        assertCommandNotIssued<Command.AskToFireproofWebsite>()
+        assertCommandNotIssued<Command.AskToAutomateFireproofWebsite>()
     }
 
     @Test
@@ -10893,6 +10986,40 @@ class BrowserTabViewModelTest {
         testee.onSiteVisited("about:blank", null)
 
         verify(mockTabVisitedSitesRepository, never()).recordVisitedSite(any(), any())
+    }
+
+    @Test
+    fun whenOnSiteVisitedInRegularModeThenSavedToHistory() = runTest {
+        browserMode = BrowserMode.REGULAR
+        resetChannels()
+        initialiseViewModel()
+
+        testee.onSiteVisited("https://sub.example.com/path", null)
+
+        verify(mockNavigationHistory).saveToHistory("https://sub.example.com/path", null, "abc")
+    }
+
+    @Test
+    fun whenOnSiteVisitedInFireModeThenNotSavedToHistory() = runTest {
+        browserMode = BrowserMode.FIRE
+        resetChannels()
+        initialiseViewModel()
+
+        testee.onSiteVisited("https://sub.example.com/path", null)
+
+        verify(mockNavigationHistory, never()).saveToHistory(any(), anyOrNull(), any())
+    }
+
+    @Test
+    fun whenOnSiteVisitedInFireModeThenVisitedSiteStillRecordedForBurnScope() = runTest {
+        fakeAndroidConfigBrowserFeature.singleTabFireDialog().setRawStoredState(State(enable = true))
+        browserMode = BrowserMode.FIRE
+        resetChannels()
+        initialiseViewModel()
+
+        testee.onSiteVisited("https://sub.example.com/path", null)
+
+        verify(mockTabVisitedSitesRepository).recordVisitedSite("abc", "example.com")
     }
 
     @Test

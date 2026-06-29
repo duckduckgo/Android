@@ -95,6 +95,8 @@
     </plurals>
 
     <!-- Fire mode -->
+    <string name="openInFireTab">Open in Fire Tab</string>
+    <string name="openInBackgroundTab">Open in Background</string>
     <string name="browserModeToggleFireDescription">Switch to Fire mode tabs</string>
     <string name="browserModeToggleRegularDescription">Switch to regular tabs</string>
     <string name="browserModeToggleTabCountInfinite">∞</string>

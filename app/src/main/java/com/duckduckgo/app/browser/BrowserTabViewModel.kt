@@ -121,6 +121,7 @@ import com.duckduckgo.app.browser.commands.Command.LaunchVpnManagement
 import com.duckduckgo.app.browser.commands.Command.LoadExtractedUrl
 import com.duckduckgo.app.browser.commands.Command.OpenAppLink
 import com.duckduckgo.app.browser.commands.Command.OpenBrokenSiteLearnMore
+import com.duckduckgo.app.browser.commands.Command.OpenInFireTab
 import com.duckduckgo.app.browser.commands.Command.OpenInNewBackgroundTab
 import com.duckduckgo.app.browser.commands.Command.OpenInNewTab
 import com.duckduckgo.app.browser.commands.Command.OpenMessageInNewTab
@@ -810,6 +811,10 @@ class BrowserTabViewModel @Inject constructor(
     private val loginDetectionObserver =
         Observer<LoginDetected> { loginEvent ->
             logcat(INFO) { "LoginDetection for $loginEvent" }
+
+            // Fireproofing is not applicable in Fire mode, so never offer to fireproof on login.
+            if (browserMode == BrowserMode.FIRE) return@Observer
+
             viewModelScope.launch(dispatchers.io()) {
                 val canPromptAboutFireproofing = !autofillFireproofDialogSuppressor.isAutofillPreventingFireproofPrompts()
 
@@ -1164,13 +1169,16 @@ class BrowserTabViewModel @Inject constructor(
         viewModelScope.launch(dispatchers.io()) {
             val uri = url.toUri()
 
-            if (duckPlayer.getDuckPlayerState() == ENABLED && duckPlayer.isSimulatedYoutubeNoCookie(uri)) {
-                val duckPlayerUrl = duckPlayer.createDuckPlayerUriFromYoutubeNoCookie(uri)
-                if (duckPlayerUrl != null) {
-                    history.saveToHistory(duckPlayerUrl, title, tabId)
+            // Fire mode must leave no trace in the shared browsing history.
+            if (browserMode != BrowserMode.FIRE) {
+                if (duckPlayer.getDuckPlayerState() == ENABLED && duckPlayer.isSimulatedYoutubeNoCookie(uri)) {
+                    val duckPlayerUrl = duckPlayer.createDuckPlayerUriFromYoutubeNoCookie(uri)
+                    if (duckPlayerUrl != null) {
+                        history.saveToHistory(duckPlayerUrl, title, tabId)
+                    }
+                } else {
+                    history.saveToHistory(url, title, tabId)
                 }
-            } else {
-                history.saveToHistory(url, title, tabId)
             }
 
             if (androidBrowserConfig.singleTabFireDialog().isEnabled()) {
@@ -2141,7 +2149,7 @@ class BrowserTabViewModel @Inject constructor(
                 isPrivacyProtectionDisabled = false,
                 canFindInPage = true,
                 canChangeBrowsingMode = true,
-                canFireproofSite = domain != null,
+                canFireproofSite = domain != null && browserMode != BrowserMode.FIRE,
                 isFireproofWebsite = isFireproofWebsite(),
                 canPrintPage = domain != null,
                 maliciousSiteBlocked = false,
@@ -3272,7 +3280,13 @@ class BrowserTabViewModel @Inject constructor(
     ): Boolean {
         val requiredAction = longPressHandler.userSelectedMenuItem(longPressTarget, item)
         logcat { "Required action from long press is $requiredAction" }
+        return onLongPressRequiredAction(longPressTarget, requiredAction)
+    }
 
+    fun onLongPressRequiredAction(
+        longPressTarget: LongPressTarget,
+        requiredAction: RequiredAction,
+    ): Boolean {
         return when (requiredAction) {
             is RequiredAction.OpenInNewTab -> {
                 if (subscriptions.shouldLaunchSubscriptionForUrl(requiredAction.url)) {
@@ -3281,6 +3295,19 @@ class BrowserTabViewModel @Inject constructor(
                 }
                 command.value = GenerateWebViewPreviewImage
                 command.value = OpenInNewTab(query = requiredAction.url, sourceTabId = tabId)
+                true
+            }
+
+            is RequiredAction.OpenInFireTab -> {
+                if (subscriptions.shouldLaunchSubscriptionForUrl(requiredAction.url)) {
+                    command.value = LaunchSubscription(requiredAction.url.toUri())
+                    return true
+                }
+                command.value = GenerateWebViewPreviewImage
+                command.value = OpenInFireTab(
+                    query = requiredAction.url,
+                    sourceTabId = if (browserMode == BrowserMode.FIRE) tabId else null,
+                )
                 true
             }
 
@@ -3898,7 +3925,11 @@ class BrowserTabViewModel @Inject constructor(
     ) {
         request.handler.proceed(credentials.username, credentials.password)
         command.value = ShowWebContent
-        command.value = SaveCredentials(request, credentials)
+
+        // Fire mode authenticates this session but never offers to save the credentials.
+        if (browserMode != BrowserMode.FIRE) {
+            command.value = SaveCredentials(request, credentials)
+        }
     }
 
     fun cancelAuthentication(request: BasicAuthenticationRequest) {
