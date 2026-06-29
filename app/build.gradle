@@ -407,6 +407,9 @@ dependencies {
     implementation project(':site-permissions-api')
     implementation project(':site-permissions-impl')
 
+    implementation project(':site-preferences-api')
+    implementation project(':site-preferences-impl')
+
     implementation project(':ad-click-api')
     implementation project(':ad-click-impl')
 

@@ -296,6 +296,18 @@ class BrowserWebViewClientTest {
     }
 
     @Test
+    fun whenOnPageStartedThenContentScopeDesktopModeComesFromCurrentSite() {
+        // pageChanged stamps site.isDesktopMode per-domain before this runs, so the C-S-S flag is read from getSite().
+        val site = mock<Site>()
+        whenever(site.isDesktopMode).thenReturn(true)
+        whenever(listener.getSite()).thenReturn(site)
+
+        testee.onPageStarted(webView, EXAMPLE_URL, null)
+
+        assertEquals(true, jsPlugins.plugin.lastDesktopMode)
+    }
+
+    @Test
     fun whenOnPageStartedCalledThenProcessUriForThirdPartyCookiesCalled() =
         runTest {
             testee.onPageStarted(webView, EXAMPLE_URL, null)
@@ -1785,6 +1797,7 @@ class BrowserWebViewClientTest {
     private class FakeJsInjectorPlugin : JsInjectorPlugin {
         var countFinished = 0
         var countStarted = 0
+        var lastDesktopMode: Boolean? = null
 
         override fun onPageStarted(
             webView: WebView,
@@ -1793,6 +1806,7 @@ class BrowserWebViewClientTest {
             activeExperiments: List<Toggle>,
         ) {
             countStarted++
+            lastDesktopMode = isDesktopMode
         }
 
         override fun onPageFinished(

@@ -59,4 +59,21 @@ class StringExtensionsTest {
         assertNull("126.0.6478a.40".compareSemanticVersion("126.0.6478.40"))
         assertNull("126.0.6478.40a".compareSemanticVersion("126.0.6478.40"))
     }
+
+    @Test
+    fun whenHostHasRegistrableDomainThenToTldPlusOneOrSelfReturnsETldPlusOne() {
+        assertEquals("example.com", "example.com".toTldPlusOneOrSelf())
+        assertEquals("example.com", "www.example.com".toTldPlusOneOrSelf())
+        assertEquals("example.com", "m.example.com".toTldPlusOneOrSelf())
+        assertEquals("example.co.uk", "news.example.co.uk".toTldPlusOneOrSelf())
+    }
+
+    @Test
+    fun whenHostHasNoRegistrableDomainThenToTldPlusOneOrSelfReturnsHost() {
+        // IPv4 literals and localhost have no eTLD+1 and must come back unchanged (used as a site key).
+        assertEquals("192.168.1.1", "192.168.1.1".toTldPlusOneOrSelf())
+        assertEquals("10.0.0.1", "10.0.0.1".toTldPlusOneOrSelf())
+        assertEquals("127.0.0.1", "127.0.0.1".toTldPlusOneOrSelf())
+        assertEquals("localhost", "localhost".toTldPlusOneOrSelf())
+    }
 }

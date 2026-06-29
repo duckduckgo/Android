@@ -334,6 +334,8 @@ import com.duckduckgo.site.permissions.api.SitePermissionsManager
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.LocationPermissionRequest
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissionQueryResponse
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissions
+import com.duckduckgo.site.preferences.api.DesktopModeSettings
+import com.duckduckgo.site.preferences.impl.RememberDesktopModeFeature
 import com.duckduckgo.subscriptions.api.SUBSCRIPTIONS_FEATURE_NAME
 import com.duckduckgo.subscriptions.api.SubscriptionPromoCtaShownPlugin
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
@@ -692,6 +694,8 @@ class BrowserTabViewModelTest {
     private var fakeFaviconFetchingFixFeature = FakeFeatureToggleFactory.create(FaviconFetchingFixFeature::class.java)
     private var fakeProgressBarUpgradeFeature = FakeFeatureToggleFactory.create(ProgressBarUpgradeFeature::class.java)
     private val fakeAutocompleteHistoryDeleteFeature = FakeFeatureToggleFactory.create(AutocompleteHistoryDeleteFeature::class.java)
+    private val mockDesktopModeSettings: DesktopModeSettings = mock()
+    private val fakeRememberDesktopModeFeature = FakeFeatureToggleFactory.create(RememberDesktopModeFeature::class.java)
     private val mockInlinePdfHandler: InlinePdfHandler = mock()
     private val mockPdfDownloadTooltipDataStore: PdfDownloadTooltipDataStore = mock()
     private val mockCachedFileDownloader: CachedFileDownloader = mock()
@@ -723,6 +727,8 @@ class BrowserTabViewModelTest {
             swipingTabsFeature.self().setRawStoredState(State(enable = true))
             swipingTabsFeature.enabledForUsers().setRawStoredState(State(enable = true))
             fakeAutocompleteHistoryDeleteFeature.self().setRawStoredState(State(enable = true))
+
+            fakeRememberDesktopModeFeature.self().setRawStoredState(State(enable = true))
 
             whenever(mockDuckChatJSHelper.enrichPageContextIfPossible(any(), any())).thenAnswer { it.getArgument<String>(1) }
             whenever(mockInlinePdfHandler.classifyPdfRequest(any(), anyOrNull(), any())).thenReturn(PdfRenderDecision.NotApplicable)
@@ -1021,6 +1027,8 @@ class BrowserTabViewModelTest {
                 autocompleteHistoryDeleteFeature = fakeAutocompleteHistoryDeleteFeature,
                 customAiOnboardingStore = mockCustomAiOnboardingStore,
                 browserMode = BrowserMode.REGULAR,
+                desktopModeSettings = mockDesktopModeSettings,
+                rememberDesktopModeFeature = fakeRememberDesktopModeFeature,
             )
 
         testee.loadData("abc", null, false, false)
@@ -2378,6 +2386,7 @@ class BrowserTabViewModelTest {
         testee.onChangeBrowserModeClicked()
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         verify(mockPixel).fire(AppPixelName.MENU_ACTION_DESKTOP_SITE_ENABLE_PRESSED)
+        verify(mockDesktopModeSettings).rememberDesktopMode("http://example.com")
         assertTrue(browserViewState().isDesktopBrowsingMode)
         val site = testee.siteLiveData.value
         assertTrue(site?.isDesktopMode == true)
@@ -2389,6 +2398,7 @@ class BrowserTabViewModelTest {
         setDesktopBrowsingMode(true)
         testee.onChangeBrowserModeClicked()
         verify(mockPixel).fire(AppPixelName.MENU_ACTION_DESKTOP_SITE_DISABLE_PRESSED)
+        verify(mockDesktopModeSettings).forgetDesktopMode("http://example.com")
         assertFalse(browserViewState().isDesktopBrowsingMode)
         val site = testee.siteLiveData.value
         assertFalse(site?.isDesktopMode == true)
@@ -2694,6 +2704,8 @@ class BrowserTabViewModelTest {
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         val ultimateCommand = commandCaptor.lastValue as Navigate
         assertEquals(exampleUrl, ultimateCommand.url)
+        // The raw URL is passed through; the site-preferences impl collapses m./www./paths to the site key.
+        verify(mockDesktopModeSettings).rememberDesktopMode("http://m.example.com")
     }
 
     @Test
@@ -2724,6 +2736,97 @@ class BrowserTabViewModelTest {
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         val ultimateCommand = commandCaptor.lastValue as Navigate
         assertEquals(exampleUrl, ultimateCommand.url)
+    }
+
+    @Test
+    fun whenDesktopToggledOnHostWithoutRegistrableDomainThenUrlStillPersisted() {
+        // IPs / localhost / single-label intranet hosts have no eTLD+1; the impl keys them on the raw
+        // host so desktop mode still works (e.g. router admin pages on 192.168.x.x). The VM passes the URL.
+        loadUrl("http://localhost")
+        setDesktopBrowsingMode(false)
+        testee.onChangeBrowserModeClicked()
+        verify(mockDesktopModeSettings).rememberDesktopMode("http://localhost")
+        verify(mockPixel).fire(AppPixelName.MENU_ACTION_DESKTOP_SITE_ENABLE_PRESSED)
+    }
+
+    @Test
+    fun whenNavigatingToNonRememberedSiteThenDesktopModeResetAndNotInheritedFromPreviousSite() {
+        whenever(mockDesktopModeSettings.isDesktopModeRememberedSync("http://a.com")).thenReturn(true)
+        whenever(mockDesktopModeSettings.isDesktopModeRememberedSync("http://b.com")).thenReturn(false)
+
+        loadUrl("http://a.com")
+        assertTrue(browserViewState().isDesktopBrowsingMode)
+        assertTrue(testee.siteLiveData.value?.isDesktopMode == true)
+
+        loadUrl("http://b.com")
+        assertFalse(browserViewState().isDesktopBrowsingMode)
+        assertFalse(testee.siteLiveData.value?.isDesktopMode == true)
+    }
+
+    @Test
+    fun whenUserRefreshesAndDesktopModeChangedSinceLoadThenFullReloadToReframe() {
+        // Mobile loaded, then desktop remembered (e.g. in another tab): a user refresh should reframe (Navigate).
+        whenever(mockDesktopModeSettings.isDesktopModeRememberedSync(exampleUrl)).thenReturn(false)
+        loadUrl(exampleUrl)
+        assertFalse(testee.siteLiveData.value?.isDesktopMode == true)
+
+        whenever(mockDesktopModeSettings.isDesktopModeRememberedSync(exampleUrl)).thenReturn(true)
+        testee.onRefreshRequested(triggeredByUser = true)
+
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        val command = commandCaptor.lastValue
+        assertTrue(command is Navigate)
+        assertEquals(exampleUrl, (command as Navigate).url)
+        assertTrue(browserViewState().isDesktopBrowsingMode)
+        assertTrue(testee.siteLiveData.value?.isDesktopMode == true)
+    }
+
+    @Test
+    fun whenUserRefreshesAndModeChangedDesktopToMobileSinceLoadThenFullReloadToReframe() {
+        // Desktop loaded, then reverted to mobile (e.g. in another tab): refresh must reframe in this direction too.
+        whenever(mockDesktopModeSettings.isDesktopModeRememberedSync(exampleUrl)).thenReturn(true)
+        loadUrl(exampleUrl)
+        assertTrue(testee.siteLiveData.value?.isDesktopMode == true)
+
+        whenever(mockDesktopModeSettings.isDesktopModeRememberedSync(exampleUrl)).thenReturn(false)
+        testee.onRefreshRequested(triggeredByUser = true)
+
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        val command = commandCaptor.lastValue
+        assertTrue(command is Navigate)
+        assertFalse(browserViewState().isDesktopBrowsingMode)
+        assertFalse(testee.siteLiveData.value?.isDesktopMode == true)
+    }
+
+    @Test
+    fun whenUserRefreshesAndDesktopModeUnchangedSinceLoadThenPlainRefresh() {
+        whenever(mockDesktopModeSettings.isDesktopModeRememberedSync(exampleUrl)).thenReturn(false)
+        loadUrl(exampleUrl)
+
+        testee.onRefreshRequested(triggeredByUser = true)
+
+        assertCommandIssued<NavigationCommand.Refresh>()
+    }
+
+    @Test
+    fun whenNonUserRefreshAndDesktopModeChangedSinceLoadThenPlainRefreshNotReframe() {
+        // The reframing full-reload only applies to user-initiated refreshes.
+        whenever(mockDesktopModeSettings.isDesktopModeRememberedSync(exampleUrl)).thenReturn(false)
+        loadUrl(exampleUrl)
+        whenever(mockDesktopModeSettings.isDesktopModeRememberedSync(exampleUrl)).thenReturn(true)
+
+        testee.onRefreshRequested(triggeredByUser = false)
+
+        assertCommandIssued<NavigationCommand.Refresh>()
+    }
+
+    @Test
+    fun whenRememberDesktopModeEnabledThenIsDesktopSiteEnabledUsesPrimingAwareRead() = runTest {
+        // The interceptor-facing read passes the raw URL to the canonical, priming-aware lookup (which the
+        // impl resolves via its site key) so the first load of a remembered site picks desktop mode.
+        whenever(mockDesktopModeSettings.isDesktopModeRemembered("http://example.com/some/path")).thenReturn(true)
+
+        assertTrue(testee.isDesktopSiteEnabled("http://example.com/some/path"))
     }
 
     @Test
