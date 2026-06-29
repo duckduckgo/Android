@@ -152,9 +152,18 @@ class ShowOnAppLaunchActivity : DuckDuckGoActivity() {
                     setTitle(R.string.afterInactivityOptionTitle)
                     binding.afterInactivityTimeoutRow.setSecondaryText(viewState.selectedIdleThresholdSeconds.toTimeoutLabel())
                     binding.afterInactivityTimeoutRow.visibility = View.VISIBLE
+                    binding.afterInactivityTimeoutDivider.visibility = View.VISIBLE
                 } else {
                     setTitle(R.string.showOnAppLaunchOptionTitle)
                     binding.afterInactivityTimeoutRow.visibility = View.GONE
+                    binding.afterInactivityTimeoutDivider.visibility = View.GONE
+                }
+
+                val showReturnToLastTabToggle = viewState.showNTPAfterIdleReturn && viewState.selectedOption == NewTabPage
+                binding.returnToLastTabDivider.visibility = if (showReturnToLastTabToggle) View.VISIBLE else View.GONE
+                binding.returnToLastTabToggle.visibility = if (showReturnToLastTabToggle) View.VISIBLE else View.GONE
+                binding.returnToLastTabToggle.quietlySetIsChecked(viewState.returnToLastTabEnabled) { _, isChecked ->
+                    viewModel.onReturnToLastTabToggled(isChecked)
                 }
 
                 if (binding.specificPageUrlInput.text.isBlank()) {

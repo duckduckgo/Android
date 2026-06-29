@@ -850,6 +850,7 @@
     <string name="preOnboardingDaxDialog1TitleDuckAi" translatable="false"><![CDATA[Hi there.<br/><br/>Ready for a faster browser that protects you and lets you decide when and how to use AI?]]></string>
     <string name="preOnboardingDaxDialog1Button">Aiziet!</string>
     <string name="preOnboardingDaxDialog1ButtonDuckAi" translatable="false">Let\&apos;s get started!</string>
+    <string name="preOnboardingDaxDialog1ButtonBrandDesign">Sāksim!</string>
     <string name="preOnboardingDaxDialog1SecondaryButton">Es jau esmu bijis/-usi šeit agrāk</string>
     <string name="preOnboardingDaxDialog2Title">Aizsardzība ir aktivizēta!</string>
     <string name="preOnboardingDaxDialog2Button">Izvēlies pārlūku</string>
@@ -916,6 +917,7 @@
     <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[DuckDuckGo piedāvā arī <b>neobligātu maksas abonementu</b> ar drošu <b>VPN</b> un <b>uzlabotu, privātu mākslīgo intelektu</b>.]]></string>
     <string name="onboardingPrivacyProDaxDialogOkButton">Uzzināt vairāk</string>
     <string name="onboardingPrivacyProDaxDialogFreeTrialOkButton">Izmēģini bez maksas!</string>
+    <string name="onboardingPrivacyProDaxDialogFreeTrialOkButtonBrandDesign">Izmēģini bez maksas!</string>
     <string name="onboardingPrivacyProDaxDialogCancelButton">Izlaist</string>
     <string name="onboardingSkippedPrivacyProDaxDialogTitle">Vai zināji?</string>
 
@@ -1050,6 +1052,42 @@
     <string name="onboardingStepIndicatorText" instruction="a counter above our instructions in onboarding that tells a user what step they are on">%1$d no %2$d</string>
     <string name="onboardingSearchDaxDialogOption1Quoted" instruction="translate &apos;duck&apos; too.">kā angliski pateikt “duck”</string>
     <string name="onboardingSearchDaxDialogOption1EnglishQuoted" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">kā spāniski pateikt “pīle”</string>
+
+    <string name="onboardingDuckAiFireButtonDaxDialogTitle">Tas ir Duck.ai!</string>
+    <string name="onboardingDuckAiFireButtonDaxDialogDescription"><![CDATA[Privātas MI tērzēšanas, ko vari jebkurā laikā izdzēst, izmantojot <b>Fire Button</b>. Izmēģini! 🔥]]></string>
+    <string name="onboardingDuckAiEndCtaTitle">Izdevās!</string>
+    <string name="onboardingDuckAiEndCtaDescription"><![CDATA[Izmanto adreses joslu, lai meklētu un apmeklētu vietnes, vai pārslēdzies uz Duck.ai privātai MI tērzēšanai.<br/><br/>Tu vari izmantot Duck.ai no jebkuras vietas, kur redzi tērzēšanas ikonu.]]></string>
+    <string name="onboardingDuckAiEndCtaButton">Dod pieci!</string>
+
+    <!-- Input Mode Demo Onboarding step -->
+    <string name="preOnboardingInputModeDemoTitle">Esi gatavs sākt?&lt;br/&gt;Izmēģini meklēšanu vai MI tērzēšanu!</string>
+    <string name="preOnboardingInputModeDemoSearchHint">Meklē privāti</string>
+    <string name="preOnboardingInputModeDemoChatHint">Jautā jebko privāti</string>
+    <string name="preOnboardingInputModeDemoChatSuggestion1">Izskaidro akciju tirgu tā, it kā man būtu 10 gadi</string>
+    <string name="preOnboardingInputModeDemoChatSuggestion2">Saplāno ideālu dienu Londonā</string>
+    <string name="preOnboardingInputModeDemoChatSuggestion3">Pārsteidz mani!</string>
+    <string name="preOnboardingInputModeDemoChatSuggestion3Prompt">Pastāsti 10 interesantus faktus par zinātni, dabu un vēsturi</string>
+
+    <!-- Custom AI onboarding flow -->
+    <!-- Pre-onboarding: initial screens -->
+    <string name="preOnboardingWelcomeDialogBodyCustomAi">Vai esi gatavs bez maksas tērzēt privāti ar ChatGPT, Claude un citiem MI pārlūkprogrammā, kas tevi aktīvi aizsargā?</string>
+    <string name="preOnboardingDaxDialog3TextCustomAi">Atceries: Duck.ai vari izmantot no jebkuras vietas, kur redzi tērzēšanas ikonu</string>
+    <string name="preOnboardingDaxDialog3ButtonCustomAi">Sākt MI tērzēšanu</string>
+    <!-- Pre-onboarding: AI comparison chart screen. -->
+    <string name="preOnboardingDaxDialogAiTitle">MI aizsardzība ir aktivizēta!</string>
+    <string name="preOnboardingAiComparisonChartPopularAis">Populāri MI</string>
+    <string name="preOnboardingAiComparisonChartItem1">Visas tērzēšanas sarunas ir anonimizētas</string>
+    <string name="preOnboardingAiComparisonChartItem2">Lai piekļūtu visām MI funkcijām, nav nepieciešams konts</string>
+    <string name="preOnboardingAiComparisonChartItem3">Tavas tērzēšanas sarunas nekad netiek izmantotas MI apmācībai</string>
+    <string name="preOnboardingAiComparisonChartItem4">Piekļūsti ChatGPT, Claude un citiem pakalpojumiem vienuviet</string>
+    <string name="preOnboardingAiComparisonChartButton">Izmēģini Duck.ai!</string>
+    <!-- Pre-onboarding: input demo screen -->
+    <string name="preOnboardingInputModeDemoTitleCustomAi">Tagad izmēģini privātu tērzēšanu ar mākslīgo intelektu!</string>
+    <!-- Pre-onboarding: browser comparison screen -->
+    <string name="preOnboardingDaxDialog2TitleCustomAi">Vai vēlies padarīt DuckDuckGo par savu noklusējuma pārlūku?</string>
+    <!-- In-context onboarding. -->
+    <string name="onboardingEndCustomAiFlowDaxDialogDescription"><![CDATA[Sāc privātu MI tērzēšanu ar Duck.ai vai pārslēdzies uz meklēšanu aizsargātai pārlūkošanai.<br/><br/>Tu vari izmantot Duck.ai no jebkuras vietas, kur redzi tērzēšanas ikonu.]]></string>
+    <string name="onboardingPrivacyProCustomAiFlowDaxDialogDescription">Mēs piedāvājam arī maksas abonementu ar uzlabotiem MI modeļiem ar augstākiem tērzēšanas ierobežojumiem no GPT un Claude, ar drošu VPN un citiem pakalpojumiem.</string>
 
     <string name="input_screen_user_pref_without_ai_updated">Meklēt tikai</string>
     <string name="input_screen_user_pref_with_ai_updated">Pārslēdzies starp\nmeklēšanu un Duck.ai</string>

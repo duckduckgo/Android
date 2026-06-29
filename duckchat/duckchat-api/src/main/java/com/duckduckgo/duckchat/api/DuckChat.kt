@@ -109,6 +109,14 @@ interface DuckChat {
      */
     fun observeNativeInputFieldUserSettingEnabled(): Flow<Boolean>
 
+    /**
+     * Observes whether the Duck.ai native chat input integration is enabled.
+     * Emits `true` only when both the native input widget and the `nativeChatInput`
+     * feature flag are enabled (and the widget is not suppressed). When `false`,
+     * Duck.ai contextual and full modes fall back to the web input.
+     */
+    fun observeNativeChatInputEnabled(): Flow<Boolean>
+
     suspend fun isStandaloneMigrationCompleted(): Boolean
 
     /**
@@ -155,6 +163,11 @@ interface DuckChat {
      * Suspending because the underlying feature-flag reads must not block the main thread.
      */
     suspend fun isChatHistoryAvailable(): Boolean
+
+    /**
+     * Returns `true` when the user enabled Duck.ai chat history in settings.
+     */
+    suspend fun hasUserEnabledChatHistory(): Boolean
 
     /**
      * Records that the user selected the "Search + Duck.ai" option on the new address bar picker, so the

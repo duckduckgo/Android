@@ -46,6 +46,7 @@ interface NativeInputHost {
      * via [NativeInputStateProvider].
      */
     fun toolSelected(tool: String?)
+    fun customizeResponsesClicked()
 }
 
 interface NativeInputPlugin : ActivePlugin {

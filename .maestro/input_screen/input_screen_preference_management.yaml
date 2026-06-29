@@ -2,7 +2,6 @@ appId: com.duckduckgo.mobile.android
 name: "Input Screen user preferences test"
 tags:
   - inputScreenTest
-  - releaseTest
 ---
 - retry:
     maxRetries: 3

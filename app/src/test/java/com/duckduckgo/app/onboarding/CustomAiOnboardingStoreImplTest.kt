@@ -17,7 +17,6 @@
 package com.duckduckgo.app.onboarding
 
 import com.duckduckgo.app.onboardingbranddesignupdate.OnboardingBrandDesignUpdateToggles
-import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.api.InMemorySharedPreferences
 import com.duckduckgo.data.store.api.SharedPreferencesProvider
@@ -36,7 +35,6 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
-import java.util.Locale
 
 class CustomAiOnboardingStoreImplTest {
 
@@ -53,7 +51,6 @@ class CustomAiOnboardingStoreImplTest {
     private val customAiOnboardingFeature: CustomAiOnboardingFeature = mock()
     private val orchestratorFeature: LinearOnboardingOrchestratorFeature = mock()
     private val brandDesignUpdateToggles: OnboardingBrandDesignUpdateToggles = mock()
-    private val appBuildConfig: AppBuildConfig = mock()
 
     private val resolvedListener = object : AppInstallationReferrerStateListener {
         override fun initialiseReferralRetrieval() {}
@@ -72,7 +69,6 @@ class CustomAiOnboardingStoreImplTest {
             customAiOnboardingFeature = customAiOnboardingFeature,
             orchestratorFeature = orchestratorFeature,
             brandDesignUpdateToggles = brandDesignUpdateToggles,
-            appBuildConfig = appBuildConfig,
         )
 
     @Before
@@ -80,7 +76,6 @@ class CustomAiOnboardingStoreImplTest {
         whenever(customAiOnboardingFeature.self()).thenReturn(enabledToggle)
         whenever(orchestratorFeature.self()).thenReturn(enabledToggle)
         whenever(brandDesignUpdateToggles.brandDesignUpdate()).thenReturn(enabledToggle)
-        whenever(appBuildConfig.deviceLocale).thenReturn(Locale.US)
     }
 
     @Test
@@ -112,22 +107,6 @@ class CustomAiOnboardingStoreImplTest {
         val store = store()
         store.process(mapOf("origin" to "funnel_playstore", "onboarding" to "ai"))
         assertFalse(store.resolve())
-    }
-
-    @Test
-    fun `when referrer ai but non-english locale then resolves false`() = runTest {
-        whenever(appBuildConfig.deviceLocale).thenReturn(Locale.FRANCE)
-        val store = store()
-        store.process(mapOf("origin" to "funnel_playstore", "onboarding" to "ai"))
-        assertFalse(store.resolve())
-    }
-
-    @Test
-    fun `when referrer ai and non-us english locale then resolves true`() = runTest {
-        whenever(appBuildConfig.deviceLocale).thenReturn(Locale.UK)
-        val store = store()
-        store.process(mapOf("origin" to "funnel_playstore", "onboarding" to "ai"))
-        assertTrue(store.resolve())
     }
 
     @Test

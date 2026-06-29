@@ -34,6 +34,10 @@ import com.duckduckgo.newtabpage.impl.pixels.NtpAfterIdlePixelName.TIMEOUT_SELEC
 import com.duckduckgo.newtabpage.impl.pixels.NtpAfterIdlePixelName.TIMEOUT_SELECTED_60_DAILY
 import com.duckduckgo.newtabpage.impl.pixels.NtpAfterIdlePixelName.TIMEOUT_SELECTED_ALWAYS
 import com.duckduckgo.newtabpage.impl.pixels.NtpAfterIdlePixelName.TIMEOUT_SELECTED_ALWAYS_DAILY
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertFalse
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.mock
@@ -47,12 +51,29 @@ class NtpAfterIdleManagerImplTest {
     private val pixel: Pixel = mock()
     private val hatchPixels: HatchPixels = mock()
     private val hatchInteractionsPlugins: PluginPoint<HatchInteractionsPlugin> = mock()
+    private val returnToLastTabStore: ReturnToLastTabStore = mock()
 
     private lateinit var testee: NtpAfterIdleManagerImpl
 
     @Before
     fun setup() {
-        testee = NtpAfterIdleManagerImpl(pixel, hatchPixels, hatchInteractionsPlugins)
+        testee = NtpAfterIdleManagerImpl(pixel, hatchPixels, hatchInteractionsPlugins, returnToLastTabStore)
+    }
+
+    // --- return-to-last-tab setting ---
+
+    @Test
+    fun returnToLastTabEnabledReflectsStore() = runTest {
+        whenever(returnToLastTabStore.isEnabled).thenReturn(flowOf(false))
+
+        assertFalse(testee.returnToLastTabEnabled.first())
+    }
+
+    @Test
+    fun setReturnToLastTabEnabledWritesToStore() = runTest {
+        testee.setReturnToLastTabEnabled(false)
+
+        verify(returnToLastTabStore).setEnabled(false)
     }
 
     // --- onNtpShown classification ---

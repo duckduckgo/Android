@@ -51,7 +51,6 @@ import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggesti
 import com.duckduckgo.browser.ui.PulseAnimation
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.ViewViewModelFactory
-import com.duckduckgo.common.utils.extensions.hideKeyboard
 import com.duckduckgo.common.utils.extensions.showKeyboard
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
@@ -71,6 +70,8 @@ import com.google.android.material.card.MaterialCardView
 import com.google.android.material.tabs.TabLayout
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -100,6 +101,8 @@ interface NativeInputWidget {
 
     /** Fired when the user picks a model in the model-change flow (→ submitChangeModelAction). */
     var onChangeModelSubmitted: ((modelId: String) -> Unit)?
+
+    var onCustomizeResponsesClicked: (() -> Unit)?
     val isModelMenuVisible: Boolean
 
     fun onBackPressed()
@@ -110,8 +113,6 @@ interface NativeInputWidget {
     fun beginEnterAnimationPreview(isBottom: Boolean)
     fun endEnterAnimationPreview()
     fun selectAllText()
-    fun hideKeyboard()
-    fun showKeyboard()
     fun selectChatTab()
     fun selectSearchTab()
     fun applyDefaultTogglePosition()
@@ -121,7 +122,6 @@ interface NativeInputWidget {
     fun setVoiceSearchAvailable(available: Boolean)
     fun setVoiceChatAvailable(available: Boolean)
     fun submitMessage(message: String?)
-    fun submitAsChat(): Boolean
     fun setToggleVisible(visible: Boolean)
     fun setFloatingSubmitContainer(container: ViewGroup)
     fun getSelectedModelId(): String?
@@ -248,6 +248,10 @@ class NativeInputModeWidget @JvmOverloads constructor(
     private var hasAttachments: Boolean = false
     private var nativeInputState: NativeInputState? = null
     private var chatSuggestionsBinding: NativeInputChatSuggestionsBinder.Binding? = null
+
+    // Outlives a single suggestions presentation (survives clear() on tab switches); handed to chat-item
+    // plugins so they can collect into their adapters. Cancelled in tearDownChatSuggestions().
+    private var chatItemPluginScope: CoroutineScope? = null
     private var onShowSuggestions: ((RecyclerView.Adapter<*>) -> Unit)? = null
     private var onClearSuggestions: ((Boolean) -> Unit)? = null
     private var voiceSearchAvailable: Boolean = false
@@ -255,6 +259,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
     private var widgetRoot: View? = null
     override var onStopTapped: (() -> Unit)? = null
     override var onChangeModelSubmitted: ((modelId: String) -> Unit)? = null
+    override var onCustomizeResponsesClicked: (() -> Unit)? = null
     override var onImageClick: (() -> Unit)? = null
     override var onVoiceSearchClick: (() -> Unit)? = null
         set(value) {
@@ -472,7 +477,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
                 when (state) {
                     ChatState.HIDE -> {
                         isFocussed = hasInputFocus()
-                        (context as? Activity)?.hideKeyboard()
+                        hideKeyboard()
                         clearInputFocus()
                         widgetRoot?.visibility = GONE
                     }
@@ -480,7 +485,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
                         widgetRoot?.visibility = VISIBLE
                         if (isFocussed) {
                             requestInputFocus()
-                            (context as? Activity)?.showKeyboard(inputField)
+                            showKeyboard()
                         }
                     }
                     ChatState.READY -> {
@@ -521,9 +526,6 @@ class NativeInputModeWidget @JvmOverloads constructor(
             updateBottomRowVisibility()
             applyVerticalPaddingForFocus()
             nativeInputState?.let { updateFireButtonVisibility(it) }
-            if (!hasFocus && isDuckAiPageContext()) {
-                hideKeyboard()
-            }
         }
     }
 
@@ -927,12 +929,14 @@ class NativeInputModeWidget @JvmOverloads constructor(
         applyVerticalPaddingForFocus()
     }
 
-    override fun hideKeyboard() {
-        (context as? Activity)?.hideKeyboard(inputField)
+    fun hideKeyboard() {
+        (context.getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager)
+            ?.hideSoftInputFromWindow(windowToken, 0)
     }
 
-    override fun showKeyboard() {
-        (context as? Activity)?.showKeyboard(inputField)
+    fun showKeyboard() {
+        (context.getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager)
+            ?.showSoftInput(inputField, InputMethodManager.SHOW_IMPLICIT)
     }
 
     override fun selectChatTab() {
@@ -1189,7 +1193,8 @@ class NativeInputModeWidget @JvmOverloads constructor(
         this.onClearSuggestions = onClearSuggestions
 
         // Lazy: bindChatSuggestions runs before attach, so @Inject fields and the ViewModel
-        // aren't ready yet. showSuggestions() only fires post-attach.
+        // aren't ready yet. The binding is created at attach (see onAttachedToWindow) or on the
+        // first showSuggestions(), whichever comes first — both run post-attach.
         fun ensureBinding(): NativeInputChatSuggestionsBinder.Binding {
             return chatSuggestionsBinding ?: chatSuggestionsBinder.create(
                 onChatSuggestionSelected = { suggestion ->
@@ -1205,7 +1210,17 @@ class NativeInputModeWidget @JvmOverloads constructor(
                     onSearchForQuerySubmitted(query)
                 },
                 onChatHistoryShortcutClicked = onChatHistoryShortcutClicked,
-            ).also { chatSuggestionsBinding = it }
+            ).also { binding ->
+                chatSuggestionsBinding = binding
+                val owner = findViewTreeLifecycleOwner()
+                if (owner != null) {
+                    val pluginScope = CoroutineScope(SupervisorJob() + dispatchers.main())
+                    chatItemPluginScope = pluginScope
+                    owner.lifecycleScope.launch {
+                        binding.loadPluginItems(context, pluginScope)
+                    }
+                }
+            }
         }
 
         fun showSuggestions(query: String) {
@@ -1237,10 +1252,17 @@ class NativeInputModeWidget @JvmOverloads constructor(
         this.onChatTextChanged = { text ->
             showSuggestions(text)
         }
+
+        // Load plugins at attach (or now, if already attached) rather than on the first Chat-tab show,
+        // so they're live regardless of the selected tab and their rows exist before the Chat tab first
+        // renders (otherwise a late insert flashes). ensureBinding() is idempotent.
+        doOnAttach { ensureBinding() }
     }
 
     private fun tearDownChatSuggestions() {
         hideChatSuggestions(hideList = true)
+        chatItemPluginScope?.cancel()
+        chatItemPluginScope = null
         chatSuggestionsBinding = null
         onShowSuggestions = null
         onClearSuggestions = null
@@ -1413,6 +1435,10 @@ class NativeInputModeWidget @JvmOverloads constructor(
         viewModel.setSelectedTool(tool)
     }
 
+    override fun customizeResponsesClicked() {
+        onCustomizeResponsesClicked?.invoke()
+    }
+
     override fun showModelPicker(showing: Boolean) {
         findViewById<FrameLayout?>(R.id.modelPickerContainer)?.isVisible = showing
     }
@@ -1468,7 +1494,6 @@ class NativeInputModeWidget @JvmOverloads constructor(
         alpha = if (locked) LOCKED_ALPHA else 1f
         if (locked) {
             clearInputFocus()
-            hideKeyboard()
         }
     }
 

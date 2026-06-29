@@ -9,10 +9,9 @@ tags:
             - launchApp:
                 clearState: true
             - runFlow: ../shared/skip_all_onboarding.yaml
-            - doubleTapOn:
-                id: "omnibarTextInput"
-            - pressKey: Backspace
-            # Test 1 - using \u2028 character
+            - tapOn:
+                id: "inputField"
+            # Test 1 - using line-separator (U+2028) character
             - inputText: "https://privacy-test-pages.site/security/address-bar-spoofing/spoof-basicauth-2028.html"
             - pressKey: Enter
 
@@ -22,8 +21,9 @@ tags:
                 id: "omnibarTextInput"
             - assertTrue: ${maestro.copiedText.indexOf("https://www.google.com") != 0}
             - tapOn:
-                id: "omnibarTextInput"
-            # Test 2 - using \u2029 character
+                id: "omnibarTextInputClickCatcher"
+            - eraseText
+            # Test 2 - using paragraph-separator (U+2029) character
             - inputText: "https://privacy-test-pages.site/security/address-bar-spoofing/spoof-basicauth-2029.html"
             - pressKey: Enter
             - tapOn: "run"
@@ -32,8 +32,9 @@ tags:
                 id: "omnibarTextInput"
             - assertTrue: ${maestro.copiedText.indexOf("https://www.google.com") != 0}
             - tapOn:
-                id: "omnibarTextInput"
-            # Test 3 - using repeated " " space character
+                id: "omnibarTextInputClickCatcher"
+            - eraseText
+            # Test 3 - using repeated space character
             - inputText: "https://privacy-test-pages.site/security/address-bar-spoofing/spoof-basicauth-whitespace.html"
             - pressKey: Enter
             - tapOn: "run"

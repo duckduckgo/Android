@@ -832,6 +832,7 @@
     <string name="preOnboardingDaxDialog1TitleDuckAi" translatable="false"><![CDATA[Hi there.<br/><br/>Ready for a faster browser that protects you and lets you decide when and how to use AI?]]></string>
     <string name="preOnboardingDaxDialog1Button">Hadi başlayalım!</string>
     <string name="preOnboardingDaxDialog1ButtonDuckAi" translatable="false">Let\&apos;s get started!</string>
+    <string name="preOnboardingDaxDialog1ButtonBrandDesign">Başlayalım!</string>
     <string name="preOnboardingDaxDialog1SecondaryButton">Daha önce buradaydım</string>
     <string name="preOnboardingDaxDialog2Title">Korumalar etkinleştirildi!</string>
     <string name="preOnboardingDaxDialog2Button">Tarayıcınızı Seçin</string>
@@ -896,6 +897,7 @@
     <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[DuckDuckGo\'nun ayrıca güvenli bir <b>VPN</b> ve <b>gelişmiş, gizli yapay zeka</b> içeren <b>isteğe bağlı ücretli bir aboneliği</b> var.]]></string>
     <string name="onboardingPrivacyProDaxDialogOkButton">Daha Fazla Bilgi</string>
     <string name="onboardingPrivacyProDaxDialogFreeTrialOkButton">Ücretsiz deneyin!</string>
+    <string name="onboardingPrivacyProDaxDialogFreeTrialOkButtonBrandDesign">Ücretsiz dene!</string>
     <string name="onboardingPrivacyProDaxDialogCancelButton">Atla</string>
     <string name="onboardingSkippedPrivacyProDaxDialogTitle">Biliyor muydunuz?</string>
 
@@ -1030,6 +1032,42 @@
     <string name="onboardingStepIndicatorText" instruction="a counter above our instructions in onboarding that tells a user what step they are on">%1$d / %2$d</string>
     <string name="onboardingSearchDaxDialogOption1Quoted" instruction="translate &apos;duck&apos; too.">ingilizcede \"ördek\" nasıl denir?</string>
     <string name="onboardingSearchDaxDialogOption1EnglishQuoted" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">ispanyolcada \"ördek\" nasıl denir?</string>
+
+    <string name="onboardingDuckAiFireButtonDaxDialogTitle">İşte Duck.ai!</string>
+    <string name="onboardingDuckAiFireButtonDaxDialogDescription"><![CDATA[<b>Fire Button</b> ile istediğiniz zaman silebileceğiniz gizli AI sohbetleri. Hemen deneyin! 🔥]]></string>
+    <string name="onboardingDuckAiEndCtaTitle">İşte bu kadar!</string>
+    <string name="onboardingDuckAiEndCtaDescription"><![CDATA[Siteleri aramak ve ziyaret etmek için adres çubuğunu kullanın veya gizli yapay zeka sohbeti için Duck.ai\'a geçin.<br/><br/>Sohbet simgesini gördüğünüz her yerde Duck.ai kullanabilirsiniz]]></string>
+    <string name="onboardingDuckAiEndCtaButton">Tebrikler!</string>
+
+    <!-- Input Mode Demo Onboarding step -->
+    <string name="preOnboardingInputModeDemoTitle">Başlamaya hazır mısınız?&lt;br/&gt;Arama yapmayı veya yapay zekâ sohbetini deneyin!</string>
+    <string name="preOnboardingInputModeDemoSearchHint">Gizli olarak arama yapın</string>
+    <string name="preOnboardingInputModeDemoChatHint">Gizli bir şekilde her şeyi sorabilirsiniz</string>
+    <string name="preOnboardingInputModeDemoChatSuggestion1">Borsa piyasasını 10 yaşında bir çocuğa anlatır gibi açıkla</string>
+    <string name="preOnboardingInputModeDemoChatSuggestion2">Londra\'da mükemmel bir gün planla</string>
+    <string name="preOnboardingInputModeDemoChatSuggestion3">Şaşırt beni!</string>
+    <string name="preOnboardingInputModeDemoChatSuggestion3Prompt">Bilim, doğa ve tarihle ilgili 10 büyüleyici gerçek nedir?</string>
+
+    <!-- Custom AI onboarding flow -->
+    <!-- Pre-onboarding: initial screens -->
+    <string name="preOnboardingWelcomeDialogBodyCustomAi">Sizi aktif olarak koruyan bir tarayıcıda ChatGPT, Claude ve diğer AI\'larla ücretsiz olarak gizlice sohbet etmeye hazır mısınız?</string>
+    <string name="preOnboardingDaxDialog3TextCustomAi">Unutmayın: sohbet simgesini gördüğünüz her yerden Duck.ai kullanabilirsiniz</string>
+    <string name="preOnboardingDaxDialog3ButtonCustomAi">Yapay Zekâ Sohbeti Başlat</string>
+    <!-- Pre-onboarding: AI comparison chart screen. -->
+    <string name="preOnboardingDaxDialogAiTitle">AI korumaları etkinleştirildi!</string>
+    <string name="preOnboardingAiComparisonChartPopularAis">Popüler AI\'lar</string>
+    <string name="preOnboardingAiComparisonChartItem1">Tüm sohbetler anonimleştirilir</string>
+    <string name="preOnboardingAiComparisonChartItem2">Tüm yapay zekâ özelliklerine erişmek için hesap gerekmez</string>
+    <string name="preOnboardingAiComparisonChartItem3">Sohbetlerinizi asla yapay zekâyı eğitmek için kullanmaz</string>
+    <string name="preOnboardingAiComparisonChartItem4">ChatGPT, Claude ve daha fazlasına tek noktadan erişin</string>
+    <string name="preOnboardingAiComparisonChartButton">Duck.ai\'ı hemen deneyin!</string>
+    <!-- Pre-onboarding: input demo screen -->
+    <string name="preOnboardingInputModeDemoTitleCustomAi">Şimdi, gizli yapay zekâ sohbetini deneyin!</string>
+    <!-- Pre-onboarding: browser comparison screen -->
+    <string name="preOnboardingDaxDialog2TitleCustomAi">DuckDuckGo\'yu varsayılan tarayıcınız yapmak ister misiniz?</string>
+    <!-- In-context onboarding. -->
+    <string name="onboardingEndCustomAiFlowDaxDialogDescription"><![CDATA[Duck.ai ile gizli bir yapay zekâ sohbeti başlatın veya korumalı gezinme için Arama moduna geçin.<br/><br/>Sohbet simgesini gördüğünüz her yerden Duck.ai kullanabilirsiniz]]></string>
+    <string name="onboardingPrivacyProCustomAiFlowDaxDialogDescription">Ayrıca, GPT ve Claude\'dan daha yüksek sohbet limitlerine sahip gelişmiş yapay zekâ modelleri, güvenli bir VPN ve daha fazlasını içeren ücretli bir abonelik de sunuyoruz.</string>
 
     <string name="input_screen_user_pref_without_ai_updated">Yalnızca Arama</string>
     <string name="input_screen_user_pref_with_ai_updated">Arama ile\nDuck.ai arasında geçiş yapın</string>

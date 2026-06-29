@@ -14,7 +14,7 @@ tags:
       - runFlow: ../shared/pre_onboarding.yaml
 
       - tapOn:
-          id: "omnibarTextInput"
+          id: "inputField"
       - inputText: "https://privacy-test-pages.site"
       - pressKey: Enter
       - assertVisible:

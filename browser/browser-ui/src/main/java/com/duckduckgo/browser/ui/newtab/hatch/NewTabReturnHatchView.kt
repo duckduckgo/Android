@@ -30,6 +30,7 @@ import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.browser.api.ui.BrowserScreens.TabSwitcherScreenNoParams
 import com.duckduckgo.browser.ui.R
 import com.duckduckgo.browser.ui.databinding.ViewNewTabHatchBinding
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.ui.menu.PopupMenu
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
@@ -129,15 +130,26 @@ class NewTabReturnHatchView @JvmOverloads constructor(
     val tabId: String
         get() = viewModel.viewState.value.tabId
 
+    val targetMode: BrowserMode
+        get() = viewModel.viewState.value.mode
+
     fun render(state: NewTabReturnHatchViewModel.ViewState) {
         faviconJob.cancel()
         if (state.shouldShow) {
-            binding.returnHatchSiteTitle.text = state.titleOrPlaceholder()
-            if (state.isDuckChat) {
-                binding.returnHatchFavicon.setImageResource(CommonR.drawable.ic_duckai)
-            } else {
-                faviconJob += viewModel.viewModelScope.launch {
-                    faviconManager.loadToViewFromLocalWithRetry(state.tabId, state.url, binding.returnHatchFavicon)
+            when (state.mode) {
+                BrowserMode.FIRE -> {
+                    binding.returnHatchSiteTitle.text = context.getString(R.string.newTabReturnHatchFireTabTitle)
+                    binding.returnHatchFavicon.setImageResource(CommonR.drawable.ic_fire_tab_placeholder_96)
+                }
+                BrowserMode.REGULAR -> {
+                    binding.returnHatchSiteTitle.text = state.titleOrPlaceholder()
+                    if (state.isDuckChat) {
+                        binding.returnHatchFavicon.setImageResource(CommonR.drawable.ic_duckai)
+                    } else {
+                        faviconJob += viewModel.viewModelScope.launch {
+                            faviconManager.loadToViewFromLocalWithRetry(state.tabId, state.url, binding.returnHatchFavicon)
+                        }
+                    }
                 }
             }
 
@@ -161,6 +173,9 @@ class NewTabReturnHatchView @JvmOverloads constructor(
         }
         popupMenu.onMenuItemClicked(popupMenu.contentView.findViewById(R.id.hatchMenuCloseTab)) {
             viewModel.closeTab()
+        }
+        popupMenu.onMenuItemClicked(popupMenu.contentView.findViewById(R.id.hatchMenuDontShowThis)) {
+            viewModel.onDontShowThisPressed()
         }
         popupMenu.onMenuItemClicked(popupMenu.contentView.findViewById(R.id.hatchMenuAfterInactivity)) {
             viewModel.onAfterInactivityPressed()

@@ -33,6 +33,7 @@ data class DaxEndBrandDesignUpdateBubbleCta(
     override val isLightTheme: Boolean,
     override val deviceInfo: DeviceInfo,
     override val onboardingImprovementsEnabled: Boolean,
+    val isOmnibarBottom: Boolean,
 ) : DaxBubbleCta.BrandDesignUpdateBubbleCta(
     ctaId = CtaId.DAX_END,
     title = R.string.onboardingEndDaxDialogTitle,
@@ -52,7 +53,9 @@ data class DaxEndBrandDesignUpdateBubbleCta(
     override val showArrow: Boolean = true
     override val wavingDaxSpec = WavingDaxSpec(
         rotationDegrees = 0f,
-        translationXDp = -40f,
+        // Bottom address bar (with native input enabled) doesn't stretch to the edge of the screen,
+        // so we need to nudge Dax to the right to ensure both his legs are behind the address bar.
+        translationXDp = if (isOmnibarBottom) -30f else -40f,
         translationYDp = -150f,
         heightDp = 178f,
         anchorToCardOnTablet = true,

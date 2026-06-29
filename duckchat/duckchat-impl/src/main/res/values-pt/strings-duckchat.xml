@@ -106,6 +106,13 @@
     <string name="duckAIContextualAutomaticContextMessage">Enviar automaticamente o conteúdo da página para o Duck.ai</string>
     <string name="duckAIContextualAttachPageContent">Anexar contexto da página</string>
 
+    <!-- Contextual sheet quick action -->
+    <string name="duckAIContextualPromptAskAboutPage">Pergunta sobre a página</string>
+
+    <!-- Contextual sheet input hint (contextualSheetImprovements flag) -->
+    <string name="contextualSheetImprovedHint">Pergunta o que quiseres em privado</string>
+    <string name="contextualSheetChatsPopupRecentSection" instruction="Section header above the list of recent Duck.ai chats in the contextual sheet overflow menu.">Conversas recentes</string>
+
     <!-- duck.ai contextual fire button -->
     <string name="duckAIContextualFireButtonContentDescription">Limpa a conversa</string>
 
@@ -125,6 +132,12 @@
 
     <!-- Duck AI Chat Suggestions -->
     <string name="duckAiChatHistoryViewAllChats">Ver todos os chats</string>
+
+    <!-- Duck.ai onboarding end CTA -->
+    <string name="duckAiEndCtaTitle">Tu consegues!</string>
+    <string name="duckAiEndCtaDescription"><![CDATA[Usa a barra de endereços para pesquisar e visitar sites ou alterna para Duck.ai para chat privado de IA.<br/><br/>Podes usar Duck.ai em qualquer lugar onde vejas o ícone de chat]]></string>
+    <string name="duckAiEndCtaButton">Dá cá cinco!</string>
+    <string name="duckAiEndCtaDescriptionCustomAi"><![CDATA[Inicia um chat privado de IA com Duck.ai ou muda para Pesquisar para teres uma navegação protegida.<br/><br/>Podes usar Duck.ai em qualquer lugar onde vejas o ícone de chat]]></string>
 
     <!-- Native Duck.ai chat history -->
     <string name="duck_ai_chat_history_title">Chats</string>

@@ -32,11 +32,15 @@ import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.tabs.model.TabSwitcherData
 import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType
 import com.duckduckgo.browser.api.wideevents.BrowserInteractionsPlugin
+import com.duckduckgo.browsermode.api.BrowserMode
+import com.duckduckgo.browsermode.api.BrowserModeDataProvider
+import com.duckduckgo.browsermode.api.BrowserModeStateHolder
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.newtabpage.api.NtpAfterIdleManager
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flowOf
@@ -49,6 +53,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
@@ -63,6 +68,9 @@ class ShowOnAppLaunchOptionHandlerImplTest {
 
     private lateinit var fakeDataStore: FakeShowOnAppLaunchOptionDataStore
     private lateinit var fakeTabRepository: TabRepository
+    private lateinit var fakeFireTabRepository: TabRepository
+    private val modeFlow = MutableStateFlow(BrowserMode.REGULAR)
+    private val browserModeStateHolder: BrowserModeStateHolder = mock { on { currentMode } doReturn modeFlow }
     private val ntpAfterIdleManager: NtpAfterIdleManager = mock()
     private val settingsDataStore: SettingsDataStore = mock()
     private val systemAutofillEngagement: SystemAutofillEngagement = mock()
@@ -73,15 +81,21 @@ class ShowOnAppLaunchOptionHandlerImplTest {
     fun setup() {
         fakeDataStore = FakeShowOnAppLaunchOptionDataStore()
         fakeTabRepository = FakeTabRepository()
+        fakeFireTabRepository = FakeTabRepository()
+        val provider = object : BrowserModeDataProvider<TabRepository> {
+            override fun forMode(mode: BrowserMode): TabRepository =
+                if (mode == BrowserMode.FIRE) fakeFireTabRepository else fakeTabRepository
+        }
         whenever(settingsDataStore.userSelectedIdleThresholdSeconds).thenReturn(null)
         testee = ShowOnAppLaunchOptionHandlerImpl(
             dispatcherProvider,
             fakeDataStore,
-            fakeTabRepository,
             ntpAfterIdleManager,
             settingsDataStore,
             systemAutofillEngagement,
             browserInteractionsPlugins,
+            provider,
+            browserModeStateHolder,
         )
     }
 
@@ -1046,6 +1060,66 @@ class ShowOnAppLaunchOptionHandlerImplTest {
         )
 
         assertNull(fakeDataStore.resolvedPageUrl)
+    }
+
+    @Test
+    fun whenFireModeAndOptionIsNewTabPageInactivityThenAddsFireTabWithoutTriggeringHatch() = runTest {
+        modeFlow.value = BrowserMode.FIRE
+        fakeDataStore.setShowOnAppLaunchOption(NewTabPage)
+        (fakeFireTabRepository as FakeTabRepository).selectedTab =
+            TabEntity(tabId = "f1", url = "https://example.com", position = 0)
+
+        testee.handleAfterInactivityOption(wasIdle = true)
+
+        fakeFireTabRepository.flowTabs.test {
+            val tabs = awaitItem()
+            awaitComplete()
+            assertTrue(tabs.size == 1)
+            assertTrue(tabs.last().url == "")
+        }
+        assertTrue(fakeTabRepository.flowTabs.firstOrNull()?.isEmpty() == true)
+        verify(ntpAfterIdleManager, never()).onIdleReturnTriggered()
+    }
+
+    @Test
+    fun whenRegularModeAndOptionIsNewTabPageInactivityThenTriggersHatchAndAddsRegularTab() = runTest {
+        modeFlow.value = BrowserMode.REGULAR
+        fakeDataStore.setShowOnAppLaunchOption(NewTabPage)
+        (fakeTabRepository as FakeTabRepository).selectedTab =
+            TabEntity(tabId = "1", url = "https://example.com", position = 0)
+
+        testee.handleAfterInactivityOption(wasIdle = true)
+
+        fakeTabRepository.flowTabs.test {
+            val tabs = awaitItem()
+            awaitComplete()
+            assertTrue(tabs.size == 1)
+            assertTrue(tabs.last().url == "")
+        }
+        verify(ntpAfterIdleManager).onIdleReturnTriggered()
+    }
+
+    @Test
+    fun whenFireModeAndOptionIsSpecificPageThenNoOp() = runTest {
+        modeFlow.value = BrowserMode.FIRE
+        fakeDataStore.setShowOnAppLaunchOption(SpecificPage("https://example.com"))
+
+        testee.handleAfterInactivityOption(wasIdle = true)
+
+        assertTrue(fakeFireTabRepository.flowTabs.firstOrNull()?.isEmpty() == true)
+        assertTrue(fakeTabRepository.flowTabs.firstOrNull()?.isEmpty() == true)
+    }
+
+    @Test
+    fun whenFireModeAndOptionIsLastOpenedTabThenNoOp() = runTest {
+        modeFlow.value = BrowserMode.FIRE
+        fakeDataStore.setShowOnAppLaunchOption(LastOpenedTab)
+
+        testee.handleAfterInactivityOption(wasIdle = true)
+
+        verify(browserInteractionsPlugins, never()).getPlugins()
+        assertTrue(fakeFireTabRepository.flowTabs.firstOrNull()?.isEmpty() == true)
+        assertTrue(fakeTabRepository.flowTabs.firstOrNull()?.isEmpty() == true)
     }
 
     private class FakeTabRepository : TabRepository {

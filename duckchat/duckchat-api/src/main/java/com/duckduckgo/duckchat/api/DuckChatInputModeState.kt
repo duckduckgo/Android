@@ -35,6 +35,19 @@ interface DuckChatInputModeState {
      * no Duck.ai input widget is attached.
      */
     val displayedMode: StateFlow<InputMode>
+
+    /**
+     * The live input query — the trimmed text in the shared input field, updated per keystroke
+     * regardless of the selected tab (the field is shared between Search and Chat, so the query is the
+     * same on both).
+     *
+     * High-frequency, kept as its own flow so it doesn't churn [displayedMode] consumers. Holds [""]
+     * only when the field is blank or no widget is attached. Deliberately NOT reset to [""] on the
+     * Search tab: a chat-tab item that derives its visibility from this (e.g. a zero-state card) would
+     * otherwise go stale while Search is active and flash when the Chat tab re-renders. Pair it with
+     * [displayedMode] when you also need to know which tab is showing.
+     */
+    val inputQuery: StateFlow<String>
 }
 
 /**
