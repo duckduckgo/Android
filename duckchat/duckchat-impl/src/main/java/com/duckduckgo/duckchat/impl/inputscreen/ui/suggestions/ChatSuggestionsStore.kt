@@ -26,25 +26,25 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import javax.inject.Inject
 
-interface ChatHistoryStore {
-    val hasChatHistory: Flow<Boolean>
+interface ChatSuggestionsStore {
+    val hasChatSuggestions: Flow<Boolean>
 }
 
 @SingleInstanceIn(AppScope::class)
-@ContributesBinding(AppScope::class, boundType = ChatHistoryStore::class)
-class RealChatHistoryStore @Inject constructor() : ChatHistoryStore {
-    private val _hasChatHistory = MutableSharedFlow<Boolean>(
+@ContributesBinding(AppScope::class, boundType = ChatSuggestionsStore::class)
+class RealChatSuggestionsStore @Inject constructor() : ChatSuggestionsStore {
+    private val _hasChatSuggestions = MutableSharedFlow<Boolean>(
         replay = 1,
         onBufferOverflow = BufferOverflow.DROP_OLDEST,
     )
-    override val hasChatHistory = _hasChatHistory.distinctUntilChanged()
+    override val hasChatSuggestions = _hasChatSuggestions.distinctUntilChanged()
 
-    suspend fun setHasChatHistory(hasHistory: Boolean) {
-        _hasChatHistory.emit(hasHistory)
+    suspend fun setHasChatSuggestions(hasHistory: Boolean) {
+        _hasChatSuggestions.emit(hasHistory)
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
     fun clearCachedValue() {
-        _hasChatHistory.resetReplayCache()
+        _hasChatSuggestions.resetReplayCache()
     }
 }

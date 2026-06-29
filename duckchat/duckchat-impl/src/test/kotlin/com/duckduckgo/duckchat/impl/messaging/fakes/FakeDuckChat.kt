@@ -118,11 +118,12 @@ class FakeDuckChat(
     override val activeVoiceChatSessions: Flow<Set<String>> = MutableStateFlow(emptySet())
     override fun observeTriggerVoiceChatSessionEnd(): Flow<String> = emptyFlow()
     override fun endVoiceChatSession(tabId: String) { }
-    override val hasChatHistory: Flow<Boolean> = emptyFlow()
 
     override suspend fun isChatHistoryAvailable(): Boolean = false
 
     override suspend fun hasUserEnabledChatHistory(): Boolean = false
+
+    override fun observeHasChatSuggestions(): Flow<Boolean> = emptyFlow()
 
     override suspend fun onAddressBarPickerDuckAiSelected() { }
 

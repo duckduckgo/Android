@@ -2357,7 +2357,7 @@ class DuckChatContextualViewModelTest {
         override fun endVoiceChatSession(tabId: String) { }
         override suspend fun isChatHistoryAvailable(): Boolean = false
         override suspend fun hasUserEnabledChatHistory(): Boolean = false
-        override val hasChatHistory: Flow<Boolean> = emptyFlow()
+        override fun observeHasChatSuggestions(): Flow<Boolean> = emptyFlow()
         override suspend fun onAddressBarPickerDuckAiSelected() = Unit
     }
 

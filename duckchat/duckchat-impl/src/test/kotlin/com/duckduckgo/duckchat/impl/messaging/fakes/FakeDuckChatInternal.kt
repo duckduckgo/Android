@@ -212,7 +212,7 @@ class FakeDuckChatInternal(
 
     override suspend fun hasUserEnabledChatHistory(): Boolean = false
 
-    override val hasChatHistory: Flow<Boolean> = emptyFlow()
+    override fun observeHasChatSuggestions(): Flow<Boolean> = emptyFlow()
 
     override suspend fun onAddressBarPickerDuckAiSelected() { }
 

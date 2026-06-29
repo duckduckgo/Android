@@ -17,18 +17,18 @@
 package com.duckduckgo.duckchat.impl.ui.inputscreen.suggestions
 
 import app.cash.turbine.test
-import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.RealChatHistoryStore
+import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.RealChatSuggestionsStore
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
-class RealChatHistoryStoreTest {
-    private val testee = RealChatHistoryStore()
+class RealChatSuggestionsStoreTest {
+    private val testee = RealChatSuggestionsStore()
 
     @Test
-    fun `hasChatHistory does not emit any initial value`() = runTest {
-        testee.hasChatHistory.test {
+    fun `hasChatSuggestions does not emit any initial value`() = runTest {
+        testee.hasChatSuggestions.test {
             expectNoEvents()
 
             cancel()
@@ -36,12 +36,12 @@ class RealChatHistoryStoreTest {
     }
 
     @Test
-    fun `hasChatHistory updates value`() = runTest {
-        testee.hasChatHistory.test {
-            testee.setHasChatHistory(true)
+    fun `hasChatSuggestions updates value`() = runTest {
+        testee.hasChatSuggestions.test {
+            testee.setHasChatSuggestions(true)
             assertTrue(awaitItem())
 
-            testee.setHasChatHistory(false)
+            testee.setHasChatSuggestions(false)
             assertFalse(awaitItem())
 
             cancel()
@@ -49,12 +49,12 @@ class RealChatHistoryStoreTest {
     }
 
     @Test
-    fun `hasChatHistory does not emit the same value`() = runTest {
-        testee.hasChatHistory.test {
-            testee.setHasChatHistory(true)
+    fun `hasChatSuggestions does not emit the same value`() = runTest {
+        testee.hasChatSuggestions.test {
+            testee.setHasChatSuggestions(true)
             assertTrue(awaitItem())
 
-            testee.setHasChatHistory(true)
+            testee.setHasChatSuggestions(true)
             expectNoEvents()
 
             cancel()
@@ -62,11 +62,11 @@ class RealChatHistoryStoreTest {
     }
 
     @Test
-    fun `hasChatHistory emits last known value`() = runTest {
-        testee.setHasChatHistory(false)
-        testee.setHasChatHistory(true)
+    fun `hasChatSuggestions emits last known value`() = runTest {
+        testee.setHasChatSuggestions(false)
+        testee.setHasChatSuggestions(true)
 
-        testee.hasChatHistory.test {
+        testee.hasChatSuggestions.test {
             assertTrue(awaitItem())
 
             cancel()
@@ -75,10 +75,10 @@ class RealChatHistoryStoreTest {
 
     @Test
     fun `clearCachedValue removes last known value`() = runTest {
-        testee.setHasChatHistory(true)
+        testee.setHasChatSuggestions(true)
         testee.clearCachedValue()
 
-        testee.hasChatHistory.test {
+        testee.hasChatSuggestions.test {
             expectNoEvents()
 
             cancel()

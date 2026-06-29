@@ -19,7 +19,7 @@ package com.duckduckgo.duckchat.impl.ui.inputscreen.suggestions.reader
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.ChatSuggestion
-import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.RealChatHistoryStore
+import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.RealChatSuggestionsStore
 import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.reader.ChatSuggestionsNativeReader
 import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.reader.DelegatingChatSuggestionsReader
 import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.reader.RealChatSuggestionsReader
@@ -49,7 +49,7 @@ class DelegatingChatSuggestionsReaderTest {
     private val feature: DuckChatFeature = mock()
     private val nativeStorageToggle: Toggle = mock()
     private val pixels: DuckChatPixels = mock()
-    private val historyStore: RealChatHistoryStore = mock()
+    private val historyStore: RealChatSuggestionsStore = mock()
     private lateinit var reader: DelegatingChatSuggestionsReader
 
     private val fakeSuggestion = ChatSuggestion("id", "Title", LocalDateTime.now(), false)
@@ -151,7 +151,7 @@ class DelegatingChatSuggestionsReaderTest {
 
         reader.fetchSuggestions()
 
-        verify(historyStore).setHasChatHistory(hasHistory = true)
+        verify(historyStore).setHasChatSuggestions(hasHistory = true)
     }
 
     @Test
@@ -162,7 +162,7 @@ class DelegatingChatSuggestionsReaderTest {
 
         reader.fetchSuggestions()
 
-        verify(historyStore).setHasChatHistory(hasHistory = false)
+        verify(historyStore).setHasChatSuggestions(hasHistory = false)
     }
 
     @Test

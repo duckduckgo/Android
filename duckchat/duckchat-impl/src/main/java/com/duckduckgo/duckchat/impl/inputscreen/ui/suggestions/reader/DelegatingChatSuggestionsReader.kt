@@ -20,7 +20,7 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.ChatSuggestion
-import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.RealChatHistoryStore
+import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.RealChatSuggestionsStore
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.store.impl.DuckAiChatStore
 import com.squareup.anvil.annotations.ContributesBinding
@@ -42,7 +42,7 @@ class DelegatingChatSuggestionsReader @Inject constructor(
     // Lazy to break potential DI cycles through DuckChatPixels → DuckChatTermsOfServiceHandler
     //   → DuckChatInternal path.
     private val pixels: Lazy<DuckChatPixels>,
-    private val historyStore: RealChatHistoryStore,
+    private val suggestionsStore: RealChatSuggestionsStore,
     private val dispatchers: DispatcherProvider,
 ) : ChatSuggestionsReader {
 
@@ -55,14 +55,14 @@ class DelegatingChatSuggestionsReader @Inject constructor(
         logcat { "DuckAI chat suggestions: using ${if (reader === nativeReader) "native store" else "WebView"} reader" }
         pixels.get().reportNativeStorageReaderUsed(native = reader === nativeReader)
         val result = reader.fetchSuggestions(query)
-        historyStore.setHasChatHistory(result.isNotEmpty())
+        suggestionsStore.setHasChatSuggestions(result.isNotEmpty())
         return@withContext result
     }
 
     override fun tearDown() {
         activeReader?.let { reader ->
             reader.tearDown()
-            historyStore.clearCachedValue()
+            suggestionsStore.clearCachedValue()
         }
         activeReader = null
     }
