@@ -23,9 +23,12 @@ import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.ViewConfiguration
 import android.widget.FrameLayout
+import androidx.core.view.doOnLayout
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator
+import androidx.lifecycle.findViewTreeLifecycleOwner
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ViewBrowserModeToggleBinding
+import com.duckduckgo.browser.ui.PulseAnimation
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.ui.view.toPx
 import kotlin.math.abs
@@ -59,6 +62,8 @@ class BrowserModeToggleView @JvmOverloads constructor(
     private var dragging = false
     private var initialTouchX = 0f
     private var initialIndicatorX = 0f
+
+    private var pulseAnimation: PulseAnimation? = null
 
     init {
         setBackgroundResource(R.drawable.background_browser_mode_toggle)
@@ -98,6 +103,18 @@ class BrowserModeToggleView @JvmOverloads constructor(
 
     fun setOnModeChangedListener(listener: (BrowserMode) -> Unit) {
         this.listener = listener
+    }
+
+    fun setFireSegmentHighlighted(highlighted: Boolean) {
+        if (highlighted) {
+            val owner = findViewTreeLifecycleOwner() ?: return
+            val pulse = pulseAnimation ?: PulseAnimation(owner).also { pulseAnimation = it }
+            if (!pulse.isActive) {
+                binding.fireSegmentIcon.doOnLayout { pulse.playOn(it) }
+            }
+        } else {
+            pulseAnimation?.stop()
+        }
     }
 
     override fun onInterceptTouchEvent(ev: MotionEvent): Boolean {
