@@ -302,7 +302,11 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
                             onSiteDrmPermissionSave(domain, SitePermissionAskSettingType.ALLOW_ALWAYS)
                             storeFavicon(url)
                         } else {
-                            sitePermissionsRepository.saveDrmForSession(domain, true)
+                            // Fire mode grants the in-session WebView permission below but must not write the
+                            // choice into the shared (app-wide, in-memory) DRM session map that regular tabs read.
+                            if (browserMode != BrowserMode.FIRE) {
+                                sitePermissionsRepository.saveDrmForSession(domain, true)
+                            }
                             grantPermissions()
                         }
                         sendPositiveDialogClickPixel(SitePermissionsPixelValues.DRM, rememberChoice)
@@ -313,7 +317,9 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
                         if (rememberChoice) {
                             onSiteDrmPermissionSave(domain, SitePermissionAskSettingType.DENY_ALWAYS)
                             storeFavicon(url)
-                        } else {
+                        } else if (browserMode != BrowserMode.FIRE) {
+                            // Fire mode denied the in-session permission above but must not write the
+                            // choice into the shared (app-wide, in-memory) DRM session map that regular tabs read.
                             sitePermissionsRepository.saveDrmForSession(domain, false)
                         }
                         sendNegativeDialogClickPixel(SitePermissionsPixelValues.DRM, rememberChoice)
