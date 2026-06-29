@@ -171,9 +171,11 @@ class DataClearing @Inject constructor(
     ) {
         when (browserMode) {
             BrowserMode.REGULAR -> {
+                // Record the burn before clearing: clearRegularDataUsingManualFireOptions may kill and
+                // restart the process, so anything after it would never run.
+                fireTabsPromos.onUserBurned()
                 performFireModeClear()
                 clearRegularDataUsingManualFireOptions(shouldRestartIfRequired)
-                fireTabsPromos.onUserBurned()
             }
             BrowserMode.FIRE -> {
                 performFireModeClear()

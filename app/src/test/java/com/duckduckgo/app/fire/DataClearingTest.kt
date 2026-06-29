@@ -60,6 +60,7 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.argThat
 import org.mockito.kotlin.eq
+import org.mockito.kotlin.inOrder
 import org.mockito.kotlin.isNull
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
@@ -292,6 +293,19 @@ class DataClearingTest {
         verify(mockClearDataAction).setAppUsedSinceLastClearFlag(false)
         verify(mockDataClearingWideEvent).finishSuccess()
         verify(mockClearDataAction).killAndRestartProcess(notifyDataCleared = false)
+    }
+
+    @Test
+    fun whenManualBurnRestartsProcess_thenUserBurnedRecordedBeforeRestart() = runTest {
+        configureManualOptions(setOf(FireClearOption.DATA))
+
+        testee.clearDataUsingManualFireOptions(shouldRestartIfRequired = true, wasAppUsedSinceLastClear = false, browserMode = BrowserMode.REGULAR)
+
+        // The burn must be recorded before the process is killed, otherwise the NTP promo trigger is lost.
+        inOrder(mockFireTabsPromos, mockClearDataAction) {
+            verify(mockFireTabsPromos).onUserBurned()
+            verify(mockClearDataAction).killAndRestartProcess(notifyDataCleared = false)
+        }
     }
 
     @Test
