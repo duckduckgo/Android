@@ -16,7 +16,6 @@
 
 package com.duckduckgo.pir.impl.dashboard.state
 
-import android.content.Context
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
@@ -26,7 +25,8 @@ import com.duckduckgo.pir.impl.dashboard.state.PirDashboardInitialScanStateProvi
 import com.duckduckgo.pir.impl.dashboard.state.PirDashboardInitialScanStateProvider.DashboardBrokerWithStatus.Status.IN_PROGRESS
 import com.duckduckgo.pir.impl.dashboard.state.PirDashboardInitialScanStateProvider.DashboardBrokerWithStatus.Status.NOT_STARTED
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord.ScanJobRecord.ScanJobStatus
-import com.duckduckgo.pir.impl.scan.PirForegroundScanService
+import com.duckduckgo.pir.impl.scan.PirForegroundScanServiceMonitor
+import com.duckduckgo.pir.impl.scan.PirScanScheduler
 import com.duckduckgo.pir.impl.store.PirRepository
 import com.duckduckgo.pir.impl.store.PirSchedulingRepository
 import com.squareup.anvil.annotations.ContributesBinding
@@ -99,7 +99,8 @@ class RealPirDashboardInitialScanStateProvider @Inject constructor(
     private val pirRepository: PirRepository,
     private val pirSchedulingRepository: PirSchedulingRepository,
     private val brokerStepsParser: BrokerStepsParser,
-    private val context: Context,
+    private val pirForegroundScanServiceMonitor: PirForegroundScanServiceMonitor,
+    private val pirScanScheduler: PirScanScheduler,
 ) : PirDashboardStateProvider(currentTimeProvider, pirRepository, pirSchedulingRepository),
     PirDashboardInitialScanStateProvider {
     override suspend fun getActiveBrokersAndMirrorSitesTotal(): Int = withContext(dispatcherProvider.io()) {
@@ -138,13 +139,18 @@ class RealPirDashboardInitialScanStateProvider @Inject constructor(
     }
 
     override suspend fun shouldRestartInitialScan(): Boolean {
-        // Check if a scan is already running
-        if (PirForegroundScanService.isServiceRunning(context)) {
+        // Don't resume if a foreground scan is already running
+        if (pirForegroundScanServiceMonitor.isRunning()) {
             logcat { "PIR-WEB: Scan is already running, no need to resume initial scan" }
             return false
         }
 
-        // Get all scan jobs that haven't been executed yet
+        // Don't resume if a scheduled background scan worker is currently running
+        if (pirScanScheduler.isScheduledScanRunning()) {
+            logcat { "PIR-WEB: Scheduled scan worker is running, no need to resume initial scan" }
+            return false
+        }
+
         val notExecutedJobs = pirSchedulingRepository.getAllValidScanJobRecords().filter { record ->
             record.status == ScanJobStatus.NOT_EXECUTED && record.lastScanDateInMillis == 0L
         }
