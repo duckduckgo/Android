@@ -189,6 +189,16 @@ interface DuckChatPixels {
     fun fireDuckAiChatHistorySuggestionClicked()
     fun fireDuckAiSearchDuckDuckGoSuggestionClicked()
     fun fireCustomizeResponsesSelected()
+    fun fireOmnibarShown()
+    fun fireOmnibarTextAreaFocused(landscape: Boolean)
+    fun fireOmnibarQuerySubmitted(query: String)
+    fun fireOmnibarModeSwitched(directionToSearch: Boolean, hadText: Boolean)
+    fun fireOmnibarClearButtonPressed(isSearchMode: Boolean)
+    fun fireOmnibarBackButtonPressed(isSearchMode: Boolean)
+    fun fireOmnibarKeyboardGoPressed(isSearchMode: Boolean)
+    fun fireOmnibarFloatingSubmitPressed(isSearchMode: Boolean)
+    fun fireOmnibarFloatingReturnPressed()
+    fun fireOmnibarSessionBothModes()
 }
 
 @ContributesBinding(AppScope::class)
@@ -674,6 +684,79 @@ class RealDuckChatPixels @Inject constructor(
             pixel.fire(DuckChatPixelName.AUTOCOMPLETE_DUCKAI_CLICK_SEARCH_DUCKDUCKGO)
         }
     }
+
+    override fun fireOmnibarShown() = fireCountAndDaily(
+        DUCK_CHAT_EXPERIMENTAL_OMNIBAR_SHOWN_COUNT,
+        DUCK_CHAT_EXPERIMENTAL_OMNIBAR_SHOWN_DAILY,
+    )
+
+    override fun fireOmnibarTextAreaFocused(landscape: Boolean) {
+        appCoroutineScope.launch(dispatcherProvider.io()) {
+            pixel.fire(
+                pixel = DUCK_CHAT_EXPERIMENTAL_OMNIBAR_TEXT_AREA_FOCUSED,
+                parameters = mapOf("orientation" to if (landscape) "landscape" else "portrait"),
+            )
+        }
+    }
+
+    override fun fireOmnibarQuerySubmitted(query: String) {
+        appCoroutineScope.launch(dispatcherProvider.io()) {
+            pixel.fire(
+                pixel = DUCK_CHAT_EXPERIMENTAL_OMNIBAR_QUERY_SUBMITTED,
+                parameters = mapOf(DuckChatPixelParameters.TEXT_LENGTH_BUCKET to toQueryLengthBucket(query.length)),
+            )
+            pixel.fire(DUCK_CHAT_EXPERIMENTAL_OMNIBAR_QUERY_SUBMITTED_DAILY, type = Pixel.PixelType.Daily())
+        }
+    }
+
+    override fun fireOmnibarModeSwitched(directionToSearch: Boolean, hadText: Boolean) {
+        appCoroutineScope.launch(dispatcherProvider.io()) {
+            pixel.fire(
+                pixel = DUCK_CHAT_EXPERIMENTAL_OMNIBAR_MODE_SWITCHED,
+                parameters = mapOf(
+                    "direction" to if (directionToSearch) "to_search" else "to_duckai",
+                    "had_text" to hadText.toString(),
+                ),
+            )
+        }
+    }
+
+    override fun fireOmnibarClearButtonPressed(isSearchMode: Boolean) = fireModeParam(
+        DUCK_CHAT_EXPERIMENTAL_OMNIBAR_CLEAR_BUTTON_PRESSED,
+        isSearchMode,
+    )
+
+    override fun fireOmnibarBackButtonPressed(isSearchMode: Boolean) = fireModeParam(
+        DUCK_CHAT_EXPERIMENTAL_OMNIBAR_BACK_BUTTON_PRESSED,
+        isSearchMode,
+    )
+
+    override fun fireOmnibarKeyboardGoPressed(isSearchMode: Boolean) = fireModeParam(
+        DUCK_CHAT_EXPERIMENTAL_OMNIBAR_KEYBOARD_GO_PRESSED,
+        isSearchMode,
+    )
+
+    override fun fireOmnibarFloatingSubmitPressed(isSearchMode: Boolean) = fireModeParam(
+        DUCK_CHAT_EXPERIMENTAL_OMNIBAR_FLOATING_SUBMIT_PRESSED,
+        isSearchMode,
+    )
+
+    override fun fireOmnibarFloatingReturnPressed() {
+        appCoroutineScope.launch(dispatcherProvider.io()) {
+            pixel.fire(DUCK_CHAT_EXPERIMENTAL_OMNIBAR_FLOATING_RETURN_PRESSED)
+        }
+    }
+
+    override fun fireOmnibarSessionBothModes() = fireCountAndDaily(
+        DUCK_CHAT_EXPERIMENTAL_OMNIBAR_SESSION_BOTH_MODES,
+        DUCK_CHAT_EXPERIMENTAL_OMNIBAR_SESSION_BOTH_MODES_DAILY,
+    )
+
+    private fun fireModeParam(name: DuckChatPixelName, isSearchMode: Boolean) {
+        appCoroutineScope.launch(dispatcherProvider.io()) {
+            pixel.fire(pixel = name, parameters = inputScreenPixelsModeParam(isSearchMode))
+        }
+    }
 }
 
 enum class DuckChatPixelName(override val pixelName: String) : Pixel.PixelName {
@@ -1145,3 +1228,11 @@ internal fun inputScreenPixelsModeParam(isSearchMode: Boolean) = mapOf(
         "aiChat"
     },
 )
+
+internal fun toQueryLengthBucket(length: Int): String =
+    when {
+        length <= 15 -> "short"
+        length <= 40 -> "medium"
+        length <= 100 -> "long"
+        else -> "very_long"
+    }
