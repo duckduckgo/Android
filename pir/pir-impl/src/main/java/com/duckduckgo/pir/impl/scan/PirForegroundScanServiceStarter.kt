@@ -32,10 +32,8 @@ class RealPirForegroundScanServiceStarter @Inject constructor(
     private val context: Context,
 ) : PirForegroundScanServiceStarter {
     override fun startResumeScan() {
-        // Resume the interrupted initial scan as MANUAL_INITIAL — the same execution type a manual
-        // re-trigger uses. Only the still-pending brokers are scanned (already-scanned jobs are skipped).
         context.startForegroundService(
-            PirForegroundScanService.intentFor(context, PirExecutionType.MANUAL_INITIAL),
+            PirForegroundScanService.intentFor(context, PirExecutionType.MANUAL_INITIAL_RESUME),
         )
     }
 }
