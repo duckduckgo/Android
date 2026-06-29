@@ -50,6 +50,7 @@ import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.api.InputMode
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState.InteractionLock
 import com.duckduckgo.duckchat.api.toChatIdOrNull
+import com.duckduckgo.duckchat.impl.inputscreen.ui.metrics.usage.InputScreenSessionUsageMetric
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.ui.nativeinput.views.NativeInputWidget
 import com.duckduckgo.navigation.api.GlobalActivityStarter
@@ -146,6 +147,7 @@ class RealNativeInputManager @Inject constructor(
     private val pixel: Pixel,
     private val nativeInputStateBugKillSwitch: NativeInputStateBugKillSwitch,
     private val duckChatPixels: DuckChatPixels,
+    private val inputScreenSessionUsageMetric: InputScreenSessionUsageMetric,
 ) : NativeInputManager {
     private lateinit var omnibarController: NativeInputOmnibarController
     private lateinit var rootView: ViewGroup
@@ -472,6 +474,7 @@ class RealNativeInputManager @Inject constructor(
             onSearchTextChanged = onSearchTextChanged,
             onSearchSubmitted = { query ->
                 duckChatPixels.fireOmnibarQuerySubmitted(query)
+                inputScreenSessionUsageMetric.onSearchSubmitted()
                 hideNativeInput(isNavigation = true)
                 callbacks.onSearchSubmitted(query)
             },
@@ -494,6 +497,7 @@ class RealNativeInputManager @Inject constructor(
                     )
                     widget.clearSelectedTool()
                     widget.onPromptSubmitted()
+                    inputScreenSessionUsageMetric.onPromptSubmitted()
                 } else if (queryUrlPredictor.isUrl(query)) {
                     // Not in a Duck.ai chat (e.g. on the NTP with the Duck.ai toggle selected): a
                     // URL is an address, so navigate to it exactly like Search mode rather than
@@ -519,6 +523,7 @@ class RealNativeInputManager @Inject constructor(
                         hideNtp()
                     }
                     isExiting = false
+                    inputScreenSessionUsageMetric.onPromptSubmitted()
                     callbacks.onDuckAiQuerySubmitted(query)
                 }
             },
