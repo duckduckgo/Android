@@ -471,6 +471,7 @@ class RealNativeInputManager @Inject constructor(
         widget.bindInputEvents(
             onSearchTextChanged = onSearchTextChanged,
             onSearchSubmitted = { query ->
+                duckChatPixels.fireOmnibarQuerySubmitted(query)
                 hideNativeInput(isNavigation = true)
                 callbacks.onSearchSubmitted(query)
             },
