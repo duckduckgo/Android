@@ -26,6 +26,20 @@ import javax.inject.Inject
 
 enum class SerpSettingsPixelName(override val pixelName: String) : Pixel.PixelName {
     SERP_SETTINGS_OPEN_DUCK_AI("serp_settings_open_duck-ai"),
+    SERP_SETTINGS_SERIALIZATION_FAILED_COUNT("serp_settings_serialization_failed_count"),
+    SERP_SETTINGS_SERIALIZATION_FAILED_DAILY("serp_settings_serialization_failed_daily"),
+    SERP_SETTINGS_KEYVALUE_STORE_READ_ERROR_COUNT("serp_settings_keyvalue_store_read_error_count"),
+    SERP_SETTINGS_KEYVALUE_STORE_READ_ERROR_DAILY("serp_settings_keyvalue_store_read_error_daily"),
+    SERP_SETTINGS_KEYVALUE_STORE_WRITE_ERROR_COUNT("serp_settings_keyvalue_store_write_error_count"),
+    SERP_SETTINGS_KEYVALUE_STORE_WRITE_ERROR_DAILY("serp_settings_keyvalue_store_write_error_daily"),
+}
+
+internal fun Pixel.fireSerpSettingsCountAndDaily(
+    countPixel: SerpSettingsPixelName,
+    dailyPixel: SerpSettingsPixelName,
+) {
+    fire(countPixel)
+    fire(dailyPixel, type = Pixel.PixelType.Daily())
 }
 
 @ContributesMultibinding(AppScope::class)
@@ -33,6 +47,12 @@ class SerpSettingsPixelParamRemovalPlugin @Inject constructor() : PixelParamRemo
     override fun names(): List<Pair<String, Set<PixelParameter>>> {
         return listOf(
             SERP_SETTINGS_OPEN_DUCK_AI.pixelName to PixelParameter.removeAtb(),
+            SerpSettingsPixelName.SERP_SETTINGS_SERIALIZATION_FAILED_COUNT.pixelName to PixelParameter.removeAtb(),
+            SerpSettingsPixelName.SERP_SETTINGS_SERIALIZATION_FAILED_DAILY.pixelName to PixelParameter.removeAtb(),
+            SerpSettingsPixelName.SERP_SETTINGS_KEYVALUE_STORE_READ_ERROR_COUNT.pixelName to PixelParameter.removeAtb(),
+            SerpSettingsPixelName.SERP_SETTINGS_KEYVALUE_STORE_READ_ERROR_DAILY.pixelName to PixelParameter.removeAtb(),
+            SerpSettingsPixelName.SERP_SETTINGS_KEYVALUE_STORE_WRITE_ERROR_COUNT.pixelName to PixelParameter.removeAtb(),
+            SerpSettingsPixelName.SERP_SETTINGS_KEYVALUE_STORE_WRITE_ERROR_DAILY.pixelName to PixelParameter.removeAtb(),
         )
     }
 }

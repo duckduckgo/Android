@@ -699,17 +699,187 @@ class DuckChatSettingsViewModelTest {
         }
 
     @Test
-    fun `when onUseWithoutAiClicked then duck chat user setting disabled`() =
+    fun `when onUseWithoutAiClicked then ai_features_disabled count and daily fired`() =
         runTest {
             testee.onUseWithoutAiClicked()
+            verify(mockPixel).fire(DuckChatPixelName.AI_FEATURES_DISABLED_COUNT)
+            verify(mockPixel).fire(DuckChatPixelName.AI_FEATURES_DISABLED_DAILY, type = Pixel.PixelType.Daily())
+        }
+
+    @Test
+    fun `when search assist set to never then never count and daily fired`() =
+        runTest {
+            testee.onSearchAssistVisibilitySelected(SearchAssistVisibility.NEVER)
+            verify(mockPixel).fire(DuckChatPixelName.AI_FEATURES_SEARCH_ASSIST_NEVER_COUNT)
+            verify(mockPixel).fire(DuckChatPixelName.AI_FEATURES_SEARCH_ASSIST_NEVER_DAILY, type = Pixel.PixelType.Daily())
+        }
+
+    @Test
+    fun `when search assist set to on demand then on_demand count and daily fired`() =
+        runTest {
+            testee.onSearchAssistVisibilitySelected(SearchAssistVisibility.ON_DEMAND)
+            verify(mockPixel).fire(DuckChatPixelName.AI_FEATURES_SEARCH_ASSIST_ON_DEMAND_COUNT)
+            verify(mockPixel).fire(DuckChatPixelName.AI_FEATURES_SEARCH_ASSIST_ON_DEMAND_DAILY, type = Pixel.PixelType.Daily())
+        }
+
+    @Test
+    fun `when search assist set to sometimes from a different value then sometimes count and daily fired`() =
+        runTest {
+            whenever(serpSettingsDataProvider.observeSetting(SearchAssistVisibility.SERP_SETTINGS_KEY))
+                .thenReturn(flowOf(SearchAssistVisibility.NEVER.serpCode))
+            testee = DuckChatSettingsViewModel(
+                duckChatActivityParams = DuckChatSettingsNoParams,
+                duckChat = duckChat,
+                pixel = mockPixel,
+                inputScreenDiscoveryFunnel = mockInputScreenDiscoveryFunnel,
+                settingsPageFeature = settingsPageFeature,
+                duckChatPixels = mockDuckChatPixels,
+                dispatcherProvider = coroutineRule.testDispatcherProvider,
+                duckChatFeature = duckChatFeature,
+                serpSettingsDataProvider = serpSettingsDataProvider,
+            )
+
+            testee.viewState.test {
+                var state = awaitItem()
+                while (state.searchAssistVisibility != SearchAssistVisibility.NEVER) {
+                    state = awaitItem()
+                }
+                testee.onSearchAssistVisibilitySelected(SearchAssistVisibility.SOMETIMES)
+                cancelAndIgnoreRemainingEvents()
+            }
+
+            verify(mockPixel).fire(DuckChatPixelName.AI_FEATURES_SEARCH_ASSIST_SOMETIMES_COUNT)
+            verify(mockPixel).fire(DuckChatPixelName.AI_FEATURES_SEARCH_ASSIST_SOMETIMES_DAILY, type = Pixel.PixelType.Daily())
+        }
+
+    @Test
+    fun `when search assist re-selected with same value then no count or daily pixel and still persisted`() =
+        runTest {
+            // Default current value is Sometimes; re-selecting it must not fire telemetry but must still persist.
+            testee.onSearchAssistVisibilitySelected(SearchAssistVisibility.SOMETIMES)
+
+            verify(mockPixel, never()).fire(DuckChatPixelName.AI_FEATURES_SEARCH_ASSIST_SOMETIMES_COUNT)
+            verify(mockPixel, never()).fire(DuckChatPixelName.AI_FEATURES_SEARCH_ASSIST_SOMETIMES_DAILY, type = Pixel.PixelType.Daily())
+            verify(serpSettingsDataProvider).setSetting(SearchAssistVisibility.SERP_SETTINGS_KEY, SearchAssistVisibility.SOMETIMES.serpCode)
+        }
+
+    @Test
+    fun `when search assist set to often then often count and daily fired`() =
+        runTest {
+            testee.onSearchAssistVisibilitySelected(SearchAssistVisibility.OFTEN)
+            verify(mockPixel).fire(DuckChatPixelName.AI_FEATURES_SEARCH_ASSIST_OFTEN_COUNT)
+            verify(mockPixel).fire(DuckChatPixelName.AI_FEATURES_SEARCH_ASSIST_OFTEN_DAILY, type = Pixel.PixelType.Daily())
+        }
+
+    @Test
+    fun `when hide images selected on then hide_images_on count and daily fired`() =
+        runTest {
+            testee.onHideAiGeneratedImagesSelected(HideAiGeneratedImages.ON)
+            verify(mockPixel).fire(DuckChatPixelName.AI_FEATURES_HIDE_IMAGES_ON_COUNT)
+            verify(mockPixel).fire(DuckChatPixelName.AI_FEATURES_HIDE_IMAGES_ON_DAILY, type = Pixel.PixelType.Daily())
+        }
+
+    @Test
+    fun `when hide images set to off from a different value then hide_images_off count and daily fired`() =
+        runTest {
+            whenever(serpSettingsDataProvider.observeSetting(HideAiGeneratedImages.SERP_SETTINGS_KEY))
+                .thenReturn(flowOf(HideAiGeneratedImages.ON.serpCode))
+            testee = DuckChatSettingsViewModel(
+                duckChatActivityParams = DuckChatSettingsNoParams,
+                duckChat = duckChat,
+                pixel = mockPixel,
+                inputScreenDiscoveryFunnel = mockInputScreenDiscoveryFunnel,
+                settingsPageFeature = settingsPageFeature,
+                duckChatPixels = mockDuckChatPixels,
+                dispatcherProvider = coroutineRule.testDispatcherProvider,
+                duckChatFeature = duckChatFeature,
+                serpSettingsDataProvider = serpSettingsDataProvider,
+            )
+
+            testee.viewState.test {
+                var state = awaitItem()
+                while (state.hideAiGeneratedImages != HideAiGeneratedImages.ON) {
+                    state = awaitItem()
+                }
+                testee.onHideAiGeneratedImagesSelected(HideAiGeneratedImages.OFF)
+                cancelAndIgnoreRemainingEvents()
+            }
+
+            verify(mockPixel).fire(DuckChatPixelName.AI_FEATURES_HIDE_IMAGES_OFF_COUNT)
+            verify(mockPixel).fire(DuckChatPixelName.AI_FEATURES_HIDE_IMAGES_OFF_DAILY, type = Pixel.PixelType.Daily())
+        }
+
+    @Test
+    fun `when hide images re-selected with same value then no count or daily pixel and still persisted`() =
+        runTest {
+            // Default current value is Off; re-selecting it must not fire telemetry but must still persist.
+            testee.onHideAiGeneratedImagesSelected(HideAiGeneratedImages.OFF)
+
+            verify(mockPixel, never()).fire(DuckChatPixelName.AI_FEATURES_HIDE_IMAGES_OFF_COUNT)
+            verify(mockPixel, never()).fire(DuckChatPixelName.AI_FEATURES_HIDE_IMAGES_OFF_DAILY, type = Pixel.PixelType.Daily())
+            verify(serpSettingsDataProvider).setSetting(HideAiGeneratedImages.SERP_SETTINGS_KEY, HideAiGeneratedImages.OFF.serpCode)
+        }
+
+    @Test
+    fun `when onUseWithoutAiClicked and duck chat enabled then duck chat user setting disabled`() =
+        runTest {
+            // Duck.ai is enabled by default in setUp(); collect viewState so the gate sees isDuckChatUserEnabled = true.
+            testee.viewState.test {
+                var state = awaitItem()
+                while (!state.isDuckChatUserEnabled) {
+                    state = awaitItem()
+                }
+                testee.onUseWithoutAiClicked()
+                cancelAndIgnoreRemainingEvents()
+            }
             verify(duckChat).setEnableDuckChatUserSetting(false)
         }
 
     @Test
-    fun `when onUseWithoutAiClicked then disabled pixel fired`() =
+    fun `when onUseWithoutAiClicked and duck chat enabled then disabled pixel fired`() =
         runTest {
-            testee.onUseWithoutAiClicked()
+            testee.viewState.test {
+                var state = awaitItem()
+                while (!state.isDuckChatUserEnabled) {
+                    state = awaitItem()
+                }
+                testee.onUseWithoutAiClicked()
+                cancelAndIgnoreRemainingEvents()
+            }
             verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_USER_DISABLED)
+        }
+
+    @Test
+    fun `when onUseWithoutAiClicked and duck chat already off then no disable pixel or write`() =
+        runTest {
+            // Duck.ai already off, but the action is still reachable because Search Assist is not Never.
+            whenever(duckChat.observeEnableDuckChatUserSetting()).thenReturn(flowOf(false))
+            whenever(serpSettingsDataProvider.observeSetting(SearchAssistVisibility.SERP_SETTINGS_KEY))
+                .thenReturn(flowOf(SearchAssistVisibility.SOMETIMES.serpCode))
+            testee = DuckChatSettingsViewModel(
+                duckChatActivityParams = DuckChatSettingsNoParams,
+                duckChat = duckChat,
+                pixel = mockPixel,
+                inputScreenDiscoveryFunnel = mockInputScreenDiscoveryFunnel,
+                settingsPageFeature = settingsPageFeature,
+                duckChatPixels = mockDuckChatPixels,
+                dispatcherProvider = coroutineRule.testDispatcherProvider,
+                duckChatFeature = duckChatFeature,
+                serpSettingsDataProvider = serpSettingsDataProvider,
+            )
+
+            testee.viewState.test {
+                // Resolve to the off state before acting.
+                var state = awaitItem()
+                while (state.isDuckChatUserEnabled) {
+                    state = awaitItem()
+                }
+                testee.onUseWithoutAiClicked()
+                cancelAndIgnoreRemainingEvents()
+            }
+
+            verify(mockPixel, never()).fire(DuckChatPixelName.DUCK_CHAT_USER_DISABLED)
+            verify(duckChat, never()).setEnableDuckChatUserSetting(false)
         }
 
     @Test

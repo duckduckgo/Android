@@ -696,6 +696,22 @@ enum class DuckChatPixelName(override val pixelName: String) : Pixel.PixelName {
     DUCK_CHAT_EXPERIMENTAL_ADDRESS_BAR_IS_ENABLED_DAILY("aichat_experimental_address_bar_is_enabled_daily"),
     DUCK_CHAT_SEARCH_ASSIST_SETTINGS_BUTTON_CLICKED("aichat_search_assist_settings_button_clicked"),
     SERP_SETTINGS_OPEN_HIDE_AI_GENERATED_IMAGES("serp_settings_open_hide-ai-generated-images"),
+    AI_FEATURES_DISABLED_COUNT("ai_features_disabled_count"),
+    AI_FEATURES_DISABLED_DAILY("ai_features_disabled_daily"),
+    AI_FEATURES_SEARCH_ASSIST_NEVER_COUNT("ai_features_search_assist_never_count"),
+    AI_FEATURES_SEARCH_ASSIST_NEVER_DAILY("ai_features_search_assist_never_daily"),
+    AI_FEATURES_SEARCH_ASSIST_ON_DEMAND_COUNT("ai_features_search_assist_on_demand_count"),
+    AI_FEATURES_SEARCH_ASSIST_ON_DEMAND_DAILY("ai_features_search_assist_on_demand_daily"),
+    AI_FEATURES_SEARCH_ASSIST_SOMETIMES_COUNT("ai_features_search_assist_sometimes_count"),
+    AI_FEATURES_SEARCH_ASSIST_SOMETIMES_DAILY("ai_features_search_assist_sometimes_daily"),
+    AI_FEATURES_SEARCH_ASSIST_OFTEN_COUNT("ai_features_search_assist_often_count"),
+    AI_FEATURES_SEARCH_ASSIST_OFTEN_DAILY("ai_features_search_assist_often_daily"),
+    AI_FEATURES_HIDE_IMAGES_ON_COUNT("ai_features_hide_images_on_count"),
+    AI_FEATURES_HIDE_IMAGES_ON_DAILY("ai_features_hide_images_on_daily"),
+    AI_FEATURES_HIDE_IMAGES_OFF_COUNT("ai_features_hide_images_off_count"),
+    AI_FEATURES_HIDE_IMAGES_OFF_DAILY("ai_features_hide_images_off_daily"),
+    AI_FEATURES_STATE_DAILY("ai_features_state_daily"),
+    SERP_SETTINGS_UNRECOGNIZED_VALUE("serp_settings_unrecognized_value"),
     DUCK_CHAT_START_NEW_CONVERSATION("aichat_start_new_conversation"),
     DUCK_CHAT_START_NEW_CONVERSATION_BUTTON_CLICKED("aichat_start_new_conversation_button_clicked"),
     DUCK_CHAT_OPEN_HISTORY("aichat_open_history"),
@@ -935,6 +951,12 @@ object DuckChatPixelParameters {
     const val UPSELL_CURRENT_TIER = "current_tier"
     const val UPSELL_REQUIRED_TIER = "required_tier"
     const val UPSELL_FLOW_TYPE = "flow_type"
+
+    // ai_features_state_daily
+    const val DUCK_AI = "duck_ai"
+    const val SEARCH_ASSIST = "search_assist"
+    const val HIDE_AI_IMAGES = "hide_ai_images"
+    const val NO_AI = "no_ai"
 }
 
 @ContributesMultibinding(AppScope::class)
@@ -960,6 +982,22 @@ class DuckChatParamRemovalPlugin @Inject constructor() : PixelParamRemovalPlugin
             DUCK_CHAT_EXPERIMENTAL_ADDRESS_BAR_IS_ENABLED_DAILY.pixelName to PixelParameter.removeAtb(),
             DUCK_CHAT_SEARCH_ASSIST_SETTINGS_BUTTON_CLICKED.pixelName to PixelParameter.removeAtb(),
             SERP_SETTINGS_OPEN_HIDE_AI_GENERATED_IMAGES.pixelName to PixelParameter.removeAtb(),
+            DuckChatPixelName.AI_FEATURES_DISABLED_COUNT.pixelName to PixelParameter.removeAtb(),
+            DuckChatPixelName.AI_FEATURES_DISABLED_DAILY.pixelName to PixelParameter.removeAtb(),
+            DuckChatPixelName.AI_FEATURES_SEARCH_ASSIST_NEVER_COUNT.pixelName to PixelParameter.removeAtb(),
+            DuckChatPixelName.AI_FEATURES_SEARCH_ASSIST_NEVER_DAILY.pixelName to PixelParameter.removeAtb(),
+            DuckChatPixelName.AI_FEATURES_SEARCH_ASSIST_ON_DEMAND_COUNT.pixelName to PixelParameter.removeAtb(),
+            DuckChatPixelName.AI_FEATURES_SEARCH_ASSIST_ON_DEMAND_DAILY.pixelName to PixelParameter.removeAtb(),
+            DuckChatPixelName.AI_FEATURES_SEARCH_ASSIST_SOMETIMES_COUNT.pixelName to PixelParameter.removeAtb(),
+            DuckChatPixelName.AI_FEATURES_SEARCH_ASSIST_SOMETIMES_DAILY.pixelName to PixelParameter.removeAtb(),
+            DuckChatPixelName.AI_FEATURES_SEARCH_ASSIST_OFTEN_COUNT.pixelName to PixelParameter.removeAtb(),
+            DuckChatPixelName.AI_FEATURES_SEARCH_ASSIST_OFTEN_DAILY.pixelName to PixelParameter.removeAtb(),
+            DuckChatPixelName.AI_FEATURES_HIDE_IMAGES_ON_COUNT.pixelName to PixelParameter.removeAtb(),
+            DuckChatPixelName.AI_FEATURES_HIDE_IMAGES_ON_DAILY.pixelName to PixelParameter.removeAtb(),
+            DuckChatPixelName.AI_FEATURES_HIDE_IMAGES_OFF_COUNT.pixelName to PixelParameter.removeAtb(),
+            DuckChatPixelName.AI_FEATURES_HIDE_IMAGES_OFF_DAILY.pixelName to PixelParameter.removeAtb(),
+            DuckChatPixelName.AI_FEATURES_STATE_DAILY.pixelName to PixelParameter.removeAtb(),
+            DuckChatPixelName.SERP_SETTINGS_UNRECOGNIZED_VALUE.pixelName to PixelParameter.removeAtb(),
             DUCK_CHAT_START_NEW_CONVERSATION.pixelName to PixelParameter.removeAtb(),
             DUCK_CHAT_START_NEW_CONVERSATION_BUTTON_CLICKED.pixelName to PixelParameter.removeAtb(),
             DUCK_CHAT_OPEN_HISTORY.pixelName to PixelParameter.removeAtb(),

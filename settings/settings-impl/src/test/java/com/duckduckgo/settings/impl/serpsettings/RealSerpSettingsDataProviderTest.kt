@@ -16,14 +16,19 @@
 
 package com.duckduckgo.settings.impl.serpsettings
 
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.settings.impl.serpsettings.fakes.FakeSerpSettingsDataStore
+import com.duckduckgo.settings.impl.serpsettings.pixel.SerpSettingsPixelName
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
+import org.mockito.kotlin.verify
 
 class RealSerpSettingsDataProviderTest {
 
@@ -31,10 +36,12 @@ class RealSerpSettingsDataProviderTest {
     val coroutineRule = CoroutineTestRule()
 
     private val dataStore = FakeSerpSettingsDataStore()
+    private val pixel: Pixel = mock()
 
     private val testee = RealSerpSettingsDataProvider(
         serpSettingsDataStore = dataStore,
         dispatcherProvider = coroutineRule.testDispatcherProvider,
+        pixel = pixel,
     )
 
     @Test
@@ -103,5 +110,24 @@ class RealSerpSettingsDataProviderTest {
         testee.setSetting("kbe", "3")
 
         assertEquals("3", testee.observeSetting("kbe").first())
+    }
+
+    @Test
+    fun whenExistingBlobIsMalformedOnWriteThenSerializationFailedPixelFired() = runTest {
+        dataStore.setSerpSettings("not-json")
+
+        testee.setSetting("kbe", "3")
+
+        verify(pixel).fire(SerpSettingsPixelName.SERP_SETTINGS_SERIALIZATION_FAILED_COUNT)
+        verify(pixel).fire(SerpSettingsPixelName.SERP_SETTINGS_SERIALIZATION_FAILED_DAILY, type = Pixel.PixelType.Daily())
+    }
+
+    @Test
+    fun whenExistingBlobIsValidOnWriteThenNoSerializationPixel() = runTest {
+        dataStore.setSerpSettings("""{"ko":"1"}""")
+
+        testee.setSetting("kbe", "3")
+
+        verify(pixel, never()).fire(SerpSettingsPixelName.SERP_SETTINGS_SERIALIZATION_FAILED_COUNT)
     }
 }

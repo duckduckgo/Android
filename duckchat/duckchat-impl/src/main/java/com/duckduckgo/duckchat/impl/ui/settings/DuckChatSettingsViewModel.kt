@@ -203,7 +203,15 @@ class DuckChatSettingsViewModel @AssistedInject constructor(
     fun onUseWithoutAiClicked() {
         // Turn off Duck.ai, silence Search Assist, and hide AI-generated images in one tap.
         // The item disables itself reactively once isDuckChatUserEnabled flips to false.
-        onDuckChatUserEnabledToggled(checked = false)
+        pixel.fireCountAndDaily(
+            countPixel = DuckChatPixelName.AI_FEATURES_DISABLED_COUNT,
+            dailyPixel = DuckChatPixelName.AI_FEATURES_DISABLED_DAILY,
+        )
+        // Only disable Duck.ai if it's currently on, so we don't fire a spurious aichat_disabled when
+        // the action is reachable purely because Search Assist or Hide AI Images is still non-no-AI.
+        if (viewState.value.isDuckChatUserEnabled) {
+            onDuckChatUserEnabledToggled(checked = false)
+        }
         onSearchAssistVisibilitySelected(SearchAssistVisibility.NEVER)
         onHideAiGeneratedImagesSelected(HideAiGeneratedImages.ON)
     }
@@ -284,6 +292,16 @@ class DuckChatSettingsViewModel @AssistedInject constructor(
     }
 
     fun onHideAiGeneratedImagesSelected(option: HideAiGeneratedImages) {
+        // Only report a value change; re-selecting the current option is a no-op for telemetry.
+        if (option != viewState.value.hideAiGeneratedImages) {
+            val (countPixel, dailyPixel) = when (option) {
+                HideAiGeneratedImages.ON ->
+                    DuckChatPixelName.AI_FEATURES_HIDE_IMAGES_ON_COUNT to DuckChatPixelName.AI_FEATURES_HIDE_IMAGES_ON_DAILY
+                HideAiGeneratedImages.OFF ->
+                    DuckChatPixelName.AI_FEATURES_HIDE_IMAGES_OFF_COUNT to DuckChatPixelName.AI_FEATURES_HIDE_IMAGES_OFF_DAILY
+            }
+            pixel.fireCountAndDaily(countPixel = countPixel, dailyPixel = dailyPixel)
+        }
         viewModelScope.launch {
             // The SERP blob is the single source of truth, so the web reflects this on its next getNativeSettings.
             serpSettingsDataProvider.setSetting(HideAiGeneratedImages.SERP_SETTINGS_KEY, option.serpCode)
@@ -339,11 +357,28 @@ class DuckChatSettingsViewModel @AssistedInject constructor(
     }
 
     fun onSearchAssistVisibilitySelected(visibility: SearchAssistVisibility) {
+        // Only report a value change; re-selecting the current option is a no-op for telemetry.
+        if (visibility != viewState.value.searchAssistVisibility) {
+            val (countPixel, dailyPixel) = searchAssistPixelPair(visibility)
+            pixel.fireCountAndDaily(countPixel = countPixel, dailyPixel = dailyPixel)
+        }
         viewModelScope.launch {
             // The SERP blob is the single source of truth, so the web reflects this on its next getNativeSettings.
             serpSettingsDataProvider.setSetting(SearchAssistVisibility.SERP_SETTINGS_KEY, visibility.serpCode)
         }
     }
+
+    private fun searchAssistPixelPair(visibility: SearchAssistVisibility): Pair<DuckChatPixelName, DuckChatPixelName> =
+        when (visibility) {
+            SearchAssistVisibility.NEVER ->
+                DuckChatPixelName.AI_FEATURES_SEARCH_ASSIST_NEVER_COUNT to DuckChatPixelName.AI_FEATURES_SEARCH_ASSIST_NEVER_DAILY
+            SearchAssistVisibility.ON_DEMAND ->
+                DuckChatPixelName.AI_FEATURES_SEARCH_ASSIST_ON_DEMAND_COUNT to DuckChatPixelName.AI_FEATURES_SEARCH_ASSIST_ON_DEMAND_DAILY
+            SearchAssistVisibility.SOMETIMES ->
+                DuckChatPixelName.AI_FEATURES_SEARCH_ASSIST_SOMETIMES_COUNT to DuckChatPixelName.AI_FEATURES_SEARCH_ASSIST_SOMETIMES_DAILY
+            SearchAssistVisibility.OFTEN ->
+                DuckChatPixelName.AI_FEATURES_SEARCH_ASSIST_OFTEN_COUNT to DuckChatPixelName.AI_FEATURES_SEARCH_ASSIST_OFTEN_DAILY
+        }
 
     // Emits null until the user (or SERP) has provided a value; callers default it.
     private fun observeSearchAssistVisibility(): Flow<SearchAssistVisibility?> =
