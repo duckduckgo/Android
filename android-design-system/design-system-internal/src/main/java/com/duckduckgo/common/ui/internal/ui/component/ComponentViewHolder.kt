@@ -647,8 +647,6 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
             view.setupThemedComposeView(R.id.composeDaxSnackbar, isDarkTheme) {
                 val context = LocalContext.current
                 Column(
-                    // Padding gives the snackbar elevation shadow room so it isn't clipped at the ComposeView edges.
-                    // In production the SnackbarHost provides this spacing.
                     modifier = Modifier.padding(8.dp),
                     verticalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
