@@ -926,6 +926,11 @@ class BrowserTabFragment :
                 username: String?,
                 generatedPassword: String,
             ) {
+                // Fire mode never offers to use or save a generated password — its session leaves no trace.
+                if (browserMode == BrowserMode.FIRE) {
+                    return
+                }
+
                 // small delay added to let keyboard disappear if it was present; helps avoid jarring transition
                 delay(KEYBOARD_DELAY)
 
