@@ -95,6 +95,24 @@
     <string name="duckAiHideAiGeneratedImagesTitle">Piilota tekoälyn luomat kuvat</string>
     <string name="duckAiHideAiGeneratedImagesDescription">Suodattaa pois tekoälyn luomat kuvat kuvahaun tuloksista</string>
 
+    <!-- Search Assist Visibility -->
+    <string name="duckAiSearchAssistVisibilityTitle">Search Assist -näkyvyys</string>
+    <string name="duckAiSearchAssistVisibilitySubtitle">Valitse, kuinka usein haluat tekoälyavusteisten vastausten näkyvän hauissasi.</string>
+    <string name="duckAiSearchAssistVisibilityNever">Ei koskaan</string>
+    <string name="duckAiSearchAssistVisibilityOnDemand">Pyynnöstä</string>
+    <string name="duckAiSearchAssistVisibilitySometimes">Joskus</string>
+    <string name="duckAiSearchAssistVisibilityOften">Usein</string>
+
+    <!-- Duck AI Use Without AI Settings Option -->
+    <string name="duckAiUseWithoutAiTitle">Käytä DuckDuckGo:ta ilman tekoälyä</string>
+    <string name="duckAiUseWithoutAiDescription">Poistaa Duck.ai:n käytöstä, piilottaa tekoälyavusteiset vastaukset haussa ja suodattaa tunnetut tekoälyroskapostisivustot kuvahaun tuloksista.</string>
+    <string name="duckAiUseWithoutAiDisabledDescription">Tekoäly on tällä hetkellä poistettu käytöstä selaimessa, joten et enää näe tekoälyavusteisia vastauksia ja näet vähemmän tekoälyn luomia kuvia kuvahaun tuloksissa.</string>
+
+    <!-- Duck AI Section in AI Feature Screen -->
+    <string name="input_screen_user_pref_toggle_between_search_and_ai">Vaihda haun ja Duck.ai:n välillä</string>
+    <string name="duckAiDialogHideAiGeneratedImagesTitle">Piilota tekoälyn luomat kuvat</string>
+    <string name="duckAiDialogHideAiGeneratedImagesDescription">Suodattaa pois tunnetut tekoälyroskapostisivustot kuvahaun tuloksista. <annotation link="learn_more">Lue lisää</annotation></string>
+
     <!-- Duck AI Paid Settings -->
     <string name="duck_ai_paid_settings_enable_in_settings">Ota käyttöön tekoälyominaisuuksien asetuksissa</string>
     <string name="duck_ai_paid_settings_manage_in_settings">Hallinnoi tekoälyominaisuuksien asetuksissa</string>
