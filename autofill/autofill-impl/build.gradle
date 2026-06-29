@@ -51,6 +51,7 @@ dependencies {
     implementation project(':sqlcipher-loader-api')
     implementation project(':saved-sites-api')
     implementation project(':cookies-api')
+    implementation project(':browser-mode-api')
 
     implementation project(path: ':anvil-annotations')
 
