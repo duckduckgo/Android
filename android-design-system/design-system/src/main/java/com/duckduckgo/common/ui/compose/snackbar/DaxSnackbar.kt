@@ -124,7 +124,7 @@ private object DaxSnackbarDefaults {
     val shape: Shape
         @Composable
         @ReadOnlyComposable
-        get() = DuckDuckGoTheme.shapes.small // 8dp corner radius, per Figma
+        get() = DuckDuckGoTheme.shapes.small
 
     val containerColor: Color
         @Composable
