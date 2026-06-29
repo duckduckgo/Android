@@ -32,20 +32,22 @@ import com.duckduckgo.sync.impl.databinding.DialogChatSyncPromoBinding
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
-import logcat.logcat
 import javax.inject.Inject
 
 @ContributesActivePlugin(
     scope = AppScope::class,
     boundType = NativeInputChatTabItemPlugin::class,
-    defaultActiveValue = DefaultFeatureValue.FALSE,
+    defaultActiveValue = DefaultFeatureValue.INTERNAL,
     priority = NativeInputChatTabItemPlugin.PRIORITY_PROMO,
     featureName = "pluginChatSyncPromoChatTabItemPlugin",
     parentFeatureName = "pluginPointNativeInputChatTabItemPlugin",
 )
 class ChatSyncPromoChatTabItemPlugin @Inject constructor(
+    private val chatSyncPromotion: ChatSyncPromotion,
     private val duckChatInput: DuckChatInputModeState,
     private val activityStarter: GlobalActivityStarter,
 ) : NativeInputChatTabItemPlugin {
@@ -53,18 +55,28 @@ class ChatSyncPromoChatTabItemPlugin @Inject constructor(
         context: Context,
         scope: CoroutineScope,
     ): NativeInputChatTabItem {
-        val listener = ChatTabPluginAdapterListener(context, activityStarter)
+        val listener = ChatTabPluginAdapterListener(context, chatSyncPromotion, scope, activityStarter)
         val adapter = ChatSyncPromoAdapter(listener)
 
-        adapter.show()
-        scope.hideBannerOnInput(adapter)
+        val showJob = scope.showPromotionBanner(adapter)
+        scope.hideBannerOnInput(adapter, showJob)
 
         return ChatSyncChatTabItem(adapter)
     }
 
-    private fun CoroutineScope.hideBannerOnInput(adapter: ChatSyncPromoAdapter) {
+    private fun CoroutineScope.showPromotionBanner(adapter: ChatSyncPromoAdapter): Job {
+        return launch {
+            if (chatSyncPromotion.canShowPromotion()) adapter.show()
+        }
+    }
+
+    private fun CoroutineScope.hideBannerOnInput(
+        adapter: ChatSyncPromoAdapter,
+        showJob: Job,
+    ) {
         launch {
             duckChatInput.inputQuery.firstOrNull(String::isNotEmpty) ?: return@launch
+            showJob.cancelAndJoin()
             adapter.dismiss(shouldAnimate = false)
         }
     }
@@ -78,12 +90,15 @@ private class ChatSyncChatTabItem(
 
 private class ChatTabPluginAdapterListener(
     private val context: Context,
+    private val promotion: ChatSyncPromotion,
+    private val scope: CoroutineScope,
     private val activityStarter: GlobalActivityStarter,
 ) : ChatSyncPromoAdapter.Listener {
     private var didBannerShow = false
     private var isDialogShowing = false
 
     override fun onSyncWithDeviceClicked(adapter: ChatSyncPromoAdapter) {
+        scope.launch { promotion.recordPromotionChecked() }
         adapter.dismiss(shouldAnimate = true)
 
         if (!isDialogShowing) {
@@ -100,13 +115,14 @@ private class ChatTabPluginAdapterListener(
     }
 
     override fun onDismissClicked(adapter: ChatSyncPromoAdapter) {
+        scope.launch { promotion.recordPromotionDismissed() }
         adapter.dismiss(shouldAnimate = true)
     }
 
     override fun onBannerShown(adapter: ChatSyncPromoAdapter) {
         if (!didBannerShow) {
             didBannerShow = true
-            logcat { "On banner shown" }
+            scope.launch { promotion.incrementImpressionCount() }
         }
     }
 }
