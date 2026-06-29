@@ -26,6 +26,7 @@ import com.duckduckgo.app.browser.api.OmnibarRepository
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.fire.promo.FireTabsPromos
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.TAB_MANAGER_GRID_VIEW_BUTTON_CLICKED
 import com.duckduckgo.app.pixels.AppPixelName.TAB_MANAGER_LIST_VIEW_BUTTON_CLICKED
@@ -38,6 +39,7 @@ import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType
 import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType.GRID
 import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType.LIST
 import com.duckduckgo.app.tabs.store.TabSwitcherDataStore
+import com.duckduckgo.app.tabs.ui.TabSwitcherItem.FireTabsPromo
 import com.duckduckgo.app.tabs.ui.TabSwitcherItem.Tab
 import com.duckduckgo.app.tabs.ui.TabSwitcherItem.Tab.DuckAiTab
 import com.duckduckgo.app.tabs.ui.TabSwitcherItem.Tab.NormalTab
@@ -110,6 +112,7 @@ class TabSwitcherViewModel @Inject constructor(
     private val omnibarRepository: OmnibarRepository,
     private val tabTitleResolver: TabTitleResolver,
     @param:AppCoroutineScope private val appCoroutineScope: CoroutineScope,
+    private val fireTabsPromos: FireTabsPromos,
 ) : ViewModel() {
 
     private val fireModeAvailable = fireModeAvailability.isAvailable()
@@ -134,6 +137,24 @@ class TabSwitcherViewModel @Inject constructor(
 
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
 
+    private val _viewState = MutableStateFlow(
+        ViewState(
+            isSplitOmnibarEnabled = omnibarRepository.omnibarType == OmnibarType.SPLIT,
+            isBrowserModeToggleVisible = fireModeAvailable,
+            browserMode = currentMode.value,
+        ),
+    )
+
+    init {
+        viewModelScope.launch {
+            if (fireTabsPromos.canShowTabSwitcherPromo()) {
+                fireTabsPromos.onTabSwitcherPromoShown()
+                pixel.fire(AppPixelName.FIRE_TABS_PROMO_TAB_SWITCHER_SHOWN)
+                _viewState.update { it.copy(isFireTabsPromoVisible = true) }
+            }
+        }
+    }
+
     private val tabSwitcherItemsFlow: Flow<TabItems> = tabRepositoryFlow.flatMapLatest { repo ->
         combine(
             repo.flowTabs.debounce(100.milliseconds),
@@ -142,7 +163,7 @@ class TabSwitcherViewModel @Inject constructor(
             tabSwitcherDataStore.isTrackersAnimationInfoTileHidden(),
             currentMode,
         ) { tabEntities, activeTab, viewState, isAnimationTileDismissed, browserMode ->
-            getTabItems(tabEntities, activeTab, isAnimationTileDismissed, viewState.mode, browserMode)
+            getTabItems(tabEntities, activeTab, isAnimationTileDismissed, viewState.mode, browserMode, viewState.isFireTabsPromoVisible)
         }
             .map<List<TabSwitcherItem>, TabItems> { TabItems.Loaded(it) }
             .onStart { emit(TabItems.NotInitialized) }
@@ -150,13 +171,6 @@ class TabSwitcherViewModel @Inject constructor(
 
     val tabSwitcherItemsLiveData: LiveData<List<TabSwitcherItem>> = tabSwitcherItemsFlow.map { it.itemsOrEmpty }.asLiveData()
 
-    private val _viewState = MutableStateFlow(
-        ViewState(
-            isSplitOmnibarEnabled = omnibarRepository.omnibarType == OmnibarType.SPLIT,
-            isBrowserModeToggleVisible = fireModeAvailable,
-            browserMode = currentMode.value,
-        ),
-    )
     val viewState = combine(
         _viewState,
         tabSwitcherItemsFlow,
@@ -623,6 +637,11 @@ class TabSwitcherViewModel @Inject constructor(
         }
     }
 
+    fun onFireTabsPromoDismissed() {
+        pixel.fire(AppPixelName.FIRE_TABS_PROMO_TAB_SWITCHER_DISMISSED)
+        _viewState.update { it.copy(isFireTabsPromoVisible = false) }
+    }
+
     fun onTrackerAnimationInfoPanelClicked() {
         trackersAnimationInfoPanelPixels.fireInfoPanelTapped()
         command.value = ShowAnimatedTileDismissalDialog
@@ -651,6 +670,7 @@ class TabSwitcherViewModel @Inject constructor(
         isTrackersAnimationInfoPanelHidden: Boolean,
         mode: Mode,
         browserMode: BrowserMode,
+        showFireTabsPromo: Boolean,
     ): List<TabSwitcherItem> {
         if (mode is Selection) {
             return tabEntities.map { entity ->
@@ -676,11 +696,17 @@ class TabSwitcherViewModel @Inject constructor(
             }
         }
 
-        return if (!isTrackersAnimationInfoPanelHidden) {
+        val withTrackerPanel = if (!isTrackersAnimationInfoPanelHidden) {
             val trackerCountForLast7Days = webTrackersBlockedAppRepository.getTrackerCountForLast7Days()
             listOf(TrackersAnimationInfoPanel(trackerCountForLast7Days)) + tabs
         } else {
             tabs
+        }
+
+        return if (showFireTabsPromo && browserMode == BrowserMode.REGULAR) {
+            listOf(FireTabsPromo) + withTrackerPanel
+        } else {
+            withTrackerPanel
         }
     }
 
@@ -701,6 +727,7 @@ class TabSwitcherViewModel @Inject constructor(
         val browserMode: BrowserMode = BrowserMode.REGULAR,
         val regularTabCount: Int? = null,
         val isBrowserModeToggleVisible: Boolean = false,
+        val isFireTabsPromoVisible: Boolean = false,
     ) {
         val tabSwitcherItems: List<TabSwitcherItem> = tabItems.itemsOrEmpty
         val tabs: List<Tab> = tabSwitcherItems.filterIsInstance<Tab>()

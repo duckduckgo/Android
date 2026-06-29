@@ -22,9 +22,11 @@ import android.annotation.SuppressLint
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.Observer
 import androidx.lifecycle.liveData
+import app.cash.turbine.test
 import com.duckduckgo.app.browser.api.OmnibarRepository
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.omnibar.OmnibarType
+import com.duckduckgo.app.fire.promo.FireTabsPromos
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
@@ -138,6 +140,8 @@ class TabSwitcherViewModelTest {
 
     private val mockPixel: Pixel = mock()
 
+    private val fireTabsPromos: FireTabsPromos = mock()
+
     private val statisticsDataStore: StatisticsDataStore = mock()
 
     private val duckChatMock: DuckChat = mock()
@@ -198,6 +202,7 @@ class TabSwitcherViewModelTest {
         whenever(mockBrowserModeStateHolder.currentMode).thenReturn(currentModeFlow)
         whenever(mockTabRepositoryProvider.forMode(BrowserMode.REGULAR)).thenReturn(mockTabRepository)
         whenever(mockTabTitleResolver.resolveTitle(any(), any())).thenReturn("")
+        whenever(fireTabsPromos.canShowTabSwitcherPromo()).thenReturn(false)
 
         initializeMockTabEntitesData()
         initializeViewModel()
@@ -211,7 +216,13 @@ class TabSwitcherViewModelTest {
     }
 
     private fun initializeViewModel(tabSwitcherDataStore: TabSwitcherDataStore = mockTabSwitcherPrefsDataStore) {
-        testee = TabSwitcherViewModel(
+        testee = createViewModel(tabSwitcherDataStore)
+        testee.command.observeForever(mockCommandObserver)
+        testee.tabSwitcherItemsLiveData.observeForever(mockTabSwitcherItemsObserver)
+    }
+
+    private fun createViewModel(tabSwitcherDataStore: TabSwitcherDataStore = mockTabSwitcherPrefsDataStore): TabSwitcherViewModel {
+        return TabSwitcherViewModel(
             mockTabRepositoryProvider,
             mockBrowserModeStateHolder,
             mockFireModeAvailability,
@@ -228,9 +239,8 @@ class TabSwitcherViewModelTest {
             mockOmnibarFeatureRepository,
             mockTabTitleResolver,
             coroutinesTestRule.testScope,
+            fireTabsPromos,
         )
-        testee.command.observeForever(mockCommandObserver)
-        testee.tabSwitcherItemsLiveData.observeForever(mockTabSwitcherItemsObserver)
     }
 
     @After
@@ -2053,6 +2063,7 @@ class TabSwitcherViewModelTest {
             mockOmnibarFeatureRepository,
             mockTabTitleResolver,
             coroutinesTestRule.testScope,
+            fireTabsPromos,
         )
         backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
             isolatedViewModel.viewState.collect()
@@ -2096,6 +2107,7 @@ class TabSwitcherViewModelTest {
             mockOmnibarFeatureRepository,
             mockTabTitleResolver,
             coroutinesTestRule.testScope,
+            fireTabsPromos,
         )
 
         assertFalse(isolatedViewModel.viewState.value.isBrowserModeToggleVisible)
@@ -2163,6 +2175,7 @@ class TabSwitcherViewModelTest {
             mockOmnibarFeatureRepository,
             mockTabTitleResolver,
             coroutinesTestRule.testScope,
+            fireTabsPromos,
         )
 
         isolatedViewModel.onBrowserModeToggled(BrowserMode.FIRE)
@@ -2179,6 +2192,43 @@ class TabSwitcherViewModelTest {
         advanceUntilIdle()
 
         assertEquals(tabList.size, testee.viewState.value.regularTabCount)
+    }
+
+    @Test
+    fun whenCanShowTabSwitcherPromoThenVisibleAndShownPixelAndMarkedShown() = runTest {
+        whenever(fireTabsPromos.canShowTabSwitcherPromo()).thenReturn(true)
+
+        val testee = createViewModel()
+
+        testee.viewState.test {
+            assertTrue(expectMostRecentItem().isFireTabsPromoVisible)
+        }
+        verify(fireTabsPromos).onTabSwitcherPromoShown()
+        verify(mockPixel).fire(AppPixelName.FIRE_TABS_PROMO_TAB_SWITCHER_SHOWN)
+    }
+
+    @Test
+    fun whenCannotShowTabSwitcherPromoThenNotVisible() = runTest {
+        whenever(fireTabsPromos.canShowTabSwitcherPromo()).thenReturn(false)
+
+        val testee = createViewModel()
+
+        testee.viewState.test {
+            assertFalse(expectMostRecentItem().isFireTabsPromoVisible)
+        }
+    }
+
+    @Test
+    fun whenFireTabsPromoDismissedThenHiddenAndPixelFired() = runTest {
+        whenever(fireTabsPromos.canShowTabSwitcherPromo()).thenReturn(true)
+
+        val testee = createViewModel()
+        testee.onFireTabsPromoDismissed()
+
+        testee.viewState.test {
+            assertFalse(expectMostRecentItem().isFireTabsPromoVisible)
+        }
+        verify(mockPixel).fire(AppPixelName.FIRE_TABS_PROMO_TAB_SWITCHER_DISMISSED)
     }
 
     private class FakeTabSwitcherDataStore : TabSwitcherDataStore {
