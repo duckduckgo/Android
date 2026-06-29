@@ -16,9 +16,14 @@
 
 package com.duckduckgo.sync.impl.promotion.chat
 
+import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelName
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.sync.impl.promotion.FakeSyncPromotionDataStore
 import com.duckduckgo.sync.impl.promotion.SyncPromotionDataStore.PromotionType
+import com.duckduckgo.sync.impl.promotion.chat.FakePixel.Measurement
 import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
@@ -35,6 +40,7 @@ class RealChatSyncPromotionTest {
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
     private val dataStore = FakeSyncPromotionDataStore()
+    private val pixel = FakePixel()
 
     // DeviceSyncState properties
     private var isSyncEnabled = false
@@ -44,6 +50,7 @@ class RealChatSyncPromotionTest {
     // DuckChat properties
     private var isChatHistoryEnabled = false
     private val hasChatSuggestions = MutableStateFlow(false)
+    
 
     private val testee = RealChatSyncPromotion(
         promotionDataStore = dataStore,
@@ -56,6 +63,7 @@ class RealChatSyncPromotionTest {
             onBlocking { hasUserEnabledChatHistory() } doAnswer { isChatHistoryEnabled }
             on { observeHasChatSuggestions() } doReturn hasChatSuggestions
         },
+        pixel = pixel,
         dispatchers = coroutineTestRule.testDispatcherProvider,
     )
 
@@ -156,6 +164,78 @@ class RealChatSyncPromotionTest {
         assertTrue(dataStore.hasPromoBeenDismissed(PromotionType.ChatTabPage))
     }
 
+    @Test
+    fun `when promotion impression count is increased then fire displayed pixel`() = runTest {
+        testee.incrementImpressionCount()
+
+        assertEquals(
+            listOf(
+                Measurement("sync_promotion_displayed", mapOf("source" to "ai_chat")),
+            ),
+            pixel.firedPixels,
+        )
+    }
+
+    @Test
+    fun `when promotion is checked then fire confirmed pixel`() = runTest {
+        testee.recordPromotionAccepted()
+
+        assertEquals(
+            listOf(
+                Measurement("sync_promotion_confirmed", mapOf("source" to "ai_chat")),
+            ),
+            pixel.firedPixels,
+        )
+    }
+
+    @Test
+    fun `when promotion is dismissed then fire user_tapped dismissed pixel`() = runTest {
+        testee.recordPromotionDismissed()
+
+        assertEquals(
+            listOf(
+                Measurement(
+                    name = "sync_promotion_dismissed",
+                    params = mapOf("source" to "ai_chat", "reason" to "user_tapped"),
+                ),
+            ),
+            pixel.firedPixels,
+        )
+    }
+
+    @Test
+    fun `when can't show promotion due to cap limit then fire user_tapped dismissed pixel`() = runTest {
+        configurePromotionToShow()
+        repeat(RealChatSyncPromotion.MAX_IMPRESSION_COUNT) {
+            testee.incrementImpressionCount()
+        }
+        pixel.clear()
+
+        testee.canShowPromotion()
+
+        assertEquals(
+            listOf(
+                Measurement(
+                    name = "sync_promotion_dismissed",
+                    params = mapOf("source" to "ai_chat", "reason" to "impression_cap"),
+                    type = Unique("sync_promotion_dismissed_ai_chat_impression_cap_3"),
+                ),
+            ),
+            pixel.firedPixels,
+        )
+    }
+
+    @Test
+    fun `when can't show promotion due to it being dismissed then fire no pixels`() = runTest {
+        configurePromotionToShow()
+        testee.recordPromotionDismissed()
+        pixel.clear()
+
+        testee.canShowPromotion()
+
+        assertTrue(pixel.firedPixels.isEmpty())
+    }
+
     private suspend fun configurePromotionToShow() {
         dataStore.clearPromoHistory(PromotionType.ChatTabPage)
         isSyncEnabled = true
@@ -164,4 +244,48 @@ class RealChatSyncPromotionTest {
         isChatHistoryEnabled = true
         hasChatSuggestions.value = true
     }
+}
+
+private class FakePixel : Pixel {
+    private val _firedPixels = mutableListOf<Measurement>()
+    val firedPixels get() = _firedPixels.toList()
+
+    fun clear() = _firedPixels.clear()
+
+    override fun fire(
+        pixelName: String,
+        parameters: Map<String, String>,
+        encodedParameters: Map<String, String>,
+        type: PixelType,
+    ) {
+        _firedPixels.add(Measurement(pixelName, parameters, encodedParameters, type))
+    }
+
+    override fun fire(
+        pixel: PixelName,
+        parameters: Map<String, String>,
+        encodedParameters: Map<String, String>,
+        type: PixelType,
+    ) = fire(pixel.pixelName, parameters, encodedParameters, type)
+
+    override fun enqueueFire(
+        pixelName: String,
+        parameters: Map<String, String>,
+        encodedParameters: Map<String, String>,
+        type: PixelType,
+    ) = fire(pixelName, parameters, encodedParameters, type)
+
+    override fun enqueueFire(
+        pixel: PixelName,
+        parameters: Map<String, String>,
+        encodedParameters: Map<String, String>,
+        type: PixelType,
+    ) = fire(pixel, parameters, encodedParameters, type)
+
+    data class Measurement(
+        val name: String,
+        val params: Map<String, String> = emptyMap(),
+        val encodedParams: Map<String, String> = emptyMap(),
+        val type: PixelType = PixelType.Count,
+    )
 }

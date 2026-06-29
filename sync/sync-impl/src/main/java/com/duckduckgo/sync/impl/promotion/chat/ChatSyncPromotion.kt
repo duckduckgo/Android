@@ -16,10 +16,14 @@
 
 package com.duckduckgo.sync.impl.promotion.chat
 
+import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.sync.api.DeviceSyncState
+import com.duckduckgo.sync.impl.pixels.SyncPixelName
+import com.duckduckgo.sync.impl.pixels.SyncPixelParameters
 import com.duckduckgo.sync.impl.promotion.SyncPromotionDataStore
 import com.duckduckgo.sync.impl.promotion.SyncPromotionDataStore.PromotionType.ChatTabPage
 import com.squareup.anvil.annotations.ContributesBinding
@@ -42,6 +46,7 @@ class RealChatSyncPromotion @Inject constructor(
     private val promotionDataStore: SyncPromotionDataStore,
     private val syncState: DeviceSyncState,
     private val duckChat: DuckChat,
+    private val pixel: Pixel,
     private val dispatchers: DispatcherProvider,
 ) : ChatSyncPromotion {
     override suspend fun canShowPromotion(): Boolean = coroutineScope {
@@ -52,19 +57,41 @@ class RealChatSyncPromotion @Inject constructor(
 
     override suspend fun incrementImpressionCount() {
         promotionDataStore.recordPromoImpression(ChatTabPage)
+        pixel.fire(SyncPixelName.SYNC_FEATURE_PROMOTION_DISPLAYED, pixelParms())
     }
 
     override suspend fun recordPromotionAccepted() {
         promotionDataStore.recordPromoDismissed(ChatTabPage)
+        pixel.fire(SyncPixelName.SYNC_FEATURE_PROMOTION_CONFIRMED, pixelParms())
     }
 
     override suspend fun recordPromotionDismissed() {
         promotionDataStore.recordPromoDismissed(ChatTabPage)
+        pixel.fire(
+            pixel = SyncPixelName.SYNC_FEATURE_PROMOTION_DISMISSED,
+            parameters = pixelParms {
+                put(SyncPixelParameters.SYNC_FEATURE_PROMOTION_DISMISS_REASON, PIXEL_DISMISS_REASON_USER_TAPPED)
+            },
+        )
     }
 
     private suspend fun isPromoExhausted(): Boolean {
-        return promotionDataStore.hasPromoBeenDismissed(ChatTabPage) ||
-            promotionDataStore.getPromoImpressionCount(ChatTabPage) >= MAX_IMPRESSION_COUNT
+        val isDismissedByUser = promotionDataStore.hasPromoBeenDismissed(ChatTabPage)
+        if (isDismissedByUser) {
+            return true
+        }
+
+        val isImpressionCapReached = promotionDataStore.getPromoImpressionCount(ChatTabPage) >= MAX_IMPRESSION_COUNT
+        if (isImpressionCapReached) {
+            pixel.fire(
+                pixel = SyncPixelName.SYNC_FEATURE_PROMOTION_DISMISSED,
+                parameters = pixelParms {
+                    put(SyncPixelParameters.SYNC_FEATURE_PROMOTION_DISMISS_REASON, PIXEL_DISMISS_REASON_IMPRESSION_CAP)
+                },
+                type = Unique(MAX_IMPRESSION_CAP_PIXEL_TAG),
+            )
+        }
+        return isImpressionCapReached
     }
 
     private suspend fun isEligibleForPromo() = coroutineScope {
@@ -86,7 +113,28 @@ class RealChatSyncPromotion @Inject constructor(
 
     private suspend fun hasChatSuggestions(): Boolean = duckChat.observeHasChatSuggestions().firstOrNull() == true
 
+    private fun pixelParms(
+        customParams: (MutableMap<String, String>.() -> Unit)? = null,
+    ): Map<String, String> = buildMap {
+        put(SyncPixelParameters.SYNC_FEATURE_PROMOTION_SOURCE, PIXEL_SOURCE)
+        customParams?.invoke(this)
+    }
+
     companion object {
         const val MAX_IMPRESSION_COUNT = 3
+
+        private const val PIXEL_SOURCE = "ai_chat"
+        private const val PIXEL_DISMISS_REASON_USER_TAPPED = "user_tapped"
+        private const val PIXEL_DISMISS_REASON_IMPRESSION_CAP = "impression_cap"
+
+        private val MAX_IMPRESSION_CAP_PIXEL_TAG = buildString {
+            append(SyncPixelName.SYNC_FEATURE_PROMOTION_DISMISSED.pixelName)
+            append('_')
+            append(PIXEL_SOURCE)
+            append('_')
+            append(PIXEL_DISMISS_REASON_IMPRESSION_CAP)
+            append('_')
+            append(MAX_IMPRESSION_COUNT)
+        }
     }
 }
