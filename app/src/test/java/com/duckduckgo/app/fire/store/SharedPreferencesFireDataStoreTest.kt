@@ -53,6 +53,16 @@ class SharedPreferencesFireDataStoreTest {
     }
 
     @Test
+    fun whenTabSwitcherPromoNotSetThenIsTabSwitcherPromoDismissedIsFalse() = runTest {
+        assertFalse(testee().isTabSwitcherPromoDismissed())
+    }
+
+    @Test
+    fun whenUserBurnedNotSetThenHasUserBurnedWhileBrowsingIsFalse() = runTest {
+        assertFalse(testee().hasUserBurnedWhileBrowsing())
+    }
+
+    @Test
     fun whenNtpPromoDismissedSetTrueThenIsNtpPromoDismissedIsTrue() = runTest {
         val testee = testee()
         testee.setNtpPromoDismissed(true)
