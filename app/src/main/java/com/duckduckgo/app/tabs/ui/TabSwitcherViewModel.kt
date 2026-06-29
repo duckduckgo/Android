@@ -638,6 +638,7 @@ class TabSwitcherViewModel @Inject constructor(
     }
 
     fun onFireTabsPromoDismissed() {
+        if (!_viewState.value.isFireTabsPromoVisible) return
         pixel.fire(AppPixelName.FIRE_TABS_PROMO_TAB_SWITCHER_DISMISSED)
         _viewState.update { it.copy(isFireTabsPromoVisible = false) }
     }

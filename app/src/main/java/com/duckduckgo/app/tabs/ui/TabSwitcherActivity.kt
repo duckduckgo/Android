@@ -570,14 +570,21 @@ class TabSwitcherActivity :
     private fun checkTrackerAnimationPanelVisibility() {
         val layoutManager = tabsRecycler.layoutManager as? LinearLayoutManager ?: return
         val firstVisible = layoutManager.findFirstVisibleItemPosition()
-        val isPanelCurrentlyVisible = firstVisible == 0 && tabsAdapter.getTabSwitcherItem(0) is TrackersAnimationInfoPanel
+        val lastVisible = layoutManager.findLastVisibleItemPosition()
 
+        val panelIndex = viewModel.tabSwitcherItems.indexOfFirst { it is TrackersAnimationInfoPanel }
+        if (panelIndex == -1) {
+            isTrackerAnimationPanelVisible = false
+            return
+        }
+
+        val isPanelCurrentlyVisible = panelIndex in firstVisible..lastVisible
         if (!isPanelCurrentlyVisible) {
             isTrackerAnimationPanelVisible = false
             return
         }
 
-        val viewHolder = tabsRecycler.findViewHolderForAdapterPosition(0) ?: return
+        val viewHolder = tabsRecycler.findViewHolderForAdapterPosition(panelIndex) ?: return
         val itemView = viewHolder.itemView
 
         val itemHeight = itemView.height
@@ -966,7 +973,7 @@ class TabSwitcherActivity :
         val canSwap = from in canSwapFromIndex..<tabSwitcherItemCount && to in canSwapFromIndex..<tabSwitcherItemCount
         if (canSwap) {
             tabsAdapter.onTabMoved(from, to)
-            // Adjust indices if animation feature is enabled to account for the TrackerAnimationTile at index 0
+            // Adjust indices to account for any leading non-Tab header items (e.g. TrackerAnimationTile, FireTabsPromo)
             viewModel.onTabMoved(from - canSwapFromIndex, to - canSwapFromIndex)
         }
     }

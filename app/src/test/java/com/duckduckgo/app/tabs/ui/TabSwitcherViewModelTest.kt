@@ -2223,6 +2223,7 @@ class TabSwitcherViewModelTest {
         whenever(fireTabsPromos.canShowTabSwitcherPromo()).thenReturn(true)
 
         val testee = createViewModel()
+        advanceUntilIdle() // ensure init coroutine sets isFireTabsPromoVisible = true
         testee.onFireTabsPromoDismissed()
 
         testee.viewState.test {
