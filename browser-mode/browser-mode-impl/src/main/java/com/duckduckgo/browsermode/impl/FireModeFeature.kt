@@ -31,4 +31,7 @@ interface FireModeFeature {
 
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun fireTabs(): Toggle
+
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    fun fireTabsPromo(): Toggle
 }
