@@ -641,6 +641,11 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
     }
 
     private fun storeFavicon(url: String) {
+        // Fire mode must not persist a site favicon: it is a domain-keyed file kept outside the WebView
+        // profile the burn clears, so it would be a cross-session trace of a visited site. The favicon
+        // only ever backs a saved permission, which Fire mode never writes, so it is safe to skip here.
+        if (browserMode == BrowserMode.FIRE) return
+
         appCoroutineScope.launch {
             faviconManager.persistCachedFavicon(tabId, url)
         }
