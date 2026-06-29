@@ -2963,7 +2963,6 @@ class BrowserTabViewModel @Inject constructor(
      */
     fun restoreOmnibarAutocomplete(forQuery: String): AutoCompleteResult? {
         val cached = omnibarAutocompleteCache.value
-        if (cached.query != forQuery || cached.suggestions.isEmpty()) return null
         val current = autoCompleteViewState.value ?: return null
         val restored = current.copy(
             searchResults = cached,
@@ -2972,7 +2971,11 @@ class BrowserTabViewModel @Inject constructor(
         )
         autoCompleteViewState.value = restored
         lastAutoCompleteState = restored
-        return cached
+        return if (cached.query != forQuery || cached.suggestions.isEmpty()) {
+            null
+        } else {
+            cached
+        }
     }
 
     fun onBookmarkMenuClicked() {
