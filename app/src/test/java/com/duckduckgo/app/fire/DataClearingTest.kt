@@ -1391,6 +1391,14 @@ class DataClearingTest {
         verify(mockFireTabsPromos).onUserBurned()
     }
 
+    @Test
+    fun whenSingleTabBurnInFireModeThenUserBurnedNotRecorded() = runTest {
+        whenever(mockTabVisitedSitesRepository.getVisitedSites("tab-1")).thenReturn(emptySet())
+        whenever(mockTabRepository.getTab("tab-1")).thenReturn(null)
+        testee.clearSingleTabData(tabId = "tab-1", replaceCurrentTab = false, browserMode = BrowserMode.FIRE)
+        verify(mockFireTabsPromos, never()).onUserBurned()
+    }
+
     private fun Set<ClearableData>.hasFireScopedType() = any { t ->
         (t is ClearableData.BrowserData.AllForMode && t.mode == BrowserMode.FIRE) ||
             (t is ClearableData.BrowserData.SingleForMode && t.mode == BrowserMode.FIRE) ||
