@@ -128,6 +128,8 @@ import com.duckduckgo.app.browser.commands.Command.OpenBrokenSiteLearnMore
 import com.duckduckgo.app.browser.commands.Command.ReportBrokenSiteError
 import com.duckduckgo.app.browser.commands.Command.ShowBackNavigationHistory
 import com.duckduckgo.app.browser.commands.NavigationCommand
+import com.duckduckgo.app.browser.contextmenu.LongPressPopupMenu
+import com.duckduckgo.app.browser.contextmenu.longPressMenuConfigFor
 import com.duckduckgo.app.browser.cookies.ThirdPartyCookieManager
 import com.duckduckgo.app.browser.customtabs.CustomTabActivity
 import com.duckduckgo.app.browser.customtabs.CustomTabPixelNames
@@ -146,8 +148,6 @@ import com.duckduckgo.app.browser.history.NavigationHistorySheet
 import com.duckduckgo.app.browser.history.NavigationHistorySheet.NavigationHistorySheetListener
 import com.duckduckgo.app.browser.httpauth.WebViewHttpAuthStore
 import com.duckduckgo.app.browser.logindetection.DOMLoginDetector
-import com.duckduckgo.app.browser.contextmenu.LongPressPopupMenu
-import com.duckduckgo.app.browser.contextmenu.longPressMenuConfigFor
 import com.duckduckgo.app.browser.menu.BrowserMenuViewStateFactory
 import com.duckduckgo.app.browser.menu.VpnMenuStore
 import com.duckduckgo.app.browser.model.BasicAuthenticationCredentials
