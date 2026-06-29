@@ -34,6 +34,7 @@ import androidx.activity.SystemBarStyle
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatDelegate.FEATURE_SUPPORT_ACTION_BAR
 import androidx.appcompat.widget.Toolbar
+import androidx.core.text.HtmlCompat
 import androidx.core.view.children
 import androidx.core.view.doOnPreDraw
 import androidx.core.view.isVisible
@@ -310,9 +311,9 @@ class TabSwitcherActivity :
             viewModel.onTrackerAnimationInfoPanelClicked()
         }
 
-        binding.fireTabsPromoBanner.firePromoText.text = androidx.core.text.HtmlCompat.fromHtml(
+        binding.fireTabsPromoBanner.firePromoText.text = HtmlCompat.fromHtml(
             getString(R.string.fireTabsPromoTabSwitcherText),
-            androidx.core.text.HtmlCompat.FROM_HTML_MODE_LEGACY,
+            HtmlCompat.FROM_HTML_MODE_LEGACY,
         )
         binding.fireTabsPromoBanner.firePromoClose.setOnClickListener {
             viewModel.onFireTabsPromoDismissed()
