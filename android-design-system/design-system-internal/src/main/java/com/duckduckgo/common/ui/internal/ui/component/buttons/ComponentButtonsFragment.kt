@@ -303,7 +303,7 @@ class ComponentButtonsFragment : Fragment() {
                     onClick = {},
                     iconPainter = painterResource(R.drawable.ic_union),
                     contentDescription = "Menu",
-                    colors = DaxIconButtonDefaults.filledColors,
+                    colors = DaxIconButtonDefaults.filledIconButtonColors,
                 )
                 DaxIconButton(
                     onClick = {},
