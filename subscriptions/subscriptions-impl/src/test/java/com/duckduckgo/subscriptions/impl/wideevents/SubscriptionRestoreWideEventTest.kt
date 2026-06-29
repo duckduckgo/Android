@@ -65,7 +65,7 @@ class SubscriptionRestoreWideEventTest {
     @SuppressLint("DenyListedApi")
     fun `onGooglePlayRestoreFlowStarted includes use_query_purchases true when feature flag enabled`() = runTest {
         subscriptionsFeature.useQueryPurchases().setRawStoredState(Toggle.State(true))
-        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any()))
+        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any()))
             .thenReturn(Result.success(321L))
 
         subscriptionRestoreWideEvent.onGooglePlayRestoreFlowStarted(isOriginWeb = false)
@@ -84,7 +84,7 @@ class SubscriptionRestoreWideEventTest {
 
     @Test
     fun `onEmailRestoreFlowStarted starts a new flow with email platform`() = runTest {
-        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any()))
+        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any()))
             .thenReturn(Result.success(123L))
 
         subscriptionRestoreWideEvent.onEmailRestoreFlowStarted(isOriginWeb = false)
@@ -104,7 +104,7 @@ class SubscriptionRestoreWideEventTest {
 
     @Test
     fun `onGooglePlayRestoreFlowStarted starts a new flow with google account platform`() = runTest {
-        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any()))
+        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any()))
             .thenReturn(Result.success(456L))
 
         subscriptionRestoreWideEvent.onGooglePlayRestoreFlowStarted(isOriginWeb = false)
@@ -124,7 +124,7 @@ class SubscriptionRestoreWideEventTest {
 
     @Test
     fun `onGooglePlayRestoreFlowStartedOnPurchaseAttempt starts a new flow with purchase attempt flag`() = runTest {
-        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any()))
+        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any()))
             .thenReturn(Result.success(789L))
 
         subscriptionRestoreWideEvent.onGooglePlayRestoreFlowStartedOnPurchaseAttempt()
@@ -143,7 +143,7 @@ class SubscriptionRestoreWideEventTest {
 
     @Test
     fun `onEmailRestoreSuccess ends interval and finishes flow with success`() = runTest {
-        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any()))
+        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any()))
             .thenReturn(Result.success(100L))
 
         subscriptionRestoreWideEvent.onEmailRestoreFlowStarted(isOriginWeb = false)
@@ -155,7 +155,7 @@ class SubscriptionRestoreWideEventTest {
 
     @Test
     fun `onGooglePlayRestoreSuccess ends interval and finishes flow with success`() = runTest {
-        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any()))
+        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any()))
             .thenReturn(Result.success(200L))
 
         subscriptionRestoreWideEvent.onGooglePlayRestoreFlowStarted(isOriginWeb = false)
@@ -167,7 +167,7 @@ class SubscriptionRestoreWideEventTest {
 
     @Test
     fun `onGooglePlayRestoreFailure finishes flow with failure`() = runTest {
-        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any()))
+        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any()))
             .thenReturn(Result.success(300L))
 
         subscriptionRestoreWideEvent.onGooglePlayRestoreFlowStarted(isOriginWeb = false)
@@ -181,7 +181,7 @@ class SubscriptionRestoreWideEventTest {
 
     @Test
     fun `starting a new flow when one is active finishes the previous flow with Unknown status`() = runTest {
-        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any()))
+        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any()))
             .thenReturn(Result.success(1L))
             .thenReturn(Result.success(2L))
 
@@ -231,18 +231,18 @@ class SubscriptionRestoreWideEventTest {
 
     @Test
     fun `flowStart failure does not call intervalStart`() = runTest {
-        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any()))
+        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any()))
             .thenReturn(Result.failure(RuntimeException("error")))
 
         subscriptionRestoreWideEvent.onEmailRestoreFlowStarted(isOriginWeb = false)
 
-        verify(wideEventClient).flowStart(any(), anyOrNull(), any(), any())
+        verify(wideEventClient).flowStart(any(), anyOrNull(), any(), any(), any())
         verify(wideEventClient, never()).intervalStart(any(), any(), any(), any())
     }
 
     @Test
     fun `onSubscriptionWebViewUrlChanged records activation flow started step`() = runTest {
-        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any()))
+        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any()))
             .thenReturn(Result.success(100L))
 
         subscriptionRestoreWideEvent.onEmailRestoreFlowStarted(isOriginWeb = false)
@@ -254,7 +254,7 @@ class SubscriptionRestoreWideEventTest {
 
     @Test
     fun `onSubscriptionWebViewUrlChanged records email input step`() = runTest {
-        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any()))
+        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any()))
             .thenReturn(Result.success(100L))
 
         subscriptionRestoreWideEvent.onEmailRestoreFlowStarted(isOriginWeb = false)
@@ -268,7 +268,7 @@ class SubscriptionRestoreWideEventTest {
 
     @Test
     fun `onSubscriptionWebViewUrlChanged records one time password input step`() = runTest {
-        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any()))
+        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any()))
             .thenReturn(Result.success(100L))
 
         subscriptionRestoreWideEvent.onEmailRestoreFlowStarted(isOriginWeb = false)
@@ -282,7 +282,7 @@ class SubscriptionRestoreWideEventTest {
 
     @Test
     fun `onSubscriptionWebViewUrlChanged ignores query parameters when matching path`() = runTest {
-        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any()))
+        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any()))
             .thenReturn(Result.success(100L))
 
         subscriptionRestoreWideEvent.onEmailRestoreFlowStarted(isOriginWeb = false)
@@ -294,7 +294,7 @@ class SubscriptionRestoreWideEventTest {
 
     @Test
     fun `onSubscriptionWebViewUrlChanged does not record step for unmatched URL`() = runTest {
-        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any()))
+        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any()))
             .thenReturn(Result.success(100L))
 
         subscriptionRestoreWideEvent.onEmailRestoreFlowStarted(isOriginWeb = false)

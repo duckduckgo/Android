@@ -52,7 +52,7 @@ class ApiWideEventSender @Inject constructor(
             global = GlobalSection(
                 platform = PLATFORM,
                 type = TYPE,
-                sampleRate = SAMPLE_RATE,
+                sampleRate = event.samplingProbability,
             ),
             app = AppSection(
                 name = APP_NAME,
@@ -101,7 +101,6 @@ class ApiWideEventSender @Inject constructor(
     private companion object {
         const val PLATFORM = "Android"
         const val TYPE = "app"
-        const val SAMPLE_RATE = 1
         const val APP_NAME = "DuckDuckGo Android"
     }
 }

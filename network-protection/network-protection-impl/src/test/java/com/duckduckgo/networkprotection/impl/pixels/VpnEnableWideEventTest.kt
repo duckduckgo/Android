@@ -60,7 +60,7 @@ class VpnEnableWideEventTest {
 
     @Test
     fun `onUserRequestedVpnStart starts a new flow`() = runTest {
-        whenever(wideEventClient.flowStart(any(), any(), any(), any()))
+        whenever(wideEventClient.flowStart(any(), any(), any(), any(), any()))
             .thenReturn(Result.success(123L))
         whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.AUTO_RENEWABLE)
         whenever(networkProtectionState.isOnboarded()).thenReturn(true)
@@ -81,7 +81,7 @@ class VpnEnableWideEventTest {
 
     @Test
     fun `onUserRequestedVpnStart with SYSTEM_TILE entry point`() = runTest {
-        whenever(wideEventClient.flowStart(any(), any(), any(), any()))
+        whenever(wideEventClient.flowStart(any(), any(), any(), any(), any()))
             .thenReturn(Result.success(456L))
         whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.UNKNOWN)
         whenever(networkProtectionState.isOnboarded()).thenReturn(false)
@@ -102,7 +102,7 @@ class VpnEnableWideEventTest {
 
     @Test
     fun `onUserRequestedVpnStart with NOTIFICATION entry point`() = runTest {
-        whenever(wideEventClient.flowStart(any(), any(), any(), any()))
+        whenever(wideEventClient.flowStart(any(), any(), any(), any(), any()))
             .thenReturn(Result.success(789L))
         whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.WAITING)
         whenever(networkProtectionState.isOnboarded()).thenReturn(true)
@@ -123,7 +123,7 @@ class VpnEnableWideEventTest {
 
     @Test
     fun `onUserRequestedVpnStart ends previous flow if one is active`() = runTest {
-        whenever(wideEventClient.flowStart(any(), any(), any(), any()))
+        whenever(wideEventClient.flowStart(any(), any(), any(), any(), any()))
             .thenReturn(Result.success(1L))
             .thenReturn(Result.success(2L))
         whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.UNKNOWN)
@@ -138,7 +138,7 @@ class VpnEnableWideEventTest {
 
     @Test
     fun `onVpnConflictDialogShown sends flowStep`() = runTest {
-        whenever(wideEventClient.flowStart(any(), any(), any(), any()))
+        whenever(wideEventClient.flowStart(any(), any(), any(), any(), any()))
             .thenReturn(Result.success(100L))
         whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.UNKNOWN)
         whenever(networkProtectionState.isOnboarded()).thenReturn(false)
@@ -155,7 +155,7 @@ class VpnEnableWideEventTest {
 
     @Test
     fun `onVpnConflictDialogCancel finishes flow with Cancelled`() = runTest {
-        whenever(wideEventClient.flowStart(any(), any(), any(), any()))
+        whenever(wideEventClient.flowStart(any(), any(), any(), any(), any()))
             .thenReturn(Result.success(200L))
         whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.UNKNOWN)
         whenever(networkProtectionState.isOnboarded()).thenReturn(false)
@@ -173,7 +173,7 @@ class VpnEnableWideEventTest {
 
     @Test
     fun `onVpnConflictDialogCancel clears wideEventId`() = runTest {
-        whenever(wideEventClient.flowStart(any(), any(), any(), any()))
+        whenever(wideEventClient.flowStart(any(), any(), any(), any(), any()))
             .thenReturn(Result.success(300L))
         whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.UNKNOWN)
         whenever(networkProtectionState.isOnboarded()).thenReturn(false)
@@ -190,7 +190,7 @@ class VpnEnableWideEventTest {
 
     @Test
     fun `onAskForVpnPermission sends flowStep`() = runTest {
-        whenever(wideEventClient.flowStart(any(), any(), any(), any()))
+        whenever(wideEventClient.flowStart(any(), any(), any(), any(), any()))
             .thenReturn(Result.success(400L))
         whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.UNKNOWN)
         whenever(networkProtectionState.isOnboarded()).thenReturn(false)
@@ -207,7 +207,7 @@ class VpnEnableWideEventTest {
 
     @Test
     fun `onVpnPermissionRejected finishes flow with Cancelled`() = runTest {
-        whenever(wideEventClient.flowStart(any(), any(), any(), any()))
+        whenever(wideEventClient.flowStart(any(), any(), any(), any(), any()))
             .thenReturn(Result.success(500L))
         whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.UNKNOWN)
         whenever(networkProtectionState.isOnboarded()).thenReturn(false)
@@ -225,7 +225,7 @@ class VpnEnableWideEventTest {
 
     @Test
     fun `onVpnPermissionRejected clears wideEventId`() = runTest {
-        whenever(wideEventClient.flowStart(any(), any(), any(), any()))
+        whenever(wideEventClient.flowStart(any(), any(), any(), any(), any()))
             .thenReturn(Result.success(600L))
         whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.UNKNOWN)
         whenever(networkProtectionState.isOnboarded()).thenReturn(false)
@@ -242,7 +242,7 @@ class VpnEnableWideEventTest {
 
     @Test
     fun `onStartVpn sends flowStep and starts interval`() = runTest {
-        whenever(wideEventClient.flowStart(any(), any(), any(), any()))
+        whenever(wideEventClient.flowStart(any(), any(), any(), any(), any()))
             .thenReturn(Result.success(700L))
         whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.UNKNOWN)
         whenever(networkProtectionState.isOnboarded()).thenReturn(false)
@@ -275,7 +275,7 @@ class VpnEnableWideEventTest {
 
     @Test
     fun `subscription status exception is handled gracefully`() = runTest {
-        whenever(wideEventClient.flowStart(any(), any(), any(), any()))
+        whenever(wideEventClient.flowStart(any(), any(), any(), any(), any()))
             .thenReturn(Result.success(800L))
         whenever(subscriptions.getSubscriptionStatus()).thenThrow(RuntimeException("Error"))
         whenever(networkProtectionState.isOnboarded()).thenReturn(false)
@@ -296,7 +296,7 @@ class VpnEnableWideEventTest {
 
     @Test
     fun `onboarded check exception is handled gracefully`() = runTest {
-        whenever(wideEventClient.flowStart(any(), any(), any(), any()))
+        whenever(wideEventClient.flowStart(any(), any(), any(), any(), any()))
             .thenReturn(Result.success(900L))
         whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.UNKNOWN)
         whenever(networkProtectionState.isOnboarded()).thenThrow(RuntimeException("Error"))
