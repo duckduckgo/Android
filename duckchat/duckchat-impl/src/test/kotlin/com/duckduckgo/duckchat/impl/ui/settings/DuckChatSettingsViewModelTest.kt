@@ -632,6 +632,29 @@ class DuckChatSettingsViewModelTest {
         }
 
     @Test
+    fun `when DuckChatNativeSettingsNoParams passed and aiFeaturesNativeControls enabled then viewState shows search section visible`() =
+        runTest {
+            @Suppress("DenyListedApi")
+            duckChatFeature.aiFeaturesNativeControls().setRawStoredState(State(enable = true))
+            testee = DuckChatSettingsViewModel(
+                duckChatActivityParams = DuckChatNativeSettingsNoParams,
+                duckChat = duckChat,
+                pixel = mockPixel,
+                inputScreenDiscoveryFunnel = mockInputScreenDiscoveryFunnel,
+                settingsPageFeature = settingsPageFeature,
+                duckChatPixels = mockDuckChatPixels,
+                dispatcherProvider = coroutineRule.testDispatcherProvider,
+                duckChatFeature = duckChatFeature,
+                serpSettingsDataProvider = serpSettingsDataProvider,
+            )
+
+            testee.viewState.test {
+                val state = awaitItem()
+                assertTrue(state.isSearchSectionVisible)
+            }
+        }
+
+    @Test
     fun `when onDuckAiHideAiGeneratedImagesClicked and native controls disabled then SERP open pixel is fired`() =
         runTest {
             testee.onDuckAiHideAiGeneratedImagesClicked()

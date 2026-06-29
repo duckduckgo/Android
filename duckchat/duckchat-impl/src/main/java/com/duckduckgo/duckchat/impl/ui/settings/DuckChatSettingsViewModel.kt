@@ -148,7 +148,7 @@ class DuckChatSettingsViewModel @AssistedInject constructor(
                 isInputScreenEnabled = isInputScreenEnabled,
                 shouldShowShortcuts = isDuckChatUserEnabled,
                 shouldShowInputScreenToggle = isDuckChatUserEnabled && duckChat.isInputScreenFeatureAvailable(),
-                isSearchSectionVisible = isSearchSectionVisible(duckChatActivityParams),
+                isSearchSectionVisible = isSearchSectionVisible(duckChatActivityParams, featureVisibility.isNativeControlsEnabled),
                 isHideGeneratedImagesOptionVisible = featureVisibility.isHideGeneratedImagesOptionVisible,
                 isAutomaticContextEnabled = featureState.isAutomaticContextEnabled,
                 isAutomaticContextVisible = isDuckChatUserEnabled && duckChatFeature.automaticContextAttachment().isEnabled(),
@@ -402,10 +402,17 @@ class DuckChatSettingsViewModel @AssistedInject constructor(
         }
     }
 
-    private fun isSearchSectionVisible(duckChatActivityParams: GlobalActivityStarter.ActivityParams): Boolean = when (duckChatActivityParams) {
-        is DuckChatSettingsNoParams -> true
-        is DuckChatNativeSettingsNoParams -> false
-        else -> throw IllegalArgumentException("Unknown params type: $duckChatActivityParams")
+    private fun isSearchSectionVisible(
+        duckChatActivityParams: GlobalActivityStarter.ActivityParams,
+        isNativeControlsEnabled: Boolean,
+    ): Boolean {
+        // With native controls the search section is always shown, regardless of how settings were launched.
+        if (isNativeControlsEnabled) return true
+        return when (duckChatActivityParams) {
+            is DuckChatSettingsNoParams -> true
+            is DuckChatNativeSettingsNoParams -> false
+            else -> throw IllegalArgumentException("Unknown params type: $duckChatActivityParams")
+        }
     }
 
     @AssistedFactory
