@@ -173,6 +173,22 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
             moveInputScreenSettingsToEnd()
         }
 
+        binding.duckAINoAiItem.isVisible = viewState.isNativeControlsEnabled
+        // The item represents "turn everything off". Once Duck.ai is off, Search Assist is Never and
+        // AI-generated images are hidden, there is nothing left to do, so it's greyed out, non-tappable,
+        // and explains why. Re-enabling any of the three makes it actionable again.
+        binding.duckAINoAiItem.isEnabled = viewState.isUseWithoutAiActionEnabled
+        binding.duckAINoAiItem.setSecondaryText(
+            if (viewState.isUseWithoutAiActionEnabled) {
+                getString(R.string.duckAiUseWithoutAiDescription)
+            } else {
+                getString(R.string.duckAiUseWithoutAiDisabledDescription)
+            },
+        )
+        binding.duckAINoAiItem.setOnClickListener {
+            viewModel.onUseWithoutAiClicked()
+        }
+
         // The Duck.ai section header and its top divider are only shown when the block lives at the end of the
         // layout (native controls enabled) and Duck.ai is enabled by the user.
         val showDuckAiSectionHeader = viewState.isNativeControlsEnabled && viewState.isDuckChatUserEnabled
@@ -271,6 +287,13 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
         val parent = container.parent as? ViewGroup ?: return
         parent.removeView(container)
         parent.addView(container)
+        // Keep the "Use DuckDuckGo Without AI" item as the very last item after the input screen
+        // settings block has been moved to the end.
+        val noAiItem = binding.duckAINoAiItem
+        (noAiItem.parent as? ViewGroup)?.let { noAiParent ->
+            noAiParent.removeView(noAiItem)
+            noAiParent.addView(noAiItem)
+        }
         inputScreenSettingsMovedToEnd = true
     }
 

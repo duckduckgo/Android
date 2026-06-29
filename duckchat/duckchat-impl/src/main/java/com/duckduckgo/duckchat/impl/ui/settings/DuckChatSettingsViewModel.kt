@@ -85,6 +85,7 @@ class DuckChatSettingsViewModel @AssistedInject constructor(
         val isNativeControlsEnabled: Boolean = false,
         val searchAssistVisibility: SearchAssistVisibility = DEFAULT_SEARCH_ASSIST_VISIBILITY,
         val hideAiGeneratedImages: HideAiGeneratedImages = HideAiGeneratedImages.OFF,
+        val isUseWithoutAiActionEnabled: Boolean = true,
     )
 
     private data class FeatureState(
@@ -136,6 +137,12 @@ class DuckChatSettingsViewModel @AssistedInject constructor(
         ) { featureState, featureVisibility, defaultTogglePosition, searchAssistVisibility, hideAiGeneratedImages ->
             val isDuckChatUserEnabled = featureState.isDuckChatUserEnabled
             val isInputScreenEnabled = featureState.isCosmeticInputScreenEnabled ?: featureState.isInputScreenEnabled
+            val resolvedSearchAssistVisibility = searchAssistVisibility ?: DEFAULT_SEARCH_ASSIST_VISIBILITY
+            // The "Use DuckDuckGo Without AI" action turns everything off at once; once Duck.ai is off,
+            // Search Assist is Never and AI-generated images are hidden, there's nothing left to do.
+            val isAlreadyWithoutAi = !isDuckChatUserEnabled &&
+                resolvedSearchAssistVisibility == SearchAssistVisibility.NEVER &&
+                hideAiGeneratedImages == HideAiGeneratedImages.ON
             ViewState(
                 isDuckChatUserEnabled = isDuckChatUserEnabled,
                 isInputScreenEnabled = isInputScreenEnabled,
@@ -149,8 +156,9 @@ class DuckChatSettingsViewModel @AssistedInject constructor(
                     duckChat.isInputScreenFeatureAvailable() && featureVisibility.isRememberTogglePositionVisible,
                 defaultTogglePosition = defaultTogglePosition,
                 isNativeControlsEnabled = featureVisibility.isNativeControlsEnabled,
-                searchAssistVisibility = searchAssistVisibility ?: DEFAULT_SEARCH_ASSIST_VISIBILITY,
+                searchAssistVisibility = resolvedSearchAssistVisibility,
                 hideAiGeneratedImages = hideAiGeneratedImages,
+                isUseWithoutAiActionEnabled = !isAlreadyWithoutAi,
             )
         }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ViewState())
 
@@ -190,6 +198,14 @@ class DuckChatSettingsViewModel @AssistedInject constructor(
             }
             duckChat.setEnableDuckChatUserSetting(checked)
         }
+    }
+
+    fun onUseWithoutAiClicked() {
+        // Turn off Duck.ai, silence Search Assist, and hide AI-generated images in one tap.
+        // The item disables itself reactively once isDuckChatUserEnabled flips to false.
+        onDuckChatUserEnabledToggled(checked = false)
+        onSearchAssistVisibilitySelected(SearchAssistVisibility.NEVER)
+        onHideAiGeneratedImagesSelected(HideAiGeneratedImages.ON)
     }
 
     fun onAutomaticContextAttachmentToggled(checked: Boolean) {

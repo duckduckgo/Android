@@ -699,6 +699,138 @@ class DuckChatSettingsViewModelTest {
         }
 
     @Test
+    fun `when onUseWithoutAiClicked then duck chat user setting disabled`() =
+        runTest {
+            testee.onUseWithoutAiClicked()
+            verify(duckChat).setEnableDuckChatUserSetting(false)
+        }
+
+    @Test
+    fun `when onUseWithoutAiClicked then disabled pixel fired`() =
+        runTest {
+            testee.onUseWithoutAiClicked()
+            verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_USER_DISABLED)
+        }
+
+    @Test
+    fun `when onUseWithoutAiClicked then search assist visibility set to never in SERP settings`() =
+        runTest {
+            testee.onUseWithoutAiClicked()
+            verify(serpSettingsDataProvider).setSetting(SearchAssistVisibility.SERP_SETTINGS_KEY, SearchAssistVisibility.NEVER.serpCode)
+        }
+
+    @Test
+    fun `when onUseWithoutAiClicked then hide ai generated images set to on in SERP settings`() =
+        runTest {
+            testee.onUseWithoutAiClicked()
+            verify(serpSettingsDataProvider).setSetting(HideAiGeneratedImages.SERP_SETTINGS_KEY, HideAiGeneratedImages.ON.serpCode)
+        }
+
+    @Test
+    fun `when duck chat off and search assist never and images hidden then use without ai action disabled`() =
+        runTest {
+            whenever(duckChat.observeEnableDuckChatUserSetting()).thenReturn(flowOf(false))
+            whenever(serpSettingsDataProvider.observeSetting(SearchAssistVisibility.SERP_SETTINGS_KEY))
+                .thenReturn(flowOf(SearchAssistVisibility.NEVER.serpCode))
+            whenever(serpSettingsDataProvider.observeSetting(HideAiGeneratedImages.SERP_SETTINGS_KEY))
+                .thenReturn(flowOf(HideAiGeneratedImages.ON.serpCode))
+            testee = DuckChatSettingsViewModel(
+                duckChatActivityParams = DuckChatSettingsNoParams,
+                duckChat = duckChat,
+                pixel = mockPixel,
+                inputScreenDiscoveryFunnel = mockInputScreenDiscoveryFunnel,
+                settingsPageFeature = settingsPageFeature,
+                duckChatPixels = mockDuckChatPixels,
+                dispatcherProvider = coroutineRule.testDispatcherProvider,
+                duckChatFeature = duckChatFeature,
+                serpSettingsDataProvider = serpSettingsDataProvider,
+            )
+
+            testee.viewState.test {
+                assertFalse(awaitItem().isUseWithoutAiActionEnabled)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `when duck chat on but search assist never and images hidden then use without ai action enabled`() =
+        runTest {
+            whenever(duckChat.observeEnableDuckChatUserSetting()).thenReturn(flowOf(true))
+            whenever(serpSettingsDataProvider.observeSetting(SearchAssistVisibility.SERP_SETTINGS_KEY))
+                .thenReturn(flowOf(SearchAssistVisibility.NEVER.serpCode))
+            whenever(serpSettingsDataProvider.observeSetting(HideAiGeneratedImages.SERP_SETTINGS_KEY))
+                .thenReturn(flowOf(HideAiGeneratedImages.ON.serpCode))
+            testee = DuckChatSettingsViewModel(
+                duckChatActivityParams = DuckChatSettingsNoParams,
+                duckChat = duckChat,
+                pixel = mockPixel,
+                inputScreenDiscoveryFunnel = mockInputScreenDiscoveryFunnel,
+                settingsPageFeature = settingsPageFeature,
+                duckChatPixels = mockDuckChatPixels,
+                dispatcherProvider = coroutineRule.testDispatcherProvider,
+                duckChatFeature = duckChatFeature,
+                serpSettingsDataProvider = serpSettingsDataProvider,
+            )
+
+            testee.viewState.test {
+                assertTrue(awaitItem().isUseWithoutAiActionEnabled)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `when duck chat off but search assist not never then use without ai action enabled`() =
+        runTest {
+            whenever(duckChat.observeEnableDuckChatUserSetting()).thenReturn(flowOf(false))
+            whenever(serpSettingsDataProvider.observeSetting(SearchAssistVisibility.SERP_SETTINGS_KEY))
+                .thenReturn(flowOf(SearchAssistVisibility.OFTEN.serpCode))
+            whenever(serpSettingsDataProvider.observeSetting(HideAiGeneratedImages.SERP_SETTINGS_KEY))
+                .thenReturn(flowOf(HideAiGeneratedImages.ON.serpCode))
+            testee = DuckChatSettingsViewModel(
+                duckChatActivityParams = DuckChatSettingsNoParams,
+                duckChat = duckChat,
+                pixel = mockPixel,
+                inputScreenDiscoveryFunnel = mockInputScreenDiscoveryFunnel,
+                settingsPageFeature = settingsPageFeature,
+                duckChatPixels = mockDuckChatPixels,
+                dispatcherProvider = coroutineRule.testDispatcherProvider,
+                duckChatFeature = duckChatFeature,
+                serpSettingsDataProvider = serpSettingsDataProvider,
+            )
+
+            testee.viewState.test {
+                assertTrue(awaitItem().isUseWithoutAiActionEnabled)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `when duck chat off and search assist never but images not hidden then use without ai action enabled`() =
+        runTest {
+            whenever(duckChat.observeEnableDuckChatUserSetting()).thenReturn(flowOf(false))
+            whenever(serpSettingsDataProvider.observeSetting(SearchAssistVisibility.SERP_SETTINGS_KEY))
+                .thenReturn(flowOf(SearchAssistVisibility.NEVER.serpCode))
+            whenever(serpSettingsDataProvider.observeSetting(HideAiGeneratedImages.SERP_SETTINGS_KEY))
+                .thenReturn(flowOf(HideAiGeneratedImages.OFF.serpCode))
+            testee = DuckChatSettingsViewModel(
+                duckChatActivityParams = DuckChatSettingsNoParams,
+                duckChat = duckChat,
+                pixel = mockPixel,
+                inputScreenDiscoveryFunnel = mockInputScreenDiscoveryFunnel,
+                settingsPageFeature = settingsPageFeature,
+                duckChatPixels = mockDuckChatPixels,
+                dispatcherProvider = coroutineRule.testDispatcherProvider,
+                duckChatFeature = duckChatFeature,
+                serpSettingsDataProvider = serpSettingsDataProvider,
+            )
+
+            testee.viewState.test {
+                assertTrue(awaitItem().isUseWithoutAiActionEnabled)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
     fun whenAutomaticContextAttachmentToggledThenSetUserSetting() =
         runTest {
             testee.onAutomaticContextAttachmentToggled(true)
