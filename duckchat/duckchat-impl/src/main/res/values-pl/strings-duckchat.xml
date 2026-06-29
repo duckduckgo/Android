@@ -106,6 +106,13 @@
     <string name="duckAIContextualAutomaticContextMessage">Automatycznie wysyłaj zawartość strony do Duck.ai</string>
     <string name="duckAIContextualAttachPageContent">Dołącz zawartość strony</string>
 
+    <!-- Contextual sheet quick action -->
+    <string name="duckAIContextualPromptAskAboutPage">Zapytaj o stronę</string>
+
+    <!-- Contextual sheet input hint (contextualSheetImprovements flag) -->
+    <string name="contextualSheetImprovedHint">Zapytaj o cokolwiek prywatnie</string>
+    <string name="contextualSheetChatsPopupRecentSection" instruction="Section header above the list of recent Duck.ai chats in the contextual sheet overflow menu.">Ostatnie czaty</string>
+
     <!-- duck.ai contextual fire button -->
     <string name="duckAIContextualFireButtonContentDescription">Wyczyść czat</string>
 
@@ -125,6 +132,12 @@
 
     <!-- Duck AI Chat Suggestions -->
     <string name="duckAiChatHistoryViewAllChats">Zobacz wszystkie czaty</string>
+
+    <!-- Duck.ai onboarding end CTA -->
+    <string name="duckAiEndCtaTitle">Udało się!</string>
+    <string name="duckAiEndCtaDescription"><![CDATA[Używaj paska adresu, aby wyszukiwać i odwiedzać witryny lub przełącz się na Duck.ai, aby prowadzić prywatny czat AI.<br/><br/>Możesz korzystać z Duck.ai z dowolnego miejsca, w którym widzisz ikonę czatu]]></string>
+    <string name="duckAiEndCtaButton">Piątka!</string>
+    <string name="duckAiEndCtaDescriptionCustomAi"><![CDATA[Rozpocznij prywatny czat AI z Duck.ai lub przełącz się na wyszukiwanie w trybie chronionego przeglądania.<br/><br/>Możesz korzystać z Duck.ai z dowolnego miejsca, w którym widzisz ikonę czatu]]></string>
 
     <!-- Native Duck.ai chat history -->
     <string name="duck_ai_chat_history_title">Czaty</string>

@@ -47,6 +47,30 @@ jobs:
         if: ${{ steps.broker-check.outputs.has_changes == 'true' }}
         run: echo "current_date=$(date +'%Y-%m-%d')" >> "$GITHUB_ENV"
 
+      - name: Create Asana task
+        if: ${{ steps.broker-check.outputs.has_changes == 'true' }}
+        id: create-task
+        uses: duckduckgo/native-github-asana-sync@v2.0
+        with:
+          asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
+          asana-project: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
+          asana-section: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
+          asana-task-name: "Update PIR broker bundle - ${{ env.current_date }}"
+          asana-task-description: |
+            PIR broker JSON files have been updated and a PR will be created.
+
+            ${{ env.changes_summary }}
+          action: 'create-asana-task'
+
+      - name: Get Asana task permalink
+        if: ${{ steps.broker-check.outputs.has_changes == 'true' }}
+        id: get-task-permalink
+        uses: duckduckgo/native-github-asana-sync@v2.0
+        with:
+          asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
+          asana-task-id: ${{ steps.create-task.outputs.taskId }}
+          action: 'get-asana-task-permalink'
+
       - name: Create Pull Request
         if: ${{ steps.broker-check.outputs.has_changes == 'true' }}
         id: create-pr
@@ -60,6 +84,8 @@ jobs:
           branch: automated/update-pir-broker-bundle-${{ env.current_date }}
           add-paths: pir/pir-impl/src/main/assets/brokers
           body: |
+            Task/Issue URL: ${{ steps.get-task-permalink.outputs.asanaTaskPermalink }}
+
             ## PIR Broker Bundle Update
 
             Automated update of PIR broker JSON files from the remote bundle.
@@ -82,35 +108,6 @@ jobs:
             --method POST \
             -f "labels[]=pir" \
             -f "labels[]=automated pr"
-
-      - name: Create Asana task
-        if: ${{ steps.broker-check.outputs.has_changes == 'true' }}
-        id: create-task
-        uses: duckduckgo/native-github-asana-sync@v2.0
-        with:
-          asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
-          asana-project: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
-          asana-section: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
-          asana-task-name: "Update PIR broker bundle - ${{ env.current_date }}"
-          asana-task-description: |
-            PIR broker JSON files have been updated and a PR has been created.
-
-            ${{ env.changes_summary }}
-
-            See ${{ steps.create-pr.outputs.pull-request-url }}
-          action: 'create-asana-task'
-
-      - name: Update PR description with Asana task
-        if: ${{ steps.broker-check.outputs.has_changes == 'true' && steps.create-task.outputs.duplicate == 'false' }}
-        uses: duckduckgo/native-github-asana-sync@v2.0
-        with:
-          github-pat: ${{ secrets.GT_DAXMOBILE }}
-          github-pr: ${{ steps.create-pr.outputs.pull-request-number }}
-          github-repository: 'android'
-          github-org: 'duckduckgo'
-          asana-project: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
-          asana-task-id: ${{ steps.create-task.outputs.taskId }}
-          action: 'add-task-pr-description'
 
       - name: Create Asana task when workflow failed
         if: ${{ failure() }}

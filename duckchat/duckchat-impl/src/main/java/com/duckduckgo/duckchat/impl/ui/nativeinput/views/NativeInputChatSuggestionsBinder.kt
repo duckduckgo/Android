@@ -130,13 +130,15 @@ class NativeInputChatSuggestionsBinder @Inject constructor(
 
             // hasContent counts the live plugin rows (a plugin item with any rows keeps the overlay open
             // even with no chat/typing). The recompute reads the LIVE query, not this submit's captured
-            // one: a zero-state item hides as soon as the user types (chatQuery updates before the typed
+            // one: a zero-state item hides as soon as the user types (inputQuery updates before the typed
             // query's fetch submits), and recomputing with a stale isTyping=false would wrongly close the
-            // overlay for a frame. The live chatQuery still distinguishes a genuine empty-state dismiss.
-            val commit = { onCommit(hasChat || inputModeState.chatQuery.value.isNotEmpty() || pluginHasContent()) }
+            // overlay for a frame. The live inputQuery still distinguishes a genuine empty-state dismiss.
+            val commit = { onCommit(hasChat || inputModeState.inputQuery.value.isNotEmpty() || pluginHasContent()) }
             recomputeOverlay = commit
 
-            chatSuggestionsAdapter.submitList(suggestions.chatHistory) { commit() }
+            chatSuggestionsAdapter.submitList(suggestions.chatHistory) {
+                commit()
+            }
             if (showUrl) {
                 urlAdapter.updateData(suggestions.urlSuggestions.query, suggestions.urlSuggestions.suggestions)
             } else {

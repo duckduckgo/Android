@@ -49,6 +49,7 @@ class FakeDuckChatInternal(
     private val inputScreenUserSettingEnabled = MutableStateFlow(false)
     private val cosmeticInputScreenUserSettingEnabled = MutableStateFlow<Boolean?>(null)
     private val nativeInputFieldUserSettingEnabled = MutableStateFlow(false)
+    private val nativeChatInputEnabled = MutableStateFlow(false)
     private val automaticContextAttachmentUserSettingEnabled = MutableStateFlow<Boolean>(false)
     private val areMultipleContentAttachmentsEnabled = MutableStateFlow<Boolean>(false)
     private val chatSuggestionsUserSettingEnabled = MutableStateFlow(true)
@@ -93,6 +94,7 @@ class FakeDuckChatInternal(
     override fun observeCosmeticInputScreenUserSettingEnabled(): Flow<Boolean?> = cosmeticInputScreenUserSettingEnabled
     override fun observeAutomaticContextAttachmentUserSettingEnabled(): Flow<Boolean> = automaticContextAttachmentUserSettingEnabled
     override fun observeNativeInputFieldUserSettingEnabled(): Flow<Boolean> = nativeInputFieldUserSettingEnabled
+    override fun observeNativeChatInputEnabled(): Flow<Boolean> = nativeChatInputEnabled
 
     override suspend fun isStandaloneMigrationCompleted(): Boolean = standaloneMigrationCompleted.value
 
@@ -173,6 +175,7 @@ class FakeDuckChatInternal(
 
     override fun isStandaloneMigrationEnabled(): Boolean = false
     override fun isNativeStorageEnabled(): Boolean = false
+    override fun isNativeChatInputEnabled(): Boolean = false
 
     override fun keepSessionIntervalInMinutes(): Int = 30
 
@@ -206,6 +209,8 @@ class FakeDuckChatInternal(
 
     override suspend fun isChatHistoryAvailable(): Boolean = false
 
+    override suspend fun hasUserEnabledChatHistory(): Boolean = false
+
     override suspend fun onAddressBarPickerDuckAiSelected() { }
 
     override fun buildChatUrl(chatId: String): String = "https://duck.ai?chatID=$chatId"
@@ -231,12 +236,12 @@ class FakeDuckChatInternal(
         _displayedMode.value = mode
     }
 
-    private val _chatQuery = MutableStateFlow("")
+    private val _inputQuery = MutableStateFlow("")
 
-    override val chatQuery: StateFlow<String> = _chatQuery.asStateFlow()
+    override val inputQuery: StateFlow<String> = _inputQuery.asStateFlow()
 
-    override fun setChatQuery(query: String) {
-        _chatQuery.value = query
+    override fun setInputQuery(query: String) {
+        _inputQuery.value = query
     }
 
     fun setDuckChatUserEnabled(enabled: Boolean) {

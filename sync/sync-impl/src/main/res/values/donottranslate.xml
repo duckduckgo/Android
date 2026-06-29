@@ -40,4 +40,12 @@
     <string name="sync_v2_error_got_it">Got It</string>
     <string name="sync_v2_already_paired_title">Already synced.</string>
     <string name="sync_v2_already_paired_message">These devices are already connected to Sync &amp; Backup.</string>
+
+    <!-- Chat sync promo -->
+    <string name="sync_chat_promo_banner_title">Access your chats across your devices using Sync &amp; Backup.</string>
+    <string name="sync_chat_promo_banner_cta_title">Sync With Another Device</string>
+    <string name="sync_chat_bottom_sheet_title">Let’s sync your chats across\nyour devices!</string>
+    <string name="sync_chat_bottom_sheet_description">Find the QR Code on the DuckDuckGo app on your other device by going to Settings › Sync &amp; Backup › Sync With Another Device.</string>
+    <string name="sync_chat_bottom_sheet_positive">Scan QR code</string>
+    <string name="sync_chat_bottom_sheet_negative">Not Now</string>
 </resources>

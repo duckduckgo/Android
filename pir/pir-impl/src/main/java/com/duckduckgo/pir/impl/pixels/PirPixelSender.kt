@@ -1673,6 +1673,7 @@ class RealPirPixelSender @Inject constructor(
 
     private fun PirExecutionType.toScanTriggerParam(): String = when (this) {
         PirExecutionType.MANUAL_INITIAL -> "onboarding"
+        PirExecutionType.MANUAL_INITIAL_RESUME -> "onboarding_resume"
         PirExecutionType.MANUAL_EDIT_PROFILE -> "profile_edit"
         PirExecutionType.SCHEDULED -> "scheduled"
     }

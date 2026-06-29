@@ -167,9 +167,6 @@ class SyncInternalSettingsActivity : DuckDuckGoActivity() {
         binding.fetchAccessCredentialsButton.setOnClickListener { viewModel.onFetchAccessCredentialsClicked() }
         binding.requestScopedTokenButton.setOnClickListener { viewModel.onRequestScopedTokenClicked() }
         binding.fetchKeysButton.setOnClickListener { viewModel.onFetchKeysClicked() }
-        binding.createProtectedKeyButton.setOnClickListener {
-            viewModel.onCreateProtectedKeyClicked(binding.createProtectedKeyPurposeInput.text)
-        }
         binding.createThirdPartyCredentialButton.setOnClickListener { viewModel.onCreateThirdPartyCredentialClicked() }
         binding.refreshThirdPartyCredentialButton.setOnClickListener { viewModel.onRefreshThirdPartyCredentialClicked() }
         binding.showThirdPartyRecoveryQrButton.setOnClickListener { viewModel.onShowThirdPartyRecoveryQrClicked() }

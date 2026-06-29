@@ -1161,6 +1161,31 @@ class RealPirPixelSenderTest {
     }
 
     @Test
+    fun whenReportInitialScanDurationWithInitialResumeThenScanTriggerIsOnboardingResume() = runTest {
+        whenever(mockNetworkProtectionState.isRunning()).thenReturn(false)
+
+        testee.reportInitialScanDuration(
+            durationMs = 1L,
+            profileQueryCount = 1,
+            isPowerSavingEnabled = false,
+            batteryOptimizationsEnabled = false,
+            brokerCount = 1,
+            executionType = PirExecutionType.MANUAL_INITIAL_RESUME,
+            notificationsPermissionGranted = true,
+        )
+
+        val paramsCaptor = argumentCaptor<Map<String, String>>()
+        verify(mockPixelSender).fire(
+            pixelName = any(),
+            parameters = paramsCaptor.capture(),
+            encodedParameters = any(),
+            type = any(),
+        )
+
+        assert(paramsCaptor.firstValue["scan_trigger"] == "onboarding_resume")
+    }
+
+    @Test
     fun whenReportInteractionDAUThenEnqueuesPixelWithAuthParams() = runTest {
         testee.reportInteractionDAU()
 

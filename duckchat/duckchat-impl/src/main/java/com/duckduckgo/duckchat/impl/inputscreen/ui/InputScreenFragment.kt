@@ -634,7 +634,9 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
                 override fun onHatchPressed() {
                     ntpAfterIdleManager.onReturnToPageTapped()
                     val tabId = binding.inputScreenHatch.tabId
-                    val data = Intent().putExtra(InputScreenActivityResultParams.TAB_ID_PARAM, tabId)
+                    val data = Intent()
+                        .putExtra(InputScreenActivityResultParams.TAB_ID_PARAM, tabId)
+                        .putExtra(InputScreenActivityResultParams.TAB_MODE_PARAM, binding.inputScreenHatch.targetMode.name)
                     requireActivity().setResult(InputScreenActivityResultCodes.SWITCH_TO_TAB_REQUESTED, data)
                     exitInputScreen()
                 }

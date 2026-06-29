@@ -106,6 +106,13 @@
     <string name="duckAIContextualAutomaticContextMessage">Trimite automat conținutul paginii către Duck.ai</string>
     <string name="duckAIContextualAttachPageContent">Atașează conținutul paginii</string>
 
+    <!-- Contextual sheet quick action -->
+    <string name="duckAIContextualPromptAskAboutPage">Întreabă despre pagină</string>
+
+    <!-- Contextual sheet input hint (contextualSheetImprovements flag) -->
+    <string name="contextualSheetImprovedHint">Întreabă orice în mod privat</string>
+    <string name="contextualSheetChatsPopupRecentSection" instruction="Section header above the list of recent Duck.ai chats in the contextual sheet overflow menu.">Chaturi recente</string>
+
     <!-- duck.ai contextual fire button -->
     <string name="duckAIContextualFireButtonContentDescription">Șterge chatul</string>
 
@@ -125,6 +132,12 @@
 
     <!-- Duck AI Chat Suggestions -->
     <string name="duckAiChatHistoryViewAllChats">Vezi toate chaturile</string>
+
+    <!-- Duck.ai onboarding end CTA -->
+    <string name="duckAiEndCtaTitle">Te descurci!</string>
+    <string name="duckAiEndCtaDescription"><![CDATA[Folosește bara de adrese pentru a căuta și vizita site-uri sau comută la Duck.ai pentru chat privat cu IA.<br/><br/>Poți folosi Duck.ai de oriunde vezi pictograma de chat]]></string>
+    <string name="duckAiEndCtaButton">Bate palma!</string>
+    <string name="duckAiEndCtaDescriptionCustomAi"><![CDATA[Începe o conversație privată cu IA cu Duck.ai sau comută la Căutare pentru navigare protejată.<br/><br/>Poți folosi Duck.ai de oriunde vezi pictograma de chat]]></string>
 
     <!-- Native Duck.ai chat history -->
     <string name="duck_ai_chat_history_title">Chaturi</string>

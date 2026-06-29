@@ -72,12 +72,11 @@ class RealThirdPartyCredentialManager @Inject constructor(
     private val syncJweCrypto: SyncJweCrypto,
     private val nativeLib: SyncLib,
     private val syncFeature: SyncFeature,
-    private val protectedKeyManager: ProtectedKeyManager,
 ) : ThirdPartyCredentialManager {
 
     /** Base linear-backoff between rate-limit retries. Overridable in tests to keep them fast. */
     @VisibleForTesting
-    internal var rateLimitRetryDelayMillis: Long = DEFAULT_RATE_LIMIT_RETRY_DELAY_MILLIS
+    internal var rateLimitRetryDelayMillis: Long = RATE_LIMIT_RETRY_DELAY_MILLIS
 
     override fun create(): Result<Boolean> {
         val inputs = when (val r = validateCreatePreconditions()) {
@@ -173,7 +172,7 @@ class RealThirdPartyCredentialManager @Inject constructor(
             is Success -> r.data
             is Error -> return r
         }
-        val reEncryptedKeys = when (val r = reEncryptExistingDdgKeysFor3party(inputs.token, newSp, inputs.hkdfSalt)) {
+        val reEncryptedKeys = when (val r = buildKeysForNewThirdPartyCredential(inputs.token, newSp, inputs.hkdfSalt)) {
             is Success -> r.data
             is Error -> return r
         }
@@ -207,14 +206,15 @@ class RealThirdPartyCredentialManager @Inject constructor(
     }
 
     /**
-     * Re-encrypt every ddg-wrapped protected key for the 3party credential. The two sides wrap
-     * differently by design (Encryption Algorithms TD, Asana 1214802412121967):
-     *   - ddg-side: libsodium-secretbox(privateKey, secretKey). Native-only, matches duck.ai's
-     *     EncryptWithSyncMasterKeyHandler.
-     *   - 3party-side: RFC 7516 JWE compact, kid="3party", AES-256-GCM,
-     *     key = HKDF(SP, salt=user_id, info="Main Key"). Cross-platform readable.
+     * Build the `keys[]` payload for `POST /access-credentials/3party`. Combines two sources:
+     *
+     *  - Re-wrappings of every existing ddg-wrapped key on the account, for 3party access.
+     *  - If no ddg-wrapped `ai_chats` key exists yet, a freshly-minted RSA keypair contributing
+     *    BOTH its ddg-wrap and its 3party-wrap (one shared `kid`). Bundling both wrappings into
+     *    the credential POST means the server writes them atomically, removing the need for a
+     *    separate `POST /sync/keys/.../set-if-absent` call (and the race window that opened).
      */
-    private fun reEncryptExistingDdgKeysFor3party(
+    private fun buildKeysForNewThirdPartyCredential(
         token: String,
         newSpBase64: String,
         hkdfSalt: ByteArray,
@@ -224,7 +224,7 @@ class RealThirdPartyCredentialManager @Inject constructor(
         val accountSecretKey = syncStore.secretKey
             ?: return Error(reason = "CreateThirdPartyCredential: no account secret key for ddg-side decrypt")
 
-        var ddgKeys = when (val r = retryingOnRateLimit { syncApi.getProtectedKeys(token) }) {
+        val ddgKeys = when (val r = retryingOnRateLimit { syncApi.getProtectedKeys(token) }) {
             is Success -> r.data.filter { it.encryptedWith == CREDENTIAL_ID_DDG }
             is Error -> {
                 // Fail rather than create a credential without its protected keys.
@@ -233,21 +233,24 @@ class RealThirdPartyCredentialManager @Inject constructor(
             }
         }
 
-        // We ensure ai_chats (the scope's required purpose) exists, then re-wrap every
-        // ddg-wrapped key — preserving any other purposes already on the account.
-        if (ddgKeys.none { it.purpose == SYNC_SCOPE_AI_CHATS }) {
-            logcat { "Sync-ScopedToken: no ddg $SYNC_SCOPE_AI_CHATS key; generating before 3party extend" }
-            when (val gen = protectedKeyManager.create(SYNC_SCOPE_AI_CHATS)) {
-                is Success -> ddgKeys = ddgKeys + gen.data
-                is Error -> {
-                    logcat(ERROR) { "Sync-ScopedToken: failed to generate $SYNC_SCOPE_AI_CHATS protected key: ${gen.reason}" }
-                    return Error(code = gen.code, reason = "CreateThirdPartyCredential: generate $SYNC_SCOPE_AI_CHATS key failed: ${gen.reason}")
+        // Never emit a ddg-wrap with a kid already on the server — only mint a fresh pair when
+        // no ddg-wrap for the purpose exists; the re-wrap loop below handles the existing case.
+        val freshlyMintedAiChats: List<ProtectedKeyEntry> =
+            if (ddgKeys.none { it.purpose == SYNC_SCOPE_AI_CHATS }) {
+                logcat { "Sync-ScopedToken: no ddg $SYNC_SCOPE_AI_CHATS key; minting locally for atomic 3party credential write" }
+                when (val mint = mintAiChatsKeyWrappings(accountSecretKey, spMek)) {
+                    is Success -> mint.data
+                    is Error -> {
+                        logcat(ERROR) { "Sync-ScopedToken: failed to mint $SYNC_SCOPE_AI_CHATS key locally: ${mint.reason}" }
+                        return Error(code = mint.code, reason = "CreateThirdPartyCredential: mint $SYNC_SCOPE_AI_CHATS key failed: ${mint.reason}")
+                    }
                 }
+            } else {
+                emptyList()
             }
-        }
-        logcat { "Sync-ScopedToken: ${ddgKeys.size} ddg key(s) to re-encrypt for 3party" }
 
-        val results = ddgKeys.map { key ->
+        logcat { "Sync-ScopedToken: ${ddgKeys.size} existing ddg key(s) to re-encrypt for 3party" }
+        val reWrapResults = ddgKeys.map { key ->
             kotlin.runCatching {
                 // ddg key arrives base64url-encoded; convert to standard base64 then libsodium-decrypt.
                 val encryptedBytes = Base64.decode(key.encryptedPrivateKey.removeUrlSafetyToRestoreB64(), Base64.NO_WRAP)
@@ -264,12 +267,54 @@ class RealThirdPartyCredentialManager @Inject constructor(
                 )
             }
         }
-        val firstFailure = results.firstOrNull { it.isFailure }?.exceptionOrNull()
+        val firstFailure = reWrapResults.firstOrNull { it.isFailure }?.exceptionOrNull()
         if (firstFailure != null) {
             logcat(ERROR) { "Sync-ScopedToken: failed to re-encrypt one or more protected keys: ${firstFailure.message}" }
             return Error(reason = "CreateThirdPartyCredential: re-encrypt key failed: ${firstFailure.message}")
         }
-        return Success(results.map { it.getOrThrow() })
+        return Success(freshlyMintedAiChats + reWrapResults.map { it.getOrThrow() })
+    }
+
+    /**
+     * Mint a fresh `ai_chats` keypair and emit one [ProtectedKeyEntry] per wrap (ddg + 3party),
+     * sharing one `kid`. Both entries are intended to be sent together in the
+     * `/access-credentials/3party` POST so the server writes them atomically.
+     *
+     * The ddg-wrap construction is delegated to [mintDdgWrappedProtectedKey]; only the 3party
+     * wrap is built here, reusing the raw private bytes returned by the helper so we don't
+     * decrypt the ddg-wrap a second time.
+     */
+    private fun mintAiChatsKeyWrappings(
+        accountSecretKey: String,
+        spMek: ByteArray,
+    ): Result<List<ProtectedKeyEntry>> {
+        val minted = when (
+            val r = mintDdgWrappedProtectedKey(
+                purpose = SYNC_SCOPE_AI_CHATS,
+                accountSecretKey = accountSecretKey,
+                syncJweCrypto = syncJweCrypto,
+                nativeLib = nativeLib,
+                errorPrefix = "MintAiChatsKey",
+            )
+        ) {
+            is Success -> r.data
+            is Error -> return r
+        }
+        val threePartyEncryptedPrivateKey = kotlin.runCatching {
+            syncJweCrypto.jweEncryptSymmetric(minted.rawPrivateKeyBytes, spMek, kid = CREDENTIAL_ID_3PARTY)
+        }.getOrElse { return it.asLoggedError("MintAiChatsKey: failed to JWE-encrypt private key for 3party") }
+        return Success(
+            listOf(
+                minted.entry,
+                ProtectedKeyEntry(
+                    kid = minted.entry.kid,
+                    purpose = SYNC_SCOPE_AI_CHATS,
+                    encryptedWith = CREDENTIAL_ID_3PARTY,
+                    encryptedPrivateKey = threePartyEncryptedPrivateKey,
+                    publicKey = minted.entry.publicKey,
+                ),
+            ),
+        )
     }
 
     private fun postCreateAccessCredential(
@@ -278,7 +323,7 @@ class RealThirdPartyCredentialManager @Inject constructor(
         newSpBase64: String,
     ): Result<Boolean> {
         logcat { "Sync-ScopedToken: posting 3party credential" }
-        return when (val result = syncApi.createAccessCredential(inputs.token, CREDENTIAL_ID_3PARTY, request)) {
+        return when (val result = postWithConcurrentModificationRetry(inputs.token, request)) {
             is Success -> {
                 logcat { "Sync-ScopedToken: 3party credential created" }
                 syncStore.scopedPassword = ScopedPassword(newSpBase64)
@@ -286,18 +331,51 @@ class RealThirdPartyCredentialManager @Inject constructor(
             }
             is Error -> {
                 if (result.code == API_CODE.COUNT_LIMIT.code) {
-                    // Spec (Asana 1214702966683640, "Setting up usage of a new scope"): on conflict,
-                    // refetch and adopt if the credential is now present.
-                    logcat { "Sync-ScopedToken: 409 conflict - another device created the credential first; adopting" }
+                    // Spec (POST /access-credentials/{id}): 409 may be
+                    // `credential_already_exists` (another device beat us — refetch & adopt) or
+                    // `concurrent_modification` (BE ETag retries exhausted — already retried in
+                    // postWithConcurrentModificationRetry; if still failing here, fall through to
+                    // adopt-or-Error so we don't silently drop a transient inconsistency).
+                    logcat { "Sync-ScopedToken: 409 conflict (reason=${result.reason}); refetching to see if credential is now present" }
                     return when (val adopted = tryAdoptExistingCredential(inputs)) {
                         AdoptResult.Adopted -> Success(true)
                         is AdoptResult.Failed -> adopted.error
-                        AdoptResult.NotFound -> Error(reason = "CreateThirdPartyCredential: 409 conflict but credential missing on refetch")
+                        AdoptResult.NotFound -> Error(
+                            reason = "CreateThirdPartyCredential: 409 conflict but credential missing on refetch (reason=${result.reason})",
+                        )
                     }
                 }
                 logcat(ERROR) { "Sync-ScopedToken: failed to create 3party credential: ${result.reason}" }
                 result
             }
+        }
+    }
+
+    /**
+     * POST `/access-credentials/3party` with a bounded linear backoff on `concurrent_modification`
+     * 409s — these surface when the BE's own ETag-conditional retries are exhausted, and a short
+     * client-side retry usually clears them.
+     *
+     * Other 409 variants (e.g. `credential_already_exists`) are NOT retried — they're returned
+     * to the caller, which handles them via the adopt path.
+     */
+    private fun postWithConcurrentModificationRetry(
+        token: String,
+        request: CreateAccessCredentialRequest,
+    ): Result<Boolean> {
+        var attempt = 0
+        while (true) {
+            val result = syncApi.createAccessCredential(token, CREDENTIAL_ID_3PARTY, request)
+            val isConcurrentMod = result is Error &&
+                result.code == API_CODE.COUNT_LIMIT.code &&
+                result.reason.contains(REASON_CONCURRENT_MODIFICATION, ignoreCase = true)
+            if (isConcurrentMod && attempt < MAX_CONCURRENT_MODIFICATION_RETRIES) {
+                attempt++
+                logcat { "Sync-ScopedToken: 3party credential POST hit concurrent_modification; retry $attempt/$MAX_CONCURRENT_MODIFICATION_RETRIES" }
+                runCatching { Thread.sleep(CONCURRENT_MODIFICATION_RETRY_DELAY_MILLIS * attempt) }
+                continue
+            }
+            return result
         }
     }
 
@@ -416,6 +494,12 @@ class RealThirdPartyCredentialManager @Inject constructor(
 
     companion object {
         const val MAX_RATE_LIMIT_RETRIES = 3
-        private const val DEFAULT_RATE_LIMIT_RETRY_DELAY_MILLIS = 1_000L
+        private const val RATE_LIMIT_RETRY_DELAY_MILLIS = 1_000L
+
+        private const val MAX_CONCURRENT_MODIFICATION_RETRIES = 2
+        private const val CONCURRENT_MODIFICATION_RETRY_DELAY_MILLIS = 250L
+
+        /** BE reason string for 409 returned when ETag-conditional retries inside the server exhausted. */
+        private const val REASON_CONCURRENT_MODIFICATION = "concurrent_modification"
     }
 }

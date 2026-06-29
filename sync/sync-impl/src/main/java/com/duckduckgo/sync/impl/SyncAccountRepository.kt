@@ -112,17 +112,20 @@ interface SyncAccountRepository {
     /**
      * Joins this device to an existing account using a 3party recovery code, executing the
      * "Native joining a 3party account" upgrade flow per the Unified Algorithm (Asana
-     * 1214739740392701). Two network calls:
+     * 1214739740392701). Three network calls:
      *
      *   1. POST /sync/login with scope=ai_chats — authenticates against the existing 3party
      *      credential and returns a short-lived token + the protected keys to re-wrap.
      *   2. POST /access-credentials/ddg — mints a fresh DDG credential on the account, attached
      *      alongside the existing 3party entry (which gets decorated with encrypted_3party_credential
      *      so future ddg-side logins can re-derive SP).
+     *   3. POST /sync/login (unscoped) — commits the new credential (without this inside the 5-min
+     *      TTL the BE auto-removes it), exchanges the ai_chats-only token for the unrestricted
+     *      ddg-scoped token, and atomically writes the SyncStore via [performLogin].
      *
      * On success the device ends in a normal Native signed-in state: full primaryKey / secretKey
-     * populated, credentialId=ddg, scopedPassword populated with SP. SyncStore is written
-     * atomically only after both network calls succeed; observers never see an intermediate state.
+     * populated, credentialId=ddg, scopedPassword populated with SP. SyncStore is written only
+     * after all three network calls succeed; observers never see an intermediate state.
      */
     fun joinAccountFromThirdPartyRecoveryCode(pastedCode: String): Result<Boolean>
 
@@ -132,14 +135,6 @@ interface SyncAccountRepository {
      * [createThirdPartyCredential] (or [refreshThirdPartyCredential]) first.
      */
     fun getThirdPartyRecoveryCode(): Result<AuthCode>
-
-    /**
-     * Creates a protected RSA keypair for the given purpose (e.g. "ai_chats") and uploads it
-     * to the server, encrypted with the ddg credential's stretchedPrimaryKey.
-     *
-     * No-op (returns existing key) if a key for the purpose already exists.
-     */
-    fun createProtectedKey(purpose: String): Result<Boolean>
 
     data class AuthCode(
         /**
@@ -173,7 +168,6 @@ class AppSyncAccountRepository @Inject constructor(
     private val syncSetupWideEvent: SyncSetupWideEvent,
     private val syncJweCrypto: SyncJweCrypto,
     private val thirdPartyCredentialManager: ThirdPartyCredentialManager,
-    private val protectedKeyManager: ProtectedKeyManager,
     private val thirdPartyDeviceListDecryptor: ThirdPartyDeviceListDecryptor,
 ) : SyncAccountRepository {
 
@@ -635,12 +629,6 @@ class AppSyncAccountRepository @Inject constructor(
 
     override fun refreshThirdPartyCredential(): Result<Boolean> = thirdPartyCredentialManager.refresh()
 
-    override fun createProtectedKey(purpose: String): Result<Boolean> =
-        when (val r = protectedKeyManager.create(purpose)) {
-            is Result.Success -> Result.Success(true)
-            is Result.Error -> r
-        }
-
     /**
      * Bundle produced by [buildThirdPartyUpgradePackage] and consumed by the upgrade POST +
      * SyncStore commit step. Keeps the locally-generated DDG account material together with the
@@ -711,7 +699,7 @@ class AppSyncAccountRepository @Inject constructor(
         // Re-wrap each FE-written key from /sync/login. Decrypt via JWE using SP MEK, then
         // re-encrypt with libsodium-secretbox using the new DDG secretKey, matching the Native
         // wire format (base64-encoded encrypted bytes with URL safety applied — mirrors
-        // createProtectedKey at line ~955 and the reverse direction at line ~770).
+        // mintDdgWrappedProtectedKey in ProtectedKeyMinting.kt).
         val rewrappedKeys = keysFromLogin.map { srcKey ->
             kotlin.runCatching {
                 // FE-only accounts always write keys with encrypted_with="3party". A defensive
@@ -750,16 +738,12 @@ class AppSyncAccountRepository @Inject constructor(
         val hashedPasswordForReauth = kotlin.runCatching { syncJweCrypto.hkdfDeriveBase64Url(spStandardB64, hkdfSalt, "Password", 32) }
             .getOrElse { return Error(reason = "Upgrade: failed to derive 3party hashed_password: ${it.message}") }
 
-        // credentialHashedPassword for the new DDG credential — HKDF(MP, salt=user_id, info="Password", 32).
-        // The server stores twice_hash(this) and validates future /login submissions against it.
-        // Pinned against the TD's test1 vector in SyncJweCryptoTdVectorsTest.
-        val credentialHashedPassword = kotlin.runCatching {
-            syncJweCrypto.hkdfDeriveBase64Url(newDdgKeys.primaryKey, hkdfSalt, "Password", 32)
-        }.getOrElse { return Error(reason = "Upgrade: failed to derive new DDG credential_hashed_password: ${it.message}") }
-
+        // credentialHashedPassword for the new DDG credential — libsodium/Argon2, the same derivation
+        // performCreateAccount uses for standard signup. Keeping every ddg credential libsodium-hashed
+        // means the standard performLogin path works for both signup-created and upgrade-created
         val request = CreateAccessCredentialRequest(
             hashedPassword = hashedPasswordForReauth,
-            credentialHashedPassword = credentialHashedPassword,
+            credentialHashedPassword = newDdgKeys.passwordHash,
             protectedEncryptionKey = newDdgKeys.protectedSecretKey,
             encrypted3partyCredential = encryptedThreePartyCredential,
             keys = rewrappedKeysList.ifEmpty { null },
@@ -843,52 +827,37 @@ class AppSyncAccountRepository @Inject constructor(
             return postResult.copy(reason = "JoinFrom3party: ${postResult.reason}")
         }
 
-        // Step 7a — Flow 4 native login with the new ddg credential. This is the BE-side commit
-        // for the credential just POSTed: without a login inside the 5-minute TTL the server
-        // auto-removes the credential. It also yields the unrestricted ddg-scoped token that
-        // device-management endpoints need (the 3party login token at this point is ai_chats-only).
-        val ddgLoginResponse = when (
-            val ddgLogin = performDdgLoginForUpgrade(
+        // Step 7 — Native login as the new ddg credential. Required: without a login inside the
+        // 5-minute TTL the BE auto-removes the credential, and the 3party token from Step 2 is
+        // ai_chats-scoped so it can't drive device-management endpoints.
+        val ddgLoginResult = retryingOnTransientError {
+            performLogin(
                 userId = parsed.userId,
                 deviceId = deviceId,
                 deviceName = deviceName,
                 primaryKey = upgradePackage.newDdgKeys.primaryKey,
             )
-        ) {
-            is Error -> {
-                if (ddgLogin.code == API_CODE.INVALID_LOGIN_CREDENTIALS.code) {
-                    logcat(ERROR) {
-                        "Sync-ScopedToken: ddg login after upgrade returned 401 — credential 5-minute TTL likely expired"
-                    }
-                } else {
-                    logcat(ERROR) { "Sync-ScopedToken: ddg login after upgrade failed: ${ddgLogin.reason}" }
+        }
+        if (ddgLoginResult is Error) {
+            if (ddgLoginResult.code == API_CODE.INVALID_LOGIN_CREDENTIALS.code) {
+                logcat(ERROR) {
+                    "Sync-ScopedToken: ddg login after upgrade returned 401 — credential 5-minute TTL likely expired"
                 }
-                return ddgLogin.copy(reason = "JoinFrom3party: post-upgrade ddg login failed: ${ddgLogin.reason}")
+            } else {
+                logcat(ERROR) { "Sync-ScopedToken: ddg login after upgrade failed: ${ddgLoginResult.reason}" }
             }
-            is Success -> ddgLogin.data
+            return ddgLoginResult.copy(reason = "JoinFrom3party: post-upgrade ddg login failed: ${ddgLoginResult.reason}")
         }
 
-        // Step 7b — atomic SyncStore commit. Everything above has either failed (returning Error
-        // without mutating SyncStore) or succeeded. External observers see the device as
-        // pre-upgrade until this block runs.
-        val spStandardB64 = kotlin.runCatching { base64UrlStringToStandardBase64(parsed.secret) }
-            .getOrElse { return Error(reason = "JoinFrom3party: failed to decode SP: ${it.message}") }
-        syncStore.storeCredentials(
-            userId = parsed.userId,
-            deviceId = deviceId,
-            deviceName = deviceName,
-            primaryKey = upgradePackage.newDdgKeys.primaryKey,
-            secretKey = upgradePackage.newDdgKeys.secretKey,
-            token = ddgLoginResponse.token,
-        )
-        syncStore.credentialId = CREDENTIAL_ID_DDG
-        syncStore.scopedPassword = ScopedPassword(spStandardB64)
+        // Defensive: performLogin will also set scopedPassword if the BE echoes back the new
+        // credential's encrypted_3party_credential, but we have the SP in hand from the pasted
+        // recovery code. Writing it locally guarantees scopedPassword is populated independent
+        // of the server response shape.
+        kotlin.runCatching { base64UrlStringToStandardBase64(parsed.secret) }
+            .onSuccess { syncStore.scopedPassword = ScopedPassword(it) }
+            .onFailure { logcat(ERROR) { "Sync-ScopedToken: failed to write local SP after upgrade: ${it.message}" } }
 
         logcat { "Sync-ScopedToken: 3party→ddg upgrade complete; account joined as ddg" }
-
-        appCoroutineScope.launch(dispatcherProvider.io()) {
-            syncEngine.triggerSync(ACCOUNT_LOGIN)
-        }
         return Success(true)
     }
 
@@ -1228,54 +1197,6 @@ class AppSyncAccountRepository @Inject constructor(
             deviceType = encryptedDeviceType,
             scope = SYNC_SCOPE_AI_CHATS,
         )
-    }
-
-    /**
-     * This login acts as the BE-side *commit* for the newly minted credential —
-     * without it, the server removes the credential after a 5-minute TTL. It is also what
-     * yields an unrestricted ddg-scoped token; the 3party token from [performThirdPartyLogin]
-     * is `scope=ai_chats` and cannot drive device-management endpoints.
-     *
-     * Returns the [LoginResponse] for the caller to commit alongside the new local key
-     * material.
-     */
-    private fun performDdgLoginForUpgrade(
-        userId: String,
-        deviceId: String,
-        deviceName: String,
-        primaryKey: String,
-    ): Result<LoginResponse> {
-        // HKDF-derived hashed_password matching the `credentialHashedPassword` we POSTed in
-        // [buildThirdPartyUpgradePackage] — the upgrade-created ddg credential was registered with
-        // the v2 cross-platform algorithm (Encryption Algorithms TD: HKDF(MP, salt=user_id,
-        // info="Password", 32)), NOT v1's, using nativeLib.prepareForLogin(...) would 401
-        val hkdfSalt = userId.toByteArray(Charsets.UTF_8)
-        val hashedPassword = kotlin.runCatching {
-            syncJweCrypto.hkdfDeriveBase64Url(primaryKey, hkdfSalt, "Password", 32)
-        }.getOrElse { return Error(reason = "Upgrade ddg login: derive hashed_password failed: ${it.message}") }
-
-        val deviceType = syncDeviceIds.deviceType()
-        val encryptedDeviceName = kotlin.runCatching {
-            nativeLib.encryptData(deviceName, primaryKey).also {
-                it.checkResult("Upgrade ddg login: encrypt device name failed")
-            }.encryptedData
-        }.getOrElse { return it.asErrorResult() }
-        val encryptedDeviceType = kotlin.runCatching {
-            nativeLib.encryptData(deviceType.deviceFactor, primaryKey).also {
-                it.checkResult("Upgrade ddg login: encrypt device type failed")
-            }.encryptedData
-        }.getOrElse { return it.asErrorResult() }
-
-        return retryingOnTransientError {
-            syncApi.login(
-                userID = userId,
-                hashedPassword = hashedPassword,
-                deviceId = deviceId,
-                deviceName = encryptedDeviceName,
-                deviceType = encryptedDeviceType,
-                scope = null,
-            )
-        }
     }
 
     private fun performLogin(

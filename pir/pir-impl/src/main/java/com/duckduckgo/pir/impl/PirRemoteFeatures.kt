@@ -54,6 +54,13 @@ interface PirRemoteFeatures {
 
     @DefaultValue(DefaultFeatureValue.TRUE)
     fun sendScanWideEvent(): Toggle
+
+    /**
+     * When enabled, opening the dashboard with an interrupted initial scan (pending scan jobs,
+     * no scan currently running) restarts the foreground scan to finish it.
+     */
+    @DefaultValue(DefaultFeatureValue.TRUE)
+    fun resumeInitialScanOnDashboardOpen(): Toggle
 }
 
 @SingleInstanceIn(AppScope::class)

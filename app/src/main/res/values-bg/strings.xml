@@ -832,6 +832,7 @@
     <string name="preOnboardingDaxDialog1TitleDuckAi" translatable="false"><![CDATA[Hi there.<br/><br/>Ready for a faster browser that protects you and lets you decide when and how to use AI?]]></string>
     <string name="preOnboardingDaxDialog1Button">Да го направим!</string>
     <string name="preOnboardingDaxDialog1ButtonDuckAi" translatable="false">Let\&apos;s get started!</string>
+    <string name="preOnboardingDaxDialog1ButtonBrandDesign">Да започваме!</string>
     <string name="preOnboardingDaxDialog1SecondaryButton">Вече знам за това</string>
     <string name="preOnboardingDaxDialog2Title">Защитите са активирани!</string>
     <string name="preOnboardingDaxDialog2Button">Изберете своя браузър</string>
@@ -896,6 +897,7 @@
     <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[DuckDuckGo също предлага <b>опция за платен абонамент</b> със защитена <b>VPN</b> услуга и <b>поверителен чат с усъвършенстван AI</b>.]]></string>
     <string name="onboardingPrivacyProDaxDialogOkButton">Научете повече</string>
     <string name="onboardingPrivacyProDaxDialogFreeTrialOkButton">Пробвайте безплатно!</string>
+    <string name="onboardingPrivacyProDaxDialogFreeTrialOkButtonBrandDesign">Пробвайте безплатно!</string>
     <string name="onboardingPrivacyProDaxDialogCancelButton">Пропускане</string>
     <string name="onboardingSkippedPrivacyProDaxDialogTitle">Знаете ли, че?</string>
 
@@ -1030,6 +1032,42 @@
     <string name="onboardingStepIndicatorText" instruction="a counter above our instructions in onboarding that tells a user what step they are on">%1$d от %2$d</string>
     <string name="onboardingSearchDaxDialogOption1Quoted" instruction="translate &apos;duck&apos; too.">как се казва “патица“ на английски</string>
     <string name="onboardingSearchDaxDialogOption1EnglishQuoted" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">как се казва \"патица\" на испански</string>
+
+    <string name="onboardingDuckAiFireButtonDaxDialogTitle">Това е Duck.ai!</string>
+    <string name="onboardingDuckAiFireButtonDaxDialogDescription"><![CDATA[Поверителни чатове с изкуствен интелект, които можете да изтриете по всяко време с <b>Fire Button</b>. Изпробвайте го! 🔥]]></string>
+    <string name="onboardingDuckAiEndCtaTitle">Справихте се!</string>
+    <string name="onboardingDuckAiEndCtaDescription"><![CDATA[Използвайте адресната лента, за да търсите и посещавате сайтове, или превключете към Duck.ai за поверителен чат с AI.<br/><br/>Можете да използвате Duck.ai от всяко място, където видите иконата за чат]]></string>
+    <string name="onboardingDuckAiEndCtaButton">Поздравления!</string>
+
+    <!-- Input Mode Demo Onboarding step -->
+    <string name="preOnboardingInputModeDemoTitle">Готови ли сте да започнете?&lt;br/&gt;Опитайте търсене или чат с изкуствен интелект!</string>
+    <string name="preOnboardingInputModeDemoSearchHint">Поверително търсене</string>
+    <string name="preOnboardingInputModeDemoChatHint">Задайте въпрос поверително</string>
+    <string name="preOnboardingInputModeDemoChatSuggestion1">Обясни ми фондовия пазар, така сякаш съм на 10 години</string>
+    <string name="preOnboardingInputModeDemoChatSuggestion2">Планирай перфектен ден в Лондон</string>
+    <string name="preOnboardingInputModeDemoChatSuggestion3">Изненадай ме!</string>
+    <string name="preOnboardingInputModeDemoChatSuggestion3Prompt">Кажи ми 10 интересни факта от науката, природата и историята?</string>
+
+    <!-- Custom AI onboarding flow -->
+    <!-- Pre-onboarding: initial screens -->
+    <string name="preOnboardingWelcomeDialogBodyCustomAi">Искате ли да разговаряте поверително и безплатно с ChatGPT, Claude и други AI в браузър, който осигурява активна защита?</string>
+    <string name="preOnboardingDaxDialog3TextCustomAi">Не забравяйте: Можете да използвате Duck.ai от всяко място, където видите иконата за чат</string>
+    <string name="preOnboardingDaxDialog3ButtonCustomAi">Започнете чат с AI</string>
+    <!-- Pre-onboarding: AI comparison chart screen. -->
+    <string name="preOnboardingDaxDialogAiTitle">AI защити активирани!</string>
+    <string name="preOnboardingAiComparisonChartPopularAis">Популярни AI</string>
+    <string name="preOnboardingAiComparisonChartItem1">Всички чатове са анонимизирани</string>
+    <string name="preOnboardingAiComparisonChartItem2">Не е необходим акаунт, за да получите достъп до всички AI функции</string>
+    <string name="preOnboardingAiComparisonChartItem3">Никога не използва чатовете за обучение на AI</string>
+    <string name="preOnboardingAiComparisonChartItem4">Достъп до ChatGPT, Claude и други, всичко на едно място</string>
+    <string name="preOnboardingAiComparisonChartButton">Изпробвайте Duck.ai!</string>
+    <!-- Pre-onboarding: input demo screen -->
+    <string name="preOnboardingInputModeDemoTitleCustomAi">А сега изпробвайте поверителен чат с AI!</string>
+    <!-- Pre-onboarding: browser comparison screen -->
+    <string name="preOnboardingDaxDialog2TitleCustomAi">Искате ли да направите DuckDuckGo браузър по подразбиране?</string>
+    <!-- In-context onboarding. -->
+    <string name="onboardingEndCustomAiFlowDaxDialogDescription"><![CDATA[Започнете поверителен чат с AI с Duck.ai или превключете към „Търсене“ за защитено сърфиране.<br/><br/>Можете да използвате Duck.ai от всяко място, където видите иконата за чат]]></string>
+    <string name="onboardingPrivacyProCustomAiFlowDaxDialogDescription">Предлагаме и платен абонамент с усъвършенствани AI модели с по-високи лимити за чат от GPT и Claude, защитена VPN и други.</string>
 
     <string name="input_screen_user_pref_without_ai_updated">Само търсене</string>
     <string name="input_screen_user_pref_with_ai_updated">Превключвайте между\nТърсене и Duck.ai</string>

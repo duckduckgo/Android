@@ -16,6 +16,7 @@
 
 package com.duckduckgo.newtabpage.api
 
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 
 /**
@@ -42,4 +43,10 @@ interface NtpAfterIdleManager {
 
     /** Emits true when the current NTP was shown as a result of an idle return, false otherwise. */
     val isAfterIdleReturn: StateFlow<Boolean>
+
+    /** Emits whether the return-to-last-tab hatch is enabled (user setting, defaults to true). */
+    val returnToLastTabEnabled: Flow<Boolean>
+
+    /** Persists whether the return-to-last-tab hatch is enabled. */
+    suspend fun setReturnToLastTabEnabled(enabled: Boolean)
 }
