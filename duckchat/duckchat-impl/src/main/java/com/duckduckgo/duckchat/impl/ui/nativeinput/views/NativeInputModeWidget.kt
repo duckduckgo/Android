@@ -535,9 +535,11 @@ class NativeInputModeWidget @JvmOverloads constructor(
 
     /**
      * Re-wraps the IME editor-action listener (originally set by the base class in init) to also
-     * fire omnibar keyboard-go and floating-return pixels. The submit path is unchanged: we call
-     * [submitMessage] and return true exactly when the base class would, so downstream behaviour
-     * (onSearchSent / onChatSent / submission pixels) is not affected.
+     * fire the omnibar keyboard-go pixel. The submit path is unchanged: we call [submitMessage] and
+     * return true exactly when the base class would (IME_ACTION_GO, or a hardware Enter when the
+     * widget submits on hardware Enter), so downstream behaviour is not affected. keyboard_go fires
+     * for both submit triggers, matching the base. (floating_return is the new-line button, wired in
+     * configureSubmitButtons, not a keyboard event.)
      */
     private fun hookEditorActionPixels() {
         inputField.setOnEditorActionListener { _, actionId, keyEvent ->
@@ -545,13 +547,9 @@ class NativeInputModeWidget @JvmOverloads constructor(
                 (keyEvent?.keyCode == KeyEvent.KEYCODE_ENTER || keyEvent?.keyCode == KeyEvent.KEYCODE_NUMPAD_ENTER) &&
                     keyEvent.action == KeyEvent.ACTION_DOWN
 
-            if (actionId == EditorInfo.IME_ACTION_GO) {
+            if (actionId == EditorInfo.IME_ACTION_GO || (isHardwareEnter && shouldSubmitOnHardwareEnter())) {
                 submitMessage()
                 viewModel.fireKeyboardGoPressed(isSearchMode())
-                true
-            } else if (isHardwareEnter && shouldSubmitOnHardwareEnter()) {
-                submitMessage()
-                viewModel.fireFloatingReturnPressed()
                 true
             } else {
                 false
@@ -1530,7 +1528,10 @@ class NativeInputModeWidget @JvmOverloads constructor(
                 useTopBar = true,
                 layoutResId = R.layout.view_native_input_screen_floating_buttons,
             ).apply {
-                onNewLineClick = { printNewLine() }
+                onNewLineClick = {
+                    printNewLine()
+                    viewModel.fireFloatingReturnPressed()
+                }
                 setSendButtonVisible(false)
                 setNewLineButtonVisible(false)
             }
