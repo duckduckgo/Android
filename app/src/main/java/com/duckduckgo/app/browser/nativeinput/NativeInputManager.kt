@@ -48,11 +48,9 @@ import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.api.InputMode
+import com.duckduckgo.duckchat.api.NativeInputOmnibarMetrics
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState.InteractionLock
 import com.duckduckgo.duckchat.api.toChatIdOrNull
-import com.duckduckgo.duckchat.impl.inputscreen.ui.metrics.discovery.InputScreenDiscoveryFunnel
-import com.duckduckgo.duckchat.impl.inputscreen.ui.metrics.usage.InputScreenSessionUsageMetric
-import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.ui.nativeinput.views.NativeInputWidget
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionPurchase
@@ -147,9 +145,7 @@ class RealNativeInputManager @Inject constructor(
     private val duckAiFeatureState: DuckAiFeatureState,
     private val pixel: Pixel,
     private val nativeInputStateBugKillSwitch: NativeInputStateBugKillSwitch,
-    private val duckChatPixels: DuckChatPixels,
-    private val inputScreenSessionUsageMetric: InputScreenSessionUsageMetric,
-    private val inputScreenDiscoveryFunnel: InputScreenDiscoveryFunnel,
+    private val omnibarMetrics: NativeInputOmnibarMetrics,
 ) : NativeInputManager {
     private lateinit var omnibarController: NativeInputOmnibarController
     private lateinit var rootView: ViewGroup
@@ -455,11 +451,8 @@ class RealNativeInputManager @Inject constructor(
         } else {
             showNtp()
         }
-        inputScreenDiscoveryFunnel.onNativeInputActive()
-        inputScreenDiscoveryFunnel.onInputScreenOpened()
-        duckChatPixels.fireOmnibarShown()
         val landscape = rootView.resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
-        duckChatPixels.fireOmnibarTextAreaFocused(landscape = landscape)
+        omnibarMetrics.onNativeInputShown(landscape = landscape)
     }
 
     private fun bindSearchCallbacks(
@@ -477,9 +470,7 @@ class RealNativeInputManager @Inject constructor(
         widget.bindInputEvents(
             onSearchTextChanged = onSearchTextChanged,
             onSearchSubmitted = { query ->
-                duckChatPixels.fireOmnibarQuerySubmitted(query)
-                inputScreenSessionUsageMetric.onSearchSubmitted()
-                inputScreenDiscoveryFunnel.onSearchSubmitted()
+                omnibarMetrics.onSearchSubmitted(query)
                 hideNativeInput(isNavigation = true)
                 callbacks.onSearchSubmitted(query)
             },
@@ -502,8 +493,7 @@ class RealNativeInputManager @Inject constructor(
                     )
                     widget.clearSelectedTool()
                     widget.onPromptSubmitted()
-                    inputScreenSessionUsageMetric.onPromptSubmitted()
-                    inputScreenDiscoveryFunnel.onPromptSubmitted()
+                    omnibarMetrics.onChatPromptSubmitted()
                 } else if (queryUrlPredictor.isUrl(query)) {
                     // Not in a Duck.ai chat (e.g. on the NTP with the Duck.ai toggle selected): a
                     // URL is an address, so navigate to it exactly like Search mode rather than
@@ -529,8 +519,7 @@ class RealNativeInputManager @Inject constructor(
                         hideNtp()
                     }
                     isExiting = false
-                    inputScreenSessionUsageMetric.onPromptSubmitted()
-                    inputScreenDiscoveryFunnel.onPromptSubmitted()
+                    omnibarMetrics.onChatPromptSubmitted()
                     callbacks.onDuckAiQuerySubmitted(query)
                 }
             },
