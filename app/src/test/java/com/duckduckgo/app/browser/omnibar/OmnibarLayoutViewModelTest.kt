@@ -13,7 +13,6 @@ import com.duckduckgo.app.browser.menu.BrowserMenuHighlight
 import com.duckduckgo.app.browser.menu.BrowserViewMode
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command
-import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command.CopyUrlToClipboard
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command.LaunchInputScreen
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.EnabledState
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.LeadingIconState
@@ -53,6 +52,7 @@ import com.duckduckgo.serp.logos.api.SerpLogo
 import com.duckduckgo.voice.api.VoiceSearchAvailability
 import com.duckduckgo.voice.api.VoiceSearchAvailabilityPixelLogger
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
@@ -140,6 +140,7 @@ class OmnibarLayoutViewModelTest {
         whenever(tabRepository.flowTabs).thenReturn(flowOf(emptyList()))
         whenever(tabRepository.flowSelectedTab).thenReturn(selectedTabFlow)
         whenever(voiceSearchAvailability.shouldShowVoiceSearch(any(), any(), any(), any())).thenReturn(true)
+        whenever(voiceSearchAvailability.observeVoiceSearchAvailability()).thenReturn(emptyFlow())
         whenever(duckPlayer.isDuckPlayerUri(DUCK_PLAYER_URL)).thenReturn(true)
         whenever(duckAiFeatureState.showOmnibarShortcutOnNtpAndOnFocus).thenReturn(duckAiShowOmnibarShortcutOnNtpAndOnFocusFlow)
         whenever(duckAiFeatureState.showOmnibarShortcutInAllStates).thenReturn(duckAiShowOmnibarShortcutInAllStatesFlow)
@@ -398,6 +399,25 @@ class OmnibarLayoutViewModelTest {
             assertEquals(expectedTitle, customTabMode.title)
             assertEquals(expectedDomain, customTabMode.domain) // Empty string because no URL is set
             assertEquals(expectedShowDuckPlayerIcon, customTabMode.showDuckPlayerIcon)
+        }
+    }
+
+    @Test
+    fun whenVoiceSearchAvailabilityEmitsWhileInCustomTabThenVoiceSearchStaysHidden() = runTest {
+        val voiceSearchAvailabilityFlow = MutableStateFlow(false)
+        whenever(voiceSearchAvailability.observeVoiceSearchAvailability()).thenReturn(voiceSearchAvailabilityFlow)
+        initializeViewModel()
+
+        testee.onViewModeChanged(ViewMode.CustomTab(100, "example", "example.com", showDuckPlayerIcon = false))
+
+        // User toggles "Private Voice Search" on while a custom tab is active.
+        voiceSearchAvailabilityFlow.value = true
+
+        testee.viewState.test {
+            val viewState = expectMostRecentItem()
+            assertTrue(viewState.viewMode is ViewMode.CustomTab)
+            assertFalse(viewState.showVoiceSearch)
+            cancelAndIgnoreRemainingEvents()
         }
     }
 

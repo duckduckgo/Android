@@ -18,6 +18,7 @@ package com.duckduckgo.voice.store
 
 import com.duckduckgo.voice.api.VoiceSearchLauncher.VoiceSearchMode
 import com.duckduckgo.voice.api.VoiceSearchStatusListener
+import kotlinx.coroutines.flow.Flow
 
 interface VoiceSearchRepository {
     fun declinePermissionForever()
@@ -27,6 +28,7 @@ interface VoiceSearchRepository {
     fun getHasAcceptedRationaleDialog(): Boolean
     fun getHasLoggedAvailability(): Boolean
     fun isVoiceSearchUserEnabled(default: Boolean): Boolean
+    fun voiceSearchUserEnabledFlow(default: Boolean): Flow<Boolean>
     fun setVoiceSearchUserEnabled(enabled: Boolean)
     fun countVoiceSearchDismissed(): Int
     fun dismissVoiceSearch()
@@ -58,6 +60,8 @@ class RealVoiceSearchRepository constructor(
     override fun getHasLoggedAvailability(): Boolean = dataStore.availabilityLogged
 
     override fun isVoiceSearchUserEnabled(default: Boolean): Boolean = dataStore.isVoiceSearchEnabled(default)
+
+    override fun voiceSearchUserEnabledFlow(default: Boolean): Flow<Boolean> = dataStore.voiceSearchEnabledFlow(default)
 
     override fun setVoiceSearchUserEnabled(enabled: Boolean) {
         dataStore.setVoiceSearchEnabled(enabled)
