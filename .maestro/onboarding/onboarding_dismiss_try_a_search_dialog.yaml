@@ -11,9 +11,9 @@ tags:
       - launchApp:
           clearState: true
       - runFlow: ../shared/pre_onboarding.yaml
-      - assertVisible:
-          id: "daxDialogDismissButton|brandDesignDismissButton"
       - tapOn:
-          id: "daxDialogDismissButton|brandDesignDismissButton"
+          id: "daxDialogDismissButton|contextualBrandDesignDismissButton"
+      - assertNotVisible:
+          text: ".*That's DuckDuckGo Search!.*"
       - assertVisible:
-          id: ddgLogo
+          id: "omnibarTextInput"
