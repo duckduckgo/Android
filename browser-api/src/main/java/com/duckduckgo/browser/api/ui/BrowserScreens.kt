@@ -61,4 +61,9 @@ sealed class BrowserScreens {
      * Use this model to launch the Tab Switcher screen
      */
     data object TabSwitcherScreenNoParams : GlobalActivityStarter.ActivityParams
+
+    /**
+     * Launches the Tab Switcher and highlights the Fire-mode toggle (used by the NTP Fire Tabs promo).
+     */
+    data object TabSwitcherScreenWithFireToggleHighlight : GlobalActivityStarter.ActivityParams
 }

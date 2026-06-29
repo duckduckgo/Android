@@ -80,6 +80,7 @@ import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.ShowUndoDeleteTab
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.ViewState.Mode
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.ViewState.Mode.Selection
 import com.duckduckgo.browser.api.ui.BrowserScreens.TabSwitcherScreenNoParams
+import com.duckduckgo.browser.api.ui.BrowserScreens.TabSwitcherScreenWithFireToggleHighlight
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.menu.PopupMenu
@@ -102,6 +103,7 @@ import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.dataclearing.api.fire.FireDialogProvider
 import com.duckduckgo.dataclearing.api.fire.FireDialogProvider.FireDialogOrigin.TabSwitcher
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.navigation.api.getActivityParams
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.collectLatest
@@ -116,6 +118,7 @@ import com.duckduckgo.mobile.android.R as CommonR
 
 @InjectWith(ActivityScope::class)
 @ContributeToActivityStarter(TabSwitcherScreenNoParams::class, screenName = "tabSwitcher")
+@ContributeToActivityStarter(TabSwitcherScreenWithFireToggleHighlight::class, screenName = "tabSwitcher")
 class TabSwitcherActivity :
     DuckDuckGoActivity(),
     TabSwitcherListener,
@@ -253,6 +256,10 @@ class TabSwitcherActivity :
     private var fadingInAfterRecreate = false
     private var fadeInAnimationStarted = false
 
+    // Read in onCreate; consumed by the Fire-mode toggle pulse wiring in Task 13.
+    private var launchedWithFireHighlight = false
+    private var fireHighlightConsumed = false
+
     private var lastSnackbar: DefaultSnackbar? = null
 
     private val binding: ActivityTabSwitcherBinding by viewBinding()
@@ -295,6 +302,8 @@ class TabSwitcherActivity :
         setContentView(binding.root)
 
         fadingInAfterRecreate = savedInstanceState?.getBoolean(KEY_FADE_IN_AFTER_RECREATE) == true
+        launchedWithFireHighlight = intent.getActivityParams(TabSwitcherScreenWithFireToggleHighlight::class.java) != null
+        fireHighlightConsumed = savedInstanceState?.getBoolean(KEY_FIRE_HIGHLIGHT_CONSUMED) == true
 
         tabsAdapter.setAnimationTileCloseClickListener {
             viewModel.onTrackerAnimationInfoPanelClicked()
@@ -320,6 +329,9 @@ class TabSwitcherActivity :
         super.onSaveInstanceState(outState)
         if (fadingOutForRecreate) {
             outState.putBoolean(KEY_FADE_IN_AFTER_RECREATE, true)
+        }
+        if (launchedWithFireHighlight) {
+            outState.putBoolean(KEY_FIRE_HIGHLIGHT_CONSUMED, true)
         }
     }
 
@@ -1172,5 +1184,6 @@ class TabSwitcherActivity :
 
         private const val ANCHOR_REPIN_WINDOW_MS = 1000L
         private const val KEY_FADE_IN_AFTER_RECREATE = "fadeInAfterModeSwitchRecreate"
+        private const val KEY_FIRE_HIGHLIGHT_CONSUMED = "fireHighlightConsumed"
     }
 }
