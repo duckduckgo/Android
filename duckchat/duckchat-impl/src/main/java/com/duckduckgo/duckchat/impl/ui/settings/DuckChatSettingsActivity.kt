@@ -311,6 +311,13 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
             if (viewState.isSearchSectionVisible) {
                 with(showDuckChatSearchSettingsLink) {
                     isVisible = true
+                    setPrimaryText(
+                        if (viewState.isNativeControlsEnabled) {
+                            getString(R.string.duckAiSearchAssistSettingsTitle)
+                        } else {
+                            getString(R.string.duck_chat_assist_settings_title)
+                        },
+                    )
                     setSecondaryText(
                         if (viewState.isNativeControlsEnabled) {
                             getString(viewState.searchAssistVisibility.toDisplayNameRes())

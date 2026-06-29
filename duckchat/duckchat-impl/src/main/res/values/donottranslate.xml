@@ -74,4 +74,5 @@
 
     <!-- Search Assist Visibility -->
     <string name="duckAiSearchAssistVisibilityTitle">Search Assist</string>
+    <string name="duckAiSearchAssistSettingsTitle">Search Assist</string>
 </resources>
