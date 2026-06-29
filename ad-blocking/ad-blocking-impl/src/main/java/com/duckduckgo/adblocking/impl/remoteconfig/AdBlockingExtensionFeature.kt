@@ -40,4 +40,7 @@ interface AdBlockingExtensionFeature {
      */
     @Toggle.DefaultValue(Toggle.DefaultFeatureValue.FALSE)
     fun enableContingencyMode(): Toggle
+
+    @Toggle.DefaultValue(Toggle.DefaultFeatureValue.FALSE)
+    fun adBlockingPhase2(): Toggle
 }
