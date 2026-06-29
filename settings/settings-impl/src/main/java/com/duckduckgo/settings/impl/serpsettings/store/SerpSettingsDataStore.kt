@@ -24,7 +24,10 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.settings.impl.serpsettings.di.SerpSettings
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 interface SerpSettingsDataStore {
@@ -32,6 +35,15 @@ interface SerpSettingsDataStore {
     suspend fun setSerpSettings(value: String)
 
     suspend fun getSerpSettings(): String?
+
+    fun observeSerpSettings(): Flow<String?>
+
+    /**
+     * Atomically reads the current value, applies [transform], and stores the result within a single
+     * DataStore transaction. Use this instead of a separate get/set pair when merging into the existing
+     * blob, so a concurrent writer (e.g. the SERP's updateNativeSettings) can't cause a lost update.
+     */
+    suspend fun updateSerpSettings(transform: (String?) -> String)
 }
 
 @ContributesBinding(AppScope::class)
@@ -45,6 +57,15 @@ class SerpSettingsPrefsDataStore @Inject constructor(
     }
 
     override suspend fun getSerpSettings(): String? = store.data.firstOrNull()?.let { it[SERP_SETTINGS] }
+
+    override fun observeSerpSettings(): Flow<String?> =
+        store.data
+            .map { prefs -> prefs[SERP_SETTINGS] }
+            .distinctUntilChanged()
+
+    override suspend fun updateSerpSettings(transform: (String?) -> String) {
+        store.edit { prefs -> prefs[SERP_SETTINGS] = transform(prefs[SERP_SETTINGS]) }
+    }
 
     private companion object {
         private val SERP_SETTINGS = stringPreferencesKey(name = "SERP_SETTINGS")
