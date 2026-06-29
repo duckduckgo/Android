@@ -268,6 +268,10 @@ class TabSwitcherViewModel @Inject constructor(
         command.value = Command.DismissSnackbar
 
         browserModeStateHolder.switchTo(mode)
+
+        // The promo banner has served its purpose once the user toggles modes; dismiss it so it does not
+        // reappear when returning to regular mode (this ViewModel survives the toggle-triggered recreate).
+        _viewState.update { it.copy(isFireTabsPromoVisible = false) }
     }
 
     suspend fun onTabSelected(tabId: String) {

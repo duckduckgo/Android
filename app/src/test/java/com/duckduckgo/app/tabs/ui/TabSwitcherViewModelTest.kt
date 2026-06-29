@@ -2232,6 +2232,22 @@ class TabSwitcherViewModelTest {
         verify(mockPixel).fire(AppPixelName.FIRE_TABS_PROMO_TAB_SWITCHER_DISMISSED)
     }
 
+    @Test
+    fun whenBrowserModeToggledThenFireTabsPromoBannerDismissed() = runTest {
+        whenever(fireTabsPromos.canShowTabSwitcherPromo()).thenReturn(true)
+
+        val testee = createViewModel()
+        advanceUntilIdle() // init sets isFireTabsPromoVisible = true
+
+        testee.onBrowserModeToggled(BrowserMode.FIRE)
+
+        // The ViewModel survives the toggle-triggered recreate, so the banner must be dismissed here,
+        // otherwise it reappears when the user returns to regular mode.
+        testee.viewState.test {
+            assertFalse(expectMostRecentItem().isFireTabsPromoVisible)
+        }
+    }
+
     private class FakeTabSwitcherDataStore : TabSwitcherDataStore {
 
         private val animationTileDismissedFlow = MutableStateFlow(false)
