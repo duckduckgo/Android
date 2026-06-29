@@ -1,0 +1,37 @@
+{
+    "m_fire_tabs_promo_ntp_shown": {
+        "description": "Fires when the Fire Tabs promo card is shown on the New Tab Page",
+        "owners": ["0nko"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_fire_tabs_promo_ntp_cta": {
+        "description": "Fires when the user taps the primary 'Try Fire Tabs' button on the NTP promo card",
+        "owners": ["0nko"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_fire_tabs_promo_ntp_dismissed": {
+        "description": "Fires when the user dismisses the NTP Fire Tabs promo card (Not Now or close)",
+        "owners": ["0nko"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_fire_tabs_promo_tab_switcher_shown": {
+        "description": "Fires when the Fire Tabs promo banner is shown in the tab switcher",
+        "owners": ["0nko"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_fire_tabs_promo_tab_switcher_dismissed": {
+        "description": "Fires when the user dismisses the Fire Tabs promo banner in the tab switcher",
+        "owners": ["0nko"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    }
+}
