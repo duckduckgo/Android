@@ -404,4 +404,13 @@ interface AndroidBrowserConfigFeature {
      */
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun recreateAwareLifecycle(): Toggle
+
+    /**
+     * Kill switch for the trampoline-activity based Clear Data shortcut implementation.
+     * When enabled (default), the Clear Data shortcut routes through a non-exported trampoline activity,
+     * and the legacy PERFORM_FIRE_ON_ENTRY_EXTRA handler on BrowserActivity is suppressed.
+     * When disabled, falls back to the legacy BrowserActivity + PERFORM_FIRE_ON_ENTRY_EXTRA intent surface.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    fun useFireAppShortcutTrampoline(): Toggle
 }

@@ -779,8 +779,15 @@ open class BrowserActivity : DuckDuckGoActivity() {
         }
 
         if (intent.getBooleanExtra(PERFORM_FIRE_ON_ENTRY_EXTRA, false)) {
-            logcat(INFO) { "Clearing everything as a result of $PERFORM_FIRE_ON_ENTRY_EXTRA flag being set" }
             appCoroutineScope.launch(dispatcherProvider.io()) {
+                // The legitimate shortcut goes through [FireShortcutTrampolineActivity]; this legacy handler is only active if FF disabled.
+                if (androidBrowserConfigFeature.useFireAppShortcutTrampoline().isEnabled()) {
+                    logcat(INFO) {
+                        "$PERFORM_FIRE_ON_ENTRY_EXTRA received but fireShortcutTrampoline kill switch is on; ignoring"
+                    }
+                    return@launch
+                }
+                logcat(INFO) { "Clearing everything as a result of $PERFORM_FIRE_ON_ENTRY_EXTRA flag being set" }
                 if (androidBrowserConfigFeature.singleTabFireDialog().isEnabled()) {
                     val clearOptions = fireDataStore.getManualClearOptions()
                     dataClearingWideEvent.start(
@@ -811,7 +818,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
                     clearDataAction.killAndRestartProcess(notifyDataCleared = false)
                 }
             }
-
             return
         }
 
