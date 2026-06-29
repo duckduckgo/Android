@@ -259,7 +259,9 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
         }
         inputScreenSettingsBinding.duckAiDefaultTogglePosition.updatePadding(left = offset)
 
-        inputScreenSettingsBinding.duckAiInputScreenDescription.isVisible = viewState.shouldShowInputScreenToggle
+        // The input screen description is hidden entirely once native controls are enabled.
+        inputScreenSettingsBinding.duckAiInputScreenDescription.isVisible =
+            viewState.shouldShowInputScreenToggle && !viewState.isNativeControlsEnabled
         inputScreenSettingsBinding.duckAiInputScreenDescription.addClickableSpan(
             textSequence = getText(R.string.input_screen_user_pref_description),
             spans =
