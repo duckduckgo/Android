@@ -20,6 +20,9 @@ import androidx.core.net.toUri
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
+import com.duckduckgo.browsermode.api.BrowserMode
+import com.duckduckgo.browsermode.api.BrowserModeDataProvider
+import com.duckduckgo.browsermode.api.FireModeAvailability
 import com.duckduckgo.dataclearing.api.plugin.ClearableData
 import com.duckduckgo.duckchat.api.DuckChat
 import kotlinx.coroutines.runBlocking
@@ -39,7 +42,16 @@ import org.mockito.kotlin.whenever
 class DuckAiTabsCleanupPluginTest {
 
     @Mock
-    private lateinit var mockTabRepository: TabRepository
+    private lateinit var mockRegularTabRepository: TabRepository
+
+    @Mock
+    private lateinit var mockFireTabRepository: TabRepository
+
+    @Mock
+    private lateinit var mockTabRepositoryProvider: BrowserModeDataProvider<TabRepository>
+
+    @Mock
+    private lateinit var mockFireModeAvailability: FireModeAvailability
 
     @Mock
     private lateinit var mockDuckChat: DuckChat
@@ -50,39 +62,49 @@ class DuckAiTabsCleanupPluginTest {
     fun setup() {
         MockitoAnnotations.openMocks(this)
         runBlocking {
-            whenever(mockTabRepository.getTabs()).thenReturn(emptyList())
+            whenever(mockRegularTabRepository.getTabs()).thenReturn(emptyList())
+            whenever(mockFireTabRepository.getTabs()).thenReturn(emptyList())
         }
-        testee = DuckAiTabsCleanupPlugin(mockTabRepository, mockDuckChat)
+        whenever(mockTabRepositoryProvider.forMode(BrowserMode.REGULAR)).thenReturn(mockRegularTabRepository)
+        whenever(mockTabRepositoryProvider.forMode(BrowserMode.FIRE)).thenReturn(mockFireTabRepository)
+        // Default: fire mode is available (flag on)
+        whenever(mockFireModeAvailability.isAvailable()).thenReturn(true)
+
+        testee = DuckAiTabsCleanupPlugin(mockTabRepositoryProvider, mockFireModeAvailability, mockDuckChat)
     }
 
+    // ── flag ON: Regular-mode tests (existing behavior, routed through forMode(REGULAR)) ──
+
     @Test
-    fun `DuckChats All closes only DuckAi tabs`() = runTest {
+    fun `DuckChats All closes only DuckAi tabs in regular repo when flag on`() = runTest {
         val duckAiTab = TabEntity(tabId = "duck-ai", url = "https://duck.ai")
         val browserTab = TabEntity(tabId = "browser", url = "https://example.com")
-        whenever(mockTabRepository.getTabs()).thenReturn(listOf(duckAiTab, browserTab))
+        whenever(mockRegularTabRepository.getTabs()).thenReturn(listOf(duckAiTab, browserTab))
         whenever(mockDuckChat.isDuckChatUrl(eq("https://duck.ai".toUri()))).thenReturn(true)
         whenever(mockDuckChat.isDuckChatUrl(eq("https://example.com".toUri()))).thenReturn(false)
 
         testee.onClearData(setOf(ClearableData.DuckChats.All))
 
-        verify(mockTabRepository).deleteTabs(listOf("duck-ai"))
+        verify(mockRegularTabRepository).deleteTabs(listOf("duck-ai"))
     }
 
     @Test
     fun `DuckChats All with no DuckAi tabs does not call deleteTabs`() = runTest {
-        whenever(mockTabRepository.getTabs()).thenReturn(listOf(TabEntity(tabId = "browser", url = "https://example.com")))
+        whenever(mockRegularTabRepository.getTabs()).thenReturn(listOf(TabEntity(tabId = "browser", url = "https://example.com")))
         whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(false)
 
         testee.onClearData(setOf(ClearableData.DuckChats.All))
 
-        verify(mockTabRepository, never()).deleteTabs(any())
+        verify(mockRegularTabRepository, never()).deleteTabs(any())
+        verify(mockFireTabRepository, never()).deleteTabs(any())
     }
 
     @Test
     fun `DuckChats All with no open tabs is a no-op`() = runTest {
         testee.onClearData(setOf(ClearableData.DuckChats.All))
 
-        verify(mockTabRepository, never()).deleteTabs(any())
+        verify(mockRegularTabRepository, never()).deleteTabs(any())
+        verify(mockFireTabRepository, never()).deleteTabs(any())
     }
 
     @Test
@@ -90,14 +112,14 @@ class DuckAiTabsCleanupPluginTest {
         val matchingTab = TabEntity(tabId = "tab1", url = "https://duck.ai?chatID=abc")
         val unrelatedDuckAiTab = TabEntity(tabId = "tab2", url = "https://duck.ai?chatID=zzz")
         val browserTab = TabEntity(tabId = "tab3", url = "https://example.com")
-        whenever(mockTabRepository.getTabs()).thenReturn(listOf(matchingTab, unrelatedDuckAiTab, browserTab))
+        whenever(mockRegularTabRepository.getTabs()).thenReturn(listOf(matchingTab, unrelatedDuckAiTab, browserTab))
         whenever(mockDuckChat.isDuckChatUrl(eq("https://duck.ai?chatID=abc".toUri()))).thenReturn(true)
         whenever(mockDuckChat.isDuckChatUrl(eq("https://duck.ai?chatID=zzz".toUri()))).thenReturn(true)
         whenever(mockDuckChat.isDuckChatUrl(eq("https://example.com".toUri()))).thenReturn(false)
 
-        testee.onClearData(setOf(ClearableData.DuckChats.Selected(setOf("https://duck.ai?chatID=abc"))))
+        testee.onClearData(setOf(ClearableData.DuckChats.SelectedForMode(setOf("https://duck.ai?chatID=abc"), BrowserMode.REGULAR)))
 
-        verify(mockTabRepository).deleteTabs(listOf("tab1"))
+        verify(mockRegularTabRepository).deleteTabs(listOf("tab1"))
     }
 
     @Test
@@ -105,27 +127,27 @@ class DuckAiTabsCleanupPluginTest {
         val t1 = TabEntity(tabId = "tab1", url = "https://duck.ai?chatID=a")
         val t2 = TabEntity(tabId = "tab2", url = "https://duck.ai?chatID=b")
         val t3 = TabEntity(tabId = "tab3", url = "https://example.com")
-        whenever(mockTabRepository.getTabs()).thenReturn(listOf(t1, t2, t3))
+        whenever(mockRegularTabRepository.getTabs()).thenReturn(listOf(t1, t2, t3))
         whenever(mockDuckChat.isDuckChatUrl(eq("https://duck.ai?chatID=a".toUri()))).thenReturn(true)
         whenever(mockDuckChat.isDuckChatUrl(eq("https://duck.ai?chatID=b".toUri()))).thenReturn(true)
         whenever(mockDuckChat.isDuckChatUrl(eq("https://example.com".toUri()))).thenReturn(false)
 
         testee.onClearData(
-            setOf(ClearableData.DuckChats.Selected(setOf("https://duck.ai?chatID=a", "https://duck.ai?chatID=b"))),
+            setOf(ClearableData.DuckChats.SelectedForMode(setOf("https://duck.ai?chatID=a", "https://duck.ai?chatID=b"), BrowserMode.REGULAR)),
         )
 
-        verify(mockTabRepository).deleteTabs(listOf("tab1", "tab2"))
+        verify(mockRegularTabRepository).deleteTabs(listOf("tab1", "tab2"))
     }
 
     @Test
     fun `DuckChats Selected with no matching tab does not call deleteTabs`() = runTest {
         val unrelated = TabEntity(tabId = "tab1", url = "https://duck.ai?chatID=other")
-        whenever(mockTabRepository.getTabs()).thenReturn(listOf(unrelated))
+        whenever(mockRegularTabRepository.getTabs()).thenReturn(listOf(unrelated))
         whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(true)
 
-        testee.onClearData(setOf(ClearableData.DuckChats.Selected(setOf("https://duck.ai?chatID=abc"))))
+        testee.onClearData(setOf(ClearableData.DuckChats.SelectedForMode(setOf("https://duck.ai?chatID=abc"), BrowserMode.REGULAR)))
 
-        verify(mockTabRepository, never()).deleteTabs(any())
+        verify(mockRegularTabRepository, never()).deleteTabs(any())
     }
 
     @Test
@@ -133,12 +155,12 @@ class DuckAiTabsCleanupPluginTest {
         val t1 = TabEntity(tabId = "tab1", url = "https://duck.ai?chatID=abc")
         val t2 = TabEntity(tabId = "tab2", url = "https://duck.ai?chatID=abc")
         val t3 = TabEntity(tabId = "tab3", url = "https://duck.ai?chatID=abc")
-        whenever(mockTabRepository.getTabs()).thenReturn(listOf(t1, t2, t3))
+        whenever(mockRegularTabRepository.getTabs()).thenReturn(listOf(t1, t2, t3))
         whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(true)
 
-        testee.onClearData(setOf(ClearableData.DuckChats.Selected(setOf("https://duck.ai?chatID=abc"))))
+        testee.onClearData(setOf(ClearableData.DuckChats.SelectedForMode(setOf("https://duck.ai?chatID=abc"), BrowserMode.REGULAR)))
 
-        verify(mockTabRepository).deleteTabs(listOf("tab1", "tab2", "tab3"))
+        verify(mockRegularTabRepository).deleteTabs(listOf("tab1", "tab2", "tab3"))
     }
 
     @Test
@@ -149,36 +171,133 @@ class DuckAiTabsCleanupPluginTest {
         val withPath = TabEntity(tabId = "tab2", url = "https://duck.ai/chat?chatID=abc")
         val withExtraParams = TabEntity(tabId = "tab3", url = "https://duck.ai?chatID=abc&model=gpt&session=xyz")
         val withFragment = TabEntity(tabId = "tab4", url = "https://duck.ai?chatID=abc#message-5")
-        whenever(mockTabRepository.getTabs()).thenReturn(listOf(original, withPath, withExtraParams, withFragment))
+        whenever(mockRegularTabRepository.getTabs()).thenReturn(listOf(original, withPath, withExtraParams, withFragment))
         whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(true)
 
-        testee.onClearData(setOf(ClearableData.DuckChats.Selected(setOf("https://duck.ai?chatID=abc"))))
+        testee.onClearData(setOf(ClearableData.DuckChats.SelectedForMode(setOf("https://duck.ai?chatID=abc"), BrowserMode.REGULAR)))
 
-        verify(mockTabRepository).deleteTabs(listOf("tab1", "tab2", "tab3", "tab4"))
+        verify(mockRegularTabRepository).deleteTabs(listOf("tab1", "tab2", "tab3", "tab4"))
     }
 
     @Test
     fun `Selected url with no chatID query param is a no-op`() = runTest {
         val anyTab = TabEntity(tabId = "tab1", url = "https://duck.ai?chatID=abc")
-        whenever(mockTabRepository.getTabs()).thenReturn(listOf(anyTab))
+        whenever(mockRegularTabRepository.getTabs()).thenReturn(listOf(anyTab))
         whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(true)
 
-        testee.onClearData(setOf(ClearableData.DuckChats.Selected(setOf("https://duck.ai"))))
+        testee.onClearData(setOf(ClearableData.DuckChats.SelectedForMode(setOf("https://duck.ai"), BrowserMode.REGULAR)))
 
-        verify(mockTabRepository, never()).deleteTabs(any())
+        verify(mockRegularTabRepository, never()).deleteTabs(any())
     }
 
     @Test
     fun `DuckChats Selected with empty url set is a no-op`() = runTest {
-        testee.onClearData(setOf(ClearableData.DuckChats.Selected(emptySet())))
+        testee.onClearData(setOf(ClearableData.DuckChats.SelectedForMode(emptySet(), BrowserMode.REGULAR)))
 
-        verify(mockTabRepository, never()).deleteTabs(any())
+        verify(mockRegularTabRepository, never()).deleteTabs(any())
     }
 
     @Test
     fun `unrelated ClearableData is a no-op`() = runTest {
         testee.onClearData(setOf(ClearableData.BrowserData.All, ClearableData.Tabs.All))
 
-        verify(mockTabRepository, never()).deleteTabs(any())
+        verify(mockRegularTabRepository, never()).deleteTabs(any())
+        verify(mockFireTabRepository, never()).deleteTabs(any())
+    }
+
+    // ── flag ON: Fire-mode tests ──
+
+    @Test
+    fun `DuckChats All closes tabs in both regular and fire repos when flag on`() = runTest {
+        val regularDuckAiTab = TabEntity(tabId = "regular-duck-ai", url = "https://duck.ai")
+        val fireDuckAiTab = TabEntity(tabId = "fire-duck-ai", url = "https://duck.ai")
+        whenever(mockRegularTabRepository.getTabs()).thenReturn(listOf(regularDuckAiTab))
+        whenever(mockFireTabRepository.getTabs()).thenReturn(listOf(fireDuckAiTab))
+        whenever(mockDuckChat.isDuckChatUrl(eq("https://duck.ai".toUri()))).thenReturn(true)
+
+        testee.onClearData(setOf(ClearableData.DuckChats.All))
+
+        verify(mockRegularTabRepository).deleteTabs(listOf("regular-duck-ai"))
+        verify(mockFireTabRepository).deleteTabs(listOf("fire-duck-ai"))
+    }
+
+    @Test
+    fun `DuckChats AllForMode FIRE closes tabs in fire repo when flag on`() = runTest {
+        val fireDuckAiTab = TabEntity(tabId = "fire-duck-ai", url = "https://duck.ai")
+        whenever(mockFireTabRepository.getTabs()).thenReturn(listOf(fireDuckAiTab))
+        whenever(mockDuckChat.isDuckChatUrl(eq("https://duck.ai".toUri()))).thenReturn(true)
+
+        testee.onClearData(setOf(ClearableData.DuckChats.AllForMode(BrowserMode.FIRE)))
+
+        verify(mockFireTabRepository).deleteTabs(listOf("fire-duck-ai"))
+        verify(mockRegularTabRepository, never()).deleteTabs(any())
+    }
+
+    @Test
+    fun `DuckChats SelectedForMode FIRE closes matching tabs in fire repo when flag on`() = runTest {
+        val fireDuckAiTab = TabEntity(tabId = "fire-tab1", url = "https://duck.ai?chatID=abc")
+        whenever(mockFireTabRepository.getTabs()).thenReturn(listOf(fireDuckAiTab))
+        whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(true)
+
+        testee.onClearData(setOf(ClearableData.DuckChats.SelectedForMode(setOf("https://duck.ai?chatID=abc"), BrowserMode.FIRE)))
+
+        verify(mockFireTabRepository).deleteTabs(listOf("fire-tab1"))
+        verify(mockRegularTabRepository, never()).deleteTabs(any())
+    }
+
+    // ── flag OFF: revert cases ──
+
+    @Test
+    fun `DuckChats All closes only regular repo when flag off`() = runTest {
+        whenever(mockFireModeAvailability.isAvailable()).thenReturn(false)
+        val regularDuckAiTab = TabEntity(tabId = "regular-duck-ai", url = "https://duck.ai")
+        val fireDuckAiTab = TabEntity(tabId = "fire-duck-ai", url = "https://duck.ai")
+        whenever(mockRegularTabRepository.getTabs()).thenReturn(listOf(regularDuckAiTab))
+        whenever(mockFireTabRepository.getTabs()).thenReturn(listOf(fireDuckAiTab))
+        whenever(mockDuckChat.isDuckChatUrl(eq("https://duck.ai".toUri()))).thenReturn(true)
+
+        testee.onClearData(setOf(ClearableData.DuckChats.All))
+
+        verify(mockRegularTabRepository).deleteTabs(listOf("regular-duck-ai"))
+        verify(mockFireTabRepository, never()).deleteTabs(any())
+    }
+
+    @Test
+    fun `DuckChats AllForMode FIRE is a no-op when flag off`() = runTest {
+        whenever(mockFireModeAvailability.isAvailable()).thenReturn(false)
+        val fireDuckAiTab = TabEntity(tabId = "fire-duck-ai", url = "https://duck.ai")
+        whenever(mockFireTabRepository.getTabs()).thenReturn(listOf(fireDuckAiTab))
+        whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(true)
+
+        testee.onClearData(setOf(ClearableData.DuckChats.AllForMode(BrowserMode.FIRE)))
+
+        verify(mockFireTabRepository, never()).deleteTabs(any())
+        verify(mockRegularTabRepository, never()).deleteTabs(any())
+    }
+
+    @Test
+    fun `DuckChats SelectedForMode FIRE is a no-op when flag off`() = runTest {
+        whenever(mockFireModeAvailability.isAvailable()).thenReturn(false)
+        val fireDuckAiTab = TabEntity(tabId = "fire-tab1", url = "https://duck.ai?chatID=abc")
+        whenever(mockFireTabRepository.getTabs()).thenReturn(listOf(fireDuckAiTab))
+        whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(true)
+
+        testee.onClearData(setOf(ClearableData.DuckChats.SelectedForMode(setOf("https://duck.ai?chatID=abc"), BrowserMode.FIRE)))
+
+        verify(mockFireTabRepository, never()).deleteTabs(any())
+        verify(mockRegularTabRepository, never()).deleteTabs(any())
+    }
+
+    @Test
+    fun `DuckChats AllForMode REGULAR closes regular repo even when flag off`() = runTest {
+        whenever(mockFireModeAvailability.isAvailable()).thenReturn(false)
+        val regularDuckAiTab = TabEntity(tabId = "regular-duck-ai", url = "https://duck.ai")
+        whenever(mockRegularTabRepository.getTabs()).thenReturn(listOf(regularDuckAiTab))
+        whenever(mockDuckChat.isDuckChatUrl(eq("https://duck.ai".toUri()))).thenReturn(true)
+
+        testee.onClearData(setOf(ClearableData.DuckChats.AllForMode(BrowserMode.REGULAR)))
+
+        verify(mockRegularTabRepository).deleteTabs(listOf("regular-duck-ai"))
+        verify(mockFireTabRepository, never()).deleteTabs(any())
     }
 }

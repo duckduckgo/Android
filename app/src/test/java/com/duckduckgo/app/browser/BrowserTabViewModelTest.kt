@@ -894,6 +894,12 @@ class BrowserTabViewModelTest {
         }
 
     private fun initialiseViewModel() {
+        // Detach the previous instance's command observer before creating a new VM, so tests that
+        // call initialiseViewModel() more than once (e.g. to swap browserMode mid-test) don't leave
+        // a stale VM attached to mockCommandObserver and emitting unexpected commands.
+        val previousTestee = if (::testee.isInitialized) testee else null
+        previousTestee?.command?.removeObserver(mockCommandObserver)
+
         val siteFactory =
             SiteFactoryImpl(
                 mockEntityLookup,
