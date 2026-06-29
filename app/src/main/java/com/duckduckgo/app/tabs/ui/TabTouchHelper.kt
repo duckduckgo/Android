@@ -153,7 +153,8 @@ class TabTouchHelper(
     }
 
     private fun ViewHolder?.isTabAnimatedTabViewHolder(): Boolean =
-        this is TabSwitcherAdapter.TabSwitcherViewHolder.TrackerAnimationInfoPanelViewHolder
+        this is TabSwitcherAdapter.TabSwitcherViewHolder.TrackerAnimationInfoPanelViewHolder ||
+            this is TabSwitcherAdapter.TabSwitcherViewHolder.FireTabsPromoViewHolder
 
     companion object {
         private const val ANIM_DURATION = 100L
