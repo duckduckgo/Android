@@ -14,11 +14,13 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.browser.longpress
+package com.duckduckgo.app.browser.contextmenu
 
 import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import androidx.core.view.isVisible
+import androidx.core.view.updateLayoutParams
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.model.LongPressTarget
 import com.duckduckgo.common.ui.menu.PopupMenu
@@ -107,17 +109,25 @@ class LongPressPopupMenu(
 
         // Clear the rounded ripple the shared PopupMenu init applied to the first/last LABELS, so
         // every row uses a single uniform full-row ripple (the label begins after the leading icon,
-        // which split the ripple between icon and text on the first/last items).
-        val root = popup.contentView as android.view.ViewGroup
+        // which split the ripple between icon and text on the first/last items). In the same pass,
+        // enlarge each row's leading icon to the long-press menu size to match the design.
+        val iconSize = layoutInflater.context.resources.getDimensionPixelSize(R.dimen.longPressMenuLeadingIconSize)
+        val root = popup.contentView as ViewGroup
         for (i in 0 until root.childCount) {
-            (root.getChildAt(i) as? com.duckduckgo.common.ui.view.PopupMenuItemView)
-                ?.findViewById<android.view.View>(com.duckduckgo.mobile.android.R.id.label)
-                ?.background = null
+            (root.getChildAt(i) as? PopupMenuItemView)?.let { item ->
+                item.findViewById<View>(com.duckduckgo.mobile.android.R.id.label)?.background = null
+                item.findViewById<View>(com.duckduckgo.mobile.android.R.id.leadingIcon)?.updateLayoutParams {
+                    width = iconSize
+                    height = iconSize
+                }
+            }
         }
         // Clip the popup content to its rounded background so full-row ripples don't bleed past the corners.
         root.clipToOutline = true
 
-        popup.showAtTouchPoint(rootView, screenX, screenY)
+        val metrics = rootView.resources.displayMetrics
+        val position = computePopupTouchPosition(screenX, screenY, metrics.widthPixels, metrics.heightPixels)
+        popup.showAtLocation(rootView, position.gravity, position.x, position.y)
         return true
     }
 }

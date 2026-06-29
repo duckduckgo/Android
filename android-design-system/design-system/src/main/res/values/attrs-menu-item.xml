@@ -33,7 +33,6 @@
         <attr name="primaryText" />
         <attr name="primaryTextType" />
         <attr name="leadingIcon" />
-        <attr name="popupLeadingIconSize" format="dimension" />
         <attr name="leadingIconTint" />
         <attr name="trailingIcon" />
         <attr name="primaryTextMaxLines" format="integer" />

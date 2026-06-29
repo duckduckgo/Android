@@ -46,7 +46,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:leadingIcon="@drawable/ic_add_24"
-        app:popupLeadingIconSize="24dp"
         app:primaryText="@string/openInNewTab" />
 
     <com.duckduckgo.common.ui.view.PopupMenuItemView
@@ -54,7 +53,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:leadingIcon="@drawable/ic_open_in_24"
-        app:popupLeadingIconSize="24dp"
         app:primaryText="@string/openInBackgroundTab" />
 
     <com.duckduckgo.common.ui.view.divider.HorizontalDivider
@@ -68,7 +66,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:leadingIcon="@drawable/ic_fire_tabs_24"
-        app:popupLeadingIconSize="24dp"
         app:primaryText="@string/openInFireTab" />
 
     <com.duckduckgo.common.ui.view.divider.HorizontalDivider
@@ -82,7 +79,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:leadingIcon="@drawable/ic_copy_24"
-        app:popupLeadingIconSize="24dp"
         app:primaryText="@string/copyUrl" />
 
     <com.duckduckgo.common.ui.view.PopupMenuItemView
@@ -90,7 +86,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:leadingIcon="@drawable/ic_copy_24"
-        app:popupLeadingIconSize="24dp"
         app:primaryText="@string/copyLinkText" />
 
     <com.duckduckgo.common.ui.view.PopupMenuItemView
@@ -98,6 +93,5 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:leadingIcon="@drawable/ic_share_android_24"
-        app:popupLeadingIconSize="24dp"
         app:primaryText="@string/shareLink" />
 </LinearLayout>

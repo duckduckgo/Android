@@ -146,8 +146,8 @@ import com.duckduckgo.app.browser.history.NavigationHistorySheet
 import com.duckduckgo.app.browser.history.NavigationHistorySheet.NavigationHistorySheetListener
 import com.duckduckgo.app.browser.httpauth.WebViewHttpAuthStore
 import com.duckduckgo.app.browser.logindetection.DOMLoginDetector
-import com.duckduckgo.app.browser.longpress.LongPressPopupMenu
-import com.duckduckgo.app.browser.longpress.longPressMenuConfigFor
+import com.duckduckgo.app.browser.contextmenu.LongPressPopupMenu
+import com.duckduckgo.app.browser.contextmenu.longPressMenuConfigFor
 import com.duckduckgo.app.browser.menu.BrowserMenuViewStateFactory
 import com.duckduckgo.app.browser.menu.VpnMenuStore
 import com.duckduckgo.app.browser.model.BasicAuthenticationCredentials

@@ -27,7 +27,6 @@ import android.widget.LinearLayout
 import androidx.annotation.ColorInt
 import androidx.annotation.DrawableRes
 import androidx.core.content.ContextCompat
-import androidx.core.view.updateLayoutParams
 import com.duckduckgo.common.ui.view.PopupMenuItemView.PopupMenuItemType.DESTRUCTIVE
 import com.duckduckgo.common.ui.view.PopupMenuItemView.PopupMenuItemType.PRIMARY
 import com.duckduckgo.common.ui.viewbinding.viewBinding
@@ -66,14 +65,6 @@ constructor(
 
             if (hasValue(R.styleable.PopupMenuItemView_leadingIcon)) {
                 setLeadingIconDrawable(getDrawable(R.styleable.PopupMenuItemView_leadingIcon)!!)
-            }
-
-            if (hasValue(R.styleable.PopupMenuItemView_popupLeadingIconSize)) {
-                val size = getDimensionPixelSize(R.styleable.PopupMenuItemView_popupLeadingIconSize, 0)
-                binding.leadingIcon.updateLayoutParams {
-                    width = size
-                    height = size
-                }
             }
 
             if (hasValue(R.styleable.PopupMenuItemView_leadingIconTint)) {

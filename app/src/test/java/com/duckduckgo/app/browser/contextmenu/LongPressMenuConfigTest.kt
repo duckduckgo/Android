@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.browser.longpress
+package com.duckduckgo.app.browser.contextmenu
 
 import android.webkit.WebView.HitTestResult.IMAGE_TYPE
 import android.webkit.WebView.HitTestResult.SRC_ANCHOR_TYPE

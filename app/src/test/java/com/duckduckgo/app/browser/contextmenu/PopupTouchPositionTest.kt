@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.common.ui.menu
+package com.duckduckgo.app.browser.contextmenu
 
 import android.view.Gravity
 import org.junit.Assert.assertEquals
