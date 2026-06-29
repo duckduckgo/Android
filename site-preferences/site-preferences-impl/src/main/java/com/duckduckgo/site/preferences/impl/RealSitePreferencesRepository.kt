@@ -56,10 +56,12 @@ class RealSitePreferencesRepository @Inject constructor(
     override fun onCreate(owner: LifecycleOwner) {
         if (!isMainProcess) return
         appCoroutineScope.launch(dispatcherProvider.io()) {
+            // Pre-warm the public-suffix list off the main thread; the first toTldPlusOne() loads it from disk.
             "example.com".toTldPlusOne()
             sitePreferencesDao.desktopModeDomainsFlow().collect { domains ->
-                desktopModeDomains.clear()
+                // Add then retain (never clear) so a concurrent read never sees an empty set and reports off.
                 desktopModeDomains.addAll(domains)
+                desktopModeDomains.retainAll(domains)
                 cachePrimed = true
             }
         }
