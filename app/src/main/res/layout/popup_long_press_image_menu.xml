@@ -46,7 +46,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:leadingIcon="@drawable/ic_downloads_24"
-        app:popupLeadingIconSize="24dp"
         app:primaryText="@string/downloadImage" />
 
     <com.duckduckgo.common.ui.view.PopupMenuItemView
@@ -54,6 +53,5 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:leadingIcon="@drawable/ic_open_in_24"
-        app:popupLeadingIconSize="24dp"
         app:primaryText="@string/openImageInNewTab" />
 </LinearLayout>

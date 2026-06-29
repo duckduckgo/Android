@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.browser.longpress
+package com.duckduckgo.app.browser.contextmenu
 
 import android.view.ContextThemeWrapper
 import android.view.LayoutInflater
