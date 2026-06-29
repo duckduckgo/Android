@@ -55,4 +55,8 @@ sealed class TabSwitcherItem(val id: String) {
             const val TRACKER_ANIMATION_PANEL_ID = "TrackersAnimationInfoPanel"
         }
     }
+
+    data object FireTabsPromo : TabSwitcherItem("FireTabsPromo") {
+        const val FIRE_TABS_PROMO_ID = "FireTabsPromo"
+    }
 }

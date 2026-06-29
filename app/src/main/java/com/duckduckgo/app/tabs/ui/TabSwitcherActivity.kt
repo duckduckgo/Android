@@ -939,6 +939,7 @@ class TabSwitcherActivity :
                 }
                 is TrackersAnimationInfoPanel -> Unit
                 is SelectableTab -> Unit
+                is TabSwitcherItem.FireTabsPromo -> Unit
             }
         }
     }

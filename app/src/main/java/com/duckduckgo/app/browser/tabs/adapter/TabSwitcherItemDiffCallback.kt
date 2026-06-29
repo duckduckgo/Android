@@ -48,6 +48,7 @@ class TabSwitcherItemDiffCallback(
                     (oldItem as? SelectableTab)?.isSelected == (newItem as? SelectableTab)?.isSelected &&
                     (oldItem as? SelectableTab)?.isDuckAi == (newItem as? SelectableTab)?.isDuckAi
             }
+            oldItem is TabSwitcherItem.FireTabsPromo && newItem is TabSwitcherItem.FireTabsPromo -> true
             else -> false
         }
     }
