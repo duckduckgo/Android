@@ -20,6 +20,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/fireTabsPromoContainer"
     style="@style/Widget.DuckDuckGo.MessageCta"
+    android:layout_marginHorizontal="6dp"
+    android:layout_marginVertical="@dimen/keyline_2"
     android:clipChildren="false">
 
     <androidx.constraintlayout.widget.ConstraintLayout
