@@ -245,6 +245,12 @@ class NativeInputModeWidgetViewModel @Inject constructor(
 
     fun fireStopGenerationTapped() = duckChatPixels.fireStopGenerationTapped()
 
+    fun fireClearPressed(isSearchMode: Boolean) = duckChatPixels.fireOmnibarClearButtonPressed(isSearchMode)
+    fun fireKeyboardGoPressed(isSearchMode: Boolean) = duckChatPixels.fireOmnibarKeyboardGoPressed(isSearchMode)
+    fun fireFloatingSubmitPressed(isSearchMode: Boolean) = duckChatPixels.fireOmnibarFloatingSubmitPressed(isSearchMode)
+    fun fireFloatingReturnPressed() = duckChatPixels.fireOmnibarFloatingReturnPressed()
+    fun fireModeSwitched(directionToSearch: Boolean, hadText: Boolean) = duckChatPixels.fireOmnibarModeSwitched(directionToSearch, hadText)
+
     private data class WidgetConfig(
         val inputContext: NativeInputState.InputContext = NativeInputState.InputContext.BROWSER,
         val inputPosition: NativeInputState.InputPosition = NativeInputState.InputPosition.TOP,
