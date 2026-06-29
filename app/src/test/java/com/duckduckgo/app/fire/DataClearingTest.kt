@@ -20,6 +20,7 @@ package com.duckduckgo.app.fire
 
 import android.annotation.SuppressLint
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.duckduckgo.app.fire.promo.FireTabsPromos
 import com.duckduckgo.app.fire.store.FireDataStore
 import com.duckduckgo.app.fire.store.TabVisitedSitesRepository
 import com.duckduckgo.app.fire.wideevents.DataClearingWideEvent
@@ -127,6 +128,9 @@ class DataClearingTest {
     @Mock
     private lateinit var mockDataClearingTrigger: DataClearingTrigger
 
+    @Mock
+    private lateinit var mockFireTabsPromos: FireTabsPromos
+
     private val showClearDuckAIChatHistoryFlow = MutableStateFlow(true)
     private val showOnAppLaunchOptionFlow = MutableStateFlow<ShowOnAppLaunchOption>(ShowOnAppLaunchOption.LastOpenedTab)
 
@@ -161,6 +165,7 @@ class DataClearingTest {
             contextualDataStore = mockContextualDataStore,
             showOnAppLaunchOptionDataStore = mockShowOnAppLaunchOptionDataStore,
             dataClearingTrigger = mockDataClearingTrigger,
+            fireTabsPromos = mockFireTabsPromos,
         )
     }
 
@@ -1363,6 +1368,27 @@ class DataClearingTest {
         testee.clearTabContextualChat("tab1", browserMode = BrowserMode.REGULAR)
 
         verify(mockDataClearingTrigger, never()).clearData(argThat { hasFireScopedType() })
+    }
+
+    // --- FireTabsPromos recording ---
+
+    @Test
+    fun whenManualBurnInRegularModeThenUserBurnedRecorded() = runTest {
+        testee.clearDataUsingManualFireOptions(browserMode = BrowserMode.REGULAR)
+        verify(mockFireTabsPromos).onUserBurned()
+    }
+
+    @Test
+    fun whenManualBurnInFireModeThenUserBurnedNotRecorded() = runTest {
+        testee.clearDataUsingManualFireOptions(browserMode = BrowserMode.FIRE)
+        verify(mockFireTabsPromos, never()).onUserBurned()
+    }
+
+    @Test
+    fun whenSingleTabBurnInRegularModeThenUserBurnedRecorded() = runTest {
+        whenever(mockClearDataAction.clearDataForSpecificDomains(any())).thenReturn(ClearDataResult.Success)
+        testee.clearSingleTabData(tabId = "tab-1", replaceCurrentTab = false, browserMode = BrowserMode.REGULAR)
+        verify(mockFireTabsPromos).onUserBurned()
     }
 
     private fun Set<ClearableData>.hasFireScopedType() = any { t ->
