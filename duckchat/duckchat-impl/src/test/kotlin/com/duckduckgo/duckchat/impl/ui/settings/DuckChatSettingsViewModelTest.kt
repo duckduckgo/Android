@@ -613,6 +613,8 @@ class DuckChatSettingsViewModelTest {
     @Test
     fun `when DuckChatNativeSettingsNoParams passed then viewState shows search section hidden`() =
         runTest {
+            @Suppress("DenyListedApi")
+            duckChatFeature.aiFeaturesNativeControls().setRawStoredState(State(enable = false))
             testee = DuckChatSettingsViewModel(
                 duckChatActivityParams = DuckChatNativeSettingsNoParams,
                 duckChat = duckChat,
