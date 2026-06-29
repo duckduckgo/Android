@@ -21,7 +21,6 @@ import com.duckduckgo.app.onboarding.OnboardingFlowChecker
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.browsermode.api.BrowserModeStateHolder
 import com.duckduckgo.browsermode.api.FireModeAvailability
-import com.duckduckgo.browsermode.impl.FireModeFeature
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.Toggle
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -40,7 +39,7 @@ class RealFireTabsPromosTest {
     @get:Rule val coroutineRule = CoroutineTestRule()
 
     private val fireModeAvailability: FireModeAvailability = mock()
-    private val fireModeFeature: FireModeFeature = mock()
+    private val fireTabsPromoFeature: FireTabsPromoFeature = mock()
     private val promoToggle: Toggle = mock()
     private val fireDataStore: FireDataStore = mock()
     private val onboardingFlowChecker: OnboardingFlowChecker = mock()
@@ -49,7 +48,7 @@ class RealFireTabsPromosTest {
     private val testee by lazy {
         RealFireTabsPromos(
             fireModeAvailability = fireModeAvailability,
-            fireModeFeature = fireModeFeature,
+            fireTabsPromoFeature = fireTabsPromoFeature,
             fireDataStore = fireDataStore,
             onboardingFlowChecker = onboardingFlowChecker,
             browserModeStateHolder = browserModeStateHolder,
@@ -59,7 +58,7 @@ class RealFireTabsPromosTest {
 
     @Before
     fun setup() {
-        whenever(fireModeFeature.fireTabsPromo()).thenReturn(promoToggle)
+        whenever(fireTabsPromoFeature.self()).thenReturn(promoToggle)
         whenever(browserModeStateHolder.currentMode).thenReturn(MutableStateFlow(BrowserMode.REGULAR))
     }
 

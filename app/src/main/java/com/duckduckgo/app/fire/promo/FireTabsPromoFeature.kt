@@ -14,21 +14,24 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.browsermode.impl
+package com.duckduckgo.app.fire.promo
 
 import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
 
+/**
+ * Remote kill-switch for the Fire Tabs promos (NTP card and tab-switcher banner).
+ *
+ * Enabled by default; can be turned off remotely to stop showing the promos once
+ * they have run their course.
+ */
 @ContributesRemoteFeature(
     scope = AppScope::class,
-    featureName = "fireMode",
+    featureName = "fireTabsPromo",
 )
-interface FireModeFeature {
-    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+interface FireTabsPromoFeature {
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun self(): Toggle
-
-    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
-    fun fireTabs(): Toggle
 }

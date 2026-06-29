@@ -21,7 +21,6 @@ import com.duckduckgo.app.onboarding.OnboardingFlowChecker
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.browsermode.api.BrowserModeStateHolder
 import com.duckduckgo.browsermode.api.FireModeAvailability
-import com.duckduckgo.browsermode.impl.FireModeFeature
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
@@ -40,7 +39,7 @@ interface FireTabsPromos {
 @ContributesBinding(AppScope::class)
 class RealFireTabsPromos @Inject constructor(
     private val fireModeAvailability: FireModeAvailability,
-    private val fireModeFeature: FireModeFeature,
+    private val fireTabsPromoFeature: FireTabsPromoFeature,
     private val fireDataStore: FireDataStore,
     private val onboardingFlowChecker: OnboardingFlowChecker,
     private val browserModeStateHolder: BrowserModeStateHolder,
@@ -78,7 +77,7 @@ class RealFireTabsPromos @Inject constructor(
 
     private suspend fun commonGate(): Boolean =
         fireModeAvailability.isAvailable() &&
-            fireModeFeature.fireTabsPromo().isEnabled() &&
+            fireTabsPromoFeature.self().isEnabled() &&
             browserModeStateHolder.currentMode.value == BrowserMode.REGULAR &&
             onboardingFlowChecker.isOnboardingComplete()
 }
