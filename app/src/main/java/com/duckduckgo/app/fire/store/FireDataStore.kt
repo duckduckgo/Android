@@ -18,6 +18,7 @@ package com.duckduckgo.app.fire.store
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.core.stringSetPreferencesKey
@@ -30,6 +31,7 @@ import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
@@ -120,6 +122,13 @@ interface FireDataStore {
      * @param option The option determining when to automatically clear data.
      */
     suspend fun setAutomaticallyClearWhenOption(option: ClearWhenOption)
+
+    suspend fun setNtpPromoDismissed(dismissed: Boolean)
+    suspend fun isNtpPromoDismissed(): Boolean
+    suspend fun setTabSwitcherPromoDismissed(dismissed: Boolean)
+    suspend fun isTabSwitcherPromoDismissed(): Boolean
+    suspend fun setUserBurnedWhileBrowsing(burned: Boolean)
+    suspend fun hasUserBurnedWhileBrowsing(): Boolean
 }
 
 @ContributesBinding(AppScope::class)
@@ -135,6 +144,9 @@ class SharedPreferencesFireDataStore @Inject constructor(
         val KEY_AUTOMATIC_CLEAR_OPTIONS = stringSetPreferencesKey(name = "AUTOMATIC_CLEAR_OPTIONS")
         val KEY_AUTOMATIC_CLEAR_WHEN_OPTION = stringPreferencesKey(name = "AUTOMATIC_CLEAR_WHEN_OPTION")
         val DEFAULT_OPTIONS = setOf(FireClearOption.TABS, FireClearOption.DATA)
+        val KEY_FIRE_TABS_NTP_PROMO_DISMISSED = booleanPreferencesKey(name = "FIRE_TABS_NTP_PROMO_DISMISSED")
+        val KEY_FIRE_TABS_TAB_SWITCHER_PROMO_DISMISSED = booleanPreferencesKey(name = "FIRE_TABS_TAB_SWITCHER_PROMO_DISMISSED")
+        val KEY_FIRE_TABS_USER_BURNED_WHILE_BROWSING = booleanPreferencesKey(name = "FIRE_TABS_USER_BURNED_WHILE_BROWSING")
     }
 
     private suspend fun getLegacyOptions(): Set<FireClearOption> = withContext(dispatcherProvider.io()) {
@@ -260,6 +272,27 @@ class SharedPreferencesFireDataStore @Inject constructor(
             preferences[KEY_AUTOMATIC_CLEAR_WHEN_OPTION] = option.name
         }
     }
+
+    override suspend fun setNtpPromoDismissed(dismissed: Boolean) {
+        store.edit { it[KEY_FIRE_TABS_NTP_PROMO_DISMISSED] = dismissed }
+    }
+
+    override suspend fun isNtpPromoDismissed(): Boolean =
+        store.data.map { it[KEY_FIRE_TABS_NTP_PROMO_DISMISSED] ?: false }.first()
+
+    override suspend fun setTabSwitcherPromoDismissed(dismissed: Boolean) {
+        store.edit { it[KEY_FIRE_TABS_TAB_SWITCHER_PROMO_DISMISSED] = dismissed }
+    }
+
+    override suspend fun isTabSwitcherPromoDismissed(): Boolean =
+        store.data.map { it[KEY_FIRE_TABS_TAB_SWITCHER_PROMO_DISMISSED] ?: false }.first()
+
+    override suspend fun setUserBurnedWhileBrowsing(burned: Boolean) {
+        store.edit { it[KEY_FIRE_TABS_USER_BURNED_WHILE_BROWSING] = burned }
+    }
+
+    override suspend fun hasUserBurnedWhileBrowsing(): Boolean =
+        store.data.map { it[KEY_FIRE_TABS_USER_BURNED_WHILE_BROWSING] ?: false }.first()
 
     private fun parseOptionsFromStrings(stringSet: Set<String>): Set<FireClearOption> {
         return stringSet.mapNotNull { name ->
