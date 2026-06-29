@@ -526,7 +526,7 @@ class TabSwitcherActivity :
         val shouldHighlightFireToggle = state.browserMode == BrowserMode.REGULAR &&
             (state.isFireTabsPromoVisible || highlightFromCta)
         browserModeToggle?.setFireSegmentHighlighted(shouldHighlightFireToggle)
-        binding.fireTabsPromoBanner.root.isVisible = state.isFireTabsPromoVisible
+        binding.fireTabsPromoBanner.root.isVisible = state.browserMode == BrowserMode.REGULAR && state.isFireTabsPromoVisible
     }
 
     private fun fadeOutTabsThenRecreate(newMode: BrowserMode) {
