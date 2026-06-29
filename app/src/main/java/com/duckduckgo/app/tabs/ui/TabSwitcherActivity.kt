@@ -340,7 +340,7 @@ class TabSwitcherActivity :
         if (fadingOutForRecreate) {
             outState.putBoolean(KEY_FADE_IN_AFTER_RECREATE, true)
         }
-        if (launchedWithFireHighlight) {
+        if (launchedWithFireHighlight && !isChangingConfigurations) {
             outState.putBoolean(KEY_FIRE_HIGHLIGHT_CONSUMED, true)
         }
     }

@@ -144,9 +144,13 @@ class TabSwitcherViewModel @Inject constructor(
         ),
     )
 
+    private var tabSwitcherPromoHandled = false
+
     init {
         viewModelScope.launch {
-            if (fireTabsPromos.canShowTabSwitcherPromo()) {
+            val canShow = fireTabsPromos.canShowTabSwitcherPromo()
+            if (canShow && !tabSwitcherPromoHandled) {
+                tabSwitcherPromoHandled = true
                 fireTabsPromos.onTabSwitcherPromoShown()
                 pixel.fire(AppPixelName.FIRE_TABS_PROMO_TAB_SWITCHER_SHOWN)
                 _viewState.update { it.copy(isFireTabsPromoVisible = true) }
@@ -271,6 +275,7 @@ class TabSwitcherViewModel @Inject constructor(
 
         // The promo banner has served its purpose once the user toggles modes; dismiss it so it does not
         // reappear when returning to regular mode (this ViewModel survives the toggle-triggered recreate).
+        tabSwitcherPromoHandled = true
         _viewState.update { it.copy(isFireTabsPromoVisible = false) }
     }
 
@@ -642,6 +647,7 @@ class TabSwitcherViewModel @Inject constructor(
 
     fun onFireTabsPromoDismissed() {
         if (!_viewState.value.isFireTabsPromoVisible) return
+        tabSwitcherPromoHandled = true
         pixel.fire(AppPixelName.FIRE_TABS_PROMO_TAB_SWITCHER_DISMISSED)
         _viewState.update { it.copy(isFireTabsPromoVisible = false) }
     }

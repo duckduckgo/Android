@@ -71,6 +71,7 @@ import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -97,6 +98,7 @@ import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.any
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.atLeastOnce
+import org.mockito.kotlin.doSuspendableAnswer
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
@@ -2246,6 +2248,23 @@ class TabSwitcherViewModelTest {
         testee.viewState.test {
             assertFalse(expectMostRecentItem().isFireTabsPromoVisible)
         }
+    }
+
+    @Test
+    fun whenModeToggledBeforePromoEligibilityResolvesThenBannerNotShown() = runTest {
+        // Suspend the eligibility read so we can toggle modes while it is still in flight.
+        val eligibility = CompletableDeferred<Boolean>()
+        whenever(fireTabsPromos.canShowTabSwitcherPromo()).doSuspendableAnswer { eligibility.await() }
+
+        val testee = createViewModel() // init starts the eligibility read and suspends on it
+        testee.onBrowserModeToggled(BrowserMode.FIRE) // user dismisses the banner before it resolves
+        eligibility.complete(true) // resolves true, but the promo was already handled by the toggle
+        advanceUntilIdle()
+
+        testee.viewState.test {
+            assertFalse(expectMostRecentItem().isFireTabsPromoVisible)
+        }
+        verify(fireTabsPromos, never()).onTabSwitcherPromoShown()
     }
 
     private class FakeTabSwitcherDataStore : TabSwitcherDataStore {
