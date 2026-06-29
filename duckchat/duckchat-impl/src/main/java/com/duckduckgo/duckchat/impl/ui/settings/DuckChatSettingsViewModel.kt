@@ -32,6 +32,7 @@ import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelParameters
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.pixel.fireCountAndDaily
 import com.duckduckgo.duckchat.impl.store.DefaultTogglePosition
+import com.duckduckgo.duckchat.impl.store.HideAiGeneratedImages
 import com.duckduckgo.duckchat.impl.store.SearchAssistVisibility
 import com.duckduckgo.duckchat.impl.ui.settings.DuckChatSettingsViewModel.Command.OpenLink
 import com.duckduckgo.duckchat.impl.ui.settings.DuckChatSettingsViewModel.Command.OpenLinkInNewTab
@@ -83,6 +84,7 @@ class DuckChatSettingsViewModel @AssistedInject constructor(
         val defaultTogglePosition: DefaultTogglePosition = DefaultTogglePosition.SEARCH,
         val isNativeControlsEnabled: Boolean = false,
         val searchAssistVisibility: SearchAssistVisibility = DEFAULT_SEARCH_ASSIST_VISIBILITY,
+        val hideAiGeneratedImages: HideAiGeneratedImages = HideAiGeneratedImages.OFF,
     )
 
     private data class FeatureState(
@@ -130,7 +132,8 @@ class DuckChatSettingsViewModel @AssistedInject constructor(
             featureVisibility,
             duckChat.observeDefaultTogglePosition(),
             observeSearchAssistVisibility(),
-        ) { featureState, featureVisibility, defaultTogglePosition, searchAssistVisibility ->
+            observeHideAiGeneratedImages(),
+        ) { featureState, featureVisibility, defaultTogglePosition, searchAssistVisibility, hideAiGeneratedImages ->
             val isDuckChatUserEnabled = featureState.isDuckChatUserEnabled
             val isInputScreenEnabled = featureState.isCosmeticInputScreenEnabled ?: featureState.isInputScreenEnabled
             ViewState(
@@ -147,6 +150,7 @@ class DuckChatSettingsViewModel @AssistedInject constructor(
                 defaultTogglePosition = defaultTogglePosition,
                 isNativeControlsEnabled = featureVisibility.isNativeControlsEnabled,
                 searchAssistVisibility = searchAssistVisibility ?: DEFAULT_SEARCH_ASSIST_VISIBILITY,
+                hideAiGeneratedImages = hideAiGeneratedImages,
             )
         }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ViewState())
 
@@ -170,6 +174,10 @@ class DuckChatSettingsViewModel @AssistedInject constructor(
 
         data class ShowSearchAssistDialog(
             val currentVisibility: SearchAssistVisibility,
+        ) : Command()
+
+        data class ShowHideAiGeneratedImagesDialog(
+            val current: HideAiGeneratedImages,
         ) : Command()
     }
 
@@ -244,15 +252,32 @@ class DuckChatSettingsViewModel @AssistedInject constructor(
 
     fun onDuckAiHideAiGeneratedImagesClicked() {
         viewModelScope.launch {
-            commandChannel.send(
-                OpenLink(
-                    link = DUCK_CHAT_HIDE_GENERATED_IMAGES_LINK_EMBEDDED,
-                    titleRes = R.string.duckAiSerpSettingsTitle,
-                ),
-            )
-            pixel.fire(DuckChatPixelName.SERP_SETTINGS_OPEN_HIDE_AI_GENERATED_IMAGES)
+            if (duckChatFeature.aiFeaturesNativeControls().isEnabled()) {
+                commandChannel.send(Command.ShowHideAiGeneratedImagesDialog(viewState.value.hideAiGeneratedImages))
+            } else {
+                commandChannel.send(
+                    OpenLink(
+                        link = DUCK_CHAT_HIDE_GENERATED_IMAGES_LINK_EMBEDDED,
+                        titleRes = R.string.duckAiSerpSettingsTitle,
+                    ),
+                )
+                // Only fires when we open the SERP settings webview; the native dialog is a different surface.
+                pixel.fire(DuckChatPixelName.SERP_SETTINGS_OPEN_HIDE_AI_GENERATED_IMAGES)
+            }
         }
     }
+
+    fun onHideAiGeneratedImagesSelected(option: HideAiGeneratedImages) {
+        viewModelScope.launch {
+            // The SERP blob is the single source of truth, so the web reflects this on its next getNativeSettings.
+            serpSettingsDataProvider.setSetting(HideAiGeneratedImages.SERP_SETTINGS_KEY, option.serpCode)
+        }
+    }
+
+    // Defaults to OFF (show) until the user (or SERP) has provided a value.
+    private fun observeHideAiGeneratedImages(): Flow<HideAiGeneratedImages> =
+        serpSettingsDataProvider.observeSetting(HideAiGeneratedImages.SERP_SETTINGS_KEY)
+            .map { HideAiGeneratedImages.fromSerpCode(it) }
 
     fun onDuckAiShortcutsClicked() {
         viewModelScope.launch {
