@@ -50,6 +50,7 @@ import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.api.InputMode
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState.InteractionLock
 import com.duckduckgo.duckchat.api.toChatIdOrNull
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.ui.nativeinput.views.NativeInputWidget
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionPurchase
@@ -144,6 +145,7 @@ class RealNativeInputManager @Inject constructor(
     private val duckAiFeatureState: DuckAiFeatureState,
     private val pixel: Pixel,
     private val nativeInputStateBugKillSwitch: NativeInputStateBugKillSwitch,
+    private val duckChatPixels: DuckChatPixels,
 ) : NativeInputManager {
     private lateinit var omnibarController: NativeInputOmnibarController
     private lateinit var rootView: ViewGroup
@@ -449,6 +451,9 @@ class RealNativeInputManager @Inject constructor(
         } else {
             showNtp()
         }
+        duckChatPixels.fireOmnibarShown()
+        val landscape = rootView.resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
+        duckChatPixels.fireOmnibarTextAreaFocused(landscape = landscape)
     }
 
     private fun bindSearchCallbacks(
