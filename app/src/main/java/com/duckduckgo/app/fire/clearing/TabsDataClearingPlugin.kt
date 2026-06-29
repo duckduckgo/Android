@@ -27,7 +27,7 @@ import logcat.logcat
 import javax.inject.Inject
 
 /** Clears tabs. For now, only Fire mode tabs are being cleared, but after the Regular mode clearing
- *  gets migrated to plugins, @ClearableData.Tabs.All will delete all tabs.
+ *  gets migrated to plugins (as part of the Modularization AOI), @ClearableData.Tabs.All will delete all tabs.
  */
 @ContributesMultibinding(AppScope::class)
 class TabsDataClearingPlugin @Inject constructor(

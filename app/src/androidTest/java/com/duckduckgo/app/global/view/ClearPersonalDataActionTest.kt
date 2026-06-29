@@ -423,7 +423,12 @@ class ClearPersonalDataActionTest {
         )
         val clearedDomains = mutableListOf<String>()
         val testeeWithCapture = createTestee(
-            siteDataCleaner = { _, domain -> clearedDomains.add(domain) },
+            siteDataCleaner = object : SiteDataCleaner {
+                override suspend fun deleteSiteData(webStorage: WebStorage, domain: String) {
+                    clearedDomains.add(domain)
+                }
+                override suspend fun deleteAllBrowsingData(webStorage: WebStorage) {}
+            },
         )
         val result = testeeWithCapture.clearDataForSpecificDomains(domains = setOf("192.168.1.1", "localhost", "clearable.com"))
         assertTrue(result is ClearDataResult.Success)
