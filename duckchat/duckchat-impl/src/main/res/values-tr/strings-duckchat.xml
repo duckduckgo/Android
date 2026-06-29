@@ -95,6 +95,24 @@
     <string name="duckAiHideAiGeneratedImagesTitle">Yapay Zeka Tarafından Oluşturulan Görselleri Gizle</string>
     <string name="duckAiHideAiGeneratedImagesDescription">Görsel arama sonuçlarından yapay zeka tarafından üretilmiş görselleri filtreler</string>
 
+    <!-- Search Assist Visibility -->
+    <string name="duckAiSearchAssistVisibilityTitle">Search Assist Görünürlüğü</string>
+    <string name="duckAiSearchAssistVisibilitySubtitle">Yapay zeka destekli yanıtların aramalarınızda ne sıklıkta görünmesini istediğinizi seçin.</string>
+    <string name="duckAiSearchAssistVisibilityNever">Hiçbir zaman</string>
+    <string name="duckAiSearchAssistVisibilityOnDemand">Talep Üzerine</string>
+    <string name="duckAiSearchAssistVisibilitySometimes">Bazen</string>
+    <string name="duckAiSearchAssistVisibilityOften">Sıklıkla</string>
+
+    <!-- Duck AI Use Without AI Settings Option -->
+    <string name="duckAiUseWithoutAiTitle">DuckDuckGo\'yu AI Olmadan Kullanın</string>
+    <string name="duckAiUseWithoutAiDescription">Duck.ai\'yi devre dışı bırakır, aramalarda yapay zeka destekli yanıtları gizler ve görsel arama sonuçlarında bilinen yapay zeka spam sitelerini filtreler.</string>
+    <string name="duckAiUseWithoutAiDisabledDescription">Tarayıcıda yapay zeka şimdilik devre dışı bırakıldı. Bu nedenle artık yapay zeka destekli yanıtları göremeyecek ve görsel arama sonuçlarında yapay zeka tarafından oluşturulmuş daha az görsel göreceksiniz.</string>
+
+    <!-- Duck AI Section in AI Feature Screen -->
+    <string name="input_screen_user_pref_toggle_between_search_and_ai">Arama ile\nDuck.ai arasında geçiş yapın</string>
+    <string name="duckAiDialogHideAiGeneratedImagesTitle">Yapay Zeka Tarafından Oluşturulan Görselleri Gizle</string>
+    <string name="duckAiDialogHideAiGeneratedImagesDescription">Görsel arama sonuçlarından bilinen yapay zeka spam sitelerini filtreler. <annotation link="learn_more">Daha fazla bilgi</annotation></string>
+
     <!-- Duck AI Paid Settings -->
     <string name="duck_ai_paid_settings_enable_in_settings">AI Özellikleri Ayarlarında etkinleştir</string>
     <string name="duck_ai_paid_settings_manage_in_settings">AI Özellikleri Ayarlarında Yönet</string>
@@ -182,4 +200,10 @@
     <string name="duck_ai_chat_history_download_view">Göster</string>
     <string name="duck_ai_chat_history_download_error">Sohbet dışa aktarılamadı</string>
     <string name="duck_ai_chat_history_bulk_download_error">Sohbetler dışa aktarılamadı</string>
+
+    <!-- Example message card: internal-only showcase of NativeInputChatTabItemPlugin, not shipped to
+         users, so these are not localized (translatable="false"). Delete with the example. -->
+    <string name="duckChatExampleMessageCardTitle" translatable="false">Example message card</string>
+    <string name="duckChatExampleMessageCardSubtitle" translatable="false">Contributed by an ActivePlugin to show how other modules can add items to the Chat tab. Dismiss it to see the card remove itself.</string>
+    <string name="duckChatExampleMessageCardAction" translatable="false">Got it</string>
 </resources>
