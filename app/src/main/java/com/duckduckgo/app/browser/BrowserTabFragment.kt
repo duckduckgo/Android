@@ -1487,6 +1487,7 @@ class BrowserTabFragment :
                     pixel.fire(DuckChatPixelName.DUCK_CHAT_SETTINGS_SIDEBAR_TAPPED)
                     viewModel.openDuckChatHistory()
                 },
+                onChatSuggestionDelete = { chatUrl -> showChatSuggestionFireDialog(chatUrl) },
                 onStopTapped = {
                     contentScopeScripts.sendSubscriptionEvent(
                         SubscriptionEventData(
@@ -1645,6 +1646,13 @@ class BrowserTabFragment :
 
     private fun onOmnibarCustomTabClosed() {
         requireActivity().finish()
+    }
+
+    private fun showChatSuggestionFireDialog(chatUrl: String) {
+        viewLifecycleOwner.lifecycleScope.launch {
+            val dialog = fireDialogProvider.createFireDialog(FireDialogOrigin.ChatHistory(selectedChatUrls = setOf(chatUrl)))
+            dialog.show(parentFragmentManager)
+        }
     }
 
     private fun onOmnibarCustomTabPrivacyDashboardPressed() {

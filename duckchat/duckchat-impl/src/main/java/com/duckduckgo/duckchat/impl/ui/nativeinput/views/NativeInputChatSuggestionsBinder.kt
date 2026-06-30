@@ -26,6 +26,7 @@ import com.duckduckgo.common.utils.plugins.ActivePluginPoint
 import com.duckduckgo.duckchat.api.DuckChatInputModeState
 import com.duckduckgo.duckchat.api.inputscreen.NativeInputChatTabItem
 import com.duckduckgo.duckchat.api.inputscreen.NativeInputChatTabItemPlugin
+import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.inputscreen.ui.InputScreenConfigResolver
 import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.ChatHistoryShortcutAdapter
 import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.ChatSearchSuggestionAdapter
@@ -47,6 +48,7 @@ class NativeInputChatSuggestionsBinder @Inject constructor(
     private val inputScreenConfigResolver: InputScreenConfigResolver,
     private val chatItemPlugins: ActivePluginPoint<NativeInputChatTabItemPlugin>,
     private val inputModeState: DuckChatInputModeState,
+    private val duckChatFeature: DuckChatFeature,
 ) {
 
     class Binding internal constructor(
@@ -174,8 +176,13 @@ class NativeInputChatSuggestionsBinder @Inject constructor(
         onChatUrlSuggestionClicked: (AutoCompleteSuggestion) -> Unit,
         onSearchForQuerySubmitted: (String) -> Unit,
         onChatHistoryShortcutClicked: () -> Unit,
+        onChatSuggestionDeleteClicked: (ChatSuggestion) -> Unit = {},
     ): Binding {
-        val chatSuggestionsAdapter = ChatSuggestionsAdapter { onChatSuggestionSelected(it) }
+        val chatSuggestionsAdapter = ChatSuggestionsAdapter(
+            showDeleteButton = duckChatFeature.removeChatHistory().isEnabled(),
+            onChatClicked = { onChatSuggestionSelected(it) },
+            onDeleteClicked = { onChatSuggestionDeleteClicked(it) },
+        )
         val urlAdapter = BrowserAutoCompleteSuggestionsAdapter(
             immediateSearchClickListener = { onChatUrlSuggestionClicked(it) },
             editableSearchClickListener = { },

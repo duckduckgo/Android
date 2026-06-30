@@ -85,6 +85,8 @@ class NativeInputCallbacks(
     val onCustomizeResponsesClicked: () -> Unit = {},
     val onChatUrlSuggestionClicked: (AutoCompleteSuggestion) -> Unit = {},
     val onChatHistoryShortcutClicked: () -> Unit = {},
+    /** User tapped the per-row delete (fire) affordance on a chat-history suggestion. Param is the chat URL. */
+    val onChatSuggestionDelete: (chatUrl: String) -> Unit = {},
     val onClearAutocomplete: () -> Unit,
     val onStopTapped: () -> Unit,
     val onFireButtonPressed: () -> Unit = {},
@@ -869,6 +871,9 @@ class RealNativeInputManager @Inject constructor(
             onChatHistoryShortcutClicked = {
                 hideNativeInput(isNavigation = true)
                 callbacks.onChatHistoryShortcutClicked()
+            },
+            onChatSuggestionDelete = { chatUrl ->
+                callbacks.onChatSuggestionDelete(chatUrl)
             },
             onShowSuggestions = { chatAdapter ->
                 if (autoCompleteList.adapter === chatAdapter) {
