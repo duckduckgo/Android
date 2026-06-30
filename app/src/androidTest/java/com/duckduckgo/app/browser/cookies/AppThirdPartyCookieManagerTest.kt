@@ -25,6 +25,8 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.browser.cookies.db.AuthCookiesAllowedDomainsDao
 import com.duckduckgo.app.browser.cookies.db.AuthCookiesAllowedDomainsRepository
 import com.duckduckgo.app.global.db.AppDatabase
+import com.duckduckgo.browsermode.api.BrowserMode
+import com.duckduckgo.browsermode.impl.RealBrowserModeStateHolder
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.cookies.api.ThirdPartyCookieNames
 import com.duckduckgo.cookies.impl.DefaultCookieManagerProvider
@@ -44,8 +46,8 @@ class AppThirdPartyCookieManagerTest {
     @get:Rule
     var coroutinesTestRule = CoroutineTestRule()
 
-    private val cookieManagerProvider = DefaultCookieManagerProvider()
-    private val cookieManager = cookieManagerProvider.get()!!
+    private val cookieManagerProvider = DefaultCookieManagerProvider(mock(), RealBrowserModeStateHolder())
+    private val cookieManager = cookieManagerProvider.forMode(BrowserMode.REGULAR)!!
     private lateinit var db: AppDatabase
     private lateinit var authCookiesAllowedDomainsDao: AuthCookiesAllowedDomainsDao
     private lateinit var authCookiesAllowedDomainsRepository: AuthCookiesAllowedDomainsRepository

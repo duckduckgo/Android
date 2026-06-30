@@ -64,7 +64,7 @@ class UrlExtractingWebViewClientTest {
             coroutinesTestRule.testDispatcherProvider,
             urlExtractor,
         )
-        whenever(cookieManagerProvider.get()).thenReturn(cookieManager)
+        whenever(cookieManagerProvider.forCurrentBrowserMode()).thenReturn(cookieManager)
     }
 
     @UiThreadTest

@@ -76,7 +76,7 @@ class RedditBlockWorkaroundTest {
     @Test
     fun `on resume with netp enabled noops if reddit_session present`() = runTest {
         whenever(networkProtectionState.isEnabled()).thenReturn(true)
-        cookieManager.setCookie(".reddit.com", "reddit_session=value;")
+        cookieManager.setCookieOnAllProfiles(".reddit.com", "reddit_session=value;")
 
         redditBlockWorkaround.onResume(lifecycleOwner)
         assertEquals("reddit_session=value;", cookieManager.getCookie(".reddit.com"))
@@ -85,7 +85,7 @@ class RedditBlockWorkaroundTest {
     @Test
     fun `on resume with netp disabled noops if reddit_session present`() = runTest {
         whenever(networkProtectionState.isEnabled()).thenReturn(false)
-        cookieManager.setCookie(".reddit.com", "reddit_session=value;")
+        cookieManager.setCookieOnAllProfiles(".reddit.com", "reddit_session=value;")
 
         redditBlockWorkaround.onResume(lifecycleOwner)
         assertEquals("reddit_session=value;", cookieManager.getCookie(".reddit.com"))
@@ -94,7 +94,7 @@ class RedditBlockWorkaroundTest {
     @Test
     fun `on pause expires the reddit_session dummy if present`() = runTest {
         whenever(networkProtectionState.isEnabled()).thenReturn(false)
-        cookieManager.setCookie(".reddit.com", "reddit_session=;")
+        cookieManager.setCookieOnAllProfiles(".reddit.com", "reddit_session=;")
         redditBlockWorkaround.onPause(lifecycleOwner)
         assertEquals("reddit_session=; Expires=Wed, 21 Oct 2015 07:28:00 GMT", cookieManager.getCookie(".reddit.com"))
     }
@@ -120,7 +120,7 @@ class FakeCookieManagerWrapper() : CookieManagerWrapper {
     }
 
     // Function to set cookies for a specific URL or domain
-    override fun setCookie(url: String, cookieString: String) {
+    override fun setCookieOnAllProfiles(url: String, cookieString: String) {
         val uri = URI(url)
         val domain = runCatching { if (uri.host.startsWith(".")) uri.host.substring(1) else uri.host }.getOrElse { url }
         val cookie = Cookie.fromString(cookieString)

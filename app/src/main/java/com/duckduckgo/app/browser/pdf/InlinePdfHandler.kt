@@ -160,7 +160,7 @@ class RealInlinePdfHandler @Inject constructor(
 
             val requestBuilder = Request.Builder().url(url)
 
-            val cookie = cookieManagerProvider.get()?.getCookie(url)
+            val cookie = cookieManagerProvider.forCurrentBrowserMode()?.getCookie(url)
             if (cookie != null) {
                 requestBuilder.addHeader("Cookie", cookie)
             }

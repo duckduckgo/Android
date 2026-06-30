@@ -16,7 +16,7 @@
 
 package com.duckduckgo.downloads.impl
 
-import android.webkit.CookieManager
+import com.duckduckgo.cookies.api.CookieManagerProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
@@ -24,14 +24,17 @@ import javax.inject.Inject
 // This class is basically a convenience wrapper for easier testing
 interface CookieManagerWrapper {
     /**
-     * @return the cookie stored for the given [url] if any, null otherwise
+     * @return the cookie stored for the given [url] in the active browser mode's cookie store, or
+     * null if none.
      */
     fun getCookie(url: String): String?
 }
 
 @ContributesBinding(AppScope::class)
-class CookieManagerWrapperImpl @Inject constructor() : CookieManagerWrapper {
+class CookieManagerWrapperImpl @Inject constructor(
+    private val cookieManagerProvider: CookieManagerProvider,
+) : CookieManagerWrapper {
     override fun getCookie(url: String): String? {
-        return CookieManager.getInstance().getCookie(url)
+        return cookieManagerProvider.forCurrentBrowserMode()?.getCookie(url)
     }
 }

@@ -61,7 +61,7 @@ class InlinePdfHandlerTest {
     private val androidBrowserConfigFeature = FakeFeatureToggleFactory.create(AndroidBrowserConfigFeature::class.java)
 
     private val cookieManagerProvider = object : CookieManagerProvider {
-        override fun get(): CookieManager? = null
+        override fun forCurrentBrowserMode(): CookieManager? = null
     }
 
     @Before
@@ -385,7 +385,7 @@ class InlinePdfHandlerTest {
         val mockCookieManager: CookieManager = mock()
         whenever(mockCookieManager.getCookie(any())).thenReturn("session=abc123")
         val cookieAwareProvider = object : CookieManagerProvider {
-            override fun get(): CookieManager = mockCookieManager
+            override fun forCurrentBrowserMode(): CookieManager = mockCookieManager
         }
         val handlerWithCookies = RealInlinePdfHandler(
             context = InstrumentationRegistry.getInstrumentation().targetContext,

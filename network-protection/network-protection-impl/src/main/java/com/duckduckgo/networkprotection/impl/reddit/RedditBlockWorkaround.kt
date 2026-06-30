@@ -16,11 +16,13 @@
 
 package com.duckduckgo.networkprotection.impl.reddit
 
-import android.webkit.CookieManager
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.cookies.api.CookieManagerProvider
+import com.duckduckgo.cookies.api.setCookieForAllModes
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.squareup.anvil.annotations.ContributesMultibinding
@@ -28,6 +30,7 @@ import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import logcat.asLog
 import logcat.logcat
 import javax.inject.Inject
@@ -63,7 +66,7 @@ class RedditBlockWorkaround @Inject constructor(
                 // if the VPN is enabled and there's no reddit_session cookie we just add a fake one
                 // when the user logs into reddit, the fake reddit_session cookie is replaced automatically by the correct one
                 // when the user logs out, the reddit_session cookie is cleared
-                cookieManager.setCookie(HTTPS_WWW_REDDIT_COM, REDDIT_SESSION_)
+                setCookieOnAllProfiles(HTTPS_WWW_REDDIT_COM, REDDIT_SESSION_)
             } else {
                 removeRedditEmptyCookie()
             }
@@ -72,11 +75,18 @@ class RedditBlockWorkaround @Inject constructor(
         }
     }
 
-    private fun removeRedditEmptyCookie() {
+    private suspend fun removeRedditEmptyCookie() {
         runCatching {
             if (cookieManager.containsRedditDummyCookie()) {
-                cookieManager.setCookie(HTTPS_WWW_REDDIT_COM, REDDIT_SESSION_EXPIRED_)
+                setCookieOnAllProfiles(HTTPS_WWW_REDDIT_COM, REDDIT_SESSION_EXPIRED_)
             }
+        }
+    }
+
+    // Apply the workaround to every already-resolved browser-mode cookie jar
+    private suspend fun setCookieOnAllProfiles(url: String, cookieString: String) {
+        withContext(dispatcherProvider.io()) {
+            cookieManager.setCookieOnAllProfiles(url, cookieString)
         }
     }
 
@@ -94,7 +104,11 @@ interface CookieManagerWrapper {
      */
     fun getCookie(url: String): String?
 
-    fun setCookie(url: String, cookieString: String)
+    /**
+     * Sets the given [cookieString] for the given [url] on every browser mode's cookie jar (the
+     * default profile plus any non-default profiles).
+     */
+    fun setCookieOnAllProfiles(url: String, cookieString: String)
 }
 
 @Retention(AnnotationRetention.BINARY)
@@ -106,19 +120,19 @@ private annotation class InternalApi
 object CookieManagerWrapperModule {
     @Provides
     @InternalApi
-    fun providesCookieManagerWrapper(): CookieManagerWrapper {
-        return CookieManagerWrapperImpl()
+    fun providesCookieManagerWrapper(cookieManagerProvider: CookieManagerProvider): CookieManagerWrapper {
+        return CookieManagerWrapperImpl(cookieManagerProvider)
     }
 }
-private class CookieManagerWrapperImpl constructor() : CookieManagerWrapper {
+private class CookieManagerWrapperImpl constructor(
+    private val cookieManagerProvider: CookieManagerProvider,
+) : CookieManagerWrapper {
 
-    private val cookieManager: CookieManager by lazy { CookieManager.getInstance() }
     override fun getCookie(url: String): String? {
-        return cookieManager.getCookie(url)
+        return cookieManagerProvider.forMode(BrowserMode.REGULAR)?.getCookie(url)
     }
 
-    override fun setCookie(domain: String, cookie: String) {
-        cookieManager.setCookie(domain, cookie)
-        cookieManager.flush()
+    override fun setCookieOnAllProfiles(url: String, cookieString: String) {
+        cookieManagerProvider.setCookieForAllModes(url, cookieString)
     }
 }

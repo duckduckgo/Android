@@ -48,7 +48,7 @@ class InlinePdfHandlerPreApi31Test {
     private val androidBrowserConfigFeature = FakeFeatureToggleFactory.create(AndroidBrowserConfigFeature::class.java)
 
     private val cookieManagerProvider = object : CookieManagerProvider {
-        override fun get(): CookieManager? = null
+        override fun forCurrentBrowserMode(): CookieManager? = null
     }
 
     @Before

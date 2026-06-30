@@ -59,6 +59,7 @@ import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.FragmentViewModelFactory
+import com.duckduckgo.cookies.api.CookieManagerProvider
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.downloads.api.DOWNLOAD_SNACKBAR_DELAY
 import com.duckduckgo.downloads.api.DOWNLOAD_SNACKBAR_LENGTH
@@ -104,6 +105,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import logcat.LogPriority.WARN
 import logcat.logcat
 import org.json.JSONObject
 import java.io.File
@@ -185,7 +187,10 @@ open class DuckChatWebViewFragment : DuckDuckGoFragment(R.layout.activity_duck_c
     @Inject
     lateinit var browserMode: BrowserMode
 
-    private val cookieManager: CookieManager by lazy { CookieManager.getInstance() }
+    @Inject
+    lateinit var cookieManagerProvider: CookieManagerProvider
+
+    private val cookieManager: CookieManager? by lazy { cookieManagerProvider.forMode(browserMode) }
 
     private var pendingFileDownload: PendingFileDownload? = null
 
@@ -208,12 +213,16 @@ open class DuckChatWebViewFragment : DuckDuckGoFragment(R.layout.activity_duck_c
 
         val url = arguments?.getString(KEY_DUCK_AI_URL) ?: "https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5"
 
-        // Explicitly enable cookies for this WebView
-        cookieManager.setAcceptCookie(true)
-        cookieManager.setAcceptThirdPartyCookies(simpleWebview, true)
-
         simpleWebview.let {
-            webViewModeInitializer.bind(it, browserMode)
+            webViewModeInitializer.bind(it, browserMode).onFailure { throwable ->
+                logcat(WARN) { "Duck.ai WebView profile bind failed for $browserMode: ${throwable.message}" }
+            }
+
+            // Explicitly enable cookies for this tab's profile
+            cookieManager?.apply {
+                setAcceptCookie(true)
+                setAcceptThirdPartyCookies(it, true)
+            }
 
             it.webViewClient = webViewClient
             it.webChromeClient = object : WebChromeClient() {
@@ -740,7 +749,7 @@ open class DuckChatWebViewFragment : DuckDuckGoFragment(R.layout.activity_duck_c
         downloadMessagesJob.cancel()
         simpleWebview.onPause()
         appCoroutineScope.launch(dispatcherProvider.io()) {
-            cookieManager.flush()
+            cookieManager?.flush()
         }
         super.onPause()
     }

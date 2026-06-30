@@ -71,10 +71,10 @@ class AppThirdPartyCookieManager(
             // Allow third-party cookies for domains that need cross-domain functionality
             if (hostsThatAlwaysRequireThirdPartyCookies.contains(host) || (domain != null && hasExcludedCookieName())) {
                 logcat { "Cookies enabled for $uri" }
-                cookieManagerProvider.get()?.setAcceptThirdPartyCookies(webView, true)
+                cookieManagerProvider.forCurrentBrowserMode()?.setAcceptThirdPartyCookies(webView, true)
             } else {
                 logcat { "Cookies disabled for $uri" }
-                cookieManagerProvider.get()?.setAcceptThirdPartyCookies(webView, false)
+                cookieManagerProvider.forCurrentBrowserMode()?.setAcceptThirdPartyCookies(webView, false)
             }
             domain?.let { deleteHost(it) }
         }
@@ -98,7 +98,7 @@ class AppThirdPartyCookieManager(
     }
 
     private fun hasExcludedCookieName(): Boolean {
-        return cookieManagerProvider.get()?.getCookie(GOOGLE_ACCOUNTS_URL)?.split(";")?.firstOrNull {
+        return cookieManagerProvider.forCurrentBrowserMode()?.getCookie(GOOGLE_ACCOUNTS_URL)?.split(";")?.firstOrNull {
             thirdPartyCookieNames.hasExcludedCookieName(it)
         } != null
     }

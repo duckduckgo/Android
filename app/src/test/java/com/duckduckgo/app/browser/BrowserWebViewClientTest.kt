@@ -236,7 +236,7 @@ class BrowserWebViewClientTest {
                 )
             testee.webViewClientListener = listener
             whenever(webResourceRequest.url).thenReturn(Uri.EMPTY)
-            whenever(cookieManagerProvider.get()).thenReturn(cookieManager)
+            whenever(cookieManagerProvider.forCurrentBrowserMode()).thenReturn(cookieManager)
             whenever(currentTimeProvider.elapsedRealtime()).thenReturn(0)
             whenever(webViewVersionProvider.getMajorVersion()).thenReturn("1")
             whenever(deviceInfo.appVersion).thenReturn("1")

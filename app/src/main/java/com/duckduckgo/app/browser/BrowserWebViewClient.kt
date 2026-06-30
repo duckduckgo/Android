@@ -703,7 +703,7 @@ class BrowserWebViewClient @Inject constructor(
     private fun flushCookies(webView: WebView) {
         val scope = webView.findViewTreeLifecycleOwner()?.lifecycleScope ?: return
         scope.launch(dispatcherProvider.io()) {
-            cookieManagerProvider.get()?.flush()
+            cookieManagerProvider.forCurrentBrowserMode()?.flush()
         }
     }
 

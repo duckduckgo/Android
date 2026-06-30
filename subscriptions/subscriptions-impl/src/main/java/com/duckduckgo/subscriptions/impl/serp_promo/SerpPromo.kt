@@ -16,12 +16,13 @@
 
 package com.duckduckgo.subscriptions.impl.serp_promo
 
-import android.webkit.CookieManager
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.cookies.api.CookieManagerProvider
+import com.duckduckgo.cookies.api.setCookieForAllModes
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.subscriptions.impl.SubscriptionsFeature
@@ -59,15 +60,16 @@ class RealSerpPromo @Inject constructor(
     private val subscriptions: Lazy<Subscriptions>, // break dep cycle
 ) : SerpPromo, MainProcessLifecycleObserver {
 
-    override suspend fun injectCookie(cookieValue: String?) = withContext(dispatcherProvider.io()) {
-        if (subscriptionsFeature.get().serpPromoCookie().isEnabled()) {
+    override suspend fun injectCookie(cookieValue: String?) {
+        if (!subscriptionsFeature.get().serpPromoCookie().isEnabled()) return
+
+        withContext(dispatcherProvider.io()) {
             synchronized(cookieManager) {
                 kotlin.runCatching {
                     val cookieString = "$SERP_PPRO_PROMO_COOKIE_NAME=${cookieValue.orEmpty()};HttpOnly;Path=/;"
-                    cookieManager.setCookie(HTTPS_WWW_SUBSCRIPTION_DDG_COM, cookieString)
+                    cookieManager.setCookieOnAllProfiles(HTTPS_WWW_SUBSCRIPTION_DDG_COM, cookieString)
                 }
             }
-            return@withContext
         }
     }
 
@@ -90,7 +92,11 @@ interface CookieManagerWrapper {
      */
     fun getCookie(url: String): String?
 
-    fun setCookie(url: String, cookieString: String)
+    /**
+     * Sets the given [cookieString] for the given [url] on every browser mode's cookie jar (the
+     * default profile plus any non-default profiles).
+     */
+    fun setCookieOnAllProfiles(url: String, cookieString: String)
 }
 
 @Retention(AnnotationRetention.BINARY)
@@ -110,15 +116,12 @@ private class CookieManagerWrapperImpl constructor(
     private val cookieManagerProvider: CookieManagerProvider,
 ) : CookieManagerWrapper {
 
-    private val cookieManager: CookieManager? by lazy { cookieManagerProvider.get() }
-
     override fun getCookie(url: String): String? {
-        return cookieManager?.getCookie(url)
+        return cookieManagerProvider.forMode(BrowserMode.REGULAR)?.getCookie(url)
     }
 
-    override fun setCookie(domain: String, cookie: String) {
-        logcat { "Setting cookie $cookie for domain $domain" }
-        cookieManager?.setCookie(domain, cookie)
-        cookieManager?.flush()
+    override fun setCookieOnAllProfiles(url: String, cookieString: String) {
+        logcat { "Setting cookie $cookieString for domain $url" }
+        cookieManagerProvider.setCookieForAllModes(url, cookieString)
     }
 }

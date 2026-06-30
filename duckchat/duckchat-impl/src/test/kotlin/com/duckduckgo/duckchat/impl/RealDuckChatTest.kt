@@ -29,6 +29,7 @@ import app.cash.turbine.test
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.AppUrl
 import com.duckduckgo.cookies.api.CookieManagerProvider
@@ -1554,7 +1555,7 @@ class RealDuckChatTest {
     @Test
     fun `when migration cookie present and kill switch enabled then isDuckChatContextualModeEnabled returns true`() = runTest {
         val cookieManager = mock<CookieManager>()
-        whenever(cookiesManager.get()).thenReturn(cookieManager)
+        whenever(cookiesManager.forMode(BrowserMode.REGULAR)).thenReturn(cookieManager)
         whenever(cookieManager.getCookie(AppUrl.Url.COOKIES)).thenReturn("migration_status_dev_01=migrated_dev_01")
         duckChatFeature.contextualMode().setRawStoredState(State(enable = false))
         duckChatFeature.contextualModeKillSwitch().setRawStoredState(State(enable = true))
@@ -1567,7 +1568,7 @@ class RealDuckChatTest {
     @Test
     fun `when migration cookie present then isStandaloneMigrationCompleted returns true`() = runTest {
         val cookieManager = mock<CookieManager>()
-        whenever(cookiesManager.get()).thenReturn(cookieManager)
+        whenever(cookiesManager.forMode(BrowserMode.REGULAR)).thenReturn(cookieManager)
         whenever(cookieManager.getCookie(AppUrl.Url.COOKIES)).thenReturn("a=b;migration_status_dev_01=migrated_dev_01;c=d")
 
         assertTrue(testee.isStandaloneMigrationCompleted())
@@ -1576,7 +1577,7 @@ class RealDuckChatTest {
     @Test
     fun `when migration cookie missing then isStandaloneMigrationCompleted returns false`() = runTest {
         val cookieManager = mock<CookieManager>()
-        whenever(cookiesManager.get()).thenReturn(cookieManager)
+        whenever(cookiesManager.forMode(BrowserMode.REGULAR)).thenReturn(cookieManager)
         whenever(cookieManager.getCookie(AppUrl.Url.COOKIES)).thenReturn("a=b; c=d")
 
         assertFalse(testee.isStandaloneMigrationCompleted())
@@ -1584,7 +1585,7 @@ class RealDuckChatTest {
 
     @Test
     fun `when cookie manager is null then isStandaloneMigrationCompleted returns false`() = runTest {
-        whenever(cookiesManager.get()).thenReturn(null)
+        whenever(cookiesManager.forMode(BrowserMode.REGULAR)).thenReturn(null)
 
         assertFalse(testee.isStandaloneMigrationCompleted())
     }
