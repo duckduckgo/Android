@@ -10,7 +10,14 @@ Use this for Android browser bugs where a live website behaves differently in Du
 
 ## Environment
 
-Prefer a real device when the report is device, Android, or WebView-version specific. If using an emulator, verify the runtime rather than assuming the system image is current.
+Use an attached real device for the primary reproduction when one is available in `adb devices`. If no real device is available, say so and use an emulator.
+
+Use an emulator when:
+
+- no real device is attached to the agent host
+- testing a specific Android or WebView version matrix
+- isolating emulator-only behavior
+- avoiding changes to a shared physical device
 
 ```sh
 adb devices
