@@ -491,7 +491,7 @@
         ]
     },
     "m_aichat_experimental_omnibar_mode_switched": {
-        "description": "User switched between Search and Duck.ai toggle in the input screen",
+        "description": "User switched between Search and Duck.ai in the native input field",
         "owners": ["YoussefKeyrouz"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
@@ -508,7 +508,7 @@
         ]
     },
     "m_aichat_duckai_dau_toggle_never_enabled": {
-        "description": "Fired once per Duck.ai DAU day for users who have never enabled the Duck.ai input screen toggle. Used to identify heavy Duck.ai users who haven't discovered the feature.",
+        "description": "Fired once per Duck.ai DAU day for users who have never enabled the Duck.ai native input field. Used to identify heavy Duck.ai users who haven't discovered the feature.",
         "owners": ["aitorvs"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
