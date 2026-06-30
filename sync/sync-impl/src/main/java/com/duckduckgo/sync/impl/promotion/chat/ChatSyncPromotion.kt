@@ -57,19 +57,19 @@ class RealChatSyncPromotion @Inject constructor(
 
     override suspend fun incrementImpressionCount() {
         promotionDataStore.recordPromoImpression(ChatTabPage)
-        pixel.fire(SyncPixelName.SYNC_FEATURE_PROMOTION_DISPLAYED, pixelParms())
+        pixel.fire(SyncPixelName.SYNC_FEATURE_PROMOTION_DISPLAYED, pixelParmas())
     }
 
     override suspend fun recordPromotionAccepted() {
         promotionDataStore.recordPromoDismissed(ChatTabPage)
-        pixel.fire(SyncPixelName.SYNC_FEATURE_PROMOTION_CONFIRMED, pixelParms())
+        pixel.fire(SyncPixelName.SYNC_FEATURE_PROMOTION_CONFIRMED, pixelParmas())
     }
 
     override suspend fun recordPromotionDismissed() {
         promotionDataStore.recordPromoDismissed(ChatTabPage)
         pixel.fire(
             pixel = SyncPixelName.SYNC_FEATURE_PROMOTION_DISMISSED,
-            parameters = pixelParms {
+            parameters = pixelParmas {
                 put(SyncPixelParameters.SYNC_FEATURE_PROMOTION_DISMISS_REASON, PIXEL_DISMISS_REASON_USER_TAPPED)
             },
         )
@@ -85,7 +85,7 @@ class RealChatSyncPromotion @Inject constructor(
         if (isImpressionCapReached) {
             pixel.fire(
                 pixel = SyncPixelName.SYNC_FEATURE_PROMOTION_DISMISSED,
-                parameters = pixelParms {
+                parameters = pixelParmas {
                     put(SyncPixelParameters.SYNC_FEATURE_PROMOTION_DISMISS_REASON, PIXEL_DISMISS_REASON_IMPRESSION_CAP)
                 },
                 type = Unique(MAX_IMPRESSION_CAP_PIXEL_TAG),
@@ -113,7 +113,7 @@ class RealChatSyncPromotion @Inject constructor(
 
     private suspend fun hasChatSuggestions(): Boolean = duckChat.observeHasChatSuggestions().firstOrNull() == true
 
-    private fun pixelParms(
+    private fun pixelParmas(
         customParams: (MutableMap<String, String>.() -> Unit)? = null,
     ): Map<String, String> = buildMap {
         put(SyncPixelParameters.SYNC_FEATURE_PROMOTION_SOURCE, PIXEL_SOURCE)
