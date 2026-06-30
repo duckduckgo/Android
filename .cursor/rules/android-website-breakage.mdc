@@ -15,9 +15,9 @@ Use an attached real device for the primary reproduction when one is available i
 Use an emulator when:
 
 - no real device is attached to the agent host
-- testing a specific Android or WebView version matrix
-- isolating emulator-only behavior
-- avoiding changes to a shared physical device
+- a required Android or WebView version is not available on an attached real device
+
+Real devices can also use alternate WebView providers when the device supports the package. Prefer Play Store Beta, Dev, or Canary installs when available; sideload only when needed.
 
 ```sh
 adb devices
