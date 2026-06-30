@@ -920,6 +920,11 @@ class NativeInputModeWidget @JvmOverloads constructor(
             hasImageAttachment = hasImageAttachment,
             hasFileAttachment = hasFileAttachment,
         )
+        // Fires alongside prompt_submitted, but only when the input is in a Duck.ai chat context
+        // (a prompt sent from within an active chat) — not omnibar submissions that start a new chat.
+        if (isDuckAiPageContext()) {
+            viewModel.fireSentPromptInChat()
+        }
     }
 
     override fun focusInput(activity: Activity?) {

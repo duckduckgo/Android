@@ -165,6 +165,9 @@ interface DuckChatPixels {
         hasFileAttachment: Boolean,
         hasText: Boolean,
     )
+
+    /** Prompt submitted while the unified input is in a Duck.ai chat context. Fires alongside [firePromptSubmitted]. */
+    fun fireSentPromptInChat()
     fun fireModelSelected(modelId: String)
     fun fireReasoningEffortSelected(effortLevel: String)
 
@@ -571,6 +574,11 @@ class RealDuckChatPixels @Inject constructor(
         )
     }
 
+    override fun fireSentPromptInChat() = fireCountAndDaily(
+        DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_SENT_PROMPT_IN_CHAT_COUNT,
+        DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_SENT_PROMPT_IN_CHAT_DAILY,
+    )
+
     override fun fireModelSelected(modelId: String) {
         appCoroutineScope.launch(dispatcherProvider.io()) {
             pixel.fire(DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_MODEL_SELECTED, parameters = mapOf(DuckChatPixelParameters.MODEL_ID to modelId))
@@ -967,6 +975,8 @@ enum class DuckChatPixelName(override val pixelName: String) : Pixel.PixelName {
     DUCK_CHAT_UNIFIED_INPUT_WEB_SEARCH_SUBMITTED_DAILY("m_aichat_unified_input_web_search_submitted_daily"),
     DUCK_CHAT_UNIFIED_INPUT_PROMPT_SUBMITTED_COUNT("m_aichat_unified_input_prompt_submitted_count"),
     DUCK_CHAT_UNIFIED_INPUT_PROMPT_SUBMITTED_DAILY("m_aichat_unified_input_prompt_submitted_daily"),
+    DUCK_CHAT_UNIFIED_INPUT_SENT_PROMPT_IN_CHAT_COUNT("m_aichat_unified_input_sent_prompt_in_chat_count"),
+    DUCK_CHAT_UNIFIED_INPUT_SENT_PROMPT_IN_CHAT_DAILY("m_aichat_unified_input_sent_prompt_in_chat_daily"),
     DUCK_CHAT_UNIFIED_INPUT_MODEL_SELECTED("m_aichat_unified_input_model_selected"),
     DUCK_CHAT_UNIFIED_INPUT_REASONING_EFFORT_SELECTED("m_aichat_unified_input_reasoning_effort_selected"),
     DUCK_CHAT_UNIFIED_INPUT_SUBSCRIPTION_UPSELL_TRIGGERED("m_aichat_unified_input_subscription_upsell_triggered"),

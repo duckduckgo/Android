@@ -421,6 +421,16 @@ class RealDuckChatPixelsTest {
     }
 
     @Test
+    fun whenFireSentPromptInChatThenCountAndDailyFired() = runTest {
+        testee.fireSentPromptInChat()
+
+        advanceUntilIdle()
+
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_SENT_PROMPT_IN_CHAT_COUNT)
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_SENT_PROMPT_IN_CHAT_DAILY, type = Pixel.PixelType.Daily())
+    }
+
+    @Test
     fun whenFireOmnibarQuerySubmittedThenCountCarriesLengthBucketAndDailyHasNoParams() = runTest {
         testee.fireOmnibarQuerySubmitted("hi") // 2 chars -> "short"
 
