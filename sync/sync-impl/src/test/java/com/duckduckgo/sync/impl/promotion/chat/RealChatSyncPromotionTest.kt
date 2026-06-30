@@ -50,7 +50,6 @@ class RealChatSyncPromotionTest {
     // DuckChat properties
     private var isChatHistoryEnabled = false
     private val hasChatSuggestions = MutableStateFlow(false)
-    
 
     private val testee = RealChatSyncPromotion(
         promotionDataStore = dataStore,
@@ -177,7 +176,7 @@ class RealChatSyncPromotionTest {
     }
 
     @Test
-    fun `when promotion is checked then fire confirmed pixel`() = runTest {
+    fun `when promotion is accepted then fire confirmed pixel`() = runTest {
         testee.recordPromotionAccepted()
 
         assertEquals(
