@@ -95,6 +95,24 @@
     <string name="duckAiHideAiGeneratedImagesTitle">Paslēpt MI ģenerētus attēlus</string>
     <string name="duckAiHideAiGeneratedImagesDescription">Filtrē MI radītus attēlus no attēlu meklēšanas rezultātiem</string>
 
+    <!-- Search Assist Visibility -->
+    <string name="duckAiSearchAssistVisibilityTitle">Search Assist redzamība</string>
+    <string name="duckAiSearchAssistVisibilitySubtitle">Izvēlies, cik bieži vēlies redzēt ar MI atbalstītas atbildes savos meklējumos.</string>
+    <string name="duckAiSearchAssistVisibilityNever">Nekad</string>
+    <string name="duckAiSearchAssistVisibilityOnDemand">Pēc pieprasījuma</string>
+    <string name="duckAiSearchAssistVisibilitySometimes">Dažreiz</string>
+    <string name="duckAiSearchAssistVisibilityOften">Bieži</string>
+
+    <!-- Duck AI Use Without AI Settings Option -->
+    <string name="duckAiUseWithoutAiTitle">Lieto DuckDuckGo bez MI</string>
+    <string name="duckAiUseWithoutAiDescription">Atspējo Duck.ai, paslēpj mākslīgā intelekta atbildes meklēšanā un filtrē zināmas MI spama vietnes attēlu meklēšanas rezultātos.</string>
+    <string name="duckAiUseWithoutAiDisabledDescription">Mākslīgais intelekts (MI) pašlaik pārlūkā ir atspējots, tāpēc vairs neredzēsi MI atbildes un attēlu meklēšanas rezultātos redzēsi mazāk ar MI ģenerētu attēlu.</string>
+
+    <!-- Duck AI Section in AI Feature Screen -->
+    <string name="input_screen_user_pref_toggle_between_search_and_ai">Pārslēdzies starp meklēšanu un Duck.ai</string>
+    <string name="duckAiDialogHideAiGeneratedImagesTitle">Paslēpt ar MI ģenerētus attēlus</string>
+    <string name="duckAiDialogHideAiGeneratedImagesDescription">Izfiltrē zināmas mākslīgā intelekta spama vietnes no attēlu meklēšanas rezultātiem. <annotation link="learn_more">Uzzināt vairāk</annotation></string>
+
     <!-- Duck AI Paid Settings -->
     <string name="duck_ai_paid_settings_enable_in_settings">Ieslēgt MI funkciju iestatījumos</string>
     <string name="duck_ai_paid_settings_manage_in_settings">Pārvaldīt MI funkciju iestatījumos</string>

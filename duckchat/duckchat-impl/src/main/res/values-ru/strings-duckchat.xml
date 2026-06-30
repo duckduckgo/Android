@@ -95,6 +95,24 @@
     <string name="duckAiHideAiGeneratedImagesTitle">Скрыть ИИ-картинки</string>
     <string name="duckAiHideAiGeneratedImagesDescription">Исключает из результатов поиска изображения, созданные нейросетью</string>
 
+    <!-- Search Assist Visibility -->
+    <string name="duckAiSearchAssistVisibilityTitle">Параметры Search Assist</string>
+    <string name="duckAiSearchAssistVisibilitySubtitle">Выберите, как часто вы хотите видеть ответы от ИИ в результатах поиска.</string>
+    <string name="duckAiSearchAssistVisibilityNever">Никогда</string>
+    <string name="duckAiSearchAssistVisibilityOnDemand">По запросу</string>
+    <string name="duckAiSearchAssistVisibilitySometimes">Иногда</string>
+    <string name="duckAiSearchAssistVisibilityOften">Часто</string>
+
+    <!-- Duck AI Use Without AI Settings Option -->
+    <string name="duckAiUseWithoutAiTitle">Использовать DuckDuckGo без ИИ</string>
+    <string name="duckAiUseWithoutAiDescription">Отключает Duck.ai, скрывает ответы с использованием ИИ в поиске и фильтрует известные сайты с ИИ-спамом в результатах поиска изображений.</string>
+    <string name="duckAiUseWithoutAiDisabledDescription">ИИ сейчас отключен в браузере, поэтому ответы с использованием ИИ больше не будут отображаться, а в результатах поиска изображений будет меньше изображений, созданных ИИ.</string>
+
+    <!-- Duck AI Section in AI Feature Screen -->
+    <string name="input_screen_user_pref_toggle_between_search_and_ai">Переключайтесь между обычным поиском и Duck.ai</string>
+    <string name="duckAiDialogHideAiGeneratedImagesTitle">Скрыть изображения, сгенерированные ИИ</string>
+    <string name="duckAiDialogHideAiGeneratedImagesDescription">Исключает из результатов поиска изображений известные сайты с ИИ-спамом. <annotation link="learn_more">Подробнее</annotation></string>
+
     <!-- Duck AI Paid Settings -->
     <string name="duck_ai_paid_settings_enable_in_settings">Посетить «Настройки функций ИИ»</string>
     <string name="duck_ai_paid_settings_manage_in_settings">Настроить функции ИИ</string>

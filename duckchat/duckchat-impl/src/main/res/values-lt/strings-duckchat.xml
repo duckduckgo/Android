@@ -95,6 +95,24 @@
     <string name="duckAiHideAiGeneratedImagesTitle">Slėpti DI generuotus vaizdus</string>
     <string name="duckAiHideAiGeneratedImagesDescription">Vaizdų paieškos rezultatuose nepalieka Di sukurtų vaizdų</string>
 
+    <!-- Search Assist Visibility -->
+    <string name="duckAiSearchAssistVisibilityTitle">„Search Assist“ matomumas</string>
+    <string name="duckAiSearchAssistVisibilitySubtitle">Pasirink, kaip dažnai paieškose nori matyti „AI-Assisted Answers“.</string>
+    <string name="duckAiSearchAssistVisibilityNever">Niekada</string>
+    <string name="duckAiSearchAssistVisibilityOnDemand">Pagal poreikį</string>
+    <string name="duckAiSearchAssistVisibilitySometimes">Kartais</string>
+    <string name="duckAiSearchAssistVisibilityOften">Dažnai</string>
+
+    <!-- Duck AI Use Without AI Settings Option -->
+    <string name="duckAiUseWithoutAiTitle">Naudok „DuckDuckGo“ be DI</string>
+    <string name="duckAiUseWithoutAiDescription">Išjungia „Duck.ai“, paieškoje paslepia DI parengtus atsakymus ir iš vaizdų paieškos rezultatų pašalina žinomas DI brukalų svetaines.</string>
+    <string name="duckAiUseWithoutAiDisabledDescription">Šiuo metu naršyklėje DI išjungtas, todėl nebematysi DI parengtų atsakymų, o vaizdų paieškos rezultatuose matysi mažiau DI sukurtų vaizdų.</string>
+
+    <!-- Duck AI Section in AI Feature Screen -->
+    <string name="input_screen_user_pref_toggle_between_search_and_ai">Perjungti paiešką ir „Duck.ai“</string>
+    <string name="duckAiDialogHideAiGeneratedImagesTitle">Slėpti DI sugeneruotus vaizdus</string>
+    <string name="duckAiDialogHideAiGeneratedImagesDescription">Iš vaizdų paieškos rezultatų pašalina žinomas DI brukalų svetaines. <annotation link="learn_more">Sužinok daugiau</annotation></string>
+
     <!-- Duck AI Paid Settings -->
     <string name="duck_ai_paid_settings_enable_in_settings">Įgalinti DI funkcijų nustatymuose</string>
     <string name="duck_ai_paid_settings_manage_in_settings">Tvarkyti DI funkcijų nustatymuose</string>

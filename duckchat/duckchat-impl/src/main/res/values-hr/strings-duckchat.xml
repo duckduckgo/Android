@@ -95,6 +95,24 @@
     <string name="duckAiHideAiGeneratedImagesTitle">Sakrij slike generirane umjetnom inteligencijom</string>
     <string name="duckAiHideAiGeneratedImagesDescription">Filtrira slike generirane umjetnom inteligencijom iz rezultata pretraživanja slika</string>
 
+    <!-- Search Assist Visibility -->
+    <string name="duckAiSearchAssistVisibilityTitle">Vidljivost Search Assista</string>
+    <string name="duckAiSearchAssistVisibilitySubtitle">Odaberi koliko često želiš da se odgovori potpomognuti umjetnom inteligencijom pojavljuju u tvojim pretraživanjima.</string>
+    <string name="duckAiSearchAssistVisibilityNever">Nikada</string>
+    <string name="duckAiSearchAssistVisibilityOnDemand">Na zahtjev</string>
+    <string name="duckAiSearchAssistVisibilitySometimes">Ponekad</string>
+    <string name="duckAiSearchAssistVisibilityOften">Često</string>
+
+    <!-- Duck AI Use Without AI Settings Option -->
+    <string name="duckAiUseWithoutAiTitle">Koristi DuckDuckGo bez AI</string>
+    <string name="duckAiUseWithoutAiDescription">Onemogućuje Duck.ai, skriva odgovore potpomognute umjetnom inteligencijom u pretraživanju i filtrira poznata web-mjesta s neželjenom umjetnom inteligencijom u rezultatima pretraživanja slika.</string>
+    <string name="duckAiUseWithoutAiDisabledDescription">Umjetna inteligencija trenutno je onemogućena u pregledniku pa više nećeš vidjeti odgovore potpomognute umjetnom inteligencijom i vidjet ćeš manje slika generiranih umjetnom inteligencijom u rezultatima pretraživanja slika.</string>
+
+    <!-- Duck AI Section in AI Feature Screen -->
+    <string name="input_screen_user_pref_toggle_between_search_and_ai">Prebacuj se između pretraživanja i Duck.ai</string>
+    <string name="duckAiDialogHideAiGeneratedImagesTitle">Sakrij slike generirane umjetnom inteligencijom</string>
+    <string name="duckAiDialogHideAiGeneratedImagesDescription">Filtrira poznata neželjena web-mjesta s AI-jem iz rezultata pretraživanja slika. <annotation link="learn_more">Saznaj više</annotation></string>
+
     <!-- Duck AI Paid Settings -->
     <string name="duck_ai_paid_settings_enable_in_settings">Omogući u postavkama AI značajki</string>
     <string name="duck_ai_paid_settings_manage_in_settings">Upravljaj u postavkama AI značajki</string>
