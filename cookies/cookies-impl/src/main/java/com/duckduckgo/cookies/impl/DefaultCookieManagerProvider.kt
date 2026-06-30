@@ -21,7 +21,6 @@ import android.os.Looper
 import android.webkit.CookieManager
 import androidx.webkit.ProfileStore
 import com.duckduckgo.browsermode.api.BrowserMode
-import com.duckduckgo.browsermode.api.BrowserModeStateHolder
 import com.duckduckgo.browsermode.api.FireModeAvailability
 import com.duckduckgo.browsermode.api.profileName
 import com.duckduckgo.cookies.api.CookieManagerProvider
@@ -38,7 +37,6 @@ import javax.inject.Inject
 @SuppressLint("RequiresFeature")
 class DefaultCookieManagerProvider @Inject constructor(
     private val fireModeAvailability: Lazy<FireModeAvailability>,
-    private val browserModeStateHolder: BrowserModeStateHolder,
 ) : CookieManagerProvider {
 
     @Volatile
@@ -46,8 +44,6 @@ class DefaultCookieManagerProvider @Inject constructor(
 
     @Volatile
     private var fireInstance: CookieManager? = null
-
-    override fun forCurrentBrowserMode(): CookieManager? = forMode(browserModeStateHolder.currentMode.value)
 
     override fun forMode(mode: BrowserMode): CookieManager? = when (mode) {
         BrowserMode.REGULAR -> defaultManager()

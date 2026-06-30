@@ -683,6 +683,7 @@ open class DuckChatWebViewFragment : DuckDuckGoFragment(R.layout.activity_duck_c
             mimeType = mimeType,
             subfolder = Environment.DIRECTORY_DOWNLOADS,
             fileName = "duck.ai_${System.currentTimeMillis()}",
+            browserMode = browserMode,
         )
 
         if (hasWriteStoragePermission()) {

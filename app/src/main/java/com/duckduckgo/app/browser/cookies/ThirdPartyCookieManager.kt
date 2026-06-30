@@ -21,6 +21,7 @@ import android.webkit.WebView
 import androidx.core.net.toUri
 import com.duckduckgo.app.browser.cookies.db.AuthCookieAllowedDomainEntity
 import com.duckduckgo.app.browser.cookies.db.AuthCookiesAllowedDomainsRepository
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.utils.DefaultDispatcherProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.cookies.api.CookieManagerProvider
@@ -33,6 +34,7 @@ interface ThirdPartyCookieManager {
     suspend fun processUriForThirdPartyCookies(
         webView: WebView,
         uri: Uri,
+        browserMode: BrowserMode,
     )
 
     suspend fun clearAllData()
@@ -49,11 +51,12 @@ class AppThirdPartyCookieManager(
     override suspend fun processUriForThirdPartyCookies(
         webView: WebView,
         uri: Uri,
+        browserMode: BrowserMode,
     ) {
         if (uri.host == GOOGLE_ACCOUNTS_HOST) {
             addHostToList(uri)
         } else {
-            processThirdPartyCookiesSetting(webView, uri)
+            processThirdPartyCookiesSetting(webView, uri, browserMode)
         }
     }
 
@@ -64,17 +67,18 @@ class AppThirdPartyCookieManager(
     private suspend fun processThirdPartyCookiesSetting(
         webView: WebView,
         uri: Uri,
+        browserMode: BrowserMode,
     ) {
         val host = uri.host ?: return
         val domain = authCookiesAllowedDomainsRepository.getDomain(host)
         withContext(dispatchers.main()) {
             // Allow third-party cookies for domains that need cross-domain functionality
-            if (hostsThatAlwaysRequireThirdPartyCookies.contains(host) || (domain != null && hasExcludedCookieName())) {
+            if (hostsThatAlwaysRequireThirdPartyCookies.contains(host) || (domain != null && hasExcludedCookieName(browserMode))) {
                 logcat { "Cookies enabled for $uri" }
-                cookieManagerProvider.forCurrentBrowserMode()?.setAcceptThirdPartyCookies(webView, true)
+                cookieManagerProvider.forMode(browserMode)?.setAcceptThirdPartyCookies(webView, true)
             } else {
                 logcat { "Cookies disabled for $uri" }
-                cookieManagerProvider.forCurrentBrowserMode()?.setAcceptThirdPartyCookies(webView, false)
+                cookieManagerProvider.forMode(browserMode)?.setAcceptThirdPartyCookies(webView, false)
             }
             domain?.let { deleteHost(it) }
         }
@@ -97,8 +101,8 @@ class AppThirdPartyCookieManager(
         }
     }
 
-    private fun hasExcludedCookieName(): Boolean {
-        return cookieManagerProvider.forCurrentBrowserMode()?.getCookie(GOOGLE_ACCOUNTS_URL)?.split(";")?.firstOrNull {
+    private fun hasExcludedCookieName(browserMode: BrowserMode): Boolean {
+        return cookieManagerProvider.forMode(browserMode)?.getCookie(GOOGLE_ACCOUNTS_URL)?.split(";")?.firstOrNull {
             thirdPartyCookieNames.hasExcludedCookieName(it)
         } != null
     }

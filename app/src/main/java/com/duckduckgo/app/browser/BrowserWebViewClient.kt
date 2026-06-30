@@ -76,6 +76,7 @@ import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.autofill.api.BrowserAutofill
 import com.duckduckgo.autofill.api.InternalTestUserChecker
 import com.duckduckgo.browser.api.JsInjectorPlugin
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.utils.AppUrl.ParamKey.QUERY
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -138,6 +139,7 @@ class BrowserWebViewClient @Inject constructor(
     private val contentScopeExperiments: ContentScopeExperiments,
     private val appSchemeInterceptionFeature: AppSchemeInterceptionFeature,
     private val forceWebViewRecompositeFeature: ForceWebViewRecompositeFeature,
+    private val browserMode: BrowserMode,
 ) : WebViewClient() {
     var webViewClientListener: WebViewClientListener? = null
     var clientProvider: ClientBrandHintProvider? = null
@@ -538,8 +540,10 @@ class BrowserWebViewClient @Inject constructor(
             handleMediaPlayback(webView, it)
             autoconsent.injectAutoconsent(webView, url)
             adClickManager.detectAdDomain(url)
-            appCoroutineScope.launch(dispatcherProvider.io()) {
-                thirdPartyCookieManager.processUriForThirdPartyCookies(webView, url.toUri())
+
+            val scope = webView.findViewTreeLifecycleOwner()?.lifecycleScope ?: return@let
+            scope.launch(dispatcherProvider.io()) {
+                thirdPartyCookieManager.processUriForThirdPartyCookies(webView, url.toUri(), browserMode)
             }
         }
         val navigationList = webView.safeCopyBackForwardList() ?: return
@@ -702,8 +706,9 @@ class BrowserWebViewClient @Inject constructor(
      */
     private fun flushCookies(webView: WebView) {
         val scope = webView.findViewTreeLifecycleOwner()?.lifecycleScope ?: return
+        val cookieManager = cookieManagerProvider.forMode(browserMode)
         scope.launch(dispatcherProvider.io()) {
-            cookieManagerProvider.forCurrentBrowserMode()?.flush()
+            cookieManager?.flush()
         }
     }
 

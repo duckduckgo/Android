@@ -25,6 +25,7 @@ import android.os.Parcel
 import androidx.annotation.VisibleForTesting
 import androidx.core.net.toUri
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.cookies.api.CookieManagerProvider
 import com.duckduckgo.di.scopes.AppScope
@@ -84,8 +85,10 @@ interface InlinePdfHandler {
      * @param forceRefresh when true, ignore any existing cache entry and re-fetch from the network.
      *   Used by the user-triggered refresh action so an updated server-side document replaces the
      *   stale cached copy.
+     * @param browserMode the browser mode whose cookie jar authenticates the download — the caller passes
+     *   its own (frozen) mode so the request carries the cookies of the tab the PDF was opened in.
      */
-    suspend fun downloadToCache(url: String, forceRefresh: Boolean = false): PdfDownloadResult
+    suspend fun downloadToCache(url: String, forceRefresh: Boolean = false, browserMode: BrowserMode): PdfDownloadResult
 
     /**
      * Extracts a sanitized filename from the PDF [url]'s last path segment.
@@ -142,7 +145,11 @@ class RealInlinePdfHandler @Inject constructor(
     private val cacheDir: File
         get() = File(context.cacheDir, PDF_CACHE_DIR).also { it.mkdirs() }
 
-    override suspend fun downloadToCache(url: String, forceRefresh: Boolean): PdfDownloadResult = withContext(dispatcherProvider.io()) {
+    override suspend fun downloadToCache(
+        url: String,
+        forceRefresh: Boolean,
+        browserMode: BrowserMode,
+    ): PdfDownloadResult = withContext(dispatcherProvider.io()) {
         val fileName = extractFileName(url)
         // Prefix the cache filename with the URL hash so two URLs sharing a last path segment
         // (e.g. report.pdf at site A and site B) don't collide and serve stale content.
@@ -160,7 +167,7 @@ class RealInlinePdfHandler @Inject constructor(
 
             val requestBuilder = Request.Builder().url(url)
 
-            val cookie = cookieManagerProvider.forCurrentBrowserMode()?.getCookie(url)
+            val cookie = cookieManagerProvider.forMode(browserMode)?.getCookie(url)
             if (cookie != null) {
                 requestBuilder.addHeader("Cookie", cookie)
             }

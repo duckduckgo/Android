@@ -69,7 +69,7 @@ import kotlin.coroutines.suspendCoroutine
 class FirstPartyCookiesReferenceTest(private val testCase: TestCase) {
 
     private val context: Context = InstrumentationRegistry.getInstrumentation().targetContext
-    private val cookieManagerProvider = DefaultCookieManagerProvider(mock(), mock())
+    private val cookieManagerProvider = DefaultCookieManagerProvider(mock())
     private val cookieManager = cookieManagerProvider.forMode(BrowserMode.REGULAR)!!
     private val cookiesRepository = mock<CookiesRepository>()
     private val unprotectedTemporary = mock<UnprotectedTemporary>()

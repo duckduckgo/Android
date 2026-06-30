@@ -59,7 +59,7 @@ class FireproofingReferenceTest(private val testCase: TestCase) {
 
     private val context: Context = InstrumentationRegistry.getInstrumentation().targetContext
     private val db = Room.inMemoryDatabaseBuilder(context, AppDatabase::class.java).build()
-    private val cookieManagerProvider = DefaultCookieManagerProvider(mock(), mock())
+    private val cookieManagerProvider = DefaultCookieManagerProvider(mock())
     private val cookieManager = cookieManagerProvider.forMode(BrowserMode.REGULAR)!!
     private val fireproofWebsiteDao = db.fireproofWebsiteDao()
     private val webViewDatabaseLocator = WebViewDatabaseLocator(context)

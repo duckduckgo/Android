@@ -77,6 +77,7 @@ import com.duckduckgo.autofill.api.BrowserAutofill
 import com.duckduckgo.autofill.api.InternalTestUserChecker
 import com.duckduckgo.browser.api.JsInjectorPlugin
 import com.duckduckgo.browser.api.WebViewVersionProvider
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.device.DeviceInfo
@@ -233,10 +234,11 @@ class BrowserWebViewClientTest {
                     mockContentScopeExperiments,
                     mockAppSchemeInterceptionFeature,
                     mockForceWebViewRecompositeFeature,
+                    BrowserMode.REGULAR,
                 )
             testee.webViewClientListener = listener
             whenever(webResourceRequest.url).thenReturn(Uri.EMPTY)
-            whenever(cookieManagerProvider.forCurrentBrowserMode()).thenReturn(cookieManager)
+            whenever(cookieManagerProvider.forMode(BrowserMode.REGULAR)).thenReturn(cookieManager)
             whenever(currentTimeProvider.elapsedRealtime()).thenReturn(0)
             whenever(webViewVersionProvider.getMajorVersion()).thenReturn("1")
             whenever(deviceInfo.appVersion).thenReturn("1")
@@ -318,7 +320,7 @@ class BrowserWebViewClientTest {
     fun whenOnPageStartedCalledThenProcessUriForThirdPartyCookiesCalled() =
         runTest {
             testee.onPageStarted(webView, EXAMPLE_URL, null)
-            verify(thirdPartyCookieManager).processUriForThirdPartyCookies(webView, EXAMPLE_URL.toUri())
+            verify(thirdPartyCookieManager).processUriForThirdPartyCookies(webView, EXAMPLE_URL.toUri(), BrowserMode.REGULAR)
         }
 
     @Test

@@ -28,21 +28,25 @@ import com.duckduckgo.app.browser.certificates.rootstore.CertificateValidationSt
 import com.duckduckgo.app.browser.certificates.rootstore.TrustedCertificateStore
 import com.duckduckgo.app.browser.cookies.ThirdPartyCookieManager
 import com.duckduckgo.app.browser.httpauth.WebViewHttpAuthStore
+import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.cookies.api.CookieManagerProvider
 import kotlinx.coroutines.*
 import logcat.LogPriority.VERBOSE
 import logcat.logcat
+import javax.inject.Inject
 
-class UrlExtractingWebViewClient(
+class UrlExtractingWebViewClient @Inject constructor(
     private val webViewHttpAuthStore: WebViewHttpAuthStore,
     private val trustedCertificateStore: TrustedCertificateStore,
     private val requestInterceptor: RequestInterceptor,
     private val cookieManagerProvider: CookieManagerProvider,
     private val thirdPartyCookieManager: ThirdPartyCookieManager,
-    private val appCoroutineScope: CoroutineScope,
+    @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
     private val urlExtractor: DOMUrlExtractor,
+    private val browserMode: BrowserMode,
 ) : WebViewClient() {
 
     var urlExtractionListener: UrlExtractionListener? = null
@@ -52,7 +56,7 @@ class UrlExtractingWebViewClient(
         logcat(VERBOSE) { "onPageStarted webViewUrl: ${webView.url} URL: $url" }
         url?.let {
             appCoroutineScope.launch(dispatcherProvider.io()) {
-                thirdPartyCookieManager.processUriForThirdPartyCookies(webView, url.toUri())
+                thirdPartyCookieManager.processUriForThirdPartyCookies(webView, url.toUri(), browserMode)
             }
         }
         logcat { "AMP link detection: Injecting JS for URL extraction" }
@@ -66,7 +70,8 @@ class UrlExtractingWebViewClient(
     }
 
     private fun flushCookies() {
-        appCoroutineScope.launch(dispatcherProvider.io()) { cookieManagerProvider.forCurrentBrowserMode()?.flush() }
+        val cookieManager = cookieManagerProvider.forMode(browserMode)
+        appCoroutineScope.launch(dispatcherProvider.io()) { cookieManager?.flush() }
     }
 
     @WorkerThread

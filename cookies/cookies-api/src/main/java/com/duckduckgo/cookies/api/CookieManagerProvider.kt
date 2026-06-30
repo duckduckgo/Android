@@ -22,14 +22,10 @@ import com.duckduckgo.browsermode.api.BrowserMode
 /** Public interface for CookieManagerProvider */
 interface CookieManagerProvider {
     /**
-     * Returns the [CookieManager] for the browser mode that is currently active.
+     * Returns the [CookieManager] for the given [mode]. Callers always specify the mode explicitly — the
+     * tab/activity's frozen mode for WebView-bound work, or the mode carried with a deferred request.
      */
-    fun forCurrentBrowserMode(): CookieManager?
-
-    /**
-     * Returns the [CookieManager] for the given [mode], regardless of which mode is currently active.
-     */
-    fun forMode(mode: BrowserMode): CookieManager? = forCurrentBrowserMode()
+    fun forMode(mode: BrowserMode): CookieManager?
 }
 
 /**

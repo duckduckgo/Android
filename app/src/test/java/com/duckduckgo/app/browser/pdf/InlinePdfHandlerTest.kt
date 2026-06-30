@@ -20,6 +20,7 @@ import android.webkit.CookieManager
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.cookies.api.CookieManagerProvider
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
@@ -61,7 +62,7 @@ class InlinePdfHandlerTest {
     private val androidBrowserConfigFeature = FakeFeatureToggleFactory.create(AndroidBrowserConfigFeature::class.java)
 
     private val cookieManagerProvider = object : CookieManagerProvider {
-        override fun forCurrentBrowserMode(): CookieManager? = null
+        override fun forMode(mode: BrowserMode): CookieManager? = null
     }
 
     @Before
@@ -95,7 +96,7 @@ class InlinePdfHandlerTest {
                 .setBody(Buffer().write(pdfBytes)),
         )
 
-        val result = inlinePdfHandler.downloadToCache(server.url("/test.pdf").toString())
+        val result = inlinePdfHandler.downloadToCache(server.url("/test.pdf").toString(), browserMode = BrowserMode.REGULAR)
 
         assertTrue(result is PdfDownloadResult.Success)
         val file = File((result as PdfDownloadResult.Success).uri.path!!)
@@ -112,7 +113,7 @@ class InlinePdfHandlerTest {
                 .setBody(Buffer().write(pdfBytes)),
         )
 
-        val result = inlinePdfHandler.downloadToCache(server.url("/test.pdf").toString())
+        val result = inlinePdfHandler.downloadToCache(server.url("/test.pdf").toString(), browserMode = BrowserMode.REGULAR)
 
         assertTrue(result is PdfDownloadResult.Success)
         assertNull((result as PdfDownloadResult.Success).certificate)
@@ -122,7 +123,7 @@ class InlinePdfHandlerTest {
     fun whenServerReturnsErrorThenReturnsFailureUnknown() = runTest {
         server.enqueue(MockResponse().setResponseCode(404))
 
-        val result = inlinePdfHandler.downloadToCache(server.url("/missing.pdf").toString())
+        val result = inlinePdfHandler.downloadToCache(server.url("/missing.pdf").toString(), browserMode = BrowserMode.REGULAR)
 
         assertEquals(PdfDownloadResult.Failure(PdfErrorType.UNKNOWN), result)
     }
@@ -136,7 +137,7 @@ class InlinePdfHandlerTest {
                 .setBody(Buffer().write(pdfBytes)),
         )
 
-        val result = inlinePdfHandler.downloadToCache(server.url("/document").toString())
+        val result = inlinePdfHandler.downloadToCache(server.url("/document").toString(), browserMode = BrowserMode.REGULAR)
 
         assertTrue(result is PdfDownloadResult.Success)
         assertTrue((result as PdfDownloadResult.Success).uri.path!!.endsWith(".pdf"))
@@ -151,7 +152,7 @@ class InlinePdfHandlerTest {
                 .setBody(Buffer().write(htmlBytes)),
         )
 
-        val result = inlinePdfHandler.downloadToCache(server.url("/fake.pdf").toString())
+        val result = inlinePdfHandler.downloadToCache(server.url("/fake.pdf").toString(), browserMode = BrowserMode.REGULAR)
 
         assertEquals(PdfDownloadResult.Failure(PdfErrorType.UNKNOWN), result)
     }
@@ -267,11 +268,11 @@ class InlinePdfHandlerTest {
         )
         val url = server.url("/cached.pdf").toString()
 
-        val firstResult = inlinePdfHandler.downloadToCache(url)
+        val firstResult = inlinePdfHandler.downloadToCache(url, browserMode = BrowserMode.REGULAR)
         assertTrue(firstResult is PdfDownloadResult.Success)
         assertEquals(1, server.requestCount)
 
-        val secondResult = inlinePdfHandler.downloadToCache(url)
+        val secondResult = inlinePdfHandler.downloadToCache(url, browserMode = BrowserMode.REGULAR)
         assertTrue(secondResult is PdfDownloadResult.Success)
         assertEquals((firstResult as PdfDownloadResult.Success).uri, (secondResult as PdfDownloadResult.Success).uri)
         assertEquals(1, server.requestCount)
@@ -285,11 +286,11 @@ class InlinePdfHandlerTest {
         server.enqueue(MockResponse().setResponseCode(200).setBody(Buffer().write(secondBytes)))
         val url = server.url("/refreshable.pdf").toString()
 
-        val firstResult = inlinePdfHandler.downloadToCache(url)
+        val firstResult = inlinePdfHandler.downloadToCache(url, browserMode = BrowserMode.REGULAR)
         assertTrue(firstResult is PdfDownloadResult.Success)
         assertEquals(1, server.requestCount)
 
-        val refreshResult = inlinePdfHandler.downloadToCache(url, forceRefresh = true)
+        val refreshResult = inlinePdfHandler.downloadToCache(url, forceRefresh = true, browserMode = BrowserMode.REGULAR)
         assertTrue(refreshResult is PdfDownloadResult.Success)
         assertEquals(2, server.requestCount)
 
@@ -313,13 +314,13 @@ class InlinePdfHandlerTest {
         server.enqueue(MockResponse().setResponseCode(200).setBody(Buffer().write(replacementBytes)))
         val url = server.url("/refresh-fails.pdf").toString()
 
-        assertTrue(inlinePdfHandler.downloadToCache(url) is PdfDownloadResult.Success)
-        val refreshResult = inlinePdfHandler.downloadToCache(url, forceRefresh = true)
+        assertTrue(inlinePdfHandler.downloadToCache(url, browserMode = BrowserMode.REGULAR) is PdfDownloadResult.Success)
+        val refreshResult = inlinePdfHandler.downloadToCache(url, forceRefresh = true, browserMode = BrowserMode.REGULAR)
         assertEquals(PdfDownloadResult.Failure(PdfErrorType.IO_ERROR), refreshResult)
 
         // A subsequent non-force-refresh load must not pick up a corrupt partial: it should
         // re-fetch from the server (3rd request) and return the replacement bytes.
-        val recovered = inlinePdfHandler.downloadToCache(url)
+        val recovered = inlinePdfHandler.downloadToCache(url, browserMode = BrowserMode.REGULAR)
         assertTrue(recovered is PdfDownloadResult.Success)
         assertEquals(3, server.requestCount)
         val recoveredFile = File((recovered as PdfDownloadResult.Success).uri.path!!)
@@ -335,8 +336,8 @@ class InlinePdfHandlerTest {
         val urlA = server.url("/site-a/report.pdf").toString()
         val urlB = server.url("/site-b/report.pdf").toString()
 
-        val resultA = inlinePdfHandler.downloadToCache(urlA)
-        val resultB = inlinePdfHandler.downloadToCache(urlB)
+        val resultA = inlinePdfHandler.downloadToCache(urlA, browserMode = BrowserMode.REGULAR)
+        val resultB = inlinePdfHandler.downloadToCache(urlB, browserMode = BrowserMode.REGULAR)
 
         assertTrue(resultA is PdfDownloadResult.Success)
         assertTrue(resultB is PdfDownloadResult.Success)
@@ -360,7 +361,7 @@ class InlinePdfHandlerTest {
         val url = server.url("/cancelled.pdf").toString()
 
         val deferred = async {
-            inlinePdfHandler.downloadToCache(url)
+            inlinePdfHandler.downloadToCache(url, browserMode = BrowserMode.REGULAR)
         }
 
         delay(100)
@@ -385,7 +386,7 @@ class InlinePdfHandlerTest {
         val mockCookieManager: CookieManager = mock()
         whenever(mockCookieManager.getCookie(any())).thenReturn("session=abc123")
         val cookieAwareProvider = object : CookieManagerProvider {
-            override fun forCurrentBrowserMode(): CookieManager = mockCookieManager
+            override fun forMode(mode: BrowserMode): CookieManager = mockCookieManager
         }
         val handlerWithCookies = RealInlinePdfHandler(
             context = InstrumentationRegistry.getInstrumentation().targetContext,
@@ -403,7 +404,7 @@ class InlinePdfHandlerTest {
         )
         val url = server.url("/auth.pdf").toString()
 
-        val result = handlerWithCookies.downloadToCache(url)
+        val result = handlerWithCookies.downloadToCache(url, browserMode = BrowserMode.REGULAR)
 
         assertTrue(result is PdfDownloadResult.Success)
         val recordedRequest = server.takeRequest()
@@ -420,7 +421,7 @@ class InlinePdfHandlerTest {
     fun whenServerReturnsEmptyBodyThenReturnsFailureUnknown() = runTest {
         server.enqueue(MockResponse().setResponseCode(200).setBody(""))
 
-        val result = inlinePdfHandler.downloadToCache(server.url("/empty.pdf").toString())
+        val result = inlinePdfHandler.downloadToCache(server.url("/empty.pdf").toString(), browserMode = BrowserMode.REGULAR)
 
         assertEquals(PdfDownloadResult.Failure(PdfErrorType.UNKNOWN), result)
     }
@@ -434,7 +435,7 @@ class InlinePdfHandlerTest {
         )
         val url = server.url("/short.pdf").toString()
 
-        val result = inlinePdfHandler.downloadToCache(url)
+        val result = inlinePdfHandler.downloadToCache(url, browserMode = BrowserMode.REGULAR)
 
         assertEquals(PdfDownloadResult.Failure(PdfErrorType.UNKNOWN), result)
         val cacheDir = File(
@@ -460,7 +461,7 @@ class InlinePdfHandlerTest {
             androidBrowserConfigFeature = androidBrowserConfigFeature,
         )
 
-        val result = handlerWithFailingDns.downloadToCache("https://example.com/test.pdf")
+        val result = handlerWithFailingDns.downloadToCache("https://example.com/test.pdf", browserMode = BrowserMode.REGULAR)
 
         assertEquals(PdfDownloadResult.Failure(PdfErrorType.IO_ERROR), result)
     }
@@ -476,7 +477,7 @@ class InlinePdfHandlerTest {
         )
         val url = server.url("/reset.pdf").toString()
 
-        val result = inlinePdfHandler.downloadToCache(url)
+        val result = inlinePdfHandler.downloadToCache(url, browserMode = BrowserMode.REGULAR)
 
         assertEquals(PdfDownloadResult.Failure(PdfErrorType.IO_ERROR), result)
     }
@@ -547,7 +548,7 @@ class InlinePdfHandlerTest {
         server.enqueue(MockResponse().setResponseCode(200).setBody(Buffer().write(pdfBytes)))
         val url = server.url("/touch.pdf").toString()
 
-        val firstResult = inlinePdfHandler.downloadToCache(url)
+        val firstResult = inlinePdfHandler.downloadToCache(url, browserMode = BrowserMode.REGULAR)
         assertTrue(firstResult is PdfDownloadResult.Success)
         val cachedFile = File((firstResult as PdfDownloadResult.Success).uri.path!!)
 
@@ -556,7 +557,7 @@ class InlinePdfHandlerTest {
         cachedFile.setLastModified(backdated)
 
         val before = cachedFile.lastModified()
-        inlinePdfHandler.downloadToCache(url)
+        inlinePdfHandler.downloadToCache(url, browserMode = BrowserMode.REGULAR)
         val after = cachedFile.lastModified()
 
         assertTrue("Cache hit should bump lastModified to keep LRU semantics accurate", after > before)
@@ -617,7 +618,7 @@ class InlinePdfHandlerTest {
         // Sidecar contains arbitrary bytes that aren't a valid marshaled Bundle.
         File(cacheDir, "${targetFile.name}.cert").writeBytes("not a valid bundle".toByteArray())
 
-        val result = inlinePdfHandler.downloadToCache(url)
+        val result = inlinePdfHandler.downloadToCache(url, browserMode = BrowserMode.REGULAR)
 
         assertTrue(result is PdfDownloadResult.Success)
         assertNull((result as PdfDownloadResult.Success).certificate)
@@ -629,11 +630,11 @@ class InlinePdfHandlerTest {
         server.enqueue(MockResponse().setResponseCode(200).setBody(Buffer().write(pdfBytes)))
         val url = server.url("/no-sidecar.pdf").toString()
 
-        val first = inlinePdfHandler.downloadToCache(url)
+        val first = inlinePdfHandler.downloadToCache(url, browserMode = BrowserMode.REGULAR)
         assertTrue(first is PdfDownloadResult.Success)
         assertNull((first as PdfDownloadResult.Success).certificate)
 
-        val second = inlinePdfHandler.downloadToCache(url)
+        val second = inlinePdfHandler.downloadToCache(url, browserMode = BrowserMode.REGULAR)
         assertTrue(second is PdfDownloadResult.Success)
         assertNull((second as PdfDownloadResult.Success).certificate)
     }

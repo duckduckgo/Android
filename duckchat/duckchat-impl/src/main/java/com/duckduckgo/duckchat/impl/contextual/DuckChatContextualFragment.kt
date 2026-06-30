@@ -1017,6 +1017,7 @@ class DuckChatContextualFragment :
             mimeType = mimeType,
             subfolder = Environment.DIRECTORY_DOWNLOADS,
             fileName = "duck.ai_${System.currentTimeMillis()}",
+            browserMode = browserMode,
         )
 
         if (hasWriteStoragePermission()) {
