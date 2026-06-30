@@ -28,6 +28,7 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.browser.api.WebViewVersionProvider
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.customtabs.api.CustomTabDetector
+import com.duckduckgo.duckchat.impl.pixel.AiFeaturesStateReporter
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.verifiedinstallation.IsVerifiedPlayStoreInstall
@@ -52,6 +53,7 @@ class EnqueuedPixelWorkerTest {
     private val androidBrowserConfigFeature = FakeFeatureToggleFactory.create(AndroidBrowserConfigFeature::class.java)
     private val isVerifiedPlayStoreInstall: IsVerifiedPlayStoreInstall = mock()
     private val appBuildConfig: AppBuildConfig = mock()
+    private val aiFeaturesStateReporter: AiFeaturesStateReporter = mock()
 
     private lateinit var enqueuedPixelWorker: EnqueuedPixelWorker
 
@@ -67,8 +69,9 @@ class EnqueuedPixelWorkerTest {
             androidBrowserConfigFeature,
             isVerifiedPlayStoreInstall,
             appBuildConfig,
-            appCoroutineScope = coroutineRule.testScope,
             dispatchers = coroutineRule.testDispatcherProvider,
+            appCoroutineScope = coroutineRule.testScope,
+            aiFeaturesStateReporter = aiFeaturesStateReporter,
         )
         setupRemoteConfig(browserEnabled = false, collectFullWebViewVersionEnabled = false)
     }
