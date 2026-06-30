@@ -145,6 +145,7 @@ class BrowserWebViewClient @Inject constructor(
     private var start: Long? = null
     private var lastInterceptedAppSchemeUrl: String? = null
     private var pageCommitVisibleFired: Boolean = false
+    private var recompositeScheduled: Boolean = false
 
     private val isAppSchemeInterceptionEnabled = AtomicBoolean(true)
     private val isForceRecompositeEnabled = AtomicBoolean(true)
@@ -513,6 +514,7 @@ class BrowserWebViewClient @Inject constructor(
         logcat { "onPageStarted webViewUrl: ${webView.url} URL: $url lastPageStarted $lastPageStarted" }
 
         pageCommitVisibleFired = false
+        recompositeScheduled = false
 
         // Handle app-scheme URLs that bypass shouldOverrideUrlLoading (e.g., window.open with intent:// URLs)
         if (url != null && interceptAppSchemeUrl(webView, url)) {
@@ -622,10 +624,12 @@ class BrowserWebViewClient @Inject constructor(
         if (webView.progress == 100) {
             // Without onPageCommitVisible a recycled WebView keeps drawing the previous
             // navigation's frame until a re-composite. Only worth doing for a foreground tab.
-            if (url != null && url != ABOUT_BLANK && !pageCommitVisibleFired) {
+            // onPageFinished can fire more than once per load (redirects, subframes), so latch
+            // to force at most one re-composite per navigation (reset in onPageStarted).
+            if (url != null && url != ABOUT_BLANK && !pageCommitVisibleFired && !recompositeScheduled) {
                 if (isForceRecompositeEnabled.get() && webViewClientListener?.isTabInForeground() == true) {
                     logcat(VERBOSE) { "onPageCommitVisible never fired for $url; forcing present" }
-                    pixel.fire(WebViewPixelName.WEB_VIEW_FORCED_RECOMPOSITE, type = Pixel.PixelType.Daily())
+                    recompositeScheduled = true
                     forceWebViewPresent(webView)
                 }
             }
@@ -705,8 +709,16 @@ class BrowserWebViewClient @Inject constructor(
 
     private fun forceWebViewPresent(webView: WebView) {
         webView.post {
-            webView.onPause()
-            webView.onResume()
+            // The foreground state checked when this was scheduled can go stale before the
+            // posted runnable runs: the user may switch tabs or move to a PDF / new-tab view,
+            // all of which pause (and hide) the WebView via the fragment lifecycle. Re-check
+            // here so we never resume a WebView the fragment intended to keep paused, which
+            // would leave it running JS/timers/media while hidden.
+            if (webView.isShown && webViewClientListener?.isTabInForeground() == true) {
+                pixel.fire(WebViewPixelName.WEB_VIEW_FORCED_RECOMPOSITE, type = Pixel.PixelType.Daily())
+                webView.onPause()
+                webView.onResume()
+            }
         }
     }
 

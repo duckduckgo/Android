@@ -1265,12 +1265,44 @@ class BrowserWebViewClientTest {
         whenever(mockWebView.progress).thenReturn(100)
         whenever(mockWebView.safeCopyBackForwardList()).thenReturn(TestBackForwardList())
         whenever(mockWebView.settings).thenReturn(mock())
+        whenever(mockWebView.isShown).thenReturn(true)
         whenever(listener.isTabInForeground()).thenReturn(true)
         testee.onPageStarted(mockWebView, EXAMPLE_URL, null)
         testee.onPageFinished(mockWebView, EXAMPLE_URL)
         verify(mockWebView).onPause()
         verify(mockWebView).onResume()
         verify(pixel).fire(WebViewPixelName.WEB_VIEW_FORCED_RECOMPOSITE, type = Pixel.PixelType.Daily())
+    }
+
+    @Test
+    fun whenPageFinishesMultipleTimesAndCommitVisibleNeverFiredThenWebViewRecompositedOnlyOnce() {
+        val mockWebView = getImmediatelyInvokedMockWebView()
+        whenever(mockWebView.progress).thenReturn(100)
+        whenever(mockWebView.safeCopyBackForwardList()).thenReturn(TestBackForwardList())
+        whenever(mockWebView.settings).thenReturn(mock())
+        whenever(mockWebView.isShown).thenReturn(true)
+        whenever(listener.isTabInForeground()).thenReturn(true)
+        testee.onPageStarted(mockWebView, EXAMPLE_URL, null)
+        testee.onPageFinished(mockWebView, EXAMPLE_URL)
+        testee.onPageFinished(mockWebView, EXAMPLE_URL)
+        verify(mockWebView, times(1)).onPause()
+        verify(mockWebView, times(1)).onResume()
+        verify(pixel, times(1)).fire(WebViewPixelName.WEB_VIEW_FORCED_RECOMPOSITE, type = Pixel.PixelType.Daily())
+    }
+
+    @Test
+    fun whenPageFinishesAndCommitVisibleNeverFiredButWebViewNotShownThenWebViewNotRecomposited() {
+        val mockWebView = getImmediatelyInvokedMockWebView()
+        whenever(mockWebView.progress).thenReturn(100)
+        whenever(mockWebView.safeCopyBackForwardList()).thenReturn(TestBackForwardList())
+        whenever(mockWebView.settings).thenReturn(mock())
+        whenever(mockWebView.isShown).thenReturn(false)
+        whenever(listener.isTabInForeground()).thenReturn(true)
+        testee.onPageStarted(mockWebView, EXAMPLE_URL, null)
+        testee.onPageFinished(mockWebView, EXAMPLE_URL)
+        verify(mockWebView, never()).onPause()
+        verify(mockWebView, never()).onResume()
+        verify(pixel, never()).fire(eq(WebViewPixelName.WEB_VIEW_FORCED_RECOMPOSITE), any(), any(), any())
     }
 
     @Test
