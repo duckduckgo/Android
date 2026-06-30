@@ -28,9 +28,6 @@ import com.duckduckgo.app.pixels.AppPixelName.ADDRESS_BAR_WEBSITE_ENTRY_CLEARED
 import com.duckduckgo.app.pixels.AppPixelName.ADD_BOOKMARK_CONFIRM_EDITED
 import com.duckduckgo.app.pixels.AppPixelName.AI_CHAT_DUCK_AI_DIRECT_NAVIGATION_COUNT
 import com.duckduckgo.app.pixels.AppPixelName.AI_CHAT_DUCK_AI_DIRECT_NAVIGATION_DAILY
-import com.duckduckgo.app.pixels.AppPixelName.FIRE_TABS_PROMO_NTP_CTA
-import com.duckduckgo.app.pixels.AppPixelName.FIRE_TABS_PROMO_NTP_DISMISSED
-import com.duckduckgo.app.pixels.AppPixelName.FIRE_TABS_PROMO_NTP_SHOWN
 import com.duckduckgo.app.pixels.AppPixelName.FIRE_TABS_PROMO_TAB_SWITCHER_DISMISSED
 import com.duckduckgo.app.pixels.AppPixelName.FIRE_TABS_PROMO_TAB_SWITCHER_SHOWN
 import com.duckduckgo.app.pixels.AppPixelName.KEYBOARD_GO_NEW_TAB_CLICKED
@@ -92,9 +89,6 @@ class EngagementPixelsParamRemovalPlugin @Inject constructor() : PixelParamRemov
             ADD_BOOKMARK_CONFIRM_EDITED.pixelName to PixelParameter.removeAtb(),
             LONG_PRESS_COPY_LINK_TEXT.pixelName to PixelParameter.removeAtb(),
             LONG_PRESS_NEW_FIRE_TAB.pixelName to PixelParameter.removeAtb(),
-            FIRE_TABS_PROMO_NTP_SHOWN.pixelName to PixelParameter.removeAtb(),
-            FIRE_TABS_PROMO_NTP_CTA.pixelName to PixelParameter.removeAtb(),
-            FIRE_TABS_PROMO_NTP_DISMISSED.pixelName to PixelParameter.removeAtb(),
             FIRE_TABS_PROMO_TAB_SWITCHER_SHOWN.pixelName to PixelParameter.removeAtb(),
             FIRE_TABS_PROMO_TAB_SWITCHER_DISMISSED.pixelName to PixelParameter.removeAtb(),
             AI_CHAT_DUCK_AI_DIRECT_NAVIGATION_COUNT.pixelName to PixelParameter.removeAtb(),

@@ -22,8 +22,6 @@ import com.duckduckgo.app.browser.defaultbrowsing.prompts.AdditionalDefaultBrows
 import com.duckduckgo.app.browser.newtab.LowPriorityMessage.DefaultBrowserMessage
 import com.duckduckgo.app.browser.newtab.NewTabPageViewModel.Command
 import com.duckduckgo.app.browser.newtab.NewTabPageViewModel.Command.LaunchDefaultBrowser
-import com.duckduckgo.app.browser.newtab.NewTabPageViewModel.Command.LaunchTabSwitcherForFirePromo
-import com.duckduckgo.app.fire.promo.FireTabsPromos
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.ui.view.MessageCta.Message
@@ -39,7 +37,6 @@ class LowPriorityMessagingModelImpl @Inject constructor(
     private val additionalDefaultBrowserPrompts: AdditionalDefaultBrowserPrompts,
     private val pixel: Pixel,
     private val context: Context,
-    private val fireTabsPromos: FireTabsPromos,
 ) : LowPriorityMessagingModel {
 
     private var lowPriorityMessage: LowPriorityMessage? = null
@@ -88,33 +85,6 @@ class LowPriorityMessagingModelImpl @Inject constructor(
                 )
             }
 
-            fireTabsPromos.canShowNtpPromo() -> {
-                LowPriorityMessage.FireTabsPromoMessage(
-                    Message(
-                        topIllustration = com.duckduckgo.mobile.android.R.drawable.ic_fire_tab_placeholder_96,
-                        title = context.getString(R.string.fireTabsPromoNtpTitle),
-                        subtitle = context.getString(R.string.fireTabsPromoNtpMessage),
-                        action = context.getString(R.string.fireTabsPromoNtpPrimaryCta),
-                        action2 = context.getString(R.string.fireTabsPromoNtpSecondaryCta),
-                    ),
-                    onPrimaryAction = {
-                        fireTabsPromos.onNtpPromoInteracted()
-                        pixel.fire(AppPixelName.FIRE_TABS_PROMO_NTP_CTA)
-                    },
-                    onSecondaryAction = {
-                        fireTabsPromos.onNtpPromoInteracted()
-                        pixel.fire(AppPixelName.FIRE_TABS_PROMO_NTP_DISMISSED)
-                    },
-                    onClose = {
-                        fireTabsPromos.onNtpPromoInteracted()
-                        pixel.fire(AppPixelName.FIRE_TABS_PROMO_NTP_DISMISSED)
-                    },
-                    onShown = {
-                        pixel.fire(AppPixelName.FIRE_TABS_PROMO_NTP_SHOWN)
-                    },
-                )
-            }
-
             else -> null
         }
     }
@@ -154,20 +124,6 @@ sealed class LowPriorityMessage {
         override fun getPrimaryAction(): Command {
             return LaunchDefaultBrowser
         }
-    }
-
-    data class FireTabsPromoMessage(
-        override val message: Message,
-        private val onPrimaryAction: suspend () -> Unit,
-        private val onSecondaryAction: suspend () -> Unit,
-        private val onClose: suspend () -> Unit,
-        private val onShown: () -> Unit,
-    ) : LowPriorityMessage() {
-        override suspend fun onPrimaryButtonClicked() = onPrimaryAction()
-        override suspend fun onSecondaryButtonClicked() = onSecondaryAction()
-        override suspend fun onCloseButtonClicked() = onClose()
-        override fun onMessageShown() = onShown()
-        override fun getPrimaryAction(): Command = LaunchTabSwitcherForFirePromo
     }
 
     // Add here other low priority messages as needed.

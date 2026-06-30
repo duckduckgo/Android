@@ -67,6 +67,8 @@ import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
+import com.duckduckgo.remote.messaging.api.Content
+import com.duckduckgo.remote.messaging.api.RemoteMessageModel
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import kotlinx.coroutines.CoroutineScope
@@ -112,11 +114,12 @@ class TabSwitcherViewModel @Inject constructor(
     private val tabTitleResolver: TabTitleResolver,
     @param:AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val fireTabsPromos: FireTabsPromos,
+    private val remoteMessageModel: RemoteMessageModel,
 ) : ViewModel() {
 
     private val fireModeAvailable = fireModeAvailability.isAvailable()
 
-    private val currentMode: StateFlow<BrowserMode> =
+    val currentMode: StateFlow<BrowserMode> =
         if (fireModeAvailable) {
             browserModeStateHolder.currentMode
         } else {
@@ -148,8 +151,16 @@ class TabSwitcherViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            val canShow = fireTabsPromos.canShowTabSwitcherPromo()
-            if (canShow && !tabSwitcherPromoHandled) {
+            val showPromo = withContext(dispatcherProvider.io()) {
+                val activeMessage = remoteMessageModel.getActiveMessage()
+                val isFireTabsCampaign =
+                    (activeMessage?.content as? Content.BigTwoActions)?.placeholder == Content.Placeholder.FIRE_TABS
+                isFireTabsCampaign &&
+                    currentMode.value == BrowserMode.REGULAR &&
+                    fireTabsPromos.canShowTabSwitcherPromo()
+            }
+            // Re-check the dismiss flag after the suspending read: the user may have toggled modes meanwhile.
+            if (showPromo && !tabSwitcherPromoHandled) {
                 tabSwitcherPromoHandled = true
                 fireTabsPromos.onTabSwitcherPromoShown()
                 pixel.fire(AppPixelName.FIRE_TABS_PROMO_TAB_SWITCHER_SHOWN)
@@ -547,6 +558,8 @@ class TabSwitcherViewModel @Inject constructor(
 
         if (viewState.value.mode is Selection) {
             triggerNormalMode()
+        } else if (viewState.value.showFireTabsEmptyState) {
+            command.value = Command.SwitchToRegularMode
         } else {
             command.value = Command.Close
         }
@@ -557,6 +570,8 @@ class TabSwitcherViewModel @Inject constructor(
 
         if (viewState.value.mode is Selection) {
             triggerNormalMode()
+        } else if (viewState.value.showFireTabsEmptyState) {
+            command.value = Command.SwitchToRegularMode
         } else {
             command.value = Command.Close
         }

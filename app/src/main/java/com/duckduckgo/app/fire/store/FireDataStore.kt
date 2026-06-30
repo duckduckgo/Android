@@ -122,12 +122,10 @@ interface FireDataStore {
      */
     suspend fun setAutomaticallyClearWhenOption(option: ClearWhenOption)
 
-    suspend fun setNtpPromoDismissed(dismissed: Boolean)
-    suspend fun isNtpPromoDismissed(): Boolean
     suspend fun setTabSwitcherPromoDismissed(dismissed: Boolean)
     suspend fun isTabSwitcherPromoDismissed(): Boolean
-    suspend fun setUserBurnedWhileBrowsing(burned: Boolean)
-    suspend fun hasUserBurnedWhileBrowsing(): Boolean
+    suspend fun setUsedFireMode(used: Boolean)
+    suspend fun hasUsedFireMode(): Boolean
 }
 
 @ContributesBinding(AppScope::class)
@@ -143,9 +141,8 @@ class SharedPreferencesFireDataStore @Inject constructor(
         val KEY_AUTOMATIC_CLEAR_OPTIONS = stringSetPreferencesKey(name = "AUTOMATIC_CLEAR_OPTIONS")
         val KEY_AUTOMATIC_CLEAR_WHEN_OPTION = stringPreferencesKey(name = "AUTOMATIC_CLEAR_WHEN_OPTION")
         val DEFAULT_OPTIONS = setOf(FireClearOption.TABS, FireClearOption.DATA)
-        val KEY_FIRE_TABS_NTP_PROMO_DISMISSED = booleanPreferencesKey(name = "FIRE_TABS_NTP_PROMO_DISMISSED")
         val KEY_FIRE_TABS_TAB_SWITCHER_PROMO_DISMISSED = booleanPreferencesKey(name = "FIRE_TABS_TAB_SWITCHER_PROMO_DISMISSED")
-        val KEY_FIRE_TABS_USER_BURNED_WHILE_BROWSING = booleanPreferencesKey(name = "FIRE_TABS_USER_BURNED_WHILE_BROWSING")
+        val KEY_FIRE_TABS_USED_FIRE_MODE = booleanPreferencesKey(name = "FIRE_TABS_USED_FIRE_MODE")
     }
 
     private suspend fun getLegacyOptions(): Set<FireClearOption> = withContext(dispatcherProvider.io()) {
@@ -272,13 +269,6 @@ class SharedPreferencesFireDataStore @Inject constructor(
         }
     }
 
-    override suspend fun setNtpPromoDismissed(dismissed: Boolean) {
-        store.edit { it[KEY_FIRE_TABS_NTP_PROMO_DISMISSED] = dismissed }
-    }
-
-    override suspend fun isNtpPromoDismissed(): Boolean =
-        store.data.map { it[KEY_FIRE_TABS_NTP_PROMO_DISMISSED] ?: false }.firstOrNull() ?: false
-
     override suspend fun setTabSwitcherPromoDismissed(dismissed: Boolean) {
         store.edit { it[KEY_FIRE_TABS_TAB_SWITCHER_PROMO_DISMISSED] = dismissed }
     }
@@ -286,12 +276,12 @@ class SharedPreferencesFireDataStore @Inject constructor(
     override suspend fun isTabSwitcherPromoDismissed(): Boolean =
         store.data.map { it[KEY_FIRE_TABS_TAB_SWITCHER_PROMO_DISMISSED] ?: false }.firstOrNull() ?: false
 
-    override suspend fun setUserBurnedWhileBrowsing(burned: Boolean) {
-        store.edit { it[KEY_FIRE_TABS_USER_BURNED_WHILE_BROWSING] = burned }
+    override suspend fun setUsedFireMode(used: Boolean) {
+        store.edit { it[KEY_FIRE_TABS_USED_FIRE_MODE] = used }
     }
 
-    override suspend fun hasUserBurnedWhileBrowsing(): Boolean =
-        store.data.map { it[KEY_FIRE_TABS_USER_BURNED_WHILE_BROWSING] ?: false }.firstOrNull() ?: false
+    override suspend fun hasUsedFireMode(): Boolean =
+        store.data.map { it[KEY_FIRE_TABS_USED_FIRE_MODE] ?: false }.firstOrNull() ?: false
 
     private fun parseOptionsFromStrings(stringSet: Set<String>): Set<FireClearOption> {
         return stringSet.mapNotNull { name ->

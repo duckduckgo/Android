@@ -48,25 +48,8 @@ class SharedPreferencesFireDataStoreTest {
     )
 
     @Test
-    fun whenNtpPromoNotSetThenIsNtpPromoDismissedIsFalse() = runTest {
-        assertFalse(testee().isNtpPromoDismissed())
-    }
-
-    @Test
     fun whenTabSwitcherPromoNotSetThenIsTabSwitcherPromoDismissedIsFalse() = runTest {
         assertFalse(testee().isTabSwitcherPromoDismissed())
-    }
-
-    @Test
-    fun whenUserBurnedNotSetThenHasUserBurnedWhileBrowsingIsFalse() = runTest {
-        assertFalse(testee().hasUserBurnedWhileBrowsing())
-    }
-
-    @Test
-    fun whenNtpPromoDismissedSetTrueThenIsNtpPromoDismissedIsTrue() = runTest {
-        val testee = testee()
-        testee.setNtpPromoDismissed(true)
-        assertTrue(testee.isNtpPromoDismissed())
     }
 
     @Test
@@ -77,9 +60,14 @@ class SharedPreferencesFireDataStoreTest {
     }
 
     @Test
-    fun whenUserBurnedSetTrueThenHasUserBurnedWhileBrowsingIsTrue() = runTest {
+    fun whenUsedFireModeNotSetThenHasUsedFireModeIsFalse() = runTest {
+        assertFalse(testee().hasUsedFireMode())
+    }
+
+    @Test
+    fun whenUsedFireModeSetTrueThenHasUsedFireModeIsTrue() = runTest {
         val testee = testee()
-        testee.setUserBurnedWhileBrowsing(true)
-        assertTrue(testee.hasUserBurnedWhileBrowsing())
+        testee.setUsedFireMode(true)
+        assertTrue(testee.hasUsedFireMode())
     }
 }

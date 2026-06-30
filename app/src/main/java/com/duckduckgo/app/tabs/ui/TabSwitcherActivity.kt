@@ -38,6 +38,7 @@ import androidx.core.text.HtmlCompat
 import androidx.core.view.children
 import androidx.core.view.doOnPreDraw
 import androidx.core.view.isVisible
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DefaultItemAnimator
@@ -82,7 +83,7 @@ import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.ShowUndoDeleteTab
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.ViewState.Mode
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.ViewState.Mode.Selection
 import com.duckduckgo.browser.api.ui.BrowserScreens.TabSwitcherScreenNoParams
-import com.duckduckgo.browser.api.ui.BrowserScreens.TabSwitcherScreenWithFireToggleHighlight
+import com.duckduckgo.browser.api.ui.BrowserScreens.TabSwitcherScreenParams
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.menu.PopupMenu
@@ -120,7 +121,7 @@ import com.duckduckgo.mobile.android.R as CommonR
 
 @InjectWith(ActivityScope::class)
 @ContributeToActivityStarter(TabSwitcherScreenNoParams::class, screenName = "tabSwitcher")
-@ContributeToActivityStarter(TabSwitcherScreenWithFireToggleHighlight::class, screenName = "tabSwitcher")
+@ContributeToActivityStarter(TabSwitcherScreenParams::class)
 class TabSwitcherActivity :
     DuckDuckGoActivity(),
     TabSwitcherListener,
@@ -258,10 +259,6 @@ class TabSwitcherActivity :
     private var fadingInAfterRecreate = false
     private var fadeInAnimationStarted = false
 
-    // Read in onCreate; consumed by the Fire-mode toggle pulse wiring in Task 13.
-    private var launchedWithFireHighlight = false
-    private var fireHighlightConsumed = false
-
     private var lastSnackbar: DefaultSnackbar? = null
 
     private val binding: ActivityTabSwitcherBinding by viewBinding()
@@ -291,6 +288,8 @@ class TabSwitcherActivity :
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        if (switchToRequestedModeIfNeeded(savedInstanceState)) return
+
         val edgeToEdgeEnabled = edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.BROWSER)
         if (edgeToEdgeEnabled) {
             val barStyle = if (isDarkThemeEnabled()) {
@@ -304,8 +303,6 @@ class TabSwitcherActivity :
         setContentView(binding.root)
 
         fadingInAfterRecreate = savedInstanceState?.getBoolean(KEY_FADE_IN_AFTER_RECREATE) == true
-        launchedWithFireHighlight = intent.getActivityParams(TabSwitcherScreenWithFireToggleHighlight::class.java) != null
-        fireHighlightConsumed = savedInstanceState?.getBoolean(KEY_FIRE_HIGHLIGHT_CONSUMED) == true
 
         tabsAdapter.setAnimationTileCloseClickListener {
             viewModel.onTrackerAnimationInfoPanelClicked()
@@ -330,18 +327,48 @@ class TabSwitcherActivity :
         }
 
         configureObservers()
+        observeBrowserModeChanges()
         configureOnBackPressedListener()
 
         initMenuClickListeners()
+    }
+
+    /**
+     * When launched via [TabSwitcherScreenParams] with a mode different from the active one, switch to that
+     * mode and recreate so the activity — and its tab repository — resolve for it. Returns true when a
+     * recreate was triggered, so [onCreate] aborts and lets the recreated instance render the requested mode.
+     *
+     * Applied only on a fresh launch ([savedInstanceState] == null). The params extra persists across
+     * recreate(), so re-reading it on every onCreate would re-apply the launch mode and undo any later mode
+     * toggle — trapping the user in the launch mode.
+     */
+    private fun switchToRequestedModeIfNeeded(savedInstanceState: Bundle?): Boolean {
+        if (savedInstanceState != null) return false
+        val requestedMode = intent.getActivityParams(TabSwitcherScreenParams::class.java)?.browserMode ?: return false
+        if (requestedMode == currentBrowserMode) return false
+        viewModel.onBrowserModeToggled(requestedMode)
+        // Recreate explicitly here (rather than via observeBrowserModeChanges): this runs before that observer
+        // is registered, and must recreate before rendering so the launch screen never shows the previous mode.
+        recreate()
+        return true
+    }
+
+    private fun observeBrowserModeChanges() {
+        lifecycleScope.launch {
+            viewModel.currentMode
+                .flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED)
+                .collect { mode ->
+                    if (mode != currentBrowserMode) {
+                        recreate()
+                    }
+                }
+        }
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         if (fadingOutForRecreate) {
             outState.putBoolean(KEY_FADE_IN_AFTER_RECREATE, true)
-        }
-        if (launchedWithFireHighlight && !isChangingConfigurations) {
-            outState.putBoolean(KEY_FIRE_HIGHLIGHT_CONSUMED, true)
         }
     }
 
@@ -522,10 +549,7 @@ class TabSwitcherActivity :
         browserModeToggle?.setMode(state.browserMode)
         state.regularTabCount?.let { browserModeToggle?.setRegularTabCount(it) }
         updateToolbarTitle(state.mode, state.tabs.size)
-        val highlightFromCta = launchedWithFireHighlight && !fireHighlightConsumed
-        val shouldHighlightFireToggle = state.browserMode == BrowserMode.REGULAR &&
-            (state.isFireTabsPromoVisible || highlightFromCta)
-        browserModeToggle?.setFireSegmentHighlighted(shouldHighlightFireToggle)
+        browserModeToggle?.setFireSegmentHighlighted(state.browserMode == BrowserMode.REGULAR && state.isFireTabsPromoVisible)
         binding.fireTabsPromoBanner.root.isVisible = state.browserMode == BrowserMode.REGULAR && state.isFireTabsPromoVisible
     }
 
@@ -533,12 +557,11 @@ class TabSwitcherActivity :
         if (fadingOutForRecreate) return
         fadingOutForRecreate = true
 
-        // In the Fire tabs empty state the recycler is hidden and empty, so there is nothing to
-        // fade out. Animate nothing and just switch mode and recreate immediately; the recreated
+        // In the Fire tabs empty state the recycler is hidden and empty, so there is nothing to fade out.
+        // Just toggle the mode; observeBrowserModeChanges() recreates as a consequence. The recreated
         // activity still fades the new mode's tabs in via the saved fadingInAfterRecreate flag.
         if (tabsRecycler.visibility != View.VISIBLE) {
             viewModel.onBrowserModeToggled(newMode)
-            recreate()
             return
         }
 
@@ -548,7 +571,6 @@ class TabSwitcherActivity :
             .withEndAction {
                 tabsRecycler.visibility = View.INVISIBLE
                 viewModel.onBrowserModeToggled(newMode)
-                recreate()
             }
             .start()
     }
@@ -1210,6 +1232,5 @@ class TabSwitcherActivity :
 
         private const val ANCHOR_REPIN_WINDOW_MS = 1000L
         private const val KEY_FADE_IN_AFTER_RECREATE = "fadeInAfterModeSwitchRecreate"
-        private const val KEY_FIRE_HIGHLIGHT_CONSUMED = "fireHighlightConsumed"
     }
 }

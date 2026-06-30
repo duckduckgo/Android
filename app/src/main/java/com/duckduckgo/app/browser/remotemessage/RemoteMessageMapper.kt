@@ -30,6 +30,7 @@ import com.duckduckgo.remote.messaging.api.Content.Placeholder.CRITICAL_UPDATE
 import com.duckduckgo.remote.messaging.api.Content.Placeholder.DDG_ANNOUNCE
 import com.duckduckgo.remote.messaging.api.Content.Placeholder.DUCK_AI
 import com.duckduckgo.remote.messaging.api.Content.Placeholder.DUCK_AI_OLD
+import com.duckduckgo.remote.messaging.api.Content.Placeholder.FIRE_TABS
 import com.duckduckgo.remote.messaging.api.Content.Placeholder.IMAGE_AI
 import com.duckduckgo.remote.messaging.api.Content.Placeholder.KEY_IMPORT
 import com.duckduckgo.remote.messaging.api.Content.Placeholder.MAC_AND_WINDOWS
@@ -116,5 +117,6 @@ private fun Placeholder.drawable(isLightModeEnabled: Boolean): Int {
         SPLIT_BAR_SETTINGS -> R.drawable.ic_split_bar_mobile_settings
         BOOKMARKS_IMPORT -> R.drawable.bookmarks_import_96
         NEW_TAB_OPTIONS -> R.drawable.newtab_options_96
+        FIRE_TABS -> R.drawable.ic_fire_tab_placeholder_96
     }
 }

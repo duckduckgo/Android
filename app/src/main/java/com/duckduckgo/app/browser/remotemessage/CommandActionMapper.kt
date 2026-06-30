@@ -47,6 +47,7 @@ class RealCommandActionMapper @Inject constructor(
                 NewTabPageViewModel.Command.SubmitUrl(surveyParameterManager.buildSurveyUrl(action.value, queryParams))
             }
             is DefaultCredentialProvider -> NewTabPageViewModel.Command.LaunchDefaultCredentialProvider
+            is FireTabsPromo -> NewTabPageViewModel.Command.LaunchTabSwitcherForFirePromo
         }
     }
 }

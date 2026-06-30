@@ -575,32 +575,6 @@ class NewTabPageViewModelTest {
     }
 
     @Test
-    fun `when Fire Tabs promo message available, then hide logo`() = runTest {
-        val lowPriorityMessage = LowPriorityMessage.FireTabsPromoMessage(
-            message = MessageCta.Message(
-                topIllustration = R.drawable.ic_device_mobile_default,
-                title = "Try Fire Tabs",
-                action = "Try Fire Tabs",
-                action2 = "Not Now",
-            ),
-            onPrimaryAction = {},
-            onSecondaryAction = {},
-            onClose = {},
-            onShown = {},
-        )
-        whenever(mockLowPriorityMessagingModel.getMessage()).thenReturn(lowPriorityMessage)
-
-        testee.onStart(mockLifecycleOwner)
-
-        testee.viewState.test {
-            expectMostRecentItem().also {
-                assertFalse(it.shouldShowLogo)
-                assertTrue(it.hasContent)
-            }
-        }
-    }
-
-    @Test
     fun `when low priority message available and logo disabled, then hide logo`() = runTest {
         val testeeWithoutLogo = createTestee(showLogo = false)
         val lowPriorityMessage = LowPriorityMessage.DefaultBrowserMessage(

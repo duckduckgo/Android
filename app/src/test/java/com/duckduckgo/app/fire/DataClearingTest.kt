@@ -20,7 +20,6 @@ package com.duckduckgo.app.fire
 
 import android.annotation.SuppressLint
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.duckduckgo.app.fire.promo.FireTabsPromos
 import com.duckduckgo.app.fire.store.FireDataStore
 import com.duckduckgo.app.fire.store.TabVisitedSitesRepository
 import com.duckduckgo.app.fire.wideevents.DataClearingWideEvent
@@ -60,7 +59,6 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.argThat
 import org.mockito.kotlin.eq
-import org.mockito.kotlin.inOrder
 import org.mockito.kotlin.isNull
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
@@ -129,9 +127,6 @@ class DataClearingTest {
     @Mock
     private lateinit var mockDataClearingTrigger: DataClearingTrigger
 
-    @Mock
-    private lateinit var mockFireTabsPromos: FireTabsPromos
-
     private val showClearDuckAIChatHistoryFlow = MutableStateFlow(true)
     private val showOnAppLaunchOptionFlow = MutableStateFlow<ShowOnAppLaunchOption>(ShowOnAppLaunchOption.LastOpenedTab)
 
@@ -166,7 +161,6 @@ class DataClearingTest {
             contextualDataStore = mockContextualDataStore,
             showOnAppLaunchOptionDataStore = mockShowOnAppLaunchOptionDataStore,
             dataClearingTrigger = mockDataClearingTrigger,
-            fireTabsPromos = mockFireTabsPromos,
         )
     }
 
@@ -293,19 +287,6 @@ class DataClearingTest {
         verify(mockClearDataAction).setAppUsedSinceLastClearFlag(false)
         verify(mockDataClearingWideEvent).finishSuccess()
         verify(mockClearDataAction).killAndRestartProcess(notifyDataCleared = false)
-    }
-
-    @Test
-    fun whenManualBurnRestartsProcess_thenUserBurnedRecordedBeforeRestart() = runTest {
-        configureManualOptions(setOf(FireClearOption.DATA))
-
-        testee.clearDataUsingManualFireOptions(shouldRestartIfRequired = true, wasAppUsedSinceLastClear = false, browserMode = BrowserMode.REGULAR)
-
-        // The burn must be recorded before the process is killed, otherwise the NTP promo trigger is lost.
-        inOrder(mockFireTabsPromos, mockClearDataAction) {
-            verify(mockFireTabsPromos).onUserBurned()
-            verify(mockClearDataAction).killAndRestartProcess(notifyDataCleared = false)
-        }
     }
 
     @Test
@@ -1382,35 +1363,6 @@ class DataClearingTest {
         testee.clearTabContextualChat("tab1", browserMode = BrowserMode.REGULAR)
 
         verify(mockDataClearingTrigger, never()).clearData(argThat { hasFireScopedType() })
-    }
-
-    // --- FireTabsPromos recording ---
-
-    @Test
-    fun whenManualBurnInRegularModeThenUserBurnedRecorded() = runTest {
-        testee.clearDataUsingManualFireOptions(browserMode = BrowserMode.REGULAR)
-        verify(mockFireTabsPromos).onUserBurned()
-    }
-
-    @Test
-    fun whenManualBurnInFireModeThenUserBurnedNotRecorded() = runTest {
-        testee.clearDataUsingManualFireOptions(browserMode = BrowserMode.FIRE)
-        verify(mockFireTabsPromos, never()).onUserBurned()
-    }
-
-    @Test
-    fun whenSingleTabBurnInRegularModeThenUserBurnedRecorded() = runTest {
-        whenever(mockClearDataAction.clearDataForSpecificDomains(any())).thenReturn(ClearDataResult.Success)
-        testee.clearSingleTabData(tabId = "tab-1", replaceCurrentTab = false, browserMode = BrowserMode.REGULAR)
-        verify(mockFireTabsPromos).onUserBurned()
-    }
-
-    @Test
-    fun whenSingleTabBurnInFireModeThenUserBurnedNotRecorded() = runTest {
-        whenever(mockTabVisitedSitesRepository.getVisitedSites("tab-1")).thenReturn(emptySet())
-        whenever(mockTabRepository.getTab("tab-1")).thenReturn(null)
-        testee.clearSingleTabData(tabId = "tab-1", replaceCurrentTab = false, browserMode = BrowserMode.FIRE)
-        verify(mockFireTabsPromos, never()).onUserBurned()
     }
 
     private fun Set<ClearableData>.hasFireScopedType() = any { t ->

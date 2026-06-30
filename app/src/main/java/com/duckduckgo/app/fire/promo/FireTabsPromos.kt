@@ -17,71 +17,47 @@
 package com.duckduckgo.app.fire.promo
 
 import com.duckduckgo.app.fire.store.FireDataStore
-import com.duckduckgo.app.onboarding.OnboardingFlowChecker
-import com.duckduckgo.browsermode.api.BrowserMode
-import com.duckduckgo.browsermode.api.BrowserModeStateHolder
-import com.duckduckgo.browsermode.api.FireModeAvailability
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.remote.messaging.api.Content
 import com.duckduckgo.remote.messaging.api.RemoteMessageModel
 import com.squareup.anvil.annotations.ContributesBinding
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
+/**
+ * Local (client-side) state for the Fire Tabs tab-switcher banner.
+ */
 interface FireTabsPromos {
-    suspend fun canShowNtpPromo(): Boolean
+    /** True if the tab-switcher banner hasn't been shown/dismissed yet (show-once). */
     suspend fun canShowTabSwitcherPromo(): Boolean
-    suspend fun onNtpPromoInteracted()
     suspend fun onTabSwitcherPromoShown()
-    suspend fun onUserBurned()
     suspend fun onFireModeEntered()
 }
 
 @ContributesBinding(AppScope::class)
 class RealFireTabsPromos @Inject constructor(
-    private val fireModeAvailability: FireModeAvailability,
-    private val fireTabsPromoFeature: FireTabsPromoFeature,
     private val fireDataStore: FireDataStore,
-    private val onboardingFlowChecker: OnboardingFlowChecker,
-    private val browserModeStateHolder: BrowserModeStateHolder,
     private val remoteMessageModel: RemoteMessageModel,
     private val dispatchers: DispatcherProvider,
 ) : FireTabsPromos {
 
-    override suspend fun canShowNtpPromo(): Boolean = withContext(dispatchers.io()) {
-        commonGate() &&
-            !fireDataStore.isNtpPromoDismissed() &&
-            fireDataStore.hasUserBurnedWhileBrowsing() &&
-            // Don't compete with an active remote message (e.g. another promo) on the NTP.
-            remoteMessageModel.getActiveMessage() == null
-    }
-
     override suspend fun canShowTabSwitcherPromo(): Boolean = withContext(dispatchers.io()) {
-        commonGate() && !fireDataStore.isTabSwitcherPromoDismissed()
-    }
-
-    override suspend fun onNtpPromoInteracted() {
-        withContext(dispatchers.io()) { fireDataStore.setNtpPromoDismissed(true) }
+        !fireDataStore.isTabSwitcherPromoDismissed()
     }
 
     override suspend fun onTabSwitcherPromoShown() {
         withContext(dispatchers.io()) { fireDataStore.setTabSwitcherPromoDismissed(true) }
     }
 
-    override suspend fun onUserBurned() {
-        withContext(dispatchers.io()) { fireDataStore.setUserBurnedWhileBrowsing(true) }
-    }
-
     override suspend fun onFireModeEntered() {
         withContext(dispatchers.io()) {
-            fireDataStore.setNtpPromoDismissed(true)
+            fireDataStore.setUsedFireMode(true)
             fireDataStore.setTabSwitcherPromoDismissed(true)
+            val activeMessage = remoteMessageModel.getActiveMessage()
+            if ((activeMessage?.content as? Content.BigTwoActions)?.placeholder == Content.Placeholder.FIRE_TABS) {
+                remoteMessageModel.onMessageDismissed(activeMessage)
+            }
         }
     }
-
-    private suspend fun commonGate(): Boolean =
-        fireModeAvailability.isAvailable() &&
-            fireTabsPromoFeature.self().isEnabled() &&
-            browserModeStateHolder.currentMode.value == BrowserMode.REGULAR &&
-            onboardingFlowChecker.isOnboardingComplete()
 }

@@ -56,7 +56,8 @@ import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
-import com.duckduckgo.browser.api.ui.BrowserScreens.TabSwitcherScreenWithFireToggleHighlight
+import com.duckduckgo.browser.api.ui.BrowserScreens.TabSwitcherScreenParams
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
@@ -323,7 +324,8 @@ class NewTabPageView @JvmOverloads constructor(
     }
 
     private fun launchTabSwitcherForFirePromo() {
-        context?.let { globalActivityStarter.start(it, TabSwitcherScreenWithFireToggleHighlight) }
+        // Open the tab switcher in Fire mode; the switcher itself performs the mode switch on open.
+        context?.let { globalActivityStarter.start(it, TabSwitcherScreenParams(BrowserMode.FIRE)) }
     }
 
     @SuppressLint("DenyListedApi")

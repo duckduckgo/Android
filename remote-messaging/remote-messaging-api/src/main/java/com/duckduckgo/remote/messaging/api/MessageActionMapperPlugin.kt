@@ -38,4 +38,5 @@ sealed class JsonActionType(val jsonValue: String) {
     data object NAVIGATION : JsonActionType("navigation")
     data object SURVEY : JsonActionType("survey")
     data object DEFAULT_CREDENTIAL_PROVIDER : JsonActionType("defaultCredentialProvider")
+    data object FIRE_TABS_PROMO : JsonActionType("fireTabsPromo")
 }

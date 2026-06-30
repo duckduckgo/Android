@@ -23,6 +23,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.playstore.PlayStoreUtils
 import com.duckduckgo.di.scopes.ViewScope
@@ -31,6 +32,7 @@ import com.duckduckgo.remote.messaging.api.Action.AppTpOnboarding
 import com.duckduckgo.remote.messaging.api.Action.DefaultBrowser
 import com.duckduckgo.remote.messaging.api.Action.DefaultCredentialProvider
 import com.duckduckgo.remote.messaging.api.Action.Dismiss
+import com.duckduckgo.remote.messaging.api.Action.FireTabsPromo
 import com.duckduckgo.remote.messaging.api.Action.Navigation
 import com.duckduckgo.remote.messaging.api.Action.PlayStore
 import com.duckduckgo.remote.messaging.api.Action.Share
@@ -89,6 +91,7 @@ class RemoteMessageViewModel @Inject constructor(
         ) : Command()
 
         data object LaunchDefaultCredentialProvider : Command()
+        data class LaunchTabSwitcher(val browserMode: BrowserMode) : Command()
     }
 
     private var lastRemoteMessageSeen: RemoteMessage? = null
@@ -209,6 +212,8 @@ class RemoteMessageViewModel @Inject constructor(
                 Command.LaunchScreen(this.value, this.additionalParameters?.get("payload").orEmpty())
             }
             is DefaultCredentialProvider -> Command.LaunchDefaultCredentialProvider
+
+            is FireTabsPromo -> Command.LaunchTabSwitcher(BrowserMode.FIRE)
 
             is Survey -> {
                 val queryParams = additionalParameters?.get("queryParams")?.split(";") ?: emptyList()

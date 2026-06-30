@@ -117,6 +117,7 @@ class BrowserViewModel @Inject constructor(
     private val androidBrowserConfigFeature: AndroidBrowserConfigFeature,
     private val browserModeStateHolder: BrowserModeStateHolder,
     private val fireModeAvailability: FireModeAvailability,
+    private val browserMode: BrowserMode,
 ) : ViewModel(), CoroutineScope {
 
     val currentMode: StateFlow<BrowserMode> = browserModeStateHolder.currentMode
@@ -322,6 +323,10 @@ class BrowserViewModel @Inject constructor(
 
     suspend fun onTabsUpdated(tabs: List<TabEntity>?) {
         if (tabs.isNullOrEmpty()) {
+            // Fire mode never seeds a tab implicitly
+            if (browserMode == BrowserMode.FIRE) {
+                return
+            }
             logcat(INFO) { "Tabs list is null or empty; adding default tab" }
             tabRepository.addDefaultTab()
             return

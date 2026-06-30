@@ -20,7 +20,6 @@ package com.duckduckgo.app.fire
 
 import android.annotation.SuppressLint
 import androidx.core.net.toUri
-import com.duckduckgo.app.fire.promo.FireTabsPromos
 import com.duckduckgo.app.fire.store.FireDataStore
 import com.duckduckgo.app.fire.store.TabVisitedSitesRepository
 import com.duckduckgo.app.fire.wideevents.DataClearingWideEvent
@@ -78,7 +77,6 @@ class DataClearing @Inject constructor(
     private val contextualDataStore: DuckChatContextualDataStore,
     private val showOnAppLaunchOptionDataStore: ShowOnAppLaunchOptionDataStore,
     private val dataClearingTrigger: DataClearingTrigger,
-    private val fireTabsPromos: FireTabsPromos,
 ) : ManualDataClearing, AutomaticDataClearing {
 
     override suspend fun clearSingleTabData(tabId: String, replaceCurrentTab: Boolean, browserMode: BrowserMode): ClearDataResult {
@@ -126,10 +124,6 @@ class DataClearing @Inject constructor(
         clearContextualChatDataIfNeeded(tabId)
         navigationHistory.removeHistoryForTab(tabId)
 
-        if (browserMode == BrowserMode.REGULAR) {
-            fireTabsPromos.onUserBurned()
-        }
-
         logcat { "Single tab clear completed for tab: $tabId" }
         return clearDataResult
     }
@@ -171,9 +165,6 @@ class DataClearing @Inject constructor(
     ) {
         when (browserMode) {
             BrowserMode.REGULAR -> {
-                // Record the burn before clearing: clearRegularDataUsingManualFireOptions may kill and
-                // restart the process, so anything after it would never run.
-                fireTabsPromos.onUserBurned()
                 performFireModeClear()
                 clearRegularDataUsingManualFireOptions(shouldRestartIfRequired)
             }

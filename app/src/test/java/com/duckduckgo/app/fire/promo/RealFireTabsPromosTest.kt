@@ -17,22 +17,19 @@
 package com.duckduckgo.app.fire.promo
 
 import com.duckduckgo.app.fire.store.FireDataStore
-import com.duckduckgo.app.onboarding.OnboardingFlowChecker
-import com.duckduckgo.browsermode.api.BrowserMode
-import com.duckduckgo.browsermode.api.BrowserModeStateHolder
-import com.duckduckgo.browsermode.api.FireModeAvailability
 import com.duckduckgo.common.test.CoroutineTestRule
-import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.remote.messaging.api.Action
+import com.duckduckgo.remote.messaging.api.Content
 import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.duckduckgo.remote.messaging.api.RemoteMessageModel
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
-import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
@@ -40,146 +37,27 @@ class RealFireTabsPromosTest {
 
     @get:Rule val coroutineRule = CoroutineTestRule()
 
-    private val fireModeAvailability: FireModeAvailability = mock()
-    private val fireTabsPromoFeature: FireTabsPromoFeature = mock()
-    private val promoToggle: Toggle = mock()
     private val fireDataStore: FireDataStore = mock()
-    private val onboardingFlowChecker: OnboardingFlowChecker = mock()
-    private val browserModeStateHolder: BrowserModeStateHolder = mock()
     private val remoteMessageModel: RemoteMessageModel = mock()
 
     private val testee by lazy {
         RealFireTabsPromos(
-            fireModeAvailability = fireModeAvailability,
-            fireTabsPromoFeature = fireTabsPromoFeature,
             fireDataStore = fireDataStore,
-            onboardingFlowChecker = onboardingFlowChecker,
-            browserModeStateHolder = browserModeStateHolder,
             remoteMessageModel = remoteMessageModel,
             dispatchers = coroutineRule.testDispatcherProvider,
         )
     }
 
-    @Before
-    fun setup() {
-        whenever(fireTabsPromoFeature.self()).thenReturn(promoToggle)
-        whenever(browserModeStateHolder.currentMode).thenReturn(MutableStateFlow(BrowserMode.REGULAR))
-        whenever(remoteMessageModel.getActiveMessage()).thenReturn(null)
-    }
-
-    private suspend fun allNtpConditionsMet() {
-        whenever(fireModeAvailability.isAvailable()).thenReturn(true)
-        whenever(promoToggle.isEnabled()).thenReturn(true)
-        whenever(onboardingFlowChecker.isOnboardingComplete()).thenReturn(true)
-        whenever(fireDataStore.isNtpPromoDismissed()).thenReturn(false)
-        whenever(fireDataStore.hasUserBurnedWhileBrowsing()).thenReturn(true)
-    }
-
     @Test
-    fun whenAllNtpConditionsMetThenCanShowNtpPromoTrue() = runTest {
-        allNtpConditionsMet()
-        assertTrue(testee.canShowNtpPromo())
-    }
-
-    @Test
-    fun whenNotAvailableThenCanShowNtpPromoFalse() = runTest {
-        allNtpConditionsMet()
-        whenever(fireModeAvailability.isAvailable()).thenReturn(false)
-        assertFalse(testee.canShowNtpPromo())
-    }
-
-    @Test
-    fun whenPromoFlagDisabledThenCanShowNtpPromoFalse() = runTest {
-        allNtpConditionsMet()
-        whenever(promoToggle.isEnabled()).thenReturn(false)
-        assertFalse(testee.canShowNtpPromo())
-    }
-
-    @Test
-    fun whenInFireModeThenCanShowNtpPromoFalse() = runTest {
-        allNtpConditionsMet()
-        whenever(browserModeStateHolder.currentMode).thenReturn(MutableStateFlow(BrowserMode.FIRE))
-        assertFalse(testee.canShowNtpPromo())
-    }
-
-    @Test
-    fun whenNtpDismissedThenCanShowNtpPromoFalse() = runTest {
-        allNtpConditionsMet()
-        whenever(fireDataStore.isNtpPromoDismissed()).thenReturn(true)
-        assertFalse(testee.canShowNtpPromo())
-    }
-
-    @Test
-    fun whenUserNotBurnedThenCanShowNtpPromoFalse() = runTest {
-        allNtpConditionsMet()
-        whenever(fireDataStore.hasUserBurnedWhileBrowsing()).thenReturn(false)
-        assertFalse(testee.canShowNtpPromo())
-    }
-
-    @Test
-    fun whenOnboardingIncompleteThenCanShowNtpPromoFalse() = runTest {
-        allNtpConditionsMet()
-        whenever(onboardingFlowChecker.isOnboardingComplete()).thenReturn(false)
-        assertFalse(testee.canShowNtpPromo())
-    }
-
-    @Test
-    fun whenRemoteMessageActiveThenCanShowNtpPromoFalseButTabSwitcherUnaffected() = runTest {
-        allNtpConditionsMet()
-        whenever(fireDataStore.isTabSwitcherPromoDismissed()).thenReturn(false)
-        whenever(remoteMessageModel.getActiveMessage()).thenReturn(mock<RemoteMessage>())
-
-        // The NTP promo must not compete with an active remote message...
-        assertFalse(testee.canShowNtpPromo())
-        // ...but the tab-switcher promo is unaffected (different surface).
-        assertTrue(testee.canShowTabSwitcherPromo())
-    }
-
-    @Test
-    fun whenCommonGateMetAndNotDismissedThenCanShowTabSwitcherPromoTrue() = runTest {
-        whenever(fireModeAvailability.isAvailable()).thenReturn(true)
-        whenever(promoToggle.isEnabled()).thenReturn(true)
-        whenever(onboardingFlowChecker.isOnboardingComplete()).thenReturn(true)
+    fun whenTabSwitcherPromoNotDismissedThenCanShowTabSwitcherPromoTrue() = runTest {
         whenever(fireDataStore.isTabSwitcherPromoDismissed()).thenReturn(false)
         assertTrue(testee.canShowTabSwitcherPromo())
     }
 
     @Test
-    fun whenTabSwitcherDismissedThenCanShowTabSwitcherPromoFalse() = runTest {
-        whenever(fireModeAvailability.isAvailable()).thenReturn(true)
-        whenever(promoToggle.isEnabled()).thenReturn(true)
-        whenever(onboardingFlowChecker.isOnboardingComplete()).thenReturn(true)
+    fun whenTabSwitcherPromoDismissedThenCanShowTabSwitcherPromoFalse() = runTest {
         whenever(fireDataStore.isTabSwitcherPromoDismissed()).thenReturn(true)
         assertFalse(testee.canShowTabSwitcherPromo())
-    }
-
-    @Test
-    fun whenInFireModeThenCanShowTabSwitcherPromoFalse() = runTest {
-        whenever(fireModeAvailability.isAvailable()).thenReturn(true)
-        whenever(promoToggle.isEnabled()).thenReturn(true)
-        whenever(onboardingFlowChecker.isOnboardingComplete()).thenReturn(true)
-        whenever(fireDataStore.isTabSwitcherPromoDismissed()).thenReturn(false)
-        whenever(browserModeStateHolder.currentMode).thenReturn(MutableStateFlow(BrowserMode.FIRE))
-        assertFalse(testee.canShowTabSwitcherPromo())
-    }
-
-    @Test
-    fun whenOnFireModeEnteredThenBothPromosDismissed() = runTest {
-        testee.onFireModeEntered()
-        verify(fireDataStore).setNtpPromoDismissed(true)
-        verify(fireDataStore).setTabSwitcherPromoDismissed(true)
-    }
-
-    @Test
-    fun whenOnUserBurnedThenBurnedRecorded() = runTest {
-        testee.onUserBurned()
-        verify(fireDataStore).setUserBurnedWhileBrowsing(true)
-    }
-
-    @Test
-    fun whenOnNtpPromoInteractedThenNtpDismissed() = runTest {
-        testee.onNtpPromoInteracted()
-        verify(fireDataStore).setNtpPromoDismissed(true)
     }
 
     @Test
@@ -187,4 +65,46 @@ class RealFireTabsPromosTest {
         testee.onTabSwitcherPromoShown()
         verify(fireDataStore).setTabSwitcherPromoDismissed(true)
     }
+
+    @Test
+    fun whenOnFireModeEnteredThenUsedFireModeAndTabSwitcherDismissedRecorded() = runTest {
+        testee.onFireModeEntered()
+        verify(fireDataStore).setUsedFireMode(true)
+        verify(fireDataStore).setTabSwitcherPromoDismissed(true)
+    }
+
+    @Test
+    fun whenOnFireModeEnteredAndFireTabsMessageActiveThenMessageDismissed() = runTest {
+        val message = fireTabsRemoteMessage()
+        whenever(remoteMessageModel.getActiveMessage()).thenReturn(message)
+
+        testee.onFireModeEntered()
+
+        verify(remoteMessageModel).onMessageDismissed(message)
+    }
+
+    @Test
+    fun whenOnFireModeEnteredAndNoActiveMessageThenNoMessageDismissed() = runTest {
+        whenever(remoteMessageModel.getActiveMessage()).thenReturn(null)
+
+        testee.onFireModeEntered()
+
+        verify(remoteMessageModel, never()).onMessageDismissed(any())
+    }
+
+    private fun fireTabsRemoteMessage() = RemoteMessage(
+        id = "fire_tabs_promo",
+        content = Content.BigTwoActions(
+            titleText = "",
+            descriptionText = "",
+            placeholder = Content.Placeholder.FIRE_TABS,
+            primaryActionText = "",
+            primaryAction = Action.FireTabsPromo,
+            secondaryActionText = "",
+            secondaryAction = Action.Dismiss,
+        ),
+        matchingRules = emptyList(),
+        exclusionRules = emptyList(),
+        surfaces = emptyList(),
+    )
 }
