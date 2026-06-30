@@ -205,10 +205,10 @@ subprojects {
                     .because("Use guava's bundled ListenableFuture to avoid duplicate classes")
         }
         resolutionStrategy.eachDependency { details ->
-            // kotlinx-serialization runtime must match Kotlin 2.2.x compiler plugin output
+            // kotlinx-serialization runtime must match Kotlin 2.3.x compiler plugin output
             if (details.requested.group == 'org.jetbrains.kotlinx' && details.requested.name.startsWith('kotlinx-serialization')) {
                 details.useVersion '1.8.1'
-                details.because 'Kotlin 2.2.21 serialization compiler plugin requires runtime >= 1.8.x'
+                details.because 'Kotlin 2.3.20 serialization compiler plugin requires runtime >= 1.8.x'
             }
         }
     }
