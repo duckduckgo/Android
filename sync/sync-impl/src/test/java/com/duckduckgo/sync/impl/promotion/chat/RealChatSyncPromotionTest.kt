@@ -142,7 +142,7 @@ class RealChatSyncPromotionTest {
     }
 
     @Test
-    fun `when duck chat has no history is disabled cannot show promotion`() = runTest {
+    fun `when duck chat has no suggestions cannot show promotion`() = runTest {
         configurePromotionToShow()
 
         hasChatSuggestions.value = false
