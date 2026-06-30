@@ -1,0 +1,152 @@
+---
+title: "Android Website Breakage Investigations"
+description: "How to reproduce and investigate live website breakage in the Android browser"
+keywords: ["android", "website breakage", "webview", "emulator", "live sites", "debugging"]
+---
+
+# Android Website Breakage Investigations
+
+Use this for Android browser bugs where a live website behaves differently in DuckDuckGo than expected.
+
+## Environment
+
+Prefer a real device when the report is device, Android, or WebView-version specific. If using an emulator, verify the runtime rather than assuming the system image is current.
+
+```sh
+adb devices
+adb shell getprop ro.build.version.sdk
+adb shell getprop ro.product.cpu.abilist
+adb shell dumpsys webviewupdate
+```
+
+Record:
+
+- device or emulator name
+- Android API level
+- active WebView package and version
+- GPU mode
+- exact URL and user action
+
+## Emulator GPU mode
+
+For WebView rendering investigations, start the emulator with software GL:
+
+```sh
+emulator -avd <avd-name> -no-window -gpu swangle_indirect -no-snapshot -no-boot-anim
+```
+
+Avoid `swiftshader_indirect` unless the task is specifically comparing graphics backends; it can introduce emulator instability that is unrelated to the site.
+
+## Installing alternate WebView versions
+
+System images often bundle old WebView versions. To test Beta, Dev, or Canary, sideload a compatible Google-signed APK for the emulator or device ABI.
+
+Check compatibility first:
+
+```sh
+adb shell getprop ro.product.cpu.abilist
+adb shell getprop ro.build.version.sdk
+```
+
+Install and select the provider:
+
+```sh
+adb install -r /tmp/webview-provider.apk
+adb shell cmd webviewupdate set-webview-implementation <package-name>
+adb shell dumpsys webviewupdate
+adb shell am force-stop com.duckduckgo.mobile.android.debug
+```
+
+Provider package names:
+
+```text
+Stable: com.google.android.webview
+Beta:   com.google.android.webview.beta
+Dev:    com.google.android.webview.dev
+Canary: com.google.android.webview.canary
+```
+
+If the selected provider does not change, confirm the APK signature, ABI, min SDK, and target SDK are valid for the device.
+
+## Reproduction fidelity
+
+Use real user input for the primary repro. DevTools-driven navigation can skip site event handlers or user-activation paths.
+
+```sh
+adb shell wm size
+adb shell input tap <x> <y>
+adb shell input swipe <x1> <y1> <x2> <y2> <duration-ms>
+```
+
+`adb shell input` uses physical screen coordinates. Screenshots may be scaled in the chat UI, so check `wm size` before calculating taps.
+
+Use DevTools for inspection and controlled follow-up tests, not as the first reproduction path.
+
+## Screenshots
+
+Capture before and after the action:
+
+```sh
+adb exec-out screencap -p > /tmp/site-before.png
+adb exec-out screencap -p > /tmp/site-after.png
+```
+
+Compare:
+
+- address bar URL
+- visible page content
+- loading indicator
+- overlays, consent dialogs, and interstitials
+- whether user input changes the visible state
+
+## Logging
+
+Clear logs immediately before the action:
+
+```sh
+adb logcat -c
+```
+
+Capture app-scoped logs:
+
+```sh
+pid=$(adb shell pidof com.duckduckgo.mobile.android.debug | tr -d '\r')
+adb logcat -d --pid "$pid" -v time | rg \
+  "BrowserWebViewClient|BrowserChromeClient|onPageStarted|onPageFinished|onProgressChanged|shouldOverride|Renderer|RenderProcess|WEB_VIEW"
+```
+
+Record callback order and timestamps alongside screenshots. A useful report states what the page did visually and what the browser believed happened.
+
+## WebView DevTools
+
+Find and forward the WebView DevTools socket:
+
+```sh
+adb shell cat /proc/net/unix | rg webview_devtools
+pid=$(adb shell pidof com.duckduckgo.mobile.android.debug | tr -d '\r')
+adb forward tcp:9222 localabstract:webview_devtools_remote_$pid
+curl http://127.0.0.1:9222/json/list
+```
+
+Use DevTools to inspect:
+
+- current URL and title
+- DOM state
+- console errors
+- network activity
+- link targets and event handlers
+
+Do not rely on `location.href = ...` or synthetic DOM clicks as the only reproduction evidence.
+
+## Minimum investigation summary
+
+Include:
+
+- device/emulator, API level, GPU mode
+- WebView provider package and version
+- tested URL and exact user action
+- whether the issue reproduces with real input
+- before/after screenshots
+- relevant callback timeline
+- whether reload, back/forward, app background/foreground, or user input changes the state
+- differences from a lightweight control page, if tested
