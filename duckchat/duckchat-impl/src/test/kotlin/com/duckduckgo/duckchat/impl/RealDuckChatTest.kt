@@ -37,6 +37,7 @@ import com.duckduckgo.duckchat.api.DuckChatSettingsNoParams
 import com.duckduckgo.duckchat.api.InputMode
 import com.duckduckgo.duckchat.impl.feature.AIChatImageUploadFeature
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
+import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.ChatSuggestionsStore
 import com.duckduckgo.duckchat.impl.repository.AddressBarPickerAttributionRepository
 import com.duckduckgo.duckchat.impl.repository.DuckChatFeatureRepository
 import com.duckduckgo.duckchat.impl.store.DefaultTogglePosition
@@ -69,7 +70,6 @@ import org.mockito.Mockito.spy
 import org.mockito.kotlin.any
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.never
-import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
@@ -97,6 +97,7 @@ class RealDuckChatTest {
     private val mockDuckAiHostProvider: DuckAiHostProvider = mock()
     private val mockAppBuildConfig: AppBuildConfig = mock()
     private val mockVoiceSessionStateManager: VoiceSessionStateManager = mock()
+    private val chatSuggestionsStore: ChatSuggestionsStore = mock()
 
     private lateinit var testee: RealDuckChat
 
@@ -138,6 +139,7 @@ class RealDuckChatTest {
                 mockDuckAiHostProvider,
                 mockAppBuildConfig,
                 mockVoiceSessionStateManager,
+                chatSuggestionsStore,
             ),
         )
         coroutineRule.testScope.advanceUntilIdle()
@@ -1838,6 +1840,15 @@ class RealDuckChatTest {
 
         assertTrue(testee.hasUserEnabledChatHistory())
         verify(mockDuckChatFeatureRepository).isAIChatHistoryEnabled()
+    }
+
+    @Test
+    fun whenObserveHasChatSuggestionsThenDelegatesToStore() = runTest {
+        whenever(chatSuggestionsStore.hasChatSuggestions).thenReturn(flowOf(true, false))
+
+        val results = testee.observeHasChatSuggestions().toList()
+        assertTrue(results[0])
+        assertFalse(results[1])
     }
 
     private suspend fun enableChatHistoryFlags() {
