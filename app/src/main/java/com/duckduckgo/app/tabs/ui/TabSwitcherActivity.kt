@@ -336,7 +336,7 @@ class TabSwitcherActivity :
     /**
      * When launched via [TabSwitcherScreenParams] with a mode different from the active one, switch to that
      * mode and recreate so the activity — and its tab repository — resolve for it. Returns true when a
-     * recreate was triggered, so [onCreate] aborts and lets the recreated instance render the requested mode.
+     * recreation was triggered, so [onCreate] aborts and lets the recreated instance render the requested mode.
      *
      * Applied only on a fresh launch ([savedInstanceState] == null). The params extra persists across
      * recreate(), so re-reading it on every onCreate would re-apply the launch mode and undo any later mode
@@ -344,9 +344,15 @@ class TabSwitcherActivity :
      */
     private fun switchToRequestedModeIfNeeded(savedInstanceState: Bundle?): Boolean {
         if (savedInstanceState != null) return false
+
         val requestedMode = intent.getActivityParams(TabSwitcherScreenParams::class.java)?.browserMode ?: return false
         if (requestedMode == currentBrowserMode) return false
+
         viewModel.onBrowserModeToggled(requestedMode)
+
+        // only recreate when it actually switched, otherwise we'd pointlessly recreate into the same mode.
+        if (viewModel.currentMode.value != requestedMode) return false
+
         // Recreate explicitly here (rather than via observeBrowserModeChanges): this runs before that observer
         // is registered, and must recreate before rendering so the launch screen never shows the previous mode.
         recreate()
