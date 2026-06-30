@@ -96,7 +96,6 @@
     <string name="duckAiHideAiGeneratedImagesDescription">Филтрира в резултатите от търсенето изображенията, генерирани от изкуствен интелект</string>
 
     <!-- Search Assist Visibility -->
-    <string name="duckAiSearchAssistVisibilityTitle">Видимост на Search Assist</string>
     <string name="duckAiSearchAssistVisibilitySubtitle">Изберете колко често искате да се появяват отговори, подпомагани от изкуствен интелект, в търсенето.</string>
     <string name="duckAiSearchAssistVisibilityNever">Никога</string>
     <string name="duckAiSearchAssistVisibilityOnDemand">При поискване</string>
