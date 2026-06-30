@@ -18,6 +18,8 @@ package com.duckduckgo.sync.impl.promotion.chat
 
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
+import com.duckduckgo.browsermode.api.BrowserMode
+import com.duckduckgo.browsermode.api.BrowserModeStateHolder
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckChat
@@ -46,6 +48,7 @@ class RealChatSyncPromotion @Inject constructor(
     private val promotionDataStore: SyncPromotionDataStore,
     private val syncState: DeviceSyncState,
     private val duckChat: DuckChat,
+    private val browserModeStateHolder: BrowserModeStateHolder,
     private val pixel: Pixel,
     private val dispatchers: DispatcherProvider,
 ) : ChatSyncPromotion {
@@ -94,13 +97,19 @@ class RealChatSyncPromotion @Inject constructor(
         return isImpressionCapReached
     }
 
-    private suspend fun isEligibleForPromo() = coroutineScope {
-        val preconditions = listOf(
-            async { canTurnOnSync() },
-            async { hasChatHistoryEnabled() },
-            async { hasChatSuggestions() },
-        ).awaitAll()
-        return@coroutineScope preconditions.all { it }
+    private suspend fun isEligibleForPromo(): Boolean {
+        if (browserModeStateHolder.currentMode.value == BrowserMode.FIRE) {
+            return false
+        }
+
+        return coroutineScope {
+            val preconditions = listOf(
+                async { canTurnOnSync() },
+                async { hasChatHistoryEnabled() },
+                async { hasChatSuggestions() },
+            ).awaitAll()
+            preconditions.all { it }
+        }
     }
 
     private suspend fun canTurnOnSync(): Boolean = withContext(dispatchers.io()) {
