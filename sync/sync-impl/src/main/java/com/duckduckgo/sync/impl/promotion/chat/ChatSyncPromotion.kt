@@ -52,16 +52,10 @@ class RealChatSyncPromotion @Inject constructor(
     private val pixel: Pixel,
     private val dispatchers: DispatcherProvider,
 ) : ChatSyncPromotion {
-    override suspend fun canShowPromotion(): Boolean {
-        if (browserModeStateHolder.currentMode.value == BrowserMode.FIRE) {
-            return false
-        }
-
-        return coroutineScope {
-            val isAvailable = async { !isPromoExhausted() }
-            val isEligible = async { isEligibleForPromo() }
-            isAvailable.await() && isEligible.await()
-        }
+    override suspend fun canShowPromotion(): Boolean = coroutineScope {
+        val isAvailable = async { !isPromoExhausted() }
+        val isEligible = async { isEligibleForPromo() }
+        return@coroutineScope isAvailable.await() && isEligible.await()
     }
 
     override suspend fun incrementImpressionCount() {
@@ -103,13 +97,19 @@ class RealChatSyncPromotion @Inject constructor(
         return isImpressionCapReached
     }
 
-    private suspend fun isEligibleForPromo() = coroutineScope {
-        val preconditions = listOf(
-            async { canTurnOnSync() },
-            async { hasChatHistoryEnabled() },
-            async { hasChatSuggestions() },
-        ).awaitAll()
-        return@coroutineScope preconditions.all { it }
+    private suspend fun isEligibleForPromo(): Boolean {
+        if (browserModeStateHolder.currentMode.value == BrowserMode.FIRE) {
+            return false
+        }
+
+        return coroutineScope {
+            val preconditions = listOf(
+                async { canTurnOnSync() },
+                async { hasChatHistoryEnabled() },
+                async { hasChatSuggestions() },
+            ).awaitAll()
+            preconditions.all { it }
+        }
     }
 
     private suspend fun canTurnOnSync(): Boolean = withContext(dispatchers.io()) {
