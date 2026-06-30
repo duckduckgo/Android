@@ -29,6 +29,7 @@ import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
+import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionsSettingsScreenWithLaunchPixel
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.subscriptions.impl.R
@@ -132,10 +133,15 @@ class SubscriptionExpirationReminderNotificationPlugin @Inject constructor(
             context,
             SubscriptionsWebViewActivityWithParams(url = subscriptionsUrlProvider.buyUrl),
         )
+        // return globalActivityStarter.startIntent(
+        //     context,
+        //     SubscriptionsSettingsScreenWithLaunchPixel(pixelName(NOTIFICATION_LAUNCHED_PIXEL)),
+        // )
     }
 
     companion object {
         private const val NOTIFICATION_SHOWN_PIXEL = "mnot_s"
         private const val NOTIFICATION_CANCELLED_PIXEL = "mnot_c"
+        private const val NOTIFICATION_LAUNCHED_PIXEL = "mnot_l"
     }
 }
