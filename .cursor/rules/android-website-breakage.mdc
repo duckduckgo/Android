@@ -98,6 +98,13 @@ adb exec-out screencap -p > /tmp/site-before.png
 adb exec-out screencap -p > /tmp/site-after.png
 ```
 
+For a standard capture of environment, screenshots, and app logs, use:
+
+```sh
+scripts/webview-site-repro.sh --url "https://example.com/" --label example
+scripts/webview-site-repro.sh --url "https://example.com/" --label example --tap 600,1400
+```
+
 Compare:
 
 - address bar URL
