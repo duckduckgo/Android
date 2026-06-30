@@ -16,27 +16,29 @@
 
 package com.duckduckgo.sync.impl.promotion
 
-class FakeSyncPromotionDataStore : SyncPromotionDataStore {
-    private val dismissMap = mutableMapOf<SyncPromotionDataStore.PromotionType, Boolean>()
-    private val impressionsMap = mutableMapOf<SyncPromotionDataStore.PromotionType, Long>()
+import com.duckduckgo.sync.impl.promotion.SyncPromotionDataStore.PromotionType
 
-    override suspend fun hasPromoBeenDismissed(promotionType: SyncPromotionDataStore.PromotionType): Boolean {
+class FakeSyncPromotionDataStore : SyncPromotionDataStore {
+    private val dismissMap = mutableMapOf<PromotionType, Boolean>()
+    private val impressionsMap = mutableMapOf<PromotionType, Long>()
+
+    override suspend fun hasPromoBeenDismissed(promotionType: PromotionType): Boolean {
         return dismissMap.getOrDefault(promotionType, false)
     }
 
-    override suspend fun recordPromoDismissed(promotionType: SyncPromotionDataStore.PromotionType) {
+    override suspend fun recordPromoDismissed(promotionType: PromotionType) {
         dismissMap[promotionType] = true
     }
 
-    override suspend fun getPromoImpressionCount(promotionType: SyncPromotionDataStore.PromotionType): Long {
+    override suspend fun getPromoImpressionCount(promotionType: PromotionType): Long {
         return impressionsMap.getOrDefault(promotionType, 0L)
     }
 
-    override suspend fun recordPromoImpression(promotionType: SyncPromotionDataStore.PromotionType) {
+    override suspend fun recordPromoImpression(promotionType: PromotionType) {
         impressionsMap[promotionType] = impressionsMap.getOrDefault(promotionType, 0) + 1
     }
 
-    override suspend fun clearPromoHistory(promotionType: SyncPromotionDataStore.PromotionType) {
+    override suspend fun clearPromoHistory(promotionType: PromotionType) {
         dismissMap.clear()
         impressionsMap.clear()
     }
