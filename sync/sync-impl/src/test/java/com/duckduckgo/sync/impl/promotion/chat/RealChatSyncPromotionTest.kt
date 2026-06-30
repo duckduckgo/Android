@@ -55,10 +55,10 @@ class RealChatSyncPromotionTest {
     }
 
     @Test
-    fun `when promotion is checked cannot show promotion`() = runTest {
+    fun `when promotion is accepted cannot show promotion`() = runTest {
         configurePromotionToShow()
 
-        testee.recordPromotionChecked()
+        testee.recordPromotionAccepted()
         assertFalse(testee.canShowPromotion())
     }
 
@@ -133,8 +133,8 @@ class RealChatSyncPromotionTest {
     }
 
     @Test
-    fun `when recordPromotionChecked then record promo dismissed`() = runTest {
-        testee.recordPromotionChecked()
+    fun `when recordPromotionAccepted then record promo dismissed`() = runTest {
+        testee.recordPromotionAccepted()
         assertTrue(dataStore.hasPromoBeenDismissed(PromotionType.ChatTabPage))
     }
 

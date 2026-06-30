@@ -33,7 +33,7 @@ import javax.inject.Inject
 interface ChatSyncPromotion {
     suspend fun canShowPromotion(): Boolean
     suspend fun incrementImpressionCount()
-    suspend fun recordPromotionChecked()
+    suspend fun recordPromotionAccepted()
     suspend fun recordPromotionDismissed()
 }
 
@@ -54,7 +54,7 @@ class RealChatSyncPromotion @Inject constructor(
         promotionDataStore.recordPromoImpression(ChatTabPage)
     }
 
-    override suspend fun recordPromotionChecked() {
+    override suspend fun recordPromotionAccepted() {
         promotionDataStore.recordPromoDismissed(ChatTabPage)
     }
 

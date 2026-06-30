@@ -98,7 +98,7 @@ private class ChatTabPluginAdapterListener(
     private var isDialogShowing = false
 
     override fun onSyncWithDeviceClicked(adapter: ChatSyncPromoAdapter) {
-        scope.launch { promotion.recordPromotionChecked() }
+        scope.launch { promotion.recordPromotionAccepted() }
         adapter.dismiss(shouldAnimate = true)
 
         if (!isDialogShowing) {
