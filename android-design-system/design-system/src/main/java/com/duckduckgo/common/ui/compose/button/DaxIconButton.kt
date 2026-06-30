@@ -24,6 +24,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.LocalMinimumInteractiveComponentSize
+import androidx.compose.material3.LocalRippleConfiguration
+import androidx.compose.material3.RippleConfiguration
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.Immutable
@@ -35,7 +37,9 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.duckduckgo.common.ui.compose.theme.Black6
 import com.duckduckgo.common.ui.compose.theme.DuckDuckGoTheme
+import com.duckduckgo.common.ui.compose.theme.White12
 import com.duckduckgo.common.ui.compose.tools.PreviewBox
 import com.duckduckgo.mobile.android.R
 
@@ -71,6 +75,7 @@ fun DaxIconButton(
 ) {
     CompositionLocalProvider(
         LocalMinimumInteractiveComponentSize provides Dp.Unspecified,
+        LocalRippleConfiguration provides DaxIconButtonDefaults.rippleConfiguration(),
     ) {
         IconButton(
             onClick = onClick,
@@ -110,6 +115,12 @@ object DaxIconButtonDefaults {
             disabledContainerColor = DuckDuckGoTheme.colors.backgrounds.containerDisabled,
             disabledContentColor = DuckDuckGoTheme.colors.icons.disabled,
         )
+
+    @Composable
+    fun rippleConfiguration(): RippleConfiguration {
+        val color = if (DuckDuckGoTheme.colors.isDark) White12 else Black6
+        return remember(color) { RippleConfiguration(color = color) }
+    }
 }
 
 @Immutable
