@@ -93,6 +93,18 @@ npm run validate-defs-without-formatting
 npm run lint
 ```
 
+## Privacy Review & Triage
+
+Any PR that **adds a new pixel or modifies the pixel registry** (`PixelDefinitions/**`) must go through privacy triage. The mechanism is a single label:
+
+- **Apply the `privacy review required` label to the PR.** This automatically creates a Privacy Triage task in Asana and adds the PR author as a collaborator; the Privacy Triage DRI follows up there. Applying the label *is* how the triage is created — there is no separate manual step.
+- **When an agent creates or helps create a pixel PR, it MUST add this label when opening the PR** (e.g. `gh pr create --label "privacy review required"`). If the agent cannot set labels, it must say so explicitly so the author applies it. This is in addition to updating the pixel definitions — both are required, do not skip either.
+- Self-service still applies: you may proceed with implementation without blocking on triage where appropriate, but the label must still be applied so triage happens.
+
+**Modifying an existing pixel that isn't in the registry yet:** first document the old pixel in the registry. If the change is small, note in the PR/code which parts are new; if it's large, split into two commits/PRs (one documenting the already-approved existing pixel, one for the change). If a prior triage is known, record it in the pixel's `privacyReview` property.
+
+Full process: [Pixels Triage using the Pixel Registry](https://app.asana.com/1/137249556945/task/1208615048491217).
+
 ## When to Use a Wide Event Instead
 
 Use a **wide event** rather than a pixel when:
