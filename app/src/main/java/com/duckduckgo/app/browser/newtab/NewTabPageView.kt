@@ -177,7 +177,7 @@ class NewTabPageView @JvmOverloads constructor(
             .launchIn(findViewTreeLifecycleOwner()?.lifecycleScope!!)
 
         conflatedNativeInputJob += duckChat.observeNativeInputFieldUserSettingEnabled()
-            .onEach { enabled -> updateLogoMargin(enabled) }
+            .onEach { enabled -> updateTopContentMargins(enabled) }
             .launchIn(findViewTreeLifecycleOwner()?.lifecycleScope!!)
 
         conflatedChatModeJob += inputModeState.displayedMode
@@ -250,12 +250,18 @@ class NewTabPageView @JvmOverloads constructor(
         }
     }
 
-    private fun updateLogoMargin(nativeInputEnabled: Boolean) {
+    private fun updateTopContentMargins(nativeInputEnabled: Boolean) {
+        // The native input widget overlays the top of the NTP, so push the logo and the message card
+        // down by the same amount to keep them clear of it — otherwise the promo / RMF card is covered.
         val baseMargin = resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.homeTabDdgLogoTopMargin)
         val extraMargin = if (nativeInputEnabled) 48.toPx() else 0
         (binding.ddgLogo.layoutParams as? MarginLayoutParams)?.let {
             it.topMargin = baseMargin + extraMargin
             binding.ddgLogo.requestLayout()
+        }
+        (binding.messageCta.layoutParams as? MarginLayoutParams)?.let {
+            it.topMargin = extraMargin
+            binding.messageCta.requestLayout()
         }
     }
 

@@ -92,10 +92,10 @@ class NewTabPageViewModel @AssistedInject constructor(
     ) {
 
         private val isLoadingContent = favourites == null
-        private val hasContentThatDisplacesHomeLogo = onboardingComplete &&
-            message != null ||
-            favourites?.isNotEmpty() == true
         private val hasLowPriorityMessage = lowPriorityMessage != null
+        private val hasContentThatDisplacesHomeLogo = onboardingComplete && message != null ||
+            favourites?.isNotEmpty() == true ||
+            lowPriorityMessage is LowPriorityMessage.FireTabsPromoMessage
 
         val showFireTabEmptyState = isFireMode
         val shouldShowLogo = !isFireMode && !isLoadingContent && !hasContentThatDisplacesHomeLogo && showDaxLogo
