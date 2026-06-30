@@ -23,6 +23,7 @@ import com.duckduckgo.browsermode.api.BrowserModeStateHolder
 import com.duckduckgo.browsermode.api.FireModeAvailability
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.remote.messaging.api.RemoteMessageModel
 import com.squareup.anvil.annotations.ContributesBinding
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -43,13 +44,16 @@ class RealFireTabsPromos @Inject constructor(
     private val fireDataStore: FireDataStore,
     private val onboardingFlowChecker: OnboardingFlowChecker,
     private val browserModeStateHolder: BrowserModeStateHolder,
+    private val remoteMessageModel: RemoteMessageModel,
     private val dispatchers: DispatcherProvider,
 ) : FireTabsPromos {
 
     override suspend fun canShowNtpPromo(): Boolean = withContext(dispatchers.io()) {
         commonGate() &&
             !fireDataStore.isNtpPromoDismissed() &&
-            fireDataStore.hasUserBurnedWhileBrowsing()
+            fireDataStore.hasUserBurnedWhileBrowsing() &&
+            // Don't compete with an active remote message (e.g. another promo) on the NTP.
+            remoteMessageModel.getActiveMessage() == null
     }
 
     override suspend fun canShowTabSwitcherPromo(): Boolean = withContext(dispatchers.io()) {

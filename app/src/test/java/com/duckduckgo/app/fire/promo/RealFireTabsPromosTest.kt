@@ -23,6 +23,8 @@ import com.duckduckgo.browsermode.api.BrowserModeStateHolder
 import com.duckduckgo.browsermode.api.FireModeAvailability
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.remote.messaging.api.RemoteMessage
+import com.duckduckgo.remote.messaging.api.RemoteMessageModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertFalse
@@ -44,6 +46,7 @@ class RealFireTabsPromosTest {
     private val fireDataStore: FireDataStore = mock()
     private val onboardingFlowChecker: OnboardingFlowChecker = mock()
     private val browserModeStateHolder: BrowserModeStateHolder = mock()
+    private val remoteMessageModel: RemoteMessageModel = mock()
 
     private val testee by lazy {
         RealFireTabsPromos(
@@ -52,6 +55,7 @@ class RealFireTabsPromosTest {
             fireDataStore = fireDataStore,
             onboardingFlowChecker = onboardingFlowChecker,
             browserModeStateHolder = browserModeStateHolder,
+            remoteMessageModel = remoteMessageModel,
             dispatchers = coroutineRule.testDispatcherProvider,
         )
     }
@@ -60,6 +64,7 @@ class RealFireTabsPromosTest {
     fun setup() {
         whenever(fireTabsPromoFeature.self()).thenReturn(promoToggle)
         whenever(browserModeStateHolder.currentMode).thenReturn(MutableStateFlow(BrowserMode.REGULAR))
+        whenever(remoteMessageModel.getActiveMessage()).thenReturn(null)
     }
 
     private suspend fun allNtpConditionsMet() {
@@ -116,6 +121,18 @@ class RealFireTabsPromosTest {
         allNtpConditionsMet()
         whenever(onboardingFlowChecker.isOnboardingComplete()).thenReturn(false)
         assertFalse(testee.canShowNtpPromo())
+    }
+
+    @Test
+    fun whenRemoteMessageActiveThenCanShowNtpPromoFalseButTabSwitcherUnaffected() = runTest {
+        allNtpConditionsMet()
+        whenever(fireDataStore.isTabSwitcherPromoDismissed()).thenReturn(false)
+        whenever(remoteMessageModel.getActiveMessage()).thenReturn(mock<RemoteMessage>())
+
+        // The NTP promo must not compete with an active remote message...
+        assertFalse(testee.canShowNtpPromo())
+        // ...but the tab-switcher promo is unaffected (different surface).
+        assertTrue(testee.canShowTabSwitcherPromo())
     }
 
     @Test
