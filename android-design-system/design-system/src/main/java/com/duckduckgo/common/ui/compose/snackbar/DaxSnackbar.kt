@@ -16,18 +16,17 @@
 
 package com.duckduckgo.common.ui.compose.snackbar
 
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarData
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.tooling.preview.PreviewLightDark
+import com.duckduckgo.common.ui.compose.button.DaxGhostButton
 import com.duckduckgo.common.ui.compose.message.DaxAction
 import com.duckduckgo.common.ui.compose.text.DaxText
 import com.duckduckgo.common.ui.compose.theme.DuckDuckGoTheme
@@ -62,22 +61,15 @@ fun DaxSnackbar(
         modifier = modifier,
         action = action?.let { daxAction ->
             {
-                TextButton(
+                DaxGhostButton(
+                    text = daxAction.text,
                     onClick = daxAction.onClick,
-                    colors = ButtonDefaults.textButtonColors(contentColor = DaxSnackbarDefaults.actionColor),
-                ) {
-                    DaxText(
-                        text = daxAction.text,
-                        style = DuckDuckGoTheme.typography.button,
-                        color = DaxSnackbarDefaults.actionColor,
-                    )
-                }
+                )
             }
         },
         shape = DaxSnackbarDefaults.shape,
         containerColor = DaxSnackbarDefaults.containerColor,
         contentColor = DaxSnackbarDefaults.contentColor,
-        actionContentColor = DaxSnackbarDefaults.actionColor,
     ) {
         DaxText(
             text = message,
@@ -135,11 +127,6 @@ private object DaxSnackbarDefaults {
         @Composable
         @ReadOnlyComposable
         get() = DuckDuckGoTheme.textColors.primary
-
-    val actionColor: Color
-        @Composable
-        @ReadOnlyComposable
-        get() = DuckDuckGoTheme.colors.brand.accentBlue
 }
 
 @PreviewLightDark
