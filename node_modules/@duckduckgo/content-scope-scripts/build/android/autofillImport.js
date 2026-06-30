@@ -8344,9 +8344,16 @@
     /**
      * Register a captcha provider
      * @param {import('./providers/provider.interface').CaptchaProvider} provider - The provider to register
+     * @param {Object} [options] - The optional provider options
+     * @param {Array<string>} [options.aliases] - An optional list of aliases for that provider
      */
-    registerProvider(provider) {
+    registerProvider(provider, options) {
       this.providers.set(provider.getType(), provider);
+      if (options?.aliases) {
+        options?.aliases.forEach((alias) => {
+          this.providers.set(alias, provider);
+        });
+      }
     }
     /**
      * Get a provider by type
@@ -8379,7 +8386,7 @@
      * @returns {Array<import('./providers/provider.interface').CaptchaProvider>}
      */
     _getAllProviders() {
-      return Array.from(this.providers.values());
+      return Array.from(new Set(this.providers.values()));
     }
   };
 
@@ -8823,7 +8830,7 @@
     })
   );
   captchaFactory.registerProvider(new CloudFlareTurnstileProvider());
-  captchaFactory.registerProvider(new ImageProvider());
+  captchaFactory.registerProvider(new ImageProvider(), { aliases: ["red-circle", "basic-math"] });
 
   // src/features/broker-protection/captcha-services/get-captcha-provider.js
   function getCaptchaProvider(root, captchaContainer, captchaType) {
@@ -8993,11 +9000,12 @@
     if (PirError.isError(captchaIdentifier)) {
       return createError(captchaIdentifier.error.message);
     }
+    const reportedType = captchaFactory.getProviderByType(captchaType) === captchaProvider ? captchaType : captchaProvider.getType();
     const response = {
       url: removeUrlQueryParams(window.location.href),
       // query params (which may include PII)
       siteKey: captchaIdentifier,
-      type: captchaProvider.getType()
+      type: reportedType
     };
     return SuccessResponse.create({ actionID, actionType, response });
   }
