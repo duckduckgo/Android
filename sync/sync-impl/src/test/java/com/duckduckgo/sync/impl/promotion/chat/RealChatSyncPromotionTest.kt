@@ -204,7 +204,7 @@ class RealChatSyncPromotionTest {
     }
 
     @Test
-    fun `when can't show promotion due to cap limit then fire user_tapped dismissed pixel`() = runTest {
+    fun `when can't show promotion due to cap limit then fire impression_cap dismissed pixel`() = runTest {
         configurePromotionToShow()
         repeat(RealChatSyncPromotion.MAX_IMPRESSION_COUNT) {
             testee.incrementImpressionCount()
