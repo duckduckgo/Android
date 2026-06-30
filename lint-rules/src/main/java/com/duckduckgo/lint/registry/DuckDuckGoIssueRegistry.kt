@@ -58,6 +58,7 @@ import com.duckduckgo.lint.ui.NoMaterial3DividerUsageDetector.Companion.NO_MATER
 import com.duckduckgo.lint.ui.NoMaterial3DividerUsageDetector.Companion.NO_MATERIAL3_VERTICAL_DIVIDER_USAGE
 import com.duckduckgo.lint.ui.NoMaterial3RadioButtonUsageDetector.Companion.NO_MATERIAL3_RADIO_BUTTON_USAGE
 import com.duckduckgo.lint.ui.NoMaterial3SwitchUsageDetector.Companion.NO_MATERIAL3_SWITCH_USAGE
+import com.duckduckgo.lint.ui.NoMaterial3TopAppBarUsageDetector.Companion.NO_MATERIAL3_TOP_APP_BAR_USAGE
 import com.duckduckgo.lint.ui.DaxTextViewStylingDetector.Companion.INVALID_DAX_TEXT_VIEW_PROPERTY
 import com.duckduckgo.lint.ui.DeprecatedAndroidWidgetsUsedInXmlDetector.Companion.DEPRECATED_WIDGET_IN_XML
 import com.duckduckgo.lint.ui.MissingDividerDetector.Companion.MISSING_HORIZONTAL_DIVIDER
@@ -119,6 +120,7 @@ class DuckDuckGoIssueRegistry : IssueRegistry() {
             INVALID_DAX_TEXT_FIELD_TRAILING_ICON_USAGE,
             INVALID_DAX_SECURE_TEXT_FIELD_TRAILING_ICON_USAGE,
             NO_MATERIAL3_SWITCH_USAGE,
+            NO_MATERIAL3_TOP_APP_BAR_USAGE,
             NO_MATERIAL3_RADIO_BUTTON_USAGE,
             NO_MATERIAL3_CHECKBOX_USAGE,
             NO_MATERIAL3_HORIZONTAL_DIVIDER_USAGE,
