@@ -18,6 +18,8 @@ package com.duckduckgo.sync.impl.promotion.chat
 
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
+import com.duckduckgo.browsermode.api.BrowserMode
+import com.duckduckgo.browsermode.api.BrowserModeStateHolder
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckChat
@@ -46,13 +48,20 @@ class RealChatSyncPromotion @Inject constructor(
     private val promotionDataStore: SyncPromotionDataStore,
     private val syncState: DeviceSyncState,
     private val duckChat: DuckChat,
+    private val browserModeStateHolder: BrowserModeStateHolder,
     private val pixel: Pixel,
     private val dispatchers: DispatcherProvider,
 ) : ChatSyncPromotion {
-    override suspend fun canShowPromotion(): Boolean = coroutineScope {
-        val isAvailable = async { !isPromoExhausted() }
-        val isEligible = async { isEligibleForPromo() }
-        return@coroutineScope isAvailable.await() && isEligible.await()
+    override suspend fun canShowPromotion(): Boolean {
+        if (browserModeStateHolder.currentMode.value == BrowserMode.FIRE) {
+            return false
+        }
+
+        return coroutineScope {
+            val isAvailable = async { !isPromoExhausted() }
+            val isEligible = async { isEligibleForPromo() }
+            isAvailable.await() && isEligible.await()
+        }
     }
 
     override suspend fun incrementImpressionCount() {

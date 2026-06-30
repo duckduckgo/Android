@@ -20,6 +20,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.sync.impl.promotion.FakeSyncPromotionDataStore
 import com.duckduckgo.sync.impl.promotion.SyncPromotionDataStore.PromotionType
@@ -51,6 +52,9 @@ class RealChatSyncPromotionTest {
     private var isChatHistoryEnabled = false
     private val hasChatSuggestions = MutableStateFlow(false)
 
+    // BrowserModeStateHolder properties
+    private val browserMode = MutableStateFlow(BrowserMode.REGULAR)
+
     private val testee = RealChatSyncPromotion(
         promotionDataStore = dataStore,
         syncState = mock {
@@ -61,6 +65,9 @@ class RealChatSyncPromotionTest {
         duckChat = mock {
             onBlocking { hasUserEnabledChatHistory() } doAnswer { isChatHistoryEnabled }
             on { observeHasChatSuggestions() } doReturn hasChatSuggestions
+        },
+        browserModeStateHolder = mock {
+            on { currentMode } doReturn browserMode
         },
         pixel = pixel,
         dispatchers = coroutineTestRule.testDispatcherProvider,
@@ -139,6 +146,14 @@ class RealChatSyncPromotionTest {
         configurePromotionToShow()
 
         hasChatSuggestions.value = false
+        assertFalse(testee.canShowPromotion())
+    }
+
+    @Test
+    fun `when browser is in Fire Mode cannot show promotion`() = runTest {
+        configurePromotionToShow()
+
+        browserMode.value = BrowserMode.FIRE
         assertFalse(testee.canShowPromotion())
     }
 
@@ -242,6 +257,7 @@ class RealChatSyncPromotionTest {
         isUserSignedIn = false
         isChatHistoryEnabled = true
         hasChatSuggestions.value = true
+        browserMode.value = BrowserMode.REGULAR
     }
 }
 
