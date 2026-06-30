@@ -292,8 +292,8 @@ interface DuckChatFeature {
 
     /**
      * @return `true` when the native controls for AI Features are enabled in the app.
-     * If the remote feature is not present defaults to `internal`
+     * If the remote feature is not present defaults to `true`
      */
-    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun aiFeaturesNativeControls(): Toggle
 }
