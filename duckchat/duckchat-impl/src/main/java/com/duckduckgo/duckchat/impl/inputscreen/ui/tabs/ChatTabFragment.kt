@@ -98,9 +98,11 @@ class ChatTabFragment : DuckDuckGoFragment(R.layout.fragment_chat_tab) {
     private fun configureChatSuggestions() {
         val parentFragment = requireParentFragment() as InputScreenFragment
 
-        chatSuggestionsAdapter = ChatSuggestionsAdapter { suggestion ->
-            viewModel.onChatSuggestionSelected(suggestion.chatId, suggestion.pinned)
-        }
+        chatSuggestionsAdapter = ChatSuggestionsAdapter(
+            onChatClicked = { suggestion ->
+                viewModel.onChatSuggestionSelected(suggestion.chatId, suggestion.pinned)
+            },
+        )
 
         chatSuggestionsRecyclerView = parentFragment.getChatSuggestionsRecyclerView().apply {
             setViewPager(parentFragment.getViewPager())

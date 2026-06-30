@@ -72,4 +72,7 @@
     <!-- Duck AI Duck.ai Section Header -->
     <string name="duckAiDuckAiSectionHeader">Duck.ai</string>
 
+    <!-- Remove chat history suggestion -->
+    <string name="duck_chat_remove_chat_suggestion_content_description">Delete chat</string>
+
 </resources>
