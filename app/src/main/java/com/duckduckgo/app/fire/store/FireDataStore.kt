@@ -278,21 +278,21 @@ class SharedPreferencesFireDataStore @Inject constructor(
     }
 
     override suspend fun isNtpPromoDismissed(): Boolean =
-        store.data.map { it[KEY_FIRE_TABS_NTP_PROMO_DISMISSED] ?: false }.first()
+        store.data.map { it[KEY_FIRE_TABS_NTP_PROMO_DISMISSED] ?: false }.firstOrNull() ?: false
 
     override suspend fun setTabSwitcherPromoDismissed(dismissed: Boolean) {
         store.edit { it[KEY_FIRE_TABS_TAB_SWITCHER_PROMO_DISMISSED] = dismissed }
     }
 
     override suspend fun isTabSwitcherPromoDismissed(): Boolean =
-        store.data.map { it[KEY_FIRE_TABS_TAB_SWITCHER_PROMO_DISMISSED] ?: false }.first()
+        store.data.map { it[KEY_FIRE_TABS_TAB_SWITCHER_PROMO_DISMISSED] ?: false }.firstOrNull() ?: false
 
     override suspend fun setUserBurnedWhileBrowsing(burned: Boolean) {
         store.edit { it[KEY_FIRE_TABS_USER_BURNED_WHILE_BROWSING] = burned }
     }
 
     override suspend fun hasUserBurnedWhileBrowsing(): Boolean =
-        store.data.map { it[KEY_FIRE_TABS_USER_BURNED_WHILE_BROWSING] ?: false }.first()
+        store.data.map { it[KEY_FIRE_TABS_USER_BURNED_WHILE_BROWSING] ?: false }.firstOrNull() ?: false
 
     private fun parseOptionsFromStrings(stringSet: Set<String>): Set<FireClearOption> {
         return stringSet.mapNotNull { name ->
