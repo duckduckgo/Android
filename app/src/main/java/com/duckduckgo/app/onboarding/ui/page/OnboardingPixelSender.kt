@@ -22,7 +22,6 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.install.daysInstalled
 import com.duckduckgo.app.onboarding.CustomAiOnboardingStore
-import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.pixels.OnboardingPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
@@ -30,6 +29,7 @@ import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.device.DeviceInfo
+import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
@@ -68,6 +68,18 @@ sealed interface OnboardingPixelAction {
 
 interface OnboardingPixelSender {
     fun fire(pixelName: OnboardingPixelName, action: OnboardingPixelAction)
+
+    /**
+     * Records that the user went down the search branch of onboarding. Persisted so it can be
+     * attached as the `variant` param to every subsequent onboarding pixel.
+     */
+    fun searchBranchSelected()
+
+    /**
+     * Records that the user went down the chat (Duck.ai) branch of onboarding. Persisted so it can be
+     * attached as the `variant` param to every subsequent onboarding pixel.
+     * */
+    fun chatBranchSelected()
 }
 
 @ContributesBinding(AppScope::class)
@@ -78,15 +90,25 @@ class RealOnboardingPixelSender @Inject constructor(
     private val dispatchers: DispatcherProvider,
     private val appInstallStore: AppInstallStore,
     private val customAiOnboardingStore: CustomAiOnboardingStore,
-    private val onboardingStore: OnboardingStore,
+    private val sharedPreferencesProvider: SharedPreferencesProvider,
     private val defaultBrowserDetector: DefaultBrowserDetector,
     private val widgetCapabilities: WidgetCapabilities,
     private val deviceInfo: DeviceInfo,
     private val appBuildConfig: AppBuildConfig,
 ) : OnboardingPixelSender {
 
+    private val variantPrefs by lazy { sharedPreferencesProvider.getSharedPreferences(PREFS_VARIANT_FILENAME) }
+
     private val isReinstallUser: Deferred<Boolean> by lazy {
         appCoroutineScope.async(dispatchers.io()) { appBuildConfig.isAppReinstall() }
+    }
+
+    override fun searchBranchSelected() {
+        variantPrefs.edit().putString(PREFS_KEY_VARIANT, PREFS_VARIANT_SEARCH).apply()
+    }
+
+    override fun chatBranchSelected() {
+        variantPrefs.edit().putString(PREFS_KEY_VARIANT, PREFS_VARIANT_CHAT).apply()
     }
 
     override fun fire(pixelName: OnboardingPixelName, action: OnboardingPixelAction) {
@@ -167,9 +189,9 @@ class RealOnboardingPixelSender @Inject constructor(
             Triple(
                 appInstallStore.daysInstalled(),
                 customAiOnboardingStore.isEnabled(),
-                when (onboardingStore.getOnboardingVariant()) {
-                    "search" -> VARIANT_SEARCH
-                    "chat" -> VARIANT_CHAT
+                when (variantPrefs.getString(PREFS_KEY_VARIANT, null)) {
+                    PREFS_VARIANT_SEARCH -> VARIANT_SEARCH
+                    PREFS_VARIANT_CHAT -> VARIANT_CHAT
                     else -> null
                 },
             )
@@ -226,6 +248,11 @@ class RealOnboardingPixelSender @Inject constructor(
 
         private const val VARIANT_SEARCH = "search_plus_duckai-search"
         private const val VARIANT_CHAT = "search_plus_duckai-chat"
+
+        private const val PREFS_VARIANT_FILENAME = "com.duckduckgo.app.onboarding.variant"
+        private const val PREFS_KEY_VARIANT = "variant"
+        private const val PREFS_VARIANT_SEARCH = "search"
+        private const val PREFS_VARIANT_CHAT = "chat"
 
         private const val VALUE_ENGAGE = "engage"
         private const val VALUE_DISMISS = "dismiss"

@@ -524,9 +524,9 @@ class NewUserOnboardingPlanProvider @Inject constructor(
                 when (event) {
                     is NewUserOnboardingEvent.InputDemoQuerySubmitted -> {
                         if (event.isChat) {
-                            onboardingStore.setChatOnboardingVariant()
+                            onboardingPixelSender.chatBranchSelected()
                         } else {
-                            onboardingStore.setSearchOnboardingVariant()
+                            onboardingPixelSender.searchBranchSelected()
                         }
                         onboardingPixelSender.fire(
                             pixelName,
@@ -583,11 +583,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
             transition = { event ->
                 when {
                     event is NewUserOnboardingEvent.InputDemoQuerySubmitted -> {
-                        if (event.isChat) {
-                            onboardingStore.setChatOnboardingVariant()
-                        } else {
-                            onboardingStore.setSearchOnboardingVariant()
-                        }
+                        onboardingPixelSender.chatBranchSelected()
                         onboardingPixelSender.fire(
                             pixelName,
                             OnboardingPixelAction.TryASearchClicked(fromSuggestion = event.fromSuggestion, isChat = event.isChat),
@@ -603,7 +599,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
 
     private fun duckAiDemoStep(ctx: NewUserOnboardingPlanContext) = NewUserBrowserActivityStep(
         id = NewUserOnboardingStepIds.DUCK_AI_DEMO,
-        pixelName = null,
+        pixelName = OnboardingPixelName.ONBOARDING_AI_CHAT,
         precondition = {
             withContext(dispatchers.io()) {
                 androidBrowserConfigFeature.singleTabFireDialog().isEnabled()

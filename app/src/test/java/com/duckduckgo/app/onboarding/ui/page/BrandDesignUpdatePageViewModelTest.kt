@@ -30,6 +30,7 @@ import com.duckduckgo.app.onboarding.CustomAiOnboardingStore
 import com.duckduckgo.app.onboarding.DuckAiOnboardingAvailability
 import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingActivityDialog
 import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingActivityStep
+import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingEvent
 import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingPlanProvider
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.ui.page.BrandDesignUpdatePageViewModel.Command
@@ -286,6 +287,28 @@ class BrandDesignUpdatePageViewModelTest {
         val testee = createViewModel()
         testee.loadDaxDialog()
         verify(mockPixel).fire(PREONBOARDING_INTRO_REINSTALL_USER_SHOWN_UNIQUE, type = Unique())
+    }
+
+    // endregion
+
+    // region Presented event
+
+    @Test
+    fun whenDialogShownThenPresentedEventSentToOrchestrator() = runTest {
+        whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(false)
+        val testee = createViewModel()
+        testee.loadDaxDialog()
+        advanceUntilIdle()
+        verify(mockOrchestrator).onEvent(NewUserOnboardingEvent.Presented)
+    }
+
+    @Test
+    fun whenNotificationPermissionRequestedThenPresentedEventSentToOrchestrator() = runTest {
+        whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(false)
+        val testee = createViewModel()
+        testee.notificationRuntimePermissionRequested()
+        advanceUntilIdle()
+        verify(mockOrchestrator).onEvent(NewUserOnboardingEvent.Presented)
     }
 
     // endregion

@@ -36,6 +36,7 @@ class OnboardingPixelParamRemovalPlugin @Inject constructor() : PixelParamRemova
             OnboardingPixelName.ONBOARDING_NOTIFICATIONS.pixelName to PixelParameter.removeAtb(),
             OnboardingPixelName.ONBOARDING_SEARCH_CHAT_TOGGLE.pixelName to PixelParameter.removeAtb(),
             OnboardingPixelName.ONBOARDING_AI_INTRO.pixelName to PixelParameter.removeAtb(),
+            OnboardingPixelName.ONBOARDING_AI_CHAT.pixelName to PixelParameter.removeAtb(),
         )
     }
 }

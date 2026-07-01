@@ -20,7 +20,6 @@ import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.onboarding.CustomAiOnboardingStore
-import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_ADDRESS_BAR_POSITION
 import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_AI_INTRO
 import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_NOTIFICATIONS
@@ -35,10 +34,13 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.common.test.api.InMemorySharedPreferences
 import com.duckduckgo.common.utils.device.DeviceInfo
+import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import kotlinx.coroutines.test.runTest
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
@@ -56,7 +58,10 @@ class RealOnboardingPixelSenderTest {
     private val mockCustomAiOnboardingStore: CustomAiOnboardingStore = mock {
         onBlocking { isEnabled() } doReturn false
     }
-    private val mockOnboardingStore: OnboardingStore = mock()
+    private val fakePreferences = InMemorySharedPreferences()
+    private val fakeSharedPreferencesProvider: SharedPreferencesProvider = mock {
+        on { getSharedPreferences(any(), any(), any()) } doReturn fakePreferences
+    }
     private val mockDefaultBrowserDetector: DefaultBrowserDetector = mock()
     private val mockWidgetCapabilities: WidgetCapabilities = mock()
     private val mockDeviceInfo: DeviceInfo = mock {
@@ -70,7 +75,7 @@ class RealOnboardingPixelSenderTest {
         dispatchers = coroutineRule.testDispatcherProvider,
         appInstallStore = mockAppInstallStore,
         customAiOnboardingStore = mockCustomAiOnboardingStore,
-        onboardingStore = mockOnboardingStore,
+        sharedPreferencesProvider = fakeSharedPreferencesProvider,
         defaultBrowserDetector = mockDefaultBrowserDetector,
         widgetCapabilities = mockWidgetCapabilities,
         deviceInfo = mockDeviceInfo,
@@ -101,7 +106,7 @@ class RealOnboardingPixelSenderTest {
             dispatchers = coroutineRule.testDispatcherProvider,
             appInstallStore = mockAppInstallStore,
             customAiOnboardingStore = mockCustomAiOnboardingStore,
-            onboardingStore = mockOnboardingStore,
+            sharedPreferencesProvider = fakeSharedPreferencesProvider,
             defaultBrowserDetector = mockDefaultBrowserDetector,
             widgetCapabilities = mockWidgetCapabilities,
             deviceInfo = mockDeviceInfo,
@@ -309,7 +314,7 @@ class RealOnboardingPixelSenderTest {
             dispatchers = coroutineRule.testDispatcherProvider,
             appInstallStore = mockAppInstallStore,
             customAiOnboardingStore = mockCustomAiOnboardingStore,
-            onboardingStore = mockOnboardingStore,
+            sharedPreferencesProvider = fakeSharedPreferencesProvider,
             defaultBrowserDetector = mockDefaultBrowserDetector,
             widgetCapabilities = mockWidgetCapabilities,
             deviceInfo = mockDeviceInfo,
@@ -337,7 +342,7 @@ class RealOnboardingPixelSenderTest {
             dispatchers = coroutineRule.testDispatcherProvider,
             appInstallStore = mockAppInstallStore,
             customAiOnboardingStore = mockCustomAiOnboardingStore,
-            onboardingStore = mockOnboardingStore,
+            sharedPreferencesProvider = fakeSharedPreferencesProvider,
             defaultBrowserDetector = mockDefaultBrowserDetector,
             widgetCapabilities = mockWidgetCapabilities,
             deviceInfo = mockDeviceInfo,
@@ -379,7 +384,7 @@ class RealOnboardingPixelSenderTest {
             dispatchers = coroutineRule.testDispatcherProvider,
             appInstallStore = mockAppInstallStore,
             customAiOnboardingStore = mockCustomAiOnboardingStore,
-            onboardingStore = mockOnboardingStore,
+            sharedPreferencesProvider = fakeSharedPreferencesProvider,
             defaultBrowserDetector = mockDefaultBrowserDetector,
             widgetCapabilities = mockWidgetCapabilities,
             deviceInfo = mockDeviceInfo,
@@ -421,7 +426,7 @@ class RealOnboardingPixelSenderTest {
             dispatchers = coroutineRule.testDispatcherProvider,
             appInstallStore = mockAppInstallStore,
             customAiOnboardingStore = mockCustomAiOnboardingStore,
-            onboardingStore = mockOnboardingStore,
+            sharedPreferencesProvider = fakeSharedPreferencesProvider,
             defaultBrowserDetector = mockDefaultBrowserDetector,
             widgetCapabilities = mockWidgetCapabilities,
             deviceInfo = mockDeviceInfo,
@@ -468,9 +473,22 @@ class RealOnboardingPixelSenderTest {
     fun whenDuckAiOnboardingFlowThenVariantParamIsChat() = runTest {
         whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis())
         whenever(mockCustomAiOnboardingStore.isEnabled()).thenReturn(true)
-        whenever(mockOnboardingStore.getOnboardingVariant()).thenReturn("chat")
+        val prefs = InMemorySharedPreferences()
+        val variantTestee = RealOnboardingPixelSender(
+            appCoroutineScope = coroutineRule.testScope,
+            pixel = mockPixel,
+            dispatchers = coroutineRule.testDispatcherProvider,
+            appInstallStore = mockAppInstallStore,
+            customAiOnboardingStore = mockCustomAiOnboardingStore,
+            sharedPreferencesProvider = mock { on { getSharedPreferences(any(), any(), any()) } doReturn prefs },
+            defaultBrowserDetector = mockDefaultBrowserDetector,
+            widgetCapabilities = mockWidgetCapabilities,
+            deviceInfo = mockDeviceInfo,
+            appBuildConfig = mockAppBuildConfig,
+        )
+        variantTestee.chatBranchSelected()
 
-        testee.fire(ONBOARDING_SET_DEFAULT, OnboardingPixelAction.Shown)
+        variantTestee.fire(ONBOARDING_SET_DEFAULT, OnboardingPixelAction.Shown)
 
         verify(mockPixel).fire(
             ONBOARDING_SET_DEFAULT,
@@ -490,9 +508,22 @@ class RealOnboardingPixelSenderTest {
     @Test
     fun whenSearchOnboardingFlowThenVariantParamIsSearch() = runTest {
         whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis())
-        whenever(mockOnboardingStore.getOnboardingVariant()).thenReturn("search")
+        val prefs = InMemorySharedPreferences()
+        val variantTestee = RealOnboardingPixelSender(
+            appCoroutineScope = coroutineRule.testScope,
+            pixel = mockPixel,
+            dispatchers = coroutineRule.testDispatcherProvider,
+            appInstallStore = mockAppInstallStore,
+            customAiOnboardingStore = mockCustomAiOnboardingStore,
+            sharedPreferencesProvider = mock { on { getSharedPreferences(any(), any(), any()) } doReturn prefs },
+            defaultBrowserDetector = mockDefaultBrowserDetector,
+            widgetCapabilities = mockWidgetCapabilities,
+            deviceInfo = mockDeviceInfo,
+            appBuildConfig = mockAppBuildConfig,
+        )
+        variantTestee.searchBranchSelected()
 
-        testee.fire(ONBOARDING_ADDRESS_BAR_POSITION, OnboardingPixelAction.Shown)
+        variantTestee.fire(ONBOARDING_ADDRESS_BAR_POSITION, OnboardingPixelAction.Shown)
 
         verify(mockPixel).fire(
             ONBOARDING_ADDRESS_BAR_POSITION,
