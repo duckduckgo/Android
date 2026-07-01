@@ -95,6 +95,24 @@
     <string name="duckAiHideAiGeneratedImagesTitle">Απόκρυψη εικόνων που δημιουργήθηκαν με τεχνητή νοημοσύνη</string>
     <string name="duckAiHideAiGeneratedImagesDescription">Φιλτράρει τις εικόνες που δημιουργούνται με τεχνητή νοημοσύνη από τα αποτελέσματα αναζήτησης εικόνων</string>
 
+    <!-- Search Assist Visibility -->
+    <string name="duckAiSearchAssistVisibilityTitle">Ορατότητα Search Assist</string>
+    <string name="duckAiSearchAssistVisibilitySubtitle">Επιλέξτε πόσο συχνά θέλετε να εμφανίζονται οι απαντήσεις που υποστηρίζονται από τεχνητή νοημοσύνη στις αναζητήσεις σας.</string>
+    <string name="duckAiSearchAssistVisibilityNever">Ποτέ</string>
+    <string name="duckAiSearchAssistVisibilityOnDemand">Κατ\' απαίτηση</string>
+    <string name="duckAiSearchAssistVisibilitySometimes">Μερικές φορές</string>
+    <string name="duckAiSearchAssistVisibilityOften">Συχνά</string>
+
+    <!-- Duck AI Use Without AI Settings Option -->
+    <string name="duckAiUseWithoutAiTitle">Χρησιμοποιήστε το DuckDuckGo χωρίς AI</string>
+    <string name="duckAiUseWithoutAiDescription">Απενεργοποιεί το Duck.ai, αποκρύπτει από την αναζήτηση απαντήσεις που υποβοηθούνται από τεχνητή νοημοσύνη και φιλτράρει γνωστούς ιστότοπους με απατηλό περιεχόμενο τεχνητής νοημοσύνης στα αποτελέσματα αναζήτησης εικόνων.</string>
+    <string name="duckAiUseWithoutAiDisabledDescription">Η τεχνητή νοημοσύνη είναι προς το παρόν απενεργοποιημένη στο πρόγραμμα περιήγησης, επομένως δεν θα βλέπετε πλέον απαντήσεις που υποβοηθούνται από τεχνητή νοημοσύνη και θα βλέπετε λιγότερες εικόνες που δημιουργούνται από τεχνητή νοημοσύνη στα αποτελέσματα αναζήτησης εικόνων.</string>
+
+    <!-- Duck AI Section in AI Feature Screen -->
+    <string name="input_screen_user_pref_toggle_between_search_and_ai">Εναλλαγή μεταξύ Αναζήτησης και Duck.ai</string>
+    <string name="duckAiDialogHideAiGeneratedImagesTitle">Απόκρυψη εικόνων που δημιουργήθηκαν με τεχνητή νοημοσύνη</string>
+    <string name="duckAiDialogHideAiGeneratedImagesDescription">Αποκλείει γνωστούς ιστότοπους με απατηλό περιεχόμενο τεχνητής νοημοσύνης από τα αποτελέσματα αναζήτησης εικόνων. <annotation link="learn_more">Μάθετε περισσότερα</annotation></string>
+
     <!-- Duck AI Paid Settings -->
     <string name="duck_ai_paid_settings_enable_in_settings">Ενεργοποίηση στις Ρυθμίσεις λειτουργιών τεχνητής νοημοσύνης</string>
     <string name="duck_ai_paid_settings_manage_in_settings">Διαχείριση στις Ρυθμίσεις λειτουργιών τεχνητής νοημοσύνης</string>
@@ -105,6 +123,13 @@
     <string name="duckAIContextualAutomaticContextTitle">Αυτόματη αποστολή περιεχομένου σελίδας</string>
     <string name="duckAIContextualAutomaticContextMessage">Αυτόματη αποστολή περιεχομένου σελίδας στο Duck.ai</string>
     <string name="duckAIContextualAttachPageContent">Επισύναψη περιεχομένου σελίδας</string>
+
+    <!-- Contextual sheet quick action -->
+    <string name="duckAIContextualPromptAskAboutPage">Ρωτήστε για τη σελίδα</string>
+
+    <!-- Contextual sheet input hint (contextualSheetImprovements flag) -->
+    <string name="contextualSheetImprovedHint">Ρωτήστε οτιδήποτε ιδιωτικά</string>
+    <string name="contextualSheetChatsPopupRecentSection" instruction="Section header above the list of recent Duck.ai chats in the contextual sheet overflow menu.">Πρόσφατες συνομιλίες</string>
 
     <!-- duck.ai contextual fire button -->
     <string name="duckAIContextualFireButtonContentDescription">Εκκαθάριση συνομιλίας</string>
@@ -125,6 +150,12 @@
 
     <!-- Duck AI Chat Suggestions -->
     <string name="duckAiChatHistoryViewAllChats">Προβολή όλων των συνομιλιών</string>
+
+    <!-- Duck.ai onboarding end CTA -->
+    <string name="duckAiEndCtaTitle">Το έχεις!</string>
+    <string name="duckAiEndCtaDescription"><![CDATA[Χρησιμοποίησε τη γραμμή διευθύνσεων για αναζήτηση και επίσκεψη σε ιστότοπους ή πήγαινε στο Duck.ai για ιδιωτική συνομιλία με τεχνητή νοημοσύνη.<br/><br/>Μπορείς να χρησιμοποιήσεις το Duck.ai από οπουδήποτε βλέπεις το εικονίδιο συνομιλίας]]></string>
+    <string name="duckAiEndCtaButton">Κόλλα πέντε!</string>
+    <string name="duckAiEndCtaDescriptionCustomAi"><![CDATA[Ξεκίνα μια ιδιωτική συνομιλία με τεχνητή νοημοσύνη (AI) με το Duck.ai ή πέρνα σε Αναζήτηση για προστατευμένη περιήγηση.<br/><br/>Μπορείς να χρησιμοποιήσεις το Duck.ai από οπουδήποτε βλέπεις το εικονίδιο συνομιλίας]]></string>
 
     <!-- Native Duck.ai chat history -->
     <string name="duck_ai_chat_history_title">Συνομιλίες</string>

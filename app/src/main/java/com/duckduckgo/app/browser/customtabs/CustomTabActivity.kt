@@ -21,6 +21,8 @@ import android.content.Intent
 import android.os.Bundle
 import android.os.Message
 import androidx.activity.OnBackPressedCallback
+import androidx.activity.SystemBarStyle
+import androidx.activity.enableEdgeToEdge
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
@@ -34,12 +36,16 @@ import com.duckduckgo.app.global.intentText
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.common.ui.viewbinding.viewBinding
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import logcat.logcat
 import java.util.UUID
+import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
 class CustomTabActivity : DuckDuckGoActivity() {
@@ -47,9 +53,27 @@ class CustomTabActivity : DuckDuckGoActivity() {
     private val viewModel: CustomTabViewModel by bindViewModel()
     private val binding: ActivityCustomTabBinding by viewBinding()
 
+    @Inject
+    lateinit var edgeToEdgeProvider: EdgeToEdgeProvider
+
+    @Inject
+    lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         viewModel.onShowCustomTab()
+
+        if (edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.BROWSER)) {
+            val toolbarColor = getColorFromAttr(com.duckduckgo.mobile.android.R.attr.daxColorToolbar)
+            val barStyle = if (isDarkThemeEnabled()) {
+                SystemBarStyle.dark(toolbarColor)
+            } else {
+                SystemBarStyle.light(toolbarColor, toolbarColor)
+            }
+            enableEdgeToEdge(statusBarStyle = barStyle, navigationBarStyle = barStyle)
+            edgeToEdgeHandler.applyStatusBarAndHorizontalInsets(binding.root)
+            applyDisplayCutoutMode(resources.configuration.orientation)
+        }
 
         setContentView(binding.root)
 

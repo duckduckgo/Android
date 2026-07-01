@@ -41,6 +41,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.FIRE_ANIMATION
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.app.tabs.model.TabRepository
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.utils.DateProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.dataclearing.api.fire.FireDialogProvider.FireDialogOrigin
@@ -87,7 +88,10 @@ class SingleTabFireDialogViewModel @Inject constructor(
     private val downloadsRepository: DownloadsRepository,
     private val duckChat: DuckChat,
     private val brandDesignUpdateToggles: OnboardingBrandDesignUpdateToggles,
+    private val browserMode: BrowserMode,
 ) : ViewModel() {
+
+    private val isFireMode: Boolean get() = browserMode == BrowserMode.FIRE
 
     var shouldRestartAfterClearing: Boolean = true
         private set
@@ -123,6 +127,14 @@ class SingleTabFireDialogViewModel @Inject constructor(
     }
 
     fun onDeleteAllClicked() {
+        if (isFireMode) {
+            onDeleteAllClickedInFireMode()
+        } else {
+            onDeleteAllClickedInRegularMode()
+        }
+    }
+
+    private fun onDeleteAllClickedInRegularMode() {
         viewModelScope.launch {
             command.send(Command.OnClearStarted)
             trySendDailyDeleteClicked()
@@ -152,12 +164,31 @@ class SingleTabFireDialogViewModel @Inject constructor(
                     clearOptions = clearOptions,
                 )
                 try {
-                    dataClearing.clearDataUsingManualFireOptions()
+                    dataClearing.clearDataUsingManualFireOptions(browserMode = browserMode)
                     dataClearingWideEvent.finishSuccess()
                 } catch (e: Exception) {
                     dataClearingWideEvent.finishFailure(e)
                     throw e
                 }
+            }
+
+            command.send(Command.ClearingComplete)
+        }
+    }
+
+    private fun onDeleteAllClickedInFireMode() {
+        viewModelScope.launch {
+            command.send(Command.OnClearStarted)
+
+            val fireAnimationEnabled = withContext(dispatcherProvider.io()) {
+                settingsDataStore.fireAnimationEnabled
+            }
+            if (fireAnimationEnabled) {
+                command.send(Command.PlayAnimation)
+            }
+
+            withContext(dispatcherProvider.io()) {
+                dataClearing.clearDataUsingManualFireOptions(browserMode = browserMode)
             }
 
             command.send(Command.ClearingComplete)
@@ -178,7 +209,7 @@ class SingleTabFireDialogViewModel @Inject constructor(
             }
 
             withContext(dispatcherProvider.io()) {
-                dataClearing.clearSelectedDuckAiChats(selectedChatUrls)
+                dataClearing.clearSelectedDuckAiChats(selectedChatUrls, browserMode)
             }
 
             command.send(Command.ClearingComplete)
@@ -214,11 +245,12 @@ class SingleTabFireDialogViewModel @Inject constructor(
             val result = withContext(dispatcherProvider.io()) {
                 if (originalTabId != null) {
                     if (origin.value == DuckAiContextualChat) {
-                        dataClearing.clearTabContextualChat(originalTabId)
+                        dataClearing.clearTabContextualChat(originalTabId, browserMode)
                     } else {
                         dataClearing.clearSingleTabData(
                             tabId = originalTabId,
                             replaceCurrentTab = origin.value !is Hatch,
+                            browserMode = browserMode,
                         )
                     }
                 } else {
@@ -279,6 +311,7 @@ class SingleTabFireDialogViewModel @Inject constructor(
             else -> {
                 val titleResId = when {
                     isDuckAiTab && isDeleteThisTabAvailable -> R.string.singleTabFireDialogTitleDuckAi
+                    isFireMode -> R.string.singleTabFireDialogTitleFireMode
                     isDuckAiChatsSelected -> R.string.singleTabFireDialogTitleWithChats
                     else -> R.string.singleTabFireDialogTitle
                 }

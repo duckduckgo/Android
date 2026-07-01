@@ -16,7 +16,6 @@
 
 package com.duckduckgo.duckchat.api
 
-import android.content.Context
 import android.net.Uri
 import kotlinx.coroutines.flow.Flow
 
@@ -74,14 +73,15 @@ interface DuckChat {
     suspend fun wasOpenedBefore(): Boolean
 
     /**
-     * Displays the new address bar option choice screen.
-     */
-    fun showNewAddressBarOptionChoiceScreen(context: Context, isDarkThemeEnabled: Boolean)
-
-    /**
      * Set user setting to determine whether dedicated Duck.ai input screen with a mode switch should be used.
      */
     suspend fun setInputScreenUserSetting(enabled: Boolean)
+
+    /**
+     * Returns `true` if the user has ever interacted with the Duck.ai input screen toggle — enabled it
+     * explicitly, or had a value written implicitly (e.g. the onboarding selection). Sticky once set.
+     */
+    suspend fun isInputScreenEverEnabled(): Boolean
 
     /**
      * Cosmetically sets the input screen user setting.
@@ -108,6 +108,14 @@ interface DuckChat {
      * Observes whether the native input field user setting is enabled.
      */
     fun observeNativeInputFieldUserSettingEnabled(): Flow<Boolean>
+
+    /**
+     * Observes whether the Duck.ai native chat input integration is enabled.
+     * Emits `true` only when both the native input widget and the `nativeChatInput`
+     * feature flag are enabled (and the widget is not suppressed). When `false`,
+     * Duck.ai contextual and full modes fall back to the web input.
+     */
+    fun observeNativeChatInputEnabled(): Flow<Boolean>
 
     suspend fun isStandaloneMigrationCompleted(): Boolean
 
@@ -155,4 +163,25 @@ interface DuckChat {
      * Suspending because the underlying feature-flag reads must not block the main thread.
      */
     suspend fun isChatHistoryAvailable(): Boolean
+
+    /**
+     * Returns `true` when the user enabled Duck.ai chat history in settings.
+     */
+    suspend fun hasUserEnabledChatHistory(): Boolean
+
+    /**
+     * Emits whether the most recent Chat Tab suggestions fetch returned any entries, reflecting the
+     * currently displayed suggestions for the latest query.
+     *
+     * Caution: the cached value is cleared when the Chat Tab is torn down, so no value is emitted
+     * until the current presentation performs its first fetch.
+     */
+    fun observeHasChatSuggestions(): Flow<Boolean>
+
+    /**
+     * Records that the user selected the "Search + Duck.ai" option on the new address bar picker, so the
+     * first prompt submitted from the Duck.ai toggle input field within the attribution window can be
+     * attributed back to the picker.
+     */
+    suspend fun onAddressBarPickerDuckAiSelected()
 }

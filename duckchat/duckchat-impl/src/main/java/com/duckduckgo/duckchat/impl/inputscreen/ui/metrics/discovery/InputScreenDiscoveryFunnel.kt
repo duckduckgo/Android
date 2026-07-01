@@ -41,6 +41,9 @@ interface InputScreenDiscoveryFunnel {
     fun onDuckAiSettingsSeen()
     fun onInputScreenEnabled()
     fun onInputScreenDisabled()
+
+    /** Records SettingsSeen + FeatureEnabled for native-input users who never toggle the Input Screen setting. */
+    fun onNativeInputActive()
     fun onInputScreenOpened()
     fun onSearchSubmitted()
     fun onPromptSubmitted()
@@ -68,6 +71,11 @@ class InputScreenDiscoveryFunnelImpl @Inject constructor(
 
     override fun onInputScreenDisabled() {
         resetFunnel()
+    }
+
+    override fun onNativeInputActive() {
+        onStep(SettingsSeen)
+        onStep(FeatureEnabled)
     }
 
     override fun onInputScreenOpened() {

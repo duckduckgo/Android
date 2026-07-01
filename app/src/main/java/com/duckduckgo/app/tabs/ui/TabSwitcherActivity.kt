@@ -304,6 +304,7 @@ class TabSwitcherActivity :
         setupToolbar(toolbar)
         configureRecycler()
         configureNavigationBar()
+        configureFireTabsEmptyState()
 
         if (edgeToEdgeEnabled) {
             configureEdgeToEdgeInsets()
@@ -324,11 +325,12 @@ class TabSwitcherActivity :
 
     private fun configureEdgeToEdgeInsets() {
         edgeToEdgeHandler.applyHorizontalSystemBarInsets(binding.root)
+        applyDisplayCutoutMode(resources.configuration.orientation)
 
         when (settingsDataStore.omnibarType) {
             OmnibarType.SINGLE_TOP -> {
                 edgeToEdgeHandler.applyStatusBarInsets(binding.tabSwitcherToolbarTop.root)
-                edgeToEdgeHandler.applyNavigationBarInsets(tabsContainer)
+                edgeToEdgeHandler.applyNavigationBarInsets(tabsContainer, drawBehindGestureNav = true)
             }
             OmnibarType.SINGLE_BOTTOM -> {
                 edgeToEdgeHandler.applyStatusBarInsets(tabsContainer)
@@ -364,6 +366,12 @@ class TabSwitcherActivity :
             binding.navigationBar.show()
         } else {
             binding.navigationBar.gone()
+        }
+    }
+
+    private fun configureFireTabsEmptyState() {
+        binding.fireTabsEmptyState.newFireTabButton.setOnClickListener {
+            onNewTabRequested(fromOverflowMenu = false)
         }
     }
 
@@ -498,6 +506,15 @@ class TabSwitcherActivity :
         if (fadingOutForRecreate) return
         fadingOutForRecreate = true
 
+        // In the Fire tabs empty state the recycler is hidden and empty, so there is nothing to
+        // fade out. Animate nothing and just switch mode and recreate immediately; the recreated
+        // activity still fades the new mode's tabs in via the saved fadingInAfterRecreate flag.
+        if (tabsRecycler.visibility != View.VISIBLE) {
+            viewModel.onBrowserModeToggled(newMode)
+            recreate()
+            return
+        }
+
         tabsRecycler.animate()
             .alpha(0f)
             .setDuration(MODE_SWITCH_FADE_OUT_MS)
@@ -562,30 +579,37 @@ class TabSwitcherActivity :
     private fun configureObservers() {
         lifecycleScope.launch {
             viewModel.viewState.flowWithLifecycle(lifecycle).collectLatest {
-                it.layoutType?.let(::updateLayoutType)
+                if (it.showFireTabsEmptyState && !fadingOutForRecreate) {
+                    binding.fireTabsEmptyState.root.show()
+                    tabsRecycler.gone()
+                } else {
+                    binding.fireTabsEmptyState.root.gone()
 
-                tabsRecycler.invalidateItemDecorations()
+                    it.layoutType?.let(::updateLayoutType)
 
-                val shouldTryScroll = it.tabs.isNotEmpty() &&
-                    (firstTimeLoadingTabsList || fadingInAfterRecreate)
+                    tabsRecycler.invalidateItemDecorations()
 
-                tabsAdapter.updateData(it.tabSwitcherItems) {
-                    pendingToggleScrollAnchor?.let { anchor -> scrollPositionToTop(anchor) }
+                    val shouldTryScroll = it.tabs.isNotEmpty() &&
+                        (firstTimeLoadingTabsList || fadingInAfterRecreate)
 
-                    val scrolled = shouldTryScroll && scrollToActiveTab(it.tabSwitcherItems)
-                    if (scrolled) firstTimeLoadingTabsList = false
+                    tabsAdapter.updateData(it.tabSwitcherItems) {
+                        pendingToggleScrollAnchor?.let { anchor -> scrollPositionToTop(anchor) }
 
-                    if (fadingInAfterRecreate && !fadeInAnimationStarted && it.tabs.isNotEmpty()) {
-                        fadeInAnimationStarted = true
-                        tabsRecycler.show()
-                        tabsRecycler.animate()
-                            .alpha(1f)
-                            .setDuration(MODE_SWITCH_FADE_IN_MS)
-                            .withEndAction {
-                                fadingInAfterRecreate = false
-                                tabsRecycler.itemAnimator = DefaultItemAnimator()
-                            }
-                            .start()
+                        val scrolled = shouldTryScroll && scrollToActiveTab(it.tabSwitcherItems)
+                        if (scrolled) firstTimeLoadingTabsList = false
+
+                        if (fadingInAfterRecreate && !fadeInAnimationStarted && it.tabs.isNotEmpty()) {
+                            fadeInAnimationStarted = true
+                            tabsRecycler.show()
+                            tabsRecycler.animate()
+                                .alpha(1f)
+                                .setDuration(MODE_SWITCH_FADE_IN_MS)
+                                .withEndAction {
+                                    fadingInAfterRecreate = false
+                                    tabsRecycler.itemAnimator = DefaultItemAnimator()
+                                }
+                                .start()
+                        }
                     }
                 }
 
@@ -787,6 +811,7 @@ class TabSwitcherActivity :
             DismissAnimatedTileDismissalDialog -> tabSwitcherAnimationTileRemovalDialog!!.dismiss()
             Command.ShowFireBottomSheet -> onFireButtonClicked()
             Command.DismissSnackbar -> lastSnackbar?.dismiss()
+            Command.SwitchToRegularMode -> fadeOutTabsThenRecreate(BrowserMode.REGULAR)
         }
     }
 

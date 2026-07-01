@@ -868,6 +868,7 @@
     <string name="preOnboardingDaxDialog1TitleDuckAi" translatable="false"><![CDATA[Hi there.<br/><br/>Ready for a faster browser that protects you and lets you decide when and how to use AI?]]></string>
     <string name="preOnboardingDaxDialog1Button">Pojďme na to!</string>
     <string name="preOnboardingDaxDialog1ButtonDuckAi" translatable="false">Let\&apos;s get started!</string>
+    <string name="preOnboardingDaxDialog1ButtonBrandDesign">Tak se do toho pustíme!</string>
     <string name="preOnboardingDaxDialog1SecondaryButton">Tohle už znám</string>
     <string name="preOnboardingDaxDialog2Title">Ochrana je aktivní!</string>
     <string name="preOnboardingDaxDialog2Button">Vyber si prohlížeč</string>
@@ -936,6 +937,7 @@
     <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[DuckDuckGo má také <b>volitelné předplatné</b> s bezpečnou <b>VPN</b> a <b>špičkovou soukromou umělou inteligencí</b>.]]></string>
     <string name="onboardingPrivacyProDaxDialogOkButton">Více informací</string>
     <string name="onboardingPrivacyProDaxDialogFreeTrialOkButton">Vyzkoušej to zdarma!</string>
+    <string name="onboardingPrivacyProDaxDialogFreeTrialOkButtonBrandDesign">Vyzkoušej to zdarma!</string>
     <string name="onboardingPrivacyProDaxDialogCancelButton">Přeskočit</string>
     <string name="onboardingSkippedPrivacyProDaxDialogTitle">Víš, že…?</string>
 
@@ -1071,6 +1073,46 @@
     <string name="onboardingSearchDaxDialogOption1Quoted" instruction="translate &apos;duck&apos; too.">jak se anglicky řekne „kachna“</string>
     <string name="onboardingSearchDaxDialogOption1EnglishQuoted" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">jak se španělsky řekne „kachna“</string>
 
+    <string name="onboardingDuckAiFireButtonDaxDialogTitle">To je Duck.ai!</string>
+    <string name="onboardingDuckAiFireButtonDaxDialogDescription"><![CDATA[Soukromé AI chaty, které můžeš kdykoli smazat pomocí tlačítka <b>Fire Button</b>. Zkus ji! 🔥]]></string>
+    <string name="onboardingDuckAiEndCtaTitle">To zvládneš!</string>
+    <string name="onboardingDuckAiEndCtaDescription"><![CDATA[Použij adresní řádek k vyhledávání a návštěvě webů nebo přepni na Duck.ai pro soukromý chat s umělou inteligencí.<br/><br/>Duck.ai můžeš používat odkudkoli, kde vidíš ikonu chatu.]]></string>
+    <string name="onboardingDuckAiEndCtaButton">Hezky!</string>
+
+    <!-- Input Mode Demo Onboarding step -->
+    <string name="preOnboardingInputModeDemoTitle">Tak co, jdeš na to?&lt;br/&gt;Zkus vyhledávání nebo AI chat!</string>
+    <string name="preOnboardingInputModeDemoSearchHint">Soukromé vyhledávání</string>
+    <string name="preOnboardingInputModeDemoChatHint">Zeptej se soukromě na cokoli</string>
+    <string name="preOnboardingInputModeDemoChatSuggestion1">Vysvětli mi akciový trh, jako kdyby mi bylo 10</string>
+    <string name="preOnboardingInputModeDemoChatSuggestion2">Naplánuj mi perfektní den v Londýně</string>
+    <string name="preOnboardingInputModeDemoChatSuggestion3">Překvap mě!</string>
+    <string name="preOnboardingInputModeDemoChatSuggestion3Prompt">Řekni mi 10 fascinujících faktů z vědy, přírody a historie.</string>
+
+    <!-- Custom AI onboarding flow -->
+    <!-- Pre-onboarding: initial screens -->
+    <string name="preOnboardingWelcomeDialogBodyCustomAi">Jsi připraven(a) chatovat soukromě s ChatGPT, Claudem a dalšími umělými inteligencemi zdarma v prohlížeči, který tě aktivně chrání?</string>
+    <string name="preOnboardingDaxDialog3TextCustomAi">Nezapomeň: Duck.ai můžeš používat odkudkoli, kde vidíš ikonu chatu.</string>
+    <string name="preOnboardingDaxDialog3ButtonCustomAi">Spustit chat s AI</string>
+    <!-- Pre-onboarding: AI comparison chart screen. -->
+    <string name="preOnboardingDaxDialogAiTitle">Ochrana AI je aktivní!</string>
+    <string name="preOnboardingAiComparisonChartPopularAis">Populární AI</string>
+    <string name="preOnboardingAiComparisonChartItem1">Všechny chaty jsou anonymizované</string>
+    <string name="preOnboardingAiComparisonChartItem2">K přístupu ke všem funkcím AI není potřeba mít účet</string>
+    <string name="preOnboardingAiComparisonChartItem3">Nikdy nepoužívá tvoje chaty k trénování AI</string>
+    <string name="preOnboardingAiComparisonChartItem4">Přístup k ChatGPT, Claude a dalším, vše na jednom místě</string>
+    <string name="preOnboardingAiComparisonChartButton">Vyzkoušej Duck.ai!</string>
+    <!-- Pre-onboarding: input demo screen -->
+    <string name="preOnboardingInputModeDemoTitleCustomAi">Teď si vyzkoušej soukromý chat s AI!</string>
+    <!-- Pre-onboarding: browser comparison screen -->
+    <string name="preOnboardingDaxDialog2TitleCustomAi">Chceš si z nastavit DuckDuckGo jako výchozí prohlížeč?</string>
+    <!-- In-context onboarding. -->
+    <string name="onboardingEndCustomAiFlowDaxDialogDescription"><![CDATA[Začni soukromý chat s AI Duck.ai, nebo přepni na Vyhledávání a začni s chráněným prohlížením.<br/><br/>Duck.ai můžeš používat odkudkoli, kde vidíš ikonu chatu.]]></string>
+    <string name="onboardingPrivacyProCustomAiFlowDaxDialogDescription">Nabízíme také placené předplatné s pokročilými modely umělé inteligence s vyššími limity pro chat od GPT a Claude, zabezpečenou VPN a dalšími funkcemi.</string>
+
     <string name="input_screen_user_pref_without_ai_updated">Jen vyhledávání</string>
     <string name="input_screen_user_pref_with_ai_updated">Přepínej mezi\nHledáním a Duck.ai</string>
+
+    <!-- New Address Bar Picker -->
+    <string name="newAddressBarPickerDuckDuckGo" translatable="false">DuckDuckGo</string>
+    <string name="newAddressBarPickerConfirm">Potvrdit</string>
 </resources>

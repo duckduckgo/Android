@@ -373,12 +373,15 @@ class SystemSearchActivity : DuckDuckGoActivity() {
                 editableSearchClickListener = {
                     viewModel.onUserSelectedToEditQuery(it.phrase)
                 },
-                autoCompleteLongPressClickListener = {
-                    viewModel.userLongPressedAutocomplete(it)
+                autoCompleteDeleteClickListener = {
+                    viewModel.onUserRequestedToDeleteAutocompleteItem(it)
                 },
                 omnibarType = settingsDataStore.omnibarType,
             )
         binding.autocompleteSuggestions.adapter = autocompleteSuggestionsAdapter
+        lifecycleScope.launch {
+            autocompleteSuggestionsAdapter.setDeleteButtonVisible(viewModel.isAutocompleteHistoryDeleteButtonEnabled())
+        }
 
         binding.content.setOnScrollChangeListener(
             NestedScrollView.OnScrollChangeListener { _, _, scrollY, _, _ ->

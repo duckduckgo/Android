@@ -36,3 +36,13 @@ object SyncActivityWithEmptyParams : GlobalActivityStarter.ActivityParams
  * ```
  */
 data class SyncActivityFromSetupUrl(val url: String) : GlobalActivityStarter.ActivityParams
+
+/**
+ * Use this class to launch the sync screen and immediately start "sync with another device" flow.
+ * [source] is an optional telemetry tag identifying where the flow was started from.
+ *
+ * ```kotlin
+ * globalActivityStarter.start(context, SyncActivityWithAnotherDevice(source = "duckai_card"))
+ * ```
+ */
+data class SyncActivityWithAnotherDevice(val source: String?) : GlobalActivityStarter.ActivityParams

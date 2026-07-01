@@ -95,6 +95,24 @@
     <string name="duckAiHideAiGeneratedImagesTitle">AI-generierte Bilder ausblenden</string>
     <string name="duckAiHideAiGeneratedImagesDescription">Filtert KI-generierte Bilder aus den Ergebnissen der Bildersuche</string>
 
+    <!-- Search Assist Visibility -->
+    <string name="duckAiSearchAssistVisibilityTitle">Sichtbarkeit von Search Assist</string>
+    <string name="duckAiSearchAssistVisibilitySubtitle">Du kannst auswählen, wie oft KI-gestützte Antworten in deinen Suchergebnissen angezeigt werden sollen.</string>
+    <string name="duckAiSearchAssistVisibilityNever">Nie</string>
+    <string name="duckAiSearchAssistVisibilityOnDemand">Auf Anfrage</string>
+    <string name="duckAiSearchAssistVisibilitySometimes">Manchmal</string>
+    <string name="duckAiSearchAssistVisibilityOften">Häufig</string>
+
+    <!-- Duck AI Use Without AI Settings Option -->
+    <string name="duckAiUseWithoutAiTitle">DuckDuckGo ohne KI verwenden</string>
+    <string name="duckAiUseWithoutAiDescription">Deaktiviert Duck.ai, verbirgt KI-gestützte Antworten in der Suche und filtert bekannte KI-Spam-Websites in den Ergebnissen der Bildsuche.</string>
+    <string name="duckAiUseWithoutAiDisabledDescription">KI ist im Browser derzeit deaktiviert, sodass dir keine KI-gestützten Antworten mehr angezeigt werden und du in den Bildersuchergebnissen weniger von der KI generierte Bilder siehst.</string>
+
+    <!-- Duck AI Section in AI Feature Screen -->
+    <string name="input_screen_user_pref_toggle_between_search_and_ai">Wechseln zwischen Suche und Duck.ai</string>
+    <string name="duckAiDialogHideAiGeneratedImagesTitle">KI-generierte Bilder ausblenden</string>
+    <string name="duckAiDialogHideAiGeneratedImagesDescription">Filtert bekannte KI-Spam-Websites aus den Bildersuchergebnissen heraus. <annotation link="learn_more">Mehr erfahren</annotation></string>
+
     <!-- Duck AI Paid Settings -->
     <string name="duck_ai_paid_settings_enable_in_settings">In Einstellungen für KI-Funktionen aktivieren</string>
     <string name="duck_ai_paid_settings_manage_in_settings">In Einstellungen für KI-Funktionen verwalten</string>
@@ -105,6 +123,13 @@
     <string name="duckAIContextualAutomaticContextTitle">Automatisch Seiteninhalte senden</string>
     <string name="duckAIContextualAutomaticContextMessage">Seiteninhalt automatisch an Duck.ai senden</string>
     <string name="duckAIContextualAttachPageContent">Seiteninhalt anhängen</string>
+
+    <!-- Contextual sheet quick action -->
+    <string name="duckAIContextualPromptAskAboutPage">Frage zur Seite</string>
+
+    <!-- Contextual sheet input hint (contextualSheetImprovements flag) -->
+    <string name="contextualSheetImprovedHint">Alles privat fragen</string>
+    <string name="contextualSheetChatsPopupRecentSection" instruction="Section header above the list of recent Duck.ai chats in the contextual sheet overflow menu.">Aktuelle Chats</string>
 
     <!-- duck.ai contextual fire button -->
     <string name="duckAIContextualFireButtonContentDescription">Chat löschen</string>
@@ -125,6 +150,12 @@
 
     <!-- Duck AI Chat Suggestions -->
     <string name="duckAiChatHistoryViewAllChats">Alle Chats anzeigen</string>
+
+    <!-- Duck.ai onboarding end CTA -->
+    <string name="duckAiEndCtaTitle">Du schaffst das!</string>
+    <string name="duckAiEndCtaDescription"><![CDATA[Verwende die Adressleiste, um zu suchen und Websites zu besuchen oder für private KI-Chats zu Duck.ai zu wechseln.<br/><br/>Du kannst Duck.ai von überall dort nutzen, wo du das Chat-Symbol siehst]]></string>
+    <string name="duckAiEndCtaButton">Schlag ein!</string>
+    <string name="duckAiEndCtaDescriptionCustomAi"><![CDATA[Starte einen privaten KI-Chat mit Duck.ai oder wechsle zur Suche, um sicher zu browsen.<br/><br/>Du kannst Duck.ai von überall dort nutzen, wo du das Chat-Symbol siehst]]></string>
 
     <!-- Native Duck.ai chat history -->
     <string name="duck_ai_chat_history_title">Chats</string>

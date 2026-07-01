@@ -136,6 +136,7 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     LONG_PRESS_COPY_URL("mlp_c"),
     LONG_PRESS_COPY_LINK_TEXT("m_long_press_copy_link_text"),
     LONG_PRESS_OPEN_IMAGE_IN_BACKGROUND_TAB("mlp_ibt"),
+    LONG_PRESS_NEW_FIRE_TAB("m_long_press_new_fire_tab"),
 
     SETTINGS_OPENED("ms"),
     SETTINGS_THEME_OPENED("ms_t_o"),
@@ -261,6 +262,8 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
 
     AUTOCOMPLETE_RESULT_DELETED("m_autocomplete_result_deleted"),
     AUTOCOMPLETE_RESULT_DELETED_DAILY("m_autocomplete_result_deleted_daily"),
+    AUTOCOMPLETE_RESULT_DELETE_BUTTON_CLICKED("autocomplete_result_delete_button_clicked"),
+    AUTOCOMPLETE_RESULT_DELETE_BUTTON_CLICKED_DAILY("autocomplete_result_delete_button_clicked_daily"),
 
     CHAT_SUGGESTIONS_GENERAL_SETTINGS_TOGGLED_ON_COUNT("m_aichat_settings_chat_suggestions_turned_on_count"),
     CHAT_SUGGESTIONS_GENERAL_SETTINGS_TOGGLED_ON_DAILY("m_aichat_settings_chat_suggestions_turned_on_daily"),
@@ -536,4 +539,6 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     GET_DESKTOP_BROWSER_LINK_CLICK("m_get_desktop_browser_link_click"),
 
     AICHAT_VOICE_SESSION_DIGITAL_ASSISTANT_STARTED("m_aichat_voice_session_digital-assistant_started"),
+
+    WEBVIEW_SESSION_LARGE_BYTES("webview_session_large_bytes"),
 }

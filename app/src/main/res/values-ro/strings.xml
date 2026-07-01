@@ -850,6 +850,7 @@
     <string name="preOnboardingDaxDialog1TitleDuckAi" translatable="false"><![CDATA[Hi there.<br/><br/>Ready for a faster browser that protects you and lets you decide when and how to use AI?]]></string>
     <string name="preOnboardingDaxDialog1Button">Hai să o facem!</string>
     <string name="preOnboardingDaxDialog1ButtonDuckAi" translatable="false">Let\&apos;s get started!</string>
+    <string name="preOnboardingDaxDialog1ButtonBrandDesign">Să începem!</string>
     <string name="preOnboardingDaxDialog1SecondaryButton">Am mai fost aici</string>
     <string name="preOnboardingDaxDialog2Title">Mecanismele de protecție au fost activate!</string>
     <string name="preOnboardingDaxDialog2Button">Alege browserul</string>
@@ -916,6 +917,7 @@
     <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[DuckDuckGo are și un <b>abonament opțional cu plată</b>, cu un <b>VPN</b> securizat și <b>IA avansată, privată</b>.]]></string>
     <string name="onboardingPrivacyProDaxDialogOkButton">Află mai multe</string>
     <string name="onboardingPrivacyProDaxDialogFreeTrialOkButton">Încearcă gratuit!</string>
+    <string name="onboardingPrivacyProDaxDialogFreeTrialOkButtonBrandDesign">Încearcă gratuit!</string>
     <string name="onboardingPrivacyProDaxDialogCancelButton">Ignorare</string>
     <string name="onboardingSkippedPrivacyProDaxDialogTitle">Știai?</string>
 
@@ -1051,6 +1053,46 @@
     <string name="onboardingSearchDaxDialogOption1Quoted" instruction="translate &apos;duck&apos; too.">cum se spune „rață” în engleză</string>
     <string name="onboardingSearchDaxDialogOption1EnglishQuoted" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">cum se spune „rață” în spaniolă</string>
 
+    <string name="onboardingDuckAiFireButtonDaxDialogTitle">Acesta este e Duck.ai!</string>
+    <string name="onboardingDuckAiFireButtonDaxDialogDescription"><![CDATA[Chaturi private cu IA pe care le poți șterge oricând cu <b>Fire Button</b>. Încearcă! 🔥]]></string>
+    <string name="onboardingDuckAiEndCtaTitle">Te descurci!</string>
+    <string name="onboardingDuckAiEndCtaDescription"><![CDATA[Folosește bara de adrese pentru a căuta și vizita site-uri sau comută la Duck.ai pentru chat privat cu IA.<br/><br/>Poți folosi Duck.ai de oriunde vezi pictograma de chat]]></string>
+    <string name="onboardingDuckAiEndCtaButton">Bate palma!</string>
+
+    <!-- Input Mode Demo Onboarding step -->
+    <string name="preOnboardingInputModeDemoTitle">Ești gata să începi?&lt;br/&gt;Încearcă o căutare sau un chat IA!</string>
+    <string name="preOnboardingInputModeDemoSearchHint">Caută în mod privat</string>
+    <string name="preOnboardingInputModeDemoChatHint">Întreabă orice în mod privat</string>
+    <string name="preOnboardingInputModeDemoChatSuggestion1">Explică-mi piața bursieră ca și cum aș avea 10 ani</string>
+    <string name="preOnboardingInputModeDemoChatSuggestion2">Planifică o zi perfectă în Londra</string>
+    <string name="preOnboardingInputModeDemoChatSuggestion3">Surprinde-mă!</string>
+    <string name="preOnboardingInputModeDemoChatSuggestion3Prompt">Care ar fi 10 lucruri fascinante despre știință, natură și istorie?</string>
+
+    <!-- Custom AI onboarding flow -->
+    <!-- Pre-onboarding: initial screens -->
+    <string name="preOnboardingWelcomeDialogBodyCustomAi">Ești gata să discuți în privat cu ChatGPT, Claude și alte sisteme de IA, în mod gratuit, într-un browser care te protejează activ?</string>
+    <string name="preOnboardingDaxDialog3TextCustomAi">Nu uita: poți folosi Duck.ai oriunde vezi pictograma de chat</string>
+    <string name="preOnboardingDaxDialog3ButtonCustomAi">Pornește chatul IA</string>
+    <!-- Pre-onboarding: AI comparison chart screen. -->
+    <string name="preOnboardingDaxDialogAiTitle">Protecții IA activate!</string>
+    <string name="preOnboardingAiComparisonChartPopularAis">Sisteme de IA populare</string>
+    <string name="preOnboardingAiComparisonChartItem1">Toate chaturile sunt anonimizate</string>
+    <string name="preOnboardingAiComparisonChartItem2">Nu ai nevoie de un cont pentru a accesa toate funcțiile IA</string>
+    <string name="preOnboardingAiComparisonChartItem3">Nu folosește niciodată chaturile tale pentru a antrena IA</string>
+    <string name="preOnboardingAiComparisonChartItem4">Accesează ChatGPT, Claude și multe altele, toate într-un singur loc</string>
+    <string name="preOnboardingAiComparisonChartButton">Încearcă Duck.ai!</string>
+    <!-- Pre-onboarding: input demo screen -->
+    <string name="preOnboardingInputModeDemoTitleCustomAi">Acum, încearcă un chat privat cu IA!</string>
+    <!-- Pre-onboarding: browser comparison screen -->
+    <string name="preOnboardingDaxDialog2TitleCustomAi">Vrei să setezi DuckDuckGo ca browser implicit?</string>
+    <!-- In-context onboarding. -->
+    <string name="onboardingEndCustomAiFlowDaxDialogDescription"><![CDATA[Începe o conversație privată cu IA cu Duck.ai sau comută la Căutare pentru navigare protejată.<br/><br/>Poți folosi Duck.ai de oriunde vezi pictograma de chat]]></string>
+    <string name="onboardingPrivacyProCustomAiFlowDaxDialogDescription">De asemenea, oferim un abonament plătit care include modele avansate de IA, cu limite de chat mai mari de la GPT și Claude, un VPN securizat și multe altele.</string>
+
     <string name="input_screen_user_pref_without_ai_updated">Doar căutare</string>
     <string name="input_screen_user_pref_with_ai_updated">Comută între Căutare și Duck.ai</string>
+
+    <!-- New Address Bar Picker -->
+    <string name="newAddressBarPickerDuckDuckGo" translatable="false">DuckDuckGo</string>
+    <string name="newAddressBarPickerConfirm">Confirmă</string>
 </resources>

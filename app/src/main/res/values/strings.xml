@@ -831,6 +831,7 @@
     <string name="preOnboardingDaxDialog1TitleDuckAi" translatable="false"><![CDATA[Hi there.<br/><br/>Ready for a faster browser that protects you and lets you decide when and how to use AI?]]></string>
     <string name="preOnboardingDaxDialog1Button">Let\'s do it!</string>
     <string name="preOnboardingDaxDialog1ButtonDuckAi" translatable="false">Let\'s get started!</string>
+    <string name="preOnboardingDaxDialog1ButtonBrandDesign">Let\'s get started!</string>
     <string name="preOnboardingDaxDialog1SecondaryButton">I\'ve been here before</string>
     <string name="preOnboardingDaxDialog2Title">Protections activated!</string>
     <string name="preOnboardingDaxDialog2Button">Choose Your Browser</string>
@@ -895,6 +896,7 @@
     <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[DuckDuckGo also has an <b>optional paid subscription</b>, with a secure <b>VPN</b> and <b>advanced, private AI</b>.]]></string>
     <string name="onboardingPrivacyProDaxDialogOkButton">Learn More</string>
     <string name="onboardingPrivacyProDaxDialogFreeTrialOkButton">Try for free!</string>
+    <string name="onboardingPrivacyProDaxDialogFreeTrialOkButtonBrandDesign">Try it free!</string>
     <string name="onboardingPrivacyProDaxDialogCancelButton">Skip</string>
     <string name="onboardingSkippedPrivacyProDaxDialogTitle">Did you know?</string>
 
@@ -1030,6 +1032,46 @@
     <string name="onboardingSearchDaxDialogOption1Quoted" instruction="translate 'duck' too.">how to say \"duck\" in english</string>
     <string name="onboardingSearchDaxDialogOption1EnglishQuoted" instruction="translate 'duck' too. Don't add question mark">how to say \"duck\" in spanish</string>
 
+    <string name="onboardingDuckAiFireButtonDaxDialogTitle">That\'s Duck.ai!</string>
+    <string name="onboardingDuckAiFireButtonDaxDialogDescription"><![CDATA[Private AI chats you can delete anytime with the <b>Fire Button</b>. Give it a try! 🔥]]></string>
+    <string name="onboardingDuckAiEndCtaTitle">You\'ve got this!</string>
+    <string name="onboardingDuckAiEndCtaDescription"><![CDATA[Use the address bar to search and visit sites or toggle to Duck.ai for private AI chat.<br/><br/>You can use Duck.ai from anywhere you see the chat icon]]></string>
+    <string name="onboardingDuckAiEndCtaButton">High five!</string>
+
+    <!-- Input Mode Demo Onboarding step -->
+    <string name="preOnboardingInputModeDemoTitle">Ready to get started?&lt;br/&gt;Try a search or AI chat!</string>
+    <string name="preOnboardingInputModeDemoSearchHint">Search privately</string>
+    <string name="preOnboardingInputModeDemoChatHint">Ask anything privately</string>
+    <string name="preOnboardingInputModeDemoChatSuggestion1">Explain the stock market like I\'m 10</string>
+    <string name="preOnboardingInputModeDemoChatSuggestion2">Plan a perfect day in London</string>
+    <string name="preOnboardingInputModeDemoChatSuggestion3">Surprise me!</string>
+    <string name="preOnboardingInputModeDemoChatSuggestion3Prompt">What are 10 fascinating facts across science, nature, and history?</string>
+
+    <!-- Custom AI onboarding flow -->
+    <!-- Pre-onboarding: initial screens -->
+    <string name="preOnboardingWelcomeDialogBodyCustomAi">Ready to chat privately with ChatGPT, Claude, and other AIs for free, in a browser that actively protects you?</string>
+    <string name="preOnboardingDaxDialog3TextCustomAi">Remember: you can use Duck.ai from anywhere you see the chat icon</string>
+    <string name="preOnboardingDaxDialog3ButtonCustomAi">Start AI Chat</string>
+    <!-- Pre-onboarding: AI comparison chart screen. -->
+    <string name="preOnboardingDaxDialogAiTitle">AI protections activated!</string>
+    <string name="preOnboardingAiComparisonChartPopularAis">Popular AIs</string>
+    <string name="preOnboardingAiComparisonChartItem1">All chats are anonymized</string>
+    <string name="preOnboardingAiComparisonChartItem2">No account needed to access all AI features</string>
+    <string name="preOnboardingAiComparisonChartItem3">Never uses your chats to train AI</string>
+    <string name="preOnboardingAiComparisonChartItem4">Access ChatGPT, Claude, and more, all in one place</string>
+    <string name="preOnboardingAiComparisonChartButton">Give Duck.ai a try!</string>
+    <!-- Pre-onboarding: input demo screen -->
+    <string name="preOnboardingInputModeDemoTitleCustomAi">Now, try a private AI chat!</string>
+    <!-- Pre-onboarding: browser comparison screen -->
+    <string name="preOnboardingDaxDialog2TitleCustomAi">Want to make DuckDuckGo your default browser?</string>
+    <!-- In-context onboarding. -->
+    <string name="onboardingEndCustomAiFlowDaxDialogDescription"><![CDATA[Start a private AI chat with Duck.ai or toggle to Search for protected browsing.<br/><br/>You can use Duck.ai from anywhere you see the chat icon]]></string>
+    <string name="onboardingPrivacyProCustomAiFlowDaxDialogDescription">We also offer a paid subscription featuring advanced AI models with higher chat limits from GPT and Claude, a secure VPN, and more.</string>
+
     <string name="input_screen_user_pref_without_ai_updated">Search only</string>
     <string name="input_screen_user_pref_with_ai_updated">Toggle between\nSearch and Duck.ai</string>
+
+    <!-- New Address Bar Picker -->
+    <string name="newAddressBarPickerDuckDuckGo" translatable="false">DuckDuckGo</string>
+    <string name="newAddressBarPickerConfirm">Confirm</string>
 </resources>

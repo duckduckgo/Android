@@ -24,8 +24,8 @@
     android:focusable="true"
     android:gravity="center_vertical"
     android:orientation="horizontal"
-    android:paddingStart="@dimen/keyline_4"
-    android:paddingEnd="@dimen/keyline_4"
+    android:paddingStart="@dimen/keyline_2"
+    android:paddingEnd="@dimen/keyline_2"
     android:paddingTop="@dimen/keyline_2"
     android:paddingBottom="@dimen/keyline_2">
 
@@ -40,7 +40,7 @@
         android:id="@+id/optionsChipClose"
         android:layout_width="@dimen/keyline_4"
         android:layout_height="@dimen/keyline_4"
-        android:layout_marginStart="@dimen/keyline_2"
+        android:layout_marginStart="@dimen/keyline_1"
         android:importantForAccessibility="no"
         android:scaleType="center"
         app:srcCompat="@drawable/ic_close_16" />

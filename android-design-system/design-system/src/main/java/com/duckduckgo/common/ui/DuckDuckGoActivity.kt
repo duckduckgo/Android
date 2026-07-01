@@ -21,9 +21,15 @@ import android.app.UiModeManager
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.pm.ActivityInfo
+import android.content.res.Configuration
+import android.graphics.Color
+import android.os.Build
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
+import android.view.WindowManager
+import androidx.activity.SystemBarStyle
+import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.widget.Toolbar
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -54,6 +60,8 @@ abstract class DuckDuckGoActivity : DaggerActivity() {
     protected open val applyFireTheme: Boolean = false
 
     private var themeChangeReceiver: BroadcastReceiver? = null
+
+    private var displayCutoutModeManaged = false
 
     @SuppressLint("MissingSuperCall")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -112,6 +120,52 @@ abstract class DuckDuckGoActivity : DaggerActivity() {
             }
             DARK -> true
             else -> false
+        }
+    }
+
+    /**
+     * Enables edge-to-edge with fully transparent system bars. Call from [onCreate] when
+     * edge-to-edge is enabled for the screen.
+     */
+    protected fun enableTransparentEdgeToEdge() {
+        val barStyle = if (isDarkThemeEnabled()) {
+            SystemBarStyle.dark(Color.TRANSPARENT)
+        } else {
+            SystemBarStyle.light(Color.TRANSPARENT, Color.TRANSPARENT)
+        }
+        enableEdgeToEdge(statusBarStyle = barStyle, navigationBarStyle = barStyle)
+        applyDisplayCutoutMode(resources.configuration.orientation)
+    }
+
+    /**
+     * Sets the window's display-cutout mode from [orientation]: in landscape the window avoids the
+     * cutout (the notch/camera area is reserved as a black letterbox), in portrait it keeps the
+     * default behaviour and draws normally around the (typically top-centre) cutout.
+     *
+     * Calling this marks the cutout mode as managed, so it is re-applied on rotation via
+     * [onConfigurationChanged] for activities that declare `android:configChanges` and are not
+     * recreated. Non-edge-to-edge screens never call this, so their cutout stays at the platform default.
+     */
+    protected fun applyDisplayCutoutMode(orientation: Int) {
+        displayCutoutModeManaged = true
+        if (Build.VERSION.SDK_INT >= 28) {
+            window.attributes = window.attributes.apply {
+                layoutInDisplayCutoutMode = if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                    WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_NEVER
+                } else {
+                    WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_DEFAULT
+                }
+            }
+        }
+    }
+
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+        // Activities declaring android:configChanges (e.g. orientation) are not recreated on rotation,
+        // so re-apply the cutout mode here. Only screens that applied it once (edge-to-edge) are managed;
+        // others keep the platform default. Subclasses overriding this must call super.
+        if (displayCutoutModeManaged) {
+            applyDisplayCutoutMode(newConfig.orientation)
         }
     }
 

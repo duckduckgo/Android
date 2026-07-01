@@ -31,9 +31,6 @@ interface ExtendedOnboardingFeatureToggles {
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun self(): Toggle
 
-    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
-    fun noBrowserCtas(): Toggle
-
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun privacyProCta(): Toggle
 
@@ -50,12 +47,6 @@ interface ExtendedOnboardingFeatureToggles {
     @Experiment
     fun freeTrialCopy(): Toggle
 
-    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
-    fun onboardingDuckAiExperimentMay26(): Toggle
-
-    enum class DuckAiOnboardingExperimentCohort(override val cohortName: String) : Toggle.State.CohortName {
-        CONTROL("control"),
-        TREATMENT_WITH_DUCK_AI_DEFAULT("treatmentWithDuckAiDefault"),
-        TREATMENT_WITH_SEARCH_DEFAULT("treatmentWithSearchDefault"),
-    }
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    fun duckAiOnboarding(): Toggle
 }

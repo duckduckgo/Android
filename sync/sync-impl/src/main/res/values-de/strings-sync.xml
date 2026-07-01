@@ -241,4 +241,12 @@
     <string name="sync_recover_data_download_pdf">Als PDF herunterladen</string>
     <string name="sync_restore_on_reinstall_title">Bei App-Neuinstallation wiederherstellen</string>
     <string name="sync_restore_on_reinstall_description">Wenn du die DuckDuckGo-App neu installierst, werden wir dich fragen, ob du deine Daten auf diesem Gerät wiederherstellen möchtest.</string>
+
+    <!-- Chat sync promo -->
+    <string name="sync_chat_promo_banner_title">Mit Sync &amp; Backup kannst du geräteübergreifend auf deine Chats zugreifen.</string>
+    <string name="sync_chat_promo_banner_cta_title">Mit anderem Gerät synchronisieren</string>
+    <string name="sync_chat_bottom_sheet_title">Lass uns deine Chats auf deinen Geräten synchronisieren!</string>
+    <string name="sync_chat_bottom_sheet_description">Finde den QR-Code in der DuckDuckGo-App auf deinem anderen Gerät unter Einstellungen › Sync &amp; Backup › Mit anderem Gerät synchronisieren.</string>
+    <string name="sync_chat_bottom_sheet_positive">QR-Code scannen</string>
+    <string name="sync_chat_bottom_sheet_negative">Jetzt nicht</string>
 </resources>

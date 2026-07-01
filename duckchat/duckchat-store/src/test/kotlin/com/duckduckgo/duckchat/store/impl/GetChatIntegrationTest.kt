@@ -19,11 +19,11 @@ package com.duckduckgo.duckchat.store.impl
 import androidx.room.Room
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
+import com.duckduckgo.browsermode.api.BrowserMode
+import com.duckduckgo.browsermode.api.BrowserModeDataProvider
 import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import com.duckduckgo.duckchat.store.impl.handler.DuckAiNativeStorageJsMessageHandler
 import com.duckduckgo.duckchat.store.impl.store.DuckAiBridgeDatabase
-import com.duckduckgo.duckchat.store.impl.store.DuckAiBridgeFileMetaDao
-import com.duckduckgo.duckchat.store.impl.store.DuckAiBridgeSettingsDao
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.js.messaging.api.JsMessage
 import com.duckduckgo.js.messaging.api.JsMessaging
@@ -36,6 +36,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.any
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
@@ -57,14 +58,21 @@ class GetChatIntegrationTest {
         ).allowMainThreadQueries().build()
 
         val hostProvider = mock<DuckAiHostProvider>().also { whenever(it.getHost()).thenReturn("duck.ai") }
-        val handlerPlugin = DuckAiNativeStorageJsMessageHandler(
-            settingsDao = mock<DuckAiBridgeSettingsDao>(),
-            chatsDao = db.chatsDao(),
-            fileMetaDao = mock<DuckAiBridgeFileMetaDao>(),
+        val storage = RealDuckAiBridgeStorage(
+            settings = mock(),
+            chats = db.chatsDao(),
+            fileMeta = mock(),
             filesDirLazy = Lazy { File("") },
+        )
+        val storageProvider = mock<BrowserModeDataProvider<DuckAiBridgeStorage>>().also {
+            whenever(it.forMode(any())).thenReturn(storage)
+        }
+        val handlerPlugin = DuckAiNativeStorageJsMessageHandler(
+            storageProvider = storageProvider,
             duckAiHostProvider = hostProvider,
             migrationPrefs = DuckAiMigrationPrefs(mock()),
             pixels = mock(),
+            browserMode = BrowserMode.REGULAR,
         )
         handler = handlerPlugin.getJsMessageHandler()
     }

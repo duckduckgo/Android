@@ -40,6 +40,7 @@ import com.duckduckgo.sync.impl.Result
 import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.impl.SyncAccountRepository
 import com.duckduckgo.sync.impl.SyncAccountRepository.AuthCode
+import com.duckduckgo.sync.impl.SyncAuthCode
 import com.duckduckgo.sync.impl.SyncFeatureToggle
 import com.duckduckgo.sync.impl.auth.DeviceAuthenticator
 import com.duckduckgo.sync.impl.autorestore.SyncAutoRestoreManager
@@ -58,6 +59,7 @@ import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.OriginalFlow
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.SetupFlows.CreateAccountFlow
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.SetupFlows.SignInFlow
 import com.duckduckgo.sync.impl.ui.SyncDeviceListItem.SyncedDevice
+import com.duckduckgo.sync.impl.ui.qrcode.SyncBarcodeUrl
 import com.duckduckgo.sync.impl.wideevents.SyncSetupWideEvent
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -1102,6 +1104,71 @@ class SyncActivityViewModelTest {
         // SyncActivity returns to foreground — viewState() is re-subscribed.
         testee.viewState().test {
             assertTrue(expectMostRecentItem().autoRestoreEnabled)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenProcessSetupDeepLinkWithV1ExchangeUrlThenAskSetupSyncDeepLinkIsSent() = runTest {
+        val url = SyncBarcodeUrl(webSafeB64EncodedCode = "code").asUrl()
+        whenever(syncAccountRepository.parseSyncAuthCode(url)).thenReturn(SyncAuthCode.Exchange(mock()))
+
+        testee.commands().test {
+            testee.processSetupDeepLink(url)
+            awaitItem().assertCommandType(Command.AskSetupSyncDeepLink::class)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenProcessSetupDeepLinkWithV1ConnectUrlThenNoCommandIsSent() = runTest {
+        val url = SyncBarcodeUrl(webSafeB64EncodedCode = "code").asUrl()
+        whenever(syncAccountRepository.parseSyncAuthCode(url)).thenReturn(SyncAuthCode.Unknown("code"))
+
+        testee.commands().test {
+            testee.processSetupDeepLink(url)
+            expectNoEvents()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenProcessSetupDeepLinkWithV2UrlAndDeviceAuthEnrolledThenDeepLinkIntoSetupIsSent() = runTest {
+        whenever(deviceAuthenticator.hasValidDeviceAuthentication()).thenReturn(true)
+        val url = SyncBarcodeUrl(
+            webSafeB64EncodedCode = "code",
+            protocolVersion = SyncBarcodeUrl.ProtocolVersion.V2,
+        ).asUrl()
+
+        testee.commands().test {
+            testee.processSetupDeepLink(url)
+            awaitItem().assertCommandType(Command.DeepLinkIntoSetup::class)
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        verify(syncAccountRepository, never()).parseSyncAuthCode(any())
+    }
+
+    @Test
+    fun whenProcessSetupDeepLinkWithV2UrlAndDeviceAuthNotEnrolledThenRequestSetupAuthenticationIsSent() = runTest {
+        whenever(deviceAuthenticator.hasValidDeviceAuthentication()).thenReturn(false)
+        val url = SyncBarcodeUrl(
+            webSafeB64EncodedCode = "code",
+            protocolVersion = SyncBarcodeUrl.ProtocolVersion.V2,
+        ).asUrl()
+
+        testee.commands().test {
+            testee.processSetupDeepLink(url)
+            awaitItem().assertCommandType(RequestSetupAuthentication::class)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenProcessSetupDeepLinkWithMalformedUrlThenNoCommandIsSent() = runTest {
+        testee.commands().test {
+            testee.processSetupDeepLink("not-a-sync-url")
+            expectNoEvents()
             cancelAndIgnoreRemainingEvents()
         }
     }

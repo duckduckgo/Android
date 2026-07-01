@@ -23,10 +23,10 @@ import com.duckduckgo.app.browser.remotemessage.CommandActionMapper
 import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.CtaId.DAX_END
 import com.duckduckgo.app.cta.ui.CtaViewModel
-import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.ExtendedOnboardingFeatureToggles
 import com.duckduckgo.app.onboardingbranddesignupdate.OnboardingBrandDesignUpdateToggles
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.ui.view.MessageCta
 import com.duckduckgo.common.utils.playstore.PlayStoreUtils
@@ -71,7 +71,6 @@ class NewTabPageViewModelTest {
     private var mockPlaystoreUtils: PlayStoreUtils = mock()
     private var mockRemoteMessageModel: RemoteMessageModel = mock()
     private var mockDismissedCtaDao: DismissedCtaDao = mock()
-    private val mockExtendedOnboardingFeatureToggles: ExtendedOnboardingFeatureToggles = mock()
     private val mockSettingsDataStore: SettingsDataStore = mock()
     private val mockLowPriorityMessagingModel: LowPriorityMessagingModel = mock()
     private val mockAppTrackingProtection: AppTrackingProtection = mock()
@@ -84,7 +83,6 @@ class NewTabPageViewModelTest {
     @Before
     fun setUp() = runTest {
         val mockDisabledToggle: Toggle = mock { on { it.isEnabled() } doReturn false }
-        whenever(mockExtendedOnboardingFeatureToggles.noBrowserCtas()).thenReturn(mockDisabledToggle)
         whenever(mockOnboardingBrandDesignUpdateToggles.brandDesignUpdate()).thenReturn(mockDisabledToggle)
         whenever(mockSavedSitesRepository.getFavorites()).thenReturn(flowOf(emptyList()))
         whenever(mockRemoteMessageModel.observeActiveMessages()).thenReturn(flowOf(null))
@@ -93,7 +91,10 @@ class NewTabPageViewModelTest {
         testee = createTestee()
     }
 
-    private fun createTestee(showLogo: Boolean = true): NewTabPageViewModel {
+    private fun createTestee(
+        showLogo: Boolean = true,
+        browserMode: BrowserMode = BrowserMode.REGULAR,
+    ): NewTabPageViewModel {
         return NewTabPageViewModel(
             showDaxLogo = showLogo,
             dispatchers = coroutinesTestRule.testDispatcherProvider,
@@ -103,14 +104,39 @@ class NewTabPageViewModelTest {
             syncEngine = mockSyncEngine,
             commandActionMapper = mockCommandActionMapper,
             dismissedCtaDao = mockDismissedCtaDao,
-            extendedOnboardingFeatureToggles = mockExtendedOnboardingFeatureToggles,
             settingsDataStore = mockSettingsDataStore,
             lowPriorityMessagingModel = mockLowPriorityMessagingModel,
             appTrackingProtection = mockAppTrackingProtection,
             pixel = pixel,
             onboardingBrandDesignUpdateToggles = mockOnboardingBrandDesignUpdateToggles,
             ctaViewModel = mockCtaViewModel,
+            browserMode = browserMode,
         )
+    }
+
+    @Test
+    fun whenFireModeThenShowFireTabEmptyStateAndLogoHidden() = runTest {
+        testee = createTestee(browserMode = BrowserMode.FIRE)
+        testee.onStart(mockLifecycleOwner)
+
+        testee.viewState.test {
+            expectMostRecentItem().also {
+                assertTrue(it.showFireTabEmptyState)
+                assertFalse(it.shouldShowLogo)
+            }
+        }
+    }
+
+    @Test
+    fun whenRegularModeThenDoesNotShowFireTabEmptyState() = runTest {
+        testee = createTestee(browserMode = BrowserMode.REGULAR)
+        testee.onStart(mockLifecycleOwner)
+
+        testee.viewState.test {
+            expectMostRecentItem().also {
+                assertFalse(it.showFireTabEmptyState)
+            }
+        }
     }
 
     @Test

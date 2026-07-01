@@ -241,4 +241,12 @@
     <string name="sync_recover_data_download_pdf">Last ned som PDF</string>
     <string name="sync_restore_on_reinstall_title">Gjenopprett ved ny appinstallasjon</string>
     <string name="sync_restore_on_reinstall_description">Hvis du installerer DuckDuckGo-appen på nytt, spør vi deg om du vil gjenopprette dataene dine på denne enheten.</string>
+
+    <!-- Chat sync promo -->
+    <string name="sync_chat_promo_banner_title">Få tilgang til chattene på alle enhetene dine med Sync &amp; Backup.</string>
+    <string name="sync_chat_promo_banner_cta_title">Synkroniser med en annen enhet</string>
+    <string name="sync_chat_bottom_sheet_title">La oss synkronisere chattene på\nalle enhetene dine!</string>
+    <string name="sync_chat_bottom_sheet_description">Finn QR-koden på DuckDuckGo-appen på den andre enheten din ved å gå til Innstillinger › Sync &amp; Backup › Synkroniser med en annen enhet.</string>
+    <string name="sync_chat_bottom_sheet_positive">Skann QR-kode</string>
+    <string name="sync_chat_bottom_sheet_negative">Ikke nå</string>
 </resources>

@@ -22,6 +22,7 @@ import com.duckduckgo.app.statistics.wideevents.CleanupPolicy
 import com.duckduckgo.app.statistics.wideevents.FlowStatus
 import com.duckduckgo.app.statistics.wideevents.WideEventClient
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.pir.impl.PirRemoteFeatures
@@ -31,16 +32,21 @@ import com.duckduckgo.pir.impl.wideevents.PirScanWideEvent.CancellationReason
 import com.duckduckgo.pir.impl.wideevents.PirScanWideEvent.FailureReason
 import com.duckduckgo.pir.impl.wideevents.PirScanWideEventImpl.Companion.ENTRY_POINT_MANUAL_EDIT_PROFILE
 import com.duckduckgo.pir.impl.wideevents.PirScanWideEventImpl.Companion.ENTRY_POINT_MANUAL_INITIAL
+import com.duckduckgo.pir.impl.wideevents.PirScanWideEventImpl.Companion.ENTRY_POINT_MANUAL_INITIAL_RESUME
 import com.duckduckgo.pir.impl.wideevents.PirScanWideEventImpl.Companion.ENTRY_POINT_SCHEDULED
 import com.duckduckgo.pir.impl.wideevents.PirScanWideEventImpl.Companion.EXECUTION_TYPE_MANUAL_EDIT_PROFILE
 import com.duckduckgo.pir.impl.wideevents.PirScanWideEventImpl.Companion.EXECUTION_TYPE_MANUAL_INITIAL
+import com.duckduckgo.pir.impl.wideevents.PirScanWideEventImpl.Companion.EXECUTION_TYPE_MANUAL_INITIAL_RESUME
 import com.duckduckgo.pir.impl.wideevents.PirScanWideEventImpl.Companion.EXECUTION_TYPE_SCHEDULED
 import com.duckduckgo.pir.impl.wideevents.PirScanWideEventImpl.Companion.INTERVAL_OPT_OUT_DURATION
+import com.duckduckgo.pir.impl.wideevents.PirScanWideEventImpl.Companion.INTERVAL_TOTAL_FLOW_DURATION
+import com.duckduckgo.pir.impl.wideevents.PirScanWideEventImpl.Companion.INTERVAL_TOTAL_SCAN_DURATION
 import com.duckduckgo.pir.impl.wideevents.PirScanWideEventImpl.Companion.KEY_BATTERY_OPTIMIZATIONS
 import com.duckduckgo.pir.impl.wideevents.PirScanWideEventImpl.Companion.KEY_BROKER_COUNT
 import com.duckduckgo.pir.impl.wideevents.PirScanWideEventImpl.Companion.KEY_CANCELLATION_REASON
 import com.duckduckgo.pir.impl.wideevents.PirScanWideEventImpl.Companion.KEY_EXECUTION_TYPE
 import com.duckduckgo.pir.impl.wideevents.PirScanWideEventImpl.Companion.KEY_LAST_STEP
+import com.duckduckgo.pir.impl.wideevents.PirScanWideEventImpl.Companion.KEY_LAST_STEP_ELAPSED
 import com.duckduckgo.pir.impl.wideevents.PirScanWideEventImpl.Companion.KEY_NOTIFICATIONS_PERMISSION_GRANTED
 import com.duckduckgo.pir.impl.wideevents.PirScanWideEventImpl.Companion.KEY_POWER_SAVING
 import com.duckduckgo.pir.impl.wideevents.PirScanWideEventImpl.Companion.KEY_PROFILE_QUERIES_COUNT
@@ -49,6 +55,7 @@ import com.duckduckgo.pir.impl.wideevents.PirScanWideEventImpl.Companion.KEY_TOT
 import com.duckduckgo.pir.impl.wideevents.PirScanWideEventImpl.Companion.KEY_TRACKER_BLOCKING_STATE
 import com.duckduckgo.pir.impl.wideevents.PirScanWideEventImpl.Companion.KEY_VPN_CONNECTION_STATE
 import com.duckduckgo.pir.impl.wideevents.PirScanWideEventImpl.Companion.KEY_WEB_VIEW_COUNT
+import com.duckduckgo.pir.impl.wideevents.PirScanWideEventImpl.Companion.PER_RUN_DURATION_BUCKETS
 import com.duckduckgo.pir.impl.wideevents.PirScanWideEventImpl.Companion.STEP_OPT_OUT_COMPLETED
 import com.duckduckgo.pir.impl.wideevents.PirScanWideEventImpl.Companion.STEP_OPT_OUT_SKIPPED
 import com.duckduckgo.pir.impl.wideevents.PirScanWideEventImpl.Companion.STEP_OPT_OUT_STARTED
@@ -70,6 +77,7 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 import java.io.IOException
+import java.time.LocalDateTime
 import kotlin.time.Duration.Companion.hours
 
 class PirScanWideEventTest {
@@ -77,6 +85,9 @@ class PirScanWideEventTest {
     val coroutineRule = CoroutineTestRule()
 
     private val wideEventClient: WideEventClient = mock()
+
+    // Controllable monotonic clock. Defaults to 0 so steps record elapsed "0" unless a test advances it.
+    private val timeProvider = FakeTimeProvider()
 
     @SuppressLint("DenyListedApi")
     private val pirRemoteFeatures: PirRemoteFeatures =
@@ -94,6 +105,7 @@ class PirScanWideEventTest {
             wideEventClient = wideEventClient,
             pirRemoteFeatures = pirRemoteFeatures,
             dispatchers = coroutineRule.testDispatcherProvider,
+            currentTimeProvider = timeProvider,
         )
         // Force scheduled runs to be sampled in by default so scheduled tests fire deterministically.
         testee.sampleScheduledIn = { true }
@@ -244,6 +256,17 @@ class PirScanWideEventTest {
             success = true,
             metadata = mapOf(KEY_LAST_STEP to STEP_STARTED),
         )
+        // The two total-duration intervals open with the wider per-run buckets.
+        verify(wideEventClient).intervalStart(
+            wideEventId = 123L,
+            key = INTERVAL_TOTAL_FLOW_DURATION,
+            buckets = PER_RUN_DURATION_BUCKETS,
+        )
+        verify(wideEventClient).intervalStart(
+            wideEventId = 123L,
+            key = INTERVAL_TOTAL_SCAN_DURATION,
+            buckets = PER_RUN_DURATION_BUCKETS,
+        )
         verify(wideEventClient).intervalStart(
             wideEventId = 123L,
             key = "decile_0_10_duration_ms_bucketed",
@@ -264,6 +287,34 @@ class PirScanWideEventTest {
             flowEntryPoint = ENTRY_POINT_MANUAL_EDIT_PROFILE,
             metadata = mapOf(
                 KEY_EXECUTION_TYPE to EXECUTION_TYPE_MANUAL_EDIT_PROFILE,
+                KEY_PROFILE_QUERIES_COUNT to "1",
+                KEY_BROKER_COUNT to "3",
+                KEY_TOTAL_SCAN_JOBS to "6",
+                KEY_WEB_VIEW_COUNT to "6",
+                KEY_POWER_SAVING to "false",
+                KEY_BATTERY_OPTIMIZATIONS to "false",
+                KEY_VPN_CONNECTION_STATE to "disconnected",
+                KEY_NOTIFICATIONS_PERMISSION_GRANTED to "true",
+                KEY_TRACKER_BLOCKING_STATE to "disabled",
+            ),
+            cleanupPolicy = CleanupPolicy.OnTimeout(duration = 8.hours, flowStatus = FlowStatus.Unknown),
+        )
+    }
+
+    @Test
+    fun whenManualInitialResumeRunStartedThenEntryPointAndExecutionTypeReflectThat() = runTest {
+        // Given
+        whenever(wideEventClient.flowStart(any(), any(), any(), any())).thenReturn(Result.success(789L))
+
+        // When
+        runStarted(PirExecutionType.MANUAL_INITIAL_RESUME, 1, 3, 6)
+
+        // Then - a resume reuses the pir-initial-scan flow but is tagged with its own entry point / type
+        verify(wideEventClient).flowStart(
+            name = WIDE_EVENT_NAME_MANUAL,
+            flowEntryPoint = ENTRY_POINT_MANUAL_INITIAL_RESUME,
+            metadata = mapOf(
+                KEY_EXECUTION_TYPE to EXECUTION_TYPE_MANUAL_INITIAL_RESUME,
                 KEY_PROFILE_QUERIES_COUNT to "1",
                 KEY_BROKER_COUNT to "3",
                 KEY_TOTAL_SCAN_JOBS to "6",
@@ -300,19 +351,19 @@ class PirScanWideEventTest {
             wideEventId = 11L,
             stepName = "progress_50",
             success = true,
-            metadata = mapOf(KEY_LAST_STEP to "progress_50"),
+            metadata = mapOf(KEY_LAST_STEP to "progress_50", KEY_LAST_STEP_ELAPSED to "0"),
         )
         verify(wideEventClient).flowStep(
             wideEventId = 22L,
             stepName = "progress_30",
             success = true,
-            metadata = mapOf(KEY_LAST_STEP to "progress_30"),
+            metadata = mapOf(KEY_LAST_STEP to "progress_30", KEY_LAST_STEP_ELAPSED to "0"),
         )
         verify(wideEventClient).flowStep(
             wideEventId = 22L,
             stepName = STEP_SCAN_COMPLETED,
             success = true,
-            metadata = mapOf(KEY_LAST_STEP to STEP_SCAN_COMPLETED),
+            metadata = mapOf(KEY_LAST_STEP to STEP_SCAN_COMPLETED, KEY_LAST_STEP_ELAPSED to "0"),
         )
         verify(wideEventClient).flowFinish(
             wideEventId = 22L,
@@ -339,7 +390,7 @@ class PirScanWideEventTest {
             wideEventId = 42L,
             stepName = "progress_90",
             success = true,
-            metadata = mapOf(KEY_LAST_STEP to "progress_90"),
+            metadata = mapOf(KEY_LAST_STEP to "progress_90", KEY_LAST_STEP_ELAPSED to "0"),
         )
     }
 
@@ -375,27 +426,43 @@ class PirScanWideEventTest {
                 wideEventId = 44L,
                 stepName = "progress_${decile * 10}",
                 success = true,
-                metadata = mapOf(KEY_LAST_STEP to "progress_${decile * 10}"),
+                metadata = mapOf(KEY_LAST_STEP to "progress_${decile * 10}", KEY_LAST_STEP_ELAPSED to "0"),
             )
         }
     }
 
     @Test
-    fun whenRunStartedWithZeroTotalScanJobsThenNoIntervalStarted() = runTest {
+    fun whenRunStartedWithZeroTotalScanJobsThenTotalIntervalsStartButNoDecileInterval() = runTest {
         // Given
         whenever(wideEventClient.flowStart(any(), any(), any(), any())).thenReturn(Result.success(789L))
 
         // When
         runStarted(PirExecutionType.MANUAL_INITIAL, 1, 0, 0)
 
-        // Then
+        // Then - the total-duration intervals open regardless of job count, but the decile interval
+        // does not (there is no scan progress to measure).
         verify(wideEventClient).flowStep(
             wideEventId = 789L,
             stepName = STEP_STARTED,
             success = true,
             metadata = mapOf(KEY_LAST_STEP to STEP_STARTED),
         )
-        verify(wideEventClient, never()).intervalStart(any(), any(), any(), any())
+        verify(wideEventClient).intervalStart(
+            wideEventId = 789L,
+            key = INTERVAL_TOTAL_FLOW_DURATION,
+            buckets = PER_RUN_DURATION_BUCKETS,
+        )
+        verify(wideEventClient).intervalStart(
+            wideEventId = 789L,
+            key = INTERVAL_TOTAL_SCAN_DURATION,
+            buckets = PER_RUN_DURATION_BUCKETS,
+        )
+        verify(wideEventClient, never()).intervalStart(
+            any(),
+            eq("decile_0_10_duration_ms_bucketed"),
+            any(),
+            any(),
+        )
     }
 
     @Test
@@ -409,10 +476,13 @@ class PirScanWideEventTest {
         runStarted(PirExecutionType.MANUAL_INITIAL, 1, 1, 1)
         runStarted(PirExecutionType.MANUAL_INITIAL, 1, 1, 1)
 
-        // Then - the stale flow had decile_0_10 open from its onRunStarted; it must be ended
-        // before flowFinish so dangling intervals don't pollute timing analytics.
+        // Then - the stale flow had decile_0_10 and both total-duration intervals open from its
+        // onRunStarted; they must all be ended before flowFinish so dangling intervals don't pollute
+        // timing analytics.
         val order = inOrder(wideEventClient)
         order.verify(wideEventClient).intervalEnd(wideEventId = 100L, key = "decile_0_10_duration_ms_bucketed")
+        order.verify(wideEventClient).intervalEnd(wideEventId = 100L, key = INTERVAL_TOTAL_SCAN_DURATION)
+        order.verify(wideEventClient).intervalEnd(wideEventId = 100L, key = INTERVAL_TOTAL_FLOW_DURATION)
         order.verify(wideEventClient).flowFinish(
             wideEventId = 100L,
             status = FlowStatus.Cancelled,
@@ -434,10 +504,35 @@ class PirScanWideEventTest {
         // Then the stale flow is attributed specifically to the profile edit
         val order = inOrder(wideEventClient)
         order.verify(wideEventClient).intervalEnd(wideEventId = 101L, key = "decile_0_10_duration_ms_bucketed")
+        order.verify(wideEventClient).intervalEnd(wideEventId = 101L, key = INTERVAL_TOTAL_SCAN_DURATION)
+        order.verify(wideEventClient).intervalEnd(wideEventId = 101L, key = INTERVAL_TOTAL_FLOW_DURATION)
         order.verify(wideEventClient).flowFinish(
             wideEventId = 101L,
             status = FlowStatus.Cancelled,
             metadata = mapOf(KEY_CANCELLATION_REASON to "superseded_by_profile_edit"),
+        )
+    }
+
+    @Test
+    fun whenManualFlowOpenAndInitialResumeRunStartsThenStaleFlowFinishedWithSupersededByNewRun() = runTest {
+        // Given an open manual flow (the interrupted initial scan)
+        whenever(wideEventClient.flowStart(any(), any(), any(), any()))
+            .thenReturn(Result.success(102L))
+            .thenReturn(Result.success(202L))
+        runStarted(PirExecutionType.MANUAL_INITIAL, 1, 1, 1)
+
+        // When the dashboard resumes it with a MANUAL_INITIAL_RESUME run that supersedes the stale flow
+        runStarted(PirExecutionType.MANUAL_INITIAL_RESUME, 1, 1, 1)
+
+        // Then the stale flow is cancelled as a generic superseded-by-new-run (a resume is not a profile edit)
+        val order = inOrder(wideEventClient)
+        order.verify(wideEventClient).intervalEnd(wideEventId = 102L, key = "decile_0_10_duration_ms_bucketed")
+        order.verify(wideEventClient).intervalEnd(wideEventId = 102L, key = INTERVAL_TOTAL_SCAN_DURATION)
+        order.verify(wideEventClient).intervalEnd(wideEventId = 102L, key = INTERVAL_TOTAL_FLOW_DURATION)
+        order.verify(wideEventClient).flowFinish(
+            wideEventId = 102L,
+            status = FlowStatus.Cancelled,
+            metadata = mapOf(KEY_CANCELLATION_REASON to "superseded_by_new_run"),
         )
     }
 
@@ -464,7 +559,7 @@ class PirScanWideEventTest {
             wideEventId = 70L,
             stepName = "progress_50",
             success = true,
-            metadata = mapOf(KEY_LAST_STEP to "progress_50"),
+            metadata = mapOf(KEY_LAST_STEP to "progress_50", KEY_LAST_STEP_ELAPSED to "0"),
         )
     }
 
@@ -483,7 +578,7 @@ class PirScanWideEventTest {
                 wideEventId = 1L,
                 stepName = "progress_${decile * 10}",
                 success = true,
-                metadata = mapOf(KEY_LAST_STEP to "progress_${decile * 10}"),
+                metadata = mapOf(KEY_LAST_STEP to "progress_${decile * 10}", KEY_LAST_STEP_ELAPSED to "0"),
             )
         }
     }
@@ -502,31 +597,31 @@ class PirScanWideEventTest {
             wideEventId = 1L,
             stepName = "progress_20",
             success = true,
-            metadata = mapOf(KEY_LAST_STEP to "progress_20"),
+            metadata = mapOf(KEY_LAST_STEP to "progress_20", KEY_LAST_STEP_ELAPSED to "0"),
         )
         verify(wideEventClient).flowStep(
             wideEventId = 1L,
             stepName = "progress_40",
             success = true,
-            metadata = mapOf(KEY_LAST_STEP to "progress_40"),
+            metadata = mapOf(KEY_LAST_STEP to "progress_40", KEY_LAST_STEP_ELAPSED to "0"),
         )
         verify(wideEventClient).flowStep(
             wideEventId = 1L,
             stepName = "progress_60",
             success = true,
-            metadata = mapOf(KEY_LAST_STEP to "progress_60"),
+            metadata = mapOf(KEY_LAST_STEP to "progress_60", KEY_LAST_STEP_ELAPSED to "0"),
         )
         verify(wideEventClient).flowStep(
             wideEventId = 1L,
             stepName = "progress_80",
             success = true,
-            metadata = mapOf(KEY_LAST_STEP to "progress_80"),
+            metadata = mapOf(KEY_LAST_STEP to "progress_80", KEY_LAST_STEP_ELAPSED to "0"),
         )
         verify(wideEventClient).flowStep(
             wideEventId = 1L,
             stepName = "progress_90",
             success = true,
-            metadata = mapOf(KEY_LAST_STEP to "progress_90"),
+            metadata = mapOf(KEY_LAST_STEP to "progress_90", KEY_LAST_STEP_ELAPSED to "0"),
         )
         verify(wideEventClient, never()).flowStep(any(), eq("progress_10"), any(), any())
         verify(wideEventClient, never()).flowStep(any(), eq("progress_30"), any(), any())
@@ -550,15 +645,18 @@ class PirScanWideEventTest {
             wideEventId = 7L,
             stepName = "progress_90",
             success = true,
-            metadata = mapOf(KEY_LAST_STEP to "progress_90"),
+            metadata = mapOf(KEY_LAST_STEP to "progress_90", KEY_LAST_STEP_ELAPSED to "0"),
         )
         verify(wideEventClient).intervalEnd(wideEventId = 7L, key = "decile_0_10_duration_ms_bucketed")
         verify(wideEventClient).flowStep(
             wideEventId = 7L,
             stepName = STEP_SCAN_COMPLETED,
             success = true,
-            metadata = mapOf(KEY_LAST_STEP to STEP_SCAN_COMPLETED),
+            metadata = mapOf(KEY_LAST_STEP to STEP_SCAN_COMPLETED, KEY_LAST_STEP_ELAPSED to "0"),
         )
+        // The scan-phase total ends at scan_completed; the end-to-end total stays open until finish.
+        verify(wideEventClient).intervalEnd(wideEventId = 7L, key = INTERVAL_TOTAL_SCAN_DURATION)
+        verify(wideEventClient, never()).intervalEnd(wideEventId = 7L, key = INTERVAL_TOTAL_FLOW_DURATION)
     }
 
     @Test
@@ -609,7 +707,7 @@ class PirScanWideEventTest {
             wideEventId = 2L,
             stepName = STEP_SCAN_COMPLETED,
             success = true,
-            metadata = mapOf(KEY_LAST_STEP to STEP_SCAN_COMPLETED),
+            metadata = mapOf(KEY_LAST_STEP to STEP_SCAN_COMPLETED, KEY_LAST_STEP_ELAPSED to "0"),
         )
     }
 
@@ -628,7 +726,7 @@ class PirScanWideEventTest {
             wideEventId = 3L,
             stepName = STEP_OPT_OUT_STARTED,
             success = true,
-            metadata = mapOf(KEY_LAST_STEP to STEP_OPT_OUT_STARTED),
+            metadata = mapOf(KEY_LAST_STEP to STEP_OPT_OUT_STARTED, KEY_LAST_STEP_ELAPSED to "0"),
         )
         order.verify(wideEventClient).intervalStart(
             wideEventId = 3L,
@@ -652,7 +750,7 @@ class PirScanWideEventTest {
             wideEventId = 4L,
             stepName = STEP_OPT_OUT_COMPLETED,
             success = true,
-            metadata = mapOf(KEY_LAST_STEP to STEP_OPT_OUT_COMPLETED),
+            metadata = mapOf(KEY_LAST_STEP to STEP_OPT_OUT_COMPLETED, KEY_LAST_STEP_ELAPSED to "0"),
         )
         verify(wideEventClient).flowFinish(
             wideEventId = 4L,
@@ -675,7 +773,7 @@ class PirScanWideEventTest {
             wideEventId = 5L,
             stepName = STEP_OPT_OUT_SKIPPED,
             success = true,
-            metadata = mapOf(KEY_LAST_STEP to STEP_OPT_OUT_SKIPPED),
+            metadata = mapOf(KEY_LAST_STEP to STEP_OPT_OUT_SKIPPED, KEY_LAST_STEP_ELAPSED to "0"),
         )
         verify(wideEventClient).flowFinish(
             wideEventId = 5L,
@@ -685,6 +783,72 @@ class PirScanWideEventTest {
         verify(wideEventClient, never()).intervalEnd(
             wideEventId = 5L,
             key = INTERVAL_OPT_OUT_DURATION,
+        )
+    }
+
+    @Test
+    fun whenScanCompletedThenOptOutCompletedThenTotalScanEndsAtScanAndTotalFlowEndsAtFinish() = runTest {
+        // Given
+        whenever(wideEventClient.flowStart(any(), any(), any(), any())).thenReturn(Result.success(70L))
+        runStarted(PirExecutionType.MANUAL_INITIAL, 1, 1, 0) // zero scan jobs, no decile interval
+
+        // When
+        testee.onScanCompleted(PirExecutionType.MANUAL_INITIAL)
+        testee.onOptOutStarted(PirExecutionType.MANUAL_INITIAL)
+        testee.onOptOutCompleted(PirExecutionType.MANUAL_INITIAL, totalOptOutJobs = 3)
+
+        // Then - the scan-phase total ends at scan_completed; the end-to-end total ends just before
+        // the success flowFinish so it spans the whole run (including opt-out).
+        val order = inOrder(wideEventClient)
+        order.verify(wideEventClient).intervalEnd(wideEventId = 70L, key = INTERVAL_TOTAL_SCAN_DURATION)
+        order.verify(wideEventClient).intervalEnd(wideEventId = 70L, key = INTERVAL_OPT_OUT_DURATION)
+        order.verify(wideEventClient).intervalEnd(wideEventId = 70L, key = INTERVAL_TOTAL_FLOW_DURATION)
+        order.verify(wideEventClient).flowFinish(
+            wideEventId = 70L,
+            status = FlowStatus.Success,
+            metadata = mapOf(KEY_TOTAL_OPT_OUT_JOBS to "3"),
+        )
+    }
+
+    @Test
+    fun whenOptOutSkippedThenTotalFlowIntervalEndedBeforeFlowFinish() = runTest {
+        // Given
+        whenever(wideEventClient.flowStart(any(), any(), any(), any())).thenReturn(Result.success(71L))
+        runStarted(PirExecutionType.MANUAL_INITIAL, 1, 1, 0)
+        testee.onScanCompleted(PirExecutionType.MANUAL_INITIAL) // ends the scan-phase total
+
+        // When
+        testee.onOptOutSkipped(PirExecutionType.MANUAL_INITIAL)
+
+        // Then - the end-to-end total is closed before the success flowFinish.
+        val order = inOrder(wideEventClient)
+        order.verify(wideEventClient).intervalEnd(wideEventId = 71L, key = INTERVAL_TOTAL_SCAN_DURATION)
+        order.verify(wideEventClient).intervalEnd(wideEventId = 71L, key = INTERVAL_TOTAL_FLOW_DURATION)
+        order.verify(wideEventClient).flowFinish(
+            wideEventId = 71L,
+            status = FlowStatus.Success,
+            metadata = mapOf(KEY_TOTAL_OPT_OUT_JOBS to "0"),
+        )
+    }
+
+    @Test
+    fun whenRunFailedMidScanThenBothTotalIntervalsEndedBeforeFlowFinish() = runTest {
+        // Given - failure fires before scan_completed, so the scan-phase total is still open.
+        whenever(wideEventClient.flowStart(any(), any(), any(), any())).thenReturn(Result.success(72L))
+        runStarted(PirExecutionType.MANUAL_INITIAL, 1, 1, 10) // decile_0_10 + both totals open
+
+        // When
+        testee.onRunFailed(PirExecutionType.MANUAL_INITIAL, FailureReason.UNKNOWN_ERROR)
+
+        // Then - closeOpenIntervalsLocked ends the decile and both total intervals before flowFinish,
+        // so the non-success run records partial (filterable) durations rather than dangling intervals.
+        val order = inOrder(wideEventClient)
+        order.verify(wideEventClient).intervalEnd(wideEventId = 72L, key = "decile_0_10_duration_ms_bucketed")
+        order.verify(wideEventClient).intervalEnd(wideEventId = 72L, key = INTERVAL_TOTAL_SCAN_DURATION)
+        order.verify(wideEventClient).intervalEnd(wideEventId = 72L, key = INTERVAL_TOTAL_FLOW_DURATION)
+        order.verify(wideEventClient).flowFinish(
+            wideEventId = 72L,
+            status = FlowStatus.Failure(reason = "unknown_error"),
         )
     }
 
@@ -1058,5 +1222,40 @@ class PirScanWideEventTest {
         testee.onUserReset()
 
         verify(wideEventClient).flowAbort(11L)
+    }
+
+    @Test
+    fun whenStepReachedAfterTimeElapsedThenLastStepElapsedIsBucketedSinceRunStart() = runTest {
+        // Given - the run starts at t=1s; a 10-job scan.
+        whenever(wideEventClient.flowStart(any(), any(), any(), any())).thenReturn(Result.success(73L))
+        timeProvider.elapsed = 1_000
+        runStarted(PirExecutionType.MANUAL_INITIAL, 1, 1, 10)
+
+        // When - 65s of wall-clock pass, then the first job completes (crosses into progress_10).
+        timeProvider.elapsed = 66_000
+        testee.onScanJobCompleted(PirExecutionType.MANUAL_INITIAL)
+
+        // Then - the step carries elapsed-since-run-start, floored to the 60s bucket. This is the
+        // value that survives a process kill and lets us tell how long an UNKNOWN run had been going.
+        verify(wideEventClient).flowStep(
+            wideEventId = 73L,
+            stepName = "progress_10",
+            success = true,
+            metadata = mapOf(KEY_LAST_STEP to "progress_10", KEY_LAST_STEP_ELAPSED to "60000"),
+        )
+        // The initial 'started' step omits elapsed (it is ~0 and carries no signal).
+        verify(wideEventClient).flowStep(
+            wideEventId = 73L,
+            stepName = STEP_STARTED,
+            success = true,
+            metadata = mapOf(KEY_LAST_STEP to STEP_STARTED),
+        )
+    }
+
+    private class FakeTimeProvider : CurrentTimeProvider {
+        var elapsed: Long = 0L
+        override fun elapsedRealtime(): Long = elapsed
+        override fun currentTimeMillis(): Long = elapsed
+        override fun localDateTimeNow(): LocalDateTime = LocalDateTime.now()
     }
 }

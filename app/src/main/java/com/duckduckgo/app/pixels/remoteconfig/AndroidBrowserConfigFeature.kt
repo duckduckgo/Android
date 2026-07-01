@@ -377,6 +377,27 @@ interface AndroidBrowserConfigFeature {
     fun pdfViewer(): Toggle
 
     /**
+     * Controls whether duck.ai links tapped inside a custom tab are redirected out of the custom
+     * tab into the Duck Chat experience (closing the custom tab) instead of loading in the custom tab.
+     * @return `true` when the remote config has the global "redirectDuckAiLinksFromCustomTab" androidBrowserConfig
+     * sub-feature flag enabled
+     * If the remote feature is not present defaults to `true`
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    fun redirectDuckAiLinksFromCustomTab(): Toggle
+
+    /**
+     * Kill switch for persisting per-tab WebView session state (back/forward history) in Room.
+     * When enabled, session bundles survive process death so back navigation works after the
+     * OS kills the app. When disabled, falls back to the legacy in-memory LruCache.
+     * @return `true` when the remote config has the global "webViewSessionPersistence" androidBrowserConfig
+     * sub-feature flag enabled
+     * If the remote feature is not present defaults to `true`
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun webViewSessionPersistence(): Toggle
+
+    /**
      * Controls whether the endless loop fix is enabled for custom tabs. When enabled,
      * HTTP navigations shouldn't launch apps unless started with a user gesture.
      * @return `true` when the remote config has the global "customTabEndlessLoopFix" androidBrowserConfig

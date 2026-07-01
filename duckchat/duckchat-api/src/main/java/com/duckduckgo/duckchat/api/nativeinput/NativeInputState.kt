@@ -26,6 +26,22 @@ data class NativeInputState(
     val chatId: String? = null,
     /** True while the active chat is streaming a response (ChatState.STREAMING or LOADING). */
     val isChatStreaming: Boolean = false,
+    /**
+     * Set when we are in model change mode in ongoing chats
+     * (between `showModelPicker` message and the next prompt submit, chat change, or dismissal without selection).
+     * Routes picker taps to `submitChangeModelAction` instead of normal behaviour.
+     */
+    val modelChangeMode: Boolean = false,
+    /**
+     * Whether the native input submit button is enabled for this tab.
+     */
+    val submitEnabled: Boolean = true,
+
+    /**  How much of the input field is locked (non-interactive + dimmed).*/
+    val interactionLock: InteractionLock = InteractionLock.Unlocked,
+
+    /** Show pulse animation around the Duck.ai fire button. */
+    val duckAiFireButtonHighlighted: Boolean = false,
 ) {
     enum class InputMode {
         SEARCH_AND_DUCK_AI,
@@ -37,6 +53,17 @@ data class NativeInputState(
     enum class ToggleSelection { SEARCH, DUCK_AI }
 
     enum class InputPosition { TOP, BOTTOM }
+
+    enum class InteractionLock {
+        /** Fully interactive. */
+        Unlocked,
+
+        /** Whole field is non-interactive and dimmed. */
+        Locked,
+
+        /** Whole field is locked, except the Duck.ai fire button stays interactive. */
+        LockedExceptDuckAiFireButton,
+    }
 
     val toggleVisible: Boolean get() = inputMode == InputMode.SEARCH_AND_DUCK_AI && inputContext == InputContext.BROWSER
 

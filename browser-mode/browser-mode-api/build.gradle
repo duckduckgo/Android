@@ -30,4 +30,6 @@ dependencies {
     implementation AndroidX.webkit
 
     compileOnly "javax.inject:javax.inject:_"
+
+    testImplementation Testing.junit4
 }

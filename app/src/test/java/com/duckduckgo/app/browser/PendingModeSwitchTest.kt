@@ -116,6 +116,28 @@ class PendingModeSwitchTest {
         assertNull(bundle.toPendingModeSwitch())
     }
 
+    @Test
+    fun whenOpenExistingTabActionHasNoTabIdThenDecodesToNull() {
+        val bundle = PendingModeSwitch(BrowserMode.FIRE, PendingAction.OpenExistingTab("tab-123"))
+            .toBundle()
+        bundle.remove(KEY_EXISTING_TAB_ID)
+
+        assertNull(bundle.toPendingModeSwitch())
+    }
+
+    @Test
+    fun whenOpenExistingTabRoundTrippedThroughBundleThenPreserved() {
+        val original = PendingModeSwitch(
+            targetMode = BrowserMode.FIRE,
+            action = PendingAction.OpenExistingTab("tab-123"),
+        )
+
+        val restored = original.toBundle().toPendingModeSwitch()
+
+        assertEquals(BrowserMode.FIRE, restored?.targetMode)
+        assertEquals(PendingAction.OpenExistingTab("tab-123"), restored?.action)
+    }
+
     private fun openNewTabBundle() = PendingModeSwitch(
         targetMode = BrowserMode.REGULAR,
         action = PendingAction.OpenNewTab(query = "q", sourceTabId = "t", skipHome = false, isExternal = false),
@@ -131,5 +153,6 @@ class PendingModeSwitchTest {
         const val KEY_TARGET_MODE = "pendingModeSwitchTargetMode"
         const val KEY_ACTION = "pendingModeSwitchAction"
         const val KEY_INTENT = "pendingModeSwitchIntent"
+        const val KEY_EXISTING_TAB_ID = "pendingModeSwitchExistingTabId"
     }
 }

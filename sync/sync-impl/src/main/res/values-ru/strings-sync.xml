@@ -241,4 +241,12 @@
     <string name="sync_recover_data_download_pdf">Скачать в формате PDF</string>
     <string name="sync_restore_on_reinstall_title">Восстановить при переустановке приложения</string>
     <string name="sync_restore_on_reinstall_description">В случае переустановки приложение DuckDuckGo предложит вам восстановить свои данные на этом устройстве.</string>
+
+    <!-- Chat sync promo -->
+    <string name="sync_chat_promo_banner_title">Получите доступ к своим чатам на всех устройствах благодаря опции Sync &amp; Backup.</string>
+    <string name="sync_chat_promo_banner_cta_title">Синхронизировать с другим устройством</string>
+    <string name="sync_chat_bottom_sheet_title">Давайте синхронизируем ваши чаты на всех ваших устройствах!</string>
+    <string name="sync_chat_bottom_sheet_description">Найдите QR-код в приложении DuckDuckGo на другом устройстве: для этого перейдите в «Настройки» → «Sync &amp; Backup» → «Синхронизация с другим устройством».</string>
+    <string name="sync_chat_bottom_sheet_positive">Сканировать QR-код</string>
+    <string name="sync_chat_bottom_sheet_negative">Не сейчас</string>
 </resources>

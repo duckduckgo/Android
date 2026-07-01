@@ -93,6 +93,8 @@ interface Pixel {
         const val DAX_TRACKERS_BLOCKED_CTA = "t"
         const val DAX_NO_TRACKERS_CTA = "nt"
         const val DAX_FIRE_DIALOG_CTA = "fd"
+        const val DUCK_AI_FIRE_BUTTON_CTA = "duck_ai_fire_button_cta"
+        const val DUCK_AI_END_CTA = "duck_ai_end_cta"
         const val DAX_AUTOCONSENT_CTA = "autoconsent"
         const val DAX_SUBSCRIPTION = "privacy_pro"
         const val MODAL_SUBSCRIPTION_CTA = "subscription_modal"

@@ -257,6 +257,7 @@ class OmnibarLayoutViewModel @Inject constructor(
         val showDuckAIHeader: Boolean = false,
         val showDuckAISidebar: Boolean = false,
         val isNativeInputEnabled: Boolean = false,
+        val isNativeChatInputEnabled: Boolean = false,
         val isAddressBarTrackersAnimationEnabled: Boolean = false,
         val useSoftwareRenderingMode: Boolean = false,
         val isProgressBarUpgradeEnabled: Boolean = false,
@@ -325,11 +326,13 @@ class OmnibarLayoutViewModel @Inject constructor(
         combine(
             duckAiFeatureState.showInputScreen,
             duckChat.observeNativeInputFieldUserSettingEnabled(),
-        ) { inputScreenEnabled, nativeInputEnabled ->
+            duckChat.observeNativeChatInputEnabled(),
+        ) { inputScreenEnabled, nativeInputEnabled, nativeChatInputEnabled ->
             _viewState.update {
                 it.copy(
                     showTextInputClickCatcher = inputScreenEnabled || nativeInputEnabled,
                     isNativeInputEnabled = nativeInputEnabled,
+                    isNativeChatInputEnabled = nativeChatInputEnabled,
                 )
             }
         }.launchIn(viewModelScope)
@@ -339,6 +342,25 @@ class OmnibarLayoutViewModel @Inject constructor(
                 it.copy(showChatMenu = showDuckAiButton)
             }
         }.launchIn(viewModelScope)
+
+        // Re-evaluate the voice-search icon reactively when the user toggles "Private Voice Search",
+        // so it appears/disappears immediately even while the omnibar is unfocused, rather than only
+        // on the next focus or page-load event.
+        voiceSearchAvailability.observeVoiceSearchAvailability()
+            .onEach {
+                _viewState.update { state ->
+                    state.copy(
+                        showVoiceSearch = shouldShowVoiceSearch(
+                            viewMode = state.viewMode,
+                            hasFocus = state.hasFocus,
+                            query = state.omnibarText,
+                            hasQueryChanged = false,
+                            urlLoaded = state.url,
+                        ),
+                    )
+                }
+            }
+            .launchIn(viewModelScope)
 
         voiceActiveOnSelectedTab.onEach { voiceActive ->
             _viewState.update {
@@ -582,7 +604,7 @@ class OmnibarLayoutViewModel @Inject constructor(
         hasQueryChanged: Boolean = false,
         urlLoaded: String = "",
     ): Boolean {
-        return if (viewMode == ViewMode.DuckAI) {
+        return if (viewMode == ViewMode.DuckAI || viewMode is CustomTab) {
             false
         } else {
             voiceSearchAvailability.shouldShowVoiceSearch(

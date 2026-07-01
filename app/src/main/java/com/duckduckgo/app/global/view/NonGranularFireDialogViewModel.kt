@@ -34,6 +34,7 @@ import com.duckduckgo.app.settings.clear.getPixelValue
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.FIRE_ANIMATION
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.utils.DateProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.FragmentScope
@@ -60,6 +61,7 @@ class NonGranularFireDialogViewModel @Inject constructor(
     private val fireButtonStore: FireButtonStore,
     private val dispatcherProvider: DispatcherProvider,
     private val dateProvider: DateProvider,
+    private val browserMode: BrowserMode,
 ) : ViewModel() {
 
     data class ViewState(
@@ -132,7 +134,7 @@ class NonGranularFireDialogViewModel @Inject constructor(
                     clearOptions = clearOptions,
                 )
                 try {
-                    dataClearing.clearDataUsingManualFireOptions()
+                    dataClearing.clearDataUsingManualFireOptions(browserMode = browserMode)
                     dataClearingWideEvent.finishSuccess()
                 } catch (e: Exception) {
                     dataClearingWideEvent.finishFailure(e)

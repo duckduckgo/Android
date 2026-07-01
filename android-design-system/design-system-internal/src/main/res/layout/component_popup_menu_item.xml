@@ -43,5 +43,12 @@
         android:layout_height="wrap_content"
         app:primaryText="With trailing icon"
         app:trailingIcon="@drawable/ic_bookmark_16"/>
+    <com.duckduckgo.common.ui.view.PopupMenuItemView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:primaryText="Max lines should only be 1 and with ellipsize text Lorem ipsum dolor sit amet consectetur adipiscing elit. Sit amet consectetur adipiscing elit quisque faucibus ex. Adipiscing elit quisque faucibus ex sapien vitae pellentesque."
+        app:trailingIcon="@drawable/ic_bookmark_16"
+        app:primaryTextMaxLines="1"
+        app:primaryTextEllipsize="end"/>
 
 </LinearLayout>

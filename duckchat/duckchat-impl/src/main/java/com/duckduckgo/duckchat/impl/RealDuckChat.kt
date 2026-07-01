@@ -42,15 +42,8 @@ import com.duckduckgo.duckchat.api.DuckChatSettingsNoParams
 import com.duckduckgo.duckchat.api.InputMode
 import com.duckduckgo.duckchat.impl.feature.AIChatImageUploadFeature
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
-import com.duckduckgo.duckchat.impl.inputscreen.newaddressbaroption.NewAddressBarCallback
-import com.duckduckgo.duckchat.impl.inputscreen.newaddressbaroption.NewAddressBarOptionBottomSheetDialogFactory
-import com.duckduckgo.duckchat.impl.inputscreen.newaddressbaroption.NewAddressBarSelection
-import com.duckduckgo.duckchat.impl.inputscreen.newaddressbaroption.NewAddressBarSelection.SEARCH_AND_AI
-import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_NEW_ADDRESS_BAR_PICKER_CANCELLED
-import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_NEW_ADDRESS_BAR_PICKER_CONFIRMED
-import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_NEW_ADDRESS_BAR_PICKER_DISPLAYED
-import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_NEW_ADDRESS_BAR_PICKER_NOT_NOW
-import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelParameters.NEW_ADDRESS_BAR_SELECTION
+import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.ChatSuggestionsStore
+import com.duckduckgo.duckchat.impl.repository.AddressBarPickerAttributionRepository
 import com.duckduckgo.duckchat.impl.repository.DuckChatFeatureRepository
 import com.duckduckgo.duckchat.impl.store.DefaultTogglePosition
 import com.duckduckgo.duckchat.impl.voice.VoiceSessionStateManager
@@ -67,6 +60,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -132,6 +126,12 @@ interface DuckChatInternal : DuckChat {
      * in sync with the actual widget state.
      */
     fun setSelectedMode(mode: InputMode)
+
+    /**
+     * Updates the live input query. Called by [InputModeWidget] as the user types (on either tab) and
+     * on attach/detach, to keep [DuckChatInputModeState.inputQuery] in sync with the shared input field.
+     */
+    fun setInputQuery(query: String)
 
     /**
      * Observes whether DuckChat is user enabled or disabled.
@@ -215,6 +215,16 @@ interface DuckChatInternal : DuckChat {
     val chatState: StateFlow<ChatState>
 
     /**
+     * Requests the native model picker to open for [tabId].
+     */
+    fun requestShowModelPicker(tabId: String)
+
+    /**
+     * Events asking the native input to open the model picker.
+     */
+    val showModelPickerEvents: Flow<String>
+
+    /**
      * Returns whether image upload is enabled or not.
      */
     fun isImageUploadEnabled(): Boolean
@@ -263,6 +273,13 @@ interface DuckChatInternal : DuckChat {
      * Returns whether Duck.ai native storage is available and enabled/ready to use
      */
     fun isNativeStorageEnabled(): Boolean
+
+    /**
+     * Returns whether the Duck.ai native chat input integration is enabled.
+     * True only when both the native input widget ([nativeInputField]) and the
+     * [nativeChatInput] toggle are enabled (and the widget is not suppressed).
+     */
+    fun isNativeChatInputEnabled(): Boolean
 
     /**
      * Returns whether Duck.ai in contextual mode should attach more than one content
@@ -351,6 +368,7 @@ data class DuckChatSettingJson(
 @ContributesMultibinding(AppScope::class, boundType = PrivacyConfigCallbackPlugin::class)
 class RealDuckChat @Inject constructor(
     private val duckChatFeatureRepository: DuckChatFeatureRepository,
+    private val addressBarPickerAttributionRepository: AddressBarPickerAttributionRepository,
     private val duckChatFeature: DuckChatFeature,
     private val moshi: Moshi,
     private val dispatchers: DispatcherProvider,
@@ -361,12 +379,12 @@ class RealDuckChat @Inject constructor(
     private val pixel: Pixel,
     private val imageUploadFeature: AIChatImageUploadFeature,
     private val browserNav: BrowserNav,
-    private val newAddressBarOptionBottomSheetDialogFactory: NewAddressBarOptionBottomSheetDialogFactory,
     private val deviceSyncState: DeviceSyncState,
     private val cookiesManager: CookieManagerProvider,
     private val duckAiHostProvider: DuckAiHostProvider,
     private val appBuildConfig: AppBuildConfig,
     private val voiceSessionStateManager: VoiceSessionStateManager,
+    private val chatSuggestionsStore: ChatSuggestionsStore,
 ) : DuckChatInternal,
     DuckAiFeatureState,
     DuckChatInputModeState,
@@ -379,12 +397,14 @@ class RealDuckChat @Inject constructor(
     private val _showPopupMenuShortcut = MutableStateFlow(false)
     private val _showOmnibarShortcutOnNtpAndOnFocus = MutableStateFlow(false)
     private val _showOmnibarShortcutInAllStates = MutableStateFlow(false)
-    private val _showNewAddressBarOptionChoiceScreen = MutableStateFlow(false)
+    private val _showAIChatAddressBarOptionChoiceScreen = MutableStateFlow(false)
     private val _showClearDuckAIChatHistory = MutableStateFlow(true)
     private val _showMainButtonsInInputScreen = MutableStateFlow(false)
 
     private val _chatState = MutableStateFlow(ChatState.HIDE)
+    private val _showModelPickerEvents = MutableSharedFlow<String>(extraBufferCapacity = 1)
     private val _nativeInputFieldEnabled = MutableStateFlow(false)
+    private val _nativeChatInputEnabled = MutableStateFlow(false)
     private val _showInputScreenOnSystemSearchLaunch = MutableStateFlow(false)
     private val _showVoiceSearchToggle = MutableStateFlow(false)
     private val _showVoiceChatEntry = MutableStateFlow(false)
@@ -393,6 +413,7 @@ class RealDuckChat @Inject constructor(
     private val _showContextualMode = MutableStateFlow(false)
     private val _allowDuckAiAsDigitalAssistant = MutableStateFlow(false)
     private val _displayedMode = MutableStateFlow(InputMode.SEARCH)
+    private val _inputQuery = MutableStateFlow("")
 
     private val jsonAdapter: JsonAdapter<DuckChatSettingJson> by lazy {
         moshi.adapter(DuckChatSettingJson::class.java)
@@ -403,7 +424,7 @@ class RealDuckChat @Inject constructor(
     private var duckAiInputScreenOpenAutomaticallyEnabled = false
     private var duckAiInputScreen = false
     private var duckAiInputScreenBottomBarEnabled = false
-    private var showAIChatAddressBarChoiceScreen = false
+    private var showNewAddressBarPickerScreen = false
     private var isDuckChatUserEnabled = false
     private var isChatSyncFeatureEnabled = false
     private var duckChatLink = DUCK_CHAT_WEB_LINK
@@ -423,6 +444,7 @@ class RealDuckChat @Inject constructor(
     private var duckAiNativeStorage: Boolean = false
     private var areMultipleContentAttachmentsEnabled: Boolean = false
     private var isNativeInputFieldEnabled: Boolean = false
+    private var isNativeChatInputEnabled: Boolean = false
 
     init {
         if (isMainProcess) {
@@ -443,6 +465,8 @@ class RealDuckChat @Inject constructor(
         duckChatFeatureRepository.setInputScreenUserSetting(enabled)
         cacheUserSettings()
     }
+
+    override suspend fun isInputScreenEverEnabled(): Boolean = duckChatFeatureRepository.isInputScreenEverEnabled()
 
     override suspend fun setCosmeticInputScreenUserSetting(enabled: Boolean) {
         duckChatFeatureRepository.setCosmeticInputScreenUserSetting(enabled)
@@ -494,6 +518,8 @@ class RealDuckChat @Inject constructor(
     override fun isAutomaticContextAttachmentEnabled(): Boolean = isAutomaticContextAttachmentEnabled
     override fun isNativeStorageEnabled(): Boolean = duckAiNativeStorage
 
+    override fun isNativeChatInputEnabled(): Boolean = isNativeChatInputEnabled
+
     override fun areMultipleContentAttachmentsEnabled(): Boolean = areMultipleContentAttachmentsEnabled
 
     override fun observeEnableDuckChatUserSetting(): Flow<Boolean> = duckChatFeatureRepository.observeDuckChatUserEnabled()
@@ -507,6 +533,8 @@ class RealDuckChat @Inject constructor(
         duckChatFeatureRepository.observeAutomaticContextAttachmentUserSettingEnabled()
 
     override fun observeNativeInputFieldUserSettingEnabled(): Flow<Boolean> = _nativeInputFieldEnabled.asStateFlow()
+
+    override fun observeNativeChatInputEnabled(): Flow<Boolean> = _nativeChatInputEnabled.asStateFlow()
 
     override fun observeShowInBrowserMenuUserSetting(): Flow<Boolean> = duckChatFeatureRepository.observeShowInBrowserMenu()
 
@@ -559,6 +587,12 @@ class RealDuckChat @Inject constructor(
         _chatState.value = state
     }
 
+    override fun requestShowModelPicker(tabId: String) {
+        _showModelPickerEvents.tryEmit(tabId)
+    }
+
+    override val showModelPickerEvents: Flow<String> = _showModelPickerEvents.asSharedFlow()
+
     override val showSettings: StateFlow<Boolean> = _showSettings.asStateFlow()
 
     override val showInputScreen: StateFlow<Boolean> = _showInputScreen.asStateFlow()
@@ -573,7 +607,7 @@ class RealDuckChat @Inject constructor(
 
     override val showOmnibarShortcutInAllStates: StateFlow<Boolean> = _showOmnibarShortcutInAllStates.asStateFlow()
 
-    override val showNewAddressBarOptionChoiceScreen: StateFlow<Boolean> = _showNewAddressBarOptionChoiceScreen.asStateFlow()
+    override val showAIChatAddressBarOptionChoiceScreen: StateFlow<Boolean> = _showAIChatAddressBarOptionChoiceScreen.asStateFlow()
 
     override val showMainButtonsInInputScreen: StateFlow<Boolean> = _showMainButtonsInInputScreen.asStateFlow()
 
@@ -592,6 +626,8 @@ class RealDuckChat @Inject constructor(
     override val showContextualMode: StateFlow<Boolean> = _showContextualMode.asStateFlow()
 
     override val allowDuckAiAsDigitalAssistant: StateFlow<Boolean> = _allowDuckAiAsDigitalAssistant.asStateFlow()
+
+    override val nativeInputFieldEnabled: StateFlow<Boolean> = _nativeInputFieldEnabled.asStateFlow()
 
     override val chatState: StateFlow<ChatState> = _chatState.asStateFlow()
 
@@ -612,6 +648,10 @@ class RealDuckChat @Inject constructor(
         openDuckChat(parameters, forceNewSession = true)
     }
 
+    override suspend fun onAddressBarPickerDuckAiSelected() {
+        addressBarPickerAttributionRepository.onPickerDuckAiSelected()
+    }
+
     override fun openDuckChatWithPrefill(query: String) {
         logcat { "Duck.ai: openDuckChatWithPrefill query $query" }
         val parameters = addChatParameters(query, autoPrompt = false, sidebar = false)
@@ -623,7 +663,7 @@ class RealDuckChat @Inject constructor(
         autoPrompt: Boolean,
         sidebar: Boolean,
     ): String {
-        val parameters = addChatParameters(query, autoPrompt = autoPrompt, sidebar = sidebar) + nativeInputParameters()
+        val parameters = addChatParameters(query, autoPrompt = autoPrompt, sidebar = sidebar) + nativeChatInputParameters()
         return appendParameters(parameters, getDuckChatLink())
     }
 
@@ -671,7 +711,7 @@ class RealDuckChat @Inject constructor(
         parameters: Map<String, String>,
         forceNewSession: Boolean = false,
     ) {
-        val url = appendParameters(parameters + nativeInputParameters(), getDuckChatLink())
+        val url = appendParameters(parameters + nativeChatInputParameters(), getDuckChatLink())
         appCoroutineScope.launch(dispatchers.io()) {
             val hasSessionActive =
                 when {
@@ -706,8 +746,14 @@ class RealDuckChat @Inject constructor(
     private fun resolveDuckAiUrl(link: String): String =
         link.toUri().buildUpon().authority(duckAiHostProvider.getHost()).build().toString()
 
-    private fun nativeInputParameters(): Map<String, String> =
-        if (isNativeInputFieldEnabled) mapOf(NATIVE_INPUT_QUERY_NAME to NATIVE_INPUT_QUERY_VALUE) else emptyMap()
+    private fun nativeChatInputParameters(): Map<String, String> {
+        if (!isNativeChatInputEnabled) return emptyMap()
+        val params = mutableMapOf(NATIVE_INPUT_QUERY_NAME to NATIVE_INPUT_QUERY_VALUE)
+        if (addressBarPickerAttributionRepository.consumeAttributionToPicker()) {
+            params[ORIGIN_QUERY_NAME] = ORIGIN_VALUE_ADDRESS_BAR_PICKER
+        }
+        return params
+    }
 
     private fun appendParameters(
         parameters: Map<String, String>,
@@ -752,43 +798,6 @@ class RealDuckChat @Inject constructor(
 
     override suspend fun wasOpenedBefore(): Boolean = duckChatFeatureRepository.wasOpenedBefore()
 
-    override fun showNewAddressBarOptionChoiceScreen(
-        context: Context,
-        isDarkThemeEnabled: Boolean,
-    ) {
-        newAddressBarOptionBottomSheetDialogFactory
-            .create(
-                context = context,
-                isDarkThemeEnabled = isDarkThemeEnabled,
-                newAddressBarCallback =
-                object : NewAddressBarCallback {
-                    override fun onDisplayed() {
-                        pixel.fire(DUCK_CHAT_NEW_ADDRESS_BAR_PICKER_DISPLAYED)
-                    }
-
-                    override fun onConfirmed(selection: NewAddressBarSelection) {
-                        if (selection == SEARCH_AND_AI) {
-                            appCoroutineScope.launch {
-                                setInputScreenUserSetting(true)
-                            }
-                        }
-                        pixel.fire(
-                            pixel = DUCK_CHAT_NEW_ADDRESS_BAR_PICKER_CONFIRMED,
-                            parameters = mapOf(NEW_ADDRESS_BAR_SELECTION to selection.value),
-                        )
-                    }
-
-                    override fun onNotNow() {
-                        pixel.fire(DUCK_CHAT_NEW_ADDRESS_BAR_PICKER_NOT_NOW)
-                    }
-
-                    override fun onCancelled() {
-                        pixel.fire(DUCK_CHAT_NEW_ADDRESS_BAR_PICKER_CANCELLED)
-                    }
-                },
-            ).show()
-    }
-
     override suspend fun isStandaloneMigrationCompleted(): Boolean {
         val cookieManager = cookiesManager.get()
         val ddgCookies = cookieManager?.getCookie(AppUrl.Url.COOKIES)?.split(";").orEmpty()
@@ -817,8 +826,16 @@ class RealDuckChat @Inject constructor(
             duckChatFeature.historyScreen().isEnabled()
     }
 
+    override suspend fun hasUserEnabledChatHistory(): Boolean {
+        return duckChatFeatureRepository.isAIChatHistoryEnabled()
+    }
+
+    override fun observeHasChatSuggestions(): Flow<Boolean> {
+        return chatSuggestionsStore.hasChatSuggestions
+    }
+
     override fun buildChatUrl(chatId: String): String {
-        return appendParameters(mapOf(CHAT_ID_QUERY_NAME to chatId) + nativeInputParameters(), getDuckChatLink())
+        return appendParameters(mapOf(CHAT_ID_QUERY_NAME to chatId) + nativeChatInputParameters(), getDuckChatLink())
     }
 
     override suspend fun setDefaultTogglePosition(position: DefaultTogglePosition) {
@@ -840,6 +857,12 @@ class RealDuckChat @Inject constructor(
 
     override fun setSelectedMode(mode: InputMode) {
         _displayedMode.value = mode
+    }
+
+    override val inputQuery: StateFlow<String> = _inputQuery.asStateFlow()
+
+    override fun setInputQuery(query: String) {
+        _inputQuery.value = query
     }
 
     private suspend fun hasActiveSession(): Boolean {
@@ -864,7 +887,7 @@ class RealDuckChat @Inject constructor(
             duckAiInputScreenOpenAutomaticallyEnabled = duckChatFeature.showInputScreenAutomaticallyOnNewTab().isEnabled()
             duckAiInputScreenBottomBarEnabled = duckChatFeature.inputScreenBottomBarSupport().isEnabled()
             clearChatHistory = duckChatFeature.clearHistory().isEnabled()
-            showAIChatAddressBarChoiceScreen = duckChatFeature.showAIChatAddressBarChoiceScreen().isEnabled()
+            showNewAddressBarPickerScreen = duckChatFeature.showNewAddressBarPickerScreen().isEnabled()
             showInputScreenOnSystemSearchLaunchEnabled = duckChatFeature.showInputScreenOnSystemSearchLaunch().isEnabled()
             inputScreenMainButtonsEnabled = duckChatFeature.showMainButtonsInInputScreen().isEnabled()
             isChatSyncFeatureEnabled = deviceSyncState.isDuckChatSyncFeatureEnabled()
@@ -907,6 +930,8 @@ class RealDuckChat @Inject constructor(
             isDuckChatUserEnabled = duckChatFeatureRepository.isDuckChatUserEnabled()
 
             isNativeInputFieldEnabled = _nativeInputFieldEnabled.value
+            isNativeChatInputEnabled = isNativeInputFieldEnabled && duckChatFeature.nativeChatInput().isEnabled()
+            _nativeChatInputEnabled.value = isNativeChatInputEnabled
             val showInputScreen =
                 isInputScreenFeatureAvailable() && isDuckChatFeatureEnabled && isDuckChatUserEnabled &&
                     duckChatFeatureRepository.isInputScreenUserSettingEnabled() && !isNativeInputFieldEnabled
@@ -931,7 +956,7 @@ class RealDuckChat @Inject constructor(
             val showOmnibarShortcutInAllStates = showInAddressBar && isDuckAiInBrowserEnabled
             _showOmnibarShortcutInAllStates.emit(showOmnibarShortcutInAllStates)
 
-            _showNewAddressBarOptionChoiceScreen.emit(showAIChatAddressBarChoiceScreen)
+            _showAIChatAddressBarOptionChoiceScreen.emit(showNewAddressBarPickerScreen)
 
             val showClearChatHistory = clearChatHistory
             _showClearDuckAIChatHistory.emit(showClearChatHistory)
@@ -994,5 +1019,7 @@ class RealDuckChat @Inject constructor(
         private const val NATIVE_INPUT_QUERY_VALUE = "true"
         private const val DEFAULT_SESSION_ALIVE = 60
         private const val REVOKE_URL = "https://duckduckgo.com/revoke-duckai-access"
+        private const val ORIGIN_QUERY_NAME = "origin"
+        private const val ORIGIN_VALUE_ADDRESS_BAR_PICKER = "funnel_addressbar_android__aitoggle"
     }
 }

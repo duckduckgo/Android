@@ -34,6 +34,8 @@ import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.helper.DuckChatJSHelper
 import com.duckduckgo.duckchat.impl.helper.NativeAction
 import com.duckduckgo.duckchat.impl.helper.RealDuckChatJSHelper
+import com.duckduckgo.duckchat.impl.history.ChatHistoryItem
+import com.duckduckgo.duckchat.impl.history.ChatHistoryRepository
 import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.store.DuckChatContextualDataStore
@@ -45,6 +47,10 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -68,6 +74,7 @@ class DuckChatContextualViewModel @Inject constructor(
     private val featureTogglesInventory: FeatureTogglesInventory,
     private val modelManager: DuckAiModelManager,
     private val contextualNativeInputManager: ContextualNativeInputManager,
+    private val chatHistoryRepository: ChatHistoryRepository,
     private val context: Context,
 ) : ViewModel() {
 
@@ -122,6 +129,15 @@ class DuckChatContextualViewModel @Inject constructor(
         ) : Command()
         data object RequestPageContext : Command()
         data object ShowFireConfirmation : Command()
+        data class ShowChatsPopup(
+            val showNewChatHeader: Boolean,
+            val recentChats: List<ChatHistoryItem>,
+        ) : Command()
+        data class OpenChatUrl(
+            val url: String,
+            val sourceTabId: String,
+        ) : Command()
+        data object LaunchChatHistory : Command()
     }
 
     private val _viewState: MutableStateFlow<ViewState> =
@@ -166,9 +182,59 @@ class DuckChatContextualViewModel @Inject constructor(
                     isFireButtonEnabled = duckChatFeature.contextualFireButton().isEnabled() && isSingleTabFireEnabled,
                     quickActionState = initialQuickActionState,
                     chatHintResId = chatHintResId,
+                    showChatsIcon = isContextualSheetImprovementsEnabled,
                 )
             }
+            if (isContextualSheetImprovementsEnabled) {
+                observeRecentChats()
+                observeCurrentChatDeletion()
+            }
         }
+    }
+
+    // Last chat id we confirmed exists in history. A brand-new chat sets _chatId (from the loaded
+    // URL) before it is persisted, so "absent from history" only means "deleted" once we've actually
+    // seen it present — this field is what distinguishes the two.
+    private var lastSeenChatId: String? = null
+
+    private fun observeCurrentChatDeletion() {
+        combine(chatHistoryRepository.observeChats(), _chatId) { chats, currentChatId ->
+            currentChatId to chats.any { it.chatId == currentChatId }
+        }
+            .flowOn(dispatchers.io())
+            .onEach { (currentChatId, isPresent) ->
+                if (isPresent) {
+                    lastSeenChatId = currentChatId
+                } else if (currentChatId != null && currentChatId == lastSeenChatId && _viewState.value.sheetMode == SheetMode.WEBVIEW) {
+                    // A chat we had seen in history is now gone -> deleted elsewhere. Clear
+                    // synchronously so repeat emissions for the same id don't retrigger before the
+                    // reset propagates to _chatId/sheetMode.
+                    lastSeenChatId = null
+                    handleLoadedChatDeleted()
+                }
+            }
+            .launchIn(viewModelScope)
+    }
+
+    private fun handleLoadedChatDeleted() {
+        logcat { "Duck.ai Contextual: loaded chat deleted elsewhere, resetting sheet" }
+        // Reset session/state but leave the sheet position untouched (sheetState = null):
+        // if visible it swaps to INPUT in place; if hidden it stays hidden and opens fresh next time.
+        renderNewChatState(sheetState = null)
+    }
+
+    private fun observeRecentChats() {
+        combine(chatHistoryRepository.observeChats(), _chatId) { chats, currentChatId ->
+            chats
+                .asSequence()
+                .filterNot { it.chatId == currentChatId }
+                .sortedByDescending { it.lastEditMillis }
+                .take(MAX_RECENT_CHATS)
+                .toList()
+        }
+            .flowOn(dispatchers.io())
+            .onEach { recent -> _viewState.update { it.copy(recentChats = recent) } }
+            .launchIn(viewModelScope)
     }
 
     data class ViewState(
@@ -184,6 +250,9 @@ class DuckChatContextualViewModel @Inject constructor(
         val isFireButtonEnabled: Boolean = false,
         val quickActionState: QuickActionState = QuickActionState.LEGACY_SUMMARIZE,
         @StringRes val chatHintResId: Int = R.string.input_screen_chat_hint,
+        // When true, the legacy "+" icon is replaced by the chats icon and shown regardless of sheet mode.
+        val showChatsIcon: Boolean = false,
+        val recentChats: List<ChatHistoryItem> = emptyList(),
     )
 
     fun onSheetReopened() {
@@ -277,7 +346,9 @@ class DuckChatContextualViewModel @Inject constructor(
                         )
                     }
                 }
-                duckChatPixels.reportContextualPlaceholderContextShown()
+                if (_viewState.value.showsAttachContextPlaceholder()) {
+                    duckChatPixels.reportContextualPlaceholderContextShown()
+                }
                 return@launch
             }
 
@@ -520,14 +591,21 @@ class DuckChatContextualViewModel @Inject constructor(
                     },
                 )
             }
+            if (_viewState.value.showsAttachContextPlaceholder()) {
+                duckChatPixels.reportContextualPlaceholderContextShown()
+            }
         }
-        duckChatPixels.reportContextualPlaceholderContextShown()
         duckChatPixels.reportContextualPageContextRemovedNative()
     }
 
-    fun addPageContext() {
+    // fromPlaceholderTap distinguishes a tap on the duckAiAttachContextLayout placeholder (which
+    // reports the placeholder-tapped pixel) from internal reuse such as the ASK_ABOUT_PAGE quick
+    // action, which attaches the same context but is not a placeholder tap.
+    fun addPageContext(fromPlaceholderTap: Boolean = false) {
         logcat { "Duck.ai Contextual: addPageContext" }
-        duckChatPixels.reportContextualPlaceholderContextTapped()
+        if (fromPlaceholderTap) {
+            duckChatPixels.reportContextualPlaceholderContextTapped()
+        }
         viewModelScope.launch {
             val isContextValid = isContextValid(updatedPageContext, reportInvalidPixels = true)
             if (isContextValid) {
@@ -568,12 +646,19 @@ class DuckChatContextualViewModel @Inject constructor(
         return title != null && content != null
     }
 
+    // Mirrors the Fragment's visibility logic for the "attach page content" placeholder
+    // (duckAiAttachContextLayout): it is only shown in INPUT mode, when not in the
+    // ASK_ABOUT_PAGE quick action, and when no context is currently attached.
+    private fun ViewState.showsAttachContextPlaceholder(): Boolean =
+        sheetMode == SheetMode.INPUT &&
+            quickActionState != QuickActionState.ASK_ABOUT_PAGE &&
+            !showContext
+
     fun replacePrompt(
         input: String,
         prompt: String,
     ) {
         logcat { "Duck.ai Contextual: add predefined Summarize prompt" }
-        duckChatPixels.reportContextualSummarizePromptSelected()
         viewModelScope.launch {
             val newPrompt = if (input.isEmpty()) {
                 prompt
@@ -592,6 +677,7 @@ class DuckChatContextualViewModel @Inject constructor(
     fun onQuickActionClicked(currentInput: String) {
         when (_viewState.value.quickActionState) {
             QuickActionState.LEGACY_SUMMARIZE -> {
+                duckChatPixels.reportContextualSummarizePromptSelected()
                 replacePrompt(currentInput, context.getString(R.string.duckAIContextualPromptSummarize))
             }
 
@@ -600,6 +686,7 @@ class DuckChatContextualViewModel @Inject constructor(
                     // Page context not ready yet; stay in ASK_ABOUT_PAGE so the user can retry.
                     return
                 }
+                duckChatPixels.reportContextualAskAboutPageSelected()
                 addPageContext()
                 viewModelScope.launch {
                     _viewState.update { it.copy(quickActionState = QuickActionState.SUBMIT_SUMMARIZE) }
@@ -611,6 +698,7 @@ class DuckChatContextualViewModel @Inject constructor(
                     // Context was removed before submit; refuse to auto-submit without it.
                     return
                 }
+                duckChatPixels.reportContextualSummarizePromptSelected()
                 onPromptSent(
                     prompt = context.getString(R.string.duckAIContextualPromptSummarize),
                     followUpPrefill = currentInput.takeIf { it.isNotEmpty() },
@@ -740,6 +828,49 @@ class DuckChatContextualViewModel @Inject constructor(
         duckChatPixels.reportContextualSheetNewChat()
     }
 
+    fun onNewChatRequestedFromPopup() {
+        renderNewChatState()
+        duckChatPixels.reportContextualSheetNewChatFromPopup()
+    }
+
+    fun onChatsIconClicked() {
+        val state = _viewState.value
+        logcat {
+            "Duck.ai Contextual: onChatsIconClicked improvementsEnabled=$isContextualSheetImprovementsEnabled " +
+                "recentChats=${state.recentChats.size} sheetMode=${state.sheetMode}"
+        }
+        if (!isContextualSheetImprovementsEnabled) {
+            onNewChatRequested()
+            return
+        }
+        duckChatPixels.reportContextualChatsMenuTapped()
+        if (state.recentChats.isEmpty()) {
+            // No recent chats means there's no popup to show, so go straight to chat history.
+            // Don't report a "View All" tap here — that pixel tracks taps from within the popup menu.
+            commandChannel.trySend(Command.LaunchChatHistory)
+        } else {
+            duckChatPixels.reportContextualRecentChatsPopupDisplayed()
+            commandChannel.trySend(
+                Command.ShowChatsPopup(
+                    showNewChatHeader = state.sheetMode == SheetMode.WEBVIEW,
+                    recentChats = state.recentChats,
+                ),
+            )
+        }
+    }
+
+    fun onRecentChatClicked(chatId: String) {
+        duckChatPixels.reportContextualRecentChatSelected()
+        val url = duckChatInternal.buildChatUrl(chatId)
+        val sourceTabId = _viewState.value.tabId
+        commandChannel.trySend(Command.OpenChatUrl(url = url, sourceTabId = sourceTabId))
+    }
+
+    fun onViewAllChatsClicked() {
+        duckChatPixels.reportContextualViewAllChatsTapped()
+        commandChannel.trySend(Command.LaunchChatHistory)
+    }
+
     fun onFireButtonClicked() {
         duckChatPixels.reportContextualFireButtonTapped()
         viewModelScope.launch {
@@ -752,7 +883,9 @@ class DuckChatContextualViewModel @Inject constructor(
         renderNewChatState(sheetState = BottomSheetBehavior.STATE_HIDDEN)
     }
 
-    private fun renderNewChatState(sheetState: Int = BottomSheetBehavior.STATE_HALF_EXPANDED) {
+    // sheetState == null leaves the bottom sheet position untouched (used when resetting after the
+    // loaded chat is deleted elsewhere, so we don't pop a dismissed sheet back open).
+    private fun renderNewChatState(sheetState: Int? = BottomSheetBehavior.STATE_HALF_EXPANDED) {
         viewModelScope.launch(dispatchers.io()) {
             val currentTabId = _viewState.value.tabId
             if (currentTabId.isNotBlank()) {
@@ -771,17 +904,24 @@ class DuckChatContextualViewModel @Inject constructor(
                             showFullscreen = true,
                             prompt = "",
                             quickActionState = resetQuickActionState,
+                            // Reset the page-context attachment so a fresh chat doesn't silently inherit
+                            // the previous chat's context: generateContextPrompt() keys off showContext, and
+                            // resetQuickActionState hides the attached-context chip, so a stale showContext
+                            // would attach context with no visual indication.
+                            showContext = false,
+                            userRemovedContext = false,
                         )
                     }
-                    commandChannel.trySend(Command.ChangeSheetState(sheetState))
+                    sheetState?.let { commandChannel.trySend(Command.ChangeSheetState(it)) }
+
+                    if (sheetState == BottomSheetBehavior.STATE_HALF_EXPANDED && _viewState.value.showsAttachContextPlaceholder()) {
+                        duckChatPixels.reportContextualPlaceholderContextShown()
+                    }
 
                     val subscriptionEvent = duckChatJSHelper.onNativeAction(NativeAction.NEW_CHAT)
                     _subscriptionEventDataChannel.trySend(subscriptionEvent)
                 }
             }
-        }
-        if (sheetState != BottomSheetBehavior.STATE_HIDDEN) {
-            duckChatPixels.reportContextualPlaceholderContextShown()
         }
     }
 
@@ -827,5 +967,9 @@ class DuckChatContextualViewModel @Inject constructor(
                 commandChannel.trySend(Command.RequestPageContext)
             }
         }
+    }
+
+    companion object {
+        const val MAX_RECENT_CHATS = 5
     }
 }

@@ -34,6 +34,9 @@ import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.common.ui.view.quietlySetValue
 import com.duckduckgo.common.ui.viewbinding.viewBinding
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.getActivityParams
 import com.google.android.material.slider.Slider
@@ -43,11 +46,18 @@ import logcat.LogPriority.INFO
 import logcat.LogPriority.VERBOSE
 import logcat.logcat
 import java.text.NumberFormat
+import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
 @ContributeToActivityStarter(Default::class, screenName = "accessibility")
 @ContributeToActivityStarter(HighlightedItem::class, screenName = "accessibility")
 class AccessibilityActivity : DuckDuckGoActivity() {
+
+    @Inject
+    lateinit var edgeToEdgeProvider: EdgeToEdgeProvider
+
+    @Inject
+    lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
 
     private val binding: ActivityAccessibilitySettingsBinding by viewBinding()
     private val viewModel: AccessibilitySettingsViewModel by bindViewModel()
@@ -73,10 +83,27 @@ class AccessibilityActivity : DuckDuckGoActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        val edgeToEdgeEnabled = edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.SETTINGS)
+        if (edgeToEdgeEnabled) {
+            enableTransparentEdgeToEdge()
+        }
+
         setContentView(binding.root)
         setupToolbar(toolbar)
+
+        if (edgeToEdgeEnabled) {
+            configureEdgeToEdgeInsets()
+        }
+
         observeViewModel()
         scrollToHighlightedItem()
+    }
+
+    private fun configureEdgeToEdgeInsets() {
+        edgeToEdgeHandler.applyHorizontalSystemBarInsets(binding.root)
+        edgeToEdgeHandler.applyStatusBarInsets(binding.includeToolbar.appBarLayout)
+        edgeToEdgeHandler.applyNavigationBarInsets(binding.scrollView, drawBehindGestureNav = true)
     }
 
     private fun scrollToHighlightedItem() {

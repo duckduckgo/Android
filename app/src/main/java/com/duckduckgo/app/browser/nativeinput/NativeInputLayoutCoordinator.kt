@@ -23,6 +23,7 @@ import android.view.ViewGroup
 import android.view.ViewTreeObserver
 import android.widget.FrameLayout
 import androidx.coordinatorlayout.widget.CoordinatorLayout
+import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
 import com.duckduckgo.app.browser.R
 import com.google.android.material.card.MaterialCardView
@@ -183,6 +184,12 @@ class NativeInputLayoutCoordinator(
         // their live visibility/height are still read on each pass.
         val ddgLogoView = rootView.findViewById<View?>(R.id.ddgLogo)
         val returnHatchView = rootView.findViewById<View?>(R.id.newTabReturnHatchView)
+        // Onboarding CTA bubbles live inside newTabContent and must clear the widget, so a visible
+        // one overrides the logo-only suppression below.
+        val onboardingCtaViews = listOfNotNull(
+            rootView.findViewById(R.id.brandDesignDialogScrollView),
+            rootView.findViewById(R.id.includeOnboardingDaxDialogBubble),
+        )
 
         // Animate child reflows when the widget toggles Search ↔ DuckAI changes our padding.
         // The transition is staged here but only assigned to the parent once the enter animation
@@ -219,7 +226,8 @@ class NativeInputLayoutCoordinator(
             if (view != newTabContent) return false
             val logoVisible = ddgLogoView?.visibility == View.VISIBLE
             val hatchHeightPx = returnHatchView?.height ?: 0
-            return isLogoOnly(logoVisible, hatchHeightPx)
+            val onboardingCtaVisible = onboardingCtaViews.any { it.isVisible }
+            return isLogoOnly(logoVisible, hatchHeightPx, onboardingCtaVisible)
         }
 
         fun computeDeltaTop(view: View, anchorBottomInWindow: Int): Int {
@@ -228,15 +236,17 @@ class NativeInputLayoutCoordinator(
             return maxOf(0, anchorBottomInWindow - viewLocation[1])
         }
 
-        fun computeDeltaBottom(): Int {
+        fun computeDeltaBottom(view: View, anchorTopInWindow: Int): Int {
             if (!isBottom) return 0
-            return maxOf(0, widgetView.height)
+            val viewLocation = IntArray(2).also { view.getLocationInWindow(it) }
+            val viewBottomInWindow = viewLocation[1] + view.height
+            return maxOf(0, viewBottomInWindow - anchorTopInWindow)
         }
 
-        fun applyOffsetWithBottom(anchorBottomInWindow: Int) {
-            val deltaBottom = computeDeltaBottom()
+        fun applyOffsetWithBottom(anchorTopInWindow: Int, anchorBottomInWindow: Int) {
             targets.forEach { target ->
                 val deltaTop = computeDeltaTop(target.view, anchorBottomInWindow)
+                val deltaBottom = computeDeltaBottom(target.view, anchorTopInWindow)
                 applyPadding(target.view, target.basePadding, deltaTop, deltaBottom)
             }
         }
@@ -248,7 +258,7 @@ class NativeInputLayoutCoordinator(
             }
             val anchorLocation = IntArray(2).also { anchor.getLocationInWindow(it) }
             val anchorBottomInWindow = anchorLocation[1] + anchor.height
-            applyOffsetWithBottom(anchorBottomInWindow)
+            applyOffsetWithBottom(anchorTopInWindow = anchorLocation[1], anchorBottomInWindow = anchorBottomInWindow)
         }
 
         // Called from the enter/exit animators' onUpdate, BEFORE the layout pass that
@@ -270,7 +280,7 @@ class NativeInputLayoutCoordinator(
             val parentLocation = IntArray(2).also { parent.getLocationInWindow(it) }
             val cardVisualTopInWindow = parentLocation[1] + params.topMargin + card.translationY.toInt()
             val cardVisualBottomInWindow = cardVisualTopInWindow + params.height
-            applyOffsetWithBottom(cardVisualBottomInWindow)
+            applyOffsetWithBottom(anchorTopInWindow = cardVisualTopInWindow, anchorBottomInWindow = cardVisualBottomInWindow)
         }
 
         widgetView.post { applyOffset() }
@@ -374,6 +384,8 @@ class NativeInputLayoutCoordinator(
  * container is always VISIBLE and merely collapses to zero height when no hatch is shown (its inner
  * content is what's toggled), so a visibility check would always report "hatch present" and defeat
  * this guard.
+ *
+ * [onboardingCtaVisible] forces a non-logo-only result: a CTA bubble must be offset clear of the widget.
  */
-internal fun isLogoOnly(logoVisible: Boolean, hatchHeightPx: Int): Boolean =
-    logoVisible && hatchHeightPx <= 0
+internal fun isLogoOnly(logoVisible: Boolean, hatchHeightPx: Int, onboardingCtaVisible: Boolean): Boolean =
+    logoVisible && hatchHeightPx <= 0 && !onboardingCtaVisible

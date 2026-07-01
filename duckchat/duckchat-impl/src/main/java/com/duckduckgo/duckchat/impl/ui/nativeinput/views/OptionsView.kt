@@ -37,6 +37,7 @@ import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputStateProvider
 import com.duckduckgo.duckchat.impl.R
+import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.models.Tool
 import com.duckduckgo.duckchat.impl.nativeinput.NativeInputHost
 import dagger.android.support.AndroidSupportInjection
@@ -52,6 +53,8 @@ class OptionsView(context: Context, private val host: NativeInputHost) : LinearL
     @Inject lateinit var viewModelFactory: ViewViewModelFactory
 
     @Inject lateinit var nativeInputStateProvider: NativeInputStateProvider
+
+    @Inject lateinit var duckChatFeature: DuckChatFeature
 
     private val viewModel by lazy {
         ViewModelProvider(findViewTreeViewModelStoreOwner()!!, viewModelFactory)[OptionsViewModel::class.java]
@@ -135,6 +138,15 @@ class OptionsView(context: Context, private val host: NativeInputHost) : LinearL
         val show = lastNativeInputState?.shouldShowPluginControls() == true
         isVisible = show
         (parent as? View)?.isVisible = show
+        refreshOptionsButtonVisibility()
+    }
+
+    private fun isCustomizeResponsesAvailable(): Boolean =
+        duckChatFeature.customizeResponses().isEnabled() &&
+            lastNativeInputState?.inputContext == NativeInputState.InputContext.DUCK_AI
+
+    private fun refreshOptionsButtonVisibility(visibleTools: Set<Tool> = viewModel.visibleTools.value) {
+        optionsButton.isVisible = visibleTools.isNotEmpty() || isCustomizeResponsesAvailable()
     }
 
     private fun renderSelection(tool: Tool?) {
@@ -173,11 +185,11 @@ class OptionsView(context: Context, private val host: NativeInputHost) : LinearL
             if (selectionCleared) host.toolSelected(null)
         }
 
-        optionsButton.isVisible = visibleTools.isNotEmpty()
+        refreshOptionsButtonVisibility(visibleTools)
     }
 
     private fun buildOptionsButton(): ImageView {
-        val iconSize = context.resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.toolbarIcon)
+        val iconSize = context.resources.getDimensionPixelSize(R.dimen.nativeInputButtonSize)
         return ImageView(context).apply {
             layoutParams = LayoutParams(iconSize, iconSize)
             setBackgroundResource(com.duckduckgo.mobile.android.R.drawable.selectable_item_rounded_corner_background)
@@ -233,6 +245,28 @@ class OptionsView(context: Context, private val host: NativeInputHost) : LinearL
             }
             container.addView(row)
         }
+        if (isCustomizeResponsesAvailable()) {
+            if (menuItems.any { it.tool in viewModel.visibleTools.value }) {
+                container.addView(
+                    LayoutInflater.from(context).inflate(R.layout.view_options_menu_divider, container, false),
+                )
+            }
+            container.addView(buildCustomizeResponsesRow(container, popup))
+        }
+    }
+
+    private fun buildCustomizeResponsesRow(container: LinearLayout, popup: PopupWindow): View {
+        val row = LayoutInflater.from(context).inflate(R.layout.view_options_menu_item, container, false)
+        row.findViewById<ImageView>(R.id.optionsMenuItemIcon).visibility = GONE
+        row.findViewById<DaxTextView>(R.id.optionsMenuItemTitle).setText(R.string.duckChatOptionsMenuCustomizeResponses)
+        row.findViewById<DaxTextView>(R.id.optionsMenuItemSubtitle).setText(R.string.duckChatOptionsMenuCustomizeResponsesSubtitle)
+        row.findViewById<ImageView>(R.id.optionsMenuItemTrailingIcon).visibility = GONE
+        row.setOnClickListener {
+            viewModel.onCustomizeResponsesClicked()
+            host.customizeResponsesClicked()
+            row.postDelayed({ popup.dismiss() }, MENU_DISMISS_DELAY_MS)
+        }
+        return row
     }
 
     private fun onOptionTapped(item: MenuItem) {

@@ -95,6 +95,24 @@
     <string name="duckAiHideAiGeneratedImagesTitle">Skryť obrázky generované umelou inteligenciou</string>
     <string name="duckAiHideAiGeneratedImagesDescription">Odstraňuje obrázky vytvorené umelou inteligenciou z výsledkov vyhľadávania obrázkov</string>
 
+    <!-- Search Assist Visibility -->
+    <string name="duckAiSearchAssistVisibilityTitle">Viditeľnosť funkcie Search Assist</string>
+    <string name="duckAiSearchAssistVisibilitySubtitle">Vyber, ako často chceš, aby sa vo vyhľadávaní zobrazovali odpovede podporované AI.</string>
+    <string name="duckAiSearchAssistVisibilityNever">Nikdy</string>
+    <string name="duckAiSearchAssistVisibilityOnDemand">Na požiadanie</string>
+    <string name="duckAiSearchAssistVisibilitySometimes">Niekedy</string>
+    <string name="duckAiSearchAssistVisibilityOften">Často</string>
+
+    <!-- Duck AI Use Without AI Settings Option -->
+    <string name="duckAiUseWithoutAiTitle">Používaj DuckDuckGo bez AI</string>
+    <string name="duckAiUseWithoutAiDescription">Zakáže Duck.ai, skryje odpovede s podporou umelej inteligencie vo vyhľadávaní a filtruje známe spamové stránky s umelou inteligenciou vo výsledkoch vyhľadávania obrázkov.</string>
+    <string name="duckAiUseWithoutAiDisabledDescription">Umelá inteligencia je momentálne v prehliadači vypnutá, takže sa ti už nebudú zobrazovať odpovede s pomocou umelej inteligencie a vo výsledkoch vyhľadávania obrázkov sa bude zobrazovať menej obrázkov vygenerovaných umelou inteligenciou.</string>
+
+    <!-- Duck AI Section in AI Feature Screen -->
+    <string name="input_screen_user_pref_toggle_between_search_and_ai">Prepínať medzi vyhľadávaním a Duck.ai</string>
+    <string name="duckAiDialogHideAiGeneratedImagesTitle">Skryť obrázky generované umelou inteligenciou</string>
+    <string name="duckAiDialogHideAiGeneratedImagesDescription">Filtruje známe spamové stránky generované umelou inteligenciou vo výsledkoch vyhľadávania obrázkov. <annotation link="learn_more">Zisti viac</annotation></string>
+
     <!-- Duck AI Paid Settings -->
     <string name="duck_ai_paid_settings_enable_in_settings">Povoliť v nastaveniach funkcií AI</string>
     <string name="duck_ai_paid_settings_manage_in_settings">Spravovať v nastaveniach funkcií AI</string>
@@ -105,6 +123,13 @@
     <string name="duckAIContextualAutomaticContextTitle">Automaticky odoslať obsah stránky</string>
     <string name="duckAIContextualAutomaticContextMessage">Automaticky odoslať obsah stránky do Duck.ai</string>
     <string name="duckAIContextualAttachPageContent">Pripoj obsah stránky</string>
+
+    <!-- Contextual sheet quick action -->
+    <string name="duckAIContextualPromptAskAboutPage">Opýtaj sa na stránku</string>
+
+    <!-- Contextual sheet input hint (contextualSheetImprovements flag) -->
+    <string name="contextualSheetImprovedHint">Spýtaj sa na čokoľvek súkromne</string>
+    <string name="contextualSheetChatsPopupRecentSection" instruction="Section header above the list of recent Duck.ai chats in the contextual sheet overflow menu.">Nedávne čety</string>
 
     <!-- duck.ai contextual fire button -->
     <string name="duckAIContextualFireButtonContentDescription">Zmazať chat</string>
@@ -125,6 +150,12 @@
 
     <!-- Duck AI Chat Suggestions -->
     <string name="duckAiChatHistoryViewAllChats">Zobraziť všetky čety</string>
+
+    <!-- Duck.ai onboarding end CTA -->
+    <string name="duckAiEndCtaTitle">Hotovo!</string>
+    <string name="duckAiEndCtaDescription"><![CDATA[Použi panel s adresou na vyhľadávanie a otváranie stránok alebo prepni na Duck.ai, ak chceš súkromne četovať s umelou inteligenciou.<br/><br/>Duck.ai môžeš používať odkiaľkoľvek, kde vidíš ikonu četu]]></string>
+    <string name="duckAiEndCtaButton">Ruku na to!</string>
+    <string name="duckAiEndCtaDescriptionCustomAi"><![CDATA[Začni súkromný četus umelou inteligenciou s Duck.ai alebo prepni na vyhľadávanie pre chránené prehliadanie.<br/><br/>Duck.ai môžeš používať odkiaľkoľvek, kde vidíš ikonu četu]]></string>
 
     <!-- Native Duck.ai chat history -->
     <string name="duck_ai_chat_history_title">Čety</string>

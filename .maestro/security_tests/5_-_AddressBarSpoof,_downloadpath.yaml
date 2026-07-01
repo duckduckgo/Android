@@ -10,8 +10,8 @@ tags:
                 clearState: true
             - runFlow: ../shared/skip_all_onboarding.yaml
             # Test 1
-            - doubleTapOn:
-                id: "omnibarTextInput"
+            - tapOn:
+                id: "inputField"
             - inputText: "https://privacy-test-pages.site/security/address-bar-spoofing/spoof-js-download-url.html"
             - pressKey: Enter
 
@@ -33,7 +33,7 @@ tags:
             - tapOn: "Cancel"
             # Should redirect back to the last page.
             - tapOn:
-                id: "omnibarTextInput"
+                id: "omnibarTextInputClickCatcher"
             - copyTextFrom:
-                id: "omnibarTextInput"
+                id: "inputField"
             - assertTrue: ${maestro.copiedText.indexOf("https://staticcdn.duckduckgo.com") == -1}

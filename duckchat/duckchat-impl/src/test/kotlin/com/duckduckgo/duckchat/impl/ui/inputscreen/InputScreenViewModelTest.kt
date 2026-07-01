@@ -21,6 +21,7 @@ import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggesti
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteSearchSuggestion
 import com.duckduckgo.browser.api.autocomplete.AutoCompleteFactory
 import com.duckduckgo.browser.api.autocomplete.AutoCompleteSettings
+import com.duckduckgo.browser.ui.autocomplete.AutocompleteHistoryDeleteFeature
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.extensions.toBinaryString
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
@@ -109,6 +110,7 @@ class InputScreenViewModelTest {
     private val chatSuggestionsReader: com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.reader.ChatSuggestionsReader = mock()
     private val duckChatFeature = FakeFeatureToggleFactory.create(DuckChatFeature::class.java)
     private val duckAiChatHistoryFeature = FakeFeatureToggleFactory.create(DuckAiChatHistoryFeature::class.java)
+    private val autocompleteHistoryDeleteFeature = FakeFeatureToggleFactory.create(AutocompleteHistoryDeleteFeature::class.java)
     private val fullScreenModeDisabledFlow = MutableStateFlow(false)
     private val fullScreenModeEnabledFlow = MutableStateFlow(true)
     private val duckChatURL = "https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5"
@@ -162,6 +164,7 @@ class InputScreenViewModelTest {
             tabRepository = tabRepository,
             tabPageContextRepository = tabPageContextRepository,
             duckChatJSHelper = duckChatJSHelper,
+            autocompleteHistoryDeleteFeature = autocompleteHistoryDeleteFeature,
         )
 
     private fun aTab(id: String) = TabEntity(tabId = id, url = null, title = null)

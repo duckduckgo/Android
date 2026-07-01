@@ -42,26 +42,32 @@ class DuckChatContentScopeJsMessageHandlerTest {
 
     @Test
     fun `only contains valid methods`() {
-        val methods = handler.methods
-        assertTrue(methods.size == 18)
-        assertTrue(methods[0] == "getAIChatNativeHandoffData")
-        assertTrue(methods[1] == "getAIChatNativeConfigValues")
-        assertTrue(methods[2] == "openAIChat")
-        assertTrue(methods[3] == "closeAIChat")
-        assertTrue(methods[4] == "openAIChatSettings")
-        assertTrue(methods[5] == "responseState")
-        assertTrue(methods[6] == "hideChatInput")
-        assertTrue(methods[7] == "showChatInput")
-        assertTrue(methods[8] == "reportMetric")
-        assertTrue(methods[9] == "openKeyboard")
-        assertTrue(methods[10] == "getAIChatPageContext")
-        assertTrue(methods[11] == "togglePageContextTelemetry")
-        assertTrue(methods[12] == "submitAIChatPageContext")
-        assertTrue(methods[13] == "userDidAcceptTermsAndConditions")
-        assertTrue(methods[14] == "getAIChatNativePrompt")
-        assertTrue(methods[15] == "voiceSessionStarted")
-        assertTrue(methods[16] == "voiceSessionEnded")
-        assertTrue(methods[17] == "responseReceived")
+        val expected = listOf(
+            "getAIChatNativeHandoffData",
+            "getAIChatNativeConfigValues",
+            "openAIChat",
+            "closeAIChat",
+            "openAIChatSettings",
+            "responseState",
+            "hideChatInput",
+            "showChatInput",
+            "reportMetric",
+            "openKeyboard",
+            "getAIChatPageContext",
+            "togglePageContextTelemetry",
+            "submitAIChatPageContext",
+            "userDidAcceptTermsAndConditions",
+            "getAIChatNativePrompt",
+            "voiceSessionStarted",
+            "voiceSessionEnded",
+            "responseReceived",
+            "showModelPicker",
+            "disableChatInput",
+            "enableChatInput",
+        )
+        // assert exact membership (size guards against accidental add/remove).
+        assertEquals(expected.size, handler.methods.size)
+        assertTrue(handler.methods.containsAll(expected))
     }
 
     private val callback = object : JsMessageCallback() {

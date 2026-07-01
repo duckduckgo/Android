@@ -152,6 +152,7 @@ class PirInitialScanCompletionWideEventImpl @Inject constructor(
                 when (executionType) {
                     PirExecutionType.MANUAL_INITIAL,
                     PirExecutionType.MANUAL_EDIT_PROFILE,
+                    PirExecutionType.MANUAL_INITIAL_RESUME,
                     -> {
                         pirDataStore.initialScanCompletionForegroundRunCount += 1
                     }
@@ -238,8 +239,11 @@ class PirInitialScanCompletionWideEventImpl @Inject constructor(
             6.hours,
             12.hours,
             1.days,
+            2.days,
             3.days,
+            5.days,
             7.days,
+            10.days,
             14.days,
         )
 

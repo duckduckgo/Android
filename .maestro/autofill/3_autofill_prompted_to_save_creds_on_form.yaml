@@ -13,8 +13,7 @@ tags:
         - runFlow: ../shared/skip_all_onboarding.yaml
 
         - tapOn:
-            id: "omnibarTextInput"
-        - eraseText
+            id: "inputField"
         - inputText: "fill.dev/form/login-simple"
         - pressKey: enter
 

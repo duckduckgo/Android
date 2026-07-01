@@ -25,6 +25,7 @@ import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.persistentstorage.api.PersistentStorage
 import com.duckduckgo.persistentstorage.api.PersistentStorageAvailability
 import com.duckduckgo.sync.api.favicons.FaviconsFetchingStore
@@ -33,6 +34,8 @@ import com.duckduckgo.sync.impl.Result
 import com.duckduckgo.sync.impl.Result.Error
 import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.impl.SyncAccountRepository
+import com.duckduckgo.sync.impl.SyncApi
+import com.duckduckgo.sync.impl.SyncAuthCode
 import com.duckduckgo.sync.impl.SyncFeature
 import com.duckduckgo.sync.impl.autorestore.SyncAutoRestoreManager
 import com.duckduckgo.sync.impl.autorestore.SyncRecoveryPersistentStorageKey
@@ -41,6 +44,7 @@ import com.duckduckgo.sync.impl.internal.SyncInternalEnvDataStore
 import com.duckduckgo.sync.impl.promotion.SyncPromotionDataStore
 import com.duckduckgo.sync.impl.promotion.SyncPromotionDataStore.PromotionType.BookmarkAddedDialog
 import com.duckduckgo.sync.impl.promotion.SyncPromotionDataStore.PromotionType.BookmarksScreen
+import com.duckduckgo.sync.impl.promotion.SyncPromotionDataStore.PromotionType.ChatTabPage
 import com.duckduckgo.sync.impl.promotion.SyncPromotionDataStore.PromotionType.PasswordsScreen
 import com.duckduckgo.sync.internal.ui.SyncInternalSettingsViewModel.Command.ReadConnectQR
 import com.duckduckgo.sync.internal.ui.SyncInternalSettingsViewModel.Command.ReadQR
@@ -56,6 +60,7 @@ import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import logcat.LogPriority
 import logcat.logcat
 import javax.inject.Inject
 
@@ -73,6 +78,7 @@ constructor(
     private val syncAutoRestoreManager: SyncAutoRestoreManager,
     private val syncFeature: SyncFeature,
     private val appBuildConfig: AppBuildConfig,
+    private val syncApi: SyncApi,
     @field:SuppressLint("StaticFieldLeak") private val context: Context,
 ) : ViewModel() {
 
@@ -95,6 +101,7 @@ constructor(
         val useDevEnvironment: Boolean = false,
         val environment: String = "",
         val recoveryCode: String = "",
+        val thirdPartyRecoveryCode: String = "",
         val syncAutoRestoreEnabled: Boolean = false,
         val blockStoreAvailable: Boolean? = null,
         val blockStoreE2ESupported: Boolean? = null,
@@ -106,6 +113,13 @@ constructor(
         val blockStoreE2eText: String = "",
         val blockStoreInferredBackupText: String = "",
         val blockStoreCurrentValueText: String = "Loading...",
+        val canUseV2ConnectFlowEnabled: Boolean = false,
+        val canShowV2ConnectCodeEnabled: Boolean = false,
+        val accessCredentialsText: String = "",
+        val scopedTokenResult: String = "",
+        val v2StoreFieldsText: String = "",
+        val createThirdPartyResult: String = "",
+        val keysText: String = "",
     )
 
     sealed class BlockStoreValue {
@@ -119,6 +133,7 @@ constructor(
         data object ReadQR : Command()
         data object ReadConnectQR : Command()
         data class ShowQR(val string: String) : Command()
+        data class ShowThirdPartyRecoveryQR(val string: String) : Command()
         data object LoginSuccess : Command()
         data object LaunchRecoverDataScreen : Command()
     }
@@ -196,6 +211,35 @@ constructor(
         }
     }
 
+    @SuppressLint("DenyListedApi")
+    fun onCanUseV2ConnectFlowFlagChanged(enabled: Boolean) {
+        viewModelScope.launch(dispatchers.io()) {
+            logcat { "Sync-ScopedToken: setting canUseV2ConnectFlow flag = $enabled" }
+            setRawToggleState(syncFeature.canUseV2ConnectFlow(), enabled)
+            updateViewState()
+        }
+    }
+
+    @SuppressLint("DenyListedApi")
+    fun onCanShowV2ConnectCodeFlagChanged(enabled: Boolean) {
+        viewModelScope.launch(dispatchers.io()) {
+            logcat { "Sync-ScopedToken: setting canShowV2ConnectCode flag = $enabled" }
+            setRawToggleState(syncFeature.canShowV2ConnectCode(), enabled)
+            updateViewState()
+        }
+    }
+
+    @SuppressLint("DenyListedApi")
+    private fun setRawToggleState(
+        toggle: Toggle,
+        enabled: Boolean,
+    ) {
+        val currentState = toggle.getRawStoredState()
+        val newState = currentState?.copy(enable = enabled, remoteEnableState = enabled)
+            ?: Toggle.State(enable = enabled, remoteEnableState = enabled)
+        toggle.setRawStoredState(newState)
+    }
+
     fun onDeleteAccountClicked() {
         viewModelScope.launch(dispatchers.io()) {
             val result = syncAccountRepository.deleteAccount()
@@ -241,6 +285,7 @@ constructor(
     private suspend fun updateViewState() {
         val accountInfo = syncAccountRepository.getAccountInfo()
         val recoveryCode = syncAccountRepository.getRecoveryCode().getOrNull()?.rawCode ?: ""
+        val thirdPartyRecoveryCode = syncAccountRepository.getThirdPartyRecoveryCode().getOrNull()?.rawCode ?: ""
         viewState.emit(
             viewState.value.copy(
                 userId = accountInfo.userId,
@@ -251,8 +296,12 @@ constructor(
                 primaryKey = accountInfo.primaryKey,
                 secretKey = accountInfo.secretKey,
                 recoveryCode = recoveryCode,
+                thirdPartyRecoveryCode = thirdPartyRecoveryCode,
                 useDevEnvironment = syncEnvDataStore.useSyncDevEnvironment,
                 environment = syncEnvDataStore.syncEnvironmentUrl,
+                canUseV2ConnectFlowEnabled = syncFeature.canUseV2ConnectFlow().isEnabled(),
+                canShowV2ConnectCodeEnabled = syncFeature.canShowV2ConnectCode().isEnabled(),
+                v2StoreFieldsText = buildV2StoreFieldsText(),
             ),
         )
     }
@@ -267,6 +316,15 @@ constructor(
         viewModelScope.launch(dispatchers.io()) {
             val recoveryCode = syncAccountRepository.getRecoveryCode().getOrNull() ?: return@launch
             command.send(ShowQR(recoveryCode.qrCode))
+        }
+    }
+
+    fun onShowThirdPartyRecoveryQrClicked() {
+        viewModelScope.launch(dispatchers.io()) {
+            when (val result = syncAccountRepository.getThirdPartyRecoveryCode()) {
+                is Success -> command.send(Command.ShowThirdPartyRecoveryQR(result.data.qrCode))
+                is Error -> command.send(ShowMessage(result.reason))
+            }
         }
     }
 
@@ -340,7 +398,23 @@ constructor(
 
     fun useRecoveryCode(recoveryCode: String) {
         viewModelScope.launch(dispatchers.io()) {
-            authFlow(recoveryCode)
+            // 3party recovery codes are intentionally rejected by parseSyncAuthCode (production
+            // paste/scan paths must not accept them). For the dev-tool entrypoint we explicitly
+            // try the 3party→ddg upgrade path when the existing parser doesn't recognize the code.
+            val codeType = syncAccountRepository.parseSyncAuthCode(recoveryCode)
+            if (codeType is SyncAuthCode.Unknown) {
+                when (val joinResult = syncAccountRepository.joinAccountFromThirdPartyRecoveryCode(recoveryCode)) {
+                    is Success -> {
+                        command.send(Command.LoginSuccess)
+                        updateViewState()
+                    }
+                    is Error -> {
+                        command.send(Command.ShowMessage("$joinResult"))
+                    }
+                }
+            } else {
+                authFlow(recoveryCode)
+            }
         }
     }
 
@@ -381,6 +455,160 @@ constructor(
         viewModelScope.launch {
             syncPromotionDataStore.clearPromoHistory(PasswordsScreen)
             command.send(ShowMessage("'Password screen' promo history cleared"))
+        }
+    }
+
+    fun onClearHistoryChatTabPagePromoClicked() {
+        viewModelScope.launch {
+            syncPromotionDataStore.clearPromoHistory(ChatTabPage)
+            command.send(ShowMessage("'Chat tab page' promo history cleared"))
+        }
+    }
+
+    fun onFetchAccessCredentialsClicked() {
+        viewModelScope.launch(dispatchers.io()) {
+            logcat { "Sync-ScopedToken: fetching access credentials" }
+            val token = syncStore.token
+            if (token.isNullOrEmpty()) {
+                logcat(LogPriority.WARN) { "Sync-ScopedToken: not signed in, skipping fetch" }
+                command.send(ShowMessage("Not signed in"))
+                return@launch
+            }
+            when (val result = syncApi.getAccessCredentials(token)) {
+                is Success -> {
+                    val text = if (result.data.isEmpty()) {
+                        "No access credentials found"
+                    } else {
+                        result.data.joinToString("\n") { cred ->
+                            "  id=${cred.id}, scope=${cred.scope ?: "(unrestricted)"}"
+                        }
+                    }
+                    logcat { "Sync-ScopedToken: access credentials:\n$text" }
+                    viewState.update { it.copy(accessCredentialsText = text) }
+                }
+                is Error -> {
+                    val text = "Error: ${result.reason} (code: ${result.code})"
+                    logcat(LogPriority.ERROR) { "Sync-ScopedToken: fetch access credentials failed: $text" }
+                    viewState.update { it.copy(accessCredentialsText = text) }
+                    command.send(ShowMessage(text))
+                }
+            }
+        }
+    }
+
+    fun onRequestScopedTokenClicked() {
+        viewModelScope.launch(dispatchers.io()) {
+            logcat { "Sync-ScopedToken: requesting scoped token (ai_chats)" }
+            val token = syncStore.token
+            if (token.isNullOrEmpty()) {
+                logcat(LogPriority.WARN) { "Sync-ScopedToken: not signed in, skipping rescope" }
+                command.send(ShowMessage("Not signed in"))
+                return@launch
+            }
+            when (val result = syncApi.rescopeToken(token, "ai_chats")) {
+                is Success -> {
+                    logcat { "Sync-ScopedToken: scoped token received" }
+                    val truncated = result.data.take(80) + "..."
+                    viewState.update { it.copy(scopedTokenResult = truncated) }
+                    command.send(ShowMessage("Scoped token received"))
+                }
+                is Error -> {
+                    val text = "Error: ${result.reason} (code: ${result.code})"
+                    logcat(LogPriority.ERROR) { "Sync-ScopedToken: rescope token failed: $text" }
+                    viewState.update { it.copy(scopedTokenResult = text) }
+                    command.send(ShowMessage(text))
+                }
+            }
+        }
+    }
+
+    private fun buildV2StoreFieldsText(): String = buildString {
+        appendLine("credentialId: ${syncStore.credentialId ?: "(not set)"}")
+        appendLine("scopedPassword: ${syncStore.scopedPassword?.raw?.take(40)?.let { "$it..." } ?: "(not set)"}")
+    }.trim().also { logcat { "Sync-ScopedToken: v2 store fields:\n$it" } }
+
+    fun onCreateThirdPartyCredentialClicked() {
+        viewModelScope.launch(dispatchers.io()) {
+            logcat { "Sync-ScopedToken: creating 3party credential from dev screen" }
+            when (val result = syncAccountRepository.createThirdPartyCredential()) {
+                is Success -> {
+                    logcat { "Sync-ScopedToken: 3party credential created successfully" }
+                    viewState.update {
+                        it.copy(
+                            createThirdPartyResult = "Success",
+                            v2StoreFieldsText = buildV2StoreFieldsText(),
+                            thirdPartyRecoveryCode = currentThirdPartyRecoveryCode(),
+                        )
+                    }
+                    command.send(ShowMessage("3party credential created"))
+                }
+                is Error -> {
+                    logcat(LogPriority.ERROR) { "Sync-ScopedToken: create 3party credential failed: ${result.reason}" }
+                    val text = "Error: ${result.reason} (code: ${result.code})"
+                    viewState.update { it.copy(createThirdPartyResult = text) }
+                    command.send(ShowMessage(text))
+                }
+            }
+        }
+    }
+
+    fun onRefreshThirdPartyCredentialClicked() {
+        viewModelScope.launch(dispatchers.io()) {
+            logcat { "Sync-ScopedToken: refreshing 3party credential from dev screen" }
+            when (val result = syncAccountRepository.refreshThirdPartyCredential()) {
+                is Success -> {
+                    viewState.update {
+                        it.copy(
+                            v2StoreFieldsText = buildV2StoreFieldsText(),
+                            thirdPartyRecoveryCode = currentThirdPartyRecoveryCode(),
+                        )
+                    }
+                    val msg = if (result.data) "3party credential refreshed" else "No 3party credential on server"
+                    command.send(ShowMessage(msg))
+                }
+                is Error -> {
+                    logcat(LogPriority.ERROR) { "Sync-ScopedToken: refresh 3party credential failed: ${result.reason}" }
+                    command.send(ShowMessage("Refresh failed: ${result.reason}"))
+                }
+            }
+        }
+    }
+
+    private fun currentThirdPartyRecoveryCode(): String =
+        syncAccountRepository.getThirdPartyRecoveryCode().getOrNull()?.rawCode ?: ""
+
+    fun onFetchKeysClicked() {
+        viewModelScope.launch(dispatchers.io()) {
+            refreshKeys()
+        }
+    }
+
+    private suspend fun refreshKeys() {
+        logcat { "Sync-ScopedToken: fetching keys" }
+        val token = syncStore.token
+        if (token.isNullOrEmpty()) {
+            logcat(LogPriority.WARN) { "Sync-ScopedToken: not signed in, skipping fetch keys" }
+            command.send(ShowMessage("Not signed in"))
+            return
+        }
+        when (val result = syncApi.getProtectedKeys(token)) {
+            is Success -> {
+                val text = if (result.data.isEmpty()) {
+                    "No keys found"
+                } else {
+                    result.data.joinToString("\n") { key ->
+                        "  kid=${key.kid}, purpose=${key.purpose}, encrypted_with=${key.encryptedWith}"
+                    }
+                }
+                logcat { "Sync-ScopedToken: keys:\n$text" }
+                viewState.update { it.copy(keysText = text) }
+            }
+            is Error -> {
+                val text = "Error: ${result.reason}"
+                logcat(LogPriority.ERROR) { "Sync-ScopedToken: fetch keys failed: $text" }
+                viewState.update { it.copy(keysText = text) }
+                command.send(ShowMessage(text))
+            }
         }
     }
 

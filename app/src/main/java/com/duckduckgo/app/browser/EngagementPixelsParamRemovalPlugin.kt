@@ -32,6 +32,7 @@ import com.duckduckgo.app.pixels.AppPixelName.KEYBOARD_GO_NEW_TAB_CLICKED
 import com.duckduckgo.app.pixels.AppPixelName.KEYBOARD_GO_SERP_CLICKED
 import com.duckduckgo.app.pixels.AppPixelName.KEYBOARD_GO_WEBSITE_CLICKED
 import com.duckduckgo.app.pixels.AppPixelName.LONG_PRESS_COPY_LINK_TEXT
+import com.duckduckgo.app.pixels.AppPixelName.LONG_PRESS_NEW_FIRE_TAB
 import com.duckduckgo.app.pixels.AppPixelName.TAB_MANAGER_BACK_BUTTON_PRESSED
 import com.duckduckgo.app.pixels.AppPixelName.TAB_MANAGER_CLICKED
 import com.duckduckgo.app.pixels.AppPixelName.TAB_MANAGER_CLOSE_TAB_CLICKED
@@ -85,6 +86,7 @@ class EngagementPixelsParamRemovalPlugin @Inject constructor() : PixelParamRemov
             TAB_MANAGER_MENU_SETTINGS_PRESSED.pixelName to PixelParameter.removeAtb(),
             ADD_BOOKMARK_CONFIRM_EDITED.pixelName to PixelParameter.removeAtb(),
             LONG_PRESS_COPY_LINK_TEXT.pixelName to PixelParameter.removeAtb(),
+            LONG_PRESS_NEW_FIRE_TAB.pixelName to PixelParameter.removeAtb(),
             AI_CHAT_DUCK_AI_DIRECT_NAVIGATION_COUNT.pixelName to PixelParameter.removeAtb(),
             AI_CHAT_DUCK_AI_DIRECT_NAVIGATION_DAILY.pixelName to PixelParameter.removeAtb(),
         )

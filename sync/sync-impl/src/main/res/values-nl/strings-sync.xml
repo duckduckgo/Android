@@ -241,4 +241,12 @@
     <string name="sync_recover_data_download_pdf">Downloaden als PDF</string>
     <string name="sync_restore_on_reinstall_title">Herstellen bij app-herinstallatie</string>
     <string name="sync_restore_on_reinstall_description">Als je de DuckDuckGo-app opnieuw installeert, vragen we of je je gegevens op dit apparaat wilt herstellen.</string>
+
+    <!-- Chat sync promo -->
+    <string name="sync_chat_promo_banner_title">Krijg toegang tot je chats op al je apparaten met Sync &amp; Backup.</string>
+    <string name="sync_chat_promo_banner_cta_title">Synchroniseren met een ander apparaat</string>
+    <string name="sync_chat_bottom_sheet_title">Laten we je chats synchroniseren op al je apparaten!</string>
+    <string name="sync_chat_bottom_sheet_description">Zoek de QR-code in de DuckDuckGo-app op je andere apparaat door op dat apparaat naar \'Instellingen\' › \'Sync &amp; Backup\' › \'Synchroniseren\' te gaan.</string>
+    <string name="sync_chat_bottom_sheet_positive">QR-code scannen</string>
+    <string name="sync_chat_bottom_sheet_negative">Niet nu</string>
 </resources>

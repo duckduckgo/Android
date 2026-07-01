@@ -19,6 +19,7 @@ package com.duckduckgo.duckchat.impl.ui.nativeinput.views
 import androidx.lifecycle.ViewModel
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.di.scopes.ViewScope
+import com.duckduckgo.duckchat.api.nativeinput.NativeInputState.InputContext
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputStateProvider
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -29,6 +30,7 @@ class StopStreamingViewModel @Inject constructor(
     nativeInputStateProvider: NativeInputStateProvider,
 ) : ViewModel() {
 
-    /** Show the stop button only while the chat is actively streaming a response. */
-    val isVisible: Flow<Boolean> = nativeInputStateProvider.state.map { it.isChatStreaming }
+    val isVisible: Flow<Boolean> = nativeInputStateProvider.state.map {
+        it.isChatStreaming && it.inputContext != InputContext.BROWSER
+    }
 }

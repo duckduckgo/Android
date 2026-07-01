@@ -37,6 +37,7 @@ dependencies {
     implementation project(path: ':di')
     implementation project(':browser-api')
     implementation project(path: ':common-utils')
+    implementation project(':data-store-api')
     implementation project(path: ':design-system')
     implementation project(path: ':sync-api')
     implementation project(path: ':sync-store')
@@ -56,6 +57,7 @@ dependencies {
     implementation project(':js-messaging-api')
     implementation project(':duckchat-api')
     implementation project(':persistent-storage-api')
+    implementation project(':browser-mode-api')
 
     implementation project(path: ':anvil-annotations')
 
@@ -74,6 +76,13 @@ dependencies {
     implementation('com.journeyapps:zxing-android-embedded:_') { transitive = false }
     implementation 'com.google.zxing:core:_'
     implementation "androidx.datastore:datastore-preferences:_"
+
+    // JWE crypto (for scoped access credentials)
+    implementation "io.jsonwebtoken:jjwt-api:_"
+    runtimeOnly "io.jsonwebtoken:jjwt-impl:_"
+    runtimeOnly("io.jsonwebtoken:jjwt-orgjson:_") {
+        exclude(group: 'org.json', module: 'json') // provided by Android natively
+    }
 
     // Shimmer
     implementation "com.facebook.shimmer:shimmer:_"

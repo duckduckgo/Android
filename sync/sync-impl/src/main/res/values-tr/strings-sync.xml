@@ -241,4 +241,12 @@
     <string name="sync_recover_data_download_pdf">PDF olarak indir</string>
     <string name="sync_restore_on_reinstall_title">Uygulama Yeniden Yüklendiğinde Geri Yükle</string>
     <string name="sync_restore_on_reinstall_description">DuckDuckGo uygulamasını yeniden yüklerseniz, verilerinizi bu cihazda geri yüklemek isteyip istemediğinizi sorarız.</string>
+
+    <!-- Chat sync promo -->
+    <string name="sync_chat_promo_banner_title">Sync &amp; Backup özelliğini kullanarak sohbetlerinize tüm cihazlarınızdan erişin.</string>
+    <string name="sync_chat_promo_banner_cta_title">Başka Bir Cihazla Senkronize Et</string>
+    <string name="sync_chat_bottom_sheet_title">Sohbetlerinizi cihazlarınız arasında senkronize edelim!</string>
+    <string name="sync_chat_bottom_sheet_description">Diğer cihazınızdaki DuckDuckGo uygulamasında Ayarlar › Sync &amp; Backup › Başka Bir Cihazla Senkronize Et seçeneğine giderek QR kodunu bulun.</string>
+    <string name="sync_chat_bottom_sheet_positive">QR kodunu tara</string>
+    <string name="sync_chat_bottom_sheet_negative">Şimdi Değil</string>
 </resources>

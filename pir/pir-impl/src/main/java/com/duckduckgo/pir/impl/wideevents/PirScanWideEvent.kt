@@ -21,6 +21,7 @@ import androidx.annotation.VisibleForTesting
 import com.duckduckgo.app.statistics.wideevents.CleanupPolicy
 import com.duckduckgo.app.statistics.wideevents.FlowStatus
 import com.duckduckgo.app.statistics.wideevents.WideEventClient
+import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.pir.impl.PirRemoteFeatures
@@ -35,6 +36,8 @@ import java.io.IOException
 import javax.inject.Inject
 import kotlin.random.Random
 import kotlin.time.Duration.Companion.hours
+import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
 
 interface PirScanWideEvent {
     suspend fun onRunStarted(
@@ -139,6 +142,7 @@ class PirScanWideEventImpl @Inject constructor(
     private val wideEventClient: WideEventClient,
     private val pirRemoteFeatures: PirRemoteFeatures,
     private val dispatchers: DispatcherProvider,
+    private val currentTimeProvider: CurrentTimeProvider,
 ) : PirScanWideEvent {
 
     private val manualState = RunState(WIDE_EVENT_NAME_MANUAL)
@@ -266,7 +270,7 @@ class PirScanWideEventImpl @Inject constructor(
     }
 
     private fun stateFor(executionType: PirExecutionType): RunState = when (executionType) {
-        PirExecutionType.MANUAL_INITIAL, PirExecutionType.MANUAL_EDIT_PROFILE -> manualState
+        PirExecutionType.MANUAL_INITIAL, PirExecutionType.MANUAL_EDIT_PROFILE, PirExecutionType.MANUAL_INITIAL_RESUME -> manualState
         PirExecutionType.SCHEDULED -> scheduledState
     }
 
@@ -275,19 +279,41 @@ class PirScanWideEventImpl @Inject constructor(
     }
 
     /**
-     * Records a flow step and persists [stepName] as `last_step` metadata in the same write. Because
-     * flowStep metadata is merged into the event and persisted immediately, the furthest-reached step
-     * survives an abnormal termination — e.g. the `:pir` process being killed mid-scan and the flow
-     * finalized as [FlowStatus.Unknown] by the cleanup-on-timeout policy, which never calls
-     * flowFinish.
+     * Records a flow step and persists [stepName] as `last_step` metadata in the same write. When
+     * [elapsedMs] is provided, also persists the bucketed time-since-run-start as
+     * `last_step_elapsed_ms_bucketed`. Because flowStep metadata is merged into the event and
+     * persisted immediately, the furthest-reached step and its elapsed time survive an abnormal
+     * termination — e.g. the `:pir` process being killed mid-scan and the flow finalized as
+     * [FlowStatus.Unknown] by the cleanup-on-timeout policy, which never calls flowFinish. That is the
+     * only way to recover how long a killed run had been going, since the `total_*_duration` intervals
+     * are never closed (and thus never recorded) on such a run.
+     *
+     * [elapsedMs] is omitted for the initial `started` step (elapsed is ~0 there and carries no
+     * signal); the field therefore being absent on a flow means it was killed before the first
+     * progress decile.
      */
-    private suspend fun recordStep(flowId: Long, stepName: String) {
+    private suspend fun recordStep(flowId: Long, stepName: String, elapsedMs: Long? = null) {
+        val metadata = buildMap {
+            put(KEY_LAST_STEP, stepName)
+            elapsedMs?.let { put(KEY_LAST_STEP_ELAPSED, bucketedElapsedMs(it)) }
+        }
         wideEventClient.flowStep(
             wideEventId = flowId,
             stepName = stepName,
             success = true,
-            metadata = mapOf(KEY_LAST_STEP to stepName),
+            metadata = metadata,
         )
+    }
+
+    /**
+     * Floors [elapsedMs] to the nearest [PER_RUN_DURATION_BUCKETS] boundary (values below the smallest
+     * bucket become 0), mirroring how the wide-events framework buckets interval durations.
+     */
+    private fun bucketedElapsedMs(elapsedMs: Long): String {
+        val matched = PER_RUN_DURATION_BUCKETS
+            .filter { it.inWholeMilliseconds <= elapsedMs }
+            .maxByOrNull { it.inWholeMilliseconds }
+        return (matched?.inWholeMilliseconds ?: 0L).toString()
     }
 
     /**
@@ -302,6 +328,9 @@ class PirScanWideEventImpl @Inject constructor(
         private var lastReportedDecile: Int = 0
         private var currentDecileIntervalKey: String? = null
         private var optOutIntervalOpen: Boolean = false
+        private var totalScanIntervalOpen: Boolean = false
+        private var totalFlowIntervalOpen: Boolean = false
+        private var runStartElapsedMs: Long = 0
 
         suspend fun onRunStarted(
             executionType: PirExecutionType,
@@ -361,7 +390,22 @@ class PirScanWideEventImpl @Inject constructor(
                 ).getOrNull() ?: return@withLock
 
                 cachedFlowId = newFlowId
+                runStartElapsedMs = currentTimeProvider.elapsedRealtime()
                 recordStep(newFlowId, STEP_STARTED)
+
+                wideEventClient.intervalStart(
+                    wideEventId = newFlowId,
+                    key = INTERVAL_TOTAL_FLOW_DURATION,
+                    buckets = PER_RUN_DURATION_BUCKETS,
+                )
+                totalFlowIntervalOpen = true
+
+                wideEventClient.intervalStart(
+                    wideEventId = newFlowId,
+                    key = INTERVAL_TOTAL_SCAN_DURATION,
+                    buckets = PER_RUN_DURATION_BUCKETS,
+                )
+                totalScanIntervalOpen = true
 
                 if (totalScanJobs > 0) {
                     val key = decileIntervalKey(0, 10)
@@ -404,7 +448,7 @@ class PirScanWideEventImpl @Inject constructor(
                     }
 
                     val stepName = "$STEP_PROGRESS_PREFIX${currentDecile * 10}"
-                    recordStep(flowId, stepName)
+                    recordStep(flowId, stepName, elapsedSinceStart())
 
                     if (currentDecile < 9) {
                         val nextKey = decileIntervalKey(currentDecile * 10, (currentDecile + 1) * 10)
@@ -428,14 +472,19 @@ class PirScanWideEventImpl @Inject constructor(
                     currentDecileIntervalKey = null
                 }
 
-                recordStep(flowId, STEP_SCAN_COMPLETED)
+                if (totalScanIntervalOpen) {
+                    wideEventClient.intervalEnd(wideEventId = flowId, key = INTERVAL_TOTAL_SCAN_DURATION)
+                    totalScanIntervalOpen = false
+                }
+
+                recordStep(flowId, STEP_SCAN_COMPLETED, elapsedSinceStart())
             }
         }
 
         suspend fun onOptOutStarted() {
             mutex.withLock {
                 val flowId = cachedFlowId ?: return@withLock
-                recordStep(flowId, STEP_OPT_OUT_STARTED)
+                recordStep(flowId, STEP_OPT_OUT_STARTED, elapsedSinceStart())
                 wideEventClient.intervalStart(wideEventId = flowId, key = INTERVAL_OPT_OUT_DURATION)
                 optOutIntervalOpen = true
             }
@@ -446,7 +495,11 @@ class PirScanWideEventImpl @Inject constructor(
                 val flowId = cachedFlowId ?: return@withLock
                 wideEventClient.intervalEnd(wideEventId = flowId, key = INTERVAL_OPT_OUT_DURATION)
                 optOutIntervalOpen = false
-                recordStep(flowId, STEP_OPT_OUT_COMPLETED)
+                recordStep(flowId, STEP_OPT_OUT_COMPLETED, elapsedSinceStart())
+                if (totalFlowIntervalOpen) {
+                    wideEventClient.intervalEnd(wideEventId = flowId, key = INTERVAL_TOTAL_FLOW_DURATION)
+                    totalFlowIntervalOpen = false
+                }
                 wideEventClient.flowFinish(
                     wideEventId = flowId,
                     status = FlowStatus.Success,
@@ -459,7 +512,11 @@ class PirScanWideEventImpl @Inject constructor(
         suspend fun onOptOutSkipped() {
             mutex.withLock {
                 val flowId = cachedFlowId ?: return@withLock
-                recordStep(flowId, STEP_OPT_OUT_SKIPPED)
+                recordStep(flowId, STEP_OPT_OUT_SKIPPED, elapsedSinceStart())
+                if (totalFlowIntervalOpen) {
+                    wideEventClient.intervalEnd(wideEventId = flowId, key = INTERVAL_TOTAL_FLOW_DURATION)
+                    totalFlowIntervalOpen = false
+                }
                 wideEventClient.flowFinish(
                     wideEventId = flowId,
                     status = FlowStatus.Success,
@@ -530,7 +587,21 @@ class PirScanWideEventImpl @Inject constructor(
                 wideEventClient.intervalEnd(wideEventId = flowId, key = INTERVAL_OPT_OUT_DURATION)
                 optOutIntervalOpen = false
             }
+            if (totalScanIntervalOpen) {
+                wideEventClient.intervalEnd(wideEventId = flowId, key = INTERVAL_TOTAL_SCAN_DURATION)
+                totalScanIntervalOpen = false
+            }
+            if (totalFlowIntervalOpen) {
+                wideEventClient.intervalEnd(wideEventId = flowId, key = INTERVAL_TOTAL_FLOW_DURATION)
+                totalFlowIntervalOpen = false
+            }
         }
+
+        /**
+         * Wall-clock time since this run's flow started.
+         */
+        private fun elapsedSinceStart(): Long =
+            (currentTimeProvider.elapsedRealtime() - runStartElapsedMs).coerceAtLeast(0)
 
         private fun clearStateLocked() {
             cachedFlowId = null
@@ -539,23 +610,28 @@ class PirScanWideEventImpl @Inject constructor(
             lastReportedDecile = 0
             currentDecileIntervalKey = null
             optOutIntervalOpen = false
+            totalScanIntervalOpen = false
+            totalFlowIntervalOpen = false
+            runStartElapsedMs = 0
         }
     }
 
     private fun entryPointFor(executionType: PirExecutionType): String = when (executionType) {
         PirExecutionType.MANUAL_INITIAL -> ENTRY_POINT_MANUAL_INITIAL
         PirExecutionType.MANUAL_EDIT_PROFILE -> ENTRY_POINT_MANUAL_EDIT_PROFILE
+        PirExecutionType.MANUAL_INITIAL_RESUME -> ENTRY_POINT_MANUAL_INITIAL_RESUME
         PirExecutionType.SCHEDULED -> ENTRY_POINT_SCHEDULED
     }
 
     private fun wideEventNameFor(executionType: PirExecutionType): String = when (executionType) {
-        PirExecutionType.MANUAL_INITIAL, PirExecutionType.MANUAL_EDIT_PROFILE -> WIDE_EVENT_NAME_MANUAL
+        PirExecutionType.MANUAL_INITIAL, PirExecutionType.MANUAL_EDIT_PROFILE, PirExecutionType.MANUAL_INITIAL_RESUME -> WIDE_EVENT_NAME_MANUAL
         PirExecutionType.SCHEDULED -> WIDE_EVENT_NAME_SCHEDULED
     }
 
     private fun PirExecutionType.metadataValue(): String = when (this) {
         PirExecutionType.MANUAL_INITIAL -> EXECUTION_TYPE_MANUAL_INITIAL
         PirExecutionType.MANUAL_EDIT_PROFILE -> EXECUTION_TYPE_MANUAL_EDIT_PROFILE
+        PirExecutionType.MANUAL_INITIAL_RESUME -> EXECUTION_TYPE_MANUAL_INITIAL_RESUME
         PirExecutionType.SCHEDULED -> EXECUTION_TYPE_SCHEDULED
     }
 
@@ -573,10 +649,12 @@ class PirScanWideEventImpl @Inject constructor(
 
         const val ENTRY_POINT_MANUAL_INITIAL = "funnel_pir_initial_android"
         const val ENTRY_POINT_MANUAL_EDIT_PROFILE = "funnel_pir_edit_profile_android"
+        const val ENTRY_POINT_MANUAL_INITIAL_RESUME = "funnel_pir_initial_resume_android"
         const val ENTRY_POINT_SCHEDULED = "funnel_pir_scheduled_android"
 
         const val EXECUTION_TYPE_MANUAL_INITIAL = "manual_initial"
         const val EXECUTION_TYPE_MANUAL_EDIT_PROFILE = "manual_edit_profile"
+        const val EXECUTION_TYPE_MANUAL_INITIAL_RESUME = "manual_initial_resume"
         const val EXECUTION_TYPE_SCHEDULED = "scheduled"
 
         const val KEY_EXECUTION_TYPE = "execution_type"
@@ -591,6 +669,7 @@ class PirScanWideEventImpl @Inject constructor(
         const val KEY_NOTIFICATIONS_PERMISSION_GRANTED = "notifications_permission_granted"
         const val KEY_TRACKER_BLOCKING_STATE = "tracker_blocking_state"
         const val KEY_LAST_STEP = "last_step"
+        const val KEY_LAST_STEP_ELAPSED = "last_step_elapsed_ms_bucketed"
         const val KEY_CANCELLATION_REASON = "cancellation_reason"
 
         const val STEP_STARTED = "started"
@@ -601,6 +680,23 @@ class PirScanWideEventImpl @Inject constructor(
         const val STEP_OPT_OUT_SKIPPED = "opt_out_skipped"
 
         const val INTERVAL_OPT_OUT_DURATION = "opt_out_duration_ms_bucketed"
+        const val INTERVAL_TOTAL_SCAN_DURATION = "total_scan_duration_ms_bucketed"
+        const val INTERVAL_TOTAL_FLOW_DURATION = "total_flow_duration_ms_bucketed"
+
+        val PER_RUN_DURATION_BUCKETS = setOf(
+            10.seconds,
+            30.seconds,
+            1.minutes,
+            2.minutes,
+            5.minutes,
+            10.minutes,
+            15.minutes,
+            30.minutes,
+            1.hours,
+            2.hours,
+            4.hours,
+            8.hours,
+        )
 
         /** Hardcoded sample rate for scheduled-scan wide events. Manual runs always send. */
         const val SCHEDULED_SCAN_SAMPLE_RATE: Double = 0.20

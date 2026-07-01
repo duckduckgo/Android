@@ -868,6 +868,7 @@
     <string name="preOnboardingDaxDialog1TitleDuckAi" translatable="false"><![CDATA[Hi there.<br/><br/>Ready for a faster browser that protects you and lets you decide when and how to use AI?]]></string>
     <string name="preOnboardingDaxDialog1Button">Padarykime tai!</string>
     <string name="preOnboardingDaxDialog1ButtonDuckAi" translatable="false">Let\&apos;s get started!</string>
+    <string name="preOnboardingDaxDialog1ButtonBrandDesign">Pradėkime!</string>
     <string name="preOnboardingDaxDialog1SecondaryButton">Aš jau čia buvau.</string>
     <string name="preOnboardingDaxDialog2Title">Apsaugos priemonės įjungtos!</string>
     <string name="preOnboardingDaxDialog2Button">Pasirinkite naršyklę</string>
@@ -936,6 +937,7 @@
     <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[„DuckDuckGo“ taip pat turi <b>pasirenkamą mokamą prenumeratą</b> su saugiu <b>VPN</b> ir <b>pažangiu, privačiu dirbtiniu intelektu</b>.]]></string>
     <string name="onboardingPrivacyProDaxDialogOkButton">Sužinoti daugiau</string>
     <string name="onboardingPrivacyProDaxDialogFreeTrialOkButton">Išbandyk nemokamai!</string>
+    <string name="onboardingPrivacyProDaxDialogFreeTrialOkButtonBrandDesign">Išbandyk nemokamai!</string>
     <string name="onboardingPrivacyProDaxDialogCancelButton">Praleisti</string>
     <string name="onboardingSkippedPrivacyProDaxDialogTitle">Ar žinojai?</string>
 
@@ -1071,6 +1073,46 @@
     <string name="onboardingSearchDaxDialogOption1Quoted" instruction="translate &apos;duck&apos; too.">kaip angliškai pasakyti „antis“</string>
     <string name="onboardingSearchDaxDialogOption1EnglishQuoted" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">kaip ispaniškai pasakyti „antis“</string>
 
+    <string name="onboardingDuckAiFireButtonDaxDialogTitle">Tai – „Duck.ai“!</string>
+    <string name="onboardingDuckAiFireButtonDaxDialogDescription"><![CDATA[Privačius DI pokalbius galite naikinti bet kada pasinaudodami ugnies mygtuku <b>Fire Button</b>. Išbandykite! 🔥]]></string>
+    <string name="onboardingDuckAiEndCtaTitle">Jums pavyks!</string>
+    <string name="onboardingDuckAiEndCtaDescription"><![CDATA[Naudokite adreso juostą paieškai ir svetainių lankymui arba perjunkite į „Duck.ai“ privačiam pokalbiui su DI.<br/><br/>„Duck.ai“ galite naudoti bet kur, kur matote pokalbių piktogramą]]></string>
+    <string name="onboardingDuckAiEndCtaButton">Duok penkis!</string>
+
+    <!-- Input Mode Demo Onboarding step -->
+    <string name="preOnboardingInputModeDemoTitle">Pasiruošei pradėti?&lt;br/&gt;Išbandyk paiešką arba DI pokalbį!</string>
+    <string name="preOnboardingInputModeDemoSearchHint">Ieškok privačiai</string>
+    <string name="preOnboardingInputModeDemoChatHint">Klausk bet ko privačiai</string>
+    <string name="preOnboardingInputModeDemoChatSuggestion1">Paaiškink akcijų rinką taip, lyg man būtų 10 metų</string>
+    <string name="preOnboardingInputModeDemoChatSuggestion2">Suplanuok tobulą dieną Londone</string>
+    <string name="preOnboardingInputModeDemoChatSuggestion3">Nustebink mane!</string>
+    <string name="preOnboardingInputModeDemoChatSuggestion3Prompt">Kokie yra 10 stulbinamų faktų apie mokslą, gamtą ir istoriją?</string>
+
+    <!-- Custom AI onboarding flow -->
+    <!-- Pre-onboarding: initial screens -->
+    <string name="preOnboardingWelcomeDialogBodyCustomAi">Pasiruošei privačiai ir nemokamai kalbėtis su „ChatGPT“, „Claude“ ir kitais DI naršyklėje, kuri tave aktyviai saugo?</string>
+    <string name="preOnboardingDaxDialog3TextCustomAi">Atmink: „Duck.ai“ gali naudoti visur, kur tik matai pokalbio piktogramą.</string>
+    <string name="preOnboardingDaxDialog3ButtonCustomAi">Pradėk DI pokalbį</string>
+    <!-- Pre-onboarding: AI comparison chart screen. -->
+    <string name="preOnboardingDaxDialogAiTitle">DI apsaugos aktyvuotos!</string>
+    <string name="preOnboardingAiComparisonChartPopularAis">Populiarūs DI</string>
+    <string name="preOnboardingAiComparisonChartItem1">Visi pokalbiai anonimizuoti</string>
+    <string name="preOnboardingAiComparisonChartItem2">Norint naudotis visomis DI funkcijomis, paskyros nereikia.</string>
+    <string name="preOnboardingAiComparisonChartItem3">Tavo pokalbiai niekada nenaudojami DI mokyti.</string>
+    <string name="preOnboardingAiComparisonChartItem4">Pasiek „ChatGPT“, „Claude“ ir kitus DI vienoje vietoje.</string>
+    <string name="preOnboardingAiComparisonChartButton">Išbandyk „Duck.ai“!</string>
+    <!-- Pre-onboarding: input demo screen -->
+    <string name="preOnboardingInputModeDemoTitleCustomAi">Dabar išbandyk privatų DI pokalbį!</string>
+    <!-- Pre-onboarding: browser comparison screen -->
+    <string name="preOnboardingDaxDialog2TitleCustomAi">Nori, kad „DuckDuckGo“ taptų tavo numatytąja naršykle?</string>
+    <!-- In-context onboarding. -->
+    <string name="onboardingEndCustomAiFlowDaxDialogDescription"><![CDATA[Pradėk privatų DI pokalbį su „Duck.ai“ arba perjunk į Paiešką, kad naršytum saugiai.<br/><br/>„Duck.ai“ gali naudoti visur, kur tik matai pokalbio piktogramą.]]></string>
+    <string name="onboardingPrivacyProCustomAiFlowDaxDialogDescription">Taip pat siūlome mokamą prenumeratą, į kurią įeina pažangūs DI modeliai su didesniais GPT ir „Claude“ pokalbių limitais, saugus VPN ir dar daugiau.</string>
+
     <string name="input_screen_user_pref_without_ai_updated">Tik paieška</string>
     <string name="input_screen_user_pref_with_ai_updated">Perjungti\npaiešką ir „Duck.ai“</string>
+
+    <!-- New Address Bar Picker -->
+    <string name="newAddressBarPickerDuckDuckGo" translatable="false">DuckDuckGo</string>
+    <string name="newAddressBarPickerConfirm">Patvirtinti</string>
 </resources>

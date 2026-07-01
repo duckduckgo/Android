@@ -29,13 +29,18 @@ import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelParameters
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.store.DefaultTogglePosition
+import com.duckduckgo.duckchat.impl.store.HideAiGeneratedImages
+import com.duckduckgo.duckchat.impl.store.SearchAssistVisibility
 import com.duckduckgo.duckchat.impl.ui.settings.DuckChatSettingsViewModel.Command.LaunchFeedback
 import com.duckduckgo.duckchat.impl.ui.settings.DuckChatSettingsViewModel.Command.OpenLink
 import com.duckduckgo.duckchat.impl.ui.settings.DuckChatSettingsViewModel.Command.OpenLinkInNewTab
 import com.duckduckgo.duckchat.impl.ui.settings.DuckChatSettingsViewModel.Command.OpenShortcutSettings
 import com.duckduckgo.duckchat.impl.ui.settings.DuckChatSettingsViewModel.Command.ShowDefaultTogglePositionDialog
+import com.duckduckgo.duckchat.impl.ui.settings.DuckChatSettingsViewModel.Command.ShowHideAiGeneratedImagesDialog
+import com.duckduckgo.duckchat.impl.ui.settings.DuckChatSettingsViewModel.Command.ShowSearchAssistDialog
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
+import com.duckduckgo.settings.api.SerpSettingsDataProvider
 import com.duckduckgo.settings.api.SettingsPageFeature
 import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.flow.flowOf
@@ -45,7 +50,9 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
@@ -62,6 +69,7 @@ class DuckChatSettingsViewModelTest {
     private val mockDuckChatPixels: DuckChatPixels = mock()
     private val settingsPageFeature = FakeFeatureToggleFactory.create(SettingsPageFeature::class.java)
     private val duckChatFeature = FakeFeatureToggleFactory.create(DuckChatFeature::class.java)
+    private val serpSettingsDataProvider: SerpSettingsDataProvider = mock()
 
     @Before
     fun setUp() =
@@ -75,6 +83,8 @@ class DuckChatSettingsViewModelTest {
             whenever(duckChat.observeInputScreenUserSettingEnabled()).thenReturn(flowOf(false))
             whenever(duckChat.observeAutomaticContextAttachmentUserSettingEnabled()).thenReturn(flowOf(false))
             whenever(duckChat.observeDefaultTogglePosition()).thenReturn(flowOf(DefaultTogglePosition.SEARCH))
+            // Default both SERP-backed settings (kbe, kbj) to "no value synced"; individual tests override per key.
+            whenever(serpSettingsDataProvider.observeSetting(any())).thenReturn(flowOf(null))
             testee = DuckChatSettingsViewModel(
                 duckChatActivityParams = DuckChatSettingsNoParams,
                 duckChat = duckChat,
@@ -84,6 +94,7 @@ class DuckChatSettingsViewModelTest {
                 duckChatPixels = mockDuckChatPixels,
                 dispatcherProvider = coroutineRule.testDispatcherProvider,
                 duckChatFeature = duckChatFeature,
+                serpSettingsDataProvider = serpSettingsDataProvider,
             )
         }
 
@@ -157,6 +168,7 @@ class DuckChatSettingsViewModelTest {
                 duckChatPixels = mockDuckChatPixels,
                 dispatcherProvider = coroutineRule.testDispatcherProvider,
                 duckChatFeature = duckChatFeature,
+                serpSettingsDataProvider = serpSettingsDataProvider,
             )
 
             testee.viewState.test {
@@ -178,6 +190,7 @@ class DuckChatSettingsViewModelTest {
                 duckChatPixels = mockDuckChatPixels,
                 dispatcherProvider = coroutineRule.testDispatcherProvider,
                 duckChatFeature = duckChatFeature,
+                serpSettingsDataProvider = serpSettingsDataProvider,
             )
 
             testee.viewState.test {
@@ -199,6 +212,7 @@ class DuckChatSettingsViewModelTest {
                 duckChatPixels = mockDuckChatPixels,
                 dispatcherProvider = coroutineRule.testDispatcherProvider,
                 duckChatFeature = duckChatFeature,
+                serpSettingsDataProvider = serpSettingsDataProvider,
             )
 
             testee.viewState.test {
@@ -220,6 +234,7 @@ class DuckChatSettingsViewModelTest {
                 duckChatPixels = mockDuckChatPixels,
                 dispatcherProvider = coroutineRule.testDispatcherProvider,
                 duckChatFeature = duckChatFeature,
+                serpSettingsDataProvider = serpSettingsDataProvider,
             )
 
             testee.viewState.test {
@@ -241,6 +256,7 @@ class DuckChatSettingsViewModelTest {
                 duckChatPixels = mockDuckChatPixels,
                 dispatcherProvider = coroutineRule.testDispatcherProvider,
                 duckChatFeature = duckChatFeature,
+                serpSettingsDataProvider = serpSettingsDataProvider,
             )
 
             testee.viewState.test {
@@ -262,6 +278,7 @@ class DuckChatSettingsViewModelTest {
                 duckChatPixels = mockDuckChatPixels,
                 dispatcherProvider = coroutineRule.testDispatcherProvider,
                 duckChatFeature = duckChatFeature,
+                serpSettingsDataProvider = serpSettingsDataProvider,
             )
 
             testee.viewState.test {
@@ -284,6 +301,7 @@ class DuckChatSettingsViewModelTest {
                 duckChatPixels = mockDuckChatPixels,
                 dispatcherProvider = coroutineRule.testDispatcherProvider,
                 duckChatFeature = duckChatFeature,
+                serpSettingsDataProvider = serpSettingsDataProvider,
             )
 
             testee.viewState.test {
@@ -307,6 +325,7 @@ class DuckChatSettingsViewModelTest {
                 duckChatPixels = mockDuckChatPixels,
                 dispatcherProvider = coroutineRule.testDispatcherProvider,
                 duckChatFeature = duckChatFeature,
+                serpSettingsDataProvider = serpSettingsDataProvider,
             )
 
             testee.viewState.test {
@@ -396,6 +415,7 @@ class DuckChatSettingsViewModelTest {
                 duckChatPixels = mockDuckChatPixels,
                 dispatcherProvider = coroutineRule.testDispatcherProvider,
                 duckChatFeature = duckChatFeature,
+                serpSettingsDataProvider = serpSettingsDataProvider,
             )
 
             testee.duckChatSearchAISettingsClicked()
@@ -493,6 +513,7 @@ class DuckChatSettingsViewModelTest {
                 duckChatPixels = mockDuckChatPixels,
                 dispatcherProvider = coroutineRule.testDispatcherProvider,
                 duckChatFeature = duckChatFeature,
+                serpSettingsDataProvider = serpSettingsDataProvider,
             )
 
             testee.viewState.test {
@@ -515,11 +536,56 @@ class DuckChatSettingsViewModelTest {
                 duckChatPixels = mockDuckChatPixels,
                 dispatcherProvider = coroutineRule.testDispatcherProvider,
                 duckChatFeature = duckChatFeature,
+                serpSettingsDataProvider = serpSettingsDataProvider,
             )
 
             testee.viewState.test {
                 val state = awaitItem()
                 assertFalse(state.isHideGeneratedImagesOptionVisible)
+            }
+        }
+
+    @Test
+    fun `when aiFeaturesNativeControls is enabled then viewState shows native controls enabled`() =
+        runTest {
+            @Suppress("DenyListedApi")
+            duckChatFeature.aiFeaturesNativeControls().setRawStoredState(State(enable = true))
+            testee = DuckChatSettingsViewModel(
+                duckChatActivityParams = DuckChatSettingsNoParams,
+                duckChat = duckChat,
+                pixel = mockPixel,
+                inputScreenDiscoveryFunnel = mockInputScreenDiscoveryFunnel,
+                settingsPageFeature = settingsPageFeature,
+                duckChatPixels = mockDuckChatPixels,
+                dispatcherProvider = coroutineRule.testDispatcherProvider,
+                duckChatFeature = duckChatFeature,
+                serpSettingsDataProvider = serpSettingsDataProvider,
+            )
+
+            testee.viewState.test {
+                assertTrue(awaitItem().isNativeControlsEnabled)
+            }
+        }
+
+    @Test
+    fun `when aiFeaturesNativeControls is disabled then viewState shows native controls disabled`() =
+        runTest {
+            @Suppress("DenyListedApi")
+            duckChatFeature.aiFeaturesNativeControls().setRawStoredState(State(enable = false))
+            testee = DuckChatSettingsViewModel(
+                duckChatActivityParams = DuckChatSettingsNoParams,
+                duckChat = duckChat,
+                pixel = mockPixel,
+                inputScreenDiscoveryFunnel = mockInputScreenDiscoveryFunnel,
+                settingsPageFeature = settingsPageFeature,
+                duckChatPixels = mockDuckChatPixels,
+                dispatcherProvider = coroutineRule.testDispatcherProvider,
+                duckChatFeature = duckChatFeature,
+                serpSettingsDataProvider = serpSettingsDataProvider,
+            )
+
+            testee.viewState.test {
+                assertFalse(awaitItem().isNativeControlsEnabled)
             }
         }
 
@@ -535,6 +601,7 @@ class DuckChatSettingsViewModelTest {
                 duckChatPixels = mockDuckChatPixels,
                 dispatcherProvider = coroutineRule.testDispatcherProvider,
                 duckChatFeature = duckChatFeature,
+                serpSettingsDataProvider = serpSettingsDataProvider,
             )
 
             testee.viewState.test {
@@ -546,6 +613,8 @@ class DuckChatSettingsViewModelTest {
     @Test
     fun `when DuckChatNativeSettingsNoParams passed then viewState shows search section hidden`() =
         runTest {
+            @Suppress("DenyListedApi")
+            duckChatFeature.aiFeaturesNativeControls().setRawStoredState(State(enable = false))
             testee = DuckChatSettingsViewModel(
                 duckChatActivityParams = DuckChatNativeSettingsNoParams,
                 duckChat = duckChat,
@@ -555,6 +624,7 @@ class DuckChatSettingsViewModelTest {
                 duckChatPixels = mockDuckChatPixels,
                 dispatcherProvider = coroutineRule.testDispatcherProvider,
                 duckChatFeature = duckChatFeature,
+                serpSettingsDataProvider = serpSettingsDataProvider,
             )
 
             testee.viewState.test {
@@ -564,7 +634,30 @@ class DuckChatSettingsViewModelTest {
         }
 
     @Test
-    fun `when onDuckAiHideAiGeneratedImagesClicked then pixel is fired`() =
+    fun `when DuckChatNativeSettingsNoParams passed and aiFeaturesNativeControls enabled then viewState shows search section visible`() =
+        runTest {
+            @Suppress("DenyListedApi")
+            duckChatFeature.aiFeaturesNativeControls().setRawStoredState(State(enable = true))
+            testee = DuckChatSettingsViewModel(
+                duckChatActivityParams = DuckChatNativeSettingsNoParams,
+                duckChat = duckChat,
+                pixel = mockPixel,
+                inputScreenDiscoveryFunnel = mockInputScreenDiscoveryFunnel,
+                settingsPageFeature = settingsPageFeature,
+                duckChatPixels = mockDuckChatPixels,
+                dispatcherProvider = coroutineRule.testDispatcherProvider,
+                duckChatFeature = duckChatFeature,
+                serpSettingsDataProvider = serpSettingsDataProvider,
+            )
+
+            testee.viewState.test {
+                val state = awaitItem()
+                assertTrue(state.isSearchSectionVisible)
+            }
+        }
+
+    @Test
+    fun `when onDuckAiHideAiGeneratedImagesClicked and native controls disabled then SERP open pixel is fired`() =
         runTest {
             testee.onDuckAiHideAiGeneratedImagesClicked()
             verify(mockPixel).fire(DuckChatPixelName.SERP_SETTINGS_OPEN_HIDE_AI_GENERATED_IMAGES)
@@ -584,6 +677,368 @@ class DuckChatSettingsViewModelTest {
                     command.link,
                 )
                 assertEquals(R.string.duckAiSerpSettingsTitle, command.titleRes)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `when onHideAiGeneratedImagesLearnMoreClicked then OpenLink command with learn more link is emitted`() =
+        runTest {
+            testee.onHideAiGeneratedImagesLearnMoreClicked()
+
+            testee.commands.test {
+                val command = awaitItem()
+                assertTrue(command is OpenLink)
+                command as OpenLink
+                assertEquals(
+                    DuckChatSettingsViewModel.DUCK_CHAT_HIDE_GENERATED_IMAGES_LEARN_MORE_LINK,
+                    command.link,
+                )
+                assertEquals(R.string.duckAiDialogHideAiGeneratedImagesTitle, command.titleRes)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `when onDuckAiHideAiGeneratedImagesClicked and native controls enabled then ShowHideAiGeneratedImagesDialog emitted`() =
+        runTest {
+            @Suppress("DenyListedApi")
+            duckChatFeature.aiFeaturesNativeControls().setRawStoredState(State(enable = true))
+            whenever(serpSettingsDataProvider.observeSetting(HideAiGeneratedImages.SERP_SETTINGS_KEY))
+                .thenReturn(flowOf(HideAiGeneratedImages.ON.serpCode))
+            testee = DuckChatSettingsViewModel(
+                duckChatActivityParams = DuckChatSettingsNoParams,
+                duckChat = duckChat,
+                pixel = mockPixel,
+                inputScreenDiscoveryFunnel = mockInputScreenDiscoveryFunnel,
+                settingsPageFeature = settingsPageFeature,
+                duckChatPixels = mockDuckChatPixels,
+                dispatcherProvider = coroutineRule.testDispatcherProvider,
+                duckChatFeature = duckChatFeature,
+                serpSettingsDataProvider = serpSettingsDataProvider,
+            )
+
+            testee.viewState.test {
+                awaitItem()
+                testee.onDuckAiHideAiGeneratedImagesClicked()
+
+                testee.commands.test {
+                    val command = awaitItem()
+                    assertTrue(command is ShowHideAiGeneratedImagesDialog)
+                    assertEquals(HideAiGeneratedImages.ON, (command as ShowHideAiGeneratedImagesDialog).current)
+                    cancelAndIgnoreRemainingEvents()
+                }
+            }
+
+            // The SERP-open pixel must not fire for the native dialog; it only tracks opening the SERP webview.
+            verify(mockPixel, never()).fire(DuckChatPixelName.SERP_SETTINGS_OPEN_HIDE_AI_GENERATED_IMAGES)
+        }
+
+    @Test
+    fun `when hide ai generated images selected then persisted to SERP settings`() =
+        runTest {
+            testee.onHideAiGeneratedImagesSelected(HideAiGeneratedImages.ON)
+            verify(serpSettingsDataProvider).setSetting(HideAiGeneratedImages.SERP_SETTINGS_KEY, HideAiGeneratedImages.ON.serpCode)
+        }
+
+    @Test
+    fun `when onUseWithoutAiClicked then ai_features_disabled count and daily fired`() =
+        runTest {
+            testee.onUseWithoutAiClicked()
+            verify(mockPixel).fire(DuckChatPixelName.AI_FEATURES_DISABLED_COUNT)
+            verify(mockPixel).fire(DuckChatPixelName.AI_FEATURES_DISABLED_DAILY, type = Pixel.PixelType.Daily())
+        }
+
+    @Test
+    fun `when search assist set to never then never count and daily fired`() =
+        runTest {
+            testee.onSearchAssistVisibilitySelected(SearchAssistVisibility.NEVER)
+            verify(mockPixel).fire(DuckChatPixelName.AI_FEATURES_SEARCH_ASSIST_NEVER_COUNT)
+            verify(mockPixel).fire(DuckChatPixelName.AI_FEATURES_SEARCH_ASSIST_NEVER_DAILY, type = Pixel.PixelType.Daily())
+        }
+
+    @Test
+    fun `when search assist set to on demand then on_demand count and daily fired`() =
+        runTest {
+            testee.onSearchAssistVisibilitySelected(SearchAssistVisibility.ON_DEMAND)
+            verify(mockPixel).fire(DuckChatPixelName.AI_FEATURES_SEARCH_ASSIST_ON_DEMAND_COUNT)
+            verify(mockPixel).fire(DuckChatPixelName.AI_FEATURES_SEARCH_ASSIST_ON_DEMAND_DAILY, type = Pixel.PixelType.Daily())
+        }
+
+    @Test
+    fun `when search assist set to sometimes from a different value then sometimes count and daily fired`() =
+        runTest {
+            whenever(serpSettingsDataProvider.observeSetting(SearchAssistVisibility.SERP_SETTINGS_KEY))
+                .thenReturn(flowOf(SearchAssistVisibility.NEVER.serpCode))
+            testee = DuckChatSettingsViewModel(
+                duckChatActivityParams = DuckChatSettingsNoParams,
+                duckChat = duckChat,
+                pixel = mockPixel,
+                inputScreenDiscoveryFunnel = mockInputScreenDiscoveryFunnel,
+                settingsPageFeature = settingsPageFeature,
+                duckChatPixels = mockDuckChatPixels,
+                dispatcherProvider = coroutineRule.testDispatcherProvider,
+                duckChatFeature = duckChatFeature,
+                serpSettingsDataProvider = serpSettingsDataProvider,
+            )
+
+            testee.viewState.test {
+                var state = awaitItem()
+                while (state.searchAssistVisibility != SearchAssistVisibility.NEVER) {
+                    state = awaitItem()
+                }
+                testee.onSearchAssistVisibilitySelected(SearchAssistVisibility.SOMETIMES)
+                cancelAndIgnoreRemainingEvents()
+            }
+
+            verify(mockPixel).fire(DuckChatPixelName.AI_FEATURES_SEARCH_ASSIST_SOMETIMES_COUNT)
+            verify(mockPixel).fire(DuckChatPixelName.AI_FEATURES_SEARCH_ASSIST_SOMETIMES_DAILY, type = Pixel.PixelType.Daily())
+        }
+
+    @Test
+    fun `when search assist re-selected with same value then no count or daily pixel and still persisted`() =
+        runTest {
+            // Default current value is Sometimes; re-selecting it must not fire telemetry but must still persist.
+            testee.onSearchAssistVisibilitySelected(SearchAssistVisibility.SOMETIMES)
+
+            verify(mockPixel, never()).fire(DuckChatPixelName.AI_FEATURES_SEARCH_ASSIST_SOMETIMES_COUNT)
+            verify(mockPixel, never()).fire(DuckChatPixelName.AI_FEATURES_SEARCH_ASSIST_SOMETIMES_DAILY, type = Pixel.PixelType.Daily())
+            verify(serpSettingsDataProvider).setSetting(SearchAssistVisibility.SERP_SETTINGS_KEY, SearchAssistVisibility.SOMETIMES.serpCode)
+        }
+
+    @Test
+    fun `when search assist set to often then often count and daily fired`() =
+        runTest {
+            testee.onSearchAssistVisibilitySelected(SearchAssistVisibility.OFTEN)
+            verify(mockPixel).fire(DuckChatPixelName.AI_FEATURES_SEARCH_ASSIST_OFTEN_COUNT)
+            verify(mockPixel).fire(DuckChatPixelName.AI_FEATURES_SEARCH_ASSIST_OFTEN_DAILY, type = Pixel.PixelType.Daily())
+        }
+
+    @Test
+    fun `when hide images selected on then hide_images_on count and daily fired`() =
+        runTest {
+            testee.onHideAiGeneratedImagesSelected(HideAiGeneratedImages.ON)
+            verify(mockPixel).fire(DuckChatPixelName.AI_FEATURES_HIDE_IMAGES_ON_COUNT)
+            verify(mockPixel).fire(DuckChatPixelName.AI_FEATURES_HIDE_IMAGES_ON_DAILY, type = Pixel.PixelType.Daily())
+        }
+
+    @Test
+    fun `when hide images set to off from a different value then hide_images_off count and daily fired`() =
+        runTest {
+            whenever(serpSettingsDataProvider.observeSetting(HideAiGeneratedImages.SERP_SETTINGS_KEY))
+                .thenReturn(flowOf(HideAiGeneratedImages.ON.serpCode))
+            testee = DuckChatSettingsViewModel(
+                duckChatActivityParams = DuckChatSettingsNoParams,
+                duckChat = duckChat,
+                pixel = mockPixel,
+                inputScreenDiscoveryFunnel = mockInputScreenDiscoveryFunnel,
+                settingsPageFeature = settingsPageFeature,
+                duckChatPixels = mockDuckChatPixels,
+                dispatcherProvider = coroutineRule.testDispatcherProvider,
+                duckChatFeature = duckChatFeature,
+                serpSettingsDataProvider = serpSettingsDataProvider,
+            )
+
+            testee.viewState.test {
+                var state = awaitItem()
+                while (state.hideAiGeneratedImages != HideAiGeneratedImages.ON) {
+                    state = awaitItem()
+                }
+                testee.onHideAiGeneratedImagesSelected(HideAiGeneratedImages.OFF)
+                cancelAndIgnoreRemainingEvents()
+            }
+
+            verify(mockPixel).fire(DuckChatPixelName.AI_FEATURES_HIDE_IMAGES_OFF_COUNT)
+            verify(mockPixel).fire(DuckChatPixelName.AI_FEATURES_HIDE_IMAGES_OFF_DAILY, type = Pixel.PixelType.Daily())
+        }
+
+    @Test
+    fun `when hide images re-selected with same value then no count or daily pixel and still persisted`() =
+        runTest {
+            // Default current value is Off; re-selecting it must not fire telemetry but must still persist.
+            testee.onHideAiGeneratedImagesSelected(HideAiGeneratedImages.OFF)
+
+            verify(mockPixel, never()).fire(DuckChatPixelName.AI_FEATURES_HIDE_IMAGES_OFF_COUNT)
+            verify(mockPixel, never()).fire(DuckChatPixelName.AI_FEATURES_HIDE_IMAGES_OFF_DAILY, type = Pixel.PixelType.Daily())
+            verify(serpSettingsDataProvider).setSetting(HideAiGeneratedImages.SERP_SETTINGS_KEY, HideAiGeneratedImages.OFF.serpCode)
+        }
+
+    @Test
+    fun `when onUseWithoutAiClicked and duck chat enabled then duck chat user setting disabled`() =
+        runTest {
+            // Duck.ai is enabled by default in setUp(); collect viewState so the gate sees isDuckChatUserEnabled = true.
+            testee.viewState.test {
+                var state = awaitItem()
+                while (!state.isDuckChatUserEnabled) {
+                    state = awaitItem()
+                }
+                testee.onUseWithoutAiClicked()
+                cancelAndIgnoreRemainingEvents()
+            }
+            verify(duckChat).setEnableDuckChatUserSetting(false)
+        }
+
+    @Test
+    fun `when onUseWithoutAiClicked and duck chat enabled then disabled pixel fired`() =
+        runTest {
+            testee.viewState.test {
+                var state = awaitItem()
+                while (!state.isDuckChatUserEnabled) {
+                    state = awaitItem()
+                }
+                testee.onUseWithoutAiClicked()
+                cancelAndIgnoreRemainingEvents()
+            }
+            verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_USER_DISABLED)
+        }
+
+    @Test
+    fun `when onUseWithoutAiClicked and duck chat already off then no disable pixel or write`() =
+        runTest {
+            // Duck.ai already off, but the action is still reachable because Search Assist is not Never.
+            whenever(duckChat.observeEnableDuckChatUserSetting()).thenReturn(flowOf(false))
+            whenever(serpSettingsDataProvider.observeSetting(SearchAssistVisibility.SERP_SETTINGS_KEY))
+                .thenReturn(flowOf(SearchAssistVisibility.SOMETIMES.serpCode))
+            testee = DuckChatSettingsViewModel(
+                duckChatActivityParams = DuckChatSettingsNoParams,
+                duckChat = duckChat,
+                pixel = mockPixel,
+                inputScreenDiscoveryFunnel = mockInputScreenDiscoveryFunnel,
+                settingsPageFeature = settingsPageFeature,
+                duckChatPixels = mockDuckChatPixels,
+                dispatcherProvider = coroutineRule.testDispatcherProvider,
+                duckChatFeature = duckChatFeature,
+                serpSettingsDataProvider = serpSettingsDataProvider,
+            )
+
+            testee.viewState.test {
+                // Resolve to the off state before acting.
+                var state = awaitItem()
+                while (state.isDuckChatUserEnabled) {
+                    state = awaitItem()
+                }
+                testee.onUseWithoutAiClicked()
+                cancelAndIgnoreRemainingEvents()
+            }
+
+            verify(mockPixel, never()).fire(DuckChatPixelName.DUCK_CHAT_USER_DISABLED)
+            verify(duckChat, never()).setEnableDuckChatUserSetting(false)
+        }
+
+    @Test
+    fun `when onUseWithoutAiClicked then search assist visibility set to never in SERP settings`() =
+        runTest {
+            testee.onUseWithoutAiClicked()
+            verify(serpSettingsDataProvider).setSetting(SearchAssistVisibility.SERP_SETTINGS_KEY, SearchAssistVisibility.NEVER.serpCode)
+        }
+
+    @Test
+    fun `when onUseWithoutAiClicked then hide ai generated images set to on in SERP settings`() =
+        runTest {
+            testee.onUseWithoutAiClicked()
+            verify(serpSettingsDataProvider).setSetting(HideAiGeneratedImages.SERP_SETTINGS_KEY, HideAiGeneratedImages.ON.serpCode)
+        }
+
+    @Test
+    fun `when duck chat off and search assist never and images hidden then use without ai action disabled`() =
+        runTest {
+            whenever(duckChat.observeEnableDuckChatUserSetting()).thenReturn(flowOf(false))
+            whenever(serpSettingsDataProvider.observeSetting(SearchAssistVisibility.SERP_SETTINGS_KEY))
+                .thenReturn(flowOf(SearchAssistVisibility.NEVER.serpCode))
+            whenever(serpSettingsDataProvider.observeSetting(HideAiGeneratedImages.SERP_SETTINGS_KEY))
+                .thenReturn(flowOf(HideAiGeneratedImages.ON.serpCode))
+            testee = DuckChatSettingsViewModel(
+                duckChatActivityParams = DuckChatSettingsNoParams,
+                duckChat = duckChat,
+                pixel = mockPixel,
+                inputScreenDiscoveryFunnel = mockInputScreenDiscoveryFunnel,
+                settingsPageFeature = settingsPageFeature,
+                duckChatPixels = mockDuckChatPixels,
+                dispatcherProvider = coroutineRule.testDispatcherProvider,
+                duckChatFeature = duckChatFeature,
+                serpSettingsDataProvider = serpSettingsDataProvider,
+            )
+
+            testee.viewState.test {
+                assertFalse(awaitItem().isUseWithoutAiActionEnabled)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `when duck chat on but search assist never and images hidden then use without ai action enabled`() =
+        runTest {
+            whenever(duckChat.observeEnableDuckChatUserSetting()).thenReturn(flowOf(true))
+            whenever(serpSettingsDataProvider.observeSetting(SearchAssistVisibility.SERP_SETTINGS_KEY))
+                .thenReturn(flowOf(SearchAssistVisibility.NEVER.serpCode))
+            whenever(serpSettingsDataProvider.observeSetting(HideAiGeneratedImages.SERP_SETTINGS_KEY))
+                .thenReturn(flowOf(HideAiGeneratedImages.ON.serpCode))
+            testee = DuckChatSettingsViewModel(
+                duckChatActivityParams = DuckChatSettingsNoParams,
+                duckChat = duckChat,
+                pixel = mockPixel,
+                inputScreenDiscoveryFunnel = mockInputScreenDiscoveryFunnel,
+                settingsPageFeature = settingsPageFeature,
+                duckChatPixels = mockDuckChatPixels,
+                dispatcherProvider = coroutineRule.testDispatcherProvider,
+                duckChatFeature = duckChatFeature,
+                serpSettingsDataProvider = serpSettingsDataProvider,
+            )
+
+            testee.viewState.test {
+                assertTrue(awaitItem().isUseWithoutAiActionEnabled)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `when duck chat off but search assist not never then use without ai action enabled`() =
+        runTest {
+            whenever(duckChat.observeEnableDuckChatUserSetting()).thenReturn(flowOf(false))
+            whenever(serpSettingsDataProvider.observeSetting(SearchAssistVisibility.SERP_SETTINGS_KEY))
+                .thenReturn(flowOf(SearchAssistVisibility.OFTEN.serpCode))
+            whenever(serpSettingsDataProvider.observeSetting(HideAiGeneratedImages.SERP_SETTINGS_KEY))
+                .thenReturn(flowOf(HideAiGeneratedImages.ON.serpCode))
+            testee = DuckChatSettingsViewModel(
+                duckChatActivityParams = DuckChatSettingsNoParams,
+                duckChat = duckChat,
+                pixel = mockPixel,
+                inputScreenDiscoveryFunnel = mockInputScreenDiscoveryFunnel,
+                settingsPageFeature = settingsPageFeature,
+                duckChatPixels = mockDuckChatPixels,
+                dispatcherProvider = coroutineRule.testDispatcherProvider,
+                duckChatFeature = duckChatFeature,
+                serpSettingsDataProvider = serpSettingsDataProvider,
+            )
+
+            testee.viewState.test {
+                assertTrue(awaitItem().isUseWithoutAiActionEnabled)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `when duck chat off and search assist never but images not hidden then use without ai action enabled`() =
+        runTest {
+            whenever(duckChat.observeEnableDuckChatUserSetting()).thenReturn(flowOf(false))
+            whenever(serpSettingsDataProvider.observeSetting(SearchAssistVisibility.SERP_SETTINGS_KEY))
+                .thenReturn(flowOf(SearchAssistVisibility.NEVER.serpCode))
+            whenever(serpSettingsDataProvider.observeSetting(HideAiGeneratedImages.SERP_SETTINGS_KEY))
+                .thenReturn(flowOf(HideAiGeneratedImages.OFF.serpCode))
+            testee = DuckChatSettingsViewModel(
+                duckChatActivityParams = DuckChatSettingsNoParams,
+                duckChat = duckChat,
+                pixel = mockPixel,
+                inputScreenDiscoveryFunnel = mockInputScreenDiscoveryFunnel,
+                settingsPageFeature = settingsPageFeature,
+                duckChatPixels = mockDuckChatPixels,
+                dispatcherProvider = coroutineRule.testDispatcherProvider,
+                duckChatFeature = duckChatFeature,
+                serpSettingsDataProvider = serpSettingsDataProvider,
+            )
+
+            testee.viewState.test {
+                assertTrue(awaitItem().isUseWithoutAiActionEnabled)
                 cancelAndIgnoreRemainingEvents()
             }
         }
@@ -623,6 +1078,7 @@ class DuckChatSettingsViewModelTest {
                 duckChatPixels = mockDuckChatPixels,
                 dispatcherProvider = coroutineRule.testDispatcherProvider,
                 duckChatFeature = duckChatFeature,
+                serpSettingsDataProvider = serpSettingsDataProvider,
             )
 
             testee.viewState.test {
@@ -643,6 +1099,7 @@ class DuckChatSettingsViewModelTest {
                 duckChatPixels = mockDuckChatPixels,
                 dispatcherProvider = coroutineRule.testDispatcherProvider,
                 duckChatFeature = duckChatFeature,
+                serpSettingsDataProvider = serpSettingsDataProvider,
             )
 
             testee.viewState.test {
@@ -666,6 +1123,7 @@ class DuckChatSettingsViewModelTest {
                 duckChatPixels = mockDuckChatPixels,
                 dispatcherProvider = coroutineRule.testDispatcherProvider,
                 duckChatFeature = duckChatFeature,
+                serpSettingsDataProvider = serpSettingsDataProvider,
             )
 
             testee.viewState.test {
@@ -689,6 +1147,7 @@ class DuckChatSettingsViewModelTest {
                 duckChatPixels = mockDuckChatPixels,
                 dispatcherProvider = coroutineRule.testDispatcherProvider,
                 duckChatFeature = duckChatFeature,
+                serpSettingsDataProvider = serpSettingsDataProvider,
             )
 
             testee.viewState.test {
@@ -711,6 +1170,7 @@ class DuckChatSettingsViewModelTest {
                 duckChatPixels = mockDuckChatPixels,
                 dispatcherProvider = coroutineRule.testDispatcherProvider,
                 duckChatFeature = duckChatFeature,
+                serpSettingsDataProvider = serpSettingsDataProvider,
             )
 
             testee.viewState.test {
@@ -735,6 +1195,7 @@ class DuckChatSettingsViewModelTest {
                 duckChatPixels = mockDuckChatPixels,
                 dispatcherProvider = coroutineRule.testDispatcherProvider,
                 duckChatFeature = duckChatFeature,
+                serpSettingsDataProvider = serpSettingsDataProvider,
             )
 
             testee.viewState.test {
@@ -759,6 +1220,7 @@ class DuckChatSettingsViewModelTest {
                 duckChatPixels = mockDuckChatPixels,
                 dispatcherProvider = coroutineRule.testDispatcherProvider,
                 duckChatFeature = duckChatFeature,
+                serpSettingsDataProvider = serpSettingsDataProvider,
             )
 
             testee.viewState.test {
@@ -783,6 +1245,7 @@ class DuckChatSettingsViewModelTest {
                 duckChatPixels = mockDuckChatPixels,
                 dispatcherProvider = coroutineRule.testDispatcherProvider,
                 duckChatFeature = duckChatFeature,
+                serpSettingsDataProvider = serpSettingsDataProvider,
             )
 
             testee.viewState.test {
@@ -807,6 +1270,7 @@ class DuckChatSettingsViewModelTest {
                 duckChatPixels = mockDuckChatPixels,
                 dispatcherProvider = coroutineRule.testDispatcherProvider,
                 duckChatFeature = duckChatFeature,
+                serpSettingsDataProvider = serpSettingsDataProvider,
             )
 
             testee.viewState.test {
@@ -831,6 +1295,7 @@ class DuckChatSettingsViewModelTest {
                 duckChatPixels = mockDuckChatPixels,
                 dispatcherProvider = coroutineRule.testDispatcherProvider,
                 duckChatFeature = duckChatFeature,
+                serpSettingsDataProvider = serpSettingsDataProvider,
             )
 
             testee.viewState.test {
@@ -851,6 +1316,7 @@ class DuckChatSettingsViewModelTest {
                 duckChatPixels = mockDuckChatPixels,
                 dispatcherProvider = coroutineRule.testDispatcherProvider,
                 duckChatFeature = duckChatFeature,
+                serpSettingsDataProvider = serpSettingsDataProvider,
             )
 
             testee.viewState.test {
@@ -887,5 +1353,95 @@ class DuckChatSettingsViewModelTest {
                 parameters = mapOf(DuckChatPixelParameters.DEFAULT_TOGGLE_POSITION_VALUE to "duckAI"),
                 type = Pixel.PixelType.Daily(),
             )
+        }
+
+    @Test
+    fun `when no search assist visibility synced then viewState defaults to SOMETIMES`() =
+        runTest {
+            testee.viewState.test {
+                assertEquals(SearchAssistVisibility.SOMETIMES, awaitItem().searchAssistVisibility)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `when search assist settings clicked and native controls enabled and no value synced then ShowSearchAssistDialog defaults to SOMETIMES`() =
+        runTest {
+            @Suppress("DenyListedApi")
+            duckChatFeature.aiFeaturesNativeControls().setRawStoredState(State(enable = true))
+
+            testee.viewState.test {
+                awaitItem()
+                testee.duckChatSearchAISettingsClicked()
+
+                testee.commands.test {
+                    val command = awaitItem()
+                    assertTrue(command is ShowSearchAssistDialog)
+                    assertEquals(SearchAssistVisibility.SOMETIMES, (command as ShowSearchAssistDialog).currentVisibility)
+                    cancelAndIgnoreRemainingEvents()
+                }
+            }
+        }
+
+    @Test
+    fun `when search assist visibility selected then persisted to SERP settings`() =
+        runTest {
+            testee.onSearchAssistVisibilitySelected(SearchAssistVisibility.OFTEN)
+            verify(serpSettingsDataProvider).setSetting(SearchAssistVisibility.SERP_SETTINGS_KEY, SearchAssistVisibility.OFTEN.serpCode)
+        }
+
+    @Test
+    fun `when search assist visibility already stored then viewState reflects it`() =
+        runTest {
+            whenever(serpSettingsDataProvider.observeSetting(SearchAssistVisibility.SERP_SETTINGS_KEY))
+                .thenReturn(flowOf(SearchAssistVisibility.SOMETIMES.serpCode))
+            testee = DuckChatSettingsViewModel(
+                duckChatActivityParams = DuckChatSettingsNoParams,
+                duckChat = duckChat,
+                pixel = mockPixel,
+                inputScreenDiscoveryFunnel = mockInputScreenDiscoveryFunnel,
+                settingsPageFeature = settingsPageFeature,
+                duckChatPixels = mockDuckChatPixels,
+                dispatcherProvider = coroutineRule.testDispatcherProvider,
+                duckChatFeature = duckChatFeature,
+                serpSettingsDataProvider = serpSettingsDataProvider,
+            )
+
+            testee.viewState.test {
+                assertEquals(SearchAssistVisibility.SOMETIMES, awaitItem().searchAssistVisibility)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `when search assist visibility already stored then ShowSearchAssistDialog carries current visibility`() =
+        runTest {
+            @Suppress("DenyListedApi")
+            duckChatFeature.aiFeaturesNativeControls().setRawStoredState(State(enable = true))
+            whenever(serpSettingsDataProvider.observeSetting(SearchAssistVisibility.SERP_SETTINGS_KEY))
+                .thenReturn(flowOf(SearchAssistVisibility.SOMETIMES.serpCode))
+            testee = DuckChatSettingsViewModel(
+                duckChatActivityParams = DuckChatSettingsNoParams,
+                duckChat = duckChat,
+                pixel = mockPixel,
+                inputScreenDiscoveryFunnel = mockInputScreenDiscoveryFunnel,
+                settingsPageFeature = settingsPageFeature,
+                duckChatPixels = mockDuckChatPixels,
+                dispatcherProvider = coroutineRule.testDispatcherProvider,
+                duckChatFeature = duckChatFeature,
+                serpSettingsDataProvider = serpSettingsDataProvider,
+            )
+
+            testee.viewState.test {
+                awaitItem()
+                testee.duckChatSearchAISettingsClicked()
+
+                testee.commands.test {
+                    val command = awaitItem()
+                    assertTrue(command is ShowSearchAssistDialog)
+                    assertEquals(SearchAssistVisibility.SOMETIMES, (command as ShowSearchAssistDialog).currentVisibility)
+                    cancelAndIgnoreRemainingEvents()
+                }
+            }
         }
 }

@@ -20,6 +20,7 @@ import com.duckduckgo.app.bookmarks.db.BookmarkFoldersDao
 import com.duckduckgo.app.bookmarks.db.BookmarksDao
 import com.duckduckgo.app.bookmarks.db.FavoritesDao
 import com.duckduckgo.app.browser.cookies.db.AuthCookiesAllowedDomainsDao
+import com.duckduckgo.app.browser.session.WebViewSessionDao
 import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.fire.db.FireModeDatabase
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteDao
@@ -137,4 +138,7 @@ object DaoModule {
 
     @Provides
     fun syncRelationsDao(database: AppDatabase): SavedSitesRelationsDao = database.syncRelationsDao()
+
+    @Provides
+    fun webViewSessionDao(database: AppDatabase): WebViewSessionDao = database.webViewSessionDao()
 }

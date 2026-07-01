@@ -33,6 +33,32 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <View
+        android:id="@+id/onboardingBackdropBrandDesign"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="?attr/onboardingSurfaceBackdrop"
+        android:importantForAccessibility="no"
+        android:theme="@style/ThemeOverlay.DuckDuckGo.Onboarding"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/onboardingBackgroundBrandDesign"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:adjustViewBounds="true"
+        android:importantForAccessibility="no"
+        android:maxHeight="@dimen/onboardingBackgroundMaxHeight"
+        android:scaleType="fitEnd"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
     <FrameLayout
         android:id="@+id/inputModeWidgetContainerTop"
         android:layout_width="0dp"
@@ -187,6 +213,20 @@
     <include
         android:id="@+id/duckAiEndCta"
         layout="@layout/include_duck_ai_end_cta"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:elevation="5dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHeight_default="wrap"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/inputModeWidgetContainerTop"
+        app:layout_constraintVertical_bias="0" />
+
+    <include
+        android:id="@+id/duckAiEndCtaBrandDesign"
+        layout="@layout/include_duck_ai_end_cta_brand_design_update"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:elevation="5dp"

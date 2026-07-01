@@ -42,6 +42,7 @@ class SubscriptionExpirationReminderSchedulerImpl @Inject constructor(
     private val workManager: WorkManager,
     private val notificationManager: NotificationManagerCompat,
     private val subscriptionsManager: SubscriptionsManager,
+    private val reminderStore: SubscriptionExpirationReminderStore,
 ) : SubscriptionExpirationReminderScheduler {
 
     override suspend fun scheduleReminderNotification(daysBeforeCancel: Int) {
@@ -54,6 +55,8 @@ class SubscriptionExpirationReminderSchedulerImpl @Inject constructor(
         val delayMillis = expiresOrRenewsAt - TimeUnit.DAYS.toMillis(daysBeforeCancel.toLong()) - System.currentTimeMillis()
         if (delayMillis <= 0) return
 
+        reminderStore.daysBeforeCancel = daysBeforeCancel
+
         val request = OneTimeWorkRequestBuilder<SubscriptionExpirationReminderWorker>()
             .addTag(EXPIRATION_REMINDER_WORK_TAG)
             .setInitialDelay(delayMillis, TimeUnit.MILLISECONDS)
@@ -64,6 +67,7 @@ class SubscriptionExpirationReminderSchedulerImpl @Inject constructor(
 
     override fun cancelScheduledNotification() {
         workManager.cancelAllWorkByTag(EXPIRATION_REMINDER_WORK_TAG)
+        reminderStore.daysBeforeCancel = null
     }
 
     companion object {

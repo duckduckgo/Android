@@ -205,6 +205,11 @@
                 "key": "urlParametersRemoved",
                 "description": "Whether URL parameters were removed.",
                 "enum": ["0", "1"]
+            },
+            {
+                "key": "breakageData",
+                "description": "Specific website breakage types (e.g., adwalls or captchas) detected by C-S-S.",
+                "type": "string"
             }
         ]
     },
@@ -343,6 +348,11 @@
             {
                 "key": "wvVersion",
                 "description": "User's runtime WebView version",
+                "type": "string"
+            },
+            {
+                "key": "breakageData",
+                "description": "Specific website breakage types (e.g., adwalls or captchas) detected by C-S-S.",
                 "type": "string"
             }
         ]
