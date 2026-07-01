@@ -36,6 +36,8 @@ import com.duckduckgo.anvil.annotations.ContributesActivePlugin
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.browser.api.ui.BrowserScreens.TabSwitcherScreenParams
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
@@ -61,6 +63,7 @@ import com.duckduckgo.remote.messaging.impl.newtab.RemoteMessageViewModel.Comman
 import com.duckduckgo.remote.messaging.impl.newtab.RemoteMessageViewModel.Command.LaunchDefaultBrowser
 import com.duckduckgo.remote.messaging.impl.newtab.RemoteMessageViewModel.Command.LaunchPlayStore
 import com.duckduckgo.remote.messaging.impl.newtab.RemoteMessageViewModel.Command.LaunchScreen
+import com.duckduckgo.remote.messaging.impl.newtab.RemoteMessageViewModel.Command.LaunchTabSwitcher
 import com.duckduckgo.remote.messaging.impl.newtab.RemoteMessageViewModel.Command.SharePromoLinkRMF
 import com.duckduckgo.remote.messaging.impl.newtab.RemoteMessageViewModel.Command.SubmitUrl
 import com.duckduckgo.remote.messaging.impl.newtab.RemoteMessageViewModel.ViewState
@@ -147,6 +150,7 @@ class RemoteMessageView @JvmOverloads constructor(
             is SharePromoLinkRMF -> launchSharePromoRMFPageChooser(command.url, command.shareTitle)
             is SubmitUrl -> submitUrl(command.url)
             is Command.LaunchDefaultCredentialProvider -> launchDefaultCredentialProvider()
+            is LaunchTabSwitcher -> launchTabSwitcher(command.browserMode)
         }
     }
 
@@ -226,6 +230,12 @@ class RemoteMessageView @JvmOverloads constructor(
     ) {
         context?.let {
             globalActivityStarter.start(it, DeeplinkActivityParams(screenName = screen, jsonArguments = payload), null)
+        }
+    }
+
+    private fun launchTabSwitcher(browserMode: BrowserMode) {
+        context?.let {
+            globalActivityStarter.start(it, TabSwitcherScreenParams(browserMode))
         }
     }
 

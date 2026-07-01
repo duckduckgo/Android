@@ -92,10 +92,9 @@ class NewTabPageViewModel @AssistedInject constructor(
     ) {
 
         private val isLoadingContent = favourites == null
-        private val hasContentThatDisplacesHomeLogo = onboardingComplete &&
-            message != null ||
-            favourites?.isNotEmpty() == true
         private val hasLowPriorityMessage = lowPriorityMessage != null
+        private val hasContentThatDisplacesHomeLogo = onboardingComplete && message != null ||
+            favourites?.isNotEmpty() == true
 
         val showFireTabEmptyState = isFireMode
         val shouldShowLogo = !isFireMode && !isLoadingContent && !hasContentThatDisplacesHomeLogo && showDaxLogo
@@ -126,6 +125,7 @@ class NewTabPageViewModel @AssistedInject constructor(
         ) : Command()
 
         data object LaunchDefaultCredentialProvider : Command()
+        data object LaunchTabSwitcherForFirePromo : Command()
     }
 
     private var lastRemoteMessageSeen: RemoteMessage? = null

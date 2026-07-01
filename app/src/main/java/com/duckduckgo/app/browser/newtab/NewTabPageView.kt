@@ -44,6 +44,7 @@ import com.duckduckgo.app.browser.newtab.NewTabPageViewModel.Command.LaunchDefau
 import com.duckduckgo.app.browser.newtab.NewTabPageViewModel.Command.LaunchDefaultCredentialProvider
 import com.duckduckgo.app.browser.newtab.NewTabPageViewModel.Command.LaunchPlayStore
 import com.duckduckgo.app.browser.newtab.NewTabPageViewModel.Command.LaunchScreen
+import com.duckduckgo.app.browser.newtab.NewTabPageViewModel.Command.LaunchTabSwitcherForFirePromo
 import com.duckduckgo.app.browser.newtab.NewTabPageViewModel.Command.SharePromoLinkRMF
 import com.duckduckgo.app.browser.newtab.NewTabPageViewModel.Command.SubmitUrl
 import com.duckduckgo.app.browser.newtab.NewTabPageViewModel.NewTabPageViewModelFactory
@@ -55,6 +56,8 @@ import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.browser.api.ui.BrowserScreens.TabSwitcherScreenParams
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
@@ -175,7 +178,7 @@ class NewTabPageView @JvmOverloads constructor(
             .launchIn(findViewTreeLifecycleOwner()?.lifecycleScope!!)
 
         conflatedNativeInputJob += duckChat.observeNativeInputFieldUserSettingEnabled()
-            .onEach { enabled -> updateLogoMargin(enabled) }
+            .onEach { enabled -> updateTopContentMargins(enabled) }
             .launchIn(findViewTreeLifecycleOwner()?.lifecycleScope!!)
 
         conflatedChatModeJob += inputModeState.displayedMode
@@ -248,12 +251,18 @@ class NewTabPageView @JvmOverloads constructor(
         }
     }
 
-    private fun updateLogoMargin(nativeInputEnabled: Boolean) {
+    private fun updateTopContentMargins(nativeInputEnabled: Boolean) {
+        // The native input widget overlays the top of the NTP, so push the logo and the message card
+        // down by the same amount to keep them clear of it — otherwise the promo / RMF card is covered.
         val baseMargin = resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.homeTabDdgLogoTopMargin)
         val extraMargin = if (nativeInputEnabled) 48.toPx() else 0
         (binding.ddgLogo.layoutParams as? MarginLayoutParams)?.let {
             it.topMargin = baseMargin + extraMargin
             binding.ddgLogo.requestLayout()
+        }
+        (binding.messageCta.layoutParams as? MarginLayoutParams)?.let {
+            it.topMargin = extraMargin
+            binding.messageCta.requestLayout()
         }
     }
 
@@ -306,11 +315,17 @@ class NewTabPageView @JvmOverloads constructor(
             is SharePromoLinkRMF -> launchSharePromoRMFPageChooser(command.url, command.shareTitle)
             is SubmitUrl -> submitUrl(command.url)
             is LaunchDefaultCredentialProvider -> launchDefaultCredentialProvider()
+            is LaunchTabSwitcherForFirePromo -> launchTabSwitcherForFirePromo()
         }
     }
 
     private fun launchDefaultBrowser() {
         context.launchDefaultAppActivity()
+    }
+
+    private fun launchTabSwitcherForFirePromo() {
+        // Open the tab switcher in Fire mode; the switcher itself performs the mode switch on open.
+        context?.let { globalActivityStarter.start(it, TabSwitcherScreenParams(BrowserMode.FIRE)) }
     }
 
     @SuppressLint("DenyListedApi")

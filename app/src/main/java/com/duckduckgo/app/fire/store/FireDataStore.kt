@@ -18,6 +18,7 @@ package com.duckduckgo.app.fire.store
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.core.stringSetPreferencesKey
@@ -120,6 +121,11 @@ interface FireDataStore {
      * @param option The option determining when to automatically clear data.
      */
     suspend fun setAutomaticallyClearWhenOption(option: ClearWhenOption)
+
+    suspend fun setTabSwitcherPromoDismissed(dismissed: Boolean)
+    suspend fun isTabSwitcherPromoDismissed(): Boolean
+    suspend fun setUsedFireMode(used: Boolean)
+    suspend fun hasUsedFireMode(): Boolean
 }
 
 @ContributesBinding(AppScope::class)
@@ -135,6 +141,8 @@ class SharedPreferencesFireDataStore @Inject constructor(
         val KEY_AUTOMATIC_CLEAR_OPTIONS = stringSetPreferencesKey(name = "AUTOMATIC_CLEAR_OPTIONS")
         val KEY_AUTOMATIC_CLEAR_WHEN_OPTION = stringPreferencesKey(name = "AUTOMATIC_CLEAR_WHEN_OPTION")
         val DEFAULT_OPTIONS = setOf(FireClearOption.TABS, FireClearOption.DATA)
+        val KEY_FIRE_TABS_TAB_SWITCHER_PROMO_DISMISSED = booleanPreferencesKey(name = "FIRE_TABS_TAB_SWITCHER_PROMO_DISMISSED")
+        val KEY_FIRE_TABS_USED_FIRE_MODE = booleanPreferencesKey(name = "FIRE_TABS_USED_FIRE_MODE")
     }
 
     private suspend fun getLegacyOptions(): Set<FireClearOption> = withContext(dispatcherProvider.io()) {
@@ -260,6 +268,20 @@ class SharedPreferencesFireDataStore @Inject constructor(
             preferences[KEY_AUTOMATIC_CLEAR_WHEN_OPTION] = option.name
         }
     }
+
+    override suspend fun setTabSwitcherPromoDismissed(dismissed: Boolean) {
+        store.edit { it[KEY_FIRE_TABS_TAB_SWITCHER_PROMO_DISMISSED] = dismissed }
+    }
+
+    override suspend fun isTabSwitcherPromoDismissed(): Boolean =
+        store.data.map { it[KEY_FIRE_TABS_TAB_SWITCHER_PROMO_DISMISSED] ?: false }.firstOrNull() ?: false
+
+    override suspend fun setUsedFireMode(used: Boolean) {
+        store.edit { it[KEY_FIRE_TABS_USED_FIRE_MODE] = used }
+    }
+
+    override suspend fun hasUsedFireMode(): Boolean =
+        store.data.map { it[KEY_FIRE_TABS_USED_FIRE_MODE] ?: false }.firstOrNull() ?: false
 
     private fun parseOptionsFromStrings(stringSet: Set<String>): Set<FireClearOption> {
         return stringSet.mapNotNull { name ->
