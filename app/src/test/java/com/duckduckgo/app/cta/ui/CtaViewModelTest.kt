@@ -205,6 +205,7 @@ class CtaViewModelTest {
         whenever(mockCustomAiOnboarding.isEnabled()).thenReturn(false)
         whenever(mockOnboardingBrandDesignUpdateToggles.brandDesignUpdate()).thenReturn(mockDisabledToggle)
         whenever(mockOnboardingBrandDesignUpdateToggles.onboardingImprovements()).thenReturn(mockEnabledToggle)
+        whenever(mockOnboardingBrandDesignUpdateToggles.onboardingImprovementsV2()).thenReturn(mockEnabledToggle)
 
         testee = CtaViewModel(
             appInstallStore = mockAppInstallStore,
@@ -1132,6 +1133,30 @@ class CtaViewModelTest {
     }
 
     @Test
+    fun whenOnboardingImprovementsV2DisabledThenVisitSiteBrandCtaHasV2FlagFalse() = runTest {
+        givenDaxOnboardingActive()
+        whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO)).thenReturn(true)
+        whenever(mockOnboardingBrandDesignUpdateToggles.brandDesignUpdate()).thenReturn(mockEnabledToggle)
+        whenever(mockOnboardingBrandDesignUpdateToggles.onboardingImprovementsV2()).thenReturn(mockDisabledToggle)
+
+        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false, detectedRefreshPatterns = detectedRefreshPatterns)
+        assertTrue(value is DaxVisitSiteOptionsBrandDesignUpdateBubbleCta)
+        assertFalse((value as DaxVisitSiteOptionsBrandDesignUpdateBubbleCta).onboardingImprovementsV2Enabled)
+    }
+
+    @Test
+    fun whenOnboardingImprovementsV2EnabledThenVisitSiteBrandCtaHasV2FlagTrue() = runTest {
+        givenDaxOnboardingActive()
+        whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO)).thenReturn(true)
+        whenever(mockOnboardingBrandDesignUpdateToggles.brandDesignUpdate()).thenReturn(mockEnabledToggle)
+        whenever(mockOnboardingBrandDesignUpdateToggles.onboardingImprovementsV2()).thenReturn(mockEnabledToggle)
+
+        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false, detectedRefreshPatterns = detectedRefreshPatterns)
+        assertTrue(value is DaxVisitSiteOptionsBrandDesignUpdateBubbleCta)
+        assertTrue((value as DaxVisitSiteOptionsBrandDesignUpdateBubbleCta).onboardingImprovementsV2Enabled)
+    }
+
+    @Test
     fun whenBrandDesignUpdateToggleDisabledThenReturnVisitSiteLegacyCta() = runTest {
         givenDaxOnboardingActive()
         whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO)).thenReturn(true)
@@ -1484,6 +1509,7 @@ class CtaViewModelTest {
             isLightTheme = true,
             deviceInfo = mockDeviceInfo,
             isCustomAiOnboardingFlow = false,
+            onboardingImprovementsV2Enabled = true,
         )
         testee.onCtaShown(cta)
 
@@ -1498,6 +1524,7 @@ class CtaViewModelTest {
             isLightTheme = true,
             deviceInfo = mockDeviceInfo,
             isCustomAiOnboardingFlow = true,
+            onboardingImprovementsV2Enabled = true,
         )
         assertEquals(R.string.onboardingEndCustomAiFlowDaxDialogDescription, cta.description)
     }
@@ -1510,6 +1537,7 @@ class CtaViewModelTest {
             isLightTheme = true,
             deviceInfo = mockDeviceInfo,
             isCustomAiOnboardingFlow = false,
+            onboardingImprovementsV2Enabled = true,
         )
         assertEquals(R.string.onboardingDuckAiEndCtaDescription, cta.description)
     }

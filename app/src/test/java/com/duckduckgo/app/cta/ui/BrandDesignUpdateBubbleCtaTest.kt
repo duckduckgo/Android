@@ -80,6 +80,17 @@ class BrandDesignUpdateBubbleCtaTest {
     }
 
     @Test
+    fun applyWavingDaxState_notPhoneLandscape_passesImprovementsDisabled_whenV2Disabled() {
+        configureContainerForPhonePortrait()
+        val cta = TestableBubbleCta(onboardingImprovementsEnabled = true, onboardingImprovementsV2Enabled = false)
+        val showsWavingDax: DaxBubbleCta.ShowsWavingDax = mock()
+
+        cta.applyWavingDaxState(container, showsWavingDax)
+
+        verify(showsWavingDax).configureWavingDax(dax, mockDeviceInfo, false)
+    }
+
+    @Test
     fun applyWavingDaxState_notPhoneLandscape_playsDaxImmediately_whenImprovementsDisabled() {
         configureContainerForPhonePortrait()
         val cta = TestableBubbleCta(onboardingImprovementsEnabled = false)
@@ -194,6 +205,7 @@ class BrandDesignUpdateBubbleCtaTest {
             isCustomAiOnboardingFlow = false,
             isFreeTrialCopy = false,
             onboardingImprovementsEnabled = true,
+            onboardingImprovementsV2Enabled = true,
         )
 
         cta.configureWavingDax(dax, mockDeviceInfo)
@@ -214,6 +226,7 @@ class BrandDesignUpdateBubbleCtaTest {
             isLightTheme = true,
             deviceInfo = mockDeviceInfo,
             onboardingImprovementsEnabled = true,
+            onboardingImprovementsV2Enabled = true,
         )
 
         cta.configureWavingDax(dax, mockDeviceInfo)
@@ -234,6 +247,7 @@ class BrandDesignUpdateBubbleCtaTest {
             isCustomAiOnboardingFlow = false,
             isFreeTrialCopy = false,
             onboardingImprovementsEnabled = true,
+            onboardingImprovementsV2Enabled = true,
         )
 
         cta.configureWavingDax(dax, mockDeviceInfo)
@@ -281,6 +295,7 @@ class BrandDesignUpdateBubbleCtaTest {
             isCustomAiOnboardingFlow = false,
             isFreeTrialCopy = false,
             onboardingImprovementsEnabled = true,
+            onboardingImprovementsV2Enabled = true,
         )
 
         cta.configureWavingDax(dax, mockDeviceInfo, improvementsEnabled = false)
@@ -313,6 +328,7 @@ class BrandDesignUpdateBubbleCtaTest {
             isCustomAiOnboardingFlow = true,
             isFreeTrialCopy = false,
             onboardingImprovementsEnabled = true,
+            onboardingImprovementsV2Enabled = true,
         )
         assertEquals(R.string.onboardingPrivacyProCustomAiFlowDaxDialogDescription, cta.description)
     }
@@ -327,12 +343,14 @@ class BrandDesignUpdateBubbleCtaTest {
             isCustomAiOnboardingFlow = false,
             isFreeTrialCopy = false,
             onboardingImprovementsEnabled = true,
+            onboardingImprovementsV2Enabled = true,
         )
         assertEquals(R.string.onboardingPrivacyProDaxDialogDescription, cta.description)
     }
 
     private inner class TestableBubbleCta(
         onboardingImprovementsEnabled: Boolean = true,
+        onboardingImprovementsV2Enabled: Boolean = true,
     ) : DaxBubbleCta.BrandDesignUpdateBubbleCta(
         ctaId = CtaId.DAX_END,
         title = R.string.onboardingEndDaxDialogTitle,
@@ -345,6 +363,7 @@ class BrandDesignUpdateBubbleCtaTest {
         isLightTheme = true,
         deviceInfo = this@BrandDesignUpdateBubbleCtaTest.mockDeviceInfo,
         onboardingImprovementsEnabled = onboardingImprovementsEnabled,
+        onboardingImprovementsV2Enabled = onboardingImprovementsV2Enabled,
     ) {
         override val activeIncludeId: Int = R.id.primaryCta
         override val showArrow: Boolean = false

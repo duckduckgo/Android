@@ -2184,20 +2184,37 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
 
     private fun applyWalkingDaxLayout(): Boolean {
         releaseCardBottomInset()
-        val walkingDaxHeight = BrandDesignUpdateOnboardingLayoutHelper.calculateDecorationHeight(
-            rootView = binding.root,
-            dialogView = binding.daxDialogCta.root,
-            decorationView = binding.welcomeScreenWalkingDax,
-            maxHeightPx = WALKING_DAX_MAX_HEIGHT_DP.toPx(),
-            minHeightPx = WALKING_DAX_MIN_HEIGHT_DP.toPx(),
-        )
+        val v2 = viewModel.viewState.value.onboardingImprovementsV2Enabled
+        val walkingDaxHeight = if (v2) {
+            BrandDesignUpdateOnboardingLayoutHelper.calculateDecorationHeight(
+                rootView = binding.root,
+                dialogView = binding.daxDialogCta.root,
+                decorationView = binding.welcomeScreenWalkingDax,
+                maxHeightPx = WALKING_DAX_MAX_HEIGHT_DP.toPx(),
+                minHeightPx = WALKING_DAX_MIN_HEIGHT_DP.toPx(),
+            )
+        } else {
+            // TODO: remove when onboardingImprovementsV2 flag is removed
+            BrandDesignUpdateOnboardingLayoutHelper.calculateWalkingDaxHeight(
+                rootView = binding.root,
+                dialogView = binding.daxDialogCta.root,
+                daxView = binding.welcomeScreenWalkingDax,
+                maxHeightPx = WALKING_DAX_MAX_HEIGHT_DP.toPx(),
+                minHeightPx = WALKING_DAX_MIN_HEIGHT_DP.toPx(),
+            )
+        }
         if (walkingDaxHeight != null) {
             binding.welcomeScreenWalkingDax.updateLayoutParams { height = walkingDaxHeight }
-            decorationFitCorrector?.track(
-                binding.welcomeScreenWalkingDax,
-                minHeightPx = WALKING_DAX_MIN_HEIGHT_DP.toPx(),
-                maxHeightPx = WALKING_DAX_MAX_HEIGHT_DP.toPx(),
-            )
+            if (v2) {
+                decorationFitCorrector?.track(
+                    binding.welcomeScreenWalkingDax,
+                    minHeightPx = WALKING_DAX_MIN_HEIGHT_DP.toPx(),
+                    maxHeightPx = WALKING_DAX_MAX_HEIGHT_DP.toPx(),
+                )
+            } else {
+                // TODO: remove when onboardingImprovementsV2 flag is removed
+                decorationFitCorrector?.clear()
+            }
         } else {
             decorationFitCorrector?.clear()
             binding.welcomeScreenWalkingDax.isVisible = false
@@ -2217,6 +2234,15 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
         bottomOverlapPx: Int = 0,
     ): Boolean {
         releaseCardBottomInset()
+        if (!viewModel.viewState.value.onboardingImprovementsV2Enabled) {
+            // TODO: remove when onboardingImprovementsV2 flag is removed
+            decorationFitCorrector?.clear()
+            return BrandDesignUpdateOnboardingLayoutHelper.hasSpaceForAnimation(
+                rootView = binding.root,
+                dialogView = binding.daxDialogCta.root,
+                decorationView = decorationView,
+            )
+        }
         val height = BrandDesignUpdateOnboardingLayoutHelper.calculateDecorationHeight(
             rootView = binding.root,
             dialogView = binding.daxDialogCta.root,

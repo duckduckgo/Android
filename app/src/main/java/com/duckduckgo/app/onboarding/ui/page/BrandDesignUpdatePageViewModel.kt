@@ -48,6 +48,7 @@ import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.INITIAL_REI
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.INPUT_SCREEN
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.SKIP_ONBOARDING_OPTION
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.SYNC_RESTORE
+import com.duckduckgo.app.onboardingbranddesignupdate.OnboardingBrandDesignUpdateToggles
 import com.duckduckgo.app.onboardingquicksetup.OnboardingQuickSetupExperimentManager
 import com.duckduckgo.app.onboardingquicksetup.OnboardingQuickSetupExperimentManager.QuickSetupExperimentVariant
 import com.duckduckgo.app.pixels.AppPixelName
@@ -127,6 +128,7 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
     private val syncAutoRestore: SyncAutoRestore,
     private val orchestrator: LinearOnboardingOrchestrator,
     private val customAiOnboardingStore: CustomAiOnboardingStore,
+    private val onboardingBrandDesignUpdateToggles: OnboardingBrandDesignUpdateToggles,
 ) : ViewModel() {
 
     // Lazy so it never starts in orchestrator mode (there the sync_restore precondition owns canRestore).
@@ -163,6 +165,7 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
         // Total steps in the indicator. Set alongside currentPageNumber from the plan-derived StepProgress
         // (orchestrator flow) or the legacy flow's fixed 3-step sequence. Only read while an indicator is shown.
         val maxPageCount: Int = DEFAULT_STEP_COUNT,
+        val onboardingImprovementsV2Enabled: Boolean = true,
     )
 
     private val _viewState = MutableStateFlow(ViewState())
@@ -456,6 +459,11 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
                 androidBrowserConfigFeature.splitOmnibarWelcomePage().isEnabled()
         }
 
+    private suspend fun isOnboardingImprovementsV2Enabled(): Boolean =
+        withContext(dispatchers.io()) {
+            onboardingBrandDesignUpdateToggles.onboardingImprovementsV2().isEnabled()
+        }
+
     private suspend fun applyAddressBarPositionSelection(fireTelemetry: Boolean = true) {
         val selected = _viewState.value.selectedAddressBarPosition
         val resolved = when {
@@ -518,6 +526,7 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
 
         override fun start() {
             viewModelScope.launch(dispatchers.io()) {
+                _viewState.update { it.copy(onboardingImprovementsV2Enabled = isOnboardingImprovementsV2Enabled()) }
                 _commands.send(Command.PlayIntroAnimation())
             }
         }
@@ -709,6 +718,7 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
                 // Custom AI plan gate requires orchestrator usage,
                 // so this is okay to apply only to OrchestratorFlow and ignore for LegacyFlow.
                 _viewState.update { it.copy(isCustomAiOnboardingFlow = customAiOnboardingStore.isEnabled()) }
+                _viewState.update { it.copy(onboardingImprovementsV2Enabled = isOnboardingImprovementsV2Enabled()) }
                 observeOrchestratorState()
             }
         }
