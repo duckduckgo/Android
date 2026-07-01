@@ -22,6 +22,9 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.translatekit.ModelSpec
+import com.duckduckgo.translatekit.TranslateKit
+import com.duckduckgo.translatekit.TranslationModel
 import com.duckduckgo.translations.api.DetectedLanguage
 import com.duckduckgo.translations.api.ModelDownloadStatus
 import com.duckduckgo.translations.api.TranslationModelManager
@@ -29,9 +32,6 @@ import com.duckduckgo.translations.api.TranslationStatus
 import com.duckduckgo.translations.api.Translator
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
-import io.github.marcosholgado.translatekit.ModelSpec
-import io.github.marcosholgado.translatekit.TranslateKit
-import io.github.marcosholgado.translatekit.TranslationModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.delay

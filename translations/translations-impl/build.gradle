@@ -33,7 +33,7 @@ dependencies {
 
     ksp project(':anvil-ksp')
 
-    implementation "io.github.marcosholgado:translate-kit-android:0.1.0"
+    implementation "com.duckduckgo.translatekit:translate-kit-android:_"
 
     implementation Square.retrofit2.retrofit
     implementation Square.retrofit2.converter.moshi

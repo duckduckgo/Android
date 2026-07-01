@@ -23,6 +23,6 @@
       at runtime to never load the native library below API 28 (see RealTranslator), so we override
       the merged minSdk to keep the manifest merger from rejecting the library on lower-API builds.
     -->
-    <uses-sdk tools:overrideLibrary="io.github.marcosholgado.translatekit" />
+    <uses-sdk tools:overrideLibrary="com.duckduckgo.translatekit" />
 
 </manifest>
