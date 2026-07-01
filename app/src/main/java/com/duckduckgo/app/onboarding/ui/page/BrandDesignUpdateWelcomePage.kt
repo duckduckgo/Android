@@ -2613,10 +2613,8 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                 width = config.headerLeftIconSizeDp.toPx(comparisonTable.context).toInt()
                 height = config.headerLeftIconSizeDp.toPx(comparisonTable.context).toInt()
             }
-            if (android.os.Build.VERSION.SDK_INT >= 28) {
-                comparisonChartHeaderLeftIconCard.addBottomShadow()
-                comparisonChartHeaderRightIconCard.addBottomShadow()
-            }
+            comparisonChartHeaderLeftIconCard.addBottomShadow()
+            comparisonChartHeaderRightIconCard.addBottomShadow()
             comparisonChartTitleHidden.text = getString(config.titleRes).preventWidows()
             if (config.headerLeftLabelRes != null) {
                 comparisonChartHeaderLabel.text = getString(config.headerLeftLabelRes).preventWidows()
