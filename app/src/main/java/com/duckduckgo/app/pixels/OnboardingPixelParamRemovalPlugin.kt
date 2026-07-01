@@ -36,12 +36,12 @@ class OnboardingPixelParamRemovalPlugin @Inject constructor() : PixelParamRemova
             OnboardingPixelName.ONBOARDING_NOTIFICATIONS.pixelName to PixelParameter.removeAtb(),
             OnboardingPixelName.ONBOARDING_SEARCH_CHAT_TOGGLE.pixelName to PixelParameter.removeAtb(),
             OnboardingPixelName.ONBOARDING_AI_INTRO.pixelName to PixelParameter.removeAtb(),
+            OnboardingPixelName.ONBOARDING_FIRE_BUTTON.pixelName to PixelParameter.removeAtb(),
             OnboardingPixelName.ONBOARDING_AI_CHAT.pixelName to PixelParameter.removeAtb(),
             OnboardingPixelName.ONBOARDING_SEARCH.pixelName to PixelParameter.removeAtb(),
             OnboardingPixelName.ONBOARDING_SEARCH_RESULTS.pixelName to PixelParameter.removeAtb(),
             OnboardingPixelName.ONBOARDING_VISIT_SITE.pixelName to PixelParameter.removeAtb(),
             OnboardingPixelName.ONBOARDING_TRACKERS_BLOCKED.pixelName to PixelParameter.removeAtb(),
-            OnboardingPixelName.ONBOARDING_FIRE_BUTTON.pixelName to PixelParameter.removeAtb(),
             OnboardingPixelName.ONBOARDING_END.pixelName to PixelParameter.removeAtb(),
         )
     }

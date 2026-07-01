@@ -597,22 +597,28 @@ class NewUserOnboardingPlanProvider @Inject constructor(
         )
     }
 
-    private fun duckAiDemoStep(ctx: NewUserOnboardingPlanContext) = NewUserBrowserActivityStep(
-        id = NewUserOnboardingStepIds.DUCK_AI_DEMO,
-        pixelName = OnboardingPixelName.ONBOARDING_AI_CHAT,
-        precondition = {
-            withContext(dispatchers.io()) {
-                androidBrowserConfigFeature.singleTabFireDialog().isEnabled()
-            }
-        },
-        resolveAction = { NewUserBrowserActivityAction.RunDuckAiOnboardingDemo(prompt = ctx.pendingDuckAiPrompt.orEmpty()) },
-        transition = { event ->
-            when {
-                event is NewUserOnboardingEvent.DuckAiFireCompleted -> Advance
-                else -> Stay
-            }
-        },
-    )
+    private fun duckAiDemoStep(ctx: NewUserOnboardingPlanContext): NewUserBrowserActivityStep {
+        val pixelName = OnboardingPixelName.ONBOARDING_FIRE_BUTTON
+        return NewUserBrowserActivityStep(
+            id = NewUserOnboardingStepIds.DUCK_AI_DEMO,
+            pixelName = pixelName,
+            precondition = {
+                withContext(dispatchers.io()) {
+                    androidBrowserConfigFeature.singleTabFireDialog().isEnabled()
+                }
+            },
+            resolveAction = { NewUserBrowserActivityAction.RunDuckAiOnboardingDemo(prompt = ctx.pendingDuckAiPrompt.orEmpty()) },
+            transition = { event ->
+                when {
+                    event is NewUserOnboardingEvent.DuckAiFireCompleted -> {
+                        onboardingPixelSender.fire(pixelName, OnboardingPixelAction.Clicked())
+                        Advance
+                    }
+                    else -> Stay
+                }
+            },
+        )
+    }
 
     private fun skipOnboardingOptionStep(): NewUserOnboardingActivityStep {
         val pixelName = OnboardingPixelName.ONBOARDING_SKIP_ONBOARDING
