@@ -67,14 +67,14 @@ fun DaxSnackbar(
                 )
             }
         },
-        shape = DaxSnackbarDefaults.shape,
-        containerColor = DaxSnackbarDefaults.containerColor,
-        contentColor = DaxSnackbarDefaults.contentColor,
+        shape = DaxSnackbarDefaults.Shape,
+        containerColor = DaxSnackbarDefaults.ContainerColor,
+        contentColor = DaxSnackbarDefaults.ContentColor,
     ) {
         DaxText(
             text = message,
             style = DuckDuckGoTheme.typography.body2,
-            color = DaxSnackbarDefaults.contentColor,
+            color = DaxSnackbarDefaults.ContentColor,
         )
     }
 }
@@ -113,17 +113,17 @@ fun DaxSnackbar(
 }
 
 private object DaxSnackbarDefaults {
-    val shape: Shape
+    val Shape: Shape
         @Composable
         @ReadOnlyComposable
         get() = DuckDuckGoTheme.shapes.small
 
-    val containerColor: Color
+    val ContainerColor: Color
         @Composable
         @ReadOnlyComposable
         get() = DuckDuckGoTheme.colors.backgrounds.surface
 
-    val contentColor: Color
+    val ContentColor: Color
         @Composable
         @ReadOnlyComposable
         get() = DuckDuckGoTheme.textColors.primary
