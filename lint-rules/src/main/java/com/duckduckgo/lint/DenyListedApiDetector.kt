@@ -241,10 +241,11 @@ internal class DenyListedApiDetector : Detector(), SourceCodeScanner, XmlScanner
             node: UCallExpression,
         ): Boolean {
             val excluded = excludedReceiverTypes ?: return false
-            val receiverType = node.receiverType as? PsiClassType ?: return false
-            val receiverClass = context.evaluator.findClass(receiverType.rawType().canonicalText) ?: return false
+            val receiverType = node.receiverType ?: return false
+            val rawType = if (receiverType is PsiClassType) receiverType.rawType() else receiverType
+            val receiverClass = context.evaluator.findClass(rawType.canonicalText) ?: return false
             return excluded.any { fqcn ->
-                receiverClass.qualifiedName == fqcn || context.evaluator.inheritsFrom(receiverClass, fqcn, false)
+                receiverClass.qualifiedName == fqcn || context.evaluator.inheritsFrom(receiverClass, fqcn)
             }
         }
 

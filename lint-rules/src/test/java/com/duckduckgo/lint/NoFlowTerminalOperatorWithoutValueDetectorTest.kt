@@ -22,7 +22,6 @@ import com.android.tools.lint.checks.infrastructure.TestLintTask.lint
 import com.android.tools.lint.checks.infrastructure.TestMode
 import org.junit.Test
 
-@Suppress("UnstableApiUsage")
 class NoFlowTerminalOperatorWithoutValueDetectorTest {
     @Test
     fun `first() on Flow is flagged`() {
