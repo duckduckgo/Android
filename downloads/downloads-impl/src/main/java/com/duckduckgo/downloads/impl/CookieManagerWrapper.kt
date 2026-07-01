@@ -17,9 +17,11 @@
 package com.duckduckgo.downloads.impl
 
 import com.duckduckgo.browsermode.api.BrowserMode
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.cookies.api.CookieManagerProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
+import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
 // This class is basically a convenience wrapper for easier testing
@@ -33,8 +35,13 @@ interface CookieManagerWrapper {
 @ContributesBinding(AppScope::class)
 class CookieManagerWrapperImpl @Inject constructor(
     private val cookieManagerProvider: CookieManagerProvider,
+    private val dispatcherProvider: DispatcherProvider,
 ) : CookieManagerWrapper {
     override fun getCookie(url: String, browserMode: BrowserMode): String? {
-        return cookieManagerProvider.forMode(browserMode)?.getCookie(url)
+        // Downloads run on a worker thread; the Fire manager (ProfileStore-backed, @UiThread) resolves
+        // to null off-main until warmed, so fall back to the main thread only in that cold case.
+        val cookieManager = cookieManagerProvider.forMode(browserMode)
+            ?: runBlocking(dispatcherProvider.main()) { cookieManagerProvider.forMode(browserMode) }
+        return cookieManager?.getCookie(url)
     }
 }

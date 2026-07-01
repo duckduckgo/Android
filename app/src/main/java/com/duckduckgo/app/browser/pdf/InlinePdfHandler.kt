@@ -167,7 +167,11 @@ class RealInlinePdfHandler @Inject constructor(
 
             val requestBuilder = Request.Builder().url(url)
 
-            val cookie = cookieManagerProvider.forMode(browserMode)?.getCookie(url)
+            // The Fire manager (ProfileStore-backed, @UiThread) resolves to null off-main until warmed,
+            // so fall back to the main thread only in that cold case; getCookie itself is thread-safe.
+            val cookieManager = cookieManagerProvider.forMode(browserMode)
+                ?: withContext(dispatcherProvider.main()) { cookieManagerProvider.forMode(browserMode) }
+            val cookie = cookieManager?.getCookie(url)
             if (cookie != null) {
                 requestBuilder.addHeader("Cookie", cookie)
             }

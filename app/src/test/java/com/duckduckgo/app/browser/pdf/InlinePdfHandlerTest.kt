@@ -22,9 +22,12 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.cookies.api.CookieManagerProvider
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.test.runTest
@@ -49,6 +52,7 @@ import org.mockito.kotlin.whenever
 import org.robolectric.annotation.Config
 import java.io.File
 import java.net.UnknownHostException
+import java.util.concurrent.Executors
 
 @RunWith(AndroidJUnit4::class)
 @Config(sdk = [34])
@@ -409,6 +413,53 @@ class InlinePdfHandlerTest {
         assertTrue(result is PdfDownloadResult.Success)
         val recordedRequest = server.takeRequest()
         assertEquals("session=abc123", recordedRequest.getHeader("Cookie"))
+    }
+
+    @Test
+    fun whenFireCookieResolvableOnlyOnMainThreadThenStillForwardedAsHeader() = runTest {
+        val mockCookieManager: CookieManager = mock()
+        whenever(mockCookieManager.getCookie(any())).thenReturn("session=abc123")
+
+        val mainExecutor = Executors.newSingleThreadExecutor { r -> Thread(r, "pdf-test-main") }
+        val ioExecutor = Executors.newSingleThreadExecutor { r -> Thread(r, "pdf-test-io") }
+        // Mirrors DefaultCookieManagerProvider: the Fire CookieManager can only be resolved on the
+        // main thread and returns null off it.
+        val mainThreadOnlyProvider = object : CookieManagerProvider {
+            override fun forMode(mode: BrowserMode): CookieManager? =
+                if (Thread.currentThread().name.contains("pdf-test-main")) mockCookieManager else null
+        }
+        val dispatchers = object : DispatcherProvider {
+            override fun io(): CoroutineDispatcher = ioExecutor.asCoroutineDispatcher()
+            override fun main(): CoroutineDispatcher = mainExecutor.asCoroutineDispatcher()
+            override fun computation(): CoroutineDispatcher = ioExecutor.asCoroutineDispatcher()
+            override fun unconfined(): CoroutineDispatcher = ioExecutor.asCoroutineDispatcher()
+        }
+        val handlerWithCookies = RealInlinePdfHandler(
+            context = InstrumentationRegistry.getInstrumentation().targetContext,
+            okHttpClient = OkHttpClient(),
+            cookieManagerProvider = mainThreadOnlyProvider,
+            dispatcherProvider = dispatchers,
+            androidBrowserConfigFeature = androidBrowserConfigFeature,
+        )
+
+        val pdfBytes = "%PDF-1.4 test content".toByteArray()
+        server.enqueue(
+            MockResponse()
+                .setResponseCode(200)
+                .setBody(Buffer().write(pdfBytes)),
+        )
+        val url = server.url("/auth.pdf").toString()
+
+        try {
+            val result = handlerWithCookies.downloadToCache(url, browserMode = BrowserMode.FIRE)
+
+            assertTrue(result is PdfDownloadResult.Success)
+            val recordedRequest = server.takeRequest()
+            assertEquals("session=abc123", recordedRequest.getHeader("Cookie"))
+        } finally {
+            mainExecutor.shutdown()
+            ioExecutor.shutdown()
+        }
     }
 
     @Test
