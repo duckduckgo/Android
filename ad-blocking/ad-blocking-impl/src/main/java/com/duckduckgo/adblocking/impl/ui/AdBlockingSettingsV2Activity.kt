@@ -24,8 +24,10 @@ import com.duckduckgo.adblocking.impl.R
 import com.duckduckgo.adblocking.impl.databinding.ActivityAdBlockingSettingsV2Binding
 import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.listitem.DaxListItem
 import com.duckduckgo.common.ui.view.listitem.OneLineListItem
+import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.text.DaxTextView
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
@@ -53,7 +55,7 @@ class AdBlockingSettingsV2Activity : BaseAdBlockingSettingsActivity() {
 
     override fun render(state: AdBlockingSettingsViewModel.ViewState) {
         super.render(state)
-        binding.adBlockingStatusIndicator.setStatus(state.isEnabled)
+        binding.adBlockingStatusIndicator.setStatus(state.isStatusIndicatorOn)
         binding.duckPlayerEntry.setSecondaryText(
             when (state.duckPlayerMode) {
                 Enabled -> getString(R.string.duck_player_mode_always)
@@ -61,5 +63,13 @@ class AdBlockingSettingsV2Activity : BaseAdBlockingSettingsActivity() {
                 else -> getString(R.string.duck_player_mode_always_ask)
             },
         )
+        if (state.isContingencyMode) {
+            binding.blockAdsToggle.gone()
+            binding.adBlockingDescription.gone()
+            binding.contingencyModeItem.show()
+        } else {
+            binding.contingencyModeItem.gone()
+            binding.blockAdsToggle.show()
+        }
     }
 }

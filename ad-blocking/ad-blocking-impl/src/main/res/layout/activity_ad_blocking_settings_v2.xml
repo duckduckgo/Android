@@ -97,6 +97,17 @@
                 app:typography="body2" />
 
             <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+                android:id="@+id/contingencyModeItem"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/keyline_1"
+                android:visibility="gone"
+                app:primaryText="@string/ad_blocking_settings_toggle_title"
+                app:secondaryText="@string/contingencyMessageContent"
+                app:trailingIcon="@drawable/ic_exclamation_yellow_24"
+                tools:visibility="visible" />
+
+            <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
                 android:id="@+id/duckPlayerEntry"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

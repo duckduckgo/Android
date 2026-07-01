@@ -23,4 +23,10 @@
     <string name="ad_blocking_settings_description">„DuckDuckGo“ blokuoja vaizdo įrašų reklamas platformoje „YouTube“, todėl galite žiūrėti vaizdo įrašus be trukdžių. <annotation type="learn_more_link">Sužinokite daugiau</annotation></string>
     <string name="ad_blocking_settings_duck_player_header">Duck Player</string>
     <string name="ad_blocking_settings_duck_player_description">Atidaro vaizdo įrašus neblaškančiu kino teatro režimu, kad tai, ką žiūri, nedarytų įtakos tavo „YouTube“ srautui.</string>
+    <string name="ad_blocking_settings_title_v2">Reklamų blokavimas</string>
+    <string name="ad_blocking_settings_header_description">Blokuoja įkyrias sekimo priemones dar prieš jas įkeliant, todėl veiksmingai pašalina sekimu pagrįstas reklamas</string>
+    <string name="contingencyMessageTitle">„YouTube“ reklamų blokavimas nepasiekiamas</string>
+    <string name="contingencyMessageContent">Naujausi „YouTube“ pakeitimai paveikė reklamų blokavimą. Sprendžiame šias problemas ir dėkojame už supratingumą</string>
+    <string name="contingencyMessagePrimaryButton">Supratau</string>
+    <string name="contingencyMessageCloseContentDescription">Uždaryti</string>
 </resources>

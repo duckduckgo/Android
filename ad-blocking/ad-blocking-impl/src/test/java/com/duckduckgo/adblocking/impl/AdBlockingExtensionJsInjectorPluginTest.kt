@@ -52,6 +52,7 @@ class AdBlockingExtensionJsInjectorPluginTest {
         on { scriptletsFlow() } doReturn scriptletsFlow
     }
     private val webView: WebView = mock()
+    private val contingencyMessageHandler: ContingencyMessageHandler = mock()
     private val testScope = CoroutineScope(UnconfinedTestDispatcher())
 
     private val isolatedName = "scriptlets/isolated/ublock-filters.js"
@@ -74,6 +75,7 @@ class AdBlockingExtensionJsInjectorPluginTest {
             statusChecker = statusChecker,
             repository = repository,
             domainMatcher = mockDomainMatcher,
+            contingencyMessageHandler = contingencyMessageHandler,
             appScope = testScope,
         )
     }
@@ -243,5 +245,14 @@ class AdBlockingExtensionJsInjectorPluginTest {
         plugin.onPageFinished(webView, url = "https://youtube.com/page", site = null)
 
         verify(webView, never()).evaluateJavascript(any(), isNull())
+    }
+
+    @Test
+    fun whenOnPageFinishedCalledThenContingencyMessageHandlerIsNotified() {
+        val url = "https://youtube.com/page"
+
+        plugin.onPageFinished(webView, url = url, site = null)
+
+        verify(contingencyMessageHandler).onPageLoaded(webView, url)
     }
 }
