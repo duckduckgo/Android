@@ -34,6 +34,7 @@ import com.duckduckgo.app.browser.mode.AppShortcutNewTab
 import com.duckduckgo.app.browser.mode.FireRestart
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
+import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
@@ -84,6 +85,7 @@ class AppShortcutCreator @Inject constructor(
     private val duckChat: DuckChat,
     private val duckAiFeatureState: DuckAiFeatureState,
     private val dispatchers: DispatcherProvider,
+    private val androidBrowserConfigFeature: AndroidBrowserConfigFeature,
 ) {
 
     init {
@@ -95,10 +97,12 @@ class AppShortcutCreator @Inject constructor(
 
     fun refreshAppShortcuts() {
         appCoroutineScope.launch(dispatchers.io()) {
+            val trampolineEnabled = androidBrowserConfigFeature.useFireAppShortcutTrampoline().isEnabled()
+
             val shortcutList = mutableListOf<ShortcutInfo>()
 
             shortcutList.add(buildNewTabShortcut(context))
-            shortcutList.add(buildClearDataShortcut(context))
+            shortcutList.add(buildClearDataShortcut(context, trampolineEnabled))
             shortcutList.add(buildBookmarksShortcut(context))
 
             if (duckAiFeatureState.showPopupMenuShortcut.value) {
@@ -106,7 +110,13 @@ class AppShortcutCreator @Inject constructor(
             }
 
             val shortcutManager = context.getSystemService(ShortcutManager::class.java)
-            kotlin.runCatching { shortcutManager.dynamicShortcuts = shortcutList }
+            kotlin.runCatching {
+                shortcutManager.dynamicShortcuts = shortcutList
+                if (trampolineEnabled) {
+                    // Pinned shortcuts carry baked-in intents that survive app updates; refresh them so the target switch takes effect.
+                    shortcutManager.updateShortcuts(shortcutList)
+                }
+            }
         }
     }
 
@@ -135,16 +145,21 @@ class AppShortcutCreator @Inject constructor(
             .build().toShortcutInfo()
     }
 
-    private fun buildClearDataShortcut(context: Context): ShortcutInfo {
+    private fun buildClearDataShortcut(context: Context, trampolineEnabled: Boolean): ShortcutInfo {
+        val intent = if (trampolineEnabled) {
+            Intent(context, FireShortcutTrampolineActivity::class.java).apply {
+                action = Intent.ACTION_VIEW
+            }
+        } else {
+            BrowserActivity.intent(context, launchSource = FireRestart).also {
+                it.action = Intent.ACTION_VIEW
+                it.putExtra(BrowserActivity.PERFORM_FIRE_ON_ENTRY_EXTRA, true)
+            }
+        }
         return ShortcutInfoCompat.Builder(context, SHORTCUT_ID_CLEAR_DATA)
             .setShortLabel(context.getString(R.string.fireMenu))
             .setIcon(IconCompat.createWithResource(context, R.drawable.ic_app_shortcut_fire_adaptive))
-            .setIntent(
-                BrowserActivity.intent(context, launchSource = FireRestart).also {
-                    it.action = Intent.ACTION_VIEW
-                    it.putExtra(BrowserActivity.PERFORM_FIRE_ON_ENTRY_EXTRA, true)
-                },
-            )
+            .setIntent(intent)
             .build().toShortcutInfo()
     }
 
