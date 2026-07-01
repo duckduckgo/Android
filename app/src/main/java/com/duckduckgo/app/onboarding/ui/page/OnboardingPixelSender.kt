@@ -159,7 +159,7 @@ class RealOnboardingPixelSender @Inject constructor(
             pixel.fire(
                 pixel = pixelName,
                 parameters = params,
-                type = Unique(tag = "${pixelName.pixelName}_$PIXEL_EVENT_CLICKED"),
+                type = Unique(tag = "${pixelName.pixelName}_clicked_$value"),
             )
         }
     }
