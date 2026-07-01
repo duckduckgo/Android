@@ -47,16 +47,17 @@ fun endBottomFillTransform(
 }
 
 /**
- * Caps a requested fill height to a fraction of the available height, keeping the band from dominating
- * short viewports (phone-landscape) or large screens (tablets). A fraction of 1f or greater, or a
- * non-positive available height, applies no cap.
+ * Caps a requested fill height to a fraction of a reference height, keeping the band from dominating
+ * large screens (tablets). Callers pass the device long edge (portrait height) as the reference so the cap
+ * is orientation-independent and the band stays the same height in portrait and landscape. A fraction of 1f
+ * or greater, or a non-positive reference height, applies no cap.
  */
 fun cappedFillHeightPx(
     requestedPx: Int,
-    availableHeightPx: Int,
+    referenceHeightPx: Int,
     maxHeightFraction: Float,
 ): Int {
-    if (maxHeightFraction >= 1f || availableHeightPx <= 0) return requestedPx
-    val cap = (availableHeightPx * maxHeightFraction).toInt()
+    if (maxHeightFraction >= 1f || referenceHeightPx <= 0) return requestedPx
+    val cap = (referenceHeightPx * maxHeightFraction).toInt()
     return minOf(requestedPx, cap)
 }
