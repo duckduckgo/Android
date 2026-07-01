@@ -34,8 +34,8 @@
     <!-- Subscription Expiration Reminder Notification -->
     <string name="subscriptionExpirationReminderNotificationChannelName">Subscription Reminders</string>
     <plurals name="subscriptionExpirationReminderNotificationTitle" tools:ignore="ImpliedQuantity">
-        <item quantity="one">Your free trial ends in 1 day</item>
-        <item quantity="other" instruction="Placeholder is the number of days until the free trial ends">Your free trial ends in %1$d days</item>
+        <item quantity="one">Your trial ends in 1 day</item>
+        <item quantity="other" instruction="Placeholder is the number of days until the free trial ends">Your trial ends in %1$d days</item>
     </plurals>
     <string name="subscriptionExpirationReminderNotificationDescription">Try all your new premium protections before your trial ends!</string>
 
