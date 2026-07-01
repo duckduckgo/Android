@@ -178,6 +178,8 @@ import com.duckduckgo.app.cta.ui.DaxBubbleCta.DaxIntroSearchOptionsCta
 import com.duckduckgo.app.cta.ui.DaxDuckAiEndBrandDesignUpdateBubbleCta
 import com.duckduckgo.app.cta.ui.DaxDuckAiEndBubbleCta
 import com.duckduckgo.app.cta.ui.DaxDuckAiFireButtonBrandDesignUpdateContextualCta
+import com.duckduckgo.app.cta.ui.DaxFireButtonBrandDesignUpdateContextualCta
+import com.duckduckgo.app.cta.ui.DaxSerpBrandDesignUpdateContextualCta
 import com.duckduckgo.app.cta.ui.DaxTryASearchBrandDesignUpdateBubbleCta
 import com.duckduckgo.app.cta.ui.HomePanelCta
 import com.duckduckgo.app.cta.ui.OnboardingDaxDialogCta.DaxDuckAiFireButtonCta
@@ -207,6 +209,8 @@ import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.AppStage.ESTABLISHED
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.store.UserStageStore
+import com.duckduckgo.app.onboarding.ui.page.OnboardingPixelAction
+import com.duckduckgo.app.onboarding.ui.page.OnboardingPixelSender
 import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.ExtendedOnboardingFeatureToggles
 import com.duckduckgo.app.onboardingbranddesignupdate.OnboardingBrandDesignUpdateToggles
 import com.duckduckgo.app.pixels.AppPixelName
@@ -217,6 +221,9 @@ import com.duckduckgo.app.pixels.AppPixelName.ONBOARDING_DAX_CTA_DISMISS_BUTTON
 import com.duckduckgo.app.pixels.AppPixelName.ONBOARDING_DAX_CTA_OK_BUTTON
 import com.duckduckgo.app.pixels.AppPixelName.ONBOARDING_SEARCH_CUSTOM
 import com.duckduckgo.app.pixels.AppPixelName.ONBOARDING_VISIT_SITE_CUSTOM
+import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_FIRE_BUTTON
+import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_SEARCH
+import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_SEARCH_RESULTS
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
@@ -587,6 +594,8 @@ class BrowserTabViewModelTest {
 
     private val mockDeviceInfo: DeviceInfo = mock()
 
+    private val mockOnboardingPixelSender: OnboardingPixelSender = mock()
+
     private val mockSitePermissionsManager: SitePermissionsManager = mock()
 
     private val cameraHardwareChecker: CameraHardwareChecker = mock()
@@ -842,6 +851,7 @@ class BrowserTabViewModelTest {
                         on { state } doReturn MutableStateFlow(LinearOnboardingState.NotStarted)
                     },
                     duckAiFeatureState = mockDuckAiFeatureState,
+                    onboardingPixelSender = mockOnboardingPixelSender,
                 )
 
             accessibilitySettingsDataStore = AccessibilitySettingsSharedPreferences(context)
@@ -9044,6 +9054,40 @@ class BrowserTabViewModelTest {
         testee.onFireMenuSelected(Omnibar.ViewMode.DuckAI)
 
         verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_FIRE_BUTTON_TAPPED)
+    }
+
+    @Test
+    fun whenCustomQuerySubmittedWithBrandDesignSearchBubbleThenSuggestionCustomFired() = runTest {
+        whenever(mockOnboardingStore.getSearchOptions()).thenReturn(emptyList())
+        whenever(mockOmnibarConverter.convertQueryToUrl("my own search", null)).thenReturn("https://duckduckgo.com/?q=my+own+search")
+        val cta = DaxTryASearchBrandDesignUpdateBubbleCta(mockOnboardingStore, mockAppInstallStore, true, mockDeviceInfo)
+        setCta(cta)
+
+        testee.onUserSubmittedQuery("my own search")
+
+        verify(mockOnboardingPixelSender).fire(ONBOARDING_SEARCH, OnboardingPixelAction.SuggestionClicked(fromSuggestion = false))
+    }
+
+    @Test
+    fun whenFireMenuSelectedWithBrandDesignFireCtaThenFireButtonEngageFired() = runTest {
+        val cta =
+            DaxFireButtonBrandDesignUpdateContextualCta(mockOnboardingStore, mockAppInstallStore, isLightTheme = true, deviceInfo = mockDeviceInfo)
+        setCta(cta)
+
+        testee.onFireMenuSelected(Omnibar.ViewMode.Browser(exampleUrl))
+
+        verify(mockOnboardingPixelSender).fire(ONBOARDING_FIRE_BUTTON, OnboardingPixelAction.Clicked(engaged = true))
+    }
+
+    @Test
+    fun whenBrandDesignSerpOkClickedThenEngageFiredButNotDismiss() = runTest {
+        val cta = DaxSerpBrandDesignUpdateContextualCta(mockOnboardingStore, mockAppInstallStore, isLightTheme = true, deviceInfo = mockDeviceInfo)
+        setCta(cta)
+
+        testee.onUserClickCtaOkButton(cta)
+
+        verify(mockOnboardingPixelSender).fire(ONBOARDING_SEARCH_RESULTS, OnboardingPixelAction.Clicked(engaged = true))
+        verify(mockOnboardingPixelSender, never()).fire(ONBOARDING_SEARCH_RESULTS, OnboardingPixelAction.Clicked(engaged = false))
     }
 
     @Test

@@ -1495,6 +1495,12 @@ class BrowserTabViewModel @Inject constructor(
             }
         }
 
+        // Unconditional per submit; onContextualSearchSubmitted only fires for the brand-design
+        // search/visit-site bubbles, and the pixel's once-per-user Unique dedup keeps it single-fire.
+        if (cta != null) {
+            ctaViewModel.onContextualSearchSubmitted(cta, query)
+        }
+
         command.value = HideKeyboard
         val trimmedInput = query.trim()
 
@@ -3694,10 +3700,10 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
-    fun onUserDismissedCta(cta: Cta?) {
+    fun onUserDismissedCta(cta: Cta?, isEngagement: Boolean = false) {
         cta?.let {
             viewModelScope.launch {
-                ctaViewModel.onUserDismissedCta(it)
+                ctaViewModel.onUserDismissedCta(it, isEngagement = isEngagement)
             }
             if ((cta is OnboardingDaxDialogCta.DaxTrackersBlockedCta || cta is DaxTrackersBlockedBrandDesignUpdateContextualCta) &&
                 currentBrowserViewState().showPrivacyShield.isHighlighted()
@@ -5106,7 +5112,7 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     private fun onOnboardingCtaOkButtonClicked(onboardingCta: OnboardingDaxDialogCta): Command? {
-        onUserDismissedCta(onboardingCta)
+        onUserDismissedCta(onboardingCta, isEngagement = true)
         return when (onboardingCta) {
             is OnboardingDaxDialogCta.DaxSerpCta,
             is DaxSerpBrandDesignUpdateContextualCta,
@@ -5157,7 +5163,7 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     private fun onDaxBubbleCtaOkButtonClicked(cta: DaxBubbleCta) {
-        onUserDismissedCta(cta)
+        onUserDismissedCta(cta, isEngagement = true)
         when (cta) {
             is DaxBubbleCta.DaxSubscriptionCta,
             is DaxSubscriptionBrandDesignUpdateBubbleCta,
@@ -5206,7 +5212,8 @@ class BrowserTabViewModel @Inject constructor(
         }
 
         if (cta is OnboardingDaxDialogCta.DaxFireButtonCta || cta is DaxFireButtonBrandDesignUpdateContextualCta) {
-            onUserDismissedCta(cta)
+            ctaViewModel.onContextualFireButtonEngaged(cta)
+            onUserDismissedCta(cta, isEngagement = true)
             command.value = HideOnboardingDaxDialog(cta as OnboardingDaxDialogCta)
         }
 
