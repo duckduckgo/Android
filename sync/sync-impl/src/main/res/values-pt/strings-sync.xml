@@ -241,4 +241,12 @@
     <string name="sync_recover_data_download_pdf">Descarregar como PDF</string>
     <string name="sync_restore_on_reinstall_title">Restaurar na reinstalação da aplicação</string>
     <string name="sync_restore_on_reinstall_description">Se reinstalares a aplicação DuckDuckGo, perguntaremos se queres restaurar os teus dados neste dispositivo.</string>
+
+    <!-- Chat sync promo -->
+    <string name="sync_chat_promo_banner_title">Acede às tuas conversas em todos os teus dispositivos através da funcionalidade Sync &amp; Backup.</string>
+    <string name="sync_chat_promo_banner_cta_title">Sincronizar com outro dispositivo</string>
+    <string name="sync_chat_bottom_sheet_title">Vamos sincronizar as tuas conversas em todos os teus dispositivos!</string>
+    <string name="sync_chat_bottom_sheet_description">Encontra o código QR na aplicação DuckDuckGo no teu outro dispositivo, indo a Definições › Sync &amp; Backup › Sincronizar com outro dispositivo.</string>
+    <string name="sync_chat_bottom_sheet_positive">Ler código QR</string>
+    <string name="sync_chat_bottom_sheet_negative">Agora não</string>
 </resources>
