@@ -16,20 +16,21 @@
 
 package com.duckduckgo.app.anr.internal.feature
 
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
-import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.anr.internal.databinding.ActivityCrashAnrInternalSettingsBinding
-import com.duckduckgo.app.anr.internal.feature.CrashANRsInternalScreens.InternalCrashSettings
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.navigation.api.GlobalActivityStarter
+import com.duckduckgo.di.scopes.AppScope
+import com.squareup.anvil.annotations.ContributesMultibinding
+import dagger.SingleInstanceIn
 import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
-@ContributeToActivityStarter(InternalCrashSettings::class)
 class CrashANRsInternalSettingsActivity : DuckDuckGoActivity() {
 
     @Inject
@@ -54,8 +55,15 @@ class CrashANRsInternalSettingsActivity : DuckDuckGoActivity() {
     }
 }
 
-sealed class CrashANRsInternalScreens : GlobalActivityStarter.ActivityParams {
-    data object InternalCrashSettings : CrashANRsInternalScreens() {
-        private fun readResolve(): Any = InternalCrashSettings
+@ContributesMultibinding(AppScope::class)
+@SingleInstanceIn(AppScope::class)
+class CrashAnrLogsCapabilityPlugin @Inject constructor() : CrashAnrDevCapabilityPlugin {
+
+    override fun title(): String = "Recent Crash & ANR"
+
+    override fun subtitle(): String = "List of recent Crash and ANRs"
+
+    override fun onCapabilityClicked(activityContext: Context) {
+        activityContext.startActivity(Intent(activityContext, CrashANRsInternalSettingsActivity::class.java))
     }
 }
