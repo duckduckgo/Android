@@ -196,7 +196,7 @@ class NotifyMeViewModelTest {
     }
 
     @Test
-    fun whenOnNotifyMeButtonClickedOnAndroid9ThenOpenSettingsOnAndroid8PlusCommandIsSent() = runTest {
+    fun whenOnNotifyMeButtonClickedOnAndroid9ThenOpenSettingsOnAndroid9PlusCommandIsSent() = runTest {
         whenever(mockAppBuildConfig.sdkInt).thenReturn(Build.VERSION_CODES.P)
 
         testee.onNotifyMeButtonClicked()
@@ -237,7 +237,7 @@ class NotifyMeViewModelTest {
     }
 
     @Test
-    fun whenHandleRequestPermissionRationaleOnAndroid9WithShouldShowRationaleFalseThenOpenSettingsOnAndroid8PlusCommandIsSent() = runTest {
+    fun whenHandleRequestPermissionRationaleOnAndroid9WithShouldShowRationaleFalseThenOpenSettingsOnAndroid9PlusCommandIsSent() = runTest {
         whenever(mockAppBuildConfig.sdkInt).thenReturn(Build.VERSION_CODES.P)
         val shouldShowRationale = false
 
