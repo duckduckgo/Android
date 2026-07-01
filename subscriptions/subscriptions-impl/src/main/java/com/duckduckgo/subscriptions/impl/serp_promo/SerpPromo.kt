@@ -19,7 +19,6 @@ package com.duckduckgo.subscriptions.impl.serp_promo
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
-import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.cookies.api.CookieManagerProvider
 import com.duckduckgo.cookies.api.setCookieForAllModes
@@ -88,11 +87,6 @@ class RealSerpPromo @Inject constructor(
 // This class is basically a convenience wrapper for easier testing
 interface CookieManagerWrapper {
     /**
-     * @return the cookie stored for the given [url] if any, null otherwise
-     */
-    fun getCookie(url: String): String?
-
-    /**
      * Sets the given [cookieString] for the given [url] on every browser mode's cookie jar (the
      * default profile plus any non-default profiles).
      */
@@ -115,10 +109,6 @@ object CookieManagerWrapperModule {
 private class CookieManagerWrapperImpl constructor(
     private val cookieManagerProvider: CookieManagerProvider,
 ) : CookieManagerWrapper {
-
-    override fun getCookie(url: String): String? {
-        return cookieManagerProvider.forMode(BrowserMode.REGULAR)?.getCookie(url)
-    }
 
     override fun setCookieOnAllProfiles(url: String, cookieString: String) {
         logcat { "Setting cookie $cookieString for domain $url" }

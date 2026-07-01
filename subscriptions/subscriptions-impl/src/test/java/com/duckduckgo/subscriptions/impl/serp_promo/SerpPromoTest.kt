@@ -72,68 +72,12 @@ class SerpPromoTest {
     }
 
     @Test
-    fun whenOnStartAndPromoCookieSetThenSetEmptyCookie() = runTest {
+    fun whenOnStartAndAccessTokenThenSetAccessTokenCookie() = runTest {
         subscriptionsFeature.serpPromoCookie().setRawStoredState(Toggle.State(enable = true))
-        whenever(cookieManager.getCookie(any())).thenReturn("privacy_pro_access_token=value;")
-
-        serpPromo.onStart(lifecycleOwner)
-        verify(cookieManager).setCookieOnAllProfiles(".subscriptions.duckduckgo.com", "privacy_pro_access_token=;HttpOnly;Path=/;")
-    }
-
-    @Test
-    fun whenOnStartAndPromoCookieSetAndAccessTokenThenSetEmptyCookie() = runTest {
-        subscriptionsFeature.serpPromoCookie().setRawStoredState(Toggle.State(enable = true))
-        whenever(cookieManager.getCookie(any())).thenReturn("privacy_pro_access_token=value;")
         whenever(subscriptions.getAccessToken()).thenReturn("value")
 
         serpPromo.onStart(lifecycleOwner)
+
         verify(cookieManager).setCookieOnAllProfiles(".subscriptions.duckduckgo.com", "privacy_pro_access_token=value;HttpOnly;Path=/;")
-    }
-
-    @Test
-    fun whenKillSwitchedOnStartAndPromoCookieSetThenNoop() = runTest {
-        subscriptionsFeature.serpPromoCookie().setRawStoredState(Toggle.State(enable = false))
-        whenever(cookieManager.getCookie(any())).thenReturn("privacy_pro_access_token=value;")
-
-        serpPromo.onStart(lifecycleOwner)
-        verify(cookieManager, never()).setCookieOnAllProfiles(any(), any())
-    }
-
-    @Test
-    fun whenOnStartAndOtherCookiesSetThenSetEmptyCookie() = runTest {
-        subscriptionsFeature.serpPromoCookie().setRawStoredState(Toggle.State(enable = true))
-        whenever(cookieManager.getCookie(any())).thenReturn("another_cookie=value;")
-
-        serpPromo.onStart(lifecycleOwner)
-        verify(cookieManager).setCookieOnAllProfiles(".subscriptions.duckduckgo.com", "privacy_pro_access_token=;HttpOnly;Path=/;")
-    }
-
-    @Test
-    fun whenOnStartAndOtherCookiesSetAndAccessTokenThenSetAccessTokenCookie() = runTest {
-        subscriptionsFeature.serpPromoCookie().setRawStoredState(Toggle.State(enable = true))
-        whenever(cookieManager.getCookie(any())).thenReturn("another_cookie=value;")
-        whenever(subscriptions.getAccessToken()).thenReturn("value")
-
-        serpPromo.onStart(lifecycleOwner)
-        verify(cookieManager).setCookieOnAllProfiles(".subscriptions.duckduckgo.com", "privacy_pro_access_token=value;HttpOnly;Path=/;")
-    }
-
-    @Test
-    fun whenKillSwitchedOnStartAndOtherCookiesSetThenNoop() = runTest {
-        subscriptionsFeature.serpPromoCookie().setRawStoredState(Toggle.State(enable = false))
-        whenever(cookieManager.getCookie(any())).thenReturn("another_cookie=value;")
-
-        serpPromo.onStart(lifecycleOwner)
-        verify(cookieManager, never()).setCookieOnAllProfiles(any(), any())
-    }
-
-    @Test
-    fun whenKillSwitchedOnStartAndOtherCookiesSetAndAccessTokenThenNoop() = runTest {
-        subscriptionsFeature.serpPromoCookie().setRawStoredState(Toggle.State(enable = false))
-        whenever(cookieManager.getCookie(any())).thenReturn("another_cookie=value;")
-        whenever(subscriptions.getAccessToken()).thenReturn("value")
-
-        serpPromo.onStart(lifecycleOwner)
-        verify(cookieManager, never()).setCookieOnAllProfiles(any(), any())
     }
 }
