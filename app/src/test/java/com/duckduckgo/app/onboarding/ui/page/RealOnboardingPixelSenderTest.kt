@@ -367,7 +367,10 @@ class RealOnboardingPixelSenderTest {
                 "e" to "clicked",
                 "value" to "set_as_default:off,widget:off,address_bar:top,input_type:search_and_duckai",
             ),
-            type = Unique(tag = "onboarding_quick-setup_clicked"),
+            type = Unique(
+                tag = "onboarding_quick-setup_clicked_" +
+                    "set_as_default:off,widget:off,address_bar:top,input_type:search_and_duckai",
+            ),
         )
     }
 
@@ -409,7 +412,10 @@ class RealOnboardingPixelSenderTest {
                 "e" to "clicked",
                 "value" to "set_as_default:on,widget:off,address_bar:bottom,input_type:search",
             ),
-            type = Unique(tag = "onboarding_quick-setup_clicked"),
+            type = Unique(
+                tag = "onboarding_quick-setup_clicked_" +
+                    "set_as_default:on,widget:off,address_bar:bottom,input_type:search",
+            ),
         )
     }
 
@@ -451,7 +457,10 @@ class RealOnboardingPixelSenderTest {
                 "e" to "clicked",
                 "value" to "set_as_default:off,widget:on,address_bar:split,input_type:search_and_duckai",
             ),
-            type = Unique(tag = "onboarding_quick-setup_clicked"),
+            type = Unique(
+                tag = "onboarding_quick-setup_clicked_" +
+                    "set_as_default:off,widget:on,address_bar:split,input_type:search_and_duckai",
+            ),
         )
     }
 
