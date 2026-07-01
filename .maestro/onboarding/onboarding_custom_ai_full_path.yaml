@@ -1,0 +1,47 @@
+appId: com.duckduckgo.mobile.android
+name: "Onboarding: Custom AI flow triggered by a referrer parameter (full path)"
+tags:
+  - onboardingInternalTest
+---
+- retry:
+    maxRetries: 3
+    commands:
+      - launchApp:
+          clearState: true
+          arguments:
+            isMaestro: "true"
+            referrer: "onboarding=ai"
+      - assertVisible:
+          text: "Ready to chat privately with ChatGPT, Claude, and other AIs.*"
+      - tapOn: "Let's get started!"
+      - assertVisible:
+          text: "AI protections.activated!"
+      - tapOn: "Give Duck.ai a try!"
+      - assertVisible:
+          text: "Now, try a private AI.chat!"
+      - tapOn: "Surprise me!"
+      - assertVisible:
+          text: "That's Duck.ai!"
+      - assertVisible:
+          text: "Private AI chats you can delete anytime.*"
+      - runFlow: ../shared/browser_screen/click_on_fire_button.yaml
+      - runFlow: ../shared/browser_screen/confirm_fire_dialog.yaml
+      - assertVisible:
+          text: "Want to make DuckDuckGo your default.browser."
+      - tapOn: "Choose Your Browser"
+      - runFlow:
+          when:
+            visible: "set as default"
+          commands:
+            - tapOn: "duckduckgo"
+            - tapOn: "set as default"
+      - assertVisible:
+          text: "Where should I put your address.bar."
+      - tapOn: "Next"
+      - assertVisible:
+          text: "Ask anything privately.*"
+      - assertVisible:
+          text: "You've got this!"
+      - assertVisible:
+          text: "Start a private AI chat with Duck.ai or toggle to Search for protected.browsing.*"
+      - tapOn: "High five!"
