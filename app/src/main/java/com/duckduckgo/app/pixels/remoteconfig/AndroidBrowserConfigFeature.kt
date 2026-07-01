@@ -398,6 +398,14 @@ interface AndroidBrowserConfigFeature {
     fun webViewSessionPersistence(): Toggle
 
     /**
+     * Kill switch: when enabled, an Activity.recreate() (mode switch / config change) is not treated as an
+     * app background->foreground, so BrowserApplicationStateInfo skips the onClose()/onOpen() pipeline for it.
+     * Disable to restore firing the full lifecycle pipeline on every recreate. Defaults to `true`.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    fun recreateAwareLifecycle(): Toggle
+
+    /**
      * Controls whether the endless loop fix is enabled for custom tabs. When enabled,
      * HTTP navigations shouldn't launch apps unless started with a user gesture.
      * @return `true` when the remote config has the global "customTabEndlessLoopFix" androidBrowserConfig

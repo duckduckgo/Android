@@ -358,9 +358,14 @@ class RealNativeInputManager @Inject constructor(
                 omnibarController.hideBackground()
                 duckAiToolbarHidden = false
             }
-            updateWidgetFocus(widget)
+            if (!isExternalKeyboardConnected()) {
+                updateWidgetFocus(widget)
+            }
         }
     }
+
+    private fun isExternalKeyboardConnected(): Boolean =
+        rootView.resources.configuration.keyboard != Configuration.KEYBOARD_NOKEYS
 
     private fun isLandscape(): Boolean =
         rootView.resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE

@@ -96,7 +96,6 @@
     <string name="duckAiHideAiGeneratedImagesDescription">Eemaldab tehisintellekti loodud pildid pildiotsingu tulemustest</string>
 
     <!-- Search Assist Visibility -->
-    <string name="duckAiSearchAssistVisibilityTitle">Search Assisti nähtavus</string>
     <string name="duckAiSearchAssistVisibilitySubtitle">Vali, kui tihti soovid tehisintellekti abil saadud vastuseid oma otsingutes kuvada.</string>
     <string name="duckAiSearchAssistVisibilityNever">Mitte kunagi</string>
     <string name="duckAiSearchAssistVisibilityOnDemand">Nõudmisel</string>

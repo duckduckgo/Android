@@ -16,42 +16,34 @@
 
 package com.duckduckgo.duckchat.impl.pixel
 
-import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.app.statistics.api.AtbLifecyclePlugin
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.store.HideAiGeneratedImages
 import com.duckduckgo.duckchat.impl.store.SearchAssistVisibility
 import com.duckduckgo.settings.api.SerpSettingsDataProvider
-import com.squareup.anvil.annotations.ContributesMultibinding
-import kotlinx.coroutines.CoroutineScope
+import com.squareup.anvil.annotations.ContributesBinding
 import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-/**
- * On each daily-active day, samples the AI-features settings and fires [DuckChatPixelName.AI_FEATURES_STATE_DAILY]
- * so we can see the distribution across the whole active base. If a stored SERP value can't decode to its native
- * enum, also fires [DuckChatPixelName.SERP_SETTINGS_UNRECOGNIZED_VALUE].
- */
-@ContributesMultibinding(AppScope::class)
-class AiFeaturesStateDauPlugin @Inject constructor(
+interface AiFeaturesStateReporter {
+    /**
+     * Samples the AI-features settings and fires [DuckChatPixelName.AI_FEATURES_STATE_DAILY] so we can see the
+     * distribution across the whole active base. If a stored SERP value can't decode to its native enum, also fires
+     * [DuckChatPixelName.SERP_SETTINGS_UNRECOGNIZED_VALUE]. The fired pixel is a daily pixel, so it is deduped per
+     * calendar day regardless of how often this is called.
+     */
+    suspend fun reportDailyState()
+}
+
+@ContributesBinding(AppScope::class)
+class RealAiFeaturesStateReporter @Inject constructor(
     private val duckChat: DuckChatInternal,
     private val serpSettingsDataProvider: SerpSettingsDataProvider,
     private val pixel: Pixel,
-    @AppCoroutineScope private val coroutineScope: CoroutineScope,
-    private val dispatcherProvider: DispatcherProvider,
-) : AtbLifecyclePlugin {
+) : AiFeaturesStateReporter {
 
-    override fun onAppRetentionAtbRefreshed(oldAtb: String, newAtb: String) {
-        coroutineScope.launch(dispatcherProvider.io()) {
-            fireStatePixel()
-        }
-    }
-
-    private suspend fun fireStatePixel() {
+    override suspend fun reportDailyState() {
         val duckAiOn = duckChat.observeEnableDuckChatUserSetting().firstOrNull() ?: false
 
         val rawKbe = serpSettingsDataProvider.observeSetting(SearchAssistVisibility.SERP_SETTINGS_KEY).firstOrNull()

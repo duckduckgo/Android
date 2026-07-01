@@ -96,7 +96,6 @@
     <string name="duckAiHideAiGeneratedImagesDescription">Filtrē MI radītus attēlus no attēlu meklēšanas rezultātiem</string>
 
     <!-- Search Assist Visibility -->
-    <string name="duckAiSearchAssistVisibilityTitle">Search Assist redzamība</string>
     <string name="duckAiSearchAssistVisibilitySubtitle">Izvēlies, cik bieži vēlies redzēt ar MI atbalstītas atbildes savos meklējumos.</string>
     <string name="duckAiSearchAssistVisibilityNever">Nekad</string>
     <string name="duckAiSearchAssistVisibilityOnDemand">Pēc pieprasījuma</string>

@@ -96,7 +96,6 @@
     <string name="duckAiHideAiGeneratedImagesDescription">Filtruje obrazy generowane przez AI z wyników wyszukiwania obrazów</string>
 
     <!-- Search Assist Visibility -->
-    <string name="duckAiSearchAssistVisibilityTitle">Widoczność Search Assist</string>
     <string name="duckAiSearchAssistVisibilitySubtitle">Wybierz, jak często w wyszukiwaniach mają pojawiać się odpowiedzi wspomagane przez sztuczną inteligencję.</string>
     <string name="duckAiSearchAssistVisibilityNever">Nigdy</string>
     <string name="duckAiSearchAssistVisibilityOnDemand">Na żądanie</string>

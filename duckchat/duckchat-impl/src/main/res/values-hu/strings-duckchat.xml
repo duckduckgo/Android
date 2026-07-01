@@ -96,7 +96,6 @@
     <string name="duckAiHideAiGeneratedImagesDescription">Kiszűri az AI által generált képeket a képkeresési találatokból</string>
 
     <!-- Search Assist Visibility -->
-    <string name="duckAiSearchAssistVisibilityTitle">Search Assist láthatósága</string>
     <string name="duckAiSearchAssistVisibilitySubtitle">Válaszd ki, milyen gyakran szeretnél mesterséges intelligenciával generált válaszokat látni a kereséseid során.</string>
     <string name="duckAiSearchAssistVisibilityNever">Soha</string>
     <string name="duckAiSearchAssistVisibilityOnDemand">Igény esetén</string>

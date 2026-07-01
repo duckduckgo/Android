@@ -96,7 +96,6 @@
     <string name="duckAiHideAiGeneratedImagesDescription">Görsel arama sonuçlarından yapay zeka tarafından üretilmiş görselleri filtreler</string>
 
     <!-- Search Assist Visibility -->
-    <string name="duckAiSearchAssistVisibilityTitle">Search Assist Görünürlüğü</string>
     <string name="duckAiSearchAssistVisibilitySubtitle">Yapay zeka destekli yanıtların aramalarınızda ne sıklıkta görünmesini istediğinizi seçin.</string>
     <string name="duckAiSearchAssistVisibilityNever">Hiçbir zaman</string>
     <string name="duckAiSearchAssistVisibilityOnDemand">Talep Üzerine</string>

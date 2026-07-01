@@ -96,7 +96,6 @@
     <string name="duckAiHideAiGeneratedImagesDescription">Filtrira slike generirane umjetnom inteligencijom iz rezultata pretraživanja slika</string>
 
     <!-- Search Assist Visibility -->
-    <string name="duckAiSearchAssistVisibilityTitle">Vidljivost Search Assista</string>
     <string name="duckAiSearchAssistVisibilitySubtitle">Odaberi koliko često želiš da se odgovori potpomognuti umjetnom inteligencijom pojavljuju u tvojim pretraživanjima.</string>
     <string name="duckAiSearchAssistVisibilityNever">Nikada</string>
     <string name="duckAiSearchAssistVisibilityOnDemand">Na zahtjev</string>
