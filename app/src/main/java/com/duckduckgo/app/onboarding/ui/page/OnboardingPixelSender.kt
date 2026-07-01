@@ -55,7 +55,7 @@ sealed interface OnboardingPixelAction {
     data class NotificationsConfirmed(val granted: Boolean) : OnboardingPixelAction
     data class AddressBarClicked(val position: OmnibarType) : OnboardingPixelAction
     data class SearchExperienceClicked(val withAi: Boolean) : OnboardingPixelAction
-    data class TryASearchClicked(
+    data class TryInputClicked(
         val fromSuggestion: Boolean,
         val isChat: Boolean,
     ) : OnboardingPixelAction
@@ -131,7 +131,7 @@ class RealOnboardingPixelSender @Inject constructor(
             is OnboardingPixelAction.SearchExperienceClicked ->
                 fireStep(pixelName, PIXEL_EVENT_CLICKED, if (action.withAi) SEARCH_PLUS_DUCKAI else SEARCH_ONLY)
 
-            is OnboardingPixelAction.TryASearchClicked ->
+            is OnboardingPixelAction.TryInputClicked ->
                 fireStep(pixelName, PIXEL_EVENT_CLICKED, tryASearchValue(action.fromSuggestion, action.isChat))
 
             is OnboardingPixelAction.QuickSetupClicked ->

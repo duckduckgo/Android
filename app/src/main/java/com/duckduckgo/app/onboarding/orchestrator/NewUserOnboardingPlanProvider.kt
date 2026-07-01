@@ -530,7 +530,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
                         }
                         onboardingPixelSender.fire(
                             pixelName,
-                            OnboardingPixelAction.TryASearchClicked(fromSuggestion = event.fromSuggestion, isChat = event.isChat),
+                            OnboardingPixelAction.TryInputClicked(fromSuggestion = event.fromSuggestion, isChat = event.isChat),
                         )
                         ctx.completionResult = if (event.isChat) {
                             NewUserOnboardingResult.LaunchChat(prompt = event.query)
@@ -586,7 +586,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
                         onboardingPixelSender.chatBranchSelected()
                         onboardingPixelSender.fire(
                             pixelName,
-                            OnboardingPixelAction.TryASearchClicked(fromSuggestion = event.fromSuggestion, isChat = event.isChat),
+                            OnboardingPixelAction.TryInputClicked(fromSuggestion = event.fromSuggestion, isChat = event.isChat),
                         )
                         ctx.pendingDuckAiPrompt = event.query
                         Advance

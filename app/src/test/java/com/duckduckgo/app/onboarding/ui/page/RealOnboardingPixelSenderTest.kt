@@ -609,12 +609,12 @@ class RealOnboardingPixelSenderTest {
     }
 
     @Test
-    fun whenFireTryASearchClickedSuggestedSearchThenValueSuggestedSearch() = runTest {
+    fun whenFireTryInputClickedSuggestedSearchThenValueSuggestedSearch() = runTest {
         whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis())
 
         testee.fire(
             ONBOARDING_SEARCH_CHAT_TOGGLE,
-            OnboardingPixelAction.TryASearchClicked(fromSuggestion = true, isChat = false),
+            OnboardingPixelAction.TryInputClicked(fromSuggestion = true, isChat = false),
         )
 
         verify(mockPixel).fire(
@@ -633,12 +633,12 @@ class RealOnboardingPixelSenderTest {
     }
 
     @Test
-    fun whenFireTryASearchClickedCustomChatThenValueCustomChat() = runTest {
+    fun whenFireTryInputClickedCustomChatThenValueCustomChat() = runTest {
         whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis())
 
         testee.fire(
             ONBOARDING_SEARCH_CHAT_TOGGLE,
-            OnboardingPixelAction.TryASearchClicked(fromSuggestion = false, isChat = true),
+            OnboardingPixelAction.TryInputClicked(fromSuggestion = false, isChat = true),
         )
 
         verify(mockPixel).fire(

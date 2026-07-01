@@ -1116,7 +1116,7 @@ class BrandDesignUpdatePageViewModelTest {
         }
     }
 
-    // TryASearchClicked brand-design pixel and onboarding variant setting are now fired from the
+    // TryInputClicked brand-design pixel and onboarding variant setting are now fired from the
     // orchestrator plan provider (inputScreenPreviewStep / customAiInputScreenPreviewStep), not the ViewModel.
 
     // endregion

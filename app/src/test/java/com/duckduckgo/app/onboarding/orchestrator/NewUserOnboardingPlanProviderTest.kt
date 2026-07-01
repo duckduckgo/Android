@@ -856,7 +856,7 @@ class NewUserOnboardingPlanProviderTest {
     }
 
     @Test
-    fun `when input screen preview suggestion search submitted then fires TryASearchClicked with suggestion and search`() = runTest {
+    fun `when input screen preview suggestion search submitted then fires TryInputClicked with suggestion and search`() = runTest {
         whenever(duckAiAvailability.isDuckAiOnboardingEnabled()).thenReturn(true)
         start()
         orchestrator.onEvent(NewUserOnboardingEvent.IntroAnimationFinished)
@@ -869,7 +869,7 @@ class NewUserOnboardingPlanProviderTest {
         orchestrator.onEvent(NewUserOnboardingEvent.InputDemoQuerySubmitted(query = "cats", isChat = false, fromSuggestion = true))
         verify(
             onboardingPixelSender,
-        ).fire(ONBOARDING_SEARCH_CHAT_TOGGLE, OnboardingPixelAction.TryASearchClicked(fromSuggestion = true, isChat = false))
+        ).fire(ONBOARDING_SEARCH_CHAT_TOGGLE, OnboardingPixelAction.TryInputClicked(fromSuggestion = true, isChat = false))
     }
 
     @Test
@@ -937,7 +937,7 @@ class NewUserOnboardingPlanProviderTest {
     }
 
     @Test
-    fun `when custom ai input screen preview demo submitted then sets chat variant and fires TryASearchClicked`() = runTest {
+    fun `when custom ai input screen preview demo submitted then sets chat variant and fires TryInputClicked`() = runTest {
         whenever(customAiOnboardingResolver.resolve()).thenReturn(true)
         start()
         orchestrator.onEvent(NewUserOnboardingEvent.IntroAnimationFinished)
@@ -950,7 +950,7 @@ class NewUserOnboardingPlanProviderTest {
         verify(onboardingPixelSender).chatBranchSelected()
         verify(onboardingPixelSender).fire(
             ONBOARDING_SEARCH_CHAT_TOGGLE,
-            OnboardingPixelAction.TryASearchClicked(fromSuggestion = false, isChat = true),
+            OnboardingPixelAction.TryInputClicked(fromSuggestion = false, isChat = true),
         )
     }
 
