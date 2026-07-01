@@ -34,14 +34,21 @@ class BrandDesignBackgroundFillSpecTest {
 
     @Before
     fun setup() {
-        whenever(onboardingStore.isCustomAiOnboardingFlow()).thenReturn(false)
         whenever(onboardingStore.getSearchOptions()).thenReturn(emptyList())
     }
 
     @Test
     fun endBubbleHasFillSpec() {
         val cta =
-            DaxEndBrandDesignUpdateBubbleCta(onboardingStore, appInstallStore, isLightTheme = true, deviceInfo, onboardingImprovementsEnabled = true)
+            DaxEndBrandDesignUpdateBubbleCta(
+                onboardingStore,
+                appInstallStore,
+                isLightTheme = true,
+                deviceInfo,
+                onboardingImprovementsEnabled = true,
+                onboardingImprovementsV2Enabled = true,
+                isOmnibarBottom = false,
+            )
         assertEquals(280f, cta.backgroundFillSpec?.fillHeightDp)
     }
 
@@ -53,8 +60,10 @@ class BrandDesignBackgroundFillSpecTest {
                 appInstallStore,
                 isLightTheme = true,
                 deviceInfo,
+                isCustomAiOnboardingFlow = false,
                 isFreeTrialCopy = false,
                 onboardingImprovementsEnabled = true,
+                onboardingImprovementsV2Enabled = true,
             )
         assertEquals(190f, cta.backgroundFillSpec?.fillHeightDp)
     }
