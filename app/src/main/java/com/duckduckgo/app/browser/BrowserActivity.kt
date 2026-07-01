@@ -1345,7 +1345,11 @@ open class BrowserActivity : DuckDuckGoActivity() {
                 .flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED)
                 .collect { mode ->
                     if (mode != currentBrowserMode) {
-                        modeSwitchRecreateSignal.markPending()
+                        // Only needed on the old path: with recreateAwareLifecycle on,
+                        // the recreate's onOpen is suppressed so FirstScreenHandler never runs
+                        if (!androidBrowserConfigFeature.recreateAwareLifecycle().isEnabled()) {
+                            modeSwitchRecreateSignal.markPending()
+                        }
                         recreate()
                     }
                 }

@@ -396,4 +396,12 @@ interface AndroidBrowserConfigFeature {
      */
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun webViewSessionPersistence(): Toggle
+
+    /**
+     * Kill switch: when enabled, an Activity.recreate() (mode switch / config change) is not treated as an
+     * app background->foreground, so BrowserApplicationStateInfo skips the onClose()/onOpen() pipeline for it.
+     * Disable to restore firing the full lifecycle pipeline on every recreate. Defaults to `true`.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    fun recreateAwareLifecycle(): Toggle
 }
