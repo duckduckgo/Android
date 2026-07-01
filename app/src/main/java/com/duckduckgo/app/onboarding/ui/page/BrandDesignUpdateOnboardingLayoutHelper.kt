@@ -71,6 +71,63 @@ object BrandDesignUpdateOnboardingLayoutHelper {
         )
     }
 
+    // TODO: remove when onboardingImprovementsV2 flag is removed
+    fun hasSpaceForAnimation(
+        rootView: View,
+        dialogView: View,
+        decorationView: View,
+    ): Boolean {
+        if (rootView.height == 0) return false
+        if (isInScrollableContainer(dialogView, rootView)) return true
+
+        val dialogWidthSpec = if (dialogView.width > 0) {
+            View.MeasureSpec.makeMeasureSpec(dialogView.width, View.MeasureSpec.EXACTLY)
+        } else {
+            View.MeasureSpec.makeMeasureSpec(rootView.width, View.MeasureSpec.AT_MOST)
+        }
+        val dialogHeightSpec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
+        dialogView.measure(dialogWidthSpec, dialogHeightSpec)
+
+        val dialogParams = dialogView.layoutParams as ViewGroup.MarginLayoutParams
+        val dialogSpace = dialogView.measuredHeight + dialogParams.topMargin + dialogParams.bottomMargin
+
+        val decorationParams = decorationView.layoutParams as ViewGroup.MarginLayoutParams
+        val decorationSpace = decorationView.layoutParams.height + decorationParams.bottomMargin
+
+        return rootView.height >= dialogSpace + decorationSpace
+    }
+
+    // TODO: remove when onboardingImprovementsV2 flag is removed
+    fun calculateWalkingDaxHeight(
+        rootView: View,
+        dialogView: View,
+        daxView: View,
+        maxHeightPx: Int,
+        minHeightPx: Int,
+    ): Int? {
+        if (rootView.height == 0) return null
+        if (isInScrollableContainer(dialogView, rootView)) return maxHeightPx
+
+        val dialogWidthSpec = if (dialogView.width > 0) {
+            View.MeasureSpec.makeMeasureSpec(dialogView.width, View.MeasureSpec.EXACTLY)
+        } else {
+            View.MeasureSpec.makeMeasureSpec(rootView.width, View.MeasureSpec.AT_MOST)
+        }
+        val dialogHeightSpec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
+        dialogView.measure(dialogWidthSpec, dialogHeightSpec)
+
+        val dialogParams = dialogView.layoutParams as ViewGroup.MarginLayoutParams
+        val dialogSpace = dialogView.measuredHeight + dialogParams.topMargin + dialogParams.bottomMargin
+
+        val daxParams = daxView.layoutParams as ViewGroup.MarginLayoutParams
+        val availableForDax = rootView.height - dialogSpace - daxParams.bottomMargin
+
+        return when {
+            availableForDax < minHeightPx -> null
+            else -> availableForDax.coerceAtMost(maxHeightPx)
+        }
+    }
+
     fun isInScrollableContainer(view: View, stopAt: View): Boolean {
         var parent = view.parent
         while (parent != null && parent != stopAt) {

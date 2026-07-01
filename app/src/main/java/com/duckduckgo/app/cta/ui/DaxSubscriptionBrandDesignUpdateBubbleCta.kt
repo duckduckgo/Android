@@ -39,6 +39,7 @@ data class DaxSubscriptionBrandDesignUpdateBubbleCta(
     val isCustomAiOnboardingFlow: Boolean,
     val isFreeTrialCopy: Boolean,
     override val onboardingImprovementsEnabled: Boolean,
+    override val onboardingImprovementsV2Enabled: Boolean,
 ) : DaxBubbleCta.BrandDesignUpdateBubbleCta(
     ctaId = CtaId.DAX_INTRO_PRIVACY_PRO,
     title = R.string.onboardingPrivacyProDaxDialogTitle,
@@ -56,6 +57,7 @@ data class DaxSubscriptionBrandDesignUpdateBubbleCta(
     isLightTheme = isLightTheme,
     deviceInfo = deviceInfo,
     onboardingImprovementsEnabled = onboardingImprovementsEnabled,
+    onboardingImprovementsV2Enabled = onboardingImprovementsV2Enabled,
 ),
     DaxBubbleCta.ShowsWavingDax {
     override val activeIncludeId: Int = R.id.primaryCta

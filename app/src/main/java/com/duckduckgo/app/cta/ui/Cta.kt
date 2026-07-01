@@ -1625,6 +1625,7 @@ sealed class DaxBubbleCta(
         open val isLightTheme: Boolean,
         open val deviceInfo: DeviceInfo,
         open val onboardingImprovementsEnabled: Boolean = true,
+        open val onboardingImprovementsV2Enabled: Boolean = true,
     ) : DaxBubbleCta(
         ctaId = ctaId,
         title = title,
@@ -1676,7 +1677,7 @@ sealed class DaxBubbleCta(
 
         private val wavingDaxController: WavingDaxController? by lazy {
             if (onboardingImprovementsEnabled && this is ShowsWavingDax) {
-                WavingDaxController(showArrow, deviceInfo, wavingDaxSpec)
+                WavingDaxController(showArrow, deviceInfo, wavingDaxSpec, improvementsV2Enabled = onboardingImprovementsV2Enabled)
             } else {
                 null
             }
@@ -1716,7 +1717,7 @@ sealed class DaxBubbleCta(
                     showsWavingDax.configureWavingDax(
                         dax = dax,
                         deviceInfo = deviceInfo,
-                        improvementsEnabled = onboardingImprovementsEnabled,
+                        improvementsEnabled = onboardingImprovementsEnabled && onboardingImprovementsV2Enabled,
                     )
                     if (onboardingImprovementsEnabled) {
                         dax.isInvisible = true

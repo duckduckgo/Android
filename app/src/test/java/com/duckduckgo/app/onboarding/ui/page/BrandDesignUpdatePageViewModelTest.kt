@@ -33,6 +33,7 @@ import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingActivityStep
 import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingPlanProvider
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.ui.page.BrandDesignUpdatePageViewModel.Command
+import com.duckduckgo.app.onboardingbranddesignupdate.OnboardingBrandDesignUpdateToggles
 import com.duckduckgo.app.onboardingquicksetup.OnboardingQuickSetupExperimentManager
 import com.duckduckgo.app.onboardingquicksetup.OnboardingQuickSetupExperimentManager.QuickSetupExperimentVariant
 import com.duckduckgo.app.pixels.AppPixelName
@@ -114,6 +115,9 @@ class BrandDesignUpdatePageViewModelTest {
     private val mockSyncAutoRestore: SyncAutoRestore = mock()
     private val mockQuickSetupPixelSender: QuickSetupPixelSender = mock()
     private val mockCustomAiOnboardingStore: CustomAiOnboardingStore = mock()
+    private val fakeOnboardingBrandDesignUpdateToggles: OnboardingBrandDesignUpdateToggles = FakeFeatureToggleFactory.create(
+        OnboardingBrandDesignUpdateToggles::class.java,
+    )
 
     private val orchestratorState = MutableStateFlow<LinearOnboardingState>(LinearOnboardingState.NotStarted)
     private val mockOrchestrator: LinearOnboardingOrchestrator = mock {
@@ -148,6 +152,7 @@ class BrandDesignUpdatePageViewModelTest {
             mockQuickSetupPixelSender,
             mockOrchestrator,
             mockCustomAiOnboardingStore,
+            fakeOnboardingBrandDesignUpdateToggles,
         )
     }
 
@@ -1651,6 +1656,18 @@ class BrandDesignUpdatePageViewModelTest {
     private suspend fun enterQuickSetupTreatment() {
         whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(true)
         whenever(mockOnboardingQuickSetupExperimentManager.enroll()).thenReturn(QuickSetupExperimentVariant.TREATMENT)
+    }
+
+    // endregion
+
+    // region onboardingImprovementsV2Enabled
+
+    @Test
+    fun whenOnboardingImprovementsV2DisabledThenViewStateReflectsFalse() = runTest {
+        fakeOnboardingBrandDesignUpdateToggles.onboardingImprovementsV2().setRawStoredState(Toggle.State(remoteEnableState = false))
+        val testee = createViewModel()
+        advanceUntilIdle()
+        assertFalse(testee.viewState.value.onboardingImprovementsV2Enabled)
     }
 
     // endregion

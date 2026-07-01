@@ -18,24 +18,21 @@ package com.duckduckgo.app.cta.ui
 
 import com.duckduckgo.common.utils.device.DeviceInfo
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.mockito.kotlin.mock
 
 class WavingDaxControllerTest {
 
     private val deviceInfo: DeviceInfo = mock()
+    private val testSpec = DaxBubbleCta.WavingDaxSpec(0f, 0f, 0f, 178f, 178f, false)
     private val controller = WavingDaxController(
         showArrow = true,
         deviceInfo = deviceInfo,
-        wavingDaxSpec = DaxBubbleCta.WavingDaxSpec(
-            rotationDegrees = 0f,
-            translationXDp = 0f,
-            translationYDp = 0f,
-            minHeightDp = 178f,
-            maxHeightDp = 178f,
-            anchorToCardOnTablet = false,
-        ),
+        wavingDaxSpec = testSpec,
+        improvementsV2Enabled = true,
     )
 
     @Test
@@ -66,5 +63,73 @@ class WavingDaxControllerTest {
     @Test
     fun daxHorizontalScale_isOne_whenMaxHeightNonPositive() {
         assertEquals(1f, controller.daxHorizontalScale(heightPx = 400, maxHeightPx = 0), 0f)
+    }
+
+    // develop / V2-off daxFits tests
+
+    @Test
+    fun daxFits_false_whenHeadIntrudesIntoCardBody() {
+        assertEquals(
+            false,
+            controller.daxFits(daxTop = 90, daxLeft = 0, daxRight = 40, cardBodyBottom = 100, finBottom = 130, finLeft = 50, finRight = 100),
+        )
+    }
+
+    @Test
+    fun daxFits_false_whenInFinBandAndOverlapsFinHorizontally() {
+        assertEquals(
+            false,
+            controller.daxFits(daxTop = 110, daxLeft = 60, daxRight = 90, cardBodyBottom = 100, finBottom = 130, finLeft = 50, finRight = 100),
+        )
+    }
+
+    @Test
+    fun daxFits_true_whenInFinBandButHorizontallyClearOfFin() {
+        assertEquals(
+            true,
+            controller.daxFits(daxTop = 110, daxLeft = 0, daxRight = 40, cardBodyBottom = 100, finBottom = 130, finLeft = 50, finRight = 100),
+        )
+    }
+
+    @Test
+    fun daxFits_true_whenEntirelyBelowFinTip() {
+        assertEquals(
+            true,
+            controller.daxFits(daxTop = 140, daxLeft = 60, daxRight = 90, cardBodyBottom = 100, finBottom = 130, finLeft = 50, finRight = 100),
+        )
+    }
+
+    @Test
+    fun whenV2DisabledThenDaxFitsRotatedRectLogicUsed() {
+        val controller = WavingDaxController(
+            showArrow = true,
+            deviceInfo = deviceInfo,
+            wavingDaxSpec = testSpec,
+            improvementsV2Enabled = false,
+        )
+        // daxTop below cardBodyBottom and clear of the fin → fits
+        assertTrue(
+            controller.daxFits(
+                daxTop = 100,
+                daxLeft = 0,
+                daxRight = 10,
+                cardBodyBottom = 50,
+                finBottom = 40,
+                finLeft = 500,
+                finRight = 600,
+            ),
+        )
+        // daxTop intruding into the card body → does not fit
+        assertFalse(
+            controller.daxFits(
+                daxTop = 30,
+                daxLeft = 0,
+                daxRight = 10,
+                cardBodyBottom = 50,
+                finBottom = 40,
+                finLeft = 500,
+                finRight = 600,
+            ),
+        )
     }
 }
