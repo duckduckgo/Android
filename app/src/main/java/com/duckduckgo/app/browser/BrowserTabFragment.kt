@@ -1650,7 +1650,7 @@ class BrowserTabFragment :
 
     private fun showChatSuggestionFireDialog(chatUrl: String) {
         viewLifecycleOwner.lifecycleScope.launch {
-            val dialog = fireDialogProvider.createFireDialog(FireDialogOrigin.ChatHistory(selectedChatUrls = setOf(chatUrl)))
+            val dialog = fireDialogProvider.createFireDialog(FireDialogOrigin.ChatAutocomplete(chatUrl))
             dialog.show(parentFragmentManager)
         }
     }
