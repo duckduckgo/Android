@@ -130,7 +130,6 @@ interface NativeInputWidget {
     fun getSelectedTool(): String?
     fun clearSelectedTool()
     fun onPromptSubmitted()
-    fun setModelPickerEnabled(enabled: Boolean)
 
     /** Block all interaction with the widget's controls and dim them, or restore. */
     fun setInteractionLocked(locked: Boolean)
@@ -1075,10 +1074,6 @@ class NativeInputModeWidget @JvmOverloads constructor(
 
     override fun onPromptSubmitted() {
         viewModel.onPromptSubmitted()
-    }
-
-    override fun setModelPickerEnabled(enabled: Boolean) {
-        viewModel.setModelPickerEnabled(enabled)
     }
 
     override fun bindModelPickerEnabledSource(source: Flow<Boolean>) {
