@@ -18,7 +18,9 @@ package com.duckduckgo.app.browser.state
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.browser.BrowserActivity
+import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.browser.api.BrowserLifecycleObserver
+import com.duckduckgo.feature.toggles.api.Toggle
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -30,6 +32,8 @@ class BrowserApplicationStateInfoTest {
     private lateinit var browserApplicationStateInfo: BrowserApplicationStateInfo
     private val observer: BrowserLifecycleObserver = mock()
     private val activity = FakeBrowserActivity()
+    private val recreateAwareToggle: Toggle = mock()
+    private val androidBrowserConfigFeature: AndroidBrowserConfigFeature = mock()
 
     class FakeBrowserActivity : BrowserActivity() {
         var isConfigChange = false
@@ -42,7 +46,9 @@ class BrowserApplicationStateInfoTest {
     @Before
     fun setup() {
         activity.destroyedByBackPress = false
-        browserApplicationStateInfo = BrowserApplicationStateInfo(setOf(observer))
+        whenever(recreateAwareToggle.isEnabled()).thenReturn(true)
+        whenever(androidBrowserConfigFeature.recreateAwareLifecycle()).thenReturn(recreateAwareToggle)
+        browserApplicationStateInfo = BrowserApplicationStateInfo(setOf(observer), androidBrowserConfigFeature)
     }
 
     @Test
@@ -193,6 +199,23 @@ class BrowserApplicationStateInfoTest {
         verify(observer).onClose()
 
         // A genuine foreground afterwards must fire onOpen() again (recreate flag not stuck).
+        browserApplicationStateInfo.onActivityStarted(activity)
+        verify(observer).onOpen(false)
+    }
+
+    @Test
+    fun whenConfigChangeButRecreateAwareLifecycleDisabledThenNotifyCloseAndOpen() {
+        // Kill switch off => behave exactly as before the fix: a recreate fires onClose()/onOpen().
+        whenever(recreateAwareToggle.isEnabled()).thenReturn(false)
+
+        browserApplicationStateInfo.onActivityCreated(activity, null)
+        browserApplicationStateInfo.onActivityStarted(activity)
+        verify(observer).onOpen(true)
+
+        activity.isConfigChange = true
+        browserApplicationStateInfo.onActivityStopped(activity)
+        verify(observer).onClose()
+
         browserApplicationStateInfo.onActivityStarted(activity)
         verify(observer).onOpen(false)
     }

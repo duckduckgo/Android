@@ -19,6 +19,7 @@ package com.duckduckgo.app.browser.state
 import android.app.Activity
 import android.os.Bundle
 import com.duckduckgo.app.browser.BrowserActivity
+import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.browser.api.ActivityLifecycleCallbacks
 import com.duckduckgo.browser.api.BrowserLifecycleObserver
 import com.duckduckgo.di.DaggerSet
@@ -31,6 +32,7 @@ import javax.inject.Inject
 @SingleInstanceIn(AppScope::class)
 class BrowserApplicationStateInfo @Inject constructor(
     private val observers: DaggerSet<BrowserLifecycleObserver>,
+    private val androidBrowserConfigFeature: AndroidBrowserConfigFeature,
 ) : ActivityLifecycleCallbacks {
     private var created = 0
     private var started = 0
@@ -75,8 +77,8 @@ class BrowserApplicationStateInfo @Inject constructor(
     override fun onActivityStopped(activity: Activity) {
         if (started > 0) (--started)
         if (started == 0) {
-            if (activity.isChangingConfigurations) {
-                // recreate()/rotation, not a real background
+            if (activity.isChangingConfigurations && androidBrowserConfigFeature.recreateAwareLifecycle().isEnabled()) {
+                // recreate()/rotation, not a real background (kill switch: recreateAwareLifecycle)
                 stoppedForRecreate = true
             } else {
                 observers.forEach { it.onClose() }
