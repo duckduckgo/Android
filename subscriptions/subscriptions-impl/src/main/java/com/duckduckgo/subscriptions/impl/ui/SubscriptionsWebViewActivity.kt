@@ -46,6 +46,7 @@ import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.SpecialUrlDetector
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.browser.api.ui.BrowserScreens.SettingsScreenNoParams
 import com.duckduckgo.common.ui.DuckDuckGoActivity
@@ -126,6 +127,7 @@ data class SubscriptionsWebViewActivityWithParams(
     val url: String,
     val toolbarConfig: ToolbarConfig = DaxSubscription,
     val origin: String? = null,
+    val launchPixel: String? = null,
 ) : ActivityParams {
 
     sealed class ToolbarConfig : Serializable {
@@ -182,6 +184,9 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
     lateinit var pixelSender: SubscriptionPixelSender
 
     @Inject
+    lateinit var pixel: Pixel
+
+    @Inject
     lateinit var duckChat: DuckChat
 
     @Inject
@@ -222,6 +227,10 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
 
         params = convertIntoSubscriptionWebViewActivityParams(intent).also {
             logcat { "Subscription Flow: entering with params $it" }
+        }
+
+        if (savedInstanceState == null) {
+            params.launchPixel?.let { pixel.fire(it) }
         }
 
         setContentView(binding.root)

@@ -29,7 +29,6 @@ import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
-import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionsSettingsScreenWithLaunchPixel
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.subscriptions.impl.R
@@ -131,12 +130,11 @@ class SubscriptionExpirationReminderNotificationPlugin @Inject constructor(
     override suspend fun getLaunchIntent(): Intent? {
         return globalActivityStarter.startIntent(
             context,
-            SubscriptionsWebViewActivityWithParams(url = subscriptionsUrlProvider.buyUrl),
+            SubscriptionsWebViewActivityWithParams(
+                url = subscriptionsUrlProvider.buyUrl,
+                launchPixel = pixelName(NOTIFICATION_LAUNCHED_PIXEL),
+            ),
         )
-        // return globalActivityStarter.startIntent(
-        //     context,
-        //     SubscriptionsSettingsScreenWithLaunchPixel(pixelName(NOTIFICATION_LAUNCHED_PIXEL)),
-        // )
     }
 
     companion object {

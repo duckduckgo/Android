@@ -26,7 +26,6 @@ import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
-import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.browser.api.ui.BrowserScreens.WebViewActivityWithParams
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.button.ButtonType.DESTRUCTIVE
@@ -41,11 +40,9 @@ import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
-import com.duckduckgo.navigation.api.getActivityParams
 import com.duckduckgo.subscriptions.api.ActiveOfferType
 import com.duckduckgo.subscriptions.api.SubscriptionFeedbackScreens.SubscriptionFeedbackScreenWithParams
 import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionsSettingsScreenWithEmptyParams
-import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionsSettingsScreenWithLaunchPixel
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.AUTO_RENEWABLE
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.EXPIRED
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.INACTIVE
@@ -77,7 +74,6 @@ import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
 @ContributeToActivityStarter(SubscriptionsSettingsScreenWithEmptyParams::class, screenName = "ppro.settings")
-@ContributeToActivityStarter(SubscriptionsSettingsScreenWithLaunchPixel::class, screenName = "ppro.settings")
 class SubscriptionSettingsActivity : DuckDuckGoActivity() {
 
     @Inject
@@ -85,9 +81,6 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var pixelSender: SubscriptionPixelSender
-
-    @Inject
-    lateinit var pixel: Pixel
 
     @Inject
     lateinit var subscriptionsUrlProvider: SubscriptionsUrlProvider
@@ -106,12 +99,6 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        if (savedInstanceState == null) {
-            intent.getActivityParams(SubscriptionsSettingsScreenWithLaunchPixel::class.java)?.let { params ->
-                pixel.fire(params.pixelName)
-            }
-        }
 
         val edgeToEdgeEnabled = edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.SETTINGS)
         if (edgeToEdgeEnabled) {

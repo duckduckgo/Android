@@ -20,12 +20,6 @@ import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
 
 sealed class SubscriptionScreens {
     data object SubscriptionsSettingsScreenWithEmptyParams : ActivityParams
-
-    /**
-     * Opens the subscription settings screen and fires [pixelName] on launch. Used when the screen is
-     * opened from a notification so the notification launch pixel can be reported.
-     */
-    data class SubscriptionsSettingsScreenWithLaunchPixel(val pixelName: String) : ActivityParams
     data class RestoreSubscriptionScreenWithParams(val isOriginWeb: Boolean = true) : ActivityParams
     data class SubscriptionPurchase(val origin: String? = null, val featurePage: String? = null) : ActivityParams
     data class SubscriptionUpgrade(val origin: String? = null) : ActivityParams
