@@ -19,6 +19,7 @@ import com.android.tools.lint.detector.api.Severity.ERROR
 import com.android.tools.lint.detector.api.SourceCodeScanner
 import com.android.tools.lint.detector.api.XmlContext
 import com.android.tools.lint.detector.api.XmlScanner
+import com.intellij.psi.PsiClassType
 import com.intellij.psi.PsiField
 import com.intellij.psi.PsiMethod
 import com.duckduckgo.lint.DenyListedEntry.Companion.MATCH_ALL
@@ -49,12 +50,16 @@ internal class DenyListedApiDetector : Detector(), SourceCodeScanner, XmlScanner
             className = "kotlinx.coroutines.flow.FlowKt__ReduceKt",
             functionName = "first",
             errorMessage = "first() will throw if flow is empty, firstOrNull() it's a safer option.",
+            // StateFlow always hold a value, so first() can never throw on them.
+            excludedReceiverTypes = listOf("kotlinx.coroutines.flow.StateFlow"),
             allowInTests = true,
         ),
         DenyListedEntry(
             className = "kotlinx.coroutines.flow.FlowKt__ReduceKt",
             functionName = "last",
             errorMessage = "last() will throw if there's not at least one item, lastOrNull() it's a safer option.",
+            // StateFlow always hold a value, so last() can never throw on them.
+            excludedReceiverTypes = listOf("kotlinx.coroutines.flow.StateFlow"),
             allowInTests = true,
         ),
         DenyListedEntry(
@@ -182,6 +187,7 @@ internal class DenyListedApiDetector : Detector(), SourceCodeScanner, XmlScanner
 
                 deniedFunctions.forEach { denyListEntry ->
                     if (denyListEntry.allowInTests && context.isTestSource) return@forEach
+                    if (denyListEntry.receiverTypeExcluded(context, node)) return@forEach
                     if (denyListEntry.parametersMatchWith(function) && denyListEntry.argumentsMatchWith(node)) {
                         context.report(
                             issue = ISSUE,
@@ -228,6 +234,18 @@ internal class DenyListedApiDetector : Detector(), SourceCodeScanner, XmlScanner
                 location = context.getLocation(element, type = NAME),
                 message = denyListEntry.errorMessage,
             )
+        }
+
+        private fun DenyListedEntry.receiverTypeExcluded(
+            context: JavaContext,
+            node: UCallExpression,
+        ): Boolean {
+            val excluded = excludedReceiverTypes ?: return false
+            val receiverType = node.receiverType as? PsiClassType ?: return false
+            val receiverClass = context.evaluator.findClass(receiverType.rawType().canonicalText) ?: return false
+            return excluded.any { fqcn ->
+                receiverClass.qualifiedName == fqcn || context.evaluator.inheritsFrom(receiverClass, fqcn, false)
+            }
         }
 
         private fun DenyListedEntry.parametersMatchWith(function: PsiMethod): Boolean {
@@ -295,6 +313,8 @@ data class DenyListedEntry(
     val parameters: List<String>? = null,
     /** Argument expressions to match at the call site, or null to match all invocations. */
     val arguments: List<String>? = null,
+    /** Fully-qualified receiver types (and their subtypes) to exclude from matching, or null to match all receivers. */
+    val excludedReceiverTypes: List<String>? = null,
     val errorMessage: String,
     /** When true, this entry is not reported in test sources (`src/test/...`, `src/androidTest/...`). */
     val allowInTests: Boolean = false,
