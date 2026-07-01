@@ -1,8 +1,8 @@
 appId: com.duckduckgo.mobile.android
 androidWebViewHierarchy: devtools
 name: "Split omnibar test"
-#tags:
-#  - omnibarTest
+tags:
+  - omnibarTest
 ---
 - retry:
     maxRetries: 3
