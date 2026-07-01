@@ -35,7 +35,6 @@ import com.duckduckgo.browser.api.WebViewVersionProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.customtabs.api.CustomTabDetector
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.duckchat.impl.pixel.AiFeaturesStateReporter
 import com.duckduckgo.verifiedinstallation.IsVerifiedPlayStoreInstall
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
@@ -66,7 +65,6 @@ class EnqueuedPixelWorker @Inject constructor(
     private val appBuildConfig: AppBuildConfig,
     private val dispatchers: DispatcherProvider,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
-    private val aiFeaturesStateReporter: AiFeaturesStateReporter,
 ) : MainProcessLifecycleObserver {
 
     private var launchedByFireAction: Boolean = false
@@ -125,9 +123,6 @@ class EnqueuedPixelWorker @Inject constructor(
                 parameters = paramsMap,
             )
         }
-
-        // daily snapshot of the AI-features settings state
-        aiFeaturesStateReporter.reportDailyState()
     }
 
     private fun isDuckDuckGoAppPackage(applicationId: String): String {
