@@ -23,6 +23,8 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.adblocking.api.duckplayer.DuckPlayerSettingsNoParams
+import com.duckduckgo.adblocking.api.duckplayer.PrivatePlayerMode.Disabled
+import com.duckduckgo.adblocking.api.duckplayer.PrivatePlayerMode.Enabled
 import com.duckduckgo.adblocking.impl.R
 import com.duckduckgo.adblocking.impl.databinding.ActivityAdBlockingSettingsBinding
 import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
@@ -98,6 +100,13 @@ class AdBlockingSettingsActivity : DuckDuckGoActivity() {
             .onEach { state ->
                 binding.blockAdsToggle.quietlySetIsChecked(state.isEnabled, blockAdsToggleListener)
                 renderDescription(state.showConsentDescription)
+                binding.duckPlayerEntry.setSecondaryText(
+                    when (state.duckPlayerMode) {
+                        Enabled -> getString(R.string.duck_player_mode_always)
+                        Disabled -> getString(R.string.duck_player_mode_never)
+                        else -> getString(R.string.duck_player_mode_always_ask)
+                    },
+                )
             }
             .launchIn(lifecycleScope)
 
