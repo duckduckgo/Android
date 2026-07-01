@@ -165,6 +165,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
     private var changeBoundsTransition: androidx.transition.Transition? = null
     private var changeBoundsTransitionListener: TransitionListenerAdapter? = null
     private var textIntroScale = 1f
+    private var cardBottomInsetPx = 0
     private var currentInputMode = InputMode.SEARCH
     private var isAnimating = false
         set(value) {
@@ -497,13 +498,6 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
         super.onViewCreated(view, savedInstanceState)
 
         ViewGroupCompat.installCompatInsetsDispatch(binding.root)
-        if (deviceInfo.isTablet()) {
-            ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, windowInsets ->
-                val tappableInsets = windowInsets.getInsets(WindowInsetsCompat.Type.tappableElement())
-                v.setPadding(v.paddingLeft, v.paddingTop, v.paddingRight, tappableInsets.bottom)
-                windowInsets
-            }
-        }
         ViewCompat.setOnApplyWindowInsetsListener(binding.daxDialogCta.root) { v, windowInsets ->
             val insets = windowInsets.getInsets(
                 WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout(),
@@ -511,6 +505,8 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
             v.updateLayoutParams<ViewGroup.MarginLayoutParams> {
                 topMargin = insets.top
             }
+            // The corrector reserves this on the card only while it is bottom-anchored (see correctOnce).
+            cardBottomInsetPx = insets.bottom + DIALOG_BOTTOM_INSET_GAP_DP.toPx()
             windowInsets
         }
 
@@ -535,6 +531,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
             dialog = binding.daxDialogCta.root,
             cardContainer = binding.daxDialogCta.cardContainer,
             onDecorationHidden = { binding.daxDialogCta.cardView.setArrowDepthFraction(0f) },
+            cardBottomInsetPx = { cardBottomInsetPx },
         ).also { it.attach() }
 
         combine(viewModel.viewState, introInProgress) { state, _ -> state }
@@ -2181,6 +2178,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
     }
 
     private fun applyWalkingDaxLayout(): Boolean {
+        releaseCardBottomInset()
         val walkingDaxHeight = BrandDesignUpdateOnboardingLayoutHelper.calculateDecorationHeight(
             rootView = binding.root,
             dialogView = binding.daxDialogCta.root,
@@ -2213,6 +2211,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
         minHeightDp: Int,
         bottomOverlapPx: Int = 0,
     ): Boolean {
+        releaseCardBottomInset()
         val height = BrandDesignUpdateOnboardingLayoutHelper.calculateDecorationHeight(
             rootView = binding.root,
             dialogView = binding.daxDialogCta.root,
@@ -2233,6 +2232,17 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
             decorationFitCorrector?.clear()
         }
         return height != null
+    }
+
+    // A bottom-anchored predecessor can leave a bottom inset on the card; clear it before measuring a
+    // decoration's fit so it does not count against the decoration's room. The corrector re-applies it
+    // if this dialog ends up bottom-anchored too.
+    private fun releaseCardBottomInset() {
+        val params = binding.daxDialogCta.root.layoutParams as? ViewGroup.MarginLayoutParams ?: return
+        if (params.bottomMargin != 0) {
+            params.bottomMargin = 0
+            binding.daxDialogCta.root.layoutParams = params
+        }
     }
 
     /**
@@ -2746,6 +2756,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
         private const val INPUT_SCREEN_PREVIEW_SUGGESTIONS_ANIMATION_DELAY = 500L
         private const val MIN_SCREEN_HEIGHT_FOR_KEYBOARD_DP = 600
         private const val ARROW_TARGET_OFFSET_END_DP = 80
+        private const val DIALOG_BOTTOM_INSET_GAP_DP = 16
 
         private const val WING_START_DELAY = 300L
         private const val WING_FADE_IN_DURATION = 150L
