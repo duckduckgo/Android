@@ -187,6 +187,8 @@ interface NativeInputWidget {
         onChatSuggestionDelete: (chatUrl: String) -> Unit = {},
     )
 
+    fun removeChatSuggestion(chatUrl: String)
+
     fun asView(): View
 }
 
@@ -1322,6 +1324,11 @@ class NativeInputModeWidget @JvmOverloads constructor(
         chatSuggestionsBinding = null
         onShowSuggestions = null
         onClearSuggestions = null
+    }
+
+    override fun removeChatSuggestion(chatUrl: String) {
+        val binding = chatSuggestionsBinding ?: return
+        binding.removeChatSuggestions { suggestion -> viewModel.buildChatSuggestionUrl(suggestion) == chatUrl }
     }
 
     override fun asView(): View = this

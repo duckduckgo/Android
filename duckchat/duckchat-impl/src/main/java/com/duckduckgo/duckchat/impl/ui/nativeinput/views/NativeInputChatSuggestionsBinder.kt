@@ -153,6 +153,21 @@ class NativeInputChatSuggestionsBinder @Inject constructor(
             historyShortcutDivider.setVisible(showShortcut)
         }
 
+        /**
+         * Optimistically drops any chat-history rows matching [matches] from the currently shown list
+         * (e.g. after a single-chat fire-dialog delete), without re-fetching. No-op if nothing matches.
+         *
+         * This does not recompute section dividers or the "View all chats" shortcut threshold — those
+         * reconcile on the next [submit] (i.e. the next keystroke / re-focus).
+         */
+        fun removeChatSuggestions(matches: (ChatSuggestion) -> Boolean) {
+            val current = chatSuggestionsAdapter.currentList
+            val remaining = current.filterNot(matches)
+            if (remaining.size != current.size) {
+                chatSuggestionsAdapter.submitList(remaining)
+            }
+        }
+
         private fun pluginHasContent(): Boolean = pluginItems.any { item -> item.adapters.any { it.itemCount > 0 } }
 
         fun clear() {
