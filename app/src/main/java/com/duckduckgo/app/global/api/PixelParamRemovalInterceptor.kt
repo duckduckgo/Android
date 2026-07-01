@@ -167,7 +167,6 @@ object PixelInterceptorPixelsRequiringDataCleaning : PixelParamRemovalPlugin {
             AppPixelName.NEW_ADDRESS_BAR_PICKER_V2_CONFIRMED_COUNT.pixelName to PixelParameter.removeAtb(),
             AppPixelName.NEW_ADDRESS_BAR_PICKER_V2_CONFIRMED_DAILY.pixelName to PixelParameter.removeAtb(),
             AppPixelName.PREONBOARDING_SPLIT_ADDRESS_BAR_SELECTED_UNIQUE.pixelName to PixelParameter.removeAtb(),
-            AppPixelName.ONBOARDING_QUICK_SETUP.pixelName to PixelParameter.removeAtb(),
             AppPixelName.SEARCH_AND_FAVORITES_WIDGET_ADDED.pixelName to PixelParameter.removeAtb(),
             AppPixelName.SEARCH_AND_FAVORITES_WIDGET_DELETED.pixelName to PixelParameter.removeAtb(),
             AppPixelName.SEARCH_WIDGET_ADDED.pixelName to PixelParameter.removeAtb(),

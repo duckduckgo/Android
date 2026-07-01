@@ -23,8 +23,9 @@ import com.duckduckgo.onboarding.api.LinearOnboardingEvent
  * User actions on the [NewUserOnboardingPlanProvider].
  */
 sealed interface NewUserOnboardingEvent : LinearOnboardingEvent {
+    data object Presented : NewUserOnboardingEvent
     data object IntroAnimationFinished : NewUserOnboardingEvent
-    data object NotificationPermissionFinished : NewUserOnboardingEvent
+    data class NotificationPermissionFinished(val granted: Boolean?) : NewUserOnboardingEvent
     data object ContinueClicked : NewUserOnboardingEvent
     data object RestoreRequested : NewUserOnboardingEvent
     data object SkipRequested : NewUserOnboardingEvent
@@ -34,7 +35,7 @@ sealed interface NewUserOnboardingEvent : LinearOnboardingEvent {
     data class AddressBarConfirmed(val type: OmnibarType) : NewUserOnboardingEvent
     data class InputModeConfirmed(val withAi: Boolean) : NewUserOnboardingEvent
     data class QuickSetupConfirmed(val type: OmnibarType, val withAi: Boolean) : NewUserOnboardingEvent
-    data class InputDemoQuerySubmitted(val query: String, val isChat: Boolean) : NewUserOnboardingEvent
+    data class InputDemoQuerySubmitted(val query: String, val isChat: Boolean, val fromSuggestion: Boolean) : NewUserOnboardingEvent
 
     /** The in-browser Duck.ai onboarding demo's fire flow completed; advances the duck_ai_demo step. */
     data object DuckAiFireCompleted : NewUserOnboardingEvent
