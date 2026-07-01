@@ -200,6 +200,13 @@ interface SubscriptionsFeature {
     fun privacyProFreeTrial(): Toggle
 
     /**
+     * When enabled, after a successful purchase the client navigates to the native subscription
+     * onboarding screen instead of signalling the web page to show its welcome screen.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun subscriptionsNativeOnboarding(): Toggle
+
+    /**
      * Enables/Disables duckAi for subscribers (advanced models)
      * This flag is used to hide the feature in the native client and FE.
      */

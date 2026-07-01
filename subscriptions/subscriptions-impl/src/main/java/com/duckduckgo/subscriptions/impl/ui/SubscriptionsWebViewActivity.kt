@@ -96,6 +96,7 @@ import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.GoToNetP
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.GoToPIR
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.GoToPIRDashboard
+import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.GoToSubscriptionOnboarding
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.Reload
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.RequestNotificationsPermission
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.RestoreSubscription
@@ -107,6 +108,8 @@ import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Purchas
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionsWebViewActivityWithParams.ToolbarConfig
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionsWebViewActivityWithParams.ToolbarConfig.CustomTitle
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionsWebViewActivityWithParams.ToolbarConfig.DaxSubscription
+import com.duckduckgo.subscriptions.impl.ui.onboarding.SubscriptionOnboardingActivity.Companion.SubscriptionOnboardingScreenWithParams
+import com.duckduckgo.subscriptions.impl.ui.onboarding.SubscriptionOnboardingOrigin
 import com.duckduckgo.subscriptions.impl.wideevents.SubscriptionRestoreWideEvent
 import com.duckduckgo.user.agent.api.UserAgentProvider
 import com.google.android.material.snackbar.Snackbar
@@ -115,6 +118,8 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import logcat.LogPriority.ERROR
+import logcat.asLog
 import logcat.logcat
 import org.json.JSONObject
 import java.io.File
@@ -526,6 +531,7 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
             is GoToPIRDashboard -> goToPIRDashboard()
             is GoToNetP -> goToNetP(command.activityParams)
             is GoToDuckAI -> goToDuckAI()
+            is GoToSubscriptionOnboarding -> goToSubscriptionOnboarding(command.event)
             is ComputeUserSettings -> computeUserSettings(command.id)
             is RequestNotificationsPermission -> launchNotificationsPermission(command.id)
             Reload -> binding.webview.reload()
@@ -559,6 +565,19 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
 
     private fun goToDuckAI() {
         duckChat.openDuckChat()
+    }
+
+    private fun goToSubscriptionOnboarding(event: SubscriptionEventData) {
+        // Notify the FE of the successful purchase before tearing down the WebView, then navigate
+        // natively. Calling sendJsEvent before finish() ensures evaluateJavascript is at least
+        // dispatched; subscription state itself is already persisted natively at this point.
+        sendJsEvent(event)
+        // Only finish the WebView if the onboarding screen actually launched, so a launch failure
+        // can't leave the user on a black/closed screen; log the cause if it does fail.
+        val launched = runCatching {
+            globalActivityStarter.start(this, SubscriptionOnboardingScreenWithParams(SubscriptionOnboardingOrigin.PURCHASE))
+        }.onFailure { logcat(ERROR) { "Subscription onboarding launch failed: ${it.asLog()}" } }.isSuccess
+        if (launched) finish()
     }
 
     private fun computeUserSettings(id: String) {
@@ -630,7 +649,9 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
                 object : TextAlertDialogBuilder.EventListener() {
                     override fun onPositiveButtonClicked() {
                         if (subscriptionEventData != null) {
-                            subscriptionJsMessaging.sendSubscriptionEvent(subscriptionEventData)
+                            // The VM decides: navigate to the native onboarding screen (flag on) or
+                            // signal the web page to show its welcome screen (flag off).
+                            viewModel.onPurchaseSuccessAcknowledged(subscriptionEventData)
                         } else {
                             finishToSettings()
                         }

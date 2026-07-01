@@ -130,6 +130,20 @@
 
             </LinearLayout>
 
+            <com.duckduckgo.common.ui.view.text.DaxTextView
+                android:id="@+id/onboardingEntryPoint"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="@dimen/keyline_4"
+                android:background="?selectableItemBackground"
+                android:clickable="true"
+                android:focusable="true"
+                android:padding="@dimen/keyline_2"
+                android:text="@string/subscriptionOnboardingEntryPoint"
+                android:textColor="?attr/daxColorAccentBlue"
+                app:typography="body1" />
+
             <com.duckduckgo.common.ui.view.InfoPanel
                 android:id="@+id/pendingDowngradeInfoPanel"
                 style="@style/Widget.DuckDuckGo.InfoPanel"

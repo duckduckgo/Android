@@ -74,6 +74,7 @@ dependencies {
     implementation "com.android.billingclient:billing:_"
     implementation "com.android.billingclient:billing-ktx:_"
     implementation "com.squareup.logcat:logcat:_"
+    implementation 'nl.dionsegijn:konfetti:1.2.5'
 
     implementation Google.dagger
     implementation AndroidX.core.ktx

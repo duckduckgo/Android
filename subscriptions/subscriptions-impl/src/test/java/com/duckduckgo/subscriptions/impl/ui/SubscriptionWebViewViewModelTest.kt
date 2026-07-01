@@ -7,6 +7,7 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.FakeToggleStore
 import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import com.duckduckgo.networkprotection.api.NetworkProtectionAccessState
 import com.duckduckgo.networkprotection.api.NetworkProtectionScreens.NetworkProtectionManagementScreenNoParams
 import com.duckduckgo.pir.api.PirFeature
@@ -170,6 +171,34 @@ class SubscriptionWebViewViewModelTest {
             assertTrue(result is Command.SendJsEvent)
             assertEquals("{\"type\":\"canceled\"}", (result as Command.SendJsEvent).event.params.toString())
 
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenPurchaseSuccessAcknowledgedAndNativeOnboardingEnabledThenGoToOnboarding() = runTest {
+        subscriptionsFeature.subscriptionsNativeOnboarding().setRawStoredState(Toggle.State(enable = true))
+        val event = SubscriptionEventData("useSubscription", "onPurchaseUpdate", JSONObject("""{"type":"completed"}"""))
+
+        viewModel.commands().test {
+            viewModel.onPurchaseSuccessAcknowledged(event)
+            val result = awaitItem()
+            assertTrue(result is Command.GoToSubscriptionOnboarding)
+            assertEquals(event, (result as Command.GoToSubscriptionOnboarding).event)
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenPurchaseSuccessAcknowledgedAndNativeOnboardingDisabledThenSendJsEvent() = runTest {
+        subscriptionsFeature.subscriptionsNativeOnboarding().setRawStoredState(Toggle.State(enable = false))
+        val event = SubscriptionEventData("useSubscription", "onPurchaseUpdate", JSONObject("""{"type":"completed"}"""))
+
+        viewModel.commands().test {
+            viewModel.onPurchaseSuccessAcknowledged(event)
+            val result = awaitItem()
+            assertTrue(result is Command.SendJsEvent)
+            assertEquals(event, (result as Command.SendJsEvent).event)
             cancelAndConsumeRemainingEvents()
         }
     }
