@@ -910,6 +910,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
             }
             super.submitMessage(message)
         }
+        hideKeyboard()
     }
 
     private fun fireSubmissionPixels(hasText: Boolean) {
