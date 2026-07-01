@@ -73,7 +73,7 @@ class InputScreenRetentionMonitor @Inject constructor(
                         if (nowMinus24hET > lastCheckET) {
                             val wasFeatureEnabled = persistedData[Key.LAST_ENABLED_STATE]
                             if (wasFeatureEnabled == true) {
-                                val isStillEnabled = duckAiFeatureState.showInputScreen.value
+                                val isStillEnabled = duckAiFeatureState.nativeInputFieldEnabled.value
                                 pixel.fire(
                                     pixel = DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_DAILY_RETENTION,
                                     parameters = mapOf("still_enabled" to isStillEnabled.toString()),
@@ -100,7 +100,7 @@ class InputScreenRetentionMonitor @Inject constructor(
 
     private suspend fun persistCurrentState() {
         val currentTimeETString = timeProvider.nowInEasternTime().toString()
-        val isFeatureEnabled = duckAiFeatureState.showInputScreen.value
+        val isFeatureEnabled = duckAiFeatureState.nativeInputFieldEnabled.value
         retentionMonitorDataStore.edit { preferences ->
             preferences[Key.LAST_CHECK_DATE_TIME_ET] = currentTimeETString
             preferences[Key.LAST_ENABLED_STATE] = isFeatureEnabled

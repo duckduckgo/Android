@@ -24,6 +24,7 @@ import android.text.InputType
 import android.transition.AutoTransition
 import android.transition.TransitionManager
 import android.util.AttributeSet
+import android.view.KeyEvent
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
@@ -497,6 +498,8 @@ class NativeInputModeWidget @JvmOverloads constructor(
             .launchIn(findViewTreeLifecycleOwner()?.lifecycleScope ?: return)
     }
 
+    private fun isSearchMode() = !isChatTabSelected()
+
     private fun applyNativeStyling() {
         setBackgroundColor(Color.TRANSPARENT)
         hideInputFieldBackground()
@@ -505,10 +508,52 @@ class NativeInputModeWidget @JvmOverloads constructor(
         prepareSubmitButtons()
         configureMainButtonsVisibility()
         configureBottomRowFocusVisibility()
+        hookClearButtonPixel()
+        hookEditorActionPixels()
         inputField.doOnTextChanged { _, _, _, _ ->
             updateSendButtonVisibility()
             updateVoiceButtonVisibility()
             updateNewLineButtonVisibility()
+        }
+    }
+
+    /**
+     * Re-wraps the clear-button click listener (originally set by the base class in init) to also
+     * fire the omnibar clear pixel. We replace rather than stack because [View.setOnClickListener]
+     * replaces existing listeners; preserving base-class behaviour manually keeps the contract clear.
+     */
+    private fun hookClearButtonPixel() {
+        val clearBtn = findViewById<View>(R.id.inputFieldClearText) ?: return
+        clearBtn.setOnClickListener {
+            inputField.text.clear()
+            inputField.setSelection(0)
+            inputField.scrollTo(0, 0)
+            onClearTextTapped?.invoke()
+            viewModel.fireClearPressed(isSearchMode())
+        }
+    }
+
+    /**
+     * Re-wraps the IME editor-action listener (originally set by the base class in init) to also
+     * fire the omnibar keyboard-go pixel. The submit path is unchanged: we call [submitMessage] and
+     * return true exactly when the base class would (IME_ACTION_GO, or a hardware Enter when the
+     * widget submits on hardware Enter), so downstream behaviour is not affected. keyboard_go fires
+     * for both submit triggers, matching the base. (floating_return is the new-line button, wired in
+     * configureSubmitButtons, not a keyboard event.)
+     */
+    private fun hookEditorActionPixels() {
+        inputField.setOnEditorActionListener { _, actionId, keyEvent ->
+            val isHardwareEnter =
+                (keyEvent?.keyCode == KeyEvent.KEYCODE_ENTER || keyEvent?.keyCode == KeyEvent.KEYCODE_NUMPAD_ENTER) &&
+                    keyEvent.action == KeyEvent.ACTION_DOWN
+
+            if (actionId == EditorInfo.IME_ACTION_GO || (isHardwareEnter && shouldSubmitOnHardwareEnter())) {
+                submitMessage()
+                viewModel.fireKeyboardGoPressed(isSearchMode())
+                true
+            } else {
+                false
+            }
         }
     }
 
@@ -775,6 +820,14 @@ class NativeInputModeWidget @JvmOverloads constructor(
             object : TabLayout.OnTabSelectedListener {
                 override fun onTabSelected(tab: TabLayout.Tab) {
                     applyTabUi()
+                    // Only fire mode_switched when the toggle is visible (i.e. user-driven); programmatic
+                    // tab changes via applyState / selectChatTab / selectSearchTab run while toggleVisible
+                    // is false and must not fire the pixel. This mirrors pushToggleSelectionIfUserDriven().
+                    if (nativeInputState?.toggleVisible == true) {
+                        val directionToSearch = tab.position == 0
+                        val hadText = inputField.text?.isNotBlank() == true
+                        viewModel.fireModeSwitched(directionToSearch, hadText)
+                    }
                     pushToggleSelectionIfUserDriven()
                     refreshTabDependentButtons()
                 }
@@ -867,6 +920,11 @@ class NativeInputModeWidget @JvmOverloads constructor(
             hasImageAttachment = hasImageAttachment,
             hasFileAttachment = hasFileAttachment,
         )
+        // Fires alongside prompt_submitted, but only when the input is in a Duck.ai chat context
+        // (a prompt sent from within an active chat) — not omnibar submissions that start a new chat.
+        if (isDuckAiPageContext()) {
+            viewModel.fireSentPromptInChat()
+        }
     }
 
     override fun focusInput(activity: Activity?) {
@@ -1455,7 +1513,10 @@ class NativeInputModeWidget @JvmOverloads constructor(
                 useTopBar = false,
                 layoutResId = R.layout.view_native_input_screen_buttons,
             ).apply {
-                onSendClick = { submitMessage() }
+                onSendClick = {
+                    submitMessage()
+                    viewModel.fireFloatingSubmitPressed(isSearchMode())
+                }
                 onStopClick = { this@NativeInputModeWidget.stop() }
                 onVoiceChatClick = voiceChatClickWithPixel
                 setSendButtonVisible(false)
@@ -1472,7 +1533,10 @@ class NativeInputModeWidget @JvmOverloads constructor(
                 useTopBar = true,
                 layoutResId = R.layout.view_native_input_screen_floating_buttons,
             ).apply {
-                onNewLineClick = { printNewLine() }
+                onNewLineClick = {
+                    printNewLine()
+                    viewModel.fireFloatingReturnPressed()
+                }
                 setSendButtonVisible(false)
                 setNewLineButtonVisible(false)
             }
