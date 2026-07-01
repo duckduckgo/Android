@@ -96,7 +96,6 @@
     <string name="duckAiHideAiGeneratedImagesDescription">Iz rezultatov iskanja slik odstrani slike, ki jih je ustvarila umetna inteligenca</string>
 
     <!-- Search Assist Visibility -->
-    <string name="duckAiSearchAssistVisibilityTitle">Vidnost pomoči pri iskanju Search Assist</string>
     <string name="duckAiSearchAssistVisibilitySubtitle">Izberite, kako pogosto želite, da se v vaših iskanjih prikazujejo odgovori s pomočjo umetne inteligence.</string>
     <string name="duckAiSearchAssistVisibilityNever">Nikoli</string>
     <string name="duckAiSearchAssistVisibilityOnDemand">Na zahtevo</string>

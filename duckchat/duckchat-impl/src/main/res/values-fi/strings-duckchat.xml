@@ -96,7 +96,6 @@
     <string name="duckAiHideAiGeneratedImagesDescription">Suodattaa pois tekoälyn luomat kuvat kuvahaun tuloksista</string>
 
     <!-- Search Assist Visibility -->
-    <string name="duckAiSearchAssistVisibilityTitle">Search Assist -näkyvyys</string>
     <string name="duckAiSearchAssistVisibilitySubtitle">Valitse, kuinka usein haluat tekoälyavusteisten vastausten näkyvän hauissasi.</string>
     <string name="duckAiSearchAssistVisibilityNever">Ei koskaan</string>
     <string name="duckAiSearchAssistVisibilityOnDemand">Pyynnöstä</string>

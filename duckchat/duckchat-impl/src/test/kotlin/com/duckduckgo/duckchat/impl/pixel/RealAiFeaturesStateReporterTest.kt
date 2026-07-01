@@ -17,16 +17,13 @@
 package com.duckduckgo.duckchat.impl.pixel
 
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.store.HideAiGeneratedImages
 import com.duckduckgo.duckchat.impl.store.SearchAssistVisibility
 import com.duckduckgo.settings.api.SerpSettingsDataProvider
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
-import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.eq
@@ -36,21 +33,16 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class AiFeaturesStateDauPluginTest {
-
-    @get:Rule
-    val coroutineRule = CoroutineTestRule()
+class RealAiFeaturesStateReporterTest {
 
     private val duckChat: DuckChatInternal = mock()
     private val serpSettingsDataProvider: SerpSettingsDataProvider = mock()
     private val pixel: Pixel = mock()
 
-    private val testee = AiFeaturesStateDauPlugin(
+    private val testee = RealAiFeaturesStateReporter(
         duckChat = duckChat,
         serpSettingsDataProvider = serpSettingsDataProvider,
         pixel = pixel,
-        coroutineScope = coroutineRule.testScope,
-        dispatcherProvider = coroutineRule.testDispatcherProvider,
     )
 
     private fun stubSettings(duckAiOn: Boolean, kbe: String?, kbj: String?) {
@@ -63,8 +55,7 @@ class AiFeaturesStateDauPluginTest {
     fun `when fully without ai then state pixel reports no_ai true`() = runTest {
         stubSettings(duckAiOn = false, kbe = "0", kbj = "1")
 
-        testee.onAppRetentionAtbRefreshed(oldAtb = "v100-1", newAtb = "v100-2")
-        advanceUntilIdle()
+        testee.reportDailyState()
 
         verify(pixel).fire(
             DuckChatPixelName.AI_FEATURES_STATE_DAILY,
@@ -82,8 +73,7 @@ class AiFeaturesStateDauPluginTest {
     fun `when duck ai on then no_ai false`() = runTest {
         stubSettings(duckAiOn = true, kbe = "0", kbj = "1")
 
-        testee.onAppRetentionAtbRefreshed(oldAtb = "v100-1", newAtb = "v100-2")
-        advanceUntilIdle()
+        testee.reportDailyState()
 
         verify(pixel).fire(
             DuckChatPixelName.AI_FEATURES_STATE_DAILY,
@@ -101,8 +91,7 @@ class AiFeaturesStateDauPluginTest {
     fun `when search assist not synced then defaults to 2 and not no_ai`() = runTest {
         stubSettings(duckAiOn = false, kbe = null, kbj = "1")
 
-        testee.onAppRetentionAtbRefreshed(oldAtb = "v100-1", newAtb = "v100-2")
-        advanceUntilIdle()
+        testee.reportDailyState()
 
         verify(pixel).fire(
             DuckChatPixelName.AI_FEATURES_STATE_DAILY,
@@ -121,8 +110,7 @@ class AiFeaturesStateDauPluginTest {
     fun `when stored kbe value is unrecognized then unrecognized pixel fired and default used`() = runTest {
         stubSettings(duckAiOn = false, kbe = "9", kbj = "1")
 
-        testee.onAppRetentionAtbRefreshed(oldAtb = "v100-1", newAtb = "v100-2")
-        advanceUntilIdle()
+        testee.reportDailyState()
 
         verify(pixel).fire(DuckChatPixelName.SERP_SETTINGS_UNRECOGNIZED_VALUE, type = Pixel.PixelType.Daily())
         verify(pixel).fire(
@@ -141,8 +129,7 @@ class AiFeaturesStateDauPluginTest {
     fun `when stored kbj value is unrecognized then unrecognized pixel fired and treated as off`() = runTest {
         stubSettings(duckAiOn = false, kbe = "0", kbj = "7")
 
-        testee.onAppRetentionAtbRefreshed(oldAtb = "v100-1", newAtb = "v100-2")
-        advanceUntilIdle()
+        testee.reportDailyState()
 
         verify(pixel).fire(DuckChatPixelName.SERP_SETTINGS_UNRECOGNIZED_VALUE, type = Pixel.PixelType.Daily())
         verify(pixel).fire(

@@ -96,7 +96,6 @@
     <string name="duckAiHideAiGeneratedImagesDescription">Filtrerer AI-genererede billeder fra billedsøgeresultater</string>
 
     <!-- Search Assist Visibility -->
-    <string name="duckAiSearchAssistVisibilityTitle">Synlighed i Search Assist</string>
     <string name="duckAiSearchAssistVisibilitySubtitle">Vælg, hvor ofte du vil have AI-assisterede svar til at optræde i dine søgninger.</string>
     <string name="duckAiSearchAssistVisibilityNever">Aldrig</string>
     <string name="duckAiSearchAssistVisibilityOnDemand">On demand</string>

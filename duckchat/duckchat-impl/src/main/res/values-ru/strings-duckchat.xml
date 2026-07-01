@@ -96,7 +96,6 @@
     <string name="duckAiHideAiGeneratedImagesDescription">Исключает из результатов поиска изображения, созданные нейросетью</string>
 
     <!-- Search Assist Visibility -->
-    <string name="duckAiSearchAssistVisibilityTitle">Параметры Search Assist</string>
     <string name="duckAiSearchAssistVisibilitySubtitle">Выберите, как часто вы хотите видеть ответы от ИИ в результатах поиска.</string>
     <string name="duckAiSearchAssistVisibilityNever">Никогда</string>
     <string name="duckAiSearchAssistVisibilityOnDemand">По запросу</string>

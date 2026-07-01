@@ -96,7 +96,6 @@
     <string name="duckAiHideAiGeneratedImagesDescription">Vaizdų paieškos rezultatuose nepalieka Di sukurtų vaizdų</string>
 
     <!-- Search Assist Visibility -->
-    <string name="duckAiSearchAssistVisibilityTitle">„Search Assist“ matomumas</string>
     <string name="duckAiSearchAssistVisibilitySubtitle">Pasirink, kaip dažnai paieškose nori matyti „AI-Assisted Answers“.</string>
     <string name="duckAiSearchAssistVisibilityNever">Niekada</string>
     <string name="duckAiSearchAssistVisibilityOnDemand">Pagal poreikį</string>

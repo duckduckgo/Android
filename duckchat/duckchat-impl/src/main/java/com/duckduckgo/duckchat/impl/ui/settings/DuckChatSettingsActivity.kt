@@ -259,7 +259,9 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
         }
         inputScreenSettingsBinding.duckAiDefaultTogglePosition.updatePadding(left = offset)
 
-        inputScreenSettingsBinding.duckAiInputScreenDescription.isVisible = viewState.shouldShowInputScreenToggle
+        // The input screen description is hidden entirely once native controls are enabled.
+        inputScreenSettingsBinding.duckAiInputScreenDescription.isVisible =
+            viewState.shouldShowInputScreenToggle && !viewState.isNativeControlsEnabled
         inputScreenSettingsBinding.duckAiInputScreenDescription.addClickableSpan(
             textSequence = getText(R.string.input_screen_user_pref_description),
             spans =
@@ -309,6 +311,13 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
             if (viewState.isSearchSectionVisible) {
                 with(showDuckChatSearchSettingsLink) {
                     isVisible = true
+                    setPrimaryText(
+                        if (viewState.isNativeControlsEnabled) {
+                            getString(R.string.duckAiSearchAssistSettingsTitle)
+                        } else {
+                            getString(R.string.duck_chat_assist_settings_title)
+                        },
+                    )
                     setSecondaryText(
                         if (viewState.isNativeControlsEnabled) {
                             getString(viewState.searchAssistVisibility.toDisplayNameRes())
