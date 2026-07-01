@@ -29,6 +29,7 @@ import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.ui.view.DaxTypeAnimationTextView
+import com.duckduckgo.app.onboarding.ui.view.OnboardingFillImageView
 import com.duckduckgo.app.onboarding.ui.view.TouchInterceptingLinearLayout
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -56,7 +57,7 @@ class BrandDesignContextualDaxDialogCtaTest {
     private val hiddenTitle: DaxTextView = mock()
     private val descriptionView: DaxTextView = mock()
     private val dismissButton: ImageView = mock()
-    private val backgroundView: ImageView = mock()
+    private val backgroundView: OnboardingFillImageView = mock()
     private val cardContainer: TouchInterceptingLinearLayout = mock()
     private val activeInclude: View = mock()
     private val primaryInclude: View = mock()
@@ -84,7 +85,7 @@ class BrandDesignContextualDaxDialogCtaTest {
             .thenReturn(primaryInclude)
         whenever(container.findViewById<View>(R.id.contextualBrandDesignOptionsContent))
             .thenReturn(optionsInclude)
-        whenever(container.findViewById<ImageView>(R.id.contextualBrandDesignBackground))
+        whenever(container.findViewById<OnboardingFillImageView>(R.id.contextualBrandDesignBackground))
             .thenReturn(backgroundView)
         whenever(container.findViewById<DaxOnboardingBubbleBrandDesignUpdateCardView>(R.id.contextualBrandDesignCardView))
             .thenReturn(cardView)
