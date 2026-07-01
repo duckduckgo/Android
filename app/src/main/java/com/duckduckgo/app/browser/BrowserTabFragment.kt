@@ -322,6 +322,7 @@ import com.duckduckgo.common.utils.extensions.websiteFromGeoLocationsApiOrigin
 import com.duckduckgo.common.utils.keyboardVisibilityFlow
 import com.duckduckgo.common.utils.playstore.PlayStoreUtils
 import com.duckduckgo.common.utils.plugins.PluginPoint
+import com.duckduckgo.dataclearing.api.fire.FireDialog
 import com.duckduckgo.dataclearing.api.fire.FireDialogProvider
 import com.duckduckgo.dataclearing.api.fire.FireDialogProvider.FireDialogOrigin
 import com.duckduckgo.di.scopes.FragmentScope
@@ -436,6 +437,10 @@ class BrowserTabFragment :
     private var contextualSheetBottomSheetCallback: BottomSheetBehavior.BottomSheetCallback? = null
 
     private var voiceActiveOnThisTab: Boolean = false
+
+    // The chat-history suggestion pending single-chat fire-dialog deletion, removed optimistically
+    // from the omnibar autocomplete once the clear begins. Null when no such delete is in flight.
+    private var pendingChatSuggestionDeleteUrl: String? = null
 
     @Inject
     lateinit var nativeInputManager: NativeInputManager
@@ -1648,6 +1653,18 @@ class BrowserTabFragment :
     }
 
     private fun showChatSuggestionFireDialog(chatUrl: String) {
+        pendingChatSuggestionDeleteUrl = chatUrl
+        setFragmentResultListener(FireDialog.REQUEST_KEY) { _, bundle ->
+            when (bundle.getString(FireDialog.RESULT_KEY_EVENT)) {
+                FireDialog.EVENT_CLEAR_WITHOUT_RESTART_STARTED,
+                FireDialog.EVENT_ON_CLEAR_STARTED,
+                -> pendingChatSuggestionDeleteUrl?.let { url ->
+                    nativeInputManager.removeChatSuggestion(url)
+                    pendingChatSuggestionDeleteUrl = null
+                }
+                FireDialog.EVENT_ON_CANCEL -> pendingChatSuggestionDeleteUrl = null
+            }
+        }
         viewLifecycleOwner.lifecycleScope.launch {
             val dialog = fireDialogProvider.createFireDialog(FireDialogOrigin.ChatAutocomplete(chatUrl))
             dialog.show(parentFragmentManager)

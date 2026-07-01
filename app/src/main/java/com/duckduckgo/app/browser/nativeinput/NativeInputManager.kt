@@ -130,6 +130,13 @@ interface NativeInputManager {
     fun setPickingImage(picking: Boolean)
     fun setText(text: String)
 
+    /**
+     * Optimistically removes the chat-history suggestion matching [chatUrl] from the omnibar
+     * autocomplete list, e.g. after its single-chat fire-dialog delete is confirmed. No-op when
+     * the native input isn't shown or the suggestion isn't currently listed.
+     */
+    fun removeChatSuggestion(chatUrl: String)
+
     /** Lock the input field (making it non-interactive + dimmed).*/
     fun setInteractionLock(lock: InteractionLock)
 
@@ -217,6 +224,12 @@ class RealNativeInputManager @Inject constructor(
         if (!::rootView.isInitialized) return
         val widget = widgetFrom(rootView) ?: return
         widget.text = text
+    }
+
+    override fun removeChatSuggestion(chatUrl: String) {
+        if (!::rootView.isInitialized) return
+        val widget = widgetFrom(rootView) ?: return
+        widget.removeChatSuggestion(chatUrl)
     }
 
     override fun handleDuckAiVoiceResult(query: String) {

@@ -17,6 +17,7 @@
 package com.duckduckgo.duckchat.impl.ui.nativeinput.views
 
 import android.content.Context
+import android.os.Looper
 import android.view.ViewGroup
 import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -50,6 +51,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
+import org.robolectric.Shadows.shadowOf
 import java.time.LocalDateTime
 
 @RunWith(AndroidJUnit4::class)
@@ -322,6 +324,45 @@ class NativeInputChatSuggestionsBinderTest {
         assertEquals(listOf(true), committed)
     }
 
+    @Test
+    fun whenRemoveChatSuggestionsMatchesNoneThenListUnchanged() {
+        val binding = createBinding()
+        binding.submit(
+            suggestions = ChatTabSuggestions(
+                chatHistory = chatSuggestions(3),
+                urlSuggestions = AutoCompleteResult(query = "", suggestions = emptyList()),
+            ),
+            query = "",
+            isHistoryAvailable = true,
+            onCommit = {},
+        )
+        assertEquals(3, binding.chatAdapter().currentList.size)
+
+        binding.removeChatSuggestions { it.chatId == "does-not-exist" }
+
+        assertEquals(3, binding.chatAdapter().currentList.size)
+    }
+
+    @Test
+    fun whenRemoveChatSuggestionsMatchesThenMatchingRowDropped() {
+        val binding = createBinding()
+        binding.submit(
+            suggestions = ChatTabSuggestions(
+                chatHistory = chatSuggestions(3),
+                urlSuggestions = AutoCompleteResult(query = "", suggestions = emptyList()),
+            ),
+            query = "",
+            isHistoryAvailable = true,
+            onCommit = {},
+        )
+
+        binding.removeChatSuggestions { it.chatId == "id-2" }
+
+        // submitList diffs a non-empty→non-empty change on AsyncListDiffer's background thread, then
+        // latches on the main looper — settle both before asserting.
+        assertEquals(listOf("id-1", "id-3"), binding.awaitChatIds(expected = listOf("id-1", "id-3")))
+    }
+
     private val scope = CoroutineScope(SupervisorJob())
 
     private val inputQueryFlow = MutableStateFlow("")
@@ -358,6 +399,22 @@ class NativeInputChatSuggestionsBinderTest {
                 type = ChatType.Discussion,
             )
         }
+
+    private fun NativeInputChatSuggestionsBinder.Binding.chatAdapter(): ChatSuggestionsAdapter {
+        val concat = adapter as ConcatAdapter
+        return concat.adapters.filterIsInstance<ChatSuggestionsAdapter>().single()
+    }
+
+    /** Drains the background diff + main-thread latch, returning as soon as the ids match [expected]. */
+    private fun NativeInputChatSuggestionsBinder.Binding.awaitChatIds(expected: List<String>): List<String> {
+        repeat(100) {
+            shadowOf(Looper.getMainLooper()).idle()
+            val ids = chatAdapter().currentList.map { it.chatId }
+            if (ids == expected) return ids
+            Thread.sleep(5)
+        }
+        return chatAdapter().currentList.map { it.chatId }
+    }
 
     private fun NativeInputChatSuggestionsBinder.Binding.shortcutAdapter(): ChatHistoryShortcutAdapter {
         val concat = adapter as ConcatAdapter
