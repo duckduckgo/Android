@@ -197,6 +197,15 @@ class SingleTabFireDialogViewModel @Inject constructor(
 
     fun onDeleteSelectedChatsClicked() {
         val selectedChatUrls = (origin.value as? FireDialogOrigin.ChatHistory)?.selectedChatUrls ?: return
+        clearDuckAiChats(selectedChatUrls)
+    }
+
+    fun onDeleteSingleChatClicked() {
+        val chatUrl = (origin.value as? FireDialogOrigin.ChatAutocomplete)?.chatUrl ?: return
+        clearDuckAiChats(setOf(chatUrl))
+    }
+
+    private fun clearDuckAiChats(chatUrls: Set<String>) {
         viewModelScope.launch {
             shouldRestartAfterClearing = false
             command.send(Command.OnClearStarted)
@@ -209,7 +218,7 @@ class SingleTabFireDialogViewModel @Inject constructor(
             }
 
             withContext(dispatcherProvider.io()) {
-                dataClearing.clearSelectedDuckAiChats(selectedChatUrls, browserMode)
+                dataClearing.clearSelectedDuckAiChats(chatUrls, browserMode)
             }
 
             command.send(Command.ClearingComplete)
@@ -285,7 +294,8 @@ class SingleTabFireDialogViewModel @Inject constructor(
 
     private suspend fun mapToViewState(dialogOrigin: FireDialogOrigin): ViewState.Loaded {
         // Non-tab origins skip the tab/download/WebView probes — there's no tab to reason about.
-        val isTabAware = dialogOrigin !is FireDialogOrigin.ChatHistory
+        val isTabAware = dialogOrigin !is FireDialogOrigin.ChatHistory &&
+            dialogOrigin !is FireDialogOrigin.ChatAutocomplete
 
         val isDuckAiChatsSelected =
             isTabAware && fireDataStore.isManualClearOptionSelected(FireClearOption.DUCKAI_CHATS)
@@ -308,6 +318,7 @@ class SingleTabFireDialogViewModel @Inject constructor(
                 pluralsId = R.plurals.fireDialogDeleteCountTitle,
                 count = dialogOrigin.count,
             )
+            is FireDialogOrigin.ChatAutocomplete -> TitleSource.Static(R.string.singleTabFireDialogTitleDuckAi)
             else -> {
                 val titleResId = when {
                     isDuckAiTab && isDeleteThisTabAvailable -> R.string.singleTabFireDialogTitleDuckAi
@@ -377,6 +388,9 @@ class SingleTabFireDialogViewModel @Inject constructor(
 
             val isInChatSelectionMode: Boolean
                 get() = origin is FireDialogOrigin.ChatHistory
+
+            val isSingleChatDeletion: Boolean
+                get() = origin is FireDialogOrigin.ChatAutocomplete
 
             val isDeleteThisTabButtonVisible: Boolean
                 get() = (stateData.isSingleTabEnabled && origin == Browser) ||

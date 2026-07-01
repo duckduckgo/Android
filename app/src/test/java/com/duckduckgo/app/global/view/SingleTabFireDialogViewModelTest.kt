@@ -1350,6 +1350,101 @@ class SingleTabFireDialogViewModelTest {
 
     // endregion
 
+    // region onDeleteSingleChatClicked
+
+    @Test
+    fun `when delete single chat clicked then clearSelectedDuckAiChats is dispatched with the single origin url`() = runTest {
+        val chatUrl = "https://duck.ai?chatID=a"
+        testee = createViewModel()
+        testee.setOrigin(FireDialogOrigin.ChatAutocomplete(chatUrl))
+
+        testee.onDeleteSingleChatClicked()
+
+        coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
+
+        verify(mockDataClearing).clearSelectedDuckAiChats(setOf(chatUrl), BrowserMode.REGULAR)
+        verify(mockDataClearing, never()).clearDataUsingManualFireOptions(any(), any(), any())
+    }
+
+    @Test
+    fun `when delete single chat clicked then process is not restarted`() = runTest {
+        testee = createViewModel()
+        testee.setOrigin(FireDialogOrigin.ChatAutocomplete("https://duck.ai?chatID=a"))
+
+        testee.onDeleteSingleChatClicked()
+
+        coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
+
+        assertFalse(testee.shouldRestartAfterClearing)
+    }
+
+    @Test
+    fun `when delete single chat clicked then no fire-dialog pixels are fired`() = runTest {
+        testee = createViewModel()
+        testee.setOrigin(FireDialogOrigin.ChatAutocomplete("https://duck.ai?chatID=a"))
+
+        testee.onDeleteSingleChatClicked()
+
+        coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
+
+        verify(mockPixel, never()).enqueueFire(eq(FIRE_DIALOG_CLEAR_PRESSED), any(), any(), any())
+        verify(mockPixel, never()).enqueueFire(eq(FIRE_DIALOG_CLEAR_PRESSED_DAILY), any(), any(), any())
+        verify(mockPixel, never()).enqueueFire(eq(PRODUCT_TELEMETRY_SURFACE_DATA_CLEARING), any(), any(), any())
+        verify(mockPixel, never()).enqueueFire(eq(FIRE_DIALOG_ANIMATION), any(), any(), any())
+    }
+
+    @Test
+    fun `when delete single chat clicked with animation enabled then play animation command is sent`() = runTest {
+        whenever(mockSettingsDataStore.fireAnimationEnabled).thenReturn(true)
+        testee = createViewModel()
+        testee.setOrigin(FireDialogOrigin.ChatAutocomplete("https://duck.ai?chatID=a"))
+
+        testee.commands().test {
+            testee.onDeleteSingleChatClicked()
+
+            awaitItem() // OnShow from init
+            assertEquals(Command.OnClearStarted, awaitItem())
+            assertEquals(Command.PlayAnimation, awaitItem())
+            assertEquals(Command.ClearingComplete, awaitItem())
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `when delete single chat clicked without ChatAutocomplete origin then nothing happens`() = runTest {
+        testee = createViewModel()
+        testee.setOrigin(FireDialogOrigin.Browser)
+
+        testee.onDeleteSingleChatClicked()
+
+        coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
+
+        verify(mockDataClearing, never()).clearSelectedDuckAiChats(any(), any())
+        verify(mockDataClearing, never()).clearDataUsingManualFireOptions(any(), any(), any())
+    }
+
+    @Test
+    fun `when origin is ChatAutocomplete then title is singular duck ai chat title`() = runTest {
+        testee = createViewModel()
+        testee.setOrigin(FireDialogOrigin.ChatAutocomplete("https://duck.ai?chatID=a"))
+
+        testee.viewState.filterIsInstance<SingleTabFireDialogViewModel.ViewState.Loaded>().test {
+            val state = awaitItem()
+
+            assertEquals(
+                SingleTabFireDialogViewModel.TitleSource.Static(R.string.singleTabFireDialogTitleDuckAi),
+                state.stateData.titleSource,
+            )
+            assertTrue(state.isSingleChatDeletion)
+            assertFalse(state.isInChatSelectionMode)
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    // endregion
+
     // region onDeleteThisTabClicked
 
     @Test
