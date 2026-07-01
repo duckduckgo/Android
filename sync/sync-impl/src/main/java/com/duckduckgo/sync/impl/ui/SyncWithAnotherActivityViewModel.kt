@@ -53,6 +53,7 @@ import com.duckduckgo.sync.impl.pixels.SyncPixels.CancellationReason
 import com.duckduckgo.sync.impl.pixels.SyncPixels.CodeVersion
 import com.duckduckgo.sync.impl.pixels.SyncPixels.PeerKind
 import com.duckduckgo.sync.impl.pixels.SyncPixels.ScreenType.SYNC_EXCHANGE
+import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupFailureReason
 import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupPath
 import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupRole
 import com.duckduckgo.sync.impl.pixels.fireSetupCancelledIfDenied
@@ -293,7 +294,7 @@ class SyncWithAnotherActivityViewModel @Inject constructor(
         outcome: DispatchOutcome,
         previousPrimaryKey: String,
     ) {
-        syncPixels.fireSetupFailed(outcome)
+        syncPixels.fireSetupFailed(SYNC_EXCHANGE, outcome)
         syncPixels.fireSetupCancelledIfDenied(outcome, SYNC_EXCHANGE)
         // Cancel the deep-link timeout only on terminal outcomes; keep it running across confirmation prompts.
         when (outcome) {
@@ -487,7 +488,7 @@ class SyncWithAnotherActivityViewModel @Inject constructor(
         if (isDeepLink) return
 
         when (this) {
-            is Unknown -> syncPixels.fireBarcodeScannerParseError(SYNC_EXCHANGE)
+            is Unknown -> syncPixels.fireBarcodeScannerParseError(SYNC_EXCHANGE, reason = SetupFailureReason.UNRECOGNIZED_CODE)
             else -> syncPixels.fireBarcodeScannerParseSuccess(SYNC_EXCHANGE, CodeVersion.V1)
         }
     }

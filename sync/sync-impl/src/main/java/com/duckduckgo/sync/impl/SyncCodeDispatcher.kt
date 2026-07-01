@@ -19,6 +19,7 @@ package com.duckduckgo.sync.impl
 import com.duckduckgo.sync.impl.pixels.SyncPixels.PeerKind
 import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupPath
 import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupRole
+import com.duckduckgo.sync.impl.pixels.SyncPixels.TimeoutStage
 import kotlinx.coroutines.flow.Flow
 
 /**
@@ -170,5 +171,11 @@ sealed interface DispatchOutcome {
         val path: SetupPath? = null,
         val myRole: SetupRole? = null,
         val peerKind: PeerKind? = null,
+        /**
+         * Populated only when [code] is [AccountErrorCodes.SESSION_TIMEOUT] — identifies which phase
+         * of the flow was in progress at the deadline so the "Setup failed" pixel can split
+         * `reason=session_timeout` by user-facing stage.
+         */
+        val timeoutStage: TimeoutStage? = null,
     ) : DispatchOutcome
 }

@@ -29,6 +29,9 @@ import com.duckduckgo.sync.impl.AccountErrorCodes.PAIRING_CANCELLED
 import com.duckduckgo.sync.impl.AccountErrorCodes.PAIRING_FAILED
 import com.duckduckgo.sync.impl.AccountErrorCodes.PAIRING_REJECTED
 import com.duckduckgo.sync.impl.AccountErrorCodes.PAIRING_UNAVAILABLE
+import com.duckduckgo.sync.impl.AccountErrorCodes.PEER_RECOVERY_CODE_UNAVAILABLE
+import com.duckduckgo.sync.impl.AccountErrorCodes.RECOVERY_CODE_PREPARATION_FAILED
+import com.duckduckgo.sync.impl.AccountErrorCodes.SESSION_TIMEOUT
 import com.duckduckgo.sync.impl.AccountErrorCodes.UNEXPECTED_EVENT
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2CodeParseResult
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Event
@@ -38,6 +41,7 @@ import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Runner
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2State
 import com.duckduckgo.sync.impl.exchange.v2.LocalTrigger
 import com.duckduckgo.sync.impl.exchange.v2.PairingRole
+import com.duckduckgo.sync.impl.exchange.v2.SessionErrorKind
 import com.duckduckgo.sync.impl.pixels.SyncPixels.PeerKind
 import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupPath
 import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupRole
@@ -778,6 +782,41 @@ class RealSyncCodeDispatcherTest {
         }
     }
 
+    @Test fun `Presenter maps a RecoveryCodePreparationFailed-kind SessionError to Failed with RECOVERY_CODE_PREPARATION_FAILED code`() = runTest {
+        dispatcher.presentV2().test {
+            runnerEventsFlow.emit(
+                ExchangeV2Event.SessionError(
+                    timestampMs = System.currentTimeMillis(),
+                    message = "Couldn't generate a recovery code: boom",
+                    kind = SessionErrorKind.RecoveryCodePreparationFailed,
+                ),
+            )
+            assertEquals(
+                DispatchOutcome.Failed(
+                    "Couldn't generate a recovery code: boom",
+                    RECOVERY_CODE_PREPARATION_FAILED.code,
+                    path = SetupPath.PAIRING,
+                ),
+                awaitItem(),
+            )
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test fun `Presenter maps a SessionTimeout-kind SessionError to Failed with SESSION_TIMEOUT code`() = runTest {
+        dispatcher.presentV2().test {
+            runnerEventsFlow.emit(
+                ExchangeV2Event.SessionError(
+                    timestampMs = System.currentTimeMillis(),
+                    message = "Session timed out",
+                    kind = SessionErrorKind.SessionTimeout,
+                ),
+            )
+            assertEquals(DispatchOutcome.Failed("Session timed out", SESSION_TIMEOUT.code, path = SetupPath.PAIRING), awaitItem())
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
     @Test fun `Presenter emits Failed when Joiner_Done arrives without a recovery code`() = runTest {
         dispatcher.presentV2().test {
             runnerEventsFlow.emit(transition(from = ExchangeV2State.Joiner.Waiting, to = ExchangeV2State.Joiner.Done))
@@ -1083,7 +1122,7 @@ class RealSyncCodeDispatcherTest {
         }
     }
 
-    @Test fun `Scanner - Joiner_AbortedByHost with RecoveryCodeUnavailable maps to Failed PAIRING_UNAVAILABLE`() = runTest {
+    @Test fun `Scanner - Joiner_AbortedByHost with RecoveryCodeUnavailable maps to Failed PEER_RECOVERY_CODE_UNAVAILABLE`() = runTest {
         startLinking().test {
             runnerEventsFlow.emit(
                 transition(
@@ -1092,7 +1131,7 @@ class RealSyncCodeDispatcherTest {
                     trigger = ExchangeV2Message.RecoveryCodeUnavailable(rawJson = "{}"),
                 ),
             )
-            assertEquals(PAIRING_UNAVAILABLE.code, (awaitItem() as DispatchOutcome.Failed).code)
+            assertEquals(PEER_RECOVERY_CODE_UNAVAILABLE.code, (awaitItem() as DispatchOutcome.Failed).code)
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -1139,10 +1178,10 @@ class RealSyncCodeDispatcherTest {
         }
     }
 
-    @Test fun `Scanner - Aborted maps to Failed NEGOTIATION_ABORTED`() = runTest {
+    @Test fun `Scanner - Aborted maps to Failed UNEXPECTED_EVENT`() = runTest {
         startLinking().test {
             runnerEventsFlow.emit(transition(from = ExchangeV2State.Negotiating, to = ExchangeV2State.Aborted))
-            assertEquals(NEGOTIATION_ABORTED.code, (awaitItem() as DispatchOutcome.Failed).code)
+            assertEquals(UNEXPECTED_EVENT.code, (awaitItem() as DispatchOutcome.Failed).code)
             cancelAndIgnoreRemainingEvents()
         }
     }

@@ -49,6 +49,7 @@ import com.duckduckgo.sync.impl.pixels.SyncPixels.PeerKind
 import com.duckduckgo.sync.impl.pixels.SyncPixels.ScreenType
 import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupPath
 import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupRole
+import com.duckduckgo.sync.impl.pixels.fireSetupCancelledIfDenied
 import com.duckduckgo.sync.impl.pixels.fireSetupFailed
 import com.duckduckgo.sync.impl.ui.EnterCodeActivity.Companion.Code
 import com.duckduckgo.sync.impl.ui.EnterCodeViewModel.Command.AskToSwitchAccount
@@ -155,7 +156,8 @@ class EnterCodeViewModel @Inject constructor(
         outcome: DispatchOutcome,
         previousPrimaryKey: String,
     ) {
-        syncPixels.fireSetupFailed(outcome)
+        syncPixels.fireSetupFailed(codeType.asScreenType(), outcome)
+        syncPixels.fireSetupCancelledIfDenied(outcome, codeType.asScreenType())
         when (outcome) {
             is DispatchOutcome.LoggedIn -> onLoginSuccess(previousPrimaryKey, outcome.path, outcome.myRole, outcome.peerKind)
             is DispatchOutcome.AlreadyConnected -> {
@@ -316,7 +318,10 @@ class EnterCodeViewModel @Inject constructor(
 
     private fun SyncAuthCode.onCodePasted() {
         when (this) {
-            is SyncAuthCode.Unknown -> syncPixels.fireSyncSetupCodePastedParseFailure(codeType.asScreenType())
+            is SyncAuthCode.Unknown -> syncPixels.fireSyncSetupCodePastedParseFailure(
+                codeType.asScreenType(),
+                reason = SyncPixels.SetupFailureReason.UNRECOGNIZED_CODE,
+            )
             else -> syncPixels.fireSyncSetupCodePastedParseSuccess(codeType.asScreenType(), CodeVersion.V1)
         }
     }
