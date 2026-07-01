@@ -3888,7 +3888,7 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     override fun handleDuckChatUrlInCustomTab(uri: Uri): Boolean {
-        if (!isCustomTabScreen) return false
+        if (customTab == null) return false
         if (!androidBrowserConfig.redirectDuckAiLinksFromCustomTab().isEnabled()) return false
 
         openDuckChatForUrl(uri)
