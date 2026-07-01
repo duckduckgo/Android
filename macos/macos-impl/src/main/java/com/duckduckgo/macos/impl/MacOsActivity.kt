@@ -28,6 +28,9 @@ import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.viewbinding.viewBinding
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.macos.api.MacOsScreenWithEmptyParams
 import com.duckduckgo.macos.impl.MacOsViewModel.Command
@@ -53,6 +56,12 @@ class MacOsActivity : DuckDuckGoActivity() {
 
     @Inject lateinit var globalActivityStarter: GlobalActivityStarter
 
+    @Inject
+    lateinit var edgeToEdgeProvider: EdgeToEdgeProvider
+
+    @Inject
+    lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
+
     private val toolbar
         get() = binding.includeToolbar.toolbar
 
@@ -62,9 +71,24 @@ class MacOsActivity : DuckDuckGoActivity() {
         viewModel.commands.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).onEach { executeCommand(it) }
             .launchIn(lifecycleScope)
 
+        val edgeToEdgeEnabled = edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.MISC)
+        if (edgeToEdgeEnabled) {
+            enableTransparentEdgeToEdge()
+        }
         setContentView(binding.root)
         setupToolbar(toolbar)
         configureUiEventHandlers()
+        if (edgeToEdgeEnabled) {
+            configureEdgeToEdgeInsets()
+        }
+    }
+
+    private fun configureEdgeToEdgeInsets() {
+        edgeToEdgeHandler.applyHorizontalSystemBarInsets(binding.root)
+        edgeToEdgeHandler.applyStatusBarInsets(binding.includeToolbar.appBarLayout)
+        // Content ends in fixed bottom buttons (Share / "Looking for Windows?"), so keep them clear of the nav
+        // bar in every mode (padded above the gesture-nav chin) rather than drawing behind the gesture handle.
+        edgeToEdgeHandler.applyNavigationBarInsets(binding.contentScrollView, drawBehindGestureNav = false)
     }
 
     private fun configureUiEventHandlers() {

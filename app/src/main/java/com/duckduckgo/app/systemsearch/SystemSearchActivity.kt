@@ -83,6 +83,9 @@ import com.duckduckgo.common.ui.view.hideKeyboard
 import com.duckduckgo.common.ui.view.showKeyboard
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.KeyboardVisibilityUtil
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.common.utils.extensions.html
 import com.duckduckgo.common.utils.extensions.showKeyboard
 import com.duckduckgo.common.utils.text.TextChangedWatcher
@@ -134,6 +137,12 @@ class SystemSearchActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var settingsDataStore: SettingsDataStore
+
+    @Inject
+    lateinit var edgeToEdgeProvider: EdgeToEdgeProvider
+
+    @Inject
+    lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
 
     private val viewModel: SystemSearchViewModel by bindViewModel()
     private val binding: ActivitySystemSearchBinding by viewBinding()
@@ -202,13 +211,38 @@ class SystemSearchActivity : DuckDuckGoActivity() {
         omnibarDivider = if (isOmnibarAtTop) binding.verticalDivider else binding.verticalDividerBottom
     }
 
+    /**
+     * One inset listener per view (each apply* replaces any prior listener on that view), and only on
+     * the views that survive [configureOmnibar] (which removes the unused omnibar app bar):
+     * - sides go on [ActivitySystemSearchBinding.rootView] in both modes
+     * - top omnibar: status -> appBarLayout, nav + IME -> content (scrolling list)
+     * - bottom omnibar: status -> content, nav + IME -> appBarLayoutBottom (rises above keyboard)
+     */
+    private fun configureEdgeToEdgeInsets(isOmnibarAtTop: Boolean) {
+        edgeToEdgeHandler.applyHorizontalSystemBarInsets(binding.rootView)
+        if (isOmnibarAtTop) {
+            edgeToEdgeHandler.applyStatusBarInsets(binding.appBarLayout)
+            edgeToEdgeHandler.applyNavigationBarInsets(binding.content, drawBehindGestureNav = true)
+        } else {
+            edgeToEdgeHandler.applyStatusBarInsets(binding.content)
+            edgeToEdgeHandler.applyNavigationBarInsets(binding.appBarLayoutBottom, drawBehindGestureNav = true)
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         dataClearerForegroundAppRestartPixel.registerIntent(intent)
+        val edgeToEdgeEnabled = edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.ONBOARDING)
+        if (edgeToEdgeEnabled) {
+            enableTransparentEdgeToEdge()
+        }
         setContentView(binding.root)
 
         configureViewReferences(viewModel.isOmnibarAtTop)
         configureOmnibar(viewModel.isOmnibarAtTop)
+        if (edgeToEdgeEnabled) {
+            configureEdgeToEdgeInsets(viewModel.isOmnibarAtTop)
+        }
         configureObservers()
         configureFlowCollectors()
         configureOnboarding()

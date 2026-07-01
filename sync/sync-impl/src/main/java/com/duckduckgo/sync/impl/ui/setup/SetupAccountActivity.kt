@@ -108,7 +108,9 @@ class SetupAccountActivity : DuckDuckGoActivity(), SyncSetupNavigationFlowListen
 
     private fun configureEdgeToEdgeInsets() {
         edgeToEdgeHandler.applyStatusBarAndHorizontalInsets(binding.root)
-        edgeToEdgeHandler.applyNavigationBarInsets(binding.fragmentContainerView, drawBehindGestureNav = true)
+        // The hosted setup fragments end in a fixed bottom CTA (Next / Turn on Sync), so keep it clear of
+        // the nav bar in every mode (padded above the gesture-nav chin) rather than behind the gesture handle.
+        edgeToEdgeHandler.applyNavigationBarInsets(binding.fragmentContainerView, drawBehindGestureNav = false)
     }
 
     override fun onSaveInstanceState(outState: Bundle) {

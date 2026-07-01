@@ -49,6 +49,9 @@ class RealEdgeToEdgeProvider @Inject constructor(
                 edgeToEdgeFeature.autofill().isEnabled()
                 edgeToEdgeFeature.sync().isEnabled()
                 edgeToEdgeFeature.vpn().isEnabled()
+                edgeToEdgeFeature.webview().isEnabled()
+                edgeToEdgeFeature.onboarding().isEnabled()
+                edgeToEdgeFeature.misc().isEnabled()
             }
         }
     }
@@ -60,6 +63,9 @@ class RealEdgeToEdgeProvider @Inject constructor(
             EdgeToEdgeBucket.AUTOFILL -> edgeToEdgeFeature.autofill()
             EdgeToEdgeBucket.SYNC -> edgeToEdgeFeature.sync()
             EdgeToEdgeBucket.VPN -> edgeToEdgeFeature.vpn()
+            EdgeToEdgeBucket.WEBVIEW -> edgeToEdgeFeature.webview()
+            EdgeToEdgeBucket.ONBOARDING -> edgeToEdgeFeature.onboarding()
+            EdgeToEdgeBucket.MISC -> edgeToEdgeFeature.misc()
         }
         bucketToggle.isEnabled()
     } else {

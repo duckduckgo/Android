@@ -132,7 +132,9 @@ class SyncConnectActivity : DuckDuckGoActivity() {
     private fun configureEdgeToEdgeInsets() {
         edgeToEdgeHandler.applyHorizontalSystemBarInsets(binding.root)
         edgeToEdgeHandler.applyStatusBarInsets(binding.includeToolbar.appBarLayout)
-        edgeToEdgeHandler.applyNavigationBarInsets(binding.contentView, drawBehindGestureNav = true)
+        // The content ends in a fixed bottom row (the "can't scan? / copy code" CTA), so keep it clear of the
+        // nav bar in every mode (padded above the gesture-nav chin) rather than drawing behind the gesture handle.
+        edgeToEdgeHandler.applyNavigationBarInsets(binding.contentView, drawBehindGestureNav = false)
     }
 
     override fun onResume() {

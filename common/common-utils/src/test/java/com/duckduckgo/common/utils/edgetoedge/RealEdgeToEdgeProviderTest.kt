@@ -69,4 +69,76 @@ class RealEdgeToEdgeProviderTest {
         assertTrue(testee.isEnabled(EdgeToEdgeBucket.BROWSER))
         assertFalse(testee.isEnabled(EdgeToEdgeBucket.SETTINGS))
     }
+
+    @Test
+    fun whenMasterDisabledThenWebviewDisabledEvenIfWebviewToggleEnabled() {
+        feature.self().setRawStoredState(State(enable = false))
+        feature.webview().setRawStoredState(State(enable = true))
+
+        assertFalse(testee.isEnabled(EdgeToEdgeBucket.WEBVIEW))
+    }
+
+    @Test
+    fun whenMasterEnabledButWebviewDisabledThenWebviewDisabled() {
+        feature.self().setRawStoredState(State(enable = true))
+        feature.webview().setRawStoredState(State(enable = false))
+
+        assertFalse(testee.isEnabled(EdgeToEdgeBucket.WEBVIEW))
+    }
+
+    @Test
+    fun whenMasterAndWebviewEnabledThenWebviewEnabled() {
+        feature.self().setRawStoredState(State(enable = true))
+        feature.webview().setRawStoredState(State(enable = true))
+
+        assertTrue(testee.isEnabled(EdgeToEdgeBucket.WEBVIEW))
+    }
+
+    @Test
+    fun whenMasterDisabledThenOnboardingDisabledEvenIfOnboardingToggleEnabled() {
+        feature.self().setRawStoredState(State(enable = false))
+        feature.onboarding().setRawStoredState(State(enable = true))
+
+        assertFalse(testee.isEnabled(EdgeToEdgeBucket.ONBOARDING))
+    }
+
+    @Test
+    fun whenMasterEnabledButOnboardingDisabledThenOnboardingDisabled() {
+        feature.self().setRawStoredState(State(enable = true))
+        feature.onboarding().setRawStoredState(State(enable = false))
+
+        assertFalse(testee.isEnabled(EdgeToEdgeBucket.ONBOARDING))
+    }
+
+    @Test
+    fun whenMasterAndOnboardingEnabledThenOnboardingEnabled() {
+        feature.self().setRawStoredState(State(enable = true))
+        feature.onboarding().setRawStoredState(State(enable = true))
+
+        assertTrue(testee.isEnabled(EdgeToEdgeBucket.ONBOARDING))
+    }
+
+    @Test
+    fun whenMasterDisabledThenMiscDisabledEvenIfMiscToggleEnabled() {
+        feature.self().setRawStoredState(State(enable = false))
+        feature.misc().setRawStoredState(State(enable = true))
+
+        assertFalse(testee.isEnabled(EdgeToEdgeBucket.MISC))
+    }
+
+    @Test
+    fun whenMasterEnabledButMiscDisabledThenMiscDisabled() {
+        feature.self().setRawStoredState(State(enable = true))
+        feature.misc().setRawStoredState(State(enable = false))
+
+        assertFalse(testee.isEnabled(EdgeToEdgeBucket.MISC))
+    }
+
+    @Test
+    fun whenMasterAndMiscEnabledThenMiscEnabled() {
+        feature.self().setRawStoredState(State(enable = true))
+        feature.misc().setRawStoredState(State(enable = true))
+
+        assertTrue(testee.isEnabled(EdgeToEdgeBucket.MISC))
+    }
 }

@@ -26,6 +26,7 @@
     tools:context="com.duckduckgo.app.widget.ui.AddWidgetInstructionsActivity">
 
     <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/addWidgetInstructionsContent"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
