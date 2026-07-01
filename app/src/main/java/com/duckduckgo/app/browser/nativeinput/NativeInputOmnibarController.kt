@@ -60,6 +60,9 @@ interface NativeInputOmnibarController : OmnibarState {
     fun restore()
     fun forceToTop()
     fun updateTierTitle(tier: DuckAiTier, onUpgradeClicked: () -> Unit)
+
+    /** Hide/show the subscription-tier indicator (Free pill / paid title) in the Duck.ai header. */
+    fun setTierVisible(visible: Boolean)
 }
 
 class RealNativeInputOmnibarController(
@@ -150,6 +153,7 @@ class RealNativeInputOmnibarController(
 
     private var currentTier: DuckAiTier = DuckAiTier.Unknown
     private var currentUpgradeClick: (() -> Unit)? = null
+    private var tierVisible: Boolean = true
 
     private fun showDuckAiTitle(omnibarView: View) {
         val header = omnibarView.findViewById<android.widget.LinearLayout?>(R.id.duckAIHeader)
@@ -167,9 +171,20 @@ class RealNativeInputOmnibarController(
         applyTierText(omnibarView)
     }
 
+    override fun setTierVisible(visible: Boolean) {
+        tierVisible = visible
+        (omnibar.omnibarView as? View)?.let { applyTierText(it) }
+    }
+
     private fun applyTierText(omnibarView: View) {
         val aiTitle = omnibarView.findViewById<TextView?>(R.id.aiTitle)
         val freePill = omnibarView.findViewById<View?>(R.id.duckAIFreePill)
+        if (!tierVisible) {
+            aiTitle?.gone()
+            freePill?.gone()
+            freePill?.setOnClickListener(null)
+            return
+        }
         if (nativeInputStateBugKillSwitch.self().isEnabled() && !overlayActive) {
             freePill?.gone()
             freePill?.setOnClickListener(null)
@@ -219,6 +234,7 @@ class RealNativeInputOmnibarController(
         overlayActive = false
         currentTier = DuckAiTier.Unknown
         currentUpgradeClick = null
+        tierVisible = true
         (omnibar.omnibarView as? View)?.let { removeLayoutListener(it) }
         restoreOmnibarColors()
         restoreOmnibarContent()
