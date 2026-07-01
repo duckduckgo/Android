@@ -161,9 +161,11 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
     private var suggestionButtonsAnimatorSet: AnimatorSet? = null
     private var bobbingDaxAnimator: ValueAnimator? = null
     private var backgroundAnimator: OnboardingBackgroundAnimator? = null
+    private var decorationFitCorrector: OnboardingDecorationFitCorrector? = null
     private var changeBoundsTransition: androidx.transition.Transition? = null
     private var changeBoundsTransitionListener: TransitionListenerAdapter? = null
     private var textIntroScale = 1f
+    private var cardBottomInsetPx = 0
     private var currentInputMode = InputMode.SEARCH
     private var isAnimating = false
         set(value) {
@@ -496,13 +498,6 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
         super.onViewCreated(view, savedInstanceState)
 
         ViewGroupCompat.installCompatInsetsDispatch(binding.root)
-        if (deviceInfo.isTablet()) {
-            ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, windowInsets ->
-                val tappableInsets = windowInsets.getInsets(WindowInsetsCompat.Type.tappableElement())
-                v.setPadding(v.paddingLeft, v.paddingTop, v.paddingRight, tappableInsets.bottom)
-                windowInsets
-            }
-        }
         ViewCompat.setOnApplyWindowInsetsListener(binding.daxDialogCta.root) { v, windowInsets ->
             val insets = windowInsets.getInsets(
                 WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout(),
@@ -510,6 +505,8 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
             v.updateLayoutParams<ViewGroup.MarginLayoutParams> {
                 topMargin = insets.top
             }
+            // The corrector reserves this on the card only while it is bottom-anchored (see correctOnce).
+            cardBottomInsetPx = insets.bottom + DIALOG_BOTTOM_INSET_GAP_DP.toPx()
             windowInsets
         }
 
@@ -528,6 +525,14 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
 
         binding.daxDialogCta.cardContainer.setOnClickListener { viewModel.onDialogTapped() }
         binding.root.setOnClickListener { viewModel.onBackgroundTapped() }
+
+        decorationFitCorrector = OnboardingDecorationFitCorrector(
+            root = binding.root,
+            dialog = binding.daxDialogCta.root,
+            cardContainer = binding.daxDialogCta.cardContainer,
+            onDecorationHidden = { binding.daxDialogCta.cardView.setArrowDepthFraction(0f) },
+            cardBottomInsetPx = { cardBottomInsetPx },
+        ).also { it.attach() }
 
         combine(viewModel.viewState, introInProgress) { state, _ -> state }
             .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
@@ -676,6 +681,9 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
 
     override fun onDestroyView() {
         super.onDestroyView()
+
+        decorationFitCorrector?.detach()
+        decorationFitCorrector = null
 
         introAnimatorSet?.cancel()
         introInProgress.value = false
@@ -914,10 +922,10 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                     binding.daxDialogCta.reinstallerQuickSetupContent.quickSetupTitleHidden.text =
                         getString(R.string.preOnboardingReinstallQuickSetupTitle).html(requireContext())
 
-                    val showBottomWingAnimation = BrandDesignUpdateOnboardingLayoutHelper.hasSpaceForAnimation(
-                        rootView = binding.root,
-                        dialogView = binding.daxDialogCta.root,
-                        decorationView = binding.bottomWingAnimation,
+                    val showBottomWingAnimation = applyDecorationLayout(
+                        binding.bottomWingAnimation,
+                        BOTTOM_WING_MAX_HEIGHT_DP,
+                        BOTTOM_WING_MIN_HEIGHT_DP,
                     )
                     if (!showBottomWingAnimation) {
                         binding.bottomWingAnimation.isVisible = false
@@ -1093,10 +1101,10 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                     binding.daxDialogCta.addressBarContent.root.isVisible = true
                     updateAddressBarPositionOptions(selectedAddressBarPosition, showSplitOption, animate = false)
 
-                    val showBobbingDax = BrandDesignUpdateOnboardingLayoutHelper.hasSpaceForAnimation(
-                        rootView = binding.root,
-                        dialogView = binding.daxDialogCta.root,
-                        decorationView = binding.bobbingDaxAnimation,
+                    val showBobbingDax = applyDecorationLayout(
+                        binding.bobbingDaxAnimation,
+                        BOBBING_DAX_MAX_HEIGHT_DP,
+                        BOBBING_DAX_MIN_HEIGHT_DP,
                     )
                     (binding.daxDialogCta.root.layoutParams as ConstraintLayout.LayoutParams).apply {
                         if (showBobbingDax && deviceInfo.isTablet()) {
@@ -1185,11 +1193,11 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                     binding.daxDialogCta.inputScreenContent.root.isVisible = true
                     updateAiChatToggleState(binding, withAi = inputScreenSelected, transition = BrandDesignInputScreenPicker.Transition.NONE)
 
-                    val leftWingView = binding.leftWingAnimation
-                    val showLeftWingAnimation = BrandDesignUpdateOnboardingLayoutHelper.hasSpaceForAnimation(
-                        rootView = binding.root,
-                        dialogView = binding.daxDialogCta.root,
-                        decorationView = leftWingView,
+                    val showLeftWingAnimation = applyDecorationLayout(
+                        binding.leftWingAnimation,
+                        LEFT_WING_MAX_HEIGHT_DP,
+                        LEFT_WING_MIN_HEIGHT_DP,
+                        bottomOverlapPx = leftWingBottomOverlapPx(),
                     )
                     if (!showLeftWingAnimation) {
                         binding.leftWingAnimation.isVisible = false
@@ -1265,6 +1273,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                     dismissBottomWingAnimation()
                     binding.daxDialogCta.comparisonChartContent.root.isVisible = false
                     dismissLeftWingAnimation()
+                    decorationFitCorrector?.clear()
 
                     val title = if (isCustomAiOnboardingFlow) {
                         getString(R.string.preOnboardingInputModeDemoTitleCustomAi)
@@ -1432,10 +1441,10 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
         binding.daxDialogCta.secondaryCta.isVisible = false
         binding.daxDialogCta.comparisonChartContent.root.isVisible = true
 
-        val showBottomWingAnimation = BrandDesignUpdateOnboardingLayoutHelper.hasSpaceForAnimation(
-            rootView = binding.root,
-            dialogView = binding.daxDialogCta.root,
-            decorationView = binding.bottomWingAnimation,
+        val showBottomWingAnimation = applyDecorationLayout(
+            binding.bottomWingAnimation,
+            BOTTOM_WING_MAX_HEIGHT_DP,
+            BOTTOM_WING_MIN_HEIGHT_DP,
         )
         if (!showBottomWingAnimation) {
             binding.bottomWingAnimation.isVisible = false
@@ -1600,10 +1609,10 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                 binding.daxDialogCta.secondaryCta.isVisible = false
                 binding.daxDialogCta.comparisonChartContent.root.isVisible = true
 
-                val showWing = BrandDesignUpdateOnboardingLayoutHelper.hasSpaceForAnimation(
-                    rootView = binding.root,
-                    dialogView = binding.daxDialogCta.root,
-                    decorationView = binding.bottomWingAnimation,
+                val showWing = applyDecorationLayout(
+                    binding.bottomWingAnimation,
+                    BOTTOM_WING_MAX_HEIGHT_DP,
+                    BOTTOM_WING_MIN_HEIGHT_DP,
                 )
                 binding.bottomWingAnimation.apply {
                     cancelAnimation()
@@ -1718,10 +1727,10 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
 
                 binding.daxDialogCta.addressBarContent.root.isVisible = true
                 updateAddressBarPositionOptions(selectedAddressBarPosition, showSplitOption, animate = false)
-                val showBobbingDax = BrandDesignUpdateOnboardingLayoutHelper.hasSpaceForAnimation(
-                    rootView = binding.root,
-                    dialogView = binding.daxDialogCta.root,
-                    decorationView = binding.bobbingDaxAnimation,
+                val showBobbingDax = applyDecorationLayout(
+                    binding.bobbingDaxAnimation,
+                    BOBBING_DAX_MAX_HEIGHT_DP,
+                    BOBBING_DAX_MIN_HEIGHT_DP,
                 )
                 binding.daxDialogCta.root.updateLayoutParams<ConstraintLayout.LayoutParams> {
                     if (showBobbingDax && deviceInfo.isTablet()) {
@@ -1795,11 +1804,11 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                 binding.daxDialogCta.inputScreenContent.root.isVisible = true
                 updateAiChatToggleState(binding, withAi = inputScreenSelected, transition = BrandDesignInputScreenPicker.Transition.NONE)
 
-                val leftWingView = binding.leftWingAnimation
-                val showLeftWing = BrandDesignUpdateOnboardingLayoutHelper.hasSpaceForAnimation(
-                    rootView = binding.root,
-                    dialogView = binding.daxDialogCta.root,
-                    decorationView = leftWingView,
+                val showLeftWing = applyDecorationLayout(
+                    binding.leftWingAnimation,
+                    LEFT_WING_MAX_HEIGHT_DP,
+                    LEFT_WING_MIN_HEIGHT_DP,
+                    bottomOverlapPx = leftWingBottomOverlapPx(),
                 )
                 binding.leftWingAnimation.apply {
                     cancelAnimation()
@@ -1896,10 +1905,10 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                 binding.daxDialogCta.primaryCta.setOnClickListener { viewModel.onPrimaryCtaClicked() }
                 setQuickSetupListeners()
 
-                val showWing = BrandDesignUpdateOnboardingLayoutHelper.hasSpaceForAnimation(
-                    rootView = binding.root,
-                    dialogView = binding.daxDialogCta.root,
-                    decorationView = binding.bottomWingAnimation,
+                val showWing = applyDecorationLayout(
+                    binding.bottomWingAnimation,
+                    BOTTOM_WING_MAX_HEIGHT_DP,
+                    BOTTOM_WING_MIN_HEIGHT_DP,
                 )
                 binding.bottomWingAnimation.apply {
                     cancelAnimation()
@@ -1938,6 +1947,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
 
                 binding.leftWingAnimation.isVisible = false
                 binding.bottomWingAnimation.isVisible = false
+                decorationFitCorrector?.clear()
 
                 backgroundAnimator?.snapTo(OnboardingBackgroundStep.InputType)
 
@@ -2167,21 +2177,41 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
         }
     }
 
-    /**
-     * Calculates the walking Dax height and applies the result to the layout.
-     * Returns true if Dax is visible, false if hidden due to insufficient space.
-     */
     private fun applyWalkingDaxLayout(): Boolean {
-        val walkingDaxHeight = BrandDesignUpdateOnboardingLayoutHelper.calculateWalkingDaxHeight(
-            rootView = binding.root,
-            dialogView = binding.daxDialogCta.root,
-            daxView = binding.welcomeScreenWalkingDax,
-            maxHeightPx = WALKING_DAX_MAX_HEIGHT_DP.toPx(),
-            minHeightPx = WALKING_DAX_MIN_HEIGHT_DP.toPx(),
-        )
+        releaseCardBottomInset()
+        val v2 = viewModel.viewState.value.onboardingImprovementsV2Enabled
+        val walkingDaxHeight = if (v2) {
+            BrandDesignUpdateOnboardingLayoutHelper.calculateDecorationHeight(
+                rootView = binding.root,
+                dialogView = binding.daxDialogCta.root,
+                decorationView = binding.welcomeScreenWalkingDax,
+                maxHeightPx = WALKING_DAX_MAX_HEIGHT_DP.toPx(),
+                minHeightPx = WALKING_DAX_MIN_HEIGHT_DP.toPx(),
+            )
+        } else {
+            // TODO: remove when onboardingImprovementsV2 flag is removed
+            BrandDesignUpdateOnboardingLayoutHelper.calculateWalkingDaxHeight(
+                rootView = binding.root,
+                dialogView = binding.daxDialogCta.root,
+                daxView = binding.welcomeScreenWalkingDax,
+                maxHeightPx = WALKING_DAX_MAX_HEIGHT_DP.toPx(),
+                minHeightPx = WALKING_DAX_MIN_HEIGHT_DP.toPx(),
+            )
+        }
         if (walkingDaxHeight != null) {
             binding.welcomeScreenWalkingDax.updateLayoutParams { height = walkingDaxHeight }
+            if (v2) {
+                decorationFitCorrector?.track(
+                    binding.welcomeScreenWalkingDax,
+                    minHeightPx = WALKING_DAX_MIN_HEIGHT_DP.toPx(),
+                    maxHeightPx = WALKING_DAX_MAX_HEIGHT_DP.toPx(),
+                )
+            } else {
+                // TODO: remove when onboardingImprovementsV2 flag is removed
+                decorationFitCorrector?.clear()
+            }
         } else {
+            decorationFitCorrector?.clear()
             binding.welcomeScreenWalkingDax.isVisible = false
             binding.daxDialogCta.root.updateLayoutParams<ConstraintLayout.LayoutParams> {
                 verticalBias = 0f
@@ -2190,6 +2220,65 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
             }
         }
         return walkingDaxHeight != null
+    }
+
+    private fun applyDecorationLayout(
+        decorationView: View,
+        maxHeightDp: Int,
+        minHeightDp: Int,
+        bottomOverlapPx: Int = 0,
+    ): Boolean {
+        releaseCardBottomInset()
+        if (!viewModel.viewState.value.onboardingImprovementsV2Enabled) {
+            // TODO: remove when onboardingImprovementsV2 flag is removed
+            decorationFitCorrector?.clear()
+            return BrandDesignUpdateOnboardingLayoutHelper.hasSpaceForAnimation(
+                rootView = binding.root,
+                dialogView = binding.daxDialogCta.root,
+                decorationView = decorationView,
+            )
+        }
+        val height = BrandDesignUpdateOnboardingLayoutHelper.calculateDecorationHeight(
+            rootView = binding.root,
+            dialogView = binding.daxDialogCta.root,
+            decorationView = decorationView,
+            maxHeightPx = maxHeightDp.toPx(),
+            minHeightPx = minHeightDp.toPx(),
+            bottomOverlapPx = bottomOverlapPx,
+        )
+        if (height != null) {
+            decorationView.updateLayoutParams { this.height = height }
+            decorationFitCorrector?.track(
+                decorationView,
+                minHeightPx = minHeightDp.toPx(),
+                maxHeightPx = maxHeightDp.toPx(),
+                bottomOverlapPx = bottomOverlapPx,
+            )
+        } else {
+            decorationFitCorrector?.clear()
+        }
+        return height != null
+    }
+
+    // A bottom-anchored predecessor can leave a bottom inset on the card; clear it before measuring a
+    // decoration's fit so it does not count against the decoration's room. The corrector re-applies it
+    // if this dialog ends up bottom-anchored too.
+    private fun releaseCardBottomInset() {
+        val params = binding.daxDialogCta.root.layoutParams as? ViewGroup.MarginLayoutParams ?: return
+        if (params.bottomMargin != 0) {
+            params.bottomMargin = 0
+            binding.daxDialogCta.root.layoutParams = params
+        }
+    }
+
+    /**
+     * Px the left wing may rise into the bottom margin the card reserves for the bubble tail. The wing
+     * sits on the opposite side from the tail, so it can use that band while keeping at least
+     * [LEFT_WING_CARD_GAP_DP] clear of the card body.
+     */
+    private fun leftWingBottomOverlapPx(): Int {
+        val cardBottomMargin = (binding.daxDialogCta.cardView.layoutParams as? ViewGroup.MarginLayoutParams)?.bottomMargin ?: return 0
+        return (cardBottomMargin - LEFT_WING_CARD_GAP_DP.toPx()).coerceAtLeast(0)
     }
 
     private fun playWalkingDaxAnimation() {
@@ -2693,6 +2782,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
         private const val INPUT_SCREEN_PREVIEW_SUGGESTIONS_ANIMATION_DELAY = 500L
         private const val MIN_SCREEN_HEIGHT_FOR_KEYBOARD_DP = 600
         private const val ARROW_TARGET_OFFSET_END_DP = 80
+        private const val DIALOG_BOTTOM_INSET_GAP_DP = 16
 
         private const val WING_START_DELAY = 300L
         private const val WING_FADE_IN_DURATION = 150L
@@ -2705,6 +2795,13 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
         private const val WALKING_DAX_FINAL_X_DP = 22
         private const val WALKING_DAX_MAX_HEIGHT_DP = 274
         private const val WALKING_DAX_MIN_HEIGHT_DP = 174
+        private const val BOTTOM_WING_MAX_HEIGHT_DP = 199
+        private const val BOTTOM_WING_MIN_HEIGHT_DP = 130
+        private const val LEFT_WING_MAX_HEIGHT_DP = 196
+        private const val LEFT_WING_MIN_HEIGHT_DP = 130
+        private const val LEFT_WING_CARD_GAP_DP = 8
+        private const val BOBBING_DAX_MAX_HEIGHT_DP = 156
+        private const val BOBBING_DAX_MIN_HEIGHT_DP = 130
 
         private const val DEFAULT_BROWSER_ROLE_MANAGER_DIALOG = 101
         private const val QUICK_SETUP_DEFAULT_BROWSER_ROLE_MANAGER_DIALOG = 102
