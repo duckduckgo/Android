@@ -738,6 +738,40 @@ class SyncWithAnotherDeviceViewModelTest {
     }
 
     @Test
+    fun whenIsDeepLinkAndV2MasterOnButDisplayOffThenLegacyPresenterPollingDoesNotStart() = runTest {
+        // Reproduces the deep-link timeout bug: canUseV2ConnectFlow=true (so codeDispatcher routes V2)
+        // but canShowV2ConnectCode=false (so the old shouldUseV2() gate fell through to legacy showQRCode()
+        // + pollSecondDeviceExchangeAcknowledgement, which fired ShowError over V2's confirmation dialog).
+        enableV2(displayOn = false)
+
+        testee.viewState(isDeepLink = true).test {
+            awaitItem()
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        verify(runner, never()).startPresent()
+        verify(syncRepository, never()).generateExchangeInvitationCode()
+        verify(syncRepository, never()).getRecoveryCode()
+        verify(syncRepository, never()).pollSecondDeviceExchangeAcknowledgement()
+    }
+
+    @Test
+    fun whenIsDeepLinkAndV2MasterOffThenLegacyPresenterPollingDoesNotStart() = runTest {
+        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(false))
+        syncFeature.canShowV2ConnectCode().setRawStoredState(State(false))
+
+        testee.viewState(isDeepLink = true).test {
+            awaitItem()
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        verify(runner, never()).startPresent()
+        verify(syncRepository, never()).generateExchangeInvitationCode()
+        verify(syncRepository, never()).getRecoveryCode()
+        verify(syncRepository, never()).pollSecondDeviceExchangeAcknowledgement()
+    }
+
+    @Test
     fun whenV2PairingRejectedByPeerThenShowError() = runTest {
         syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
         whenever(syncRepository.getAccountInfo()).thenReturn(accountA)

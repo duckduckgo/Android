@@ -115,10 +115,12 @@ class SyncWithAnotherActivityViewModel @Inject constructor(
         if (sessionStarted) return
         sessionStarted = true
         viewModelScope.launch(dispatchers.io()) {
+            // On the deep-link receive path, routing is owned by onDeepLinkCodeReceived → onQRCodeScanned
+            // → codeDispatcher.route(). This VM is the scanner here, so neither showQRCode() (presenter
+            // QR) nor the legacy presenter-side acknowledgement polling loop below should run.
+            if (isDeepLink) return@launch
             if (shouldUseV2()) {
-                if (!isDeepLink) {
-                    startV2Present()
-                }
+                startV2Present()
                 return@launch
             }
             showQRCode()
