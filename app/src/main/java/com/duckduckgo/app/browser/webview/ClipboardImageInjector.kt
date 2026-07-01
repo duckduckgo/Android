@@ -315,9 +315,7 @@ class ClipboardImageInjectorImpl @Inject constructor(
             if (uri != null) {
                 val clipboardSuccess = withContext(dispatcherProvider.main()) {
                     runCatching {
-                        if (appBuildConfig.sdkInt >= Build.VERSION_CODES.P) {
-                            clipboardManager.clearPrimaryClip()
-                        }
+                        clipboardManager.clearPrimaryClip()
 
                         val clipData = ClipData.newUri(context.contentResolver, "Image", uri)
                         clipboardManager.setPrimaryClip(clipData)

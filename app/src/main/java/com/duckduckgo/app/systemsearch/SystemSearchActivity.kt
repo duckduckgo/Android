@@ -19,7 +19,6 @@ package com.duckduckgo.app.systemsearch
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
-import android.os.Build
 import android.os.Bundle
 import android.text.Editable
 import android.text.Spanned
@@ -233,14 +232,12 @@ class SystemSearchActivity : DuckDuckGoActivity() {
             }
         }
 
-        if (Build.VERSION.SDK_INT >= 28) {
-            shadowContainer.addBottomShadow(
-                shadowSizeDp = 12f,
-                offsetYDp = 3f,
-                insetDp = 3f,
-                shadowColor = ContextCompat.getColor(this, CommonR.color.background_omnibar_shadow),
-            )
-        }
+        shadowContainer.addBottomShadow(
+            shadowSizeDp = 12f,
+            offsetYDp = 3f,
+            insetDp = 3f,
+            shadowColor = ContextCompat.getColor(this, CommonR.color.background_omnibar_shadow),
+        )
 
         viewModel.setLaunchedFromSearchOnlyWidget(launchedFromSearchOnlyWidget(intent))
 

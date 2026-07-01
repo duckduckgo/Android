@@ -28,7 +28,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
-import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat.Type
@@ -148,9 +147,7 @@ class SingleTabFireDialog : BottomSheetDialogFragment(), FireDialog {
         configureBottomSheet()
         observeViewModel()
 
-        if (appBuildConfig.sdkInt == 26) {
-            dialog?.window?.navigationBarColor = ContextCompat.getColor(requireContext(), CommonR.color.translucentDark)
-        } else if (appBuildConfig.sdkInt in 27..<30) {
+        if (appBuildConfig.sdkInt < 30) {
             dialog?.window?.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
         }
 

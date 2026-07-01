@@ -17,7 +17,6 @@
 package com.duckduckgo.autofill.impl.service
 
 import android.app.assist.AssistStructure.ViewNode
-import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.autofill.impl.service.AutofillFieldType.PASSWORD
 import com.duckduckgo.autofill.impl.service.AutofillFieldType.UNKNOWN
 import com.duckduckgo.autofill.impl.service.AutofillFieldType.USERNAME
@@ -30,12 +29,11 @@ import org.mockito.kotlin.whenever
 
 class RealAutofillParserTest {
 
-    private val appBuildConfig: AppBuildConfig = mock()
     private val viewNodeClassifier: ViewNodeClassifier = mock<ViewNodeClassifier>().also {
         whenever(it.classify(any())).thenReturn(UNKNOWN)
     }
 
-    private val testee = RealAutofillParser(appBuildConfig, viewNodeClassifier)
+    private val testee = RealAutofillParser(viewNodeClassifier)
 
     @Test
     fun whenZeroWindowNodesThenReturnEmptyList() {
