@@ -34,7 +34,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancelAndJoin
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -75,7 +75,7 @@ class ChatSyncPromoChatTabItemPlugin @Inject constructor(
         showJob: Job,
     ) {
         launch {
-            duckChatInput.inputQuery.first(String::isNotEmpty)
+            duckChatInput.inputQuery.firstOrNull(String::isNotEmpty) ?: return@launch
             showJob.cancelAndJoin()
             adapter.dismiss(shouldAnimate = false)
         }
