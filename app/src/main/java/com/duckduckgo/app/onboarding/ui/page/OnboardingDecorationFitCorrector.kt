@@ -29,6 +29,7 @@ class OnboardingDecorationFitCorrector(
     private val dialog: View,
     private val cardContainer: View,
     private val onDecorationHidden: () -> Unit = {},
+    private val cardBottomInsetPx: () -> Int = { 0 },
 ) {
 
     private var decoration: View? = null
@@ -67,9 +68,18 @@ class OnboardingDecorationFitCorrector(
 
     @VisibleForTesting
     fun correctOnce(): Boolean {
-        val deco = decoration ?: return true
-        if (deco.isGone) return true
         if (root.height == 0) return true
+
+        val deco = decoration
+        val decorationShown = deco != null && !deco.isGone
+        // The card reserves the bottom-bar inset only when it is the bottom-most element: bottom-anchored
+        // AND no decoration shown below it. A shown decoration is at least its min height, which exceeds
+        // any bar inset, so it covers the bar for the card; reserving the inset then would feed dialogSpace
+        // and hide that very decoration.
+        if (syncCardBottomInset(decorationShown)) return false
+
+        if (deco == null) return true
+        if (deco.isGone) return true
         if (BrandDesignUpdateOnboardingLayoutHelper.isInScrollableContainer(dialog, root)) return true
 
         val viewport = cardContainer.parent as? View ?: return true
@@ -113,6 +123,15 @@ class OnboardingDecorationFitCorrector(
             return false
         }
 
+        return true
+    }
+
+    private fun syncCardBottomInset(decorationShown: Boolean): Boolean {
+        val params = dialog.layoutParams as? ConstraintLayout.LayoutParams ?: return false
+        val bottomAnchored = params.bottomToBottom == ConstraintLayout.LayoutParams.PARENT_ID
+        val desired = if (bottomAnchored && !decorationShown) cardBottomInsetPx() else 0
+        if (params.bottomMargin == desired) return false
+        dialog.updateLayoutParams<ConstraintLayout.LayoutParams> { bottomMargin = desired }
         return true
     }
 }
