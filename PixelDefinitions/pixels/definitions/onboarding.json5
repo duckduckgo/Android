@@ -355,8 +355,8 @@
             { "key": "pixelSource", "type": "string", "description": "Device form factor", "enum": ["phone", "tablet"] }
         ]
     },
-    "onboarding_ai-chat": {
-        "description": "Duck.ai demo step. shown when the in-browser Duck.ai onboarding demo is presented. Custom Duck.ai flow only. Unique once per user.",
+    "onboarding_fire-button": {
+        "description": "Fire-button demo step. shown when the in-browser fire-button demo is presented; clicked (no value) when the demo completes. Displayed both in the Duck.ai flow, on the chat tab, and in the regular flow in the browser tab.",
         "owners": ["catalinradoiu"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
@@ -366,7 +366,7 @@
                 "key": "e",
                 "type": "string",
                 "description": "Event type for the onboarding instrumentation standard",
-                "enum": ["shown"]
+                "enum": ["shown", "clicked"]
             },
             { "key": "it", "type": "string", "description": "Install type", "enum": ["new", "reinstall"] },
             {
