@@ -39,6 +39,8 @@ class WebViewCookieManager @Inject constructor(
     private val dispatcher: DispatcherProvider,
     duckAiHostProvider: DuckAiHostProvider,
 ) : DuckDuckGoCookieManager {
+    // Regular mode used here because this is Regular mode-only data-clearing
+    private val browserMode = BrowserMode.REGULAR
 
     override suspend fun removeExternalCookies() {
         withContext(dispatcher.io()) {
@@ -52,7 +54,7 @@ class WebViewCookieManager @Inject constructor(
         // These cookies are not stored in a personally identifiable way. For example, the large size setting is stored as 's=l.'
         // More info in https://duckduckgo.com/privacy
         val ddgCookies = getDuckDuckGoCookies()
-        if (cookieManager.forMode(BrowserMode.REGULAR)?.hasCookies() == true) {
+        if (cookieManager.forMode(browserMode)?.hasCookies() == true) {
             removeCookies.removeCookies()
             storeDuckDuckGoCookies(ddgCookies)
         }
@@ -73,7 +75,7 @@ class WebViewCookieManager @Inject constructor(
 
     private suspend fun storeCookie(cookie: String, host: String) {
         suspendCoroutine { continuation ->
-            cookieManager.forMode(BrowserMode.REGULAR)?.setCookie(host, cookie) { success ->
+            cookieManager.forMode(browserMode)?.setCookie(host, cookie) { success ->
                 logcat(VERBOSE) { "Cookie $cookie stored successfully: $success" }
                 continuation.resume(Unit)
             }
@@ -83,13 +85,13 @@ class WebViewCookieManager @Inject constructor(
     private fun getDuckDuckGoCookies(): Map<String, List<String>> {
         val map = mutableMapOf<String, List<String>>()
         ddgCookieDomains.forEach { host ->
-            map[host] = cookieManager.forMode(BrowserMode.REGULAR)?.getCookie(host)?.split(";").orEmpty()
+            map[host] = cookieManager.forMode(browserMode)?.getCookie(host)?.split(";").orEmpty()
         }
         return map
     }
 
     override fun flush() {
-        cookieManager.forMode(BrowserMode.REGULAR)?.flush()
+        cookieManager.forMode(browserMode)?.flush()
     }
 
     private val ddgCookieDomains: List<String> = listOf(AppUrl.Url.COOKIES, AppUrl.Url.SURVEY_COOKIES, "https://${duckAiHostProvider.getHost()}")

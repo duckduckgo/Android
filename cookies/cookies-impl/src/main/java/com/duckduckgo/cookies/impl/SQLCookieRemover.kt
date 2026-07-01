@@ -43,6 +43,7 @@ import kotlin.coroutines.suspendCoroutine
 class CookieManagerRemover @Inject constructor(private val cookieManagerProvider: CookieManagerProvider) : CookieRemover {
     override suspend fun removeCookies(): Boolean {
         suspendCoroutine { continuation ->
+            // Regular mode used here because this is Regular mode-only data-clearing
             cookieManagerProvider.forMode(BrowserMode.REGULAR)?.removeAllCookies {
                 logcat(VERBOSE) { "All cookies removed; restoring DDG cookies" }
                 continuation.resume(Unit)
