@@ -42,6 +42,7 @@ import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.showKeyboard
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.downloads.api.DownloadFileAccessor
 import com.duckduckgo.downloads.api.DownloadsFileActions
 import com.duckduckgo.downloads.api.DownloadsScreens.DownloadsScreenNoParams
 import com.duckduckgo.downloads.api.model.DownloadItem
@@ -49,7 +50,6 @@ import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import java.io.File
 import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
@@ -64,6 +64,9 @@ class DownloadsActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var downloadsFileActions: DownloadsFileActions
+
+    @Inject
+    lateinit var downloadFileAccessor: DownloadFileAccessor
 
     private val toolbar
         get() = binding.toolbar
@@ -135,19 +138,18 @@ class DownloadsActivity : DuckDuckGoActivity() {
     }
 
     private fun showOpen(command: OpenFile) {
-        val file = File(command.item.filePath)
-        if (file.exists()) {
-            val result = downloadsFileActions.openFile(this@DownloadsActivity, file)
-            if (!result) {
-                showSnackbar(R.string.downloadsCannotOpenFileErrorMessage)
-            }
-        } else {
+        if (!downloadFileAccessor.exists(command.item.filePath)) {
             viewModel.delete(command.item)
+            return
+        }
+        val result = downloadsFileActions.openFileAtPath(this@DownloadsActivity, command.item.filePath)
+        if (!result) {
+            showSnackbar(R.string.downloadsCannotOpenFileErrorMessage)
         }
     }
 
     private fun showShare(command: ShareFile) {
-        downloadsFileActions.shareFile(this@DownloadsActivity, File(command.item.filePath))
+        downloadsFileActions.shareFileAtPath(this@DownloadsActivity, command.item.filePath)
     }
 
     private fun showUndo(command: DisplayUndoMessage) {

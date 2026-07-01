@@ -113,16 +113,19 @@ class DefaultFileDownloadNotificationManager @Inject constructor(
 
     @AnyThread
     override fun showDownloadFinishedNotification(downloadId: Long, file: File, mimeType: String?) {
-        val filename = file.name
+        showDownloadFinishedNotification(downloadId, file.absolutePath, file.name, mimeType)
+    }
 
-        val intent = createIntentToOpenFile(applicationContext, file)
+    @AnyThread
+    override fun showDownloadFinishedNotification(downloadId: Long, storagePath: String, fileName: String, mimeType: String?) {
+        val intent = createIntentToOpenFile(applicationContext, storagePath, mimeType)
 
         val pendingIntentFlags = PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
 
         val notification = NotificationCompat.Builder(applicationContext, FileDownloadNotificationChannelType.FILE_DOWNLOADED.id)
             .setPriority(FileDownloadNotificationChannelType.FILE_DOWNLOADING.priority)
             .setShowWhen(false)
-            .setContentTitle(filename)
+            .setContentTitle(fileName)
             .setContentText(applicationContext.getString(R.string.notificationDownloadComplete))
             .setContentIntent(PendingIntent.getActivity(applicationContext, downloadId.toInt(), intent, pendingIntentFlags))
             .setAutoCancel(true)
@@ -218,17 +221,25 @@ class DefaultFileDownloadNotificationManager @Inject constructor(
         return next
     }
 
-    private fun createIntentToOpenFile(applicationContext: Context, file: File): Intent {
-        val fileUri = getFilePathUri(applicationContext, file)
+    private fun createIntentToOpenFile(applicationContext: Context, storagePath: String, mimeType: String?): Intent {
+        val fileUri = getFilePathUri(applicationContext, storagePath)
         return Intent().apply {
-            setDataAndType(fileUri, applicationContext.contentResolver?.getType(fileUri))
+            setDataAndType(fileUri, mimeType ?: applicationContext.contentResolver?.getType(fileUri))
             action = Intent.ACTION_VIEW
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_GRANT_READ_URI_PERMISSION
         }
     }
 
-    private fun getFilePathUri(context: Context, file: File): Uri {
-        return FileProvider.getUriForFile(context, "${appBuildConfig.applicationId}.provider", file)
+    private fun getFilePathUri(context: Context, storagePath: String): Uri {
+        return if (storagePath.startsWith(CONTENT_URI_PREFIX)) {
+            Uri.parse(storagePath)
+        } else {
+            FileProvider.getUriForFile(context, "${appBuildConfig.applicationId}.provider", File(storagePath))
+        }
+    }
+
+    companion object {
+        private const val CONTENT_URI_PREFIX = "content://"
     }
 
     private fun interface UpdateInProgress {

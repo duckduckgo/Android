@@ -1,0 +1,10 @@
+appId: com.duckduckgo.mobile.android
+tags:
+  - releaseTest
+---
+- launchApp
+- tapOn: "Settings"
+- tapOn: "Downloads"
+- assertVisible: "Download Location"
+- assertVisible: "Change Folder"
+- tapOn: "Change Folder"

@@ -34,6 +34,7 @@ import com.duckduckgo.app.downloads.DownloadsViewModel.Command.ShareFile
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.formatters.time.TimeDiffFormatter
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.downloads.api.DownloadFileAccessor
 import com.duckduckgo.downloads.api.DownloadsRepository
 import com.duckduckgo.downloads.api.model.DownloadItem
 import com.duckduckgo.downloads.store.DownloadStatus
@@ -48,7 +49,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import java.io.File
 import java.time.LocalDateTime
 import javax.inject.Inject
 
@@ -58,6 +58,7 @@ class DownloadsViewModel @Inject constructor(
     private val downloadsRepository: DownloadsRepository,
     private val dispatcher: DispatcherProvider,
     private val downloadMenuStateProvider: DownloadMenuStateProvider,
+    private val downloadFileAccessor: DownloadFileAccessor,
 ) : ViewModel(), DownloadsItemListener {
 
     data class ViewState(
@@ -126,7 +127,7 @@ class DownloadsViewModel @Inject constructor(
 
     fun removeFromDiskAndFromDownloadManager(items: List<DownloadItem>) {
         items.forEach {
-            File(it.filePath).delete()
+            downloadFileAccessor.delete(it.filePath)
         }
 
         // Remove all unfinished downloads from DownloadManager.
@@ -149,7 +150,7 @@ class DownloadsViewModel @Inject constructor(
         viewModelScope.launch(dispatcher.io()) {
             val downloads = downloadsRepository.getDownloads()
             val staleDownloadIds = downloads
-                .filter { it.downloadStatus == DownloadStatus.FINISHED && !File(it.filePath).exists() }
+                .filter { it.downloadStatus == DownloadStatus.FINISHED && !downloadFileAccessor.exists(it.filePath) }
                 .map { it.downloadId }
             if (staleDownloadIds.isNotEmpty()) {
                 downloadsRepository.delete(staleDownloadIds)

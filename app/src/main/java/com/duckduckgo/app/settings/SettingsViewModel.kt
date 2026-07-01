@@ -177,6 +177,7 @@ class SettingsViewModel @Inject constructor(
         data object LaunchAppearanceScreen : Command()
         data object LaunchAboutScreen : Command()
         data object LaunchGeneralSettingsScreen : Command()
+        data object LaunchDownloadLocationSettingsScreen : Command()
         data object LaunchFeedback : Command()
         data object LaunchSubscriptionUnifiedFeedback : Command()
         data object LaunchOtherPlatforms : Command()
@@ -392,6 +393,10 @@ class SettingsViewModel @Inject constructor(
     fun onGeneralSettingClicked() {
         viewModelScope.launch { command.send(LaunchGeneralSettingsScreen) }
         pixel.fire(SETTINGS_GENERAL_PRESSED)
+    }
+
+    fun onDownloadsSettingClicked() {
+        viewModelScope.launch { command.send(Command.LaunchDownloadLocationSettingsScreen) }
     }
 
     fun onEmailProtectionSettingClicked() {

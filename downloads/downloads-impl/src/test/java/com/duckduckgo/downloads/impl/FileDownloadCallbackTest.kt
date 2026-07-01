@@ -102,17 +102,17 @@ class FileDownloadCallbackTest {
         val updatedContentLength = 20L
         whenever(mockDownloadsRepository.getDownloadItem(item.downloadId)).thenReturn(item.copy(contentLength = updatedContentLength))
 
-        val file: File = mock()
-        callback.onSuccess(item.downloadId, updatedContentLength, file, "type")
+        val file = File(item.filePath)
+        callback.onSuccess(item.downloadId, updatedContentLength, file.absolutePath, file.name, "type")
 
         verify(mockPixel).fire(DownloadsPixelName.DOWNLOAD_REQUEST_SUCCEEDED)
-        verify(mockMediaScanner).scan(file)
+        verify(mockMediaScanner).scan(file.absolutePath, "type")
         verify(mockDownloadsRepository).update(
             downloadId = item.downloadId,
             downloadStatus = FINISHED,
             contentLength = updatedContentLength,
         )
-        verify(mockFileDownloadNotificationManager).showDownloadFinishedNotification(item.downloadId, file, "type")
+        verify(mockFileDownloadNotificationManager).showDownloadFinishedNotification(item.downloadId, file.absolutePath, file.name, "type")
         callback.commands().test {
             val actualItem = awaitItem()
             assertTrue(actualItem is ShowDownloadSuccessMessage)
@@ -128,16 +128,17 @@ class FileDownloadCallbackTest {
         val mimeType = "image/jpeg"
         val file = File(item.fileName)
 
-        callback.onSuccess(file = file, mimeType = mimeType)
+        whenever(mockMediaScanner.fileLength(file.absolutePath)).thenReturn(file.length())
+        callback.onSuccess(storagePath = file.absolutePath, fileName = file.name, mimeType = mimeType)
 
         verify(mockPixel).fire(DownloadsPixelName.DOWNLOAD_REQUEST_SUCCEEDED)
-        verify(mockMediaScanner).scan(file)
+        verify(mockMediaScanner).scan(file.absolutePath, mimeType)
         verify(mockDownloadsRepository).update(
             fileName = item.fileName,
             downloadStatus = FINISHED,
             contentLength = file.length(),
         )
-        verify(mockFileDownloadNotificationManager).showDownloadFinishedNotification(0, file, mimeType)
+        verify(mockFileDownloadNotificationManager).showDownloadFinishedNotification(0, file.absolutePath, file.name, mimeType)
         callback.commands().test {
             val actualItem = awaitItem()
             assertTrue(actualItem is ShowDownloadSuccessMessage)
@@ -285,8 +286,8 @@ class FileDownloadCallbackTest {
         val item = oneItem()
         whenever(mockDownloadsRepository.getDownloadItem(item.downloadId)).thenReturn(item)
 
-        val file: File = mock()
-        callback.onSuccess(item.downloadId, 20L, file, "type")
+        val file = File(item.filePath)
+        callback.onSuccess(item.downloadId, 20L, file.absolutePath, file.name, "type")
 
         verify(mockFileDownloadCallbackPlugin).onFileDownloaded()
     }
@@ -295,8 +296,9 @@ class FileDownloadCallbackTest {
     fun whenOnSuccessCalledForFileThenPluginsNotified() = runTest {
         val item = oneItem()
         val file = File(item.fileName)
+        whenever(mockMediaScanner.fileLength(file.absolutePath)).thenReturn(file.length())
 
-        callback.onSuccess(file = file, mimeType = "image/jpeg")
+        callback.onSuccess(storagePath = file.absolutePath, fileName = file.name, mimeType = "image/jpeg")
 
         verify(mockFileDownloadCallbackPlugin).onFileDownloaded()
     }

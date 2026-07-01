@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 DuckDuckGo
+ * Copyright (c) 2026 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,19 +16,17 @@
 
 package com.duckduckgo.downloads.api
 
-import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
+import java.io.Serializable
 
-sealed interface DownloadsScreens {
+/** Where a browser download should be written. */
+sealed interface DownloadDestination : Serializable {
 
-    /**
-     * Launch the Downloads activity
-     */
-    data object DownloadsScreenNoParams : ActivityParams {
-        private fun readResolve(): Any = DownloadsScreenNoParams
-    }
+    /** System public Downloads directory (default, opt-out behaviour). */
+    data object Default : DownloadDestination
 
-    /** Launch the Download Location settings screen. */
-    data object DownloadLocationSettingsScreenNoParams : ActivityParams {
-        private fun readResolve(): Any = DownloadLocationSettingsScreenNoParams
-    }
+    /** User-selected folder via Storage Access Framework tree URI. */
+    data class CustomTree(
+        val treeUri: String,
+        val displayLabel: String,
+    ) : DownloadDestination
 }

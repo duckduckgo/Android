@@ -33,6 +33,7 @@ import com.duckduckgo.app.downloads.DownloadsViewModel.Command.ShareFile
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.formatters.time.RealTimeDiffFormatter
 import com.duckduckgo.common.utils.formatters.time.TimeDiffFormatter
+import com.duckduckgo.downloads.api.DownloadFileAccessor
 import com.duckduckgo.downloads.api.DownloadsRepository
 import com.duckduckgo.downloads.api.model.DownloadItem
 import com.duckduckgo.downloads.store.DownloadStatus.FINISHED
@@ -65,6 +66,8 @@ class DownloadsViewModelTest {
 
     private val mockDownloadMenuStateProvider: DownloadMenuStateProvider = mock()
 
+    private val mockDownloadFileAccessor: DownloadFileAccessor = mock()
+
     private val context: Context = mock()
 
     private val testee: DownloadsViewModel by lazy {
@@ -74,6 +77,7 @@ class DownloadsViewModelTest {
                 mockDownloadsRepository,
                 coroutineRule.testDispatcherProvider,
                 mockDownloadMenuStateProvider,
+                mockDownloadFileAccessor,
             )
         model
     }
@@ -358,6 +362,8 @@ class DownloadsViewModelTest {
         val existingItem = oneItem().copy(downloadId = 2L, filePath = existingFile.absolutePath)
         whenever(mockDownloadsRepository.getDownloads()).thenReturn(listOf(staleItem, existingItem))
         whenever(mockDownloadsRepository.getDownloadsAsFlow()).thenReturn(flowOf(listOf(existingItem)))
+        whenever(mockDownloadFileAccessor.exists(staleItem.filePath)).thenReturn(false)
+        whenever(mockDownloadFileAccessor.exists(existingItem.filePath)).thenReturn(true)
 
         testee.syncDownloads()
 

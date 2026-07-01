@@ -21,6 +21,7 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.downloads.api.DownloadDestinationResolver
 import com.duckduckgo.downloads.api.DownloadFailReason
 import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
@@ -33,16 +34,23 @@ class AndroidFileDownloader constructor(
     private val workManager: WorkManager,
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
+    private val downloadDestinationResolver: DownloadDestinationResolver,
 ) : FileDownloader {
 
     override fun enqueueDownload(
         pending: PendingFileDownload,
     ) {
-        when {
-            pending.isNetworkUrl -> enqueueToWorker(pending)
-            // We don't delegate the data URLs to the worker because you can't pass a lot of data through the [Data] class.
-            pending.isDataUrl -> coroutineScope.launch(dispatcherProvider.io()) { dataUriDownloader.download(pending, callback) }
-            else -> callback.onError(url = pending.url, reason = DownloadFailReason.UnsupportedUrlType)
+        coroutineScope.launch(dispatcherProvider.io()) {
+            val resolved = downloadDestinationResolver.resolve()
+            val pendingWithDestination = pending.copy(destination = resolved.destination)
+            if (resolved.usedFallback) {
+                callback.onDownloadLocationFallbackUsed()
+            }
+            when {
+                pendingWithDestination.isNetworkUrl -> enqueueToWorker(pendingWithDestination)
+                pendingWithDestination.isDataUrl -> dataUriDownloader.download(pendingWithDestination, callback)
+                else -> callback.onError(url = pending.url, reason = DownloadFailReason.UnsupportedUrlType)
+            }
         }
     }
 

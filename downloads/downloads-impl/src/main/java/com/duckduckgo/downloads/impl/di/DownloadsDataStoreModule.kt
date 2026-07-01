@@ -34,10 +34,21 @@ object DownloadsDataStoreModule {
         name = "downloads_retry_urls",
     )
 
+    private val Context.downloadLocationDataStore: DataStore<Preferences> by preferencesDataStore(
+        name = "downloads_location",
+    )
+
     @Provides
     @Downloads
     fun provideDownloadsDataStore(context: Context): DataStore<Preferences> = context.downloadsDataStore
+
+    @Provides
+    @DownloadLocation
+    fun provideDownloadLocationDataStore(context: Context): DataStore<Preferences> = context.downloadLocationDataStore
 }
 
 @Qualifier
 internal annotation class Downloads
+
+@Qualifier
+internal annotation class DownloadLocation

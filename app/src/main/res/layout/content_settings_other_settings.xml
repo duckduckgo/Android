@@ -80,6 +80,20 @@
         app:primaryText="@string/settingsDataClearing"
         app:leadingIcon="@drawable/ic_fire_color_24"/>
 
+    <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+        android:id="@+id/downloadsSetting"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:primaryText="@string/settingsDownloads"
+        app:leadingIcon="@drawable/ic_downloads_color_24"/>
+
+    <LinearLayout
+        android:id="@+id/settingsSectionDuckPlayer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical" >
+    </LinearLayout>
+
     <include
         android:id="@+id/includeDuckChatSetting"
         layout="@layout/view_settings_item_duck_chat" />

@@ -17,10 +17,14 @@
 package com.duckduckgo.downloads.impl
 
 import android.annotation.SuppressLint
+import androidx.test.core.app.ApplicationProvider
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.downloads.api.DownloadFailReason
 import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.impl.feature.FileDownloadFeature
+import com.duckduckgo.downloads.impl.location.DownloadFileWriter
+import com.duckduckgo.downloads.impl.location.RealSafDownloadStorage
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
 import kotlinx.coroutines.test.runTest
@@ -29,12 +33,14 @@ import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.junit.runner.RunWith
 import org.mockito.ArgumentMatchers.anyString
 import org.mockito.kotlin.*
 import retrofit2.Call
 import retrofit2.Response
 import java.io.File
 
+@RunWith(AndroidJUnit4::class)
 @SuppressLint("DenyListedApi")
 class UrlFileDownloaderTest {
     @get:Rule
@@ -54,11 +60,14 @@ class UrlFileDownloaderTest {
         realFileDownloadManager = RealUrlFileDownloadCallManager()
         whenever(downloadFileService.downloadFile(anyOrNull(), anyString())).thenReturn(call)
 
+        val context: android.content.Context = ApplicationProvider.getApplicationContext()
+        val downloadFileWriter = DownloadFileWriter(context, RealSafDownloadStorage(context))
         urlFileDownloader = UrlFileDownloader(
             downloadFileService,
             realFileDownloadManager,
             FakeCookieManagerWrapper(),
             fileDownloadFeature = fileDownloadFeature,
+            downloadFileWriter = downloadFileWriter,
         )
     }
 
@@ -74,7 +83,7 @@ class UrlFileDownloaderTest {
 
         verify(downloadCallback).onStart(any())
         verify(downloadCallback).onProgress(any(), eq(filename), eq(100))
-        verify(downloadCallback).onSuccess(any(), eq("success".length.toLong()), eq(File(pendingFileDownload.directory, filename)), anyOrNull())
+        verify(downloadCallback).onSuccess(any(), eq("success".length.toLong()), any(), eq(filename), anyOrNull())
     }
 
     @Test
@@ -92,7 +101,7 @@ class UrlFileDownloaderTest {
 
         verify(downloadCallback).onStart(any())
         verify(downloadCallback).onProgress(any(), any(), any())
-        verify(downloadCallback, never()).onSuccess(any(), any(), any(), anyOrNull())
+        verify(downloadCallback, never()).onSuccess(any(), any(), any(), any(), anyOrNull())
         verify(downloadCallback, never()).onError(any(), any(), any())
 
         verify(downloadCallback).onCancel(any())
@@ -113,7 +122,7 @@ class UrlFileDownloaderTest {
 
         verify(downloadCallback).onStart(any())
         verify(downloadCallback).onProgress(any(), any(), any())
-        verify(downloadCallback, never()).onSuccess(any(), any(), any(), anyOrNull())
+        verify(downloadCallback, never()).onSuccess(any(), any(), any(), any(), anyOrNull())
         verify(downloadCallback, never()).onCancel(any())
 
         verify(downloadCallback).onError(any(), any(), eq(DownloadFailReason.Other))
@@ -131,7 +140,7 @@ class UrlFileDownloaderTest {
 
         verify(downloadCallback).onStart(any())
         verify(downloadCallback, never()).onProgress(any(), any(), any())
-        verify(downloadCallback, never()).onSuccess(any(), any(), any(), anyOrNull())
+        verify(downloadCallback, never()).onSuccess(any(), any(), any(), any(), anyOrNull())
         verify(downloadCallback, never()).onCancel(any())
 
         verify(downloadCallback).onError(any(), any(), any())
@@ -152,7 +161,7 @@ class UrlFileDownloaderTest {
 
         verify(downloadCallback).onStart(any())
         verify(downloadCallback).onProgress(any(), any(), any())
-        verify(downloadCallback, never()).onSuccess(any(), any(), any(), anyOrNull())
+        verify(downloadCallback, never()).onSuccess(any(), any(), any(), any(), anyOrNull())
 
         verify(downloadCallback).onCancel(any())
         verify(downloadCallback, never()).onError(any(), any(), any())
@@ -173,7 +182,7 @@ class UrlFileDownloaderTest {
 
         verify(downloadCallback).onStart(any())
         verify(downloadCallback).onProgress(any(), any(), any())
-        verify(downloadCallback, never()).onSuccess(any(), any(), any(), anyOrNull())
+        verify(downloadCallback, never()).onSuccess(any(), any(), any(), any(), anyOrNull())
 
         verify(downloadCallback, never()).onCancel(any())
         verify(downloadCallback, never()).onError(eq(pendingFileDownload.url), any(), eq(DownloadFailReason.ConnectionRefused))
@@ -203,11 +212,14 @@ class UrlFileDownloaderTest {
     fun whenFeatureFlagEnabledAndCookieNotNullThenCookieHeaderIncluded() = runTest {
         fileDownloadFeature.omitEmptyCookieHeader().setRawStoredState(Toggle.State(enable = true))
 
+        val context: android.content.Context = ApplicationProvider.getApplicationContext()
+        val downloadFileWriter = DownloadFileWriter(context, RealSafDownloadStorage(context))
         val urlFileDownloader = UrlFileDownloader(
             downloadFileService,
             realFileDownloadManager,
             FakeCookieManagerWrapper("session=abc123; token=xyz"),
             fileDownloadFeature = fileDownloadFeature,
+            downloadFileWriter = downloadFileWriter,
         )
 
         val pendingFileDownload = buildPendingDownload("https://example.com/file.txt")
@@ -220,11 +232,14 @@ class UrlFileDownloaderTest {
     fun whenFeatureFlagDisabledAndCookieNotNullThenCookieHeaderIncluded() = runTest {
         fileDownloadFeature.omitEmptyCookieHeader().setRawStoredState(Toggle.State(enable = false))
 
+        val context: android.content.Context = ApplicationProvider.getApplicationContext()
+        val downloadFileWriter = DownloadFileWriter(context, RealSafDownloadStorage(context))
         val urlFileDownloader = UrlFileDownloader(
             downloadFileService,
             realFileDownloadManager,
             FakeCookieManagerWrapper("session=abc123; token=xyz"),
             fileDownloadFeature = fileDownloadFeature,
+            downloadFileWriter = downloadFileWriter,
         )
 
         val pendingFileDownload = buildPendingDownload("https://example.com/file.txt")
