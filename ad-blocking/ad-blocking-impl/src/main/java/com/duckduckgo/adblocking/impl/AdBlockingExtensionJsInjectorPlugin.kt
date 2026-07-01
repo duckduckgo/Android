@@ -42,6 +42,7 @@ import javax.inject.Inject
 class AdBlockingExtensionJsInjectorPlugin @Inject constructor(
     private val statusChecker: AdBlockingStatusChecker,
     repository: AdBlockingExtensionRepository,
+    private val contingencyMessageHandler: ContingencyMessageHandler,
     @AppCoroutineScope appScope: CoroutineScope,
 ) : JsInjectorPlugin {
 
@@ -75,7 +76,9 @@ class AdBlockingExtensionJsInjectorPlugin @Inject constructor(
         webView.evaluateJavascript("javascript:$script", null)
     }
 
-    override fun onPageFinished(webView: WebView, url: String?, site: Site?) = Unit
+    override fun onPageFinished(webView: WebView, url: String?, site: Site?) {
+        contingencyMessageHandler.onPageLoaded(webView, url)
+    }
 
     private fun buildScript(scriptlets: List<Scriptlet>): String? =
         scriptlets
