@@ -431,10 +431,18 @@ class RealExchangeV2Runner @Inject constructor(
     /**
      * Composite of [SideEffect.RequestRecoveryCodeShare]: fetch + send the recovery code
      * (or `recovery_code_unavailable` if it can't be produced), then advance the SM.
+     *
+     * The fetch+send runs inside the launched coroutine so the underlying retry backoff can use
+     * `delay` rather than blocking the dispatcher thread. This means the SM mutex is NOT held
+     * while the network work runs, so a concurrent [cancelLocked] (user back-out / 5-min timeout /
+     * explicit [cancel]) can race with this body. The short-circuit below catches the common case;
+     * any work that proceeds past it is best-effort, and any orphaned server-side credential is
+     * cleaned up by the BE's 5-min TTL (Unified Algorithm, Backend-supported Alternative).
      */
     private fun shareRecoveryCodeAndAdvanceLocked() {
-        val responseOk = sendRecoveryCodeResponse()
         appScope.launch(dispatchers.io()) {
+            if (session == null) return@launch
+            val responseOk = sendRecoveryCodeResponse()
             mutex.withLock {
                 val s = session ?: return@withLock
                 if (s.currentState != ExchangeV2State.Host.Sending) return@withLock
@@ -657,7 +665,7 @@ class RealExchangeV2Runner @Inject constructor(
      * `recovery_code_unavailable` to the peer + emitted a SessionError event, and the SM
      * should be driven to [ExchangeV2State.Host.Aborted] rather than Done).
      */
-    private fun sendRecoveryCodeResponse(): Boolean {
+    private suspend fun sendRecoveryCodeResponse(): Boolean {
         val peer = peerChannelId ?: return false
         val peerKey = peerPublicKey ?: return false
         // Recovery code per peer kind. Per spec §"Exchange Share Recovery Code": create the host
@@ -703,7 +711,7 @@ class RealExchangeV2Runner @Inject constructor(
             }
         }
 
-    private fun provisionForThirdPartyPeer(): Result<String> {
+    private suspend fun provisionForThirdPartyPeer(): Result<String> {
         when (val ddg = recoveryCodeProvider.createDdgAccountIfNeeded()) {
             is Result.Success -> Unit
             is Result.Error -> {
