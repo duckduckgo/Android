@@ -191,6 +191,13 @@ interface AndroidBrowserConfigFeature {
     fun hideDuckAiInSerpKillSwitch(): Toggle
 
     /**
+     * Controls whether search queries are routed to noai.duckduckgo.com when Duck.ai is disabled.
+     * If the remote feature is not present defaults to internal (always-on for internal builds during rollout).
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun noAiSerpHost(): Toggle
+
+    /**
      * Kill switch for intent resolution validation in SpecialUrlDetector
      * @return `true` when the remote config has the global "validateIntentResolution" androidBrowserConfig
      * sub-feature flag enabled

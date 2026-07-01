@@ -17,6 +17,7 @@
 package com.duckduckgo.app.autocomplete.api
 
 import com.duckduckgo.app.autocomplete.AutocompleteTabsFeature
+import com.duckduckgo.app.browser.DuckDuckGoSerpHostProvider
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.systemsearch.DeviceAppLookup
@@ -48,6 +49,7 @@ class AutoCompleteFactoryImpl @Inject constructor(
     private val dispatchers: DispatcherProvider,
     private val pixel: Pixel,
     private val deviceAppLookup: DeviceAppLookup,
+    private val serpHostProvider: DuckDuckGoSerpHostProvider,
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
 ) : AutoCompleteFactory {
 
@@ -66,6 +68,7 @@ class AutoCompleteFactoryImpl @Inject constructor(
             pixel = pixel,
             deviceAppLookup = deviceAppLookup,
             coroutineScope = coroutineScope,
+            serpHostProvider = serpHostProvider,
             config = config,
         )
     }

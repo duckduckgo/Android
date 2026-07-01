@@ -41,6 +41,7 @@ class DuckDuckGoRequestRewriter(
     private val duckChat: DuckChat,
     private val androidConfigFeatures: AndroidBrowserConfigFeature,
     private val serpSettingsFeature: SerpSettingsFeature,
+    private val serpHostProvider: DuckDuckGoSerpHostProvider,
 ) : RequestRewriter {
 
     private val hideDuckAiSerpKillSwitch by lazy { androidConfigFeatures.hideDuckAiInSerpKillSwitch().isEnabled() }
@@ -84,7 +85,7 @@ class DuckDuckGoRequestRewriter(
         builder.appendQueryParameter(ParamKey.HIDE_SERP, ParamValue.HIDE_SERP)
         if (!serpSettingsFeature.storeSerpSettings().isEnabled()) {
             // Once serpSettingsSync feature is permanently enabled this can be removed.
-            if (!duckChat.isEnabled() && hideDuckAiSerpKillSwitch) {
+            if (!duckChat.isEnabled() && hideDuckAiSerpKillSwitch && !serpHostProvider.shouldUseNoAiHost()) {
                 builder.appendQueryParameter(ParamKey.HIDE_DUCK_AI, ParamValue.HIDE_DUCK_AI)
             }
         }
