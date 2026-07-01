@@ -35,7 +35,10 @@ class RedditBlockWorkaroundTest {
     private val networkProtectionState: NetworkProtectionState = mock()
     private lateinit var lifecycleOwner: LifecycleOwner
 
-    private val cookieManager = FakeCookieManagerWrapper()
+    // Two independent cookie jars, mirroring a Regular profile and a Fire profile.
+    private val regularJar = FakeCookieJar()
+    private val fireJar = FakeCookieJar()
+    private val cookieManager = FakeCookieManagerWrapper(listOf(regularJar, fireJar))
 
     private lateinit var redditBlockWorkaround: RedditBlockWorkaround
 
@@ -54,7 +57,7 @@ class RedditBlockWorkaroundTest {
         redditBlockWorkaround.onResume(lifecycleOwner)
 
         redditBlockWorkaround.onResume(lifecycleOwner)
-        assertEquals("reddit_session=; Expires=Wed, 21 Oct 2015 07:28:00 GMT", cookieManager.getCookie(".reddit.com"))
+        assertEquals("reddit_session=; Expires=Wed, 21 Oct 2015 07:28:00 GMT", regularJar.getCookie(".reddit.com"))
     }
 
     @Test
@@ -62,7 +65,7 @@ class RedditBlockWorkaroundTest {
         whenever(networkProtectionState.isEnabled()).thenReturn(true)
 
         redditBlockWorkaround.onResume(lifecycleOwner)
-        assertEquals("reddit_session=;", cookieManager.getCookie(".reddit.com"))
+        assertEquals("reddit_session=;", regularJar.getCookie(".reddit.com"))
     }
 
     @Test
@@ -70,62 +73,95 @@ class RedditBlockWorkaroundTest {
         whenever(networkProtectionState.isEnabled()).thenReturn(false)
 
         redditBlockWorkaround.onResume(lifecycleOwner)
-        assertNull(cookieManager.getCookie(".reddit.com"))
+        assertNull(regularJar.getCookie(".reddit.com"))
     }
 
     @Test
     fun `on resume with netp enabled noops if reddit_session present`() = runTest {
         whenever(networkProtectionState.isEnabled()).thenReturn(true)
-        cookieManager.setCookieOnAllProfiles(".reddit.com", "reddit_session=value;")
+        regularJar.setCookie(".reddit.com", "reddit_session=value;")
 
         redditBlockWorkaround.onResume(lifecycleOwner)
-        assertEquals("reddit_session=value;", cookieManager.getCookie(".reddit.com"))
+        assertEquals("reddit_session=value;", regularJar.getCookie(".reddit.com"))
     }
 
     @Test
     fun `on resume with netp disabled noops if reddit_session present`() = runTest {
         whenever(networkProtectionState.isEnabled()).thenReturn(false)
-        cookieManager.setCookieOnAllProfiles(".reddit.com", "reddit_session=value;")
+        regularJar.setCookie(".reddit.com", "reddit_session=value;")
 
         redditBlockWorkaround.onResume(lifecycleOwner)
-        assertEquals("reddit_session=value;", cookieManager.getCookie(".reddit.com"))
+        assertEquals("reddit_session=value;", regularJar.getCookie(".reddit.com"))
+    }
+
+    @Test
+    fun `on resume with netp enabled adds the dummy to every resolved profile`() = runTest {
+        whenever(networkProtectionState.isEnabled()).thenReturn(true)
+
+        redditBlockWorkaround.onResume(lifecycleOwner)
+
+        assertEquals("reddit_session=;", regularJar.getCookie(".reddit.com"))
+        assertEquals("reddit_session=;", fireJar.getCookie(".reddit.com"))
+    }
+
+    @Test
+    fun `on resume with netp enabled does not clobber a real session in another profile`() = runTest {
+        whenever(networkProtectionState.isEnabled()).thenReturn(true)
+        // The Fire profile holds a real reddit login while the Regular profile is logged out.
+        fireJar.setCookie(".reddit.com", "reddit_session=realtoken;")
+
+        redditBlockWorkaround.onResume(lifecycleOwner)
+
+        // Regular gets the dummy, but Fire's real session must be left untouched.
+        assertEquals("reddit_session=;", regularJar.getCookie(".reddit.com"))
+        assertEquals("reddit_session=realtoken;", fireJar.getCookie(".reddit.com"))
+    }
+
+    @Test
+    fun `on pause with netp enabled does not clobber a real session in another profile`() = runTest {
+        whenever(networkProtectionState.isEnabled()).thenReturn(true)
+        fireJar.setCookie(".reddit.com", "reddit_session=realtoken;")
+
+        redditBlockWorkaround.onPause(lifecycleOwner)
+
+        assertEquals("reddit_session=realtoken;", fireJar.getCookie(".reddit.com"))
     }
 
     @Test
     fun `on pause expires the reddit_session dummy if present`() = runTest {
         whenever(networkProtectionState.isEnabled()).thenReturn(false)
-        cookieManager.setCookieOnAllProfiles(".reddit.com", "reddit_session=;")
+        regularJar.setCookie(".reddit.com", "reddit_session=;")
         redditBlockWorkaround.onPause(lifecycleOwner)
-        assertEquals("reddit_session=; Expires=Wed, 21 Oct 2015 07:28:00 GMT", cookieManager.getCookie(".reddit.com"))
+        assertEquals("reddit_session=; Expires=Wed, 21 Oct 2015 07:28:00 GMT", regularJar.getCookie(".reddit.com"))
     }
 
     @Test
     fun `on pause noops if reddit_session dummy if not present`() = runTest {
         whenever(networkProtectionState.isEnabled()).thenReturn(false)
         redditBlockWorkaround.onPause(lifecycleOwner)
-        assertNull(cookieManager.getCookie(".reddit.com"))
+        assertNull(regularJar.getCookie(".reddit.com"))
     }
 }
 
-class FakeCookieManagerWrapper() : CookieManagerWrapper {
+class FakeCookieManagerWrapper(private val profiles: List<FakeCookieJar>) : CookieManagerWrapper {
+    override fun resolvedProfiles(): List<CookieJar> = profiles
+}
 
-    val cookieStore: MutableMap<String, MutableList<Cookie>> = mutableMapOf()
-    // private val cookieStore: MutableMap<String, MutableList<String>> = mutableMapOf()
+class FakeCookieJar : CookieJar {
 
-    // Function to get cookies for a specific URL
+    private val cookieStore: MutableMap<String, MutableList<Cookie>> = mutableMapOf()
+
     override fun getCookie(url: String): String? {
         val host = getCookieHost(url)
         val cookies = cookieStore[host] ?: return null
         return cookies.joinToString(";") { it.toString() }
     }
 
-    // Function to set cookies for a specific URL or domain
-    override fun setCookieOnAllProfiles(url: String, cookieString: String) {
+    override fun setCookie(url: String, cookieString: String) {
         val uri = URI(url)
         val domain = runCatching { if (uri.host.startsWith(".")) uri.host.substring(1) else uri.host }.getOrElse { url }
         val cookie = Cookie.fromString(cookieString)
 
-        // Add cookie to the specific domain
         val cookies = cookieStore.computeIfAbsent(domain) { mutableListOf() }.filter { it.name != cookie.name }.toMutableList().apply {
             add(cookie)
         }
