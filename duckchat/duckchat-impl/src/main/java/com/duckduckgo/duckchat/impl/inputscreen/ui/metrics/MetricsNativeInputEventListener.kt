@@ -17,7 +17,7 @@
 package com.duckduckgo.duckchat.impl.inputscreen.ui.metrics
 
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.duckchat.api.NativeInputOmnibarMetrics
+import com.duckduckgo.duckchat.api.NativeInputEventListener
 import com.duckduckgo.duckchat.impl.inputscreen.ui.metrics.discovery.InputScreenDiscoveryFunnel
 import com.duckduckgo.duckchat.impl.inputscreen.ui.metrics.usage.InputScreenSessionUsageMetric
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
@@ -25,11 +25,11 @@ import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 
 @ContributesBinding(AppScope::class)
-class RealNativeInputOmnibarMetrics @Inject constructor(
+class MetricsNativeInputEventListener @Inject constructor(
     private val duckChatPixels: DuckChatPixels,
     private val sessionUsageMetric: InputScreenSessionUsageMetric,
     private val discoveryFunnel: InputScreenDiscoveryFunnel,
-) : NativeInputOmnibarMetrics {
+) : NativeInputEventListener {
 
     override fun onNativeInputShown(landscape: Boolean) {
         discoveryFunnel.onNativeInputActive()

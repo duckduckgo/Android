@@ -509,21 +509,21 @@
     },
     "m_aichat_experimental_omnibar_shown": {
         "description": "(Daily Pixel) Native input field shown to the user",
-        "owners": ["YoussefKeyrouz"],
+        "owners": ["malmstein"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
         "parameters": ["appVersion"]
     },
     "m_aichat_experimental_omnibar_shown_count": {
         "description": "Native input field shown to the user",
-        "owners": ["YoussefKeyrouz"],
+        "owners": ["malmstein"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
         "parameters": ["appVersion"]
     },
     "m_aichat_experimental_omnibar_query_submitted_count": {
         "description": "User submitted a search query from the native input field",
-        "owners": ["YoussefKeyrouz"],
+        "owners": ["malmstein"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
         "parameters": [
@@ -538,28 +538,28 @@
     },
     "m_aichat_experimental_omnibar_query_submitted_daily": {
         "description": "(Daily Pixel) User submitted a search query from the native input field",
-        "owners": ["YoussefKeyrouz"],
+        "owners": ["malmstein"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
         "parameters": ["appVersion"]
     },
     "m_aichat_experimental_omnibar_session_both_modes_count": {
         "description": "User used both Search and Duck.ai in the same session in the native input field",
-        "owners": ["YoussefKeyrouz"],
+        "owners": ["malmstein"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
         "parameters": ["appVersion"]
     },
     "m_aichat_experimental_omnibar_session_both_modes_daily": {
         "description": "(Daily Pixel) User used both Search and Duck.ai in the same session in the native input field",
-        "owners": ["YoussefKeyrouz"],
+        "owners": ["malmstein"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
         "parameters": ["appVersion"]
     },
     "m_aichat_experimental_omnibar_session_summary": {
         "description": "Summary of native input field usage for a session, emitted when the app is backgrounded",
-        "owners": ["YoussefKeyrouz"],
+        "owners": ["malmstein"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
         "parameters": [
@@ -570,49 +570,49 @@
     },
     "m_aichat_experimental_omnibar_first_settings_viewed": {
         "description": "Discovery funnel: user viewed the Duck.ai settings",
-        "owners": ["YoussefKeyrouz"],
+        "owners": ["malmstein"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
         "parameters": ["appVersion"]
     },
     "m_aichat_experimental_omnibar_first_enabled": {
         "description": "Discovery funnel: native input field first enabled",
-        "owners": ["YoussefKeyrouz"],
+        "owners": ["malmstein"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
         "parameters": ["appVersion"]
     },
     "m_aichat_experimental_omnibar_first_interaction": {
         "description": "Discovery funnel: user first interacted with the native input field",
-        "owners": ["YoussefKeyrouz"],
+        "owners": ["malmstein"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
         "parameters": ["appVersion"]
     },
     "m_aichat_experimental_omnibar_first_search_submission": {
         "description": "Discovery funnel: user's first search submission from the native input field",
-        "owners": ["YoussefKeyrouz"],
+        "owners": ["malmstein"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
         "parameters": ["appVersion"]
     },
     "m_aichat_experimental_omnibar_first_prompt_submission": {
         "description": "Discovery funnel: user's first Duck.ai prompt submission from the native input field",
-        "owners": ["YoussefKeyrouz"],
+        "owners": ["malmstein"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
         "parameters": ["appVersion"]
     },
     "m_aichat_experimental_omnibar_full_conversion_user": {
         "description": "Discovery funnel: user completed full conversion (interaction + search + prompt) in the native input field",
-        "owners": ["YoussefKeyrouz"],
+        "owners": ["malmstein"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
         "parameters": ["appVersion"]
     },
     "m_aichat_experimental_omnibar_text_area_focused": {
         "description": "Native input field text area focused",
-        "owners": ["YoussefKeyrouz"],
+        "owners": ["malmstein"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
         "parameters": [
@@ -622,7 +622,7 @@
     },
     "m_aichat_experimental_omnibar_clear_button_pressed": {
         "description": "User pressed the clear button in the native input field",
-        "owners": ["YoussefKeyrouz"],
+        "owners": ["malmstein"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
         "parameters": [
@@ -632,7 +632,7 @@
     },
     "m_aichat_experimental_omnibar_back_button_pressed": {
         "description": "User pressed the back button in the native input field",
-        "owners": ["YoussefKeyrouz"],
+        "owners": ["malmstein"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
         "parameters": [
@@ -642,7 +642,7 @@
     },
     "m_aichat_experimental_omnibar_keyboard_go_pressed": {
         "description": "User pressed the keyboard Go key in the native input field",
-        "owners": ["YoussefKeyrouz"],
+        "owners": ["malmstein"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
         "parameters": [
@@ -652,7 +652,7 @@
     },
     "m_aichat_experimental_omnibar_floating_submit_pressed": {
         "description": "User pressed the floating submit button in the native input field",
-        "owners": ["YoussefKeyrouz"],
+        "owners": ["malmstein"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
         "parameters": [
@@ -662,14 +662,14 @@
     },
     "m_aichat_experimental_omnibar_floating_return_pressed": {
         "description": "User pressed the new-line/return button in the native input field",
-        "owners": ["YoussefKeyrouz"],
+        "owners": ["malmstein"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
         "parameters": ["appVersion"]
     },
     "m_aichat_experimental_omnibar_daily_retention": {
         "description": "(Daily Pixel) Fired for users with the native input field active, used to measure retention",
-        "owners": ["YoussefKeyrouz"],
+        "owners": ["malmstein"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
         "parameters": [

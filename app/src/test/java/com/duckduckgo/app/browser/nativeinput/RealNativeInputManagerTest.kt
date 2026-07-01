@@ -37,7 +37,7 @@ import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
-import com.duckduckgo.duckchat.api.NativeInputOmnibarMetrics
+import com.duckduckgo.duckchat.api.NativeInputEventListener
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.voice.api.VoiceSearchAvailability
@@ -72,7 +72,7 @@ class RealNativeInputManagerTest {
     private val queryUrlPredictor: QueryUrlPredictor = mock()
     private val duckAiFeatureState: DuckAiFeatureState = mock()
     private val pixel: Pixel = mock()
-    private val omnibarMetrics: NativeInputOmnibarMetrics = mock()
+    private val nativeInputEventListener: NativeInputEventListener = mock()
     private val nativeInputStateBugKillSwitch = FakeFeatureToggleFactory.create(NativeInputStateBugKillSwitch::class.java)
 
     private val context: Context = ApplicationProvider.getApplicationContext()
@@ -93,7 +93,7 @@ class RealNativeInputManagerTest {
             duckAiFeatureState,
             pixel,
             nativeInputStateBugKillSwitch,
-            omnibarMetrics,
+            nativeInputEventListener,
         )
     }
 

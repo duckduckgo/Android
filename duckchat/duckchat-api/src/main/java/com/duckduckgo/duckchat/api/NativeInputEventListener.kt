@@ -17,11 +17,12 @@
 package com.duckduckgo.duckchat.api
 
 /**
- * Telemetry for the native input omnibar that is triggered from the app layer (the host that shows
- * the widget and receives its submit callbacks). This keeps `:app` off `duckchat-impl` internals:
- * the impl binding fans out to the pixel, session-usage and discovery-funnel collaborators.
+ * Listens for native input events raised from the app layer (the host that shows the widget and
+ * receives its submit callbacks). Keeps `:app` off `duckchat-impl` internals — implementations live
+ * in `duckchat-impl`. The current implementation (`MetricsNativeInputEventListener`) fans these
+ * events out to the pixel, session-usage and discovery-funnel collaborators.
  */
-interface NativeInputOmnibarMetrics {
+interface NativeInputEventListener {
 
     /** Native input shown to the user. Fires once per presentation. */
     fun onNativeInputShown(landscape: Boolean)
