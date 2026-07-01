@@ -41,10 +41,10 @@ interface AdBlockingExtensionFeature {
     @Toggle.DefaultValue(Toggle.DefaultFeatureValue.FALSE)
     fun enableContingencyMode(): Toggle
 
-    /** 
+    /**
      * When enabled, UX improvements for ad blocking phase 2 will be available.
      * To be removed after phase 2 initial rollout
-     * 
+     *
      */
     @Toggle.DefaultValue(Toggle.DefaultFeatureValue.FALSE)
     fun adBlockingUXImprovements(): Toggle

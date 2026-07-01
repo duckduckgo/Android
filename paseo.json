@@ -1,0 +1,10 @@
+{
+  "worktree": {
+    "setup": "git fetch origin develop\ngit rebase origin/develop\ngit submodule update --init --recursive"
+  },
+  "metadataGeneration": {
+    "branchName": {
+      "instructions": "feature/cris/"
+    }
+  }
+}
