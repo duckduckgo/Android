@@ -294,4 +294,3 @@ Always run `validate-defs-without-formatting` after making changes. CI will run 
 5. If the pixel is temporary, add `"expires": "YYYY-MM-DD"`
 6. Run `npm run validate-defs-without-formatting` from the `PixelDefinitions` directory
 7. Run `npm run lint.fix` if formatting issues are reported
-8. Open the PR and **apply the `privacy review required` label** — this auto-creates the Privacy Triage task in Asana. Agents opening the PR must set this label (`gh pr create --label "privacy review required"`). See the **Privacy Review & Triage** section in the `pixels` rule.
