@@ -23,6 +23,7 @@ import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.content.res.Configuration
 import android.graphics.Color
+import android.os.Build.VERSION.SDK_INT
 import android.os.Bundle
 import android.provider.Settings
 import android.view.WindowManager
@@ -98,6 +99,10 @@ class DaxPromptBrowserComparisonActivity : DuckDuckGoActivity() {
 
         setContentView(binding.root)
 
+        if (SDK_INT >= 34) {
+            overrideActivityTransition(OVERRIDE_TRANSITION_CLOSE, 0, R.anim.slide_to_bottom)
+        }
+
         setupListeners()
         setupObservers()
         setupOnBackNavigation()
@@ -152,6 +157,10 @@ class DaxPromptBrowserComparisonActivity : DuckDuckGoActivity() {
                     setResult(RESULT_OK, resultIntent)
                 }
                 finish()
+                if (SDK_INT < 34) {
+                    @Suppress("DEPRECATION")
+                    overridePendingTransition(0, R.anim.slide_to_bottom)
+                }
             }
 
             is Command.BrowserComparisonChart -> {
