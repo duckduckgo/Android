@@ -38,6 +38,7 @@ import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_RESUME_ONBOARDING_PR
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_SKIP_ONBOARDING_PRESSED
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_SYNC_RESTORE_TAPPED_UNIQUE
 import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_ADDRESS_BAR_POSITION
+import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_AI_CHAT
 import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_AI_INTRO
 import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_NOTIFICATIONS
 import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_QUICK_SETUP
@@ -697,6 +698,45 @@ class NewUserOnboardingPlanProviderTest {
         verify(onboardingPixelSender).fire(ONBOARDING_QUICK_SETUP, OnboardingPixelAction.Shown)
     }
 
+    @Test
+    fun `when ai comparison chart step presented then fires AiIntroShown pixel`() = runTest {
+        whenever(customAiOnboardingResolver.resolve()).thenReturn(true)
+        start()
+        orchestrator.onEvent(NewUserOnboardingEvent.IntroAnimationFinished)
+        orchestrator.onEvent(NewUserOnboardingEvent.NotificationPermissionFinished(granted = null))
+        orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked) // initial
+        assertStep(NewUserOnboardingStepIds.AI_COMPARISON_CHART)
+        orchestrator.onEvent(NewUserOnboardingEvent.Presented)
+        verify(onboardingPixelSender).fire(ONBOARDING_AI_INTRO, OnboardingPixelAction.Shown)
+    }
+
+    @Test
+    fun `when custom ai input screen preview step presented then fires SearchChatToggleShown pixel`() = runTest {
+        whenever(customAiOnboardingResolver.resolve()).thenReturn(true)
+        start()
+        orchestrator.onEvent(NewUserOnboardingEvent.IntroAnimationFinished)
+        orchestrator.onEvent(NewUserOnboardingEvent.NotificationPermissionFinished(granted = null))
+        orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked) // initial
+        orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked) // ai_comparison_chart
+        assertStep(NewUserOnboardingStepIds.INPUT_SCREEN_PREVIEW)
+        orchestrator.onEvent(NewUserOnboardingEvent.Presented)
+        verify(onboardingPixelSender).fire(ONBOARDING_SEARCH_CHAT_TOGGLE, OnboardingPixelAction.Shown)
+    }
+
+    @Test
+    fun `when duck ai demo step presented then fires AiChatShown pixel`() = runTest {
+        whenever(customAiOnboardingResolver.resolve()).thenReturn(true)
+        start()
+        orchestrator.onEvent(NewUserOnboardingEvent.IntroAnimationFinished)
+        orchestrator.onEvent(NewUserOnboardingEvent.NotificationPermissionFinished(granted = null))
+        orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked) // initial
+        orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked) // ai_comparison_chart
+        orchestrator.onEvent(NewUserOnboardingEvent.InputDemoQuerySubmitted(query = "hello", isChat = true, fromSuggestion = false))
+        assertStep(NewUserOnboardingStepIds.DUCK_AI_DEMO)
+        orchestrator.onEvent(NewUserOnboardingEvent.Presented)
+        verify(onboardingPixelSender).fire(ONBOARDING_AI_CHAT, OnboardingPixelAction.Shown)
+    }
+
     // endregion
 
     // region Clicked/confirmed pixel tests
@@ -816,7 +856,7 @@ class NewUserOnboardingPlanProviderTest {
     }
 
     @Test
-    fun `when input screen preview suggestion search submitted then fires TryASearchClicked with suggestion and search`() = runTest {
+    fun `when input screen preview suggestion search submitted then fires TryInputClicked with suggestion and search`() = runTest {
         whenever(duckAiAvailability.isDuckAiOnboardingEnabled()).thenReturn(true)
         start()
         orchestrator.onEvent(NewUserOnboardingEvent.IntroAnimationFinished)
@@ -829,7 +869,7 @@ class NewUserOnboardingPlanProviderTest {
         orchestrator.onEvent(NewUserOnboardingEvent.InputDemoQuerySubmitted(query = "cats", isChat = false, fromSuggestion = true))
         verify(
             onboardingPixelSender,
-        ).fire(ONBOARDING_SEARCH_CHAT_TOGGLE, OnboardingPixelAction.TryASearchClicked(fromSuggestion = true, isChat = false))
+        ).fire(ONBOARDING_SEARCH_CHAT_TOGGLE, OnboardingPixelAction.TryInputClicked(fromSuggestion = true, isChat = false))
     }
 
     @Test
@@ -844,7 +884,7 @@ class NewUserOnboardingPlanProviderTest {
         orchestrator.onEvent(NewUserOnboardingEvent.AddressBarConfirmed(OmnibarType.SINGLE_TOP))
         orchestrator.onEvent(NewUserOnboardingEvent.InputModeConfirmed(withAi = true))
         orchestrator.onEvent(NewUserOnboardingEvent.InputDemoQuerySubmitted(query = "cats", isChat = false, fromSuggestion = false))
-        verify(onboardingStore).setSearchOnboardingVariant()
+        verify(onboardingPixelSender).searchBranchSelected()
     }
 
     @Test
@@ -859,7 +899,7 @@ class NewUserOnboardingPlanProviderTest {
         orchestrator.onEvent(NewUserOnboardingEvent.AddressBarConfirmed(OmnibarType.SINGLE_TOP))
         orchestrator.onEvent(NewUserOnboardingEvent.InputModeConfirmed(withAi = true))
         orchestrator.onEvent(NewUserOnboardingEvent.InputDemoQuerySubmitted(query = "hello", isChat = true, fromSuggestion = false))
-        verify(onboardingStore).setChatOnboardingVariant()
+        verify(onboardingPixelSender).chatBranchSelected()
     }
 
     @Test
@@ -894,6 +934,24 @@ class NewUserOnboardingPlanProviderTest {
         assertStep(NewUserOnboardingStepIds.AI_COMPARISON_CHART)
         orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked)
         verify(onboardingPixelSender).fire(ONBOARDING_AI_INTRO, OnboardingPixelAction.Clicked())
+    }
+
+    @Test
+    fun `when custom ai input screen preview demo submitted then sets chat variant and fires TryInputClicked`() = runTest {
+        whenever(customAiOnboardingResolver.resolve()).thenReturn(true)
+        start()
+        orchestrator.onEvent(NewUserOnboardingEvent.IntroAnimationFinished)
+        orchestrator.onEvent(NewUserOnboardingEvent.NotificationPermissionFinished(granted = null))
+        orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked) // initial
+        orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked) // ai_comparison_chart
+        assertStep(NewUserOnboardingStepIds.INPUT_SCREEN_PREVIEW)
+        orchestrator.onEvent(NewUserOnboardingEvent.InputDemoQuerySubmitted(query = "hello", isChat = true, fromSuggestion = false))
+        // Chat-only preview always records the chat branch, regardless of the submitted mode.
+        verify(onboardingPixelSender).chatBranchSelected()
+        verify(onboardingPixelSender).fire(
+            ONBOARDING_SEARCH_CHAT_TOGGLE,
+            OnboardingPixelAction.TryInputClicked(fromSuggestion = false, isChat = true),
+        )
     }
 
     // endregion

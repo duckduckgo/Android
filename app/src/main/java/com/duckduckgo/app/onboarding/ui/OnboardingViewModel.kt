@@ -25,7 +25,6 @@ import com.duckduckgo.app.cta.model.DismissedCta
 import com.duckduckgo.app.onboarding.DuckAiOnboardingDemo
 import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingEvent
 import com.duckduckgo.app.onboarding.store.AppStage
-import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.onboarding.ui.OnboardingViewModel.ExtendedOnboardingFlow.*
 import com.duckduckgo.app.onboarding.ui.OnboardingViewModel.ExtendedOnboardingFlow.DEFAULT
@@ -50,7 +49,6 @@ class OnboardingViewModel @Inject constructor(
     private val onboardingSkipper: OnboardingSkipper,
     private val appBuildConfig: AppBuildConfig,
     private val dismissedCtaDao: DismissedCtaDao,
-    private val onboardingStore: OnboardingStore,
     private val onboardingBrandDesignUpdateToggles: OnboardingBrandDesignUpdateToggles,
     private val linearOnboardingOrchestrator: LinearOnboardingOrchestrator,
     private val duckAiOnboardingDemo: DuckAiOnboardingDemo,
@@ -96,12 +94,10 @@ class OnboardingViewModel @Inject constructor(
                     // Arm the in-browser Duck.ai demo (sets the flow + silences the standard DAX CTAs).
                     // Shared with the linear-onboarding duck_ai_demo step so both paths arm identically.
                     duckAiOnboardingDemo.arm()
-                    onboardingStore.setChatOnboardingVariant()
                 }
 
                 DEFAULT_WITHOUT_INTRO_CTA -> {
                     dismissedCtaDao.insert(DismissedCta(CtaId.DAX_INTRO))
-                    onboardingStore.setSearchOnboardingVariant()
                 }
             }
         }

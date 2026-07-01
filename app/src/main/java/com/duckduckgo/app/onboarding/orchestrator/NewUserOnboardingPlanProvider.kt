@@ -524,13 +524,13 @@ class NewUserOnboardingPlanProvider @Inject constructor(
                 when (event) {
                     is NewUserOnboardingEvent.InputDemoQuerySubmitted -> {
                         if (event.isChat) {
-                            onboardingStore.setChatOnboardingVariant()
+                            onboardingPixelSender.chatBranchSelected()
                         } else {
-                            onboardingStore.setSearchOnboardingVariant()
+                            onboardingPixelSender.searchBranchSelected()
                         }
                         onboardingPixelSender.fire(
                             pixelName,
-                            OnboardingPixelAction.TryASearchClicked(fromSuggestion = event.fromSuggestion, isChat = event.isChat),
+                            OnboardingPixelAction.TryInputClicked(fromSuggestion = event.fromSuggestion, isChat = event.isChat),
                         )
                         ctx.completionResult = if (event.isChat) {
                             NewUserOnboardingResult.LaunchChat(prompt = event.query)
@@ -583,14 +583,10 @@ class NewUserOnboardingPlanProvider @Inject constructor(
             transition = { event ->
                 when {
                     event is NewUserOnboardingEvent.InputDemoQuerySubmitted -> {
-                        if (event.isChat) {
-                            onboardingStore.setChatOnboardingVariant()
-                        } else {
-                            onboardingStore.setSearchOnboardingVariant()
-                        }
+                        onboardingPixelSender.chatBranchSelected()
                         onboardingPixelSender.fire(
                             pixelName,
-                            OnboardingPixelAction.TryASearchClicked(fromSuggestion = event.fromSuggestion, isChat = event.isChat),
+                            OnboardingPixelAction.TryInputClicked(fromSuggestion = event.fromSuggestion, isChat = event.isChat),
                         )
                         ctx.pendingDuckAiPrompt = event.query
                         Advance
@@ -603,7 +599,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
 
     private fun duckAiDemoStep(ctx: NewUserOnboardingPlanContext) = NewUserBrowserActivityStep(
         id = NewUserOnboardingStepIds.DUCK_AI_DEMO,
-        pixelName = null,
+        pixelName = OnboardingPixelName.ONBOARDING_AI_CHAT,
         precondition = {
             withContext(dispatchers.io()) {
                 androidBrowserConfigFeature.singleTabFireDialog().isEnabled()
