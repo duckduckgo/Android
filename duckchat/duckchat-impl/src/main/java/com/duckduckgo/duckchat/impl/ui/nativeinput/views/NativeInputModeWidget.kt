@@ -185,7 +185,10 @@ interface NativeInputWidget {
         onChatHistoryShortcutClicked: () -> Unit,
         onShowSuggestions: (RecyclerView.Adapter<*>) -> Unit,
         onClearSuggestions: (Boolean) -> Unit,
+        onChatSuggestionDelete: (chatUrl: String) -> Unit = {},
     )
+
+    fun removeChatSuggestion(chatUrl: String)
 
     fun asView(): View
 }
@@ -1246,6 +1249,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
         onChatHistoryShortcutClicked: () -> Unit,
         onShowSuggestions: (RecyclerView.Adapter<*>) -> Unit,
         onClearSuggestions: (Boolean) -> Unit,
+        onChatSuggestionDelete: (chatUrl: String) -> Unit,
     ) {
         this.onShowSuggestions = onShowSuggestions
         this.onClearSuggestions = onClearSuggestions
@@ -1258,6 +1262,9 @@ class NativeInputModeWidget @JvmOverloads constructor(
                 onChatSuggestionSelected = { suggestion ->
                     viewModel.fireChatHistorySelectedPixel(suggestion.pinned)
                     onChatSuggestionSelected(viewModel.buildChatSuggestionUrl(suggestion))
+                },
+                onChatSuggestionDeleteClicked = { suggestion ->
+                    onChatSuggestionDelete(viewModel.buildChatSuggestionUrl(suggestion))
                 },
                 onChatUrlSuggestionClicked = { suggestion ->
                     viewModel.fireChatUrlSuggestionPixel(suggestion)
@@ -1324,6 +1331,11 @@ class NativeInputModeWidget @JvmOverloads constructor(
         chatSuggestionsBinding = null
         onShowSuggestions = null
         onClearSuggestions = null
+    }
+
+    override fun removeChatSuggestion(chatUrl: String) {
+        val binding = chatSuggestionsBinding ?: return
+        binding.removeChatSuggestions { suggestion -> viewModel.buildChatSuggestionUrl(suggestion) == chatUrl }
     }
 
     override fun asView(): View = this

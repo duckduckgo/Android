@@ -296,4 +296,11 @@ interface DuckChatFeature {
      */
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun aiFeaturesNativeControls(): Toggle
+
+    /**
+     * @return Toggle iseÉnabled `true` when the remove chat history feature is enabled.
+     * If the remote feature is not present defaults to `internal`
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun removeChatHistory(): Toggle
 }

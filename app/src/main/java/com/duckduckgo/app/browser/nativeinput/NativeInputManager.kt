@@ -83,6 +83,8 @@ class NativeInputCallbacks(
     val onCustomizeResponsesClicked: () -> Unit = {},
     val onChatUrlSuggestionClicked: (AutoCompleteSuggestion) -> Unit = {},
     val onChatHistoryShortcutClicked: () -> Unit = {},
+    /** User tapped the per-row delete (fire) affordance on a chat-history suggestion. Param is the chat URL. */
+    val onChatSuggestionDelete: (chatUrl: String) -> Unit = {},
     val onClearAutocomplete: () -> Unit,
     val onStopTapped: () -> Unit,
     val onFireButtonPressed: () -> Unit = {},
@@ -127,6 +129,13 @@ interface NativeInputManager {
     fun onKeyboardVisibilityChanged(isVisible: Boolean)
     fun setPickingImage(picking: Boolean)
     fun setText(text: String)
+
+    /**
+     * Optimistically removes the chat-history suggestion matching [chatUrl] from the omnibar
+     * autocomplete list, e.g. after its single-chat fire-dialog delete is confirmed. No-op when
+     * the native input isn't shown or the suggestion isn't currently listed.
+     */
+    fun removeChatSuggestion(chatUrl: String)
 
     /** Lock the input field (making it non-interactive + dimmed).*/
     fun setInteractionLock(lock: InteractionLock)
@@ -215,6 +224,12 @@ class RealNativeInputManager @Inject constructor(
         if (!::rootView.isInitialized) return
         val widget = widgetFrom(rootView) ?: return
         widget.text = text
+    }
+
+    override fun removeChatSuggestion(chatUrl: String) {
+        if (!::rootView.isInitialized) return
+        val widget = widgetFrom(rootView) ?: return
+        widget.removeChatSuggestion(chatUrl)
     }
 
     override fun handleDuckAiVoiceResult(query: String) {
@@ -859,6 +874,9 @@ class RealNativeInputManager @Inject constructor(
             onChatHistoryShortcutClicked = {
                 hideNativeInput(isNavigation = true)
                 callbacks.onChatHistoryShortcutClicked()
+            },
+            onChatSuggestionDelete = { chatUrl ->
+                callbacks.onChatSuggestionDelete(chatUrl)
             },
             onShowSuggestions = { chatAdapter ->
                 if (autoCompleteList.adapter === chatAdapter) {
