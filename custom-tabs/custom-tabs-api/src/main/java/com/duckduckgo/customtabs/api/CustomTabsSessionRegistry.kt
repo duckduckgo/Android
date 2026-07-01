@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 DuckDuckGo
+ * Copyright (c) 2026 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,18 +14,16 @@
  * limitations under the License.
  */
 
-plugins {
-    id 'com.android.library'
-    id 'kotlin-android'
-}
+package com.duckduckgo.customtabs.api
 
-apply from: "$rootProject.projectDir/gradle/android-library.gradle"
+import androidx.browser.customtabs.CustomTabsSessionToken
 
-dependencies {
-    implementation Kotlin.stdlib.jdk7
-    api "androidx.browser:browser:_"
-}
+/**
+ * Read-only view of verified Custom Tabs sessions (token -> calling package), used by
+ * IntentDispatcherViewModel to support handleAppLink's trusted-caller carve-out.
+ */
+interface CustomTabsSessionRegistry {
 
-android {
-    namespace 'com.duckduckgo.customtabs.api'
+    /** Returns the verified calling package for the session, or null if no verified binding exists. */
+    fun lookupClientPackage(sessionToken: CustomTabsSessionToken): String?
 }
