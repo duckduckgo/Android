@@ -39,21 +39,21 @@ class OnboardingBackgroundFillGeometryTest {
 
     @Test
     fun whenRequestedExceedsFractionOfAvailableThenCapped() {
-        assertEquals(360, cappedFillHeightPx(requestedPx = 600, availableHeightPx = 900, maxHeightFraction = 0.4f))
+        assertEquals(360, cappedFillHeightPx(requestedPx = 600, referenceHeightPx = 900, maxHeightFraction = 0.4f))
     }
 
     @Test
     fun whenRequestedBelowFractionOfAvailableThenUnchanged() {
-        assertEquals(300, cappedFillHeightPx(requestedPx = 300, availableHeightPx = 1600, maxHeightFraction = 0.4f))
+        assertEquals(300, cappedFillHeightPx(requestedPx = 300, referenceHeightPx = 1600, maxHeightFraction = 0.4f))
     }
 
     @Test
     fun whenFractionAtLeastOneThenNoCap() {
-        assertEquals(600, cappedFillHeightPx(requestedPx = 600, availableHeightPx = 900, maxHeightFraction = 1f))
+        assertEquals(600, cappedFillHeightPx(requestedPx = 600, referenceHeightPx = 900, maxHeightFraction = 1f))
     }
 
     @Test
     fun whenAvailableHeightNonPositiveThenNoCap() {
-        assertEquals(600, cappedFillHeightPx(requestedPx = 600, availableHeightPx = 0, maxHeightFraction = 0.4f))
+        assertEquals(600, cappedFillHeightPx(requestedPx = 600, referenceHeightPx = 0, maxHeightFraction = 0.4f))
     }
 }

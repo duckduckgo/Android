@@ -56,7 +56,8 @@ constructor(
                 layoutHeight = layoutParams?.height ?: ViewGroup.LayoutParams.WRAP_CONTENT,
             )
         }
-        fillHeightPx = cappedFillHeightPx(heightPx, resources.displayMetrics.heightPixels, maxHeightFraction)
+        val referenceHeightPx = maxOf(resources.displayMetrics.widthPixels, resources.displayMetrics.heightPixels)
+        fillHeightPx = cappedFillHeightPx(heightPx, referenceHeightPx, maxHeightFraction)
         adjustViewBounds = false
         maxHeight = Int.MAX_VALUE
         scaleType = ScaleType.MATRIX
