@@ -65,7 +65,7 @@ class NoFlowTerminalOperatorWithoutValueDetectorTest {
             .issues(DenyListedApiDetector.ISSUE)
             .testModes(TestMode.DEFAULT)
             .run()
-            .expectContains("last() will throw if there's not at least one item")
+            .expectContains("last() will throw if flow is empty")
     }
 
     @Test

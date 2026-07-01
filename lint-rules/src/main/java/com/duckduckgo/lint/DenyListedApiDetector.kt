@@ -57,7 +57,7 @@ internal class DenyListedApiDetector : Detector(), SourceCodeScanner, XmlScanner
         DenyListedEntry(
             className = "kotlinx.coroutines.flow.FlowKt__ReduceKt",
             functionName = "last",
-            errorMessage = "last() will throw if there's not at least one item, lastOrNull() it's a safer option.",
+            errorMessage = "last() will throw if flow is empty, lastOrNull() it's a safer option.",
             // StateFlow always hold a value, so last() can never throw on them.
             excludedReceiverTypes = listOf("kotlinx.coroutines.flow.StateFlow"),
             allowInTests = true,
