@@ -130,12 +130,16 @@ class SubscriptionExpirationReminderNotificationPlugin @Inject constructor(
     override suspend fun getLaunchIntent(): Intent? {
         return globalActivityStarter.startIntent(
             context,
-            SubscriptionsWebViewActivityWithParams(url = subscriptionsUrlProvider.buyUrl),
+            SubscriptionsWebViewActivityWithParams(
+                url = subscriptionsUrlProvider.buyUrl,
+                launchPixel = pixelName(NOTIFICATION_LAUNCHED_PIXEL),
+            ),
         )
     }
 
     companion object {
         private const val NOTIFICATION_SHOWN_PIXEL = "mnot_s"
         private const val NOTIFICATION_CANCELLED_PIXEL = "mnot_c"
+        private const val NOTIFICATION_LAUNCHED_PIXEL = "mnot_l"
     }
 }
