@@ -32,7 +32,9 @@ private data class TelemetryPixelJson(
 )
 
 private data class TelemetryTriggerJson(
-    val period: TelemetryPeriodJson,
+    val type: String? = null,
+    val period: TelemetryPeriodJson? = null,
+    val source: String? = null,
 )
 
 private data class TelemetryPeriodJson(
@@ -45,6 +47,7 @@ private data class TelemetryPeriodJson(
 private data class TelemetryParameterJson(
     val template: String,
     val source: String? = null,
+    val dataKey: String? = null,
     val buckets: Map<String, BucketJson>? = null,
 )
 
@@ -85,18 +88,21 @@ object EventHubConfigParser {
         val pixelJson = TelemetryPixelJson(
             state = config.state,
             trigger = TelemetryTriggerJson(
+                type = config.trigger.type,
                 period = TelemetryPeriodJson(
                     seconds = config.trigger.period.seconds,
                     minutes = config.trigger.period.minutes,
                     hours = config.trigger.period.hours,
                     days = config.trigger.period.days,
                 ),
+                source = config.trigger.source,
             ),
             parameters = config.parameters.mapValues { (_, paramConfig) ->
                 TelemetryParameterJson(
                     template = paramConfig.template,
                     source = paramConfig.source,
-                    buckets = paramConfig.buckets.mapValues { (_, bucket) ->
+                    dataKey = paramConfig.dataKey,
+                    buckets = paramConfig.buckets.takeIf { it.isNotEmpty() }?.mapValues { (_, bucket) ->
                         BucketJson(gte = bucket.gte, lt = bucket.lt)
                     },
                 )
@@ -108,41 +114,66 @@ object EventHubConfigParser {
     }
 
     private fun toTelemetryPixelConfig(name: String, json: TelemetryPixelJson): TelemetryPixelConfig? {
-        val periodJson = json.trigger.period
-        if (periodJson.seconds == 0 && periodJson.minutes == 0 && periodJson.hours == 0 && periodJson.days == 0) return null
-
-        val period = TelemetryPeriodConfig(
-            seconds = periodJson.seconds,
-            minutes = periodJson.minutes,
-            hours = periodJson.hours,
-            days = periodJson.days,
-        )
-        if (period.periodSeconds <= 0) return null
+        val trigger = toTriggerConfig(json.trigger) ?: return null
 
         val parameters = mutableMapOf<String, TelemetryParameterConfig>()
         for ((paramName, paramJson) in json.parameters) {
             toParameterConfig(paramJson)?.let { parameters[paramName] = it }
         }
-        if (parameters.isEmpty()) return null
+        // Period pixels need at least one parameter to produce a payload; immediate pixels may fire with none.
+        if (trigger.isPeriod && parameters.isEmpty()) return null
 
         return TelemetryPixelConfig(
             name = name,
             state = json.state,
-            trigger = TelemetryTriggerConfig(period = period),
+            trigger = trigger,
             parameters = parameters,
         )
     }
 
-    private fun toParameterConfig(json: TelemetryParameterJson): TelemetryParameterConfig? {
-        if (json.template != "counter") return null
-        val source = json.source ?: return null
-        val bucketsJson = json.buckets ?: return null
-
-        val buckets = bucketsJson.mapValuesTo(linkedMapOf()) { (_, bucketJson) ->
-            BucketConfig(gte = bucketJson.gte, lt = bucketJson.lt)
+    private fun toTriggerConfig(json: TelemetryTriggerJson): TelemetryTriggerConfig? {
+        return when (json.type ?: PERIOD) {
+            PERIOD -> {
+                val periodJson = json.period ?: return null
+                val period = TelemetryPeriodConfig(
+                    seconds = periodJson.seconds,
+                    minutes = periodJson.minutes,
+                    hours = periodJson.hours,
+                    days = periodJson.days,
+                )
+                if (period.periodSeconds <= 0) return null
+                TelemetryTriggerConfig(type = PERIOD, period = period)
+            }
+            IMMEDIATE -> {
+                val source = json.source?.takeIf { it.isNotEmpty() } ?: return null
+                TelemetryTriggerConfig(type = IMMEDIATE, source = source)
+            }
+            else -> null
         }
-        if (buckets.isEmpty()) return null
-
-        return TelemetryParameterConfig(template = json.template, source = source, buckets = buckets)
     }
+
+    private fun toParameterConfig(json: TelemetryParameterJson): TelemetryParameterConfig? {
+        return when (json.template) {
+            COUNTER -> {
+                val source = json.source ?: return null
+                val bucketsJson = json.buckets ?: return null
+                val buckets = bucketsJson.mapValuesTo(linkedMapOf()) { (_, bucketJson) ->
+                    BucketConfig(gte = bucketJson.gte, lt = bucketJson.lt)
+                }
+                if (buckets.isEmpty()) return null
+                TelemetryParameterConfig(template = COUNTER, source = source, buckets = buckets)
+            }
+            DATA -> {
+                val dataKey = json.dataKey?.takeIf { it.isNotEmpty() } ?: return null
+                // source is optional: aggregate pixels use it to select the source event; immediate pixels omit it.
+                TelemetryParameterConfig(template = DATA, source = json.source, dataKey = dataKey)
+            }
+            else -> null
+        }
+    }
+
+    private const val PERIOD = "period"
+    private const val IMMEDIATE = "immediate"
+    private const val COUNTER = "counter"
+    private const val DATA = "data"
 }
