@@ -48,6 +48,7 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.SpecialUrlDetector
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.browser.api.ui.BrowserScreens.SettingsScreenNoParams
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.view.hide
@@ -424,6 +425,8 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
             contentDisposition = contentDisposition,
             mimeType = mimeType,
             subfolder = Environment.DIRECTORY_DOWNLOADS,
+            // The subscription web flow runs in the default profile, so its downloads use the Regular cookie jar.
+            browserMode = BrowserMode.REGULAR,
         )
 
         if (hasWriteStoragePermission()) {

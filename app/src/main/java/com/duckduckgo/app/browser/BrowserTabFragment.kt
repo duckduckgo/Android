@@ -3296,7 +3296,8 @@ class BrowserTabFragment :
             client.urlExtractionListener = viewModel
 
             logcat { "AMP link detection: Creating WebView for URL extraction" }
-            urlExtractingWebView = UrlExtractingWebView(requireContext(), client, urlExtractorUserAgent.get(), urlExtractor.get())
+            urlExtractingWebView =
+                UrlExtractingWebView(requireContext(), client, urlExtractorUserAgent.get(), urlExtractor.get(), webViewModeInitializer, browserMode)
 
             urlExtractingWebView?.urlExtractionListener = viewModel
 
@@ -3356,7 +3357,7 @@ class BrowserTabFragment :
         webView?.let {
             val url = it.url ?: return
             launch {
-                thirdPartyCookieManager.processUriForThirdPartyCookies(it, url.toUri())
+                thirdPartyCookieManager.processUriForThirdPartyCookies(it, url.toUri(), browserMode)
             }
         }
     }
@@ -5248,6 +5249,7 @@ class BrowserTabFragment :
                 contentDisposition = contentDisposition,
                 mimeType = mimeType,
                 subfolder = Environment.DIRECTORY_DOWNLOADS,
+                browserMode = browserMode,
             )
 
         if (hasWriteStoragePermission()) {
@@ -5265,6 +5267,7 @@ class BrowserTabFragment :
             PendingFileDownload(
                 url = url,
                 subfolder = Environment.DIRECTORY_DOWNLOADS,
+                browserMode = browserMode,
             )
 
         if (hasWriteStoragePermission()) {

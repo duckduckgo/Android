@@ -29,6 +29,7 @@ import com.duckduckgo.app.di.IsMainProcess
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.utils.AppUrl
 import com.duckduckgo.common.utils.AppUrl.ParamKey.QUERY
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -799,7 +800,7 @@ class RealDuckChat @Inject constructor(
     override suspend fun wasOpenedBefore(): Boolean = duckChatFeatureRepository.wasOpenedBefore()
 
     override suspend fun isStandaloneMigrationCompleted(): Boolean {
-        val cookieManager = cookiesManager.get()
+        val cookieManager = cookiesManager.forMode(BrowserMode.REGULAR)
         val ddgCookies = cookieManager?.getCookie(AppUrl.Url.COOKIES)?.split(";").orEmpty()
         val isMigrationCompleted = ddgCookies.contains("migration_status_dev_01=migrated_dev_01")
         return isMigrationCompleted

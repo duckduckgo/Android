@@ -4077,7 +4077,7 @@ class BrowserTabViewModel @Inject constructor(
         pdfDownloadJob += viewModelScope.launch {
             // downloadToCache wraps its own work in withContext(io); viewModelScope.launch
             // defaults to Main, so we stay on Main for the LiveData updates below.
-            val result = inlinePdfHandler.downloadToCache(url, forceRefresh = forceRefresh)
+            val result = inlinePdfHandler.downloadToCache(url, forceRefresh = forceRefresh, browserMode = browserMode)
             loadingViewState.value = currentLoadingViewState().copy(isLoading = false, progress = 100)
             when (result) {
                 is PdfDownloadResult.Success -> {
