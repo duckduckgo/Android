@@ -155,14 +155,13 @@ class RealContextualNativeInputManager @Inject constructor(
     }
 
     private fun applyCardShape(card: MaterialCardView) {
+        // The card floats within the input area (margins on all sides), matching the Duck.ai omnibar
+        // card, so all four corners are rounded rather than the docked top-only shape.
         val radius = card.resources.getDimension(
             com.duckduckgo.mobile.android.R.dimen.extraLargeShapeCornerRadius,
         )
         card.shapeAppearanceModel = card.shapeAppearanceModel.toBuilder()
-            .setTopLeftCornerSize(radius)
-            .setTopRightCornerSize(radius)
-            .setBottomLeftCornerSize(0f)
-            .setBottomRightCornerSize(0f)
+            .setAllCornerSizes(radius)
             .build()
     }
 
