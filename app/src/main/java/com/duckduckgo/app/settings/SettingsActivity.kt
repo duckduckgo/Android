@@ -22,6 +22,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.LinearLayout
+import androidx.activity.result.ActivityResultLauncher
 import androidx.core.view.children
 import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
@@ -94,7 +95,7 @@ import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.api.DuckChatSettingsNoParams
-import com.duckduckgo.feedback.api.FeedbackScreenNoParams
+import com.duckduckgo.feedback.api.FeedbackLauncher
 import com.duckduckgo.internal.features.api.InternalFeaturePlugin
 import com.duckduckgo.mobile.android.app.tracking.ui.AppTrackingProtectionScreens.AppTrackerActivityWithEmptyParams
 import com.duckduckgo.mobile.android.app.tracking.ui.AppTrackingProtectionScreens.AppTrackerOnboardingActivityWithEmptyParamsParams
@@ -145,6 +146,11 @@ class SettingsActivity : DuckDuckGoActivity() {
     lateinit var globalActivityStarter: GlobalActivityStarter
 
     @Inject
+    lateinit var feedbackLauncher: FeedbackLauncher
+
+    private lateinit var feedbackFlow: ActivityResultLauncher<Void?>
+
+    @Inject
     lateinit var _proSettingsPlugin: PluginPoint<ProSettingsPlugin>
     private val proSettingsPlugin by lazy {
         _proSettingsPlugin.getPlugins()
@@ -191,6 +197,10 @@ class SettingsActivity : DuckDuckGoActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        feedbackFlow = registerForActivityResult(feedbackLauncher.feedbackContract()) { resultOk ->
+            if (resultOk) feedbackLauncher.showFeedbackSubmittedMessage(binding.root)
+        }
 
         val edgeToEdgeEnabled = edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.SETTINGS)
         if (edgeToEdgeEnabled) {
@@ -571,7 +581,7 @@ class SettingsActivity : DuckDuckGoActivity() {
     }
 
     private fun launchFeedback() {
-        globalActivityStarter.start(this, FeedbackScreenNoParams)
+        feedbackFlow.launch(null)
     }
 
     companion object {

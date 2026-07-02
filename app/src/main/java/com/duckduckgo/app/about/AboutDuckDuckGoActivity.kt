@@ -26,6 +26,7 @@ import android.text.style.ClickableSpan
 import android.text.style.ForegroundColorSpan
 import android.text.style.UnderlineSpan
 import android.view.View
+import androidx.activity.result.ActivityResultLauncher
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -50,7 +51,7 @@ import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.AppUrl.Url
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.feedback.api.FeedbackScreenNoParams
+import com.duckduckgo.feedback.api.FeedbackLauncher
 import com.duckduckgo.mobile.android.R.attr
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.subscriptions.api.SubscriptionFeedbackScreens.GeneralSubscriptionFeedbackScreenNoParams
@@ -68,8 +69,17 @@ class AboutDuckDuckGoActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var globalActivityStarter: GlobalActivityStarter
 
+    @Inject
+    lateinit var feedbackLauncher: FeedbackLauncher
+
+    private lateinit var feedbackFlow: ActivityResultLauncher<Void?>
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        feedbackFlow = registerForActivityResult(feedbackLauncher.feedbackContract()) { resultOk ->
+            if (resultOk) feedbackLauncher.showFeedbackSubmittedMessage(binding.root)
+        }
 
         setContentView(binding.root)
         setupToolbar(binding.includeToolbar.toolbar)
@@ -228,7 +238,7 @@ class AboutDuckDuckGoActivity : DuckDuckGoActivity() {
     }
 
     private fun launchFeedback() {
-        globalActivityStarter.start(this, FeedbackScreenNoParams)
+        feedbackFlow.launch(null)
     }
 
     private fun launchSubscriptionUnifiedFeedback() {

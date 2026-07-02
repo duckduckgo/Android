@@ -16,8 +16,9 @@
 
 package com.duckduckgo.feedback.impl.ui.common
 
+import android.app.Activity.RESULT_CANCELED
+import android.app.Activity.RESULT_OK
 import android.os.Bundle
-import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.FragmentTransaction
 import androidx.fragment.app.transaction
@@ -260,9 +261,8 @@ class FeedbackActivity :
 }
 
 private fun FeedbackActivity.animateFinish(feedbackSubmitted: Boolean) {
-    if (feedbackSubmitted) {
-        Toast.makeText(this, R.string.thanksForTheFeedback, Toast.LENGTH_LONG).show()
-    }
+    val resultCode = if (feedbackSubmitted) RESULT_OK else RESULT_CANCELED
+    setResult(resultCode)
     finish()
     overridePendingTransition(com.duckduckgo.mobile.android.R.anim.slide_from_left, com.duckduckgo.mobile.android.R.anim.slide_to_right)
 }
