@@ -37,6 +37,7 @@ import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
@@ -154,6 +155,110 @@ class RealContextualNativeInputManagerTest {
         enabled.value = false
 
         verify(card).visibility = View.GONE
+    }
+
+    @Test
+    fun `when native chat input enabled and onInputMode then card shown and picker enabled`() {
+        val enabled = MutableStateFlow(true)
+        whenever(duckChat.observeNativeChatInputEnabled()).thenReturn(enabled)
+        val card = mockCard()
+        // View.show() only writes visibility when it isn't already VISIBLE; a mock defaults to 0
+        // (VISIBLE), so start it GONE to observe the transition.
+        whenever(card.visibility).thenReturn(View.GONE)
+        val widget = mock<NativeInputModeWidget>()
+        testee.init(
+            tabId = "tab",
+            card = card,
+            widget = widget,
+            jsMessaging = mock<JsMessaging>(),
+            lifecycleOwner = lifecycleOwner(),
+            chatIdFlow = emptyFlow(),
+            onSearchSubmitted = {},
+        )
+
+        testee.onInputMode()
+
+        verify(card).visibility = View.VISIBLE
+        verify(widget).setModelPickerEnabled(true)
+    }
+
+    @Test
+    fun `when native chat input disabled and onInputMode then card hidden`() {
+        val enabled = MutableStateFlow(false)
+        whenever(duckChat.observeNativeChatInputEnabled()).thenReturn(enabled)
+        val card = mockCard()
+        val widget = mock<NativeInputModeWidget>()
+        testee.init(
+            tabId = "tab",
+            card = card,
+            widget = widget,
+            jsMessaging = mock<JsMessaging>(),
+            lifecycleOwner = lifecycleOwner(),
+            chatIdFlow = emptyFlow(),
+            onSearchSubmitted = {},
+        )
+
+        testee.onInputMode()
+
+        verify(card).visibility = View.GONE
+    }
+
+    @Test
+    fun `when input mode and chat submitted then routes to new chat callback with widget selections`() {
+        val enabled = MutableStateFlow(true)
+        whenever(duckChat.observeNativeChatInputEnabled()).thenReturn(enabled)
+        val widget = mock<NativeInputModeWidget>()
+        whenever(widget.getSelectedModelId()).thenReturn("model-1")
+        whenever(widget.getResolvedReasoningEffort()).thenReturn("high")
+        whenever(widget.getSelectedTool()).thenReturn("web-search")
+        var submitted: NativeInputPrompt? = null
+        testee.init(
+            tabId = "tab",
+            card = mockCard(),
+            widget = widget,
+            jsMessaging = mock<JsMessaging>(),
+            lifecycleOwner = lifecycleOwner(),
+            chatIdFlow = emptyFlow(),
+            onSearchSubmitted = {},
+            onNewChatPromptSubmitted = { submitted = it },
+        )
+        testee.onInputMode()
+
+        val captor = argumentCaptor<(String) -> Unit>()
+        verify(widget).bindInputEvents(any(), any(), captor.capture())
+        captor.firstValue.invoke("hello")
+
+        assertEquals("hello", submitted?.prompt)
+        assertEquals("model-1", submitted?.modelId)
+        assertEquals("high", submitted?.reasoningEffort)
+        assertEquals("web-search", submitted?.selectedTool)
+    }
+
+    @Test
+    fun `when web view mode and chat submitted then sends in-chat prompt event and skips new chat callback`() {
+        val enabled = MutableStateFlow(true)
+        whenever(duckChat.observeNativeChatInputEnabled()).thenReturn(enabled)
+        val widget = mock<NativeInputModeWidget>()
+        val jsMessaging = mock<JsMessaging>()
+        var submitted: NativeInputPrompt? = null
+        testee.init(
+            tabId = "tab",
+            card = mockCard(),
+            widget = widget,
+            jsMessaging = jsMessaging,
+            lifecycleOwner = lifecycleOwner(),
+            chatIdFlow = emptyFlow(),
+            onSearchSubmitted = {},
+            onNewChatPromptSubmitted = { submitted = it },
+        )
+        testee.onWebViewMode()
+
+        val captor = argumentCaptor<(String) -> Unit>()
+        verify(widget).bindInputEvents(any(), any(), captor.capture())
+        captor.firstValue.invoke("hello")
+
+        assertNull(submitted)
+        verify(jsMessaging).sendSubscriptionEvent(any())
     }
 
     private fun mockCard(): MaterialCardView {

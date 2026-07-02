@@ -56,6 +56,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import logcat.logcat
+import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
 import javax.inject.Inject
@@ -190,6 +191,10 @@ class DuckChatContextualViewModel @Inject constructor(
                 observeCurrentChatDeletion()
             }
         }
+
+        duckChat.observeNativeChatInputEnabled()
+            .onEach { enabled -> _viewState.update { it.copy(nativeChatInputEnabled = enabled) } }
+            .launchIn(viewModelScope)
     }
 
     // Last chat id we confirmed exists in history. A brand-new chat sets _chatId (from the loaded
@@ -253,6 +258,9 @@ class DuckChatContextualViewModel @Inject constructor(
         // When true, the legacy "+" icon is replaced by the chats icon and shown regardless of sheet mode.
         val showChatsIcon: Boolean = false,
         val recentChats: List<ChatHistoryItem> = emptyList(),
+        // When true, the initial (INPUT) sheet uses the unified input widget as its composer instead
+        // of the legacy EditText. Mirrors duckChat.observeNativeChatInputEnabled().
+        val nativeChatInputEnabled: Boolean = false,
     )
 
     fun onSheetReopened() {
@@ -386,9 +394,14 @@ class DuckChatContextualViewModel @Inject constructor(
     fun onPromptSent(
         prompt: String,
         followUpPrefill: String? = null,
+        modelId: String? = null,
+        reasoningEffort: String? = null,
+        selectedTool: String? = null,
+        imagesJson: JSONArray? = null,
+        filesJson: JSONArray? = null,
     ) {
         viewModelScope.launch(dispatchers.io()) {
-            val contextPrompt = generateContextPrompt(prompt)
+            val contextPrompt = generateContextPrompt(prompt, modelId, reasoningEffort, selectedTool, imagesJson, filesJson)
             val prefillText = followUpPrefill?.takeIf { it.isNotEmpty() }
             val prefillEvent = prefillText?.let { generatePrefillEvent(it) }
             withContext(dispatchers.main()) {
@@ -458,7 +471,14 @@ class DuckChatContextualViewModel @Inject constructor(
         }
     }
 
-    private fun generateContextPrompt(prompt: String): SubscriptionEventData {
+    private fun generateContextPrompt(
+        prompt: String,
+        modelId: String? = null,
+        reasoningEffort: String? = null,
+        selectedTool: String? = null,
+        imagesJson: JSONArray? = null,
+        filesJson: JSONArray? = null,
+    ): SubscriptionEventData {
         val viewState = _viewState.value
         val pageContext =
             if (viewState.showContext) {
@@ -479,8 +499,11 @@ class DuckChatContextualViewModel @Inject constructor(
             duckChatPixels.reportContextualPromptSubmittedWithContextNative()
         }
 
-        val modelId = modelManager.getSelectedModelId()
-        val reasoningEffort = modelManager.getResolvedReasoningEffort()
+        // The unified input widget is the source of truth for model/reasoning/tool/attachments when it
+        // is the composer; fall back to the shared model manager for callers that don't pass them (e.g.
+        // the Summarize/Ask-about-page quick action).
+        val resolvedModelId = modelId ?: modelManager.getSelectedModelId()
+        val resolvedReasoningEffort = reasoningEffort ?: modelManager.getResolvedReasoningEffort()
         val params =
             JSONObject().apply {
                 put("platform", "android")
@@ -490,11 +513,20 @@ class DuckChatContextualViewModel @Inject constructor(
                     JSONObject().apply {
                         put("prompt", prompt)
                         put("autoSubmit", true)
-                        if (modelId != null) {
-                            put("modelId", modelId)
+                        if (resolvedModelId != null) {
+                            put("modelId", resolvedModelId)
                         }
-                        if (reasoningEffort != null) {
-                            put("reasoningEffort", reasoningEffort)
+                        if (resolvedReasoningEffort != null) {
+                            put("reasoningEffort", resolvedReasoningEffort)
+                        }
+                        if (selectedTool != null) {
+                            put("toolChoice", JSONArray().apply { put(selectedTool) })
+                        }
+                        if (imagesJson != null) {
+                            put("images", imagesJson)
+                        }
+                        if (filesJson != null) {
+                            put("files", filesJson)
                         }
                     },
                 )

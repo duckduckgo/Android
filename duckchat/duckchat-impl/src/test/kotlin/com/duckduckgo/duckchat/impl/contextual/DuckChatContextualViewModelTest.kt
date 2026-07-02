@@ -43,6 +43,7 @@ import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
+import org.json.JSONArray
 import org.json.JSONObject
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -266,6 +267,61 @@ class DuckChatContextualViewModelTest {
 
             cancelAndIgnoreRemainingEvents()
         }
+    }
+
+    @Test
+    fun `when prompt sent with explicit model reasoning tool and attachments then query contains them`() = runTest {
+        val images = JSONArray().apply { put("image-1") }
+        val files = JSONArray().apply { put("file-1") }
+
+        testee.subscriptionEventDataFlow.test {
+            testee.onPromptSent(
+                prompt = "hello",
+                modelId = "gpt-5.2",
+                reasoningEffort = "high",
+                selectedTool = "web-search",
+                imagesJson = images,
+                filesJson = files,
+            )
+
+            val event = awaitItem()
+            val query = event.params.getJSONObject("query")
+            assertEquals("gpt-5.2", query.getString("modelId"))
+            assertEquals("high", query.getString("reasoningEffort"))
+            assertEquals("web-search", query.getJSONArray("toolChoice").getString(0))
+            assertEquals("image-1", query.getJSONArray("images").getString(0))
+            assertEquals("file-1", query.getJSONArray("files").getString(0))
+
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `when explicit model not provided then falls back to model manager selection`() = runTest {
+        whenever(modelManager.getSelectedModelId()).thenReturn("fallback-model")
+        whenever(modelManager.getResolvedReasoningEffort()).thenReturn("low")
+
+        testee.subscriptionEventDataFlow.test {
+            testee.onPromptSent(prompt = "hello", selectedTool = "web-search")
+
+            val event = awaitItem()
+            val query = event.params.getJSONObject("query")
+            assertEquals("fallback-model", query.getString("modelId"))
+            assertEquals("low", query.getString("reasoningEffort"))
+            assertEquals("web-search", query.getJSONArray("toolChoice").getString(0))
+
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `when native chat input flag enabled then view state reflects it`() = runTest {
+        assertFalse(testee.viewState.value.nativeChatInputEnabled)
+
+        (duckChat as FakeDuckChat).setNativeChatInputEnabled(true)
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+        assertTrue(testee.viewState.value.nativeChatInputEnabled)
     }
 
     @Test
@@ -2322,6 +2378,10 @@ class DuckChatContextualViewModelTest {
         private val automaticContextAttachment = MutableStateFlow(true)
         private val nativeInputFieldSettingEnabled = MutableStateFlow(false)
         private val nativeChatInputEnabled = MutableStateFlow(false)
+
+        fun setNativeChatInputEnabled(enabled: Boolean) {
+            nativeChatInputEnabled.value = enabled
+        }
 
         override fun isEnabled(): Boolean = true
         override fun openDuckChat() = Unit
