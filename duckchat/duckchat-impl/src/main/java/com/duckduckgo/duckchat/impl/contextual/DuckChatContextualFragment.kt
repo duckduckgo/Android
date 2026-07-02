@@ -120,7 +120,7 @@ import javax.inject.Named
 
 @InjectWith(FragmentScope::class)
 class DuckChatContextualFragment :
-    DuckDuckGoFragment(R.layout.fragment_contextual_duck_ai),
+    DuckDuckGoFragment(R.layout.fragment_contextual_duck_ai_native),
     DownloadConfirmationDialogListener {
 
     @Inject
