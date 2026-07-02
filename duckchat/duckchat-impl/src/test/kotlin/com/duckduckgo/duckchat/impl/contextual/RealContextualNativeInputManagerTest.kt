@@ -21,6 +21,7 @@ import android.view.View
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LifecycleRegistry
+import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
@@ -30,9 +31,13 @@ import com.duckduckgo.js.messaging.api.JsMessaging
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.shape.ShapeAppearanceModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.any
@@ -96,6 +101,37 @@ class RealContextualNativeInputManagerTest {
 
         // inputMode is owned by the main widget VM; the reset must leave it alone.
         assertEquals(NativeInputState.InputMode.SEARCH_ONLY, updated.inputMode)
+    }
+
+    @Test
+    fun `when webview mode then input mode modelPickerEnabled emits false then true`() = runTest {
+        val enabled = MutableStateFlow(true)
+        whenever(duckChat.observeNativeChatInputEnabled()).thenReturn(enabled)
+        val widget = mock<NativeInputModeWidget>()
+        val pickerFlowCaptor = argumentCaptor<Flow<Boolean>>()
+        testee.init(
+            tabId = "tab",
+            card = mockCard(),
+            widget = widget,
+            jsMessaging = mock<JsMessaging>(),
+            lifecycleOwner = lifecycleOwner(),
+            chatIdFlow = emptyFlow(),
+            onSearchSubmitted = {},
+        )
+        verify(widget).bindModelPickerEnabledSource(pickerFlowCaptor.capture())
+        val pickerFlow = pickerFlowCaptor.firstValue
+
+        pickerFlow.test {
+            assertTrue(awaitItem())
+
+            testee.onWebViewMode()
+            assertFalse(awaitItem())
+
+            testee.onInputMode()
+            assertTrue(awaitItem())
+
+            cancelAndIgnoreRemainingEvents()
+        }
     }
 
     @Test
