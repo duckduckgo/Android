@@ -507,8 +507,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
                     }
                 }
                 FireDialog.EVENT_ON_FIRE_TABS_CLEARED -> {
-                    // All Fire tabs were burned without a process restart; land the user on the
-                    // (now empty) Fire tabs view in the tab switcher, staying in Fire mode.
+                    // All Fire tabs were burned; land the user on the (now empty) Fire tab switcher
                     globalActivityStarter.start(this, TabSwitcherScreenWithParams(BrowserMode.FIRE))
                 }
                 FireDialog.EVENT_ON_SINGLE_TAB_CLEAR_COMPLETE -> {
