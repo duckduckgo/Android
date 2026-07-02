@@ -158,7 +158,7 @@ class RealContextualNativeInputManagerTest {
     }
 
     @Test
-    fun `when native chat input enabled and onInputMode then card shown and picker enabled`() {
+    fun `when native chat input enabled and onInputMode then card shown`() {
         val enabled = MutableStateFlow(true)
         whenever(duckChat.observeNativeChatInputEnabled()).thenReturn(enabled)
         val card = mockCard()
@@ -178,8 +178,9 @@ class RealContextualNativeInputManagerTest {
 
         testee.onInputMode()
 
+        // The model picker is re-enabled via the bound modelPickerEnabled flow (covered separately);
+        // here we assert the contextual card itself is shown in INPUT mode.
         verify(card).visibility = View.VISIBLE
-        verify(widget).setModelPickerEnabled(true)
     }
 
     @Test

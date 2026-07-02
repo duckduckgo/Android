@@ -382,6 +382,10 @@ class NativeInputModeWidget @JvmOverloads constructor(
             launch {
                 viewModel.plugins.collect { plugins ->
                     for (plugin in plugins) {
+                        // The start-chat shortcut is a search-only address-bar affordance; it has no place
+                        // in the contextual sheet's Duck.ai composer (and reads the shared per-tab state,
+                        // which can be search-only), so skip it there.
+                        if (isContextualWidget && plugin.containerId == R.id.startChatContainer) continue
                         val container = findViewById<FrameLayout?>(plugin.containerId) ?: continue
                         val pluginView = plugin.createView(context, this@NativeInputModeWidget)
                         container.removeAllViews()
@@ -708,7 +712,19 @@ class NativeInputModeWidget @JvmOverloads constructor(
         floatingButtons?.setNewLineButtonVisible(visible)
     }
 
-    private fun applyState(state: NativeInputState) {
+    private fun applyState(incomingState: NativeInputState) {
+        // The contextual sheet is always a Duck.ai chat surface, but the shared per-tab state store can
+        // carry a browser/search state written by the main omnibar widget (e.g. for search-only users).
+        // Force the Duck.ai context/toggle here so the contextual widget never renders that search state,
+        // which would otherwise flip the tab off "chat" (hiding the chat-tab controls).
+        val state = if (isContextualWidget) {
+            incomingState.copy(
+                inputContext = NativeInputState.InputContext.DUCK_AI_CONTEXTUAL,
+                toggleSelection = NativeInputState.ToggleSelection.DUCK_AI,
+            )
+        } else {
+            incomingState
+        }
         val previousState = nativeInputState
         val firstStateEmission = previousState == null
         val contextChanged = previousState?.inputContext != state.inputContext
