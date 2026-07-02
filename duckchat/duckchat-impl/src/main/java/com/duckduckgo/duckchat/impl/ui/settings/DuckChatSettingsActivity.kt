@@ -218,7 +218,7 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
         )
         inputScreenSettingsBinding.duckAiInputScreenDescription.updatePadding(left = offset)
         inputScreenSettingsBinding.duckAiShortcuts.updatePadding(left = offset)
-        inputScreenSettingsBinding.duckAiWebSettingsNative.updatePadding(left = offset)
+        inputScreenSettingsBinding.duckAiWebSettings.updatePadding(left = offset)
         inputScreenSettingsBinding.duckAIAutomaticContext.updatePadding(left = offset)
 
         binding.duckChatSettingsText.addClickableSpan(
@@ -281,11 +281,11 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
             viewModel.onDuckAiShortcutsClicked()
         }
 
-        binding.duckAiWebSettings.isVisible = viewState.isDuckAiWebSettingsVisible && !viewState.isNativeControlsEnabled
-        binding.duckAiWebSettings.updatePadding(left = offset)
-        binding.duckAiWebSettings.setOnClickListener { viewModel.onDuckAiWebSettingsClicked() }
-        inputScreenSettingsBinding.duckAiWebSettingsNative.isVisible = viewState.isDuckAiWebSettingsVisible && viewState.isNativeControlsEnabled
-        inputScreenSettingsBinding.duckAiWebSettingsNative.setOnClickListener { viewModel.onDuckAiWebSettingsClicked() }
+        binding.duckAiWebSettingsItem.isVisible = viewState.isDuckAiWebSettingsVisible && !viewState.isNativeControlsEnabled
+        binding.duckAiWebSettingsItem.updatePadding(left = offset)
+        binding.duckAiWebSettingsItem.setOnClickListener { viewModel.onDuckAiWebSettingsClicked() }
+        inputScreenSettingsBinding.duckAiWebSettings.isVisible = viewState.isDuckAiWebSettingsVisible && viewState.isNativeControlsEnabled
+        inputScreenSettingsBinding.duckAiWebSettings.setOnClickListener { viewModel.onDuckAiWebSettingsClicked() }
 
         renderSearchSettingsSection(viewState)
 

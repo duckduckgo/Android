@@ -84,12 +84,12 @@
                 app:showSwitch="true" />
 
             <com.duckduckgo.common.ui.view.listitem.OneLineListItem
-                android:id="@+id/duckAiWebSettings"
+                android:id="@+id/duckAiWebSettingsItem"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:visibility="gone"
                 app:trailingIcon="@drawable/ic_open_in_24_small"
-                app:primaryText="@string/duck_ai_web_settings_title" />
+                app:primaryText="@string/duckAiSettingsTitle" />
 
             <include
                 android:id="@+id/inputScreenSettings"
