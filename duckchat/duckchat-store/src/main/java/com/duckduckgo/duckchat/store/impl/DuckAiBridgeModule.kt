@@ -84,7 +84,6 @@ object DuckAiBridgeModule {
     fun provideFireFileMetaDao(db: FireModeDuckAiDatabase): DuckAiBridgeFileMetaDao = db.fileMetaDao()
 
     @Provides
-    @SingleInstanceIn(AppScope::class)
     @DuckAiBridgeFilesDir
     fun provideFilesDir(context: Context): File =
         File(context.filesDir, "duck_ai_bridge_files")
