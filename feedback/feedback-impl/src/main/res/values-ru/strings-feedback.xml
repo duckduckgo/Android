@@ -45,7 +45,6 @@
     <string name="openEndedInputHint">Опишите максимально подробно</string>
     <string name="submitFeedback">Подтвердить</string>
     <string name="tellUsHowToImprove">Что мы можем улучшить?</string>
-    <string name="thanksForTheFeedback">Спасибо за отзыв!</string>
     <string name="feedbackNegativeMainReasonPageSubtitle">Что именно вам не понравилось?</string>
     <string name="feedbackNegativeMainReasonPageTitle">Очень жаль</string>
     <string name="feedbackShareDetails">Добавить комментарий</string>

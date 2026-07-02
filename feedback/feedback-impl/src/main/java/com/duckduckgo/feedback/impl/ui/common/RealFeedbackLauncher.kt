@@ -19,14 +19,11 @@ package com.duckduckgo.feedback.impl.ui.common
 import android.app.Activity.RESULT_OK
 import android.content.Context
 import android.content.Intent
-import android.view.View
 import androidx.activity.result.contract.ActivityResultContract
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feedback.api.FeedbackLauncher
 import com.duckduckgo.feedback.api.FeedbackScreenNoParams
-import com.duckduckgo.feedback.impl.R
 import com.duckduckgo.navigation.api.GlobalActivityStarter
-import com.google.android.material.snackbar.Snackbar
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 
@@ -37,10 +34,6 @@ class RealFeedbackLauncher @Inject constructor(
 
     override fun feedbackContract(): ActivityResultContract<Void?, Boolean> =
         FeedbackContract(globalActivityStarter)
-
-    override fun showFeedbackSubmittedMessage(hostView: View) {
-        Snackbar.make(hostView, R.string.thanksForTheFeedback, Snackbar.LENGTH_LONG).show()
-    }
 }
 
 private class FeedbackContract(

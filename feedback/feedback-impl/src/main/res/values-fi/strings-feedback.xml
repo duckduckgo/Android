@@ -45,7 +45,6 @@
     <string name="openEndedInputHint">Kerro mahdollisimman tarkasti</string>
     <string name="submitFeedback">Lähetä</string>
     <string name="tellUsHowToImprove">Kerro meille, mitä voimme parantaa.</string>
-    <string name="thanksForTheFeedback">Kiitos palautteesta!</string>
     <string name="feedbackNegativeMainReasonPageSubtitle">Mikä turhauttaa sinua eniten?</string>
     <string name="feedbackNegativeMainReasonPageTitle">Ikävä kuulla</string>
     <string name="feedbackShareDetails">Kerro tarkempia tietoja</string>

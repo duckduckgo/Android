@@ -1012,4 +1012,5 @@
     <!-- New Address Bar Picker -->
     <string name="newAddressBarPickerDuckDuckGo" translatable="false">DuckDuckGo</string>
     <string name="newAddressBarPickerConfirm">Conferma</string>
+    <string name="thanksForTheFeedback">Grazie per il tuo feedback!</string>
 </resources>

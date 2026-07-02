@@ -45,7 +45,6 @@
     <string name="openEndedInputHint">Concreta lo máximo posible</string>
     <string name="submitFeedback">Enviar</string>
     <string name="tellUsHowToImprove">Dinos cómo podemos mejorar.</string>
-    <string name="thanksForTheFeedback">Gracias por compartir tu opinión.</string>
     <string name="feedbackNegativeMainReasonPageSubtitle">¿A qué se debe principalmente tu frustración?</string>
     <string name="feedbackNegativeMainReasonPageTitle">Sentimos que opines así</string>
     <string name="feedbackShareDetails">Compartir detalles</string>

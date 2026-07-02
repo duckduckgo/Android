@@ -45,7 +45,6 @@
     <string name="openEndedInputHint">Please be as specific as possible</string>
     <string name="submitFeedback">Submit</string>
     <string name="tellUsHowToImprove">Please tell us what we can improve.</string>
-    <string name="thanksForTheFeedback">Thanks for the feedback!</string>
     <string name="feedbackNegativeMainReasonPageSubtitle">What is your frustration most related to?</string>
     <string name="feedbackNegativeMainReasonPageTitle">We\'re Sorry to Hear That</string>
     <string name="feedbackShareDetails">Share Details</string>

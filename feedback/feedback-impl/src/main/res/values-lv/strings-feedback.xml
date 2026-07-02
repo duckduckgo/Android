@@ -45,7 +45,6 @@
     <string name="openEndedInputHint">Lūdzu, norādiet pēc iespējas precīzāk</string>
     <string name="submitFeedback">Iesniegt</string>
     <string name="tellUsHowToImprove">Lūdzu, pastāsti, ko mēs varam uzlabot.</string>
-    <string name="thanksForTheFeedback">Paldies tev par atsauksmēm!</string>
     <string name="feedbackNegativeMainReasonPageSubtitle">Ar ko tava vilšanās ir visvairāk saistīta?</string>
     <string name="feedbackNegativeMainReasonPageTitle">Mums žēl to dzirdēt</string>
     <string name="feedbackShareDetails">Kopīgot informāciju</string>

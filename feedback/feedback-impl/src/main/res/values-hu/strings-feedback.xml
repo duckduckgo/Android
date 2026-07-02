@@ -45,7 +45,6 @@
     <string name="openEndedInputHint">Kérjük, a lehető legpontosabban írj meg mindent</string>
     <string name="submitFeedback">Küldés</string>
     <string name="tellUsHowToImprove">Kérjük, mondd el, min tudunk még javítani.</string>
-    <string name="thanksForTheFeedback">Köszönjük a visszajelzést!</string>
     <string name="feedbackNegativeMainReasonPageSubtitle">Mi okozta a legtöbb problémát?</string>
     <string name="feedbackNegativeMainReasonPageTitle">Sajnálattal halljuk</string>
     <string name="feedbackShareDetails">Részletek megosztása</string>

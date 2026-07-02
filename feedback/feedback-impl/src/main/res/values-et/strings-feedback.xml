@@ -45,7 +45,6 @@
     <string name="openEndedInputHint">Palun ole võimalikult konkreetne</string>
     <string name="submitFeedback">Esita</string>
     <string name="tellUsHowToImprove">Palun öelge meile, mida saaksime täiustada.</string>
-    <string name="thanksForTheFeedback">Aitäh tagasiside eest!</string>
     <string name="feedbackNegativeMainReasonPageSubtitle">Mis on teie pettumusega kõige rohkem seotud?</string>
     <string name="feedbackNegativeMainReasonPageTitle">Meil on kahju seda kuulda</string>
     <string name="feedbackShareDetails">Jaga üksikasju</string>

@@ -45,7 +45,6 @@
     <string name="openEndedInputHint">Vær så specifik som muligt</string>
     <string name="submitFeedback">Indsend</string>
     <string name="tellUsHowToImprove">Fortæl os, hvad vi kan forbedre.</string>
-    <string name="thanksForTheFeedback">Tak for din feedback!</string>
     <string name="feedbackNegativeMainReasonPageSubtitle">Hvad handler din frustration mest om?</string>
     <string name="feedbackNegativeMainReasonPageTitle">Det er vi kede af at høre</string>
     <string name="feedbackShareDetails">Del oplysninger</string>

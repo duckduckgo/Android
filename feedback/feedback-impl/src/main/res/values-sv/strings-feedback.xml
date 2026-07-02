@@ -45,7 +45,6 @@
     <string name="openEndedInputHint">Beskriv så noggrant som möjligt</string>
     <string name="submitFeedback">Skicka</string>
     <string name="tellUsHowToImprove">Berätta vad vi kan förbättra.</string>
-    <string name="thanksForTheFeedback">Tack för din återkoppling!</string>
     <string name="feedbackNegativeMainReasonPageSubtitle">Vad anser du vara mest frustrerande?</string>
     <string name="feedbackNegativeMainReasonPageTitle">Det var tråkigt att höra</string>
     <string name="feedbackShareDetails">Berätta mer om dina upplevelser</string>

@@ -45,7 +45,6 @@
     <string name="openEndedInputHint">Bitte sei so genau wie möglich</string>
     <string name="submitFeedback">Abschicken</string>
     <string name="tellUsHowToImprove">Teile uns bitte mit, was wir verbessern können.</string>
-    <string name="thanksForTheFeedback">Vielen Dank für dein Feedback!</string>
     <string name="feedbackNegativeMainReasonPageSubtitle">Was stört dich am meisten?</string>
     <string name="feedbackNegativeMainReasonPageTitle">Es tut uns leid, das zu hören</string>
     <string name="feedbackShareDetails">Weitere Informationen teilen</string>

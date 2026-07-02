@@ -108,6 +108,7 @@ import com.duckduckgo.settings.api.ProSettingsPlugin
 import com.duckduckgo.settings.api.ThreatProtectionSettingsPlugin
 import com.duckduckgo.subscriptions.api.SubscriptionFeedbackScreens.GeneralSubscriptionFeedbackScreenNoParams
 import com.duckduckgo.sync.api.SyncActivityWithEmptyParams
+import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -199,7 +200,13 @@ class SettingsActivity : DuckDuckGoActivity() {
         super.onCreate(savedInstanceState)
 
         feedbackFlow = registerForActivityResult(feedbackLauncher.feedbackContract()) { resultOk ->
-            if (resultOk) feedbackLauncher.showFeedbackSubmittedMessage(binding.root)
+            if (resultOk) {
+                Snackbar.make(
+                    binding.root,
+                    R.string.thanksForTheFeedback,
+                    Snackbar.LENGTH_LONG,
+                ).show()
+            }
         }
 
         val edgeToEdgeEnabled = edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.SETTINGS)
