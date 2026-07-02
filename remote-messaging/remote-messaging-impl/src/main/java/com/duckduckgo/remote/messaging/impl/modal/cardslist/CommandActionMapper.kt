@@ -22,7 +22,6 @@ import com.duckduckgo.remote.messaging.api.Action.AppTpOnboarding
 import com.duckduckgo.remote.messaging.api.Action.DefaultBrowser
 import com.duckduckgo.remote.messaging.api.Action.DefaultCredentialProvider
 import com.duckduckgo.remote.messaging.api.Action.Dismiss
-import com.duckduckgo.remote.messaging.api.Action.FireTabsPromo
 import com.duckduckgo.remote.messaging.api.Action.Navigation
 import com.duckduckgo.remote.messaging.api.Action.PlayStore
 import com.duckduckgo.remote.messaging.api.Action.Share
@@ -61,9 +60,6 @@ class RealCommandActionMapper @Inject constructor(
                 Command.SubmitUrl(surveyParameterManager.buildSurveyUrl(action.value, queryParams))
             }
             is DefaultCredentialProvider -> Command.LaunchDefaultCredentialProvider
-            // Fire Tabs is a NEW_TAB_PAGE-surface campaign, so it never reaches the cards-list/modal surface.
-            // This branch exists only to keep the `when` exhaustive; dismiss as a safe no-op if ever encountered.
-            is FireTabsPromo -> Command.DismissMessage
         }
     }
 }

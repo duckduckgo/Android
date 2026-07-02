@@ -28,7 +28,6 @@ import com.duckduckgo.remote.messaging.api.JsonActionType.APP_TP_ONBOARDING
 import com.duckduckgo.remote.messaging.api.JsonActionType.DEFAULT_BROWSER
 import com.duckduckgo.remote.messaging.api.JsonActionType.DEFAULT_CREDENTIAL_PROVIDER
 import com.duckduckgo.remote.messaging.api.JsonActionType.DISMISS
-import com.duckduckgo.remote.messaging.api.JsonActionType.FIRE_TABS_PROMO
 import com.duckduckgo.remote.messaging.api.JsonActionType.NAVIGATION
 import com.duckduckgo.remote.messaging.api.JsonActionType.PLAYSTORE
 import com.duckduckgo.remote.messaging.api.JsonActionType.SHARE
@@ -166,7 +165,6 @@ sealed class Action(
     ) : Action(JsonActionType.SURVEY.jsonValue, value, additionalParameters)
 
     data object DefaultCredentialProvider : Action(DEFAULT_CREDENTIAL_PROVIDER.jsonValue, "", null)
-    data object FireTabsPromo : Action(FIRE_TABS_PROMO.jsonValue, "", null)
 }
 
 sealed class CardItem {

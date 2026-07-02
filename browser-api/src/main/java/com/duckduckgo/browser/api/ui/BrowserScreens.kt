@@ -68,5 +68,5 @@ sealed class BrowserScreens {
      * differs from the active mode, the Tab Switcher switches to it on open. Use [TabSwitcherScreenNoParams]
      * to open in the current mode.
      */
-    data class TabSwitcherScreenParams(val browserMode: BrowserMode) : GlobalActivityStarter.ActivityParams
+    data class TabSwitcherScreenWithParams(val browserMode: BrowserMode) : GlobalActivityStarter.ActivityParams
 }

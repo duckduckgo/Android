@@ -25,7 +25,6 @@ import com.duckduckgo.remote.messaging.api.JsonActionType
 import com.duckduckgo.remote.messaging.api.JsonActionType.DEFAULT_BROWSER
 import com.duckduckgo.remote.messaging.api.JsonActionType.DEFAULT_CREDENTIAL_PROVIDER
 import com.duckduckgo.remote.messaging.api.JsonActionType.DISMISS
-import com.duckduckgo.remote.messaging.api.JsonActionType.FIRE_TABS_PROMO
 import com.duckduckgo.remote.messaging.api.JsonActionType.NAVIGATION
 import com.duckduckgo.remote.messaging.api.JsonActionType.PLAYSTORE
 import com.duckduckgo.remote.messaging.api.JsonActionType.SHARE
@@ -138,19 +137,6 @@ class DefaultCredentialProviderActionMapper @Inject constructor() : MessageActio
     override fun evaluate(jsonMessageAction: JsonMessageAction): Action? {
         return if (jsonMessageAction.type == DEFAULT_CREDENTIAL_PROVIDER.jsonValue) {
             Action.DefaultCredentialProvider
-        } else {
-            null
-        }
-    }
-}
-
-@ContributesMultibinding(
-    AppScope::class,
-)
-class FireTabsPromoActionMapper @Inject constructor() : MessageActionMapperPlugin {
-    override fun evaluate(jsonMessageAction: JsonMessageAction): Action? {
-        return if (jsonMessageAction.type == FIRE_TABS_PROMO.jsonValue) {
-            Action.FireTabsPromo
         } else {
             null
         }

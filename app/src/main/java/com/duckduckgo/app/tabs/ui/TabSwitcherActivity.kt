@@ -83,7 +83,7 @@ import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.ShowUndoDeleteTab
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.ViewState.Mode
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.ViewState.Mode.Selection
 import com.duckduckgo.browser.api.ui.BrowserScreens.TabSwitcherScreenNoParams
-import com.duckduckgo.browser.api.ui.BrowserScreens.TabSwitcherScreenParams
+import com.duckduckgo.browser.api.ui.BrowserScreens.TabSwitcherScreenWithParams
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.menu.PopupMenu
@@ -121,7 +121,7 @@ import com.duckduckgo.mobile.android.R as CommonR
 
 @InjectWith(ActivityScope::class)
 @ContributeToActivityStarter(TabSwitcherScreenNoParams::class, screenName = "tabSwitcher")
-@ContributeToActivityStarter(TabSwitcherScreenParams::class)
+@ContributeToActivityStarter(TabSwitcherScreenWithParams::class, screenName = "tabSwitcherWithParams")
 class TabSwitcherActivity :
     DuckDuckGoActivity(),
     TabSwitcherListener,
@@ -334,7 +334,7 @@ class TabSwitcherActivity :
     }
 
     /**
-     * When launched via [TabSwitcherScreenParams] with a mode different from the active one, switch to that
+     * When launched via [TabSwitcherScreenWithParams] with a mode different from the active one, switch to that
      * mode and recreate so the activity — and its tab repository — resolve for it. Returns true when a
      * recreation was triggered, so [onCreate] aborts and lets the recreated instance render the requested mode.
      *
@@ -345,7 +345,7 @@ class TabSwitcherActivity :
     private fun switchToRequestedModeIfNeeded(savedInstanceState: Bundle?): Boolean {
         if (savedInstanceState != null) return false
 
-        val requestedMode = intent.getActivityParams(TabSwitcherScreenParams::class.java)?.browserMode ?: return false
+        val requestedMode = intent.getActivityParams(TabSwitcherScreenWithParams::class.java)?.browserMode ?: return false
         if (requestedMode == currentBrowserMode) return false
 
         viewModel.onBrowserModeToggled(requestedMode)

@@ -99,7 +99,10 @@ class RealFireTabsPromosTest {
             descriptionText = "",
             placeholder = Content.Placeholder.ANNOUNCE,
             primaryActionText = "",
-            primaryAction = Action.FireTabsPromo,
+            primaryAction = Action.Navigation(
+                value = "tabSwitcherWithParams",
+                additionalParameters = mapOf("payload" to """{"browserMode":"FIRE"}"""),
+            ),
             secondaryActionText = "",
             secondaryAction = Action.Dismiss,
         ),
