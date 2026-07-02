@@ -739,9 +739,9 @@ class DialogsFragment : Fragment() {
                     content = {
                         item {
                             DaxOneLineListItem(
-                                text = "Primary Item",
-                                leadingIcon = {
-                                    DaxListItemTrailingIcon(
+                                primaryText = "Primary Item",
+                                leadingContent = {
+                                    Icon(
                                         painter = painterResource(CommonR.drawable.ic_add_24),
                                         contentDescription = null,
                                     )
@@ -750,9 +750,9 @@ class DialogsFragment : Fragment() {
                         }
                         item {
                             DaxOneLineListItem(
-                                text = "Secondary Item",
-                                leadingIcon = {
-                                    DaxListItemTrailingIcon(
+                                primaryText = "Secondary Item",
+                                leadingContent = {
+                                    Icon(
                                         painter = painterResource(CommonR.drawable.ic_add_24),
                                         contentDescription = null,
                                     )
