@@ -1008,7 +1008,7 @@ class TabSwitcherActivity :
         val canSwap = from in canSwapFromIndex..<tabSwitcherItemCount && to in canSwapFromIndex..<tabSwitcherItemCount
         if (canSwap) {
             tabsAdapter.onTabMoved(from, to)
-            // Adjust indices to account for any leading non-Tab header items (e.g. TrackerAnimationTile, FireTabsPromo)
+            // Adjust indices to account for any leading non-Tab header items (e.g. TrackerAnimationInfoPanel)
             viewModel.onTabMoved(from - canSwapFromIndex, to - canSwapFromIndex)
         }
     }
