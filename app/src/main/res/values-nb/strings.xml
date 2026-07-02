@@ -413,15 +413,6 @@
     <!-- User-facing label for when a user selects text and might want to search for that text -->
     <string name="systemTextSearchMessage">Søk med DuckDuckGo</string>
 
-    <!-- App feedback disambiguation -->
-
-
-
-
-
-
-
-
     <!-- Webview Recovery -->
     <string name="crashedWebViewErrorMessage">"Nettstedet kunne ikke vises."</string>
     <string name="crashedWebViewErrorAction">"Last inn på nytt"</string>

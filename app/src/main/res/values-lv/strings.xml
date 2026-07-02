@@ -418,15 +418,6 @@
     <!-- User-facing label for when a user selects text and might want to search for that text -->
     <string name="systemTextSearchMessage">Meklēt DuckDuckGo</string>
 
-    <!-- App feedback disambiguation -->
-
-
-
-
-
-
-
-
     <!-- Webview Recovery -->
     <string name="crashedWebViewErrorMessage">"Vietni nevarēja parādīt."</string>
     <string name="crashedWebViewErrorAction">"Pārlādēt"</string>

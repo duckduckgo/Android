@@ -413,15 +413,6 @@
     <!-- User-facing label for when a user selects text and might want to search for that text -->
     <string name="systemTextSearchMessage">DuckDuckGo\'da Ara</string>
 
-    <!-- App feedback disambiguation -->
-
-
-
-
-
-
-
-
     <!-- Webview Recovery -->
     <string name="crashedWebViewErrorMessage">"Web sayfası görüntülenemedi."</string>
     <string name="crashedWebViewErrorAction">"Tekrar yükle"</string>

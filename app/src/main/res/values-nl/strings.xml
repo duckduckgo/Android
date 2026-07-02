@@ -413,15 +413,6 @@
     <!-- User-facing label for when a user selects text and might want to search for that text -->
     <string name="systemTextSearchMessage">Zoek in DuckDuckGo</string>
 
-    <!-- App feedback disambiguation -->
-
-
-
-
-
-
-
-
     <!-- Webview Recovery -->
     <string name="crashedWebViewErrorMessage">"De webpagina kon niet worden weergegeven."</string>
     <string name="crashedWebViewErrorAction">"Opnieuw laden"</string>

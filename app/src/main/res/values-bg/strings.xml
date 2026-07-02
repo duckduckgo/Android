@@ -413,15 +413,6 @@
     <!-- User-facing label for when a user selects text and might want to search for that text -->
     <string name="systemTextSearchMessage">Търсене с DuckDuckGo</string>
 
-    <!-- App feedback disambiguation -->
-
-
-
-
-
-
-
-
     <!-- Webview Recovery -->
     <string name="crashedWebViewErrorMessage">"Уеб страницата не може да бъде показана."</string>
     <string name="crashedWebViewErrorAction">"Презареждане"</string>

@@ -418,15 +418,6 @@
     <!-- User-facing label for when a user selects text and might want to search for that text -->
     <string name="systemTextSearchMessage">Căutare DuckDuckGo</string>
 
-    <!-- App feedback disambiguation -->
-
-
-
-
-
-
-
-
     <!-- Webview Recovery -->
     <string name="crashedWebViewErrorMessage">"Pagina web nu a putut fi afișată."</string>
     <string name="crashedWebViewErrorAction">"Reîncarcă"</string>

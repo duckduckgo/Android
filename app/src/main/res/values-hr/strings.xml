@@ -423,15 +423,6 @@
     <!-- User-facing label for when a user selects text and might want to search for that text -->
     <string name="systemTextSearchMessage">Pretraži DuckDuckGo</string>
 
-    <!-- App feedback disambiguation -->
-
-
-
-
-
-
-
-
     <!-- Webview Recovery -->
     <string name="crashedWebViewErrorMessage">"Web-stranica nije mogla biti prikazana."</string>
     <string name="crashedWebViewErrorAction">"Ponovno učitaj"</string>
