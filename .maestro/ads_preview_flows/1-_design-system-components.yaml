@@ -159,8 +159,30 @@ tags:
             timeout: 50000
             speed: 60
             element:
-              text: "With Beta Pill and Switch"
+              text: "Single Line Items"
             direction: DOWN
+        - assertVisible: "Single Line Items"
+        - scrollUntilVisible:
+            timeout: 50000
+            speed: 60
+            element:
+              text: ".*Item with Extra Large Leading Image.*"
+            direction: DOWN
+        - assertVisible: ".*Item with Extra Large Leading Image.*"
+        - scrollUntilVisible:
+            timeout: 50000
+            speed: 60
+            element:
+              text: "Two Line Items"
+            direction: DOWN
+        - assertVisible: "Two Line Items"
+        - scrollUntilVisible:
+            timeout: 50000
+            speed: 60
+            element:
+              text: "Settings List Item Always On"
+            direction: DOWN
+        - assertVisible: "Settings List Item Always On"
         - tapOn: "Others"
         - scrollUntilVisible:
             timeout: 50000
