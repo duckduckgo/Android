@@ -125,7 +125,6 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
     private val defaultBrowserDetector: DefaultBrowserDetector,
     private val widgetCapabilities: WidgetCapabilities,
     private val syncAutoRestore: SyncAutoRestore,
-    private val quickSetupPixelSender: QuickSetupPixelSender,
     private val orchestrator: LinearOnboardingOrchestrator,
     private val customAiOnboardingStore: CustomAiOnboardingStore,
 ) : ViewModel() {
@@ -175,6 +174,8 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
     private var quickSetupDefaultBrowserDialogShown: Boolean = false
 
     private var notificationPermissionFlowStarted = false
+
+    private var notificationPermissionGranted: Boolean? = null
 
     // Which flow drives this run, chosen once at construction. Legacy = the in-VM state machine;
     // Orchestrator = translate fragment callbacks to LinearOnboardingOrchestrator events and render its
@@ -271,13 +272,9 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
             SKIP_ONBOARDING_OPTION -> pixel.fire(PREONBOARDING_SKIP_ONBOARDING_SHOWN_UNIQUE, type = Unique())
             ADDRESS_BAR_POSITION -> pixel.fire(PREONBOARDING_ADDRESS_BAR_POSITION_SHOWN_UNIQUE, type = Unique())
             INPUT_SCREEN -> pixel.fire(PREONBOARDING_CHOOSE_SEARCH_EXPERIENCE_IMPRESSIONS_UNIQUE, type = Unique())
-            INPUT_SCREEN_PREVIEW -> {
-            }
-
-            QUICK_SETUP -> {
-                quickSetupPixelSender.fireShown(isReinstallUser = _viewState.value.isReinstallUser)
-            }
+            INPUT_SCREEN_PREVIEW, QUICK_SETUP -> Unit
         }
+        viewModelScope.launch { orchestrator.onEvent(NewUserOnboardingEvent.Presented) }
     }
 
     fun onIntroAnimationStarted() {
@@ -301,7 +298,10 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
     fun onInputModeDemoQuerySubmitted(
         query: String,
         isChat: Boolean,
-    ) = flow.onInputModeDemoQuerySubmitted(query = query, isChat = isChat)
+        fromSuggestion: Boolean,
+    ) {
+        flow.onInputModeDemoQuerySubmitted(query = query, isChat = isChat, fromSuggestion = fromSuggestion)
+    }
 
     fun onDefaultBrowserSet() {
         recordDefaultBrowserDialogResult(isSet = true)
@@ -420,6 +420,7 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
 
     fun notificationRuntimePermissionRequested() {
         pixel.fire(NOTIFICATION_RUNTIME_PERMISSION_SHOWN)
+        viewModelScope.launch { orchestrator.onEvent(NewUserOnboardingEvent.Presented) }
     }
 
     fun notificationRuntimePermissionGranted() {
@@ -427,12 +428,12 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
             AppPixelName.NOTIFICATIONS_ENABLED,
             mapOf(PixelParameter.FROM_ONBOARDING to true.toString()),
         )
+        notificationPermissionGranted = true
     }
 
-    private suspend fun isAppReinstall(): Boolean =
-        withContext(dispatchers.io()) {
-            appBuildConfig.isAppReinstall()
-        }
+    fun notificationRuntimePermissionDenied() {
+        notificationPermissionGranted = false
+    }
 
     private suspend fun showQuickSetupDialog() {
         val splitEnabled = isSplitOmnibarEnabled()
@@ -508,7 +509,7 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
         fun loadDaxDialog()
         fun onPrimaryCta(dialog: PreOnboardingDialogType)
         fun onSecondaryCta(dialog: PreOnboardingDialogType)
-        fun onInputModeDemoQuerySubmitted(query: String, isChat: Boolean)
+        fun onInputModeDemoQuerySubmitted(query: String, isChat: Boolean, fromSuggestion: Boolean)
         fun onDefaultBrowserResult(isDefaultBrowser: Boolean)
     }
 
@@ -537,7 +538,7 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
                 } ?: false
 
                 // Always call isAppReinstall() — it has side effects (creates DDG downloads directory, persists reinstall state)
-                val isReinstall = isAppReinstall()
+                val isReinstall = withContext(dispatchers.io()) { appBuildConfig.isAppReinstall() }
 
                 val dialogType = when {
                     canRestore -> {
@@ -635,12 +636,6 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
                     viewModelScope.launch {
                         applyAddressBarPositionSelection(fireTelemetry = false)
                         applyInputScreenSelection(fireTelemetry = false)
-                        val state = _viewState.value
-                        quickSetupPixelSender.fireClicked(
-                            isReinstallUser = state.isReinstallUser,
-                            addressBarPosition = state.selectedAddressBarPosition,
-                            inputScreenSelected = state.inputScreenSelected,
-                        )
                         _commands.send(Command.OnboardingSkipped)
                     }
                 }
@@ -684,7 +679,7 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
             }
         }
 
-        override fun onInputModeDemoQuerySubmitted(query: String, isChat: Boolean) {
+        override fun onInputModeDemoQuerySubmitted(query: String, isChat: Boolean, fromSuggestion: Boolean) {
             viewModelScope.launch {
                 if (isChat) {
                     _commands.send(Command.FinishAndSubmitChatPrompt(prompt = query))
@@ -724,7 +719,7 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
         // (requested from onIntroAnimationFinished) to load the next dax dialog. In orchestrator mode
         // the orchestrator owns which first dialog comes next via step preconditions, so this call
         // only signals that the notification_permission step is done -> Advance.
-        override fun loadDaxDialog() = emit(NewUserOnboardingEvent.NotificationPermissionFinished)
+        override fun loadDaxDialog() = emit(NewUserOnboardingEvent.NotificationPermissionFinished(granted = notificationPermissionGranted))
 
         override fun onPrimaryCta(dialog: PreOnboardingDialogType) {
             when (dialog) {
@@ -752,8 +747,8 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
         }
 
         // The step records the query into the run; the Completed handler reads it off state.result.
-        override fun onInputModeDemoQuerySubmitted(query: String, isChat: Boolean) =
-            emit(NewUserOnboardingEvent.InputDemoQuerySubmitted(query = query, isChat = isChat))
+        override fun onInputModeDemoQuerySubmitted(query: String, isChat: Boolean, fromSuggestion: Boolean) =
+            emit(NewUserOnboardingEvent.InputDemoQuerySubmitted(query = query, isChat = isChat, fromSuggestion = fromSuggestion))
 
         override fun onDefaultBrowserResult(isDefaultBrowser: Boolean) =
             emit(NewUserOnboardingEvent.DefaultBrowserPromptFinished(isDefaultBrowser = isDefaultBrowser))
