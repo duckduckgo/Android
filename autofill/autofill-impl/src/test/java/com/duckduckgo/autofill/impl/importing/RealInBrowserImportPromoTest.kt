@@ -6,9 +6,12 @@ import com.duckduckgo.autofill.impl.importing.RealInBrowserImportPromo.Companion
 import com.duckduckgo.autofill.impl.importing.capability.ImportGooglePasswordsCapabilityChecker
 import com.duckduckgo.autofill.impl.store.InternalAutofillStore
 import com.duckduckgo.autofill.impl.store.NeverSavedSiteRepository
+import com.duckduckgo.browsermode.api.BrowserMode
+import com.duckduckgo.browsermode.api.BrowserModeStateHolder
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -35,6 +38,8 @@ class RealInBrowserImportPromoParameterizedTest(
     private val neverSavedSiteRepository: NeverSavedSiteRepository = mock()
     private val importPasswordCapabilityChecker: ImportGooglePasswordsCapabilityChecker = mock()
     private val inBrowserPromoPreviousPromptsStore: InBrowserPromoPreviousPromptsStore = mock()
+    private val browserModeStateHolder: BrowserModeStateHolder = mock()
+    private val modeFlow = MutableStateFlow(BrowserMode.REGULAR)
 
     private val testee = RealInBrowserImportPromo(
         autofillStore = autofillStore,
@@ -43,10 +48,13 @@ class RealInBrowserImportPromoParameterizedTest(
         autofillFeature = autofillFeature,
         importPasswordCapabilityChecker = importPasswordCapabilityChecker,
         inBrowserPromoPreviousPromptsStore = inBrowserPromoPreviousPromptsStore,
+        browserModeStateHolder = browserModeStateHolder,
     )
 
     @Before
     fun setup() = runTest {
+        whenever(browserModeStateHolder.currentMode).thenReturn(modeFlow)
+        modeFlow.value = testCase.browserMode
         whenever(autofillStore.hasEverImportedPasswords).thenReturn(testCase.hasEverImportedPasswords)
         whenever(autofillStore.hasDeclinedInBrowserPasswordImportPromo).thenReturn(testCase.hasDeclinedPromo)
         whenever(autofillStore.getCredentialCount()).thenReturn(flowOf(testCase.credentialCount))
@@ -318,6 +326,19 @@ class RealInBrowserImportPromoParameterizedTest(
                     expected = false,
                     description = "ineligible: couldn't retrieve credentials count",
                 ),
+                CanShowPromoTestCase(
+                    credentialsAvailableForCurrentPage = false,
+                    url = EXAMPLE_URL,
+                    inBrowserPromoFeatureEnabled = true,
+                    autofillFeatureEnabled = true,
+                    hasEverImportedPasswords = false,
+                    hasDeclinedPromo = false,
+                    credentialCount = Result.success(0),
+                    promoShownCount = 0,
+                    browserMode = BrowserMode.FIRE,
+                    expected = false,
+                    description = "ineligible: fire mode active",
+                ),
             )
         }
 
@@ -341,6 +362,7 @@ data class CanShowPromoTestCase(
     val promoShownCount: Int,
     val webViewSupportsImportingPasswords: Boolean = true,
     val promoPreviouslyShownForUrl: Boolean = false,
+    val browserMode: BrowserMode = BrowserMode.REGULAR,
     val expected: Boolean,
     val description: String,
 ) {

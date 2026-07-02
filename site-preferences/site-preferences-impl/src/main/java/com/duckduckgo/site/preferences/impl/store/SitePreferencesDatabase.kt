@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 DuckDuckGo
+ * Copyright (c) 2026 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,14 +14,12 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.subscriptions.impl.wideevents
+package com.duckduckgo.site.preferences.impl.store
 
-import com.duckduckgo.common.utils.DispatcherProvider
-import com.duckduckgo.subscriptions.impl.SubscriptionsFeature
-import dagger.Lazy
-import kotlinx.coroutines.withContext
+import androidx.room.Database
+import androidx.room.RoomDatabase
 
-internal suspend fun Lazy<SubscriptionsFeature>.isUseQueryPurchasesEnabled(dispatchers: DispatcherProvider): String =
-    withContext(dispatchers.io()) {
-        get().useQueryPurchases().isEnabled().toString()
-    }
+@Database(entities = [SitePreferencesEntity::class], version = 1)
+abstract class SitePreferencesDatabase : RoomDatabase() {
+    abstract fun sitePreferencesDao(): SitePreferencesDao
+}

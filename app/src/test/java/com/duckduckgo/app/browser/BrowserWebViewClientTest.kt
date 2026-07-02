@@ -179,6 +179,8 @@ class BrowserWebViewClientTest {
     private val pageLoadWideEvent: PageLoadWideEvent = mock()
     private val mockAppSchemeInterceptionFeature: AppSchemeInterceptionFeature = mock()
     private val appSchemeInterceptionEnabledFlow = MutableStateFlow(true)
+    private val mockForceWebViewRecompositeFeature: ForceWebViewRecompositeFeature = mock()
+    private val forceRecompositeEnabledFlow = MutableStateFlow(true)
 
     @Before
     fun setup() =
@@ -191,6 +193,10 @@ class BrowserWebViewClientTest {
             whenever(enabledToggle.isEnabled()).thenReturn(true)
             whenever(enabledToggle.enabled()).thenReturn(appSchemeInterceptionEnabledFlow)
             whenever(mockAppSchemeInterceptionFeature.self()).thenReturn(enabledToggle)
+            val forceRecompositeToggle: Toggle = mock()
+            whenever(forceRecompositeToggle.isEnabled()).thenReturn(true)
+            whenever(forceRecompositeToggle.enabled()).thenReturn(forceRecompositeEnabledFlow)
+            whenever(mockForceWebViewRecompositeFeature.self()).thenReturn(forceRecompositeToggle)
             testee =
                 BrowserWebViewClient(
                     webViewHttpAuthStore,
@@ -226,6 +232,7 @@ class BrowserWebViewClientTest {
                     mockDuckChat,
                     mockContentScopeExperiments,
                     mockAppSchemeInterceptionFeature,
+                    mockForceWebViewRecompositeFeature,
                 )
             testee.webViewClientListener = listener
             whenever(webResourceRequest.url).thenReturn(Uri.EMPTY)
@@ -293,6 +300,18 @@ class BrowserWebViewClientTest {
         testee.onPageStarted(webView, EXAMPLE_URL, null)
         assertEquals(1, jsPlugins.plugin.countStarted)
         assertEquals(0, jsPlugins.plugin.countFinished)
+    }
+
+    @Test
+    fun whenOnPageStartedThenContentScopeDesktopModeComesFromCurrentSite() {
+        // pageChanged stamps site.isDesktopMode per-domain before this runs, so the C-S-S flag is read from getSite().
+        val site = mock<Site>()
+        whenever(site.isDesktopMode).thenReturn(true)
+        whenever(listener.getSite()).thenReturn(site)
+
+        testee.onPageStarted(webView, EXAMPLE_URL, null)
+
+        assertEquals(true, jsPlugins.plugin.lastDesktopMode)
     }
 
     @Test
@@ -1253,6 +1272,97 @@ class BrowserWebViewClientTest {
     }
 
     @Test
+    fun whenPageFinishesAndCommitVisibleNeverFiredAndTabInForegroundThenWebViewRecomposited() {
+        val mockWebView = getImmediatelyInvokedMockWebView()
+        whenever(mockWebView.progress).thenReturn(100)
+        whenever(mockWebView.safeCopyBackForwardList()).thenReturn(TestBackForwardList())
+        whenever(mockWebView.settings).thenReturn(mock())
+        whenever(mockWebView.isShown).thenReturn(true)
+        whenever(listener.isTabInForeground()).thenReturn(true)
+        testee.onPageStarted(mockWebView, EXAMPLE_URL, null)
+        testee.onPageFinished(mockWebView, EXAMPLE_URL)
+        verify(mockWebView).onPause()
+        verify(mockWebView).onResume()
+        verify(pixel).fire(WebViewPixelName.WEB_VIEW_FORCED_RECOMPOSITE, type = Pixel.PixelType.Daily())
+    }
+
+    @Test
+    fun whenPageFinishesMultipleTimesAndCommitVisibleNeverFiredThenWebViewRecompositedOnlyOnce() {
+        val mockWebView = getImmediatelyInvokedMockWebView()
+        whenever(mockWebView.progress).thenReturn(100)
+        whenever(mockWebView.safeCopyBackForwardList()).thenReturn(TestBackForwardList())
+        whenever(mockWebView.settings).thenReturn(mock())
+        whenever(mockWebView.isShown).thenReturn(true)
+        whenever(listener.isTabInForeground()).thenReturn(true)
+        testee.onPageStarted(mockWebView, EXAMPLE_URL, null)
+        testee.onPageFinished(mockWebView, EXAMPLE_URL)
+        testee.onPageFinished(mockWebView, EXAMPLE_URL)
+        verify(mockWebView, times(1)).onPause()
+        verify(mockWebView, times(1)).onResume()
+        verify(pixel, times(1)).fire(WebViewPixelName.WEB_VIEW_FORCED_RECOMPOSITE, type = Pixel.PixelType.Daily())
+    }
+
+    @Test
+    fun whenPageFinishesAndCommitVisibleNeverFiredButWebViewNotShownThenWebViewNotRecomposited() {
+        val mockWebView = getImmediatelyInvokedMockWebView()
+        whenever(mockWebView.progress).thenReturn(100)
+        whenever(mockWebView.safeCopyBackForwardList()).thenReturn(TestBackForwardList())
+        whenever(mockWebView.settings).thenReturn(mock())
+        whenever(mockWebView.isShown).thenReturn(false)
+        whenever(listener.isTabInForeground()).thenReturn(true)
+        testee.onPageStarted(mockWebView, EXAMPLE_URL, null)
+        testee.onPageFinished(mockWebView, EXAMPLE_URL)
+        verify(mockWebView, never()).onPause()
+        verify(mockWebView, never()).onResume()
+        verify(pixel, never()).fire(eq(WebViewPixelName.WEB_VIEW_FORCED_RECOMPOSITE), any(), any(), any())
+    }
+
+    @Test
+    fun whenPageFinishesAndCommitVisibleFiredThenWebViewNotRecomposited() {
+        val mockWebView = getImmediatelyInvokedMockWebView()
+        whenever(mockWebView.progress).thenReturn(100)
+        whenever(mockWebView.safeCopyBackForwardList()).thenReturn(TestBackForwardList())
+        whenever(mockWebView.settings).thenReturn(mock())
+        whenever(listener.isTabInForeground()).thenReturn(true)
+        testee.onPageStarted(mockWebView, EXAMPLE_URL, null)
+        testee.onPageCommitVisible(mockWebView, EXAMPLE_URL)
+        testee.onPageFinished(mockWebView, EXAMPLE_URL)
+        verify(mockWebView, never()).onPause()
+        verify(mockWebView, never()).onResume()
+        verify(pixel, never()).fire(eq(WebViewPixelName.WEB_VIEW_FORCED_RECOMPOSITE), any(), any(), any())
+    }
+
+    @Test
+    fun whenPageFinishesAndCommitVisibleNeverFiredButTabNotInForegroundThenWebViewNotRecomposited() {
+        val mockWebView = getImmediatelyInvokedMockWebView()
+        whenever(mockWebView.progress).thenReturn(100)
+        whenever(mockWebView.safeCopyBackForwardList()).thenReturn(TestBackForwardList())
+        whenever(mockWebView.settings).thenReturn(mock())
+        whenever(listener.isTabInForeground()).thenReturn(false)
+        testee.onPageStarted(mockWebView, EXAMPLE_URL, null)
+        testee.onPageFinished(mockWebView, EXAMPLE_URL)
+        verify(mockWebView, never()).onPause()
+        verify(mockWebView, never()).onResume()
+        verify(pixel, never()).fire(eq(WebViewPixelName.WEB_VIEW_FORCED_RECOMPOSITE), any(), any(), any())
+    }
+
+    @Test
+    fun whenPageFinishesAndCommitVisibleNeverFiredButFeatureDisabledThenWebViewNotRecomposited() =
+        runTest {
+            forceRecompositeEnabledFlow.emit(false)
+            val mockWebView = getImmediatelyInvokedMockWebView()
+            whenever(mockWebView.progress).thenReturn(100)
+            whenever(mockWebView.safeCopyBackForwardList()).thenReturn(TestBackForwardList())
+            whenever(mockWebView.settings).thenReturn(mock())
+            whenever(listener.isTabInForeground()).thenReturn(true)
+            testee.onPageStarted(mockWebView, EXAMPLE_URL, null)
+            testee.onPageFinished(mockWebView, EXAMPLE_URL)
+            verify(mockWebView, never()).onPause()
+            verify(mockWebView, never()).onResume()
+            verify(pixel, never()).fire(eq(WebViewPixelName.WEB_VIEW_FORCED_RECOMPOSITE), any(), any(), any())
+        }
+
+    @Test
     fun whenPageStartedMoreThanOnceThenStartTimeIsNotUpdated() {
         val mockWebView = getImmediatelyInvokedMockWebView()
         whenever(mockWebView.progress).thenReturn(100)
@@ -1785,6 +1895,7 @@ class BrowserWebViewClientTest {
     private class FakeJsInjectorPlugin : JsInjectorPlugin {
         var countFinished = 0
         var countStarted = 0
+        var lastDesktopMode: Boolean? = null
 
         override fun onPageStarted(
             webView: WebView,
@@ -1793,6 +1904,7 @@ class BrowserWebViewClientTest {
             activeExperiments: List<Toggle>,
         ) {
             countStarted++
+            lastDesktopMode = isDesktopMode
         }
 
         override fun onPageFinished(

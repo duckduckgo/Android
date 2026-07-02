@@ -53,7 +53,7 @@ class RealFireModeAvailability @Inject constructor(
 
     private fun computeAndCache(): Boolean {
         cachedAvailability?.let { return it }
-        val value = isMultiProfileSupported() && fireModeFeature.fireTabs().isEnabled()
+        val value = isMultiProfileSupported() && isDeleteBrowsingDataSupported() && fireModeFeature.fireTabs().isEnabled()
         cachedAvailability = value
         return value
     }
@@ -62,6 +62,14 @@ class RealFireModeAvailability @Inject constructor(
         return runCatching { WebViewFeature.isFeatureSupported(WebViewFeature.MULTI_PROFILE) }
             .getOrElse { exception ->
                 logcat(ERROR) { "Failed to check MULTI_PROFILE WebView support: ${exception.asLog()}" }
+                false
+            }
+    }
+
+    private fun isDeleteBrowsingDataSupported(): Boolean {
+        return runCatching { WebViewFeature.isFeatureSupported(WebViewFeature.DELETE_BROWSING_DATA) }
+            .getOrElse { exception ->
+                logcat(ERROR) { "Failed to check DELETE_BROWSING_DATA WebView support: ${exception.asLog()}" }
                 false
             }
     }

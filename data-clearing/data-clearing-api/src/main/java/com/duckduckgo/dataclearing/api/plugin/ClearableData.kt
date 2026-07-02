@@ -16,34 +16,53 @@
 
 package com.duckduckgo.dataclearing.api.plugin
 
+import com.duckduckgo.browsermode.api.BrowserMode
+
 /**
  * Describes the kind of data being cleaned up.
  *
- * Each sealed subclass represents a category of data. Nested subclasses
- * express scope within that category (e.g., all tabs vs. a single tab).
+ * Each sealed subclass represents a category of data. Nested variants express scope within that
+ * category (e.g. all data vs. a single tab) and, where applicable, the [BrowserMode] the operation
+ * targets.
  */
 sealed class ClearableData {
 
     /** Browser data: cookies, cache, web storage, etc. */
     sealed class BrowserData : ClearableData() {
+        /** Clear every mode's browser data. */
         data object All : BrowserData()
-        data class Single(val tabId: String) : BrowserData()
+
+        /** Clear all browser data scoped to [mode]. */
+        data class AllForMode(val mode: BrowserMode) : BrowserData()
+
+        /** Clear browser data linked to a single tab in [mode]. */
+        data class SingleForMode(val tabId: String, val mode: BrowserMode) : BrowserData()
     }
 
     /** Tab data. */
     sealed class Tabs : ClearableData() {
+        /** Clear every mode's tabs. */
         data object All : Tabs()
-        data class Single(val tabId: String) : Tabs()
+
+        /** Clear all tabs belonging to [mode]. */
+        data class AllForMode(val mode: BrowserMode) : Tabs()
+
+        /** Clear a single tab in [mode]. */
+        data class SingleForMode(val tabId: String, val mode: BrowserMode) : Tabs()
     }
 
     /** Duck AI chats. */
     sealed class DuckChats : ClearableData() {
+        /** Clear every mode's chats. */
         data object All : DuckChats()
 
+        /** Clear all chats scoped to [mode]. */
+        data class AllForMode(val mode: BrowserMode) : DuckChats()
+
         /**
-         * A known set of Duck.ai chats, identified by their full chat URLs.
+         * A known set of Duck.ai chats in [mode], identified by their full chat URLs.
          * `setOf(oneUrl)` is the single-chat case; `emptySet()` is a valid no-op.
          */
-        data class Selected(val chatUrls: Set<String>) : DuckChats()
+        data class SelectedForMode(val chatUrls: Set<String>, val mode: BrowserMode) : DuckChats()
     }
 }

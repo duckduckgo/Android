@@ -288,5 +288,26 @@
         "triggers": ["other"],
         "suffixes": ["form_factor"],
         "parameters": ["appVersion"]
+    },
+    "m_ntp_after_idle_escape_hatch_hidden_from_menu": {
+        "description": "User tapped the 'Don't Show This' menu item in the NTP escape hatch card menu",
+        "owners": ["YoussefKeyrouz"],
+        "triggers": ["other"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_ntp_after_idle_last_tab_shortcut_setting_enabled": {
+        "description": "User enabled the Return To Last Tab shortcut from the After Inactivity settings toggle",
+        "owners": ["YoussefKeyrouz"],
+        "triggers": ["other"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_ntp_after_idle_last_tab_shortcut_setting_disabled": {
+        "description": "User disabled the Return To Last Tab shortcut from the After Inactivity settings toggle",
+        "owners": ["YoussefKeyrouz"],
+        "triggers": ["other"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": ["appVersion"]
     }
 }

@@ -14,19 +14,23 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.onboarding
+package com.duckduckgo.app.browser
 
 import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
 
+/**
+ * Kill switch for forcing a WebView re-composite (onPause/onResume) when onPageCommitVisible
+ * never fired, to clear a stale frame left by a recycled WebView.
+ */
 @ContributesRemoteFeature(
     scope = AppScope::class,
-    featureName = "customDuckAiOnboarding",
+    featureName = "forceWebViewRecomposite",
 )
-interface CustomDuckAiOnboardingFeature {
+interface ForceWebViewRecompositeFeature {
 
-    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun self(): Toggle
 }

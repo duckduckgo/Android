@@ -129,7 +129,6 @@ class DaxDuckAiFireButtonBrandDesignUpdateContextualCtaTest {
 
     @Before
     fun before() = runTest {
-        whenever(mockExtendedOnboardingFeatureToggles.noBrowserCtas()).thenReturn(disabledToggle)
         whenever(mockExtendedOnboardingFeatureToggles.subscriptionPromoModalCta()).thenReturn(disabledToggle)
         whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(1))
         whenever(mockUserAllowListRepository.isDomainInUserAllowList(any())).thenReturn(false)

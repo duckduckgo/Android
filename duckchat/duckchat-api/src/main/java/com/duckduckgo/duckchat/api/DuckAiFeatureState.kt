@@ -94,4 +94,10 @@ interface DuckAiFeatureState {
      * Indicates whether Duck.ai should be used as digital assistant
      */
     val allowDuckAiAsDigitalAssistant: StateFlow<Boolean>
+
+    /**
+     * True when the native input field is the active input surface. Mutually exclusive with
+     * [showInputScreen] (which is computed with `&& !isNativeInputFieldEnabled`).
+     */
+    val nativeInputFieldEnabled: StateFlow<Boolean>
 }

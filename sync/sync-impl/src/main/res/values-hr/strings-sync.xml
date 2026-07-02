@@ -241,4 +241,12 @@
     <string name="sync_recover_data_download_pdf">Preuzmi kao PDF</string>
     <string name="sync_restore_on_reinstall_title">Vraćanje prilikom ponovne instalacije aplikacije</string>
     <string name="sync_restore_on_reinstall_description">Ako ponovno instaliraš aplikaciju DuckDuckGo, pitat ćemo te želiš li vratiti podatke na ovom uređaju.</string>
+
+    <!-- Chat sync promo -->
+    <string name="sync_chat_promo_banner_title">Pristupi svojim čavrljanjima na svim uređajima pomoću opcije Sync &amp; Backup.</string>
+    <string name="sync_chat_promo_banner_cta_title">Sinkronizacija s drugim uređajem</string>
+    <string name="sync_chat_bottom_sheet_title">Sinkroniziraj svoje razgovore na\nsvim svojim uređajima!</string>
+    <string name="sync_chat_bottom_sheet_description">Pronađi QR kôd u aplikaciji DuckDuckGo na drugom uređaju tako da odeš na Postavke › Sync &amp; Backup › Sinkroniziraj s drugim uređajem.</string>
+    <string name="sync_chat_bottom_sheet_positive">Skeniraj QR kôd</string>
+    <string name="sync_chat_bottom_sheet_negative">Ne sada</string>
 </resources>

@@ -158,24 +158,6 @@
             android:layout_marginBottom="@dimen/keyline_4"
             app:typography="body2" />
 
-        <com.duckduckgo.common.ui.view.text.DaxTextInput
-            android:id="@+id/createProtectedKeyPurposeInput"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/keyline_4"
-            android:layout_marginEnd="@dimen/keyline_4"
-            android:hint="Purpose (e.g. ai_chats, sync)"
-            android:text="ai_chats"
-            app:editable="true"
-            app:type="single_line" />
-
-        <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
-            android:id="@+id/createProtectedKeyButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="10dp"
-            android:text="Create Protected Key" />
-
         <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -680,6 +662,13 @@
             android:layout_height="wrap_content"
             android:layout_margin="10dp"
             android:text="@string/sync_internal_promotions_clear_history_password_screen_promo" />
+
+        <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
+            android:id="@+id/clearHistoryChatTabPagePromo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:text="@string/sync_internal_promotions_clear_history_chat_tab_page_promo" />
 
     </LinearLayout>
 </ScrollView>

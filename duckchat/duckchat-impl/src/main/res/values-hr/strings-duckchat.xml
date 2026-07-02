@@ -95,6 +95,23 @@
     <string name="duckAiHideAiGeneratedImagesTitle">Sakrij slike generirane umjetnom inteligencijom</string>
     <string name="duckAiHideAiGeneratedImagesDescription">Filtrira slike generirane umjetnom inteligencijom iz rezultata pretraživanja slika</string>
 
+    <!-- Search Assist Visibility -->
+    <string name="duckAiSearchAssistVisibilitySubtitle">Odaberi koliko često želiš da se odgovori potpomognuti umjetnom inteligencijom pojavljuju u tvojim pretraživanjima.</string>
+    <string name="duckAiSearchAssistVisibilityNever">Nikada</string>
+    <string name="duckAiSearchAssistVisibilityOnDemand">Na zahtjev</string>
+    <string name="duckAiSearchAssistVisibilitySometimes">Ponekad</string>
+    <string name="duckAiSearchAssistVisibilityOften">Često</string>
+
+    <!-- Duck AI Use Without AI Settings Option -->
+    <string name="duckAiUseWithoutAiTitle">Koristi DuckDuckGo bez AI</string>
+    <string name="duckAiUseWithoutAiDescription">Onemogućuje Duck.ai, skriva odgovore potpomognute umjetnom inteligencijom u pretraživanju i filtrira poznata web-mjesta s neželjenom umjetnom inteligencijom u rezultatima pretraživanja slika.</string>
+    <string name="duckAiUseWithoutAiDisabledDescription">Umjetna inteligencija trenutno je onemogućena u pregledniku pa više nećeš vidjeti odgovore potpomognute umjetnom inteligencijom i vidjet ćeš manje slika generiranih umjetnom inteligencijom u rezultatima pretraživanja slika.</string>
+
+    <!-- Duck AI Section in AI Feature Screen -->
+    <string name="input_screen_user_pref_toggle_between_search_and_ai">Prebacuj se između pretraživanja i Duck.ai</string>
+    <string name="duckAiDialogHideAiGeneratedImagesTitle">Sakrij slike generirane umjetnom inteligencijom</string>
+    <string name="duckAiDialogHideAiGeneratedImagesDescription">Filtrira poznata neželjena web-mjesta s AI-jem iz rezultata pretraživanja slika. <annotation link="learn_more">Saznaj više</annotation></string>
+
     <!-- Duck AI Paid Settings -->
     <string name="duck_ai_paid_settings_enable_in_settings">Omogući u postavkama AI značajki</string>
     <string name="duck_ai_paid_settings_manage_in_settings">Upravljaj u postavkama AI značajki</string>
@@ -105,6 +122,13 @@
     <string name="duckAIContextualAutomaticContextTitle">Automatski pošalji sadržaj stranice</string>
     <string name="duckAIContextualAutomaticContextMessage">Automatski pošalji sadržaj stranice Duck.ai-ju</string>
     <string name="duckAIContextualAttachPageContent">Priloži sadržaj stranice</string>
+
+    <!-- Contextual sheet quick action -->
+    <string name="duckAIContextualPromptAskAboutPage">Pitaj o stranici</string>
+
+    <!-- Contextual sheet input hint (contextualSheetImprovements flag) -->
+    <string name="contextualSheetImprovedHint">Privatno pitaj bilo što</string>
+    <string name="contextualSheetChatsPopupRecentSection" instruction="Section header above the list of recent Duck.ai chats in the contextual sheet overflow menu.">Nedavna čavrljanja</string>
 
     <!-- duck.ai contextual fire button -->
     <string name="duckAIContextualFireButtonContentDescription">Izbriši čavrljanje</string>
@@ -125,6 +149,12 @@
 
     <!-- Duck AI Chat Suggestions -->
     <string name="duckAiChatHistoryViewAllChats">Prikaži sva čavrljanja</string>
+
+    <!-- Duck.ai onboarding end CTA -->
+    <string name="duckAiEndCtaTitle">Možeš ti to!</string>
+    <string name="duckAiEndCtaDescription"><![CDATA[Koristi adresnu traku za pretraživanje i posjećivanje web-mjesta ili se prebaci na Duck.ai za privatno AI čavrljanje.<br/><br/>Duck.ai možeš koristiti na svakom mjestu na kojem je ikona za čavrljanje]]></string>
+    <string name="duckAiEndCtaButton">Daj pet!</string>
+    <string name="duckAiEndCtaDescriptionCustomAi"><![CDATA[Započni privatno AI čavrljanje uz Duck.ai ili prebaci na traženje za zaštićeno pregledavanje.<br/><br/>Duck.ai možeš koristiti na svakom mjestu na kojem je ikona za čavrljanje]]></string>
 
     <!-- Native Duck.ai chat history -->
     <string name="duck_ai_chat_history_title">Čavrljanja</string>

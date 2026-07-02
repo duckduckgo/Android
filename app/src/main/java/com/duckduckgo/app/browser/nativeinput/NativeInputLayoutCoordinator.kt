@@ -236,15 +236,17 @@ class NativeInputLayoutCoordinator(
             return maxOf(0, anchorBottomInWindow - viewLocation[1])
         }
 
-        fun computeDeltaBottom(): Int {
+        fun computeDeltaBottom(view: View, anchorTopInWindow: Int): Int {
             if (!isBottom) return 0
-            return maxOf(0, widgetView.height)
+            val viewLocation = IntArray(2).also { view.getLocationInWindow(it) }
+            val viewBottomInWindow = viewLocation[1] + view.height
+            return maxOf(0, viewBottomInWindow - anchorTopInWindow)
         }
 
-        fun applyOffsetWithBottom(anchorBottomInWindow: Int) {
-            val deltaBottom = computeDeltaBottom()
+        fun applyOffsetWithBottom(anchorTopInWindow: Int, anchorBottomInWindow: Int) {
             targets.forEach { target ->
                 val deltaTop = computeDeltaTop(target.view, anchorBottomInWindow)
+                val deltaBottom = computeDeltaBottom(target.view, anchorTopInWindow)
                 applyPadding(target.view, target.basePadding, deltaTop, deltaBottom)
             }
         }
@@ -256,7 +258,7 @@ class NativeInputLayoutCoordinator(
             }
             val anchorLocation = IntArray(2).also { anchor.getLocationInWindow(it) }
             val anchorBottomInWindow = anchorLocation[1] + anchor.height
-            applyOffsetWithBottom(anchorBottomInWindow)
+            applyOffsetWithBottom(anchorTopInWindow = anchorLocation[1], anchorBottomInWindow = anchorBottomInWindow)
         }
 
         // Called from the enter/exit animators' onUpdate, BEFORE the layout pass that
@@ -278,7 +280,7 @@ class NativeInputLayoutCoordinator(
             val parentLocation = IntArray(2).also { parent.getLocationInWindow(it) }
             val cardVisualTopInWindow = parentLocation[1] + params.topMargin + card.translationY.toInt()
             val cardVisualBottomInWindow = cardVisualTopInWindow + params.height
-            applyOffsetWithBottom(cardVisualBottomInWindow)
+            applyOffsetWithBottom(anchorTopInWindow = cardVisualTopInWindow, anchorBottomInWindow = cardVisualBottomInWindow)
         }
 
         widgetView.post { applyOffset() }

@@ -1384,7 +1384,7 @@
                 "key": "scan_trigger",
                 "description": "What triggered the scan run",
                 "type": "string",
-                "enum": ["onboarding", "profile_edit", "scheduled"]
+                "enum": ["onboarding", "onboarding_resume", "profile_edit", "scheduled"]
             },
             {
                 "key": "vpn_connection_state",
@@ -1480,7 +1480,7 @@
                 "key": "scan_trigger",
                 "description": "What triggered the scan run",
                 "type": "string",
-                "enum": ["onboarding", "profile_edit", "scheduled"]
+                "enum": ["onboarding", "onboarding_resume", "profile_edit", "scheduled"]
             },
             {
                 "key": "vpn_connection_state",
@@ -1564,7 +1564,7 @@
                 "key": "scan_trigger",
                 "description": "What triggered the scan run",
                 "type": "string",
-                "enum": ["onboarding", "profile_edit", "scheduled"]
+                "enum": ["onboarding", "onboarding_resume", "profile_edit", "scheduled"]
             },
             {
                 "key": "vpn_connection_state",
@@ -2183,12 +2183,12 @@
             {
                 "key": "context.name",
                 "description": "Entry point that triggered the manual PIR run",
-                "enum": ["funnel_pir_initial_android", "funnel_pir_edit_profile_android"]
+                "enum": ["funnel_pir_initial_android", "funnel_pir_edit_profile_android", "funnel_pir_initial_resume_android"]
             },
             {
                 "key": "feature.data.ext.execution_type",
-                "description": "Distinguishes between the user's first manual scan after onboarding and a re-scan triggered by editing a saved profile",
-                "enum": ["manual_initial", "manual_edit_profile"]
+                "description": "Distinguishes the user's first manual scan after onboarding (manual_initial), a dashboard-triggered resume of an interrupted initial scan (manual_initial_resume), and a re-scan triggered by editing a saved profile (manual_edit_profile)",
+                "enum": ["manual_initial", "manual_edit_profile", "manual_initial_resume"]
             },
             {
                 "key": "feature.data.ext.profile_queries_count",

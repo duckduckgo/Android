@@ -52,8 +52,6 @@ import com.duckduckgo.app.browser.logindetection.*
 import com.duckduckgo.app.browser.menu.BrowserMenuHighlightPlugin
 import com.duckduckgo.app.browser.pageloadpixel.PageLoadedPixelDao
 import com.duckduckgo.app.browser.pageloadpixel.firstpaint.PagePaintedPixelDao
-import com.duckduckgo.app.browser.session.WebViewSessionInMemoryStorage
-import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.browser.tabpreview.FileBasedWebViewPreviewGenerator
 import com.duckduckgo.app.browser.tabpreview.FileBasedWebViewPreviewPersister
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewGenerator
@@ -187,10 +185,6 @@ class BrowserModule {
             pixel = pixel,
         )
     }
-
-    @SingleInstanceIn(AppScope::class)
-    @Provides
-    fun webViewSessionStorage(): WebViewSessionStorage = WebViewSessionInMemoryStorage()
 
     @Provides
     fun clipboardManager(context: Context): ClipboardManager {

@@ -40,6 +40,7 @@ class DuckChatDailyPixelSender @Inject constructor(
     private val pixel: Pixel,
     private val duckChatInternal: DuckChatInternal,
     private val duckChatFeatureRepository: DuckChatFeatureRepository,
+    private val aiFeaturesStateReporter: AiFeaturesStateReporter,
     private val dispatcherProvider: DispatcherProvider,
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
 ) : MainProcessLifecycleObserver {
@@ -72,6 +73,8 @@ class DuckChatDailyPixelSender @Inject constructor(
                 parameters = mapOf(PixelParameter.IS_ENABLED to duckChatInternal.isAutomaticContextAttachmentEnabled().toString()),
                 type = Daily(),
             )
+
+            aiFeaturesStateReporter.reportDailyState()
         }
     }
 }

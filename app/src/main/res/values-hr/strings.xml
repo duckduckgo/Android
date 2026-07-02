@@ -868,6 +868,7 @@
     <string name="preOnboardingDaxDialog1TitleDuckAi" translatable="false"><![CDATA[Hi there.<br/><br/>Ready for a faster browser that protects you and lets you decide when and how to use AI?]]></string>
     <string name="preOnboardingDaxDialog1Button">Učinimo to!</string>
     <string name="preOnboardingDaxDialog1ButtonDuckAi" translatable="false">Let\&apos;s get started!</string>
+    <string name="preOnboardingDaxDialog1ButtonBrandDesign">Započnimo!</string>
     <string name="preOnboardingDaxDialog1SecondaryButton">Već sam bio ovdje</string>
     <string name="preOnboardingDaxDialog2Title">Zaštite su aktivirane!</string>
     <string name="preOnboardingDaxDialog2Button">Odaberi preglednik</string>
@@ -936,6 +937,7 @@
     <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[DuckDuckGo također nudi <b>neobaveznu plaćenu</b> pretplatu, sa sigurnim <b>VPN-om</b> i <b>naprednom, privatnom umjetnom</b> inteligencijom.]]></string>
     <string name="onboardingPrivacyProDaxDialogOkButton">Saznajte više</string>
     <string name="onboardingPrivacyProDaxDialogFreeTrialOkButton">Isprobaj besplatno!</string>
+    <string name="onboardingPrivacyProDaxDialogFreeTrialOkButtonBrandDesign">Isprobaj besplatno!</string>
     <string name="onboardingPrivacyProDaxDialogCancelButton">Preskoči</string>
     <string name="onboardingSkippedPrivacyProDaxDialogTitle">Jeste li znali?</string>
 
@@ -1070,6 +1072,42 @@
     <string name="onboardingStepIndicatorText" instruction="a counter above our instructions in onboarding that tells a user what step they are on">%1$d od %2$d</string>
     <string name="onboardingSearchDaxDialogOption1Quoted" instruction="translate &apos;duck&apos; too.">kako se kaže \"patka\" na engleskom</string>
     <string name="onboardingSearchDaxDialogOption1EnglishQuoted" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">kako se kaže \"patka\" na španjolskom</string>
+
+    <string name="onboardingDuckAiFireButtonDaxDialogTitle">To je Duck.ai!</string>
+    <string name="onboardingDuckAiFireButtonDaxDialogDescription"><![CDATA[Privatna AI čavrljanja koja možeš izbrisati u bilo kojem trenutku pomoću <b>Fire Buttona</b>. Pokušaj! 🔥]]></string>
+    <string name="onboardingDuckAiEndCtaTitle">Možeš ti to!</string>
+    <string name="onboardingDuckAiEndCtaDescription"><![CDATA[Koristi adresnu traku za pretraživanje i posjećivanje web-mjesta ili se prebaci na Duck.ai za privatno AI čavrljanje.<br/><br/>Duck.ai možeš koristiti na svakom mjestu na kojem je ikona za čavrljanje]]></string>
+    <string name="onboardingDuckAiEndCtaButton">Daj pet!</string>
+
+    <!-- Input Mode Demo Onboarding step -->
+    <string name="preOnboardingInputModeDemoTitle">Spreman za početak?&lt;br/&gt;Probaj pretraživanje ili AI čavrljanje!</string>
+    <string name="preOnboardingInputModeDemoSearchHint">Pretražuj privatno</string>
+    <string name="preOnboardingInputModeDemoChatHint">Privatno pitaj bilo što</string>
+    <string name="preOnboardingInputModeDemoChatSuggestion1">Objasni mi burzu kao da imam 10 godina</string>
+    <string name="preOnboardingInputModeDemoChatSuggestion2">Isplaniraj savršen dan u Londonu</string>
+    <string name="preOnboardingInputModeDemoChatSuggestion3">Iznenadi me!</string>
+    <string name="preOnboardingInputModeDemoChatSuggestion3Prompt">Navedi 10 zanimljivih činjenica iz znanosti, prirode i povijesti.</string>
+
+    <!-- Custom AI onboarding flow -->
+    <!-- Pre-onboarding: initial screens -->
+    <string name="preOnboardingWelcomeDialogBodyCustomAi">Spreman za privatno čavrljanje s ChatGPT-om, Claudeom i drugim umjetnim inteligencijama besplatno, u pregledniku koji te aktivno štiti?</string>
+    <string name="preOnboardingDaxDialog3TextCustomAi">Zapamti: Duck.ai možeš koristiti na svakom mjestu na kojem se nalazi ikona za čavrljanje</string>
+    <string name="preOnboardingDaxDialog3ButtonCustomAi">Pokreni AI čavrljanje</string>
+    <!-- Pre-onboarding: AI comparison chart screen. -->
+    <string name="preOnboardingDaxDialogAiTitle">AI zaštite aktivirane!</string>
+    <string name="preOnboardingAiComparisonChartPopularAis">Popularne umjetne inteligencije</string>
+    <string name="preOnboardingAiComparisonChartItem1">Sva su čavrljanja anonimizirana</string>
+    <string name="preOnboardingAiComparisonChartItem2">Za pristup svim AI značajkama nije potreban račun</string>
+    <string name="preOnboardingAiComparisonChartItem3">Nikad ne koristimo tvoja čavrljanja za obuku AI-ja</string>
+    <string name="preOnboardingAiComparisonChartItem4">Pristupi ChatGPT-u, Claudeu i još mnogo čemu, sve na jednom mjestu</string>
+    <string name="preOnboardingAiComparisonChartButton">Isprobaj Duck.ai!</string>
+    <!-- Pre-onboarding: input demo screen -->
+    <string name="preOnboardingInputModeDemoTitleCustomAi">Sada isprobaj svoje privatno AI čavrljanje!</string>
+    <!-- Pre-onboarding: browser comparison screen -->
+    <string name="preOnboardingDaxDialog2TitleCustomAi">Želiš li postaviti DuckDuckGo kao svoj zadani preglednik?</string>
+    <!-- In-context onboarding. -->
+    <string name="onboardingEndCustomAiFlowDaxDialogDescription"><![CDATA[Započni privatno AI čavrljanje uz Duck.ai ili prebaci na traženje za zaštićeno pregledavanje.<br/><br/>Duck.ai možeš koristiti na svakom mjestu na kojem je ikona za čavrljanje]]></string>
+    <string name="onboardingPrivacyProCustomAiFlowDaxDialogDescription">Također nudimo plaćenu pretplatu s naprednim AI modelima s većim količinama dopuštenog čavrljanja od GPT-a i Claudea, siguran VPN i još mnogo toga.</string>
 
     <string name="input_screen_user_pref_without_ai_updated">Samo pretraživanje</string>
     <string name="input_screen_user_pref_with_ai_updated">Prebacuj se između pretraživanja i Duck.ai</string>

@@ -28,4 +28,5 @@ android {
 dependencies {
     implementation KotlinX.coroutines.core
     implementation project(':common-utils')
+    implementation project(':browser-mode-api')
 }

@@ -51,6 +51,7 @@ import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import com.duckduckgo.history.api.NavigationHistory
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.site.permissions.api.SitePermissionsManager
+import com.duckduckgo.site.preferences.api.SitePreferencesDataClearer
 import com.duckduckgo.sync.api.DeviceSyncState
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Lazy
@@ -84,6 +85,7 @@ object PrivacyModule {
         webViewCapabilityChecker: WebViewCapabilityChecker,
         duckAiHostProvider: DuckAiHostProvider,
         siteDataCleaner: SiteDataCleaner,
+        sitePreferencesDataClearer: SitePreferencesDataClearer,
     ): ClearDataAction {
         // TODO: Burns currently only clear @RegularMode tabs. Cross-mode tab clearing will be
         // handled as part of the data-clearing fire-mode work.
@@ -107,6 +109,7 @@ object PrivacyModule {
             webViewCapabilityChecker,
             duckAiHostProvider,
             siteDataCleaner,
+            sitePreferencesDataClearer,
         )
     }
 

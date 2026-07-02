@@ -152,6 +152,7 @@ class PirInitialScanCompletionWideEventImpl @Inject constructor(
                 when (executionType) {
                     PirExecutionType.MANUAL_INITIAL,
                     PirExecutionType.MANUAL_EDIT_PROFILE,
+                    PirExecutionType.MANUAL_INITIAL_RESUME,
                     -> {
                         pirDataStore.initialScanCompletionForegroundRunCount += 1
                     }

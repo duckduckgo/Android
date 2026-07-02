@@ -37,6 +37,7 @@ class SubscriptionExpirationReminderSchedulerImplTest {
     private val workManager: WorkManager = mock()
     private val notificationManager: NotificationManagerCompat = mock()
     private val subscriptionsManager: SubscriptionsManager = mock()
+    private val reminderStore: SubscriptionExpirationReminderStore = mock()
 
     private lateinit var testee: SubscriptionExpirationReminderSchedulerImpl
 
@@ -46,6 +47,7 @@ class SubscriptionExpirationReminderSchedulerImplTest {
             workManager,
             notificationManager,
             subscriptionsManager,
+            reminderStore,
         )
     }
 
@@ -68,20 +70,22 @@ class SubscriptionExpirationReminderSchedulerImplTest {
     }
 
     @Test
-    fun whenAllConditionsMetThenNotificationScheduled() = runTest {
+    fun whenAllConditionsMetThenNotificationScheduledAndDaysBeforeCancelStored() = runTest {
         whenever(notificationManager.areNotificationsEnabled()).thenReturn(true)
         whenever(subscriptionsManager.getSubscription()).thenReturn(activeSubscriptionExpiringIn(days = 30))
 
         testee.scheduleReminderNotification(7)
 
+        verify(reminderStore).daysBeforeCancel = 7
         verify(workManager).enqueue(any<WorkRequest>())
     }
 
     @Test
-    fun whenCancelScheduledNotificationThenWorkCancelled() {
+    fun whenCancelScheduledNotificationThenWorkCancelledAndStoreCleared() {
         testee.cancelScheduledNotification()
 
         verify(workManager).cancelAllWorkByTag(SubscriptionExpirationReminderSchedulerImpl.EXPIRATION_REMINDER_WORK_TAG)
+        verify(reminderStore).daysBeforeCancel = null
     }
 
     private fun activeSubscriptionExpiringIn(days: Int): Subscription = Subscription(

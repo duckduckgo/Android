@@ -70,6 +70,7 @@ import com.duckduckgo.app.browser.mode.BrowserLaunchSource
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.browser.shortcut.ShortcutBuilder
+import com.duckduckgo.app.browser.state.ModeSwitchRecreateSignal
 import com.duckduckgo.app.browser.tabs.TabManager
 import com.duckduckgo.app.browser.tabs.TabManager.TabModel
 import com.duckduckgo.app.browser.tabs.adapter.TabPagerAdapter
@@ -206,6 +207,8 @@ open class BrowserActivity : DuckDuckGoActivity() {
     lateinit var appCoroutineScope: CoroutineScope
 
     @Inject lateinit var dispatcherProvider: DispatcherProvider
+
+    @Inject lateinit var modeSwitchRecreateSignal: ModeSwitchRecreateSignal
 
     @Inject
     lateinit var externalIntentProcessingState: ExternalIntentProcessingState
@@ -785,7 +788,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
                         clearOptions = clearOptions,
                     )
                     try {
-                        dataClearing.clearDataUsingManualFireOptions(shouldRestartIfRequired = true)
+                        dataClearing.clearDataUsingManualFireOptions(shouldRestartIfRequired = true, browserMode = currentBrowserMode)
                         dataClearingWideEvent.finishSuccess()
                     } catch (e: Exception) {
                         dataClearingWideEvent.finishFailure(e)
@@ -1342,6 +1345,11 @@ open class BrowserActivity : DuckDuckGoActivity() {
                 .flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED)
                 .collect { mode ->
                     if (mode != currentBrowserMode) {
+                        // Only needed on the old path: with recreateAwareLifecycle on,
+                        // the recreate's onOpen is suppressed so FirstScreenHandler never runs
+                        if (!androidBrowserConfigFeature.recreateAwareLifecycle().isEnabled()) {
+                            modeSwitchRecreateSignal.markPending()
+                        }
                         recreate()
                     }
                 }
@@ -1773,6 +1781,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
                 action.skipHome,
                 action.isExternal,
             )
+            is PendingAction.OpenExistingTab -> openExistingTab(action.tabId)
         }
     }
 
@@ -1831,6 +1840,9 @@ open class BrowserActivity : DuckDuckGoActivity() {
                 viewModel.onTabSelected(tabId)
             }
         }
+
+    fun openExistingTabInMode(mode: BrowserMode, tabId: String) =
+        switchModeThen(mode, PendingAction.OpenExistingTab(tabId))
 
     fun onEditModeChanged(isInEditMode: Boolean) {
         viewModel.onOmnibarEditModeChanged(isInEditMode)

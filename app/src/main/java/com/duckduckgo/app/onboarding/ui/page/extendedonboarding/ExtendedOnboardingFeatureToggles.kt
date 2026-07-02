@@ -31,9 +31,6 @@ interface ExtendedOnboardingFeatureToggles {
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun self(): Toggle
 
-    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
-    fun noBrowserCtas(): Toggle
-
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun privacyProCta(): Toggle
 
@@ -50,6 +47,6 @@ interface ExtendedOnboardingFeatureToggles {
     @Experiment
     fun freeTrialCopy(): Toggle
 
-    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun duckAiOnboarding(): Toggle
 }

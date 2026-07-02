@@ -95,6 +95,23 @@
     <string name="duckAiHideAiGeneratedImagesTitle">Piilota tekoälyn luomat kuvat</string>
     <string name="duckAiHideAiGeneratedImagesDescription">Suodattaa pois tekoälyn luomat kuvat kuvahaun tuloksista</string>
 
+    <!-- Search Assist Visibility -->
+    <string name="duckAiSearchAssistVisibilitySubtitle">Valitse, kuinka usein haluat tekoälyavusteisten vastausten näkyvän hauissasi.</string>
+    <string name="duckAiSearchAssistVisibilityNever">Ei koskaan</string>
+    <string name="duckAiSearchAssistVisibilityOnDemand">Pyynnöstä</string>
+    <string name="duckAiSearchAssistVisibilitySometimes">Joskus</string>
+    <string name="duckAiSearchAssistVisibilityOften">Usein</string>
+
+    <!-- Duck AI Use Without AI Settings Option -->
+    <string name="duckAiUseWithoutAiTitle">Käytä DuckDuckGo:ta ilman tekoälyä</string>
+    <string name="duckAiUseWithoutAiDescription">Poistaa Duck.ai:n käytöstä, piilottaa tekoälyavusteiset vastaukset haussa ja suodattaa tunnetut tekoälyroskapostisivustot kuvahaun tuloksista.</string>
+    <string name="duckAiUseWithoutAiDisabledDescription">Tekoäly on tällä hetkellä poistettu käytöstä selaimessa, joten et enää näe tekoälyavusteisia vastauksia ja näet vähemmän tekoälyn luomia kuvia kuvahaun tuloksissa.</string>
+
+    <!-- Duck AI Section in AI Feature Screen -->
+    <string name="input_screen_user_pref_toggle_between_search_and_ai">Vaihda haun ja Duck.ai:n välillä</string>
+    <string name="duckAiDialogHideAiGeneratedImagesTitle">Piilota tekoälyn luomat kuvat</string>
+    <string name="duckAiDialogHideAiGeneratedImagesDescription">Suodattaa pois tunnetut tekoälyroskapostisivustot kuvahaun tuloksista. <annotation link="learn_more">Lue lisää</annotation></string>
+
     <!-- Duck AI Paid Settings -->
     <string name="duck_ai_paid_settings_enable_in_settings">Ota käyttöön tekoälyominaisuuksien asetuksissa</string>
     <string name="duck_ai_paid_settings_manage_in_settings">Hallinnoi tekoälyominaisuuksien asetuksissa</string>
@@ -105,6 +122,13 @@
     <string name="duckAIContextualAutomaticContextTitle">Lähetä sivun sisältö automaattisesti</string>
     <string name="duckAIContextualAutomaticContextMessage">Lähetä sivun sisältö automaattisesti Duck.ai:lle</string>
     <string name="duckAIContextualAttachPageContent">Liitä sivun sisältö</string>
+
+    <!-- Contextual sheet quick action -->
+    <string name="duckAIContextualPromptAskAboutPage">Kysy sivusta</string>
+
+    <!-- Contextual sheet input hint (contextualSheetImprovements flag) -->
+    <string name="contextualSheetImprovedHint">Kysy mitä tahansa yksityisesti</string>
+    <string name="contextualSheetChatsPopupRecentSection" instruction="Section header above the list of recent Duck.ai chats in the contextual sheet overflow menu.">Viimeaikaiset keskustelut</string>
 
     <!-- duck.ai contextual fire button -->
     <string name="duckAIContextualFireButtonContentDescription">Tyhjennä keskustelu</string>
@@ -125,6 +149,12 @@
 
     <!-- Duck AI Chat Suggestions -->
     <string name="duckAiChatHistoryViewAllChats">Näytä kaikki keskustelut</string>
+
+    <!-- Duck.ai onboarding end CTA -->
+    <string name="duckAiEndCtaTitle">Hyvin menee!</string>
+    <string name="duckAiEndCtaDescription"><![CDATA[Hae sivustoja ja vieraile niillä osoiteriviltä tai aloita yksityinen tekoälykeskustelu siirtymällä Duck.ai:hin.<br/><br/>Voit käyttää Duck.ai:ta mistä tahansa, missä näet chat-kuvakkeen]]></string>
+    <string name="duckAiEndCtaButton">Ylävitonen!</string>
+    <string name="duckAiEndCtaDescriptionCustomAi"><![CDATA[Aloita yksityinen tekoälykeskustelu Duck.ai:n kanssa tai siirry suojatun selaamisen hakuun.<br/><br/>Voit käyttää Duck.ai:ta mistä tahansa, missä näet chat-kuvakkeen]]></string>
 
     <!-- Native Duck.ai chat history -->
     <string name="duck_ai_chat_history_title">Keskustelut</string>

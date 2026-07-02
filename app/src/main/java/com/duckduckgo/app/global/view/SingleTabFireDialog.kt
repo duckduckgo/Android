@@ -398,6 +398,8 @@ class SingleTabFireDialog : BottomSheetDialogFragment(), FireDialog {
             canFinish = true
             if (event is ClearAllEvent.ClearingFinished) {
                 binding.fireAnimationView.addAnimatorUpdateListener(accelerateAnimatorUpdateListener)
+            } else {
+                binding.clearingProgressIndicator.show()
             }
         } else {
             if (viewModel.shouldRestartAfterClearing) {

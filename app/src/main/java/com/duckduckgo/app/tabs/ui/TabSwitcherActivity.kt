@@ -252,6 +252,7 @@ class TabSwitcherActivity :
     private var fadingOutForRecreate = false
     private var fadingInAfterRecreate = false
     private var fadeInAnimationStarted = false
+    private var switchedModeFromDrag = false
 
     private var lastSnackbar: DefaultSnackbar? = null
 
@@ -295,6 +296,7 @@ class TabSwitcherActivity :
         setContentView(binding.root)
 
         fadingInAfterRecreate = savedInstanceState?.getBoolean(KEY_FADE_IN_AFTER_RECREATE) == true
+        switchedModeFromDrag = savedInstanceState?.getBoolean(KEY_MODE_SWITCH_FROM_DRAG) == true
 
         tabsAdapter.setAnimationTileCloseClickListener {
             viewModel.onTrackerAnimationInfoPanelClicked()
@@ -320,6 +322,23 @@ class TabSwitcherActivity :
         super.onSaveInstanceState(outState)
         if (fadingOutForRecreate) {
             outState.putBoolean(KEY_FADE_IN_AFTER_RECREATE, true)
+            outState.putBoolean(KEY_MODE_SWITCH_FROM_DRAG, switchedModeFromDrag)
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        // Safety net: a recreate()/animation race must never leave the tabs recycler permanently hidden.
+        // If we're "fading in" but no fade-in is running and tabs exist, force it back to visible.
+        val hasTabs = tabsAdapter.itemCount > 0
+        val recyclerNotVisible = tabsRecycler.visibility != View.VISIBLE || tabsRecycler.alpha < 1f
+        if (fadingInAfterRecreate && !fadeInAnimationStarted && hasTabs && recyclerNotVisible) {
+            fadingInAfterRecreate = false
+            tabsRecycler.animate().cancel()
+            tabsRecycler.alpha = 1f
+            tabsRecycler.show()
+            tabsRecycler.itemAnimator = DefaultItemAnimator()
         }
     }
 
@@ -483,11 +502,11 @@ class TabSwitcherActivity :
                 Gravity.START or Gravity.CENTER_VERTICAL,
             ),
         )
-        toggle.setOnModeChangedListener { mode ->
-            fadeOutTabsThenRecreate(mode)
+        toggle.setOnModeChangedListener { mode, fromDrag ->
+            fadeOutTabsThenRecreate(mode, fromDrag = fromDrag)
         }
 
-        if (fadingInAfterRecreate) {
+        if (fadingInAfterRecreate && !switchedModeFromDrag) {
             val previousMode = when (currentBrowserMode) {
                 BrowserMode.FIRE -> BrowserMode.REGULAR
                 BrowserMode.REGULAR -> BrowserMode.FIRE
@@ -502,9 +521,17 @@ class TabSwitcherActivity :
         updateToolbarTitle(state.mode, state.tabs.size)
     }
 
-    private fun fadeOutTabsThenRecreate(newMode: BrowserMode) {
+    private fun fadeOutTabsThenRecreate(
+        newMode: BrowserMode,
+        fromUser: Boolean = true,
+        fromDrag: Boolean = false,
+    ) {
         if (fadingOutForRecreate) return
+        // Ignore user taps while the previous switch is still settling on the recreated activity, so we don't
+        // stack recreate()/overlapping fades (which freezes the UI). Programmatic switches are mandatory and bypass.
+        if (fromUser && fadingInAfterRecreate) return
         fadingOutForRecreate = true
+        switchedModeFromDrag = fromDrag
 
         // In the Fire tabs empty state the recycler is hidden and empty, so there is nothing to
         // fade out. Animate nothing and just switch mode and recreate immediately; the recreated
@@ -582,6 +609,14 @@ class TabSwitcherActivity :
                 if (it.showFireTabsEmptyState && !fadingOutForRecreate) {
                     binding.fireTabsEmptyState.root.show()
                     tabsRecycler.gone()
+
+                    // No fade-in runs in the empty state, so settle the post-recreate flags here; otherwise
+                    // fadingInAfterRecreate stays true forever and the mode toggle (guarded on it) is stuck disabled.
+                    if (fadingInAfterRecreate) {
+                        fadingInAfterRecreate = false
+                        fadeInAnimationStarted = false
+                        tabsRecycler.itemAnimator = DefaultItemAnimator()
+                    }
                 } else {
                     binding.fireTabsEmptyState.root.gone()
 
@@ -811,7 +846,7 @@ class TabSwitcherActivity :
             DismissAnimatedTileDismissalDialog -> tabSwitcherAnimationTileRemovalDialog!!.dismiss()
             Command.ShowFireBottomSheet -> onFireButtonClicked()
             Command.DismissSnackbar -> lastSnackbar?.dismiss()
-            Command.SwitchToRegularMode -> fadeOutTabsThenRecreate(BrowserMode.REGULAR)
+            Command.SwitchToRegularMode -> fadeOutTabsThenRecreate(BrowserMode.REGULAR, fromUser = false)
         }
     }
 
@@ -1172,5 +1207,6 @@ class TabSwitcherActivity :
 
         private const val ANCHOR_REPIN_WINDOW_MS = 1000L
         private const val KEY_FADE_IN_AFTER_RECREATE = "fadeInAfterModeSwitchRecreate"
+        private const val KEY_MODE_SWITCH_FROM_DRAG = "modeSwitchFromDrag"
     }
 }

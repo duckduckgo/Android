@@ -48,6 +48,7 @@ import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.api.InputMode
+import com.duckduckgo.duckchat.api.NativeInputEventListener
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState.InteractionLock
 import com.duckduckgo.duckchat.api.toChatIdOrNull
 import com.duckduckgo.duckchat.impl.ui.nativeinput.views.NativeInputWidget
@@ -79,6 +80,7 @@ class NativeInputCallbacks(
     val onDuckAiQuerySubmitted: (query: String) -> Unit = {},
     /** User picked a model in the native picker (→ submitChangeModelAction). */
     val onChangeModelSubmitted: (modelId: String) -> Unit = {},
+    val onCustomizeResponsesClicked: () -> Unit = {},
     val onChatUrlSuggestionClicked: (AutoCompleteSuggestion) -> Unit = {},
     val onChatHistoryShortcutClicked: () -> Unit = {},
     val onClearAutocomplete: () -> Unit,
@@ -131,6 +133,9 @@ interface NativeInputManager {
 
     /** Show pulse animation around the Duck.ai fire button. */
     fun setDuckAiFireButtonHighlighted(highlighted: Boolean)
+
+    /** Hide/show the subscription-tier indicator in the Duck.ai header (hidden during the onboarding lock). */
+    fun setDuckAiTierVisible(visible: Boolean)
 }
 
 @ContributesBinding(FragmentScope::class)
@@ -143,11 +148,13 @@ class RealNativeInputManager @Inject constructor(
     private val duckAiFeatureState: DuckAiFeatureState,
     private val pixel: Pixel,
     private val nativeInputStateBugKillSwitch: NativeInputStateBugKillSwitch,
+    private val nativeInputEventListener: NativeInputEventListener,
 ) : NativeInputManager {
     private lateinit var omnibarController: NativeInputOmnibarController
     private lateinit var rootView: ViewGroup
     private lateinit var layoutCoordinator: NativeInputLayoutCoordinator
     private var isNativeInputFieldEnabled: Boolean = false
+    private var isNativeChatInputEnabled: Boolean = false
     private var isExiting: Boolean = false
     private var isPickingImage: Boolean = false
     private var duckAiToolbarHidden: Boolean = false
@@ -175,6 +182,19 @@ class RealNativeInputManager @Inject constructor(
             .onEach { isEnabled ->
                 if (isNativeInputFieldEnabled && !isEnabled) onDisabled()
                 isNativeInputFieldEnabled = isEnabled
+            }
+            .launchIn(lifecycleOwner.lifecycleScope)
+        duckChat.observeNativeChatInputEnabled()
+            .onEach { isEnabled ->
+                val wasEnabled = isNativeChatInputEnabled
+                isNativeChatInputEnabled = isEnabled
+                // If the flag turns off while Duck.ai is showing the native widget, tear it down so
+                // Duck.ai's own web input is the only input — otherwise the two overlap. Go through
+                // hideNativeInput (not a bare removeWidget) so the omnibar overlay chrome that
+                // showNativeInput set up — forceToTop, hidden content — is restored too.
+                if (wasEnabled && !isEnabled && omnibarController.isDuckAiMode()) {
+                    hideNativeInput(animate = false)
+                }
             }
             .launchIn(lifecycleOwner.lifecycleScope)
     }
@@ -253,12 +273,6 @@ class RealNativeInputManager @Inject constructor(
         val isBottom = widgetFrom(widgetView)?.isWidgetBottom() ?: false
         isExiting = true
         if (!omnibarController.isDuckAiMode() && card != null && omnibarCard != null && omnibarCard.width > 0) {
-            if (isBottom) {
-                // Bottom omnibar: trigger IME hide synchronously so the activity resizes
-                // (adjustResize), letting the bottom-anchored widgetView descend to its
-                // post-IME-hide layout position before the exit animation captures its snapshot.
-                widgetFrom(widgetView)?.hideKeyboard()
-            }
             layoutCoordinator.setWidgetAnimating(true)
             animator.animateExit(
                 widgetCard = card,
@@ -344,9 +358,14 @@ class RealNativeInputManager @Inject constructor(
                 omnibarController.hideBackground()
                 duckAiToolbarHidden = false
             }
-            updateWidgetFocus(widget)
+            if (!isExternalKeyboardConnected()) {
+                updateWidgetFocus(widget)
+            }
         }
     }
+
+    private fun isExternalKeyboardConnected(): Boolean =
+        rootView.resources.configuration.keyboard != Configuration.KEYBOARD_NOKEYS
 
     private fun isLandscape(): Boolean =
         rootView.resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
@@ -384,6 +403,13 @@ class RealNativeInputManager @Inject constructor(
         initialInputMode: InputMode?,
     ) {
         if (!isNativeInputFieldEnabled) return
+
+        // When native chat input is disabled, Duck.ai renders its own web input — don't overlay
+        // the native widget. Remove any widget left over from a previous (non-Duck.ai) state.
+        if (omnibarController.isDuckAiMode() && !isNativeChatInputEnabled) {
+            removeWidget()
+            return
+        }
 
         if (omnibarController.isDuckAiMode() && rootView.findViewById<View?>(R.id.inputModeWidget) != null) return
 
@@ -433,6 +459,8 @@ class RealNativeInputManager @Inject constructor(
         } else {
             showNtp()
         }
+        val landscape = rootView.resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
+        nativeInputEventListener.onNativeInputShown(landscape = landscape)
     }
 
     private fun bindSearchCallbacks(
@@ -450,6 +478,7 @@ class RealNativeInputManager @Inject constructor(
         widget.bindInputEvents(
             onSearchTextChanged = onSearchTextChanged,
             onSearchSubmitted = { query ->
+                nativeInputEventListener.onSearchSubmitted(query)
                 hideNativeInput(isNavigation = true)
                 callbacks.onSearchSubmitted(query)
             },
@@ -462,7 +491,6 @@ class RealNativeInputManager @Inject constructor(
                     val filesJson = widget.getFileAttachmentsJson()
                     widget.text = ""
                     widget.clearAttachments()
-                    widget.hideKeyboard()
                     callbacks.onDuckAiChatSubmitted(
                         query,
                         widget.getSelectedModelId(),
@@ -473,6 +501,7 @@ class RealNativeInputManager @Inject constructor(
                     )
                     widget.clearSelectedTool()
                     widget.onPromptSubmitted()
+                    nativeInputEventListener.onChatPromptSubmitted()
                 } else if (queryUrlPredictor.isUrl(query)) {
                     // Not in a Duck.ai chat (e.g. on the NTP with the Duck.ai toggle selected): a
                     // URL is an address, so navigate to it exactly like Search mode rather than
@@ -498,6 +527,7 @@ class RealNativeInputManager @Inject constructor(
                         hideNtp()
                     }
                     isExiting = false
+                    nativeInputEventListener.onChatPromptSubmitted()
                     callbacks.onDuckAiQuerySubmitted(query)
                 }
             },
@@ -510,7 +540,6 @@ class RealNativeInputManager @Inject constructor(
             // target so the hide sticks. In SEARCH_AND_DUCK_AI the field has already lost focus, so
             // this is a no-op there.
             widget.clearInputFocus()
-            widget.hideKeyboard()
             hideNativeInput()
         }
         val previousOnChatSelected = widget.onChatSelected
@@ -580,6 +609,7 @@ class RealNativeInputManager @Inject constructor(
         widgetFrom(widgetView)?.apply {
             onStopTapped = callbacks.onStopTapped
             onFireButtonTapped = callbacks.onFireButtonPressed
+            onCustomizeResponsesClicked = callbacks.onCustomizeResponsesClicked
             bindTabCount(lifecycleOwner, tabs.map { it.size })
             hideMainButtons()
             onAttachmentChooserStateChanged = { showing -> isPickingImage = showing }
@@ -719,6 +749,10 @@ class RealNativeInputManager @Inject constructor(
         duckAiFireButtonHighlightSource.value = highlighted
     }
 
+    override fun setDuckAiTierVisible(visible: Boolean) {
+        if (::omnibarController.isInitialized) omnibarController.setTierVisible(visible)
+    }
+
     private fun suppressShadow(view: View) {
         view.outlineProvider = object : ViewOutlineProvider() {
             override fun getOutline(v: View, outline: Outline) {
@@ -775,13 +809,7 @@ class RealNativeInputManager @Inject constructor(
                 layoutCoordinator.setWidgetAnimating(false)
                 widgetFrom(widgetView)?.let { widget ->
                     widget.endEnterAnimationPreview()
-                    // Symmetric teardown for bottom mode: beginEnterAnimationPreview's
-                    // showKeyboard() requested focus + raised the IME. onEnterComplete is what
-                    // "owns" the focused state on success, so on cancel we undo it here —
-                    // otherwise the widget is left half-entered (focused, IME up) without the
-                    // animation having completed.
                     if (widget.isWidgetBottom()) {
-                        widget.hideKeyboard()
                         widget.clearInputFocus()
                     }
                 }
