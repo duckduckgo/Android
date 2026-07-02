@@ -37,6 +37,16 @@
             app:srcCompat="@drawable/logo_full"
             android:visibility="gone" />
 
+        <ImageView
+            android:id="@+id/focusedFireLogo"
+            android:layout_width="96dp"
+            android:layout_height="96dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="@dimen/homeTabDdgLogoTopMargin"
+            android:importantForAccessibility="no"
+            android:src="@drawable/ic_fire_tab_placeholder_96"
+            android:visibility="gone" />
+
         <com.duckduckgo.savedsites.impl.newtab.FavouritesNewTabSectionView
             android:id="@+id/focusedFavourites"
             android:layout_width="match_parent"

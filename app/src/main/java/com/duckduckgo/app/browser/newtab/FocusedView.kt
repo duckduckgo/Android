@@ -45,8 +45,11 @@ class FocusedView @JvmOverloads constructor(
         }
     }
 
-    fun showLogo(show: Boolean) {
-        binding.focusedLogo.isVisible = show
+    fun showLogo(show: Boolean, isFireMode: Boolean) {
+        // In Fire mode show the Fire tab visual instead of the Dax logo so the user can tell they
+        // are in Fire mode while the omnibar is focused on the New Tab Page.
+        binding.focusedLogo.isVisible = show && !isFireMode
+        binding.focusedFireLogo.isVisible = show && isFireMode
         binding.focusedFavourites.isVisible = !show
     }
 }
