@@ -21,6 +21,7 @@ import androidx.work.WorkManager
 import androidx.work.WorkRequest
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
+import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.repository.Subscription
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
@@ -38,6 +39,7 @@ class SubscriptionExpirationReminderSchedulerImplTest {
     private val notificationManager: NotificationManagerCompat = mock()
     private val subscriptionsManager: SubscriptionsManager = mock()
     private val reminderStore: SubscriptionExpirationReminderStore = mock()
+    private val pixelSender: SubscriptionPixelSender = mock()
 
     private lateinit var testee: SubscriptionExpirationReminderSchedulerImpl
 
@@ -48,6 +50,7 @@ class SubscriptionExpirationReminderSchedulerImplTest {
             notificationManager,
             subscriptionsManager,
             reminderStore,
+            pixelSender,
         )
     }
 
@@ -78,6 +81,29 @@ class SubscriptionExpirationReminderSchedulerImplTest {
 
         verify(reminderStore).daysBeforeCancel = 7
         verify(workManager).enqueue(any<WorkRequest>())
+    }
+
+    @Test
+    fun whenNotificationScheduledThenScheduledPixelFired() = runTest {
+        whenever(notificationManager.areNotificationsEnabled()).thenReturn(true)
+        whenever(subscriptionsManager.getSubscription()).thenReturn(activeSubscriptionExpiringIn(days = 30))
+
+        testee.scheduleReminderNotification(7)
+
+        verify(pixelSender).reportExpirationReminderScheduled()
+        verify(pixelSender, never()).reportExpirationReminderSchedulingError()
+    }
+
+    @Test
+    fun whenSchedulingFailsThenSchedulingErrorPixelFired() = runTest {
+        whenever(notificationManager.areNotificationsEnabled()).thenReturn(true)
+        whenever(subscriptionsManager.getSubscription()).thenReturn(activeSubscriptionExpiringIn(days = 30))
+        whenever(workManager.enqueue(any<WorkRequest>())).thenThrow(RuntimeException("boom"))
+
+        testee.scheduleReminderNotification(7)
+
+        verify(pixelSender).reportExpirationReminderSchedulingError()
+        verify(pixelSender, never()).reportExpirationReminderScheduled()
     }
 
     @Test

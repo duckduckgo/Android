@@ -316,6 +316,31 @@ enum class SubscriptionPixel(
         includedParameters = setOf(APP_VERSION),
         enqueue = true,
     ),
+
+    SUBSCRIPTION_EXPIRATION_REMINDER_SCHEDULED(
+        baseName = "m_subscription_expiration_reminder_scheduled",
+        type = Count,
+        withSuffix = false,
+        includedParameters = setOf(APP_VERSION),
+    ),
+    SUBSCRIPTION_EXPIRATION_REMINDER_SCHEDULING_ERROR(
+        baseName = "m_subscription_expiration_reminder_scheduling_error",
+        type = Count,
+        withSuffix = false,
+        includedParameters = setOf(APP_VERSION),
+    ),
+    SUBSCRIPTION_EXPIRATION_REMINDER_NOT_FIRED_INACTIVE_SUBSCRIPTION(
+        baseName = "m_subscription_expiration_reminder_not_fired_inactive_subscription",
+        type = Count,
+        withSuffix = false,
+        includedParameters = setOf(APP_VERSION),
+    ),
+    SUBSCRIPTION_EXPIRATION_REMINDER_NOT_FIRED_PERMISSIONS_REJECTED(
+        baseName = "m_subscription_expiration_reminder_not_fired_permissions_rejected",
+        type = Count,
+        withSuffix = false,
+        includedParameters = setOf(APP_VERSION),
+    ),
     ;
 
     constructor(

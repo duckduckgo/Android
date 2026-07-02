@@ -152,5 +152,33 @@
         "triggers": ["other"],
         "suffixes": ["daily_count_short", "form_factor"],
         "parameters": ["appVersion"]
+    },
+    "m_subscription_expiration_reminder_scheduled": {
+        "description": "Fired when the subscription expiration reminder local notification is successfully scheduled after a purchase.",
+        "owners": ["nalcalag"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_subscription_expiration_reminder_scheduling_error": {
+        "description": "Fired when scheduling the subscription expiration reminder local notification fails with an error.",
+        "owners": ["nalcalag"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_subscription_expiration_reminder_not_fired_inactive_subscription": {
+        "description": "Fired when the scheduled subscription expiration reminder notification is not shown because the subscription is no longer active.",
+        "owners": ["nalcalag"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_subscription_expiration_reminder_not_fired_permissions_rejected": {
+        "description": "Fired when the scheduled subscription expiration reminder notification is not shown because notification permissions are disabled.",
+        "owners": ["nalcalag"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
     }
 }
