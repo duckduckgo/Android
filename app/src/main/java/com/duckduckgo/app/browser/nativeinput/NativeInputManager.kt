@@ -92,6 +92,11 @@ class NativeInputCallbacks(
     val onVoiceSearchPressed: (isChatTab: Boolean) -> Unit = {},
     val onCameraCaptureRequested: (ValueCallback<Array<Uri>>) -> Unit = {},
     val onFilePickerRequested: (ValueCallback<Array<Uri>>, List<String>) -> Unit = { _, _ -> },
+    /**
+     * Restore the autocomplete view state from the always-on cache the viewmodel keeps for
+     * the omnibar's text. Returns true when the cache matched [forQuery] and was applied;
+     * the caller uses the return value to decide whether to re-show the suggestions list.
+     */
     val restoreOmnibarAutocomplete: (forQuery: String) -> Boolean = { _ -> false },
     val onContextualSheetRequested: () -> Unit = {},
 )

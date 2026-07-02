@@ -24,6 +24,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteResult
 import com.duckduckgo.browser.ui.autocomplete.BrowserAutoCompleteSuggestionsAdapter
 import com.duckduckgo.common.utils.plugins.ActivePluginPoint
+import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChatInputModeState
 import com.duckduckgo.duckchat.api.InputMode
 import com.duckduckgo.duckchat.api.inputscreen.NativeInputChatTabItem
@@ -56,11 +57,13 @@ import java.time.LocalDateTime
 class NativeInputChatSuggestionsBinderTest {
     private val inputScreenConfigResolver: InputScreenConfigResolver = mock()
     private val duckChatFeature = FakeFeatureToggleFactory.create(DuckChatFeature::class.java)
+    private val duckAiFeatureState: DuckAiFeatureState = mock()
     private lateinit var binder: NativeInputChatSuggestionsBinder
 
     @Before
     fun setUp() {
         whenever(inputScreenConfigResolver.useTopBar()).thenReturn(false)
+        whenever(duckAiFeatureState.showClearDuckAIChatHistory).thenReturn(MutableStateFlow(true))
         binder = binderWith()
     }
 
@@ -338,6 +341,7 @@ class NativeInputChatSuggestionsBinderTest {
             },
             inputModeState,
             duckChatFeature,
+            duckAiFeatureState,
         )
 
     private fun createBinding(): NativeInputChatSuggestionsBinder.Binding =
