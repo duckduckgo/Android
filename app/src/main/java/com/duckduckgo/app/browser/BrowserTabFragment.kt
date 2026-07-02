@@ -5983,8 +5983,7 @@ class BrowserTabFragment :
         }
 
         private fun showFocusedView(hasFavorites: Boolean = true) {
-            binding.focusedView.show()
-            binding.focusedView.showLogo(show = !hasFavorites, isFireMode = browserMode == BrowserMode.FIRE)
+            binding.focusedView.show(isLogoVisible = !hasFavorites, browserMode)
         }
 
         private fun hideFocusedView() {

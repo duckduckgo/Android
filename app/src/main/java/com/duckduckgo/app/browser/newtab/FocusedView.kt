@@ -22,6 +22,8 @@ import android.widget.LinearLayout
 import androidx.core.view.isVisible
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.databinding.ViewFocusedViewBinding
+import com.duckduckgo.browsermode.api.BrowserMode
+import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ViewScope
 
@@ -45,11 +47,11 @@ class FocusedView @JvmOverloads constructor(
         }
     }
 
-    fun showLogo(show: Boolean, isFireMode: Boolean) {
-        // In Fire mode show the Fire tab visual instead of the Dax logo so the user can tell they
-        // are in Fire mode while the omnibar is focused on the New Tab Page.
-        binding.focusedLogo.isVisible = show && !isFireMode
-        binding.focusedFireLogo.isVisible = show && isFireMode
-        binding.focusedFavourites.isVisible = !show
+    fun show(isLogoVisible: Boolean, browserMode: BrowserMode) {
+        binding.focusedLogo.isVisible = isLogoVisible && browserMode == BrowserMode.REGULAR
+        binding.focusedFireEmptyState.root.isVisible = isLogoVisible &&
+                browserMode == BrowserMode.FIRE
+        binding.focusedFavourites.isVisible = !isLogoVisible
+        this.show()
     }
 }
