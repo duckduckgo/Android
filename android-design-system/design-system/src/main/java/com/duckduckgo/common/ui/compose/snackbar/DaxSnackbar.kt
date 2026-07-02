@@ -152,6 +152,16 @@ private fun DaxSnackbarWithActionPreview() {
 
 @PreviewLightDark
 @Composable
+private fun DaxSnackbarShortMessagePreview() {
+    PreviewBox {
+        DaxSnackbar(
+            message = "Fireproofing removed.",
+        )
+    }
+}
+
+@PreviewLightDark
+@Composable
 private fun DaxSnackbarLongMessagePreview() {
     PreviewBox {
         DaxSnackbar(
