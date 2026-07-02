@@ -24,6 +24,8 @@ import com.duckduckgo.duckchat.impl.models.ChatType
 import com.duckduckgo.duckchat.impl.models.toChatType
 import com.duckduckgo.duckchat.store.impl.DuckAiChat
 import com.duckduckgo.duckchat.store.impl.DuckAiChatStore
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
@@ -36,12 +38,17 @@ class ChatSuggestionsNativeReader @Inject constructor(
     private val duckChatFeature: DuckChatFeature,
 ) : ChatSuggestionsReader {
 
-    override suspend fun fetchSuggestions(query: String): List<ChatSuggestion> {
+    override suspend fun fetchSuggestions(query: String): List<ChatSuggestion> = toSuggestions(store.getChats(), query)
+
+    override fun observeSuggestions(query: String): Flow<List<ChatSuggestion>> =
+        store.getChatsFlow().map { chats -> toSuggestions(chats, query) }
+
+    private fun toSuggestions(chats: List<DuckAiChat>, query: String): List<ChatSuggestion> {
         val maxSuggestions = feature.maxHistoryCount()
         val recentCutoff = LocalDateTime.now().minusDays(RECENT_DAYS_CUTOFF).toLocalDate().atStartOfDay()
         val typeIconEnabled = duckChatFeature.chatSuggestionTypeIcon().isEnabled()
 
-        return store.getChats()
+        return chats
             .filter { chat ->
                 if (query.isEmpty()) {
                     chat.pinned || parseLastEdit(chat.lastEdit) >= recentCutoff

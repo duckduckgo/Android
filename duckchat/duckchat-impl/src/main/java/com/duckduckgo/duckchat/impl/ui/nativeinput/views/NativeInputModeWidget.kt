@@ -1395,21 +1395,21 @@ class NativeInputModeWidget @JvmOverloads constructor(
     ) {
         chatSuggestionsJob?.cancel()
         chatSuggestionsJob = lifecycleOwner.lifecycleScope.launch {
-            val result = viewModel.fetchChatTabSuggestions(query, chatSuggestionsUserEnabled)
-            // Defer the adapter swap until the chat history arrives, so the RecyclerView
-            // lays out from position 0 with chat history on top and avoids repositioning.
-            binding.submit(
-                suggestions = result,
-                query = query,
-                isHistoryAvailable = viewModel.isHistoryAvailable.value,
-                onCommit = { hasContent ->
-                    if (hasContent) {
-                        onShowSuggestions?.invoke(binding.adapter)
-                    } else {
-                        onClearSuggestions?.invoke(true)
-                    }
-                },
-            )
+            viewModel.chatTabSuggestions(query, chatSuggestionsUserEnabled)
+                .collect { result ->
+                    binding.submit(
+                        suggestions = result,
+                        query = query,
+                        isHistoryAvailable = viewModel.isHistoryAvailable.value,
+                        onCommit = { hasContent ->
+                            if (hasContent) {
+                                onShowSuggestions?.invoke(binding.adapter)
+                            } else {
+                                onClearSuggestions?.invoke(true)
+                            }
+                        },
+                    )
+                }
         }
     }
 

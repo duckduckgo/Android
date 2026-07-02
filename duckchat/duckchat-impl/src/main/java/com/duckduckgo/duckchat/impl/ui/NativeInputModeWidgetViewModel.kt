@@ -63,21 +63,23 @@ import com.duckduckgo.subscriptions.api.Subscriptions
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.async
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -251,7 +253,10 @@ class NativeInputModeWidgetViewModel @Inject constructor(
     fun fireKeyboardGoPressed(isSearchMode: Boolean) = duckChatPixels.fireOmnibarKeyboardGoPressed(isSearchMode)
     fun fireFloatingSubmitPressed(isSearchMode: Boolean) = duckChatPixels.fireOmnibarFloatingSubmitPressed(isSearchMode)
     fun fireFloatingReturnPressed() = duckChatPixels.fireOmnibarFloatingReturnPressed()
-    fun fireModeSwitched(directionToSearch: Boolean, hadText: Boolean) = duckChatPixels.fireOmnibarModeSwitched(directionToSearch, hadText)
+    fun fireModeSwitched(
+        directionToSearch: Boolean,
+        hadText: Boolean,
+    ) = duckChatPixels.fireOmnibarModeSwitched(directionToSearch, hadText)
 
     private data class WidgetConfig(
         val inputContext: NativeInputState.InputContext = NativeInputState.InputContext.BROWSER,
@@ -456,7 +461,10 @@ class NativeInputModeWidgetViewModel @Inject constructor(
         applyChatId(tabId, chatId)
     }
 
-    private fun applyChatId(tabId: String, chatId: String?) {
+    private fun applyChatId(
+        tabId: String,
+        chatId: String?,
+    ) {
         nativeInputStatePublisher.update(tabId) { current ->
             // Reset submitEnabled to true if we changed chats.
             // Always end the model-change window since it's per-visit.
@@ -471,7 +479,11 @@ class NativeInputModeWidgetViewModel @Inject constructor(
         }
     }
 
-    fun configure(tabId: String, isDuckAiMode: Boolean, isBottom: Boolean) {
+    fun configure(
+        tabId: String,
+        isDuckAiMode: Boolean,
+        isBottom: Boolean,
+    ) {
         activeTabId.value = tabId
         val context = if (isDuckAiMode) NativeInputState.InputContext.DUCK_AI else NativeInputState.InputContext.BROWSER
         val position = if (isBottom) NativeInputState.InputPosition.BOTTOM else NativeInputState.InputPosition.TOP
@@ -518,46 +530,44 @@ class NativeInputModeWidgetViewModel @Inject constructor(
         lastChatUrlSuggestions = emptyList()
     }
 
-    suspend fun fetchChatTabSuggestions(
+    fun chatTabSuggestions(
         query: String,
         chatSuggestionsEnabled: Boolean,
-    ): ChatTabSuggestions = coroutineScope {
-        val chatHistoryDeferred = async {
+    ): Flow<ChatTabSuggestions> {
+        val chatHistoryFlow = (
             if (chatSuggestionsEnabled) {
-                runCatching { chatSuggestionsReader.fetchSuggestions(query) }.getOrDefault(emptyList())
+                chatSuggestionsReader.observeSuggestions(query).catch { emit(emptyList()) }
             } else {
-                emptyList()
+                flowOf(emptyList())
+            }
+            ).onEach { chatHistory ->
+            if (query.isEmpty()) {
+                lastEmptyQueryHadChats = chatHistory.isNotEmpty()
             }
         }
-        val urlSuggestionsDeferred = async(dispatchers.io()) {
-            if (autoCompleteSettings.autoCompleteSuggestionsEnabled && query.isNotEmpty()) {
-                runCatching {
-                    val raw = autoComplete.autoComplete(query).firstOrNull()
-                        ?: return@runCatching AutoCompleteResult(query, emptyList())
-                    raw.copy(
-                        suggestions = raw.suggestions.filter {
-                            it is AutoCompleteBookmarkSuggestion ||
-                                it is AutoCompleteSwitchToTabSuggestion ||
-                                it is AutoCompleteHistorySuggestion ||
-                                (it is AutoCompleteSearchSuggestion && it.isUrl)
-                        }.take(duckAiChatHistoryFeature.maxUrlSuggestions()),
-                    )
-                }.getOrDefault(AutoCompleteResult(query, emptyList()))
-            } else {
-                AutoCompleteResult(query, emptyList())
-            }
+        val urlFlow = flow { emit(fetchUrlSuggestions(query)) }
+            .onEach { lastChatUrlSuggestions = it.suggestions }
+        return combine(chatHistoryFlow, urlFlow) { chatHistory, urlSuggestions ->
+            ChatTabSuggestions(chatHistory = chatHistory, urlSuggestions = urlSuggestions)
         }
-        val chatHistory = chatHistoryDeferred.await()
-        if (query.isEmpty()) {
-            // Remember whether an empty query yields chats so the cover decision can predict it next time.
-            lastEmptyQueryHadChats = chatHistory.isNotEmpty()
+    }
+
+    private suspend fun fetchUrlSuggestions(query: String): AutoCompleteResult {
+        if (!autoCompleteSettings.autoCompleteSuggestionsEnabled || query.isEmpty()) {
+            return AutoCompleteResult(query, emptyList())
         }
-        val result = ChatTabSuggestions(
-            chatHistory = chatHistory,
-            urlSuggestions = urlSuggestionsDeferred.await(),
-        )
-        lastChatUrlSuggestions = result.urlSuggestions.suggestions
-        result
+        return runCatching {
+            val raw = autoComplete.autoComplete(query).firstOrNull()
+                ?: return@runCatching AutoCompleteResult(query, emptyList())
+            raw.copy(
+                suggestions = raw.suggestions.filter {
+                    it is AutoCompleteBookmarkSuggestion ||
+                        it is AutoCompleteSwitchToTabSuggestion ||
+                        it is AutoCompleteHistorySuggestion ||
+                        (it is AutoCompleteSearchSuggestion && it.isUrl)
+                }.take(duckAiChatHistoryFeature.maxUrlSuggestions()),
+            )
+        }.getOrDefault(AutoCompleteResult(query, emptyList()))
     }
 
     fun fireChatUrlSuggestionPixel(suggestion: AutoCompleteSuggestion) {

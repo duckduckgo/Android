@@ -26,6 +26,11 @@ import com.duckduckgo.duckchat.store.impl.DuckAiChatStore
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.Lazy
 import dagger.SingleInstanceIn
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.withContext
 import logcat.logcat
 import javax.inject.Inject
@@ -58,6 +63,18 @@ class DelegatingChatSuggestionsReader @Inject constructor(
         suggestionsStore.setHasChatSuggestions(result.isNotEmpty())
         return@withContext result
     }
+
+    override fun observeSuggestions(query: String): Flow<List<ChatSuggestion>> = flow {
+        val useNative = store.hasMigrated() && feature.useNativeStorageChatData().isEnabled()
+        val reader = if (useNative) nativeReader else webViewReader
+        if (activeReader != null && activeReader !== reader) tearDown()
+        activeReader = reader
+        logcat { "DuckAI chat suggestions: observing via ${if (useNative) "native store" else "WebView"} reader" }
+        pixels.get().reportNativeStorageReaderUsed(native = useNative)
+        emitAll(
+            reader.observeSuggestions(query).onEach { suggestionsStore.setHasChatSuggestions(it.isNotEmpty()) },
+        )
+    }.flowOn(dispatchers.io())
 
     override fun tearDown() {
         activeReader?.let { reader ->

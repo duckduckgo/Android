@@ -34,6 +34,8 @@ import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import com.squareup.anvil.annotations.ContributesBinding
 import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import org.json.JSONArray
@@ -47,6 +49,14 @@ import javax.inject.Inject
 
 interface ChatSuggestionsReader {
     suspend fun fetchSuggestions(query: String = ""): List<ChatSuggestion>
+
+    /**
+     * Reactive variant of [fetchSuggestions]: emits the current suggestions for [query] and,
+     * on the native-store path, re-emits whenever the underlying chats change (insert/update/
+     * delete). The WebView path emits a single value (it can't observe changes).
+     */
+    fun observeSuggestions(query: String = ""): Flow<List<ChatSuggestion>>
+
     fun tearDown()
 }
 
@@ -92,6 +102,8 @@ class RealChatSuggestionsReader @Inject constructor(
             mergeSuggestions(bestResult.pinnedChats, bestResult.recentChats, maxSuggestions)
         }
     }
+
+    override fun observeSuggestions(query: String): Flow<List<ChatSuggestion>> = flow { emit(fetchSuggestions(query)) }
 
     override fun tearDown() {
         pageLoadDeferred?.cancel()
