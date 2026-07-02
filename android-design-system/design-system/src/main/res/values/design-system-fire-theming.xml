@@ -53,6 +53,7 @@
         <item name="daxDrawableTabPlaceholderPreview">@drawable/ic_fire_tab_placeholder_96</item>
 
         <item name="daxOmnibarThemeOverlay">@style/ThemeOverlay.DuckDuckGo.Omnibar.FireDark</item>
+        <item name="daxInputModeCardThemeOverlay">@style/ThemeOverlay.DuckDuckGo.InputModeCard.FireDark</item>
     </style>
 
     <style name="ThemeOverlay.DuckDuckGo.Omnibar.None" parent="" />
@@ -87,6 +88,15 @@
         <item name="daxColorAccentAltContentPrimary">?attr/daxColorBlack</item>
         <item name="daxColorOmnibarAccentContent">?attr/daxColorBlack</item>
         <item name="colorControlActivated">?attr/daxColorFireModeAccentDark</item>
+    </style>
+
+    <!-- Dark Fire mode: give the expanded input card the Canvas fire colour (#1C1C1C) so it matches
+         the collapsed omnibar, instead of the default surface (#373737) / window (#3D3D3D) it would
+         otherwise inherit. Applied on top of the already-active Dark.Fire context, so accents etc.
+         still resolve from the base theme. -->
+    <style name="ThemeOverlay.DuckDuckGo.InputModeCard.FireDark" parent="">
+        <item name="daxColorSurface">@color/omnibar_card_fire_dark</item>
+        <item name="daxColorWindow">@color/omnibar_card_fire_dark</item>
     </style>
 
 </resources>
