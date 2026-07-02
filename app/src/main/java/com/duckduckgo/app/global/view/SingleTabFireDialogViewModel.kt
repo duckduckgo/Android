@@ -178,6 +178,10 @@ class SingleTabFireDialogViewModel @Inject constructor(
 
     private fun onDeleteAllClickedInFireMode() {
         viewModelScope.launch {
+            // Burning all Fire tabs deletes every Fire tab and its data, then lands the user on the
+            // empty Fire tabs view in the tab switcher (see EVENT_ON_FIRE_TABS_CLEARED) instead of
+            // restarting the process — Fire mode is in-memory, so a restart would drop back to Regular.
+            shouldRestartAfterClearing = false
             command.send(Command.OnClearStarted)
 
             val fireAnimationEnabled = withContext(dispatcherProvider.io()) {
@@ -191,7 +195,7 @@ class SingleTabFireDialogViewModel @Inject constructor(
                 dataClearing.clearDataUsingManualFireOptions(browserMode = browserMode)
             }
 
-            command.send(Command.ClearingComplete)
+            command.send(Command.OnFireTabsClearComplete)
         }
     }
 
@@ -419,6 +423,7 @@ class SingleTabFireDialogViewModel @Inject constructor(
         data object OnShow : Command()
         data object OnCancel : Command()
         data object OnClearStarted : Command()
+        data object OnFireTabsClearComplete : Command()
         data object OnSingleTabClearComplete : Command()
         data object OnSingleTabClearFeatureNotSupported : Command()
         data object OnSingleTabClearError : Command()
