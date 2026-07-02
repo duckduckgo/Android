@@ -1,7 +1,7 @@
 appId: com.duckduckgo.mobile.android
 name: "Preonboarding: Ensuring user can resume onboarding with show tutorial"
 tags:
-  - preonboardingTest
+  - onboardingInternalTest
 ---
 # Pre-requisite: None
 
