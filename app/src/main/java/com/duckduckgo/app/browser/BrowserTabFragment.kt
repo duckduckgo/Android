@@ -322,7 +322,6 @@ import com.duckduckgo.common.utils.extensions.websiteFromGeoLocationsApiOrigin
 import com.duckduckgo.common.utils.keyboardVisibilityFlow
 import com.duckduckgo.common.utils.playstore.PlayStoreUtils
 import com.duckduckgo.common.utils.plugins.PluginPoint
-import com.duckduckgo.dataclearing.api.fire.FireDialog
 import com.duckduckgo.dataclearing.api.fire.FireDialogProvider
 import com.duckduckgo.dataclearing.api.fire.FireDialogProvider.FireDialogOrigin
 import com.duckduckgo.di.scopes.FragmentScope
@@ -437,10 +436,6 @@ class BrowserTabFragment :
     private var contextualSheetBottomSheetCallback: BottomSheetBehavior.BottomSheetCallback? = null
 
     private var voiceActiveOnThisTab: Boolean = false
-
-    // The chat-history suggestion pending single-chat fire-dialog deletion, removed optimistically
-    // from the omnibar autocomplete once the clear begins. Null when no such delete is in flight.
-    private var pendingChatSuggestionDeleteUrl: String? = null
 
     @Inject
     lateinit var nativeInputManager: NativeInputManager
@@ -1654,21 +1649,13 @@ class BrowserTabFragment :
     }
 
     private fun showChatSuggestionFireDialog(chatUrl: String) {
-        pendingChatSuggestionDeleteUrl = chatUrl
-        setFragmentResultListener(FireDialog.REQUEST_KEY) { _, bundle ->
-            when (bundle.getString(FireDialog.RESULT_KEY_EVENT)) {
-                FireDialog.EVENT_CLEAR_WITHOUT_RESTART_STARTED,
-                FireDialog.EVENT_ON_CLEAR_STARTED,
-                -> pendingChatSuggestionDeleteUrl?.let { url ->
-                    nativeInputManager.removeChatSuggestion(url)
-                    pendingChatSuggestionDeleteUrl = null
-                }
-                FireDialog.EVENT_ON_CANCEL -> pendingChatSuggestionDeleteUrl = null
-            }
-        }
         viewLifecycleOwner.lifecycleScope.launch {
+            parentFragmentManager.findFragmentByTag(CHAT_DELETE_DIALOG_TAG)?.let { existing ->
+                parentFragmentManager.commitNow(allowStateLoss = true) { remove(existing) }
+            }
+
             val dialog = fireDialogProvider.createFireDialog(FireDialogOrigin.ChatAutocomplete(chatUrl))
-            dialog.show(parentFragmentManager)
+            dialog.show(parentFragmentManager, CHAT_DELETE_DIALOG_TAG)
         }
     }
 
@@ -1837,6 +1824,7 @@ class BrowserTabFragment :
             BrowserMode.FIRE -> {
                 bottomSheetMenu?.newTabMenuItem?.label(getString(string.fireTabsNewTabButton))
             }
+
             BrowserMode.REGULAR -> {
                 bottomSheetMenu?.newTabMenuItem?.label(getString(string.newTabMenuItem))
             }
@@ -4201,8 +4189,7 @@ class BrowserTabFragment :
             val bindResult = webViewModeInitializer.bind(it, browserMode)
             if (bindResult.isFailure) {
                 if (browserMode != BrowserMode.REGULAR) {
-                    bindResult.exceptionOrNull()?.message?.let {
-                            message ->
+                    bindResult.exceptionOrNull()?.message?.let { message ->
                         logcat(ERROR) { message }
                     }
                     this.closeCurrentTab()
@@ -4862,11 +4849,13 @@ class BrowserTabFragment :
         override fun onOpenInFireTab(url: String) = dispatchLongPress(AppPixelName.LONG_PRESS_NEW_FIRE_TAB, RequiredAction.OpenInFireTab(url))
         override fun onOpenInBackgroundTab(url: String) =
             dispatchLongPress(AppPixelName.LONG_PRESS_NEW_BACKGROUND_TAB, RequiredAction.OpenInNewBackgroundTab(url))
+
         override fun onCopyLinkAddress(url: String) = dispatchLongPress(AppPixelName.LONG_PRESS_COPY_URL, RequiredAction.CopyLink(url))
         override fun onShareLink(url: String) = dispatchLongPress(AppPixelName.LONG_PRESS_SHARE, RequiredAction.ShareLink(url))
         override fun onDownloadImage(
             imageUrl: String,
         ) = dispatchLongPress(AppPixelName.LONG_PRESS_DOWNLOAD_IMAGE, RequiredAction.DownloadFile(imageUrl))
+
         override fun onOpenImageInNewTab(imageUrl: String) =
             dispatchLongPress(AppPixelName.LONG_PRESS_OPEN_IMAGE_IN_BACKGROUND_TAB, RequiredAction.OpenInNewBackgroundTab(imageUrl))
 
@@ -5549,6 +5538,7 @@ class BrowserTabFragment :
 
         private const val DOWNLOAD_CONFIRMATION_TAG = "DOWNLOAD_CONFIRMATION_TAG"
         private const val DAX_DIALOG_DIALOG_TAG = "DAX_DIALOG_TAG"
+        private const val CHAT_DELETE_DIALOG_TAG = "CHAT_DELETE_DIALOG_TAG"
 
         private const val MAX_PROGRESS = 100
         private const val TRACKERS_INI_DELAY = 500L
@@ -6290,13 +6280,17 @@ class BrowserTabFragment :
             showCta(cta, instantShow = true)
         }
 
-        private fun showCta(configuration: Cta, instantShow: Boolean = false) {
+        private fun showCta(
+            configuration: Cta,
+            instantShow: Boolean = false,
+        ) {
             when (configuration) {
                 is HomePanelCta -> showBottomSheetCta(configuration)
                 is SubscriptionPromoModalCta -> showPrivacyProSkippedOnboardingBottomSheet(configuration)
                 is DaxBubbleCta -> showDaxOnboardingBubbleCta(configuration)
                 is OnboardingDaxDialogCta.BrandDesignContextualDaxDialogCta ->
                     showOnboardingDialogCta(configuration, instantShow = instantShow)
+
                 is OnboardingDaxDialogCta -> showOnboardingDialogCta(configuration)
                 is BrokenSitePromptDialogCta -> showBrokenSitePromptCta(configuration)
             }
@@ -6803,6 +6797,10 @@ class BrowserTabFragment :
 
     fun dismissDuckAiFireOnboardingCta() {
         viewModel.dismissDuckAiFireOnboardingCta()
+    }
+
+    fun refreshAutoComplete() {
+        nativeInputManager.refreshChatSuggestions()
     }
 }
 

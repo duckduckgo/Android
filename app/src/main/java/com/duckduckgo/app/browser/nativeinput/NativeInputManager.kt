@@ -85,7 +85,6 @@ class NativeInputCallbacks(
     val onCustomizeResponsesClicked: () -> Unit = {},
     val onChatUrlSuggestionClicked: (AutoCompleteSuggestion) -> Unit = {},
     val onChatHistoryShortcutClicked: () -> Unit = {},
-    /** User tapped the per-row delete (fire) affordance on a chat-history suggestion. Param is the chat URL. */
     val onChatSuggestionDelete: (chatUrl: String) -> Unit = {},
     val onClearAutocomplete: () -> Unit,
     val onStopTapped: () -> Unit,
@@ -93,11 +92,6 @@ class NativeInputCallbacks(
     val onVoiceSearchPressed: (isChatTab: Boolean) -> Unit = {},
     val onCameraCaptureRequested: (ValueCallback<Array<Uri>>) -> Unit = {},
     val onFilePickerRequested: (ValueCallback<Array<Uri>>, List<String>) -> Unit = { _, _ -> },
-    /**
-     * Restore the autocomplete view state from the always-on cache the viewmodel keeps for
-     * the omnibar's text. Returns true when the cache matched [forQuery] and was applied;
-     * the caller uses the return value to decide whether to re-show the suggestions list.
-     */
     val restoreOmnibarAutocomplete: (forQuery: String) -> Boolean = { _ -> false },
     val onContextualSheetRequested: () -> Unit = {},
 )
@@ -133,11 +127,11 @@ interface NativeInputManager {
     fun setText(text: String)
 
     /**
-     * Optimistically removes the chat-history suggestion matching [chatUrl] from the omnibar
-     * autocomplete list, e.g. after its single-chat fire-dialog delete is confirmed. No-op when
-     * the native input isn't shown or the suggestion isn't currently listed.
+     * Re-fetches the omnibar chat-history suggestions from the source of truth, e.g. after a
+     * single-chat delete has completed and the chat is actually gone from the store. No-op when
+     * the native input isn't shown or the chat tab isn't selected.
      */
-    fun removeChatSuggestion(chatUrl: String)
+    fun refreshChatSuggestions()
 
     /** Lock the input field (making it non-interactive + dimmed).*/
     fun setInteractionLock(lock: InteractionLock)
@@ -228,10 +222,10 @@ class RealNativeInputManager @Inject constructor(
         widget.text = text
     }
 
-    override fun removeChatSuggestion(chatUrl: String) {
+    override fun refreshChatSuggestions() {
         if (!::rootView.isInitialized) return
         val widget = widgetFrom(rootView) ?: return
-        widget.removeChatSuggestion(chatUrl)
+        widget.refreshChatSuggestions()
     }
 
     override fun handleDuckAiVoiceResult(query: String) {

@@ -187,7 +187,11 @@ interface NativeInputWidget {
         onChatSuggestionDelete: (chatUrl: String) -> Unit = {},
     )
 
-    fun removeChatSuggestion(chatUrl: String)
+    /**
+     * Re-fetches the chat-history suggestions for the current query from the source of truth.
+     * No-op when the chat suggestions aren't currently active (binding not created / chat tab not selected).
+     */
+    fun refreshChatSuggestions()
 
     fun asView(): View
 }
@@ -257,6 +261,9 @@ class NativeInputModeWidget @JvmOverloads constructor(
     private var chatItemPluginScope: CoroutineScope? = null
     private var onShowSuggestions: ((RecyclerView.Adapter<*>) -> Unit)? = null
     private var onClearSuggestions: ((Boolean) -> Unit)? = null
+
+    // Re-runs the chat-suggestions fetch for the current query. Set in bindChatSuggestions, cleared in tearDownChatSuggestions.
+    private var refreshChatSuggestionsAction: (() -> Unit)? = null
     private var voiceSearchAvailable: Boolean = false
     private var voiceChatAvailable: Boolean = false
     private var widgetRoot: View? = null
@@ -1285,6 +1292,9 @@ class NativeInputModeWidget @JvmOverloads constructor(
             fetchChatTabSuggestions(lifecycleOwner, query, ensureBinding())
         }
 
+        // Allow an external re-fetch (e.g. after a chat delete completes) using the current query.
+        this.refreshChatSuggestionsAction = { showSuggestions(text) }
+
         val previousOnSearchSelected = this.onSearchSelected
         this.onSearchSelected = { animate ->
             hideChatSuggestions(hideList = false)
@@ -1324,11 +1334,12 @@ class NativeInputModeWidget @JvmOverloads constructor(
         chatSuggestionsBinding = null
         onShowSuggestions = null
         onClearSuggestions = null
+        refreshChatSuggestionsAction = null
     }
 
-    override fun removeChatSuggestion(chatUrl: String) {
-        val binding = chatSuggestionsBinding ?: return
-        binding.removeChatSuggestions { suggestion -> viewModel.buildChatSuggestionUrl(suggestion) == chatUrl }
+    override fun refreshChatSuggestions() {
+        if (chatSuggestionsBinding == null || !isChatTabSelected()) return
+        refreshChatSuggestionsAction?.invoke()
     }
 
     override fun asView(): View = this
