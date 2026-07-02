@@ -221,7 +221,10 @@ class SingleTabFireDialogViewModel @Inject constructor(
                 dataClearing.clearSelectedDuckAiChats(chatUrls, browserMode)
             }
 
-            command.send(Command.ClearingComplete)
+            // Distinct from ClearingComplete (which the restart paths use): this carries the origin
+            // out to listeners once the chats are actually gone from the store, so callers can
+            // reconcile UI (e.g. re-fetch the omnibar chat suggestions) against real state.
+            command.send(Command.OnChatClearComplete)
         }
     }
 
@@ -434,6 +437,7 @@ class SingleTabFireDialogViewModel @Inject constructor(
         data object OnCancel : Command()
         data object OnClearStarted : Command()
         data object OnSingleTabClearComplete : Command()
+        data object OnChatClearComplete : Command()
         data object OnSingleTabClearFeatureNotSupported : Command()
         data object OnSingleTabClearError : Command()
     }

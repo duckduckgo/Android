@@ -1312,7 +1312,7 @@ class SingleTabFireDialogViewModelTest {
             awaitItem() // OnShow from init
             assertEquals(Command.OnClearStarted, awaitItem())
             assertEquals(Command.PlayAnimation, awaitItem())
-            assertEquals(Command.ClearingComplete, awaitItem())
+            assertEquals(Command.OnChatClearComplete, awaitItem())
 
             cancelAndConsumeRemainingEvents()
         }
@@ -1329,7 +1329,7 @@ class SingleTabFireDialogViewModelTest {
 
             awaitItem() // OnShow from init
             assertEquals(Command.OnClearStarted, awaitItem())
-            assertEquals(Command.ClearingComplete, awaitItem())
+            assertEquals(Command.OnChatClearComplete, awaitItem())
 
             cancelAndConsumeRemainingEvents()
         }
@@ -1405,7 +1405,7 @@ class SingleTabFireDialogViewModelTest {
             awaitItem() // OnShow from init
             assertEquals(Command.OnClearStarted, awaitItem())
             assertEquals(Command.PlayAnimation, awaitItem())
-            assertEquals(Command.ClearingComplete, awaitItem())
+            assertEquals(Command.OnChatClearComplete, awaitItem())
 
             cancelAndConsumeRemainingEvents()
         }
