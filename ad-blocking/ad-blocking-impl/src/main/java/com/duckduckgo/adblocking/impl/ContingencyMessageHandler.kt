@@ -35,7 +35,6 @@ import dagger.SingleInstanceIn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
-import logcat.logcat
 import javax.inject.Inject
 
 /**
@@ -62,15 +61,15 @@ interface ContingencyMessageHandler {
 class RealContingencyMessageHandler @Inject constructor(
     private val feature: AdBlockingExtensionFeature,
     private val store: ContingencyMessageStore,
+    private val view: ContingencyMessageView,
     @AppCoroutineScope private val appScope: CoroutineScope,
     private val dispatchers: DispatcherProvider,
 ) : ContingencyMessageHandler, MainProcessLifecycleObserver {
 
-    private var dialog: ContingencyMessageBottomSheet? = null
+    @Volatile
+    private var shownInSession = false
 
     override fun onCreate(owner: LifecycleOwner) {
-        // Reset the "shown" flag whenever contingency mode is disabled, so the message shows again
-        // next time it is (re)enabled. enableContingencyMode().enabled() re-emits on remote config changes.
         appScope.launch(dispatchers.io()) {
             feature.enableContingencyMode().enabled()
                 .distinctUntilChanged()
@@ -80,47 +79,28 @@ class RealContingencyMessageHandler @Inject constructor(
 
     @UiThread
     override fun onPageLoaded(webView: WebView, url: String?) {
-        logcat { "$TAG onPageLoaded url=$url" }
         if (!shouldShow(url)) return
-        if (dialog?.isShowing == true) {
-            logcat { "$TAG dialog already showing, skipping" }
-            return
-        }
-
-        logcat { "$TAG showing contingency message" }
-        showMessage(webView)
+        shownInSession = true
+        view.show(webView)
         appScope.launch(dispatchers.io()) { store.setShown() }
     }
 
     internal suspend fun onContingencyModeChanged(contingencyEnabled: Boolean) {
         val shown = store.shown.value
-        logcat { "$TAG onContingencyModeChanged contingencyEnabled=$contingencyEnabled shown=$shown" }
-        if (!contingencyEnabled && shown) {
-            logcat { "$TAG resetting shown state" }
-            store.reset()
+        if (!contingencyEnabled) {
+            shownInSession = false
+            if (shown) store.reset()
         }
     }
 
     internal fun shouldShow(url: String?): Boolean {
         val uxImprovements = feature.adBlockingUXImprovements().isEnabled()
         val contingency = feature.enableContingencyMode().isEnabled()
-        val shown = store.shown.value
+        val shown = shownInSession || store.shown.value
         val uri = url?.toUri()
         val isYouTube = uri != null &&
             (UriString.sameOrSubdomain(uri, YOUTUBE_HOST) || UriString.sameOrSubdomain(uri, YOUTUBE_MOBILE_HOST))
         val result = uxImprovements && contingency && isYouTube && !shown
-        logcat {
-            "$TAG shouldShow=$result (uxImprovements=$uxImprovements, contingency=$contingency, " +
-                "isYouTube=$isYouTube, shown=$shown, url=$url)"
-        }
         return result
-    }
-
-    private fun showMessage(webView: WebView) {
-        dialog = ContingencyMessageBottomSheet(webView.context).also { it.show() }
-    }
-
-    companion object {
-        private const val TAG = "ContingencyMessage:"
     }
 }

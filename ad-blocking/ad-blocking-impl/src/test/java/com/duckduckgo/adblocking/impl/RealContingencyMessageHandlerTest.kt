@@ -17,6 +17,7 @@
 package com.duckduckgo.adblocking.impl
 
 import android.annotation.SuppressLint
+import android.webkit.WebView
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.adblocking.impl.remoteconfig.AdBlockingExtensionFeature
 import com.duckduckgo.adblocking.impl.remoteconfig.ContingencyMessageStore
@@ -27,11 +28,13 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.mock
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @SuppressLint("DenyListedApi") // setRawStoredState
@@ -55,9 +58,12 @@ class RealContingencyMessageHandlerTest {
         }
     }
 
+    private val view = FakeContingencyMessageView()
+
     private val handler = RealContingencyMessageHandler(
         feature = feature,
         store = store,
+        view = view,
         appScope = coroutineRule.testScope,
         dispatchers = coroutineRule.testDispatcherProvider,
     )
@@ -133,5 +139,59 @@ class RealContingencyMessageHandlerTest {
         handler.onContingencyModeChanged(contingencyEnabled = true)
 
         assertTrue(shownFlow.value)
+    }
+
+    @Test
+    fun whenPageLoadedRepeatedlyBeforeStoreWriteReflectsThenShowsOnlyOnce() = runTest {
+        setToggles(uxImprovements = true, contingency = true)
+        // Model DataStore write latency: setShown() never flips the observable value during the
+        // test, so only the in-memory guard can prevent a repeat show.
+        val handler = handlerWith(laggingStore())
+        val webView = mock<WebView>()
+
+        handler.onPageLoaded(webView, YOUTUBE_URL)
+        handler.onPageLoaded(webView, YOUTUBE_URL)
+        handler.onPageLoaded(webView, YOUTUBE_URL)
+
+        assertEquals(1, view.shownCount)
+    }
+
+    @Test
+    fun whenContingencyDisabledThenReenabledThenShowsAgain() = runTest {
+        setToggles(uxImprovements = true, contingency = true)
+        val handler = handlerWith(laggingStore())
+        val webView = mock<WebView>()
+
+        handler.onPageLoaded(webView, YOUTUBE_URL)
+        handler.onContingencyModeChanged(contingencyEnabled = false)
+        handler.onPageLoaded(webView, YOUTUBE_URL)
+
+        assertEquals(2, view.shownCount)
+    }
+
+    private fun laggingStore() = object : ContingencyMessageStore {
+        private val value = MutableStateFlow(false)
+        override val shown: StateFlow<Boolean> = value
+        override suspend fun setShown() { /* write is async; observable value lags */ }
+        override suspend fun reset() { value.value = false }
+    }
+
+    private fun handlerWith(store: ContingencyMessageStore) = RealContingencyMessageHandler(
+        feature = feature,
+        store = store,
+        view = view,
+        appScope = coroutineRule.testScope,
+        dispatchers = coroutineRule.testDispatcherProvider,
+    )
+
+    private class FakeContingencyMessageView : ContingencyMessageView {
+        var shownCount = 0
+        override fun show(webView: WebView) {
+            shownCount++
+        }
+    }
+
+    private companion object {
+        private const val YOUTUBE_URL = "https://youtube.com/watch?v=abc"
     }
 }
