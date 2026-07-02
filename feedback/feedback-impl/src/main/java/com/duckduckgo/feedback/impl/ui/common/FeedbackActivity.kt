@@ -30,7 +30,7 @@ import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.feedback.api.FeedbackScreenNoParams
 import com.duckduckgo.feedback.impl.R
-import com.duckduckgo.feedback.impl.databinding.ActivityFeedbackBinding
+import com.duckduckgo.feedback.impl.databinding.ActivityShareFeedbackBinding
 import com.duckduckgo.feedback.impl.ui.initial.InitialFeedbackFragment
 import com.duckduckgo.feedback.impl.ui.negative.FeedbackType.*
 import com.duckduckgo.feedback.impl.ui.negative.brokensite.BrokenSiteNegativeFeedbackFragment
@@ -54,7 +54,7 @@ class FeedbackActivity :
 
     private val viewModel: FeedbackViewModel by bindViewModel()
 
-    private val binding: ActivityFeedbackBinding by viewBinding()
+    private val binding: ActivityShareFeedbackBinding by viewBinding()
 
     private val toolbar
         get() = binding.includeToolbar.toolbar
