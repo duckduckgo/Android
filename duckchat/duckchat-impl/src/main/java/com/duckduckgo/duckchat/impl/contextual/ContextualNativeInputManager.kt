@@ -40,6 +40,20 @@ import org.json.JSONArray
 import org.json.JSONObject
 import javax.inject.Inject
 
+/**
+ * A prompt submitted from the unified input widget while the contextual sheet is in its initial
+ * (INPUT) state. Carries the widget's current model/reasoning/tool/attachment selections so the
+ * new chat starts with everything the user configured.
+ */
+data class NativeInputPrompt(
+    val prompt: String,
+    val modelId: String?,
+    val reasoningEffort: String?,
+    val selectedTool: String?,
+    val imagesJson: JSONArray?,
+    val filesJson: JSONArray?,
+)
+
 interface ContextualNativeInputManager {
     fun init(
         tabId: String,
@@ -51,6 +65,9 @@ interface ContextualNativeInputManager {
         onSearchSubmitted: (String) -> Unit,
         onCameraCaptureRequested: (ValueCallback<Array<Uri>>) -> Unit = {},
         onFilePickerRequested: (ValueCallback<Array<Uri>>, List<String>) -> Unit = { _, _ -> },
+        // Invoked when the widget submits a prompt while the sheet is in INPUT mode: starts a new chat.
+        // WEBVIEW-mode submissions keep going through the in-chat JS event path (see setupWidget).
+        onNewChatPromptSubmitted: (NativeInputPrompt) -> Unit = {},
     )
 
     fun onWebViewMode()
@@ -90,13 +107,14 @@ class RealContextualNativeInputManager @Inject constructor(
         onSearchSubmitted: (String) -> Unit,
         onCameraCaptureRequested: (ValueCallback<Array<Uri>>) -> Unit,
         onFilePickerRequested: (ValueCallback<Array<Uri>>, List<String>) -> Unit,
+        onNewChatPromptSubmitted: (NativeInputPrompt) -> Unit,
     ) {
         this.card = card
         this.jsMessaging = jsMessaging
         this.widget = widget
 
         applyCardShape(card)
-        setupWidget(tabId, widget, chatIdFlow, onSearchSubmitted, onCameraCaptureRequested, onFilePickerRequested)
+        setupWidget(tabId, widget, chatIdFlow, onSearchSubmitted, onCameraCaptureRequested, onFilePickerRequested, onNewChatPromptSubmitted)
         observeNativeInputSetting(lifecycleOwner)
     }
 
@@ -125,9 +143,15 @@ class RealContextualNativeInputManager @Inject constructor(
 
     override fun onInputMode() {
         lastMode = Mode.INPUT
-        card?.gone()
-        // INPUT mode is a new chat: restore the picker
-        if (isNativeInputEnabled) modelPickerEnabled.value = true
+        if (isNativeInputEnabled) {
+            // The unified input widget is the composer for the initial sheet.
+            card?.show()
+            // INPUT mode is a new chat: restore the picker so the user can pick a model before starting.
+            modelPickerEnabled.value = true
+        } else {
+            // Flag off: the legacy EditText composer is shown instead, so keep the widget card hidden.
+            card?.gone()
+        }
     }
 
     private fun applyCardShape(card: MaterialCardView) {
@@ -149,6 +173,7 @@ class RealContextualNativeInputManager @Inject constructor(
         onSearchSubmitted: (String) -> Unit,
         onCameraCaptureRequested: (ValueCallback<Array<Uri>>) -> Unit,
         onFilePickerRequested: (ValueCallback<Array<Uri>>, List<String>) -> Unit,
+        onNewChatPromptSubmitted: (NativeInputPrompt) -> Unit,
     ) {
         widget.configureContextual(tabId)
         widget.bindChatIdSource(chatIdFlow)
@@ -167,8 +192,19 @@ class RealContextualNativeInputManager @Inject constructor(
             onChatSubmitted = { prompt ->
                 val imagesJson = widget.getImageAttachmentsJson()
                 val filesJson = widget.getFileAttachmentsJson()
+                val modelId = widget.getSelectedModelId()
+                val reasoningEffort = widget.getResolvedReasoningEffort()
+                val selectedTool = widget.getSelectedTool()
                 widget.clearAttachments()
-                sendPrompt(prompt, widget.getSelectedModelId(), widget.getResolvedReasoningEffort(), widget.getSelectedTool(), imagesJson, filesJson)
+                if (lastMode == Mode.INPUT) {
+                    // Initial sheet: start a new chat via the ViewModel so the sheet switches to WEBVIEW.
+                    onNewChatPromptSubmitted(
+                        NativeInputPrompt(prompt, modelId, reasoningEffort, selectedTool, imagesJson, filesJson),
+                    )
+                } else {
+                    // Chat already in progress: submit into the running chat via the JS event.
+                    sendPrompt(prompt, modelId, reasoningEffort, selectedTool, imagesJson, filesJson)
+                }
                 widget.clearSelectedTool()
                 widget.text = ""
             },
