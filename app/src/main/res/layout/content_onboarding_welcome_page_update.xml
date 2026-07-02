@@ -158,7 +158,6 @@
         android:id="@+id/bottomWingAnimation"
         android:layout_width="wrap_content"
         android:layout_height="199dp"
-        android:adjustViewBounds="true"
         android:alpha="0"
         android:visibility="gone"
         app:layout_constrainedWidth="true"

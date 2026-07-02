@@ -60,6 +60,7 @@ class OnboardingDecorationFitCorrectorTest {
         viewportMeasuredHeight: Int = viewportHeight,
         bottomOverlapPx: Int = 0,
         cardBottomInsetPx: Int = 0,
+        enabled: Boolean = true,
         onDecorationHidden: () -> Unit = {},
     ): Harness {
         val root = ConstraintLayout(context)
@@ -104,6 +105,7 @@ class OnboardingDecorationFitCorrectorTest {
         decoration.layout(0, 0, 200, decorationHeight)
 
         val corrector = OnboardingDecorationFitCorrector(root, dialog, cardContainer, onDecorationHidden, { cardBottomInsetPx })
+        corrector.enabled = enabled
         corrector.track(decoration, minHeightPx = minHeightPx, maxHeightPx = maxHeightPx, bottomOverlapPx = bottomOverlapPx)
         return Harness(corrector, dialog, decoration)
     }
@@ -125,6 +127,27 @@ class OnboardingDecorationFitCorrectorTest {
 
         assertFalse(h.corrector.correctOnce())
         assertEquals(247, h.decoration.layoutParams.height)
+    }
+
+    @Test
+    fun whenDisabledThenDecorationIsNeitherShrunkNorHidden() {
+        // Same tight fit that would hide the decoration when enabled, but with the flag off the
+        // corrector must leave the decoration's height and visibility untouched (V2-off == develop).
+        val h = harness(
+            rootHeight = 1200,
+            rootPaddingBottom = 84,
+            dialogHeight = 1080,
+            contentHeight = 1100,
+            viewportHeight = 1080,
+            decorationHeight = 299,
+            minHeightPx = 247,
+            maxHeightPx = 299,
+            enabled = false,
+        )
+
+        assertTrue(h.corrector.correctOnce())
+        assertEquals(299, h.decoration.layoutParams.height)
+        assertFalse(h.decoration.isGone)
     }
 
     @Test
@@ -373,6 +396,31 @@ class OnboardingDecorationFitCorrectorTest {
 
         assertFalse(h.corrector.correctOnce())
         assertEquals(108, (h.dialog.layoutParams as ViewGroup.MarginLayoutParams).bottomMargin)
+    }
+
+    @Test
+    fun whenDisabledThenBottomAnchoredCardReservesNoInset() {
+        // V2 off: the corrector must stay inert so V2-off layout matches legacy, which never reserved an
+        // inset. Even bottom-anchored with no decoration, the margin stays 0.
+        val h = harness(
+            rootHeight = 1200,
+            dialogHeight = 600,
+            contentHeight = 600,
+            viewportHeight = 600,
+            decorationHeight = 200,
+            minHeightPx = 247,
+            maxHeightPx = 299,
+            cardBottomInsetPx = 108,
+            enabled = false,
+        )
+        h.corrector.clear()
+        (h.dialog.layoutParams as ConstraintLayout.LayoutParams).apply {
+            bottomToTop = ConstraintLayout.LayoutParams.UNSET
+            bottomToBottom = ConstraintLayout.LayoutParams.PARENT_ID
+        }
+
+        h.corrector.correctOnce()
+        assertEquals(0, (h.dialog.layoutParams as ViewGroup.MarginLayoutParams).bottomMargin)
     }
 
     @Test

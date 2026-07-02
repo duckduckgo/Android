@@ -32,6 +32,9 @@ class OnboardingDecorationFitCorrector(
     private val cardBottomInsetPx: () -> Int = { 0 },
 ) {
 
+    // TODO: remove when onboardingImprovementsV2 flag is removed
+    var enabled: Boolean = false
+
     private var decoration: View? = null
     private var minHeightPx = 0
     private var maxHeightPx = 0
@@ -77,6 +80,10 @@ class OnboardingDecorationFitCorrector(
         // any bar inset, so it covers the bar for the card; reserving the inset then would feed dialogSpace
         // and hide that very decoration.
         if (syncCardBottomInset(decorationShown)) return false
+
+        // While onboardingImprovementsV2 is off the corrector stays inert: syncCardBottomInset above
+        // has already reverted any reserved inset, and the shrink/hide logic below must not run.
+        if (!enabled) return true
 
         if (deco == null) return true
         if (deco.isGone) return true
@@ -129,7 +136,7 @@ class OnboardingDecorationFitCorrector(
     private fun syncCardBottomInset(decorationShown: Boolean): Boolean {
         val params = dialog.layoutParams as? ConstraintLayout.LayoutParams ?: return false
         val bottomAnchored = params.bottomToBottom == ConstraintLayout.LayoutParams.PARENT_ID
-        val desired = if (bottomAnchored && !decorationShown) cardBottomInsetPx() else 0
+        val desired = if (enabled && bottomAnchored && !decorationShown) cardBottomInsetPx() else 0
         if (params.bottomMargin == desired) return false
         dialog.updateLayoutParams<ConstraintLayout.LayoutParams> { bottomMargin = desired }
         return true

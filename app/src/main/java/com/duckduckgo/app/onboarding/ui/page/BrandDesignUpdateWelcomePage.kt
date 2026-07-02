@@ -542,6 +542,10 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
         combine(viewModel.viewState, introInProgress) { state, _ -> state }
             .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
             .onEach { state ->
+                // Set before any dialog layout this pass triggers below, so the corrector's inset
+                // reservation stays inert while onboardingImprovementsV2 is off (legacy parity).
+                decorationFitCorrector?.enabled = state.onboardingImprovementsV2Enabled
+                applyImprovementsV2LayoutTweaks(state.onboardingImprovementsV2Enabled)
                 when {
                     introInProgress.value -> {
                         // Suppress snap while the intro animator is mid-flight in this view;
@@ -2263,6 +2267,20 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
             decorationFitCorrector?.clear()
         }
         return height != null
+    }
+
+    // The XML holds develop's values (adjustViewBounds off, constrainedHeight on); onboardingImprovementsV2
+    // flips both. Symmetric so V2-off restores develop's values even if a stale default-true state applied
+    // them first, keeping V2-off identical to develop.
+    private fun applyImprovementsV2LayoutTweaks(enabled: Boolean) {
+        if (binding.bottomWingAnimation.adjustViewBounds != enabled) {
+            binding.bottomWingAnimation.adjustViewBounds = enabled
+        }
+        val params = binding.daxDialogCta.cardView.layoutParams as ConstraintLayout.LayoutParams
+        if (params.constrainedHeight != !enabled) {
+            params.constrainedHeight = !enabled
+            binding.daxDialogCta.cardView.layoutParams = params
+        }
     }
 
     // A bottom-anchored predecessor can leave a bottom inset on the card; clear it before measuring a

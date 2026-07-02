@@ -170,7 +170,6 @@
                 android:id="@+id/bottomWingAnimation"
                 android:layout_width="0dp"
                 android:layout_height="199dp"
-                android:adjustViewBounds="true"
                 android:layout_marginTop="40dp"
                 android:alpha="0"
                 android:visibility="gone"
