@@ -29,10 +29,10 @@ enum class OnboardingPixelName(override val pixelName: String) : Pixel.PixelName
     ONBOARDING_SEARCH_CHAT_TOGGLE("onboarding_search-chat-toggle"),
     ONBOARDING_AI_INTRO("onboarding_ai-intro"),
     ONBOARDING_FIRE_BUTTON("onboarding_fire-button"),
-    ONBOARDING_AI_CHAT("onboarding_ai-chat"),
     ONBOARDING_SEARCH("onboarding_search"),
     ONBOARDING_SEARCH_RESULTS("onboarding_search-results"),
     ONBOARDING_VISIT_SITE("onboarding_visit-site"),
     ONBOARDING_TRACKERS_BLOCKED("onboarding_trackers-blocked"),
     ONBOARDING_END("onboarding_end"),
+    ONBOARDING_SUBSCRIPTION_PROMO("onboarding_subscription-promo"),
 }

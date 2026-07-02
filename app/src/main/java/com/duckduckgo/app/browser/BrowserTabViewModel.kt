@@ -5285,13 +5285,16 @@ class BrowserTabViewModel @Inject constructor(
         }
         val cta = currentCtaViewState().cta
 
+        if (cta != null) {
+            ctaViewModel.onContextualFireButtonEngaged(cta)
+        }
+
         // Defer cleanup (CTA dismiss, highlight removal) until the fire action actually completes.
         if (cta is OnboardingDaxDialogCta.DaxDuckAiFireButtonCta || cta is DaxDuckAiFireButtonBrandDesignUpdateContextualCta) {
             return
         }
 
         if (cta is OnboardingDaxDialogCta.DaxFireButtonCta || cta is DaxFireButtonBrandDesignUpdateContextualCta) {
-            ctaViewModel.onContextualFireButtonEngaged(cta)
             onUserDismissedCta(cta, isEngagement = true)
             command.value = HideOnboardingDaxDialog(cta as OnboardingDaxDialogCta)
         }
@@ -5310,9 +5313,14 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
+    fun onPrivacyShieldSelected() {
+        currentCtaViewState().cta?.let { ctaViewModel.onContextualTrackersBlockedShieldEngaged(it) }
+    }
+
     override fun onShouldOverride() {
         val cta = currentCtaViewState().cta
         if (cta is OnboardingDaxDialogCta) {
+            ctaViewModel.onContextualSiteLinkTapped(cta)
             onDismissOnboardingDaxDialog(cta)
         }
     }
@@ -5718,9 +5726,16 @@ class BrowserTabViewModel @Inject constructor(
 
             val cta = ctaViewState.value?.cta ?: return@launch
             if (cta is OnboardingDaxDialogCta.DaxDuckAiFireButtonCta || cta is DaxDuckAiFireButtonBrandDesignUpdateContextualCta) {
-                ctaViewModel.onUserDismissedCta(cta = cta)
+                // This runs only once the fire action has actually completed, so it's an engagement,
+                // not a passive dismiss — mirrors the toolbar-fire-button pairing in onFireMenuSelected.
+                ctaViewModel.onContextualFireButtonEngaged(cta)
+                ctaViewModel.onUserDismissedCta(cta = cta, isEngagement = true)
             }
         }
+    }
+
+    fun onOnboardingFireButtonCleared() {
+        currentCtaViewState().cta?.let { ctaViewModel.onContextualFireButtonEngaged(it) }
     }
 
     private fun trackersCount(): String =

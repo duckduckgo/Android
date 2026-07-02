@@ -489,6 +489,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
                 }
                 FireDialog.EVENT_ON_CANCEL -> {
                     pendingDuckAiOnboardingFire = false
+                    pendingOnboardingFireButtonFire = false
                     pixel.fire(FIRE_DIALOG_CANCEL)
                     currentTab?.onFireDialogVisibilityChanged(isVisible = false)
                     externalIntentProcessingState.onPendingSnackbarDisplayed()
@@ -501,6 +502,9 @@ open class BrowserActivity : DuckDuckGoActivity() {
                     currentTab?.onFireDialogVisibilityChanged(isVisible = false)
                     if (pendingDuckAiOnboardingFire) {
                         currentTab?.dismissDuckAiFireOnboardingCta()
+                    } else if (pendingOnboardingFireButtonFire) {
+                        pendingOnboardingFireButtonFire = false
+                        currentTab?.onOnboardingFireButtonCleared()
                     } else {
                         externalIntentProcessingState.onIntentRequestToShowSnackbar()
                     }
@@ -525,6 +529,9 @@ open class BrowserActivity : DuckDuckGoActivity() {
                         pendingDuckAiOnboardingFire = false
                         closeDuckChatFullScreen()
                         onboardingHostViewModel.onDuckAiFireCompleted()
+                    } else if (pendingOnboardingFireButtonFire) {
+                        pendingOnboardingFireButtonFire = false
+                        currentTab?.onOnboardingFireButtonCleared()
                     }
                 }
                 FireDialog.EVENT_ON_SINGLE_TAB_CLEAR_FEATURE_NOT_SUPPORTED -> {
@@ -533,6 +540,9 @@ open class BrowserActivity : DuckDuckGoActivity() {
                         pendingDuckAiOnboardingFire = false
                         closeDuckChatFullScreen()
                         onboardingHostViewModel.onDuckAiFireCompleted()
+                    } else if (pendingOnboardingFireButtonFire) {
+                        pendingOnboardingFireButtonFire = false
+                        currentTab?.onOnboardingFireButtonCleared()
                     }
                 }
                 FireDialog.EVENT_ON_SINGLE_TAB_CLEAR_ERROR -> {
@@ -541,6 +551,9 @@ open class BrowserActivity : DuckDuckGoActivity() {
                         pendingDuckAiOnboardingFire = false
                         closeDuckChatFullScreen()
                         onboardingHostViewModel.onDuckAiFireCompleted()
+                    } else if (pendingOnboardingFireButtonFire) {
+                        pendingOnboardingFireButtonFire = false
+                        currentTab?.onOnboardingFireButtonCleared()
                     }
                 }
             }
@@ -1067,9 +1080,15 @@ open class BrowserActivity : DuckDuckGoActivity() {
     }
 
     private var pendingDuckAiOnboardingFire = false
+    private var pendingOnboardingFireButtonFire = false
 
-    fun launchFire(launchedFromFocusedNtp: Boolean = false, isDuckAiOnboarding: Boolean = false) {
+    fun launchFire(
+        launchedFromFocusedNtp: Boolean = false,
+        isDuckAiOnboarding: Boolean = false,
+        isOnboardingFireButton: Boolean = false,
+    ) {
         pendingDuckAiOnboardingFire = isDuckAiOnboarding
+        pendingOnboardingFireButtonFire = isOnboardingFireButton
         val params = mapOf(PixelParameter.FROM_FOCUSED_NTP to launchedFromFocusedNtp.toString())
         pixel.fire(AppPixelName.FORGET_ALL_PRESSED_BROWSING, params)
         pixel.fire(AppPixelName.FORGET_ALL_PRESSED_BROWSING_DAILY, params, type = Daily())

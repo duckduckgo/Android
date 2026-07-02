@@ -180,6 +180,8 @@ import com.duckduckgo.app.cta.ui.DaxDuckAiEndBubbleCta
 import com.duckduckgo.app.cta.ui.DaxDuckAiFireButtonBrandDesignUpdateContextualCta
 import com.duckduckgo.app.cta.ui.DaxFireButtonBrandDesignUpdateContextualCta
 import com.duckduckgo.app.cta.ui.DaxSerpBrandDesignUpdateContextualCta
+import com.duckduckgo.app.cta.ui.DaxSiteSuggestionsBrandDesignUpdateContextualCta
+import com.duckduckgo.app.cta.ui.DaxTrackersBlockedBrandDesignUpdateContextualCta
 import com.duckduckgo.app.cta.ui.DaxTryASearchBrandDesignUpdateBubbleCta
 import com.duckduckgo.app.cta.ui.HomePanelCta
 import com.duckduckgo.app.cta.ui.OnboardingDaxDialogCta.DaxDuckAiFireButtonCta
@@ -224,6 +226,8 @@ import com.duckduckgo.app.pixels.AppPixelName.ONBOARDING_VISIT_SITE_CUSTOM
 import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_FIRE_BUTTON
 import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_SEARCH
 import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_SEARCH_RESULTS
+import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_TRACKERS_BLOCKED
+import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_VISIT_SITE
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
@@ -385,6 +389,7 @@ import org.mockito.ArgumentMatchers.anyString
 import org.mockito.Mockito.never
 import org.mockito.Mockito.times
 import org.mockito.Mockito.verify
+import org.mockito.Mockito.verifyNoInteractions
 import org.mockito.MockitoAnnotations
 import org.mockito.internal.util.DefaultMockingDetails
 import org.mockito.kotlin.KArgumentCaptor
@@ -9274,7 +9279,7 @@ class BrowserTabViewModelTest {
 
         testee.onUserSubmittedQuery("my own search")
 
-        verify(mockOnboardingPixelSender).fire(ONBOARDING_SEARCH, OnboardingPixelAction.SuggestionClicked(fromSuggestion = false))
+        verify(mockOnboardingPixelSender).fireContextual(ONBOARDING_SEARCH, OnboardingPixelAction.SuggestionClicked(fromSuggestion = false))
     }
 
     @Test
@@ -9285,7 +9290,7 @@ class BrowserTabViewModelTest {
 
         testee.onFireMenuSelected(Omnibar.ViewMode.Browser(exampleUrl))
 
-        verify(mockOnboardingPixelSender).fire(ONBOARDING_FIRE_BUTTON, OnboardingPixelAction.Clicked(engaged = true))
+        verify(mockOnboardingPixelSender).fireContextual(ONBOARDING_FIRE_BUTTON, OnboardingPixelAction.Clicked(engaged = true))
     }
 
     @Test
@@ -9295,8 +9300,51 @@ class BrowserTabViewModelTest {
 
         testee.onUserClickCtaOkButton(cta)
 
-        verify(mockOnboardingPixelSender).fire(ONBOARDING_SEARCH_RESULTS, OnboardingPixelAction.Clicked(engaged = true))
-        verify(mockOnboardingPixelSender, never()).fire(ONBOARDING_SEARCH_RESULTS, OnboardingPixelAction.Clicked(engaged = false))
+        verify(mockOnboardingPixelSender).fireContextual(ONBOARDING_SEARCH_RESULTS, OnboardingPixelAction.Clicked(engaged = true))
+        verify(mockOnboardingPixelSender, never()).fireContextual(ONBOARDING_SEARCH_RESULTS, OnboardingPixelAction.Clicked(engaged = false))
+    }
+
+    @Test
+    fun whenShouldOverrideWithSiteSuggestionsContextualCtaThenSuggestionClickedCustomFired() = runTest {
+        val cta =
+            DaxSiteSuggestionsBrandDesignUpdateContextualCta(
+                mockOnboardingStore,
+                mockAppInstallStore,
+                isLightTheme = true,
+                deviceInfo = mockDeviceInfo,
+            )
+        setCta(cta)
+
+        testee.onShouldOverride()
+
+        verify(mockOnboardingPixelSender).fireContextual(ONBOARDING_VISIT_SITE, OnboardingPixelAction.SuggestionClicked(fromSuggestion = false))
+    }
+
+    @Test
+    fun whenPrivacyShieldSelectedWithBrandDesignTrackersBlockedCtaThenClickedEngageFired() = runTest {
+        val cta = DaxTrackersBlockedBrandDesignUpdateContextualCta(
+            mockOnboardingStore,
+            mockAppInstallStore,
+            emptyList(),
+            mockSettingsDataStore,
+            isLightTheme = true,
+            deviceInfo = mockDeviceInfo,
+        )
+        setCta(cta)
+
+        testee.onPrivacyShieldSelected()
+
+        verify(mockOnboardingPixelSender).fireContextual(ONBOARDING_TRACKERS_BLOCKED, OnboardingPixelAction.Clicked(engaged = true))
+    }
+
+    @Test
+    fun whenPrivacyShieldSelectedWithUnrelatedCtaThenNoPixelFired() = runTest {
+        val cta = DaxSerpBrandDesignUpdateContextualCta(mockOnboardingStore, mockAppInstallStore, isLightTheme = true, deviceInfo = mockDeviceInfo)
+        setCta(cta)
+
+        testee.onPrivacyShieldSelected()
+
+        verifyNoInteractions(mockOnboardingPixelSender)
     }
 
     @Test
@@ -10179,6 +10227,13 @@ class BrowserTabViewModelTest {
     private fun browserViewState() = testee.browserViewState.value!!
 
     private fun brandDesignDuckAiFireButtonCta() = DaxDuckAiFireButtonBrandDesignUpdateContextualCta(
+        onboardingStore = mockOnboardingStore,
+        appInstallStore = mockAppInstallStore,
+        isLightTheme = true,
+        deviceInfo = mockDeviceInfo,
+    )
+
+    private fun brandDesignFireButtonCta() = DaxFireButtonBrandDesignUpdateContextualCta(
         onboardingStore = mockOnboardingStore,
         appInstallStore = mockAppInstallStore,
         isLightTheme = true,
@@ -12009,6 +12064,18 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenDismissDuckAiFireOnboardingCtaCalledWithBrandDesignUpdateCtaThenEngageFiredButNotDismiss() = runTest {
+        dismissedCtaDaoChannel.send(emptyList())
+        testee.ctaViewState.value = ctaViewState().copy(cta = brandDesignDuckAiFireButtonCta())
+
+        testee.dismissDuckAiFireOnboardingCta()
+        advanceUntilIdle()
+
+        verify(mockOnboardingPixelSender).fireContextual(ONBOARDING_FIRE_BUTTON, OnboardingPixelAction.Clicked(engaged = true))
+        verify(mockOnboardingPixelSender, never()).fireContextual(ONBOARDING_FIRE_BUTTON, OnboardingPixelAction.Clicked(engaged = false))
+    }
+
+    @Test
     fun whenDismissDuckAiFireOnboardingCtaCalledWithDifferentCtaThenNoop() = runTest {
         dismissedCtaDaoChannel.send(emptyList())
         val cta = DaxSerpCta(mockOnboardingStore, mockAppInstallStore)
@@ -12032,6 +12099,27 @@ class BrowserTabViewModelTest {
         advanceUntilIdle()
 
         verify(mockDismissedCtaDao, never()).insert(DismissedCta(CtaId.DAX_DUCK_AI_FIRE_BUTTON))
+    }
+
+    @Test
+    fun whenOnboardingFireButtonClearedWithBrandDesignFireButtonCtaThenEngageFired() = runTest {
+        testee.ctaViewState.value = ctaViewState().copy(cta = brandDesignFireButtonCta())
+
+        testee.onOnboardingFireButtonCleared()
+        advanceUntilIdle()
+
+        verify(mockOnboardingPixelSender).fireContextual(ONBOARDING_FIRE_BUTTON, OnboardingPixelAction.Clicked(engaged = true))
+    }
+
+    @Test
+    fun whenOnboardingFireButtonClearedWithUnrelatedCtaThenNoPixelFired() = runTest {
+        val cta = DaxSerpCta(mockOnboardingStore, mockAppInstallStore)
+        testee.ctaViewState.value = ctaViewState().copy(cta = cta)
+
+        testee.onOnboardingFireButtonCleared()
+        advanceUntilIdle()
+
+        verifyNoInteractions(mockOnboardingPixelSender)
     }
 
     @Test

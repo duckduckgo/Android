@@ -686,7 +686,6 @@ class RealOnboardingPixelSenderTest {
             ONBOARDING_SEARCH,
             mapOf(
                 "it" to "new",
-                "source" to "default",
                 "flow" to "default",
                 "pixelSource" to "phone",
                 "d" to "0",
@@ -707,7 +706,6 @@ class RealOnboardingPixelSenderTest {
             ONBOARDING_VISIT_SITE,
             mapOf(
                 "it" to "new",
-                "source" to "default",
                 "flow" to "default",
                 "pixelSource" to "phone",
                 "d" to "0",
@@ -716,5 +714,75 @@ class RealOnboardingPixelSenderTest {
             ),
             type = Unique(tag = "onboarding_visit-site_clicked_custom"),
         )
+    }
+
+    @Test
+    fun whenFireContextualShownThenTagHasNoValueSuffix() = runTest {
+        whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis())
+
+        testee.fireContextual(ONBOARDING_SEARCH, OnboardingPixelAction.Shown)
+
+        verify(mockPixel).fire(
+            ONBOARDING_SEARCH,
+            mapOf("it" to "new", "flow" to "default", "pixelSource" to "phone", "d" to "0", "e" to "shown"),
+            type = Unique(tag = "onboarding_search_shown"),
+        )
+    }
+
+    @Test
+    fun whenFireContextualClickedEngagedThenValueSetButTagOmitsIt() = runTest {
+        whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis())
+
+        testee.fireContextual(ONBOARDING_SEARCH, OnboardingPixelAction.Clicked(engaged = true))
+
+        verify(mockPixel).fire(
+            ONBOARDING_SEARCH,
+            mapOf("it" to "new", "flow" to "default", "pixelSource" to "phone", "d" to "0", "e" to "clicked", "value" to "engage"),
+            type = Unique(tag = "onboarding_search_clicked"),
+        )
+    }
+
+    @Test
+    fun whenFireContextualClickedEngagedAndDismissedThenBothShareTheSameDedupTag() = runTest {
+        whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis())
+
+        testee.fireContextual(ONBOARDING_SEARCH, OnboardingPixelAction.Clicked(engaged = true))
+        testee.fireContextual(ONBOARDING_SEARCH, OnboardingPixelAction.Clicked(engaged = false))
+
+        verify(mockPixel).fire(
+            ONBOARDING_SEARCH,
+            mapOf("it" to "new", "flow" to "default", "pixelSource" to "phone", "d" to "0", "e" to "clicked", "value" to "engage"),
+            type = Unique(tag = "onboarding_search_clicked"),
+        )
+        verify(mockPixel).fire(
+            ONBOARDING_SEARCH,
+            mapOf("it" to "new", "flow" to "default", "pixelSource" to "phone", "d" to "0", "e" to "clicked", "value" to "dismiss"),
+            type = Unique(tag = "onboarding_search_clicked"),
+        )
+    }
+
+    @Test
+    fun whenFireContextualSuggestionClickedThenTagOmitsSuggestedOrCustom() = runTest {
+        whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis())
+
+        testee.fireContextual(ONBOARDING_VISIT_SITE, OnboardingPixelAction.SuggestionClicked(fromSuggestion = true))
+
+        verify(mockPixel).fire(
+            ONBOARDING_VISIT_SITE,
+            mapOf(
+                "it" to "new",
+                "flow" to "default",
+                "pixelSource" to "phone",
+                "d" to "0",
+                "e" to "clicked",
+                "value" to "suggested",
+            ),
+            type = Unique(tag = "onboarding_visit-site_clicked"),
+        )
+    }
+
+    @Test(expected = IllegalStateException::class)
+    fun whenFireContextualCalledWithUnsupportedActionThenThrows() = runTest {
+        testee.fireContextual(ONBOARDING_SEARCH, OnboardingPixelAction.SetDefaultConfirmed(isDdgDefault = true))
     }
 }

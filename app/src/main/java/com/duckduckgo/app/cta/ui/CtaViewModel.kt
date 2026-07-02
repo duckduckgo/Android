@@ -157,16 +157,26 @@ class CtaViewModel @Inject constructor(
 
     private fun contextualOnboardingPixelName(cta: Cta): OnboardingPixelName? = when (cta) {
         is DaxTryASearchBrandDesignUpdateBubbleCta -> OnboardingPixelName.ONBOARDING_SEARCH
-        is DaxVisitSiteOptionsBrandDesignUpdateBubbleCta -> OnboardingPixelName.ONBOARDING_VISIT_SITE
+        is DaxVisitSiteOptionsBrandDesignUpdateBubbleCta,
+        is DaxSiteSuggestionsBrandDesignUpdateContextualCta,
+        -> OnboardingPixelName.ONBOARDING_VISIT_SITE
+
         is DaxSerpBrandDesignUpdateContextualCta -> OnboardingPixelName.ONBOARDING_SEARCH_RESULTS
         is DaxTrackersBlockedBrandDesignUpdateContextualCta,
         is DaxMainNetworkBrandDesignUpdateContextualCta,
         is DaxNoTrackersBrandDesignUpdateContextualCta,
         -> OnboardingPixelName.ONBOARDING_TRACKERS_BLOCKED
-        is DaxFireButtonBrandDesignUpdateContextualCta -> OnboardingPixelName.ONBOARDING_FIRE_BUTTON
+
+        is DaxFireButtonBrandDesignUpdateContextualCta,
+        is DaxDuckAiFireButtonBrandDesignUpdateContextualCta,
+        -> OnboardingPixelName.ONBOARDING_FIRE_BUTTON
+
         is DaxEndBrandDesignUpdateBubbleCta,
         is DaxEndBrandDesignUpdateContextualCta,
+        is DaxDuckAiEndBrandDesignUpdateBubbleCta,
         -> OnboardingPixelName.ONBOARDING_END
+
+        is DaxSubscriptionBrandDesignUpdateBubbleCta -> OnboardingPixelName.ONBOARDING_SUBSCRIPTION_PROMO
         else -> null
     }
 
@@ -205,7 +215,7 @@ class CtaViewModel @Inject constructor(
 
     suspend fun onCtaShown(cta: Cta) {
         withContext(dispatchers.io()) {
-            contextualOnboardingPixelName(cta)?.let { onboardingPixelSender.fire(it, OnboardingPixelAction.Shown) }
+            contextualOnboardingPixelName(cta)?.let { onboardingPixelSender.fireContextual(it, OnboardingPixelAction.Shown) }
             cta.shownPixel?.let {
                 val canSendPixel = when (cta) {
                     is DaxCta -> cta.canSendShownPixel()
@@ -242,22 +252,22 @@ class CtaViewModel @Inject constructor(
         }
     }
 
-    suspend fun onUserDismissedCta(cta: Cta, viaCloseBtn: Boolean = false, isEngagement: Boolean = false) {
+    suspend fun onUserDismissedCta(
+        cta: Cta,
+        viaCloseBtn: Boolean = false,
+        isEngagement: Boolean = false,
+    ) {
         withContext(dispatchers.io()) {
             if (!isEngagement) {
-                when (cta) {
-                    is DaxSerpBrandDesignUpdateContextualCta ->
-                        onboardingPixelSender.fire(OnboardingPixelName.ONBOARDING_SEARCH_RESULTS, OnboardingPixelAction.Clicked(engaged = false))
-                    is DaxTrackersBlockedBrandDesignUpdateContextualCta,
-                    is DaxMainNetworkBrandDesignUpdateContextualCta,
-                    is DaxNoTrackersBrandDesignUpdateContextualCta,
-                    -> onboardingPixelSender.fire(OnboardingPixelName.ONBOARDING_TRACKERS_BLOCKED, OnboardingPixelAction.Clicked(engaged = false))
-                    is DaxFireButtonBrandDesignUpdateContextualCta ->
-                        onboardingPixelSender.fire(OnboardingPixelName.ONBOARDING_FIRE_BUTTON, OnboardingPixelAction.Clicked(engaged = false))
-                    is DaxEndBrandDesignUpdateBubbleCta,
-                    is DaxEndBrandDesignUpdateContextualCta,
-                    -> onboardingPixelSender.fire(OnboardingPixelName.ONBOARDING_END, OnboardingPixelAction.Clicked(engaged = false))
-                    else -> {}
+                // The option-bubble/contextual CTAs report their click via onContextualSearchSubmitted, so
+                // exclude them here to avoid emitting a dismiss pixel they don't fire today.
+                if (cta !is DaxTryASearchBrandDesignUpdateBubbleCta &&
+                    cta !is DaxVisitSiteOptionsBrandDesignUpdateBubbleCta &&
+                    cta !is DaxSiteSuggestionsBrandDesignUpdateContextualCta
+                ) {
+                    contextualOnboardingPixelName(cta)?.let {
+                        onboardingPixelSender.fireContextual(it, OnboardingPixelAction.Clicked(engaged = false))
+                    }
                 }
             }
             if (cta is BrokenSitePromptDialogCta) {
@@ -280,17 +290,13 @@ class CtaViewModel @Inject constructor(
     }
 
     suspend fun onUserClickCtaOkButton(cta: Cta) {
-        when (cta) {
-            is DaxSerpBrandDesignUpdateContextualCta ->
-                onboardingPixelSender.fire(OnboardingPixelName.ONBOARDING_SEARCH_RESULTS, OnboardingPixelAction.Clicked(engaged = true))
-            is DaxTrackersBlockedBrandDesignUpdateContextualCta,
-            is DaxMainNetworkBrandDesignUpdateContextualCta,
-            is DaxNoTrackersBrandDesignUpdateContextualCta,
-            -> onboardingPixelSender.fire(OnboardingPixelName.ONBOARDING_TRACKERS_BLOCKED, OnboardingPixelAction.Clicked(engaged = true))
-            is DaxEndBrandDesignUpdateBubbleCta,
-            is DaxEndBrandDesignUpdateContextualCta,
-            -> onboardingPixelSender.fire(OnboardingPixelName.ONBOARDING_END, OnboardingPixelAction.Clicked(engaged = true))
-            else -> {}
+        // The fire-button CTA's engagement is reported once the fire action actually completes
+        // (see onContextualFireButtonEngaged), so exclude it here to avoid firing on the mere tap
+        // of its "Try It" button, before the user has confirmed anything gets cleared.
+        if (cta !is DaxFireButtonBrandDesignUpdateContextualCta) {
+            contextualOnboardingPixelName(cta)?.let {
+                onboardingPixelSender.fireContextual(it, OnboardingPixelAction.Clicked(engaged = true))
+            }
         }
         cta.okPixel?.let {
             pixel.fire(it, cta.pixelOkParameters())
@@ -568,7 +574,11 @@ class CtaViewModel @Inject constructor(
         extendedOnboardingFeatureToggles.freeTrialCopy().isEnabled() && subscriptions.isFreeTrialEligible()
 
     @WorkerThread
-    private suspend fun getBrowserCta(site: Site?, detectedRefreshPatterns: Set<RefreshPattern>, suppressDuckAiOnboardingCta: Boolean): Cta? {
+    private suspend fun getBrowserCta(
+        site: Site?,
+        detectedRefreshPatterns: Set<RefreshPattern>,
+        suppressDuckAiOnboardingCta: Boolean,
+    ): Cta? {
         val nonNullSite = site ?: return null
 
         val host = nonNullSite.domain
@@ -807,25 +817,53 @@ class CtaViewModel @Inject constructor(
 
     private fun hideTips() = settingsDataStore.hideTips
 
-    fun onContextualSearchSubmitted(cta: Cta, query: String) {
+    fun onContextualSearchSubmitted(
+        cta: Cta,
+        query: String,
+    ) {
         when (cta) {
             is DaxTryASearchBrandDesignUpdateBubbleCta ->
-                onboardingPixelSender.fire(
+                onboardingPixelSender.fireContextual(
                     OnboardingPixelName.ONBOARDING_SEARCH,
                     OnboardingPixelAction.SuggestionClicked(fromSuggestion = isSuggestedSearchOption(query)),
                 )
-            is DaxVisitSiteOptionsBrandDesignUpdateBubbleCta ->
-                onboardingPixelSender.fire(
+
+            is DaxVisitSiteOptionsBrandDesignUpdateBubbleCta,
+            is DaxSiteSuggestionsBrandDesignUpdateContextualCta,
+            -> {
+                onboardingPixelSender.fireContextual(
                     OnboardingPixelName.ONBOARDING_VISIT_SITE,
                     OnboardingPixelAction.SuggestionClicked(fromSuggestion = isSuggestedSiteOption(query)),
                 )
+            }
+
             else -> {}
         }
     }
 
+    // The user tapped a real link/result inside the loaded page (e.g. a SERP result) rather than
+    // using the dialog's own suggested-site option or typing a query, so this is always "custom".
+    fun onContextualSiteLinkTapped(cta: Cta) {
+        if (cta is DaxVisitSiteOptionsBrandDesignUpdateBubbleCta || cta is DaxSiteSuggestionsBrandDesignUpdateContextualCta) {
+            onboardingPixelSender.fireContextual(
+                OnboardingPixelName.ONBOARDING_VISIT_SITE,
+                OnboardingPixelAction.SuggestionClicked(fromSuggestion = false),
+            )
+        }
+    }
+
     fun onContextualFireButtonEngaged(cta: Cta) {
-        if (cta is DaxFireButtonBrandDesignUpdateContextualCta) {
-            onboardingPixelSender.fire(OnboardingPixelName.ONBOARDING_FIRE_BUTTON, OnboardingPixelAction.Clicked(engaged = true))
+        if (cta is DaxFireButtonBrandDesignUpdateContextualCta || cta is DaxDuckAiFireButtonBrandDesignUpdateContextualCta) {
+            onboardingPixelSender.fireContextual(OnboardingPixelName.ONBOARDING_FIRE_BUTTON, OnboardingPixelAction.Clicked(engaged = true))
+        }
+    }
+
+    fun onContextualTrackersBlockedShieldEngaged(cta: Cta) {
+        if (cta is DaxTrackersBlockedBrandDesignUpdateContextualCta ||
+            cta is DaxMainNetworkBrandDesignUpdateContextualCta ||
+            cta is DaxNoTrackersBrandDesignUpdateContextualCta
+        ) {
+            onboardingPixelSender.fireContextual(OnboardingPixelName.ONBOARDING_TRACKERS_BLOCKED, OnboardingPixelAction.Clicked(engaged = true))
         }
     }
 
