@@ -26,7 +26,6 @@ import android.text.style.ClickableSpan
 import android.text.style.ForegroundColorSpan
 import android.text.style.UnderlineSpan
 import android.view.View
-import androidx.activity.result.ActivityResultLauncher
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -35,8 +34,6 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.about.AboutDuckDuckGoViewModel.Command
 import com.duckduckgo.app.about.AboutDuckDuckGoViewModel.Command.LaunchBrowserWithLearnMoreUrl
 import com.duckduckgo.app.about.AboutDuckDuckGoViewModel.Command.LaunchBrowserWithPrivacyProtectionsUrl
-import com.duckduckgo.app.about.AboutDuckDuckGoViewModel.Command.LaunchFeedback
-import com.duckduckgo.app.about.AboutDuckDuckGoViewModel.Command.LaunchSubscriptionUnifiedFeedback
 import com.duckduckgo.app.about.AboutDuckDuckGoViewModel.Command.LaunchWebViewWithComparisonChartUrl
 import com.duckduckgo.app.about.AboutDuckDuckGoViewModel.Command.LaunchWebViewWithPrivacyPolicyUrl
 import com.duckduckgo.app.about.AboutDuckDuckGoViewModel.Command.LaunchWebViewWithSubscriptionUrl
@@ -51,10 +48,8 @@ import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.AppUrl.Url
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.feedback.api.FeedbackLauncher
 import com.duckduckgo.mobile.android.R.attr
 import com.duckduckgo.navigation.api.GlobalActivityStarter
-import com.duckduckgo.subscriptions.api.SubscriptionFeedbackScreens.GeneralSubscriptionFeedbackScreenNoParams
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
@@ -69,17 +64,8 @@ class AboutDuckDuckGoActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var globalActivityStarter: GlobalActivityStarter
 
-    @Inject
-    lateinit var feedbackLauncher: FeedbackLauncher
-
-    private lateinit var feedbackFlow: ActivityResultLauncher<Void?>
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        feedbackFlow = registerForActivityResult(feedbackLauncher.feedbackContract()) { resultOk ->
-            if (resultOk) feedbackLauncher.showFeedbackSubmittedMessage(binding.root)
-        }
 
         setContentView(binding.root)
         setupToolbar(binding.includeToolbar.toolbar)
@@ -204,8 +190,6 @@ class AboutDuckDuckGoActivity : DuckDuckGoActivity() {
             LaunchBrowserWithLearnMoreUrl -> launchBrowserScreen()
             LaunchWebViewWithPrivacyPolicyUrl -> launchWebViewScreen(PRIVACY_POLICY_WEB_LINK, getString(R.string.settingsPrivacyPolicyDuckduckgo))
             LaunchBrowserWithPrivacyProtectionsUrl -> launchPrivacyProtectionsScreen()
-            LaunchFeedback -> launchFeedback()
-            LaunchSubscriptionUnifiedFeedback -> launchSubscriptionUnifiedFeedback()
             LaunchWebViewWithComparisonChartUrl -> launchWebViewScreen(COMPARISON_CHART_URL, getString(R.string.settingsAboutDuckduckgo))
             LaunchWebViewWithSubscriptionUrl -> launchWebViewScreen(PPRO_URL, getString(R.string.settingsAboutDuckduckgo))
             LaunchWebViewWithVPNUrl -> launchWebViewScreen(VPN_URL, getString(R.string.settingsAboutDuckduckgo))
@@ -234,17 +218,6 @@ class AboutDuckDuckGoActivity : DuckDuckGoActivity() {
                 url = PRIVACY_PROTECTIONS_WEB_LINK,
                 screenTitle = getString(R.string.settingsAboutDuckduckgo),
             ),
-        )
-    }
-
-    private fun launchFeedback() {
-        feedbackFlow.launch(null)
-    }
-
-    private fun launchSubscriptionUnifiedFeedback() {
-        globalActivityStarter.start(
-            this,
-            GeneralSubscriptionFeedbackScreenNoParams,
         )
     }
 

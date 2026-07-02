@@ -22,13 +22,10 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_ABOUT_DDG_LEARN_MORE_PRESSED
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_ABOUT_DDG_PRIVACY_POLICY_PRESSED
-import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_ABOUT_DDG_SHARE_FEEDBACK_PRESSED
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_ABOUT_DDG_VERSION_EASTER_EGG_PRESSED
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.subscriptions.api.SubscriptionUnifiedFeedback
-import com.duckduckgo.subscriptions.api.SubscriptionUnifiedFeedback.SubscriptionFeedbackSource.DDG_SETTINGS
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -44,7 +41,6 @@ import javax.inject.Inject
 class AboutDuckDuckGoViewModel @Inject constructor(
     private val appBuildConfig: AppBuildConfig,
     private val pixel: Pixel,
-    private val subscriptionUnifiedFeedback: SubscriptionUnifiedFeedback,
 ) : ViewModel() {
 
     data class ViewState(
@@ -55,8 +51,6 @@ class AboutDuckDuckGoViewModel @Inject constructor(
         data object LaunchBrowserWithLearnMoreUrl : Command()
         data object LaunchBrowserWithPrivacyProtectionsUrl : Command()
         data object LaunchWebViewWithPrivacyPolicyUrl : Command()
-        data object LaunchFeedback : Command()
-        data object LaunchSubscriptionUnifiedFeedback : Command()
         data object LaunchWebViewWithComparisonChartUrl : Command()
         data object LaunchWebViewWithSubscriptionUrl : Command()
         data object LaunchWebViewWithVPNUrl : Command()
@@ -114,17 +108,6 @@ class AboutDuckDuckGoViewModel @Inject constructor(
             resetEasterEggCounter()
             pixel.fire(SETTINGS_ABOUT_DDG_VERSION_EASTER_EGG_PRESSED)
         }
-    }
-
-    fun onProvideFeedbackClicked() {
-        viewModelScope.launch {
-            if (subscriptionUnifiedFeedback.shouldUseUnifiedFeedback(source = DDG_SETTINGS)) {
-                command.send(Command.LaunchSubscriptionUnifiedFeedback)
-            } else {
-                command.send(Command.LaunchFeedback)
-            }
-        }
-        pixel.fire(SETTINGS_ABOUT_DDG_SHARE_FEEDBACK_PRESSED)
     }
 
     fun resetEasterEggCounter() {
