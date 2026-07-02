@@ -22,12 +22,7 @@ import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 
-/**
- * Shows and tracks the ad-blocking contingency bottom sheet, keeping the dialog/UI concern out of
- * [ContingencyMessageHandler].
- */
 interface ContingencyMessageView {
-    /** Shows the contingency bottom sheet using the given [webView]'s context. */
     @UiThread
     fun show(webView: WebView)
 }

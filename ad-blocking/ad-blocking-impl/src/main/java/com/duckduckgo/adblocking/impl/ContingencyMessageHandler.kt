@@ -37,24 +37,12 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-/**
- * Decides whether to show the ad-blocking contingency bottom sheet and shows it. It is driven by
- * [AdBlockingExtensionJsInjectorPlugin] on page load rather than being a [JsInjectorPlugin] itself,
- * so that JS injection and UI concerns stay separated.
- */
 interface ContingencyMessageHandler {
     /** Called on page load. Shows the contingency message if all conditions are met. */
     @UiThread
     fun onPageLoaded(webView: WebView, url: String?)
 }
 
-/**
- * Shows a one-off bottom sheet informing the user that YouTube ad blocking is temporarily
- * unavailable while ad-blocking contingency mode is active. Gated behind the
- * [AdBlockingExtensionFeature.adBlockingUXImprovements] rollout flag. The message is shown only the
- * first time the user reaches YouTube after contingency mode is enabled; the "shown" state is reset
- * whenever contingency mode is disabled so it shows again next time it is enabled.
- */
 @SingleInstanceIn(AppScope::class)
 @ContributesBinding(scope = AppScope::class, boundType = ContingencyMessageHandler::class)
 @ContributesMultibinding(scope = AppScope::class, boundType = MainProcessLifecycleObserver::class)
