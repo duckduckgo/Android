@@ -128,7 +128,7 @@ jobs:
           test_suite_name: Onboarding Internal (Nightly)
 
       - name: Create Asana task when workflow failed
-        if: ${{ failure() }}
+        if: ${{ failure() && github.event_name != 'workflow_dispatch' }}
         id: create-failure-task
         uses: duckduckgo/native-github-asana-sync@v2.0
         with:

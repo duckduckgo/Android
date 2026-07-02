@@ -219,7 +219,7 @@ jobs:
     name: Create Asana task when workflow failed
     runs-on: ubuntu-24.04 #https://github.com/actions/runner-images/issues/6709
     needs: [code_formatting, unit_tests, lint, android_tests]
-    if: ${{ failure() }}
+    if: ${{ failure() && github.event_name != 'workflow_dispatch' }}
     steps:
       - name: Create Asana task when workflow failed
         id: create-failure-task
