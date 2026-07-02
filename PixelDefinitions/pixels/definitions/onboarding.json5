@@ -73,12 +73,6 @@
                 "description": "Days since install (0-28). Omitted when more than 28 days have passed since install."
             },
             {
-                "key": "source",
-                "type": "string",
-                "description": "Onboarding entry point",
-                "enum": ["default", "duckai_cpp"]
-            },
-            {
                 "key": "flow",
                 "type": "string",
                 "description": "Onboarding flow type",
@@ -144,7 +138,6 @@
                 "type": "integer",
                 "description": "Days since install (0-28). Omitted when more than 28 days have passed since install."
             },
-            { "key": "source", "type": "string", "description": "Onboarding entry point", "enum": ["default", "duckai_cpp"] },
             { "key": "flow", "type": "string", "description": "Onboarding flow type", "enum": ["default", "duckai"] },
             { "key": "pixelSource", "type": "string", "description": "Device form factor", "enum": ["phone", "tablet"] },
             { "key": "value", "type": "string", "description": "Only set when e=clicked.", "enum": ["engage", "dismiss"] }
@@ -169,7 +162,6 @@
                 "type": "integer",
                 "description": "Days since install (0-28). Omitted when more than 28 days have passed since install."
             },
-            { "key": "source", "type": "string", "description": "Onboarding entry point", "enum": ["default", "duckai_cpp"] },
             { "key": "flow", "type": "string", "description": "Onboarding flow type", "enum": ["default", "duckai"] },
             { "key": "pixelSource", "type": "string", "description": "Device form factor", "enum": ["phone", "tablet"] },
             {
@@ -199,7 +191,6 @@
                 "type": "integer",
                 "description": "Days since install (0-28). Omitted when more than 28 days have passed since install."
             },
-            { "key": "source", "type": "string", "description": "Onboarding entry point", "enum": ["default", "duckai_cpp"] },
             { "key": "flow", "type": "string", "description": "Onboarding flow type", "enum": ["default", "duckai"] },
             { "key": "pixelSource", "type": "string", "description": "Device form factor", "enum": ["phone", "tablet"] },
             {
@@ -229,7 +220,6 @@
                 "type": "integer",
                 "description": "Days since install (0-28). Omitted when more than 28 days have passed since install."
             },
-            { "key": "source", "type": "string", "description": "Onboarding entry point", "enum": ["default", "duckai_cpp"] },
             { "key": "flow", "type": "string", "description": "Onboarding flow type", "enum": ["default", "duckai"] },
             { "key": "pixelSource", "type": "string", "description": "Device form factor", "enum": ["phone", "tablet"] },
             {
@@ -259,7 +249,6 @@
                 "type": "integer",
                 "description": "Days since install (0-28). Omitted when more than 28 days have passed since install."
             },
-            { "key": "source", "type": "string", "description": "Onboarding entry point", "enum": ["default", "duckai_cpp"] },
             { "key": "flow", "type": "string", "description": "Onboarding flow type", "enum": ["default", "duckai"] },
             { "key": "pixelSource", "type": "string", "description": "Device form factor", "enum": ["phone", "tablet"] },
             { "key": "value", "type": "string", "description": "Only set when e=clicked.", "enum": ["engage", "dismiss"] }
@@ -284,7 +273,6 @@
                 "type": "integer",
                 "description": "Days since install (0-28). Omitted when more than 28 days have passed since install."
             },
-            { "key": "source", "type": "string", "description": "Onboarding entry point", "enum": ["default", "duckai_cpp"] },
             { "key": "flow", "type": "string", "description": "Onboarding flow type", "enum": ["default", "duckai"] },
             { "key": "pixelSource", "type": "string", "description": "Device form factor", "enum": ["phone", "tablet"] },
             {
@@ -314,7 +302,6 @@
                 "type": "integer",
                 "description": "Days since install (0-28). Omitted when more than 28 days have passed since install."
             },
-            { "key": "source", "type": "string", "description": "Onboarding entry point", "enum": ["default", "duckai_cpp"] },
             { "key": "flow", "type": "string", "description": "Onboarding flow type", "enum": ["default", "duckai"] },
             { "key": "pixelSource", "type": "string", "description": "Device form factor", "enum": ["phone", "tablet"] },
             {
@@ -350,7 +337,6 @@
                 "type": "integer",
                 "description": "Days since install (0-28). Omitted when more than 28 days have passed since install."
             },
-            { "key": "source", "type": "string", "description": "Onboarding entry point", "enum": ["default", "duckai_cpp"] },
             { "key": "flow", "type": "string", "description": "Onboarding flow type", "enum": ["default", "duckai"] },
             { "key": "pixelSource", "type": "string", "description": "Device form factor", "enum": ["phone", "tablet"] }
         ]
@@ -374,7 +360,6 @@
                 "type": "integer",
                 "description": "Days since install (0-28). Omitted when more than 28 days have passed since install."
             },
-            { "key": "source", "type": "string", "description": "Onboarding entry point", "enum": ["default", "duckai_cpp"] },
             { "key": "flow", "type": "string", "description": "Onboarding flow type", "enum": ["default", "duckai"] },
             { "key": "pixelSource", "type": "string", "description": "Device form factor", "enum": ["phone", "tablet"] },
             {

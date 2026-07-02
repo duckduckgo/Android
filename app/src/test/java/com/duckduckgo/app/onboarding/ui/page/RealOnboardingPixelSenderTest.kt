@@ -90,7 +90,7 @@ class RealOnboardingPixelSenderTest {
 
         verify(mockPixel).fire(
             ONBOARDING_WELCOME,
-            mapOf("it" to "new", "source" to "default", "flow" to "default", "pixelSource" to "phone", "d" to "0", "e" to "shown"),
+            mapOf("it" to "new", "flow" to "default", "pixelSource" to "phone", "d" to "0", "e" to "shown"),
             type = Unique(tag = "onboarding_welcome_shown"),
         )
     }
@@ -118,7 +118,6 @@ class RealOnboardingPixelSenderTest {
             ONBOARDING_WELCOME,
             mapOf(
                 "it" to "reinstall",
-                "source" to "default",
                 "flow" to "default",
                 "pixelSource" to "phone",
                 "d" to "3",
@@ -139,7 +138,6 @@ class RealOnboardingPixelSenderTest {
             ONBOARDING_WELCOME,
             mapOf(
                 "it" to "new",
-                "source" to "default",
                 "flow" to "default",
                 "pixelSource" to "phone",
                 "d" to "0",
@@ -158,7 +156,7 @@ class RealOnboardingPixelSenderTest {
 
         verify(mockPixel).fire(
             ONBOARDING_SKIP_ONBOARDING,
-            mapOf("it" to "new", "source" to "default", "flow" to "default", "pixelSource" to "phone", "e" to "shown"),
+            mapOf("it" to "new", "flow" to "default", "pixelSource" to "phone", "e" to "shown"),
             type = Unique(tag = "onboarding_skip-onboarding_shown"),
         )
     }
@@ -173,7 +171,6 @@ class RealOnboardingPixelSenderTest {
             ONBOARDING_ADDRESS_BAR_POSITION,
             mapOf(
                 "it" to "new",
-                "source" to "default",
                 "flow" to "default",
                 "pixelSource" to "phone",
                 "d" to "0",
@@ -194,7 +191,6 @@ class RealOnboardingPixelSenderTest {
             ONBOARDING_SEARCH_EXPERIENCE,
             mapOf(
                 "it" to "new",
-                "source" to "default",
                 "flow" to "default",
                 "pixelSource" to "phone",
                 "d" to "0",
@@ -215,7 +211,6 @@ class RealOnboardingPixelSenderTest {
             ONBOARDING_SEARCH_EXPERIENCE,
             mapOf(
                 "it" to "new",
-                "source" to "default",
                 "flow" to "default",
                 "pixelSource" to "phone",
                 "d" to "0",
@@ -236,7 +231,6 @@ class RealOnboardingPixelSenderTest {
             ONBOARDING_SET_DEFAULT,
             mapOf(
                 "it" to "new",
-                "source" to "default",
                 "flow" to "default",
                 "pixelSource" to "phone",
                 "d" to "0",
@@ -257,7 +251,6 @@ class RealOnboardingPixelSenderTest {
             ONBOARDING_SET_DEFAULT,
             mapOf(
                 "it" to "new",
-                "source" to "default",
                 "flow" to "default",
                 "pixelSource" to "phone",
                 "d" to "0",
@@ -276,7 +269,7 @@ class RealOnboardingPixelSenderTest {
 
         verify(mockPixel).fire(
             ONBOARDING_SET_DEFAULT,
-            mapOf("it" to "new", "source" to "default", "flow" to "default", "pixelSource" to "phone", "d" to "0", "e" to "clicked"),
+            mapOf("it" to "new", "flow" to "default", "pixelSource" to "phone", "d" to "0", "e" to "clicked"),
             type = Unique(tag = "onboarding_set-default_clicked"),
         )
     }
@@ -292,7 +285,6 @@ class RealOnboardingPixelSenderTest {
             ONBOARDING_NOTIFICATIONS,
             mapOf(
                 "it" to "new",
-                "source" to "default",
                 "flow" to "default",
                 "pixelSource" to "tablet",
                 "d" to "0",
@@ -324,7 +316,7 @@ class RealOnboardingPixelSenderTest {
 
         verify(mockPixel).fire(
             ONBOARDING_QUICK_SETUP,
-            mapOf("it" to "reinstall", "source" to "default", "flow" to "default", "pixelSource" to "phone", "d" to "3", "e" to "shown"),
+            mapOf("it" to "reinstall", "flow" to "default", "pixelSource" to "phone", "d" to "3", "e" to "shown"),
             type = Unique(tag = "onboarding_quick-setup_shown"),
         )
     }
@@ -360,7 +352,6 @@ class RealOnboardingPixelSenderTest {
             ONBOARDING_QUICK_SETUP,
             mapOf(
                 "it" to "reinstall",
-                "source" to "default",
                 "flow" to "default",
                 "pixelSource" to "phone",
                 "d" to "0",
@@ -405,7 +396,6 @@ class RealOnboardingPixelSenderTest {
             ONBOARDING_QUICK_SETUP,
             mapOf(
                 "it" to "reinstall",
-                "source" to "default",
                 "flow" to "default",
                 "pixelSource" to "phone",
                 "d" to "0",
@@ -450,7 +440,6 @@ class RealOnboardingPixelSenderTest {
             ONBOARDING_QUICK_SETUP,
             mapOf(
                 "it" to "reinstall",
-                "source" to "default",
                 "flow" to "default",
                 "pixelSource" to "phone",
                 "d" to "0",
@@ -465,7 +454,7 @@ class RealOnboardingPixelSenderTest {
     }
 
     @Test
-    fun whenCustomAiFlowThenSourceDuckaiCppAndFlowDuckai() = runTest {
+    fun whenCustomAiFlowThenFlowDuckai() = runTest {
         whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis())
         whenever(mockCustomAiOnboardingStore.isEnabled()).thenReturn(true)
 
@@ -473,7 +462,7 @@ class RealOnboardingPixelSenderTest {
 
         verify(mockPixel).fire(
             ONBOARDING_WELCOME,
-            mapOf("it" to "new", "source" to "duckai_cpp", "flow" to "duckai", "pixelSource" to "phone", "d" to "0", "e" to "shown"),
+            mapOf("it" to "new", "flow" to "duckai", "pixelSource" to "phone", "d" to "0", "e" to "shown"),
             type = Unique(tag = "onboarding_welcome_shown"),
         )
     }
@@ -503,7 +492,6 @@ class RealOnboardingPixelSenderTest {
             ONBOARDING_SET_DEFAULT,
             mapOf(
                 "it" to "new",
-                "source" to "duckai_cpp",
                 "flow" to "duckai",
                 "variant" to "search_plus_duckai-chat",
                 "pixelSource" to "phone",
@@ -538,7 +526,6 @@ class RealOnboardingPixelSenderTest {
             ONBOARDING_ADDRESS_BAR_POSITION,
             mapOf(
                 "it" to "new",
-                "source" to "default",
                 "flow" to "default",
                 "variant" to "search_plus_duckai-search",
                 "pixelSource" to "phone",
@@ -557,7 +544,7 @@ class RealOnboardingPixelSenderTest {
 
         verify(mockPixel).fire(
             ONBOARDING_WELCOME,
-            mapOf("it" to "new", "source" to "default", "flow" to "default", "pixelSource" to "phone", "d" to "0", "e" to "shown"),
+            mapOf("it" to "new", "flow" to "default", "pixelSource" to "phone", "d" to "0", "e" to "shown"),
             type = Unique(tag = "onboarding_welcome_shown"),
         )
     }
@@ -572,7 +559,6 @@ class RealOnboardingPixelSenderTest {
             ONBOARDING_WELCOME,
             mapOf(
                 "it" to "new",
-                "source" to "default",
                 "flow" to "default",
                 "pixelSource" to "phone",
                 "d" to "0",
@@ -593,7 +579,6 @@ class RealOnboardingPixelSenderTest {
             ONBOARDING_WELCOME,
             mapOf(
                 "it" to "new",
-                "source" to "default",
                 "flow" to "default",
                 "pixelSource" to "phone",
                 "d" to "0",
@@ -612,7 +597,7 @@ class RealOnboardingPixelSenderTest {
 
         verify(mockPixel).fire(
             ONBOARDING_SEARCH_CHAT_TOGGLE,
-            mapOf("it" to "new", "source" to "default", "flow" to "default", "pixelSource" to "phone", "d" to "0", "e" to "shown"),
+            mapOf("it" to "new", "flow" to "default", "pixelSource" to "phone", "d" to "0", "e" to "shown"),
             type = Unique(tag = "onboarding_search-chat-toggle_shown"),
         )
     }
@@ -630,7 +615,6 @@ class RealOnboardingPixelSenderTest {
             ONBOARDING_SEARCH_CHAT_TOGGLE,
             mapOf(
                 "it" to "new",
-                "source" to "default",
                 "flow" to "default",
                 "pixelSource" to "phone",
                 "d" to "0",
@@ -654,7 +638,6 @@ class RealOnboardingPixelSenderTest {
             ONBOARDING_SEARCH_CHAT_TOGGLE,
             mapOf(
                 "it" to "new",
-                "source" to "default",
                 "flow" to "default",
                 "pixelSource" to "phone",
                 "d" to "0",
@@ -673,7 +656,7 @@ class RealOnboardingPixelSenderTest {
 
         verify(mockPixel).fire(
             ONBOARDING_AI_INTRO,
-            mapOf("it" to "new", "source" to "default", "flow" to "default", "pixelSource" to "phone", "d" to "0", "e" to "shown"),
+            mapOf("it" to "new", "flow" to "default", "pixelSource" to "phone", "d" to "0", "e" to "shown"),
             type = Unique(tag = "onboarding_ai-intro_shown"),
         )
     }
@@ -686,7 +669,7 @@ class RealOnboardingPixelSenderTest {
 
         verify(mockPixel).fire(
             ONBOARDING_AI_INTRO,
-            mapOf("it" to "new", "source" to "default", "flow" to "default", "pixelSource" to "phone", "d" to "0", "e" to "clicked"),
+            mapOf("it" to "new", "flow" to "default", "pixelSource" to "phone", "d" to "0", "e" to "clicked"),
             type = Unique(tag = "onboarding_ai-intro_clicked"),
         )
     }
