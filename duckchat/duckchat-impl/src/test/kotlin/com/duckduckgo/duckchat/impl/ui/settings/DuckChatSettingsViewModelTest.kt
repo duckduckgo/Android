@@ -32,6 +32,7 @@ import com.duckduckgo.duckchat.impl.store.DefaultTogglePosition
 import com.duckduckgo.duckchat.impl.store.HideAiGeneratedImages
 import com.duckduckgo.duckchat.impl.store.SearchAssistVisibility
 import com.duckduckgo.duckchat.impl.ui.settings.DuckChatSettingsViewModel.Command.LaunchFeedback
+import com.duckduckgo.duckchat.impl.ui.settings.DuckChatSettingsViewModel.Command.OpenDuckAiWebSettings
 import com.duckduckgo.duckchat.impl.ui.settings.DuckChatSettingsViewModel.Command.OpenLink
 import com.duckduckgo.duckchat.impl.ui.settings.DuckChatSettingsViewModel.Command.OpenLinkInNewTab
 import com.duckduckgo.duckchat.impl.ui.settings.DuckChatSettingsViewModel.Command.OpenShortcutSettings
@@ -1039,6 +1040,91 @@ class DuckChatSettingsViewModelTest {
 
             testee.viewState.test {
                 assertTrue(awaitItem().isUseWithoutAiActionEnabled)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `when duckAiSettings toggle enabled and duck chat enabled then isDuckAiWebSettingsVisible is true`() =
+        runTest {
+            @Suppress("DenyListedApi")
+            duckChatFeature.duckAiSettings().setRawStoredState(State(enable = true))
+            whenever(duckChat.observeEnableDuckChatUserSetting()).thenReturn(flowOf(true))
+            testee = DuckChatSettingsViewModel(
+                duckChatActivityParams = DuckChatSettingsNoParams,
+                duckChat = duckChat,
+                pixel = mockPixel,
+                inputScreenDiscoveryFunnel = mockInputScreenDiscoveryFunnel,
+                settingsPageFeature = settingsPageFeature,
+                duckChatPixels = mockDuckChatPixels,
+                dispatcherProvider = coroutineRule.testDispatcherProvider,
+                duckChatFeature = duckChatFeature,
+                serpSettingsDataProvider = serpSettingsDataProvider,
+            )
+
+            testee.viewState.test {
+                assertTrue(awaitItem().isDuckAiWebSettingsVisible)
+            }
+        }
+
+    @Test
+    fun `when duckAiSettings toggle disabled then isDuckAiWebSettingsVisible is false`() =
+        runTest {
+            @Suppress("DenyListedApi")
+            duckChatFeature.duckAiSettings().setRawStoredState(State(enable = false))
+            whenever(duckChat.observeEnableDuckChatUserSetting()).thenReturn(flowOf(true))
+            testee = DuckChatSettingsViewModel(
+                duckChatActivityParams = DuckChatSettingsNoParams,
+                duckChat = duckChat,
+                pixel = mockPixel,
+                inputScreenDiscoveryFunnel = mockInputScreenDiscoveryFunnel,
+                settingsPageFeature = settingsPageFeature,
+                duckChatPixels = mockDuckChatPixels,
+                dispatcherProvider = coroutineRule.testDispatcherProvider,
+                duckChatFeature = duckChatFeature,
+                serpSettingsDataProvider = serpSettingsDataProvider,
+            )
+
+            testee.viewState.test {
+                assertFalse(awaitItem().isDuckAiWebSettingsVisible)
+            }
+        }
+
+    @Test
+    fun `when duckAiSettings toggle enabled and duck chat disabled then isDuckAiWebSettingsVisible is false`() =
+        runTest {
+            @Suppress("DenyListedApi")
+            duckChatFeature.duckAiSettings().setRawStoredState(State(enable = true))
+            whenever(duckChat.observeEnableDuckChatUserSetting()).thenReturn(flowOf(false))
+            testee = DuckChatSettingsViewModel(
+                duckChatActivityParams = DuckChatSettingsNoParams,
+                duckChat = duckChat,
+                pixel = mockPixel,
+                inputScreenDiscoveryFunnel = mockInputScreenDiscoveryFunnel,
+                settingsPageFeature = settingsPageFeature,
+                duckChatPixels = mockDuckChatPixels,
+                dispatcherProvider = coroutineRule.testDispatcherProvider,
+                duckChatFeature = duckChatFeature,
+                serpSettingsDataProvider = serpSettingsDataProvider,
+            )
+
+            testee.viewState.test {
+                assertFalse(awaitItem().isDuckAiWebSettingsVisible)
+            }
+        }
+
+    @Test
+    fun `when onDuckAiWebSettingsClicked then OpenDuckAiWebSettings command sent`() =
+        runTest {
+            val expectedUrl = "https://duck.ai?settings=open"
+            whenever(duckChat.getDuckChatSettingsUrl()).thenReturn(expectedUrl)
+
+            testee.onDuckAiWebSettingsClicked()
+
+            testee.commands.test {
+                val command = awaitItem()
+                assertTrue(command is OpenDuckAiWebSettings)
+                assertEquals(expectedUrl, (command as OpenDuckAiWebSettings).url)
                 cancelAndIgnoreRemainingEvents()
             }
         }

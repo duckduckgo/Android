@@ -86,6 +86,7 @@ class DuckChatSettingsViewModel @AssistedInject constructor(
         val searchAssistVisibility: SearchAssistVisibility = DEFAULT_SEARCH_ASSIST_VISIBILITY,
         val hideAiGeneratedImages: HideAiGeneratedImages = HideAiGeneratedImages.OFF,
         val isUseWithoutAiActionEnabled: Boolean = true,
+        val isDuckAiWebSettingsVisible: Boolean = false,
     )
 
     private data class FeatureState(
@@ -159,6 +160,7 @@ class DuckChatSettingsViewModel @AssistedInject constructor(
                 searchAssistVisibility = resolvedSearchAssistVisibility,
                 hideAiGeneratedImages = hideAiGeneratedImages,
                 isUseWithoutAiActionEnabled = !isAlreadyWithoutAi,
+                isDuckAiWebSettingsVisible = isDuckChatUserEnabled && duckChatFeature.duckAiSettings().isEnabled(),
             )
         }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ViewState())
 
@@ -187,6 +189,8 @@ class DuckChatSettingsViewModel @AssistedInject constructor(
         data class ShowHideAiGeneratedImagesDialog(
             val current: HideAiGeneratedImages,
         ) : Command()
+
+        data class OpenDuckAiWebSettings(val url: String) : Command()
     }
 
     fun onDuckChatUserEnabledToggled(checked: Boolean) {
@@ -327,6 +331,12 @@ class DuckChatSettingsViewModel @AssistedInject constructor(
     fun onDuckAiShortcutsClicked() {
         viewModelScope.launch {
             commandChannel.send(OpenShortcutSettings)
+        }
+    }
+
+    fun onDuckAiWebSettingsClicked() {
+        viewModelScope.launch {
+            commandChannel.send(Command.OpenDuckAiWebSettings(duckChat.getDuckChatSettingsUrl()))
         }
     }
 

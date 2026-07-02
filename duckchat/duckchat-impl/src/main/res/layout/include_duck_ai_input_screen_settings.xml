@@ -166,6 +166,14 @@
         app:primaryText="@string/duck_ai_shortcut_settings_title"
         app:secondaryText="@string/duck_ai_shortcut_settings_description" />
 
+    <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+        android:id="@+id/duckAiWebSettings"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:trailingIcon="@drawable/ic_open_in_24_small"
+        app:primaryText="@string/duckAiSettingsTitle" />
+
     <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
         android:id="@+id/duckAIAutomaticContext"
         android:layout_width="match_parent"

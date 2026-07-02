@@ -218,6 +218,7 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
         )
         inputScreenSettingsBinding.duckAiInputScreenDescription.updatePadding(left = offset)
         inputScreenSettingsBinding.duckAiShortcuts.updatePadding(left = offset)
+        inputScreenSettingsBinding.duckAiWebSettings.updatePadding(left = offset)
         inputScreenSettingsBinding.duckAIAutomaticContext.updatePadding(left = offset)
 
         binding.duckChatSettingsText.addClickableSpan(
@@ -279,6 +280,12 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
         inputScreenSettingsBinding.duckAiShortcuts.setOnClickListener {
             viewModel.onDuckAiShortcutsClicked()
         }
+
+        binding.duckAiWebSettingsItem.isVisible = viewState.isDuckAiWebSettingsVisible && !viewState.isNativeControlsEnabled
+        binding.duckAiWebSettingsItem.updatePadding(left = offset)
+        binding.duckAiWebSettingsItem.setOnClickListener { viewModel.onDuckAiWebSettingsClicked() }
+        inputScreenSettingsBinding.duckAiWebSettings.isVisible = viewState.isDuckAiWebSettingsVisible && viewState.isNativeControlsEnabled
+        inputScreenSettingsBinding.duckAiWebSettings.setOnClickListener { viewModel.onDuckAiWebSettingsClicked() }
 
         renderSearchSettingsSection(viewState)
 
@@ -407,6 +414,10 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
 
             is DuckChatSettingsViewModel.Command.ShowHideAiGeneratedImagesDialog -> {
                 showHideAiGeneratedImagesDialog(command.current)
+            }
+
+            is DuckChatSettingsViewModel.Command.OpenDuckAiWebSettings -> {
+                startActivity(browserNav.openInNewTab(this@DuckChatSettingsActivity, command.url))
             }
         }
     }
