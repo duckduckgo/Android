@@ -93,11 +93,11 @@ class RealFireTabsPromosTest {
     }
 
     private fun fireTabsRemoteMessage() = RemoteMessage(
-        id = "fire_tabs_promo",
+        id = FireTabsPromos.FIRE_TABS_PROMO_MESSAGE_ID,
         content = Content.BigTwoActions(
             titleText = "",
             descriptionText = "",
-            placeholder = Content.Placeholder.FIRE_TABS,
+            placeholder = Content.Placeholder.ANNOUNCE,
             primaryActionText = "",
             primaryAction = Action.FireTabsPromo,
             secondaryActionText = "",

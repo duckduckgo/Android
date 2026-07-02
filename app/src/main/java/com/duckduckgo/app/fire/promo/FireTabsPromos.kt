@@ -16,10 +16,10 @@
 
 package com.duckduckgo.app.fire.promo
 
+import com.duckduckgo.app.fire.promo.FireTabsPromos.Companion.FIRE_TABS_PROMO_MESSAGE_ID
 import com.duckduckgo.app.fire.store.FireDataStore
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.remote.messaging.api.Content
 import com.duckduckgo.remote.messaging.api.RemoteMessageModel
 import com.squareup.anvil.annotations.ContributesBinding
 import kotlinx.coroutines.withContext
@@ -29,6 +29,10 @@ import javax.inject.Inject
  * Local (client-side) state for the Fire Tabs tab-switcher banner.
  */
 interface FireTabsPromos {
+    companion object {
+        const val FIRE_TABS_PROMO_MESSAGE_ID = "fire_tabs_promo"
+    }
+
     /** True if the tab-switcher banner hasn't been shown/dismissed yet (show-once). */
     suspend fun canShowTabSwitcherPromo(): Boolean
     suspend fun onTabSwitcherPromoShown()
@@ -55,7 +59,7 @@ class RealFireTabsPromos @Inject constructor(
             fireDataStore.setUsedFireMode(true)
             fireDataStore.setTabSwitcherPromoDismissed(true)
             val activeMessage = remoteMessageModel.getActiveMessage()
-            if ((activeMessage?.content as? Content.BigTwoActions)?.placeholder == Content.Placeholder.FIRE_TABS) {
+            if (activeMessage?.id == FIRE_TABS_PROMO_MESSAGE_ID) {
                 remoteMessageModel.onMessageDismissed(activeMessage)
             }
         }

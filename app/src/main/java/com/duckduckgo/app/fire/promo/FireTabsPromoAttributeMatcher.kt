@@ -30,7 +30,7 @@ import javax.inject.Inject
 /**
  * Supplies the matching attributes the Fire Tabs promo RMF message is gated on:
  *  - `fireModeAvailable` — whether Fire Mode is available on this device/build.
- *  - `usedFireMode` — whether the user has ever entered Fire Mode (used in exclusionRules).
+ *  - `fireModeUsed` — whether the user has ever entered Fire Mode (used in exclusionRules).
  */
 @ContributesMultibinding(
     scope = AppScope::class,
@@ -67,7 +67,7 @@ class FireTabsPromoAttributeMatcher @Inject constructor(
 
     companion object {
         internal const val ATTRIBUTE_FIRE_MODE_AVAILABLE = "fireModeAvailable"
-        internal const val ATTRIBUTE_USED_FIRE_MODE = "usedFireMode"
+        internal const val ATTRIBUTE_USED_FIRE_MODE = "fireModeUsed"
     }
 }
 

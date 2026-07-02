@@ -67,7 +67,6 @@ import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
-import com.duckduckgo.remote.messaging.api.Content
 import com.duckduckgo.remote.messaging.api.RemoteMessageModel
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
@@ -153,8 +152,7 @@ class TabSwitcherViewModel @Inject constructor(
         viewModelScope.launch {
             val showPromo = withContext(dispatcherProvider.io()) {
                 val activeMessage = remoteMessageModel.getActiveMessage()
-                val isFireTabsCampaign =
-                    (activeMessage?.content as? Content.BigTwoActions)?.placeholder == Content.Placeholder.FIRE_TABS
+                val isFireTabsCampaign = activeMessage?.id == FireTabsPromos.FIRE_TABS_PROMO_MESSAGE_ID
                 isFireTabsCampaign &&
                     currentMode.value == BrowserMode.REGULAR &&
                     fireTabsPromos.canShowTabSwitcherPromo()
