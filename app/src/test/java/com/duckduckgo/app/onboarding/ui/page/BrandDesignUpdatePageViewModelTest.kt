@@ -893,10 +893,6 @@ class BrandDesignUpdatePageViewModelTest {
         )
     }
 
-    // Notification brand-design pixels (NotificationsShown/Confirmed) are now fired from the
-    // orchestrator plan provider, not the ViewModel. The VM only fires the legacy NOTIFICATION_RUNTIME_PERMISSION_SHOWN
-    // pixel and records the grant outcome for forwarding via NotificationPermissionFinished(granted).
-
     // endregion
 
     // region hasAnimatedCurrentDialog
@@ -1116,9 +1112,6 @@ class BrandDesignUpdatePageViewModelTest {
         }
     }
 
-    // TryInputClicked brand-design pixel and onboarding variant setting are now fired from the
-    // orchestrator plan provider (inputScreenPreviewStep / customAiInputScreenPreviewStep), not the ViewModel.
-
     // endregion
 
     // region Quick setup experiment - onSecondaryCtaClicked
@@ -1203,13 +1196,6 @@ class BrandDesignUpdatePageViewModelTest {
             assertTrue(awaitItem() is Command.OnboardingSkipped)
         }
     }
-
-    // endregion
-
-    // region Quick setup pixels
-    // Brand-design pixels (QuickSetupShown/Clicked, AddressBarPositionClicked, SearchExperienceClicked,
-    // SkipOnboardingClicked, SetDefaultClicked, SetDefaultConfirmed) are now fired from the orchestrator
-    // plan provider step definitions, not the ViewModel. Tests for these moved to NewUserOnboardingPlanProviderTest.
 
     // endregion
 

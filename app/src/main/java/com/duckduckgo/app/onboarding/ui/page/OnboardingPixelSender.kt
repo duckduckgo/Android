@@ -135,7 +135,7 @@ class RealOnboardingPixelSender @Inject constructor(
                 fireStep(pixelName, PIXEL_EVENT_CLICKED, if (action.withAi) SEARCH_PLUS_DUCKAI else SEARCH_ONLY)
 
             is OnboardingPixelAction.TryInputClicked ->
-                fireStep(pixelName, PIXEL_EVENT_CLICKED, tryASearchValue(action.fromSuggestion, action.isChat))
+                fireStep(pixelName, PIXEL_EVENT_CLICKED, tryInputValue(action.fromSuggestion, action.isChat))
 
             is OnboardingPixelAction.SuggestionClicked ->
                 fireStep(pixelName, PIXEL_EVENT_CLICKED, if (action.fromSuggestion) VALUE_SUGGESTED else VALUE_CUSTOM)
@@ -204,7 +204,7 @@ class RealOnboardingPixelSender @Inject constructor(
         }
         val params = mutableMapOf(
             PIXEL_PARAM_INSTALL_TYPE to if (reinstall) INSTALL_TYPE_REINSTALL else INSTALL_TYPE_NEW,
-            PIXEL_PARAM_SOURCE to if (isCustomAiFlow) SOURCE_DUCKAI_CPP else ONBOARDING_DEFAULT,
+            // PIXEL_PARAM_SOURCE to null, - this will be added in a follow-up PR
             PIXEL_PARAM_FLOW to if (isCustomAiFlow) FLOW_DUCKAI else ONBOARDING_DEFAULT,
             PIXEL_PARAM_PIXEL_SOURCE to deviceInfo.formFactor().description,
         )
@@ -217,7 +217,7 @@ class RealOnboardingPixelSender @Inject constructor(
 
     private fun engageOrDismiss(engaged: Boolean): String = if (engaged) VALUE_ENGAGE else VALUE_DISMISS
 
-    private fun tryASearchValue(fromSuggestion: Boolean, isChat: Boolean): String {
+    private fun tryInputValue(fromSuggestion: Boolean, isChat: Boolean): String {
         val source = if (fromSuggestion) VALUE_SUGGESTED else VALUE_CUSTOM
         val mode = if (isChat) VALUE_CHAT else VALUE_SEARCH
         return "${source}_$mode"
@@ -249,7 +249,6 @@ class RealOnboardingPixelSender @Inject constructor(
         private const val INSTALL_TYPE_REINSTALL = "reinstall"
 
         private const val ONBOARDING_DEFAULT = "default"
-        private const val SOURCE_DUCKAI_CPP = "duckai_cpp"
         private const val FLOW_DUCKAI = "duckai"
 
         private const val VARIANT_SEARCH = "search_plus_duckai-search"
