@@ -64,6 +64,7 @@ import com.duckduckgo.common.ui.DuckDuckGoFragment
 import com.duckduckgo.common.ui.menu.PopupMenu
 import com.duckduckgo.common.ui.view.PopupMenuItemView
 import com.duckduckgo.common.ui.view.dialog.ActionBottomSheetDialog
+import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.makeSnackbarWithNoBottomInset
 import com.duckduckgo.common.ui.view.show
@@ -716,6 +717,9 @@ class DuckChatContextualFragment :
             DuckChatContextualViewModel.SheetMode.INPUT -> {
                 binding.contextualWebviewContainer.gone()
                 binding.contextualModePrompts.show()
+                binding.contextualInputContainer.setBackgroundColor(
+                    requireContext().getColorFromAttr(com.duckduckgo.mobile.android.R.attr.daxColorSurface),
+                )
                 contextualNativeInputManager.onInputMode()
 
                 if (viewState.showChatsIcon) {
@@ -756,6 +760,9 @@ class DuckChatContextualFragment :
             DuckChatContextualViewModel.SheetMode.WEBVIEW -> {
                 binding.contextualModeNativeContent.gone()
                 binding.contextualModePrompts.gone()
+                binding.contextualInputContainer.setBackgroundColor(
+                    requireContext().getColorFromAttr(com.duckduckgo.mobile.android.R.attr.daxColorDuckAiBackground),
+                )
                 binding.contextualWebviewContainer.show()
                 binding.contextualNewChat.show()
                 if (viewState.isFireButtonEnabled) binding.contextualFire.show() else binding.contextualFire.gone()

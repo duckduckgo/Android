@@ -120,9 +120,10 @@
     <LinearLayout
         android:id="@+id/contextualModePrompts"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="200dp"
         android:orientation="vertical"
         android:paddingHorizontal="@dimen/keyline_4"
+        android:gravity="bottom"
         android:paddingTop="@dimen/keyline_4"
         android:paddingBottom="@dimen/keyline_1"
         app:layout_constraintBottom_toTopOf="@id/inputModeWidgetCard"

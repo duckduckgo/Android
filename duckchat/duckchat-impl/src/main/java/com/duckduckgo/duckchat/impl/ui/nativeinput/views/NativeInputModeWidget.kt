@@ -589,6 +589,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
             // and animating the padding shrink afterwards looks like a two-step collapse.
             if (hasFocus) {
                 beginFocusTransition()
+                reassertContextualPluginVisibility()
             } else if (isDuckAiPageContext()) {
                 hideKeyboard()
             }
@@ -608,15 +609,27 @@ class NativeInputModeWidget @JvmOverloads constructor(
 
     private fun updateBottomRowVisibility() {
         val bottomRow = findViewById<View?>(R.id.inputModeWidgetBottomRow) ?: return
-        val visible = shouldShowBottomRow(
-            onChatTab = isChatTabSelected(),
-            isContextual = isContextualWidget,
-            hasFocus = inputField.hasFocus(),
-            previewEnterFocus = previewEnterFocus,
-            isStreaming = isStreaming,
-            suppress = nativeInputState?.shouldSuppressBottomRow() == true,
-        )
+        val suppress = nativeInputState?.shouldSuppressBottomRow() == true
+        val visible = isChatTabSelected() &&
+            (inputField.hasFocus() || previewEnterFocus) &&
+            !isStreaming &&
+            !suppress
         bottomRow.visibility = if (visible) VISIBLE else GONE
+    }
+
+    /**
+     * In the contextual sheet the widget is reused across the sheet being hidden and shown again;
+     * on reopen the bottom-row plugin containers can end up hidden (their visibility is set once when
+     * plugins first load and isn't restored on reuse). Re-assert them here, from the focus path so the
+     * change rides the focus layout transition and re-measures. Scoped to the contextual widget so the
+     * omnibar is untouched. The model picker is gated on its enabled state so it stays hidden mid-chat.
+     */
+    private fun reassertContextualPluginVisibility() {
+        if (!isContextualWidget) return
+        val onChatTab = isChatTabSelected()
+        findViewById<View?>(R.id.attachButtonContainer)?.isVisible = onChatTab
+        findViewById<View?>(R.id.optionsButtonContainer)?.isVisible = onChatTab
+        findViewById<View?>(R.id.modelPickerContainer)?.isVisible = onChatTab && viewModel.modelPickerEnabled.value
     }
 
     private fun updateToggleVisibilityForState() {
@@ -1679,25 +1692,6 @@ internal fun NativeInputState.shouldShowTrailingFireButton(): Boolean =
 internal fun NativeInputState.shouldSuppressBottomRow(): Boolean =
     inputMode == NativeInputState.InputMode.SEARCH_ONLY &&
         inputContext == NativeInputState.InputContext.BROWSER
-
-/**
- * Whether the bottom tools row (attachments, options, reasoning, model picker) should be visible.
- * On the Duck.ai chat tab, while not streaming and not suppressed. In the contextual sheet the widget
- * is the dedicated composer, so the row is always visible there; everywhere else it only reveals once
- * the input has focus (or the pre-focus preview state is active), matching the omnibar behaviour.
- */
-internal fun shouldShowBottomRow(
-    onChatTab: Boolean,
-    isContextual: Boolean,
-    hasFocus: Boolean,
-    previewEnterFocus: Boolean,
-    isStreaming: Boolean,
-    suppress: Boolean,
-): Boolean =
-    onChatTab &&
-        (isContextual || hasFocus || previewEnterFocus) &&
-        !isStreaming &&
-        !suppress
 
 /**
  * Bottom-row controls (model / reasoning / options / attachment) are shown only on the Duck.ai
