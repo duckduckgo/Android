@@ -329,6 +329,9 @@ class TabSwitcherActivity :
     override fun onResume() {
         super.onResume()
 
+        // Bail when onCreate aborted before wiring up views to recreate into the launch-requested mode.
+        if (!::tabsRecycler.isInitialized) return
+
         // Safety net: a recreate()/animation race must never leave the tabs recycler permanently hidden.
         // If we're "fading in" but no fade-in is running and tabs exist, force it back to visible.
         val hasTabs = tabsAdapter.itemCount > 0
