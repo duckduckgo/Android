@@ -34,6 +34,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -147,7 +148,7 @@ class RealContingencyMessageHandlerTest {
         // Model DataStore write latency: setShown() never flips the observable value during the
         // test, so only the in-memory guard can prevent a repeat show.
         val handler = handlerWith(laggingStore())
-        val webView = mock<WebView>()
+        val webView = foregroundWebView()
 
         handler.onPageLoaded(webView, YOUTUBE_URL)
         handler.onPageLoaded(webView, YOUTUBE_URL)
@@ -160,7 +161,7 @@ class RealContingencyMessageHandlerTest {
     fun whenContingencyDisabledThenReenabledThenShowsAgain() = runTest {
         setToggles(uxImprovements = true, contingency = true)
         val handler = handlerWith(laggingStore())
-        val webView = mock<WebView>()
+        val webView = foregroundWebView()
 
         handler.onPageLoaded(webView, YOUTUBE_URL)
         handler.onContingencyModeChanged(contingencyEnabled = false)
@@ -168,6 +169,32 @@ class RealContingencyMessageHandlerTest {
 
         assertEquals(2, view.shownCount)
     }
+
+    @Test
+    fun whenWebViewNotShownThenDoesNotShow() = runTest {
+        setToggles(uxImprovements = true, contingency = true)
+        val handler = handlerWith(laggingStore())
+
+        handler.onPageLoaded(backgroundWebView(), YOUTUBE_URL)
+
+        assertEquals(0, view.shownCount)
+    }
+
+    @Test
+    fun whenBackgroundLoadThenOneOffNotConsumedAndForegroundStillShows() = runTest {
+        setToggles(uxImprovements = true, contingency = true)
+        val store = laggingStore()
+        val handler = handlerWith(store)
+
+        handler.onPageLoaded(backgroundWebView(), YOUTUBE_URL)
+        handler.onPageLoaded(foregroundWebView(), YOUTUBE_URL)
+
+        assertEquals(1, view.shownCount)
+    }
+
+    private fun foregroundWebView() = mock<WebView> { on { isShown } doReturn true }
+
+    private fun backgroundWebView() = mock<WebView> { on { isShown } doReturn false }
 
     private fun laggingStore() = object : ContingencyMessageStore {
         private val value = MutableStateFlow(false)

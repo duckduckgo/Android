@@ -79,6 +79,7 @@ class RealContingencyMessageHandler @Inject constructor(
 
     @UiThread
     override fun onPageLoaded(webView: WebView, url: String?) {
+        if (!webView.isShown) return
         if (!shouldShow(url)) return
         shownInSession = true
         view.show(webView)
