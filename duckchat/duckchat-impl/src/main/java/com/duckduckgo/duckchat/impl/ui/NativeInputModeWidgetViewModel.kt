@@ -83,6 +83,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 data class ChatTabSuggestions(
@@ -563,11 +564,22 @@ class NativeInputModeWidgetViewModel @Inject constructor(
         result
     }
 
-    fun onDeleteChatUrlSuggestion(suggestion: AutoCompleteSuggestion) {
+    fun onDeleteChatUrlSuggestion(
+        suggestion: AutoCompleteSuggestion,
+        onDeleted: () -> Unit = {},
+    ) {
         appCoroutineScope.launch(dispatchers.io()) {
             when (suggestion) {
-                is AutoCompleteHistorySuggestion -> history.removeHistoryEntryByUrl(suggestion.url)
-                is AutoCompleteHistorySearchSuggestion -> history.removeHistoryEntryByQuery(suggestion.phrase)
+                is AutoCompleteHistorySuggestion -> {
+                    history.removeHistoryEntryByUrl(suggestion.url)
+                    withContext(dispatchers.main()) { onDeleted() }
+                }
+
+                is AutoCompleteHistorySearchSuggestion -> {
+                    history.removeHistoryEntryByQuery(suggestion.phrase)
+                    withContext(dispatchers.main()) { onDeleted() }
+                }
+
                 else -> {}
             }
         }

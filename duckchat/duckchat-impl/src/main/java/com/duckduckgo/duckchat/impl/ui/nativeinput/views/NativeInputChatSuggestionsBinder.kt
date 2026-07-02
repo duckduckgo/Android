@@ -193,7 +193,7 @@ class NativeInputChatSuggestionsBinder @Inject constructor(
         val urlAdapter = BrowserAutoCompleteSuggestionsAdapter(
             immediateSearchClickListener = { onChatUrlSuggestionClicked(it) },
             editableSearchClickListener = { },
-            autoCompleteDeleteClickListener = { onChatUrlSuggestionDeleteClicked(it) },
+            autoCompleteDeleteClickListener = { if (removeChatHistoryEnabled) onChatUrlSuggestionDeleteClicked(it) },
             omnibarType = if (inputScreenConfigResolver.useTopBar()) OmnibarType.SINGLE_TOP else OmnibarType.SINGLE_BOTTOM,
             hideEditQueryArrow = true,
             hideSectionDividers = true,

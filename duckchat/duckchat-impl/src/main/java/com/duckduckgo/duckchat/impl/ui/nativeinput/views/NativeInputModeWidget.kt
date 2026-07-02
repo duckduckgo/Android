@@ -1271,8 +1271,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
                     onChatUrlSuggestionClicked(suggestion)
                 },
                 onChatUrlSuggestionDeleteClicked = { suggestion ->
-                    viewModel.onDeleteChatUrlSuggestion(suggestion)
-                    refreshChatSuggestions()
+                    viewModel.onDeleteChatUrlSuggestion(suggestion) { refreshChatSuggestions() }
                 },
                 onSearchForQuerySubmitted = { query ->
                     viewModel.fireDuckAiSearchForQuerySubmittedPixel()

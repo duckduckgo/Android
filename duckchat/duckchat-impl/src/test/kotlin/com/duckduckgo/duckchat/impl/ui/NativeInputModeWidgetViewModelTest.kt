@@ -88,6 +88,7 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.clearInvocations
 import org.mockito.kotlin.doSuspendableAnswer
 import org.mockito.kotlin.eq
+import org.mockito.kotlin.inOrder
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.stub
@@ -1630,6 +1631,23 @@ class NativeInputModeWidgetViewModelTest {
 
         verify(history, never()).removeHistoryEntryByUrl(any())
         verify(history, never()).removeHistoryEntryByQuery(any())
+    }
+
+    @Test
+    fun whenDeleteHistorySuggestionThenOnDeletedInvokedAfterRemoval() = runTest {
+        val onDeleted: () -> Unit = mock()
+
+        testee.onDeleteChatUrlSuggestion(
+            AutoCompleteHistorySuggestion(phrase = "q", title = "T", url = "https://example.com", isAllowedInTopHits = true),
+            onDeleted,
+        )
+        advanceUntilIdle()
+
+        // Refresh callback must fire only after the removal commits, else the re-fetch races the delete.
+        inOrder(history, onDeleted) {
+            verify(history).removeHistoryEntryByUrl("https://example.com")
+            verify(onDeleted).invoke()
+        }
     }
 
     // endregion
