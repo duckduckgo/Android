@@ -37,17 +37,21 @@ class StartChatViewModel @Inject constructor(
 
     /**
      * Show the start-chat icon only when Duck.ai is available (feature enabled +
-     * user setting on) but the input-screen toggle is off — i.e. the user has Duck.ai
-     * but is in `SEARCH_ONLY` mode. The feature + user-setting gate is needed because
-     * `inputMode == SEARCH_ONLY` also covers the case where Duck.ai is entirely
-     * disabled, which would let the icon navigate to a Duck.ai URL the user has opted out of.
+     * user setting on), the address bar shortcut is enabled, but the input-screen
+     * toggle is off — i.e. the user has Duck.ai but is in `SEARCH_ONLY` mode. The
+     * feature + user-setting gate is needed because `inputMode == SEARCH_ONLY` also
+     * covers the case where Duck.ai is entirely disabled, which would let the icon
+     * navigate to a Duck.ai URL the user has opted out of. The address bar shortcut
+     * gate ensures the icon stays hidden when the user has turned off the Duck.ai
+     * address bar shortcut, even while in `SEARCH_ONLY` mode.
      */
     val isVisible: Flow<Boolean> = combine(
         duckAiFeatureState.showSettings,
         duckChatInternal.observeEnableDuckChatUserSetting(),
+        duckChatInternal.observeShowInAddressBarUserSetting(),
         nativeInputStateProvider.state,
-    ) { isFeatureEnabled, isUserEnabled, state ->
-        isFeatureEnabled && isUserEnabled &&
+    ) { isFeatureEnabled, isUserEnabled, isAddressBarShortcutEnabled, state ->
+        isFeatureEnabled && isUserEnabled && isAddressBarShortcutEnabled &&
             state.inputMode == InputMode.SEARCH_ONLY &&
             state.toggleSelection == ToggleSelection.SEARCH
     }
