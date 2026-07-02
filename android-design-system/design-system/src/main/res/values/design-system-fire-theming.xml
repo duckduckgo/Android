@@ -59,8 +59,6 @@
     <style name="ThemeOverlay.DuckDuckGo.Omnibar.None" parent="" />
 
     <style name="ThemeOverlay.DuckDuckGo.Omnibar.FireLight" parent="Theme.DuckDuckGo.Dark">
-        <!-- The omnibar island is dark (#3D3D3D) even in light Fire mode, so its accent uses the
-             dark fire accent (mandarin40) — orange on a dark background per the Fire Mode spec. -->
         <item name="daxColorWindow">@color/omnibar_card_fire_light</item>
         <item name="daxColorOmnibarAccent">?attr/daxColorFireModeAccentDark</item>
         <item name="daxOmnibarTextColorHighlight">?attr/daxColorFireModeAccentDarkTranslucent</item>
@@ -74,14 +72,9 @@
         <item name="colorControlActivated">?attr/daxColorFireModeAccentDark</item>
     </style>
 
-    <!-- Applied to the input mode widget card via android:theme. The DarkFire variant re-applies the
-         full dark Fire theme to the card subtree so it is pixel-identical to dark Fire mode; None is a
-         no-op used by every theme that should leave the card on its own palette. -->
     <style name="ThemeOverlay.DuckDuckGo.InputModeCard.None" parent="" />
 
     <style name="ThemeOverlay.DuckDuckGo.InputModeCard.DarkFire" parent="Theme.DuckDuckGo.Dark.Fire">
-        <!-- The card is dark even in light Fire mode, so it mirrors dark Fire mode exactly: the
-             dark fire accent (mandarin40) with black content on top of it. -->
         <item name="daxColorOmnibarAccent">?attr/daxColorFireModeAccentDark</item>
         <item name="daxOmnibarTextColorHighlight">?attr/daxColorFireModeAccentDarkTranslucent</item>
         <item name="daxColorAccentAltPrimary">?attr/daxColorOmnibarAccent</item>
@@ -90,10 +83,6 @@
         <item name="colorControlActivated">?attr/daxColorFireModeAccentDark</item>
     </style>
 
-    <!-- Dark Fire mode: give the expanded input card the Canvas fire colour (#1C1C1C) so it matches
-         the collapsed omnibar, instead of the default surface (#373737) / window (#3D3D3D) it would
-         otherwise inherit. Applied on top of the already-active Dark.Fire context, so accents etc.
-         still resolve from the base theme. -->
     <style name="ThemeOverlay.DuckDuckGo.InputModeCard.FireDark" parent="">
         <item name="daxColorSurface">@color/omnibar_card_fire_dark</item>
         <item name="daxColorWindow">@color/omnibar_card_fire_dark</item>
