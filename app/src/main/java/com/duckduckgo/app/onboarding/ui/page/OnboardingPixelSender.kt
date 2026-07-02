@@ -132,7 +132,7 @@ class RealOnboardingPixelSender @Inject constructor(
                 fireStep(pixelName, PIXEL_EVENT_CLICKED, if (action.withAi) SEARCH_PLUS_DUCKAI else SEARCH_ONLY)
 
             is OnboardingPixelAction.TryInputClicked ->
-                fireStep(pixelName, PIXEL_EVENT_CLICKED, tryASearchValue(action.fromSuggestion, action.isChat))
+                fireStep(pixelName, PIXEL_EVENT_CLICKED, tryInputValue(action.fromSuggestion, action.isChat))
 
             is OnboardingPixelAction.QuickSetupClicked ->
                 fireQuickSetupClicked(pixelName, action.addressBarPosition, action.inputScreenSelected)
@@ -211,7 +211,7 @@ class RealOnboardingPixelSender @Inject constructor(
 
     private fun engageOrDismiss(engaged: Boolean): String = if (engaged) VALUE_ENGAGE else VALUE_DISMISS
 
-    private fun tryASearchValue(fromSuggestion: Boolean, isChat: Boolean): String {
+    private fun tryInputValue(fromSuggestion: Boolean, isChat: Boolean): String {
         val source = if (fromSuggestion) VALUE_SUGGESTED else VALUE_CUSTOM
         val mode = if (isChat) VALUE_CHAT else VALUE_SEARCH
         return "${source}_$mode"

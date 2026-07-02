@@ -18,10 +18,6 @@ package com.duckduckgo.app.pixels
 
 import com.duckduckgo.app.statistics.pixels.Pixel
 
-/**
- * Pixel names for the linear-onboarding instrumentation. Kept separate from [AppPixelName] so the
- * onboarding pixel catalogue stays self-contained; the wire strings are unchanged.
- */
 enum class OnboardingPixelName(override val pixelName: String) : Pixel.PixelName {
     ONBOARDING_QUICK_SETUP("onboarding_quick-setup"),
     ONBOARDING_WELCOME("onboarding_welcome"),
