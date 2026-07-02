@@ -1095,4 +1095,21 @@
     <!-- New Address Bar Picker -->
     <string name="newAddressBarPickerDuckDuckGo" translatable="false">DuckDuckGo</string>
     <string name="newAddressBarPickerConfirm">Confirmă</string>
+
+    <!-- Fire mode -->
+    <string name="openInFireTab">Deschide în fila Fire</string>
+    <string name="openInBackgroundTab">Deschide în fundal</string>
+    <string name="browserModeToggleFireDescription">Comută la filele modului Fire</string>
+    <string name="browserModeToggleRegularDescription">Comută la filele obișnuite</string>
+    <string name="browserModeToggleTabCountInfinite">∞</string>
+    <string name="fireTabMenuItem">Filă Fire</string>
+    <string name="fireTabNewTabPageTitle">Filă Fire</string>
+    <string name="fireTabsEmptyStateTitle">File Fire</string>
+    <string name="fireTabsFeatureNoHistory">Navighează fără a salva istoricul local</string>
+    <string name="fireTabsFeatureDifferentAccount">Conectează-te la un site cu un alt cont</string>
+    <string name="fireTabsFeatureTroubleshoot">Depanează site-uri</string>
+    <string name="fireTabsExplainer">Filele Fire sunt izolate de alte date din browser. Datele acestora sunt distruse când le închizi pe toate. Acestea îți oferă aceeași protecție împotriva urmăririi ca și alte file.</string>
+    <string name="fireTabsNewTabButton">Noua filă Fire</string>
+    <string name="fireTabsPromoTabSwitcherText"><![CDATA[<b>NOU!</b> Încearcă filele Fire pentru a naviga fără a salva istoricul local.]]></string>
+    <string name="singleTabFireDialogTitleFireMode">Ștergi filele Fire și datele aferente?</string>
 </resources>
