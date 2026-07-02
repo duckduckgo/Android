@@ -46,6 +46,7 @@
     <string name="duck_chat_assist_settings_description">Choose how often you want AI-Assisted answers to appear in your searches</string>
     <string name="duck_ai_shortcut_settings_title">Duck.ai Shortcuts</string>
     <string name="duck_ai_shortcut_settings_description">Choose which Duck.ai shortcuts to display</string>
+    <string name="duck_ai_web_settings_title">Duck.ai Settings</string>
 
     <!-- Default Toggle Position -->
     <string name="duckAiDefaultTogglePositionTitle" instruction="'Toggle' refers to the UI tab switcher component (Search/Duck.ai), not the verb 'to toggle'.">New Tab Toggle Position</string>
