@@ -1115,4 +1115,21 @@
     <!-- New Address Bar Picker -->
     <string name="newAddressBarPickerDuckDuckGo" translatable="false">DuckDuckGo</string>
     <string name="newAddressBarPickerConfirm">Potrdi</string>
+
+    <!-- Fire mode -->
+    <string name="openInFireTab">Odpri v zavihku Fire</string>
+    <string name="openInBackgroundTab">Odpri v ozadju</string>
+    <string name="browserModeToggleFireDescription">Preklopi na zavihke v načinu Fire</string>
+    <string name="browserModeToggleRegularDescription">Preklopi na običajne zavihke</string>
+    <string name="browserModeToggleTabCountInfinite">∞</string>
+    <string name="fireTabMenuItem">Zavihek Fire</string>
+    <string name="fireTabNewTabPageTitle">Zavihek Fire</string>
+    <string name="fireTabsEmptyStateTitle">Zavihki Fire</string>
+    <string name="fireTabsFeatureNoHistory">Brskaj brez shranjevanja lokalne zgodovine</string>
+    <string name="fireTabsFeatureDifferentAccount">Prijava v spletno mesto z drugim računom</string>
+    <string name="fireTabsFeatureTroubleshoot">Odpravljanje težav s spletnimi mesti</string>
+    <string name="fireTabsExplainer">Zavihki Fire so ločeni od drugih podatkov brskanja. Njihovi podatki se izbrišejo, ko jih vse zaprete. Imajo enako zaščito pred sledenjem kot drugi zavihki.</string>
+    <string name="fireTabsNewTabButton">Nov zavihek Fire</string>
+    <string name="fireTabsPromoTabSwitcherText"><![CDATA[<b>NOVO!</b> Preizkusite zavihke Fire za brskanje brez shranjevanja lokalne zgodovine.]]></string>
+    <string name="singleTabFireDialogTitleFireMode">Želite izbrisati zavihke Fire in njihove podatke?</string>
 </resources>
