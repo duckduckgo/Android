@@ -66,6 +66,7 @@ class AdBlockingSettingsViewModel @Inject constructor(
         val showConsentDescription: Boolean? = null,
         val duckPlayerMode: PrivatePlayerMode = AlwaysAsk,
         val isContingencyMode: Boolean = false,
+        val isStatusIndicatorOn: Boolean = false,
     )
 
     sealed class Command {
@@ -79,10 +80,13 @@ class AdBlockingSettingsViewModel @Inject constructor(
         feature.adBlockingUXImprovements().enabled(),
         feature.enableContingencyMode().enabled(),
     ) { state, duckPlayerPreferences, uxImprovements, contingencyModeOn ->
+        val isEnabled = state is AdBlockingState.Enabled
+        val isContingencyMode = uxImprovements && contingencyModeOn
         ViewState(
-            isEnabled = state is AdBlockingState.Enabled,
+            isEnabled = isEnabled,
             showConsentDescription = state !is AdBlockingState.Enabled.Default,
-            isContingencyMode = uxImprovements && contingencyModeOn,
+            isContingencyMode = isContingencyMode,
+            isStatusIndicatorOn = isEnabled && !isContingencyMode,
             duckPlayerMode = duckPlayerPreferences.privatePlayerMode,
         )
     }

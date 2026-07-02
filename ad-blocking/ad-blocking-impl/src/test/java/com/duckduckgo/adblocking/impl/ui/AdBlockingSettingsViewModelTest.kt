@@ -61,6 +61,7 @@ class AdBlockingSettingsViewModelTest {
         .create(AdBlockingExtensionFeature::class.java)
     private val repository: AdBlockingSettingsRepository = mock()
     private val pixel: Pixel = mock()
+    private val duckPlayer: DuckPlayer = mock()
 
     private fun createViewModel(duckPlayerMode: PrivatePlayerMode = AlwaysAsk): AdBlockingSettingsViewModel {
         whenever(duckPlayer.observeUserPreferences()).thenReturn(flowOf(userPreferences(duckPlayerMode)))
@@ -153,6 +154,38 @@ class AdBlockingSettingsViewModelTest {
 
         createViewModel().viewState.test {
             assertFalse(expectMostRecentItem().isContingencyMode)
+        }
+    }
+
+    @Test
+    fun whenEnabledAndNotContingencyModeThenStatusIndicatorOn() = runTest {
+        whenever(statusChecker.observeState()).thenReturn(flowOf(AdBlockingState.Enabled.Default))
+        setToggles(uxImprovements = true, contingency = false)
+
+        createViewModel().viewState.test {
+            assertTrue(expectMostRecentItem().isStatusIndicatorOn)
+        }
+    }
+
+    @Test
+    fun whenContingencyModeOnThenStatusIndicatorOff() = runTest {
+        whenever(statusChecker.observeState()).thenReturn(flowOf(AdBlockingState.Enabled.Default))
+        setToggles(uxImprovements = true, contingency = true)
+
+        createViewModel().viewState.test {
+            val state = expectMostRecentItem()
+            assertTrue(state.isEnabled)
+            assertFalse(state.isStatusIndicatorOn)
+        }
+    }
+
+    @Test
+    fun whenDisabledThenStatusIndicatorOff() = runTest {
+        whenever(statusChecker.observeState()).thenReturn(flowOf(AdBlockingState.Disabled))
+        setToggles(uxImprovements = true, contingency = false)
+
+        createViewModel().viewState.test {
+            assertFalse(expectMostRecentItem().isStatusIndicatorOn)
         }
     }
 

@@ -55,7 +55,7 @@ class AdBlockingSettingsV2Activity : BaseAdBlockingSettingsActivity() {
 
     override fun render(state: AdBlockingSettingsViewModel.ViewState) {
         super.render(state)
-        binding.adBlockingStatusIndicator.setStatus(state.isEnabled)
+        binding.adBlockingStatusIndicator.setStatus(state.isStatusIndicatorOn)
         binding.duckPlayerEntry.setSecondaryText(
             when (state.duckPlayerMode) {
                 Enabled -> getString(R.string.duck_player_mode_always)
