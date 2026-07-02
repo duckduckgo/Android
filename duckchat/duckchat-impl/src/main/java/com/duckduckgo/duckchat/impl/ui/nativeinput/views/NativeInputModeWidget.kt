@@ -608,11 +608,14 @@ class NativeInputModeWidget @JvmOverloads constructor(
 
     private fun updateBottomRowVisibility() {
         val bottomRow = findViewById<View?>(R.id.inputModeWidgetBottomRow) ?: return
-        val suppress = nativeInputState?.shouldSuppressBottomRow() == true
-        val visible = isChatTabSelected() &&
-            (inputField.hasFocus() || previewEnterFocus) &&
-            !isStreaming &&
-            !suppress
+        val visible = shouldShowBottomRow(
+            onChatTab = isChatTabSelected(),
+            isContextual = isContextualWidget,
+            hasFocus = inputField.hasFocus(),
+            previewEnterFocus = previewEnterFocus,
+            isStreaming = isStreaming,
+            suppress = nativeInputState?.shouldSuppressBottomRow() == true,
+        )
         bottomRow.visibility = if (visible) VISIBLE else GONE
     }
 
@@ -1214,7 +1217,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
     }
 
     private fun applyOmnibarShape() {
-        // The contextual sheet's parent card has a top-only rounded shape applied by
+        // The contextual sheet's parent card has its rounded shape applied by
         // ContextualNativeInputManager.applyCardShape(); never overwrite it from here. The
         // shared per-tab state store can briefly emit a BROWSER state with toggleVisible=false
         // (e.g. SEARCH_ONLY users when the main widget publishes first), which would otherwise
@@ -1676,6 +1679,25 @@ internal fun NativeInputState.shouldShowTrailingFireButton(): Boolean =
 internal fun NativeInputState.shouldSuppressBottomRow(): Boolean =
     inputMode == NativeInputState.InputMode.SEARCH_ONLY &&
         inputContext == NativeInputState.InputContext.BROWSER
+
+/**
+ * Whether the bottom tools row (attachments, options, reasoning, model picker) should be visible.
+ * On the Duck.ai chat tab, while not streaming and not suppressed. In the contextual sheet the widget
+ * is the dedicated composer, so the row is always visible there; everywhere else it only reveals once
+ * the input has focus (or the pre-focus preview state is active), matching the omnibar behaviour.
+ */
+internal fun shouldShowBottomRow(
+    onChatTab: Boolean,
+    isContextual: Boolean,
+    hasFocus: Boolean,
+    previewEnterFocus: Boolean,
+    isStreaming: Boolean,
+    suppress: Boolean,
+): Boolean =
+    onChatTab &&
+        (isContextual || hasFocus || previewEnterFocus) &&
+        !isStreaming &&
+        !suppress
 
 /**
  * Bottom-row controls (model / reasoning / options / attachment) are shown only on the Duck.ai

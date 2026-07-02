@@ -159,7 +159,8 @@
     <FrameLayout
         android:id="@+id/contextualInputContainer"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:background="?attr/daxColorDuckAiBackground">
 
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/contextualNativeInputCard"
@@ -167,7 +168,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
-            app:cardBackgroundColor="?attr/daxColorSurface"
+            android:layout_margin="@dimen/keyline_2"
+            app:cardBackgroundColor="?attr/daxColorWindow"
             app:cardElevation="4dp"
             app:cardUseCompatPadding="false">
 
@@ -182,6 +184,7 @@
 
         <LinearLayout
             android:id="@+id/contextualModeNativeContent"
+            android:visibility="gone"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
