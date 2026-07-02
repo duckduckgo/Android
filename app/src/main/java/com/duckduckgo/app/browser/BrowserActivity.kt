@@ -77,16 +77,13 @@ import com.duckduckgo.app.browser.tabs.adapter.TabPagerAdapter
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.dispatchers.ExternalIntentProcessingState
 import com.duckduckgo.app.feedback.ui.common.FeedbackActivity
+import com.duckduckgo.app.fire.AppShortcutDataClearer
 import com.duckduckgo.app.fire.DataClearer
 import com.duckduckgo.app.fire.DataClearerForegroundAppRestartPixel
-import com.duckduckgo.app.fire.ManualDataClearing
-import com.duckduckgo.app.fire.store.FireDataStore
-import com.duckduckgo.app.fire.wideevents.DataClearingWideEvent
 import com.duckduckgo.app.global.ApplicationClearDataState
 import com.duckduckgo.app.global.intentText
 import com.duckduckgo.app.global.rating.PromptCount
 import com.duckduckgo.app.global.sanitize
-import com.duckduckgo.app.global.view.ClearDataAction
 import com.duckduckgo.app.global.view.ORIGIN_DUCK_AI_CONTEXTUAL_CHAT
 import com.duckduckgo.app.global.view.ORIGIN_HATCH
 import com.duckduckgo.app.global.view.renderIfChanged
@@ -96,7 +93,6 @@ import com.duckduckgo.app.onboarding.ui.page.DefaultBrowserPage
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.FIRE_DIALOG_CANCEL
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
-import com.duckduckgo.app.settings.clear.ClearWhatOption
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
@@ -167,16 +163,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
     lateinit var settingsDataStore: SettingsDataStore
 
     @Inject
-    lateinit var clearDataAction: ClearDataAction
-
-    @Inject
-    lateinit var dataClearing: ManualDataClearing
-
-    @Inject
-    lateinit var fireDataStore: FireDataStore
-
-    @Inject
-    lateinit var dataClearingWideEvent: DataClearingWideEvent
+    lateinit var appShortcutDataClearer: AppShortcutDataClearer
 
     @Inject
     lateinit var androidBrowserConfigFeature: AndroidBrowserConfigFeature
@@ -788,35 +775,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
                     return@launch
                 }
                 logcat(INFO) { "Clearing everything as a result of $PERFORM_FIRE_ON_ENTRY_EXTRA flag being set" }
-                if (androidBrowserConfigFeature.singleTabFireDialog().isEnabled()) {
-                    val clearOptions = fireDataStore.getManualClearOptions()
-                    dataClearingWideEvent.start(
-                        entryPoint = DataClearingWideEvent.EntryPoint.APP_SHORTCUT,
-                        clearOptions = clearOptions,
-                    )
-                    try {
-                        dataClearing.clearDataUsingManualFireOptions(shouldRestartIfRequired = true, browserMode = currentBrowserMode)
-                        dataClearingWideEvent.finishSuccess()
-                    } catch (e: Exception) {
-                        dataClearingWideEvent.finishFailure(e)
-                        throw e
-                    }
-                } else {
-                    dataClearingWideEvent.startLegacy(
-                        entryPoint = DataClearingWideEvent.EntryPoint.LEGACY_APP_SHORTCUT,
-                        clearWhatOption = ClearWhatOption.CLEAR_TABS_AND_DATA,
-                        clearDuckAiData = settingsDataStore.clearDuckAiData,
-                    )
-                    try {
-                        clearDataAction.clearTabsAndAllDataAsync(appInForeground = true, shouldFireDataClearPixel = true)
-                        clearDataAction.setAppUsedSinceLastClearFlag(false)
-                        dataClearingWideEvent.finishSuccess()
-                    } catch (e: Exception) {
-                        dataClearingWideEvent.finishFailure(e)
-                        throw e
-                    }
-                    clearDataAction.killAndRestartProcess(notifyDataCleared = false)
-                }
+                appShortcutDataClearer.clearFromAppShortcut(currentBrowserMode)
             }
             return
         }

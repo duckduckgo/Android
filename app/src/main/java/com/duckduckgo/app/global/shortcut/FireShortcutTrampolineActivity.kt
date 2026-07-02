@@ -21,13 +21,8 @@ import android.os.Bundle
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.app.fire.ManualDataClearing
-import com.duckduckgo.app.fire.store.FireDataStore
-import com.duckduckgo.app.fire.wideevents.DataClearingWideEvent
-import com.duckduckgo.app.global.view.ClearDataAction
+import com.duckduckgo.app.fire.AppShortcutDataClearer
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
-import com.duckduckgo.app.settings.clear.ClearWhatOption
-import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -55,15 +50,7 @@ class FireShortcutTrampolineActivity : DuckDuckGoActivity() {
 
     @Inject lateinit var androidBrowserConfigFeature: AndroidBrowserConfigFeature
 
-    @Inject lateinit var fireDataStore: FireDataStore
-
-    @Inject lateinit var dataClearingWideEvent: DataClearingWideEvent
-
-    @Inject lateinit var dataClearing: ManualDataClearing
-
-    @Inject lateinit var clearDataAction: ClearDataAction
-
-    @Inject lateinit var settingsDataStore: SettingsDataStore
+    @Inject lateinit var appShortcutDataClearer: AppShortcutDataClearer
 
     @Inject lateinit var currentBrowserMode: BrowserMode
 
@@ -83,35 +70,7 @@ class FireShortcutTrampolineActivity : DuckDuckGoActivity() {
                     startActivity(delegate)
                     return@launch
                 }
-                if (androidBrowserConfigFeature.singleTabFireDialog().isEnabled()) {
-                    val clearOptions = fireDataStore.getManualClearOptions()
-                    dataClearingWideEvent.start(
-                        entryPoint = DataClearingWideEvent.EntryPoint.APP_SHORTCUT,
-                        clearOptions = clearOptions,
-                    )
-                    try {
-                        dataClearing.clearDataUsingManualFireOptions(shouldRestartIfRequired = true, browserMode = currentBrowserMode)
-                        dataClearingWideEvent.finishSuccess()
-                    } catch (e: Exception) {
-                        dataClearingWideEvent.finishFailure(e)
-                        throw e
-                    }
-                } else {
-                    dataClearingWideEvent.startLegacy(
-                        entryPoint = DataClearingWideEvent.EntryPoint.LEGACY_APP_SHORTCUT,
-                        clearWhatOption = ClearWhatOption.CLEAR_TABS_AND_DATA,
-                        clearDuckAiData = settingsDataStore.clearDuckAiData,
-                    )
-                    try {
-                        clearDataAction.clearTabsAndAllDataAsync(appInForeground = true, shouldFireDataClearPixel = true)
-                        clearDataAction.setAppUsedSinceLastClearFlag(false)
-                        dataClearingWideEvent.finishSuccess()
-                    } catch (e: Exception) {
-                        dataClearingWideEvent.finishFailure(e)
-                        throw e
-                    }
-                    clearDataAction.killAndRestartProcess(notifyDataCleared = false)
-                }
+                appShortcutDataClearer.clearFromAppShortcut(currentBrowserMode)
             } finally {
                 finish()
             }
