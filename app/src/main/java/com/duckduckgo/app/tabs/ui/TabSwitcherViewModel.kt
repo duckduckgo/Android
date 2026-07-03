@@ -27,10 +27,13 @@ import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.fire.promo.FireTabsPromos
+import com.duckduckgo.app.fire.ManualDataClearing
+import com.duckduckgo.app.fire.wideevents.DataClearingWideEvent
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.TAB_MANAGER_GRID_VIEW_BUTTON_CLICKED
 import com.duckduckgo.app.pixels.AppPixelName.TAB_MANAGER_LIST_VIEW_BUTTON_CLICKED
 import com.duckduckgo.app.pixels.duckchat.createWasUsedBeforePixelParams
+import com.duckduckgo.app.settings.clear.FireClearOption
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.app.tabs.model.TabEntity
@@ -111,6 +114,8 @@ class TabSwitcherViewModel @Inject constructor(
     private val trackersAnimationInfoPanelPixels: TrackersAnimationInfoPanelPixels,
     private val omnibarRepository: OmnibarRepository,
     private val tabTitleResolver: TabTitleResolver,
+    private val dataClearing: ManualDataClearing,
+    private val dataClearingWideEvent: DataClearingWideEvent,
     @param:AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val fireTabsPromos: FireTabsPromos,
     private val remoteMessageModel: RemoteMessageModel,
@@ -288,6 +293,28 @@ class TabSwitcherViewModel @Inject constructor(
         _viewState.update { it.copy(isFireTabsPromoVisible = false) }
     }
 
+    // Runs on the app scope so the burn survives the activity recreate() that the Fire -> Regular
+    // mode switch triggers, otherwise the clear would be cancelled mid-flight.
+    private fun switchToRegularModeClearingFireData() {
+        appCoroutineScope.launch(dispatcherProvider.io()) {
+            dataClearingWideEvent.start(
+                entryPoint = DataClearingWideEvent.EntryPoint.FIRE_TABS_EMPTIED,
+                clearOptions = setOf(FireClearOption.TABS, FireClearOption.DATA, FireClearOption.DUCKAI_CHATS),
+            )
+            try {
+                dataClearing.clearDataUsingManualFireOptions(
+                    shouldRestartIfRequired = false,
+                    browserMode = BrowserMode.FIRE,
+                )
+                dataClearingWideEvent.finishSuccess()
+            } catch (e: Exception) {
+                dataClearingWideEvent.finishFailure(e)
+                throw e
+            }
+        }
+        command.value = Command.SwitchToRegularMode
+    }
+
     suspend fun onTabSelected(tabId: String) {
         val mode = viewState.value.mode as? Selection ?: Normal
         if (mode is Selection) {
@@ -457,7 +484,7 @@ class TabSwitcherViewModel @Inject constructor(
                 if (fireModeAvailable && currentMode.value == BrowserMode.FIRE) {
                     // emptying all Fire tabs returns the user to Regular mode, matching the single-tab
                     // close path; the tab switcher stays open instead of closing with an undo snackbar
-                    command.value = Command.SwitchToRegularMode
+                    switchToRegularModeClearingFireData()
                 } else {
                     // the undo snackbar will be displayed when the tab switcher is closed
                     command.value = Command.CloseAndShowUndoMessage(tabIds)
@@ -486,7 +513,7 @@ class TabSwitcherViewModel @Inject constructor(
             val isLastTab = tabs.size == 1
             if (isLastTab && fireModeAvailable && currentMode.value == BrowserMode.FIRE) {
                 markTabAsDeletable(tab, swipeGestureUsed)
-                command.value = Command.SwitchToRegularMode
+                switchToRegularModeClearingFireData()
             } else if (isLastTab) {
                 // mark the tab as deletable, the undo snackbar will be shown after tab switcher is closed
                 markTabAsDeletable(tab, swipeGestureUsed)
