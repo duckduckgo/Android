@@ -1132,6 +1132,7 @@ class OmnibarLayout @JvmOverloads constructor(
                 sceneRoot,
                 isCosmetic,
                 enqueueAnimation,
+                useLightAnimation = if (browserMode == BrowserMode.FIRE) false else null,
             )
         }
     }

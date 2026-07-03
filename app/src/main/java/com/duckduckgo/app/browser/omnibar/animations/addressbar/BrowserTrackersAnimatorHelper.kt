@@ -78,6 +78,7 @@ interface BrowserTrackersAnimatorHelper {
      * @param cookieBackground holder of the cookie consent animation background.
      * @param cookieAnimationView holder of the cookie consent animation.
      * @param cookieScene holder of cookie consent text animation.
+     * @param useLightAnimation if specified, determines whether to use light (true) or dark (false) animation variant. If null, uses system theme.
      */
     fun createCookiesAnimation(
         context: Context,
@@ -88,6 +89,7 @@ interface BrowserTrackersAnimatorHelper {
         cookieScene: ViewGroup,
         cookieCosmeticHide: Boolean,
         enqueueCookieAnimation: Boolean,
+        useLightAnimation: Boolean? = null,
     )
 
     /**

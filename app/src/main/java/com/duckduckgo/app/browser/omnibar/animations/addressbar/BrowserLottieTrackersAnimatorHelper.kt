@@ -66,6 +66,7 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
     private var enqueueCookiesAnimation = false
     private var isCookiesAnimationRunning = false
     private var hasCookiesAnimationBeenCanceled = false
+    private var cookieUseLightAnimation: Boolean? = null
 
     private val conflatedJob = ConflatedJob()
     private val coroutineScope = CoroutineScope(SupervisorJob() + dispatcherProvider.main())
@@ -88,13 +89,13 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
         this.shieldAnimation = shieldAnimationView
 
         if (entities.isNullOrEmpty()) { // no badge nor tracker animations
-            tryToStartCookiesAnimation(context, omnibarViews)
+            tryToStartCookiesAnimation(omnibarViews)
             return
         }
 
         val logos = getLogos(context, entities)
         if (logos.isEmpty()) {
-            tryToStartCookiesAnimation(context, omnibarViews)
+            tryToStartCookiesAnimation(omnibarViews)
             return
         }
 
@@ -115,7 +116,7 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
 
                     override fun onAnimationEnd(animation: Animator) {
                         commonAddressBarAnimationHelper.animateViewsIn(omnibarViews).start()
-                        tryToStartCookiesAnimation(context, omnibarViews)
+                        tryToStartCookiesAnimation(omnibarViews)
                         listener?.onAnimationFinished()
                     }
 
@@ -161,7 +162,7 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
                 conflatedJob +=
                     coroutineScope.launch {
                         delay(DELAY_BETWEEN_ANIMATIONS_DURATION)
-                        tryToStartCookiesAnimation(context, omnibarViews + shieldViews)
+                        tryToStartCookiesAnimation(omnibarViews + shieldViews)
                     }
             },
         )
@@ -176,16 +177,18 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
         cookieScene: ViewGroup,
         cookieCosmeticHide: Boolean,
         enqueueCookieAnimation: Boolean,
+        useLightAnimation: Boolean?,
     ) {
         this.cookieScene = cookieScene
         this.cookieViewBackground = cookieBackground
         this.cookieView = cookieAnimationView
         this.cookieCosmeticHide = cookieCosmeticHide
+        this.cookieUseLightAnimation = useLightAnimation
 
         if (enqueueCookieAnimation) {
             this.enqueueCookiesAnimation = true
         } else if (this.trackersAnimation?.isAnimating != true && !addressBarTrackersAnimator.isAnimationRunning) {
-            startCookiesAnimation(context, omnibarViews + shieldViews)
+            startCookiesAnimation(omnibarViews + shieldViews)
         } else {
             enqueueCookiesAnimation = false
         }
@@ -210,35 +213,36 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
     }
 
     private fun tryToStartCookiesAnimation(
-        context: Context,
         omnibarViews: List<View>,
     ) {
         if (enqueueCookiesAnimation) {
-            startCookiesAnimation(context, omnibarViews)
+            startCookiesAnimation(omnibarViews)
             enqueueCookiesAnimation = false
         }
     }
 
     private fun startCookiesAnimation(
-        context: Context,
         omnibarViews: List<View>,
     ) {
         if (omnibarViews.any { it.id == R.id.customTabDomain }) return // Do not show cookies animation in custom tabs
         isCookiesAnimationRunning = true
 
+        // Inflate the scene with the scene root's own themed context so the animation follows the
+        // omnibar theme overlay (e.g. the dark omnibar island used in light Fire mode).
+        val sceneContext = cookieScene.context
         if (cookieCosmeticHide) {
-            firstScene = Scene.getSceneForLayout(cookieScene, R.layout.cookie_cosmetic_scene_1, context)
-            secondScene = Scene.getSceneForLayout(cookieScene, R.layout.cookie_cosmetic_scene_2, context)
+            firstScene = Scene.getSceneForLayout(cookieScene, R.layout.cookie_cosmetic_scene_1, sceneContext)
+            secondScene = Scene.getSceneForLayout(cookieScene, R.layout.cookie_cosmetic_scene_2, sceneContext)
         } else {
-            firstScene = Scene.getSceneForLayout(cookieScene, R.layout.cookie_scene_1, context)
-            secondScene = Scene.getSceneForLayout(cookieScene, R.layout.cookie_scene_2, context)
+            firstScene = Scene.getSceneForLayout(cookieScene, R.layout.cookie_scene_1, sceneContext)
+            secondScene = Scene.getSceneForLayout(cookieScene, R.layout.cookie_scene_2, sceneContext)
         }
 
         hasCookiesAnimationBeenCanceled = false
         val allOmnibarViews: List<View> = (omnibarViews).filterNotNull().toList()
         cookieView.show()
         cookieView.alpha = 0F
-        if (theme.isLightModeEnabled()) {
+        if (cookieUseLightAnimation ?: theme.isLightModeEnabled()) {
             cookieView.setAnimation(R.raw.cookie_icon_animated_light)
         } else {
             cookieView.setAnimation(R.raw.cookie_icon_animated_dark)
