@@ -20,6 +20,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.onboarding.OnboardingFlowChecker
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.browser.api.autocomplete.AutoComplete
@@ -108,6 +109,7 @@ class NativeInputModeWidgetViewModel @Inject constructor(
     private val modelManager: DuckAiModelManager,
     private val duckAiChatStore: DuckAiChatStore,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
+    private val onboardingFlowChecker: OnboardingFlowChecker,
 ) : ViewModel() {
 
     private val autoComplete: AutoComplete = autoCompleteFactory.create(
@@ -523,7 +525,7 @@ class NativeInputModeWidgetViewModel @Inject constructor(
         chatSuggestionsEnabled: Boolean,
     ): ChatTabSuggestions = coroutineScope {
         val chatHistoryDeferred = async {
-            if (chatSuggestionsEnabled) {
+            if (chatSuggestionsEnabled && onboardingFlowChecker.isOnboardingComplete()) {
                 runCatching { chatSuggestionsReader.fetchSuggestions(query) }.getOrDefault(emptyList())
             } else {
                 emptyList()
