@@ -108,6 +108,7 @@
     <string name="fireTabsFeatureTroubleshoot">Troubleshoot websites</string>
     <string name="fireTabsExplainer">Fire Tabs are isolated from other browser data. Their data is burned when you close them all. They give you the same tracking protection as other tabs.</string>
     <string name="fireTabsNewTabButton">New Fire Tab</string>
+    <string name="fireTabsPromoTabSwitcherText"><![CDATA[<b>NEW!</b> Try Fire Tabs to browse without saving local history.]]></string>
     <string name="singleTabFireDialogTitleFireMode">Delete Fire Tabs and their data?</string>
 
     <!-- After Inactivity: return-to-last-tab hatch setting -->
