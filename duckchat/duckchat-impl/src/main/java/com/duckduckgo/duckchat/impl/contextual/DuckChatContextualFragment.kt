@@ -650,6 +650,7 @@ class DuckChatContextualFragment :
 
                     is DuckChatContextualViewModel.Command.ChangeSheetState -> {
                         command.prefillNativeInput?.let { binding.contextualNativeInputWidget.text = it }
+                        if (command.hideKeyboard) activity?.hideKeyboard()
                         bottomSheetBehavior.state = command.newState
                     }
                     is DuckChatContextualViewModel.Command.RequestPageContext -> {

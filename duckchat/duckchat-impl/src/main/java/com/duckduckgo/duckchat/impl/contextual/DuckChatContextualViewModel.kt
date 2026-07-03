@@ -127,6 +127,10 @@ class DuckChatContextualViewModel @Inject constructor(
         data class ChangeSheetState(
             val newState: Int,
             val prefillNativeInput: String? = null,
+            // Hide the soft keyboard as part of this transition (e.g. leaving the initial input state for
+            // the chat). Folded into this command rather than a separate one because commandChannel is a
+            // capacity-1 DROP_OLDEST channel: two commands emitted in the same burst would lose the older.
+            val hideKeyboard: Boolean = false,
         ) : Command()
         data object RequestPageContext : Command()
         data object ShowFireConfirmation : Command()
@@ -406,6 +410,9 @@ class DuckChatContextualViewModel @Inject constructor(
             val prefillText = followUpPrefill?.takeIf { it.isNotEmpty() }
             val prefillEvent = prefillText?.let { generatePrefillEvent(it) }
             withContext(dispatchers.main()) {
+                // Sending from the initial input state leaves the sheet in the chat; hide the keyboard so
+                // the user sees the streaming reply instead of the composer.
+                val wasInInputMode = _viewState.value.sheetMode == SheetMode.INPUT
                 _viewState.value =
                     _viewState.value.copy(
                         sheetMode = SheetMode.WEBVIEW,
@@ -423,6 +430,7 @@ class DuckChatContextualViewModel @Inject constructor(
                     Command.ChangeSheetState(
                         newState = BottomSheetBehavior.STATE_EXPANDED,
                         prefillNativeInput = prefillText.orEmpty(),
+                        hideKeyboard = wasInInputMode,
                     ),
                 )
             }

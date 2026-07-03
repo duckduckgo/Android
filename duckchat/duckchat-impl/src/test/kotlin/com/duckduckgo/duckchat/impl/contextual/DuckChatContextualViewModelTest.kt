@@ -1111,6 +1111,34 @@ class DuckChatContextualViewModelTest {
     }
 
     @Test
+    fun `when prompt sent from input state then sheet state change hides keyboard`() = runTest {
+        val testee = buildViewModel()
+
+        testee.commands.test {
+            testee.onPromptSent(prompt = "hello")
+            val command = expectMostRecentItem()
+            assertTrue(command is DuckChatContextualViewModel.Command.ChangeSheetState)
+            assertTrue((command as DuckChatContextualViewModel.Command.ChangeSheetState).hideKeyboard)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `when prompt sent while already in chat then keyboard is not hidden`() = runTest {
+        val testee = buildViewModel()
+        testee.onPromptSent(prompt = "first") // INPUT -> WEBVIEW
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+        testee.commands.test {
+            testee.onPromptSent(prompt = "second") // already in WEBVIEW
+            val command = expectMostRecentItem()
+            assertTrue(command is DuckChatContextualViewModel.Command.ChangeSheetState)
+            assertFalse((command as DuckChatContextualViewModel.Command.ChangeSheetState).hideKeyboard)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
     fun `when replace prompt with previous input then prompt is appended`() =
         runTest {
             testee.viewState.test {
