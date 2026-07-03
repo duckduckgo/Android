@@ -413,4 +413,14 @@ interface AndroidBrowserConfigFeature {
      */
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun useFireAppShortcutTrampoline(): Toggle
+
+    /**
+     * Controls whether the endless loop fix is enabled for custom tabs. When enabled,
+     * HTTP navigations shouldn't launch apps unless started with a user gesture.
+     * @return `true` when the remote config has the global "customTabEndlessLoopFix" androidBrowserConfig
+     * sub-feature flag enabled
+     * If the remote feature is not present defaults to `true`
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    fun customTabEndlessLoopFix(): Toggle
 }
