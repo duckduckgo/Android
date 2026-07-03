@@ -14,28 +14,27 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.downloads
+package com.duckduckgo.downloads.impl
 
 import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
-import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.browser.menu.DownloadMenuStateProvider
-import com.duckduckgo.app.downloads.DownloadViewItem.Empty
-import com.duckduckgo.app.downloads.DownloadViewItem.Header
-import com.duckduckgo.app.downloads.DownloadViewItem.Item
-import com.duckduckgo.app.downloads.DownloadViewItem.NotifyMe
-import com.duckduckgo.app.downloads.DownloadsViewModel.Command.CancelDownload
-import com.duckduckgo.app.downloads.DownloadsViewModel.Command.DisplayMessage
-import com.duckduckgo.app.downloads.DownloadsViewModel.Command.DisplayUndoMessage
-import com.duckduckgo.app.downloads.DownloadsViewModel.Command.OpenFile
-import com.duckduckgo.app.downloads.DownloadsViewModel.Command.ShareFile
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.formatters.time.TimeDiffFormatter
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.downloads.api.DownloadsRepository
+import com.duckduckgo.downloads.api.DownloadsScreenViewedListener
 import com.duckduckgo.downloads.api.model.DownloadItem
+import com.duckduckgo.downloads.impl.DownloadViewItem.Empty
+import com.duckduckgo.downloads.impl.DownloadViewItem.Header
+import com.duckduckgo.downloads.impl.DownloadViewItem.Item
+import com.duckduckgo.downloads.impl.DownloadViewItem.NotifyMe
+import com.duckduckgo.downloads.impl.DownloadsViewModel.Command.CancelDownload
+import com.duckduckgo.downloads.impl.DownloadsViewModel.Command.DisplayMessage
+import com.duckduckgo.downloads.impl.DownloadsViewModel.Command.DisplayUndoMessage
+import com.duckduckgo.downloads.impl.DownloadsViewModel.Command.OpenFile
+import com.duckduckgo.downloads.impl.DownloadsViewModel.Command.ShareFile
 import com.duckduckgo.downloads.store.DownloadStatus
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
@@ -57,7 +56,7 @@ class DownloadsViewModel @Inject constructor(
     private val timeDiffFormatter: TimeDiffFormatter,
     private val downloadsRepository: DownloadsRepository,
     private val dispatcher: DispatcherProvider,
-    private val downloadMenuStateProvider: DownloadMenuStateProvider,
+    private val downloadsScreenViewedListener: DownloadsScreenViewedListener,
 ) : ViewModel(), DownloadsItemListener {
 
     data class ViewState(
@@ -154,7 +153,7 @@ class DownloadsViewModel @Inject constructor(
             if (staleDownloadIds.isNotEmpty()) {
                 downloadsRepository.delete(staleDownloadIds)
             }
-            downloadMenuStateProvider.onDownloadsScreenViewed()
+            downloadsScreenViewedListener.onDownloadsScreenViewed()
         }
     }
 

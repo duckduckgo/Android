@@ -18,6 +18,7 @@ package com.duckduckgo.app.browser.menu
 
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.downloads.api.DownloadsScreenViewedListener
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.flow.Flow
@@ -47,11 +48,12 @@ interface DownloadMenuStateProvider {
     fun onDownloadsScreenViewed()
 }
 
-@ContributesBinding(AppScope::class)
+@ContributesBinding(scope = AppScope::class, boundType = DownloadMenuStateProvider::class)
+@ContributesBinding(scope = AppScope::class, boundType = DownloadsScreenViewedListener::class)
 @SingleInstanceIn(AppScope::class)
 class RealDownloadMenuStateProvider @Inject constructor(
     private val settingsDataStore: SettingsDataStore,
-) : DownloadMenuStateProvider {
+) : DownloadMenuStateProvider, DownloadsScreenViewedListener {
 
     private val _hasNewDownloadFlow = MutableStateFlow(settingsDataStore.hasNewDownload)
     override val hasNewDownloadFlow: Flow<Boolean> = _hasNewDownloadFlow.asStateFlow()

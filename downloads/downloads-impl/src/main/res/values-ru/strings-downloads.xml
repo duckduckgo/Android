@@ -34,4 +34,20 @@
 
     <string name="downloadConfirmationContinue">Сохранить в «Загрузки»</string>
     <string name="downloadConfirmationSubtitle" instruction="Placeholder is the address of a website">Источник: %1$s</string>
+    <string name="downloadsActivityMenuDeleteAll">Удалить все</string>
+    <string name="downloadsActivityNoItemsDescription">Пока ничего не загружено</string>
+    <string name="downloadsActivityTitle">Загрузки</string>
+    <string name="downloadsAllFilesDeletedMessage">Все файлы удалены</string>
+    <string name="downloadsCannotOpenFileErrorMessage">Не удается открыть файл. Попробуйте найти совместимое приложение.</string>
+    <string name="downloadsFileDeletedMessage" instruction="Placeholder is the name of the file deleted">Удален %1$s</string>
+    <string name="downloadsFileNotFoundErrorMessage">Файл больше не существует</string>
+    <string name="downloadsItemMenuCancel">Отменить</string>
+    <string name="downloadsItemMenuDelete">Удалить</string>
+    <string name="downloadsItemMenuShare">Поделиться</string>
+    <string name="downloadsMoreOptionsContentDescription" instruction="Placeholder is the name of a file">Другие опции для %1$s</string>
+    <string name="downloadsNotifyMeSubtitle">Получайте уведомления по окончании загрузок.</string>
+    <string name="downloadsNotifyMeTitle">Уведомления о готовых загрузках</string>
+    <string name="downloadsShareTitle">Поделиться с…</string>
+    <string name="downloadsStateInProgress">Выполняется…</string>
+    <string name="downloadsUndoActionName">Отменить</string>
 </resources>

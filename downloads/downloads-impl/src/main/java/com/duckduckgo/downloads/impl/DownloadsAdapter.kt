@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.downloads
+package com.duckduckgo.downloads.impl
 
 import android.content.Context
 import android.view.LayoutInflater
@@ -22,20 +22,19 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.browser.R.layout
-import com.duckduckgo.app.browser.databinding.ViewItemDownloadsEmptyBinding
-import com.duckduckgo.app.browser.databinding.ViewItemDownloadsHeaderBinding
-import com.duckduckgo.app.browser.databinding.ViewItemDownloadsNotifyMeBinding
-import com.duckduckgo.app.downloads.DownloadViewItem.Empty
-import com.duckduckgo.app.downloads.DownloadViewItem.Header
-import com.duckduckgo.app.downloads.DownloadViewItem.Item
-import com.duckduckgo.app.downloads.DownloadViewItem.NotifyMe
 import com.duckduckgo.common.ui.menu.PopupMenu
 import com.duckduckgo.common.ui.notifyme.NotifyMeView
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.utils.formatters.data.DataSizeFormatter
+import com.duckduckgo.downloads.impl.DownloadViewItem.Empty
+import com.duckduckgo.downloads.impl.DownloadViewItem.Header
+import com.duckduckgo.downloads.impl.DownloadViewItem.Item
+import com.duckduckgo.downloads.impl.DownloadViewItem.NotifyMe
+import com.duckduckgo.downloads.impl.R.layout
+import com.duckduckgo.downloads.impl.databinding.ViewItemDownloadsEmptyBinding
+import com.duckduckgo.downloads.impl.databinding.ViewItemDownloadsHeaderBinding
+import com.duckduckgo.downloads.impl.databinding.ViewItemDownloadsNotifyMeBinding
 import com.duckduckgo.downloads.store.DownloadStatus.FINISHED
 import com.duckduckgo.mobile.android.databinding.RowTwoLineItemBinding
 import javax.inject.Inject

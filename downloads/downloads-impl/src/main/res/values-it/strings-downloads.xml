@@ -34,4 +34,20 @@
 
     <string name="downloadConfirmationContinue">Salva in Download</string>
     <string name="downloadConfirmationSubtitle" instruction="Placeholder is the address of a website">Da: %1$s</string>
+    <string name="downloadsActivityMenuDeleteAll">Elimina tutto</string>
+    <string name="downloadsActivityNoItemsDescription">Non è ancora stato scaricato nessun file</string>
+    <string name="downloadsActivityTitle">Download</string>
+    <string name="downloadsAllFilesDeletedMessage">Tutti i file eliminati</string>
+    <string name="downloadsCannotOpenFileErrorMessage">Impossibile aprire il file. Verifica la disponibilità di un\'app compatibile.</string>
+    <string name="downloadsFileDeletedMessage" instruction="Placeholder is the name of the file deleted">%1$s eliminato</string>
+    <string name="downloadsFileNotFoundErrorMessage">Il file non esiste più</string>
+    <string name="downloadsItemMenuCancel">Annulla</string>
+    <string name="downloadsItemMenuDelete">Elimina</string>
+    <string name="downloadsItemMenuShare">Condividi</string>
+    <string name="downloadsMoreOptionsContentDescription" instruction="Placeholder is the name of a file">Ulteriori opzioni per %1$s</string>
+    <string name="downloadsNotifyMeSubtitle">Ricevi una notifica al termine dei download.</string>
+    <string name="downloadsNotifyMeTitle">Scopri quando i download sono pronti</string>
+    <string name="downloadsShareTitle">Condividi con…</string>
+    <string name="downloadsStateInProgress">In corso…</string>
+    <string name="downloadsUndoActionName">Annulla</string>
 </resources>

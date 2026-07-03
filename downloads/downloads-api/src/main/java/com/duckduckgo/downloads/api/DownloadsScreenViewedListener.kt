@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 DuckDuckGo
+ * Copyright (c) 2025 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,19 +14,13 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.downloads
+package com.duckduckgo.downloads.api
 
-import com.duckduckgo.downloads.api.model.DownloadItem
-
-interface DownloadsItemListener {
-
-    fun onItemClicked(item: DownloadItem)
-
-    fun onShareItemClicked(item: DownloadItem)
-
-    fun onDeleteItemClicked(item: DownloadItem)
-
-    fun onCancelItemClicked(item: DownloadItem)
-
-    fun onItemVisibilityChanged(visible: Boolean)
+/**
+ * Signals that the user has viewed the downloads screen, so any "new download" state
+ * (e.g. the browser menu badge) can be cleared. Implemented in the app module by the
+ * component that owns the menu-badge state; consumed by the downloads screen ViewModel.
+ */
+interface DownloadsScreenViewedListener {
+    fun onDownloadsScreenViewed()
 }

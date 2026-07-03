@@ -34,4 +34,20 @@
 
     <string name="downloadConfirmationContinue">Salvează în Descărcări</string>
     <string name="downloadConfirmationSubtitle" instruction="Placeholder is the address of a website">De la: %1$s</string>
+    <string name="downloadsActivityMenuDeleteAll">Șterge toate</string>
+    <string name="downloadsActivityNoItemsDescription">Nu a fost descărcat încă niciun fișier</string>
+    <string name="downloadsActivityTitle">Descărcări</string>
+    <string name="downloadsAllFilesDeletedMessage">Toate fișierele au fost șterse</string>
+    <string name="downloadsCannotOpenFileErrorMessage">Nu se poate deschide fișierul. Caută o aplicație compatibilă.</string>
+    <string name="downloadsFileDeletedMessage" instruction="Placeholder is the name of the file deleted">S-a șters %1$s</string>
+    <string name="downloadsFileNotFoundErrorMessage">Fișierul nu mai există</string>
+    <string name="downloadsItemMenuCancel">Anulează</string>
+    <string name="downloadsItemMenuDelete">Ștergere</string>
+    <string name="downloadsItemMenuShare">Trimite…</string>
+    <string name="downloadsMoreOptionsContentDescription" instruction="Placeholder is the name of a file">Mai multe opțiuni pentru %1$s</string>
+    <string name="downloadsNotifyMeSubtitle">Primește o notificare când s-au finalizat descărcările.</string>
+    <string name="downloadsNotifyMeTitle">Află când sunt pregătite descărcările</string>
+    <string name="downloadsShareTitle">Distribuie către...</string>
+    <string name="downloadsStateInProgress">În curs...</string>
+    <string name="downloadsUndoActionName">Anulează</string>
 </resources>

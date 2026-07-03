@@ -14,13 +14,19 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.downloads
+package com.duckduckgo.downloads.impl
 
 import com.duckduckgo.downloads.api.model.DownloadItem
 
-sealed class DownloadViewItem {
-    data object Empty : DownloadViewItem()
-    data object NotifyMe : DownloadViewItem()
-    data class Header(val text: String) : DownloadViewItem()
-    data class Item(val downloadItem: DownloadItem) : DownloadViewItem()
+interface DownloadsItemListener {
+
+    fun onItemClicked(item: DownloadItem)
+
+    fun onShareItemClicked(item: DownloadItem)
+
+    fun onDeleteItemClicked(item: DownloadItem)
+
+    fun onCancelItemClicked(item: DownloadItem)
+
+    fun onItemVisibilityChanged(visible: Boolean)
 }
