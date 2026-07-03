@@ -1075,4 +1075,21 @@
     <!-- New Address Bar Picker -->
     <string name="newAddressBarPickerDuckDuckGo" translatable="false">DuckDuckGo</string>
     <string name="newAddressBarPickerConfirm">Confirmer</string>
+
+    <!-- Fire mode -->
+    <string name="openInFireTab">Ouvrir dans l\'onglet Fire</string>
+    <string name="openInBackgroundTab">Ouvrir en arrière-plan</string>
+    <string name="browserModeToggleFireDescription">Passer aux onglets en mode Fire</string>
+    <string name="browserModeToggleRegularDescription">Passer aux onglets classiques</string>
+    <string name="browserModeToggleTabCountInfinite">∞</string>
+    <string name="fireTabMenuItem">Onglet Fire</string>
+    <string name="fireTabNewTabPageTitle">Onglet Fire</string>
+    <string name="fireTabsEmptyStateTitle">Onglets Fire</string>
+    <string name="fireTabsFeatureNoHistory">Parcourir sans enregistrer l\'historique local</string>
+    <string name="fireTabsFeatureDifferentAccount">Se connecter à un site avec un autre compte</string>
+    <string name="fireTabsFeatureTroubleshoot">Résoudre les problèmes des sites Web</string>
+    <string name="fireTabsExplainer">Les onglets Fire sont isolés des autres données du navigateur. Leurs données sont supprimées lorsque vous les fermez tous. Ils sont dotés de la même protection contre le pistage que les autres onglets.</string>
+    <string name="fireTabsNewTabButton">Nouvel onglet Fire</string>
+    <string name="fireTabsPromoTabSwitcherText"><![CDATA[<b>NOUVEAU !</b> Essayez les onglets Fire pour naviguer sans enregistrer l\'historique local.]]></string>
+    <string name="singleTabFireDialogTitleFireMode">Supprimer les onglets Fire et leurs données ?</string>
 </resources>

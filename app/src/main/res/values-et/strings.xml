@@ -1075,4 +1075,21 @@
     <!-- New Address Bar Picker -->
     <string name="newAddressBarPickerDuckDuckGo" translatable="false">DuckDuckGo</string>
     <string name="newAddressBarPickerConfirm">Kinnita</string>
+
+    <!-- Fire mode -->
+    <string name="openInFireTab">Ava Fire vahekaardil</string>
+    <string name="openInBackgroundTab">Ava taustal</string>
+    <string name="browserModeToggleFireDescription">Lülitu Fire-režiimi vahekaartidele</string>
+    <string name="browserModeToggleRegularDescription">Lülitu tavalistele vahekaartidele</string>
+    <string name="browserModeToggleTabCountInfinite">∞</string>
+    <string name="fireTabMenuItem">Fire vahekaart</string>
+    <string name="fireTabNewTabPageTitle">Fire vahekaart</string>
+    <string name="fireTabsEmptyStateTitle">Fire vahekaardid</string>
+    <string name="fireTabsFeatureNoHistory">Sirvi kohalikku ajalugu salvestamata</string>
+    <string name="fireTabsFeatureDifferentAccount">Logi saidile sisse teise kontoga</string>
+    <string name="fireTabsFeatureTroubleshoot">Tõrkeotsing veebilehtedel</string>
+    <string name="fireTabsExplainer">Fire vahekaardid on teistest brauseriandmetest isoleeritud. Nende andmed põletatakse, kui sa need kõik sulged. Need pakuvad sulle sama jälgimiskaitset kui teisedki vahekaardid.</string>
+    <string name="fireTabsNewTabButton">Uus Fire vahekaart</string>
+    <string name="fireTabsPromoTabSwitcherText"><![CDATA[<b>UUS!</b> Proovi Fire vahekaarte, et sirvida ilma kohalikku ajalugu salvestamata.]]></string>
+    <string name="singleTabFireDialogTitleFireMode">Kas kustutada Fire vahekaardid ja nende andmed?</string>
 </resources>

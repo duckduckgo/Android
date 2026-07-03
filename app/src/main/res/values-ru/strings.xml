@@ -1115,4 +1115,21 @@
     <!-- New Address Bar Picker -->
     <string name="newAddressBarPickerDuckDuckGo" translatable="false">DuckDuckGo</string>
     <string name="newAddressBarPickerConfirm">Подтвердить</string>
+
+    <!-- Fire mode -->
+    <string name="openInFireTab">Открыть в Fire-вкладке</string>
+    <string name="openInBackgroundTab">Открыть в фоновом режиме</string>
+    <string name="browserModeToggleFireDescription">Переключиться на Fire-вкладки</string>
+    <string name="browserModeToggleRegularDescription">Перейти на обычные вкладки</string>
+    <string name="browserModeToggleTabCountInfinite">∞</string>
+    <string name="fireTabMenuItem">Fire-вкладка</string>
+    <string name="fireTabNewTabPageTitle">Fire-вкладка</string>
+    <string name="fireTabsEmptyStateTitle">Fire-вкладки</string>
+    <string name="fireTabsFeatureNoHistory">Просмотр сайтов без сохранения локальной истории</string>
+    <string name="fireTabsFeatureDifferentAccount">Вход на сайт через другую учетную запись</string>
+    <string name="fireTabsFeatureTroubleshoot">Устранение неполадок с сайтами</string>
+    <string name="fireTabsExplainer">Данные Fire-вкладок изолированы от прочих данных браузера. При закрытии их данные будут уничтожены. Защита от отслеживания в таких вкладках не отличается от стандартной.</string>
+    <string name="fireTabsNewTabButton">Новая Fire-вкладка</string>
+    <string name="fireTabsPromoTabSwitcherText"><![CDATA[<b>Новинка!</b> Используйте Fire-вкладки, чтобы просматривать веб-страницы без сохранения локальной истории.]]></string>
+    <string name="singleTabFireDialogTitleFireMode">Удалить Fire-вкладки и их данные?</string>
 </resources>

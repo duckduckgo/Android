@@ -1075,4 +1075,21 @@
     <!-- New Address Bar Picker -->
     <string name="newAddressBarPickerDuckDuckGo" translatable="false">DuckDuckGo</string>
     <string name="newAddressBarPickerConfirm">Conferma</string>
+
+    <!-- Fire mode -->
+    <string name="openInFireTab">Apri in una scheda Fire</string>
+    <string name="openInBackgroundTab">Apri in background</string>
+    <string name="browserModeToggleFireDescription">Passa alle schede in modalità Fire</string>
+    <string name="browserModeToggleRegularDescription">Passa alle schede normali</string>
+    <string name="browserModeToggleTabCountInfinite">∞</string>
+    <string name="fireTabMenuItem">Scheda Fire</string>
+    <string name="fireTabNewTabPageTitle">Scheda Fire</string>
+    <string name="fireTabsEmptyStateTitle">Schede Fire</string>
+    <string name="fireTabsFeatureNoHistory">Sfoglia senza salvare la cronologia locale</string>
+    <string name="fireTabsFeatureDifferentAccount">Accedi a un sito con un altro account</string>
+    <string name="fireTabsFeatureTroubleshoot">Risolvi i problemi dei siti web</string>
+    <string name="fireTabsExplainer">Le schede Fire sono isolate dagli altri dati del browser. I dati vengono eliminati quando le chiudi tutte. Ti offrono la stessa protezione dal tracciamento delle altre schede.</string>
+    <string name="fireTabsNewTabButton">Nuova scheda Fire</string>
+    <string name="fireTabsPromoTabSwitcherText"><![CDATA[<b>NOVITÀ!</b> Prova le schede Fire per navigare senza salvare la cronologia locale.]]></string>
+    <string name="singleTabFireDialogTitleFireMode">Eliminare le schede Fire e i relativi dati?</string>
 </resources>

@@ -1075,4 +1075,21 @@
     <!-- New Address Bar Picker -->
     <string name="newAddressBarPickerDuckDuckGo" translatable="false">DuckDuckGo</string>
     <string name="newAddressBarPickerConfirm">Bekreft</string>
+
+    <!-- Fire mode -->
+    <string name="openInFireTab">Åpne i Fire-fanen</string>
+    <string name="openInBackgroundTab">Åpne i bakgrunnen</string>
+    <string name="browserModeToggleFireDescription">Bytt til Fire-modus-faner</string>
+    <string name="browserModeToggleRegularDescription">Bytt til vanlige faner</string>
+    <string name="browserModeToggleTabCountInfinite">∞</string>
+    <string name="fireTabMenuItem">Fire-fane</string>
+    <string name="fireTabNewTabPageTitle">Fire-fane</string>
+    <string name="fireTabsEmptyStateTitle">Fire-faner</string>
+    <string name="fireTabsFeatureNoHistory">Surf uten å lagre lokal historikk</string>
+    <string name="fireTabsFeatureDifferentAccount">Logg inn på et nettsted med en annen konto</string>
+    <string name="fireTabsFeatureTroubleshoot">Feilsøk nettsteder</string>
+    <string name="fireTabsExplainer">Fire-faner er isolert fra andre nettleserdata. Dataene deres blir slettet når du lukker alle sammen. De gir deg samme sporingsbeskyttelse som andre faner.</string>
+    <string name="fireTabsNewTabButton">Ny Fire-fane</string>
+    <string name="fireTabsPromoTabSwitcherText"><![CDATA[<b>NYHET!</b> Prøv Fire-faner for å surfe uten å lagre lokal historikk.]]></string>
+    <string name="singleTabFireDialogTitleFireMode">Vil du slette Fire-faner og dataene i dem?</string>
 </resources>

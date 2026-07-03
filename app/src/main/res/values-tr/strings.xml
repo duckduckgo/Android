@@ -1075,4 +1075,21 @@
     <!-- New Address Bar Picker -->
     <string name="newAddressBarPickerDuckDuckGo" translatable="false">DuckDuckGo</string>
     <string name="newAddressBarPickerConfirm">Onayla</string>
+
+    <!-- Fire mode -->
+    <string name="openInFireTab">Fire Sekmesinde Aç</string>
+    <string name="openInBackgroundTab">Arka Planda Aç</string>
+    <string name="browserModeToggleFireDescription">Fire modu sekmelerine geçin</string>
+    <string name="browserModeToggleRegularDescription">Normal sekmelere geç</string>
+    <string name="browserModeToggleTabCountInfinite">∞</string>
+    <string name="fireTabMenuItem">Fire Sekmesi</string>
+    <string name="fireTabNewTabPageTitle">Fire Sekmesi</string>
+    <string name="fireTabsEmptyStateTitle">Fire Sekmeleri</string>
+    <string name="fireTabsFeatureNoHistory">Yerel geçmişi kaydetmeden göz atın</string>
+    <string name="fireTabsFeatureDifferentAccount">Bir sitede farklı bir hesapla oturum açın</string>
+    <string name="fireTabsFeatureTroubleshoot">Web sitelerindeki sorunları giderin</string>
+    <string name="fireTabsExplainer">Fire Sekmeleri diğer tarayıcı verilerinden izole edilmiştir. Tüm pencereleri kapattığınızda veriler imha edilir. Diğer sekmelerle aynı izleme korumasını sunarlar.</string>
+    <string name="fireTabsNewTabButton">Yeni Fire Sekmesi</string>
+    <string name="fireTabsPromoTabSwitcherText"><![CDATA[<b>YENİ!</b> Yerel geçmişi kaydetmeden göz atmak için Fire Sekmelerini deneyin.]]></string>
+    <string name="singleTabFireDialogTitleFireMode">Fire Sekmeleri ve verileri silinsin mi?</string>
 </resources>

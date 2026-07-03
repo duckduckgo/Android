@@ -1115,4 +1115,21 @@
     <!-- New Address Bar Picker -->
     <string name="newAddressBarPickerDuckDuckGo" translatable="false">DuckDuckGo</string>
     <string name="newAddressBarPickerConfirm">Potvrdiť</string>
+
+    <!-- Fire mode -->
+    <string name="openInFireTab">Otvoriť na karte Fire</string>
+    <string name="openInBackgroundTab">Otvoriť na pozadí</string>
+    <string name="browserModeToggleFireDescription">Prejdi na karty v režime Fire</string>
+    <string name="browserModeToggleRegularDescription">Prepnúť na bežné karty</string>
+    <string name="browserModeToggleTabCountInfinite">∞</string>
+    <string name="fireTabMenuItem">Karta Fire</string>
+    <string name="fireTabNewTabPageTitle">Karta Fire</string>
+    <string name="fireTabsEmptyStateTitle">Karty Fire</string>
+    <string name="fireTabsFeatureNoHistory">Prehliadaj bez lokálneho ukladania histórie</string>
+    <string name="fireTabsFeatureDifferentAccount">Prihlás sa na stránku s iným účtom</string>
+    <string name="fireTabsFeatureTroubleshoot">Riešenie problémov s webovými stránkami</string>
+    <string name="fireTabsExplainer">Karty Fire sú izolované od ostatných údajov prehliadača. Keď ich všetky zatvoríš, ich údaje sa vymažú. Poskytujú ti rovnakú ochranu proti sledovaniu ako ostatné karty.</string>
+    <string name="fireTabsNewTabButton">Nová karta Fire</string>
+    <string name="fireTabsPromoTabSwitcherText"><![CDATA[<b>NOVINKA!</b> Vyskúšaj karty Fire na prehliadanie bez ukladania do lokálnej histórie.]]></string>
+    <string name="singleTabFireDialogTitleFireMode">Chceš vymazať karty Fire a ich údaje?</string>
 </resources>

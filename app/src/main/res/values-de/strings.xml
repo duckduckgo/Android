@@ -1075,4 +1075,21 @@
     <!-- New Address Bar Picker -->
     <string name="newAddressBarPickerDuckDuckGo" translatable="false">DuckDuckGo</string>
     <string name="newAddressBarPickerConfirm">Bestätigen</string>
+
+    <!-- Fire mode -->
+    <string name="openInFireTab">In einem Fire-Tab öffnen</string>
+    <string name="openInBackgroundTab">Im Hintergrund öffnen</string>
+    <string name="browserModeToggleFireDescription">Zu Fire-Modus-Tabs wechseln</string>
+    <string name="browserModeToggleRegularDescription">Zu regulären Tabs wechseln</string>
+    <string name="browserModeToggleTabCountInfinite">∞</string>
+    <string name="fireTabMenuItem">Fire-Tab</string>
+    <string name="fireTabNewTabPageTitle">Fire-Tab</string>
+    <string name="fireTabsEmptyStateTitle">Fire-Tabs</string>
+    <string name="fireTabsFeatureNoHistory">Durchsuchen ohne Speichern des lokalen Verlaufs</string>
+    <string name="fireTabsFeatureDifferentAccount">Melde dich mit einem anderen Konto bei einer Website an</string>
+    <string name="fireTabsFeatureTroubleshoot">Website-Fehlerbehebung</string>
+    <string name="fireTabsExplainer">Fire Tabs sind von anderen Browserdaten isoliert. Ihre Daten werden gelöscht, wenn du alle Fenster schließt. Sie haben den gleichen Tracking-Schutz wie andere Tabs.</string>
+    <string name="fireTabsNewTabButton">Neues Fire-Tab</string>
+    <string name="fireTabsPromoTabSwitcherText"><![CDATA[<b>NEU!</b> Fire-Tabs ausprobieren, um zu surfen, ohne den lokalen Verlauf zu speichern.]]></string>
+    <string name="singleTabFireDialogTitleFireMode">Fire-Tabs und deren Daten löschen?</string>
 </resources>

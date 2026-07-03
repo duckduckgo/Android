@@ -1115,4 +1115,21 @@
     <!-- New Address Bar Picker -->
     <string name="newAddressBarPickerDuckDuckGo" translatable="false">DuckDuckGo</string>
     <string name="newAddressBarPickerConfirm">Patvirtinti</string>
+
+    <!-- Fire mode -->
+    <string name="openInFireTab">Atidaryti „Fire“ skirtuke</string>
+    <string name="openInBackgroundTab">Atidaryti fone</string>
+    <string name="browserModeToggleFireDescription">Perjungti į „Fire“ režimo skirtukus</string>
+    <string name="browserModeToggleRegularDescription">Perjungti į įprastus skirtukus</string>
+    <string name="browserModeToggleTabCountInfinite">∞</string>
+    <string name="fireTabMenuItem">„Fire“ skirtukas</string>
+    <string name="fireTabNewTabPageTitle">„Fire“ skirtukas</string>
+    <string name="fireTabsEmptyStateTitle">„Fire“ skirtukai</string>
+    <string name="fireTabsFeatureNoHistory">Naršyti ir nesaugoti vietinės istorijos</string>
+    <string name="fireTabsFeatureDifferentAccount">Prisijungti prie svetainės su kita paskyra</string>
+    <string name="fireTabsFeatureTroubleshoot">Šalinti interneto svetainių triktis</string>
+    <string name="fireTabsExplainer">„Fire“ skirtukai yra izoliuoti nuo kitų naršyklės duomenų. Jų duomenys „sudeginami“, kai tik juos visus uždarote. Jie suteikia tokią pačią apsaugą nuo sekimo kaip ir kiti skirtukai.</string>
+    <string name="fireTabsNewTabButton">Naujas „Fire“ skirtukas</string>
+    <string name="fireTabsPromoTabSwitcherText"><![CDATA[<b>NAUJIENA!</b> Išbandykite „Fire“ skirtukus naršymui neišsaugant vietinės naršymo istorijos.]]></string>
+    <string name="singleTabFireDialogTitleFireMode">Ar trinti „Fire“ skirtukus ir jų duomenis?</string>
 </resources>

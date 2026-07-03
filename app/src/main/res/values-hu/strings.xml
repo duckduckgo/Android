@@ -1075,4 +1075,21 @@
     <!-- New Address Bar Picker -->
     <string name="newAddressBarPickerDuckDuckGo" translatable="false">DuckDuckGo</string>
     <string name="newAddressBarPickerConfirm">Megerősítés</string>
+
+    <!-- Fire mode -->
+    <string name="openInFireTab">Megnyitás Fire-lapon</string>
+    <string name="openInBackgroundTab">Megnyitás a háttérben</string>
+    <string name="browserModeToggleFireDescription">Váltás Fire-lapokra</string>
+    <string name="browserModeToggleRegularDescription">Váltás normál lapokra</string>
+    <string name="browserModeToggleTabCountInfinite">∞</string>
+    <string name="fireTabMenuItem">Fire-lap</string>
+    <string name="fireTabNewTabPageTitle">Fire-lap</string>
+    <string name="fireTabsEmptyStateTitle">Fire-lapoka</string>
+    <string name="fireTabsFeatureNoHistory">Böngéssz helyi előzmények mentése nélkül</string>
+    <string name="fireTabsFeatureDifferentAccount">Jelentkezz be egy webhelyre másik fiókkal</string>
+    <string name="fireTabsFeatureTroubleshoot">Oldd meg a webhelyekkel kapcsolatos problémákat</string>
+    <string name="fireTabsExplainer">A Fire-lapok elkülönülnek a többi böngészőadattól. Az összes bezárásakor a hozzájuk tartozó adatok törlésre kerülnek. Ugyanazt a követés elleni védelmet nyújtják, mint a többi lap.</string>
+    <string name="fireTabsNewTabButton">Új Fire-lap</string>
+    <string name="fireTabsPromoTabSwitcherText"><![CDATA[<b>ÚJ! </b> Próbáld ki a Fire-lapokat, és böngéssz helyi előzmények mentése nélkül.]]></string>
+    <string name="singleTabFireDialogTitleFireMode">Törlöd a Fire-lapokat és az adataikat?</string>
 </resources>

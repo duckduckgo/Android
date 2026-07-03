@@ -1075,4 +1075,21 @@
     <!-- New Address Bar Picker -->
     <string name="newAddressBarPickerDuckDuckGo" translatable="false">DuckDuckGo</string>
     <string name="newAddressBarPickerConfirm">Vahvista</string>
+
+    <!-- Fire mode -->
+    <string name="openInFireTab">Avaa Fire-välilehdessä</string>
+    <string name="openInBackgroundTab">Avaa taustalla</string>
+    <string name="browserModeToggleFireDescription">Vaihda Fire-tilan välilehtiin</string>
+    <string name="browserModeToggleRegularDescription">Vaihda tavallisiin välilehtiin</string>
+    <string name="browserModeToggleTabCountInfinite">∞</string>
+    <string name="fireTabMenuItem">Fire-välilehti</string>
+    <string name="fireTabNewTabPageTitle">Fire-välilehti</string>
+    <string name="fireTabsEmptyStateTitle">Fire-välilehdet</string>
+    <string name="fireTabsFeatureNoHistory">Selaa tallentamatta paikallista historiaa</string>
+    <string name="fireTabsFeatureDifferentAccount">Kirjaudu sivustolle eri tilillä</string>
+    <string name="fireTabsFeatureTroubleshoot">Vianmääritys verkkosivustoille</string>
+    <string name="fireTabsExplainer">Fire-välilehdet on eristetty muista selaintiedoista. Niiden tiedot poltetaan, kun suljet ne kaikki. Ne antavat sinulle saman seurantasuojan kuin muutkin välilehdet.</string>
+    <string name="fireTabsNewTabButton">Uusi Fire-välilehti</string>
+    <string name="fireTabsPromoTabSwitcherText"><![CDATA[<b>UUTTA!</b> Kokeile Fire-välilehtiä selataksesi ilman paikallisen historian tallentamista.]]></string>
+    <string name="singleTabFireDialogTitleFireMode">Poistetaanko Fire-välilehdet ja niiden tiedot?</string>
 </resources>
