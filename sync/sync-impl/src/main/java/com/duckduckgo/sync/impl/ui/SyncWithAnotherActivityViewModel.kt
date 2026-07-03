@@ -115,10 +115,10 @@ class SyncWithAnotherActivityViewModel @Inject constructor(
         if (sessionStarted) return
         sessionStarted = true
         viewModelScope.launch(dispatchers.io()) {
+            // If deep-linking, neither showQRCode() nor legacy polling should run
+            if (isDeepLink) return@launch
             if (shouldUseV2()) {
-                if (!isDeepLink) {
-                    startV2Present()
-                }
+                startV2Present()
                 return@launch
             }
             showQRCode()
