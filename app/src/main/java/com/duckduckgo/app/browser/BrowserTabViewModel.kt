@@ -5319,8 +5319,10 @@ class BrowserTabViewModel @Inject constructor(
 
     override fun onShouldOverride() {
         val cta = currentCtaViewState().cta
-        if (cta is OnboardingDaxDialogCta) {
+        if (cta != null) {
             ctaViewModel.onContextualSiteLinkTapped(cta)
+        }
+        if (cta is OnboardingDaxDialogCta) {
             onDismissOnboardingDaxDialog(cta)
         }
     }
@@ -5726,16 +5728,9 @@ class BrowserTabViewModel @Inject constructor(
 
             val cta = ctaViewState.value?.cta ?: return@launch
             if (cta is OnboardingDaxDialogCta.DaxDuckAiFireButtonCta || cta is DaxDuckAiFireButtonBrandDesignUpdateContextualCta) {
-                // This runs only once the fire action has actually completed, so it's an engagement,
-                // not a passive dismiss — mirrors the toolbar-fire-button pairing in onFireMenuSelected.
-                ctaViewModel.onContextualFireButtonEngaged(cta)
                 ctaViewModel.onUserDismissedCta(cta = cta, isEngagement = true)
             }
         }
-    }
-
-    fun onOnboardingFireButtonCleared() {
-        currentCtaViewState().cta?.let { ctaViewModel.onContextualFireButtonEngaged(it) }
     }
 
     private fun trackersCount(): String =

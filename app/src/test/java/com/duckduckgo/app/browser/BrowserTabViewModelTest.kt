@@ -10233,13 +10233,6 @@ class BrowserTabViewModelTest {
         deviceInfo = mockDeviceInfo,
     )
 
-    private fun brandDesignFireButtonCta() = DaxFireButtonBrandDesignUpdateContextualCta(
-        onboardingStore = mockOnboardingStore,
-        appInstallStore = mockAppInstallStore,
-        isLightTheme = true,
-        deviceInfo = mockDeviceInfo,
-    )
-
     private fun omnibarViewState() = testee.omnibarViewState.value!!
 
     private fun loadingViewState() = testee.loadingViewState.value!!
@@ -12064,18 +12057,6 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenDismissDuckAiFireOnboardingCtaCalledWithBrandDesignUpdateCtaThenEngageFiredButNotDismiss() = runTest {
-        dismissedCtaDaoChannel.send(emptyList())
-        testee.ctaViewState.value = ctaViewState().copy(cta = brandDesignDuckAiFireButtonCta())
-
-        testee.dismissDuckAiFireOnboardingCta()
-        advanceUntilIdle()
-
-        verify(mockOnboardingPixelSender).fireContextual(ONBOARDING_FIRE_BUTTON, OnboardingPixelAction.Clicked(engaged = true))
-        verify(mockOnboardingPixelSender, never()).fireContextual(ONBOARDING_FIRE_BUTTON, OnboardingPixelAction.Clicked(engaged = false))
-    }
-
-    @Test
     fun whenDismissDuckAiFireOnboardingCtaCalledWithDifferentCtaThenNoop() = runTest {
         dismissedCtaDaoChannel.send(emptyList())
         val cta = DaxSerpCta(mockOnboardingStore, mockAppInstallStore)
@@ -12099,27 +12080,6 @@ class BrowserTabViewModelTest {
         advanceUntilIdle()
 
         verify(mockDismissedCtaDao, never()).insert(DismissedCta(CtaId.DAX_DUCK_AI_FIRE_BUTTON))
-    }
-
-    @Test
-    fun whenOnboardingFireButtonClearedWithBrandDesignFireButtonCtaThenEngageFired() = runTest {
-        testee.ctaViewState.value = ctaViewState().copy(cta = brandDesignFireButtonCta())
-
-        testee.onOnboardingFireButtonCleared()
-        advanceUntilIdle()
-
-        verify(mockOnboardingPixelSender).fireContextual(ONBOARDING_FIRE_BUTTON, OnboardingPixelAction.Clicked(engaged = true))
-    }
-
-    @Test
-    fun whenOnboardingFireButtonClearedWithUnrelatedCtaThenNoPixelFired() = runTest {
-        val cta = DaxSerpCta(mockOnboardingStore, mockAppInstallStore)
-        testee.ctaViewState.value = ctaViewState().copy(cta = cta)
-
-        testee.onOnboardingFireButtonCleared()
-        advanceUntilIdle()
-
-        verifyNoInteractions(mockOnboardingPixelSender)
     }
 
     @Test

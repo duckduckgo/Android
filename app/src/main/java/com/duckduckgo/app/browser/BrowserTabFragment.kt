@@ -210,7 +210,6 @@ import com.duckduckgo.app.cta.ui.CtaViewModel
 import com.duckduckgo.app.cta.ui.DaxBubbleCta
 import com.duckduckgo.app.cta.ui.DaxBubbleCta.DaxDialogIntroOption
 import com.duckduckgo.app.cta.ui.DaxDuckAiFireButtonBrandDesignUpdateContextualCta
-import com.duckduckgo.app.cta.ui.DaxFireButtonBrandDesignUpdateContextualCta
 import com.duckduckgo.app.cta.ui.HomePanelCta
 import com.duckduckgo.app.cta.ui.HomePanelCta.AddWidgetAutoOnboarding
 import com.duckduckgo.app.cta.ui.OnboardingDaxDialogCta
@@ -3064,9 +3063,7 @@ class BrowserTabFragment :
             is Command.ReinflateBrandDesignContextualDialog -> renderer.reinflateContextualBrandDesignDialog()
             is Command.LaunchFireDialogFromOnboardingDialog -> {
                 hideOnboardingDaxDialog(it.onboardingCta)
-                val isOnboardingFireButton = it.onboardingCta is OnboardingDaxDialogCta.DaxFireButtonCta ||
-                    it.onboardingCta is DaxFireButtonBrandDesignUpdateContextualCta
-                browserActivity?.launchFire(isOnboardingFireButton = isOnboardingFireButton)
+                browserActivity?.launchFire()
             }
 
             is Command.SwitchToTab -> {
@@ -6773,10 +6770,6 @@ class BrowserTabFragment :
 
     fun dismissDuckAiFireOnboardingCta() {
         viewModel.dismissDuckAiFireOnboardingCta()
-    }
-
-    fun onOnboardingFireButtonCleared() {
-        viewModel.onOnboardingFireButtonCleared()
     }
 }
 

@@ -290,13 +290,8 @@ class CtaViewModel @Inject constructor(
     }
 
     suspend fun onUserClickCtaOkButton(cta: Cta) {
-        // The fire-button CTA's engagement is reported once the fire action actually completes
-        // (see onContextualFireButtonEngaged), so exclude it here to avoid firing on the mere tap
-        // of its "Try It" button, before the user has confirmed anything gets cleared.
-        if (cta !is DaxFireButtonBrandDesignUpdateContextualCta) {
-            contextualOnboardingPixelName(cta)?.let {
-                onboardingPixelSender.fireContextual(it, OnboardingPixelAction.Clicked(engaged = true))
-            }
+        contextualOnboardingPixelName(cta)?.let {
+            onboardingPixelSender.fireContextual(it, OnboardingPixelAction.Clicked(engaged = true))
         }
         cta.okPixel?.let {
             pixel.fire(it, cta.pixelOkParameters())

@@ -42,6 +42,7 @@ class OnboardingPixelParamRemovalPlugin @Inject constructor() : PixelParamRemova
             OnboardingPixelName.ONBOARDING_VISIT_SITE.pixelName to PixelParameter.removeAtb(),
             OnboardingPixelName.ONBOARDING_TRACKERS_BLOCKED.pixelName to PixelParameter.removeAtb(),
             OnboardingPixelName.ONBOARDING_END.pixelName to PixelParameter.removeAtb(),
+            OnboardingPixelName.ONBOARDING_SUBSCRIPTION_PROMO.pixelName to PixelParameter.removeAtb(),
         )
     }
 }
