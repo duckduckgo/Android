@@ -113,7 +113,7 @@ class OnboardingActivity : DuckDuckGoActivity() {
     private fun onOnboardingDone() {
         lifecycleScope.launch {
             viewModel.onOnboardingDone()
-            startActivity(BrowserActivity.intent(this@OnboardingActivity, launchSource = Onboarding, newSearch = true))
+            startActivity(BrowserActivity.intent(this@OnboardingActivity, launchSource = Onboarding))
             finish()
         }
     }
