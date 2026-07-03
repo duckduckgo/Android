@@ -101,8 +101,10 @@ class RealAutoconsentSettingsDataStore constructor(
             return parsePreference(preferences.getString(AUTOCONSENT_COOKIE_POP_UP_PREFERENCE, null))
         }
         val migrated = migrateFromLegacySetting()
-        preferences.edit(commit = true) {
-            putString(AUTOCONSENT_COOKIE_POP_UP_PREFERENCE, migrated.name)
+        if (preferences.contains(AUTOCONSENT_USER_SETTING)) {
+            preferences.edit(commit = true) {
+                putString(AUTOCONSENT_COOKIE_POP_UP_PREFERENCE, migrated.name)
+            }
         }
         return migrated
     }

@@ -76,6 +76,21 @@ class RealAutoconsentSettingsDataStoreTest {
     }
 
     @Test
+    fun whenReadBeforeRemoteConfigThenPreferenceUpdatesAfterCacheInvalidation() = runTest {
+        feature.onByDefault().setRawStoredState(Toggle.State(enable = false))
+        val dataStore = createDataStore()
+
+        assertEquals(CookiePopUpPreference.off, dataStore.cookiePopUpPreference)
+        assertFalse(preferences().contains(COOKIE_POP_UP_PREFERENCE_KEY))
+
+        feature.onByDefault().setRawStoredState(Toggle.State(enable = true))
+        dataStore.invalidateCache()
+
+        assertEquals(CookiePopUpPreference.`default`, dataStore.cookiePopUpPreference)
+        assertFalse(preferences().contains(COOKIE_POP_UP_PREFERENCE_KEY))
+    }
+
+    @Test
     fun whenPreferenceAlreadyStoredThenMigrationIsIdempotent() = runTest {
         val dataStore = createDataStore()
         dataStore.cookiePopUpPreference = CookiePopUpPreference.max
@@ -114,5 +129,6 @@ class RealAutoconsentSettingsDataStoreTest {
     companion object {
         private const val PREFS_FILENAME = "com.duckduckgo.autoconsent.store.settings"
         private const val LEGACY_USER_SETTING_KEY = "AutoconsentUserSetting"
+        private const val COOKIE_POP_UP_PREFERENCE_KEY = "AutoconsentCookiePopUpPreference"
     }
 }
