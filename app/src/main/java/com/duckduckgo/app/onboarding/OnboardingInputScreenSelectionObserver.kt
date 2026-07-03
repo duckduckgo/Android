@@ -66,7 +66,10 @@ class OnboardingInputScreenSelectionObserver @Inject constructor(
             .onEach { (isInputScreenCosmeticallyEnabled, isInputScreenEnabled) ->
                 if (isInputScreenCosmeticallyEnabled != isInputScreenEnabled) return@onEach
 
-                if (userStageStore.getUserAppStage() != AppStage.ESTABLISHED && onboardingStore.getInputScreenSelection() != null) {
+                if (userStageStore.getUserAppStage() != AppStage.ESTABLISHED &&
+                    onboardingStore.getInputScreenSelection() != null &&
+                    !onboardingStore.isInputScreenSelectionAppliedByOnboarding()
+                ) {
                     onboardingStore.setInputScreenSelectionOverriddenByUser()
                     inputScreenOnboardingWideEvent.onInputScreenSettingEnabledBeforeInputScreenShown(enabled = isInputScreenEnabled)
                 }

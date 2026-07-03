@@ -28,6 +28,8 @@ interface OnboardingStore {
     fun getInputScreenSelection(): Boolean?
     fun isInputScreenSelectionOverriddenByUser(): Boolean
     fun setInputScreenSelectionOverriddenByUser()
+    fun isInputScreenSelectionAppliedByOnboarding(): Boolean
+    fun setInputScreenSelectionAppliedByOnboarding()
     fun setDuckAiOnboardingFlow()
     fun isDuckAiOnboardingFlow(): Boolean
 }

@@ -155,7 +155,8 @@ class CtaViewModel @Inject constructor(
     @VisibleForTesting
     suspend fun requiredDaxOnboardingCtas(): List<CtaId> {
         if (onboardingStore.isDuckAiOnboardingFlow()) {
-            return listOf(CtaId.DAX_DUCK_AI_FIRE_BUTTON)
+            // T2: DAX_DUCK_AI_END gates stage completion, deferring ESTABLISHED to End-CTA dismissal.
+            return listOf(CtaId.DAX_DUCK_AI_FIRE_BUTTON, CtaId.DAX_DUCK_AI_END)
         }
         return if (isSubscriptionCtaAvailable()) {
             listOf(
@@ -194,10 +195,6 @@ class CtaViewModel @Inject constructor(
                 if (canSendPixel) {
                     pixel.fire(it, cta.pixelShownParameters())
                 }
-            }
-            if (cta is DaxDuckAiEndBubbleCta || cta is DaxDuckAiEndBrandDesignUpdateBubbleCta) {
-                // Native-input bubble path: mirror prepareAndMarkDuckAiEndCtaForInputScreen's side-effects.
-                completeStageIfDaxOnboardingCompleted()
             }
             if (cta is DaxCta && cta.markAsReadOnShow) {
                 dismissedCtaDao.insert(DismissedCta(cta.ctaId))
@@ -263,8 +260,9 @@ class CtaViewModel @Inject constructor(
             val shouldShow = canShowDuckAiEndCta() && !settingsDataStore.hideTips
             if (!shouldShow) return@withContext DuckAiOnboardingEndCtaVariant.NONE
 
+            // T2: mark the End CTA read here (dedups re-shows via canShowDuckAiEndCta), but DO NOT complete
+            // the stage yet — ESTABLISHED is deferred to onDuckAiEndCtaInteraction (dismissal).
             dismissedCtaDao.insert(DismissedCta(CtaId.DAX_DUCK_AI_END))
-            completeStageIfDaxOnboardingCompleted()
             if (canSendShownPixel(onboardingStore, Pixel.PixelValues.DUCK_AI_END_CTA)) {
                 val journey = addCtaToHistory(onboardingStore, appInstallStore, Pixel.PixelValues.DUCK_AI_END_CTA)
                 pixel.fire(AppPixelName.ONBOARDING_DAX_CTA_SHOWN, mapOf(Pixel.PixelParameter.CTA_SHOWN to journey))
@@ -285,6 +283,9 @@ class CtaViewModel @Inject constructor(
             } else {
                 pixel.fire(AppPixelName.ONBOARDING_DAX_CTA_DISMISS_BUTTON, params)
             }
+            // T2: the input-screen path completes the Duck.ai onboarding stage on End-CTA interaction
+            // (dismissal), mirroring the home-bubble path's onUserDismissedCta.
+            completeStageIfDaxOnboardingCompleted()
         }
     }
 

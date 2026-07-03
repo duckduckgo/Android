@@ -218,6 +218,14 @@ class OnboardingStoreImpl @Inject constructor(
         preferences.edit { putBoolean(KEY_INPUT_SCREEN_SELECTION_OVERRIDDEN_BY_USER, true) }
     }
 
+    override fun isInputScreenSelectionAppliedByOnboarding(): Boolean {
+        return preferences.getBoolean(KEY_INPUT_SCREEN_SELECTION_APPLIED_BY_ONBOARDING, false)
+    }
+
+    override fun setInputScreenSelectionAppliedByOnboarding() {
+        preferences.edit { putBoolean(KEY_INPUT_SCREEN_SELECTION_APPLIED_BY_ONBOARDING, true) }
+    }
+
     override fun setDuckAiOnboardingFlow() {
         preferences.edit { putBoolean(KEY_DUCK_AI_ONBOARDING_FLOW, true) }
     }
@@ -231,6 +239,7 @@ class OnboardingStoreImpl @Inject constructor(
         const val ONBOARDING_JOURNEY = "onboardingJourney"
         private const val KEY_INPUT_SCREEN_SELECTION = "inputScreenSelection"
         private const val KEY_INPUT_SCREEN_SELECTION_OVERRIDDEN_BY_USER = "inputScreenSelectionOverriddenByUser"
+        private const val KEY_INPUT_SCREEN_SELECTION_APPLIED_BY_ONBOARDING = "inputScreenSelectionAppliedByOnboarding"
         private const val KEY_DUCK_AI_ONBOARDING_FLOW = "duckAiOnboardingFlow"
     }
 }

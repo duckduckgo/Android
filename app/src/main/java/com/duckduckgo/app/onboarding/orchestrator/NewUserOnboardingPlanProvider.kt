@@ -173,14 +173,30 @@ class NewUserOnboardingPlanProvider @Inject constructor(
             // The custom-AI flow always finishes on the Duck.ai (chat) tab
             customAiOnboardingStore.setOpenInputOnDuckAiTab()
         }
+        val applyInputScreenSetting = suspend {
+            // T1: apply the functional Duck.ai toggle setting at plan completion, before the browser
+            // renders the post-onboarding toggle surface. This is awaited here, so it happens-before
+            // every fire-and-forget LaunchInputScreen / ShowKeyboard emission — decoupled from ESTABLISHED.
+            withContext(dispatchers.io()) {
+                val selection = onboardingStore.getInputScreenSelection()
+                if (selection != null && !onboardingStore.isInputScreenSelectionOverriddenByUser()) {
+                    // Suppress the override observer: this programmatic apply makes the real setting equal
+                    // the cosmetic one before ESTABLISHED, which would otherwise be mis-flagged as a user override.
+                    onboardingStore.setInputScreenSelectionAppliedByOnboarding()
+                    duckChat.setInputScreenUserSetting(selection)
+                }
+            }
+        }
         val onCompleted = suspend {
             dismissDuckAiFireCta()
             markInputToLaunchOnChat()
+            applyInputScreenSetting()
             rootOnCompleted()
         }
         val onSkipped = suspend {
             dismissDuckAiFireCta()
             markInputToLaunchOnChat()
+            applyInputScreenSetting()
             rootOnSkipped()
         }
 
