@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 DuckDuckGo
+ * Copyright (c) 2026 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,19 +16,16 @@
 
 package com.duckduckgo.downloads.api
 
-import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
+import kotlinx.coroutines.flow.Flow
 
-sealed interface DownloadsScreens {
+/** Persists the user's custom download folder selection. */
+interface DownloadLocationRepository {
 
-    /**
-     * Launch the Downloads activity
-     */
-    data object DownloadsScreenNoParams : ActivityParams {
-        private fun readResolve(): Any = DownloadsScreenNoParams
-    }
+    val customLocationFlow: Flow<CustomDownloadLocation?>
 
-    /** Launch the Download Location settings screen. */
-    data object DownloadLocationSettingsScreenNoParams : ActivityParams {
-        private fun readResolve(): Any = DownloadLocationSettingsScreenNoParams
-    }
+    suspend fun getCustomLocation(): CustomDownloadLocation?
+
+    suspend fun saveCustomLocation(location: CustomDownloadLocation)
+
+    suspend fun clearCustomLocation()
 }

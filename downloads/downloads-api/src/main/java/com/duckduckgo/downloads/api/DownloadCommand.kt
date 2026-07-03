@@ -33,6 +33,10 @@ sealed class DownloadCommand(@StringRes val messageId: Int) {
     class ShowDownloadFailedMessage(
         @StringRes messageId: Int,
     ) : DownloadCommand(messageId)
+
+    class ShowDownloadLocationFallbackMessage(
+        @StringRes messageId: Int,
+    ) : DownloadCommand(messageId)
 }
 
 const val DOWNLOAD_SNACKBAR_LENGTH = 750

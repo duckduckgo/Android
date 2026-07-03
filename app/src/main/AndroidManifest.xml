@@ -471,6 +471,13 @@
             android:exported="false"
             android:label="@string/fireButtonActivityTitle"
             android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity" />
+
+        <activity
+            android:name="com.duckduckgo.downloads.impl.location.DownloadLocationSettingsActivity"
+            android:exported="false"
+            android:label="@string/downloadsLocationSettingTitle"
+            android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity" />
+
         <activity
             android:name="com.duckduckgo.app.firebutton.AutomaticDataClearingSettingsActivity"
             android:exported="false"

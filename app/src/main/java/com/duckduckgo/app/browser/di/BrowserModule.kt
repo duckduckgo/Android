@@ -342,8 +342,16 @@ class BrowserModule {
         workManager: WorkManager,
         @AppCoroutineScope appCoroutineScope: CoroutineScope,
         dispatcherProvider: DispatcherProvider,
+        downloadDestinationResolver: com.duckduckgo.downloads.api.DownloadDestinationResolver,
     ): FileDownloader {
-        return AndroidFileDownloader(dataUriDownloader, callback, workManager, appCoroutineScope, dispatcherProvider)
+        return AndroidFileDownloader(
+            dataUriDownloader,
+            callback,
+            workManager,
+            appCoroutineScope,
+            dispatcherProvider,
+            downloadDestinationResolver,
+        )
     }
 
     @Provides

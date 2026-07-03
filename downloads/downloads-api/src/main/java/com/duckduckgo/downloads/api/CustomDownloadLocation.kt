@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 DuckDuckGo
+ * Copyright (c) 2026 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,19 +16,9 @@
 
 package com.duckduckgo.downloads.api
 
-import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
-
-sealed interface DownloadsScreens {
-
-    /**
-     * Launch the Downloads activity
-     */
-    data object DownloadsScreenNoParams : ActivityParams {
-        private fun readResolve(): Any = DownloadsScreenNoParams
-    }
-
-    /** Launch the Download Location settings screen. */
-    data object DownloadLocationSettingsScreenNoParams : ActivityParams {
-        private fun readResolve(): Any = DownloadLocationSettingsScreenNoParams
-    }
-}
+/** Persisted user preference for a custom download folder. */
+data class CustomDownloadLocation(
+    val treeUri: String,
+    val displayName: String,
+    val pathLabel: String,
+)

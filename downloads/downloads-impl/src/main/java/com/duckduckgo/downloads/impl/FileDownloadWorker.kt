@@ -26,6 +26,7 @@ import androidx.work.WorkerParameters
 import com.duckduckgo.anvil.annotations.ContributesWorker
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.downloads.api.DownloadDestination
 import com.duckduckgo.downloads.api.DownloadFailReason
 import com.duckduckgo.downloads.api.FileDownloader
 import kotlinx.coroutines.withContext
@@ -52,7 +53,6 @@ class FileDownloadWorker(
         val pending = inputData.toPendingFileDownload()
 
         when {
-            // the worker should only handle URL downloads
             pending.isNetworkUrl -> networkFileDownloader.download(pending, callback)
             else -> callback.onError(url = pending.url, reason = DownloadFailReason.UnsupportedUrlType)
         }
@@ -67,33 +67,57 @@ private const val CONTENT_DISPOSITION = "CONTENT_DISPOSITION"
 private const val MIME_TYPE = "MIME_TYPE"
 private const val SUBFOLDER = "SUBFOLDER"
 private const val DIRECTORY = "DIRECTORY"
+private const val DESTINATION_TYPE = "DESTINATION_TYPE"
+private const val DESTINATION_TREE_URI = "DESTINATION_TREE_URI"
+private const val DESTINATION_DISPLAY_LABEL = "DESTINATION_DISPLAY_LABEL"
 
 @VisibleForTesting
 internal const val IS_URL_COMPRESSED = "IS_URL_COMPRESSED"
 private const val MAX_URL_DATA_BYTES = MAX_DATA_BYTES * 0.9
 private const val BYTE_ARRAY_SIZE = 256
 
+private const val DESTINATION_TYPE_DEFAULT = "default"
+private const val DESTINATION_TYPE_CUSTOM = "custom"
+
 fun FileDownloader.PendingFileDownload.toInputData(): Data {
     val urlTooLarge = url.toByteArray().size > MAX_URL_DATA_BYTES
-    return Data.Builder()
+    val builder = Data.Builder()
         .putString(URL, if (urlTooLarge) compress(url) else url)
         .putString(CONTENT_DISPOSITION, contentDisposition)
         .putString(MIME_TYPE, mimeType)
         .putString(SUBFOLDER, subfolder)
         .putString(DIRECTORY, directory.absolutePath)
         .putBoolean(IS_URL_COMPRESSED, urlTooLarge)
-        .build()
+
+    when (val resolvedDestination = destination) {
+        is DownloadDestination.Default -> builder.putString(DESTINATION_TYPE, DESTINATION_TYPE_DEFAULT)
+        is DownloadDestination.CustomTree ->
+            builder
+                .putString(DESTINATION_TYPE, DESTINATION_TYPE_CUSTOM)
+                .putString(DESTINATION_TREE_URI, resolvedDestination.treeUri)
+                .putString(DESTINATION_DISPLAY_LABEL, resolvedDestination.displayLabel)
+    }
+
+    return builder.build()
 }
 
 fun Data.toPendingFileDownload(): FileDownloader.PendingFileDownload {
     val isUrlCompressed = getBoolean(IS_URL_COMPRESSED, false)
     val url = if (isUrlCompressed) decompress(getString(URL)!!) else getString(URL)!!
+    val destination = when (getString(DESTINATION_TYPE)) {
+        DESTINATION_TYPE_CUSTOM -> DownloadDestination.CustomTree(
+            treeUri = getString(DESTINATION_TREE_URI)!!,
+            displayLabel = getString(DESTINATION_DISPLAY_LABEL).orEmpty(),
+        )
+        else -> DownloadDestination.Default
+    }
     return FileDownloader.PendingFileDownload(
         url = url,
         contentDisposition = getString(CONTENT_DISPOSITION),
         mimeType = getString(MIME_TYPE),
         subfolder = getString(SUBFOLDER)!!,
         directory = File(getString(DIRECTORY)!!),
+        destination = destination,
         isUrlCompressed = false,
     )
 }

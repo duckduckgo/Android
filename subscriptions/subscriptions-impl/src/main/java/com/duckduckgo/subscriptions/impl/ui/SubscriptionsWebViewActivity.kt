@@ -118,7 +118,6 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import logcat.logcat
 import org.json.JSONObject
-import java.io.File
 import java.io.Serializable
 import javax.inject.Inject
 import javax.inject.Named
@@ -393,6 +392,7 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
             is DownloadCommand.ShowDownloadStartedMessage -> downloadStarted(command)
             is DownloadCommand.ShowDownloadFailedMessage -> downloadFailed(command)
             is DownloadCommand.ShowDownloadSuccessMessage -> downloadSucceeded(command)
+            is DownloadCommand.ShowDownloadLocationFallbackMessage -> downloadLocationFallback(command)
         }
     }
 
@@ -406,6 +406,10 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
         binding.root.postDelayed({ downloadFailedSnackbar?.show() }, DOWNLOAD_SNACKBAR_DELAY)
     }
 
+    private fun downloadLocationFallback(command: DownloadCommand.ShowDownloadLocationFallbackMessage) {
+        binding.root.makeSnackbarWithNoBottomInset(getString(command.messageId), Snackbar.LENGTH_LONG)?.show()
+    }
+
     private fun downloadSucceeded(command: DownloadCommand.ShowDownloadSuccessMessage) {
         val downloadSucceededSnackbar = binding.root.makeSnackbarWithNoBottomInset(
             getString(command.messageId, command.fileName),
@@ -413,7 +417,7 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
         )
             .apply {
                 this.setAction(string.downloadsDownloadFinishedActionName) {
-                    val result = downloadsFileActions.openFile(context, File(command.filePath))
+                    val result = downloadsFileActions.openFileAtPath(context, command.filePath)
                     if (!result) {
                         view.makeSnackbarWithNoBottomInset(getString(string.downloadsCannotOpenFileErrorMessage), Snackbar.LENGTH_LONG).show()
                     }

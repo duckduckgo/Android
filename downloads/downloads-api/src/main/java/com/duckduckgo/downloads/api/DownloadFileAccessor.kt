@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 DuckDuckGo
+ * Copyright (c) 2026 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,19 +16,12 @@
 
 package com.duckduckgo.downloads.api
 
-import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
+/** Access downloaded files whether stored on disk or via a content URI. */
+interface DownloadFileAccessor {
 
-sealed interface DownloadsScreens {
+    fun exists(filePath: String): Boolean
 
-    /**
-     * Launch the Downloads activity
-     */
-    data object DownloadsScreenNoParams : ActivityParams {
-        private fun readResolve(): Any = DownloadsScreenNoParams
-    }
+    fun delete(filePath: String): Boolean
 
-    /** Launch the Download Location settings screen. */
-    data object DownloadLocationSettingsScreenNoParams : ActivityParams {
-        private fun readResolve(): Any = DownloadLocationSettingsScreenNoParams
-    }
+    fun isContentUri(filePath: String): Boolean
 }

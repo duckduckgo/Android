@@ -37,6 +37,7 @@ dependencies {
     ksp project(':anvil-ksp')
     implementation project(path: ':anvil-annotations')
     implementation project(path: ':downloads-api')
+    implementation project(path: ':navigation-api')
     implementation project(path: ':browser-api')
     implementation project(path: ':di')
     implementation project(path: ':common-utils')
@@ -48,6 +49,7 @@ dependencies {
 
     implementation AndroidX.dataStore.preferences
     implementation AndroidX.core.ktx
+    implementation "androidx.documentfile:documentfile:1.0.1"
 
     implementation AndroidX.appCompat
     implementation Google.android.material
