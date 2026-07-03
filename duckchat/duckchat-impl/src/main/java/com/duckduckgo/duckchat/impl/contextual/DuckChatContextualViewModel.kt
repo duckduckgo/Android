@@ -139,6 +139,7 @@ class DuckChatContextualViewModel @Inject constructor(
             val sourceTabId: String,
         ) : Command()
         data object LaunchChatHistory : Command()
+        data object FocusInput : Command()
     }
 
     private val _viewState: MutableStateFlow<ViewState> =
@@ -409,6 +410,10 @@ class DuckChatContextualViewModel @Inject constructor(
                     _viewState.value.copy(
                         sheetMode = SheetMode.WEBVIEW,
                         prompt = "",
+                        // The context has already been captured in contextPrompt above, so drop the
+                        // page-context chip from the input once the prompt is sent — mirroring how image
+                        // attachments are cleared on submit.
+                        showContext = false,
                     )
                 _subscriptionEventDataChannel.trySend(contextPrompt)
                 prefillEvent?.let { _subscriptionEventDataChannel.trySend(it) }
@@ -720,6 +725,9 @@ class DuckChatContextualViewModel @Inject constructor(
                 }
                 duckChatPixels.reportContextualAskAboutPageSelected()
                 addPageContext()
+                // Focus the input in the same tap so the keyboard and the (focus-gated) tools row come
+                // up without the user needing a second tap.
+                commandChannel.trySend(Command.FocusInput)
                 viewModelScope.launch {
                     _viewState.update { it.copy(quickActionState = QuickActionState.SUBMIT_SUMMARIZE) }
                 }

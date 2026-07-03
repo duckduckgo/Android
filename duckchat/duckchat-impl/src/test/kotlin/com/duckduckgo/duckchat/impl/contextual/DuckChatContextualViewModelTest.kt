@@ -1078,6 +1078,39 @@ class DuckChatContextualViewModelTest {
     }
 
     @Test
+    fun `when ask about page quick action clicked then focus input command emitted`() = runTest {
+        whenever(contextualSheetImprovementsToggle.isEnabled()).thenReturn(true)
+        val testee = buildViewModel()
+        testee.onSheetOpened("tab-1")
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+        val pageContext = """{"title":"Page","url":"https://example.com","content":"text"}"""
+        testee.onPageContextReceived("tab-1", pageContext)
+
+        testee.commands.test {
+            testee.onQuickActionClicked("") // ASK_ABOUT_PAGE with valid context
+            assertTrue(expectMostRecentItem() is DuckChatContextualViewModel.Command.FocusInput)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `when prompt sent then attached page context is cleared from input`() = runTest {
+        whenever(contextualSheetImprovementsToggle.isEnabled()).thenReturn(true)
+        val testee = buildViewModel()
+        testee.onSheetOpened("tab-1")
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+        testee.onPageContextReceived("tab-1", """{"title":"Page","url":"https://example.com","content":"text"}""")
+        testee.addPageContext()
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+        assertTrue(testee.viewState.value.showContext)
+
+        testee.onPromptSent(prompt = "hello")
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+        assertFalse(testee.viewState.value.showContext)
+    }
+
+    @Test
     fun `when replace prompt with previous input then prompt is appended`() =
         runTest {
             testee.viewState.test {

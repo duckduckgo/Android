@@ -478,7 +478,7 @@ class DuckChatContextualFragment :
             onFilePickerRequested = { callback, mimeTypes ->
                 launchNativeFilePicker(callback, mimeTypes)
             },
-            onNewPromptSubmitted = { submitted ->
+            onPromptSubmitted = { submitted ->
                 viewModel.onPromptSent(
                     prompt = submitted.prompt,
                     modelId = submitted.modelId,
@@ -672,6 +672,10 @@ class DuckChatContextualFragment :
                     is DuckChatContextualViewModel.Command.LaunchChatHistory -> {
                         viewModel.onContextualClose()
                         globalActivityStarter.start(requireContext(), DuckChatHistoryNoParams)
+                    }
+
+                    is DuckChatContextualViewModel.Command.FocusInput -> {
+                        binding.contextualNativeInputWidget.focusInput(activity)
                     }
                 }
             }.launchIn(lifecycleScope)

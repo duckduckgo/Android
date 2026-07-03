@@ -41,9 +41,9 @@ import org.json.JSONObject
 import javax.inject.Inject
 
 /**
- * A prompt submitted from the unified input widget while the contextual sheet is in its initial
- * (INPUT) state. Carries the widget's current model/reasoning/tool/attachment selections so the
- * new chat starts with everything the user configured.
+ * A prompt submitted from the unified input widget in the contextual sheet, in either the initial
+ * (INPUT) state or a running chat (WEBVIEW). Carries the widget's current model/reasoning/tool/
+ * attachment selections so the chat is submitted with everything the user configured.
  */
 data class NativeInputPrompt(
     val prompt: String,
@@ -65,9 +65,9 @@ interface ContextualNativeInputManager {
         onSearchSubmitted: (String) -> Unit,
         onCameraCaptureRequested: (ValueCallback<Array<Uri>>) -> Unit = {},
         onFilePickerRequested: (ValueCallback<Array<Uri>>, List<String>) -> Unit = { _, _ -> },
-        // Invoked when the widget submits a prompt while the sheet is in INPUT mode: starts a new chat.
-        // WEBVIEW-mode submissions keep going through the in-chat JS event path (see setupWidget).
-        onNewPromptSubmitted: (NativeInputPrompt) -> Unit = {},
+        // Invoked when the widget submits a prompt, in both INPUT and WEBVIEW modes. Routing every submit
+        // through the ViewModel keeps prompt-building (and page-context attachment) in one place.
+        onPromptSubmitted: (NativeInputPrompt) -> Unit = {},
         onAskAboutTab: () -> Unit = {},
         onAskAboutPage: () -> Unit = {},
         onPageContextRemoved: () -> Unit = {},
@@ -110,7 +110,7 @@ class RealContextualNativeInputManager @Inject constructor(
         onSearchSubmitted: (String) -> Unit,
         onCameraCaptureRequested: (ValueCallback<Array<Uri>>) -> Unit,
         onFilePickerRequested: (ValueCallback<Array<Uri>>, List<String>) -> Unit,
-        onNewPromptSubmitted: (NativeInputPrompt) -> Unit,
+        onPromptSubmitted: (NativeInputPrompt) -> Unit,
         onAskAboutTab: () -> Unit,
         onAskAboutPage: () -> Unit,
         onPageContextRemoved: () -> Unit,
@@ -123,7 +123,7 @@ class RealContextualNativeInputManager @Inject constructor(
         setupWidget(
             tabId, widget, chatIdFlow, onSearchSubmitted,
             onCameraCaptureRequested, onFilePickerRequested,
-            onNewPromptSubmitted, onAskAboutTab, onAskAboutPage, onPageContextRemoved,
+            onPromptSubmitted, onAskAboutTab, onAskAboutPage, onPageContextRemoved,
         )
         observeNativeInputSetting(lifecycleOwner)
     }
@@ -182,7 +182,7 @@ class RealContextualNativeInputManager @Inject constructor(
         onSearchSubmitted: (String) -> Unit,
         onCameraCaptureRequested: (ValueCallback<Array<Uri>>) -> Unit,
         onFilePickerRequested: (ValueCallback<Array<Uri>>, List<String>) -> Unit,
-        onNewChatPromptSubmitted: (NativeInputPrompt) -> Unit,
+        onPromptSubmitted: (NativeInputPrompt) -> Unit,
         onAskAboutTab: () -> Unit,
         onAskAboutPage: () -> Unit,
         onPageContextRemoved: () -> Unit,
@@ -213,14 +213,15 @@ class RealContextualNativeInputManager @Inject constructor(
                 val reasoningEffort = widget.getResolvedReasoningEffort()
                 val selectedTool = widget.getSelectedTool()
                 widget.clearAttachments()
-                if (lastMode != Mode.WEBVIEW) {
-                    onNewChatPromptSubmitted(
-                        NativeInputPrompt(prompt, modelId, reasoningEffort, selectedTool, imagesJson, filesJson),
-                    )
-                } else {
-                    // Chat already in progress: submit into the running chat via the JS event.
-                    sendPrompt(prompt, modelId, reasoningEffort, selectedTool, imagesJson, filesJson)
-                }
+                // Both the initial submit (INPUT) and follow-ups in a running chat (WEBVIEW) go through the
+                // ViewModel so the prompt is built in one place (generateContextPrompt). That single path is
+                // what attaches any page context the user added from the "+" menu; the previous WEBVIEW
+                // shortcut built its own JS event and silently dropped that context. onPromptSent starts a
+                // new chat from INPUT and appends to the active chat from WEBVIEW — the web page decides
+                // which, based on its own state, not on the native caller.
+                onPromptSubmitted(
+                    NativeInputPrompt(prompt, modelId, reasoningEffort, selectedTool, imagesJson, filesJson),
+                )
                 widget.clearSelectedTool()
                 widget.text = ""
             },
@@ -241,49 +242,6 @@ class RealContextualNativeInputManager @Inject constructor(
                 }
             }
             .launchIn(lifecycleOwner.lifecycleScope)
-    }
-
-    private fun sendPrompt(
-        prompt: String,
-        modelId: String? = null,
-        reasoningEffort: String? = null,
-        selectedTool: String? = null,
-        imagesJson: JSONArray? = null,
-        filesJson: JSONArray? = null,
-    ) {
-        val params = JSONObject().apply {
-            put("platform", "android")
-            put("tool", "query")
-            put(
-                "query",
-                JSONObject().apply {
-                    put("prompt", prompt)
-                    put("autoSubmit", true)
-                    if (modelId != null) {
-                        put("modelId", modelId)
-                    }
-                    if (reasoningEffort != null) {
-                        put("reasoningEffort", reasoningEffort)
-                    }
-                    if (selectedTool != null) {
-                        put("toolChoice", JSONArray().apply { put(selectedTool) })
-                    }
-                    if (imagesJson != null) {
-                        put("images", imagesJson)
-                    }
-                    if (filesJson != null) {
-                        put("files", filesJson)
-                    }
-                },
-            )
-        }
-        jsMessaging?.sendSubscriptionEvent(
-            SubscriptionEventData(
-                featureName = RealDuckChatJSHelper.DUCK_CHAT_FEATURE_NAME,
-                subscriptionName = "submitAIChatNativePrompt",
-                params = params,
-            ),
-        )
     }
 
     private fun sendStopEvent() {

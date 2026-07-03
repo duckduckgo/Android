@@ -37,7 +37,6 @@ import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
-import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
@@ -221,7 +220,7 @@ class RealContextualNativeInputManagerTest {
             lifecycleOwner = lifecycleOwner(),
             chatIdFlow = emptyFlow(),
             onSearchSubmitted = {},
-            onNewPromptSubmitted = { submitted = it },
+            onPromptSubmitted = { submitted = it },
         )
         testee.onInputMode()
 
@@ -236,10 +235,11 @@ class RealContextualNativeInputManagerTest {
     }
 
     @Test
-    fun `when web view mode and chat submitted then sends in-chat prompt event and skips new chat callback`() {
+    fun `when web view mode and chat submitted then routes to prompt callback and does not send event directly`() {
         val enabled = MutableStateFlow(true)
         whenever(duckChat.observeNativeChatInputEnabled()).thenReturn(enabled)
         val widget = mock<NativeInputModeWidget>()
+        whenever(widget.getSelectedModelId()).thenReturn("model-1")
         val jsMessaging = mock<JsMessaging>()
         var submitted: NativeInputPrompt? = null
         testee.init(
@@ -250,7 +250,7 @@ class RealContextualNativeInputManagerTest {
             lifecycleOwner = lifecycleOwner(),
             chatIdFlow = emptyFlow(),
             onSearchSubmitted = {},
-            onNewPromptSubmitted = { submitted = it },
+            onPromptSubmitted = { submitted = it },
         )
         testee.onWebViewMode()
 
@@ -258,8 +258,11 @@ class RealContextualNativeInputManagerTest {
         verify(widget).bindInputEvents(any(), any(), captor.capture(), any())
         captor.firstValue.invoke("hello")
 
-        assertNull(submitted)
-        verify(jsMessaging).sendSubscriptionEvent(any())
+        // Follow-ups in a running chat now route through the ViewModel too, so page context is attached
+        // in one place; the manager no longer builds and sends its own in-chat event.
+        assertEquals("hello", submitted?.prompt)
+        assertEquals("model-1", submitted?.modelId)
+        verify(jsMessaging, never()).sendSubscriptionEvent(any())
     }
 
     @Test
@@ -277,7 +280,7 @@ class RealContextualNativeInputManagerTest {
             lifecycleOwner = lifecycleOwner(),
             chatIdFlow = emptyFlow(),
             onSearchSubmitted = {},
-            onNewPromptSubmitted = { submitted = it },
+            onPromptSubmitted = { submitted = it },
         )
         // Submit before onInputMode/onWebViewMode runs (lastMode still null): must start a new chat,
         // not fall through to the in-chat JS path.
