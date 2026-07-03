@@ -24,6 +24,7 @@ import android.webkit.WebResourceResponse
 import android.webkit.WebView
 import androidx.core.net.toUri
 import androidx.fragment.app.FragmentManager
+import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.adblocking.api.duckplayer.DuckPlayer
 import com.duckduckgo.adblocking.api.duckplayer.DuckPlayer.*
 import com.duckduckgo.adblocking.api.duckplayer.DuckPlayer.DuckPlayerOrigin.AUTO
@@ -57,6 +58,7 @@ import com.duckduckgo.adblocking.impl.duckplayer.ui.DuckPlayerPrimeDialogFragmen
 import com.duckduckgo.adblocking.impl.remoteconfig.AdBlockingExtensionFeature
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.di.IsMainProcess
+import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
@@ -112,6 +114,7 @@ interface DuckPlayerInternal : DuckPlayer {
 @ContributesBinding(AppScope::class, boundType = DuckPlayer::class)
 @ContributesBinding(AppScope::class, boundType = DuckPlayerInternal::class)
 @ContributesMultibinding(AppScope::class, boundType = PrivacyConfigCallbackPlugin::class)
+@ContributesMultibinding(AppScope::class, boundType = MainProcessLifecycleObserver::class)
 class RealDuckPlayer @Inject constructor(
     private val duckPlayerFeatureRepository: DuckPlayerFeatureRepository,
     private val duckPlayerFeature: DuckPlayerFeature,
@@ -123,7 +126,7 @@ class RealDuckPlayer @Inject constructor(
     private val appBuildConfig: AppBuildConfig,
     @IsMainProcess private val isMainProcess: Boolean,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
-) : DuckPlayerInternal, PrivacyConfigCallbackPlugin {
+) : DuckPlayerInternal, PrivacyConfigCallbackPlugin, MainProcessLifecycleObserver {
 
     private var shouldForceYTNavigation = false
     private var shouldHideOverlay = false
@@ -134,15 +137,19 @@ class RealDuckPlayer @Inject constructor(
     init {
         if (isMainProcess) {
             loadToMemory()
-            appCoroutineScope.launch {
-                combine(
-                    duckPlayerFeatureRepository.observeUserPreferences(),
-                    adBlockingExtensionFeature.self().enabled(),
-                    adBlockingExtensionFeature.enabledByDefault().enabled(),
-                    ::Triple,
-                ).collect { (stored, selfEnabled, enabledByDefault) ->
-                    applyAdBlockingRolloutDefaultIfEligible(stored, selfEnabled, enabledByDefault)
-                }
+        }
+    }
+
+    override fun onCreate(owner: LifecycleOwner) {
+        if (!isMainProcess) return
+        appCoroutineScope.launch {
+            combine(
+                duckPlayerFeatureRepository.observeUserPreferences(),
+                adBlockingExtensionFeature.self().enabled(),
+                adBlockingExtensionFeature.enabledByDefault().enabled(),
+                ::Triple,
+            ).collect { (stored, selfEnabled, enabledByDefault) ->
+                applyAdBlockingRolloutDefaultIfEligible(stored, selfEnabled, enabledByDefault)
             }
         }
     }

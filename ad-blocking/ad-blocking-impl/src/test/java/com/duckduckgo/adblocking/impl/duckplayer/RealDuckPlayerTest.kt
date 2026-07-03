@@ -24,6 +24,7 @@ import android.webkit.MimeTypeMap
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import androidx.core.net.toUri
+import androidx.lifecycle.LifecycleOwner
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.adblocking.api.duckplayer.DuckPlayer.DuckPlayerOrigin.AUTO
 import com.duckduckgo.adblocking.api.duckplayer.DuckPlayer.DuckPlayerState.DISABLED
@@ -50,6 +51,8 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.utils.UrlScheme.Companion.duck
 import com.duckduckgo.common.utils.UrlScheme.Companion.https
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.feature.toggles.api.FakeToggleStore
+import com.duckduckgo.feature.toggles.api.FeatureToggles
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -89,7 +92,13 @@ class RealDuckPlayerTest {
     private val mockDuckPlayerLocalFilesPath: DuckPlayerLocalFilesPath = mock()
     private val mimeType: MimeTypeMap = mock()
     private val dispatcherProvider = coroutineRule.testDispatcherProvider
-    private val adBlockingExtensionFeature = FakeFeatureToggleFactory.create(AdBlockingExtensionFeature::class.java)
+    private val adBlockingExtensionFeature = FeatureToggles.Builder()
+        .store(FakeToggleStore())
+        .appVersionProvider { Int.MAX_VALUE }
+        .featureName("adBlockingExtension")
+        .ioDispatcher(coroutineRule.testDispatcher)
+        .build()
+        .create(AdBlockingExtensionFeature::class.java)
     private val mockAppBuildConfig: AppBuildConfig = mock()
     private val storedUserPreferencesFlow = MutableStateFlow(StoredUserPreferences(false, null))
 
@@ -217,12 +226,14 @@ class RealDuckPlayerTest {
 
     //endregion
 
-    // region ad-blocking rollout default (driven by combine() in init)
+    // region ad-blocking rollout default (driven by combine() started in onCreate)
     @Test
     fun whenNotNewInstall_combineDoesNotPersistRolloutDefault() = runTest {
         whenever(mockAppBuildConfig.isNewInstall()).thenReturn(false)
         adBlockingExtensionFeature.self().setRawStoredState(State(true))
         adBlockingExtensionFeature.enabledByDefault().setRawStoredState(State(true))
+
+        testee.onCreate(mock(LifecycleOwner::class.java))
 
         verify(mockDuckPlayerFeatureRepository, never()).setUserPreferences(any())
     }
@@ -233,6 +244,8 @@ class RealDuckPlayerTest {
         adBlockingExtensionFeature.self().setRawStoredState(State(true))
         adBlockingExtensionFeature.enabledByDefault().setRawStoredState(State(false))
 
+        testee.onCreate(mock(LifecycleOwner::class.java))
+
         verify(mockDuckPlayerFeatureRepository, never()).setUserPreferences(any())
     }
 
@@ -242,16 +255,22 @@ class RealDuckPlayerTest {
         adBlockingExtensionFeature.self().setRawStoredState(State(false))
         adBlockingExtensionFeature.enabledByDefault().setRawStoredState(State(true))
 
+        testee.onCreate(mock(LifecycleOwner::class.java))
+
         verify(mockDuckPlayerFeatureRepository, never()).setUserPreferences(any())
     }
 
+    // Runs on the rule's dispatcher so advanceUntilIdle() drives the onCreate combine collector (which lives on
+    // coroutineRule.testScope); the fresh runTest scope keeps its own Job so the collector isn't policed for completion.
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun whenNewInstallAndRolloutOnAndNoStoredMode_combinePersistsDisabled() = runTest {
+    fun whenNewInstallAndRolloutOnAndNoStoredMode_combinePersistsDisabled() = runTest(coroutineRule.testDispatcher) {
         whenever(mockAppBuildConfig.isNewInstall()).thenReturn(true)
         storedUserPreferencesFlow.value = StoredUserPreferences(true, null)
         adBlockingExtensionFeature.self().setRawStoredState(State(true))
         adBlockingExtensionFeature.enabledByDefault().setRawStoredState(State(true))
+
+        testee.onCreate(mock(LifecycleOwner::class.java))
         advanceUntilIdle()
 
         // atLeastOnce because the mocked repo doesn't propagate the write back through
@@ -265,6 +284,8 @@ class RealDuckPlayerTest {
         storedUserPreferencesFlow.value = StoredUserPreferences(false, AlwaysAsk)
         adBlockingExtensionFeature.self().setRawStoredState(State(true))
         adBlockingExtensionFeature.enabledByDefault().setRawStoredState(State(true))
+
+        testee.onCreate(mock(LifecycleOwner::class.java))
 
         verify(mockDuckPlayerFeatureRepository, never()).setUserPreferences(any())
     }
