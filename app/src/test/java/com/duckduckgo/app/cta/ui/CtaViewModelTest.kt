@@ -46,6 +46,7 @@ import com.duckduckgo.app.onboarding.ui.page.OnboardingPixelSender
 import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.ExtendedOnboardingFeatureToggles
 import com.duckduckgo.app.onboardingbranddesignupdate.OnboardingBrandDesignUpdateToggles
 import com.duckduckgo.app.pixels.AppPixelName.*
+import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_END
 import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_FIRE_BUTTON
 import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_SEARCH
 import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_SEARCH_RESULTS
@@ -1847,6 +1848,60 @@ class CtaViewModelTest {
     }
 
     @Test
+    fun whenBrandDesignEndBubbleShownThenOnboardingShownPixelFired() = runTest {
+        val cta = daxEndBrandDesignUpdateBubbleCta()
+
+        testee.onCtaShown(cta)
+
+        verify(mockOnboardingPixelSender).fireContextual(ONBOARDING_END, OnboardingPixelAction.Shown)
+    }
+
+    @Test
+    fun whenBrandDesignEndBubbleOkClickedThenClickedEngageFired() = runTest {
+        val cta = daxEndBrandDesignUpdateBubbleCta()
+
+        testee.onUserClickCtaOkButton(cta)
+
+        verify(mockOnboardingPixelSender).fireContextual(ONBOARDING_END, OnboardingPixelAction.Clicked(engaged = true))
+    }
+
+    @Test
+    fun whenBrandDesignEndBubbleDismissedNotEngagementThenClickedDismissFired() = runTest {
+        val cta = daxEndBrandDesignUpdateBubbleCta()
+
+        testee.onUserDismissedCta(cta)
+
+        verify(mockOnboardingPixelSender).fireContextual(ONBOARDING_END, OnboardingPixelAction.Clicked(engaged = false))
+    }
+
+    @Test
+    fun whenBrandDesignDuckAiEndBubbleShownThenOnboardingShownPixelFired() = runTest {
+        val cta = daxDuckAiEndBrandDesignUpdateBubbleCta()
+
+        testee.onCtaShown(cta)
+
+        verify(mockOnboardingPixelSender).fireContextual(ONBOARDING_END, OnboardingPixelAction.Shown)
+    }
+
+    @Test
+    fun whenBrandDesignDuckAiEndBubbleOkClickedThenClickedEngageFired() = runTest {
+        val cta = daxDuckAiEndBrandDesignUpdateBubbleCta()
+
+        testee.onUserClickCtaOkButton(cta)
+
+        verify(mockOnboardingPixelSender).fireContextual(ONBOARDING_END, OnboardingPixelAction.Clicked(engaged = true))
+    }
+
+    @Test
+    fun whenBrandDesignDuckAiEndBubbleDismissedNotEngagementThenClickedDismissFired() = runTest {
+        val cta = daxDuckAiEndBrandDesignUpdateBubbleCta()
+
+        testee.onUserDismissedCta(cta)
+
+        verify(mockOnboardingPixelSender).fireContextual(ONBOARDING_END, OnboardingPixelAction.Clicked(engaged = false))
+    }
+
+    @Test
     fun whenBrandDesignSubscriptionPromoBubbleShownThenOnboardingShownPixelFired() = runTest {
         val cta = subscriptionPromoBubbleCta()
 
@@ -1890,5 +1945,22 @@ class CtaViewModelTest {
         isCustomAiOnboardingFlow = false,
         isFreeTrialCopy = false,
         onboardingImprovementsEnabled = false,
+    )
+
+    private fun daxEndBrandDesignUpdateBubbleCta() = DaxEndBrandDesignUpdateBubbleCta(
+        mockOnboardingStore,
+        mockAppInstallStore,
+        isLightTheme = true,
+        deviceInfo = mockDeviceInfo,
+        onboardingImprovementsEnabled = false,
+        isOmnibarBottom = false,
+    )
+
+    private fun daxDuckAiEndBrandDesignUpdateBubbleCta() = DaxDuckAiEndBrandDesignUpdateBubbleCta(
+        mockOnboardingStore,
+        mockAppInstallStore,
+        isLightTheme = true,
+        deviceInfo = mockDeviceInfo,
+        isCustomAiOnboardingFlow = false,
     )
 }
