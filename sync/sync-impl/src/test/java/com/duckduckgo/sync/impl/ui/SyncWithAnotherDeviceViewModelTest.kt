@@ -738,10 +738,7 @@ class SyncWithAnotherDeviceViewModelTest {
     }
 
     @Test
-    fun whenIsDeepLinkAndV2MasterOnButDisplayOffThenLegacyPresenterPollingDoesNotStart() = runTest {
-        // Reproduces the deep-link timeout bug: canUseV2ConnectFlow=true (so codeDispatcher routes V2)
-        // but canShowV2ConnectCode=false (so the old shouldUseV2() gate fell through to legacy showQRCode()
-        // + pollSecondDeviceExchangeAcknowledgement, which fired ShowError over V2's confirmation dialog).
+    fun `when deep linking with main v2 flag enabled and ability to show v2 barcode disabled, then legacy polling not started`() = runTest {
         enableV2(displayOn = false)
 
         testee.viewState(isDeepLink = true).test {
