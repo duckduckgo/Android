@@ -371,7 +371,7 @@
         ]
     },
     "onboarding_search": {
-        "description": "Contextual onboarding search step. shown when the try-a-search DAX bubble is displayed; clicked when the user submits a query, with value indicating whether the query came from a suggestion or was typed. Unique once per user per (event, value).",
+        "description": "Contextual onboarding search step. shown when the try-a-search DAX bubble is displayed; clicked with value suggested/custom when the user submits a query, or dismiss when the user closes the bubble via the close button. Unique once per user per event.",
         "owners": ["catalinradoiu"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
@@ -394,8 +394,8 @@
             {
                 "key": "value",
                 "type": "string",
-                "description": "Only set when e=clicked. Whether the query came from a suggestion or was typed.",
-                "enum": ["suggested", "custom"]
+                "description": "Only set when e=clicked. Whether the query came from a suggestion or was typed, or dismiss if closed via the close button.",
+                "enum": ["suggested", "custom", "dismiss"]
             }
         ]
     },
@@ -424,7 +424,7 @@
         ]
     },
     "onboarding_visit-site": {
-        "description": "Contextual onboarding visit-site step. shown when the visit-site suggestions DAX bubble is displayed; clicked when the user submits a query, with value indicating whether the query came from a suggestion or was typed. Unique once per user per (event, value).",
+        "description": "Contextual onboarding visit-site step. shown when the visit-site suggestions DAX bubble is displayed; clicked with value suggested/custom when the user submits a query, or dismiss when the user closes the bubble via the close button. Unique once per user per event.",
         "owners": ["catalinradoiu"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
@@ -447,8 +447,8 @@
             {
                 "key": "value",
                 "type": "string",
-                "description": "Only set when e=clicked. Whether the query came from a suggestion or was typed.",
-                "enum": ["suggested", "custom"]
+                "description": "Only set when e=clicked. Whether the query came from a suggestion or was typed, or dismiss if closed via the close button.",
+                "enum": ["suggested", "custom", "dismiss"]
             }
         ]
     },

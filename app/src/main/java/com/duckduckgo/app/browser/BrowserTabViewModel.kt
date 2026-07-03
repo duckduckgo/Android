@@ -1508,8 +1508,6 @@ class BrowserTabViewModel @Inject constructor(
             }
         }
 
-        // Unconditional per submit; onContextualSearchSubmitted only fires for the brand-design
-        // search/visit-site bubbles, and the pixel's once-per-user Unique dedup keeps it single-fire.
         if (cta != null) {
             ctaViewModel.onContextualSearchSubmitted(cta, query)
         }
@@ -3774,10 +3772,10 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
-    fun onUserDismissedCta(cta: Cta?, isEngagement: Boolean = false) {
+    fun onUserDismissedCta(cta: Cta?) {
         cta?.let {
             viewModelScope.launch {
-                ctaViewModel.onUserDismissedCta(it, isEngagement = isEngagement)
+                ctaViewModel.onUserDismissedCta(it)
             }
             if ((cta is OnboardingDaxDialogCta.DaxTrackersBlockedCta || cta is DaxTrackersBlockedBrandDesignUpdateContextualCta) &&
                 currentBrowserViewState().showPrivacyShield.isHighlighted()
@@ -5191,7 +5189,7 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     private fun onOnboardingCtaOkButtonClicked(onboardingCta: OnboardingDaxDialogCta): Command? {
-        onUserDismissedCta(onboardingCta, isEngagement = true)
+        onUserDismissedCta(onboardingCta)
         return when (onboardingCta) {
             is OnboardingDaxDialogCta.DaxSerpCta,
             is DaxSerpBrandDesignUpdateContextualCta,
@@ -5242,7 +5240,7 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     private fun onDaxBubbleCtaOkButtonClicked(cta: DaxBubbleCta) {
-        onUserDismissedCta(cta, isEngagement = true)
+        onUserDismissedCta(cta)
         when (cta) {
             is DaxBubbleCta.DaxSubscriptionCta,
             is DaxSubscriptionBrandDesignUpdateBubbleCta,
@@ -5295,7 +5293,7 @@ class BrowserTabViewModel @Inject constructor(
         }
 
         if (cta is OnboardingDaxDialogCta.DaxFireButtonCta || cta is DaxFireButtonBrandDesignUpdateContextualCta) {
-            onUserDismissedCta(cta, isEngagement = true)
+            onUserDismissedCta(cta)
             command.value = HideOnboardingDaxDialog(cta as OnboardingDaxDialogCta)
         }
 
@@ -5728,7 +5726,7 @@ class BrowserTabViewModel @Inject constructor(
 
             val cta = ctaViewState.value?.cta ?: return@launch
             if (cta is OnboardingDaxDialogCta.DaxDuckAiFireButtonCta || cta is DaxDuckAiFireButtonBrandDesignUpdateContextualCta) {
-                ctaViewModel.onUserDismissedCta(cta = cta, isEngagement = true)
+                ctaViewModel.onUserDismissedCta(cta = cta)
             }
         }
     }

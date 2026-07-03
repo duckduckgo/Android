@@ -1574,21 +1574,21 @@ class CtaViewModelTest {
     }
 
     @Test
-    fun whenBrandDesignSerpDismissedNotEngagementThenClickedDismissFired() = runTest {
+    fun whenBrandDesignSerpDismissedNotViaCloseBtnThenNoOnboardingPixelFired() = runTest {
         val cta = DaxSerpBrandDesignUpdateContextualCta(mockOnboardingStore, mockAppInstallStore, isLightTheme = true, deviceInfo = mockDeviceInfo)
 
         testee.onUserDismissedCta(cta)
 
-        verify(mockOnboardingPixelSender).fireContextual(ONBOARDING_SEARCH_RESULTS, OnboardingPixelAction.Clicked(engaged = false))
+        verifyNoInteractions(mockOnboardingPixelSender)
     }
 
     @Test
-    fun whenBrandDesignSerpDismissedAsEngagementThenNoDismissFired() = runTest {
+    fun whenBrandDesignSerpDismissedViaCloseBtnThenClickedDismissFired() = runTest {
         val cta = DaxSerpBrandDesignUpdateContextualCta(mockOnboardingStore, mockAppInstallStore, isLightTheme = true, deviceInfo = mockDeviceInfo)
 
-        testee.onUserDismissedCta(cta, isEngagement = true)
+        testee.onUserDismissedCta(cta, viaCloseBtn = true)
 
-        verifyNoInteractions(mockOnboardingPixelSender)
+        verify(mockOnboardingPixelSender).fireContextual(ONBOARDING_SEARCH_RESULTS, OnboardingPixelAction.Clicked(engaged = false))
     }
 
     @Test
@@ -1709,7 +1709,7 @@ class CtaViewModelTest {
     }
 
     @Test
-    fun whenContextualDuckAiFireButtonDismissedNotEngagementThenClickedDismissFired() = runTest {
+    fun whenContextualDuckAiFireButtonDismissedNotViaCloseBtnThenNoOnboardingPixelFired() = runTest {
         val cta =
             DaxDuckAiFireButtonBrandDesignUpdateContextualCta(
                 mockOnboardingStore,
@@ -1720,7 +1720,7 @@ class CtaViewModelTest {
 
         testee.onUserDismissedCta(cta)
 
-        verify(mockOnboardingPixelSender).fireContextual(ONBOARDING_FIRE_BUTTON, OnboardingPixelAction.Clicked(engaged = false))
+        verifyNoInteractions(mockOnboardingPixelSender)
     }
 
     @Test
@@ -1760,6 +1760,30 @@ class CtaViewModelTest {
         testee.onContextualSearchSubmitted(cta, "custom")
 
         verify(mockOnboardingPixelSender).fireContextual(ONBOARDING_VISIT_SITE, OnboardingPixelAction.SuggestionClicked(fromSuggestion = false))
+    }
+
+    @Test
+    fun whenContextualTryASearchBubbleDismissedNotViaCloseBtnThenNoOnboardingPixelFired() = runTest {
+        val cta = DaxTryASearchBrandDesignUpdateBubbleCta(mockOnboardingStore, mockAppInstallStore, true, mockDeviceInfo)
+
+        testee.onUserDismissedCta(cta)
+
+        verifyNoInteractions(mockOnboardingPixelSender)
+    }
+
+    @Test
+    fun whenContextualVisitSiteOptionsBubbleDismissedNotViaCloseBtnThenNoOnboardingPixelFired() = runTest {
+        val cta = DaxVisitSiteOptionsBrandDesignUpdateBubbleCta(
+            mockOnboardingStore,
+            mockAppInstallStore,
+            true,
+            mockDeviceInfo,
+            onboardingImprovementsEnabled = false,
+        )
+
+        testee.onUserDismissedCta(cta)
+
+        verifyNoInteractions(mockOnboardingPixelSender)
     }
 
     @Test
@@ -1813,7 +1837,7 @@ class CtaViewModelTest {
     }
 
     @Test
-    fun whenBrandDesignSiteSuggestionsContextualCtaDismissedNotEngagementThenNoOnboardingPixelFired() = runTest {
+    fun whenBrandDesignSiteSuggestionsContextualCtaDismissedNotViaCloseBtnThenNoOnboardingPixelFired() = runTest {
         val cta =
             DaxSiteSuggestionsBrandDesignUpdateContextualCta(
                 mockOnboardingStore,
@@ -1828,13 +1852,13 @@ class CtaViewModelTest {
     }
 
     @Test
-    fun whenContextualFireButtonDismissedNotEngagementThenClickedDismissFired() = runTest {
+    fun whenContextualFireButtonDismissedNotViaCloseBtnThenNoOnboardingPixelFired() = runTest {
         val cta =
             DaxFireButtonBrandDesignUpdateContextualCta(mockOnboardingStore, mockAppInstallStore, isLightTheme = true, deviceInfo = mockDeviceInfo)
 
         testee.onUserDismissedCta(cta)
 
-        verify(mockOnboardingPixelSender).fireContextual(ONBOARDING_FIRE_BUTTON, OnboardingPixelAction.Clicked(engaged = false))
+        verifyNoInteractions(mockOnboardingPixelSender)
     }
 
     @Test
@@ -1866,12 +1890,12 @@ class CtaViewModelTest {
     }
 
     @Test
-    fun whenBrandDesignEndBubbleDismissedNotEngagementThenClickedDismissFired() = runTest {
+    fun whenBrandDesignEndBubbleDismissedNotViaCloseBtnThenNoOnboardingPixelFired() = runTest {
         val cta = daxEndBrandDesignUpdateBubbleCta()
 
         testee.onUserDismissedCta(cta)
 
-        verify(mockOnboardingPixelSender).fireContextual(ONBOARDING_END, OnboardingPixelAction.Clicked(engaged = false))
+        verifyNoInteractions(mockOnboardingPixelSender)
     }
 
     @Test
@@ -1893,12 +1917,12 @@ class CtaViewModelTest {
     }
 
     @Test
-    fun whenBrandDesignDuckAiEndBubbleDismissedNotEngagementThenClickedDismissFired() = runTest {
+    fun whenBrandDesignDuckAiEndBubbleDismissedNotViaCloseBtnThenNoOnboardingPixelFired() = runTest {
         val cta = daxDuckAiEndBrandDesignUpdateBubbleCta()
 
         testee.onUserDismissedCta(cta)
 
-        verify(mockOnboardingPixelSender).fireContextual(ONBOARDING_END, OnboardingPixelAction.Clicked(engaged = false))
+        verifyNoInteractions(mockOnboardingPixelSender)
     }
 
     @Test
@@ -1920,21 +1944,21 @@ class CtaViewModelTest {
     }
 
     @Test
-    fun whenBrandDesignSubscriptionPromoBubbleDismissedNotEngagementThenClickedDismissFired() = runTest {
+    fun whenBrandDesignSubscriptionPromoBubbleDismissedNotViaCloseBtnThenNoOnboardingPixelFired() = runTest {
         val cta = subscriptionPromoBubbleCta()
 
         testee.onUserDismissedCta(cta)
 
-        verify(mockOnboardingPixelSender).fireContextual(ONBOARDING_SUBSCRIPTION_PROMO, OnboardingPixelAction.Clicked(engaged = false))
+        verifyNoInteractions(mockOnboardingPixelSender)
     }
 
     @Test
-    fun whenBrandDesignSubscriptionPromoBubbleDismissedAsEngagementThenNoDismissFired() = runTest {
+    fun whenBrandDesignSubscriptionPromoBubbleDismissedViaCloseBtnThenClickedDismissFired() = runTest {
         val cta = subscriptionPromoBubbleCta()
 
-        testee.onUserDismissedCta(cta, isEngagement = true)
+        testee.onUserDismissedCta(cta, viaCloseBtn = true)
 
-        verifyNoInteractions(mockOnboardingPixelSender)
+        verify(mockOnboardingPixelSender).fireContextual(ONBOARDING_SUBSCRIPTION_PROMO, OnboardingPixelAction.Clicked(engaged = false))
     }
 
     private fun subscriptionPromoBubbleCta() = DaxSubscriptionBrandDesignUpdateBubbleCta(

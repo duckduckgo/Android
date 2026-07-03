@@ -255,19 +255,11 @@ class CtaViewModel @Inject constructor(
     suspend fun onUserDismissedCta(
         cta: Cta,
         viaCloseBtn: Boolean = false,
-        isEngagement: Boolean = false,
     ) {
         withContext(dispatchers.io()) {
-            if (!isEngagement) {
-                // The option-bubble/contextual CTAs report their click via onContextualSearchSubmitted, so
-                // exclude them here to avoid emitting a dismiss pixel they don't fire today.
-                if (cta !is DaxTryASearchBrandDesignUpdateBubbleCta &&
-                    cta !is DaxVisitSiteOptionsBrandDesignUpdateBubbleCta &&
-                    cta !is DaxSiteSuggestionsBrandDesignUpdateContextualCta
-                ) {
-                    contextualOnboardingPixelName(cta)?.let {
-                        onboardingPixelSender.fireContextual(it, OnboardingPixelAction.Clicked(engaged = false))
-                    }
+            if (viaCloseBtn) {
+                contextualOnboardingPixelName(cta)?.let {
+                    onboardingPixelSender.fireContextual(it, OnboardingPixelAction.Clicked(engaged = false))
                 }
             }
             if (cta is BrokenSitePromptDialogCta) {
@@ -360,10 +352,12 @@ class CtaViewModel @Inject constructor(
                     isFreeTrialCopy = freeTrialCopyAvailable(),
                     flow = SubscriptionPromoFlow.SKIPPED_ONBOARDING,
                 )
+
                 canShowSubscriptionPromoCta() -> SubscriptionPromoModalCta(
                     isFreeTrialCopy = freeTrialCopyAvailable(),
                     flow = SubscriptionPromoFlow.NUDGE,
                 )
+
                 else -> null
             }
         }
