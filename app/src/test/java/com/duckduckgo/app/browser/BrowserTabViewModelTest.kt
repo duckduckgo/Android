@@ -5592,6 +5592,7 @@ class BrowserTabViewModelTest {
             contentDisposition = contentDisposition,
             mimeType = mimeType,
             subfolder = "folder",
+            browserMode = BrowserMode.REGULAR,
         )
 
     @Test
@@ -11135,7 +11136,9 @@ class BrowserTabViewModelTest {
     fun whenPdfEnabledAndApi31ThenDownloadToCacheAndEmitShowPdfCommand() = runTest {
         whenever(mockInlinePdfHandler.classifyPdfRequest(any(), anyOrNull(), any())).thenReturn(PdfRenderDecision.Inline)
         val testUri = Uri.parse("file:///cache/test.pdf")
-        whenever(mockInlinePdfHandler.downloadToCache("https://example.com/doc.pdf")).thenReturn(PdfDownloadResult.Success(testUri))
+        whenever(
+            mockInlinePdfHandler.downloadToCache("https://example.com/doc.pdf", browserMode = BrowserMode.REGULAR),
+        ).thenReturn(PdfDownloadResult.Success(testUri))
         val webView: WebView = mock()
 
         testee.requestFileDownload(webView, "https://example.com/doc.pdf", null, "application/pdf", true, false)
@@ -11149,7 +11152,9 @@ class BrowserTabViewModelTest {
     @Test
     fun whenPdfDownloadToCacheFailsThenFallbackToStandardDownload() = runTest {
         whenever(mockInlinePdfHandler.classifyPdfRequest(any(), anyOrNull(), any())).thenReturn(PdfRenderDecision.Inline)
-        whenever(mockInlinePdfHandler.downloadToCache("https://example.com/doc.pdf")).thenReturn(PdfDownloadResult.Failure(PdfErrorType.UNKNOWN))
+        whenever(
+            mockInlinePdfHandler.downloadToCache("https://example.com/doc.pdf", browserMode = BrowserMode.REGULAR),
+        ).thenReturn(PdfDownloadResult.Failure(PdfErrorType.UNKNOWN))
         val webView: WebView = mock()
 
         testee.requestFileDownload(webView, "https://example.com/doc.pdf", null, "application/pdf", true, false)
@@ -11161,7 +11166,9 @@ class BrowserTabViewModelTest {
     fun whenPdfInlineThenExpandOmnibarCommandIsEmitted() = runTest {
         whenever(mockInlinePdfHandler.classifyPdfRequest(any(), anyOrNull(), any())).thenReturn(PdfRenderDecision.Inline)
         val testUri = Uri.parse("file:///cache/test.pdf")
-        whenever(mockInlinePdfHandler.downloadToCache("https://example.com/doc.pdf")).thenReturn(PdfDownloadResult.Success(testUri))
+        whenever(
+            mockInlinePdfHandler.downloadToCache("https://example.com/doc.pdf", browserMode = BrowserMode.REGULAR),
+        ).thenReturn(PdfDownloadResult.Success(testUri))
         val webView: WebView = mock()
 
         testee.requestFileDownload(webView, "https://example.com/doc.pdf", null, "application/pdf", true, false)
@@ -11173,7 +11180,9 @@ class BrowserTabViewModelTest {
     fun whenPdfDownloadStartsThenLoadingStateShowsProgress() = runTest {
         whenever(mockInlinePdfHandler.classifyPdfRequest(any(), anyOrNull(), any())).thenReturn(PdfRenderDecision.Inline)
         val testUri = Uri.parse("file:///cache/test.pdf")
-        whenever(mockInlinePdfHandler.downloadToCache("https://example.com/doc.pdf")).thenReturn(PdfDownloadResult.Success(testUri))
+        whenever(
+            mockInlinePdfHandler.downloadToCache("https://example.com/doc.pdf", browserMode = BrowserMode.REGULAR),
+        ).thenReturn(PdfDownloadResult.Success(testUri))
         val webView: WebView = mock()
 
         testee.requestFileDownload(webView, "https://example.com/doc.pdf", null, "application/pdf", true, false)
@@ -11185,7 +11194,9 @@ class BrowserTabViewModelTest {
     @Test
     fun whenPdfDownloadFailsThenLoadingStateIsReset() = runTest {
         whenever(mockInlinePdfHandler.classifyPdfRequest(any(), anyOrNull(), any())).thenReturn(PdfRenderDecision.Inline)
-        whenever(mockInlinePdfHandler.downloadToCache("https://example.com/doc.pdf")).thenReturn(PdfDownloadResult.Failure(PdfErrorType.UNKNOWN))
+        whenever(
+            mockInlinePdfHandler.downloadToCache("https://example.com/doc.pdf", browserMode = BrowserMode.REGULAR),
+        ).thenReturn(PdfDownloadResult.Failure(PdfErrorType.UNKNOWN))
         val webView: WebView = mock()
 
         testee.requestFileDownload(webView, "https://example.com/doc.pdf", null, "application/pdf", true, false)
@@ -11213,7 +11224,9 @@ class BrowserTabViewModelTest {
     fun whenPdfWithContentDispositionInlineThenShowPdf() = runTest {
         whenever(mockInlinePdfHandler.classifyPdfRequest(any(), anyOrNull(), any())).thenReturn(PdfRenderDecision.Inline)
         val testUri = Uri.parse("file:///cache/test.pdf")
-        whenever(mockInlinePdfHandler.downloadToCache("https://example.com/doc.pdf")).thenReturn(PdfDownloadResult.Success(testUri))
+        whenever(
+            mockInlinePdfHandler.downloadToCache("https://example.com/doc.pdf", browserMode = BrowserMode.REGULAR),
+        ).thenReturn(PdfDownloadResult.Success(testUri))
         val webView: WebView = mock()
 
         testee.requestFileDownload(webView, "https://example.com/doc.pdf", "inline", "application/pdf", true, false)
@@ -11236,7 +11249,7 @@ class BrowserTabViewModelTest {
     fun whenPdfDownloadInProgressAndUserNavigatesAwayThenShowPdfNotEmitted() = runTest {
         whenever(mockInlinePdfHandler.classifyPdfRequest(any(), anyOrNull(), any())).thenReturn(PdfRenderDecision.Inline)
         // Return COROUTINE_SUSPENDED to simulate a long-running download that never completes
-        whenever(mockInlinePdfHandler.downloadToCache("https://example.com/doc.pdf")).thenAnswer {
+        whenever(mockInlinePdfHandler.downloadToCache("https://example.com/doc.pdf", browserMode = BrowserMode.REGULAR)).thenAnswer {
             COROUTINE_SUSPENDED
         }
         val webView: WebView = mock()
@@ -11261,10 +11274,10 @@ class BrowserTabViewModelTest {
 
         // First download hangs forever; second resolves immediately. ConflatedJob should
         // ensure only the second one's command is emitted.
-        whenever(mockInlinePdfHandler.downloadToCache(urlA)).thenAnswer {
+        whenever(mockInlinePdfHandler.downloadToCache(urlA, browserMode = BrowserMode.REGULAR)).thenAnswer {
             COROUTINE_SUSPENDED
         }
-        whenever(mockInlinePdfHandler.downloadToCache(urlB)).thenReturn(PdfDownloadResult.Success(uriB))
+        whenever(mockInlinePdfHandler.downloadToCache(urlB, browserMode = BrowserMode.REGULAR)).thenReturn(PdfDownloadResult.Success(uriB))
         val webView: WebView = mock()
 
         testee.requestFileDownload(webView, urlA, null, "application/pdf", true, false)
@@ -11282,7 +11295,7 @@ class BrowserTabViewModelTest {
         whenever(mockInlinePdfHandler.classifyPdfRequest(any(), anyOrNull(), any())).thenReturn(PdfRenderDecision.Inline)
         val url = "https://example.com/doc.pdf"
         val cachedUri = Uri.parse("file:///cache/doc.pdf")
-        whenever(mockInlinePdfHandler.downloadToCache(url)).thenReturn(PdfDownloadResult.Success(cachedUri))
+        whenever(mockInlinePdfHandler.downloadToCache(url, browserMode = BrowserMode.REGULAR)).thenReturn(PdfDownloadResult.Success(cachedUri))
         whenever(mockInlinePdfHandler.extractFileName(url)).thenReturn("doc.pdf")
         val webView: WebView = mock()
 
@@ -11296,7 +11309,9 @@ class BrowserTabViewModelTest {
     fun whenPdfShownAfterFreshViewModelThenPerPageMenuFlagsArePopulated() = runTest {
         whenever(mockInlinePdfHandler.classifyPdfRequest(any(), anyOrNull(), any())).thenReturn(PdfRenderDecision.Inline)
         val url = "https://example.com/doc.pdf"
-        whenever(mockInlinePdfHandler.downloadToCache(url)).thenReturn(PdfDownloadResult.Success(Uri.parse("file:///cache/doc.pdf")))
+        whenever(
+            mockInlinePdfHandler.downloadToCache(url, browserMode = BrowserMode.REGULAR),
+        ).thenReturn(PdfDownloadResult.Success(Uri.parse("file:///cache/doc.pdf")))
         whenever(mockInlinePdfHandler.extractFileName(url)).thenReturn("doc.pdf")
         testee.browserViewState.value = browserViewState().copy(
             canSaveSite = false,
@@ -11325,7 +11340,9 @@ class BrowserTabViewModelTest {
     fun whenPdfShownThenPrivacyShieldEnabled() = runTest {
         whenever(mockInlinePdfHandler.classifyPdfRequest(any(), anyOrNull(), any())).thenReturn(PdfRenderDecision.Inline)
         val url = "https://example.com/doc.pdf"
-        whenever(mockInlinePdfHandler.downloadToCache(url)).thenReturn(PdfDownloadResult.Success(Uri.parse("file:///cache/doc.pdf")))
+        whenever(
+            mockInlinePdfHandler.downloadToCache(url, browserMode = BrowserMode.REGULAR),
+        ).thenReturn(PdfDownloadResult.Success(Uri.parse("file:///cache/doc.pdf")))
         whenever(mockInlinePdfHandler.extractFileName(url)).thenReturn("doc.pdf")
         testee.browserViewState.value = browserViewState().copy(
             showPrivacyShield = HighlightableButton.Visible(enabled = false),
@@ -11341,7 +11358,7 @@ class BrowserTabViewModelTest {
         whenever(mockInlinePdfHandler.classifyPdfRequest(any(), anyOrNull(), any())).thenReturn(PdfRenderDecision.Inline)
         val url = "https://example.com/doc.pdf"
         val certificate: SslCertificate = mock()
-        whenever(mockInlinePdfHandler.downloadToCache(url))
+        whenever(mockInlinePdfHandler.downloadToCache(url, browserMode = BrowserMode.REGULAR))
             .thenReturn(PdfDownloadResult.Success(Uri.parse("file:///cache/doc.pdf"), certificate))
         whenever(mockInlinePdfHandler.extractFileName(url)).thenReturn("doc.pdf")
 
@@ -11354,7 +11371,7 @@ class BrowserTabViewModelTest {
     fun whenPdfDownloadHasNoCertificateThenSiteCertificateRemainsNull() = runTest {
         whenever(mockInlinePdfHandler.classifyPdfRequest(any(), anyOrNull(), any())).thenReturn(PdfRenderDecision.Inline)
         val url = "https://example.com/doc.pdf"
-        whenever(mockInlinePdfHandler.downloadToCache(url))
+        whenever(mockInlinePdfHandler.downloadToCache(url, browserMode = BrowserMode.REGULAR))
             .thenReturn(PdfDownloadResult.Success(Uri.parse("file:///cache/doc.pdf"), certificate = null))
         whenever(mockInlinePdfHandler.extractFileName(url)).thenReturn("doc.pdf")
 
@@ -11379,7 +11396,7 @@ class BrowserTabViewModelTest {
     fun whenPdfReopenedAfterUserAllowListedThenShieldShowsUnprotected() = runTest {
         whenever(mockInlinePdfHandler.classifyPdfRequest(any(), anyOrNull(), any())).thenReturn(PdfRenderDecision.Inline)
         val pdfUrl = "https://www.example.com/doc.pdf"
-        whenever(mockInlinePdfHandler.downloadToCache(pdfUrl))
+        whenever(mockInlinePdfHandler.downloadToCache(pdfUrl, browserMode = BrowserMode.REGULAR))
             .thenReturn(PdfDownloadResult.Success(Uri.parse("file:///cache/doc.pdf")))
         whenever(mockInlinePdfHandler.extractFileName(pdfUrl)).thenReturn("doc.pdf")
         // Domain is already in the user allow list (user disabled protection in a previous session).
@@ -11419,12 +11436,14 @@ class BrowserTabViewModelTest {
             currentPdfCachedUri = Uri.parse("file:///cache/doc.pdf"),
             currentPdfFileName = "doc.pdf",
         )
-        whenever(mockInlinePdfHandler.downloadToCache(pdfUrl, forceRefresh = true)).thenReturn(PdfDownloadResult.Success(refreshedUri))
+        whenever(
+            mockInlinePdfHandler.downloadToCache(pdfUrl, forceRefresh = true, browserMode = BrowserMode.REGULAR),
+        ).thenReturn(PdfDownloadResult.Success(refreshedUri))
 
         testee.onRefreshRequested(triggeredByUser = true)
         advanceUntilIdle()
 
-        verify(mockInlinePdfHandler).downloadToCache(pdfUrl, forceRefresh = true)
+        verify(mockInlinePdfHandler).downloadToCache(pdfUrl, forceRefresh = true, browserMode = BrowserMode.REGULAR)
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         val lastShowPdf = commandCaptor.allValues.filterIsInstance<Command.ShowPdfInTab>().last()
         assertEquals(pdfUrl, lastShowPdf.url)
@@ -11441,7 +11460,7 @@ class BrowserTabViewModelTest {
         advanceUntilIdle()
 
         assertCommandIssued<NavigationCommand.Refresh>()
-        verify(mockInlinePdfHandler, never()).downloadToCache(any(), eq(true))
+        verify(mockInlinePdfHandler, never()).downloadToCache(any(), eq(true), any())
     }
 
     @Test
@@ -11453,7 +11472,9 @@ class BrowserTabViewModelTest {
             currentPdfCachedUri = originalUri,
             currentPdfFileName = "doc.pdf",
         )
-        whenever(mockInlinePdfHandler.downloadToCache(pdfUrl, forceRefresh = true)).thenReturn(PdfDownloadResult.Failure(PdfErrorType.IO_ERROR))
+        whenever(
+            mockInlinePdfHandler.downloadToCache(pdfUrl, forceRefresh = true, browserMode = BrowserMode.REGULAR),
+        ).thenReturn(PdfDownloadResult.Failure(PdfErrorType.IO_ERROR))
 
         testee.onRefreshRequested(triggeredByUser = true)
         advanceUntilIdle()
@@ -11698,7 +11719,7 @@ class BrowserTabViewModelTest {
     fun whenPdfRenderedInlineThenAllThreeOpenedPixelsFire() = runTest {
         whenever(mockInlinePdfHandler.classifyPdfRequest(any(), anyOrNull(), any())).thenReturn(PdfRenderDecision.Inline)
         val testUri = Uri.parse("file:///cache/doc.pdf")
-        whenever(mockInlinePdfHandler.downloadToCache("https://example.com/doc.pdf"))
+        whenever(mockInlinePdfHandler.downloadToCache("https://example.com/doc.pdf", browserMode = BrowserMode.REGULAR))
             .thenReturn(PdfDownloadResult.Success(testUri))
 
         testee.requestFileDownload(mock(), "https://example.com/doc.pdf", null, "application/pdf", true, false)
@@ -11711,7 +11732,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenPdfDownloadFailsWithIoErrorThenRenderFailurePixelFiresWithErrorType() = runTest {
         whenever(mockInlinePdfHandler.classifyPdfRequest(any(), anyOrNull(), any())).thenReturn(PdfRenderDecision.Inline)
-        whenever(mockInlinePdfHandler.downloadToCache("https://example.com/doc.pdf"))
+        whenever(mockInlinePdfHandler.downloadToCache("https://example.com/doc.pdf", browserMode = BrowserMode.REGULAR))
             .thenReturn(PdfDownloadResult.Failure(PdfErrorType.IO_ERROR))
 
         testee.requestFileDownload(mock(), "https://example.com/doc.pdf", null, "application/pdf", true, false)
@@ -11722,7 +11743,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenPdfDownloadFailsWithUnknownThenRenderFailurePixelFiresWithUnknownErrorType() = runTest {
         whenever(mockInlinePdfHandler.classifyPdfRequest(any(), anyOrNull(), any())).thenReturn(PdfRenderDecision.Inline)
-        whenever(mockInlinePdfHandler.downloadToCache("https://example.com/doc.pdf"))
+        whenever(mockInlinePdfHandler.downloadToCache("https://example.com/doc.pdf", browserMode = BrowserMode.REGULAR))
             .thenReturn(PdfDownloadResult.Failure(PdfErrorType.UNKNOWN))
 
         testee.requestFileDownload(mock(), "https://example.com/doc.pdf", null, "application/pdf", true, false)
@@ -11761,7 +11782,9 @@ class BrowserTabViewModelTest {
         whenever(mockPdfDownloadTooltipDataStore.canShow()).thenReturn(true)
         whenever(mockInlinePdfHandler.classifyPdfRequest(any(), anyOrNull(), any())).thenReturn(PdfRenderDecision.Inline)
         val testUri = Uri.parse("file:///cache/test.pdf")
-        whenever(mockInlinePdfHandler.downloadToCache("https://example.com/test.pdf")).thenReturn(PdfDownloadResult.Success(testUri))
+        whenever(
+            mockInlinePdfHandler.downloadToCache("https://example.com/test.pdf", browserMode = BrowserMode.REGULAR),
+        ).thenReturn(PdfDownloadResult.Success(testUri))
         whenever(mockInlinePdfHandler.extractFileName("https://example.com/test.pdf")).thenReturn("test.pdf")
 
         testee.requestFileDownload(mock(), "https://example.com/test.pdf", null, "application/pdf", true, false)
@@ -11775,7 +11798,9 @@ class BrowserTabViewModelTest {
         whenever(mockPdfDownloadTooltipDataStore.canShow()).thenReturn(false)
         whenever(mockInlinePdfHandler.classifyPdfRequest(any(), anyOrNull(), any())).thenReturn(PdfRenderDecision.Inline)
         val testUri = Uri.parse("file:///cache/test.pdf")
-        whenever(mockInlinePdfHandler.downloadToCache("https://example.com/test.pdf")).thenReturn(PdfDownloadResult.Success(testUri))
+        whenever(
+            mockInlinePdfHandler.downloadToCache("https://example.com/test.pdf", browserMode = BrowserMode.REGULAR),
+        ).thenReturn(PdfDownloadResult.Success(testUri))
         whenever(mockInlinePdfHandler.extractFileName("https://example.com/test.pdf")).thenReturn("test.pdf")
 
         testee.requestFileDownload(mock(), "https://example.com/test.pdf", null, "application/pdf", true, false)
@@ -11787,7 +11812,9 @@ class BrowserTabViewModelTest {
     @Test
     fun whenInlinePdfDownloadFailsThenTooltipCommandIsNotEmittedAndStoreIsNotIncremented() = runTest {
         whenever(mockInlinePdfHandler.classifyPdfRequest(any(), anyOrNull(), any())).thenReturn(PdfRenderDecision.Inline)
-        whenever(mockInlinePdfHandler.downloadToCache("https://example.com/test.pdf")).thenReturn(PdfDownloadResult.Failure(PdfErrorType.IO_ERROR))
+        whenever(
+            mockInlinePdfHandler.downloadToCache("https://example.com/test.pdf", browserMode = BrowserMode.REGULAR),
+        ).thenReturn(PdfDownloadResult.Failure(PdfErrorType.IO_ERROR))
 
         testee.requestFileDownload(mock(), "https://example.com/test.pdf", null, "application/pdf", true, false)
 
@@ -11801,7 +11828,9 @@ class BrowserTabViewModelTest {
         whenever(mockPdfDownloadTooltipDataStore.canShow()).thenReturn(true)
         whenever(mockInlinePdfHandler.classifyPdfRequest(any(), anyOrNull(), any())).thenReturn(PdfRenderDecision.Inline)
         val testUri = Uri.parse("file:///cache/test.pdf")
-        whenever(mockInlinePdfHandler.downloadToCache("https://example.com/test.pdf")).thenReturn(PdfDownloadResult.Success(testUri))
+        whenever(
+            mockInlinePdfHandler.downloadToCache("https://example.com/test.pdf", browserMode = BrowserMode.REGULAR),
+        ).thenReturn(PdfDownloadResult.Success(testUri))
         whenever(mockInlinePdfHandler.extractFileName("https://example.com/test.pdf")).thenReturn("test.pdf")
 
         testee.requestFileDownload(mock(), "https://example.com/test.pdf", null, "application/pdf", true, false)

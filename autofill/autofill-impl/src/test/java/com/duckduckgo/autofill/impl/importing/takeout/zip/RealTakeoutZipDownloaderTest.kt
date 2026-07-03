@@ -3,6 +3,7 @@ package com.duckduckgo.autofill.impl.importing.takeout.zip
 import android.content.Context
 import android.webkit.CookieManager
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.cookies.api.CookieManagerProvider
 import dagger.Lazy
@@ -56,7 +57,7 @@ class RealTakeoutZipDownloaderTest {
 
     @Before
     fun setup() {
-        whenever(mockCookieManagerProvider.get()).thenReturn(mockCookieManager)
+        whenever(mockCookieManagerProvider.forMode(BrowserMode.REGULAR)).thenReturn(mockCookieManager)
         whenever(mockOkHttpClient.newCall(any())).thenReturn(mockCall)
         whenever(mockCall.execute()).thenReturn(mockResponse)
 

@@ -25,6 +25,7 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.browser.cookies.db.AuthCookiesAllowedDomainsDao
 import com.duckduckgo.app.browser.cookies.db.AuthCookiesAllowedDomainsRepository
 import com.duckduckgo.app.global.db.AppDatabase
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.cookies.api.ThirdPartyCookieNames
 import com.duckduckgo.cookies.impl.DefaultCookieManagerProvider
@@ -44,8 +45,8 @@ class AppThirdPartyCookieManagerTest {
     @get:Rule
     var coroutinesTestRule = CoroutineTestRule()
 
-    private val cookieManagerProvider = DefaultCookieManagerProvider()
-    private val cookieManager = cookieManagerProvider.get()!!
+    private val cookieManagerProvider = DefaultCookieManagerProvider(mock())
+    private val cookieManager = cookieManagerProvider.forMode(BrowserMode.REGULAR)!!
     private lateinit var db: AppDatabase
     private lateinit var authCookiesAllowedDomainsDao: AuthCookiesAllowedDomainsDao
     private lateinit var authCookiesAllowedDomainsRepository: AuthCookiesAllowedDomainsRepository
@@ -85,7 +86,7 @@ class AppThirdPartyCookieManagerTest {
     @UiThreadTest
     @Test
     fun whenProcessUriForThirdPartyCookiesIfDomainIsNotGoogleAuthAndIsNotInTheListThenThirdPartyCookiesDisabled() = runTest {
-        testee.processUriForThirdPartyCookies(webView, EXAMPLE_URI)
+        testee.processUriForThirdPartyCookies(webView, EXAMPLE_URI, BrowserMode.REGULAR)
 
         assertFalse(cookieManager.acceptThirdPartyCookies(webView))
     }
@@ -96,7 +97,7 @@ class AppThirdPartyCookieManagerTest {
         givenDomainIsInTheThirdPartyCookieList(EXAMPLE_URI.host!!)
         givenUserIdCookieIsSet()
 
-        testee.processUriForThirdPartyCookies(webView, EXAMPLE_URI)
+        testee.processUriForThirdPartyCookies(webView, EXAMPLE_URI, BrowserMode.REGULAR)
 
         assertTrue(cookieManager.acceptThirdPartyCookies(webView))
     }
@@ -106,7 +107,7 @@ class AppThirdPartyCookieManagerTest {
     fun whenProcessUriForThirdPartyCookiesIfDomainIsNotGoogleAuthAndIsInTheListAndDoesNotHaveCookieThenThirdPartyCookiesDisabled() = runTest {
         givenDomainIsInTheThirdPartyCookieList(EXAMPLE_URI.host!!)
 
-        testee.processUriForThirdPartyCookies(webView, EXAMPLE_URI)
+        testee.processUriForThirdPartyCookies(webView, EXAMPLE_URI, BrowserMode.REGULAR)
 
         assertFalse(cookieManager.acceptThirdPartyCookies(webView))
     }
@@ -117,7 +118,7 @@ class AppThirdPartyCookieManagerTest {
         givenUserIdCookieIsSet()
         givenDomainIsInTheThirdPartyCookieList(EXAMPLE_URI.host!!)
 
-        testee.processUriForThirdPartyCookies(webView, EXAMPLE_URI)
+        testee.processUriForThirdPartyCookies(webView, EXAMPLE_URI, BrowserMode.REGULAR)
 
         assertNull(authCookiesAllowedDomainsRepository.getDomain(EXAMPLE_URI.host!!))
     }
@@ -127,7 +128,7 @@ class AppThirdPartyCookieManagerTest {
     fun whenProcessUriForThirdPartyCookiesIfDomainIsInTheListAndCookieIsNotSetThenDomainRemovedFromList() = runTest {
         givenDomainIsInTheThirdPartyCookieList(EXAMPLE_URI.host!!)
 
-        testee.processUriForThirdPartyCookies(webView, EXAMPLE_URI)
+        testee.processUriForThirdPartyCookies(webView, EXAMPLE_URI, BrowserMode.REGULAR)
 
         assertNull(authCookiesAllowedDomainsRepository.getDomain(EXAMPLE_URI.host!!))
     }
@@ -137,7 +138,7 @@ class AppThirdPartyCookieManagerTest {
     fun whenProcessUriForThirdPartyCookiesIfDomainIsInTheListAndIsFromExceptionListThenDomainNotRemovedFromList() = runTest {
         givenDomainIsInTheThirdPartyCookieList(EXCLUDED_DOMAIN_URI.host!!)
 
-        testee.processUriForThirdPartyCookies(webView, EXCLUDED_DOMAIN_URI)
+        testee.processUriForThirdPartyCookies(webView, EXCLUDED_DOMAIN_URI, BrowserMode.REGULAR)
 
         assertNotNull(authCookiesAllowedDomainsRepository.getDomain(EXCLUDED_DOMAIN_URI.host!!))
     }
@@ -145,7 +146,7 @@ class AppThirdPartyCookieManagerTest {
     @UiThreadTest
     @Test
     fun whenProcessUriForThirdPartyCookiesIfUrlIsGoogleAuthAndIsTokenTypeThenDomainAddedToTheList() = runTest {
-        testee.processUriForThirdPartyCookies(webView, THIRD_PARTY_AUTH_URI)
+        testee.processUriForThirdPartyCookies(webView, THIRD_PARTY_AUTH_URI, BrowserMode.REGULAR)
 
         assertNotNull(authCookiesAllowedDomainsRepository.getDomain(EXAMPLE_URI.host!!))
     }
@@ -153,7 +154,7 @@ class AppThirdPartyCookieManagerTest {
     @UiThreadTest
     @Test
     fun whenProcessUriForThirdPartyCookiesIfUrlIsGoogleAuthAndIsNotTokenTypeThenDomainNotAddedToTheList() = runTest {
-        testee.processUriForThirdPartyCookies(webView, NON_THIRD_PARTY_AUTH_URI)
+        testee.processUriForThirdPartyCookies(webView, NON_THIRD_PARTY_AUTH_URI, BrowserMode.REGULAR)
 
         assertNull(authCookiesAllowedDomainsRepository.getDomain(EXAMPLE_URI.host!!))
     }
@@ -161,7 +162,7 @@ class AppThirdPartyCookieManagerTest {
     @UiThreadTest
     @Test
     fun whenProcessUriForThirdPartyCookiesIfUrlIsGoogleAuthWithAppDomainAndNoSsDomainThenDomainAddedToTheList() = runTest {
-        testee.processUriForThirdPartyCookies(webView, THIRD_PARTY_AUTH_APP_DOMAIN_URI)
+        testee.processUriForThirdPartyCookies(webView, THIRD_PARTY_AUTH_APP_DOMAIN_URI, BrowserMode.REGULAR)
 
         assertNotNull(authCookiesAllowedDomainsRepository.getDomain(EXAMPLE_URI.host!!))
     }
@@ -169,7 +170,7 @@ class AppThirdPartyCookieManagerTest {
     @UiThreadTest
     @Test
     fun whenProcessUriForThirdPartyCookiesIfUrlIsGoogleAuthWithBothSsDomainAndAppDomainThenSsDomainUsed() = runTest {
-        testee.processUriForThirdPartyCookies(webView, THIRD_PARTY_AUTH_BOTH_DOMAINS_URI)
+        testee.processUriForThirdPartyCookies(webView, THIRD_PARTY_AUTH_BOTH_DOMAINS_URI, BrowserMode.REGULAR)
 
         assertNotNull(authCookiesAllowedDomainsRepository.getDomain("ss.com"))
         assertNull(authCookiesAllowedDomainsRepository.getDomain("app.com"))

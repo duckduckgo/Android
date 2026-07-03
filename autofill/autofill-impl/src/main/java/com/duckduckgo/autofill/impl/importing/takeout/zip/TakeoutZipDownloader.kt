@@ -18,6 +18,7 @@ package com.duckduckgo.autofill.impl.importing.takeout.zip
 
 import android.content.Context
 import android.net.Uri
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.cookies.api.CookieManagerProvider
 import com.duckduckgo.di.scopes.AppScope
@@ -79,7 +80,7 @@ class RealTakeoutZipDownloader @Inject constructor(
                 .addHeader(HEADER_USER_AGENT, userAgent)
 
         // Extract cookies from WebView's CookieManager for this URL
-        val cookieManager = cookieManagerProvider.get()
+        val cookieManager = cookieManagerProvider.forMode(BrowserMode.REGULAR)
         val cookies = cookieManager?.getCookie(url)
         if (cookies != null) {
             requestBuilder.addHeader(HEADER_COOKIE, cookies)

@@ -17,6 +17,7 @@
 package com.duckduckgo.downloads.impl
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.downloads.api.DownloadFailReason
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
 import com.duckduckgo.downloads.impl.DataUriParser.GeneratedFilename
@@ -149,6 +150,7 @@ class DataUriDownloaderTest {
             url = url,
             subfolder = "Downloads",
             directory = temporaryFolder.newFolder("downloads_${folderCounter++}"),
+            browserMode = BrowserMode.REGULAR,
         )
     }
 }

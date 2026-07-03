@@ -20,6 +20,7 @@ import android.webkit.CookieManager
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.cookies.api.CookieManagerProvider
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
@@ -48,7 +49,7 @@ class InlinePdfHandlerPreApi31Test {
     private val androidBrowserConfigFeature = FakeFeatureToggleFactory.create(AndroidBrowserConfigFeature::class.java)
 
     private val cookieManagerProvider = object : CookieManagerProvider {
-        override fun get(): CookieManager? = null
+        override fun forMode(mode: BrowserMode): CookieManager? = null
     }
 
     @Before

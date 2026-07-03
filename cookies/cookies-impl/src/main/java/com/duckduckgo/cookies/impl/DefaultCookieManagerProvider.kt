@@ -16,25 +16,53 @@
 
 package com.duckduckgo.cookies.impl
 
+import android.annotation.SuppressLint
+import android.os.Looper
 import android.webkit.CookieManager
+import androidx.webkit.ProfileStore
+import com.duckduckgo.browsermode.api.BrowserMode
+import com.duckduckgo.browsermode.api.FireModeAvailability
+import com.duckduckgo.browsermode.api.profileName
 import com.duckduckgo.cookies.api.CookieManagerProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
+import dagger.Lazy
 import dagger.SingleInstanceIn
+import logcat.LogPriority
+import logcat.logcat
 import javax.inject.Inject
 
 @ContributesBinding(AppScope::class)
 @SingleInstanceIn(AppScope::class)
-class DefaultCookieManagerProvider @Inject constructor() : CookieManagerProvider {
+@SuppressLint("RequiresFeature")
+class DefaultCookieManagerProvider @Inject constructor(
+    private val fireModeAvailability: Lazy<FireModeAvailability>,
+) : CookieManagerProvider {
 
     @Volatile
-    private var instance: CookieManager? = null
+    private var defaultInstance: CookieManager? = null
 
-    override fun get(): CookieManager? {
-        return runCatching {
-            instance ?: synchronized(this) {
-                instance ?: CookieManager.getInstance().also { instance = it }
-            }
-        }.getOrNull()
+    @Volatile
+    private var fireInstance: CookieManager? = null
+
+    override fun forMode(mode: BrowserMode): CookieManager? = when (mode) {
+        BrowserMode.REGULAR -> defaultManager()
+        BrowserMode.FIRE -> if (fireModeAvailability.get().isAvailable()) fireManager() else defaultManager()
     }
+
+    private fun fireManager(): CookieManager? {
+        fireInstance?.let { return it }
+        // ProfileStore is @UiThread: off the main thread we can't resolve the Fire profile
+        if (Looper.myLooper() != Looper.getMainLooper()) {
+            logcat(LogPriority.WARN) { "Fire CookieManager requested off the main thread before warm-up; returning null" }
+            return null
+        }
+
+        return runCatching {
+            ProfileStore.getInstance().getOrCreateProfile(BrowserMode.FIRE.profileName).cookieManager
+        }.getOrNull()?.also { fireInstance = it }
+    }
+
+    private fun defaultManager(): CookieManager? =
+        runCatching { defaultInstance ?: CookieManager.getInstance().also { defaultInstance = it } }.getOrNull()
 }
