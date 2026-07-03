@@ -16,11 +16,16 @@
 
 package com.duckduckgo.common.utils.edgetoedge
 
+import android.content.Context
+import android.util.TypedValue
+import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
+import android.widget.FrameLayout
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.doOnAttach
+import androidx.core.view.updateLayoutParams
 import androidx.core.view.updatePadding
 import javax.inject.Inject
 
@@ -41,8 +46,10 @@ class EdgeToEdgeHandler @Inject constructor() {
      * Pads [view]'s top (status bar + cutout) and left/right (side system bars + cutout) edges.
      *
      * @param view The view to pad, typically the screen's root.
+     * @param installScrim When true (default), a status-bar scrim (see [installStatusBarScrim]) is drawn behind
+     *   the transparent status bar. Pass false for screens that colour their own system bars (e.g. via SystemBarStyle).
      */
-    fun applyStatusBarAndHorizontalInsets(view: View) {
+    fun applyStatusBarAndHorizontalInsets(view: View, installScrim: Boolean = true) {
         val initialLeft = view.paddingLeft
         val initialTop = view.paddingTop
         val initialRight = view.paddingRight
@@ -58,14 +65,17 @@ class EdgeToEdgeHandler @Inject constructor() {
             insets
         }
         ViewCompat.requestApplyInsets(view)
+        if (installScrim) installStatusBarScrim(view)
     }
 
     /**
      * Pads [view]'s top by the status-bar + cutout inset.
      *
      * @param view The view to pad at the top edge.
+     * @param installScrim When true (default), a status-bar scrim (see [installStatusBarScrim]) is drawn behind
+     *   the transparent status bar. Pass false for screens that colour their own system bars (e.g. via SystemBarStyle).
      */
-    fun applyStatusBarInsets(view: View) {
+    fun applyStatusBarInsets(view: View, installScrim: Boolean = true) {
         val initialTop = view.paddingTop
         ViewCompat.setOnApplyWindowInsetsListener(view) { v, insets ->
             val top = insets.getInsets(
@@ -75,6 +85,7 @@ class EdgeToEdgeHandler @Inject constructor() {
             insets
         }
         ViewCompat.requestApplyInsets(view)
+        if (installScrim) installStatusBarScrim(view)
     }
 
     /**
@@ -160,5 +171,52 @@ class EdgeToEdgeHandler @Inject constructor() {
             ViewCompat.getRootWindowInsets(attached)?.let(apply)
             ViewCompat.requestApplyInsets(attached)
         }
+    }
+
+    /**
+     * Installs a status-bar scrim: a view sized to the top (status-bar + cutout) inset and filled with the
+     * theme's status-bar colour (the toolbar colour), added over the content so it renders behind the transparent status bar.
+     *
+     * On Android 15 (targetSdk 35) `window.statusBarColor` is ignored, so painting this scrim is how the solid
+     * status-bar colour the screen had before edge-to-edge is restored. Every edge-to-edge screen already pads
+     * its content below the status bar, so the scrim only repaints the otherwise-empty strip. Idempotent per
+     * screen; a no-op when the colour can't be resolved.
+     */
+    private fun installStatusBarScrim(anchor: View) {
+        val contentRoot = anchor.rootView?.findViewById<ViewGroup>(android.R.id.content) ?: return
+        if (contentRoot.findViewWithTag<View>(STATUS_BAR_SCRIM_TAG) != null) return
+        val scrimColor = anchor.context.resolveStatusBarScrimColor() ?: return
+
+        val scrim = View(anchor.context).apply {
+            tag = STATUS_BAR_SCRIM_TAG
+            setBackgroundColor(scrimColor)
+            layoutParams = FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, 0, Gravity.TOP)
+        }
+        contentRoot.addView(scrim)
+
+        ViewCompat.setOnApplyWindowInsetsListener(scrim) { v, insets ->
+            val top = insets.getInsets(
+                WindowInsetsCompat.Type.statusBars() or WindowInsetsCompat.Type.displayCutout(),
+            ).top
+            if (v.layoutParams.height != top) {
+                v.updateLayoutParams { height = top }
+            }
+            insets
+        }
+        ViewCompat.requestApplyInsets(scrim)
+    }
+
+    /**
+     * Resolves the scrim colour from the theme's framework [android.R.attr.statusBarColor], which the app themes
+     * wire to the toolbar colour (`?attr/preferredStatusBarColor` -> `daxColorToolbar`). Using the framework attr
+     * keeps this in `common-utils`, which can't reference the design-system's `daxColorToolbar` attr directly.
+     */
+    private fun Context.resolveStatusBarScrimColor(): Int? {
+        val typedValue = TypedValue()
+        return if (theme.resolveAttribute(android.R.attr.statusBarColor, typedValue, true)) typedValue.data else null
+    }
+
+    companion object {
+        private const val STATUS_BAR_SCRIM_TAG = "edge_to_edge_status_bar_scrim"
     }
 }

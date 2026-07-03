@@ -71,7 +71,9 @@ class CustomTabActivity : DuckDuckGoActivity() {
                 SystemBarStyle.light(toolbarColor, toolbarColor)
             }
             enableEdgeToEdge(statusBarStyle = barStyle, navigationBarStyle = barStyle)
-            edgeToEdgeHandler.applyStatusBarAndHorizontalInsets(binding.root)
+            // No status-bar scrim: a custom tab colours its bars with the caller-supplied toolbar colour, so a
+            // static scrim would paint the wrong colour over it.
+            edgeToEdgeHandler.applyStatusBarAndHorizontalInsets(binding.root, installScrim = false)
             applyDisplayCutoutMode(resources.configuration.orientation)
         }
 

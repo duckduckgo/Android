@@ -191,7 +191,8 @@ class PrivacyDashboardHybridActivity : DuckDuckGoActivity() {
 
     private fun configureEdgeToEdgeInsets() {
         edgeToEdgeHandler.applyStatusBarAndHorizontalInsets(binding.root)
-        edgeToEdgeHandler.applyNavigationBarInsets(binding.webViewContainer, drawBehindGestureNav = true)
+        // Keep the web content clear of the navigation bar rather than drawing behind the gesture nav.
+        edgeToEdgeHandler.applyNavigationBarInsets(binding.webViewContainer, drawBehindGestureNav = false)
     }
 
     private fun configureObservers() {

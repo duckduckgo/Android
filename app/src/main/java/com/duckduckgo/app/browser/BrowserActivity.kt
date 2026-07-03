@@ -903,7 +903,9 @@ open class BrowserActivity : DuckDuckGoActivity() {
                 SystemBarStyle.light(toolbarColor, toolbarColor)
             }
             enableEdgeToEdge(statusBarStyle = barStyle, navigationBarStyle = barStyle)
-            edgeToEdgeHandler.applyStatusBarAndHorizontalInsets(binding.root)
+            // No status-bar scrim: the browser colours its own system bars (SystemBarStyle + the omnibar's
+            // own background), so a scrim would override that with the wrong colour.
+            edgeToEdgeHandler.applyStatusBarAndHorizontalInsets(binding.root, installScrim = false)
             edgeToEdgeHandler.applyNavigationBarInsets(binding.navigationBarMockup.root)
             applyDisplayCutoutMode(resources.configuration.orientation)
         }
