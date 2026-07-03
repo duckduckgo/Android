@@ -82,6 +82,14 @@ class AutoconsentSettingsActivity : DuckDuckGoActivity() {
         viewModel.onUserToggleAutoconsent(isChecked)
     }
 
+    private val autoManageCookiePopUpsToggleListener = CompoundButton.OnCheckedChangeListener { _, isChecked ->
+        viewModel.onAutoManageCookiePopUpsToggled(isChecked)
+    }
+
+    private val popUpsWithoutOptOutsToggleListener = CompoundButton.OnCheckedChangeListener { _, isChecked ->
+        viewModel.onPopUpsWithoutOptOutsToggled(isChecked)
+    }
+
     private val clickableSpan = object : ClickableSpan() {
         override fun onClick(widget: View) {
             viewModel.onLearnMoreSelected()
@@ -122,15 +130,8 @@ class AutoconsentSettingsActivity : DuckDuckGoActivity() {
 
     private fun configureUiEventHandlers() {
         binding.autoconsentToggle.setOnCheckedChangeListener(autoconsentToggleListener)
-        binding.autoconsentPreferenceBlockAll.setClickListener {
-            viewModel.onCookiePopUpPreferenceSelected(CookiePopUpPreference.max)
-        }
-        binding.autoconsentPreferenceBlockStandard.setClickListener {
-            viewModel.onCookiePopUpPreferenceSelected(CookiePopUpPreference.`default`)
-        }
-        binding.autoconsentPreferenceDoNotBlock.setClickListener {
-            viewModel.onCookiePopUpPreferenceSelected(CookiePopUpPreference.off)
-        }
+        binding.autoManageCookiePopUpsToggle.setOnCheckedChangeListener(autoManageCookiePopUpsToggleListener)
+        binding.popUpsWithoutOptOutsToggle.setOnCheckedChangeListener(popUpsWithoutOptOutsToggleListener)
     }
 
     private fun observeViewModel() {
@@ -157,9 +158,15 @@ class AutoconsentSettingsActivity : DuckDuckGoActivity() {
             autoconsentToggle.isVisible = !showCookiePopUpPreferenceSetting
             cookiePopUpPreferenceContainer.isVisible = showCookiePopUpPreferenceSetting
             autoconsentToggle.quietlySetIsChecked(viewState.autoconsentEnabled, autoconsentToggleListener)
-            autoconsentPreferenceBlockAll.setChecked(viewState.selectedPreference == CookiePopUpPreference.max)
-            autoconsentPreferenceBlockStandard.setChecked(viewState.selectedPreference == CookiePopUpPreference.`default`)
-            autoconsentPreferenceDoNotBlock.setChecked(viewState.selectedPreference == CookiePopUpPreference.off)
+            autoManageCookiePopUpsToggle.quietlySetIsChecked(
+                viewState.autoManageEnabled,
+                autoManageCookiePopUpsToggleListener,
+            )
+            popUpsWithoutOptOutsToggle.setSwitchEnabled(viewState.autoManageEnabled)
+            popUpsWithoutOptOutsToggle.quietlySetIsChecked(
+                viewState.popUpsWithoutOptOutsEnabled,
+                popUpsWithoutOptOutsToggleListener,
+            )
         }
     }
 

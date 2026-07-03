@@ -114,13 +114,13 @@ class AutoconsentSettingsViewModelTest {
     }
 
     @Test
-    fun whenOnCookiePopUpPreferenceSelectedToBlockStandardThenPreferenceUpdated() = runTest {
+    fun whenOnAutoManageCookiePopUpsToggledOnThenPreferenceSetToDefault() = runTest {
         feature.cookiePopUpPreferenceSetting().setRawStoredState(Toggle.State(enable = true))
         initViewModel()
 
         viewModel.viewState.test {
             assertEquals(CookiePopUpPreference.off, awaitItem().selectedPreference)
-            viewModel.onCookiePopUpPreferenceSelected(CookiePopUpPreference.`default`)
+            viewModel.onAutoManageCookiePopUpsToggled(true)
             assertEquals(CookiePopUpPreference.`default`, autoconsent.getCookiePopUpPreference())
             assertEquals(CookiePopUpPreference.`default`, awaitItem().selectedPreference)
             cancelAndIgnoreRemainingEvents()
@@ -128,22 +128,46 @@ class AutoconsentSettingsViewModelTest {
     }
 
     @Test
-    fun whenOnCookiePopUpPreferenceSelectedToDoNotBlockThenPreferenceUpdated() {
+    fun whenOnAutoManageCookiePopUpsToggledOffThenPreferenceSetToOff() {
         feature.cookiePopUpPreferenceSetting().setRawStoredState(Toggle.State(enable = true))
         initViewModel()
-        viewModel.onCookiePopUpPreferenceSelected(CookiePopUpPreference.max)
-        viewModel.onCookiePopUpPreferenceSelected(CookiePopUpPreference.off)
+        viewModel.onAutoManageCookiePopUpsToggled(true)
+        viewModel.onAutoManageCookiePopUpsToggled(false)
 
         assertEquals(CookiePopUpPreference.off, autoconsent.getCookiePopUpPreference())
         assertEquals(CookiePopUpPreference.off, viewModel.viewState.value.selectedPreference)
+        assertFalse(viewModel.viewState.value.popUpsWithoutOptOutsEnabled)
     }
 
     @Test
-    fun whenOnCookiePopUpPreferenceSelectedToBlockAllThenAutoconsentOnPixelIsFired() {
+    fun whenOnPopUpsWithoutOptOutsToggledOnThenPreferenceSetToMax() {
+        feature.cookiePopUpPreferenceSetting().setRawStoredState(Toggle.State(enable = true))
+        initViewModel()
+        viewModel.onAutoManageCookiePopUpsToggled(true)
+        viewModel.onPopUpsWithoutOptOutsToggled(true)
+
+        assertEquals(CookiePopUpPreference.max, autoconsent.getCookiePopUpPreference())
+        assertEquals(CookiePopUpPreference.max, viewModel.viewState.value.selectedPreference)
+    }
+
+    @Test
+    fun whenOnPopUpsWithoutOptOutsToggledOffThenPreferenceSetToDefault() {
+        feature.cookiePopUpPreferenceSetting().setRawStoredState(Toggle.State(enable = true))
+        initViewModel()
+        viewModel.onAutoManageCookiePopUpsToggled(true)
+        viewModel.onPopUpsWithoutOptOutsToggled(true)
+        viewModel.onPopUpsWithoutOptOutsToggled(false)
+
+        assertEquals(CookiePopUpPreference.`default`, autoconsent.getCookiePopUpPreference())
+        assertEquals(CookiePopUpPreference.`default`, viewModel.viewState.value.selectedPreference)
+    }
+
+    @Test
+    fun whenOnAutoManageCookiePopUpsToggledOnThenAutoconsentOnPixelIsFired() {
         feature.cookiePopUpPreferenceSetting().setRawStoredState(Toggle.State(enable = true))
         initViewModel()
 
-        viewModel.onCookiePopUpPreferenceSelected(CookiePopUpPreference.max)
+        viewModel.onAutoManageCookiePopUpsToggled(true)
 
         assertEquals(2, pixel.firedPixels.size)
         assertEquals(AutoConsentPixel.SETTINGS_AUTOCONSENT_ON.pixelName, pixel.firedPixels[1])

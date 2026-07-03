@@ -97,47 +97,39 @@
                 android:orientation="vertical"
                 android:visibility="gone">
 
-                <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
+                <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+                    android:id="@+id/autoManageCookiePopUpsToggle"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:primaryText="@string/autoconsentPreferenceHeader" />
-
-                <RadioGroup
-                    android:id="@+id/autoconsentPreferenceGroup"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-
-                    <com.duckduckgo.common.ui.view.listitem.RadioListItem
-                        android:id="@+id/autoconsentPreferenceBlockAll"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:minHeight="@dimen/oneLineItemHeight"
-                        app:primaryText="@string/autoconsentPreferenceBlockAll" />
-
-                    <com.duckduckgo.common.ui.view.listitem.RadioListItem
-                        android:id="@+id/autoconsentPreferenceBlockStandard"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:minHeight="@dimen/oneLineItemHeight"
-                        app:primaryText="@string/autoconsentPreferenceBlockStandard" />
-
-                    <com.duckduckgo.common.ui.view.listitem.RadioListItem
-                        android:id="@+id/autoconsentPreferenceDoNotBlock"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:minHeight="@dimen/oneLineItemHeight"
-                        app:primaryText="@string/autoconsentPreferenceDoNotBlock" />
-
-                </RadioGroup>
+                    app:primaryText="@string/autoconsentAutoManageToggle"
+                    app:primaryTextTruncated="false"
+                    app:showSwitch="true" />
 
                 <com.duckduckgo.common.ui.view.text.DaxTextView
-                    android:id="@+id/autoconsentPreferenceClarification"
+                    android:id="@+id/autoManageCookiePopUpsDescription"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:paddingHorizontal="@dimen/keyline_4"
-                    android:paddingTop="@dimen/keyline_2"
                     android:paddingBottom="@dimen/keyline_4"
-                    android:text="@string/autoconsentPreferenceClarification"
+                    android:text="@string/autoconsentAutoManageDescription"
+                    app:textType="secondary"
+                    app:typography="body2" />
+
+                <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+                    android:id="@+id/popUpsWithoutOptOutsToggle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:primaryText="@string/autoconsentPopUpsWithoutOptOutsToggle"
+                    app:primaryTextTruncated="false"
+                    app:showSwitch="true" />
+
+                <com.duckduckgo.common.ui.view.text.DaxTextView
+                    android:id="@+id/popUpsWithoutOptOutsDescription"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingHorizontal="@dimen/keyline_4"
+                    android:paddingBottom="@dimen/keyline_4"
+                    android:text="@string/autoconsentPopUpsWithoutOptOutsDescription"
                     app:textType="secondary"
                     app:typography="body2" />
             </LinearLayout>
