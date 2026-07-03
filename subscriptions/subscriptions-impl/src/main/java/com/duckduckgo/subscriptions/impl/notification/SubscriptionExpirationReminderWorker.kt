@@ -17,11 +17,13 @@
 package com.duckduckgo.subscriptions.impl.notification
 
 import android.content.Context
+import androidx.core.app.NotificationManagerCompat
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.duckduckgo.anvil.annotations.ContributesWorker
 import com.duckduckgo.app.notification.NotificationSender
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import javax.inject.Inject
 
 @ContributesWorker(AppScope::class)
@@ -34,10 +36,26 @@ class SubscriptionExpirationReminderWorker(
     lateinit var notificationSender: NotificationSender
 
     @Inject
+    lateinit var notificationManager: NotificationManagerCompat
+
+    @Inject
     lateinit var subscriptionExpirationReminderNotification: SubscriptionExpirationReminderNotification
 
+    @Inject
+    lateinit var pixelSender: SubscriptionPixelSender
+
     override suspend fun doWork(): Result {
-        notificationSender.sendNotification(subscriptionExpirationReminderNotification)
+        when {
+            !notificationManager.areNotificationsEnabled() -> {
+                pixelSender.reportExpirationReminderNotFiredPermissionsRejected()
+            }
+            !subscriptionExpirationReminderNotification.canShow() -> {
+                pixelSender.reportExpirationReminderNotFiredInactiveSubscription()
+            }
+            else -> {
+                notificationSender.sendNotification(subscriptionExpirationReminderNotification)
+            }
+        }
         return Result.success()
     }
 }

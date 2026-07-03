@@ -21,6 +21,7 @@ import androidx.room.Room
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.browser.api.AppProperties
 import com.duckduckgo.browser.api.UserBrowserProperties
+import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.DaggerSet
 import com.duckduckgo.di.scopes.AppScope
@@ -102,12 +103,14 @@ object DataSourceModule {
         remoteMessagesDao: RemoteMessagesDao,
         messageMapper: MessageMapper,
         remoteMessageImageStore: RemoteMessageImageStore,
+        currentTimeProvider: CurrentTimeProvider,
     ): RemoteMessagingRepository {
         return AppRemoteMessagingRepository(
             remoteMessagingConfigRepository,
             remoteMessagesDao,
             messageMapper,
             remoteMessageImageStore,
+            currentTimeProvider,
         )
     }
 

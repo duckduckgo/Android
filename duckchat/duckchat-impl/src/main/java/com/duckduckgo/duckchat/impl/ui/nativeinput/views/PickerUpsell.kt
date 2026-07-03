@@ -20,10 +20,10 @@ import com.duckduckgo.duckchat.impl.models.UserTier
 import logcat.logcat
 
 enum class PickerSurface(val origin: String) {
-    MODEL_PICKER_ADDRESS_BAR("funnel_nativeinput_androidapp__modelpicker"),
-    MODEL_PICKER_DUCK_AI_TAB("funnel_duckai_androidapp__modelpicker"),
-    REASONING_PICKER_ADDRESS_BAR("funnel_nativeinput_androidapp__reasoningpicker"),
-    REASONING_PICKER_DUCK_AI_TAB("funnel_duckai_androidapp__reasoningpicker"),
+    MODEL_PICKER_ADDRESS_BAR("funnel_nativeinput_android__modelpicker"),
+    MODEL_PICKER_DUCK_AI_TAB("funnel_duckai_android__modelpicker"),
+    REASONING_PICKER_ADDRESS_BAR("funnel_nativeinput_android__reasoningpicker"),
+    REASONING_PICKER_DUCK_AI_TAB("funnel_duckai_android__reasoningpicker"),
 }
 
 sealed class UpsellCommand {

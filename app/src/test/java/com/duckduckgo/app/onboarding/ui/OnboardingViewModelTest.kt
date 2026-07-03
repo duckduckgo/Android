@@ -24,7 +24,6 @@ import com.duckduckgo.app.cta.model.DismissedCta
 import com.duckduckgo.app.onboarding.DuckAiOnboardingDemo
 import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingEvent
 import com.duckduckgo.app.onboarding.store.AppStage
-import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.onboarding.ui.FullOnboardingSkipper.ViewState
 import com.duckduckgo.app.onboarding.ui.OnboardingViewModel.ExtendedOnboardingFlow.DEFAULT_WITHOUT_INTRO_CTA
@@ -73,8 +72,6 @@ class OnboardingViewModelTest {
 
     private val dismissedCtaDao: DismissedCtaDao = mock()
 
-    private val onboardingStore: OnboardingStore = mock()
-
     private val onboardingBrandDesignUpdateToggles: OnboardingBrandDesignUpdateToggles = mock()
     private val enabledToggle: Toggle = mock { on { it.isEnabled() } doReturn true }
     private val disabledToggle: Toggle = mock { on { it.isEnabled() } doReturn false }
@@ -94,7 +91,6 @@ class OnboardingViewModelTest {
             onboardingSkipper = onboardingSkipper,
             appBuildConfig = appBuildConfig,
             dismissedCtaDao = dismissedCtaDao,
-            onboardingStore = onboardingStore,
             onboardingBrandDesignUpdateToggles = onboardingBrandDesignUpdateToggles,
             linearOnboardingOrchestrator = linearOnboardingOrchestrator,
             duckAiOnboardingDemo = duckAiOnboardingDemo,
