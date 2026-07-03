@@ -488,9 +488,6 @@ class NativeInputModeWidget @JvmOverloads constructor(
                             showKeyboard()
                         }
                     }
-                    ChatState.READY -> {
-                        widgetRoot?.visibility = VISIBLE
-                    }
                     else -> {}
                 }
             }

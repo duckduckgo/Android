@@ -120,6 +120,7 @@ interface NativeInputManager {
         query: String = "",
         callbacks: NativeInputCallbacks,
         initialInputMode: InputMode? = null,
+        initiallyHidden: Boolean = false,
     )
 
     fun hideNativeInput(animate: Boolean = true, isNavigation: Boolean = false): Boolean
@@ -401,6 +402,7 @@ class RealNativeInputManager @Inject constructor(
         query: String,
         callbacks: NativeInputCallbacks,
         initialInputMode: InputMode?,
+        initiallyHidden: Boolean,
     ) {
         if (!isNativeInputFieldEnabled) return
 
@@ -452,6 +454,9 @@ class RealNativeInputManager @Inject constructor(
             }
         }
         attachWidget(widgetView, isBottom, tabId)
+        if (initiallyHidden) {
+            widgetView.gone()
+        }
         val isNewTab = query.isEmpty() && omnibarController.getText().isEmpty()
         applyInitialTabSelection(widgetView, isNewTab, initialInputMode)
         if (omnibarController.isDuckAiMode()) {
