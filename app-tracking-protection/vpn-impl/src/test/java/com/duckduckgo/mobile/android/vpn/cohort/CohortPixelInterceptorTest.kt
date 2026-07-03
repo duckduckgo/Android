@@ -21,9 +21,7 @@ import com.duckduckgo.appbuildconfig.api.BuildFlavor
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.api.FakeChain
 import com.duckduckgo.common.test.api.InMemorySharedPreferences
-import com.duckduckgo.common.utils.featureflags.OkHttpInterceptorRefactorFeature
 import com.duckduckgo.data.store.api.SharedPreferencesProvider
-import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import org.junit.Assert
 import org.junit.Before
@@ -68,7 +66,6 @@ class CohortPixelInterceptorTest {
         cohortPixelInterceptor = CohortPixelInterceptor(
             cohortCalculator,
             cohortStore,
-            FakeFeatureToggleFactory.create(OkHttpInterceptorRefactorFeature::class.java),
         )
     }
 

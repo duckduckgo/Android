@@ -27,7 +27,6 @@ import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.utils.AppUrl.Url
 import com.duckduckgo.common.utils.DispatcherProvider
-import com.duckduckgo.common.utils.featureflags.OkHttpInterceptorRefactorFeature
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.common.utils.plugins.pixel.PixelInterceptorPlugin
 import com.duckduckgo.di.scopes.AppScope
@@ -161,10 +160,8 @@ class NetworkModule {
     }
 
     @Provides
-    fun pixelReQueryInterceptor(
-        okHttpInterceptorRefactorFeature: OkHttpInterceptorRefactorFeature,
-    ): PixelReQueryInterceptor {
-        return PixelReQueryInterceptor(okHttpInterceptorRefactorFeature)
+    fun pixelReQueryInterceptor(): PixelReQueryInterceptor {
+        return PixelReQueryInterceptor()
     }
 
     @Provides
