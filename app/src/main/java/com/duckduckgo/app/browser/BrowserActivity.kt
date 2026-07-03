@@ -1068,10 +1068,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
     private var pendingDuckAiOnboardingFire = false
 
-    fun launchFire(
-        launchedFromFocusedNtp: Boolean = false,
-        isDuckAiOnboarding: Boolean = false,
-    ) {
+    fun launchFire(launchedFromFocusedNtp: Boolean = false, isDuckAiOnboarding: Boolean = false) {
         pendingDuckAiOnboardingFire = isDuckAiOnboarding
         val params = mapOf(PixelParameter.FROM_FOCUSED_NTP to launchedFromFocusedNtp.toString())
         pixel.fire(AppPixelName.FORGET_ALL_PRESSED_BROWSING, params)
