@@ -167,6 +167,7 @@ class DataClearing @Inject constructor(
             BrowserMode.REGULAR -> {
                 performFireModeClear()
                 clearRegularDataUsingManualFireOptions(shouldRestartIfRequired)
+                clearDataAction.setAppUsedSinceLastClearFlag(wasAppUsedSinceLastClear)
             }
             BrowserMode.FIRE -> {
                 performFireModeClear()
@@ -175,10 +176,9 @@ class DataClearing @Inject constructor(
                     dataClearingWideEvent.finishSuccess() // If there is an open wide event, complete it before killing the process.
                     clearDataAction.killAndRestartProcess(notifyDataCleared = false)
                 }
+                // Regular data is untouched, so appUsedSinceLastClear (a Regular-clear flag) must not change.
             }
         }
-
-        clearDataAction.setAppUsedSinceLastClearFlag(wasAppUsedSinceLastClear)
     }
 
     private suspend fun clearRegularDataUsingManualFireOptions(
