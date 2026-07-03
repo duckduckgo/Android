@@ -3593,6 +3593,10 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun onNewTabMenuItemClicked(longPress: Boolean = false) {
+        if (longPress && !currentBrowserViewState().browserShowing) {
+            return
+        }
+
         openNewTab()
 
         if (longPress) {

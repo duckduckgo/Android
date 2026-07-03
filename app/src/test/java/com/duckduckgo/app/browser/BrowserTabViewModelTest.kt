@@ -3398,10 +3398,24 @@ class BrowserTabViewModelTest {
         }
 
     @Test
-    fun whenUserRequestedToOpenNewTabByLongPressThenPixelFired() {
+    fun whenUserRequestedToOpenNewTabByLongPressAndBrowserShowingThenNewTabOpenedAndPixelFired() {
+        setBrowserShowing(true)
+
         testee.onNewTabMenuItemClicked(longPress = true)
 
+        assertCommandIssued<Command.GenerateWebViewPreviewImage>()
         verify(mockPixel).fire(AppPixelName.TAB_MANAGER_NEW_TAB_LONG_PRESSED)
+    }
+
+    @Test
+    fun whenUserRequestedToOpenNewTabByLongPressAndAlreadyOnNewTabPageThenNoNewTabOpenedAndNoPixelFired() {
+        setBrowserShowing(false)
+
+        testee.onNewTabMenuItemClicked(longPress = true)
+
+        assertCommandNotIssued<Command.GenerateWebViewPreviewImage>()
+        assertCommandNotIssued<Command.LaunchNewTab>()
+        verify(mockPixel, never()).fire(AppPixelName.TAB_MANAGER_NEW_TAB_LONG_PRESSED)
     }
 
     @Test
