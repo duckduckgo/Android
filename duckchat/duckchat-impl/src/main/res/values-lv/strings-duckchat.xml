@@ -49,7 +49,7 @@
     <string name="duck_ai_shortcut_settings_description">Izvēlies, kurus Duck.ai īsceļus parādīt</string>
 
     <!-- Default Toggle Position -->
-    <string name="duckAiDefaultTogglePositionTitle" instruction="&apos;Toggle&apos; refers to the UI tab switcher component (Search/Duck.ai), not the verb &apos;to toggle&apos;.">Jauna cilnes slēdža pozīcija</string>
+    <string name="duckAiDefaultTogglePositionTitle" instruction="&apos;Toggle&apos; refers to the UI tab switcher component (Search/Duck.ai), not the verb &apos;to toggle&apos;.">Pārslēga novietojums jaunā cilnē</string>
     <string name="duckAiDefaultTogglePositionSearch">Meklēt</string>
     <string name="duckAiDefaultTogglePositionDuckAi">Duck.ai</string>
     <string name="duckAiDefaultTogglePositionLastUsed">Pēdējo reizi lietots</string>
