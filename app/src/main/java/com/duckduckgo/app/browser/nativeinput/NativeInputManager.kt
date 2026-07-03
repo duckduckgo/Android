@@ -59,9 +59,11 @@ import com.google.android.material.card.MaterialCardView
 import com.squareup.anvil.annotations.ContributesBinding
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 import org.json.JSONArray
 import javax.inject.Inject
 
@@ -120,7 +122,6 @@ interface NativeInputManager {
         query: String = "",
         callbacks: NativeInputCallbacks,
         initialInputMode: InputMode? = null,
-        initiallyHidden: Boolean = false,
     )
 
     fun hideNativeInput(animate: Boolean = true, isNavigation: Boolean = false): Boolean
@@ -402,7 +403,6 @@ class RealNativeInputManager @Inject constructor(
         query: String,
         callbacks: NativeInputCallbacks,
         initialInputMode: InputMode?,
-        initiallyHidden: Boolean,
     ) {
         if (!isNativeInputFieldEnabled) return
 
@@ -454,8 +454,8 @@ class RealNativeInputManager @Inject constructor(
             }
         }
         attachWidget(widgetView, isBottom, tabId)
-        if (initiallyHidden) {
-            widgetView.gone()
+        lifecycleOwner.lifecycleScope.launch {
+            if (isDuckAiSettingsUrl(currentTabUrl.firstOrNull())) widgetView.gone()
         }
         val isNewTab = query.isEmpty() && omnibarController.getText().isEmpty()
         applyInitialTabSelection(widgetView, isNewTab, initialInputMode)
@@ -938,6 +938,11 @@ class RealNativeInputManager @Inject constructor(
         if (rawUrl.isNullOrBlank()) return null
         val uri = runCatching { rawUrl.toUri() }.getOrNull() ?: return null
         return uri.toChatIdOrNull(duckChat)
+    }
+
+    private fun isDuckAiSettingsUrl(url: String?): Boolean {
+        val uri = url?.toUri() ?: return false
+        return duckChat.isDuckChatUrl(uri) && uri.getQueryParameter("settings") == "open"
     }
 
     companion object {

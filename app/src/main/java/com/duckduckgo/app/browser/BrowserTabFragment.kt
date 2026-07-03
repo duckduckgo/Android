@@ -1429,7 +1429,6 @@ class BrowserTabFragment :
             tabs = viewModel.tabs,
             currentTabUrl = viewModel.siteLiveData.asFlow().map { it?.url },
             query = query,
-            initiallyHidden = isDuckAiSettingsPage(),
             initialInputMode = if (customAiOnboardingStore.consumeOpenInputOnDuckAiTab()) {
                 InputMode.DUCK_AI
             } else {
@@ -1528,11 +1527,6 @@ class BrowserTabFragment :
                 },
             ),
         )
-    }
-
-    private fun isDuckAiSettingsPage(): Boolean {
-        val uri = webView?.url?.toUri() ?: return false
-        return duckChat.isDuckChatUrl(uri) && uri.getQueryParameter("settings") == "open"
     }
 
     private fun launchInputScreen(
