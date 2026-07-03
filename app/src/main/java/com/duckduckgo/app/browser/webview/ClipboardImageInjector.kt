@@ -66,7 +66,6 @@ interface ClipboardImageInjector {
 
 @ContributesBinding(AppScope::class)
 class ClipboardImageInjectorImpl @Inject constructor(
-    private val webViewClipboardImageFeature: WebViewClipboardImageFeature,
     private val webViewCapabilityChecker: WebViewCapabilityChecker,
     private val webViewCompatWrapper: WebViewCompatWrapper,
     private val appBuildConfig: AppBuildConfig,
@@ -92,24 +91,12 @@ class ClipboardImageInjectorImpl @Inject constructor(
 
     @SuppressLint("AddDocumentStartJavaScriptUsage", "RequiresFeature")
     override suspend fun configureWebViewForClipboard(webView: WebView) {
-        if (!isFeatureEnabled()) {
-            logcat { "ClipboardImageInjector: Feature flag not enabled" }
-            requiresLegacyPolyfillInjection = false
-            return
-        }
-
         if (isModernApproachSupported()) {
             requiresLegacyPolyfillInjection = false
             configureModernApproach(webView)
         } else {
             requiresLegacyPolyfillInjection = true
             configureLegacyApproach(webView)
-        }
-    }
-
-    private suspend fun isFeatureEnabled(): Boolean {
-        return withContext(dispatcherProvider.io()) {
-            webViewClipboardImageFeature.self().isEnabled()
         }
     }
 
