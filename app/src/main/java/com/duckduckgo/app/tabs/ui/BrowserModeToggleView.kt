@@ -24,6 +24,7 @@ import android.view.MotionEvent
 import android.view.View.MeasureSpec
 import android.view.ViewConfiguration
 import android.widget.FrameLayout
+import androidx.appcompat.widget.TooltipCompat
 import androidx.core.view.doOnAttach
 import androidx.core.view.doOnLayout
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator
@@ -78,6 +79,10 @@ class BrowserModeToggleView @JvmOverloads constructor(
 
         binding.fireSegment.setOnClickListener { dispatchToggle() }
         binding.regularSegment.setOnClickListener { dispatchToggle() }
+
+        // Long-pressing shows the label as a tooltip and consumes the press, so it no longer toggles the mode.
+        TooltipCompat.setTooltipText(binding.fireSegment, binding.fireSegment.contentDescription)
+        TooltipCompat.setTooltipText(binding.regularSegment, binding.regularSegment.contentDescription)
     }
 
     fun setMode(mode: BrowserMode) {

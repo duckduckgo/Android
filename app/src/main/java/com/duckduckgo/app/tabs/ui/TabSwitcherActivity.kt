@@ -912,6 +912,13 @@ class TabSwitcherActivity :
             navigationBar = binding.navigationBar,
         )
 
+        menu.findItem(R.id.newTabToolbarButton).setTitle(
+            when (currentBrowserMode) {
+                BrowserMode.FIRE -> R.string.fireTabsNewTabButton
+                BrowserMode.REGULAR -> R.string.newTabMenuItem
+            },
+        )
+
         return true
     }
 
