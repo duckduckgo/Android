@@ -249,4 +249,31 @@
     <string name="sync_chat_bottom_sheet_description">Etsi QR-koodi DuckDuckGo-sovelluksesta toisella laitteellasi siirtymällä kohtaan Asetukset › Sync &amp; Backup › Synkronoi toisen laitteen kanssa.</string>
     <string name="sync_chat_bottom_sheet_positive">Skannaa QR-koodi</string>
     <string name="sync_chat_bottom_sheet_negative">Ei nyt</string>
+
+    <!-- v2 Exchange confirmation prompts (spec §"Exchange Confirmations") -->
+    <string name="sync_v2_joiner_confirmation_title">Synkronoidaanko tietosi?</string>
+    <string name="sync_v2_joiner_confirmation_positive">Synkronoi nyt</string>
+    <string name="sync_v2_joiner_confirmation_negative">Peruuta</string>
+
+    <string name="sync_v2_host_confirmation_title">Synkronoidaanko tietosi?</string>
+    <string name="sync_v2_host_confirmation_positive">Synkronoi nyt</string>
+    <string name="sync_v2_host_confirmation_negative">Peruuta</string>
+
+    <!-- v2 consent-dialog data-access copy (kind-specific; shared by joiner & host) -->
+    <string name="sync_v2_confirmation_message_ddg" instruction="Placeholder is a peer device name, e.g. Samsung S23.">\"%1$s\" voi käyttää synkronoituja DuckDuckGo-salasanojasi, automaattisen täytön tietojasi ja Duck.ai-keskustelujasi.</string>
+    <string name="sync_v2_confirmation_message_3p" instruction="Placeholder is a peer device name, e.g. Samsung S23.">\"%1$s\" voi käyttää synkronoituja Duck.ai-keskustelujasi.</string>
+    <string name="sync_v2_confirmation_message_unknown_peer_ddg">Toinen laite voi käyttää synkronoituja DuckDuckGo-salasanojasi, automaattisen täytön tietojasi ja Duck.ai-keskustelujasi.</string>
+    <string name="sync_v2_confirmation_message_unknown_peer_3p">Toinen laite voi käyttää synkronoituja Duck.ai-keskustelujasi.</string>
+
+    <!-- v2 pairing terminal-outcome copy (interim, English-only). Spec 2026-06-17 (title-primary). -->
+    <string name="sync_v2_error_pairing_failed">Synkronointi epäonnistui.</string>
+    <string name="sync_v2_error_pairing_rejected">Synkronointi peruutettu toisesta laitteestasi.</string>
+    <string name="sync_v2_error_pairing_canceled">Synkronointi peruutettu.</string>
+    <string name="sync_v2_error_upgrade_required">Päivitä DuckDuckGo-selain ja yritä uudelleen.</string>
+    <string name="sync_v2_error_third_party_already_upgraded">Synkronoi tämä laite jo yhdistetystä DuckDuckGo-selaimesta toisella laitteella</string>
+    <string name="sync_v2_error_try_again">Yritä uudelleen.</string>
+    <string name="sync_v2_error_got_it">Selvä</string>
+    <string name="sync_v2_already_paired_title">Jo synkronoitu.</string>
+    <string name="sync_v2_already_paired_message">Nämä laitteet on jo kytketty Sync &amp; Backupiin.</string>
+
 </resources>
