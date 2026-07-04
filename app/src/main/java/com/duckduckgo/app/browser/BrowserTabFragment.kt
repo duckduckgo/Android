@@ -1440,9 +1440,8 @@ class BrowserTabFragment :
                     if (binding.autoCompleteSuggestionsList.isVisible) {
                         viewModel.autoCompleteSuggestionsGone()
                     }
-                    viewModel.triggerAutocomplete("", hasFocus = false, hasQueryChanged = true)
+                    viewModel.triggerAutocomplete("", hasFocus = true, hasQueryChanged = true)
                     binding.autoCompleteSuggestionsList.gone()
-                    binding.focusedView.gone()
                 },
                 onSearchSubmitted = { query -> onUserSubmittedText(query) },
                 onDuckAiChatSubmitted = { query, modelId, reasoningEffort, selectedTool, imagesJson, filesJson ->

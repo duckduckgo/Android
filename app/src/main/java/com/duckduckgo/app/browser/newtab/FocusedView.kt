@@ -48,10 +48,10 @@ class FocusedView @JvmOverloads constructor(
     }
 
     fun show(isLogoVisible: Boolean, browserMode: BrowserMode) {
-        binding.focusedLogo.isVisible = isLogoVisible && browserMode == BrowserMode.REGULAR
-        binding.focusedFireEmptyState.root.isVisible = isLogoVisible &&
-                browserMode == BrowserMode.FIRE
-        binding.focusedFavourites.isVisible = !isLogoVisible
+        val isFireMode = browserMode == BrowserMode.FIRE
+        binding.focusedFireEmptyState.root.isVisible = isFireMode
+        binding.focusedLogo.isVisible = isLogoVisible && !isFireMode
+        binding.focusedFavourites.isVisible = !isLogoVisible && !isFireMode
         this.show()
     }
 }

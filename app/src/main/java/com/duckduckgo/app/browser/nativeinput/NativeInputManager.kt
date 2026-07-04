@@ -530,6 +530,7 @@ class RealNativeInputManager @Inject constructor(
         val previousOnChatSelected = widget.onChatSelected
         widget.onChatSelected = { animate ->
             callbacks.onClearAutocomplete()
+            rootView.findViewById<View?>(R.id.focusedView)?.gone()
             previousOnChatSelected?.invoke(animate)
         }
         widget.onClearTextTapped = {
