@@ -199,4 +199,68 @@
     <string name="duck_ai_chat_history_download_view">Kuva</string>
     <string name="duck_ai_chat_history_download_error">Vestlust ei õnnestunud eksportida</string>
     <string name="duck_ai_chat_history_bulk_download_error">Vestlusi ei õnnestunud eksportida</string>
+
+    <string name="duckAiChatSearchDuckDuckGo">DuckDuckGo otsing</string>
+    <string name="native_input_chat_hint">Küsi ükskõik mida privaatselt…</string>
+    <string name="native_input_chat_duck_mode_hint">Vasta...</string>
+
+    <!-- Model Picker -->
+    <string name="duckAiModelPickerPlusModels">Plus</string>
+    <string name="duckAiModelPickerProModels">Pro</string>
+
+    <!-- Reasoning Mode Picker -->
+    <string name="duckChatReasoningModeContentDescription">Arutlusrežiim</string>
+    <string name="duckChatReasoningModeFastTitle">Kiire</string>
+    <string name="duckChatReasoningModeFastSubtitle">Vastab kiiresti</string>
+    <string name="duckChatReasoningModeReasoningTitle">Arutlus</string>
+    <string name="duckChatReasoningModeReasoningSubtitle">Keeruliste ülesannete jaoks</string>
+    <string name="duckChatReasoningModeExtendedTitle">Laiendatud arutlus</string>
+    <string name="duckChatReasoningModeExtendedSubtitle">Analüütiliste ülesannete jaoks</string>
+
+    <!-- Start chat icon content description -->
+    <string name="duckChatStartChatContentDescription">Alusta vestlust</string>
+    <string name="duckChatStopStreamingContentDescription">Lõpeta genereerimine</string>
+
+    <!-- Image attachment -->
+    <string name="duckChatImageAttachmentRemoveContentDescription">Eemalda pilt</string>
+
+    <!-- Image attachment limits -->
+    <string name="duckChatImageAttachmentLimitPerMessage" instruction="%1$d is the maximum number of images allowed per message.">Korraga saad lisada ainult %1$d pilti.</string>
+    <string name="duckChatImageAttachmentLimitPerConversation" instruction="%1$d is the maximum number of images allowed in a single conversation.">Saad vestlusele lisada ainult %1$d pilti.</string>
+
+    <!-- File/image attachment menu options -->
+    <string name="attachmentTakePhoto">Tee pilt</string>
+    <string name="attachmentAttachPhoto">Lisa pilt</string>
+    <string name="attachmentAttachFile">Lisa fail</string>
+
+    <!-- File attachment -->
+    <string name="duckChatFileAttachmentRemoveContentDescription">Eemalda fail</string>
+    <string name="duckChatFileAttachmentLimitPerConversation" instruction="%1$d is the maximum number of files allowed in a single conversation.">Saad vestluse kohta lisada ainult %1$d faili.</string>
+    <string name="duckChatFileAttachmentTooLarge" instruction="%1$d is the maximum file size in MB.">Fail ületab maksimaalse suuruse %1$d MB.</string>
+    <string name="duckChatFileAttachmentTooManyPages" instruction="%1$d is the maximum number of pages per file.">Ühel lisatud failidest on rohkem lehekülgi, kui me toetame. Palun laadi üles failid, millel on %1$d lehekülge või vähem.</string>
+    <string name="duckChatFileAttachmentTotalSizeLimitExceeded" instruction="%1$d is the total size limit in MB.">Lisatud failid ületavad %1$d MB suuruse kogumahu piirangut.</string>
+    <string name="fileCaptureBrowseDisambiguationTitle">Laadi fail üles</string>
+
+    <!-- Options button -->
+    <string name="duckChatOptionsButtonContentDescription">Duck.ai valikud</string>
+    <string name="duckChatOptionsChipDismissContentDescription" instruction="%1$s is the name of the option being removed (e.g. Create Image).">Eemalda %1$s</string>
+    <string name="duckChatOptionsMenuCreateImage">Loo pilt</string>
+    <string name="duckChatOptionsMenuCreateImageSubtitle">Muuda tekst piltideks</string>
+    <string name="duckChatOptionsMenuWebSearch">Veebiotsing</string>
+    <string name="duckChatOptionsMenuWebSearchSubtitle">Vastused veebist</string>
+    <string name="duckChatOptionsMenuCustomizeResponses">Kohanda vastuseid</string>
+    <string name="duckChatOptionsMenuCustomizeResponsesSubtitle">Määra toon, pikkus ja käitumine</string>
+
+    <!-- Duck.ai header -->
+    <string name="duckChatPlusButtonContentDescription">Ava Duck.ai menüü</string>
+
+    <!-- Duck AI Duck.ai Section Header -->
+    <string name="duckAiDuckAiSectionHeader">Duck.ai</string>
+
+    <!-- Search Assist Visibility -->
+    <string name="duckAiSearchAssistVisibilityTitle">Search Assist</string>
+    <string name="duckAiSearchAssistSettingsTitle">Search Assist</string>
+
+    <!-- Settings -->
+    <string name="duckAiSettingsTitle">Duck.ai seaded</string>
 </resources>
