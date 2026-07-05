@@ -42,11 +42,9 @@ class NativeInputLayoutCoordinator(
     private var widgetAnimationFrameHandler: ((card: View) -> Unit)? = null
 
     /**
-     * While true, the [configureContentOffset] layout listener no-ops. Set by the manager
-     * around `animateEnter` / `animateExit` so the snapshot/setup phases of those animators
-     * (which briefly mutate the card's layoutParams before translation is applied) don't
-     * cause the content offset to snap to an intermediate state. During the actual animation,
-     * [onWidgetAnimationFrame] drives the offset from the animator's `onUpdate`.
+     * While true the [configureContentOffset] layout listener no-ops. Set by the manager around
+     * animateEnter/animateExit so their setup phase doesn't snap the offset to an intermediate state;
+     * [onWidgetAnimationFrame] drives the offset during the animation instead.
      */
     private var isWidgetAnimating: Boolean = false
 
@@ -178,12 +176,17 @@ class NativeInputLayoutCoordinator(
         if (targets.isEmpty()) return
         val anchor = widgetView.findViewById(R.id.inputModeWidgetCard) ?: widgetView
 
-        // Resolved once here instead of per call inside isLogoOnlyContent: that runs from the global
-        // layout listener below on every window layout pass, and findViewById walks the tree each
-        // time. These views inflate alongside newTabContent, so caching the references is safe;
-        // their live visibility/height are still read on each pass.
+        // Cached once: isLogoOnlyContent runs on every layout pass and findViewById walks the tree.
+        // Safe to cache (they inflate with newTabContent); live visibility/height are read each pass.
         val ddgLogoView = rootView.findViewById<View?>(R.id.ddgLogo)
         val returnHatchView = rootView.findViewById<View?>(R.id.newTabReturnHatchView)
+        // NTP content that renders above the logo and must clear the widget. Checked by height, not
+        // visibility: these containers stay attached and collapse to zero height when empty.
+        val nonLogoContentViews = listOfNotNull(
+            rootView.findViewById(R.id.appTrackingProtectionStateView),
+            rootView.findViewById(R.id.indonesiaNewTabSectionView),
+            rootView.findViewById(R.id.messageCta),
+        )
         // Onboarding CTA bubbles live inside newTabContent and must clear the widget, so a visible
         // one overrides the logo-only suppression below.
         val onboardingCtaViews = listOfNotNull(
@@ -191,11 +194,9 @@ class NativeInputLayoutCoordinator(
             rootView.findViewById(R.id.includeOnboardingDaxDialogBubble),
         )
 
-        // Animate child reflows when the widget toggles Search ↔ DuckAI changes our padding.
-        // The transition is staged here but only assigned to the parent once the enter animation
-        // completes (see enableContentLayoutTransition). Otherwise the per-frame setPadding
-        // calls during the enter animation would each spawn a fresh CHANGING animator and the
-        // content would visibly lag behind the widget growth.
+        // Animate content reflow when the widget toggles Search ↔ DuckAI. Staged here but only assigned
+        // once the enter animation completes (enableContentLayoutTransition); otherwise per-frame
+        // setPadding during the enter would spawn CHANGING animators and the content would lag the widget.
         val ntpGroup = newTabContent as? ViewGroup
         val previousNtpTransition = ntpGroup?.layoutTransition
         if (ntpGroup != null) {
@@ -227,7 +228,8 @@ class NativeInputLayoutCoordinator(
             val logoVisible = ddgLogoView?.visibility == View.VISIBLE
             val hatchHeightPx = returnHatchView?.height ?: 0
             val onboardingCtaVisible = onboardingCtaViews.any { it.isVisible }
-            return isLogoOnly(logoVisible, hatchHeightPx, onboardingCtaVisible)
+            val sectionsVisible = nonLogoContentViews.any { it.isVisible && it.height > 0 }
+            return isLogoOnly(logoVisible, hatchHeightPx, onboardingCtaVisible, sectionsVisible)
         }
 
         fun computeDeltaTop(view: View, anchorBottomInWindow: Int): Int {
@@ -261,12 +263,9 @@ class NativeInputLayoutCoordinator(
             applyOffsetWithBottom(anchorTopInWindow = anchorLocation[1], anchorBottomInWindow = anchorBottomInWindow)
         }
 
-        // Called from the enter/exit animators' onUpdate, BEFORE the layout pass that
-        // processes the new card layoutParams. We project the card's current visual bottom
-        // from the values the animator has just written (layoutParams + translation), so the
-        // setPadding here and the card's own requestLayout coalesce into the same
-        // measure/layout pass — content tracks the widget's growth/shrinkage in the same
-        // frame instead of lagging by one.
+        // Called from the animators' onUpdate before the layout pass. Projects the card's visual bottom
+        // from the values the animator just wrote (layoutParams + translation) so this setPadding and the
+        // card's requestLayout coalesce into one pass — content tracks the widget in the same frame.
         widgetAnimationFrameHandler = lambda@{ card ->
             if (!widgetView.isShown) return@lambda
             val parent = card.parent as? View ?: return@lambda
@@ -292,15 +291,10 @@ class NativeInputLayoutCoordinator(
         widgetView.addOnLayoutChangeListener(layoutListener)
         rootView.addOnLayoutChangeListener(layoutListener)
 
-        // Several inputs to the offset change asynchronously without moving rootView/widgetView —
-        // the return hatch showing/hiding (its height feeds isLogoOnlyContent), the logo's
-        // visibility, and NTP content reflow shifting the content's window position. The per-view
-        // OnLayoutChange listeners above don't fire for those, so we need a post-layout signal that
-        // covers the whole NTP. viewTreeObserver is the window-shared one, so this fires on every
-        // global layout pass (keyboard, scroll, etc.); that breadth is deliberate — a listener
-        // scoped to just the hatch misses the logo/content cases and fires mid-layout with stale
-        // sibling positions. Kept cheap: skipped while animating (isWidgetAnimating), a no-op when
-        // padding is unchanged (applyPadding), and the lookups it needs are cached above.
+        // Some offset inputs change without moving rootView/widgetView (hatch height, logo visibility,
+        // NTP reflow), which the per-view listeners miss. The window-shared viewTreeObserver fires on
+        // every global layout pass — broad by design; kept cheap via the isWidgetAnimating skip and
+        // no-op applyPadding.
         val ntpContentView = newTabContent?.takeIf { !isBottom }
         val globalLayoutListener =
             ViewTreeObserver.OnGlobalLayoutListener {
@@ -375,17 +369,12 @@ class NativeInputLayoutCoordinator(
 }
 
 /**
- * Whether the new-tab page's only content is the dax logo. When true the content is NOT offset below
- * the input widget (it stays centered), so the logo keeps a fixed vertical position regardless of the
- * widget's height — otherwise it would sit lower on the Duck.ai tab (whose widget is taller than
- * Search's) and appear to shift when switching tabs.
+ * Whether the new-tab page shows only the dax logo. When true the content is NOT offset below the widget
+ * so the logo stays centered (otherwise it shifts between Search and the taller Duck.ai tab).
  *
- * A real return-hatch is detected via [hatchHeightPx] rather than visibility: the NewTabReturnHatchView
- * container is always VISIBLE and merely collapses to zero height when no hatch is shown (its inner
- * content is what's toggled), so a visibility check would always report "hatch present" and defeat
- * this guard.
- *
- * [onboardingCtaVisible] forces a non-logo-only result: a CTA bubble must be offset clear of the widget.
+ * [hatchHeightPx] is used instead of hatch visibility: the container is always VISIBLE and only collapses
+ * to zero height when no hatch is shown. [onboardingCtaVisible]/[sectionsVisible] force a non-logo-only
+ * result — a CTA bubble or a section above the logo (AppTP banner, RMF, Indonesia message) must clear the widget.
  */
-internal fun isLogoOnly(logoVisible: Boolean, hatchHeightPx: Int, onboardingCtaVisible: Boolean): Boolean =
-    logoVisible && hatchHeightPx <= 0 && !onboardingCtaVisible
+internal fun isLogoOnly(logoVisible: Boolean, hatchHeightPx: Int, onboardingCtaVisible: Boolean, sectionsVisible: Boolean): Boolean =
+    logoVisible && hatchHeightPx <= 0 && !onboardingCtaVisible && !sectionsVisible
