@@ -64,6 +64,7 @@ import com.duckduckgo.app.browser.logindetection.WebNavigationEvent
 import com.duckduckgo.app.browser.mediaplayback.MediaPlayback
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.navigation.safeCopyBackForwardList
+import com.duckduckgo.app.browser.pageload.PageLoadTraceMarker
 import com.duckduckgo.app.browser.pageload.PageLoadWideEvent
 import com.duckduckgo.app.browser.pageloadpixel.PageLoadedHandler
 import com.duckduckgo.app.browser.pageloadpixel.firstpaint.PagePaintedHandler
@@ -147,11 +148,8 @@ class BrowserWebViewClient @Inject constructor(
     private var pageCommitVisibleFired: Boolean = false
     private var recompositeScheduled: Boolean = false
 
-    // POC: unique cookie per main-frame page load for the ddg.pageLoad async trace section
-    // (begin in onPageStarted, end in onPageFinished). Unique cookies avoid begin/end mispairing
-    // across successive loads (a constant cookie produced degenerate/negative-duration slices).
-    private var pageLoadTraceCookie: Int? = null
-    private var pageLoadCookieSeq: Int = 0
+    // Brackets each main-frame page load with the ddg.pageLoad async trace section (see PageLoadTraceMarker).
+    private val pageLoadTraceMarker = PageLoadTraceMarker()
 
     private val isAppSchemeInterceptionEnabled = AtomicBoolean(true)
     private val isForceRecompositeEnabled = AtomicBoolean(true)
@@ -531,18 +529,7 @@ class BrowserWebViewClient @Inject constructor(
         lastInterceptedAppSchemeUrl = null
 
         url?.let {
-            // See https://app.asana.com/0/0/1206159443951489/f (WebView limitations)
-            if (it.startsWith("http://") || it.startsWith("https://")) {
-                // POC: bracket each main-frame page load with a ddg.pageLoad async section.
-                // Only real http(s) navigations are instrumented (skips about:blank / new-tab /
-                // duck:// etc.), and any section left open by a previous non-completing load is
-                // closed first — so this navigation always begins a fresh, correctly-paired section
-                // and the latch can't get stuck (which previously dropped measurements).
-                pageLoadTraceCookie?.let { open -> androidx.tracing.Trace.endAsyncSection("ddg.pageLoad", open) }
-                val cookie = pageLoadCookieSeq++
-                pageLoadTraceCookie = cookie
-                androidx.tracing.Trace.beginAsyncSection("ddg.pageLoad", cookie)
-            }
+            pageLoadTraceMarker.onPageStarted(it)
             if (it != ABOUT_BLANK && start == null) {
                 start = currentTimeProvider.elapsedRealtime()
                 webViewClientListener?.getCurrentTabId()?.let { tabId ->
@@ -639,13 +626,7 @@ class BrowserWebViewClient @Inject constructor(
 
         // See https://app.asana.com/0/0/1206159443951489/f (WebView limitations)
         if (webView.progress == 100) {
-            if (url != null && url != ABOUT_BLANK) {
-                // POC: close the page-load trace section opened in onPageStarted.
-                pageLoadTraceCookie?.let { cookie ->
-                    androidx.tracing.Trace.endAsyncSection("ddg.pageLoad", cookie)
-                    pageLoadTraceCookie = null
-                }
-            }
+            pageLoadTraceMarker.onPageFinished(url, webView.progress)
             // Without onPageCommitVisible a recycled WebView keeps drawing the previous
             // navigation's frame until a re-composite. Only worth doing for a foreground tab.
             // onPageFinished can fire more than once per load (redirects, subframes), so latch
