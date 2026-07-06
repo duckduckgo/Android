@@ -1,6 +1,6 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
-    "version": 1652275711516,
+    "version": 90000000000001,
     "features": {
         "ampLinks": {
             "exceptions": [
@@ -79,6 +79,10 @@
                 {
                     "domain": "concursolutions.com",
                     "reason": "blank page during opt-out"
+                },
+                {
+                    "domain": "as.com",
+                    "reason": "blank area while scrolling"
                 }
             ],
             "settings": {
@@ -150,6 +154,10 @@
                 {
                     "domain": "danmurphys.com.au",
                     "reason": "Site not displaying"
+                },
+                {
+                    "domain": "autojournal.fr",
+                    "reason": "Blank ad spaces"
                 }
             ]
         },
