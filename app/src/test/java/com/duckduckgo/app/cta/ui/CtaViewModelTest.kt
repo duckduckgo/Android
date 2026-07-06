@@ -1783,6 +1783,7 @@ class CtaViewModelTest {
             true,
             mockDeviceInfo,
             onboardingImprovementsEnabled = false,
+            onboardingImprovementsV2Enabled = true,
         )
 
         testee.onContextualSearchSubmitted(cta, "custom")
@@ -1807,6 +1808,7 @@ class CtaViewModelTest {
             true,
             mockDeviceInfo,
             onboardingImprovementsEnabled = false,
+            onboardingImprovementsV2Enabled = true,
         )
 
         testee.onUserDismissedCta(cta)
@@ -1997,6 +1999,7 @@ class CtaViewModelTest {
         isCustomAiOnboardingFlow = false,
         isFreeTrialCopy = false,
         onboardingImprovementsEnabled = false,
+        onboardingImprovementsV2Enabled = true,
     )
 
     private fun daxEndBrandDesignUpdateBubbleCta() = DaxEndBrandDesignUpdateBubbleCta(
@@ -2005,6 +2008,7 @@ class CtaViewModelTest {
         isLightTheme = true,
         deviceInfo = mockDeviceInfo,
         onboardingImprovementsEnabled = false,
+        onboardingImprovementsV2Enabled = true,
         isOmnibarBottom = false,
     )
 
@@ -2014,5 +2018,6 @@ class CtaViewModelTest {
         isLightTheme = true,
         deviceInfo = mockDeviceInfo,
         isCustomAiOnboardingFlow = false,
+        onboardingImprovementsV2Enabled = true,
     )
 }
