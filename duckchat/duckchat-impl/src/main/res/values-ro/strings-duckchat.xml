@@ -200,4 +200,68 @@
     <string name="duck_ai_chat_history_download_view">Afișează</string>
     <string name="duck_ai_chat_history_download_error">Nu s-a putut exporta chatul</string>
     <string name="duck_ai_chat_history_bulk_download_error">Nu s-au putut exporta chaturile</string>
+
+    <string name="duckAiChatSearchDuckDuckGo">Caută pe DuckDuckGo</string>
+    <string name="native_input_chat_hint">Întreabă orice în mod privat…</string>
+    <string name="native_input_chat_duck_mode_hint">Răspunde…</string>
+
+    <!-- Model Picker -->
+    <string name="duckAiModelPickerPlusModels">Plus</string>
+    <string name="duckAiModelPickerProModels">Pro</string>
+
+    <!-- Reasoning Mode Picker -->
+    <string name="duckChatReasoningModeContentDescription">Modul de raționament</string>
+    <string name="duckChatReasoningModeFastTitle">Rapid</string>
+    <string name="duckChatReasoningModeFastSubtitle">Răspunde rapid</string>
+    <string name="duckChatReasoningModeReasoningTitle">Raționament</string>
+    <string name="duckChatReasoningModeReasoningSubtitle">Pentru sarcini complexe</string>
+    <string name="duckChatReasoningModeExtendedTitle">Raționament extins</string>
+    <string name="duckChatReasoningModeExtendedSubtitle">Pentru sarcini analitice</string>
+
+    <!-- Start chat icon content description -->
+    <string name="duckChatStartChatContentDescription">Pornește chatul</string>
+    <string name="duckChatStopStreamingContentDescription">Oprește generarea</string>
+
+    <!-- Image attachment -->
+    <string name="duckChatImageAttachmentRemoveContentDescription">Șterge imaginea</string>
+
+    <!-- Image attachment limits -->
+    <string name="duckChatImageAttachmentLimitPerMessage" instruction="%1$d is the maximum number of images allowed per message.">Poți atașa doar %1$d imagini odată.</string>
+    <string name="duckChatImageAttachmentLimitPerConversation" instruction="%1$d is the maximum number of images allowed in a single conversation.">Poți atașa doar %1$d imagini per conversație.</string>
+
+    <!-- File/image attachment menu options -->
+    <string name="attachmentTakePhoto">Fă o fotografie</string>
+    <string name="attachmentAttachPhoto">Adaugă imagine</string>
+    <string name="attachmentAttachFile">Adaugă fișier</string>
+
+    <!-- File attachment -->
+    <string name="duckChatFileAttachmentRemoveContentDescription">Elimină fișierul</string>
+    <string name="duckChatFileAttachmentLimitPerConversation" instruction="%1$d is the maximum number of files allowed in a single conversation.">Poți atașa doar %1$d fișiere per conversație.</string>
+    <string name="duckChatFileAttachmentTooLarge" instruction="%1$d is the maximum file size in MB.">Fișierul depășește dimensiunea maximă de %1$d MB.</string>
+    <string name="duckChatFileAttachmentTooManyPages" instruction="%1$d is the maximum number of pages per file.">Unul dintre fișierele atașate are mai multe pagini decât acceptăm. Încarcă fișiere cu %1$d pagini sau mai puține.</string>
+    <string name="duckChatFileAttachmentTotalSizeLimitExceeded" instruction="%1$d is the total size limit in MB.">Fișierele atașate depășesc limita totală de %1$d MB.</string>
+    <string name="fileCaptureBrowseDisambiguationTitle">Încarcă un fișier</string>
+
+    <!-- Options button -->
+    <string name="duckChatOptionsButtonContentDescription">Opțiuni Duck.ai</string>
+    <string name="duckChatOptionsChipDismissContentDescription" instruction="%1$s is the name of the option being removed (e.g. Create Image).">Elimină %1$s</string>
+    <string name="duckChatOptionsMenuCreateImage">Creează imaginea</string>
+    <string name="duckChatOptionsMenuCreateImageSubtitle">Transformă textul în imagini</string>
+    <string name="duckChatOptionsMenuWebSearch">Căutare pe web</string>
+    <string name="duckChatOptionsMenuWebSearchSubtitle">Obține răspunsuri de pe web</string>
+    <string name="duckChatOptionsMenuCustomizeResponses">Personalizează răspunsurile</string>
+    <string name="duckChatOptionsMenuCustomizeResponsesSubtitle">Setează tonul, durata și comportamentul</string>
+
+    <!-- Duck.ai header -->
+    <string name="duckChatPlusButtonContentDescription">Deschide meniul Duck.ai</string>
+
+    <!-- Duck AI Duck.ai Section Header -->
+    <string name="duckAiDuckAiSectionHeader">Duck.ai</string>
+
+    <!-- Search Assist Visibility -->
+    <string name="duckAiSearchAssistVisibilityTitle">Search Assist</string>
+    <string name="duckAiSearchAssistSettingsTitle">Search Assist</string>
+
+    <!-- Settings -->
+    <string name="duckAiSettingsTitle">Setări Duck.ai</string>
 </resources>
