@@ -532,8 +532,13 @@ class BrowserWebViewClient @Inject constructor(
 
         url?.let {
             // See https://app.asana.com/0/0/1206159443951489/f (WebView limitations)
-            if (it != ABOUT_BLANK && pageLoadTraceCookie == null) {
-                // POC: begin the page-load trace section (unique cookie per load; ends in onPageFinished).
+            if (it.startsWith("http://") || it.startsWith("https://")) {
+                // POC: bracket each main-frame page load with a ddg.pageLoad async section.
+                // Only real http(s) navigations are instrumented (skips about:blank / new-tab /
+                // duck:// etc.), and any section left open by a previous non-completing load is
+                // closed first — so this navigation always begins a fresh, correctly-paired section
+                // and the latch can't get stuck (which previously dropped measurements).
+                pageLoadTraceCookie?.let { open -> androidx.tracing.Trace.endAsyncSection("ddg.pageLoad", open) }
                 val cookie = pageLoadCookieSeq++
                 pageLoadTraceCookie = cookie
                 androidx.tracing.Trace.beginAsyncSection("ddg.pageLoad", cookie)
