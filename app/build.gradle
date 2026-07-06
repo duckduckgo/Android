@@ -197,6 +197,8 @@ android {
         animationsDisabled = true
         unitTests.all {
             jvmArgs '-XX:+TieredCompilation', '-XX:TieredStopAtLevel=1'
+            maxHeapSize = "2g"
+            forkEvery = 100
         }
     }
 
