@@ -369,5 +369,183 @@
                 "enum": ["search_plus_duckai-search", "search_plus_duckai-chat"]
             }
         ]
+    },
+    "onboarding_search": {
+        "description": "Contextual onboarding search step. shown when the try-a-search DAX bubble is displayed; clicked with value suggested/custom when the user submits a query, or dismiss when the user closes the bubble via the close button. Unique once per user per event.",
+        "owners": ["catalinradoiu"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "e",
+                "type": "string",
+                "description": "Event type for the onboarding instrumentation standard",
+                "enum": ["shown", "clicked"]
+            },
+            { "key": "it", "type": "string", "description": "Install type", "enum": ["new", "reinstall"] },
+            {
+                "key": "d",
+                "type": "integer",
+                "description": "Days since install (0-28). Omitted when more than 28 days have passed since install."
+            },
+            { "key": "flow", "type": "string", "description": "Onboarding flow type", "enum": ["default", "duckai"] },
+            { "key": "pixelSource", "type": "string", "description": "Device form factor", "enum": ["phone", "tablet"] },
+            {
+                "key": "value",
+                "type": "string",
+                "description": "Only set when e=clicked. Whether the query came from a suggestion or was typed, or dismiss if closed via the close button.",
+                "enum": ["suggested", "custom", "dismiss"]
+            }
+        ]
+    },
+    "onboarding_search-results": {
+        "description": "Contextual onboarding search-results step. shown when the SERP contextual DAX dialog is displayed; clicked engage when the user taps Got it, dismiss when the user closes. Unique once per user per (event, value).",
+        "owners": ["catalinradoiu"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "e",
+                "type": "string",
+                "description": "Event type for the onboarding instrumentation standard",
+                "enum": ["shown", "clicked"]
+            },
+            { "key": "it", "type": "string", "description": "Install type", "enum": ["new", "reinstall"] },
+            {
+                "key": "d",
+                "type": "integer",
+                "description": "Days since install (0-28). Omitted when more than 28 days have passed since install."
+            },
+            { "key": "flow", "type": "string", "description": "Onboarding flow type", "enum": ["default", "duckai"] },
+            { "key": "pixelSource", "type": "string", "description": "Device form factor", "enum": ["phone", "tablet"] },
+            { "key": "value", "type": "string", "description": "Only set when e=clicked.", "enum": ["engage", "dismiss"] }
+        ]
+    },
+    "onboarding_visit-site": {
+        "description": "Contextual onboarding visit-site step. shown when the visit-site suggestions DAX bubble is displayed; clicked with value suggested/custom when the user submits a query, or dismiss when the user closes the bubble via the close button. Unique once per user per event.",
+        "owners": ["catalinradoiu"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "e",
+                "type": "string",
+                "description": "Event type for the onboarding instrumentation standard",
+                "enum": ["shown", "clicked"]
+            },
+            { "key": "it", "type": "string", "description": "Install type", "enum": ["new", "reinstall"] },
+            {
+                "key": "d",
+                "type": "integer",
+                "description": "Days since install (0-28). Omitted when more than 28 days have passed since install."
+            },
+            { "key": "flow", "type": "string", "description": "Onboarding flow type", "enum": ["default", "duckai"] },
+            { "key": "pixelSource", "type": "string", "description": "Device form factor", "enum": ["phone", "tablet"] },
+            {
+                "key": "value",
+                "type": "string",
+                "description": "Only set when e=clicked. Whether the query came from a suggestion or was typed, or dismiss if closed via the close button.",
+                "enum": ["suggested", "custom", "dismiss"]
+            }
+        ]
+    },
+    "onboarding_trackers-blocked": {
+        "description": "Contextual onboarding trackers-blocked step. shown when any tracker-related DAX dialog is displayed (trackers found, main network, or no trackers); clicked engage when the user taps Got it, dismiss when the user closes. Unique once per user per (event, value).",
+        "owners": ["catalinradoiu"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "e",
+                "type": "string",
+                "description": "Event type for the onboarding instrumentation standard",
+                "enum": ["shown", "clicked"]
+            },
+            { "key": "it", "type": "string", "description": "Install type", "enum": ["new", "reinstall"] },
+            {
+                "key": "d",
+                "type": "integer",
+                "description": "Days since install (0-28). Omitted when more than 28 days have passed since install."
+            },
+            { "key": "flow", "type": "string", "description": "Onboarding flow type", "enum": ["default", "duckai"] },
+            { "key": "pixelSource", "type": "string", "description": "Device form factor", "enum": ["phone", "tablet"] },
+            { "key": "value", "type": "string", "description": "Only set when e=clicked.", "enum": ["engage", "dismiss"] }
+        ]
+    },
+    "onboarding_fire-button": {
+        "description": "Contextual onboarding fire-button step. shown when the fire-button DAX dialog is displayed; clicked engage when the user taps the fire button (via Got it or the toolbar fire icon), dismiss when the user closes. Unique once per user per (event, value).",
+        "owners": ["catalinradoiu"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "e",
+                "type": "string",
+                "description": "Event type for the onboarding instrumentation standard",
+                "enum": ["shown", "clicked"]
+            },
+            { "key": "it", "type": "string", "description": "Install type", "enum": ["new", "reinstall"] },
+            {
+                "key": "d",
+                "type": "integer",
+                "description": "Days since install (0-28). Omitted when more than 28 days have passed since install."
+            },
+            { "key": "flow", "type": "string", "description": "Onboarding flow type", "enum": ["default", "duckai"] },
+            { "key": "pixelSource", "type": "string", "description": "Device form factor", "enum": ["phone", "tablet"] },
+            { "key": "value", "type": "string", "description": "Only set when e=clicked.", "enum": ["engage", "dismiss"] }
+        ]
+    },
+    "onboarding_end": {
+        "description": "Contextual onboarding end step. shown when the final DAX bubble/dialog is displayed; clicked engage when the user taps the primary CTA, dismiss when the user closes. Unique once per user per (event, value).",
+        "owners": ["catalinradoiu"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "e",
+                "type": "string",
+                "description": "Event type for the onboarding instrumentation standard",
+                "enum": ["shown", "clicked"]
+            },
+            { "key": "it", "type": "string", "description": "Install type", "enum": ["new", "reinstall"] },
+            {
+                "key": "d",
+                "type": "integer",
+                "description": "Days since install (0-28). Omitted when more than 28 days have passed since install."
+            },
+            { "key": "flow", "type": "string", "description": "Onboarding flow type", "enum": ["default", "duckai"] },
+            { "key": "pixelSource", "type": "string", "description": "Device form factor", "enum": ["phone", "tablet"] },
+            { "key": "value", "type": "string", "description": "Only set when e=clicked.", "enum": ["engage", "dismiss"] }
+        ]
+    },
+    "onboarding_subscription-promo": {
+        "description": "Contextual onboarding subscription-promo step. shown when the Privacy Pro DAX bubble is displayed; clicked engage when the user taps the primary CTA, dismiss when the user closes. Unique once per user per (event, value).",
+        "owners": ["catalinradoiu"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "e",
+                "type": "string",
+                "description": "Event type for the onboarding instrumentation standard",
+                "enum": ["shown", "clicked"]
+            },
+            { "key": "it", "type": "string", "description": "Install type", "enum": ["new", "reinstall"] },
+            {
+                "key": "d",
+                "type": "integer",
+                "description": "Days since install (0-28). Omitted when more than 28 days have passed since install."
+            },
+            { "key": "flow", "type": "string", "description": "Onboarding flow type", "enum": ["default", "duckai"] },
+            { "key": "pixelSource", "type": "string", "description": "Device form factor", "enum": ["phone", "tablet"] },
+            { "key": "value", "type": "string", "description": "Only set when e=clicked.", "enum": ["engage", "dismiss"] }
+        ]
     }
 }

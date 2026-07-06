@@ -136,6 +136,7 @@ class OnboardingDaxDialogTests {
                 whenever(state).thenReturn(MutableStateFlow(LinearOnboardingState.NotStarted))
             },
             mock(DuckAiFeatureState::class.java).also { whenever(it.showInputScreen).thenReturn(MutableStateFlow(true)) },
+            mock(),
         )
     }
 

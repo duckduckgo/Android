@@ -1694,6 +1694,7 @@ class BrowserTabFragment :
 
     private fun onOmnibarPrivacyShieldButtonPressed() {
         contentScopeScripts.sendSubscriptionEvent(createBreakageReportingEventData())
+        viewModel.onPrivacyShieldSelected()
         launchPrivacyDashboard(toggle = false)
     }
 

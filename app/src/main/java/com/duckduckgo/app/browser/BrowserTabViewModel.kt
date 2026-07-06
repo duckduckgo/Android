@@ -1513,6 +1513,10 @@ class BrowserTabViewModel @Inject constructor(
             }
         }
 
+        if (cta != null) {
+            ctaViewModel.onContextualSearchSubmitted(cta, query)
+        }
+
         command.value = HideKeyboard
         val trimmedInput = query.trim()
 
@@ -5288,6 +5292,10 @@ class BrowserTabViewModel @Inject constructor(
         }
         val cta = currentCtaViewState().cta
 
+        if (cta != null) {
+            ctaViewModel.onContextualFireButtonEngaged(cta)
+        }
+
         // Defer cleanup (CTA dismiss, highlight removal) until the fire action actually completes.
         if (cta is OnboardingDaxDialogCta.DaxDuckAiFireButtonCta || cta is DaxDuckAiFireButtonBrandDesignUpdateContextualCta) {
             return
@@ -5312,8 +5320,15 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
+    fun onPrivacyShieldSelected() {
+        currentCtaViewState().cta?.let { ctaViewModel.onContextualTrackersBlockedShieldEngaged(it) }
+    }
+
     override fun onShouldOverride() {
         val cta = currentCtaViewState().cta
+        if (cta != null) {
+            ctaViewModel.onContextualSiteLinkTapped(cta)
+        }
         if (cta is OnboardingDaxDialogCta) {
             onDismissOnboardingDaxDialog(cta)
         }
