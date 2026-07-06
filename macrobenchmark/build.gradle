@@ -17,6 +17,10 @@ android {
         targetSdk target_sdk
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
+        // We knowingly benchmark on virtual/emulator devices for v1 (noise accepted, Phase 0 gates it);
+        // macrobenchmark hard-blocks on emulators unless this error is suppressed.
+        testInstrumentationRunnerArguments["androidx.benchmark.suppressErrors"] = "EMULATOR"
+
         // :app declares a `store` flavor dimension; target the `internal` flavor.
         missingDimensionStrategy "store", "internal"
     }
@@ -59,6 +63,4 @@ dependencies {
     implementation "androidx.test.espresso:espresso-core:3.6.1"
     implementation "androidx.test.uiautomator:uiautomator:2.3.0"
     implementation "androidx.benchmark:benchmark-macro-junit4:1.3.4"
-    // Serves the deterministic synthetic page for the page-load benchmark.
-    implementation "com.squareup.okhttp3:mockwebserver:4.12.0"
 }

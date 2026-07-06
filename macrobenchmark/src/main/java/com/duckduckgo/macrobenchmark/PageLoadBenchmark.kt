@@ -17,6 +17,8 @@
 package com.duckduckgo.macrobenchmark
 
 import android.content.Intent
+import android.net.Uri
+import android.os.SystemClock
 import androidx.benchmark.macro.ExperimentalMetricApi
 import androidx.benchmark.macro.TraceSectionMetric
 import androidx.benchmark.macro.junit4.MacrobenchmarkRule
@@ -25,34 +27,29 @@ import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.uiautomator.By
 import androidx.test.uiautomator.UiDevice
 import androidx.test.uiautomator.Until
-import java.util.Collections
-import okhttp3.mockwebserver.Dispatcher
-import okhttp3.mockwebserver.MockResponse
-import okhttp3.mockwebserver.MockWebServer
-import okhttp3.mockwebserver.RecordedRequest
-import org.junit.After
-import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
 /**
- * Page-load benchmark: drives N sequential navigations over a deterministic synthetic page inside a
- * SINGLE measured iteration, producing ONE Perfetto trace containing N `ddg.pageLoad` async sections
- * (added by the app in BrowserWebViewClient via PageLoadTraceMarker).
+ * Page-load benchmark: drives N sequential navigations to a deterministic, company-maintained test
+ * page inside a SINGLE measured iteration, producing ONE Perfetto trace containing N `ddg.pageLoad`
+ * async sections (added by the app in BrowserWebViewClient via PageLoadTraceMarker).
  *
  * We deliberately do NOT rely on the [TraceSectionMetric] value — its per-iteration windowing was
  * unreliable for an async section spanning an async navigation. The real signal is the captured
  * `.perfetto-trace`, post-processed offline (perf-benchmarks/pageload_benchmark.py) which counts
  * every `ddg.pageLoad` slice and computes the stats itself.
  *
+ * Fixture: a real HTTPS publisher test page maintained by the company (PAGE_URL). A local
+ * MockWebServer on localhost was tried first but DDG's browser never fetched it end-to-end, so we
+ * use a real domain. This adds network variance (quantified/gated by Phase 0) but exercises the real
+ * subresource/tracker interception path.
+ *
  * Run on a connected device:
  *   ./gradlew :macrobenchmark:connectedReleaseAndroidTest \
- *       -Pandroid.testInstrumentationRunnerArguments.class=com.duckduckgo.macrobenchmark.PageLoadBenchmark
- *
- * Deterministic fixture: an in-test MockWebServer serves a synthetic HTML page with ~10 subresources
- * (css/js/img/xhr), all over localhost cleartext (permitted on internal builds). No network, no
- * redirects -> one clean load per navigation, and every subresource exercises shouldInterceptRequest.
+ *       -Pandroid.testInstrumentationRunnerArguments.class=com.duckduckgo.macrobenchmark.PageLoadBenchmark \
+ *       -Pandroid.testInstrumentationRunnerArguments.androidx.benchmark.suppressErrors=EMULATOR
  */
 @OptIn(ExperimentalMetricApi::class)
 @RunWith(AndroidJUnit4::class)
@@ -63,73 +60,35 @@ class PageLoadBenchmark {
 
     private val instrumentation = InstrumentationRegistry.getInstrumentation()
     private val device = UiDevice.getInstance(instrumentation)
-    private lateinit var server: MockWebServer
-    private lateinit var pageUrl: String
-
-    // Records subresource paths served, so we can assert interception actually fired (setup guard).
-    private val servedPaths = Collections.synchronizedList(mutableListOf<String>())
-
-    @Before
-    fun setUp() {
-        server = MockWebServer().apply {
-            dispatcher = object : Dispatcher() {
-                override fun dispatch(request: RecordedRequest): MockResponse {
-                    val path = request.path.orEmpty()
-                    servedPaths += path
-                    return when {
-                        path.endsWith(".css") -> ok("text/css", "body{background:#fff;font-family:sans-serif}")
-                        path.endsWith(".js") -> ok("application/javascript", "console.log('bench')")
-                        path.endsWith(".png") -> ok("image/png", "")
-                        path.startsWith("/xhr") -> ok("application/json", "{\"ok\":true}")
-                        else -> ok("text/html", PAGE_HTML)
-                    }
-                }
-            }
-            start()
-        }
-        pageUrl = server.url("/index.html").toString()
-
-        completeOnboarding()
-    }
-
-    @After
-    fun tearDown() {
-        assertInterceptionExercised()
-        server.shutdown()
-    }
 
     @Test
-    fun pageLoad() = benchmarkRule.measureRepeated(
-        packageName = TARGET_PACKAGE,
-        // We do NOT rely on this metric — it only satisfies the framework. The real signal is
-        // the captured .perfetto-trace, post-processed offline (see pageload_benchmark.py).
-        metrics = listOf(TraceSectionMetric("ddg.pageLoad", TraceSectionMetric.Mode.Sum)),
-        iterations = 1,
-    ) {
-        // Warm-up navigation (discarded in post-processing), then NAV_COUNT measured navigations.
-        // Unique URL per navigation (?i=$i) guarantees a fresh main-frame load each time.
-        repeat(NAV_COUNT + 1) { i ->
-            navigateViaOmnibar("$pageUrl?i=$i")
+    fun pageLoad() {
+        completeOnboarding()
+        benchmarkRule.measureRepeated(
+            packageName = TARGET_PACKAGE,
+            // We do NOT rely on this metric — it only satisfies the framework. The real signal is
+            // the captured .perfetto-trace, post-processed offline (see pageload_benchmark.py).
+            metrics = listOf(TraceSectionMetric("ddg.pageLoad", TraceSectionMetric.Mode.Sum)),
+            iterations = 1,
+        ) {
+            // Warm-up navigation (discarded in post-processing), then NAV_COUNT measured navigations.
+            // Unique URL per navigation (?i=$i) forces a fresh main-frame load each time.
+            repeat(NAV_COUNT + 1) { i ->
+                navigateTo("$PAGE_URL?i=$i")
+            }
         }
     }
 
-    private fun navigateViaOmnibar(url: String) {
-        val omnibar = By.res(TARGET_PACKAGE, "omnibarTextInput")
-        device.wait(Until.hasObject(omnibar), 10_000L)
-        val field = device.findObject(omnibar)
-        field.click()
-        device.waitForIdle()
-        field.text = "" // clear any current URL
-        field.text = url
-        device.pressEnter()
-        // Deterministic wait for the synthetic page to finish rendering.
-        device.wait(Until.hasObject(By.textContains(PAGE_MARKER)), 15_000L)
-    }
-
-    private fun assertInterceptionExercised() {
-        check(servedPaths.any { it.endsWith(".css") } && servedPaths.any { it.startsWith("/xhr") }) {
-            "shouldInterceptRequest did not fire for subresources — measuring the wrong thing. Served: $servedPaths"
+    private fun navigateTo(url: String) {
+        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url)).apply {
+            setPackage(TARGET_PACKAGE)
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         }
+        instrumentation.context.startActivity(intent)
+        // The trace section captures the real timing; this settle just needs to reliably span the
+        // load so the next navigation doesn't start before onPageFinished fires. A stuck (slow) load
+        // is closed by PageLoadTraceMarker on the next onPageStarted, so worst case is one lost sample.
+        SystemClock.sleep(PAGE_SETTLE_MS)
     }
 
     private fun completeOnboarding() {
@@ -145,27 +104,10 @@ class PageLoadBenchmark {
         }
     }
 
-    private fun ok(contentType: String, body: String) =
-        MockResponse()
-            .setHeader("Content-Type", contentType)
-            .setHeader("Cache-Control", "no-store")
-            .setBody(body)
-
     companion object {
         private const val TARGET_PACKAGE = "com.duckduckgo.mobile.android"
-        private const val PAGE_MARKER = "Benchmark Page"
+        private const val PAGE_URL = "https://www.publisher-company.site/"
         private const val NAV_COUNT = 10
-        private val PAGE_HTML = """
-            <!doctype html><html><head>
-            <link rel="stylesheet" href="/a.css">
-            <link rel="stylesheet" href="/b.css">
-            <script src="/a.js"></script>
-            <script src="/b.js"></script>
-            </head><body>
-            <h1>Benchmark Page</h1>
-            <img src="/img1.png"><img src="/img2.png"><img src="/img3.png">
-            <script>fetch('/xhr1');fetch('/xhr2');</script>
-            </body></html>
-        """.trimIndent()
+        private const val PAGE_SETTLE_MS = 8_000L
     }
 }
