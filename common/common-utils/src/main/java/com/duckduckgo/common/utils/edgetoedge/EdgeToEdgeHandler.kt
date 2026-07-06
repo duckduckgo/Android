@@ -202,6 +202,39 @@ class EdgeToEdgeHandler @Inject constructor() {
     }
 
     /**
+     * Combines [applyHorizontalSystemBarInsets] and [applyNavigationBarInsetsAsMargin] in a single listener, for
+     * when both are needed on the *same* view: only one [androidx.core.view.OnApplyWindowInsetsListener] can be
+     * attached per view, so calling both separately on the same view would silently drop the first one.
+     *
+     * @param view The view to pad on the left/right edges and set the bottom margin on; must use [ViewGroup.MarginLayoutParams].
+     */
+    fun applyHorizontalInsetsAndNavigationBarMargin(view: View) {
+        val initialLeft = view.paddingLeft
+        val initialRight = view.paddingRight
+        val initialBottomMargin = (view.layoutParams as? ViewGroup.MarginLayoutParams)?.bottomMargin ?: 0
+        view.applyInsets { insets ->
+            val barsAndCutout = insets.getInsets(
+                WindowInsetsCompat.Type.navigationBars() or WindowInsetsCompat.Type.displayCutout(),
+            )
+            view.updatePadding(
+                left = initialLeft + barsAndCutout.left,
+                right = initialRight + barsAndCutout.right,
+            )
+
+            val bottom = insets.getInsets(
+                WindowInsetsCompat.Type.navigationBars() or WindowInsetsCompat.Type.displayCutout() or WindowInsetsCompat.Type.ime(),
+            ).bottom
+            (view.layoutParams as? ViewGroup.MarginLayoutParams)?.let { lp ->
+                val newMargin = initialBottomMargin + bottom
+                if (lp.bottomMargin != newMargin) {
+                    lp.bottomMargin = newMargin
+                    view.requestLayout()
+                }
+            }
+        }
+    }
+
+    /**
      * Pads [view] on all four edges by the system-bar (status + navigation), display-cutout and IME insets, in a
      * single listener. Use for a screen whose root carries a full-bleed background and has no separate toolbar:
      * the background fills the padded bounds (so it still reaches every edge) while the content is inset clear of

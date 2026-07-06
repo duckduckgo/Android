@@ -214,20 +214,21 @@ class SystemSearchActivity : DuckDuckGoActivity() {
     /**
      * One inset listener per view (each apply* replaces any prior listener on that view), and only on
      * the views that survive [configureOmnibar] (which removes the unused omnibar app bar):
-     * - sides go on [ActivitySystemSearchBinding.rootView] in both modes
-     * - top omnibar: status -> appBarLayout, nav + IME -> content (scrolling list)
-     * - bottom omnibar: status -> content; nav + IME -> rootView bottom margin, so the whole root
-     *   (including the fixed-height appBarLayoutBottom) rises above the keyboard/gesture nav - padding
-     *   the fixed-height bar directly would just squeeze its content instead of moving it
+     * - top omnibar: sides -> rootView, status -> appBarLayout, nav + IME -> content (scrolling list)
+     * - bottom omnibar: status -> content; sides + nav + IME -> rootView bottom margin (single combined
+     *   listener - rootView can't take both [EdgeToEdgeHandler.applyHorizontalSystemBarInsets] and
+     *   [EdgeToEdgeHandler.applyNavigationBarInsetsAsMargin] separately, the second would drop the first),
+     *   so the whole root (including the fixed-height appBarLayoutBottom) rises above the keyboard/gesture
+     *   nav - padding the fixed-height bar directly would just squeeze its content instead of moving it
      */
     private fun configureEdgeToEdgeInsets(isOmnibarAtTop: Boolean) {
-        edgeToEdgeHandler.applyHorizontalSystemBarInsets(binding.rootView)
         if (isOmnibarAtTop) {
+            edgeToEdgeHandler.applyHorizontalSystemBarInsets(binding.rootView)
             edgeToEdgeHandler.applyStatusBarInsets(binding.appBarLayout)
             edgeToEdgeHandler.applyScrollableNavigationBarInsets(binding.content)
         } else {
             edgeToEdgeHandler.applyStatusBarInsets(binding.content)
-            edgeToEdgeHandler.applyNavigationBarInsetsAsMargin(binding.rootView)
+            edgeToEdgeHandler.applyHorizontalInsetsAndNavigationBarMargin(binding.rootView)
         }
     }
 

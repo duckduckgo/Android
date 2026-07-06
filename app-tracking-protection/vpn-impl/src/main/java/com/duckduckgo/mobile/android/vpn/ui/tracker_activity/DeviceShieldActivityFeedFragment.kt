@@ -220,7 +220,7 @@ class DeviceShieldActivityFeedFragment : DuckDuckGoFragment() {
             ) {
                 return true
             }
-            ancestor = ancestor.parent
+            ancestor = (ancestor as View).parent
         }
         return false
     }
