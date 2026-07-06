@@ -147,6 +147,12 @@ class BrowserWebViewClient @Inject constructor(
     private var pageCommitVisibleFired: Boolean = false
     private var recompositeScheduled: Boolean = false
 
+    // POC: unique cookie per main-frame page load for the ddg.pageLoad async trace section
+    // (begin in onPageStarted, end in onPageFinished). Unique cookies avoid begin/end mispairing
+    // across successive loads (a constant cookie produced degenerate/negative-duration slices).
+    private var pageLoadTraceCookie: Int? = null
+    private var pageLoadCookieSeq: Int = 0
+
     private val isAppSchemeInterceptionEnabled = AtomicBoolean(true)
     private val isForceRecompositeEnabled = AtomicBoolean(true)
 
@@ -526,6 +532,12 @@ class BrowserWebViewClient @Inject constructor(
 
         url?.let {
             // See https://app.asana.com/0/0/1206159443951489/f (WebView limitations)
+            if (it != ABOUT_BLANK && pageLoadTraceCookie == null) {
+                // POC: begin the page-load trace section (unique cookie per load; ends in onPageFinished).
+                val cookie = pageLoadCookieSeq++
+                pageLoadTraceCookie = cookie
+                androidx.tracing.Trace.beginAsyncSection("ddg.pageLoad", cookie)
+            }
             if (it != ABOUT_BLANK && start == null) {
                 start = currentTimeProvider.elapsedRealtime()
                 webViewClientListener?.getCurrentTabId()?.let { tabId ->
@@ -622,6 +634,13 @@ class BrowserWebViewClient @Inject constructor(
 
         // See https://app.asana.com/0/0/1206159443951489/f (WebView limitations)
         if (webView.progress == 100) {
+            if (url != null && url != ABOUT_BLANK) {
+                // POC: close the page-load trace section opened in onPageStarted.
+                pageLoadTraceCookie?.let { cookie ->
+                    androidx.tracing.Trace.endAsyncSection("ddg.pageLoad", cookie)
+                    pageLoadTraceCookie = null
+                }
+            }
             // Without onPageCommitVisible a recycled WebView keeps drawing the previous
             // navigation's frame until a re-composite. Only worth doing for a foreground tab.
             // onPageFinished can fire more than once per load (redirects, subframes), so latch

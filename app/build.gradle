@@ -139,6 +139,15 @@ android {
                 keyPassword = props['key.alias.password']
             }
         }
+
+        // LOCAL-ONLY (do not commit): debug-keystore signing so the macrobenchmark `benchmark`
+        // build type (non-debuggable release-like build) is installable on a device.
+        localDebugFallback {
+            storeFile = new File("${System.getProperty('user.home')}/.android/debug.keystore")
+            storePassword = "android"
+            keyAlias = "androiddebugkey"
+            keyPassword = "android"
+        }
     }
     buildTypes {
         debug {
@@ -162,8 +171,9 @@ android {
             } else if (isValidSigningConfig(signingConfigs.release)) {
                 signingConfig = signingConfigs.release
             } else {
-                println "Signing properties not found, release artifacts will not be signed."
-                signingConfig = null
+                // LOCAL-ONLY (do not commit): sign release with the debug keystore so
+                // internalRelease is installable for local macrobenchmark runs (never on CI).
+                signingConfig signingConfigs.localDebugFallback
             }
         }
     }
@@ -552,6 +562,8 @@ dependencies {
     implementation AndroidX.recyclerView
     implementation AndroidX.swipeRefreshLayout
     implementation AndroidX.webkit
+    // POC (macrobenchmark): async trace sections for page-load measurement.
+    implementation "androidx.tracing:tracing:1.2.0"
     implementation Square.okHttp3.okHttp
     implementation "com.squareup.okhttp3:okhttp-tls:_"
     implementation Square.retrofit2.retrofit
