@@ -216,16 +216,18 @@ class SystemSearchActivity : DuckDuckGoActivity() {
      * the views that survive [configureOmnibar] (which removes the unused omnibar app bar):
      * - sides go on [ActivitySystemSearchBinding.rootView] in both modes
      * - top omnibar: status -> appBarLayout, nav + IME -> content (scrolling list)
-     * - bottom omnibar: status -> content, nav + IME -> appBarLayoutBottom (rises above keyboard)
+     * - bottom omnibar: status -> content; nav + IME -> rootView bottom margin, so the whole root
+     *   (including the fixed-height appBarLayoutBottom) rises above the keyboard/gesture nav - padding
+     *   the fixed-height bar directly would just squeeze its content instead of moving it
      */
     private fun configureEdgeToEdgeInsets(isOmnibarAtTop: Boolean) {
         edgeToEdgeHandler.applyHorizontalSystemBarInsets(binding.rootView)
         if (isOmnibarAtTop) {
             edgeToEdgeHandler.applyStatusBarInsets(binding.appBarLayout)
-            edgeToEdgeHandler.applyNavigationBarInsets(binding.content, drawBehindGestureNav = true)
+            edgeToEdgeHandler.applyScrollableNavigationBarInsets(binding.content)
         } else {
             edgeToEdgeHandler.applyStatusBarInsets(binding.content)
-            edgeToEdgeHandler.applyNavigationBarInsets(binding.appBarLayoutBottom, drawBehindGestureNav = true)
+            edgeToEdgeHandler.applyNavigationBarInsetsAsMargin(binding.rootView)
         }
     }
 

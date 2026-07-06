@@ -34,9 +34,9 @@ import com.duckduckgo.navigation.api.getActivityParams
 import com.duckduckgo.remote.messaging.impl.databinding.ActivityModalSurfaceBinding
 import com.duckduckgo.remote.messaging.impl.modal.ModalSurfaceViewModel.Command
 import com.duckduckgo.remote.messaging.impl.modal.cardslist.CardsListRemoteMessageView
-import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
 @ContributeToActivityStarter(ModalSurfaceActivityFromMessageId::class)
