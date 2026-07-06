@@ -131,7 +131,7 @@ class SubscriptionExpirationReminderNotificationPlugin @Inject constructor(
         return globalActivityStarter.startIntent(
             context,
             SubscriptionsWebViewActivityWithParams(
-                url = subscriptionsUrlProvider.buyUrl,
+                url = subscriptionsUrlProvider.welcomeUrl,
                 launchPixel = pixelName(NOTIFICATION_LAUNCHED_PIXEL),
             ),
         )
