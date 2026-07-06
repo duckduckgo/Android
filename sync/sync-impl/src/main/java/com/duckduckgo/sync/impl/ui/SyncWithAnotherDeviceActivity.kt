@@ -109,7 +109,7 @@ class SyncWithAnotherDeviceActivity : DuckDuckGoActivity() {
         edgeToEdgeHandler.applyStatusBarInsets(binding.includeToolbar.appBarLayout)
         // Content ends in the fixed "Copy code" button, so keep it clear of the nav bar in every mode
         // (padded above the gesture-nav chin) rather than drawing behind the transparent gesture handle.
-        edgeToEdgeHandler.applyNavigationBarInsets(binding.contentScrollView, drawBehindGestureNav = false)
+        edgeToEdgeHandler.applyScrollableNavigationBarInsets(binding.contentScrollView)
     }
 
     private fun configureDeepLinkMode(deepLink: String) {

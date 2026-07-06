@@ -209,7 +209,7 @@ class BookmarksActivity : DuckDuckGoActivity(), BookmarksScreenPromotionPlugin.C
         // Only one of the two app bars is visible at a time (bookmarks sorting feature flag); insetting both is safe.
         edgeToEdgeHandler.applyStatusBarInsets(binding.appBarLayoutSorting)
         edgeToEdgeHandler.applyStatusBarInsets(binding.appBarLayout)
-        edgeToEdgeHandler.applyNavigationBarInsets(contentBookmarksBinding.recycler, drawBehindGestureNav = true)
+        edgeToEdgeHandler.applyScrollableNavigationBarInsets(contentBookmarksBinding.recycler)
     }
 
     private fun configureImportBookmarksDialog() {

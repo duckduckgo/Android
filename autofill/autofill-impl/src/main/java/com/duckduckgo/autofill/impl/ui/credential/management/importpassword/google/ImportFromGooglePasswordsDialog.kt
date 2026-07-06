@@ -28,6 +28,9 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.core.content.IntentCompat
 import androidx.core.os.BundleCompat
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updatePadding
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModel
@@ -271,9 +274,19 @@ class ImportFromGooglePasswordsDialog : BottomSheetDialogFragment() {
     ): View {
         _binding = ContentImportFromGooglePasswordDialogBinding.inflate(inflater, container, false)
         configureViews(binding)
+        applyBottomSystemBarInset()
         observeViewModel()
         logcat { "Creating ImportFromGooglePasswordsDialog with launch source: ${getLaunchSource()}" }
         return binding.root
+    }
+
+    private fun applyBottomSystemBarInset() {
+        // On Android 15+ the bottom-sheet window is edge-to-edge, so pad the content clear of the navigation bar
+        // (gesture pill / buttons). A no-op when the window still reserves the bar (the inset is then 0).
+        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { view, insets ->
+            view.updatePadding(bottom = insets.getInsets(WindowInsetsCompat.Type.systemBars()).bottom)
+            insets
+        }
     }
 
     private fun observeViewModel() {

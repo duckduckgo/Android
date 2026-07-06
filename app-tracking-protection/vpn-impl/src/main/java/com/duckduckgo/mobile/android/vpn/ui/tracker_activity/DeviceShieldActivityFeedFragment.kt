@@ -31,6 +31,9 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoFragment
 import com.duckduckgo.common.ui.recyclerviewext.StickyHeadersLinearLayoutManager
 import com.duckduckgo.common.utils.FragmentViewModelFactory
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.apps.ui.TrackingProtectionExclusionListActivity
@@ -58,6 +61,12 @@ class DeviceShieldActivityFeedFragment : DuckDuckGoFragment() {
     @Inject
     lateinit var trackerFeedAdapter: TrackerFeedAdapter
 
+    @Inject
+    lateinit var edgeToEdgeProvider: EdgeToEdgeProvider
+
+    @Inject
+    lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
+
     private val viewModel: DeviceShieldActivityFeedViewModel by bindViewModel()
     private lateinit var binding: ViewDeviceShieldActivityFeedBinding
 
@@ -81,6 +90,13 @@ class DeviceShieldActivityFeedFragment : DuckDuckGoFragment() {
         with(binding.activityRecyclerView) {
             layoutManager = StickyHeadersLinearLayoutManager<TrackerFeedAdapter>(this@DeviceShieldActivityFeedFragment.requireContext())
             adapter = trackerFeedAdapter
+        }
+
+        // This fragment is reused both full-screen (DeviceShieldMostRecentActivity) and nested inside the
+        // dashboard's ScrollView (DeviceShieldTrackerActivity). Only reserve the navigation-bar inset when we're
+        // the top-level scroller; when nested in a scrolling ancestor, that outer scroller already handles it.
+        if (edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.VPN) && !binding.activityRecyclerView.hasVerticalScrollAncestor()) {
+            edgeToEdgeHandler.applyScrollableNavigationBarInsets(binding.activityRecyclerView)
         }
 
         lifecycleScope.launch {
@@ -193,6 +209,21 @@ class DeviceShieldActivityFeedFragment : DuckDuckGoFragment() {
     }
 
     private inline fun <reified V : ViewModel> bindViewModel() = lazy { ViewModelProvider(this, viewModelFactory).get(V::class.java) }
+
+    private fun View.hasVerticalScrollAncestor(): Boolean {
+        var ancestor = parent
+        while (ancestor is View) {
+            if (
+                ancestor is android.widget.ScrollView ||
+                ancestor is androidx.core.widget.NestedScrollView ||
+                ancestor is androidx.recyclerview.widget.RecyclerView
+            ) {
+                return true
+            }
+            ancestor = ancestor.parent
+        }
+        return false
+    }
 
     companion object {
         private val defaultConfig = ActivityFeedConfig(

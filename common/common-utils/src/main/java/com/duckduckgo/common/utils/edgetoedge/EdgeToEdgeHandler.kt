@@ -96,6 +96,10 @@ class EdgeToEdgeHandler @Inject constructor() {
      * the button-bar height in 2/3-button navigation (so content sits above the buttons). When false it
      * uses the full navigation-bar inset, keeping content clear of the bar in every navigation mode.
      *
+     * No scrim is painted: the navigation bar is transparent and the solid [android.R.attr.windowBackground]
+     * shows through it, so on 2/3-button navigation the bar appears opaque and matches the activity body, while
+     * gesture navigation stays transparent.
+     *
      * @param view The view to pad at the bottom edge.
      */
     fun applyNavigationBarInsets(
@@ -113,6 +117,41 @@ class EdgeToEdgeHandler @Inject constructor() {
                 bottomType or WindowInsetsCompat.Type.displayCutout() or WindowInsetsCompat.Type.ime(),
             ).bottom
 
+            v.updatePadding(bottom = initialBottom + bottom)
+            insets
+        }
+        ViewCompat.requestApplyInsets(view)
+    }
+
+    /**
+     * Bottom insets for a **scrolling list**: reserves the navigation-bar (plus display cutout and IME) inset as
+     * bottom padding (on top of the view's original padding) so the last item rests *above* the nav bar in every
+     * mode — no overlap with the gesture pill or the buttons — while still letting content draw behind the
+     * transparent **gesture** nav *while scrolling*.
+     *
+     * The trick is [ViewGroup.setClipToPadding], toggled per navigation mode on each inset dispatch:
+     * - **Gesture navigation** (a navigation bar is present but nothing there is tappable — the pill):
+     *   `clipToPadding = false`, so items scroll *through* the reserved padding, behind the transparent pill,
+     *   and rest above it at the end.
+     * - **2/3-button navigation** (or no bottom nav bar): `clipToPadding = true`, so items stay above the
+     *   (opaque) button bar and never bleed behind it — the button bar keeps showing the window background.
+     *
+     * Use this for scrolling lists; use [applyNavigationBarInsets] for static content and full-bleed WebViews.
+     * Pass the scrolling view itself (RecyclerView/ScrollView); for a scroll nested inside a fragment, the
+     * hosting container only gets the reserved padding (last item clears the bar), not the in-scroll bleed.
+     *
+     * @param view The scrolling view (or its hosting container).
+     */
+    fun applyScrollableNavigationBarInsets(view: View) {
+        val initialBottom = view.paddingBottom
+        ViewCompat.setOnApplyWindowInsetsListener(view) { v, insets ->
+            val navigationBar = insets.getInsets(WindowInsetsCompat.Type.navigationBars()).bottom
+            val tappable = insets.getInsets(WindowInsetsCompat.Type.tappableElement()).bottom
+            val bottom = insets.getInsets(
+                WindowInsetsCompat.Type.navigationBars() or WindowInsetsCompat.Type.displayCutout() or WindowInsetsCompat.Type.ime(),
+            ).bottom
+
+            (v as? ViewGroup)?.clipToPadding = !(navigationBar > 0 && tappable == 0)
             v.updatePadding(bottom = initialBottom + bottom)
             insets
         }
@@ -156,6 +195,34 @@ class EdgeToEdgeHandler @Inject constructor() {
             v.updatePadding(
                 left = initialLeft + barsAndCutout.left,
                 right = initialRight + barsAndCutout.right,
+            )
+            insets
+        }
+        ViewCompat.requestApplyInsets(view)
+    }
+
+    /**
+     * Pads [view] on all four edges by the system-bar (status + navigation), display-cutout and IME insets, in a
+     * single listener. Use for a screen whose root carries a full-bleed background and has no separate toolbar:
+     * the background fills the padded bounds (so it still reaches every edge) while the content is inset clear of
+     * every system bar. No scrim is painted — the view's own background is the full-bleed surface.
+     *
+     * @param view The full-bleed root to pad on every edge.
+     */
+    fun applySystemBarInsets(view: View) {
+        val initialLeft = view.paddingLeft
+        val initialTop = view.paddingTop
+        val initialRight = view.paddingRight
+        val initialBottom = view.paddingBottom
+        ViewCompat.setOnApplyWindowInsetsListener(view) { v, insets ->
+            val bars = insets.getInsets(
+                WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout() or WindowInsetsCompat.Type.ime(),
+            )
+            v.updatePadding(
+                left = initialLeft + bars.left,
+                top = initialTop + bars.top,
+                right = initialRight + bars.right,
+                bottom = initialBottom + bars.bottom,
             )
             insets
         }

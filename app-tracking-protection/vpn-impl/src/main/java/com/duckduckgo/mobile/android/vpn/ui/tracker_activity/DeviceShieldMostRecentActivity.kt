@@ -57,7 +57,8 @@ class DeviceShieldMostRecentActivity : DuckDuckGoActivity() {
     private fun configureEdgeToEdgeInsets() {
         edgeToEdgeHandler.applyHorizontalSystemBarInsets(binding.root)
         edgeToEdgeHandler.applyStatusBarInsets(binding.includeToolbar.appBarLayout)
-        edgeToEdgeHandler.applyNavigationBarInsets(binding.activityList, drawBehindGestureNav = true)
+        // Bottom navigation-bar insets are applied inside DeviceShieldActivityFeedFragment (on its RecyclerView),
+        // because padding this FragmentContainerView host wouldn't reliably inset the fragment's scroll view.
     }
 
     override fun onBackPressed() {

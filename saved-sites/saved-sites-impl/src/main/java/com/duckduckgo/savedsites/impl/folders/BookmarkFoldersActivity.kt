@@ -78,7 +78,7 @@ class BookmarkFoldersActivity : DuckDuckGoActivity() {
     private fun configureEdgeToEdgeInsets() {
         edgeToEdgeHandler.applyHorizontalSystemBarInsets(binding.root)
         edgeToEdgeHandler.applyStatusBarInsets(binding.appBarLayout.appBarLayout)
-        edgeToEdgeHandler.applyNavigationBarInsets(binding.bookmarkFolderStructure, drawBehindGestureNav = true)
+        edgeToEdgeHandler.applyScrollableNavigationBarInsets(binding.bookmarkFolderStructure)
     }
 
     private fun setupAdapter() {

@@ -74,6 +74,9 @@ import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.FragmentViewModelFactory
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
@@ -129,6 +132,12 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
     @Inject
     lateinit var grouper: CredentialGrouper
 
+    @Inject
+    lateinit var edgeToEdgeProvider: EdgeToEdgeProvider
+
+    @Inject
+    lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
+
     val viewModel by lazy {
         ViewModelProvider(requireActivity(), viewModelFactory)[AutofillPasswordsManagementViewModel::class.java]
     }
@@ -159,6 +168,12 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
         savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
+        if (edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.AUTOFILL)) {
+            // Inset the list directly: the hosting FragmentContainerView's padding doesn't reliably reach it.
+            // Last item rests above the nav bar (no gesture overlap), bleeds behind the gesture nav while
+            // scrolling, and stays opaque in 2/3-button nav.
+            edgeToEdgeHandler.applyScrollableNavigationBarInsets(binding.logins)
+        }
         configureRecyclerView()
         configureCurrentSiteState()
         observeViewModel()

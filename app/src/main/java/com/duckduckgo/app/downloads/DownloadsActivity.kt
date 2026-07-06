@@ -111,7 +111,7 @@ class DownloadsActivity : DuckDuckGoActivity() {
     private fun configureEdgeToEdgeInsets() {
         edgeToEdgeHandler.applyHorizontalSystemBarInsets(binding.root)
         edgeToEdgeHandler.applyStatusBarInsets(binding.appBarLayout)
-        edgeToEdgeHandler.applyNavigationBarInsets(binding.downloadsContentView, drawBehindGestureNav = true)
+        edgeToEdgeHandler.applyScrollableNavigationBarInsets(binding.downloadsContentView)
     }
 
     override fun onResume() {

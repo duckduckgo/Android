@@ -95,7 +95,9 @@ class SurveyActivity : DuckDuckGoActivity() {
     }
 
     private fun configureEdgeToEdgeInsets() {
-        edgeToEdgeHandler.applyStatusBarAndHorizontalInsets(binding.surveyActivityContainerViewGroup)
+        // Translucent floating survey backed by a WebView: no status-bar scrim (this activity has a translucent
+        // status bar, so a scrim would show as an opaque band).
+        edgeToEdgeHandler.applyStatusBarAndHorizontalInsets(binding.surveyActivityContainerViewGroup, installScrim = false)
         edgeToEdgeHandler.applyNavigationBarInsets(binding.root, drawBehindGestureNav = true)
     }
 
