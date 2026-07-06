@@ -179,24 +179,25 @@ class NativeInputChatSuggestionsBinder @Inject constructor(
         onSearchForQuerySubmitted: (String) -> Unit,
         onChatHistoryShortcutClicked: () -> Unit,
         onChatSuggestionDeleteClicked: (ChatSuggestion) -> Unit = {},
+        onChatUrlSuggestionDeleteClicked: (AutoCompleteSuggestion) -> Unit = {},
     ): Binding {
+        val removeChatHistoryEnabled = duckChatFeature.removeChatHistory().isEnabled()
         val chatSuggestionsAdapter = ChatSuggestionsAdapter(
             // Only show the per-row delete (fire) icon when deletion will actually run. The delete
             // path (clearSelectedDuckAiChats) no-ops unless showClearDuckAIChatHistory is on, so
             // gating the icon on the same signal avoids a delete that looks done but did nothing.
-            showDeleteButton = duckChatFeature.removeChatHistory().isEnabled() &&
-                duckAiFeatureState.showClearDuckAIChatHistory.value,
+            showDeleteButton = removeChatHistoryEnabled && duckAiFeatureState.showClearDuckAIChatHistory.value,
             onChatClicked = { onChatSuggestionSelected(it) },
             onDeleteClicked = { onChatSuggestionDeleteClicked(it) },
         )
         val urlAdapter = BrowserAutoCompleteSuggestionsAdapter(
             immediateSearchClickListener = { onChatUrlSuggestionClicked(it) },
             editableSearchClickListener = { },
-            autoCompleteDeleteClickListener = { },
+            autoCompleteDeleteClickListener = { if (removeChatHistoryEnabled) onChatUrlSuggestionDeleteClicked(it) },
             omnibarType = if (inputScreenConfigResolver.useTopBar()) OmnibarType.SINGLE_TOP else OmnibarType.SINGLE_BOTTOM,
             hideEditQueryArrow = true,
             hideSectionDividers = true,
-            isDeleteButtonVisible = false,
+            isDeleteButtonVisible = removeChatHistoryEnabled,
         )
         val urlDivider = SectionDividerAdapter()
         val searchDivider = SectionDividerAdapter()
