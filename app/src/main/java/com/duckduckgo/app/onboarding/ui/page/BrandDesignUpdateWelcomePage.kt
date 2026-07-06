@@ -507,11 +507,14 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
             val insets = windowInsets.getInsets(
                 WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout(),
             )
+            val imeVisible = windowInsets.isVisible(WindowInsetsCompat.Type.ime())
             v.updateLayoutParams<ViewGroup.MarginLayoutParams> {
                 topMargin = insets.top
             }
-            // The corrector reserves this on the card only while it is bottom-anchored (see correctOnce).
-            cardBottomInsetPx = insets.bottom + DIALOG_BOTTOM_INSET_GAP_DP.toPx()
+            // Freeze while the IME shows: adjustResize folds the keyboard into systemBars().bottom.
+            if (!imeVisible && viewModel.viewState.value.onboardingImprovementsV2Enabled) {
+                cardBottomInsetPx = insets.bottom + DIALOG_BOTTOM_INSET_GAP_DP.toPx()
+            }
             windowInsets
         }
 

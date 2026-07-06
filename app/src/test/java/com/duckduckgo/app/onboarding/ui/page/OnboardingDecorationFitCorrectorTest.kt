@@ -518,4 +518,93 @@ class OnboardingDecorationFitCorrectorTest {
         assertTrue(withOverlap.corrector.correctOnce())
         assertFalse(withOverlap.decoration.isGone)
     }
+
+    @Test
+    fun whenBottomAnchoredNoDecorationAndContentFitsThenClampDisabled() {
+        val h = harness(
+            rootHeight = 1200,
+            dialogHeight = 620,
+            contentHeight = 584,
+            viewportHeight = 582,
+            decorationHeight = 200,
+            minHeightPx = 247,
+            maxHeightPx = 299,
+        )
+        h.corrector.clear()
+        (h.dialog.layoutParams as ConstraintLayout.LayoutParams).apply {
+            bottomToTop = ConstraintLayout.LayoutParams.UNSET
+            bottomToBottom = ConstraintLayout.LayoutParams.PARENT_ID
+            constrainedHeight = true
+        }
+
+        assertFalse(h.corrector.correctOnce())
+        assertFalse((h.dialog.layoutParams as ConstraintLayout.LayoutParams).constrainedHeight)
+    }
+
+    @Test
+    fun whenBottomAnchoredNoDecorationAndContentOverflowsThenClampEnabled() {
+        val h = harness(
+            rootHeight = 1200,
+            dialogHeight = 1300,
+            contentHeight = 1300,
+            viewportHeight = 1300,
+            decorationHeight = 200,
+            minHeightPx = 247,
+            maxHeightPx = 299,
+        )
+        h.corrector.clear()
+        (h.dialog.layoutParams as ConstraintLayout.LayoutParams).apply {
+            bottomToTop = ConstraintLayout.LayoutParams.UNSET
+            bottomToBottom = ConstraintLayout.LayoutParams.PARENT_ID
+            constrainedHeight = false
+        }
+
+        assertFalse(h.corrector.correctOnce())
+        assertTrue((h.dialog.layoutParams as ConstraintLayout.LayoutParams).constrainedHeight)
+    }
+
+    @Test
+    fun whenBottomAnchoredClampAlreadyMatchesThenNoOp() {
+        val h = harness(
+            rootHeight = 1200,
+            dialogHeight = 620,
+            contentHeight = 584,
+            viewportHeight = 582,
+            decorationHeight = 200,
+            minHeightPx = 247,
+            maxHeightPx = 299,
+        )
+        h.corrector.clear()
+        (h.dialog.layoutParams as ConstraintLayout.LayoutParams).apply {
+            bottomToTop = ConstraintLayout.LayoutParams.UNSET
+            bottomToBottom = ConstraintLayout.LayoutParams.PARENT_ID
+            constrainedHeight = false
+        }
+
+        assertTrue(h.corrector.correctOnce())
+        assertFalse((h.dialog.layoutParams as ConstraintLayout.LayoutParams).constrainedHeight)
+    }
+
+    @Test
+    fun whenDisabledThenBottomAnchoredClampNotTouched() {
+        val h = harness(
+            rootHeight = 1200,
+            dialogHeight = 620,
+            contentHeight = 584,
+            viewportHeight = 582,
+            decorationHeight = 200,
+            minHeightPx = 247,
+            maxHeightPx = 299,
+            enabled = false,
+        )
+        h.corrector.clear()
+        (h.dialog.layoutParams as ConstraintLayout.LayoutParams).apply {
+            bottomToTop = ConstraintLayout.LayoutParams.UNSET
+            bottomToBottom = ConstraintLayout.LayoutParams.PARENT_ID
+            constrainedHeight = true
+        }
+
+        assertTrue(h.corrector.correctOnce())
+        assertTrue((h.dialog.layoutParams as ConstraintLayout.LayoutParams).constrainedHeight)
+    }
 }

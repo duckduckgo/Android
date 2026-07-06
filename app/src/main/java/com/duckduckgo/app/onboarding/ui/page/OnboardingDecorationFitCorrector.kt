@@ -85,7 +85,7 @@ class OnboardingDecorationFitCorrector(
         // has already reverted any reserved inset, and the shrink/hide logic below must not run.
         if (!enabled) return true
 
-        if (deco == null) return true
+        if (deco == null) return !syncBottomAnchoredClamp()
         if (deco.isGone) return true
         if (BrandDesignUpdateOnboardingLayoutHelper.isInScrollableContainer(dialog, root)) return true
 
@@ -139,6 +139,18 @@ class OnboardingDecorationFitCorrector(
         val desired = if (enabled && bottomAnchored && !decorationShown) cardBottomInsetPx() else 0
         if (params.bottomMargin == desired) return false
         dialog.updateLayoutParams<ConstraintLayout.LayoutParams> { bottomMargin = desired }
+        return true
+    }
+
+    // Clamp only on overflow: constrainedHeight rounds a fitting wrap down a pixel → a permanent scrollbar.
+    private fun syncBottomAnchoredClamp(): Boolean {
+        val params = dialog.layoutParams as? ConstraintLayout.LayoutParams ?: return false
+        if (params.bottomToBottom != ConstraintLayout.LayoutParams.PARENT_ID) return false
+        val content = cardContainer.measuredHeight.takeIf { it > 0 } ?: return false
+        val span = root.height - root.paddingTop - root.paddingBottom - params.topMargin - params.bottomMargin
+        val shouldClamp = dialog.paddingTop + content > span
+        if (params.constrainedHeight == shouldClamp) return false
+        dialog.updateLayoutParams<ConstraintLayout.LayoutParams> { constrainedHeight = shouldClamp }
         return true
     }
 }
