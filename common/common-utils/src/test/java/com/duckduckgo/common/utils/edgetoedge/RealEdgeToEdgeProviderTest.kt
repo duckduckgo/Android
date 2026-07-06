@@ -141,4 +141,28 @@ class RealEdgeToEdgeProviderTest {
 
         assertTrue(testee.isEnabled(EdgeToEdgeBucket.MISC))
     }
+
+    @Test
+    fun whenMasterDisabledThenBottomSheetsDisabledEvenIfBottomSheetsToggleEnabled() {
+        feature.self().setRawStoredState(State(enable = false))
+        feature.bottomSheets().setRawStoredState(State(enable = true))
+
+        assertFalse(testee.isEnabled(EdgeToEdgeBucket.BOTTOM_SHEETS))
+    }
+
+    @Test
+    fun whenMasterEnabledButBottomSheetsDisabledThenBottomSheetsDisabled() {
+        feature.self().setRawStoredState(State(enable = true))
+        feature.bottomSheets().setRawStoredState(State(enable = false))
+
+        assertFalse(testee.isEnabled(EdgeToEdgeBucket.BOTTOM_SHEETS))
+    }
+
+    @Test
+    fun whenMasterAndBottomSheetsEnabledThenBottomSheetsEnabled() {
+        feature.self().setRawStoredState(State(enable = true))
+        feature.bottomSheets().setRawStoredState(State(enable = true))
+
+        assertTrue(testee.isEnabled(EdgeToEdgeBucket.BOTTOM_SHEETS))
+    }
 }

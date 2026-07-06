@@ -52,6 +52,7 @@ class RealEdgeToEdgeProvider @Inject constructor(
                 edgeToEdgeFeature.webview().isEnabled()
                 edgeToEdgeFeature.onboarding().isEnabled()
                 edgeToEdgeFeature.misc().isEnabled()
+                edgeToEdgeFeature.bottomSheets().isEnabled()
             }
         }
     }
@@ -66,6 +67,7 @@ class RealEdgeToEdgeProvider @Inject constructor(
             EdgeToEdgeBucket.WEBVIEW -> edgeToEdgeFeature.webview()
             EdgeToEdgeBucket.ONBOARDING -> edgeToEdgeFeature.onboarding()
             EdgeToEdgeBucket.MISC -> edgeToEdgeFeature.misc()
+            EdgeToEdgeBucket.BOTTOM_SHEETS -> edgeToEdgeFeature.bottomSheets()
         }
         bucketToggle.isEnabled()
     } else {

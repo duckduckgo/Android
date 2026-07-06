@@ -28,9 +28,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.core.content.IntentCompat
 import androidx.core.os.BundleCompat
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
-import androidx.core.view.updatePadding
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModel
@@ -61,10 +58,13 @@ import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.goog
 import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.google.ImportFromGooglePasswordsDialogViewModel.ViewMode.Importing
 import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.google.ImportFromGooglePasswordsDialogViewModel.ViewMode.PreImport
 import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.google.ImportFromGooglePasswordsDialogViewModel.ViewState
+import com.duckduckgo.common.ui.applyBottomSystemBarInsetPadding
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.prependIconToText
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.utils.FragmentViewModelFactory
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.common.utils.extensions.html
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
@@ -93,7 +93,11 @@ class ImportFromGooglePasswordsDialog : BottomSheetDialogFragment() {
      */
     private var ignoreCancellationEvents = false
 
-    override fun getTheme(): Int = R.style.AutofillBottomSheetDialogTheme
+    override fun getTheme(): Int = if (edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.BOTTOM_SHEETS)) {
+        R.style.AutofillBottomSheetDialogThemeEdgeToEdge
+    } else {
+        R.style.AutofillBottomSheetDialogTheme
+    }
 
     @Inject
     lateinit var faviconManager: FaviconManager
@@ -103,6 +107,9 @@ class ImportFromGooglePasswordsDialog : BottomSheetDialogFragment() {
 
     @Inject
     lateinit var authorizationGracePeriod: AutofillAuthorizationGracePeriod
+
+    @Inject
+    lateinit var edgeToEdgeProvider: EdgeToEdgeProvider
 
     private var _binding: ContentImportFromGooglePasswordDialogBinding? = null
 
@@ -274,19 +281,12 @@ class ImportFromGooglePasswordsDialog : BottomSheetDialogFragment() {
     ): View {
         _binding = ContentImportFromGooglePasswordDialogBinding.inflate(inflater, container, false)
         configureViews(binding)
-        applyBottomSystemBarInset()
+        if (edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.BOTTOM_SHEETS)) {
+            binding.dialogRootView.applyBottomSystemBarInsetPadding()
+        }
         observeViewModel()
         logcat { "Creating ImportFromGooglePasswordsDialog with launch source: ${getLaunchSource()}" }
         return binding.root
-    }
-
-    private fun applyBottomSystemBarInset() {
-        // On Android 15+ the bottom-sheet window is edge-to-edge, so pad the content clear of the navigation bar
-        // (gesture pill / buttons). A no-op when the window still reserves the bar (the inset is then 0).
-        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { view, insets ->
-            view.updatePadding(bottom = insets.getInsets(WindowInsetsCompat.Type.systemBars()).bottom)
-            insets
-        }
     }
 
     private fun observeViewModel() {

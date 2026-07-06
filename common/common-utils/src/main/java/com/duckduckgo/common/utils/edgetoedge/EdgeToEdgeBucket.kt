@@ -28,4 +28,5 @@ enum class EdgeToEdgeBucket {
     WEBVIEW,
     ONBOARDING,
     MISC,
+    BOTTOM_SHEETS,
 }

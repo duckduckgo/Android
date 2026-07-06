@@ -28,19 +28,30 @@ import com.duckduckgo.autofill.api.EmailProtectionChooseEmailDialog
 import com.duckduckgo.autofill.api.EmailProtectionChooseEmailDialog.UseEmailResultType
 import com.duckduckgo.autofill.impl.R
 import com.duckduckgo.autofill.impl.databinding.DialogEmailProtectionChooseEmailBinding
+import com.duckduckgo.common.ui.applyBottomSystemBarInsetPadding
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.common.utils.extensions.html
 import com.duckduckgo.di.scopes.FragmentScope
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dagger.android.support.AndroidSupportInjection
+import javax.inject.Inject
 import logcat.LogPriority.VERBOSE
 import logcat.logcat
 
 @InjectWith(FragmentScope::class)
 class EmailProtectionChooseEmailFragment : BottomSheetDialogFragment(), EmailProtectionChooseEmailDialog {
 
-    override fun getTheme(): Int = R.style.AutofillBottomSheetDialogTheme
+    @Inject
+    lateinit var edgeToEdgeProvider: EdgeToEdgeProvider
+
+    override fun getTheme(): Int = if (edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.BOTTOM_SHEETS)) {
+        R.style.AutofillBottomSheetDialogThemeEdgeToEdge
+    } else {
+        R.style.AutofillBottomSheetDialogTheme
+    }
 
     override fun onAttach(context: Context) {
         AndroidSupportInjection.inject(this)
@@ -63,6 +74,9 @@ class EmailProtectionChooseEmailFragment : BottomSheetDialogFragment(), EmailPro
     ): View {
         val binding = DialogEmailProtectionChooseEmailBinding.inflate(inflater, container, false)
         configureViews(binding)
+        if (edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.BOTTOM_SHEETS)) {
+            binding.dialogRootView.applyBottomSystemBarInsetPadding()
+        }
         return binding.root
     }
 

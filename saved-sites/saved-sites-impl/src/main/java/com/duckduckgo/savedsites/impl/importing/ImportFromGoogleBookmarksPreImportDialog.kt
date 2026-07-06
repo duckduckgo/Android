@@ -26,7 +26,10 @@ import android.view.ViewGroup
 import androidx.fragment.app.setFragmentResult
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.common.ui.applyBottomSystemBarInsetPadding
 import com.duckduckgo.common.utils.FragmentViewModelFactory
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.saved.sites.impl.R
 import com.duckduckgo.saved.sites.impl.databinding.ContentImportBookmarksFromGooglePreimportDialogBinding
@@ -48,11 +51,18 @@ class ImportFromGoogleBookmarksPreImportDialog : BottomSheetDialogFragment() {
      */
     private var ignoreCancellationEvents = false
 
-    override fun getTheme(): Int = R.style.BookmarksImportBottomSheetDialogTheme
+    override fun getTheme(): Int = if (edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.BOTTOM_SHEETS)) {
+        R.style.BookmarksImportBottomSheetDialogThemeEdgeToEdge
+    } else {
+        R.style.BookmarksImportBottomSheetDialogTheme
+    }
 
     private var _binding: ContentImportBookmarksFromGooglePreimportDialogBinding? = null
 
     val binding get() = _binding!!
+
+    @Inject
+    lateinit var edgeToEdgeProvider: EdgeToEdgeProvider
 
     @Inject
     lateinit var viewModelFactory: FragmentViewModelFactory
@@ -74,6 +84,9 @@ class ImportFromGoogleBookmarksPreImportDialog : BottomSheetDialogFragment() {
         configureViews(binding)
         if (savedInstanceState == null) {
             pixel.fire(SavedSitesPixelName.BOOKMARK_IMPORT_FROM_GOOGLE_PREIMPORT_DIALOG_SHOWN)
+        }
+        if (edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.BOTTOM_SHEETS)) {
+            binding.dialogRootView.applyBottomSystemBarInsetPadding()
         }
         return binding.root
     }
