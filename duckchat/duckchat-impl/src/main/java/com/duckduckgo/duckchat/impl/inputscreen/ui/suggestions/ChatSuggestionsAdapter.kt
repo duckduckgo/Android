@@ -18,6 +18,7 @@ package com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -25,7 +26,9 @@ import com.duckduckgo.duckchat.impl.databinding.ItemChatSuggestionBinding
 import com.duckduckgo.duckchat.impl.models.iconRes
 
 class ChatSuggestionsAdapter(
+    private val showDeleteButton: Boolean = false,
     private val onChatClicked: (ChatSuggestion) -> Unit,
+    private val onDeleteClicked: (ChatSuggestion) -> Unit = {},
 ) : ListAdapter<ChatSuggestion, ChatSuggestionsAdapter.ChatSuggestionViewHolder>(ChatSuggestionsDiffCallback) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ChatSuggestionViewHolder {
@@ -38,19 +41,29 @@ class ChatSuggestionsAdapter(
     }
 
     override fun onBindViewHolder(holder: ChatSuggestionViewHolder, position: Int) {
-        holder.bind(getItem(position), onChatClicked)
+        holder.bind(getItem(position), showDeleteButton, onChatClicked, onDeleteClicked)
     }
 
     class ChatSuggestionViewHolder(
         private val binding: ItemChatSuggestionBinding,
     ) : RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(suggestion: ChatSuggestion, onChatClicked: (ChatSuggestion) -> Unit) {
+        fun bind(
+            suggestion: ChatSuggestion,
+            showDeleteButton: Boolean,
+            onChatClicked: (ChatSuggestion) -> Unit,
+            onDeleteClicked: (ChatSuggestion) -> Unit,
+        ) {
             binding.chatSuggestionTitle.text = suggestion.title
             binding.chatSuggestionIcon.setImageResource(suggestion.type.iconRes(suggestion.pinned))
 
             binding.root.setOnClickListener {
                 onChatClicked(suggestion)
+            }
+
+            binding.chatSuggestionDeleteButton.isVisible = showDeleteButton
+            binding.chatSuggestionDeleteButton.setOnClickListener {
+                onDeleteClicked(suggestion)
             }
         }
     }

@@ -84,6 +84,7 @@ import com.duckduckgo.app.global.ApplicationClearDataState
 import com.duckduckgo.app.global.intentText
 import com.duckduckgo.app.global.rating.PromptCount
 import com.duckduckgo.app.global.sanitize
+import com.duckduckgo.app.global.view.ORIGIN_CHAT_AUTOCOMPLETE
 import com.duckduckgo.app.global.view.ORIGIN_DUCK_AI_CONTEXTUAL_CHAT
 import com.duckduckgo.app.global.view.ORIGIN_HATCH
 import com.duckduckgo.app.global.view.renderIfChanged
@@ -490,6 +491,11 @@ open class BrowserActivity : DuckDuckGoActivity() {
                         currentTab?.dismissDuckAiFireOnboardingCta()
                     } else {
                         externalIntentProcessingState.onIntentRequestToShowSnackbar()
+                    }
+                }
+                FireDialog.EVENT_ON_CHAT_CLEAR_COMPLETE -> {
+                    if (bundle.getString(FireDialog.RESULT_KEY_ORIGIN) == ORIGIN_CHAT_AUTOCOMPLETE) {
+                        currentTab?.refreshAutoComplete()
                     }
                 }
                 FireDialog.EVENT_ON_SINGLE_TAB_CLEAR_COMPLETE -> {

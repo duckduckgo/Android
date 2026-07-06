@@ -1487,6 +1487,7 @@ class BrowserTabFragment :
                     pixel.fire(DuckChatPixelName.DUCK_CHAT_SETTINGS_SIDEBAR_TAPPED)
                     viewModel.openDuckChatHistory()
                 },
+                onChatSuggestionDelete = { chatUrl -> showChatSuggestionFireDialog(chatUrl) },
                 onStopTapped = {
                     contentScopeScripts.sendSubscriptionEvent(
                         SubscriptionEventData(
@@ -1645,6 +1646,17 @@ class BrowserTabFragment :
 
     private fun onOmnibarCustomTabClosed() {
         requireActivity().finish()
+    }
+
+    private fun showChatSuggestionFireDialog(chatUrl: String) {
+        viewLifecycleOwner.lifecycleScope.launch {
+            parentFragmentManager.findFragmentByTag(CHAT_DELETE_DIALOG_TAG)?.let { existing ->
+                parentFragmentManager.commitNow(allowStateLoss = true) { remove(existing) }
+            }
+
+            val dialog = fireDialogProvider.createFireDialog(FireDialogOrigin.ChatAutocomplete(chatUrl))
+            dialog.show(parentFragmentManager, CHAT_DELETE_DIALOG_TAG)
+        }
     }
 
     private fun onOmnibarCustomTabPrivacyDashboardPressed() {
@@ -1812,6 +1824,7 @@ class BrowserTabFragment :
             BrowserMode.FIRE -> {
                 bottomSheetMenu?.newTabMenuItem?.label(getString(string.fireTabsNewTabButton))
             }
+
             BrowserMode.REGULAR -> {
                 bottomSheetMenu?.newTabMenuItem?.label(getString(string.newTabMenuItem))
             }
@@ -4176,8 +4189,7 @@ class BrowserTabFragment :
             val bindResult = webViewModeInitializer.bind(it, browserMode)
             if (bindResult.isFailure) {
                 if (browserMode != BrowserMode.REGULAR) {
-                    bindResult.exceptionOrNull()?.message?.let {
-                            message ->
+                    bindResult.exceptionOrNull()?.message?.let { message ->
                         logcat(ERROR) { message }
                     }
                     this.closeCurrentTab()
@@ -4837,11 +4849,13 @@ class BrowserTabFragment :
         override fun onOpenInFireTab(url: String) = dispatchLongPress(AppPixelName.LONG_PRESS_NEW_FIRE_TAB, RequiredAction.OpenInFireTab(url))
         override fun onOpenInBackgroundTab(url: String) =
             dispatchLongPress(AppPixelName.LONG_PRESS_NEW_BACKGROUND_TAB, RequiredAction.OpenInNewBackgroundTab(url))
+
         override fun onCopyLinkAddress(url: String) = dispatchLongPress(AppPixelName.LONG_PRESS_COPY_URL, RequiredAction.CopyLink(url))
         override fun onShareLink(url: String) = dispatchLongPress(AppPixelName.LONG_PRESS_SHARE, RequiredAction.ShareLink(url))
         override fun onDownloadImage(
             imageUrl: String,
         ) = dispatchLongPress(AppPixelName.LONG_PRESS_DOWNLOAD_IMAGE, RequiredAction.DownloadFile(imageUrl))
+
         override fun onOpenImageInNewTab(imageUrl: String) =
             dispatchLongPress(AppPixelName.LONG_PRESS_OPEN_IMAGE_IN_BACKGROUND_TAB, RequiredAction.OpenInNewBackgroundTab(imageUrl))
 
@@ -5524,6 +5538,7 @@ class BrowserTabFragment :
 
         private const val DOWNLOAD_CONFIRMATION_TAG = "DOWNLOAD_CONFIRMATION_TAG"
         private const val DAX_DIALOG_DIALOG_TAG = "DAX_DIALOG_TAG"
+        private const val CHAT_DELETE_DIALOG_TAG = "CHAT_DELETE_DIALOG_TAG"
 
         private const val MAX_PROGRESS = 100
         private const val TRACKERS_INI_DELAY = 500L
@@ -6265,13 +6280,17 @@ class BrowserTabFragment :
             showCta(cta, instantShow = true)
         }
 
-        private fun showCta(configuration: Cta, instantShow: Boolean = false) {
+        private fun showCta(
+            configuration: Cta,
+            instantShow: Boolean = false,
+        ) {
             when (configuration) {
                 is HomePanelCta -> showBottomSheetCta(configuration)
                 is SubscriptionPromoModalCta -> showPrivacyProSkippedOnboardingBottomSheet(configuration)
                 is DaxBubbleCta -> showDaxOnboardingBubbleCta(configuration)
                 is OnboardingDaxDialogCta.BrandDesignContextualDaxDialogCta ->
                     showOnboardingDialogCta(configuration, instantShow = instantShow)
+
                 is OnboardingDaxDialogCta -> showOnboardingDialogCta(configuration)
                 is BrokenSitePromptDialogCta -> showBrokenSitePromptCta(configuration)
             }
@@ -6778,6 +6797,10 @@ class BrowserTabFragment :
 
     fun dismissDuckAiFireOnboardingCta() {
         viewModel.dismissDuckAiFireOnboardingCta()
+    }
+
+    fun refreshAutoComplete() {
+        nativeInputManager.refreshChatSuggestions()
     }
 }
 
