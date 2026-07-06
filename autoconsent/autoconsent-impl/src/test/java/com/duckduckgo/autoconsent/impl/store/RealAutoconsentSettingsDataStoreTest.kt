@@ -16,6 +16,7 @@
 
 package com.duckduckgo.autoconsent.impl.store
 
+import android.annotation.SuppressLint
 import android.content.Context
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -34,6 +35,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
+@SuppressLint("DenyListedApi")
 class RealAutoconsentSettingsDataStoreTest {
 
     @get:Rule
@@ -53,26 +55,26 @@ class RealAutoconsentSettingsDataStoreTest {
     fun whenLegacyUserSettingIsFalseThenMigratesToDoNotBlock() = runTest {
         preferences().edit().putBoolean(LEGACY_USER_SETTING_KEY, false).commit()
 
-        assertEquals(CookiePopUpPreference.off, createDataStore().cookiePopUpPreference)
+        assertEquals(CookiePopUpPreference.OFF, createDataStore().cookiePopUpPreference)
     }
 
     @Test
     fun whenLegacyUserSettingIsTrueThenMigratesToBlockStandard() = runTest {
         preferences().edit().putBoolean(LEGACY_USER_SETTING_KEY, true).commit()
 
-        assertEquals(CookiePopUpPreference.`default`, createDataStore().cookiePopUpPreference)
+        assertEquals(CookiePopUpPreference.DEFAULT, createDataStore().cookiePopUpPreference)
     }
 
     @Test
     fun whenNoLegacySettingAndOnByDefaultThenMigratesToBlockStandard() = runTest {
-        assertEquals(CookiePopUpPreference.`default`, createDataStore().cookiePopUpPreference)
+        assertEquals(CookiePopUpPreference.DEFAULT, createDataStore().cookiePopUpPreference)
     }
 
     @Test
     fun whenNoLegacySettingAndOffByDefaultThenMigratesToDoNotBlock() = runTest {
         feature.onByDefault().setRawStoredState(Toggle.State(enable = false))
 
-        assertEquals(CookiePopUpPreference.off, createDataStore().cookiePopUpPreference)
+        assertEquals(CookiePopUpPreference.OFF, createDataStore().cookiePopUpPreference)
     }
 
     @Test
@@ -80,23 +82,23 @@ class RealAutoconsentSettingsDataStoreTest {
         feature.onByDefault().setRawStoredState(Toggle.State(enable = false))
         val dataStore = createDataStore()
 
-        assertEquals(CookiePopUpPreference.off, dataStore.cookiePopUpPreference)
+        assertEquals(CookiePopUpPreference.OFF, dataStore.cookiePopUpPreference)
         assertFalse(preferences().contains(COOKIE_POP_UP_PREFERENCE_KEY))
 
         feature.onByDefault().setRawStoredState(Toggle.State(enable = true))
         dataStore.invalidateCache()
 
-        assertEquals(CookiePopUpPreference.`default`, dataStore.cookiePopUpPreference)
+        assertEquals(CookiePopUpPreference.DEFAULT, dataStore.cookiePopUpPreference)
         assertFalse(preferences().contains(COOKIE_POP_UP_PREFERENCE_KEY))
     }
 
     @Test
     fun whenPreferenceAlreadyStoredThenMigrationIsIdempotent() = runTest {
         val dataStore = createDataStore()
-        dataStore.cookiePopUpPreference = CookiePopUpPreference.max
+        dataStore.cookiePopUpPreference = CookiePopUpPreference.MAX
         preferences().edit().putBoolean(LEGACY_USER_SETTING_KEY, false).commit()
 
-        assertEquals(CookiePopUpPreference.max, createDataStore().cookiePopUpPreference)
+        assertEquals(CookiePopUpPreference.MAX, createDataStore().cookiePopUpPreference)
     }
 
     @Test

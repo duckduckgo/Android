@@ -112,14 +112,14 @@ class RealAutoconsentSettingsDataStore constructor(
     private fun migrateFromLegacySetting(): CookiePopUpPreference {
         return if (preferences.contains(AUTOCONSENT_USER_SETTING)) {
             if (preferences.getBoolean(AUTOCONSENT_USER_SETTING, false)) {
-                CookiePopUpPreference.`default`
+                CookiePopUpPreference.DEFAULT
             } else {
-                CookiePopUpPreference.off
+                CookiePopUpPreference.OFF
             }
         } else if (defaultValue) {
-            CookiePopUpPreference.`default`
+            CookiePopUpPreference.DEFAULT
         } else {
-            CookiePopUpPreference.off
+            CookiePopUpPreference.OFF
         }
     }
 
@@ -137,7 +137,7 @@ class RealAutoconsentSettingsDataStore constructor(
         return try {
             CookiePopUpPreference.valueOf(value!!)
         } catch (_: Exception) {
-            CookiePopUpPreference.`default`
+            CookiePopUpPreference.DEFAULT
         }
     }
 

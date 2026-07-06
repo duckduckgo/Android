@@ -79,12 +79,12 @@ class InitMessageHandlerPlugin @Inject constructor(
                     val preference = if (autoconsentFeature.cookiePopUpPreferenceSetting().isEnabled()) {
                         settingsRepository.cookiePopUpPreference
                     } else if (settingsRepository.userSetting) {
-                        CookiePopUpPreference.`default`
+                        CookiePopUpPreference.DEFAULT
                     } else {
-                        CookiePopUpPreference.off
+                        CookiePopUpPreference.OFF
                     }
 
-                    if (preference == CookiePopUpPreference.off) {
+                    if (preference == CookiePopUpPreference.OFF) {
                         autoconsentPixelManager.fireDailyPixel(AutoConsentPixel.AUTOCONSENT_DISABLED_FOR_SITE_DAILY)
                         return@launch
                     }
@@ -163,9 +163,9 @@ class InitMessageHandlerPlugin @Inject constructor(
         }
 
         return when (preference) {
-            CookiePopUpPreference.max -> "tier2"
-            CookiePopUpPreference.`default` -> if (cookiePopUpPreferenceSettingEnabled) "tier1" else "reject"
-            CookiePopUpPreference.off -> "off"
+            CookiePopUpPreference.MAX -> "tier2"
+            CookiePopUpPreference.DEFAULT -> if (cookiePopUpPreferenceSettingEnabled) "tier1" else "reject"
+            CookiePopUpPreference.OFF -> "off"
         }
     }
 
