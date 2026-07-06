@@ -1,0 +1,70 @@
+name: Perf Benchmark - Nightly
+
+on:
+  schedule:
+    - cron: '0 3 * * *'   # 3 AM UTC, after build-benchmark (2 AM)
+  workflow_dispatch:
+
+jobs:
+  page-load-benchmark:
+    name: Page-load benchmark
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event_name == 'schedule' && 'develop' || github.ref_name }}
+          submodules: recursive
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: 'adopt'
+          java-version-file: .github/.java-version
+
+      - uses: gradle/actions/setup-gradle@v5
+        with:
+          cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
+          cache-read-only: true
+
+      - name: Write Flank credentials
+        env:
+          FLANK: ${{ secrets.FLANK }}
+        run: echo "$FLANK" > flank.json
+
+      - name: Build APKs
+        run: ./gradlew :app:assembleInternalRelease :macrobenchmark:assembleRelease
+
+      - name: Run page-load benchmark on FTL
+        run: ./gradlew runFlankPerfTests --no-configuration-cache
+
+      - name: Install Perfetto trace_processor
+        run: |
+          curl -LO https://get.perfetto.dev/trace_processor
+          chmod +x trace_processor
+          sudo mv trace_processor /usr/local/bin/trace_processor_shell
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install -r perf-benchmarks/requirements.txt
+
+      - name: Post-process trace and report
+        run: |
+          TRACE=$(find build/fladle/perfResults -name '*.perfetto-trace' | head -1)
+          DATA=$(find build/fladle/perfResults -name '*-benchmarkData.json' | head -1)
+          python3 perf-benchmarks/pageload_benchmark.py \
+            --trace "$TRACE" --benchmark-data "$DATA" \
+            --github-action-run-id "${{ github.run_id }}" \
+            --git-commit-sha "${{ github.sha }}" \
+            ${{ github.event_name == 'schedule' && '--report-pixel' || '' }}
+
+      - name: Upload results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pageload-benchmark-${{ github.run_number }}
+          path: |
+            pageload-results.json
+            build/fladle/perfResults/**/*.perfetto-trace
+          retention-days: 30
