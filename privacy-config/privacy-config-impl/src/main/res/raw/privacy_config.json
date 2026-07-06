@@ -975,5 +975,10 @@
             }
         }
     },
-    "unprotectedTemporary": []
+    "unprotectedTemporary": [
+        {
+            "domain": "as.com",
+            "reason": "blank area while scrolling"
+        }
+    ]
 }
