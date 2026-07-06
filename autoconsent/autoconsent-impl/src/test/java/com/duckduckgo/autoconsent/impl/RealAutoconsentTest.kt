@@ -121,11 +121,11 @@ class RealAutoconsentTest {
 
     @Test
     fun whenChangeCookiePopUpPreferenceThenRepoSetValueChanged() {
-        autoconsent.changeCookiePopUpPreference(CookiePopUpPreference.max)
-        assertEquals(CookiePopUpPreference.max, settingsRepository.cookiePopUpPreference)
+        autoconsent.changeCookiePopUpPreference(CookiePopUpPreference.MAX)
+        assertEquals(CookiePopUpPreference.MAX, settingsRepository.cookiePopUpPreference)
 
-        autoconsent.changeCookiePopUpPreference(CookiePopUpPreference.off)
-        assertEquals(CookiePopUpPreference.off, autoconsent.getCookiePopUpPreference())
+        autoconsent.changeCookiePopUpPreference(CookiePopUpPreference.OFF)
+        assertEquals(CookiePopUpPreference.OFF, autoconsent.getCookiePopUpPreference())
     }
 
     @Test

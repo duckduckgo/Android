@@ -49,10 +49,10 @@ class AutoconsentSettingsViewModel @Inject constructor(
         val autoconsentEnabled: Boolean,
     ) {
         val autoManageEnabled: Boolean
-            get() = selectedPreference != CookiePopUpPreference.off
+            get() = selectedPreference != CookiePopUpPreference.OFF
 
         val popUpsWithoutOptOutsEnabled: Boolean
-            get() = selectedPreference == CookiePopUpPreference.max
+            get() = selectedPreference == CookiePopUpPreference.MAX
     }
 
     sealed class Command {
@@ -78,9 +78,9 @@ class AutoconsentSettingsViewModel @Inject constructor(
     fun onAutoManageCookiePopUpsToggled(enabled: Boolean) {
         if (!isCookiePopUpPreferenceSettingEnabled()) return
         val preference = if (enabled) {
-            CookiePopUpPreference.`default`
+            CookiePopUpPreference.DEFAULT
         } else {
-            CookiePopUpPreference.off
+            CookiePopUpPreference.OFF
         }
         updateCookiePopUpPreference(preference)
     }
@@ -88,9 +88,9 @@ class AutoconsentSettingsViewModel @Inject constructor(
     fun onPopUpsWithoutOptOutsToggled(enabled: Boolean) {
         if (!isCookiePopUpPreferenceSettingEnabled()) return
         val preference = if (enabled) {
-            CookiePopUpPreference.max
+            CookiePopUpPreference.MAX
         } else {
-            CookiePopUpPreference.`default`
+            CookiePopUpPreference.DEFAULT
         }
         updateCookiePopUpPreference(preference)
     }
@@ -98,7 +98,7 @@ class AutoconsentSettingsViewModel @Inject constructor(
     private fun updateCookiePopUpPreference(preference: CookiePopUpPreference) {
         viewModelScope.launch {
             pixel.fire(
-                if (preference == CookiePopUpPreference.off) {
+                if (preference == CookiePopUpPreference.OFF) {
                     SETTINGS_AUTOCONSENT_OFF
                 } else {
                     SETTINGS_AUTOCONSENT_ON
@@ -136,7 +136,7 @@ class AutoconsentSettingsViewModel @Inject constructor(
         if (!isCookiePopUpPreferenceSettingEnabled()) {
             val enabled = autoconsent.isSettingEnabled()
             return ViewState(
-                selectedPreference = if (enabled) CookiePopUpPreference.`default` else CookiePopUpPreference.off,
+                selectedPreference = if (enabled) CookiePopUpPreference.DEFAULT else CookiePopUpPreference.OFF,
                 autoconsentEnabled = enabled,
             )
         }
