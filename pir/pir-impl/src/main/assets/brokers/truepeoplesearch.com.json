@@ -1,7 +1,7 @@
 {
   "name": "TruePeopleSearch",
   "url": "truepeoplesearch.com",
-  "version": "0.8.0",
+  "version": "0.9.0",
   "parent": "peoplefinders.com",
   "addedDatetime": 1703138400000,
   "optOutUrl": "https://www.truepeoplesearch.com/removal",
@@ -28,11 +28,11 @@
         },
         {
           "actionType": "expectation",
-          "_comment": "detect CF internal captcha form - the site renders its own form#captchaForm with an h-captcha div wrapping a Cloudflare challenge iframe plus a Submit button",
+          "_comment": "detect Cloudflare verification UI - older blocks use form#captchaForm, newer blocks keep the page shell but show a Turnstile widget instead of results",
           "expectations": [
             {
               "type": "element",
-              "selector": "//body[not(.//form[@id='captchaForm'])]"
+              "selector": "//body[not(.//form[@id='captchaForm'] or .//script[contains(@src,'/cdn-cgi/challenge-platform/')] or .//script[contains(@src,'challenges.cloudflare.com/turnstile')] or .//input[@name='cf-turnstile-response'])]"
             }
           ],
           "id": "9ea1684f-1953-45b7-954e-d1597a0c5063"
@@ -43,7 +43,7 @@
           "expectations": [
             {
               "type": "element",
-              "selector": ".card-summary",
+              "selector": "(//div[contains(@class,'card-summary') and @data-detail-link and not(contains(@class,'d-none'))])[1]",
               "failSilently": true
             }
           ],
@@ -52,34 +52,30 @@
         {
           "actionType": "extract",
           "id": "267a0b26-dc67-4ed9-b5c4-a6de838765ed",
-          "selector": ".card-summary",
+          "selector": "//div[contains(@class,'card-summary') and @data-detail-link and not(contains(@class,'d-none'))]",
           "noResultsSelector": "//span[contains(text(), 'We could not find any records')]",
           "profile": {
             "name": {
-              "selector": ".h4"
+              "selector": ".content-header"
             },
             "age": {
-              "selector": ".//div[@class='h4']/following-sibling::div[1]",
-              "afterText": "Age "
+              "selector": ".//span[normalize-space()='Age']/following-sibling::span[contains(@class,'content-value')][1]"
             },
             "addressCityState": {
-              "selector": ".//div[@class='h4']/following-sibling::div[2]",
-              "afterText": "Lives in"
+              "selector": ".//span[normalize-space()='Age']/following-sibling::span[contains(@class,'content-value')][2]"
             },
             "addressCityStateList": {
-              "selector": ".//div[@class='h4']/following-sibling::div[3]",
-              "afterText": "Used to live in",
+              "selector": ".//span[normalize-space()='Used to live in']/following-sibling::span[contains(@class,'content-value')][1]",
               "separator": ",",
               "beforeText": "..."
             },
             "relativesList": {
-              "selector": ".//div[@class='h4']/following-sibling::div[4]",
-              "afterText": "Related to",
+              "selector": ".//span[normalize-space()='Related to']/following-sibling::span[contains(@class,'content-value')][1]",
               "separator": ",",
               "beforeText": "..."
             },
             "profileUrl": {
-              "selector": "a",
+              "selector": ".//a[contains(@class,'detail-link') and not(ancestor::div[contains(@class,'visible-mobile')])]",
               "identifierType": "path",
               "identifier": "https://www.truepeoplesearch.com/find/person/${id}"
             }
