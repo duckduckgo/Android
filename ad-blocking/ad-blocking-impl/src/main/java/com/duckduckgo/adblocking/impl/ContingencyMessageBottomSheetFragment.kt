@@ -16,20 +16,29 @@
 
 package com.duckduckgo.adblocking.impl
 
-import android.annotation.SuppressLint
-import android.content.Context
+import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import com.duckduckgo.adblocking.impl.databinding.BottomSheetContingencyMessageBinding
-import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 
-@SuppressLint("NoBottomSheetDialog")
-class ContingencyMessageBottomSheet(context: Context) : BottomSheetDialog(context) {
+class ContingencyMessageBottomSheetFragment : BottomSheetDialogFragment() {
 
-    private val binding = BottomSheetContingencyMessageBinding.inflate(LayoutInflater.from(context))
-
-    init {
-        setContentView(binding.root)
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?,
+    ): View {
+        val binding = BottomSheetContingencyMessageBinding.inflate(inflater, container, false)
         binding.contingencyMessageCloseButton.setOnClickListener { dismiss() }
         binding.contingencyMessagePrimaryButton.setOnClickListener { dismiss() }
+        return binding.root
+    }
+
+    companion object {
+        const val TAG = "ContingencyMessageBottomSheet"
+
+        fun newInstance() = ContingencyMessageBottomSheetFragment()
     }
 }

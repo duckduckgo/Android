@@ -16,11 +16,19 @@
 
 package com.duckduckgo.adblocking.impl
 
+import android.view.ViewTreeObserver
 import android.webkit.WebView
 import androidx.annotation.UiThread
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
+import androidx.lifecycle.findViewTreeLifecycleOwner
+import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.suspendCancellableCoroutine
 import javax.inject.Inject
+import kotlin.coroutines.resume
 
 interface ContingencyMessageView {
     @UiThread
@@ -31,6 +39,32 @@ interface ContingencyMessageView {
 class RealContingencyMessageView @Inject constructor() : ContingencyMessageView {
 
     override fun show(webView: WebView) {
-        ContingencyMessageBottomSheet(webView.context).show()
+        val lifecycleOwner = webView.findViewTreeLifecycleOwner() ?: return
+        lifecycleOwner.lifecycleScope.launch {
+            webView.awaitWindowFocus()
+            val fragment: Fragment = FragmentManager.findFragment(webView)
+            val fragmentManager = fragment.childFragmentManager
+            if (fragmentManager.findFragmentByTag(ContingencyMessageBottomSheetFragment.TAG) == null) {
+                ContingencyMessageBottomSheetFragment.newInstance()
+                    .show(fragmentManager, ContingencyMessageBottomSheetFragment.TAG)
+            }
+        }
+    }
+}
+
+private suspend fun WebView.awaitWindowFocus() {
+    if (hasWindowFocus()) return
+    suspendCancellableCoroutine { continuation ->
+        val observer = viewTreeObserver
+        val listener = object : ViewTreeObserver.OnWindowFocusChangeListener {
+            override fun onWindowFocusChanged(hasFocus: Boolean) {
+                if (hasFocus) {
+                    observer.removeOnWindowFocusChangeListener(this)
+                    continuation.resume(Unit)
+                }
+            }
+        }
+        observer.addOnWindowFocusChangeListener(listener)
+        continuation.invokeOnCancellation { observer.removeOnWindowFocusChangeListener(listener) }
     }
 }
