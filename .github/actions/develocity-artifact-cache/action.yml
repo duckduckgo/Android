@@ -34,6 +34,14 @@ inputs:
     description: 'Develocity server URL'
     required: false
     default: 'https://duckduckgo.develocity.cloud'
+  disable-setup-cache:
+    description: 'Set to "true" to disable the Develocity Setup Cache.'
+    required: false
+    default: 'false'
+  disable-artifact-cache:
+    description: 'Set to "true" to disable the Develocity Artifact Cache.'
+    required: false
+    default: 'false'
 
 runs:
   using: 'composite'
@@ -69,8 +77,16 @@ runs:
         # Honour a custom Gradle User Home; default to the conventional location so this
         # works on both GitHub-hosted and self-hosted runners (not just /home/runner).
         GRADLE_HOME_DIR="${GRADLE_USER_HOME:-$HOME/.gradle}"
-        # Only the artifact (dependency) cache is enabled; the Develocity setup cache stays disabled for now.
-        echo "ARTIFACT_CACHE_CMD_OPTS=--dv-server=${{ inputs.dv-server }} --image-name=${{ inputs.image-name }} --gradle-home=$GRADLE_HOME_DIR --disable-setup-cache" >> "$GITHUB_ENV"
+        # Both caches are enabled by default; either can be disabled via its input.
+        SETUP_CACHE_OPT=""
+        if [ "${{ inputs.disable-setup-cache }}" = "true" ]; then
+          SETUP_CACHE_OPT="--disable-setup-cache"
+        fi
+        ARTIFACT_CACHE_OPT=""
+        if [ "${{ inputs.disable-artifact-cache }}" = "true" ]; then
+          ARTIFACT_CACHE_OPT="--disable-artifact-cache"
+        fi
+        echo "ARTIFACT_CACHE_CMD_OPTS=--dv-server=${{ inputs.dv-server }} --image-name=${{ inputs.image-name }} --gradle-home=$GRADLE_HOME_DIR $SETUP_CACHE_OPT $ARTIFACT_CACHE_OPT" >> "$GITHUB_ENV"
 
     - name: Restore from Artifact Cache
       if: inputs.command == 'restore'
