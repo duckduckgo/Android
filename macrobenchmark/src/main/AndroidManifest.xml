@@ -2,4 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <!-- Needed for the in-test MockWebServer to bind a local socket. -->
     <uses-permission android:name="android.permission.INTERNET" />
+
+    <!-- Lets macrobench write its perfetto trace to a pullable global dir (/sdcard/Download) on
+         API 29+, so Flank's directoriesToPull can return it from Firebase Test Lab. -->
+    <application android:requestLegacyExternalStorage="true" />
 </manifest>

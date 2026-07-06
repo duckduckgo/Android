@@ -349,6 +349,26 @@ fladle {
             // including the failed attempt + passed rerun of a flaky test.
             fullJunitResult.set(true)
         }
+        // Page-load perf benchmark (Fladle derives task `runFlankPerfTests` from this config name).
+        // Runs ONLY the page-load macrobenchmark and pulls back its perfetto trace for offline
+        // post-processing.
+        perfTests {
+            serviceAccountCredentials.set(project.layout.projectDirectory.file("flank.json"))
+            flankVersion.set("21.+")
+            useOrchestrator.set(false)
+            recordVideo.set(false)
+            testTargets.set(["class com.duckduckgo.macrobenchmark.PageLoadBenchmark"])
+            // Single virtual model for v1 (we accept virtual noise; Phase 0 gates it).
+            devices.set([["model": "MediumPhone.arm", "version": "30"]])
+            // Storage flags so macrobench can write to a pullable global dir on API 29+.
+            environmentVariables.set([
+                    "additionalTestOutputDir": "/sdcard/Download",
+                    "no-isolated-storage"    : "true",
+            ])
+            directoriesToPull.set(["/sdcard/Download"])
+            localResultsDir.set("perfResults")
+            flakyTestAttempts.set(0)
+        }
     }
 }
 
