@@ -4,3 +4,7 @@
 
 # Keep all classes, interfaces, enums and their members in the verified-installation-impl module
 -keep class com.duckduckgo.verified.installation.impl.** { *; }
+
+# verified-installation-api is a pure-JVM module, so its own consumer-rules.pro is inert
+# (consumerProguardFiles only applies to Android libraries). Keep its classes here.
+-keep class com.duckduckgo.verifiedinstallation.** { *; }
