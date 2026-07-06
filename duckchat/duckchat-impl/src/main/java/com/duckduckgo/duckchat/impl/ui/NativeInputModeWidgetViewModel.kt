@@ -25,6 +25,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.browser.api.autocomplete.AutoComplete
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteResult
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion
+import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteHistorySearchSuggestion
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteHistorySuggestion
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteSearchSuggestion
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteUrlSuggestion.AutoCompleteBookmarkSuggestion
@@ -58,6 +59,7 @@ import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.store.DefaultTogglePosition
 import com.duckduckgo.duckchat.store.impl.DuckAiChat
 import com.duckduckgo.duckchat.store.impl.DuckAiChatStore
+import com.duckduckgo.history.api.NavigationHistory
 import com.duckduckgo.subscriptions.api.Product
 import com.duckduckgo.subscriptions.api.Subscriptions
 import kotlinx.coroutines.CoroutineScope
@@ -81,6 +83,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 data class ChatTabSuggestions(
@@ -107,6 +110,7 @@ class NativeInputModeWidgetViewModel @Inject constructor(
     private val nativeInputStateProvider: NativeInputStateProvider,
     private val modelManager: DuckAiModelManager,
     private val duckAiChatStore: DuckAiChatStore,
+    private val history: NavigationHistory,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : ViewModel() {
 
@@ -558,6 +562,27 @@ class NativeInputModeWidgetViewModel @Inject constructor(
         )
         lastChatUrlSuggestions = result.urlSuggestions.suggestions
         result
+    }
+
+    fun onDeleteChatUrlSuggestion(
+        suggestion: AutoCompleteSuggestion,
+        onDeleted: () -> Unit = {},
+    ) {
+        appCoroutineScope.launch(dispatchers.io()) {
+            when (suggestion) {
+                is AutoCompleteHistorySuggestion -> {
+                    history.removeHistoryEntryByUrl(suggestion.url)
+                    withContext(dispatchers.main()) { onDeleted() }
+                }
+
+                is AutoCompleteHistorySearchSuggestion -> {
+                    history.removeHistoryEntryByQuery(suggestion.phrase)
+                    withContext(dispatchers.main()) { onDeleted() }
+                }
+
+                else -> {}
+            }
+        }
     }
 
     fun fireChatUrlSuggestionPixel(suggestion: AutoCompleteSuggestion) {

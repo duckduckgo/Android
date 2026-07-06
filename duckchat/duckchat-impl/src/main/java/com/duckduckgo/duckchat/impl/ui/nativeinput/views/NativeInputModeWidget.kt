@@ -184,7 +184,14 @@ interface NativeInputWidget {
         onChatHistoryShortcutClicked: () -> Unit,
         onShowSuggestions: (RecyclerView.Adapter<*>) -> Unit,
         onClearSuggestions: (Boolean) -> Unit,
+        onChatSuggestionDelete: (chatUrl: String) -> Unit = {},
     )
+
+    /**
+     * Re-fetches the chat-history suggestions for the current query from the source of truth.
+     * No-op when the chat suggestions aren't currently active (binding not created / chat tab not selected).
+     */
+    fun refreshChatSuggestions()
 
     fun asView(): View
 }
@@ -254,6 +261,9 @@ class NativeInputModeWidget @JvmOverloads constructor(
     private var chatItemPluginScope: CoroutineScope? = null
     private var onShowSuggestions: ((RecyclerView.Adapter<*>) -> Unit)? = null
     private var onClearSuggestions: ((Boolean) -> Unit)? = null
+
+    // Re-runs the chat-suggestions fetch for the current query. Set in bindChatSuggestions, cleared in tearDownChatSuggestions.
+    private var refreshChatSuggestionsAction: (() -> Unit)? = null
     private var voiceSearchAvailable: Boolean = false
     private var voiceChatAvailable: Boolean = false
     private var widgetRoot: View? = null
@@ -1239,6 +1249,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
         onChatHistoryShortcutClicked: () -> Unit,
         onShowSuggestions: (RecyclerView.Adapter<*>) -> Unit,
         onClearSuggestions: (Boolean) -> Unit,
+        onChatSuggestionDelete: (chatUrl: String) -> Unit,
     ) {
         this.onShowSuggestions = onShowSuggestions
         this.onClearSuggestions = onClearSuggestions
@@ -1252,9 +1263,15 @@ class NativeInputModeWidget @JvmOverloads constructor(
                     viewModel.fireChatHistorySelectedPixel(suggestion.pinned)
                     onChatSuggestionSelected(viewModel.buildChatSuggestionUrl(suggestion))
                 },
+                onChatSuggestionDeleteClicked = { suggestion ->
+                    onChatSuggestionDelete(viewModel.buildChatSuggestionUrl(suggestion))
+                },
                 onChatUrlSuggestionClicked = { suggestion ->
                     viewModel.fireChatUrlSuggestionPixel(suggestion)
                     onChatUrlSuggestionClicked(suggestion)
+                },
+                onChatUrlSuggestionDeleteClicked = { suggestion ->
+                    viewModel.onDeleteChatUrlSuggestion(suggestion) { refreshChatSuggestions() }
                 },
                 onSearchForQuerySubmitted = { query ->
                     viewModel.fireDuckAiSearchForQuerySubmittedPixel()
@@ -1277,6 +1294,9 @@ class NativeInputModeWidget @JvmOverloads constructor(
         fun showSuggestions(query: String) {
             fetchChatTabSuggestions(lifecycleOwner, query, ensureBinding())
         }
+
+        // Allow an external re-fetch (e.g. after a chat delete completes) using the current query.
+        this.refreshChatSuggestionsAction = { showSuggestions(text) }
 
         val previousOnSearchSelected = this.onSearchSelected
         this.onSearchSelected = { animate ->
@@ -1317,6 +1337,12 @@ class NativeInputModeWidget @JvmOverloads constructor(
         chatSuggestionsBinding = null
         onShowSuggestions = null
         onClearSuggestions = null
+        refreshChatSuggestionsAction = null
+    }
+
+    override fun refreshChatSuggestions() {
+        if (chatSuggestionsBinding == null || !isChatTabSelected()) return
+        refreshChatSuggestionsAction?.invoke()
     }
 
     override fun asView(): View = this

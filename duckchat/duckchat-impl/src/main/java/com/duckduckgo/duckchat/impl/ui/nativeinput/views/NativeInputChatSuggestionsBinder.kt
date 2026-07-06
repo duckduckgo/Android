@@ -23,9 +23,11 @@ import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion
 import com.duckduckgo.browser.ui.autocomplete.BrowserAutoCompleteSuggestionsAdapter
 import com.duckduckgo.common.utils.plugins.ActivePluginPoint
+import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChatInputModeState
 import com.duckduckgo.duckchat.api.inputscreen.NativeInputChatTabItem
 import com.duckduckgo.duckchat.api.inputscreen.NativeInputChatTabItemPlugin
+import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.inputscreen.ui.InputScreenConfigResolver
 import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.ChatHistoryShortcutAdapter
 import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.ChatSearchSuggestionAdapter
@@ -47,6 +49,8 @@ class NativeInputChatSuggestionsBinder @Inject constructor(
     private val inputScreenConfigResolver: InputScreenConfigResolver,
     private val chatItemPlugins: ActivePluginPoint<NativeInputChatTabItemPlugin>,
     private val inputModeState: DuckChatInputModeState,
+    private val duckChatFeature: DuckChatFeature,
+    private val duckAiFeatureState: DuckAiFeatureState,
 ) {
 
     class Binding internal constructor(
@@ -174,16 +178,26 @@ class NativeInputChatSuggestionsBinder @Inject constructor(
         onChatUrlSuggestionClicked: (AutoCompleteSuggestion) -> Unit,
         onSearchForQuerySubmitted: (String) -> Unit,
         onChatHistoryShortcutClicked: () -> Unit,
+        onChatSuggestionDeleteClicked: (ChatSuggestion) -> Unit = {},
+        onChatUrlSuggestionDeleteClicked: (AutoCompleteSuggestion) -> Unit = {},
     ): Binding {
-        val chatSuggestionsAdapter = ChatSuggestionsAdapter { onChatSuggestionSelected(it) }
+        val removeChatHistoryEnabled = duckChatFeature.removeChatHistory().isEnabled()
+        val chatSuggestionsAdapter = ChatSuggestionsAdapter(
+            // Only show the per-row delete (fire) icon when deletion will actually run. The delete
+            // path (clearSelectedDuckAiChats) no-ops unless showClearDuckAIChatHistory is on, so
+            // gating the icon on the same signal avoids a delete that looks done but did nothing.
+            showDeleteButton = removeChatHistoryEnabled && duckAiFeatureState.showClearDuckAIChatHistory.value,
+            onChatClicked = { onChatSuggestionSelected(it) },
+            onDeleteClicked = { onChatSuggestionDeleteClicked(it) },
+        )
         val urlAdapter = BrowserAutoCompleteSuggestionsAdapter(
             immediateSearchClickListener = { onChatUrlSuggestionClicked(it) },
             editableSearchClickListener = { },
-            autoCompleteDeleteClickListener = { },
+            autoCompleteDeleteClickListener = { if (removeChatHistoryEnabled) onChatUrlSuggestionDeleteClicked(it) },
             omnibarType = if (inputScreenConfigResolver.useTopBar()) OmnibarType.SINGLE_TOP else OmnibarType.SINGLE_BOTTOM,
             hideEditQueryArrow = true,
             hideSectionDividers = true,
-            isDeleteButtonVisible = false,
+            isDeleteButtonVisible = removeChatHistoryEnabled,
         )
         val urlDivider = SectionDividerAdapter()
         val searchDivider = SectionDividerAdapter()

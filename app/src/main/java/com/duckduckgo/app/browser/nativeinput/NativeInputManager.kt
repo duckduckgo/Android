@@ -85,6 +85,7 @@ class NativeInputCallbacks(
     val onCustomizeResponsesClicked: () -> Unit = {},
     val onChatUrlSuggestionClicked: (AutoCompleteSuggestion) -> Unit = {},
     val onChatHistoryShortcutClicked: () -> Unit = {},
+    val onChatSuggestionDelete: (chatUrl: String) -> Unit = {},
     val onClearAutocomplete: () -> Unit,
     val onStopTapped: () -> Unit,
     val onFireButtonPressed: () -> Unit = {},
@@ -129,6 +130,13 @@ interface NativeInputManager {
     fun onKeyboardVisibilityChanged(isVisible: Boolean)
     fun setPickingImage(picking: Boolean)
     fun setText(text: String)
+
+    /**
+     * Re-fetches the omnibar chat-history suggestions from the source of truth, e.g. after a
+     * single-chat delete has completed and the chat is actually gone from the store. No-op when
+     * the native input isn't shown or the chat tab isn't selected.
+     */
+    fun refreshChatSuggestions()
 
     /** Lock the input field (making it non-interactive + dimmed).*/
     fun setInteractionLock(lock: InteractionLock)
@@ -217,6 +225,12 @@ class RealNativeInputManager @Inject constructor(
         if (!::rootView.isInitialized) return
         val widget = widgetFrom(rootView) ?: return
         widget.text = text
+    }
+
+    override fun refreshChatSuggestions() {
+        if (!::rootView.isInitialized) return
+        val widget = widgetFrom(rootView) ?: return
+        widget.refreshChatSuggestions()
     }
 
     override fun handleDuckAiVoiceResult(query: String) {
@@ -869,6 +883,9 @@ class RealNativeInputManager @Inject constructor(
             onChatHistoryShortcutClicked = {
                 hideNativeInput(isNavigation = true)
                 callbacks.onChatHistoryShortcutClicked()
+            },
+            onChatSuggestionDelete = { chatUrl ->
+                callbacks.onChatSuggestionDelete(chatUrl)
             },
             onShowSuggestions = { chatAdapter ->
                 if (autoCompleteList.adapter === chatAdapter) {
