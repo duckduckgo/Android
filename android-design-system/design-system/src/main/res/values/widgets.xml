@@ -466,7 +466,7 @@
          View.applyBottomSystemBarInsetPadding(); Material adds the top status-bar inset.
          `enableEdgeToEdge` can only be read from the theme at dialog construction (no runtime setter),
          so callers pick this style vs. the plain one above based on the toggle. -->
-    <style name="Widget.DuckDuckGo.BottomSheetDialog.EdgeToEdge">
+    <style name="Widget.DuckDuckGo.BottomSheetDialog.EdgeToEdge" parent="Widget.DuckDuckGo.BottomSheetDialog">
         <item name="enableEdgeToEdge">true</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:navigationBarColor">@android:color/transparent</item>
@@ -497,7 +497,7 @@
 
     <!-- Opt-in variant used when EdgeToEdgeBucket.BOTTOM_SHEETS is enabled: draw behind the transparent
          system bars; content clears the nav bar via View.applyBottomSystemBarInsetPadding(). -->
-    <style name="Widget.DuckDuckGo.BottomSheetDialogCollapsed.EdgeToEdge">
+    <style name="Widget.DuckDuckGo.BottomSheetDialogCollapsed.EdgeToEdge" parent="Widget.DuckDuckGo.BottomSheetDialogCollapsed">
         <item name="enableEdgeToEdge">true</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:navigationBarColor">@android:color/transparent</item>
