@@ -34,7 +34,28 @@
 -dontwarn java.beans.ConstructorProperties
 -dontwarn java.beans.Transient
 
-# The :app module is the composition root and has no consumer-rules.pro; it owns
-# reflective Moshi models (TdsJson, SettingsJson, AppStartupMetricsJson, ...).
-# Kept broadly for now — should be refined to targeted keeps (like sync-impl).
--keep class com.duckduckgo.app.** { *; }
+# :app has no consumer-rules.pro (it's the composition root). It parses remote
+# config / settings with reflection-based Moshi in ~11 features; those models use
+# property names as JSON keys (no @field:Json anywhere in :app), so their packages
+# must be kept. Package-scoped (not per-class) to stay robust to nested/sibling
+# model types. Everything else in :app is now shrunk/optimized/obfuscated.
+# NOTE: verified via the sync E2E + boot only; the non-sync features below need the
+# full QA/E2E suite before shipping. Candidates for further per-class narrowing.
+-keep class com.duckduckgo.app.trackerdetection.api.** { *; }       # TdsJson family (tracker data set)
+-keep class com.duckduckgo.app.pixels.campaign.** { *; }            # AdditionalPixelParamsSettings
+-keep class com.duckduckgo.app.startup.** { *; }                    # AppStartupMetricsJson
+-keep class com.duckduckgo.app.email.sync.** { *; }                 # DuckAddressSetting
+-keep class com.duckduckgo.app.browser.defaultbrowsing.prompts.** { *; }  # FeatureSettingsConfigModel
+-keep class com.duckduckgo.app.browser.indexeddb.** { *; }          # IndexedDBSettings
+-keep class com.duckduckgo.app.browser.mediaplayback.store.** { *; }      # MediaPlaybackSettingsJson
+-keep class com.duckduckgo.app.browser.weblocalstorage.** { *; }    # WebLocalStorageSettings / SettingsJson
+-keep class com.duckduckgo.app.browser.trafficquality.remote.** { *; }    # TrafficQualitySettingsJson family
+-keep class com.duckduckgo.app.browser.webview.** { *; }            # WebViewCompatFeatureSettings
+-keep class com.duckduckgo.app.browser.certificates.remoteconfig.** { *; }  # SSLCertificatesFeature.State
+
+# WorkManager workers are instantiated reflectively by class name in
+# DaggerWorkerFactory (Class.forName(workerClassName).newInstance(...)), so keep
+# every worker's name + (Context, WorkerParameters) constructor app-wide.
+-keep class * extends androidx.work.ListenableWorker {
+    public <init>(android.content.Context, androidx.work.WorkerParameters);
+}
