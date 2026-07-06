@@ -23,6 +23,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
@@ -34,6 +35,7 @@ import com.duckduckgo.common.ui.compose.button.DaxDestructiveGhostSecondaryButto
 import com.duckduckgo.common.ui.compose.button.DaxDestructivePrimaryButton
 import com.duckduckgo.common.ui.compose.button.DaxGhostButton
 import com.duckduckgo.common.ui.compose.button.DaxIconButton
+import com.duckduckgo.common.ui.compose.button.DaxIconButtonDefaults
 import com.duckduckgo.common.ui.compose.button.DaxPrimaryButton
 import com.duckduckgo.common.ui.compose.button.DaxSecondaryButton
 import com.duckduckgo.common.ui.internal.databinding.ComponentButtonsBinding
@@ -288,11 +290,28 @@ class ComponentButtonsFragment : Fragment() {
             id = com.duckduckgo.common.ui.internal.R.id.compose_icon_button,
             isDarkTheme = isDarkTheme,
         ) {
-            DaxIconButton(
-                onClick = {},
-                iconPainter = painterResource(R.drawable.ic_union),
-                contentDescription = "Menu",
-            )
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                DaxIconButton(
+                    onClick = {},
+                    iconPainter = painterResource(R.drawable.ic_union),
+                    contentDescription = "Menu",
+                )
+                DaxIconButton(
+                    onClick = {},
+                    iconPainter = painterResource(R.drawable.ic_union),
+                    contentDescription = "Menu",
+                    colors = DaxIconButtonDefaults.filledIconButtonColors,
+                )
+                DaxIconButton(
+                    onClick = {},
+                    iconPainter = painterResource(R.drawable.ic_union),
+                    contentDescription = "Menu",
+                    enabled = false,
+                )
+            }
         }
     }
 }

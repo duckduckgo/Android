@@ -29,6 +29,7 @@ import app.cash.turbine.test
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.AppUrl
 import com.duckduckgo.cookies.api.CookieManagerProvider
@@ -37,6 +38,7 @@ import com.duckduckgo.duckchat.api.DuckChatSettingsNoParams
 import com.duckduckgo.duckchat.api.InputMode
 import com.duckduckgo.duckchat.impl.feature.AIChatImageUploadFeature
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
+import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.ChatSuggestionsStore
 import com.duckduckgo.duckchat.impl.repository.AddressBarPickerAttributionRepository
 import com.duckduckgo.duckchat.impl.repository.DuckChatFeatureRepository
 import com.duckduckgo.duckchat.impl.store.DefaultTogglePosition
@@ -69,7 +71,6 @@ import org.mockito.Mockito.spy
 import org.mockito.kotlin.any
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.never
-import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
@@ -97,6 +98,7 @@ class RealDuckChatTest {
     private val mockDuckAiHostProvider: DuckAiHostProvider = mock()
     private val mockAppBuildConfig: AppBuildConfig = mock()
     private val mockVoiceSessionStateManager: VoiceSessionStateManager = mock()
+    private val chatSuggestionsStore: ChatSuggestionsStore = mock()
 
     private lateinit var testee: RealDuckChat
 
@@ -138,6 +140,7 @@ class RealDuckChatTest {
                 mockDuckAiHostProvider,
                 mockAppBuildConfig,
                 mockVoiceSessionStateManager,
+                chatSuggestionsStore,
             ),
         )
         coroutineRule.testScope.advanceUntilIdle()
@@ -1552,7 +1555,7 @@ class RealDuckChatTest {
     @Test
     fun `when migration cookie present and kill switch enabled then isDuckChatContextualModeEnabled returns true`() = runTest {
         val cookieManager = mock<CookieManager>()
-        whenever(cookiesManager.get()).thenReturn(cookieManager)
+        whenever(cookiesManager.forMode(BrowserMode.REGULAR)).thenReturn(cookieManager)
         whenever(cookieManager.getCookie(AppUrl.Url.COOKIES)).thenReturn("migration_status_dev_01=migrated_dev_01")
         duckChatFeature.contextualMode().setRawStoredState(State(enable = false))
         duckChatFeature.contextualModeKillSwitch().setRawStoredState(State(enable = true))
@@ -1565,7 +1568,7 @@ class RealDuckChatTest {
     @Test
     fun `when migration cookie present then isStandaloneMigrationCompleted returns true`() = runTest {
         val cookieManager = mock<CookieManager>()
-        whenever(cookiesManager.get()).thenReturn(cookieManager)
+        whenever(cookiesManager.forMode(BrowserMode.REGULAR)).thenReturn(cookieManager)
         whenever(cookieManager.getCookie(AppUrl.Url.COOKIES)).thenReturn("a=b;migration_status_dev_01=migrated_dev_01;c=d")
 
         assertTrue(testee.isStandaloneMigrationCompleted())
@@ -1574,7 +1577,7 @@ class RealDuckChatTest {
     @Test
     fun `when migration cookie missing then isStandaloneMigrationCompleted returns false`() = runTest {
         val cookieManager = mock<CookieManager>()
-        whenever(cookiesManager.get()).thenReturn(cookieManager)
+        whenever(cookiesManager.forMode(BrowserMode.REGULAR)).thenReturn(cookieManager)
         whenever(cookieManager.getCookie(AppUrl.Url.COOKIES)).thenReturn("a=b; c=d")
 
         assertFalse(testee.isStandaloneMigrationCompleted())
@@ -1582,7 +1585,7 @@ class RealDuckChatTest {
 
     @Test
     fun `when cookie manager is null then isStandaloneMigrationCompleted returns false`() = runTest {
-        whenever(cookiesManager.get()).thenReturn(null)
+        whenever(cookiesManager.forMode(BrowserMode.REGULAR)).thenReturn(null)
 
         assertFalse(testee.isStandaloneMigrationCompleted())
     }
@@ -1838,6 +1841,15 @@ class RealDuckChatTest {
 
         assertTrue(testee.hasUserEnabledChatHistory())
         verify(mockDuckChatFeatureRepository).isAIChatHistoryEnabled()
+    }
+
+    @Test
+    fun whenObserveHasChatSuggestionsThenDelegatesToStore() = runTest {
+        whenever(chatSuggestionsStore.hasChatSuggestions).thenReturn(flowOf(true, false))
+
+        val results = testee.observeHasChatSuggestions().toList()
+        assertTrue(results[0])
+        assertFalse(results[1])
     }
 
     private suspend fun enableChatHistoryFlags() {

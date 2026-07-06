@@ -36,6 +36,7 @@ import com.duckduckgo.pir.impl.pixels.PirPixelSender
 import com.duckduckgo.pir.impl.scan.PirScan
 import com.duckduckgo.pir.impl.scheduling.PirExecutionType.MANUAL_EDIT_PROFILE
 import com.duckduckgo.pir.impl.scheduling.PirExecutionType.MANUAL_INITIAL
+import com.duckduckgo.pir.impl.scheduling.PirExecutionType.MANUAL_INITIAL_RESUME
 import com.duckduckgo.pir.impl.scheduling.PirExecutionType.SCHEDULED
 import com.duckduckgo.pir.impl.store.PirRepository
 import com.duckduckgo.pir.impl.store.PirSchedulingRepository
@@ -389,6 +390,63 @@ class RealPirJobsRunnerTest {
         verify(mockPixelSender).reportInitialScanDuration(any(), any(), any(), any(), any(), eq(MANUAL_EDIT_PROFILE), any())
         verify(mockPixelSender).reportManualScanCompleted(any(), any(), any(), any(), any(), any(), any(), eq(MANUAL_EDIT_PROFILE), any())
         verify(mockPixelSender, never()).reportFirstScanStarted()
+    }
+
+    @Test
+    fun whenInitialResumeExecutionTypeThenForwardsResumeTriggerAndDoesNotReportFirstScan() = runTest {
+        // Given
+        whenever(mockPirRepository.getAllActiveBrokers()).thenReturn(listOf(testBrokerName))
+        whenever(mockPirRepository.getAllUserProfileQueries()).thenReturn(listOf(testProfileQuery))
+        whenever(mockPirRepository.getBrokersForOptOut(true)).thenReturn(emptyList())
+        whenever(
+            mockPirSchedulingRepository.getValidScanJobRecord(
+                testBrokerName,
+                testProfileQuery.id,
+            ),
+        ).thenReturn(testScanJobRecord)
+        whenever(mockEligibleScanJobProvider.getAllEligibleScanJobs(testCurrentTime)).thenReturn(
+            emptyList(),
+        )
+        whenever(mockPirRepository.getAllExtractedProfiles()).thenReturn(emptyList())
+        whenever(mockEligibleOptOutJobProvider.getAllEligibleOptOutJobs(testCurrentTime)).thenReturn(
+            emptyList(),
+        )
+        whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(testCurrentTime)
+        whenever(mockPirRepository.latestBackgroundScanRunInMs()).thenReturn(testCurrentTime)
+
+        // When
+        testee.runEligibleJobs(mockContext, MANUAL_INITIAL_RESUME)
+
+        // Then - a resume is a manual run (forwards the resume trigger to pixels and both wide events)
+        // but must NOT re-fire the once-per-install first-scan pixel.
+        verify(mockPixelSender).reportManualScanStarted(any(), any(), any(), eq(MANUAL_INITIAL_RESUME), any())
+        verify(mockPixelSender).reportInitialScanDuration(any(), any(), any(), any(), any(), eq(MANUAL_INITIAL_RESUME), any())
+        verify(mockPixelSender).reportManualScanCompleted(any(), any(), any(), any(), any(), any(), any(), eq(MANUAL_INITIAL_RESUME), any())
+        verify(mockPixelSender, never()).reportFirstScanStarted()
+        verify(mockPirScanWideEvent).onRunStarted(
+            executionType = eq(MANUAL_INITIAL_RESUME),
+            profileQueriesCount = any(),
+            brokerCount = any(),
+            totalScanJobs = any(),
+            webViewCount = any(),
+            isPowerSavingEnabled = any(),
+            isVpnConnected = any(),
+            batteryOptimizationsEnabled = any(),
+            notificationsPermissionGranted = any(),
+            isTrackerBlockingEnabled = any(),
+        )
+        verify(mockPirInitialScanCompletionWideEvent).onRunStarted(
+            executionType = eq(MANUAL_INITIAL_RESUME),
+            profileQueriesCount = any(),
+            brokerCount = any(),
+            totalScanJobs = any(),
+            webViewCount = any(),
+            isPowerSavingEnabled = any(),
+            isVpnConnected = any(),
+            batteryOptimizationsEnabled = any(),
+            notificationsPermissionGranted = any(),
+            isTrackerBlockingEnabled = any(),
+        )
     }
 
     @Test

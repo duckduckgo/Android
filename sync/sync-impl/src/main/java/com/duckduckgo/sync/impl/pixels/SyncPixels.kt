@@ -776,6 +776,7 @@ object SyncPixelParameters {
     const val ERROR_REASON = "reason"
     const val ERROR = "error"
     const val SYNC_FEATURE_PROMOTION_SOURCE = "source"
+    const val SYNC_FEATURE_PROMOTION_DISMISS_REASON = "reason"
     const val GET_OTHER_DEVICES_SCREEN_LAUNCH_SOURCE = "source"
     const val SYNC_SETUP_SCREEN_TYPE = "source"
     const val SYNC_SETUP_FLOW_VERSION = "flow_version"

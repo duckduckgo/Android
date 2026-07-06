@@ -95,6 +95,23 @@
     <string name="duckAiHideAiGeneratedImagesTitle">Ukryj obrazy generowane przez AI</string>
     <string name="duckAiHideAiGeneratedImagesDescription">Filtruje obrazy generowane przez AI z wyników wyszukiwania obrazów</string>
 
+    <!-- Search Assist Visibility -->
+    <string name="duckAiSearchAssistVisibilitySubtitle">Wybierz, jak często w wyszukiwaniach mają pojawiać się odpowiedzi wspomagane przez sztuczną inteligencję.</string>
+    <string name="duckAiSearchAssistVisibilityNever">Nigdy</string>
+    <string name="duckAiSearchAssistVisibilityOnDemand">Na żądanie</string>
+    <string name="duckAiSearchAssistVisibilitySometimes">Czasami</string>
+    <string name="duckAiSearchAssistVisibilityOften">Często</string>
+
+    <!-- Duck AI Use Without AI Settings Option -->
+    <string name="duckAiUseWithoutAiTitle">Korzystaj z DuckDuckGo bez AI</string>
+    <string name="duckAiUseWithoutAiDescription">Wyłącza Duck.ai, ukrywa odpowiedzi wspomagane sztuczną inteligencją w wyszukiwaniu i odfiltrowuje znane strony ze spamem AI w wynikach wyszukiwania obrazów.</string>
+    <string name="duckAiUseWithoutAiDisabledDescription">Sztuczna inteligencja jest obecnie wyłączona w przeglądarce, więc nie zobaczysz już odpowiedzi wspomaganych sztuczną inteligencją oraz uzyskasz mniej obrazów generowanych przez sztuczną inteligencję w wynikach wyszukiwania obrazów.</string>
+
+    <!-- Duck AI Section in AI Feature Screen -->
+    <string name="input_screen_user_pref_toggle_between_search_and_ai">Przełącz między wyszukiwaniem a Duck.ai</string>
+    <string name="duckAiDialogHideAiGeneratedImagesTitle">Ukryj obrazy generowane przez AI</string>
+    <string name="duckAiDialogHideAiGeneratedImagesDescription">Odfiltrowuje znane strony ze spamem AI z wyników wyszukiwania obrazów. <annotation link="learn_more">Dowiedz się więcej</annotation></string>
+
     <!-- Duck AI Paid Settings -->
     <string name="duck_ai_paid_settings_enable_in_settings">Włącz w ustawieniach funkcji AI</string>
     <string name="duck_ai_paid_settings_manage_in_settings">Zarządzaj w ustawieniach funkcji AI</string>

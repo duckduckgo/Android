@@ -33,6 +33,7 @@ import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import com.google.android.material.card.MaterialCardView
 import com.squareup.anvil.annotations.ContributesBinding
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import org.json.JSONArray
@@ -75,6 +76,7 @@ class RealContextualNativeInputManager @Inject constructor(
     private var jsMessaging: JsMessaging? = null
     private var widget: NativeInputModeWidget? = null
     private var lastMode: Mode? = null
+    private val modelPickerEnabled = MutableStateFlow(true)
 
     private enum class Mode { WEBVIEW, INPUT }
 
@@ -115,7 +117,7 @@ class RealContextualNativeInputManager @Inject constructor(
             card?.show()
             // WEBVIEW mode means a chat is in progress.
             // Hide the picker so the user can't change models mid-chat.
-            widget?.setModelPickerEnabled(false)
+            modelPickerEnabled.value = false
         } else {
             card?.gone()
         }
@@ -125,7 +127,7 @@ class RealContextualNativeInputManager @Inject constructor(
         lastMode = Mode.INPUT
         card?.gone()
         // INPUT mode is a new chat: restore the picker
-        if (isNativeInputEnabled) widget?.setModelPickerEnabled(true)
+        if (isNativeInputEnabled) modelPickerEnabled.value = true
     }
 
     private fun applyCardShape(card: MaterialCardView) {
@@ -150,6 +152,7 @@ class RealContextualNativeInputManager @Inject constructor(
     ) {
         widget.configureContextual(tabId)
         widget.bindChatIdSource(chatIdFlow)
+        widget.bindModelPickerEnabledSource(modelPickerEnabled)
         widget.hideMainButtons()
         widget.onStopTapped = ::sendStopEvent
         widget.bindAttachmentCallbacks(

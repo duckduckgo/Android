@@ -170,6 +170,15 @@ interface DuckChat {
     suspend fun hasUserEnabledChatHistory(): Boolean
 
     /**
+     * Emits whether the most recent Chat Tab suggestions fetch returned any entries, reflecting the
+     * currently displayed suggestions for the latest query.
+     *
+     * Caution: the cached value is cleared when the Chat Tab is torn down, so no value is emitted
+     * until the current presentation performs its first fetch.
+     */
+    fun observeHasChatSuggestions(): Flow<Boolean>
+
+    /**
      * Records that the user selected the "Search + Duck.ai" option on the new address bar picker, so the
      * first prompt submitted from the Duck.ai toggle input field within the attribution window can be
      * attributed back to the picker.

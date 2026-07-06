@@ -14,18 +14,23 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.common.utils.featureflags
+package com.duckduckgo.app.browser
 
 import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
 
+/**
+ * Kill switch for forcing a WebView re-composite (onPause/onResume) when onPageCommitVisible
+ * never fired, to clear a stale frame left by a recycled WebView.
+ */
 @ContributesRemoteFeature(
     scope = AppScope::class,
-    featureName = "okHttpInterceptorRefactor",
+    featureName = "forceWebViewRecomposite",
 )
-interface OkHttpInterceptorRefactorFeature {
+interface ForceWebViewRecompositeFeature {
+
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun self(): Toggle
 }

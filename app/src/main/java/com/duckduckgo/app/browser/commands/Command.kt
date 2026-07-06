@@ -62,6 +62,11 @@ sealed class Command {
         val sourceTabId: String? = null,
     ) : Command()
 
+    class OpenInFireTab(
+        val query: String,
+        val sourceTabId: String? = null,
+    ) : Command()
+
     class OpenMessageInNewTab(
         val message: Message,
         val sourceTabId: String? = null,

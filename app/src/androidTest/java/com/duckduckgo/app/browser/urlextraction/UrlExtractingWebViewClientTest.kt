@@ -24,6 +24,7 @@ import com.duckduckgo.app.browser.*
 import com.duckduckgo.app.browser.certificates.rootstore.TrustedCertificateStore
 import com.duckduckgo.app.browser.cookies.ThirdPartyCookieManager
 import com.duckduckgo.app.browser.httpauth.WebViewHttpAuthStore
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.cookies.api.CookieManagerProvider
 import kotlinx.coroutines.test.TestScope
@@ -63,8 +64,9 @@ class UrlExtractingWebViewClientTest {
             TestScope(),
             coroutinesTestRule.testDispatcherProvider,
             urlExtractor,
+            BrowserMode.REGULAR,
         )
-        whenever(cookieManagerProvider.get()).thenReturn(cookieManager)
+        whenever(cookieManagerProvider.forMode(BrowserMode.REGULAR)).thenReturn(cookieManager)
     }
 
     @UiThreadTest
@@ -78,7 +80,7 @@ class UrlExtractingWebViewClientTest {
     @Test
     fun whenOnPageStartedCalledThenProcessUriForThirdPartyCookiesCalled() = runTest {
         testee.onPageStarted(mockWebView, EXAMPLE_URL, null)
-        verify(thirdPartyCookieManager).processUriForThirdPartyCookies(mockWebView, EXAMPLE_URL.toUri())
+        verify(thirdPartyCookieManager).processUriForThirdPartyCookies(mockWebView, EXAMPLE_URL.toUri(), BrowserMode.REGULAR)
     }
 
     @UiThreadTest

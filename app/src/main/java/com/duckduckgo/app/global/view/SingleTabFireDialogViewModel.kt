@@ -164,7 +164,7 @@ class SingleTabFireDialogViewModel @Inject constructor(
                     clearOptions = clearOptions,
                 )
                 try {
-                    dataClearing.clearDataUsingManualFireOptions()
+                    dataClearing.clearDataUsingManualFireOptions(browserMode = browserMode)
                     dataClearingWideEvent.finishSuccess()
                 } catch (e: Exception) {
                     dataClearingWideEvent.finishFailure(e)
@@ -187,7 +187,9 @@ class SingleTabFireDialogViewModel @Inject constructor(
                 command.send(Command.PlayAnimation)
             }
 
-            // TODO: clear all Fire tabs and their data only (handled in the follow-up PR)
+            withContext(dispatcherProvider.io()) {
+                dataClearing.clearDataUsingManualFireOptions(browserMode = browserMode)
+            }
 
             command.send(Command.ClearingComplete)
         }
@@ -207,7 +209,7 @@ class SingleTabFireDialogViewModel @Inject constructor(
             }
 
             withContext(dispatcherProvider.io()) {
-                dataClearing.clearSelectedDuckAiChats(selectedChatUrls)
+                dataClearing.clearSelectedDuckAiChats(selectedChatUrls, browserMode)
             }
 
             command.send(Command.ClearingComplete)
@@ -240,15 +242,15 @@ class SingleTabFireDialogViewModel @Inject constructor(
                 resolveTargetTabId(origin.value)
             }
 
-            // TODO: when isFireMode, the clear must target Fire-tab data (done in a follow-up PR)
             val result = withContext(dispatcherProvider.io()) {
                 if (originalTabId != null) {
                     if (origin.value == DuckAiContextualChat) {
-                        dataClearing.clearTabContextualChat(originalTabId)
+                        dataClearing.clearTabContextualChat(originalTabId, browserMode)
                     } else {
                         dataClearing.clearSingleTabData(
                             tabId = originalTabId,
                             replaceCurrentTab = origin.value !is Hatch,
+                            browserMode = browserMode,
                         )
                     }
                 } else {

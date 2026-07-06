@@ -32,9 +32,11 @@ import com.duckduckgo.pir.impl.wideevents.PirScanWideEvent.CancellationReason
 import com.duckduckgo.pir.impl.wideevents.PirScanWideEvent.FailureReason
 import com.duckduckgo.pir.impl.wideevents.PirScanWideEventImpl.Companion.ENTRY_POINT_MANUAL_EDIT_PROFILE
 import com.duckduckgo.pir.impl.wideevents.PirScanWideEventImpl.Companion.ENTRY_POINT_MANUAL_INITIAL
+import com.duckduckgo.pir.impl.wideevents.PirScanWideEventImpl.Companion.ENTRY_POINT_MANUAL_INITIAL_RESUME
 import com.duckduckgo.pir.impl.wideevents.PirScanWideEventImpl.Companion.ENTRY_POINT_SCHEDULED
 import com.duckduckgo.pir.impl.wideevents.PirScanWideEventImpl.Companion.EXECUTION_TYPE_MANUAL_EDIT_PROFILE
 import com.duckduckgo.pir.impl.wideevents.PirScanWideEventImpl.Companion.EXECUTION_TYPE_MANUAL_INITIAL
+import com.duckduckgo.pir.impl.wideevents.PirScanWideEventImpl.Companion.EXECUTION_TYPE_MANUAL_INITIAL_RESUME
 import com.duckduckgo.pir.impl.wideevents.PirScanWideEventImpl.Companion.EXECUTION_TYPE_SCHEDULED
 import com.duckduckgo.pir.impl.wideevents.PirScanWideEventImpl.Companion.INTERVAL_OPT_OUT_DURATION
 import com.duckduckgo.pir.impl.wideevents.PirScanWideEventImpl.Companion.INTERVAL_TOTAL_FLOW_DURATION
@@ -300,6 +302,34 @@ class PirScanWideEventTest {
     }
 
     @Test
+    fun whenManualInitialResumeRunStartedThenEntryPointAndExecutionTypeReflectThat() = runTest {
+        // Given
+        whenever(wideEventClient.flowStart(any(), any(), any(), any())).thenReturn(Result.success(789L))
+
+        // When
+        runStarted(PirExecutionType.MANUAL_INITIAL_RESUME, 1, 3, 6)
+
+        // Then - a resume reuses the pir-initial-scan flow but is tagged with its own entry point / type
+        verify(wideEventClient).flowStart(
+            name = WIDE_EVENT_NAME_MANUAL,
+            flowEntryPoint = ENTRY_POINT_MANUAL_INITIAL_RESUME,
+            metadata = mapOf(
+                KEY_EXECUTION_TYPE to EXECUTION_TYPE_MANUAL_INITIAL_RESUME,
+                KEY_PROFILE_QUERIES_COUNT to "1",
+                KEY_BROKER_COUNT to "3",
+                KEY_TOTAL_SCAN_JOBS to "6",
+                KEY_WEB_VIEW_COUNT to "6",
+                KEY_POWER_SAVING to "false",
+                KEY_BATTERY_OPTIMIZATIONS to "false",
+                KEY_VPN_CONNECTION_STATE to "disconnected",
+                KEY_NOTIFICATIONS_PERMISSION_GRANTED to "true",
+                KEY_TRACKER_BLOCKING_STATE to "disabled",
+            ),
+            cleanupPolicy = CleanupPolicy.OnTimeout(duration = 8.hours, flowStatus = FlowStatus.Unknown),
+        )
+    }
+
+    @Test
     fun whenManualAndScheduledFlowsBothActiveThenTheyDoNotInterfere() = runTest {
         // Given
         whenever(wideEventClient.flowStart(any(), any(), any(), any()))
@@ -480,6 +510,29 @@ class PirScanWideEventTest {
             wideEventId = 101L,
             status = FlowStatus.Cancelled,
             metadata = mapOf(KEY_CANCELLATION_REASON to "superseded_by_profile_edit"),
+        )
+    }
+
+    @Test
+    fun whenManualFlowOpenAndInitialResumeRunStartsThenStaleFlowFinishedWithSupersededByNewRun() = runTest {
+        // Given an open manual flow (the interrupted initial scan)
+        whenever(wideEventClient.flowStart(any(), any(), any(), any()))
+            .thenReturn(Result.success(102L))
+            .thenReturn(Result.success(202L))
+        runStarted(PirExecutionType.MANUAL_INITIAL, 1, 1, 1)
+
+        // When the dashboard resumes it with a MANUAL_INITIAL_RESUME run that supersedes the stale flow
+        runStarted(PirExecutionType.MANUAL_INITIAL_RESUME, 1, 1, 1)
+
+        // Then the stale flow is cancelled as a generic superseded-by-new-run (a resume is not a profile edit)
+        val order = inOrder(wideEventClient)
+        order.verify(wideEventClient).intervalEnd(wideEventId = 102L, key = "decile_0_10_duration_ms_bucketed")
+        order.verify(wideEventClient).intervalEnd(wideEventId = 102L, key = INTERVAL_TOTAL_SCAN_DURATION)
+        order.verify(wideEventClient).intervalEnd(wideEventId = 102L, key = INTERVAL_TOTAL_FLOW_DURATION)
+        order.verify(wideEventClient).flowFinish(
+            wideEventId = 102L,
+            status = FlowStatus.Cancelled,
+            metadata = mapOf(KEY_CANCELLATION_REASON to "superseded_by_new_run"),
         )
     }
 

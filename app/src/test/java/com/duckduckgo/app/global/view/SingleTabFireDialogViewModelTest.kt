@@ -117,8 +117,8 @@ class SingleTabFireDialogViewModelTest {
             whenever(mockFireDataStore.getManualClearOptions()).thenReturn(emptySet())
             whenever(mockWebViewCapabilityChecker.isSupported(DeleteBrowsingData)).thenReturn(false)
             whenever(mockDownloadsRepository.getDownloads()).thenReturn(emptyList())
-            whenever(mockDataClearing.clearSingleTabData(any(), any())).thenReturn(ClearDataResult.Success)
-            whenever(mockDataClearing.clearTabContextualChat(any())).thenReturn(ClearDataResult.Success)
+            whenever(mockDataClearing.clearSingleTabData(any(), any(), any())).thenReturn(ClearDataResult.Success)
+            whenever(mockDataClearing.clearTabContextualChat(any(), any())).thenReturn(ClearDataResult.Success)
         }
     }
 
@@ -1046,7 +1046,7 @@ class SingleTabFireDialogViewModelTest {
 
         coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
 
-        verify(mockDataClearing).clearDataUsingManualFireOptions()
+        verify(mockDataClearing).clearDataUsingManualFireOptions(browserMode = BrowserMode.REGULAR)
     }
 
     @Test
@@ -1201,14 +1201,15 @@ class SingleTabFireDialogViewModelTest {
     }
 
     @Test
-    fun `when in fire mode delete all clicked then manual fire clear is not invoked`() = runTest {
+    fun `when in fire mode delete all clicked then manual fire clear is invoked for fire mode`() = runTest {
         testee = createViewModel(browserMode = BrowserMode.FIRE)
 
         testee.onDeleteAllClicked()
 
         coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
 
-        verify(mockDataClearing, never()).clearDataUsingManualFireOptions()
+        verify(mockDataClearing).clearDataUsingManualFireOptions(browserMode = BrowserMode.FIRE)
+        verify(mockDataClearing, never()).clearDataUsingManualFireOptions(browserMode = BrowserMode.REGULAR)
     }
 
     @Test
@@ -1241,8 +1242,8 @@ class SingleTabFireDialogViewModelTest {
 
         coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
 
-        verify(mockDataClearing).clearSelectedDuckAiChats(urls)
-        verify(mockDataClearing, never()).clearDataUsingManualFireOptions(any(), any())
+        verify(mockDataClearing).clearSelectedDuckAiChats(urls, BrowserMode.REGULAR)
+        verify(mockDataClearing, never()).clearDataUsingManualFireOptions(any(), any(), any())
     }
 
     @Test
@@ -1343,8 +1344,8 @@ class SingleTabFireDialogViewModelTest {
 
         coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
 
-        verify(mockDataClearing, never()).clearSelectedDuckAiChats(any())
-        verify(mockDataClearing, never()).clearDataUsingManualFireOptions(any(), any())
+        verify(mockDataClearing, never()).clearSelectedDuckAiChats(any(), any())
+        verify(mockDataClearing, never()).clearDataUsingManualFireOptions(any(), any(), any())
     }
 
     // endregion
@@ -1447,7 +1448,7 @@ class SingleTabFireDialogViewModelTest {
 
         coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
 
-        verify(mockDataClearing).clearSingleTabData(tabId = "tab1", replaceCurrentTab = true)
+        verify(mockDataClearing).clearSingleTabData(tabId = "tab1", replaceCurrentTab = true, browserMode = BrowserMode.REGULAR)
     }
 
     @Test
@@ -1459,7 +1460,7 @@ class SingleTabFireDialogViewModelTest {
 
         coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
 
-        verify(mockDataClearing, never()).clearSingleTabData(any(), any())
+        verify(mockDataClearing, never()).clearSingleTabData(any(), any(), any())
     }
 
     @Test
@@ -1492,7 +1493,7 @@ class SingleTabFireDialogViewModelTest {
 
         coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
 
-        verify(mockDataClearing, never()).clearDataUsingManualFireOptions()
+        verify(mockDataClearing, never()).clearDataUsingManualFireOptions(any(), any(), any())
     }
 
     @Test
@@ -1500,7 +1501,7 @@ class SingleTabFireDialogViewModelTest {
         whenever(mockTabRepository.getSelectedTab()).thenReturn(
             TabEntity(tabId = "tab1", url = "https://example.com", title = "Example"),
         )
-        whenever(mockDataClearing.clearSingleTabData(any(), any())).thenReturn(ClearDataResult.FeatureNotSupported)
+        whenever(mockDataClearing.clearSingleTabData(any(), any(), any())).thenReturn(ClearDataResult.FeatureNotSupported)
         testee = createViewModel()
 
         testee.commands().test {
@@ -1520,7 +1521,7 @@ class SingleTabFireDialogViewModelTest {
         whenever(mockTabRepository.getSelectedTab()).thenReturn(
             TabEntity(tabId = "tab1", url = "https://example.com", title = "Example"),
         )
-        whenever(mockDataClearing.clearSingleTabData(any(), any())).thenReturn(ClearDataResult.Error(RuntimeException("test")))
+        whenever(mockDataClearing.clearSingleTabData(any(), any(), any())).thenReturn(ClearDataResult.Error(RuntimeException("test")))
         testee = createViewModel()
 
         testee.commands().test {
@@ -1540,7 +1541,7 @@ class SingleTabFireDialogViewModelTest {
         whenever(mockTabRepository.getSelectedTab()).thenReturn(
             TabEntity(tabId = "tab1", url = "https://example.com", title = "Example"),
         )
-        whenever(mockDataClearing.clearSingleTabData(any(), any())).thenReturn(ClearDataResult.FeatureNotSupported)
+        whenever(mockDataClearing.clearSingleTabData(any(), any(), any())).thenReturn(ClearDataResult.FeatureNotSupported)
         testee = createViewModel()
 
         testee.commands().test {
@@ -1678,7 +1679,7 @@ class SingleTabFireDialogViewModelTest {
 
         coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
 
-        verify(mockDataClearing, never()).clearSingleTabData(any(), any())
+        verify(mockDataClearing, never()).clearSingleTabData(any(), any(), any())
     }
 
     @Test
@@ -1693,7 +1694,7 @@ class SingleTabFireDialogViewModelTest {
 
         coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
 
-        verify(mockDataClearing).clearTabContextualChat("tab1")
+        verify(mockDataClearing).clearTabContextualChat("tab1", BrowserMode.REGULAR)
     }
 
     @Test
@@ -1874,8 +1875,8 @@ class SingleTabFireDialogViewModelTest {
             cancelAndConsumeRemainingEvents()
         }
 
-        verify(mockDataClearing).clearSingleTabData(tabId = "hatch-tab", replaceCurrentTab = false)
-        verify(mockDataClearing, never()).clearSingleTabData(eq("selected-tab"), any())
+        verify(mockDataClearing).clearSingleTabData(tabId = "hatch-tab", replaceCurrentTab = false, browserMode = BrowserMode.REGULAR)
+        verify(mockDataClearing, never()).clearSingleTabData(eq("selected-tab"), any(), any())
     }
 
     // endregion

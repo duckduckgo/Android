@@ -186,6 +186,8 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
     private val requestPermission = registerForActivityResult(ActivityResultContracts.RequestPermission()) { permissionGranted ->
         if (permissionGranted) {
             viewModel.notificationRuntimePermissionGranted()
+        } else {
+            viewModel.notificationRuntimePermissionDenied()
         }
         if (view?.windowVisibility == View.VISIBLE) {
             viewModel.loadDaxDialog()
@@ -2495,14 +2497,14 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
             .forEachIndexed { index, button ->
                 suggestions[index].setOptionView(button)
                 button.setOnClickListener {
-                    viewModel.onInputModeDemoQuerySubmitted(suggestions[index].link, isChat = inputMode == InputMode.CHAT)
+                    viewModel.onInputModeDemoQuerySubmitted(suggestions[index].link, isChat = inputMode == InputMode.CHAT, fromSuggestion = true)
                 }
             }
 
         previewContent.inputModeDemoActionIcon.setOnClickListener {
             val query = previewContent.inputText.text?.toString().orEmpty().trim()
             if (query.isNotEmpty()) {
-                viewModel.onInputModeDemoQuerySubmitted(query, isChat = currentInputMode == InputMode.CHAT)
+                viewModel.onInputModeDemoQuerySubmitted(query, isChat = currentInputMode == InputMode.CHAT, fromSuggestion = false)
             }
         }
 

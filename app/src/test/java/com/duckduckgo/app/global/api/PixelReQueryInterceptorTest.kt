@@ -17,8 +17,6 @@
 package com.duckduckgo.app.global.api
 
 import com.duckduckgo.common.test.api.FakeChain
-import com.duckduckgo.common.utils.featureflags.OkHttpInterceptorRefactorFeature
-import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import org.junit.Assert.assertEquals
 import org.junit.Before
@@ -30,9 +28,7 @@ class PixelReQueryInterceptorTest {
 
     @Before
     fun setup() {
-        pixelReQueryInterceptor = PixelReQueryInterceptor(
-            FakeFeatureToggleFactory.create(OkHttpInterceptorRefactorFeature::class.java),
-        )
+        pixelReQueryInterceptor = PixelReQueryInterceptor()
     }
 
     @Test

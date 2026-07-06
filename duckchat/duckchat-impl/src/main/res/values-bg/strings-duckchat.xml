@@ -95,6 +95,23 @@
     <string name="duckAiHideAiGeneratedImagesTitle">Скриване на изображения, генерирани от изкуствен интелект</string>
     <string name="duckAiHideAiGeneratedImagesDescription">Филтрира в резултатите от търсенето изображенията, генерирани от изкуствен интелект</string>
 
+    <!-- Search Assist Visibility -->
+    <string name="duckAiSearchAssistVisibilitySubtitle">Изберете колко често искате да се появяват отговори, подпомагани от изкуствен интелект, в търсенето.</string>
+    <string name="duckAiSearchAssistVisibilityNever">Никога</string>
+    <string name="duckAiSearchAssistVisibilityOnDemand">При поискване</string>
+    <string name="duckAiSearchAssistVisibilitySometimes">Понякога</string>
+    <string name="duckAiSearchAssistVisibilityOften">Често</string>
+
+    <!-- Duck AI Use Without AI Settings Option -->
+    <string name="duckAiUseWithoutAiTitle">Използвайте DuckDuckGo без AI</string>
+    <string name="duckAiUseWithoutAiDescription">Деактивира Duck.ai, скрива подпомогнатите от AI отговори в търсенето и филтрира известни спам AI сайтове в резултатите от търсенето на изображения.</string>
+    <string name="duckAiUseWithoutAiDisabledDescription">AI в момента е деактивиран в браузъра, затова вече няма да виждате подпомогнати от AI отговори и ще виждате по-малко генерирани от AI изображения в резултатите от търсенето на изображения.</string>
+
+    <!-- Duck AI Section in AI Feature Screen -->
+    <string name="input_screen_user_pref_toggle_between_search_and_ai">Превключвайте между\nТърсене и Duck.ai</string>
+    <string name="duckAiDialogHideAiGeneratedImagesTitle">Скриване на изображения, генерирани от изкуствен интелект</string>
+    <string name="duckAiDialogHideAiGeneratedImagesDescription">Филтрира известни спам AI сайтове в резултатите от търсенето на изображения. <annotation link="learn_more">Научете повече</annotation></string>
+
     <!-- Duck AI Paid Settings -->
     <string name="duck_ai_paid_settings_enable_in_settings">Активиране в настройките на AI функции</string>
     <string name="duck_ai_paid_settings_manage_in_settings">Управление на настройките на AI функциите</string>

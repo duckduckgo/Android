@@ -1075,4 +1075,21 @@
     <!-- New Address Bar Picker -->
     <string name="newAddressBarPickerDuckDuckGo" translatable="false">DuckDuckGo</string>
     <string name="newAddressBarPickerConfirm">Bekräfta</string>
+
+    <!-- Fire mode -->
+    <string name="openInFireTab">Öppna på en Fire-flik</string>
+    <string name="openInBackgroundTab">Öppna i bakgrunden</string>
+    <string name="browserModeToggleFireDescription">Växla till Fire-flikar</string>
+    <string name="browserModeToggleRegularDescription">Byt till vanliga flikar</string>
+    <string name="browserModeToggleTabCountInfinite">∞</string>
+    <string name="fireTabMenuItem">Fire-flik</string>
+    <string name="fireTabNewTabPageTitle">Fire-flik</string>
+    <string name="fireTabsEmptyStateTitle">Fire-flikar</string>
+    <string name="fireTabsFeatureNoHistory">Surfa utan att spara lokal historik</string>
+    <string name="fireTabsFeatureDifferentAccount">Logga in på en webbplats med ett annat konto</string>
+    <string name="fireTabsFeatureTroubleshoot">Felsöka webbplatser</string>
+    <string name="fireTabsExplainer">Fire-flikar är isolerade från andra webbläsardata. Deras data rensas när du stänger dem alla. De ger dig samma spårningsskydd som andra flikar.</string>
+    <string name="fireTabsNewTabButton">Ny Fire-flik</string>
+    <string name="fireTabsPromoTabSwitcherText"><![CDATA[<b>NYTT!</b> Prova Fire-flikar för att surfa utan att spara lokal historik.]]></string>
+    <string name="singleTabFireDialogTitleFireMode">Ta bort Fire Tabs och deras data?</string>
 </resources>

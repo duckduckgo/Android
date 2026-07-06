@@ -1075,4 +1075,21 @@
     <!-- New Address Bar Picker -->
     <string name="newAddressBarPickerDuckDuckGo" translatable="false">DuckDuckGo</string>
     <string name="newAddressBarPickerConfirm">Bevestigen</string>
+
+    <!-- Fire mode -->
+    <string name="openInFireTab">Openen in Fire-tabblad</string>
+    <string name="openInBackgroundTab">Openen op de achtergrond</string>
+    <string name="browserModeToggleFireDescription">Overschakelen naar Fire-tabbladen</string>
+    <string name="browserModeToggleRegularDescription">Overschakelen naar normale tabbladen</string>
+    <string name="browserModeToggleTabCountInfinite">∞</string>
+    <string name="fireTabMenuItem">Fire-tabblad</string>
+    <string name="fireTabNewTabPageTitle">Fire-tabblad</string>
+    <string name="fireTabsEmptyStateTitle">Fire-tabbladen</string>
+    <string name="fireTabsFeatureNoHistory">Bladeren zonder lokale geschiedenis op te slaan</string>
+    <string name="fireTabsFeatureDifferentAccount">Meld je aan bij een website met een ander account</string>
+    <string name="fireTabsFeatureTroubleshoot">Problemen met websites oplossen</string>
+    <string name="fireTabsExplainer">Fire-tabbladen zijn geïsoleerd van andere browsergegevens. Hun gegevens worden verwijderd als je ze allemaal afsluit. Ze geven je dezelfde trackingbeveiliging als andere tabbladen.</string>
+    <string name="fireTabsNewTabButton">Nieuw Fire-tabblad</string>
+    <string name="fireTabsPromoTabSwitcherText"><![CDATA[<b>NIEUW!</b> Probeer Fire Tabs om te browsen zonder de lokale geschiedenis op te slaan.]]></string>
+    <string name="singleTabFireDialogTitleFireMode">Fire-tabbladen en hun gegevens verwijderen?</string>
 </resources>

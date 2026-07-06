@@ -44,6 +44,7 @@ import com.duckduckgo.sync.impl.internal.SyncInternalEnvDataStore
 import com.duckduckgo.sync.impl.promotion.SyncPromotionDataStore
 import com.duckduckgo.sync.impl.promotion.SyncPromotionDataStore.PromotionType.BookmarkAddedDialog
 import com.duckduckgo.sync.impl.promotion.SyncPromotionDataStore.PromotionType.BookmarksScreen
+import com.duckduckgo.sync.impl.promotion.SyncPromotionDataStore.PromotionType.ChatTabPage
 import com.duckduckgo.sync.impl.promotion.SyncPromotionDataStore.PromotionType.PasswordsScreen
 import com.duckduckgo.sync.internal.ui.SyncInternalSettingsViewModel.Command.ReadConnectQR
 import com.duckduckgo.sync.internal.ui.SyncInternalSettingsViewModel.Command.ReadQR
@@ -454,6 +455,13 @@ constructor(
         viewModelScope.launch {
             syncPromotionDataStore.clearPromoHistory(PasswordsScreen)
             command.send(ShowMessage("'Password screen' promo history cleared"))
+        }
+    }
+
+    fun onClearHistoryChatTabPagePromoClicked() {
+        viewModelScope.launch {
+            syncPromotionDataStore.clearPromoHistory(ChatTabPage)
+            command.send(ShowMessage("'Chat tab page' promo history cleared"))
         }
     }
 

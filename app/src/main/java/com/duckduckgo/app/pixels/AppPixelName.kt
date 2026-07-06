@@ -66,7 +66,6 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     PREONBOARDING_SKIP_ONBOARDING_PRESSED("m_preonboarding_skip-onboarding-pressed"),
     PREONBOARDING_CONFIRM_SKIP_ONBOARDING_PRESSED("m_preonboarding_confirm-skip-onboarding-pressed"),
     PREONBOARDING_RESUME_ONBOARDING_PRESSED("m_preonboarding_resume-onboarding-pressed"),
-    ONBOARDING_QUICK_SETUP("onboarding_quick-setup"),
     ONBOARDING_SEARCH_CUSTOM("m_onboarding_search_custom"),
     ONBOARDING_VISIT_SITE_CUSTOM("m_onboarding_visit_site_custom"),
     ONBOARDING_DAX_CTA_SHOWN("m_odc_s"),
@@ -136,6 +135,9 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     LONG_PRESS_COPY_URL("mlp_c"),
     LONG_PRESS_COPY_LINK_TEXT("m_long_press_copy_link_text"),
     LONG_PRESS_OPEN_IMAGE_IN_BACKGROUND_TAB("mlp_ibt"),
+    LONG_PRESS_NEW_FIRE_TAB("m_long_press_new_fire_tab"),
+    FIRE_TABS_PROMO_TAB_SWITCHER_SHOWN("m_fire_tabs_promo_tab_switcher_shown"),
+    FIRE_TABS_PROMO_TAB_SWITCHER_DISMISSED("m_fire_tabs_promo_tab_switcher_dismissed"),
 
     SETTINGS_OPENED("ms"),
     SETTINGS_THEME_OPENED("ms_t_o"),

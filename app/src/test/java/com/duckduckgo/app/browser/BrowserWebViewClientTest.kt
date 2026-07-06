@@ -77,6 +77,7 @@ import com.duckduckgo.autofill.api.BrowserAutofill
 import com.duckduckgo.autofill.api.InternalTestUserChecker
 import com.duckduckgo.browser.api.JsInjectorPlugin
 import com.duckduckgo.browser.api.WebViewVersionProvider
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.device.DeviceInfo
@@ -179,6 +180,8 @@ class BrowserWebViewClientTest {
     private val pageLoadWideEvent: PageLoadWideEvent = mock()
     private val mockAppSchemeInterceptionFeature: AppSchemeInterceptionFeature = mock()
     private val appSchemeInterceptionEnabledFlow = MutableStateFlow(true)
+    private val mockForceWebViewRecompositeFeature: ForceWebViewRecompositeFeature = mock()
+    private val forceRecompositeEnabledFlow = MutableStateFlow(true)
 
     @Before
     fun setup() =
@@ -191,6 +194,10 @@ class BrowserWebViewClientTest {
             whenever(enabledToggle.isEnabled()).thenReturn(true)
             whenever(enabledToggle.enabled()).thenReturn(appSchemeInterceptionEnabledFlow)
             whenever(mockAppSchemeInterceptionFeature.self()).thenReturn(enabledToggle)
+            val forceRecompositeToggle: Toggle = mock()
+            whenever(forceRecompositeToggle.isEnabled()).thenReturn(true)
+            whenever(forceRecompositeToggle.enabled()).thenReturn(forceRecompositeEnabledFlow)
+            whenever(mockForceWebViewRecompositeFeature.self()).thenReturn(forceRecompositeToggle)
             testee =
                 BrowserWebViewClient(
                     webViewHttpAuthStore,
@@ -226,10 +233,12 @@ class BrowserWebViewClientTest {
                     mockDuckChat,
                     mockContentScopeExperiments,
                     mockAppSchemeInterceptionFeature,
+                    mockForceWebViewRecompositeFeature,
+                    BrowserMode.REGULAR,
                 )
             testee.webViewClientListener = listener
             whenever(webResourceRequest.url).thenReturn(Uri.EMPTY)
-            whenever(cookieManagerProvider.get()).thenReturn(cookieManager)
+            whenever(cookieManagerProvider.forMode(BrowserMode.REGULAR)).thenReturn(cookieManager)
             whenever(currentTimeProvider.elapsedRealtime()).thenReturn(0)
             whenever(webViewVersionProvider.getMajorVersion()).thenReturn("1")
             whenever(deviceInfo.appVersion).thenReturn("1")
@@ -296,10 +305,22 @@ class BrowserWebViewClientTest {
     }
 
     @Test
+    fun whenOnPageStartedThenContentScopeDesktopModeComesFromCurrentSite() {
+        // pageChanged stamps site.isDesktopMode per-domain before this runs, so the C-S-S flag is read from getSite().
+        val site = mock<Site>()
+        whenever(site.isDesktopMode).thenReturn(true)
+        whenever(listener.getSite()).thenReturn(site)
+
+        testee.onPageStarted(webView, EXAMPLE_URL, null)
+
+        assertEquals(true, jsPlugins.plugin.lastDesktopMode)
+    }
+
+    @Test
     fun whenOnPageStartedCalledThenProcessUriForThirdPartyCookiesCalled() =
         runTest {
             testee.onPageStarted(webView, EXAMPLE_URL, null)
-            verify(thirdPartyCookieManager).processUriForThirdPartyCookies(webView, EXAMPLE_URL.toUri())
+            verify(thirdPartyCookieManager).processUriForThirdPartyCookies(webView, EXAMPLE_URL.toUri(), BrowserMode.REGULAR)
         }
 
     @Test
@@ -676,9 +697,9 @@ class BrowserWebViewClientTest {
         whenever(specialUrlDetector.determineType(initiatingUrl = any(), uri = any())).thenReturn(urlType)
         whenever(webResourceRequest.isRedirect).thenReturn(false)
         whenever(webResourceRequest.isForMainFrame).thenReturn(true)
-        whenever(listener.handleAppLink(any(), any())).thenReturn(true)
+        whenever(listener.handleAppLink(any(), any(), any())).thenReturn(true)
         assertTrue(testee.shouldOverrideUrlLoading(webView, webResourceRequest))
-        verify(listener).handleAppLink(urlType, isForMainFrame = true)
+        verify(listener).handleAppLink(urlType, isForMainFrame = true, hasGesture = false)
     }
 
     @Test
@@ -687,9 +708,9 @@ class BrowserWebViewClientTest {
         whenever(specialUrlDetector.determineType(initiatingUrl = any(), uri = any())).thenReturn(urlType)
         whenever(webResourceRequest.isRedirect).thenReturn(false)
         whenever(webResourceRequest.isForMainFrame).thenReturn(true)
-        whenever(listener.handleAppLink(any(), any())).thenReturn(false)
+        whenever(listener.handleAppLink(any(), any(), any())).thenReturn(false)
         assertFalse(testee.shouldOverrideUrlLoading(webView, webResourceRequest))
-        verify(listener).handleAppLink(urlType, isForMainFrame = true)
+        verify(listener).handleAppLink(urlType, isForMainFrame = true, hasGesture = false)
     }
 
     @Test
@@ -698,7 +719,19 @@ class BrowserWebViewClientTest {
             .thenReturn(SpecialUrlDetector.UrlType.AppLink(uriString = EXAMPLE_URL))
         testee.webViewClientListener = null
         assertFalse(testee.shouldOverrideUrlLoading(webView, webResourceRequest))
-        verify(listener, never()).handleAppLink(any(), any())
+        verify(listener, never()).handleAppLink(any(), any(), any())
+    }
+
+    @Test
+    fun whenAppLinkDetectedThenHasGestureForwardedFromRequest() {
+        val urlType = SpecialUrlDetector.UrlType.AppLink(uriString = EXAMPLE_URL)
+        whenever(specialUrlDetector.determineType(initiatingUrl = any(), uri = any())).thenReturn(urlType)
+        whenever(webResourceRequest.isRedirect).thenReturn(false)
+        whenever(webResourceRequest.isForMainFrame).thenReturn(true)
+        whenever(webResourceRequest.hasGesture()).thenReturn(true)
+        whenever(listener.handleAppLink(any(), any(), any())).thenReturn(true)
+        testee.shouldOverrideUrlLoading(webView, webResourceRequest)
+        verify(listener).handleAppLink(urlType, isForMainFrame = true, hasGesture = true)
     }
 
     @Test
@@ -922,13 +955,13 @@ class BrowserWebViewClientTest {
             .thenReturn(SpecialUrlDetector.UrlType.TrackingParameterLink(EXAMPLE_URL))
         val appLink = SpecialUrlDetector.UrlType.AppLink(uriString = EXAMPLE_URL)
         whenever(specialUrlDetector.processUrl(anyString(), anyString())).thenReturn(appLink)
-        whenever(listener.handleAppLink(any(), any())).thenReturn(true)
+        whenever(listener.handleAppLink(any(), any(), any())).thenReturn(true)
         whenever(webResourceRequest.isForMainFrame).thenReturn(true)
         val mockWebView = getImmediatelyInvokedMockWebView()
         assertTrue(testee.shouldOverrideUrlLoading(mockWebView, webResourceRequest))
         verify(mockWebView).loadUrl(EXAMPLE_URL)
         verify(listener).startProcessingTrackingLink()
-        verify(listener).handleAppLink(appLink, true)
+        verify(listener).handleAppLink(appLink, isForMainFrame = true, hasGesture = false)
     }
 
     @Test
@@ -943,13 +976,13 @@ class BrowserWebViewClientTest {
             .thenReturn(SpecialUrlDetector.UrlType.TrackingParameterLink(EXAMPLE_URL))
         val appLink = SpecialUrlDetector.UrlType.AppLink(uriString = EXAMPLE_URL)
         whenever(specialUrlDetector.processUrl(anyString(), anyString())).thenReturn(appLink)
-        whenever(listener.handleAppLink(any(), any())).thenReturn(false)
+        whenever(listener.handleAppLink(any(), any(), any())).thenReturn(false)
         whenever(webResourceRequest.isForMainFrame).thenReturn(true)
         val mockWebView = getImmediatelyInvokedMockWebView()
         assertFalse(testee.shouldOverrideUrlLoading(mockWebView, webResourceRequest))
         verify(mockWebView).loadUrl(EXAMPLE_URL)
         verify(listener).startProcessingTrackingLink()
-        verify(listener).handleAppLink(appLink, true)
+        verify(listener).handleAppLink(appLink, isForMainFrame = true, hasGesture = false)
     }
 
     @Test
@@ -1251,6 +1284,97 @@ class BrowserWebViewClientTest {
             verify(listener).onSiteVisited(eq(EXAMPLE_URL), eq(null))
         }
     }
+
+    @Test
+    fun whenPageFinishesAndCommitVisibleNeverFiredAndTabInForegroundThenWebViewRecomposited() {
+        val mockWebView = getImmediatelyInvokedMockWebView()
+        whenever(mockWebView.progress).thenReturn(100)
+        whenever(mockWebView.safeCopyBackForwardList()).thenReturn(TestBackForwardList())
+        whenever(mockWebView.settings).thenReturn(mock())
+        whenever(mockWebView.isShown).thenReturn(true)
+        whenever(listener.isTabInForeground()).thenReturn(true)
+        testee.onPageStarted(mockWebView, EXAMPLE_URL, null)
+        testee.onPageFinished(mockWebView, EXAMPLE_URL)
+        verify(mockWebView).onPause()
+        verify(mockWebView).onResume()
+        verify(pixel).fire(WebViewPixelName.WEB_VIEW_FORCED_RECOMPOSITE, type = Pixel.PixelType.Daily())
+    }
+
+    @Test
+    fun whenPageFinishesMultipleTimesAndCommitVisibleNeverFiredThenWebViewRecompositedOnlyOnce() {
+        val mockWebView = getImmediatelyInvokedMockWebView()
+        whenever(mockWebView.progress).thenReturn(100)
+        whenever(mockWebView.safeCopyBackForwardList()).thenReturn(TestBackForwardList())
+        whenever(mockWebView.settings).thenReturn(mock())
+        whenever(mockWebView.isShown).thenReturn(true)
+        whenever(listener.isTabInForeground()).thenReturn(true)
+        testee.onPageStarted(mockWebView, EXAMPLE_URL, null)
+        testee.onPageFinished(mockWebView, EXAMPLE_URL)
+        testee.onPageFinished(mockWebView, EXAMPLE_URL)
+        verify(mockWebView, times(1)).onPause()
+        verify(mockWebView, times(1)).onResume()
+        verify(pixel, times(1)).fire(WebViewPixelName.WEB_VIEW_FORCED_RECOMPOSITE, type = Pixel.PixelType.Daily())
+    }
+
+    @Test
+    fun whenPageFinishesAndCommitVisibleNeverFiredButWebViewNotShownThenWebViewNotRecomposited() {
+        val mockWebView = getImmediatelyInvokedMockWebView()
+        whenever(mockWebView.progress).thenReturn(100)
+        whenever(mockWebView.safeCopyBackForwardList()).thenReturn(TestBackForwardList())
+        whenever(mockWebView.settings).thenReturn(mock())
+        whenever(mockWebView.isShown).thenReturn(false)
+        whenever(listener.isTabInForeground()).thenReturn(true)
+        testee.onPageStarted(mockWebView, EXAMPLE_URL, null)
+        testee.onPageFinished(mockWebView, EXAMPLE_URL)
+        verify(mockWebView, never()).onPause()
+        verify(mockWebView, never()).onResume()
+        verify(pixel, never()).fire(eq(WebViewPixelName.WEB_VIEW_FORCED_RECOMPOSITE), any(), any(), any())
+    }
+
+    @Test
+    fun whenPageFinishesAndCommitVisibleFiredThenWebViewNotRecomposited() {
+        val mockWebView = getImmediatelyInvokedMockWebView()
+        whenever(mockWebView.progress).thenReturn(100)
+        whenever(mockWebView.safeCopyBackForwardList()).thenReturn(TestBackForwardList())
+        whenever(mockWebView.settings).thenReturn(mock())
+        whenever(listener.isTabInForeground()).thenReturn(true)
+        testee.onPageStarted(mockWebView, EXAMPLE_URL, null)
+        testee.onPageCommitVisible(mockWebView, EXAMPLE_URL)
+        testee.onPageFinished(mockWebView, EXAMPLE_URL)
+        verify(mockWebView, never()).onPause()
+        verify(mockWebView, never()).onResume()
+        verify(pixel, never()).fire(eq(WebViewPixelName.WEB_VIEW_FORCED_RECOMPOSITE), any(), any(), any())
+    }
+
+    @Test
+    fun whenPageFinishesAndCommitVisibleNeverFiredButTabNotInForegroundThenWebViewNotRecomposited() {
+        val mockWebView = getImmediatelyInvokedMockWebView()
+        whenever(mockWebView.progress).thenReturn(100)
+        whenever(mockWebView.safeCopyBackForwardList()).thenReturn(TestBackForwardList())
+        whenever(mockWebView.settings).thenReturn(mock())
+        whenever(listener.isTabInForeground()).thenReturn(false)
+        testee.onPageStarted(mockWebView, EXAMPLE_URL, null)
+        testee.onPageFinished(mockWebView, EXAMPLE_URL)
+        verify(mockWebView, never()).onPause()
+        verify(mockWebView, never()).onResume()
+        verify(pixel, never()).fire(eq(WebViewPixelName.WEB_VIEW_FORCED_RECOMPOSITE), any(), any(), any())
+    }
+
+    @Test
+    fun whenPageFinishesAndCommitVisibleNeverFiredButFeatureDisabledThenWebViewNotRecomposited() =
+        runTest {
+            forceRecompositeEnabledFlow.emit(false)
+            val mockWebView = getImmediatelyInvokedMockWebView()
+            whenever(mockWebView.progress).thenReturn(100)
+            whenever(mockWebView.safeCopyBackForwardList()).thenReturn(TestBackForwardList())
+            whenever(mockWebView.settings).thenReturn(mock())
+            whenever(listener.isTabInForeground()).thenReturn(true)
+            testee.onPageStarted(mockWebView, EXAMPLE_URL, null)
+            testee.onPageFinished(mockWebView, EXAMPLE_URL)
+            verify(mockWebView, never()).onPause()
+            verify(mockWebView, never()).onResume()
+            verify(pixel, never()).fire(eq(WebViewPixelName.WEB_VIEW_FORCED_RECOMPOSITE), any(), any(), any())
+        }
 
     @Test
     fun whenPageStartedMoreThanOnceThenStartTimeIsNotUpdated() {
@@ -1785,6 +1909,7 @@ class BrowserWebViewClientTest {
     private class FakeJsInjectorPlugin : JsInjectorPlugin {
         var countFinished = 0
         var countStarted = 0
+        var lastDesktopMode: Boolean? = null
 
         override fun onPageStarted(
             webView: WebView,
@@ -1793,6 +1918,7 @@ class BrowserWebViewClientTest {
             activeExperiments: List<Toggle>,
         ) {
             countStarted++
+            lastDesktopMode = isDesktopMode
         }
 
         override fun onPageFinished(

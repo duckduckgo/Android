@@ -1075,4 +1075,21 @@
     <!-- New Address Bar Picker -->
     <string name="newAddressBarPickerDuckDuckGo" translatable="false">DuckDuckGo</string>
     <string name="newAddressBarPickerConfirm">Επιβεβαίωση</string>
+
+    <!-- Fire mode -->
+    <string name="openInFireTab">Άνοιγμα σε Καρτέλα Fire</string>
+    <string name="openInBackgroundTab">Άνοιγμα στο παρασκήνιο</string>
+    <string name="browserModeToggleFireDescription">Μετάβαση σε καρτέλες λειτουργίας Fire</string>
+    <string name="browserModeToggleRegularDescription">Αλλαγή σε κανονικές καρτέλες</string>
+    <string name="browserModeToggleTabCountInfinite">∞</string>
+    <string name="fireTabMenuItem">Καρτέλα Fire</string>
+    <string name="fireTabNewTabPageTitle">Καρτέλα Fire</string>
+    <string name="fireTabsEmptyStateTitle">Καρτέλες Fire</string>
+    <string name="fireTabsFeatureNoHistory">Περιηγηθείτε χωρίς να αποθηκεύετε το τοπικό ιστορικό</string>
+    <string name="fireTabsFeatureDifferentAccount">Συνδεθείτε σε ιστότοπο με διαφορετικό λογαριασμό</string>
+    <string name="fireTabsFeatureTroubleshoot">Αντιμετώπιση προβλημάτων ιστοτόπων</string>
+    <string name="fireTabsExplainer">Οι καρτέλες Fire είναι απομονωμένες από άλλα δεδομένα του προγράμματος περιήγησης. Τα δεδομένα τους καίγονται όταν τις κλείσετε όλες. Παρέχουν την ίδια προστασία παρακολούθησης με άλλες καρτέλες.</string>
+    <string name="fireTabsNewTabButton">Νέα καρτέλα Fire</string>
+    <string name="fireTabsPromoTabSwitcherText"><![CDATA[<b>ΝΕΟ!</b> Δοκιμάστε τις καρτέλες Fire για περιήγηση χωρίς να αποθηκεύετε το τοπικό ιστορικό.]]></string>
+    <string name="singleTabFireDialogTitleFireMode">Να διαγραφούν οι καρτέλες Fire και τα δεδομένα τους;</string>
 </resources>

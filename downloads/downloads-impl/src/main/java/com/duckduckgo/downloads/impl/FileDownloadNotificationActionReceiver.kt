@@ -26,6 +26,7 @@ import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.extensions.registerNotExportedReceiver
 import com.duckduckgo.di.scopes.AppScope
@@ -99,6 +100,8 @@ class FileDownloadNotificationActionReceiver @Inject constructor(
                 val pendingDownload = PendingFileDownload(
                     url = url,
                     subfolder = Environment.DIRECTORY_DOWNLOADS,
+                    // an app-level action with no live browsing session uses the Regular mode jar
+                    browserMode = BrowserMode.REGULAR,
                 )
                 logcat { "Retrying download for $url" }
                 downloadsRepository.delete(downloadId)

@@ -22,15 +22,18 @@ import android.webkit.PermissionRequest
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import com.duckduckgo.site.permissions.api.SitePermissionsGrantedListener
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissions
+import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.never
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.verifyNoMoreInteractions
 import com.nhaarman.mockitokotlin2.whenever
+import kotlinx.coroutines.test.runTest
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -50,7 +53,9 @@ class SitePermissionsDialogActivityLauncherTest {
         whenever(it.getHost()).thenReturn("duck.ai")
     }
 
-    private val testee = SitePermissionsDialogActivityLauncher(
+    private val testee = createLauncher(BrowserMode.REGULAR)
+
+    private fun createLauncher(browserMode: BrowserMode) = SitePermissionsDialogActivityLauncher(
         systemPermissionsHelper = systemPermissionsHelper,
         sitePermissionsRepository = sitePermissionsRepository,
         faviconManager = faviconManager,
@@ -58,6 +63,7 @@ class SitePermissionsDialogActivityLauncherTest {
         dispatcher = coroutineRule.testDispatcherProvider,
         appCoroutineScope = coroutineRule.testScope,
         duckAiHostProvider = duckAiHostProvider,
+        browserMode = browserMode,
     )
 
     @Test
@@ -160,5 +166,62 @@ class SitePermissionsDialogActivityLauncherTest {
         verifyNoMoreInteractions(pixel)
         // System permission not re-requested (already granted)
         verify(systemPermissionsHelper, never()).requestMultiplePermissions(com.nhaarman.mockitokotlin2.any())
+    }
+
+    @Test
+    fun whenRegularModeAndPermissionGrantedThenPersistedAndWebViewGranted() {
+        whenever(systemPermissionsHelper.hasMicPermissionsGranted()).thenReturn(true)
+
+        val activity: Activity = mock()
+        val request: PermissionRequest = mock()
+        whenever(request.resources).thenReturn(arrayOf(PermissionRequest.RESOURCE_AUDIO_CAPTURE))
+        whenever(request.origin).thenReturn(Uri.parse("https://duck.ai"))
+
+        testee.askForSitePermission(
+            activity = activity,
+            url = "https://duck.ai",
+            tabId = "tabId",
+            permissionsRequested = SitePermissions(
+                autoAccept = emptyList(),
+                userHandled = listOf(PermissionRequest.RESOURCE_AUDIO_CAPTURE),
+            ),
+            request = request,
+            permissionsGrantedListener = permissionsGrantedListener,
+        )
+
+        // WebView permission granted in-session
+        verify(request).grant(any())
+        // And the grant is persisted into the shared store
+        verify(sitePermissionsRepository).sitePermissionGranted("https://duck.ai", "tabId", PermissionRequest.RESOURCE_AUDIO_CAPTURE)
+    }
+
+    @Test
+    fun whenFireModeAndPermissionGrantedThenWebViewGrantedButNotPersisted() = runTest {
+        val fireLauncher = createLauncher(BrowserMode.FIRE)
+        whenever(systemPermissionsHelper.hasMicPermissionsGranted()).thenReturn(true)
+
+        val activity: Activity = mock()
+        val request: PermissionRequest = mock()
+        whenever(request.resources).thenReturn(arrayOf(PermissionRequest.RESOURCE_AUDIO_CAPTURE))
+        whenever(request.origin).thenReturn(Uri.parse("https://duck.ai"))
+
+        fireLauncher.askForSitePermission(
+            activity = activity,
+            url = "https://duck.ai",
+            tabId = "tabId",
+            permissionsRequested = SitePermissions(
+                autoAccept = emptyList(),
+                userHandled = listOf(PermissionRequest.RESOURCE_AUDIO_CAPTURE),
+            ),
+            request = request,
+            permissionsGrantedListener = permissionsGrantedListener,
+        )
+
+        // WebView permission still granted in-session so the page works
+        verify(request).grant(any())
+        // But nothing is persisted into the shared store in Fire mode
+        verify(sitePermissionsRepository, never()).sitePermissionGranted(any(), any(), any())
+        verify(sitePermissionsRepository, never()).sitePermissionPermanentlySaved(any(), any(), any())
+        verify(sitePermissionsRepository, never()).savePermission(any())
     }
 }

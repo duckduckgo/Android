@@ -95,6 +95,23 @@
     <string name="duckAiHideAiGeneratedImagesTitle">Masquer les images générées par l\'IA</string>
     <string name="duckAiHideAiGeneratedImagesDescription">Filtre les images générées par l\'IA des résultats de recherche d\'images</string>
 
+    <!-- Search Assist Visibility -->
+    <string name="duckAiSearchAssistVisibilitySubtitle">Choisissez la fréquence à laquelle vous souhaitez que les réponses assistées par l\'IA apparaissent dans vos recherches.</string>
+    <string name="duckAiSearchAssistVisibilityNever">Jamais</string>
+    <string name="duckAiSearchAssistVisibilityOnDemand">À la demande</string>
+    <string name="duckAiSearchAssistVisibilitySometimes">Parfois</string>
+    <string name="duckAiSearchAssistVisibilityOften">Souvent</string>
+
+    <!-- Duck AI Use Without AI Settings Option -->
+    <string name="duckAiUseWithoutAiTitle">Utiliser DuckDuckGo sans IA</string>
+    <string name="duckAiUseWithoutAiDescription">Désactive Duck.ai, masque les réponses assistées par l\'IA dans la recherche et filtre les sites de spam liés à l\'IA dans les résultats de recherche d\'images.</string>
+    <string name="duckAiUseWithoutAiDisabledDescription">L\'IA est actuellement désactivée dans le navigateur, vous ne verrez donc plus de réponses assistées par l\'IA et vous verrez moins d\'images générées par l\'IA dans les résultats de recherche d\'images.</string>
+
+    <!-- Duck AI Section in AI Feature Screen -->
+    <string name="input_screen_user_pref_toggle_between_search_and_ai">Basculer entre la recherche et Duck.ai</string>
+    <string name="duckAiDialogHideAiGeneratedImagesTitle">Masquer les images générées par l\'IA</string>
+    <string name="duckAiDialogHideAiGeneratedImagesDescription">Filtre les sites de spam IA connus dans les résultats de recherche d\'images. <annotation link="learn_more">En savoir plus</annotation></string>
+
     <!-- Duck AI Paid Settings -->
     <string name="duck_ai_paid_settings_enable_in_settings">Activer dans les réglages des fonctionnalités d\'IA</string>
     <string name="duck_ai_paid_settings_manage_in_settings">Gérer dans les réglages des fonctionnalités d\'IA</string>

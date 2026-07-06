@@ -48,6 +48,7 @@ import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.api.InputMode
+import com.duckduckgo.duckchat.api.NativeInputEventListener
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState.InteractionLock
 import com.duckduckgo.duckchat.api.toChatIdOrNull
 import com.duckduckgo.duckchat.impl.ui.nativeinput.views.NativeInputWidget
@@ -58,9 +59,11 @@ import com.google.android.material.card.MaterialCardView
 import com.squareup.anvil.annotations.ContributesBinding
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 import org.json.JSONArray
 import javax.inject.Inject
 
@@ -132,6 +135,9 @@ interface NativeInputManager {
 
     /** Show pulse animation around the Duck.ai fire button. */
     fun setDuckAiFireButtonHighlighted(highlighted: Boolean)
+
+    /** Hide/show the subscription-tier indicator in the Duck.ai header (hidden during the onboarding lock). */
+    fun setDuckAiTierVisible(visible: Boolean)
 }
 
 @ContributesBinding(FragmentScope::class)
@@ -144,6 +150,7 @@ class RealNativeInputManager @Inject constructor(
     private val duckAiFeatureState: DuckAiFeatureState,
     private val pixel: Pixel,
     private val nativeInputStateBugKillSwitch: NativeInputStateBugKillSwitch,
+    private val nativeInputEventListener: NativeInputEventListener,
 ) : NativeInputManager {
     private lateinit var omnibarController: NativeInputOmnibarController
     private lateinit var rootView: ViewGroup
@@ -353,9 +360,14 @@ class RealNativeInputManager @Inject constructor(
                 omnibarController.hideBackground()
                 duckAiToolbarHidden = false
             }
-            updateWidgetFocus(widget)
+            if (!isExternalKeyboardConnected()) {
+                updateWidgetFocus(widget)
+            }
         }
     }
+
+    private fun isExternalKeyboardConnected(): Boolean =
+        rootView.resources.configuration.keyboard != Configuration.KEYBOARD_NOKEYS
 
     private fun isLandscape(): Boolean =
         rootView.resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
@@ -442,6 +454,9 @@ class RealNativeInputManager @Inject constructor(
             }
         }
         attachWidget(widgetView, isBottom, tabId)
+        lifecycleOwner.lifecycleScope.launch {
+            if (isDuckAiSettingsUrl(currentTabUrl.firstOrNull())) widgetView.gone()
+        }
         val isNewTab = query.isEmpty() && omnibarController.getText().isEmpty()
         applyInitialTabSelection(widgetView, isNewTab, initialInputMode)
         if (omnibarController.isDuckAiMode()) {
@@ -449,6 +464,8 @@ class RealNativeInputManager @Inject constructor(
         } else {
             showNtp()
         }
+        val landscape = rootView.resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
+        nativeInputEventListener.onNativeInputShown(landscape = landscape)
     }
 
     private fun bindSearchCallbacks(
@@ -466,6 +483,7 @@ class RealNativeInputManager @Inject constructor(
         widget.bindInputEvents(
             onSearchTextChanged = onSearchTextChanged,
             onSearchSubmitted = { query ->
+                nativeInputEventListener.onSearchSubmitted(query)
                 hideNativeInput(isNavigation = true)
                 callbacks.onSearchSubmitted(query)
             },
@@ -488,6 +506,7 @@ class RealNativeInputManager @Inject constructor(
                     )
                     widget.clearSelectedTool()
                     widget.onPromptSubmitted()
+                    nativeInputEventListener.onChatPromptSubmitted()
                 } else if (queryUrlPredictor.isUrl(query)) {
                     // Not in a Duck.ai chat (e.g. on the NTP with the Duck.ai toggle selected): a
                     // URL is an address, so navigate to it exactly like Search mode rather than
@@ -513,6 +532,7 @@ class RealNativeInputManager @Inject constructor(
                         hideNtp()
                     }
                     isExiting = false
+                    nativeInputEventListener.onChatPromptSubmitted()
                     callbacks.onDuckAiQuerySubmitted(query)
                 }
             },
@@ -734,6 +754,10 @@ class RealNativeInputManager @Inject constructor(
         duckAiFireButtonHighlightSource.value = highlighted
     }
 
+    override fun setDuckAiTierVisible(visible: Boolean) {
+        if (::omnibarController.isInitialized) omnibarController.setTierVisible(visible)
+    }
+
     private fun suppressShadow(view: View) {
         view.outlineProvider = object : ViewOutlineProvider() {
             override fun getOutline(v: View, outline: Outline) {
@@ -914,6 +938,11 @@ class RealNativeInputManager @Inject constructor(
         if (rawUrl.isNullOrBlank()) return null
         val uri = runCatching { rawUrl.toUri() }.getOrNull() ?: return null
         return uri.toChatIdOrNull(duckChat)
+    }
+
+    private fun isDuckAiSettingsUrl(url: String?): Boolean {
+        val uri = url?.toUri() ?: return false
+        return duckChat.isDuckChatUrl(uri) && uri.getQueryParameter("settings") == "open"
     }
 
     companion object {

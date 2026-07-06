@@ -1075,4 +1075,21 @@
     <!-- New Address Bar Picker -->
     <string name="newAddressBarPickerDuckDuckGo" translatable="false">DuckDuckGo</string>
     <string name="newAddressBarPickerConfirm">Потвърждаване</string>
+
+    <!-- Fire mode -->
+    <string name="openInFireTab">Отваряне в раздел Fire</string>
+    <string name="openInBackgroundTab">Отваряне във фонов режим</string>
+    <string name="browserModeToggleFireDescription">Превключване към раздели в режим Fire</string>
+    <string name="browserModeToggleRegularDescription">Превключване към обикновени раздели</string>
+    <string name="browserModeToggleTabCountInfinite">∞</string>
+    <string name="fireTabMenuItem">Раздел Fire</string>
+    <string name="fireTabNewTabPageTitle">Раздел Fire</string>
+    <string name="fireTabsEmptyStateTitle">Раздели Fire</string>
+    <string name="fireTabsFeatureNoHistory">Сърфиране без запазване на локалната история</string>
+    <string name="fireTabsFeatureDifferentAccount">Влизане в сайт с друг акаунт</string>
+    <string name="fireTabsFeatureTroubleshoot">Отстраняване на неизправности в уебсайтове</string>
+    <string name="fireTabsExplainer">Разделите Fire са изолирани от другите данни на браузъра. Когато затворите всички такива раздели, данните в тях се изгарят. Те имат същата защита от проследяване като другите раздели.</string>
+    <string name="fireTabsNewTabButton">Нов раздел Fire</string>
+    <string name="fireTabsPromoTabSwitcherText"><![CDATA[<b>НОВО!</b> Изпробвайте разделите Fire, в които сърфирате, без да запазвате локална история.]]></string>
+    <string name="singleTabFireDialogTitleFireMode">Изтриване на разделите Fire и данните в тях?</string>
 </resources>

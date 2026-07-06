@@ -95,6 +95,23 @@
     <string name="duckAiHideAiGeneratedImagesTitle">Nascondi le immagini generate dall\'IA</string>
     <string name="duckAiHideAiGeneratedImagesDescription">Filtra le immagini generate dall\'intelligenza artificiale dai risultati di ricerca delle immagini</string>
 
+    <!-- Search Assist Visibility -->
+    <string name="duckAiSearchAssistVisibilitySubtitle">Scegli la frequenza con cui vuoi che le risposte assistite dall\'AI appaiano nelle tue ricerche.</string>
+    <string name="duckAiSearchAssistVisibilityNever">Mai</string>
+    <string name="duckAiSearchAssistVisibilityOnDemand">Su richiesta</string>
+    <string name="duckAiSearchAssistVisibilitySometimes">A volte</string>
+    <string name="duckAiSearchAssistVisibilityOften">Spesso</string>
+
+    <!-- Duck AI Use Without AI Settings Option -->
+    <string name="duckAiUseWithoutAiTitle">Usa DuckDuckGo senza AI</string>
+    <string name="duckAiUseWithoutAiDescription">Disattiva Duck.ai, nasconde le risposte formulate dall\'AI nei risultati di ricerca e filtra i siti di spam noti generati dall\'AI nei risultati della ricerca per immagini.</string>
+    <string name="duckAiUseWithoutAiDisabledDescription">Attualmente l\'AI è disattivata nel browser, quindi non vedrai più risposte formulate con l\'aiuto dell\'AI e vedrai meno immagini generate dall\'AI nei risultati di ricerca delle immagini.</string>
+
+    <!-- Duck AI Section in AI Feature Screen -->
+    <string name="input_screen_user_pref_toggle_between_search_and_ai">Alterna tra\nCerca e Duck.ai</string>
+    <string name="duckAiDialogHideAiGeneratedImagesTitle">Nascondi le immagini generate dall\'AI</string>
+    <string name="duckAiDialogHideAiGeneratedImagesDescription">Filtra i siti di spam AI noti dai risultati di ricerca delle immagini. <annotation link="learn_more">Ulteriori informazioni</annotation></string>
+
     <!-- Duck AI Paid Settings -->
     <string name="duck_ai_paid_settings_enable_in_settings">Abilita nelle impostazioni delle funzionalità AI</string>
     <string name="duck_ai_paid_settings_manage_in_settings">Gestisci nelle impostazioni delle funzionalità AI</string>

@@ -17,7 +17,6 @@
 package com.duckduckgo.app.global.api
 
 import com.duckduckgo.common.utils.device.DeviceInfo
-import com.duckduckgo.common.utils.featureflags.OkHttpInterceptorRefactorFeature
 import logcat.logcat
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.Interceptor
@@ -31,13 +30,8 @@ import okhttp3.Response
  *
  * This interceptor removes the _android_{formFactor} appended suffix
  */
-class PixelReQueryInterceptor(
-    private val okHttpInterceptorRefactorFeature: OkHttpInterceptorRefactorFeature,
-) : Interceptor {
+class PixelReQueryInterceptor : Interceptor {
     override fun intercept(chain: Interceptor.Chain): Response {
-        if (!okHttpInterceptorRefactorFeature.self().isEnabled()) {
-            return interceptLegacy(chain)
-        }
         val originalRequest = chain.request()
         val originalUrlString = originalRequest.url.toUrl().toString()
 
@@ -54,19 +48,5 @@ class PixelReQueryInterceptor(
         logcat { "Pixel interceptor: $modifiedUrlString" }
 
         return chain.proceed(originalRequest.newBuilder().url(modifiedUrlString.toHttpUrl()).build())
-    }
-
-    private fun interceptLegacy(chain: Interceptor.Chain): Response {
-        var url = chain.request().url
-        val request = chain.request().newBuilder()
-
-        url = url.toUrl().toString().replace("rq_0_android_${DeviceInfo.FormFactor.PHONE.description}", "rq_0").toHttpUrl()
-        url = url.toUrl().toString().replace("rq_0_android_${DeviceInfo.FormFactor.TABLET.description}", "rq_0").toHttpUrl()
-        url = url.toUrl().toString().replace("rq_1_android_${DeviceInfo.FormFactor.PHONE.description}", "rq_1").toHttpUrl()
-        url = url.toUrl().toString().replace("rq_1_android_${DeviceInfo.FormFactor.TABLET.description}", "rq_1").toHttpUrl()
-
-        logcat { "Pixel interceptor: $url" }
-
-        return chain.proceed(request.url(url).build())
     }
 }

@@ -49,7 +49,7 @@
         android:layout_marginBottom="@dimen/keyline_4"
         android:fontFeatureSettings="tnum"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/infoIcon"
+        app:layout_constraintEnd_toStartOf="@+id/closeIcon"
         app:layout_constraintStart_toEndOf="@+id/infoPanelAnimatedImage"
         app:layout_constraintTop_toTopOf="parent"
         app:textType="primary"
@@ -58,15 +58,15 @@
         tools:text="396 trackers blocked in the last 7 days" />
 
     <ImageView
-        android:id="@+id/infoIcon"
+        android:id="@+id/closeIcon"
         android:layout_width="16dp"
         android:layout_height="16dp"
-        android:layout_marginEnd="@dimen/keyline_4"
+        android:layout_marginEnd="14dp"
         android:importantForAccessibility="no"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/ic_info_16"
+        app:srcCompat="@drawable/ic_close_16"
         app:tint="?attr/daxColorSecondaryIcon" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

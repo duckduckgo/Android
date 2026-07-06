@@ -60,6 +60,7 @@ class NewUserBrowserOnboardingViewModelTest {
     private fun onboardingActivityStep() =
         NewUserOnboardingActivityStep(
             id = "initial",
+            pixelName = null,
             transition = { LinearOnboardingTransition.Stay },
             resolveDialog = { NewUserOnboardingActivityDialog.Initial },
         )
@@ -67,6 +68,7 @@ class NewUserBrowserOnboardingViewModelTest {
     private fun duckAiDemoStep(prompt: String) =
         NewUserBrowserActivityStep(
             id = NewUserOnboardingStepIds.DUCK_AI_DEMO,
+            pixelName = null,
             transition = { LinearOnboardingTransition.Stay },
             resolveAction = { NewUserBrowserActivityAction.RunDuckAiOnboardingDemo(prompt) },
         )
@@ -104,6 +106,18 @@ class NewUserBrowserOnboardingViewModelTest {
                 (command as NewUserBrowserOnboardingViewModel.Command.OpenDuckAiOnboardingDemo).url,
             )
         }
+    }
+
+    @Test
+    fun `when duck ai demo step presented then emits Presented event`() = runTest {
+        whenever(duckChat.getDuckChatUrl("hello", autoPrompt = true)).thenReturn("https://duck.ai?q=hello")
+        val demoPlan = LinearOnboardingPlan(id = NewUserOnboardingPlanProvider.ROOT_PLAN_ID, steps = listOf(duckAiDemoStep("hello")))
+        fakeOrchestrator.stateFlow.value =
+            InProgress(rootPlanId = NewUserOnboardingPlanProvider.ROOT_PLAN_ID, currentPlan = demoPlan, currentStepIndex = 0)
+        val testee = createViewModel()
+        advanceUntilIdle()
+
+        assertTrue(fakeOrchestrator.events.contains(NewUserOnboardingEvent.Presented))
     }
 
     @Test

@@ -19,6 +19,7 @@ package com.duckduckgo.downloads.impl
 import android.webkit.MimeTypeMap
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -292,6 +293,7 @@ class UriUtilsFilenameExtractorTest {
             contentDisposition = contentDisposition,
             mimeType = mimeType,
             subfolder = "aFolder",
+            browserMode = BrowserMode.REGULAR,
         )
     }
 }

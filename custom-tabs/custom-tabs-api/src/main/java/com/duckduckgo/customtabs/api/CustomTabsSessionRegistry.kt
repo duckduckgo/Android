@@ -14,20 +14,16 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.browser.webview
+package com.duckduckgo.customtabs.api
 
-import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
-import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.feature.toggles.api.Toggle
-import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
+import androidx.browser.customtabs.CustomTabsSessionToken
 
-@ContributesRemoteFeature(
-    scope = AppScope::class,
-    featureName = "webViewClipboardImage",
-)
-interface WebViewClipboardImageFeature {
+/**
+ * Read-only view of verified Custom Tabs sessions (token -> calling package), used by
+ * IntentDispatcherViewModel to support handleAppLink's trusted-caller carve-out.
+ */
+interface CustomTabsSessionRegistry {
 
-    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
-    @Toggle.InternalAlwaysEnabled
-    fun self(): Toggle
+    /** Returns the verified calling package for the session, or null if no verified binding exists. */
+    fun lookupClientPackage(sessionToken: CustomTabsSessionToken): String?
 }

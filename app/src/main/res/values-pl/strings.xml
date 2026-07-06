@@ -1115,4 +1115,21 @@
     <!-- New Address Bar Picker -->
     <string name="newAddressBarPickerDuckDuckGo" translatable="false">DuckDuckGo</string>
     <string name="newAddressBarPickerConfirm">Potwierdź</string>
+
+    <!-- Fire mode -->
+    <string name="openInFireTab">Otwórz w karcie Fire</string>
+    <string name="openInBackgroundTab">Otwórz w tle</string>
+    <string name="browserModeToggleFireDescription">Przełącz się na karty w trybie Fire</string>
+    <string name="browserModeToggleRegularDescription">Przełącz na zwykłe karty</string>
+    <string name="browserModeToggleTabCountInfinite">∞</string>
+    <string name="fireTabMenuItem">Karta Fire</string>
+    <string name="fireTabNewTabPageTitle">Karta Fire</string>
+    <string name="fireTabsEmptyStateTitle">Karty Fire</string>
+    <string name="fireTabsFeatureNoHistory">Przeglądaj bez zapisywania historii lokalnej</string>
+    <string name="fireTabsFeatureDifferentAccount">Zaloguj się do witryny przy użyciu innego konta</string>
+    <string name="fireTabsFeatureTroubleshoot">Rozwiązuj problemy z witrynami</string>
+    <string name="fireTabsExplainer">Karty Fire są izolowane od innych danych przeglądarki. Ich dane zostaną zniszczone, gdy zamkniesz je wszystkie. Zapewniają one taką samą ochronę przed śledzeniem jak inne karty.</string>
+    <string name="fireTabsNewTabButton">Nowa karta Fire</string>
+    <string name="fireTabsPromoTabSwitcherText"><![CDATA[<b>NOWOŚĆ!</b> Wypróbuj karty Fire, aby przeglądać bez lokalnego zapisywania historii.]]></string>
+    <string name="singleTabFireDialogTitleFireMode">Usunąć karty Fire i ich dane?</string>
 </resources>

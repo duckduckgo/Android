@@ -94,20 +94,6 @@
         <item quantity="other" instruction="%1$d is the number of chats the user is about to delete.">Delete %1$d chats?</item>
     </plurals>
 
-    <!-- Fire mode -->
-    <string name="browserModeToggleFireDescription">Switch to Fire mode tabs</string>
-    <string name="browserModeToggleRegularDescription">Switch to regular tabs</string>
-    <string name="browserModeToggleTabCountInfinite">∞</string>
-    <string name="fireTabMenuItem">Fire Tab</string>
-    <string name="fireTabNewTabPageTitle">Fire Tab</string>
-    <string name="fireTabsEmptyStateTitle">Fire Tabs</string>
-    <string name="fireTabsFeatureNoHistory">Browse without saving local history</string>
-    <string name="fireTabsFeatureDifferentAccount">Sign in to a site with a different account</string>
-    <string name="fireTabsFeatureTroubleshoot">Troubleshoot websites</string>
-    <string name="fireTabsExplainer">Fire Tabs are isolated from other browser data. Their data is burned when you close them all. They give you the same tracking protection as other tabs.</string>
-    <string name="fireTabsNewTabButton">New Fire Tab</string>
-    <string name="singleTabFireDialogTitleFireMode">Delete Fire Tabs and their data?</string>
-
     <!-- After Inactivity: return-to-last-tab hatch setting -->
     <string name="returnToLastTabSettingTitle">Return To Last Tab</string>
     <string name="returnToLastTabSettingSubtitle">Show a link to your last tab on the New Tab Page when you reopen the app</string>

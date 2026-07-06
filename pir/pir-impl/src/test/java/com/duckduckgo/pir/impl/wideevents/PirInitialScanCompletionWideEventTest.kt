@@ -270,6 +270,27 @@ class PirInitialScanCompletionWideEventTest {
     }
 
     @Test
+    fun whenManualInitialResumeRunStartedAndNoFlowOpenThenNothingIsStarted() = runTest {
+        runStarted(executionType = PirExecutionType.MANUAL_INITIAL_RESUME)
+
+        verifyNoInteractions(wideEventClient)
+        assertFalse(dataStore.hasInitialScanEverStarted)
+    }
+
+    @Test
+    fun whenManualInitialResumeRunStartedWhileFlowOpenThenForegroundCountIncremented() = runTest {
+        whenever(wideEventClient.flowStart(any(), any(), any(), any())).thenReturn(Result.success(1L))
+        runStarted(executionType = PirExecutionType.MANUAL_INITIAL)
+
+        runStarted(executionType = PirExecutionType.MANUAL_INITIAL_RESUME)
+
+        // The resume continues the open journey flow (no second flowStart) and counts as a foreground run.
+        verify(wideEventClient).flowStart(any(), any(), any(), any())
+        assertEquals(2, dataStore.initialScanCompletionForegroundRunCount)
+        assertEquals(0, dataStore.initialScanCompletionScheduledRunCount)
+    }
+
+    @Test
     fun whenScanCompletedAndAllJobsDoneThenFlowFinishedWithSuccess() = runTest {
         whenever(wideEventClient.flowStart(any(), any(), any(), any())).thenReturn(Result.success(99L))
         runStarted(executionType = PirExecutionType.MANUAL_INITIAL)

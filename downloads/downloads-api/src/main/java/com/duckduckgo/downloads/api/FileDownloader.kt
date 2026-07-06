@@ -18,6 +18,7 @@ package com.duckduckgo.downloads.api
 
 import android.os.Environment
 import androidx.annotation.AnyThread
+import com.duckduckgo.browsermode.api.BrowserMode
 import java.io.File
 import java.io.Serializable
 
@@ -37,5 +38,6 @@ interface FileDownloader {
         val directory: File = Environment.getExternalStoragePublicDirectory(subfolder),
         val isUrlCompressed: Boolean = false,
         val fileName: String? = null,
+        val browserMode: BrowserMode,
     ) : Serializable
 }

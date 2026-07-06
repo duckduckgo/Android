@@ -47,6 +47,7 @@ interface LongPressHandler {
         data object None : RequiredAction()
         class OpenInNewTab(val url: String) : RequiredAction()
         class OpenInNewBackgroundTab(val url: String) : RequiredAction()
+        class OpenInFireTab(val url: String) : RequiredAction()
         class DownloadFile(val url: String) : RequiredAction()
         class ShareLink(val url: String) : RequiredAction()
         class CopyLink(val url: String) : RequiredAction()

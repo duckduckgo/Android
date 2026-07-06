@@ -48,7 +48,7 @@
     <string name="duck_ai_shortcut_settings_description">Choose which Duck.ai shortcuts to display</string>
 
     <!-- Default Toggle Position -->
-    <string name="duckAiDefaultTogglePositionTitle" instruction="'Toggle' refers to the UI tab switcher component (Search/Duck.ai), not the verb 'to toggle'.">New tab toggle position</string>
+    <string name="duckAiDefaultTogglePositionTitle" instruction="'Toggle' refers to the UI tab switcher component (Search/Duck.ai), not the verb 'to toggle'.">New Tab Toggle Position</string>
     <string name="duckAiDefaultTogglePositionSearch">Search</string>
     <string name="duckAiDefaultTogglePositionDuckAi">Duck.ai</string>
     <string name="duckAiDefaultTogglePositionLastUsed">Last Used</string>
@@ -93,6 +93,23 @@
     <!-- Duck AI Hide Generated Images Settings Option -->
     <string name="duckAiHideAiGeneratedImagesTitle">Hide AI-Generated Images</string>
     <string name="duckAiHideAiGeneratedImagesDescription">Filters out AI-generated images from image search results</string>
+
+    <!-- Search Assist Visibility -->
+    <string name="duckAiSearchAssistVisibilitySubtitle">Choose how often you want AI-assisted answers to appear in your searches.</string>
+    <string name="duckAiSearchAssistVisibilityNever">Never</string>
+    <string name="duckAiSearchAssistVisibilityOnDemand">On demand</string>
+    <string name="duckAiSearchAssistVisibilitySometimes">Sometimes</string>
+    <string name="duckAiSearchAssistVisibilityOften">Often</string>
+
+    <!-- Duck AI Use Without AI Settings Option -->
+    <string name="duckAiUseWithoutAiTitle">Use DuckDuckGo Without AI</string>
+    <string name="duckAiUseWithoutAiDescription">Disables Duck.ai, hides AI-assisted answers in search, and filters known AI spam sites in image search results.</string>
+    <string name="duckAiUseWithoutAiDisabledDescription">AI is currently disabled in the browser so you’ll no longer see AI-assisted answers and see fewer AI-generated images in image search results.</string>
+
+    <!-- Duck AI Section in AI Feature Screen -->
+    <string name="input_screen_user_pref_toggle_between_search_and_ai">Toggle between Search and Duck.ai</string>
+    <string name="duckAiDialogHideAiGeneratedImagesTitle">Hide AI-Generated Images</string>
+    <string name="duckAiDialogHideAiGeneratedImagesDescription">Filters out known AI spam sites from image search results. <annotation link="learn_more">Learn more</annotation></string>
 
     <!-- Duck AI Paid Settings -->
     <string name="duck_ai_paid_settings_enable_in_settings">Enable in AI Features Settings</string>

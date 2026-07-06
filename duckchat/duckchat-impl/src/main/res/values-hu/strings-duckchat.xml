@@ -95,6 +95,23 @@
     <string name="duckAiHideAiGeneratedImagesTitle">AI által generált képek elrejtése</string>
     <string name="duckAiHideAiGeneratedImagesDescription">Kiszűri az AI által generált képeket a képkeresési találatokból</string>
 
+    <!-- Search Assist Visibility -->
+    <string name="duckAiSearchAssistVisibilitySubtitle">Válaszd ki, milyen gyakran szeretnél mesterséges intelligenciával generált válaszokat látni a kereséseid során.</string>
+    <string name="duckAiSearchAssistVisibilityNever">Soha</string>
+    <string name="duckAiSearchAssistVisibilityOnDemand">Igény esetén</string>
+    <string name="duckAiSearchAssistVisibilitySometimes">Néha</string>
+    <string name="duckAiSearchAssistVisibilityOften">Gyakran</string>
+
+    <!-- Duck AI Use Without AI Settings Option -->
+    <string name="duckAiUseWithoutAiTitle">DuckDuckGo használata AI nélkül</string>
+    <string name="duckAiUseWithoutAiDescription">Kikapcsolja a Duck.ai-t, elrejti az AI segítségével létrehozott válaszokat a keresésben, és kiszűri az ismert AI-spam-webhelyeket a képkeresési eredmények közül.</string>
+    <string name="duckAiUseWithoutAiDisabledDescription">Az AI jelenleg ki van kapcsolva a böngészőben, így a továbbiakban nem fogsz AI segítségével létrehozott válaszokat látni, és kevesebb AI által generált kép jelenik meg a képkeresési találatok között.</string>
+
+    <!-- Duck AI Section in AI Feature Screen -->
+    <string name="input_screen_user_pref_toggle_between_search_and_ai">Váltás a keresés és a Duck.ai között</string>
+    <string name="duckAiDialogHideAiGeneratedImagesTitle">AI által generált képek elrejtése</string>
+    <string name="duckAiDialogHideAiGeneratedImagesDescription">Kiszűri az ismert AI-spam-webhelyeket a képkeresési találatok közül. <annotation link="learn_more">További információk</annotation></string>
+
     <!-- Duck AI Paid Settings -->
     <string name="duck_ai_paid_settings_enable_in_settings">Engedélyezés az AI-funkciók beállításaiban</string>
     <string name="duck_ai_paid_settings_manage_in_settings">Kezelés az AI-funkciók beállításaiban</string>

@@ -23,7 +23,6 @@ import com.duckduckgo.app.browser.remotemessage.CommandActionMapper
 import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.CtaId.DAX_END
 import com.duckduckgo.app.cta.ui.CtaViewModel
-import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.ExtendedOnboardingFeatureToggles
 import com.duckduckgo.app.onboardingbranddesignupdate.OnboardingBrandDesignUpdateToggles
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -72,7 +71,6 @@ class NewTabPageViewModelTest {
     private var mockPlaystoreUtils: PlayStoreUtils = mock()
     private var mockRemoteMessageModel: RemoteMessageModel = mock()
     private var mockDismissedCtaDao: DismissedCtaDao = mock()
-    private val mockExtendedOnboardingFeatureToggles: ExtendedOnboardingFeatureToggles = mock()
     private val mockSettingsDataStore: SettingsDataStore = mock()
     private val mockLowPriorityMessagingModel: LowPriorityMessagingModel = mock()
     private val mockAppTrackingProtection: AppTrackingProtection = mock()
@@ -85,7 +83,6 @@ class NewTabPageViewModelTest {
     @Before
     fun setUp() = runTest {
         val mockDisabledToggle: Toggle = mock { on { it.isEnabled() } doReturn false }
-        whenever(mockExtendedOnboardingFeatureToggles.noBrowserCtas()).thenReturn(mockDisabledToggle)
         whenever(mockOnboardingBrandDesignUpdateToggles.brandDesignUpdate()).thenReturn(mockDisabledToggle)
         whenever(mockSavedSitesRepository.getFavorites()).thenReturn(flowOf(emptyList()))
         whenever(mockRemoteMessageModel.observeActiveMessages()).thenReturn(flowOf(null))
@@ -107,7 +104,6 @@ class NewTabPageViewModelTest {
             syncEngine = mockSyncEngine,
             commandActionMapper = mockCommandActionMapper,
             dismissedCtaDao = mockDismissedCtaDao,
-            extendedOnboardingFeatureToggles = mockExtendedOnboardingFeatureToggles,
             settingsDataStore = mockSettingsDataStore,
             lowPriorityMessagingModel = mockLowPriorityMessagingModel,
             appTrackingProtection = mockAppTrackingProtection,

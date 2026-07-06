@@ -29,6 +29,8 @@ dependencies {
     implementation project(':anvil-annotations')
     implementation project(':app-build-config-api')
     implementation project(':browser-api')
+    implementation project(':browser-mode-api')
+    implementation project(':cookies-api')
     implementation project(':common-utils')
     implementation project(':design-system')
     implementation project(':di')

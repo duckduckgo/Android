@@ -343,6 +343,25 @@ class OmnibarLayoutViewModel @Inject constructor(
             }
         }.launchIn(viewModelScope)
 
+        // Re-evaluate the voice-search icon reactively when the user toggles "Private Voice Search",
+        // so it appears/disappears immediately even while the omnibar is unfocused, rather than only
+        // on the next focus or page-load event.
+        voiceSearchAvailability.observeVoiceSearchAvailability()
+            .onEach {
+                _viewState.update { state ->
+                    state.copy(
+                        showVoiceSearch = shouldShowVoiceSearch(
+                            viewMode = state.viewMode,
+                            hasFocus = state.hasFocus,
+                            query = state.omnibarText,
+                            hasQueryChanged = false,
+                            urlLoaded = state.url,
+                        ),
+                    )
+                }
+            }
+            .launchIn(viewModelScope)
+
         voiceActiveOnSelectedTab.onEach { voiceActive ->
             _viewState.update {
                 it.copy(showDuckAISidebar = shouldShowDuckAiSidebar(it.viewMode, it.hasFocus, voiceActive))
@@ -585,7 +604,7 @@ class OmnibarLayoutViewModel @Inject constructor(
         hasQueryChanged: Boolean = false,
         urlLoaded: String = "",
     ): Boolean {
-        return if (viewMode == ViewMode.DuckAI) {
+        return if (viewMode == ViewMode.DuckAI || viewMode is CustomTab) {
             false
         } else {
             voiceSearchAvailability.shouldShowVoiceSearch(

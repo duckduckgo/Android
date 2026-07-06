@@ -95,6 +95,23 @@
     <string name="duckAiHideAiGeneratedImagesTitle">Dölj AI-genererade bilder</string>
     <string name="duckAiHideAiGeneratedImagesDescription">Filtrerar bort AI-genererade bilder från bildsökningsresultaten</string>
 
+    <!-- Search Assist Visibility -->
+    <string name="duckAiSearchAssistVisibilitySubtitle">Välj hur ofta du vill att AI-assisterade svar ska visas i dina sökningar.</string>
+    <string name="duckAiSearchAssistVisibilityNever">Aldrig</string>
+    <string name="duckAiSearchAssistVisibilityOnDemand">På begäran</string>
+    <string name="duckAiSearchAssistVisibilitySometimes">Ibland</string>
+    <string name="duckAiSearchAssistVisibilityOften">Ofta</string>
+
+    <!-- Duck AI Use Without AI Settings Option -->
+    <string name="duckAiUseWithoutAiTitle">Använd DuckDuckGo utan AI</string>
+    <string name="duckAiUseWithoutAiDescription">Inaktiverar Duck.ai, döljer AI-assisterade svar i sökningen och filtrerar bort kända webbplatser för AI-spam från sökresultaten för bilder.</string>
+    <string name="duckAiUseWithoutAiDisabledDescription">AI är för närvarande inaktiverat i webbläsaren, så du kommer inte längre att se AI-assisterade svar eller AI-genererade bilder i sökresultaten för bilder.</string>
+
+    <!-- Duck AI Section in AI Feature Screen -->
+    <string name="input_screen_user_pref_toggle_between_search_and_ai">Växla mellan\nsökning och Duck.ai</string>
+    <string name="duckAiDialogHideAiGeneratedImagesTitle">Dölj AI-genererade bilder</string>
+    <string name="duckAiDialogHideAiGeneratedImagesDescription">Filtrerar bort kända webbplatser för AI-spam från sökresultaten för bilder. <annotation link="learn_more">Läs mer</annotation></string>
+
     <!-- Duck AI Paid Settings -->
     <string name="duck_ai_paid_settings_enable_in_settings">Aktivera i inställningarna för AI-funktioner</string>
     <string name="duck_ai_paid_settings_manage_in_settings">Hantera i inställningarna för AI-funktioner</string>

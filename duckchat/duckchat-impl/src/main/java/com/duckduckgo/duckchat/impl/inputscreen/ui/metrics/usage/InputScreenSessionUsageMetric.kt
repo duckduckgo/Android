@@ -22,9 +22,11 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
+import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicInteger
 import javax.inject.Inject
 
@@ -45,6 +47,7 @@ interface InputScreenSessionUsageMetric {
 class InputScreenSessionUsageMetricImpl @Inject constructor(
     private val pixel: Pixel,
     private val duckAiFeatureState: DuckAiFeatureState,
+    private val duckChatPixels: DuckChatPixels,
 ) : MainProcessLifecycleObserver, InputScreenSessionUsageMetric {
 
     private companion object {
@@ -54,13 +57,15 @@ class InputScreenSessionUsageMetricImpl @Inject constructor(
 
     private val searchCounter: AtomicInteger = AtomicInteger()
     private val promptCounter: AtomicInteger = AtomicInteger()
+    private val bothModesFired: AtomicBoolean = AtomicBoolean(false)
 
     override fun onStop(owner: LifecycleOwner) {
-        if (!duckAiFeatureState.showInputScreen.value) {
+        if (!duckAiFeatureState.nativeInputFieldEnabled.value) {
             return
         }
         val searchCount = searchCounter.getAndSet(0)
         val promptCount = promptCounter.getAndSet(0)
+        bothModesFired.set(false)
         val params = mapOf(
             PIXEL_PARAM_SEARCH_COUNT to searchCount.toString(),
             PIXEL_PARAM_PROMPT_COUNT to promptCount.toString(),
@@ -73,9 +78,17 @@ class InputScreenSessionUsageMetricImpl @Inject constructor(
 
     override fun onSearchSubmitted() {
         searchCounter.incrementAndGet()
+        maybeFireBothModes()
     }
 
     override fun onPromptSubmitted() {
         promptCounter.incrementAndGet()
+        maybeFireBothModes()
+    }
+
+    private fun maybeFireBothModes() {
+        if (searchCounter.get() > 0 && promptCounter.get() > 0 && bothModesFired.compareAndSet(false, true)) {
+            duckChatPixels.fireOmnibarSessionBothModes()
+        }
     }
 }

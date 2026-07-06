@@ -260,7 +260,7 @@ class CtaViewModel @Inject constructor(
 
     suspend fun prepareAndMarkDuckAiEndCtaForInputScreen(): DuckAiOnboardingEndCtaVariant {
         return withContext(dispatchers.io()) {
-            val shouldShow = canShowDuckAiEndCta() && !extendedOnboardingFeatureToggles.noBrowserCtas().isEnabled() && !settingsDataStore.hideTips
+            val shouldShow = canShowDuckAiEndCta() && !settingsDataStore.hideTips
             if (!shouldShow) return@withContext DuckAiOnboardingEndCtaVariant.NONE
 
             dismissedCtaDao.insert(DismissedCta(CtaId.DAX_DUCK_AI_END))
@@ -371,15 +371,8 @@ class CtaViewModel @Inject constructor(
 
     private suspend fun getHomeCta(): Cta? {
         return when {
-            // Onboarding disabled
-            canShowDaxIntroCta() && extendedOnboardingFeatureToggles.noBrowserCtas().isEnabled() -> {
-                settingsDataStore.hideTips = true
-                userStageStore.stageCompleted(AppStage.DAX_ONBOARDING)
-                null
-            }
-
             // Duck.ai onboarding end
-            canShowDuckAiEndCta() && !extendedOnboardingFeatureToggles.noBrowserCtas().isEnabled() -> {
+            canShowDuckAiEndCta() -> {
                 if (isInputScreenEnabled()) {
                     // Legacy path: the input screen auto-launches with the end CTA. Suppress home
                     // CTAs until that flow runs (see prepareAndMarkDuckAiEndCtaForInputScreen).
@@ -398,7 +391,7 @@ class CtaViewModel @Inject constructor(
             }
 
             // Search suggestions
-            canShowDaxIntroCta() && !extendedOnboardingFeatureToggles.noBrowserCtas().isEnabled() -> {
+            canShowDaxIntroCta() -> {
                 if (isBrandDesignUpdateEnabled()) {
                     DaxTryASearchBrandDesignUpdateBubbleCta(onboardingStore, appInstallStore, appTheme.isLightModeEnabled(), deviceInfo)
                 } else {
@@ -407,7 +400,7 @@ class CtaViewModel @Inject constructor(
             }
 
             // Site suggestions
-            canShowDaxIntroVisitSiteCta() && !extendedOnboardingFeatureToggles.noBrowserCtas().isEnabled() -> {
+            canShowDaxIntroVisitSiteCta() -> {
                 if (isBrandDesignUpdateEnabled()) {
                     DaxVisitSiteOptionsBrandDesignUpdateBubbleCta(
                         onboardingStore,
@@ -422,7 +415,7 @@ class CtaViewModel @Inject constructor(
             }
 
             // End
-            canShowDaxCtaEndOfJourney() && !extendedOnboardingFeatureToggles.noBrowserCtas().isEnabled() -> {
+            canShowDaxCtaEndOfJourney() -> {
                 if (isBrandDesignUpdateEnabled()) {
                     DaxEndBrandDesignUpdateBubbleCta(
                         onboardingStore,
@@ -674,25 +667,23 @@ class CtaViewModel @Inject constructor(
 
     suspend fun areBubbleDaxDialogsCompleted(): Boolean {
         return withContext(dispatchers.io()) {
-            val noBrowserCtaExperiment = extendedOnboardingFeatureToggles.noBrowserCtas().isEnabled()
             val isLastContextDialogShown = when {
                 onboardingStore.isDuckAiOnboardingFlow() -> duckAiEndShown()
                 isSubscriptionCtaAvailable() -> daxDialogSubscriptionShown()
                 else -> daxDialogEndShown()
             }
-            noBrowserCtaExperiment || isLastContextDialogShown || hideTips() || !userStageStore.daxOnboardingActive()
+            isLastContextDialogShown || hideTips() || !userStageStore.daxOnboardingActive()
         }
     }
 
     suspend fun areInContextDaxDialogsCompleted(): Boolean {
         return withContext(dispatchers.io()) {
-            val noBrowserCtaExperiment = extendedOnboardingFeatureToggles.noBrowserCtas().isEnabled()
             val inContextDaxCtasShown = if (onboardingStore.isDuckAiOnboardingFlow()) {
                 duckAiFireButtonShown() && duckAiEndShown()
             } else {
                 daxDialogSerpShown() && daxDialogTrackersFoundShown() && daxDialogFireEducationShown() && daxDialogEndShown()
             }
-            noBrowserCtaExperiment || inContextDaxCtasShown || hideTips() || !userStageStore.daxOnboardingActive()
+            inContextDaxCtasShown || hideTips() || !userStageStore.daxOnboardingActive()
         }
     }
 
