@@ -8,7 +8,8 @@ on:
 jobs:
   page-load-benchmark:
     name: Page-load benchmark
-    runs-on: ubuntu-latest
+    # Matches the Flank/androidTests job in nightly.yml — the :app build is too heavy for a stock runner.
+    runs-on: android-large-runner
     timeout-minutes: 90
     steps:
       - uses: actions/checkout@v4
@@ -30,6 +31,20 @@ jobs:
         env:
           FLANK: ${{ secrets.FLANK }}
         run: echo "$FLANK" > flank.json
+
+      # internalRelease falls back to debug-keystore signing when no release-signing secrets are set
+      # for this job (see app/build.gradle localDebugFallback + macrobenchmark debugKey). A release
+      # build won't auto-create the debug keystore, so ensure it exists (matches AGP's default debug key).
+      - name: Ensure debug keystore exists
+        run: |
+          if [ ! -f "$HOME/.android/debug.keystore" ]; then
+            mkdir -p "$HOME/.android"
+            keytool -genkeypair -v \
+              -keystore "$HOME/.android/debug.keystore" \
+              -storepass android -alias androiddebugkey -keypass android \
+              -keyalg RSA -keysize 2048 -validity 10000 \
+              -dname "CN=Android Debug,O=Android,C=US"
+          fi
 
       - name: Build APKs
         run: ./gradlew :app:assembleInternalRelease :macrobenchmark:assembleRelease
