@@ -32,6 +32,8 @@ import com.duckduckgo.browsermode.api.BrowserModeDataProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.duckchat.api.DuckChatInputModeState
+import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import com.duckduckgo.newtabpage.api.EscapeHatchTarget
 import com.duckduckgo.newtabpage.api.EscapeHatchTargetResolver
 import com.duckduckgo.newtabpage.api.NtpAfterIdleManager
@@ -57,6 +59,7 @@ class NewTabReturnHatchViewModel @Inject constructor(
     private val tabRepositoryProvider: BrowserModeDataProvider<TabRepository>,
     private val dispatchers: DispatcherProvider,
     private val duckChat: DuckChat,
+    private val duckChatInputModeState: DuckChatInputModeState,
     private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
     private val ntpAfterIdleManager: NtpAfterIdleManager,
     private val escapeHatchTargetResolver: EscapeHatchTargetResolver,
@@ -116,10 +119,19 @@ class NewTabReturnHatchViewModel @Inject constructor(
     // repository (burned, closed, or purged), so every live ViewModel instance stays in sync without
     // per-instance burn tracking. For a Fire target, visibility tracks the fire repo's flowTabs,
     // while the activity-mode repo supplies the tabs count shown in the tab button.
+    // The tabs button shows only when native input is enabled AND the address bar isn't search-only.
+    // In search-only the hatch mirrors the legacy chrome, which has no tabs entry here.
+    private val shouldShowTabsButton: Flow<Boolean> = combine(
+        duckChat.observeNativeInputFieldUserSettingEnabled(),
+        duckChatInputModeState.inputModeCapability,
+    ) { nativeInputEnabled, capability ->
+        nativeInputEnabled && capability != NativeInputState.InputMode.SEARCH_ONLY
+    }
+
     val viewState = snapshotTarget.flatMapLatest { target ->
         if (target == null) {
-            combine(currentTabRepository.flowTabs, duckChat.observeNativeInputFieldUserSettingEnabled()) { tabs, nativeInputEnabled ->
-                ViewState(shouldShow = false, tabs = tabs.size, showTabsButton = nativeInputEnabled)
+            combine(currentTabRepository.flowTabs, shouldShowTabsButton) { tabs, showTabs ->
+                ViewState(shouldShow = false, tabs = tabs.size, showTabsButton = showTabs)
             }
         } else {
             val isFireTarget = target.mode == BrowserMode.FIRE
@@ -127,9 +139,9 @@ class NewTabReturnHatchViewModel @Inject constructor(
                 pendingClose,
                 tabRepositoryProvider.forMode(target.mode).flowTabs,
                 currentTabRepository.flowTabs,
-                duckChat.observeNativeInputFieldUserSettingEnabled(),
+                shouldShowTabsButton,
                 ntpAfterIdleManager.returnToLastTabEnabled,
-            ) { closed, targetTabs, activityTabs, nativeInputEnabled, returnToLastTabEnabled ->
+            ) { closed, targetTabs, activityTabs, showTabs, returnToLastTabEnabled ->
                 val tab = targetTabs.firstOrNull { it.tabId == target.tabId }
                 if (!closed && tab != null && returnToLastTabEnabled) {
                     val url = if (isFireTarget) "" else tab.url.orEmpty()
@@ -143,10 +155,10 @@ class NewTabReturnHatchViewModel @Inject constructor(
                         isDuckChat = url.isNotEmpty() && duckChat.isDuckChatUrl(Uri.parse(url)),
                         isSerp = url.isNotEmpty() && duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url),
                         tabs = activityTabs.size,
-                        showTabsButton = nativeInputEnabled,
+                        showTabsButton = showTabs,
                     )
                 } else {
-                    ViewState(shouldShow = false, tabs = activityTabs.size, showTabsButton = nativeInputEnabled)
+                    ViewState(shouldShow = false, tabs = activityTabs.size, showTabsButton = showTabs)
                 }
             }
         }
