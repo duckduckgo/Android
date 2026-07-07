@@ -942,10 +942,11 @@ class RealDuckChat @Inject constructor(
             // Mirrors NativeInputModeWidgetViewModel.getInputMode: the address bar offers the
             // Search↔Duck.ai toggle only when Duck.ai is on (feature + user) and the address-bar
             // Duck.ai setting is on; otherwise it is search-only.
-            _availableInputMode.value = if (isDuckChatFeatureEnabled && isDuckChatUserEnabled && inputScreenUserSettingEnabled) {
-                NativeInputState.InputMode.SEARCH_AND_DUCK_AI
-            } else {
+            val searchOnly = !(isDuckChatFeatureEnabled && isDuckChatUserEnabled && inputScreenUserSettingEnabled)
+            _availableInputMode.value = if (searchOnly) {
                 NativeInputState.InputMode.SEARCH_ONLY
+            } else {
+                NativeInputState.InputMode.SEARCH_AND_DUCK_AI
             }
 
             val showInputScreen =
@@ -1001,7 +1002,9 @@ class RealDuckChat @Inject constructor(
                 isDuckChatFeatureEnabled && isDuckChatUserEnabled && duckChatFeature.contextualMode().isEnabled()
                 )
 
-            isContextualModeEnabled = showContextualMode && isContextualModeKillSwitch
+            // Contextual chat is part of the Search & Duck.ai experience; in search-only the omnibar
+            // Duck.ai button opens full-screen Duck.ai instead of the contextual sheet.
+            isContextualModeEnabled = showContextualMode && isContextualModeKillSwitch && !searchOnly
             _showContextualMode.emit(isContextualModeEnabled)
 
             isAutomaticContextAttachmentEnabled = isContextualModeEnabled &&
