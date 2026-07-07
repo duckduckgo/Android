@@ -1474,6 +1474,31 @@ class NativeInputModeWidgetViewModelTest {
 
     // endregion
 
+    // region fireRecentChatDeleteButtonTappedPixel
+
+    @Test
+    fun whenFireRecentChatDeleteButtonTappedPixelThenDelegatesToDuckChatPixels() {
+        testee.fireRecentChatDeleteButtonTappedPixel()
+
+        verify(duckChatPixels).fireRecentChatDeleteButtonTapped()
+    }
+
+    @Test
+    fun whenFireRecentChatDeleteConfirmedPixelThenDelegatesToDuckChatPixels() {
+        testee.fireRecentChatDeleteConfirmedPixel()
+
+        verify(duckChatPixels).fireRecentChatDeleteConfirmed()
+    }
+
+    @Test
+    fun whenFireRecentChatDeleteCancelledPixelThenDelegatesToDuckChatPixels() {
+        testee.fireRecentChatDeleteCancelledPixel()
+
+        verify(duckChatPixels).fireRecentChatDeleteCancelled()
+    }
+
+    // endregion
+
     // region duckai autocomplete-family pixels
 
     @Test

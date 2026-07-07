@@ -6803,6 +6803,14 @@ class BrowserTabFragment :
     fun refreshAutoComplete() {
         nativeInputManager.refreshChatSuggestions()
     }
+
+    fun onChatDeleteConfirmed() {
+        nativeInputManager.onChatDeleteConfirmed()
+    }
+
+    fun onChatDeleteCancelled() {
+        nativeInputManager.onChatDeleteCancelled()
+    }
 }
 
 private class JsOrientationHandler {

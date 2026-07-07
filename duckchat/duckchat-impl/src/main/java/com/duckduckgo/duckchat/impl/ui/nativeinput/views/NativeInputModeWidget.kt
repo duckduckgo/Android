@@ -193,6 +193,12 @@ interface NativeInputWidget {
      */
     fun refreshChatSuggestions()
 
+    /** The user confirmed deleting a recent chat from the chat-autocomplete fire dialog. */
+    fun onChatDeleteConfirmed()
+
+    /** The user cancelled deleting a recent chat from the chat-autocomplete fire dialog. */
+    fun onChatDeleteCancelled()
+
     fun asView(): View
 }
 
@@ -1264,6 +1270,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
                     onChatSuggestionSelected(viewModel.buildChatSuggestionUrl(suggestion))
                 },
                 onChatSuggestionDeleteClicked = { suggestion ->
+                    viewModel.fireRecentChatDeleteButtonTappedPixel()
                     onChatSuggestionDelete(viewModel.buildChatSuggestionUrl(suggestion))
                 },
                 onChatUrlSuggestionClicked = { suggestion ->
@@ -1343,6 +1350,14 @@ class NativeInputModeWidget @JvmOverloads constructor(
     override fun refreshChatSuggestions() {
         if (chatSuggestionsBinding == null || !isChatTabSelected()) return
         refreshChatSuggestionsAction?.invoke()
+    }
+
+    override fun onChatDeleteConfirmed() {
+        viewModel.fireRecentChatDeleteConfirmedPixel()
+    }
+
+    override fun onChatDeleteCancelled() {
+        viewModel.fireRecentChatDeleteCancelledPixel()
     }
 
     override fun asView(): View = this
