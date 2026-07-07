@@ -359,11 +359,20 @@ fladle {
             recordVideo.set(false)
             // The app-under-test is internalRelease (not the default play/debug that Fulladle
             // auto-discovers), and the instrumentation APK lives in a separate module
-            // (:macrobenchmark), so neither can be inferred — point at both. Wildcards because the
-            // app APK filename embeds the version name. Paths are relative to the root project.
-            // (On a named config these are `debugApk`/`instrumentationApk`, not appApk/testApk.)
-            debugApk.set("app/build/outputs/apk/internal/release/*.apk")
-            instrumentationApk.set("macrobenchmark/build/outputs/apk/release/*.apk")
+            // (:macrobenchmark), so neither can be inferred — point at both. On a named config the
+            // properties are `debugApk`/`instrumentationApk` (not appApk/testApk). Flank needs a
+            // concrete file (it does NOT expand wildcards), and the internalRelease APK filename
+            // embeds the version name, so resolve it lazily at execution time (after the app is
+            // assembled). The macrobenchmark APK name is stable, so it can be an exact path.
+            debugApk.set(project.provider {
+                def dir = rootProject.file("app/build/outputs/apk/internal/release")
+                def apks = dir.exists() ? (dir.listFiles() ?: []).findAll { it.name.endsWith("-internal-release.apk") } : []
+                if (apks.isEmpty()) {
+                    throw new GradleException("No internalRelease APK in $dir — run :app:assembleInternalRelease first")
+                }
+                apks.first().absolutePath
+            })
+            instrumentationApk.set(rootProject.file("macrobenchmark/build/outputs/apk/release/macrobenchmark-release.apk").absolutePath)
             testTargets.set(["class com.duckduckgo.macrobenchmark.PageLoadBenchmark"])
             // Single virtual model for v1 (we accept virtual noise; Phase 0 gates it).
             devices.set([["model": "MediumPhone.arm", "version": "30"]])
