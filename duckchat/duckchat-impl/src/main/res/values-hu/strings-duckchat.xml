@@ -199,4 +199,68 @@
     <string name="duck_ai_chat_history_download_view">Megjelenítés</string>
     <string name="duck_ai_chat_history_download_error">Nem sikerült exportálni a csevegést</string>
     <string name="duck_ai_chat_history_bulk_download_error">Nem sikerült exportálni a csevegéseket</string>
+
+    <string name="duckAiChatSearchDuckDuckGo">DuckDuckGo-keresés</string>
+    <string name="native_input_chat_hint">Kérdezz bármit privátban…</string>
+    <string name="native_input_chat_duck_mode_hint">Válasz…</string>
+
+    <!-- Model Picker -->
+    <string name="duckAiModelPickerPlusModels">Plus</string>
+    <string name="duckAiModelPickerProModels">Pro</string>
+
+    <!-- Reasoning Mode Picker -->
+    <string name="duckChatReasoningModeContentDescription">Érvelési mód</string>
+    <string name="duckChatReasoningModeFastTitle">Gyors</string>
+    <string name="duckChatReasoningModeFastSubtitle">Gyors válaszok</string>
+    <string name="duckChatReasoningModeReasoningTitle">Érvelés</string>
+    <string name="duckChatReasoningModeReasoningSubtitle">Összetett feladatokhoz</string>
+    <string name="duckChatReasoningModeExtendedTitle">Kibővített érvelés</string>
+    <string name="duckChatReasoningModeExtendedSubtitle">Elemezési feladatokhoz</string>
+
+    <!-- Start chat icon content description -->
+    <string name="duckChatStartChatContentDescription">Beszélgetés indítása</string>
+    <string name="duckChatStopStreamingContentDescription">Generálás leállítása</string>
+
+    <!-- Image attachment -->
+    <string name="duckChatImageAttachmentRemoveContentDescription">Kép eltávolítása</string>
+
+    <!-- Image attachment limits -->
+    <string name="duckChatImageAttachmentLimitPerMessage" instruction="%1$d is the maximum number of images allowed per message.">Egyszerre csak %1$d képet csatolhatsz.</string>
+    <string name="duckChatImageAttachmentLimitPerConversation" instruction="%1$d is the maximum number of images allowed in a single conversation.">Beszélgetésenként csak %1$d képet csatolhatsz.</string>
+
+    <!-- File/image attachment menu options -->
+    <string name="attachmentTakePhoto">Fénykép készítése</string>
+    <string name="attachmentAttachPhoto">Kép hozzáadása</string>
+    <string name="attachmentAttachFile">Fájl hozzáadása</string>
+
+    <!-- File attachment -->
+    <string name="duckChatFileAttachmentRemoveContentDescription">Fájl eltávolítása</string>
+    <string name="duckChatFileAttachmentLimitPerConversation" instruction="%1$d is the maximum number of files allowed in a single conversation.">Beszélgetésenként csak %1$d fájlt csatolhatsz.</string>
+    <string name="duckChatFileAttachmentTooLarge" instruction="%1$d is the maximum file size in MB.">A fájl mérete meghaladja a maximálisan megengedett %1$d MB-ot.</string>
+    <string name="duckChatFileAttachmentTooManyPages" instruction="%1$d is the maximum number of pages per file.">Az egyik csatolt fájlnak az általunk támogatottnál több oldala van. Legfeljebb %1$d oldalas fájlokat tölts fel.</string>
+    <string name="duckChatFileAttachmentTotalSizeLimitExceeded" instruction="%1$d is the total size limit in MB.">A csatolt fájlok összmérete meghaladja a maximálisan megengedett %1$d MB-ot.</string>
+    <string name="fileCaptureBrowseDisambiguationTitle">Fájl feltöltése</string>
+
+    <!-- Options button -->
+    <string name="duckChatOptionsButtonContentDescription">Duck.ai-lehetőségek</string>
+    <string name="duckChatOptionsChipDismissContentDescription" instruction="%1$s is the name of the option being removed (e.g. Create Image).">%1$s eltávolítása</string>
+    <string name="duckChatOptionsMenuCreateImage">Kép létrehozása</string>
+    <string name="duckChatOptionsMenuCreateImageSubtitle">Szövegből képek létrehozása</string>
+    <string name="duckChatOptionsMenuWebSearch">Webes keresés</string>
+    <string name="duckChatOptionsMenuWebSearchSubtitle">Válaszok keresése az interneten</string>
+    <string name="duckChatOptionsMenuCustomizeResponses">Válaszok testreszabása</string>
+    <string name="duckChatOptionsMenuCustomizeResponsesSubtitle">Hangnem, hosszúság és működés beállítása</string>
+
+    <!-- Duck.ai header -->
+    <string name="duckChatPlusButtonContentDescription">A Duck.ai menü megnyitása</string>
+
+    <!-- Duck AI Duck.ai Section Header -->
+    <string name="duckAiDuckAiSectionHeader">Duck.ai</string>
+
+    <!-- Search Assist Visibility -->
+    <string name="duckAiSearchAssistVisibilityTitle">Search Assist</string>
+    <string name="duckAiSearchAssistSettingsTitle">Search Assist</string>
+
+    <!-- Settings -->
+    <string name="duckAiSettingsTitle">Duck.ai-beállítások</string>
 </resources>
