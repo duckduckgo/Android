@@ -275,6 +275,18 @@ class InitMessageHandlerPluginTest {
     }
 
     @Test
+    fun whenCookiePopUpPreferenceSettingDisabledAndPreferenceIsDefaultThenInitProceeds() {
+        feature.cookiePopUpPreferenceSetting().setRawStoredState(Toggle.State(enable = false))
+        settingsRepository.cookiePopUpPreference = CookiePopUpPreference.DEFAULT
+        settingsCache.updateSettings("{\"disabledCMPs\": [], \"compactRuleList\": {\"v\": 1, \"s\": [], \"r\": []}}")
+
+        initHandlerPlugin.process(initHandlerPlugin.supportedTypes.first(), message(), webView, mockCallback)
+
+        verify(mockPixelManager).fireDailyPixel(AutoConsentPixel.AUTOCONSENT_INIT_DAILY)
+        assertNotNull(shadowOf(webView).lastEvaluatedJavascript)
+    }
+
+    @Test
     @Ignore("Only valid when firstPopupHandled is being used")
     fun whenProcessMessageAndFirstPopupHandledThenOnResultReceivedCalled() {
         settingsRepository.userSetting = true

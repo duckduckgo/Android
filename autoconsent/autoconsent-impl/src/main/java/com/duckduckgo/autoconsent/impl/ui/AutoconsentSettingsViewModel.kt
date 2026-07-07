@@ -133,16 +133,10 @@ class AutoconsentSettingsViewModel @Inject constructor(
     }
 
     private fun buildViewState(): ViewState {
-        if (!isCookiePopUpPreferenceSettingEnabled()) {
-            val enabled = autoconsent.isSettingEnabled()
-            return ViewState(
-                selectedPreference = if (enabled) CookiePopUpPreference.DEFAULT else CookiePopUpPreference.OFF,
-                autoconsentEnabled = enabled,
-            )
-        }
+        val selectedPreference = autoconsent.getCookiePopUpPreference()
         return ViewState(
-            selectedPreference = autoconsent.getCookiePopUpPreference(),
-            autoconsentEnabled = autoconsent.isSettingEnabled(),
+            selectedPreference = selectedPreference,
+            autoconsentEnabled = selectedPreference != CookiePopUpPreference.OFF,
         )
     }
 

@@ -40,7 +40,6 @@ class RealAutoconsentSettingsDataStore constructor(
 ) : AutoconsentSettingsDataStore {
 
     private val preferences: SharedPreferences by lazy { context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE) }
-    private var cachedLegacyUserSetting: Boolean? = null
     private var cachedCookiePopUpPreference: CookiePopUpPreference? = null
 
     private var _defaultValue: Boolean? = null
@@ -54,7 +53,6 @@ class RealAutoconsentSettingsDataStore constructor(
 
     init {
         appCoroutineScope.launch(dispatcherProvider.io()) {
-            cachedLegacyUserSetting = readLegacyUserSetting()
             cachedCookiePopUpPreference = readCookiePopUpPreference()
         }
     }
@@ -66,18 +64,23 @@ class RealAutoconsentSettingsDataStore constructor(
             }
         }
         set(value) {
+            val enabled = value != CookiePopUpPreference.OFF
             preferences.edit(commit = true) {
                 putString(AUTOCONSENT_COOKIE_POP_UP_PREFERENCE, value.name)
+                putBoolean(AUTOCONSENT_USER_SETTING, enabled)
             }.also {
                 cachedCookiePopUpPreference = value
             }
         }
 
     override var userSetting: Boolean
-        get() = cachedLegacyUserSetting ?: readLegacyUserSetting().also { cachedLegacyUserSetting = it }
+        get() = cookiePopUpPreference != CookiePopUpPreference.OFF
         set(value) {
-            writeLegacyUserSetting(value)
-            cachedLegacyUserSetting = value
+            cookiePopUpPreference = if (value) {
+                CookiePopUpPreference.DEFAULT
+            } else {
+                CookiePopUpPreference.OFF
+            }
         }
 
     override var firstPopupHandled: Boolean
@@ -91,7 +94,6 @@ class RealAutoconsentSettingsDataStore constructor(
     override fun invalidateCache() {
         appCoroutineScope.launch(dispatcherProvider.io()) {
             _defaultValue = autoconsentFeature.onByDefault().isEnabled()
-            cachedLegacyUserSetting = null
             cachedCookiePopUpPreference = null
         }
     }
@@ -120,16 +122,6 @@ class RealAutoconsentSettingsDataStore constructor(
             CookiePopUpPreference.DEFAULT
         } else {
             CookiePopUpPreference.OFF
-        }
-    }
-
-    private fun readLegacyUserSetting(): Boolean {
-        return preferences.getBoolean(AUTOCONSENT_USER_SETTING, defaultValue)
-    }
-
-    private fun writeLegacyUserSetting(value: Boolean) {
-        preferences.edit(commit = true) {
-            putBoolean(AUTOCONSENT_USER_SETTING, value)
         }
     }
 

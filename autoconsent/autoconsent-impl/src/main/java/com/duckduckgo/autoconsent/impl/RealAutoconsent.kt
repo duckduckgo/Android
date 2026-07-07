@@ -84,7 +84,13 @@ class RealAutoconsent @Inject constructor(
     }
 
     override fun changeSetting(setting: Boolean) {
-        settingsRepository.userSetting = setting
+        changeCookiePopUpPreference(
+            if (setting) {
+                CookiePopUpPreference.DEFAULT
+            } else {
+                CookiePopUpPreference.OFF
+            },
+        )
     }
 
     override fun changeCookiePopUpPreference(preference: CookiePopUpPreference) {
@@ -96,7 +102,7 @@ class RealAutoconsent @Inject constructor(
     }
 
     override fun isSettingEnabled(): Boolean {
-        return settingsRepository.userSetting
+        return settingsRepository.cookiePopUpPreference != CookiePopUpPreference.OFF
     }
 
     override fun isAutoconsentEnabled(): Boolean {
