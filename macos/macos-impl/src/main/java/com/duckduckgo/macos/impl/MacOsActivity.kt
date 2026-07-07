@@ -86,8 +86,6 @@ class MacOsActivity : DuckDuckGoActivity() {
     private fun configureEdgeToEdgeInsets() {
         edgeToEdgeHandler.applyHorizontalSystemBarInsets(binding.root)
         edgeToEdgeHandler.applyStatusBarInsets(binding.includeToolbar.appBarLayout)
-        // Content ends in fixed bottom buttons (Share / "Looking for Windows?"), so keep them clear of the nav
-        // bar in every mode (padded above the gesture-nav chin) rather than drawing behind the gesture handle.
         edgeToEdgeHandler.applyNavigationBarInsets(binding.contentScrollView, drawBehindGestureNav = false)
     }
 

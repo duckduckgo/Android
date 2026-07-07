@@ -69,8 +69,6 @@ class WidgetThemeConfiguration : DuckDuckGoActivity() {
         }
         setContentView(binding.root)
         if (edgeToEdgeEnabled) {
-            // Panel is top-anchored under this opaque theme, so status + sides go on the root; the nav-bar
-            // pad on the panel keeps the Add button clear if the panel is ever bottom-aligned.
             edgeToEdgeHandler.applyStatusBarAndHorizontalInsets(binding.root)
             edgeToEdgeHandler.applyNavigationBarInsets(binding.widgetConfigPanel, drawBehindGestureNav = false)
         }

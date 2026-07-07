@@ -96,8 +96,6 @@ class FeedbackActivity :
     private fun configureEdgeToEdgeInsets() {
         edgeToEdgeHandler.applyHorizontalSystemBarInsets(binding.root)
         edgeToEdgeHandler.applyStatusBarInsets(binding.includeToolbar.appBarLayout)
-        // Hosted fragments end in a fixed bottom CTA (Submit / Cancel), so keep it clear of the nav bar in every
-        // mode (padded above the gesture-nav chin) rather than drawing behind the gesture handle.
         edgeToEdgeHandler.applyNavigationBarInsets(binding.fragmentContainer, drawBehindGestureNav = false)
     }
 

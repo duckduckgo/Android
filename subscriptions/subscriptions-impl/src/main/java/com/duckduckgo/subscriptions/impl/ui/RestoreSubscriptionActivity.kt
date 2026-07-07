@@ -114,8 +114,6 @@ class RestoreSubscriptionActivity : DuckDuckGoActivity() {
     private fun configureEdgeToEdgeInsets() {
         edgeToEdgeHandler.applyHorizontalSystemBarInsets(binding.root)
         edgeToEdgeHandler.applyStatusBarInsets(binding.includeToolbar.appBarLayout)
-        // The screen's primary actions are the terminal email / Google Play restore rows, so keep them clear of
-        // the nav bar in every mode (padded above the gesture-nav chin) rather than drawing behind the gesture handle.
         edgeToEdgeHandler.applyNavigationBarInsets(binding.contentScrollView, drawBehindGestureNav = false)
     }
 

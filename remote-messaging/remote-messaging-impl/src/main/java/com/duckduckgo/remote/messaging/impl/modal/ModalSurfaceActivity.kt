@@ -59,8 +59,6 @@ class ModalSurfaceActivity : DuckDuckGoActivity(), CardsListRemoteMessageView.Ca
         }
         setContentView(binding.root)
         if (edgeToEdgeEnabled) {
-            // Full-bleed modal surface: the background reaches every edge while the content (close button, cards
-            // list, action button) is inset clear of the system bars.
             binding.cardsListRemoteMessageView.applyEdgeToEdgeInsets(edgeToEdgeHandler)
         }
 

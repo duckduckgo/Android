@@ -75,13 +75,8 @@ class PirActivity : DuckDuckGoActivity() {
     }
 
     private fun configureEdgeToEdgeInsets() {
-        // `container` IS the layout root and carries the gradient as its android:background. A background
-        // drawable is drawn across the full view bounds regardless of padding, so applying horizontal cutout
-        // padding here keeps the gradient full-bleed while insetting only the children (toolbar + scroll content).
         edgeToEdgeHandler.applyHorizontalSystemBarInsets(binding.root)
         edgeToEdgeHandler.applyStatusBarInsets(binding.includeToolbar.appBarLayout)
-        // Content ends in a fixed bottom button (Get on Windows), so keep it clear of the nav bar in every
-        // mode (padded above the gesture-nav chin) rather than drawing behind the gesture handle.
         edgeToEdgeHandler.applyNavigationBarInsets(binding.contentScrollView, drawBehindGestureNav = false)
     }
 

@@ -55,8 +55,6 @@ class AddWidgetInstructionsActivity : DuckDuckGoActivity() {
         }
         setContentView(binding.root)
         if (edgeToEdgeEnabled) {
-            // The modal content fills the height, so it must clear the status bar + side cutouts at the top
-            // (the blue/sheet background still bleeds behind the bars); the buttons clear the nav bar.
             edgeToEdgeHandler.applyStatusBarAndHorizontalInsets(binding.addWidgetInstructionsContent)
             edgeToEdgeHandler.applyNavigationBarInsets(instructionsButtons.root, drawBehindGestureNav = false)
         }

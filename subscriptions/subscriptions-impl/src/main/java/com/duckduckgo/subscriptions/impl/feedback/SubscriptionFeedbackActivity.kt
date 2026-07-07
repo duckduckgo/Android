@@ -109,9 +109,6 @@ class SubscriptionFeedbackActivity :
     private fun configureEdgeToEdgeInsets() {
         edgeToEdgeHandler.applyHorizontalSystemBarInsets(binding.root)
         edgeToEdgeHandler.applyStatusBarInsets(binding.includeToolbar.appBarLayout)
-        // Draw the scrollable content behind the transparent gesture nav (0 bottom inset in gesture mode);
-        // in 2/3-button mode it still clears the buttons. The container's bottom margin is dropped in the
-        // layout so nothing blocks the content from reaching the bottom edge behind the gesture handle.
         edgeToEdgeHandler.applyNavigationBarInsets(binding.feedbackFragmentContainer, drawBehindGestureNav = true)
     }
 
