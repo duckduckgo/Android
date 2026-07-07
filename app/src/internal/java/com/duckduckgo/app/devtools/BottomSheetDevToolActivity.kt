@@ -93,242 +93,278 @@ class BottomSheetDevToolActivity : DuckDuckGoActivity() {
         linearLayout.addView(titleView)
 
         // Button 1: EmailProtectionChooseEmailFragment
-        linearLayout.addView(createButton("1. EmailProtectionChooseEmail") {
-            try {
-                EmailProtectionChooseEmailFragment.instance(
-                    personalDuckAddress = "debug@duck.com",
-                    url = "https://example.com",
-                    tabId = "debug-tab-id",
-                ).show(supportFragmentManager, "devtool_1")
-            } catch (e: Exception) {
-                Toast.makeText(this, "Failed: ${e.message}", Toast.LENGTH_LONG).show()
-            }
-        })
+        linearLayout.addView(
+            createButton("1. EmailProtectionChooseEmail") {
+                try {
+                    EmailProtectionChooseEmailFragment.instance(
+                        personalDuckAddress = "debug@duck.com",
+                        url = "https://example.com",
+                        tabId = "debug-tab-id",
+                    ).show(supportFragmentManager, "devtool_1")
+                } catch (e: Exception) {
+                    Toast.makeText(this, "Failed: ${e.message}", Toast.LENGTH_LONG).show()
+                }
+            },
+        )
 
         // Button 2: EmailProtectionInContextSignUpPromptFragment
-        linearLayout.addView(createButton("2. EmailProtectionInContextSignUpPrompt") {
-            try {
-                EmailProtectionInContextSignUpPromptFragment.instance(
-                    tabId = "debug-tab-id",
-                ).show(supportFragmentManager, "devtool_2")
-            } catch (e: Exception) {
-                Toast.makeText(this, "Failed: ${e.message}", Toast.LENGTH_LONG).show()
-            }
-        })
+        linearLayout.addView(
+            createButton("2. EmailProtectionInContextSignUpPrompt") {
+                try {
+                    EmailProtectionInContextSignUpPromptFragment.instance(
+                        tabId = "debug-tab-id",
+                    ).show(supportFragmentManager, "devtool_2")
+                } catch (e: Exception) {
+                    Toast.makeText(this, "Failed: ${e.message}", Toast.LENGTH_LONG).show()
+                }
+            },
+        )
 
         // Button 3: ImportFromGooglePasswordsDialog
-        linearLayout.addView(createButton("3. ImportFromGooglePasswordsDialog") {
-            try {
-                ImportFromGooglePasswordsDialog.instance(
-                    importSource = AutofillImportLaunchSource.AutofillSettings,
-                    tabId = "debug-tab-id",
-                    originalUrl = "https://example.com",
-                ).show(supportFragmentManager, "devtool_3")
-            } catch (e: Exception) {
-                Toast.makeText(this, "Failed: ${e.message}", Toast.LENGTH_LONG).show()
-            }
-        })
+        linearLayout.addView(
+            createButton("3. ImportFromGooglePasswordsDialog") {
+                try {
+                    ImportFromGooglePasswordsDialog.instance(
+                        importSource = AutofillImportLaunchSource.AutofillSettings,
+                        tabId = "debug-tab-id",
+                        originalUrl = "https://example.com",
+                    ).show(supportFragmentManager, "devtool_3")
+                } catch (e: Exception) {
+                    Toast.makeText(this, "Failed: ${e.message}", Toast.LENGTH_LONG).show()
+                }
+            },
+        )
 
         // Button 4: AutofillUseGeneratedPasswordDialogFragment
-        linearLayout.addView(createButton("4. AutofillUseGeneratedPassword") {
-            try {
-                AutofillUseGeneratedPasswordDialogFragment.instance(
-                    url = "https://example.com",
-                    username = "debuguser",
-                    generatedPassword = "DebugPassword123!",
-                    tabId = "debug-tab-id",
-                ).show(supportFragmentManager, "devtool_4")
-            } catch (e: Exception) {
-                Toast.makeText(this, "Failed: ${e.message}", Toast.LENGTH_LONG).show()
-            }
-        })
+        linearLayout.addView(
+            createButton("4. AutofillUseGeneratedPassword") {
+                try {
+                    AutofillUseGeneratedPasswordDialogFragment.instance(
+                        url = "https://example.com",
+                        username = "debuguser",
+                        generatedPassword = "DebugPassword123!",
+                        tabId = "debug-tab-id",
+                    ).show(supportFragmentManager, "devtool_4")
+                } catch (e: Exception) {
+                    Toast.makeText(this, "Failed: ${e.message}", Toast.LENGTH_LONG).show()
+                }
+            },
+        )
 
         // Button 5: AutofillSavingCredentialsDialogFragment
-        linearLayout.addView(createButton("5. AutofillSavingCredentials") {
-            try {
-                val dummyCredentials = LoginCredentials(
-                    domain = "example.com",
-                    username = "debug@example.com",
-                    password = "DebugPassword123!",
-                )
-                AutofillSavingCredentialsDialogFragment.instance(
-                    url = "https://example.com",
-                    credentials = dummyCredentials,
-                    tabId = "debug-tab-id",
-                ).show(supportFragmentManager, "devtool_5")
-            } catch (e: Exception) {
-                Toast.makeText(this, "Failed: ${e.message}", Toast.LENGTH_LONG).show()
-            }
-        })
+        linearLayout.addView(
+            createButton("5. AutofillSavingCredentials") {
+                try {
+                    val dummyCredentials = LoginCredentials(
+                        domain = "example.com",
+                        username = "debug@example.com",
+                        password = "DebugPassword123!",
+                    )
+                    AutofillSavingCredentialsDialogFragment.instance(
+                        url = "https://example.com",
+                        credentials = dummyCredentials,
+                        tabId = "debug-tab-id",
+                    ).show(supportFragmentManager, "devtool_5")
+                } catch (e: Exception) {
+                    Toast.makeText(this, "Failed: ${e.message}", Toast.LENGTH_LONG).show()
+                }
+            },
+        )
 
         // Button 6: AutofillSelectCredentialsDialogFragment
-        linearLayout.addView(createButton("6. AutofillSelectCredentials") {
-            try {
-                val dummyCredentials = LoginCredentials(
-                    domain = "example.com",
-                    username = "debug@example.com",
-                    password = "DebugPassword123!",
-                )
-                AutofillSelectCredentialsDialogFragment.instance(
-                    url = "https://example.com",
-                    credentials = listOf(dummyCredentials),
-                    triggerType = LoginTriggerType.USER_INITIATED,
-                    tabId = "debug-tab-id",
-                ).show(supportFragmentManager, "devtool_6")
-            } catch (e: Exception) {
-                Toast.makeText(this, "Failed: ${e.message}", Toast.LENGTH_LONG).show()
-            }
-        })
+        linearLayout.addView(
+            createButton("6. AutofillSelectCredentials") {
+                try {
+                    val dummyCredentials = LoginCredentials(
+                        domain = "example.com",
+                        username = "debug@example.com",
+                        password = "DebugPassword123!",
+                    )
+                    AutofillSelectCredentialsDialogFragment.instance(
+                        url = "https://example.com",
+                        credentials = listOf(dummyCredentials),
+                        triggerType = LoginTriggerType.USER_INITIATED,
+                        tabId = "debug-tab-id",
+                    ).show(supportFragmentManager, "devtool_6")
+                } catch (e: Exception) {
+                    Toast.makeText(this, "Failed: ${e.message}", Toast.LENGTH_LONG).show()
+                }
+            },
+        )
 
         // Button 7: AutofillUpdatingExistingCredentialsDialogFragment
-        linearLayout.addView(createButton("7. AutofillUpdatingExistingCredentials") {
-            try {
-                val dummyCredentials = LoginCredentials(
-                    domain = "example.com",
-                    username = "debug@example.com",
-                    password = "DebugPassword123!",
-                )
-                AutofillUpdatingExistingCredentialsDialogFragment.instance(
-                    url = "https://example.com",
-                    credentials = dummyCredentials,
-                    tabId = "debug-tab-id",
-                    credentialUpdateType = CredentialUpdateType.Username,
-                ).show(supportFragmentManager, "devtool_7")
-            } catch (e: Exception) {
-                Toast.makeText(this, "Failed: ${e.message}", Toast.LENGTH_LONG).show()
-            }
-        })
+        linearLayout.addView(
+            createButton("7. AutofillUpdatingExistingCredentials") {
+                try {
+                    val dummyCredentials = LoginCredentials(
+                        domain = "example.com",
+                        username = "debug@example.com",
+                        password = "DebugPassword123!",
+                    )
+                    AutofillUpdatingExistingCredentialsDialogFragment.instance(
+                        url = "https://example.com",
+                        credentials = dummyCredentials,
+                        tabId = "debug-tab-id",
+                        credentialUpdateType = CredentialUpdateType.Username,
+                    ).show(supportFragmentManager, "devtool_7")
+                } catch (e: Exception) {
+                    Toast.makeText(this, "Failed: ${e.message}", Toast.LENGTH_LONG).show()
+                }
+            },
+        )
 
         // Button 8: DownloadConfirmationFragment
-        linearLayout.addView(createButton("8. DownloadConfirmation") {
-            try {
-                val dummyFileDownload = PendingFileDownload(
-                    url = "https://example.com/file.pdf",
-                    subfolder = "Downloads",
-                    browserMode = BrowserMode.REGULAR,
-                )
-                val fragment = downloadConfirmation.instance(dummyFileDownload)
-                fragment.show(supportFragmentManager, "devtool_8")
-            } catch (e: Exception) {
-                Toast.makeText(this, "Failed: ${e.message}", Toast.LENGTH_LONG).show()
-            }
-        })
+        linearLayout.addView(
+            createButton("8. DownloadConfirmation") {
+                try {
+                    val dummyFileDownload = PendingFileDownload(
+                        url = "https://example.com/file.pdf",
+                        subfolder = "Downloads",
+                        browserMode = BrowserMode.REGULAR,
+                    )
+                    val fragment = downloadConfirmation.instance(dummyFileDownload)
+                    fragment.show(supportFragmentManager, "devtool_8")
+                } catch (e: Exception) {
+                    Toast.makeText(this, "Failed: ${e.message}", Toast.LENGTH_LONG).show()
+                }
+            },
+        )
 
         // Button 9: AlwaysOnAlertDialogFragment
-        linearLayout.addView(createButton("9. VpnAlwaysOnAlertDialog") {
-            try {
-                AlwaysOnAlertDialogFragment.newAlwaysOnDialog(
-                    object : AlwaysOnAlertDialogFragment.Listener {
-                        override fun onGoToSettingsClicked() {}
-                        override fun onCanceled() {}
-                    },
-                ).show(supportFragmentManager, "devtool_9")
-            } catch (e: Exception) {
-                Toast.makeText(this, "Failed: ${e.message}", Toast.LENGTH_LONG).show()
-            }
-        })
+        linearLayout.addView(
+            createButton("9. VpnAlwaysOnAlertDialog") {
+                try {
+                    AlwaysOnAlertDialogFragment.newAlwaysOnDialog(
+                        object : AlwaysOnAlertDialogFragment.Listener {
+                            override fun onGoToSettingsClicked() {}
+                            override fun onCanceled() {}
+                        },
+                    ).show(supportFragmentManager, "devtool_9")
+                } catch (e: Exception) {
+                    Toast.makeText(this, "Failed: ${e.message}", Toast.LENGTH_LONG).show()
+                }
+            },
+        )
 
         // Button 10: VpnAutoExcludePromptFragment
-        linearLayout.addView(createButton("10. VpnAutoExcludePrompt") {
-            try {
-                VpnAutoExcludePromptFragment.instance(
-                    incompatibleApps = listOf(VpnIncompatibleApp(packageName = "com.debug.incompatible.app")),
-                    source = VpnAutoExcludePromptFragment.Companion.Source.EXCLUSION_LIST_SCREEN,
-                ).show(supportFragmentManager, "devtool_10")
-            } catch (e: Exception) {
-                Toast.makeText(this, "Failed: ${e.message}", Toast.LENGTH_LONG).show()
-            }
-        })
+        linearLayout.addView(
+            createButton("10. VpnAutoExcludePrompt") {
+                try {
+                    VpnAutoExcludePromptFragment.instance(
+                        incompatibleApps = listOf(VpnIncompatibleApp(packageName = "com.debug.incompatible.app")),
+                        source = VpnAutoExcludePromptFragment.Companion.Source.EXCLUSION_LIST_SCREEN,
+                    ).show(supportFragmentManager, "devtool_10")
+                } catch (e: Exception) {
+                    Toast.makeText(this, "Failed: ${e.message}", Toast.LENGTH_LONG).show()
+                }
+            },
+        )
 
         // Button 11: NetworkProtectionAlwaysOnDialogFragment
-        linearLayout.addView(createButton("11. NetworkProtectionAlwaysOnDialog") {
-            try {
-                NetworkProtectionAlwaysOnDialogFragment.newPromotionDialog(
-                    object : NetworkProtectionAlwaysOnDialogFragment.Listener {
-                        override fun onGoToSettingsClicked() {}
-                        override fun onCanceled() {}
-                    },
-                ).show(supportFragmentManager, "devtool_11")
-            } catch (e: Exception) {
-                Toast.makeText(this, "Failed: ${e.message}", Toast.LENGTH_LONG).show()
-            }
-        })
+        linearLayout.addView(
+            createButton("11. NetworkProtectionAlwaysOnDialog") {
+                try {
+                    NetworkProtectionAlwaysOnDialogFragment.newPromotionDialog(
+                        object : NetworkProtectionAlwaysOnDialogFragment.Listener {
+                            override fun onGoToSettingsClicked() {}
+                            override fun onCanceled() {}
+                        },
+                    ).show(supportFragmentManager, "devtool_11")
+                } catch (e: Exception) {
+                    Toast.makeText(this, "Failed: ${e.message}", Toast.LENGTH_LONG).show()
+                }
+            },
+        )
 
         // Button 12: NetpGeoswitchingCityChoiceDialogFragment
-        linearLayout.addView(createButton("12. NetpGeoswitchingCityChoice") {
-            try {
-                NetpGeoswitchingCityChoiceDialogFragment.instance(
-                    countryName = "Debugland",
-                    cities = arrayListOf("Debug City"),
-                ).show(supportFragmentManager, "devtool_12")
-            } catch (e: Exception) {
-                Toast.makeText(this, "Failed: ${e.message}", Toast.LENGTH_LONG).show()
-            }
-        })
+        linearLayout.addView(
+            createButton("12. NetpGeoswitchingCityChoice") {
+                try {
+                    NetpGeoswitchingCityChoiceDialogFragment.instance(
+                        countryName = "Debugland",
+                        cities = arrayListOf("Debug City"),
+                    ).show(supportFragmentManager, "devtool_12")
+                } catch (e: Exception) {
+                    Toast.makeText(this, "Failed: ${e.message}", Toast.LENGTH_LONG).show()
+                }
+            },
+        )
 
         // Button 13: ImportFromGoogleBookmarksPreImportDialog
-        linearLayout.addView(createButton("13. ImportFromGoogleBookmarksPreImport") {
-            try {
-                ImportFromGoogleBookmarksPreImportDialog.instance()
-                    .show(supportFragmentManager, "devtool_13")
-            } catch (e: Exception) {
-                Toast.makeText(this, "Failed: ${e.message}", Toast.LENGTH_LONG).show()
-            }
-        })
+        linearLayout.addView(
+            createButton("13. ImportFromGoogleBookmarksPreImport") {
+                try {
+                    ImportFromGoogleBookmarksPreImportDialog.instance()
+                        .show(supportFragmentManager, "devtool_13")
+                } catch (e: Exception) {
+                    Toast.makeText(this, "Failed: ${e.message}", Toast.LENGTH_LONG).show()
+                }
+            },
+        )
 
         // Button 14: DuckPlayerPrimeBottomSheet
-        linearLayout.addView(createButton("14. DuckPlayerPrimeBottomSheet") {
-            try {
-                DuckPlayerPrimeBottomSheet.newInstance(fromDuckPlayerPage = false)
-                    .show(supportFragmentManager, null)
-            } catch (e: Exception) {
-                Toast.makeText(this, "Failed: ${e.message}", Toast.LENGTH_LONG).show()
-            }
-        })
+        linearLayout.addView(
+            createButton("14. DuckPlayerPrimeBottomSheet") {
+                try {
+                    DuckPlayerPrimeBottomSheet.newInstance(fromDuckPlayerPage = false)
+                        .show(supportFragmentManager, null)
+                } catch (e: Exception) {
+                    Toast.makeText(this, "Failed: ${e.message}", Toast.LENGTH_LONG).show()
+                }
+            },
+        )
 
         // Button 15: QuickSetupAddressBarPositionBottomSheet
-        linearLayout.addView(createButton("15. QuickSetupAddressBarPosition") {
-            try {
-                QuickSetupAddressBarPositionBottomSheet.newInstance(
-                    initialSelection = OmnibarType.SINGLE_TOP,
-                    showSplitOption = false,
-                ).show(supportFragmentManager, "devtool_15")
-            } catch (e: Exception) {
-                Toast.makeText(this, "Failed: ${e.message}", Toast.LENGTH_LONG).show()
-            }
-        })
+        linearLayout.addView(
+            createButton("15. QuickSetupAddressBarPosition") {
+                try {
+                    QuickSetupAddressBarPositionBottomSheet.newInstance(
+                        initialSelection = OmnibarType.SINGLE_TOP,
+                        showSplitOption = false,
+                    ).show(supportFragmentManager, "devtool_15")
+                } catch (e: Exception) {
+                    Toast.makeText(this, "Failed: ${e.message}", Toast.LENGTH_LONG).show()
+                }
+            },
+        )
 
         // Button 16: QuickSetupSearchOptionsBottomSheet
-        linearLayout.addView(createButton("16. QuickSetupSearchOptions") {
-            try {
-                QuickSetupSearchOptionsBottomSheet.newInstance(initialWithAi = true)
-                    .show(supportFragmentManager, "devtool_16")
-            } catch (e: Exception) {
-                Toast.makeText(this, "Failed: ${e.message}", Toast.LENGTH_LONG).show()
-            }
-        })
+        linearLayout.addView(
+            createButton("16. QuickSetupSearchOptions") {
+                try {
+                    QuickSetupSearchOptionsBottomSheet.newInstance(initialWithAi = true)
+                        .show(supportFragmentManager, "devtool_16")
+                } catch (e: Exception) {
+                    Toast.makeText(this, "Failed: ${e.message}", Toast.LENGTH_LONG).show()
+                }
+            },
+        )
 
         // Button 17: RemoveWidgetInstructionsBottomSheet
-        linearLayout.addView(createButton("17. RemoveWidgetInstructions") {
-            try {
-                RemoveWidgetInstructionsBottomSheet()
-                    .show(supportFragmentManager, "devtool_17")
-            } catch (e: Exception) {
-                Toast.makeText(this, "Failed: ${e.message}", Toast.LENGTH_LONG).show()
-            }
-        })
+        linearLayout.addView(
+            createButton("17. RemoveWidgetInstructions") {
+                try {
+                    RemoveWidgetInstructionsBottomSheet()
+                        .show(supportFragmentManager, "devtool_17")
+                } catch (e: Exception) {
+                    Toast.makeText(this, "Failed: ${e.message}", Toast.LENGTH_LONG).show()
+                }
+            },
+        )
 
         // Button 18: DefaultBrowserBottomSheetDialog
-        linearLayout.addView(createButton("18. DefaultBrowserBottomSheetDialog") {
-            try {
-                DefaultBrowserBottomSheetDialog(
-                    context = this,
-                    edgeToEdgeProvider = edgeToEdgeProvider,
-                ).show()
-            } catch (e: Exception) {
-                Toast.makeText(this, "Failed: ${e.message}", Toast.LENGTH_LONG).show()
-            }
-        })
+        linearLayout.addView(
+            createButton("18. DefaultBrowserBottomSheetDialog") {
+                try {
+                    DefaultBrowserBottomSheetDialog(
+                        context = this,
+                        edgeToEdgeProvider = edgeToEdgeProvider,
+                    ).show()
+                } catch (e: Exception) {
+                    Toast.makeText(this, "Failed: ${e.message}", Toast.LENGTH_LONG).show()
+                }
+            },
+        )
 
         scrollView.addView(linearLayout)
         setContentView(scrollView)
