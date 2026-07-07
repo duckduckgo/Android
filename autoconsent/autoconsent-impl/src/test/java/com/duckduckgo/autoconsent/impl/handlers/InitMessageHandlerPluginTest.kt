@@ -23,7 +23,9 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.autoconsent.api.AutoconsentCallback
 import com.duckduckgo.autoconsent.api.AutoconsentResult
 import com.duckduckgo.autoconsent.api.CookiePopUpPreference
+import com.duckduckgo.autoconsent.impl.AutoconsentHeuristicModeProvider
 import com.duckduckgo.autoconsent.impl.AutoconsentReloadLoopDetector
+import com.duckduckgo.autoconsent.impl.RealAutoconsentHeuristicModeProvider
 import com.duckduckgo.autoconsent.impl.FakeSettingsRepository
 import com.duckduckgo.autoconsent.impl.adapters.JSONObjectAdapter
 import com.duckduckgo.autoconsent.impl.cache.RealAutoconsentSettingsCache
@@ -60,6 +62,10 @@ class InitMessageHandlerPluginTest {
     private var settingsCache = RealAutoconsentSettingsCache()
     private val feature = FakeFeatureToggleFactory.create(AutoconsentFeature::class.java)
     private val mockReloadLoopDetector: AutoconsentReloadLoopDetector = mock()
+    private val heuristicModeProvider: AutoconsentHeuristicModeProvider = RealAutoconsentHeuristicModeProvider(
+        settingsRepository,
+        feature,
+    )
 
     init {
         feature.cookiePopUpPreferenceSetting().setRawStoredState(Toggle.State(enable = true))
@@ -76,6 +82,7 @@ class InitMessageHandlerPluginTest {
         feature,
         mockPixelManager,
         mockReloadLoopDetector,
+        heuristicModeProvider,
     )
 
     @Test

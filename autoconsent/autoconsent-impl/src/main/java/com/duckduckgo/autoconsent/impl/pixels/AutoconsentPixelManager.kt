@@ -19,6 +19,7 @@ package com.duckduckgo.autoconsent.impl.pixels
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
+import com.duckduckgo.autoconsent.impl.AutoconsentHeuristicModeProvider
 import com.duckduckgo.autoconsent.impl.remoteconfig.AutoconsentFeature
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
@@ -48,6 +49,7 @@ class RealAutoconsentPixelManager @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val autoconsentFeature: AutoconsentFeature,
     private val dispatcherProvider: DispatcherProvider,
+    private val heuristicModeProvider: AutoconsentHeuristicModeProvider,
 ) : AutoconsentPixelManager {
 
     private val detectedByPatternsCache = mutableSetOf<String>()
@@ -75,7 +77,7 @@ class RealAutoconsentPixelManager @Inject constructor(
                 }
             }
 
-            pixel.fire(pixelName, type = Daily())
+            pixel.fire(pixelName, parameters = heuristicModeParameters(), type = Daily())
         }
     }
 
@@ -124,6 +126,10 @@ class RealAutoconsentPixelManager @Inject constructor(
         summaryJob = null
     }
 
+    private fun heuristicModeParameters(): Map<String, String> {
+        return mapOf(CONSENT_HEURISTIC_ENABLED_PARAM to heuristicModeProvider.getHeuristicMode())
+    }
+
     private fun buildSummaryParameters(): Map<String, String> {
         val summaryParams = mutableMapOf<String, String>()
         pixelCounter.forEach { (pixelName, count) ->
@@ -132,6 +138,11 @@ class RealAutoconsentPixelManager @Inject constructor(
                 .removeSuffix("_daily")
             summaryParams[name] = count.toString()
         }
+        summaryParams.putAll(heuristicModeParameters())
         return summaryParams
+    }
+
+    companion object {
+        private const val CONSENT_HEURISTIC_ENABLED_PARAM = "consentHeuristicEnabled"
     }
 }
