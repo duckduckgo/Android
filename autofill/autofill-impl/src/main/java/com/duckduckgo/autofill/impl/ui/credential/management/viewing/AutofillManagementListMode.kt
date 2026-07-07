@@ -170,8 +170,6 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
         super.onViewCreated(view, savedInstanceState)
         if (edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.AUTOFILL)) {
             // Inset the list directly: the hosting FragmentContainerView's padding doesn't reliably reach it.
-            // Last item rests above the nav bar (no gesture overlap), bleeds behind the gesture nav while
-            // scrolling, and stays opaque in 2/3-button nav.
             edgeToEdgeHandler.applyScrollableNavigationBarInsets(binding.logins)
         }
         configureRecyclerView()
