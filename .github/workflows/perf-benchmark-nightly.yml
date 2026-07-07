@@ -62,6 +62,17 @@ jobs:
       - name: Run page-load benchmark on FTL
         run: ./gradlew runFlankPerfTests --no-configuration-cache
 
+      # DIAGNOSTIC (remove once the results layout is confirmed): show exactly what Flank pulled
+      # back and where, so we can see whether the macrobenchmark trace + benchmarkData.json landed
+      # where the post-processing step expects them.
+      - name: List FTL results (diagnostic)
+        if: always()
+        run: |
+          echo "=== build/fladle tree ==="
+          find build/fladle -type f 2>/dev/null | sort || echo "(no build/fladle dir)"
+          echo "=== workspace-wide trace / benchmarkData files ==="
+          find . -type f \( -name '*.perfetto-trace' -o -name '*benchmarkData.json' -o -name '*.perfetto' \) 2>/dev/null | sort || true
+
       - name: Install Perfetto trace_processor
         run: |
           curl -LO https://get.perfetto.dev/trace_processor
@@ -107,5 +118,5 @@ jobs:
           name: pageload-benchmark-${{ github.run_number }}
           path: |
             pageload-results.json
-            build/fladle/perfResults/**/*.perfetto-trace
+            build/fladle/perfResults/**
           retention-days: 30
