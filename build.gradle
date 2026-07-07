@@ -357,6 +357,13 @@ fladle {
             flankVersion.set("21.+")
             useOrchestrator.set(false)
             recordVideo.set(false)
+            // The app-under-test is internalRelease (not the default play/debug that Fulladle
+            // auto-discovers), and the instrumentation APK lives in a separate module
+            // (:macrobenchmark), so neither can be inferred — point at both. Wildcards because the
+            // app APK filename embeds the version name. Paths are relative to the root project.
+            // (On a named config these are `debugApk`/`instrumentationApk`, not appApk/testApk.)
+            debugApk.set("app/build/outputs/apk/internal/release/*.apk")
+            instrumentationApk.set("macrobenchmark/build/outputs/apk/release/*.apk")
             testTargets.set(["class com.duckduckgo.macrobenchmark.PageLoadBenchmark"])
             // Single virtual model for v1 (we accept virtual noise; Phase 0 gates it).
             devices.set([["model": "MediumPhone.arm", "version": "30"]])
