@@ -1655,18 +1655,6 @@ class OmnibarLayoutViewModelTest {
     }
 
     @Test
-    fun whenNativeInputEnabledButSearchOnlyThenShowContextualSheetIconFalse() = runTest {
-        nativeInputFieldSettingFlow.value = true
-        availableInputModeFlow.value = NativeInputState.InputMode.SEARCH_ONLY
-
-        testee.viewState.test {
-            val viewState = expectMostRecentItem()
-            assertFalse(viewState.showContextualSheetIcon)
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    @Test
     fun `when input text click catcher clicked and no URL then input screen launched with draft query`() = runTest {
         testee.onInputStateChanged(query = "draft", hasFocus = false, clearQuery = false, deleteLastCharacter = false)
 

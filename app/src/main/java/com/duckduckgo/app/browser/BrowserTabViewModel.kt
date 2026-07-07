@@ -5605,7 +5605,10 @@ class BrowserTabViewModel @Inject constructor(
         }
 
         when {
-            duckAiFeatureState.showContextualMode.value && !isNtp -> {
+            // Contextual chat is about the page you're viewing, so it's only offered from the
+            // unfocused omnibar. Once the omnibar is focused (composing), fall through to full-screen
+            // Duck.ai.
+            duckAiFeatureState.showContextualMode.value && !isNtp && !hasFocus -> {
                 command.value = Command.ShowDuckAIContextualMode(tabId)
             }
 

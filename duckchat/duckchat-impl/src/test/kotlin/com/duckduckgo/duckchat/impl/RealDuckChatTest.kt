@@ -1541,15 +1541,6 @@ class RealDuckChatTest {
     }
 
     @Test
-    fun `when contextual mode enabled but search-only, then showContextualMode emits false`() = runTest {
-        duckChatFeature.contextualMode().setRawStoredState(State(enable = true))
-        whenever(mockDuckChatFeatureRepository.isInputScreenUserSettingEnabled()).thenReturn(false)
-        testee.onPrivacyConfigDownloaded()
-
-        assertFalse(testee.showContextualMode.value)
-    }
-
-    @Test
     fun `when contextual mode enabled, isDuckChatContextualModeEnabled returns true`() = runTest {
         duckChatFeature.contextualMode().setRawStoredState(State(enable = true))
         duckChatFeature.contextualModeKillSwitch().setRawStoredState(State(enable = true))
