@@ -443,7 +443,8 @@ class SyncWithAnotherActivityViewModel @Inject constructor(
     fun onEnterCodeResult(result: EnterCodeContractOutput) {
         viewModelScope.launch {
             when (result) {
-                EnterCodeContractOutput.Error -> {}
+                EnterCodeContractOutput.Error -> command.send(FinishWithError)
+                EnterCodeContractOutput.Cancelled -> {}
                 EnterCodeContractOutput.LoginSuccess -> {
                     // Manual entry: EnterCodeViewModel fires "Setup success"; only fire login pixel here.
                     syncPixels.fireLoginPixel()

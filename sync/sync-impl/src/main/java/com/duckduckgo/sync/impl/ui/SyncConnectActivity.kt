@@ -82,8 +82,15 @@ class SyncConnectActivity : DuckDuckGoActivity() {
     private val enterCodeLauncher = registerForActivityResult(
         EnterCodeContract(),
     ) { result ->
-        if (result != EnterCodeContractOutput.Error) {
-            viewModel.onLoginSuccess()
+        when (result) {
+            EnterCodeContractOutput.LoginSuccess,
+            EnterCodeContractOutput.SwitchAccountSuccess,
+            -> viewModel.onLoginSuccess()
+            EnterCodeContractOutput.Error -> {
+                setResult(RESULT_CANCELED)
+                finish()
+            }
+            EnterCodeContractOutput.Cancelled -> {}
         }
     }
 

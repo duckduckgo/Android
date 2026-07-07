@@ -74,6 +74,7 @@ import com.duckduckgo.sync.impl.ui.SyncWithAnotherActivityViewModel.Command.Logi
 import com.duckduckgo.sync.impl.ui.SyncWithAnotherActivityViewModel.Command.ShowError
 import com.duckduckgo.sync.impl.ui.SyncWithAnotherActivityViewModel.Command.ShowV2Error
 import com.duckduckgo.sync.impl.ui.SyncWithAnotherActivityViewModel.Command.SwitchAccountSuccess
+import com.duckduckgo.sync.impl.ui.setup.EnterCodeContract.EnterCodeContractOutput
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
@@ -791,6 +792,38 @@ class SyncWithAnotherDeviceViewModelTest {
             val command = awaitItem()
             assertTrue("expected ShowV2Error, got $command", command is ShowV2Error)
             assertEquals(PAIRING_REJECTED.code.toV2PairingError(), (command as ShowV2Error).content)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenEnterCodeReturnsErrorThenFinishWithError() = runTest {
+        testee.onEnterCodeResult(EnterCodeContractOutput.Error)
+
+        testee.commands().test {
+            val command = awaitItem()
+            assertTrue("expected FinishWithError, got $command", command is Command.FinishWithError)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenEnterCodeReturnsCancelledThenNoCommand() = runTest {
+        testee.onEnterCodeResult(EnterCodeContractOutput.Cancelled)
+
+        testee.commands().test {
+            expectNoEvents()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenEnterCodeReturnsLoginSuccessThenLoginSuccessCommand() = runTest {
+        testee.onEnterCodeResult(EnterCodeContractOutput.LoginSuccess)
+
+        testee.commands().test {
+            val command = awaitItem()
+            assertTrue("expected LoginSuccess, got $command", command is LoginSuccess)
             cancelAndIgnoreRemainingEvents()
         }
     }
