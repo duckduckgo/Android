@@ -16,6 +16,8 @@
 
 package com.duckduckgo.sync.impl.exchange.v2
 
+import com.duckduckgo.sync.impl.pixels.SyncPixels.TimeoutStage
+
 /**
  * Observable events emitted by the v2 exchange runner. Downstream consumers
  * subscribe to the runner's event flow and react.
@@ -54,11 +56,26 @@ sealed interface ExchangeV2Event {
         val linkingCode: String?,
     ) : ExchangeV2Event
 
-    /** A transport or protocol-level failure during bootstrap / poll / send. */
+    /**
+     * A transport or protocol-level failure during bootstrap / poll / send.
+     */
     data class SessionError(
         override val timestampMs: Long,
         val message: String,
+        val kind: SessionErrorKind = SessionErrorKind.Unknown,
+        val timeoutStage: TimeoutStage? = null,
     ) : ExchangeV2Event
 }
 
 enum class RejectReason { ImplicitAbort, SameAccount, UnknownMessageDropped }
+
+enum class SessionErrorKind {
+    SessionTimeout,
+    UnexpectedSecondHello,
+    UnexpectedEvent,
+    PairingSessionNotReady,
+    RelayChannelUnavailable,
+    RecoveryCodePreparationFailed,
+    MalformedRelayRequest,
+    Unknown,
+}

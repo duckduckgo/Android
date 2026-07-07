@@ -155,6 +155,12 @@
                 "type": "string",
                 "description": "This device's credential kind. Always ddg for the native client",
                 "enum": ["ddg", "3party"]
+            },
+            {
+                "key": "reason",
+                "type": "string",
+                "description": "Why the scanned code failed parsing/recognition. Emitted from v2 call sites when the parser rejects the code.",
+                "enum": ["unrecognized_code", "needs_upgrade", "incompatible_code"]
             }
         ]
     },
@@ -182,6 +188,12 @@
                 "type": "string",
                 "description": "This device's credential kind. Always ddg for the native client",
                 "enum": ["ddg", "3party"]
+            },
+            {
+                "key": "reason",
+                "type": "string",
+                "description": "Why the pasted code failed parsing/recognition. Emitted from v2 call sites when the parser rejects the code.",
+                "enum": ["unrecognized_code", "needs_upgrade", "incompatible_code"]
             }
         ]
     },
@@ -238,17 +250,49 @@
         "parameters": [
             "appVersion",
             {
+                "key": "source",
+                "type": "string",
+                "description": "Which sync setup flow failed",
+                "enum": ["connect", "exchange"]
+            },
+            {
                 "key": "reason",
                 "type": "string",
-                "description": "Why the v2 setup failed, aligned with the error codes we handle",
+                "description": "Why the v2 setup failed, per the canonical reason vocabulary in the v2 sync pixels spec (Exchange V2 Unified Algorithm)",
                 "enum": [
-                    "needs_upgrade",
-                    "already_upgraded",
-                    "invalid_credentials",
-                    "pairing_unavailable",
-                    "protocol_error",
+                    "session_timeout",
                     "transport_failure",
+                    "needs_upgrade",
+                    "invalid_credentials",
+                    "account_creation_failed",
+                    "account_upgrade_failed",
+                    "already_upgraded",
+                    "already_paired",
+                    "recovery_code_preparation_failed",
+                    "missing_3party_credential",
+                    "undecryptable_3party_credential",
+                    "account_extend_failed",
+                    "missing_3party_key",
+                    "local_storage_failed",
+                    "peer_recovery_code_unavailable",
+                    "unexpected_second_hello",
+                    "unexpected_event",
+                    "pairing_session_not_ready",
+                    "relay_channel_unavailable",
+                    "protocol_error",
                     "unexpected_failure"
+                ]
+            },
+            {
+                "key": "timeout_stage",
+                "type": "string",
+                "description": "Which phase of the v2 setup was in progress when reason=session_timeout. Emitted only when reason is session_timeout; omitted otherwise",
+                "enum": [
+                    "waiting_for_peer_hello",
+                    "waiting_for_peer_status",
+                    "waiting_for_confirmation",
+                    "waiting_for_recovery_code",
+                    "logging_in"
                 ]
             },
             {

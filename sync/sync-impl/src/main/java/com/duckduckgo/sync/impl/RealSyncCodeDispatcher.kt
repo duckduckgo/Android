@@ -24,8 +24,14 @@ import com.duckduckgo.sync.impl.AccountErrorCodes.NO_RECOVERY_CODE
 import com.duckduckgo.sync.impl.AccountErrorCodes.PAIRING_CANCELLED
 import com.duckduckgo.sync.impl.AccountErrorCodes.PAIRING_FAILED
 import com.duckduckgo.sync.impl.AccountErrorCodes.PAIRING_REJECTED
+import com.duckduckgo.sync.impl.AccountErrorCodes.PAIRING_SESSION_NOT_READY
 import com.duckduckgo.sync.impl.AccountErrorCodes.PAIRING_UNAVAILABLE
+import com.duckduckgo.sync.impl.AccountErrorCodes.PEER_RECOVERY_CODE_UNAVAILABLE
+import com.duckduckgo.sync.impl.AccountErrorCodes.RECOVERY_CODE_PREPARATION_FAILED
+import com.duckduckgo.sync.impl.AccountErrorCodes.RELAY_CHANNEL_UNAVAILABLE
+import com.duckduckgo.sync.impl.AccountErrorCodes.SESSION_TIMEOUT
 import com.duckduckgo.sync.impl.AccountErrorCodes.UNEXPECTED_EVENT
+import com.duckduckgo.sync.impl.AccountErrorCodes.UNEXPECTED_SECOND_HELLO
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2CodeParseResult
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Event
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Message
@@ -33,6 +39,7 @@ import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2QrCode
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Runner
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2State
 import com.duckduckgo.sync.impl.exchange.v2.LocalTrigger
+import com.duckduckgo.sync.impl.exchange.v2.SessionErrorKind
 import com.duckduckgo.sync.impl.pixels.SyncPixels.PeerKind
 import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupPath
 import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupRole
@@ -124,7 +131,7 @@ class RealSyncCodeDispatcher @Inject constructor(
     private fun mapV2PresentEventToOutcome(event: ExchangeV2Event, peerKind: PeerKind?): DispatchOutcome? = when (event) {
         is ExchangeV2Event.SessionStarted -> event.linkingCode?.let { DispatchOutcome.LinkingCodeReady(it) }
         is ExchangeV2Event.Transition -> mapV2Transition(event, peerKind)
-        is ExchangeV2Event.SessionError -> sessionErrorToOutcome(event.message)
+        is ExchangeV2Event.SessionError -> sessionErrorToOutcome(event)
         else -> null
     }
 
@@ -289,7 +296,7 @@ class RealSyncCodeDispatcher @Inject constructor(
 
     private fun mapV2LinkingEventToOutcome(event: ExchangeV2Event, peerKind: PeerKind?): DispatchOutcome? = when (event) {
         is ExchangeV2Event.Transition -> mapV2Transition(event, peerKind)
-        is ExchangeV2Event.SessionError -> sessionErrorToOutcome(event.message)
+        is ExchangeV2Event.SessionError -> sessionErrorToOutcome(event)
         else -> null
     }
 
@@ -317,21 +324,32 @@ class RealSyncCodeDispatcher @Inject constructor(
             is ExchangeV2Message.RecoveryCodeDenied ->
                 DispatchOutcome.Failed("peer_denied_recovery_code", PAIRING_REJECTED.code)
             is ExchangeV2Message.RecoveryCodeUnavailable ->
-                DispatchOutcome.Failed("peer_recovery_code_unavailable", PAIRING_UNAVAILABLE.code)
+                DispatchOutcome.Failed("peer_recovery_code_unavailable", PEER_RECOVERY_CODE_UNAVAILABLE.code)
             else -> DispatchOutcome.Failed("peer_aborted", PAIRING_REJECTED.code)
         }
         ExchangeV2State.Joiner.AbortedLocal -> joinerAbortedLocalToOutcome(transition.localTrigger, transition.trigger)
-        ExchangeV2State.Aborted -> DispatchOutcome.Failed("negotiation_aborted", NEGOTIATION_ABORTED.code)
+        ExchangeV2State.Aborted -> DispatchOutcome.Failed("negotiation_aborted", UNEXPECTED_EVENT.code)
         else -> null
     }
 
-    private fun sessionErrorToOutcome(message: String): DispatchOutcome {
-        val match = VERSION_TOO_NEW_REGEX.find(message)
-        return if (match != null) {
-            DispatchOutcome.UpgradeRequired(codeMajor = match.groupValues[1].toIntOrNull() ?: -1)
-        } else {
-            DispatchOutcome.Failed(message, PAIRING_FAILED.code)
+    private fun sessionErrorToOutcome(event: ExchangeV2Event.SessionError): DispatchOutcome {
+        val match = VERSION_TOO_NEW_REGEX.find(event.message)
+        if (match != null) {
+            return DispatchOutcome.UpgradeRequired(codeMajor = match.groupValues[1].toIntOrNull() ?: -1)
         }
+        // The structured kind lets sync_setup_ended_failed distinguish v2 protocol violations from a
+        // generic transport failure. Unknown falls back to PAIRING_FAILED → transport_failure.
+        val code = when (event.kind) {
+            SessionErrorKind.SessionTimeout -> SESSION_TIMEOUT.code
+            SessionErrorKind.UnexpectedSecondHello -> UNEXPECTED_SECOND_HELLO.code
+            SessionErrorKind.UnexpectedEvent -> UNEXPECTED_EVENT.code
+            SessionErrorKind.PairingSessionNotReady -> PAIRING_SESSION_NOT_READY.code
+            SessionErrorKind.RelayChannelUnavailable -> RELAY_CHANNEL_UNAVAILABLE.code
+            SessionErrorKind.RecoveryCodePreparationFailed -> RECOVERY_CODE_PREPARATION_FAILED.code
+            SessionErrorKind.MalformedRelayRequest -> NEGOTIATION_ABORTED.code
+            SessionErrorKind.Unknown -> PAIRING_FAILED.code
+        }
+        return DispatchOutcome.Failed(event.message, code, timeoutStage = event.timeoutStage)
     }
 
     private fun hostAbortedToOutcome(

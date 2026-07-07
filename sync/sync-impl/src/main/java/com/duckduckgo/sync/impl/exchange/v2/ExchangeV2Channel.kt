@@ -33,6 +33,15 @@ import javax.inject.Inject
  *
  * Spec: Transport TD (Asana 1214486492252757) §BE Relay + §Polling for messages.
  */
+/** Own channel is gone on the relay (HTTP 404/410 on poll). Peer or BE TTL deleted it. */
+class ChannelGone(val status: Int) : RuntimeException("Poll got $status — channel gone")
+
+/** Malformed poll request (HTTP 400). Client-side protocol bug. */
+class PollBadRequest(val status: Int) : RuntimeException("Poll rejected with $status — malformed request")
+
+/** Poll auth/policy failure (HTTP 401/403). Credentials invalidated or server-side policy denied. */
+class PollAuthDenied(val status: Int) : RuntimeException("Poll denied with $status — auth or policy")
+
 interface ExchangeV2Channel {
 
     /**
@@ -52,10 +61,10 @@ interface ExchangeV2Channel {
     ): Result<Unit>
 
     /**
-     * Poll loop on [ownChannelId], emitting decrypted + parsed messages. See spec §Polling.
-     *  - Completes on a non-recoverable HTTP status; transient statuses keep polling.
-     *  - Throws [EnvelopeVersionTooNew] (too-new version) and [EnvelopeDecryptFailure]
-     *    (decrypt failure) as terminal; drops unknown message types (forward-compat).
+     * Poll loop on [ownChannelId], emitting decrypted + parsed messages.
+     *  - Transient statuses (5xx / 429 / network / timeouts) keep polling; the 5-min session timer catches persistent transient failures.
+     *  - Throws [ChannelGone] on 404/410 (channel deleted or TTL'd), [PollBadRequest] on 400, [PollAuthDenied] on 401/403
+     *  - Throws [EnvelopeVersionTooNew] on a too-new envelope and [EnvelopeDecryptFailure] on decrypt failure
      */
     fun poll(ownChannelId: String, ownPrivateKeyBase64: String): Flow<ExchangeV2Message>
 
@@ -103,12 +112,12 @@ class RealExchangeV2Channel @Inject constructor(
                     }
                 }
                 is Result.Error -> {
-                    if (outcome.code in NON_RECOVERABLE_HTTP_CODES) {
-                        // Re-polling won't recover; stop.
-                        logcat { "Sync-ExchangeV2: ending poll on $ownChannelId — non-recoverable status ${outcome.code} (${outcome.reason})" }
-                        return@flow
+                    when (outcome.code) {
+                        404, 410 -> throw ChannelGone(outcome.code)
+                        400 -> throw PollBadRequest(outcome.code)
+                        401, 403 -> throw PollAuthDenied(outcome.code)
+                        else -> logcat(ERROR) { "Sync-ExchangeV2: transient poll error ${outcome.code}: ${outcome.reason}, retrying" }
                     }
-                    logcat(ERROR) { "Sync-ExchangeV2: transient poll error ${outcome.code}: ${outcome.reason}, retrying" }
                 }
             }
             delay(POLL_INTERVAL_MS)
@@ -134,15 +143,5 @@ class RealExchangeV2Channel @Inject constructor(
 
     companion object {
         private const val POLL_INTERVAL_MS: Long = 1_000L
-
-        // Statuses that won't recover by re-polling; transient ones (5xx / 429 / 418 / timeouts)
-        // are deliberately absent so they keep polling.
-        private val NON_RECOVERABLE_HTTP_CODES = setOf(
-            400, // Bad Request — malformed poll
-            401, // Unauthorized
-            403, // Forbidden
-            404, // Not Found — channel gone (the normal end when the peer/server closed it)
-            410, // Gone — channel permanently removed
-        )
     }
 }

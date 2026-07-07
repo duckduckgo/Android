@@ -824,7 +824,10 @@ class AppSyncAccountRepository @Inject constructor(
                 )
             }
             logcat(ERROR) { "Sync-ScopedToken: /access-credentials/ddg POST failed: ${postResult.reason}" }
-            return postResult.copy(reason = "JoinFrom3party: ${postResult.reason}")
+            return postResult.copy(
+                code = AccountErrorCodes.ACCOUNT_UPGRADE_FAILED.code,
+                reason = "JoinFrom3party: ${postResult.reason}",
+            )
         }
 
         // Step 7 — Native login as the new ddg credential. Required: without a login inside the
@@ -1494,6 +1497,20 @@ enum class AccountErrorCodes(val code: Int) {
     NO_RECOVERY_CODE(62),
     PAIRING_FAILED(63),
     UNEXPECTED_EVENT(64),
+    SESSION_TIMEOUT(65),
+    ACCOUNT_CREATION_FAILED(66),
+    ACCOUNT_UPGRADE_FAILED(67),
+    RECOVERY_CODE_PREPARATION_FAILED(68),
+    MISSING_3PARTY_CREDENTIAL(69),
+    UNDECRYPTABLE_3PARTY_CREDENTIAL(70),
+    ACCOUNT_EXTEND_FAILED(71),
+    MISSING_3PARTY_KEY(72),
+    LOCAL_STORAGE_FAILED(73),
+    PEER_RECOVERY_CODE_UNAVAILABLE(74),
+    ALREADY_PAIRED(75),
+    UNEXPECTED_SECOND_HELLO(76),
+    PAIRING_SESSION_NOT_READY(77),
+    RELAY_CHANNEL_UNAVAILABLE(78),
 }
 
 sealed interface SyncAuthCode {
