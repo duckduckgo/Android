@@ -32,9 +32,10 @@ jobs:
           FLANK: ${{ secrets.FLANK }}
         run: echo "$FLANK" > flank.json
 
-      # internalRelease falls back to debug-keystore signing when no release-signing secrets are set
-      # for this job (see app/build.gradle localDebugFallback + macrobenchmark debugKey). A release
-      # build won't auto-create the debug keystore, so ensure it exists (matches AGP's default debug key).
+      # With -PmacrobenchLocalSigning, internalRelease is signed with the local debug keystore so FTL
+      # can install the (non-debuggable) app under test (see app/build.gradle macrobenchDebug + the
+      # macrobenchmark module's debugKey). A release build won't auto-create the debug keystore, so
+      # ensure it exists (matches AGP's default debug key).
       - name: Ensure debug keystore exists
         run: |
           if [ ! -f "$HOME/.android/debug.keystore" ]; then
@@ -47,7 +48,7 @@ jobs:
           fi
 
       - name: Build APKs
-        run: ./gradlew :app:assembleInternalRelease :macrobenchmark:assembleRelease
+        run: ./gradlew :app:assembleInternalRelease :macrobenchmark:assembleRelease -PmacrobenchLocalSigning
 
       - name: Run page-load benchmark on FTL
         run: ./gradlew runFlankPerfTests --no-configuration-cache

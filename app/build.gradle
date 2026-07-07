@@ -140,13 +140,16 @@ android {
             }
         }
 
-        // LOCAL-ONLY (do not commit): debug-keystore signing so the macrobenchmark `benchmark`
-        // build type (non-debuggable release-like build) is installable on a device.
-        localDebugFallback {
-            storeFile = new File("${System.getProperty('user.home')}/.android/debug.keystore")
-            storePassword = "android"
-            keyAlias = "androiddebugkey"
-            keyPassword = "android"
+        // Opt-in ONLY via -PmacrobenchLocalSigning: signs release with the local debug keystore so
+        // a non-debuggable internalRelease is installable for macrobenchmark runs (local + benchmark
+        // CI). Never used unless the property is set, so default release signing is unchanged.
+        if (project.hasProperty('macrobenchLocalSigning')) {
+            macrobenchDebug {
+                storeFile = new File("${System.getProperty('user.home')}/.android/debug.keystore")
+                storePassword = "android"
+                keyAlias = "androiddebugkey"
+                keyPassword = "android"
+            }
         }
     }
     buildTypes {
@@ -170,10 +173,13 @@ android {
                 signingConfig = signingConfigs.upload
             } else if (isValidSigningConfig(signingConfigs.release)) {
                 signingConfig = signingConfigs.release
+            } else if (project.hasProperty('macrobenchLocalSigning')) {
+                // Opt-in only (see macrobenchDebug signingConfig): makes internalRelease installable
+                // for macrobenchmark runs. Not reached by normal release builds.
+                signingConfig = signingConfigs.macrobenchDebug
             } else {
-                // LOCAL-ONLY (do not commit): sign release with the debug keystore so
-                // internalRelease is installable for local macrobenchmark runs (never on CI).
-                signingConfig signingConfigs.localDebugFallback
+                println "Signing properties not found, release artifacts will not be signed."
+                signingConfig = null
             }
         }
     }
