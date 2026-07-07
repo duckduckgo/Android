@@ -35,7 +35,6 @@ import com.duckduckgo.app.browser.databinding.ActivityDevSettingsBinding
 import com.duckduckgo.app.browser.mode.InAppNavigation
 import com.duckduckgo.app.browser.webview.WebContentDebuggingFeature
 import com.duckduckgo.app.dev.settings.DevSettingsViewModel.Command
-import com.duckduckgo.app.dev.settings.DevSettingsViewModel.Command.BottomSheetDevTools
 import com.duckduckgo.app.dev.settings.DevSettingsViewModel.Command.ChangePrivacyConfigUrl
 import com.duckduckgo.app.dev.settings.DevSettingsViewModel.Command.CustomTabs
 import com.duckduckgo.app.dev.settings.DevSettingsViewModel.Command.Notifications
@@ -47,7 +46,6 @@ import com.duckduckgo.app.dev.settings.db.UAOverride
 import com.duckduckgo.app.dev.settings.notifications.NotificationsActivity
 import com.duckduckgo.app.dev.settings.privacy.TrackerDataDevReceiver.Companion.DOWNLOAD_TDS_INTENT_ACTION
 import com.duckduckgo.app.dev.settings.tabs.DevTabsActivity
-import com.duckduckgo.app.devtools.BottomSheetDevToolActivity
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.menu.PopupMenu
 import com.duckduckgo.common.ui.viewbinding.viewBinding
@@ -108,7 +106,6 @@ class DevSettingsActivity : DuckDuckGoActivity() {
         binding.customTabs.setOnClickListener { viewModel.customTabsClicked() }
         binding.notifications.setOnClickListener { viewModel.notificationsClicked() }
         binding.tabs.setOnClickListener { viewModel.tabsClicked() }
-        binding.bottomSheetDevTools.setOnClickListener { viewModel.bottomSheetDevToolsClicked() }
     }
 
     private fun observeViewModel() {
@@ -138,7 +135,6 @@ class DevSettingsActivity : DuckDuckGoActivity() {
             is CustomTabs -> showCustomTabs()
             Notifications -> showNotifications()
             Tabs -> showTabs()
-            BottomSheetDevTools -> showBottomSheetDevTools()
             is Command.Toast -> showToast(it.message)
         }
     }
@@ -182,10 +178,6 @@ class DevSettingsActivity : DuckDuckGoActivity() {
 
     private fun showTabs() {
         startActivity(DevTabsActivity.intent(this))
-    }
-
-    private fun showBottomSheetDevTools() {
-        startActivity(BottomSheetDevToolActivity.intent(this))
     }
 
     private fun showToast(message: String) {

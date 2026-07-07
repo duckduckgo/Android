@@ -58,7 +58,6 @@ class DevSettingsViewModel @Inject constructor(
         data object CustomTabs : Command()
         data object Notifications : Command()
         data object Tabs : Command()
-        data object BottomSheetDevTools : Command()
         data class Toast(val message: String) : Command()
     }
 
@@ -137,9 +136,5 @@ class DevSettingsViewModel @Inject constructor(
 
     fun tabsClicked() {
         viewModelScope.launch { command.send(Command.Tabs) }
-    }
-
-    fun bottomSheetDevToolsClicked() {
-        viewModelScope.launch { command.send(Command.BottomSheetDevTools) }
     }
 }
