@@ -67,8 +67,24 @@ jobs:
 
       - name: Post-process trace and report
         run: |
-          TRACE=$(find build/fladle/perfResults -name '*.perfetto-trace' | head -1)
-          DATA=$(find build/fladle/perfResults -name '*-benchmarkData.json' | head -1)
+          set -euo pipefail
+          # Exactly one device/model is configured (fladle perfTests), so we expect exactly one
+          # trace + one benchmarkData.json. Fail loudly on 0 (run produced nothing) or >1 (device
+          # matrix grew and this single-trace assumption no longer holds) rather than silently
+          # post an arbitrary result.
+          require_one() {
+            local label="$1"; shift
+            local matches; matches=$(find build/fladle/perfResults -name "$1" | sort)
+            local n; n=$(printf '%s' "$matches" | grep -c . || true)
+            if [ "$n" -ne 1 ]; then
+              echo "ERROR: expected exactly 1 $label, found $n:" >&2
+              printf '%s\n' "$matches" >&2
+              exit 1
+            fi
+            printf '%s' "$matches"
+          }
+          TRACE=$(require_one "perfetto trace" '*.perfetto-trace')
+          DATA=$(require_one "benchmarkData.json" '*-benchmarkData.json')
           python3 perf-benchmarks/pageload_benchmark.py \
             --trace "$TRACE" --benchmark-data "$DATA" \
             --github-action-run-id "${{ github.run_id }}" \
