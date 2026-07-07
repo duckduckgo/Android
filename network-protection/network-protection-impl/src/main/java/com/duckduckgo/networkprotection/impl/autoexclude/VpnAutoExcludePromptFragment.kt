@@ -199,7 +199,7 @@ class VpnAutoExcludePromptFragment : BottomSheetDialogFragment() {
         private const val KEY_PROMPT_APP_PACKAGES = "KEY_PROMPT_APP_PACKAGES"
         private const val KEY_PROMPT_SOURCE = "KEY_PROMPT_SOURCE"
 
-        internal fun instance(
+        fun instance(
             incompatibleApps: List<VpnIncompatibleApp>,
             source: Source,
         ): VpnAutoExcludePromptFragment {

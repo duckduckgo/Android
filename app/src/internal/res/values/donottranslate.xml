@@ -47,6 +47,10 @@
     <!-- Tabs and Saved Sites -->
     <string name="devSettingsScreenTabs">Tabs and Saved Sites</string>
     <string name="devSettingsScreenTabsSubtitle">Create tabs or bookmarks for testing</string>
+
+    <!-- Bottom Sheet DevTools -->
+    <string name="devSettingsScreenBottomSheetDevTools">Bottom Sheet DevTools</string>
+    <string name="devSettingsScreenBottomSheetDevToolsSubtitle">Launch each edge-to-edge bottom sheet directly</string>
     <string name="devSettingsTabsScreenHeader" instruction="Not translated">Current tab count: %1$d</string>
     <string name="devSettingsTabsScreenTabsToAdd">Tabs to add</string>
     <string name="devSettingsTabsScreenAddTabsButtonText">Add Tabs</string>
@@ -134,4 +138,7 @@
     <string name="onboardingDevSettingsCompletedTitle">Onboarding completed</string>
     <string name="onboardingDevSettingsSkippedTitle">Onboarding skipped</string>
     <string name="onboardingDevSettingsDialogsSection">Dialogs shown</string>
+
+    <!-- Bottom Sheet DevTool Activity -->
+    <string name="bottomSheetDevToolActivityTitle">Bottom Sheet DevTools</string>
 </resources>
