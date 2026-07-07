@@ -195,7 +195,7 @@ class RealExchangeV2Runner @Inject constructor(
             }
             emitSessionStarted()
             if (!sendHello()) {
-                // sendOnWireAndRecord already emitted a SessionError classified by HTTP status
+                // sendHello already emitted a SessionError (incomplete state or HTTP status)
                 cancel()
                 return@launch
             }
@@ -653,10 +653,14 @@ class RealExchangeV2Runner @Inject constructor(
 
     /** Returns true if hello reached the relay; false signals a fatal abort to the caller. */
     private fun sendHello(): Boolean {
-        val own = ownChannelId ?: return false
-        val peer = peerChannelId ?: return false
-        val peerKey = peerPublicKey ?: return false
-        val ourKey = ownKeyPair ?: return false
+        val own = ownChannelId
+        val peer = peerChannelId
+        val peerKey = peerPublicKey
+        val ourKey = ownKeyPair
+        if (own == null || peer == null || peerKey == null || ourKey == null) {
+            emitSessionError("Cannot send hello — pairing session state is incomplete", SessionErrorKind.PairingSessionNotReady)
+            return false
+        }
         val json = JSONObject().apply {
             put("type", "hello")
             put("channel_id", own)
