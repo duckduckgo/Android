@@ -68,6 +68,8 @@ import com.duckduckgo.common.utils.isLocalUrl
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.duckchat.api.DuckChatInputModeState
+import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardPixels
 import com.duckduckgo.serp.logos.api.SerpEasterEggLogosToggles
@@ -110,6 +112,7 @@ class OmnibarLayoutViewModel @Inject constructor(
     private val browserMenuHighlight: BrowserMenuHighlight,
     private val duckChat: DuckChat,
     private val duckAiFeatureState: DuckAiFeatureState,
+    private val duckChatInputModeState: DuckChatInputModeState,
     private val addressDisplayFormatter: AddressDisplayFormatter,
     private val settingsDataStore: SettingsDataStore,
     private val urlDisplayRepository: UrlDisplayRepository,
@@ -252,7 +255,8 @@ class OmnibarLayoutViewModel @Inject constructor(
         val trackersBlocked: Int = 0,
         val previouslyTrackersBlocked: Int = 0,
         val showShadows: Boolean = false,
-        val showTextInputClickCatcher: Boolean = false,
+        val inputScreenEnabled: Boolean = false,
+        val isSearchOnly: Boolean = false,
         val showFindInPage: Boolean = false,
         val showDuckAIHeader: Boolean = false,
         val showDuckAISidebar: Boolean = false,
@@ -272,6 +276,16 @@ class OmnibarLayoutViewModel @Inject constructor(
          */
         val showContextualSheetIcon: Boolean
             get() = isNativeInputEnabled && viewMode !is NewTab
+
+        /**
+         * The click catcher routes an omnibar tap to the native input overlay. Shown when the
+         * input-screen feature is on, or the native field is on and we should use it for the current
+         * context — i.e. we're in Duck.ai (always UTI) or not in search-only. In search-only the
+         * browser omnibar keeps the catcher hidden so its text input stays focusable and a tap
+         * focuses it directly. Derived from flags + viewMode so it can't drift out of sync.
+         */
+        val showTextInputClickCatcher: Boolean
+            get() = inputScreenEnabled || (isNativeInputEnabled && (viewMode is ViewMode.DuckAI || !isSearchOnly))
 
         fun shouldUpdateOmnibarText(
             isFullUrlEnabled: Boolean,
@@ -327,10 +341,12 @@ class OmnibarLayoutViewModel @Inject constructor(
             duckAiFeatureState.showInputScreen,
             duckChat.observeNativeInputFieldUserSettingEnabled(),
             duckChat.observeNativeChatInputEnabled(),
-        ) { inputScreenEnabled, nativeInputEnabled, nativeChatInputEnabled ->
+            duckChatInputModeState.availableInputMode,
+        ) { inputScreenEnabled, nativeInputEnabled, nativeChatInputEnabled, availableInputMode ->
             _viewState.update {
                 it.copy(
-                    showTextInputClickCatcher = inputScreenEnabled || nativeInputEnabled,
+                    inputScreenEnabled = inputScreenEnabled,
+                    isSearchOnly = availableInputMode == NativeInputState.InputMode.SEARCH_ONLY,
                     isNativeInputEnabled = nativeInputEnabled,
                     isNativeChatInputEnabled = nativeChatInputEnabled,
                 )

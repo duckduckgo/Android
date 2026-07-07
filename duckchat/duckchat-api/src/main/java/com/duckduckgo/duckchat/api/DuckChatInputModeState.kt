@@ -16,6 +16,7 @@
 
 package com.duckduckgo.duckchat.api
 
+import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import kotlinx.coroutines.flow.StateFlow
 
 /**
@@ -48,6 +49,17 @@ interface DuckChatInputModeState {
      * [displayedMode] when you also need to know which tab is showing.
      */
     val inputQuery: StateFlow<String>
+
+    /**
+     * Whether the current configuration offers the Search↔Duck.ai toggle in the address bar
+     * ([NativeInputState.InputMode.SEARCH_AND_DUCK_AI]) or is search-only
+     * ([NativeInputState.InputMode.SEARCH_ONLY]).
+     *
+     * Unlike [displayedMode] (the selected tab, pushed by a live widget), this is the capability of the
+     * current config and is known even when no widget is attached — so callers can decide whether to use
+     * the native input for the browser omnibar at all. Emits on subscription and on every settings change.
+     */
+    val availableInputMode: StateFlow<NativeInputState.InputMode>
 }
 
 /**

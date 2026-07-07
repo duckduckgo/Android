@@ -20,6 +20,7 @@ import android.net.Uri
 import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.duckchat.api.DuckChatInputModeState
 import com.duckduckgo.duckchat.api.InputMode
+import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import com.duckduckgo.duckchat.impl.ChatState
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.store.DefaultTogglePosition
@@ -242,6 +243,9 @@ class FakeDuckChatInternal(
     private val _inputQuery = MutableStateFlow("")
 
     override val inputQuery: StateFlow<String> = _inputQuery.asStateFlow()
+
+    val availableInputModeFlow = MutableStateFlow(NativeInputState.InputMode.SEARCH_ONLY)
+    override val availableInputMode: StateFlow<NativeInputState.InputMode> = availableInputModeFlow.asStateFlow()
 
     override fun setInputQuery(query: String) {
         _inputQuery.value = query
