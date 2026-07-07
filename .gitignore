@@ -113,3 +113,5 @@ PixelDefinitions/node_modules/
 /.claude/worktrees/*
 CLAUDE.local.md
 docs/*
+# Firebase Test Lab service-account key (secret; injected from the FLANK secret in CI)
+flank.json
