@@ -66,6 +66,7 @@ class AdBlockingExtensionJsInjectorPluginTest {
             statusChecker = statusChecker,
             repository = repository,
             contingencyMessageHandler = contingencyMessageHandler,
+            domainMatcher = AdBlockingExtensionDomainMatcher(),
             appScope = testScope,
         )
     }

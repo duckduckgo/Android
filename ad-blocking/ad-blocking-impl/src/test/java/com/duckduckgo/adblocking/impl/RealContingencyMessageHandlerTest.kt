@@ -65,6 +65,7 @@ class RealContingencyMessageHandlerTest {
         feature = feature,
         store = store,
         view = view,
+        domainMatcher = AdBlockingExtensionDomainMatcher(),
         appScope = coroutineRule.testScope,
         dispatchers = coroutineRule.testDispatcherProvider,
     )
@@ -86,6 +87,13 @@ class RealContingencyMessageHandlerTest {
         setToggles(uxImprovements = true, contingency = true)
 
         assertTrue(handler.shouldShow("https://m.youtube.com/watch?v=abc"))
+    }
+
+    @Test
+    fun whenYouTubeNoCookieThenShouldShow() {
+        setToggles(uxImprovements = true, contingency = true)
+
+        assertTrue(handler.shouldShow("https://youtube-nocookie.com/watch?v=abc"))
     }
 
     @Test
@@ -207,6 +215,7 @@ class RealContingencyMessageHandlerTest {
         feature = feature,
         store = store,
         view = view,
+        domainMatcher = AdBlockingExtensionDomainMatcher(),
         appScope = coroutineRule.testScope,
         dispatchers = coroutineRule.testDispatcherProvider,
     )

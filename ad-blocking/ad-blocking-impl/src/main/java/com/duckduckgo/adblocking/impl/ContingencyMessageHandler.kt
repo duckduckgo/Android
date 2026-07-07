@@ -18,13 +18,9 @@ package com.duckduckgo.adblocking.impl
 
 import android.webkit.WebView
 import androidx.annotation.UiThread
-import androidx.core.net.toUri
 import androidx.lifecycle.LifecycleOwner
-import com.duckduckgo.adblocking.api.duckplayer.YOUTUBE_HOST
-import com.duckduckgo.adblocking.api.duckplayer.YOUTUBE_MOBILE_HOST
 import com.duckduckgo.adblocking.impl.remoteconfig.AdBlockingExtensionFeature
 import com.duckduckgo.adblocking.impl.remoteconfig.ContingencyMessageStore
-import com.duckduckgo.app.browser.UriString
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -50,6 +46,7 @@ class RealContingencyMessageHandler @Inject constructor(
     private val feature: AdBlockingExtensionFeature,
     private val store: ContingencyMessageStore,
     private val view: ContingencyMessageView,
+    private val domainMatcher: AdBlockingExtensionDomainMatcher,
     @AppCoroutineScope private val appScope: CoroutineScope,
     private val dispatchers: DispatcherProvider,
 ) : ContingencyMessageHandler, MainProcessLifecycleObserver {
@@ -86,10 +83,8 @@ class RealContingencyMessageHandler @Inject constructor(
         val uxImprovements = feature.adBlockingUXImprovements().isEnabled()
         val contingency = feature.enableContingencyMode().isEnabled()
         val shown = shownInSession || store.shown.value
-        val uri = url?.toUri()
-        val isYouTube = uri != null &&
-            (UriString.sameOrSubdomain(uri, YOUTUBE_HOST) || UriString.sameOrSubdomain(uri, YOUTUBE_MOBILE_HOST))
-        val result = uxImprovements && contingency && isYouTube && !shown
+        val isExtensionDomain = domainMatcher.matches(url)
+        val result = uxImprovements && contingency && isExtensionDomain && !shown
         return result
     }
 }
