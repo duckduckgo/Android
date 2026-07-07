@@ -23,4 +23,10 @@
     <string name="ad_blocking_settings_description">DuckDuckGo blokkerer videoannonser på YouTube, slik at du kan se videoer uten avbrudd. <annotation type="learn_more_link">Finn ut mer</annotation></string>
     <string name="ad_blocking_settings_duck_player_header">Duck Player</string>
     <string name="ad_blocking_settings_duck_player_description">Åpner videoer i en distraksjonsfri kinomodus som hindrer at det du ser på påvirker YouTube-feeden din.</string>
+    <string name="ad_blocking_settings_title_v2">Annonseblokkering</string>
+    <string name="ad_blocking_settings_header_description">Blokkerer invaderende sporere før de blir lastet inn, og dette eliminerer også annonser som er basert på sporing</string>
+    <string name="contingencyMessageTitle">Annonseblokkering på YouTube er ikke tilgjengelig</string>
+    <string name="contingencyMessageContent">Annonseblokkering har blitt påvirket av nylige endringer på YouTube. Vi jobber med å løse disse problemene og takker for tålmodigheten</string>
+    <string name="contingencyMessagePrimaryButton">Den er grei</string>
+    <string name="contingencyMessageCloseContentDescription">Lukk</string>
 </resources>
