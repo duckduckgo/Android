@@ -245,11 +245,11 @@ internal class RealExchangeV2StateMachine(
     }
 
     /**
-     * The SM rejected [msg] in state [from]. When [newState] == [from] the SM stays put (e.g.
-     * a duplicate `hello` in Negotiating) and the event is a [MessageRejected]; when [newState]
-     * differs the SM is actually transitioning into [newState] driven by [msg] (e.g. same-account
-     * detected, per Asana state-machine spec `1215056232572322`), and we emit a [Transition] so
-     * downstream consumers can react to the new terminal state.
+     * Reject [msg] and abort. By default we drive to [from]'s terminal state (see [abortTerminal]):
+     *  - If [from] is still active, that's a real transition into the terminal → emit [Transition].
+     *  - If [from] is already terminal, [abortTerminal] returns itself, so we stay put → emit [MessageRejected].
+     *
+     * Callers can override [newState] to abort somewhere other than the default terminal.
      */
     private fun abort(
         from: ExchangeV2State,
