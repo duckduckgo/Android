@@ -73,6 +73,33 @@ jobs:
           echo "=== workspace-wide trace / benchmarkData files ==="
           find . -type f \( -name '*.perfetto-trace' -o -name '*benchmarkData.json' -o -name '*.perfetto' \) 2>/dev/null | sort || true
 
+      # Flank uploads the directories-to-pull output (the macrobench trace + benchmarkData.json) to
+      # its GCS results bucket but does NOT download it to the runner — only test-result XMLs land in
+      # build/fladle/perfResults. Authenticate with the same FTL service account and pull the two
+      # files from the bucket path Flank recorded in matrix_ids.json.
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.FLANK }}
+
+      - name: Set up gcloud
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Download benchmark artifacts from the FTL results bucket
+        run: |
+          set -euo pipefail
+          GCS_PATH=$(jq -r '.[].gcsPath' build/fladle/perfResults/matrix_ids.json | head -1)
+          if [ -z "$GCS_PATH" ] || [ "$GCS_PATH" = "null" ]; then
+            echo "ERROR: could not read gcsPath from matrix_ids.json:" >&2
+            cat build/fladle/perfResults/matrix_ids.json >&2
+            exit 1
+          fi
+          echo "FTL results bucket path: gs://${GCS_PATH}"
+          mkdir -p pageload-artifacts
+          gcloud storage cp "gs://${GCS_PATH}/**/*.perfetto-trace" pageload-artifacts/
+          gcloud storage cp "gs://${GCS_PATH}/**/*-benchmarkData.json" pageload-artifacts/
+          echo "=== downloaded ==="; ls -la pageload-artifacts/
+
       - name: Install Perfetto trace_processor
         run: |
           curl -LO https://get.perfetto.dev/trace_processor
@@ -88,15 +115,13 @@ jobs:
       - name: Post-process trace and report
         run: |
           set -euo pipefail
-          # Flank pulls the macrobench outputs into its results tree under
-          # .../<axis>/artifacts/sdcard/Download/. Anchor on that stable `artifacts` segment rather
-          # than the results-dir name or device axis (e.g. "redfin-30-..."), which can change.
-          # Exactly one device/model is configured (fladle perfTests), so we expect exactly one
-          # trace + one benchmarkData.json — fail loudly on 0 (run produced nothing) or >1 (matrix
-          # grew and this single-trace assumption no longer holds) rather than pick one arbitrarily.
+          # Inputs were downloaded from the FTL bucket into pageload-artifacts/ by the previous step.
+          # Exactly one device/model is configured (fladle perfTests), so we expect exactly one trace
+          # + one benchmarkData.json — fail loudly on 0 (nothing downloaded) or >1 (matrix grew and
+          # this single-trace assumption no longer holds) rather than pick one arbitrarily.
           require_one() {
             local label="$1"; shift
-            local matches; matches=$(find . -path '*/artifacts/*' -name "$1" | sort)
+            local matches; matches=$(find pageload-artifacts -name "$1" | sort)
             local n; n=$(printf '%s' "$matches" | grep -c . || true)
             if [ "$n" -ne 1 ]; then
               echo "ERROR: expected exactly 1 $label, found $n:" >&2
@@ -107,9 +132,6 @@ jobs:
           }
           TRACE=$(require_one "perfetto trace" '*.perfetto-trace')
           DATA=$(require_one "benchmarkData.json" '*-benchmarkData.json')
-          # Stage the raw inputs at a stable path so the upload step doesn't depend on Flank's layout.
-          mkdir -p pageload-artifacts
-          cp "$TRACE" "$DATA" pageload-artifacts/
           python3 perf-benchmarks/pageload_benchmark.py \
             --trace "$TRACE" --benchmark-data "$DATA" \
             --github-action-run-id "${{ github.run_id }}" \
