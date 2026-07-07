@@ -99,7 +99,7 @@ class OmnibarLayoutViewModelTest {
     private val duckChat: DuckChat = mock()
     private val duckAiFeatureState: DuckAiFeatureState = mock()
     private val duckChatInputModeState: DuckChatInputModeState = mock()
-    private val availableInputModeFlow = MutableStateFlow(NativeInputState.InputMode.SEARCH_AND_DUCK_AI)
+    private val inputModeCapabilityFlow = MutableStateFlow(NativeInputState.InputMode.SEARCH_AND_DUCK_AI)
     private val duckAiShowOmnibarShortcutOnNtpAndOnFocusFlow = MutableStateFlow(true)
     private val duckAiShowOmnibarShortcutInAllStatesFlow = MutableStateFlow(true)
     private val duckAiShowInputScreenFlow = MutableStateFlow(false)
@@ -152,7 +152,7 @@ class OmnibarLayoutViewModelTest {
         whenever(duckAiFeatureState.showInputScreen).thenReturn(duckAiShowInputScreenFlow)
         whenever(duckChat.observeNativeInputFieldUserSettingEnabled()).thenReturn(nativeInputFieldSettingFlow)
         whenever(duckChat.observeNativeChatInputEnabled()).thenReturn(nativeChatInputEnabledFlow)
-        whenever(duckChatInputModeState.availableInputMode).thenReturn(availableInputModeFlow)
+        whenever(duckChatInputModeState.inputModeCapability).thenReturn(inputModeCapabilityFlow)
         whenever(duckChat.activeVoiceChatSessions).thenReturn(activeVoiceSessionsFlow)
         whenever(duckChat.observeInputScreenUserSettingEnabled()).thenReturn(inputScreenUserSettingFlow)
         whenever(serpEasterEggLogosToggles.setFavourite()).thenReturn(mock())
@@ -1632,7 +1632,7 @@ class OmnibarLayoutViewModelTest {
     @Test
     fun whenNativeInputFieldEnabledButSearchOnlyThenShowClickCatcherFalse() = runTest {
         nativeInputFieldSettingFlow.value = true
-        availableInputModeFlow.value = NativeInputState.InputMode.SEARCH_ONLY
+        inputModeCapabilityFlow.value = NativeInputState.InputMode.SEARCH_ONLY
 
         testee.viewState.test {
             val viewState = expectMostRecentItem()
@@ -1644,7 +1644,7 @@ class OmnibarLayoutViewModelTest {
     @Test
     fun whenSearchOnlyButInDuckAiViewModeThenShowClickCatcherTrue() = runTest {
         nativeInputFieldSettingFlow.value = true
-        availableInputModeFlow.value = NativeInputState.InputMode.SEARCH_ONLY
+        inputModeCapabilityFlow.value = NativeInputState.InputMode.SEARCH_ONLY
         testee.onViewModeChanged(ViewMode.DuckAI)
 
         testee.viewState.test {
@@ -1657,7 +1657,7 @@ class OmnibarLayoutViewModelTest {
     @Test
     fun whenSearchOnlyThenShowContextualSheetIconFalse() = runTest {
         nativeInputFieldSettingFlow.value = true
-        availableInputModeFlow.value = NativeInputState.InputMode.SEARCH_ONLY
+        inputModeCapabilityFlow.value = NativeInputState.InputMode.SEARCH_ONLY
 
         testee.viewState.test {
             val viewState = expectMostRecentItem()

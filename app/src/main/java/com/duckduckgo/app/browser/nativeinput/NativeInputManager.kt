@@ -175,7 +175,7 @@ class RealNativeInputManager @Inject constructor(
     private lateinit var layoutCoordinator: NativeInputLayoutCoordinator
     private var isNativeInputFieldEnabled: Boolean = false
     private var isNativeChatInputEnabled: Boolean = false
-    private var availableInputMode: NativeInputState.InputMode = NativeInputState.InputMode.SEARCH_ONLY
+    private var inputModeCapability: NativeInputState.InputMode = NativeInputState.InputMode.SEARCH_ONLY
     private var isExiting: Boolean = false
     private var isPickingImage: Boolean = false
     private var duckAiToolbarHidden: Boolean = false
@@ -218,8 +218,8 @@ class RealNativeInputManager @Inject constructor(
                 }
             }
             .launchIn(lifecycleOwner.lifecycleScope)
-        duckChatInputModeState.availableInputMode
-            .onEach { availableInputMode = it }
+        duckChatInputModeState.inputModeCapability
+            .onEach { inputModeCapability = it }
             .launchIn(lifecycleOwner.lifecycleScope)
     }
 
@@ -229,7 +229,7 @@ class RealNativeInputManager @Inject constructor(
         if (!isNativeInputFieldEnabled) return false
         // Duck.ai always uses the native input; the browser omnibar only does so outside search-only.
         val inDuckAi = ::omnibarController.isInitialized && omnibarController.isDuckAiMode()
-        return inDuckAi || availableInputMode != NativeInputState.InputMode.SEARCH_ONLY
+        return inDuckAi || inputModeCapability != NativeInputState.InputMode.SEARCH_ONLY
     }
 
     override fun isChatTabSelected(): Boolean {

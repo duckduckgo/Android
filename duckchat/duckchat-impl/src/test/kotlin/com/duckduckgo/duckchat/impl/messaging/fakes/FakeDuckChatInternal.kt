@@ -244,8 +244,8 @@ class FakeDuckChatInternal(
 
     override val inputQuery: StateFlow<String> = _inputQuery.asStateFlow()
 
-    val availableInputModeFlow = MutableStateFlow(NativeInputState.InputMode.SEARCH_ONLY)
-    override val availableInputMode: StateFlow<NativeInputState.InputMode> = availableInputModeFlow.asStateFlow()
+    val inputModeCapabilityFlow = MutableStateFlow(NativeInputState.InputMode.SEARCH_ONLY)
+    override val inputModeCapability: StateFlow<NativeInputState.InputMode> = inputModeCapabilityFlow.asStateFlow()
 
     override fun setInputQuery(query: String) {
         _inputQuery.value = query

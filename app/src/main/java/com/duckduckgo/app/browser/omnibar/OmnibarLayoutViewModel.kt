@@ -341,12 +341,12 @@ class OmnibarLayoutViewModel @Inject constructor(
             duckAiFeatureState.showInputScreen,
             duckChat.observeNativeInputFieldUserSettingEnabled(),
             duckChat.observeNativeChatInputEnabled(),
-            duckChatInputModeState.availableInputMode,
-        ) { inputScreenEnabled, nativeInputEnabled, nativeChatInputEnabled, availableInputMode ->
+            duckChatInputModeState.inputModeCapability,
+        ) { inputScreenEnabled, nativeInputEnabled, nativeChatInputEnabled, inputModeCapability ->
             _viewState.update {
                 it.copy(
                     inputScreenEnabled = inputScreenEnabled,
-                    isSearchOnly = availableInputMode == NativeInputState.InputMode.SEARCH_ONLY,
+                    isSearchOnly = inputModeCapability == NativeInputState.InputMode.SEARCH_ONLY,
                     isNativeInputEnabled = nativeInputEnabled,
                     isNativeChatInputEnabled = nativeChatInputEnabled,
                 )

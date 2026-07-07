@@ -231,7 +231,7 @@ class RealDuckChatTest {
         testee.onPrivacyConfigDownloaded()
         advanceUntilIdle()
 
-        assertEquals(NativeInputState.InputMode.SEARCH_AND_DUCK_AI, testee.availableInputMode.value)
+        assertEquals(NativeInputState.InputMode.SEARCH_AND_DUCK_AI, testee.inputModeCapability.value)
     }
 
     @Test
@@ -243,7 +243,7 @@ class RealDuckChatTest {
         testee.onPrivacyConfigDownloaded()
         advanceUntilIdle()
 
-        assertEquals(NativeInputState.InputMode.SEARCH_ONLY, testee.availableInputMode.value)
+        assertEquals(NativeInputState.InputMode.SEARCH_ONLY, testee.inputModeCapability.value)
     }
 
     @Test
@@ -255,7 +255,7 @@ class RealDuckChatTest {
         testee.onPrivacyConfigDownloaded()
         advanceUntilIdle()
 
-        assertEquals(NativeInputState.InputMode.SEARCH_ONLY, testee.availableInputMode.value)
+        assertEquals(NativeInputState.InputMode.SEARCH_ONLY, testee.inputModeCapability.value)
     }
 
     @Test
@@ -267,7 +267,7 @@ class RealDuckChatTest {
         testee.onPrivacyConfigDownloaded()
         advanceUntilIdle()
 
-        assertEquals(NativeInputState.InputMode.SEARCH_ONLY, testee.availableInputMode.value)
+        assertEquals(NativeInputState.InputMode.SEARCH_ONLY, testee.inputModeCapability.value)
     }
 
     @Test

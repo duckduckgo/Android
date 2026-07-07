@@ -59,7 +59,7 @@ interface DuckChatInputModeState {
      * current config and is known even when no widget is attached — so callers can decide whether to use
      * the native input for the browser omnibar at all. Emits on subscription and on every settings change.
      */
-    val availableInputMode: StateFlow<NativeInputState.InputMode>
+    val inputModeCapability: StateFlow<NativeInputState.InputMode>
 }
 
 /**

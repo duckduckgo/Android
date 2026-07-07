@@ -87,7 +87,7 @@ class RealNativeInputManagerTest {
 
     @Before
     fun setUp() {
-        whenever(duckChatInputModeState.availableInputMode)
+        whenever(duckChatInputModeState.inputModeCapability)
             .thenReturn(MutableStateFlow(NativeInputState.InputMode.SEARCH_AND_DUCK_AI))
         testee = RealNativeInputManager(
             duckChat,

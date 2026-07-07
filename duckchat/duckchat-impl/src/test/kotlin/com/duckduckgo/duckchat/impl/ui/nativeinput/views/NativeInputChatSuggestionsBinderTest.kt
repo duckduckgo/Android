@@ -332,7 +332,7 @@ class NativeInputChatSuggestionsBinderTest {
     private val inputModeState = object : DuckChatInputModeState {
         override val displayedMode: StateFlow<InputMode> = MutableStateFlow(InputMode.SEARCH)
         override val inputQuery: StateFlow<String> = inputQueryFlow
-        override val availableInputMode: StateFlow<NativeInputState.InputMode> =
+        override val inputModeCapability: StateFlow<NativeInputState.InputMode> =
             MutableStateFlow(NativeInputState.InputMode.SEARCH_ONLY)
     }
 
