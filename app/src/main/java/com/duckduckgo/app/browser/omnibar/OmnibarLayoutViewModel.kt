@@ -269,13 +269,13 @@ class OmnibarLayoutViewModel @Inject constructor(
     ) {
         /**
          * The Duck.ai entry icon shows the chevron-down (contextual sheet) variant when the native
-         * input field setting is enabled and we're not on the new-tab page — tapping it then opens
-         * the contextual sheet. In every other case it falls back to the standard chat icon, whose
-         * tap opens Duck.ai in full screen. Derived from the flag + viewMode rather than a stored
-         * flag so it can't drift out of sync with other state-update paths.
+         * input field setting is enabled, we're not on the new-tab page, and Duck.ai is available in
+         * the address bar (not search-only) — tapping it then opens the contextual sheet. In every
+         * other case (including search-only) it falls back to the standard chat icon. Derived from
+         * flags + viewMode rather than a stored flag so it can't drift out of sync.
          */
         val showContextualSheetIcon: Boolean
-            get() = isNativeInputEnabled && viewMode !is NewTab
+            get() = isNativeInputEnabled && viewMode !is NewTab && !isSearchOnly
 
         /**
          * The click catcher routes an omnibar tap to the native input overlay. Shown when the
