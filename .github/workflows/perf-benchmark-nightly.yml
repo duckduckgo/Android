@@ -62,17 +62,6 @@ jobs:
       - name: Run page-load benchmark on FTL
         run: ./gradlew runFlankPerfTests --no-configuration-cache
 
-      # DIAGNOSTIC (remove once the results layout is confirmed): show exactly what Flank pulled
-      # back and where, so we can see whether the macrobenchmark trace + benchmarkData.json landed
-      # where the post-processing step expects them.
-      - name: List FTL results (diagnostic)
-        if: always()
-        run: |
-          echo "=== build/fladle tree ==="
-          find build/fladle -type f 2>/dev/null | sort || echo "(no build/fladle dir)"
-          echo "=== workspace-wide trace / benchmarkData files ==="
-          find . -type f \( -name '*.perfetto-trace' -o -name '*benchmarkData.json' -o -name '*.perfetto' \) 2>/dev/null | sort || true
-
       # Flank uploads the directories-to-pull output (the macrobench trace + benchmarkData.json) to
       # its GCS results bucket but does NOT download it to the runner — only test-result XMLs land in
       # build/fladle/perfResults. Authenticate with the same FTL service account and pull the two
