@@ -3,6 +3,15 @@ plugins {
     id 'kotlin-android'
 }
 
+// This is a `com.android.test` module, so it deliberately does NOT apply android-library.gradle
+// (which is for -api/-impl library modules and registers jvm_tests/jvm_checks/lint_check). As a
+// result it's skipped by those aggregate tasks; we apply code-formatting.gradle directly so the
+// module's Kotlin is still covered by spotless. Note: the benchmark tests live in src/main (not
+// src/androidTest) because this whole module IS the test APK — the root build.gradle enforcement
+// rejects a src/androidTest dir outside :app, and this layout is what a com.android.test module
+// expects anyway.
+apply from: "$rootDir/code-formatting.gradle"
+
 android {
     namespace 'com.duckduckgo.macrobenchmark'
     compileSdk compile_sdk
