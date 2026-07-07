@@ -1,6 +1,10 @@
 name: Perf Benchmark - Nightly
 
 on:
+  # TEMPORARY (remove before PR): smoke-test the workflow on this branch. A push run does NOT
+  # report the pixel (that's gated on event_name == 'schedule') and checks out this branch's code.
+  push:
+    branches: [feature/ana/macrobenchmark_poc]
   schedule:
     - cron: '0 3 * * *'   # 3 AM UTC, after build-benchmark (2 AM)
   workflow_dispatch:
