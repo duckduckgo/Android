@@ -22,6 +22,7 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.autoconsent.api.AutoconsentCallback
 import com.duckduckgo.autoconsent.api.AutoconsentResult
 import com.duckduckgo.autoconsent.api.CookiePopUpPreference
+import com.duckduckgo.autoconsent.impl.AutoconsentHeuristicModeProvider
 import com.duckduckgo.autoconsent.impl.AutoconsentReloadLoopDetector
 import com.duckduckgo.autoconsent.impl.MessageHandlerPlugin
 import com.duckduckgo.autoconsent.impl.adapters.JSONObjectAdapter
@@ -53,6 +54,7 @@ class InitMessageHandlerPlugin @Inject constructor(
     private val autoconsentFeature: AutoconsentFeature,
     private val autoconsentPixelManager: AutoconsentPixelManager,
     private val reloadLoopDetector: AutoconsentReloadLoopDetector,
+    private val heuristicModeProvider: AutoconsentHeuristicModeProvider,
 ) : MessageHandlerPlugin {
 
     private val moshi = Moshi.Builder().add(JSONObjectAdapter()).build()
@@ -98,8 +100,7 @@ class InitMessageHandlerPlugin @Inject constructor(
                     )
 
                     val settings = settingsCache.getSettings() ?: return@launch
-                    val cookiePopUpPreferenceSettingEnabled = autoconsentFeature.cookiePopUpPreferenceSetting().isEnabled()
-                    val config = buildConfig(preference, cookiePopUpPreferenceSettingEnabled, settings.disabledCMPs, webView)
+                    val config = buildConfig(settings.disabledCMPs, webView)
                     val initResp = if (autoconsentFeature.ruleFiltering().isEnabled()) {
                         InitResp(config = config, rules = filterCompactRules(settings.compactRuleList, url))
                     } else {
@@ -130,8 +131,6 @@ class InitMessageHandlerPlugin @Inject constructor(
     }
 
     private fun buildConfig(
-        preference: CookiePopUpPreference,
-        cookiePopUpPreferenceSettingEnabled: Boolean,
         disabledCmps: List<String>,
         webView: WebView,
     ): Config {
@@ -144,23 +143,8 @@ class InitMessageHandlerPlugin @Inject constructor(
             isMainWorld = true,
             enableCosmeticRules = true,
             enableHeuristicDetection = true,
-            heuristicMode = getHeuristicMode(preference, cookiePopUpPreferenceSettingEnabled),
+            heuristicMode = heuristicModeProvider.getHeuristicMode(),
         )
-    }
-
-    private fun getHeuristicMode(
-        preference: CookiePopUpPreference,
-        cookiePopUpPreferenceSettingEnabled: Boolean,
-    ): String {
-        if (!autoconsentFeature.heuristicAction().isEnabled()) {
-            return "off"
-        }
-
-        return when (preference) {
-            CookiePopUpPreference.MAX -> "tier2"
-            CookiePopUpPreference.DEFAULT -> if (cookiePopUpPreferenceSettingEnabled) "tier1" else "reject"
-            CookiePopUpPreference.OFF -> "off"
-        }
     }
 
     private fun parseMessage(jsonString: String): InitMessage? {
