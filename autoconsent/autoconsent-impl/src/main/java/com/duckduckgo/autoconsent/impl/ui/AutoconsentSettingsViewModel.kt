@@ -129,7 +129,7 @@ class AutoconsentSettingsViewModel @Inject constructor(
     }
 
     companion object {
-        const val LEARN_MORE_URL = "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#cookie-pop-up-management"
+        const val LEARN_MORE_URL = "https://duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections#cookie-pop-up-protection"
     }
 
     private fun buildViewState(): ViewState {

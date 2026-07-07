@@ -183,9 +183,12 @@ class AutoconsentSettingsActivity : DuckDuckGoActivity() {
     }
 
     private fun configureClickableLink() {
-        val htmlText = getString(
-            R.string.autoconsentDescription,
-        ).html(this)
+        val descriptionResId = if (showCookiePopUpPreferenceSetting) {
+            R.string.autoconsentCookiePopUpPreferenceHeaderDescription
+        } else {
+            R.string.autoconsentDescription
+        }
+        val htmlText = getString(descriptionResId).html(this)
         val spannableString = SpannableStringBuilder(htmlText)
         val urlSpans = htmlText.getSpans(0, htmlText.length, URLSpan::class.java)
         urlSpans?.forEach {
