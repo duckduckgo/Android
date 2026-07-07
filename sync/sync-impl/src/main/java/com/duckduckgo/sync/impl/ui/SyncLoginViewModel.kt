@@ -133,7 +133,7 @@ class SyncLoginViewModel @Inject constructor(
     /** Map one v2 [DispatchOutcome] onto this VM's existing command pipeline. */
     private suspend fun handleV2Outcome(outcome: DispatchOutcome) {
         syncPixels.fireSetupFailed(SYNC_EXCHANGE, outcome)
-        syncPixels.fireSetupCancelledIfDenied(outcome, SYNC_EXCHANGE)
+        syncPixels.fireSetupCancelledIfDenied(SYNC_EXCHANGE, outcome)
         when (outcome) {
             is DispatchOutcome.LoggedIn -> {
                 syncPixels.fireLoginPixel()

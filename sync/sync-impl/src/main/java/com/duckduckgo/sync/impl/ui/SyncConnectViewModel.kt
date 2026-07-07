@@ -146,7 +146,7 @@ class SyncConnectViewModel @Inject constructor(
     /** Map one v2 [DispatchOutcome] onto this VM's command pipeline. Shared by the Presenter and Scanner paths. */
     private suspend fun handleV2Outcome(outcome: DispatchOutcome) {
         syncPixels.fireSetupFailed(SYNC_CONNECT, outcome)
-        syncPixels.fireSetupCancelledIfDenied(outcome, SYNC_CONNECT)
+        syncPixels.fireSetupCancelledIfDenied(SYNC_CONNECT, outcome)
         when (outcome) {
             is DispatchOutcome.LinkingCodeReady -> renderV2QrCode(outcome.linkingCode)
             is DispatchOutcome.HostConfirmationRequested -> command.send(Command.AskHostConfirmation(outcome.peerName, outcome.peerKind))

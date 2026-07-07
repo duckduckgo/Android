@@ -157,7 +157,7 @@ class EnterCodeViewModel @Inject constructor(
         previousPrimaryKey: String,
     ) {
         syncPixels.fireSetupFailed(codeType.asScreenType(), outcome)
-        syncPixels.fireSetupCancelledIfDenied(outcome, codeType.asScreenType())
+        syncPixels.fireSetupCancelledIfDenied(codeType.asScreenType(), outcome)
         when (outcome) {
             is DispatchOutcome.LoggedIn -> onLoginSuccess(previousPrimaryKey, outcome.path, outcome.myRole, outcome.peerKind)
             is DispatchOutcome.AlreadyConnected -> {

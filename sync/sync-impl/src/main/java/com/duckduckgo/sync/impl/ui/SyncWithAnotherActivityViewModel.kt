@@ -295,7 +295,7 @@ class SyncWithAnotherActivityViewModel @Inject constructor(
         previousPrimaryKey: String,
     ) {
         syncPixels.fireSetupFailed(SYNC_EXCHANGE, outcome)
-        syncPixels.fireSetupCancelledIfDenied(outcome, SYNC_EXCHANGE)
+        syncPixels.fireSetupCancelledIfDenied(SYNC_EXCHANGE, outcome)
         // Cancel the deep-link timeout only on terminal outcomes; keep it running across confirmation prompts.
         when (outcome) {
             is DispatchOutcome.LoggedIn -> {

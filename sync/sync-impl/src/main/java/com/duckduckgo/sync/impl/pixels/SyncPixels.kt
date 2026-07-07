@@ -924,7 +924,7 @@ internal fun SyncPixels.fireSetupFailed(screenType: ScreenType, outcome: Dispatc
 // Both devices fire the "abandoned" pixel on a v2 confirmation denial — from each device's POV the
 // setup ended via denial. PAIRING_CANCELLED is this device's own denial; PAIRING_REJECTED is the peer's
 // denial received on the wire.
-internal fun SyncPixels.fireSetupCancelledIfDenied(outcome: DispatchOutcome, screenType: ScreenType) {
+internal fun SyncPixels.fireSetupCancelledIfDenied(screenType: ScreenType, outcome: DispatchOutcome) {
     if (outcome is DispatchOutcome.Failed &&
         (outcome.code == AccountErrorCodes.PAIRING_CANCELLED.code || outcome.code == AccountErrorCodes.PAIRING_REJECTED.code)
     ) {

@@ -494,8 +494,8 @@ class RealSyncPixelsTest {
         syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
 
         testee.fireSetupCancelledIfDenied(
-            DispatchOutcome.Failed(reason = "user_denied", code = AccountErrorCodes.PAIRING_CANCELLED.code),
             ScreenType.SYNC_CONNECT,
+            DispatchOutcome.Failed(reason = "user_denied", code = AccountErrorCodes.PAIRING_CANCELLED.code),
         )
 
         verify(pixel).fire(
@@ -514,8 +514,8 @@ class RealSyncPixelsTest {
         syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
 
         testee.fireSetupCancelledIfDenied(
-            DispatchOutcome.Failed(reason = "peer", code = AccountErrorCodes.PAIRING_REJECTED.code),
             ScreenType.SYNC_EXCHANGE,
+            DispatchOutcome.Failed(reason = "peer", code = AccountErrorCodes.PAIRING_REJECTED.code),
         )
 
         verify(pixel).fire(
@@ -532,8 +532,8 @@ class RealSyncPixelsTest {
     @Test
     fun whenFireSetupCancelledIfDeniedForNonCancellationOutcomeThenNotFired() {
         testee.fireSetupCancelledIfDenied(
-            DispatchOutcome.Failed(reason = "boom", code = AccountErrorCodes.PAIRING_FAILED.code),
             ScreenType.SYNC_CONNECT,
+            DispatchOutcome.Failed(reason = "boom", code = AccountErrorCodes.PAIRING_FAILED.code),
         )
 
         verifyNoInteractions(pixel)
