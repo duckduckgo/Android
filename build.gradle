@@ -373,6 +373,10 @@ fladle {
                 apks.first().absolutePath
             })
             instrumentationApk.set(rootProject.file("macrobenchmark/build/outputs/apk/release/macrobenchmark-release.apk").absolutePath)
+            // Fulladle auto-discovers every android-test module (httpsupgrade-impl, pir-impl,
+            // sync-lib) and injects them as additional-app-test-apks. This config runs ONLY the
+            // page-load macrobenchmark, and those APKs aren't built here, so clear the list.
+            additionalTestApks.set([])
             testTargets.set(["class com.duckduckgo.macrobenchmark.PageLoadBenchmark"])
             // Single virtual model for v1 (we accept virtual noise; Phase 0 gates it).
             devices.set([["model": "MediumPhone.arm", "version": "30"]])
