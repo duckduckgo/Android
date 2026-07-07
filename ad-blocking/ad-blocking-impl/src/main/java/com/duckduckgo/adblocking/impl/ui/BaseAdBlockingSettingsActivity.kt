@@ -65,7 +65,6 @@ abstract class BaseAdBlockingSettingsActivity : DuckDuckGoActivity() {
     protected fun configure() {
         setupToolbar(toolbar)
 
-        blockAdsToggle.setOnCheckedChangeListener(blockAdsToggleListener)
         duckPlayerEntry.setClickListener { viewModel.onDuckPlayerClicked() }
         duckPlayerDescription.setOnClickListener { viewModel.onDuckPlayerClicked() }
 
@@ -102,7 +101,7 @@ abstract class BaseAdBlockingSettingsActivity : DuckDuckGoActivity() {
 
     private fun observeViewModel() {
         viewModel.viewState
-            .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
+            .flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED)
             .onEach { render(it) }
             .launchIn(lifecycleScope)
 
