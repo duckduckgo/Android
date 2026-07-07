@@ -29,6 +29,7 @@ import com.duckduckgo.feature.toggles.api.Toggle.State
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.async
+import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.test.runTest
 import okhttp3.OkHttpClient
@@ -369,7 +370,7 @@ class InlinePdfHandlerTest {
         }
 
         delay(100)
-        deferred.cancel()
+        deferred.cancelAndJoin()
 
         val cacheDir = File(
             InstrumentationRegistry.getInstrumentation().targetContext.cacheDir,
