@@ -85,4 +85,13 @@ class PageLoadTraceMarkerTest {
 
         assertEquals(listOf(Event("begin", 0)), tracer.events)
     }
+
+    @Test
+    fun whenNonHttpFinishesThenOpenHttpSectionStaysOpen() {
+        marker.onPageStarted("https://a.com") // begin 0, still open
+        marker.onPageFinished("about:blank", 100) // must NOT close section 0
+        marker.onPageFinished("duck://newtab", 100) // must NOT close section 0
+
+        assertEquals(listOf(Event("begin", 0)), tracer.events)
+    }
 }

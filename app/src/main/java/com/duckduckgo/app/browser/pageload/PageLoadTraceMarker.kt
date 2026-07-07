@@ -45,19 +45,24 @@ class PageLoadTraceMarker(
     private var openCookie: Int? = null
 
     fun onPageStarted(url: String?) {
-        if (url == null || !(url.startsWith("http://") || url.startsWith("https://"))) return
+        if (!url.isHttp()) return
         openCookie?.let { tracer.endAsyncSection(SECTION, it) } // close any stuck section
         openCookie = tracer.beginAsyncSection(SECTION)
     }
 
     fun onPageFinished(url: String?, progress: Int) {
         if (progress != 100) return
-        if (url == null || url == "about:blank") return
+        // Same http(s) guard as onPageStarted: a non-http finish (e.g. about:blank, duck://) must
+        // NOT close the http section currently open, or that load's slice gets stretched to the
+        // wrong endpoint. A genuinely stuck section is closed by the next onPageStarted instead.
+        if (!url.isHttp()) return
         openCookie?.let {
             tracer.endAsyncSection(SECTION, it)
             openCookie = null
         }
     }
+
+    private fun String?.isHttp() = this != null && (startsWith("http://") || startsWith("https://"))
 
     companion object {
         const val SECTION = "ddg.pageLoad"
