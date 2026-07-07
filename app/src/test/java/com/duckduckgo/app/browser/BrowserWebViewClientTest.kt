@@ -61,6 +61,7 @@ import com.duckduckgo.app.browser.logindetection.WebNavigationEvent
 import com.duckduckgo.app.browser.mediaplayback.MediaPlayback
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.navigation.safeCopyBackForwardList
+import com.duckduckgo.app.browser.pageload.PageLoadTracer
 import com.duckduckgo.app.browser.pageload.PageLoadWideEvent
 import com.duckduckgo.app.browser.pageloadpixel.PageLoadedHandler
 import com.duckduckgo.app.browser.pageloadpixel.firstpaint.PagePaintedHandler
@@ -233,6 +234,10 @@ class BrowserWebViewClientTest {
                     mockContentScopeExperiments,
                     mockAppSchemeInterceptionFeature,
                     mockForceWebViewRecompositeFeature,
+                    object : PageLoadTracer {
+                        override fun beginAsyncSection(name: String): Int = 0
+                        override fun endAsyncSection(name: String, cookie: Int) = Unit
+                    },
                 )
             testee.webViewClientListener = listener
             whenever(webResourceRequest.url).thenReturn(Uri.EMPTY)

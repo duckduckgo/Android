@@ -65,6 +65,7 @@ import com.duckduckgo.app.browser.mediaplayback.MediaPlayback
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.navigation.safeCopyBackForwardList
 import com.duckduckgo.app.browser.pageload.PageLoadTraceMarker
+import com.duckduckgo.app.browser.pageload.PageLoadTracer
 import com.duckduckgo.app.browser.pageload.PageLoadWideEvent
 import com.duckduckgo.app.browser.pageloadpixel.PageLoadedHandler
 import com.duckduckgo.app.browser.pageloadpixel.firstpaint.PagePaintedHandler
@@ -139,6 +140,7 @@ class BrowserWebViewClient @Inject constructor(
     private val contentScopeExperiments: ContentScopeExperiments,
     private val appSchemeInterceptionFeature: AppSchemeInterceptionFeature,
     private val forceWebViewRecompositeFeature: ForceWebViewRecompositeFeature,
+    private val pageLoadTracer: PageLoadTracer,
 ) : WebViewClient() {
     var webViewClientListener: WebViewClientListener? = null
     var clientProvider: ClientBrandHintProvider? = null
@@ -149,7 +151,8 @@ class BrowserWebViewClient @Inject constructor(
     private var recompositeScheduled: Boolean = false
 
     // Brackets each main-frame page load with the ddg.pageLoad async trace section (see PageLoadTraceMarker).
-    private val pageLoadTraceMarker = PageLoadTraceMarker()
+    // The injected tracer is a no-op in non-internal flavors.
+    private val pageLoadTraceMarker = PageLoadTraceMarker(pageLoadTracer)
 
     private val isAppSchemeInterceptionEnabled = AtomicBoolean(true)
     private val isForceRecompositeEnabled = AtomicBoolean(true)

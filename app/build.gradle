@@ -568,8 +568,9 @@ dependencies {
     implementation AndroidX.recyclerView
     implementation AndroidX.swipeRefreshLayout
     implementation AndroidX.webkit
-    // POC (macrobenchmark): async trace sections for page-load measurement.
-    implementation "androidx.tracing:tracing:1.2.0"
+    // POC (macrobenchmark): async trace sections for page-load measurement. Internal flavor only —
+    // the real PageLoadTracer lives in src/internal; non-internal flavors bind a no-op.
+    internalImplementation "androidx.tracing:tracing:1.2.0"
     implementation Square.okHttp3.okHttp
     implementation "com.squareup.okhttp3:okhttp-tls:_"
     implementation Square.retrofit2.retrofit

@@ -16,39 +16,38 @@
 
 package com.duckduckgo.app.browser.pageload
 
-import androidx.tracing.Trace
-
-/** Seam so the cookie sequencing can be unit-tested without the android tracing runtime. */
+/**
+ * Emits the `ddg.pageLoad` async trace section. The real implementation (androidx.tracing) ships
+ * only in the internal flavor; Play/F-Droid get a no-op binding and never link the tracing library
+ * (this instrumentation is only readable via a profileable/shell trace, which is internal-only).
+ *
+ * A single [AppScope] instance is shared across every [PageLoadTraceMarker] (i.e. every tab), so the
+ * cookies it hands out are process-unique — two tabs loading concurrently can't collide on the same
+ * (section, cookie) pair and corrupt each other's slices.
+ */
 interface PageLoadTracer {
-    fun beginAsyncSection(name: String, cookie: Int)
+    /** Begins an async section and returns a process-unique cookie to pass back to [endAsyncSection]. */
+    fun beginAsyncSection(name: String): Int
     fun endAsyncSection(name: String, cookie: Int)
-}
-
-class AndroidxPageLoadTracer : PageLoadTracer {
-    override fun beginAsyncSection(name: String, cookie: Int) = Trace.beginAsyncSection(name, cookie)
-    override fun endAsyncSection(name: String, cookie: Int) = Trace.endAsyncSection(name, cookie)
 }
 
 /**
  * Brackets each real http(s) main-frame page load with the `ddg.pageLoad` async trace section,
- * using a unique cookie per load and closing any section left open by a non-completing load.
- * One instance per WebViewClient (holds per-client mutable state).
+ * closing any section left open by a non-completing load. One instance per WebViewClient (holds the
+ * per-client open-cookie state); cookie uniqueness across clients is guaranteed by the shared [tracer].
  *
  * This section is read offline by Perfetto `trace_processor` in the page-load CI benchmark; it is
  * NOT read by macrobenchmark's `TraceSectionMetric` (whose per-iteration windowing was unreliable).
  */
 class PageLoadTraceMarker(
-    private val tracer: PageLoadTracer = AndroidxPageLoadTracer(),
+    private val tracer: PageLoadTracer,
 ) {
     private var openCookie: Int? = null
-    private var cookieSeq: Int = 0
 
     fun onPageStarted(url: String?) {
         if (url == null || !(url.startsWith("http://") || url.startsWith("https://"))) return
         openCookie?.let { tracer.endAsyncSection(SECTION, it) } // close any stuck section
-        val cookie = cookieSeq++
-        openCookie = cookie
-        tracer.beginAsyncSection(SECTION, cookie)
+        openCookie = tracer.beginAsyncSection(SECTION)
     }
 
     fun onPageFinished(url: String?, progress: Int) {

@@ -25,7 +25,12 @@ class PageLoadTraceMarkerTest {
 
     private class FakeTracer : PageLoadTracer {
         val events = mutableListOf<Event>()
-        override fun beginAsyncSection(name: String, cookie: Int) { events += Event("begin", cookie) }
+        private var seq = 0
+        override fun beginAsyncSection(name: String): Int {
+            val cookie = seq++
+            events += Event("begin", cookie)
+            return cookie
+        }
         override fun endAsyncSection(name: String, cookie: Int) { events += Event("end", cookie) }
     }
 
