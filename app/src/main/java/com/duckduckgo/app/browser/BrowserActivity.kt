@@ -1821,7 +1821,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
     )
 
     private fun showSetAsDefaultBrowserDialog() {
-        val dialog = DefaultBrowserBottomSheetDialog(context = this)
+        val dialog = DefaultBrowserBottomSheetDialog(context = this, edgeToEdgeProvider = edgeToEdgeProvider)
         dialog.eventListener =
             object : EventListener {
                 override fun onShown() {
