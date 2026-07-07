@@ -107,6 +107,8 @@ class RealAutoconsentSettingsDataStoreTest {
         dataStore.userSetting = true
 
         assertTrue(dataStore.userSetting)
+        assertEquals(CookiePopUpPreference.DEFAULT, dataStore.cookiePopUpPreference)
+        assertTrue(preferences().getBoolean(LEGACY_USER_SETTING_KEY, false))
     }
 
     @Test
@@ -115,6 +117,26 @@ class RealAutoconsentSettingsDataStoreTest {
         dataStore.userSetting = false
 
         assertFalse(dataStore.userSetting)
+        assertEquals(CookiePopUpPreference.OFF, dataStore.cookiePopUpPreference)
+        assertFalse(preferences().getBoolean(LEGACY_USER_SETTING_KEY, true))
+    }
+
+    @Test
+    fun whenCookiePopUpPreferenceSetToMaxThenLegacySettingMirrorsTrue() {
+        val dataStore = createDataStore()
+        dataStore.cookiePopUpPreference = CookiePopUpPreference.MAX
+
+        assertTrue(dataStore.userSetting)
+        assertTrue(preferences().getBoolean(LEGACY_USER_SETTING_KEY, false))
+    }
+
+    @Test
+    fun whenCookiePopUpPreferenceSetToOffThenLegacySettingMirrorsFalse() {
+        val dataStore = createDataStore()
+        dataStore.cookiePopUpPreference = CookiePopUpPreference.OFF
+
+        assertFalse(dataStore.userSetting)
+        assertFalse(preferences().getBoolean(LEGACY_USER_SETTING_KEY, true))
     }
 
     private fun preferences() = context.getSharedPreferences(PREFS_FILENAME, Context.MODE_PRIVATE)

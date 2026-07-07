@@ -129,6 +129,31 @@ class RealAutoconsentTest {
     }
 
     @Test
+    fun whenChangeCookiePopUpPreferenceToDefaultThenSettingEnabled() {
+        autoconsent.changeCookiePopUpPreference(CookiePopUpPreference.DEFAULT)
+
+        assertTrue(autoconsent.isSettingEnabled())
+    }
+
+    @Test
+    fun whenChangeCookiePopUpPreferenceToOffThenSettingDisabled() {
+        autoconsent.changeCookiePopUpPreference(CookiePopUpPreference.DEFAULT)
+        autoconsent.changeCookiePopUpPreference(CookiePopUpPreference.OFF)
+
+        assertFalse(autoconsent.isSettingEnabled())
+    }
+
+    @Test
+    fun whenInjectAutoconsentWithCookiePopUpPreferenceEnabledThenCallEvaluate() {
+        settingsRepository.cookiePopUpPreference = CookiePopUpPreference.DEFAULT
+        settingsRepository.firstPopupHandled = true
+
+        autoconsent.injectAutoconsent(webView, URL)
+
+        assertNotNull(shadowOf(webView).lastEvaluatedJavascript)
+    }
+
+    @Test
     fun whenSettingEnabledCalledThenReturnValueFromRepo() {
         settingsRepository.userSetting = false
         assertFalse(autoconsent.isSettingEnabled())

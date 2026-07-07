@@ -76,13 +76,7 @@ class InitMessageHandlerPlugin @Inject constructor(
 
                     reloadLoopDetector.updateUrl(webView, url)
 
-                    val preference = if (autoconsentFeature.cookiePopUpPreferenceSetting().isEnabled()) {
-                        settingsRepository.cookiePopUpPreference
-                    } else if (settingsRepository.userSetting) {
-                        CookiePopUpPreference.DEFAULT
-                    } else {
-                        CookiePopUpPreference.OFF
-                    }
+                    val preference = settingsRepository.cookiePopUpPreference
 
                     if (preference == CookiePopUpPreference.OFF) {
                         autoconsentPixelManager.fireDailyPixel(AutoConsentPixel.AUTOCONSENT_DISABLED_FOR_SITE_DAILY)
