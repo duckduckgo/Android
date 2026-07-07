@@ -162,7 +162,8 @@ class AutoconsentSettingsActivity : DuckDuckGoActivity() {
                 viewState.autoManageEnabled,
                 autoManageCookiePopUpsToggleListener,
             )
-            popUpsWithoutOptOutsToggle.setSwitchEnabled(viewState.autoManageEnabled)
+            popUpsWithoutOptOutsToggle.isVisible = viewState.autoManageEnabled
+            popUpsWithoutOptOutsDescription.isVisible = viewState.autoManageEnabled
             popUpsWithoutOptOutsToggle.quietlySetIsChecked(
                 viewState.popUpsWithoutOptOutsEnabled,
                 popUpsWithoutOptOutsToggleListener,
