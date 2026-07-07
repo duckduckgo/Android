@@ -15,5 +15,6 @@
   -->
 
 <resources>
-
+    <string name="ad_blocking_menu_disable">Disable YouTube Ad Blocking</string>
+    <string name="ad_blocking_menu_enable">Enable YouTube Ad Blocking</string>
 </resources>

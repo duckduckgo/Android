@@ -18,6 +18,7 @@ package com.duckduckgo.browser.ui.browsermenu
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.net.Uri
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.LinearLayout
@@ -26,6 +27,7 @@ import androidx.core.view.isVisible
 import androidx.lifecycle.coroutineScope
 import com.bumptech.glide.Glide
 import com.duckduckgo.app.browser.favicon.FaviconManager
+import com.duckduckgo.app.browser.menu.TopInContextSection
 import com.duckduckgo.browser.ui.R
 import com.duckduckgo.browser.ui.databinding.BottomSheetBrowserMenuBinding
 import com.duckduckgo.browser.ui.databinding.ViewBrowserMenuDuckaiSectionBinding
@@ -50,6 +52,8 @@ class BrowserMenuBottomSheet(
     private val onDismissListener: () -> Unit,
     private val onMenuItemClickListener: () -> Unit,
     private val edgeToEdgeEnabled: Boolean,
+    private val topInContextSections: Collection<TopInContextSection> = emptyList(),
+    private val currentUrl: Uri? = null,
 ) : BottomSheetDialog(
     context,
     if (edgeToEdgeEnabled) com.duckduckgo.mobile.android.R.style.Widget_DuckDuckGo_BottomSheetDialog_EdgeToEdge else 0,
@@ -74,6 +78,8 @@ class BrowserMenuBottomSheet(
         binding.includeVpnMenuItem.vpnMenuItem
             .findViewById<MenuItemView>(R.id.menuItemView)
             .setSize(MenuItemViewSize.MEDIUM)
+
+        addTopInContextSections()
 
         setOnShowListener { dialogInterface ->
             (dialogInterface as BottomSheetDialog).setRoundCorners()
@@ -218,6 +224,30 @@ class BrowserMenuBottomSheet(
         menuItemsContainer.addView(duckAiSectionBinding.root, menuItemsContainer.indexOfChild(anchor))
     }
 
+    /**
+     * Adds the contributed top-of-menu sections (if any) into their container, and keeps the single
+     * trailing divider shown only while at least one section is visible. Contributed views hide
+     * themselves asynchronously, so a global-layout listener re-derives the divider visibility on every
+     * layout pass (the guarded write prevents a relayout loop).
+     */
+    private fun addTopInContextSections() {
+        val url = currentUrl ?: return
+        topInContextSections.forEach { section ->
+            binding.topInContextSection.addView(section.getView(url, context) { onContributedItemClicked() })
+        }
+        binding.topInContextSection.viewTreeObserver.addOnGlobalLayoutListener {
+            val shouldShow = binding.topInContextSection.isVisible && binding.topInContextSection.children.any { it.isVisible }
+            if (binding.topInContextSectionDivider.isVisible != shouldShow) {
+                binding.topInContextSectionDivider.isVisible = shouldShow
+            }
+        }
+    }
+
+    private fun onContributedItemClicked() {
+        onMenuItemClickListener()
+        dismiss()
+    }
+
     fun onMenuItemClicked(view: View, onClick: () -> Unit) {
         view.setOnClickListener {
             onMenuItemClickListener()
@@ -251,6 +281,7 @@ class BrowserMenuBottomSheet(
     }
 
     private fun renderBrowserMenu(viewState: BrowserMenuViewState.Browser) {
+        binding.topInContextSection.isVisible = true
         backMenuItem.isEnabled = viewState.canGoBack
         forwardMenuItem.isEnabled = viewState.canGoForward
         newDuckChatMenuItem.isEnabled = viewState.showDuckChatOption
@@ -367,6 +398,7 @@ class BrowserMenuBottomSheet(
     }
 
     private fun renderCustomTabsMenu(viewState: BrowserMenuViewState.CustomTabs) {
+        binding.topInContextSection.isVisible = true
         backMenuItem.isEnabled = viewState.canGoBack
         forwardMenuItem.isEnabled = viewState.canGoForward
         newTabMenuItem.isVisible = false
