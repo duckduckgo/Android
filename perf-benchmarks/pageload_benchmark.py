@@ -16,8 +16,10 @@ PIXEL_BASE = "https://improving.duckduckgo.com/t/m_page_load_time_android"
 
 
 def query_durations_ms(trace_path: Path) -> list:
-    """Run trace_processor and return ddg.pageLoad slice durations in ms (positive only)."""
-    sql = f"SELECT dur FROM slice WHERE name = '{SECTION}' AND dur > 0;"
+    """Run trace_processor and return ddg.pageLoad slice durations in ms (positive only), in time order."""
+    # ORDER BY ts so the returned order is chronological — compute_stats() drops the first sample as
+    # the warmup navigation, which is only correct if the rows come back in the order they occurred.
+    sql = f"SELECT dur FROM slice WHERE name = '{SECTION}' AND dur > 0 ORDER BY ts;"
     out = subprocess.run(
         ["trace_processor_shell", "-q", "/dev/stdin", str(trace_path)],
         input=sql,
