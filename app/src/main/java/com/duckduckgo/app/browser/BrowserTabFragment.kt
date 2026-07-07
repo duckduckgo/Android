@@ -149,6 +149,7 @@ import com.duckduckgo.app.browser.history.NavigationHistorySheet.NavigationHisto
 import com.duckduckgo.app.browser.httpauth.WebViewHttpAuthStore
 import com.duckduckgo.app.browser.logindetection.DOMLoginDetector
 import com.duckduckgo.app.browser.menu.BrowserMenuViewStateFactory
+import com.duckduckgo.app.browser.menu.TopInContextSection
 import com.duckduckgo.app.browser.menu.VpnMenuStore
 import com.duckduckgo.app.browser.model.BasicAuthenticationCredentials
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
@@ -543,6 +544,9 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var faviconManager: FaviconManager
+
+    @Inject
+    lateinit var topInContextSections: PluginPoint<TopInContextSection>
 
     @Inject
     lateinit var gridViewColumnCalculator: GridViewColumnCalculator
@@ -1821,6 +1825,8 @@ class BrowserTabFragment :
                 pixel.fire(AppPixelName.BROWSING_MENU_USED, type = Count)
             },
             edgeToEdgeEnabled = edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.BOTTOM_SHEETS),
+            topInContextSections = topInContextSections.getPlugins(),
+            currentUrl = viewModel.url?.toUri(),
         )
 
         when (browserMode) {
