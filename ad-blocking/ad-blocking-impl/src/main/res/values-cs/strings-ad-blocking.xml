@@ -23,4 +23,10 @@
     <string name="ad_blocking_settings_description">DuckDuckGo blokuje při sledování videí na YouTube reklamy, takže se můžeš dívat bez přerušení. <annotation type="learn_more_link">Další informace</annotation></string>
     <string name="ad_blocking_settings_duck_player_header">Duck Player</string>
     <string name="ad_blocking_settings_duck_player_description">Otevírá videa v režimu kina, který brání tomu, aby sledovaná videa ovlivňovala tvůj feed na YouTube.</string>
+    <string name="ad_blocking_settings_title_v2">Blokování reklam</string>
+    <string name="ad_blocking_settings_header_description">Zablokuje invazivní trackery ještě před jejich načtením, čímž účinně eliminuje reklamy, které spoléhají na sledování.</string>
+    <string name="contingencyMessageTitle">Blokování reklam na YouTube není k dispozici</string>
+    <string name="contingencyMessageContent">Blokování reklam bylo ovlivněno nedávnými změnami na YouTube. Problémy se snažíme opravit. Děkujeme za pochopení.</string>
+    <string name="contingencyMessagePrimaryButton">Rozumím</string>
+    <string name="contingencyMessageCloseContentDescription">Zavřít</string>
 </resources>
