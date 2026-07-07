@@ -88,13 +88,15 @@ jobs:
       - name: Post-process trace and report
         run: |
           set -euo pipefail
+          # Flank pulls the macrobench outputs into its results tree under
+          # .../<axis>/artifacts/sdcard/Download/. Anchor on that stable `artifacts` segment rather
+          # than the results-dir name or device axis (e.g. "redfin-30-..."), which can change.
           # Exactly one device/model is configured (fladle perfTests), so we expect exactly one
-          # trace + one benchmarkData.json. Fail loudly on 0 (run produced nothing) or >1 (device
-          # matrix grew and this single-trace assumption no longer holds) rather than silently
-          # post an arbitrary result.
+          # trace + one benchmarkData.json — fail loudly on 0 (run produced nothing) or >1 (matrix
+          # grew and this single-trace assumption no longer holds) rather than pick one arbitrarily.
           require_one() {
             local label="$1"; shift
-            local matches; matches=$(find build/fladle/perfResults -name "$1" | sort)
+            local matches; matches=$(find . -path '*/artifacts/*' -name "$1" | sort)
             local n; n=$(printf '%s' "$matches" | grep -c . || true)
             if [ "$n" -ne 1 ]; then
               echo "ERROR: expected exactly 1 $label, found $n:" >&2
@@ -105,6 +107,9 @@ jobs:
           }
           TRACE=$(require_one "perfetto trace" '*.perfetto-trace')
           DATA=$(require_one "benchmarkData.json" '*-benchmarkData.json')
+          # Stage the raw inputs at a stable path so the upload step doesn't depend on Flank's layout.
+          mkdir -p pageload-artifacts
+          cp "$TRACE" "$DATA" pageload-artifacts/
           python3 perf-benchmarks/pageload_benchmark.py \
             --trace "$TRACE" --benchmark-data "$DATA" \
             --github-action-run-id "${{ github.run_id }}" \
@@ -118,5 +123,5 @@ jobs:
           name: pageload-benchmark-${{ github.run_number }}
           path: |
             pageload-results.json
-            build/fladle/perfResults/**
+            pageload-artifacts/**
           retention-days: 30
