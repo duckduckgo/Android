@@ -51,7 +51,12 @@ jobs:
               -dname "CN=Android Debug,O=Android,C=US"
           fi
 
+      # Real DuckSans font (not placeholder stubs) so page-load rendering timings are representative.
+      # Same GitHub Packages credentials the release/e2e jobs use.
       - name: Build APKs
+        env:
+          DUCKSANS_PACKAGE_AUTH_USER: ${{ secrets.DAXMOBILE_GITHUB_PACKAGES_AUTOMATION_USER }}
+          DUCKSANS_PACKAGE_AUTH_TOKEN: ${{ secrets.DAXMOBILE_GITHUB_PACKAGES_AUTOMATION }}
         run: ./gradlew :app:assembleInternalRelease :macrobenchmark:assembleRelease -PmacrobenchLocalSigning
 
       - name: Run page-load benchmark on FTL
