@@ -89,16 +89,18 @@ jobs:
         run: |
           set -euo pipefail
           GCS_PATH=$(jq -r '.[].gcsPath' build/fladle/perfResults/matrix_ids.json | head -1)
+          GCS_PATH="${GCS_PATH%/}"   # gcsPath ends with '/'; strip it to avoid a '//' in the URL
           if [ -z "$GCS_PATH" ] || [ "$GCS_PATH" = "null" ]; then
             echo "ERROR: could not read gcsPath from matrix_ids.json:" >&2
             cat build/fladle/perfResults/matrix_ids.json >&2
             exit 1
           fi
           echo "FTL results bucket path: gs://${GCS_PATH}"
+          # Recursively download the whole matrix results dir (no server-side globbing to depend on);
+          # post-processing then finds the trace + benchmarkData.json under it.
           mkdir -p pageload-artifacts
-          gcloud storage cp "gs://${GCS_PATH}/**/*.perfetto-trace" pageload-artifacts/
-          gcloud storage cp "gs://${GCS_PATH}/**/*-benchmarkData.json" pageload-artifacts/
-          echo "=== downloaded ==="; ls -la pageload-artifacts/
+          gcloud storage cp -r "gs://${GCS_PATH}/*" pageload-artifacts/
+          echo "=== downloaded ==="; find pageload-artifacts -type f | sort
 
       - name: Install Perfetto trace_processor
         run: |
