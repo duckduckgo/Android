@@ -63,18 +63,17 @@ class VpnAutoExcludePromptViewModel @Inject constructor(
             }
 
             appsToExclude.putAll(appPackages.associateWith { true })
-            //TODO: Uncomment after testing. DO NOT MERGE.
-            // _viewState.emit(
-            //     ViewState(
-            //         incompatibleApps = appPackages.map { packageName ->
-            //             ItemInfo(
-            //                 name = packageManager.getAppName(packageName),
-            //                 packageName = packageName,
-            //             )
-            //         }.sortedBy { it.name },
-            //         promptState = if (source == VPN_SCREEN) NEW_INCOMPATIBLE_APP else ALL_INCOMPATIBLE_APPS,
-            //     ),
-            // )
+            _viewState.emit(
+                ViewState(
+                    incompatibleApps = appPackages.map { packageName ->
+                        ItemInfo(
+                            name = packageManager.getAppName(packageName),
+                            packageName = packageName,
+                        )
+                    }.sortedBy { it.name },
+                    promptState = if (source == VPN_SCREEN) NEW_INCOMPATIBLE_APP else ALL_INCOMPATIBLE_APPS,
+                ),
+            )
         }
     }
 
