@@ -158,10 +158,6 @@
                 {
                     "domain": "autojournal.fr",
                     "reason": "Blank ad spaces"
-                },
-                {
-                    "domain": "railpictures.net",
-                    "reason": "Adblocker wall"
                 }
             ]
         },
@@ -983,6 +979,10 @@
         {
             "domain": "as.com",
             "reason": "blank area while scrolling"
+        },
+        {
+            "domain": "railpictures.net",
+            "reason": "Adblocker wall"
         }
     ]
 }
