@@ -23,4 +23,10 @@
     <string name="ad_blocking_settings_description">O DuckDuckGo bloqueia anúncios de vídeo no YouTube para que possas ver vídeos sem interrupções. <annotation type="learn_more_link">Sabe mais</annotation></string>
     <string name="ad_blocking_settings_duck_player_header">Duck Player</string>
     <string name="ad_blocking_settings_duck_player_description">Abre vídeos num modo de cinema sem distrações que impede que os vídeos que vês influenciem o teu feed do YouTube.</string>
+    <string name="ad_blocking_settings_title_v2">Bloqueio de anúncios</string>
+    <string name="ad_blocking_settings_header_description">Bloqueia os rastreadores invasivos antes de serem carregados, eliminando eficazmente os anúncios que usam rastreio</string>
+    <string name="contingencyMessageTitle">Bloqueio de anúncios do YouTube indisponível</string>
+    <string name="contingencyMessageContent">O bloqueio de anúncios foi afetado por alterações recentes ao YouTube. Estamos a trabalhar para resolver estes problemas e agradecemos a tua compreensão.</string>
+    <string name="contingencyMessagePrimaryButton">Entendido</string>
+    <string name="contingencyMessageCloseContentDescription">Fechar</string>
 </resources>
