@@ -161,6 +161,19 @@
                 }
             ]
         },
+        "elementHiding": {
+            "state": "enabled",
+            "exceptions": [
+                {
+                    "domain": "railpictures.net",
+                    "reason": "Adblocker wall"
+                }
+            ],
+            "settings": {
+                "useStrictHideStyleTag": true,
+                "rules": []
+            }
+        },
         "fingerprintingAudio": {
             "state": "disabled",
             "exceptions": [
@@ -979,10 +992,6 @@
         {
             "domain": "as.com",
             "reason": "blank area while scrolling"
-        },
-        {
-            "domain": "railpictures.net",
-            "reason": "Adblocker wall"
         }
     ]
 }
