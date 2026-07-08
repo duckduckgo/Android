@@ -105,7 +105,7 @@
     <!-- Duck AI Use Without AI Settings Option -->
     <string name="duckAiUseWithoutAiTitle">Utiliser DuckDuckGo sans IA</string>
     <string name="duckAiUseWithoutAiDescription">Désactive Duck.ai, masque les réponses assistées par l\'IA dans la recherche et filtre les sites de spam liés à l\'IA dans les résultats de recherche d\'images.</string>
-    <string name="duckAiUseWithoutAiDisabledDescription">L\'IA est actuellement désactivée dans le navigateur, vous ne verrez donc plus de réponses assistées par l\'IA et vous verrez moins d\'images générées par l\'IA dans les résultats de recherche d\'images.</string>
+    <string name="duckAiUseWithoutAiDisabledDescription">L\'IA est actuellement désactivée dans le navigateur ; vous ne verrez donc plus de réponses assistées par l\'IA et verrez moins d\'images générées par l\'IA dans les résultats de recherche d\'images.</string>
 
     <!-- Duck AI Section in AI Feature Screen -->
     <string name="input_screen_user_pref_toggle_between_search_and_ai">Basculer entre la recherche et Duck.ai</string>
