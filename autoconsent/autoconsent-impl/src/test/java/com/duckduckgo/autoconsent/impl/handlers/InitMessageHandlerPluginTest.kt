@@ -25,8 +25,8 @@ import com.duckduckgo.autoconsent.api.AutoconsentResult
 import com.duckduckgo.autoconsent.api.CookiePopUpPreference
 import com.duckduckgo.autoconsent.impl.AutoconsentHeuristicModeProvider
 import com.duckduckgo.autoconsent.impl.AutoconsentReloadLoopDetector
-import com.duckduckgo.autoconsent.impl.RealAutoconsentHeuristicModeProvider
 import com.duckduckgo.autoconsent.impl.FakeSettingsRepository
+import com.duckduckgo.autoconsent.impl.RealAutoconsentHeuristicModeProvider
 import com.duckduckgo.autoconsent.impl.adapters.JSONObjectAdapter
 import com.duckduckgo.autoconsent.impl.cache.RealAutoconsentSettingsCache
 import com.duckduckgo.autoconsent.impl.handlers.InitMessageHandlerPlugin.InitResp
