@@ -46,6 +46,7 @@ class RealAdBlockingStatusCheckerTest {
     private val killSwitchEnabledFlow = MutableStateFlow(true)
     private val enabledByDefaultFlow = MutableStateFlow(false)
     private val contingencyModeEnabledFlow = MutableStateFlow(false)
+    private val uxImprovementsFlow = MutableStateFlow(false)
 
     private val selfToggle: Toggle = mock {
         on { isEnabled() } doAnswer { killSwitchEnabled }
@@ -59,10 +60,15 @@ class RealAdBlockingStatusCheckerTest {
         on { isEnabled() } doAnswer { enabledByDefaultFlow.value }
         on { enabled() } doReturn enabledByDefaultFlow
     }
+    private val uxImprovementsToggle: Toggle = mock {
+        on { isEnabled() } doAnswer { uxImprovementsFlow.value }
+        on { enabled() } doReturn uxImprovementsFlow
+    }
     private val feature: AdBlockingExtensionFeature = mock {
         on { self() } doReturn selfToggle
         on { enableContingencyMode() } doReturn contingencyModeToggle
         on { enabledByDefault() } doReturn enabledByDefaultToggle
+        on { adBlockingUXImprovements() } doReturn uxImprovementsToggle
     }
 
     private val userEnabledFlow = MutableStateFlow<Boolean?>(true)
@@ -203,38 +209,48 @@ class RealAdBlockingStatusCheckerTest {
     }
 
     @Test
-    fun whenKillSwitchIsOnThenIsShownInSettings() {
-        assertTrue(checker.isShownInSettings())
-    }
-
-    @Test
-    fun whenKillSwitchIsOffThenIsNotShownInSettings() {
-        killSwitchEnabled = false
-
-        assertFalse(checker.isShownInSettings())
-    }
-
-    @Test
-    fun whenKillSwitchEnabledThenIsShownInSettingsFlowEmitsTrue() = runTest {
+    fun whenKillSwitchOnAndPhase2OffThenPlacementIsOther() = runTest {
         killSwitchEnabledFlow.value = true
+        uxImprovementsFlow.value = false
 
-        assertTrue(checker.isShownInSettingsFlow().first())
+        assertEquals(SettingsPlacement.Other, checker.settingsPlacementFlow().first())
     }
 
     @Test
-    fun whenKillSwitchDisabledThenIsShownInSettingsFlowEmitsFalse() = runTest {
-        killSwitchEnabledFlow.value = false
-
-        assertFalse(checker.isShownInSettingsFlow().first())
-    }
-
-    @Test
-    fun whenKillSwitchFlowChangesThenIsShownInSettingsFlowReflectsIt() = runTest {
+    fun whenKillSwitchOnAndPhase2OnThenPlacementIsProtections() = runTest {
         killSwitchEnabledFlow.value = true
-        assertTrue(checker.isShownInSettingsFlow().first())
+        uxImprovementsFlow.value = true
+
+        assertEquals(SettingsPlacement.Protections, checker.settingsPlacementFlow().first())
+    }
+
+    @Test
+    fun whenKillSwitchOffAndPhase2OffThenPlacementIsHidden() = runTest {
+        killSwitchEnabledFlow.value = false
+        uxImprovementsFlow.value = false
+
+        assertEquals(SettingsPlacement.Hidden, checker.settingsPlacementFlow().first())
+    }
+
+    @Test
+    fun whenKillSwitchOffAndPhase2OnThenPlacementIsHidden() = runTest {
+        killSwitchEnabledFlow.value = false
+        uxImprovementsFlow.value = true
+
+        assertEquals(SettingsPlacement.Hidden, checker.settingsPlacementFlow().first())
+    }
+
+    @Test
+    fun whenPlacementFlowInputsChangeThenPlacementReflectsIt() = runTest {
+        killSwitchEnabledFlow.value = true
+        uxImprovementsFlow.value = false
+        assertEquals(SettingsPlacement.Other, checker.settingsPlacementFlow().first())
+
+        uxImprovementsFlow.value = true
+        assertEquals(SettingsPlacement.Protections, checker.settingsPlacementFlow().first())
 
         killSwitchEnabledFlow.value = false
-        assertFalse(checker.isShownInSettingsFlow().first())
+        assertEquals(SettingsPlacement.Hidden, checker.settingsPlacementFlow().first())
     }
 
     @Test

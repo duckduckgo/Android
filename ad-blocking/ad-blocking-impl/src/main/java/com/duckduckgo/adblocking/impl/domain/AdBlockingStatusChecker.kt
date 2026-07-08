@@ -43,13 +43,12 @@ interface AdBlockingStatusChecker {
      */
     fun observeCanInject(): Flow<Boolean>
 
-    fun isShownInSettings(): Boolean
-
     /**
-     * Emits whether the feature is shown in settings and re-emits when it changes
-     * (e.g. after a remote privacy config download).
+     * Emits where (or whether) the ad blocking entry should be shown in settings and re-emits when
+     * it changes (e.g. after a remote privacy config download). This is the single source of truth
+     * for the entry's placement across the settings screen.
      */
-    fun isShownInSettingsFlow(): Flow<Boolean>
+    fun settingsPlacementFlow(): Flow<SettingsPlacement>
 
     /**
      * Emits the current [AdBlockingState], distinguishing whether ad blocking is enabled because
@@ -68,6 +67,15 @@ sealed interface AdBlockingState {
         data object UserEnabled : Enabled
         data object Default : Enabled
     }
+}
+
+/**
+ * Where the ad blocking entry is rendered in settings.
+ */
+sealed interface SettingsPlacement {
+    data object Protections : SettingsPlacement
+    data object Other : SettingsPlacement
+    data object Hidden : SettingsPlacement
 }
 
 @SingleInstanceIn(AppScope::class)
@@ -107,9 +115,17 @@ class RealAdBlockingStatusChecker @Inject constructor(
             killSwitchOn && !contingencyModeOn && (stored ?: enabledByDefault)
         }
 
-    override fun isShownInSettings(): Boolean = feature.self().isEnabled()
-
-    override fun isShownInSettingsFlow(): Flow<Boolean> = feature.self().enabled()
+    override fun settingsPlacementFlow(): Flow<SettingsPlacement> =
+        combine(
+            feature.self().enabled(),
+            feature.adBlockingUXImprovements().enabled(),
+        ) { killSwitchOn, uxImprovementsEnabled ->
+            when {
+                !killSwitchOn -> SettingsPlacement.Hidden
+                uxImprovementsEnabled -> SettingsPlacement.Protections
+                else -> SettingsPlacement.Other
+            }
+        }
 
     override fun observeState(): Flow<AdBlockingState> =
         combine(

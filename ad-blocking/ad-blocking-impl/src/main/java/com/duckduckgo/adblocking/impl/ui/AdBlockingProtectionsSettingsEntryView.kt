@@ -25,10 +25,10 @@ import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.findViewTreeViewModelStoreOwner
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.adblocking.impl.R
-import com.duckduckgo.adblocking.impl.ui.AdBlockingSettingsEntryViewModel.Command
-import com.duckduckgo.adblocking.impl.ui.AdBlockingSettingsEntryViewModel.Command.OpenSettings
+import com.duckduckgo.adblocking.impl.ui.AdBlockingProtectionsSettingsEntryViewModel.Command
+import com.duckduckgo.adblocking.impl.ui.AdBlockingProtectionsSettingsEntryViewModel.Command.OpenSettings
 import com.duckduckgo.anvil.annotations.InjectWith
-import com.duckduckgo.common.ui.view.listitem.OneLineListItem
+import com.duckduckgo.common.ui.view.listitem.SettingsListItem
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.ViewViewModelFactory
 import com.duckduckgo.di.scopes.ViewScope
@@ -40,15 +40,11 @@ import javax.inject.Inject
 import com.duckduckgo.mobile.android.R as CommonR
 
 @InjectWith(ViewScope::class)
-class AdBlockingSettingsEntryView @JvmOverloads constructor(
+class AdBlockingProtectionsSettingsEntryView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyle: Int = 0,
 ) : LinearLayout(context, attrs, defStyle) {
-
-    init {
-        orientation = VERTICAL
-    }
 
     @Inject
     lateinit var viewModelFactory: ViewViewModelFactory
@@ -56,19 +52,21 @@ class AdBlockingSettingsEntryView @JvmOverloads constructor(
     @Inject
     lateinit var globalActivityStarter: GlobalActivityStarter
 
-    private val listItem: OneLineListItem by lazy {
-        OneLineListItem(context).apply {
-            setLeadingIconResource(CommonR.drawable.ic_video_player_color_24)
-            setPrimaryText(context.getString(R.string.ad_blocking_settings_title))
-        }
+    private val listItem = SettingsListItem(context).apply {
+        setLeadingIconResource(CommonR.drawable.ic_ads_blocked_color_24)
+        setPrimaryText(context.getString(R.string.ad_blocking_settings_title_v2))
     }
 
     init {
+        orientation = VERTICAL
         addView(listItem)
     }
 
-    private val viewModel: AdBlockingSettingsEntryViewModel by lazy {
-        ViewModelProvider(findViewTreeViewModelStoreOwner()!!, viewModelFactory)[AdBlockingSettingsEntryViewModel::class.java]
+    private val viewModel: AdBlockingProtectionsSettingsEntryViewModel by lazy {
+        ViewModelProvider(
+            findViewTreeViewModelStoreOwner()!!,
+            viewModelFactory,
+        )[AdBlockingProtectionsSettingsEntryViewModel::class.java]
     }
 
     private val conflatedStateJob = ConflatedJob()
@@ -78,13 +76,16 @@ class AdBlockingSettingsEntryView @JvmOverloads constructor(
         AndroidSupportInjection.inject(this)
         super.onAttachedToWindow()
 
-        listItem.setOnClickListener { viewModel.onSettingClicked() }
+        listItem.setClickListener { viewModel.onSettingClicked() }
 
         findViewTreeLifecycleOwner()?.lifecycle?.addObserver(viewModel)
         val coroutineScope = findViewTreeLifecycleOwner()?.lifecycleScope
 
         conflatedStateJob += viewModel.viewState
-            .onEach { isGone = !it.isVisible }
+            .onEach {
+                isGone = !it.isVisible
+                listItem.setStatus(it.isOn)
+            }
             .launchIn(coroutineScope!!)
 
         conflatedCommandJob += viewModel.commands()
@@ -101,7 +102,7 @@ class AdBlockingSettingsEntryView @JvmOverloads constructor(
 
     private fun processCommand(command: Command) {
         when (command) {
-            is OpenSettings -> globalActivityStarter.start(context, AdBlockingSettingsNoParams, null)
+            is OpenSettings -> globalActivityStarter.start(context, AdBlockingSettingsV2NoParams, null)
         }
     }
 }
