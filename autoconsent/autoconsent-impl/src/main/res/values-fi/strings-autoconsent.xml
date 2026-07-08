@@ -20,4 +20,9 @@
     <string name="autoconsentTitle">Evästeiden ponnahdusikkuna -suojaus</string>
     <string name="autoconsentDescription"><![CDATA[DuckDuckGo yrittää valita valittavissa olevista asetuksista yksityisimmät ja piilottaa nämä ponnahdusikkunat puolestasi.\n<a href=\"\">Lue lisää</a>]]></string>
     <string name="autoconsentToggle">Anna DuckDuckGo hoitaa evästeiden ponnahdusikkunat</string>
+    <string name="autoconsentAutoManageToggle">Evästeponnahdusikkunoiden automaattinen hallinta</string>
+    <string name="autoconsentAutoManageDescription">Pyrimme valitsemaan sinulle vain yksityisyyttä parhaiten suojaavat evästeasetukset ja sulkemaan sitten nämä ponnahdusikkunat.</string>
+    <string name="autoconsentCookiePopUpPreferenceHeaderDescription"><![CDATA[DuckDuckGo voi hallinnoida evästeasetuksia automaattisesti yksityisyyden maksimoimiseksi, evästeiden minimoimiseksi ja näiden ponnahdusikkunoiden sulkemiseksi.\n<a href=\"\">Lue lisää</a>]]></string>
+    <string name="autoconsentPopUpsWithoutOptOutsToggle">Ponnahdusikkunat ilman kieltäytymismahdollisuutta</string>
+    <string name="autoconsentPopUpsWithoutOptOutsDescription">Anna myös DuckDuckGon säästää sinulta yhden klikkauksen hyväksymällä evästeet puolestasi, jotta se voi sulkea ponnahdusikkunat, joissa ei voi kieltäytyä evästeistä.</string>
 </resources>
