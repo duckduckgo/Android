@@ -45,8 +45,7 @@ class RealContingencyMessageView @Inject constructor() : ContingencyMessageView 
         val lifecycleOwner = webView.findViewTreeLifecycleOwner() ?: return
         lifecycleOwner.lifecycleScope.launch {
             webView.awaitWindowFocus()
-            val fragment = runCatching { FragmentManager.findFragment<Fragment>(webView) }.getOrNull() ?: return@launch
-            val fragmentManager = fragment.childFragmentManager
+            val fragmentManager = webView.resolveFragmentManager() ?: return@launch
             if (fragmentManager.isStateSaved) return@launch
             if (fragmentManager.findFragmentByTag(ContingencyMessageBottomSheetFragment.TAG) == null) {
                 ContingencyMessageBottomSheetFragment.newInstance()
@@ -55,6 +54,23 @@ class RealContingencyMessageView @Inject constructor() : ContingencyMessageView 
             }
         }
     }
+}
+
+/**
+ * Resolves a [FragmentManager] able to host the bottom sheet, supporting both a fragment-hosted WebView
+ * (e.g. BrowserTabFragment) or an Activity-hosted WebView. Returns null when neither is available.
+ */
+private fun WebView.resolveFragmentManager(): FragmentManager? {
+    runCatching { FragmentManager.findFragment<Fragment>(this) }
+        .getOrNull()
+        ?.let { return it.childFragmentManager }
+    return context.findFragmentActivity()?.supportFragmentManager
+}
+
+private tailrec fun Context.findFragmentActivity(): FragmentActivity? = when (this) {
+    is FragmentActivity -> this
+    is ContextWrapper -> baseContext.findFragmentActivity()
+    else -> null
 }
 
 private suspend fun WebView.awaitWindowFocus() {
