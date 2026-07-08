@@ -28,23 +28,30 @@ import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.viewbinding.viewBinding
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.internal.DuckAiUrlSettingsViewModel.Command.RestartApp
 import com.duckduckgo.duckchat.internal.DuckAiUrlSettingsViewModel.Command.ShowMessage
 import com.duckduckgo.duckchat.internal.databinding.ActivityDuckAiUrlSettingsBinding
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import javax.inject.Inject
 import kotlin.system.exitProcess
 
 @InjectWith(ActivityScope::class)
 class DuckAiUrlSettingsActivity : DuckDuckGoActivity() {
+
+    @Inject
+    lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
 
     private val binding: ActivityDuckAiUrlSettingsBinding by viewBinding()
     private val viewModel: DuckAiUrlSettingsViewModel by bindViewModel()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        enableTransparentEdgeToEdge()
         setContentView(binding.root)
+        configureEdgeToEdgeInsets()
         setupToolbar(binding.toolbar)
         title = getString(R.string.devSettingsDuckAiUrlOverrideTitle)
 
@@ -60,6 +67,12 @@ class DuckAiUrlSettingsActivity : DuckDuckGoActivity() {
             .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
             .onEach { processCommand(it) }
             .launchIn(lifecycleScope)
+    }
+
+    private fun configureEdgeToEdgeInsets() {
+        edgeToEdgeHandler.applyHorizontalSystemBarInsets(binding.root)
+        edgeToEdgeHandler.applyStatusBarInsets(binding.appBar)
+        edgeToEdgeHandler.applyNavigationBarInsets(binding.reset, drawBehindGestureNav = false)
     }
 
     private fun configureViews() {
