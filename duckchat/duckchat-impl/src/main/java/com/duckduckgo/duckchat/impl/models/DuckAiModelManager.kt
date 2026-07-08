@@ -134,9 +134,18 @@ class RealDuckAiModelManager @Inject constructor(
             try {
                 val userTier = resolveUserTier()
                 val response = fetchModelsResponse()
+                val isSubscriptionEligible = runCatching {
+                    subscriptions.isEligible()
+                }.getOrElse {
+                    logcat { "Duck.ai Model Manager: failed to resolve purchase eligibility, defaulting to not eligible: ${it.message}" }
+                    false
+                }
                 val models = response.models
                     .map { resolveModel(it, userTier) }
                     .filterNot { it.accessTier.isEmpty() && !it.isAccessible }
+                    .filterNot {
+                        !it.isAccessible && !isSubscriptionEligible
+                    }
                 val attachmentLimits = resolveAttachmentLimits(response.attachmentLimits, userTier)
                 stateMutex.withLock {
                     val selectedModelId = validateAndPersistSelection(models)
@@ -283,7 +292,10 @@ class RealDuckAiModelManager @Inject constructor(
         )
     }
 
-    private fun resolveModel(remote: RemoteAIChatModel, userTier: UserTier): AIChatModel {
+    private fun resolveModel(
+        remote: RemoteAIChatModel,
+        userTier: UserTier,
+    ): AIChatModel {
         val accessTier = remote.accessTier.orEmpty()
         val isAccessible = if (accessTier.isEmpty()) {
             remote.entityHasAccess
