@@ -865,6 +865,7 @@ class BrowserTabViewModelTest {
                     },
                     duckAiFeatureState = mockDuckAiFeatureState,
                     onboardingPixelSender = mockOnboardingPixelSender,
+                    contextualCtaSuppressorPlugins = mock(),
                 )
 
             accessibilitySettingsDataStore = AccessibilitySettingsSharedPreferences(context)
