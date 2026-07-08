@@ -36,6 +36,7 @@ import com.duckduckgo.cookies.api.CookieManagerProvider
 import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import com.duckduckgo.duckchat.api.DuckChatSettingsNoParams
 import com.duckduckgo.duckchat.api.InputMode
+import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import com.duckduckgo.duckchat.impl.feature.AIChatImageUploadFeature
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.ChatSuggestionsStore
@@ -219,6 +220,54 @@ class RealDuckChatTest {
         testee.onPrivacyConfigDownloaded()
 
         assertFalse(testee.isEnabled())
+    }
+
+    @Test
+    fun whenFeatureAndUserAndInputScreenSettingEnabledThenAvailableInputModeIsSearchAndDuckAi() = runTest {
+        duckChatFeature.self().setRawStoredState(State(true))
+        whenever(mockDuckChatFeatureRepository.isDuckChatUserEnabled()).thenReturn(true)
+        whenever(mockDuckChatFeatureRepository.isInputScreenUserSettingEnabled()).thenReturn(true)
+
+        testee.onPrivacyConfigDownloaded()
+        advanceUntilIdle()
+
+        assertEquals(NativeInputState.InputMode.SEARCH_AND_DUCK_AI, testee.inputModeCapability.value)
+    }
+
+    @Test
+    fun whenInputScreenUserSettingDisabledThenAvailableInputModeIsSearchOnly() = runTest {
+        duckChatFeature.self().setRawStoredState(State(true))
+        whenever(mockDuckChatFeatureRepository.isDuckChatUserEnabled()).thenReturn(true)
+        whenever(mockDuckChatFeatureRepository.isInputScreenUserSettingEnabled()).thenReturn(false)
+
+        testee.onPrivacyConfigDownloaded()
+        advanceUntilIdle()
+
+        assertEquals(NativeInputState.InputMode.SEARCH_ONLY, testee.inputModeCapability.value)
+    }
+
+    @Test
+    fun whenDuckChatUserDisabledThenAvailableInputModeIsSearchOnly() = runTest {
+        duckChatFeature.self().setRawStoredState(State(true))
+        whenever(mockDuckChatFeatureRepository.isDuckChatUserEnabled()).thenReturn(false)
+        whenever(mockDuckChatFeatureRepository.isInputScreenUserSettingEnabled()).thenReturn(true)
+
+        testee.onPrivacyConfigDownloaded()
+        advanceUntilIdle()
+
+        assertEquals(NativeInputState.InputMode.SEARCH_ONLY, testee.inputModeCapability.value)
+    }
+
+    @Test
+    fun whenDuckChatFeatureDisabledThenAvailableInputModeIsSearchOnly() = runTest {
+        duckChatFeature.self().setRawStoredState(State(false))
+        whenever(mockDuckChatFeatureRepository.isDuckChatUserEnabled()).thenReturn(true)
+        whenever(mockDuckChatFeatureRepository.isInputScreenUserSettingEnabled()).thenReturn(true)
+
+        testee.onPrivacyConfigDownloaded()
+        advanceUntilIdle()
+
+        assertEquals(NativeInputState.InputMode.SEARCH_ONLY, testee.inputModeCapability.value)
     }
 
     @Test
