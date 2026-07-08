@@ -579,7 +579,11 @@ class NativeInputModeWidget @JvmOverloads constructor(
             // setToggleVisible — e.g. re-show the toggle after the keyboard has been dismissed.
             // Only animate on focus-gain — focus-loss pairs with an instant setToggleVisible hide,
             // and animating the padding shrink afterwards looks like a two-step collapse.
-            if (hasFocus) beginFocusTransition()
+            if (hasFocus) {
+                beginFocusTransition()
+            } else if (isDuckAiPageContext()) {
+                hideKeyboard()
+            }
             updateBottomRowVisibility()
             applyVerticalPaddingForFocus()
             nativeInputState?.let { updateFireButtonVisibility(it) }
