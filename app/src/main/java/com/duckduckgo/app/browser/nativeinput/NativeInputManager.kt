@@ -47,8 +47,10 @@ import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.duckchat.api.DuckChatInputModeState
 import com.duckduckgo.duckchat.api.InputMode
 import com.duckduckgo.duckchat.api.NativeInputEventListener
+import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState.InteractionLock
 import com.duckduckgo.duckchat.api.toChatIdOrNull
 import com.duckduckgo.duckchat.impl.ui.nativeinput.views.NativeInputWidget
@@ -85,6 +87,7 @@ class NativeInputCallbacks(
     val onCustomizeResponsesClicked: () -> Unit = {},
     val onChatUrlSuggestionClicked: (AutoCompleteSuggestion) -> Unit = {},
     val onChatHistoryShortcutClicked: () -> Unit = {},
+    val onChatSuggestionDelete: (chatUrl: String) -> Unit = {},
     val onClearAutocomplete: () -> Unit,
     val onStopTapped: () -> Unit,
     val onFireButtonPressed: () -> Unit = {},
@@ -110,6 +113,13 @@ interface NativeInputManager {
 
     fun isNativeInputEnabled(): Boolean
 
+    /**
+     * Whether the native input should actually be used for the current context, as opposed to the
+     * legacy omnibar. True when the field is enabled AND either we're in Duck.ai or the config is not
+     * search-only. In search-only mode the browser omnibar falls back to the legacy text input.
+     */
+    fun isNativeInputActive(): Boolean
+
     /** True when the widget is shown with the chat tab selected. */
     fun isChatTabSelected(): Boolean
 
@@ -130,6 +140,13 @@ interface NativeInputManager {
     fun setPickingImage(picking: Boolean)
     fun setText(text: String)
 
+    /**
+     * Re-fetches the omnibar chat-history suggestions from the source of truth, e.g. after a
+     * single-chat delete has completed and the chat is actually gone from the store. No-op when
+     * the native input isn't shown or the chat tab isn't selected.
+     */
+    fun refreshChatSuggestions()
+
     /** Lock the input field (making it non-interactive + dimmed).*/
     fun setInteractionLock(lock: InteractionLock)
 
@@ -148,6 +165,7 @@ class RealNativeInputManager @Inject constructor(
     private val globalActivityStarter: GlobalActivityStarter,
     private val queryUrlPredictor: QueryUrlPredictor,
     private val duckAiFeatureState: DuckAiFeatureState,
+    private val duckChatInputModeState: DuckChatInputModeState,
     private val pixel: Pixel,
     private val nativeInputStateBugKillSwitch: NativeInputStateBugKillSwitch,
     private val nativeInputEventListener: NativeInputEventListener,
@@ -157,6 +175,7 @@ class RealNativeInputManager @Inject constructor(
     private lateinit var layoutCoordinator: NativeInputLayoutCoordinator
     private var isNativeInputFieldEnabled: Boolean = false
     private var isNativeChatInputEnabled: Boolean = false
+    private var inputModeCapability: NativeInputState.InputMode = NativeInputState.InputMode.SEARCH_ONLY
     private var isExiting: Boolean = false
     private var isPickingImage: Boolean = false
     private var duckAiToolbarHidden: Boolean = false
@@ -199,9 +218,19 @@ class RealNativeInputManager @Inject constructor(
                 }
             }
             .launchIn(lifecycleOwner.lifecycleScope)
+        duckChatInputModeState.inputModeCapability
+            .onEach { inputModeCapability = it }
+            .launchIn(lifecycleOwner.lifecycleScope)
     }
 
     override fun isNativeInputEnabled(): Boolean = isNativeInputFieldEnabled
+
+    override fun isNativeInputActive(): Boolean {
+        if (!isNativeInputFieldEnabled) return false
+        // Duck.ai always uses the native input; the browser omnibar only does so outside search-only.
+        val inDuckAi = ::omnibarController.isInitialized && omnibarController.isDuckAiMode()
+        return inDuckAi || inputModeCapability != NativeInputState.InputMode.SEARCH_ONLY
+    }
 
     override fun isChatTabSelected(): Boolean {
         if (!::rootView.isInitialized) return false
@@ -217,6 +246,12 @@ class RealNativeInputManager @Inject constructor(
         if (!::rootView.isInitialized) return
         val widget = widgetFrom(rootView) ?: return
         widget.text = text
+    }
+
+    override fun refreshChatSuggestions() {
+        if (!::rootView.isInitialized) return
+        val widget = widgetFrom(rootView) ?: return
+        widget.refreshChatSuggestions()
     }
 
     override fun handleDuckAiVoiceResult(query: String) {
@@ -869,6 +904,9 @@ class RealNativeInputManager @Inject constructor(
             onChatHistoryShortcutClicked = {
                 hideNativeInput(isNavigation = true)
                 callbacks.onChatHistoryShortcutClicked()
+            },
+            onChatSuggestionDelete = { chatUrl ->
+                callbacks.onChatSuggestionDelete(chatUrl)
             },
             onShowSuggestions = { chatAdapter ->
                 if (autoCompleteList.adapter === chatAdapter) {
