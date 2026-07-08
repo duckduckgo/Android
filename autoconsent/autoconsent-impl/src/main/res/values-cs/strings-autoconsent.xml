@@ -20,4 +20,9 @@
     <string name="autoconsentTitle">Ochrana před vyskakovacími okny ohledně cookies</string>
     <string name="autoconsentDescription"><![CDATA[DuckDuckGo se pokusí zvolit nastavení s maximálním zachováním soukromí a tato vyskakovací okna ti bude skrývat.\n<a href=\"\">Další informace</a>]]></string>
     <string name="autoconsentToggle">Nech správu vyskakovacích oken ohledně cookie na DuckDuckGo</string>
+    <string name="autoconsentAutoManageToggle">Automaticky spravovat vyskakovací okna o cookies</string>
+    <string name="autoconsentAutoManageDescription">Budeme se snažit vybírat pro tebe jen ty možnosti cookies, které nejlépe chrání soukromí, a pak tato vyskakovací okna zavřeme.</string>
+    <string name="autoconsentCookiePopUpPreferenceHeaderDescription"><![CDATA[DuckDuckGo může automaticky spravovat předvolby cookies tak, aby zajistilo maximální ochranu soukromí, co nejméně cookies a zavíralo vyskakovací okna.\n<a href=\"\">Další informace</a>]]></string>
+    <string name="autoconsentPopUpsWithoutOptOutsToggle">Vyskakovací okna bez možnosti odmítnutí</string>
+    <string name="autoconsentPopUpsWithoutOptOutsDescription">Nech DuckDuckGo, ať ti také šetří klikání přijímáním cookies za tebe a zavírá vyskakovací okna, kde není možnost cookies odmítnout.</string>
 </resources>
