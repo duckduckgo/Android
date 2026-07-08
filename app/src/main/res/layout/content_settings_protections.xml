@@ -51,6 +51,12 @@
         app:primaryText="@string/settingsWebTrackingProtectionTitle" />
 
     <LinearLayout
+        android:id="@+id/topInContextSection"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical" />
+
+    <LinearLayout
         android:id="@+id/settingsSectionThreatProtection"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

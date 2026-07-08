@@ -328,9 +328,8 @@ class SettingsActivity : DuckDuckGoActivity() {
             }
         }
 
-        // TODO (cbarreiro): Clear indexed insertion once the entire section uses plugins
-        protectionsSettingsPlugin.forEachIndexed { index, plugin ->
-            viewsPrivacy.root.addView(plugin.getView(this), 4 + index)
+        protectionsSettingsPlugin.forEach { plugin ->
+            viewsPrivacy.topInContextSection.addView(plugin.getView(this))
         }
     }
 
