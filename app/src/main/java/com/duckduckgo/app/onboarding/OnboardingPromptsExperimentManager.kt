@@ -16,14 +16,19 @@
 
 package com.duckduckgo.app.onboarding
 
-import com.duckduckgo.app.onboarding.OnboardingHomeScreenPromptsExperimentManager.OnboardingPromptExperimentVariant
+import com.duckduckgo.app.onboarding.OnboardingPromptsExperimentManager.OnboardingPromptExperimentVariant
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.privacy.config.api.PrivacyConfigCallbackPlugin
 import com.squareup.anvil.annotations.ContributesBinding
+import com.squareup.anvil.annotations.ContributesMultibinding
+import dagger.SingleInstanceIn
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeoutOrNull
 import javax.inject.Inject
 
-interface OnboardingHomeScreenPromptsExperimentManager {
+interface OnboardingPromptsExperimentManager {
 
     suspend fun enroll(): OnboardingPromptExperimentVariant?
 
@@ -35,29 +40,60 @@ interface OnboardingHomeScreenPromptsExperimentManager {
     }
 }
 
-@ContributesBinding(AppScope::class)
-class OnboardingHomeScreenPromptsExperimentManagerImpl @Inject constructor(
+@ContributesBinding(AppScope::class, boundType = OnboardingPromptsExperimentManager::class)
+@ContributesMultibinding(AppScope::class, boundType = PrivacyConfigCallbackPlugin::class)
+@SingleInstanceIn(AppScope::class)
+class OnboardingPromptsExperimentManagerImpl @Inject constructor(
     private val toggles: OnboardingPromptsToggles,
     private val dispatcherProvider: DispatcherProvider,
-) : OnboardingHomeScreenPromptsExperimentManager {
+) : OnboardingPromptsExperimentManager, PrivacyConfigCallbackPlugin {
+
+    @Volatile
+    private var privacyPersisted: Boolean = false
 
     override suspend fun enroll(): OnboardingPromptExperimentVariant? = withContext(dispatcherProvider.io()) {
-        val toggle = toggles.addToDockAndWidgetExperimentJul25()
-        toggle.enroll()
-        when {
-            toggle.isEnrolledAndEnabled(OnboardingPromptsToggles.OnboardingPromptsCohorts.TREATMENT_DOCK_AND_WIDGET) -> {
-                OnboardingPromptExperimentVariant.TREATMENT_DOCK_AND_WIDGET
+        if (waitForPrivacyConfig()) {
+            val toggle = toggles.addToDockAndWidgetExperimentJul25()
+            toggle.enroll()
+            when {
+                toggle.isEnrolledAndEnabled(OnboardingPromptsToggles.OnboardingPromptsCohorts.TREATMENT_DOCK_AND_WIDGET) -> {
+                    OnboardingPromptExperimentVariant.TREATMENT_DOCK_AND_WIDGET
+                }
+
+                toggle.isEnrolledAndEnabled(OnboardingPromptsToggles.OnboardingPromptsCohorts.TREATMENT_WIDGET_ONLY) -> {
+                    OnboardingPromptExperimentVariant.TREATMENT_WIDGET_ONLY
+                }
+
+                toggle.isEnrolledAndEnabled(OnboardingPromptsToggles.OnboardingPromptsCohorts.TREATMENT_DOCK_ONLY) -> {
+                    OnboardingPromptExperimentVariant.TREATMENT_DOCK_ONLY
+                }
+
+                toggle.isEnrolledAndEnabled(OnboardingPromptsToggles.OnboardingPromptsCohorts.CONTROL) -> {
+                    OnboardingPromptExperimentVariant.CONTROL
+                }
+
+                else -> null
             }
-            toggle.isEnrolledAndEnabled(OnboardingPromptsToggles.OnboardingPromptsCohorts.TREATMENT_WIDGET_ONLY) -> {
-                OnboardingPromptExperimentVariant.TREATMENT_WIDGET_ONLY
-            }
-            toggle.isEnrolledAndEnabled(OnboardingPromptsToggles.OnboardingPromptsCohorts.TREATMENT_DOCK_ONLY) -> {
-                OnboardingPromptExperimentVariant.TREATMENT_DOCK_ONLY
-            }
-            toggle.isEnrolledAndEnabled(OnboardingPromptsToggles.OnboardingPromptsCohorts.CONTROL) -> {
-                OnboardingPromptExperimentVariant.CONTROL
-            }
-            else -> null
+        } else {
+            null
         }
+    }
+
+    private suspend fun waitForPrivacyConfig(): Boolean =
+        withTimeoutOrNull(PRIVACY_CONFIG_WAIT_TIMEOUT_MS) {
+            while (!privacyPersisted) {
+                delay(10)
+            }
+        } != null
+
+    override fun onPrivacyConfigPersisted() {
+        super.onPrivacyConfigPersisted()
+        privacyPersisted = true
+    }
+
+    override fun onPrivacyConfigDownloaded() = Unit
+
+    companion object {
+        private const val PRIVACY_CONFIG_WAIT_TIMEOUT_MS = 2000L
     }
 }
