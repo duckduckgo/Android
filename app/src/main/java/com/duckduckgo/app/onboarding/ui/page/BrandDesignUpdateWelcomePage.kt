@@ -29,6 +29,7 @@ import android.content.Intent
 import android.graphics.Typeface
 import android.graphics.drawable.AnimatedVectorDrawable
 import android.os.Bundle
+import android.text.InputType
 import android.util.TypedValue
 import android.view.ContextThemeWrapper
 import android.view.LayoutInflater
@@ -36,6 +37,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.animation.OvershootInterpolator
 import android.view.animation.PathInterpolator
+import android.view.inputmethod.EditorInfo
+import android.view.inputmethod.InputMethodManager
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.Toast
@@ -2501,10 +2504,21 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                 }
             }
 
-        previewContent.inputModeDemoActionIcon.setOnClickListener {
+        val submitQuery = {
             val query = previewContent.inputText.text?.toString().orEmpty().trim()
             if (query.isNotEmpty()) {
                 viewModel.onInputModeDemoQuerySubmitted(query, isChat = currentInputMode == InputMode.CHAT, fromSuggestion = false)
+            }
+        }
+
+        previewContent.inputModeDemoActionIcon.setOnClickListener { submitQuery() }
+
+        previewContent.inputText.setOnEditorActionListener { _, actionId, _ ->
+            if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+                submitQuery()
+                true
+            } else {
+                false
             }
         }
 
@@ -2512,14 +2526,26 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
             InputMode.SEARCH -> {
                 previewContent.inputText.minLines = 1
                 previewContent.inputText.maxLines = 1
+                previewContent.inputText.inputType = InputType.TYPE_CLASS_TEXT
+                previewContent.inputText.imeOptions = EditorInfo.IME_ACTION_SEARCH
                 previewContent.inputText.setHint(R.string.preOnboardingInputModeDemoSearchHint)
                 previewContent.inputModeDemoActionIcon.setImageResource(CommonR.drawable.ic_find_search_24)
             }
             InputMode.CHAT -> {
                 previewContent.inputText.minLines = 3
                 previewContent.inputText.maxLines = 3
+                previewContent.inputText.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_MULTI_LINE
+                previewContent.inputText.imeOptions = EditorInfo.IME_ACTION_UNSPECIFIED
                 previewContent.inputText.setHint(R.string.preOnboardingInputModeDemoChatHint)
                 previewContent.inputModeDemoActionIcon.setImageResource(CommonR.drawable.ic_arrow_right_24)
+            }
+        }
+
+        // Toggling modes changes inputType/imeOptions while the EditText may be focused with the keyboard shown;
+        // restart input so the IME picks up the new action/Enter behavior immediately.
+        if (previewContent.inputText.hasFocus()) {
+            context?.let { ctx ->
+                ContextCompat.getSystemService(ctx, InputMethodManager::class.java)?.restartInput(previewContent.inputText)
             }
         }
     }
