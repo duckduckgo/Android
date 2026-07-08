@@ -67,6 +67,31 @@ class ModelProviderTest {
     }
 
     @Test
+    fun whenProviderIsTinfoilThenOss() {
+        assertEquals(ModelProvider.OSS, ModelProvider.from("tinfoil/gemma4-31b", providerString = "tinfoil"))
+    }
+
+    @Test
+    fun whenIdHasTinfoilSlashPrefixAndProviderMissingThenOss() {
+        assertEquals(ModelProvider.OSS, ModelProvider.from("tinfoil/gemma4-31b", providerString = null))
+    }
+
+    @Test
+    fun whenProviderIsTinfoilCapitalisedThenOss() {
+        assertEquals(ModelProvider.OSS, ModelProvider.from("gemma-3n-e4b-it", providerString = "Tinfoil"))
+    }
+
+    @Test
+    fun whenProviderIsCapitalisedOpenAiThenOpenAi() {
+        assertEquals(ModelProvider.OPENAI, ModelProvider.from("gpt-5-mini", providerString = "OpenAI"))
+    }
+
+    @Test
+    fun whenProviderIsCapitalisedAnthropicThenAnthropic() {
+        assertEquals(ModelProvider.ANTHROPIC, ModelProvider.from("claude-3-5-sonnet", providerString = "Anthropic"))
+    }
+
+    @Test
     fun whenProviderIsUnknownStringThenUnknown() {
         assertEquals(ModelProvider.UNKNOWN, ModelProvider.from("some-id", providerString = "perplexity"))
     }
