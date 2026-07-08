@@ -18,7 +18,10 @@ package com.duckduckgo.adblocking.impl.ui
 
 import android.os.Bundle
 import androidx.appcompat.widget.Toolbar
-import com.duckduckgo.adblocking.impl.databinding.ActivityAdBlockingSettingsBinding
+import com.duckduckgo.adblocking.api.duckplayer.PrivatePlayerMode.Disabled
+import com.duckduckgo.adblocking.api.duckplayer.PrivatePlayerMode.Enabled
+import com.duckduckgo.adblocking.impl.R
+import com.duckduckgo.adblocking.impl.databinding.ActivityAdBlockingSettingsV2Binding
 import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.view.listitem.DaxListItem
@@ -28,10 +31,10 @@ import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
 
 @InjectWith(ActivityScope::class)
-@ContributeToActivityStarter(AdBlockingSettingsNoParams::class)
-class AdBlockingSettingsActivity : BaseAdBlockingSettingsActivity() {
+@ContributeToActivityStarter(AdBlockingSettingsV2NoParams::class)
+class AdBlockingSettingsV2Activity : BaseAdBlockingSettingsActivity() {
 
-    private val binding: ActivityAdBlockingSettingsBinding by viewBinding()
+    private val binding: ActivityAdBlockingSettingsV2Binding by viewBinding()
 
     override val toolbar: Toolbar get() = binding.includeToolbar.toolbar
     override val blockAdsToggle: OneLineListItem get() = binding.blockAdsToggle
@@ -39,9 +42,24 @@ class AdBlockingSettingsActivity : BaseAdBlockingSettingsActivity() {
     override val duckPlayerEntry: DaxListItem get() = binding.duckPlayerEntry
     override val duckPlayerDescription: DaxTextView get() = binding.duckPlayerDescription
 
+    override val learnMoreScreenTitle: Int = R.string.ad_blocking_settings_title_v2
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
+        setTitle(R.string.ad_blocking_settings_title_v2)
         configure()
+    }
+
+    override fun render(state: AdBlockingSettingsViewModel.ViewState) {
+        super.render(state)
+        binding.adBlockingStatusIndicator.setStatus(state.isEnabled)
+        binding.duckPlayerEntry.setSecondaryText(
+            when (state.duckPlayerMode) {
+                Enabled -> getString(R.string.duck_player_mode_always)
+                Disabled -> getString(R.string.duck_player_mode_never)
+                else -> getString(R.string.duck_player_mode_always_ask)
+            },
+        )
     }
 }
