@@ -140,7 +140,7 @@ class TrackingProtectionExclusionListActivity :
     private fun configureEdgeToEdgeInsets() {
         edgeToEdgeHandler.applyHorizontalSystemBarInsets(binding.rootContainer)
         edgeToEdgeHandler.applyStatusBarInsets(binding.includeToolbar.appBarLayout)
-        edgeToEdgeHandler.applyNavigationBarInsets(binding.excludedAppsRecycler, drawBehindGestureNav = true)
+        edgeToEdgeHandler.applyScrollableNavigationBarInsets(binding.excludedAppsRecycler)
     }
 
     override fun onDestroy() {

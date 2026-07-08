@@ -29,6 +29,9 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.viewbinding.viewBinding
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessaging
@@ -61,6 +64,12 @@ class SettingsWebViewActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var serpSettingsFeature: SerpSettingsFeature
 
+    @Inject
+    lateinit var edgeToEdgeProvider: EdgeToEdgeProvider
+
+    @Inject
+    lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
+
     private val binding: ActivitySettingsWebviewBinding by viewBinding()
 
     private val toolbar
@@ -74,8 +83,17 @@ class SettingsWebViewActivity : DuckDuckGoActivity() {
         val url = params?.url
         title = params?.screenTitle.orEmpty()
 
+        val edgeToEdgeEnabled = edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.WEBVIEW)
+        if (edgeToEdgeEnabled) {
+            enableTransparentEdgeToEdge()
+        }
+
         setContentView(binding.root)
         setupToolbar(toolbar)
+
+        if (edgeToEdgeEnabled) {
+            configureEdgeToEdgeInsets()
+        }
 
         lifecycleScope.launch {
             setupWebView()
@@ -86,6 +104,12 @@ class SettingsWebViewActivity : DuckDuckGoActivity() {
         }
 
         observeSubscriptionEventDataChannel()
+    }
+
+    private fun configureEdgeToEdgeInsets() {
+        edgeToEdgeHandler.applyHorizontalSystemBarInsets(binding.root)
+        edgeToEdgeHandler.applyStatusBarInsets(binding.includeToolbar.appBarLayout)
+        edgeToEdgeHandler.applyNavigationBarInsets(binding.webViewContainer, drawBehindGestureNav = true)
     }
 
     override fun onResume() {
@@ -130,7 +154,7 @@ class SettingsWebViewActivity : DuckDuckGoActivity() {
 
     private fun exit() {
         binding.settingsWebView.stopLoading()
-        binding.root.removeView(binding.settingsWebView)
+        binding.webViewContainer.removeView(binding.settingsWebView)
         binding.settingsWebView.destroy()
 
         finish()

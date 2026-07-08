@@ -139,7 +139,7 @@ class SyncConnectActivity : DuckDuckGoActivity() {
     private fun configureEdgeToEdgeInsets() {
         edgeToEdgeHandler.applyHorizontalSystemBarInsets(binding.root)
         edgeToEdgeHandler.applyStatusBarInsets(binding.includeToolbar.appBarLayout)
-        edgeToEdgeHandler.applyNavigationBarInsets(binding.contentView, drawBehindGestureNav = true)
+        edgeToEdgeHandler.applyNavigationBarInsets(binding.contentView, drawBehindGestureNav = false)
     }
 
     override fun onResume() {

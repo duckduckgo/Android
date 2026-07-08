@@ -909,7 +909,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
                 SystemBarStyle.light(toolbarColor, toolbarColor)
             }
             enableEdgeToEdge(statusBarStyle = barStyle, navigationBarStyle = barStyle)
-            edgeToEdgeHandler.applyStatusBarAndHorizontalInsets(binding.root)
+            edgeToEdgeHandler.applyStatusBarAndHorizontalInsets(binding.root, installScrim = false)
             edgeToEdgeHandler.applyNavigationBarInsets(binding.navigationBarMockup.root)
             applyDisplayCutoutMode(resources.configuration.orientation)
         }
@@ -1825,7 +1825,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
     )
 
     private fun showSetAsDefaultBrowserDialog() {
-        val dialog = DefaultBrowserBottomSheetDialog(context = this)
+        val dialog = DefaultBrowserBottomSheetDialog(context = this, edgeToEdgeProvider = edgeToEdgeProvider)
         dialog.eventListener =
             object : EventListener {
                 override fun onShown() {

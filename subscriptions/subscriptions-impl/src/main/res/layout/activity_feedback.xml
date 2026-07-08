@@ -29,6 +29,6 @@
         android:id="@+id/feedbackFragmentContainer"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginVertical="@dimen/keyline_4"/>
+        android:layout_marginTop="@dimen/keyline_4"/>
 
 </LinearLayout>

@@ -71,7 +71,7 @@ class CustomTabActivity : DuckDuckGoActivity() {
                 SystemBarStyle.light(toolbarColor, toolbarColor)
             }
             enableEdgeToEdge(statusBarStyle = barStyle, navigationBarStyle = barStyle)
-            edgeToEdgeHandler.applyStatusBarAndHorizontalInsets(binding.root)
+            edgeToEdgeHandler.applyStatusBarAndHorizontalInsets(binding.root, installScrim = false)
             applyDisplayCutoutMode(resources.configuration.orientation)
         }
 

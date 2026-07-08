@@ -108,7 +108,7 @@ class SetupAccountActivity : DuckDuckGoActivity(), SyncSetupNavigationFlowListen
 
     private fun configureEdgeToEdgeInsets() {
         edgeToEdgeHandler.applyStatusBarAndHorizontalInsets(binding.root)
-        edgeToEdgeHandler.applyNavigationBarInsets(binding.fragmentContainerView, drawBehindGestureNav = true)
+        edgeToEdgeHandler.applyNavigationBarInsets(binding.fragmentContainerView, drawBehindGestureNav = false)
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
