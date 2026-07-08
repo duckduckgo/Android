@@ -6496,6 +6496,7 @@ class BrowserTabFragment :
                     HomeScreenWidgetBottomSheetDialog(
                         context = requireContext(),
                         isLightModeEnabled = appTheme.isLightModeEnabled(),
+                        edgeToEdgeProvider = edgeToEdgeProvider,
                     )
                 widgetBottomSheetDialog.eventListener =
                     object : HomeScreenWidgetBottomSheetDialog.EventListener {
