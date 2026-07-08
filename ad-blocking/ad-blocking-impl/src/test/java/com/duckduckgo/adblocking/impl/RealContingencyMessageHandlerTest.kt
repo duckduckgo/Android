@@ -200,6 +200,21 @@ class RealContingencyMessageHandlerTest {
         assertEquals(1, view.shownCount)
     }
 
+    @Test
+    fun whenViewDoesNotPresentThenOneOffNotConsumedAndNextLoadRetries() = runTest {
+        setToggles(uxImprovements = true, contingency = true)
+        val handler = handlerWith(laggingStore())
+        val webView = foregroundWebView()
+        view.presents = false
+
+        handler.onPageLoaded(webView, YOUTUBE_URL)
+        view.presents = true
+        handler.onPageLoaded(webView, YOUTUBE_URL)
+
+        assertEquals(2, view.invokedCount)
+        assertEquals(1, view.shownCount)
+    }
+
     private fun foregroundWebView() = mock<WebView> { on { isShown } doReturn true }
 
     private fun backgroundWebView() = mock<WebView> { on { isShown } doReturn false }
@@ -222,8 +237,16 @@ class RealContingencyMessageHandlerTest {
 
     private class FakeContingencyMessageView : ContingencyMessageView {
         var shownCount = 0
-        override fun show(webView: WebView) {
-            shownCount++
+        var invokedCount = 0
+
+        var presents = true
+
+        override fun show(webView: WebView, onShown: () -> Unit) {
+            invokedCount++
+            if (presents) {
+                shownCount++
+                onShown()
+            }
         }
     }
 

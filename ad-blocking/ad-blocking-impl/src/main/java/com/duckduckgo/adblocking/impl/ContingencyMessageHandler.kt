@@ -66,9 +66,10 @@ class RealContingencyMessageHandler @Inject constructor(
     override fun onPageLoaded(webView: WebView, url: String?) {
         if (!webView.isShown) return
         if (!shouldShow(url)) return
-        shownInSession = true
-        view.show(webView)
-        appScope.launch(dispatchers.io()) { store.setShown() }
+        view.show(webView) {
+            shownInSession = true
+            appScope.launch(dispatchers.io()) { store.setShown() }
+        }
     }
 
     internal suspend fun onContingencyModeChanged(contingencyEnabled: Boolean) {

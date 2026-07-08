@@ -16,10 +16,13 @@
 
 package com.duckduckgo.adblocking.impl
 
+import android.content.Context
+import android.content.ContextWrapper
 import android.view.ViewTreeObserver
 import android.webkit.WebView
 import androidx.annotation.UiThread
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.lifecycleScope
@@ -32,21 +35,23 @@ import kotlin.coroutines.resume
 
 interface ContingencyMessageView {
     @UiThread
-    fun show(webView: WebView)
+    fun show(webView: WebView, onShown: () -> Unit)
 }
 
 @ContributesBinding(AppScope::class)
 class RealContingencyMessageView @Inject constructor() : ContingencyMessageView {
 
-    override fun show(webView: WebView) {
+    override fun show(webView: WebView, onShown: () -> Unit) {
         val lifecycleOwner = webView.findViewTreeLifecycleOwner() ?: return
         lifecycleOwner.lifecycleScope.launch {
             webView.awaitWindowFocus()
-            val fragment: Fragment = FragmentManager.findFragment(webView)
+            val fragment = runCatching { FragmentManager.findFragment<Fragment>(webView) }.getOrNull() ?: return@launch
             val fragmentManager = fragment.childFragmentManager
+            if (fragmentManager.isStateSaved) return@launch
             if (fragmentManager.findFragmentByTag(ContingencyMessageBottomSheetFragment.TAG) == null) {
                 ContingencyMessageBottomSheetFragment.newInstance()
                     .show(fragmentManager, ContingencyMessageBottomSheetFragment.TAG)
+                onShown()
             }
         }
     }
