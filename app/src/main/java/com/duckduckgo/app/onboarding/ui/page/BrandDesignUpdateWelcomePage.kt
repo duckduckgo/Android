@@ -2775,7 +2775,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                     false,
                 ) as LinearLayout
                 rowView.findViewById<ImageView>(R.id.rowIcon).setImageResource(row.iconRes)
-                rowView.findViewById<DaxTextView>(R.id.rowText).text = getString(row.textRes).preventWidows()
+                rowView.findViewById<DaxTextView>(R.id.rowText).text = getString(row.textRes)
                 if (index % 2 == 0) {
                     rowView.setBackgroundResource(R.drawable.background_comparison_chart_row_highlighted)
                 }
