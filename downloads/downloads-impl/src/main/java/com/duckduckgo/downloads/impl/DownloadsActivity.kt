@@ -216,12 +216,7 @@ class DownloadsActivity : DuckDuckGoActivity() {
 
     private fun render(viewState: ViewState) {
         downloadsAdapter.updateData(viewState.filteredItems)
-        searchMenuItem?.isVisible = itemsAvailable(viewState)
-    }
-
-    private fun itemsAvailable(viewState: ViewState): Boolean {
-        // The empty view is part of the list.
-        return viewState.filteredItems.size > 1
+        searchMenuItem?.isVisible = viewState.enableSearch
     }
 
     private fun setupRecyclerView() {
