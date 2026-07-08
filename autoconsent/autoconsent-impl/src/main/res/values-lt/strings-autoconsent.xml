@@ -20,4 +20,9 @@
     <string name="autoconsentTitle">Apsauga nuo slapukų iškylančiųjų langų</string>
     <string name="autoconsentDescription"><![CDATA[„DuckDuckGo“ stengsis pasirinkti didžiausią privatumą užtikrinančius nustatymus ir paslėpti šiuos iškylančiuosius langus.\n<a href=\"\">Sužinoti daugiau</a>]]></string>
     <string name="autoconsentToggle">Leiskite „DuckDuckGo“ tvarkyti slapukų iškylančiuosius langus</string>
+    <string name="autoconsentAutoManageToggle">Automatiškai valdyti slapukų iššokančiuosius langus</string>
+    <string name="autoconsentAutoManageDescription">Stengsimės parinkti tik didžiausią privatumą užtikrinančias slapukų parinktis ir uždaryti šiuos iškylančiuosius langus.</string>
+    <string name="autoconsentCookiePopUpPreferenceHeaderDescription"><![CDATA[„DuckDuckGo“ gali automatiškai tvarkyti slapukų nuostatas, kad maksimaliai padidintų privatumą, sumažintų slapukų kiekį ir uždarytų šiuos iškylančiuosius langus.\n<a href=\"\">Sužinoti daugiau</a>]]></string>
+    <string name="autoconsentPopUpsWithoutOptOutsToggle">Iššokantieji langai be atsisakymo galimybės</string>
+    <string name="autoconsentPopUpsWithoutOptOutsDescription">Taip pat leisti „DuckDuckGo“ išlaisvinti jus nuo paspaudimo priimant slapukus jūsų vardu, kad būtų uždaromi iškylantieji langai, kurie neleidžia jų atsisakyti.</string>
 </resources>
