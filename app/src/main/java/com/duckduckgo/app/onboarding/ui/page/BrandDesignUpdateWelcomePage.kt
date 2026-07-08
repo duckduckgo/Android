@@ -511,8 +511,9 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
             v.updateLayoutParams<ViewGroup.MarginLayoutParams> {
                 topMargin = insets.top
             }
-            // Freeze while the IME shows: adjustResize folds the keyboard into systemBars().bottom.
-            if (!imeVisible && viewModel.viewState.value.onboardingImprovementsV2Enabled) {
+            // Under adjustResize, systemBars().bottom already includes the keyboard height while the IME shows.
+            val trackImeInset = viewModel.viewState.value.currentDialog == INPUT_SCREEN_PREVIEW
+            if (viewModel.viewState.value.onboardingImprovementsV2Enabled && (!imeVisible || trackImeInset)) {
                 cardBottomInsetPx = insets.bottom + DIALOG_BOTTOM_INSET_GAP_DP.toPx()
             }
             windowInsets
