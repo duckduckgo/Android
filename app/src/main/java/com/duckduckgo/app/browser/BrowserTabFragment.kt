@@ -735,7 +735,7 @@ class BrowserTabFragment :
                 newState: Int,
             ) {
                 if (newState == RecyclerView.SCROLL_STATE_DRAGGING) {
-                    if (nativeInputManager.isNativeInputEnabled()) {
+                    if (nativeInputManager.isNativeInputActive()) {
                         hideKeyboardImmediatelyRetainFocus()
                     } else {
                         hideKeyboardRetainFocus()
@@ -2851,7 +2851,7 @@ class BrowserTabFragment :
             }
 
             is Command.ShowKeyboard -> {
-                if (nativeInputManager.isNativeInputEnabled()) {
+                if (nativeInputManager.isNativeInputActive()) {
                     // Surface the native input widget so its onEnterComplete focuses the input
                     // and brings up the keyboard via the same path as a manual omnibar tap.
                     // Skip if the widget is already attached — Command.ShowKeyboard can fire
@@ -2870,7 +2870,7 @@ class BrowserTabFragment :
             }
 
             is Command.DropAddressBarFocus -> {
-                if (nativeInputManager.isNativeInputEnabled()) {
+                if (nativeInputManager.isNativeInputActive()) {
                     nativeInputManager.hideNativeInput()
                 } else {
                     hideKeyboard()
@@ -2983,7 +2983,7 @@ class BrowserTabFragment :
             is Command.CancelIncomingAutofillRequest -> injectAutofillCredentials(it.url, null)
             is Command.LaunchAutofillSettings -> launchAutofillManagementScreen(it.privacyProtectionEnabled)
             is Command.EditWithSelectedQuery -> {
-                if (nativeInputManager.isNativeInputEnabled()) {
+                if (nativeInputManager.isNativeInputActive()) {
                     nativeInputManager.setText(it.query)
                 } else {
                     omnibar.setText(it.query)
@@ -4084,7 +4084,7 @@ class BrowserTabFragment :
                     hasFocus: Boolean,
                     query: String,
                 ) {
-                    if (nativeInputManager.isNativeInputEnabled()) return
+                    if (nativeInputManager.isNativeInputActive()) return
                     onOmnibarTextFocusChanged(hasFocus, query)
                 }
 
@@ -4100,12 +4100,12 @@ class BrowserTabFragment :
                 }
 
                 override fun onOmnibarTextChanged(state: OmnibarTextState) {
-                    if (nativeInputManager.isNativeInputEnabled()) return
+                    if (nativeInputManager.isNativeInputActive()) return
                     onUserEnteredText(state.text, state.hasFocus)
                 }
 
                 override fun onShowSuggestions(state: OmnibarTextState) {
-                    if (nativeInputManager.isNativeInputEnabled()) return
+                    if (nativeInputManager.isNativeInputActive()) return
                     viewModel.triggerAutocomplete(
                         state.text,
                         state.hasFocus,
