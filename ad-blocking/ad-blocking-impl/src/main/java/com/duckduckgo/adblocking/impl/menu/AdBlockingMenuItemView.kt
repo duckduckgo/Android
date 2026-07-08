@@ -36,6 +36,7 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import logcat.logcat
 import javax.inject.Inject
 
 @InjectWith(ViewScope::class)
@@ -77,7 +78,10 @@ class AdBlockingMenuItemView @JvmOverloads constructor(
         super.onAttachedToWindow()
 
         val url = this.url ?: return
-        menuItem.setOnClickListener { onHostClick?.invoke() }
+        menuItem.setOnClickListener {
+            showMenuBottomSheet()
+            onHostClick?.invoke()
+        }
 
         scope?.cancel()
         scope = CoroutineScope(SupervisorJob() + dispatcherProvider.main()).also { scope ->
@@ -92,6 +96,24 @@ class AdBlockingMenuItemView @JvmOverloads constructor(
         scope?.cancel()
         scope = null
         super.onDetachedFromWindow()
+    }
+
+    private fun showMenuBottomSheet() {
+        AdBlockingMenuBottomSheetDialog(context).apply {
+            eventListener = object : AdBlockingMenuBottomSheetDialog.EventListener {
+                override fun onAlwaysOnClicked() {
+                    logcat { "AdBlocking menu: Always On" }
+                }
+
+                override fun onDisableUntilRelaunchClicked() {
+                    logcat { "AdBlocking menu: Disable Until Relaunch" }
+                }
+
+                override fun onAlwaysOffClicked() {
+                    logcat { "AdBlocking menu: Always Off" }
+                }
+            }
+        }.show()
     }
 
     private fun render(state: AdBlockingMenuState) {
