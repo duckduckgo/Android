@@ -3593,7 +3593,9 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun onNewTabMenuItemClicked(longPress: Boolean = false): Boolean {
-        if (longPress && !currentBrowserViewState().browserShowing) {
+        val state = currentBrowserViewState()
+        val isOnNewTabPage = !state.browserShowing && !state.maliciousSiteBlocked && state.sslError == NONE
+        if (longPress && isOnNewTabPage) {
             return false
         }
 

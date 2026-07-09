@@ -3437,6 +3437,34 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenUserRequestedToOpenNewTabByLongPressAndMaliciousSiteBlockedThenNewTabOpenedAndPixelFired() {
+        testee.browserViewState.value =
+            browserViewState().copy(
+                browserShowing = false,
+                maliciousSiteBlocked = true,
+            )
+
+        testee.onNewTabMenuItemClicked(longPress = true)
+
+        assertCommandIssued<Command.GenerateWebViewPreviewImage>()
+        verify(mockPixel).fire(AppPixelName.TAB_MANAGER_NEW_TAB_LONG_PRESSED)
+    }
+
+    @Test
+    fun whenUserRequestedToOpenNewTabByLongPressAndSslWarningShowingThenNewTabOpenedAndPixelFired() {
+        testee.browserViewState.value =
+            browserViewState().copy(
+                browserShowing = false,
+                sslError = EXPIRED,
+            )
+
+        testee.onNewTabMenuItemClicked(longPress = true)
+
+        assertCommandIssued<Command.GenerateWebViewPreviewImage>()
+        verify(mockPixel).fire(AppPixelName.TAB_MANAGER_NEW_TAB_LONG_PRESSED)
+    }
+
+    @Test
     fun whenUserRequestedToOpenNewTabByNormalClickAndAlreadyOnNewTabPageThenReturnsTrue() {
         setBrowserShowing(false)
 
