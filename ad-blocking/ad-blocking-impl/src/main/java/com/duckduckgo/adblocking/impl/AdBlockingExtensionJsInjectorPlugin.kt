@@ -18,10 +18,7 @@ package com.duckduckgo.adblocking.impl
 
 import android.webkit.WebView
 import androidx.annotation.UiThread
-import androidx.core.net.toUri
 import com.duckduckgo.adblocking.impl.domain.AdBlockingStatusChecker
-import com.duckduckgo.app.browser.Domain
-import com.duckduckgo.app.browser.UriString
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.browser.api.JsInjectorPlugin
@@ -42,6 +39,7 @@ import javax.inject.Inject
 class AdBlockingExtensionJsInjectorPlugin @Inject constructor(
     private val statusChecker: AdBlockingStatusChecker,
     repository: AdBlockingExtensionRepository,
+    private val domainMatcher: AdBlockingExtensionDomainMatcher,
     @AppCoroutineScope appScope: CoroutineScope,
 ) : JsInjectorPlugin {
 
@@ -61,8 +59,7 @@ class AdBlockingExtensionJsInjectorPlugin @Inject constructor(
             logcat { "Status checker rejected injection, skipping" }
             return
         }
-        val uri = url?.toUri() ?: return
-        if (domains.none { UriString.sameOrSubdomain(uri, it) }) {
+        if (!domainMatcher.matches(url)) {
             logcat { "No domains matching, skipping" }
             return
         }
@@ -83,9 +80,4 @@ class AdBlockingExtensionJsInjectorPlugin @Inject constructor(
             .takeUnless { it.isEmpty() }
             ?.sortedBy { it.name }
             ?.joinToString(separator = "\n") { it.content }
-
-    private val domains = listOf(
-        Domain("youtube.com"),
-        Domain("youtube-nocookie.com"),
-    )
 }
