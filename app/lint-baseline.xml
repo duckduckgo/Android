@@ -282,8 +282,8 @@
         errorLine1="import com.duckduckgo.onboarding.impl.LinearOnboardingOrchestratorImpl"
         errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/test/java/com/duckduckgo/app/onboarding/ui/page/BrandDesignUpdatePageViewModelOrchestratorTest.kt"
-            line="38"
+            file="src/test/java/com/duckduckgo/app/onboarding/ui/page/BrandDesignUpdatePageViewModelTest.kt"
+            line="59"
             column="1"/>
     </issue>
 
