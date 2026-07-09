@@ -9,6 +9,8 @@ tags:
             - launchApp:
                 clearState: true
             - runFlow: ../shared/skip_all_onboarding.yaml
+            - tapOn:
+                id: "omnibarTextInput"
             - inputText: "https://www.search-company.site/#ad-id-5"
             - pressKey: Enter
             - assertVisible:
@@ -60,9 +62,9 @@ tags:
             - tapOn:
                 id: "com.duckduckgo.mobile.android:id/close"
             - assertVisible:
-                id: "com.duckduckgo.mobile.android:id/inputField"
+                id: "com.duckduckgo.mobile.android:id/omnibarTextInput"
             - tapOn:
-                id: "com.duckduckgo.mobile.android:id/inputField"
+                id: "com.duckduckgo.mobile.android:id/omnibarTextInput"
             - inputText: "https://www.publisher-company.site/product.html?p=200"
             - pressKey: Enter
             - assertVisible:
