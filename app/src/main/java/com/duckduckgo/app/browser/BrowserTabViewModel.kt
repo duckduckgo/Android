@@ -349,6 +349,7 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.SingleLiveEvent
 import com.duckduckgo.common.utils.baseHost
 import com.duckduckgo.common.utils.device.DeviceInfo
+import com.duckduckgo.common.utils.device.isTablet
 import com.duckduckgo.common.utils.extensions.asLocationPermissionOrigin
 import com.duckduckgo.common.utils.extensions.toTldPlusOneOrSelf
 import com.duckduckgo.common.utils.formatters.time.DatabaseDateFormatter
@@ -5444,6 +5445,8 @@ class BrowserTabViewModel @Inject constructor(
                 cta.backgroundRes,
                 useRebrandBackground = true,
                 backgroundColorAttr = com.duckduckgo.mobile.android.R.attr.onboardingSurfaceBackdrop,
+                fillHeightDp = cta.backgroundFillSpec?.heightDpFor(cta.deviceInfo.isTablet()) ?: 0f,
+                fillMaxHeightFraction = cta.backgroundFillSpec?.maxHeightFraction ?: 1f,
             )
         } else {
             command.value = SetBrowserBackground(getBackgroundResource(lightModeEnabled))
