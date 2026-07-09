@@ -101,16 +101,8 @@ class AdBlockingMenuItemView @JvmOverloads constructor(
     private fun showMenuBottomSheet() {
         AdBlockingMenuBottomSheetDialog(context).apply {
             eventListener = object : AdBlockingMenuBottomSheetDialog.EventListener {
-                override fun onAlwaysOnClicked() {
-                    logcat { "AdBlocking menu: Always On" }
-                }
-
-                override fun onDisableUntilRelaunchClicked() {
-                    logcat { "AdBlocking menu: Disable Until Relaunch" }
-                }
-
-                override fun onAlwaysOffClicked() {
-                    logcat { "AdBlocking menu: Always Off" }
+                override fun onChoiceSelected(choice: AdBlockingChoice) {
+                    logcat { "AdBlocking menu choice selected: $choice" }
                 }
             }
         }.show()

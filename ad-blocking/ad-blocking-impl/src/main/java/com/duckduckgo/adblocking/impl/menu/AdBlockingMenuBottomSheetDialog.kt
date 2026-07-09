@@ -26,9 +26,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 class AdBlockingMenuBottomSheetDialog(builderContext: Context) : BottomSheetDialog(builderContext) {
 
     interface EventListener {
-        fun onAlwaysOnClicked()
-        fun onDisableUntilRelaunchClicked()
-        fun onAlwaysOffClicked()
+        fun onChoiceSelected(choice: AdBlockingChoice)
     }
 
     var eventListener: EventListener? = null
@@ -40,17 +38,15 @@ class AdBlockingMenuBottomSheetDialog(builderContext: Context) : BottomSheetDial
         setContentView(binding.root)
 
         binding.adBlockingMenuCloseButton.setOnClickListener { dismiss() }
-        binding.adBlockingMenuAlwaysOn.setOnClickListener {
-            eventListener?.onAlwaysOnClicked()
-            dismiss()
-        }
+        binding.adBlockingMenuAlwaysOn.setOnClickListener { onChoiceSelected(AdBlockingChoice.ALWAYS_ON) }
         binding.adBlockingMenuDisableUntilRelaunch.setOnClickListener {
-            eventListener?.onDisableUntilRelaunchClicked()
-            dismiss()
+            onChoiceSelected(AdBlockingChoice.DISABLE_UNTIL_RELAUNCH)
         }
-        binding.adBlockingMenuAlwaysOff.setOnClickListener {
-            eventListener?.onAlwaysOffClicked()
-            dismiss()
-        }
+        binding.adBlockingMenuAlwaysOff.setOnClickListener { onChoiceSelected(AdBlockingChoice.ALWAYS_OFF) }
+    }
+
+    private fun onChoiceSelected(choice: AdBlockingChoice) {
+        eventListener?.onChoiceSelected(choice)
+        dismiss()
     }
 }
