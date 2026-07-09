@@ -122,6 +122,9 @@ class AutofillSettingsActivity : DuckDuckGoActivity() {
         edgeToEdgeHandler.applyStatusBarInsets(binding.includeToolbar.appBarLayout)
         // Inset the scrolling content directly (the ViewSwitcher's "available" child), not the ViewSwitcher container.
         edgeToEdgeHandler.applyScrollableNavigationBarInsets(binding.autofillAvailable.root)
+        // The "unavailable"/"disabled" child hosts its own fragment-provided scrolling content; inset the container
+        // so it still reserves nav-bar space in every mode (its last visible content clears the bar).
+        edgeToEdgeHandler.applyScrollableNavigationBarInsets(binding.autofillUnsupported.root)
     }
 
     private fun sendLaunchPixel(savedInstanceState: Bundle?) {
