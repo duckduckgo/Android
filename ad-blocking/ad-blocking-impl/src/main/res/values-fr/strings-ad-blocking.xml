@@ -29,4 +29,15 @@
     <string name="contingencyMessageContent">Les récents changements apportés à YouTube ont affecté le blocage des publicités. Nous nous efforçons de résoudre ces problèmes et vous remercions de votre compréhension.</string>
     <string name="contingencyMessagePrimaryButton">J\'ai compris</string>
     <string name="contingencyMessageCloseContentDescription">Fermer</string>
+    <string name="ad_blocking_menu_disable">Désactiver le blocage des publicités sur YouTube</string>
+    <string name="ad_blocking_menu_enable">Activer le blocage des publicités sur YouTube</string>
+    <string name="ad_blocking_menu_title">Blocage des publicités sur YouTube</string>
+    <string name="ad_blocking_menu_close_content_description">Fermer</string>
+    <string name="ad_blocking_menu_always_on">Toujours activé</string>
+    <string name="ad_blocking_menu_disable_until_relaunch">Désactiver jusqu\'au redémarrage</string>
+    <string name="ad_blocking_menu_always_off">Toujours désactivé</string>
+    <string name="ad_blocking_disabled_popup_title">Le blocage des publicités sur YouTube ne fonctionne pas ?</string>
+    <string name="ad_blocking_disabled_popup_description">Envoyez un rapport anonyme de dysfonctionnement à DuckDuckGo. Contribuez à améliorer le blocage des publicités pour tous !</string>
+    <string name="ad_blocking_disabled_primary_action">Envoyer un rapport de défaillance</string>
+    <string name="ad_blocking_disabled_secondary_action">Annuler</string>
 </resources>
