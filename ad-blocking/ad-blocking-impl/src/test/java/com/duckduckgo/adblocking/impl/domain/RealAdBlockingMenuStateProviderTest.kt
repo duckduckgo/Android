@@ -108,4 +108,11 @@ class RealAdBlockingMenuStateProviderTest {
 
         assertEquals(AdBlockingMenuState.Disabled, provider.observe(youtubeUrl).first())
     }
+
+    @Test
+    fun whenYoutubeAndDisabledUntilRelaunchThenDisabled() = runTest {
+        stateFlow.value = AdBlockingState.Disabled.UntilRelaunch
+
+        assertEquals(AdBlockingMenuState.Disabled, provider.observe(youtubeUrl).first())
+    }
 }

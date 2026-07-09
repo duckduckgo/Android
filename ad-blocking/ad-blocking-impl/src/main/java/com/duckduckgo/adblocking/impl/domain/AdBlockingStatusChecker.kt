@@ -18,6 +18,7 @@ package com.duckduckgo.adblocking.impl.domain
 
 import com.duckduckgo.adblocking.impl.AdBlockingSettingsRepository
 import com.duckduckgo.adblocking.impl.remoteconfig.AdBlockingExtensionFeature
+import com.duckduckgo.adblocking.impl.store.AdBlockingSessionStore
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
@@ -86,6 +87,7 @@ sealed interface SettingsPlacement {
 class RealAdBlockingStatusChecker @Inject constructor(
     private val feature: AdBlockingExtensionFeature,
     private val settingsRepository: AdBlockingSettingsRepository,
+    private val sessionStore: AdBlockingSessionStore,
     @AppCoroutineScope appScope: CoroutineScope,
 ) : AdBlockingStatusChecker {
 
@@ -102,7 +104,7 @@ class RealAdBlockingStatusChecker @Inject constructor(
             return false
         }
         if (state.value !is AdBlockingState.Enabled) {
-            logcat { "User disabled ad blocking" }
+            logcat { "Ad blocking disabled" }
             return false
         }
         return true
@@ -112,10 +114,9 @@ class RealAdBlockingStatusChecker @Inject constructor(
         combine(
             feature.self().enabled(),
             feature.enableContingencyMode().enabled(),
-            settingsRepository.isEnabledFlow(),
-            feature.enabledByDefault().enabled(),
-        ) { killSwitchOn, contingencyModeOn, stored, enabledByDefault ->
-            killSwitchOn && !contingencyModeOn && (stored ?: enabledByDefault)
+            observeState(),
+        ) { killSwitchOn, contingencyModeOn, state ->
+            killSwitchOn && !contingencyModeOn && state is AdBlockingState.Enabled
         }
 
     override fun settingsPlacementFlow(): Flow<SettingsPlacement> =
@@ -134,15 +135,14 @@ class RealAdBlockingStatusChecker @Inject constructor(
         combine(
             settingsRepository.isEnabledFlow(),
             feature.enabledByDefault().enabled(),
-        ) { userSetting, enabledByDefault ->
-            when (userSetting) {
-                true -> AdBlockingState.Enabled.UserEnabled
-                false -> AdBlockingState.Disabled.Permanent
-                null -> if (enabledByDefault) {
-                    AdBlockingState.Enabled.Default
-                } else {
-                    AdBlockingState.Disabled.Permanent
-                }
+            sessionStore.observe(),
+        ) { userSetting, enabledByDefault, disabledUntilRelaunch ->
+            when {
+                disabledUntilRelaunch -> AdBlockingState.Disabled.UntilRelaunch
+                userSetting == true -> AdBlockingState.Enabled.UserEnabled
+                userSetting == false -> AdBlockingState.Disabled.Permanent
+                enabledByDefault -> AdBlockingState.Enabled.Default
+                else -> AdBlockingState.Disabled.Permanent
             }
         }
 

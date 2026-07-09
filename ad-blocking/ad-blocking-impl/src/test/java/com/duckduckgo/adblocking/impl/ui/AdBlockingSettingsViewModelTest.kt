@@ -29,6 +29,7 @@ import com.duckduckgo.adblocking.impl.AdBlockingSettingsRepository
 import com.duckduckgo.adblocking.impl.domain.AdBlockingState
 import com.duckduckgo.adblocking.impl.domain.AdBlockingStatusChecker
 import com.duckduckgo.adblocking.impl.remoteconfig.AdBlockingExtensionFeature
+import com.duckduckgo.adblocking.impl.store.RealAdBlockingSessionStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.FakeToggleStore
@@ -60,12 +61,13 @@ class AdBlockingSettingsViewModelTest {
         .build()
         .create(AdBlockingExtensionFeature::class.java)
     private val repository: AdBlockingSettingsRepository = mock()
+    private val sessionStore = RealAdBlockingSessionStore()
     private val pixel: Pixel = mock()
     private val duckPlayer: DuckPlayer = mock()
 
     private fun createViewModel(duckPlayerMode: PrivatePlayerMode = AlwaysAsk): AdBlockingSettingsViewModel {
         whenever(duckPlayer.observeUserPreferences()).thenReturn(flowOf(userPreferences(duckPlayerMode)))
-        return AdBlockingSettingsViewModel(statusChecker, feature, repository, pixel, duckPlayer)
+        return AdBlockingSettingsViewModel(statusChecker, feature, repository, sessionStore, pixel, duckPlayer)
     }
 
     private fun setToggles(uxImprovements: Boolean, contingency: Boolean) {
@@ -106,6 +108,26 @@ class AdBlockingSettingsViewModelTest {
             val state = expectMostRecentItem()
             assertFalse(state.isEnabled)
             assertEquals(true, state.showConsentDescription)
+        }
+    }
+
+    @Test
+    fun whenDisabledUntilRelaunchThenNotEnabledAndFlagSet() = runTest {
+        whenever(statusChecker.observeState()).thenReturn(flowOf(AdBlockingState.Disabled.UntilRelaunch))
+
+        createViewModel().viewState.test {
+            val state = expectMostRecentItem()
+            assertFalse(state.isEnabled)
+            assertTrue(state.disabledUntilRelaunch)
+        }
+    }
+
+    @Test
+    fun whenEnabledThenDisabledUntilRelaunchFlagNotSet() = runTest {
+        whenever(statusChecker.observeState()).thenReturn(flowOf(AdBlockingState.Enabled.UserEnabled))
+
+        createViewModel().viewState.test {
+            assertFalse(expectMostRecentItem().disabledUntilRelaunch)
         }
     }
 
@@ -181,7 +203,7 @@ class AdBlockingSettingsViewModelTest {
 
     @Test
     fun whenDisabledThenStatusIndicatorOff() = runTest {
-        whenever(statusChecker.observeState()).thenReturn(flowOf(AdBlockingState.Disabled))
+        whenever(statusChecker.observeState()).thenReturn(flowOf(AdBlockingState.Disabled.Permanent))
         setToggles(uxImprovements = true, contingency = false)
 
         createViewModel().viewState.test {
@@ -208,6 +230,16 @@ class AdBlockingSettingsViewModelTest {
         verify(repository).setEnabled(true)
         verify(pixel).fire(AdBlockingPixelNames.AD_BLOCKING_ENABLED_DAILY, type = Pixel.PixelType.Daily())
         verify(pixel).fire(AdBlockingPixelNames.AD_BLOCKING_ENABLED_COUNT)
+    }
+
+    @Test
+    fun whenBlockAdsToggledThenClearsSessionOverride() = runTest {
+        whenever(statusChecker.observeState()).thenReturn(flowOf(AdBlockingState.Disabled.UntilRelaunch))
+        sessionStore.setDisabledUntilRelaunch()
+
+        createViewModel().onBlockAdsToggled(enabled = true)
+
+        assertFalse(sessionStore.isDisabledUntilRelaunch())
     }
 
     @Test

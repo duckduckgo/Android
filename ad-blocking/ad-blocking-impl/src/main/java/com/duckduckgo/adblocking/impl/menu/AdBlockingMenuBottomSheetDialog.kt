@@ -18,12 +18,19 @@ package com.duckduckgo.adblocking.impl.menu
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.graphics.Color
 import android.view.LayoutInflater
+import androidx.core.graphics.drawable.toDrawable
+import com.duckduckgo.adblocking.impl.R
 import com.duckduckgo.adblocking.impl.databinding.BottomSheetAdBlockingMenuBinding
+import com.duckduckgo.common.ui.view.listitem.OneLineListItem
 import com.google.android.material.bottomsheet.BottomSheetDialog
 
 @SuppressLint("NoBottomSheetDialog")
-class AdBlockingMenuBottomSheetDialog(builderContext: Context) : BottomSheetDialog(builderContext) {
+class AdBlockingMenuBottomSheetDialog(
+    builderContext: Context,
+    private val selectedChoice: AdBlockingChoice,
+) : BottomSheetDialog(builderContext) {
 
     interface EventListener {
         fun onChoiceSelected(choice: AdBlockingChoice)
@@ -37,6 +44,10 @@ class AdBlockingMenuBottomSheetDialog(builderContext: Context) : BottomSheetDial
     init {
         setContentView(binding.root)
 
+        binding.adBlockingMenuAlwaysOn.setChecked(selectedChoice == AdBlockingChoice.ALWAYS_ON)
+        binding.adBlockingMenuDisableUntilRelaunch.setChecked(selectedChoice == AdBlockingChoice.DISABLE_UNTIL_RELAUNCH)
+        binding.adBlockingMenuAlwaysOff.setChecked(selectedChoice == AdBlockingChoice.ALWAYS_OFF)
+
         binding.adBlockingMenuCloseButton.setOnClickListener { dismiss() }
         binding.adBlockingMenuAlwaysOn.setOnClickListener { onChoiceSelected(AdBlockingChoice.ALWAYS_ON) }
         binding.adBlockingMenuDisableUntilRelaunch.setOnClickListener {
@@ -45,8 +56,16 @@ class AdBlockingMenuBottomSheetDialog(builderContext: Context) : BottomSheetDial
         binding.adBlockingMenuAlwaysOff.setOnClickListener { onChoiceSelected(AdBlockingChoice.ALWAYS_OFF) }
     }
 
-    private fun onChoiceSelected(choice: AdBlockingChoice) {
-        eventListener?.onChoiceSelected(choice)
+    private fun onChoiceSelected(selected: AdBlockingChoice) {
+        eventListener?.onChoiceSelected(selected)
         dismiss()
+    }
+
+    private fun OneLineListItem.setChecked(checked: Boolean) {
+        if (checked) {
+            setLeadingIconResource(R.drawable.check)
+        } else {
+            setLeadingIconDrawable(Color.TRANSPARENT.toDrawable())
+        }
     }
 }

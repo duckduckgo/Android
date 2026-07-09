@@ -18,6 +18,7 @@ package com.duckduckgo.adblocking.impl.domain
 
 import com.duckduckgo.adblocking.impl.AdBlockingSettingsRepository
 import com.duckduckgo.adblocking.impl.remoteconfig.AdBlockingExtensionFeature
+import com.duckduckgo.adblocking.impl.store.RealAdBlockingSessionStore
 import com.duckduckgo.feature.toggles.api.Toggle
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -78,10 +79,11 @@ class RealAdBlockingStatusCheckerTest {
             userEnabledFlow.value = enabled
         }
     }
+    private val sessionStore = RealAdBlockingSessionStore()
     private val testScope = CoroutineScope(UnconfinedTestDispatcher())
 
     private val checker by lazy {
-        RealAdBlockingStatusChecker(feature, settingsRepository, testScope)
+        RealAdBlockingStatusChecker(feature, settingsRepository, sessionStore, testScope)
     }
 
     @After
@@ -339,8 +341,52 @@ class RealAdBlockingStatusCheckerTest {
             override suspend fun setEnabled(enabled: Boolean) = Unit
         }
 
-        val checker = RealAdBlockingStatusChecker(feature, pendingRepository, testScope)
+        val checker = RealAdBlockingStatusChecker(feature, pendingRepository, sessionStore, testScope)
 
         assertEquals(AdBlockingState.Uninitialized, checker.currentState())
+    }
+
+    @Test
+    fun whenSessionDisabledThenCannotInjectEvenIfPersistedEnabled() {
+        userEnabledFlow.value = true
+        sessionStore.setDisabledUntilRelaunch()
+
+        assertFalse(checker.canInject())
+    }
+
+    @Test
+    fun whenSessionDisabledThenClearedThenCanInjectAgain() {
+        userEnabledFlow.value = true
+        sessionStore.setDisabledUntilRelaunch()
+        assertFalse(checker.canInject())
+
+        sessionStore.clear()
+        assertTrue(checker.canInject())
+    }
+
+    @Test
+    fun whenSessionDisabledThenObserveCanInjectEmitsFalse() = runTest {
+        userEnabledFlow.value = true
+        sessionStore.setDisabledUntilRelaunch()
+
+        assertFalse(checker.observeCanInject().first())
+    }
+
+    @Test
+    fun whenSessionDisabledThenObserveStateEmitsUntilRelaunchEvenIfPersistedEnabled() = runTest {
+        userEnabledFlow.value = true
+        sessionStore.setDisabledUntilRelaunch()
+
+        assertEquals(AdBlockingState.Disabled.UntilRelaunch, checker.observeState().first())
+    }
+
+    @Test
+    fun whenSessionClearedThenObserveStateReflectsPersistedAgain() = runTest {
+        userEnabledFlow.value = true
+        sessionStore.setDisabledUntilRelaunch()
+        assertEquals(AdBlockingState.Disabled.UntilRelaunch, checker.observeState().first())
+
+        sessionStore.clear()
+        assertEquals(AdBlockingState.Enabled.UserEnabled, checker.observeState().first())
     }
 }
