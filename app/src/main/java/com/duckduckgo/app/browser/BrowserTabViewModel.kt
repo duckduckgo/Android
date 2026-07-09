@@ -3592,9 +3592,10 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
-    fun onNewTabMenuItemClicked(longPress: Boolean = false) {
+
+    fun onNewTabMenuItemClicked(longPress: Boolean = false): Boolean {
         if (longPress && !currentBrowserViewState().browserShowing) {
-            return
+            return false
         }
 
         openNewTab()
@@ -3611,6 +3612,8 @@ class BrowserTabViewModel @Inject constructor(
                 }
             }
         }
+
+        return true
     }
 
     fun onNavigationBarNewTabButtonClicked() {
