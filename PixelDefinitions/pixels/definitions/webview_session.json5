@@ -1,0 +1,8 @@
+{
+    "webview_session_large_bytes": {
+        "description": "A persisted WebView session bundle exceeded the size threshold (256 KiB) on save. Used to monitor the size distribution of per-tab session state stored in Room. Stripped of appVersion and ATB at send time via PixelInterceptorPixelsRequiringDataCleaning.",
+        "owners": ["marcosholgado"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"]
+    }
+}

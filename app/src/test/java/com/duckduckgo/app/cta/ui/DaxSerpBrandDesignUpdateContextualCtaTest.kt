@@ -135,7 +135,6 @@ class DaxSerpBrandDesignUpdateContextualCtaTest {
             .allowMainThreadQueries()
             .build()
 
-        whenever(mockExtendedOnboardingFeatureToggles.noBrowserCtas()).thenReturn(disabledToggle)
         whenever(mockExtendedOnboardingFeatureToggles.subscriptionPromoModalCta()).thenReturn(disabledToggle)
         whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(1))
         whenever(mockUserAllowListRepository.isDomainInUserAllowList(any())).thenReturn(false)
@@ -181,6 +180,7 @@ class DaxSerpBrandDesignUpdateContextualCtaTest {
                 on { state } doReturn MutableStateFlow(LinearOnboardingState.NotStarted)
             },
             duckAiFeatureState = mock { on { showInputScreen } doReturn MutableStateFlow(true) },
+            onboardingPixelSender = mock(),
         )
     }
 

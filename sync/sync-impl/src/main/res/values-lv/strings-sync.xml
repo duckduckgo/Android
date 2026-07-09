@@ -241,4 +241,12 @@
     <string name="sync_recover_data_download_pdf">Lejupielādēt PDF formātā</string>
     <string name="sync_restore_on_reinstall_title">Atjauno, atkārtoti instalējot lietotni</string>
     <string name="sync_restore_on_reinstall_description">Ja atkārtoti instalēsi lietotni DuckDuckGo, mēs jautāsim, vai vēlies atjaunot datus šajā ierīcē.</string>
+
+    <!-- Chat sync promo -->
+    <string name="sync_chat_promo_banner_title">Piekļūsti savām tērzēšanas sarunām visās savās ierīcēs, izmantojot Sync &amp; Backup.</string>
+    <string name="sync_chat_promo_banner_cta_title">Sinhronizēt ar citu ierīci</string>
+    <string name="sync_chat_bottom_sheet_title">Sinhronizēsim tērzēšanas sarunas visās tavās ierīcēs!</string>
+    <string name="sync_chat_bottom_sheet_description">Atrodi QR kodu DuckDuckGo lietotnē savā otrā ierīcē, dodoties uz Iestatījumi › Sync &amp; Backup › Sinhronizēt ar citu ierīci.</string>
+    <string name="sync_chat_bottom_sheet_positive">Kvadrātkoda skenēšana</string>
+    <string name="sync_chat_bottom_sheet_negative">Ne tagad</string>
 </resources>

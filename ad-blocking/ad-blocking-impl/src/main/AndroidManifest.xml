@@ -27,5 +27,10 @@
             android:exported="false"
             android:label="@string/ad_blocking_settings_title"
             android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity" />
+        <activity
+            android:name=".ui.AdBlockingSettingsV2Activity"
+            android:exported="false"
+            android:label="@string/ad_blocking_settings_title_v2"
+            android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity" />
     </application>
 </manifest>

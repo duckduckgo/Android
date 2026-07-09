@@ -36,4 +36,13 @@ enum class TestSeederKey(val key: String, val description: String) {
         "Semicolon-separated list of URLs to seed as bookmarks. " +
             "URLs without a scheme are normalised to https://. Example: \"reddit.com;eff.org;cnn.com\"",
     ),
+    REFERRER(
+        key = "referrer",
+        description = """
+            |Simulates a Play Store install that came from a link with a referrer param.
+            |Pass the decoded referrer value, e.g. 'origin=funnel_appnosupport_website&onboarding=ai'.
+            |This is the referrer part of a Play Store link such as:
+            |https://play.google.com/store/apps/details?id=com.duckduckgo.mobile.android&referrer=origin%3Dfunnel_appnosupport_website%26onboarding%3Dai
+        """.trimMargin(),
+    ),
 }

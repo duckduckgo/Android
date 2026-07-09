@@ -95,6 +95,23 @@
     <string name="duckAiHideAiGeneratedImagesTitle">Ascunde imaginile generate de IA</string>
     <string name="duckAiHideAiGeneratedImagesDescription">Filtrează imaginile generate de IA din rezultatele căutării de imagini</string>
 
+    <!-- Search Assist Visibility -->
+    <string name="duckAiSearchAssistVisibilitySubtitle">Alege cât de des dorești să apară răspunsurile asistate de IA în căutările tale.</string>
+    <string name="duckAiSearchAssistVisibilityNever">Niciodată</string>
+    <string name="duckAiSearchAssistVisibilityOnDemand">La cerere</string>
+    <string name="duckAiSearchAssistVisibilitySometimes">Uneori</string>
+    <string name="duckAiSearchAssistVisibilityOften">Adesea</string>
+
+    <!-- Duck AI Use Without AI Settings Option -->
+    <string name="duckAiUseWithoutAiTitle">Folosește DuckDuckGo fără IA</string>
+    <string name="duckAiUseWithoutAiDescription">Dezactivează Duck.ai, ascunde răspunsurile asistate de IA în căutare și filtrează site-urile de spam cunoscute bazate pe IA din rezultatele căutării de imagini.</string>
+    <string name="duckAiUseWithoutAiDisabledDescription">IA este în prezent dezactivată în browser, așa că nu vei mai vedea răspunsuri asistate de IA și vei vedea mai puține imagini generate de IA în rezultatele căutării de imagini.</string>
+
+    <!-- Duck AI Section in AI Feature Screen -->
+    <string name="input_screen_user_pref_toggle_between_search_and_ai">Comută între Căutare și Duck.ai</string>
+    <string name="duckAiDialogHideAiGeneratedImagesTitle">Ascunde imaginile generate de IA</string>
+    <string name="duckAiDialogHideAiGeneratedImagesDescription">Filtrează site-urile spam cunoscute, bazate pe IA, din rezultatele căutării de imagini. <annotation link="learn_more">Află mai multe</annotation></string>
+
     <!-- Duck AI Paid Settings -->
     <string name="duck_ai_paid_settings_enable_in_settings">Activează în setările funcțiilor IA</string>
     <string name="duck_ai_paid_settings_manage_in_settings">Gestionează în setările funcțiilor IA</string>
@@ -105,6 +122,13 @@
     <string name="duckAIContextualAutomaticContextTitle">Trimite automat conținutul paginii</string>
     <string name="duckAIContextualAutomaticContextMessage">Trimite automat conținutul paginii către Duck.ai</string>
     <string name="duckAIContextualAttachPageContent">Atașează conținutul paginii</string>
+
+    <!-- Contextual sheet quick action -->
+    <string name="duckAIContextualPromptAskAboutPage">Întreabă despre pagină</string>
+
+    <!-- Contextual sheet input hint (contextualSheetImprovements flag) -->
+    <string name="contextualSheetImprovedHint">Întreabă orice în mod privat</string>
+    <string name="contextualSheetChatsPopupRecentSection" instruction="Section header above the list of recent Duck.ai chats in the contextual sheet overflow menu.">Chaturi recente</string>
 
     <!-- duck.ai contextual fire button -->
     <string name="duckAIContextualFireButtonContentDescription">Șterge chatul</string>
@@ -125,6 +149,12 @@
 
     <!-- Duck AI Chat Suggestions -->
     <string name="duckAiChatHistoryViewAllChats">Vezi toate chaturile</string>
+
+    <!-- Duck.ai onboarding end CTA -->
+    <string name="duckAiEndCtaTitle">Te descurci!</string>
+    <string name="duckAiEndCtaDescription"><![CDATA[Folosește bara de adrese pentru a căuta și vizita site-uri sau comută la Duck.ai pentru chat privat cu IA.<br/><br/>Poți folosi Duck.ai de oriunde vezi pictograma de chat]]></string>
+    <string name="duckAiEndCtaButton">Bate palma!</string>
+    <string name="duckAiEndCtaDescriptionCustomAi"><![CDATA[Începe o conversație privată cu IA cu Duck.ai sau comută la Căutare pentru navigare protejată.<br/><br/>Poți folosi Duck.ai de oriunde vezi pictograma de chat]]></string>
 
     <!-- Native Duck.ai chat history -->
     <string name="duck_ai_chat_history_title">Chaturi</string>
@@ -170,4 +200,68 @@
     <string name="duck_ai_chat_history_download_view">Afișează</string>
     <string name="duck_ai_chat_history_download_error">Nu s-a putut exporta chatul</string>
     <string name="duck_ai_chat_history_bulk_download_error">Nu s-au putut exporta chaturile</string>
+
+    <string name="duckAiChatSearchDuckDuckGo">Caută pe DuckDuckGo</string>
+    <string name="native_input_chat_hint">Întreabă orice în mod privat…</string>
+    <string name="native_input_chat_duck_mode_hint">Răspunde…</string>
+
+    <!-- Model Picker -->
+    <string name="duckAiModelPickerPlusModels">Plus</string>
+    <string name="duckAiModelPickerProModels">Pro</string>
+
+    <!-- Reasoning Mode Picker -->
+    <string name="duckChatReasoningModeContentDescription">Modul de raționament</string>
+    <string name="duckChatReasoningModeFastTitle">Rapid</string>
+    <string name="duckChatReasoningModeFastSubtitle">Răspunde rapid</string>
+    <string name="duckChatReasoningModeReasoningTitle">Raționament</string>
+    <string name="duckChatReasoningModeReasoningSubtitle">Pentru sarcini complexe</string>
+    <string name="duckChatReasoningModeExtendedTitle">Raționament extins</string>
+    <string name="duckChatReasoningModeExtendedSubtitle">Pentru sarcini analitice</string>
+
+    <!-- Start chat icon content description -->
+    <string name="duckChatStartChatContentDescription">Pornește chatul</string>
+    <string name="duckChatStopStreamingContentDescription">Oprește generarea</string>
+
+    <!-- Image attachment -->
+    <string name="duckChatImageAttachmentRemoveContentDescription">Șterge imaginea</string>
+
+    <!-- Image attachment limits -->
+    <string name="duckChatImageAttachmentLimitPerMessage" instruction="%1$d is the maximum number of images allowed per message.">Poți atașa doar %1$d imagini odată.</string>
+    <string name="duckChatImageAttachmentLimitPerConversation" instruction="%1$d is the maximum number of images allowed in a single conversation.">Poți atașa doar %1$d imagini per conversație.</string>
+
+    <!-- File/image attachment menu options -->
+    <string name="attachmentTakePhoto">Fă o fotografie</string>
+    <string name="attachmentAttachPhoto">Adaugă imagine</string>
+    <string name="attachmentAttachFile">Adaugă fișier</string>
+
+    <!-- File attachment -->
+    <string name="duckChatFileAttachmentRemoveContentDescription">Elimină fișierul</string>
+    <string name="duckChatFileAttachmentLimitPerConversation" instruction="%1$d is the maximum number of files allowed in a single conversation.">Poți atașa doar %1$d fișiere per conversație.</string>
+    <string name="duckChatFileAttachmentTooLarge" instruction="%1$d is the maximum file size in MB.">Fișierul depășește dimensiunea maximă de %1$d MB.</string>
+    <string name="duckChatFileAttachmentTooManyPages" instruction="%1$d is the maximum number of pages per file.">Unul dintre fișierele atașate are mai multe pagini decât acceptăm. Încarcă fișiere cu %1$d pagini sau mai puține.</string>
+    <string name="duckChatFileAttachmentTotalSizeLimitExceeded" instruction="%1$d is the total size limit in MB.">Fișierele atașate depășesc limita totală de %1$d MB.</string>
+    <string name="fileCaptureBrowseDisambiguationTitle">Încarcă un fișier</string>
+
+    <!-- Options button -->
+    <string name="duckChatOptionsButtonContentDescription">Opțiuni Duck.ai</string>
+    <string name="duckChatOptionsChipDismissContentDescription" instruction="%1$s is the name of the option being removed (e.g. Create Image).">Elimină %1$s</string>
+    <string name="duckChatOptionsMenuCreateImage">Creează imaginea</string>
+    <string name="duckChatOptionsMenuCreateImageSubtitle">Transformă textul în imagini</string>
+    <string name="duckChatOptionsMenuWebSearch">Căutare pe web</string>
+    <string name="duckChatOptionsMenuWebSearchSubtitle">Obține răspunsuri de pe web</string>
+    <string name="duckChatOptionsMenuCustomizeResponses">Personalizează răspunsurile</string>
+    <string name="duckChatOptionsMenuCustomizeResponsesSubtitle">Setează tonul, durata și comportamentul</string>
+
+    <!-- Duck.ai header -->
+    <string name="duckChatPlusButtonContentDescription">Deschide meniul Duck.ai</string>
+
+    <!-- Duck AI Duck.ai Section Header -->
+    <string name="duckAiDuckAiSectionHeader">Duck.ai</string>
+
+    <!-- Search Assist Visibility -->
+    <string name="duckAiSearchAssistVisibilityTitle">Search Assist</string>
+    <string name="duckAiSearchAssistSettingsTitle">Search Assist</string>
+
+    <!-- Settings -->
+    <string name="duckAiSettingsTitle">Setări Duck.ai</string>
 </resources>

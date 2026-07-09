@@ -39,6 +39,7 @@ import com.duckduckgo.browser.api.ui.BrowserScreens.WebViewActivityWithParams
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.ViewViewModelFactory
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
 import com.duckduckgo.common.utils.playstore.PlayStoreUtils
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.mobile.android.app.tracking.ui.AppTrackingProtectionScreens.AppTrackerOnboardingActivityWithEmptyParamsParams
@@ -101,6 +102,14 @@ class CardsListRemoteMessageView @JvmOverloads constructor(
 
     var listener: CardsListRemoteMessageListener? = null
     var messageId: String? = null
+
+    /**
+     * Insets the content clear of the system bars while the full-bleed background still reaches every edge
+     * ([binding.root] carries the background). Call from the hosting activity when edge-to-edge is enabled.
+     */
+    fun applyEdgeToEdgeInsets(edgeToEdgeHandler: EdgeToEdgeHandler) {
+        edgeToEdgeHandler.applySystemBarInsets(binding.root)
+    }
 
     override fun onAttachedToWindow() {
         AndroidSupportInjection.inject(this)

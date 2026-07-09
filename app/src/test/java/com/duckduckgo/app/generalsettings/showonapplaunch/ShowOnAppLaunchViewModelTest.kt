@@ -25,11 +25,14 @@ import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_AFTER_INACTIVITY_TIMEOUT_
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Count
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.newtabpage.api.NtpAfterIdleManager
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -57,6 +60,7 @@ class ShowOnAppLaunchViewModelTest {
     @Before
     fun setup() {
         whenever(settingsDataStore.userSelectedIdleThresholdSeconds).thenReturn(null)
+        whenever(ntpAfterIdleManager.returnToLastTabEnabled).thenReturn(flowOf(true))
         fakeDataStore = FakeShowOnAppLaunchOptionDataStore(LastOpenedTab)
         testee = ShowOnAppLaunchViewModel(
             dispatcherProvider,
@@ -212,6 +216,26 @@ class ShowOnAppLaunchViewModelTest {
         coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
 
         verify(ntpAfterIdleManager).onIdleTimeoutSelected(300L)
+    }
+
+    @Test
+    fun whenReturnToLastTabToggledOffThenSettingPersistedAndDisabledPixelsFired() = runTest {
+        testee.onReturnToLastTabToggled(false)
+        coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
+
+        verify(ntpAfterIdleManager).setReturnToLastTabEnabled(false)
+        verify(pixel).fire(ShowOnAppLaunchPixelName.LAST_TAB_SHORTCUT_SETTING_DISABLED, type = Count)
+        verify(pixel).fire(ShowOnAppLaunchPixelName.LAST_TAB_SHORTCUT_SETTING_DISABLED_DAILY, type = Daily())
+    }
+
+    @Test
+    fun whenReturnToLastTabToggledOnThenSettingPersistedAndEnabledPixelsFired() = runTest {
+        testee.onReturnToLastTabToggled(true)
+        coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
+
+        verify(ntpAfterIdleManager).setReturnToLastTabEnabled(true)
+        verify(pixel).fire(ShowOnAppLaunchPixelName.LAST_TAB_SHORTCUT_SETTING_ENABLED, type = Count)
+        verify(pixel).fire(ShowOnAppLaunchPixelName.LAST_TAB_SHORTCUT_SETTING_ENABLED_DAILY, type = Daily())
     }
 
     @Test

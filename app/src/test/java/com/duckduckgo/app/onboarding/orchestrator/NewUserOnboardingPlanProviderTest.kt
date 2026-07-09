@@ -26,7 +26,8 @@ import com.duckduckgo.app.onboarding.CustomAiOnboardingStore
 import com.duckduckgo.app.onboarding.DuckAiOnboardingAvailability
 import com.duckduckgo.app.onboarding.DuckAiOnboardingDemo
 import com.duckduckgo.app.onboarding.store.OnboardingStore
-import com.duckduckgo.app.onboarding.ui.page.QuickSetupPixelSender
+import com.duckduckgo.app.onboarding.ui.page.OnboardingPixelAction
+import com.duckduckgo.app.onboarding.ui.page.OnboardingPixelSender
 import com.duckduckgo.app.onboardingquicksetup.OnboardingQuickSetupExperimentManager
 import com.duckduckgo.app.onboardingquicksetup.OnboardingQuickSetupExperimentManager.QuickSetupExperimentVariant
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_AICHAT_SELECTED
@@ -36,6 +37,16 @@ import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_CONFIRM_SKIP_ONBOARD
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_RESUME_ONBOARDING_PRESSED
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_SKIP_ONBOARDING_PRESSED
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_SYNC_RESTORE_TAPPED_UNIQUE
+import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_ADDRESS_BAR_POSITION
+import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_AI_INTRO
+import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_FIRE_BUTTON
+import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_NOTIFICATIONS
+import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_QUICK_SETUP
+import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_SEARCH_CHAT_TOGGLE
+import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_SEARCH_EXPERIENCE
+import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_SET_DEFAULT
+import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_SKIP_ONBOARDING
+import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_WELCOME
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -79,7 +90,7 @@ class NewUserOnboardingPlanProviderTest {
     private val androidBrowserConfigFeature: AndroidBrowserConfigFeature = mock()
     private val duckAiAvailability: DuckAiOnboardingAvailability = mock()
     private val quickSetupExperiment: OnboardingQuickSetupExperimentManager = mock()
-    private val quickSetupPixelSender: QuickSetupPixelSender = mock()
+    private val onboardingPixelSender: OnboardingPixelSender = mock()
     private val inputScreenOnboardingWideEvent: InputScreenOnboardingWideEvent = mock()
     private val defaultBrowserDetector: DefaultBrowserDetector = mock()
     private val widgetCapabilities: WidgetCapabilities = mock()
@@ -123,7 +134,7 @@ class NewUserOnboardingPlanProviderTest {
             androidBrowserConfigFeature = androidBrowserConfigFeature,
             duckAiOnboardingAvailability = duckAiAvailability,
             onboardingQuickSetupExperimentManager = quickSetupExperiment,
-            quickSetupPixelSender = quickSetupPixelSender,
+            onboardingPixelSender = onboardingPixelSender,
             inputScreenOnboardingWideEvent = inputScreenOnboardingWideEvent,
             defaultBrowserDetector = defaultBrowserDetector,
             widgetCapabilities = widgetCapabilities,
@@ -156,7 +167,7 @@ class NewUserOnboardingPlanProviderTest {
         assertStep(NewUserOnboardingStepIds.INTRO_ANIMATION)
         orchestrator.onEvent(NewUserOnboardingEvent.IntroAnimationFinished)
         assertStep(NewUserOnboardingStepIds.NOTIFICATION_PERMISSION)
-        orchestrator.onEvent(NewUserOnboardingEvent.NotificationPermissionFinished)
+        orchestrator.onEvent(NewUserOnboardingEvent.NotificationPermissionFinished(granted = null))
         assertStep(NewUserOnboardingStepIds.INITIAL)
         orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked)
         assertStep(NewUserOnboardingStepIds.COMPARISON_CHART)
@@ -179,7 +190,7 @@ class NewUserOnboardingPlanProviderTest {
         whenever(appBuildConfig.isAppReinstall()).thenReturn(true)
         start()
         orchestrator.onEvent(NewUserOnboardingEvent.IntroAnimationFinished)
-        orchestrator.onEvent(NewUserOnboardingEvent.NotificationPermissionFinished)
+        orchestrator.onEvent(NewUserOnboardingEvent.NotificationPermissionFinished(granted = null))
         assertStep(NewUserOnboardingStepIds.INITIAL_REINSTALL_USER)
     }
 
@@ -189,7 +200,7 @@ class NewUserOnboardingPlanProviderTest {
         whenever(appBuildConfig.isAppReinstall()).thenReturn(true)
         start()
         orchestrator.onEvent(NewUserOnboardingEvent.IntroAnimationFinished)
-        orchestrator.onEvent(NewUserOnboardingEvent.NotificationPermissionFinished)
+        orchestrator.onEvent(NewUserOnboardingEvent.NotificationPermissionFinished(granted = null))
         assertStep(NewUserOnboardingStepIds.SYNC_RESTORE)
         // isAppReinstall must run even when Sync Restore wins (side-effecting).
         verify(appBuildConfig).isAppReinstall()
@@ -208,16 +219,18 @@ class NewUserOnboardingPlanProviderTest {
         whenever(quickSetupExperiment.enroll()).thenReturn(QuickSetupExperimentVariant.TREATMENT)
         start()
         orchestrator.onEvent(NewUserOnboardingEvent.IntroAnimationFinished)
-        orchestrator.onEvent(NewUserOnboardingEvent.NotificationPermissionFinished)
+        orchestrator.onEvent(NewUserOnboardingEvent.NotificationPermissionFinished(granted = null))
         assertStep(NewUserOnboardingStepIds.INITIAL_REINSTALL_USER)
         orchestrator.onEvent(NewUserOnboardingEvent.SkipRequested)
         verify(pixel).fire(PREONBOARDING_SKIP_ONBOARDING_PRESSED)
         assertStep(NewUserOnboardingStepIds.QUICK_SETUP)
         orchestrator.onEvent(NewUserOnboardingEvent.QuickSetupConfirmed(OmnibarType.SINGLE_TOP, withAi = true))
-        verify(quickSetupPixelSender).fireClicked(
-            isReinstallUser = true,
-            addressBarPosition = OmnibarType.SINGLE_TOP,
-            inputScreenSelected = true,
+        verify(onboardingPixelSender).fire(
+            ONBOARDING_QUICK_SETUP,
+            OnboardingPixelAction.QuickSetupClicked(
+                addressBarPosition = OmnibarType.SINGLE_TOP,
+                inputScreenSelected = true,
+            ),
         )
         assertEquals(Skipped(rootPlanId = NewUserOnboardingPlanProvider.ROOT_PLAN_ID), orchestrator.state.value)
     }
@@ -228,7 +241,7 @@ class NewUserOnboardingPlanProviderTest {
         whenever(quickSetupExperiment.enroll()).thenReturn(QuickSetupExperimentVariant.CONTROL)
         start()
         orchestrator.onEvent(NewUserOnboardingEvent.IntroAnimationFinished)
-        orchestrator.onEvent(NewUserOnboardingEvent.NotificationPermissionFinished)
+        orchestrator.onEvent(NewUserOnboardingEvent.NotificationPermissionFinished(granted = null))
         orchestrator.onEvent(NewUserOnboardingEvent.SkipRequested)
         assertStep(NewUserOnboardingStepIds.SKIP_ONBOARDING_OPTION)
     }
@@ -238,7 +251,7 @@ class NewUserOnboardingPlanProviderTest {
         whenever(appBuildConfig.isAppReinstall()).thenReturn(true)
         start()
         orchestrator.onEvent(NewUserOnboardingEvent.IntroAnimationFinished)
-        orchestrator.onEvent(NewUserOnboardingEvent.NotificationPermissionFinished)
+        orchestrator.onEvent(NewUserOnboardingEvent.NotificationPermissionFinished(granted = null))
         orchestrator.onEvent(NewUserOnboardingEvent.SkipRequested)
         assertStep(NewUserOnboardingStepIds.SKIP_ONBOARDING_OPTION)
         orchestrator.onEvent(NewUserOnboardingEvent.SkipConfirmed)
@@ -252,7 +265,7 @@ class NewUserOnboardingPlanProviderTest {
         whenever(appBuildConfig.isAppReinstall()).thenReturn(true)
         start()
         orchestrator.onEvent(NewUserOnboardingEvent.IntroAnimationFinished)
-        orchestrator.onEvent(NewUserOnboardingEvent.NotificationPermissionFinished)
+        orchestrator.onEvent(NewUserOnboardingEvent.NotificationPermissionFinished(granted = null))
         orchestrator.onEvent(NewUserOnboardingEvent.SkipRequested)
         orchestrator.onEvent(NewUserOnboardingEvent.ResumeRequested)
         verify(pixel).fire(PREONBOARDING_RESUME_ONBOARDING_PRESSED)
@@ -264,7 +277,7 @@ class NewUserOnboardingPlanProviderTest {
         whenever(duckAiAvailability.isDuckAiOnboardingEnabled()).thenReturn(true)
         start()
         orchestrator.onEvent(NewUserOnboardingEvent.IntroAnimationFinished)
-        orchestrator.onEvent(NewUserOnboardingEvent.NotificationPermissionFinished)
+        orchestrator.onEvent(NewUserOnboardingEvent.NotificationPermissionFinished(granted = null))
         orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked) // initial
         orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked) // comparison_chart
         orchestrator.onEvent(NewUserOnboardingEvent.DefaultBrowserPromptFinished(isDefaultBrowser = false))
@@ -288,7 +301,7 @@ class NewUserOnboardingPlanProviderTest {
         whenever(duckAiAvailability.isDuckAiOnboardingEnabled()).thenReturn(false)
         start()
         orchestrator.onEvent(NewUserOnboardingEvent.IntroAnimationFinished)
-        orchestrator.onEvent(NewUserOnboardingEvent.NotificationPermissionFinished)
+        orchestrator.onEvent(NewUserOnboardingEvent.NotificationPermissionFinished(granted = null))
         orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked) // initial
         orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked) // comparison_chart
         orchestrator.onEvent(NewUserOnboardingEvent.DefaultBrowserPromptFinished(isDefaultBrowser = false))
@@ -302,7 +315,7 @@ class NewUserOnboardingPlanProviderTest {
         whenever(duckAiAvailability.isDuckAiOnboardingEnabled()).thenReturn(true)
         start()
         orchestrator.onEvent(NewUserOnboardingEvent.IntroAnimationFinished)
-        orchestrator.onEvent(NewUserOnboardingEvent.NotificationPermissionFinished)
+        orchestrator.onEvent(NewUserOnboardingEvent.NotificationPermissionFinished(granted = null))
         orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked) // initial
         orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked) // comparison_chart
         orchestrator.onEvent(NewUserOnboardingEvent.DefaultBrowserPromptFinished(isDefaultBrowser = false))
@@ -310,7 +323,7 @@ class NewUserOnboardingPlanProviderTest {
         orchestrator.onEvent(NewUserOnboardingEvent.InputModeConfirmed(withAi = true))
         assertStep(NewUserOnboardingStepIds.INPUT_SCREEN_PREVIEW)
 
-        orchestrator.onEvent(NewUserOnboardingEvent.InputDemoQuerySubmitted(query = "weather", isChat = false))
+        orchestrator.onEvent(NewUserOnboardingEvent.InputDemoQuerySubmitted(query = "weather", isChat = false, fromSuggestion = false))
 
         assertEquals(
             Completed(rootPlanId = NewUserOnboardingPlanProvider.ROOT_PLAN_ID, result = NewUserOnboardingResult.LaunchSearch(query = "weather")),
@@ -323,14 +336,14 @@ class NewUserOnboardingPlanProviderTest {
         whenever(duckAiAvailability.isDuckAiOnboardingEnabled()).thenReturn(true)
         start()
         orchestrator.onEvent(NewUserOnboardingEvent.IntroAnimationFinished)
-        orchestrator.onEvent(NewUserOnboardingEvent.NotificationPermissionFinished)
+        orchestrator.onEvent(NewUserOnboardingEvent.NotificationPermissionFinished(granted = null))
         orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked) // initial
         orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked) // comparison_chart
         orchestrator.onEvent(NewUserOnboardingEvent.DefaultBrowserPromptFinished(isDefaultBrowser = false))
         orchestrator.onEvent(NewUserOnboardingEvent.AddressBarConfirmed(OmnibarType.SINGLE_TOP))
         orchestrator.onEvent(NewUserOnboardingEvent.InputModeConfirmed(withAi = true))
 
-        orchestrator.onEvent(NewUserOnboardingEvent.InputDemoQuerySubmitted(query = "why is the sky blue", isChat = true))
+        orchestrator.onEvent(NewUserOnboardingEvent.InputDemoQuerySubmitted(query = "why is the sky blue", isChat = true, fromSuggestion = false))
 
         assertEquals(
             Completed(
@@ -347,7 +360,7 @@ class NewUserOnboardingPlanProviderTest {
         whenever(defaultRoleBrowserDialog.shouldShowDialog()).thenReturn(false)
         start()
         orchestrator.onEvent(NewUserOnboardingEvent.IntroAnimationFinished)
-        orchestrator.onEvent(NewUserOnboardingEvent.NotificationPermissionFinished)
+        orchestrator.onEvent(NewUserOnboardingEvent.NotificationPermissionFinished(granted = null))
         orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked) // initial
         orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked) // comparison_chart
         verify(pixel).fire(PREONBOARDING_CHOOSE_BROWSER_PRESSED, mapOf(PixelParameter.DEFAULT_BROWSER to "true"))
@@ -359,7 +372,7 @@ class NewUserOnboardingPlanProviderTest {
     fun `when address bar split selected but split disabled then resolves to single top`() = runTest {
         start()
         orchestrator.onEvent(NewUserOnboardingEvent.IntroAnimationFinished)
-        orchestrator.onEvent(NewUserOnboardingEvent.NotificationPermissionFinished)
+        orchestrator.onEvent(NewUserOnboardingEvent.NotificationPermissionFinished(granted = null))
         orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked) // initial
         orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked) // comparison_chart
         orchestrator.onEvent(NewUserOnboardingEvent.DefaultBrowserPromptFinished(isDefaultBrowser = false))
@@ -379,7 +392,7 @@ class NewUserOnboardingPlanProviderTest {
     fun `when dev skip mid flow then aborts to skipped`() = runTest {
         start()
         orchestrator.onEvent(NewUserOnboardingEvent.IntroAnimationFinished)
-        orchestrator.onEvent(NewUserOnboardingEvent.NotificationPermissionFinished)
+        orchestrator.onEvent(NewUserOnboardingEvent.NotificationPermissionFinished(granted = null))
         orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked) // initial
         assertStep(NewUserOnboardingStepIds.COMPARISON_CHART)
         orchestrator.onEvent(NewUserOnboardingEvent.SkipNewUserOnboardingDevOptionClicked)
@@ -391,7 +404,7 @@ class NewUserOnboardingPlanProviderTest {
         whenever(appBuildConfig.isAppReinstall()).thenReturn(true)
         start()
         orchestrator.onEvent(NewUserOnboardingEvent.IntroAnimationFinished)
-        orchestrator.onEvent(NewUserOnboardingEvent.NotificationPermissionFinished)
+        orchestrator.onEvent(NewUserOnboardingEvent.NotificationPermissionFinished(granted = null))
         orchestrator.onEvent(NewUserOnboardingEvent.SkipRequested)
         assertStep(NewUserOnboardingStepIds.SKIP_ONBOARDING_OPTION)
         orchestrator.onEvent(NewUserOnboardingEvent.SkipNewUserOnboardingDevOptionClicked)
@@ -408,7 +421,7 @@ class NewUserOnboardingPlanProviderTest {
         assertStep(NewUserOnboardingStepIds.INTRO_ANIMATION)
         orchestrator.onEvent(NewUserOnboardingEvent.IntroAnimationFinished)
         assertStep(NewUserOnboardingStepIds.NOTIFICATION_PERMISSION)
-        orchestrator.onEvent(NewUserOnboardingEvent.NotificationPermissionFinished)
+        orchestrator.onEvent(NewUserOnboardingEvent.NotificationPermissionFinished(granted = null))
         assertStep(NewUserOnboardingStepIds.INITIAL)
         orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked)
         assertStep(NewUserOnboardingStepIds.AI_COMPARISON_CHART)
@@ -416,7 +429,7 @@ class NewUserOnboardingPlanProviderTest {
         orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked)
         assertStep(NewUserOnboardingStepIds.INPUT_SCREEN_PREVIEW)
         assertStepProgress(current = 2, total = 4)
-        orchestrator.onEvent(NewUserOnboardingEvent.InputDemoQuerySubmitted(query = "best privacy tips", isChat = true))
+        orchestrator.onEvent(NewUserOnboardingEvent.InputDemoQuerySubmitted(query = "best privacy tips", isChat = true, fromSuggestion = false))
         assertStep(NewUserOnboardingStepIds.DUCK_AI_DEMO)
 
         val step = (orchestrator.state.value as InProgress).currentStep as NewUserBrowserActivityStep
@@ -441,7 +454,7 @@ class NewUserOnboardingPlanProviderTest {
         start()
 
         orchestrator.onEvent(NewUserOnboardingEvent.IntroAnimationFinished)
-        orchestrator.onEvent(NewUserOnboardingEvent.NotificationPermissionFinished)
+        orchestrator.onEvent(NewUserOnboardingEvent.NotificationPermissionFinished(granted = null))
         assertStep(NewUserOnboardingStepIds.INITIAL_REINSTALL_USER)
         orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked)
         assertStep(NewUserOnboardingStepIds.AI_COMPARISON_CHART)
@@ -452,7 +465,7 @@ class NewUserOnboardingPlanProviderTest {
         whenever(customAiOnboardingResolver.resolve()).thenReturn(true)
         start()
         orchestrator.onEvent(NewUserOnboardingEvent.IntroAnimationFinished)
-        orchestrator.onEvent(NewUserOnboardingEvent.NotificationPermissionFinished)
+        orchestrator.onEvent(NewUserOnboardingEvent.NotificationPermissionFinished(granted = null))
         orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked) // initial
         orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked) // ai_comparison_chart
         assertStep(NewUserOnboardingStepIds.INPUT_SCREEN_PREVIEW)
@@ -469,10 +482,10 @@ class NewUserOnboardingPlanProviderTest {
         whenever(customAiOnboardingResolver.resolve()).thenReturn(true)
         start()
         orchestrator.onEvent(NewUserOnboardingEvent.IntroAnimationFinished)
-        orchestrator.onEvent(NewUserOnboardingEvent.NotificationPermissionFinished)
+        orchestrator.onEvent(NewUserOnboardingEvent.NotificationPermissionFinished(granted = null))
         orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked) // initial
         orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked) // ai_comparison_chart
-        orchestrator.onEvent(NewUserOnboardingEvent.InputDemoQuerySubmitted(query = "best privacy tips", isChat = true))
+        orchestrator.onEvent(NewUserOnboardingEvent.InputDemoQuerySubmitted(query = "best privacy tips", isChat = true, fromSuggestion = false))
         orchestrator.onEvent(NewUserOnboardingEvent.DuckAiFireCompleted)
         orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked) // comparison_chart
         orchestrator.onEvent(NewUserOnboardingEvent.DefaultBrowserPromptFinished(isDefaultBrowser = false))
@@ -488,7 +501,7 @@ class NewUserOnboardingPlanProviderTest {
         whenever(appBuildConfig.isAppReinstall()).thenReturn(true)
         start()
         orchestrator.onEvent(NewUserOnboardingEvent.IntroAnimationFinished)
-        orchestrator.onEvent(NewUserOnboardingEvent.NotificationPermissionFinished)
+        orchestrator.onEvent(NewUserOnboardingEvent.NotificationPermissionFinished(granted = null))
         assertStep(NewUserOnboardingStepIds.INITIAL_REINSTALL_USER)
         orchestrator.onEvent(NewUserOnboardingEvent.SkipRequested)
         assertStep(NewUserOnboardingStepIds.SKIP_ONBOARDING_OPTION)
@@ -502,7 +515,7 @@ class NewUserOnboardingPlanProviderTest {
     fun `when default onboarding completed then does not arm open input on duck ai tab`() = runTest {
         start()
         orchestrator.onEvent(NewUserOnboardingEvent.IntroAnimationFinished)
-        orchestrator.onEvent(NewUserOnboardingEvent.NotificationPermissionFinished)
+        orchestrator.onEvent(NewUserOnboardingEvent.NotificationPermissionFinished(granted = null))
         orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked) // initial
         orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked) // comparison_chart
         orchestrator.onEvent(NewUserOnboardingEvent.DefaultBrowserPromptFinished(isDefaultBrowser = false))
@@ -520,7 +533,7 @@ class NewUserOnboardingPlanProviderTest {
         whenever(singleTabFireDialogToggle.isEnabled()).thenReturn(false)
         start()
         orchestrator.onEvent(NewUserOnboardingEvent.IntroAnimationFinished)
-        orchestrator.onEvent(NewUserOnboardingEvent.NotificationPermissionFinished)
+        orchestrator.onEvent(NewUserOnboardingEvent.NotificationPermissionFinished(granted = null))
         orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked) // initial
         assertStep(NewUserOnboardingStepIds.AI_COMPARISON_CHART)
 
@@ -548,7 +561,7 @@ class NewUserOnboardingPlanProviderTest {
         whenever(syncAutoRestore.canRestore()).thenReturn(true)
         start()
         orchestrator.onEvent(NewUserOnboardingEvent.IntroAnimationFinished)
-        orchestrator.onEvent(NewUserOnboardingEvent.NotificationPermissionFinished)
+        orchestrator.onEvent(NewUserOnboardingEvent.NotificationPermissionFinished(granted = null))
         // The custom-AI plan has no sync-restore step, so a restore-capable user gets the reinstall dialog instead.
         assertStep(NewUserOnboardingStepIds.INITIAL_REINSTALL_USER)
         verify(pixel).fire(CustomAiOnboardingPixelName.RETURNING_SYNC_USER_IGNORED, type = Unique())
@@ -563,8 +576,397 @@ class NewUserOnboardingPlanProviderTest {
         whenever(customAiOnboardingResolver.resolve()).thenReturn(true)
         start()
         orchestrator.onEvent(NewUserOnboardingEvent.IntroAnimationFinished)
-        orchestrator.onEvent(NewUserOnboardingEvent.NotificationPermissionFinished)
+        orchestrator.onEvent(NewUserOnboardingEvent.NotificationPermissionFinished(granted = null))
         assertStep(NewUserOnboardingStepIds.INITIAL)
         verify(pixel, never()).fire(CustomAiOnboardingPixelName.RETURNING_SYNC_USER_IGNORED, type = Unique())
     }
+
+    // region Shown pixel tests
+
+    @Test
+    fun `when notification permission step presented then fires NotificationsShown pixel`() = runTest {
+        start()
+        orchestrator.onEvent(NewUserOnboardingEvent.IntroAnimationFinished)
+        // Now at NOTIFICATION_PERMISSION — emit Presented
+        orchestrator.onEvent(NewUserOnboardingEvent.Presented)
+        verify(onboardingPixelSender).fire(ONBOARDING_NOTIFICATIONS, OnboardingPixelAction.Shown)
+    }
+
+    @Test
+    fun `when intro animation step presented then fires no shown pixel`() = runTest {
+        start()
+        assertStep(NewUserOnboardingStepIds.INTRO_ANIMATION)
+        orchestrator.onEvent(NewUserOnboardingEvent.Presented)
+        verify(onboardingPixelSender, never()).fire(ONBOARDING_NOTIFICATIONS, OnboardingPixelAction.Shown)
+    }
+
+    @Test
+    fun `when sync restore step presented then fires SyncRestoreShown pixel`() = runTest {
+        whenever(syncAutoRestore.canRestore()).thenReturn(true)
+        start()
+        orchestrator.onEvent(NewUserOnboardingEvent.IntroAnimationFinished)
+        orchestrator.onEvent(NewUserOnboardingEvent.NotificationPermissionFinished(granted = null))
+        assertStep(NewUserOnboardingStepIds.SYNC_RESTORE)
+        orchestrator.onEvent(NewUserOnboardingEvent.Presented)
+        verify(onboardingPixelSender).fire(ONBOARDING_WELCOME, OnboardingPixelAction.Shown)
+    }
+
+    @Test
+    fun `when welcome step presented then fires WelcomeShown pixel`() = runTest {
+        start()
+        orchestrator.onEvent(NewUserOnboardingEvent.IntroAnimationFinished)
+        orchestrator.onEvent(NewUserOnboardingEvent.NotificationPermissionFinished(granted = null))
+        assertStep(NewUserOnboardingStepIds.INITIAL)
+        orchestrator.onEvent(NewUserOnboardingEvent.Presented)
+        verify(onboardingPixelSender).fire(ONBOARDING_WELCOME, OnboardingPixelAction.Shown)
+    }
+
+    @Test
+    fun `when comparison chart step presented then fires SetDefaultShown pixel`() = runTest {
+        start()
+        orchestrator.onEvent(NewUserOnboardingEvent.IntroAnimationFinished)
+        orchestrator.onEvent(NewUserOnboardingEvent.NotificationPermissionFinished(granted = null))
+        orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked) // initial
+        assertStep(NewUserOnboardingStepIds.COMPARISON_CHART)
+        orchestrator.onEvent(NewUserOnboardingEvent.Presented)
+        verify(onboardingPixelSender).fire(ONBOARDING_SET_DEFAULT, OnboardingPixelAction.Shown)
+    }
+
+    @Test
+    fun `when default browser prompt step presented then fires no shown pixel`() = runTest {
+        start()
+        orchestrator.onEvent(NewUserOnboardingEvent.IntroAnimationFinished)
+        orchestrator.onEvent(NewUserOnboardingEvent.NotificationPermissionFinished(granted = null))
+        orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked) // initial
+        orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked) // comparison_chart
+        assertStep(NewUserOnboardingStepIds.DEFAULT_BROWSER_PROMPT)
+        orchestrator.onEvent(NewUserOnboardingEvent.Presented)
+        // pixelName = null for this step; sender should not be called for a shown event
+        verify(onboardingPixelSender, never()).fire(ONBOARDING_SET_DEFAULT, OnboardingPixelAction.SetDefaultConfirmed(isDdgDefault = true))
+        verify(onboardingPixelSender, never()).fire(ONBOARDING_SET_DEFAULT, OnboardingPixelAction.SetDefaultConfirmed(isDdgDefault = false))
+    }
+
+    @Test
+    fun `when address bar position step presented then fires AddressBarPositionShown pixel`() = runTest {
+        start()
+        orchestrator.onEvent(NewUserOnboardingEvent.IntroAnimationFinished)
+        orchestrator.onEvent(NewUserOnboardingEvent.NotificationPermissionFinished(granted = null))
+        orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked) // initial
+        orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked) // comparison_chart
+        orchestrator.onEvent(NewUserOnboardingEvent.DefaultBrowserPromptFinished(isDefaultBrowser = false))
+        assertStep(NewUserOnboardingStepIds.ADDRESS_BAR_POSITION)
+        orchestrator.onEvent(NewUserOnboardingEvent.Presented)
+        verify(onboardingPixelSender).fire(ONBOARDING_ADDRESS_BAR_POSITION, OnboardingPixelAction.Shown)
+    }
+
+    @Test
+    fun `when input screen step presented then fires SearchExperienceShown pixel`() = runTest {
+        start()
+        orchestrator.onEvent(NewUserOnboardingEvent.IntroAnimationFinished)
+        orchestrator.onEvent(NewUserOnboardingEvent.NotificationPermissionFinished(granted = null))
+        orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked) // initial
+        orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked) // comparison_chart
+        orchestrator.onEvent(NewUserOnboardingEvent.DefaultBrowserPromptFinished(isDefaultBrowser = false))
+        orchestrator.onEvent(NewUserOnboardingEvent.AddressBarConfirmed(OmnibarType.SINGLE_TOP))
+        assertStep(NewUserOnboardingStepIds.INPUT_SCREEN)
+        orchestrator.onEvent(NewUserOnboardingEvent.Presented)
+        verify(onboardingPixelSender).fire(ONBOARDING_SEARCH_EXPERIENCE, OnboardingPixelAction.Shown)
+    }
+
+    @Test
+    fun `when skip onboarding option step presented then fires SkipOnboardingShown pixel`() = runTest {
+        whenever(appBuildConfig.isAppReinstall()).thenReturn(true)
+        start()
+        orchestrator.onEvent(NewUserOnboardingEvent.IntroAnimationFinished)
+        orchestrator.onEvent(NewUserOnboardingEvent.NotificationPermissionFinished(granted = null))
+        orchestrator.onEvent(NewUserOnboardingEvent.SkipRequested)
+        assertStep(NewUserOnboardingStepIds.SKIP_ONBOARDING_OPTION)
+        orchestrator.onEvent(NewUserOnboardingEvent.Presented)
+        verify(onboardingPixelSender).fire(ONBOARDING_SKIP_ONBOARDING, OnboardingPixelAction.Shown)
+    }
+
+    @Test
+    fun `when quick setup step presented then fires QuickSetupShown pixel`() = runTest {
+        whenever(appBuildConfig.isAppReinstall()).thenReturn(true)
+        whenever(quickSetupExperiment.enroll()).thenReturn(QuickSetupExperimentVariant.TREATMENT)
+        start()
+        orchestrator.onEvent(NewUserOnboardingEvent.IntroAnimationFinished)
+        orchestrator.onEvent(NewUserOnboardingEvent.NotificationPermissionFinished(granted = null))
+        orchestrator.onEvent(NewUserOnboardingEvent.SkipRequested)
+        assertStep(NewUserOnboardingStepIds.QUICK_SETUP)
+        orchestrator.onEvent(NewUserOnboardingEvent.Presented)
+        verify(onboardingPixelSender).fire(ONBOARDING_QUICK_SETUP, OnboardingPixelAction.Shown)
+    }
+
+    @Test
+    fun `when ai comparison chart step presented then fires AiIntroShown pixel`() = runTest {
+        whenever(customAiOnboardingResolver.resolve()).thenReturn(true)
+        start()
+        orchestrator.onEvent(NewUserOnboardingEvent.IntroAnimationFinished)
+        orchestrator.onEvent(NewUserOnboardingEvent.NotificationPermissionFinished(granted = null))
+        orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked) // initial
+        assertStep(NewUserOnboardingStepIds.AI_COMPARISON_CHART)
+        orchestrator.onEvent(NewUserOnboardingEvent.Presented)
+        verify(onboardingPixelSender).fire(ONBOARDING_AI_INTRO, OnboardingPixelAction.Shown)
+    }
+
+    @Test
+    fun `when custom ai input screen preview step presented then fires SearchChatToggleShown pixel`() = runTest {
+        whenever(customAiOnboardingResolver.resolve()).thenReturn(true)
+        start()
+        orchestrator.onEvent(NewUserOnboardingEvent.IntroAnimationFinished)
+        orchestrator.onEvent(NewUserOnboardingEvent.NotificationPermissionFinished(granted = null))
+        orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked) // initial
+        orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked) // ai_comparison_chart
+        assertStep(NewUserOnboardingStepIds.INPUT_SCREEN_PREVIEW)
+        orchestrator.onEvent(NewUserOnboardingEvent.Presented)
+        verify(onboardingPixelSender).fire(ONBOARDING_SEARCH_CHAT_TOGGLE, OnboardingPixelAction.Shown)
+    }
+
+    @Test
+    fun `when duck ai demo step presented then fires AiChatShown pixel`() = runTest {
+        whenever(customAiOnboardingResolver.resolve()).thenReturn(true)
+        start()
+        orchestrator.onEvent(NewUserOnboardingEvent.IntroAnimationFinished)
+        orchestrator.onEvent(NewUserOnboardingEvent.NotificationPermissionFinished(granted = null))
+        orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked) // initial
+        orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked) // ai_comparison_chart
+        orchestrator.onEvent(NewUserOnboardingEvent.InputDemoQuerySubmitted(query = "hello", isChat = true, fromSuggestion = false))
+        assertStep(NewUserOnboardingStepIds.DUCK_AI_DEMO)
+        orchestrator.onEvent(NewUserOnboardingEvent.Presented)
+        verify(onboardingPixelSender).fire(ONBOARDING_FIRE_BUTTON, OnboardingPixelAction.Shown)
+    }
+
+    // endregion
+
+    // region Clicked/confirmed pixel tests
+
+    @Test
+    fun `when notification permission granted then fires NotificationsConfirmed with granted true`() = runTest {
+        start()
+        orchestrator.onEvent(NewUserOnboardingEvent.IntroAnimationFinished)
+        orchestrator.onEvent(NewUserOnboardingEvent.NotificationPermissionFinished(granted = true))
+        verify(onboardingPixelSender).fire(ONBOARDING_NOTIFICATIONS, OnboardingPixelAction.NotificationsConfirmed(granted = true))
+    }
+
+    @Test
+    fun `when notification permission denied then fires NotificationsConfirmed with granted false`() = runTest {
+        start()
+        orchestrator.onEvent(NewUserOnboardingEvent.IntroAnimationFinished)
+        orchestrator.onEvent(NewUserOnboardingEvent.NotificationPermissionFinished(granted = false))
+        verify(onboardingPixelSender).fire(ONBOARDING_NOTIFICATIONS, OnboardingPixelAction.NotificationsConfirmed(granted = false))
+    }
+
+    @Test
+    fun `when notification permission sdk less than 33 then does not fire NotificationsConfirmed`() = runTest {
+        start()
+        orchestrator.onEvent(NewUserOnboardingEvent.IntroAnimationFinished)
+        orchestrator.onEvent(NewUserOnboardingEvent.NotificationPermissionFinished(granted = null))
+        verify(onboardingPixelSender, never()).fire(ONBOARDING_NOTIFICATIONS, OnboardingPixelAction.NotificationsConfirmed(granted = true))
+        verify(onboardingPixelSender, never()).fire(ONBOARDING_NOTIFICATIONS, OnboardingPixelAction.NotificationsConfirmed(granted = false))
+    }
+
+    @Test
+    fun `when sync restore accepted then fires SyncRestoreClicked with engaged true`() = runTest {
+        whenever(syncAutoRestore.canRestore()).thenReturn(true)
+        start()
+        orchestrator.onEvent(NewUserOnboardingEvent.IntroAnimationFinished)
+        orchestrator.onEvent(NewUserOnboardingEvent.NotificationPermissionFinished(granted = null))
+        orchestrator.onEvent(NewUserOnboardingEvent.RestoreRequested)
+        verify(onboardingPixelSender).fire(ONBOARDING_WELCOME, OnboardingPixelAction.Clicked(engaged = true))
+    }
+
+    @Test
+    fun `when sync restore skipped then fires SyncRestoreClicked with engaged false`() = runTest {
+        whenever(syncAutoRestore.canRestore()).thenReturn(true)
+        start()
+        orchestrator.onEvent(NewUserOnboardingEvent.IntroAnimationFinished)
+        orchestrator.onEvent(NewUserOnboardingEvent.NotificationPermissionFinished(granted = null))
+        orchestrator.onEvent(NewUserOnboardingEvent.SkipRequested)
+        verify(onboardingPixelSender).fire(ONBOARDING_WELCOME, OnboardingPixelAction.Clicked(engaged = false))
+    }
+
+    @Test
+    fun `when welcome continue clicked then fires WelcomeClicked with engaged true`() = runTest {
+        start()
+        orchestrator.onEvent(NewUserOnboardingEvent.IntroAnimationFinished)
+        orchestrator.onEvent(NewUserOnboardingEvent.NotificationPermissionFinished(granted = null))
+        assertStep(NewUserOnboardingStepIds.INITIAL)
+        orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked)
+        verify(onboardingPixelSender).fire(ONBOARDING_WELCOME, OnboardingPixelAction.Clicked(engaged = true))
+    }
+
+    @Test
+    fun `when reinstall welcome skip clicked then fires WelcomeClicked with engaged false`() = runTest {
+        whenever(appBuildConfig.isAppReinstall()).thenReturn(true)
+        start()
+        orchestrator.onEvent(NewUserOnboardingEvent.IntroAnimationFinished)
+        orchestrator.onEvent(NewUserOnboardingEvent.NotificationPermissionFinished(granted = null))
+        assertStep(NewUserOnboardingStepIds.INITIAL_REINSTALL_USER)
+        orchestrator.onEvent(NewUserOnboardingEvent.SkipRequested)
+        verify(onboardingPixelSender).fire(ONBOARDING_WELCOME, OnboardingPixelAction.Clicked(engaged = false))
+    }
+
+    @Test
+    fun `when comparison chart continue clicked then fires SetDefaultClicked`() = runTest {
+        start()
+        orchestrator.onEvent(NewUserOnboardingEvent.IntroAnimationFinished)
+        orchestrator.onEvent(NewUserOnboardingEvent.NotificationPermissionFinished(granted = null))
+        orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked) // initial
+        orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked) // comparison_chart
+        verify(onboardingPixelSender).fire(ONBOARDING_SET_DEFAULT, OnboardingPixelAction.Clicked())
+    }
+
+    @Test
+    fun `when default browser set confirmed then fires SetDefaultConfirmed with isDdgDefault true`() = runTest {
+        start()
+        orchestrator.onEvent(NewUserOnboardingEvent.IntroAnimationFinished)
+        orchestrator.onEvent(NewUserOnboardingEvent.NotificationPermissionFinished(granted = null))
+        orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked) // initial
+        orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked) // comparison_chart
+        orchestrator.onEvent(NewUserOnboardingEvent.DefaultBrowserPromptFinished(isDefaultBrowser = true))
+        verify(onboardingPixelSender).fire(ONBOARDING_SET_DEFAULT, OnboardingPixelAction.SetDefaultConfirmed(isDdgDefault = true))
+    }
+
+    @Test
+    fun `when address bar position bottom confirmed then fires AddressBarPositionClicked with bottom`() = runTest {
+        start()
+        orchestrator.onEvent(NewUserOnboardingEvent.IntroAnimationFinished)
+        orchestrator.onEvent(NewUserOnboardingEvent.NotificationPermissionFinished(granted = null))
+        orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked) // initial
+        orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked) // comparison_chart
+        orchestrator.onEvent(NewUserOnboardingEvent.DefaultBrowserPromptFinished(isDefaultBrowser = false))
+        orchestrator.onEvent(NewUserOnboardingEvent.AddressBarConfirmed(OmnibarType.SINGLE_BOTTOM))
+        verify(
+            onboardingPixelSender,
+        ).fire(ONBOARDING_ADDRESS_BAR_POSITION, OnboardingPixelAction.AddressBarClicked(position = OmnibarType.SINGLE_BOTTOM))
+    }
+
+    @Test
+    fun `when input screen search only confirmed then fires SearchExperienceClicked with withAi false`() = runTest {
+        start()
+        orchestrator.onEvent(NewUserOnboardingEvent.IntroAnimationFinished)
+        orchestrator.onEvent(NewUserOnboardingEvent.NotificationPermissionFinished(granted = null))
+        orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked) // initial
+        orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked) // comparison_chart
+        orchestrator.onEvent(NewUserOnboardingEvent.DefaultBrowserPromptFinished(isDefaultBrowser = false))
+        orchestrator.onEvent(NewUserOnboardingEvent.AddressBarConfirmed(OmnibarType.SINGLE_TOP))
+        orchestrator.onEvent(NewUserOnboardingEvent.InputModeConfirmed(withAi = false))
+        verify(onboardingPixelSender).fire(ONBOARDING_SEARCH_EXPERIENCE, OnboardingPixelAction.SearchExperienceClicked(withAi = false))
+    }
+
+    @Test
+    fun `when input screen preview suggestion search submitted then fires TryInputClicked with suggestion and search`() = runTest {
+        whenever(duckAiAvailability.isDuckAiOnboardingEnabled()).thenReturn(true)
+        start()
+        orchestrator.onEvent(NewUserOnboardingEvent.IntroAnimationFinished)
+        orchestrator.onEvent(NewUserOnboardingEvent.NotificationPermissionFinished(granted = null))
+        orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked) // initial
+        orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked) // comparison_chart
+        orchestrator.onEvent(NewUserOnboardingEvent.DefaultBrowserPromptFinished(isDefaultBrowser = false))
+        orchestrator.onEvent(NewUserOnboardingEvent.AddressBarConfirmed(OmnibarType.SINGLE_TOP))
+        orchestrator.onEvent(NewUserOnboardingEvent.InputModeConfirmed(withAi = true))
+        orchestrator.onEvent(NewUserOnboardingEvent.InputDemoQuerySubmitted(query = "cats", isChat = false, fromSuggestion = true))
+        verify(
+            onboardingPixelSender,
+        ).fire(ONBOARDING_SEARCH_CHAT_TOGGLE, OnboardingPixelAction.TryInputClicked(fromSuggestion = true, isChat = false))
+    }
+
+    @Test
+    fun `when input screen preview submitted then sets search onboarding variant`() = runTest {
+        whenever(duckAiAvailability.isDuckAiOnboardingEnabled()).thenReturn(true)
+        start()
+        orchestrator.onEvent(NewUserOnboardingEvent.IntroAnimationFinished)
+        orchestrator.onEvent(NewUserOnboardingEvent.NotificationPermissionFinished(granted = null))
+        orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked) // initial
+        orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked) // comparison_chart
+        orchestrator.onEvent(NewUserOnboardingEvent.DefaultBrowserPromptFinished(isDefaultBrowser = false))
+        orchestrator.onEvent(NewUserOnboardingEvent.AddressBarConfirmed(OmnibarType.SINGLE_TOP))
+        orchestrator.onEvent(NewUserOnboardingEvent.InputModeConfirmed(withAi = true))
+        orchestrator.onEvent(NewUserOnboardingEvent.InputDemoQuerySubmitted(query = "cats", isChat = false, fromSuggestion = false))
+        verify(onboardingPixelSender).searchBranchSelected()
+    }
+
+    @Test
+    fun `when input screen preview chat submitted then sets chat onboarding variant`() = runTest {
+        whenever(duckAiAvailability.isDuckAiOnboardingEnabled()).thenReturn(true)
+        start()
+        orchestrator.onEvent(NewUserOnboardingEvent.IntroAnimationFinished)
+        orchestrator.onEvent(NewUserOnboardingEvent.NotificationPermissionFinished(granted = null))
+        orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked) // initial
+        orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked) // comparison_chart
+        orchestrator.onEvent(NewUserOnboardingEvent.DefaultBrowserPromptFinished(isDefaultBrowser = false))
+        orchestrator.onEvent(NewUserOnboardingEvent.AddressBarConfirmed(OmnibarType.SINGLE_TOP))
+        orchestrator.onEvent(NewUserOnboardingEvent.InputModeConfirmed(withAi = true))
+        orchestrator.onEvent(NewUserOnboardingEvent.InputDemoQuerySubmitted(query = "hello", isChat = true, fromSuggestion = false))
+        verify(onboardingPixelSender).chatBranchSelected()
+    }
+
+    @Test
+    fun `when skip onboarding confirmed then fires SkipOnboardingClicked with engaged true`() = runTest {
+        whenever(appBuildConfig.isAppReinstall()).thenReturn(true)
+        start()
+        orchestrator.onEvent(NewUserOnboardingEvent.IntroAnimationFinished)
+        orchestrator.onEvent(NewUserOnboardingEvent.NotificationPermissionFinished(granted = null))
+        orchestrator.onEvent(NewUserOnboardingEvent.SkipRequested)
+        orchestrator.onEvent(NewUserOnboardingEvent.SkipConfirmed)
+        verify(onboardingPixelSender).fire(ONBOARDING_SKIP_ONBOARDING, OnboardingPixelAction.Clicked(engaged = true))
+    }
+
+    @Test
+    fun `when skip onboarding resumed then fires SkipOnboardingClicked with engaged false`() = runTest {
+        whenever(appBuildConfig.isAppReinstall()).thenReturn(true)
+        start()
+        orchestrator.onEvent(NewUserOnboardingEvent.IntroAnimationFinished)
+        orchestrator.onEvent(NewUserOnboardingEvent.NotificationPermissionFinished(granted = null))
+        orchestrator.onEvent(NewUserOnboardingEvent.SkipRequested)
+        orchestrator.onEvent(NewUserOnboardingEvent.ResumeRequested)
+        verify(onboardingPixelSender).fire(ONBOARDING_SKIP_ONBOARDING, OnboardingPixelAction.Clicked(engaged = false))
+    }
+
+    @Test
+    fun `when ai comparison chart continue clicked then fires AiComparisonClicked`() = runTest {
+        whenever(customAiOnboardingResolver.resolve()).thenReturn(true)
+        start()
+        orchestrator.onEvent(NewUserOnboardingEvent.IntroAnimationFinished)
+        orchestrator.onEvent(NewUserOnboardingEvent.NotificationPermissionFinished(granted = null))
+        orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked) // initial
+        assertStep(NewUserOnboardingStepIds.AI_COMPARISON_CHART)
+        orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked)
+        verify(onboardingPixelSender).fire(ONBOARDING_AI_INTRO, OnboardingPixelAction.Clicked())
+    }
+
+    @Test
+    fun `when custom ai input screen preview demo submitted then sets chat variant and fires TryInputClicked`() = runTest {
+        whenever(customAiOnboardingResolver.resolve()).thenReturn(true)
+        start()
+        orchestrator.onEvent(NewUserOnboardingEvent.IntroAnimationFinished)
+        orchestrator.onEvent(NewUserOnboardingEvent.NotificationPermissionFinished(granted = null))
+        orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked) // initial
+        orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked) // ai_comparison_chart
+        assertStep(NewUserOnboardingStepIds.INPUT_SCREEN_PREVIEW)
+        orchestrator.onEvent(NewUserOnboardingEvent.InputDemoQuerySubmitted(query = "hello", isChat = true, fromSuggestion = false))
+        // Chat-only preview always records the chat branch, regardless of the submitted mode.
+        verify(onboardingPixelSender).chatBranchSelected()
+        verify(onboardingPixelSender).fire(
+            ONBOARDING_SEARCH_CHAT_TOGGLE,
+            OnboardingPixelAction.TryInputClicked(fromSuggestion = false, isChat = true),
+        )
+    }
+
+    @Test
+    fun `when duck ai demo fire completed then fires AiChatClicked`() = runTest {
+        whenever(customAiOnboardingResolver.resolve()).thenReturn(true)
+        start()
+        orchestrator.onEvent(NewUserOnboardingEvent.IntroAnimationFinished)
+        orchestrator.onEvent(NewUserOnboardingEvent.NotificationPermissionFinished(granted = null))
+        orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked) // initial
+        orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked) // ai_comparison_chart
+        orchestrator.onEvent(NewUserOnboardingEvent.InputDemoQuerySubmitted(query = "hello", isChat = true, fromSuggestion = false))
+        assertStep(NewUserOnboardingStepIds.DUCK_AI_DEMO)
+        orchestrator.onEvent(NewUserOnboardingEvent.DuckAiFireCompleted)
+        verify(onboardingPixelSender).fire(ONBOARDING_FIRE_BUTTON, OnboardingPixelAction.Clicked())
+    }
+
+    // endregion
 }

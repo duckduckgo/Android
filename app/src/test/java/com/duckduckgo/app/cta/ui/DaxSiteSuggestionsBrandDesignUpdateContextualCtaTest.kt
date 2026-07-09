@@ -146,7 +146,6 @@ class DaxSiteSuggestionsBrandDesignUpdateContextualCtaTest {
             .allowMainThreadQueries()
             .build()
 
-        whenever(mockExtendedOnboardingFeatureToggles.noBrowserCtas()).thenReturn(mockDisabledToggle)
         whenever(mockExtendedOnboardingFeatureToggles.subscriptionPromoModalCta()).thenReturn(mockDisabledToggle)
         whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(1))
         whenever(mockUserAllowListRepository.isDomainInUserAllowList(any())).thenReturn(false)
@@ -189,6 +188,7 @@ class DaxSiteSuggestionsBrandDesignUpdateContextualCtaTest {
                 on { state } doReturn MutableStateFlow(LinearOnboardingState.NotStarted)
             },
             duckAiFeatureState = mock { on { showInputScreen } doReturn MutableStateFlow(true) },
+            onboardingPixelSender = mock(),
         )
     }
 

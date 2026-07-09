@@ -33,7 +33,6 @@ import com.duckduckgo.app.browser.addtohome.AddToHomeSystemCapabilityDetector
 import com.duckduckgo.app.browser.api.DuckAiChatDeletionListener
 import com.duckduckgo.app.browser.applinks.AppSchemeInterceptionFeature
 import com.duckduckgo.app.browser.applinks.ExternalAppIntentFlagsFeature
-import com.duckduckgo.app.browser.certificates.rootstore.TrustedCertificateStore
 import com.duckduckgo.app.browser.cookies.AppThirdPartyCookieManager
 import com.duckduckgo.app.browser.cookies.ThirdPartyCookieManager
 import com.duckduckgo.app.browser.cookies.db.AuthCookiesAllowedDomainsRepository
@@ -43,7 +42,6 @@ import com.duckduckgo.app.browser.downloader.*
 import com.duckduckgo.app.browser.duckchat.AIChatQueryDetectionFeature
 import com.duckduckgo.app.browser.favicon.FaviconPersister
 import com.duckduckgo.app.browser.favicon.FileBasedFaviconPersister
-import com.duckduckgo.app.browser.httpauth.WebViewHttpAuthStore
 import com.duckduckgo.app.browser.httperrors.HttpCodeSiteErrorHandler
 import com.duckduckgo.app.browser.httperrors.HttpCodeSiteErrorHandlerImpl
 import com.duckduckgo.app.browser.httperrors.StringSiteErrorHandler
@@ -52,15 +50,12 @@ import com.duckduckgo.app.browser.logindetection.*
 import com.duckduckgo.app.browser.menu.BrowserMenuHighlightPlugin
 import com.duckduckgo.app.browser.pageloadpixel.PageLoadedPixelDao
 import com.duckduckgo.app.browser.pageloadpixel.firstpaint.PagePaintedPixelDao
-import com.duckduckgo.app.browser.session.WebViewSessionInMemoryStorage
-import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.browser.tabpreview.FileBasedWebViewPreviewGenerator
 import com.duckduckgo.app.browser.tabpreview.FileBasedWebViewPreviewPersister
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewGenerator
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
 import com.duckduckgo.app.browser.urlextraction.DOMUrlExtractor
 import com.duckduckgo.app.browser.urlextraction.JsUrlExtractor
-import com.duckduckgo.app.browser.urlextraction.UrlExtractingWebViewClient
 import com.duckduckgo.app.browser.webview.MaliciousSiteBlockerWebViewIntegration
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.di.IsMainProcess
@@ -142,29 +137,6 @@ class BrowserModule {
     }
 
     @Provides
-    fun urlExtractingWebViewClient(
-        webViewHttpAuthStore: WebViewHttpAuthStore,
-        trustedCertificateStore: TrustedCertificateStore,
-        requestInterceptor: RequestInterceptor,
-        cookieManagerProvider: CookieManagerProvider,
-        thirdPartyCookieManager: ThirdPartyCookieManager,
-        @AppCoroutineScope appCoroutineScope: CoroutineScope,
-        dispatcherProvider: DispatcherProvider,
-        urlExtractor: DOMUrlExtractor,
-    ): UrlExtractingWebViewClient {
-        return UrlExtractingWebViewClient(
-            webViewHttpAuthStore,
-            trustedCertificateStore,
-            requestInterceptor,
-            cookieManagerProvider,
-            thirdPartyCookieManager,
-            appCoroutineScope,
-            dispatcherProvider,
-            urlExtractor,
-        )
-    }
-
-    @Provides
     fun webViewLongPressHandler(
         context: Context,
         pixel: Pixel,
@@ -187,10 +159,6 @@ class BrowserModule {
             pixel = pixel,
         )
     }
-
-    @SingleInstanceIn(AppScope::class)
-    @Provides
-    fun webViewSessionStorage(): WebViewSessionStorage = WebViewSessionInMemoryStorage()
 
     @Provides
     fun clipboardManager(context: Context): ClipboardManager {

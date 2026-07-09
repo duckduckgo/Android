@@ -178,6 +178,10 @@ import com.duckduckgo.app.cta.ui.DaxBubbleCta.DaxIntroSearchOptionsCta
 import com.duckduckgo.app.cta.ui.DaxDuckAiEndBrandDesignUpdateBubbleCta
 import com.duckduckgo.app.cta.ui.DaxDuckAiEndBubbleCta
 import com.duckduckgo.app.cta.ui.DaxDuckAiFireButtonBrandDesignUpdateContextualCta
+import com.duckduckgo.app.cta.ui.DaxFireButtonBrandDesignUpdateContextualCta
+import com.duckduckgo.app.cta.ui.DaxSerpBrandDesignUpdateContextualCta
+import com.duckduckgo.app.cta.ui.DaxSiteSuggestionsBrandDesignUpdateContextualCta
+import com.duckduckgo.app.cta.ui.DaxTrackersBlockedBrandDesignUpdateContextualCta
 import com.duckduckgo.app.cta.ui.DaxTryASearchBrandDesignUpdateBubbleCta
 import com.duckduckgo.app.cta.ui.HomePanelCta
 import com.duckduckgo.app.cta.ui.OnboardingDaxDialogCta.DaxDuckAiFireButtonCta
@@ -207,6 +211,8 @@ import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.AppStage.ESTABLISHED
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.store.UserStageStore
+import com.duckduckgo.app.onboarding.ui.page.OnboardingPixelAction
+import com.duckduckgo.app.onboarding.ui.page.OnboardingPixelSender
 import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.ExtendedOnboardingFeatureToggles
 import com.duckduckgo.app.onboardingbranddesignupdate.OnboardingBrandDesignUpdateToggles
 import com.duckduckgo.app.pixels.AppPixelName
@@ -217,6 +223,11 @@ import com.duckduckgo.app.pixels.AppPixelName.ONBOARDING_DAX_CTA_DISMISS_BUTTON
 import com.duckduckgo.app.pixels.AppPixelName.ONBOARDING_DAX_CTA_OK_BUTTON
 import com.duckduckgo.app.pixels.AppPixelName.ONBOARDING_SEARCH_CUSTOM
 import com.duckduckgo.app.pixels.AppPixelName.ONBOARDING_VISIT_SITE_CUSTOM
+import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_FIRE_BUTTON
+import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_SEARCH
+import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_SEARCH_RESULTS
+import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_TRACKERS_BLOCKED
+import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_VISIT_SITE
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
@@ -334,6 +345,8 @@ import com.duckduckgo.site.permissions.api.SitePermissionsManager
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.LocationPermissionRequest
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissionQueryResponse
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissions
+import com.duckduckgo.site.preferences.api.DesktopModeSettings
+import com.duckduckgo.site.preferences.impl.RememberDesktopModeFeature
 import com.duckduckgo.subscriptions.api.SUBSCRIPTIONS_FEATURE_NAME
 import com.duckduckgo.subscriptions.api.SubscriptionPromoCtaShownPlugin
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
@@ -376,6 +389,7 @@ import org.mockito.ArgumentMatchers.anyString
 import org.mockito.Mockito.never
 import org.mockito.Mockito.times
 import org.mockito.Mockito.verify
+import org.mockito.Mockito.verifyNoInteractions
 import org.mockito.MockitoAnnotations
 import org.mockito.internal.util.DefaultMockingDetails
 import org.mockito.kotlin.KArgumentCaptor
@@ -388,6 +402,7 @@ import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
+import org.mockito.kotlin.stub
 import org.mockito.kotlin.whenever
 import org.robolectric.RuntimeEnvironment
 import org.robolectric.annotation.Config
@@ -551,6 +566,8 @@ class BrowserTabViewModelTest {
 
     private lateinit var testee: BrowserTabViewModel
 
+    private var browserMode: BrowserMode = BrowserMode.REGULAR
+
     private lateinit var fireproofWebsiteDao: FireproofWebsiteDao
 
     private lateinit var locationPermissionsDao: LocationPermissionsDao
@@ -586,6 +603,8 @@ class BrowserTabViewModelTest {
     private val automaticSavedLoginsMonitor: AutomaticSavedLoginsMonitor = mock()
 
     private val mockDeviceInfo: DeviceInfo = mock()
+
+    private val mockOnboardingPixelSender: OnboardingPixelSender = mock()
 
     private val mockSitePermissionsManager: SitePermissionsManager = mock()
 
@@ -691,6 +710,8 @@ class BrowserTabViewModelTest {
     private var fakeFaviconFetchingFixFeature = FakeFeatureToggleFactory.create(FaviconFetchingFixFeature::class.java)
     private var fakeProgressBarUpgradeFeature = FakeFeatureToggleFactory.create(ProgressBarUpgradeFeature::class.java)
     private val fakeAutocompleteHistoryDeleteFeature = FakeFeatureToggleFactory.create(AutocompleteHistoryDeleteFeature::class.java)
+    private val mockDesktopModeSettings: DesktopModeSettings = mock()
+    private val fakeRememberDesktopModeFeature = FakeFeatureToggleFactory.create(RememberDesktopModeFeature::class.java)
     private val mockInlinePdfHandler: InlinePdfHandler = mock()
     private val mockPdfDownloadTooltipDataStore: PdfDownloadTooltipDataStore = mock()
     private val mockCachedFileDownloader: CachedFileDownloader = mock()
@@ -722,6 +743,8 @@ class BrowserTabViewModelTest {
             swipingTabsFeature.self().setRawStoredState(State(enable = true))
             swipingTabsFeature.enabledForUsers().setRawStoredState(State(enable = true))
             fakeAutocompleteHistoryDeleteFeature.self().setRawStoredState(State(enable = true))
+
+            fakeRememberDesktopModeFeature.self().setRawStoredState(State(enable = true))
 
             whenever(mockDuckChatJSHelper.enrichPageContextIfPossible(any(), any())).thenAnswer { it.getArgument<String>(1) }
             whenever(mockInlinePdfHandler.classifyPdfRequest(any(), anyOrNull(), any())).thenReturn(PdfRenderDecision.NotApplicable)
@@ -796,7 +819,6 @@ class BrowserTabViewModelTest {
             whenever(subscriptions.isEligible()).thenReturn(false)
             whenever(mockExtendedOnboardingFeatureToggles.subscriptionPromoModalCta()).thenReturn(mockDisabledToggle)
             whenever(mockExtendedOnboardingFeatureToggles.subscriptionPromoModalCtaExistingUsers()).thenReturn(mockDisabledToggle)
-            whenever(mockExtendedOnboardingFeatureToggles.noBrowserCtas()).thenReturn(mockDisabledToggle)
             whenever(mockExtendedOnboardingFeatureToggles.freeTrialCopy()).thenReturn(mockDisabledToggle)
             whenever(mockOnboardingBrandDesignUpdateToggles.self()).thenReturn(mockDisabledToggle)
             whenever(mockOnboardingBrandDesignUpdateToggles.brandDesignUpdate()).thenReturn(mockDisabledToggle)
@@ -842,6 +864,7 @@ class BrowserTabViewModelTest {
                         on { state } doReturn MutableStateFlow(LinearOnboardingState.NotStarted)
                     },
                     duckAiFeatureState = mockDuckAiFeatureState,
+                    onboardingPixelSender = mockOnboardingPixelSender,
                 )
 
             accessibilitySettingsDataStore = AccessibilitySettingsSharedPreferences(context)
@@ -888,6 +911,12 @@ class BrowserTabViewModelTest {
         }
 
     private fun initialiseViewModel() {
+        // Detach the previous instance's command observer before creating a new VM, so tests that
+        // call initialiseViewModel() more than once (e.g. to swap browserMode mid-test) don't leave
+        // a stale VM attached to mockCommandObserver and emitting unexpected commands.
+        val previousTestee = if (::testee.isInitialized) testee else null
+        previousTestee?.command?.removeObserver(mockCommandObserver)
+
         val siteFactory =
             SiteFactoryImpl(
                 mockEntityLookup,
@@ -1020,6 +1049,9 @@ class BrowserTabViewModelTest {
                 onboardingStore = mockOnboardingStore,
                 autocompleteHistoryDeleteFeature = fakeAutocompleteHistoryDeleteFeature,
                 customAiOnboardingStore = mockCustomAiOnboardingStore,
+                browserMode = browserMode,
+                desktopModeSettings = mockDesktopModeSettings,
+                rememberDesktopModeFeature = fakeRememberDesktopModeFeature,
             )
 
         testee.loadData("abc", null, false, false)
@@ -1081,7 +1113,6 @@ class BrowserTabViewModelTest {
     @Test
     fun whenViewBecomesVisibleAndHomeShowingThenKeyboardShown() =
         runTest {
-            whenever(mockExtendedOnboardingFeatureToggles.noBrowserCtas()).thenReturn(mockDisabledToggle)
             whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(true)
 
             setBrowserShowing(false)
@@ -1094,7 +1125,6 @@ class BrowserTabViewModelTest {
     @Test
     fun whenViewBecomesVisibleAndMaliciousSiteBlockedThenKeyboardNotShown() =
         runTest {
-            whenever(mockExtendedOnboardingFeatureToggles.noBrowserCtas()).thenReturn(mockDisabledToggle)
             whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(true)
             testee.browserViewState.value = browserViewState().copy(maliciousSiteBlocked = true)
 
@@ -1106,7 +1136,6 @@ class BrowserTabViewModelTest {
     @Test
     fun whenOmnibarTypeSplitThenThenKeyboardShownOnlyTheFirstTimeNtpIsVisible() =
         runTest {
-            whenever(mockExtendedOnboardingFeatureToggles.noBrowserCtas()).thenReturn(mockDisabledToggle)
             whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(true)
             testee.browserViewState.value = browserViewState().copy(browserShowing = false)
             whenever(mockSettingsDataStore.omnibarType).thenReturn(OmnibarType.SPLIT)
@@ -1123,7 +1152,6 @@ class BrowserTabViewModelTest {
     @Test
     fun whenOmnibarTypeNotSplitThenThenKeyboardNotHiddenWhenOpenedMultipleTimes() =
         runTest {
-            whenever(mockExtendedOnboardingFeatureToggles.noBrowserCtas()).thenReturn(mockDisabledToggle)
             whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(true)
             testee.browserViewState.value = browserViewState().copy(browserShowing = false)
             whenever(mockSettingsDataStore.omnibarType).thenReturn(OmnibarType.SINGLE_TOP)
@@ -1140,7 +1168,6 @@ class BrowserTabViewModelTest {
     @Test
     fun whenViewBecomesVisibleAndDuckAIPoCIsEnabledThenKeyboardNotShown() =
         runTest {
-            whenever(mockExtendedOnboardingFeatureToggles.noBrowserCtas()).thenReturn(mockDisabledToggle)
             whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(true)
             whenever(mockDuckAiFeatureState.showInputScreen).thenReturn(MutableStateFlow(true))
 
@@ -1161,7 +1188,6 @@ class BrowserTabViewModelTest {
     fun whenViewBecomesVisibleAndHomeShowingThenRefreshCtaIsCalled() {
         runTest {
             setBrowserShowing(false)
-            whenever(mockExtendedOnboardingFeatureToggles.noBrowserCtas()).thenReturn(mockDisabledToggle)
             val observer = ValueCaptorObserver<CtaViewState>()
             testee.ctaViewState.observeForever(observer)
 
@@ -2383,6 +2409,7 @@ class BrowserTabViewModelTest {
         testee.onChangeBrowserModeClicked()
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         verify(mockPixel).fire(AppPixelName.MENU_ACTION_DESKTOP_SITE_ENABLE_PRESSED)
+        verify(mockDesktopModeSettings).rememberDesktopMode("http://example.com")
         assertTrue(browserViewState().isDesktopBrowsingMode)
         val site = testee.siteLiveData.value
         assertTrue(site?.isDesktopMode == true)
@@ -2394,6 +2421,7 @@ class BrowserTabViewModelTest {
         setDesktopBrowsingMode(true)
         testee.onChangeBrowserModeClicked()
         verify(mockPixel).fire(AppPixelName.MENU_ACTION_DESKTOP_SITE_DISABLE_PRESSED)
+        verify(mockDesktopModeSettings).forgetDesktopMode("http://example.com")
         assertFalse(browserViewState().isDesktopBrowsingMode)
         val site = testee.siteLiveData.value
         assertFalse(site?.isDesktopMode == true)
@@ -2699,6 +2727,8 @@ class BrowserTabViewModelTest {
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         val ultimateCommand = commandCaptor.lastValue as Navigate
         assertEquals(exampleUrl, ultimateCommand.url)
+        // The raw URL is passed through; the site-preferences impl collapses m./www./paths to the site key.
+        verify(mockDesktopModeSettings).rememberDesktopMode("http://m.example.com")
     }
 
     @Test
@@ -2729,6 +2759,97 @@ class BrowserTabViewModelTest {
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         val ultimateCommand = commandCaptor.lastValue as Navigate
         assertEquals(exampleUrl, ultimateCommand.url)
+    }
+
+    @Test
+    fun whenDesktopToggledOnHostWithoutRegistrableDomainThenUrlStillPersisted() {
+        // IPs / localhost / single-label intranet hosts have no eTLD+1; the impl keys them on the raw
+        // host so desktop mode still works (e.g. router admin pages on 192.168.x.x). The VM passes the URL.
+        loadUrl("http://localhost")
+        setDesktopBrowsingMode(false)
+        testee.onChangeBrowserModeClicked()
+        verify(mockDesktopModeSettings).rememberDesktopMode("http://localhost")
+        verify(mockPixel).fire(AppPixelName.MENU_ACTION_DESKTOP_SITE_ENABLE_PRESSED)
+    }
+
+    @Test
+    fun whenNavigatingToNonRememberedSiteThenDesktopModeResetAndNotInheritedFromPreviousSite() {
+        whenever(mockDesktopModeSettings.isDesktopModeRememberedSync("http://a.com")).thenReturn(true)
+        whenever(mockDesktopModeSettings.isDesktopModeRememberedSync("http://b.com")).thenReturn(false)
+
+        loadUrl("http://a.com")
+        assertTrue(browserViewState().isDesktopBrowsingMode)
+        assertTrue(testee.siteLiveData.value?.isDesktopMode == true)
+
+        loadUrl("http://b.com")
+        assertFalse(browserViewState().isDesktopBrowsingMode)
+        assertFalse(testee.siteLiveData.value?.isDesktopMode == true)
+    }
+
+    @Test
+    fun whenUserRefreshesAndDesktopModeChangedSinceLoadThenFullReloadToReframe() {
+        // Mobile loaded, then desktop remembered (e.g. in another tab): a user refresh should reframe (Navigate).
+        whenever(mockDesktopModeSettings.isDesktopModeRememberedSync(exampleUrl)).thenReturn(false)
+        loadUrl(exampleUrl)
+        assertFalse(testee.siteLiveData.value?.isDesktopMode == true)
+
+        whenever(mockDesktopModeSettings.isDesktopModeRememberedSync(exampleUrl)).thenReturn(true)
+        testee.onRefreshRequested(triggeredByUser = true)
+
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        val command = commandCaptor.lastValue
+        assertTrue(command is Navigate)
+        assertEquals(exampleUrl, (command as Navigate).url)
+        assertTrue(browserViewState().isDesktopBrowsingMode)
+        assertTrue(testee.siteLiveData.value?.isDesktopMode == true)
+    }
+
+    @Test
+    fun whenUserRefreshesAndModeChangedDesktopToMobileSinceLoadThenFullReloadToReframe() {
+        // Desktop loaded, then reverted to mobile (e.g. in another tab): refresh must reframe in this direction too.
+        whenever(mockDesktopModeSettings.isDesktopModeRememberedSync(exampleUrl)).thenReturn(true)
+        loadUrl(exampleUrl)
+        assertTrue(testee.siteLiveData.value?.isDesktopMode == true)
+
+        whenever(mockDesktopModeSettings.isDesktopModeRememberedSync(exampleUrl)).thenReturn(false)
+        testee.onRefreshRequested(triggeredByUser = true)
+
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        val command = commandCaptor.lastValue
+        assertTrue(command is Navigate)
+        assertFalse(browserViewState().isDesktopBrowsingMode)
+        assertFalse(testee.siteLiveData.value?.isDesktopMode == true)
+    }
+
+    @Test
+    fun whenUserRefreshesAndDesktopModeUnchangedSinceLoadThenPlainRefresh() {
+        whenever(mockDesktopModeSettings.isDesktopModeRememberedSync(exampleUrl)).thenReturn(false)
+        loadUrl(exampleUrl)
+
+        testee.onRefreshRequested(triggeredByUser = true)
+
+        assertCommandIssued<NavigationCommand.Refresh>()
+    }
+
+    @Test
+    fun whenNonUserRefreshAndDesktopModeChangedSinceLoadThenPlainRefreshNotReframe() {
+        // The reframing full-reload only applies to user-initiated refreshes.
+        whenever(mockDesktopModeSettings.isDesktopModeRememberedSync(exampleUrl)).thenReturn(false)
+        loadUrl(exampleUrl)
+        whenever(mockDesktopModeSettings.isDesktopModeRememberedSync(exampleUrl)).thenReturn(true)
+
+        testee.onRefreshRequested(triggeredByUser = false)
+
+        assertCommandIssued<NavigationCommand.Refresh>()
+    }
+
+    @Test
+    fun whenRememberDesktopModeEnabledThenIsDesktopSiteEnabledUsesPrimingAwareRead() = runTest {
+        // The interceptor-facing read passes the raw URL to the canonical, priming-aware lookup (which the
+        // impl resolves via its site key) so the first load of a remembered site picks desktop mode.
+        whenever(mockDesktopModeSettings.isDesktopModeRemembered("http://example.com/some/path")).thenReturn(true)
+
+        assertTrue(testee.isDesktopSiteEnabled("http://example.com/some/path"))
     }
 
     @Test
@@ -2767,6 +2888,37 @@ class BrowserTabViewModelTest {
         assertEquals(exampleUrl, command.query)
 
         assertCommandIssued<Command.OpenInNewTab> {
+            assertNotNull(sourceTabId)
+        }
+    }
+
+    @Test
+    fun whenOnLongPressRequiredActionWithOpenInFireTabInRegularModeThenOpensFreshFireTabWithoutSource() = runTest {
+        val target = LongPressTarget(url = "https://example.com", type = WebView.HitTestResult.SRC_ANCHOR_TYPE)
+
+        val handled = testee.onLongPressRequiredAction(target, RequiredAction.OpenInFireTab("https://example.com"))
+
+        assertTrue(handled)
+        assertCommandIssued<Command.GenerateWebViewPreviewImage>()
+        assertCommandIssued<Command.OpenInFireTab> {
+            assertEquals("https://example.com", query)
+            assertNull(sourceTabId)
+        }
+    }
+
+    @Test
+    fun whenOnLongPressRequiredActionWithOpenInFireTabInFireModeThenOpensFromSourceTab() = runTest {
+        browserMode = BrowserMode.FIRE
+        resetChannels()
+        initialiseViewModel()
+        val target = LongPressTarget(url = "https://example.com", type = WebView.HitTestResult.SRC_ANCHOR_TYPE)
+
+        val handled = testee.onLongPressRequiredAction(target, RequiredAction.OpenInFireTab("https://example.com"))
+
+        assertTrue(handled)
+        assertCommandIssued<Command.GenerateWebViewPreviewImage>()
+        assertCommandIssued<Command.OpenInFireTab> {
+            assertEquals("https://example.com", query)
             assertNotNull(sourceTabId)
         }
     }
@@ -2942,9 +3094,9 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenRestoringWebViewSessionNotRestorableThenPreviousUrlLoaded() {
+    fun whenRestoringWebViewSessionNotRestorableThenPreviousUrlLoaded() = runTest {
         whenever(mockOmnibarConverter.convertQueryToUrl("foo.com")).thenReturn("foo.com")
-        whenever(webViewSessionStorage.restoreSession(anyOrNull(), anyString())).thenReturn(false)
+        webViewSessionStorage.stub { onBlocking { restoreSession(anyOrNull(), anyString()) }.thenReturn(false) }
         testee.restoreWebViewState(null, "foo.com")
 
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
@@ -2953,17 +3105,31 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenRestoringWebViewSessionNotRestorableAndNoPreviousUrlThenNoUrlLoaded() {
-        whenever(webViewSessionStorage.restoreSession(anyOrNull(), anyString())).thenReturn(false)
+    fun whenRestoringWebViewSessionNotRestorableAndNoPreviousUrlThenNoUrlLoaded() = runTest {
+        webViewSessionStorage.stub { onBlocking { restoreSession(anyOrNull(), anyString()) }.thenReturn(false) }
         testee.restoreWebViewState(null, "")
         assertFalse(commandCaptor.allValues.any { it is Navigate })
     }
 
     @Test
-    fun whenWebViewSessionRestorableThenSessionRestored() {
-        whenever(webViewSessionStorage.restoreSession(anyOrNull(), anyString())).thenReturn(true)
+    fun whenWebViewSessionRestorableThenSessionRestored() = runTest {
+        webViewSessionStorage.stub { onBlocking { restoreSession(anyOrNull(), anyString()) }.thenReturn(true) }
         testee.restoreWebViewState(null, "")
         assertFalse(browserGlobalLayoutViewState().isNewTabState)
+    }
+
+    @Test
+    fun whenRestoringWebViewSessionNotRestorableAndLastUrlBlankThenTabEntityUrlLoaded() = runTest {
+        val tabUrl = "https://example.com/"
+        whenever(mockOmnibarConverter.convertQueryToUrl(tabUrl)).thenReturn(tabUrl)
+        testee.loadData("TAB_ID", tabUrl, skipHome = false, isExternal = false)
+        webViewSessionStorage.stub { onBlocking { restoreSession(anyOrNull(), anyString()) }.thenReturn(false) }
+
+        testee.restoreWebViewState(null, "")
+
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        val command = commandCaptor.allValues.filterIsInstance<Navigate>().last()
+        assertEquals(tabUrl, command.url)
     }
 
     @Test
@@ -3150,6 +3316,36 @@ class BrowserTabViewModelTest {
         testee.handleAuthentication(request = authenticationRequest, credentials = credentials)
 
         assertCommandIssued<Command.ShowWebContent>()
+    }
+
+    @Test
+    fun whenAuthenticationHandledInRegularModeThenOffersToSaveCredentials() {
+        browserMode = BrowserMode.REGULAR
+        resetChannels()
+        initialiseViewModel()
+        val authenticationRequest = BasicAuthenticationRequest(mock(), "example.com", "test realm", "")
+        val credentials = BasicAuthenticationCredentials(username = "user", password = "password")
+
+        testee.handleAuthentication(request = authenticationRequest, credentials = credentials)
+
+        assertCommandIssued<Command.SaveCredentials>()
+    }
+
+    @Test
+    fun whenAuthenticationHandledInFireModeThenNeverOffersToSaveCredentials() {
+        browserMode = BrowserMode.FIRE
+        resetChannels()
+        initialiseViewModel()
+        val mockHandler = mock<HttpAuthHandler>()
+        val authenticationRequest = BasicAuthenticationRequest(mockHandler, "example.com", "test realm", "")
+        val credentials = BasicAuthenticationCredentials(username = "user", password = "password")
+
+        testee.handleAuthentication(request = authenticationRequest, credentials = credentials)
+
+        // Authentication still proceeds for the session, but the save prompt is suppressed.
+        verify(mockHandler, atLeastOnce()).proceed("user", "password")
+        assertCommandIssued<Command.ShowWebContent>()
+        assertCommandNotIssued<Command.SaveCredentials>()
     }
 
     @Test
@@ -3449,7 +3645,6 @@ class BrowserTabViewModelTest {
     @Test
     fun whenCtaRefreshedAndOnlyStandardAddSupportedAndWidgetAlreadyInstalledThenCtaIsNull() =
         runTest {
-            whenever(mockExtendedOnboardingFeatureToggles.noBrowserCtas()).thenReturn(mockDisabledToggle)
             whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(false)
             whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(true)
             testee.refreshCta()
@@ -3460,7 +3655,6 @@ class BrowserTabViewModelTest {
     fun whenCtaRefreshedAndIsNewTabIsFalseThenReturnNull() =
         runTest {
             setBrowserShowing(true)
-            whenever(mockExtendedOnboardingFeatureToggles.noBrowserCtas()).thenReturn(mockDisabledToggle)
             whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(true)
             whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(false)
             testee.refreshCta()
@@ -3470,7 +3664,6 @@ class BrowserTabViewModelTest {
     @Test
     fun whenCtaRefreshedAndOnboardingCompleteThenViewStateUpdated() =
         runTest {
-            whenever(mockExtendedOnboardingFeatureToggles.noBrowserCtas()).thenReturn(mockDisabledToggle)
             whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(false)
             whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(true)
             whenever(mockDismissedCtaDao.exists(DAX_END)).thenReturn(true)
@@ -3485,7 +3678,6 @@ class BrowserTabViewModelTest {
     fun whenCtaRefreshedAndBrowserShowingThenViewStateUpdated() =
         runTest {
             setBrowserShowing(true)
-            whenever(mockExtendedOnboardingFeatureToggles.noBrowserCtas()).thenReturn(mockDisabledToggle)
             whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(false)
             whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(true)
             whenever(mockDismissedCtaDao.exists(DAX_END)).thenReturn(true)
@@ -3499,7 +3691,6 @@ class BrowserTabViewModelTest {
     @Test
     fun whenCtaRefreshedAndMaliciousSiteBlockedThenViewStateUpdated() =
         runTest {
-            whenever(mockExtendedOnboardingFeatureToggles.noBrowserCtas()).thenReturn(mockDisabledToggle)
             testee.browserViewState.value =
                 browserViewState().copy(
                     browserShowing = false,
@@ -3515,7 +3706,6 @@ class BrowserTabViewModelTest {
     fun whenCtaRefreshedGetUserRefreshesCalled() =
         runTest {
             setBrowserShowing(true)
-            whenever(mockExtendedOnboardingFeatureToggles.noBrowserCtas()).thenReturn(mockDisabledToggle)
             whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(false)
             whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(true)
             val expectedRefreshPatterns = setOf(RefreshPattern.THRICE_IN_20_SECONDS)
@@ -3773,6 +3963,24 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenUserLoadsWebsiteInRegularModeThenCanFireproofSite() {
+        browserMode = BrowserMode.REGULAR
+        resetChannels()
+        initialiseViewModel()
+        loadUrl("http://www.example.com/path", isBrowserShowing = true)
+        assertTrue(browserViewState().canFireproofSite)
+    }
+
+    @Test
+    fun whenUserLoadsWebsiteInFireModeThenCannotFireproofSite() {
+        browserMode = BrowserMode.FIRE
+        resetChannels()
+        initialiseViewModel()
+        loadUrl("http://www.example.com/path", isBrowserShowing = true)
+        assertFalse(browserViewState().canFireproofSite)
+    }
+
+    @Test
     fun whenUserLoadsFireproofWebsiteThenFireproofWebsiteBrowserStateUpdated() {
         givenFireproofWebsiteDomain("www.example.com")
         loadUrl("http://www.example.com/path", isBrowserShowing = true)
@@ -3964,6 +4172,18 @@ class BrowserTabViewModelTest {
         whenever(mockSettingsDataStore.automaticFireproofSetting).thenReturn(AutomaticFireproofSetting.ALWAYS)
         loginEventLiveData.value = givenLoginDetected("example.com")
         assertCommandNotIssued<Command.AskToFireproofWebsite>()
+    }
+
+    @Test
+    fun whenLoginDetectedInFireModeThenNeverAskToFireproofWebsite() {
+        // initialiseViewModel() detaches the previous VM's observer before registering the new one,
+        // so no stale REGULAR-mode VM can emit AskToFireproofWebsite via mockCommandObserver.
+        browserMode = BrowserMode.FIRE
+        resetChannels()
+        initialiseViewModel()
+        loginEventLiveData.value = givenLoginDetected("example.com")
+        assertCommandNotIssued<Command.AskToFireproofWebsite>()
+        assertCommandNotIssued<Command.AskToAutomateFireproofWebsite>()
     }
 
     @Test
@@ -4842,50 +5062,48 @@ class BrowserTabViewModelTest {
     @Test
     fun whenHandleAppLinkCalledAndShowAppLinksPromptIsTrueThenShowAppLinkPromptAndUserQueryStateSetToFalse() {
         val urlType = SpecialUrlDetector.UrlType.AppLink(uriString = exampleUrl)
-        testee.handleAppLink(urlType, isForMainFrame = true)
-        whenever(mockAppLinksHandler.isUserQuery()).thenReturn(false)
+        testee.handleAppLink(urlType, isForMainFrame = true, hasGesture = true)
         whenever(ctaViewModelMockSettingsStore.showAppLinksPrompt).thenReturn(true)
-        verify(mockAppLinksHandler).handleAppLink(eq(true), eq(exampleUrl), eq(false), eq(true), appLinkCaptor.capture())
+        verify(mockAppLinksHandler).handleAppLink(eq(true), eq(urlType), eq(true), eq(null), eq(false), eq(true), appLinkCaptor.capture())
         appLinkCaptor.lastValue.invoke()
         assertCommandIssued<Command.ShowAppLinkPrompt>()
         verify(mockAppLinksHandler).setUserQueryState(false)
     }
 
     @Test
-    fun whenHandleAppLinkCalledAndIsUserQueryAndShowAppLinksPromptIsFalseThenOpenAppLink() {
+    fun whenHandleAppLinkCalledAndShowAppLinksPromptIsFalseThenOpenAppLink() {
         val urlType = SpecialUrlDetector.UrlType.AppLink(uriString = exampleUrl)
-        testee.handleAppLink(urlType, isForMainFrame = true)
-        whenever(mockAppLinksHandler.isUserQuery()).thenReturn(true)
+        testee.handleAppLink(urlType, isForMainFrame = true, hasGesture = true)
         whenever(ctaViewModelMockSettingsStore.showAppLinksPrompt).thenReturn(false)
-        verify(mockAppLinksHandler).handleAppLink(eq(true), eq(exampleUrl), eq(false), eq(true), appLinkCaptor.capture())
+        verify(mockAppLinksHandler).handleAppLink(eq(true), eq(urlType), eq(true), eq(null), eq(false), eq(true), appLinkCaptor.capture())
         appLinkCaptor.lastValue.invoke()
         assertCommandIssued<Command.OpenAppLink>()
         verify(mockAppLinksHandler).setUserQueryState(false)
     }
 
     @Test
-    fun whenHandleAppLinkCalledAndIsNotUserQueryAndShowAppLinksPromptIsFalseThenOpenAppLink() {
+    fun whenHandleAppLinkCalledThenGestureIsForwardedToHandler() {
         val urlType = SpecialUrlDetector.UrlType.AppLink(uriString = exampleUrl)
-        testee.handleAppLink(urlType, isForMainFrame = true)
-        whenever(mockAppLinksHandler.isUserQuery()).thenReturn(false)
-        whenever(ctaViewModelMockSettingsStore.showAppLinksPrompt).thenReturn(false)
-        verify(mockAppLinksHandler).handleAppLink(eq(true), eq(exampleUrl), eq(false), eq(true), appLinkCaptor.capture())
-        appLinkCaptor.lastValue.invoke()
-        assertCommandIssued<Command.OpenAppLink>()
-        verify(mockAppLinksHandler).setUserQueryState(false)
+        testee.handleAppLink(urlType, isForMainFrame = true, hasGesture = false)
+        verify(mockAppLinksHandler).handleAppLink(eq(true), eq(urlType), eq(false), eq(null), eq(false), eq(true), appLinkCaptor.capture())
     }
 
     @Test
-    fun whenHandleAppLinkCalledAndCustomTabIsTrueThenOpenAppLink() {
+    fun whenHandleAppLinkCalledInCustomTabThenClientPackageIsForwardedToHandler() {
         val urlType = SpecialUrlDetector.UrlType.AppLink(uriString = exampleUrl)
-        testee.setIsCustomTab(true)
-        testee.handleAppLink(urlType, isForMainFrame = true)
-        whenever(mockAppLinksHandler.isUserQuery()).thenReturn(false)
-        whenever(ctaViewModelMockSettingsStore.showAppLinksPrompt).thenReturn(false)
-        verify(mockAppLinksHandler).handleAppLink(eq(true), eq(exampleUrl), eq(false), eq(true), appLinkCaptor.capture())
-        appLinkCaptor.lastValue.invoke()
-        assertCommandIssued<Command.OpenAppLink>()
-        verify(mockAppLinksHandler).setUserQueryState(false)
+        testee.setIsCustomTab(isCustomTab = true, clientPackage = "com.example.app")
+        testee.handleAppLink(urlType, isForMainFrame = true, hasGesture = false)
+        verify(
+            mockAppLinksHandler,
+        ).handleAppLink(eq(true), eq(urlType), eq(false), eq("com.example.app"), eq(false), eq(true), appLinkCaptor.capture())
+    }
+
+    @Test
+    fun whenHandleAppLinkCalledOutsideCustomTabThenNullClientPackageIsForwardedToHandler() {
+        val urlType = SpecialUrlDetector.UrlType.AppLink(uriString = exampleUrl)
+        testee.setIsCustomTab(isCustomTab = false)
+        testee.handleAppLink(urlType, isForMainFrame = true, hasGesture = false)
+        verify(mockAppLinksHandler).handleAppLink(eq(true), eq(urlType), eq(false), eq(null), eq(false), eq(true), appLinkCaptor.capture())
     }
 
     @Test
@@ -5387,6 +5605,7 @@ class BrowserTabViewModelTest {
             contentDisposition = contentDisposition,
             mimeType = mimeType,
             subfolder = "folder",
+            browserMode = BrowserMode.REGULAR,
         )
 
     @Test
@@ -7763,7 +7982,6 @@ class BrowserTabViewModelTest {
     fun whenRefreshCtaAndPatternsDetectedThenSendBreakageRefreshPixels() =
         runTest {
             setBrowserShowing(true)
-            whenever(mockExtendedOnboardingFeatureToggles.noBrowserCtas()).thenReturn(mockDisabledToggle)
             val refreshPatterns = setOf(RefreshPattern.TWICE_IN_12_SECONDS, RefreshPattern.THRICE_IN_20_SECONDS)
             whenever(mockBrokenSitePrompt.getUserRefreshPatterns()).thenReturn(refreshPatterns)
             testee.refreshCta()
@@ -8161,6 +8379,7 @@ class BrowserTabViewModelTest {
                     any(),
                     anyOrNull(),
                     any(),
+                    any(),
                 ),
             ).thenReturn(jsCallbackData)
             testee.processJsCallbackMessage(
@@ -8177,6 +8396,7 @@ class BrowserTabViewModelTest {
                 anyOrNull(),
                 any(),
                 anyOrNull(),
+                any(),
                 any(),
             )
             assertCommandIssued<Command.SendResponseToJs>()
@@ -8195,6 +8415,7 @@ class BrowserTabViewModelTest {
                     any(),
                     anyOrNull(),
                     any(),
+                    any(),
                 ),
             ).thenReturn(null)
             testee.processJsCallbackMessage(
@@ -8211,6 +8432,7 @@ class BrowserTabViewModelTest {
                 anyOrNull(),
                 any(),
                 anyOrNull(),
+                any(),
                 any(),
             )
             assertCommandNotIssued<Command.SendResponseToJs>()
@@ -8284,6 +8506,27 @@ class BrowserTabViewModelTest {
     fun whenOnDuckChatOmnibarButtonClickedWhenOnNtpWithQueryAndWithoutFocusThenOpenDuckChat() {
         testee.onDuckChatOmnibarButtonClicked(query = "example", hasFocus = false, isNtp = true)
         verify(mockDuckChat).openDuckChat()
+    }
+
+    @Test
+    fun whenOnDuckChatOmnibarButtonClickedUnfocusedWithContextualModeThenShowsContextualSheet() {
+        mockDuckAiContextualModeFlow.value = true
+
+        testee.onDuckChatOmnibarButtonClicked(query = "example", hasFocus = false, isNtp = false)
+
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        assertTrue(commandCaptor.allValues.any { it is Command.ShowDuckAIContextualMode })
+    }
+
+    @Test
+    fun whenOnDuckChatOmnibarButtonClickedFocusedWithContextualModeThenOpensDuckChatNotContextualSheet() {
+        mockDuckAiContextualModeFlow.value = true
+
+        testee.onDuckChatOmnibarButtonClicked(query = "example", hasFocus = true, isNtp = false)
+
+        verify(mockDuckChat).openDuckChatWithAutoPrompt(query = "example")
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        assertFalse(commandCaptor.allValues.any { it is Command.ShowDuckAIContextualMode })
     }
 
     @Test
@@ -8814,6 +9057,7 @@ class BrowserTabViewModelTest {
                     any(),
                     any(),
                     any(),
+                    any(),
                 ),
             ).thenReturn(null)
             testee.processJsCallbackMessage(
@@ -9044,6 +9288,83 @@ class BrowserTabViewModelTest {
         testee.onFireMenuSelected(Omnibar.ViewMode.DuckAI)
 
         verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_FIRE_BUTTON_TAPPED)
+    }
+
+    @Test
+    fun whenCustomQuerySubmittedWithBrandDesignSearchBubbleThenSuggestionCustomFired() = runTest {
+        whenever(mockOnboardingStore.getSearchOptions()).thenReturn(emptyList())
+        whenever(mockOmnibarConverter.convertQueryToUrl("my own search", null)).thenReturn("https://duckduckgo.com/?q=my+own+search")
+        val cta = DaxTryASearchBrandDesignUpdateBubbleCta(mockOnboardingStore, mockAppInstallStore, true, mockDeviceInfo)
+        setCta(cta)
+
+        testee.onUserSubmittedQuery("my own search")
+
+        verify(mockOnboardingPixelSender).fireContextual(ONBOARDING_SEARCH, OnboardingPixelAction.SuggestionClicked(fromSuggestion = false))
+    }
+
+    @Test
+    fun whenFireMenuSelectedWithBrandDesignFireCtaThenFireButtonEngageFired() = runTest {
+        val cta =
+            DaxFireButtonBrandDesignUpdateContextualCta(mockOnboardingStore, mockAppInstallStore, isLightTheme = true, deviceInfo = mockDeviceInfo)
+        setCta(cta)
+
+        testee.onFireMenuSelected(Omnibar.ViewMode.Browser(exampleUrl))
+
+        verify(mockOnboardingPixelSender).fireContextual(ONBOARDING_FIRE_BUTTON, OnboardingPixelAction.Clicked(engaged = true))
+    }
+
+    @Test
+    fun whenBrandDesignSerpOkClickedThenEngageFiredButNotDismiss() = runTest {
+        val cta = DaxSerpBrandDesignUpdateContextualCta(mockOnboardingStore, mockAppInstallStore, isLightTheme = true, deviceInfo = mockDeviceInfo)
+        setCta(cta)
+
+        testee.onUserClickCtaOkButton(cta)
+
+        verify(mockOnboardingPixelSender).fireContextual(ONBOARDING_SEARCH_RESULTS, OnboardingPixelAction.Clicked(engaged = true))
+        verify(mockOnboardingPixelSender, never()).fireContextual(ONBOARDING_SEARCH_RESULTS, OnboardingPixelAction.Clicked(engaged = false))
+    }
+
+    @Test
+    fun whenShouldOverrideWithSiteSuggestionsContextualCtaThenSuggestionClickedCustomFired() = runTest {
+        val cta =
+            DaxSiteSuggestionsBrandDesignUpdateContextualCta(
+                mockOnboardingStore,
+                mockAppInstallStore,
+                isLightTheme = true,
+                deviceInfo = mockDeviceInfo,
+            )
+        setCta(cta)
+
+        testee.onShouldOverride()
+
+        verify(mockOnboardingPixelSender).fireContextual(ONBOARDING_VISIT_SITE, OnboardingPixelAction.SuggestionClicked(fromSuggestion = false))
+    }
+
+    @Test
+    fun whenPrivacyShieldSelectedWithBrandDesignTrackersBlockedCtaThenClickedEngageFired() = runTest {
+        val cta = DaxTrackersBlockedBrandDesignUpdateContextualCta(
+            mockOnboardingStore,
+            mockAppInstallStore,
+            emptyList(),
+            mockSettingsDataStore,
+            isLightTheme = true,
+            deviceInfo = mockDeviceInfo,
+        )
+        setCta(cta)
+
+        testee.onPrivacyShieldSelected()
+
+        verify(mockOnboardingPixelSender).fireContextual(ONBOARDING_TRACKERS_BLOCKED, OnboardingPixelAction.Clicked(engaged = true))
+    }
+
+    @Test
+    fun whenPrivacyShieldSelectedWithUnrelatedCtaThenNoPixelFired() = runTest {
+        val cta = DaxSerpBrandDesignUpdateContextualCta(mockOnboardingStore, mockAppInstallStore, isLightTheme = true, deviceInfo = mockDeviceInfo)
+        setCta(cta)
+
+        testee.onPrivacyShieldSelected()
+
+        verifyNoInteractions(mockOnboardingPixelSender)
     }
 
     @Test
@@ -9726,7 +10047,6 @@ class BrowserTabViewModelTest {
     }
 
     private suspend fun givenFireButtonPulsing() {
-        whenever(mockExtendedOnboardingFeatureToggles.noBrowserCtas()).thenReturn(mockEnabledToggle)
         whenever(mockUserStageStore.getUserAppStage()).thenReturn(AppStage.DAX_ONBOARDING)
         dismissedCtaDaoChannel.send(listOf(DismissedCta(DAX_DIALOG_TRACKERS_FOUND)))
     }
@@ -10190,6 +10510,26 @@ class BrowserTabViewModelTest {
         whenever(mockDuckChatJSHelper.onNativeAction(NativeAction.SIDEBAR)).thenReturn(expectedEvent)
 
         testee.openDuckChatSidebar()
+
+        testee.subscriptionEventDataFlow.test {
+            val emittedEvent = awaitItem()
+            assertEquals(expectedEvent.featureName, emittedEvent.featureName)
+            assertEquals(expectedEvent.subscriptionName, emittedEvent.subscriptionName)
+            assertEquals(expectedEvent.params.toString(), emittedEvent.params.toString())
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenCustomizeResponsesClickedThenSubscriptionEventEmitted() = runTest {
+        val expectedEvent = SubscriptionEventData(
+            featureName = "aiChat",
+            subscriptionName = "submitCustomizeResponsesAction",
+            params = JSONObject(),
+        )
+        whenever(mockDuckChatJSHelper.onNativeAction(NativeAction.CUSTOMIZE_RESPONSES)).thenReturn(expectedEvent)
+
+        testee.onCustomizeResponsesClicked()
 
         testee.subscriptionEventDataFlow.test {
             val emittedEvent = awaitItem()
@@ -10761,6 +11101,40 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenOnSiteVisitedInRegularModeThenSavedToHistory() = runTest {
+        browserMode = BrowserMode.REGULAR
+        resetChannels()
+        initialiseViewModel()
+
+        testee.onSiteVisited("https://sub.example.com/path", null)
+
+        verify(mockNavigationHistory).saveToHistory("https://sub.example.com/path", null, "abc")
+    }
+
+    @Test
+    fun whenOnSiteVisitedInFireModeThenNotSavedToHistory() = runTest {
+        browserMode = BrowserMode.FIRE
+        resetChannels()
+        initialiseViewModel()
+
+        testee.onSiteVisited("https://sub.example.com/path", null)
+
+        verify(mockNavigationHistory, never()).saveToHistory(any(), anyOrNull(), any())
+    }
+
+    @Test
+    fun whenOnSiteVisitedInFireModeThenVisitedSiteStillRecordedForBurnScope() = runTest {
+        fakeAndroidConfigBrowserFeature.singleTabFireDialog().setRawStoredState(State(enable = true))
+        browserMode = BrowserMode.FIRE
+        resetChannels()
+        initialiseViewModel()
+
+        testee.onSiteVisited("https://sub.example.com/path", null)
+
+        verify(mockTabVisitedSitesRepository).recordVisitedSite("abc", "example.com")
+    }
+
+    @Test
     fun whenProgressExceedsFixedProgressFirstTimeThenManagerOnProgressChangedCalled() {
         val testUrl = "https://example.com"
         val mockWebHistoryItem: WebHistoryItem = mock()
@@ -10873,7 +11247,9 @@ class BrowserTabViewModelTest {
     fun whenPdfEnabledAndApi31ThenDownloadToCacheAndEmitShowPdfCommand() = runTest {
         whenever(mockInlinePdfHandler.classifyPdfRequest(any(), anyOrNull(), any())).thenReturn(PdfRenderDecision.Inline)
         val testUri = Uri.parse("file:///cache/test.pdf")
-        whenever(mockInlinePdfHandler.downloadToCache("https://example.com/doc.pdf")).thenReturn(PdfDownloadResult.Success(testUri))
+        whenever(
+            mockInlinePdfHandler.downloadToCache("https://example.com/doc.pdf", browserMode = BrowserMode.REGULAR),
+        ).thenReturn(PdfDownloadResult.Success(testUri))
         val webView: WebView = mock()
 
         testee.requestFileDownload(webView, "https://example.com/doc.pdf", null, "application/pdf", true, false)
@@ -10887,7 +11263,9 @@ class BrowserTabViewModelTest {
     @Test
     fun whenPdfDownloadToCacheFailsThenFallbackToStandardDownload() = runTest {
         whenever(mockInlinePdfHandler.classifyPdfRequest(any(), anyOrNull(), any())).thenReturn(PdfRenderDecision.Inline)
-        whenever(mockInlinePdfHandler.downloadToCache("https://example.com/doc.pdf")).thenReturn(PdfDownloadResult.Failure(PdfErrorType.UNKNOWN))
+        whenever(
+            mockInlinePdfHandler.downloadToCache("https://example.com/doc.pdf", browserMode = BrowserMode.REGULAR),
+        ).thenReturn(PdfDownloadResult.Failure(PdfErrorType.UNKNOWN))
         val webView: WebView = mock()
 
         testee.requestFileDownload(webView, "https://example.com/doc.pdf", null, "application/pdf", true, false)
@@ -10899,7 +11277,9 @@ class BrowserTabViewModelTest {
     fun whenPdfInlineThenExpandOmnibarCommandIsEmitted() = runTest {
         whenever(mockInlinePdfHandler.classifyPdfRequest(any(), anyOrNull(), any())).thenReturn(PdfRenderDecision.Inline)
         val testUri = Uri.parse("file:///cache/test.pdf")
-        whenever(mockInlinePdfHandler.downloadToCache("https://example.com/doc.pdf")).thenReturn(PdfDownloadResult.Success(testUri))
+        whenever(
+            mockInlinePdfHandler.downloadToCache("https://example.com/doc.pdf", browserMode = BrowserMode.REGULAR),
+        ).thenReturn(PdfDownloadResult.Success(testUri))
         val webView: WebView = mock()
 
         testee.requestFileDownload(webView, "https://example.com/doc.pdf", null, "application/pdf", true, false)
@@ -10911,7 +11291,9 @@ class BrowserTabViewModelTest {
     fun whenPdfDownloadStartsThenLoadingStateShowsProgress() = runTest {
         whenever(mockInlinePdfHandler.classifyPdfRequest(any(), anyOrNull(), any())).thenReturn(PdfRenderDecision.Inline)
         val testUri = Uri.parse("file:///cache/test.pdf")
-        whenever(mockInlinePdfHandler.downloadToCache("https://example.com/doc.pdf")).thenReturn(PdfDownloadResult.Success(testUri))
+        whenever(
+            mockInlinePdfHandler.downloadToCache("https://example.com/doc.pdf", browserMode = BrowserMode.REGULAR),
+        ).thenReturn(PdfDownloadResult.Success(testUri))
         val webView: WebView = mock()
 
         testee.requestFileDownload(webView, "https://example.com/doc.pdf", null, "application/pdf", true, false)
@@ -10923,7 +11305,9 @@ class BrowserTabViewModelTest {
     @Test
     fun whenPdfDownloadFailsThenLoadingStateIsReset() = runTest {
         whenever(mockInlinePdfHandler.classifyPdfRequest(any(), anyOrNull(), any())).thenReturn(PdfRenderDecision.Inline)
-        whenever(mockInlinePdfHandler.downloadToCache("https://example.com/doc.pdf")).thenReturn(PdfDownloadResult.Failure(PdfErrorType.UNKNOWN))
+        whenever(
+            mockInlinePdfHandler.downloadToCache("https://example.com/doc.pdf", browserMode = BrowserMode.REGULAR),
+        ).thenReturn(PdfDownloadResult.Failure(PdfErrorType.UNKNOWN))
         val webView: WebView = mock()
 
         testee.requestFileDownload(webView, "https://example.com/doc.pdf", null, "application/pdf", true, false)
@@ -10951,7 +11335,9 @@ class BrowserTabViewModelTest {
     fun whenPdfWithContentDispositionInlineThenShowPdf() = runTest {
         whenever(mockInlinePdfHandler.classifyPdfRequest(any(), anyOrNull(), any())).thenReturn(PdfRenderDecision.Inline)
         val testUri = Uri.parse("file:///cache/test.pdf")
-        whenever(mockInlinePdfHandler.downloadToCache("https://example.com/doc.pdf")).thenReturn(PdfDownloadResult.Success(testUri))
+        whenever(
+            mockInlinePdfHandler.downloadToCache("https://example.com/doc.pdf", browserMode = BrowserMode.REGULAR),
+        ).thenReturn(PdfDownloadResult.Success(testUri))
         val webView: WebView = mock()
 
         testee.requestFileDownload(webView, "https://example.com/doc.pdf", "inline", "application/pdf", true, false)
@@ -10974,7 +11360,7 @@ class BrowserTabViewModelTest {
     fun whenPdfDownloadInProgressAndUserNavigatesAwayThenShowPdfNotEmitted() = runTest {
         whenever(mockInlinePdfHandler.classifyPdfRequest(any(), anyOrNull(), any())).thenReturn(PdfRenderDecision.Inline)
         // Return COROUTINE_SUSPENDED to simulate a long-running download that never completes
-        whenever(mockInlinePdfHandler.downloadToCache("https://example.com/doc.pdf")).thenAnswer {
+        whenever(mockInlinePdfHandler.downloadToCache("https://example.com/doc.pdf", browserMode = BrowserMode.REGULAR)).thenAnswer {
             COROUTINE_SUSPENDED
         }
         val webView: WebView = mock()
@@ -10999,10 +11385,10 @@ class BrowserTabViewModelTest {
 
         // First download hangs forever; second resolves immediately. ConflatedJob should
         // ensure only the second one's command is emitted.
-        whenever(mockInlinePdfHandler.downloadToCache(urlA)).thenAnswer {
+        whenever(mockInlinePdfHandler.downloadToCache(urlA, browserMode = BrowserMode.REGULAR)).thenAnswer {
             COROUTINE_SUSPENDED
         }
-        whenever(mockInlinePdfHandler.downloadToCache(urlB)).thenReturn(PdfDownloadResult.Success(uriB))
+        whenever(mockInlinePdfHandler.downloadToCache(urlB, browserMode = BrowserMode.REGULAR)).thenReturn(PdfDownloadResult.Success(uriB))
         val webView: WebView = mock()
 
         testee.requestFileDownload(webView, urlA, null, "application/pdf", true, false)
@@ -11020,7 +11406,7 @@ class BrowserTabViewModelTest {
         whenever(mockInlinePdfHandler.classifyPdfRequest(any(), anyOrNull(), any())).thenReturn(PdfRenderDecision.Inline)
         val url = "https://example.com/doc.pdf"
         val cachedUri = Uri.parse("file:///cache/doc.pdf")
-        whenever(mockInlinePdfHandler.downloadToCache(url)).thenReturn(PdfDownloadResult.Success(cachedUri))
+        whenever(mockInlinePdfHandler.downloadToCache(url, browserMode = BrowserMode.REGULAR)).thenReturn(PdfDownloadResult.Success(cachedUri))
         whenever(mockInlinePdfHandler.extractFileName(url)).thenReturn("doc.pdf")
         val webView: WebView = mock()
 
@@ -11034,7 +11420,9 @@ class BrowserTabViewModelTest {
     fun whenPdfShownAfterFreshViewModelThenPerPageMenuFlagsArePopulated() = runTest {
         whenever(mockInlinePdfHandler.classifyPdfRequest(any(), anyOrNull(), any())).thenReturn(PdfRenderDecision.Inline)
         val url = "https://example.com/doc.pdf"
-        whenever(mockInlinePdfHandler.downloadToCache(url)).thenReturn(PdfDownloadResult.Success(Uri.parse("file:///cache/doc.pdf")))
+        whenever(
+            mockInlinePdfHandler.downloadToCache(url, browserMode = BrowserMode.REGULAR),
+        ).thenReturn(PdfDownloadResult.Success(Uri.parse("file:///cache/doc.pdf")))
         whenever(mockInlinePdfHandler.extractFileName(url)).thenReturn("doc.pdf")
         testee.browserViewState.value = browserViewState().copy(
             canSaveSite = false,
@@ -11063,7 +11451,9 @@ class BrowserTabViewModelTest {
     fun whenPdfShownThenPrivacyShieldEnabled() = runTest {
         whenever(mockInlinePdfHandler.classifyPdfRequest(any(), anyOrNull(), any())).thenReturn(PdfRenderDecision.Inline)
         val url = "https://example.com/doc.pdf"
-        whenever(mockInlinePdfHandler.downloadToCache(url)).thenReturn(PdfDownloadResult.Success(Uri.parse("file:///cache/doc.pdf")))
+        whenever(
+            mockInlinePdfHandler.downloadToCache(url, browserMode = BrowserMode.REGULAR),
+        ).thenReturn(PdfDownloadResult.Success(Uri.parse("file:///cache/doc.pdf")))
         whenever(mockInlinePdfHandler.extractFileName(url)).thenReturn("doc.pdf")
         testee.browserViewState.value = browserViewState().copy(
             showPrivacyShield = HighlightableButton.Visible(enabled = false),
@@ -11079,7 +11469,7 @@ class BrowserTabViewModelTest {
         whenever(mockInlinePdfHandler.classifyPdfRequest(any(), anyOrNull(), any())).thenReturn(PdfRenderDecision.Inline)
         val url = "https://example.com/doc.pdf"
         val certificate: SslCertificate = mock()
-        whenever(mockInlinePdfHandler.downloadToCache(url))
+        whenever(mockInlinePdfHandler.downloadToCache(url, browserMode = BrowserMode.REGULAR))
             .thenReturn(PdfDownloadResult.Success(Uri.parse("file:///cache/doc.pdf"), certificate))
         whenever(mockInlinePdfHandler.extractFileName(url)).thenReturn("doc.pdf")
 
@@ -11092,7 +11482,7 @@ class BrowserTabViewModelTest {
     fun whenPdfDownloadHasNoCertificateThenSiteCertificateRemainsNull() = runTest {
         whenever(mockInlinePdfHandler.classifyPdfRequest(any(), anyOrNull(), any())).thenReturn(PdfRenderDecision.Inline)
         val url = "https://example.com/doc.pdf"
-        whenever(mockInlinePdfHandler.downloadToCache(url))
+        whenever(mockInlinePdfHandler.downloadToCache(url, browserMode = BrowserMode.REGULAR))
             .thenReturn(PdfDownloadResult.Success(Uri.parse("file:///cache/doc.pdf"), certificate = null))
         whenever(mockInlinePdfHandler.extractFileName(url)).thenReturn("doc.pdf")
 
@@ -11117,7 +11507,7 @@ class BrowserTabViewModelTest {
     fun whenPdfReopenedAfterUserAllowListedThenShieldShowsUnprotected() = runTest {
         whenever(mockInlinePdfHandler.classifyPdfRequest(any(), anyOrNull(), any())).thenReturn(PdfRenderDecision.Inline)
         val pdfUrl = "https://www.example.com/doc.pdf"
-        whenever(mockInlinePdfHandler.downloadToCache(pdfUrl))
+        whenever(mockInlinePdfHandler.downloadToCache(pdfUrl, browserMode = BrowserMode.REGULAR))
             .thenReturn(PdfDownloadResult.Success(Uri.parse("file:///cache/doc.pdf")))
         whenever(mockInlinePdfHandler.extractFileName(pdfUrl)).thenReturn("doc.pdf")
         // Domain is already in the user allow list (user disabled protection in a previous session).
@@ -11157,12 +11547,14 @@ class BrowserTabViewModelTest {
             currentPdfCachedUri = Uri.parse("file:///cache/doc.pdf"),
             currentPdfFileName = "doc.pdf",
         )
-        whenever(mockInlinePdfHandler.downloadToCache(pdfUrl, forceRefresh = true)).thenReturn(PdfDownloadResult.Success(refreshedUri))
+        whenever(
+            mockInlinePdfHandler.downloadToCache(pdfUrl, forceRefresh = true, browserMode = BrowserMode.REGULAR),
+        ).thenReturn(PdfDownloadResult.Success(refreshedUri))
 
         testee.onRefreshRequested(triggeredByUser = true)
         advanceUntilIdle()
 
-        verify(mockInlinePdfHandler).downloadToCache(pdfUrl, forceRefresh = true)
+        verify(mockInlinePdfHandler).downloadToCache(pdfUrl, forceRefresh = true, browserMode = BrowserMode.REGULAR)
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         val lastShowPdf = commandCaptor.allValues.filterIsInstance<Command.ShowPdfInTab>().last()
         assertEquals(pdfUrl, lastShowPdf.url)
@@ -11179,7 +11571,7 @@ class BrowserTabViewModelTest {
         advanceUntilIdle()
 
         assertCommandIssued<NavigationCommand.Refresh>()
-        verify(mockInlinePdfHandler, never()).downloadToCache(any(), eq(true))
+        verify(mockInlinePdfHandler, never()).downloadToCache(any(), eq(true), any())
     }
 
     @Test
@@ -11191,7 +11583,9 @@ class BrowserTabViewModelTest {
             currentPdfCachedUri = originalUri,
             currentPdfFileName = "doc.pdf",
         )
-        whenever(mockInlinePdfHandler.downloadToCache(pdfUrl, forceRefresh = true)).thenReturn(PdfDownloadResult.Failure(PdfErrorType.IO_ERROR))
+        whenever(
+            mockInlinePdfHandler.downloadToCache(pdfUrl, forceRefresh = true, browserMode = BrowserMode.REGULAR),
+        ).thenReturn(PdfDownloadResult.Failure(PdfErrorType.IO_ERROR))
 
         testee.onRefreshRequested(triggeredByUser = true)
         advanceUntilIdle()
@@ -11436,7 +11830,7 @@ class BrowserTabViewModelTest {
     fun whenPdfRenderedInlineThenAllThreeOpenedPixelsFire() = runTest {
         whenever(mockInlinePdfHandler.classifyPdfRequest(any(), anyOrNull(), any())).thenReturn(PdfRenderDecision.Inline)
         val testUri = Uri.parse("file:///cache/doc.pdf")
-        whenever(mockInlinePdfHandler.downloadToCache("https://example.com/doc.pdf"))
+        whenever(mockInlinePdfHandler.downloadToCache("https://example.com/doc.pdf", browserMode = BrowserMode.REGULAR))
             .thenReturn(PdfDownloadResult.Success(testUri))
 
         testee.requestFileDownload(mock(), "https://example.com/doc.pdf", null, "application/pdf", true, false)
@@ -11449,7 +11843,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenPdfDownloadFailsWithIoErrorThenRenderFailurePixelFiresWithErrorType() = runTest {
         whenever(mockInlinePdfHandler.classifyPdfRequest(any(), anyOrNull(), any())).thenReturn(PdfRenderDecision.Inline)
-        whenever(mockInlinePdfHandler.downloadToCache("https://example.com/doc.pdf"))
+        whenever(mockInlinePdfHandler.downloadToCache("https://example.com/doc.pdf", browserMode = BrowserMode.REGULAR))
             .thenReturn(PdfDownloadResult.Failure(PdfErrorType.IO_ERROR))
 
         testee.requestFileDownload(mock(), "https://example.com/doc.pdf", null, "application/pdf", true, false)
@@ -11460,7 +11854,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenPdfDownloadFailsWithUnknownThenRenderFailurePixelFiresWithUnknownErrorType() = runTest {
         whenever(mockInlinePdfHandler.classifyPdfRequest(any(), anyOrNull(), any())).thenReturn(PdfRenderDecision.Inline)
-        whenever(mockInlinePdfHandler.downloadToCache("https://example.com/doc.pdf"))
+        whenever(mockInlinePdfHandler.downloadToCache("https://example.com/doc.pdf", browserMode = BrowserMode.REGULAR))
             .thenReturn(PdfDownloadResult.Failure(PdfErrorType.UNKNOWN))
 
         testee.requestFileDownload(mock(), "https://example.com/doc.pdf", null, "application/pdf", true, false)
@@ -11499,7 +11893,9 @@ class BrowserTabViewModelTest {
         whenever(mockPdfDownloadTooltipDataStore.canShow()).thenReturn(true)
         whenever(mockInlinePdfHandler.classifyPdfRequest(any(), anyOrNull(), any())).thenReturn(PdfRenderDecision.Inline)
         val testUri = Uri.parse("file:///cache/test.pdf")
-        whenever(mockInlinePdfHandler.downloadToCache("https://example.com/test.pdf")).thenReturn(PdfDownloadResult.Success(testUri))
+        whenever(
+            mockInlinePdfHandler.downloadToCache("https://example.com/test.pdf", browserMode = BrowserMode.REGULAR),
+        ).thenReturn(PdfDownloadResult.Success(testUri))
         whenever(mockInlinePdfHandler.extractFileName("https://example.com/test.pdf")).thenReturn("test.pdf")
 
         testee.requestFileDownload(mock(), "https://example.com/test.pdf", null, "application/pdf", true, false)
@@ -11513,7 +11909,9 @@ class BrowserTabViewModelTest {
         whenever(mockPdfDownloadTooltipDataStore.canShow()).thenReturn(false)
         whenever(mockInlinePdfHandler.classifyPdfRequest(any(), anyOrNull(), any())).thenReturn(PdfRenderDecision.Inline)
         val testUri = Uri.parse("file:///cache/test.pdf")
-        whenever(mockInlinePdfHandler.downloadToCache("https://example.com/test.pdf")).thenReturn(PdfDownloadResult.Success(testUri))
+        whenever(
+            mockInlinePdfHandler.downloadToCache("https://example.com/test.pdf", browserMode = BrowserMode.REGULAR),
+        ).thenReturn(PdfDownloadResult.Success(testUri))
         whenever(mockInlinePdfHandler.extractFileName("https://example.com/test.pdf")).thenReturn("test.pdf")
 
         testee.requestFileDownload(mock(), "https://example.com/test.pdf", null, "application/pdf", true, false)
@@ -11525,7 +11923,9 @@ class BrowserTabViewModelTest {
     @Test
     fun whenInlinePdfDownloadFailsThenTooltipCommandIsNotEmittedAndStoreIsNotIncremented() = runTest {
         whenever(mockInlinePdfHandler.classifyPdfRequest(any(), anyOrNull(), any())).thenReturn(PdfRenderDecision.Inline)
-        whenever(mockInlinePdfHandler.downloadToCache("https://example.com/test.pdf")).thenReturn(PdfDownloadResult.Failure(PdfErrorType.IO_ERROR))
+        whenever(
+            mockInlinePdfHandler.downloadToCache("https://example.com/test.pdf", browserMode = BrowserMode.REGULAR),
+        ).thenReturn(PdfDownloadResult.Failure(PdfErrorType.IO_ERROR))
 
         testee.requestFileDownload(mock(), "https://example.com/test.pdf", null, "application/pdf", true, false)
 
@@ -11539,7 +11939,9 @@ class BrowserTabViewModelTest {
         whenever(mockPdfDownloadTooltipDataStore.canShow()).thenReturn(true)
         whenever(mockInlinePdfHandler.classifyPdfRequest(any(), anyOrNull(), any())).thenReturn(PdfRenderDecision.Inline)
         val testUri = Uri.parse("file:///cache/test.pdf")
-        whenever(mockInlinePdfHandler.downloadToCache("https://example.com/test.pdf")).thenReturn(PdfDownloadResult.Success(testUri))
+        whenever(
+            mockInlinePdfHandler.downloadToCache("https://example.com/test.pdf", browserMode = BrowserMode.REGULAR),
+        ).thenReturn(PdfDownloadResult.Success(testUri))
         whenever(mockInlinePdfHandler.extractFileName("https://example.com/test.pdf")).thenReturn("test.pdf")
 
         testee.requestFileDownload(mock(), "https://example.com/test.pdf", null, "application/pdf", true, false)

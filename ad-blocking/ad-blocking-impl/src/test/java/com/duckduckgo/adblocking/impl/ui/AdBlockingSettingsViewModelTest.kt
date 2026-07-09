@@ -17,6 +17,12 @@
 package com.duckduckgo.adblocking.impl.ui
 
 import app.cash.turbine.test
+import com.duckduckgo.adblocking.api.duckplayer.DuckPlayer
+import com.duckduckgo.adblocking.api.duckplayer.DuckPlayer.UserPreferences
+import com.duckduckgo.adblocking.api.duckplayer.PrivatePlayerMode
+import com.duckduckgo.adblocking.api.duckplayer.PrivatePlayerMode.AlwaysAsk
+import com.duckduckgo.adblocking.api.duckplayer.PrivatePlayerMode.Disabled
+import com.duckduckgo.adblocking.api.duckplayer.PrivatePlayerMode.Enabled
 import com.duckduckgo.adblocking.impl.AdBlockingPixelNames
 import com.duckduckgo.adblocking.impl.AdBlockingSettingsRepository
 import com.duckduckgo.adblocking.impl.domain.AdBlockingState
@@ -42,8 +48,15 @@ class AdBlockingSettingsViewModelTest {
     private val statusChecker: AdBlockingStatusChecker = mock()
     private val repository: AdBlockingSettingsRepository = mock()
     private val pixel: Pixel = mock()
+    private val duckPlayer: DuckPlayer = mock()
 
-    private fun createViewModel() = AdBlockingSettingsViewModel(statusChecker, repository, pixel)
+    private fun createViewModel(duckPlayerMode: PrivatePlayerMode = AlwaysAsk): AdBlockingSettingsViewModel {
+        whenever(duckPlayer.observeUserPreferences()).thenReturn(flowOf(userPreferences(duckPlayerMode)))
+        return AdBlockingSettingsViewModel(statusChecker, repository, pixel, duckPlayer)
+    }
+
+    private fun userPreferences(privatePlayerMode: PrivatePlayerMode) =
+        UserPreferences(overlayInteracted = false, privatePlayerMode = privatePlayerMode)
 
     @Test
     fun whenEnabledByDefaultThenDoesNotShowConsentDescription() = runTest {
@@ -75,6 +88,24 @@ class AdBlockingSettingsViewModelTest {
             val state = expectMostRecentItem()
             assertFalse(state.isEnabled)
             assertEquals(true, state.showConsentDescription)
+        }
+    }
+
+    @Test
+    fun whenDuckPlayerModeIsEnabledThenViewStateReflectsIt() = runTest {
+        whenever(statusChecker.observeState()).thenReturn(flowOf(AdBlockingState.Enabled.Default))
+
+        createViewModel(duckPlayerMode = Enabled).viewState.test {
+            assertEquals(Enabled, expectMostRecentItem().duckPlayerMode)
+        }
+    }
+
+    @Test
+    fun whenDuckPlayerModeIsDisabledThenViewStateReflectsIt() = runTest {
+        whenever(statusChecker.observeState()).thenReturn(flowOf(AdBlockingState.Enabled.Default))
+
+        createViewModel(duckPlayerMode = Disabled).viewState.test {
+            assertEquals(Disabled, expectMostRecentItem().duckPlayerMode)
         }
     }
 

@@ -123,7 +123,7 @@ class ManageRecentAppsProtectionActivity :
     private fun configureEdgeToEdgeInsets() {
         edgeToEdgeHandler.applyHorizontalSystemBarInsets(binding.rootContainer)
         edgeToEdgeHandler.applyStatusBarInsets(binding.includeToolbar.appBarLayout)
-        edgeToEdgeHandler.applyNavigationBarInsets(binding.contentScrollView, drawBehindGestureNav = true)
+        edgeToEdgeHandler.applyScrollableNavigationBarInsets(binding.contentScrollView)
     }
 
     override fun onDestroy() {

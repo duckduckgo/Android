@@ -805,7 +805,6 @@ class RealSubscriptionsManager @Inject constructor(
                         }
 
                         StoreLoginResult.Failure.AccountExternalIdMismatch,
-                        StoreLoginResult.Failure.PurchaseHistoryNotAvailable,
                         StoreLoginResult.Failure.AuthenticationError,
                         StoreLoginResult.Failure.NoActivePurchase,
                         -> {
@@ -941,16 +940,10 @@ class RealSubscriptionsManager @Inject constructor(
 
     private suspend fun storeLogin(accountExternalId: String? = null): StoreLoginResult {
         return try {
-            val signedPurchase = if (subscriptionsFeature.get().useQueryPurchases().isEnabled()) {
-                when (val result = playBillingManager.getLatestPurchase()) {
-                    is LatestPurchaseResult.Present -> SignedPurchase(result.purchase.signature, result.purchase.originalJson)
-                    LatestPurchaseResult.Absent -> return StoreLoginResult.Failure.NoActivePurchase
-                    is LatestPurchaseResult.Unknown -> return StoreLoginResult.Failure.PurchaseInfoNotAvailable(cause = result.cause)
-                }
-            } else {
-                playBillingManager.purchaseHistory.lastOrNull()
-                    ?.let { SignedPurchase(it.signature, it.originalJson) }
-                    ?: return StoreLoginResult.Failure.PurchaseHistoryNotAvailable
+            val signedPurchase = when (val result = playBillingManager.getLatestPurchase()) {
+                is LatestPurchaseResult.Present -> SignedPurchase(result.purchase.signature, result.purchase.originalJson)
+                LatestPurchaseResult.Absent -> return StoreLoginResult.Failure.NoActivePurchase
+                is LatestPurchaseResult.Unknown -> return StoreLoginResult.Failure.PurchaseInfoNotAvailable(cause = result.cause)
             }
 
             val codeVerifier = pkceGenerator.generateCodeVerifier()
@@ -1342,7 +1335,6 @@ class RealSubscriptionsManager @Inject constructor(
     private sealed class StoreLoginResult {
         data class Success(val tokens: ValidatedTokenPair) : StoreLoginResult()
         sealed class Failure : StoreLoginResult() {
-            data object PurchaseHistoryNotAvailable : Failure()
             data object NoActivePurchase : Failure()
             data class PurchaseInfoNotAvailable(val cause: String) : Failure()
             data object AccountExternalIdMismatch : Failure()

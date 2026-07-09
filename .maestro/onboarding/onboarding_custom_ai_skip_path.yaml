@@ -1,0 +1,26 @@
+appId: com.duckduckgo.mobile.android
+name: "Onboarding: Custom AI flow triggered by a referrer parameter (skip path)"
+tags:
+  - onboardingInternalTest
+---
+- retry:
+    maxRetries: 3
+    commands:
+      # First launch as a fresh install
+      - launchApp:
+          clearState: true
+      # Wait for the welcome dialog so we create the reinstaller marker before relaunch
+      - assertVisible:
+          text: "Let's get started!"
+      # Relaunch with app data cleared
+      - launchApp:
+          clearState: true
+          arguments:
+            isMaestro: "true"
+            referrer: "onboarding=ai"
+      - assertVisible:
+          text: "Ready to chat privately with ChatGPT, Claude, and other AIs.*"
+      - tapOn: "I've been here before"
+      - tapOn: "Start AI Chat"
+      - assertVisible:
+          text: "Ask anything privately.*"

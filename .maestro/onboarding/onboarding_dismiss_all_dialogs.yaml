@@ -12,12 +12,10 @@ tags:
       - launchApp:
           clearState: true
       - runFlow: ../shared/pre_onboarding.yaml
-      - assertVisible:
-          id: "daxDialogDismissButton|brandDesignDismissButton"
       - tapOn:
-          id: "daxDialogDismissButton|brandDesignDismissButton"
-      - assertVisible:
-          id: ddgLogo
+          id: "daxDialogDismissButton|contextualBrandDesignDismissButton"
+      - tapOn:
+          id: "omnibarTextInput"
       - inputText: "https://www.search-company.site/#ad-id-14"
       - pressKey: Enter
       - assertVisible:

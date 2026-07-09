@@ -20,6 +20,8 @@ import com.duckduckgo.autofill.api.AutofillFeature
 import com.duckduckgo.autofill.impl.importing.capability.ImportGooglePasswordsCapabilityChecker
 import com.duckduckgo.autofill.impl.store.InternalAutofillStore
 import com.duckduckgo.autofill.impl.store.NeverSavedSiteRepository
+import com.duckduckgo.browsermode.api.BrowserMode
+import com.duckduckgo.browsermode.api.BrowserModeStateHolder
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
@@ -45,6 +47,7 @@ class RealInBrowserImportPromo @Inject constructor(
     private val autofillFeature: AutofillFeature,
     private val importPasswordCapabilityChecker: ImportGooglePasswordsCapabilityChecker,
     private val inBrowserPromoPreviousPromptsStore: InBrowserPromoPreviousPromptsStore,
+    private val browserModeStateHolder: BrowserModeStateHolder,
 ) : InBrowserImportPromo {
 
     override suspend fun canShowPromo(
@@ -53,6 +56,11 @@ class RealInBrowserImportPromo @Inject constructor(
     ): Boolean {
         return withContext(dispatchers.io()) {
             if (credentialsAvailableForCurrentPage) {
+                return@withContext false
+            }
+
+            // Fire mode is an ephemeral session and never offers to import passwords from Google.
+            if (browserModeStateHolder.currentMode.value == BrowserMode.FIRE) {
                 return@withContext false
             }
 

@@ -80,6 +80,7 @@ class NewUserBrowserOnboardingViewModel @Inject constructor(
                 is NewUserBrowserActivityAction.RunDuckAiOnboardingDemo -> {
                     val url = duckChat.getDuckChatUrl(action.prompt, autoPrompt = true) + "&flow=mobile-app-onboarding"
                     _commands.send(Command.OpenDuckAiOnboardingDemo(url))
+                    orchestrator.onEvent(NewUserOnboardingEvent.Presented)
                 }
             }
         }

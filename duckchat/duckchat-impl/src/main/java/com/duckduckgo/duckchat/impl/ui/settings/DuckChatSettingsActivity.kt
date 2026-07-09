@@ -21,7 +21,9 @@ import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
 import android.view.View
+import android.view.ViewGroup
 import android.widget.CompoundButton
+import androidx.annotation.StringRes
 import androidx.core.content.ContextCompat
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
@@ -51,9 +53,12 @@ import com.duckduckgo.duckchat.api.DuckChatNativeSettingsNoParams
 import com.duckduckgo.duckchat.api.DuckChatSettingsNoParams
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.databinding.ActivityDuckChatSettingsBinding
+import com.duckduckgo.duckchat.impl.databinding.IncludeDuckAiInputScreenSettingsBinding
 import com.duckduckgo.duckchat.impl.inputscreen.ui.metrics.discovery.InputScreenDiscoveryFunnel
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_SETTINGS_DISPLAYED
 import com.duckduckgo.duckchat.impl.store.DefaultTogglePosition
+import com.duckduckgo.duckchat.impl.store.HideAiGeneratedImages
+import com.duckduckgo.duckchat.impl.store.SearchAssistVisibility
 import com.duckduckgo.duckchat.impl.store.getDefaultTogglePositionForIndex
 import com.duckduckgo.duckchat.impl.ui.settings.DuckChatSettingsViewModel.DuckChatSettingsViewModelFactory
 import com.duckduckgo.duckchat.impl.ui.settings.DuckChatSettingsViewModel.ViewState
@@ -75,6 +80,12 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
     lateinit var duckChatSettingsViewModelFactory: DuckChatSettingsViewModelFactory
 
     private val binding: ActivityDuckChatSettingsBinding by viewBinding()
+
+    private val inputScreenSettingsBinding: IncludeDuckAiInputScreenSettingsBinding
+        get() = binding.inputScreenSettings
+
+    // Guards the one-time relocation of the input screen settings block to the end of the layout.
+    private var inputScreenSettingsMovedToEnd = false
 
     private val viewModel by lazy {
         val activityParams = intent.getActivityParams(GlobalActivityStarter.ActivityParams::class.java)!!
@@ -158,17 +169,46 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
     }
 
     private fun renderViewState(viewState: ViewState) {
+        if (viewState.isNativeControlsEnabled) {
+            moveInputScreenSettingsToEnd()
+        }
+
+        binding.duckAINoAiItem.isVisible = viewState.isNativeControlsEnabled
+        // The item represents "turn everything off". Once Duck.ai is off, Search Assist is Never and
+        // AI-generated images are hidden, there is nothing left to do, so it's greyed out, non-tappable,
+        // and explains why. Re-enabling any of the three makes it actionable again.
+        binding.duckAINoAiItem.isEnabled = viewState.isUseWithoutAiActionEnabled
+        binding.duckAINoAiItem.setSecondaryText(
+            if (viewState.isUseWithoutAiActionEnabled) {
+                getString(R.string.duckAiUseWithoutAiDescription)
+            } else {
+                getString(R.string.duckAiUseWithoutAiDisabledDescription)
+            },
+        )
+        binding.duckAINoAiItem.setOnClickListener {
+            viewModel.onUseWithoutAiClicked()
+        }
+
+        // The Duck.ai section header and its top divider are only shown when the block lives at the end of the
+        // layout (native controls enabled) and Duck.ai is enabled by the user.
+        val showDuckAiSectionHeader = viewState.isNativeControlsEnabled && viewState.isDuckChatUserEnabled
+        inputScreenSettingsBinding.duckAiSectionTopDivider.isVisible = showDuckAiSectionHeader
+        inputScreenSettingsBinding.duckAiSectionHeader.isVisible = showDuckAiSectionHeader
+
         binding.userEnabledDuckChatToggle.quietlySetIsChecked(viewState.isDuckChatUserEnabled, userEnabledDuckChatToggleListener)
 
-        binding.duckAIAutomaticContext.isVisible = viewState.isAutomaticContextVisible
-        binding.duckAIAutomaticContext.quietlySetIsChecked(viewState.isAutomaticContextEnabled, userEnabledAutomaticPageContextToggleListener)
+        inputScreenSettingsBinding.duckAIAutomaticContext.isVisible = viewState.isAutomaticContextVisible
+        inputScreenSettingsBinding.duckAIAutomaticContext.quietlySetIsChecked(
+            viewState.isAutomaticContextEnabled,
+            userEnabledAutomaticPageContextToggleListener,
+        )
 
         // align content with the main Duck.ai toggle's text
         val offset =
             resources.getDimensionPixelSize(CommonR.dimen.listItemImageContainerSize) +
                 resources.getDimensionPixelSize(CommonR.dimen.keyline_4)
         val orientation = resources.configuration.orientation
-        binding.duckAiInputScreenToggleContainer.updatePadding(
+        inputScreenSettingsBinding.duckAiInputScreenToggleContainer.updatePadding(
             left =
             if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
                 0
@@ -176,9 +216,10 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
                 offset
             },
         )
-        binding.duckAiInputScreenDescription.updatePadding(left = offset)
-        binding.duckAiShortcuts.updatePadding(left = offset)
-        binding.duckAIAutomaticContext.updatePadding(left = offset)
+        inputScreenSettingsBinding.duckAiInputScreenDescription.updatePadding(left = offset)
+        inputScreenSettingsBinding.duckAiShortcuts.updatePadding(left = offset)
+        inputScreenSettingsBinding.duckAiWebSettings.updatePadding(left = offset)
+        inputScreenSettingsBinding.duckAIAutomaticContext.updatePadding(left = offset)
 
         binding.duckChatSettingsText.addClickableSpan(
             textSequence = getText(R.string.duck_chat_settings_activity_description),
@@ -193,27 +234,36 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
             ),
         )
 
-        binding.duckAiInputScreenToggleContainer.isVisible = viewState.shouldShowInputScreenToggle
+        inputScreenSettingsBinding.duckAiInputScreenToggleContainer.isVisible = viewState.shouldShowInputScreenToggle
+        inputScreenSettingsBinding.duckAiInputScreenToggleWithAiText.text = getString(
+            if (viewState.isNativeControlsEnabled) {
+                R.string.input_screen_user_pref_toggle_between_search_and_ai
+            } else {
+                R.string.input_screen_user_pref_with_ai
+            },
+        )
         configureInputScreenToggle(
             withoutAi = InputScreenToggleButton.WithoutAi(isActive = !viewState.isInputScreenEnabled, appTheme.isLightModeEnabled()),
             withAi = InputScreenToggleButton.WithAi(isActive = viewState.isInputScreenEnabled, appTheme.isLightModeEnabled()),
         )
 
-        binding.duckAiDefaultTogglePosition.isVisible = viewState.isDefaultTogglePositionVisible
-        binding.duckAiDefaultTogglePosition.setSecondaryText(
+        inputScreenSettingsBinding.duckAiDefaultTogglePosition.isVisible = viewState.isDefaultTogglePositionVisible
+        inputScreenSettingsBinding.duckAiDefaultTogglePosition.setSecondaryText(
             when (viewState.defaultTogglePosition) {
                 DefaultTogglePosition.SEARCH -> getString(R.string.duckAiDefaultTogglePositionSearch)
                 DefaultTogglePosition.DUCK_AI -> getString(R.string.duckAiDefaultTogglePositionDuckAi)
                 DefaultTogglePosition.LAST_USED -> getString(R.string.duckAiDefaultTogglePositionLastUsed)
             },
         )
-        binding.duckAiDefaultTogglePosition.setOnClickListener {
+        inputScreenSettingsBinding.duckAiDefaultTogglePosition.setOnClickListener {
             viewModel.onDefaultTogglePositionClicked()
         }
-        binding.duckAiDefaultTogglePosition.updatePadding(left = offset)
+        inputScreenSettingsBinding.duckAiDefaultTogglePosition.updatePadding(left = offset)
 
-        binding.duckAiInputScreenDescription.isVisible = viewState.shouldShowInputScreenToggle
-        binding.duckAiInputScreenDescription.addClickableSpan(
+        // The input screen description is hidden entirely once native controls are enabled.
+        inputScreenSettingsBinding.duckAiInputScreenDescription.isVisible =
+            viewState.shouldShowInputScreenToggle && !viewState.isNativeControlsEnabled
+        inputScreenSettingsBinding.duckAiInputScreenDescription.addClickableSpan(
             textSequence = getText(R.string.input_screen_user_pref_description),
             spans =
             listOf(
@@ -226,19 +276,41 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
             ),
         )
 
-        binding.duckAiShortcuts.isVisible = viewState.shouldShowShortcuts
-        binding.duckAiShortcuts.setOnClickListener {
+        inputScreenSettingsBinding.duckAiShortcuts.isVisible = viewState.shouldShowShortcuts
+        inputScreenSettingsBinding.duckAiShortcuts.setOnClickListener {
             viewModel.onDuckAiShortcutsClicked()
         }
 
+        binding.duckAiWebSettingsItem.isVisible = viewState.isDuckAiWebSettingsVisible && !viewState.isNativeControlsEnabled
+        binding.duckAiWebSettingsItem.updatePadding(left = offset)
+        binding.duckAiWebSettingsItem.setOnClickListener { viewModel.onDuckAiWebSettingsClicked() }
+        inputScreenSettingsBinding.duckAiWebSettings.isVisible = viewState.isDuckAiWebSettingsVisible && viewState.isNativeControlsEnabled
+        inputScreenSettingsBinding.duckAiWebSettings.setOnClickListener { viewModel.onDuckAiWebSettingsClicked() }
+
         renderSearchSettingsSection(viewState)
 
-        binding.duckAiInputScreenWithoutAiContainer.setOnClickListener {
+        inputScreenSettingsBinding.duckAiInputScreenWithoutAiContainer.setOnClickListener {
             viewModel.onDuckAiInputScreenWithoutAiSelected()
         }
-        binding.duckAiInputScreenWithAiContainer.setOnClickListener {
+        inputScreenSettingsBinding.duckAiInputScreenWithAiContainer.setOnClickListener {
             viewModel.onDuckAiInputScreenWithAiSelected()
         }
+    }
+
+    private fun moveInputScreenSettingsToEnd() {
+        if (inputScreenSettingsMovedToEnd) return
+        val container = inputScreenSettingsBinding.root
+        val parent = container.parent as? ViewGroup ?: return
+        parent.removeView(container)
+        parent.addView(container)
+        // Keep the "Use DuckDuckGo Without AI" item as the very last item after the input screen
+        // settings block has been moved to the end.
+        val noAiItem = binding.duckAINoAiItem
+        (noAiItem.parent as? ViewGroup)?.let { noAiParent ->
+            noAiParent.removeView(noAiItem)
+            noAiParent.addView(noAiItem)
+        }
+        inputScreenSettingsMovedToEnd = true
     }
 
     private fun renderSearchSettingsSection(viewState: ViewState) {
@@ -246,6 +318,20 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
             if (viewState.isSearchSectionVisible) {
                 with(showDuckChatSearchSettingsLink) {
                     isVisible = true
+                    setPrimaryText(
+                        if (viewState.isNativeControlsEnabled) {
+                            getString(R.string.duckAiSearchAssistSettingsTitle)
+                        } else {
+                            getString(R.string.duck_chat_assist_settings_title)
+                        },
+                    )
+                    setSecondaryText(
+                        if (viewState.isNativeControlsEnabled) {
+                            getString(viewState.searchAssistVisibility.toDisplayNameRes())
+                        } else {
+                            getString(R.string.duck_chat_assist_settings_description)
+                        },
+                    )
                     setOnClickListener {
                         viewModel.duckChatSearchAISettingsClicked()
                     }
@@ -256,6 +342,11 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
 
                     with(duckAiHideAiGeneratedImagesLink) {
                         isVisible = true
+                        // When native controls are on the row reflects the current On/Off state and opens the
+                        // native dialog; otherwise it keeps its static description and opens the SERP webview.
+                        if (viewState.isNativeControlsEnabled) {
+                            setSecondaryText(getString(viewState.hideAiGeneratedImages.toDisplayNameRes()))
+                        }
                         setOnClickListener {
                             viewModel.onDuckAiHideAiGeneratedImagesClicked()
                         }
@@ -265,10 +356,16 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
                     duckAiHideAiGeneratedImagesLink.isGone = true
                 }
             } else {
-                divider2.isGone = true
+                inputScreenSettingsBinding.divider2.isGone = true
                 searchSettingsSectionHeader.isGone = true
                 showDuckChatSearchSettingsLink.isGone = true
                 duckAiHideAiGeneratedImagesLink.isGone = true
+            }
+
+            // When native controls are enabled the block (with its own Duck.ai header) moves to the end,
+            // so the search-settings section header is redundant and should be hidden.
+            if (viewState.isNativeControlsEnabled) {
+                searchSettingsSectionHeader.isGone = true
             }
         }
     }
@@ -310,6 +407,18 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
             is DuckChatSettingsViewModel.Command.ShowDefaultTogglePositionDialog -> {
                 showDefaultTogglePositionDialog(command.currentPosition)
             }
+
+            is DuckChatSettingsViewModel.Command.ShowSearchAssistDialog -> {
+                showSearchAssistVisibilityDialog(command.currentVisibility)
+            }
+
+            is DuckChatSettingsViewModel.Command.ShowHideAiGeneratedImagesDialog -> {
+                showHideAiGeneratedImagesDialog(command.current)
+            }
+
+            is DuckChatSettingsViewModel.Command.OpenDuckAiWebSettings -> {
+                startActivity(browserNav.openInNewTab(this@DuckChatSettingsActivity, command.url))
+            }
         }
     }
 
@@ -335,10 +444,95 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
             ).show()
     }
 
+    // The order Search Assist options are presented in the dialog. Change this freely — pre-selection and
+    // the chosen result are both derived from this list, so they stay in sync. It is independent of the
+    // SERP `kbe` encoding, which only governs how the web value is read.
+    private val searchAssistVisibilityOptions: List<SearchAssistVisibility> = listOf(
+        SearchAssistVisibility.NEVER,
+        SearchAssistVisibility.ON_DEMAND,
+        SearchAssistVisibility.SOMETIMES,
+        SearchAssistVisibility.OFTEN,
+    )
+
+    @StringRes
+    private fun SearchAssistVisibility.toDisplayNameRes(): Int =
+        when (this) {
+            SearchAssistVisibility.NEVER -> R.string.duckAiSearchAssistVisibilityNever
+            SearchAssistVisibility.ON_DEMAND -> R.string.duckAiSearchAssistVisibilityOnDemand
+            SearchAssistVisibility.SOMETIMES -> R.string.duckAiSearchAssistVisibilitySometimes
+            SearchAssistVisibility.OFTEN -> R.string.duckAiSearchAssistVisibilityOften
+        }
+
+    private fun showSearchAssistVisibilityDialog(currentVisibility: SearchAssistVisibility) {
+        // `options` is the single source of truth for the dialog's order. RadioListAlertDialogBuilder
+        // assigns radio ids as (listIndex + 1); deriving both the pre-selected id and the chosen result
+        // from this same list keeps them correct no matter how the options are ordered.
+        val options = searchAssistVisibilityOptions
+        RadioListAlertDialogBuilder(this)
+            .setTitle(R.string.duckAiSearchAssistVisibilityTitle)
+            .setMessage(R.string.duckAiSearchAssistVisibilitySubtitle)
+            .setOptions(
+                options.map { it.toDisplayNameRes() },
+                options.indexOf(currentVisibility).takeIf { index -> index >= 0 }?.plus(1),
+            )
+            .setPositiveButton(CommonR.string.dialogSave)
+            .setNegativeButton(CommonR.string.cancel)
+            .addEventListener(
+                object : RadioListAlertDialogBuilder.EventListener() {
+                    override fun onPositiveButtonClicked(selectedItem: Int) {
+                        options.getOrNull(selectedItem - 1)?.let {
+                            viewModel.onSearchAssistVisibilitySelected(it)
+                        }
+                    }
+                },
+            ).show()
+    }
+
+    // The order Hide AI-Generated Images options are presented in the dialog. Pre-selection and the chosen
+    // result are both derived from this list, so they stay in sync independently of the SERP `kbj` encoding.
+    private val hideAiGeneratedImagesOptions: List<HideAiGeneratedImages> = listOf(
+        HideAiGeneratedImages.ON,
+        HideAiGeneratedImages.OFF,
+    )
+
+    @StringRes
+    private fun HideAiGeneratedImages.toDisplayNameRes(): Int =
+        when (this) {
+            HideAiGeneratedImages.ON -> CommonR.string.on
+            HideAiGeneratedImages.OFF -> CommonR.string.off
+        }
+
+    private fun showHideAiGeneratedImagesDialog(current: HideAiGeneratedImages) {
+        val options = hideAiGeneratedImagesOptions
+        RadioListAlertDialogBuilder(this)
+            .setTitle(R.string.duckAiDialogHideAiGeneratedImagesTitle)
+            .setClickableMessage(
+                getText(R.string.duckAiDialogHideAiGeneratedImagesDescription),
+                "learn_more",
+            ) {
+                viewModel.onHideAiGeneratedImagesLearnMoreClicked()
+            }
+            .setOptions(
+                options.map { it.toDisplayNameRes() },
+                options.indexOf(current).takeIf { index -> index >= 0 }?.plus(1),
+            )
+            .setPositiveButton(CommonR.string.dialogSave)
+            .setNegativeButton(CommonR.string.cancel)
+            .addEventListener(
+                object : RadioListAlertDialogBuilder.EventListener() {
+                    override fun onPositiveButtonClicked(selectedItem: Int) {
+                        options.getOrNull(selectedItem - 1)?.let {
+                            viewModel.onHideAiGeneratedImagesSelected(it)
+                        }
+                    }
+                },
+            ).show()
+    }
+
     private fun configureInputScreenToggle(
         withoutAi: InputScreenToggleButton,
         withAi: InputScreenToggleButton,
-    ) = with(binding) {
+    ) = with(inputScreenSettingsBinding) {
         val context = this@DuckChatSettingsActivity
         duckAiInputScreenToggleWithoutAiImage.setImageDrawable(ContextCompat.getDrawable(context, withoutAi.imageRes))
         duckAiInputScreenToggleWithoutAiCheck.setImageDrawable(ContextCompat.getDrawable(context, withoutAi.checkRes))

@@ -27,13 +27,16 @@ import com.duckduckgo.sync.TestSyncFixtures.token
 import com.duckduckgo.sync.TestSyncFixtures.userId
 import com.duckduckgo.sync.TestSyncFixtures.validLoginKeys
 import com.duckduckgo.sync.crypto.DecryptBytesResult
+import com.duckduckgo.sync.crypto.EncryptBytesResult
 import com.duckduckgo.sync.crypto.SyncLib
 import com.duckduckgo.sync.impl.Result.Error
 import com.duckduckgo.sync.impl.Result.Success
+import com.duckduckgo.sync.impl.crypto.RsaKeyPair
 import com.duckduckgo.sync.impl.crypto.SyncJweCrypto
 import com.duckduckgo.sync.store.ScopedPassword
 import com.duckduckgo.sync.store.SyncStore
 import com.squareup.moshi.Moshi
+import kotlinx.coroutines.test.runTest
 import org.json.JSONObject
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -60,7 +63,6 @@ class ThirdPartyCredentialManagerTest {
     private val syncJweCrypto: SyncJweCrypto = mock()
     private val nativeLib: SyncLib = mock()
     private val syncFeature = FakeFeatureToggleFactory.create(SyncFeature::class.java)
-    private val protectedKeyManager: ProtectedKeyManager = mock()
 
     // A ddg-wrapped key already on the account; used by the happy-path tests.
     private val existingDdgKey = ProtectedKeyEntry(
@@ -75,19 +77,19 @@ class ThirdPartyCredentialManagerTest {
 
     @Before
     fun before() {
-        manager = RealThirdPartyCredentialManager(syncStore, syncApi, syncJweCrypto, nativeLib, syncFeature, protectedKeyManager)
+        manager = RealThirdPartyCredentialManager(syncStore, syncApi, syncJweCrypto, nativeLib, syncFeature)
     }
 
     // ---- create() ----
 
     @Test
-    fun whenFlagOffThenCreateReturnsError() {
+    fun whenFlagOffThenCreateReturnsError() = runTest {
         val result = manager.create()
         assertTrue(result is Error)
     }
 
     @Test
-    fun whenNotSignedInThenCreateReturnsError() {
+    fun whenNotSignedInThenCreateReturnsError() = runTest {
         syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
         whenever(syncStore.token).thenReturn(null)
 
@@ -96,7 +98,7 @@ class ThirdPartyCredentialManagerTest {
     }
 
     @Test
-    fun whenCredentialAlreadyExistsOnServerThenDecryptsAndStores() {
+    fun whenCredentialAlreadyExistsOnServerThenDecryptsAndStores() = runTest {
         // Server's `encryptedCredential` is decrypted via AES-GCM-JWE-dir(SP, DDG-MEK); the
         // resulting base64url SP is re-encoded as standard base64 for local storage. Fixture
         // chosen so wire ("_-__") and stored ("/+//") differ on every character.
@@ -120,7 +122,7 @@ class ThirdPartyCredentialManagerTest {
     }
 
     @Test
-    fun whenServerReturnsCredentialMissingEncryptedThenError() {
+    fun whenServerReturnsCredentialMissingEncryptedThenError() = runTest {
         syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
         whenever(syncStore.token).thenReturn(token)
         whenever(syncApi.getAccessCredentials(token)).thenReturn(
@@ -134,7 +136,7 @@ class ThirdPartyCredentialManagerTest {
     }
 
     @Test
-    fun whenCreateSucceedsThenStoresScopedPassword() {
+    fun whenCreateSucceedsThenStoresScopedPassword() = runTest {
         primeCreate()
         whenever(syncApi.getProtectedKeys(token)).thenReturn(Success(listOf(existingDdgKey)))
 
@@ -145,7 +147,7 @@ class ThirdPartyCredentialManagerTest {
     }
 
     @Test
-    fun whenCreateSucceedsThenCredentialHashedPasswordIsHkdfOfSpRawBytes() {
+    fun whenCreateSucceedsThenCredentialHashedPasswordIsHkdfOfSpRawBytes() = runTest {
         // Regression guard: 3party `credential_hashed_password` MUST be HKDF-SHA-256(SP_raw,
         // salt=user_id_bytes, info="Password", 32) re-encoded as base64url (no padding). Per
         // Encryption Algorithms TD §"Hashed password derivation" (Asana 1214802412121967).
@@ -182,7 +184,7 @@ class ThirdPartyCredentialManagerTest {
     }
 
     @Test
-    fun whenExistingKeysOnServerThenReEncryptsForThirdParty() {
+    fun whenExistingKeysOnServerThenReEncryptsForThirdParty() = runTest {
         primeCreate()
         val existingKey = ProtectedKeyEntry(
             kid = "k1",
@@ -211,7 +213,7 @@ class ThirdPartyCredentialManagerTest {
     }
 
     @Test
-    fun whenCreateAccessCredentialApiFailsThenError() {
+    fun whenCreateAccessCredentialApiFailsThenError() = runTest {
         primeCreate()
         whenever(syncApi.getProtectedKeys(token)).thenReturn(Success(listOf(existingDdgKey)))
         whenever(syncApi.createAccessCredential(anyString(), anyString(), any())).thenReturn(
@@ -224,42 +226,44 @@ class ThirdPartyCredentialManagerTest {
     }
 
     @Test
-    fun whenNoDdgProtectedKeysThenGeneratesAiChatsKeyAndIncludesItInThirdPartyCredential() {
+    fun whenNoDdgProtectedKeysThenLocallyMintsAiChatsAndIncludesBothWrappingsInCredential() = runTest {
         // BUG-C: a freshly-created ddg account has no protected keys. Per Unified Algorithm
         // §"Obtaining 3party secret": "if there are no Protected Keys, generate new ones for
         // ai_chat purpose". Otherwise POST /access-credentials/3party carries no keys and the real
         // FE browser's login returns no ai_chat key. (1215297327538410)
+        //
+        // The mint happens locally and both wrappings (ddg + 3party, sharing one kid) are sent
+        // atomically inside POST /access-credentials/3party — there is no separate set-if-absent
+        // call, eliminating the native-vs-embedded-FE race documented in 1216006812462330.
         primeCreate()
-        val generatedDdgKey = ProtectedKeyEntry(
-            kid = "k-ai",
-            purpose = "ai_chats",
-            encryptedWith = "ddg",
-            encryptedPrivateKey = "AAAA",
-            publicKey = RsaJwk(n = "mod", e = "AQAB"),
-        )
         whenever(syncApi.getProtectedKeys(token)).thenReturn(Success(emptyList()))
-        whenever(protectedKeyManager.create("ai_chats")).thenReturn(Success(generatedDdgKey))
-        whenever(nativeLib.decryptData(any<ByteArray>(), eq(secretKey))).thenReturn(DecryptBytesResult(0, "raw_key".toByteArray()))
+        whenever(syncJweCrypto.generateRsaKeyPair()).thenReturn(RsaKeyPair("pubKey", "cHJpdktleQ"))
+        whenever(syncJweCrypto.extractJwkComponents(anyString())).thenReturn("modulus" to "AQAB")
+        whenever(nativeLib.encryptData(any<ByteArray>(), eq(secretKey)))
+            .thenReturn(EncryptBytesResult(0, "ddg_wrapped".toByteArray()))
 
         val result = manager.create()
 
         assertEquals(Success(true), result)
-        verify(protectedKeyManager).create("ai_chats")
-        // getProtectedKeys is called once (initial check); generation does NOT trigger a re-fetch.
+        // getProtectedKeys called once (no re-fetch after local mint).
         verify(syncApi, times(1)).getProtectedKeys(token)
         verify(syncApi).createAccessCredential(
             eq(token),
             eq("3party"),
             check { request ->
-                assertEquals(1, request.keys?.size)
-                assertEquals("k-ai", request.keys?.first()?.kid)
-                assertEquals("3party", request.keys?.first()?.encryptedWith)
+                val keys = request.keys ?: error("expected keys[] in credential request")
+                assertEquals(2, keys.size)
+                // Both wrappings of ai_chats share one kid.
+                assertEquals(1, keys.map { it.kid }.toSet().size)
+                assertEquals(setOf("ai_chats"), keys.map { it.purpose }.toSet())
+                // One ddg wrap, one 3party wrap.
+                assertEquals(setOf("ddg", "3party"), keys.map { it.encryptedWith }.toSet())
             },
         )
     }
 
     @Test
-    fun whenGetKeysRateLimitedThenRetriesAndSucceeds() {
+    fun whenGetKeysRateLimitedThenRetriesAndSucceeds() = runTest {
         // BUG-B: the no-account Host provisioning burst gets HTTP 418 (TOO_MANY_REQUESTS_2) on
         // GET /keys. The call is idempotent, so a bounded retry-on-rate-limit should recover.
         (manager as RealThirdPartyCredentialManager).rateLimitRetryDelayMillis = 0L
@@ -276,7 +280,7 @@ class ThirdPartyCredentialManagerTest {
     }
 
     @Test
-    fun whenGetKeysRateLimitedBeyondRetryLimitThenError() {
+    fun whenGetKeysRateLimitedBeyondRetryLimitThenError() = runTest {
         (manager as RealThirdPartyCredentialManager).rateLimitRetryDelayMillis = 0L
         primeCreate()
         whenever(syncApi.getProtectedKeys(token)).thenReturn(Error(code = API_CODE.TOO_MANY_REQUESTS_2.code))
@@ -289,7 +293,7 @@ class ThirdPartyCredentialManagerTest {
     }
 
     @Test
-    fun whenCreate409ConflictAndCredentialNowPresentThenAdoptsAndStoresSp() {
+    fun whenCreate409ConflictAndCredentialNowPresentThenAdoptsAndStoresSp() = runTest {
         // Spec (Asana 1214702966683640, "Setting up usage of a new scope"): on conflict,
         // refetch and adopt the credential another device just created.
         primeCreate()
@@ -314,7 +318,7 @@ class ThirdPartyCredentialManagerTest {
     }
 
     @Test
-    fun whenCreate409ConflictButCredentialStillMissingThenError() {
+    fun whenCreate409ConflictButCredentialStillMissingThenError() = runTest {
         primeCreate()
         whenever(syncApi.getProtectedKeys(token)).thenReturn(Success(listOf(existingDdgKey)))
         whenever(syncApi.createAccessCredential(anyString(), anyString(), any())).thenReturn(
@@ -328,7 +332,7 @@ class ThirdPartyCredentialManagerTest {
     }
 
     @Test
-    fun whenGetProtectedKeysFailsThenAbortsBeforeCreatingCredential() {
+    fun whenGetProtectedKeysFailsThenAbortsBeforeCreatingCredential() = runTest {
         primeCreate()
         whenever(syncApi.getProtectedKeys(token)).thenReturn(Error(code = 500, reason = "getKeys failed"))
 
@@ -487,7 +491,7 @@ class ThirdPartyCredentialManagerTest {
     }
 
     @Test
-    fun whenCreateAccessCredentialPostedThenRequestJsonMatchesSpec() {
+    fun whenCreateAccessCredentialPostedThenRequestJsonMatchesSpec() = runTest {
         primeCreate()
         whenever(syncApi.getProtectedKeys(token)).thenReturn(Success(listOf(existingDdgKey)))
 

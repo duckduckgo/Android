@@ -72,6 +72,7 @@ import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.common.utils.extensions.hideKeyboard
+import com.duckduckgo.cookies.api.CookieManagerProvider
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.downloads.api.DOWNLOAD_SNACKBAR_DELAY
 import com.duckduckgo.downloads.api.DOWNLOAD_SNACKBAR_LENGTH
@@ -110,6 +111,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import logcat.LogPriority.WARN
 import logcat.logcat
 import org.json.JSONObject
 import java.io.File
@@ -199,7 +201,10 @@ class DuckChatContextualFragment :
     @Inject
     lateinit var browserMode: BrowserMode
 
-    private val cookieManager: CookieManager by lazy { CookieManager.getInstance() }
+    @Inject
+    lateinit var cookieManagerProvider: CookieManagerProvider
+
+    private val cookieManager: CookieManager? by lazy { cookieManagerProvider.forMode(browserMode) }
 
     private var pendingFileDownload: FileDownloader.PendingFileDownload? = null
     private val downloadMessagesJob = ConflatedJob()
@@ -213,6 +218,7 @@ class DuckChatContextualFragment :
     private lateinit var backPressedCallback: OnBackPressedCallback
     internal val simpleWebview: WebView by lazy { binding.simpleWebview }
     private var isKeyboardVisible = false
+    private var chatsPopup: PopupMenu? = null
 
     private val keyboardVisibilityListener =
         ViewTreeObserver.OnGlobalLayoutListener {
@@ -262,12 +268,16 @@ class DuckChatContextualFragment :
     ) {
         super.onViewCreated(view, savedInstanceState)
 
-        // Explicitly enable cookies for this WebView
-        cookieManager.setAcceptCookie(true)
-        cookieManager.setAcceptThirdPartyCookies(simpleWebview, true)
-
         simpleWebview.let {
-            webViewModeInitializer.bind(it, browserMode)
+            webViewModeInitializer.bind(it, browserMode).onFailure { throwable ->
+                logcat(WARN) { "Duck.ai WebView profile bind failed for $browserMode: ${throwable.message}" }
+            }
+
+            // Explicitly enable cookies for this tab's profile
+            cookieManager?.apply {
+                setAcceptCookie(true)
+                setAcceptThirdPartyCookies(it, true)
+            }
 
             it.webViewClient = webViewClient
             webViewClient
@@ -378,6 +388,7 @@ class DuckChatContextualFragment :
                                             Mode.CONTEXTUAL,
                                             viewModel.updatedPageContext,
                                             viewModel.sheetTabId,
+                                            browserMode,
                                         )?.let { response ->
                                             logcat { "JS Helper: response $response" }
                                             withContext(dispatcherProvider.main()) {
@@ -781,6 +792,8 @@ class DuckChatContextualFragment :
             popup.onMenuItemClicked(viewAllRow) { viewModel.onViewAllChatsClicked() }
         }
 
+        popup.setOnDismissListener { chatsPopup = null }
+        chatsPopup = popup
         popup.showAnchoredView(requireActivity(), binding.root, binding.contextualNewChat)
     }
 
@@ -1004,6 +1017,7 @@ class DuckChatContextualFragment :
             mimeType = mimeType,
             subfolder = Environment.DIRECTORY_DOWNLOADS,
             fileName = "duck.ai_${System.currentTimeMillis()}",
+            browserMode = browserMode,
         )
 
         if (hasWriteStoragePermission()) {
@@ -1071,9 +1085,14 @@ class DuckChatContextualFragment :
         downloadMessagesJob.cancel()
         simpleWebview.onPause()
         appCoroutineScope.launch(dispatcherProvider.io()) {
-            cookieManager.flush()
+            cookieManager?.flush()
         }
         super.onPause()
+    }
+
+    override fun onStop() {
+        chatsPopup?.dismiss()
+        super.onStop()
     }
 
     override fun onDestroyView() {
@@ -1081,7 +1100,7 @@ class DuckChatContextualFragment :
         binding.root.viewTreeObserver.removeOnGlobalLayoutListener(keyboardVisibilityListener)
         super.onDestroyView()
         appCoroutineScope.launch(dispatcherProvider.io()) {
-            cookieManager.flush()
+            cookieManager?.flush()
         }
     }
 

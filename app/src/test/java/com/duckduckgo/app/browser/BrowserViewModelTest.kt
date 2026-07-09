@@ -112,6 +112,9 @@ class BrowserViewModelTest {
     }
     private val mockFireModeAvailability: FireModeAvailability = mock()
 
+    // The activity's frozen BrowserMode value injected into BrowserViewModel; defaults to REGULAR.
+    private var browserMode = BrowserMode.REGULAR
+
     private val selectedTabFlow = MutableSharedFlow<TabEntity?>(replay = 1)
 
     private lateinit var testee: BrowserViewModel
@@ -238,6 +241,17 @@ class BrowserViewModelTest {
     @Test
     fun whenTabsUpdatedWithTabsThenNewTabNotLaunched() = runTest {
         testee.onTabsUpdated(listOf(TabEntity("123")))
+        verify(mockTabRepository, never()).addDefaultTab()
+    }
+
+    @Test
+    fun whenTabsUpdatedAndNoTabsInFireModeThenDefaultTabNotAdded() = runTest {
+        // Fire mode never seeds a tab implicitly — fire tabs are only ever created by an explicit user action.
+        browserMode = BrowserMode.FIRE
+        initTestee()
+
+        testee.onTabsUpdated(listOf())
+
         verify(mockTabRepository, never()).addDefaultTab()
     }
 
@@ -753,6 +767,7 @@ class BrowserViewModelTest {
             androidBrowserConfigFeature = fakeAndroidBrowserConfigFeature,
             browserModeStateHolder = mockBrowserModeStateHolder,
             fireModeAvailability = mockFireModeAvailability,
+            browserMode = browserMode,
         )
     }
 
@@ -778,6 +793,7 @@ class BrowserViewModelTest {
             androidBrowserConfigFeature = fakeAndroidBrowserConfigFeature,
             browserModeStateHolder = mockBrowserModeStateHolder,
             fireModeAvailability = mockFireModeAvailability,
+            browserMode = browserMode,
         )
     }
 

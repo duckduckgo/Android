@@ -52,7 +52,7 @@ tags:
 - tapOn:
     id: "omnibarTextInput"
 - tapOn:
-    id: "clearTextButton"
+    id: "inputFieldClearText"
 - inputText: "eff.org"
 - pressKey: Enter
 - assertVisible:
@@ -67,7 +67,7 @@ tags:
 - tapOn:
     id: "omnibarTextInput"
 - tapOn:
-    id: "clearTextButton"
+    id: "inputFieldClearText"
 - tapOn:
     id: "quickAccessFavicon"
     childOf:

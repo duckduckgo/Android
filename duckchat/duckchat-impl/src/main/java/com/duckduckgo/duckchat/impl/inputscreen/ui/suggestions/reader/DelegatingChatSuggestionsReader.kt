@@ -20,6 +20,7 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.ChatSuggestion
+import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.RealChatSuggestionsStore
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.store.impl.DuckAiChatStore
 import com.squareup.anvil.annotations.ContributesBinding
@@ -41,6 +42,7 @@ class DelegatingChatSuggestionsReader @Inject constructor(
     // Lazy to break potential DI cycles through DuckChatPixels → DuckChatTermsOfServiceHandler
     //   → DuckChatInternal path.
     private val pixels: Lazy<DuckChatPixels>,
+    private val suggestionsStore: RealChatSuggestionsStore,
     private val dispatchers: DispatcherProvider,
 ) : ChatSuggestionsReader {
 
@@ -48,15 +50,20 @@ class DelegatingChatSuggestionsReader @Inject constructor(
 
     override suspend fun fetchSuggestions(query: String): List<ChatSuggestion> = withContext(dispatchers.io()) {
         val reader = if (store.hasMigrated() && feature.useNativeStorageChatData().isEnabled()) nativeReader else webViewReader
-        if (activeReader != null && activeReader !== reader) activeReader?.tearDown()
+        if (activeReader != null && activeReader !== reader) tearDown()
         activeReader = reader
         logcat { "DuckAI chat suggestions: using ${if (reader === nativeReader) "native store" else "WebView"} reader" }
         pixels.get().reportNativeStorageReaderUsed(native = reader === nativeReader)
-        return@withContext reader.fetchSuggestions(query)
+        val result = reader.fetchSuggestions(query)
+        suggestionsStore.setHasChatSuggestions(result.isNotEmpty())
+        return@withContext result
     }
 
     override fun tearDown() {
-        activeReader?.tearDown()
+        activeReader?.let { reader ->
+            reader.tearDown()
+            suggestionsStore.clearCachedValue()
+        }
         activeReader = null
     }
 }

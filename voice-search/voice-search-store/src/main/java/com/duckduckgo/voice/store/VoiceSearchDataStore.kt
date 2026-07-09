@@ -20,6 +20,9 @@ import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.content.edit
 import com.duckduckgo.voice.api.VoiceSearchLauncher.VoiceSearchMode
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
 
 interface VoiceSearchDataStore {
     var permissionDeclinedForever: Boolean
@@ -30,6 +33,9 @@ interface VoiceSearchDataStore {
 
     fun isVoiceSearchEnabled(default: Boolean): Boolean
     fun setVoiceSearchEnabled(value: Boolean)
+
+    /** Emits the current enabled value immediately, then again on every change to the enabled flag. */
+    fun voiceSearchEnabledFlow(default: Boolean): Flow<Boolean>
 }
 
 class SharedPreferencesVoiceSearchDataStore constructor(
@@ -71,6 +77,17 @@ class SharedPreferencesVoiceSearchDataStore constructor(
 
     override fun setVoiceSearchEnabled(value: Boolean) {
         updateValue(KEY_VOICE_SEARCH_ENABLED, value)
+    }
+
+    override fun voiceSearchEnabledFlow(default: Boolean): Flow<Boolean> = callbackFlow {
+        val listener = SharedPreferences.OnSharedPreferenceChangeListener { prefs, key ->
+            if (key == KEY_VOICE_SEARCH_ENABLED) {
+                trySend(prefs.getBoolean(KEY_VOICE_SEARCH_ENABLED, default))
+            }
+        }
+        trySend(preferences.getBoolean(KEY_VOICE_SEARCH_ENABLED, default))
+        preferences.registerOnSharedPreferenceChangeListener(listener)
+        awaitClose { preferences.unregisterOnSharedPreferenceChangeListener(listener) }
     }
 
     override var countVoiceSearchDismissed: Int

@@ -17,6 +17,7 @@
 package com.duckduckgo.downloads.impl
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.downloads.api.FileDownloader
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -95,6 +96,7 @@ class PendingFileDownloadCompressTest {
             mimeType = "image/png",
             subfolder = "folder",
             directory = File("directory"),
+            browserMode = BrowserMode.REGULAR,
         )
     }
 }

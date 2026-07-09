@@ -1,9 +1,9 @@
 {
   "name": "Veripages",
   "url": "veripages.com",
-  "version": "0.7.0",
+  "version": "0.8.1",
   "addedDatetime": 1691989200000,
-  "optOutUrl": "https://veripages.com/inner/control/privacy",
+  "optOutUrl": "https://veripages.com/inner/removal-service",
   "steps": [
     {
       "stepType": "scan",
@@ -76,6 +76,7 @@
             },
             "profileUrl": {
               "selector": ".search-item-title-link",
+              "attribute": "data-link",
               "identifierType": "path",
               "identifier": "https://veriforia.com/view/${id}"
             }
@@ -89,56 +90,120 @@
       "actions": [
         {
           "actionType": "navigate",
-          "url": "https://veripages.com/inner/control-privacy",
+          "url": "https://veripages.com/inner/removal-service",
           "id": "764853d2-0735-4348-a6c6-039388b25094"
         },
         {
           "actionType": "expectation",
+          "_comment": "wait for cloudflare check to pass - we are using a negative xpath selector to ensure the challenge is not being displayed",
           "expectations": [
             {
               "type": "element",
-              "selector": "//p[contains(text(), 'opt out')]",
-              "parent": ".container"
+              "selector": "//body[not(.//script[contains(@src, '/cdn-cgi/challenge-platform/')]) and not(.//script[contains(., '_cf_chl_opt')])]"
             }
           ],
-          "id": "837814e9-34b7-41d8-bd58-c670c1e07ccf"
+          "id": "cfc-c1b452c6-3a15-4822-9d35-fd97793d8d3b"
+        },
+        {
+          "actionType": "expectation",
+          "_comment": "step 1/6 - intro screen",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//h1[contains(text(), 'Veripages Opt Out Form')]"
+            }
+          ],
+          "id": "0a52e764-a62a-4a73-9bf5-f0d8125a6229"
+        },
+        {
+          "actionType": "click",
+          "_comment": "step 1/6 - click NEXT",
+          "elements": [
+            {
+              "type": "button",
+              "selector": "//section[@id='step-1']//div[contains(@class, 'js-rf-section-next-btn')]"
+            }
+          ],
+          "id": "6e9d9a70-9aff-401f-891e-5af2be3b77e5"
+        },
+        {
+          "actionType": "click",
+          "_comment": "step 2/6 - click NEXT",
+          "elements": [
+            {
+              "type": "button",
+              "selector": "//section[@id='step-2']//div[contains(@class, 'js-rf-section-next-btn')]"
+            }
+          ],
+          "id": "3dacbf90-4080-456d-8ad1-864a466a7fd0"
         },
         {
           "actionType": "fillForm",
-          "selector": ".ahm",
+          "_comment": "step 3/6 - enter the profile URL into the <textarea>; typing into it reveals the NEXT button",
+          "selector": "#step-3 .ahm",
           "elements": [
-            {
-              "type": "fullName",
-              "selector": "#name"
-            },
-            {
-              "type": "email",
-              "selector": "#email"
-            },
             {
               "type": "profileUrl",
               "selector": "#url"
             }
           ],
-          "id": "08b36264-34fe-469e-bc28-e7ccf46ffcaa"
+          "id": "9bfc61a8-8372-4f67-90b1-139148597962"
+        },
+        {
+          "actionType": "click",
+          "_comment": "step 3/6 - click NEXT",
+          "elements": [
+            {
+              "type": "button",
+              "selector": "//section[@id='step-3']//div[contains(@class, 'js-rf-section-next-btn')]"
+            }
+          ],
+          "id": "1d2954dc-0ab4-4b5d-bd52-028edd39a043"
+        },
+        {
+          "actionType": "click",
+          "_comment": "step 4/6 - data provider list, click SKIP (advances step 4 -> 5, making the step 5 form visible so its Turnstile widget renders)",
+          "elements": [
+            {
+              "type": "button",
+              "selector": "//section[@id='step-4']//div[contains(@class, 'js-rf-section-next-btn')]"
+            }
+          ],
+          "id": "460dac62-8940-4a57-8c72-22de41a2fcfd"
+        },
+        {
+          "actionType": "fillForm",
+          "_comment": "step 5/6 - name and email",
+          "selector": "#step-5 .ahm",
+          "elements": [
+            {
+              "type": "fullName",
+              "selector": "#user_name"
+            },
+            {
+              "type": "email",
+              "selector": "#user_email"
+            }
+          ],
+          "id": "521d843e-389f-4320-a78b-69b9e05e1253"
         },
         {
           "actionType": "expectation",
           "expectations": [
             {
               "type": "element",
-              "selector": "//input[@name='cf-turnstile-response' and @value and @value != '']",
-              "parent": "//form[@id='privacynew']"
+              "selector": "//section[@id='step-5']//input[@name='cf-turnstile-response' and @value and @value != '']"
             }
           ],
-          "id": "a403483f-8ee9-4a6a-92fb-b5bf8fc97df9"
+          "id": "cft-a403483f-8ee9-4a6a-92fb-b5bf8fc97df9"
         },
         {
           "actionType": "click",
+          "_comment": "step 5/6 - submit",
           "elements": [
             {
               "type": "button",
-              "selector": ".//button[@type='submit']"
+              "selector": "//section[@id='step-5']//button[@type='submit']"
             }
           ],
           "id": "e897bc2f-8460-4b7c-9ef4-979eda057f03"
@@ -165,10 +230,42 @@
             {
               "type": "text",
               "selector": "body",
-              "expect": "Your information control request has been confirmed."
+              "expect": "Removal Request Confirmation"
             }
           ],
-          "id": "4623cdb6-ad7e-474a-9bdd-2c759ac6e735"
+          "id": "88489df6-eed4-4505-8936-f941f354ec36"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//input[@name='cf-turnstile-response' and @value and @value != '']",
+              "parent": "//form[@id='privacynew']"
+            }
+          ],
+          "id": "cft-e0389be7-2c24-45c8-b479-e08dd68773b5"
+        },
+        {
+          "actionType": "click",
+          "elements": [
+            {
+              "type": "button",
+              "selector": "//form[@id='privacynew']//button[@type='submit']"
+            }
+          ],
+          "id": "4d72660a-a6c4-484d-b91e-9fe04d39944f"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "text",
+              "selector": "body",
+              "expect": "has been confirmed"
+            }
+          ],
+          "id": "227028b7-d665-4e99-90ae-c2aceb896e5d"
         }
       ]
     }

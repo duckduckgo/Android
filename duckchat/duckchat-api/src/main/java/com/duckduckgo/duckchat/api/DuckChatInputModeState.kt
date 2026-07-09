@@ -16,6 +16,7 @@
 
 package com.duckduckgo.duckchat.api
 
+import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import kotlinx.coroutines.flow.StateFlow
 
 /**
@@ -35,6 +36,30 @@ interface DuckChatInputModeState {
      * no Duck.ai input widget is attached.
      */
     val displayedMode: StateFlow<InputMode>
+
+    /**
+     * The live input query — the trimmed text in the shared input field, updated per keystroke
+     * regardless of the selected tab (the field is shared between Search and Chat, so the query is the
+     * same on both).
+     *
+     * High-frequency, kept as its own flow so it doesn't churn [displayedMode] consumers. Holds [""]
+     * only when the field is blank or no widget is attached. Deliberately NOT reset to [""] on the
+     * Search tab: a chat-tab item that derives its visibility from this (e.g. a zero-state card) would
+     * otherwise go stale while Search is active and flash when the Chat tab re-renders. Pair it with
+     * [displayedMode] when you also need to know which tab is showing.
+     */
+    val inputQuery: StateFlow<String>
+
+    /**
+     * Whether the current configuration offers the Search↔Duck.ai toggle in the address bar
+     * ([NativeInputState.InputMode.SEARCH_AND_DUCK_AI]) or is search-only
+     * ([NativeInputState.InputMode.SEARCH_ONLY]).
+     *
+     * Unlike [displayedMode] (the selected tab, pushed by a live widget), this is the capability of the
+     * current config and is known even when no widget is attached — so callers can decide whether to use
+     * the native input for the browser omnibar at all. Emits on subscription and on every settings change.
+     */
+    val inputModeCapability: StateFlow<NativeInputState.InputMode>
 }
 
 /**

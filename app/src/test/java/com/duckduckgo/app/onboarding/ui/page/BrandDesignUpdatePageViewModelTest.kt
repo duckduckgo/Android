@@ -30,6 +30,7 @@ import com.duckduckgo.app.onboarding.CustomAiOnboardingStore
 import com.duckduckgo.app.onboarding.DuckAiOnboardingAvailability
 import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingActivityDialog
 import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingActivityStep
+import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingEvent
 import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingPlanProvider
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.ui.page.BrandDesignUpdatePageViewModel.Command
@@ -112,7 +113,6 @@ class BrandDesignUpdatePageViewModelTest {
     private val mockDefaultBrowserDetector: DefaultBrowserDetector = mock()
     private val mockWidgetCapabilities: WidgetCapabilities = mock()
     private val mockSyncAutoRestore: SyncAutoRestore = mock()
-    private val mockQuickSetupPixelSender: QuickSetupPixelSender = mock()
     private val mockCustomAiOnboardingStore: CustomAiOnboardingStore = mock()
 
     private val orchestratorState = MutableStateFlow<LinearOnboardingState>(LinearOnboardingState.NotStarted)
@@ -145,7 +145,6 @@ class BrandDesignUpdatePageViewModelTest {
             mockDefaultBrowserDetector,
             mockWidgetCapabilities,
             mockSyncAutoRestore,
-            mockQuickSetupPixelSender,
             mockOrchestrator,
             mockCustomAiOnboardingStore,
         )
@@ -288,6 +287,28 @@ class BrandDesignUpdatePageViewModelTest {
         val testee = createViewModel()
         testee.loadDaxDialog()
         verify(mockPixel).fire(PREONBOARDING_INTRO_REINSTALL_USER_SHOWN_UNIQUE, type = Unique())
+    }
+
+    // endregion
+
+    // region Presented event
+
+    @Test
+    fun whenDialogShownThenPresentedEventSentToOrchestrator() = runTest {
+        whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(false)
+        val testee = createViewModel()
+        testee.loadDaxDialog()
+        advanceUntilIdle()
+        verify(mockOrchestrator).onEvent(NewUserOnboardingEvent.Presented)
+    }
+
+    @Test
+    fun whenNotificationPermissionRequestedThenPresentedEventSentToOrchestrator() = runTest {
+        whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(false)
+        val testee = createViewModel()
+        testee.notificationRuntimePermissionRequested()
+        advanceUntilIdle()
+        verify(mockOrchestrator).onEvent(NewUserOnboardingEvent.Presented)
     }
 
     // endregion
@@ -852,16 +873,20 @@ class BrandDesignUpdatePageViewModelTest {
     // region Notification permissions
 
     @Test
-    fun whenNotificationPermissionRequestedThenPixelFired() {
+    fun whenNotificationPermissionRequestedThenPixelFired() = runTest {
+        whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(false)
         val testee = createViewModel()
         testee.notificationRuntimePermissionRequested()
+        advanceUntilIdle()
         verify(mockPixel).fire(NOTIFICATION_RUNTIME_PERMISSION_SHOWN)
     }
 
     @Test
-    fun whenNotificationPermissionGrantedThenPixelFired() {
+    fun whenNotificationPermissionGrantedThenPixelFired() = runTest {
+        whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(false)
         val testee = createViewModel()
         testee.notificationRuntimePermissionGranted()
+        advanceUntilIdle()
         verify(mockPixel).fire(
             AppPixelName.NOTIFICATIONS_ENABLED,
             mapOf(PixelParameter.FROM_ONBOARDING to true.toString()),
@@ -1068,7 +1093,7 @@ class BrandDesignUpdatePageViewModelTest {
         val testee = createViewModel()
         testee.commands.test {
             awaitItem() // drain initial PlayIntroAnimation
-            testee.onInputModeDemoQuerySubmitted("hello world", isChat = true)
+            testee.onInputModeDemoQuerySubmitted("hello world", isChat = true, fromSuggestion = true)
             val command = awaitItem()
             assertTrue(command is Command.FinishAndSubmitChatPrompt)
             assertEquals("hello world", (command as Command.FinishAndSubmitChatPrompt).prompt)
@@ -1080,7 +1105,7 @@ class BrandDesignUpdatePageViewModelTest {
         val testee = createViewModel()
         testee.commands.test {
             awaitItem() // drain initial PlayIntroAnimation
-            testee.onInputModeDemoQuerySubmitted("search query", isChat = false)
+            testee.onInputModeDemoQuerySubmitted("search query", isChat = false, fromSuggestion = false)
             val command = awaitItem()
             assertTrue(command is Command.FinishAndSubmitSearchQuery)
             assertEquals("search query", (command as Command.FinishAndSubmitSearchQuery).query)
@@ -1170,43 +1195,6 @@ class BrandDesignUpdatePageViewModelTest {
             testee.onPrimaryCtaClicked()
             assertTrue(awaitItem() is Command.OnboardingSkipped)
         }
-    }
-
-    // endregion
-
-    // region Quick setup pixels
-
-    @Test
-    fun whenQuickSetupShownThenSenderFiresShownWithReinstallState() = runTest {
-        whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(true)
-        whenever(mockOnboardingQuickSetupExperimentManager.enroll()).thenReturn(QuickSetupExperimentVariant.TREATMENT)
-
-        val testee = createViewModel()
-        testee.loadDaxDialog()
-        testee.onSecondaryCtaClicked() // INITIAL_REINSTALL_USER -> QUICK_SETUP
-        advanceUntilIdle()
-
-        verify(mockQuickSetupPixelSender).fireShown(isReinstallUser = true)
-    }
-
-    @Test
-    fun whenQuickSetupClickedThenSenderFiresClickedWithCurrentSelections() = runTest {
-        whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(true)
-        whenever(mockOnboardingQuickSetupExperimentManager.enroll()).thenReturn(QuickSetupExperimentVariant.TREATMENT)
-
-        val testee = createViewModel()
-        testee.loadDaxDialog()
-        testee.onSecondaryCtaClicked() // -> QUICK_SETUP
-        testee.onAddressBarPositionOptionSelected(OmnibarType.SINGLE_BOTTOM)
-        testee.onInputScreenOptionSelected(withAi = false)
-        testee.onPrimaryCtaClicked()
-        advanceUntilIdle()
-
-        verify(mockQuickSetupPixelSender).fireClicked(
-            isReinstallUser = true,
-            addressBarPosition = OmnibarType.SINGLE_BOTTOM,
-            inputScreenSelected = false,
-        )
     }
 
     // endregion
@@ -1679,6 +1667,7 @@ class BrandDesignUpdatePageViewModelTest {
     private fun aiComparisonChartStep() =
         NewUserOnboardingActivityStep(
             id = "ai_comparison_chart",
+            pixelName = null,
             showsStepIndicator = true,
             transition = { LinearOnboardingTransition.Stay },
             resolveDialog = { NewUserOnboardingActivityDialog.AiComparisonChart },

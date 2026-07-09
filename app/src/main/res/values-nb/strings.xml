@@ -832,6 +832,7 @@
     <string name="preOnboardingDaxDialog1TitleDuckAi" translatable="false"><![CDATA[Hi there.<br/><br/>Ready for a faster browser that protects you and lets you decide when and how to use AI?]]></string>
     <string name="preOnboardingDaxDialog1Button">Sett i gang!</string>
     <string name="preOnboardingDaxDialog1ButtonDuckAi" translatable="false">Let\&apos;s get started!</string>
+    <string name="preOnboardingDaxDialog1ButtonBrandDesign">Vi setter i gang!</string>
     <string name="preOnboardingDaxDialog1SecondaryButton">Jeg har vært her før</string>
     <string name="preOnboardingDaxDialog2Title">Beskyttelser er aktivert!</string>
     <string name="preOnboardingDaxDialog2Button">Velg nettleseren din</string>
@@ -896,6 +897,7 @@
     <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[DuckDuckGo har også et <b>valgfritt betalt abonnement</b>, med en sikker <b>VPN</b> og <b>avansert, privat AI</b>.]]></string>
     <string name="onboardingPrivacyProDaxDialogOkButton">Finn ut mer</string>
     <string name="onboardingPrivacyProDaxDialogFreeTrialOkButton">Prøv gratis!</string>
+    <string name="onboardingPrivacyProDaxDialogFreeTrialOkButtonBrandDesign">Prøv det gratis!</string>
     <string name="onboardingPrivacyProDaxDialogCancelButton">Hopp over</string>
     <string name="onboardingSkippedPrivacyProDaxDialogTitle">Visste du?</string>
 
@@ -1031,10 +1033,63 @@
     <string name="onboardingSearchDaxDialogOption1Quoted" instruction="translate &apos;duck&apos; too.">hvordan si «duck» på engelsk</string>
     <string name="onboardingSearchDaxDialogOption1EnglishQuoted" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">hvordan si duck» på spansk</string>
 
+    <string name="onboardingDuckAiFireButtonDaxDialogTitle">Det er Duck.ai!</string>
+    <string name="onboardingDuckAiFireButtonDaxDialogDescription"><![CDATA[Private AI-chatter som du kan slette når som helst med <b>Fire Button</b>. Prøv den! 🔥]]></string>
+    <string name="onboardingDuckAiEndCtaTitle">Dette går bra!</string>
+    <string name="onboardingDuckAiEndCtaDescription"><![CDATA[Bruk adressefeltet til å søke etter og gå til nettsteder, eller bytt til Duck.ai for privat AI-chat.<br/><br/>Du kan bruke Duck.ai overalt der du ser chat-ikonet]]></string>
+    <string name="onboardingDuckAiEndCtaButton">High five!</string>
+
+    <!-- Input Mode Demo Onboarding step -->
+    <string name="preOnboardingInputModeDemoTitle">Er du klar til å komme i gang?&lt;br/&gt;Prøv et søk eller en AI-chat!</string>
+    <string name="preOnboardingInputModeDemoSearchHint">Søk privat</string>
+    <string name="preOnboardingInputModeDemoChatHint">Spør om hva som helst, privat</string>
+    <string name="preOnboardingInputModeDemoChatSuggestion1">Forklar aksjemarkedet som om jeg var ti</string>
+    <string name="preOnboardingInputModeDemoChatSuggestion2">Planlegg en perfekt dag i London</string>
+    <string name="preOnboardingInputModeDemoChatSuggestion3">Overrask meg!</string>
+    <string name="preOnboardingInputModeDemoChatSuggestion3Prompt">Gi meg ti fascinerende fakta fra vitenskap, natur og historie.</string>
+
+    <!-- Custom AI onboarding flow -->
+    <!-- Pre-onboarding: initial screens -->
+    <string name="preOnboardingWelcomeDialogBodyCustomAi">Er du klar til å chatte privat med ChatGPT, Claude og andre AI-er gratis, i en nettleser som beskytter deg aktivt?</string>
+    <string name="preOnboardingDaxDialog3TextCustomAi">Husk: Du kan bruke Duck.ai overalt der du ser chat-ikonet</string>
+    <string name="preOnboardingDaxDialog3ButtonCustomAi">Start AI-chat</string>
+    <!-- Pre-onboarding: AI comparison chart screen. -->
+    <string name="preOnboardingDaxDialogAiTitle">AI-beskyttelser er aktivert!</string>
+    <string name="preOnboardingAiComparisonChartPopularAis">Populære AI-er</string>
+    <string name="preOnboardingAiComparisonChartItem1">Alle chatter er anonymisert</string>
+    <string name="preOnboardingAiComparisonChartItem2">Ingen konto er nødvendig for å få tilgang til alle AI-funksjonene</string>
+    <string name="preOnboardingAiComparisonChartItem3">Bruker aldri chattene dine til å trene AI</string>
+    <string name="preOnboardingAiComparisonChartItem4">Få tilgang til ChatGTP, Claude m.m., alle på ett sted</string>
+    <string name="preOnboardingAiComparisonChartButton">Prøv Duck.ai!</string>
+    <!-- Pre-onboarding: input demo screen -->
+    <string name="preOnboardingInputModeDemoTitleCustomAi">Nå kan du prøve en privat AI-chat!</string>
+    <!-- Pre-onboarding: browser comparison screen -->
+    <string name="preOnboardingDaxDialog2TitleCustomAi">Vil du gjøre DuckDuckGo til standardnettleseren din?</string>
+    <!-- In-context onboarding. -->
+    <string name="onboardingEndCustomAiFlowDaxDialogDescription"><![CDATA[Start en privat AI-chat med Duck.ai eller bytt til Søk for beskyttet surfing.<br/><br/>Du kan bruke Duck.ai overalt der du ser chat-ikonet]]></string>
+    <string name="onboardingPrivacyProCustomAiFlowDaxDialogDescription">Vi tilbyr også et betalt abonnement med avanserte AI-modeller med høyere chattegrenser fra GPT og Claude, en sikker VPN og mye mer.</string>
+
     <string name="input_screen_user_pref_without_ai_updated">Bare søk</string>
     <string name="input_screen_user_pref_with_ai_updated">Bytt mellom\nsøk og Duck.ai</string>
 
     <!-- New Address Bar Picker -->
     <string name="newAddressBarPickerDuckDuckGo" translatable="false">DuckDuckGo</string>
     <string name="newAddressBarPickerConfirm">Bekreft</string>
+
+    <!-- Fire mode -->
+    <string name="openInFireTab">Åpne i Fire-fanen</string>
+    <string name="openInBackgroundTab">Åpne i bakgrunnen</string>
+    <string name="browserModeToggleFireDescription">Bytt til Fire-modus-faner</string>
+    <string name="browserModeToggleRegularDescription">Bytt til vanlige faner</string>
+    <string name="browserModeToggleTabCountInfinite">∞</string>
+    <string name="fireTabMenuItem">Fire-fane</string>
+    <string name="fireTabNewTabPageTitle">Fire-fane</string>
+    <string name="fireTabsEmptyStateTitle">Fire-faner</string>
+    <string name="fireTabsFeatureNoHistory">Surf uten å lagre lokal historikk</string>
+    <string name="fireTabsFeatureDifferentAccount">Logg inn på et nettsted med en annen konto</string>
+    <string name="fireTabsFeatureTroubleshoot">Feilsøk nettsteder</string>
+    <string name="fireTabsExplainer">Fire-faner er isolert fra andre nettleserdata. Dataene deres blir slettet når du lukker alle sammen. De gir deg samme sporingsbeskyttelse som andre faner.</string>
+    <string name="fireTabsNewTabButton">Ny Fire-fane</string>
+    <string name="fireTabsPromoTabSwitcherText"><![CDATA[<b>NYHET!</b> Prøv Fire-faner for å surfe uten å lagre lokal historikk.]]></string>
+    <string name="singleTabFireDialogTitleFireMode">Vil du slette Fire-faner og dataene i dem?</string>
 </resources>

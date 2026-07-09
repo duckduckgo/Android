@@ -29,6 +29,16 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
+    <include
+        android:id="@+id/fireTabsPromoBanner"
+        layout="@layout/item_tab_switcher_fire_tabs_promo"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/keyline_4"
+        android:layout_marginTop="@dimen/keyline_2"
+        android:layout_marginBottom="@dimen/keyline_4"
+        android:visibility="gone" />
+
     <FrameLayout
         android:id="@+id/tabsContainer"
         android:layout_width="match_parent"

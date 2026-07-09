@@ -26,7 +26,7 @@ import com.duckduckgo.app.browser.remotemessage.CommandActionMapper
 import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.cta.ui.CtaViewModel
-import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.ExtendedOnboardingFeatureToggles
+import com.duckduckgo.app.generalsettings.showonapplaunch.rmf.AfterIdleMessageTriggerProvider
 import com.duckduckgo.app.onboardingbranddesignupdate.OnboardingBrandDesignUpdateToggles
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -46,12 +46,14 @@ import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.FEATURE_READ
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
@@ -62,16 +64,17 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 @SuppressLint("NoLifecycleObserver") // we don't observe app lifecycle
+@OptIn(ExperimentalCoroutinesApi::class)
 class NewTabPageViewModel @AssistedInject constructor(
     @Assisted private val showDaxLogo: Boolean,
     private val dispatchers: DispatcherProvider,
     private val remoteMessagingModel: RemoteMessageModel,
+    private val afterIdleMessageTriggerProvider: AfterIdleMessageTriggerProvider,
     private val playStoreUtils: PlayStoreUtils,
     private val savedSitesRepository: SavedSitesRepository,
     private val syncEngine: SyncEngine,
     private val commandActionMapper: CommandActionMapper,
     private val dismissedCtaDao: DismissedCtaDao,
-    private val extendedOnboardingFeatureToggles: ExtendedOnboardingFeatureToggles,
     private val settingsDataStore: SettingsDataStore,
     private val lowPriorityMessagingModel: LowPriorityMessagingModel,
     private val appTrackingProtection: AppTrackingProtection,
@@ -145,7 +148,10 @@ class NewTabPageViewModel @AssistedInject constructor(
         viewModelScope.launch(dispatchers.io()) {
             savedSitesRepository.getFavorites()
                 .combine(
-                    remoteMessagingModel.observeActiveMessages()
+                    afterIdleMessageTriggerProvider.activeTrigger()
+                        .flatMapLatest { trigger ->
+                            remoteMessagingModel.observeActiveMessages(trigger)
+                        }
                         .map { message ->
                             if (message?.surfaces?.contains(Surface.NEW_TAB_PAGE) == true) message else null
                         },
@@ -190,14 +196,12 @@ class NewTabPageViewModel @AssistedInject constructor(
     // We only want to show New Tab when the Home CTAs from Onboarding has finished
     // https://app.asana.com/0/1157893581871903/1207769731595075/f
     private suspend fun isHomeOnboardingComplete(): Boolean {
-        val noBrowserCtaExperiment = extendedOnboardingFeatureToggles.noBrowserCtas().isEnabled()
         val lastDialogShown = if (onboardingBrandDesignUpdateToggles.brandDesignUpdate().isEnabled()) {
             ctaViewModel.areBubbleDaxDialogsCompleted()
         } else {
             dismissedCtaDao.exists(CtaId.DAX_END)
         }
         return lastDialogShown ||
-            noBrowserCtaExperiment ||
             settingsDataStore.hideTips ||
             dismissedCtaDao.exists(CtaId.ADD_WIDGET)
     }

@@ -41,6 +41,9 @@ import com.duckduckgo.common.ui.view.hideKeyboard
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.showKeyboard
 import com.duckduckgo.common.ui.viewbinding.viewBinding
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.downloads.api.DownloadsFileActions
 import com.duckduckgo.downloads.api.DownloadsScreens.DownloadsScreenNoParams
@@ -65,6 +68,12 @@ class DownloadsActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var downloadsFileActions: DownloadsFileActions
 
+    @Inject
+    lateinit var edgeToEdgeProvider: EdgeToEdgeProvider
+
+    @Inject
+    lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
+
     private val toolbar
         get() = binding.toolbar
 
@@ -75,9 +84,16 @@ class DownloadsActivity : DuckDuckGoActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val edgeToEdgeEnabled = edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.MISC)
+        if (edgeToEdgeEnabled) {
+            enableTransparentEdgeToEdge()
+        }
         setContentView(binding.root)
         setupToolbar(toolbar)
         setupRecyclerView()
+        if (edgeToEdgeEnabled) {
+            configureEdgeToEdgeInsets()
+        }
 
         lifecycleScope.launch {
             viewModel.viewState
@@ -90,6 +106,12 @@ class DownloadsActivity : DuckDuckGoActivity() {
                 .flowWithLifecycle(lifecycle, STARTED)
                 .collectLatest { processCommands(it) }
         }
+    }
+
+    private fun configureEdgeToEdgeInsets() {
+        edgeToEdgeHandler.applyHorizontalSystemBarInsets(binding.root)
+        edgeToEdgeHandler.applyStatusBarInsets(binding.appBarLayout)
+        edgeToEdgeHandler.applyScrollableNavigationBarInsets(binding.downloadsContentView)
     }
 
     override fun onResume() {

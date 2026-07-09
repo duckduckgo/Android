@@ -95,6 +95,9 @@ data object InputScreenActivityResultParams {
     /** Key for the target tab ID when result is [InputScreenActivityResultCodes.SWITCH_TO_TAB_REQUESTED] */
     const val TAB_ID_PARAM = "tab_id"
 
+    /** Key for the target tab's [com.duckduckgo.browsermode.api.BrowserMode] name when result is [InputScreenActivityResultCodes.SWITCH_TO_TAB_REQUESTED] */
+    const val TAB_MODE_PARAM = "tab_mode"
+
     /** Key for any canceled draft content when result is [Activity.RESULT_CANCELED] */
     const val CANCELED_DRAFT_PARAM = "draft"
 

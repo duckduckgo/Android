@@ -16,21 +16,43 @@
 
 package com.duckduckgo.app.browser.nativeinput
 
+import android.content.Context
 import android.net.Uri
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.FrameLayout
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.LifecycleRegistry
+import androidx.lifecycle.LiveData
+import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.browser.omnibar.Omnibar
 import com.duckduckgo.app.browser.omnibar.QueryUrlPredictor
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.tabs.model.TabEntity
+import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.duckchat.api.DuckChatInputModeState
+import com.duckduckgo.duckchat.api.NativeInputEventListener
+import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.voice.api.VoiceSearchAvailability
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.emptyFlow
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
@@ -38,8 +60,12 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
+@OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(AndroidJUnit4::class)
 class RealNativeInputManagerTest {
+
+    @get:Rule
+    val coroutineRule = CoroutineTestRule()
 
     private val duckChat: DuckChat = mock()
     private val animator: NativeInputAnimator = mock()
@@ -47,13 +73,22 @@ class RealNativeInputManagerTest {
     private val globalActivityStarter: GlobalActivityStarter = mock()
     private val queryUrlPredictor: QueryUrlPredictor = mock()
     private val duckAiFeatureState: DuckAiFeatureState = mock()
+    private val duckChatInputModeState: DuckChatInputModeState = mock()
     private val pixel: Pixel = mock()
+    private val nativeInputEventListener: NativeInputEventListener = mock()
     private val nativeInputStateBugKillSwitch = FakeFeatureToggleFactory.create(NativeInputStateBugKillSwitch::class.java)
+
+    private val context: Context = ApplicationProvider.getApplicationContext()
+    private val rootView: ViewGroup = FrameLayout(context)
+    private val omnibar: Omnibar = mock()
+    private val lifecycleOwner = FakeLifecycleOwner()
 
     private lateinit var testee: RealNativeInputManager
 
     @Before
     fun setUp() {
+        whenever(duckChatInputModeState.inputModeCapability)
+            .thenReturn(MutableStateFlow(NativeInputState.InputMode.SEARCH_AND_DUCK_AI))
         testee = RealNativeInputManager(
             duckChat,
             animator,
@@ -61,9 +96,67 @@ class RealNativeInputManagerTest {
             globalActivityStarter,
             queryUrlPredictor,
             duckAiFeatureState,
+            duckChatInputModeState,
             pixel,
             nativeInputStateBugKillSwitch,
+            nativeInputEventListener,
         )
+    }
+
+    @Test
+    fun whenDuckAiModeAndNativeChatInputDisabledThenShowNativeInputRemovesWidget() {
+        whenever(duckChat.observeNativeInputFieldUserSettingEnabled()).thenReturn(MutableStateFlow(true))
+        whenever(duckChat.observeNativeChatInputEnabled()).thenReturn(MutableStateFlow(false))
+        whenever(omnibar.viewMode).thenReturn(Omnibar.ViewMode.DuckAI)
+        testee.init(omnibar, rootView, lifecycleOwner)
+        rootView.addView(View(context).apply { id = R.id.inputModeTopRoot })
+
+        showNativeInput()
+
+        assertNull(rootView.findViewById<View?>(R.id.inputModeTopRoot))
+    }
+
+    @Test
+    fun whenNativeInputFieldDisabledThenShowNativeInputLeavesWidgetUntouched() {
+        whenever(duckChat.observeNativeInputFieldUserSettingEnabled()).thenReturn(MutableStateFlow(false))
+        whenever(duckChat.observeNativeChatInputEnabled()).thenReturn(MutableStateFlow(false))
+        testee.init(omnibar, rootView, lifecycleOwner)
+        rootView.addView(View(context).apply { id = R.id.inputModeTopRoot })
+
+        showNativeInput()
+
+        assertNotNull(rootView.findViewById<View?>(R.id.inputModeTopRoot))
+    }
+
+    @Test
+    fun whenNativeChatInputFlipsOffInDuckAiModeThenWidgetRemoved() {
+        val nativeChatInputEnabled = MutableStateFlow(true)
+        whenever(duckChat.observeNativeInputFieldUserSettingEnabled()).thenReturn(MutableStateFlow(true))
+        whenever(duckChat.observeNativeChatInputEnabled()).thenReturn(nativeChatInputEnabled)
+        whenever(omnibar.viewMode).thenReturn(Omnibar.ViewMode.DuckAI)
+        testee.init(omnibar, rootView, lifecycleOwner)
+        rootView.addView(View(context).apply { id = R.id.inputModeTopRoot })
+
+        nativeChatInputEnabled.value = false
+
+        assertNull(rootView.findViewById<View?>(R.id.inputModeTopRoot))
+    }
+
+    private fun showNativeInput() {
+        testee.showNativeInput(
+            tabId = "tab",
+            layoutInflater = LayoutInflater.from(context),
+            lifecycleOwner = lifecycleOwner,
+            tabs = mock<LiveData<List<TabEntity>>>(),
+            currentTabUrl = emptyFlow(),
+            query = "",
+            callbacks = mock<NativeInputCallbacks>(),
+        )
+    }
+
+    private class FakeLifecycleOwner : LifecycleOwner {
+        private val registry = LifecycleRegistry(this).apply { currentState = Lifecycle.State.RESUMED }
+        override val lifecycle: Lifecycle get() = registry
     }
 
     @Test

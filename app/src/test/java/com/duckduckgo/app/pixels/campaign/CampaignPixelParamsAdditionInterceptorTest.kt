@@ -2,7 +2,6 @@ package com.duckduckgo.app.pixels.campaign
 
 import com.duckduckgo.app.pixels.campaign.params.AdditionalPixelParamsGenerator
 import com.duckduckgo.common.test.api.FakeChain
-import com.duckduckgo.common.utils.featureflags.OkHttpInterceptorRefactorFeature
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
@@ -45,7 +44,6 @@ class CampaignPixelParamsAdditionInterceptorTest {
             additionalPixelParamsGenerator,
             additionalPixelParamsFeature,
             additionalPixelParamsDataStore,
-            FakeFeatureToggleFactory.create(OkHttpInterceptorRefactorFeature::class.java),
         )
     }
 

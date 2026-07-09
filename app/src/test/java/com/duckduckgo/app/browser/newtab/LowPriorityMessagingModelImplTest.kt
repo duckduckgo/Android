@@ -1,7 +1,7 @@
+package com.duckduckgo.app.browser.newtab
+
 import android.content.Context
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.AdditionalDefaultBrowserPrompts
-import com.duckduckgo.app.browser.newtab.LowPriorityMessage
-import com.duckduckgo.app.browser.newtab.LowPriorityMessagingModelImpl
 import com.duckduckgo.app.browser.newtab.NewTabPageViewModel.Command.LaunchDefaultBrowser
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel

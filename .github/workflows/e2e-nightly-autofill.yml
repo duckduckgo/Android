@@ -69,7 +69,7 @@ jobs:
           test_suite_name: Autofill Web Flows
 
       - name: Create Asana task when workflow failed
-        if: ${{ failure() && steps.maestro-critical-path.outputs.flow_summary_status != 'failure' && steps.maestro-web-flows.outputs.flow_summary_status != 'failure' }}
+        if: ${{ failure() && steps.maestro-critical-path.outputs.flow_summary_status != 'failure' && steps.maestro-web-flows.outputs.flow_summary_status != 'failure' && github.event_name != 'workflow_dispatch' }}
         id: create-failure-task
         uses: duckduckgo/native-github-asana-sync@v2.0
         with:

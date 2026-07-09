@@ -35,6 +35,7 @@ dependencies {
     implementation project(':cookies-api')
     implementation project(':cookies-store')
     implementation project(':browser-api')
+    implementation project(':browser-mode-api')
     implementation project(':statistics-api')
     implementation project(':content-scope-scripts-api')
     implementation project(':duckchat-api')
@@ -52,6 +53,7 @@ dependencies {
 
     implementation Google.dagger
     implementation AndroidX.core.ktx
+    implementation AndroidX.webkit
     implementation AndroidX.work.runtimeKtx
     implementation AndroidX.room.runtime
 

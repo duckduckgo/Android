@@ -20,7 +20,8 @@ import com.duckduckgo.sync.impl.Result
 import com.duckduckgo.sync.impl.SyncApi
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.test.runTest
-import org.junit.Assert.assertTrue
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotNull
 import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
@@ -40,27 +41,55 @@ class RealExchangeV2ChannelTest {
         messageParser = messageParser,
     )
 
-    @Test fun `poll stops without retrying when the relay returns a non-recoverable status`() = runTest {
+    @Test fun `poll throws PollAuthDenied on 403 without retrying`() = runTest {
         whenever(syncApi.pollExchangeMessages(any(), any())).thenReturn(
             Result.Error(code = 403, reason = "Forbidden"),
             Result.Error(code = 404, reason = "should not be reached"),
         )
 
-        val received = channel.poll("own-channel", "own-priv").toList()
+        var thrown: PollAuthDenied? = null
+        try { channel.poll("own-channel", "own-priv").toList() } catch (e: PollAuthDenied) { thrown = e }
 
-        assertTrue(received.isEmpty())
+        assertNotNull(thrown)
+        assertEquals(403, thrown!!.status)
         verify(syncApi, times(1)).pollExchangeMessages(any(), any())
     }
 
-    @Test fun `poll keeps polling after a transient status and ends on 404`() = runTest {
+    @Test fun `poll throws PollBadRequest on 400 without retrying`() = runTest {
+        whenever(syncApi.pollExchangeMessages(any(), any())).thenReturn(
+            Result.Error(code = 400, reason = "Bad Request"),
+        )
+
+        var thrown: PollBadRequest? = null
+        try { channel.poll("own-channel", "own-priv").toList() } catch (e: PollBadRequest) { thrown = e }
+
+        assertNotNull(thrown)
+        assertEquals(400, thrown!!.status)
+    }
+
+    @Test fun `poll keeps polling after a transient status and throws ChannelGone on 404`() = runTest {
         whenever(syncApi.pollExchangeMessages(any(), any())).thenReturn(
             Result.Error(code = 500, reason = "Server error"),
             Result.Error(code = 404, reason = "channel gone"),
         )
 
-        val received = channel.poll("own-channel", "own-priv").toList()
+        var thrown: ChannelGone? = null
+        try { channel.poll("own-channel", "own-priv").toList() } catch (e: ChannelGone) { thrown = e }
 
-        assertTrue(received.isEmpty())
+        assertNotNull(thrown)
+        assertEquals(404, thrown!!.status)
         verify(syncApi, times(2)).pollExchangeMessages(any(), any())
+    }
+
+    @Test fun `poll throws ChannelGone on 410`() = runTest {
+        whenever(syncApi.pollExchangeMessages(any(), any())).thenReturn(
+            Result.Error(code = 410, reason = "Gone"),
+        )
+
+        var thrown: ChannelGone? = null
+        try { channel.poll("own-channel", "own-priv").toList() } catch (e: ChannelGone) { thrown = e }
+
+        assertNotNull(thrown)
+        assertEquals(410, thrown!!.status)
     }
 }

@@ -50,6 +50,9 @@ class PirScheduledScanRemoteWorker(
     @Inject
     lateinit var pirFeatureDataCleaner: PirFeatureDataCleaner
 
+    @Inject
+    lateinit var pirForegroundScanServiceMonitor: PirForegroundScanServiceMonitor
+
     override suspend fun doRemoteWork(): Result {
         logcat { "PIR-WORKER ($this}: doRemoteWork ${Process.myPid()}" }
         return try {
@@ -59,6 +62,11 @@ class PirScheduledScanRemoteWorker(
                 pirWorkHandler.cancelWork(CancellationReason.fromDisabledReason(eligibility.reason))
                 pirFeatureDataCleaner.removeAllData()
                 return Result.failure()
+            }
+
+            if (pirForegroundScanServiceMonitor.isRunning()) {
+                logcat { "PIR-WORKER ($this}: Foreground scan running, skipping this scheduled run" }
+                return Result.success()
             }
 
             val result = pirJobsRunner.runEligibleJobs(context.applicationContext, PirExecutionType.SCHEDULED)

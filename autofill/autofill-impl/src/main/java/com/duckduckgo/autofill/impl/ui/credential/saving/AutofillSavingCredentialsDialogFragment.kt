@@ -66,10 +66,13 @@ import com.duckduckgo.autofill.impl.ui.credential.saving.AutofillSavingCredentia
 import com.duckduckgo.autofill.impl.ui.credential.saving.AutofillSavingCredentialsDialogFragment.DialogEvent.Shown
 import com.duckduckgo.autofill.impl.ui.credential.saving.AutofillSavingCredentialsViewModel.ViewState
 import com.duckduckgo.autofill.impl.ui.credential.saving.declines.AutofillDeclineCounter
+import com.duckduckgo.common.ui.applyBottomSystemBarInsetPadding
 import com.duckduckgo.common.ui.view.button.DaxButton
 import com.duckduckgo.common.ui.view.prependIconToText
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.FragmentViewModelFactory
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.common.utils.extractDomain
 import com.duckduckgo.di.scopes.FragmentScope
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -91,7 +94,14 @@ import javax.inject.Inject
 @InjectWith(FragmentScope::class)
 class AutofillSavingCredentialsDialogFragment : BottomSheetDialogFragment(), CredentialSavePickerDialog {
 
-    override fun getTheme(): Int = R.style.AutofillBottomSheetDialogTheme
+    override fun getTheme(): Int = if (edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.BOTTOM_SHEETS)) {
+        R.style.AutofillBottomSheetDialogThemeEdgeToEdge
+    } else {
+        R.style.AutofillBottomSheetDialogTheme
+    }
+
+    @Inject
+    lateinit var edgeToEdgeProvider: EdgeToEdgeProvider
 
     @Inject
     lateinit var faviconManager: FaviconManager
@@ -167,6 +177,9 @@ class AutofillSavingCredentialsDialogFragment : BottomSheetDialogFragment(), Cre
         val binding = ContentAutofillSaveNewCredentialsBinding.inflate(inflater, container, false)
         configureViews(binding)
         observeViewModel()
+        if (edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.BOTTOM_SHEETS)) {
+            binding.dialogRootView.applyBottomSystemBarInsetPadding()
+        }
         return binding.root
     }
 

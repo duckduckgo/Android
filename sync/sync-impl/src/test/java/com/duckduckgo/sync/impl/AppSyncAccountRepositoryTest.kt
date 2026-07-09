@@ -84,6 +84,7 @@ import com.duckduckgo.sync.store.ScopedPassword
 import com.duckduckgo.sync.store.SyncStore
 import com.squareup.moshi.Moshi
 import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
@@ -129,7 +130,6 @@ class AppSyncAccountRepositoryTest {
     private val syncSetupWideEvent: SyncSetupWideEvent = mock()
     private val syncJweCrypto: SyncJweCrypto = mock()
     private val thirdPartyCredentialManager: ThirdPartyCredentialManager = mock()
-    private val protectedKeyManager: ProtectedKeyManager = mock()
     private val thirdPartyDeviceListDecryptor: ThirdPartyDeviceListDecryptor = mock()
 
     @Before
@@ -150,7 +150,6 @@ class AppSyncAccountRepositoryTest {
             syncSetupWideEvent = syncSetupWideEvent,
             syncJweCrypto = syncJweCrypto,
             thirdPartyCredentialManager = thirdPartyCredentialManager,
-            protectedKeyManager = protectedKeyManager,
             thirdPartyDeviceListDecryptor = thirdPartyDeviceListDecryptor,
         )
         (syncRepo as AppSyncAccountRepository).upgradeRetryDelayMillis = 0L // keep retry-path tests instant
@@ -1243,11 +1242,11 @@ class AppSyncAccountRepositoryTest {
         verify(syncApi).createAccount(anyString(), anyString(), anyString(), anyString(), anyString(), anyString(), eq(null))
     }
 
-    // ---- Delegation to ThirdPartyCredentialManager / ProtectedKeyManager ----
-    // Per-manager logic is covered in ThirdPartyCredentialManagerTest and ProtectedKeyManagerTest.
+    // ---- Delegation to ThirdPartyCredentialManager ----
+    // Per-manager logic is covered in ThirdPartyCredentialManagerTest.
 
     @Test
-    fun whenCreateThirdPartyCredentialThenDelegatesToManager() {
+    fun whenCreateThirdPartyCredentialThenDelegatesToManager() = runTest {
         whenever(thirdPartyCredentialManager.create()).thenReturn(Success(true))
 
         val result = syncRepo.createThirdPartyCredential()
@@ -1287,27 +1286,10 @@ class AppSyncAccountRepositoryTest {
         assertEquals(managerError, result)
     }
 
-    @Test
-    fun whenCreateProtectedKeyThenDelegatesToManager() {
-        val createdKey = ProtectedKeyEntry(
-            kid = "k1",
-            purpose = "ai_chats",
-            encryptedWith = "ddg",
-            encryptedPrivateKey = "enc",
-            publicKey = RsaJwk(n = "mod", e = "AQAB"),
-        )
-        whenever(protectedKeyManager.create("ai_chats")).thenReturn(Success(createdKey))
-
-        val result = syncRepo.createProtectedKey("ai_chats")
-
-        assertEquals(Success(true), result)
-        verify(protectedKeyManager).create("ai_chats")
-    }
-
     // joinAccountFromThirdPartyRecoveryCode
 
     @Test
-    fun whenJoinAccountFromThirdPartyAndAllStepsSucceedThenAtomicStoreUsesDdgTokenFromSecondLogin() {
+    fun whenJoinAccountFromThirdPartyAndAllStepsSucceedThenAtomicStoreUsesDdgTokenFromSecondLogin() = runTest {
         val pastedCode = prepareForJoinAccountFromThirdPartyRecoveryCode()
 
         val result = syncRepo.joinAccountFromThirdPartyRecoveryCode(pastedCode)
@@ -1325,7 +1307,21 @@ class AppSyncAccountRepositoryTest {
     }
 
     @Test
-    fun whenJoinAccountFromThirdPartyThenStep7aPostUpgradeLoginUsesUnrestrictedScope() {
+    fun whenJoinAccountFromThirdPartySucceedsThenScopedPasswordIsWrittenFromLocalRecoveryCode() = runTest {
+        // Defensive: even if the BE response omits encrypted_3party_credential (so performLogin's
+        // server-decoded SP path is a no-op), the join should still leave scopedPassword populated
+        // from the locally-parsed recovery code.
+        val pastedCode = prepareForJoinAccountFromThirdPartyRecoveryCode()
+
+        val result = syncRepo.joinAccountFromThirdPartyRecoveryCode(pastedCode)
+
+        assertEquals(Success(true), result)
+        val expectedSp = base64UrlStringToStandardBase64("rUzlGqLLlbonAC_zIeh1nrCmuDsDAn6UooUUDz-6x3o")
+        verify(syncStore).scopedPassword = ScopedPassword(expectedSp)
+    }
+
+    @Test
+    fun whenJoinAccountFromThirdPartyThenStep7aPostUpgradeLoginUsesUnrestrictedScope() = runTest {
         val pastedCode = prepareForJoinAccountFromThirdPartyRecoveryCode()
 
         syncRepo.joinAccountFromThirdPartyRecoveryCode(pastedCode)
@@ -1350,7 +1346,7 @@ class AppSyncAccountRepositoryTest {
     }
 
     @Test
-    fun whenStep7aPostUpgradeLoginReturns401ThenAbortsWithoutAtomicStore() {
+    fun whenStep7aPostUpgradeLoginReturns401ThenAbortsWithoutAtomicStore() = runTest {
         val pastedCode = prepareForJoinAccountFromThirdPartyRecoveryCode(step7aResult = step7aLoginUnauthorized)
 
         val result = syncRepo.joinAccountFromThirdPartyRecoveryCode(pastedCode)
@@ -1361,7 +1357,7 @@ class AppSyncAccountRepositoryTest {
     }
 
     @Test
-    fun whenStep7aPostUpgradeLoginFailsWithNon401ThenAbortsWithoutAtomicStore() {
+    fun whenStep7aPostUpgradeLoginFailsWithNon401ThenAbortsWithoutAtomicStore() = runTest {
         val pastedCode = prepareForJoinAccountFromThirdPartyRecoveryCode(step7aResult = step7aLoginServerError)
 
         val result = syncRepo.joinAccountFromThirdPartyRecoveryCode(pastedCode)
@@ -1375,7 +1371,7 @@ class AppSyncAccountRepositoryTest {
     }
 
     @Test
-    fun whenJoinAccountFromThirdPartyAndAccountAlreadyHasDdgCredentialThenAbortsBeforePost() {
+    fun whenJoinAccountFromThirdPartyAndAccountAlreadyHasDdgCredentialThenAbortsBeforePost() = runTest {
         val pastedCode = prepareForJoinAccountFromThirdPartyRecoveryCode(accountAlreadyHasDdg = true)
 
         val result = syncRepo.joinAccountFromThirdPartyRecoveryCode(pastedCode)
@@ -1388,7 +1384,7 @@ class AppSyncAccountRepositoryTest {
     }
 
     @Test
-    fun whenStep7PostRateLimitedThenRetriesAndSucceeds() {
+    fun whenStep7PostRateLimitedThenRetriesAndSucceeds() = runTest {
         val pastedCode = prepareForJoinAccountFromThirdPartyRecoveryCode()
         whenever(syncApi.createAccessCredential(anyString(), eq("ddg"), any()))
             .thenReturn(Error(code = API_CODE.TOO_MANY_REQUESTS_2.code, reason = "rate limited"), Success(true))
@@ -1400,7 +1396,7 @@ class AppSyncAccountRepositoryTest {
     }
 
     @Test
-    fun whenStep7aLoginServerErrorThenRetriesAndSucceeds() {
+    fun whenStep7aLoginServerErrorThenRetriesAndSucceeds() = runTest {
         val pastedCode = prepareForJoinAccountFromThirdPartyRecoveryCode()
         whenever(syncApi.login(eq(userId), any(), eq(deviceId), any(), any(), eq<String?>(null)))
             .thenReturn(step7aLoginServerError, step7aLoginSuccess)
@@ -1420,7 +1416,7 @@ class AppSyncAccountRepositoryTest {
     }
 
     @Test
-    fun whenStep7aLoginTransportErrorThenRetriesAndSucceeds() {
+    fun whenStep7aLoginTransportErrorThenRetriesAndSucceeds() = runTest {
         val pastedCode = prepareForJoinAccountFromThirdPartyRecoveryCode()
         whenever(syncApi.login(eq(userId), any(), eq(deviceId), any(), any(), eq<String?>(null)))
             .thenReturn(step7aLoginTransportError, step7aLoginSuccess)
@@ -1432,7 +1428,7 @@ class AppSyncAccountRepositoryTest {
     }
 
     @Test
-    fun whenStep7aLogin401ThenAbortsWithoutRetry() {
+    fun whenStep7aLogin401ThenAbortsWithoutRetry() = runTest {
         val pastedCode = prepareForJoinAccountFromThirdPartyRecoveryCode(step7aResult = step7aLoginUnauthorized)
 
         val result = syncRepo.joinAccountFromThirdPartyRecoveryCode(pastedCode)
@@ -1443,7 +1439,7 @@ class AppSyncAccountRepositoryTest {
     }
 
     @Test
-    fun whenStep7Post409AlreadyExistsThenAbortsWithoutRetry() {
+    fun whenStep7Post409AlreadyExistsThenAbortsWithoutRetry() = runTest {
         val pastedCode = prepareForJoinAccountFromThirdPartyRecoveryCode()
         whenever(syncApi.createAccessCredential(anyString(), eq("ddg"), any()))
             .thenReturn(Error(code = API_CODE.COUNT_LIMIT.code, reason = "already exists"))
@@ -1456,7 +1452,7 @@ class AppSyncAccountRepositoryTest {
     }
 
     @Test
-    fun whenStep7PostRateLimitedBeyondRetryLimitThenAbortsWithoutStore() {
+    fun whenStep7PostRateLimitedBeyondRetryLimitThenAbortsWithoutStore() = runTest {
         val pastedCode = prepareForJoinAccountFromThirdPartyRecoveryCode()
         whenever(syncApi.createAccessCredential(anyString(), eq("ddg"), any()))
             .thenReturn(Error(code = API_CODE.TOO_MANY_REQUESTS_1.code, reason = "rate limited"))
@@ -1470,7 +1466,7 @@ class AppSyncAccountRepositoryTest {
     }
 
     @Test
-    fun whenJoinAccountFromThirdPartyAndCodeIsLaterMinorVersionThenAccepted() {
+    fun whenJoinAccountFromThirdPartyAndCodeIsLaterMinorVersionThenAccepted() = runTest {
         val pastedCode = prepareForJoinAccountFromThirdPartyRecoveryCode(version = "2.5")
 
         val result = syncRepo.joinAccountFromThirdPartyRecoveryCode(pastedCode)
@@ -1479,7 +1475,7 @@ class AppSyncAccountRepositoryTest {
     }
 
     @Test
-    fun whenJoinAccountFromThirdPartyAndCodeIsBareMajorVersionThenAccepted() {
+    fun whenJoinAccountFromThirdPartyAndCodeIsBareMajorVersionThenAccepted() = runTest {
         // "2" is the spec's common shorthand for "2.0" (Transport TD 1214486492252757).
         val pastedCode = prepareForJoinAccountFromThirdPartyRecoveryCode(version = "2")
 
@@ -1489,7 +1485,7 @@ class AppSyncAccountRepositoryTest {
     }
 
     @Test
-    fun whenJoinAccountFromThirdPartyAndCodeIsMajorVersion3ThenRejectedWithoutNetwork() {
+    fun whenJoinAccountFromThirdPartyAndCodeIsMajorVersion3ThenRejectedWithoutNetwork() = runTest {
         val pastedCode = prepareForJoinAccountFromThirdPartyRecoveryCode(version = "3.0")
 
         val result = syncRepo.joinAccountFromThirdPartyRecoveryCode(pastedCode)
@@ -1499,7 +1495,7 @@ class AppSyncAccountRepositoryTest {
     }
 
     @Test
-    fun whenJoinAccountFromThirdPartyAndCodeCidIsNotThirdPartyThenRejectedWithoutNetwork() {
+    fun whenJoinAccountFromThirdPartyAndCodeCidIsNotThirdPartyThenRejectedWithoutNetwork() = runTest {
         val pastedCode = prepareForJoinAccountFromThirdPartyRecoveryCode(cid = "ddg")
 
         val result = syncRepo.joinAccountFromThirdPartyRecoveryCode(pastedCode)
@@ -1524,7 +1520,7 @@ class AppSyncAccountRepositoryTest {
     private val step7aLoginSuccess = Success(
         LoginResponse(
             token = "ddg_token_step7a",
-            protected_encryption_key = null,
+            protected_encryption_key = protectedEncryptionKey,
             devices = emptyList(),
             accessCredentials = null,
             keys = null,
@@ -1551,6 +1547,11 @@ class AppSyncAccountRepositoryTest {
         whenever(syncJweCrypto.jweEncryptSymmetric(any(), any(), any())).thenReturn("encrypted_3party_credential")
         whenever(nativeLib.generateAccountKeys(userId = eq(userId), password = anyString())).thenReturn(accountKeys)
 
+        // Step 7's performLogin uses libsodium derivations on the new ddg primaryKey, then decrypts
+        // the protected_encryption_key the server echoes back to recover the secretKey.
+        whenever(nativeLib.prepareForLogin(primaryKey = primaryKey)).thenReturn(validLoginKeys)
+        whenever(nativeLib.decrypt(encryptedData = protectedEncryptionKey, secretKey = stretchedPrimaryKey)).thenReturn(decryptedSecretKey)
+
         // Step 2 response; optionally includes ddg to drive the "already upgraded" path.
         val accessCredentialsInResponse = buildList {
             add(AccessCredentialEntry(id = "3party", scope = "ai_chats"))
@@ -1567,7 +1568,7 @@ class AppSyncAccountRepositoryTest {
         val step7aResponse = step7aResult ?: Success(
             LoginResponse(
                 token = "ddg_token_step7a",
-                protected_encryption_key = null,
+                protected_encryption_key = protectedEncryptionKey,
                 devices = emptyList(),
                 accessCredentials = null,
                 keys = null,

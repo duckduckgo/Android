@@ -37,6 +37,7 @@ import com.duckduckgo.newtabpage.impl.pixels.NtpAfterIdlePixels
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -50,11 +51,19 @@ class NtpAfterIdleManagerImpl @Inject constructor(
     private val pixel: Pixel,
     private val hatchPixels: HatchPixels,
     private val hatchInteractionsPlugins: PluginPoint<HatchInteractionsPlugin>,
+    private val returnToLastTabStore: ReturnToLastTabStore,
 ) : NtpAfterIdleManager, BrowserLifecycleObserver {
 
     private val pendingAfterIdle = AtomicBoolean(false)
     private val _isAfterIdleReturn = MutableStateFlow(false)
     override val isAfterIdleReturn: StateFlow<Boolean> = _isAfterIdleReturn.asStateFlow()
+
+    override val returnToLastTabEnabled: Flow<Boolean>
+        get() = returnToLastTabStore.isEnabled
+
+    override suspend fun setReturnToLastTabEnabled(enabled: Boolean) {
+        returnToLastTabStore.setEnabled(enabled)
+    }
 
     override fun onOpen(isFreshLaunch: Boolean) {
         // pendingAfterIdle is intentionally NOT reset: FirstScreenHandlerImpl.onOpen may

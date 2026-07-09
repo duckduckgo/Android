@@ -122,6 +122,18 @@ class RealDuckChatPixelsToolsTest {
     }
 
     @Test
+    fun whenCustomizeResponsesSelectedThenFiresCountAndDaily() = runTest {
+        testee.fireCustomizeResponsesSelected()
+
+        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_CUSTOMIZE_RESPONSES_SELECTED_COUNT, parameters = emptyMap())
+        verify(pixel).fire(
+            DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_CUSTOMIZE_RESPONSES_SELECTED_DAILY,
+            parameters = emptyMap(),
+            type = Pixel.PixelType.Daily(),
+        )
+    }
+
+    @Test
     fun whenPromptSubmittedThenFiresWithFullState() = runTest {
         testee.firePromptSubmitted(
             selectedTool = "image_generation",

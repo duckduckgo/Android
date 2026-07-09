@@ -39,6 +39,7 @@ dependencies {
     implementation project(path: ':design-system')
     implementation project(path: ':autofill-api')
     implementation project(path: ':browser-api')
+    implementation project(path: ':browser-mode-api')
     implementation project(path: ':statistics-api')
     testImplementation project(path: ':autofill-test')
     implementation project(path: ':sync-api')
@@ -51,6 +52,7 @@ dependencies {
     implementation project(':sqlcipher-loader-api')
     implementation project(':saved-sites-api')
     implementation project(':cookies-api')
+    implementation project(':browser-mode-api')
 
     implementation project(path: ':anvil-annotations')
 

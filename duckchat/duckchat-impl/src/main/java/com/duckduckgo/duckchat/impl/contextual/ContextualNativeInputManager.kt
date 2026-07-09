@@ -33,6 +33,7 @@ import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import com.google.android.material.card.MaterialCardView
 import com.squareup.anvil.annotations.ContributesBinding
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import org.json.JSONArray
@@ -74,6 +75,10 @@ class RealContextualNativeInputManager @Inject constructor(
     private var card: MaterialCardView? = null
     private var jsMessaging: JsMessaging? = null
     private var widget: NativeInputModeWidget? = null
+    private var lastMode: Mode? = null
+    private val modelPickerEnabled = MutableStateFlow(true)
+
+    private enum class Mode { WEBVIEW, INPUT }
 
     override fun init(
         tabId: String,
@@ -107,20 +112,22 @@ class RealContextualNativeInputManager @Inject constructor(
     }
 
     override fun onWebViewMode() {
+        lastMode = Mode.WEBVIEW
         if (isNativeInputEnabled) {
             card?.show()
             // WEBVIEW mode means a chat is in progress.
             // Hide the picker so the user can't change models mid-chat.
-            widget?.setModelPickerEnabled(false)
+            modelPickerEnabled.value = false
         } else {
             card?.gone()
         }
     }
 
     override fun onInputMode() {
+        lastMode = Mode.INPUT
         card?.gone()
         // INPUT mode is a new chat: restore the picker
-        if (isNativeInputEnabled) widget?.setModelPickerEnabled(true)
+        if (isNativeInputEnabled) modelPickerEnabled.value = true
     }
 
     private fun applyCardShape(card: MaterialCardView) {
@@ -145,6 +152,7 @@ class RealContextualNativeInputManager @Inject constructor(
     ) {
         widget.configureContextual(tabId)
         widget.bindChatIdSource(chatIdFlow)
+        widget.bindModelPickerEnabledSource(modelPickerEnabled)
         widget.hideMainButtons()
         widget.onStopTapped = ::sendStopEvent
         widget.bindAttachmentCallbacks(
@@ -154,7 +162,6 @@ class RealContextualNativeInputManager @Inject constructor(
         widget.bindInputEvents(
             onSearchTextChanged = { },
             onSearchSubmitted = { query ->
-                widget.hideKeyboard()
                 onSearchSubmitted(query)
             },
             onChatSubmitted = { prompt ->
@@ -169,8 +176,18 @@ class RealContextualNativeInputManager @Inject constructor(
     }
 
     private fun observeNativeInputSetting(lifecycleOwner: LifecycleOwner) {
-        duckChat.observeNativeInputFieldUserSettingEnabled()
-            .onEach { isEnabled -> isNativeInputEnabled = isEnabled }
+        duckChat.observeNativeChatInputEnabled()
+            .onEach { isEnabled ->
+                isNativeInputEnabled = isEnabled
+                // Re-apply the current mode so the card shows/hides immediately when the flag
+                // flips at runtime — otherwise a card left over from WEBVIEW mode would overlap
+                // the web input after the flag turns off.
+                when (lastMode) {
+                    Mode.WEBVIEW -> onWebViewMode()
+                    Mode.INPUT -> onInputMode()
+                    null -> {}
+                }
+            }
             .launchIn(lifecycleOwner.lifecycleScope)
     }
 

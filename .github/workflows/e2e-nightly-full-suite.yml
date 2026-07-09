@@ -286,6 +286,28 @@ jobs:
           asana_releases_project_id: ${{ vars.GH_ANDROID_APP_RELEASES_PROJECT_ID }}
           asana_releases_blocker_section_id: ${{ vars.GH_ANDROID_APP_RELEASES_PROJECT_BLOCKER_SECTION_ID }}
 
+      - name: Unified Input Field
+        id: maestro-unified-input
+        uses: ./.github/actions/maestro-cloud-asana-reporter
+        timeout-minutes: 120
+        with:
+          maestro_api_key: ${{ secrets.ROBIN_API_KEY }}
+          maestro_project_id: ${{ vars.ROBIN_ANDROID_PROJECT_ID }}
+          maestro_test_name: unifiedInputTest${{ env.DI_UNDERSCORE_SUFFIX }}_${{ github.sha }}
+          maestro_timeout: ${{ vars.ROBIN_TIMEOUT_MINUTES }}
+          maestro_app_binary_id: ${{ steps.maestro-upload-internal-binary.outputs.maestro_app_binary_id }}
+          maestro_api_level: 34
+          maestro_include_tags: unifiedInputTest
+          asana_pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
+          asana_project_id: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
+          asana_section_id: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
+          test_suite_name: Unified Input Field (${{ env.DDG_DI == 'AnvilDagger' && 'Nightly' || format('{0} Nightly', env.DDG_DI) }})
+          create_asana_error_task: ${{ inputs.create_asana_tasks }}
+          # Only block releases for the default Anvil path. Metro is informational.
+          is_release_blocker: ${{ env.DDG_DI == 'AnvilDagger' }}
+          asana_releases_project_id: ${{ vars.GH_ANDROID_APP_RELEASES_PROJECT_ID }}
+          asana_releases_blocker_section_id: ${{ vars.GH_ANDROID_APP_RELEASES_PROJECT_BLOCKER_SECTION_ID }}
+
       - name: Notifications permissions Android 13+
         id: maestro-notification-permissions
         uses: ./.github/actions/maestro-cloud-asana-reporter
@@ -309,7 +331,7 @@ jobs:
           asana_releases_blocker_section_id: ${{ vars.GH_ANDROID_APP_RELEASES_PROJECT_BLOCKER_SECTION_ID }}
 
       - name: Create Asana task when workflow failed
-        if: ${{ failure() && inputs.create_asana_tasks == true }}
+        if: ${{ failure() && inputs.create_asana_tasks == true && github.event_name != 'workflow_dispatch' }}
         id: create-failure-task
         uses: duckduckgo/native-github-asana-sync@v2.0
         with:

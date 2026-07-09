@@ -82,7 +82,7 @@ class CustomAiOnboardingStoreImpl @Inject constructor(
     private val sharedPreferencesProvider: SharedPreferencesProvider,
     private val referrerStateListener: Lazy<AppInstallationReferrerStateListener>,
     private val dispatcherProvider: DispatcherProvider,
-    private val customDuckAiOnboardingFeature: CustomDuckAiOnboardingFeature,
+    private val customAiOnboardingFeature: CustomAiOnboardingFeature,
     private val orchestratorFeature: LinearOnboardingOrchestratorFeature,
     private val brandDesignUpdateToggles: OnboardingBrandDesignUpdateToggles,
 ) : CustomAiOnboardingStore, CustomAiOnboardingResolver, ReferrerParserPlugin {
@@ -106,7 +106,7 @@ class CustomAiOnboardingStoreImpl @Inject constructor(
             withTimeoutOrNull(MAX_REFERRER_WAIT_TIME_MS) { referrerStateListener.get().waitForReferrerCode() }
             val referrerExists = preferences.getBoolean(PREFS_KEY_REFERRER_PARAM_PRESENT, false)
 
-            val customAiOnboardingEnabled = customDuckAiOnboardingFeature.self().isEnabled()
+            val customAiOnboardingEnabled = customAiOnboardingFeature.self().isEnabled()
             val orchestratorEnabled = orchestratorFeature.self().isEnabled()
             val brandDesignEnabled = brandDesignUpdateToggles.brandDesignUpdate().isEnabled()
 

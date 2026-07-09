@@ -136,13 +136,6 @@ interface SyncService {
         @Header("Authorization") token: String,
     ): Call<ProtectedKeysResponse>
 
-    @POST("$SYNC_PROD_ENVIRONMENT_URL/sync/keys/purpose/{purpose}/set-if-absent")
-    fun setProtectedKeyIfAbsent(
-        @Header("Authorization") token: String,
-        @Path("purpose") purpose: String,
-        @Body request: SetProtectedKeyIfAbsentRequest,
-    ): Call<ProtectedKeysResponse>
-
     @GET("$SYNC_PROD_ENVIRONMENT_URL/sync/access-credentials")
     fun getAccessCredentials(
         @Header("Authorization") token: String,
@@ -278,11 +271,6 @@ data class TokenRescopeResponse(
 
 /** Response from GET /sync/keys — the account's protected keys for all purposes. */
 data class ProtectedKeysResponse(
-    val keys: List<ProtectedKeyEntry>,
-)
-
-/** Body for POST /sync/keys/purpose/{purpose}/set-if-absent — adds a protected key only if no key exists for that purpose. */
-data class SetProtectedKeyIfAbsentRequest(
     val keys: List<ProtectedKeyEntry>,
 )
 

@@ -22,7 +22,6 @@ import com.duckduckgo.app.browser.tabs.TabManager.TabModel
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.browsermode.api.BrowserMode
-import com.duckduckgo.browsermode.api.BrowserModeStateHolder
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.squareup.anvil.annotations.ContributesBinding
@@ -62,7 +61,6 @@ class DefaultTabManager @Inject constructor(
     private val queryUrlConverter: OmnibarEntryConverter,
     private val skipUrlConversionOnNewTabFeature: SkipUrlConversionOnNewTabFeature,
     private val browserMode: BrowserMode,
-    private val browserModeStateHolder: BrowserModeStateHolder,
 ) : TabManager {
     private lateinit var onTabsUpdated: (List<TabModel>) -> Unit
     private var selectedTabId: String? = null
@@ -84,7 +82,8 @@ class DefaultTabManager @Inject constructor(
         onTabsUpdated(updatedTabIds)
 
         if (updatedTabIds.isEmpty()) {
-            if (browserMode == BrowserMode.FIRE && browserModeStateHolder.currentMode.value != BrowserMode.FIRE) {
+            // Fire mode never seeds a tab implicitly
+            if (browserMode == BrowserMode.FIRE) {
                 return
             }
             withContext(dispatchers.io()) {

@@ -503,10 +503,10 @@ class ModelPickerViewModelTest {
     }
 
     @Test
-    fun whenModelProviderIsUnknownThenNoIcon() {
+    fun whenModelProviderIsUnknownThenOssIconFallback() {
         val model = freeModel(id = "some-other-model", shortName = "Other", provider = ModelProvider.UNKNOWN)
 
-        assertNull(testee.getIconResForModel(model))
+        assertEquals(R.drawable.ic_ai_model_oss_16, testee.getIconResForModel(model))
     }
 
     @Test

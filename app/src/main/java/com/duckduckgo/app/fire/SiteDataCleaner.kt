@@ -25,8 +25,9 @@ import kotlinx.coroutines.suspendCancellableCoroutine
 import javax.inject.Inject
 import kotlin.coroutines.resume
 
-fun interface SiteDataCleaner {
+interface SiteDataCleaner {
     suspend fun deleteSiteData(webStorage: WebStorage, domain: String)
+    suspend fun deleteAllBrowsingData(webStorage: WebStorage)
 }
 
 @ContributesBinding(AppScope::class)
@@ -35,6 +36,14 @@ class RealSiteDataCleaner @Inject constructor() : SiteDataCleaner {
     override suspend fun deleteSiteData(webStorage: WebStorage, domain: String) {
         suspendCancellableCoroutine { continuation ->
             WebStorageCompat.deleteBrowsingDataForSite(webStorage, domain) {
+                continuation.resume(Unit)
+            }
+        }
+    }
+
+    override suspend fun deleteAllBrowsingData(webStorage: WebStorage) {
+        suspendCancellableCoroutine { continuation ->
+            WebStorageCompat.deleteBrowsingData(webStorage) {
                 continuation.resume(Unit)
             }
         }

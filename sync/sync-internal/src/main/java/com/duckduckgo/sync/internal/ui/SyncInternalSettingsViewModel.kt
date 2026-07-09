@@ -44,6 +44,7 @@ import com.duckduckgo.sync.impl.internal.SyncInternalEnvDataStore
 import com.duckduckgo.sync.impl.promotion.SyncPromotionDataStore
 import com.duckduckgo.sync.impl.promotion.SyncPromotionDataStore.PromotionType.BookmarkAddedDialog
 import com.duckduckgo.sync.impl.promotion.SyncPromotionDataStore.PromotionType.BookmarksScreen
+import com.duckduckgo.sync.impl.promotion.SyncPromotionDataStore.PromotionType.ChatTabPage
 import com.duckduckgo.sync.impl.promotion.SyncPromotionDataStore.PromotionType.PasswordsScreen
 import com.duckduckgo.sync.internal.ui.SyncInternalSettingsViewModel.Command.ReadConnectQR
 import com.duckduckgo.sync.internal.ui.SyncInternalSettingsViewModel.Command.ReadQR
@@ -457,6 +458,13 @@ constructor(
         }
     }
 
+    fun onClearHistoryChatTabPagePromoClicked() {
+        viewModelScope.launch {
+            syncPromotionDataStore.clearPromoHistory(ChatTabPage)
+            command.send(ShowMessage("'Chat tab page' promo history cleared"))
+        }
+    }
+
     fun onFetchAccessCredentialsClicked() {
         viewModelScope.launch(dispatchers.io()) {
             logcat { "Sync-ScopedToken: fetching access credentials" }
@@ -600,28 +608,6 @@ constructor(
                 logcat(LogPriority.ERROR) { "Sync-ScopedToken: fetch keys failed: $text" }
                 viewState.update { it.copy(keysText = text) }
                 command.send(ShowMessage(text))
-            }
-        }
-    }
-
-    fun onCreateProtectedKeyClicked(purpose: String) {
-        viewModelScope.launch(dispatchers.io()) {
-            logcat { "Sync-ScopedToken: creating protected key for purpose=$purpose from dev screen" }
-            if (syncStore.token.isNullOrEmpty()) {
-                logcat(LogPriority.WARN) { "Sync-ScopedToken: not signed in, skipping create protected key" }
-                command.send(ShowMessage("Not signed in"))
-                return@launch
-            }
-            if (purpose.isBlank()) {
-                command.send(ShowMessage("Purpose is required"))
-                return@launch
-            }
-            when (val result = syncAccountRepository.createProtectedKey(purpose)) {
-                is Success -> {
-                    command.send(ShowMessage("Protected key created for $purpose"))
-                    refreshKeys()
-                }
-                is Error -> command.send(ShowMessage("Create key failed: ${result.reason}"))
             }
         }
     }

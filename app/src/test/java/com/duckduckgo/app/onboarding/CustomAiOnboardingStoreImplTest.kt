@@ -48,7 +48,7 @@ class CustomAiOnboardingStoreImplTest {
 
     private val enabledToggle: Toggle = mock { on { isEnabled() } doReturn true }
     private val disabledToggle: Toggle = mock { on { isEnabled() } doReturn false }
-    private val customDuckAiOnboardingFeature: CustomDuckAiOnboardingFeature = mock()
+    private val customAiOnboardingFeature: CustomAiOnboardingFeature = mock()
     private val orchestratorFeature: LinearOnboardingOrchestratorFeature = mock()
     private val brandDesignUpdateToggles: OnboardingBrandDesignUpdateToggles = mock()
 
@@ -66,14 +66,14 @@ class CustomAiOnboardingStoreImplTest {
             sharedPreferencesProvider = sharedPreferencesProvider,
             referrerStateListener = Lazy { listener },
             dispatcherProvider = coroutineRule.testDispatcherProvider,
-            customDuckAiOnboardingFeature = customDuckAiOnboardingFeature,
+            customAiOnboardingFeature = customAiOnboardingFeature,
             orchestratorFeature = orchestratorFeature,
             brandDesignUpdateToggles = brandDesignUpdateToggles,
         )
 
     @Before
     fun setup() {
-        whenever(customDuckAiOnboardingFeature.self()).thenReturn(enabledToggle)
+        whenever(customAiOnboardingFeature.self()).thenReturn(enabledToggle)
         whenever(orchestratorFeature.self()).thenReturn(enabledToggle)
         whenever(brandDesignUpdateToggles.brandDesignUpdate()).thenReturn(enabledToggle)
     }
@@ -87,7 +87,7 @@ class CustomAiOnboardingStoreImplTest {
 
     @Test
     fun `when referrer ai but custom ai feature disabled then resolves false`() = runTest {
-        whenever(customDuckAiOnboardingFeature.self()).thenReturn(disabledToggle)
+        whenever(customAiOnboardingFeature.self()).thenReturn(disabledToggle)
         val store = store()
         store.process(mapOf("origin" to "funnel_playstore", "onboarding" to "ai"))
         assertFalse(store.resolve())
@@ -178,7 +178,7 @@ class CustomAiOnboardingStoreImplTest {
         store.resolve()
         assertTrue(store.isEnabled())
 
-        whenever(customDuckAiOnboardingFeature.self()).thenReturn(disabledToggle) // flips after the decision
+        whenever(customAiOnboardingFeature.self()).thenReturn(disabledToggle) // flips after the decision
         assertTrue(store.isEnabled()) // read does not re-evaluate preconditions
     }
 

@@ -26,6 +26,7 @@ import com.duckduckgo.sync.impl.crypto.SyncJweCrypto
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2State.Host
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2State.Joiner
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2State.SameAccountAbort
+import com.duckduckgo.sync.impl.pixels.SyncPixels.TimeoutStage
 import com.duckduckgo.sync.store.SyncStore
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
@@ -194,11 +195,8 @@ class RealExchangeV2Runner @Inject constructor(
             }
             emitSessionStarted()
             if (!sendHello()) {
-                // Couldn't reach the Presenter (their channel TTL'd out, or a stale/typo'd code) — abort.
-                failSession(
-                    "Pairing aborted — couldn't reach the Presenter. Their session may have expired (5-min TTL). " +
-                        "Ask them to Start as Presenter again.",
-                )
+                // sendHello already emitted a SessionError (incomplete state or HTTP status)
+                cancel()
                 return@launch
             }
             sendOwnAvailability()
@@ -255,13 +253,16 @@ class RealExchangeV2Runner @Inject constructor(
                     if (r.code == HTTP_CONFLICT) {
                         logcat { "Sync-ExchangeV2: channel_id $candidate already taken, retrying (${attempt + 1}/$MAX_CHANNEL_CREATE_RETRIES)" }
                     } else {
-                        emitSessionError("Failed to create channel")
+                        emitSessionError("Failed to create channel", SessionErrorKind.RelayChannelUnavailable)
                         return null
                     }
                 }
             }
         }
-        emitSessionError("Could not allocate unique channel_id after $MAX_CHANNEL_CREATE_RETRIES attempts")
+        emitSessionError(
+            "Could not allocate unique channel_id after $MAX_CHANNEL_CREATE_RETRIES attempts",
+            SessionErrorKind.RelayChannelUnavailable,
+        )
         return null
     }
 
@@ -271,16 +272,33 @@ class RealExchangeV2Runner @Inject constructor(
         withContext(NonCancellable) { mutex.withLock { cancelLocked() } }
     }
 
-    /** Emit one error, then tear down. No-ops if the session already ended, so a late timeout or
-     *  poll error can't surface a spurious error over a completed session. */
-    private suspend fun failSession(reason: String) {
+    /**
+     * Emit one error, then tear down. No-op if the session already ended, so a late timeout or poll error
+     * can't produce an error if a session already completed.
+     */
+    private suspend fun failSession(
+        reason: String,
+        kind: SessionErrorKind = SessionErrorKind.Unknown,
+        timeoutStage: TimeoutStage? = null,
+    ) {
         withContext(NonCancellable) {
             mutex.withLock {
-                if (session == null) return@withLock
-                emitSessionError(reason)
-                cancelLocked()
+                failSessionLocked(reason, kind, timeoutStage)
             }
         }
+    }
+
+    /** Caller MUST hold [mutex]. Same as [failSession] but assumes the lock is already held — call
+     *  this from paths already inside `mutex.withLock` (e.g. [processIncomingLocked]) to avoid the
+     *  non-reentrant `Mutex` deadlocking on itself. */
+    private fun failSessionLocked(
+        reason: String,
+        kind: SessionErrorKind = SessionErrorKind.Unknown,
+        timeoutStage: TimeoutStage? = null,
+    ) {
+        if (session == null) return
+        emitSessionError(reason, kind, timeoutStage)
+        cancelLocked()
     }
 
     /** Caller MUST hold [mutex]. The single teardown path, so field resets can't drift between
@@ -337,6 +355,12 @@ class RealExchangeV2Runner @Inject constructor(
                     "Couldn't decrypt a message from the peer (seq=${decryptFailure.seq}): " +
                         "${decryptFailure.cause?.message}. The keys probably don't match — try restarting pairing.",
                 )
+            } catch (gone: ChannelGone) {
+                failSession("Poll got ${gone.status} — channel gone", SessionErrorKind.RelayChannelUnavailable)
+            } catch (badRequest: PollBadRequest) {
+                failSession("Poll rejected with ${badRequest.status} — malformed request", SessionErrorKind.MalformedRelayRequest)
+            } catch (authDenied: PollAuthDenied) {
+                failSession("Poll denied with ${authDenied.status} — auth or policy", SessionErrorKind.Unknown)
             } catch (cancellation: CancellationException) {
                 throw cancellation // normal teardown (cancel() / scope cancellation) — let it propagate
             } catch (t: Throwable) {
@@ -357,8 +381,21 @@ class RealExchangeV2Runner @Inject constructor(
         timeoutJob = appScope.launch(dispatchers.io()) {
             delay(SESSION_TIMEOUT_MS)
             logcat { "Sync-ExchangeV2: session deadline (${SESSION_TIMEOUT_MS}ms) reached" }
-            failSession("Session timed out")
+            // Capture the phase we were stuck in before failSession() tears the state machine down
+            val stage = mutex.withLock { session?.currentState?.toTimeoutStage() }
+            failSession("Session timed out", kind = SessionErrorKind.SessionTimeout, timeoutStage = stage)
         }
+    }
+
+    /**
+     * Map the state active at the moment the 5-min deadline fires into a [TimeoutStage].
+     */
+    private fun ExchangeV2State.toTimeoutStage(): TimeoutStage? = when (this) {
+        ExchangeV2State.Bootstrapped -> TimeoutStage.WAITING_FOR_PEER_HELLO
+        ExchangeV2State.Negotiating -> TimeoutStage.WAITING_FOR_PEER_STATUS
+        Host.Confirming, Joiner.Confirming -> TimeoutStage.WAITING_FOR_CONFIRMATION
+        Host.Sending, Joiner.Waiting -> TimeoutStage.WAITING_FOR_RECOVERY_CODE
+        else -> null
     }
 
     // -----------------------------------------------------------------------
@@ -373,7 +410,11 @@ class RealExchangeV2Runner @Inject constructor(
 
     private suspend fun processIncomingLocked(message: ExchangeV2Message) {
         val sm = session ?: run {
-            logcat { "Sync-ExchangeV2: deliverIncomingMessage ${message.messageType} ignored — no active session" }
+            logcat { "Sync-ExchangeV2: deliverIncomingMessage ${message.messageType} rejected — no active session" }
+            emitSessionError(
+                "Received ${message.messageType} with no active pairing session",
+                SessionErrorKind.PairingSessionNotReady,
+            )
             return
         }
 
@@ -382,6 +423,13 @@ class RealExchangeV2Runner @Inject constructor(
         if (sm.currentState == ExchangeV2State.Joiner.Confirming && message.isJoinerWaitingPhase()) {
             logcat { "Sync-ExchangeV2: buffering ${message.messageType} (Joiner still in Confirming; will replay after user confirms)" }
             pendingJoinerWaitingMessages.add(message)
+            return
+        }
+
+        // Hello is only valid as the first inbound message. Surface it as UnexpectedSecondHello for a precise error.
+        if (message is ExchangeV2Message.Hello && sm.currentState != ExchangeV2State.Bootstrapped) {
+            logcat { "Sync-ExchangeV2: unexpected hello in state ${sm.currentState} — aborting" }
+            failSessionLocked("Unexpected hello received in state ${sm.currentState}", kind = SessionErrorKind.UnexpectedSecondHello)
             return
         }
 
@@ -433,8 +481,9 @@ class RealExchangeV2Runner @Inject constructor(
      * (or `recovery_code_unavailable` if it can't be produced), then advance the SM.
      */
     private fun shareRecoveryCodeAndAdvanceLocked() {
-        val responseOk = sendRecoveryCodeResponse()
         appScope.launch(dispatchers.io()) {
+            if (session == null) return@launch
+            val responseOk = sendRecoveryCodeResponse()
             mutex.withLock {
                 val s = session ?: return@withLock
                 if (s.currentState != ExchangeV2State.Host.Sending) return@withLock
@@ -605,10 +654,14 @@ class RealExchangeV2Runner @Inject constructor(
 
     /** Returns true if hello reached the relay; false signals a fatal abort to the caller. */
     private fun sendHello(): Boolean {
-        val own = ownChannelId ?: return false
-        val peer = peerChannelId ?: return false
-        val peerKey = peerPublicKey ?: return false
-        val ourKey = ownKeyPair ?: return false
+        val own = ownChannelId
+        val peer = peerChannelId
+        val peerKey = peerPublicKey
+        val ourKey = ownKeyPair
+        if (own == null || peer == null || peerKey == null || ourKey == null) {
+            emitSessionError("Cannot send hello — pairing session state is incomplete", SessionErrorKind.PairingSessionNotReady)
+            return false
+        }
         val json = JSONObject().apply {
             put("type", "hello")
             put("channel_id", own)
@@ -657,7 +710,7 @@ class RealExchangeV2Runner @Inject constructor(
      * `recovery_code_unavailable` to the peer + emitted a SessionError event, and the SM
      * should be driven to [ExchangeV2State.Host.Aborted] rather than Done).
      */
-    private fun sendRecoveryCodeResponse(): Boolean {
+    private suspend fun sendRecoveryCodeResponse(): Boolean {
         val peer = peerChannelId ?: return false
         val peerKey = peerPublicKey ?: return false
         // Recovery code per peer kind. Per spec §"Exchange Share Recovery Code": create the host
@@ -685,7 +738,10 @@ class RealExchangeV2Runner @Inject constructor(
                 logcat(ERROR) { "Sync-ExchangeV2: recovery code unavailable for peerKind=$_peerKind: ${codeResult.reason}" }
                 val json = """{"type":"recovery_code_unavailable"}"""
                 sendOnWireAndRecord(json, peer, peerKey, ExchangeV2Message.RecoveryCodeUnavailable(json))
-                emitSessionError("Couldn't generate a recovery code: ${codeResult.reason}")
+                emitSessionError(
+                    "Couldn't generate a recovery code: ${codeResult.reason}",
+                    SessionErrorKind.RecoveryCodePreparationFailed,
+                )
                 false
             }
         }
@@ -703,7 +759,7 @@ class RealExchangeV2Runner @Inject constructor(
             }
         }
 
-    private fun provisionForThirdPartyPeer(): Result<String> {
+    private suspend fun provisionForThirdPartyPeer(): Result<String> {
         when (val ddg = recoveryCodeProvider.createDdgAccountIfNeeded()) {
             is Result.Success -> Unit
             is Result.Error -> {
@@ -743,10 +799,20 @@ class RealExchangeV2Runner @Inject constructor(
                 true
             }
             is Result.Error -> {
-                emitSessionError("Failed to send message to peer over channel")
+                emitSessionError("Failed to send message to peer over channel (${r.code})", r.code.toSendFailureKind())
                 false
             }
         }
+    }
+
+    /**
+     * Map HTTP status returned by [ExchangeV2Channel.sendMessage] into a [SessionErrorKind]
+     * Allows us to differentiate between a peer-channel-gone (404/410), client-side malformed body (400), and a generic transport failure
+     */
+    private fun Int.toSendFailureKind(): SessionErrorKind = when (this) {
+        404, 410 -> SessionErrorKind.RelayChannelUnavailable
+        400 -> SessionErrorKind.MalformedRelayRequest
+        else -> SessionErrorKind.Unknown
     }
 
     override fun recordSentMessage(message: ExchangeV2Message) {
@@ -783,8 +849,12 @@ class RealExchangeV2Runner @Inject constructor(
         emit(ExchangeV2Event.SessionStarted(clock.nowMs(), role, ch, _linkingCode))
     }
 
-    private fun emitSessionError(message: String) {
-        emit(ExchangeV2Event.SessionError(clock.nowMs(), message))
+    private fun emitSessionError(
+        message: String,
+        kind: SessionErrorKind = SessionErrorKind.Unknown,
+        timeoutStage: TimeoutStage? = null,
+    ) {
+        emit(ExchangeV2Event.SessionError(clock.nowMs(), message, kind, timeoutStage))
     }
 
     private fun ExchangeV2State.isTerminal(): Boolean = when (this) {

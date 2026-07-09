@@ -30,4 +30,6 @@
     <dimen name="quickSetupRemoveWidgetStepNumberSize">28dp</dimen>
     <dimen name="browserModeToggleSegmentWidth">56dp</dimen>
     <dimen name="browserModeToggleSegmentHeight">40dp</dimen>
+    <dimen name="longPressMenuWidth">240dp</dimen>
+    <dimen name="longPressMenuLeadingIconSize">24dp</dimen>
 </resources>

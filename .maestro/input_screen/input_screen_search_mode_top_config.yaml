@@ -2,7 +2,6 @@ appId: com.duckduckgo.mobile.android
 name: "Input Screen Search Mode test (top config)"
 tags:
   - inputScreenTest
-  - releaseTest
 ---
 - retry:
     maxRetries: 3

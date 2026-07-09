@@ -39,6 +39,7 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
@@ -2320,6 +2321,7 @@ class DuckChatContextualViewModelTest {
         var nextUrl: String = ""
         private val automaticContextAttachment = MutableStateFlow(true)
         private val nativeInputFieldSettingEnabled = MutableStateFlow(false)
+        private val nativeChatInputEnabled = MutableStateFlow(false)
 
         override fun isEnabled(): Boolean = true
         override fun openDuckChat() = Unit
@@ -2340,19 +2342,22 @@ class DuckChatContextualViewModelTest {
         override suspend fun setInputScreenUserSetting(enabled: Boolean) = Unit
         override suspend fun isInputScreenEverEnabled(): Boolean = false
         override suspend fun setCosmeticInputScreenUserSetting(enabled: Boolean) = Unit
-        override fun observeInputScreenUserSettingEnabled(): Flow<Boolean> = kotlinx.coroutines.flow.emptyFlow()
-        override fun observeCosmeticInputScreenUserSettingEnabled(): Flow<Boolean?> = kotlinx.coroutines.flow.emptyFlow()
+        override fun observeInputScreenUserSettingEnabled(): Flow<Boolean> = emptyFlow()
+        override fun observeCosmeticInputScreenUserSettingEnabled(): Flow<Boolean?> = emptyFlow()
         override fun observeAutomaticContextAttachmentUserSettingEnabled(): Flow<Boolean> = automaticContextAttachment
         override fun observeNativeInputFieldUserSettingEnabled(): Flow<Boolean> = nativeInputFieldSettingEnabled
+        override fun observeNativeChatInputEnabled(): Flow<Boolean> = nativeChatInputEnabled
         override suspend fun isStandaloneMigrationCompleted(): Boolean = true
         override suspend fun setChatSuggestionsUserSetting(enabled: Boolean) = Unit
         override fun observeChatSuggestionsUserSettingEnabled(): Flow<Boolean> = flowOf(true)
         override fun openVoiceDuckChat() { }
         override fun isVoiceChatSessionActive(tabId: String): Boolean = false
         override val activeVoiceChatSessions: Flow<Set<String>> = flowOf(emptySet())
-        override fun observeTriggerVoiceChatSessionEnd(): Flow<String> = kotlinx.coroutines.flow.emptyFlow()
+        override fun observeTriggerVoiceChatSessionEnd(): Flow<String> = emptyFlow()
         override fun endVoiceChatSession(tabId: String) { }
         override suspend fun isChatHistoryAvailable(): Boolean = false
+        override suspend fun hasUserEnabledChatHistory(): Boolean = false
+        override fun observeHasChatSuggestions(): Flow<Boolean> = emptyFlow()
         override suspend fun onAddressBarPickerDuckAiSelected() = Unit
     }
 

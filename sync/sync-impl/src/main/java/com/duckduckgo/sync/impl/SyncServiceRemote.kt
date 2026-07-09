@@ -119,9 +119,6 @@ interface SyncApi {
     /** List this account's protected keys across all purposes. */
     fun getProtectedKeys(token: String): Result<List<ProtectedKeyEntry>>
 
-    /** Atomically claim [purpose] with [key] or no-op if one already exists. */
-    fun setProtectedKeyIfAbsent(token: String, purpose: String, keys: List<ProtectedKeyEntry>): Result<List<ProtectedKeyEntry>>
-
     fun getAccessCredentials(token: String): Result<List<AccessCredentialEntry>>
 
     fun createAccessCredential(
@@ -536,20 +533,6 @@ class SyncServiceRemote @Inject constructor(
             val result = Result.Error(response.code(), reason = response.message())
             result.removeKeysIfInvalid()
             return result
-        }
-    }
-
-    override fun setProtectedKeyIfAbsent(token: String, purpose: String, keys: List<ProtectedKeyEntry>): Result<List<ProtectedKeyEntry>> {
-        val response = runCatching {
-            val call = syncService.setProtectedKeyIfAbsent("Bearer $token", purpose, SetProtectedKeyIfAbsentRequest(keys))
-            call.execute()
-        }.getOrElse { throwable ->
-            return Result.Error(reason = throwable.message.toString())
-        }
-
-        return onSuccess(response) {
-            val keys = response.body()?.keys ?: emptyList()
-            Result.Success(keys)
         }
     }
 

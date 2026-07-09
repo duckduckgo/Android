@@ -14,9 +14,20 @@
   ~ limitations under the License.
   -->
 
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <style name="DuckPlayerBottomSheetDialogTheme" parent="@style/ThemeOverlay.MaterialComponents.BottomSheetDialog">
         <item name="bottomSheetStyle">@style/DuckPlayerBottomSheetStyle</item>
+    </style>
+
+    <!-- Opt-in variant used when EdgeToEdgeBucket.BOTTOM_SHEETS is enabled: draws the sheet behind the
+         transparent system bars (edge-to-edge, Android 15+); content clears the nav bar via
+         View.applyBottomSystemBarInsetPadding() and Material adds the top status-bar inset. -->
+    <style name="DuckPlayerBottomSheetDialogThemeEdgeToEdge" parent="DuckPlayerBottomSheetDialogTheme">
+        <item name="enableEdgeToEdge">true</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:enforceNavigationBarContrast" tools:targetApi="q">false</item>
+        <item name="paddingBottomSystemWindowInsets">false</item>
     </style>
 
     <style name="DuckPlayerBottomSheetStyle" parent="Widget.MaterialComponents.BottomSheet.Modal">
