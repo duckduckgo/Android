@@ -56,7 +56,7 @@
     <include
         android:id="@+id/bottomMockupToolbar"
         android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
+        android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         layout="@layout/include_omnibar_toolbar_mockup_bottom" />
 

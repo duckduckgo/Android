@@ -911,6 +911,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
             enableEdgeToEdge(statusBarStyle = barStyle, navigationBarStyle = barStyle)
             edgeToEdgeHandler.applyStatusBarAndHorizontalInsets(binding.root, installScrim = false)
             edgeToEdgeHandler.applyNavigationBarInsets(binding.navigationBarMockup.root)
+            edgeToEdgeHandler.applyNavigationBarInsets(binding.bottomMockupToolbar.appBarLayoutMockup)
             applyDisplayCutoutMode(resources.configuration.orientation)
         }
     }
