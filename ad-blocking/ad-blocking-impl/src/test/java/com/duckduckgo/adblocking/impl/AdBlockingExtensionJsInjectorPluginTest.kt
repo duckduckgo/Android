@@ -16,6 +16,7 @@
 
 package com.duckduckgo.adblocking.impl
 
+import android.net.Uri
 import android.webkit.WebView
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.adblocking.impl.domain.AdBlockingStatusChecker
@@ -35,6 +36,7 @@ import org.mockito.kotlin.isNull
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(AndroidJUnit4::class)
@@ -61,12 +63,17 @@ class AdBlockingExtensionJsInjectorPluginTest {
         Scriptlet(name = isolatedName, content = "console.log('a')"),
     )
 
+    private val mockDomainMatcher: AdBlockingExtensionDomainMatcher = mock() {
+        on { matches(any<Uri>()) } doReturn true
+        on { matches(any<String>()) } doReturn true
+    }
+
     private val plugin by lazy {
         AdBlockingExtensionJsInjectorPlugin(
             statusChecker = statusChecker,
             repository = repository,
             contingencyMessageHandler = contingencyMessageHandler,
-            domainMatcher = AdBlockingExtensionDomainMatcher(),
+            domainMatcher = mockDomainMatcher,
             appScope = testScope,
         )
     }
@@ -130,6 +137,7 @@ class AdBlockingExtensionJsInjectorPluginTest {
     @Test
     fun whenUrlHostNotInConfiguredDomainsThenScriptIsNotInjected() {
         scriptletsFlow.value = singleScriptlet
+        whenever(mockDomainMatcher.matches(any<String>())).thenReturn(false)
 
         plugin.onPageStarted(webView, url = "https://example.com/page", isDesktopMode = null)
 
@@ -167,6 +175,7 @@ class AdBlockingExtensionJsInjectorPluginTest {
     @Test
     fun whenUrlHasNoHostThenScriptIsNotInjected() {
         scriptletsFlow.value = singleScriptlet
+        whenever(mockDomainMatcher.matches(any<String>())).thenReturn(false)
 
         plugin.onPageStarted(webView, url = "data:text/html,<p>hi</p>", isDesktopMode = null)
 

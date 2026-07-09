@@ -17,6 +17,7 @@
 package com.duckduckgo.adblocking.impl
 
 import android.annotation.SuppressLint
+import android.net.Uri
 import android.webkit.WebView
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.adblocking.impl.remoteconfig.AdBlockingExtensionFeature
@@ -34,8 +35,10 @@ import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @SuppressLint("DenyListedApi") // setRawStoredState
@@ -61,11 +64,16 @@ class RealContingencyMessageHandlerTest {
 
     private val view = FakeContingencyMessageView()
 
+    private val mockDomainMatcher: AdBlockingExtensionDomainMatcher = mock() {
+        on { matches(any<Uri>()) } doReturn true
+        on { matches(any<String>()) } doReturn true
+    }
+
     private val handler = RealContingencyMessageHandler(
         feature = feature,
         store = store,
         view = view,
-        domainMatcher = AdBlockingExtensionDomainMatcher(),
+        domainMatcher = mockDomainMatcher,
         appScope = coroutineRule.testScope,
         dispatchers = coroutineRule.testDispatcherProvider,
     )
@@ -113,6 +121,7 @@ class RealContingencyMessageHandlerTest {
     @Test
     fun whenUrlIsNotYouTubeThenShouldNotShow() {
         setToggles(uxImprovements = true, contingency = true)
+        whenever(mockDomainMatcher.matches(any<String>())).thenReturn(false)
 
         assertFalse(handler.shouldShow("https://example.com/watch?v=abc"))
     }
@@ -230,7 +239,7 @@ class RealContingencyMessageHandlerTest {
         feature = feature,
         store = store,
         view = view,
-        domainMatcher = AdBlockingExtensionDomainMatcher(),
+        domainMatcher = mockDomainMatcher,
         appScope = coroutineRule.testScope,
         dispatchers = coroutineRule.testDispatcherProvider,
     )

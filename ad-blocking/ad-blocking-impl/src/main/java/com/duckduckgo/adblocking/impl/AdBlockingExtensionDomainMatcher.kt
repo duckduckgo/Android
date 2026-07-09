@@ -16,10 +16,12 @@
 
 package com.duckduckgo.adblocking.impl
 
+import android.net.Uri
 import androidx.core.net.toUri
 import com.duckduckgo.app.browser.Domain
 import com.duckduckgo.app.browser.UriString
 import com.duckduckgo.di.scopes.AppScope
+import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import javax.inject.Inject
 
@@ -27,13 +29,23 @@ import javax.inject.Inject
  * Single source of truth for the domains the ad-blocking extension operates on. A subdomain
  * match means `youtube.com` also covers `m.youtube.com`, `www.youtube.com`, etc.
  */
-@SingleInstanceIn(AppScope::class)
-class AdBlockingExtensionDomainMatcher @Inject constructor() {
 
-    fun matches(url: String?): Boolean {
+interface AdBlockingExtensionDomainMatcher {
+    fun matches(url: String?): Boolean
+
+    fun matches(uri: Uri): Boolean
+}
+
+@ContributesBinding(AppScope::class)
+@SingleInstanceIn(AppScope::class)
+class RealAdBlockingExtensionDomainMatcher @Inject constructor() : AdBlockingExtensionDomainMatcher {
+
+    override fun matches(url: String?): Boolean {
         val uri = url?.toUri() ?: return false
-        return DOMAINS.any { UriString.sameOrSubdomain(uri, it) }
+        return matches(uri)
     }
+
+    override fun matches(uri: Uri): Boolean = DOMAINS.any { UriString.sameOrSubdomain(uri, it) }
 
     private companion object {
         val DOMAINS = listOf(
