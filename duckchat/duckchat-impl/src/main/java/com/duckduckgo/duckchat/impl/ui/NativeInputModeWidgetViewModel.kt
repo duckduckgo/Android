@@ -610,6 +610,18 @@ class NativeInputModeWidgetViewModel @Inject constructor(
         duckChatPixels.fireDuckAiSearchDuckDuckGoSuggestionClicked()
     }
 
+    fun fireRecentChatDeleteButtonTappedPixel() {
+        duckChatPixels.fireRecentChatDeleteButtonTapped()
+    }
+
+    fun fireRecentChatDeleteConfirmedPixel() {
+        duckChatPixels.fireRecentChatDeleteConfirmed()
+    }
+
+    fun fireRecentChatDeleteCancelledPixel() {
+        duckChatPixels.fireRecentChatDeleteCancelled()
+    }
+
     fun buildChatSuggestionUrl(suggestion: ChatSuggestion): String =
         duckChatInternal.buildChatUrl(suggestion.chatId)
 
