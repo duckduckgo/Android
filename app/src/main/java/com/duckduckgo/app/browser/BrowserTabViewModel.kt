@@ -3592,7 +3592,13 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
-    fun onNewTabMenuItemClicked(longPress: Boolean = false) {
+    fun onNewTabMenuItemClicked(longPress: Boolean = false): Boolean {
+        val state = currentBrowserViewState()
+        val isOnNewTabPage = !state.browserShowing && !state.maliciousSiteBlocked && state.sslError == NONE
+        if (longPress && isOnNewTabPage) {
+            return false
+        }
+
         openNewTab()
 
         if (longPress) {
@@ -3607,6 +3613,8 @@ class BrowserTabViewModel @Inject constructor(
                 }
             }
         }
+
+        return true
     }
 
     fun onNavigationBarNewTabButtonClicked() {

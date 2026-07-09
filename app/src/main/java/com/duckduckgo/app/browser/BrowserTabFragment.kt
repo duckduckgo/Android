@@ -1621,8 +1621,8 @@ class BrowserTabFragment :
         launch { viewModel.userLaunchingTabSwitcher(omnibar.viewMode, omnibar.getText().isEmpty() && omnibar.omnibarTextInput.hasFocus()) }
     }
 
-    private fun onTabsButtonLongPressed() {
-        launch { viewModel.onNewTabMenuItemClicked(longPress = true) }
+    private fun onTabsButtonLongPressed(): Boolean {
+        return viewModel.onNewTabMenuItemClicked(longPress = true)
     }
 
     private fun onUserSubmittedText(text: String) {
@@ -3927,8 +3927,8 @@ class BrowserTabFragment :
                     this@BrowserTabFragment.onTabsButtonPressed()
                 }
 
-                override fun onTabsButtonLongPressed() {
-                    this@BrowserTabFragment.onTabsButtonLongPressed()
+                override fun onTabsButtonLongPressed(): Boolean {
+                    return this@BrowserTabFragment.onTabsButtonLongPressed()
                 }
 
                 override fun onFireButtonPressed() {
