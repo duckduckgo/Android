@@ -14,24 +14,20 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.adblocking.impl.duckplayer
+package com.duckduckgo.adblocking.impl.ui
 
 import android.annotation.SuppressLint
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.duckduckgo.adblocking.api.duckplayer.DuckPlayer.DuckPlayerState.DISABLED_WIH_HELP_LINK
-import com.duckduckgo.adblocking.api.duckplayer.DuckPlayer.DuckPlayerState.ENABLED
+import com.duckduckgo.adblocking.impl.domain.AdBlockingState
 import com.duckduckgo.adblocking.impl.domain.AdBlockingStatusChecker
 import com.duckduckgo.adblocking.impl.domain.SettingsPlacement
-import com.duckduckgo.adblocking.impl.duckplayer.DuckPlayerPixelName.DUCK_PLAYER_SETTINGS_PRESSED
-import com.duckduckgo.adblocking.impl.duckplayer.DuckPlayerSettingsEntryViewModel.Command.OpenSettings
+import com.duckduckgo.adblocking.impl.ui.AdBlockingProtectionsSettingsEntryViewModel.Command.OpenSettings
 import com.duckduckgo.anvil.annotations.ContributesViewModel
-import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
-import com.duckduckgo.common.utils.extensions.toBinaryString
 import com.duckduckgo.di.scopes.ViewScope
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
@@ -48,14 +44,15 @@ import javax.inject.Inject
 
 @SuppressLint("NoLifecycleObserver") // we don't observe app lifecycle
 @ContributesViewModel(ViewScope::class)
-class DuckPlayerSettingsEntryViewModel @Inject constructor(
-    private val duckPlayer: DuckPlayerInternal,
+class AdBlockingProtectionsSettingsEntryViewModel @Inject constructor(
     private val statusChecker: AdBlockingStatusChecker,
-    private val pixel: Pixel,
     private val dispatcherProvider: DispatcherProvider,
 ) : ViewModel(), DefaultLifecycleObserver {
 
-    data class ViewState(val isVisible: Boolean = false)
+    data class ViewState(
+        val isVisible: Boolean = false,
+        val isOn: Boolean = false,
+    )
 
     sealed class Command {
         data object OpenSettings : Command()
@@ -73,12 +70,15 @@ class DuckPlayerSettingsEntryViewModel @Inject constructor(
         super.onStart(owner)
 
         viewStateJob += combine(
-            duckPlayer.observeDuckPlayerState(),
             statusChecker.settingsPlacementFlow(),
-        ) { duckPlayerState, adBlockingPlacement ->
-            val isVisible = adBlockingPlacement == SettingsPlacement.Hidden &&
-                (duckPlayerState == ENABLED || duckPlayerState == DISABLED_WIH_HELP_LINK)
-            _viewState.update { it.copy(isVisible = isVisible) }
+            statusChecker.observeState(),
+        ) { placement, state ->
+            _viewState.update {
+                it.copy(
+                    isVisible = placement == SettingsPlacement.Protections,
+                    isOn = state is AdBlockingState.Enabled,
+                )
+            }
         }
             .flowOn(dispatcherProvider.io())
             .launchIn(viewModelScope)
@@ -92,8 +92,6 @@ class DuckPlayerSettingsEntryViewModel @Inject constructor(
     fun onSettingClicked() {
         viewModelScope.launch {
             command.send(OpenSettings)
-            val wasUsedBefore = duckPlayer.wasUsedBefore()
-            pixel.fire(DUCK_PLAYER_SETTINGS_PRESSED, parameters = mapOf("was_used_before" to wasUsedBefore.toBinaryString()))
         }
     }
 }

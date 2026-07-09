@@ -22,13 +22,12 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.adblocking.impl.domain.AdBlockingStatusChecker
-import com.duckduckgo.adblocking.impl.remoteconfig.AdBlockingExtensionFeature
+import com.duckduckgo.adblocking.impl.domain.SettingsPlacement
 import com.duckduckgo.adblocking.impl.ui.AdBlockingSettingsEntryViewModel.Command.OpenSettings
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ViewScope
-import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -47,13 +46,12 @@ import javax.inject.Inject
 class AdBlockingSettingsEntryViewModel @Inject constructor(
     private val statusChecker: AdBlockingStatusChecker,
     private val dispatcherProvider: DispatcherProvider,
-    private val feature: AdBlockingExtensionFeature,
 ) : ViewModel(), DefaultLifecycleObserver {
 
     data class ViewState(val isVisible: Boolean = false)
 
     sealed class Command {
-        data class OpenSettings(val params: ActivityParams) : Command()
+        data object OpenSettings : Command()
     }
 
     private val command = Channel<Command>(1, BufferOverflow.DROP_OLDEST)
@@ -67,8 +65,8 @@ class AdBlockingSettingsEntryViewModel @Inject constructor(
     override fun onStart(owner: LifecycleOwner) {
         super.onStart(owner)
 
-        viewStateJob += statusChecker.isShownInSettingsFlow()
-            .onEach { isShownInSettings -> _viewState.update { it.copy(isVisible = isShownInSettings) } }
+        viewStateJob += statusChecker.settingsPlacementFlow()
+            .onEach { placement -> _viewState.update { it.copy(isVisible = placement == SettingsPlacement.Other) } }
             .flowOn(dispatcherProvider.io())
             .launchIn(viewModelScope)
     }
@@ -80,12 +78,7 @@ class AdBlockingSettingsEntryViewModel @Inject constructor(
 
     fun onSettingClicked() {
         viewModelScope.launch {
-            val params = if (feature.adBlockingUXImprovements().isEnabled()) {
-                AdBlockingSettingsV2NoParams
-            } else {
-                AdBlockingSettingsNoParams
-            }
-            command.send(OpenSettings(params))
+            command.send(OpenSettings)
         }
     }
 }
