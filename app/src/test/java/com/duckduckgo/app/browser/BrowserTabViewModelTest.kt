@@ -121,7 +121,6 @@ import com.duckduckgo.app.browser.logindetection.LoginDetected
 import com.duckduckgo.app.browser.logindetection.NavigationAwareLoginDetector
 import com.duckduckgo.app.browser.logindetection.NavigationEvent
 import com.duckduckgo.app.browser.logindetection.NavigationEvent.LoginAttempt
-import com.duckduckgo.app.browser.menu.DownloadMenuStateProvider
 import com.duckduckgo.app.browser.menu.VpnMenuStateProvider
 import com.duckduckgo.app.browser.model.BasicAuthenticationCredentials
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
@@ -298,6 +297,7 @@ import com.duckduckgo.downloads.api.DownloadStateListener
 import com.duckduckgo.downloads.api.DownloadsRepository
 import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
+import com.duckduckgo.downloads.api.NewDownloadState
 import com.duckduckgo.downloads.api.model.DownloadItem
 import com.duckduckgo.downloads.store.DownloadStatus
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
@@ -715,7 +715,7 @@ class BrowserTabViewModelTest {
     private val mockInlinePdfHandler: InlinePdfHandler = mock()
     private val mockPdfDownloadTooltipDataStore: PdfDownloadTooltipDataStore = mock()
     private val mockCachedFileDownloader: CachedFileDownloader = mock()
-    private val mockDownloadMenuStateProvider: DownloadMenuStateProvider = mock()
+    private val mockNewDownloadState: NewDownloadState = mock()
     private val mockDownloadsRepository: DownloadsRepository = mock()
     private val mockSerpEasterEggLogosToggles: SerpEasterEggLogosToggles = mock()
     private val mockSetFavouriteToggle: Toggle = mock()
@@ -1043,7 +1043,7 @@ class BrowserTabViewModelTest {
                 inlinePdfHandler = mockInlinePdfHandler,
                 pdfDownloadTooltipDataStore = mockPdfDownloadTooltipDataStore,
                 cachedFileDownloader = mockCachedFileDownloader,
-                downloadMenuStateProvider = mockDownloadMenuStateProvider,
+                newDownloadState = mockNewDownloadState,
                 downloadsRepository = mockDownloadsRepository,
                 onboardingBrandDesignUpdateToggles = mockOnboardingBrandDesignUpdateToggles,
                 onboardingStore = mockOnboardingStore,
@@ -11643,7 +11643,7 @@ class BrowserTabViewModelTest {
         advanceUntilIdle()
 
         verify(mockCachedFileDownloader, never()).saveToDownloads(any(), any(), any())
-        verify(mockDownloadMenuStateProvider, never()).onDownloadComplete()
+        verify(mockNewDownloadState, never()).onDownloadComplete()
     }
 
     @Test
@@ -11659,7 +11659,7 @@ class BrowserTabViewModelTest {
         testee.onDownloadPdfMenuItemClicked()
         advanceUntilIdle()
 
-        verify(mockDownloadMenuStateProvider).onDownloadComplete()
+        verify(mockNewDownloadState).onDownloadComplete()
     }
 
     @Test
@@ -11673,7 +11673,7 @@ class BrowserTabViewModelTest {
         testee.onDownloadPdfMenuItemClicked()
         advanceUntilIdle()
 
-        verify(mockDownloadMenuStateProvider, never()).onDownloadComplete()
+        verify(mockNewDownloadState, never()).onDownloadComplete()
     }
 
     @Test

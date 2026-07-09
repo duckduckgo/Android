@@ -96,6 +96,7 @@ dependencies {
     testImplementation Testing.robolectric
     testImplementation project(path: ':common-test')
     testImplementation project(':feature-toggles-test')
+    testImplementation project(':data-store-test')
 
     coreLibraryDesugaring Android.tools.desugarJdkLibs
 }

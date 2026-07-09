@@ -23,7 +23,7 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.formatters.time.RealTimeDiffFormatter
 import com.duckduckgo.common.utils.formatters.time.TimeDiffFormatter
 import com.duckduckgo.downloads.api.DownloadsRepository
-import com.duckduckgo.downloads.api.DownloadsScreenViewedListener
+import com.duckduckgo.downloads.api.NewDownloadState
 import com.duckduckgo.downloads.api.model.DownloadItem
 import com.duckduckgo.downloads.impl.DownloadViewItem.Empty
 import com.duckduckgo.downloads.impl.DownloadViewItem.Header
@@ -62,7 +62,7 @@ class DownloadsViewModelTest {
 
     private val mockDownloadsRepository: DownloadsRepository = mock()
 
-    private val mockDownloadsScreenViewedListener: DownloadsScreenViewedListener = mock()
+    private val mockNewDownloadState: NewDownloadState = mock()
 
     private val context: Context = mock()
 
@@ -72,7 +72,7 @@ class DownloadsViewModelTest {
                 FakeTimeDiffFormatter(TODAY, RealTimeDiffFormatter(context)),
                 mockDownloadsRepository,
                 coroutineRule.testDispatcherProvider,
-                mockDownloadsScreenViewedListener,
+                mockNewDownloadState,
             )
         model
     }
@@ -381,7 +381,7 @@ class DownloadsViewModelTest {
 
         testee.syncDownloads()
 
-        verify(mockDownloadsScreenViewedListener).onDownloadsScreenViewed()
+        verify(mockNewDownloadState).onDownloadsScreenViewed()
     }
 
     private fun oneItem() =

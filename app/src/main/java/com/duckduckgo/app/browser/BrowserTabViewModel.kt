@@ -194,7 +194,6 @@ import com.duckduckgo.app.browser.logindetection.FireproofDialogsEventHandler.Ev
 import com.duckduckgo.app.browser.logindetection.LoginDetected
 import com.duckduckgo.app.browser.logindetection.NavigationAwareLoginDetector
 import com.duckduckgo.app.browser.logindetection.NavigationEvent
-import com.duckduckgo.app.browser.menu.DownloadMenuStateProvider
 import com.duckduckgo.app.browser.menu.VpnMenuStateProvider
 import com.duckduckgo.app.browser.model.BasicAuthenticationCredentials
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
@@ -363,6 +362,7 @@ import com.duckduckgo.downloads.api.DownloadStateListener
 import com.duckduckgo.downloads.api.DownloadsRepository
 import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
+import com.duckduckgo.downloads.api.NewDownloadState
 import com.duckduckgo.downloads.api.model.DownloadItem
 import com.duckduckgo.downloads.store.DownloadStatus
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
@@ -573,7 +573,7 @@ class BrowserTabViewModel @Inject constructor(
     private val inlinePdfHandler: InlinePdfHandler,
     private val pdfDownloadTooltipDataStore: PdfDownloadTooltipDataStore,
     private val cachedFileDownloader: CachedFileDownloader,
-    private val downloadMenuStateProvider: DownloadMenuStateProvider,
+    private val newDownloadState: NewDownloadState,
     private val downloadsRepository: DownloadsRepository,
     private val onboardingBrandDesignUpdateToggles: OnboardingBrandDesignUpdateToggles,
     private val onboardingStore: OnboardingStore,
@@ -4194,7 +4194,7 @@ class BrowserTabViewModel @Inject constructor(
                         filePath = savedFilePath,
                     ),
                 )
-                downloadMenuStateProvider.onDownloadComplete()
+                newDownloadState.onDownloadComplete()
                 pdfDownloadCommandFlow.emit(
                     DownloadCommand.ShowDownloadSuccessMessage(
                         messageId = com.duckduckgo.downloads.impl.R.string.downloadsDownloadFinishedMessage,

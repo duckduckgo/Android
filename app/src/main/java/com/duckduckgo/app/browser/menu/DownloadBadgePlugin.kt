@@ -18,14 +18,15 @@ package com.duckduckgo.app.browser.menu
 
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.downloads.api.FileDownloadCallbackPlugin
+import com.duckduckgo.downloads.api.NewDownloadState
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 
 @ContributesMultibinding(AppScope::class)
 class DownloadBadgePlugin @Inject constructor(
-    private val downloadMenuStateProvider: DownloadMenuStateProvider,
+    private val newDownloadState: NewDownloadState,
 ) : FileDownloadCallbackPlugin {
     override fun onFileDownloaded() {
-        downloadMenuStateProvider.onDownloadComplete()
+        newDownloadState.onDownloadComplete()
     }
 }
