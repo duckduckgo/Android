@@ -3,6 +3,7 @@
         "description": "Fired when a Sync promotion is shown to the user.",
         "owners": ["MiSikora"],
         "triggers": ["other"],
+        "suffixes": ["form_factor"],
         "parameters": [
             "appVersion",
             {
@@ -17,6 +18,7 @@
         "description": "Fired when the user taps a Sync promotion to start setting up Sync.",
         "owners": ["MiSikora"],
         "triggers": ["other"],
+        "suffixes": ["form_factor"],
         "parameters": [
             "appVersion",
             {
@@ -31,6 +33,7 @@
         "description": "Fired when a Sync promotion is dismissed by the user or after its impression cap is reached.",
         "owners": ["MiSikora"],
         "triggers": ["other"],
+        "suffixes": ["form_factor"],
         "parameters": [
             "appVersion",
             {
