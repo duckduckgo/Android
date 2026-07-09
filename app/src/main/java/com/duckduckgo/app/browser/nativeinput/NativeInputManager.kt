@@ -107,6 +107,7 @@ interface NativeInputManager {
     fun init(
         omnibar: Omnibar,
         rootView: ViewGroup,
+        topNavRootView: ViewGroup,
         lifecycleOwner: LifecycleOwner,
         onDisabled: () -> Unit = {},
     )
@@ -199,12 +200,13 @@ class RealNativeInputManager @Inject constructor(
     override fun init(
         omnibar: Omnibar,
         rootView: ViewGroup,
+        topNavRootView: ViewGroup,
         lifecycleOwner: LifecycleOwner,
         onDisabled: () -> Unit,
     ) {
         this.omnibarController = RealNativeInputOmnibarController(omnibar, rootView, nativeInputStateBugKillSwitch)
         this.rootView = rootView
-        this.layoutCoordinator = NativeInputLayoutCoordinator(rootView, this.omnibarController)
+        this.layoutCoordinator = NativeInputLayoutCoordinator(rootView, topNavRootView, this.omnibarController)
         duckChat.observeNativeInputFieldUserSettingEnabled()
             .onEach { isEnabled ->
                 if (isNativeInputFieldEnabled && !isEnabled) onDisabled()

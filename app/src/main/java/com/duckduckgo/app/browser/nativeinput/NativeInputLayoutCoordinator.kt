@@ -30,6 +30,7 @@ import com.google.android.material.card.MaterialCardView
 
 class NativeInputLayoutCoordinator(
     private val rootView: ViewGroup,
+    private val topNavRootView: ViewGroup,
     private val omnibarState: OmnibarState,
 ) {
     private data class Padding(val left: Int, val top: Int, val right: Int, val bottom: Int)
@@ -165,6 +166,7 @@ class NativeInputLayoutCoordinator(
 
     fun configureContentOffset(widgetView: View, isBottom: Boolean) {
         data class Target(val view: View, val basePadding: Padding)
+
         val newTabContent =
             rootView.findViewById<View?>(R.id.newTabPage)
                 ?: rootView.findViewById(R.id.includeNewBrowserTab)

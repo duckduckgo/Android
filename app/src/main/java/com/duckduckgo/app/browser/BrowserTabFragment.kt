@@ -1229,11 +1229,19 @@ class BrowserTabFragment :
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
 
+        val omnibarType = settingsDataStore.omnibarType
         omnibar = Omnibar(
-            omnibarType = settingsDataStore.omnibarType,
+            omnibarType = omnibarType,
             binding = binding,
         )
-        nativeInputManager.init(omnibar, binding.rootView, viewLifecycleOwner) {
+
+        val nativeInputRoot = if (omnibarType == OmnibarType.SINGLE_BOTTOM){
+            binding.rootView
+        } else {
+            binding.includeInputFieldNavBarRoot
+        }
+
+        nativeInputManager.init(omnibar, binding.rootView, binding.includeInputFieldNavBarRoot, viewLifecycleOwner) {
             nativeInputManager.hideNativeInput()
         }
 

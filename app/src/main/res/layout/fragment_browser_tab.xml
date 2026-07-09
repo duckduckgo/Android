@@ -20,6 +20,19 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <LinearLayout
+        android:id="@+id/includeInputFieldNavBarRoot"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <include
+            android:id="@+id/includeInputFieldNavBar"
+            layout="@layout/input_mode_widget_nav_bar" />
+
+    </LinearLayout>
+
+
     <FrameLayout
         android:id="@+id/webViewFullScreenContainer"
         android:layout_width="match_parent"
