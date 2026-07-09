@@ -3419,6 +3419,33 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenUserRequestedToOpenNewTabByLongPressAndBrowserShowingThenReturnsTrue() {
+        setBrowserShowing(true)
+
+        val handled = testee.onNewTabMenuItemClicked(longPress = true)
+
+        assertTrue(handled)
+    }
+
+    @Test
+    fun whenUserRequestedToOpenNewTabByLongPressAndAlreadyOnNewTabPageThenReturnsFalse() {
+        setBrowserShowing(false)
+
+        val handled = testee.onNewTabMenuItemClicked(longPress = true)
+
+        assertFalse(handled)
+    }
+
+    @Test
+    fun whenUserRequestedToOpenNewTabByNormalClickAndAlreadyOnNewTabPageThenReturnsTrue() {
+        setBrowserShowing(false)
+
+        val handled = testee.onNewTabMenuItemClicked(longPress = false)
+
+        assertTrue(handled)
+    }
+
+    @Test
     fun whenNewTabMenuItemClickedAndEmptyTabExistsAndInputScreenDisabledThenShowKeyboard() =
         runTest {
             swipingTabsFeature.self().setRawStoredState(State(enable = true))
